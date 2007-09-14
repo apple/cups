@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 6758 2007-08-02 00:13:44Z mike $"
+ * "$Id: client.h 6949 2007-09-12 21:33:23Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -30,7 +30,7 @@ struct cupsd_client_s
   time_t		start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
-  char			username[33],	/* Username from Authorization: line */
+  char			username[256],	/* Username from Authorization: line */
 			password[33],	/* Password from Authorization: line */
 			uri[HTTP_MAX_URI],
 					/* Localized URL/URI for GET/PUT */
@@ -131,5 +131,5 @@ extern void	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 6758 2007-08-02 00:13:44Z mike $".
+ * End of "$Id: client.h 6949 2007-09-12 21:33:23Z mike $".
  */

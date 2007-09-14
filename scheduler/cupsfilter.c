@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsfilter.c 6695 2007-07-19 21:59:30Z mike $"
+ * "$Id: cupsfilter.c 6816 2007-08-20 20:16:00Z mike $"
  *
  *   CUPS filtering program for the Common UNIX Printing System (CUPS).
  *
@@ -76,8 +76,9 @@ static int	exec_filter(const char *filter, char **argv, char **envp,
 		            int infd, int outfd);
 static int	exec_filters(cups_array_t *filters, const char *infile,
 		             const char *outfile, const char *ppdfile,
-			     const char *user, const char *title,
-			     int num_options, cups_option_t *options);
+			     const char *printer, const char *user,
+			     const char *title, int num_options,
+			     cups_option_t *options);
 static int	open_pipe(int *fds);
 static int	read_cupsd_conf(const char *filename);
 static void	set_string(char **s, const char *val);
@@ -396,8 +397,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Do it!
   */
 
-  status = exec_filters(filters, infile, outfile, ppdfile, user, title,
-                        num_options, options);
+  status = exec_filters(filters, infile, outfile, ppdfile,
+                        !strcmp(command, "convert") ? "tofile" : "cupsfilter",
+			user, title, num_options, options);
 
  /*
   * Remove files as needed, then exit...
@@ -590,6 +592,7 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
              const char    *infile,	/* I - File to filter */
 	     const char    *outfile,	/* I - File to create */
 	     const char    *ppdfile,	/* I - PPD file, if any */
+	     const char    *printer,	/* I - Printer name */
 	     const char    *user,	/* I - Username */
 	     const char    *title,	/* I - Job title */
              int           num_options,	/* I - Number of filter options */
@@ -643,17 +646,24 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
     snprintf(ppd, sizeof(ppd), "PPD=%s", temp);
   else
 #ifdef __APPLE__
+  if (!access("/System/Library/Frameworks/ApplicationServices.framework/"
+	      "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
+	      "Resources/English.lproj/Generic.ppd", 0))
     strlcpy(ppd, "PPD=/System/Library/Frameworks/ApplicationServices.framework/"
                  "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
 		 "Resources/English.lproj/Generic.ppd", sizeof(ppd));
+  else
+    strlcpy(ppd, "PPD=/System/Library/Frameworks/ApplicationServices.framework/"
+                 "Versions/A/Frameworks/PrintCore.framework/Versions/A/"
+		 "Resources/Generic.ppd", sizeof(ppd));
 #else
     snprintf(ppd, sizeof(ppd), "PPD=%s/model/laserjet.ppd", DataDir);
 #endif /* __APPLE__ */
   snprintf(rip_cache, sizeof(rip_cache), "RIP_CACHE=%s", RIPCache);
   snprintf(userenv, sizeof(userenv), "USER=%s", user);
 
-  argv[0] = "cupsfilter";
-  argv[1] = "0";
+  argv[0] = (char *)printer;
+  argv[1] = "1";
   argv[2] = user;
   argv[3] = title;
   argv[4] = cupsGetOption("copies", num_options, options);
@@ -982,5 +992,5 @@ usage(const char *command,		/* I - Command name */
 
 
 /*
- * End of "$Id: cupsfilter.c 6695 2007-07-19 21:59:30Z mike $".
+ * End of "$Id: cupsfilter.c 6816 2007-08-20 20:16:00Z mike $".
  */

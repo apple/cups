@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6758 2007-08-02 00:13:44Z mike $"
+ * "$Id: auth.c 6949 2007-09-12 21:33:23Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -83,6 +83,9 @@
 extern const char *cssmErrorString(int error);
 #  endif /* HAVE_SECBASEPRIV_H */
 #endif /* HAVE_AUTHORIZATION_H */
+#ifdef HAVE_SYS_PARAM_H
+#  include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */
 #ifdef HAVE_SYS_UCRED_H
 #  include <sys/ucred.h>
 typedef struct xucred cupsd_ucred_t;
@@ -329,7 +332,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   int		type;			/* Authentication type */
   const char	*authorization;		/* Pointer into Authorization string */
   char		*ptr,			/* Pointer into string */
-		username[65],		/* Username string */
+		username[256],		/* Username string */
 		password[33];		/* Password string */
   const char	*localuser;		/* Certificate username */
   char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
@@ -371,28 +374,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       type = DefaultAuthType;
     else
       type = con->best->type;
-  }
-  else if (!strncmp(con->uri, "/printers/", 10) ||
-           !strncmp(con->uri, "/classes/", 9))
-  {
-   /*
-    * Lookup the printer or class and see what kind of authentication it
-    * needs...
-    */
-
-    cupsd_printer_t	*p;		/* Printer or class */
-
-
-    if (!strncmp(con->uri, "/printers/", 10))
-      p = cupsdFindDest(con->uri + 10);
-    else
-      p = cupsdFindDest(con->uri + 9);
-
-    if (p && p->num_auth_info_required > 0 &&
-        !strcmp(p->auth_info_required[0], "negotiate"))
-      type = AUTH_NEGOTIATE;
-    else
-      type = DefaultAuthType;       
   }
   else
     type = DefaultAuthType;
@@ -936,7 +917,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		    username);
   }
 #ifdef HAVE_GSSAPI
-  else if (!strncmp(authorization, "Negotiate", 9) && type == AUTH_NEGOTIATE) 
+  else if (!strncmp(authorization, "Negotiate", 9)) 
   {
     int			len;		/* Length of authorization string */
     gss_cred_id_t	server_creds;	/* Server credentials */
@@ -1064,8 +1045,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
-      if ((ptr = strchr(username, '@')) != NULL)
-        *ptr = '\0';			/* Strip @KDC from the username */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Negotiate",
@@ -1818,7 +1797,9 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
-  const char		*username;	/* Username to authorize */
+  char			username[256],	/* Username to authorize */
+			ownername[256],	/* Owner name to authorize */
+			*ptr;		/* Pointer into username */
   struct passwd		*pw;		/* User password data */
   static const char * const levels[] =	/* Auth levels */
 		{
@@ -1998,7 +1979,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "cupsdIsAuthorized: requesting-user-name=\"%s\"",
                       attr->values[0].string.text);
-      username = attr->values[0].string.text;
+      strlcpy(username, attr->values[0].string.text, sizeof(username));
     }
     else if (best->satisfy == AUTH_SATISFY_ALL || auth == AUTH_DENY)
       return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
@@ -2022,7 +2003,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	return (HTTP_OK);		/* unless overridden with Satisfy */
     }
 
-    username = con->username;
+    strlcpy(username, con->username, sizeof(username));
   }
 
  /*
@@ -2032,6 +2013,23 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   if (!strcmp(username, "root"))
     return (HTTP_OK);
+
+ /*
+  * Strip any @domain or @KDC from the username and owner...
+  */
+
+  if ((ptr = strchr(username, '@')) != NULL)
+    *ptr = '\0';
+
+  if (owner)
+  {
+    strlcpy(ownername, owner, sizeof(ownername));
+
+    if ((ptr = strchr(ownername, '@')) != NULL)
+      *ptr = '\0';
+  }
+  else
+    ownername[0] = '\0';
 
  /*
   * Get the user info...
@@ -2088,7 +2086,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     for (i = 0; i < best->num_names; i ++)
     {
       if (!strcasecmp(best->names[i], "@OWNER") && owner &&
-          !strcasecmp(username, owner))
+          !strcasecmp(username, ownername))
 	return (HTTP_OK);
       else if (!strcasecmp(best->names[i], "@SYSTEM"))
       {
@@ -2670,5 +2668,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6758 2007-08-02 00:13:44Z mike $".
+ * End of "$Id: auth.c 6949 2007-09-12 21:33:23Z mike $".
  */

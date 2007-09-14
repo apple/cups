@@ -1,5 +1,54 @@
-CHANGES.txt - 2007-08-13
+CHANGES.txt - 2007-09-13
 ------------------------
+
+CHANGES IN CUPS V1.3.1
+
+	- Documentation updates.
+	- The USB backend on Mac OS X could hang if the driver and
+	  printer did not match.
+	- Delegated Kerberos credentials were not working.
+	- "make distclean" incorrectly removed the edit-config.tmpl
+	  files (STR #2508)
+	- Fix compile problem on HP-UX (STR #2501)
+	- The cupstestppd utility now tests for resolutions greater
+	  than 99999 DPI to detect a missing  "x" between the X and Y
+	  resolutions.
+	- Fixed many problems in the various translations and added
+	  a new "checkpo" utility to validate them.
+	- The cupstestppd utility now tests the custom page size code
+	  for CUPS raster drivers.
+	- cupsLangDefault() did not attempt to return a language that
+	  was supported by the calling application.
+	- If a remote printer stopped while a job was being sent, the
+	  local queue would also get stopped and the job re-queued,
+	  resulting in duplicate prints in some cases.
+	- A few Apple-specific job options needed to be omitted when
+	  printing a banner page.
+	- The new peer credential support did not compile on FreeBSD
+	  (STR #2495)
+	- Direct links to help files did not set the current section
+	  so the table-of-contents was not shown.
+	- The configure script did not support --localedir=foo (STR #2488)
+	- The backends were not displaying their localized messages.
+	- CUPS-Authenticate-Job did not require Kerberos authentication
+	  on queues protected by Kerberos.
+	- The Zebra ZPL driver did not work with Brady label printers
+	  (STR #2487)
+	- Norwegian wasn't localized on Mac OS X.
+	- getnameinfo() returns an error on some systems when DNS is
+	  not available, leading to numerous problems (STR #2486)
+	- The cupsfilter command did not work properly on Mac OS X.
+	- The scheduler makefile contained a typo (STR #2483)
+	- The TBCP and BCP port monitors did not handle the trailing
+	  CTRL-D in some PostScript output properly.
+	- Fixed the localization instructions and German template for
+	  the "Find New Printers" button (STR #2478)
+	- The web interface did not work with the Chinese localization
+	  (STR #2477)
+	- The web interface home page did not work for languages that
+	  were only partially localized (STR #2472)
+	- Updated the Spanish web interface localization (STR #2473)
+	- ppdLocalize() did not work for country-specific localizations.
 
 
 CHANGES IN CUPS V1.3.0

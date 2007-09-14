@@ -1,7 +1,7 @@
 /*
-* "$Id: usb-darwin.c 6680 2007-07-16 18:46:16Z mike $"
+* "$Id: usb-darwin.c 6953 2007-09-13 22:41:21Z mike $"
 *
-* Copyright © 2005-2007 Apple Inc. All rights reserved.
+* Copyright ï¿½ 2005-2007 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -267,7 +267,7 @@ static void copy_devicestring(io_service_t usbInterface, CFStringRef *deviceID, 
 static void device_added(void *userdata, io_iterator_t iterator);
 static void get_device_id(cups_sc_status_t *status, char *data, int *datalen);
 static void iterate_printers(iterator_callback_t callBack, void *userdata);
-static void parse_options(const char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
+static void parse_options(char *options, char *serial, int serial_size, UInt32 *location, Boolean *wait_eof);
 static void release_deviceinfo(CFStringRef *make, CFStringRef *model, CFStringRef *serial);
 static void setup_cfLanguage(void);
 static void soft_reset();
@@ -304,7 +304,7 @@ int					/* O - Exit status */
 print_device(const char *uri,		/* I - Device URI */
              const char *hostname,	/* I - Hostname/manufacturer */
              const char *resource,	/* I - Resource/modelname */
-	     const char *options,	/* I - Device options/serial number */
+	     char       *options,	/* I - Device options/serial number */
 	     int        print_fd,	/* I - File descriptor to print */
 	     int        copies,		/* I - Copies to print */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
@@ -313,7 +313,8 @@ print_device(const char *uri,		/* I - Device URI */
   char		  serial[1024];		/* Serial number buffer */
   OSStatus	  status;		/* Function results */
   pthread_t	  read_thread_id,	/* Read thread */
-		  sidechannel_thread_id;/* Side channel thread */
+		  sidechannel_thread_id;/* Side-channel thread */
+  int		  sidechannel_started = 0;/* Was the side-channel thread started? */
   char		  print_buffer[8192],	/* Print data buffer */
 		  *print_ptr;		/* Pointer into print data buffer */
   UInt32	  location;		/* Unique location in bus topology */
@@ -326,6 +327,7 @@ print_device(const char *uri,		/* I - Device URI */
   struct timeval  *timeout,		/* Timeout pointer */
 		  stimeout;		/* Timeout for select() */
   struct timespec cond_timeout;		/* pthread condition timeout */
+
 
   setup_cfLanguage();
 
@@ -387,7 +389,7 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      fprintf(stderr, _("FATAL: Could not load %s\n"), print_buffer);
+      _cupsLangPrintf(stderr, _("FATAL: Could not load %s\n"), print_buffer);
 
       if (driverBundlePath)
 	CFRelease(driverBundlePath);
@@ -404,7 +406,8 @@ print_device(const char *uri,		/* I - Device URI */
       countdown -= PRINTER_POLLING_INTERVAL;
       if (countdown <= 0)
       {
-	fprintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"), (int)status);
+	_cupsLangPrintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"),
+	                (int)status);
 	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
       }
     }
@@ -456,9 +459,11 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      fputs(_("WARNING: Couldn't create side channel\n"), stderr);
+      _cupsLangPuts(stderr, _("WARNING: Couldn't create side channel\n"));
       return CUPS_BACKEND_STOP;
     }
+
+    sidechannel_started = 1;
   }
 
  /*
@@ -473,7 +478,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    fputs(_("WARNING: Couldn't create read channel\n"), stderr);
+    _cupsLangPuts(stderr, _("WARNING: Couldn't create read channel\n"));
     return CUPS_BACKEND_STOP;
   }
 
@@ -488,7 +493,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   while (status == noErr && copies-- > 0)
   {
-    fputs(_("INFO: Sending data\n"), stderr);
+    _cupsLangPuts(stderr, _("INFO: Sending data\n"));
 
     if (print_fd != STDIN_FILENO)
     {
@@ -556,7 +561,7 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN)
 	{
-	 fprintf(stderr, _("ERROR: select() returned %d\n"), (int)errno);
+	 _cupsLangPrintf(stderr, _("ERROR: select() returned %d\n"), (int)errno);
 	 return CUPS_BACKEND_STOP;
 	}
       }
@@ -632,7 +637,8 @@ print_device(const char *uri,		/* I - Device URI */
 	  */
 
 	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
-	  fprintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"), (long)status, (long)err);
+	  _cupsLangPrintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"),
+	                  (long)status, (long)err);
 	  status = CUPS_BACKEND_STOP;
 	  break;
 	}
@@ -656,27 +662,42 @@ print_device(const char *uri,		/* I - Device URI */
   * Wait for the side channel thread to exit...
   */
 
-  close(CUPS_SC_FD);
-  pthread_mutex_lock(&g.readwrite_lock_mutex);
-  g.readwrite_lock = 0;
-  pthread_cond_signal(&g.readwrite_lock_cond);
-  pthread_mutex_unlock(&g.readwrite_lock_mutex);
-
-  g.sidechannel_thread_stop = 1;
-  pthread_mutex_lock(&g.sidechannel_thread_mutex);
-  if (!g.sidechannel_thread_done)
+  if (sidechannel_started)
   {
-    cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
-    cond_timeout.tv_nsec = 0;
-    pthread_cond_timedwait(&g.sidechannel_thread_cond,
-                           &g.sidechannel_thread_mutex, &cond_timeout);
+    close(CUPS_SC_FD);
+    pthread_mutex_lock(&g.readwrite_lock_mutex);
+    g.readwrite_lock = 0;
+    pthread_cond_signal(&g.readwrite_lock_cond);
+    pthread_mutex_unlock(&g.readwrite_lock_mutex);
+
+    g.sidechannel_thread_stop = 1;
+    pthread_mutex_lock(&g.sidechannel_thread_mutex);
+    if (!g.sidechannel_thread_done)
+    {
+     /*
+      * Wait for the side-channel thread to exit...
+      */
+
+      cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
+      cond_timeout.tv_nsec = 0;
+      if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
+			         &g.sidechannel_thread_mutex,
+				 &cond_timeout) != 0)
+      {
+       /*
+	* Force the side-channel thread to exit...
+	*/
+
+	pthread_kill(sidechannel_thread_id, SIGTERM);
+      }
+    }
+    pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
+    pthread_join(sidechannel_thread_id, NULL);
+
+    pthread_cond_destroy(&g.sidechannel_thread_cond);
+    pthread_mutex_destroy(&g.sidechannel_thread_mutex);
   }
-  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
-
-  pthread_join(sidechannel_thread_id, NULL);
-
-  pthread_cond_destroy(&g.sidechannel_thread_cond);
-  pthread_mutex_destroy(&g.sidechannel_thread_mutex);
 
   pthread_cond_destroy(&g.readwrite_lock_cond);
   pthread_mutex_destroy(&g.readwrite_lock_mutex);
@@ -689,9 +710,7 @@ print_device(const char *uri,		/* I - Device URI */
 
  /*
   * Give the read thread WAIT_EOF_DELAY seconds to complete all the data. If
-  * we are not signaled in that time then force the thread to exit by setting
-  * the waiteof to be false. Plese note that this relies on us using the timeout
-  * class driver.
+  * we are not signaled in that time then force the thread to exit.
   */
 
   pthread_mutex_lock(&g.read_thread_mutex);
@@ -703,7 +722,13 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
                                &cond_timeout) != 0)
-      g.wait_eof = false;
+    {
+     /*
+      * Force the read thread to exit...
+      */
+
+      pthread_kill(read_thread_id, SIGTERM);
+    }
   }
   pthread_mutex_unlock(&g.read_thread_mutex);
 
@@ -827,8 +852,16 @@ sidechannel_thread(void *reference)
     switch (command)
     {
       case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
-	  soft_reset();
-	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, NULL, 0, 1.0);
+          if ((*g.classdriver)->SoftReset != NULL)
+	  {
+	    soft_reset();
+	    cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, NULL, 0, 1.0);
+	  }
+	  else
+	  {
+	    cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED,
+	                         NULL, 0, 1.0);
+	  }
 	  break;
 
       case CUPS_SC_CMD_DRAIN_OUTPUT:	/* Drain all pending output */
@@ -1091,7 +1124,7 @@ static Boolean find_device_cb(void *refcon,
   if (!keepLooking && g.status_timer != NULL)
   {
     fputs("STATE: -offline-error\n", stderr);
-    fputs(_("INFO: Printer is now on-line.\n"), stderr);
+    _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
     g.status_timer = NULL;
@@ -1109,7 +1142,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  fputs(_("INFO: Printer is currently off-line.\n"), stderr);
+  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 }
 
 
@@ -1541,18 +1574,19 @@ CFStringRef cfstr_create_trim(const char *cstr)
 
 #pragma mark -
 /*
- * 'parse_options()' - Parse uri options.
+ * 'parse_options()' - Parse URI options.
  */
 
-static void parse_options(const char *options,
+static void parse_options(char *options,
 			  char *serial,
 			  int serial_size,
 			  UInt32 *location,
 			  Boolean *wait_eof)
 {
-  char	optionName[255],	/* Name of option */
-	value[255],		/* Value of option */
-	*ptr;			/* Pointer into name or value */
+  char	sep,				/* Separator character */
+	*name,				/* Name of option */
+	*value;				/* Value of option */
+
 
   if (serial)
     *serial = '\0';
@@ -1562,56 +1596,61 @@ static void parse_options(const char *options,
   if (!options)
     return;
 
-  while (*options != '\0')
+  while (*options)
   {
-    /* Get the name... */
-    for (ptr = optionName; *options && *options != '=' && *options != '+';)
-      *ptr++ = *options++;
+   /*
+    * Get the name...
+    */
 
-    *ptr = '\0';
-    value[0] = '\0';
+    name = options;
 
-    if (*options == '=')
-    {
-      /* Get the value... */
+    while (*options && *options != '=' && *options != '+' && *options != '&')
       options ++;
 
-      for (ptr = value; *options && *options != '+';)
-	*ptr++ = *options++;
+    if ((sep = *options) != '\0')
+      *options++ = '\0';
 
-      *ptr = '\0';
+    if (sep == '=')
+    {
+     /*
+      * Get the value...
+      */
 
-      if (*options == '+')
+      value = options;
+
+      while (*options && *options != '+' && *options != '&')
 	options ++;
-    }
-    else if (*options == '+')
-      options ++;
 
-    /*
-     * Process the option...
-     */
-    if (strcasecmp(optionName, "waiteof") == 0)
+      if (*options)
+	*options++ = '\0';
+    }
+    else
+      value = (char *)"";
+
+   /*
+    * Process the option...
+    */
+
+    if (!strcasecmp(name, "waiteof"))
     {
-      if (strcasecmp(value, "on") == 0 ||
-	  strcasecmp(value, "yes") == 0 ||
-	  strcasecmp(value, "true") == 0)
+      if (!strcasecmp(value, "on") ||
+	  !strcasecmp(value, "yes") ||
+	  !strcasecmp(value, "true"))
 	*wait_eof = true;
-      else if (strcasecmp(value, "off")   == 0 ||
-	       strcasecmp(value, "no")    == 0 ||
-	       strcasecmp(value, "false") == 0)
+      else if (!strcasecmp(value, "off") ||
+	       !strcasecmp(value, "no") ||
+	       !strcasecmp(value, "false"))
 	*wait_eof = false;
       else
-	fprintf(stderr, _("WARNING: Boolean expected for waiteof option \"%s\"\n"), value);
+	_cupsLangPrintf(stderr,
+	                _("WARNING: Boolean expected for waiteof option "
+			  "\"%s\"\n"), value);
     }
-    else if (strcasecmp(optionName, "serial") == 0)
-    {
+    else if (!strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
-    }
-    else if (strcasecmp(optionName, "location") == 0 && location)
+    else if (!strcasecmp(name, "location") && location)
       *location = strtol(value, NULL, 16);
   }
-
-  return;
 }
 
 
@@ -1885,7 +1924,7 @@ static void parse_pserror(char *sockBuffer,
 
 
 /*
- * 'soft_reset'
+ * 'soft_reset()' - Send a soft reset to the device.
  */
 
 static void soft_reset()
@@ -1971,5 +2010,5 @@ static void get_device_id(cups_sc_status_t *status,
 
 
 /*
- * End of "$Id: usb-darwin.c 6680 2007-07-16 18:46:16Z mike $".
+ * End of "$Id: usb-darwin.c 6953 2007-09-13 22:41:21Z mike $".
  */

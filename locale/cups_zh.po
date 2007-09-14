@@ -472,7 +472,7 @@ msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      **失败**  错误的 %s 选择！\n"
+"      **失败**  错误的 %s %s 选择！\n"
 "                REF: 页 122，节 5.17。\n"
 
 #, c-format
@@ -480,7 +480,7 @@ msgid ""
 "      **FAIL**  Bad %s choice %s!\n"
 "                REF: Page 84, section 5.9\n"
 msgstr ""
-"      **失败**  错误的 %s 选择！\n"
+"      **失败**  错误的 %s %s 选择！\n"
 "                REF: 页 84，节 5.9。\n"
 
 #, c-format

@@ -1549,7 +1549,7 @@ msgstr "ERROR: 不支援的光度值 %s，使用光度=1000！\n"
 
 #, c-format
 msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
-msgstr "ERROR: 不支援的 number-up 值 %s，使用 number-up=1！\n"
+msgstr "ERROR: 不支援的 number-up 值 %d，使用 number-up=1！\n"
 
 #, c-format
 msgid ""
@@ -1652,7 +1652,7 @@ msgstr "INFO: 嘗試為印表機“%2$s”連接主機“%1$s”\n"
 
 #, c-format
 msgid "INFO: Attempting to connect to host %s on port %d\n"
-msgstr "INFO: 嘗試在“%d”埠上連接主機“%s”\n"
+msgstr "INFO: 嘗試在“%2$d”埠上連接主機“%1$s”\n"
 
 msgid "INFO: Canceling print job...\n"
 msgstr "INFO: 正在取消列印工作⋯\n"
@@ -1663,7 +1663,7 @@ msgstr "INFO: 已連接“%s”⋯\n"
 
 #, c-format
 msgid "INFO: Connecting to %s on port %d...\n"
-msgstr "INFO: 正在連接“%d”埠上的“%s”⋯\n"
+msgstr "INFO: 正在連接“%2$d”埠上的“%1$s”⋯\n"
 
 msgid "INFO: Control file sent successfully\n"
 msgstr "INFO: 已成功傳送控制檔案\n"

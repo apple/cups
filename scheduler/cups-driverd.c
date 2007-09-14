@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-driverd.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: cups-driverd.c 6762 2007-08-02 18:05:03Z mike $"
  *
  *   PPD/driver support for the Common UNIX Printing System (CUPS).
  *
@@ -1702,5 +1702,5 @@ load_drivers(void)
 
 
 /*
- * End of "$Id: cups-driverd.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: cups-driverd.c 6762 2007-08-02 18:05:03Z mike $".
  */

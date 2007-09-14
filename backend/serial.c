@@ -1,5 +1,5 @@
 /*
- * "$Id: serial.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: serial.c 6911 2007-09-04 20:35:08Z mike $"
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
@@ -104,9 +104,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		username[255],		/* Username info (not used) */
 		resource[1024],		/* Resource info (device and options) */
 		*options,		/* Pointer to options */
-		name[255],		/* Name of option */
-		value[255],		/* Value of option */
-		*ptr;			/* Pointer into name or value */
+		*name,			/* Name of option */
+		*value,			/* Value of option */
+		sep;			/* Option separator */
   int		port;			/* Port number (not used) */
   int		copies;			/* Number of copies to print */
   int		print_fd,		/* Print file */
@@ -161,8 +161,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
   else if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-	    argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+	            argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
 
@@ -234,8 +235,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        fputs(_("INFO: Unable to contact printer, queuing on next "
-		"printer in class...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Unable to contact printer, queuing on next "
+			"printer in class...\n"));
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -248,13 +250,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        fputs(_("INFO: Printer busy; will retry in 30 seconds...\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("INFO: Printer busy; will retry in 30 seconds...\n"));
 	sleep(30);
       }
       else
       {
-	fprintf(stderr, _("ERROR: Unable to open device file \"%s\": %s\n"),
-	        resource, strerror(errno));
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unable to open device file \"%s\": %s\n"),
+			resource, strerror(errno));
 	return (CUPS_BACKEND_FAILED);
       }
     }
@@ -285,29 +289,30 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       * Get the name...
       */
 
-      for (ptr = name; *options && *options != '=';)
-        if (ptr < (name + sizeof(name) - 1))
-          *ptr++ = *options++;
-      *ptr = '\0';
+      name = options;
 
-      if (*options == '=')
+      while (*options && *options != '=' && *options != '+' && *options != '&')
+        options ++;
+
+      if ((sep = *options) != '\0')
+        *options++ = '\0';
+
+      if (sep == '=')
       {
        /*
         * Get the value...
 	*/
 
-        options ++;
+        value = options;
 
-	for (ptr = value; *options && *options != '+' && *options != '&';)
-          if (ptr < (value + sizeof(value) - 1))
-            *ptr++ = *options++;
-	*ptr = '\0';
-
-	if (*options == '+' || *options == '&')
+	while (*options && *options != '+' && *options != '&')
 	  options ++;
+
+        if (*options)
+	  *options++ = '\0';
       }
       else
-        value[0] = '\0';
+        value = (char *)"";
 
      /*
       * Process the option...
@@ -370,8 +375,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 #  endif /* B230400 */
           default :
-	      fprintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
-	              value);
+	      _cupsLangPrintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
+			      value);
 	      break;
 	}
 #endif /* B19200 == 19200 */
@@ -1247,7 +1252,8 @@ side_cb(int print_fd,			/* I - Print file */
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
-    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
+    _cupsLangPuts(stderr,
+                  _("WARNING: Failed to read side-channel request!\n"));
     return;
   }
 
@@ -1280,5 +1286,5 @@ side_cb(int print_fd,			/* I - Print file */
 
 
 /*
- * End of "$Id: serial.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: serial.c 6911 2007-09-04 20:35:08Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: rastertolabel.c 6718 2007-07-25 00:02:41Z mike $"
+ * "$Id: rastertolabel.c 6820 2007-08-20 21:15:28Z mike $"
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
@@ -660,7 +660,8 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
         * End the label and eject...
 	*/
 
-        puts("^XZ");
+        puts("^IDR:CUPS.GRF^FS");
+	puts("^XZ");
 
        /*
         * Free compression buffers...
@@ -1299,5 +1300,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: rastertolabel.c 6718 2007-07-25 00:02:41Z mike $".
+ * End of "$Id: rastertolabel.c 6820 2007-08-20 21:15:28Z mike $".
  */

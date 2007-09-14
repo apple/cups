@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 6676 2007-07-16 17:09:09Z mike $"
+ * "$Id: testppd.c 6799 2007-08-15 19:33:36Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -224,6 +224,18 @@ main(int  argc,				/* I - Number of command-line arguments */
       printf("FAIL (\"%s\" instead of \"La Long Foo Reason\")\n", buffer);
     }
 
+    putenv("LANG=zh_TW");
+
+    fputs("ppdLocalizeIPPReason(zh_TW text): ", stdout);
+    if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
+        !strcmp(buffer, "Number 1 Foo Reason"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"Number 1 Foo Reason\")\n", buffer);
+    }
+
     ppdClose(ppd);
   }
   else
@@ -360,5 +372,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 6676 2007-07-16 17:09:09Z mike $".
+ * End of "$Id: testppd.c 6799 2007-08-15 19:33:36Z mike $".
  */

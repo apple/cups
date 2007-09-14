@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 6686 2007-07-16 23:11:59Z mike $"
+ * "$Id: localize.c 6883 2007-08-29 21:05:17Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -44,7 +44,8 @@
  * Local functions...
  */
 
-static void		ppd_ll_CC(char *ll_CC, char *ll);
+static void		ppd_ll_CC(char *ll_CC, int ll_CC_size,
+			          char *ll, int ll_size);
 static ppd_attr_t	*ppd_localized_attr(ppd_file_t *ppd,
 			                    const char *keyword,
 			                    const char *spec, const char *ll_CC,
@@ -90,7 +91,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, ll);
+  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
 
  /*
   * Now lookup all of the groups, options, choices, etc.
@@ -240,7 +241,7 @@ ppdLocalizeIPPReason(
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, ll);
+  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
 
  /*
   * Find the localized attribute...
@@ -391,8 +392,9 @@ ppdLocalizeIPPReason(
 
 static void
 ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
-          char *ll)			/* O - Generic locale name */
-          
+          int  ll_CC_size,		/* I - Size of country-specific name */
+          char *ll,			/* O - Generic locale name */
+          int  ll_size)			/* I - Size of generic name */
 {
   cups_lang_t	*lang;			/* Current language */
 
@@ -403,8 +405,8 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
 
   if ((lang = cupsLangDefault()) == NULL)
   {
-    strcpy(ll_CC, "en_US");
-    strcpy(ll, "en");
+    strlcpy(ll_CC, "en_US", ll_CC_size);
+    strlcpy(ll, "en", ll_size);
     return;
   }
 
@@ -412,8 +414,10 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
   * Copy the locale name...
   */
 
-  strlcpy(ll_CC, lang->language, sizeof(ll_CC));
-  strlcpy(ll, lang->language, sizeof(ll));
+  strlcpy(ll_CC, lang->language, ll_CC_size);
+  strlcpy(ll, lang->language, ll_size);
+
+  DEBUG_printf(("ll_CC=\"%s\", ll=\"%s\"\n", ll_CC, ll));
 
   if (strlen(ll_CC) == 2)
   {
@@ -423,16 +427,16 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
     */
 
     if (!strcmp(ll_CC, "cs"))
-      strcpy(ll_CC, "cs_CZ");
+      strlcpy(ll_CC, "cs_CZ", ll_CC_size);
     else if (!strcmp(ll_CC, "en"))
-      strcpy(ll_CC, "en_US");
+      strlcpy(ll_CC, "en_US", ll_CC_size);
     else if (!strcmp(ll_CC, "ja"))
-      strcpy(ll_CC, "ja_JP");
+      strlcpy(ll_CC, "ja_JP", ll_CC_size);
     else if (!strcmp(ll_CC, "sv"))
-      strcpy(ll_CC, "sv_SE");
-    else if (!strcmp(ll_CC, "zh"))
-      strcpy(ll_CC, "zh_CN");		/* Simplified Chinese */
-    else
+      strlcpy(ll_CC, "sv_SE", ll_CC_size);
+    else if (!strcmp(ll_CC, "zh"))	/* Simplified Chinese */
+      strlcpy(ll_CC, "zh_CN", ll_CC_size);
+    else if (ll_CC_size >= 6)
     {
       ll_CC[2] = '_';
       ll_CC[3] = toupper(ll_CC[0] & 255);
@@ -475,17 +479,31 @@ ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
     snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll, keyword);
     attr = ppdFindAttr(ppd, lkeyword, spec);
 
-    if (!attr && !strcmp(ll, "ja"))
+    if (!attr)
     {
-     /*
-      * Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
-      * PPD files were incorrectly assigned "jp" as the locale name
-      * instead of "ja".  Support both the old (incorrect) and new
-      * locale names for Japanese...
-      */
+      if (!strcmp(ll, "ja"))
+      {
+       /*
+	* Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
+	* PPD files were incorrectly assigned "jp" as the locale name
+	* instead of "ja".  Support both the old (incorrect) and new
+	* locale names for Japanese...
+	*/
 
-      snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
-      attr = ppdFindAttr(ppd, lkeyword, spec);
+	snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
+      else if (!strcmp(ll, "no"))
+      {
+       /*
+	* Norway has two languages, "Bokmal" (the primary one)
+	* and "Nynorsk" (new Norwegian); we map "no" to "nb" here as
+	* recommended by the locale folks...
+	*/
+
+	snprintf(lkeyword, sizeof(lkeyword), "nb.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
     }
   }
 
@@ -502,5 +520,5 @@ ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 6686 2007-07-16 23:11:59Z mike $".
+ * End of "$Id: localize.c 6883 2007-08-29 21:05:17Z mike $".
  */

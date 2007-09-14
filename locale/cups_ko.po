@@ -783,7 +783,7 @@ msgid ""
 "      **FAIL**  Unable to open PPD file - %s on line %d.\n"
 msgstr ""
 " 실패\n"
-"      **실패**  PPD 파일을 열 수 없습니다 - %d번째 줄에 있는 %s\n"
+"      **실패**  PPD 파일을 열 수 없습니다 - %2$d번째 줄에 있는 %1$s\n"
 
 msgid " PASS\n"
 msgstr " 통과\n"
@@ -1512,7 +1512,7 @@ msgstr "ERROR: pictwpstops를 기다릴 수 없음: %s\n"
 
 #, c-format
 msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
-msgstr "ERROR: \"%s\"에 %d바이트를 쓸 수 없음: %s\n"
+msgstr "ERROR: \"%2$s\"에 %1$d바이트를 쓸 수 없음: %s\n"
 
 #, c-format
 msgid "ERROR: Unable to write print data: %s\n"
@@ -1559,7 +1559,7 @@ msgstr "ERROR: 감마=1000을 사용하는, 지원되지 않는 %s 감마 값!\n
 
 #, c-format
 msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
-msgstr "ERROR: number-up=1을 사용하는, 지원되지 않는 %s 초과 값!\n"
+msgstr "ERROR: number-up=1을 사용하는, 지원되지 않는 %d 초과 값!\n"
 
 #, c-format
 msgid ""
@@ -1661,11 +1661,11 @@ msgstr "도움말"
 
 #, c-format
 msgid "INFO: Attempting to connect to host %s for printer %s\n"
-msgstr "INFO: %s 프린터의 %s 호스트에 연결을 시도하는 중\n"
+msgstr "INFO: %2$s 프린터의 %1$s 호스트에 연결을 시도하는 중\n"
 
 #, c-format
 msgid "INFO: Attempting to connect to host %s on port %d\n"
-msgstr "INFO: %d번 포트에 있는 %s 호스트에 연결을 시도하는 중\n"
+msgstr "INFO: %2$d번 포트에 있는 %1$s 호스트에 연결을 시도하는 중\n"
 
 msgid "INFO: Canceling print job...\n"
 msgstr "INFO: 프린트 작업 취소 중...\n"
@@ -1676,7 +1676,7 @@ msgstr "INFO: %s에 연결됨...\n"
 
 #, c-format
 msgid "INFO: Connecting to %s on port %d...\n"
-msgstr "INFO: %d번 포트에 있는 %s에 연결 중...\n"
+msgstr "INFO: %2$d번 포트에 있는 %1$s에 연결 중...\n"
 
 msgid "INFO: Control file sent successfully\n"
 msgstr "INFO: 제어 파일을 성공적으로 보냄\n"
@@ -1739,7 +1739,7 @@ msgstr "INFO: 제어 파일 보내는 중(%lu바이트)\n"
 
 #, c-format
 msgid "INFO: Sending control file (%u bytes)\n"
-msgstr "INFO: 제어 파일 보내는 중(%lu바이트)\n"
+msgstr "INFO: 제어 파일 보내는 중(%u바이트)\n"
 
 msgid "INFO: Sending data\n"
 msgstr "INFO: 데이터 보내는 중\n"
@@ -1845,7 +1845,7 @@ msgstr "작업 #%d이(가) 유지되지 않음!"
 
 #, c-format
 msgid "Job #%s does not exist!"
-msgstr "작업 #%d이(가) 존재하지 않음!"
+msgstr "작업 #%s이(가) 존재하지 않음!"
 
 #, c-format
 msgid "Job %d not found!"

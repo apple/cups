@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 6716 2007-07-24 20:46:39Z mike $"
+# "$Id: cups.list.in 6777 2007-08-08 17:43:14Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -723,5 +723,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6716 2007-07-24 20:46:39Z mike $".
+# End of "$Id: cups.list.in 6777 2007-08-08 17:43:14Z mike $".
 #

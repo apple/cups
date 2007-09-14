@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: http-private.h 6934 2007-09-10 16:46:20Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -62,6 +62,9 @@
 #    ifndef HAVE_GSS_C_NT_HOSTBASED_SERVICE
 #      define GSS_C_NT_HOSTBASED_SERVICE gss_nt_service_name
 #    endif /* !HAVE_GSS_C_NT_HOSTBASED_SERVICE */
+#    ifdef HAVE_KRB5_H
+#      include <krb5.h>
+#    endif /* HAVE_KRB5_H */
 #  endif /* HAVE_GSSAPI */
 
 #  ifdef HAVE_AUTHORIZATION_H
@@ -263,5 +266,5 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: http-private.h 6934 2007-09-10 16:46:20Z mike $".
  */

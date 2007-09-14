@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 6755 2007-08-01 19:02:47Z mike $"
+ * "$Id: main.c 6915 2007-09-05 21:05:17Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -151,6 +151,18 @@ main(int  argc,				/* I - Number of command-line args */
 					/* Idle exit on select timeout? */
 #endif	/* HAVE_LAUNCHD */
 
+
+#ifdef HAVE_GETEUID
+ /*
+  * Check for setuid invocation, which we do not support!
+  */
+
+  if (getuid() != geteuid())
+  {
+    fputs("cupsd: Cannot run as a setuid program!\n", stderr);
+    return (1);
+  }
+#endif /* HAVE_GETEUID */
 
  /*
   * Check for command-line arguments...
@@ -1880,5 +1892,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6755 2007-08-01 19:02:47Z mike $".
+ * End of "$Id: main.c 6915 2007-09-05 21:05:17Z mike $".
  */

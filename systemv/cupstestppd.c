@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: cupstestppd.c 6928 2007-09-07 18:05:14Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -981,7 +981,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  else
 	    ydpi = xdpi;
 
-	  if (xdpi <= 0 || ydpi <= 0 || strcmp(ptr, "dpi"))
+	  if (xdpi <= 0 || xdpi > 99999 || ydpi <= 0 || ydpi > 99999 ||
+	      strcmp(ptr, "dpi"))
 	  {
 	    if (verbose >= 0)
 	    {
@@ -2393,8 +2394,30 @@ test_raster(ppd_file_t *ppd,		/* I - PPD file */
 
     return (0);
   }
-  else
+
+ /*
+  * Try a test of custom page size code, if available...
+  */
+
+  if (!ppdPageSize(ppd, "Custom.612x792"))
     return (1);
+
+  ppdMarkOption(ppd, "PageSize", "Custom.612x792");
+
+  if (cupsRasterInterpretPPD(&header, ppd, 0, NULL, 0))
+  {
+    if (!verbose)
+      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+    if (verbose >= 0)
+      _cupsLangPrintf(stdout,
+		      _("      **FAIL**  Default option code cannot be "
+			"interpreted: %s\n"), cupsRasterErrorString());
+
+    return (0);
+  }
+
+  return (1);
 }
 
 
@@ -2501,5 +2524,5 @@ valid_utf8(const char *s)		/* I - String to check */
 
 
 /*
- * End of "$Id: cupstestppd.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: cupstestppd.c 6928 2007-09-07 18:05:14Z mike $".
  */

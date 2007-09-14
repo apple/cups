@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: Makefile 6945 2007-09-12 17:08:32Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -63,9 +63,8 @@ distclean:	clean
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
 	$(RM) man/cupsd.conf.man man/lpoptions.man
 	$(RM) packaging/cups.list
-	$(RM) templates/edit-config.tmpl templates/header.tmpl
+	$(RM) templates/header.tmpl
 	-$(RM) doc/*/index.html
-	-$(RM) templates/*/edit-config.tmpl
 	-$(RM) templates/*/header.tmpl
 	-$(RM) -r autom4te*.cache
 
@@ -282,5 +281,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id: Makefile 6945 2007-09-12 17:08:32Z mike $".
 #

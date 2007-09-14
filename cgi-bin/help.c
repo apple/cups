@@ -151,6 +151,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     cgiSetVariable("HELPFILE", helpfile);
     cgiSetVariable("HELPTITLE", n->text);
+    cgiSetVariable("TOPIC", n->section);
 
    /*
     * Send a standard page header...

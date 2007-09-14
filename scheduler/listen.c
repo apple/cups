@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: listen.c 6788 2007-08-13 17:20:14Z mike $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -428,5 +428,5 @@ cupsdStopListening(void)
 
 
 /*
- * End of "$Id: listen.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: listen.c 6788 2007-08-13 17:20:14Z mike $".
  */

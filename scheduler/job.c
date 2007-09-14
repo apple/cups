@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 6755 2007-08-01 19:02:47Z mike $"
+ * "$Id: job.c 6887 2007-08-29 21:52:06Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -2843,7 +2843,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 	   !strcmp(attr->name, "page-ranges") ||
 	   !strcmp(attr->name, "page-set") ||
 	   !strcasecmp(attr->name, "AP_FIRSTPAGE_InputSlot") ||
-	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed")) &&
+	   !strcasecmp(attr->name, "AP_FIRSTPAGE_ManualFeed") ||
+	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	                           "PMTotalSidesImaged..n.") ||
+	   !strcasecmp(attr->name, "com.apple.print.PrintSettings."
+	                           "PMTotalBeginPages..n.")) &&
 	  banner_page)
         continue;
 
@@ -3784,5 +3788,5 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 6755 2007-08-01 19:02:47Z mike $".
+ * End of "$Id: job.c 6887 2007-08-29 21:52:06Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6755 2007-08-01 19:02:47Z mike $"
+ * "$Id: config.h.in 6878 2007-08-29 17:22:26Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -524,6 +524,13 @@
 
 
 /*
+ * Do we have <sys/param.h>?
+ */
+
+#undef HAVE_SYS_PARAM_H
+
+
+/*
  * Do we have <sys/ucred.h>?
  */
 
@@ -540,5 +547,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6755 2007-08-01 19:02:47Z mike $".
+ * End of "$Id: config.h.in 6878 2007-08-29 17:22:26Z mike $".
  */

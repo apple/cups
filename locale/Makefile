@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6707 2007-07-23 17:49:41Z mike $"
+# "$Id: Makefile 6926 2007-09-06 14:34:31Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -16,8 +16,8 @@
 include ../Makedefs
 
 
-OBJS	=	po2strings.o strings2po.o translate.o
-TARGETS	=	po2strings strings2po translate
+OBJS	=	checkpo po2strings.o strings2po.o translate.o
+TARGETS	=	checkpo po2strings strings2po translate
 
 
 #
@@ -96,6 +96,18 @@ pot:
 
 
 #
+# checkpo - A simple utility to check PO files for correct translation
+#           strings.
+#
+# checkpo filename.po [... filenameN.po]
+#
+
+checkpo:	checkpo.o ../cups/$(LIBCUPS)
+	echo Linking $<...
+	$(CC) $(LDFLAGS) -o checkpo checkpo.o $(LIBS)
+
+
+#
 # po2strings - A simple utility which uses iconv to convert GNU gettext
 #              message catalogs to Mac OS X .strings files.
 #
@@ -139,5 +151,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6707 2007-07-23 17:49:41Z mike $".
+# End of "$Id: Makefile 6926 2007-09-06 14:34:31Z mike $".
 #

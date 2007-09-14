@@ -1,5 +1,5 @@
 /*
- * "$Id: mark.c 6703 2007-07-20 21:28:10Z mike $"
+ * "$Id: mark.c 6942 2007-09-10 22:55:00Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
@@ -724,5 +724,5 @@ ppd_defaults(ppd_file_t  *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 6703 2007-07-20 21:28:10Z mike $".
+ * End of "$Id: mark.c 6942 2007-09-10 22:55:00Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: tbcp.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: tbcp.c 6802 2007-08-16 18:44:46Z mike $"
  *
  *   TBCP port monitor for the Common UNIX Printing System (CUPS).
  *
@@ -120,11 +120,10 @@ main(int  argc,				/* I - Number of command-line args */
     else
     {
      /*
-      * No PJL stuff, add it...
+      * No PJL stuff, just add the UEL...
       */
 
-      puts("\033%-12345X@PJL");
-      puts("@PJL ENTER LANGUAGE = POSTSCRIPT");
+      fputs("\033%-12345X", stdout);
     }
 
    /*
@@ -244,9 +243,19 @@ pswrite(const char *buf,		/* I - Buffer to write */
   for (count = bytes; count > 0; count --, buf ++)
     switch (*buf)
     {
+      case 0x04 : /* CTRL-D */
+          if (bytes == 1)
+	  {
+	   /*
+	    * Don't quote the last CTRL-D...
+	    */
+
+	    putchar(0x04);
+	    break;
+	  }
+
       case 0x01 : /* CTRL-A */
       case 0x03 : /* CTRL-C */
-      case 0x04 : /* CTRL-D */
       case 0x05 : /* CTRL-E */
       case 0x11 : /* CTRL-Q */
       case 0x13 : /* CTRL-S */
@@ -270,5 +279,5 @@ pswrite(const char *buf,		/* I - Buffer to write */
 
 
 /*
- * End of "$Id: tbcp.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: tbcp.c 6802 2007-08-16 18:44:46Z mike $".
  */

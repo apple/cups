@@ -1,5 +1,5 @@
 /*
- * "$Id: language.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: language.c 6917 2007-09-05 21:14:17Z mike $"
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
@@ -985,10 +985,11 @@ typedef struct
 static const _apple_name_locale_t apple_name_locale[] =
 {
   { "en"	, "en_US" },
-  { "no"	, "nb"    },
+  { "nb"	, "no"    },
   { "zh-Hans"	, "zh_CN" },
   { "zh-Hant"	, "zh_TW" }
 };
+
 
 /*
  * 'appleLangDefault()' - Get the default locale string.
@@ -998,6 +999,8 @@ static const char *			/* O - Locale string */
 appleLangDefault(void)
 {
   int			i;		/* Looping var */
+  CFBundleRef		bundle;		/* Main bundle (if any) */
+  CFArrayRef		bundleList;	/* List of localizations in bundle */
   CFPropertyListRef 	localizationList;
 					/* List of localization data */
   CFStringRef		languageName;	/* Current name */
@@ -1014,63 +1017,77 @@ appleLangDefault(void)
   if (!cg->language[0])
   {
     if ((lang = getenv("LANG")))
+    {
       strlcpy(cg->language, lang, sizeof(cg->language));
-    else
+      return (cg->language);
+    }
+    else if ((bundle = CFBundleGetMainBundle()) != NULL &&
+             (bundleList = CFBundleCopyBundleLocalizations(bundle)) != NULL)
     {
       localizationList =
-          CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
-                                    kCFPreferencesCurrentApplication);
+	  CFBundleCopyPreferredLocalizationsFromArray(bundleList);
 
-      if (localizationList != NULL)
+      CFRelease(bundleList);
+    }
+    else
+      localizationList =
+	  CFPreferencesCopyAppValue(CFSTR("AppleLanguages"),
+				    kCFPreferencesCurrentApplication);
+
+    if (localizationList)
+    {
+      if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
+	  CFArrayGetCount(localizationList) > 0)
       {
-	if (CFGetTypeID(localizationList) == CFArrayGetTypeID() &&
-	    CFArrayGetCount(localizationList) > 0)
+	languageName = CFArrayGetValueAtIndex(localizationList, 0);
+
+	if (languageName &&
+	    CFGetTypeID(languageName) == CFStringGetTypeID())
 	{
-          languageName = CFArrayGetValueAtIndex(localizationList, 0);
+	  localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
+			   kCFAllocatorDefault, languageName);
 
-          if (languageName != NULL &&
-              CFGetTypeID(languageName) == CFStringGetTypeID())
-          {
-	    localeName = CFLocaleCreateCanonicalLocaleIdentifierFromString(
-	                     kCFAllocatorDefault, languageName);
+	  if (localeName)
+	  {
+	    CFStringGetCString(localeName, cg->language, sizeof(cg->language),
+			       kCFStringEncodingASCII);
+	    CFRelease(localeName);
 
-	    if (localeName != NULL)
+	    DEBUG_printf(("appleLangDefault: cg->language=\"%s\"\n",
+			  cg->language));
+
+	   /*
+	    * Map new language identifiers to locales...
+	    */
+
+	    for (i = 0;
+		 i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
+		 i++)
 	    {
-	      CFStringGetCString(localeName, cg->language, sizeof(cg->language),
-				 kCFStringEncodingASCII);
-	      CFRelease(localeName);
-
-	     /*
-	      * Map new language identifiers to locales...
-	      */
-
-	      for (i = 0;
-		   i < sizeof(apple_name_locale) / sizeof(apple_name_locale[0]);
-		   i++)
+	      if (!strcmp(cg->language, apple_name_locale[i].name))
 	      {
-		if (!strcmp(cg->language, apple_name_locale[i].name))
-		{
-		  strlcpy(cg->language, apple_name_locale[i].locale, 
-			  sizeof(cg->language));
-		  break;
-		}
+		DEBUG_printf(("appleLangDefault: mapping \"%s\" to \"%s\"...\n",
+			      cg->language, apple_name_locale[i].locale));
+		strlcpy(cg->language, apple_name_locale[i].locale, 
+			sizeof(cg->language));
+		break;
 	      }
-
-	     /*
-	      * Convert language subtag into region subtag...
-	      */
-
-	      if (cg->language[2] == '-')
-		cg->language[2] = '_';
-
-	      if (strchr(cg->language, '.') == NULL)
-		strlcat(cg->language, ".UTF-8", sizeof(cg->language));
 	    }
-          }
-	}
 
-	CFRelease(localizationList);
+	   /*
+	    * Convert language subtag into region subtag...
+	    */
+
+	    if (cg->language[2] == '-')
+	      cg->language[2] = '_';
+
+	    if (!strchr(cg->language, '.'))
+	      strlcat(cg->language, ".UTF-8", sizeof(cg->language));
+	  }
+	}
       }
+
+      CFRelease(localizationList);
     }
   
    /*
@@ -1354,5 +1371,5 @@ cups_unquote(char       *d,		/* O - Unquoted string */
 
 
 /*
- * End of "$Id: language.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: language.c 6917 2007-09-05 21:14:17Z mike $".
  */

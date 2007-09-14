@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6746 2007-07-30 16:47:10Z mike $"
+ * "$Id: conf.c 6783 2007-08-10 19:48:57Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -3352,5 +3352,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6746 2007-07-30 16:47:10Z mike $".
+ * End of "$Id: conf.c 6783 2007-08-10 19:48:57Z mike $".
  */

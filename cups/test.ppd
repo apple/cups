@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id: test.ppd 6676 2007-07-16 17:09:09Z mike $"
+*% "$Id: test.ppd 6799 2007-08-15 19:33:36Z mike $"
 *%
 *% Test PPD file for the Common UNIX Printing System (CUPS).
 *%
@@ -149,6 +149,18 @@ http://foo/fr/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/fr/foo/bar.html"
 *End
+*zh_TW.cupsIPPReason foo/Number 1 Foo Reason: "text:Number%201
+text:Foo%20Reason
+http://foo/zh_TW/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/zh_TW/foo/bar.html"
+*End
+*zh.cupsIPPReason foo/Number 2 Foo Reason: "text:Number%202
+text:Foo%20Reason
+http://foo/zh/bar.html
+help:anchor='foo'%20bookID=Vendor%20Help
+/help/zh/foo/bar.html"
+*End
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
@@ -187,5 +199,5 @@ help:anchor='foo'%20bookID=Vendor%20Help
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id: test.ppd 6676 2007-07-16 17:09:09Z mike $".
+*% End of "$Id: test.ppd 6799 2007-08-15 19:33:36Z mike $".
 *%

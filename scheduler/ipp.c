@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6755 2007-08-01 19:02:47Z mike $"
+ * "$Id: ipp.c 6949 2007-09-12 21:33:23Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -98,10 +98,6 @@
  */
 
 #include "cupsd.h"
-
-#ifdef HAVE_KRB5_H
-#  include <krb5.h>
-#endif /* HAVE_KRB5_H */
 
 #ifdef HAVE_LIBPAPER
 #  include <paper.h>
@@ -2877,8 +2873,22 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->username[0] && !auth_info)
   {
-    send_ipp_status(con, IPP_NOT_AUTHORIZED,
-                    _("No authentication information provided!"));
+    cupsd_printer_t	*printer;	/* Job destination */
+
+
+   /*
+    * No auth data.  If we need to authenticate via Kerberos, send a
+    * HTTP auth challenge, otherwise just return an IPP error...
+    */
+
+    printer = cupsdFindDest(job->dest);
+
+    if (printer && printer->num_auth_info_required > 0 &&
+        !strcmp(printer->auth_info_required[0], "negotiate"))
+      send_http_error(con, HTTP_UNAUTHORIZED, printer);
+    else
+      send_ipp_status(con, IPP_NOT_AUTHORIZED,
+		      _("No authentication information provided!"));
     return;
   }
 
@@ -8262,9 +8272,12 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   return;
 
 #  else
-  krb5_error_code error;		/* Kerberos error code */
-  OM_uint32	major_status,		/* Major status code */
-		minor_status;		/* Minor status code */
+  krb5_error_code	error;		/* Kerberos error code */
+  OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
+  krb5_principal	principal;	/* Kerberos principal */
+#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
 
 
 #   ifdef __APPLE__
@@ -8297,11 +8310,34 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                                &(job->ccache))) != 0)
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create new credentials (%d/%s)",
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create new credentials cache (%d/%s)",
                     error, strerror(errno));
     job->ccache = NULL;
     return;
   }
+
+  if ((error = krb5_parse_name(KerberosContext, con->username, &principal)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to parse kerberos username (%d/%s)",
+                    error, strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    job->ccache = NULL;
+    return;
+  }
+
+  if ((error = krb5_cc_initialize(KerberosContext, job->ccache, principal)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to initialize credentials cache (%d/%s)", error,
+		    strerror(errno));
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    krb5_free_principal(KerberosContext, principal);
+    job->ccache = NULL;
+    return;
+  }
+
+  krb5_free_principal(KerberosContext, principal);
 
  /*
   * Copy the user's credentials to the new cache file...
@@ -9893,5 +9929,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6755 2007-08-01 19:02:47Z mike $".
+ * End of "$Id: ipp.c 6949 2007-09-12 21:33:23Z mike $".
  */
