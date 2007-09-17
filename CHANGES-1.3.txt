@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.2
 
+	- The scheduler no longer writes the printcap file for
+	  every remote printer update (STR #2512)
 	- Remote raw printing with multiple copies did not work
 	  (STR #2518)
 	- Updated the configure script to require at least autoconf

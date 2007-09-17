@@ -91,7 +91,7 @@ static void	process_browse_data(const char *uri, const char *host,
 				    ipp_pstate_t state, const char *location,
 				    const char *info, const char *make_model,
 				    int num_attrs, cups_option_t *attrs);
-static void	process_implicit_classes(void);
+static void	process_implicit_classes(int *write_printcap);
 static void	send_cups_browse(cupsd_printer_t *p);
 #ifdef HAVE_LDAP
 static void	send_ldap_browse(cupsd_printer_t *p);
@@ -609,7 +609,7 @@ cupsdLoadRemoteCache(void)
   * Do auto-classing if needed...
   */
 
-  process_implicit_classes();
+  process_implicit_classes(NULL);
 }
 
 
@@ -1685,7 +1685,8 @@ process_browse_data(
     cups_option_t *attrs)		/* I - Attributes */
 {
   int		i;			/* Looping var */
-  int		update;			/* Update printer attributes? */
+  int		update,			/* Update printer attributes? */
+		write_printcap;		/* Write the printcap file? */
   char		finaluri[HTTP_MAX_URI],	/* Final URI for printer */
 		name[IPP_MAX_NAME],	/* Name of printer */
 		newname[IPP_MAX_NAME],	/* New name of printer */
@@ -1772,11 +1773,12 @@ process_browse_data(
   * See if we already have it listed in the Printers list, and add it if not...
   */
 
-  type   |= CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED;
-  type   &= ~CUPS_PRINTER_IMPLICIT;
-  update = 0;
-  hptr   = strchr(host, '.');
-  sptr   = strchr(ServerName, '.');
+  type           |= CUPS_PRINTER_REMOTE | CUPS_PRINTER_DISCOVERED;
+  type           &= ~CUPS_PRINTER_IMPLICIT;
+  update         = 0;
+  write_printcap = 0;
+  hptr           = strchr(host, '.');
+  sptr           = strchr(ServerName, '.');
 
   if (!ServerNameIsIP && sptr != NULL && hptr != NULL)
   {
@@ -1899,7 +1901,8 @@ process_browse_data(
       cupsdSetString(&p->device_uri, uri);
       cupsdSetString(&p->hostname, host);
 
-      update = 1;
+      update         = 1;
+      write_printcap = 1;
     }
   }
   else
@@ -2005,7 +2008,8 @@ process_browse_data(
       cupsdSetString(&p->uri, uri);
       cupsdSetString(&p->device_uri, uri);
 
-      update = 1;
+      write_printcap = 1;
+      update         = 1;
     }
   }
 
@@ -2064,7 +2068,8 @@ process_browse_data(
   if (info && (!p->info || strcmp(p->info, info)))
   {
     cupsdSetString(&p->info, info);
-    update = 1;
+    update         = 1;
+    write_printcap = 1;
   }
 
   if (!make_model || !make_model[0])
@@ -2153,6 +2158,7 @@ process_browse_data(
       if (p->type & CUPS_PRINTER_DEFAULT)
       {
         DefaultPrinter = p;
+	write_printcap = 1;
 	break;
       }
   }
@@ -2161,13 +2167,14 @@ process_browse_data(
   * Do auto-classing if needed...
   */
 
-  process_implicit_classes();
+  process_implicit_classes(&write_printcap);
 
  /*
   * Update the printcap file...
   */
 
-  cupsdWritePrintcap();
+  if (write_printcap)
+    cupsdWritePrintcap();
 }
 
 
@@ -2657,7 +2664,8 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
  */
 
 static void
-process_implicit_classes(void)
+process_implicit_classes(
+    int *write_printcap)		/* O - Write printcap file? */
 {
   int		i;			/* Looping var */
   int		update;			/* Update printer attributes? */
@@ -2737,6 +2745,9 @@ process_implicit_classes(void)
         cupsdSetString(&pclass->job_sheets[1], p->job_sheets[1]);
 
         update = 1;
+
+	if (write_printcap)
+	  *write_printcap = 1;
 
         cupsdLogMessage(CUPSD_LOG_DEBUG, "Added implicit class \"%s\"...",
 	                name);
