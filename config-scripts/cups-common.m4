@@ -13,8 +13,8 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-dnl We need at least autoconf 2.50...
-AC_PREREQ(2.50)
+dnl We need at least autoconf 2.60...
+AC_PREREQ(2.60)
 
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
