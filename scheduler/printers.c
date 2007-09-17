@@ -3228,8 +3228,8 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
                   "number-up-default", 1);
 
   if (!cupsGetOption("orientation-requested", p->num_options, p->options))
-    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
-                  "orientation-requested-default", IPP_PORTRAIT);
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
+                 "orientation-requested-default", NULL, NULL);
 
   if (!cupsGetOption("notify-lease-duration", p->num_options, p->options))
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
