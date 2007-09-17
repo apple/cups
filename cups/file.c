@@ -1207,7 +1207,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
     if (fp->ptr >= fp->end)
       if (cups_fill(fp) <= 0)
       {
-        DEBUG_printf(("    cups_fill() returned -1, total=%d\n", total));
+        DEBUG_printf(("    cups_fill() returned -1, total=%d\n", (int)total));
 
         if (total > 0)
           return ((ssize_t)total);
@@ -1235,7 +1235,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   * Return the total number of bytes read...
   */
 
-  DEBUG_printf(("    total=%d\n", total));
+  DEBUG_printf(("    total=%d\n", (int)total));
 
   return ((ssize_t)total);
 }
@@ -1703,6 +1703,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 {
   ssize_t		bytes;		/* Number of bytes read */
 #ifdef HAVE_LIBZ
+  int			status;		/* Decompression status */
   const unsigned char	*ptr,		/* Pointer into buffer */
 			*end;		/* End of buffer */
 #endif /* HAVE_LIBZ */
@@ -1921,7 +1922,13 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
       fp->stream.next_out  = (Bytef *)fp->buf;
       fp->stream.avail_out = sizeof(fp->buf);
 
-      if (inflate(&(fp->stream), Z_NO_FLUSH) == Z_STREAM_END)
+      status = inflate(&(fp->stream), Z_NO_FLUSH);
+
+      if (fp->stream.next_out > (Bytef *)fp->buf)
+        fp->crc = crc32(fp->crc, (Bytef *)fp->buf,
+	                fp->stream.next_out - (Bytef *)fp->buf);
+
+      if (status == Z_STREAM_END)
       {
        /*
 	* Read the CRC and length...
@@ -1949,6 +1956,9 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	   /*
             * Bad CRC, mark end-of-file...
 	    */
+
+            DEBUG_printf(("cups_fill: tcrc=%08x, fp->crc=%08x\n",
+	                  (unsigned int)tcrc, (unsigned int)fp->crc));
 
 	    fp->eof = 1;
 

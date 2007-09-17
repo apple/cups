@@ -16,7 +16,8 @@
  *
  * Contents:
  *
- *   main() - Main entry.
+ *   main()             - Main entry.
+ *   read_write_tests() - Perform read/write tests.
  */
 
 /*
@@ -149,6 +150,8 @@ read_write_tests(int compression)	/* I - Use compression? */
   unsigned char	readbuf[8192],		/* Read buffer */
 		writebuf[8192];		/* Write buffer */
   int		byte;			/* Byte from file */
+  static const char *partial_line = "partial line";
+					/* Partial line */
 
 
  /*
@@ -253,11 +256,25 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileWrite(): ", stdout);
 
-    for (i = 0; i < 100; i ++)
+    for (i = 0; i < 10000; i ++)
       if (cupsFileWrite(fp, (char *)writebuf, sizeof(writebuf)) < 0)
         break;
 
-    if (i >= 100)
+    if (i >= 10000)
+      puts("PASS");
+    else
+    {
+      printf("FAIL (%s)\n", strerror(errno));
+      status ++;
+    }
+
+   /*
+    * cupsFilePuts() with partial line...
+    */
+
+    fputs("cupsFilePuts(\"partial line\"): ", stdout);
+
+    if (cupsFilePuts(fp, partial_line) > 0)
       puts("PASS");
     else
     {
@@ -405,13 +422,13 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileRead(): ", stdout);
 
-    for (i = 0; i < 100; i ++)
+    for (i = 0; i < 10000; i ++)
       if ((byte = cupsFileRead(fp, (char *)readbuf, sizeof(readbuf))) < 0)
         break;
       else if (memcmp(readbuf, writebuf, sizeof(readbuf)))
         break;
 
-    if (i >= 100)
+    if (i >= 10000)
       puts("PASS");
     else if (byte > 0)
     {
@@ -427,6 +444,26 @@ read_write_tests(int compression)	/* I - Use compression? */
     else
     {
       printf("FAIL (%s)\n", strerror(errno));
+      status ++;
+    }
+
+   /*
+    * cupsFileGetChar() with partial line...
+    */
+
+    fputs("cupsFileGetChar(partial line): ", stdout);
+
+    for (i = 0; i < strlen(partial_line); i ++)
+      if ((byte = cupsFileGetChar(fp)) < 0)
+        break;
+      else if (byte != partial_line[i])
+        break;
+
+    if (!partial_line[i])
+      puts("PASS");
+    else
+    {
+      printf("FAIL (got '%c', expected '%c')\n", byte, partial_line[i]);
       status ++;
     }
 
