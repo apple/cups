@@ -132,7 +132,8 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
-  const char	*content_type;		/* CONTENT_TYPE environment variable */
+  const char	*content_type,		/* CONTENT_TYPE environment variable */
+		*final_content_type;	/* FINAL_CONTENT_TYPE environment var */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -209,12 +210,16 @@ main(int  argc,				/* I - Number of command-line args */
   * Get the (final) content type...
   */
 
-  if ((content_type = getenv("FINAL_CONTENT_TYPE")) == NULL)
-    if ((content_type = getenv("CONTENT_TYPE")) == NULL)
-      content_type = "application/octet-stream";
+  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+    content_type = "application/octet-stream";
 
-  if (!strncmp(content_type, "printer/", 8))
-    content_type = "application/vnd.cups-raw";
+  if ((final_content_type = getenv("FINAL_CONTENT_TYPE")) == NULL)
+  {
+    final_content_type = content_type;
+
+    if (!strncmp(final_content_type, "printer/", 8))
+      final_content_type = "application/vnd.cups-raw";
+  }
 
  /*
   * Extract the hostname and printer name from the URI...
@@ -426,10 +431,9 @@ main(int  argc,				/* I - Number of command-line args */
     * Point to the single file from stdin...
     */
 
-    filename  = tmpfilename;
-    files     = &filename;
-    num_files = 1;
-
+    filename     = tmpfilename;
+    num_files    = 1;
+    files        = &filename;
     send_options = 0;
   }
   else
@@ -438,10 +442,9 @@ main(int  argc,				/* I - Number of command-line args */
     * Point to the files on the command-line...
     */
 
-    num_files = argc - 6;
-    files     = argv + 6;
-
-    send_options = strncasecmp(content_type, "application/vnd.cups-", 21) != 0;
+    num_files    = argc - 6;
+    files        = argv + 6;
+    send_options = 1;
 
 #ifdef HAVE_LIBZ
     if (compression)
@@ -859,8 +862,7 @@ main(int  argc,				/* I - Number of command-line args */
     num_options = cupsParseOptions(argv[5], 0, &options);
 
 #ifdef __APPLE__
-    if (content_type != NULL &&
-        !strcasecmp(content_type, "application/pictwps") && num_files == 1)
+    if (!strcasecmp(content_type, "application/pictwps") && num_files == 1)
     {
       if (format_sup != NULL)
       {
@@ -886,23 +888,23 @@ main(int  argc,				/* I - Number of command-line args */
 	* number of copies to 1...
 	*/
 
-	content_type     = "application/postscript";
-	copies           = 1;
-	copies_remaining = 1;
-        send_options     = 0;
+	final_content_type = "application/postscript";
+	copies             = 1;
+	copies_remaining   = 1;
+        send_options       = 0;
       }
     }
 #endif /* __APPLE__ */
 
-    if (content_type != NULL && format_sup != NULL)
+    if (format_sup != NULL)
     {
       for (i = 0; i < format_sup->num_values; i ++)
-        if (!strcasecmp(content_type, format_sup->values[i].string.text))
+        if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
           break;
 
       if (i < format_sup->num_values)
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-	             "document-format", NULL, content_type);
+	             "document-format", NULL, final_content_type);
     }
 
     if (copies_sup && version > 0 && send_options)
