@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 6778 2007-08-08 19:27:51Z mike $"
+# "$Id: cups.spec.in 6960 2007-09-14 21:15:04Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -592,7 +592,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /usr/share/locale/pt/cups_pt.po
 /usr/share/locale/pt_BR/cups_pt_BR.po
-/usr/share/locale/pt_PT/cups_pt_PT.po
 
 %files ru
 %defattr(-,root,root)
@@ -627,5 +626,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 6778 2007-08-08 19:27:51Z mike $".
+# End of "$Id: cups.spec.in 6960 2007-09-14 21:15:04Z mike $".
 #

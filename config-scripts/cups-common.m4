@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6946 2007-09-12 18:28:16Z mike $"
+dnl "$Id: cups-common.m4 6965 2007-09-17 21:34:07Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -13,14 +13,14 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-dnl We need at least autoconf 2.50...
-AC_PREREQ(2.50)
+dnl We need at least autoconf 2.60...
+AC_PREREQ(2.60)
 
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
 dnl Versio number information...
-CUPS_VERSION="1.3.1"
+CUPS_VERSION="1.3.2"
 CUPS_REVISION=""
 #if test -z "$CUPS_REVISION" -a -d .svn; then
 #	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
@@ -287,5 +287,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-common.m4 6946 2007-09-12 18:28:16Z mike $".
+dnl End of "$Id: cups-common.m4 6965 2007-09-17 21:34:07Z mike $".
 dnl

@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-directories.m4 6838 2007-08-22 20:00:19Z mike $"
+dnl "$Id: cups-directories.m4 6976 2007-09-18 20:39:31Z mike $"
 dnl
 dnl   Directory stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -99,17 +99,23 @@ if test "$sysconfdir" = "\${prefix}/etc"; then
 	fi
 fi
 
-dnl Fix "libdir" variable for IRIX 6.x...
+dnl Fix "libdir" variable...
 if test "$libdir" = "\${exec_prefix}/lib"; then
-	if test "$uname" = "IRIX"; then
-		libdir="$exec_prefix/lib32"
-	else
-		if test "$uname" = Linux -a -d /usr/lib64; then
-			libdir="$exec_prefix/lib64"
-		else
-			libdir="$exec_prefix/lib"
-		fi
-	fi
+	case "$uname" in
+		IRIX*)
+			libdir="$exec_prefix/lib32"
+			;;
+		Linux*)
+			if test -d /usr/lib64; then
+				libdir="$exec_prefix/lib64"
+			fi
+			;;
+		HP-UX*)
+			if test -d /usr/lib/hpux32; then
+				libdir="$exec_prefix/lib/hpux32"
+			fi
+			;;
+	esac
 fi
 
 dnl Setup init.d locations...
@@ -146,8 +152,8 @@ if test x$rcdir = x; then
 		HP-UX*)
 			INITDIR="/sbin"
 			RCLEVELS="2"
-			RCSTART="620"
-			RCSTOP="380"
+			RCSTART="380"
+			RCSTOP="620"
 			;;
 
 		IRIX*)
@@ -291,11 +297,12 @@ fi
 AC_SUBST(CUPS_FONTPATH)
 AC_DEFINE_UNQUOTED(CUPS_FONTPATH, "$CUPS_FONTPATH")
 
-# Locale data
-if test "$localedir" = "\${datarootdir}/locale"; then
+# Locale data (initial assignment allows us not to require autoconf 2.60)
+localedir="${localedir:=}"
+if test "$localedir" = "\${datarootdir}/locale" -o "$localedir" = ""; then
 	case "$uname" in
 		Linux | GNU | *BSD* | Darwin*)
-			CUPS_LOCALEDIR="$datarootdir/locale"
+			CUPS_LOCALEDIR="$datadir/locale"
 			;;
 
 		OSF1* | AIX*)
@@ -360,5 +367,5 @@ AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
-dnl End of "$Id: cups-directories.m4 6838 2007-08-22 20:00:19Z mike $".
+dnl End of "$Id: cups-directories.m4 6976 2007-09-18 20:39:31Z mike $".
 dnl

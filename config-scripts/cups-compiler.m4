@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-compiler.m4 6698 2007-07-20 14:15:44Z mike $"
+dnl "$Id: cups-compiler.m4 6976 2007-09-18 20:39:31Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -301,6 +301,40 @@ else
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
 			fi
+
+			if test "x$enable_32bit" = xyes; then
+				# Build 32-bit libraries, 64-bit base...
+				if test -z "$with_arch32flags"; then
+					ARCH32FLAGS="+DD32"
+				else
+					ARCH32FLAGS="$with_arch32flags"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch64flags"; then
+						ARCHFLAGS="+DD64"
+					else
+						ARCHFLAGS="$with_arch64flags"
+					fi
+				fi
+			fi
+
+			if test "x$enable_64bit" = xyes; then
+				# Build 64-bit libraries, 32-bit base...
+				if test -z "$with_arch64flags"; then
+					ARCH64FLAGS="+DD64"
+				else
+					ARCH64FLAGS="$with_arch64flags"
+				fi
+
+				if test -z "$with_archflags"; then
+					if test -z "$with_arch32flags"; then
+						ARCHFLAGS="+DD32"
+					else
+						ARCHFLAGS="$with_arch32flags"
+					fi
+				fi
+			fi
 			;;
         	IRIX)
 			if test -z "$OPTIM"; then
@@ -464,5 +498,5 @@ case $uname in
 esac
 
 dnl
-dnl End of "$Id: cups-compiler.m4 6698 2007-07-20 14:15:44Z mike $".
+dnl End of "$Id: cups-compiler.m4 6976 2007-09-18 20:39:31Z mike $".
 dnl
