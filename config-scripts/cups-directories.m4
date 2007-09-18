@@ -99,17 +99,23 @@ if test "$sysconfdir" = "\${prefix}/etc"; then
 	fi
 fi
 
-dnl Fix "libdir" variable for IRIX 6.x...
+dnl Fix "libdir" variable...
 if test "$libdir" = "\${exec_prefix}/lib"; then
-	if test "$uname" = "IRIX"; then
-		libdir="$exec_prefix/lib32"
-	else
-		if test "$uname" = Linux -a -d /usr/lib64; then
-			libdir="$exec_prefix/lib64"
-		else
-			libdir="$exec_prefix/lib"
-		fi
-	fi
+	case "$uname" in
+		IRIX*)
+			libdir="$exec_prefix/lib32"
+			;;
+		Linux*)
+			if test -d /usr/lib64; then
+				libdir="$exec_prefix/lib64"
+			fi
+			;;
+		HP-UX*)
+			if test -d /usr/lib/hpux32; then
+				libdir="$exec_prefix/lib/hpux32"
+			fi
+			;;
+	esac
 fi
 
 dnl Setup init.d locations...
@@ -146,8 +152,8 @@ if test x$rcdir = x; then
 		HP-UX*)
 			INITDIR="/sbin"
 			RCLEVELS="2"
-			RCSTART="620"
-			RCSTOP="380"
+			RCSTART="380"
+			RCSTOP="620"
 			;;
 
 		IRIX*)
