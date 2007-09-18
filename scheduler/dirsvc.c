@@ -2134,6 +2134,7 @@ process_browse_data(
  
     cupsdDeletePrinter(p, 1);
     cupsdUpdateImplicitClasses();
+    write_printcap = 1;
   }
   else if (update)
   {
