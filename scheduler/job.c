@@ -3610,6 +3610,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
                                 attrs)) != NULL)
       {
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
+	cupsdSetPrinterAttrs(job->printer);
 	cupsdSaveAllPrinters();
       }
 

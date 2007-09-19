@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.3
 
+	- The auth-info-required attribute was not always updated
+	  for remote queues that required authentication.
 	- The German web interface localization contained errors
 	  (STR #2523)
 	- The Swedish localization contained errors (STR #2522)
