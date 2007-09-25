@@ -740,56 +740,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   else
     oldinfo = NULL;
 
-  if ((name = cgiGetVariable("PRINTER_NAME")) == NULL ||
-      cgiGetVariable("PRINTER_LOCATION") == NULL)
-  {
-    cgiStartHTML(title);
-
-    if (modify)
-    {
-     /*
-      * Update the location and description of an existing printer...
-      */
-
-      if (oldinfo)
-	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
-
-      cgiCopyTemplateLang("modify-printer.tmpl");
-    }
-    else
-    {
-     /*
-      * Get the name, location, and description for a new printer...
-      */
-
-      cgiCopyTemplateLang("add-printer.tmpl");
-    }
-
-    cgiEndHTML();
-
-    if (oldinfo)
-      ippDelete(oldinfo);
-
-    return;
-  }
-
-  for (ptr = name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
-      break;
-
-  if (*ptr || ptr == name || strlen(name) > 127)
-  {
-    cgiSetVariable("ERROR",
-                   cgiText(_("The printer name may only contain up to "
-			     "127 printable characters and may not "
-			     "contain spaces, slashes (/), or the "
-			     "pound sign (#).")));
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
   file = cgiGetFile();
 
   if (file)
@@ -800,7 +750,91 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     fprintf(stderr, "DEBUG: file->mimetype=%s\n", file->mimetype);
   }
 
-  if ((var = cgiGetVariable("DEVICE_URI")) == NULL)
+  if ((name = cgiGetVariable("PRINTER_NAME")) != NULL)
+  {
+    for (ptr = name; *ptr; ptr ++)
+      if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+	break;
+
+    if (*ptr || ptr == name || strlen(name) > 127)
+    {
+      cgiSetVariable("ERROR",
+		     cgiText(_("The printer name may only contain up to "
+			       "127 printable characters and may not "
+			       "contain spaces, slashes (/), or the "
+			       "pound sign (#).")));
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+      return;
+    }
+  }
+
+  if ((var = cgiGetVariable("DEVICE_URI")) != NULL)
+  {
+    if ((uriptr = strrchr(var, '|')) != NULL)
+    {
+     /*
+      * Extract make and make/model from device URI string...
+      */
+
+      char	make[1024],		/* Make string */
+		*makeptr;		/* Pointer into make */
+
+
+      *uriptr++ = '\0';
+
+      strlcpy(make, uriptr, sizeof(make));
+
+      if ((makeptr = strchr(make, ' ')) != NULL)
+        *makeptr = '\0';
+      else if ((makeptr = strchr(make, '-')) != NULL)
+        *makeptr = '\0';
+      else if (!strncasecmp(make, "laserjet", 8) ||
+               !strncasecmp(make, "deskjet", 7) ||
+               !strncasecmp(make, "designjet", 9))
+        strcpy(make, "HP");
+      else if (!strncasecmp(make, "phaser", 6))
+        strcpy(make, "Xerox");
+      else if (!strncasecmp(make, "stylus", 6))
+        strcpy(make, "Epson");
+      else
+        strcpy(make, "Generic");
+
+      if (!cgiGetVariable("CURRENT_MAKE"))
+        cgiSetVariable("CURRENT_MAKE", make);
+
+      cgiSetVariable("PPD_MAKE", make);
+
+      if (!cgiGetVariable("CURRENT_MAKE_AND_MODEL"))
+        cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
+
+      if (!modify)
+      {
+        char	template[128],		/* Template name */
+		*tptr;			/* Pointer into template name */
+
+	cgiSetVariable("PRINTER_INFO", uriptr);
+
+	for (tptr = template;
+	     tptr < (template + sizeof(template) - 1) && *uriptr;
+	     uriptr ++)
+	  if (isalnum(*uriptr & 255) || *uriptr == '_' || *uriptr == '-' ||
+	      *uriptr == '.')
+	    *tptr++ = *uriptr;
+	  else if ((*uriptr == ' ' || *uriptr == '/') && tptr[-1] != '_')
+	    *tptr++ = '_';
+	  else if (*uriptr == '?' || *uriptr == '(')
+	    break;
+
+        *tptr = '\0';
+
+        cgiSetVariable("TEMPLATE_NAME", template);
+      }
+    }
+  }
+
+  if (!var)
   {
    /*
     * Build a CUPS_GET_DEVICES request, which requires the following
@@ -897,6 +931,37 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     cgiCopyTemplateLang("choose-serial.tmpl");
     cgiEndHTML();
   }
+  else if (!name || !cgiGetVariable("PRINTER_LOCATION"))
+  {
+    cgiStartHTML(title);
+
+    if (modify)
+    {
+     /*
+      * Update the location and description of an existing printer...
+      */
+
+      if (oldinfo)
+	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
+
+      cgiCopyTemplateLang("modify-printer.tmpl");
+    }
+    else
+    {
+     /*
+      * Get the name, location, and description for a new printer...
+      */
+
+      cgiCopyTemplateLang("add-printer.tmpl");
+    }
+
+    cgiEndHTML();
+
+    if (oldinfo)
+      ippDelete(oldinfo);
+
+    return;
+  }
   else if (!file && (var = cgiGetVariable("PPD_NAME")) == NULL)
   {
     if (modify)
@@ -959,39 +1024,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	        strerror(errno));
       }
     }
-    else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), '|')) != NULL)
-    {
-     /*
-      * Extract make and make/model from device URI string...
-      */
-
-      char	make[1024],		/* Make string */
-		*makeptr;		/* Pointer into make */
-
-
-      *uriptr++ = '\0';
-
-      strlcpy(make, uriptr, sizeof(make));
-
-      if ((makeptr = strchr(make, ' ')) != NULL)
-        *makeptr = '\0';
-      else if ((makeptr = strchr(make, '-')) != NULL)
-        *makeptr = '\0';
-      else if (!strncasecmp(make, "laserjet", 8) ||
-               !strncasecmp(make, "deskjet", 7) ||
-               !strncasecmp(make, "designjet", 9))
-        strcpy(make, "HP");
-      else if (!strncasecmp(make, "phaser", 6))
-        strcpy(make, "Xerox");
-      else if (!strncasecmp(make, "stylus", 6))
-        strcpy(make, "Epson");
-      else
-        strcpy(make, "Generic");
-
-      cgiSetVariable("CURRENT_MAKE", make);
-      cgiSetVariable("PPD_MAKE", make);
-      cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
-    }
 
    /*
     * Build a CUPS_GET_PPDS request, which requires the following
@@ -1007,7 +1039,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
 
-    if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
+    if ((var = cgiGetVariable("CURRENT_MAKE")) != NULL)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
     else

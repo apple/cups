@@ -1,17 +1,31 @@
 <FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
-<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
 <INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
 <INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
 <INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
 <INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
 
-<H2 CLASS="title">Model/Driver for {printer_name}</H2>
-
 <TABLE>
+<TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Name:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Description:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Location:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Make:</TH>
+<TD>{PPD_MAKE} <INPUT TYPE="SUBMIT" NAME="SELECT_MAKE" VALUE="Select Another Make/Manufacturer"></TD>
+</TR>
 <TR>
 <TH CLASS="label">Model:</TH>
 <TD>
@@ -24,10 +38,6 @@
 <TH CLASS="label">Or Provide a PPD File:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="MAX_FILE_SIZE" VALUE="262144"><INPUT
 TYPE="FILE" NAME="PPD_FILE"></TD>
-</TR>
-<TR>
-<TH CLASS="label">Or Select a Different Make/Manufacturer:</TH>
-<TD><INPUT TYPE="SUBMIT" NAME="SELECT_MAKE" VALUE="Select Make/Manufacturer"></TD>
 </TR>
 <TR>
 <TD></TD>

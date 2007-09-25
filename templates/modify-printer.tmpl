@@ -1,12 +1,19 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-{?device_uri=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_DEVICE_URI" VALUE="{device_uri}">}
-{?printer_make_and_model=?:<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{printer_make_and_model}">}
+{?printer_make_and_model=?{?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}:<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{printer_make_and_model}">}
 
 <TABLE>
 <TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
 <TH CLASS="label">Name:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
+</TR>
+<TH CLASS="label">Description:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
+<SMALL>(Human-readable description such as "HP LaserJet with Duplexer")</SMALL></TD>
 </TR>
 <TR>
 <TH CLASS="label">Location:</TH>
@@ -14,10 +21,6 @@
 <SMALL>(Human-readable location such as "Lab 1")</SMALL></TD>
 </TR>
 <TR>
-<TH CLASS="label">Description:</TH>
-<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
-<SMALL>(Human-readable description such as "HP LaserJet with Duplexer")</SMALL></TD>
-</TR>
 <TR>
 <TD></TD>
 <TD><INPUT TYPE="SUBMIT" VALUE="Continue"></TD>

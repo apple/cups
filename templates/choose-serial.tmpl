@@ -1,13 +1,11 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
-<INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">
-
-<H2 CLASS="title">Serial Port Settings for {printer_name}</H2>
 
 <TABLE>
+<TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
 <TR>
 <TH CLASS="label">Baud Rate:</TH>
 <TD><SELECT NAME="BAUDRATE">

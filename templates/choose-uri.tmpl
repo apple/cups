@@ -1,15 +1,10 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{?printer_location}">
-<INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{?printer_info}">
 <INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{?current_make_and_model}">
-
-<H2 CLASS="title">Device URI for {printer_name}</H2>
 
 <TABLE>
 <TR>
-<TH CLASS="label">Device URI:</TH>
+<TH CLASS="label">Connection:</TH>
 <TD><INPUT TYPE="TEXT" SIZE="60" MAXLENGTH="1024" NAME="DEVICE_URI" VALUE="{device_uri}"></TD>
 </TR>
 <TR>
