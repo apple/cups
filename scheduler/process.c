@@ -135,6 +135,7 @@ cupsdStartProcess(
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
+    *pid = 0;
     return (0);
   }
 
