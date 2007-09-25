@@ -8,13 +8,31 @@
 <H2 CLASS="title">Device for {printer_name}</H2>
 
 <TABLE>
-<TR>
-<TH CLASS="label">Device:</TH>
+<TH CLASS="label">Local Printers:</TH>
 <TD>
-<SELECT NAME="DEVICE_URI">
-{[device_uri]<OPTION VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?SELECTED:{current_device_scheme={device_uri}?SELECTED:}}>
-{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}</OPTION>
-}</SELECT>
+{[device_uri]{device_class!network?<INPUT TYPE="radio" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+:}}
+</TD>
+</TR>
+<TR>
+<TH CLASS="label">Discovered Network Printers:</TH>
+<TD>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="radio" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+:}:}}
+</TD>
+</TR>
+<TR>
+<TR>
+<TH CLASS="label">Other Network Printers:</TH>
+<TD>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="radio" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
+}:}}
 </TD>
 </TR>
 <TR>
