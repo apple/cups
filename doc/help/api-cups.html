@@ -4,7 +4,7 @@
 <head>
 	<title>CUPS API</title>
 	<meta name='keywords' content='Programming'>
-	<meta name='creator' content='Mini-XML v2.3'>
+	<meta name='creator' content='Mini-XML v2.4'>
 	<style type='text/css'><!--
 	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
 	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
@@ -160,6 +160,7 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsGetOption'><tt>cupsGetOption()</tt></a> </li>
 	<li><a href='#cupsGetPPD'><tt>cupsGetPPD()</tt></a> </li>
 	<li><a href='#cupsGetPPD2'><tt>cupsGetPPD2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetPPD3'><tt>cupsGetPPD3()</tt></a> </li>
 	<li><a href='#cupsGetPassword'><tt>cupsGetPassword()</tt></a> </li>
 	<li><a href='#cupsGetPrinters'><tt>cupsGetPrinters()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#cupsGetServerPPD'><tt>cupsGetServerPPD()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
@@ -666,6 +667,41 @@ cupsGetPPD2(
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Filename for PPD file</p>
+<!-- NEW PAGE -->
+<h3 class='title'><a name='cupsGetPPD3'>cupsGetPPD3()</a></h3>
+<h4>Description</h4>
+<p>Get the PPD file for a printer on the specified
+server if it has changed.
+<p>The &quot;modtime&quot; parameter contains the modification time of any
+locally-cached content and is updated with the time from the PPD file on
+the server.
+<p>The &quot;buffer&quot; parameter contains the local PPD filename.  If it contains
+the empty string, a new temporary file is created, otherwise the existing
+file will be overwritten as needed.
+<p>On success, HTTP_OK is returned for a new PPD file and HTTP_NOT_MODIFIED
+if the existing PPD file is up-to-date.  Any other status is an error.
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsGetPPD3(
+    http_t * http,
+    const char * name,
+    time_t * modtime,
+    char * buffer,
+    size_t bufsize);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>name</tt></td><td>Printer name</td></tr>
+<tr><td><tt>modtime</tt></td><td>Modification time</td></tr>
+<tr><td><tt>buffer</tt></td><td>Filename buffer</td></tr>
+<tr><td><tt>bufsize</tt></td><td>Size of filename buffer</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetPassword'>cupsGetPassword()</a></h3>
 <h4>Description</h4>
