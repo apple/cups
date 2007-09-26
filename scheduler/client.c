@@ -3245,11 +3245,11 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
     snprintf(filename, len, "%s%s", ServerRoot, con->uri + 11);
   else if (!strncmp(con->uri, "/admin/log/", 11))
   {
-    if (!strcmp(con->uri + 11, "access_log") && AccessLog[0] == '/')
+    if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
       strlcpy(filename, AccessLog, len);
-    else if (!strcmp(con->uri + 11, "error_log") && ErrorLog[0] == '/')
+    else if (!strncmp(con->uri + 11, "error_log", 10) && ErrorLog[0] == '/')
       strlcpy(filename, ErrorLog, len);
-    else if (!strcmp(con->uri + 11, "page_log") && PageLog[0] == '/')
+    else if (!strncmp(con->uri + 11, "page_log", 10) && PageLog[0] == '/')
       strlcpy(filename, PageLog, len);
     else
       return (NULL);
