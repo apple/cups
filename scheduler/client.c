@@ -3247,9 +3247,9 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
   {
     if (!strncmp(con->uri + 11, "access_log", 10) && AccessLog[0] == '/')
       strlcpy(filename, AccessLog, len);
-    else if (!strncmp(con->uri + 11, "error_log", 10) && ErrorLog[0] == '/')
+    else if (!strncmp(con->uri + 11, "error_log", 9) && ErrorLog[0] == '/')
       strlcpy(filename, ErrorLog, len);
-    else if (!strncmp(con->uri + 11, "page_log", 10) && PageLog[0] == '/')
+    else if (!strncmp(con->uri + 11, "page_log", 8) && PageLog[0] == '/')
       strlcpy(filename, PageLog, len);
     else
       return (NULL);
