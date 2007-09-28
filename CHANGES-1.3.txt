@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.3
 
+	- The scheduler did not use the natural-language-requested
+	  attribute when passing the LANG environment variable to
+	  cups-deviced or cups-driverd.
 	- The scheduler did not use the printer-op-policy when
 	  modifying classes or printers (STR #2525)
 	- The auth-info-required attribute was not always updated

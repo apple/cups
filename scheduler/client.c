@@ -4235,6 +4235,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		script_name[1024],	/* SCRIPT_NAME environment variable */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
+  ipp_attribute_t *attr;		/* natural-language-request attribute */
 
 
  /*
@@ -4370,7 +4371,44 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   else
     auth_type[0] = '\0';
 
-  if (con->language)
+  if (con->request &&
+      (attr = ippFindAttribute(con->request, "natural-language-requested",
+                               IPP_TAG_LANGUAGE)) != NULL)
+  {
+    switch (strlen(attr->values[0].string.text))
+    {
+      default :
+	 /*
+	  * This is an unknown or badly formatted language code; use
+	  * the POSIX locale...
+	  */
+
+	  strcpy(lang, "LANG=C");
+	  break;
+
+      case 2 :
+	 /*
+	  * Just the language code (ll)...
+	  */
+
+	  snprintf(lang, sizeof(lang), "LANG=%s",
+		   attr->values[0].string.text);
+	  break;
+
+      case 5 :
+	 /*
+	  * Language and country code (ll-cc)...
+	  */
+
+	  snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
+		   attr->values[0].string.text[0],
+		   attr->values[0].string.text[1],
+		   toupper(attr->values[0].string.text[3] & 255),
+		   toupper(attr->values[0].string.text[4] & 255));
+	  break;
+    }
+  }
+  else if (con->language)
     snprintf(lang, sizeof(lang), "LANG=%s.UTF-8", con->language->language);
   else
     strcpy(lang, "LANG=C");
