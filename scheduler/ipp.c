@@ -908,16 +908,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   }
 
  /*
-  * Check policy...
-  */
-
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
-  {
-    send_http_error(con, status, NULL);
-    return;
-  }
-
- /*
   * See if the class already exists; if not, create a new class...
   */
 
@@ -941,8 +931,14 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     }
 
    /*
-    * No, add the pclass...
+    * No, check the default policy and then add the class...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
@@ -950,8 +946,15 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit class to "AnyClass" or remove it...
+    * Check the default policy, then tename the implicit class to "AnyClass"
+    * or remove it...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     if (ImplicitAnyClasses)
     {
@@ -971,8 +974,14 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
-    * Rename the remote class to "Class"...
+    * Check the default policy, then rename the remote class to "Class"...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     snprintf(newname, sizeof(newname), "%s@%s", resource + 9, pclass->hostname);
     cupsdRenamePrinter(pclass, newname);
@@ -983,6 +992,12 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
+  }
+  else if ((status = cupsdCheckPolicy(pclass->op_policy_ptr, con,
+                                      NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
   }
   else
     modify = 1;
@@ -2180,16 +2195,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * Check policy...
-  */
-
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
-  {
-    send_http_error(con, status, NULL);
-    return;
-  }
-
- /*
   * See if the printer already exists; if not, create a new printer...
   */
 
@@ -2213,8 +2218,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     }
 
    /*
-    * No, add the printer...
+    * No, check the default policy then add the printer...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
@@ -2222,8 +2233,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit printer to "AnyPrinter" or delete it...
+    * Check the default policy, then rename the implicit printer to
+    * "AnyPrinter" or delete it...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     if (ImplicitAnyClasses)
     {
@@ -2243,8 +2261,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
-    * Rename the remote printer to "Printer@server"...
+    * Check the default policy, then rename the remote printer to
+    * "Printer@server"...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     snprintf(newname, sizeof(newname), "%s@%s", resource + 10,
              printer->hostname);
@@ -2256,6 +2281,12 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
+  }
+  else if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
+                                      NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
   }
   else
     modify = 1;
