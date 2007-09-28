@@ -1,5 +1,19 @@
-CHANGES.txt - 2007-09-18
+CHANGES.txt - 2007-09-28
 ------------------------
+
+CHANGES IN CUPS V1.3.3
+
+	- The scheduler did not use the attributes-natural-language
+	  attribute when passing the LANG environment variable to
+	  cups-deviced or cups-driverd.
+	- The scheduler did not use the printer-op-policy when
+	  modifying classes or printers (STR #2525)
+	- The auth-info-required attribute was not always updated
+	  for remote queues that required authentication.
+	- The German web interface localization contained errors
+	  (STR #2523)
+	- The Swedish localization contained errors (STR #2522)
+
 
 CHANGES IN CUPS V1.3.2
 
