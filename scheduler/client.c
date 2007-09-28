@@ -4391,7 +4391,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	  * Just the language code (ll)...
 	  */
 
-	  snprintf(lang, sizeof(lang), "LANG=%s",
+	  snprintf(lang, sizeof(lang), "LANG=%s.UTF8",
 		   attr->values[0].string.text);
 	  break;
 
@@ -4400,7 +4400,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	  * Language and country code (ll-cc)...
 	  */
 
-	  snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
+	  snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c.UTF8",
 		   attr->values[0].string.text[0],
 		   attr->values[0].string.text[1],
 		   toupper(attr->values[0].string.text[3] & 255),
@@ -4409,7 +4409,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     }
   }
   else if (con->language)
-    snprintf(lang, sizeof(lang), "LANG=%s.UTF-8", con->language->language);
+    snprintf(lang, sizeof(lang), "LANG=%s.UTF8", con->language->language);
   else
     strcpy(lang, "LANG=C");
 

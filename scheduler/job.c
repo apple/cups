@@ -3007,7 +3007,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
         * Just the language code (ll)...
 	*/
 
-        snprintf(lang, sizeof(lang), "LANG=%s",
+        snprintf(lang, sizeof(lang), "LANG=%s.UTF8",
 	         attr->values[0].string.text);
         break;
 
@@ -3016,7 +3016,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
         * Language and country code (ll-cc)...
 	*/
 
-        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c",
+        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c.UTF8",
 	         attr->values[0].string.text[0],
 		 attr->values[0].string.text[1],
 		 toupper(attr->values[0].string.text[3] & 255),
