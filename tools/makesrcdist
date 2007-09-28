@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: makesrcdist 5502 2006-05-08 21:09:15Z mike $"
+# "$Id: makesrcdist 6979 2007-09-18 22:10:40Z mike $"
 #
 # makesrcdist - make a source distribution of CUPS.
 #
@@ -32,7 +32,7 @@ else
 	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar."
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
-	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
+	svn copy https://svn.easysw.com/public/cups/branches/branch-1.3 "$url" \
 		-m "Tag $version" || exit 1
 fi
 
@@ -81,5 +81,5 @@ rm -rf cups-$version
 echo "Done!"
 
 #
-# End of "$Id: makesrcdist 5502 2006-05-08 21:09:15Z mike $".
+# End of "$Id: makesrcdist 6979 2007-09-18 22:10:40Z mike $".
 #

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6926 2007-09-06 14:34:31Z mike $"
+# "$Id: Makefile 6996 2007-09-28 18:30:31Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -16,7 +16,7 @@
 include ../Makedefs
 
 
-OBJS	=	checkpo po2strings.o strings2po.o translate.o
+OBJS	=	checkpo.o po2strings.o strings2po.o translate.o
 TARGETS	=	checkpo po2strings strings2po translate
 
 
@@ -151,5 +151,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6926 2007-09-06 14:34:31Z mike $".
+# End of "$Id: Makefile 6996 2007-09-28 18:30:31Z mike $".
 #

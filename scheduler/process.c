@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 6783 2007-08-10 19:48:57Z mike $"
+ * "$Id: process.c 6988 2007-09-25 15:44:07Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -135,6 +135,7 @@ cupsdStartProcess(
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
+    *pid = 0;
     return (0);
   }
 
@@ -349,5 +350,5 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 
 
 /*
- * End of "$Id: process.c 6783 2007-08-10 19:48:57Z mike $".
+ * End of "$Id: process.c 6988 2007-09-25 15:44:07Z mike $".
  */
