@@ -4235,7 +4235,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		script_name[1024],	/* SCRIPT_NAME environment variable */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
-  ipp_attribute_t *attr;		/* natural-language-request attribute */
+  ipp_attribute_t *attr;		/* attributes-natural-language attribute */
 
 
  /*
@@ -4372,7 +4372,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     auth_type[0] = '\0';
 
   if (con->request &&
-      (attr = ippFindAttribute(con->request, "natural-language-requested",
+      (attr = ippFindAttribute(con->request, "attributes-natural-language",
                                IPP_TAG_LANGUAGE)) != NULL)
   {
     switch (strlen(attr->values[0].string.text))
