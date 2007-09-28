@@ -95,7 +95,7 @@ PPD file to stdout.</p>
 "<br>
 *End</p>
 
-<p>The <tt>?<i>MainKeyword</i><tt> attribute defines PostScript code that
+<p>The <tt>?<i>MainKeyword</i></tt> attribute defines PostScript code that
 determines the currently selected/enabled option keyword (choice) for the
 main keyword (option). It is typically used when communicating with USB,
 serial, Appletalk, and AppSocket (port 9100) printers.</p>
@@ -152,7 +152,7 @@ printers.</p>
 
 <p>CUPS supports three types of color profiles. The first type is
 based on sRGB and is used by the standard CUPS raster filters and
-ESP Ghostscript. The second type is based on ICC profiles and is
+GPL Ghostscript. The second type is based on ICC profiles and is
 used by the Quartz-based filters on MacOS X. The final type is
 based on well-known colorspaces such as sRGB and Adobe RGB.</p>
 
@@ -866,7 +866,7 @@ PRE B {
 	<td><tt>cupsColorSpace</tt></td>
 	<td>Integer</td>
 	<td>Specifies the page image colorspace: 0 = W, 1 = RGB, 2 = RGBA, 3 = K, 4 = CMY, 5 = YMC, 6 = CMYK, 7 = YMCK, 8 = KCMY, 9 = KCMYcm, 10 = GMCK, 11 = GMCS, 12 = White, 13 = Gold, 14 = Silver, 15 = CIE XYZ, 16 = CIE Lab, 17 = RGBW, 32 to 46 = CIE Lab (1 to 15 inks)</td>
-	<td><tt>&lt;&lt;/cupsColorSpace &gt;&gt;setpagedevice</tt></td>
+	<td><tt>&lt;&lt;/cupsColorSpace 1 &gt;&gt;setpagedevice</tt></td>
 </tr>
 <tr valign='top'>
 	<td><tt>cupsCompression</tt></td>

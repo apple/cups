@@ -16,7 +16,7 @@
 include ../Makedefs
 
 
-OBJS	=	checkpo po2strings.o strings2po.o translate.o
+OBJS	=	checkpo.o po2strings.o strings2po.o translate.o
 TARGETS	=	checkpo po2strings strings2po translate
 
 

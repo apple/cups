@@ -105,7 +105,7 @@
  */
 #define WAIT_EOF_DELAY			7
 #define WAIT_SIDE_DELAY			3
-#define DEFAULT_TIMEOUT			60L
+#define DEFAULT_TIMEOUT			5000L
 
 #define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
 #define kUSBLanguageEnglish		0x409
@@ -341,6 +341,13 @@ print_device(const char *uri,		/* I - Device URI */
   g.model	= cfstr_create_trim(resource);
   g.serial	= cfstr_create_trim(serial);
   g.location	= location;
+
+  if (!g.make || !g.model)
+  {
+    _cupsLangPrintf(stderr, 
+		    _("ERROR: Unable to create make and model strings\n"));
+    return CUPS_BACKEND_STOP;
+  }
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -1073,9 +1080,9 @@ static Boolean find_device_cb(void *refcon,
       CFStringRef make = NULL,  model = NULL, serial = NULL;
 
       copy_deviceinfo(idString, &make, &model, &serial);
-      if (CFStringCompare(make, g.make, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+      if (make && CFStringCompare(make, g.make, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
       {
-	if (CFStringCompare(model, g.model, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+	if (model && CFStringCompare(model, g.model, kCFCompareCaseInsensitive) == kCFCompareEqualTo)
 	{
 	  if (g.serial != NULL && CFStringGetLength(g.serial) > 0)
 	  {
@@ -1972,7 +1979,7 @@ static void soft_reset()
   * Send the reset...
   */
 
-  (*g.classdriver)->SoftReset(g.classdriver, 0);
+  (*g.classdriver)->SoftReset(g.classdriver, DEFAULT_TIMEOUT);
 
  /*
   * Release the I/O lock...
