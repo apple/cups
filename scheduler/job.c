@@ -878,6 +878,7 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
 
   job->state->values[0].integer = IPP_JOB_HELD;
   job->state_value              = IPP_JOB_HELD;
+  job->current_file             = 0;
 
   cupsdSaveJob(job);
 
