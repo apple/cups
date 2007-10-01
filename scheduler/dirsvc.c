@@ -794,6 +794,7 @@ cupsdSendBrowseList(void)
   cupsd_printer_t	*p;		/* Current printer */
   time_t		ut,		/* Minimum update time */
 			to;		/* Timeout time */
+  int			write_printcap;	/* Write the printcap file? */
 
 
   if (!Browsing || !BrowseLocalProtocols || !Printers)
@@ -891,7 +892,7 @@ cupsdSendBrowseList(void)
   * Loop through all of the printers and send local updates as needed...
   */
 
-  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers), write_printcap = 0;
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
@@ -916,9 +917,13 @@ cupsdSendBrowseList(void)
         cupsArraySave(Printers);
         cupsdDeletePrinter(p, 1);
         cupsArrayRestore(Printers);
+	write_printcap = 1;
       }
     }
   }
+
+  if (write_printcap)
+    cupsdWritePrintcap();
 }
 
 
