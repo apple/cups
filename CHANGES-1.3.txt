@@ -1,6 +1,12 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.4
+
+	- The cupsd.conf man page incorrectly referenced
+	  "AuthType Kerberos" instead of "AuthType Negotiate".
+
+
 CHANGES IN CUPS V1.3.3
 
 	- The scheduler did not use the attributes-natural-language

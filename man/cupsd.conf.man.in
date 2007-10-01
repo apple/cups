@@ -75,9 +75,9 @@ AuthType BasicDigest
 .TP 5
 AuthType Digest
 .TP 5
-AuthType Kerberos
+AuthType Negotiate
 .br
-Specifies the authentication type (None, Basic, BasicDigest, Digest, Kerberos)
+Specifies the authentication type (None, Basic, BasicDigest, Digest, Negotiate)
 .TP 5
 AutoPurgeJobs Yes
 .TP 5
@@ -214,7 +214,7 @@ DefaultAuthType BasicDigest
 .TP 5
 DefaultAuthType Digest
 .TP 5
-DefaultAuthType Kerberos
+DefaultAuthType Negotiate
 .br
 Specifies the default type of authentication to use.
 .TP 5
