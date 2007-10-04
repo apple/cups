@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
+	- The PostScript filter generated N^2 copies when the
+	  printer supported collated copies and user requested
+	  reverse-order output.
 	- The scheduler did not reprint all of the files in a
 	  job that was held.
 	- The scheduler did not update the printcap file after

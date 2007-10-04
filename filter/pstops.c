@@ -947,7 +947,12 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
     * Make the copies...
     */
 
-    for (copy = !doc->slow_order; copy < doc->copies; copy ++)
+    if (doc->slow_collate)
+      copy = !doc->slow_order;
+    else
+      copy = doc->copies - 1;
+
+    for (; copy < doc->copies; copy ++)
     {
       if (JobCanceled)
 	break;
@@ -1011,7 +1016,8 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
         number ++;
 
 	if (!ppd || !ppd->num_filters)
-	  fprintf(stderr, "PAGE: %d 1\n", number);
+	  fprintf(stderr, "PAGE: %d %d\n", number,
+	          doc->slow_collate ? 1 : doc->copies);
 
 	if (doc->number_up > 1)
 	{
