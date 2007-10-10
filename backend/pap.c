@@ -207,12 +207,7 @@ int main (int argc, const char * argv[])
 
   if (argc == 1 || (argc == 2 && strcmp(argv[1], "-discover") == 0))
   {
-    /* If listDevices() didn't find any devices or returns an error output a 
-    *  legacy style announcement.
-    *  
-    */
-    if (listDevices() <= 0)
-      puts("network pap \"Unknown\" \"AppleTalk Printer Access Protocol (pap)\"");
+    listDevices();
 
     return 0;
   }
@@ -291,7 +286,7 @@ static int listDevices(void)
   /* Make sure it's okay to use appletalk */
   if (!okayToUseAppleTalk())
   {
-    fprintf(stderr, "ERROR: AppleTalk disabled in System Preferences\n");
+    fprintf(stderr, "INFO: AppleTalk disabled in System Preferences\n");
     return -1;  /* Network is down */
   }
 

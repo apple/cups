@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
+	- The AppleTalk backend incorrectly added a scheme
+	  listing when AppleTalk was disabled or no printers
+	  were found.
 	- The PostScript filter generated N^2 copies when the
 	  printer supported collated copies and user requested
 	  reverse-order output.
