@@ -3,6 +3,10 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
+	- The scheduler did not reject requests with charsets
+	  other than US-ASCII or UTF-8, and the CUPS API
+	  incorrectly passed the locale charset to the scheduler
+	  instead of UTF-8 (STR #2537)
 	- cups-deviced did not filter out duplicate devices.
 	- The AppleTalk backend incorrectly added a scheme
 	  listing when AppleTalk was disabled or no printers

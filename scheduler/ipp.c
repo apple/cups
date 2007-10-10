@@ -362,13 +362,31 @@ cupsdProcessIPPRequest(
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                      "attributes-natural-language", NULL, DefaultLanguage);
 
-      if (!charset || !language ||
-	  (!uri &&
-	   con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
-	   con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
-	   con->request->request.op.operation_id != CUPS_GET_CLASSES &&
-	   con->request->request.op.operation_id != CUPS_GET_DEVICES &&
-	   con->request->request.op.operation_id != CUPS_GET_PPDS))
+      if (charset &&
+          strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          strcasecmp(charset->values[0].string.text, "utf-8"))
+      {
+       /*
+        * Bad character set...
+	*/
+
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unsupported character set \"%s\"!",
+	                charset->values[0].string.text);
+	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+		      "%04X %s Unsupported attributes-charset value \"%s\"",
+		      IPP_CHARSET, con->http.hostname,
+		      charset->values[0].string.text);
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Unsupported character set \"%s\"!"),
+	                charset->values[0].string.text);
+      }
+      else if (!charset || !language ||
+	       (!uri &&
+	        con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
+	        con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
+	        con->request->request.op.operation_id != CUPS_GET_CLASSES &&
+	        con->request->request.op.operation_id != CUPS_GET_DEVICES &&
+	        con->request->request.op.operation_id != CUPS_GET_PPDS))
       {
        /*
 	* Return an error, since attributes-charset,
