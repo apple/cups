@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
+	- Compilation failed when a previous version of CUPS
+	  was installed and was included in the SSL include
+	  path (STR #2538)
 	- The scheduler did not reject requests with charsets
 	  other than US-ASCII or UTF-8, and the CUPS API
 	  incorrectly passed the locale charset to the scheduler
