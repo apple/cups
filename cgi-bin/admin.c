@@ -1039,7 +1039,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
 
-    if ((var = cgiGetVariable("CURRENT_MAKE")) != NULL)
+    if ((var = cgiGetVariable("CURRENT_MAKE")) == NULL)
+      var = cgiGetVariable("PPD_MAKE");
+    if (var)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
     else
