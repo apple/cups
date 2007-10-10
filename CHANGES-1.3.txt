@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
+	- cups-deviced did not filter out duplicate devices.
 	- The AppleTalk backend incorrectly added a scheme
 	  listing when AppleTalk was disabled or no printers
 	  were found.
