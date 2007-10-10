@@ -324,7 +324,8 @@ list_devices(void)
   char	device[255],		/* Device filename */
 	basedevice[255],	/* Base device filename for ports */
 	device_id[1024],	/* Device ID string */
-	make_model[1024];	/* Make and model */
+	make_model[1024],	/* Make and model */
+	uri[1024];		/* Device URI */
 
 
   if (!access("/dev/parallel/", 0))
@@ -350,13 +351,15 @@ list_devices(void)
       * Now grab the IEEE 1284 device ID string...
       */
 
+      snprintf(uri, sizeof(uri), "parallel:%s", device);
+
       if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                               make_model, sizeof(make_model),
-			      NULL, NULL, 0))
-	printf("direct parallel:%s \"%s\" \"%s LPT #%d\" \"%s\"\n", device,
+			      NULL, uri, sizeof(uri)))
+	printf("direct %s \"%s\" \"%s LPT #%d\" \"%s\"\n", uri,
 	       make_model, make_model, i + 1, device_id);
       else
-	printf("direct parallel:%s \"Unknown\" \"LPT #%d\"\n", device, i + 1);
+	printf("direct %s \"Unknown\" \"LPT #%d\"\n", uri, i + 1);
 
       close(fd);
     }

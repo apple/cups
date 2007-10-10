@@ -32,6 +32,10 @@
 #  include <linux/lp.h>
 #  define IOCNR_GET_DEVICE_ID		1
 #  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
+#  include <linux/parport.h>
+#  include <linux/ppdev.h>
+#  include <unistd.h>
+#  include <fcntl.h>
 #endif /* __linux */
 
 #ifdef __sun
@@ -68,6 +72,7 @@ backendGetDeviceID(
   int	manulen;			/* Length of manufacturer string */
 #ifdef __linux
   int	length;				/* Length of device ID info */
+  int   got_id = 0;
 #endif /* __linux */
 #if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
@@ -93,9 +98,6 @@ backendGetDeviceID(
   if (make_model)
     *make_model = '\0';
 
-  if (uri)
-    *uri = '\0';
-
   if (fd >= 0)
   {
    /*
@@ -105,7 +107,83 @@ backendGetDeviceID(
     *device_id = '\0';
 
 #ifdef __linux
-    if (!ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
+  if (ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
+  {
+   /*
+    * Linux has to implement things differently for every device it seems.
+    * Since the standard parallel port driver does not provide a simple
+    * ioctl() to get the 1284 device ID, we have to open the "raw" parallel
+    * device corresponding to this port and do some negotiation trickery
+    * to get the current device ID.
+    */
+
+    if (uri && !strncmp(uri, "parallel:/dev/", 14))
+    {
+      char	devparport[16];		/* /dev/parportN */
+      int	devparportfd,		/* File descriptor for raw device */
+		status,			/* ioctl status */
+		mode;			/* Port mode */
+
+
+     /*
+      * Since the Linux parallel backend only supports 4 parallel port
+      * devices, just grab the trailing digit and use it to construct a
+      * /dev/parportN filename...
+      */
+
+      snprintf(devparport, sizeof(devparport), "/dev/parport%s",
+               uri + strlen(uri) - 1);
+
+      if ((devparportfd = open(devparport, O_RDWR | O_NOCTTY)) != -1)
+      {
+       /*
+        * Claim the device...
+        */
+
+	if (!ioctl(devparportfd, PPCLAIM))
+	{
+          fcntl(devparport, F_SETFL, fcntl(devparportfd, F_GETFL) | O_NONBLOCK);
+
+	  mode = IEEE1284_MODE_COMPAT;
+
+	  if (!ioctl(devparportfd, PPNEGOT, &mode))
+	  {
+	   /*
+	    * Put the device into Device ID mode...
+	    */
+
+	    mode = IEEE1284_MODE_NIBBLE | IEEE1284_DEVICEID;
+
+	    if (!ioctl(devparportfd, PPNEGOT, &mode))
+	    {
+	     /*
+	      * Read the 1284 device ID...
+	      */
+
+	      if ((length = read(devparportfd, device_id,
+	                         device_id_size - 1)) >= 2)
+              {
+	        device_id[length] = '\0';
+	        got_id = 1;
+	      }
+	    }
+	  }
+
+         /*
+	  * Release the device...
+	  */
+
+	  ioctl(devparportfd, PPRELEASE);
+	}
+
+        close(devparportfd);
+      }
+    }
+  }
+  else
+    got_id = 1;
+
+  if (got_id)
     {
      /*
       * Extract the length of the device ID string from the first two
@@ -167,6 +245,9 @@ backendGetDeviceID(
   }
 
   DEBUG_printf(("backendGetDeviceID: device_id=\"%s\"\n", device_id));
+
+  if (scheme && uri)
+    *uri = '\0';
 
   if (!*device_id)
     return (-1);
