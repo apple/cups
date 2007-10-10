@@ -200,11 +200,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	case 'l' : /* Literal/raw */
-            num_options = cupsAddOption("raw", "", num_options, &options);
+            num_options = cupsAddOption("raw", "true", num_options, &options);
 	    break;
 
 	case 'p' : /* Prettyprint */
-            num_options = cupsAddOption("prettyprint", "", num_options,
+            num_options = cupsAddOption("prettyprint", "true", num_options,
 	                                &options);
 	    break;
 
