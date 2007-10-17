@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6967 2007-09-17 23:30:52Z mike $"
+ * "$Id: ipp.c 7018 2007-10-10 22:14:03Z mike $"
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
@@ -1055,7 +1055,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPuts(stderr, _("INFO: Waiting for job to complete...\n"));
 
-    for (; !job_cancelled;)
+    for (delay = 1; !job_cancelled;)
     {
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
@@ -1146,10 +1146,14 @@ main(int  argc,				/* I - Number of command-line args */
       check_printer_state(http, uri, resource, argv[2], version, job_id);
 
      /*
-      * Wait 10 seconds before polling again...
+      * Wait 1-10 seconds before polling again...
       */
 
-      sleep(10);
+      sleep(delay);
+
+      delay ++;
+      if (delay > 10)
+        delay = 1;
     }
   }
 
@@ -1758,5 +1762,5 @@ sigterm_handler(int sig)		/* I - Signal */
 
 
 /*
- * End of "$Id: ipp.c 6967 2007-09-17 23:30:52Z mike $".
+ * End of "$Id: ipp.c 7018 2007-10-10 22:14:03Z mike $".
  */

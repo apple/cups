@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h.in 6878 2007-08-29 17:22:26Z mike $"
+ * "$Id: config.h.in 6930 2007-09-08 00:28:06Z mike $"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -67,6 +67,14 @@
  */
 
 #define CUPS_DEFAULT_PRINTCAP	"/etc/printcap"
+
+
+/*
+ * Default Samba and LPD config files...
+ */
+
+#define CUPS_DEFAULT_SMB_CONFIG_FILE	""
+#define CUPS_DEFAULT_LPD_CONFIG_FILE	""
 
 
 /*
@@ -547,5 +555,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h.in 6878 2007-08-29 17:22:26Z mike $".
+ * End of "$Id: config.h.in 6930 2007-09-08 00:28:06Z mike $".
  */

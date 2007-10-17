@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 6783 2007-08-10 19:48:57Z mike $"
+ * "$Id: conf.c 6930 2007-09-08 00:28:06Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -126,6 +126,7 @@ static cupsd_var_t	variables[] =
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
+  { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "MaxActiveJobs",		&MaxActiveJobs,		CUPSD_VARTYPE_INTEGER },
   { "MaxClients",		&MaxClients,		CUPSD_VARTYPE_INTEGER },
   { "MaxClientsPerHost",	&MaxClientsPerHost,	CUPSD_VARTYPE_INTEGER },
@@ -162,6 +163,7 @@ static cupsd_var_t	variables[] =
 #endif /* HAVE_SSL */
   { "ServerName",		&ServerName,		CUPSD_VARTYPE_STRING },
   { "ServerRoot",		&ServerRoot,		CUPSD_VARTYPE_PATHNAME },
+  { "SMBConfigFile",		&SMBConfigFile,		CUPSD_VARTYPE_STRING },
   { "StateDir",			&StateDir,		CUPSD_VARTYPE_STRING },
 #ifdef HAVE_AUTHORIZATION_H
   { "SystemGroupAuthKey",	&SystemGroupAuthKey,	CUPSD_VARTYPE_STRING },
@@ -349,6 +351,7 @@ cupsdReadConfiguration(void)
 		*old_requestroot;	/* Old RequestRoot */
   const char	*tmpdir;		/* TMPDIR environment variable */
   struct stat	tmpinfo;		/* Temporary directory info */
+  cupsd_policy_t *p;			/* Policy */
 
 
  /*
@@ -545,6 +548,9 @@ cupsdReadConfiguration(void)
   BrowseTimeout         = DEFAULT_TIMEOUT;
   Browsing              = CUPS_DEFAULT_BROWSING;
   DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
+
+  cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);
+  cupsdSetString(&SMBConfigFile, CUPS_DEFAULT_SMB_CONFIG_FILE);
 
   cupsdClearString(&BrowseLocalOptions);
   cupsdClearString(&BrowseRemoteOptions);
@@ -930,7 +936,6 @@ cupsdReadConfiguration(void)
 
   if (!DefaultPolicyPtr)
   {
-    cupsd_policy_t	*p;		/* New policy */
     cupsd_location_t	*po;		/* New policy operation */
 
 
@@ -958,7 +963,7 @@ cupsdReadConfiguration(void)
 		      "Renew-Subscription Cancel-Subscription "
 		      "Get-Notifications Reprocess-Job Cancel-Current-Job "
 		      "Suspend-Current-Job Resume-Job CUPS-Move-Job "
-		      "CUPS-Authenticate-Job>");
+		      "CUPS-Authenticate-Job CUPS-Get-Document>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
 
       po = cupsdAddPolicyOp(p, NULL, IPP_SEND_DOCUMENT);
@@ -986,6 +991,7 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_AUTHENTICATE_JOB);
+      cupsdAddPolicyOp(p, po, CUPS_GET_DOCUMENT);
 
       cupsdLogMessage(CUPSD_LOG_INFO, "</Limit>");
 
@@ -1046,11 +1052,12 @@ cupsdReadConfiguration(void)
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadConfiguration: NumPolicies=%d",
-                  NumPolicies);
-  for (i = 0; i < NumPolicies; i ++)
+                  cupsArrayCount(Policies));
+  for (i = 0, p = (cupsd_policy_t *)cupsArrayFirst(Policies);
+       p;
+       i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i,
-                    Policies[i]->name);
+                    "cupsdReadConfiguration: Policies[%d]=\"%s\"", i, p->name);
 
  /*
   * If we are doing a full reload or the server root has changed, flush
@@ -2018,6 +2025,10 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_LDAP;
     else if (!strcasecmp(valstart, "dnssd") || !strcasecmp(valstart, "bonjour"))
       protocols |= BROWSE_DNSSD;
+    else if (!strcasecmp(valstart, "lpd"))
+      protocols |= BROWSE_LPD;
+    else if (!strcasecmp(valstart, "smb"))
+      protocols |= BROWSE_SMB;
     else if (!strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
     else if (strcasecmp(valstart, "none"))
@@ -3245,6 +3256,30 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                "Missing </Limit> before </Policy> on line %d!",
 	                linenum);
 
+     /*
+      * Verify that we have an explicit policy for CUPS-Get-Document
+      * (ensures that upgrades do not introduce new security issues...)
+      */
+
+      if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
+      {
+        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
+	{
+	 /*
+	  * Add a new limit for CUPS-Get-Document using the Send-Document
+	  * limit as a template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for CUPS-Get-Document defined in policy %s "
+			  "- using Send-Document's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
+	}
+      }
+
       return (linenum);
     }
     else if (!strcasecmp(line, "<Limit") && !op)
@@ -3352,5 +3387,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 6783 2007-08-10 19:48:57Z mike $".
+ * End of "$Id: conf.c 6930 2007-09-08 00:28:06Z mike $".
  */

@@ -11,14 +11,16 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "Common UNIX Printing System" "12 July 2007" "Apple Inc."
+.TH cupsfilter 8 "Common UNIX Printing System" "29 August 2007" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
 .B cupsfilter
 [ -c
 .I config-file
-] -m
+] -j
+.I job-id[,N]
+-m
 .I mime/type
 [ -n
 .I copies
@@ -39,6 +41,11 @@ through CUPS.
 -c config-file
 .br
 Uses the named cupsd.conf configuration file.
+.TP 5
+-j job-id[,N]
+.br
+Converts document N from the specified job. If N is omitted, document 1 is
+converted.
 .TP 5
 -m mime/type
 .br

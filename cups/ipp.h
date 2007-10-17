@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: ipp.h 6879 2007-08-29 20:26:50Z mike $"
  *
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -246,7 +246,8 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   CUPS_GET_PPDS,			/* Get a list of supported drivers */
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
   CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2@ */
-  CUPS_GET_PPD				/* Get a PPD file @since CUPS 1.3@ */
+  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3@ */
+  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4@ */
 } ipp_op_t;
 
 /* Old names for the operations */
@@ -492,5 +493,5 @@ extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: ipp.h 6879 2007-08-29 20:26:50Z mike $".
  */

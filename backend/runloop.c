@@ -1,5 +1,5 @@
 /*
- * "$Id: runloop.c 6835 2007-08-22 18:34:34Z mike $"
+ * "$Id: runloop.c 6834 2007-08-22 18:29:25Z mike $"
  *
  *   Common run loop APIs for the Common UNIX Printing System (CUPS).
  *
@@ -374,5 +374,5 @@ backendRunLoop(
 
 
 /*
- * End of "$Id: runloop.c 6835 2007-08-22 18:34:34Z mike $".
+ * End of "$Id: runloop.c 6834 2007-08-22 18:29:25Z mike $".
  */

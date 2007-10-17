@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: policy.h 6895 2007-08-30 00:09:27Z mike $"
  *
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -22,8 +22,7 @@
 typedef struct
 {
   char			*name;		/* Policy name */
-  int			num_ops;	/* Number of operations */
-  cupsd_location_t	**ops;		/* Operations */
+  cups_array_t		*ops;		/* Operations */
 } cupsd_policy_t;
 
 
@@ -31,9 +30,7 @@ typedef struct
  * Globals...
  */
 
-VAR int			NumPolicies	VALUE(0);
-					/* Number of policies */
-VAR cupsd_policy_t	**Policies	VALUE(NULL);
+VAR cups_array_t	*Policies	VALUE(NULL);
 					/* Policies */
 
 
@@ -53,5 +50,5 @@ extern cupsd_location_t	*cupsdFindPolicyOp(cupsd_policy_t *p, ipp_op_t op);
 
 
 /*
- * End of "$Id: policy.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: policy.h 6895 2007-08-30 00:09:27Z mike $".
  */

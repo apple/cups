@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: log.c 6875 2007-08-27 23:25:06Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -195,6 +195,19 @@ cupsdLogMessage(int        level,	/* I - Log level */
  /*
   * See if we want to log this message...
   */
+
+  if (TestConfigFile)
+  {
+    if (level <= CUPSD_LOG_WARN)
+    {
+      va_start(ap, message);
+      vfprintf(stderr, message, ap);
+      putc('\n', stderr);
+      va_end(ap);
+    }
+
+    return (1);
+  }
 
   if (level > LogLevel || !ErrorLog)
     return (1);
@@ -607,5 +620,5 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: log.c 6875 2007-08-27 23:25:06Z mike $".
  */

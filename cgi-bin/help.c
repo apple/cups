@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   On-line help CGI for the Common UNIX Printing System (CUPS).
+ *   Online help CGI for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 2007 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
@@ -86,7 +86,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     perror(filename);
 
-    cgiStartHTML(cgiText(_("Help")));
+    cgiStartHTML(cgiText(_("Online Help")));
     cgiSetVariable("ERROR", "Unable to load help index!");
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -127,7 +127,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       perror(filename);
 
-      cgiStartHTML(cgiText(_("Help")));
+      cgiStartHTML(cgiText(_("Online Help")));
       cgiSetVariable("ERROR", "Unable to access help file!");
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -137,7 +137,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((n = helpFindNode(hi, helpfile, NULL)) == NULL)
     {
-      cgiStartHTML(cgiText(_("Help")));
+      cgiStartHTML(cgiText(_("Online Help")));
       cgiSetVariable("ERROR", "Help file not in index!");
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
@@ -168,12 +168,15 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Send a standard page header...
     */
 
-    cgiStartHTML(cgiText(_("Help")));
+    cgiStartHTML(cgiText(_("Online Help")));
   }
 
  /*
   * Do a search as needed...
   */
+
+  if (cgiGetVariable("CLEAR"))
+    cgiSetVariable("QUERY", "");
 
   query = cgiGetVariable("QUERY");
   topic = cgiGetVariable("TOPIC");

@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 6759 2007-08-02 04:10:23Z mike $"
+ * "$Id: pstops.c 7006 2007-10-04 17:43:38Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -947,7 +947,12 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
     * Make the copies...
     */
 
-    for (copy = !doc->slow_order; copy < doc->copies; copy ++)
+    if (doc->slow_collate)
+      copy = !doc->slow_order;
+    else
+      copy = doc->copies - 1;
+
+    for (; copy < doc->copies; copy ++)
     {
       if (JobCanceled)
 	break;
@@ -1011,7 +1016,8 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
         number ++;
 
 	if (!ppd || !ppd->num_filters)
-	  fprintf(stderr, "PAGE: %d 1\n", number);
+	  fprintf(stderr, "PAGE: %d %d\n", number,
+	          doc->slow_collate ? 1 : doc->copies);
 
 	if (doc->number_up > 1)
 	{
@@ -3351,5 +3357,5 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 6759 2007-08-02 04:10:23Z mike $".
+ * End of "$Id: pstops.c 7006 2007-10-04 17:43:38Z mike $".
  */

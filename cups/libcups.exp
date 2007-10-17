@@ -116,6 +116,7 @@ _cupsGetOption
 _cupsGetPassword
 _cupsGetPPD
 _cupsGetPPD2
+_cupsGetPPD3
 _cupsGetPrinters
 _cupsGetServerPPD
 _cupsLangDefault

@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: util.c 7014 2007-10-10 21:57:43Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -30,6 +30,8 @@
  *                            server.
  *   cupsGetPPD2()          - Get the PPD file for a printer on the specified
  *                            server.
+ *   cupsGetPPD3()          - Get the PPD file for a printer on the specified
+ *                            server if it has changed.
  *   cupsGetPrinters()      - Get a list of printers from the default server.
  *   cupsGetServerPPD()     - Get an available PPD file from the server.
  *   cupsLastError()        - Return the last IPP status code.
@@ -91,7 +93,6 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
 		uri[HTTP_MAX_URI];	/* Printer URI */
   ipp_t		*request,		/* IPP request */
 		*response;		/* IPP response */
-  cups_lang_t	*language;		/* Language info */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -129,21 +130,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
   *    [requesting-user-name]
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_CANCEL_JOB;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL,
-               language != NULL ? language->language : "C");
-
-  cupsLangFree(language);
+  request = ippNewRequest(IPP_CANCEL_JOB);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -205,7 +192,6 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
   char		**temp;			/* Temporary pointer */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -237,20 +223,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
   *    requested-attributes
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_CLASSES;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
+  request = ippNewRequest(CUPS_GET_CLASSES);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
@@ -371,7 +344,6 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
   const char	*var;			/* Environment variable */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -403,20 +375,7 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
   *    attributes-natural-language
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_DEFAULT;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
+  request = ippNewRequest(CUPS_GET_DEFAULT);
 
  /*
   * Do the request and get back a response...
@@ -491,7 +450,6 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
   cups_job_t	*temp;			/* Temporary pointer */
   int		id,			/* job-id */
 		priority,		/* job-priority */
@@ -564,20 +522,7 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection */
   *    requested-attributes
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = IPP_GET_JOBS;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
+  request = ippNewRequest(IPP_GET_JOBS);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                "printer-uri", NULL, uri);
@@ -758,6 +703,8 @@ const char *				/* O - Filename for PPD file */
 cupsGetPPD(const char *name)		/* I - Printer name */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  time_t	modtime = 0;		/* Modification time */
+
 
  /*
   * See if we can connect to the server...
@@ -774,7 +721,13 @@ cupsGetPPD(const char *name)		/* I - Printer name */
   * Return the PPD file...
   */
 
-  return (cupsGetPPD2(cg->http, name));
+  cg->ppd_filename[0] = '\0';
+
+  if (cupsGetPPD3(cg->http, name, &modtime, cg->ppd_filename,
+                  sizeof(cg->ppd_filename)) == HTTP_OK)
+    return (cg->ppd_filename);
+  else
+    return (NULL);
 }
 
 
@@ -790,6 +743,43 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 const char *				/* O - Filename for PPD file */
 cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
             const char *name)		/* I - Printer name */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+  time_t	modtime = 0;		/* Modification time */
+
+
+  cg->ppd_filename[0] = '\0';
+
+  if (cupsGetPPD3(http, name, &modtime, cg->ppd_filename,
+                  sizeof(cg->ppd_filename)) == HTTP_OK)
+    return (cg->ppd_filename);
+  else
+    return (NULL);
+}
+
+
+/*
+ * 'cupsGetPPD3()' - Get the PPD file for a printer on the specified
+ *                   server if it has changed.
+ *
+ * The "modtime" parameter contains the modification time of any
+ * locally-cached content and is updated with the time from the PPD file on
+ * the server.
+ *
+ * The "buffer" parameter contains the local PPD filename.  If it contains
+ * the empty string, a new temporary file is created, otherwise the existing
+ * file will be overwritten as needed.
+ *
+ * On success, HTTP_OK is returned for a new PPD file and HTTP_NOT_MODIFIED
+ * if the existing PPD file is up-to-date.  Any other status is an error.
+ */
+
+http_status_t				/* O  - HTTP status */
+cupsGetPPD3(http_t     *http,		/* I  - HTTP connection */
+            const char *name,		/* I  - Printer name */
+	    time_t     *modtime,	/* IO - Modification time */
+	    char       *buffer,		/* I  - Filename buffer */
+	    size_t     bufsize)		/* I  - Size of filename buffer */
 {
   int		http_port;		/* Port number */
   char		http_hostname[HTTP_MAX_HOST];
@@ -808,17 +798,32 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetPPD2(http=%p, name=\"%s\")\n", http,
-                name ? name : "(null)"));
+  DEBUG_printf(("cupsGetPPD3(http=%p, name=\"%s\", modtime=%p(%d), buffer=%p, "
+                "bufsize=%d)\n", http, name ? name : "(null)", modtime,
+		modtime ? *modtime : 0, buffer, (int)bufsize));
 
-  if (!http || !name)
+  if (!http)
   {
-    if (!http)
-      _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
-    else
-      _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
+    _cupsSetError(IPP_INTERNAL_ERROR, "No HTTP connection!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
 
-    return (NULL);
+  if (!name)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
+
+  if (!modtime)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "No modification time!");
+    return (HTTP_NOT_ACCEPTABLE);
+  }
+
+  if (!buffer || bufsize <= 1)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, "Bad filename buffer!");
+    return (HTTP_NOT_ACCEPTABLE);
   }
 
  /*
@@ -827,7 +832,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
 
   if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port,
                             resource, sizeof(resource), 0))
-    return (NULL);
+    return (HTTP_NOT_FOUND);
 
   DEBUG_printf(("Printer hostname=\"%s\", port=%d\n", hostname, port));
 
@@ -872,14 +877,19 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   {
     DEBUG_puts("Unable to connect to server!");
 
-    return (NULL);
+    return (HTTP_SERVICE_UNAVAILABLE);
   }
 
  /*
   * Get a temp file...
   */
 
-  if ((fd = cupsTempFd(cg->ppd_filename, sizeof(cg->ppd_filename))) < 0)
+  if (buffer[0])
+    fd = open(buffer, O_CREAT | O_TRUNC | O_WRONLY, 0600);
+  else
+    fd = cupsTempFd(buffer, bufsize);
+
+  if (fd < 0)
   {
    /*
     * Can't open file; close the server connection and return NULL...
@@ -890,7 +900,7 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     if (http2 != http)
       httpClose(http2);
 
-    return (NULL);
+    return (HTTP_SERVER_ERROR);
   }
 
  /*
@@ -898,6 +908,10 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   */
 
   strlcat(resource, ".ppd", sizeof(resource));
+
+  if (*modtime > 0)
+    httpSetField(http2, HTTP_FIELD_IF_MODIFIED_SINCE,
+                 httpGetDateString(*modtime));
 
   status = cupsGetFd(http2, resource, fd);
 
@@ -910,7 +924,9 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
   * See if we actually got the file or an error...
   */
 
-  if (status != HTTP_OK)
+  if (status == HTTP_OK)
+    *modtime = httpGetDateTime(httpGetField(http2, HTTP_FIELD_DATE));
+  else if (status != HTTP_NOT_MODIFIED)
   {
     switch (status)
     {
@@ -930,15 +946,13 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection */
     }
 
     unlink(cg->ppd_filename);
-
-    return (NULL);
   }
 
  /*
   * Return the PPD file...
   */
 
-  return (cg->ppd_filename);
+  return (status);
 }
 
 
@@ -957,7 +971,6 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
   char		**temp;			/* Temporary pointer */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
@@ -989,20 +1002,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
   *    requested-attributes
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
-
-  cupsLangFree(language);
+  request = ippNewRequest(CUPS_GET_PRINTERS);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                "requested-attributes", NULL, "printer-name");
@@ -1270,7 +1270,6 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   ipp_t		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* IPP job-id attribute */
   char		uri[HTTP_MAX_URI];	/* Printer URI */
-  cups_lang_t	*language;		/* Language to use */
   int		jobid;			/* New job ID */
   const char	*base;			/* Basename of current filename */
 
@@ -1303,33 +1302,17 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
   }
 
  /*
-  * Setup the request data...
-  */
-
-  language = cupsLangDefault();
-
- /*
   * Build a standard CUPS URI for the printer and fill the standard IPP
   * attributes...
   */
 
-  if ((request = ippNew()) == NULL)
+  if ((request = ippNewRequest(num_files == 1 ? IPP_PRINT_JOB :
+                                                IPP_CREATE_JOB)) == NULL)
   {
     _cupsSetError(IPP_INTERNAL_ERROR, NULL);
 
     return (0);
   }
-
-  request->request.op.operation_id = num_files == 1 ? IPP_PRINT_JOB :
-                                                      IPP_CREATE_JOB;
-  request->request.op.request_id   = 1;
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL,
-               language != NULL ? language->language : "C");
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -1392,20 +1375,10 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
       * attributes...
       */
 
-      if ((request = ippNew()) == NULL)
+      if ((request = ippNewRequest(IPP_SEND_DOCUMENT)) == NULL)
 	return (0);
 
-      request->request.op.operation_id = IPP_SEND_DOCUMENT;
-      request->request.op.request_id   = 1;
-
       snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", jobid);
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	   "attributes-charset", NULL, cupsLangEncoding(language));
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-        	   "attributes-natural-language", NULL,
-        	   language != NULL ? language->language : "C");
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
         	   NULL, uri);
@@ -1457,8 +1430,6 @@ cupsPrintFiles2(http_t        *http,	/* I - HTTP connection */
                                         files[i])) != NULL)
 	ippDelete(response);
     }
-
-  cupsLangFree(language);
 
   return (jobid);
 }
@@ -1728,5 +1699,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: util.c 7014 2007-10-10 21:57:43Z mike $".
  */

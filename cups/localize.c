@@ -1,5 +1,5 @@
 /*
- * "$Id: localize.c 6883 2007-08-29 21:05:17Z mike $"
+ * "$Id: localize.c 6882 2007-08-29 21:05:10Z mike $"
  *
  *   PPD custom option routines for the Common UNIX Printing System (CUPS).
  *
@@ -520,5 +520,5 @@ ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: localize.c 6883 2007-08-29 21:05:17Z mike $".
+ * End of "$Id: localize.c 6882 2007-08-29 21:05:10Z mike $".
  */

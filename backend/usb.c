@@ -1,5 +1,5 @@
 /*
- * "$Id: usb.c 6911 2007-09-04 20:35:08Z mike $"
+ * "$Id: usb.c 6910 2007-09-04 20:34:29Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
@@ -64,7 +64,7 @@ int	print_device(const char *uri, const char *hostname,
 
 #ifdef __APPLE__
 #  include "usb-darwin.c"
-#elif defined(__linux) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+#elif defined(__linux) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
 #  include "usb-unix.c"
 #else
 /*
@@ -266,5 +266,5 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 
 /*
- * End of "$Id: usb.c 6911 2007-09-04 20:35:08Z mike $".
+ * End of "$Id: usb.c 6910 2007-09-04 20:34:29Z mike $".
  */

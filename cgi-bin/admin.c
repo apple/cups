@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 6733 2007-07-26 18:09:46Z mike $"
+ * "$Id: admin.c 7012 2007-10-10 21:22:45Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -119,7 +119,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     do_menu(http);
   }
-  else if ((op = cgiGetVariable("OP")) != NULL)
+  else if ((op = cgiGetVariable("OP")) != NULL && cgiIsPOST())
   {
    /*
     * Do the operation...
@@ -127,25 +127,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
-    if (!strcmp(op, "redirect"))
-    {
-      const char *url;			/* Redirection URL... */
-      char	prefix[1024];		/* URL prefix */
-
-
-      if (getenv("HTTPS"))
-        snprintf(prefix, sizeof(prefix), "https://%s:%s",
-	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
-      else
-        snprintf(prefix, sizeof(prefix), "http://%s:%s",
-	         getenv("SERVER_NAME"), getenv("SERVER_PORT"));
-
-      if ((url = cgiGetVariable("URL")) != NULL)
-        printf("Location: %s%s\n\n", prefix, url);
-      else
-        printf("Location: %s/admin\n\n", prefix);
-    }
-    else if (!strcmp(op, "start-printer"))
+    if (!strcmp(op, "start-printer"))
       do_printer_op(http, IPP_RESUME_PRINTER, cgiText(_("Start Printer")));
     else if (!strcmp(op, "stop-printer"))
       do_printer_op(http, IPP_PAUSE_PRINTER, cgiText(_("Stop Printer")));
@@ -202,6 +184,24 @@ main(int  argc,				/* I - Number of command-line arguments */
       cgiCopyTemplateLang("error-op.tmpl");
       cgiEndHTML();
     }
+  }
+  else if (op && !strcmp(op, "redirect"))
+  {
+    const char *url;			/* Redirection URL... */
+    char	prefix[1024];		/* URL prefix */
+
+
+    if (getenv("HTTPS"))
+      snprintf(prefix, sizeof(prefix), "https://%s:%s",
+	       getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+    else
+      snprintf(prefix, sizeof(prefix), "http://%s:%s",
+	       getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+
+    if ((url = cgiGetVariable("URL")) != NULL)
+      printf("Location: %s%s\n\n", prefix, url);
+    else
+      printf("Location: %s/admin\n\n", prefix);
   }
   else
   {
@@ -740,56 +740,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   else
     oldinfo = NULL;
 
-  if ((name = cgiGetVariable("PRINTER_NAME")) == NULL ||
-      cgiGetVariable("PRINTER_LOCATION") == NULL)
-  {
-    cgiStartHTML(title);
-
-    if (modify)
-    {
-     /*
-      * Update the location and description of an existing printer...
-      */
-
-      if (oldinfo)
-	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
-
-      cgiCopyTemplateLang("modify-printer.tmpl");
-    }
-    else
-    {
-     /*
-      * Get the name, location, and description for a new printer...
-      */
-
-      cgiCopyTemplateLang("add-printer.tmpl");
-    }
-
-    cgiEndHTML();
-
-    if (oldinfo)
-      ippDelete(oldinfo);
-
-    return;
-  }
-
-  for (ptr = name; *ptr; ptr ++)
-    if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
-      break;
-
-  if (*ptr || ptr == name || strlen(name) > 127)
-  {
-    cgiSetVariable("ERROR",
-                   cgiText(_("The printer name may only contain up to "
-			     "127 printable characters and may not "
-			     "contain spaces, slashes (/), or the "
-			     "pound sign (#).")));
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
   file = cgiGetFile();
 
   if (file)
@@ -800,7 +750,91 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     fprintf(stderr, "DEBUG: file->mimetype=%s\n", file->mimetype);
   }
 
-  if ((var = cgiGetVariable("DEVICE_URI")) == NULL)
+  if ((name = cgiGetVariable("PRINTER_NAME")) != NULL)
+  {
+    for (ptr = name; *ptr; ptr ++)
+      if ((*ptr >= 0 && *ptr <= ' ') || *ptr == 127 || *ptr == '/' || *ptr == '#')
+	break;
+
+    if (*ptr || ptr == name || strlen(name) > 127)
+    {
+      cgiSetVariable("ERROR",
+		     cgiText(_("The printer name may only contain up to "
+			       "127 printable characters and may not "
+			       "contain spaces, slashes (/), or the "
+			       "pound sign (#).")));
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+      return;
+    }
+  }
+
+  if ((var = cgiGetVariable("DEVICE_URI")) != NULL)
+  {
+    if ((uriptr = strrchr(var, '|')) != NULL)
+    {
+     /*
+      * Extract make and make/model from device URI string...
+      */
+
+      char	make[1024],		/* Make string */
+		*makeptr;		/* Pointer into make */
+
+
+      *uriptr++ = '\0';
+
+      strlcpy(make, uriptr, sizeof(make));
+
+      if ((makeptr = strchr(make, ' ')) != NULL)
+        *makeptr = '\0';
+      else if ((makeptr = strchr(make, '-')) != NULL)
+        *makeptr = '\0';
+      else if (!strncasecmp(make, "laserjet", 8) ||
+               !strncasecmp(make, "deskjet", 7) ||
+               !strncasecmp(make, "designjet", 9))
+        strcpy(make, "HP");
+      else if (!strncasecmp(make, "phaser", 6))
+        strcpy(make, "Xerox");
+      else if (!strncasecmp(make, "stylus", 6))
+        strcpy(make, "Epson");
+      else
+        strcpy(make, "Generic");
+
+      if (!cgiGetVariable("CURRENT_MAKE"))
+        cgiSetVariable("CURRENT_MAKE", make);
+
+      cgiSetVariable("PPD_MAKE", make);
+
+      if (!cgiGetVariable("CURRENT_MAKE_AND_MODEL"))
+        cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
+
+      if (!modify)
+      {
+        char	template[128],		/* Template name */
+		*tptr;			/* Pointer into template name */
+
+	cgiSetVariable("PRINTER_INFO", uriptr);
+
+	for (tptr = template;
+	     tptr < (template + sizeof(template) - 1) && *uriptr;
+	     uriptr ++)
+	  if (isalnum(*uriptr & 255) || *uriptr == '_' || *uriptr == '-' ||
+	      *uriptr == '.')
+	    *tptr++ = *uriptr;
+	  else if ((*uriptr == ' ' || *uriptr == '/') && tptr[-1] != '_')
+	    *tptr++ = '_';
+	  else if (*uriptr == '?' || *uriptr == '(')
+	    break;
+
+        *tptr = '\0';
+
+        cgiSetVariable("TEMPLATE_NAME", template);
+      }
+    }
+  }
+
+  if (!var)
   {
    /*
     * Build a CUPS_GET_DEVICES request, which requires the following
@@ -897,6 +931,37 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     cgiCopyTemplateLang("choose-serial.tmpl");
     cgiEndHTML();
   }
+  else if (!name || !cgiGetVariable("PRINTER_LOCATION"))
+  {
+    cgiStartHTML(title);
+
+    if (modify)
+    {
+     /*
+      * Update the location and description of an existing printer...
+      */
+
+      if (oldinfo)
+	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
+
+      cgiCopyTemplateLang("modify-printer.tmpl");
+    }
+    else
+    {
+     /*
+      * Get the name, location, and description for a new printer...
+      */
+
+      cgiCopyTemplateLang("add-printer.tmpl");
+    }
+
+    cgiEndHTML();
+
+    if (oldinfo)
+      ippDelete(oldinfo);
+
+    return;
+  }
   else if (!file && (var = cgiGetVariable("PPD_NAME")) == NULL)
   {
     if (modify)
@@ -959,39 +1024,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	        strerror(errno));
       }
     }
-    else if ((uriptr = strrchr(cgiGetVariable("DEVICE_URI"), '|')) != NULL)
-    {
-     /*
-      * Extract make and make/model from device URI string...
-      */
-
-      char	make[1024],		/* Make string */
-		*makeptr;		/* Pointer into make */
-
-
-      *uriptr++ = '\0';
-
-      strlcpy(make, uriptr, sizeof(make));
-
-      if ((makeptr = strchr(make, ' ')) != NULL)
-        *makeptr = '\0';
-      else if ((makeptr = strchr(make, '-')) != NULL)
-        *makeptr = '\0';
-      else if (!strncasecmp(make, "laserjet", 8) ||
-               !strncasecmp(make, "deskjet", 7) ||
-               !strncasecmp(make, "designjet", 9))
-        strcpy(make, "HP");
-      else if (!strncasecmp(make, "phaser", 6))
-        strcpy(make, "Xerox");
-      else if (!strncasecmp(make, "stylus", 6))
-        strcpy(make, "Epson");
-      else
-        strcpy(make, "Generic");
-
-      cgiSetVariable("CURRENT_MAKE", make);
-      cgiSetVariable("PPD_MAKE", make);
-      cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
-    }
 
    /*
     * Build a CUPS_GET_PPDS request, which requires the following
@@ -1007,7 +1039,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
 
-    if ((var = cgiGetVariable("PPD_MAKE")) != NULL)
+    if ((var = cgiGetVariable("CURRENT_MAKE")) == NULL)
+      var = cgiGetVariable("PPD_MAKE");
+    if (var)
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
     else
@@ -1047,7 +1081,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	cgiCopyTemplateLang("choose-make.tmpl");
         cgiEndHTML();
       }
-      else if (!var)
+      else if (!var || cgiGetVariable("SELECT_MAKE"))
       {
         cgiStartHTML(title);
 	cgiCopyTemplateLang("choose-make.tmpl");
@@ -1201,10 +1235,10 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       cgiShowIPPError(modify ? _("Unable to modify printer:") :
                                _("Unable to add printer:"));
     }
-    else
+    else if (modify)
     {
      /*
-      * Redirect successful updates back to the printer or set-options pages...
+      * Redirect successful updates back to the printer page...
       */
 
       char	refresh[1024];		/* Refresh URL */
@@ -1212,21 +1246,24 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
       cgiFormEncode(uri, name, sizeof(uri));
 
-      if (modify)
-	snprintf(refresh, sizeof(refresh),
-	         "5;/admin/?OP=redirect&URL=/printers/%s", uri);
-      else
-	snprintf(refresh, sizeof(refresh),
-	         "5;URL=/admin/?OP=set-printer-options&PRINTER_NAME=%s", uri);
+      snprintf(refresh, sizeof(refresh),
+	       "5;/admin/?OP=redirect&URL=/printers/%s", uri);
 
       cgiSetVariable("refresh_page", refresh);
 
       cgiStartHTML(title);
 
-      if (modify)
-        cgiCopyTemplateLang("printer-modified.tmpl");
-      else
-        cgiCopyTemplateLang("printer-added.tmpl");
+      cgiCopyTemplateLang("printer-modified.tmpl");
+    }
+    else
+    {
+     /*
+      * Set the printer options...
+      */
+
+      cgiSetVariable("OP", "set-printer-options");
+      do_set_options(http, 0);
+      return;
     }
 
     cgiEndHTML();
@@ -1319,7 +1356,7 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
 static void
 do_config_server(http_t *http)		/* I - HTTP connection */
 {
-  if (cgiIsPOST() && !cgiGetVariable("CUPSDCONF"))
+  if (cgiGetVariable("CHANGESETTINGS"))
   {
    /*
     * Save basic setting changes...
@@ -1454,7 +1491,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     cgiEndHTML();
   }
-  else if (cgiIsPOST())
+  else if (cgiGetVariable("SAVECHANGES") && cgiGetVariable("CUPSDCONF"))
   {
    /*
     * Save hand-edited config file...
@@ -2132,8 +2169,8 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    * Not found, so it must be a new printer...
 	    */
 
-            char	options[1024],	/* Form variables for this device */
-			*options_ptr;	/* Pointer into string */
+            char	option[1024],	/* Form variables for this device */
+			*option_ptr;	/* Pointer into string */
 	    const char	*ptr;		/* Pointer into device string */
 
 
@@ -2145,9 +2182,6 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    * suitable name.
 	    */
 
-	    strcpy(options, "TEMPLATE_NAME=");
-	    options_ptr = options + strlen(options);
-
             if (strncasecmp(device_info, "unknown", 7))
 	      ptr = device_info;
             else if ((ptr = strstr(device_uri, "://")) != NULL)
@@ -2155,49 +2189,20 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	    else
 	      ptr = device_make_and_model;
 
-	    for (;
-	         options_ptr < (options + sizeof(options) - 1) && *ptr;
+	    for (option_ptr = option;
+	         option_ptr < (option + sizeof(option) - 1) && *ptr;
 		 ptr ++)
 	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' ||
 	          *ptr == '.')
-	        *options_ptr++ = *ptr;
-	      else if ((*ptr == ' ' || *ptr == '/') && options_ptr[-1] != '_')
-	        *options_ptr++ = '_';
+	        *option_ptr++ = *ptr;
+	      else if ((*ptr == ' ' || *ptr == '/') && option_ptr[-1] != '_')
+	        *option_ptr++ = '_';
 	      else if (*ptr == '?' || *ptr == '(')
 	        break;
 
-           /*
-	    * Then add the make and model in the printer info, so
-	    * that MacOS clients see something reasonable...
-	    */
+            *option_ptr = '\0';
 
-            strlcpy(options_ptr, "&PRINTER_LOCATION=Local+Printer"
-	                         "&PRINTER_INFO=",
-	            sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            cgiFormEncode(options_ptr, device_make_and_model,
-	                  sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-           /*
-	    * Then copy the device URI...
-	    */
-
-	    strlcpy(options_ptr, "&DEVICE_URI=",
-	            sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            cgiFormEncode(options_ptr, device_uri,
-	                  sizeof(options) - (options_ptr - options));
-	    options_ptr += strlen(options_ptr);
-
-            if (options_ptr < (options + sizeof(options) - 1))
-	    {
-	      *options_ptr++ = '|';
-	      cgiFormEncode(options_ptr, device_make_and_model,
-	                  sizeof(options) - (options_ptr - options));
-	    }
+            cgiSetArray("TEMPLATE_NAME", i, option);
 
            /*
 	    * Finally, set the form variables for this printer...
@@ -2205,7 +2210,6 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 
 	    cgiSetArray("device_info", i, device_info);
 	    cgiSetArray("device_make_and_model", i, device_make_and_model);
-	    cgiSetArray("device_options", i, options);
             cgiSetArray("device_uri", i, device_uri);
 	    i ++;
 	  }
@@ -3412,5 +3416,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 6733 2007-07-26 18:09:46Z mike $".
+ * End of "$Id: admin.c 7012 2007-10-10 21:22:45Z mike $".
  */

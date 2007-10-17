@@ -1,5 +1,5 @@
 /*
-* "$Id: usb-darwin.c 6996 2007-09-28 18:30:31Z mike $"
+* "$Id: usb-darwin.c 6993 2007-09-28 18:05:28Z mike $"
 *
 * Copyright � 2005-2007 Apple Inc. All rights reserved.
 *
@@ -2017,5 +2017,5 @@ static void get_device_id(cups_sc_status_t *status,
 
 
 /*
- * End of "$Id: usb-darwin.c 6996 2007-09-28 18:30:31Z mike $".
+ * End of "$Id: usb-darwin.c 6993 2007-09-28 18:05:28Z mike $".
  */

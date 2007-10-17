@@ -1,5 +1,5 @@
 #
-# "$Id: Makedefs.in 6687 2007-07-18 19:49:45Z mike $"
+# "$Id: Makedefs.in 7016 2007-10-10 22:07:51Z mike $"
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
@@ -108,8 +108,8 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #               for extra debug info)
 #
 
-ALL_CFLAGS	=	$(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
-			$(OPTIONS) $(CFLAGS)
+ALL_CFLAGS	=	$(CFLAGS) $(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
+			$(OPTIONS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
@@ -272,5 +272,5 @@ DBUSDIR		=	@DBUSDIR@
 
 
 #
-# End of "$Id: Makedefs.in 6687 2007-07-18 19:49:45Z mike $"
+# End of "$Id: Makedefs.in 7016 2007-10-10 22:07:51Z mike $"
 #

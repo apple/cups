@@ -1,5 +1,5 @@
 /*
- * "$Id: file.c 6963 2007-09-17 20:35:54Z mike $"
+ * "$Id: file.c 6962 2007-09-17 20:35:47Z mike $"
  *
  *   File functions for the Common UNIX Printing System (CUPS).
  *
@@ -2136,5 +2136,5 @@ cups_write(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * End of "$Id: file.c 6963 2007-09-17 20:35:54Z mike $".
+ * End of "$Id: file.c 6962 2007-09-17 20:35:47Z mike $".
  */

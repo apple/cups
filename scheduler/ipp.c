@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 6949 2007-09-12 21:33:23Z mike $"
+ * "$Id: ipp.c 7014 2007-10-10 21:57:43Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -54,6 +54,7 @@
  *   get_default()               - Get the default destination.
  *   get_devices()               - Get the list of available devices on the
  *                                 local system.
+ *   get_document()              - Get a copy of a job file.
  *   get_job_attrs()             - Get job attributes.
  *   get_jobs()                  - Get a list of jobs for the specified printer.
  *   get_notifications()         - Get events for a subscription.
@@ -165,6 +166,7 @@ static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	delete_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_default(cupsd_client_t *con);
 static void	get_devices(cupsd_client_t *con);
+static void	get_document(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_notifications(cupsd_client_t *con);
@@ -360,13 +362,31 @@ cupsdProcessIPPRequest(
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
                      "attributes-natural-language", NULL, DefaultLanguage);
 
-      if (!charset || !language ||
-	  (!uri &&
-	   con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
-	   con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
-	   con->request->request.op.operation_id != CUPS_GET_CLASSES &&
-	   con->request->request.op.operation_id != CUPS_GET_DEVICES &&
-	   con->request->request.op.operation_id != CUPS_GET_PPDS))
+      if (charset &&
+          strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          strcasecmp(charset->values[0].string.text, "utf-8"))
+      {
+       /*
+        * Bad character set...
+	*/
+
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unsupported character set \"%s\"!",
+	                charset->values[0].string.text);
+	cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+		      "%04X %s Unsupported attributes-charset value \"%s\"",
+		      IPP_CHARSET, con->http.hostname,
+		      charset->values[0].string.text);
+	send_ipp_status(con, IPP_BAD_REQUEST,
+	                _("Unsupported character set \"%s\"!"),
+	                charset->values[0].string.text);
+      }
+      else if (!charset || !language ||
+	       (!uri &&
+	        con->request->request.op.operation_id != CUPS_GET_DEFAULT &&
+	        con->request->request.op.operation_id != CUPS_GET_PRINTERS &&
+	        con->request->request.op.operation_id != CUPS_GET_CLASSES &&
+	        con->request->request.op.operation_id != CUPS_GET_DEVICES &&
+	        con->request->request.op.operation_id != CUPS_GET_PPDS))
       {
        /*
 	* Return an error, since attributes-charset,
@@ -570,6 +590,10 @@ cupsdProcessIPPRequest(
 	  case CUPS_GET_DEVICES :
               get_devices(con);
               break;
+
+          case CUPS_GET_DOCUMENT :
+	      get_document(con, uri);
+	      break;
 
 	  case CUPS_GET_PPD :
               get_ppd(con, uri);
@@ -902,16 +926,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   }
 
  /*
-  * Check policy...
-  */
-
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
-  {
-    send_http_error(con, status, NULL);
-    return;
-  }
-
- /*
   * See if the class already exists; if not, create a new class...
   */
 
@@ -935,8 +949,14 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     }
 
    /*
-    * No, add the pclass...
+    * No, check the default policy and then add the class...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
@@ -944,8 +964,15 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit class to "AnyClass" or remove it...
+    * Check the default policy, then tename the implicit class to "AnyClass"
+    * or remove it...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     if (ImplicitAnyClasses)
     {
@@ -965,8 +992,14 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   else if (pclass->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
-    * Rename the remote class to "Class"...
+    * Check the default policy, then rename the remote class to "Class"...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     snprintf(newname, sizeof(newname), "%s@%s", resource + 9, pclass->hostname);
     cupsdRenamePrinter(pclass, newname);
@@ -977,6 +1010,12 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     pclass = cupsdAddClass(resource + 9);
     modify = 0;
+  }
+  else if ((status = cupsdCheckPolicy(pclass->op_policy_ptr, con,
+                                      NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
   }
   else
     modify = 1;
@@ -2174,16 +2213,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * Check policy...
-  */
-
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
-  {
-    send_http_error(con, status, NULL);
-    return;
-  }
-
- /*
   * See if the printer already exists; if not, create a new printer...
   */
 
@@ -2207,8 +2236,14 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     }
 
    /*
-    * No, add the printer...
+    * No, check the default policy then add the printer...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
@@ -2216,8 +2251,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_IMPLICIT)
   {
    /*
-    * Rename the implicit printer to "AnyPrinter" or delete it...
+    * Check the default policy, then rename the implicit printer to
+    * "AnyPrinter" or delete it...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     if (ImplicitAnyClasses)
     {
@@ -2237,8 +2279,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   else if (printer->type & CUPS_PRINTER_DISCOVERED)
   {
    /*
-    * Rename the remote printer to "Printer@server"...
+    * Check the default policy, then rename the remote printer to
+    * "Printer@server"...
     */
+
+    if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, NULL);
+      return;
+    }
 
     snprintf(newname, sizeof(newname), "%s@%s", resource + 10,
              printer->hostname);
@@ -2250,6 +2299,12 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     printer = cupsdAddPrinter(resource + 10);
     modify  = 0;
+  }
+  else if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
+                                      NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
   }
   else
     modify = 1;
@@ -4531,6 +4586,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
                    con->servername, con->serverport, "/jobs/%d",
         	   job->id);
 
+  if (!ra || cupsArrayFind(ra, "document-count"))
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+        	  "document-count", job->num_files);
+
   if (!ra || cupsArrayFind(ra, "job-more-info"))
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
@@ -5600,6 +5659,150 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
     send_ipp_status(con, IPP_INTERNAL_ERROR,
                     _("cups-deviced failed to execute."));
   }
+}
+
+
+/*
+ * 'get_document()' - Get a copy of a job file.
+ */
+
+static void
+get_document(cupsd_client_t  *con,	/* I - Client connection */
+             ipp_attribute_t *uri)	/* I - Job URI */
+{
+  http_status_t	status;			/* Policy status */
+  ipp_attribute_t *attr;		/* Current attribute */
+  int		jobid;			/* Job ID */
+  int		docnum;			/* Document number */
+  cupsd_job_t	*job;			/* Current job */
+  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+		username[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+  int		port;			/* Port portion of URI */
+  char		filename[1024],		/* Filename for document */
+		format[1024];		/* Format for document */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_document(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (!strcmp(uri->name, "printer-uri"))
+  {
+   /*
+    * Got a printer URI; see if we also have a job-id attribute...
+    */
+
+    if ((attr = ippFindAttribute(con->request, "job-id",
+                                 IPP_TAG_INTEGER)) == NULL)
+    {
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Got a printer-uri attribute but no job-id!"));
+      return;
+    }
+
+    jobid = attr->values[0].integer;
+  }
+  else
+  {
+   /*
+    * Got a job URI; parse it to get the job ID...
+    */
+
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
+                    sizeof(method), username, sizeof(username), host,
+		    sizeof(host), &port, resource, sizeof(resource));
+
+    if (strncmp(resource, "/jobs/", 6))
+    {
+     /*
+      * Not a valid URI!
+      */
+
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Bad job-uri attribute \"%s\"!"),
+                      uri->values[0].string.text);
+      return;
+    }
+
+    jobid = atoi(resource + 6);
+  }
+
+ /*
+  * See if the job exists...
+  */
+
+  if ((job = cupsdFindJob(jobid)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist!"), jobid);
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, NULL);
+    return;
+  }
+
+ /*
+  * Get the document number...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "document-number",
+                               IPP_TAG_INTEGER)) == NULL)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+                    _("Missing document-number attribute!"));
+    return;
+  }
+
+  if ((docnum = attr->values[0].integer) < 1 || docnum > job->num_files ||
+      attr->num_values > 1)
+  {
+    send_ipp_status(con, IPP_NOT_FOUND, _("Document %d not found in job %d."),
+                    docnum, jobid);
+    return;
+  }
+
+  snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, jobid,
+           docnum);
+  if ((con->file = open(filename, O_RDONLY)) == -1)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to open document %d in job %d - %s", docnum, jobid,
+		    strerror(errno));
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("Unable to open document %d in job %d!"), docnum, jobid);
+    return;
+  }
+
+  fcntl(con->file, F_SETFD, fcntl(con->file, F_GETFD) | FD_CLOEXEC);
+
+  cupsdLoadJob(job);
+
+  snprintf(format, sizeof(format), "%s/%s", job->filetypes[docnum - 1]->super,
+           job->filetypes[docnum - 1]->type);
+
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
+               NULL, format);
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "document-number",
+                docnum);
+  if ((attr = ippFindAttribute(job->attrs, "document-name",
+                               IPP_TAG_NAME)) != NULL)
+    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_NAME, "document-name",
+                 NULL, attr->values[0].string.text);
 }
 
 
@@ -9929,5 +10132,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 6949 2007-09-12 21:33:23Z mike $".
+ * End of "$Id: ipp.c 7014 2007-10-10 21:57:43Z mike $".
  */

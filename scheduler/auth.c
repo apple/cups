@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6949 2007-09-12 21:33:23Z mike $"
+ * "$Id: auth.c 6947 2007-09-12 21:09:49Z mike $"
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
@@ -2668,5 +2668,5 @@ to64(char          *s,			/* O - Output string */
 
 
 /*
- * End of "$Id: auth.c 6949 2007-09-12 21:33:23Z mike $".
+ * End of "$Id: auth.c 6947 2007-09-12 21:09:49Z mike $".
  */

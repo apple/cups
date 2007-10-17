@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 6799 2007-08-15 19:33:36Z mike $"
+ * "$Id: testppd.c 6936 2007-09-10 18:15:36Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -235,8 +235,6 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
       printf("FAIL (\"%s\" instead of \"Number 1 Foo Reason\")\n", buffer);
     }
-
-    ppdClose(ppd);
   }
   else
   {
@@ -362,15 +360,27 @@ main(int  argc,				/* I - Number of command-line arguments */
 	   attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
         printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
 	       attr->text, attr->value ? attr->value : "");
-
-      ppdClose(ppd);
     }
   }
+
+#ifdef __APPLE__
+  if (getenv("MallocStackLogging") && getenv("MallocStackLoggingNoCompact"))
+  {
+    char	command[1024];		/* malloc_history command */
+
+    snprintf(command, sizeof(command), "malloc_history %d -all_by_size",
+	     getpid());
+    fflush(stdout);
+    system(command);
+  }
+#endif /* __APPLE__ */
+
+  ppdClose(ppd);
 
   return (status);
 }
 
 
 /*
- * End of "$Id: testppd.c 6799 2007-08-15 19:33:36Z mike $".
+ * End of "$Id: testppd.c 6936 2007-09-10 18:15:36Z mike $".
  */

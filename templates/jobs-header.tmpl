@@ -1,15 +1,5 @@
-<P>{?which_jobs=?<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
-SRC="/images/button-show-completed.gif" CLASS="button" ALT="Show Completed Jobs"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
-SRC="/images/button-show-all.gif" CLASS="button" ALT="Show All Jobs">:{which_jobs=all?<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=completed"><IMG
-SRC="/images/button-show-completed.gif" CLASS="button" ALT="Show Completed Jobs"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
-SRC="/images/button-show-active.gif" CLASS="button" ALT="Show Active Jobs">:<A
-HREF="{?printer_name=?/jobs:{printer_uri_supported}}"><IMG
-SRC="/images/button-show-active.gif" CLASS="button" ALT="Show Active Jobs"></A>
-<A HREF="{?printer_name=?/jobs:{printer_uri_supported}}?which_jobs=all"><IMG
-SRC="/images/button-show-all.gif" CLASS="button" ALT="Show All Jobs">}}</A></P>
+<P>{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Show Active Jobs"></FORM>}
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Show Completed Jobs"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Show All Jobs"></FORM>}</P>
 
 <P ALIGN="CENTER">{total=0?No jobs:Showing {#job_id} of {total} {?which_jobs=?active:{which_jobs=all?:completed}} job{total=1?:s}}.</P>

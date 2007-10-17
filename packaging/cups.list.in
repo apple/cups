@@ -1,5 +1,5 @@
 #
-# "$Id: cups.list.in 6960 2007-09-14 21:15:04Z mike $"
+# "$Id: cups.list.in 7014 2007-10-10 21:57:43Z mike $"
 #
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
@@ -409,6 +409,7 @@ f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 %subpackage pt
 f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
 f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
+f 0644 root sys $LOCALEDIR/pt_PT/cups_pt_PT.po locale/cups_pt_PT.po
 %subpackage ru
 f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
 %subpackage sv
@@ -432,29 +433,6 @@ d 0755 root sys $DATADIR/charmaps -
 f 0644 root sys $DATADIR/charmaps data/*.txt
 
 d 0755 root sys $DATADIR/charsets -
-f 0644 root sys $DATADIR/charsets/windows-874 data/windows-874
-f 0644 root sys $DATADIR/charsets/windows-1250 data/windows-1250
-f 0644 root sys $DATADIR/charsets/windows-1251 data/windows-1251
-f 0644 root sys $DATADIR/charsets/windows-1252 data/windows-1252
-f 0644 root sys $DATADIR/charsets/windows-1253 data/windows-1253
-f 0644 root sys $DATADIR/charsets/windows-1254 data/windows-1254
-f 0644 root sys $DATADIR/charsets/windows-1255 data/windows-1255
-f 0644 root sys $DATADIR/charsets/windows-1256 data/windows-1256
-f 0644 root sys $DATADIR/charsets/windows-1257 data/windows-1257
-f 0644 root sys $DATADIR/charsets/windows-1258 data/windows-1258
-f 0644 root sys $DATADIR/charsets/iso-8859-1 data/iso-8859-1
-f 0644 root sys $DATADIR/charsets/iso-8859-2 data/iso-8859-2
-f 0644 root sys $DATADIR/charsets/iso-8859-3 data/iso-8859-3
-f 0644 root sys $DATADIR/charsets/iso-8859-4 data/iso-8859-4
-f 0644 root sys $DATADIR/charsets/iso-8859-5 data/iso-8859-5
-f 0644 root sys $DATADIR/charsets/iso-8859-6 data/iso-8859-6
-f 0644 root sys $DATADIR/charsets/iso-8859-7 data/iso-8859-7
-f 0644 root sys $DATADIR/charsets/iso-8859-8 data/iso-8859-8
-f 0644 root sys $DATADIR/charsets/iso-8859-9 data/iso-8859-9
-f 0644 root sys $DATADIR/charsets/iso-8859-10 data/iso-8859-10
-f 0644 root sys $DATADIR/charsets/iso-8859-13 data/iso-8859-13
-f 0644 root sys $DATADIR/charsets/iso-8859-14 data/iso-8859-14
-f 0644 root sys $DATADIR/charsets/iso-8859-15 data/iso-8859-15
 f 0644 root sys $DATADIR/charsets/utf-8 data/utf-8
 
 d 0755 root sys $DATADIR/data -
@@ -578,54 +556,34 @@ f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 %subpackage de
 d 0755 root sys $DOCDIR/de
 f 0644 root sys $DOCDIR/de doc/de/*.html
-d 0755 root sys $DOCDIR/de/images -
-f 0644 root sys $DOCDIR/de/images doc/de/images/*.gif
 %subpackage es
 d 0755 root sys $DOCDIR/es
 f 0644 root sys $DOCDIR/es doc/es/*.html
-d 0755 root sys $DOCDIR/es/images -
-f 0644 root sys $DOCDIR/es/images doc/es/images/*.gif
 %subpackage et
 d 0755 root sys $DOCDIR/et
 f 0644 root sys $DOCDIR/et doc/et/*.html
-d 0755 root sys $DOCDIR/et/images -
-f 0644 root sys $DOCDIR/et/images doc/et/images/*.gif
 %subpackage fr
 d 0755 root sys $DOCDIR/fr
 f 0644 root sys $DOCDIR/fr doc/fr/*.html
-d 0755 root sys $DOCDIR/fr/images -
-f 0644 root sys $DOCDIR/fr/images doc/fr/images/*.gif
 %subpackage he
 d 0755 root sys $DOCDIR/he
 f 0644 root sys $DOCDIR/he doc/he/*.html
 f 0644 root sys $DOCDIR/he/cups.css doc/he/cups.css
-d 0755 root sys $DOCDIR/he/images -
-f 0644 root sys $DOCDIR/he/images doc/he/images/*.gif
 %subpackage it
 d 0755 root sys $DOCDIR/it
 f 0644 root sys $DOCDIR/it doc/it/*.html
-d 0755 root sys $DOCDIR/it/images -
-f 0644 root sys $DOCDIR/it/images doc/it/images/*.gif
 %subpackage ja
 d 0755 root sys $DOCDIR/ja
 f 0644 root sys $DOCDIR/ja doc/ja/*.html
-d 0755 root sys $DOCDIR/ja/images -
-f 0644 root sys $DOCDIR/ja/images doc/ja/images/*.gif
 %subpackage pl
 d 0755 root sys $DOCDIR/pl
 f 0644 root sys $DOCDIR/pl doc/pl/*.html
-d 0755 root sys $DOCDIR/pl/images -
-f 0644 root sys $DOCDIR/pl/images doc/pl/images/*.gif
 %subpackage sv
 d 0755 root sys $DOCDIR/sv
 f 0644 root sys $DOCDIR/sv doc/sv/*.html
-d 0755 root sys $DOCDIR/sv/images -
-f 0644 root sys $DOCDIR/sv/images doc/sv/images/*.gif
 %subpackage zh
 d 0755 root sys $DOCDIR/zh_TW
 f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
-d 0755 root sys $DOCDIR/zh_TW/images -
-f 0644 root sys $DOCDIR/zh_TW/images doc/zh_TW/images/*.gif
 %subpackage
 
 # Man pages
@@ -722,5 +680,5 @@ f 0644 root sys $XINETD/cups-lpd init/cups-lpd
 %subpackage
 
 #
-# End of "$Id: cups.list.in 6960 2007-09-14 21:15:04Z mike $".
+# End of "$Id: cups.list.in 7014 2007-10-10 21:57:43Z mike $".
 #

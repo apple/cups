@@ -1,5 +1,5 @@
 /*
- * "$Id: request.c 6712 2007-07-24 00:13:05Z mike $"
+ * "$Id: request.c 6879 2007-08-29 20:26:50Z mike $"
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
@@ -17,6 +17,7 @@
  * Contents:
  *
  *   cupsDoFileRequest() - Do an IPP request with a file.
+ *   cupsDoIORequest()   - Do an IPP request with file descriptors.
  *   cupsDoRequest()     - Do an IPP request.
  *   _cupsSetError()     - Set the last IPP status code and status-message.
  *   _cupsSetHTTPError() - Set the last error using the HTTP status.
@@ -552,5 +553,5 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
 
 /*
- * End of "$Id: request.c 6712 2007-07-24 00:13:05Z mike $".
+ * End of "$Id: request.c 6879 2007-08-29 20:26:50Z mike $".
  */

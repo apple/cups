@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 7000 2007-09-28 19:47:00Z mike $"
+ * "$Id: job.c 7005 2007-10-01 23:45:48Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -878,6 +878,7 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
 
   job->state->values[0].integer = IPP_JOB_HELD;
   job->state_value              = IPP_JOB_HELD;
+  job->current_file             = 0;
 
   cupsdSaveJob(job);
 
@@ -3789,5 +3790,5 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 7000 2007-09-28 19:47:00Z mike $".
+ * End of "$Id: job.c 7005 2007-10-01 23:45:48Z mike $".
  */

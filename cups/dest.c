@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: dest.c 6943 2007-09-10 23:00:33Z mike $"
  *
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
@@ -127,7 +127,7 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
   * Initialize the destination...
   */
 
-  dest->name        = strdup(name);
+  dest->name        = _cupsStrAlloc(name);
   dest->is_default  = 0;
   dest->num_options = 0;
   dest->options     = (cups_option_t *)0;
@@ -140,7 +140,7 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
     * Copy options from the primary instance...
     */
 
-    dest->instance = strdup(instance);
+    dest->instance = _cupsStrAlloc(instance);
 
     if ((parent = cupsGetDest(name, NULL, num_dests + 1, *dests)) != NULL)
     {
@@ -174,10 +174,8 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
 
   for (i = num_dests, dest = dests; i > 0; i --, dest ++)
   {
-    free(dest->name);
-
-    if (dest->instance)
-      free(dest->instance);
+    _cupsStrFree(dest->name);
+    _cupsStrFree(dest->instance);
 
     cupsFreeOptions(dest->num_options, dest->options);
   }
@@ -483,6 +481,8 @@ cupsRemoveDest(const char  *name,	/* I  - Destination name */
   * Free memory...
   */
 
+  _cupsStrFree(dest->name);
+  _cupsStrFree(dest->instance);
   cupsFreeOptions(dest->num_options, dest->options);
 
  /*
@@ -1293,5 +1293,5 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 
 
 /*
- * End of "$Id: dest.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: dest.c 6943 2007-09-10 23:00:33Z mike $".
  */

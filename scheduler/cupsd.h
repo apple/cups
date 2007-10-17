@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 6755 2007-08-01 19:02:47Z mike $"
+ * "$Id: cupsd.h 6875 2007-08-27 23:25:06Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -152,6 +152,8 @@ typedef void (*cupsd_selfunc_t)(void *data);
  * Globals...
  */
 
+VAR int			TestConfigFile	VALUE(0);
+					/* Test the cupsd.conf file? */
 VAR int			MaxFDs;		/* Maximum number of files */
 
 VAR time_t		ReloadTime	VALUE(0);
@@ -226,5 +228,5 @@ extern void	cupsdStopSelect(void);
 extern int	cupsdRemoveFile(const char *filename);
 
 /*
- * End of "$Id: cupsd.h 6755 2007-08-01 19:02:47Z mike $".
+ * End of "$Id: cupsd.h 6875 2007-08-27 23:25:06Z mike $".
  */

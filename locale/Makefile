@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6996 2007-09-28 18:30:31Z mike $"
+# "$Id: Makefile 6993 2007-09-28 18:05:28Z mike $"
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
@@ -151,5 +151,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6996 2007-09-28 18:30:31Z mike $".
+# End of "$Id: Makefile 6993 2007-09-28 18:05:28Z mike $".
 #

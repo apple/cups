@@ -257,6 +257,98 @@ Version "1.3"
   }
 }
 
+// Generic drivers
+{
+  Manufacturer "Generic"
+
+  // Generic PCL Laser Printer
+  {
+    DriverType hp
+
+    ModelName "PCL Laser Printer"
+    PCFileName "GENERPCL.PPD"
+    Throughput 8
+    ModelNumber $HP_LASERJET
+    ColorDevice No
+
+    UIConstraints "*Duplex  *Option1 False"
+    UIConstraints "*PageSize A3 *InputSlot Envelope"
+    UIConstraints "*PageSize A4 *InputSlot Envelope"
+    UIConstraints "*PageSize A5 *InputSlot Envelope"
+    UIConstraints "*PageSize B5 *InputSlot Envelope"
+    UIConstraints "*PageSize Executive *InputSlot Envelope"
+    UIConstraints "*PageSize Legal *InputSlot Envelope"
+    UIConstraints "*PageSize Letter *InputSlot Envelope"
+    UIConstraints "*PageSize Tabloid *InputSlot Envelope"
+
+    HWMargins 18 12 18 12
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    *Resolution k 1 0 0 0 300dpi
+    Resolution k 1 0 0 0 600dpi
+
+    *InputSlot 0 "Default/Printer Default"
+    InputSlot 8 "Tray1/Tray 1"
+    InputSlot 1 "Tray2/Tray 2"
+    InputSlot 4 "Tray3/Tray 3"
+    InputSlot 5 "Tray4/Tray 4"
+    InputSlot 2 "Manual/Manual Feed"
+    InputSlot 3 "Envelope/Envelope Feed"
+
+    Duplex Yes
+    Installable "Option1/Duplexer"
+  }
+
+  // Generic PostScript Printer
+  {
+    DriverType ps
+
+    ModelName "PostScript Printer"
+    PCFileName "GENERIC.PPD"
+    Throughput 8
+    ColorDevice No
+    Attribute PSVersion "" "(2016.0) 0"
+    Attribute LanguageLevel "" 2
+
+    UIConstraints "*Duplex  *Option1 False"
+
+    HWMargins 12 12 12 12
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize Executive
+    MediaSize Tabloid
+    MediaSize A3
+    MediaSize A4
+    MediaSize A5
+    MediaSize B5
+    MediaSize EnvISOB5
+    MediaSize Env10
+    MediaSize EnvC5
+    MediaSize EnvDL
+    MediaSize EnvMonarch
+
+    Option "InputSlot/Media Source" PickOne AnySetup 10
+      *Choice "Default/Printer Default" ""
+      Choice "Tray1/Tray 1" "<</ManualFeed false>>setpagedevice"
+      Choice "Manual/Manual Feed" "<</ManualFeed true>>setpagedevice"
+
+    Duplex Yes
+    Installable "Option1/Duplexer"
+  }
+}
+
 // HP
 {
   Manufacturer "HP"

@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6741 2007-07-27 19:26:53Z mike $"
+ * "$Id: adminutil.c 6930 2007-09-08 00:28:06Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -1458,6 +1458,8 @@ _cupsAdminSetServerSettings(
               !strcasecmp(line, "BrowseAddress") ||
               !strcasecmp(line, "BrowseAllow") ||
               !strcasecmp(line, "BrowseDeny") ||
+              !strcasecmp(line, "BrowseLocalProtocols") ||
+              !strcasecmp(line, "BrowseRemoteProtocols") ||
               !strcasecmp(line, "BrowseOrder")) &&
 	     (remote_printers >= 0 || share_printers >= 0))
     {
@@ -1474,6 +1476,11 @@ _cupsAdminSetServerSettings(
 
         if (new_remote_printers || new_share_printers)
 	{
+	  const char *localp = cupsGetOption("BrowseLocalProtocols",
+					     num_settings, settings);
+	  const char *remotep = cupsGetOption("BrowseRemoteProtocols",
+					      num_settings, settings);
+
 	  if (new_remote_printers && new_share_printers)
 	    cupsFilePuts(temp,
 	                 "# Enable printer sharing and shared printers.\n");
@@ -1488,10 +1495,30 @@ _cupsAdminSetServerSettings(
 	  cupsFilePuts(temp, "BrowseOrder allow,deny\n");
 
 	  if (new_remote_printers)
+	  {
 	    cupsFilePuts(temp, "BrowseAllow all\n");
 
+	    if (!remotep || !*remotep)
+	      cupsFilePuts(temp, "BrowseRemoteProtocols "
+	                         CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS "\n");
+            else if (remotep)
+	      cupsFilePrintf(temp, "BrowseRemoteProtocols %s\n", remotep);
+          }
+	  else
+	    cupsFilePuts(temp, "BrowseRemoteProtocols\n");
+
 	  if (new_share_printers)
+	  {
 	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
+
+	    if (!localp || !*localp)
+	      cupsFilePuts(temp, "BrowseLocalProtocols "
+	                         CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "\n");
+            else if (localp)
+	      cupsFilePrintf(temp, "BrowseLocalProtocols %s\n", localp);
+	  }
+	  else
+	    cupsFilePuts(temp, "BrowseLocalProtocols\n");
         }
 	else
 	{
@@ -2346,5 +2373,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6741 2007-07-27 19:26:53Z mike $".
+ * End of "$Id: adminutil.c 6930 2007-09-08 00:28:06Z mike $".
  */

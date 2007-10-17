@@ -3,15 +3,17 @@
 
 <P ALIGN="CENTER"><B>Search in
 {HELPTITLE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}:</B> <INPUT
-TYPE="TEXT" NAME="QUERY" VALUE="{?QUERY}" SIZE="60"> <INPUT
-TYPE="IMAGE" SRC="/images/button-search.gif" ALT="Search">
-<A HREF="/help/{?HELPFILE}{QUERY?{TOPIC??TOPIC={TOPIC}:}:}"><IMG
-SRC="/images/button-clear.gif" ALT="Clear" CLASS="button"></A></P>
+TYPE="SEARCH" NAME="QUERY" VALUE="{?QUERY}" SIZE="60" PLACEHOLDER=""
+AUTOSAVE="org.cups.help" RESULTS="20">
+<INPUT TYPE="SUBMIT" NAME="SEARCH" VALUE="Search">
+<INPUT TYPE="SUBMIT" NAME="CLEAR" VALUE="Clear"></P>
 
 </FORM>
 
 <!-- Bookmarks -->
-<DIV CLASS="sidebar">
+<DIV CLASS="sidebar"><TABLE CLASS="inset" SUMMARY="Contents">
+<TR><TD>
+
 <H3 CLASS="title">On-Line Help Documents</H3>
 
 <P CLASS="l0"><A HREF="/help/{QUERY??QUERY={QUERY}:}">All Documents</A></P>
@@ -19,7 +21,8 @@ SRC="/images/button-clear.gif" ALT="Clear" CLASS="button"></A></P>
 
 {[BMTEXT]<P CLASS="l{BMINDENT}"><A HREF="{BMLINK}">{BMTEXT}</A></P>
 }
-</DIV>
+</TD></TR>
+</TABLE></DIV>
 
 {QUERY?<P>Search Results in {HELPFILE?{HELPTITLE}:{TOPIC?{TOPIC}:All Documents}}\:</P>
 {QTEXT?<UL>
@@ -27,10 +30,7 @@ SRC="/images/button-clear.gif" ALT="Clear" CLASS="button"></A></P>
 {QTEXT?</UL>:}
 :<P>No matches found.</P>}
 <HR NOSHADE>:}
-{HELPTITLE?<H1>{HELPTITLE}
-<A HREF="/help/{HELPFILE}?PRINTABLE=YES" TARGET="_blank"><IMG
-SRC="/images/button-view-printable-version.gif" ALT="View Printable Version"
-CLASS="button"></A></H1>:<H1>CUPS Help Pages</H1>
+{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="View Printable Version"></FORM>:
 
 <P>This is the CUPS on-line help interface. Enter search words
 above or click on any of the documentation links to display

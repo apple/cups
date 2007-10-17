@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: Makefile 7014 2007-10-10 21:57:43Z mike $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -67,31 +67,6 @@ CHARMAPS =	\
 		windows-950.txt
 
 CHARSETS =	\
-		windows-874 \
-		windows-1250 \
-		windows-1251 \
-		windows-1252 \
-		windows-1253 \
-		windows-1254 \
-		windows-1255 \
-		windows-1256 \
-		windows-1257 \
-		windows-1258 \
-		koi8-r \
-		koi8-u \
-		iso-8859-1 \
-		iso-8859-2 \
-		iso-8859-3 \
-		iso-8859-4 \
-		iso-8859-5 \
-		iso-8859-6 \
-		iso-8859-7 \
-		iso-8859-8 \
-		iso-8859-9 \
-		iso-8859-10 \
-		iso-8859-13 \
-		iso-8859-14 \
-		iso-8859-15 \
 		utf-8
 
 DATAFILES =	\
@@ -171,5 +146,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id: Makefile 7014 2007-10-10 21:57:43Z mike $".
 #

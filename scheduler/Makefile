@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6802 2007-08-16 18:44:46Z mike $"
+# "$Id: Makefile 6801 2007-08-16 18:42:49Z mike $"
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -324,5 +324,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 6802 2007-08-16 18:44:46Z mike $".
+# End of "$Id: Makefile 6801 2007-08-16 18:42:49Z mike $".
 #
