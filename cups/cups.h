@@ -194,64 +194,64 @@ extern const char	*cupsUser(void);
 
 /**** New in CUPS 1.1.20 ****/
 extern int		cupsDoAuthentication(http_t *http, const char *method,
-			                     const char *resource);
+			                     const char *resource) _CUPS_API_1_1_20;
 extern http_status_t	cupsGetFile(http_t *http, const char *resource,
-			            const char *filename);
+			            const char *filename) _CUPS_API_1_1_20;
 extern http_status_t	cupsGetFd(http_t *http, const char *resource, int fd);
 extern http_status_t	cupsPutFile(http_t *http, const char *resource,
-			            const char *filename);
-extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd);
+			            const char *filename) _CUPS_API_1_1_20;
+extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd) _CUPS_API_1_1_20;
 
 /**** New in CUPS 1.1.21 ****/
-extern const char	*cupsGetDefault2(http_t *http);
-extern int		cupsGetDests2(http_t *http, cups_dest_t **dests);
+extern const char	*cupsGetDefault2(http_t *http) _CUPS_API_1_1_21;
+extern int		cupsGetDests2(http_t *http, cups_dest_t **dests) _CUPS_API_1_1_21;
 extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
 			             const char *dest, int myjobs,
-				     int completed);
-extern const char	*cupsGetPPD2(http_t *http, const char *printer);
+				     int completed) _CUPS_API_1_1_21;
+extern const char	*cupsGetPPD2(http_t *http, const char *printer) _CUPS_API_1_1_21;
 extern int		cupsPrintFile2(http_t *http, const char *printer,
 			               const char *filename,
 				       const char *title, int num_options,
-				       cups_option_t *options);
+				       cups_option_t *options) _CUPS_API_1_1_21;
 extern int		cupsPrintFiles2(http_t *http, const char *printer,
 			                int num_files, const char **files,
 					const char *title, int num_options,
-					cups_option_t *options);
+					cups_option_t *options) _CUPS_API_1_1_21;
 extern int		cupsSetDests2(http_t *http, int num_dests,
-			              cups_dest_t *dests);
+			              cups_dest_t *dests) _CUPS_API_1_1_21;
 
 /**** New in CUPS 1.2 ****/
 extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
-			                    double timeout);
+			                    double timeout) _CUPS_API_1_2;
 extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
-			                     double timeout);
+			                     double timeout) _CUPS_API_1_2;
 extern void		cupsEncodeOptions2(ipp_t *ipp, int num_options,
 					   cups_option_t *options,
-					   ipp_tag_t group_tag);
-extern const char	*cupsLastErrorString(void);
-extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event);
-extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event);
+					   ipp_tag_t group_tag) _CUPS_API_1_2;
+extern const char	*cupsLastErrorString(void) _CUPS_API_1_2;
+extern char		*cupsNotifySubject(cups_lang_t *lang, ipp_t *event) _CUPS_API_1_2;
+extern char		*cupsNotifyText(cups_lang_t *lang, ipp_t *event) _CUPS_API_1_2;
 extern int		cupsRemoveOption(const char *name, int num_options,
-			                 cups_option_t **options);
-extern cups_file_t	*cupsTempFile2(char *filename, int len);
+			                 cups_option_t **options) _CUPS_API_1_2;
+extern cups_file_t	*cupsTempFile2(char *filename, int len) _CUPS_API_1_2;
 
 /**** New in CUPS 1.3 ****/
 extern ipp_t		*cupsDoIORequest(http_t *http, ipp_t *request,
 			                 const char *resource, int infile,
-					 int outfile);
-extern char		*cupsGetServerPPD(http_t *http, const char *name);
+					 int outfile) _CUPS_API_1_3;
+extern char		*cupsGetServerPPD(http_t *http, const char *name) _CUPS_API_1_3;
 extern int		cupsRemoveDest(const char *name,
 			               const char *instance,
-				       int num_dests, cups_dest_t **dests);
+				       int num_dests, cups_dest_t **dests) _CUPS_API_1_3;
 extern void		cupsSetDefaultDest(const char *name,
 			                   const char *instance,
 					   int num_dests,
-					   cups_dest_t *dests);
+					   cups_dest_t *dests) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
 			            time_t *modtime, char *buffer,
-				    size_t bufsize);
+				    size_t bufsize) _CUPS_API_1_4;
 
 #  ifdef __cplusplus
 }

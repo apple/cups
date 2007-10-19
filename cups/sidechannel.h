@@ -19,6 +19,13 @@
 #  define _CUPS_SIDECHANNEL_H_
 
 /*
+ * Include necessary headers...
+ */
+
+#  include "versioning.h"
+
+
+/*
  * C++ magic...
  */
 
@@ -84,15 +91,15 @@ typedef enum				/**** Response status codes ****/
 
 extern cups_sc_status_t	cupsSideChannelDoRequest(cups_sc_command_t command,
 			                         char *data, int *datalen,
-						 double timeout);
+						 double timeout) _CUPS_API_1_3;
 extern int		cupsSideChannelRead(cups_sc_command_t *command,
 			                    cups_sc_status_t *status,
 					    char *data, int *datalen,
-					    double timeout);
+					    double timeout) _CUPS_API_1_3;
 extern int		cupsSideChannelWrite(cups_sc_command_t command,
 			                     cups_sc_status_t status,
 					     const char *data, int datalen,
-					     double timeout);
+					     double timeout) _CUPS_API_1_3;
 
 
 #  ifdef __cplusplus

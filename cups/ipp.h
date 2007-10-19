@@ -461,26 +461,26 @@ extern void		ippSetPort(int p);
 
 /**** New in CUPS 1.1.19 ****/
 extern ipp_attribute_t	*ippAddCollection(ipp_t *ipp, ipp_tag_t group,
-			                  const char *name, ipp_t *value);
+			                  const char *name, ipp_t *value) _CUPS_API_1_1_19;
 extern ipp_attribute_t	*ippAddCollections(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name, int num_values,
-					   const ipp_t **values);
-extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr);
-extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp);
-extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp);
+					   const ipp_t **values) _CUPS_API_1_1_19;
+extern void		ippDeleteAttribute(ipp_t *ipp, ipp_attribute_t *attr) _CUPS_API_1_1_19;
+extern ipp_state_t	ippReadFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
+extern ipp_state_t	ippWriteFile(int fd, ipp_t *ipp) _CUPS_API_1_1_19;
 
 /**** New in CUPS 1.2 ****/
 extern ipp_attribute_t	*ippAddOctetString(ipp_t *ipp, ipp_tag_t group,
 			                   const char *name,
-					   const void *data, int datalen);
-extern ipp_status_t	ippErrorValue(const char *name);
-extern ipp_t		*ippNewRequest(ipp_op_t op);
-extern const char	*ippOpString(ipp_op_t op);
-extern ipp_op_t		ippOpValue(const char *name);
+					   const void *data, int datalen) _CUPS_API_1_2;
+extern ipp_status_t	ippErrorValue(const char *name) _CUPS_API_1_2;
+extern ipp_t		*ippNewRequest(ipp_op_t op) _CUPS_API_1_2;
+extern const char	*ippOpString(ipp_op_t op) _CUPS_API_1_2;
+extern ipp_op_t		ippOpValue(const char *name) _CUPS_API_1_2;
 extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
-			          ipp_t *parent, ipp_t *ipp);
+			          ipp_t *parent, ipp_t *ipp) _CUPS_API_1_2;
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
-			           ipp_t *parent, ipp_t *ipp);
+			           ipp_t *parent, ipp_t *ipp) _CUPS_API_1_2;
 
 
 /*

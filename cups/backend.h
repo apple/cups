@@ -20,6 +20,13 @@
 
 
 /*
+ * Include necessary headers...
+ */
+
+#  include "versioning.h"
+
+
+/*
  * Constants...
  */
 
@@ -38,7 +45,7 @@ typedef enum cups_backend_e		/**** Backend exit codes ****/
  * Prototypes...
  */
 
-extern const char	*cupsBackendDeviceURI(char **argv);
+extern const char	*cupsBackendDeviceURI(char **argv) _CUPS_API_1_2;
 
 
 #endif /* !_CUPS_BACKEND_H_ */

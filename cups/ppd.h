@@ -358,41 +358,41 @@ extern ppd_size_t	*ppdPageSize(ppd_file_t *ppd, const char *name);
 extern float		ppdPageWidth(ppd_file_t *ppd, const char *name);
 
 /**** New in CUPS 1.1.19 ****/
-extern const char	*ppdErrorString(ppd_status_t status);
+extern const char	*ppdErrorString(ppd_status_t status) _CUPS_API_1_1_19;
 extern ppd_attr_t	*ppdFindAttr(ppd_file_t *ppd, const char *name,
-			             const char *spec);
+			             const char *spec) _CUPS_API_1_1_19;
 extern ppd_attr_t	*ppdFindNextAttr(ppd_file_t *ppd, const char *name,
-			                 const char *spec);
-extern ppd_status_t	ppdLastError(int *line);
+			                 const char *spec) _CUPS_API_1_1_19;
+extern ppd_status_t	ppdLastError(int *line) _CUPS_API_1_1_19;
 
 /**** New in CUPS 1.1.20 ****/
-extern void		ppdSetConformance(ppd_conform_t c);
+extern void		ppdSetConformance(ppd_conform_t c) _CUPS_API_1_1_20;
 
 /**** New in CUPS 1.2 ****/
 extern int		ppdCollect2(ppd_file_t *ppd, ppd_section_t section,
-			            float min_order, ppd_choice_t  ***choices);
+			            float min_order, ppd_choice_t  ***choices) _CUPS_API_1_2;
 extern int		ppdEmitAfterOrder(ppd_file_t *ppd, FILE *fp,
 			                  ppd_section_t section, int limit,
-					  float min_order);
-extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp);
+					  float min_order) _CUPS_API_1_2;
+extern int		ppdEmitJCLEnd(ppd_file_t *ppd, FILE *fp) _CUPS_API_1_2;
 extern char		*ppdEmitString(ppd_file_t *ppd, ppd_section_t section,
-			               float min_order);
+			               float min_order) _CUPS_API_1_2;
 extern ppd_coption_t	*ppdFindCustomOption(ppd_file_t *ppd,
-			                     const char *keyword);
+			                     const char *keyword) _CUPS_API_1_2;
 extern ppd_cparam_t	*ppdFindCustomParam(ppd_coption_t *opt,
-			                    const char *name);
-extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt);
-extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd);
-extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt);
-extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd);
-extern int		ppdLocalize(ppd_file_t *ppd);
-extern ppd_file_t	*ppdOpen2(cups_file_t *fp);
+			                    const char *name) _CUPS_API_1_2;
+extern ppd_cparam_t	*ppdFirstCustomParam(ppd_coption_t *opt) _CUPS_API_1_2;
+extern ppd_option_t	*ppdFirstOption(ppd_file_t *ppd) _CUPS_API_1_2;
+extern ppd_cparam_t	*ppdNextCustomParam(ppd_coption_t *opt) _CUPS_API_1_2;
+extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _CUPS_API_1_2;
+extern int		ppdLocalize(ppd_file_t *ppd) _CUPS_API_1_2;
+extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _CUPS_API_1_2;
 
 /**** New in CUPS 1.3 ****/
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
-					      char *buffer, size_t bufsize);
+					      char *buffer, size_t bufsize) _CUPS_API_1_3;
 
 
 /*
