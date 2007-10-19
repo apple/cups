@@ -317,14 +317,14 @@ extern int		cupsRasterInterpretPPD(cups_page_header2_t *h,
 			                       ppd_file_t *ppd,
 					       int num_options,
 					       cups_option_t *options,
-					       cups_interpret_cb_t func);
+					       cups_interpret_cb_t func) _CUPS_API_1_2;
 extern unsigned		cupsRasterReadHeader2(cups_raster_t *r,
-			                      cups_page_header2_t *h);
+			                      cups_page_header2_t *h) _CUPS_API_1_2;
 extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
-			                       cups_page_header2_t *h);
+			                       cups_page_header2_t *h) _CUPS_API_1_2;
 
 /**** New in CUPS 1.3 ****/
-extern const char	*cupsRasterErrorString(void);
+extern const char	*cupsRasterErrorString(void) _CUPS_API_1_3;
 
 #  ifdef __cplusplus
 }
