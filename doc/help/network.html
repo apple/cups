@@ -99,7 +99,7 @@ socket://<i>ip-address-or-hostname</i>:<i>port-number</i>?waiteof=false
 
 <H3><A NAME="IPP">Internet Printing Protocol (IPP)</A></H3>
 
-<P>IPP is the only protocol that CUPS supports natively, and is also supported by many network printers. We recommend using this protocol over others whenever the printer or server supports it. IPP printing normally happens over port 631 and uses the <tt>http</tt> and <tt>ipp</tt> URI schemes:</P>
+<P>IPP is the only protocol that CUPS supports natively and is supported by some network printers and print servers. However, since many printers do not implement IPP properly, only use IPP when the vendor actually documents official support for it. IPP printing normally happens over port 631 and uses the <tt>http</tt> and <tt>ipp</tt> URI schemes:</P>
 
 <PRE>
 http://<i>ip-address-or-hostname</i>:<i>port-number</i>/<i>resource</i>
@@ -322,17 +322,10 @@ lpd://<i>ip-address-or-hostname</i>/<i>queue</i>?<i>option=value&option=value</i
 	lpd://<I>address</I>/pr3</TD>
 </TR>
 <TR>
-	<TD>Hewlett Packard JetDirect w/o IPP</TD>
+	<TD>Hewlett Packard JetDirect</TD>
 	<TD>socket://<I>address</I>:9100<BR>
 	socket://<I>address</I>:9101<BR>
 	socket://<I>address</I>:9102</TD>
-</TR>
-<TR>
-	<TD>Hewlett Packard JetDirect w/IPP</TD>
-	<TD>ipp://<I>address</I>/ipp<BR>
-	ipp://<I>address</I>/ipp/port1<BR>
-	ipp://<I>address</I>/ipp/port2<BR>
-	ipp://<I>address</I>/ipp/port3</TD>
 </TR>
 <TR>
 	<TD>Intel&reg; NetportExpress XL, PRO/100</TD>
