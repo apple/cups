@@ -2332,11 +2332,26 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Do we have a valid device URI?
     */
 
+    http_uri_status_t uri_status;	/* URI separation status */
+
+
     need_restart_job = 1;
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text, scheme,
-                    sizeof(scheme), username, sizeof(username), host,
-		    sizeof(host), &port, resource, sizeof(resource));
+    uri_status = httpSeparateURI(HTTP_URI_CODING_ALL,
+				 attr->values[0].string.text,
+				 scheme, sizeof(scheme),
+				 username, sizeof(username),
+				 host, sizeof(host), &port,
+				 resource, sizeof(resource));
+
+    if (uri_status < HTTP_URI_OK)
+    {
+      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"!"),
+		      attr->values[0].string.text);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "add_printer: httpSeparateURI returned %d", uri_status);
+      return;
+    }
 
     if (!strcmp(scheme, "file"))
     {
