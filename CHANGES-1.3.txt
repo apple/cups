@@ -3,7 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.4
 
-	- Documentation updates (STR #2560)
+	- Documentation updates (STR #2560, STR #2563)
 	- The snmp.conf file referenced the wrong man page (STR
 	  #2564)
 	- The cupsaddsmb program didn't handle domain sockets
