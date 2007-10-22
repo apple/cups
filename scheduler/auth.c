@@ -363,6 +363,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   */
 
   con->best = cupsdFindBest(con->uri, con->http.state);
+  con->type = AUTH_NONE;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdAuthorize: con->uri=\"%s\", con->best=%p(%s)",
@@ -398,17 +399,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   }
 #endif /* HAVE_AUTHORIZATION_H */
 
-  if (type == AUTH_NONE)
-  {
-   /*
-    * No authorization required, return early...
-    */
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdAuthorize: No authentication required.");
-    return;
-  }
-  else if (!*authorization)
+  if (!*authorization)
   {
    /*
     * No authorization data provided, return early...
@@ -471,6 +462,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		    username);
 
     AuthorizationFreeItemSet(authinfo);
+
+    con->type = AUTH_BASIC;
   }
 #endif /* HAVE_AUTHORIZATION_H */
 #if defined(SO_PEERCRED) && defined(AF_LOCAL)
@@ -526,6 +519,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdAuthorize: Authorized as %s using PeerCred",
 		    username);
+
+    con->type = AUTH_BASIC;
   }
 #endif /* SO_PEERCRED && AF_LOCAL */
   else if (!strncmp(authorization, "Local", 5) &&
@@ -554,9 +549,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		      "found!");
       return;
     }
+
+    con->type = AUTH_BASIC;
   }
-  else if (!strncmp(authorization, "Basic", 5) &&
-           (type == AUTH_BASIC || type == AUTH_BASICDIGEST))
+  else if (!strncmp(authorization, "Basic", 5))
   {
    /*
     * Get the Basic authentication data...
@@ -615,6 +611,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     switch (type)
     {
+      default :
       case AUTH_BASIC :
           {
 #if HAVE_LIBPAM
@@ -842,8 +839,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			  username);
 	  break;
     }
+
+    con->type = type;
   }
-  else if (!strncmp(authorization, "Digest", 6) && type == AUTH_DIGEST)
+  else if (!strncmp(authorization, "Digest", 6))
   {
    /*
     * Get the username, password, and nonce from the Digest attributes...
@@ -915,6 +914,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdAuthorize: Authorized as %s using Digest",
 		    username);
+
+    con->type = AUTH_DIGEST;
   }
 #ifdef HAVE_GSSAPI
   else if (!strncmp(authorization, "Negotiate", 9)) 
@@ -1054,30 +1055,23 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 
       con->gss_have_creds = 1;
+
+      con->type = AUTH_NEGOTIATE;
     }
     else
       gss_release_name(&minor_status, &client_name);
   }
 #endif /* HAVE_GSSAPI */
-  else if (type != AUTH_NONE)
+  else
   {
     char	scheme[256];		/* Auth scheme... */
-    static const char * const types[] =	/* Auth types */
-    {
-      "None",
-      "Basic",
-      "Digest",
-      "BasicDigest",
-      "Negotiate"
-    };
 
 
     if (sscanf(authorization, "%255s", scheme) != 1)
       strcpy(scheme, "UNKNOWN");
 
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Bad authentication data \"%s ...\", expected \"%s ...\"",
-                    scheme, types[type]);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad authentication data \"%s ...\"",
+                    scheme);
     return;
   }
 
@@ -1809,11 +1803,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 		};
   static const char * const types[] =	/* Auth types */
 		{
-		  "NONE",
-		  "BASIC",
-		  "DIGEST",
-		  "BASICDIGEST",
-		  "KERBEROS"
+		  "None",
+		  "Basic",
+		  "Digest",
+		  "BasicDigest",
+		  "Negotiate"
 		};
 
 
@@ -1843,7 +1837,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   best = con->best;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdIsAuthorized: level=AUTH_%s, type=AUTH_%s, "
+                  "cupsdIsAuthorized: level=AUTH_%s, type=%s, "
 		  "satisfy=AUTH_SATISFY_%s, num_names=%d",
                   levels[best->level], types[best->type],
 	          best->satisfy ? "ANY" : "ALL", best->num_names);
@@ -2001,6 +1995,15 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	return (HTTP_UNAUTHORIZED);	/* Non-anonymous needs user/pass */
       else
 	return (HTTP_OK);		/* unless overridden with Satisfy */
+    }
+
+    if (con->type != best->type &&
+        (con->type != AUTH_BASIC || best->type != AUTH_BASICDIGEST))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Authorized using %s, expected %s!",
+                      types[con->type], types[best->type]);
+
+      return (HTTP_UNAUTHORIZED);
     }
 
     strlcpy(username, con->username, sizeof(username));
