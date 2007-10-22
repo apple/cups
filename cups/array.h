@@ -22,6 +22,7 @@
  * Include necessary headers...
  */
 
+#  include "versioning.h"
 #  include <stdlib.h>
 
 
@@ -50,28 +51,28 @@ typedef int (*cups_ahash_func_t)(void *element, void *data);
  * Functions...
  */
 
-extern int		cupsArrayAdd(cups_array_t *a, void *e);
-extern void		cupsArrayClear(cups_array_t *a);
-extern int		cupsArrayCount(cups_array_t *a);
-extern void		*cupsArrayCurrent(cups_array_t *a);
-extern void		cupsArrayDelete(cups_array_t *a);
-extern cups_array_t	*cupsArrayDup(cups_array_t *a);
-extern void		*cupsArrayFind(cups_array_t *a, void *e);
-extern void		*cupsArrayFirst(cups_array_t *a);
-extern int		cupsArrayGetIndex(cups_array_t *a);
-extern int		cupsArrayGetInsert(cups_array_t *a);
-extern void		*cupsArrayIndex(cups_array_t *a, int n);
-extern int		cupsArrayInsert(cups_array_t *a, void *e);
-extern void		*cupsArrayLast(cups_array_t *a);
-extern cups_array_t	*cupsArrayNew(cups_array_func_t f, void *d);
+extern int		cupsArrayAdd(cups_array_t *a, void *e) _CUPS_API_1_2;
+extern void		cupsArrayClear(cups_array_t *a) _CUPS_API_1_2;
+extern int		cupsArrayCount(cups_array_t *a) _CUPS_API_1_2;
+extern void		*cupsArrayCurrent(cups_array_t *a) _CUPS_API_1_2;
+extern void		cupsArrayDelete(cups_array_t *a) _CUPS_API_1_2;
+extern cups_array_t	*cupsArrayDup(cups_array_t *a) _CUPS_API_1_2;
+extern void		*cupsArrayFind(cups_array_t *a, void *e) _CUPS_API_1_2;
+extern void		*cupsArrayFirst(cups_array_t *a) _CUPS_API_1_2;
+extern int		cupsArrayGetIndex(cups_array_t *a) _CUPS_API_1_3;
+extern int		cupsArrayGetInsert(cups_array_t *a) _CUPS_API_1_3;
+extern void		*cupsArrayIndex(cups_array_t *a, int n) _CUPS_API_1_2;
+extern int		cupsArrayInsert(cups_array_t *a, void *e) _CUPS_API_1_2;
+extern void		*cupsArrayLast(cups_array_t *a) _CUPS_API_1_2;
+extern cups_array_t	*cupsArrayNew(cups_array_func_t f, void *d) _CUPS_API_1_2;
 extern cups_array_t	*cupsArrayNew2(cups_array_func_t f, void *d,
-			               cups_ahash_func_t h, int hsize);
-extern void		*cupsArrayNext(cups_array_t *a);
-extern void		*cupsArrayPrev(cups_array_t *a);
-extern int		cupsArrayRemove(cups_array_t *a, void *e);
-extern void		*cupsArrayRestore(cups_array_t *a);
-extern int		cupsArraySave(cups_array_t *a);
-extern void		*cupsArrayUserData(cups_array_t *a);
+			               cups_ahash_func_t h, int hsize) _CUPS_API_1_3;
+extern void		*cupsArrayNext(cups_array_t *a) _CUPS_API_1_2;
+extern void		*cupsArrayPrev(cups_array_t *a) _CUPS_API_1_2;
+extern int		cupsArrayRemove(cups_array_t *a, void *e) _CUPS_API_1_2;
+extern void		*cupsArrayRestore(cups_array_t *a) _CUPS_API_1_2;
+extern int		cupsArraySave(cups_array_t *a) _CUPS_API_1_2;
+extern void		*cupsArrayUserData(cups_array_t *a) _CUPS_API_1_2;
 
 #  ifdef __cplusplus
 }

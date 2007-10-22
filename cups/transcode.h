@@ -57,17 +57,17 @@ typedef unsigned long  cups_vbcs_t;	/* VBCS Legacy 32-bit unit */
 extern int	cupsCharsetToUTF8(cups_utf8_t *dest,
 				  const char *src,
 				  const int maxout,
-				  const cups_encoding_t encoding);
+				  const cups_encoding_t encoding) _CUPS_API_1_2;
 extern int	cupsUTF8ToCharset(char *dest,
 				  const cups_utf8_t *src,
 				  const int maxout,
-				  const cups_encoding_t encoding);
+				  const cups_encoding_t encoding) _CUPS_API_1_2;
 extern int	cupsUTF8ToUTF32(cups_utf32_t *dest,
 				const cups_utf8_t *src,
-				const int maxout);
+				const int maxout) _CUPS_API_1_2;
 extern int	cupsUTF32ToUTF8(cups_utf8_t *dest,
 				const cups_utf32_t *src,
-				const int maxout);
+				const int maxout) _CUPS_API_1_2;
 
 #  ifdef __cplusplus
 }

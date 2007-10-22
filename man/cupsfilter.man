@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "Common UNIX Printing System" "29 August 2007" "Apple Inc."
+.TH cupsfilter 8 "Common UNIX Printing System" "19 October 2007" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
@@ -20,9 +20,9 @@ cupsfilter \- convert a file to another format using cups filters
 .I config-file
 ] -j
 .I job-id[,N]
--m
+[ -m
 .I mime/type
-[ -n
+] [ -n
 .I copies
 ] [ -o
 .I name=value
@@ -35,7 +35,7 @@ cupsfilter \- convert a file to another format using cups filters
 .SH DESCRIPTION
 \fIcupsfilter\fR is a front-end to the CUPS filter subsystem which allows you
 to convert a file to a specific format, just as if you had printed the file
-through CUPS.
+through CUPS. By default, \fIcupsfilter\fR generates a PDF file.
 .SH OPTIONS
 .TP 5
 -c config-file
@@ -49,7 +49,7 @@ converted.
 .TP 5
 -m mime/type
 .br
-Specifies the destination file type.
+Specifies the destination file type. The default file type is application/pdf.
 .TP 5
 -n copies
 .br
@@ -66,6 +66,9 @@ Specifies the PPD file to use.
 -t title
 .br
 Specifies the document title.
+.SH KNOWN ISSUES
+\fIcupsfilter\fR currently does not use the filters defined in the PPD file.
+This will be addressed in a future CUPS release.
 .SH SEE ALSO
 \fIcupsd.conf(5)\fR
 .br

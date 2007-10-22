@@ -26,6 +26,7 @@
  * Include necessary headers...
  */
 
+#  include "versioning.h"
 #  include <sys/types.h>
 #  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
 #    define __CUPS_SSIZE_T_DEFINED
@@ -62,36 +63,36 @@ typedef struct _cups_file_s cups_file_t;/**** CUPS file type ****/
  * Prototypes...
  */
 
-extern int		cupsFileClose(cups_file_t *fp);
-extern int		cupsFileCompression(cups_file_t *fp);
-extern int		cupsFileEOF(cups_file_t *fp);
+extern int		cupsFileClose(cups_file_t *fp) _CUPS_API_1_2;
+extern int		cupsFileCompression(cups_file_t *fp) _CUPS_API_1_2;
+extern int		cupsFileEOF(cups_file_t *fp) _CUPS_API_1_2;
 extern const char	*cupsFileFind(const char *filename, const char *path,
 			              int executable, char *buffer,
-				      int bufsize);
-extern int		cupsFileFlush(cups_file_t *fp);
-extern int		cupsFileGetChar(cups_file_t *fp);
+				      int bufsize) _CUPS_API_1_2;
+extern int		cupsFileFlush(cups_file_t *fp) _CUPS_API_1_2;
+extern int		cupsFileGetChar(cups_file_t *fp) _CUPS_API_1_2;
 extern char		*cupsFileGetConf(cups_file_t *fp, char *buf, size_t buflen,
-			                 char **value, int *linenum);
+			                 char **value, int *linenum) _CUPS_API_1_2;
 extern size_t		cupsFileGetLine(cups_file_t *fp, char *buf,
-			                size_t buflen);
-extern char		*cupsFileGets(cups_file_t *fp, char *buf, size_t buflen);
-extern int		cupsFileLock(cups_file_t *fp, int block);
-extern int		cupsFileNumber(cups_file_t *fp);
-extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode);
-extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode);
-extern int		cupsFilePeekChar(cups_file_t *fp);
-extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...);
-extern int		cupsFilePutChar(cups_file_t *fp, int c);
-extern int		cupsFilePuts(cups_file_t *fp, const char *s);
-extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes);
-extern off_t		cupsFileRewind(cups_file_t *fp);
-extern off_t		cupsFileSeek(cups_file_t *fp, off_t pos);
-extern cups_file_t	*cupsFileStderr(void);
-extern cups_file_t	*cupsFileStdin(void);
-extern cups_file_t	*cupsFileStdout(void);
-extern off_t		cupsFileTell(cups_file_t *fp);
-extern int		cupsFileUnlock(cups_file_t *fp);
-extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf, size_t bytes);
+			                size_t buflen) _CUPS_API_1_2;
+extern char		*cupsFileGets(cups_file_t *fp, char *buf, size_t buflen) _CUPS_API_1_2;
+extern int		cupsFileLock(cups_file_t *fp, int block) _CUPS_API_1_2;
+extern int		cupsFileNumber(cups_file_t *fp) _CUPS_API_1_2;
+extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode) _CUPS_API_1_2;
+extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode) _CUPS_API_1_2;
+extern int		cupsFilePeekChar(cups_file_t *fp) _CUPS_API_1_2;
+extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...) _CUPS_API_1_2;
+extern int		cupsFilePutChar(cups_file_t *fp, int c) _CUPS_API_1_2;
+extern int		cupsFilePuts(cups_file_t *fp, const char *s) _CUPS_API_1_2;
+extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes) _CUPS_API_1_2;
+extern off_t		cupsFileRewind(cups_file_t *fp) _CUPS_API_1_2;
+extern off_t		cupsFileSeek(cups_file_t *fp, off_t pos) _CUPS_API_1_2;
+extern cups_file_t	*cupsFileStderr(void) _CUPS_API_1_2;
+extern cups_file_t	*cupsFileStdin(void) _CUPS_API_1_2;
+extern cups_file_t	*cupsFileStdout(void) _CUPS_API_1_2;
+extern off_t		cupsFileTell(cups_file_t *fp) _CUPS_API_1_2;
+extern int		cupsFileUnlock(cups_file_t *fp) _CUPS_API_1_2;
+extern ssize_t		cupsFileWrite(cups_file_t *fp, const char *buf, size_t bytes) _CUPS_API_1_2;
 
 
 #  ifdef __cplusplus

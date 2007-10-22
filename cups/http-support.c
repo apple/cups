@@ -1016,7 +1016,7 @@ httpSeparateURI(
 			 "0123456789"
 	        	 "-._~"
 			 "%"
-			 "!$&'()*+,;=", *ptr))
+			 "!$&'()*+,;=\\", *ptr))
 	{
 	  *host = '\0';
 	  return (HTTP_URI_BAD_HOSTNAME);

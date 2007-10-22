@@ -30,6 +30,7 @@ struct cupsd_client_s
   time_t		start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
+  int			type;		/* AuthType for username */
   char			username[256],	/* Username from Authorization: line */
 			password[33],	/* Password from Authorization: line */
 			uri[HTTP_MAX_URI],

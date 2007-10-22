@@ -58,16 +58,16 @@ extern int	cupsAdminExportSamba(const char *dest, const char *ppd,
 		                     const char *samba_server,
 			             const char *samba_user,
 				     const char *samba_password,
-				     FILE *logfile);
+				     FILE *logfile) _CUPS_API_1_2;
 extern char	*cupsAdminCreateWindowsPPD(http_t *http, const char *dest,
-		                           char *buffer, int bufsize);
+		                           char *buffer, int bufsize) _CUPS_API_1_2;
 
 extern int	cupsAdminGetServerSettings(http_t *http,
 			                   int *num_settings,
-		                           cups_option_t **settings);
+		                           cups_option_t **settings) _CUPS_API_1_3;
 extern int	cupsAdminSetServerSettings(http_t *http,
 		                           int num_settings,
-		                           cups_option_t *settings);
+		                           cups_option_t *settings) _CUPS_API_1_3;
 
 
 #  ifdef __cplusplus
