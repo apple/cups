@@ -96,7 +96,8 @@ HEADERS	=	\
 		language.h \
 		ppd.h \
 		sidechannel.h \
-		transcode.h
+		transcode.h \
+		versioning.h
 
 
 #
