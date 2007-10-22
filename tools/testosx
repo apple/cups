@@ -99,7 +99,7 @@ for file in packaging/cups-desc.plist packaging/cups-info.plist \
 	echo Updating $file...
 	sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 		-e '1,$s/@CUPS_REVISION@//g' \
-		-e '1,$s/@CUPS_RELEASE@/1.3.'$rev'/g' \
+		-e '1,$s/@CUPS_RELEASE@/1.4.'$rev'/g' \
 		<$file.in >$file
 done
 
