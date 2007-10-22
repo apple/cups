@@ -1787,7 +1787,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
                   const char     *owner)/* I - Owner of object */
 {
   int			i, j,		/* Looping vars */
-			auth;		/* Authorization status */
+			auth,		/* Authorization status */
+			type;		/* Type of authentication */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
@@ -1836,10 +1837,13 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   best = con->best;
 
+  if ((type = best->type) == AUTH_DEFAULT)
+    type = DefaultAuthType;
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdIsAuthorized: level=AUTH_%s, type=%s, "
 		  "satisfy=AUTH_SATISFY_%s, num_names=%d",
-                  levels[best->level], types[best->type],
+                  levels[best->level], types[type],
 	          best->satisfy ? "ANY" : "ALL", best->num_names);
 
   if (best->limit == AUTH_LIMIT_IPP)
@@ -1940,8 +1944,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
       strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == AUTH_SATISFY_ALL) &&
-      !(best->type == AUTH_NEGOTIATE || 
-        (best->type == AUTH_NONE && DefaultAuthType == AUTH_NEGOTIATE)))
+      !(type == AUTH_NEGOTIATE || 
+        (type == AUTH_NONE && DefaultAuthType == AUTH_NEGOTIATE)))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "cupsdIsAuthorized: Need upgrade to TLS...");
@@ -1954,10 +1958,10 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if (best->level == AUTH_ANON ||	/* Anonymous access - allow it */
-      (best->type == AUTH_NONE && best->num_names == 0))
+      (type == AUTH_NONE && best->num_names == 0))
     return (HTTP_OK);
 
-  if (!con->username[0] && best->type == AUTH_NONE &&
+  if (!con->username[0] && type == AUTH_NONE &&
       best->limit == AUTH_LIMIT_IPP)
   {
    /*
@@ -1997,11 +2001,11 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	return (HTTP_OK);		/* unless overridden with Satisfy */
     }
 
-    if (con->type != best->type &&
-        (con->type != AUTH_BASIC || best->type != AUTH_BASICDIGEST))
+    if (con->type != type && type != AUTH_NONE &&
+        (con->type != AUTH_BASIC || type != AUTH_BASICDIGEST))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Authorized using %s, expected %s!",
-                      types[con->type], types[best->type]);
+                      types[con->type], types[type]);
 
       return (HTTP_UNAUTHORIZED);
     }
