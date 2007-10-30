@@ -502,7 +502,11 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (krb5_init_context(&KerberosContext))
+  {
+    KerberosContext = NULL;
+
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+  }
 #endif /* HAVE_GSSAPI */
 
  /*
@@ -1052,7 +1056,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (krb5_init_context != NULL)
 #  endif /* __APPLE__ */
-  krb5_free_context(KerberosContext);
+  if (KerberosContext)
+    krb5_free_context(KerberosContext);
 #endif /* HAVE_GSSAPI */
 
 #ifdef __APPLE__
