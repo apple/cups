@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.4
 
 	- Documentation updates (STR #2560, STR #2563, STR #2569)
+	- CUPS now maps the "nb" locale to "no" on all platforms
+	  (STR #2575)
 	- CUPS did not work with a Windows 2003 R2 KDC (STR #2568)
 	- ippReadIO() could read past the end of a buffer (STR
 	  #2561)

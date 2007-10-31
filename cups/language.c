@@ -413,8 +413,14 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       strlcpy(locale, ptr, sizeof(locale));
       language = locale;
 
-      DEBUG_printf(("cupsLangGet: new language value is \"%s\"\n",
-                    language ? language : "(null)"));
+     /*
+      * CUPS STR #2575: Map "nb" to "no" for back-compatibility...
+      */
+
+      if (!strncmp(locale, "nb", 2)
+        locale[1] = 'o';
+
+      DEBUG_printf(("cupsLangGet: new language value is \"%s\"\n", language));
     }
   }
 #endif /* __APPLE__ */
