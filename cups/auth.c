@@ -92,7 +92,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   char		prompt[1024],		/* Prompt for user */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
 		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
-		encode[2048];		/* Encoded username:password */
+		encode[4096];		/* Encoded username:password */
   int		localauth;		/* Local authentication result */
   _cups_globals_t *cg;			/* Global data */
 
