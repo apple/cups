@@ -1014,8 +1014,10 @@ ippReadIO(void       *src,		/* I - Data source */
           ipp_t      *ipp)		/* I - IPP data */
 {
   int			n;		/* Length of data */
-  unsigned char		buffer[32768],	/* Data buffer */
-			string[255],	/* Small string buffer */
+  unsigned char		buffer[IPP_MAX_LENGTH],
+					/* Data buffer */
+			string[IPP_MAX_NAME],
+					/* Small string buffer */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_tag_t		tag;		/* Current tag */
@@ -1306,6 +1308,12 @@ ippReadIO(void       *src,		/* I - Data source */
 	  {
 	    case IPP_TAG_INTEGER :
 	    case IPP_TAG_ENUM :
+		if (n != 4)
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, buffer, 4) < 4)
 		{
 	          DEBUG_puts("ippReadIO: Unable to read integer value!");
@@ -1318,6 +1326,12 @@ ippReadIO(void       *src,		/* I - Data source */
                 value->integer = n;
 	        break;
 	    case IPP_TAG_BOOLEAN :
+		if (n != 1)
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, buffer, 1) < 1)
 		{
 	          DEBUG_puts("ippReadIO: Unable to read boolean value!");
@@ -1335,6 +1349,12 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_CHARSET :
 	    case IPP_TAG_LANGUAGE :
 	    case IPP_TAG_MIMETYPE :
+		if (n >= sizeof(buffer))
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 		if ((*cb)(src, buffer, n) < n)
 		{
 		  DEBUG_puts("ippReadIO: unable to read name!");
@@ -1347,6 +1367,12 @@ ippReadIO(void       *src,		/* I - Data source */
 		              value->string.text));
 	        break;
 	    case IPP_TAG_DATE :
+		if (n != 11)
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, value->date, 11) < 11)
 		{
 	          DEBUG_puts("ippReadIO: Unable to date integer value!");
@@ -1354,6 +1380,12 @@ ippReadIO(void       *src,		/* I - Data source */
 		}
 	        break;
 	    case IPP_TAG_RESOLUTION :
+		if (n != 9)
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, buffer, 9) < 9)
 		{
 	          DEBUG_puts("ippReadIO: Unable to read resolution value!");
@@ -1370,6 +1402,12 @@ ippReadIO(void       *src,		/* I - Data source */
 		    (ipp_res_t)buffer[8];
 	        break;
 	    case IPP_TAG_RANGE :
+		if (n != 8)
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, buffer, 8) < 8)
 		{
 	          DEBUG_puts("ippReadIO: Unable to read range value!");
@@ -1385,7 +1423,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	        break;
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
-	        if (n > sizeof(buffer) || n < 4)
+	        if (n >= sizeof(buffer) || n < 4)
 		{
 		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
 		  return (IPP_ERROR);
@@ -1411,21 +1449,26 @@ ippReadIO(void       *src,		/* I - Data source */
 
 		n = (bufptr[0] << 8) | bufptr[1];
 
-                if (n >= sizeof(string))
+		if ((bufptr + 2 + n) >= (buffer + sizeof(buffer)) ||
+		    n >= sizeof(string))
 		{
-		  memcpy(string, bufptr + 2, sizeof(string) - 1);
-		  string[sizeof(string) - 1] = '\0';
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
 		}
-		else
-		{
-		  memcpy(string, bufptr + 2, n);
-		  string[n] = '\0';
-                }
+
+		memcpy(string, bufptr + 2, n);
+		string[n] = '\0';
 
 		value->string.charset = _cupsStrAlloc((char *)string);
 
                 bufptr += 2 + n;
 		n = (bufptr[0] << 8) | bufptr[1];
+
+		if ((bufptr + 2 + n) >= (buffer + sizeof(buffer)))
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
 
 		bufptr[2 + n] = '\0';
                 value->string.text = _cupsStrAlloc((char *)bufptr + 2);
@@ -1468,6 +1511,12 @@ ippReadIO(void       *src,		/* I - Data source */
 		* we need to carry over...
 		*/
 
+		if (n >= sizeof(buffer))
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
 	        if ((*cb)(src, buffer, n) < n)
 		{
 	          DEBUG_puts("ippReadIO: Unable to read member name value!");
@@ -1489,6 +1538,12 @@ ippReadIO(void       *src,		/* I - Data source */
 		break;
 
             default : /* Other unsupported values */
+		if (n > sizeof(buffer))
+		{
+		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
+		  return (IPP_ERROR);
+		}
+
                 value->unknown.length = n;
 	        if (n > 0)
 		{
@@ -1627,7 +1682,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 {
   int			i;		/* Looping var */
   int			n;		/* Length of data */
-  unsigned char		buffer[32768],	/* Data buffer */
+  unsigned char		buffer[IPP_MAX_LENGTH + 2],
+					/* Data buffer + length bytes */
 			*bufptr;	/* Pointer into buffer */
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_value_t		*value;		/* Current value */
@@ -1947,7 +2003,7 @@ ippWriteIO(void       *dst,		/* I - Destination */
 		 /*
 		  * All simple strings consist of the 2-byte length and
 		  * character data without the trailing nul normally found
-		  * in C strings.  Also, strings cannot be longer than 32767
+		  * in C strings.  Also, strings cannot be longer than IPP_MAX_LENGTH
 		  * bytes since the 2-byte length is a signed (twos-complement)
 		  * value.
 		  *

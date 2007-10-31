@@ -55,7 +55,8 @@ extern "C" {
  * Common limits...
  */
 
-#  define IPP_MAX_NAME		256
+#  define IPP_MAX_LENGTH	32767	/* Maximum size of any single value */
+#  define IPP_MAX_NAME		256	/* Maximum length of common name values */
 #  define IPP_MAX_VALUES	8	/* Power-of-2 allocation increment */
 
 
