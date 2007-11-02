@@ -1815,10 +1815,10 @@ set_printer_options(
   if ((protocol = cupsGetOption("protocol", num_options, options)) != NULL)
   {
     if (!strcasecmp(protocol, "bcp"))
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "port-monitor",
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
                    NULL, "bcp");
     else if (!strcasecmp(protocol, "tbcp"))
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "port-monitor",
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "port-monitor",
                    NULL, "tbcp");
   }
 

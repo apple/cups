@@ -2415,7 +2415,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     need_restart_job = 1;
 
     supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
-                                 IPP_TAG_KEYWORD);
+                                 IPP_TAG_NAME);
     for (i = 0; i < supported->num_values; i ++)
       if (!strcmp(supported->values[i].string.text,
                   attr->values[0].string.text))
