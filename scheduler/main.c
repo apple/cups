@@ -146,6 +146,10 @@ main(int  argc,				/* I - Number of command-line args */
   cups_file_t		*fp;		/* Fake lpsched lock file */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
+#ifdef __APPLE__
+  int			run_as_child = 0;
+					/* Needed for Mac OS X fork/exec */
+#endif /* __APPLE__ */
 #if HAVE_LAUNCHD
   int			launchd_idle_exit;
 					/* Idle exit on select timeout? */
@@ -183,6 +187,12 @@ main(int  argc,				/* I - Number of command-line args */
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
         switch (*opt)
 	{
+#ifdef __APPLE__
+	  case 'C' : /* Run as child with config file */
+              run_as_child = 1;
+	      fg           = -1;
+#endif /* __APPLE__ */
+
 	  case 'c' : /* Configuration file */
 	      i ++;
 	      if (i >= argc)
@@ -339,6 +349,18 @@ main(int  argc,				/* I - Number of command-line args */
 	return (3);
       }
     }
+
+#ifdef __APPLE__
+   /*
+    * Since CoreFoundation has an overly-agressive check for whether a
+    * process has forked but not exec'd (whether CF has been called or
+    * not...), we now have to exec ourselves with the "-f" option to
+    * eliminate their bogus warning messages.
+    */
+
+    execlp(argv[0], argv[0], "-C", ConfigurationFile, (char *)0);
+    exit(errno);
+#endif /* __APPLE__ */
   }
 
   if (fg < 1)
@@ -587,7 +609,11 @@ main(int  argc,				/* I - Number of command-line args */
   * we are up and running...
   */
 
+#ifdef __APPLE__
+  if (!fg || run_as_child)
+#else
   if (!fg)
+#endif /* __APPLE__ */
   {
    /*
     * Send a signal to the parent process, but only if the parent is
