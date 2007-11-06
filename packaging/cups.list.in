@@ -450,38 +450,38 @@ f 0644 root sys $DATADIR/model ppd/*.ppd
 d 0755 root sys $DATADIR/templates -
 f 0644 root sys $DATADIR/templates templates/*.tmpl
 
-# Japanese template files
-%subpackage de
-d 0755 root sys $DATADIR/templates/de
-f 0644 root sys $DATADIR/templates/de templates/de/*.tmpl
-%subpackage es
-d 0755 root sys $DATADIR/templates/es
-f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
-%subpackage et
-d 0755 root sys $DATADIR/templates/et
-f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
-%subpackage fr
-d 0755 root sys $DATADIR/templates/fr
-f 0644 root sys $DATADIR/templates/fr templates/fr/*.tmpl
-%subpackage he
-d 0755 root sys $DATADIR/templates/he
-f 0644 root sys $DATADIR/templates/he templates/he/*.tmpl
-%subpackage it
-d 0755 root sys $DATADIR/templates/it
-f 0644 root sys $DATADIR/templates/it templates/it/*.tmpl
-%subpackage ja
-d 0755 root sys $DATADIR/templates/ja
-f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
-%subpackage pl
-d 0755 root sys $DATADIR/templates/pl
-f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
-%subpackage sv
-d 0755 root sys $DATADIR/templates/sv
-f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
-%subpackage zh
-d 0755 root sys $DATADIR/templates/zh_TW
-f 0644 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
-%subpackage
+## Template files
+#%subpackage de
+#d 0755 root sys $DATADIR/templates/de
+#f 0644 root sys $DATADIR/templates/de templates/de/*.tmpl
+#%subpackage es
+#d 0755 root sys $DATADIR/templates/es
+#f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
+#%subpackage et
+#d 0755 root sys $DATADIR/templates/et
+#f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
+#%subpackage fr
+#d 0755 root sys $DATADIR/templates/fr
+#f 0644 root sys $DATADIR/templates/fr templates/fr/*.tmpl
+#%subpackage he
+#d 0755 root sys $DATADIR/templates/he
+#f 0644 root sys $DATADIR/templates/he templates/he/*.tmpl
+#%subpackage it
+#d 0755 root sys $DATADIR/templates/it
+#f 0644 root sys $DATADIR/templates/it templates/it/*.tmpl
+#%subpackage ja
+#d 0755 root sys $DATADIR/templates/ja
+#f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
+#%subpackage pl
+#d 0755 root sys $DATADIR/templates/pl
+#f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
+#%subpackage sv
+#d 0755 root sys $DATADIR/templates/sv
+#f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
+#%subpackage zh
+#d 0755 root sys $DATADIR/templates/zh_TW
+#f 0644 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
+#%subpackage
 
 # Config files
 d 0755 root sys $SERVERROOT -
@@ -640,12 +640,6 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 # Startup scripts
 %system darwin
 f 0644 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
-d 0755 root sys /System/Library/StartupItems/PrintingServices -
-f 0644 root sys /System/Library/StartupItems/PrintingServices/PrintingServices init/PrintingServices.launchd
-f 0644 root sys /System/Library/StartupItems/PrintingServices/StartupParamters.plist init/StartupParameters.plist
-d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources -
-d 0755 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj -
-f 0644 root sys /System/Library/StartupItems/PrintingServices/Resources/English.lproj/Localizable.strings init/Localizable.strings
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 killall cupsd || exit 0

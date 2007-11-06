@@ -1,7 +1,0 @@
-{
-  Description     = "Printing Services";
-  Provides        = ("PrintingServices");
-  Requires        = ("Resolver");
-  Uses            = ("Network Time");
-  OrderPreference = "Late";
-}

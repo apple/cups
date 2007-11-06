@@ -118,13 +118,7 @@ install:	installhdrs
 	fi
 	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
 		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
-		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
-			echo Installing StartupItems files...; \
-			$(INSTALL_SCRIPT) init/PrintingServices $(BUILDROOT)$(INITDDIR)/PrintingServices; \
-			$(INSTALL_DATA) init/StartupParameters.plist $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
-			$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
-			$(INSTALL_DATA) init/Localizable.strings $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
-		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+		if test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
 			echo Installing LaunchDaemons configuration files...; \
 			$(INSTALL_DATA) init/org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
 			$(INSTALL_DATA) init/org.cups.cups-lpd.plist $(BUILDROOT)/System/Library/LaunchDaemons; \
