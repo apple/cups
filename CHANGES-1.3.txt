@@ -3,6 +3,10 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The scheduler would abort if a bad browse protocol name
+	  was listed in the cupsd.conf file.
+	- The online cupsd.conf help file incorrectly showed "dns-sd"
+	  instead of "dnssd" for Bonjour sharing.
 	- The scheduler could crash changing the port-monitor value.
 	- The scheduler generated CoreFoundation errors when run
 	  as a background process.

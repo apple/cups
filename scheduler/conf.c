@@ -2023,7 +2023,9 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_SLP;
     else if (!strcasecmp(valstart, "ldap"))
       protocols |= BROWSE_LDAP;
-    else if (!strcasecmp(valstart, "dnssd") || !strcasecmp(valstart, "bonjour"))
+    else if (!strcasecmp(valstart, "dnssd") ||
+             !strcasecmp(valstart, "dns-sd") ||
+             !strcasecmp(valstart, "bonjour"))
       protocols |= BROWSE_DNSSD;
     else if (!strcasecmp(valstart, "lpd"))
       protocols |= BROWSE_LPD;
@@ -2032,7 +2034,8 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
     else if (!strcasecmp(valstart, "all"))
       protocols |= BROWSE_ALL;
     else if (strcasecmp(valstart, "none"))
-      return (-1);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unknown browse protocol \"%s\" ignored!", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
       if (!isspace(*valstart & 255) || *valstart != ',')
