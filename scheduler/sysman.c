@@ -286,7 +286,7 @@ cupsdUpdateSystemMonitor(void)
            p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
       {
-	if (p->type & CUPS_PRINTER_REMOTE)
+	if (p->type & CUPS_PRINTER_DISCOVERED)
 	{
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deleting remote destination \"%s\"", p->name);
