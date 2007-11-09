@@ -201,6 +201,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
+  if (!port)
+    port = 515;				/* Default to port 515 */
+
   if (!username[0])
   {
    /*

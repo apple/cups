@@ -510,10 +510,10 @@ printers. The default is to not include any options.</P>
 BrowseLocalProtocols all
 BrowseLocalProtocols none
 BrowseLocalProtocols cups
-BrowseLocalProtocols dns-sd
+BrowseLocalProtocols dnssd
 BrowseLocalProtocols ldap
 BrowseLocalProtocols slp
-BrowseLocalProtocols cups dns-sd
+BrowseLocalProtocols cups dnssd
 </PRE>
 
 <H3>Description</H3>
@@ -603,10 +603,10 @@ on all of the systems that you want to see.
 BrowseProtocols all
 BrowseProtocols none
 BrowseProtocols cups
-BrowseProtocols dns-sd
+BrowseProtocols dnssd
 BrowseProtocols ldap
 BrowseProtocols slp
-BrowseProtocols cups dns-sd
+BrowseProtocols cups dnssd
 </PRE>
 
 <H3>Description</H3>
@@ -689,10 +689,10 @@ The default is to not include any options.</P>
 BrowseRemoteProtocols all
 BrowseRemoteProtocols none
 BrowseRemoteProtocols cups
-BrowseRemoteProtocols dns-sd
+BrowseRemoteProtocols dnssd
 BrowseRemoteProtocols ldap
 BrowseRemoteProtocols slp
-BrowseRemoteProtocols cups dns-sd
+BrowseRemoteProtocols cups dnssd
 </PRE>
 
 <H3>Description</H3>

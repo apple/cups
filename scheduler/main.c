@@ -146,6 +146,10 @@ main(int  argc,				/* I - Number of command-line args */
   cups_file_t		*fp;		/* Fake lpsched lock file */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
+#ifdef __APPLE__
+  int			run_as_child = 0;
+					/* Needed for Mac OS X fork/exec */
+#endif /* __APPLE__ */
 #if HAVE_LAUNCHD
   int			launchd_idle_exit;
 					/* Idle exit on select timeout? */
@@ -183,6 +187,12 @@ main(int  argc,				/* I - Number of command-line args */
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
         switch (*opt)
 	{
+#ifdef __APPLE__
+	  case 'C' : /* Run as child with config file */
+              run_as_child = 1;
+	      fg           = -1;
+#endif /* __APPLE__ */
+
 	  case 'c' : /* Configuration file */
 	      i ++;
 	      if (i >= argc)
@@ -339,6 +349,18 @@ main(int  argc,				/* I - Number of command-line args */
 	return (3);
       }
     }
+
+#ifdef __APPLE__
+   /*
+    * Since CoreFoundation has an overly-agressive check for whether a
+    * process has forked but not exec'd (whether CF has been called or
+    * not...), we now have to exec ourselves with the "-f" option to
+    * eliminate their bogus warning messages.
+    */
+
+    execlp(argv[0], argv[0], "-C", ConfigurationFile, (char *)0);
+    exit(errno);
+#endif /* __APPLE__ */
   }
 
   if (fg < 1)
@@ -502,7 +524,11 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (krb5_init_context(&KerberosContext))
+  {
+    KerberosContext = NULL;
+
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+  }
 #endif /* HAVE_GSSAPI */
 
  /*
@@ -583,7 +609,11 @@ main(int  argc,				/* I - Number of command-line args */
   * we are up and running...
   */
 
+#ifdef __APPLE__
+  if (!fg || run_as_child)
+#else
   if (!fg)
+#endif /* __APPLE__ */
   {
    /*
     * Send a signal to the parent process, but only if the parent is
@@ -968,7 +998,9 @@ main(int  argc,				/* I - Number of command-line args */
     if (LastEvent)
     {
 #ifdef HAVE_NOTIFY_POST
-      if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
+      if (LastEvent & (CUPSD_EVENT_PRINTER_ADDED |
+                       CUPSD_EVENT_PRINTER_DELETED |
+                       CUPSD_EVENT_PRINTER_MODIFIED))
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerListChange\")");
@@ -1052,7 +1084,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (krb5_init_context != NULL)
 #  endif /* __APPLE__ */
-  krb5_free_context(KerberosContext);
+  if (KerberosContext)
+    krb5_free_context(KerberosContext);
 #endif /* HAVE_GSSAPI */
 
 #ifdef __APPLE__
