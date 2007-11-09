@@ -998,7 +998,9 @@ main(int  argc,				/* I - Number of command-line args */
     if (LastEvent)
     {
 #ifdef HAVE_NOTIFY_POST
-      if (LastEvent & CUPSD_EVENT_PRINTER_CHANGED)
+      if (LastEvent & (CUPSD_EVENT_PRINTER_ADDED |
+                       CUPSD_EVENT_PRINTER_DELETED |
+                       CUPSD_EVENT_PRINTER_MODIFIED))
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "notify_post(\"com.apple.printerListChange\")");

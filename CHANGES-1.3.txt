@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The scheduler incorrectly sent the
+	  "com.apple.printerListChanged" message for printer state
+	  changes.
 	- The PostScript filter drew the page borders (when enabled)
 	  outside the imageable area.
 	- The LPD and IPP backends did not default to the correct
