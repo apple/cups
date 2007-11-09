@@ -236,6 +236,9 @@ main(int  argc,				/* I - Number of command-line args */
     return (CUPS_BACKEND_STOP);
   }
 
+  if (!port)
+    port = IPP_PORT;			/* Default to port 631 */
+
   if (!strcmp(method, "https"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
   else
