@@ -553,37 +553,37 @@ f 0644 root sys $DOCDIR/images doc/images/*.png
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 
 # Localized documentation files
-%subpackage de
-d 0755 root sys $DOCDIR/de
-f 0644 root sys $DOCDIR/de doc/de/*.html
-%subpackage es
-d 0755 root sys $DOCDIR/es
-f 0644 root sys $DOCDIR/es doc/es/*.html
-%subpackage et
-d 0755 root sys $DOCDIR/et
-f 0644 root sys $DOCDIR/et doc/et/*.html
-%subpackage fr
-d 0755 root sys $DOCDIR/fr
-f 0644 root sys $DOCDIR/fr doc/fr/*.html
-%subpackage he
-d 0755 root sys $DOCDIR/he
-f 0644 root sys $DOCDIR/he doc/he/*.html
-f 0644 root sys $DOCDIR/he/cups.css doc/he/cups.css
-%subpackage it
-d 0755 root sys $DOCDIR/it
-f 0644 root sys $DOCDIR/it doc/it/*.html
-%subpackage ja
-d 0755 root sys $DOCDIR/ja
-f 0644 root sys $DOCDIR/ja doc/ja/*.html
-%subpackage pl
-d 0755 root sys $DOCDIR/pl
-f 0644 root sys $DOCDIR/pl doc/pl/*.html
-%subpackage sv
-d 0755 root sys $DOCDIR/sv
-f 0644 root sys $DOCDIR/sv doc/sv/*.html
-%subpackage zh
-d 0755 root sys $DOCDIR/zh_TW
-f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
+#%subpackage de
+#d 0755 root sys $DOCDIR/de
+#f 0644 root sys $DOCDIR/de doc/de/*.html
+#%subpackage es
+#d 0755 root sys $DOCDIR/es
+#f 0644 root sys $DOCDIR/es doc/es/*.html
+#%subpackage et
+#d 0755 root sys $DOCDIR/et
+#f 0644 root sys $DOCDIR/et doc/et/*.html
+#%subpackage fr
+#d 0755 root sys $DOCDIR/fr
+#f 0644 root sys $DOCDIR/fr doc/fr/*.html
+#%subpackage he
+#d 0755 root sys $DOCDIR/he
+#f 0644 root sys $DOCDIR/he doc/he/*.html
+#f 0644 root sys $DOCDIR/he/cups.css doc/he/cups.css
+#%subpackage it
+#d 0755 root sys $DOCDIR/it
+#f 0644 root sys $DOCDIR/it doc/it/*.html
+#%subpackage ja
+#d 0755 root sys $DOCDIR/ja
+#f 0644 root sys $DOCDIR/ja doc/ja/*.html
+#%subpackage pl
+#d 0755 root sys $DOCDIR/pl
+#f 0644 root sys $DOCDIR/pl doc/pl/*.html
+#%subpackage sv
+#d 0755 root sys $DOCDIR/sv
+#f 0644 root sys $DOCDIR/sv doc/sv/*.html
+#%subpackage zh
+#d 0755 root sys $DOCDIR/zh_TW
+#f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
 %subpackage
 
 # Man pages
