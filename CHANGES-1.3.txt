@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The Mac OS X USB backend did not allow for requeuing of
+	  jobs submitted to a class.
 	- lpmove didn't accept a job ID by itself.
 	- The scheduler incorrectly removed job history information
 	  for remote print jobs.
