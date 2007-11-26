@@ -463,6 +463,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   cups_encoding_t	encoding;	/* Encoding of PPD file */
   _cups_globals_t	*cg = _cupsGlobals();
 					/* Global data */
+  char			custom_name[PPD_MAX_NAME];
+					/* CustomFoo attribute name */
+  ppd_attr_t		*custom_attr;	/* CustomFoo attribute */
   static const char * const ui_keywords[] =
 			{
 #ifdef CUPS_USE_FULL_UI_KEYWORDS_LIST
@@ -1015,43 +1018,13 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     }
     else if (!strncmp(keyword, "Custom", 6) && !strcmp(name, "True") && !option)
     {
+      ppd_option_t	*custom_option;	/* Custom option */
+
       DEBUG_puts("Processing Custom option...");
 
      /*
       * Get the option and custom option...
       */
-
-      if ((option = ppdFindOption(ppd, keyword + 6)) == NULL)
-      {
-        int		groupidx = -1;	/* Index for current group */
-	ppd_group_t	*gtemp;		/* Temporary group */
-
-
-        DEBUG_printf(("%s option not found for %s...\n", keyword + 6, keyword));
-
-        if (group)
-          groupidx = group - ppd->groups; /* Save index for current group */
-
-	if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
-	                           encoding)) == NULL)
-	{
-	  DEBUG_puts("Unable to get general group!");
-
-	  goto error;
-	}
-
-        if (group)
-          group = ppd->groups + groupidx; /* Restore group pointer */
-
-	if ((option = ppd_get_option(gtemp, keyword + 6)) == NULL)
-	{
-	  DEBUG_printf(("Unable to get %s option!\n", keyword + 6));
-
-          cg->ppd_status = PPD_ALLOC_ERROR;
-
-	  goto error;
-	}
-      }
 
       if (!ppd_get_coption(ppd, keyword + 6))
       {
@@ -1060,63 +1033,18 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	goto error;
       }
 
-     /*
-      * Add the "custom" option...
-      */
+      if (option && !strcasecmp(option->keyword, keyword + 6))
+        custom_option = option;
+      else
+        custom_option = ppdFindOption(ppd, keyword + 6);
 
-      if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+      if (custom_option)
       {
-	DEBUG_puts("Unable to add Custom choice!");
-
-        cg->ppd_status = PPD_ALLOC_ERROR;
-
-	goto error;
-      }
-
-      strlcpy(choice->text, text[0] ? text : _("Custom"),
-              sizeof(choice->text));
-
-      choice->code = string;
-      string       = NULL;		/* Don't add as an attribute below */
-      option       = NULL;
-
-     /*
-      * Now process custom page sizes specially...
-      */
-
-      if (!strcmp(keyword, "CustomPageSize"))
-      {
-	ppd->variable_sizes = 1;
-
        /*
-	* Add a "Custom" page size entry...
+	* Add the "custom" option...
 	*/
 
-	ppd_add_size(ppd, "Custom");
-
-	if ((option = ppdFindOption(ppd, "PageRegion")) == NULL)
-	{
-	  int		groupidx = -1;	/* Index to current group */
-	  ppd_group_t	*gtemp;		/* Temporary group */
-
-          if (group)
-            groupidx = group - ppd->groups; /* Save index for current group */
-
-	  if ((gtemp = ppd_get_group(ppd, "General", _("General"), cg,
-				     encoding)) == NULL)
-	  {
-	    DEBUG_puts("Unable to get general group!");
-
-	    goto error;
-	  }
-
-          if (group)
-            group = ppd->groups + groupidx; /* Restore group pointer */
-
-	  option = ppd_get_option(gtemp, "PageRegion");
-        }
-
-	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+	if ((choice = ppd_add_choice(custom_option, "Custom")) == NULL)
 	{
 	  DEBUG_puts("Unable to add Custom choice!");
 
@@ -1127,7 +1055,43 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 	strlcpy(choice->text, text[0] ? text : _("Custom"),
 		sizeof(choice->text));
-        option = NULL;
+
+	choice->code = _cupsStrAlloc(string);
+      }
+
+     /*
+      * Now process custom page sizes specially...
+      */
+
+      if (!strcmp(keyword, "CustomPageSize"))
+      {
+       /*
+	* Add a "Custom" page size entry...
+	*/
+
+	ppd->variable_sizes = 1;
+
+	ppd_add_size(ppd, "Custom");
+
+	if (option && !strcasecmp(option->keyword, "PageRegion"))
+	  custom_option = option;
+	else
+	  custom_option = ppdFindOption(ppd, "PageRegion");
+
+        if (custom_option)
+	{
+	  if ((choice = ppd_add_choice(custom_option, "Custom")) == NULL)
+	  {
+	    DEBUG_puts("Unable to add Custom choice!");
+
+	    cg->ppd_status = PPD_ALLOC_ERROR;
+
+	    goto error;
+	  }
+
+	  strlcpy(choice->text, text[0] ? text : _("Custom"),
+		  sizeof(choice->text));
+        }
       }
     }
     else if (!strcmp(keyword, "LandscapeOrientation"))
@@ -1310,6 +1274,33 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       _cupsStrFree(string);
       string = NULL;
+
+     /*
+      * Add a custom option choice if we have already seen a CustomFoo
+      * attribute...
+      */
+
+      if (!strcasecmp(name, "PageRegion"))
+        strcpy(custom_name, "CustomPageSize");
+      else
+        snprintf(custom_name, sizeof(custom_name), "Custom%s", name);
+
+      if ((custom_attr = ppdFindAttr(ppd, custom_name, "True")) != NULL)
+      {
+	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+	{
+	  DEBUG_puts("Unable to add Custom choice!");
+
+	  cg->ppd_status = PPD_ALLOC_ERROR;
+
+	  goto error;
+	}
+
+	strlcpy(choice->text,
+	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
+		sizeof(choice->text));
+        choice->code = _cupsStrAlloc(custom_attr->value);
+      }
     }
     else if (!strcmp(keyword, "JCLOpenUI"))
     {
@@ -1389,6 +1380,30 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       _cupsStrFree(string);
       string = NULL;
+
+     /*
+      * Add a custom option choice if we have already seen a CustomFoo
+      * attribute...
+      */
+
+      snprintf(custom_name, sizeof(custom_name), "Custom%s", name);
+
+      if ((custom_attr = ppdFindAttr(ppd, custom_name, "True")) != NULL)
+      {
+	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
+	{
+	  DEBUG_puts("Unable to add Custom choice!");
+
+	  cg->ppd_status = PPD_ALLOC_ERROR;
+
+	  goto error;
+	}
+
+	strlcpy(choice->text,
+	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
+		sizeof(choice->text));
+        choice->code = _cupsStrAlloc(custom_attr->value);
+      }
     }
     else if (!strcmp(keyword, "CloseUI") || !strcmp(keyword, "JCLCloseUI"))
     {

@@ -3,6 +3,10 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- ppdOpen() did not handle custom options properly when the
+	  Custom attribute appeared before the OpenUI for that option.
+	- The scheduler could crash when deleting a printer or listing
+	  old jobs.
 	- The Mac OS X USB backend did not allow for requeuing of
 	  jobs submitted to a class.
 	- lpmove didn't accept a job ID by itself.
