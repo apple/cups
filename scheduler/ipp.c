@@ -6089,6 +6089,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: job->id = %d", job->id);
 
+    if (!job->dest || !job->username)
+      cupsdLoadJob(job);
+
+    if (!job->dest || !job->username)
+      continue;
+
     if ((dest && strcmp(job->dest, dest)) &&
         (!job->printer || !dest || strcmp(job->printer->name, dest)))
       continue;
