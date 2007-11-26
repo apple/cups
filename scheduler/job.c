@@ -318,6 +318,13 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
+  {
+    if (!job->dest || !job->username)
+      cupsdLoadJob(job);
+
+    if (!job->dest || !job->username)
+      continue;
+
     if ((dest == NULL || !strcmp(job->dest, dest)) &&
         (username == NULL || !strcmp(job->username, username)))
     {
@@ -327,6 +334,7 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
 
       cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
     }
+  }
 
   cupsdCheckJobs();
 }
