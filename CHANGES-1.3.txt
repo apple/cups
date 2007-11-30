@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The scheduler would crash if a job was sent to an empty
+	  class (STR #2605)
 	- The lpc command did not work in non-UTF-8 locales (STR
 	  #2595)
 	- Subscriptions for printer-stopped events also received
