@@ -215,7 +215,11 @@ static cups_array_t	*cupsd_inactive_fds = NULL;
 static int		cupsd_in_select = 0;
 #endif /* HAVE_EPOLL || HAVE_KQUEUE */
 
-#ifdef HAVE_POLL
+#ifdef HAVE_KQUEUE
+static int		cupsd_kqueue_fd = -1,
+			cupsd_kqueue_changes = 0;
+static struct kevent	*cupsd_kqueue_events = NULL;
+#elif defined(HAVE_POLL)
 static int		cupsd_alloc_pollfds = 0,
 			cupsd_update_pollfds = 0;
 static struct pollfd	*cupsd_pollfds = NULL;
@@ -223,16 +227,12 @@ static struct pollfd	*cupsd_pollfds = NULL;
 static int		cupsd_epoll_fd = -1;
 static struct epoll_event *cupsd_epoll_events = NULL;
 #  endif /* HAVE_EPOLL */
-#elif defined(HAVE_KQUEUE)
-static int		cupsd_kqueue_fd = -1,
-			cupsd_kqueue_changes = 0;
-static struct kevent	*cupsd_kqueue_events = NULL;
 #else /* select() */
 static fd_set		cupsd_global_input,
 			cupsd_global_output,
 			cupsd_current_input,
 			cupsd_current_output;
-#endif /* HAVE_EPOLL */
+#endif /* HAVE_KQUEUE */
 
 
 /*
@@ -737,7 +737,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   * Release all inactive file descriptors...
   */
 
+#  ifndef HAVE_KQUEUE
   release_inactive:
+#  endif /* !HAVE_KQUEUE */
 
   cupsd_in_select = 0;
 
