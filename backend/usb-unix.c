@@ -90,8 +90,8 @@ print_device(const char *uri,		/* I - Device URI */
 
     use_bc = strcasecmp(hostname, "Brother") &&
              strcasecmp(hostname, "Canon") &&
-             strcasecmp(hostname, "Konica Minolta") &&
-             strcasecmp(hostname, "Minolta");
+             strncasecmp(hostname, "Konica", 6) &&
+             strncasecmp(hostname, "Minolta", 7);
 #endif /* __FreeBSD__ || __NetBSD__ || __OpenBSD__ || __DragonFly__ */
 
     if ((device_fd = open_device(uri, &use_bc)) == -1)

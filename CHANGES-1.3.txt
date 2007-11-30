@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The USB backend did not work with some Minolta USB printers
+	  (STR #2604)
 	- The strcasecmp() emulation code did not compile (STR #2612)
 	- The scheduler would crash if a job was sent to an empty
 	  class (STR #2605)
