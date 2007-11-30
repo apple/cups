@@ -345,7 +345,7 @@ open_device(const char *uri,		/* I - Device URI */
     * Find the correct USB device...
     */
 
-    do
+    for (;;)
     {
       for (busy = 0, i = 0; i < 16; i ++)
       {
@@ -420,15 +420,6 @@ open_device(const char *uri,		/* I - Device URI */
 	sleep(5);
       }
     }
-    while (busy);
-
-   /*
-    * Couldn't find the printer, return "no such device or address"...
-    */
-
-    errno = ENODEV;
-
-    return (-1);
   }
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)
   {

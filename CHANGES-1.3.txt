@@ -3,11 +3,14 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
-	- Printers with untranslated JCL options were not exported to
-	  Samba correctly (STR #2570)
-	- The USB backend did not work with some Minolta USB printers
-	  (STR #2604)
-	- The strcasecmp() emulation code did not compile (STR #2612)
+	- The USB backend now retries connections to a printer
+	  indefinitely rather than stopping the queue.
+	- Printers with untranslated JCL options were not exported
+	  to Samba correctly (STR #2570)
+	- The USB backend did not work with some Minolta USB
+	  printers (STR #2604)
+	- The strcasecmp() emulation code did not compile (STR
+	  #2612)
 	- The scheduler would crash if a job was sent to an empty
 	  class (STR #2605)
 	- The lpc command did not work in non-UTF-8 locales (STR
@@ -17,9 +20,10 @@ CHANGES IN CUPS V1.3.5
 	- cupstestppd incorrectly reported translation errors for
 	  the "en" locale.
 	- ppdOpen() did not handle custom options properly when the
-	  Custom attribute appeared before the OpenUI for that option.
-	- The scheduler could crash when deleting a printer or listing
-	  old jobs.
+	  Custom attribute appeared before the OpenUI for that
+	  option.
+	- The scheduler could crash when deleting a printer or
+	  listing old jobs.
 	- The Mac OS X USB backend did not allow for requeuing of
 	  jobs submitted to a class.
 	- lpmove didn't accept a job ID by itself.
@@ -32,15 +36,15 @@ CHANGES IN CUPS V1.3.5
 	  outside the imageable area.
 	- The LPD and IPP backends did not default to the correct
 	  port numbers when using alternate scheme names.
-	- The scheduler incorrectly deleted hardwired remote printers
-	  on system sleep.
+	- The scheduler incorrectly deleted hardwired remote
+	  printers on system sleep.
 	- The scheduler would abort if a bad browse protocol name
 	  was listed in the cupsd.conf file.
-	- The online cupsd.conf help file incorrectly showed "dns-sd"
-	  instead of "dnssd" for Bonjour sharing.
+	- The online cupsd.conf help file incorrectly showed
+	  "dns-sd" instead of "dnssd" for Bonjour sharing.
 	- The scheduler could crash changing the port-monitor value.
-	- The scheduler generated CoreFoundation errors when run
-	  as a background process.
+	- The scheduler generated CoreFoundation errors when run as
+	  a background process.
 	- When printing with number-up > 1, it was possible to get
 	  an extra blank page.
 
