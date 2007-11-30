@@ -291,7 +291,7 @@ cupsAdminCreateWindowsPPD(
 	return (NULL);
       }
 
-      if (sscanf(line, "*%40s%*[ \t]%40[^/]", option, choice) != 2)
+      if (sscanf(line, "*%40s%*[ \t]%40[^:/]", option, choice) != 2)
       {
         snprintf(line, sizeof(line),
 	         _cupsLangString(language,
