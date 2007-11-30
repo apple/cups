@@ -8499,9 +8499,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   krb5_error_code	error;		/* Kerberos error code */
   OM_uint32		major_status,	/* Major status code */
 			minor_status;	/* Minor status code */
-#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
   krb5_principal	principal;	/* Kerberos principal */
-#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
 
 
 #   ifdef __APPLE__
@@ -8530,7 +8528,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
                                   &(job->ccache))) != 0)
 #    else /* HAVE_HEIMDAL */
-  if ((error = krb5_cc_gen_new(krb_context, &krb5_fcc_ops,
+  if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
                                &(job->ccache))) != 0)
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {

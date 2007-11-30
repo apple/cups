@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- Fixed a compile problem with Heimdal Kerberos (STR #2592)
 	- The USB backend now retries connections to a printer
 	  indefinitely rather than stopping the queue.
 	- Printers with untranslated JCL options were not exported
