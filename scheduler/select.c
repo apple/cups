@@ -344,8 +344,6 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
   }
 
 #elif defined(HAVE_POLL)
-  cupsd_update_pollfds = 1;
-
 #  ifdef HAVE_EPOLL
   if (cupsd_epoll_fd >= 0)
   {
@@ -366,10 +364,14 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
                   &event))
     {
       close(cupsd_epoll_fd);
-      cupsd_epoll_fd = -1;
+      cupsd_epoll_fd       = -1;
+      cupsd_update_pollfds = 1;
     }
   }
+  else
 #  endif /* HAVE_EPOLL */
+
+  cupsd_update_pollfds = 1;
 
 #else /* select() */
  /*
@@ -494,9 +496,9 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
                   "cupsdDoSelect: polling %d fds for %ld seconds...",
 		  cupsArrayCount(cupsd_fds), timeout);
 
+#  ifdef HAVE_EPOLL
   cupsd_in_select = 1;
 
-#  ifdef HAVE_EPOLL
   if (cupsd_epoll_fd >= 0)
   {
     int			i;		/* Looping var */
@@ -545,7 +547,7 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	release_fd(fdptr);
       }
 
-      return (nfds);
+      goto release_inactive;
     }
   }
 #  endif /* HAVE_EPOLL */
@@ -734,6 +736,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
  /*
   * Release all inactive file descriptors...
   */
+
+  release_inactive:
 
   cupsd_in_select = 0;
 
