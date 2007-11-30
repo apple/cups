@@ -519,13 +519,15 @@ private:
   int row;			// current row
   int inputBuf;			// input buffer
   int inputBits;		// number of bits in input buffer
-  short *refLine;		// reference line changing elements
-  int b1;			// index into refLine
-  short *codingLine;		// coding line changing elements
-  int a0;			// index into codingLine
+  int *codingLine;		// coding line changing elements
+  int *refLine;			// reference line changing elements
+  int a0i;			// index into codingLine
+  GBool err;			// error on current line
   int outputBits;		// remaining ouput bits
   int buf;			// character buffer
 
+  void addPixels(int a1, int black);
+  void addPixelsNeg(int a1, int black);
   short getTwoDimCode();
   short getWhiteCode();
   short getBlackCode();
