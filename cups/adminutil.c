@@ -956,7 +956,7 @@ _cupsAdminGetServerSettings(
     while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
     {
       if (!value && strncmp(line, "</", 2))
-        continue;
+        value = line + strlen(line);
 
       if (!strcasecmp(line, "Port") || !strcasecmp(line, "Listen"))
       {
@@ -1481,6 +1481,14 @@ _cupsAdminSetServerSettings(
 	  const char *remotep = cupsGetOption("BrowseRemoteProtocols",
 					      num_settings, settings);
 
+          if (!localp)
+	    localp = cupsGetOption("BrowseLocalProtocols", cupsd_num_settings,
+	                           cupsd_settings);
+
+          if (!remotep)
+	    remotep = cupsGetOption("BrowseRemoteProtocols", cupsd_num_settings,
+	                            cupsd_settings);
+
 	  if (new_remote_printers && new_share_printers)
 	    cupsFilePuts(temp,
 	                 "# Enable printer sharing and shared printers.\n");
@@ -1726,7 +1734,8 @@ _cupsAdminSetServerSettings(
     else if ((((in_admin_location || in_conf_location || in_root_location) &&
                remote_admin >= 0) ||
               (in_root_location && share_printers >= 0)) &&
-             (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
+             (((!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny")) &&
+	       !strcasecmp(value, "@LOCAL")) ||
 	      !strcasecmp(line, "Order")))
       continue;
     else if (in_cancel_job == 2)
@@ -1900,7 +1909,7 @@ _cupsAdminSetServerSettings(
       cupsFilePuts(temp, "# Restrict access to the configuration files...\n");
 
     cupsFilePuts(temp, "<Location /admin/conf>\n"
-                       "  AuthType Basic\n"
+                       "  AuthType Default\n"
                        "  Require user @SYSTEM\n"
                        "  Order allow,deny\n");
 
@@ -1938,7 +1947,7 @@ _cupsAdminSetServerSettings(
 		       "CUPS-Add-Class CUPS-Delete-Class "
 		       "CUPS-Accept-Jobs CUPS-Reject-Jobs "
 		       "CUPS-Set-Default CUPS-Add-Device CUPS-Delete-Device>\n"
-                       "    AuthType Basic\n"
+                       "    AuthType Default\n"
 		       "    Require user @SYSTEM\n"
                        "    Order deny,allow\n"
                        "</Limit>\n");
