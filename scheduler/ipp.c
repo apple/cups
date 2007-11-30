@@ -1274,7 +1274,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
                   con, con->http.fd, printer, printer->name,
-		  filetype, filetype->super, filetype->type);
+		  filetype, filetype ? filetype->super : "none",
+		  filetype ? filetype->type : "none");
 
  /*
   * Check remote printing to non-shared printer...

@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.5
 
+	- The scheduler would crash when submitting an undefined
+	  format file from Samba with LogLevel debug2 (STR #2600)
 	- The scheduler did not use poll() when epoll() was not
 	  supported by the running kernel (STR #2582)
 	- Fixed a compile problem with Heimdal Kerberos (STR #2592)
