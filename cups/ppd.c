@@ -1466,8 +1466,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       _cupsStrFree(string);
       string = NULL;
     }
-    else if (!strcmp(keyword, "OrderDependency") ||
-             !strcmp(keyword, "NonUIOrderDependency"))
+    else if (!strcmp(keyword, "OrderDependency"))
     {
       order = (float)_cupsStrScand(string, &sptr, loc);
 

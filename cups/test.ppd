@@ -95,6 +95,7 @@
 
 *% Custom page size support
 *HWMargins:      0 0 0 0
+*NonUIOrderDependency: 100 AnySetup *CustomPageSize True
 *CustomPageSize True/Custom Page Size: "PageSize=Custom"
 *ParamCustomPageSize Width:        1 points 36 1080
 *ParamCustomPageSize Height:       2 points 36 86400
@@ -103,7 +104,7 @@
 *ParamCustomPageSize Orientation:  5 int 0 0
 
 *OpenUI *InputSlot/Input Slot: PickOne
-*OrderDependency: 10 AnySetup *InputSlot
+*OrderDependency: 20 AnySetup *InputSlot
 *DefaultInputSlot: Tray
 *InputSlot Tray/Tray: "InputSlot=Tray"
 *InputSlot Manual/Manual Feed: "InputSlot=Manual"
@@ -114,7 +115,7 @@
 *OpenGroup: Extended/Extended Options
 
 *OpenUI IntOption/Integer: PickOne
-*OrderDependency: 10 AnySetup *IntOption
+*OrderDependency: 30 AnySetup *IntOption
 *DefaultIntOption: None
 *IntOption None: ""
 *IntOption 1: "IntOption=1"
@@ -126,7 +127,7 @@
 *ParamCustomIntOption Integer: 1 int -100 100
 
 *OpenUI StringOption/String: PickOne
-*OrderDependency: 10 AnySetup *StringOption
+*OrderDependency: 40 AnySetup *StringOption
 *DefaultStringOption: None
 *StringOption None: ""
 *StringOption foo: "StringOption=foo"

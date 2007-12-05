@@ -62,16 +62,6 @@ static const char	*default_code =
 
 static const char	*custom_code =
 			"[{\n"
-			"%%BeginFeature: *CustomPageSize True\n"
-			"400\n"
-			"500\n"
-			"0\n"
-			"0\n"
-			"0\n"
-			"PageSize=Custom\n"
-			"%%EndFeature\n"
-			"} stopped cleartomark\n"
-			"[{\n"
 			"%%BeginFeature: *InputSlot Tray\n"
 			"InputSlot=Tray\n"
 			"%%EndFeature\n"
@@ -82,6 +72,16 @@ static const char	*custom_code =
 			"} stopped cleartomark\n"
 			"[{\n"
 			"%%BeginFeature: *StringOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *CustomPageSize True\n"
+			"400\n"
+			"500\n"
+			"0\n"
+			"0\n"
+			"0\n"
+			"PageSize=Custom\n"
 			"%%EndFeature\n"
 			"} stopped cleartomark\n";
 

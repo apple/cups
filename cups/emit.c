@@ -30,7 +30,6 @@
  *   ppdEmitJCLEnd()     - Emit JCLEnd code to a file.
  *   ppdEmitString()     - Get a string containing the code for marked options.
  *   ppd_handle_media()  - Handle media selection...
- *   ppd_sort()          - Sort options by ordering numbers...
  */
 
 /*
@@ -55,7 +54,6 @@
  */
 
 static void	ppd_handle_media(ppd_file_t *ppd);
-static int	ppd_sort(ppd_choice_t **c1, ppd_choice_t **c2);
 
 
 /*
@@ -94,13 +92,12 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
 	    float         min_order,	/* I - Minimum OrderDependency value */
             ppd_choice_t  ***choices)	/* O - Pointers to choices */
 {
-  int		i, j, k, m;		/* Looping vars */
-  ppd_group_t	*g,			/* Current group */
-		*sg;			/* Current sub-group */
-  ppd_option_t	*o;			/* Current option */
   ppd_choice_t	*c;			/* Current choice */
+  ppd_section_t	csection;		/* Current section */
+  float		corder;			/* Current OrderDependency value */
   int		count;			/* Number of choices collected */
   ppd_choice_t	**collect;		/* Collected choices */
+  float		*orders;		/* Collected order values */
 
 
   DEBUG_printf(("ppdCollect2(ppd=%p, section=%d, min_order=%f, choices=%p)\n",
@@ -110,40 +107,72 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
     return (0);
 
  /*
-  * Allocate memory for up to 1000 selected choices...
+  * Allocate memory for up to N selected choices...
   */
 
   count   = 0;
-  collect = calloc(sizeof(ppd_choice_t *), 1000);
+  collect = calloc(sizeof(ppd_choice_t *), cupsArrayCount(ppd->marked));
+  orders  = calloc(sizeof(float), cupsArrayCount(ppd->marked));
 
  /*
   * Loop through all options and add choices as needed...
   */
 
-  for (i = ppd->num_groups, g = ppd->groups; i > 0; i --, g ++)
+  for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
+       c;
+       c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
   {
-    for (j = g->num_options, o = g->options; j > 0; j --, o ++)
-      if (o->section == section && o->order >= min_order)
-	for (k = o->num_choices, c = o->choices; k > 0; k --, c ++)
-	  if (c->marked && count < 1000)
-	  {
-	    DEBUG_printf(("ppdCollect2: %s=%s marked...\n", o->keyword,
-	                  c->choice));
-            collect[count] = c;
-	    count ++;
-	  }
+    csection = c->option->section;
+    corder   = c->option->order;
 
-    for (j = g->num_subgroups, sg = g->subgroups; j > 0; j --, sg ++)
-      for (k = sg->num_options, o = sg->options; k > 0; k --, o ++)
-	if (o->section == section && o->order >= min_order)
-	  for (m = o->num_choices, c = o->choices; m > 0; m --, c ++)
-	    if (c->marked && count < 1000)
-	    {
-	      DEBUG_printf(("ppdCollect2: %s=%s marked...\n", o->keyword,
-	                    c->choice));
-              collect[count] = c;
-	      count ++;
-	    }
+    if (!strcmp(c->choice, "Custom"))
+    {
+      ppd_attr_t	*attr;		/* NonUIOrderDependency value */
+      float		aorder;		/* Order value */
+      char		asection[17],	/* Section name */
+			amain[PPD_MAX_NAME + 1],
+			aoption[PPD_MAX_NAME];
+					/* *CustomFoo and True */
+
+
+      for (attr = ppdFindAttr(ppd, "NonUIOrderDependency", NULL);
+           attr;
+	   attr = ppdFindNextAttr(ppd, "NonUIOrderDependency", NULL))
+        if (attr->value &&
+	    sscanf(attr->value, "%f%16s%41s%40s", &aorder, asection, amain,
+	           aoption) == 4 &&
+	    !strncmp(amain, "*Custom", 7) &&
+	    !strcmp(amain + 7, c->option->keyword) && !strcmp(aoption, "True"))
+	{
+	 /*
+	  * Use this NonUIOrderDependency...
+	  */
+
+          corder = aorder;
+
+	  if (!strcmp(asection, "DocumentSetup"))
+	    csection = PPD_ORDER_DOCUMENT;
+	  else if (!strcmp(asection, "ExitServer"))
+	    csection = PPD_ORDER_EXIT;
+	  else if (!strcmp(asection, "JCLSetup"))
+	    csection = PPD_ORDER_JCL;
+	  else if (!strcmp(asection, "PageSetup"))
+	    csection = PPD_ORDER_PAGE;
+	  else if (!strcmp(asection, "Prolog"))
+	    csection = PPD_ORDER_PROLOG;
+	  else
+	    csection = PPD_ORDER_ANY;
+
+	  break;
+	}
+    }
+
+    if (csection == section && corder >= min_order)
+    {
+      collect[count] = c;
+      orders[count]  = corder;
+      count ++;
+    }
   }
 
  /*
@@ -151,8 +180,23 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
   */
 
   if (count > 1)
-    qsort(collect, count, sizeof(ppd_choice_t *),
-          (int (*)(const void *, const void *))ppd_sort);
+  {
+    int i, j;				/* Looping vars */
+
+    for (i = 0; i < (count - 1); i ++)
+      for (j = i + 1; j < count; j ++)
+        if (orders[i] > orders[j])
+	{
+	  c          = collect[i];
+	  corder     = orders[i];
+	  collect[i] = collect[j];
+	  orders[i]  = orders[j];
+	  collect[j] = c;
+	  orders[j]  = corder;
+	}
+  }
+
+  free(orders);
 
   DEBUG_printf(("ppdCollect2: %d marked choices...\n", count));
 
@@ -925,23 +969,6 @@ ppd_handle_media(ppd_file_t *ppd)
         page->marked = 0;
     }
   }
-}
-
-
-/*
- * 'ppd_sort()' - Sort options by ordering numbers...
- */
-
-static int			/* O - -1 if c1 < c2, 0 if equal, 1 otherwise */
-ppd_sort(ppd_choice_t **c1,	/* I - First choice */
-         ppd_choice_t **c2)	/* I - Second choice */
-{
-  if ((*c1)->option->order < (*c2)->option->order)
-    return (-1);
-  else if ((*c1)->option->order > (*c2)->option->order)
-    return (1);
-  else
-    return (0);
 }
 
 
