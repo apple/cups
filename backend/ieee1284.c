@@ -121,7 +121,6 @@ backendGetDeviceID(
     {
       char	devparport[16];		/* /dev/parportN */
       int	devparportfd,		/* File descriptor for raw device */
-		status,			/* ioctl status */
 		mode;			/* Port mode */
 
 
@@ -142,7 +141,7 @@ backendGetDeviceID(
 
 	if (!ioctl(devparportfd, PPCLAIM))
 	{
-          fcntl(devparport, F_SETFL, fcntl(devparportfd, F_GETFL) | O_NONBLOCK);
+          fcntl(devparportfd, F_SETFL, fcntl(devparportfd, F_GETFL) | O_NONBLOCK);
 
 	  mode = IEEE1284_MODE_COMPAT;
 
