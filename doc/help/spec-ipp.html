@@ -119,7 +119,7 @@ summary='Supported Operations'>
 	<td>Send a file for a print job.</td>
 </tr>
 <tr>
-	<td>Cancel-Job</td>
+	<td><a href='#CANCEL_JOB'>Cancel-Job</a></td>
 	<td>1.0</td>
 	<td>0x0008</td>
 	<td>Cancel a print job.</td>
@@ -173,7 +173,7 @@ summary='Supported Operations'>
 	<td>Resume printing on a printer.</td>
 </tr>
 <tr>
-	<td>Purge-Jobs</td>
+	<td><a href='#PURGE_JOBS'>Purge-Jobs</a></td>
 	<td>1.0</td>
 	<td>0x0012</td>
 	<td>Purge all jobs.</td>
@@ -554,6 +554,119 @@ Create-Job Response:
 	<dd>The required authentication information.
 
 </dl
+
+<h3 class='title'><a name='CANCEL_JOB'>Set-Job-Attributes Operation</a></h3>
+
+<p>The Cancel-Job operation (0x0008) cancels the specified job. CUPS 1.4 adds
+a new <tt>purge-job (boolean)</tt> attribute that allows you to purge both
+active and completed jobs, removing all history and document files for the
+job as well.
+
+<h4>Cancel-Job Request</h4>
+
+<p>The following groups of attributes are supplied as part of the
+Set-Job-Attributes request:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.1 of the IPP Model and
+	Semantics document.
+
+	<dt>"printer-uri" (uri) and "job-id" (integer)
+	<br><i>OR</i>
+	<br>"job-uri":
+
+	<dd>The client MUST supply a URI for the specified printer and
+	a job ID number, or the job URI.
+
+	<dt><span class="info">CUPS 1.4</span>"purge-job" (boolean):
+
+	<dd>The client OPTIONALLY supplies this attribute. When true,
+	all job files (history and document) are purged. The default
+	is false, leading to the standard IPP behavior.
+
+</dl>
+
+<h4>Cancel-Job Response</h4>
+
+<p>The following groups of attributes are send as part of the Cancel-Job
+Response:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Status Message:
+
+	<dd>The standard response status message.
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.2 of the IPP Model and
+	Semantics document.
+
+</dl>
+
+<h3 class='title'><a name='PURGE_JOBS'>Purge-Jobs Operation</a></h3>
+
+<p>The Purge-Jobs operation (0x0012) cancels all of the jobs on a
+given destination and optionally removes all history and document
+files for the jobs as well.
+
+<h4>Purge-Jobs Request</h4>
+
+<p>The following groups of attributes are supplied as part of the
+Purge-Jobs request:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.1 of the IPP Model and
+	Semantics document.
+
+	<dt>"printer-uri" (uri):
+
+	<dd>The client MUST supply a URI for the specified printer or
+	"ipp://.../printers" for all printers and classes.
+
+	<dt><span class="info">CUPS 1.2</span>"purge-jobs" (boolean):
+
+	<dd>The client OPTIONALLY supplies this attribute to specify
+	whether the jobs are purged (true) or just canceled (false).
+	The default is true.
+
+</dl>
+
+<h4>Purge-Jobs Response</h4>
+
+<p>The following groups of attributes are send as part of the Purge-Jobs
+Response:
+
+<p>Group 1: Operation Attributes
+
+<dl>
+
+	<dt>Status Message:
+
+	<dd>The standard response status message.
+
+	<dt>Natural Language and Character Set:
+
+	<dd>The "attributes-charset" and "attributes-natural-language"
+	attributes as described in section 3.1.4.2 of the IPP Model and
+	Semantics document.
+
+</dl>
 
 <h3 class='title'><span class='info'>CUPS 1.1</span><a name='SET_JOB_ATTRIBUTES'>Set-Job-Attributes Operation</a></h3>
 

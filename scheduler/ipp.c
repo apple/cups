@@ -3159,6 +3159,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_job_t	*job;			/* Job information */
   cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
+  int		purge;			/* Purge the job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_job(%p[%d], %s)", con,
@@ -3267,6 +3268,16 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
+  * Look for the "purge-job" attribute...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "purge-job",
+                               IPP_TAG_BOOLEAN)) != NULL)
+    purge = attr->values[0].boolean;
+  else
+    purge = 0;
+
+ /*
   * See if the job exists...
   */
 
@@ -3295,7 +3306,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state_value >= IPP_JOB_CANCELED)
+  if (job->state_value >= IPP_JOB_CANCELED && !purge)
   {
     switch (job->state_value)
     {
@@ -3325,11 +3336,15 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdCancelJob(job, 0, IPP_JOB_CANCELED);
+  cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
-                  username);
+  if (purge)
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Purged by \"%s\".", jobid,
+                    username);
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
+                    username);
 
   con->response->request.status.status_code = IPP_OK;
 }
