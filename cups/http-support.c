@@ -55,7 +55,8 @@
 
 static const char * const http_days[7] =
 			{
-			  "Sun",			  "Mon",
+			  "Sun",
+			  "Mon",
 			  "Tue",
 			  "Wed",
 			  "Thu",

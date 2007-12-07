@@ -1388,11 +1388,6 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     remote_printers   = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
     share_printers    = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
     user_cancel_any   = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
-#ifdef HAVE_GSSAPI
-    default_auth_type = cgiGetVariable("KERBEROS") ? "Negotiate" : "Basic";
-
-    fprintf(stderr, "DEBUG: DefaultAuthType %s\n", default_auth_type);
-#endif /* HAVE_GSSAPI */
 
    /*
     * Get the current server settings...
@@ -1408,6 +1403,24 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       cgiEndHTML();
       return;
     }
+
+#ifdef HAVE_GSSAPI
+   /*
+    * Get authentication settings...
+    */
+
+    if (cgiGetVariable("KERBEROS"))
+      default_auth_type = "Negotiate";
+    else
+    {
+      default_auth_type = cupsGetOption("DefaultAuthType", num_settings,
+                                        settings);
+      if (!strcasecmp(default_auth_type, "Negotiate"))
+        default_auth_type = "Basic";
+    }
+
+    fprintf(stderr, "DEBUG: DefaultAuthType %s\n", default_auth_type);
+#endif /* HAVE_GSSAPI */
 
    /*
     * See if the settings have changed...

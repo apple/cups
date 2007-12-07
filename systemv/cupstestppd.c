@@ -2053,6 +2053,9 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	continue;
       }
 
+      if (!strcmp(langstart, "en"))
+        continue;
+
       cupsArrayAdd(langlist, langstart);
 
       strlcpy(ll, langstart, sizeof(ll));

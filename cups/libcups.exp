@@ -1,6 +1,7 @@
 __cups_strcpy
 __cupsAdminGetServerSettings
 __cupsAdminSetServerSettings
+__cupsAppleLanguage
 __cupsCharmapFlush
 __cupsCharmapFree
 __cupsCharmapGet

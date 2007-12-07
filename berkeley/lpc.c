@@ -230,7 +230,6 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  cups_lang_t	*language;		/* Default language */
   char		*printer,		/* Printer name */
 		*device,		/* Device URI */
                 *delimiter;		/* Char search result */
@@ -263,18 +262,7 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
   *    attributes-natural-language
   */
 
-  request = ippNew();
-
-  request->request.op.operation_id = CUPS_GET_PRINTERS;
-  request->request.op.request_id   = 1;
-
-  language = cupsLangDefault();
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-               "attributes-charset", NULL, cupsLangEncoding(language));
-
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-               "attributes-natural-language", NULL, language->language);
+  request = ippNewRequest(CUPS_GET_PRINTERS);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(requested) / sizeof(requested[0]),

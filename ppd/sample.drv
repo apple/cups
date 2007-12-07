@@ -1,4 +1,17 @@
-// CUPS PPD Compiler v1.1.1
+//
+// "$Id$"
+//
+//   Driver info file for CUPS-supplied PPDs.
+//
+//   Copyright 2007 by Apple Inc.
+//   Copyright 1993-2006 by Easy Software Products.
+//
+//   These coded instructions, statements, and computer programs are the
+//   property of Apple Inc. and are protected by Federal copyright
+//   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+//   which should have been included with this file.  If this file is
+//   file is missing or damaged, see the license at "http://www.cups.org/".
+//
 
 // Include necessary files...
 #include <font.defs>
@@ -76,7 +89,7 @@
 #media "w576h468/8.00x6.50\"" 576 468
 
 // Common stuff for all drivers...
-Attribute "cupsVersion" "" "1.3"
+Attribute "cupsVersion" "" "1.4"
 Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "LanguageLevel" "" "3"
@@ -97,7 +110,7 @@ Copyright "file is missing or damaged, see the license at \"http://www.cups.org/
 
 Font *
 
-Version "1.3"
+Version "1.4"
 
 // Dymo Label Printer
 {
@@ -1191,3 +1204,7 @@ Version "1.3"
 	Choice "Never/Never" ""
   }
 }
+
+//
+// End of "$Id$".
+//

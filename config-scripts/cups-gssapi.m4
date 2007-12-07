@@ -23,14 +23,26 @@ LIBGSSAPI=""
 if test x$enable_gssapi != xno; then
 	AC_PATH_PROG(KRB5CONFIG, krb5-config)
 	if test "x$KRB5CONFIG" != x; then
-		if test "x$uname" = "xDarwin"; then
-			# Mac OS X weak-links to the Kerberos framework...
-			LIBGSSAPI="-weak_framework Kerberos"
-		else
-			CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"		
-			CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"		
-			LIBGSSAPI="`$KRB5CONFIG --libs gssapi`"
-		fi
+		case "$uname" in
+			Darwin)
+				# Mac OS X weak-links to the Kerberos framework...
+				LIBGSSAPI="-weak_framework Kerberos"
+				;;
+			SunOS*)
+				# Solaris has a non-standard krb5-config, don't use it!
+				AC_CHECK_LIB(gss, gss_display_status,
+					AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
+					CFLAGS="`$KRB5CONFIG --cflags` $CFLAGS"		
+					CPPFLAGS="`$KRB5CONFIG --cflags` $CPPFLAGS"		
+					LIBGSSAPI="-lgss `$KRB5CONFIG --libs`")
+				;;
+			*)
+				# Other platforms just ask for GSSAPI
+				CFLAGS="`$KRB5CONFIG --cflags gssapi` $CFLAGS"		
+				CPPFLAGS="`$KRB5CONFIG --cflags gssapi` $CPPFLAGS"		
+				LIBGSSAPI="`$KRB5CONFIG --libs gssapi`"
+				;;
+		esac
 		AC_DEFINE(HAVE_GSSAPI, 1, [Whether GSSAPI is available])
 	else
 		# Check for vendor-specific implementations...

@@ -1274,7 +1274,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
                   con, con->http.fd, printer, printer->name,
-		  filetype, filetype->super, filetype->type);
+		  filetype, filetype ? filetype->super : "none",
+		  filetype ? filetype->type : "none");
 
  /*
   * Check remote printing to non-shared printer...
@@ -3158,6 +3159,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_job_t	*job;			/* Job information */
   cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
+  int		purge;			/* Purge the job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_job(%p[%d], %s)", con,
@@ -3266,6 +3268,16 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
+  * Look for the "purge-job" attribute...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "purge-job",
+                               IPP_TAG_BOOLEAN)) != NULL)
+    purge = attr->values[0].boolean;
+  else
+    purge = 0;
+
+ /*
   * See if the job exists...
   */
 
@@ -3294,7 +3306,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state_value >= IPP_JOB_CANCELED)
+  if (job->state_value >= IPP_JOB_CANCELED && !purge)
   {
     switch (job->state_value)
     {
@@ -3324,11 +3336,15 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdCancelJob(job, 0, IPP_JOB_CANCELED);
+  cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
   cupsdCheckJobs();
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
-                  username);
+  if (purge)
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Purged by \"%s\".", jobid,
+                    username);
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
+                    username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -6089,6 +6105,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: job->id = %d", job->id);
 
+    if (!job->dest || !job->username)
+      cupsdLoadJob(job);
+
+    if (!job->dest || !job->username)
+      continue;
+
     if ((dest && strcmp(job->dest, dest)) &&
         (!job->printer || !dest || strcmp(job->printer->name, dest)))
       continue;
@@ -8493,9 +8515,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   krb5_error_code	error;		/* Kerberos error code */
   OM_uint32		major_status,	/* Major status code */
 			minor_status;	/* Minor status code */
-#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
   krb5_principal	principal;	/* Kerberos principal */
-#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
 
 
 #   ifdef __APPLE__
@@ -8524,7 +8544,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
                                   &(job->ccache))) != 0)
 #    else /* HAVE_HEIMDAL */
-  if ((error = krb5_cc_gen_new(krb_context, &krb5_fcc_ops,
+  if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
                                &(job->ccache))) != 0)
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
   {

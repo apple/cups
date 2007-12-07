@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *% PPD file for Label Printer with CUPS.
-*% Created by the CUPS PPD Compiler v1.2.0.
+*% Created by the CUPS PPD Compiler v1.2.4.
 *% Copyright 2007 by Apple Inc.
 *% Copyright 1997-2007 by Easy Software Products.
 *% 
@@ -10,7 +10,7 @@
 *% which should have been included with this file.  If this file is
 *% file is missing or damaged, see the license at "http://www.cups.org/".
 *FormatVersion: "4.3"
-*FileVersion: "1.3"
+*FileVersion: "1.4"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "DYMO.PPD"
@@ -19,7 +19,7 @@
 *Manufacturer: "Dymo"
 *ModelName: "Dymo Label Printer"
 *ShortNickName: "Dymo Label Printer"
-*NickName: "Dymo Label Printer, 1.3"
+*NickName: "Dymo Label Printer, 1.4"
 *PSVersion: "(3010.000) 81504"
 *PSVersion: "(3010.000) 860"
 *LanguageLevel: "3"
@@ -30,11 +30,11 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*cupsVersion: 1.3
+*cupsVersion: 1.4
 *cupsModelNumber: 0
 *cupsManualCopies: False
 *cupsFilter: "application/vnd.cups-raster 50 rastertolabel"
-*cupsLanguages: "da de es fi fr it ja ko nl no pt pt_BR pt_PT sv zh zh_TW"
+*cupsLanguages: "en da de es fi fr it ja ko nl no pt pt_BR sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: w81h252
@@ -100,7 +100,7 @@
 *da.Translation Manufacturer/Dymo: ""
 *da.Translation ModelName/Dymo Label Printer: ""
 *da.Translation ShortNickName/Dymo Label Printer: ""
-*da.Translation NickName/Dymo Label Printer, 1.3: ""
+*da.Translation NickName/Dymo Label Printer, 1.4: ""
 *da.Translation PageSize/Media Size: ""
 *da.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *da.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -123,7 +123,7 @@
 *de.Translation Manufacturer/Dymo: ""
 *de.Translation ModelName/Dymo Label Printer: ""
 *de.Translation ShortNickName/Dymo Label Printer: ""
-*de.Translation NickName/Dymo Label Printer, 1.3: ""
+*de.Translation NickName/Dymo Label Printer, 1.4: ""
 *de.Translation PageSize/Media Size: ""
 *de.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *de.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -146,7 +146,7 @@
 *es.Translation Manufacturer/Dymo: ""
 *es.Translation ModelName/Dymo Label Printer: ""
 *es.Translation ShortNickName/Dymo Label Printer: ""
-*es.Translation NickName/Dymo Label Printer, 1.3: ""
+*es.Translation NickName/Dymo Label Printer, 1.4: ""
 *es.Translation PageSize/Media Size: ""
 *es.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *es.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -169,7 +169,7 @@
 *fi.Translation Manufacturer/Dymo: ""
 *fi.Translation ModelName/Dymo Label Printer: ""
 *fi.Translation ShortNickName/Dymo Label Printer: ""
-*fi.Translation NickName/Dymo Label Printer, 1.3: ""
+*fi.Translation NickName/Dymo Label Printer, 1.4: ""
 *fi.Translation PageSize/Media Size: ""
 *fi.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *fi.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -192,7 +192,7 @@
 *fr.Translation Manufacturer/Dymo: ""
 *fr.Translation ModelName/Dymo Label Printer: ""
 *fr.Translation ShortNickName/Dymo Label Printer: ""
-*fr.Translation NickName/Dymo Label Printer, 1.3: ""
+*fr.Translation NickName/Dymo Label Printer, 1.4: ""
 *fr.Translation PageSize/Media Size: ""
 *fr.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *fr.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -215,7 +215,7 @@
 *it.Translation Manufacturer/Dymo: ""
 *it.Translation ModelName/Dymo Label Printer: ""
 *it.Translation ShortNickName/Dymo Label Printer: ""
-*it.Translation NickName/Dymo Label Printer, 1.3: ""
+*it.Translation NickName/Dymo Label Printer, 1.4: ""
 *it.Translation PageSize/Media Size: ""
 *it.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *it.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -238,7 +238,7 @@
 *ja.Translation Manufacturer/Dymo: ""
 *ja.Translation ModelName/Dymo Label Printer: ""
 *ja.Translation ShortNickName/Dymo Label Printer: ""
-*ja.Translation NickName/Dymo Label Printer, 1.3: ""
+*ja.Translation NickName/Dymo Label Printer, 1.4: ""
 *ja.Translation PageSize/Media Size: ""
 *ja.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *ja.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -261,8 +261,8 @@
 *ko.Translation Manufacturer/Dymo: ""
 *ko.Translation ModelName/Dymo Label Printer: ""
 *ko.Translation ShortNickName/Dymo Label Printer: ""
-*ko.Translation NickName/Dymo Label Printer, 1.3: ""
-*ko.Translation PageSize/Media Size: ""
+*ko.Translation NickName/Dymo Label Printer, 1.4: ""
+*ko.Translation PageSize/Page Size: ""
 *ko.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *ko.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
 *ko.PageSize w54h144/Return Address - 3/4x2in: ""
@@ -284,7 +284,7 @@
 *nl.Translation Manufacturer/Dymo: ""
 *nl.Translation ModelName/Dymo Label Printer: ""
 *nl.Translation ShortNickName/Dymo Label Printer: ""
-*nl.Translation NickName/Dymo Label Printer, 1.3: ""
+*nl.Translation NickName/Dymo Label Printer, 1.4: ""
 *nl.Translation PageSize/Media Size: ""
 *nl.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *nl.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -307,7 +307,7 @@
 *no.Translation Manufacturer/Dymo: ""
 *no.Translation ModelName/Dymo Label Printer: ""
 *no.Translation ShortNickName/Dymo Label Printer: ""
-*no.Translation NickName/Dymo Label Printer, 1.3: ""
+*no.Translation NickName/Dymo Label Printer, 1.4: ""
 *no.Translation PageSize/Media Size: ""
 *no.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *no.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -330,7 +330,7 @@
 *pt.Translation Manufacturer/Dymo: ""
 *pt.Translation ModelName/Dymo Label Printer: ""
 *pt.Translation ShortNickName/Dymo Label Printer: ""
-*pt.Translation NickName/Dymo Label Printer, 1.3: ""
+*pt.Translation NickName/Dymo Label Printer, 1.4: ""
 *pt.Translation PageSize/Media Size: ""
 *pt.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *pt.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -353,7 +353,7 @@
 *pt_BR.Translation Manufacturer/Dymo: ""
 *pt_BR.Translation ModelName/Dymo Label Printer: ""
 *pt_BR.Translation ShortNickName/Dymo Label Printer: ""
-*pt_BR.Translation NickName/Dymo Label Printer, 1.3: ""
+*pt_BR.Translation NickName/Dymo Label Printer, 1.4: ""
 *pt_BR.Translation PageSize/Media Size: ""
 *pt_BR.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *pt_BR.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -373,33 +373,10 @@
 *pt_BR.cupsDarkness Medium/Medium: ""
 *pt_BR.cupsDarkness Normal/Normal: ""
 *pt_BR.cupsDarkness Dark/Dark: ""
-*pt_PT.Translation Manufacturer/Dymo: ""
-*pt_PT.Translation ModelName/Dymo Label Printer: ""
-*pt_PT.Translation ShortNickName/Dymo Label Printer: ""
-*pt_PT.Translation NickName/Dymo Label Printer, 1.3: ""
-*pt_PT.Translation PageSize/Media Size: ""
-*pt_PT.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
-*pt_PT.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
-*pt_PT.PageSize w54h144/Return Address - 3/4x2in: ""
-*pt_PT.PageSize w167h288/Shipping Address - 2 5/16x4in: ""
-*pt_PT.PageSize w162h540/Internet Postage 2-Part - 2 1/4x7 1/2in: ""
-*pt_PT.PageSize w162h504/Internet Postage 3-Part - 2 1/4x7in: ""
-*pt_PT.PageSize w41h248/File Folder - 9/16x3 7/16in: ""
-*pt_PT.PageSize w41h144/Hanging Folder - 9/16x2in: ""
-*pt_PT.PageSize w153h198/3.5" Disk - 2 1/8x2 3/4in: ""
-*pt_PT.Translation Resolution/Resolution: ""
-*pt_PT.Resolution 136dpi/136dpi: ""
-*pt_PT.Resolution 203dpi/203dpi: ""
-*pt_PT.Resolution 300dpi/300dpi: ""
-*pt_PT.Translation cupsDarkness/Darkness: ""
-*pt_PT.cupsDarkness Light/Light: ""
-*pt_PT.cupsDarkness Medium/Medium: ""
-*pt_PT.cupsDarkness Normal/Normal: ""
-*pt_PT.cupsDarkness Dark/Dark: ""
 *sv.Translation Manufacturer/Dymo: ""
 *sv.Translation ModelName/Dymo Label Printer: ""
 *sv.Translation ShortNickName/Dymo Label Printer: ""
-*sv.Translation NickName/Dymo Label Printer, 1.3: ""
+*sv.Translation NickName/Dymo Label Printer, 1.4: ""
 *sv.Translation PageSize/Media Size: ""
 *sv.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *sv.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
@@ -422,8 +399,8 @@
 *zh.Translation Manufacturer/Dymo: ""
 *zh.Translation ModelName/Dymo Label Printer: ""
 *zh.Translation ShortNickName/Dymo Label Printer: ""
-*zh.Translation NickName/Dymo Label Printer, 1.3: ""
-*zh.Translation PageSize/Media Size: ""
+*zh.Translation NickName/Dymo Label Printer, 1.4: ""
+*zh.Translation PageSize/Page Size: ""
 *zh.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *zh.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
 *zh.PageSize w54h144/Return Address - 3/4x2in: ""
@@ -445,8 +422,8 @@
 *zh_TW.Translation Manufacturer/Dymo: ""
 *zh_TW.Translation ModelName/Dymo Label Printer: ""
 *zh_TW.Translation ShortNickName/Dymo Label Printer: ""
-*zh_TW.Translation NickName/Dymo Label Printer, 1.3: ""
-*zh_TW.Translation PageSize/Media Size: ""
+*zh_TW.Translation NickName/Dymo Label Printer, 1.4: ""
+*zh_TW.Translation PageSize/Page Size: ""
 *zh_TW.PageSize w81h252/Address - 1 1/8x3 1/2in: ""
 *zh_TW.PageSize w101h252/Large Address - 1 4/10x3 1/2in: ""
 *zh_TW.PageSize w54h144/Return Address - 3/4x2in: ""
@@ -501,4 +478,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of DYMO.PPD, 24761 bytes.
+*% End of DYMO.PPD, 23640 bytes.

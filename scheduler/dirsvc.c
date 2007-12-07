@@ -202,7 +202,7 @@ cupsdDeregisterPrinter(
   * Announce the deletion...
   */
 
-  if ((BrowseLocalProtocols & BROWSE_CUPS))
+  if ((BrowseLocalProtocols & BROWSE_CUPS) && BrowseSocket >= 0)
   {
     cups_ptype_t savedtype = p->type;	/* Saved printer type */
 
@@ -866,7 +866,7 @@ cupsdSendBrowseList(void)
 
 	p->browse_time = time(NULL);
 
-	if (BrowseLocalProtocols & BROWSE_CUPS)
+	if ((BrowseLocalProtocols & BROWSE_CUPS) && BrowseSocket >= 0)
           send_cups_browse(p);
 
 #ifdef HAVE_LIBSLP

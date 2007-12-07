@@ -256,6 +256,9 @@ cupsdFindAvailablePrinter(
     return (NULL);
   }
 
+  if (c->num_printers == 0)
+    return (NULL);
+
  /*
   * Make sure that the last printer is also a valid index into the printer
   * array.  If not, reset the last printer to 0...

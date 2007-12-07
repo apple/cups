@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *% PPD file for New Stylus Color Series with CUPS.
-*% Created by the CUPS PPD Compiler v1.2.0.
+*% Created by the CUPS PPD Compiler v1.2.4.
 *% Copyright 2007 by Apple Inc.
 *% Copyright 1997-2007 by Easy Software Products.
 *% 
@@ -10,7 +10,7 @@
 *% which should have been included with this file.  If this file is
 *% file is missing or damaged, see the license at "http://www.cups.org/".
 *FormatVersion: "4.3"
-*FileVersion: "1.3"
+*FileVersion: "1.4"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "STCOLOR2.PPD"
@@ -19,7 +19,7 @@
 *Manufacturer: "Epson"
 *ModelName: "Epson New Stylus Color Series"
 *ShortNickName: "Epson New Stylus Color Series"
-*NickName: "Epson New Stylus Color Series, 1.3"
+*NickName: "Epson New Stylus Color Series, 1.4"
 *PSVersion: "(3010.000) 81504"
 *PSVersion: "(3010.000) 860"
 *LanguageLevel: "3"
@@ -30,11 +30,11 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer: Type42
 *% Driver-defined attributes...
-*cupsVersion: 1.3
+*cupsVersion: 1.4
 *cupsModelNumber: 4
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 50 rastertoepson"
-*cupsLanguages: "da de es fi fr it ja ko nl no pt pt_BR pt_PT sv zh zh_TW"
+*cupsLanguages: "en da de es fi fr it ja ko nl no pt pt_BR sv zh zh_TW"
 *OpenUI *PageSize/Media Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
 *DefaultPageSize: Letter
@@ -99,7 +99,7 @@
 *da.Translation Manufacturer/Epson: ""
 *da.Translation ModelName/Epson New Stylus Color Series: ""
 *da.Translation ShortNickName/Epson New Stylus Color Series: ""
-*da.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*da.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *da.Translation PageSize/Media Size: ""
 *da.PageSize Letter/Letter - 8.5x11in: ""
 *da.PageSize Legal/Legal - 8.5x14in: ""
@@ -118,7 +118,7 @@
 *de.Translation Manufacturer/Epson: ""
 *de.Translation ModelName/Epson New Stylus Color Series: ""
 *de.Translation ShortNickName/Epson New Stylus Color Series: ""
-*de.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*de.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *de.Translation PageSize/Media Size: ""
 *de.PageSize Letter/Letter - 8.5x11in: ""
 *de.PageSize Legal/Legal - 8.5x14in: ""
@@ -137,7 +137,7 @@
 *es.Translation Manufacturer/Epson: ""
 *es.Translation ModelName/Epson New Stylus Color Series: ""
 *es.Translation ShortNickName/Epson New Stylus Color Series: ""
-*es.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*es.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *es.Translation PageSize/Media Size: ""
 *es.PageSize Letter/Letter - 8.5x11in: ""
 *es.PageSize Legal/Legal - 8.5x14in: ""
@@ -156,7 +156,7 @@
 *fi.Translation Manufacturer/Epson: ""
 *fi.Translation ModelName/Epson New Stylus Color Series: ""
 *fi.Translation ShortNickName/Epson New Stylus Color Series: ""
-*fi.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*fi.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *fi.Translation PageSize/Media Size: ""
 *fi.PageSize Letter/Letter - 8.5x11in: ""
 *fi.PageSize Legal/Legal - 8.5x14in: ""
@@ -175,7 +175,7 @@
 *fr.Translation Manufacturer/Epson: ""
 *fr.Translation ModelName/Epson New Stylus Color Series: ""
 *fr.Translation ShortNickName/Epson New Stylus Color Series: ""
-*fr.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*fr.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *fr.Translation PageSize/Media Size: ""
 *fr.PageSize Letter/Letter - 8.5x11in: ""
 *fr.PageSize Legal/Legal - 8.5x14in: ""
@@ -194,7 +194,7 @@
 *it.Translation Manufacturer/Epson: ""
 *it.Translation ModelName/Epson New Stylus Color Series: ""
 *it.Translation ShortNickName/Epson New Stylus Color Series: ""
-*it.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*it.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *it.Translation PageSize/Media Size: ""
 *it.PageSize Letter/Letter - 8.5x11in: ""
 *it.PageSize Legal/Legal - 8.5x14in: ""
@@ -213,7 +213,7 @@
 *ja.Translation Manufacturer/Epson: ""
 *ja.Translation ModelName/Epson New Stylus Color Series: ""
 *ja.Translation ShortNickName/Epson New Stylus Color Series: ""
-*ja.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*ja.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *ja.Translation PageSize/Media Size: ""
 *ja.PageSize Letter/Letter - 8.5x11in: ""
 *ja.PageSize Legal/Legal - 8.5x14in: ""
@@ -232,8 +232,8 @@
 *ko.Translation Manufacturer/Epson: ""
 *ko.Translation ModelName/Epson New Stylus Color Series: ""
 *ko.Translation ShortNickName/Epson New Stylus Color Series: ""
-*ko.Translation NickName/Epson New Stylus Color Series, 1.3: ""
-*ko.Translation PageSize/Media Size: ""
+*ko.Translation NickName/Epson New Stylus Color Series, 1.4: ""
+*ko.Translation PageSize/Page Size: ""
 *ko.PageSize Letter/Letter - 8.5x11in: ""
 *ko.PageSize Legal/Legal - 8.5x14in: ""
 *ko.PageSize A4/A4 - 210x297mm: ""
@@ -251,7 +251,7 @@
 *nl.Translation Manufacturer/Epson: ""
 *nl.Translation ModelName/Epson New Stylus Color Series: ""
 *nl.Translation ShortNickName/Epson New Stylus Color Series: ""
-*nl.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*nl.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *nl.Translation PageSize/Media Size: ""
 *nl.PageSize Letter/Letter - 8.5x11in: ""
 *nl.PageSize Legal/Legal - 8.5x14in: ""
@@ -270,7 +270,7 @@
 *no.Translation Manufacturer/Epson: ""
 *no.Translation ModelName/Epson New Stylus Color Series: ""
 *no.Translation ShortNickName/Epson New Stylus Color Series: ""
-*no.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*no.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *no.Translation PageSize/Media Size: ""
 *no.PageSize Letter/Letter - 8.5x11in: ""
 *no.PageSize Legal/Legal - 8.5x14in: ""
@@ -289,7 +289,7 @@
 *pt.Translation Manufacturer/Epson: ""
 *pt.Translation ModelName/Epson New Stylus Color Series: ""
 *pt.Translation ShortNickName/Epson New Stylus Color Series: ""
-*pt.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*pt.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *pt.Translation PageSize/Media Size: ""
 *pt.PageSize Letter/Letter - 8.5x11in: ""
 *pt.PageSize Legal/Legal - 8.5x14in: ""
@@ -308,7 +308,7 @@
 *pt_BR.Translation Manufacturer/Epson: ""
 *pt_BR.Translation ModelName/Epson New Stylus Color Series: ""
 *pt_BR.Translation ShortNickName/Epson New Stylus Color Series: ""
-*pt_BR.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*pt_BR.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *pt_BR.Translation PageSize/Media Size: ""
 *pt_BR.PageSize Letter/Letter - 8.5x11in: ""
 *pt_BR.PageSize Legal/Legal - 8.5x14in: ""
@@ -324,29 +324,10 @@
 *pt_BR.Translation ColorModel/Modo Cor: ""
 *pt_BR.ColorModel CMYK/CMYK: ""
 *pt_BR.ColorModel Gray/Grayscale: ""
-*pt_PT.Translation Manufacturer/Epson: ""
-*pt_PT.Translation ModelName/Epson New Stylus Color Series: ""
-*pt_PT.Translation ShortNickName/Epson New Stylus Color Series: ""
-*pt_PT.Translation NickName/Epson New Stylus Color Series, 1.3: ""
-*pt_PT.Translation PageSize/Media Size: ""
-*pt_PT.PageSize Letter/Letter - 8.5x11in: ""
-*pt_PT.PageSize Legal/Legal - 8.5x14in: ""
-*pt_PT.PageSize A4/A4 - 210x297mm: ""
-*pt_PT.PageSize FanFoldUS/Fanfold - 14.875x11in: ""
-*pt_PT.PageSize Letter/Letter - 8.5x11in: ""
-*pt_PT.PageSize Legal/Legal - 8.5x14in: ""
-*pt_PT.PageSize A4/A4 - 210x297mm: ""
-*pt_PT.Translation Resolution/Resolution: ""
-*pt_PT.Resolution 180dpi/180dpi: ""
-*pt_PT.Resolution 360dpi/360dpi: ""
-*pt_PT.Resolution 720dpi/720dpi: ""
-*pt_PT.Translation ColorModel/Modo Cor: ""
-*pt_PT.ColorModel CMYK/CMYK: ""
-*pt_PT.ColorModel Gray/Grayscale: ""
 *sv.Translation Manufacturer/Epson: ""
 *sv.Translation ModelName/Epson New Stylus Color Series: ""
 *sv.Translation ShortNickName/Epson New Stylus Color Series: ""
-*sv.Translation NickName/Epson New Stylus Color Series, 1.3: ""
+*sv.Translation NickName/Epson New Stylus Color Series, 1.4: ""
 *sv.Translation PageSize/Media Size: ""
 *sv.PageSize Letter/Letter - 8.5x11in: ""
 *sv.PageSize Legal/Legal - 8.5x14in: ""
@@ -365,8 +346,8 @@
 *zh.Translation Manufacturer/Epson: ""
 *zh.Translation ModelName/Epson New Stylus Color Series: ""
 *zh.Translation ShortNickName/Epson New Stylus Color Series: ""
-*zh.Translation NickName/Epson New Stylus Color Series, 1.3: ""
-*zh.Translation PageSize/Media Size: ""
+*zh.Translation NickName/Epson New Stylus Color Series, 1.4: ""
+*zh.Translation PageSize/Page Size: ""
 *zh.PageSize Letter/Letter - 8.5x11in: ""
 *zh.PageSize Legal/Legal - 8.5x14in: ""
 *zh.PageSize A4/A4 - 210x297mm: ""
@@ -384,8 +365,8 @@
 *zh_TW.Translation Manufacturer/Epson: ""
 *zh_TW.Translation ModelName/Epson New Stylus Color Series: ""
 *zh_TW.Translation ShortNickName/Epson New Stylus Color Series: ""
-*zh_TW.Translation NickName/Epson New Stylus Color Series, 1.3: ""
-*zh_TW.Translation PageSize/Media Size: ""
+*zh_TW.Translation NickName/Epson New Stylus Color Series, 1.4: ""
+*zh_TW.Translation PageSize/Page Size: ""
 *zh_TW.PageSize Letter/Letter - 8.5x11in: ""
 *zh_TW.PageSize Legal/Legal - 8.5x14in: ""
 *zh_TW.PageSize A4/A4 - 210x297mm: ""
@@ -436,4 +417,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of STCOLOR2.PPD, 20042 bytes.
+*% End of STCOLOR2.PPD, 19185 bytes.

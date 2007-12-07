@@ -613,7 +613,7 @@ _cups_strcasecmp(const char *s,	/* I - First string */
 #ifndef HAVE_STRNCASECMP
 int					/* O - Result of comparison (-1, 0, or 1) */
 _cups_strncasecmp(const char *s,	/* I - First string */
-                 vconst char *t,	/* I - Second string */
+                  const char *t,	/* I - Second string */
 		  size_t     n)		/* I - Maximum number of characters to compare */
 {
   while (*s != '\0' && *t != '\0' && n > 0)

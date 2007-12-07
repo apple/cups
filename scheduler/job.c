@@ -250,7 +250,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
 
   job->current_file = 0;
 
-  if (!JobHistory || !JobFiles || purge || (job->dtype & CUPS_PRINTER_REMOTE))
+  if (!JobHistory || !JobFiles || purge)
   {
     for (i = 1; i <= job->num_files; i ++)
     {
@@ -270,7 +270,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     }
   }
 
-  if (JobHistory && !purge && !(job->dtype & CUPS_PRINTER_REMOTE))
+  if (JobHistory && !purge)
   {
    /*
     * Save job state info...
@@ -318,6 +318,13 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
+  {
+    if (!job->dest || !job->username)
+      cupsdLoadJob(job);
+
+    if (!job->dest || !job->username)
+      continue;
+
     if ((dest == NULL || !strcmp(job->dest, dest)) &&
         (username == NULL || !strcmp(job->username, username)))
     {
@@ -327,6 +334,7 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
 
       cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
     }
+  }
 
   cupsdCheckJobs();
 }
@@ -2437,7 +2445,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 15],
+			*envp[MAX_ENV + 16],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -2450,6 +2458,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			final_content_type[1024],
 					/* FINAL_CONTENT_TYPE env variable */
 			lang[255],	/* LANG env variable */
+#ifdef __APPLE__
+			apple_language[255],
+					/* APPLE_LANGUAGE env variable */
+#endif /* __APPLE__ */
 			ppd[1024],	/* PPD env variable */
 			printer_name[255],
 					/* PRINTER env variable */
@@ -2992,6 +3004,12 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   attr = ippFindAttribute(job->attrs, "attributes-natural-language",
                           IPP_TAG_LANGUAGE);
 
+#ifdef __APPLE__
+  strcpy(apple_language, "APPLE_LANGUAGE");
+  _cupsAppleLanguage(attr->values[0].string.text,
+		     apple_language + 15, sizeof(apple_language) - 15);
+#endif /* __APPLE__ */
+
   switch (strlen(attr->values[0].string.text))
   {
     default :
@@ -3052,6 +3070,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   envp[envc ++] = charset;
   envp[envc ++] = lang;
+#ifdef __APPLE__
+  envp[envc ++] = apple_language;
+#endif /* __APPLE__ */
   envp[envc ++] = ppd;
   envp[envc ++] = rip_max_cache;
   envp[envc ++] = content_type;
