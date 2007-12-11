@@ -394,6 +394,14 @@ main(int  argc,				/* I - Number of command-line args */
 
     for (i = 0; i < limit.rlim_cur && i < 1024; i ++)
       close(i);
+
+   /*
+    * Redirect stdin/out/err to /dev/null...
+    */
+
+    open("/dev/null", O_RDONLY);
+    open("/dev/null", O_WRONLY);
+    open("/dev/null", O_WRONLY);
 #endif /* DEBUG */
   }
 
