@@ -3005,7 +3005,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
                           IPP_TAG_LANGUAGE);
 
 #ifdef __APPLE__
-  strcpy(apple_language, "APPLE_LANGUAGE");
+  strcpy(apple_language, "APPLE_LANGUAGE=");
   _cupsAppleLanguage(attr->values[0].string.text,
 		     apple_language + 15, sizeof(apple_language) - 15);
 #endif /* __APPLE__ */
