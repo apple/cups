@@ -26,12 +26,6 @@
 #  include <config.h>
 
 #  ifdef __sun
-/*
- * Define FD_SETSIZE to CUPS_MAX_FDS on Solaris to get the correct version of
- * select() for large numbers of file descriptors.
- */
-
-#    define FD_SETSIZE	CUPS_MAX_FDS
 #    include <sys/select.h>
 #  endif /* __sun */
 
