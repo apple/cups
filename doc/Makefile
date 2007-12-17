@@ -165,11 +165,6 @@ install-languages:
 		if test -f $$lang/cups.css; then \
 			$(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang; \
 		fi; \
-		for file in $(WEBBUTTONS); do \
-			if test -f $$lang/$$file; then \
-				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images; \
-			fi; \
-		done \
 	done
 
 
