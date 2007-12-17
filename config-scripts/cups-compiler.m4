@@ -56,9 +56,6 @@ AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
 ARCH64FLAGS=""
 AC_SUBST(ARCH64FLAGS)
 
-dnl Position-Independent Executable support on Linux...
-AC_ARG_ENABLE(pie, [  --enable-pie            use GCC -fPIE option, default=no])
-
 dnl Read-only data/program support on Linux...
 AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
 
