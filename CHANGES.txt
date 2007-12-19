@@ -3,6 +3,8 @@ CHANGES.txt - 2007-12-19
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now sets the PAM RHOST value on systems
+	  that support it (STR #2637)
 	- The scheduler now sandboxes child processes when
 	  possible.
 	- The Cancel-Job operation now supports a purge-job

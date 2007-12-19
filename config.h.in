@@ -131,6 +131,7 @@
 #endif /* !HAVE_LIBPAM */
 
 #undef HAVE_PAM_PAM_APPL_H
+#undef HAVE_PAM_SET_ITEM
 
 
 /*
