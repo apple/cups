@@ -108,7 +108,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
                  "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\"))\n",
-		 temp, cache, temp, cache);
+		 temp, temp, cache, cache);
   if (job_id)
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"
