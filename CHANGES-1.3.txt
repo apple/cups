@@ -1,6 +1,15 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.6
+
+	- The scheduler did not detect network interface changes
+	  on operating systems other than Mac OS X (STR #2631)
+	- The scheduler now logs the UNIX error message when it
+	  is unable to create a request file such as a print job.
+	- Added support for --enable-pie on Mac OS X.
+
+
 CHANGES IN CUPS V1.3.5
 
 	- The SNMP backend did not check for negative string

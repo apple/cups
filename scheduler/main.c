@@ -149,6 +149,8 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef __APPLE__
   int			run_as_child = 0;
 					/* Needed for Mac OS X fork/exec */
+#else
+  time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
 #if HAVE_LAUNCHD
   int			launchd_idle_exit;
@@ -847,6 +849,18 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
     current_time = time(NULL);
+
+#ifndef __APPLE__
+   /*
+    * Update the network interfaces once a minute...
+    */
+
+    if ((current_time - netif_time) >= 60)
+    {
+      netif_time  = current_time;
+      NetIFUpdate = 1;
+    }
+#endif /* !__APPLE__ */
 
 #if HAVE_LAUNCHD
    /*
