@@ -237,6 +237,9 @@ case $uname in
 			CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
 			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
+
+		dnl Check for sandbox/Seatbelt support
+		AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
                 ;;
 
 	Linux*)

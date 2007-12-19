@@ -545,6 +545,13 @@
 #undef HAVE_REMOVEFILE
 
 
+/*
+ * Do we have <sandbox.h>?
+ */
+
+#undef HAVE_SANDBOX_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

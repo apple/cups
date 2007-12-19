@@ -80,6 +80,12 @@ cupsdStartServer(void)
 #endif /* HAVE_LIBSSL */
 
  /*
+  * Create the default security profile...
+  */
+
+  DefaultProfile = cupsdCreateProfile(0);
+
+ /*
   * Startup all the networking stuff...
   */
 
@@ -155,6 +161,16 @@ cupsdStopServer(void)
     CGIPipes[1] = -1;
   }
 
+#ifdef HAVE_NOTIFY_POST
+ /*
+  * Send one last notification as the server shuts down.
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "notify_post(\"com.apple.printerListChange\") last");
+  notify_post("com.apple.printerListChange");
+#endif /* HAVE_NOTIFY_POST */
+
  /*
   * Close all log files...
   */
@@ -180,15 +196,12 @@ cupsdStopServer(void)
     PageFile = NULL;
   }
 
-#ifdef HAVE_NOTIFY_POST
  /*
-  * Send one last notification as the server shuts down.
+  * Delete the default security profile...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "notify_post(\"com.apple.printerListChange\") last");
-  notify_post("com.apple.printerListChange");
-#endif /* HAVE_NOTIFY_POST */
+  cupsdDestroyProfile(DefaultProfile);
+  DefaultProfile = NULL;
 
   started = 0;
 }

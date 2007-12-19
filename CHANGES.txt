@@ -1,8 +1,10 @@
-CHANGES.txt - 2007-12-07
+CHANGES.txt - 2007-12-19
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now sandboxes child processes when
+	  possible.
 	- The Cancel-Job operation now supports a purge-job
 	  attriibute to purge a specified job.
 	- ppdEmit* and ppdCollect* now use the NonUIOrderDependency

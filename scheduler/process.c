@@ -14,10 +14,13 @@
  *
  * Contents:
  *
- *   cupsdEndProcess()    - End a process.
- *   cupsdFinishProcess() - Finish a process and get its name.
- *   cupsdStartProcess()  - Start a process.
- *   compare_procs()      - Compare two processes.
+ *   cupsdCreateProfile()  - Create an execution profile for a subprocess.
+ *   cupsdDestroyProfile() - Delete an execution profile.
+ *   cupsdEndProcess()     - End a process.
+ *   cupsdFinishProcess()  - Finish a process and get its name.
+ *   cupsdStartProcess()   - Start a process.
+ *   compare_procs()       - Compare two processes.
+ *   cupsd_requote()       - Make a regular-expression version of a string.
  */
 
 /*
@@ -26,9 +29,13 @@
 
 #include "cupsd.h"
 #include <grp.h>
-#if defined(__APPLE__)
+#ifdef __APPLE__
 #  include <libgen.h>
 #endif /* __APPLE__ */ 
+#ifdef HAVE_SANDBOX_H
+#  define __APPLE_API_PRIVATE
+#  include <sandbox.h>
+#endif /* HAVE_SANDBOX_H */
 
 
 /*
@@ -54,6 +61,85 @@ static cups_array_t	*process_array = NULL;
  */
 
 static int	compare_procs(cupsd_proc_t *a, cupsd_proc_t *b);
+#ifdef HAVE_SANDBOX_H
+static char	*cupsd_requote(char *dst, const char *src, size_t dstsize);
+#endif /* HAVE_SANDBOX_H */
+
+
+/*
+ * 'cupsdCreateProfile()' - Create an execution profile for a subprocess.
+ */
+
+void *					/* O - Profile or NULL on error */
+cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
+{
+#ifdef HAVE_SANDBOX_H
+  cups_file_t	*fp;			/* File pointer */
+  char		profile[1024],		/* File containing the profile */
+		cache[1024],		/* Quoted CacheDir */
+		request[1024],		/* Quoted RequestRoot */
+		root[1024],		/* Quoted ServerRoot */
+		temp[1024];		/* Quoted TempDir */
+  size_t	requestlen;		/* Length of RequestRoot */
+
+
+  if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create security profile: %s",
+                    strerror(errno));
+    return (NULL);
+  }
+
+  cupsd_requote(cache, CacheDir, sizeof(cache));
+  cupsd_requote(request, RequestRoot, sizeof(request));
+  cupsd_requote(root, ServerRoot, sizeof(root));
+  cupsd_requote(temp, TempDir, sizeof(temp));
+
+  cupsFilePuts(fp, "(version 1)\n");
+  cupsFilePuts(fp, "(debug deny)\n");
+  cupsFilePuts(fp, "(allow default)\n");
+  cupsFilePrintf(fp,
+                 "(deny file-write* file-read-data file-read-metadata\n"
+                 "  (regex #\"^%s\"))\n", request);
+  cupsFilePrintf(fp,
+                 "(deny file-write*\n"
+                 "  (regex #\"^%s\" #\"^/etc\" #\"^/usr/local/etc\" "
+		 "#\"^/Library\" #\"^/System\"))\n", root);
+  cupsFilePrintf(fp,
+                 "(allow file-write* file-read-data file-read-metadata\n"
+                 "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\"))\n",
+		 temp, cache, temp, cache);
+  if (job_id)
+    cupsFilePrintf(fp,
+                   "(allow file-read-data file-read-metadata\n"
+                   "  (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
+		   request);
+
+  cupsFileClose(fp);
+
+  return ((void *)strdup(profile));
+#else
+
+  return (NULL);
+#endif /* HAVE_SANDBOX_H */
+}
+
+
+/*
+ * 'cupsdDestroyProfile()' - Delete an execution profile.
+ */
+
+void
+cupsdDestroyProfile(void *profile)	/* I - Profile */
+{
+#ifdef HAVE_SANDBOX_H
+  if (profile)
+  {
+    unlink((char *)profile);
+    free(profile);
+  }
+#endif /* HAVE_SANDBOX_H */
+}
 
 
 /*
@@ -114,6 +200,7 @@ cupsdStartProcess(
     int        backfd,			/* I - Backchannel file descriptor */
     int        sidefd,			/* I - Sidechannel file descriptor */
     int        root,			/* I - Run as root? */
+    void       *profile,		/* I - Security profile to use */
     int        *pid)			/* O - Process ID */
 {
   cupsd_proc_t	*proc;			/* New process record */
@@ -289,6 +376,24 @@ cupsdStartProcess(
 
     cupsdReleaseSignals();
 
+#ifdef HAVE_SANDBOX_H
+   /*
+    * Run in a separate security profile...
+    */
+
+    if (profile)
+    {
+      char *error;			/* Sandbox error, if any */
+
+      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
+      {
+        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
+	        strerror(errno));
+	sandbox_free_error(error);
+      }
+    }
+#endif /* HAVE_SANDBOX_H */
+
    /*
     * Execute the command; if for some reason this doesn't work,
     * return the error code...
@@ -347,6 +452,41 @@ compare_procs(cupsd_proc_t *a,		/* I - First process */
 {
   return (a->pid - b->pid);
 }
+
+
+#ifdef HAVE_SANDBOX_H
+/*
+ * 'cupsd_requote()' - Make a regular-expression version of a string.
+ */
+
+static char *				/* O - Quoted string */
+cupsd_requote(char       *dst,		/* I - Destination buffer */
+              const char *src,		/* I - Source string */
+	      size_t     dstsize)	/* I - Size of destination buffer */
+{
+  int	ch;				/* Current character */
+  char	*dstptr,			/* Current position in buffer */
+	*dstend;			/* End of destination buffer */
+
+
+  dstptr = dst;
+  dstend = dst + dstsize - 2;
+
+  while (*src && dstptr < dstend)
+  {
+    ch = *src++;
+
+    if (strchr(".?*()[]^$\\", ch))
+      *dstptr++ = '\\';
+
+    *dstptr++ = ch;
+  }
+
+  *dstptr = '\0';
+
+  return (dst);
+}
+#endif /* HAVE_SANDBOX_H */
 
 
 /*

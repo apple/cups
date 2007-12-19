@@ -1710,6 +1710,9 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
     job->backend = 0;
   }
 
+  cupsdDestroyProfile(job->profile);
+  job->profile = NULL;
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "[Job %d] Closing print pipes [ %d %d ]...",
                   job->id, job->print_pipes[0], job->print_pipes[1]);
 
@@ -3182,6 +3185,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   job->status = 0;
   memset(job->filters, 0, sizeof(job->filters));
 
+  if (!job->profile)
+    job->profile = cupsdCreateProfile(job->id);
+
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -3292,7 +3298,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
 		            job->back_pipes[0], job->side_pipes[0], 0,
-			    job->filters + i);
+			    job->profile, job->filters + i);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "[Job %d] start_job: Closing filter pipes for slot %d "
@@ -3364,7 +3370,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
 			      job->back_pipes[1], job->side_pipes[1],
-			      backroot, &(job->backend));
+			      backroot, job->profile, &(job->backend));
 
       if (pid == 0)
       {
