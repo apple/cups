@@ -68,9 +68,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_copies;		/* Number of copies per file */
   int		num_files;		/* Number of files to print */
   const char	*files[1000];		/* Files to print */
-  int		num_dests;		/* Number of destinations */
-  cups_dest_t	*dests,			/* Destinations */
-		*dest;			/* Selected destination */
+  cups_dest_t	*dest;			/* Selected destination */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   int		deletefile;		/* Delete file after print? */
@@ -88,8 +86,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   deletefile  = 0;
   printer     = NULL;
-  num_dests   = 0;
-  dests       = NULL;
+  dest        = NULL;
   num_options = 0;
   options     = NULL;
   num_files   = 0;
@@ -258,10 +255,7 @@ main(int  argc,				/* I - Number of command-line arguments */
             if ((instance = strrchr(printer, '/')) != NULL)
 	      *instance++ = '\0';
 
-	    if (num_dests == 0)
-	      num_dests = cupsGetDests(&dests);
-
-            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
+            if ((dest = cupsGetNamedDest(NULL, printer, instance)) != NULL)
 	    {
 	      for (j = 0; j < dest->num_options; j ++)
 	        if (cupsGetOption(dest->options[j].name, num_options,
@@ -355,10 +349,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (printer == NULL)
   {
-    if (num_dests == 0)
-      num_dests = cupsGetDests(&dests);
-
-    if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
+    if ((dest = cupsGetNamedDest(NULL, NULL, NULL)) != NULL)
     {
       printer = dest->name;
 
@@ -387,7 +378,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       val = "LPDEST";
 
-    if (printer && !cupsGetDest(printer, NULL, num_dests, dests))
+    if (printer && !cupsGetNamedDest(NULL, printer, NULL))
       _cupsLangPrintf(stderr,
                       _("%s: Error - %s environment variable names "
 		        "non-existent destination \"%s\"!\n"),

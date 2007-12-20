@@ -16,7 +16,8 @@
  *
  * Contents:
  *
- *   main() - Main entry.
+ *   main()        - Main entry.
+ *   dests_equal() - Determine whether two destinations are equal.
  */
 
 /*
@@ -29,6 +30,14 @@
 
 
 /*
+ * Local functions...
+ */
+
+static int	dests_equal(cups_dest_t *a, cups_dest_t *b);
+static void	show_diffs(cups_dest_t *a, cups_dest_t *b);
+
+
+/*
  * 'main()' - Main entry.
  */
 
@@ -37,9 +46,11 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   int		status = 0,		/* Exit status */
+		i,			/* Looping var */
 		num_dests;		/* Number of destinations */
   cups_dest_t	*dests,			/* Destinations */
-		*dest;			/* Current destination */
+		*dest,			/* Current destination */
+		*named_dest;		/* Current named destination */
   const char	*ppdfile;		/* PPD file */
   ppd_file_t	*ppd;			/* PPD file data */
   int		num_jobs;		/* Number of jobs for queue */
@@ -61,7 +72,78 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
   else
-    puts("PASS");
+  {
+    printf("PASS (%d dests)\n", num_dests);
+
+    for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+    {
+      printf("    %s", dest->name);
+
+      if (dest->instance)
+        printf("    /%s", dest->instance);
+
+      if (dest->is_default)
+        puts(" ***DEFAULT***");
+      else
+        putchar('\n');
+    }
+  }
+
+ /*
+  * cupsGetDest(NULL)
+  */
+
+  fputs("cupsGetDest(NULL): ", stdout);
+  fflush(stdout);
+
+  if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+  {
+    for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+      if (dest->is_default)
+        break;
+
+    if (i)
+    {
+      status = 1;
+      puts("FAIL");
+    }
+    else
+      puts("PASS (no default)");
+
+    dest = NULL;
+  }
+  else
+    printf("PASS (%s)\n", dest->name);
+
+ /*
+  * cupsGetNamedDest(NULL, NULL, NULL)
+  */
+
+  fputs("cupsGetNamedDest(NULL, NULL, NULL): ", stdout);
+  fflush(stdout);
+
+  if ((named_dest = cupsGetNamedDest(NULL, NULL, NULL)) == NULL ||
+      !dests_equal(dest, named_dest))
+  {
+    if (!dest)
+      puts("PASS (no default)");
+    else if (named_dest)
+    {
+      puts("FAIL (different values)");
+      show_diffs(dest, named_dest);
+      status = 1;
+    }
+    else
+    {
+      puts("FAIL (no default)");
+      status = 1;
+    }
+  }
+  else
+    printf("PASS (%s)\n", named_dest->name);
+
+  if (named_dest)
+    cupsFreeDests(1, named_dest);
 
  /*
   * cupsGetDest(printer)
@@ -80,19 +162,33 @@ main(int  argc,				/* I - Number of command-line arguments */
     puts("PASS");
 
  /*
-  * cupsGetDest(NULL)
+  * cupsGetNamedDest(NULL, printer, instance)
   */
 
-  fputs("cupsGetDest(NULL): ", stdout);
+  printf("cupsGetNamedDest(NULL, \"%s\", \"%s\"): ", dest->name,
+         dest->instance ? dest->instance : "(null)");
   fflush(stdout);
 
-  if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) == NULL)
+  if ((named_dest = cupsGetNamedDest(NULL, dest->name,
+                                     dest->instance)) == NULL ||
+      !dests_equal(dest, named_dest))
   {
+    if (named_dest)
+    {
+      puts("FAIL (different values)");
+      show_diffs(dest, named_dest);
+    }
+    else
+      puts("FAIL (no destination)");
+
+
     status = 1;
-    puts("FAIL");
   }
   else
     puts("PASS");
+
+  if (named_dest)
+    cupsFreeDests(1, named_dest);
 
  /*
   * cupsPrintFile()
@@ -166,6 +262,84 @@ main(int  argc,				/* I - Number of command-line arguments */
   cupsFreeDests(num_dests, dests);
 
   return (status);
+}
+
+
+/*
+ * 'dests_equal()' - Determine whether two destinations are equal.
+ */
+
+static int				/* O - 1 if equal, 0 if not equal */
+dests_equal(cups_dest_t *a,		/* I - First destination */
+            cups_dest_t *b)		/* I - Second destination */
+{
+  int		i;			/* Looping var */
+  cups_option_t	*aoption;		/* Current option */
+  const char	*bval;			/* Option value */
+
+
+  if (a == b)
+    return (1);
+
+  if ((!a && b) || (a && !b))
+    return (0);
+
+  if (strcasecmp(a->name, b->name) ||
+      (a->instance && !b->instance) ||
+      (!a->instance && b->instance) ||
+      (a->instance && strcasecmp(a->instance, b->instance)) ||
+      a->num_options != b->num_options)
+    return (0);
+
+  for (i = a->num_options, aoption = a->options; i > 0; i --, aoption ++)
+    if ((bval = cupsGetOption(aoption->name, b->num_options,
+                              b->options)) == NULL ||
+        strcmp(aoption->value, bval))
+      return (0);
+
+  return (1);
+}
+
+
+/*
+ * 'show_diffs()' - Show differences between two destinations.
+ */
+
+static void
+show_diffs(cups_dest_t *a,		/* I - First destination */
+           cups_dest_t *b)		/* I - Second destination */
+{
+  int		i;			/* Looping var */
+  cups_option_t	*aoption;		/* Current option */
+  const char	*bval;			/* Option value */
+
+
+  if (!a || !b)
+    return;
+
+  puts("    Item                  cupsGetDest           cupsGetNamedDest");
+  puts("    --------------------  --------------------  --------------------");
+
+  if (strcasecmp(a->name, b->name))
+    printf("    name                  %-20.20s  %-20.20s\n", a->name, b->name);
+
+  if ((a->instance && !b->instance) ||
+      (!a->instance && b->instance) ||
+      (a->instance && strcasecmp(a->instance, b->instance)))
+    printf("    instance              %-20.20s  %-20.20s\n",
+           a->instance ? a->instance : "(null)",
+	   b->instance ? b->instance : "(null)");
+
+  if (a->num_options != b->num_options)
+    printf("    num_options           %-20d  %-20d\n", a->num_options,
+           b->num_options);
+
+  for (i = a->num_options, aoption = a->options; i > 0; i --, aoption ++)
+    if ((bval = cupsGetOption(aoption->name, b->num_options,
+                              b->options)) == NULL ||
+        strcmp(aoption->value, bval))
+      printf("    %-20.20s  %-20.20s  %-20.20s\n", aoption->name,
+             aoption->value, bval ? bval : "(null)");
 }
 
 

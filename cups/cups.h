@@ -249,6 +249,8 @@ extern void		cupsSetDefaultDest(const char *name,
 					   cups_dest_t *dests) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
+extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
+			                  const char *instance) _CUPS_API_1_4;
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
 			            time_t *modtime, char *buffer,
 				    size_t bufsize) _CUPS_API_1_4;
