@@ -80,7 +80,6 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		request[1024],		/* Quoted RequestRoot */
 		root[1024],		/* Quoted ServerRoot */
 		temp[1024];		/* Quoted TempDir */
-  size_t	requestlen;		/* Length of RequestRoot */
 
 
   if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
