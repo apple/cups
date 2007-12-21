@@ -1064,18 +1064,38 @@ asn1_get_string(
     char          *string,		/* I  - String buffer */
     int           strsize)		/* I  - String buffer size */
 {
-  if (length < strsize)
+  if (length < 0)
   {
-    memcpy(string, *buffer, length);
+   /*
+    * Disallow negative lengths!
+    */
+
+    fprintf(stderr, "ERROR: Bad ASN1 string length %d!\n", length);
+    *string = '\0';
+  }
+  else if (length < strsize)
+  {
+   /*
+    * String is smaller than the buffer...
+    */
+
+    if (length > 0)
+      memcpy(string, *buffer, length);
+
     string[length] = '\0';
   }
   else
   {
+   /*
+    * String is larger than the buffer...
+    */
+
     memcpy(string, buffer, strsize - 1);
     string[strsize - 1] = '\0';
   }
 
-  (*buffer) += length;
+  if (length > 0)
+    (*buffer) += length;
 
   return (string);
 }

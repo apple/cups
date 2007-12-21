@@ -25,6 +25,7 @@
  *                              server.
  *   cupsGetDests2()          - Get the list of destinations from the
  *                              specified server.
+ *   cupsGetNamedDest()       - Get options for the named destination.
  *   cupsRemoveDest()         - Remove a destination from the destination list.
  *   cupsDestSetDefaultDest() - Set the default destination.
  *   cupsSetDests()           - Set the list of destinations for the default
@@ -39,6 +40,7 @@
  * Include necessary headers...
  */
 
+#include "debug.h"
 #include "globals.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -53,10 +55,13 @@
  * Local functions...
  */
 
-static int	cups_get_dests(const char *filename, int num_dests,
+static const char *cups_get_default(const char *filename, char *namebuf,
+				    size_t namesize, const char **instance);
+static int	cups_get_dests(const char *filename, const char *match_name,
+		               const char *match_inst, int num_dests,
 		               cups_dest_t **dests);
-static int	cups_get_sdests(http_t *http, ipp_op_t op, int num_dests,
-		                cups_dest_t **dests);
+static int	cups_get_sdests(http_t *http, ipp_op_t op, const char *name,
+		                int num_dests, cups_dest_t **dests);
 
 
 /*
@@ -261,19 +266,17 @@ int					/* O - Number of destinations */
 cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 {
   int		num_dests;		/* Number of destinations */
-  http_t	*http;			/* HTTP connection */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * Connect to the CUPS server and get the destination list and options...
   */
 
-  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+  if (!cg->http)
+    cg->http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
-  num_dests = cupsGetDests2(http, dests);
-
-  if (http)
-    httpClose(http);
+  num_dests = cupsGetDests2(cg->http, dests);
 
   return (num_dests);
 }
@@ -328,8 +331,8 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   * Grab the printers and classes...
   */
 
-  num_dests = cups_get_sdests(http, CUPS_GET_PRINTERS, num_dests, dests);
-  num_dests = cups_get_sdests(http, CUPS_GET_CLASSES, num_dests, dests);
+  num_dests = cups_get_sdests(http, CUPS_GET_PRINTERS, NULL, num_dests, dests);
+  num_dests = cups_get_sdests(http, CUPS_GET_CLASSES, NULL, num_dests, dests);
 
  /*
   * Make a copy of the "real" queues for a later sanity check...
@@ -388,7 +391,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  num_dests = cups_get_dests(filename, num_dests, dests);
+  num_dests = cups_get_dests(filename, NULL, NULL, num_dests, dests);
 
   if ((home = getenv("HOME")) != NULL)
   {
@@ -396,7 +399,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
     if (access(filename, 0))
       snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
 
-    num_dests = cups_get_dests(filename, num_dests, dests);
+    num_dests = cups_get_dests(filename, NULL, NULL, num_dests, dests);
   }
 
  /*
@@ -446,6 +449,136 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
   */
 
   return (num_dests);
+}
+
+
+/*
+ * 'cupsGetNamedDest()' - Get options for the named destination.
+ *
+ * This function is optimized for retrieving a single destination and should
+ * be used instead of cupsGetDests() and cupsGetDest() when you either know
+ * the name of the destination or want to print to the default destination.
+ * If NULL is returned, the destination does not exist or there is no default
+ * destination.
+ *
+ * If "http" is NULL, the connection to the default print server will be used.
+ *
+ * If "name" is NULL, the default printer for the current user will be returned.
+ *
+ * The returned destination must be freed using cupsFreeDests() with a
+ * "num_dests" of 1.
+ *
+ * @since CUPS 1.4@
+ */
+
+cups_dest_t *				/* O - Destination or NULL */
+cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or NULL */
+                 const char *name,	/* I - Destination name or NULL */
+                 const char *instance)	/* I - Instance name or NULL */
+{
+  cups_dest_t	*dest;			/* Destination */
+  char		filename[1024],		/* Path to lpoptions */
+		defname[256];		/* Default printer name */
+  const char	*home = getenv("HOME");	/* Home directory */
+  ipp_op_t	op = IPP_GET_PRINTER_ATTRIBUTES;
+					/* IPP operation to get server ops */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+ /*
+  * Connect to the server as needed...
+  */
+
+  if (!http)
+  {
+    if (!cg->http &&
+        (cg->http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                       cupsEncryption())) == NULL)
+      return (NULL);
+
+    http = cg->http;
+  }
+
+ /*
+  * If "name" is NULL, find the default destination...
+  */
+
+  if (!name)
+  {
+    if ((name = getenv("LPDEST")) == NULL)
+      if ((name = getenv("PRINTER")) != NULL && !strcmp(name, "lp"))
+        name = NULL;
+
+    if (!name && home)
+    {
+     /*
+      * No default in the environment, try the user's lpoptions files...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+
+      if ((name = cups_get_default(filename, defname, sizeof(defname),
+				   &instance)) == NULL)
+      {
+	snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+	name = cups_get_default(filename, defname, sizeof(defname),
+				&instance);
+      }
+    }
+
+    if (!name)
+    {
+     /*
+      * Still not there?  Try the system lpoptions file...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/lpoptions",
+	       cg->cups_serverroot);
+      name = cups_get_default(filename, defname, sizeof(defname), &instance);
+    }
+
+    if (!name)
+    {
+     /*
+      * No locally-set default destination, ask the server...
+      */
+
+      op = CUPS_GET_DEFAULT;
+    }
+  }
+
+ /*
+  * Get the printer's attributes...
+  */
+
+  if (!cups_get_sdests(http, op, name, 0, &dest))
+    return (NULL);
+
+  if (instance)
+    dest->instance = _cupsStrAlloc(instance);
+
+ /*
+  * Then add local options...
+  */
+
+  snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
+  cups_get_dests(filename, name, instance, 1, &dest);
+
+  if (home)
+  {
+    snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
+
+    if (access(filename, 0))
+      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
+
+    cups_get_dests(filename, name, instance, 1, &dest);
+  }
+
+ /*
+  * Return the result...
+  */
+
+  return (dest);
 }
 
 
@@ -548,19 +681,17 @@ void
 cupsSetDests(int         num_dests,	/* I - Number of destinations */
              cups_dest_t *dests)	/* I - Destinations */
 {
-  http_t	*http;			/* HTTP connection */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * Connect to the CUPS server and save the destination list and options...
   */
 
-  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+  if (!cg->http)
+    cg->http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
-  cupsSetDests2(http, num_dests, dests);
-
-  if (http)
-    httpClose(http);
+  cupsSetDests2(cg->http, num_dests, dests);
 }
 
 
@@ -606,8 +737,8 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   * Get the server destinations...
   */
 
-  num_temps = cups_get_sdests(http, CUPS_GET_PRINTERS, 0, &temps);
-  num_temps = cups_get_sdests(http, CUPS_GET_CLASSES, num_temps, &temps);
+  num_temps = cups_get_sdests(http, CUPS_GET_PRINTERS, NULL, 0, &temps);
+  num_temps = cups_get_sdests(http, CUPS_GET_CLASSES, NULL, num_temps, &temps);
 
  /*
   * Figure out which file to write to...
@@ -622,7 +753,7 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
     * Merge in server defaults...
     */
 
-    num_temps = cups_get_dests(filename, num_temps, &temps);
+    num_temps = cups_get_dests(filename, NULL, NULL, num_temps, &temps);
 
    /*
     * Point to user defaults...
@@ -789,23 +920,87 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
 
 
 /*
+ * 'cups_get_default()' - Get the default destination from an lpoptions file.
+ */
+
+static const char *			/* O - Default destination or NULL */
+cups_get_default(const char *filename,	/* I - File to read */
+                 char       *namebuf,	/* I - Name buffer */
+		 size_t     namesize,	/* I - Size of name buffer */
+		 const char **instance)	/* I - Instance */
+{
+  cups_file_t	*fp;			/* lpoptions file */
+  char		line[8192],		/* Line from file */
+		*value,			/* Value for line */
+		*nameptr;		/* Pointer into name */
+  int		linenum;		/* Current line */  
+
+
+  *namebuf = '\0';
+
+  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  {
+    linenum  = 0;
+
+    while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+    {
+      if (!strcasecmp(line, "default") && value)
+      {
+        strlcpy(namebuf, value, namesize);
+
+	if ((nameptr = strchr(namebuf, ' ')) != NULL)
+	  *nameptr = '\0';
+	if ((nameptr = strchr(namebuf, '\t')) != NULL)
+	  *nameptr = '\0';
+
+	if ((nameptr = strchr(namebuf, '/')) != NULL)
+	  *nameptr++ = '\0';
+
+        *instance = nameptr;
+	break;
+      }
+    }
+
+    cupsFileClose(fp);
+  }
+
+  return (*namebuf ? namebuf : NULL);
+}
+
+
+/*
  * 'cups_get_dests()' - Get destinations from a file.
  */
 
 static int				/* O - Number of destinations */
 cups_get_dests(const char  *filename,	/* I - File to read from */
+               const char  *match_name,	/* I - Destination name we want */
+	       const char  *match_inst,	/* I - Instance name we want */
                int         num_dests,	/* I - Number of destinations */
                cups_dest_t **dests)	/* IO - Destinations */
 {
   int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
-  FILE		*fp;			/* File pointer */
+  cups_file_t	*fp;			/* File pointer */
   char		line[8192],		/* Line from file */
 		*lineptr,		/* Pointer into line */
 		*name,			/* Name of destination/option */
 		*instance;		/* Instance of destination */
+  int		linenum;		/* Current line number */
   const char	*printer;		/* PRINTER or LPDEST */
 
+
+  DEBUG_printf(("cups_get_dests(filename=\"%s\", match_name=\"%s\", "
+                "match_inst=\"%s\", num_dests=%d, dests=%p)\n", filename,
+		match_name ? match_name : "(null)",
+		match_inst ? match_inst : "(null)", num_dests, dests));
+
+ /*
+  * Try to open the file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+    return (num_dests);
 
  /*
   * Check environment variables...
@@ -816,12 +1011,8 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
       if (strcmp(printer, "lp") == 0)
         printer = NULL;
 
- /*
-  * Try to open the file...
-  */
-
-  if ((fp = fopen(filename, "r")) == NULL)
-    return (num_dests);
+  DEBUG_printf(("cups_get_dests: printer=\"%s\"\n",
+                printer ? printer : "(null)"));
 
  /*
   * Read each printer; each line looks like:
@@ -830,28 +1021,22 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
   *    Default name[/instance] options
   */
 
-  while (fgets(line, sizeof(line), fp) != NULL)
+  linenum = 0;
+
+  while (cupsFileGetConf(fp, line, sizeof(line), &lineptr, &linenum))
   {
    /*
     * See what type of line it is...
     */
 
-    if (strncasecmp(line, "dest", 4) == 0 && isspace(line[4] & 255))
-      lineptr = line + 4;
-    else if (strncasecmp(line, "default", 7) == 0 && isspace(line[7] & 255))
-      lineptr = line + 7;
-    else
+    DEBUG_printf(("cups_get_dests: linenum=%d line=\"%s\" lineptr=\"%s\"\n",
+                  linenum, line, lineptr ? lineptr : "(null)"));
+
+    if ((strcasecmp(line, "dest") && strcasecmp(line, "default")) || !lineptr)
+    {
+      DEBUG_puts("cups_get_dests: Not a dest or default line...");
       continue;
-
-   /*
-    * Skip leading whitespace...
-    */
-
-    while (isspace(*lineptr & 255))
-      lineptr ++;
-
-    if (!*lineptr)
-      continue;
+    }
 
     name = lineptr;
 
@@ -861,9 +1046,6 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
     while (!isspace(*lineptr & 255) && *lineptr && *lineptr != '/')
       lineptr ++;
-
-    if (!*lineptr)
-      continue;
 
     if (*lineptr == '/')
     {
@@ -884,30 +1066,49 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     else
       instance = NULL;
 
-    *lineptr++ = '\0';
+    if (*lineptr)
+      *lineptr++ = '\0';
+
+    DEBUG_printf(("cups_get_dests: name=\"%s\", instance=\"%s\"\n", name,
+                  instance));
 
    /*
     * See if the primary instance of the destination exists; if not,
     * ignore this entry and move on...
     */
 
-    if (cupsGetDest(name, NULL, num_dests, *dests) == NULL)
+    if (match_name)
+    {
+      if (strcasecmp(name, match_name) ||
+          (!instance && match_inst) ||
+	  (instance && !match_inst) ||
+	  (instance && strcasecmp(instance, match_inst)))
+	continue;
+
+      dest = *dests;
+    }
+    else if (cupsGetDest(name, NULL, num_dests, *dests) == NULL)
+    {
+      DEBUG_puts("cups_get_dests: Not found!");
       continue;
-
-   /*
-    * Add the destination...
-    */
-
-    num_dests = cupsAddDest(name, instance, num_dests, dests);
-
-    if ((dest = cupsGetDest(name, instance, num_dests, *dests)) == NULL)
+    }
+    else
     {
      /*
-      * Out of memory!
+      * Add the destination...
       */
 
-      fclose(fp);
-      return (num_dests);
+      num_dests = cupsAddDest(name, instance, num_dests, dests);
+
+      if ((dest = cupsGetDest(name, instance, num_dests, *dests)) == NULL)
+      {
+       /*
+	* Out of memory!
+	*/
+
+        DEBUG_puts("cups_get_dests: Out of memory!");
+        break;
+      }
     }
 
    /*
@@ -918,11 +1119,20 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
                                          &(dest->options));
 
    /*
+    * If we found what we were looking for, stop now...
+    */
+
+    if (match_name)
+      break;
+
+   /*
     * Set this as default if needed...
     */
 
-    if (strncasecmp(line, "default", 7) == 0 && printer == NULL)
+    if (!printer && !strcasecmp(line, "default"))
     {
+      DEBUG_puts("cups_get_dests: Setting as default...");
+
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;
 
@@ -934,7 +1144,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
   * Close the file and return...
   */
 
-  fclose(fp);      
+  cupsFileClose(fp);      
 
   return (num_dests);
 }
@@ -946,7 +1156,8 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
 static int				/* O - Number of destinations */
 cups_get_sdests(http_t      *http,	/* I - HTTP connection */
-                ipp_op_t    op,		/* I - get-printers or get-classes */
+                ipp_op_t    op,		/* I - IPP operation */
+		const char  *name,	/* I - Name of destination */
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
@@ -963,8 +1174,9 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
   const char	*info,			/* printer-info attribute */
 		*location,		/* printer-location attribute */
 		*make_model,		/* printer-make-and-model attribute */
-		*name;			/* printer-name attribute */
-  char		job_sheets[1024],	/* job-sheets-default attribute */
+		*printer_name;		/* printer-name attribute */
+  char		uri[1024],		/* printer-uri value */
+		job_sheets[1024],	/* job-sheets-default attribute */
 		auth_info_req[1024],	/* auth-info-required attribute */
 		reasons[1024];		/* printer-state-reasons attribute */
   int		num_options;		/* Number of options */
@@ -1008,6 +1220,14 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, cupsUser());
 
+  if (name)
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", ippPort(), "/printers/%s", name);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+                 uri);
+  }
+
  /*
   * Do the request and get back a response...
   */
@@ -1030,17 +1250,17 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       * Pull the needed attributes from this printer...
       */
 
-      accepting   = 0;
-      change_time = 0;
-      info        = NULL;
-      location    = NULL;
-      make_model  = NULL;
-      name        = NULL;
-      num_options = 0;
-      options     = NULL;
-      shared      = 1;
-      state       = IPP_PRINTER_IDLE;
-      type        = CUPS_PRINTER_LOCAL;
+      accepting    = 0;
+      change_time  = 0;
+      info         = NULL;
+      location     = NULL;
+      make_model   = NULL;
+      printer_name = NULL;
+      num_options  = 0;
+      options      = NULL;
+      shared       = 1;
+      state        = IPP_PRINTER_IDLE;
+      type         = CUPS_PRINTER_LOCAL;
 
       auth_info_req[0] = '\0';
       job_sheets[0]    = '\0';
@@ -1091,7 +1311,7 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
 	  make_model = attr->values[0].string.text;
         else if (!strcmp(attr->name, "printer-name") &&
 	         attr->value_tag == IPP_TAG_NAME)
-	  name = attr->values[0].string.text;
+	  printer_name = attr->values[0].string.text;
 	else if (!strcmp(attr->name, "printer-state") &&
 	         attr->value_tag == IPP_TAG_ENUM)
           state = attr->values[0].integer;
@@ -1196,7 +1416,7 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
       * See if we have everything needed...
       */
 
-      if (!name)
+      if (!printer_name)
       {
         cupsFreeOptions(num_options, options);
 
@@ -1206,9 +1426,9 @@ cups_get_sdests(http_t      *http,	/* I - HTTP connection */
           continue;
       }
 
-      num_dests = cupsAddDest(name, NULL, num_dests, dests);
+      num_dests = cupsAddDest(printer_name, NULL, num_dests, dests);
 
-      if ((dest = cupsGetDest(name, NULL, num_dests, *dests)) != NULL)
+      if ((dest = cupsGetDest(printer_name, NULL, num_dests, *dests)) != NULL)
       {
         dest->num_options = num_options;
 	dest->options     = options;

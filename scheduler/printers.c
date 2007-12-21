@@ -1691,10 +1691,12 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		  "username",
 		  "password"
 		};
+#ifdef HAVE_GSSAPI
   static const char * const air_negotiate[] =
 		{			/* Kerberos authentication */
 		  "negotiate"
 		};
+#endif /* HAVE_GSSAPI */
   static const char * const air_none[] =
 		{			/* No authentication */
 		  "none"

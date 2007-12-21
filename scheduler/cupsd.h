@@ -160,6 +160,8 @@ VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
 VAR int			NeedReload	VALUE(RELOAD_ALL);
 					/* Need to load configuration? */
+VAR void		*DefaultProfile	VALUE(0);
+					/* Default security profile */
 
 #ifdef HAVE_GSSAPI
 VAR krb5_context	KerberosContext;/* Kerberos context for credentials */
@@ -208,12 +210,14 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
 
+extern void	*cupsdCreateProfile(int job_id);
+extern void	cupsdDestroyProfile(void *profile);
 extern int	cupsdEndProcess(int pid, int force);
 extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int sidefd,
-				  int root, int *pid);
+				  int root, void *profile, int *pid);
 
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
 		               cupsd_selfunc_t write_cb, void *data);

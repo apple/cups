@@ -1639,18 +1639,22 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                    request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 
-            cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                    "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
-	                    con->filename, con->file);
-
 	    if (con->file < 0)
 	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Unable to create request file %s: %s",
+	                      con->filename, strerror(errno));
+
 	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
 	      }
 	    }
+
+            cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                    "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
+	                    con->filename, con->file);
 
 	    fchmod(con->file, 0640);
 	    fchown(con->file, RunUser, Group);
@@ -1978,17 +1982,21 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
             cupsdSetStringf(&con->filename, "%s/%08x", RequestRoot, request_id ++);
 	    con->file = open(con->filename, O_WRONLY | O_CREAT | O_TRUNC, 0640);
 
-            cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
-	                    con->filename, con->file);
-
 	    if (con->file < 0)
 	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+	                      "Unable to create request file %s: %s",
+	                      con->filename, strerror(errno));
+
 	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
 	      }
 	    }
+
+            cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: %d REQUEST %s=%d", con->http.fd,
+	                    con->filename, con->file);
 
 	    fchmod(con->file, 0640);
 	    fchown(con->file, RunUser, Group);
@@ -3839,7 +3847,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, &pid))
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
+                           &pid))
     {
       unlink(seedfile);
       return (0);
@@ -3916,7 +3925,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 
   infofd = open(infofile, O_RDONLY);
 
-  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, &pid))
+  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
+                         &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4149,7 +4159,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 
   infofd = open(infofile, O_RDONLY);
 
-  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, &pid))
+  if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
+                         &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4549,7 +4560,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   */
 
   if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
-			-1, -1, root, &pid) < 0)
+			-1, -1, root, DefaultProfile, &pid) < 0)
   {
    /*
     * Error - can't fork!

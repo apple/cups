@@ -30,6 +30,7 @@ if test x$enable_pam != xno; then
 
 	AC_CHECK_LIB(dl,dlopen)
 	AC_CHECK_LIB(pam,pam_start)
+	AC_CHECK_LIB(pam,pam_set_item,AC_DEFINE(HAVE_PAM_SET_ITEM))
 	AC_CHECK_HEADER(security/pam_appl.h)
 	if test x$ac_cv_header_security_pam_appl_h != xyes; then
 		AC_CHECK_HEADER(pam/pam_appl.h,

@@ -113,6 +113,7 @@ _cupsGetFd
 _cupsGetFile
 _cupsGetJobs
 _cupsGetJobs2
+_cupsGetNamedDest
 _cupsGetOption
 _cupsGetPassword
 _cupsGetPPD

@@ -85,13 +85,6 @@
 
 
 /*
- * Maximum number of file descriptors to support.
- */
-
-#define CUPS_MAX_FDS		4096
-
-
-/*
  * Do we have domain socket support?
  */
 
@@ -138,6 +131,7 @@
 #endif /* !HAVE_LIBPAM */
 
 #undef HAVE_PAM_PAM_APPL_H
+#undef HAVE_PAM_SET_ITEM
 
 
 /*
@@ -550,6 +544,13 @@
  */
 
 #undef HAVE_REMOVEFILE
+
+
+/*
+ * Do we have <sandbox.h>?
+ */
+
+#undef HAVE_SANDBOX_H
 
 
 #endif /* !_CUPS_CONFIG_H_ */

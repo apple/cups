@@ -29,24 +29,6 @@ fi
 AC_CHECK_MEMBER(struct sockaddr.sa_len,,, [#include <sys/socket.h>])
 AC_CHECK_HEADER(sys/sockio.h, AC_DEFINE(HAVE_SYS_SOCKIO_H))
 
-if test "$uname" = "SunOS"; then
-	case "$uversion" in
-		55* | 56*)
-			maxfiles=1024
-			;;
-		*)
-			maxfiles=4096
-			;;
-	esac
-else
-	maxfiles=4096
-fi
-
-AC_ARG_WITH(maxfiles, [  --with-maxfiles=N       set maximum number of file descriptors for scheduler ],
-	maxfiles=$withval)
-
-AC_DEFINE_UNQUOTED(CUPS_MAX_FDS, $maxfiles)
-
 CUPS_DEFAULT_DOMAINSOCKET=""
 
 dnl Domain socket support...

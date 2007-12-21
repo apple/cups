@@ -1512,17 +1512,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     */
 
     if (auth_info)
-    {
-      if (job->attrs->prev)
-        job->attrs->prev->next = auth_info->next;
-      else
-        job->attrs->attrs = auth_info->next;
-
-      if (job->attrs->last == auth_info)
-        job->attrs->last = job->attrs->prev;
-
-      _ippFreeAttr(auth_info);
-    }
+      ippDeleteAttribute(job->attrs, auth_info);
   }
 
   if ((attr = ippFindAttribute(job->attrs, "job-originating-host-name",
@@ -4303,10 +4293,11 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
 
   if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
-                         -1, -1, 0, &temppid))
+                         -1, -1, 0, DefaultProfile, &temppid))
   {
     close(tempfd);
     unlink(tempfile);
+
     return (-1);
   }
 

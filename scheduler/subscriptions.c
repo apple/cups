@@ -1565,7 +1565,7 @@ cupsd_start_notifier(
   */
 
   if (cupsdStartProcess(command, argv, envp, fds[0], -1, NotifierPipes[1],
-			-1, -1, 0, &pid) < 0)
+			-1, -1, 0, DefaultProfile, &pid) < 0)
   {
    /*
     * Error - can't fork!

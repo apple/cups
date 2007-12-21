@@ -657,6 +657,14 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      return;
 	    }
 
+#  if defined(HAVE_PAM_SET_ITEM) && defined(PAM_RHOST)
+	    pamerr = pam_set_item(pamh, PAM_RHOST, con->http.hostname);
+	    if (pamerr != PAM_SUCCESS)
+	      cupsdLogMessage(CUPSD_LOG_WARN,
+	                      "cupsdAuthorize: pam_set_item() returned %d "
+			      "(%s)!\n", pamerr, pam_strerror(pamh, pamerr));
+#  endif /* HAVE_PAM_SET_ITEM && PAM_RHOST */
+
 	    pamerr = pam_authenticate(pamh, PAM_SILENT);
 	    if (pamerr != PAM_SUCCESS)
 	    {

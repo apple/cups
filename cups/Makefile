@@ -265,7 +265,7 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
+libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER) libcups.exp
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
