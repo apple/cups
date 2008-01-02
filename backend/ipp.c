@@ -3,7 +3,7 @@
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -865,12 +865,13 @@ main(int  argc,				/* I - Number of command-line args */
     num_options = cupsParseOptions(argv[5], 0, &options);
 
 #ifdef __APPLE__
-    if (!strcasecmp(content_type, "application/pictwps") && num_files == 1)
+    if (!strcasecmp(final_content_type, "application/pictwps") &&
+        num_files == 1)
     {
       if (format_sup != NULL)
       {
 	for (i = 0; i < format_sup->num_values; i ++)
-	  if (!strcasecmp(content_type, format_sup->values[i].string.text))
+	  if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
 	    break;
       }
 

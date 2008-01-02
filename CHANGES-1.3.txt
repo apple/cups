@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.6
 
+	- The IPP backend did not handle printing of pictwps files
+	  to a non-Mac CUPS server properly.
 	- The scheduler did not detect network interface changes
 	  on operating systems other than Mac OS X (STR #2631)
 	- The scheduler now logs the UNIX error message when it
