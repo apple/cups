@@ -308,8 +308,7 @@ main(int  argc,				// I - Number of command-line args
     // write PostScript file
     psOut = new PSOutputDev(psFileName->getCString(), doc->getXRef(),
                             doc->getCatalog(), 1, doc->getNumPages(),
-			    psModePS, 0, 0, 0, 0, gFalse,
-			    cupsGetOption("page-ranges", num_options, options));
+			    psModePS, 0, 0, 0, 0, gFalse, NULL);
     if (psOut->isOk())
       doc->displayPages(psOut, 1, doc->getNumPages(), 72.0, 72.0, 0,
                         gTrue, gFalse, gFalse);
