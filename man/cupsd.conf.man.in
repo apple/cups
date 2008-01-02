@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "6 June 2006" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "2 January 2008" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -229,6 +229,12 @@ Specifies the default language to use for text and web content.
 DefaultPolicy policy-name
 .br
 Specifies the default access policy to use.
+.TP 5
+DefaultShared Yes
+.TP 5
+DefaultShared No
+.br
+Specifies whether local printers are shared by default.
 .TP 5
 Deny all
 .TP 5
@@ -606,7 +612,7 @@ Specifies the user name or ID that is used when running external programs.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
