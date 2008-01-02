@@ -3,9 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.6
 
-	- Documentation updates (STR #2649)
+	- Documentation updates (STR #2646, STR #2647, STR #2649)
 	- The PDF filter incorrectly filtered pages when page-ranges
-	  and number-up were both specified.
+	  and number-up were both specified (STR #2643)
 	- The IPP backend did not handle printing of pictwps files
 	  to a non-Mac CUPS server properly.
 	- The scheduler did not detect network interface changes
