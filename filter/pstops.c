@@ -889,7 +889,8 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   * Finish up the last page(s)...
   */
 
-  if (number && is_not_last_page(number) && cupsArrayLast(doc->pages))
+  if (number && is_not_last_page(number) && cupsArrayLast(doc->pages) &&
+      check_range(doc, (number - 1) / doc->number_up + 1))
   {
     pageinfo = (pstops_page_t *)cupsArrayLast(doc->pages);
 
