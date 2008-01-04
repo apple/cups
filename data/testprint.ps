@@ -14,7 +14,7 @@
 %
 %   PostScript test page for the Common UNIX Printing System ("CUPS").
 %
-%   Copyright 2007 Apple Inc.
+%   Copyright 2007-2008 Apple Inc.
 %   Copyright 1993-2007 Easy Software Products
 %
 %   These coded instructions, statements, and computer programs are the
@@ -567,16 +567,16 @@ gsave
   pageWidth 17 mul			% Center of page
   pageHeight 10 mul			% Bottom of page
   moveto				% Position text
-  (Printed Using CUPS v1.3.x) show
+  (Printed Using CUPS v1.4.x) show
 
   pageWidth 17 mul			% Left side of page
   pageHeight 8 mul			% Move down...
   2 copy moveto				% Position text
   smallFont setfont			% Font
-  (Copyright 2007 Apple Inc., All Rights Reserved. CUPS and the CUPS logo are the trademark) show
+  (Copyright 2007-2008 Apple Inc., All Rights Reserved. CUPS and the CUPS logo are the) show
   pageHeight 2 add sub			% Move down...
   2 copy moveto				% Position text
-  (property of Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA.) show
+  (trademark property of Apple Inc., 1 Infinite Loop, Cupertino, CA 95014, USA.) show
   pageHeight 2 mul 4 add sub		% Move down...
   moveto				% Position text
   (Need help? Contact your operating system vendor or visit "http://www.cups.org/".) show

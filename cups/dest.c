@@ -265,20 +265,7 @@ cupsGetDest(const char  *name,		/* I - Destination name or NULL for the default 
 int					/* O - Number of destinations */
 cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
 {
-  int		num_dests;		/* Number of destinations */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-
-
- /*
-  * Connect to the CUPS server and get the destination list and options...
-  */
-
-  if (!cg->http)
-    cg->http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
-
-  num_dests = cupsGetDests2(cg->http, dests);
-
-  return (num_dests);
+  return (cupsGetDests2(CUPS_HTTP_DEFAULT, dests));
 }
 
 
@@ -297,7 +284,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  */
 
 int					/* O - Number of destinations */
-cupsGetDests2(http_t      *http,	/* I - HTTP connection */
+cupsGetDests2(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
               cups_dest_t **dests)	/* O - Destinations */
 {
   int		i;			/* Looping var */
@@ -310,14 +297,14 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
 		*instance;		/* Pointer to instance name */
   int		num_reals;		/* Number of real queues */
   cups_dest_t	*reals;			/* Real queues */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * Range check the input...
   */
 
-  if (!http || !dests)
+  if (!dests)
     return (0);
 
  /*
@@ -461,7 +448,8 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
  * If NULL is returned, the destination does not exist or there is no default
  * destination.
  *
- * If "http" is NULL, the connection to the default print server will be used.
+ * If "http" is CUPS_HTTP_DEFAULT, the connection to the default print server
+ * will be used.
  *
  * If "name" is NULL, the default printer for the current user will be returned.
  *
@@ -472,7 +460,7 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection */
  */
 
 cups_dest_t *				/* O - Destination or NULL */
-cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or NULL */
+cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
                  const char *name,	/* I - Destination name or NULL */
                  const char *instance)	/* I - Instance name or NULL */
 {
@@ -484,20 +472,6 @@ cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or NULL */
 					/* IPP operation to get server ops */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
-
- /*
-  * Connect to the server as needed...
-  */
-
-  if (!http)
-  {
-    if (!cg->http &&
-        (cg->http = httpConnectEncrypt(cupsServer(), ippPort(),
-                                       cupsEncryption())) == NULL)
-      return (NULL);
-
-    http = cg->http;
-  }
 
  /*
   * If "name" is NULL, find the default destination...
@@ -634,7 +608,7 @@ cupsRemoveDest(const char  *name,	/* I  - Destination name */
 
 
 /*
- * 'cupsDestSetDefaultDest()' - Set the default destination.
+ * 'cupsSetDefaultDest()' - Set the default destination.
  *
  * @since CUPS 1.3@
  */
@@ -681,17 +655,7 @@ void
 cupsSetDests(int         num_dests,	/* I - Number of destinations */
              cups_dest_t *dests)	/* I - Destinations */
 {
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-
-
- /*
-  * Connect to the CUPS server and save the destination list and options...
-  */
-
-  if (!cg->http)
-    cg->http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
-
-  cupsSetDests2(cg->http, num_dests, dests);
+  cupsSetDests2(CUPS_HTTP_DEFAULT, num_dests, dests);
 }
 
 
@@ -705,7 +669,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsSetDests2(http_t      *http,	/* I - HTTP connection */
+cupsSetDests2(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
               int         num_dests,	/* I - Number of destinations */
               cups_dest_t *dests)	/* I - Destinations */
 {
@@ -723,14 +687,14 @@ cupsSetDests2(http_t      *http,	/* I - HTTP connection */
   cups_dest_t	*temps,			/* Temporary destinations */
 		*temp;			/* Current temporary dest */
   const char	*val;			/* Value of temporary option */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
   * Range check the input...
   */
 
-  if (!http || !num_dests || !dests)
+  if (!num_dests || !dests)
     return (-1);
 
  /*
@@ -1155,7 +1119,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
  */
 
 static int				/* O - Number of destinations */
-cups_get_sdests(http_t      *http,	/* I - HTTP connection */
+cups_get_sdests(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
                 ipp_op_t    op,		/* I - IPP operation */
 		const char  *name,	/* I - Name of destination */
                 int         num_dests,	/* I - Number of destinations */

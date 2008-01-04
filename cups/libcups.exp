@@ -62,7 +62,9 @@ _cupsBackChannelRead
 _cupsBackChannelWrite
 _cupsBackendDeviceURI
 _cupsCancelJob
+_cupsCancelJob2
 _cupsCharsetToUTF8
+_cupsCreateJob
 _cupsDirClose
 _cupsDirOpen
 _cupsDirRead
@@ -100,6 +102,7 @@ _cupsFileStdout
 _cupsFileTell
 _cupsFileUnlock
 _cupsFileWrite
+_cupsFinishDocument
 _cupsFreeDests
 _cupsFreeJobs
 _cupsFreeOptions
@@ -120,6 +123,7 @@ _cupsGetPPD
 _cupsGetPPD2
 _cupsGetPPD3
 _cupsGetPrinters
+_cupsGetResponse
 _cupsGetServerPPD
 _cupsLangDefault
 _cupsLangEncoding
@@ -138,8 +142,10 @@ _cupsPrintFiles
 _cupsPrintFiles2
 _cupsPutFd
 _cupsPutFile
+_cupsReadResponseData
 _cupsRemoveDest
 _cupsRemoveOption
+_cupsSendRequest
 _cupsServer
 _cupsSetDefaultDest
 _cupsSetDests
@@ -151,6 +157,7 @@ _cupsSetUser
 _cupsSideChannelDoRequest
 _cupsSideChannelRead
 _cupsSideChannelWrite
+_cupsStartDocument
 _cupsTempFd
 _cupsTempFile
 _cupsTempFile2
@@ -158,6 +165,7 @@ _cupsUser
 _cupsUTF32ToUTF8
 _cupsUTF8ToCharset
 _cupsUTF8ToUTF32
+_cupsWriteRequestData
 _httpAddrAny
 _httpAddrConnect
 _httpAddrEqual

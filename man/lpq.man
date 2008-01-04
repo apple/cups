@@ -3,7 +3,7 @@
 .\"
 .\"   lpq man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpq 1 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH lpq 1 "Common UNIX Printing System" "2 January 2008" "Apple Inc."
 .SH NAME
 lpq \- show printer queue status
 .SH SYNOPSIS
@@ -33,7 +33,7 @@ no printer or class is specified on the command-line.
 .LP
 The \fI+interval\fR option allows you to continuously report the
 jobs in the queue until the queue is empty; the list of jobs is
-show one every \fIinterval\fR seconds.
+show once every \fIinterval\fR seconds.
 .SH OPTIONS
 \fIlpq\fR supports the following options:
 .TP 5
@@ -66,7 +66,7 @@ Requests a more verbose (long) reporting format.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id: lpq.man 6649 2007-07-11 21:46:42Z mike $".
 .\"

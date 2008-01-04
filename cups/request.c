@@ -3,7 +3,7 @@
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,11 +16,15 @@
  *
  * Contents:
  *
- *   cupsDoFileRequest() - Do an IPP request with a file.
- *   cupsDoIORequest()   - Do an IPP request with file descriptors.
- *   cupsDoRequest()     - Do an IPP request.
- *   _cupsSetError()     - Set the last IPP status code and status-message.
- *   _cupsSetHTTPError() - Set the last error using the HTTP status.
+ *   cupsDoFileRequest()    - Do an IPP request with a file.
+ *   cupsDoIORequest()      - Do an IPP request with file descriptors.
+ *   cupsDoRequest()        - Do an IPP request.
+ *   cupsGetResponse()      - Get a response to an IPP request.
+ *   cupsReadResponseData() - Read additional data after the IPP response.
+ *   cupsSendRequest()      - Send an IPP request.
+ *   cupsWriteRequestData() - Write additional data after an IPP request.
+ *   _cupsSetError()        - Set the last IPP status code and status-message.
+ *   _cupsSetHTTPError()    - Set the last error using the HTTP status.
  */
 
 /*
@@ -52,7 +56,7 @@
  */
 
 ipp_t *					/* O - Response data */
-cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
+cupsDoFileRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
                   ipp_t      *request,	/* I - IPP request */
                   const char *resource,	/* I - HTTP resource for POST */
 		  const char *filename)	/* I - File to send or NULL for none */
@@ -106,36 +110,43 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection to server */
  */
 
 ipp_t *					/* O - Response data */
-cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
+cupsDoIORequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
                 ipp_t      *request,	/* I - IPP request */
                 const char *resource,	/* I - HTTP resource for POST */
 		int        infile,	/* I - File to read from or -1 for none */
 		int        outfile)	/* I - File to write to or -1 for none */
 {
-  ipp_t		*response;		/* IPP response data */
-  size_t	length;			/* Content-Length value */
+  ipp_t		*response = NULL;	/* IPP response data */
+  size_t	length = 0;		/* Content-Length value */
   http_status_t	status;			/* Status of HTTP request */
-  int		got_status;		/* Did we get the status? */
-  ipp_state_t	state;			/* State of IPP processing */
   struct stat	fileinfo;		/* File information */
   int		bytes;			/* Number of bytes read/written */
   char		buffer[32768];		/* Output buffer */
-  http_status_t	expect;			/* Expect: header to use */
 
 
-  DEBUG_printf(("cupsDoFileRequest(%p, %p, \'%s\', \'%s\')\n",
-                http, request, resource ? resource : "(null)",
-		filename ? filename : "(null)"));
+  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p, resource=\"%s\""
+                "infile=%d, outfile=%d)\n", http, request,
+		resource ? resource : "(null)", infile, outfile));
 
-  if (http == NULL || request == NULL || resource == NULL)
+ /*
+  * Range check input...
+  */
+
+  if (!request || !resource)
   {
-    if (request != NULL)
-      ippDelete(request);
+    ippDelete(request);
 
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
 
     return (NULL);
   }
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * See if we have a file to send...
@@ -149,7 +160,7 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
       * Can't get file information!
       */
 
-      _cupsSetError(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
+      _cupsSetError(errno == EBADF ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
                     strerror(errno));
 
       ippDelete(request);
@@ -173,112 +184,39 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
 
       return (NULL);
     }
+
+#ifndef WIN32
+    if (!S_ISREG(fileinfo.st_mode))
+      length = 0;			/* Chunk when piping */
+    else
+#endif /* !WIN32 */
+    length = ippLength(request) + fileinfo.st_size;
   }
-
-#ifdef HAVE_SSL
- /*
-  * See if we have an auth-info attribute and are communicating over
-  * a non-local link.  If so, encrypt the link so that we can pass
-  * the authentication information securely...
-  */
-
-  if (ippFindAttribute(request, "auth-info", IPP_TAG_TEXT) &&
-      !httpAddrLocalhost(http->hostaddr) && !http->tls &&
-      httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
-    return (NULL);
-#endif /* HAVE_SSL */
+  else
+    length = ippLength(request);
 
  /*
   * Loop until we can send the request without authorization problems.
   */
-
-  response = NULL;
-  status   = HTTP_ERROR;
-  expect   = HTTP_CONTINUE;
 
   while (response == NULL)
   {
     DEBUG_puts("cupsDoFileRequest: setup...");
 
    /*
-    * Setup the HTTP variables needed...
+    * Send the request...
     */
 
-    length = ippLength(request);
-    if (infile >= 0)
-    {
-#ifndef WIN32
-      if (!S_ISREG(fileinfo.st_mode))
-        length = 0;			/* Chunk when piping */
-      else
-#endif /* !WIN32 */
-      length += fileinfo.st_size;
-    }
+    status = cupsSendRequest(http, request, resource, length);
 
-    httpClearFields(http);
-    httpSetLength(http, length);
-    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
-    httpSetExpect(http, expect);
+    DEBUG_printf(("cupsDoFileRequest: status=%d\n", status));
 
-    DEBUG_printf(("cupsDoFileRequest: authstring=\"%s\"\n", http->authstring));
-
-   /*
-    * Try the request...
-    */
-
-    DEBUG_puts("cupsDoFileRequest: post...");
-
-    if (httpPost(http, resource))
-    {
-      if (httpReconnect(http))
-      {
-        status = HTTP_ERROR;
-        break;
-      }
-      else
-        continue;
-    }
-
-   /*
-    * Send the IPP data...
-    */
-
-    DEBUG_puts("cupsDoFileRequest: ipp write...");
-
-    request->state = IPP_IDLE;
-    status         = HTTP_CONTINUE;
-    got_status     = 0;
-
-    while ((state = ippWrite(http, request)) != IPP_DATA)
-      if (state == IPP_ERROR)
-	break;
-      else if (httpCheck(http))
-      {
-        got_status = 1;
-
-	if ((status = httpUpdate(http)) != HTTP_CONTINUE)
-	  break;
-      }
-
-    if (!got_status)
-    {
-     /*
-      * Wait up to 1 second to get the 100-continue response...
-      */
-
-      if (httpWait(http, 1000))
-        status = httpUpdate(http);
-    }
-    else if (httpCheck(http))
-      status = httpUpdate(http);
-
-    if (status == HTTP_CONTINUE && state == IPP_DATA && infile >= 0)
+    if (status == HTTP_CONTINUE && request->state == IPP_DATA && infile >= 0)
     {
       DEBUG_puts("cupsDoFileRequest: file write...");
 
      /*
-      * Send the file...
+      * Send the file with the request...
       */
 
 #ifndef WIN32
@@ -300,125 +238,18 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
     }
 
    /*
-    * Get the server's return status...
+    * Get the server's response...
     */
 
-    DEBUG_puts("cupsDoFileRequest: update...");
-
-    while (status == HTTP_CONTINUE)
-      status = httpUpdate(http);
-
-    DEBUG_printf(("cupsDoFileRequest: status = %d\n", status));
-
-    if (status == HTTP_UNAUTHORIZED)
+    if (status == HTTP_CONTINUE || status == HTTP_OK)
     {
-      DEBUG_puts("cupsDoFileRequest: unauthorized...");
-
-     /*
-      * Flush any error message...
-      */
-
-      httpFlush(http);
-
-     /*
-      * See if we can do authentication...
-      */
-
-      if (cupsDoAuthentication(http, "POST", resource))
-        break;
-
-      if (httpReconnect(http))
-      {
-        status = HTTP_ERROR;
-	break;
-      }
-
-      continue;
+      response = cupsGetResponse(http, resource);
+      status   = http->status;
     }
-    else if (status == HTTP_ERROR)
+
+    if (response)
     {
-      DEBUG_printf(("cupsDoFileRequest: http->error=%d (%s)\n", http->error,
-                    strerror(http->error)));
-
-#ifdef WIN32
-      if (http->error != WSAENETDOWN && http->error != WSAENETUNREACH &&
-          http->error != WSAETIMEDOUT)
-#else
-      if (http->error != ENETDOWN && http->error != ENETUNREACH &&
-          http->error != ETIMEDOUT)
-#endif /* WIN32 */
-        continue;
-      else
-        break;
-    }
-#ifdef HAVE_SSL
-    else if (status == HTTP_UPGRADE_REQUIRED)
-    {
-      /* Flush any error message... */
-      httpFlush(http);
-
-      /* Reconnect... */
-      if (httpReconnect(http))
-      {
-        status = HTTP_ERROR;
-        break;
-      }
-
-      /* Upgrade with encryption... */
-      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
-
-      /* Try again, this time with encryption enabled... */
-      continue;
-    }
-#endif /* HAVE_SSL */
-    else if (status == HTTP_EXPECTATION_FAILED)
-    {
-     /*
-      * Don't try using the Expect: header the next time around...
-      */
-
-      expect = (http_status_t)0;
-    }
-    else if (status != HTTP_OK)
-    {
-      DEBUG_printf(("cupsDoFileRequest: error %d...\n", status));
-
-     /*
-      * Flush any error message...
-      */
-
-      httpFlush(http);
-      break;
-    }
-    else
-    {
-     /*
-      * Read the response...
-      */
-
-      DEBUG_puts("cupsDoFileRequest: response...");
-
-      response = ippNew();
-
-      while ((state = ippRead(http, response)) != IPP_DATA)
-	if (state == IPP_ERROR)
-	  break;
-
-      if (state == IPP_ERROR)
-      {
-       /*
-        * Delete the response...
-	*/
-
-        DEBUG_puts("IPP read error!");
-	ippDelete(response);
-	response = NULL;
-
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
-
-	break;
-      }
-      else if (outfile >= 0)
+      if (outfile >= 0)
       {
        /*
         * Write trailing data to file...
@@ -445,6 +276,150 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
   
   ippDelete(request);
 
+  return (response);
+}
+
+
+/*
+ * 'cupsDoRequest()' - Do an IPP request.
+ *
+ * This function sends the IPP request to the specified server, retrying
+ * and authenticating as necessary.  The request is freed with ippDelete()
+ * after receiving a valid IPP response.
+ */
+
+ipp_t *					/* O - Response data */
+cupsDoRequest(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+              ipp_t      *request,	/* I - IPP request */
+              const char *resource)	/* I - HTTP resource for POST */
+{
+  return (cupsDoFileRequest(http, request, resource, NULL));
+}
+
+
+/*
+ * 'cupsGetResponse()' - Get a response to an IPP request.
+ *
+ * Use this function to get the response for an IPP request sent using
+ * cupsSendDocument() or cupsSendRequest(). For requests that return
+ * additional data, use httpRead() after getting a successful response.
+ *
+ * @since CUPS 1.4@
+ */
+
+ipp_t *					/* O - Response or NULL on HTTP error */
+cupsGetResponse(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+                const char *resource)	/* I - HTTP resource for POST */
+{
+  http_status_t	status;			/* HTTP status */
+  ipp_state_t	state;			/* IPP read state */
+  ipp_t		*response = NULL;	/* IPP response */
+
+
+  DEBUG_printf(("cupsGetReponse(http=%p)\n", http));
+
+ /*
+  * Connect to the default server as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+  if (!http || (http->state != HTTP_POST_RECV && http->state != HTTP_POST_SEND))
+    return (NULL);
+
+ /*
+  * Check for an unfinished chunked request...
+  */
+
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+  {
+   /*
+    * Send a 0-length chunk to finish off the request...
+    */
+
+    DEBUG_puts("cupsGetResponse: Finishing chunked POST...");
+
+    if (httpWrite2(http, "", 0) < 0)
+      return (NULL);
+  }
+
+ /*
+  * Wait for a response from the server...
+  */
+
+  DEBUG_puts("cupsGetResponse: update...");
+
+  while ((status = httpUpdate(http)) == HTTP_CONTINUE)
+    /* Do nothing but update */;
+
+  DEBUG_printf(("cupsGetResponse: status = %d\n", status));
+
+  if (status == HTTP_OK)
+  {
+   /*
+    * Get the IPP response...
+    */
+
+    response = ippNew();
+
+    while ((state = ippRead(http, response)) != IPP_DATA)
+      if (state == IPP_ERROR)
+	break;
+
+    if (state == IPP_ERROR)
+    {
+     /*
+      * Delete the response...
+      */
+
+      DEBUG_puts("IPP read error!");
+
+      ippDelete(response);
+      response = NULL;
+
+      _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+    }
+  }
+  else if (status != HTTP_ERROR)
+  {
+   /*
+    * Flush any error message...
+    */
+
+    httpFlush(http);
+
+   /*
+    * Then handle encryption and authentication...
+    */
+
+    if (status == HTTP_UNAUTHORIZED)
+    {
+     /*
+      * See if we can do authentication...
+      */
+
+      DEBUG_puts("cupsGetResponse: Need authorization...");
+
+      if (!cupsDoAuthentication(http, "POST", resource))
+	httpReconnect(http);
+    }
+
+#ifdef HAVE_SSL
+    else if (status == HTTP_UPGRADE_REQUIRED)
+    {
+     /*
+      * Force a reconnect with encryption...
+      */
+
+      DEBUG_puts("cupsGetResponse: Need encryption...");
+
+      if (!httpReconnect(http))
+        httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+    }
+#endif /* HAVE_SSL */
+  }
+
   if (response)
   {
     ipp_attribute_t	*attr;		/* status-message attribute */
@@ -464,19 +439,272 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection to server */
 
 
 /*
- * 'cupsDoRequest()' - Do an IPP request.
+ * 'cupsReadResponseData()' - Read additional data after the IPP response.
  *
- * This function sends the IPP request to the specified server, retrying
- * and authenticating as necessary.  The request is freed with ippDelete()
- * after receiving a valid IPP response.
+ * This function is used after cupsGetResponse() to read the PPD or document
+ * files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
+ *
+ * @since CUPS 1.4@
  */
 
-ipp_t *					/* O - Response data */
-cupsDoRequest(http_t     *http,		/* I - HTTP connection to server */
-              ipp_t      *request,	/* I - IPP request */
-              const char *resource)	/* I - HTTP resource for POST */
+ssize_t					/* O - Bytes read, 0 on EOF, -1 on error */
+cupsReadResponseData(
+    http_t *http,			/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    char   *buffer,			/* I - Buffer to use */
+    size_t length)			/* I - Number of bytes to read */
 {
-  return (cupsDoFileRequest(http, request, resource, NULL));
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+  {
+    _cups_globals_t *cg = _cupsGlobals();
+					/* Pointer to library globals */
+
+    if ((http = cg->http) == NULL)
+    {
+      _cupsSetError(IPP_INTERNAL_ERROR, "No active connection");
+      return (-1);
+    }
+  }
+
+ /*
+  * Then read from the HTTP connection...
+  */
+
+  return (httpRead2(http, buffer, length));
+}
+
+
+/*
+ * 'cupsSendRequest()' - Send an IPP request.
+ *
+ * Use httpWrite() to write any additional data (document, PPD file, etc.)
+ * for the request, cupsGetResponse() to get the IPP response, and httpRead()
+ * to read any additional data following the response. Only one request can be 
+ * sent/queued at a time.
+ *
+ * Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
+ * request is not freed.
+ *
+ * @since CUPS 1.4@
+ */
+
+http_status_t				/* O - Initial HTTP status */
+cupsSendRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+                ipp_t      *request,	/* I - IPP request */
+                const char *resource,	/* I - Resource path */
+		size_t     length)	/* I - Length of data to follow or CUPS_LENGTH_VARIABLE */
+{
+  http_status_t	status;			/* Status of HTTP request */
+  int		got_status;		/* Did we get the status? */
+  ipp_state_t	state;			/* State of IPP processing */
+  http_status_t	expect;			/* Expect: header to use */
+
+
+  DEBUG_printf(("cupsSendRequest(http=%p, request=%p, resource=\"%s\", "
+                "length=" CUPS_LLFMT ")\n", http, request,
+		resource ? resource : "(null)", CUPS_LLCAST length));
+
+ /*
+  * Range check input...
+  */
+
+  if (!request || !resource)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
+
+    return (HTTP_ERROR);
+  }
+
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+    http = _cupsConnect();
+
+#ifdef HAVE_SSL
+ /*
+  * See if we have an auth-info attribute and are communicating over
+  * a non-local link.  If so, encrypt the link so that we can pass
+  * the authentication information securely...
+  */
+
+  if (ippFindAttribute(request, "auth-info", IPP_TAG_TEXT) &&
+      !httpAddrLocalhost(http->hostaddr) && !http->tls &&
+      httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
+    return (HTTP_ERROR);
+#endif /* HAVE_SSL */
+
+ /*
+  * Loop until we can send the request without authorization problems.
+  */
+
+  status = HTTP_ERROR;
+  expect = HTTP_CONTINUE;
+
+  for (;;)
+  {
+    DEBUG_puts("cupsSendRequest: setup...");
+
+   /*
+    * Setup the HTTP variables needed...
+    */
+
+    httpClearFields(http);
+    httpSetLength(http, length);
+    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
+    httpSetExpect(http, expect);
+
+    DEBUG_printf(("cupsSendRequest: authstring=\"%s\"\n", http->authstring));
+
+   /*
+    * Try the request...
+    */
+
+    DEBUG_puts("cupsSendRequest: post...");
+
+    if (httpPost(http, resource))
+    {
+      if (httpReconnect(http))
+        return (HTTP_ERROR);
+      else
+        continue;
+    }
+
+   /*
+    * Send the IPP data...
+    */
+
+    DEBUG_puts("cupsSendRequest: ipp write...");
+
+    request->state = IPP_IDLE;
+    status         = HTTP_CONTINUE;
+    got_status     = 0;
+
+    while ((state = ippWrite(http, request)) != IPP_DATA)
+      if (state == IPP_ERROR)
+	break;
+      else if (httpCheck(http))
+      {
+        got_status = 1;
+
+	if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	  break;
+      }
+
+   /*
+    * Wait up to 1 second to get the 100-continue response as needed...
+    */
+
+    if (!got_status && expect == HTTP_CONTINUE)
+    {
+      if (httpWait(http, 1000))
+        status = httpUpdate(http);
+    }
+    else if (httpCheck(http))
+      status = httpUpdate(http);
+
+   /*
+    * Process the current HTTP status...
+    */
+
+    switch (status)
+    {
+      case HTTP_ERROR :
+      case HTTP_CONTINUE :
+      case HTTP_OK :
+          return (status);
+
+      case HTTP_UNAUTHORIZED :
+          if (!cupsDoAuthentication(http, "POST", resource))
+	    if (httpReconnect(http))
+	      return (HTTP_ERROR);
+
+          return (status);
+
+#ifdef HAVE_SSL
+      case HTTP_UPGRADE_REQUIRED :
+	 /*
+	  * Flush any error message, reconnect, and then upgrade with
+	  * encryption...
+	  */
+
+	  if (httpReconnect(http))
+	    return (HTTP_ERROR);
+
+	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+
+          return (status);
+#endif /* HAVE_SSL */
+
+      case HTTP_EXPECTATION_FAILED :
+	 /*
+	  * Don't try using the Expect: header the next time around...
+	  */
+
+	  expect = (http_status_t)0;
+
+      default :
+         /*
+	  * Some other error...
+	  */
+
+	  return (status);
+    }
+  }
+}
+
+
+/*
+ * 'cupsWriteRequestData()' - Write additional data after an IPP request.
+ *
+ * This function is used after cupsSendRequest() or cupsStartDocument()
+ * to provide a PPD or document file as needed.
+ *
+ * @since CUPS 1.4@
+ */
+
+http_status_t				/* O - HTTP_CONTINUE if OK or HTTP status on error */
+cupsWriteRequestData(
+    http_t     *http,			/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    const char *buffer,			/* I - Bytes to write */
+    size_t     length)			/* I - Number of bytes to write */
+{
+ /*
+  * Get the default connection as needed...
+  */
+
+  if (!http)
+  {
+    _cups_globals_t *cg = _cupsGlobals();
+					/* Pointer to library globals */
+
+    if ((http = cg->http) == NULL)
+    {
+      _cupsSetError(IPP_INTERNAL_ERROR, "No active connection");
+      return (HTTP_ERROR);
+    }
+  }
+
+ /*
+  * Then write to the HTTP connection...
+  */
+
+  if (httpWrite2(http, buffer, length) < 0)
+    return (HTTP_ERROR);
+
+ /*
+  * Finally, check if we have any pending data from the server...
+  */
+
+  if (httpCheck(http))
+    return (httpUpdate(http));
+  else
+    return (HTTP_CONTINUE);
 }
 
 
