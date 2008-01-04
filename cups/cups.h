@@ -59,11 +59,19 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0400
+#  define CUPS_VERSION		1.0399
 #  define CUPS_VERSION_MAJOR	1
 #  define CUPS_VERSION_MINOR	4
-#  define CUPS_VERSION_PATCH	0
-#  define CUPS_DATE_ANY		-1
+#  define CUPS_VERSION_PATCH	-1
+
+#  define CUPS_DATE_ANY		(time_t)-1
+#  define CUPS_FORMAT_AUTO	"application/octet-stream"
+#  define CUPS_FORMAT_PDF	"application/pdf"
+#  define CUPS_FORMAT_POSTSCRIPT "application/postscript"
+#  define CUPS_FORMAT_RAW	"application/vnd.cups-raw"
+#  define CUPS_FORMAT_TEXT	"text/plain"
+#  define CUPS_HTTP_DEFAULT	(http_t *)0
+#  define CUPS_LENGTH_VARIABLE	(ssize_t)0
 
 
 /*
@@ -140,7 +148,7 @@ typedef struct cups_job_s		/**** Job ****/
  * Functions...
  */
 
-extern int		cupsCancelJob(const char *printer, int job);
+extern int		cupsCancelJob(const char *name, int job_id);
 extern ipp_t		*cupsDoFileRequest(http_t *http, ipp_t *request,
 			                   const char *resource,
 					   const char *filename);
@@ -152,13 +160,13 @@ extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
 extern const char	*cupsGetDefault(void);
 extern int		cupsGetJobs(cups_job_t **jobs, const char *dest,
 			            int myjobs, int completed);
-extern const char	*cupsGetPPD(const char *printer);
+extern const char	*cupsGetPPD(const char *name);
 extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED;
 extern ipp_status_t	cupsLastError(void);
-extern int		cupsPrintFile(const char *printer, const char *filename,
+extern int		cupsPrintFile(const char *name, const char *filename,
 			              const char *title, int num_options,
 				      cups_option_t *options);
-extern int		cupsPrintFiles(const char *printer, int num_files,
+extern int		cupsPrintFiles(const char *name, int num_files,
 			               const char **files, const char *title,
 				       int num_options, cups_option_t *options);
 extern char		*cupsTempFile(char *filename, int len) _CUPS_DEPRECATED;
@@ -206,14 +214,14 @@ extern http_status_t	cupsPutFd(http_t *http, const char *resource, int fd) _CUPS
 extern const char	*cupsGetDefault2(http_t *http) _CUPS_API_1_1_21;
 extern int		cupsGetDests2(http_t *http, cups_dest_t **dests) _CUPS_API_1_1_21;
 extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
-			             const char *dest, int myjobs,
+			             const char *name, int myjobs,
 				     int completed) _CUPS_API_1_1_21;
-extern const char	*cupsGetPPD2(http_t *http, const char *printer) _CUPS_API_1_1_21;
-extern int		cupsPrintFile2(http_t *http, const char *printer,
+extern const char	*cupsGetPPD2(http_t *http, const char *name) _CUPS_API_1_1_21;
+extern int		cupsPrintFile2(http_t *http, const char *name,
 			               const char *filename,
 				       const char *title, int num_options,
 				       cups_option_t *options) _CUPS_API_1_1_21;
-extern int		cupsPrintFiles2(http_t *http, const char *printer,
+extern int		cupsPrintFiles2(http_t *http, const char *name,
 			                int num_files, const char **files,
 					const char *title, int num_options,
 					cups_option_t *options) _CUPS_API_1_1_21;
@@ -249,11 +257,30 @@ extern void		cupsSetDefaultDest(const char *name,
 					   cups_dest_t *dests) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
+extern ipp_status_t	cupsCancelJob2(http_t *http, int job_id, int purge);
+extern int		cupsCreateJob(http_t *http, const char *name,
+				      const char *title, int num_options,
+				      cups_option_t *options) _CUPS_API_1_4;
+extern ipp_status_t	cupsFinishDocument(http_t *http,
+			                   const char *name) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
 			                  const char *instance) _CUPS_API_1_4;
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
 			            time_t *modtime, char *buffer,
 				    size_t bufsize) _CUPS_API_1_4;
+extern ipp_t		*cupsGetResponse(http_t *http,
+			                 const char *resource) _CUPS_API_1_4;
+extern ssize_t		cupsReadResponseData(http_t *http, char *buffer,
+			                     size_t length) _CUPS_API_1_4;
+extern http_status_t	cupsSendRequest(http_t *http, ipp_t *request,
+			                const char *resource,
+					size_t length) _CUPS_API_1_4;
+extern http_status_t	cupsStartDocument(http_t *http, const char *name,
+			                  int job_id, const char *docname,
+					  const char *format,
+					  int last_document) _CUPS_API_1_4;
+extern http_status_t	cupsWriteRequestData(http_t *http, const char *buffer,
+			                     size_t length) _CUPS_API_1_4;
 
 #  ifdef __cplusplus
 }

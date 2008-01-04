@@ -17,7 +17,6 @@
  *   main()          - Parse options and send files for printing.
  *   restart_job()   - Restart a job.
  *   set_job_attrs() - Set job attributes.
- *   sighandler()    - Signal catcher for when we print from stdin...
  */
 
 /*
@@ -32,27 +31,13 @@
 #include <cups/i18n.h>
 
 
-#ifndef WIN32
-#  include <unistd.h>
-#  include <signal.h>
-
-
 /*
  * Local functions.
  */
 
-void	sighandler(int);
-#endif /* !WIN32 */
 int	restart_job(const char *command, int job_id);
 int	set_job_attrs(const char *command, int job_id, int num_options,
 	              cups_option_t *options);
-
-
-/*
- * Globals...
- */
-
-char	tempfile[1024];		/* Temporary file for printing from stdin */
 
 
 /*
@@ -79,13 +64,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		end_options;		/* No more options? */
   int		silent;			/* Silent or verbose output? */
   char		buffer[8192];		/* Copy buffer */
-  ssize_t	bytes;			/* Bytes copied */
-  off_t		filesize;		/* Size of temp file */
-  int		temp;			/* Temporary file descriptor */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Signal action */
-  struct sigaction oldaction;		/* Old signal action */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
 
 
 #ifdef __sun
@@ -635,73 +613,38 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (num_files > 0)
     job_id = cupsPrintFiles(printer, num_files, files, title, num_options, options);
-  else
+  else if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, printer,
+                                   title ? title : "(stdin)",
+                                   num_options, options)) > 0)
   {
-    num_files = 1;
+    http_status_t	status;		/* Write status */
+    const char		*format;	/* Document format */
+    ssize_t		bytes;		/* Bytes read */
 
-#ifndef WIN32
-#  if defined(HAVE_SIGSET)
-    sigset(SIGHUP, sighandler);
-    if (sigset(SIGINT, sighandler) == SIG_IGN)
-      sigset(SIGINT, SIG_IGN);
-    sigset(SIGTERM, sighandler);
-#  elif defined(HAVE_SIGACTION)
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = sighandler;
 
-    sigaction(SIGHUP, &action, NULL);
-    sigaction(SIGINT, NULL, &oldaction);
-    if (oldaction.sa_handler != SIG_IGN)
-      sigaction(SIGINT, &action, NULL);
-    sigaction(SIGTERM, &action, NULL);
-#  else
-    signal(SIGHUP, sighandler);
-    if (signal(SIGINT, sighandler) == SIG_IGN)
-      signal(SIGINT, SIG_IGN);
-    signal(SIGTERM, sighandler);
-#  endif
-#endif /* !WIN32 */
+    if (cupsGetOption("raw", num_options, options))
+      format = CUPS_FORMAT_RAW;
+    else if ((format = cupsGetOption("document-format", num_options,
+                                     options)) == NULL)
+      format = CUPS_FORMAT_AUTO;
 
-    temp = cupsTempFd(tempfile, sizeof(tempfile));
+    status = cupsStartDocument(CUPS_HTTP_DEFAULT, printer, job_id, NULL,
+                               format, 1);
 
-    if (temp < 0)
+    while (status == HTTP_CONTINUE &&
+           (bytes = read(0, buffer, sizeof(buffer))) > 0)
+      status = cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer, bytes);
+
+    if (status != HTTP_CONTINUE)
     {
       _cupsLangPrintf(stderr,
-		      _("%s: Error - unable to create temporary file \"%s\" - %s\n"),
-        	      argv[0], tempfile, strerror(errno));
+		      _("%s: Error - unable to queue from stdin - %s\n"),
+		      argv[0], httpStatus(status));
       return (1);
     }
 
-    while ((bytes = read(0, buffer, sizeof(buffer))) > 0)
-      if (write(temp, buffer, bytes) < 0)
-      {
-	_cupsLangPrintf(stderr,
-		        _("%s: Error - unable to write to temporary file "
-			  "\"%s\" - %s\n"),
-        	        argv[0], tempfile, strerror(errno));
-        close(temp);
-        unlink(tempfile);
-	return (1);
-      }
-
-    filesize = lseek(temp, 0, SEEK_CUR);
-    close(temp);
-
-    if (filesize <= 0)
-    {
-      _cupsLangPrintf(stderr,
-		      _("%s: Error - stdin is empty, so no job has been sent.\n"),
-		      argv[0]);
-      unlink(tempfile);
-      return (1);
-    }
-
-    if (title)
-      job_id = cupsPrintFile(printer, tempfile, title, num_options, options);
-    else
-      job_id = cupsPrintFile(printer, tempfile, "(stdin)", num_options, options);
-
-    unlink(tempfile);
+    if (cupsFinishDocument(CUPS_HTTP_DEFAULT, printer) != IPP_OK)
+      job_id = 0;
   }
 
   if (job_id < 1)
@@ -725,12 +668,9 @@ int					/* O - Exit status */
 restart_job(const char *command,	/* I - Command name */
             int        job_id)		/* I - Job ID */
 {
-  http_t	*http;			/* HTTP connection to server */
   ipp_t		*request;		/* IPP request */
   char		uri[HTTP_MAX_URI];	/* URI for job */
 
-
-  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
   request = ippNewRequest(IPP_RESTART_JOB);
 
@@ -742,7 +682,7 @@ restart_job(const char *command,	/* I - Command name */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, cupsUser());
 
-  ippDelete(cupsDoRequest(http, request, "/jobs"));
+  ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/jobs"));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
   {
@@ -764,15 +704,12 @@ set_job_attrs(const char    *command,	/* I - Command name */
               int           num_options,/* I - Number of options */
 	      cups_option_t *options)	/* I - Options */
 {
-  http_t	*http;			/* HTTP connection to server */
   ipp_t		*request;		/* IPP request */
   char		uri[HTTP_MAX_URI];	/* URI for job */
 
 
   if (num_options == 0)
     return (0);
-
-  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
   request = ippNewRequest(IPP_SET_JOB_ATTRIBUTES);
 
@@ -786,7 +723,7 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
   cupsEncodeOptions(request, num_options, options);
 
-  ippDelete(cupsDoRequest(http, request, "/jobs"));
+  ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/jobs"));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
   {
@@ -796,29 +733,6 @@ set_job_attrs(const char    *command,	/* I - Command name */
 
   return (0);
 }
-
-
-#ifndef WIN32
-/*
- * 'sighandler()' - Signal catcher for when we print from stdin...
- */
-
-void
-sighandler(int s)			/* I - Signal number */
-{
- /*
-  * Remove the temporary file we're using to print from stdin...
-  */
-
-  unlink(tempfile);
-
- /*
-  * Exit...
-  */
-
-  exit(s);
-}
-#endif /* !WIN32 */
 
 
 /*

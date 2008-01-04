@@ -1,8 +1,9 @@
-CHANGES.txt - 2007-12-19
+CHANGES.txt - 2008-01-03
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added a new streaming request API (STR #2261)
 	- Added a new cupsGetNamedDest() function to the CUPS
 	  library for faster printing with lp and lpr (STR #2638)
 	- The scheduler now sets the PAM RHOST value on systems

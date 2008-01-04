@@ -124,6 +124,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
  * Prototypes...
  */
 
+extern http_t		*_cupsConnect(void);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message);
