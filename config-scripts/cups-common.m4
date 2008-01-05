@@ -203,7 +203,7 @@ case $uname in
 		LEGACY_BACKENDS=""
                 BACKLIBS="-framework IOKit"
                 CUPSDLIBS="-sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
-                LIBS="-framework CoreFoundation $LIBS"
+                LIBS="-framework SystemConfiguration -framework CoreFoundation $LIBS"
 
 		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
 		AC_MSG_CHECKING(for CFLocaleCreateCanonicalLocaleIdentifierFromString)
