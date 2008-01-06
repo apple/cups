@@ -784,11 +784,15 @@ cgi_initialize_post(void)
 
   for (tbytes = 0; tbytes < length; tbytes += nbytes)
     if ((nbytes = read(0, data + tbytes, length - tbytes)) < 0)
+    {
       if (errno != EAGAIN)
       {
         free(data);
         return (0);
       }
+      else
+        nbytes = 0;
+    }
 
   data[length] = '\0';
 
