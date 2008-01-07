@@ -4,7 +4,7 @@
  *   Authorization definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -134,6 +134,8 @@ extern void		cupsdAllowHost(cupsd_location_t *loc, char *name);
 extern void		cupsdAllowIP(cupsd_location_t *loc, unsigned address[4],
 			             unsigned netmask[4]);
 extern void		cupsdAuthorize(cupsd_client_t *con);
+extern int		cupsdCheckAccess(unsigned ip[4], char *name,
+			                 int namelen, cupsd_location_t *loc);
 extern int		cupsdCheckAuth(unsigned ip[4], char *name, int namelen,
 				       int num_masks, cupsd_authmask_t *masks);
 extern int		cupsdCheckGroup(const char *username,

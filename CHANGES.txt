@@ -1,8 +1,11 @@
-CHANGES.txt - 2008-01-05
+CHANGES.txt - 2008-01-07
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Bonjour printer registrations now advertise as local or
+	  global based on the current access policies for the
+	  printer.
 	- cupsGetDests*() and cupsSetDests*() now track the last
 	  used printer preference on Mac OS X.
 	- Added a new streaming request API (STR #2261)

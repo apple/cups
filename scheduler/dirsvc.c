@@ -2473,10 +2473,15 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 			*name;		/* Service name */
   int			txt_len,	/* TXT record length */
 			port;		/* IPP port number */
-  char			str_buffer[1024];
+  char			resource[1024],	/* Resource path for printer */
+			str_buffer[1024];
 					/* C-string buffer */
   const char		*computerName;  /* Computer name c-string ptr */
   const char		*regtype;	/* Registration type */
+  const char		*domain;   	/* Registration domain */
+  cupsd_location_t	*location,	/* Printer location */
+			*policy;	/* Operation policy for Print-Job */
+  unsigned		address[4];	/* INADDR_ANY address */
 #ifdef HAVE_COREFOUNDATION_H
   CFStringRef		computerNameRef;/* Computer name CFString */
   CFStringEncoding	nameEncoding;	/* Computer name encoding */
@@ -2571,17 +2576,39 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     }
 
    /*
+    * If 'Allow printing from the Internet' is enabled (i.e. from any address)
+    * let dnssd decide on the domain, otherwise restrict it to ".local".
+    */
+
+    if (p->type & CUPS_PRINTER_CLASS)
+      snprintf(resource, sizeof(resource), "/classes/%s", p->name);
+    else
+      snprintf(resource, sizeof(resource), "/printers/%s", p->name);
+
+    address[0] = address[1] = address[2] = address[3] = 0;
+    location   = cupsdFindBest(resource, HTTP_POST);
+    policy     = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
+
+    if ((location && !cupsdCheckAccess(address, "", 0, location)) ||
+        (policy && !cupsdCheckAccess(address, "", 0, policy)))
+      domain = "local.";
+    else
+      domain = NULL;
+
+   /*
     * Use the _fax subtype for fax queues...
     */
 
     regtype = (p->type & CUPS_PRINTER_FAX) ? dnssdIPPFaxRegType :
                                              dnssdIPPRegType;
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterPrinter(%s) type is \"%s\"",
-                    p->name, regtype);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, 
+		"dnssdRegisterPrinter(%s) type, domain is \"%s\", \"%s\"",
+		p->name, regtype, domain ? domain : "(null)");
 
     se = DNSServiceRegister(&p->dnssd_ipp_ref, 0, 0, name, regtype, 
-			    NULL, NULL, htons(port), txt_len, txt_record,
+			    domain, NULL, htons(port), txt_len, txt_record,
 			    dnssdRegisterCallback, p);
 
    /*
