@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The scheduler incorrectly treated MIME types as case-
+	  sensitive (STR #2657)
 	- The Java support classes did not send UTF-8 strings to
 	  the scheduler (STR #2651)
 	- The CGI code did not handle interrupted POST requests
