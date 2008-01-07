@@ -10,7 +10,7 @@
 <TD VALIGN="TOP"><B>Description:</B> {printer_info}<BR>
 <B>Location:</B> {printer_location}<BR>
 <B>Printer Driver:</B> {printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported?, 2-sided printing:})<BR>
-<B>Printer State:</B> {printer_state=3?idle:{printer_state=4?processing:stopped}},
+<B>Printer State:</B> {printer_state=3?idle:{printer_state=4?processing:paused}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {server_is_sharing_printers=0?not:{printer_is_shared=0?not:}} shared{default_name={printer_name}?, server default:}.<BR>
 <B>Default Options:</B> job-sheets={job_sheets_default}
 media={media_default?{media_default}:unknown}
