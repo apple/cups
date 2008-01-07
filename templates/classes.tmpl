@@ -17,8 +17,8 @@
 <CAPTION>Maintenance Commands</CAPTION>
 <TR><TD><FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="print-test-page"><INPUT TYPE="SUBMIT" VALUE="Print Test Page"></FORM>
 {printer_state=5?
-<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="start-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Start Class"></FORM>
-:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="stop-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Stop Class"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="start-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Resume Class"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="stop-class"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Pause Class"></FORM>
 }
 {printer_is_accepting_jobs=0?
 <FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="accept-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}<INPUT TYPE="HIDDEN" NAME="is_class" VALUE="Y"><INPUT TYPE="SUBMIT" VALUE="Accept Jobs"></FORM>

@@ -23,8 +23,8 @@ media={media_default?{media_default}:unknown}
 {?cupscommand=1?<FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="clean-print-heads"><INPUT TYPE="SUBMIT" VALUE="Clean Print Heads"></FORM>
 <FORM ACTION="{printer_uri_supported}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="print-self-test-page"><INPUT TYPE="SUBMIT" VALUE="Print Self Test Page"></FORM>:}
 {printer_state=5?
-<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="start-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Start Printer"></FORM>
-:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="stop-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Stop Printer"></FORM>
+<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="start-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Resume Printer"></FORM>
+:<FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="stop-printer"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Pause Printer"></FORM>
 }
 {printer_is_accepting_jobs=0?
 <FORM ACTION="{admin_uri}" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="accept-jobs"><INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}"><INPUT TYPE="SUBMIT" VALUE="Accept Jobs"></FORM>
