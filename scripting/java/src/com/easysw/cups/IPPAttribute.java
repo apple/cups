@@ -7,7 +7,7 @@ package com.easysw.cups;
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2002 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -263,7 +263,9 @@ public class IPPAttribute
   {
     IPPValue val;
     int      bytes = 0;          // Start with one for the group tag.
-   
+    Charset  utf8 = Charset::forName("UTF-8");
+    ByteBuffer temp;
+
     //
     //  Add 1 if first time, or group tag changes.
     //
@@ -308,8 +310,12 @@ public class IPPAttribute
         case IPPDefs.TAG_CHARSET:
         case IPPDefs.TAG_LANGUAGE:
         case IPPDefs.TAG_MIMETYPE:
+	    temp = utf8.encode(val.text);
             bytes += 2;
-	    bytes += val.text.length();
+	    if (temp.capacity() > 32767)
+	      bytes += 32767;
+	    else
+	      bytes += temp.capacity();
 	    break;
 
         case IPPDefs.TAG_DATE :
@@ -329,9 +335,13 @@ public class IPPAttribute
 
         case IPPDefs.TAG_TEXTLANG :
         case IPPDefs.TAG_NAMELANG :
+	    temp = utf8.encode(val.text);
             bytes += 6;  // 2 overall len, 2 charset len, 2 text len
-	    bytes += val.charset.length() +
-	             val.text.length();
+	    bytes += val.charset.length();
+	    if (temp.capacity() > 32767)
+	      bytes += 32767;
+	    else
+	      bytes += temp.capacity();
 	    break;
 
         default :
@@ -359,6 +369,8 @@ public class IPPAttribute
     int    i,j, n;
     int    bi    = 0;          // Start with one for the group tag.
     byte[] bytes = new byte[sz];
+    Charset  utf8 = Charset::forName("UTF-8");
+    ByteBuffer temp;
 
     if (group_tag != last_group)
     {
@@ -412,12 +424,16 @@ public class IPPAttribute
         case IPPDefs.TAG_CHARSET :
         case IPPDefs.TAG_LANGUAGE :
         case IPPDefs.TAG_MIMETYPE :
-            bytes[bi++] = (byte)((val.text.length() & 0xff00) >> 8);
-            bytes[bi++] = (byte)(val.text.length() & 0xff);
-            for (j=0; j < val.text.length(); j++)
-            {
-              bytes[bi++] = (byte)val.text.charAt(j);
-            }
+	    temp = utf8.encode(val.text);
+	    n    = temp.capacity();
+	    
+	    if (n > 32767)
+	      n = 32767;
+
+            bytes[bi++] = (byte)((n & 0x7f00) >> 8);
+            bytes[bi++] = (byte)(n & 0xff);
+	    temp.get(bytes, bi, n);
+	    bi += n;
 	    break;
 
         case IPPDefs.TAG_DATE:
@@ -456,23 +472,30 @@ public class IPPAttribute
 
         case IPPDefs.TAG_TEXTLANG :
         case IPPDefs.TAG_NAMELANG :
-            n = val.charset.length() +
-                val.text.length() + 4;
-            bytes[bi++] = (byte)((n & 0xff00) >> 8);
+	    temp = utf8.encode(val.text);
+	    n    = temp.capacity() + val.charset.length() + 4;
+
+	    if (n > 32767)
+	      n = 32767;
+
+            bytes[bi++] = (byte)((n & 0x7f00) >> 8);
             bytes[bi++] = (byte)(n & 0xff);
 
             n = val.charset.length();
-            bytes[bi++] = (byte)((n & 0xff00) >> 8);
+            bytes[bi++] = (byte)((n & 0x7f00) >> 8);
             bytes[bi++] = (byte)(n & 0xff);
             for (j=0; j < val.charset.length(); j++)
               bytes[bi++] = (byte)val.charset.charAt(j);
-            
-            n = val.text.length();
-            bytes[bi++] = (byte)((n & 0xff00) >> 8);
+
+            n = temp.capacity();
+
+	    if (n > 32767)
+	      n = 32767;
+
+            bytes[bi++] = (byte)((n & 0x7f00) >> 8);
             bytes[bi++] = (byte)(n & 0xff);
-            for (j=0; j < (byte)val.text.length(); j++)
-              bytes[bi++] = (byte)val.text.charAt(j);
-            
+	    temp.get(bytes, bi, n);
+	    bi += n;
 	    break;
 
         default :
