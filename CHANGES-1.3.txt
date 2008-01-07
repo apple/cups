@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The CGI code did not handle interrupted POST requests
+	  properly (STR #2652)
 	- The PostScript filter incorrectly handled number-up when
 	  the number of pages was evenly divisible by the number-up
 	  value.
