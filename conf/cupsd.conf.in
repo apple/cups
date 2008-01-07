@@ -29,14 +29,12 @@ DefaultAuthType Basic
 # Restrict access to the server...
 <Location />
   Order allow,deny
-  Allow localhost
 </Location>
 
 # Restrict access to the admin pages...
 <Location /admin>
 @ENCRYPTION_REQUIRED@
   Order allow,deny
-  Allow localhost
 </Location>
 
 # Restrict access to configuration files...
@@ -44,7 +42,6 @@ DefaultAuthType Basic
   AuthType Default
   Require user @SYSTEM
   Order allow,deny
-  Allow localhost
 </Location>
 
 # Set the default printer/job policies...

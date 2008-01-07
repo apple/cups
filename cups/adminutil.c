@@ -1057,7 +1057,7 @@ _cupsAdminGetServerSettings(
 	in_admin_location = 0;
 	in_location       = 0;
       }
-      else if (!strcasecmp(line, "Allow") && in_admin_location &&
+      else if (!strcasecmp(line, "Allow") &&
                strcasecmp(value, "localhost") && strcasecmp(value, "127.0.0.1")
 #ifdef AF_LOCAL
 	       && *value != '/'
@@ -1067,9 +1067,9 @@ _cupsAdminGetServerSettings(
 #endif /* AF_INET6 */
 	       )
       {
-	remote_admin = 1;
-
-	if (!strcasecmp(value, "all"))
+        if (in_admin_location)
+	  remote_admin = 1;
+        else if (!strcasecmp(value, "all"))
 	  remote_any = 1;
       }
       else if (line[0] != '<' && !in_location && !in_policy)
