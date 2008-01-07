@@ -230,7 +230,7 @@ backendRunLoop(
 	if (errno == ENXIO && offline != 1)
 	{
 	  fputs("STATE: +offline-error\n", stderr);
-	  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
+	  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
 	  offline = 1;
 	}
 	else if (errno == EINTR && total_bytes == 0)
@@ -352,7 +352,7 @@ backendRunLoop(
 	if (offline)
 	{
 	  fputs("STATE: -offline-error\n", stderr);
-	  _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
+	  _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
 	  offline = 0;
 	}
 

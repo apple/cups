@@ -1485,7 +1485,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
     else if (!strncmp(reason, "moving-to-paused", 16) ||
              !strncmp(reason, "paused", 6) ||
 	     !strncmp(reason, "shutdown", 8))
-      message = _("Printer off-line.");
+      message = _("Printer offline.");
     else if (!strncmp(reason, "toner-low", 9))
       message = _("Toner low.");
     else if (!strncmp(reason, "toner-empty", 11))
