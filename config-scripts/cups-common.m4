@@ -205,15 +205,6 @@ case $uname in
                 CUPSDLIBS="-sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation $LIBS"
 
-		dnl Check for CFLocaleCreateCanonicalLocaleIdentifierFromString...
-		AC_MSG_CHECKING(for CFLocaleCreateCanonicalLocaleIdentifierFromString)
-		if test "$uname" = "Darwin" -a $uversion -ge 70; then
-			AC_DEFINE(HAVE_CF_LOCALE_ID)
-			AC_MSG_RESULT(yes)
-		else
-			AC_MSG_RESULT(no)
-		fi
-
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
 		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
