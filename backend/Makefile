@@ -114,18 +114,6 @@ libbackend.a:	$(LIBOBJS)
 
 
 #
-# ieee1394
-#
-
-ieee1394:	ieee1394.o ieee1394-linux.o
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o ieee1394 ieee1394.o ieee1394-linux.o -lraw1394 $(LIBS)
-
-ieee1394.o:		ieee1394.h
-ieee1394-linux.o:	ieee1394.h
-
-
-#
 # ipp
 #
 

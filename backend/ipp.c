@@ -407,13 +407,13 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
-      perror("ERROR: unable to create temporary file");
+      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
       return (CUPS_BACKEND_FAILED);
     }
 
     if ((fp = cupsFileOpenFd(fd, compression ? "w9" : "w")) == NULL)
     {
-      perror("ERROR: unable to open temporary file");
+      _cupsLangPrintError(_("ERROR: Unable to open temporary file"));
       close(fd);
       unlink(tmpfilename);
       return (CUPS_BACKEND_FAILED);
@@ -422,7 +422,7 @@ main(int  argc,				/* I - Number of command-line args */
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (cupsFileWrite(fp, buffer, bytes) < bytes)
       {
-        perror("ERROR: unable to write to temporary file");
+        _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
 	cupsFileClose(fp);
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);

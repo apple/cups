@@ -1,7 +1,7 @@
 /*
 * "$Id$"
 *
-* Copyright � 2005-2007 Apple Inc. All rights reserved.
+* Copyright � 2005-2008 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -600,7 +600,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN || errno != EINTR)
 	  {
-	    perror("ERROR: Unable to read print data");
+	    _cupsLangPrintError(_("ERROR: Unable to read print data"));
 	    return CUPS_BACKEND_STOP;
 	  }
 
@@ -1798,7 +1798,7 @@ static void run_ppc_backend(int argc,
 
       execv("/usr/libexec/cups/backend/usb", my_argv);
 
-      perror("/usr/libexec/cups/backend/usb");
+      _cupsLangPrintError(_("ERROR: Unable to exec /usr/libexec/cups/backend/usb"));
       exit(errno);
     }
     else if (child_pid < 0)
@@ -1807,7 +1807,7 @@ static void run_ppc_backend(int argc,
       * Error - couldn't fork a new process!
       */
 
-      perror("fork");
+      _cupsLangPrintError(_("ERROR: Unable to fork"));
       exit(errno);
     }
 

@@ -185,7 +185,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      perror("ERROR: unable to open print file");
+      _cupsLangPrintf(stderr,
+                      _("ERROR: Unable to open print file \"%s\": %s\n"),
+                      argv[6], strerror(errno));
       return (CUPS_BACKEND_FAILED);
     }
 
@@ -601,7 +603,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	  if (errno != EAGAIN || errno != EINTR)
 	  {
-	    perror("ERROR: Unable to read print data");
+	    _cupsLangPrintError(_("ERROR: Unable to read print data"));
 
             tcsetattr(device_fd, TCSADRAIN, &origopts);
 
@@ -677,7 +679,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	  if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	  {
-	    perror("ERROR: Unable to write print data");
+	    _cupsLangPrintError(_("ERROR: Unable to write print data"));
 
             tcsetattr(device_fd, TCSADRAIN, &origopts);
 

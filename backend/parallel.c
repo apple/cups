@@ -3,7 +3,7 @@
  *
  *   Parallel port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -146,7 +146,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      perror("ERROR: unable to open print file");
+      _cupsLangPrintf(stderr,
+                      _("ERROR: Unable to open print file \"%s\": %s\n"),
+		      argv[6], strerror(errno));
       return (CUPS_BACKEND_FAILED);
     }
 

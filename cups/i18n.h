@@ -3,7 +3,7 @@
  *
  *   (Private) localization support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -90,6 +90,7 @@ extern void		_cupsCharmapFlush(void);
 extern void		_cupsCharmapFree(const cups_encoding_t encoding);
 extern void		*_cupsCharmapGet(const cups_encoding_t encoding);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
+extern void		_cupsLangPrintError(const char *message);
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)
 #    ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))

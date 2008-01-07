@@ -177,7 +177,9 @@ main(int  argc,		/* I - Number of command-line arguments (6 or 7) */
 
     if ((fp = open(argv[6], O_RDONLY)) < 0)
     {
-      perror("ERROR: unable to open print file");
+      _cupsLangPrintf(stderr,
+                      _("ERROR: Unable to open print file \"%s\": %s\n"),
+		      argv[6], strerror(errno));
       return (CUPS_BACKEND_FAILED);
     }
 
