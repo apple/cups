@@ -3,7 +3,7 @@
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,48 +14,51 @@
  *
  * Contents:
  *
- *   cupsdDeregisterPrinter()      - Stop sending broadcast information for a 
- *				     local printer and remove any pending
- *                                   references to remote printers.
- *   cupsdLoadRemoteCache()        - Load the remote printer cache.
- *   cupsdRegisterPrinter()        - Start sending broadcast information for a
- *                                   printer update the broadcast contents.
- *   cupsdSaveRemoteCache()        - Save the remote printer cache.
- *   cupsdSendBrowseList()         - Send new browsing information as necessary.
- *   cupsdStartBrowsing()          - Start sending and receiving broadcast
- *                                   information.
- *   cupsdStartPolling()           - Start polling servers as needed.
- *   cupsdStopBrowsing()           - Stop sending and receiving broadcast
- *                                   information.
- *   cupsdStopPolling()            - Stop polling servers as needed.
- *   cupsdUpdateDNSSDBrowse()      - Handle DNS-SD queries.
- *   cupsdUpdateLDAPBrowse()       - Scan for new printers via LDAP...
- *   cupsdUpdateSLPBrowse()        - Get browsing information via SLP.
- *   dnssdBuildTxtRecord()         - Build a TXT record from printer info.
- *   dnssdDeregisterPrinter()      - Stop sending broadcast information for a
- *                                   printer.
- *   dnssdPackTxtRecord()          - Pack an array of key/value pairs into the
- *                                   TXT record format.
- *   dnssdRegisterCallback()       - DNSServiceRegister callback.
- *   dnssdRegisterPrinter()        - Start sending broadcast information for a
- *                                   printer or update the broadcast contents.
- *   dequote()                     - Remote quotes from a string.
- *   process_browse_data()         - Process new browse data.
- *   process_implicit_classes()    - Create/update implicit classes as needed.
- *   send_cups_browse()            - Send new browsing information using the
- *                                   CUPS protocol.
- *   send_ldap_browse()            - Send LDAP printer registrations.
- *   send_slp_browse()             - Register the specified printer with SLP.
- *   slp_attr_callback()           - SLP attribute callback 
- *   slp_dereg_printer()           - SLPDereg() the specified printer
- *   slp_get_attr()                - Get an attribute from an SLP registration.
- *   slp_reg_callback()            - Empty SLPRegReport.
- *   slp_url_callback()            - SLP service url callback
- *   update_cups_browse()          - Update the browse lists using the CUPS
- *                                   protocol.
- *   update_lpd()                  - Update the LPD configuration as needed.
- *   update_polling()              - Read status messages from the poll daemons.
- *   update_smb()                  - Update the SMB configuration as needed.
+ *   cupsdDeregisterPrinter()   - Stop sending broadcast information for a local
+ *                                printer and remove any pending references to
+ *                                remote printers.
+ *   cupsdLoadRemoteCache()     - Load the remote printer cache.
+ *   cupsdRegisterPrinter()     - Start sending broadcast information for a
+ *                                printer or update the broadcast contents.
+ *   cupsdRestartPolling()      - Restart polling servers as needed.
+ *   cupsdSaveRemoteCache()     - Save the remote printer cache.
+ *   cupsdSendBrowseList()      - Send new browsing information as necessary.
+ *   cupsdStartBrowsing()       - Start sending and receiving broadcast
+ *                                information.
+ *   cupsdStartPolling()        - Start polling servers as needed.
+ *   cupsdStopBrowsing()        - Stop sending and receiving broadcast
+ *                                information.
+ *   cupsdStopPolling()         - Stop polling servers as needed.
+ *   cupsdUpdateDNSSDBrowse()   - Handle DNS-SD queries.
+ *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
+ *   cupsdUpdateSLPBrowse()     - Get browsing information via SLP.
+ *   dequote()                  - Remote quotes from a string.
+ *   is_local_queue()           - Determine whether the URI points at a local
+ *                                queue.
+ *   process_browse_data()      - Process new browse data.
+ *   dnssdBuildTxtRecord()      - Build a TXT record from printer info.
+ *   dnssdDeregisterPrinter()   - Stop sending broadcast information for a
+ *                                printer.
+ *   dnssdPackTxtRecord()       - Pack an array of key/value pairs into the TXT
+ *                                record format.
+ *   dnssdRegisterCallback()    - DNSServiceRegister callback.
+ *   dnssdRegisterPrinter()     - Start sending broadcast information for a
+ *                                printer or update the broadcast contents.
+ *   process_implicit_classes() - Create/update implicit classes as needed.
+ *   send_cups_browse()         - Send new browsing information using the CUPS
+ *                                protocol.
+ *   send_ldap_browse()         - Send LDAP printer registrations.
+ *   send_slp_browse()          - Register the specified printer with SLP.
+ *   slp_attr_callback()        - SLP attribute callback
+ *   slp_dereg_printer()        - SLPDereg() the specified printer
+ *   slp_get_attr()             - Get an attribute from an SLP registration.
+ *   slp_reg_callback()         - Empty SLPRegReport.
+ *   slp_url_callback()         - SLP service url callback
+ *   update_cups_browse()       - Update the browse lists using the CUPS
+ *                                protocol.
+ *   update_lpd()               - Update the LPD configuration as needed.
+ *   update_polling()           - Read status messages from the poll daemons.
+ *   update_smb()               - Update the SMB configuration as needed.
  */
 
 /*
@@ -1817,9 +1820,9 @@ process_browse_data(
     if (hptr && !*hptr)
       *hptr = '.';			/* Resource FQDN */
 
-    if ((p = cupsdFindClass(name)) == NULL && BrowseShortNames)
+    if ((p = cupsdFindDest(name)) == NULL && BrowseShortNames)
     {
-      if ((p = cupsdFindClass(resource + 9)) != NULL)
+      if ((p = cupsdFindDest(resource + 9)) != NULL)
       {
         if (p->hostname && strcasecmp(p->hostname, host))
 	{
@@ -1924,9 +1927,9 @@ process_browse_data(
     if (hptr && !*hptr)
       *hptr = '.';			/* Resource FQDN */
 
-    if ((p = cupsdFindPrinter(name)) == NULL && BrowseShortNames)
+    if ((p = cupsdFindDest(name)) == NULL && BrowseShortNames)
     {
-      if ((p = cupsdFindPrinter(resource + 10)) != NULL)
+      if ((p = cupsdFindDest(resource + 10)) != NULL)
       {
         if (p->hostname && strcasecmp(p->hostname, host))
 	{

@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The scheduler could crash if a polled remote printer was
+	  converted to a class (STR #2656)
 	- The web interface and cupsctl did not correctly reflect
 	  the "allow printing from the Internet" state (STR #2650)
 	- The scheduler incorrectly treated MIME types as case-
