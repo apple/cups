@@ -7,7 +7,7 @@ package com.easysw.cups;
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -831,7 +831,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
             
 
@@ -1014,7 +1014,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
             
 
@@ -1091,7 +1091,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
             
 
@@ -1155,7 +1155,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
             
 
@@ -1229,7 +1229,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
 
       // ------------
@@ -1315,7 +1315,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
 
       // ------------
@@ -1375,7 +1375,7 @@ public class Cups
 
       a = new IPPAttribute( IPPDefs.TAG_OPERATION, IPPDefs.TAG_CHARSET,
                             "attributes-charset" );
-      a.addString( "", "iso-8859-1" );  
+      a.addString( "", "utf-8" );  
       ipp.addAttribute(a);
             
 

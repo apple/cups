@@ -214,12 +214,10 @@ int main (int argc, const char * argv[])
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, "argc = %d\n", argc);
-    for (err = 0; err < argc; err++) {
-      fprintf(stderr, "%02d:%s\n", err, argv[err]);
-    }
-    fprintf(stderr, "Usage: pap job-id user title copies options [file]\n");
-    exit(EINVAL);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+                    argv[0]);
+    return (CUPS_BACKEND_FAILED);
   }
 
   /* If we have 7 arguments, print the file named on the command-line.
@@ -240,7 +238,7 @@ int main (int argc, const char * argv[])
       _cupsLangPrintf(stderr,
                       _("ERROR: Unable to open print file \"%s\": %s\n"),
 		      argv[6], strerror(errno));
-      return (1);
+      return (CUPS_BACKEND_FAILED);
     }
 
     copies = atoi(argv[4]);
@@ -286,20 +284,21 @@ static int listDevices(void)
   /* Make sure it's okay to use appletalk */
   if (!okayToUseAppleTalk())
   {
-    fprintf(stderr, "INFO: AppleTalk disabled in System Preferences\n");
+    _cupsLangPuts(stderr, _("INFO: AppleTalk disabled in System Preferences\n"));
     return -1;  /* Network is down */
   }
 
   if ((err = zip_getmyzone(ZIP_DEF_INTERFACE, &at_zone)) != 0)
   {
-    perror("ERROR: Unable to get default AppleTalk zone");
+    _cupsLangPrintError(_("ERROR: Unable to get default AppleTalk zone"));
     return -2;
   }
 
   memcpy(zone, at_zone.str, MIN(at_zone.len, sizeof(zone)-1));
   zone[MIN(at_zone.len, sizeof(zone)-1)] = '\0';
 
-  fprintf(stderr, "INFO: Using default AppleTalk zone \"%s\"\n", zone);
+  _cupsLangPrintf(stderr, _("INFO: Using default AppleTalk zone \"%s\"\n"),
+                  zone);
 
   addPercentEscapes(zone, encodedZone, sizeof(encodedZone));
 
@@ -311,12 +310,14 @@ static int listDevices(void)
 
   if ((numberFound = nbp_lookup(&entity, buf, MAX_PRINTERS, &retry)) < 0)
   {
-    perror("ERROR: Unable to lookup AppleTalk printers");
+    _cupsLangPrintError(_("ERROR: Unable to lookup AppleTalk printers"));
     return numberFound;
   }
 
   if (numberFound >= MAX_PRINTERS)
-    fprintf(stderr, "WARNING: Adding only the first %d printers found", MAX_PRINTERS);
+    _cupsLangPrintf(stderr,
+                    _("WARNING: Adding only the first %d printers found"),
+		    MAX_PRINTERS);
 
   /* Not required but sort them so they look nice */
   qsort(buf, numberFound, sizeof(at_nbptuple_t), nbptuple_compare);
@@ -439,7 +440,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   /* try to find our printer */
   if ((err = nbp_make_entity(&entity, name, type, zone)) != noErr)
   {
-    fprintf(stderr, "ERROR: Unable to make AppleTalk address: %s\n", strerror(errno));
+    _cupsLangPrintError(_("ERROR: Unable to make AppleTalk address"));
     goto Exit;
   }
 
@@ -480,7 +481,8 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         if ((err = papOpen(&tuple, &gConnID, &gSockfd, &gSessionAddr, &flowQuantum)) == 0)
           break;
 
-        fprintf(stderr, "WARNING: Unable to open \"%s:%s\": %s\n", name, zone, strerror(err));
+        _cupsLangPrintf(stderr, _("WARNING: Unable to open \"%s:%s\": %s\n"),
+	                name, zone, strerror(err));
       }
       else
       {
@@ -490,14 +492,15 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 	  retry.interval = 2;
 	  retry.retries = 3;
 	  fprintf(stderr, "STATE: +apple-nbp-lookup-warning\n");
-	  fprintf(stderr, "WARNING: Printer not responding\n");
+	  _cupsLangPuts(stderr, _("WARNING: Printer not responding\n"));
 	}
       }
     }
     else
     {
       fprintf(stderr, "STATE: +apple-appletalk-disabled-warning\n");
-      fprintf(stderr, "INFO: AppleTalk disabled in System Preferences.\n");
+      _cupsLangPuts(stderr,
+                    _("INFO: AppleTalk disabled in System Preferences.\n"));
     }
 
     elasped_time = time(NULL) - start_time;
@@ -507,7 +510,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 
     if (connect_timeout && elasped_time > connect_timeout)
     {
-      fprintf(stderr, "ERROR: Printer not responding\n");
+      _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
       err = ETIMEDOUT;
       goto Exit;					 	/* Waiting too long... */
     }
@@ -550,14 +553,14 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 
 #endif /* HAVE_SIGSET */
 
-  fprintf(stderr, "INFO: Sending data\n");
+  _cupsLangPuts(stderr, _("INFO: Sending data\n"));
 
   sendDataAddr = tuple.enu_addr;
 
   /* Start the tickle packets and set a timeout alarm  */
   if ((err = papSendRequest(gSockfd, &gSessionAddr, gConnID, AT_PAP_TYPE_TICKLE, 0, false, false)) < 0)
   {
-    perror("ERROR: Unable to send PAP tickle request");
+    _cupsLangPrintError(_("ERROR: Unable to send PAP tickle request"));
     goto Exit;
   }
   signal(SIGALRM, signalHandler);
@@ -566,7 +569,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   /* Prime the pump with an initial send-data packet */
   if ((err = papSendRequest(gSockfd, &gSessionAddr, gConnID, AT_PAP_TYPE_SEND_DATA, 0xFF, true, true)) < 0)
   {
-    perror("ERROR: Unable to send initial PAP send data request");
+    _cupsLangPrintError(_("ERROR: Unable to send initial PAP send data request"));
     goto Exit;
   }
 
@@ -615,7 +618,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     /* Wait here for something interesting to happen */
     if ((err = select(maxfdp1, &readSet, 0, 0, timeoutPtr)) < 0)
     {
-      perror("ERROR: select");
+      _cupsLangPrintError(_("ERROR: select() failed"));
       break;
     }
 
@@ -623,7 +626,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     {
       /* Time to send a status request */
       if ((err = papSendRequest(gSockfd, &tuple.enu_addr, 0, AT_PAP_TYPE_SEND_STATUS, 0x01, false, false)) < 0)
-        perror("WARNING: Unable to send PAP status request");
+        _cupsLangPrintError(_("WARNING: Unable to send PAP status request"));
 
       if (gStatusInterval)
         nextStatusTime = time(NULL) + gStatusInterval;
@@ -674,7 +677,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     {
       if ((rc = atp_look(gSockfd)) < 0)
       {
-        perror("ERROR: Unable to look for PAP response");
+        _cupsLangPrintError(_("ERROR: Unable to look for PAP response"));
         break;
       }
   
@@ -687,7 +690,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   
         if ((err = atp_getresp(gSockfd, &tid, &resp)) < 0)
         {
-          perror("ERROR: Unable to get PAP response");
+          _cupsLangPrintError(_("ERROR: Unable to get PAP response"));
           break;
         }
         userdata = resp.userdata[0];
@@ -698,7 +701,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         reqlen = sizeof(atpReqBuf);
         if ((err = atp_getreq(gSockfd, &src, atpReqBuf, &reqlen, &userdata, &xo, &tid, &bitmap, 0)) < 0)
         {
-          perror("ERROR: Unable to get PAP request");
+          _cupsLangPrintError(_("ERROR: Unable to get PAP request"));
           break;
         }
       }
@@ -817,13 +820,15 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
             goto Exit;
           else
           {
-            fprintf(stderr, "WARNING: Printer sent unexpected EOF\n");
+            _cupsLangPuts(stderr, _("WARNING: Printer sent unexpected EOF\n"));
           }
         }
 
         if ((err = papSendRequest(gSockfd, &gSessionAddr, gConnID, AT_PAP_TYPE_SEND_DATA, 0xFF, true, true)) < 0)
         {
-          fprintf(stderr, "ERROR: Error %d sending PAPSendData resuest: %s\n", err, strerror(errno));
+          _cupsLangPrintf(stderr,
+	                  _("ERROR: Error %d sending PAPSendData request: %s\n"),
+			  err, strerror(errno));
           goto Exit;
         }
         break;
@@ -838,11 +843,11 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         /* If this is EOF then were we expecting it? */
         if (fileEOFSent == true)
         {
-          fprintf(stderr, "WARNING: Printer sent unexpected EOF\n");
+          _cupsLangPuts(stderr, _("WARNING: Printer sent unexpected EOF\n"));
         }
         else
         {
-          fprintf(stderr, "ERROR: Printer sent unexpected EOF\n");
+          _cupsLangPuts(stderr, _("ERROR: Printer sent unexpected EOF\n"));
         }
         goto Exit;
         break;
@@ -851,11 +856,13 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
       case AT_PAP_TYPE_OPEN_CONN_REPLY:        /* Open-Connection-Reply packet */
       case AT_PAP_TYPE_SEND_STATUS:          /* Send-Status packet */
       case AT_PAP_TYPE_CLOSE_CONN_REPLY:        /* Close-Connection-Reply packet */
-        fprintf(stderr, "WARNING: Unexpected PAP packet of type %d\n", TYPE_OF(userdata));
+        _cupsLangPrintf(stderr, _("WARNING: Unexpected PAP packet of type %d\n"),
+	                TYPE_OF(userdata));
         break;
       
       default:
-        fprintf(stderr, "WARNING: Unknown PAP packet of type %d\n", TYPE_OF(userdata));
+        _cupsLangPrintf(stderr, _("WARNING: Unknown PAP packet of type %d\n"),
+	                TYPE_OF(userdata));
         break;
       }
     
@@ -911,7 +918,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
   socketfd  = 0;
   puserdata = (u_char *)&userdata;
 
-  fprintf(stderr, "INFO: Opening connection\n");
+  _cupsLangPuts(stderr, _("INFO: Opening connection\n"));
 
   if ((*fd = atp_open(&socketfd)) < 0)
     return -1;
@@ -1443,7 +1450,9 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
         }
         else
         {
-          fprintf(stderr, "WARNING: Boolean expected for waiteof option \"%s\"\n", value);
+          _cupsLangPrintf(stderr,
+	                  _("WARNING: Boolean expected for waiteof option \"%s\"\n"),
+			  value);
         }
       }
       else if (!strcasecmp(optionName, "status"))
@@ -1455,8 +1464,9 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
         statusInterval = atoi(value);
         if (value[0] < '0' || value[0] > '9' || statusInterval < 0)
         {
-          fprintf(stderr, "WARNING: number expected for status option \"%s\"\n",
-	          value);
+          _cupsLangPrintf(stderr,
+	                  _("WARNING: number expected for status option \"%s\"\n"),
+	                  value);
         }
         else
         {
@@ -1675,7 +1685,7 @@ static int connectTimeout()
  */
 static void signalHandler(int sigraised)
 {
-  fprintf(stderr, "ERROR: There was a timeout error while sending data to the printer\n");
+  _cupsLangPuts(stderr, _("ERROR: There was a timeout error while sending data to the printer\n"));
 
   papClose();
 

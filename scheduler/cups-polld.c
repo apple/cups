@@ -144,7 +144,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop forever, asking for available printers and classes...
   */
 
-  for (http = NULL;;)
+  for (http = NULL; !ferror(stderr);)
   {
    /*
     * Open a connection to the server...
@@ -180,6 +180,8 @@ main(int  argc,				/* I - Number of command-line args */
     if (remain > 0 && !restart_polling)
       sleep(remain);
   }
+
+  return (1);
 }
 
 

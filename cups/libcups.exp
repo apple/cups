@@ -8,6 +8,7 @@ __cupsCharmapGet
 __cupsEncodingName
 __cupsGetPassword
 __cupsGlobals
+__cupsLangPrintError
 __cupsLangPrintf
 __cupsLangPuts
 __cupsLangString

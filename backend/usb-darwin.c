@@ -1,7 +1,7 @@
 /*
 * "$Id: usb-darwin.c 6993 2007-09-28 18:05:28Z mike $"
 *
-* Copyright � 2005-2007 Apple Inc. All rights reserved.
+* Copyright � 2005-2008 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -600,7 +600,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN || errno != EINTR)
 	  {
-	    perror("ERROR: Unable to read print data");
+	    _cupsLangPrintError(_("ERROR: Unable to read print data"));
 	    return CUPS_BACKEND_STOP;
 	  }
 
@@ -1131,7 +1131,7 @@ static Boolean find_device_cb(void *refcon,
   if (!keepLooking && g.status_timer != NULL)
   {
     fputs("STATE: -offline-error\n", stderr);
-    _cupsLangPuts(stderr, _("INFO: Printer is now on-line.\n"));
+    _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
     g.status_timer = NULL;
@@ -1149,7 +1149,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
+  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
 
   if (getenv("CLASS") != NULL)
   {
@@ -1798,7 +1798,7 @@ static void run_ppc_backend(int argc,
 
       execv("/usr/libexec/cups/backend/usb", my_argv);
 
-      perror("/usr/libexec/cups/backend/usb");
+      _cupsLangPrintError(_("ERROR: Unable to exec /usr/libexec/cups/backend/usb"));
       exit(errno);
     }
     else if (child_pid < 0)
@@ -1807,7 +1807,7 @@ static void run_ppc_backend(int argc,
       * Error - couldn't fork a new process!
       */
 
-      perror("fork");
+      _cupsLangPrintError(_("ERROR: Unable to fork"));
       exit(errno);
     }
 

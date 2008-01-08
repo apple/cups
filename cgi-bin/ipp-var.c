@@ -845,7 +845,7 @@ cgiSetIPPObjectVars(
         remaining = sizeof(value) - (valptr - value);
 
         if (!strcmp(attr->values[i].string.text, "printer-stopped"))
-	  strlcpy(valptr, _("Printer Stopped"), remaining);
+	  strlcpy(valptr, _("Printer Paused"), remaining);
 	else if (!strcmp(attr->values[i].string.text, "printer-added"))
 	  strlcpy(valptr, _("Printer Added"), remaining);
 	else if (!strcmp(attr->values[i].string.text, "printer-modified"))

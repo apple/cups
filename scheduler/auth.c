@@ -3,7 +3,7 @@
  *
  *   Authorization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -21,9 +21,11 @@
  *   cupsdAddName()            - Add a name to a location...
  *   cupsdAllowHost()          - Add a host name that is allowed to access the
  *                               location.
- *   cupsdAllowIP()            - Add an IP address or network that is allowed
- *                               to access the location.
+ *   cupsdAllowIP()            - Add an IP address or network that is allowed to
+ *                               access the location.
  *   cupsdAuthorize()          - Validate any authorization credentials.
+ *   cupsdCheckAccess()        - Check whether the given address is allowed to
+ *                               access a location.
  *   cupsdCheckAuth()          - Check authorization masks.
  *   cupsdCheckGroup()         - Check for a user's group membership.
  *   cupsdCopyLocation()       - Make a copy of a location...
@@ -40,6 +42,8 @@
  *   cupsdIsAuthorized()       - Check to see if the user is authorized...
  *   add_allow()               - Add an allow mask to the location.
  *   add_deny()                - Add a deny mask to the location.
+ *   check_authref()           - Check if an authorization services reference
+ *                               has the supplied right.
  *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
@@ -47,7 +51,6 @@
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
- *   check_authref()           - Check an authorization services reference.
  */
 
 /*
@@ -1095,6 +1098,67 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
 /*
+ * 'cupsdCheckAccess()' - Check whether the given address is allowed to
+ *                        access a location.
+ */
+
+int					/* O - 1 if allowed, 0 otherwise */
+cupsdCheckAccess(
+    unsigned         ip[4],		/* I - Client address */
+    char             *name,		/* I - Client hostname */
+    int              namelen,		/* I - Length of hostname */
+    cupsd_location_t *loc)		/* I - Location to check */
+{
+  int	allow;				/* 1 if allowed, 0 otherwise */
+
+
+  if (!strcasecmp(name, "localhost"))
+  {
+   /*
+    * Access from localhost (127.0.0.1 or ::1) is always allowed...
+    */
+
+    return (1);
+  }
+  else
+  {
+   /*
+    * Do authorization checks on the domain/address...
+    */
+
+    switch (loc->order_type)
+    {
+      default :
+	  allow = 0;	/* anti-compiler-warning-code */
+	  break;
+
+      case AUTH_ALLOW : /* Order Deny,Allow */
+          allow = 1;
+
+          if (cupsdCheckAuth(ip, name, namelen, loc->num_deny, loc->deny))
+	    allow = 0;
+
+          if (cupsdCheckAuth(ip, name, namelen, loc->num_allow, loc->allow))
+	    allow = 1;
+	  break;
+
+      case AUTH_DENY : /* Order Allow,Deny */
+          allow = 0;
+
+          if (cupsdCheckAuth(ip, name, namelen, loc->num_allow, loc->allow))
+	    allow = 1;
+
+          if (cupsdCheckAuth(ip, name, namelen, loc->num_deny, loc->deny))
+	    allow = 0;
+	  break;
+    }
+  }
+
+  return (allow);
+}
+
+
+/*
  * 'cupsdCheckAuth()' - Check authorization masks.
  */
 
@@ -1892,51 +1956,8 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
   hostlen = strlen(con->http.hostname);
 
-  if (!strcasecmp(con->http.hostname, "localhost"))
-  {
-   /*
-    * Access from localhost (127.0.0.1 or ::1) is always allowed...
-    */
-
-    auth = AUTH_ALLOW;
-  }
-  else
-  {
-   /*
-    * Do authorization checks on the domain/address...
-    */
-
-    switch (best->order_type)
-    {
-      default :
-	  auth = AUTH_DENY;	/* anti-compiler-warning-code */
-	  break;
-
-      case AUTH_ALLOW : /* Order Deny,Allow */
-          auth = AUTH_ALLOW;
-
-          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
-	          	best->num_deny, best->deny))
-	    auth = AUTH_DENY;
-
-          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
-	        	best->num_allow, best->allow))
-	    auth = AUTH_ALLOW;
-	  break;
-
-      case AUTH_DENY : /* Order Allow,Deny */
-          auth = AUTH_DENY;
-
-          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
-	        	best->num_allow, best->allow))
-	    auth = AUTH_ALLOW;
-
-          if (cupsdCheckAuth(address, con->http.hostname, hostlen,
-	        	best->num_deny, best->deny))
-	    auth = AUTH_DENY;
-	  break;
-    }
-  }
+  auth = cupsdCheckAccess(address, con->http.hostname, hostlen, best)
+             ? AUTH_ALLOW : AUTH_DENY;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: auth=AUTH_%s...",
                   auth ? "DENY" : "ALLOW");

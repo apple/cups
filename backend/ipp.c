@@ -407,13 +407,13 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
-      perror("ERROR: unable to create temporary file");
+      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
       return (CUPS_BACKEND_FAILED);
     }
 
     if ((fp = cupsFileOpenFd(fd, compression ? "w9" : "w")) == NULL)
     {
-      perror("ERROR: unable to open temporary file");
+      _cupsLangPrintError(_("ERROR: Unable to open temporary file"));
       close(fd);
       unlink(tmpfilename);
       return (CUPS_BACKEND_FAILED);
@@ -422,7 +422,7 @@ main(int  argc,				/* I - Number of command-line args */
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (cupsFileWrite(fp, buffer, bytes) < bytes)
       {
-        perror("ERROR: unable to write to temporary file");
+        _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
 	cupsFileClose(fp);
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
@@ -1485,7 +1485,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
     else if (!strncmp(reason, "moving-to-paused", 16) ||
              !strncmp(reason, "paused", 6) ||
 	     !strncmp(reason, "shutdown", 8))
-      message = _("Printer off-line.");
+      message = _("Printer offline.");
     else if (!strncmp(reason, "toner-low", 9))
       message = _("Toner low.");
     else if (!strncmp(reason, "toner-empty", 11))
