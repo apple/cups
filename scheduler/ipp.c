@@ -2407,12 +2407,15 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
                                  IPP_TAG_NAME);
-    for (i = 0; i < supported->num_values; i ++)
-      if (!strcmp(supported->values[i].string.text,
-                  attr->values[0].string.text))
-        break;
+    if (supported)
+    {
+      for (i = 0; i < supported->num_values; i ++)
+        if (!strcmp(supported->values[i].string.text,
+                    attr->values[0].string.text))
+          break;
+    }
 
-    if (i >= supported->num_values)
+    if (!supported || i >= supported->num_values)
     {
       send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad port-monitor \"%s\"!"),
         	      attr->values[0].string.text);
