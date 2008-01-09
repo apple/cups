@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Filename-based MIME rules did not work (STR #2659)
 	- The cups-polld program did not exit if the scheduler crashed
 	  (STR #2640)
 	- The scheduler would crash if you tried to set the port-monitor
