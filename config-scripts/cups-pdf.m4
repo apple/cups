@@ -18,12 +18,20 @@ AC_ARG_ENABLE(pdftops, [  --enable-pdftops        build pdftops filter, default=
 PDFTOPS=""
 
 if test "x$enable_pdftops" != xno; then
-	AC_MSG_CHECKING(whether to build pdftops filter)
-	if test "x$enable_pdftops" = xyes -o $uname != Darwin; then
-		PDFTOPS="pdftops"
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
+	AC_PATH_PROG(CUPS_PDFTOPS, pdftops)
+	AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
+
+	if test "x$CUPS_PDFTOPS" != x; then
+		AC_MSG_CHECKING(whether to build pdftops filter)
+		if test x$enable_pdftops = xyes -o $uname != Darwin; then
+			PDFTOPS="pdftops"
+			AC_MSG_RESULT(yes)
+		else
+			AC_MSG_RESULT(no)
+		fi
+	elif test x$enable_pdftops = xyes; then
+		AC_MSG_ERROR(Unable to find pdftops program!)
+		exit 1
 	fi
 fi
 

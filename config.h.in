@@ -431,6 +431,13 @@
 
 
 /*
+ * Location of the poppler/Xpdf pdftops program...
+ */
+
+#define CUPS_PDFTOPS	"/usr/bin/pdftops"
+
+
+/*
  * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
  */
 
