@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The standard CUPS backends could use 100% CPU while waiting
+	  for print data (STR #2664)
 	- Filename-based MIME rules did not work (STR #2659)
 	- The cups-polld program did not exit if the scheduler crashed
 	  (STR #2640)
