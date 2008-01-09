@@ -3,7 +3,7 @@
 #
 #   Notifier makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -44,7 +44,7 @@ install:	all
 	for file in $(TARGETS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done
-	$(INSTALL_DIR) -m 755 $(CACHEDIR)/rss
+	$(INSTALL_DIR) -m 775 $(CACHEDIR)/rss
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
