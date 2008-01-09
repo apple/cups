@@ -27,6 +27,7 @@
 #include <cups/string.h>
 #include <cups/i18n.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 
 /*
