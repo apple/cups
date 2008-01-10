@@ -58,6 +58,7 @@ typedef enum cups_asn1_e		/**** ASN1 request/object types ****/
 typedef struct cups_snmp_data_s		/**** SNMP data packet ****/
 {
   const char	*error;			/* Encode/decode error */
+  http_addr_t	address;		/* Source address */
   int		version;		/* Version number */
   char		community[CUPS_SNMP_MAX_STRING];
 					/* Community name */
@@ -88,7 +89,7 @@ extern "C" {
 
 extern void		cupsSNMPClose(int fd);
 extern int		cupsSNMPOpen(void);
-extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *buffer);
+extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet);
 extern int		cupsSNMPWrite(int fd, http_addr_t *addr, int version,
 				      const char *community,
 				      const unsigned request_id,

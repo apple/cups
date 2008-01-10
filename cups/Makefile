@@ -55,6 +55,7 @@ LIBOBJS	=	\
 		ppd.o \
 		request.o \
 		sidechannel.o \
+		snmp.o \
 		snprintf.o \
 		string.o \
 		tempfile.o \
