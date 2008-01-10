@@ -3,7 +3,7 @@
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -223,6 +223,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   read_snmp_conf(argv[1]);
+
+  cupsSNMPDebug(DebugLevel);
 
   Devices = cupsArrayNew((cups_array_func_t)compare_cache, NULL);
 

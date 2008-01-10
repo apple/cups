@@ -88,6 +88,7 @@ extern "C" {
 #  endif /* __cplusplus */
 
 extern void		cupsSNMPClose(int fd);
+extern void		cupsSNMPDebug(int level);
 extern int		cupsSNMPOpen(void);
 extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet);
 extern int		cupsSNMPWrite(int fd, http_addr_t *addr, int version,

@@ -20,6 +20,7 @@
  *   cupsSNMPOpen()      - Open a SNMP socket.
  *   cupsSNMPRead()      - Read and parse a SNMP response...
  *   cupsSNMPWrite()     - Send an SNMP query packet.
+ *   asn1_debug()        - Dump an ASN1-encoded message.
  *   asn1_decode_snmp()  - Decode a SNMP packet.
  *   asn1_encode_snmp()  - Encode a SNMP packet.
  *   asn1_get_integer()  - Get an integer value.
@@ -58,6 +59,8 @@
 
 static int		asn1_decode_snmp(unsigned char *buffer, size_t len,
 			                 cups_snmp_t *packet);
+static void		asn1_debug(const char *prefix, unsigned char *buffer,
+			           size_t len, int indent);
 static int		asn1_encode_snmp(unsigned char *buffer, size_t len,
 			                 cups_snmp_t *packet);
 static int		asn1_get_integer(unsigned char **buffer,
@@ -94,6 +97,8 @@ static void		snmp_set_error(cups_snmp_t *packet,
 
 /*
  * 'cupsSNMPClose()' - Close a SNMP socket.
+ *
+ * @since CUPS 1.4@
  */
 
 void
@@ -108,7 +113,25 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 
 
 /*
+ * 'cupsSNMPDebug()' - Enable/disable debug logging to stderr.
+ *
+ * @since CUPS 1.4@
+ */
+
+void
+cupsSNMPDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  cg->snmp_debug = level;
+}
+
+
+/*
  * 'cupsSNMPOpen()' - Open a SNMP socket.
+ *
+ * @since CUPS 1.4@
  */
 
 int					/* O - SNMP socket file descriptor */
@@ -144,6 +167,8 @@ cupsSNMPOpen(void)
 
 /*
  * 'cupsSNMPRead()' - Read and parse a SNMP response...
+ *
+ * @since CUPS 1.4@
  */
 
 cups_snmp_t *				/* O - SNMP packet or NULL if none */
@@ -177,6 +202,8 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Look for the response status code in the SNMP message header...
   */
 
+  asn1_debug("DEBUG: IN ", buffer, bytes, 0);
+
   asn1_decode_snmp(buffer, bytes, packet);
 
  /*
@@ -189,6 +216,8 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
 /*
  * 'cupsSNMPWrite()' - Send an SNMP query packet.
+ *
+ * @since CUPS 1.4@
  */
 
 int					/* O - 1 on success, 0 on error */
@@ -231,6 +260,8 @@ cupsSNMPWrite(
 
     return (0);
   }
+
+  asn1_debug("DEBUG: OUT ", buffer, bytes, 0);
 
  /*
   * Send the message...
@@ -386,6 +417,116 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
   return (packet->error ? -1 : 0);
 }
 
+
+/*
+ * 'asn1_debug()' - Decode an ASN1-encoded message.
+ */
+
+static void
+asn1_debug(const char    *prefix,	/* I - Prefix string */
+           unsigned char *buffer,	/* I - Buffer */
+           size_t        len,		/* I - Length of buffer */
+           int           indent)	/* I - Indentation */
+{
+  int		i;			/* Looping var */
+  unsigned char	*bufend;		/* End of buffer */
+  int		integer;		/* Number value */
+  int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
+  char		string[CUPS_SNMP_MAX_STRING];
+					/* String value */
+  unsigned char	value_type;		/* Type of value */
+  int		value_length;		/* Length of value */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (cg->snmp_debug <= 0)
+    return;
+
+  bufend = buffer + len;
+
+  while (buffer < bufend)
+  {
+   /*
+    * Get value type...
+    */
+
+    value_type   = asn1_get_type(&buffer, bufend);
+    value_length = asn1_get_length(&buffer, bufend);
+
+    switch (value_type)
+    {
+      case CUPS_ASN1_BOOLEAN :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sBOOLEAN %d bytes %d\n", prefix, indent, "",
+	          value_length, integer);
+          break;
+
+      case CUPS_ASN1_INTEGER :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sINTEGER %d bytes %d\n", prefix, indent, "",
+	          value_length, integer);
+          break;
+
+      case CUPS_ASN1_OCTET_STRING :
+          fprintf(stderr, "%s%*sOCTET STRING %d bytes \"%s\"\n", prefix,
+	          indent, "", value_length,
+		  asn1_get_string(&buffer, bufend, value_length, string,
+				  sizeof(string)));
+          break;
+
+      case CUPS_ASN1_NULL_VALUE :
+          fprintf(stderr, "%s%*sNULL VALUE %d bytes\n", prefix, indent, "",
+	          value_length);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_OID :
+          asn1_get_oid(&buffer, bufend, value_length, oid, CUPS_SNMP_MAX_OID);
+
+          fprintf(stderr, "%s%*sOID %d bytes ", prefix, indent, "",
+	          value_length);
+	  for (i = 0; oid[i]; i ++)
+	    fprintf(stderr, ".%d", oid[i]);
+	  putc('\n', stderr);
+          break;
+
+      case CUPS_ASN1_SEQUENCE :
+          fprintf(stderr, "%s%*sSEQUENCE %d bytes\n", prefix, indent, "",
+	          value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_GET_REQUEST :
+          fprintf(stderr, "%s%*sGet-Request-PDU %d bytes\n", prefix, indent, "",
+	          value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_GET_RESPONSE :
+          fprintf(stderr, "%s%*sGet-Response-PDU %d bytes\n", prefix, indent,
+	          "", value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      default :
+          fprintf(stderr, "%s%*sUNKNOWN(%x) %d bytes\n", prefix, indent, "",
+	          value_type, value_length);
+
+	  buffer += value_length;
+          break;
+    }
+  }
+}
+          
 
 /*
  * 'asn1_encode_snmp()' - Encode a SNMP packet.

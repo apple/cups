@@ -147,6 +147,7 @@ _cupsReadResponseData
 _cupsRemoveDest
 _cupsRemoveOption
 _cupsSNMPClose
+_cupsSNMPDebug
 _cupsSNMPOpen
 _cupsSNMPRead
 _cupsSNMPWrite
