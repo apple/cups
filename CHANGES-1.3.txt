@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Fixed another ASN1 string parsing bug (STR #2665)
 	- The RSS notifier directory was not installed with the
 	  correct permissions.
 	- The standard CUPS backends could use 100% CPU while waiting
