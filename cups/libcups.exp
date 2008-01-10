@@ -146,6 +146,10 @@ _cupsPutFile
 _cupsReadResponseData
 _cupsRemoveDest
 _cupsRemoveOption
+_cupsSNMPClose
+_cupsSNMPOpen
+_cupsSNMPRead
+_cupsSNMPWrite
 _cupsSendRequest
 _cupsServer
 _cupsSetDefaultDest
