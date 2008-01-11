@@ -31,7 +31,7 @@
  */
 
 #define CUPS_SNMP_PORT		161	/* SNMP well-known port */
-#define CUPS_SNMP_MAX_OID	64	/* Maximum number of OID numbers */
+#define CUPS_SNMP_MAX_OID	128	/* Maximum number of OID numbers */
 #define CUPS_SNMP_MAX_PACKET	1472	/* Maximum size of SNMP packet */
 #define CUPS_SNMP_MAX_STRING	512	/* Maximum size of string */
 #define CUPS_SNMP_VERSION_1	0	/* SNMPv1 */
@@ -51,12 +51,15 @@ typedef enum cups_asn1_e		/**** ASN1 request/object types ****/
   CUPS_ASN1_NULL_VALUE = 0x05,		/* NULL VALUE */
   CUPS_ASN1_OID = 0x06,			/* OBJECT IDENTIFIER */
   CUPS_ASN1_SEQUENCE = 0x30,		/* SEQUENCE */
+  CUPS_ASN1_APPLICATION = 0x40,		/* Application-specific bit */
+  CUPS_ASN1_COUNTER = 0x41,		/* 32-bit unsigned aka Counter32 */
+  CUPS_ASN1_GAUGE = 0x42,		/* 32-bit unsigned aka Gauge32 */
   CUPS_ASN1_GET_REQUEST = 0xa0,		/* GetRequest-PDU */
   CUPS_ASN1_GET_NEXT_REQUEST = 0xa1,	/* GetNextRequest-PDU */
   CUPS_ASN1_GET_RESPONSE = 0xa2		/* GetResponse-PDU */
 } cups_asn1_t;
 
-typedef struct cups_snmp_data_s		/**** SNMP data packet ****/
+typedef struct cups_snmp_s		/**** SNMP data packet ****/
 {
   const char	*error;			/* Encode/decode error */
   http_addr_t	address;		/* Source address */
@@ -74,6 +77,8 @@ typedef struct cups_snmp_data_s		/**** SNMP data packet ****/
   {
     int		boolean;		/* Boolean value */
     int		integer;		/* Integer value */
+    unsigned	counter;		/* Counter value */
+    unsigned	gauge;			/* Gauge value */
     int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
     char	string[CUPS_SNMP_MAX_STRING];/* String value */
   }		object_value;		/* object-value value */

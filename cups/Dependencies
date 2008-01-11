@@ -109,6 +109,7 @@ testlang.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.o: ../config.h
 testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
 testppd.o: file.h
+testsnmp.o: string.h ../config.h snmp.h http.h versioning.h
 # DO NOT DELETE
 
 adminutil.32.o: adminutil.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
@@ -220,6 +221,7 @@ testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h st
 testlang.32.o: testlang.c  ../config.h
 testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
 testppd.32.o: testppd.c  file.h
+testsnmp.32.o: testsnmp.c  string.h ../config.h snmp.h http.h versioning.h
 # DO NOT DELETE
 
 adminutil.64.o: adminutil.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
@@ -331,3 +333,4 @@ testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h st
 testlang.64.o: testlang.c  ../config.h
 testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
 testppd.64.o: testppd.c  file.h
+testsnmp.64.o: testsnmp.c  string.h ../config.h snmp.h http.h versioning.h

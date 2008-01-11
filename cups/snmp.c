@@ -556,6 +556,16 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 		                 packet->object_value.oid, CUPS_SNMP_MAX_OID);
 	            break;
 
+	        case CUPS_ASN1_COUNTER :
+		    packet->object_value.counter =
+		        asn1_get_integer(&bufptr, bufend, length);
+	            break;
+
+	        case CUPS_ASN1_GAUGE :
+		    packet->object_value.gauge =
+		        asn1_get_integer(&bufptr, bufend, length);
+	            break;
+
                 default :
 		    snmp_set_error(packet, _("Unsupported value type"));
 		    break;

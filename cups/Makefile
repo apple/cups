@@ -77,6 +77,7 @@ OBJS	=	\
 		testipp.o \
 		testlang.o \
 		testppd.o \
+		testsnmp.o \
 		php_cups_wrap.o
 
 
@@ -97,6 +98,7 @@ HEADERS	=	\
 		language.h \
 		ppd.h \
 		sidechannel.h \
+		snmp.h \
 		transcode.h \
 		versioning.h
 
@@ -118,7 +120,8 @@ TARGETS	=	\
 		testi18n \
 		testipp \
 		testlang \
-		testppd
+		testppd \
+		testsnmp
 
 
 #
@@ -422,6 +425,16 @@ testlang:	testlang.o libcups.a
 testppd:	testppd.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testsnmp (dependency on static CUPS library is intentional)
+#
+
+testsnmp:	testsnmp.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testsnmp.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
