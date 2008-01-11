@@ -147,11 +147,12 @@ _cupsReadResponseData
 _cupsRemoveDest
 _cupsRemoveOption
 _cupsSNMPClose
-_cupsSNMPDebug
-_cupsSNMPHasPrefix
+_cupsSNMPCopyOID
 _cupsSNMPIsOID
+_cupsSNMPIsOIDPrefixed
 _cupsSNMPOpen
 _cupsSNMPRead
+_cupsSNMPSetDebug
 _cupsSNMPWrite
 _cupsSendRequest
 _cupsServer

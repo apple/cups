@@ -16,37 +16,38 @@
  *
  * Contents:
  *
- *   cupsSNMPClose()     - Close a SNMP socket.
- *   cupsSNMPDebug()     - Enable/disable debug logging to stderr.
- *   cupsSNMPHasPrefix() - Test whetehr a SNMP response uses the specified OID
- *                         prefix.
- *   cupsSNMPIsOID()     - Test whether a SNMP response contains the specified
- *                         OID.
- *   cupsSNMPOpen()      - Open a SNMP socket.
- *   cupsSNMPRead()      - Read and parse a SNMP response...
- *   cupsSNMPWrite()     - Send an SNMP query packet.
- *   asn1_debug()        - Dump an ASN1-encoded message.
- *   asn1_decode_snmp()  - Decode a SNMP packet.
- *   asn1_encode_snmp()  - Encode a SNMP packet.
- *   asn1_get_integer()  - Get an integer value.
- *   asn1_get_length()   - Get a value length.
- *   asn1_get_oid()      - Get an OID value.
- *   asn1_get_packed()   - Get a packed integer value.
- *   asn1_get_string()   - Get a string value.
- *   asn1_get_type()     - Get a value type.
- *   asn1_set_integer()  - Set an integer value.
- *   asn1_set_length()   - Set a value length.
- *   asn1_set_oid()      - Set an OID value.
- *   asn1_set_packed()   - Set a packed integer value.
- *   asn1_size_integer() - Figure out the number of bytes needed for an integer
- *                         value.
- *   asn1_size_length()  - Figure out the number of bytes needed for a length
- *                         value.
- *   asn1_size_oid()     - Figure out the numebr of bytes needed for an OID
- *                         value.
- *   asn1_size_packed()  - Figure out the number of bytes needed for a packed
- *                         integer value.
- *   snmp_set_error()    - Set the localized error for a packet.
+ *   cupsSNMPClose()         - Close a SNMP socket.
+ *   cupsSNMPCopyOID()       - Copy an OID.
+ *   cupsSNMPIsOID()         - Test whether a SNMP response contains the
+ *                             specified OID.
+ *   cupsSNMPIsOIDPrefixed() - Test whether a SNMP response uses the specified
+ *                             OID prefix.
+ *   cupsSNMPOpen()          - Open a SNMP socket.
+ *   cupsSNMPRead()          - Read and parse a SNMP response...
+ *   cupsSNMPSetDebug()      - Enable/disable debug logging to stderr.
+ *   cupsSNMPWrite()         - Send an SNMP query packet.
+ *   asn1_decode_snmp()      - Decode a SNMP packet.
+ *   asn1_debug()            - Decode an ASN1-encoded message.
+ *   asn1_encode_snmp()      - Encode a SNMP packet.
+ *   asn1_get_integer()      - Get an integer value.
+ *   asn1_get_length()       - Get a value length.
+ *   asn1_get_oid()          - Get an OID value.
+ *   asn1_get_packed()       - Get a packed integer value.
+ *   asn1_get_string()       - Get a string value.
+ *   asn1_get_type()         - Get a value type.
+ *   asn1_set_integer()      - Set an integer value.
+ *   asn1_set_length()       - Set a value length.
+ *   asn1_set_oid()          - Set an OID value.
+ *   asn1_set_packed()       - Set a packed integer value.
+ *   asn1_size_integer()     - Figure out the number of bytes needed for an
+ *                             integer value.
+ *   asn1_size_length()      - Figure out the number of bytes needed for a
+ *                             length value.
+ *   asn1_size_oid()         - Figure out the numebr of bytes needed for an OID
+ *                             value.
+ *   asn1_size_packed()      - Figure out the number of bytes needed for a
+ *                             packed integer value.
+ *   snmp_set_error()        - Set the localized error for a packet.
  */
 
 /*
@@ -56,6 +57,9 @@
 #include "globals.h"
 #include "snmp.h"
 #include <errno.h>
+#ifdef HAVE_POLL
+#  include <sys/poll.h>
+#endif /* HAVE_POLL */
 
 
 /*
@@ -118,55 +122,23 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 
 
 /*
- * 'cupsSNMPDebug()' - Enable/disable debug logging to stderr.
- *
- * @since CUPS 1.4@
+ * 'cupsSNMPCopyOID()' - Copy an OID.
  */
 
-void
-cupsSNMPDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
-{
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
-
-
-  cg->snmp_debug = level;
-}
-
-
-/*
- * 'cupsSNMPHasPrefix()' - Test whetehr a SNMP response uses the specified OID
- *                         prefix.
- *
- * The array pointed to by "prefix" is 0-terminated.
- *
- * @since CUPS 1.4@
- */
-
-int					/* O - 1 if equal, 0 if not equal */
-cupsSNMPHasPrefix(cups_snmp_t *packet,	/* I - Response packet */
-                  const int   *prefix)	/* I - OID prefix */
+int *					/* O - New OID */
+cupsSNMPCopyOID(int       *dst,		/* I - Destination OID */
+                const int *src,		/* I - Source OID */
+		int       dstsize)	/* I - Number of integers in dst */
 {
   int	i;				/* Looping var */
 
 
- /*
-  * Range check input...
-  */
+  for (i = 0, dstsize --; src[i] && i < dstsize; i ++)
+    dst[i] = src[i];
 
-  if (!packet || !prefix)
-    return (0);
+  dst[i] = 0;
 
- /*
-  * Compare OIDs...
-  */
-
-  for (i = 0;
-       i < CUPS_SNMP_MAX_OID && prefix[i] && packet->object_name[i];
-       i ++)
-    if (prefix[i] != packet->object_name[i])
-      return (0);
-
-  return (i < CUPS_SNMP_MAX_OID);
+  return (dst);
 }
 
 
@@ -201,6 +173,44 @@ cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
       return (0);
 
   return (i < CUPS_SNMP_MAX_OID && oid[i] == packet->object_name[i]);
+}
+
+
+/*
+ * 'cupsSNMPIsOIDPrefixed()' - Test whether a SNMP response uses the specified
+ *                             OID prefix.
+ *
+ * The array pointed to by "prefix" is 0-terminated.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - 1 if prefixed, 0 if not prefixed */
+cupsSNMPIsOIDPrefixed(
+    cups_snmp_t *packet,		/* I - Response packet */
+    const int   *prefix)		/* I - OID prefix */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!packet || !prefix)
+    return (0);
+
+ /*
+  * Compare OIDs...
+  */
+
+  for (i = 0;
+       i < CUPS_SNMP_MAX_OID && prefix[i] && packet->object_name[i];
+       i ++)
+    if (prefix[i] != packet->object_name[i])
+      return (0);
+
+  return (i < CUPS_SNMP_MAX_OID);
 }
 
 
@@ -244,12 +254,16 @@ cupsSNMPOpen(void)
 /*
  * 'cupsSNMPRead()' - Read and parse a SNMP response...
  *
+ * If "timeout" is negative, cupsSNMPRead() will wait for a response
+ * indefinitely.
+ *
  * @since CUPS 1.4@
  */
 
 cups_snmp_t *				/* O - SNMP packet or NULL if none */
 cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
-             cups_snmp_t *packet)	/* I - SNMP packet buffer */
+             cups_snmp_t *packet,	/* I - SNMP packet buffer */
+	     int         msec)		/* I - Timeout in milliseconds */
 {
   unsigned char	buffer[CUPS_SNMP_MAX_PACKET];
 					/* Data packet */
@@ -263,6 +277,50 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
   if (fd < 0 || !packet)
     return (NULL);
+
+ /*
+  * Optionally wait for a response...
+  */
+
+  if (msec >= 0)
+  {
+    int			ready;		/* Data ready on socket? */
+#ifdef HAVE_POLL
+    struct pollfd	pfd;		/* Polled file descriptor */
+
+    pfd.fd     = fd;
+    pfd.events = POLLIN;
+
+    while ((ready = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+
+#else
+    fd_set		input_set;	/* select() input set */
+    struct timeval	timeout;	/* select() timeout */
+
+    do
+    {
+      FD_ZERO(&input_set);
+      FD_SET(fd, &input_set);
+
+      timeout.tv_sec  = msec / 1000;
+      timeout.tv_usec = (msec % 1000) * 1000;
+
+      ready = select(fd + 1, &input_set, NULL, NULL, &timeout);
+    }
+#  ifdef WIN32
+    while (ready < 0 && WSAGetLastError() == WSAEINTR);
+#  else
+    while (ready < 0 && errno == EINTR);
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
+
+   /*
+    * If we don't have any data ready, return right away...
+    */
+
+    if (ready <= 0)
+      return (NULL);
+  }
 
  /*
   * Read the response data...
@@ -287,6 +345,22 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   */
 
   return (packet);
+}
+
+
+/*
+ * 'cupsSNMPSetDebug()' - Enable/disable debug logging to stderr.
+ *
+ * @since CUPS 1.4@
+ */
+
+void
+cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  cg->snmp_debug = level;
 }
 
 

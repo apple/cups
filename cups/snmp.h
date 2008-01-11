@@ -89,14 +89,16 @@ extern "C" {
 #  endif /* __cplusplus */
 
 extern void		cupsSNMPClose(int fd) _CUPS_API_1_4;
-extern void		cupsSNMPDebug(int level) _CUPS_API_1_4;
-extern int		cupsSNMPHasPrefix(cups_snmp_t *packet,
-			                  const int *prefix) _CUPS_API_1_4;
+extern int		*cupsSNMPCopyOID(int *dst, const int *src, int dstsize)
+			    _CUPS_API_1_4;
 extern int		cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
 			    _CUPS_API_1_4;
+extern int		cupsSNMPIsOIDPrefixed(cups_snmp_t *packet,
+			                      const int *prefix) _CUPS_API_1_4;
 extern int		cupsSNMPOpen(void) _CUPS_API_1_4;
-extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet)
+extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet, int msec)
 			    _CUPS_API_1_4;
+extern void		cupsSNMPSetDebug(int level) _CUPS_API_1_4;
 extern int		cupsSNMPWrite(int fd, http_addr_t *addr, int version,
 				      const char *community,
 				      cups_asn1_t request_type,

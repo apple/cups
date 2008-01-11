@@ -16,6 +16,29 @@
  *
  * Contents:
  *
+ *   main()                    - Discover printers via SNMP.
+ *   add_array()               - Add a string to an array.
+ *   add_cache()               - Add a cached device...
+ *   add_device_uri()          - Add a device URI to the cache.
+ *   alarm_handler()           - Handle alarm signals...
+ *   compare_cache()           - Compare two cache entries.
+ *   debug_printf()            - Display some debugging information.
+ *   fix_make_model()          - Fix common problems in the make-and-model
+ *                               string.
+ *   free_array()              - Free an array of strings.
+ *   free_cache()              - Free the array of cached devices.
+ *   get_interface_addresses() - Get the broadcast address(es) associated with
+ *                               an interface.
+ *   list_device()             - List a device we found...
+ *   password_cb()             - Handle authentication requests.
+ *   probe_device()            - Probe a device to discover whether it is a
+ *                               printer.
+ *   read_snmp_conf()          - Read the snmp.conf file.
+ *   read_snmp_response()      - Read and parse a SNMP response...
+ *   run_time()                - Return the total running time...
+ *   scan_devices()            - Scan for devices using SNMP.
+ *   try_connect()             - Try connecting on a port...
+ *   update_cache()            - Update a cached device...
  */
 
 /*
@@ -222,7 +245,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   read_snmp_conf(argv[1]);
 
-  cupsSNMPDebug(DebugLevel);
+  cupsSNMPSetDebug(DebugLevel);
 
   Devices = cupsArrayNew((cups_array_func_t)compare_cache, NULL);
 
@@ -878,7 +901,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Read the response data...
   */
 
-  if (!cupsSNMPRead(fd, &packet))
+  if (!cupsSNMPRead(fd, &packet, -1))
   {
     fprintf(stderr, "ERROR: Unable to read data from socket: %s\n",
             strerror(errno));
