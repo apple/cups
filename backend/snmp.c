@@ -152,11 +152,9 @@ static cups_array_t	*Addresses = NULL;
 static cups_array_t	*Communities = NULL;
 static cups_array_t	*Devices = NULL;
 static int		DebugLevel = 0;
-static int		DeviceDescOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
-			                    2, 1, 3, 1, 0 };
+static int		DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, 0 };
 static unsigned		DeviceDescRequest;
-static int		DeviceTypeOID[] = { 1, 3, 6, 1, 2, 1, 25, 3,
-			                    2, 1, 2, 1, 0 };
+static int		DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, 0 };
 static unsigned		DeviceTypeRequest;
 static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
@@ -944,7 +942,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
     add_cache(&(packet.address), addrname, NULL, NULL, NULL);
 
     cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
-                  DeviceDescRequest, DeviceDescOID);
+                  CUPS_ASN1_GET_REQUEST, DeviceDescRequest, DeviceDescOID);
   }
   else if (packet.request_id == DeviceDescRequest &&
            packet.object_type == CUPS_ASN1_OCTET_STRING)
@@ -1077,7 +1075,7 @@ scan_devices(int fd)			/* I - SNMP socket */
 
       for (addr = addrs; addr; addr = addr->next)
         cupsSNMPWrite(fd, &(addr->addr), CUPS_SNMP_VERSION_1, community,
-	              DeviceTypeRequest, DeviceTypeOID);
+	              CUPS_ASN1_GET_REQUEST, DeviceTypeRequest, DeviceTypeOID);
     }
 
     httpAddrFreeList(addrs);

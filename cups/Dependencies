@@ -1,324 +1,333 @@
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-adminutil.o: adminutil.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h globals.h string.h \
-  http-private.h md5.h ipp-private.h i18n.h transcode.h debug.h
-array.o: array.c array.h string.h ../config.h string.h debug.h
-attr.o: attr.c ppd.h array.h file.h debug.h string.h ../config.h string.h
-auth.o: auth.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-backchannel.o: backchannel.c cups.h ipp.h http.h string.h ../config.h \
-  ppd.h array.h file.h language.h
-backend.o: backend.c backend.h string.h ../config.h string.h
-custom.o: custom.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-dest.o: dest.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-dir.o: dir.c dir.h string.h ../config.h string.h debug.h
-emit.o: emit.c ppd.h array.h file.h string.h ../config.h string.h debug.h
-encode.o: encode.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h ipp-private.h string.h debug.h
-file.o: file.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-getifaddrs.o: getifaddrs.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h
-getputfile.o: getputfile.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  string.h debug.h
-globals.o: globals.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http.o: http.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http-addr.o: http-addr.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-http-addrlist.o: http-addrlist.c http-private.h ../config.h http.h \
-  string.h md5.h ipp-private.h ipp.h globals.h string.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h debug.h
-http-support.o: http-support.c debug.h globals.h string.h ../config.h \
-  string.h http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h
-ipp.o: ipp.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-ipp-support.o: ipp-support.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-langprintf.o: langprintf.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h
-language.o: language.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-localize.o: localize.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-mark.o: mark.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h string.h debug.h
-md5.o: md5.c md5.h string.h ../config.h string.h
-md5passwd.o: md5passwd.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h string.h
-notify.o: notify.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-options.o: options.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h string.h debug.h
-page.o: page.c ppd.h array.h file.h string.h ../config.h string.h
-ppd.o: ppd.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-request.o: request.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-sidechannel.o: sidechannel.c sidechannel.h string.h ../config.h string.h
-snprintf.o: snprintf.c string.h ../config.h string.h
-string.o: string.c array.h debug.h string.h ../config.h string.h
-tempfile.o: tempfile.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-transcode.o: transcode.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-usersys.o: usersys.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-util.o: util.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-testadmin.o: testadmin.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h string.h
-testarray.o: testarray.c ../cups/string.h ../config.h string.h array.h \
-  dir.h debug.h
-testcups.o: testcups.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h
-testfile.o: testfile.c string.h ../config.h string.h file.h debug.h
-testhttp.o: testhttp.c http.h string.h ../config.h string.h
-testi18n.o: testi18n.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testipp.o: testipp.c ../cups/string.h ../config.h string.h ipp-private.h \
-  ipp.h http.h
-testlang.o: testlang.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testppd.o: testppd.c ../cups/string.h ../config.h string.h ppd.h array.h \
-  file.h
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-adminutil.32.o: adminutil.c  adminutil.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h globals.h string.h \
-  http-private.h md5.h ipp-private.h i18n.h transcode.h debug.h
-array.32.o: array.c  array.c array.h string.h ../config.h string.h debug.h
-attr.32.o: attr.c  attr.c ppd.h array.h file.h debug.h string.h ../config.h string.h
-auth.32.o: auth.c  auth.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-backchannel.32.o: backchannel.c  backchannel.c cups.h ipp.h http.h string.h ../config.h \
-  ppd.h array.h file.h language.h
-backend.32.o: backend.c  backend.c backend.h string.h ../config.h string.h
-custom.32.o: custom.c  custom.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-dest.32.o: dest.c  dest.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-dir.32.o: dir.c  dir.c dir.h string.h ../config.h string.h debug.h
-emit.32.o: emit.c  emit.c ppd.h array.h file.h string.h ../config.h string.h debug.h
-encode.32.o: encode.c  encode.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h ipp-private.h string.h debug.h
-file.32.o: file.c  file.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-getifaddrs.32.o: getifaddrs.c  getifaddrs.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h
-getputfile.32.o: getputfile.c  getputfile.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  string.h debug.h
-globals.32.o: globals.c  globals.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http.32.o: http.c  http.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http-addr.32.o: http-addr.c  http-addr.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-http-addrlist.32.o: http-addrlist.c  http-addrlist.c http-private.h ../config.h http.h \
-  string.h md5.h ipp-private.h ipp.h globals.h string.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h debug.h
-http-support.32.o: http-support.c  http-support.c debug.h globals.h string.h ../config.h \
-  string.h http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h
-ipp.32.o: ipp.c  ipp.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-ipp-support.32.o: ipp-support.c  ipp-support.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-langprintf.32.o: langprintf.c  langprintf.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h
-language.32.o: language.c  language.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-localize.32.o: localize.c  localize.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-mark.32.o: mark.c  mark.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h string.h debug.h
-md5.32.o: md5.c  md5.c md5.h string.h ../config.h string.h
-md5passwd.32.o: md5passwd.c  md5passwd.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h string.h
-notify.32.o: notify.c  notify.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-options.32.o: options.c  options.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h string.h debug.h
-page.32.o: page.c  page.c ppd.h array.h file.h string.h ../config.h string.h
-ppd.32.o: ppd.c  ppd.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-request.32.o: request.c  request.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-sidechannel.32.o: sidechannel.c  sidechannel.c sidechannel.h string.h ../config.h string.h
-snprintf.32.o: snprintf.c  snprintf.c string.h ../config.h string.h
-string.32.o: string.c  string.c array.h debug.h string.h ../config.h string.h
-tempfile.32.o: tempfile.c  tempfile.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-transcode.32.o: transcode.c  transcode.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-usersys.32.o: usersys.c  usersys.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-util.32.o: util.c  util.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-testadmin.32.o: testadmin.c  testadmin.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h string.h
-testarray.32.o: testarray.c  testarray.c ../cups/string.h ../config.h string.h array.h \
-  dir.h debug.h
-testcups.32.o: testcups.c  testcups.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h
-testfile.32.o: testfile.c  testfile.c string.h ../config.h string.h file.h debug.h
-testhttp.32.o: testhttp.c  testhttp.c http.h string.h ../config.h string.h
-testi18n.32.o: testi18n.c  testi18n.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testipp.32.o: testipp.c  testipp.c ../cups/string.h ../config.h string.h ipp-private.h \
-  ipp.h http.h
-testlang.32.o: testlang.c  testlang.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testppd.32.o: testppd.c  testppd.c ../cups/string.h ../config.h string.h ppd.h array.h \
-  file.h
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-adminutil.64.o: adminutil.c  adminutil.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h globals.h string.h \
-  http-private.h md5.h ipp-private.h i18n.h transcode.h debug.h
-array.64.o: array.c  array.c array.h string.h ../config.h string.h debug.h
-attr.64.o: attr.c  attr.c ppd.h array.h file.h debug.h string.h ../config.h string.h
-auth.64.o: auth.c  auth.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-backchannel.64.o: backchannel.c  backchannel.c cups.h ipp.h http.h string.h ../config.h \
-  ppd.h array.h file.h language.h
-backend.64.o: backend.c  backend.c backend.h string.h ../config.h string.h
-custom.64.o: custom.c  custom.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-dest.64.o: dest.c  dest.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-dir.64.o: dir.c  dir.c dir.h string.h ../config.h string.h debug.h
-emit.64.o: emit.c  emit.c ppd.h array.h file.h string.h ../config.h string.h debug.h
-encode.64.o: encode.c  encode.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h ipp-private.h string.h debug.h
-file.64.o: file.c  file.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-getifaddrs.64.o: getifaddrs.c  getifaddrs.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h
-getputfile.64.o: getputfile.c  getputfile.c http-private.h ../config.h http.h string.h \
-  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  string.h debug.h
-globals.64.o: globals.c  globals.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http.64.o: http.c  http.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-http-addr.64.o: http-addr.c  http-addr.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-http-addrlist.64.o: http-addrlist.c  http-addrlist.c http-private.h ../config.h http.h \
-  string.h md5.h ipp-private.h ipp.h globals.h string.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h debug.h
-http-support.64.o: http-support.c  http-support.c debug.h globals.h string.h ../config.h \
-  string.h http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h \
-  array.h file.h language.h i18n.h transcode.h
-ipp.64.o: ipp.c  ipp.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-ipp-support.64.o: ipp-support.c  ipp-support.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-langprintf.64.o: langprintf.c  langprintf.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h
-language.64.o: language.c  language.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-localize.64.o: localize.c  localize.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-mark.64.o: mark.c  mark.c cups.h ipp.h http.h string.h ../config.h ppd.h array.h \
-  file.h language.h string.h debug.h
-md5.64.o: md5.c  md5.c md5.h string.h ../config.h string.h
-md5passwd.64.o: md5passwd.c  md5passwd.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h string.h
-notify.64.o: notify.c  notify.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h
-options.64.o: options.c  options.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h string.h debug.h
-page.64.o: page.c  page.c ppd.h array.h file.h string.h ../config.h string.h
-ppd.64.o: ppd.c  ppd.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-request.64.o: request.c  request.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-sidechannel.64.o: sidechannel.c  sidechannel.c sidechannel.h string.h ../config.h string.h
-snprintf.64.o: snprintf.c  snprintf.c string.h ../config.h string.h
-string.64.o: string.c  string.c array.h debug.h string.h ../config.h string.h
-tempfile.64.o: tempfile.c  tempfile.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-transcode.64.o: transcode.c  transcode.c globals.h string.h ../config.h string.h \
-  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h \
-  file.h language.h i18n.h transcode.h debug.h
-usersys.64.o: usersys.c  usersys.c http-private.h ../config.h http.h string.h md5.h \
-  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h \
-  language.h i18n.h transcode.h debug.h
-util.64.o: util.c  util.c globals.h string.h ../config.h string.h http-private.h \
-  http.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h \
-  i18n.h transcode.h debug.h
-testadmin.64.o: testadmin.c  testadmin.c adminutil.h cups.h ipp.h http.h string.h \
-  ../config.h ppd.h array.h file.h language.h string.h
-testarray.64.o: testarray.c  testarray.c ../cups/string.h ../config.h string.h array.h \
-  dir.h debug.h
-testcups.64.o: testcups.c  testcups.c cups.h ipp.h http.h string.h ../config.h ppd.h \
-  array.h file.h language.h
-testfile.64.o: testfile.c  testfile.c string.h ../config.h string.h file.h debug.h
-testhttp.64.o: testhttp.c  testhttp.c http.h string.h ../config.h string.h
-testi18n.64.o: testi18n.c  testi18n.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testipp.64.o: testipp.c  testipp.c ../cups/string.h ../config.h string.h ipp-private.h \
-  ipp.h http.h
-testlang.64.o: testlang.c  testlang.c i18n.h transcode.h language.h array.h string.h \
-  ../config.h string.h
-testppd.64.o: testppd.c  testppd.c ../cups/string.h ../config.h string.h ppd.h array.h \
-  file.h
+# DO NOT DELETE
+
+adminutil.o: adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+adminutil.o: file.h language.h globals.h string.h ../config.h http-private.h
+adminutil.o: md5.h ipp-private.h i18n.h transcode.h debug.h
+array.o: array.h versioning.h string.h ../config.h debug.h
+attr.o: ppd.h array.h versioning.h file.h debug.h string.h ../config.h
+auth.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+auth.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+auth.o: i18n.h transcode.h debug.h
+backchannel.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+backchannel.o: language.h
+backend.o: backend.h versioning.h string.h ../config.h
+custom.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+custom.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+custom.o: i18n.h transcode.h debug.h
+dest.o: debug.h globals.h string.h ../config.h http-private.h http.h
+dest.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
+dest.o: language.h i18n.h transcode.h
+dir.o: dir.h versioning.h string.h ../config.h debug.h
+emit.o: ppd.h array.h versioning.h file.h string.h ../config.h debug.h
+encode.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+encode.o: ipp-private.h string.h ../config.h debug.h
+file.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+file.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+file.o: i18n.h transcode.h debug.h
+getifaddrs.o: http-private.h ../config.h http.h versioning.h md5.h
+getifaddrs.o: ipp-private.h ipp.h
+getputfile.o: globals.h string.h ../config.h http-private.h http.h
+getputfile.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+getputfile.o: file.h language.h i18n.h transcode.h debug.h
+globals.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+globals.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+globals.o: i18n.h transcode.h debug.h
+http.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+http.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+http.o: i18n.h transcode.h debug.h
+http-addr.o: globals.h string.h ../config.h http-private.h http.h
+http-addr.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.o: file.h language.h i18n.h transcode.h debug.h
+http-addrlist.o: http-private.h ../config.h http.h versioning.h md5.h
+http-addrlist.o: ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
+http-addrlist.o: file.h language.h i18n.h transcode.h debug.h
+http-support.o: debug.h globals.h string.h ../config.h http-private.h http.h
+http-support.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-support.o: file.h language.h i18n.h transcode.h
+ipp.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+ipp.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
+ipp.o: transcode.h debug.h
+ipp-support.o: globals.h string.h ../config.h http-private.h http.h
+ipp-support.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+ipp-support.o: file.h language.h i18n.h transcode.h debug.h
+langprintf.o: globals.h string.h ../config.h http-private.h http.h
+langprintf.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+langprintf.o: file.h language.h i18n.h transcode.h
+language.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+language.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+language.o: i18n.h transcode.h debug.h
+localize.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+localize.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+localize.o: i18n.h transcode.h debug.h
+mark.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+mark.o: string.h ../config.h debug.h
+md5.o: md5.h string.h ../config.h
+md5passwd.o: http-private.h ../config.h http.h versioning.h md5.h
+md5passwd.o: ipp-private.h ipp.h string.h
+notify.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+notify.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+notify.o: i18n.h transcode.h
+options.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+options.o: string.h ../config.h debug.h
+page.o: ppd.h array.h versioning.h file.h string.h ../config.h
+ppd.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+ppd.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+ppd.o: i18n.h transcode.h debug.h
+request.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+request.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+request.o: i18n.h transcode.h debug.h
+sidechannel.o: sidechannel.h versioning.h string.h ../config.h
+snmp.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+snmp.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+snmp.o: i18n.h transcode.h snmp.h
+snprintf.o: string.h ../config.h
+string.o: array.h versioning.h debug.h string.h ../config.h
+tempfile.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+tempfile.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+tempfile.o: i18n.h transcode.h debug.h
+transcode.o: globals.h string.h ../config.h http-private.h http.h
+transcode.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+transcode.o: file.h language.h i18n.h transcode.h debug.h
+usersys.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+usersys.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+usersys.o: i18n.h transcode.h debug.h
+util.o: globals.h string.h ../config.h http-private.h http.h versioning.h
+util.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+util.o: i18n.h transcode.h debug.h
+testadmin.o: adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+testadmin.o: file.h language.h string.h ../config.h
+testarray.o: ../cups/string.h ../config.h string.h array.h versioning.h dir.h
+testarray.o: debug.h
+testcups.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testfile.o: string.h ../config.h file.h versioning.h debug.h
+testhttp.o: http.h versioning.h string.h ../config.h
+testi18n.o: i18n.h transcode.h language.h array.h versioning.h string.h
+testi18n.o: ../config.h
+testipp.o: ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.o: versioning.h
+testlang.o: i18n.h transcode.h language.h array.h versioning.h string.h
+testlang.o: ../config.h
+testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
+testppd.o: file.h
+# DO NOT DELETE
+
+adminutil.32.o: adminutil.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+adminutil.32.o: adminutil.c  file.h language.h globals.h string.h ../config.h http-private.h
+adminutil.32.o: adminutil.c  md5.h ipp-private.h i18n.h transcode.h debug.h
+array.32.o: array.c  array.h versioning.h string.h ../config.h debug.h
+attr.32.o: attr.c  ppd.h array.h versioning.h file.h debug.h string.h ../config.h
+auth.32.o: auth.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+auth.32.o: auth.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+auth.32.o: auth.c  i18n.h transcode.h debug.h
+backchannel.32.o: backchannel.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+backchannel.32.o: backchannel.c  language.h
+backend.32.o: backend.c  backend.h versioning.h string.h ../config.h
+custom.32.o: custom.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+custom.32.o: custom.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+custom.32.o: custom.c  i18n.h transcode.h debug.h
+dest.32.o: dest.c  debug.h globals.h string.h ../config.h http-private.h http.h
+dest.32.o: dest.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
+dest.32.o: dest.c  language.h i18n.h transcode.h
+dir.32.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
+emit.32.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
+encode.32.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+encode.32.o: encode.c  ipp-private.h string.h ../config.h debug.h
+file.32.o: file.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+file.32.o: file.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+file.32.o: file.c  i18n.h transcode.h debug.h
+getifaddrs.32.o: getifaddrs.c  http-private.h ../config.h http.h versioning.h md5.h
+getifaddrs.32.o: getifaddrs.c  ipp-private.h ipp.h
+getputfile.32.o: getputfile.c  globals.h string.h ../config.h http-private.h http.h
+getputfile.32.o: getputfile.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+getputfile.32.o: getputfile.c  file.h language.h i18n.h transcode.h debug.h
+globals.32.o: globals.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+globals.32.o: globals.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+globals.32.o: globals.c  i18n.h transcode.h debug.h
+http.32.o: http.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+http.32.o: http.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+http.32.o: http.c  i18n.h transcode.h debug.h
+http-addr.32.o: http-addr.c  globals.h string.h ../config.h http-private.h http.h
+http-addr.32.o: http-addr.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.32.o: http-addr.c  file.h language.h i18n.h transcode.h debug.h
+http-addrlist.32.o: http-addrlist.c  http-private.h ../config.h http.h versioning.h md5.h
+http-addrlist.32.o: http-addrlist.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
+http-addrlist.32.o: http-addrlist.c  file.h language.h i18n.h transcode.h debug.h
+http-support.32.o: http-support.c  debug.h globals.h string.h ../config.h http-private.h http.h
+http-support.32.o: http-support.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-support.32.o: http-support.c  file.h language.h i18n.h transcode.h
+ipp.32.o: ipp.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+ipp.32.o: ipp.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
+ipp.32.o: ipp.c  transcode.h debug.h
+ipp-support.32.o: ipp-support.c  globals.h string.h ../config.h http-private.h http.h
+ipp-support.32.o: ipp-support.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+ipp-support.32.o: ipp-support.c  file.h language.h i18n.h transcode.h debug.h
+langprintf.32.o: langprintf.c  globals.h string.h ../config.h http-private.h http.h
+langprintf.32.o: langprintf.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+langprintf.32.o: langprintf.c  file.h language.h i18n.h transcode.h
+language.32.o: language.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+language.32.o: language.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+language.32.o: language.c  i18n.h transcode.h debug.h
+localize.32.o: localize.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+localize.32.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+localize.32.o: localize.c  i18n.h transcode.h debug.h
+mark.32.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+mark.32.o: mark.c  string.h ../config.h debug.h
+md5.32.o: md5.c  md5.h string.h ../config.h
+md5passwd.32.o: md5passwd.c  http-private.h ../config.h http.h versioning.h md5.h
+md5passwd.32.o: md5passwd.c  ipp-private.h ipp.h string.h
+notify.32.o: notify.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+notify.32.o: notify.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+notify.32.o: notify.c  i18n.h transcode.h
+options.32.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+options.32.o: options.c  string.h ../config.h debug.h
+page.32.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
+ppd.32.o: ppd.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+ppd.32.o: ppd.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+ppd.32.o: ppd.c  i18n.h transcode.h debug.h
+request.32.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+request.32.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+request.32.o: request.c  i18n.h transcode.h debug.h
+sidechannel.32.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h
+snmp.32.o: snmp.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+snmp.32.o: snmp.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+snmp.32.o: snmp.c  i18n.h transcode.h snmp.h
+snprintf.32.o: snprintf.c  string.h ../config.h
+string.32.o: string.c  array.h versioning.h debug.h string.h ../config.h
+tempfile.32.o: tempfile.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+tempfile.32.o: tempfile.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+tempfile.32.o: tempfile.c  i18n.h transcode.h debug.h
+transcode.32.o: transcode.c  globals.h string.h ../config.h http-private.h http.h
+transcode.32.o: transcode.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+transcode.32.o: transcode.c  file.h language.h i18n.h transcode.h debug.h
+usersys.32.o: usersys.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+usersys.32.o: usersys.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+usersys.32.o: usersys.c  i18n.h transcode.h debug.h
+util.32.o: util.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+util.32.o: util.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+util.32.o: util.c  i18n.h transcode.h debug.h
+testadmin.32.o: testadmin.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+testadmin.32.o: testadmin.c  file.h language.h string.h ../config.h
+testarray.32.o: testarray.c  ../cups/string.h ../config.h string.h array.h versioning.h dir.h
+testarray.32.o: testarray.c  debug.h
+testcups.32.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testfile.32.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
+testhttp.32.o: testhttp.c  http.h versioning.h string.h ../config.h
+testi18n.32.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h string.h
+testi18n.32.o: testi18n.c  ../config.h
+testipp.32.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.32.o: testipp.c  versioning.h
+testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
+testlang.32.o: testlang.c  ../config.h
+testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
+testppd.32.o: testppd.c  file.h
+# DO NOT DELETE
+
+adminutil.64.o: adminutil.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+adminutil.64.o: adminutil.c  file.h language.h globals.h string.h ../config.h http-private.h
+adminutil.64.o: adminutil.c  md5.h ipp-private.h i18n.h transcode.h debug.h
+array.64.o: array.c  array.h versioning.h string.h ../config.h debug.h
+attr.64.o: attr.c  ppd.h array.h versioning.h file.h debug.h string.h ../config.h
+auth.64.o: auth.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+auth.64.o: auth.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+auth.64.o: auth.c  i18n.h transcode.h debug.h
+backchannel.64.o: backchannel.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+backchannel.64.o: backchannel.c  language.h
+backend.64.o: backend.c  backend.h versioning.h string.h ../config.h
+custom.64.o: custom.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+custom.64.o: custom.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+custom.64.o: custom.c  i18n.h transcode.h debug.h
+dest.64.o: dest.c  debug.h globals.h string.h ../config.h http-private.h http.h
+dest.64.o: dest.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
+dest.64.o: dest.c  language.h i18n.h transcode.h
+dir.64.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
+emit.64.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
+encode.64.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+encode.64.o: encode.c  ipp-private.h string.h ../config.h debug.h
+file.64.o: file.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+file.64.o: file.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+file.64.o: file.c  i18n.h transcode.h debug.h
+getifaddrs.64.o: getifaddrs.c  http-private.h ../config.h http.h versioning.h md5.h
+getifaddrs.64.o: getifaddrs.c  ipp-private.h ipp.h
+getputfile.64.o: getputfile.c  globals.h string.h ../config.h http-private.h http.h
+getputfile.64.o: getputfile.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+getputfile.64.o: getputfile.c  file.h language.h i18n.h transcode.h debug.h
+globals.64.o: globals.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+globals.64.o: globals.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+globals.64.o: globals.c  i18n.h transcode.h debug.h
+http.64.o: http.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+http.64.o: http.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+http.64.o: http.c  i18n.h transcode.h debug.h
+http-addr.64.o: http-addr.c  globals.h string.h ../config.h http-private.h http.h
+http-addr.64.o: http-addr.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.64.o: http-addr.c  file.h language.h i18n.h transcode.h debug.h
+http-addrlist.64.o: http-addrlist.c  http-private.h ../config.h http.h versioning.h md5.h
+http-addrlist.64.o: http-addrlist.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
+http-addrlist.64.o: http-addrlist.c  file.h language.h i18n.h transcode.h debug.h
+http-support.64.o: http-support.c  debug.h globals.h string.h ../config.h http-private.h http.h
+http-support.64.o: http-support.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-support.64.o: http-support.c  file.h language.h i18n.h transcode.h
+ipp.64.o: ipp.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+ipp.64.o: ipp.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h i18n.h
+ipp.64.o: ipp.c  transcode.h debug.h
+ipp-support.64.o: ipp-support.c  globals.h string.h ../config.h http-private.h http.h
+ipp-support.64.o: ipp-support.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+ipp-support.64.o: ipp-support.c  file.h language.h i18n.h transcode.h debug.h
+langprintf.64.o: langprintf.c  globals.h string.h ../config.h http-private.h http.h
+langprintf.64.o: langprintf.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+langprintf.64.o: langprintf.c  file.h language.h i18n.h transcode.h
+language.64.o: language.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+language.64.o: language.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+language.64.o: language.c  i18n.h transcode.h debug.h
+localize.64.o: localize.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+localize.64.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+localize.64.o: localize.c  i18n.h transcode.h debug.h
+mark.64.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+mark.64.o: mark.c  string.h ../config.h debug.h
+md5.64.o: md5.c  md5.h string.h ../config.h
+md5passwd.64.o: md5passwd.c  http-private.h ../config.h http.h versioning.h md5.h
+md5passwd.64.o: md5passwd.c  ipp-private.h ipp.h string.h
+notify.64.o: notify.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+notify.64.o: notify.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+notify.64.o: notify.c  i18n.h transcode.h
+options.64.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+options.64.o: options.c  string.h ../config.h debug.h
+page.64.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
+ppd.64.o: ppd.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+ppd.64.o: ppd.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+ppd.64.o: ppd.c  i18n.h transcode.h debug.h
+request.64.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+request.64.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+request.64.o: request.c  i18n.h transcode.h debug.h
+sidechannel.64.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h
+snmp.64.o: snmp.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+snmp.64.o: snmp.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+snmp.64.o: snmp.c  i18n.h transcode.h snmp.h
+snprintf.64.o: snprintf.c  string.h ../config.h
+string.64.o: string.c  array.h versioning.h debug.h string.h ../config.h
+tempfile.64.o: tempfile.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+tempfile.64.o: tempfile.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+tempfile.64.o: tempfile.c  i18n.h transcode.h debug.h
+transcode.64.o: transcode.c  globals.h string.h ../config.h http-private.h http.h
+transcode.64.o: transcode.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+transcode.64.o: transcode.c  file.h language.h i18n.h transcode.h debug.h
+usersys.64.o: usersys.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
+usersys.64.o: usersys.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
+usersys.64.o: usersys.c  i18n.h transcode.h debug.h
+util.64.o: util.c  globals.h string.h ../config.h http-private.h http.h versioning.h
+util.64.o: util.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
+util.64.o: util.c  i18n.h transcode.h debug.h
+testadmin.64.o: testadmin.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
+testadmin.64.o: testadmin.c  file.h language.h string.h ../config.h
+testarray.64.o: testarray.c  ../cups/string.h ../config.h string.h array.h versioning.h dir.h
+testarray.64.o: testarray.c  debug.h
+testcups.64.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testfile.64.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
+testhttp.64.o: testhttp.c  http.h versioning.h string.h ../config.h
+testi18n.64.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h string.h
+testi18n.64.o: testi18n.c  ../config.h
+testipp.64.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
+testipp.64.o: testipp.c  versioning.h
+testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
+testlang.64.o: testlang.c  ../config.h
+testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
+testppd.64.o: testppd.c  file.h

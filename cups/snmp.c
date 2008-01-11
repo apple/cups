@@ -17,6 +17,11 @@
  * Contents:
  *
  *   cupsSNMPClose()     - Close a SNMP socket.
+ *   cupsSNMPDebug()     - Enable/disable debug logging to stderr.
+ *   cupsSNMPHasPrefix() - Test whetehr a SNMP response uses the specified OID
+ *                         prefix.
+ *   cupsSNMPIsOID()     - Test whether a SNMP response contains the specified
+ *                         OID.
  *   cupsSNMPOpen()      - Open a SNMP socket.
  *   cupsSNMPRead()      - Read and parse a SNMP response...
  *   cupsSNMPWrite()     - Send an SNMP query packet.
@@ -129,6 +134,77 @@ cupsSNMPDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
 
 
 /*
+ * 'cupsSNMPHasPrefix()' - Test whetehr a SNMP response uses the specified OID
+ *                         prefix.
+ *
+ * The array pointed to by "prefix" is 0-terminated.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - 1 if equal, 0 if not equal */
+cupsSNMPHasPrefix(cups_snmp_t *packet,	/* I - Response packet */
+                  const int   *prefix)	/* I - OID prefix */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!packet || !prefix)
+    return (0);
+
+ /*
+  * Compare OIDs...
+  */
+
+  for (i = 0;
+       i < CUPS_SNMP_MAX_OID && prefix[i] && packet->object_name[i];
+       i ++)
+    if (prefix[i] != packet->object_name[i])
+      return (0);
+
+  return (i < CUPS_SNMP_MAX_OID);
+}
+
+
+/*
+ * 'cupsSNMPIsOID()' - Test whether a SNMP response contains the specified OID.
+ *
+ * The array pointed to by "oid" is 0-terminated.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - 1 if equal, 0 if not equal */
+cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
+              const int   *oid)		/* I - OID */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!packet || !oid)
+    return (0);
+
+ /*
+  * Compare OIDs...
+  */
+
+  for (i = 0; i < CUPS_SNMP_MAX_OID && oid[i] && packet->object_name[i]; i ++)
+    if (oid[i] != packet->object_name[i])
+      return (0);
+
+  return (i < CUPS_SNMP_MAX_OID && oid[i] == packet->object_name[i]);
+}
+
+
+/*
  * 'cupsSNMPOpen()' - Open a SNMP socket.
  *
  * @since CUPS 1.4@
@@ -217,6 +293,8 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 /*
  * 'cupsSNMPWrite()' - Send an SNMP query packet.
  *
+ * The array pointed to by "oid" is 0-terminated.
+ *
  * @since CUPS 1.4@
  */
 
@@ -226,6 +304,7 @@ cupsSNMPWrite(
     http_addr_t    *address,		/* I - Address to send to */
     int            version,		/* I - SNMP version */
     const char     *community,		/* I - Community name */
+    cups_asn1_t    request_type,	/* I - Request type */
     const unsigned request_id,		/* I - Request ID */
     const int      *oid)		/* I - OID */
 {
@@ -243,7 +322,7 @@ cupsSNMPWrite(
   memset(&packet, 0, sizeof(packet));
 
   packet.version      = version;
-  packet.request_type = CUPS_ASN1_GET_REQUEST;
+  packet.request_type = request_type;
   packet.request_id   = request_id;
   packet.object_type  = CUPS_ASN1_NULL_VALUE;
   

@@ -148,6 +148,8 @@ _cupsRemoveDest
 _cupsRemoveOption
 _cupsSNMPClose
 _cupsSNMPDebug
+_cupsSNMPHasPrefix
+_cupsSNMPIsOID
 _cupsSNMPOpen
 _cupsSNMPRead
 _cupsSNMPWrite

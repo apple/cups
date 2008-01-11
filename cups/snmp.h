@@ -51,8 +51,9 @@ typedef enum cups_asn1_e		/**** ASN1 request/object types ****/
   CUPS_ASN1_NULL_VALUE = 0x05,		/* NULL VALUE */
   CUPS_ASN1_OID = 0x06,			/* OBJECT IDENTIFIER */
   CUPS_ASN1_SEQUENCE = 0x30,		/* SEQUENCE */
-  CUPS_ASN1_GET_REQUEST = 0xa0,		/* Get-Request-PDU */
-  CUPS_ASN1_GET_RESPONSE = 0xa2		/* Get-Response-PDU */
+  CUPS_ASN1_GET_REQUEST = 0xa0,		/* GetRequest-PDU */
+  CUPS_ASN1_GET_NEXT_REQUEST = 0xa1,	/* GetNextRequest-PDU */
+  CUPS_ASN1_GET_RESPONSE = 0xa2		/* GetResponse-PDU */
 } cups_asn1_t;
 
 typedef struct cups_snmp_data_s		/**** SNMP data packet ****/
@@ -87,14 +88,20 @@ typedef struct cups_snmp_data_s		/**** SNMP data packet ****/
 extern "C" {
 #  endif /* __cplusplus */
 
-extern void		cupsSNMPClose(int fd);
-extern void		cupsSNMPDebug(int level);
-extern int		cupsSNMPOpen(void);
-extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet);
+extern void		cupsSNMPClose(int fd) _CUPS_API_1_4;
+extern void		cupsSNMPDebug(int level) _CUPS_API_1_4;
+extern int		cupsSNMPHasPrefix(cups_snmp_t *packet,
+			                  const int *prefix) _CUPS_API_1_4;
+extern int		cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
+			    _CUPS_API_1_4;
+extern int		cupsSNMPOpen(void) _CUPS_API_1_4;
+extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet)
+			    _CUPS_API_1_4;
 extern int		cupsSNMPWrite(int fd, http_addr_t *addr, int version,
 				      const char *community,
+				      cups_asn1_t request_type,
 				      const unsigned request_id,
-				      const int *oid);
+				      const int *oid) _CUPS_API_1_4;
 
 #  ifdef __cplusplus
 }
