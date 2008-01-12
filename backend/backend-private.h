@@ -59,8 +59,14 @@ extern "C" {
 #define CUPS_OID_hrDevice			CUPS_OID_host,3
 #define CUPS_OID_hrDeviceTable			CUPS_OID_hrDevice,2
 #define CUPS_OID_hrDeviceEntry			CUPS_OID_hrDeviceTable,1
+#define CUPS_OID_hrDeviceIndex			CUPS_OID_hrDeviceEntry,1
 #define CUPS_OID_hrDeviceType			CUPS_OID_hrDeviceEntry,2
 #define CUPS_OID_hrDeviceDescr			CUPS_OID_hrDeviceEntry,3
+
+#define CUPS_OID_hrPrinterTable			CUPS_OID_hrDevice,5
+#define CUPS_OID_hrPrinterEntry			CUPS_OID_hrPrinterTable,1
+#define CUPS_OID_hrPrinterStatus		CUPS_OID_hrPrinterEntry,1
+#define CUPS_OID_hrPrinterDetectedErrorState	CUPS_OID_hrPrinterEntry,2
 
 #define CUPS_OID_printmib			CUPS_OID_mib2,43
 
@@ -116,6 +122,27 @@ extern "C" {
 
 #define CUPS_TC_other				1
 #define CUPS_TC_unknown				2
+
+#define CUPS_TC_idle				3
+#define CUPS_TC_printing			4
+#define CUPS_TC_warmup				5
+
+/* These come from the hrPrinterDetectedErrorState OCTET-STRING */
+#define CUPS_TC_lowPaper			0x8000
+#define CUPS_TC_noPaper				0x4000
+#define CUPS_TC_lowToner			0x2000
+#define CUPS_TC_noToner				0x1000
+#define CUPS_TC_doorOpen			0x0800
+#define CUPS_TC_jammed				0x0400
+#define CUPS_TC_offline				0x0200
+#define CUPS_TC_serviceRequested		0x0100
+#define CUPS_TC_inputTrayMissing		0x0080
+#define CUPS_TC_outputTrayMissing		0x0040
+#define CUPS_TC_markerSupplyMissing		0x0020
+#define CUPS_TC_outputNearFull			0x0010
+#define CUPS_TC_outputFull			0x0008
+#define CUPS_TC_inputTrayEmpty			0x0004
+#define CUPS_TC_overduePreventMaint		0x0002
 
 #define CUPS_TC_prtCoverStatus_coverOpen	3
 #define CUPS_TC_prtCoverStatus_coverClosed	4
