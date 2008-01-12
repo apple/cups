@@ -79,6 +79,7 @@ extern "C" {
 #define CUPS_OID_prtMarker			CUPS_OID_printmib,10
 #define CUPS_OID_prtMarkerTable			CUPS_OID_prtMarker,2
 #define CUPS_OID_prtMarkerEntry			CUPS_OID_prtMarkerTable,1
+#define CUPS_OID_prtMarkerLifeCount		CUPS_OID_prtMarkerEntry,4
 
 #define CUPS_OID_prtMarkerSupplies		CUPS_OID_printmib,11
 #define CUPS_OID_prtMarkerSuppliesTable		CUPS_OID_prtMarkerSupplies,1

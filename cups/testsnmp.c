@@ -166,6 +166,12 @@ show_oid(int         fd,		/* I - SNMP socket */
     return (0);
   }
 
+  if (packet.error)
+  {
+    printf("FAIL (%s)\n", packet.error);
+    return (0);
+  }
+
   switch (packet.object_type)
   {
     case CUPS_ASN1_BOOLEAN :
