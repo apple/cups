@@ -166,7 +166,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Exit with no errors...
   */
 
-  return (status);
+  return (0);
 }
 
 

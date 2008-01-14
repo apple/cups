@@ -402,9 +402,11 @@ httpConnectEncrypt(
   * Allocate memory for the structure...
   */
 
-  http = calloc(sizeof(http_t), 1);
-  if (http == NULL)
+  if ((http = calloc(sizeof(http_t), 1)) == NULL)
+  {
+    httpAddrFreeList(addrlist);
     return (NULL);
+  }
 
   http->version  = HTTP_1_1;
   http->blocking = 1;

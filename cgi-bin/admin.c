@@ -3088,7 +3088,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     * Binary protocol support...
     */
 
-    if (ppd->protocols && strstr(ppd->protocols, "BCP"))
+    if (ppd && ppd->protocols && strstr(ppd->protocols, "BCP"))
     {
       protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
 

@@ -3,7 +3,7 @@
  *
  *   CUPS filtering program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -138,6 +138,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   mime         = NULL;
   srctype      = NULL;
+  compression  = 0;
   dsttype      = "application/pdf";
   infile       = NULL;
   outfile      = NULL;
@@ -829,6 +830,8 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
 	        filter->filter, pid);
     }
   }
+
+  cupsArrayDelete(pids);
 
   return (retval);
 }

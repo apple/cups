@@ -153,7 +153,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * Send a reset sequence.
   */
 
-  if (ppd->nickname && strstr(ppd->nickname, "OKIDATA") != NULL)
+  if (ppd && ppd->nickname && strstr(ppd->nickname, "OKIDATA") != NULL)
     printf("\033{A");	/* Set EPSON emulation mode */
 
   printf("\033@");
@@ -164,7 +164,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 
   EjectPage = header->Margins[0] || header->Margins[1];
     
-  switch (ppd->model_number)
+  switch (Model)
   {
     case EPSON_9PIN :
     case EPSON_24PIN :
@@ -196,7 +196,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	DotColumns = header->HWResolution[0] / 60;
         Shingling  = 0;
 
-        if (ppd->model_number == EPSON_9PIN)
+        if (Model == EPSON_9PIN)
 	  printf("\033\063\030");	/* Set line feed */
 	else
 	  switch (header->HWResolution[0])
@@ -251,8 +251,11 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	putchar(n);
 	putchar(n >> 8);
 
-	t = (ppd->sizes[1].length - ppd->sizes[1].top) *
-	    header->HWResolution[1] / 72.0;
+        if (ppd)
+	  t = (ppd->sizes[1].length - ppd->sizes[1].top) *
+	      header->HWResolution[1] / 72.0;
+        else
+	  t = 0;
 
 	pwrite("\033(c\004\000", 5);		/* Top & bottom margins */
 	putchar(t);

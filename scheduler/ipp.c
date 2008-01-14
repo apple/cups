@@ -3,7 +3,7 @@
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -3430,13 +3430,6 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "check_quotas(%p[%d], %p[%s])",
                   con, con->http.fd, p, p->name);
-
- /*
-  * Check input...
-  */
-
-  if (!con || !p)
-    return (0);
 
  /*
   * Figure out who is printing...
@@ -10150,8 +10143,8 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, "
 		  "userlen=%d)",
-        	  job ? job->id : 0, con->http.fd, owner ? owner : "(null)",
-		  username, userlen);
+        	  job->id, con ? con->http.fd : 0,
+		  owner ? owner : "(null)", username, userlen);
 
  /*
   * Validate input...

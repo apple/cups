@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -48,6 +48,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
 		i;		/* Looping var */
   char		buf[262144],	/* String buffer */
 		*bufptr;	/* Pointer into buffer */
+  float		temp;		/* Temporary parameter value */
   static param_t p[MAX_PARAMS];	/* Parameter buffer */
 
 
@@ -212,10 +213,10 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
       case '-' :
       case '+' :
           ungetc(ch, fp);
-          fscanf(fp, "%f", &(p[num_params].value.number));
-          if (num_params < MAX_PARAMS)
+          if (fscanf(fp, "%f", &temp) == 1 && num_params < MAX_PARAMS)
           {
-            p[num_params].type = PARAM_RELATIVE;
+            p[num_params].type         = PARAM_RELATIVE;
+            p[num_params].value.number = temp;
             num_params ++;
           }
           break;
@@ -231,10 +232,10 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
       case '9' :
       case '.' :
           ungetc(ch, fp);
-          fscanf(fp, "%f", &(p[num_params].value.number));
-          if (num_params < MAX_PARAMS)
+          if (fscanf(fp, "%f", &temp) == 1 && num_params < MAX_PARAMS)
           {
-            p[num_params].type = PARAM_ABSOLUTE;
+            p[num_params].type         = PARAM_ABSOLUTE;
+            p[num_params].value.number = temp;
             num_params ++;
           }
           break;

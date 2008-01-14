@@ -3,7 +3,7 @@
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -132,8 +132,6 @@ _cupsCharmapFlush(void)
     vnext = vmap->next;
 
     free_vbcs_charmap(vmap);
-
-    free(vmap);
   }
 
   vmap_cache = NULL;
@@ -330,13 +328,8 @@ cupsCharsetToUTF8(
 
   if (encoding < CUPS_ENCODING_SBCS_END)
     bytes = conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
-  else if (encoding < CUPS_ENCODING_VBCS_END)
-    bytes = conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
   else
-  {
-    DEBUG_puts("    Bad encoding, returning -1");
-    bytes = -1;
-  }
+    bytes = conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
 
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_unlock(&map_mutex);
@@ -437,10 +430,8 @@ cupsUTF8ToCharset(
 
   if (encoding < CUPS_ENCODING_SBCS_END)
     bytes = conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding);
-  else if (encoding < CUPS_ENCODING_VBCS_END)
-    bytes = conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding);
   else
-    bytes = -1;
+    bytes = conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding);
 
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_unlock(&map_mutex);

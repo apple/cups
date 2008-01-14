@@ -3,7 +3,7 @@
  *
  *   CGI template function.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -53,6 +53,13 @@ cgiCopyTemplateFile(FILE       *out,	/* I - Output file */
 
   fprintf(stderr, "DEBUG2: cgiCopyTemplateFile(out=%p, tmpl=\"%s\")\n", out,
           tmpl ? tmpl : "(null)");
+
+ /*
+  * Range check input...
+  */
+
+  if (!tmpl || !out)
+    return;
 
  /*
   * Open the template file...

@@ -4,7 +4,7 @@
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -277,7 +277,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   * Set graphics mode...
   */
 
-  if (ppd->model_number == 2)
+  if (ppd && ppd->model_number == 2)
   {
    /*
     * Figure out the number of color planes...

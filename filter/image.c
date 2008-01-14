@@ -320,15 +320,10 @@ cupsImageOpen(
   */
 
   if ((fp = fopen(filename, "r")) == NULL)
-  {
-/*    perror("ERROR: Unable to open image file");
-*/    return (NULL);
-  }
+    return (NULL);
 
   if (fread(header, 1, sizeof(header), fp) == 0)
   {
-/*    perror("ERROR: Unable to read image file header");
-*/
     fclose(fp);
     return (NULL);
   }
@@ -346,8 +341,7 @@ cupsImageOpen(
 
   if (img == NULL)
   {
-/*    perror("ERROR: Unable to allocate memory for image file");
-*/    fclose(fp);
+    fclose(fp);
     return (NULL);
   }
 
@@ -401,8 +395,7 @@ cupsImageOpen(
 #endif /* HAVE_LIBTIFF */
   else
   {
-/*    fputs("ERROR: Unknown image file format!");
-*/    fclose(fp);
+    fclose(fp);
     status = -1;
   }
 

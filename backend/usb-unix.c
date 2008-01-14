@@ -516,7 +516,7 @@ open_device(const char *uri,		/* I - Device URI */
   }
 #else
   {
-    if (use_bc)
+    if (*use_bc)
       fd = open(uri + 4, O_RDWR | O_EXCL);
     else
       fd = -1;

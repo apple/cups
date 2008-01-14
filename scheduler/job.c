@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -3557,7 +3557,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * job sheet count...
       */
 
-      if (job->sheets != NULL)
+      if (job->sheets)
       {
         if (!strncasecmp(message, "total ", 6))
 	{
@@ -3602,8 +3602,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdLogPage(job, message);
 
-      cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-                    "Printed %d page(s).", job->sheets->values[0].integer);
+      if (job->sheets)
+	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+		      "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {

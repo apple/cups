@@ -3,7 +3,7 @@
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -164,27 +164,27 @@ static void		cancel_job(int sig);
 static int		check_range(pstops_doc_t *doc, int page);
 static void		copy_bytes(cups_file_t *fp, off_t offset,
 			           size_t length);
-static size_t		copy_comments(cups_file_t *fp, pstops_doc_t *doc,
+static ssize_t		copy_comments(cups_file_t *fp, pstops_doc_t *doc,
 			              ppd_file_t *ppd, char *line,
-				      size_t linelen, size_t linesize);
+				      ssize_t linelen, size_t linesize);
 static void		copy_dsc(cups_file_t *fp, pstops_doc_t *doc,
-			         ppd_file_t *ppd, char *line, size_t linelen,
+			         ppd_file_t *ppd, char *line, ssize_t linelen,
 				 size_t linesize);
 static void		copy_non_dsc(cups_file_t *fp, pstops_doc_t *doc,
 			             ppd_file_t *ppd, char *line,
-				     size_t linelen, size_t linesize);
-static size_t		copy_page(cups_file_t *fp, pstops_doc_t *doc,
+				     ssize_t linelen, size_t linesize);
+static ssize_t		copy_page(cups_file_t *fp, pstops_doc_t *doc,
 			          ppd_file_t *ppd, int number, char *line,
-				  size_t linelen, size_t linesize);
-static size_t		copy_prolog(cups_file_t *fp, pstops_doc_t *doc,
+				  ssize_t linelen, size_t linesize);
+static ssize_t		copy_prolog(cups_file_t *fp, pstops_doc_t *doc,
 			            ppd_file_t *ppd, char *line,
-				    size_t linelen, size_t linesize);
-static size_t		copy_setup(cups_file_t *fp, pstops_doc_t *doc,
+				    ssize_t linelen, size_t linesize);
+static ssize_t		copy_setup(cups_file_t *fp, pstops_doc_t *doc,
 			           ppd_file_t *ppd, char *line,
-				   size_t linelen, size_t linesize);
-static size_t		copy_trailer(cups_file_t *fp, pstops_doc_t *doc,
+				   ssize_t linelen, size_t linesize);
+static ssize_t		copy_trailer(cups_file_t *fp, pstops_doc_t *doc,
 			             ppd_file_t *ppd, int number, char *line,
-				     size_t linelen, size_t linesize);
+				     ssize_t linelen, size_t linesize);
 static void		do_prolog(pstops_doc_t *doc, ppd_file_t *ppd);
 static void 		do_setup(pstops_doc_t *doc, ppd_file_t *ppd);
 static void		doc_printf(pstops_doc_t *doc, const char *format, ...)
@@ -203,7 +203,7 @@ static char		*parse_text(const char *start, char **end, char *buffer,
 static void		set_pstops_options(pstops_doc_t *doc, ppd_file_t *ppd,
 			                   char *argv[], int num_options,
 			                   cups_option_t *options);
-static size_t		skip_page(cups_file_t *fp, char *line, size_t linelen,
+static ssize_t		skip_page(cups_file_t *fp, char *line, ssize_t linelen,
 				  size_t linesize);
 static void		start_nup(pstops_doc_t *doc, int number,
 				  int show_border, const int *bounding_box);
@@ -581,12 +581,12 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
  * On return, "line" will contain the next line in the file, if any.
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 copy_comments(cups_file_t  *fp,		/* I - File to read from */
               pstops_doc_t *doc,	/* I - Document info */
 	      ppd_file_t   *ppd,	/* I - PPD file */
               char         *line,	/* I - Line buffer */
-	      size_t       linelen,	/* I - Length of initial line */
+	      ssize_t      linelen,	/* I - Length of initial line */
 	      size_t       linesize)	/* I - Size of line buffer */
 {
   int	saw_bounding_box,		/* Saw %%BoundingBox: comment? */
@@ -809,7 +809,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
          pstops_doc_t *doc,		/* I - Document info */
          ppd_file_t   *ppd,		/* I - PPD file */
 	 char         *line,		/* I - Line buffer */
-	 size_t       linelen,		/* I - Length of initial line */
+	 ssize_t      linelen,		/* I - Length of initial line */
 	 size_t       linesize)		/* I - Size of line buffer */
 {
   int		number;			/* Page number */
@@ -931,7 +931,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
   number = doc->slow_order ? 0 : doc->page;
 
-  if (doc->temp && !JobCanceled)
+  if (doc->temp && !JobCanceled && cupsArrayCount(doc->pages) > 0)
   {
     int	copy;				/* Current copy */
 
@@ -1069,7 +1069,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
              pstops_doc_t *doc,		/* I - Document info */
              ppd_file_t   *ppd,		/* I - PPD file */
 	     char         *line,	/* I - Line buffer */
-	     size_t       linelen,	/* I - Length of initial line */
+	     ssize_t      linelen,	/* I - Length of initial line */
 	     size_t       linesize)	/* I - Size of line buffer */
 {
   int	copy;				/* Current copy */
@@ -1245,13 +1245,13 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
  * On return, "line" will contain the next line in the file, if any.
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 copy_page(cups_file_t  *fp,		/* I - File to read from */
           pstops_doc_t *doc,		/* I - Document info */
           ppd_file_t   *ppd,		/* I - PPD file */
 	  int          number,		/* I - Current page number */
 	  char         *line,		/* I - Line buffer */
-	  size_t       linelen,		/* I - Length of initial line */
+	  ssize_t      linelen,		/* I - Length of initial line */
 	  size_t       linesize)	/* I - Size of line buffer */
 {
   char		label[256],		/* Page label string */
@@ -1714,12 +1714,12 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
  * On return, "line" will contain the next line in the file, if any.
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 copy_prolog(cups_file_t  *fp,		/* I - File to read from */
             pstops_doc_t *doc,		/* I - Document info */
             ppd_file_t   *ppd,		/* I - PPD file */
 	    char         *line,		/* I - Line buffer */
-	    size_t       linelen,	/* I - Length of initial line */
+	    ssize_t      linelen,	/* I - Length of initial line */
 	    size_t       linesize)	/* I - Size of line buffer */
 {
   while (strncmp(line, "%%BeginProlog", 13))
@@ -1768,12 +1768,12 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
  * On return, "line" will contain the next line in the file, if any.
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 copy_setup(cups_file_t  *fp,		/* I - File to read from */
            pstops_doc_t *doc,		/* I - Document info */
            ppd_file_t   *ppd,		/* I - PPD file */
 	   char         *line,		/* I - Line buffer */
-	   size_t       linelen,	/* I - Length of initial line */
+	   ssize_t      linelen,	/* I - Length of initial line */
 	   size_t       linesize)	/* I - Size of line buffer */
 {
   while (strncmp(line, "%%BeginSetup", 12))
@@ -1833,13 +1833,13 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
  * On return, "line" will contain the next line in the file, if any.
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 copy_trailer(cups_file_t  *fp,		/* I - File to read from */
              pstops_doc_t *doc,		/* I - Document info */
              ppd_file_t   *ppd,		/* I - PPD file */
 	     int          number,	/* I - Number of pages */
 	     char         *line,	/* I - Line buffer */
-	     size_t       linelen,	/* I - Length of initial line */
+	     ssize_t      linelen,	/* I - Length of initial line */
 	     size_t       linesize)	/* I - Size of line buffer */
 {
  /*
@@ -2712,10 +2712,10 @@ set_pstops_options(
  * 'skip_page()' - Skip past a page that won't be printed...
  */
 
-static size_t				/* O - Length of next line */
+static ssize_t				/* O - Length of next line */
 skip_page(cups_file_t *fp,		/* I - File to read from */
           char        *line,		/* I - Line buffer */
-	  size_t      linelen,		/* I - Length of initial line */
+	  ssize_t     linelen,		/* I - Length of initial line */
           size_t      linesize)		/* I - Size of line buffer */
 {
   int	level;				/* Embedded document level */

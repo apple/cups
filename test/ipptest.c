@@ -3,7 +3,7 @@
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -268,6 +268,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
   {
     printf("Unable to connect to %s on port %d - %s\n", server, port,
            strerror(errno));
+    fclose(fp);
     return (0);
   }
 

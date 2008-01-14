@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1277,7 +1277,11 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ippAddAttr(ipp, 1);
+	    if ((attr = ipp->current = _ippAddAttr(ipp, 1)) == NULL)
+	    {
+	      DEBUG_puts("ippReadIO: unable to allocate attribute!");
+	      return (IPP_ERROR);
+	    }
 
 	    DEBUG_printf(("ippReadIO: name=\'%s\', ipp->current=%p, ipp->prev=%p\n",
 	                  buffer, ipp->current, ipp->prev));

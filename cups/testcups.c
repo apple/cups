@@ -157,6 +157,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     status = 1;
     puts("FAIL");
+    return (1);
   }
   else
     puts("PASS");
