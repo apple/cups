@@ -3,7 +3,7 @@
  *
  *   Sun Raster image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -152,8 +152,23 @@ _cupsImageReadSunRaster(
     in = malloc(img->xsize * 3 + 1);
   }
 
-  bpp       = cupsImageGetDepth(img);
-  out       = malloc(img->xsize * bpp);
+  if (!in)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    return (1);
+  }
+
+  bpp = cupsImageGetDepth(img);
+
+  if ((out = malloc(img->xsize * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    free(in);
+    return (1);
+  }
+
   scanline  = malloc(scanwidth);
   run_count = 0;
   run_value = 0;

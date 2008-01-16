@@ -4,7 +4,7 @@
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -296,18 +296,35 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * Allocate memory for a line/row of graphics...
   */
 
-  Planes[0] = malloc(header->cupsBytesPerLine);
+  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  {
+    fputs("ERROR: Unable to allocate memory!\n", stderr);
+    exit(1);
+  }
+
   for (plane = 1; plane < NumPlanes; plane ++)
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
 
   if (header->cupsCompression || DotBytes)
-    CompBuffer = calloc(2, header->cupsWidth);
+  {
+    if ((CompBuffer = calloc(2, header->cupsWidth)) == NULL)
+    {
+      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      exit(1);
+    }
+  }
   else
     CompBuffer = NULL;
 
   if (DotBytes)
   {
-    LineBuffers[0] = calloc(DotBytes, header->cupsWidth * (Shingling + 1));
+    if ((LineBuffers[0] = calloc(DotBytes,
+                                 header->cupsWidth * (Shingling + 1))) == NULL)
+    {
+      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      exit(1);
+    }
+
     LineBuffers[1] = LineBuffers[0] + DotBytes * header->cupsWidth;
     DotBit         = 128;
     LineCount      = 0;

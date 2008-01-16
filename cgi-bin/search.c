@@ -3,7 +3,7 @@
  *
  *   Search routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -53,7 +53,8 @@ cgiCompileSearch(const char *query)	/* I - Query string */
   * Allocate a regular expression storage structure...
   */
 
-  re = (regex_t *)calloc(1, sizeof(regex_t));
+  if ((re = (regex_t *)calloc(1, sizeof(regex_t))) == NULL)
+    return (NULL);
 
  /*
   * Allocate a buffer to hold the regular expression string, starting
@@ -65,7 +66,11 @@ cgiCompileSearch(const char *query)	/* I - Query string */
   if (slen < 1024)
     slen = 1024;
 
-  s = (char *)malloc(slen);
+  if ((s = (char *)malloc(slen)) == NULL)
+  {
+    free(re);
+    return (NULL);
+  }
 
  /*
   * Copy the query string to the regular expression, handling basic
@@ -227,7 +232,13 @@ cgiCompileSearch(const char *query)	/* I - Query string */
         char *lword2;			/* New "last word" */
 
 
-        lword2 = strdup(sword);
+        if ((lword2 = strdup(sword)) == NULL)
+	{
+	  free(lword);
+	  free(s);
+	  free(re);
+	  return (NULL);
+	}
 
         strcpy(sptr, ".*|.*");
 	sptr += 5;

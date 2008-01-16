@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2010,8 +2010,10 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
     * This file contains localizations, check them...
     */
 
-    languages = strdup(attr->value);
-    langlist  = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+    if ((languages = strdup(attr->value)) == NULL)
+      return (1);
+
+    langlist = cupsArrayNew((cups_array_func_t)strcmp, NULL);
 
     for (langptr = languages; *langptr;)
     {

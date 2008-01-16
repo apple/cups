@@ -3,7 +3,7 @@
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -228,11 +228,22 @@ main(int  argc,				/* I - Number of command-line args */
 		* are passed a NULL pointer.
 	        */
 
-                current = malloc(1024);
-		getcwd(current, 1024);
+                if ((current = malloc(1024)) == NULL)
+		{
+		  _cupsLangPuts(stderr,
+		                _("cupsd: Unable to get current directory!\n"));
+                  return (1);
+		}
+
+		if (!getcwd(current, 1024))
+		{
+		  _cupsLangPuts(stderr,
+		                _("cupsd: Unable to get current directory!\n"));
+                  free(current);
+		  return (1);
+		}
 
 		cupsdSetStringf(&ConfigurationFile, "%s/%s", current, argv[i]);
-
 		free(current);
               }
 	      break;

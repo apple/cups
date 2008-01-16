@@ -382,7 +382,12 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   * Allocate memory for a line of graphics...
   */
 
-  Planes[0] = malloc(header->cupsBytesPerLine);
+  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  {
+    fputs("ERROR: Unable to allocate memory!\n", stderr);
+    exit(1);
+  }
+
   for (plane = 1; plane < NumPlanes; plane ++)
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
 

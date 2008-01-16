@@ -3,7 +3,7 @@
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1684,13 +1684,14 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Allocate memory and load the file into a string buffer...
     */
 
-    buffer = calloc(1, info.st_size + 1);
+    if ((buffer = calloc(1, info.st_size + 1)) != NULL)
+    {
+      cupsFileRead(cupsd, buffer, info.st_size);
+      cgiSetVariable("CUPSDCONF", buffer);
+      free(buffer);
+    }
 
-    cupsFileRead(cupsd, buffer, info.st_size);
     cupsFileClose(cupsd);
-
-    cgiSetVariable("CUPSDCONF", buffer);
-    free(buffer);
 
    /*
     * Then get the default cupsd.conf file and put that into a string as
@@ -1702,37 +1703,39 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     if (!stat(filename, &info) && info.st_size < (1024 * 1024) &&
         (cupsd = cupsFileOpen(filename, "r")) != NULL)
     {
-      buffer = calloc(1, 2 * info.st_size + 1);
-      bufend = buffer + 2 * info.st_size - 1;
-
-      for (bufptr = buffer;
-           bufptr < bufend && (ch = cupsFileGetChar(cupsd)) != EOF;)
+      if ((buffer = calloc(1, 2 * info.st_size + 1)) != NULL)
       {
-        if (ch == '\\' || ch == '\"')
+	bufend = buffer + 2 * info.st_size - 1;
+
+	for (bufptr = buffer;
+	     bufptr < bufend && (ch = cupsFileGetChar(cupsd)) != EOF;)
 	{
-	  *bufptr++ = '\\';
-	  *bufptr++ = ch;
+	  if (ch == '\\' || ch == '\"')
+	  {
+	    *bufptr++ = '\\';
+	    *bufptr++ = ch;
+	  }
+	  else if (ch == '\n')
+	  {
+	    *bufptr++ = '\\';
+	    *bufptr++ = 'n';
+	  }
+	  else if (ch == '\t')
+	  {
+	    *bufptr++ = '\\';
+	    *bufptr++ = 't';
+	  }
+	  else if (ch >= ' ')
+	    *bufptr++ = ch;
 	}
-	else if (ch == '\n')
-	{
-	  *bufptr++ = '\\';
-	  *bufptr++ = 'n';
-	}
-	else if (ch == '\t')
-	{
-	  *bufptr++ = '\\';
-	  *bufptr++ = 't';
-	}
-	else if (ch >= ' ')
-	  *bufptr++ = ch;
+
+	*bufptr = '\0';
+
+	cgiSetVariable("CUPSDCONF_DEFAULT", buffer);
+	free(buffer);
       }
 
-      *bufptr = '\0';
-
       cupsFileClose(cupsd);
-
-      cgiSetVariable("CUPSDCONF_DEFAULT", buffer);
-      free(buffer);
     }
 
    /*

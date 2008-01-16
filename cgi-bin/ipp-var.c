@@ -3,7 +3,7 @@
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -158,6 +158,8 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
     for (i = 0; i < num_attrs; i ++)
       free(attrs[i]);
   }
+
+  fclose(in);
 }
 
 

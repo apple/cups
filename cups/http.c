@@ -3,7 +3,7 @@
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -1737,9 +1737,15 @@ httpSetAuthString(http_t     *http,	/* I - HTTP connection */
     */
 
     int len = (int)strlen(scheme) + (data ? (int)strlen(data) + 1 : 0) + 1;
+    char *temp;
 
     if (len > (int)sizeof(http->_authstring))
-      http->authstring = malloc(len);
+    {
+      if ((temp = malloc(len)) == NULL)
+        len = sizeof(http->_authstring);
+      else
+        http->authstring = temp;
+    }
 
     if (data)
       snprintf(http->authstring, len, "%s %s", scheme, data);

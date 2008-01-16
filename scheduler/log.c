@@ -3,7 +3,7 @@
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -274,6 +274,9 @@ cupsdLogMessage(int        level,	/* I - Log level */
 
   if (len >= linesize)
   {
+    char	*temp;			/* Temporary string pointer */
+
+
     len ++;
 
     if (len < 8192)
@@ -281,18 +284,12 @@ cupsdLogMessage(int        level,	/* I - Log level */
     else if (len > 65536)
       len = 65536;
 
-    line = realloc(line, len);
+    temp = realloc(line, len);
 
-    if (line)
-      linesize = len;
-    else
+    if (temp)
     {
-      cupsFilePrintf(ErrorFile,
-                     "ERROR: Unable to allocate memory for line - %s\n",
-                     strerror(errno));
-      cupsFileFlush(ErrorFile);
-
-      return (0);
+      line     = temp;
+      linesize = len;
     }
 
     va_start(ap, message);

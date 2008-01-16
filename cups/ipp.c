@@ -361,7 +361,12 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
   if (data)
   {
-    attr->values[0].unknown.data = malloc(datalen);
+    if ((attr->values[0].unknown.data = malloc(datalen)) == NULL)
+    {
+      ippDeleteAttribute(ipp, attr);
+      return (NULL);
+    }
+
     memcpy(attr->values[0].unknown.data, data, datalen);
   }
 
@@ -1542,7 +1547,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		break;
 
             default : /* Other unsupported values */
-		if (n > sizeof(buffer))
+		if (n > IPP_MAX_LENGTH)
 		{
 		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
 		  return (IPP_ERROR);
@@ -1551,7 +1556,12 @@ ippReadIO(void       *src,		/* I - Data source */
                 value->unknown.length = n;
 	        if (n > 0)
 		{
-		  value->unknown.data = malloc(n);
+		  if ((value->unknown.data = malloc(n)) == NULL)
+		  {
+		    DEBUG_puts("ippReadIO: Unable to allocate value");
+		    return (IPP_ERROR);
+		  }
+
 	          if ((*cb)(src, value->unknown.data, n) < n)
 		  {
 	            DEBUG_puts("ippReadIO: Unable to read unsupported value!");

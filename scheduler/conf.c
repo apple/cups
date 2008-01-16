@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1126,19 +1126,27 @@ cupsdReadConfiguration(void)
     if (!mimeType(MimeDatabase, "application", "octet-stream"))
       NumMimeTypes ++;
 
-    MimeTypes = calloc(NumMimeTypes, sizeof(const char *));
-
-    for (i = 0, type = mimeFirstType(MimeDatabase);
-         type;
-	 i ++, type = mimeNextType(MimeDatabase))
+    if ((MimeTypes = calloc(NumMimeTypes, sizeof(const char *))) == NULL)
     {
-      snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
-
-      MimeTypes[i] = _cupsStrAlloc(mimetype);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for %d MIME types!",
+		      NumMimeTypes);
+      NumMimeTypes = 0;
     }
+    else
+    {
+      for (i = 0, type = mimeFirstType(MimeDatabase);
+	   type;
+	   i ++, type = mimeNextType(MimeDatabase))
+      {
+	snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
-    if (i < NumMimeTypes)
-      MimeTypes[i] = _cupsStrAlloc("application/octet-stream");
+	MimeTypes[i] = _cupsStrAlloc(mimetype);
+      }
+
+      if (i < NumMimeTypes)
+	MimeTypes[i] = _cupsStrAlloc("application/octet-stream");
+    }
 
     if (LogLevel == CUPSD_LOG_DEBUG2)
     {
@@ -2570,8 +2578,16 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	if ((ptr = strchr(temp, ' ')) != NULL)
 	  *ptr = '\0';
 
-        relay->from.type             = AUTH_NAME;
-	relay->from.mask.name.name   = strdup(temp);
+        relay->from.type = AUTH_NAME;
+
+	if ((relay->from.mask.name.name = strdup(temp)) == NULL)
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to allocate BrowseRelay name at line %d - %s.",
+			  linenum, strerror(errno));
+	  continue;
+	}
+
 	relay->from.mask.name.length = strlen(temp);
       }
       else

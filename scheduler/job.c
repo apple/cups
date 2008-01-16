@@ -113,7 +113,8 @@ cupsdAddJob(int        priority,	/* I - Job priority */
   cupsd_job_t	*job;			/* New job record */
 
 
-  job = calloc(sizeof(cupsd_job_t), 1);
+  if ((job = calloc(sizeof(cupsd_job_t), 1)) == NULL)
+    return (NULL);
 
   job->id              = NextJobId ++;
   job->priority        = priority;
@@ -376,7 +377,11 @@ cupsdCheckJobs(void)
 	job->hold_until < time(NULL))
     {
       if (job->pending_timeout)
-        cupsdTimeoutJob(job);		/* Add trailing banner as needed */
+      {
+       /* Add trailing banner as needed */
+        if (cupsdTimeoutJob(job))
+	  continue;
+      }
 
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
@@ -2970,6 +2975,17 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     argv = calloc(7 + job->num_files, sizeof(char *));
   else
     argv = calloc(8, sizeof(char *));
+
+  if (!argv)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to allocate argument array!");
+    cupsArrayDelete(filters);
+
+    FilterLevel -= job->cost;
+
+    cupsdStopPrinter(printer, 0);
+    return;
+  }
 
   sprintf(jobid, "%d", job->id);
 

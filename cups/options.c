@@ -3,7 +3,7 @@
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -473,15 +473,24 @@ cupsParseOptions(
 	*value;				/* Pointer to value */
 
 
-  if (arg == NULL || options == NULL || num_options < 0)
+ /*
+  * Range check input...
+  */
+
+  if (!arg)
+    return (num_options);
+
+  if (!options || num_options < 0)
     return (0);
 
  /*
   * Make a copy of the argument string and then divide it up...
   */
 
-  copyarg     = strdup(arg);
-  ptr         = copyarg;
+  if ((copyarg = strdup(arg)) == NULL)
+    return (num_options);
+
+  ptr = copyarg;
 
  /*
   * Skip leading spaces...

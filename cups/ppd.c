@@ -826,6 +826,13 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         profile = realloc(ppd->profiles, sizeof(ppd_profile_t) *
 	                                 (ppd->num_profiles + 1));
 
+      if (!profile)
+      {
+        cg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
+
       ppd->profiles     = profile;
       profile           += ppd->num_profiles;
       ppd->num_profiles ++;
@@ -1112,7 +1119,12 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       ppd->num_emulations = count;
-      ppd->emulations     = calloc(count, sizeof(ppd_emul_t));
+      if ((ppd->emulations = calloc(count, sizeof(ppd_emul_t))) == NULL)
+      {
+        cg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
 
       for (i = 0, sptr = string; i < count; i ++)
       {

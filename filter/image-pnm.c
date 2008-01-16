@@ -153,8 +153,21 @@ _cupsImageReadPNM(
   cupsImageSetMaxTiles(img, 0);
 
   bpp = cupsImageGetDepth(img);
-  in  = malloc(img->xsize * 3);
-  out = malloc(img->xsize * bpp);
+
+  if ((in = malloc(img->xsize * 3)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    return (1);
+  }
+
+  if ((out = malloc(img->xsize * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    free(in);
+    return (1);
+  }
 
  /*
   * Read the image file...

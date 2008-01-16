@@ -179,8 +179,13 @@ cupsdAddLocation(const char *location)	/* I - Location path */
   * Initialize the record and copy the name over...
   */
 
-  temp->location = strdup(location);
-  temp->length   = strlen(temp->location);
+  if ((temp->location = strdup(location)) == NULL)
+  {
+    free(temp);
+    return (NULL);
+  }
+
+  temp->length = strlen(temp->location);
 
   cupsArrayAdd(Locations, temp);
 

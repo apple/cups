@@ -3,7 +3,7 @@
  *
  *   Base image support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -722,8 +722,11 @@ get_tile(cups_image_t *img,		/* I - Image */
 
     DEBUG_printf(("Creating tile array (%dx%d)\n", xtiles, ytiles));
 
-    img->tiles = calloc(sizeof(cups_itile_t *), ytiles);
-    tile       = calloc(sizeof(cups_itile_t), xtiles * ytiles);
+    if ((img->tiles = calloc(sizeof(cups_itile_t *), ytiles)) == NULL)
+      return (NULL);
+
+    if ((tile = calloc(sizeof(cups_itile_t), xtiles * ytiles)) == NULL)
+      return (NULL);
 
     for (tiley = 0; tiley < ytiles; tiley ++)
     {
@@ -744,13 +747,23 @@ get_tile(cups_image_t *img,		/* I - Image */
   {
     if (img->num_ics < img->max_ics)
     {
-      ic         = calloc(sizeof(cups_ic_t) + bpp * CUPS_TILE_SIZE *
-                                              CUPS_TILE_SIZE, 1);
-      ic->pixels = ((cups_ib_t *)ic) + sizeof(cups_ic_t);
+      if ((ic = calloc(sizeof(cups_ic_t) +
+                       bpp * CUPS_TILE_SIZE * CUPS_TILE_SIZE, 1)) == NULL)
+      {
+        if (img->num_ics == 0)
+	  return (NULL);
 
-      img->num_ics ++;
+        flush_tile(img);
+	ic = img->first;
+      }
+      else
+      {
+	ic->pixels = ((cups_ib_t *)ic) + sizeof(cups_ic_t);
 
-      DEBUG_printf(("Allocated cache tile %d (%p)...\n", img->num_ics, ic));
+	img->num_ics ++;
+
+	DEBUG_printf(("Allocated cache tile %d (%p)...\n", img->num_ics, ic));
+      }
     }
     else
     {

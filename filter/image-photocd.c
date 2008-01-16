@@ -99,11 +99,33 @@ _cupsImageReadPhotoCD(
   cupsImageSetMaxTiles(img, 0);
 
   bpp = cupsImageGetDepth(img);
-  in  = malloc(768 * 3);
-  out = malloc(768 * bpp);
+
+  if ((in = malloc(768 * 3)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    return (1);
+  }
+
+  if ((out = malloc(768 * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    free(in);
+    return (1);
+  }
 
   if (bpp > 1)
-    rgb = malloc(768 * 3);
+  {
+    if ((rgb = malloc(768 * 3)) == NULL)
+    {
+      fputs("DEBUG: Unable to allocate memory!\n", stderr);
+      fclose(fp);
+      free(in);
+      free(out);
+      return (1);
+    }
+  }
   else
     rgb = NULL;
 

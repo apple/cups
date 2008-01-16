@@ -3,7 +3,7 @@
  *
  *   I18N/language support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -975,7 +975,12 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
 	return (a);
       }
 
-      m->id = strdup(ptr);
+      if ((m->id = strdup(ptr)) == NULL)
+      {
+        free(m);
+        cupsFileClose(fp);
+	return (a);
+      }
     }
     else if (s[0] == '\"' && m)
     {
@@ -1023,7 +1028,11 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
       * Set the string...
       */
 
-      m->str = strdup(ptr);
+      if ((m->str = strdup(ptr)) == NULL)
+      {
+        cupsFileClose(fp);
+	return (a);
+      }
     }
   }
 

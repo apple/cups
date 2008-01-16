@@ -3,7 +3,7 @@
  *
  *   CGI form variable and array functions.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -322,9 +322,15 @@ cgiSetArray(const char *name,		/* I - Name of variable */
   {
     if (element >= var->avalues)
     {
+      const char **temp;		/* Temporary pointer */
+
+      temp = (const char **)realloc((void *)(var->values),
+                                    sizeof(char *) * (element + 16));
+      if (!temp)
+        return;
+
       var->avalues = element + 16;
-      var->values  = (const char **)realloc((void *)(var->values),
-                                            sizeof(char *) * var->avalues);
+      var->values  = temp;
     }
 
     if (element >= var->nvalues)
@@ -362,9 +368,15 @@ cgiSetSize(const char *name,		/* I - Name of variable */
 
   if (size >= var->avalues)
   {
+    const char **temp;			/* Temporary pointer */
+
+    temp = (const char **)realloc((void *)(var->values),
+				  sizeof(char *) * (size + 16));
+    if (!temp)
+      return;
+
     var->avalues = size + 16;
-    var->values  = (const char **)realloc((void *)(var->values),
-                                          sizeof(char *) * var->avalues);
+    var->values  = temp;
   }
 
   if (size > var->nvalues)
@@ -426,7 +438,7 @@ cgi_add_variable(const char *name,	/* I - Variable name */
 		 int        element,	/* I - Array element number */
                  const char *value)	/* I - Variable value */
 {
-  _cgi_var_t	*var;				/* New variable */
+  _cgi_var_t	*var;			/* New variable */
 
 
   if (name == NULL || value == NULL || element < 0 || element > 100000)
@@ -438,19 +450,29 @@ cgi_add_variable(const char *name,	/* I - Variable name */
 
   if (form_count >= form_alloc)
   {
-    if (form_alloc == 0)
-      form_vars = malloc(sizeof(_cgi_var_t) * 16);
-    else
-      form_vars = realloc(form_vars, (form_alloc + 16) * sizeof(_cgi_var_t));
+    _cgi_var_t	*temp_vars;		/* Temporary form pointer */
 
+
+    if (form_alloc == 0)
+      temp_vars = malloc(sizeof(_cgi_var_t) * 16);
+    else
+      temp_vars = realloc(form_vars, (form_alloc + 16) * sizeof(_cgi_var_t));
+
+    if (!temp_vars)
+      return;
+
+    form_vars  = temp_vars;
     form_alloc += 16;
   }
 
-  var                  = form_vars + form_count;
+  var = form_vars + form_count;
+
+  if ((var->values = calloc(element + 1, sizeof(char *))) == NULL)
+    return;
+
   var->name            = strdup(name);
   var->nvalues         = element + 1;
   var->avalues         = element + 1;
-  var->values          = calloc(element + 1, sizeof(char *));
   var->values[element] = strdup(value);
 
   form_count ++;

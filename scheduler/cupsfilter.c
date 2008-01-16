@@ -481,7 +481,8 @@ escape_options(
   for (i = num_options, option = options, bytes = 1; i > 0; i --, option ++)
     bytes += 2 * (strlen(option->name) + strlen(option->value)) + 2;
 
-  s = malloc(bytes);
+  if ((s = malloc(bytes)) == NULL)
+    return (NULL);
 
  /*
   * Copy the options to the string...

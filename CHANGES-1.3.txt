@@ -4,6 +4,9 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Added lots of memory allocation checks (Fortify)
+	- The scheduler would crash if it was unable to add a job
+	  file (Fortify)
 	- ppdOpen*() did not check all memory allocations (Coverity)
 	- ippReadIO() did not check all memory allocations (Coverity)
 	- The PostScript filter did not detect read errors (Coverity)

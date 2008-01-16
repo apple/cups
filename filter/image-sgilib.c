@@ -4,7 +4,7 @@
  *   SGI image file format library routines for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -250,8 +250,20 @@ sgiOpenFile(FILE *file,			/* I - File to open */
 
           fseek(sgip->file, 512, SEEK_SET);
 
-          sgip->table    = calloc(sgip->zsize, sizeof(long *));
-          sgip->table[0] = calloc(sgip->ysize * sgip->zsize, sizeof(long));
+          if ((sgip->table = calloc(sgip->zsize, sizeof(long *))) == NULL)
+	  {
+	    free(sgip);
+	    return (NULL);
+	  }
+
+          if ((sgip->table[0] = calloc(sgip->ysize * sgip->zsize,
+	                               sizeof(long))) == NULL)
+          {
+	    free(sgip->table);
+	    free(sgip);
+	    return (NULL);
+	  }
+
           for (i = 1; i < sgip->zsize; i ++)
             sgip->table[i] = sgip->table[0] + i * sgip->ysize;
 
@@ -333,12 +345,39 @@ sgiOpenFile(FILE *file,			/* I - File to open */
 
               sgip->firstrow = ftell(sgip->file);
               sgip->nextrow  = ftell(sgip->file);
-              sgip->table    = calloc(sgip->zsize, sizeof(long *));
-              sgip->table[0] = calloc(sgip->ysize * sgip->zsize, sizeof(long));
+              if ((sgip->table = calloc(sgip->zsize, sizeof(long *))) == NULL)
+	      {
+	        free(sgip);
+		return (NULL);
+	      }
+
+              if ((sgip->table[0] = calloc(sgip->ysize * sgip->zsize,
+	                                   sizeof(long))) == NULL)
+              {
+	        free(sgip->table);
+		free(sgip);
+		return (NULL);
+	      }
+
               for (i = 1; i < sgip->zsize; i ++)
         	sgip->table[i] = sgip->table[0] + i * sgip->ysize;
-              sgip->length    = calloc(sgip->zsize, sizeof(long *));
-              sgip->length[0] = calloc(sgip->ysize * sgip->zsize, sizeof(long));
+
+              if ((sgip->length = calloc(sgip->zsize, sizeof(long *))) == NULL)
+	      {
+	        free(sgip->table);
+		free(sgip);
+		return (NULL);
+	      }
+
+              if ((sgip->length[0] = calloc(sgip->ysize * sgip->zsize,
+	                                    sizeof(long))) == NULL)
+              {
+	        free(sgip->length);
+		free(sgip->table);
+		free(sgip);
+		return (NULL);
+	      }
+
               for (i = 1; i < sgip->zsize; i ++)
         	sgip->length[i] = sgip->length[0] + i * sgip->ysize;
               break;
