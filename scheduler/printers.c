@@ -3,7 +3,7 @@
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -909,7 +909,7 @@ cupsdLoadAllPrinters(void)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-        return;
+	break;
       }
     }
     else if (!strcasecmp(line, "</Printer>"))
@@ -954,14 +954,14 @@ cupsdLoadAllPrinters(void)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-        return;
+	break;
       }
     }
     else if (!p)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of printers.conf.", linenum);
-      return;
+      break;
     }
     else if (!strcasecmp(line, "AuthInfoRequired"))
     {
@@ -988,7 +988,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "Option") && value)
@@ -1020,7 +1020,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "State"))
@@ -1037,7 +1037,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "StateMessage"))
@@ -1078,7 +1078,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "Shared"))
@@ -1101,7 +1101,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "JobSheets"))
@@ -1136,7 +1136,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "AllowUser"))
@@ -1150,7 +1150,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "DenyUser"))
@@ -1164,7 +1164,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "QuotaPeriod"))
@@ -1175,7 +1175,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "PageLimit"))
@@ -1186,7 +1186,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "KLimit"))
@@ -1197,7 +1197,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "OpPolicy"))
@@ -1221,7 +1221,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "ErrorPolicy"))
@@ -1232,7 +1232,7 @@ cupsdLoadAllPrinters(void)
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	return;
+	break;
       }
     }
     else

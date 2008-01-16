@@ -50,8 +50,7 @@ main(int  argc,				/* I - Number of command-line args */
 			*strfmts;	/* Format strings in msgstr */
   char			*idfmt,		/* Current msgid format string */
 			*strfmt;	/* Current msgstr format string */
-  int			fmtidx,		/* Format index */
-			fmtcount;	/* Format count */
+  int			fmtidx;		/* Format index */
   int			status,		/* Exit status */
 			pass,		/* Pass/fail status */
 			untranslated;	/* Untranslated messages */
@@ -135,8 +134,6 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  if (!idfmt || strcmp(strfmt, idfmt))
 	    break;
-
-	  fmtcount ++;
 	}
 
         if (cupsArrayCount(strfmts) != cupsArrayCount(idfmts) || strfmt)

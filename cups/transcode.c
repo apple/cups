@@ -1459,6 +1459,8 @@ get_vbcs_charmap(
   {
     DEBUG_puts("    Unable to get charmap count!");
 
+    cupsFileClose(fp);
+
     return (NULL);
   }
 
@@ -1470,8 +1472,9 @@ get_vbcs_charmap(
 
   if ((vmap = (_cups_vmap_t *)calloc(1, sizeof(_cups_vmap_t))) == NULL)
   {
-    cupsFileClose(fp);
     DEBUG_puts("    Unable to allocate memory!");
+
+    cupsFileClose(fp);
 
     return (NULL);
   }

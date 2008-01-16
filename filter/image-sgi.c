@@ -77,7 +77,6 @@ _cupsImageReadSGI(
     fprintf(stderr, "DEBUG: Bad SGI image dimensions %ux%ux%u!\n",
             sgip->xsize, sgip->ysize, sgip->zsize);
     sgiClose(sgip);
-    fclose(fp);
     return (1);
   }
 
@@ -97,7 +96,6 @@ _cupsImageReadSGI(
   {
     fputs("DEBUG: Unable to allocate memory!\n", stderr);
     sgiClose(sgip);
-    fclose(fp);
     return (1);
   }
 
@@ -105,12 +103,20 @@ _cupsImageReadSGI(
   {
     fputs("DEBUG: Unable to allocate memory!\n", stderr);
     sgiClose(sgip);
-    fclose(fp);
     free(in);
     return (1);
   }
 
-  rows[0] = calloc(img->xsize * sgip->zsize, sizeof(unsigned short));
+  if ((rows[0] = calloc(img->xsize * sgip->zsize,
+                        sizeof(unsigned short))) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    sgiClose(sgip);
+    free(in);
+    free(out);
+    return (1);
+  }
+
   for (i = 1; i < sgip->zsize; i ++)
     rows[i] = rows[0] + i * img->xsize;
 
@@ -279,7 +285,6 @@ _cupsImageReadSGI(
   free(rows[0]);
 
   sgiClose(sgip);
-  fclose(fp);
 
   return (0);
 }

@@ -169,7 +169,15 @@ _cupsImageReadSunRaster(
     return (1);
   }
 
-  scanline  = malloc(scanwidth);
+  if ((scanline = malloc(scanwidth)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    free(in);
+    free(out);
+    return (1);
+  }
+
   run_count = 0;
   run_value = 0;
 
