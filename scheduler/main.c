@@ -133,10 +133,7 @@ main(int  argc,				/* I - Number of command-line args */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
-			mallinfo_time;	/* Malloc information time */
-  size_t		string_count,	/* String count */
-			alloc_bytes,	/* Allocated string bytes */
-			total_bytes;	/* Total string bytes */
+			report_time;	/* Malloc/client/job report time */
   long			timeout;	/* Timeout for cupsdDoSelect() */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -666,11 +663,11 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop forever...
   */
 
-  mallinfo_time = 0;
   browse_time   = time(NULL);
-  senddoc_time  = time(NULL);
   expire_time   = time(NULL);
   fds           = 1;
+  report_time   = 0;
+  senddoc_time  = time(NULL);
 
   while (!stop_scheduler)
   {
@@ -997,30 +994,49 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * Log memory usage every minute...
+    * Log statistics at most once a minute when in debug mode...
     */
 
-    if ((current_time - mallinfo_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG2)
+    if ((current_time - report_time) >= 60 && LogLevel >= CUPSD_LOG_DEBUG)
     {
+      size_t		string_count,	/* String count */
+			alloc_bytes,	/* Allocated string bytes */
+			total_bytes;	/* Total string bytes */
 #ifdef HAVE_MALLINFO
-      struct mallinfo mem;		/* Malloc information */
+      struct mallinfo	mem;		/* Malloc information */
 
 
       mem = mallinfo();
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "mallinfo: arena = %d, used = %d, free = %d\n",
-                      mem.arena, mem.usmblks + mem.uordblks,
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: malloc-arena=%lu", mem.arena);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: malloc-used=%lu",
+                      mem.usmblks + mem.uordblks);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: malloc-free=%lu",
 		      mem.fsmblks + mem.fordblks);
 #endif /* HAVE_MALLINFO */
 
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: clients=%d",
+                      cupsArrayCount(Clients));
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: jobs=%d",
+                      cupsArrayCount(Jobs));
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: jobs-active=%d",
+                      cupsArrayCount(ActiveJobs));
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: printers=%d",
+                      cupsArrayCount(Printers));
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Report: printers-implicit=%d",
+                      cupsArrayCount(ImplicitPrinters));
+
       string_count = _cupsStrStatistics(&alloc_bytes, &total_bytes);
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "stringpool: " CUPS_LLFMT " strings, "
-		      CUPS_LLFMT " allocated, " CUPS_LLFMT " total bytes",
-		      CUPS_LLCAST string_count, CUPS_LLCAST alloc_bytes,
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Report: stringpool-string-count=" CUPS_LLFMT,
+		      CUPS_LLCAST string_count);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Report: stringpool-alloc-bytes=" CUPS_LLFMT,
+		      CUPS_LLCAST alloc_bytes);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Report: stringpool-total-bytes=" CUPS_LLFMT,
 		      CUPS_LLCAST total_bytes);
 
-      mallinfo_time = current_time;
+      report_time = current_time;
     }
 
    /*
