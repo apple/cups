@@ -103,7 +103,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex #\"^%s\" #\"^/private/etc\" #\"^/usr/local/etc\" "
-		 "#\"^/Library\" #\"^/System\"))\n", root);
+		 "#\"^/Library\" #\"^/System\" #\"^/Users\"))\n", root);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
                  "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\"))\n",
@@ -312,11 +312,29 @@ cupsdStartProcess(
 
    /*
     * Change the priority of the process based on the FilterNice setting.
-    * (this is not done for backends...)
+    * (this is not done for root processes...)
     */
 
     if (!root)
       nice(FilterNice);
+
+#ifdef HAVE_SANDBOX_H
+   /*
+    * Run in a separate security profile...
+    */
+
+    if (profile)
+    {
+      char *error;			/* Sandbox error, if any */
+
+      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
+      {
+        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
+	        strerror(errno));
+	sandbox_free_error(error);
+      }
+    }
+#endif /* HAVE_SANDBOX_H */
 
    /*
     * Change user to something "safe"...
@@ -374,24 +392,6 @@ cupsdStartProcess(
 #endif /* HAVE_SIGSET */
 
     cupsdReleaseSignals();
-
-#ifdef HAVE_SANDBOX_H
-   /*
-    * Run in a separate security profile...
-    */
-
-    if (profile)
-    {
-      char *error;			/* Sandbox error, if any */
-
-      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
-      {
-        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
-	        strerror(errno));
-	sandbox_free_error(error);
-      }
-    }
-#endif /* HAVE_SANDBOX_H */
 
    /*
     * Execute the command; if for some reason this doesn't work,
