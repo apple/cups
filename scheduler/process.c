@@ -99,7 +99,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"
-                 "  (regex #\"^%s\"))\n", request);
+                 "  (regex #\"^%s/\"))\n", request);
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex #\"^%s\" #\"^/private/etc\" #\"^/usr/local/etc\" "
