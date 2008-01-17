@@ -1131,11 +1131,6 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
     return;
   }
 
-#ifdef DEBUG
-  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-  printf("appleSetDefault: network=\"%s\"\n", name);
-#endif /* DEBUG */
-
   if ((newprinter = CFStringCreateWithCString(kCFAllocatorDefault, name,
                                               kCFStringEncodingUTF8)) == NULL)
   {
@@ -1209,8 +1204,9 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
     if (newlocation)
       CFRelease(newlocation);
   }
-  
-  CFRelease(locations);
+
+  if (locations)
+    CFRelease(locations);
   CFRelease(network);
   CFRelease(newprinter);
 }

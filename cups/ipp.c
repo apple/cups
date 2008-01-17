@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -361,7 +361,12 @@ ippAddOctetString(ipp_t      *ipp,	/* I - IPP message */
 
   if (data)
   {
-    attr->values[0].unknown.data = malloc(datalen);
+    if ((attr->values[0].unknown.data = malloc(datalen)) == NULL)
+    {
+      ippDeleteAttribute(ipp, attr);
+      return (NULL);
+    }
+
     memcpy(attr->values[0].unknown.data, data, datalen);
   }
 
@@ -1277,7 +1282,11 @@ ippReadIO(void       *src,		/* I - Data source */
             if (ipp->current)
 	      ipp->prev = ipp->current;
 
-	    attr = ipp->current = _ippAddAttr(ipp, 1);
+	    if ((attr = ipp->current = _ippAddAttr(ipp, 1)) == NULL)
+	    {
+	      DEBUG_puts("ippReadIO: unable to allocate attribute!");
+	      return (IPP_ERROR);
+	    }
 
 	    DEBUG_printf(("ippReadIO: name=\'%s\', ipp->current=%p, ipp->prev=%p\n",
 	                  buffer, ipp->current, ipp->prev));
@@ -1538,7 +1547,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		break;
 
             default : /* Other unsupported values */
-		if (n > sizeof(buffer))
+		if (n > IPP_MAX_LENGTH)
 		{
 		  DEBUG_printf(("ippReadIO: bad value length %d!\n", n));
 		  return (IPP_ERROR);
@@ -1547,7 +1556,12 @@ ippReadIO(void       *src,		/* I - Data source */
                 value->unknown.length = n;
 	        if (n > 0)
 		{
-		  value->unknown.data = malloc(n);
+		  if ((value->unknown.data = malloc(n)) == NULL)
+		  {
+		    DEBUG_puts("ippReadIO: Unable to allocate value");
+		    return (IPP_ERROR);
+		  }
+
 	          if ((*cb)(src, value->unknown.data, n) < n)
 		  {
 	            DEBUG_puts("ippReadIO: Unable to read unsupported value!");

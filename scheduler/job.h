@@ -3,7 +3,7 @@
  *
  *   Print job definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -123,7 +123,7 @@ extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
-extern void		cupsdTimeoutJob(cupsd_job_t *job);
+extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
 
 

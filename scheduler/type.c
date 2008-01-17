@@ -567,12 +567,12 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
     if ((base = strrchr(filename, '/')) != NULL)
       base ++;
     else
-      filename = filename;
+      base = filename;
   }
   else if ((base = strrchr(pathname, '/')) != NULL)
     base ++;
   else
-    filename = pathname;
+    base = pathname;
 
  /*
   * Then check it against all known types...

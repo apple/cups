@@ -61,7 +61,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   dest      = NULL;
   dests     = NULL;
-  http      = NULL;
   job       = NULL;
   jobid     = 0;
   num_dests = 0;
@@ -75,8 +74,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 #ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 
-	    if (http)
-	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
@@ -85,12 +82,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    if (http)
-	    {
-	      httpClose(http);
-	      http = NULL;
-	    }
-
 	    if (argv[i][2] != '\0')
 	      cupsSetServer(argv[i] + 2);
 	    else
@@ -142,17 +133,14 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
 
-  if (!http)
-  {
-    http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
 
-    if (http == NULL)
-    {
-      _cupsLangPrintf(stderr,
-                      _("lpmove: Unable to connect to server: %s\n"),
-		      strerror(errno));
-      return (1);
-    }
+  if (http == NULL)
+  {
+    _cupsLangPrintf(stderr,
+		    _("lpmove: Unable to connect to server: %s\n"),
+		    strerror(errno));
+    return (1);
   }
 
   return (move_job(http, src, jobid, dest));

@@ -4,7 +4,7 @@
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -153,7 +153,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * Send a reset sequence.
   */
 
-  if (ppd->nickname && strstr(ppd->nickname, "OKIDATA") != NULL)
+  if (ppd && ppd->nickname && strstr(ppd->nickname, "OKIDATA") != NULL)
     printf("\033{A");	/* Set EPSON emulation mode */
 
   printf("\033@");
@@ -164,7 +164,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 
   EjectPage = header->Margins[0] || header->Margins[1];
     
-  switch (ppd->model_number)
+  switch (Model)
   {
     case EPSON_9PIN :
     case EPSON_24PIN :
@@ -196,7 +196,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	DotColumns = header->HWResolution[0] / 60;
         Shingling  = 0;
 
-        if (ppd->model_number == EPSON_9PIN)
+        if (Model == EPSON_9PIN)
 	  printf("\033\063\030");	/* Set line feed */
 	else
 	  switch (header->HWResolution[0])
@@ -251,8 +251,11 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 	putchar(n);
 	putchar(n >> 8);
 
-	t = (ppd->sizes[1].length - ppd->sizes[1].top) *
-	    header->HWResolution[1] / 72.0;
+        if (ppd)
+	  t = (ppd->sizes[1].length - ppd->sizes[1].top) *
+	      header->HWResolution[1] / 72.0;
+        else
+	  t = 0;
 
 	pwrite("\033(c\004\000", 5);		/* Top & bottom margins */
 	putchar(t);
@@ -293,18 +296,35 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * Allocate memory for a line/row of graphics...
   */
 
-  Planes[0] = malloc(header->cupsBytesPerLine);
+  if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
+  {
+    fputs("ERROR: Unable to allocate memory!\n", stderr);
+    exit(1);
+  }
+
   for (plane = 1; plane < NumPlanes; plane ++)
     Planes[plane] = Planes[0] + plane * header->cupsBytesPerLine / NumPlanes;
 
   if (header->cupsCompression || DotBytes)
-    CompBuffer = calloc(2, header->cupsWidth);
+  {
+    if ((CompBuffer = calloc(2, header->cupsWidth)) == NULL)
+    {
+      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      exit(1);
+    }
+  }
   else
     CompBuffer = NULL;
 
   if (DotBytes)
   {
-    LineBuffers[0] = calloc(DotBytes, header->cupsWidth * (Shingling + 1));
+    if ((LineBuffers[0] = calloc(DotBytes,
+                                 header->cupsWidth * (Shingling + 1))) == NULL)
+    {
+      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      exit(1);
+    }
+
     LineBuffers[1] = LineBuffers[0] + DotBytes * header->cupsWidth;
     DotBit         = 128;
     LineCount      = 0;

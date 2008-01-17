@@ -3,7 +3,7 @@
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -103,16 +103,32 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
   DEBUG_printf(("ppdCollect2(ppd=%p, section=%d, min_order=%f, choices=%p)\n",
                 ppd, section, min_order, choices));
 
-  if (ppd == NULL)
+  if (!ppd || !choices)
+  {
+    if (choices)
+      *choices = NULL;
+
     return (0);
+  }
 
  /*
   * Allocate memory for up to N selected choices...
   */
 
-  count   = 0;
-  collect = calloc(sizeof(ppd_choice_t *), cupsArrayCount(ppd->marked));
-  orders  = calloc(sizeof(float), cupsArrayCount(ppd->marked));
+  count = 0;
+  if ((collect = calloc(sizeof(ppd_choice_t *),
+                        cupsArrayCount(ppd->marked))) == NULL)
+  {
+    *choices = NULL;
+    return (0);
+  }
+
+  if ((orders = calloc(sizeof(float), cupsArrayCount(ppd->marked))) == NULL)
+  {
+    *choices = NULL;
+    free(collect);
+    return (0);
+  }
 
  /*
   * Loop through all options and add choices as needed...

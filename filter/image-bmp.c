@@ -3,7 +3,7 @@
  *
  *   BMP image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -179,9 +179,22 @@ _cupsImageReadBMP(
 
   cupsImageSetMaxTiles(img, 0);
 
-  in  = malloc(img->xsize * 3);
   bpp = cupsImageGetDepth(img);
-  out = malloc(img->xsize * bpp);
+
+  if ((in = malloc(img->xsize * 3)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    return (1);
+  }
+
+  if ((out = malloc(img->xsize * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    free(in);
+    fclose(fp);
+    return (1);
+  }
 
  /*
   * Read the image data...

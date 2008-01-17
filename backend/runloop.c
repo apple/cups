@@ -3,7 +3,7 @@
  *
  *   Common run loop APIs for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -216,7 +216,7 @@ backendRunLoop(
       FD_SET(CUPS_SC_FD, &input);
 
     FD_ZERO(&output);
-    if (print_bytes || !use_bc)
+    if (print_bytes || (!use_bc && !side_cb))
       FD_SET(device_fd, &output);
 
     if (use_bc || side_cb)

@@ -3,7 +3,7 @@
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by

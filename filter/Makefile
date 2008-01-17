@@ -3,7 +3,7 @@
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -19,7 +19,7 @@ include ../Makedefs
 
 
 FILTERS	=	gziptoany hpgltops texttops pstops $(IMGFILTERS) \
-		rastertolabel rastertoepson rastertohp
+		$(PDFTOPS) rastertolabel rastertoepson rastertohp
 TARGETS	=	$(FILTERS) \
 		$(LIBCUPSIMAGE) \
 		libcupsimage.a \
@@ -39,7 +39,8 @@ IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
 IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
-		gziptoany.o imagetops.o imagetoraster.o common.o pstops.o \
+		gziptoany.o imagetops.o imagetoraster.o common.o \
+		pdftops.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
 		testimage.o testraster.o textcommon.o texttops.o
 
@@ -321,6 +322,15 @@ imagetoraster:	imagetoraster.o common.o $(LIBCUPSIMAGE) \
 pstops:	pstops.o common.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ pstops.o common.o $(LIBS) -lm
+
+
+#
+# pdftops
+#
+
+pdftops:	pdftops.o common.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ pdftops.o common.o $(LIBS)
 
 
 #

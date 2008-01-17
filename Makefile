@@ -3,7 +3,7 @@
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,7 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier $(PDFTOPS) scheduler systemv test \
+		notifier scheduler systemv test \
 		$(PHPDIR) \
 		conf data doc $(FONTS) ppd templates
 

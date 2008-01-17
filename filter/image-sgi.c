@@ -3,7 +3,7 @@
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -77,7 +77,6 @@ _cupsImageReadSGI(
     fprintf(stderr, "DEBUG: Bad SGI image dimensions %ux%ux%u!\n",
             sgip->xsize, sgip->ysize, sgip->zsize);
     sgiClose(sgip);
-    fclose(fp);
     return (1);
   }
 
@@ -92,10 +91,32 @@ _cupsImageReadSGI(
   cupsImageSetMaxTiles(img, 0);
 
   bpp = cupsImageGetDepth(img);
-  in  = malloc(img->xsize * sgip->zsize);
-  out = malloc(img->xsize * bpp);
 
-  rows[0] = calloc(img->xsize * sgip->zsize, sizeof(unsigned short));
+  if ((in = malloc(img->xsize * sgip->zsize)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    sgiClose(sgip);
+    return (1);
+  }
+
+  if ((out = malloc(img->xsize * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    sgiClose(sgip);
+    free(in);
+    return (1);
+  }
+
+  if ((rows[0] = calloc(img->xsize * sgip->zsize,
+                        sizeof(unsigned short))) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    sgiClose(sgip);
+    free(in);
+    free(out);
+    return (1);
+  }
+
   for (i = 1; i < sgip->zsize; i ++)
     rows[i] = rows[0] + i * img->xsize;
 

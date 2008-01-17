@@ -3,7 +3,7 @@
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -571,7 +571,7 @@ _cupsRasterExecPS(
           break;
     }
 
-    if (obj->type == CUPS_PS_OTHER)
+    if (obj && obj->type == CUPS_PS_OTHER)
       break;
   }
 

@@ -3,7 +3,7 @@
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -752,7 +752,7 @@ cupsdProcessIPPRequest(
  * 'cupsdTimeoutJob()' - Timeout a job waiting on job files.
  */
 
-void
+int					/* O - 0 on success, -1 on error */
 cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
 {
   cupsd_printer_t	*printer;	/* Destination printer or class */
@@ -780,10 +780,13 @@ cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
     cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Adding end banner page \"%s\".",
                     job->id, attr->values[1].string.text);
 
-    kbytes = copy_banner(NULL, job, attr->values[1].string.text);
+    if ((kbytes = copy_banner(NULL, job, attr->values[1].string.text)) < 0)
+      return (-1);
 
     cupsdUpdateQuota(printer, job->username, 0, kbytes);
   }
+
+  return (0);
 }
 
 
@@ -1792,7 +1795,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                       "[Job %d] Adding start banner page \"%s\".",
                       job->id, attr->values[0].string.text);
 
-      kbytes = copy_banner(con, job, attr->values[0].string.text);
+      if ((kbytes = copy_banner(con, job, attr->values[0].string.text)) < 0)
+        return (NULL);
 
       cupsdUpdateQuota(printer, job->username, 0, kbytes);
     }
@@ -3432,13 +3436,6 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
                   con, con->http.fd, p, p->name);
 
  /*
-  * Check input...
-  */
-
-  if (!con || !p)
-    return (0);
-
- /*
   * Figure out who is printing...
   */
 
@@ -3944,7 +3941,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
   */
 
   if (add_file(con, job, banner->filetype, 0))
-    return (0);
+    return (-1);
 
   snprintf(filename, sizeof(filename), "%s/d%05d-%03d", RequestRoot, job->id,
            job->num_files);
@@ -7712,7 +7709,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * See if we need to add the ending sheet...
   */
 
-  cupsdTimeoutJob(job);
+  if (cupsdTimeoutJob(job))
+    return;
 
  /*
   * Log and save the job...
@@ -8916,7 +8914,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * See if we need to add the ending sheet...
     */
 
-    cupsdTimeoutJob(job);
+    if (cupsdTimeoutJob(job))
+      return;
 
     if (job->state_value == IPP_JOB_STOPPED)
     {
@@ -10150,8 +10149,8 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "validate_user(job=%d, con=%d, owner=\"%s\", username=%p, "
 		  "userlen=%d)",
-        	  job ? job->id : 0, con->http.fd, owner ? owner : "(null)",
-		  username, userlen);
+        	  job->id, con ? con->http.fd : 0,
+		  owner ? owner : "(null)", username, userlen);
 
  /*
   * Validate input...

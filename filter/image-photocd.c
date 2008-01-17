@@ -7,7 +7,7 @@
  *   is only YCC encoded.  Support for the higher resolution images will
  *   require a lot of extra code...
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -99,11 +99,33 @@ _cupsImageReadPhotoCD(
   cupsImageSetMaxTiles(img, 0);
 
   bpp = cupsImageGetDepth(img);
-  in  = malloc(768 * 3);
-  out = malloc(768 * bpp);
+
+  if ((in = malloc(768 * 3)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    return (1);
+  }
+
+  if ((out = malloc(768 * bpp)) == NULL)
+  {
+    fputs("DEBUG: Unable to allocate memory!\n", stderr);
+    fclose(fp);
+    free(in);
+    return (1);
+  }
 
   if (bpp > 1)
-    rgb = malloc(768 * 3);
+  {
+    if ((rgb = malloc(768 * 3)) == NULL)
+    {
+      fputs("DEBUG: Unable to allocate memory!\n", stderr);
+      fclose(fp);
+      free(in);
+      free(out);
+      return (1);
+    }
+  }
   else
     rgb = NULL;
 
@@ -140,6 +162,9 @@ _cupsImageReadPhotoCD(
 
       free(in);
       free(out);
+
+      if (bpp > 1)
+        free(rgb);
 
       return (-1);
     }

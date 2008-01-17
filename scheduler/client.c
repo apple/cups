@@ -3,7 +3,7 @@
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -144,9 +144,19 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     Clients = cupsArrayNew(NULL, NULL);
 
   if (!Clients)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to allocate memory for client array!");
+    cupsdPauseListening();
     return;
+  }
 
-  con = calloc(1, sizeof(cupsd_client_t));
+  if ((con = calloc(1, sizeof(cupsd_client_t))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to allocate memory for client!");
+    cupsdPauseListening();
+    return;
+  }
 
   con->http.activity = time(NULL);
   con->file          = -1;

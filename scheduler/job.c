@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -113,7 +113,8 @@ cupsdAddJob(int        priority,	/* I - Job priority */
   cupsd_job_t	*job;			/* New job record */
 
 
-  job = calloc(sizeof(cupsd_job_t), 1);
+  if ((job = calloc(sizeof(cupsd_job_t), 1)) == NULL)
+    return (NULL);
 
   job->id              = NextJobId ++;
   job->priority        = priority;
@@ -376,7 +377,11 @@ cupsdCheckJobs(void)
 	job->hold_until < time(NULL))
     {
       if (job->pending_timeout)
-        cupsdTimeoutJob(job);		/* Add trailing banner as needed */
+      {
+       /* Add trailing banner as needed */
+        if (cupsdTimeoutJob(job))
+	  continue;
+      }
 
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
@@ -2971,6 +2976,17 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   else
     argv = calloc(8, sizeof(char *));
 
+  if (!argv)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to allocate argument array!");
+    cupsArrayDelete(filters);
+
+    FilterLevel -= job->cost;
+
+    cupsdStopPrinter(printer, 0);
+    return;
+  }
+
   sprintf(jobid, "%d", job->id);
 
   argv[0] = printer->name;
@@ -3557,7 +3573,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * job sheet count...
       */
 
-      if (job->sheets != NULL)
+      if (job->sheets)
       {
         if (!strncasecmp(message, "total ", 6))
 	{
@@ -3602,8 +3618,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdLogPage(job, message);
 
-      cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-                    "Printed %d page(s).", job->sheets->values[0].integer);
+      if (job->sheets)
+	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+		      "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {

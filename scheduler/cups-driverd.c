@@ -7,7 +7,7 @@
  *   in CUPS_DATADIR/model and dynamically generated PPD files using
  *   the driver helper programs in CUPS_SERVERBIN/driver.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1664,6 +1664,7 @@ load_drivers(void)
           if (!ppd)
 	  {
             cupsDirClose(dir);
+	    pclose(fp);
 	    return (0);
 	  }
 

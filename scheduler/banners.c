@@ -3,7 +3,7 @@
  *
  *   Banner routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -147,8 +147,8 @@ add_banner(const char *name,		/* I - Name of banner */
   if ((filetype = mimeFileType(MimeDatabase, filename, NULL, NULL)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_WARN,
-                    "add_banner: Banner \"%s\" (\"%s\") is of an unknown file type - skipping!",
-                    name, filename);
+                    "add_banner: Banner \"%s\" (\"%s\") is of an unknown file "
+		    "type - skipping!", name, filename);
     return;
   }
 
@@ -156,13 +156,27 @@ add_banner(const char *name,		/* I - Name of banner */
   * Allocate memory...
   */
 
-  temp = calloc(1, sizeof(cupsd_banner_t));
+  if ((temp = calloc(1, sizeof(cupsd_banner_t))) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "add_banner: Unable to allocate memory for banner \"%s\" - "
+		    "skipping!", name);
+    return;
+  }
 
  /*
   * Copy the new banner data over...
   */
 
-  temp->name     = strdup(name);
+  if ((temp->name = strdup(name)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "add_banner: Unable to allocate memory for banner \"%s\" - "
+		    "skipping!", name);
+    free(temp);
+    return;
+  }
+
   temp->filetype = filetype;
 
   cupsArrayAdd(Banners, temp);

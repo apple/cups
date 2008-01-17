@@ -3,7 +3,7 @@
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -731,7 +731,7 @@ cupsdLoadAllSubscriptions(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-        return;
+        break;
       }
     }
     else if (!strcasecmp(line, "</Subscription>"))
@@ -741,7 +741,7 @@ cupsdLoadAllSubscriptions(void)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-        return;
+        break;
       }
 
       if (delete_sub)
@@ -755,7 +755,7 @@ cupsdLoadAllSubscriptions(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of subscriptions.conf.",
 	              linenum);
-      return;
+      break;
     }
     else if (!strcasecmp(line, "Events"))
     {
@@ -769,7 +769,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
 
       while (*value)
@@ -792,7 +792,7 @@ cupsdLoadAllSubscriptions(void)
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unknown event name \'%s\' on line %d of subscriptions.conf.",
 	                  value, linenum);
-	  return;
+	  break;
 	}
 
 	value = valueptr;
@@ -811,7 +811,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "Recipient"))
@@ -827,7 +827,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "JobId"))
@@ -851,7 +851,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "PrinterName"))
@@ -875,7 +875,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "UserData"))
@@ -937,7 +937,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "LeaseDuration"))
@@ -956,7 +956,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "Interval"))
@@ -972,7 +972,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "ExpirationTime"))
@@ -988,7 +988,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else if (!strcasecmp(line, "NextEventId"))
@@ -1004,7 +1004,7 @@ cupsdLoadAllSubscriptions(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of subscriptions.conf.",
 	                linenum);
-	return;
+	break;
       }
     }
     else

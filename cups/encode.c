@@ -396,10 +396,44 @@ cupsEncodeOptions2(
       * Find the end of this value and mark it if needed...
       */
 
-      if ((sep = strchr(val, ',')) != NULL)
+      for (sep = val; *sep; sep ++)
+      {
+	if (*sep == '\'')
+	{
+	 /*
+	  * Skip quoted option value...
+	  */
+
+	  sep ++;
+
+	  while (*sep && *sep != '\'')
+	    sep ++;
+
+	  if (!*sep)
+	    sep --;
+	}
+	else if (*sep == '\"')
+	{
+	 /*
+	  * Skip quoted option value...
+	  */
+
+	  sep ++;
+
+	  while (*sep && *sep != '\"')
+	    sep ++;
+
+	  if (!*sep)
+	    sep --;
+	}
+	else if (*sep == ',')
+	  break;
+	else if (*sep == '\\' && sep[1])
+	  sep ++;
+      }
+
+      if (*sep == ',')
 	*sep++ = '\0';
-      else
-	sep = val + strlen(val);
 
      /*
       * Copy the option value(s) over as needed by the type...

@@ -4,6 +4,31 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- cupsEncodeOptions2() did not handle option values like
+	  "What's up, doc?" properly.
+	- Added lots of memory allocation checks (Fortify)
+	- The scheduler would crash if it was unable to add a job
+	  file (Fortify)
+	- ppdOpen*() did not check all memory allocations (Coverity)
+	- ippReadIO() did not check all memory allocations (Coverity)
+	- The PostScript filter did not detect read errors (Coverity)
+	- The scheduler did not check for a missing job-sheets-completed
+	  attribute when sending an event notification (Coverity)
+	- "Set Printer Options" might not work with raw queues (Coverity)
+	- cupsRasterInterpretPPD() could crash on certain PostScript
+	  errors (Coverity)
+	- The USB backend did not check for back-channel support
+	  properly on all systems (Coverity)
+	- Fixed memory leaks in the GIF and PNM image loading code
+	  (Coverity)
+	- Removed some dead code in the CUPS API and scheduler (Coverity)
+	- Fixed two overflow bugs in the HP-GL/2 filter (Coverity)
+	- Fixed another ASN1 string parsing bug (STR #2665)
+	- The RSS notifier directory was not installed with the
+	  correct permissions.
+	- The standard CUPS backends could use 100% CPU while waiting
+	  for print data (STR #2664)
+	- Filename-based MIME rules did not work (STR #2659)
 	- The cups-polld program did not exit if the scheduler crashed
 	  (STR #2640)
 	- The scheduler would crash if you tried to set the port-monitor

@@ -3,7 +3,7 @@
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -826,6 +826,13 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         profile = realloc(ppd->profiles, sizeof(ppd_profile_t) *
 	                                 (ppd->num_profiles + 1));
 
+      if (!profile)
+      {
+        cg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
+
       ppd->profiles     = profile;
       profile           += ppd->num_profiles;
       ppd->num_profiles ++;
@@ -1112,7 +1119,12 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	}
 
       ppd->num_emulations = count;
-      ppd->emulations     = calloc(count, sizeof(ppd_emul_t));
+      if ((ppd->emulations = calloc(count, sizeof(ppd_emul_t))) == NULL)
+      {
+        cg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
 
       for (i = 0, sptr = string; i < count; i ++)
       {
@@ -1875,7 +1887,12 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Add the option choice...
       */
 
-      choice = ppd_add_choice(option, name);
+      if ((choice = ppd_add_choice(option, name)) == NULL)
+      {
+        cg->ppd_status = PPD_ALLOC_ERROR;
+
+	goto error;
+      }
 
       if (text[0])
         cupsCharsetToUTF8((cups_utf8_t *)choice->text, text,
