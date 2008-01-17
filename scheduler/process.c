@@ -112,10 +112,12 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"
                    "  (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
-		   request);
+		   request, job_id, job_id);
 
   cupsFileClose(fp);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = \"%s\"",
+                  job_id, profile);
   return ((void *)strdup(profile));
 #else
 
@@ -134,6 +136,8 @@ cupsdDestroyProfile(void *profile)	/* I - Profile */
 #ifdef HAVE_SANDBOX_H
   if (profile)
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
+                    (char *)profile);
     unlink((char *)profile);
     free(profile);
   }
