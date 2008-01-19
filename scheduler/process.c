@@ -329,7 +329,7 @@ cupsdStartProcess(
 
     if (profile)
     {
-      char *error;			/* Sandbox error, if any */
+      char *error = NULL;		/* Sandbox error, if any */
 
       if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
       {
