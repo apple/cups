@@ -9975,6 +9975,8 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
 {
   int		i;			/* Looping var */
   struct passwd	*pw;			/* User password data */
+  char		baseuser[256],		/* Base username */
+		*baseptr;		/* Pointer to "@" in base username */
 
 
   if (p->num_users == 0)
@@ -9982,6 +9984,20 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
 
   if (!strcmp(username, "root"))
     return (1);
+
+  if (strchr(username, '@'))
+  {
+   /*
+    * Strip @REALM for username check...
+    */
+
+    strlcpy(baseuser, username, sizeof(baseuser));
+
+    if ((baseptr = strchr(baseuser, '@')) != NULL)
+      *baseptr = '\0';
+
+    username = baseuser;
+  }
 
   pw = getpwnam(username);
   endpwent();
