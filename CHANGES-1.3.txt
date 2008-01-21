@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- CUPS didn't compile on HP-UX 11i (STR #2679)
 	- cupsEncodeOptions2() did not handle option values like
 	  "What's up, doc?" properly.
 	- Added lots of memory allocation checks (Fortify)

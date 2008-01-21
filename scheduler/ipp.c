@@ -664,7 +664,7 @@ cupsdProcessIPPRequest(
                     con->http.fd, con->response->request.status.status_code,
 	            ippErrorString(con->response->request.status.status_code));
 
-    if (cupsdSendHeader(con, HTTP_OK, "application/ipp", AUTH_NONE))
+    if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
 #ifdef CUPSD_USE_CHUNKING
      /*
@@ -8434,13 +8434,13 @@ save_auth_info(
       cupsFilePrintf(fp, "%s\n", line);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
-        cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s",
+        cupsdSetStringf(&job->auth_username, "CUPSD_AUTH_USERNAME=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "domain"))
-        cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s",
+        cupsdSetStringf(&job->auth_domain, "CUPSD_AUTH_DOMAIN=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "password"))
-        cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s",
+        cupsdSetStringf(&job->auth_password, "CUPSD_AUTH_PASSWORD=%s",
 	                auth_info->values[i].string.text);
     }
   }
@@ -8453,7 +8453,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", con->username);
+    cupsdSetStringf(&job->auth_username, "CUPSD_AUTH_USERNAME=%s", con->username);
     cupsdClearString(&job->auth_domain);
 
    /*
@@ -8463,7 +8463,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
+    cupsdSetStringf(&job->auth_password, "CUPSD_AUTH_PASSWORD=%s", con->password);
   }
 
  /*
@@ -9000,7 +9000,7 @@ send_http_error(
   if (status == HTTP_UNAUTHORIZED &&
       printer && printer->num_auth_info_required > 0 &&
       !strcmp(printer->auth_info_required[0], "negotiate"))
-    cupsdSendError(con, status, AUTH_NEGOTIATE);
+    cupsdSendError(con, status, CUPSD_AUTH_NEGOTIATE);
   else if (printer)
   {
     char	resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -9013,13 +9013,13 @@ send_http_error(
       snprintf(resource, sizeof(resource), "/printers/%s", printer->name);
 
     if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
-        auth->type == AUTH_NONE)
+        auth->type == CUPSD_AUTH_NONE)
       auth = cupsdFindPolicyOp(printer->op_policy_ptr, IPP_PRINT_JOB);
 
-    cupsdSendError(con, status, auth ? auth->type : AUTH_NONE);
+    cupsdSendError(con, status, auth ? auth->type : CUPSD_AUTH_NONE);
   }
   else
-    cupsdSendError(con, status, AUTH_NONE);
+    cupsdSendError(con, status, CUPSD_AUTH_NONE);
 
   ippDelete(con->response);
   con->response = NULL;

@@ -853,7 +853,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "Bad request line \"%s\" from %s!", line,
 	                      con->http.hostname);
-	      cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+	      cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	      cupsdCloseClient(con);
 	      return;
 	  case 2 :
@@ -865,7 +865,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdLogMessage(CUPSD_LOG_ERROR,
 		                "Bad request line \"%s\" from %s!", line,
 	                        con->http.hostname);
-		cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
 		return;
 	      }
@@ -880,7 +880,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      }
 	      else
 	      {
-	        cupsdSendError(con, HTTP_NOT_SUPPORTED, AUTH_NONE);
+	        cupsdSendError(con, HTTP_NOT_SUPPORTED, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
 		return;
 	      }
@@ -926,7 +926,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad URI \"%s\" in request!",
 	                    con->uri);
-	    cupsdSendError(con, HTTP_METHOD_NOT_ALLOWED, AUTH_NONE);
+	    cupsdSendError(con, HTTP_METHOD_NOT_ALLOWED, CUPSD_AUTH_NONE);
 	    cupsdCloseClient(con);
 	    return;
 	  }
@@ -960,7 +960,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	else
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad operation \"%s\"!", operation);
-	  cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+	  cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	  cupsdCloseClient(con);
 	  return;
 	}
@@ -992,7 +992,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
 	{
-	  cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+	  cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	  cupsdCloseClient(con);
 	  return;
 	}
@@ -1060,7 +1060,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * HTTP/1.1 and higher require the "Host:" field...
       */
 
-      if (!cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE))
+      if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
       {
 	cupsdCloseClient(con);
 	return;
@@ -1072,9 +1072,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * Do OPTIONS command...
       */
 
-      if (con->best && con->best->type != AUTH_NONE)
+      if (con->best && con->best->type != CUPSD_AUTH_NONE)
       {
-	if (!cupsdSendHeader(con, HTTP_UNAUTHORIZED, NULL, AUTH_NONE))
+	if (!cupsdSendHeader(con, HTTP_UNAUTHORIZED, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1089,7 +1089,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
-	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL, AUTH_NONE))
+	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1112,7 +1112,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1120,7 +1120,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 #endif /* HAVE_SSL */
       }
 
-      if (!cupsdSendHeader(con, HTTP_OK, NULL, AUTH_NONE))
+      if (!cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE))
       {
 	cupsdCloseClient(con);
 	return;
@@ -1142,7 +1142,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * Protect against malicious users!
       */
 
-      if (!cupsdSendError(con, HTTP_FORBIDDEN, AUTH_NONE))
+      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
       {
 	cupsdCloseClient(con);
 	return;
@@ -1158,7 +1158,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         * Do encryption stuff...
 	*/
 
-	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL, AUTH_NONE))
+	if (!cupsdSendHeader(con, HTTP_SWITCHING_PROTOCOLS, NULL, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1181,7 +1181,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 #else
-	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, AUTH_NONE))
+	if (!cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE))
 	{
 	  cupsdCloseClient(con);
 	  return;
@@ -1194,7 +1194,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
 	                "cupsdReadClient: Unauthorized request for %s...\n",
 	                con->uri);
-	cupsdSendError(con, status, AUTH_NONE);
+	cupsdSendError(con, status, CUPSD_AUTH_NONE);
 	cupsdCloseClient(con);
 	return;
       }
@@ -1208,7 +1208,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Send 100-continue header...
 	  */
 
-	  if (!cupsdSendHeader(con, HTTP_CONTINUE, NULL, AUTH_NONE))
+	  if (!cupsdSendHeader(con, HTTP_CONTINUE, NULL, CUPSD_AUTH_NONE))
 	  {
 	    cupsdCloseClient(con);
 	    return;
@@ -1220,7 +1220,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Send 417-expectation-failed header...
 	  */
 
-	  if (!cupsdSendHeader(con, HTTP_EXPECTATION_FAILED, NULL, AUTH_NONE))
+	  if (!cupsdSendHeader(con, HTTP_EXPECTATION_FAILED, NULL, CUPSD_AUTH_NONE))
 	  {
 	    cupsdCloseClient(con);
 	    return;
@@ -1254,7 +1254,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
 	      else
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1326,7 +1326,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
               if (!cupsdSendCommand(con, con->command, con->options, 0))
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1350,7 +1350,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * /admin/conf...
 	      */
 
-	      if (!cupsdSendError(con, HTTP_FORBIDDEN, AUTH_NONE))
+	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1367,7 +1367,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               if ((filename = get_file(con, &filestats, buf,
 	                               sizeof(buf))) == NULL)
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1387,7 +1387,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
         	if (!cupsdSendCommand(con, con->command, con->options, 0))
 		{
-		  if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		  if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		  {
 		    cupsdCloseClient(con);
 		    return;
@@ -1403,7 +1403,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      if (!check_if_modified(con, &filestats))
               {
-        	if (!cupsdSendError(con, HTTP_NOT_MODIFIED, AUTH_NONE))
+        	if (!cupsdSendError(con, HTTP_NOT_MODIFIED, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1443,7 +1443,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Request too large...
 	      */
 
-              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1457,7 +1457,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Negative content lengths are invalid!
 	      */
 
-              if (!cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1552,7 +1552,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
               if ((filename = get_file(con, &filestats, buf,
 	                               sizeof(buf))) == NULL)
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1569,7 +1569,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	        * Only POST to CGI's...
 		*/
 
-		if (!cupsdSendError(con, HTTP_UNAUTHORIZED, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_UNAUTHORIZED, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1592,7 +1592,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * /admin/conf...
 	      */
 
-	      if (!cupsdSendError(con, HTTP_FORBIDDEN, AUTH_NONE))
+	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1618,7 +1618,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Request too large...
 	      */
 
-              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1632,7 +1632,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * Negative content lengths are invalid!
 	      */
 
-              if (!cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1655,7 +1655,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                      "Unable to create request file %s: %s",
 	                      con->filename, strerror(errno));
 
-	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1673,7 +1673,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	case HTTP_DELETE :
 	case HTTP_TRACE :
-            cupsdSendError(con, HTTP_NOT_IMPLEMENTED, AUTH_NONE);
+            cupsdSendError(con, HTTP_NOT_IMPLEMENTED, CUPSD_AUTH_NONE);
 	    cupsdCloseClient(con);
 	    return;
 
@@ -1692,7 +1692,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		snprintf(con->uri, sizeof(con->uri), "/ppd/%s.ppd", p->name);
 	      else
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -1714,7 +1714,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * CGI output...
 	      */
 
-              if (!cupsdSendHeader(con, HTTP_OK, "text/html", AUTH_NONE))
+              if (!cupsdSendHeader(con, HTTP_OK, "text/html", CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1746,7 +1746,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * /admin/conf...
 	      */
 
-	      if (!cupsdSendError(con, HTTP_FORBIDDEN, AUTH_NONE))
+	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1757,7 +1757,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    else if ((filename = get_file(con, &filestats, buf,
 	                                  sizeof(buf))) == NULL)
 	    {
-	      if (!cupsdSendHeader(con, HTTP_NOT_FOUND, "text/html", AUTH_NONE))
+	      if (!cupsdSendHeader(con, HTTP_NOT_FOUND, "text/html", CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1767,7 +1767,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    }
 	    else if (!check_if_modified(con, &filestats))
             {
-              if (!cupsdSendError(con, HTTP_NOT_MODIFIED, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_NOT_MODIFIED, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1787,7 +1787,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      else
 		snprintf(line, sizeof(line), "%s/%s", type->super, type->type);
 
-              if (!cupsdSendHeader(con, HTTP_OK, line, AUTH_NONE))
+              if (!cupsdSendHeader(con, HTTP_OK, line, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1876,7 +1876,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      unlink(con->filename);
 	      cupsdClearString(&con->filename);
 
-              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -1916,7 +1916,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    unlink(con->filename);
 	    cupsdClearString(&con->filename);
 
-            if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+            if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	    {
 	      cupsdCloseClient(con);
 	      return;
@@ -1933,7 +1933,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * Return the status to the client...
 	  */
 
-          if (!cupsdSendError(con, status, AUTH_NONE))
+          if (!cupsdSendError(con, status, CUPSD_AUTH_NONE))
 	  {
 	    cupsdCloseClient(con);
 	    return;
@@ -1964,7 +1964,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                      "cupsdReadClient: %d IPP Read Error!",
 			      con->http.fd);
 
-	      cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+	      cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 	      cupsdCloseClient(con);
 	      return;
 	    }
@@ -1972,7 +1972,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    {
               if (con->http.state == HTTP_POST_SEND)
 	      {
-		cupsdSendError(con, HTTP_BAD_REQUEST, AUTH_NONE);
+		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
 		return;
 	      }
@@ -1998,7 +1998,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	                      "Unable to create request file %s: %s",
 	                      con->filename, strerror(errno));
 
-	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+	      if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -2043,7 +2043,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		unlink(con->filename);
 		cupsdClearString(&con->filename);
 
-        	if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+        	if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -2099,7 +2099,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		con->request = NULL;
               }
 
-              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, AUTH_NONE))
+              if (!cupsdSendError(con, HTTP_REQUEST_TOO_LARGE, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
 		return;
@@ -2110,7 +2110,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    {
 	      if (!cupsdSendCommand(con, con->command, con->options, 0))
 	      {
-		if (!cupsdSendError(con, HTTP_NOT_FOUND, AUTH_NONE))
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
 		{
 		  cupsdCloseClient(con);
 		  return;
@@ -2250,7 +2250,7 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
   * never disable it in that case.
   */
 
-  if (code >= HTTP_BAD_REQUEST && con->http.auth_type != AUTH_NEGOTIATE)
+  if (code >= HTTP_BAD_REQUEST && con->http.auth_type != CUPSD_AUTH_NEGOTIATE)
     con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
  /*
@@ -2412,9 +2412,9 @@ cupsdSendHeader(
 
   if (code == HTTP_UNAUTHORIZED)
   {
-    if (auth_type == AUTH_NONE)
+    if (auth_type == CUPSD_AUTH_NONE)
     {
-      if (!con->best || con->best->type <= AUTH_NONE)
+      if (!con->best || con->best->type <= CUPSD_AUTH_NONE)
 	auth_type = DefaultAuthType;
       else
 	auth_type = con->best->type;
@@ -2422,18 +2422,18 @@ cupsdSendHeader(
 
     auth_str[0] = '\0';
 
-    if (auth_type == AUTH_BASIC || auth_type == AUTH_BASICDIGEST)
+    if (auth_type == CUPSD_AUTH_BASIC || auth_type == CUPSD_AUTH_BASICDIGEST)
       strlcpy(auth_str, "Basic realm=\"CUPS\"", sizeof(auth_str));
-    else if (auth_type == AUTH_DIGEST)
+    else if (auth_type == CUPSD_AUTH_DIGEST)
       snprintf(auth_str, sizeof(auth_str), "Digest realm=\"CUPS\", nonce=\"%s\"",
 	       con->http.hostname);
 #ifdef HAVE_GSSAPI
-    else if (auth_type == AUTH_NEGOTIATE && con->gss_output_token.length == 0)
+    else if (auth_type == CUPSD_AUTH_NEGOTIATE && con->gss_output_token.length == 0)
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H
-    if (con->best && auth_type != AUTH_NEGOTIATE)
+    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE)
     {
       int 	 i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
@@ -2637,7 +2637,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
             if (!strncasecmp(buf, "Location:", 9))
 	    {
-  	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, AUTH_NONE);
+  	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE);
 	      con->sent_header = 2;
 
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
@@ -2645,12 +2645,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    }
 	    else if (!strncasecmp(buf, "Status:", 7))
 	    {
-  	      cupsdSendError(con, (http_status_t)atoi(buf + 7), AUTH_NONE);
+  	      cupsdSendError(con, (http_status_t)atoi(buf + 7), CUPSD_AUTH_NONE);
 	      con->sent_header = 2;
 	    }
 	    else
 	    {
-  	      cupsdSendHeader(con, HTTP_OK, NULL, AUTH_NONE);
+  	      cupsdSendHeader(con, HTTP_OK, NULL, CUPSD_AUTH_NONE);
 	      con->sent_header = 1;
 
 	      if (con->http.version == HTTP_1_1)
@@ -4241,7 +4241,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
 		*envp[MAX_ENV + 20];	/* Environment variables */
-  char		auth_type[256],		/* AUTH_TYPE environment variable */
+  char		auth_type[256],		/* CUPSD_AUTH_TYPE environment variable */
 		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
@@ -4383,7 +4383,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   if (con->username[0])
   {
-    snprintf(auth_type, sizeof(auth_type), "AUTH_TYPE=%s",
+    snprintf(auth_type, sizeof(auth_type), "CUPSD_AUTH_TYPE=%s",
              httpGetField(HTTP(con), HTTP_FIELD_AUTHORIZATION));
 
     if ((uriptr = strchr(auth_type + 10, ' ')) != NULL)
@@ -4625,7 +4625,7 @@ write_file(cupsd_client_t *con,		/* I - Client connection */
 
   con->pipe_pid = 0;
 
-  if (!cupsdSendHeader(con, code, type, AUTH_NONE))
+  if (!cupsdSendHeader(con, code, type, CUPSD_AUTH_NONE))
     return (0);
 
   if (httpPrintf(HTTP(con), "Last-Modified: %s\r\n",

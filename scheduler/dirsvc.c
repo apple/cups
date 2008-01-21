@@ -3683,7 +3683,7 @@ update_cups_browse(void)
       * Access from localhost (127.0.0.1) is always allowed...
       */
 
-      auth = AUTH_ALLOW;
+      auth = CUPSD_AUTH_ALLOW;
     }
     else
     {
@@ -3694,39 +3694,39 @@ update_cups_browse(void)
       switch (BrowseACL->order_type)
       {
         default :
-	    auth = AUTH_DENY;	/* anti-compiler-warning-code */
+	    auth = CUPSD_AUTH_DENY;	/* anti-compiler-warning-code */
 	    break;
 
-	case AUTH_ALLOW : /* Order Deny,Allow */
-            auth = AUTH_ALLOW;
+	case CUPSD_AUTH_ALLOW : /* Order Deny,Allow */
+            auth = CUPSD_AUTH_ALLOW;
 
             if (cupsdCheckAuth(address, srcname, len,
 	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
+	      auth = CUPSD_AUTH_DENY;
 
             if (cupsdCheckAuth(address, srcname, len,
 	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
+	      auth = CUPSD_AUTH_ALLOW;
 	    break;
 
-	case AUTH_DENY : /* Order Allow,Deny */
-            auth = AUTH_DENY;
+	case CUPSD_AUTH_DENY : /* Order Allow,Deny */
+            auth = CUPSD_AUTH_DENY;
 
             if (cupsdCheckAuth(address, srcname, len,
 	        	  BrowseACL->num_allow, BrowseACL->allow))
-	      auth = AUTH_ALLOW;
+	      auth = CUPSD_AUTH_ALLOW;
 
             if (cupsdCheckAuth(address, srcname, len,
 	        	  BrowseACL->num_deny, BrowseACL->deny))
-	      auth = AUTH_DENY;
+	      auth = CUPSD_AUTH_DENY;
 	    break;
       }
     }
   }
   else
-    auth = AUTH_ALLOW;
+    auth = CUPSD_AUTH_ALLOW;
 
-  if (auth == AUTH_DENY)
+  if (auth == CUPSD_AUTH_DENY)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "update_cups_browse: Refused %d bytes from %s", bytes,

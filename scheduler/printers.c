@@ -1745,25 +1745,25 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       snprintf(resource, sizeof(resource), "/printers/%s", p->name);
 
     if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
-        auth->type == AUTH_NONE)
+        auth->type == CUPSD_AUTH_NONE)
       auth = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
 
     if (auth)
     {
-      if (auth->type == AUTH_BASIC || auth->type == AUTH_BASICDIGEST)
+      if (auth->type == CUPSD_AUTH_BASIC || auth->type == CUPSD_AUTH_BASICDIGEST)
       {
 	auth_supported = "basic";
 	num_air        = 2;
 	air            = air_userpass;
       }
-      else if (auth->type == AUTH_DIGEST)
+      else if (auth->type == CUPSD_AUTH_DIGEST)
       {
 	auth_supported = "digest";
 	num_air        = 2;
 	air            = air_userpass;
       }
 #ifdef HAVE_GSSAPI
-      else if (auth->type == AUTH_NEGOTIATE)
+      else if (auth->type == CUPSD_AUTH_NEGOTIATE)
       {
 	auth_supported = "negotiate";
 	num_air        = 1;
@@ -1771,7 +1771,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
 #endif /* HAVE_GSSAPI */
 
-      if (auth->type != AUTH_NONE)
+      if (auth->type != CUPSD_AUTH_NONE)
         p->type |= CUPS_PRINTER_AUTHENTICATED;
       else
         p->type &= ~CUPS_PRINTER_AUTHENTICATED;
