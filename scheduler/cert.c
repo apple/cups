@@ -4,7 +4,7 @@
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -42,7 +42,8 @@
 
 void
 cupsdAddCert(int        pid,		/* I - Process ID */
-             const char *username)	/* I - Username */
+             const char *username,	/* I - Username */
+             void       *ccache)	/* I - Kerberos credentials or NULL */
 {
   int		i;			/* Looping var */
   cupsd_cert_t	*cert;			/* Current certificate */
@@ -244,6 +245,16 @@ cupsdAddCert(int        pid,		/* I - Process ID */
   close(fd);
 
  /*
+  * Add Kerberos credentials as needed...
+  */
+
+#ifdef HAVE_GSSAPI
+  cert->ccache = (krb5_ccache)ccache;
+#else
+  (void)ccache;
+#endif /* HAVE_GSSAPI */
+
+ /*
   * Insert the certificate at the front of the list...
   */
 
@@ -281,6 +292,15 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
         Certs = cert->next;
       else
         prev->next = cert->next;
+
+#ifdef HAVE_GSSAPI
+     /*
+      * Release Kerberos credentials as needed...
+      */
+
+      if (cert->ccache)
+	krb5_cc_destroy(KerberosContext, cert->ccache);
+#endif /* HAVE_GSSAPI */
 
       free(cert);
 
@@ -412,7 +432,7 @@ cupsdInitCerts(void)
   */
 
   if (!RunUser)
-    cupsdAddCert(0, "root");
+    cupsdAddCert(0, "root", NULL);
 }
 
 

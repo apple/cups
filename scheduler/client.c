@@ -4257,6 +4257,10 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
   ipp_attribute_t *attr;		/* attributes-natural-language attribute */
+#ifdef HAVE_GSSAPI
+  krb5_ccache	ccache = NULL;		/* Kerberos credentials */
+  char		krb5ccname[1024];	/* KRB5CCNAME environment variable */
+#endif /* HAVE_GSSAPI */
 
 
  /*
@@ -4476,6 +4480,120 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     snprintf(remote_user, sizeof(remote_user), "REMOTE_USER=%s", con->username);
 
     envp[envc ++] = remote_user;
+
+   /*
+    * Save Kerberos credentials, if any...
+    */
+
+#ifdef HAVE_GSSAPI
+    if (con->gss_have_creds)
+    {
+#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
+      cupsdLogMessage(CUPSD_LOG_INFO,
+		      "Sorry, your version of Kerberos does not support "
+		      "delegated credentials!");
+
+#  else
+      krb5_error_code	error;		/* Kerberos error code */
+      OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+      krb5_principal	principal;	/* Kerberos principal */
+
+
+#   ifdef __APPLE__
+     /*
+      * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+      * to use it...
+      */
+
+      if (krb5_init_context != NULL)
+      {
+#    endif /* __APPLE__ */
+
+     /*
+      * We MUST create a file-based cache because memory-based caches are
+      * only valid for the current process/address space.
+      *
+      * Due to various bugs/features in different versions of Kerberos, we
+      * need either the krb5_cc_new_unique() function or Heimdal's version
+      * of krb5_cc_gen_new() to create a new FILE: credential cache that
+      * can be passed to the backend.  These functions create a temporary
+      * file (typically in /tmp) containing the cached credentials, which
+      * are removed when we have successfully printed a job.
+      */
+
+#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
+      if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
+				      &ccache)) != 0)
+#    else /* HAVE_HEIMDAL */
+      if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
+				   &ccache)) != 0)
+#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to create new credentials cache (%d/%s)",
+			error, strerror(errno));
+	ccache = NULL;
+      }
+      else if ((error = krb5_parse_name(KerberosContext, con->username,
+				        &principal)) != 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to parse kerberos username (%d/%s)", error,
+			strerror(errno));
+	krb5_cc_destroy(KerberosContext, ccache);
+	ccache = NULL;
+      }
+      else if ((error = krb5_cc_initialize(KerberosContext, ccache,
+                                           principal)))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to initialize credentials cache (%d/%s)", error,
+			strerror(errno));
+	krb5_cc_destroy(KerberosContext, ccache);
+	krb5_free_principal(KerberosContext, principal);
+	ccache = NULL;
+      }
+      else
+      {
+	krb5_free_principal(KerberosContext, principal);
+
+       /*
+	* Copy the user's credentials to the new cache file...
+	*/
+
+	major_status = gss_krb5_copy_ccache(&minor_status,
+	                                    con->gss_delegated_cred, ccache);
+
+	if (GSS_ERROR(major_status))
+	{
+	  cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
+			     "Unable to import client credentials cache");
+	  krb5_cc_destroy(KerberosContext, ccache);
+	  ccache = NULL;
+	}
+	else
+	{
+	 /*
+	  * Add the KRB5CCNAME environment variable to the job so that the
+	  * backend can use the credentials when printing.
+	  */
+
+	  snprintf(krb5ccname, sizeof(krb5ccname), "KRB5CCNAME=FILE:%s",
+		   krb5_cc_get_name(KerberosContext, ccache));
+          envp[envc++] = krb5ccname;
+
+	  if (!RunUser)
+	    chown(krb5_cc_get_name(KerberosContext, ccache), User, Group);
+        }
+     }
+#    ifdef __APPLE__
+     }
+#    endif /* __APPLE__ */
+#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
+    }
+#endif /* HAVE_GSSAPI */
+
   }
 
   if (con->http.version == HTTP_1_1)
@@ -4589,7 +4707,11 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     */
 
     if (con->username[0])
-      cupsdAddCert(pid, con->username);
+#ifdef HAVE_GSSAPI
+      cupsdAddCert(pid, con->username, ccache);
+#else
+      cupsdAddCert(pid, con->username, NULL);
+#endif /* HAVE_GSSAPI */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] %s started - PID = %d",
                     command, pid);

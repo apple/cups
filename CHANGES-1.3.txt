@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Kerberos authentication did not work with the web
+	  interface (STR #2606)
 	- The requesing-user-name-allowed and -denied functionality
 	  did not work for Kerberos-authenticated usernames (STR
 	  #2670)

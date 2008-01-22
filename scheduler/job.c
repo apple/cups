@@ -1820,6 +1820,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
   cupsdClearString(&job->auth_username);
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
+
 #ifdef HAVE_GSSAPI
  /*
   * Destroy the credential cache and clear the KRB5CCNAME env var string.

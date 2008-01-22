@@ -946,7 +946,7 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       cupsdDeleteCert(0);
-      cupsdAddCert(0, "root");
+      cupsdAddCert(0, "root", NULL);
     }
 
    /*
