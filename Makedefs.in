@@ -3,7 +3,7 @@
 #
 #   Common makefile definitions for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,6 @@
 AR		=	@AR@
 AWK		=	@AWK@
 CC		=	@LIBTOOL@ @CC@
-CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@
 HTMLDOC		=	@HTMLDOC@
 INSTALL		=	@INSTALL@
@@ -108,18 +107,14 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 #               for extra debug info)
 #
 
-ALL_CFLAGS	=	$(CFLAGS) $(SSLFLAGS) @LARGEFILE@ @PTHREAD_FLAGS@ \
-			$(OPTIONS)
+ALL_CFLAGS	=	-I.. -D_CUPS_SOURCE $(CFLAGS) $(SSLFLAGS) \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
-CFLAGS		=	-I.. -D_CUPS_SOURCE @CPPFLAGS@ @CFLAGS@ \
-			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
+CFLAGS		=	@CPPFLAGS@ @CFLAGS@
 COMMONLIBS	=	@LIBS@
 CUPSDLIBS	=	@CUPSDLIBS@
-CXXFLAGS	=	-I.. -D_CUPS_SOURCE $(SSLFLAGS) @CPPFLAGS@ @CXXFLAGS@ \
-			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
-CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 DNSSDLIBS	=	@DNSSDLIBS@
@@ -242,7 +237,7 @@ DBUSDIR		=	@DBUSDIR@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .32.o .64.o .gz
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .h .man .o .32.o .64.o .gz
 
 .c.o:
 	echo Compiling $<...
@@ -255,10 +250,6 @@ DBUSDIR		=	@DBUSDIR@
 .c.64.o:
 	echo Compiling 64-bit $<...
 	$(CC) $(ARCH64FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
-
-.cxx.o:
-	echo Compiling $<...
-	$(CXX) $(ARCHFLAGS) $(OPTIM) $(CXXFLAGS) -c $<
 
 .man.1 .man.1m .man.5 .man.7 .man.8:
 	echo Linking $<...

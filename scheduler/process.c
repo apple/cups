@@ -99,11 +99,11 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"
-                 "  (regex #\"^%s\"))\n", request);
+                 "  (regex #\"^%s/\"))\n", request);
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex #\"^%s\" #\"^/private/etc\" #\"^/usr/local/etc\" "
-		 "#\"^/Library\" #\"^/System\"))\n", root);
+		 "#\"^/Library\" #\"^/System\" #\"^/Users\"))\n", root);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
                  "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\"))\n",
@@ -112,10 +112,12 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"
                    "  (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
-		   request);
+		   request, job_id, job_id);
 
   cupsFileClose(fp);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = \"%s\"",
+                  job_id, profile);
   return ((void *)strdup(profile));
 #else
 
@@ -134,6 +136,8 @@ cupsdDestroyProfile(void *profile)	/* I - Profile */
 #ifdef HAVE_SANDBOX_H
   if (profile)
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
+                    (char *)profile);
     unlink((char *)profile);
     free(profile);
   }
@@ -312,11 +316,29 @@ cupsdStartProcess(
 
    /*
     * Change the priority of the process based on the FilterNice setting.
-    * (this is not done for backends...)
+    * (this is not done for root processes...)
     */
 
     if (!root)
       nice(FilterNice);
+
+#ifdef HAVE_SANDBOX_H
+   /*
+    * Run in a separate security profile...
+    */
+
+    if (profile)
+    {
+      char *error = NULL;		/* Sandbox error, if any */
+
+      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
+      {
+        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
+	        strerror(errno));
+	sandbox_free_error(error);
+      }
+    }
+#endif /* HAVE_SANDBOX_H */
 
    /*
     * Change user to something "safe"...
@@ -374,24 +396,6 @@ cupsdStartProcess(
 #endif /* HAVE_SIGSET */
 
     cupsdReleaseSignals();
-
-#ifdef HAVE_SANDBOX_H
-   /*
-    * Run in a separate security profile...
-    */
-
-    if (profile)
-    {
-      char *error;			/* Sandbox error, if any */
-
-      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
-      {
-        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
-	        strerror(errno));
-	sandbox_free_error(error);
-      }
-    }
-#endif /* HAVE_SANDBOX_H */
 
    /*
     * Execute the command; if for some reason this doesn't work,

@@ -71,7 +71,7 @@
 #    define _CUPS_API_1_2
 #    define _CUPS_API_1_3
 #    define _CUPS_API_1_4
-#  endif /* __APPLE__ */
+#  endif /* __APPLE__ && !_CUPS_SOURCE */
 
 /*
  * With GCC 3.0 and higher, we can mark old APIs "deprecated" so you get

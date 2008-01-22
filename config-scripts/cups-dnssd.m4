@@ -7,7 +7,7 @@ dnl   http://www.dns-sd.org
 dnl   http://www.multicastdns.org/
 dnl   http://developer.apple.com/networking/bonjour/
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Apple Inc. and are protected by Federal copyright
@@ -22,7 +22,6 @@ AC_ARG_WITH(dnssd-libs, [  --with-dnssd-libs       set directory for DNS Service
 	DSOFLAGS="-L$withval $DSOFLAGS",)
 AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes   set directory for DNS Service Discovery includes],
 	CFLAGS="-I$withval $CFLAGS"
-	CXXFLAGS="-I$withval $CXXFLAGS"
 	CPPFLAGS="-I$withval $CPPFLAGS",)
 
 DNSSDLIBS=""

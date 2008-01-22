@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.3.0 - 2007-08-13
-----------------------------------
+INSTALL - CUPS v1.4svn - 2008-01-22
+-----------------------------------
 
 This file describes how to compile and install CUPS from source
 code. For more information on CUPS see the file called
@@ -14,15 +14,16 @@ code. For more information on CUPS see the file called
 
 BEFORE YOU BEGIN
 
-    You'll need ANSI-compliant C and C++ compilers, plus a make
-    program and Bourne shell.  The GNU compiler tools work well -
-    we've tested the current CUPS code against several versions
-    of GCC with excellent results.
+    You'll need an ANSI-compliant C compiler, plus a make program
+    and Bourne shell.  The GNU compiler tools work well - we've
+    tested the current CUPS code against several versions of GCC
+    with excellent results.
 
-    The makefiles used by the project should work with all
+    The makefiles used by the project should work with most
     versions of make.  We've tested them with GNU make as well as
     the make programs shipped by Compaq, HP, SGI, and Sun. 
-    BSD users should use GNU make (gmake).
+    BSD users should use GNU make (gmake) since BSD make does
+    not support "include".
 
     Besides these tools you'll want the JPEG, PNG, TIFF, and ZLIB
     libraries for image support, the CDSA, GNU TLS, or OpenSSL
@@ -31,9 +32,8 @@ BEFORE YOU BEGIN
     compile and run without these, however you'll miss out on
     many of the features provided by CUPS.
 
-    Kerberos support requires a very recent version of the MIT
-    implementation with the krb5_cc_new_unique() function or the
-    Heimdal implementation, along with the corresponding GSSAPI
+    Kerberos support requires MIT Kerberos 1.6.3 or later or
+    or Heimdal Kerberos, along with the corresponding GSSAPI
     pieces.
 
     Also, please note that CUPS no longer includes the
@@ -47,7 +47,7 @@ COMPILING FROM SUBVERSION
 
     The CUPS Subversion repository doesn't hold a copy of the
     pre-built configure script.  You'll need to run the GNU
-    autoconf software (2.52 or higher) before compiling the
+    autoconf software (2.60 or higher) before compiling the
     software from Subversion:
 
 	autoconf -f

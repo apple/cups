@@ -1820,6 +1820,7 @@ free_job(cupsd_job_t *job)		/* I - Job */
   cupsdClearString(&job->auth_username);
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
+
 #ifdef HAVE_GSSAPI
  /*
   * Destroy the credential cache and clear the KRB5CCNAME env var string.
@@ -3146,8 +3147,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc] = NULL;
 
   for (i = 0; i < envc; i ++)
-    if (!strncmp(envp[i], "AUTH_", 5))
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"AUTH_%c****\"",
+    if (!strncmp(envp[i], "CUPSD_AUTH_", 5))
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"CUPSD_AUTH_%c****\"",
                       job->id, i, envp[i][5]);
     else if (strncmp(envp[i], "DEVICE_URI=", 11))
       cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] envp[%d]=\"%s\"",

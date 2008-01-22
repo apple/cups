@@ -25,36 +25,36 @@
  * HTTP authorization types and levels...
  */
 
-#define AUTH_DEFAULT		-1	/* Use DefaultAuthType */
-#define AUTH_NONE		0	/* No authentication */
-#define AUTH_BASIC		1	/* Basic authentication */
-#define AUTH_DIGEST		2	/* Digest authentication */
-#define AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
-#define AUTH_NEGOTIATE		4	/* Kerberos authentication */
+#define CUPSD_AUTH_DEFAULT	-1	/* Use DefaultAuthType */
+#define CUPSD_AUTH_NONE		0	/* No authentication */
+#define CUPSD_AUTH_BASIC	1	/* Basic authentication */
+#define CUPSD_AUTH_DIGEST	2	/* Digest authentication */
+#define CUPSD_AUTH_BASICDIGEST	3	/* Basic authentication w/passwd.md5 */
+#define CUPSD_AUTH_NEGOTIATE	4	/* Kerberos authentication */
 
-#define AUTH_ANON		0	/* Anonymous access */
-#define AUTH_USER		1	/* Must have a valid username/password */
-#define AUTH_GROUP		2	/* Must also be in a named group */
+#define CUPSD_AUTH_ANON		0	/* Anonymous access */
+#define CUPSD_AUTH_USER		1	/* Must have a valid username/password */
+#define CUPSD_AUTH_GROUP	2	/* Must also be in a named group */
 
-#define AUTH_ALLOW		0	/* Allow access */
-#define AUTH_DENY		1	/* Deny access */
+#define CUPSD_AUTH_ALLOW	0	/* Allow access */
+#define CUPSD_AUTH_DENY		1	/* Deny access */
 
-#define AUTH_NAME		0	/* Authorize host by name */
-#define AUTH_IP			1	/* Authorize host by IP */
-#define AUTH_INTERFACE		2	/* Authorize host by interface */
+#define CUPSD_AUTH_NAME		0	/* Authorize host by name */
+#define CUPSD_AUTH_IP		1	/* Authorize host by IP */
+#define CUPSD_AUTH_INTERFACE	2	/* Authorize host by interface */
 
-#define AUTH_SATISFY_ALL	0	/* Satisfy both address and auth */
-#define AUTH_SATISFY_ANY	1	/* Satisfy either address or auth */
+#define CUPSD_AUTH_SATISFY_ALL	0	/* Satisfy both address and auth */
+#define CUPSD_AUTH_SATISFY_ANY	1	/* Satisfy either address or auth */
 
-#define AUTH_LIMIT_DELETE	1	/* Limit DELETE requests */
-#define AUTH_LIMIT_GET		2	/* Limit GET requests */
-#define AUTH_LIMIT_HEAD		4	/* Limit HEAD requests */
-#define AUTH_LIMIT_OPTIONS	8	/* Limit OPTIONS requests */
-#define AUTH_LIMIT_POST		16	/* Limit POST requests */
-#define AUTH_LIMIT_PUT		32	/* Limit PUT requests */
-#define AUTH_LIMIT_TRACE	64	/* Limit TRACE requests */
-#define AUTH_LIMIT_ALL		127	/* Limit all requests */
-#define AUTH_LIMIT_IPP		128	/* Limit IPP requests */
+#define CUPSD_AUTH_LIMIT_DELETE	1	/* Limit DELETE requests */
+#define CUPSD_AUTH_LIMIT_GET	2	/* Limit GET requests */
+#define CUPSD_AUTH_LIMIT_HEAD	4	/* Limit HEAD requests */
+#define CUPSD_AUTH_LIMIT_OPTIONS 8	/* Limit OPTIONS requests */
+#define CUPSD_AUTH_LIMIT_POST	16	/* Limit POST requests */
+#define CUPSD_AUTH_LIMIT_PUT	32	/* Limit PUT requests */
+#define CUPSD_AUTH_LIMIT_TRACE	64	/* Limit TRACE requests */
+#define CUPSD_AUTH_LIMIT_ALL	127	/* Limit all requests */
+#define CUPSD_AUTH_LIMIT_IPP	128	/* Limit IPP requests */
 
 #define IPP_ANY_OPERATION	(ipp_op_t)0
 					/* Any IPP operation */
@@ -116,7 +116,7 @@ typedef struct cupsd_client_s cupsd_client_t;
 
 VAR cups_array_t	*Locations	VALUE(NULL);
 					/* Authorization locations */
-VAR int			DefaultAuthType	VALUE(AUTH_BASIC);
+VAR int			DefaultAuthType	VALUE(CUPSD_AUTH_BASIC);
 					/* Default AuthType, if not specified */
 #ifdef HAVE_SSL
 VAR http_encryption_t	DefaultEncryption VALUE(HTTP_ENCRYPT_REQUIRED);
