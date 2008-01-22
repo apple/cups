@@ -3,7 +3,7 @@
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -279,6 +279,11 @@ print_command(http_t     *http,		/* I - Connection to server */
     cgiFormEncode(uri, resource, sizeof(uri));
     snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
+  }
+  else if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
   }
 
   cgiStartHTML(cgiText(_("Printer Maintenance")));

@@ -3,7 +3,7 @@
  *
  *   Job status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -184,6 +184,11 @@ do_job_op(http_t      *http,		/* I - HTTP connection */
     strcpy(url, "5;URL=");
     cgiFormEncode(url + 6, getenv("HTTP_REFERER"), sizeof(url) - 6);
     cgiSetVariable("refresh_page", url);
+  }
+  else if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
   }
 
   cgiStartHTML(cgiText(_("Jobs")));

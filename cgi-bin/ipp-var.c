@@ -595,6 +595,11 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
     snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
   }
+  else if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
 
   cgiStartHTML(cgiText(_("Print Test Page")));
 
