@@ -1,7 +1,7 @@
 /*
 * "$Id$"
 *
-* © Copyright 2004 Apple Computer, Inc. All rights reserved.
+* © Copyright 2004-2008 Apple Computer, Inc. All rights reserved.
 * 
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -70,6 +70,16 @@
 *  signalHandler()	 - handle SIGINT to close the session before quiting.
 */
 
+/*
+ * This backend uses deprecated APIs for AppleTalk; we know this, so
+ * silence any warnings about it...
+ */
+
+#ifdef MAC_OS_X_VERSION_MIN_REQUIRED
+#  undef MAC_OS_X_VERSION_MIN_REQUIRED
+#endif /* MAX_OS_X_VERSION_MIN_REQUIRED */
+#define MAC_OS_X_VERSION_MIN_REQUIRED MAC_OS_X_VERSION_10_0
+
 #include <config.h>
 
 #include <stdio.h>
@@ -85,16 +95,16 @@
 #include <sys/time.h>
 #include <sys/errno.h>
 
+#include <cups/cups.h>
+#include <cups/backend.h>
+#include <cups/sidechannel.h>
+#include <cups/i18n.h>
+
 #include <netat/appletalk.h>
 #include <netat/atp.h>
 #include <netat/ddp.h>
 #include <netat/nbp.h>
 #include <netat/pap.h>
-
-#include <cups/cups.h>
-#include <cups/backend.h>
-#include <cups/sidechannel.h>
-#include <cups/i18n.h>
 
 #include <libkern/OSByteOrder.h>
 
