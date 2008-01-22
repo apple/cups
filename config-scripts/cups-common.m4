@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -34,13 +34,11 @@ AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION$CUPS_REVISION")
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"
 CPPFLAGS="${CPPFLAGS:=}"
-CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_CPP
 AC_PROG_INSTALL
 if test "$INSTALL" = "$ac_install_sh"; then
@@ -63,9 +61,6 @@ if test "x$AR" = x; then
 fi
 if test "x$CC" = x; then
 	AC_MSG_ERROR([Unable to find required C compiler command.])
-fi
-if test "x$CXX" = x; then
-	AC_MSG_ERROR([Unable to find required C++ compiler command.])
 fi
 
 dnl Static library option...

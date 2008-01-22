@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -22,7 +22,6 @@ AC_ARG_WITH(openssl-libs, [  --with-openssl-libs     set directory for OpenSSL l
     DSOFLAGS="-L$withval $DSOFLAGS",)
 AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenSSL includes],
     CFLAGS="-I$withval $CFLAGS"
-    CXXFLAGS="-I$withval $CXXFLAGS"
     CPPFLAGS="-I$withval $CPPFLAGS",)
 
 SSLFLAGS=""

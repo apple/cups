@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -60,9 +60,6 @@ dnl Read-only data/program support on Linux...
 AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
 
 dnl Update compiler options...
-CXXLIBS=""
-AC_SUBST(CXXLIBS)
-
 PIEFLAGS=""
 AC_SUBST(PIEFLAGS)
 
@@ -313,9 +310,6 @@ else
 			fi
 
 			CFLAGS="-Ae $CFLAGS"
-			# Warning 336 is "empty translation unit"
-			# Warning 829 is passing constant string as char *
-			CXXFLAGS="+W336,829 $CXXFLAGS"
 
 			if test $PICFLAG = 1; then
 				OPTIM="+z $OPTIM"
@@ -487,8 +481,8 @@ else
 			# cups-support@cups.org...
 			echo "Building CUPS with default compiler optimizations; contact"
 			echo "cups-bugs@cups.org with uname and compiler options needed"
-			echo "for your platform, or set the CFLAGS and CXXFLAGS"
-			echo "environment variable before running configure."
+			echo "for your platform, or set the CFLAGS and LDFLAGS environment"
+			echo "variables before running configure."
 			;;
 	esac
 fi

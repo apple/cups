@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   OpenSLP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -19,7 +19,6 @@ AC_ARG_WITH(openslp-libs, [  --with-openslp-libs     set directory for OpenSLP l
     DSOFLAGS="-L$withval $DSOFLAGS",)
 AC_ARG_WITH(openslp-includes, [  --with-openslp-includes set directory for OpenSLP includes],
     CFLAGS="-I$withval $CFLAGS"
-    CXXFLAGS="-I$withval $CXXFLAGS"
     CPPFLAGS="-I$withval $CPPFLAGS",)
 
 LIBSLP=""

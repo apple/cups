@@ -1,4 +1,4 @@
-README - CUPS v1.4svn - 2008-01-02
+*README - CUPS v1.4svn - 2008-01-02
 ----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
@@ -158,9 +158,6 @@ LEGAL STUFF
     of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
-
-    The PDF filter (pdftops) is based on the Xpdf software,
-    Copyright 1996-2005 by Derek B. Noonburg.
 
     This software is based in part on the work of the Independent
     JPEG Group.

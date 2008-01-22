@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   LDAP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 2003-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -20,7 +20,6 @@ AC_ARG_WITH(openldap-libs, [  --with-openldap-libs    set directory for OpenLDAP
 AC_ARG_WITH(openldap-includes, [  --with-openldap-includes
                           set directory for OpenLDAP includes],
     CFLAGS="-I$withval $CFLAGS"
-    CXXFLAGS="-I$withval $CXXFLAGS"
     CPPFLAGS="-I$withval $CPPFLAGS",)
 
 LIBLDAP=""
