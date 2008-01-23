@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-01-08
+CHANGES.txt - 2008-01-23
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now provides the printer-dns-sd-name
+	  attribute for printers shared via DNS-SD/Bonjour.
 	- The pdftops filter now executes the Xpdf or poppler
 	  pdftops utility to convert PDF files (STR #1471)
 	- Bonjour printer registrations now advertise as local or

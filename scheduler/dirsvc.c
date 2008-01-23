@@ -2448,16 +2448,26 @@ dnssdRegisterCallback(
     const char		*domain,   	/* I - Domain. ".local" for now */
     void		*context)	/* I - User-defined context */
 {
-  (void)context;
+  cupsd_printer_t *p = (cupsd_printer_t *)context;
+					/* Current printer */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, 
-		  "dnssdRegisterCallback(%s, %s)", name, regtype);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterCallback(%s, %s) for %s",
+                  name, regtype, p->name);
 
   if (errorCode)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, 
 		    "DNSServiceRegister failed with error %d", (int)errorCode);
     return;
+  }
+  else if (strcasecmp(name, p->reg_name))
+  {
+    cupsdLogMessage(CUPSD_LOG_INFO, "Using service name \"%s\" for \"%s\"",
+                    name, p->name);
+
+    cupsdSetString(&p->reg_name, name);
+    LastEvent |= CUPSD_EVENT_PRINTER_MODIFIED;
   }
 }
 
@@ -2607,8 +2617,8 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		"dnssdRegisterPrinter(%s) type, domain is \"%s\", \"%s\"",
-		p->name, regtype, domain ? domain : "(null)");
+		    "dnssdRegisterPrinter(%s) type, domain is \"%s\", \"%s\"",
+		    p->name, regtype, domain ? domain : "(null)");
 
     se = DNSServiceRegister(&p->dnssd_ipp_ref, 0, 0, name, regtype, 
 			    domain, NULL, htons(port), txt_len, txt_record,
