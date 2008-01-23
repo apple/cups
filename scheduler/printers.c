@@ -2643,7 +2643,7 @@ cupsdSetPrinterState(
   if (old_state != s)
   {
     cupsdAddEvent(s == IPP_PRINTER_STOPPED ? CUPSD_EVENT_PRINTER_STOPPED :
-                      CUPSD_EVENT_PRINTER_STATE_CHANGED, p, NULL,
+                      CUPSD_EVENT_PRINTER_STATE, p, NULL,
 		  "%s \"%s\" state changed.",
 		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
 		  p->name);

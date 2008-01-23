@@ -9322,7 +9322,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       else if (con->response->request.status.status_code == IPP_OK)
       {
         cupsdSetJobPriority(job, attr->values[0].integer);
-        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED |
+	         CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED;
       }
     }
     else if (!strcmp(attr->name, "job-state"))
@@ -9468,6 +9469,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * Send events as needed...
   */
+
+  if (event & CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED)
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED, job->printer, job,
+                  "Job priority changed by user.");
 
   if (event & CUPSD_EVENT_JOB_STATE)
     cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,

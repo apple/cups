@@ -20,47 +20,52 @@
 typedef enum
 {
   /* Individual printer events... */
-  CUPSD_EVENT_PRINTER_RESTARTED = 0x0001,
+  CUPSD_EVENT_PRINTER_STATE = 0x0001,	/* Sent after generic printer state change */
+  CUPSD_EVENT_PRINTER_RESTARTED = 0x0002,
 					/* Sent after printer restarted */
-  CUPSD_EVENT_PRINTER_SHUTDOWN = 0x0002,/* Sent after printer shutdown */
-  CUPSD_EVENT_PRINTER_STOPPED = 0x0004,	/* Sent after printer stopped */
-  CUPSD_EVENT_PRINTER_FINISHINGS_CHANGED = 0x0008,
+  CUPSD_EVENT_PRINTER_SHUTDOWN = 0x0004,/* Sent after printer shutdown */
+  CUPSD_EVENT_PRINTER_STOPPED = 0x0008,	/* Sent after printer stopped */
+
+  CUPSD_EVENT_PRINTER_CONFIG = 0x0010,	/* Send after add/modify changes attrs */
+  CUPSD_EVENT_PRINTER_FINISHINGS_CHANGED = 0x0020,
 					/* Sent after finishings-supported changed */
-  CUPSD_EVENT_PRINTER_MEDIA_CHANGED = 0x0010,
+  CUPSD_EVENT_PRINTER_MEDIA_CHANGED = 0x0040,
 					/* Sent after media-supported changed */
-  CUPSD_EVENT_PRINTER_ADDED = 0x0020,	/* Sent after printer added */
-  CUPSD_EVENT_PRINTER_DELETED = 0x0040,	/* Sent after printer deleted */
-  CUPSD_EVENT_PRINTER_MODIFIED = 0x0080,/* Sent after printer modified */
+  CUPSD_EVENT_PRINTER_ADDED = 0x0080,	/* Sent after printer added */
+  CUPSD_EVENT_PRINTER_DELETED = 0x0100,	/* Sent after printer deleted */
+  CUPSD_EVENT_PRINTER_MODIFIED = 0x0200,/* Sent after printer modified */
+  CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED = 0x0400,
+					/* Sent when the order of jobs is changed */
 
   /* Convenience printer event groupings... */
-  CUPSD_EVENT_PRINTER_STATE_CHANGED = 0x0007,
-					/* RESTARTED + SHUTDOWN + STOPPED */
-  CUPSD_EVENT_PRINTER_CONFIG_CHANGED = 0x0018,
-					/* FINISHINGS_CHANGED + MEDIA_CHANGED */
-  CUPSD_EVENT_PRINTER_CHANGED = 0x00ff,	/* All of the above */
+  CUPSD_EVENT_PRINTER_STATE_CHANGED = 0x000f,
+					/* STATE + RESTARTED + SHUTDOWN + STOPPED */
+  CUPSD_EVENT_PRINTER_CONFIG_CHANGED = 0x0070,
+					/* CONFIG + FINISHINGS_CHANGED + MEDIA_CHANGED */
+  CUPSD_EVENT_PRINTER_CHANGED = 0x07ff,	/* All of the above */
 
   /* Individual job events... */
-  CUPSD_EVENT_JOB_STATE = 0x0100,	/* Any state change */
-  CUPSD_EVENT_JOB_CREATED = 0x0200,	/* Send after job is created */
-  CUPSD_EVENT_JOB_COMPLETED = 0x0400,	/* Sent after job is completed */
-  CUPSD_EVENT_JOB_STOPPED = 0x0800,	/* Sent after job is stopped */
-  CUPSD_EVENT_JOB_CONFIG_CHANGED = 0x1000,
+  CUPSD_EVENT_JOB_STATE = 0x0800,	/* Any state change */
+  CUPSD_EVENT_JOB_CREATED = 0x1000,	/* Send after job is created */
+  CUPSD_EVENT_JOB_COMPLETED = 0x2000,	/* Sent after job is completed */
+  CUPSD_EVENT_JOB_STOPPED = 0x4000,	/* Sent after job is stopped */
+  CUPSD_EVENT_JOB_CONFIG_CHANGED = 0x8000,
 					/* Sent after set-job-attributes */
-  CUPSD_EVENT_JOB_PROGRESS = 0x2000,	/* Sent for each page */
+  CUPSD_EVENT_JOB_PROGRESS = 0x10000,	/* Sent for each page */
 
   /* Convenience job event grouping... */
-  CUPSD_EVENT_JOB_STATE_CHANGED = 0x0f00,
-					/* Any state change + CREATED + COMPLETED + STOPPED */
+  CUPSD_EVENT_JOB_STATE_CHANGED = 0x7800,
+					/* STATE + CREATED + COMPLETED + STOPPED */
 
   /* Server events... */
-  CUPSD_EVENT_SERVER_RESTARTED = 0x4000,/* Sent after server restarts */
-  CUPSD_EVENT_SERVER_STARTED = 0x8000,	/* Sent when server first starts */
-  CUPSD_EVENT_SERVER_STOPPED = 0x10000,	/* Sent when server is stopped */
-  CUPSD_EVENT_SERVER_AUDIT = 0x20000,	/* Security-related stuff */
+  CUPSD_EVENT_SERVER_RESTARTED = 0x20000,/* Sent after server restarts */
+  CUPSD_EVENT_SERVER_STARTED = 0x40000,	/* Sent when server first starts */
+  CUPSD_EVENT_SERVER_STOPPED = 0x80000,	/* Sent when server is stopped */
+  CUPSD_EVENT_SERVER_AUDIT = 0x100000,	/* Security-related stuff */
 
   /* Everything and nothing... */
   CUPSD_EVENT_NONE = 0,			/* Nothing */
-  CUPSD_EVENT_ALL = 0x1ffff		/* Everything */
+  CUPSD_EVENT_ALL = 0x1fffff		/* Everything */
 } cupsd_eventmask_t;
 
 

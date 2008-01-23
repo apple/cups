@@ -504,9 +504,14 @@ cupsdEventName(
     case CUPSD_EVENT_PRINTER_MODIFIED :
         return ("printer-modified");
 
+    case CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED :
+        return ("printer-queue-order-changed");
+
+    case CUPSD_EVENT_PRINTER_STATE :
     case CUPSD_EVENT_PRINTER_STATE_CHANGED :
         return ("printer-state-changed");
 
+    case CUPSD_EVENT_PRINTER_CONFIG :
     case CUPSD_EVENT_PRINTER_CONFIG_CHANGED :
         return ("printer-config-changed");
 
@@ -529,8 +534,6 @@ cupsdEventName(
         return ("job-progress");
 
     case CUPSD_EVENT_JOB_STATE :
-        return ("job-state");
-
     case CUPSD_EVENT_JOB_STATE_CHANGED :
         return ("job-state-changed");
 
@@ -577,14 +580,14 @@ cupsdEventValue(const char *name)	/* I - Name of event */
     return (CUPSD_EVENT_PRINTER_DELETED);
   else if (!strcmp(name, "printer-modified"))
     return (CUPSD_EVENT_PRINTER_MODIFIED);
+  else if (!strcmp(name, "printer-queue-order-changed"))
+    return (CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED);
   else if (!strcmp(name, "printer-state-changed"))
     return (CUPSD_EVENT_PRINTER_STATE_CHANGED);
   else if (!strcmp(name, "printer-config-changed"))
     return (CUPSD_EVENT_PRINTER_CONFIG_CHANGED);
   else if (!strcmp(name, "printer-changed"))
     return (CUPSD_EVENT_PRINTER_CHANGED);
-  else if (!strcmp(name, "job-state"))
-    return (CUPSD_EVENT_JOB_STATE);
   else if (!strcmp(name, "job-created"))
     return (CUPSD_EVENT_JOB_CREATED);
   else if (!strcmp(name, "job-completed"))
