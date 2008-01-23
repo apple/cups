@@ -2527,7 +2527,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
                       "[Job %d] Unable to convert file %d to printable format!",
 	              job->current_file, job->id);
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Hint: Do you have ESP Ghostscript installed?");
+                      "Hint: Do you have Ghostscript installed?");
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogMessage(CUPSD_LOG_INFO,
@@ -3357,7 +3357,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
-    if (job->current_file == 1)
+    if (job->current_file == 1 || printer->remote)
     {
       sscanf(printer->device_uri, "%254[^:]", method);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
