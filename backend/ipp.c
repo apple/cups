@@ -521,8 +521,8 @@ main(int  argc,				/* I - Number of command-line args */
 	              _("INFO: Unable to contact printer, queuing on next "
 			"printer in class...\n"));
 
-        if (argc == 6 || strcmp(filename, argv[6]))
-	  unlink(filename);
+        if (tmpfilename[0])
+	  unlink(tmpfilename);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -579,8 +579,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (job_cancelled)
   {
-    if (argc == 6 || strcmp(filename, argv[6]))
-      unlink(filename);
+    if (tmpfilename[0])
+      unlink(tmpfilename);
 
     return (CUPS_BACKEND_FAILED);
   }
@@ -765,8 +765,8 @@ main(int  argc,				/* I - Number of command-line args */
       ippDelete(supported);
       httpClose(http);
 
-      if (argc == 6 || strcmp(filename, argv[6]))
-	unlink(filename);
+      if (tmpfilename[0])
+	unlink(tmpfilename);
 
      /*
       * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -882,10 +882,18 @@ main(int  argc,				/* I - Number of command-line args */
 	* so convert the document to PostScript...
 	*/
 
-	if (run_pictwps_filter(argv, filename))
-	  return (CUPS_BACKEND_FAILED);
+	if (run_pictwps_filter(argv, files[0]))
+	{
+	  if (pstmpname[0])
+	    unlink(pstmpname);
 
-        filename = pstmpname;
+	  if (tmpfilename[0])
+	    unlink(tmpfilename);
+
+	  return (CUPS_BACKEND_FAILED);
+        }
+
+        files[0] = pstmpname;
 
        /*
 	* Change the MIME type to application/postscript and change the
@@ -1681,7 +1689,6 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
 
     _cupsLangPrintf(stderr, _("ERROR: Unable to fork pictwpstops: %s\n"),
 		    strerror(errno));
-    unlink(filename);
     if (ppdfile)
       unlink(ppdfile);
     return (-1);
@@ -1696,7 +1703,6 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
     _cupsLangPrintf(stderr, _("ERROR: Unable to wait for pictwpstops: %s\n"),
 		    strerror(errno));
     close(fd);
-    unlink(filename);
     if (ppdfile)
       unlink(ppdfile);
     return (-1);
@@ -1716,7 +1722,6 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
       _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d!\n"),
 		      status);
 
-    unlink(filename);
     return (status);
   }
 
