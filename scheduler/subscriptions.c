@@ -323,7 +323,7 @@ cupsdAddSubscription(
                   "cupsdAddSubscription(mask=%x, dest=%p(%s), job=%p(%d), "
 		  "uri=\"%s\")",
                   mask, dest, dest ? dest->name : "", job, job ? job->id : 0,
-		  uri);
+		  uri ? uri : "(null)");
 
   if (!Subscriptions)
     Subscriptions = cupsArrayNew((cups_array_func_t)cupsd_compare_subscriptions,
