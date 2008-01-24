@@ -4682,6 +4682,18 @@ copy_printer_attrs(
     ippAddDate(con->response, IPP_TAG_PRINTER, "printer-current-time",
                ippTimeToDate(curtime));
 
+#ifdef HAVE_DNSSD
+  if (!ra || cupsArrayFind(ra, "printer-dns-sd-name"))
+  {
+    if (printer->reg_name)
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                   "printer-dns-sd-name", NULL, printer->reg_name);
+    else
+      ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
+                   "printer-dns-sd-name", 0);
+  }
+#endif /* HAVE_DNSSD */
+
   if (!ra || cupsArrayFind(ra, "printer-error-policy"))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
         	 "printer-error-policy", NULL, printer->error_policy);
@@ -9322,7 +9334,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       else if (con->response->request.status.status_code == IPP_OK)
       {
         cupsdSetJobPriority(job, attr->values[0].integer);
-        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED;
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED |
+	         CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED;
       }
     }
     else if (!strcmp(attr->name, "job-state"))
@@ -9468,6 +9481,10 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * Send events as needed...
   */
+
+  if (event & CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED)
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED, job->printer, job,
+                  "Job priority changed by user.");
 
   if (event & CUPSD_EVENT_JOB_STATE)
     cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,

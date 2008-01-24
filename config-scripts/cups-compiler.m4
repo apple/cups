@@ -125,7 +125,9 @@ if test -n "$GCC"; then
 		# Add useful warning options for tracking down problems...
 		OPTIM="-Wall -Wno-format-y2k $OPTIM"
 		# Additional warning options for development testing...
-		OPTIM="-Wshadow -Wunused $OPTIM"
+		if test -d .svn; then
+			OPTIM="-Wshadow -Wunused $OPTIM"
+		fi
 	fi
 
 	case "$uname" in

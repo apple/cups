@@ -2527,7 +2527,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
                       "[Job %d] Unable to convert file %d to printable format!",
 	              job->current_file, job->id);
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Hint: Do you have ESP Ghostscript installed?");
+                      "Hint: Do you have Ghostscript installed?");
 
       if (LogLevel < CUPSD_LOG_DEBUG)
         cupsdLogMessage(CUPSD_LOG_INFO,
@@ -3357,7 +3357,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (strncmp(printer->device_uri, "file:", 5) != 0)
   {
-    if (job->current_file == 1)
+    if (job->current_file == 1 || printer->remote)
     {
       sscanf(printer->device_uri, "%254[^:]", method);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, method);
@@ -3634,7 +3634,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
 	cupsdSetPrinterReasons(job->printer, message);
 	cupsdAddPrinterHistory(job->printer);
-	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       update_job_attrs(job);
@@ -3663,14 +3663,14 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
       {
         cupsdSetString(&job->printer->alert, attr);
-	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("printer-alert-description", num_attrs,
                                 attrs)) != NULL)
       {
         cupsdSetString(&job->printer->alert_description, attr);
-	event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       cupsFreeOptions(num_attrs, attrs);
@@ -3687,7 +3687,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdSetString(&job->printer->recoverable, ptr);
       cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      event |= CUPSD_EVENT_PRINTER_STATE;
     }
     else if (!strncmp(message, "recovered:", 10))
     {
@@ -3700,7 +3700,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdSetString(&job->printer->recoverable, ptr);
       cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      event |= CUPSD_EVENT_PRINTER_STATE;
     }
 #endif /* __APPLE__ */
     else if (loglevel <= job->status_level)
@@ -3715,7 +3715,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       strlcpy(job->printer->state_message, message,
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE_CHANGED;
+      event |= CUPSD_EVENT_PRINTER_STATE;
 
       update_job_attrs(job);
     }
@@ -3724,8 +3724,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       break;
   }
 
-  if ((event & CUPSD_EVENT_PRINTER_STATE_CHANGED))
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE_CHANGED, job->printer, NULL,
+  if (event & CUPSD_EVENT_PRINTER_STATE)
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		  (job->printer->type & CUPS_PRINTER_CLASS) ?
 		      "Class \"%s\" state changed." :
 		      "Printer \"%s\" state changed.",

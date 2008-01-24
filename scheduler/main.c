@@ -1077,7 +1077,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Reset the accumulated events...
       */
 
-      LastEvent     = CUPSD_EVENT_NONE;
+      LastEvent = CUPSD_EVENT_NONE;
     }
   }
 
