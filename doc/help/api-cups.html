@@ -20,7 +20,7 @@
 
   CUPS API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007 by Apple Inc.
+  Copyright 2007-2008 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -30,38 +30,440 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'>Introduction</h2>
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/cups.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcups</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-httpipp.html'>HTTP and IPP APIs</a><br>
+	Programming: <a href='api-ppd.html'>PPD API</a><br>
+	Programming: <a href='api-raster.html'>Raster API</a></td>
+</tr>
+</tbody>
+</table></div>
 
-<p>The CUPS library provides a whole collection of interfaces
-needed to support the internal needs of the CUPS software as well
-as the needs of applications, filters, printer drivers, and
-backends.</p>
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
-<p>Unlike the rest of CUPS, the CUPS API library is provided
-under the GNU Library General Public License. This means that you
-can use the CUPS API library in both proprietary and open-source
-programs.</p>
+<p>The CUPS API provides the convenience functions needed to support
+applications, filters, printer drivers, and backends that need to interface
+with the CUPS scheduler.</p>
 
-<h2 class='title'>General Usage</h2>
+<h3><a name='PRINTERS_AND_CLASSES'>Printers and Classes</a></h3>
 
-<p>The <var>&lt;cups/cups.h&gt;</var> header file must be included to
-use the CUPS functions.</p>
+<p>Printers and classes (collections of printers) are accessed through
+the <a href="#cups_dest_t"><code>cups_dest_t</code></a> structure which
+includes the name (<code>name</code>), instance (<code>instance</code> -
+a way of selected certain saved options), and the options and attributes
+associated with that destination (<code>num_options</code> and
+<code>options</code>). Destinations are created using the
+<a href="#cupsGetDests"><code>cupsGetDests</code></a> function and freed
+using the <a href='#cupsFreeDests'><code>cupsFreeDests</code></a> function.
+The <a href='#cupsGetDest'><code>cupsGetDest</code></a> function finds a
+specific destination for printing:</p>
 
-<p>Programs using these functions must be linked to the CUPS
-library: <var>libcups.a</var>, <var>libcups.so.2</var>,
-<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
-<var>libcups2.lib</var> depending on the platform. The following
-command compiles <var>myprogram.c</var> using GCC and the CUPS
-library:</p>
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
 
-<pre class='command'>
-<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+<a href='#cups_dest_t'>cups_dest_t</a> *dests;
+int num_dests = <a href='#cupsGetDests'>cupsGetDests</a>(&amp;dests);
+<a href='#cups_dest_t'>cups_dest_t</a> *dest = <a href='#cupsGetDest'>cupsGetDest</a>("name", NULL, num_dests, dests);
+
+/* do something wiith dest */
+
+<a href='#cupsFreeDests'>cupsFreeDests</a>(num_dests, dests);
 </pre>
 
-<h2 class='title'>Compatibility</h2>
+<p>Passing <code>NULL</code> to
+<a href='#cupsGetDest'><code>cupsGetDest</code></a> for the destination name
+will return the default destination. Similarly, passing a <code>NULL</code>
+instance will return the default instance for that destination.</p>
 
-<p>Unless otherwise specified, the CUPS API functions require
-CUPS 1.1 or higher.</p>
+<div class='table'><table summary='Table 1: Printer Attributes' width='80%'>
+<caption>Table 1: <a name='TABLE1'>Printer Attributes</a></caption>
+<thead>
+<tr>
+	<th>Attribute Name</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>"auth-info-required"</td>
+	<td>The type of authentication required for printing to this
+	destination: "none", "username,password", "domain,username,password",
+	or "negotiate" (Kerberos)</td>
+</tr>
+<tr>
+	<td>"printer-info"</td>
+	<td>The human-readable description of the destination such as "My
+	Laser Printer".</td>
+</tr>
+<tr>
+	<td>"printer-is-accepting-jobs"</td>
+	<td>"1" if the destination is accepting new jobs, "0" if not.</td>
+</tr>
+<tr>
+	<td>"printer-is-shared"</td>
+	<td>"1" if the destination is being shared with other computers, "0" if
+	not.</td>
+</tr>
+<tr>
+	<td>"printer-location"</td>
+	<td>The human-readable location of the destination such as "Lab 4".</td>
+</tr>
+<tr>
+	<td>"printer-make-and-model"</td>
+	<td>The human-readable make and model of the destination such as "HP
+	LaserJet 4000 Series".</td>
+</tr>
+<tr>
+	<td>"printer-state"</td>
+	<td>"3" if the destination is idle, "4" if the destination is printing
+	a job, and "5" if the destination is stopped.</td>
+</tr>
+<tr>
+	<td>"printer-state-change-time"</td>
+	<td>The UNIX time when the destination entered the current state.</td>
+</tr>
+<tr>
+	<td>"printer-state-reasons"</td>
+	<td>Additional comma-delimited state keywords for the destination
+	such as "media-tray-empty-error" and "toner-low-warning".</td>
+</tr>
+<tr>
+	<td>"printer-type"</td>
+	<td>The <a href='#cups_printer_t'><code>cups_printer_t</code></a>
+	value associated with the destination.</td>
+</tr>
+</tbody>
+</table></div>
+
+<h3><a name='OPTIONS'>Options</a></h3>
+
+<p>Options are stored in arrays of
+<a href='#cups_option_t'><code>cups_option_t</code></a> structures. Each
+option has a name (<code>name</code>) and value (<code>value</code>)
+associated with it. The <a href='#cups_dest_t'><code>cups_dest_t</code></a>
+<code>num_options</code> and <code>options</code> members contain the
+default options for a particular destination, along with several informational
+attributes about the destination as shown in <a href='#TABLE1'>Table 1</a>.
+The <a href='#cupsGetOption'><code>cupsGetOption</code></a> function gets
+the value for the named option. For example, the following code lists the
+available destinations and their human-readable descriptions:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dests;
+int num_dests = <a href='#cupsGetDests'>cupsGetDests</a>(&amp;dests);
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int i;
+const char *value;
+
+for (i = num_dests, dest = dests; i > 0; i --, dest ++)
+  if (dest->instance == NULL)
+  {
+    value = <a href='#cupsGetOption'>cupsGetOption</a>("printer-info", dest->num_options, dest->options);
+    printf("%s (%s)\n", dest->name, value ? value : "no description");
+  }
+
+<a href='#cupsFreeDests'>cupsFreeDests</a>(num_dests, dests);
+</pre>
+
+<p>You can create your own option arrays using the
+<a href='#cupsAddOption'><code>cupsAddOption</code></a> function, which
+adds a single named option to an array:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+int num_options = 0;
+<a href='#cups_option_t'>cups_option_t</a> *options = NULL;
+
+/* The returned num_options value is updated as needed */
+num_options = <a href='#cupsAddOption'>cupsAddOption</a>("first", "value", num_options, &amp;options);
+
+/* This adds a second option value */
+num_options = <a href='#cupsAddOption'>cupsAddOption</a>("second", "value", num_options, &amp;options);
+
+/* This replaces the first option we added */
+num_options = <a href='#cupsAddOption'>cupsAddOption</a>("first", "new value", num_options, &amp;options);
+</pre>
+
+<p>Use a <code>for</code> loop to copy the options from a destination:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+int i;
+int num_options = 0;
+<a href='#cups_option_t'>cups_option_t</a> *options = NULL;
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+
+for (i = 0; i < dest->num_options; i ++)
+  num_options = <a href='#cupsAddOption'>cupsAddOption</a>(dest->options[i].name, dest->options[i].value, num_options, &amp;options);
+</pre>
+
+<p>Use the <a href='#cupsFreeOptions'><code>cupsFreeOptions</code></a>
+function to free the options array when you are done using it:</p>
+
+<pre class='example'>
+<a href='#cupsFreeOptions'>cupsFreeOptions</a>(num_options, options);
+</pre>
+
+<h3><a name='PRINT_JOBS'>Print Jobs</a></h3>
+
+<p>Print jobs are identified by a locally-unique job ID number from 1 to
+2<sup>31</sup>-1 and have options and one or more files for printing to a
+single destination. The <a href='#cupsPrintFile'><code>cupsPrintFile</code></a>
+function creates a new job with one file. The following code prints the CUPS
+test page file:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int num_options;
+<a href='#cups_option_t'>cups_option_t</a> *options;
+int job_id;
+
+/* Print a single file */
+job_id = <a href='#cupsPrintFile'>cupsPrintFile</a>(dest->name, "/usr/share/cups/data/testprint.ps", "Test Print", num_options, options);
+</pre>
+
+<p>The <a href='#cupsPrintFiles'><code>cupsPrintFiles</code></a> function
+creates a job with multiple files. The files are provided in a
+<code>char *</code> array:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int num_options;
+<a href='#cups_option_t'>cups_option_t</a> *options;
+int job_id;
+char *files[3] = { "file1.pdf", "file2.pdf", "file3.pdf" };
+
+/* Print three files */
+job_id = <a href='#cupsPrintFiles'>cupsPrintFiles</a>(dest->name, 3, files, "Test Print", num_options, options);
+</pre>
+
+<p>Finally, the <a href='#cupsCreateJob'><code>cupsCreateJob</code></a>
+function creates a new job with no files in it. Files are added using the
+<a href='#cupsStartDocument'><code>cupsStartDocument</code></a>, 
+<a href='api-httpipp.html#cupsWriteRequestData'><code>cupsWriteRequestData</code></a>,
+and <a href='#cupsFinishDocument'><code>cupsFinishDocument</code></a> functions.
+The following example creates a job with 10 text files for printing:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int num_options;
+<a href='#cups_option_t'>cups_option_t</a> *options;
+int job_id;
+int i;
+char buffer[1024];
+
+/* Create the job */
+job_id = <a href='#cupsCreateJob'>cupsCreateJob</a>(CUPS_HTTP_DEFAULT, dest->name, "10 Text Files", num_options, options);
+
+/* If the job is created, add 10 files */
+if (job_id > 0)
+{
+  for (i = 1; i &lt;= 10; i ++)
+  {
+    snprintf(buffer, sizeof(buffer), "file%d.txt", i);
+
+    <a href='#cupsStartDocument'>cupsStartDocument</a>(CUPS_HTTP_DEFAULT, dest->name, job_id, buffer, CUPS_FORMAT_TEXT, i == 10);
+
+    snprintf(buffer, sizeof(buffer),
+             "File %d\n"
+             "\n"
+             "One fish,\n"
+             "Two fish,\n
+             "Red fish,\n
+             "Blue fish\n", i);
+
+    /* cupsWriteRequestData can be called as many times as needed */
+    <a href='#cupsWriteRequestData'>cupsWriteRequestData</a>(CUPS_HTTP_DEFAULT, buffer, strlen(buffer));
+
+    <a href='#cupsFinishDocument'>cupsFinishDocument</a>(CUPS_HTTP_DEFAULT, dest->name);
+  }
+}
+</pre>
+
+<p>Once you have created a job, you can monitor its status using the
+<a href='#cupsGetJobs'><code>cupsGetJobs</code></a> function, which returns
+an array of <a href='#cups_job_t'><code>cups_job_t</code></a> structures.
+Each contains the job ID (<code>id</code>), destination name
+(<code>dest</code>), title (<code>title</code>), and other information
+associated with the job. The job array is freed using the
+<a href='#cupsFreeJobs'><code>cupsFreeJobs</code></a> function. The following
+example monitors a specific job ID, showing the current job state once every
+5 seconds until the job is completed:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int job_id;
+int num_jobs;
+<a href='#cups_job_t'>cups_job_t</a> *jobs;
+int i;
+ipp_jstate_t job_state = IPP_JOB_PENDING;
+ 
+while (job_state &lt; IPP_JOB_STOPPED)
+{
+  /* Get my jobs (1) with any state (-1) */
+  num_jobs = <a href='#cupsGetJobs'>cupsGetJobs</a>(&amp;jobs, dest->name, 1, -1);
+
+  /* Loop to find my job */
+  job_state = IPP_JOB_COMPLETED;
+
+  for (i = 0; i &lt; num_jobs; i ++)
+    if (jobs[i].id == job_id)
+    {
+      job_state = jobs[i].state;
+      break;
+    }
+
+  /* Free the job array */
+  <a href='#cupsFreeJobs'>cupsFreeJobs</a>(num_jobs, jobs);
+
+  /* Show the current state */
+  switch (job_state)
+  {
+    case IPP_JOB_PENDING :
+        printf("Job %d is pending.\n", job_id);
+        break;
+    case IPP_JOB_HELD :
+        printf("Job %d is held.\n", job_id);
+        break;
+    case IPP_JOB_PROCESSING :
+        printf("Job %d is processing.\n", job_id);
+        break;
+    case IPP_JOB_STOPPED :
+        printf("Job %d is stopped.\n", job_id);
+        break;
+    case IPP_JOB_CANCELED :
+        printf("Job %d is canceled.\n", job_id);
+        break;
+    case IPP_JOB_ABORTED :
+        printf("Job %d is aborted.\n", job_id);
+        break;
+    case IPP_JOB_COMPLETED :
+        printf("Job %d is completed.\n", job_id);
+        break;
+  }
+
+  /* Sleep if the job is not finished */
+  if (job_state &lt; IPP_JOB_STOPPED)
+    sleep(5);
+}
+</pre>
+
+<p>To cancel a job, use the
+<a href='#cupsCancelJob'><code>cupsCancelJob</code></a> function with the
+job ID:</p>
+
+<pre class='exmaple'>
+#include &lt;cups/cups.h&gt;
+
+<a href='#cups_dest_t'>cups_dest_t</a> *dest;
+int job_id;
+
+<a href='#cupsCancelJob'>cupsCancelJob</a>(dest->name, job_id);
+</pre>
+
+<h3><a name='ERROR_HANDLING'>Error Handling</a></h3>
+
+<p>If any of the CUPS API printing functions returns an error, the reason for
+that error can be found by calling the
+<a href='#cupsLastError'><code>cupsLastError</code></a> and
+<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> functions.
+<a href='#cupsLastError'><code>cupsLastError</code></a> returns the last IPP
+error code
+(<a href='api-httpipp.html#ipp_status_t'><code>ipp_status_t</code></a>)
+that was encountered, while
+<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> returns
+a (localized) human-readable string that can be shown to the user. For example,
+if any of the job creation functions returns a job ID of 0, you can use
+<a href='#cupsLastErrorString'><code>cupsLastErrorString</code></a> to show
+the reason why the job could not be created:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+int job_id;
+
+if (job_id == 0)
+  puts(cupsLastErrorString());
+</pre>
+
+<h3><a name='PASSWORDS_AND_AUTHENTICATION'>Passwords and Authentication</a></h3>
+
+<p>CUPS supports authentication of any request, including submission of print
+jobs. The default mechanism for getting the username and password is to use the
+login user and a password from the console.</p>
+
+<p>To support other types of applications, in particular Graphical User
+Interfaces ("GUIs"), the CUPS API provides functions to set the default
+username and to register a callback function that returns a password string.</p>
+
+<p>The <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a>
+function is used to set a password callback in your program. Only one
+function can be used at any time.</p>
+
+<p>The <a href="#cupsSetUser"><code>cupsSetUser</code></a> function sets the
+current username for authentication. This function can be called by your
+password callback function to change the current username as needed.</p>
+
+<p>The following example shows a simple password callback that gets a
+username and password from the user:</p>
+
+<pre class='example'>
+#include &lt;cups/cups.h&gt;
+
+const char *
+my_password_cb(const char *prompt)
+{
+  char	user[65];
+
+
+  puts(prompt);
+
+  /* Get a username from the user */
+  printf("Username: ");
+  if (fgets(user, sizeof(user), stdin) == NULL)
+    return (NULL);
+
+  /* Strip the newline from the string and set the user */
+  user[strlen(user) - 1] = '\0';
+
+  <a href='#cupsSetUser'>cupsSetUser</a>(user);
+
+  /* Use getpass() to ask for the password... */
+  return (getpass("Password: "));
+}
+
+<a href='#cupsSetPasswordCB'>cupsSetPasswordCB</a>(my_password_cb);
+</pre>
+
+<p>Similarly, a GUI could display the prompt string in a window with input
+fields for the username and password. The username should default to the
+string returned by the <a href="#cupsUser"><code>cupsUser</code></a>
+function.</p>
 <h2 class='title'>Contents</h2>
 <ul>
 	<li><a href='#ENUMERATIONS'>Enumerations</a></li>
@@ -143,7 +545,10 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsAddDest'><tt>cupsAddDest()</tt></a> </li>
 	<li><a href='#cupsAddOption'><tt>cupsAddOption()</tt></a> </li>
 	<li><a href='#cupsCancelJob'><tt>cupsCancelJob()</tt></a> </li>
+	<li><a href='#cupsCancelJob2'><tt>cupsCancelJob2()</tt></a> <span class='info'>&nbsp;CUPS 1.4&nbsp;</span></li>
+	<li><a href='#cupsCreateJob'><tt>cupsCreateJob()</tt></a> <span class='info'>&nbsp;CUPS 1.4&nbsp;</span></li>
 	<li><a href='#cupsEncryption'><tt>cupsEncryption()</tt></a> </li>
+	<li><a href='#cupsFinishDocument'><tt>cupsFinishDocument()</tt></a> <span class='info'>&nbsp;CUPS 1.4&nbsp;</span></li>
 	<li><a href='#cupsFreeDests'><tt>cupsFreeDests()</tt></a> </li>
 	<li><a href='#cupsFreeJobs'><tt>cupsFreeJobs()</tt></a> </li>
 	<li><a href='#cupsFreeOptions'><tt>cupsFreeOptions()</tt></a> </li>
@@ -157,6 +562,7 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsGetFile'><tt>cupsGetFile()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
 	<li><a href='#cupsGetJobs'><tt>cupsGetJobs()</tt></a> </li>
 	<li><a href='#cupsGetJobs2'><tt>cupsGetJobs2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
+	<li><a href='#cupsGetNamedDest'><tt>cupsGetNamedDest()</tt></a> <span class='info'>&nbsp;CUPS 1.4&nbsp;</span></li>
 	<li><a href='#cupsGetOption'><tt>cupsGetOption()</tt></a> </li>
 	<li><a href='#cupsGetPPD'><tt>cupsGetPPD()</tt></a> </li>
 	<li><a href='#cupsGetPPD2'><tt>cupsGetPPD2()</tt></a> <span class='info'>&nbsp;CUPS 1.1.21&nbsp;</span></li>
@@ -191,6 +597,7 @@ CUPS 1.1 or higher.</p>
 	<li><a href='#cupsSetPasswordCB'><tt>cupsSetPasswordCB()</tt></a> </li>
 	<li><a href='#cupsSetServer'><tt>cupsSetServer()</tt></a> </li>
 	<li><a href='#cupsSetUser'><tt>cupsSetUser()</tt></a> </li>
+	<li><a href='#cupsStartDocument'><tt>cupsStartDocument()</tt></a> <span class='info'>&nbsp;CUPS 1.4&nbsp;</span></li>
 	<li><a href='#cupsTempFd'><tt>cupsTempFd()</tt></a> </li>
 	<li><a href='#cupsTempFile'><tt>cupsTempFile()</tt></a> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></li>
 	<li><a href='#cupsTempFile2'><tt>cupsTempFile2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
@@ -221,10 +628,14 @@ cupsAddDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Destination name</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance name or NULL for none/primary</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name
+</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL for none/primary
+</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New number of destinations</p>
@@ -245,10 +656,14 @@ cupsAddOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Name of option</td></tr>
-<tr><td><tt>value</tt></td><td>Value of option</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
+<tr><td><tt>name</tt></td><td>Name of option
+</td></tr>
+<tr><td><tt>value</tt></td><td>Value of option
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Pointer to options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of options</p>
@@ -263,17 +678,85 @@ the cause of any failure.
 int<br>
 cupsCancelJob(
     const char * name,
-    int job);
+    int job_id);
 </tt></p>
 <h4>Arguments</h4>
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Name of printer or class</td></tr>
-<tr><td><tt>job</tt></td><td>Job ID</td></tr>
+<tr><td><tt>name</tt></td><td>Name of printer or class
+</td></tr>
+<tr><td><tt>job_id</tt></td><td>Job ID
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>1 on success, 0 on failure</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.4&nbsp;</span><a name='cupsCancelJob2'>cupsCancelJob2()</a></h3>
+<h4>Description</h4>
+<p>Cancel or purge a print job.
+<p>Canceled jobs remain in the job history while purged jobs are removed
+from the job history.
+<p>Use the cupsLastError() and cupsLastErrorString() functions to get
+the cause of any failure.
+
+
+<h4>Syntax</h4>
+<p><tt>
+ipp_status_t<br>
+cupsCancelJob2(
+    http_t * http,
+    int job_id,
+    int purge);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>job_id</tt></td><td>Job ID
+</td></tr>
+<tr><td><tt>purge</tt></td><td>1 to purge, 0 to cancel
+</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>IPP status</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.4&nbsp;</span><a name='cupsCreateJob'>cupsCreateJob()</a></h3>
+<h4>Description</h4>
+<p>Create an empty job.
+<p>Submit files for printing to the job using the cupsStartDocument(),
+cupsWriteRequestData(), and cupsFinishDocument() functions.
+
+
+<h4>Syntax</h4>
+<p><tt>
+int<br>
+cupsCreateJob(
+    http_t * http,
+    const char * name,
+    const char * title,
+    int num_options,
+    <a href='#cups_option_t'>cups_option_t</a> * options);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Job ID or 0 on error</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsEncryption'>cupsEncryption()</a></h3>
 <h4>Description</h4>
@@ -292,6 +775,30 @@ cupsEncryption(void);
 <h4>Returns</h4>
 <p>Encryption settings</p>
 <!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.4&nbsp;</span><a name='cupsFinishDocument'>cupsFinishDocument()</a></h3>
+<h4>Description</h4>
+<p>Finish sending a document.
+
+
+<h4>Syntax</h4>
+<p><tt>
+ipp_status_t<br>
+cupsFinishDocument(
+    http_t * http,
+    const char * name);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Status of document submission</p>
+<!-- NEW PAGE -->
 <h3 class='title'><a name='cupsFreeDests'>cupsFreeDests()</a></h3>
 <h4>Description</h4>
 <p>Free the memory used by the list of destinations.
@@ -306,8 +813,10 @@ cupsFreeDests(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -326,8 +835,10 @@ cupsFreeJobs(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>num_jobs</tt></td><td>Number of jobs</td></tr>
-<tr><td><tt>jobs</tt></td><td>Jobs</td></tr>
+<tr><td><tt>num_jobs</tt></td><td>Number of jobs
+</td></tr>
+<tr><td><tt>jobs</tt></td><td>Jobs
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -346,8 +857,10 @@ cupsFreeOptions(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Pointer to options</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Pointer to options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -368,7 +881,8 @@ cupsGetClasses(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>classes</tt></td><td>Classes</td></tr>
+<tr><td><tt>classes</tt></td><td>Classes
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of classes</p>
@@ -413,7 +927,8 @@ cupsGetDefault2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Default printer or NULL</p>
@@ -436,10 +951,14 @@ cupsGetDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Destination name or NULL for the default destination</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name or NULL for the default destination
+</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL
+</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Destination pointer or NULL</p>
@@ -463,7 +982,8 @@ cupsGetDests(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of destinations</p>
@@ -490,8 +1010,10 @@ cupsGetDests2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of destinations</p>
@@ -514,9 +1036,12 @@ cupsGetFd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection to server
+</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name
+</td></tr>
+<tr><td><tt>fd</tt></td><td>File descriptor
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -539,9 +1064,12 @@ cupsGetFile(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>filename</tt></td><td>Filename</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection to server
+</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name
+</td></tr>
+<tr><td><tt>filename</tt></td><td>Filename
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -562,12 +1090,16 @@ cupsGetJobs(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
+<tr><td><tt>jobs</tt></td><td>Job data
+</td></tr>
 <tr><td><tt>mydest</tt></td><td>NULL = all destinations,       *
-otherwise show jobs for mydest</td></tr>
-<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine</td></tr>
+otherwise show jobs for mydest
+</td></tr>
+<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine
+</td></tr>
 <tr><td><tt>completed</tt></td><td>-1 = show all, 0 = active, *
-1 = completed jobs</td></tr>
+1 = completed jobs
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of jobs</p>
@@ -591,16 +1123,58 @@ cupsGetJobs2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>jobs</tt></td><td>Job data</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>jobs</tt></td><td>Job data
+</td></tr>
 <tr><td><tt>mydest</tt></td><td>NULL = all destinations,       *
-otherwise show jobs for mydest</td></tr>
-<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine</td></tr>
+otherwise show jobs for mydest
+</td></tr>
+<tr><td><tt>myjobs</tt></td><td>0 = all users, 1 = mine
+</td></tr>
 <tr><td><tt>completed</tt></td><td>-1 = show all, 0 = active, *
-1 = completed jobs</td></tr>
+1 = completed jobs
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of jobs</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.4&nbsp;</span><a name='cupsGetNamedDest'>cupsGetNamedDest()</a></h3>
+<h4>Description</h4>
+<p>Get options for the named destination.
+<p>This function is optimized for retrieving a single destination and should
+be used instead of cupsGetDests() and cupsGetDest() when you either know
+the name of the destination or want to print to the default destination.
+If NULL is returned, the destination does not exist or there is no default
+destination.
+<p>If &quot;http&quot; is CUPS_HTTP_DEFAULT, the connection to the default print server
+will be used.
+<p>If &quot;name&quot; is NULL, the default printer for the current user will be returned.
+<p>The returned destination must be freed using cupsFreeDests() with a
+&quot;num_dests&quot; of 1.
+
+
+<h4>Syntax</h4>
+<p><tt>
+<a href='#cups_dest_t'>cups_dest_t</a> *<br>
+cupsGetNamedDest(
+    http_t * http,
+    const char * name,
+    const char * instance);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name or NULL
+</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL
+</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>Destination or NULL</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsGetOption'>cupsGetOption()</a></h3>
 <h4>Description</h4>
@@ -617,9 +1191,12 @@ cupsGetOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Name of option</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>name</tt></td><td>Name of option
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Option value or NULL</p>
@@ -639,7 +1216,8 @@ cupsGetPPD(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Printer name</td></tr>
+<tr><td><tt>name</tt></td><td>Printer name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Filename for PPD file</p>
@@ -662,8 +1240,10 @@ cupsGetPPD2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer name</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Filename for PPD file</p>
@@ -694,11 +1274,16 @@ cupsGetPPD3(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer name</td></tr>
-<tr><td><tt>modtime</tt></td><td>Modification time</td></tr>
-<tr><td><tt>buffer</tt></td><td>Filename buffer</td></tr>
-<tr><td><tt>bufsize</tt></td><td>Size of filename buffer</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer name
+</td></tr>
+<tr><td><tt>modtime</tt></td><td>Modification time
+</td></tr>
+<tr><td><tt>buffer</tt></td><td>Filename buffer
+</td></tr>
+<tr><td><tt>bufsize</tt></td><td>Size of filename buffer
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -718,7 +1303,8 @@ cupsGetPassword(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>prompt</tt></td><td>Prompt string</td></tr>
+<tr><td><tt>prompt</tt></td><td>Prompt string
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Password</p>
@@ -739,7 +1325,8 @@ cupsGetPrinters(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>printers</tt></td><td>Printers</td></tr>
+<tr><td><tt>printers</tt></td><td>Printers
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of printers</p>
@@ -767,8 +1354,10 @@ cupsGetServerPPD(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Name of PPD file (&quot;ppd-name&quot;)</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Name of PPD file (&quot;ppd-name&quot;)
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Name of PPD file or NULL on error</p>
@@ -800,7 +1389,8 @@ cupsLangEncoding(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>lang</tt></td><td>Language data</td></tr>
+<tr><td><tt>lang</tt></td><td>Language data
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Character encoding</p>
@@ -832,7 +1422,8 @@ cupsLangFree(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>lang</tt></td><td>Language to free</td></tr>
+<tr><td><tt>lang</tt></td><td>Language to free
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -850,7 +1441,8 @@ cupsLangGet(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>language</tt></td><td>Language or locale</td></tr>
+<tr><td><tt>language</tt></td><td>Language or locale
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Language data</p>
@@ -898,9 +1490,12 @@ cupsMarkOptions(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>1 if conflicting</p>
@@ -922,8 +1517,10 @@ cupsNotifySubject(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>lang</tt></td><td>Language data</td></tr>
-<tr><td><tt>event</tt></td><td>Event data</td></tr>
+<tr><td><tt>lang</tt></td><td>Language data
+</td></tr>
+<tr><td><tt>event</tt></td><td>Event data
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Subject string or NULL</p>
@@ -945,8 +1542,10 @@ cupsNotifyText(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>lang</tt></td><td>Language data</td></tr>
-<tr><td><tt>event</tt></td><td>Event data</td></tr>
+<tr><td><tt>lang</tt></td><td>Language data
+</td></tr>
+<tr><td><tt>event</tt></td><td>Event data
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Message text or NULL</p>
@@ -971,9 +1570,12 @@ cupsParseOptions(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>arg</tt></td><td>Argument to parse</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options found</td></tr>
+<tr><td><tt>arg</tt></td><td>Argument to parse
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options found
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of options found</p>
@@ -995,11 +1597,16 @@ cupsPrintFile(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>filename</tt></td><td>File to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>filename</tt></td><td>File to print
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Job ID</p>
@@ -1024,12 +1631,18 @@ cupsPrintFile2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>filename</tt></td><td>File to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>filename</tt></td><td>File to print
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Job ID</p>
@@ -1053,12 +1666,18 @@ cupsPrintFiles(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
-<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>num_files</tt></td><td>Number of files
+</td></tr>
+<tr><td><tt>files</tt></td><td>File(s) to print
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Job ID</p>
@@ -1085,13 +1704,20 @@ cupsPrintFiles2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>name</tt></td><td>Printer or class name</td></tr>
-<tr><td><tt>num_files</tt></td><td>Number of files</td></tr>
-<tr><td><tt>files</tt></td><td>File(s) to print</td></tr>
-<tr><td><tt>title</tt></td><td>Title of job</td></tr>
-<tr><td><tt>num_options</tt></td><td>Number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>num_files</tt></td><td>Number of files
+</td></tr>
+<tr><td><tt>files</tt></td><td>File(s) to print
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title of job
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Job ID</p>
@@ -1114,9 +1740,12 @@ cupsPutFd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>fd</tt></td><td>File descriptor</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection to server
+</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name
+</td></tr>
+<tr><td><tt>fd</tt></td><td>File descriptor
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -1139,9 +1768,12 @@ cupsPutFile(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection to server</td></tr>
-<tr><td><tt>resource</tt></td><td>Resource name</td></tr>
-<tr><td><tt>filename</tt></td><td>Filename</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection to server
+</td></tr>
+<tr><td><tt>resource</tt></td><td>Resource name
+</td></tr>
+<tr><td><tt>filename</tt></td><td>Filename
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>HTTP status</p>
@@ -1168,10 +1800,14 @@ cupsRemoveDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Destination name</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name
+</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL
+</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New number of destinations</p>
@@ -1193,9 +1829,12 @@ cupsRemoveOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Option name</td></tr>
-<tr><td><tt>num_options</tt></td><td>Current number of options</td></tr>
-<tr><td><tt>options</tt></td><td>Options</td></tr>
+<tr><td><tt>name</tt></td><td>Option name
+</td></tr>
+<tr><td><tt>num_options</tt></td><td>Current number of options
+</td></tr>
+<tr><td><tt>options</tt></td><td>Options
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New number of options</p>
@@ -1233,10 +1872,14 @@ cupsSetDefaultDest(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>name</tt></td><td>Destination name</td></tr>
-<tr><td><tt>instance</tt></td><td>Instance name or NULL</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>name</tt></td><td>Destination name
+</td></tr>
+<tr><td><tt>instance</tt></td><td>Instance name or NULL
+</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1257,8 +1900,10 @@ cupsSetDests(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1282,9 +1927,12 @@ cupsSetDests2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>http</tt></td><td>HTTP connection</td></tr>
-<tr><td><tt>num_dests</tt></td><td>Number of destinations</td></tr>
-<tr><td><tt>dests</tt></td><td>Destinations</td></tr>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>num_dests</tt></td><td>Number of destinations
+</td></tr>
+<tr><td><tt>dests</tt></td><td>Destinations
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
@@ -1302,7 +1950,8 @@ cupsSetEncryption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>e</tt></td><td>New encryption preference</td></tr>
+<tr><td><tt>e</tt></td><td>New encryption preference
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1321,7 +1970,8 @@ cupsSetPasswordCB(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>cb</tt></td><td>Callback function</td></tr>
+<tr><td><tt>cb</tt></td><td>Callback function
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1342,7 +1992,8 @@ cupsSetServer(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>server</tt></td><td>Server name</td></tr>
+<tr><td><tt>server</tt></td><td>Server name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -1361,10 +2012,53 @@ cupsSetUser(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>user</tt></td><td>User name</td></tr>
+<tr><td><tt>user</tt></td><td>User name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
+<!-- NEW PAGE -->
+<h3 class='title'><span class='info'>&nbsp;CUPS 1.4&nbsp;</span><a name='cupsStartDocument'>cupsStartDocument()</a></h3>
+<h4>Description</h4>
+<p>Add a document to a job created with cupsCreateJob().
+<p>Use cupsWriteRequestData() to write data for the document and
+cupsFinishDocument() to finish the document and get the submission status.
+<p>The MIME type constants CUPS_FORMAT_AUTO, CUPS_FORMAT_PDF,
+CUPS_FORMAT_POSTSCRIPT, CUPS_FORMAT_RAW, and CUPS_FORMAT_TEXT are provided
+for the &quot;format&quot; argument, although any supported MIME type string can be
+supplied.
+
+
+<h4>Syntax</h4>
+<p><tt>
+http_status_t<br>
+cupsStartDocument(
+    http_t * http,
+    const char * name,
+    int job_id,
+    const char * docname,
+    const char * format,
+    int last_document);
+</tt></p>
+<h4>Arguments</h4>
+<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
+<thead><tr><th>Name</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><tt>http</tt></td><td>HTTP connection or CUPS_HTTP_DEFAULT
+</td></tr>
+<tr><td><tt>name</tt></td><td>Printer or class name
+</td></tr>
+<tr><td><tt>job_id</tt></td><td>Job ID from cupsCreateJob()
+</td></tr>
+<tr><td><tt>docname</tt></td><td>Name of document
+</td></tr>
+<tr><td><tt>format</tt></td><td>MIME type or CUPS_FORMAT_foo
+</td></tr>
+<tr><td><tt>last_document</tt></td><td>1 for last document in job, 0 otherwise
+</td></tr>
+</tbody></table></div>
+<h4>Returns</h4>
+<p>HTTP status of request</p>
 <!-- NEW PAGE -->
 <h3 class='title'><a name='cupsTempFd'>cupsTempFd()</a></h3>
 <h4>Description</h4>
@@ -1382,8 +2076,10 @@ cupsTempFd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
-<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer
+</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>New file descriptor or -1 on error</p>
@@ -1407,8 +2103,10 @@ cupsTempFile(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
-<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer
+</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Filename or NULL on error</p>
@@ -1431,8 +2129,10 @@ cupsTempFile2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>filename</tt></td><td>Pointer to buffer</td></tr>
-<tr><td><tt>len</tt></td><td>Size of buffer</td></tr>
+<tr><td><tt>filename</tt></td><td>Pointer to buffer
+</td></tr>
+<tr><td><tt>len</tt></td><td>Size of buffer
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>CUPS file or NULL on error</p>

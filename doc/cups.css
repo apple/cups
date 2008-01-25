@@ -23,8 +23,16 @@ PRE.command {
   margin-left: 36pt;
 }
 
-PRE.command EM {
+PRE.example {
+  background: white;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+PRE.command EM, PRE.example EM {
   color: #3f0000;
+  font-family: sans-serif;
 }
 
 P.command {
@@ -164,6 +172,7 @@ TR.data TH {
 
 DIV.table TABLE {
   border: solid thin #999999;
+  border-collapse: collapse;
   border-spacing: 0;
   margin-left: auto;
   margin-right: auto;
@@ -179,12 +188,13 @@ DIV.table CAPTION {
 }
 
 DIV.table TABLE TD {
+  background: white;
   border: solid thin #bbbbbb;
   padding-top: 5pt;
 }
 
 DIV.table TABLE TH {
-  background: #bbbbbb;
+  background: #eeeeee;
   border: none;
   border-bottom: solid thin #999999;
 }
@@ -310,4 +320,24 @@ P.summary {
 SPAN.message {
   font-style: italic;
   font-size: smaller;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  background: white;
+  border: solid thin #999999;
+  border-spacing: 0;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
 }

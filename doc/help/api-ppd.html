@@ -276,7 +276,8 @@ ppdClose(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -297,9 +298,12 @@ ppdCollect(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>section</tt></td><td>Section to collect</td></tr>
-<tr><td><tt>choices</tt></td><td>Pointers to choices</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to collect
+</td></tr>
+<tr><td><tt>choices</tt></td><td>Pointers to choices
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of options marked</p>
@@ -323,10 +327,14 @@ ppdCollect2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>section</tt></td><td>Section to collect</td></tr>
-<tr><td><tt>min_order</tt></td><td>Minimum OrderDependency value</td></tr>
-<tr><td><tt>choices</tt></td><td>Pointers to choices</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to collect
+</td></tr>
+<tr><td><tt>min_order</tt></td><td>Minimum OrderDependency value
+</td></tr>
+<tr><td><tt>choices</tt></td><td>Pointers to choices
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of options marked</p>
@@ -344,7 +352,8 @@ ppdConflicts(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD to check</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD to check
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of conflicts found</p>
@@ -364,9 +373,12 @@ ppdEmit(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>fp</tt></td><td>File to write to
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to write
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -393,11 +405,16 @@ ppdEmitAfterOrder(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write</td></tr>
-<tr><td><tt>limit</tt></td><td>Non-zero to use min_order</td></tr>
-<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>fp</tt></td><td>File to write to
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to write
+</td></tr>
+<tr><td><tt>limit</tt></td><td>Non-zero to use min_order
+</td></tr>
+<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -417,9 +434,12 @@ ppdEmitFd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>fd</tt></td><td>File to write to</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>fd</tt></td><td>File to write to
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to write
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -441,11 +461,16 @@ ppdEmitJCL(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to</td></tr>
-<tr><td><tt>job_id</tt></td><td>Job ID</td></tr>
-<tr><td><tt>user</tt></td><td>Username</td></tr>
-<tr><td><tt>title</tt></td><td>Title</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>fp</tt></td><td>File to write to
+</td></tr>
+<tr><td><tt>job_id</tt></td><td>Job ID
+</td></tr>
+<tr><td><tt>user</tt></td><td>Username
+</td></tr>
+<tr><td><tt>title</tt></td><td>Title
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -466,8 +491,10 @@ ppdEmitJCLEnd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>fp</tt></td><td>File to write to
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on failure</p>
@@ -495,9 +522,12 @@ ppdEmitString(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write</td></tr>
-<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>section</tt></td><td>Section to write
+</td></tr>
+<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>String containing option code</p>
@@ -517,7 +547,8 @@ ppdErrorString(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>status</tt></td><td>PPD status</td></tr>
+<tr><td><tt>status</tt></td><td>PPD status
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status string</p>
@@ -539,9 +570,12 @@ ppdFindAttr(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>name</tt></td><td>Attribute name</td></tr>
-<tr><td><tt>spec</tt></td><td>Specifier string or NULL</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>name</tt></td><td>Attribute name
+</td></tr>
+<tr><td><tt>spec</tt></td><td>Specifier string or NULL
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Attribute or NULL if not found</p>
@@ -560,8 +594,10 @@ ppdFindChoice(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>o</tt></td><td>Pointer to option</td></tr>
-<tr><td><tt>choice</tt></td><td>Name of choice</td></tr>
+<tr><td><tt>o</tt></td><td>Pointer to option
+</td></tr>
+<tr><td><tt>choice</tt></td><td>Name of choice
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Choice pointer or NULL</p>
@@ -582,8 +618,10 @@ ppdFindCustomOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>keyword</tt></td><td>Custom option name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
+<tr><td><tt>keyword</tt></td><td>Custom option name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Custom option or NULL</p>
@@ -604,8 +642,10 @@ ppdFindCustomParam(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
-<tr><td><tt>name</tt></td><td>Parameter name</td></tr>
+<tr><td><tt>opt</tt></td><td>Custom option
+</td></tr>
+<tr><td><tt>name</tt></td><td>Parameter name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Custom parameter or NULL</p>
@@ -624,8 +664,10 @@ ppdFindMarkedChoice(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>option</tt></td><td>Keyword/option name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
+<tr><td><tt>option</tt></td><td>Keyword/option name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Pointer to choice or NULL</p>
@@ -647,9 +689,12 @@ ppdFindNextAttr(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>name</tt></td><td>Attribute name</td></tr>
-<tr><td><tt>spec</tt></td><td>Specifier string or NULL</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>name</tt></td><td>Attribute name
+</td></tr>
+<tr><td><tt>spec</tt></td><td>Specifier string or NULL
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Attribute or NULL if not found</p>
@@ -668,8 +713,10 @@ ppdFindOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>option</tt></td><td>Option/Keyword name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>option</tt></td><td>Option/Keyword name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Pointer to option or NULL</p>
@@ -689,7 +736,8 @@ ppdFirstCustomParam(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
+<tr><td><tt>opt</tt></td><td>Custom option
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Custom parameter or NULL</p>
@@ -710,7 +758,8 @@ ppdFirstOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>First option or NULL</p>
@@ -730,9 +779,12 @@ ppdIsMarked(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data</td></tr>
-<tr><td><tt>option</tt></td><td>Option/Keyword name</td></tr>
-<tr><td><tt>choice</tt></td><td>Choice name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file data
+</td></tr>
+<tr><td><tt>option</tt></td><td>Option/Keyword name
+</td></tr>
+<tr><td><tt>choice</tt></td><td>Choice name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Non-zero if option is marked</p>
@@ -752,7 +804,8 @@ ppdLastError(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>line</tt></td><td>Line number</td></tr>
+<tr><td><tt>line</tt></td><td>Line number
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Status code</p>
@@ -775,7 +828,8 @@ ppdLocalize(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>0 on success, -1 on error</p>
@@ -805,11 +859,16 @@ ppdLocalizeIPPReason(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>reason</tt></td><td>IPP reason keyword to look up</td></tr>
-<tr><td><tt>scheme</tt></td><td>URI scheme or NULL for text</td></tr>
-<tr><td><tt>buffer</tt></td><td>Value buffer</td></tr>
-<tr><td><tt>bufsize</tt></td><td>Size of value buffer</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
+<tr><td><tt>reason</tt></td><td>IPP reason keyword to look up
+</td></tr>
+<tr><td><tt>scheme</tt></td><td>URI scheme or NULL for text
+</td></tr>
+<tr><td><tt>buffer</tt></td><td>Value buffer
+</td></tr>
+<tr><td><tt>bufsize</tt></td><td>Size of value buffer
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Value or NULL if not found</p>
@@ -827,7 +886,8 @@ ppdMarkDefaults(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>
@@ -850,9 +910,12 @@ ppdMarkOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>option</tt></td><td>Keyword</td></tr>
-<tr><td><tt>choice</tt></td><td>Option name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>option</tt></td><td>Keyword
+</td></tr>
+<tr><td><tt>choice</tt></td><td>Option name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Number of conflicts</p>
@@ -872,7 +935,8 @@ ppdNextCustomParam(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>opt</tt></td><td>Custom option</td></tr>
+<tr><td><tt>opt</tt></td><td>Custom option
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Custom parameter or NULL</p>
@@ -893,7 +957,8 @@ ppdNextOption(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Next option or NULL</p>
@@ -911,7 +976,8 @@ ppdOpen(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>fp</tt></td><td>File to read from</td></tr>
+<tr><td><tt>fp</tt></td><td>File to read from
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>PPD file record</p>
@@ -931,7 +997,8 @@ ppdOpen2(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>fp</tt></td><td>File to read from</td></tr>
+<tr><td><tt>fp</tt></td><td>File to read from
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>PPD file record</p>
@@ -949,7 +1016,8 @@ ppdOpenFd(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>fd</tt></td><td>File to read from</td></tr>
+<tr><td><tt>fd</tt></td><td>File to read from
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>PPD file record</p>
@@ -967,7 +1035,8 @@ ppdOpenFile(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>filename</tt></td><td>File to read from</td></tr>
+<tr><td><tt>filename</tt></td><td>File to read from
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>PPD file record</p>
@@ -986,8 +1055,10 @@ ppdPageLength(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file</td></tr>
-<tr><td><tt>name</tt></td><td>Size name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file
+</td></tr>
+<tr><td><tt>name</tt></td><td>Size name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Length of page in points or 0.0</p>
@@ -1006,8 +1077,10 @@ ppdPageSize(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>name</tt></td><td>Size name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>name</tt></td><td>Size name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Size record for page or NULL</p>
@@ -1026,8 +1099,10 @@ ppdPageWidth(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record</td></tr>
-<tr><td><tt>name</tt></td><td>Size name</td></tr>
+<tr><td><tt>ppd</tt></td><td>PPD file record
+</td></tr>
+<tr><td><tt>name</tt></td><td>Size name
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Width of page in points or 0.0</p>
@@ -1047,7 +1122,8 @@ ppdSetConformance(
 <div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
 <thead><tr><th>Name</th><th>Description</th></tr></thead>
 <tbody>
-<tr><td><tt>c</tt></td><td>Conformance level</td></tr>
+<tr><td><tt>c</tt></td><td>Conformance level
+</td></tr>
 </tbody></table></div>
 <h4>Returns</h4>
 <p>Nothing.</p>

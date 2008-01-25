@@ -19,6 +19,17 @@ PRE.command {
   margin-left: 36pt;
 }
 
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: sans-serif;
+}
+
 P.command {
   font-family: monospace;
   margin-left: 36pt;
@@ -51,6 +62,7 @@ SUB, SUP {
 
 DIV.table TABLE {
   border: solid thin #999999;
+  border-collapse: collapse;
   border-spacing: 0;
   margin-left: auto;
   margin-right: auto;
@@ -140,4 +152,22 @@ P.summary {
 SPAN.message {
   font-style: italic;
   font-size: smaller;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
 }
