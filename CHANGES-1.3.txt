@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Printing a test page from the web interface incorrectly
+	  defaulted to the "guest" user (STR #2688)
 	- The cupsEncodeOptions2() function did not parse multiple-
 	  value attribute values properly (STR #2690)
 	- The scheduler incorrectly sent printer-stopped events for

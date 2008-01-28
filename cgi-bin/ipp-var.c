@@ -525,8 +525,7 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
   * See who is logged in...
   */
 
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
+  user = getenv("REMOTE_USER");
 
  /*
   * Locate the test page file...
@@ -564,8 +563,9 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-               "requesting-user-name", NULL, user);
+  if (user)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		 "requesting-user-name", NULL, user);
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
                NULL, "Test Page");
