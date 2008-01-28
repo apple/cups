@@ -1613,8 +1613,6 @@ _cupsAdminSetServerSettings(
 	if (remote_admin)
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
-	else
-	  cupsFilePuts(temp, "  Allow localhost\n");
       }
       else if (in_conf_location && remote_admin >= 0)
       {
@@ -1632,8 +1630,6 @@ _cupsAdminSetServerSettings(
 	if (remote_admin)
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
-	else
-	  cupsFilePuts(temp, "  Allow localhost\n");
       }
       else if (in_root_location && (remote_admin >= 0 || share_printers >= 0))
       {
@@ -1654,8 +1650,6 @@ _cupsAdminSetServerSettings(
 	if (remote_admin > 0 || share_printers > 0)
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
-	else
-	  cupsFilePuts(temp, "  Allow localhost\n");
       }
 
       in_admin_location = 0;
@@ -1876,8 +1870,6 @@ _cupsAdminSetServerSettings(
 
     if (remote_admin > 0 || share_printers > 0)
       cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
-    else
-      cupsFilePuts(temp, "  Allow localhost\n");
 
     cupsFilePuts(temp, "</Location>\n");
   }
@@ -1894,8 +1886,6 @@ _cupsAdminSetServerSettings(
 
     if (remote_admin)
       cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
-    else
-      cupsFilePuts(temp, "  Allow localhost\n");
 
     cupsFilePuts(temp, "</Location>\n");
   }
@@ -1915,8 +1905,6 @@ _cupsAdminSetServerSettings(
 
     if (remote_admin)
       cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
-    else
-      cupsFilePuts(temp, "  Allow localhost\n");
 
     cupsFilePuts(temp, "</Location>\n");
   }
