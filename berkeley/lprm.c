@@ -37,19 +37,13 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
-  http_t	*http;		/* HTTP connection to server */
   int		i;		/* Looping var */
   int		job_id;		/* Job ID */
-  const char	*dest;		/* Destination printer */
+  const char	*name;		/* Destination printer */
   char		*instance;	/* Pointer to instance name */
-  char		uri[1024];	/* Printer or job URI */
-  ipp_t		*request;	/* IPP request */
-  ipp_t		*response;	/* IPP response */
-  ipp_op_t	op;		/* Operation */
-  int		num_dests;	/* Number of destinations */
-  cups_dest_t	*dests,		/* Destinations */
+  cups_dest_t	*dest,		/* Destination */
 		*defdest;	/* Default destination */
-  http_encryption_t encryption;	/* Encryption? */
+  int		did_cancel;	/* Did we cancel something? */
 
 
   _cupsSetLocale(argv);
@@ -58,26 +52,9 @@ main(int  argc,			/* I - Number of command-line arguments */
   * Setup to cancel individual print jobs...
   */
 
-  op         = IPP_CANCEL_JOB;
-  job_id     = 0;
-  dest       = NULL;
-  response   = NULL;
-  http       = NULL;
-  encryption = cupsEncryption();
-
- /*
-  * Open a connection to the server...
-  */
-
-  if ((http = httpConnectEncrypt(cupsServer(), ippPort(), encryption)) == NULL)
-  {
-    _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
-    return (1);
-  }
-
-  num_dests  = cupsGetDests2(http, &dests);
-  defdest    = cupsGetDest(NULL, NULL, num_dests, dests);
-  dest       = defdest ? defdest->name : NULL;
+  did_cancel = 0;
+  defdest    = cupsGetNamedDest(CUPS_HTTP_DEFAULT, NULL, NULL);
+  name       = defdest ? defdest->name : NULL;
 
  /*
   * Process command-line arguments...
@@ -89,10 +66,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	    encryption = HTTP_ENCRYPT_REQUIRED;
-
-	    httpEncryption(http, encryption);
-	    cupsSetEncryption(encryption);
+	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
@@ -102,25 +76,26 @@ main(int  argc,			/* I - Number of command-line arguments */
 
         case 'P' : /* Cancel jobs on a printer */
 	    if (argv[i][2])
-	      dest = argv[i] + 2;
+	      name = argv[i] + 2;
 	    else
 	    {
 	      i ++;
-	      dest = argv[i];
+	      name = argv[i];
 	    }
 
-	    if ((instance = strchr(dest, '/')) != NULL)
+	    if ((instance = strchr(name, '/')) != NULL)
 	      *instance = '\0';
 
-	    if (cupsGetDest(dest, NULL, num_dests, dests) == NULL)
+	    if ((dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, name,
+	                                 NULL)) == NULL)
 	    {
 	      _cupsLangPrintf(stderr,
 	                      _("%s: Error - unknown destination \"%s\"!\n"),
-			      argv[0], dest);
-              cupsFreeDests(num_dests, dests);
-	      httpClose(http);
-	      return(1);
+			      argv[0], name);
+              goto error;
 	    }
+
+	    cupsFreeDests(1, dest);
 	    break;
 
         case 'U' : /* Username */
@@ -135,7 +110,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		                _("%s: Error - expected username after "
 				  "\'-U\' option!\n"),
 		        	argv[0]);
-	        return (1);
+	        goto error;
 	      }
 
               cupsSetUser(argv[i]);
@@ -155,34 +130,24 @@ main(int  argc,			/* I - Number of command-line arguments */
 		        	_("%s: Error - expected hostname after "
 			          "\'-h\' option!\n"),
 				argv[0]);
-		return (1);
+		goto error;
               }
 	      else
                 cupsSetServer(argv[i]);
 	    }
 
-            httpClose(http);
-            cupsFreeDests(num_dests, dests);
+            if (defdest)
+	      cupsFreeDests(1, defdest);
 
-	    if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                   encryption)) == NULL)
-	    {
-	      _cupsLangPuts(stderr, _("lprm: Unable to contact server!\n"));
-	      return (1);
-	    }
-
-	    num_dests  = cupsGetDests2(http, &dests);
-	    defdest    = cupsGetDest(NULL, NULL, num_dests, dests);
-	    dest       = defdest ? defdest->name : NULL;
+	    defdest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, NULL, NULL);
+	    name    = defdest ? defdest->name : NULL;
 	    break;
 
 	default :
 	    _cupsLangPrintf(stderr,
 	                    _("%s: Error - unknown option \'%c\'!\n"),
 			    argv[0], argv[i][1]);
-            cupsFreeDests(num_dests, dests);
-	    httpClose(http);
-	    return (1);
+            goto error;
       }
     else
     {
@@ -190,11 +155,17 @@ main(int  argc,			/* I - Number of command-line arguments */
       * Cancel a job or printer...
       */
 
-      if (isdigit(argv[i][0] & 255) &&
-          cupsGetDest(argv[i], NULL, num_dests, dests) == NULL)
+      if ((dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, argv[i], NULL)) != NULL)
+        cupsFreeDests(1, dest);
+
+      if (dest)
       {
-        dest   = NULL;
-	op     = IPP_CANCEL_JOB;
+        name   = argv[i];
+        job_id = 0;
+      }
+      else if (isdigit(argv[i][0] & 255))
+      {
+        name   = NULL;
         job_id = atoi(argv[i]);
       }
       else if (!strcmp(argv[i], "-"))
@@ -203,64 +174,23 @@ main(int  argc,			/* I - Number of command-line arguments */
         * Cancel all jobs
         */
 
-        op = IPP_PURGE_JOBS;
+        job_id = -1;
       }
       else
       {
-        dest   = argv[i];
-        job_id = 0;
+	_cupsLangPrintf(stderr,
+			_("%s: Error - unknown destination \"%s\"!\n"),
+			argv[0], argv[i]);
+	goto error;
       }
 
-     /*
-      * Build an IPP request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri + job-id *or* job-uri
-      *    [requesting-user-name]
-      */
-
-      request = ippNewRequest(op);
-
-      if (dest)
-      {
-        httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-	                 "localhost", 0, "/printers/%s", dest);
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
-	             "printer-uri", NULL, uri);
-	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
-	              job_id);
-      }
-      else
-      {
-        sprintf(uri, "ipp://localhost/jobs/%d", job_id);
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
-	             uri);
-      }
-
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                   "requesting-user-name", NULL, cupsUser());
-
-     /*
-      * Do the request and get back a response...
-      */
-
-      if (op == IPP_PURGE_JOBS)
-        response = cupsDoRequest(http, request, "/admin/");
-      else
-        response = cupsDoRequest(http, request, "/jobs/");
-
-      ippDelete(response);
-
-      if (cupsLastError() > IPP_OK_CONFLICT)
+      if (cupsCancelJob2(CUPS_HTTP_DEFAULT, name, job_id, 0) != IPP_OK)
       {
         _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
-
-        cupsFreeDests(num_dests, dests);
-        httpClose(http);
-	return (1);
+	goto error;
       }
+
+      did_cancel = 1;
     }
 
  /*
@@ -268,19 +198,27 @@ main(int  argc,			/* I - Number of command-line arguments */
   * (or default) printer...
   */
 
-  if (response == NULL)
-    if (!cupsCancelJob(dest, 0))
+  if (!did_cancel && cupsCancelJob2(CUPS_HTTP_DEFAULT, name, 0, 0) != IPP_OK)
     {
       _cupsLangPrintf(stderr, "%s: %s\n", argv[0], cupsLastErrorString());
-      cupsFreeDests(num_dests, dests);
-      httpClose(http);
-      return (1);
+      goto error;
     }
 
-  cupsFreeDests(num_dests, dests);
-  httpClose(http);
+  if (defdest)
+    cupsFreeDests(1, defdest);
 
   return (0);
+
+ /*
+  * If we get here there was an error, so clean up...
+  */
+
+  error:
+
+  if (defdest)
+    cupsFreeDests(1, defdest);
+
+  return (1);
 }
 
 

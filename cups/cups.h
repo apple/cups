@@ -257,7 +257,8 @@ extern void		cupsSetDefaultDest(const char *name,
 					   cups_dest_t *dests) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
-extern ipp_status_t	cupsCancelJob2(http_t *http, int job_id, int purge);
+extern ipp_status_t	cupsCancelJob2(http_t *http, const char *name,
+			               int job_id, int purge) _CUPS_API_1_4;
 extern int		cupsCreateJob(http_t *http, const char *name,
 				      const char *title, int num_options,
 				      cups_option_t *options) _CUPS_API_1_4;

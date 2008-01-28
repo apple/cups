@@ -151,7 +151,13 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 void
 cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
 {
-  _cupsGlobals()->encryption = e;
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  cg->encryption = e;
+
+  if (cg->http)
+    httpEncryption(cg->http, e);
 }
 
 
@@ -318,6 +324,12 @@ cupsSetServer(const char *server)	/* I - Server name */
   {
     cg->server[0]     = '\0';
     cg->servername[0] = '\0';
+  }
+
+  if (cg->http)
+  {
+    httpClose(cg->http);
+    cg->http = NULL;
   }
 }
 

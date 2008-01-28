@@ -84,15 +84,15 @@ static int	cups_get_printer_uri(http_t *http, const char *name,
 /*
  * 'cupsCancelJob()' - Cancel a print job on the default server.
  *
- * Use the cupsLastError() and cupsLastErrorString() functions to get
+ * Use the *link cupsLastError* and *link cupsLastErrorString* functions to get
  * the cause of any failure.
  */
 
 int					/* O - 1 on success, 0 on failure */
 cupsCancelJob(const char *name,		/* I - Name of printer or class */
-              int        job_id)	/* I - Job ID */
+              int        job_id)	/* I - Job ID or 0 for the current job, -1 for all jobs */
 {
-  return (cupsCancelJob2(CUPS_HTTP_DEFAULT, job_id, 0)
+  return (cupsCancelJob2(CUPS_HTTP_DEFAULT, name, job_id, 0)
               < IPP_REDIRECTION_OTHER_SITE);
 }
 
@@ -103,18 +103,19 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
  * Canceled jobs remain in the job history while purged jobs are removed
  * from the job history.
  *
- * Use the cupsLastError() and cupsLastErrorString() functions to get
+ * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
  *
  * @since CUPS 1.4@
  */
 
 ipp_status_t				/* O - IPP status */
-cupsCancelJob2(http_t *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
-               int    job_id,		/* I - Job ID */
-	       int    purge)		/* I - 1 to purge, 0 to cancel */
+cupsCancelJob2(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
+               const char *name,	/* I - Name of printer or class */
+               int        job_id,	/* I - Job ID or 0 for the current job, -1 for all jobs */
+	       int        purge)	/* I - 1 to purge, 0 to cancel */
 {
-  char		uri[HTTP_MAX_URI];	/* Job URI */
+  char		uri[HTTP_MAX_URI];	/* Job/printer URI */
   ipp_t		*request;		/* IPP request */
 
 
@@ -122,7 +123,7 @@ cupsCancelJob2(http_t *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
   * Range check input...
   */
 
-  if (job_id <= 0)
+  if (job_id < -1 || (!name && job_id == 0))
   {
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
     return (0);
@@ -137,25 +138,42 @@ cupsCancelJob2(http_t *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
       return (IPP_SERVICE_UNAVAILABLE);
 
  /*
-  * Build an IPP_CANCEL_JOB request, which requires the following
+  * Build an IPP_CANCEL_JOB or IPP_PURGE_JOBS request, which requires the following
   * attributes:
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    job-uri
+  *    job-uri or printer-uri + job-id
   *    requesting-user-name
-  *    [purge-job]
+  *    [purge-job] or [purge-jobs]
   */
 
-  request = ippNewRequest(IPP_CANCEL_JOB);
+  request = ippNewRequest(job_id < 0 ? IPP_PURGE_JOBS : IPP_CANCEL_JOB);
 
-  snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+  if (name)
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", ippPort(), "/printers/%s", name);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+                 uri);
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
+                  job_id);
+  }
+  else if (job_id > 0)
+  {
+    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL, uri);
+  }
+
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, cupsUser());
-  if (purge)
+
+  if (purge && job_id >= 0)
     ippAddBoolean(request, IPP_TAG_OPERATION, "purge-job", 1);
+  else if (!purge && job_id < 0)
+    ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", 0);
 
  /*
   * Do the request...
@@ -1378,7 +1396,7 @@ cupsPrintFiles2(
       * Unable to open print file, cancel the job and return...
       */
 
-      cupsCancelJob2(http, job_id, 0);
+      cupsCancelJob2(http, name, job_id, 0);
       return (0);
     }
 
@@ -1397,7 +1415,7 @@ cupsPrintFiles2(
       * Unable to queue, cancel the job and return...
       */
 
-      cupsCancelJob2(http, job_id, 0);
+      cupsCancelJob2(http, name, job_id, 0);
       return (0);
     }
   }
