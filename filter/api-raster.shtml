@@ -3,7 +3,7 @@
 
   Raster API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007 by Apple Inc.
+  Copyright 2007-2008 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'>Introduction</h2>
+<h2 class='title'><a name="INTRODUCTION">Introduction</a></h2>
 
 <p>The CUPS raster API provides a standard interface for reading
 and writing CUPS raster streams which are used for printing to

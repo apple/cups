@@ -13,27 +13,6 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<div class='summary'><table summary='General Information'>
-<thead>
-<tr>
-	<th>Header</th>
-	<th>cups/cups.h</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<th>Library</th>
-	<td>-lcups</td>
-</tr>
-<tr>
-	<th>See Also</th>
-	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-cups.html'>CUPS API</a><br>
-	References: <a href='spec-ipp.html'>CUPS Implementation of IPP</a></td>
-</tr>
-</tbody>
-</table></div>
-
 <h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
 <p>The CUPS HTTP and IPP APIs provide low-level access to the HTTP and IPP
@@ -170,7 +149,7 @@ if (response != NULL)
 }
 </pre>
 
-<h3>Creating URI Strings</h3>
+<h3><a name='CREATING_URI_STRINGS'>Creating URI Strings</a></h3>
 
 <p>To ensure proper encoding, the
 <a href='#httpAssembleURIf'><code>httpAssembleURIf</code></a> function must be
@@ -186,7 +165,7 @@ char uri[1024];
 <a href='#ippAddString'>ippAddString</a>(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL, uri);
 </pre>
 
-<h3>Sending Requests with Files</h3>
+<h3><a name='SENDING_REQUESTS_WITH_FILES'>Sending Requests with Files</a></h3>
 
 <p>The <a href='#cupsDoFileRequest'><code>cupsDoFileRequest</code></a> and
 <a href='#cupsDoIORequest'><code>cupsDoIORequest</code></a> functions are
@@ -245,7 +224,7 @@ that no file is to be attached to the request. The PPD file attached to the
 response is written to the temporary file descriptor we created using the
 <code>cupsTempFd</code> function.</p>
 
-<h3>Asynchronous Request Processing</h3>
+<h3><a name='ASYNCHRONOUS_REQUEST_PROCESSING'>Asynchronous Request Processing</a></h3>
 
 <p>The <a href='#cupsSendRequest'><code>cupsSendRequest</code></a> and
 <a href='#cupsGetResponse'><code>cupsGetResponse</code></a> support

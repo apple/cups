@@ -1,0 +1,38 @@
+<!--
+  "$Id$"
+
+  CUPS API header for the Common UNIX Printing System (CUPS).
+
+  Copyright 2007-2008 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class="title">CUPS API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/cups.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcups</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-httpipp.html'>HTTP and IPP APIs</a><br>
+	Programming: <a href='api-ppd.html'>PPD API</a><br>
+	Programming: <a href='api-raster.html'>Raster API</a></td>
+</tr>
+</tbody>
+</table></div>

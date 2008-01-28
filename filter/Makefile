@@ -168,7 +168,8 @@ uninstall64bit:
 apihelp:
 	echo Generating CUPS API help files...
 	mxmldoc --section "Programming" --title "Raster API" \
-		--intro api-raster.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-raster.header --intro api-raster.shtml \
 		raster.h interpret.c raster.c >../doc/help/api-raster.html
 
 

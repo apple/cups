@@ -13,28 +13,6 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<div class='summary'><table summary='General Information'>
-<thead>
-<tr>
-	<th>Header</th>
-	<th>cups/cups.h</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<th>Library</th>
-	<td>-lcups</td>
-</tr>
-<tr>
-	<th>See Also</th>
-	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
-	Programming: <a href='api-httpipp.html'>HTTP and IPP APIs</a><br>
-	Programming: <a href='api-ppd.html'>PPD API</a><br>
-	Programming: <a href='api-raster.html'>Raster API</a></td>
-</tr>
-</tbody>
-</table></div>
-
 <h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
 <p>The CUPS API provides the convenience functions needed to support

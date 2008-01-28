@@ -2,19 +2,237 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-	<title>PPD API</title>
-	<meta name='keywords' content='Programming'>
-	<meta name='creator' content='Mini-XML v2.4'>
-	<style type='text/css'><!--
-	h1, h2, h3, p { font-family: sans-serif; text-align: justify; }
-	tt, pre a:link, pre a:visited, tt a:link, tt a:visited { font-weight: bold; color: #7f0000; }
-	pre { font-weight: bold; color: #7f0000; margin-left: 2em; }
-	span.info { background: #000000; border: solid thin #000000; color: #ffffff; font-size: 80%; font-style: italic; font-weight: bold; white-space: nowrap; }
-	h3 span.info { float: right; font-size: 100%; }
-	h1.title, h2.title, h3.title { border-bottom: solid 2px #000000; }
-	--></style>
+<title>PPD API</title>
+<meta name="keywords" content="Programming">
+<meta name="creator" content="Mini-XML v2.5">
+<style type="text/css"><!--
+BODY {
+  font-family: sans-serif;
+}
+
+H1, H2, H3, H4, H5, H6, P, TD, TH {
+  font-family: sans-serif;
+}
+
+KBD {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+PRE {
+  font-family: monospace;
+}
+
+PRE.command {
+  margin-left: 36pt;
+}
+
+PRE.example {
+  background: #eeeeee;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+PRE.command EM, PRE.example EM {
+  font-family: sans-serif;
+}
+
+P.command {
+  font-family: monospace;
+  margin-left: 36pt;
+}
+
+P.formula {
+  font-style: italic;
+  margin-left: 36pt;
+}
+
+BLOCKQUOTE {
+  background: #cccccc;
+  border: solid thin #999999;
+  padding: 10pt;
+}
+
+A:link, A:visited {
+  text-decoration: none;
+  font-weight: bold;
+}
+
+A:link:hover, A:visited:hover, A:active {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+SUB, SUP {
+  font-size: 50%;
+}
+
+DIV.table TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table CAPTION {
+  caption-side: top;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.table TABLE TD {
+  border: solid thin #cccccc;
+  padding-top: 5pt;
+}
+
+DIV.table TABLE TH {
+  background: #cccccc;
+  border: none;
+  border-bottom: solid thin #999999;
+}
+
+DIV.figure TABLE {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+DIV.figure CAPTION {
+  caption-side: bottom;
+  font-size: 120%;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH.label {
+  padding-top: 5pt;
+  text-align: right;
+  vertical-align: top;
+}
+
+HR {
+  border: solid thin;
+}
+
+SPAN.info {
+  background: #000000;
+  border: thin solid #000000;
+  color: #ffffff;
+  font-size: 80%;
+  font-style: italic;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
+  float: right;
+  font-size: 100%;
+}
+
+H2.title, H3.title {
+  border-bottom: solid 2pt #000000;
+}
+
+DT {
+  margin-left: 36pt;
+  margin-top: 12pt;
+}
+
+DD {
+  margin-left: 54pt;
+}
+
+DL.category DT {
+  font-weight: bold;
+}
+
+P.summary {
+  margin-left: 36pt;
+  font-family: monospace;
+}
+
+SPAN.message {
+  font-style: italic;
+  font-size: smaller;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  border: solid thin #999999;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
+}
+--></style>
 </head>
 <body>
+<div class='body'>
 <!--
   "$Id: api-ppd.shtml 6649 2007-07-11 21:46:42Z mike $"
 
@@ -58,1755 +276,1381 @@ library:</p>
 
 <p>Unless otherwise specified, the PPD API functions require CUPS
 1.1 or higher.</p>
-<h2 class='title'>Contents</h2>
-<ul>
-	<li><a href='#ENUMERATIONS'>Enumerations</a></li>
-	<li><a href='#FUNCTIONS'>Functions</a></li>
-	<li><a href='#STRUCTURES'>Structures</a></li>
-	<li><a href='#TYPES'>Types</a></li>
-	<li><a href='#UNIONS'>Unions</a></li>
+<h2 class="title">Contents</h2>
+<ul class="contents">
+</li>
+<li><a href="#FUNCTIONS">Functions</a><ul class="code">
+<li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
+<li><a href="#ppdCollect" title="Collect all marked options that reside in the specified
+section.">ppdCollect</a></li>
+<li><a href="#ppdCollect2" title="Collect all marked options that reside in the
+specified section and minimum order.">ppdCollect2</a></li>
+<li><a href="#ppdConflicts" title="Check to see if there are any conflicts.">ppdConflicts</a></li>
+<li><a href="#ppdEmit" title="Emit code for marked options to a file.">ppdEmit</a></li>
+<li><a href="#ppdEmitAfterOrder" title="Emit a subset of the code for marked options to a file.">ppdEmitAfterOrder</a></li>
+<li><a href="#ppdEmitFd" title="Emit code for marked options to a file.">ppdEmitFd</a></li>
+<li><a href="#ppdEmitJCL" title="Emit code for JCL options to a file.">ppdEmitJCL</a></li>
+<li><a href="#ppdEmitJCLEnd" title="Emit JCLEnd code to a file.">ppdEmitJCLEnd</a></li>
+<li><a href="#ppdEmitString" title="Get a string containing the code for marked options.">ppdEmitString</a></li>
+<li><a href="#ppdErrorString" title="Returns the text assocated with a status.">ppdErrorString</a></li>
+<li><a href="#ppdFindAttr" title="Find the first matching attribute...">ppdFindAttr</a></li>
+<li><a href="#ppdFindChoice" title="Return a pointer to an option choice.">ppdFindChoice</a></li>
+<li><a href="#ppdFindCustomOption" title="Find a custom option.">ppdFindCustomOption</a></li>
+<li><a href="#ppdFindCustomParam" title="Find a parameter for a custom option.">ppdFindCustomParam</a></li>
+<li><a href="#ppdFindMarkedChoice" title="Return the marked choice for the specified option.">ppdFindMarkedChoice</a></li>
+<li><a href="#ppdFindNextAttr" title="Find the next matching attribute...">ppdFindNextAttr</a></li>
+<li><a href="#ppdFindOption" title="Return a pointer to the specified option.">ppdFindOption</a></li>
+<li><a href="#ppdFirstCustomParam" title="Return the first parameter for a custom option.">ppdFirstCustomParam</a></li>
+<li><a href="#ppdFirstOption" title="Return the first option in the PPD file.">ppdFirstOption</a></li>
+<li><a href="#ppdIsMarked" title="Check to see if an option is marked...">ppdIsMarked</a></li>
+<li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
+<li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
+<li><a href="#ppdLocalizeIPPReason" title="Get the localized version of a cupsIPPReason
+attribute.">ppdLocalizeIPPReason</a></li>
+<li><a href="#ppdMarkDefaults" title="Mark all default options in the PPD file.">ppdMarkDefaults</a></li>
+<li><a href="#ppdMarkOption" title="Mark an option in a PPD file.">ppdMarkOption</a></li>
+<li><a href="#ppdNextCustomParam" title="Return the next parameter for a custom option.">ppdNextCustomParam</a></li>
+<li><a href="#ppdNextOption" title="Return the next option in the PPD file.">ppdNextOption</a></li>
+<li><a href="#ppdOpen" title="Read a PPD file into memory.">ppdOpen</a></li>
+<li><a href="#ppdOpen2" title="Read a PPD file into memory.">ppdOpen2</a></li>
+<li><a href="#ppdOpenFd" title="Read a PPD file into memory.">ppdOpenFd</a></li>
+<li><a href="#ppdOpenFile" title="Read a PPD file into memory.">ppdOpenFile</a></li>
+<li><a href="#ppdPageLength" title="Get the page length for the given size.">ppdPageLength</a></li>
+<li><a href="#ppdPageSize" title="Get the page size record for the given size.">ppdPageSize</a></li>
+<li><a href="#ppdPageWidth" title="Get the page width for the given size.">ppdPageWidth</a></li>
+<li><a href="#ppdSetConformance" title="Set the conformance level for PPD files.">ppdSetConformance</a></li>
 </ul>
-<!-- NEW PAGE -->
-<h2 class='title'><a name='ENUMERATIONS'>Enumerations</a></h2>
-<ul>
-	<li><a href='#ppd_conform_e'><tt>ppd_conform_e</tt></a> </li>
-	<li><a href='#ppd_cptype_e'><tt>ppd_cptype_e</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cs_e'><tt>ppd_cs_e</tt></a> </li>
-	<li><a href='#ppd_section_e'><tt>ppd_section_e</tt></a> </li>
-	<li><a href='#ppd_status_e'><tt>ppd_status_e</tt></a> </li>
-	<li><a href='#ppd_ui_e'><tt>ppd_ui_e</tt></a> </li>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#ppd_attr_t" title="PPD Attribute Structure ">ppd_attr_t</a></li>
+	<li><a href="#ppd_choice_t" title="Option choices">ppd_choice_t</a></li>
+	<li><a href="#ppd_const_t" title="Constraints">ppd_const_t</a></li>
+	<li><a href="#ppd_coption_t" title="Custom Option ">ppd_coption_t</a></li>
+	<li><a href="#ppd_cparam_t" title="Custom Parameter ">ppd_cparam_t</a></li>
+	<li><a href="#ppd_cplimit_t" title="Custom Parameter Limit ">ppd_cplimit_t</a></li>
+	<li><a href="#ppd_cptype_t" title="Custom Parameter Type ">ppd_cptype_t</a></li>
+	<li><a href="#ppd_cpvalue_t" title="Custom Parameter Value ">ppd_cpvalue_t</a></li>
+	<li><a href="#ppd_emul_t" title="Emulators">ppd_emul_t</a></li>
+	<li><a href="#ppd_file_t" title="PPD File">ppd_file_t</a></li>
+	<li><a href="#ppd_group_t" title="Groups">ppd_group_t</a></li>
+	<li><a href="#ppd_option_t" title="Options">ppd_option_t</a></li>
+	<li><a href="#ppd_profile_t" title="sRGB Color Profiles">ppd_profile_t</a></li>
+	<li><a href="#ppd_section_t" title="Order dependency sections">ppd_section_t</a></li>
+	<li><a href="#ppd_size_t" title="Page Sizes">ppd_size_t</a></li>
+	<li><a href="#ppd_ui_t" title="UI Types">ppd_ui_t</a></li>
+</ul></li>
+<li><a href="#STRUCTURES">Structures</a><ul class="code">
+	<li><a href="#ppd_attr_s" title="PPD Attribute Structure ">ppd_attr_s</a></li>
+	<li><a href="#ppd_choice_s" title="Option choices">ppd_choice_s</a></li>
+	<li><a href="#ppd_coption_s" title="Custom Option ">ppd_coption_s</a></li>
+	<li><a href="#ppd_cparam_s" title="Custom Parameter ">ppd_cparam_s</a></li>
+	<li><a href="#ppd_emul_s" title="Emulators">ppd_emul_s</a></li>
+	<li><a href="#ppd_file_s" title="PPD File">ppd_file_s</a></li>
+	<li><a href="#ppd_group_s" title="Groups">ppd_group_s</a></li>
+	<li><a href="#ppd_option_s" title="Options">ppd_option_s</a></li>
+	<li><a href="#ppd_profile_s" title="sRGB Color Profiles">ppd_profile_s</a></li>
+	<li><a href="#ppd_size_s" title="Page Sizes">ppd_size_s</a></li>
+</ul></li>
+<li><a href="#UNIONS">Unions</a><ul class="code">
+	<li><a href="#ppd_cplimit_u" title="Custom Parameter Limit ">ppd_cplimit_u</a></li>
+	<li><a href="#ppd_cpvalue_u" title="Custom Parameter Value ">ppd_cpvalue_u</a></li>
+</ul></li>
+<li><a href="#ENUMERATIONS">Constants</a><ul class="code">
+	<li><a href="#ppd_conform_e" title="">ppd_conform_e</a></li>
+	<li><a href="#ppd_cptype_e" title="Custom Parameter Type ">ppd_cptype_e</a></li>
+	<li><a href="#ppd_cs_e" title="Colorspaces">ppd_cs_e</a></li>
+	<li><a href="#ppd_section_e" title="Order dependency sections">ppd_section_e</a></li>
+	<li><a href="#ppd_status_e" title="Types and structures...">ppd_status_e</a></li>
+	<li><a href="#ppd_ui_e" title="UI Types">ppd_ui_e</a></li>
+</ul></li>
 </ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_conform_e'>ppd_conform_e</a></h3>
-<h4>Description</h4>
-<p>
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_CONFORM_RELAXED</tt> </td><td>Relax whitespace and control char
-</td></tr>
-<tr><td><tt>PPD_CONFORM_STRICT</tt> </td><td>Require strict conformance
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cptype_e'>ppd_cptype_e</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Type 
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_CUSTOM_CURVE</tt> </td><td>Curve value for f(x) = x^value
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_INT</tt> </td><td>Integer number value
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_INVCURVE</tt> </td><td>Curve value for f(x) = x^(1/value)
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_PASSCODE</tt> </td><td>String of (hidden) numbers
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_PASSWORD</tt> </td><td>String of (hidden) characters
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_POINTS</tt> </td><td>Measurement value in points
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_REAL</tt> </td><td>Real number value
-</td></tr>
-<tr><td><tt>PPD_CUSTOM_STRING</tt> </td><td>String of characters
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_cs_e'>ppd_cs_e</a></h3>
-<h4>Description</h4>
-<p>Colorspaces
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_CS_CMY</tt> </td><td>CMY colorspace
-</td></tr>
-<tr><td><tt>PPD_CS_CMYK</tt> </td><td>CMYK colorspace
-</td></tr>
-<tr><td><tt>PPD_CS_GRAY</tt> </td><td>Grayscale colorspace
-</td></tr>
-<tr><td><tt>PPD_CS_N</tt> </td><td>DeviceN colorspace
-</td></tr>
-<tr><td><tt>PPD_CS_RGB</tt> </td><td>RGB colorspace
-</td></tr>
-<tr><td><tt>PPD_CS_RGBK</tt> </td><td>RGBK (K = gray) colorspace
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_section_e'>ppd_section_e</a></h3>
-<h4>Description</h4>
-<p>Order dependency sections
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_ORDER_ANY</tt> </td><td>Option code can be anywhere in the file
-</td></tr>
-<tr><td><tt>PPD_ORDER_DOCUMENT</tt> </td><td>... must be in the DocumentSetup section
-</td></tr>
-<tr><td><tt>PPD_ORDER_EXIT</tt> </td><td>... must be sent prior to the document
-</td></tr>
-<tr><td><tt>PPD_ORDER_JCL</tt> </td><td>... must be sent as a JCL command
-</td></tr>
-<tr><td><tt>PPD_ORDER_PAGE</tt> </td><td>... must be in the PageSetup section
-</td></tr>
-<tr><td><tt>PPD_ORDER_PROLOG</tt> </td><td>... must be in the Prolog section
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_status_e'>ppd_status_e</a></h3>
-<h4>Description</h4>
-<p>Types and structures...
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_ALLOC_ERROR</tt> </td><td>Memory allocation error
-</td></tr>
-<tr><td><tt>PPD_BAD_CUSTOM_PARAM</tt> </td><td>Bad custom parameter
-</td></tr>
-<tr><td><tt>PPD_BAD_OPEN_GROUP</tt> </td><td>Bad OpenGroup
-</td></tr>
-<tr><td><tt>PPD_BAD_OPEN_UI</tt> </td><td>Bad OpenUI/JCLOpenUI
-</td></tr>
-<tr><td><tt>PPD_BAD_ORDER_DEPENDENCY</tt> </td><td>Bad OrderDependency
-</td></tr>
-<tr><td><tt>PPD_BAD_UI_CONSTRAINTS</tt> </td><td>Bad UIConstraints
-</td></tr>
-<tr><td><tt>PPD_FILE_OPEN_ERROR</tt> </td><td>Unable to open PPD file
-</td></tr>
-<tr><td><tt>PPD_ILLEGAL_CHARACTER</tt> </td><td>Illegal control character
-</td></tr>
-<tr><td><tt>PPD_ILLEGAL_MAIN_KEYWORD</tt> </td><td>Illegal main keyword string
-</td></tr>
-<tr><td><tt>PPD_ILLEGAL_OPTION_KEYWORD</tt> </td><td>Illegal option keyword string
-</td></tr>
-<tr><td><tt>PPD_ILLEGAL_TRANSLATION</tt> </td><td>Illegal translation string
-</td></tr>
-<tr><td><tt>PPD_ILLEGAL_WHITESPACE</tt> </td><td>Illegal whitespace character
-</td></tr>
-<tr><td><tt>PPD_INTERNAL_ERROR</tt> </td><td>Internal error
-</td></tr>
-<tr><td><tt>PPD_LINE_TOO_LONG</tt> </td><td>Line longer than 255 chars
-</td></tr>
-<tr><td><tt>PPD_MISSING_ASTERISK</tt> </td><td>Missing asterisk in column 0
-</td></tr>
-<tr><td><tt>PPD_MISSING_PPDADOBE4</tt> </td><td>Missing PPD-Adobe-4.x header
-</td></tr>
-<tr><td><tt>PPD_MISSING_VALUE</tt> </td><td>Missing value string
-</td></tr>
-<tr><td><tt>PPD_NESTED_OPEN_GROUP</tt> </td><td>OpenGroup without a CloseGroup first
-</td></tr>
-<tr><td><tt>PPD_NESTED_OPEN_UI</tt> </td><td>OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first
-</td></tr>
-<tr><td><tt>PPD_NULL_FILE</tt> </td><td>NULL PPD file pointer
-</td></tr>
-<tr><td><tt>PPD_OK</tt> </td><td>OK
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_ui_e'>ppd_ui_e</a></h3>
-<h4>Description</h4>
-<p>UI Types
-<h4>Values</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Values'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_UI_BOOLEAN</tt> </td><td>True or False option
-</td></tr>
-<tr><td><tt>PPD_UI_PICKMANY</tt> </td><td>Pick zero or more from a list
-</td></tr>
-<tr><td><tt>PPD_UI_PICKONE</tt> </td><td>Pick one from a list
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h2 class='title'><a name='FUNCTIONS'>Functions</a></h2>
-<ul>
-	<li><a href='#ppdClose'><tt>ppdClose()</tt></a> </li>
-	<li><a href='#ppdCollect'><tt>ppdCollect()</tt></a> </li>
-	<li><a href='#ppdCollect2'><tt>ppdCollect2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdConflicts'><tt>ppdConflicts()</tt></a> </li>
-	<li><a href='#ppdEmit'><tt>ppdEmit()</tt></a> </li>
-	<li><a href='#ppdEmitAfterOrder'><tt>ppdEmitAfterOrder()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdEmitFd'><tt>ppdEmitFd()</tt></a> </li>
-	<li><a href='#ppdEmitJCL'><tt>ppdEmitJCL()</tt></a> </li>
-	<li><a href='#ppdEmitJCLEnd'><tt>ppdEmitJCLEnd()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdEmitString'><tt>ppdEmitString()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdErrorString'><tt>ppdErrorString()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppdFindAttr'><tt>ppdFindAttr()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppdFindChoice'><tt>ppdFindChoice()</tt></a> </li>
-	<li><a href='#ppdFindCustomOption'><tt>ppdFindCustomOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdFindCustomParam'><tt>ppdFindCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdFindMarkedChoice'><tt>ppdFindMarkedChoice()</tt></a> </li>
-	<li><a href='#ppdFindNextAttr'><tt>ppdFindNextAttr()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppdFindOption'><tt>ppdFindOption()</tt></a> </li>
-	<li><a href='#ppdFirstCustomParam'><tt>ppdFirstCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdFirstOption'><tt>ppdFirstOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdIsMarked'><tt>ppdIsMarked()</tt></a> </li>
-	<li><a href='#ppdLastError'><tt>ppdLastError()</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppdLocalize'><tt>ppdLocalize()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdLocalizeIPPReason'><tt>ppdLocalizeIPPReason()</tt></a> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></li>
-	<li><a href='#ppdMarkDefaults'><tt>ppdMarkDefaults()</tt></a> </li>
-	<li><a href='#ppdMarkOption'><tt>ppdMarkOption()</tt></a> </li>
-	<li><a href='#ppdNextCustomParam'><tt>ppdNextCustomParam()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdNextOption'><tt>ppdNextOption()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdOpen'><tt>ppdOpen()</tt></a> </li>
-	<li><a href='#ppdOpen2'><tt>ppdOpen2()</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppdOpenFd'><tt>ppdOpenFd()</tt></a> </li>
-	<li><a href='#ppdOpenFile'><tt>ppdOpenFile()</tt></a> </li>
-	<li><a href='#ppdPageLength'><tt>ppdPageLength()</tt></a> </li>
-	<li><a href='#ppdPageSize'><tt>ppdPageSize()</tt></a> </li>
-	<li><a href='#ppdPageWidth'><tt>ppdPageWidth()</tt></a> </li>
-	<li><a href='#ppdSetConformance'><tt>ppdSetConformance()</tt></a> <span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span></li>
-</ul>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdClose'>ppdClose()</a></h3>
-<h4>Description</h4>
-<p>Free all memory used by the PPD file.
-<h4>Syntax</h4>
-<p><tt>
-void<br>
-ppdClose(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdCollect'>ppdCollect()</a></h3>
-<h4>Description</h4>
-<p>Collect all marked options that reside in the specified
-section.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdCollect(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    <a href='#ppd_section_t'>ppd_section_t</a> section,
-    <a href='#ppd_choice_t'>ppd_choice_t</a> *** choices);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to collect
-</td></tr>
-<tr><td><tt>choices</tt></td><td>Pointers to choices
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of options marked</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdCollect2'>ppdCollect2()</a></h3>
-<h4>Description</h4>
-<p>Collect all marked options that reside in the
-specified section and minimum order.
+<!--
+  "$Id: api-ppd.shtml 6649 2007-07-11 21:46:42Z mike $"
 
+  PPD API introduction for the Common UNIX Printing System (CUPS).
 
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdCollect2(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    <a href='#ppd_section_t'>ppd_section_t</a> section,
-    float min_order,
-    <a href='#ppd_choice_t'>ppd_choice_t</a> *** choices);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to collect
-</td></tr>
-<tr><td><tt>min_order</tt></td><td>Minimum OrderDependency value
-</td></tr>
-<tr><td><tt>choices</tt></td><td>Pointers to choices
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of options marked</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdConflicts'>ppdConflicts()</a></h3>
-<h4>Description</h4>
-<p>Check to see if there are any conflicts.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdConflicts(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD to check
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of conflicts found</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdEmit'>ppdEmit()</a></h3>
-<h4>Description</h4>
-<p>Emit code for marked options to a file.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdEmit(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    FILE * fp,
-    <a href='#ppd_section_t'>ppd_section_t</a> section);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on failure</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdEmitAfterOrder'>ppdEmitAfterOrder()</a></h3>
-<h4>Description</h4>
-<p>Emit a subset of the code for marked options to a file.
-<p>When &quot;limit&quot; is non-zero, this function only emits options whose
-OrderDependency value is greater than or equal to &quot;min_order&quot;.
-<p>When &quot;limit&quot; is zero, this function is identical to ppdEmit().
+  Copyright 2007 by Apple Inc.
+  Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
 
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdEmitAfterOrder(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    FILE * fp,
-    <a href='#ppd_section_t'>ppd_section_t</a> section,
-    int limit,
-    float min_order);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write
-</td></tr>
-<tr><td><tt>limit</tt></td><td>Non-zero to use min_order
-</td></tr>
-<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on failure</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdEmitFd'>ppdEmitFd()</a></h3>
-<h4>Description</h4>
-<p>Emit code for marked options to a file.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdEmitFd(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    int fd,
-    <a href='#ppd_section_t'>ppd_section_t</a> section);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>fd</tt></td><td>File to write to
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on failure</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdEmitJCL'>ppdEmitJCL()</a></h3>
-<h4>Description</h4>
-<p>Emit code for JCL options to a file.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdEmitJCL(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    FILE * fp,
-    int job_id,
-    const char * user,
-    const char * title);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to
-</td></tr>
-<tr><td><tt>job_id</tt></td><td>Job ID
-</td></tr>
-<tr><td><tt>user</tt></td><td>Username
-</td></tr>
-<tr><td><tt>title</tt></td><td>Title
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on failure</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdEmitJCLEnd'>ppdEmitJCLEnd()</a></h3>
-<h4>Description</h4>
-<p>Emit JCLEnd code to a file.
+<h2 class='title'>Introduction</h2>
 
+<p>The CUPS PPD API provides read-only access the data in
+PostScript Printer Description ("PPD") files. With it you can
+display printer options to users, mark option choices and check
+for conflicting choices, and output marked choices in PostScript
+output.</p>
 
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdEmitJCLEnd(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    FILE * fp);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>fp</tt></td><td>File to write to
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on failure</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdEmitString'>ppdEmitString()</a></h3>
-<h4>Description</h4>
-<p>Get a string containing the code for marked options.
-<p>When &quot;min_order&quot; is greater than zero, this function only includes options
+<h2 class='title'>General Usage</h2>
+
+<p>The <var>&lt;cups/ppd.h&gt;</var> header file must be included
+to use the <tt>ppd</tt> functions.</p>
+
+<p>Programs using these functions must be linked to the CUPS
+library: <var>libcups.a</var>, <var>libcups.so.2</var>,
+<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
+<var>libcups2.lib</var> depending on the platform. The following
+command compiles <var>myprogram.c</var> using GCC and the CUPS
+library:</p>
+
+<pre class='command'>
+<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+</pre>
+
+<h2 class='title'>Compatibility</h2>
+
+<p>Unless otherwise specified, the PPD API functions require CUPS
+1.1 or higher.</p>
+<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="ppdClose">ppdClose</a></h3>
+<p class="description">Free all memory used by the PPD file.</p>
+<p class="code">
+void ppdClose (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+</dl>
+<h3 class="function"><a name="ppdCollect">ppdCollect</a></h3>
+<p class="description">Collect all marked options that reside in the specified
+section.</p>
+<p class="code">
+int ppdCollect (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_choice_t">ppd_choice_t</a> ***choices<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>section</dt>
+<dd class="description">Section to collect</dd>
+<dt>choices</dt>
+<dd class="description">Pointers to choices</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of options marked</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdCollect2">ppdCollect2</a></h3>
+<p class="description">Collect all marked options that reside in the
+specified section and minimum order.</p>
+<p class="code">
+int ppdCollect2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float min_order,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_choice_t">ppd_choice_t</a> ***choices<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>section</dt>
+<dd class="description">Section to collect</dd>
+<dt>min_order</dt>
+<dd class="description">Minimum OrderDependency value</dd>
+<dt>choices</dt>
+<dd class="description">Pointers to choices</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of options marked</p>
+<h3 class="function"><a name="ppdConflicts">ppdConflicts</a></h3>
+<p class="description">Check to see if there are any conflicts.</p>
+<p class="code">
+int ppdConflicts (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD to check</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of conflicts found</p>
+<h3 class="function"><a name="ppdEmit">ppdEmit</a></h3>
+<p class="description">Emit code for marked options to a file.</p>
+<p class="code">
+int ppdEmit (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>fp</dt>
+<dd class="description">File to write to</dd>
+<dt>section</dt>
+<dd class="description">Section to write</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitAfterOrder">ppdEmitAfterOrder</a></h3>
+<p class="description">Emit a subset of the code for marked options to a file.</p>
+<p class="code">
+int ppdEmitAfterOrder (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int limit,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float min_order<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>fp</dt>
+<dd class="description">File to write to</dd>
+<dt>section</dt>
+<dd class="description">Section to write</dd>
+<dt>limit</dt>
+<dd class="description">Non-zero to use min_order</dd>
+<dt>min_order</dt>
+<dd class="description">Lowest OrderDependency</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">When &quot;limit&quot; is non-zero, this function only emits options whose
+OrderDependency value is greater than or equal to &quot;min_order&quot;.<br>
+<br>
+When &quot;limit&quot; is zero, this function is identical to ppdEmit().
+
+</p>
+<h3 class="function"><a name="ppdEmitFd">ppdEmitFd</a></h3>
+<p class="description">Emit code for marked options to a file.</p>
+<p class="code">
+int ppdEmitFd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>fd</dt>
+<dd class="description">File to write to</dd>
+<dt>section</dt>
+<dd class="description">Section to write</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h3 class="function"><a name="ppdEmitJCL">ppdEmitJCL</a></h3>
+<p class="description">Emit code for JCL options to a file.</p>
+<p class="code">
+int ppdEmitJCL (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int job_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *user,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *title<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>fp</dt>
+<dd class="description">File to write to</dd>
+<dt>job_id</dt>
+<dd class="description">Job ID</dd>
+<dt>user</dt>
+<dd class="description">Username</dd>
+<dt>title</dt>
+<dd class="description">Title</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitJCLEnd">ppdEmitJCLEnd</a></h3>
+<p class="description">Emit JCLEnd code to a file.</p>
+<p class="code">
+int ppdEmitJCLEnd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>fp</dt>
+<dd class="description">File to write to</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on failure</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitString">ppdEmitString</a></h3>
+<p class="description">Get a string containing the code for marked options.</p>
+<p class="code">
+char *ppdEmitString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float min_order<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>section</dt>
+<dd class="description">Section to write</dd>
+<dt>min_order</dt>
+<dd class="description">Lowest OrderDependency</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">String containing option code</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">When &quot;min_order&quot; is greater than zero, this function only includes options
 whose OrderDependency value is greater than or equal to &quot;min_order&quot;.
 Otherwise, all options in the specified section are included in the
-returned string.
-<p>The return string is allocated on the heap and should be freed using
+returned string.<br>
+<br>
+The return string is allocated on the heap and should be freed using
 free() when you are done with it.
 
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdErrorString">ppdErrorString</a></h3>
+<p class="description">Returns the text assocated with a status.</p>
+<p class="code">
+const char *ppdErrorString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_status_t status<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>status</dt>
+<dd class="description">PPD status</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status string</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdFindAttr">ppdFindAttr</a></h3>
+<p class="description">Find the first matching attribute...</p>
+<p class="code">
+<a href="#ppd_attr_t">ppd_attr_t</a> *ppdFindAttr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *spec<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>name</dt>
+<dd class="description">Attribute name</dd>
+<dt>spec</dt>
+<dd class="description">Specifier string or NULL</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Attribute or NULL if not found</p>
+<h3 class="function"><a name="ppdFindChoice">ppdFindChoice</a></h3>
+<p class="description">Return a pointer to an option choice.</p>
+<p class="code">
+<a href="#ppd_choice_t">ppd_choice_t</a> *ppdFindChoice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_option_t">ppd_option_t</a> *o,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>o</dt>
+<dd class="description">Pointer to option</dd>
+<dt>choice</dt>
+<dd class="description">Name of choice</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Choice pointer or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFindCustomOption">ppdFindCustomOption</a></h3>
+<p class="description">Find a custom option.</p>
+<p class="code">
+<a href="#ppd_coption_t">ppd_coption_t</a> *ppdFindCustomOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *keyword<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>keyword</dt>
+<dd class="description">Custom option name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Custom option or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFindCustomParam">ppdFindCustomParam</a></h3>
+<p class="description">Find a parameter for a custom option.</p>
+<p class="code">
+<a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdFindCustomParam (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_coption_t">ppd_coption_t</a> *opt,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>opt</dt>
+<dd class="description">Custom option</dd>
+<dt>name</dt>
+<dd class="description">Parameter name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Custom parameter or NULL</p>
+<h3 class="function"><a name="ppdFindMarkedChoice">ppdFindMarkedChoice</a></h3>
+<p class="description">Return the marked choice for the specified option.</p>
+<p class="code">
+<a href="#ppd_choice_t">ppd_choice_t</a> *ppdFindMarkedChoice (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>option</dt>
+<dd class="description">Keyword/option name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Pointer to choice or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdFindNextAttr">ppdFindNextAttr</a></h3>
+<p class="description">Find the next matching attribute...</p>
+<p class="code">
+<a href="#ppd_attr_t">ppd_attr_t</a> *ppdFindNextAttr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *spec<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>name</dt>
+<dd class="description">Attribute name</dd>
+<dt>spec</dt>
+<dd class="description">Specifier string or NULL</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Attribute or NULL if not found</p>
+<h3 class="function"><a name="ppdFindOption">ppdFindOption</a></h3>
+<p class="description">Return a pointer to the specified option.</p>
+<p class="code">
+<a href="#ppd_option_t">ppd_option_t</a> *ppdFindOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>option</dt>
+<dd class="description">Option/Keyword name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Pointer to option or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFirstCustomParam">ppdFirstCustomParam</a></h3>
+<p class="description">Return the first parameter for a custom option.</p>
+<p class="code">
+<a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdFirstCustomParam (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_coption_t">ppd_coption_t</a> *opt<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>opt</dt>
+<dd class="description">Custom option</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Custom parameter or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFirstOption">ppdFirstOption</a></h3>
+<p class="description">Return the first option in the PPD file.</p>
+<p class="code">
+<a href="#ppd_option_t">ppd_option_t</a> *ppdFirstOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">First option or NULL</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Options are returned from all groups in sorted order.
 
-<h4>Syntax</h4>
-<p><tt>
-char *<br>
-ppdEmitString(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    <a href='#ppd_section_t'>ppd_section_t</a> section,
-    float min_order);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>section</tt></td><td>Section to write
-</td></tr>
-<tr><td><tt>min_order</tt></td><td>Lowest OrderDependency
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>String containing option code</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppdErrorString'>ppdErrorString()</a></h3>
-<h4>Description</h4>
-<p>Returns the text assocated with a status.
-
-
-<h4>Syntax</h4>
-<p><tt>
-const char *<br>
-ppdErrorString(
-    ppd_status_t status);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>status</tt></td><td>PPD status
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status string</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppdFindAttr'>ppdFindAttr()</a></h3>
-<h4>Description</h4>
-<p>Find the first matching attribute...
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_attr_t'>ppd_attr_t</a> *<br>
-ppdFindAttr(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * name,
-    const char * spec);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>name</tt></td><td>Attribute name
-</td></tr>
-<tr><td><tt>spec</tt></td><td>Specifier string or NULL
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Attribute or NULL if not found</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdFindChoice'>ppdFindChoice()</a></h3>
-<h4>Description</h4>
-<p>Return a pointer to an option choice.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_choice_t'>ppd_choice_t</a> *<br>
-ppdFindChoice(
-    <a href='#ppd_option_t'>ppd_option_t</a> * o,
-    const char * choice);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>o</tt></td><td>Pointer to option
-</td></tr>
-<tr><td><tt>choice</tt></td><td>Name of choice
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Choice pointer or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFindCustomOption'>ppdFindCustomOption()</a></h3>
-<h4>Description</h4>
-<p>Find a custom option.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_coption_t'>ppd_coption_t</a> *<br>
-ppdFindCustomOption(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * keyword);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-<tr><td><tt>keyword</tt></td><td>Custom option name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Custom option or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFindCustomParam'>ppdFindCustomParam()</a></h3>
-<h4>Description</h4>
-<p>Find a parameter for a custom option.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_cparam_t'>ppd_cparam_t</a> *<br>
-ppdFindCustomParam(
-    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt,
-    const char * name);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>opt</tt></td><td>Custom option
-</td></tr>
-<tr><td><tt>name</tt></td><td>Parameter name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Custom parameter or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdFindMarkedChoice'>ppdFindMarkedChoice()</a></h3>
-<h4>Description</h4>
-<p>Return the marked choice for the specified option.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_choice_t'>ppd_choice_t</a> *<br>
-ppdFindMarkedChoice(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * option);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-<tr><td><tt>option</tt></td><td>Keyword/option name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Pointer to choice or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppdFindNextAttr'>ppdFindNextAttr()</a></h3>
-<h4>Description</h4>
-<p>Find the next matching attribute...
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_attr_t'>ppd_attr_t</a> *<br>
-ppdFindNextAttr(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * name,
-    const char * spec);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>name</tt></td><td>Attribute name
-</td></tr>
-<tr><td><tt>spec</tt></td><td>Specifier string or NULL
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Attribute or NULL if not found</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdFindOption'>ppdFindOption()</a></h3>
-<h4>Description</h4>
-<p>Return a pointer to the specified option.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_option_t'>ppd_option_t</a> *<br>
-ppdFindOption(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * option);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>option</tt></td><td>Option/Keyword name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Pointer to option or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFirstCustomParam'>ppdFirstCustomParam()</a></h3>
-<h4>Description</h4>
-<p>Return the first parameter for a custom option.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_cparam_t'>ppd_cparam_t</a> *<br>
-ppdFirstCustomParam(
-    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>opt</tt></td><td>Custom option
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Custom parameter or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdFirstOption'>ppdFirstOption()</a></h3>
-<h4>Description</h4>
-<p>Return the first option in the PPD file.
-<p>Options are returned from all groups in sorted order.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_option_t'>ppd_option_t</a> *<br>
-ppdFirstOption(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>First option or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdIsMarked'>ppdIsMarked()</a></h3>
-<h4>Description</h4>
-<p>Check to see if an option is marked...
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdIsMarked(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * option,
-    const char * choice);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file data
-</td></tr>
-<tr><td><tt>option</tt></td><td>Option/Keyword name
-</td></tr>
-<tr><td><tt>choice</tt></td><td>Choice name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Non-zero if option is marked</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppdLastError'>ppdLastError()</a></h3>
-<h4>Description</h4>
-<p>Return the status from the last ppdOpen*().
-
-
-<h4>Syntax</h4>
-<p><tt>
-ppd_status_t<br>
-ppdLastError(
-    int * line);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>line</tt></td><td>Line number
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Status code</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdLocalize'>ppdLocalize()</a></h3>
-<h4>Description</h4>
-<p>Localize the PPD file to the current locale.
-<p>All groups, options, and choices are localized, as are ICC profile
+</p>
+<h3 class="function"><a name="ppdIsMarked">ppdIsMarked</a></h3>
+<p class="description">Check to see if an option is marked...</p>
+<p class="code">
+int ppdIsMarked (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file data</dd>
+<dt>option</dt>
+<dd class="description">Option/Keyword name</dd>
+<dt>choice</dt>
+<dd class="description">Choice name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Non-zero if option is marked</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdLastError">ppdLastError</a></h3>
+<p class="description">Return the status from the last ppdOpen*().</p>
+<p class="code">
+ppd_status_t ppdLastError (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *line<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>line</dt>
+<dd class="description">Line number</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status code</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdLocalize">ppdLocalize</a></h3>
+<p class="description">Localize the PPD file to the current locale.</p>
+<p class="code">
+int ppdLocalize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">All groups, options, and choices are localized, as are ICC profile
 descriptions, printer presets, and custom option parameters.  Each
 localized string uses the UTF-8 character encoding.
 
-
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdLocalize(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>0 on success, -1 on error</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.3&nbsp;</span><a name='ppdLocalizeIPPReason'>ppdLocalizeIPPReason()</a></h3>
-<h4>Description</h4>
-<p>Get the localized version of a cupsIPPReason
-attribute.
-<p>This function uses the current locale to find the corresponding reason
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="ppdLocalizeIPPReason">ppdLocalizeIPPReason</a></h3>
+<p class="description">Get the localized version of a cupsIPPReason
+attribute.</p>
+<p class="code">
+const char *ppdLocalizeIPPReason (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *reason,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *scheme,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *buffer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t bufsize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>reason</dt>
+<dd class="description">IPP reason keyword to look up</dd>
+<dt>scheme</dt>
+<dd class="description">URI scheme or NULL for text</dd>
+<dt>buffer</dt>
+<dd class="description">Value buffer</dd>
+<dt>bufsize</dt>
+<dd class="description">Size of value buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value or NULL if not found</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function uses the current locale to find the corresponding reason
 text or URI from the attribute value. If &quot;scheme&quot; is NULL or &quot;text&quot;,
 the returned value contains human-readable (UTF-8) text from the translation
-string or attribute value. Otherwise the corresponding URI is returned.
-<p>If no value of the requested scheme can be found, NULL is returned.
+string or attribute value. Otherwise the corresponding URI is returned.<br>
+<br>
+If no value of the requested scheme can be found, NULL is returned.
 
+</p>
+<h3 class="function"><a name="ppdMarkDefaults">ppdMarkDefaults</a></h3>
+<p class="description">Mark all default options in the PPD file.</p>
+<p class="code">
+void ppdMarkDefaults (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+</dl>
+<h3 class="function"><a name="ppdMarkOption">ppdMarkOption</a></h3>
+<p class="description">Mark an option in a PPD file.</p>
+<p class="code">
+int ppdMarkOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>option</dt>
+<dd class="description">Keyword</dd>
+<dt>choice</dt>
+<dd class="description">Option name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of conflicts</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Notes:<br>
+<br>
+-1 is returned if the given option would conflict with any currently
+selected option.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdNextCustomParam">ppdNextCustomParam</a></h3>
+<p class="description">Return the next parameter for a custom option.</p>
+<p class="code">
+<a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdNextCustomParam (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_coption_t">ppd_coption_t</a> *opt<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>opt</dt>
+<dd class="description">Custom option</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Custom parameter or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdNextOption">ppdNextOption</a></h3>
+<p class="description">Return the next option in the PPD file.</p>
+<p class="code">
+<a href="#ppd_option_t">ppd_option_t</a> *ppdNextOption (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Next option or NULL</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Options are returned from all groups in sorted order.
 
-<h4>Syntax</h4>
-<p><tt>
-const char *<br>
-ppdLocalizeIPPReason(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * reason,
-    const char * scheme,
-    char * buffer,
-    size_t bufsize);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-<tr><td><tt>reason</tt></td><td>IPP reason keyword to look up
-</td></tr>
-<tr><td><tt>scheme</tt></td><td>URI scheme or NULL for text
-</td></tr>
-<tr><td><tt>buffer</tt></td><td>Value buffer
-</td></tr>
-<tr><td><tt>bufsize</tt></td><td>Size of value buffer
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Value or NULL if not found</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdMarkDefaults'>ppdMarkDefaults()</a></h3>
-<h4>Description</h4>
-<p>Mark all default options in the PPD file.
-<h4>Syntax</h4>
-<p><tt>
-void<br>
-ppdMarkDefaults(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdMarkOption'>ppdMarkOption()</a></h3>
-<h4>Description</h4>
-<p>Mark an option in a PPD file.
-<p>Notes:
-<p>-1 is returned if the given option would conflict with any currently
-selected option.
-<h4>Syntax</h4>
-<p><tt>
-int<br>
-ppdMarkOption(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * option,
-    const char * choice);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>option</tt></td><td>Keyword
-</td></tr>
-<tr><td><tt>choice</tt></td><td>Option name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Number of conflicts</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdNextCustomParam'>ppdNextCustomParam()</a></h3>
-<h4>Description</h4>
-<p>Return the next parameter for a custom option.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_cparam_t'>ppd_cparam_t</a> *<br>
-ppdNextCustomParam(
-    <a href='#ppd_coption_t'>ppd_coption_t</a> * opt);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>opt</tt></td><td>Custom option
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Custom parameter or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdNextOption'>ppdNextOption()</a></h3>
-<h4>Description</h4>
-<p>Return the next option in the PPD file.
-<p>Options are returned from all groups in sorted order.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_option_t'>ppd_option_t</a> *<br>
-ppdNextOption(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Next option or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdOpen'>ppdOpen()</a></h3>
-<h4>Description</h4>
-<p>Read a PPD file into memory.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_file_t'>ppd_file_t</a> *<br>
-ppdOpen(
-    FILE * fp);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>fp</tt></td><td>File to read from
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>PPD file record</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppdOpen2'>ppdOpen2()</a></h3>
-<h4>Description</h4>
-<p>Read a PPD file into memory.
-
-
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_file_t'>ppd_file_t</a> *<br>
-ppdOpen2(
-    cups_file_t * fp);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>fp</tt></td><td>File to read from
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>PPD file record</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdOpenFd'>ppdOpenFd()</a></h3>
-<h4>Description</h4>
-<p>Read a PPD file into memory.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_file_t'>ppd_file_t</a> *<br>
-ppdOpenFd(
-    int fd);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>fd</tt></td><td>File to read from
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>PPD file record</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdOpenFile'>ppdOpenFile()</a></h3>
-<h4>Description</h4>
-<p>Read a PPD file into memory.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_file_t'>ppd_file_t</a> *<br>
-ppdOpenFile(
-    const char * filename);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>filename</tt></td><td>File to read from
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>PPD file record</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdPageLength'>ppdPageLength()</a></h3>
-<h4>Description</h4>
-<p>Get the page length for the given size.
-<h4>Syntax</h4>
-<p><tt>
-float<br>
-ppdPageLength(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * name);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file
-</td></tr>
-<tr><td><tt>name</tt></td><td>Size name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Length of page in points or 0.0</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdPageSize'>ppdPageSize()</a></h3>
-<h4>Description</h4>
-<p>Get the page size record for the given size.
-<h4>Syntax</h4>
-<p><tt>
-<a href='#ppd_size_t'>ppd_size_t</a> *<br>
-ppdPageSize(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * name);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>name</tt></td><td>Size name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Size record for page or NULL</p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppdPageWidth'>ppdPageWidth()</a></h3>
-<h4>Description</h4>
-<p>Get the page width for the given size.
-<h4>Syntax</h4>
-<p><tt>
-float<br>
-ppdPageWidth(
-    <a href='#ppd_file_t'>ppd_file_t</a> * ppd,
-    const char * name);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>ppd</tt></td><td>PPD file record
-</td></tr>
-<tr><td><tt>name</tt></td><td>Size name
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Width of page in points or 0.0</p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.20&nbsp;</span><a name='ppdSetConformance'>ppdSetConformance()</a></h3>
-<h4>Description</h4>
-<p>Set the conformance level for PPD files.
-
-
-<h4>Syntax</h4>
-<p><tt>
-void<br>
-ppdSetConformance(
-    <a href='#ppd_conform_t'>ppd_conform_t</a> c);
-</tt></p>
-<h4>Arguments</h4>
-<div class='table'><table align='center' border='1' width='80%' cellpadding='5' cellspacing='0' summary='Arguments'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>c</tt></td><td>Conformance level
-</td></tr>
-</tbody></table></div>
-<h4>Returns</h4>
-<p>Nothing.</p>
-<!-- NEW PAGE -->
-<h2 class='title'><a name='STRUCTURES'>Structures</a></h2>
-<ul>
-	<li><a href='#ppd_attr_s'><tt>ppd_attr_s</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppd_choice_s'><tt>ppd_choice_s</tt></a> </li>
-	<li><a href='#ppd_coption_s'><tt>ppd_coption_s</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cparam_s'><tt>ppd_cparam_s</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_emul_s'><tt>ppd_emul_s</tt></a> </li>
-	<li><a href='#ppd_file_s'><tt>ppd_file_s</tt></a> </li>
-	<li><a href='#ppd_group_s'><tt>ppd_group_s</tt></a> </li>
-	<li><a href='#ppd_option_s'><tt>ppd_option_s</tt></a> </li>
-	<li><a href='#ppd_profile_s'><tt>ppd_profile_s</tt></a> </li>
-	<li><a href='#ppd_size_s'><tt>ppd_size_s</tt></a> </li>
-</ul>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppd_attr_s'>ppd_attr_s</a></h3>
-<h4>Description</h4>
-<p>PPD Attribute Structure 
-<h4>Definition</h4>
-<p><tt>
-struct ppd_attr_s<br>
-{<br>
-&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char spec[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
-&nbsp;&nbsp;char * value;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name[PPD_MAX_NAME]</tt> </td><td>Name of attribute (cupsXYZ)
-</td></tr>
-<tr><td><tt>spec[PPD_MAX_NAME]</tt> </td><td>Specifier string, if any
-</td></tr>
-<tr><td><tt>text[PPD_MAX_TEXT]</tt> </td><td>Human-readable text, if any
-</td></tr>
-<tr><td><tt>value</tt> </td><td>Value string
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_choice_s'>ppd_choice_s</a></h3>
-<h4>Description</h4>
-<p>Option choices
-<h4>Definition</h4>
-<p><tt>
-struct ppd_choice_s<br>
-{<br>
-&nbsp;&nbsp;char choice[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char * code;<br>
-&nbsp;&nbsp;char marked;<br>
-&nbsp;&nbsp;<a href='#ppd_option_t'>ppd_option_t</a> * option;<br>
-&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>choice[PPD_MAX_NAME]</tt> </td><td>Computer-readable option name
-</td></tr>
-<tr><td><tt>code</tt> </td><td>Code to send for this option
-</td></tr>
-<tr><td><tt>marked</tt> </td><td>0 if not selected, 1 otherwise
-</td></tr>
-<tr><td><tt>option</tt> </td><td>Pointer to parent option structure
-</td></tr>
-<tr><td><tt>text[PPD_MAX_TEXT]</tt> </td><td>Human-readable option name
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_coption_s'>ppd_coption_s</a></h3>
-<h4>Description</h4>
-<p>Custom Option 
-<h4>Definition</h4>
-<p><tt>
-struct ppd_coption_s<br>
-{<br>
-&nbsp;&nbsp;char keyword[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;int marked;<br>
-&nbsp;&nbsp;<a href='#ppd_option_t'>ppd_option_t</a> * option;<br>
-&nbsp;&nbsp;cups_array_t * params;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>keyword[PPD_MAX_NAME]</tt> </td><td>Name of option that is being extended...
-</td></tr>
-<tr><td><tt>marked</tt> </td><td>Extended option is marked
-</td></tr>
-<tr><td><tt>option</tt> </td><td>Option that is being extended...
-</td></tr>
-<tr><td><tt>params</tt> </td><td>Parameters
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cparam_s'>ppd_cparam_s</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter 
-<h4>Definition</h4>
-<p><tt>
-struct ppd_cparam_s<br>
-{<br>
-&nbsp;&nbsp;<a href='#ppd_cpvalue_t'>ppd_cpvalue_t</a> current;<br>
-&nbsp;&nbsp;<a href='#ppd_cplimit_t'>ppd_cplimit_t</a> minimum, maximum;<br>
-&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;int order;<br>
-&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
-&nbsp;&nbsp;<a href='#ppd_cptype_t'>ppd_cptype_t</a> type;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>current</tt> </td><td>Current value
-</td></tr>
-<tr><td><tt>maximum</tt> </td><td>Maximum value
-</td></tr>
-<tr><td><tt>name[PPD_MAX_NAME]</tt> </td><td>Parameter name
-</td></tr>
-<tr><td><tt>order</tt> </td><td>Order (0 to N)
-</td></tr>
-<tr><td><tt>text[PPD_MAX_TEXT]</tt> </td><td>Human-readable text
-</td></tr>
-<tr><td><tt>type</tt> </td><td>Parameter type
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_emul_s'>ppd_emul_s</a></h3>
-<h4>Description</h4>
-<p>Emulators
-<h4>Definition</h4>
-<p><tt>
-struct ppd_emul_s<br>
-{<br>
-&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char * start;<br>
-&nbsp;&nbsp;char * stop;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>name[PPD_MAX_NAME]</tt> </td><td>Emulator name
-</td></tr>
-<tr><td><tt>start</tt> </td><td>Code to switch to this emulation
-</td></tr>
-<tr><td><tt>stop</tt> </td><td>Code to stop this emulation
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_file_s'>ppd_file_s</a></h3>
-<h4>Description</h4>
-<p>PPD File
-<h4>Definition</h4>
-<p><tt>
-struct ppd_file_s<br>
-{<br>
-&nbsp;&nbsp;int accurate_screens;<br>
-&nbsp;&nbsp;<a href='#ppd_attr_t'>ppd_attr_t</a> ** attrs;<br>
-&nbsp;&nbsp;int color_device;<br>
-&nbsp;&nbsp;ppd_cs_t colorspace;<br>
-&nbsp;&nbsp;<a href='#ppd_const_t'>ppd_const_t</a> * consts;<br>
-&nbsp;&nbsp;int contone_only;<br>
-&nbsp;&nbsp;cups_array_t * coptions;<br>
-&nbsp;&nbsp;int cur_attr;<br>
-&nbsp;&nbsp;float custom_margins[4];<br>
-&nbsp;&nbsp;float custom_max[2];<br>
-&nbsp;&nbsp;float custom_min[2];<br>
-&nbsp;&nbsp;<a href='#ppd_emul_t'>ppd_emul_t</a> * emulations;<br>
-&nbsp;&nbsp;char ** filters;<br>
-&nbsp;&nbsp;int flip_duplex;<br>
-&nbsp;&nbsp;char ** fonts;<br>
-&nbsp;&nbsp;<a href='#ppd_group_t'>ppd_group_t</a> * groups;<br>
-&nbsp;&nbsp;char * jcl_begin;<br>
-&nbsp;&nbsp;char * jcl_end;<br>
-&nbsp;&nbsp;char * jcl_ps;<br>
-&nbsp;&nbsp;int landscape;<br>
-&nbsp;&nbsp;char * lang_encoding;<br>
-&nbsp;&nbsp;char * lang_version;<br>
-&nbsp;&nbsp;int language_level;<br>
-&nbsp;&nbsp;int manual_copies;<br>
-&nbsp;&nbsp;char * manufacturer;<br>
-&nbsp;&nbsp;cups_array_t * marked;<br>
-&nbsp;&nbsp;int model_number;<br>
-&nbsp;&nbsp;char * modelname;<br>
-&nbsp;&nbsp;char * nickname;<br>
-&nbsp;&nbsp;int num_attrs;<br>
-&nbsp;&nbsp;int num_consts;<br>
-&nbsp;&nbsp;int num_emulations;<br>
-&nbsp;&nbsp;int num_filters;<br>
-&nbsp;&nbsp;int num_fonts;<br>
-&nbsp;&nbsp;int num_groups;<br>
-&nbsp;&nbsp;int num_profiles;<br>
-&nbsp;&nbsp;int num_sizes;<br>
-&nbsp;&nbsp;cups_array_t * options;<br>
-&nbsp;&nbsp;char * patches;<br>
-&nbsp;&nbsp;char * pcfilename;<br>
-&nbsp;&nbsp;char * product;<br>
-&nbsp;&nbsp;<a href='#ppd_profile_t'>ppd_profile_t</a> * profiles;<br>
-&nbsp;&nbsp;char * protocols;<br>
-&nbsp;&nbsp;char * shortnickname;<br>
-&nbsp;&nbsp;<a href='#ppd_size_t'>ppd_size_t</a> * sizes;<br>
-&nbsp;&nbsp;cups_array_t * sorted_attrs;<br>
-&nbsp;&nbsp;int throughput;<br>
-&nbsp;&nbsp;char * ttrasterizer;<br>
-&nbsp;&nbsp;int variable_sizes;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>accurate_screens</tt> </td><td>1 = supports accurate screens, 0 = not
-</td></tr>
-<tr><td><tt>attrs</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Attributes  @private@
-</td></tr>
-<tr><td><tt>color_device</tt> </td><td>1 = color device, 0 = grayscale
-</td></tr>
-<tr><td><tt>colorspace</tt> </td><td>Default colorspace
-</td></tr>
-<tr><td><tt>consts</tt> </td><td>UI/Non-UI constraints
-</td></tr>
-<tr><td><tt>contone_only</tt> </td><td>1 = continuous tone only, 0 = not
-</td></tr>
-<tr><td><tt>coptions</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Custom options array  @private@
-</td></tr>
-<tr><td><tt>cur_attr</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Current attribute  @private@
-</td></tr>
-<tr><td><tt>custom_margins[4]</tt> </td><td>Margins around page
-</td></tr>
-<tr><td><tt>custom_max[2]</tt> </td><td>Maximum variable page size
-</td></tr>
-<tr><td><tt>custom_min[2]</tt> </td><td>Minimum variable page size
-</td></tr>
-<tr><td><tt>emulations</tt> </td><td>Emulations and the code to invoke them
-</td></tr>
-<tr><td><tt>filters</tt> </td><td>Filter strings...
-</td></tr>
-<tr><td><tt>flip_duplex</tt> <span class='info'>&nbsp;DEPRECATED&nbsp;</span></td><td>1 = Flip page for back sides 
-</td></tr>
-<tr><td><tt>fonts</tt> </td><td>Pre-loaded fonts
-</td></tr>
-<tr><td><tt>groups</tt> </td><td>UI groups
-</td></tr>
-<tr><td><tt>jcl_begin</tt> </td><td>Start JCL commands
-</td></tr>
-<tr><td><tt>jcl_end</tt> </td><td>End JCL commands
-</td></tr>
-<tr><td><tt>jcl_ps</tt> </td><td>Enter PostScript interpreter
-</td></tr>
-<tr><td><tt>landscape</tt> </td><td>-90 or 90
-</td></tr>
-<tr><td><tt>lang_encoding</tt> </td><td>Language encoding
-</td></tr>
-<tr><td><tt>lang_version</tt> </td><td>Language version (English, Spanish, etc.)
-</td></tr>
-<tr><td><tt>language_level</tt> </td><td>Language level of device
-</td></tr>
-<tr><td><tt>manual_copies</tt> </td><td>1 = Copies done manually, 0 = hardware
-</td></tr>
-<tr><td><tt>manufacturer</tt> </td><td>Manufacturer name
-</td></tr>
-<tr><td><tt>marked</tt> <span class='info'>&nbsp;CUPS 1.3&nbsp;</span></td><td>Marked choices  @private@
-</td></tr>
-<tr><td><tt>model_number</tt> </td><td>Device-specific model number
-</td></tr>
-<tr><td><tt>modelname</tt> </td><td>Model name (general)
-</td></tr>
-<tr><td><tt>nickname</tt> </td><td>Nickname (specific)
-</td></tr>
-<tr><td><tt>num_attrs</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Number of attributes  @private@
-</td></tr>
-<tr><td><tt>num_consts</tt> </td><td>Number of UI/Non-UI constraints
-</td></tr>
-<tr><td><tt>num_emulations</tt> </td><td>Number of emulations supported
-</td></tr>
-<tr><td><tt>num_filters</tt> </td><td>Number of filters
-</td></tr>
-<tr><td><tt>num_fonts</tt> </td><td>Number of pre-loaded fonts
-</td></tr>
-<tr><td><tt>num_groups</tt> </td><td>Number of UI groups
-</td></tr>
-<tr><td><tt>num_profiles</tt> </td><td>Number of sRGB color profiles
-</td></tr>
-<tr><td><tt>num_sizes</tt> </td><td>Number of page sizes
-</td></tr>
-<tr><td><tt>options</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Option lookup array  @private@
-</td></tr>
-<tr><td><tt>patches</tt> </td><td>Patch commands to be sent to printer
-</td></tr>
-<tr><td><tt>pcfilename</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>PCFileName string 
-</td></tr>
-<tr><td><tt>product</tt> </td><td>Product name (from PS RIP/interpreter)
-</td></tr>
-<tr><td><tt>profiles</tt> </td><td>sRGB color profiles
-</td></tr>
-<tr><td><tt>protocols</tt> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></td><td>Protocols (BCP, TBCP) string 
-</td></tr>
-<tr><td><tt>shortnickname</tt> </td><td>Short version of nickname
-</td></tr>
-<tr><td><tt>sizes</tt> </td><td>Page sizes
-</td></tr>
-<tr><td><tt>sorted_attrs</tt> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></td><td>Attribute lookup array  @private@
-</td></tr>
-<tr><td><tt>throughput</tt> </td><td>Pages per minute
-</td></tr>
-<tr><td><tt>ttrasterizer</tt> </td><td>Truetype rasterizer
-</td></tr>
-<tr><td><tt>variable_sizes</tt> </td><td>1 = supports variable sizes, 0 = doesn't
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_group_s'>ppd_group_s</a></h3>
-<h4>Description</h4>
-<p>Groups
-<h4>Definition</h4>
-<p><tt>
-struct ppd_group_s<br>
-{<br>
-&nbsp;&nbsp;char text[PPD_MAX_TEXT - PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;int num_options;<br>
-&nbsp;&nbsp;int num_subgroups;<br>
-&nbsp;&nbsp;<a href='#ppd_option_t'>ppd_option_t</a> * options;<br>
-&nbsp;&nbsp;struct <a href='#ppd_group_s'>ppd_group_s</a> * subgroups;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>PPD_MAX_NAME]</tt> </td><td>Human-readable group name
-</td></tr>
-<tr><td><tt>name[PPD_MAX_NAME]</tt> <span class='info'>&nbsp;CUPS 1.1.18&nbsp;</span></td><td>Group name 
-</td></tr>
-<tr><td><tt>num_options</tt> </td><td>Number of options
-</td></tr>
-<tr><td><tt>num_subgroups</tt> </td><td>Number of sub-groups
-</td></tr>
-<tr><td><tt>options</tt> </td><td>Options
-</td></tr>
-<tr><td><tt>subgroups</tt> </td><td>Sub-groups (max depth = 1)
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_option_s'>ppd_option_s</a></h3>
-<h4>Description</h4>
-<p>Options
-<h4>Definition</h4>
-<p><tt>
-struct ppd_option_s<br>
-{<br>
-&nbsp;&nbsp;<a href='#ppd_choice_t'>ppd_choice_t</a> * choices;<br>
-&nbsp;&nbsp;char conflicted;<br>
-&nbsp;&nbsp;char defchoice[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char keyword[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;int num_choices;<br>
-&nbsp;&nbsp;float order;<br>
-&nbsp;&nbsp;<a href='#ppd_section_t'>ppd_section_t</a> section;<br>
-&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
-&nbsp;&nbsp;<a href='#ppd_ui_t'>ppd_ui_t</a> ui;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>choices</tt> </td><td>Option choices
-</td></tr>
-<tr><td><tt>conflicted</tt> </td><td>0 if no conflicts exist, 1 otherwise
-</td></tr>
-<tr><td><tt>defchoice[PPD_MAX_NAME]</tt> </td><td>Default option choice
-</td></tr>
-<tr><td><tt>keyword[PPD_MAX_NAME]</tt> </td><td>Option keyword name (&quot;PageSize&quot;, etc.)
-</td></tr>
-<tr><td><tt>num_choices</tt> </td><td>Number of option choices
-</td></tr>
-<tr><td><tt>order</tt> </td><td>Order number
-</td></tr>
-<tr><td><tt>section</tt> </td><td>Section for command
-</td></tr>
-<tr><td><tt>text[PPD_MAX_TEXT]</tt> </td><td>Human-readable text
-</td></tr>
-<tr><td><tt>ui</tt> </td><td>Type of UI option
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_profile_s'>ppd_profile_s</a></h3>
-<h4>Description</h4>
-<p>sRGB Color Profiles
-<h4>Definition</h4>
-<p><tt>
-struct ppd_profile_s<br>
-{<br>
-&nbsp;&nbsp;float density;<br>
-&nbsp;&nbsp;float gamma;<br>
-&nbsp;&nbsp;float matrix[3][3];<br>
-&nbsp;&nbsp;char media_type[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;char resolution[PPD_MAX_NAME];<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>density</tt> </td><td>Ink density to use
-</td></tr>
-<tr><td><tt>gamma</tt> </td><td>Gamma correction to use
-</td></tr>
-<tr><td><tt>matrix[3][3]</tt> </td><td>Transform matrix
-</td></tr>
-<tr><td><tt>media_type[PPD_MAX_NAME]</tt> </td><td>Media type or &quot;-&quot;
-</td></tr>
-<tr><td><tt>resolution[PPD_MAX_NAME]</tt> </td><td>Resolution or &quot;-&quot;
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_size_s'>ppd_size_s</a></h3>
-<h4>Description</h4>
-<p>Page Sizes
-<h4>Definition</h4>
-<p><tt>
-struct ppd_size_s<br>
-{<br>
-&nbsp;&nbsp;float bottom;<br>
-&nbsp;&nbsp;float left;<br>
-&nbsp;&nbsp;float length;<br>
-&nbsp;&nbsp;int marked;<br>
-&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
-&nbsp;&nbsp;float right;<br>
-&nbsp;&nbsp;float top;<br>
-&nbsp;&nbsp;float width;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>bottom</tt> </td><td>Bottom printable margin in points
-</td></tr>
-<tr><td><tt>left</tt> </td><td>Left printable margin in points
-</td></tr>
-<tr><td><tt>length</tt> </td><td>Length of media in points
-</td></tr>
-<tr><td><tt>marked</tt> </td><td>Page size selected?
-</td></tr>
-<tr><td><tt>name[PPD_MAX_NAME]</tt> </td><td>Media size option
-</td></tr>
-<tr><td><tt>right</tt> </td><td>Right printable margin in points
-</td></tr>
-<tr><td><tt>top</tt> </td><td>Top printable margin in points
-</td></tr>
-<tr><td><tt>width</tt> </td><td>Width of media in points
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h2 class='title'><a name='TYPES'>Types</a></h2>
-<ul>
-	<li><a href='#ppd_attr_t'><tt>ppd_attr_t</tt></a> <span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span></li>
-	<li><a href='#ppd_choice_t'><tt>ppd_choice_t</tt></a> </li>
-	<li><a href='#ppd_const_t'><tt>ppd_const_t</tt></a> </li>
-	<li><a href='#ppd_coption_t'><tt>ppd_coption_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cparam_t'><tt>ppd_cparam_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cplimit_t'><tt>ppd_cplimit_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cptype_t'><tt>ppd_cptype_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cpvalue_t'><tt>ppd_cpvalue_t</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_emul_t'><tt>ppd_emul_t</tt></a> </li>
-	<li><a href='#ppd_file_t'><tt>ppd_file_t</tt></a> </li>
-	<li><a href='#ppd_group_t'><tt>ppd_group_t</tt></a> </li>
-	<li><a href='#ppd_option_t'><tt>ppd_option_t</tt></a> </li>
-	<li><a href='#ppd_profile_t'><tt>ppd_profile_t</tt></a> </li>
-	<li><a href='#ppd_section_t'><tt>ppd_section_t</tt></a> </li>
-	<li><a href='#ppd_size_t'><tt>ppd_size_t</tt></a> </li>
-	<li><a href='#ppd_ui_t'><tt>ppd_ui_t</tt></a> </li>
-</ul>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.1.19&nbsp;</span><a name='ppd_attr_t'>ppd_attr_t</a></h3>
-<h4>Description</h4>
-<p>PPD Attribute Structure 
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_attr_s'>ppd_attr_s</a> ppd_attr_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_choice_t'>ppd_choice_t</a></h3>
-<h4>Description</h4>
-<p>Option choices
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_choice_s'>ppd_choice_s</a> ppd_choice_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_const_t'>ppd_const_t</a></h3>
-<h4>Description</h4>
-<p>Constraints
-<h4>Definition</h4>
-<p><tt>
+</p>
+<h3 class="function"><a name="ppdOpen">ppdOpen</a></h3>
+<p class="description">Read a PPD file into memory.</p>
+<p class="code">
+<a href="#ppd_file_t">ppd_file_t</a> *ppdOpen (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;FILE *fp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read from</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PPD file record</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdOpen2">ppdOpen2</a></h3>
+<p class="description">Read a PPD file into memory.</p>
+<p class="code">
+<a href="#ppd_file_t">ppd_file_t</a> *ppdOpen2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_file_t *fp<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>fp</dt>
+<dd class="description">File to read from</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PPD file record</p>
+<h3 class="function"><a name="ppdOpenFd">ppdOpenFd</a></h3>
+<p class="description">Read a PPD file into memory.</p>
+<p class="code">
+<a href="#ppd_file_t">ppd_file_t</a> *ppdOpenFd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>fd</dt>
+<dd class="description">File to read from</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PPD file record</p>
+<h3 class="function"><a name="ppdOpenFile">ppdOpenFile</a></h3>
+<p class="description">Read a PPD file into memory.</p>
+<p class="code">
+<a href="#ppd_file_t">ppd_file_t</a> *ppdOpenFile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>filename</dt>
+<dd class="description">File to read from</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">PPD file record</p>
+<h3 class="function"><a name="ppdPageLength">ppdPageLength</a></h3>
+<p class="description">Get the page length for the given size.</p>
+<p class="code">
+float ppdPageLength (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>name</dt>
+<dd class="description">Size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Length of page in points or 0.0</p>
+<h3 class="function"><a name="ppdPageSize">ppdPageSize</a></h3>
+<p class="description">Get the page size record for the given size.</p>
+<p class="code">
+<a href="#ppd_size_t">ppd_size_t</a> *ppdPageSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>name</dt>
+<dd class="description">Size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Size record for page or NULL</p>
+<h3 class="function"><a name="ppdPageWidth">ppdPageWidth</a></h3>
+<p class="description">Get the page width for the given size.</p>
+<p class="code">
+float ppdPageWidth (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>name</dt>
+<dd class="description">Size name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Width of page in points or 0.0</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="ppdSetConformance">ppdSetConformance</a></h3>
+<p class="description">Set the conformance level for PPD files.</p>
+<p class="code">
+void ppdSetConformance (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_conform_t">ppd_conform_t</a> c<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>c</dt>
+<dd class="description">Conformance level</dd>
+</dl>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppd_attr_t">ppd_attr_t</a></h3>
+<p class="description">PPD Attribute Structure </p>
+<p class="code">
+typedef struct <a href="#ppd_attr_s">ppd_attr_s</a> ppd_attr_t;
+</p>
+<h3 class="typedef"><a name="ppd_choice_t">ppd_choice_t</a></h3>
+<p class="description">Option choices</p>
+<p class="code">
+typedef struct <a href="#ppd_choice_s">ppd_choice_s</a> ppd_choice_t;
+</p>
+<h3 class="typedef"><a name="ppd_const_t">ppd_const_t</a></h3>
+<p class="description">Constraints</p>
+<p class="code">
 typedef struct ppd_const_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_coption_t'>ppd_coption_t</a></h3>
-<h4>Description</h4>
-<p>Custom Option 
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_coption_s'>ppd_coption_s</a> ppd_coption_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cparam_t'>ppd_cparam_t</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter 
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_cparam_s'>ppd_cparam_s</a> ppd_cparam_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cplimit_t'>ppd_cplimit_t</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Limit 
-<h4>Definition</h4>
-<p><tt>
-typedef union <a href='#ppd_cplimit_u'>ppd_cplimit_u</a> ppd_cplimit_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cptype_t'>ppd_cptype_t</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Type 
-<h4>Definition</h4>
-<p><tt>
-typedef enum <a href='#ppd_cptype_e'>ppd_cptype_e</a> ppd_cptype_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cpvalue_t'>ppd_cpvalue_t</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Value 
-<h4>Definition</h4>
-<p><tt>
-typedef union <a href='#ppd_cpvalue_u'>ppd_cpvalue_u</a> ppd_cpvalue_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_emul_t'>ppd_emul_t</a></h3>
-<h4>Description</h4>
-<p>Emulators
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_emul_s'>ppd_emul_s</a> ppd_emul_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_file_t'>ppd_file_t</a></h3>
-<h4>Description</h4>
-<p>PPD File
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_file_s'>ppd_file_s</a> ppd_file_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_group_t'>ppd_group_t</a></h3>
-<h4>Description</h4>
-<p>Groups
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_group_s'>ppd_group_s</a> ppd_group_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_option_t'>ppd_option_t</a></h3>
-<h4>Description</h4>
-<p>Options
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_option_s'>ppd_option_s</a> ppd_option_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_profile_t'>ppd_profile_t</a></h3>
-<h4>Description</h4>
-<p>sRGB Color Profiles
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_profile_s'>ppd_profile_s</a> ppd_profile_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_section_t'>ppd_section_t</a></h3>
-<h4>Description</h4>
-<p>Order dependency sections
-<h4>Definition</h4>
-<p><tt>
-typedef enum <a href='#ppd_section_e'>ppd_section_e</a> ppd_section_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_size_t'>ppd_size_t</a></h3>
-<h4>Description</h4>
-<p>Page Sizes
-<h4>Definition</h4>
-<p><tt>
-typedef struct <a href='#ppd_size_s'>ppd_size_s</a> ppd_size_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h3 class='title'><a name='ppd_ui_t'>ppd_ui_t</a></h3>
-<h4>Description</h4>
-<p>UI Types
-<h4>Definition</h4>
-<p><tt>
-typedef enum <a href='#ppd_ui_e'>ppd_ui_e</a> ppd_ui_t;
-</tt></p>
-<!-- NEW PAGE -->
-<h2 class='title'><a name='UNIONS'>Unions</a></h2>
-<ul>
-	<li><a href='#ppd_cplimit_u'><tt>ppd_cplimit_u</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-	<li><a href='#ppd_cpvalue_u'><tt>ppd_cpvalue_u</tt></a> <span class='info'>&nbsp;CUPS 1.2&nbsp;</span></li>
-</ul>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cplimit_u'>ppd_cplimit_u</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Limit 
-<h4>Definition</h4>
-<p><tt>
-union ppd_cplimit_u<br>
-{<br>
-&nbsp;&nbsp;float custom_curve;<br>
-&nbsp;&nbsp;int custom_int;<br>
-&nbsp;&nbsp;float custom_invcurve;<br>
-&nbsp;&nbsp;int custom_passcode;<br>
-&nbsp;&nbsp;int custom_password;<br>
-&nbsp;&nbsp;float custom_points;<br>
-&nbsp;&nbsp;float custom_real;<br>
-&nbsp;&nbsp;int custom_string;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>custom_curve</tt> </td><td>Gamma value
-</td></tr>
-<tr><td><tt>custom_int</tt> </td><td>Integer value
-</td></tr>
-<tr><td><tt>custom_invcurve</tt> </td><td>Gamma value
-</td></tr>
-<tr><td><tt>custom_passcode</tt> </td><td>Passcode length
-</td></tr>
-<tr><td><tt>custom_password</tt> </td><td>Password length
-</td></tr>
-<tr><td><tt>custom_points</tt> </td><td>Measurement value
-</td></tr>
-<tr><td><tt>custom_real</tt> </td><td>Real value
-</td></tr>
-<tr><td><tt>custom_string</tt> </td><td>String length
-</td></tr>
-</tbody></table></div>
-<!-- NEW PAGE -->
-<h3 class='title'><span class='info'>&nbsp;CUPS 1.2&nbsp;</span><a name='ppd_cpvalue_u'>ppd_cpvalue_u</a></h3>
-<h4>Description</h4>
-<p>Custom Parameter Value 
-<h4>Definition</h4>
-<p><tt>
-union ppd_cpvalue_u<br>
-{<br>
-&nbsp;&nbsp;float custom_curve;<br>
-&nbsp;&nbsp;int custom_int;<br>
-&nbsp;&nbsp;float custom_invcurve;<br>
-&nbsp;&nbsp;char * custom_passcode;<br>
-&nbsp;&nbsp;char * custom_password;<br>
-&nbsp;&nbsp;float custom_points;<br>
-&nbsp;&nbsp;float custom_real;<br>
-&nbsp;&nbsp;char * custom_string;<br>
-};</tt></p>
-<h4>Members</h4>
-<div class='table'><table align='center' border='1' width='80%' summary='Members'>
-<thead><tr><th>Name</th><th>Description</th></tr></thead>
-<tbody>
-<tr><td><tt>custom_curve</tt> </td><td>Gamma value
-</td></tr>
-<tr><td><tt>custom_int</tt> </td><td>Integer value
-</td></tr>
-<tr><td><tt>custom_invcurve</tt> </td><td>Gamma value
-</td></tr>
-<tr><td><tt>custom_passcode</tt> </td><td>Passcode value
-</td></tr>
-<tr><td><tt>custom_password</tt> </td><td>Password value
-</td></tr>
-<tr><td><tt>custom_points</tt> </td><td>Measurement value
-</td></tr>
-<tr><td><tt>custom_real</tt> </td><td>Real value
-</td></tr>
-<tr><td><tt>custom_string</tt> </td><td>String value
-</td></tr>
-</tbody></table></div>
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_coption_t">ppd_coption_t</a></h3>
+<p class="description">Custom Option </p>
+<p class="code">
+typedef struct <a href="#ppd_coption_s">ppd_coption_s</a> ppd_coption_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cparam_t">ppd_cparam_t</a></h3>
+<p class="description">Custom Parameter </p>
+<p class="code">
+typedef struct <a href="#ppd_cparam_s">ppd_cparam_s</a> ppd_cparam_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cplimit_t">ppd_cplimit_t</a></h3>
+<p class="description">Custom Parameter Limit </p>
+<p class="code">
+typedef union <a href="#ppd_cplimit_u">ppd_cplimit_u</a> ppd_cplimit_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cptype_t">ppd_cptype_t</a></h3>
+<p class="description">Custom Parameter Type </p>
+<p class="code">
+typedef enum <a href="#ppd_cptype_e">ppd_cptype_e</a> ppd_cptype_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cpvalue_t">ppd_cpvalue_t</a></h3>
+<p class="description">Custom Parameter Value </p>
+<p class="code">
+typedef union <a href="#ppd_cpvalue_u">ppd_cpvalue_u</a> ppd_cpvalue_t;
+</p>
+<h3 class="typedef"><a name="ppd_emul_t">ppd_emul_t</a></h3>
+<p class="description">Emulators</p>
+<p class="code">
+typedef struct <a href="#ppd_emul_s">ppd_emul_s</a> ppd_emul_t;
+</p>
+<h3 class="typedef"><a name="ppd_file_t">ppd_file_t</a></h3>
+<p class="description">PPD File</p>
+<p class="code">
+typedef struct <a href="#ppd_file_s">ppd_file_s</a> ppd_file_t;
+</p>
+<h3 class="typedef"><a name="ppd_group_t">ppd_group_t</a></h3>
+<p class="description">Groups</p>
+<p class="code">
+typedef struct <a href="#ppd_group_s">ppd_group_s</a> ppd_group_t;
+</p>
+<h3 class="typedef"><a name="ppd_option_t">ppd_option_t</a></h3>
+<p class="description">Options</p>
+<p class="code">
+typedef struct <a href="#ppd_option_s">ppd_option_s</a> ppd_option_t;
+</p>
+<h3 class="typedef"><a name="ppd_profile_t">ppd_profile_t</a></h3>
+<p class="description">sRGB Color Profiles</p>
+<p class="code">
+typedef struct <a href="#ppd_profile_s">ppd_profile_s</a> ppd_profile_t;
+</p>
+<h3 class="typedef"><a name="ppd_section_t">ppd_section_t</a></h3>
+<p class="description">Order dependency sections</p>
+<p class="code">
+typedef enum <a href="#ppd_section_e">ppd_section_e</a> ppd_section_t;
+</p>
+<h3 class="typedef"><a name="ppd_size_t">ppd_size_t</a></h3>
+<p class="description">Page Sizes</p>
+<p class="code">
+typedef struct <a href="#ppd_size_s">ppd_size_s</a> ppd_size_t;
+</p>
+<h3 class="typedef"><a name="ppd_ui_t">ppd_ui_t</a></h3>
+<p class="description">UI Types</p>
+<p class="code">
+typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
+</p>
+<h2 class="title"><a name="STRUCTURES">Structures</a></h2>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppd_attr_s">ppd_attr_s</a></h3>
+<p class="description">PPD Attribute Structure </p>
+<p class="code">struct ppd_attr_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char spec[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *value;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>name[PPD_MAX_NAME] </dt>
+<dd class="description">Name of attribute (cupsXYZ)</dd>
+<dt>spec[PPD_MAX_NAME] </dt>
+<dd class="description">Specifier string, if any</dd>
+<dt>text[PPD_MAX_TEXT] </dt>
+<dd class="description">Human-readable text, if any</dd>
+<dt>value </dt>
+<dd class="description">Value string</dd>
+</dl>
+<h3 class="struct"><a name="ppd_choice_s">ppd_choice_s</a></h3>
+<p class="description">Option choices</p>
+<p class="code">struct ppd_choice_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char choice[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *code;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char marked;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_option_t">ppd_option_t</a> *option;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>choice[PPD_MAX_NAME] </dt>
+<dd class="description">Computer-readable option name</dd>
+<dt>code </dt>
+<dd class="description">Code to send for this option</dd>
+<dt>marked </dt>
+<dd class="description">0 if not selected, 1 otherwise</dd>
+<dt>option </dt>
+<dd class="description">Pointer to parent option structure</dd>
+<dt>text[PPD_MAX_TEXT] </dt>
+<dd class="description">Human-readable option name</dd>
+</dl>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_coption_s">ppd_coption_s</a></h3>
+<p class="description">Custom Option </p>
+<p class="code">struct ppd_coption_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char keyword[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int marked;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_option_t">ppd_option_t</a> *option;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *params;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>keyword[PPD_MAX_NAME] </dt>
+<dd class="description">Name of option that is being extended...</dd>
+<dt>marked </dt>
+<dd class="description">Extended option is marked</dd>
+<dt>option </dt>
+<dd class="description">Option that is being extended...</dd>
+<dt>params </dt>
+<dd class="description">Parameters</dd>
+</dl>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cparam_s">ppd_cparam_s</a></h3>
+<p class="description">Custom Parameter </p>
+<p class="code">struct ppd_cparam_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_cpvalue_t">ppd_cpvalue_t</a> current;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_cplimit_t">ppd_cplimit_t</a> minimum, maximum;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int order;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_cptype_t">ppd_cptype_t</a> type;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>current </dt>
+<dd class="description">Current value</dd>
+<dt>maximum </dt>
+<dd class="description">Maximum value</dd>
+<dt>name[PPD_MAX_NAME] </dt>
+<dd class="description">Parameter name</dd>
+<dt>order </dt>
+<dd class="description">Order (0 to N)</dd>
+<dt>text[PPD_MAX_TEXT] </dt>
+<dd class="description">Human-readable text</dd>
+<dt>type </dt>
+<dd class="description">Parameter type</dd>
+</dl>
+<h3 class="struct"><a name="ppd_emul_s">ppd_emul_s</a></h3>
+<p class="description">Emulators</p>
+<p class="code">struct ppd_emul_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *start;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *stop;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>name[PPD_MAX_NAME] </dt>
+<dd class="description">Emulator name</dd>
+<dt>start </dt>
+<dd class="description">Code to switch to this emulation</dd>
+<dt>stop </dt>
+<dd class="description">Code to stop this emulation</dd>
+</dl>
+<h3 class="struct"><a name="ppd_file_s">ppd_file_s</a></h3>
+<p class="description">PPD File</p>
+<p class="code">struct ppd_file_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int accurate_screens;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int color_device;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_cs_t colorspace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_const_t">ppd_const_t</a> *consts;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int contone_only;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_margins[4];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_max[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_min[2];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_emul_t">ppd_emul_t</a> *emulations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char **filters;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int flip_duplex;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char **fonts;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_group_t">ppd_group_t</a> *groups;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *jcl_begin;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *jcl_end;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *jcl_ps;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int landscape;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *lang_encoding;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *lang_version;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int language_level;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int manual_copies;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *manufacturer;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int model_number;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *modelname;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *nickname;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_consts;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_emulations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_filters;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_fonts;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_groups;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_profiles;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_sizes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *patches;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *pcfilename;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *product;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_profile_t">ppd_profile_t</a> *profiles;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *protocols;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *shortnickname;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_size_t">ppd_size_t</a> *sizes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int throughput;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *ttrasterizer;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int variable_sizes;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>accurate_screens </dt>
+<dd class="description">1 = supports accurate screens, 0 = not</dd>
+<dt>color_device </dt>
+<dd class="description">1 = color device, 0 = grayscale</dd>
+<dt>colorspace </dt>
+<dd class="description">Default colorspace</dd>
+<dt>consts </dt>
+<dd class="description">UI/Non-UI constraints</dd>
+<dt>contone_only </dt>
+<dd class="description">1 = continuous tone only, 0 = not</dd>
+<dt>custom_margins[4] </dt>
+<dd class="description">Margins around page</dd>
+<dt>custom_max[2] </dt>
+<dd class="description">Maximum variable page size</dd>
+<dt>custom_min[2] </dt>
+<dd class="description">Minimum variable page size</dd>
+<dt>emulations </dt>
+<dd class="description">Emulations and the code to invoke them</dd>
+<dt>filters </dt>
+<dd class="description">Filter strings...</dd>
+<dt>flip_duplex <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">1 = Flip page for back sides </dd>
+<dt>fonts </dt>
+<dd class="description">Pre-loaded fonts</dd>
+<dt>groups </dt>
+<dd class="description">UI groups</dd>
+<dt>jcl_begin </dt>
+<dd class="description">Start JCL commands</dd>
+<dt>jcl_end </dt>
+<dd class="description">End JCL commands</dd>
+<dt>jcl_ps </dt>
+<dd class="description">Enter PostScript interpreter</dd>
+<dt>landscape </dt>
+<dd class="description">-90 or 90</dd>
+<dt>lang_encoding </dt>
+<dd class="description">Language encoding</dd>
+<dt>lang_version </dt>
+<dd class="description">Language version (English, Spanish, etc.)</dd>
+<dt>language_level </dt>
+<dd class="description">Language level of device</dd>
+<dt>manual_copies </dt>
+<dd class="description">1 = Copies done manually, 0 = hardware</dd>
+<dt>manufacturer </dt>
+<dd class="description">Manufacturer name</dd>
+<dt>model_number </dt>
+<dd class="description">Device-specific model number</dd>
+<dt>modelname </dt>
+<dd class="description">Model name (general)</dd>
+<dt>nickname </dt>
+<dd class="description">Nickname (specific)</dd>
+<dt>num_consts </dt>
+<dd class="description">Number of UI/Non-UI constraints</dd>
+<dt>num_emulations </dt>
+<dd class="description">Number of emulations supported</dd>
+<dt>num_filters </dt>
+<dd class="description">Number of filters</dd>
+<dt>num_fonts </dt>
+<dd class="description">Number of pre-loaded fonts</dd>
+<dt>num_groups </dt>
+<dd class="description">Number of UI groups</dd>
+<dt>num_profiles </dt>
+<dd class="description">Number of sRGB color profiles</dd>
+<dt>num_sizes </dt>
+<dd class="description">Number of page sizes</dd>
+<dt>patches </dt>
+<dd class="description">Patch commands to be sent to printer</dd>
+<dt>pcfilename <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dd class="description">PCFileName string </dd>
+<dt>product </dt>
+<dd class="description">Product name (from PS RIP/interpreter)</dd>
+<dt>profiles </dt>
+<dd class="description">sRGB color profiles</dd>
+<dt>protocols <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dd class="description">Protocols (BCP, TBCP) string </dd>
+<dt>shortnickname </dt>
+<dd class="description">Short version of nickname</dd>
+<dt>sizes </dt>
+<dd class="description">Page sizes</dd>
+<dt>throughput </dt>
+<dd class="description">Pages per minute</dd>
+<dt>ttrasterizer </dt>
+<dd class="description">Truetype rasterizer</dd>
+<dt>variable_sizes </dt>
+<dd class="description">1 = supports variable sizes, 0 = doesn't</dd>
+</dl>
+<h3 class="struct"><a name="ppd_group_s">ppd_group_s</a></h3>
+<p class="description">Groups</p>
+<p class="code">struct ppd_group_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char text[PPD_MAX_TEXT - PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_options;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_subgroups;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_option_t">ppd_option_t</a> *options;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;struct <a href="#ppd_group_s">ppd_group_s</a> *subgroups;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>PPD_MAX_NAME] </dt>
+<dd class="description">Human-readable group name</dd>
+<dt>name[PPD_MAX_NAME] <span class="info">&nbsp;CUPS 1.1.18&nbsp;</span></dt>
+<dd class="description">Group name </dd>
+<dt>num_options </dt>
+<dd class="description">Number of options</dd>
+<dt>num_subgroups </dt>
+<dd class="description">Number of sub-groups</dd>
+<dt>options </dt>
+<dd class="description">Options</dd>
+<dt>subgroups </dt>
+<dd class="description">Sub-groups (max depth = 1)</dd>
+</dl>
+<h3 class="struct"><a name="ppd_option_s">ppd_option_s</a></h3>
+<p class="description">Options</p>
+<p class="code">struct ppd_option_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_choice_t">ppd_choice_t</a> *choices;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char conflicted;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char defchoice[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char keyword[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int num_choices;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float order;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_section_t">ppd_section_t</a> section;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char text[PPD_MAX_TEXT];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_ui_t">ppd_ui_t</a> ui;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>choices </dt>
+<dd class="description">Option choices</dd>
+<dt>conflicted </dt>
+<dd class="description">0 if no conflicts exist, 1 otherwise</dd>
+<dt>defchoice[PPD_MAX_NAME] </dt>
+<dd class="description">Default option choice</dd>
+<dt>keyword[PPD_MAX_NAME] </dt>
+<dd class="description">Option keyword name (&quot;PageSize&quot;, etc.)</dd>
+<dt>num_choices </dt>
+<dd class="description">Number of option choices</dd>
+<dt>order </dt>
+<dd class="description">Order number</dd>
+<dt>section </dt>
+<dd class="description">Section for command</dd>
+<dt>text[PPD_MAX_TEXT] </dt>
+<dd class="description">Human-readable text</dd>
+<dt>ui </dt>
+<dd class="description">Type of UI option</dd>
+</dl>
+<h3 class="struct"><a name="ppd_profile_s">ppd_profile_s</a></h3>
+<p class="description">sRGB Color Profiles</p>
+<p class="code">struct ppd_profile_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float density;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float gamma;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float matrix[3][3];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char media_type[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char resolution[PPD_MAX_NAME];<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>density </dt>
+<dd class="description">Ink density to use</dd>
+<dt>gamma </dt>
+<dd class="description">Gamma correction to use</dd>
+<dt>matrix[3][3] </dt>
+<dd class="description">Transform matrix</dd>
+<dt>media_type[PPD_MAX_NAME] </dt>
+<dd class="description">Media type or &quot;-&quot;</dd>
+<dt>resolution[PPD_MAX_NAME] </dt>
+<dd class="description">Resolution or &quot;-&quot;</dd>
+</dl>
+<h3 class="struct"><a name="ppd_size_s">ppd_size_s</a></h3>
+<p class="description">Page Sizes</p>
+<p class="code">struct ppd_size_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float bottom;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float left;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float length;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int marked;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float right;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float top;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float width;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>bottom </dt>
+<dd class="description">Bottom printable margin in points</dd>
+<dt>left </dt>
+<dd class="description">Left printable margin in points</dd>
+<dt>length </dt>
+<dd class="description">Length of media in points</dd>
+<dt>marked </dt>
+<dd class="description">Page size selected?</dd>
+<dt>name[PPD_MAX_NAME] </dt>
+<dd class="description">Media size option</dd>
+<dt>right </dt>
+<dd class="description">Right printable margin in points</dd>
+<dt>top </dt>
+<dd class="description">Top printable margin in points</dd>
+<dt>width </dt>
+<dd class="description">Width of media in points</dd>
+</dl>
+<h2 class="title"><a name="UNIONS">Unions</a></h2>
+<h3 class="union"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cplimit_u">ppd_cplimit_u</a></h3>
+<p class="description">Custom Parameter Limit </p>
+<p class="code">union ppd_cplimit_u {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_curve;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int custom_int;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_invcurve;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int custom_passcode;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int custom_password;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_points;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_real;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int custom_string;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>custom_curve </dt>
+<dd class="description">Gamma value</dd>
+<dt>custom_int </dt>
+<dd class="description">Integer value</dd>
+<dt>custom_invcurve </dt>
+<dd class="description">Gamma value</dd>
+<dt>custom_passcode </dt>
+<dd class="description">Passcode length</dd>
+<dt>custom_password </dt>
+<dd class="description">Password length</dd>
+<dt>custom_points </dt>
+<dd class="description">Measurement value</dd>
+<dt>custom_real </dt>
+<dd class="description">Real value</dd>
+<dt>custom_string </dt>
+<dd class="description">String length</dd>
+</dl>
+<h3 class="union"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cpvalue_u">ppd_cpvalue_u</a></h3>
+<p class="description">Custom Parameter Value </p>
+<p class="code">union ppd_cpvalue_u {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_curve;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int custom_int;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_invcurve;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *custom_passcode;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *custom_password;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_points;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;float custom_real;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *custom_string;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>custom_curve </dt>
+<dd class="description">Gamma value</dd>
+<dt>custom_int </dt>
+<dd class="description">Integer value</dd>
+<dt>custom_invcurve </dt>
+<dd class="description">Gamma value</dd>
+<dt>custom_passcode </dt>
+<dd class="description">Passcode value</dd>
+<dt>custom_password </dt>
+<dd class="description">Password value</dd>
+<dt>custom_points </dt>
+<dd class="description">Measurement value</dd>
+<dt>custom_real </dt>
+<dd class="description">Real value</dd>
+<dt>custom_string </dt>
+<dd class="description">String value</dd>
+</dl>
+<h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
+<h3 class="enumeration"><a name="ppd_conform_e">ppd_conform_e</a></h3>
+<p class="description"></p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_CONFORM_RELAXED </dt>
+<dd class="description">Relax whitespace and control char</dd>
+<dt>PPD_CONFORM_STRICT </dt>
+<dd class="description">Require strict conformance</dd>
+</dl>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cptype_e">ppd_cptype_e</a></h3>
+<p class="description">Custom Parameter Type </p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_CUSTOM_CURVE </dt>
+<dd class="description">Curve value for f(x) = x^value</dd>
+<dt>PPD_CUSTOM_INT </dt>
+<dd class="description">Integer number value</dd>
+<dt>PPD_CUSTOM_INVCURVE </dt>
+<dd class="description">Curve value for f(x) = x^(1/value)</dd>
+<dt>PPD_CUSTOM_PASSCODE </dt>
+<dd class="description">String of (hidden) numbers</dd>
+<dt>PPD_CUSTOM_PASSWORD </dt>
+<dd class="description">String of (hidden) characters</dd>
+<dt>PPD_CUSTOM_POINTS </dt>
+<dd class="description">Measurement value in points</dd>
+<dt>PPD_CUSTOM_REAL </dt>
+<dd class="description">Real number value</dd>
+<dt>PPD_CUSTOM_STRING </dt>
+<dd class="description">String of characters</dd>
+</dl>
+<h3 class="enumeration"><a name="ppd_cs_e">ppd_cs_e</a></h3>
+<p class="description">Colorspaces</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_CS_CMY </dt>
+<dd class="description">CMY colorspace</dd>
+<dt>PPD_CS_CMYK </dt>
+<dd class="description">CMYK colorspace</dd>
+<dt>PPD_CS_GRAY </dt>
+<dd class="description">Grayscale colorspace</dd>
+<dt>PPD_CS_N </dt>
+<dd class="description">DeviceN colorspace</dd>
+<dt>PPD_CS_RGB </dt>
+<dd class="description">RGB colorspace</dd>
+<dt>PPD_CS_RGBK </dt>
+<dd class="description">RGBK (K = gray) colorspace</dd>
+</dl>
+<h3 class="enumeration"><a name="ppd_section_e">ppd_section_e</a></h3>
+<p class="description">Order dependency sections</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_ORDER_ANY </dt>
+<dd class="description">Option code can be anywhere in the file</dd>
+<dt>PPD_ORDER_DOCUMENT </dt>
+<dd class="description">... must be in the DocumentSetup section</dd>
+<dt>PPD_ORDER_EXIT </dt>
+<dd class="description">... must be sent prior to the document</dd>
+<dt>PPD_ORDER_JCL </dt>
+<dd class="description">... must be sent as a JCL command</dd>
+<dt>PPD_ORDER_PAGE </dt>
+<dd class="description">... must be in the PageSetup section</dd>
+<dt>PPD_ORDER_PROLOG </dt>
+<dd class="description">... must be in the Prolog section</dd>
+</dl>
+<h3 class="enumeration"><a name="ppd_status_e">ppd_status_e</a></h3>
+<p class="description">Types and structures...</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_ALLOC_ERROR </dt>
+<dd class="description">Memory allocation error</dd>
+<dt>PPD_BAD_CUSTOM_PARAM </dt>
+<dd class="description">Bad custom parameter</dd>
+<dt>PPD_BAD_OPEN_GROUP </dt>
+<dd class="description">Bad OpenGroup</dd>
+<dt>PPD_BAD_OPEN_UI </dt>
+<dd class="description">Bad OpenUI/JCLOpenUI</dd>
+<dt>PPD_BAD_ORDER_DEPENDENCY </dt>
+<dd class="description">Bad OrderDependency</dd>
+<dt>PPD_BAD_UI_CONSTRAINTS </dt>
+<dd class="description">Bad UIConstraints</dd>
+<dt>PPD_FILE_OPEN_ERROR </dt>
+<dd class="description">Unable to open PPD file</dd>
+<dt>PPD_ILLEGAL_CHARACTER </dt>
+<dd class="description">Illegal control character</dd>
+<dt>PPD_ILLEGAL_MAIN_KEYWORD </dt>
+<dd class="description">Illegal main keyword string</dd>
+<dt>PPD_ILLEGAL_OPTION_KEYWORD </dt>
+<dd class="description">Illegal option keyword string</dd>
+<dt>PPD_ILLEGAL_TRANSLATION </dt>
+<dd class="description">Illegal translation string</dd>
+<dt>PPD_ILLEGAL_WHITESPACE </dt>
+<dd class="description">Illegal whitespace character</dd>
+<dt>PPD_INTERNAL_ERROR </dt>
+<dd class="description">Internal error</dd>
+<dt>PPD_LINE_TOO_LONG </dt>
+<dd class="description">Line longer than 255 chars</dd>
+<dt>PPD_MISSING_ASTERISK </dt>
+<dd class="description">Missing asterisk in column 0</dd>
+<dt>PPD_MISSING_PPDADOBE4 </dt>
+<dd class="description">Missing PPD-Adobe-4.x header</dd>
+<dt>PPD_MISSING_VALUE </dt>
+<dd class="description">Missing value string</dd>
+<dt>PPD_NESTED_OPEN_GROUP </dt>
+<dd class="description">OpenGroup without a CloseGroup first</dd>
+<dt>PPD_NESTED_OPEN_UI </dt>
+<dd class="description">OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first</dd>
+<dt>PPD_NULL_FILE </dt>
+<dd class="description">NULL PPD file pointer</dd>
+<dt>PPD_OK </dt>
+<dd class="description">OK</dd>
+</dl>
+<h3 class="enumeration"><a name="ppd_ui_e">ppd_ui_e</a></h3>
+<p class="description">UI Types</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>PPD_UI_BOOLEAN </dt>
+<dd class="description">True or False option</dd>
+<dt>PPD_UI_PICKMANY </dt>
+<dd class="description">Pick zero or more from a list</dd>
+<dt>PPD_UI_PICKONE </dt>
+<dd class="description">Pick one from a list</dd>
+</dl>
+</div>
 </body>
 </html>
