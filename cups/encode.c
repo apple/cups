@@ -43,98 +43,98 @@
 
 static const _ipp_option_t ipp_options[] =
 {
-  { "auth-info",		IPP_TAG_TEXT,		IPP_TAG_JOB },
-  { "auth-info-required",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "blackplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "brightness-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "columns",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "columns-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "copies",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "copies-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "document-format",		IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
-  { "document-format-default",	IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
-  { "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
-  { "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
-  { "fitplot",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "fitplot-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "gamma",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "gamma-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "job-page-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "job-quota-period",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "job-uuid",			IPP_TAG_URI,		IPP_TAG_JOB },
-  { "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
-  { "mirror",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "mirror-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "natural-scaling",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "natural-scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "notify-charset",		IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
-  { "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
-  { "notify-events-default",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { "notify-lease-duration",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
-  { "notify-lease-duration-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "notify-natural-language",	IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
-  { "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
-  { "notify-recipient-uri",	IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
-  { "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
-  { "notify-user-data",		IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
-  { "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "number-up-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB },
-  { "orientation-requested-default", IPP_TAG_ENUM,	IPP_TAG_PRINTER },
-  { "page-bottom",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "page-bottom-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "page-left",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "page-left-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB },
-  { "page-ranges-default",	IPP_TAG_RANGE,		IPP_TAG_PRINTER },
-  { "page-right",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "page-right-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "page-top",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "page-top-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "penwidth",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "penwidth-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "port-monitor",             IPP_TAG_NAME,           IPP_TAG_PRINTER },
-  { "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
-  { "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
-  { "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
-  { "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
-  { "printer-is-accepting-jobs",IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
-  { "printer-location",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
-  { "printer-make-and-model",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
-  { "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
-  { "printer-op-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
-  { "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
-  { "printer-state",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
-  { "printer-state-change-time",IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "printer-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { "printer-type",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
-  { "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
-  { "queued-job-count",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
-  { "requesting-user-name-allowed",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
-  { "requesting-user-name-denied",	IPP_TAG_NAME,	IPP_TAG_PRINTER },
-  { "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
-  { "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
-  { "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "scaling",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
-  { "scaling-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
-  { "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
-  { "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
-  { "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER }
+  { 1, "auth-info",		IPP_TAG_TEXT,		IPP_TAG_JOB },
+  { 1, "auth-info-required",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "blackplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "blackplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "brightness",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "brightness-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "columns",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "columns-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "document-format",	IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { 0, "document-format-default", IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
+  { 1, "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 1, "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 0, "fitplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "fitplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "gamma",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "gamma-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-page-limit",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-quota-period",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "job-uuid",		IPP_TAG_URI,		IPP_TAG_JOB },
+  { 0, "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 1, "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "mirror",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "mirror-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "natural-scaling",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "natural-scaling-default", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "notify-charset",	IPP_TAG_CHARSET,	IPP_TAG_SUBSCRIPTION },
+  { 1, "notify-events",		IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { 1, "notify-events-default",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "notify-lease-duration",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { 0, "notify-lease-duration-default", IPP_TAG_INTEGER, IPP_TAG_PRINTER },
+  { 0, "notify-natural-language", IPP_TAG_LANGUAGE,	IPP_TAG_SUBSCRIPTION },
+  { 0, "notify-pull-method",	IPP_TAG_KEYWORD,	IPP_TAG_SUBSCRIPTION },
+  { 0, "notify-recipient-uri",	IPP_TAG_URI,		IPP_TAG_SUBSCRIPTION },
+  { 0, "notify-time-interval",	IPP_TAG_INTEGER,	IPP_TAG_SUBSCRIPTION },
+  { 0, "notify-user-data",	IPP_TAG_STRING,		IPP_TAG_SUBSCRIPTION },
+  { 0, "number-up",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "number-up-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "orientation-requested",	IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 0, "orientation-requested-default", IPP_TAG_ENUM,	IPP_TAG_PRINTER },
+  { 0, "page-bottom",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "page-bottom-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "page-left",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "page-left-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "page-ranges",		IPP_TAG_RANGE,		IPP_TAG_JOB },
+  { 1, "page-ranges-default",	IPP_TAG_RANGE,		IPP_TAG_PRINTER },
+  { 0, "page-right",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "page-right-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "page-top",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "page-top-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "penwidth",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "penwidth-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "port-monitor",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
+  { 0, "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 0, "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { 0, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "printer-is-shared",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "printer-location",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { 0, "printer-make-and-model", IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { 0, "printer-more-info",	IPP_TAG_URI,		IPP_TAG_PRINTER },
+  { 0, "printer-op-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "printer-resolution",	IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { 0, "printer-state",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 0, "printer-state-change-time", IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "printer-state-reasons",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "printer-type",		IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 0, "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
+  { 0, "queued-job-count",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { 1, "requesting-user-name-allowed", IPP_TAG_NAME,	IPP_TAG_PRINTER },
+  { 1, "requesting-user-name-denied", IPP_TAG_NAME,	IPP_TAG_PRINTER },
+  { 0, "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
+  { 0, "resolution-default",	IPP_TAG_RESOLUTION,	IPP_TAG_PRINTER },
+  { 0, "saturation",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "saturation-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "scaling",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "scaling-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER }
 };
 
 
@@ -192,7 +192,8 @@ cupsEncodeOptions2(
   char		*s,			/* Pointer into option value */
 		*val,			/* Pointer to option value */
 		*copy,			/* Copy of option value */
-		*sep;			/* Option separator */
+		*sep,			/* Option separator */
+		quote;			/* Quote character */
   ipp_attribute_t *attr;		/* IPP attribute */
   ipp_tag_t	value_tag;		/* IPP value tag */
   cups_option_t	*option;		/* Current option */
@@ -284,41 +285,28 @@ cupsEncodeOptions2(
     * Count the number of values...
     */
 
-    for (count = 1, sep = option->value; *sep; sep ++)
+    if (match && match->multivalue)
     {
-      if (*sep == '\'')
+      for (count = 1, sep = option->value, quote = 0; *sep; sep ++)
       {
-       /*
-        * Skip quoted option value...
-	*/
+	if (*sep == quote)
+	  quote = 0;
+	else if (!quote && (*sep == '\'' || *sep == '\"'))
+	{
+	 /*
+	  * Skip quoted option value...
+	  */
 
-        sep ++;
-
-        while (*sep && *sep != '\'')
+	  quote = *sep++;
+	}
+	else if (*sep == ',' && !quote)
+	  count ++;
+	else if (*sep == '\\' && sep[1])
 	  sep ++;
-
-	if (!*sep)
-	  sep --;
       }
-      else if (*sep == '\"')
-      {
-       /*
-        * Skip quoted option value...
-	*/
-
-        sep ++;
-
-        while (*sep && *sep != '\"')
-	  sep ++;
-
-	if (!*sep)
-	  sep --;
-      }
-      else if (*sep == ',')
-        count ++;
-      else if (*sep == '\\' && sep[1])
-        sep ++;
     }
+    else
+      count = 1;
 
     DEBUG_printf(("cupsEncodeOptions2: option = \'%s\', count = %d\n",
                   option->name, count));
@@ -390,50 +378,47 @@ cupsEncodeOptions2(
     * Scan the value string for values...
     */
 
-    for (j = 0; j < count; val = sep, j ++)
+    for (j = 0, sep = val; j < count; val = sep, j ++)
     {
      /*
       * Find the end of this value and mark it if needed...
       */
 
-      for (sep = val; *sep; sep ++)
+      if (count > 1)
       {
-	if (*sep == '\'')
+	for (quote = 0; *sep; sep ++)
 	{
-	 /*
-	  * Skip quoted option value...
-	  */
+	  if (*sep == quote)
+	  {
+	   /*
+	    * Finish quoted value...
+	    */
 
-	  sep ++;
+	    quote = 0;
+	  }
+	  else if (!quote && (*sep == '\'' || *sep == '\"'))
+	  {
+	   /*
+	    * Handle quoted option value...
+	    */
 
-	  while (*sep && *sep != '\'')
+	    quote = *sep;
+	  }
+	  else if (*sep == ',' && count > 1)
+	    break;
+	  else if (*sep == '\\' && sep[1])
+	  {
+	   /*
+	    * Skip quoted character...
+	    */
+
 	    sep ++;
-
-	  if (!*sep)
-	    sep --;
+	  }
 	}
-	else if (*sep == '\"')
-	{
-	 /*
-	  * Skip quoted option value...
-	  */
 
-	  sep ++;
-
-	  while (*sep && *sep != '\"')
-	    sep ++;
-
-	  if (!*sep)
-	    sep --;
-	}
-	else if (*sep == ',')
-	  break;
-	else if (*sep == '\\' && sep[1])
-	  sep ++;
+	if (*sep == ',')
+	  *sep++ = '\0';
       }
-
-      if (*sep == ',')
-	*sep++ = '\0';
 
      /*
       * Copy the option value(s) over as needed by the type...
@@ -447,7 +432,7 @@ cupsEncodeOptions2(
 	    * Integer/enumeration value...
 	    */
 
-            attr->values[j].integer = strtol(val, &s, 0);
+            attr->values[j].integer = strtol(val, &s, 10);
 
             DEBUG_printf(("cupsEncodeOptions2: Added integer option value %d...\n",
 	                  attr->values[j].integer));
@@ -489,12 +474,12 @@ cupsEncodeOptions2(
 	      s = val;
 	    }
 	    else
-	      attr->values[j].range.lower = strtol(val, &s, 0);
+	      attr->values[j].range.lower = strtol(val, &s, 10);
 
 	    if (*s == '-')
 	    {
 	      if (s[1])
-		attr->values[j].range.upper = strtol(s + 1, NULL, 0);
+		attr->values[j].range.upper = strtol(s + 1, NULL, 10);
 	      else
 		attr->values[j].range.upper = 2147483647;
             }
@@ -511,10 +496,10 @@ cupsEncodeOptions2(
 	    * Resolution...
 	    */
 
-	    attr->values[j].resolution.xres = strtol(val, &s, 0);
+	    attr->values[j].resolution.xres = strtol(val, &s, 10);
 
 	    if (*s == 'x')
-	      attr->values[j].resolution.yres = strtol(s + 1, &s, 0);
+	      attr->values[j].resolution.yres = strtol(s + 1, &s, 10);
 	    else
 	      attr->values[j].resolution.yres = attr->values[j].resolution.xres;
 
@@ -533,7 +518,7 @@ cupsEncodeOptions2(
 	    */
 
             attr->values[j].unknown.length = (int)strlen(val);
-	    attr->values[j].unknown.data   = _cupsStrAlloc(val);
+	    attr->values[j].unknown.data   = strdup(val);
 
             DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",
 	                  attr->values[j].unknown.data));

@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The cupsEncodeOptions2() function did not parse multiple-
+	  value attribute values properly (STR #2690)
 	- The scheduler incorrectly sent printer-stopped events for
 	  status updates from the print filters (STR #2680)
 	- The IPP backend could crash when handling printer errors

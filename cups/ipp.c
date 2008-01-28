@@ -1187,17 +1187,15 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	      attr->value_tag = tag;
 	    }
-	    else if (value_tag == IPP_TAG_STRING ||
-    		     (value_tag >= IPP_TAG_TEXTLANG &&
-		      value_tag <= IPP_TAG_MIMETYPE))
+	    else if (value_tag >= IPP_TAG_TEXTLANG &&
+		     value_tag <= IPP_TAG_MIMETYPE)
             {
 	     /*
 	      * String values can sometimes come across in different
 	      * forms; accept sets of differing values...
 	      */
 
-	      if (tag != IPP_TAG_STRING &&
-    		  (tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE))
+	      if (tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE)
 	        return (IPP_ERROR);
             }
 	    else if (value_tag != tag)
@@ -1334,6 +1332,7 @@ ippReadIO(void       *src,		/* I - Data source */
 
                 value->integer = n;
 	        break;
+
 	    case IPP_TAG_BOOLEAN :
 		if (n != 1)
 		{
@@ -1349,10 +1348,10 @@ ippReadIO(void       *src,		/* I - Data source */
 
                 value->boolean = buffer[0];
 	        break;
+
 	    case IPP_TAG_TEXT :
 	    case IPP_TAG_NAME :
 	    case IPP_TAG_KEYWORD :
-	    case IPP_TAG_STRING :
 	    case IPP_TAG_URI :
 	    case IPP_TAG_URISCHEME :
 	    case IPP_TAG_CHARSET :
@@ -1375,6 +1374,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		DEBUG_printf(("ippReadIO: value = \'%s\'\n",
 		              value->string.text));
 	        break;
+
 	    case IPP_TAG_DATE :
 		if (n != 11)
 		{
@@ -1388,6 +1388,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		  return (IPP_ERROR);
 		}
 	        break;
+
 	    case IPP_TAG_RESOLUTION :
 		if (n != 9)
 		{
@@ -1410,6 +1411,7 @@ ippReadIO(void       *src,		/* I - Data source */
                 value->resolution.units =
 		    (ipp_res_t)buffer[8];
 	        break;
+
 	    case IPP_TAG_RANGE :
 		if (n != 8)
 		{
@@ -1430,6 +1432,7 @@ ippReadIO(void       *src,		/* I - Data source */
 		    (((((buffer[4] << 8) | buffer[5]) << 8) | buffer[6]) << 8) |
 		    buffer[7];
 	        break;
+
 	    case IPP_TAG_TEXTLANG :
 	    case IPP_TAG_NAMELANG :
 	        if (n >= sizeof(buffer) || n < 4)
@@ -1955,7 +1958,6 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    case IPP_TAG_TEXT :
 	    case IPP_TAG_NAME :
 	    case IPP_TAG_KEYWORD :
-	    case IPP_TAG_STRING :
 	    case IPP_TAG_URI :
 	    case IPP_TAG_URISCHEME :
 	    case IPP_TAG_CHARSET :
@@ -2521,7 +2523,6 @@ _ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
     case IPP_TAG_TEXT :
     case IPP_TAG_NAME :
     case IPP_TAG_KEYWORD :
-    case IPP_TAG_STRING :
     case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :
     case IPP_TAG_CHARSET :
@@ -2559,6 +2560,13 @@ _ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
 	     i ++, value ++)
           ippDelete(value->collection);
 	break;
+
+    case IPP_TAG_STRING :
+	for (i = 0, value = attr->values;
+	     i < attr->num_values;
+	     i ++, value ++)
+	  free(value->unknown.data);
+        break;
 
     default :
         if (!((int)attr->value_tag & IPP_TAG_COPY))
@@ -2648,7 +2656,6 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
       case IPP_TAG_TEXT :
       case IPP_TAG_NAME :
       case IPP_TAG_KEYWORD :
-      case IPP_TAG_STRING :
       case IPP_TAG_URI :
       case IPP_TAG_URISCHEME :
       case IPP_TAG_CHARSET :
