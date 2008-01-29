@@ -469,7 +469,8 @@ apihelp:
 		http.h ipp.h auth.c encode.c http.c http-addr.c \
 		http-support.c ipp.c ipp-support.c md5passwd.c \
 		request.c >../doc/help/api-httpipp.html
-	mxmldoc --section "Programming" --title "Filter and Backend APIs" \
+	mxmldoc --section "Programming" \
+		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
 		backchannel.c sidechannel.c sidechannel.h >../doc/help/api-filter.html

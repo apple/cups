@@ -646,7 +646,7 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection or @code CUPS_HTTP_DEFAUL
   if (whichjobs == CUPS_WHICHJOBS_COMPLETED)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                  "which-jobs", NULL, "completed");
-  else if (whichkob == CUPS_WHICHJOBS_ALL)
+  else if (whichjobs == CUPS_WHICHJOBS_ALL)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                  "which-jobs", NULL, "all");
 
