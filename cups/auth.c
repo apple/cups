@@ -91,8 +91,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
   const char	*password;		/* Password string */
   char		prompt[1024],		/* Prompt for user */
 		realm[HTTP_MAX_VALUE],	/* realm="xyz" string */
-		nonce[HTTP_MAX_VALUE],	/* nonce="xyz" string */
-		encode[4096];		/* Encoded username:password */
+		nonce[HTTP_MAX_VALUE];	/* nonce="xyz" string */
   int		localauth;		/* Local authentication result */
   _cups_globals_t *cg;			/* Global data */
 
@@ -301,13 +300,39 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     if (major_status == GSS_S_CONTINUE_NEEDED)
       DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
 
-    if (output_token.length)
+    if (output_token.length < 65536)
     {
-      httpEncode64_2(encode, sizeof(encode), output_token.value,
+     /*
+      * Allocate the authorization string since Windows KDCs can have
+      * arbitrarily large credentials...
+      */
+
+      int authsize = 10 +				/* "Negotiate " */
+                     output_token.length * 4 / 3 + 1 +	/* Base64 */
+		     1;					/* nul */
+
+      httpSetAuthString(http, NULL, NULL);
+
+      if ((http->authstring = malloc(authsize)) == NULL)
+      {
+        http->authstring = http->_authstring;
+	authsize         = sizeof(http->_authstring);
+      }
+
+      strcpy(http->authstring, "Negotiate ");
+      httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
 		     output_token.length);
-      httpSetAuthString(http, "Negotiate", encode);
  
       major_status = gss_release_buffer(&minor_status, &output_token);
+    }
+    else
+    {
+      DEBUG_printf(("cupsDoAuthentication: Kerberos credentials too large - "
+                    "%d bytes!\n", output_token.length));
+
+      major_status = gss_release_buffer(&minor_status, &output_token);
+
+      return (-1);
     }
 #endif /* HAVE_GSSAPI */
   }
@@ -316,6 +341,9 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
    /*
     * Basic authentication...
     */
+
+    char	encode[256];		/* Base64 buffer */
+
 
     httpEncode64_2(encode, sizeof(encode), http->userpass,
                    (int)strlen(http->userpass));
@@ -327,7 +355,8 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     * Digest authentication...
     */
 
-    char digest[1024];			/* Digest auth data */
+    char	encode[33],		/* MD5 buffer */
+		digest[1024];		/* Digest auth data */
 
 
     httpGetSubField(http, HTTP_FIELD_WWW_AUTHENTICATE, "realm", realm);
