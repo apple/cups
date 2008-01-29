@@ -3,7 +3,7 @@
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -71,16 +71,21 @@ extern "C" {
 #  define CUPS_FORMAT_RAW	"application/vnd.cups-raw"
 #  define CUPS_FORMAT_TEXT	"text/plain"
 #  define CUPS_HTTP_DEFAULT	(http_t *)0
+#  define CUPS_JOBID_ALL	-1
+#  define CUPS_JOBID_CURRENT	0
 #  define CUPS_LENGTH_VARIABLE	(ssize_t)0
+#  define CUPS_WHICHJOBS_ALL	-1
+#  define CUPS_WHICHJOBS_ACTIVE	0
+#  define CUPS_WHICHJOBS_COMPLETED 1
 
 
 /*
  * Types and structures...
  */
 
-typedef unsigned cups_ptype_t;		/**** Printer Type/Capability Bits ****/
-enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
-{
+typedef unsigned cups_ptype_t;		/**** Printer type/capability bits ****/
+enum cups_ptype_e			/**** Printer type/capability bit constants ****/
+{					/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_LOCAL = 0x0000,		/* Local printer or class */
   CUPS_PRINTER_CLASS = 0x0001,		/* Printer class */
   CUPS_PRINTER_REMOTE = 0x0002,		/* Remote printer or class */
@@ -107,7 +112,7 @@ enum cups_ptype_e			/* Not a typedef'd enum so we can OR */
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3@ */
-  CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) */
+  CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */
 };
 
 typedef const char *(*cups_password_cb_t)(const char *);
@@ -158,8 +163,8 @@ extern http_encryption_t cupsEncryption(void);
 extern void		cupsFreeJobs(int num_jobs, cups_job_t *jobs);
 extern int		cupsGetClasses(char ***classes) _CUPS_DEPRECATED;
 extern const char	*cupsGetDefault(void);
-extern int		cupsGetJobs(cups_job_t **jobs, const char *dest,
-			            int myjobs, int completed);
+extern int		cupsGetJobs(cups_job_t **jobs, const char *name,
+			            int myjobs, int whichjobs);
 extern const char	*cupsGetPPD(const char *name);
 extern int		cupsGetPrinters(char ***printers) _CUPS_DEPRECATED;
 extern ipp_status_t	cupsLastError(void);
@@ -215,7 +220,7 @@ extern const char	*cupsGetDefault2(http_t *http) _CUPS_API_1_1_21;
 extern int		cupsGetDests2(http_t *http, cups_dest_t **dests) _CUPS_API_1_1_21;
 extern int		cupsGetJobs2(http_t *http, cups_job_t **jobs,
 			             const char *name, int myjobs,
-				     int completed) _CUPS_API_1_1_21;
+				     int whichjobs) _CUPS_API_1_1_21;
 extern const char	*cupsGetPPD2(http_t *http, const char *name) _CUPS_API_1_1_21;
 extern int		cupsPrintFile2(http_t *http, const char *name,
 			               const char *filename,

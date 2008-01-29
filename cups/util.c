@@ -84,13 +84,16 @@ static int	cups_get_printer_uri(http_t *http, const char *name,
 /*
  * 'cupsCancelJob()' - Cancel a print job on the default server.
  *
- * Use the *link cupsLastError* and *link cupsLastErrorString* functions to get
+ * Pass @code CUPS_JOBID_ALL@ to cancel all jobs or @code CUPS_JOBID_CURRENT@
+ * to cancel the current job on the named destination.
+ *
+ * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
  */
 
 int					/* O - 1 on success, 0 on failure */
 cupsCancelJob(const char *name,		/* I - Name of printer or class */
-              int        job_id)	/* I - Job ID or 0 for the current job, -1 for all jobs */
+              int        job_id)	/* I - Job ID */
 {
   return (cupsCancelJob2(CUPS_HTTP_DEFAULT, name, job_id, 0)
               < IPP_REDIRECTION_OTHER_SITE);
@@ -102,6 +105,9 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
  *
  * Canceled jobs remain in the job history while purged jobs are removed
  * from the job history.
+ *
+ * Pass @code CUPS_JOBID_ALL@ to cancel all jobs or @code CUPS_JOBID_CURRENT@
+ * to cancel the current job on the named destination.
  *
  * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
@@ -188,15 +194,15 @@ cupsCancelJob2(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAU
 /*
  * 'cupsCreateJob()' - Create an empty job.
  *
- * Submit files for printing to the job using the cupsStartDocument(),
- * cupsWriteRequestData(), and cupsFinishDocument() functions.
+ * Submit files for printing to the job using the @link cupsStartDocument@,
+ * @link cupsWriteRequestData@, and @link cupsFinishDocument@ functions.
  *
  * @since CUPS 1.4@
  */
 
 int					/* O - Job ID or 0 on error */
 cupsCreateJob(
-    http_t        *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    http_t        *http,		/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
     const char    *name,		/* I - Printer or class name */
     const char    *title,		/* I - Title of job */
     int           num_options,		/* I - Number of options */
@@ -269,11 +275,13 @@ cupsCreateJob(
 /*
  * 'cupsFinishDocument()' - Finish sending a document.
  *
+ * The document must have been started using @link cupsStartDocument@.
+ *
  * @since CUPS 1.4@
  */
 
 ipp_status_t				/* O - Status of document submission */
-cupsFinishDocument(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsFinishDocument(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
                    const char *name)	/* I - Printer or class name */
 {
   char	resource[1024];			/* Printer resource */
@@ -317,7 +325,7 @@ cupsFreeJobs(int        num_jobs,	/* I - Number of jobs */
 /*
  * 'cupsGetClasses()' - Get a list of printer classes from the default server.
  *
- * This function is deprecated - use cupsGetDests() instead.
+ * This function is deprecated - use @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -412,12 +420,12 @@ cupsGetClasses(char ***classes)		/* O - Classes */
  * This function returns the default printer or class as defined by
  * the LPDEST or PRINTER environment variables. If these environment
  * variables are not set, the server default destination is returned.
- * Applications should use the cupsGetDests() and cupsGetDest() functions
- * to get the user-defined default printer, as this function does not
- * support the lpoptions-defined default printer.
+ * Applications should use the @link cupsGetDests@ and @link cupsGetDest@
+ * functions to get the user-defined default printer, as this function does
+ * not support the lpoptions-defined default printer.
  */
 
-const char *				/* O - Default printer or NULL */
+const char *				/* O - Default printer or @code NULL@ */
 cupsGetDefault(void)
 {
  /*
@@ -434,15 +442,15 @@ cupsGetDefault(void)
  * This function returns the default printer or class as defined by
  * the LPDEST or PRINTER environment variables. If these environment
  * variables are not set, the server default destination is returned.
- * Applications should use the cupsGetDests() and cupsGetDest() functions
- * to get the user-defined default printer, as this function does not
- * support the lpoptions-defined default printer.
+ * Applications should use the @link cupsGetDests@ and @link cupsGetDest@
+ * functions to get the user-defined default printer, as this function does
+ * not support the lpoptions-defined default printer.
  *
  * @since CUPS 1.1.21@
  */
 
-const char *				/* O - Default printer or NULL */
-cupsGetDefault2(http_t *http)		/* I - HTTP connection */
+const char *				/* O - Default printer or @code NULL@ */
+cupsGetDefault2(http_t *http)		/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
 {
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -505,21 +513,24 @@ cupsGetDefault2(http_t *http)		/* I - HTTP connection */
 
 /*
  * 'cupsGetJobs()' - Get the jobs from the default server.
+ *
+ * A "whichjobs" value of @code CUPS_WHICHJOBS_ALL@ returns all jobs regardless
+ * of state, while @code CUPS_WHICHJOBS_ACTIVE@ returns jobs that are
+ * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
+ * jobs that are stopped, canceled, aborted, or completed.
  */
 
 int					/* O - Number of jobs */
 cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
-            const char *mydest,		/* I - NULL = all destinations,       *
-	                                 *     otherwise show jobs for mydest */
+            const char *name,		/* I - @code NULL@ = all destinations, otherwise show jobs for mydest */
             int        myjobs,		/* I - 0 = all users, 1 = mine */
-	    int        completed)	/* I - -1 = show all, 0 = active, *
-	                                 *     1 = completed jobs         */
+	    int        whichjobs)	/* I - @code CUPS_WHICHJOBS_ALL@, @code CUPS_WHICHJOBS_ACTIVE@, or @code CUPS_WHICHJOBS_COMPLETED@ */
 {
  /*
   * Return the jobs...
   */
 
-  return (cupsGetJobs2(CUPS_HTTP_DEFAULT, jobs, mydest, myjobs, completed));
+  return (cupsGetJobs2(CUPS_HTTP_DEFAULT, jobs, name, myjobs, whichjobs));
 }
 
 
@@ -527,17 +538,20 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
 /*
  * 'cupsGetJobs2()' - Get the jobs from the specified server.
  *
+ * A "whichjobs" value of @code CUPS_WHICHJOBS_ALL@ returns all jobs regardless
+ * of state, while @code CUPS_WHICHJOBS_ACTIVE@ returns jobs that are
+ * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
+ * jobs that are stopped, canceled, aborted, or completed.
+ *
  * @since CUPS 1.1.21@
  */
 
 int					/* O - Number of jobs */
-cupsGetJobs2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsGetJobs2(http_t     *http,		/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
              cups_job_t **jobs,		/* O - Job data */
-             const char *mydest,	/* I - NULL = all destinations,       *
-	                                 *     otherwise show jobs for mydest */
+             const char *name,		/* I - @code NULL@ = all destinations, otherwise show jobs for mydest */
              int        myjobs,		/* I - 0 = all users, 1 = mine */
-	     int        completed)	/* I - -1 = show all, 0 = active, *
-	                                 *     1 = completed jobs         */
+	     int        whichjobs)	/* I - @code CUPS_WHICHJOBS_ALL@, @code CUPS_WHICHJOBS_ACTIVE@, or @code CUPS_WHICHJOBS_COMPLETED@ */
 {
   int		n;			/* Number of jobs */
   ipp_t		*request,		/* IPP Request */
@@ -588,10 +602,10 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
   * Get the right URI...
   */
 
-  if (mydest)
+  if (name)
   {
     if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                         "localhost", 0, "/printers/%s", mydest) != HTTP_URI_OK)
+                         "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
     {
       _cupsSetError(IPP_INTERNAL_ERROR, NULL);
 
@@ -629,10 +643,10 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
   if (myjobs)
     ippAddBoolean(request, IPP_TAG_OPERATION, "my-jobs", 1);
 
-  if (completed > 0)
+  if (whichjobs == CUPS_WHICHJOBS_COMPLETED)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                  "which-jobs", NULL, "completed");
-  else if (completed < 0)
+  else if (whichkob == CUPS_WHICHJOBS_ALL)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                  "which-jobs", NULL, "all");
 
@@ -794,7 +808,7 @@ cupsGetJobs2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
 /*
  * 'cupsGetPPD()' - Get the PPD file for a printer on the default server.
  *
- * For classes, cupsGetPPD() returns the PPD file for the first printer
+ * For classes, @code cupsGetPPD@ returns the PPD file for the first printer
  * in the class.
  */
 
@@ -822,14 +836,14 @@ cupsGetPPD(const char *name)		/* I - Printer name */
 /*
  * 'cupsGetPPD2()' - Get the PPD file for a printer from the specified server.
  *
- * For classes, cupsGetPPD2() returns the PPD file for the first printer
+ * For classes, @code cupsGetPPD2@ returns the PPD file for the first printer
  * in the class.
  *
  * @since CUPS 1.1.21@
  */
 
 const char *				/* O - Filename for PPD file */
-cupsGetPPD2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsGetPPD2(http_t     *http,		/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
             const char *name)		/* I - Printer name */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -858,12 +872,16 @@ cupsGetPPD2(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
  * the empty string, a new temporary file is created, otherwise the existing
  * file will be overwritten as needed.
  *
- * On success, HTTP_OK is returned for a new PPD file and HTTP_NOT_MODIFIED
- * if the existing PPD file is up-to-date.  Any other status is an error.
+ * On success, @code HTTP_OK@ is returned for a new PPD file and
+ * @code HTTP_NOT_MODIFIED@ if the existing PPD file is up-to-date.  Any other
+ * status is an error.
+ *
+ * For classes, @code cupsGetPPD3@ returns the PPD file for the first printer
+ * in the class.
  */
 
 http_status_t				/* O  - HTTP status */
-cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
             const char *name,		/* I  - Printer name */
 	    time_t     *modtime,	/* IO - Modification time */
 	    char       *buffer,		/* I  - Filename buffer */
@@ -1044,7 +1062,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or CUPS_HTTP_DEFAULT */
 /*
  * 'cupsGetPrinters()' - Get a list of printers from the default server.
  *
- * This function is deprecated - use cupsGetDests() instead.
+ * This function is deprecated - use @link cupsGetDests@ instead.
  *
  * @deprecated@
  */
@@ -1151,19 +1169,19 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
  * 'cupsGetServerPPD()' - Get an available PPD file from the server.
  *
  * This function returns the named PPD file from the server.  The
- * list of available PPDs is provided by the IPP CUPS_GET_PPDS
+ * list of available PPDs is provided by the IPP @code CUPS_GET_PPDS@
  * operation.
  *
  * You must remove (unlink) the PPD file when you are finished with
  * it. The PPD filename is stored in a static location that will be
- * overwritten on the next call to cupsGetPPD(), cupsGetPPD2(), or
- * cupsGetServerPPD().
+ * overwritten on the next call to @link cupsGetPPD@, @link cupsGetPPD2@,
+ * or @link cupsGetServerPPD@.
  *
  * @since CUPS 1.3@
  */
 
-char *					/* O - Name of PPD file or NULL on error */
-cupsGetServerPPD(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+char *					/* O - Name of PPD file or @code NULL@ on error */
+cupsGetServerPPD(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
                  const char *name)	/* I - Name of PPD file ("ppd-name") */
 {
   int			fd;		/* PPD file descriptor */
@@ -1252,7 +1270,7 @@ cupsLastErrorString(void)
  * 'cupsPrintFile()' - Print a file to a printer or class on the default server.
  */
 
-int					/* O - Job ID */
+int					/* O - Job ID or 0 on error */
 cupsPrintFile(const char    *name,	/* I - Printer or class name */
               const char    *filename,	/* I - File to print */
 	      const char    *title,	/* I - Title of job */
@@ -1269,12 +1287,13 @@ cupsPrintFile(const char    *name,	/* I - Printer or class name */
 
 
 /*
- * 'cupsPrintFile2()' - Print a file to a printer or class on the specified server.
+ * 'cupsPrintFile2()' - Print a file to a printer or class on the specified
+ *                      server.
  *
  * @since CUPS 1.1.21@
  */
 
-int					/* O - Job ID */
+int					/* O - Job ID or 0 on error */
 cupsPrintFile2(
     http_t        *http,		/* I - HTTP connection */
     const char    *name,		/* I - Printer or class name */
@@ -1297,7 +1316,7 @@ cupsPrintFile2(
  *                      default server.
  */
 
-int					/* O - Job ID */
+int					/* O - Job ID or 0 on error */
 cupsPrintFiles(
     const char    *name,		/* I - Printer or class name */
     int           num_files,		/* I - Number of files */
@@ -1327,9 +1346,9 @@ cupsPrintFiles(
  * @since CUPS 1.1.21@
  */
 
-int					/* O - Job ID */
+int					/* O - Job ID or 0 on error */
 cupsPrintFiles2(
-    http_t        *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    http_t        *http,		/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
     const char    *name,		/* I - Printer or class name */
     int           num_files,		/* I - Number of files */
     const char    **files,		/* I - File(s) to print */
@@ -1427,24 +1446,24 @@ cupsPrintFiles2(
 /*
  * 'cupsStartDocument()' - Add a document to a job created with cupsCreateJob().
  *
- * Use cupsWriteRequestData() to write data for the document and
- * cupsFinishDocument() to finish the document and get the submission status.
+ * Use @link cupsWriteRequestData@ to write data for the document and
+ * @link cupsFinishDocument@ to finish the document and get the submission status.
  *
- * The MIME type constants CUPS_FORMAT_AUTO, CUPS_FORMAT_PDF,
- * CUPS_FORMAT_POSTSCRIPT, CUPS_FORMAT_RAW, and CUPS_FORMAT_TEXT are provided
- * for the "format" argument, although any supported MIME type string can be
- * supplied.
+ * The MIME type constants @code CUPS_FORMAT_AUTO@, @code CUPS_FORMAT_PDF@,
+ * @code CUPS_FORMAT_POSTSCRIPT@, @code CUPS_FORMAT_RAW@, and
+ * @code CUPS_FORMAT_TEXT@ are provided for the "format" argument, although
+ * any supported MIME type string can be supplied.
  *
  * @since CUPS 1.4@
  */
 
 http_status_t				/* O - HTTP status of request */
 cupsStartDocument(
-    http_t     *http,			/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    http_t     *http,			/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
     const char *name,			/* I - Printer or class name */
-    int        job_id,			/* I - Job ID from cupsCreateJob() */
+    int        job_id,			/* I - Job ID from @link cupsCreateJob@ */
     const char *docname,		/* I - Name of document */
-    const char *format,			/* I - MIME type or CUPS_FORMAT_foo */
+    const char *format,			/* I - MIME type or @code CUPS_FORMAT_foo@ */
     int        last_document)		/* I - 1 for last document in job, 0 otherwise */
 {
   char		resource[1024],		/* Resource for destinatio */

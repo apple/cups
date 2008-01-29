@@ -4,7 +4,7 @@
  *   User, system, and password routines for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -56,7 +56,7 @@ static cups_file_t	*cups_open_client_conf(void);
  * The default encryption setting comes from the CUPS_ENCRYPTION
  * environment variable, then the ~/.cupsrc file, and finally the
  * /etc/cups/client.conf file. If not set, the default is
- * HTTP_ENCRYPT_IF_REQUESTED.
+ * @code HTTP_ENCRYPT_IF_REQUESTED@.
  */
 
 http_encryption_t			/* O - Encryption settings */
@@ -133,7 +133,7 @@ cupsEncryption(void)
 /*
  * 'cupsGetPassword()' - Get a password from the user.
  *
- * Uses the current password callback function. Returns NULL if the
+ * Uses the current password callback function. Returns @code NULL@ if the
  * user does not provide a password.
  */
 
@@ -272,7 +272,7 @@ cupsServer(void)
 /*
  * 'cupsSetPasswordCB()' - Set the password callback for CUPS.
  *
- * Pass NULL to restore the default (console) password callback.
+ * Pass @code NULL@ to restore the default (console) password callback.
  */
 
 void
@@ -292,7 +292,7 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
  * 'cupsSetServer()' - Set the default server name.
  *
  * The "server" string can be a fully-qualified hostname, a numeric
- * IPv4 or IPv6 address, or a domain socket pathname. Pass NULL to
+ * IPv4 or IPv6 address, or a domain socket pathname. Pass @code NULL@ to
  * restore the default server name.
  */
 
@@ -337,7 +337,7 @@ cupsSetServer(const char *server)	/* I - Server name */
 /*
  * 'cupsSetUser()' - Set the default user name.
  *
- * Pass NULL to restore the default user name.
+ * Pass @code NULL@ to restore the default user name.
  */
 
 void

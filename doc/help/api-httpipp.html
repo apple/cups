@@ -234,7 +234,7 @@ div.body dd {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-httpipp.shtml 7257 2008-01-25 02:42:47Z mike $"
+  "$Id: api-httpipp.header 7258 2008-01-28 00:15:05Z mike $"
 
   HTTP and IPP API header for the Common UNIX Printing System (CUPS).
 
@@ -456,7 +456,7 @@ with a hostname. ">http_addrlist_s</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id: api-httpipp.shtml 7257 2008-01-25 02:42:47Z mike $"
+  "$Id: api-httpipp.shtml 7258 2008-01-28 00:15:05Z mike $"
 
   HTTP and IPP API introduction for the Common UNIX Printing System (CUPS).
 
@@ -792,14 +792,14 @@ int cupsDoAuthentication (<br>
 <dt>http</dt>
 <dd class="description">HTTP connection to server</dd>
 <dt>method</dt>
-<dd class="description">Request method (GET, POST, PUT)</dd>
+<dd class="description">Request method (&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;)</dd>
 <dt>resource</dt>
 <dd class="description">Resource path</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function should be called in response to a HTTP_UNAUTHORIZED
+<p class="discussion">This function should be called in response to a <code>HTTP_UNAUTHORIZED</code>
 status, prior to resubmitting your request.
 
 </p>

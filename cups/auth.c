@@ -76,7 +76,7 @@ static int	cups_local_auth(http_t *http);
 /*
  * 'cupsDoAuthentication()' - Authenticate a request.
  *
- * This function should be called in response to a HTTP_UNAUTHORIZED
+ * This function should be called in response to a @code HTTP_UNAUTHORIZED@
  * status, prior to resubmitting your request.
  *
  * @since CUPS 1.1.20@
@@ -84,7 +84,7 @@ static int	cups_local_auth(http_t *http);
 
 int					/* O - 0 on success, -1 on error */
 cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
-                     const char *method,/* I - Request method (GET, POST, PUT) */
+                     const char *method,/* I - Request method ("GET", "POST", "PUT") */
 		     const char *resource)
 					/* I - Resource path */
 {

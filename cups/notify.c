@@ -3,7 +3,7 @@
  *
  *   Notification routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2005-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -36,7 +36,7 @@
  * @since CUPS 1.2@
  */
 
-char *					/* O - Subject string or NULL */
+char *					/* O - Subject string or @code NULL@ */
 cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
                   ipp_t       *event)	/* I - Event data */
 {
@@ -162,12 +162,12 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
 /*
  * 'cupsNotifyText()' - Return the text for the given notification message.
  *
- * The returned string must be freed by the caller using free().
+ * The returned string must be freed by the caller using @code free@.
  *
  * @since CUPS 1.2@
  */
 
-char *					/* O - Message text or NULL */
+char *					/* O - Message text or @code NULL@ */
 cupsNotifyText(cups_lang_t *lang,	/* I - Language data */
                ipp_t       *event)	/* I - Event data */
 {

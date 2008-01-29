@@ -3,7 +3,7 @@
  *
  *   Temp file utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -155,8 +155,8 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
  * 'cupsTempFile()' - Generates a temporary filename.
  *
  * The temporary filename is returned in the filename buffer.
- * This function is deprecated - use cupsTempFd() or cupsTempFile2()
- * instead.
+ * This function is deprecated - use @link cupsTempFd@ or
+ * @link cupsTempFile2@ instead.
  *
  * @deprecated@
  */

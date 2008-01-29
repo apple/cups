@@ -101,13 +101,13 @@ static int	cups_get_sdests(http_t *http, ipp_op_t op, const char *name,
  * returned unchanged.  Adding a new instance of a destination creates
  * a copy of that destination's options.
  *
- * Use the cupsSaveDests() function to save the updated list of
+ * Use the @link cupsSaveDests@ function to save the updated list of
  * destinations to the user's lpoptions file.
  */
 
 int					/* O  - New number of destinations */
 cupsAddDest(const char  *name,		/* I  - Destination name */
-            const char	*instance,	/* I  - Instance name or NULL for none/primary */
+            const char	*instance,	/* I  - Instance name or @code NULL@ for none/primary */
             int         num_dests,	/* I  - Number of destinations */
             cups_dest_t **dests)	/* IO - Destinations */
 {
@@ -218,13 +218,13 @@ cupsFreeDests(int         num_dests,	/* I - Number of destinations */
 /*
  * 'cupsGetDest()' - Get the named destination from the list.
  *
- * Use the cupsGetDests() or cupsGetDests2() functions to get a
+ * Use the @link cupsGetDests@ or @link cupsGetDests2@ functions to get a
  * list of supported destinations for the current user.
  */
 
-cups_dest_t *				/* O - Destination pointer or NULL */
-cupsGetDest(const char  *name,		/* I - Destination name or NULL for the default destination */
-            const char	*instance,	/* I - Instance name or NULL */
+cups_dest_t *				/* O - Destination pointer or @code NULL@ */
+cupsGetDest(const char  *name,		/* I - Destination name or @code NULL@ for the default destination */
+            const char	*instance,	/* I - Instance name or @code NULL@ */
             int         num_dests,	/* I - Number of destinations */
             cups_dest_t *dests)		/* I - Destinations */
 {
@@ -284,8 +284,8 @@ cupsGetDest(const char  *name,		/* I - Destination name or NULL for the default 
  * printer-make-and-model, printer-state, printer-state-change-time,
  * printer-state-reasons, and printer-type attributes as options.
  *
- * Use the cupsFreeDests() function to free the destination list and
- * the cupsGetDest() function to find a particular destination.
+ * Use the @link cupsFreeDests@ function to free the destination list and
+ * the @link cupsGetDest@ function to find a particular destination.
  */
 
 int					/* O - Number of destinations */
@@ -303,14 +303,14 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  * printer-make-and-model, printer-state, printer-state-change-time,
  * printer-state-reasons, and printer-type attributes as options.
  *
- * Use the cupsFreeDests() function to free the destination list and
- * the cupsGetDest() function to find a particular destination.
+ * Use the @link cupsFreeDests@ function to free the destination list and
+ * the @link cupsGetDest@ function to find a particular destination.
  *
  * @since CUPS 1.1.21@
  */
 
 int					/* O - Number of destinations */
-cupsGetDests2(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsGetDests2(http_t      *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
               cups_dest_t **dests)	/* O - Destinations */
 {
   int		i;			/* Looping var */
@@ -477,26 +477,27 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
  * 'cupsGetNamedDest()' - Get options for the named destination.
  *
  * This function is optimized for retrieving a single destination and should
- * be used instead of cupsGetDests() and cupsGetDest() when you either know
- * the name of the destination or want to print to the default destination.
- * If NULL is returned, the destination does not exist or there is no default
- * destination.
+ * be used instead of @link cupsGetDests@ and @link cupsGetDest@ when you either
+ * know the name of the destination or want to print to the default destination.
+ * If @code NULL@ is returned, the destination does not exist or there is no
+ * default destination.
  *
- * If "http" is CUPS_HTTP_DEFAULT, the connection to the default print server
- * will be used.
+ * If "http" is @code CUPS_HTTP_DEFAULT@, the connection to the default print
+ * server will be used.
  *
- * If "name" is NULL, the default printer for the current user will be returned.
+ * If "name" is @code NULL@, the default printer for the current user will be
+ * returned.
  *
- * The returned destination must be freed using cupsFreeDests() with a
- * "num_dests" of 1.
+ * The returned destination must be freed using @link cupsFreeDests@ with a
+ * "num_dests" value of 1.
  *
  * @since CUPS 1.4@
  */
 
-cups_dest_t *				/* O - Destination or NULL */
-cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
-                 const char *name,	/* I - Destination name or NULL */
-                 const char *instance)	/* I - Instance name or NULL */
+cups_dest_t *				/* O - Destination or @code NULL@ */
+cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
+                 const char *name,	/* I - Destination name or @code NULL@ */
+                 const char *instance)	/* I - Instance name or @code NULL@ */
 {
   cups_dest_t	*dest;			/* Destination */
   char		filename[1024],		/* Path to lpoptions */
@@ -595,15 +596,15 @@ cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT *
  *
  * Removing a destination/instance does not delete the class or printer
  * queue, merely the lpoptions for that destination/instance.  Use the
- * cupsSetDests() or cupsSetDests2() functions to save the new options
- * for the user.
+ * @link cupsSetDests@ or @link cupsSetDests2@ functions to save the new
+ * options for the user.
  *
  * @since CUPS 1.3@
  */
 
 int					/* O  - New number of destinations */
 cupsRemoveDest(const char  *name,	/* I  - Destination name */
-               const char  *instance,	/* I  - Instance name or NULL */
+               const char  *instance,	/* I  - Instance name or @code NULL@ */
 	       int         num_dests,	/* I  - Number of destinations */
 	       cups_dest_t **dests)	/* IO - Destinations */
 {
@@ -650,7 +651,7 @@ cupsRemoveDest(const char  *name,	/* I  - Destination name */
 void
 cupsSetDefaultDest(
     const char  *name,			/* I - Destination name */
-    const char  *instance,		/* I - Instance name or NULL */
+    const char  *instance,		/* I - Instance name or @code NULL@ */
     int         num_dests,		/* I - Number of destinations */
     cups_dest_t *dests)			/* I - Destinations */
 {
@@ -703,7 +704,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsSetDests2(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsSetDests2(http_t      *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
               int         num_dests,	/* I - Number of destinations */
               cups_dest_t *dests)	/* I - Destinations */
 {

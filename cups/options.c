@@ -51,12 +51,15 @@ static int	ppd_mark_choices(ppd_file_t *ppd, const char *options);
 
 /*
  * 'cupsAddOption()' - Add an option to an option array.
+ *
+ * New option arrays can be initialized simply by passing 0 for the
+ * "num_options" parameter.
  */
 
-int					/* O - Number of options */
-cupsAddOption(const char    *name,	/* I - Name of option */
-              const char    *value,	/* I - Value of option */
-	      int           num_options,/* I - Number of options */
+int					/* O  - Number of options */
+cupsAddOption(const char    *name,	/* I  - Name of option */
+              const char    *value,	/* I  - Value of option */
+	      int           num_options,/* I  - Number of options */
               cups_option_t **options)	/* IO - Pointer to options */
 {
   int		i;			/* Looping var */
@@ -139,7 +142,7 @@ cupsFreeOptions(
  * 'cupsGetOption()' - Get an option value.
  */
 
-const char *				/* O - Option value or NULL */
+const char *				/* O - Option value or @code NULL@ */
 cupsGetOption(const char    *name,	/* I - Name of option */
               int           num_options,/* I - Number of options */
               cups_option_t *options)	/* I - Options */
@@ -160,6 +163,10 @@ cupsGetOption(const char    *name,	/* I - Name of option */
 
 /*
  * 'cupsMarkOptions()' - Mark command-line options in a PPD file.
+ *
+ * This function maps the IPP "finishings", "media", "mirror",
+ * "multiple-document-handling", "output-bin", "printer-resolution", and
+ * "sides" attributes to their corresponding PPD options and choices.
  */
 
 int					/* O - 1 if conflicting */
@@ -457,8 +464,8 @@ cupsMarkOptions(
  * This function converts space-delimited name/value pairs according
  * to the PAPI text option ABNF specification. Collection values
  * ("name={a=... b=... c=...}") are stored with the curley brackets
- * intact - use cupsParseOptions() on the value to extract the collection
- * attributes.
+ * intact - use @code cupsParseOptions@ on the value to extract the
+ * collection attributes.
  */
 
 int					/* O - Number of options found */
