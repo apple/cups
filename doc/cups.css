@@ -1,21 +1,21 @@
 BODY {
   background: #e8e8e8;
   color: #000000;
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 H1, H2, H3, H4, H5, H6, P, TD, TH {
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 KBD {
   color: #006600;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   font-weight: bold;
 }
 
 PRE {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 PRE.command {
@@ -32,12 +32,12 @@ PRE.example {
 
 PRE.command EM, PRE.example EM {
   color: #3f0000;
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 P.command {
   color: #7f0000;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   margin-left: 36pt;
 }
 
@@ -145,7 +145,7 @@ FORM {
 }
 
 INPUT[TYPE="TEXT"], TEXTAREA {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 INPUT[TYPE="IMAGE"] {
@@ -314,7 +314,7 @@ DL.category DT {
 
 P.summary {
   margin-left: 36pt;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 SPAN.message {
@@ -362,7 +362,7 @@ div.body h3, div.body h4, div.body h5 {
   margin-top: 0.5em;
 }
 code, p.code, pre, ul.code li {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   font-size: 90%;
 }
 ul.code, ul.contents, ul.subcontents {

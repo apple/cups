@@ -3,7 +3,7 @@
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -101,6 +101,8 @@ static int	cups_array_find(cups_array_t *a, void *e, int prev, int *rdiff);
  * When adding an element to a sorted array, non-unique elements are
  * appended at the end of the run.  For unsorted arrays, the element
  * is inserted at the end of the array.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -129,6 +131,8 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
 /*
  * 'cupsArrayClear()' - Clear the array.
+ *
+ * @since CUPS 1.2@
  */
 
 void
@@ -156,6 +160,8 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayCount()' - Get the number of elements in the array.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - Number of elements */
@@ -178,6 +184,8 @@ cupsArrayCount(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayCurrent()' - Return the current element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
 void *					/* O - Element */
@@ -203,6 +211,8 @@ cupsArrayCurrent(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cupsArrayDelete()' - Free all memory used by the array.
+ *
+ * @since CUPS 1.2@
  */
 
 void
@@ -232,6 +242,8 @@ cupsArrayDelete(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cupsArrayDup()' - Duplicate the array.
+ *
+ * @since CUPS 1.2@
  */
 
 cups_array_t *				/* O - Duplicate array */
@@ -296,9 +308,11 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayFind()' - Find an element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - Element found or NULL */
+void *					/* O - Element found or @code NULL@ */
 cupsArrayFind(cups_array_t *a,		/* I - Array */
               void         *e)		/* I - Element */
 {
@@ -389,9 +403,11 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
 
 /*
  * 'cupsArrayFirst()' - Get the first element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - First element or NULL */
+void *					/* O - First element or @code NULL@ */
 cupsArrayFirst(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -445,9 +461,11 @@ cupsArrayGetInsert(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cupsArrayIndex()' - Get the N-th element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - N-th element or NULL */
+void *					/* O - N-th element or @code NULL@ */
 cupsArrayIndex(cups_array_t *a,		/* I - Array */
                int          n)		/* I - Index into array, starting at 0 */
 {
@@ -466,6 +484,8 @@ cupsArrayIndex(cups_array_t *a,		/* I - Array */
  * When inserting an element in a sorted array, non-unique elements are
  * inserted at the beginning of the run.  For unsorted arrays, the element
  * is inserted at the beginning of the array.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on failure, 1 on success */
@@ -494,9 +514,11 @@ cupsArrayInsert(cups_array_t *a,	/* I - Array */
 
 /*
  * 'cupsArrayLast()' - Get the last element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - Last element or NULL */
+void *					/* O - Last element or @code NULL@ */
 cupsArrayLast(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -518,6 +540,8 @@ cupsArrayLast(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayNew()' - Create a new array.
+ *
+ * @since CUPS 1.2@
  */
 
 cups_array_t *				/* O - Array */
@@ -579,9 +603,11 @@ cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function */
 
 /*
  * 'cupsArrayNext()' - Get the next element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - Next element or NULL */
+void *					/* O - Next element or @code NULL@ */
 cupsArrayNext(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -604,9 +630,11 @@ cupsArrayNext(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayPrev()' - Get the previous element in the array.
+ *
+ * @since CUPS 1.2@
  */
 
-void *					/* O - Previous element or NULL */
+void *					/* O - Previous element or @code NULL@ */
 cupsArrayPrev(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -629,6 +657,8 @@ cupsArrayPrev(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayRemove()' - Remove an element from the array.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -689,6 +719,8 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 
 /*
  * 'cupsArrayRestore()' - Reset the current element to the last cupsArraySave.
+ *
+ * @since CUPS 1.2@
  */
 
 void *					/* O - New current element */
@@ -714,6 +746,8 @@ cupsArrayRestore(cups_array_t *a)	/* I - Array */
  * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
  *
  * The save/restore stack is guaranteed to be at least 32 elements deep.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 1 on success, 0 on failure */
@@ -734,6 +768,8 @@ cupsArraySave(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayUserData()' - Return the user data for an array.
+ *
+ * @since CUPS 1.2@
  */
 
 void *					/* O - User data */
@@ -748,6 +784,8 @@ cupsArrayUserData(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cups_array_add()' - Insert or append an element to the array...
+ *
+ * @since CUPS 1.2@
  */
 
 static int				/* O - 1 on success, 0 on failure */
@@ -916,6 +954,8 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 
 /*
  * 'cups_array_find()' - Find an element in the array...
+ *
+ * @since CUPS 1.2@
  */
 
 static int				/* O - Index of match */
