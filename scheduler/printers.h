@@ -150,6 +150,8 @@ extern void		cupsdSaveAllPrinters(void);
 extern int		cupsdSetAuthInfoRequired(cupsd_printer_t *p,
 			                         const char *values,
 						 ipp_attribute_t *attr);
+extern void		cupsdSetPrinterAttr(cupsd_printer_t *p,
+			                    const char *name, char *value);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
 extern void		cupsdSetPrinterReasons(cupsd_printer_t *p,
 			                       const char *s);

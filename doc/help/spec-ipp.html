@@ -11,7 +11,7 @@
 
   CUPS IPP specification for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007 by Apple Inc.
+  Copyright 2007-2008 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -2458,6 +2458,95 @@ the system.
 
 <p>The job-sheets-supported attribute specifies the available banner files.
 There will always be at least one banner file available called "none".
+
+<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a></h4>
+
+<p>The marker-colors attribute specifies the color(s) for each supply in the
+printer. It is only available when the driver provides supply levels. The
+color is either "none" or one or more hex-encoded sRGB colors of the form
+"#RRGGBB".</p>
+
+<h4><a name="marker-levels">marker-levels (1setof integer(-1:100))</a></h4>
+
+<p>The marker-levels attribute specifies the current supply levels for the
+printer. It is only available when the driver provides supply levels. A
+value of -1 indicates the level is unknown, while values from 0 to 100
+indicate the corresponding percentage.</p>
+
+<h4><a name="marker-names">marker-names (1setof name(MAX))</a></h4>
+
+<p>The marker-names attribute specifies the name(s) for each supply in the
+printer. It is only available when the driver provides supply levels.</p>
+
+<h4><a name="marker-types">marker-types (1setof type3 keyword)</a></h4>
+
+<p>The marker-types attribute specifies the type(s) of each supply in the
+printer. It is only available when the driver provides supply levels. The
+following (RFC 3805) types are currently supported:</p>
+
+<ul>
+
+	<li><tt>toner</tt></li>
+
+	<li><tt>wasteToner</tt></li>
+
+	<li><tt>ink</tt></li>
+
+	<li><tt>inkCartridge</tt></li>
+
+	<li><tt>inkRibbon</tt></li>
+
+	<li><tt>wasteInk</tt></li>
+
+	<li><tt>opc</tt></li>
+
+	<li><tt>developer</tt></li>
+
+	<li><tt>fuserOil</tt></li>
+
+	<li><tt>solidWax</tt></li>
+
+	<li><tt>ribbonWax</tt></li>
+
+	<li><tt>wasteWax</tt></li>
+
+	<li><tt>fuser</tt></li>
+
+	<li><tt>coronaWire</tt></li>
+
+	<li><tt>fuserOilWick</tt></li>
+
+	<li><tt>cleanerUnit</tt></li>
+
+	<li><tt>fuserCleaningPad</tt></li>
+
+	<li><tt>transferUnit</tt></li>
+
+	<li><tt>tonerCartridge</tt></li>
+
+	<li><tt>fuserOiler</tt></li>
+
+	<li><tt>water</tt></li>
+
+	<li><tt>wasteWater</tt></li>
+
+	<li><tt>bindingSupply</tt></li>
+
+	<li><tt>bandingSupply</tt></li>
+
+	<li><tt>stichingWire</tt></li>
+
+	<li><tt>shrinkWrap</tt></li>
+
+	<li><tt>paperWrap</tt></li>
+
+	<li><tt>staples</tt></li>
+
+	<li><tt>inserts</tt></li>
+
+	<li><tt>covers</tt></li>
+
+</ul>
 
 <h4><a name="port-monitor">port-monitor" (name(127))</a></h4>
 
