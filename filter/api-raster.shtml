@@ -13,39 +13,96 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'><a name="INTRODUCTION">Introduction</a></h2>
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
 
-<p>The CUPS raster API provides a standard interface for reading
-and writing CUPS raster streams which are used for printing to
-raster printers. Because the raster format is updated from time
-to time, it is important to use this API to avoid
-incompatibilities with newer versions of CUPS.</p>
+<p>The CUPS raster API provides a standard interface for reading and writing
+CUPS raster streams which are used for printing to raster printers. Because the
+raster format is updated from time to time, it is important to use this API to
+avoid incompatibilities with newer versions of CUPS.</p>
 
-<h2 class='title'>General Usage</h2>
+<p>CUPS raster files (<code>application/vnd.cups-raster</code>) consists of
+a stream of raster page descriptions produced by one of the RIP filters such as
+<var>pstoraster</var>, <var>imagetoraster</var>, or
+<var>cgpdftoraster</var>. CUPS raster files are referred to using the
+<a href='#cups_raster_t'><code>cups_raster_t</code></a> type and are
+opened using the <a href='#cupsRasterOpen'><code>cupsRasterOpen</code></a>
+function. For example, to read raster data from the standard input, open
+file descriptor 0:</p>
 
-<p>The <var>&lt;cups/raster.h&gt;</var> header file must be
-included to use the <tt>cupsRaster</tt> functions.</p>
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
 
-<p>Programs using these functions must be linked to the CUPS
-imaging library: <var>libcupsimage.a</var>,
-<var>libcupsimage.so.2</var>, <var>libcupsimage.2.dylib</var>,
-<var>libcupsimage_s.a</var>, or <var>libcupsimage2.lib</var>
-depending on the platform. The following command compiles
-<var>myprogram.c</var> using GCC and the CUPS imaging
-library:</p>
-
-<pre class='command'>
-<kbd>gcc -o myprogram myprogram.c -lcupsimage</kbd>
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
 </pre>
 
-<h2 class='title'>Compatibility</h2>
+<p>Each page of data begins with a page dictionary structure called
+<a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a>. This
+structure contains the colorspace, bits per color, media size, media type,
+hardware resolution, and so forth used for the page. You read the page header
+using the
+<a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a>
+function:</p>
 
-<p>Unless otherwise specified, the raster API functions require
-CUPS 1.1 or higher.</p>
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
 
-<h2 class='title'>Licensing</h2>
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
 
-<p>The CUPS raster API is provided under the terms of the GNU
-Library General Public License, with exceptions for MacOS X-based
-programs. Please see the CUPS license agreement for more
-information.</p>
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+
+  /* read raster data */
+
+  /* finish this page */
+}
+</pre>
+
+<p>After the page dictionary comes the page data which is a full-resolution,
+possibly compressed bitmap representing the page in the printer's output
+colorspace. You read uncompressed raster data using the
+<a href="#cupsRasterReadPixels"><code>cupsRasterReadPixels</code></a>
+function. A <code>for</code> loop is normally used to read the page one line
+at a time:</p>
+
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
+
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
+int page = 0;
+int y;
+char *buffer;
+
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+  page ++;
+  fprintf(stderr, "PAGE: %d %d\n", page, header.NumCopies);
+
+  /* allocate memory for 1 line */
+  buffer = malloc(header.cupsBytesPerLine);
+
+  /* read raster data */
+  for (y = 0; y &lt; header.cupsHeight; y ++)
+  {
+    if (<a href="#cupsRasterReadPixels">cupsRasterReadPixels</a>(ras, buffer, header.cupsBytesPerLine) == 0)
+      break;
+
+    /* write raster data to printer */
+  }
+
+  /* finish this page */
+}
+</pre>
+
+<p>When you are done reading the raster data, call the
+<a href="#cupsRasterClose"><code>cupsRasterClose</code></a> function to free
+the memory used to read the raster file:</p>
+
+<pre class="example">
+<a href="#cups_raster_t">cups_raster_t</a> *ras;
+
+<a href="#cupsRasterClose">cupsRasterClose</a>(ras);
+</pre>

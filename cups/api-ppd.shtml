@@ -13,31 +13,10 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'>Introduction</h2>
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
 <p>The CUPS PPD API provides read-only access the data in
 PostScript Printer Description ("PPD") files. With it you can
 display printer options to users, mark option choices and check
 for conflicting choices, and output marked choices in PostScript
 output.</p>
-
-<h2 class='title'>General Usage</h2>
-
-<p>The <var>&lt;cups/ppd.h&gt;</var> header file must be included
-to use the <tt>ppd</tt> functions.</p>
-
-<p>Programs using these functions must be linked to the CUPS
-library: <var>libcups.a</var>, <var>libcups.so.2</var>,
-<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
-<var>libcups2.lib</var> depending on the platform. The following
-command compiles <var>myprogram.c</var> using GCC and the CUPS
-library:</p>
-
-<pre class='command'>
-<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
-</pre>
-
-<h2 class='title'>Compatibility</h2>
-
-<p>Unless otherwise specified, the PPD API functions require CUPS
-1.1 or higher.</p>

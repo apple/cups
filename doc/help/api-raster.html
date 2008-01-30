@@ -7,20 +7,20 @@
 <meta name="creator" content="Mini-XML v2.5">
 <style type="text/css"><!--
 BODY {
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 H1, H2, H3, H4, H5, H6, P, TD, TH {
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 KBD {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   font-weight: bold;
 }
 
 PRE {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 PRE.command {
@@ -35,11 +35,11 @@ PRE.example {
 }
 
 PRE.command EM, PRE.example EM {
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 P.command {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   margin-left: 36pt;
 }
 
@@ -154,7 +154,7 @@ DL.category DT {
 
 P.summary {
   margin-left: 36pt;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 SPAN.message {
@@ -200,7 +200,7 @@ div.body h3, div.body h4, div.body h5 {
   margin-top: 0.5em;
 }
 code, p.code, pre, ul.code li {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   font-size: 90%;
 }
 ul.code, ul.contents, ul.subcontents {
@@ -228,6 +228,22 @@ div.body dt {
 }
 div.body dd {
   margin-bottom: 0.5em;
+}
+
+/* This is just for the HTML files generated with the framedhelp target */
+div.contents {
+  background: #e8e8e8;
+  border: solid thin black;
+  padding: 10px;
+}
+div.contents h1 {
+  font-size: 110%;
+}
+div.contents h2 {
+  font-size: 100%;
+}
+div.contents ul.contents {
+  font-size: 80%;
 }
 --></style>
 </head>
@@ -265,6 +281,7 @@ div.body dd {
 	<th>See Also</th>
 	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
 	Programming: <a href='api-cups.html'>CUPS API</a><br>
+	Programming: <a href='api-cups.html'>PPD API</a><br>
 	References: <a href='spec-ppd.html'>CUPS PPD Specification</a></td>
 </tr>
 </tbody>
@@ -272,7 +289,7 @@ div.body dd {
 <h2 class="title">Contents</h2>
 <ul class="contents">
 </li>
-<li><a href="#INTRODUCTION">Introduction</a></li>
+<li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
 <li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
@@ -289,14 +306,15 @@ header structure.">cupsRasterWriteHeader2</a></li>
 <li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
 </ul>
 <li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_interpret_cb_t" title="Prototypes...">cups_interpret_cb_t</a></li>
-	<li><a href="#cups_page_header2_t" title="Version 2 Page Header ">cups_page_header2_t</a></li>
-	<li><a href="#cups_page_header_t" title="Version 1 Page Header">cups_page_header_t</a></li>
+	<li><a href="#cups_interpret_cb_t" title="cupsRasterInterpretPPD callback function">cups_interpret_cb_t</a></li>
+	<li><a href="#cups_mode_t" title="cupsRasterOpen modes">cups_mode_t</a></li>
+	<li><a href="#cups_page_header2_t" title="Version 2 page header ">cups_page_header2_t</a></li>
+	<li><a href="#cups_page_header_t" title="Version 1 page header">cups_page_header_t</a></li>
 	<li><a href="#cups_raster_t" title="Raster stream data">cups_raster_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
-	<li><a href="#cups_page_header2_s" title="Version 2 Page Header ">cups_page_header2_s</a></li>
-	<li><a href="#cups_page_header_s" title="Version 1 Page Header">cups_page_header_s</a></li>
+	<li><a href="#cups_page_header2_s" title="Version 2 page header ">cups_page_header2_s</a></li>
+	<li><a href="#cups_page_header_s" title="Version 1 page header">cups_page_header_s</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#cups_adv_e" title="AdvanceMedia attribute values">cups_adv_e</a></li>
@@ -306,7 +324,7 @@ header structure.">cupsRasterWriteHeader2</a></li>
 	<li><a href="#cups_edge_e" title="">cups_edge_e</a></li>
 	<li><a href="#cups_jog_e" title="">cups_jog_e</a></li>
 	<li><a href="#cups_mode_e" title="">cups_mode_e</a></li>
-	<li><a href="#cups_order_e" title="">cups_order_e</a></li>
+	<li><a href="#cups_order_e" title="cupsColorOrder attribute values">cups_order_e</a></li>
 	<li><a href="#cups_orient_e" title="">cups_orient_e</a></li>
 </ul></li>
 </ul>
@@ -325,42 +343,99 @@ header structure.">cupsRasterWriteHeader2</a></li>
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'><a name="INTRODUCTION">Introduction</a></h2>
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
 
-<p>The CUPS raster API provides a standard interface for reading
-and writing CUPS raster streams which are used for printing to
-raster printers. Because the raster format is updated from time
-to time, it is important to use this API to avoid
-incompatibilities with newer versions of CUPS.</p>
+<p>The CUPS raster API provides a standard interface for reading and writing
+CUPS raster streams which are used for printing to raster printers. Because the
+raster format is updated from time to time, it is important to use this API to
+avoid incompatibilities with newer versions of CUPS.</p>
 
-<h2 class='title'>General Usage</h2>
+<p>CUPS raster files (<code>application/vnd.cups-raster</code>) consists of
+a stream of raster page descriptions produced by one of the RIP filters such as
+<var>pstoraster</var>, <var>imagetoraster</var>, or
+<var>cgpdftoraster</var>. CUPS raster files are referred to using the
+<a href='#cups_raster_t'><code>cups_raster_t</code></a> type and are
+opened using the <a href='#cupsRasterOpen'><code>cupsRasterOpen</code></a>
+function. For example, to read raster data from the standard input, open
+file descriptor 0:</p>
 
-<p>The <var>&lt;cups/raster.h&gt;</var> header file must be
-included to use the <tt>cupsRaster</tt> functions.</p>
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
 
-<p>Programs using these functions must be linked to the CUPS
-imaging library: <var>libcupsimage.a</var>,
-<var>libcupsimage.so.2</var>, <var>libcupsimage.2.dylib</var>,
-<var>libcupsimage_s.a</var>, or <var>libcupsimage2.lib</var>
-depending on the platform. The following command compiles
-<var>myprogram.c</var> using GCC and the CUPS imaging
-library:</p>
-
-<pre class='command'>
-<kbd>gcc -o myprogram myprogram.c -lcupsimage</kbd>
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
 </pre>
 
-<h2 class='title'>Compatibility</h2>
+<p>Each page of data begins with a page dictionary structure called
+<a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a>. This
+structure contains the colorspace, bits per color, media size, media type,
+hardware resolution, and so forth used for the page. You read the page header
+using the
+<a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a>
+function:</p>
 
-<p>Unless otherwise specified, the raster API functions require
-CUPS 1.1 or higher.</p>
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
 
-<h2 class='title'>Licensing</h2>
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
 
-<p>The CUPS raster API is provided under the terms of the GNU
-Library General Public License, with exceptions for MacOS X-based
-programs. Please see the CUPS license agreement for more
-information.</p>
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+
+  /* read raster data */
+
+  /* finish this page */
+}
+</pre>
+
+<p>After the page dictionary comes the page data which is a full-resolution,
+possibly compressed bitmap representing the page in the printer's output
+colorspace. You read uncompressed raster data using the
+<a href="#cupsRasterReadPixels"><code>cupsRasterReadPixels</code></a>
+function. A <code>for</code> loop is normally used to read the page one line
+at a time:</p>
+
+<pre class="example">
+#include &lt;cups/raster.h&gt;>
+
+<a href="#cups_raster_t">cups_raster_t</a> *ras = <a href="#cupsRasterOpen">cupsRasterOpen</a>(0, CUPS_RASTER_READ);
+<a href="#cups_page_header2_t">cups_page_header2_t</a> header;
+int page = 0;
+int y;
+char *buffer;
+
+while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;header))
+{
+  /* setup this page */
+  page ++;
+  fprintf(stderr, "PAGE: %d %d\n", page, header.NumCopies);
+
+  /* allocate memory for 1 line */
+  buffer = malloc(header.cupsBytesPerLine);
+
+  /* read raster data */
+  for (y = 0; y &lt; header.cupsHeight; y ++)
+  {
+    if (<a href="#cupsRasterReadPixels">cupsRasterReadPixels</a>(ras, buffer, header.cupsBytesPerLine) == 0)
+      break;
+
+    /* write raster data to printer */
+  }
+
+  /* finish this page */
+}
+</pre>
+
+<p>When you are done reading the raster data, call the
+<a href="#cupsRasterClose"><code>cupsRasterClose</code></a> function to free
+the memory used to read the raster file:</p>
+
+<pre class="example">
+<a href="#cups_raster_t">cups_raster_t</a> *ras;
+
+<a href="#cupsRasterClose">cupsRasterClose</a>(ras);
+</pre>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><a name="cupsRasterClose">cupsRasterClose</a></h3>
 <p class="description">Close a raster stream.</p>
@@ -400,19 +475,22 @@ int cupsRasterInterpretPPD (<br>
 <p class="description">0 on success, -1 on failure</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function does not mark the options in the PPD using the &quot;num_options&quot;
-and &quot;options&quot; arguments.  Instead, mark the options prior to calling
-cupsRasterInterpretPPD() - this allows you to do per-page options
+and &quot;options&quot; arguments.  Instead, mark the options with
+<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling
+<code>cupsRasterInterpretPPD</code> - this allows you to do per-page options
 without manipulating the options array.<br>
 <br>
 The &quot;func&quot; argument specifies an optional callback function that is
 called prior to the computation of the final raster data.  The function
-can make changes to the cups_page_header2_t data as needed to use a
+can make changes to the <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a> data as needed to use a
 supported raster format and then returns 0 on success and -1 if the
-requested attributes cannot be supported.<br>
-<br>
-cupsRasterInterpretPPD() supports a subset of the PostScript language.
-Currently only the [, ], &lt;&lt;, &gt;&gt;, {, }, cleartomark, copy, dup, index,
-pop, roll, setpagedevice, and stopped operators are supported.
+requested attributes cannot be supported.
+
+<code>cupsRasterInterpretPPD</code> supports a subset of the PostScript language.
+Currently only the <code>[</code>, <code>]</code>, <code><<</code>, <code>>></code>, <code>{</code>,
+<code>}</code>, <code>cleartomark</code>, <code>copy</code>, <code>dup</code>, <code>index</code>,
+<code>pop</code>, <code>roll</code>, <code>setpagedevice</code>, and <code>stopped</code> operators
+are supported.
 
 </p>
 <h3 class="function"><a name="cupsRasterOpen">cupsRasterOpen</a></h3>
@@ -420,7 +498,7 @@ pop, roll, setpagedevice, and stopped operators are supported.
 <p class="code">
 <a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_mode_t mode<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -539,17 +617,22 @@ unsigned cupsRasterWritePixels (<br>
 <p class="description">Number of bytes written</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><a name="cups_interpret_cb_t">cups_interpret_cb_t</a></h3>
-<p class="description">Prototypes...</p>
+<p class="description">cupsRasterInterpretPPD callback function</p>
 <p class="code">
 typedef int (*cups_interpret_cb_t)(<a href="#cups_page_header2_t">cups_page_header2_t</a> *header, int preferred_bits);
 </p>
+<h3 class="typedef"><a name="cups_mode_t">cups_mode_t</a></h3>
+<p class="description">cupsRasterOpen modes</p>
+<p class="code">
+typedef enum <a href="#cups_mode_e">cups_mode_e</a> cups_mode_t;
+</p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
-<p class="description">Version 2 Page Header </p>
+<p class="description">Version 2 page header </p>
 <p class="code">
 typedef struct <a href="#cups_page_header2_s">cups_page_header2_s</a> cups_page_header2_t;
 </p>
 <h3 class="typedef"><a name="cups_page_header_t">cups_page_header_t</a></h3>
-<p class="description">Version 1 Page Header</p>
+<p class="description">Version 1 page header</p>
 <p class="code">
 typedef struct <a href="#cups_page_header_s">cups_page_header_s</a> cups_page_header_t;
 </p>
@@ -560,7 +643,7 @@ typedef struct _cups_raster_s cups_raster_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
 <h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
-<p class="description">Version 2 Page Header </p>
+<p class="description">Version 2 page header </p>
 <p class="code">struct cups_page_header2_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_adv_t AdvanceMedia;<br>
@@ -716,7 +799,7 @@ factor not applied) </dd>
 <dd class="description">Width of page image in pixels</dd>
 </dl>
 <h3 class="struct"><a name="cups_page_header_s">cups_page_header_s</a></h3>
-<p class="description">Version 1 Page Header</p>
+<p class="description">Version 1 page header</p>
 <p class="code">struct cups_page_header_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_adv_t AdvanceMedia;<br>
@@ -989,7 +1072,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Open stream for compressed writing </dd>
 </dl>
 <h3 class="enumeration"><a name="cups_order_e">cups_order_e</a></h3>
-<p class="description"></p>
+<p class="description">cupsColorOrder attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_ORDER_BANDED </dt>

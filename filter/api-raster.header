@@ -30,6 +30,7 @@
 	<th>See Also</th>
 	<td>Programming: <a href='api-overview.html'>Introduction to CUPS Programming</a><br>
 	Programming: <a href='api-cups.html'>CUPS API</a><br>
+	Programming: <a href='api-cups.html'>PPD API</a><br>
 	References: <a href='spec-ppd.html'>CUPS PPD Specification</a></td>
 </tr>
 </tbody>

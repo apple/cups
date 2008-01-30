@@ -147,12 +147,14 @@ typedef enum cups_jog_e			/**** Jog attribute values ****/
   CUPS_JOG_SET = 3			/* Move pages after this set */
 } cups_jog_t;
 
-typedef enum cups_mode_e		/**** Raster modes ****/
+enum cups_mode_e			/**** cupsRasterOpen modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
   CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
-} cups_mode_t;
+};
+
+typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/
 
 typedef enum cups_order_e		/**** cupsColorOrder attribute values ****/
 {
@@ -179,7 +181,7 @@ typedef enum cups_orient_e		/**** Orientation attribute values ****/
  * (from CUPS 1.2 and higher) page header, for binary compatibility.
  */
 
-typedef struct cups_page_header_s	/**** Version 1 Page Header ****/
+typedef struct cups_page_header_s	/**** Version 1 page header ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -228,7 +230,7 @@ typedef struct cups_page_header_s	/**** Version 1 Page Header ****/
 } cups_page_header_t;
 
 /**** New in CUPS 1.2 ****/
-typedef struct cups_page_header2_s	/**** Version 2 Page Header @since CUPS 1.2@ ****/
+typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2@ ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -295,6 +297,13 @@ typedef struct _cups_raster_s cups_raster_t;
 					/**** Raster stream data ****/
 
 typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bits);
+					/**** cupsRasterInterpretPPD callback function
+					 *
+					 * This function is called by
+					 * @link cupsRasterInterpretPPD@ to
+					 * validate (and update, as needed)
+					 * the page header attributes.
+					 ****/
 
 
 /*
