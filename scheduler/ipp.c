@@ -4668,6 +4668,10 @@ copy_printer_attrs(
 		 printer->recoverable);
 #endif /* __APPLE__ */
 
+  if (!ra || cupsArrayFind(ra, "marker-change-time"))
+    ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "marker-change-time", printer->marker_time);
+
   if (printer->alert && (!ra || cupsArrayFind(ra, "printer-alert")))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_STRING,
                  "printer-alert", NULL, printer->alert);

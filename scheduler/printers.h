@@ -86,6 +86,7 @@ typedef struct cupsd_printer_s
   const char	*auth_info_required[4];	/* Required authentication fields */
   char		*alert,			/* PSX printer-alert value */
 		*alert_description;	/* PSX printer-alert-description value */
+  time_t	marker_time;		/* Last time marker attributes were updated */
 
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */

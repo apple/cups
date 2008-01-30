@@ -3676,24 +3676,28 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       if ((attr = cupsGetOption("marker-colors", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-colors", (char *)attr);
+	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("marker-levels", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-levels", (char *)attr);
+	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("marker-names", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-names", (char *)attr);
+	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("marker-types", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-types", (char *)attr);
+	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
