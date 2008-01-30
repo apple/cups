@@ -3,7 +3,7 @@
  *
  *   Backend support definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -160,6 +160,12 @@ extern "C" {
 #define CUPS_TC_langPCLXL			47
 #define CUPS_TC_langPDF				54
 #define CUPS_TC_langJPEG			61
+
+#define CUPS_TC_supplyThatIsConsumed		3
+#define CUPS_TC_receptacleThatIsFilled		4
+
+#define CUPS_TC_process				3
+#define CUPS_TC_spot				4
 
 #define CUPS_TC_toner				3
 #define CUPS_TC_wasteToner			4
