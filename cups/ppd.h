@@ -4,7 +4,7 @@
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -392,7 +392,12 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _CUPS_API_1_2;
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
-					      char *buffer, size_t bufsize) _CUPS_API_1_3;
+					      char *buffer,
+					      size_t bufsize) _CUPS_API_1_3;
+
+/**** New in CUPS 1.4 ****/
+extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
+			                       const char *name) _CUPS_API_1_4;
 
 
 /*

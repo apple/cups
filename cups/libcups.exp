@@ -305,6 +305,7 @@ _ppdIsMarked
 _ppdLastError
 _ppdLocalize
 _ppdLocalizeIPPReason
+_ppdLocalizeMarkerName
 _ppdMarkDefaults
 _ppdMarkOption
 _ppdNextCustomParam

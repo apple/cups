@@ -139,7 +139,7 @@
 
 *CloseGroup: Extended
 
-*% IPP reasons (for ppdLocalizeIPPReason tests)
+*% IPP reasons for ppdLocalizeIPPReason tests
 *cupsIPPReason foo/Foo Reason: "http://foo/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/foo/bar.html"
@@ -162,6 +162,12 @@ http://foo/zh/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/zh/foo/bar.html"
 *End
+
+*% Marker names for ppdLocalizeMarkerName tests
+*cupsMarkerName cyan/Cyan Toner: ""
+*fr.cupsMarkerName cyan/La Toner Cyan: ""
+*zh_TW.cupsMarkerName cyan/Number 1 Cyan Toner: ""
+*zh.cupsMarkerName cyan/Number 2 Cyan Toner: ""
 
 *DefaultFont: Courier
 *Font AvantGarde-Book: Standard "(001.006S)" Standard ROM

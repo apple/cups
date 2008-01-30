@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   PPD custom option routines for the Common UNIX Printing System (CUPS).
+ *   PPD localization routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,11 +25,13 @@
  *
  * Contents:
  *
- *   ppdLocalize()          - Localize the PPD file to the current locale.
- *   ppdLocalizeIPPReason() - Get the localized version of a cupsIPPReason
- *                            attribute.
- *   ppd_ll_CC()            - Get the current locale names.
- *   ppd_localized_attr()   - Find a localized attribute.
+ *   ppdLocalize()           - Localize the PPD file to the current locale.
+ *   ppdLocalizeIPPReason()  - Get the localized version of a cupsIPPReason
+ *                             attribute.
+ *   ppdLocalizeMarkerName() - Get the localized version of a marker-names
+ *                             attribute value.
+ *   ppd_ll_CC()             - Get the current locale names.
+ *   ppd_localized_attr()    - Find a localized attribute.
  */
 
 /*
@@ -383,6 +385,52 @@ ppdLocalizeIPPReason(
 
     return (NULL);
   }
+}
+
+
+/*
+ * 'ppdLocalizeMarkerName()' - Get the localized version of a marker-names
+ *                             attribute value.
+ *
+ * This function uses the current locale to find the corresponding name
+ * text from the attribute value. If no localized text for the requested
+ * name can be found, @code NULL@ is returned.
+ *
+ * @since CUPS 1.4@
+ */
+
+const char *				/* O - Value or @code NULL@ if not found */
+ppdLocalizeMarkerName(
+    ppd_file_t *ppd,			/* I - PPD file */
+    const char *name)			/* I - Marker name to look up */
+{
+  ppd_attr_t	*locattr;		/* Localized attribute */
+  char		ll_CC[6],		/* Language + country locale */
+		ll[3];			/* Language locale */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!ppd || !name)
+    return (NULL);
+
+ /*
+  * Get the default language...
+  */
+
+  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
+
+ /*
+  * Find the localized attribute...
+  */
+
+  if ((locattr = ppd_localized_attr(ppd, "cupsMarkerName", name,
+                                    ll_CC, ll)) == NULL)
+    locattr = ppdFindAttr(ppd, "cupsMarkerName", name);
+
+  return (locattr ? locattr->text : NULL);
 }
 
 
