@@ -8,7 +8,7 @@ CHANGES IN CUPS V1.3.6
 	  (STR #1307)
 	- The Kerberos credentials provided by some Windows KDCs
 	  were still too large - now use a dynamic buffer to
-	  support credentials up to 64k in size.
+	  support credentials up to 64k in size (STR #2695)
 	- Printing a test page from the web interface incorrectly
 	  defaulted to the "guest" user (STR #2688)
 	- The cupsEncodeOptions2() function did not parse multiple-

@@ -300,7 +300,7 @@ cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
     if (major_status == GSS_S_CONTINUE_NEEDED)
       DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
 
-    if (output_token.length < 65536)
+    if (output_token.length > 0 && output_token.length <= 65536)
     {
      /*
       * Allocate the authorization string since Windows KDCs can have
