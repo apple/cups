@@ -444,6 +444,11 @@ testsnmp:	testsnmp.o libcups.a
 
 apihelp:
 	echo Generating CUPS API help files...
+	mxmldoc --section "Programming" \
+		--title "Introduction to CUPS Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-overview.header --intro api-overview.shtml \
+		>../doc/help/api-overview.html
 	mxmldoc --section "Programming" --title "Array API" \
 		--css ../doc/cups-printable.css \
 		--header api-array.header --intro api-array.shtml \
@@ -477,6 +482,11 @@ apihelp:
 
 framedhelp:
 	echo Generating CUPS API help files...
+	mxmldoc --framed api-overview \
+		--section "Programming" \
+		--title "Introduction to CUPS Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-overview.header --intro api-overview.shtml
 	mxmldoc --framed api-array \
 		--section "Programming" --title "Array API" \
 		--css ../doc/cups-printable.css \

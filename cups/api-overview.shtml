@@ -1,0 +1,29 @@
+<!--
+  "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
+
+  Introduction to CUPS programming content for the Common UNIX Printing System
+  (CUPS).
+
+  Copyright 2008 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class="title"><a name="OVERVIEW">Overview</a></h2>
+
+<h2 class="title"><a name="COMPILING">Compiling Programs</a></h2>
+
+<h3><a name="FIRSTPROGRAM">Your First Program</a></h3>
+
+<h3><a name="XCODE">Compiling with Xcode</a></h3>
+
+<h3><a name="COMMANDLINE">Compiling at the Command-Line</a></h3>
+
+<h3><a name="AUTOCONF">Detecting CUPS with GNU Autoconf</a></h3>
+
+<h2 class="title"><a name="WHERETOGO">Where to Go Next</a></h2>
+
