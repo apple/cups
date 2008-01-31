@@ -249,9 +249,54 @@ div.contents ul.contents {
 </head>
 <body>
 <div class='body'>
+<!--
+  "$Id: api-cups.header 7279 2008-01-31 01:50:44Z mike $"
+
+  Filter and backend programming header for the Common UNIX Printing System
+  (CUPS).
+
+  Copyright 2008 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class="title">Filter and Backend Programming</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/backend.h<br>
+	cups/sidechannel.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcups</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='api-ppd.html' target='_top'>PPD API</a><br>
+	Programming: <a href='api-raster.html' target='_top'>Raster API</a></td>
+</tr>
+</tbody>
+</table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
 </li>
+<li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+<li><a href="#EXITCODES">Exit Codes</a></li>
+<li><a href="#ENVIRONMENT">Environment Variables</a></li>
+<li><a href="#MESSAGES">Communicating with the Scheduler</a></li>
+<li><a href="#COMMUNICATING">Communicating with the Backend</a></li>
+</ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cupsBackChannelRead" title="Read data from the backchannel.">cupsBackChannelRead</a></li>
 <li><a href="#cupsBackChannelWrite" title="Write data to the backchannel.">cupsBackChannelWrite</a></li>
@@ -259,13 +304,28 @@ div.contents ul.contents {
 <li><a href="#cupsSideChannelRead" title="Read a side-channel message.">cupsSideChannelRead</a></li>
 <li><a href="#cupsSideChannelWrite" title="Write a side-channel message.">cupsSideChannelWrite</a></li>
 </ul>
+<li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cups_backend_t" title="Backend exit codes">cups_backend_t</a></li>
+	<li><a href="#cups_sc_bidi_t" title="Bidirectional capabilities">cups_sc_bidi_t</a></li>
+	<li><a href="#cups_sc_command_t" title="Request command codes">cups_sc_command_t</a></li>
+	<li><a href="#cups_sc_state_t" title="Printer state bits">cups_sc_state_t</a></li>
+	<li><a href="#cups_sc_status_t" title="Response status codes">cups_sc_status_t</a></li>
+</ul></li>
+<li><a href="#ENUMERATIONS">Constants</a><ul class="code">
+	<li><a href="#cups_backend_e" title="Backend exit codes">cups_backend_e</a></li>
+	<li><a href="#cups_sc_bidi_e" title="Bidirectional capabilities">cups_sc_bidi_e</a></li>
+	<li><a href="#cups_sc_command_e" title="Request command codes">cups_sc_command_e</a></li>
+	<li><a href="#cups_sc_state_e" title="Printer state bits">cups_sc_state_e</a></li>
+	<li><a href="#cups_sc_status_e" title="Response status codes">cups_sc_status_e</a></li>
+</ul></li>
 </ul>
 <!--
   "$Id: api-filter.shtml 6649 2007-07-11 21:46:42Z mike $"
 
-  Filter and backend API introduction for the Common UNIX Printing System (CUPS).
+  Filter and backend programming introduction for the Common UNIX Printing
+  System (CUPS).
 
-  Copyright 2007 by Apple Inc.
+  Copyright 2007-2008 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -275,46 +335,193 @@ div.contents ul.contents {
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h2 class='title'>Introduction</h2>
+<h2 class='title'><a name="OVERVIEW">Overview</a></h2>
 
-<p>The CUPS filter and backend APIs define standard exit codes
-and provide access to the backchannel data stream. They are only
-used when writing backends, filters, and port monitors.</p>
+<p>Filters, printer drivers, port monitors, and backends use a common interface
+for processing print jobs and communicating status information to the scheduler.
+Each filter is run with a standard set of command-line arguments:<p>
 
-<h2 class='title'>General Usage</h2>
+<dl class="code">
 
-<p>The <var>&lt;cups/backend.h&gt;</var> and
-<var>&lt;cups/cups.h&gt;</var> header files must be included to
-use the <tt>CUPS_BACKEND_</tt> constants and
-<tt>cupsBackChannel</tt> functions, respectively.</p>
+	<dt>argv[1]</dt>
+	<dd>The job ID</dd>
 
-<p>The <var>&lt;cups/sidechannel.h&gt;</var> header file must be
-included to use the <tt>CUPS_SC_</tt> constants and <tt>cupsSideChannel</tt> functions.</p>
+	<dt>argv[2]</dt>
+	<dd>The user printing the job</dd>
 
-<p>Programs using these functions must be linked to the CUPS
-library: <var>libcups.a</var>, <var>libcups.so.2</var>,
-<var>libcups.2.dylib</var>, <var>libcups_s.a</var>, or
-<var>libcups2.lib</var> depending on the platform. The following
-command compiles <var>myprogram.c</var> using GCC and the CUPS
-library:</p>
+	<dt>argv[3]</dt>
+	<dd>The job name/title</dd>
 
-<pre class='command'>
-<kbd>gcc -o myprogram myprogram.c -lcups</kbd>
+	<dt>argv[4]</dt>
+	<dd>The number of copies to print</dd>
+
+	<dt>argv[5]</dt>
+	<dd>The options that were provided when the job was submitted</dd>
+
+	<dt>argv[6]</dt>
+	<dd>The file to print (first filter only)</dd>
+</dl>
+
+<p>The scheduler runs one or more of these programs to print any given job. The
+first filter reads from the print file and writes to the standard output, while
+the remaining filters read from the standard input and write to the standard
+output. The backend is the last filter in the chain and writes to the
+device.</p>
+
+<h3><a name="EXITCODES">Exit Codes</a></h3>
+
+<p>Filters must exit with status 0 when they successfully generate print data
+or 1 when they encounter an error. Backends can return any of the
+<a href="#cups_backend_t"><code>cups_backend_t</code></a> constants.</p>
+
+<h3><a name="ENVIRONMENT">Environment Variables</a></h3>
+
+<p>The following environment variables are defined by the printing system:</p>
+
+<dl class="code">
+
+	<dt>APPLE_LANGUAGES</dt>
+	<dd>The Apple language identifier associated with the job
+	(Mac OS X only).</dd>
+
+	<dt>CHARSET</dt>
+	<dd>The job character set, typically "utf-8".</dd>
+
+	<dt>CLASS</dt>
+	<dd>When a job is submitted to a printer class, contains the name of
+	the destination printer class. Otherwise this environment
+	variable will not be set.</dd>
+
+	<dt>CONTENT_TYPE</dt>
+	<dd>The MIME type associated with the file (e.g.
+	application/postscript).</dd>
+
+	<dt>CUPS_CACHEDIR</dt>
+	<dd>The directory where cache files can be stored.</dd>
+
+	<dt>CUPS_DATADIR</dt>
+	<dd>The directory where data files can be found.</dd>
+
+	<dt>CUPS_SERVERROOT</dt>
+	<dd>The root directory of the server.</dd>
+
+	<dt>DEVICE_URI</dt>
+	<dd>The device-uri associated with the printer.</dd>
+
+	<dt>FINAL_CONTENT_TYPE</dt>
+	<dd>The MIME type associated with the printer (e.g.
+	application/vnd.cups-postscript).</dd>
+
+	<dt>LANG</dt>
+	<dd>The language locale associated with the job.</dd>
+
+	<dt>PPD</dt>
+	<dd>The full pathname of the PostScript Printer Description (PPD)
+	file for this printer.</dd>
+
+	<dt>PRINTER</dt>
+	<dd>The name of the printer.</dd>
+
+	<dt>RIP_CACHE</dt>
+	<dd>The recommended amount of memory to use for Raster Image
+	Processors (RIPs).</dd>
+
+</dl>
+
+<h3><a name="MESSAGES">Communicating with the Scheduler</a></h3>
+
+<p>Filters and backends communicate wih the scheduler by writing messages
+to the standard error file. For example, the following code sets the current
+printer state message to "Printing page 5":</p>
+
+<pre class="example">
+int page = 5;
+
+fprintf(stderr, "INFO: Printing page %d\n", page);
 </pre>
 
+<p>Each message is a single line of text starting with one of the following
+prefix strings:</p>
 
-<h2 class='title'>Compatibility</h2>
+<dl class="code">
 
-<p>The <tt>cupsBackChannel</tt> functions require CUPS 1.2 or higher. The <tt>cupsSideChannel</tt> functions require CUPS 1.3 or higher.</p>
+	<dt>ALERT: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "alert" log level.</dd>
 
+	<dt>ATTR: attribute=value [attribute=value]</dt>
+	<dd>Sets the named printer or job attribute(s). Typically this is used
+	to set the <code>marker-colors</code>, <code>marker-levels</code>,
+	<code>marker-names</code>, <code>marker-types</code>,
+	<code>printer-alert</code>, and <code>printer-alert-description</code>
+	printer attributes.</dd>
 
-<h2 class='title'>Using the cupsBackChannel APIs</h2>
+	<dt>CRIT: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "critical" log
+	level.</dd>
 
-<p>The <tt>cupsBackChannel</tt> APIs allow your filters, drivers, and port monitors to read data back from a printer and your backends to send data from a printer to the filters, drivers, and port monitors associated with the current job. Back-channel data is normally sent by the printer in response to a command sent from your program to the printer via <tt>stdout</tt>.</p>
+	<dt>DEBUG: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "debug" log level.</dd>
 
-<p>The <tt>cupsBackChannelRead()</tt> function reads data from the printer via the backend. You provide a timeout in seconds along with a buffer pointer and the size of that buffer. It returns the number of bytes or -1 if there was an error. The following code example shows how to poll for back-channel data in your program:</p>
+	<dt>DEBUG2: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "debug2" log level.</dd>
 
-<pre class='command'>
+	<dt>EMERG: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "emergency" log
+	level.</dd>
+
+	<dt>ERROR: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "error" log level.</dd>
+
+	<dt>INFO: message</dt>
+	<dd>Sets the printer-state-message attribute. If the current log level
+	is set to "debug2", also adds the specified message to the current error
+	log file using the "info" log level.</dd>
+
+	<dt>NOTICE: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "notice" log level.</dd>
+
+	<dt>PAGE: page-number #-copies</dt>
+	<dt>PAGE: total #-pages</dt>
+	<dd>Adds an entry to the current page log file. The first form adds
+	#-copies to the job-media-sheets-completed attribute. The second
+	form sets the job-media-sheets-completed attribute to #-pages.</dd>
+
+	<dt>STATE: printer-state-reason [printer-state-reason ...]</dt>
+	<dt>STATE: + printer-state-reason [printer-state-reason ...]</dt>
+	<dt>STATE: - printer-state-reason [printer-state-reason ...]</dt>
+	<dd>Sets, adds, or removes printer-state-reason keywords to the
+	current queue. Typically this is used to indicate media, ink, and
+	toner conditions on a printer.</dd>
+
+	<dt>WARNING: message</dt>
+	<dd>Sets the printer-state-message attribute and adds the specified
+	message to the current error log file using the "warning" log
+	level.</dd>
+
+</dl>
+
+<p>Messages without one of these prefixes are treated as if they began with
+the "DEBUG:" prefix string.</p>
+
+<h3><a name="COMMUNICATING">Communicating with the Backend</a></h3>
+
+<p>Filters can communicate with the backend via the
+<a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> and
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+functions. The 
+<a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> function
+reads data that has been sent back from the device and is typically used to
+obtain status and configuration information. For example, the following code
+polls the backend for back-channel data:</p>
+
+<pre class="example">
 #include &lt;cups/cups.h&gt;
 
 char buffer[8192];
@@ -324,9 +531,39 @@ ssize_t bytes;
 bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0.0);
 </pre>
 
-<p>If you are writing a backend, the <tt>cupsBackChannelWrite()</tt> function sends any back-channel data you have received from the printer to upstream filters in the print filter chain. We recommend using a timeout of 1.0 seconds:</p>
+The
+<a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
+function allows you to get out-of-band status information and do synchronization
+with the device. For example, the following code gets the current IEEE-1284
+device ID string from the backend:</p>
 
-<pre class='command'>
+<pre class="example">
+#include &lt;cups/sidechannel.h&gt;
+
+char data[2049];
+int datalen;
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+
+/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for nul-termination... */
+datalen = sizeof(data) - 1;
+
+/* Get the IEEE-1284 device ID, waiting for up to 1 second */
+status = <a href="#cupsSideChannelDoRequest">cupsSideChannelDoRequest</a>(CUPS_SC_CMD_GET_DEVICE_ID, data, &amp;datalen, 1.0);
+
+/* Use the returned value if OK was returned and the length is non-zero */
+if (status == CUPS_SC_STATUS_OK && datalen > 0)
+  data[datalen] = '\0';
+else
+  data[0] = '\0';
+</pre>
+
+<p>Backends communicate with filters using the reciprocal functions
+<a href="#cupsBackChannelWrite"><code>cupsBackChannelWrite</code></a>,
+<a href="#cupsSideChannelRead"><code>cupsSideChannelRead</code></a>, and
+<a href="#cupsSideChannelWrite"><code>cupsSideChannelWrite</code></a>. We
+recommend writing back-channel data using a timeout of 1.0 seconds:</p>
+
+<pre class="example">
 #include &lt;cups/cups.h&gt;
 
 char buffer[8192];
@@ -336,132 +573,37 @@ ssize_t bytes;
 cupsBackChannelWrite(buffer, bytes, 1.0);
 </pre>
 
+<p>The <a href="#cupsSideChannelRead"><code>cupsSideChannelRead</code></a>
+function reads a side-channel command from a filter, driver, or port monitor.
+Backends can either poll for commands using a <code>timeout</code> of 0.0, wait
+indefinitely for commands using a <code>timeout</code> of -1.0 (probably in a
+separate thread for that purpose), or use <code>select</code> or
+<code>poll</code> on the <code>CUPS_SC_FD</code> file descriptor (4) to handle
+input and output on several file descriptors at the same time. Backends can pass
+<code>NULL</code> for the <code>data</code> and <code>datalen</code> parameters
+since none of the commands sent by upstream filters contain any data at this
+time.</p>
 
-<h2 class='title'>Using the cupsSideChannel APIs</h2>
+<p>Once a command is processed, the backend uses the
+<a href="#cupsSideChannelWrite"><code>cupsSideChannelWrite</code></a> function
+to send its response. For example, the following code shows how to poll for a
+side-channel command and respond to it:</p>
 
-<p>The <tt>cupsSideChannel</tt> APIs allow your filters, drivers, port monitors, and backend to send and receive the following out-of-band commands:</p>
-
-<ul>
-
-	<li><tt>CUPS_SC_CMD_SOFT_RESET</tt> -  Do a soft reset</li>
-	<li><tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> -  Drain all pending output</li>
-	<li><tt>CUPS_SC_CMD_GET_BIDI</tt> -  Return bidirectional capabilities</li>
-	<li><tt>CUPS_SC_CMD_GET_DEVICE_ID</tt> -  Return the IEEE-1284 device ID</li>
-	<li><tt>CUPS_SC_CMD_GET_STATE</tt> - Return the device state</li>
-
-</ul>
-
-
-<h3>Sending Commands from a Filter, Driver, or Port Monitor</h3>
-
-<p>The <tt>cupsSideChannelDoRequest()</tt> function is used by filters, drivers, and port monitors to send a command to the backend and read back a response:</p>
-
-<pre class='command'>
-cups_sc_status_t cupsSideChannelDoRequest(cups_sc_command_t command,
-                                          char *data, int *datalen,
-                                          double timeout);
-</pre>
-
-<p>The <tt>CUPS_SC_CMD_SOFT_RESET</tt> and <tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> commands do not return any data values, while the others return one or more bytes. The <tt>timeout</tt> parameter allows your program to poll or wait for the command to complete - use a timeout of 30 seconds for <tt>CUPS_SC_CMD_SOFT_RESET</tt> and <tt>CUPS_SC_CMD_DRAIN_OUTPUT</tt> and a timeout of 1 second for all other commands.</p>
-
-<p><tt>CUPS_SC_CMD_GET_BIDI</tt> returns a single <tt>char</tt> value that tells you whether the backend supports bidirectional communications:</p>
-
-<pre class='command'>
+<pre class="example">
 #include &lt;cups/sidechannel.h&gt;
 
-char data;
-int datalen;
-cups_sc_bidi_t bidi;
-cups_sc_status_t status;
-
-/* Tell cupsSideChannelDoRequest() how big our buffer is... */
-datalen = 1;
-
-/* Get the bidirectional capabilities, waiting for up to 1 second */
-status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_BIDI, &amp;data, &amp;datalen, 1.0);
-
-/* Use the returned value if OK was returned and the length is still 1 */
-if (status == CUPS_SC_STATUS_OK && datalen == 1)
-  bidi = (cups_sc_bidi_t)data;
-else
-  bidi = CUPS_SC_BIDI_NOT_SUPPORTED;
-</pre>
-
-<p><tt>CUPS_SC_CMD_GET_DEVICE_ID</tt> returns a string of characters containing the IEEE-1284 device ID for the connected printer:</p>
-
-<pre class='command'>
-#include &lt;cups/sidechannel.h&gt;
-
-char data[2049];
-int datalen;
-cups_sc_status_t status;
-
-/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for nul-termination... */
-datalen = sizeof(data) - 1;
-
-/* Get the IEEE-1284 device ID, waiting for up to 1 second */
-status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_DEVICE_ID, data, &amp;datalen, 1.0);
-
-/* Use the returned value if OK was returned and the length is non-zero */
-if (status == CUPS_SC_STATUS_OK && datalen > 0)
-  data[datalen] = '\0';
-else
-  data[0] = '\0';
-</pre>
-
-<p><tt>CUPS_SC_CMD_GET_STATE</tt> returns a single <tt>char</tt> value that tells you the current device state:</p>
-
-<pre class='command'>
-#include &lt;cups/sidechannel.h&gt;
-
-char data;
-int datalen;
-cups_sc_state_t state;
-cups_sc_status_t status;
-
-/* Tell cupsSideChannelDoRequest() how big our buffer is... */
-datalen = 1;
-
-/* Get the bidirectional capabilities, waiting for up to 1 second */
-status  = cupsSideChannelDoRequest(CUPS_SC_CMD_GET_STATE, &amp;data, &amp;datalen, 1.0);
-
-/* Use the returned value if OK was returned and the length is still 1 */
-if (status == CUPS_SC_STATUS_OK && datalen == 1)
-  state = (cups_sc_state_t)data;
-else
-  state = CUPS_SC_STATE_OFFLINE;
-</pre>
-
-
-<h3>Handling Commands in your Backend</h3>
-
-<p>The <tt>cupsSideChannelRead()</tt> function is used by backends to read a command from a filter, driver, or port monitor:</p>
-
-<pre class='command'>
-int cupsSideChannelRead(cups_sc_command_t &amp;command,
-                        cups_sc_status_t  &amp;status,
-                        char *data, int *datalen, double timeout);
-</pre>
-
-<p>Backends can either poll for commands using a <tt>timeout</tt> of 0.0, wait indefinitely for commands using a <tt>timeout</tt> of -1.0 (probably in a separate thread for that purpose), or use <tt>select()</tt> or <tt>poll()</tt> on the <tt>CUPS_SC_FD</tt> file descriptor (4) to handle input and output on several file descriptors at the same time. Backends can pass <tt>NULL</tt> for the <tt>data</tt> and <tt>datalen</tt> parameters, since none of the commands sent by upstream filters contain any data at this time.</p>
-
-<p>Once a command is processed, the backend uses the <tt>cupsSideChannelWrite()</tt> function to send its response:</p>
-
-<pre class='command'>
-#include &lt;cups/sidechannel.h&gt;
-
-cups_sc_command_t command;
-cups_sc_status_t status;
+<a href="#cups_sc_command_t">cups_sc_command_t</a> command;
+<a href="#cups_sc_status_t">cups_sc_status_t</a> status;
 
 /* Poll for a command... */
-if (!cupsSideChannelRead(&amp;command, &amp;status, NULL, NULL, 0.0))
+if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;status, NULL, NULL, 0.0))
 {
   char data[2048];
   int datalen;
 
   switch (command)
   {
-    ... handle supported commands, file data/datalen/status with values as needed ...
+    /* handle supported commands, file data/datalen/status with values as needed */
 
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
@@ -470,7 +612,7 @@ if (!cupsSideChannelRead(&amp;command, &amp;status, NULL, NULL, 0.0))
   }
 
   /* Send a response... */
-  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+  <a href="#cupsSideChannelWrite">cupsSideChannelWrite</a>(command, status, data, datalen, 1.0);
 }
 </pre>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
@@ -530,7 +672,7 @@ indefinitely.
 <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">
 <a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_sc_command_t command,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *data,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int *datalen,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
@@ -564,7 +706,7 @@ update the value to contain the number of data bytes in the buffer.
 <p class="description">Read a side-channel message.</p>
 <p class="code">
 int cupsSideChannelRead (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_sc_command_t *command,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> *command,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_status_t">cups_sc_status_t</a> *status,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *data,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int *datalen,<br>
@@ -600,7 +742,7 @@ update the value to contain the number of data bytes in the buffer.
 <p class="description">Write a side-channel message.</p>
 <p class="code">
 int cupsSideChannelWrite (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_sc_command_t command,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_command_t">cups_sc_command_t</a> command,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_sc_status_t">cups_sc_status_t</a> status,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *data,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int datalen,<br>
@@ -626,6 +768,116 @@ int cupsSideChannelWrite (<br>
 responses to a filter, driver, or port monitor program.
 
 </p>
+<h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="cups_backend_t">cups_backend_t</a></h3>
+<p class="description">Backend exit codes</p>
+<p class="code">
+typedef enum <a href="#cups_backend_e">cups_backend_e</a> cups_backend_t;
+</p>
+<h3 class="typedef"><a name="cups_sc_bidi_t">cups_sc_bidi_t</a></h3>
+<p class="description">Bidirectional capabilities</p>
+<p class="code">
+typedef enum <a href="#cups_sc_bidi_e">cups_sc_bidi_e</a> cups_sc_bidi_t;
+</p>
+<h3 class="typedef"><a name="cups_sc_command_t">cups_sc_command_t</a></h3>
+<p class="description">Request command codes</p>
+<p class="code">
+typedef enum <a href="#cups_sc_command_e">cups_sc_command_e</a> cups_sc_command_t;
+</p>
+<h3 class="typedef"><a name="cups_sc_state_t">cups_sc_state_t</a></h3>
+<p class="description">Printer state bits</p>
+<p class="code">
+typedef enum <a href="#cups_sc_state_e">cups_sc_state_e</a> cups_sc_state_t;
+</p>
+<h3 class="typedef"><a name="cups_sc_status_t">cups_sc_status_t</a></h3>
+<p class="description">Response status codes</p>
+<p class="code">
+typedef enum <a href="#cups_sc_status_e">cups_sc_status_e</a> cups_sc_status_t;
+</p>
+<h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
+<h3 class="enumeration"><a name="cups_backend_e">cups_backend_e</a></h3>
+<p class="description">Backend exit codes</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_BACKEND_AUTH_REQUIRED </dt>
+<dd class="description">Job failed, authentication required</dd>
+<dt>CUPS_BACKEND_CANCEL </dt>
+<dd class="description">Job failed, cancel job</dd>
+<dt>CUPS_BACKEND_FAILED </dt>
+<dd class="description">Job failed, use error-policy</dd>
+<dt>CUPS_BACKEND_HOLD </dt>
+<dd class="description">Job failed, hold job</dd>
+<dt>CUPS_BACKEND_OK </dt>
+<dd class="description">Job completed successfully</dd>
+<dt>CUPS_BACKEND_STOP </dt>
+<dd class="description">Job failed, stop queue</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_sc_bidi_e">cups_sc_bidi_e</a></h3>
+<p class="description">Bidirectional capabilities</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_SC_BIDI_NOT_SUPPORTED </dt>
+<dd class="description">Bidirectional I/O is not supported</dd>
+<dt>CUPS_SC_BIDI_SUPPORTED </dt>
+<dd class="description">Bidirectional I/O is supported</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_sc_command_e">cups_sc_command_e</a></h3>
+<p class="description">Request command codes</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_SC_CMD_DRAIN_OUTPUT </dt>
+<dd class="description">Drain all pending output</dd>
+<dt>CUPS_SC_CMD_GET_BIDI </dt>
+<dd class="description">Return bidirectional capabilities</dd>
+<dt>CUPS_SC_CMD_GET_DEVICE_ID </dt>
+<dd class="description">Return the IEEE-1284 device ID</dd>
+<dt>CUPS_SC_CMD_GET_STATE </dt>
+<dd class="description">Return the device state</dd>
+<dt>CUPS_SC_CMD_SOFT_RESET </dt>
+<dd class="description">Do a soft reset</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_sc_state_e">cups_sc_state_e</a></h3>
+<p class="description">Printer state bits</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_SC_STATE_BUSY </dt>
+<dd class="description">Device is busy</dd>
+<dt>CUPS_SC_STATE_ERROR </dt>
+<dd class="description">Other error condition</dd>
+<dt>CUPS_SC_STATE_MARKER_EMPTY </dt>
+<dd class="description">Toner/ink out condition</dd>
+<dt>CUPS_SC_STATE_MARKER_LOW </dt>
+<dd class="description">Toner/ink low condition</dd>
+<dt>CUPS_SC_STATE_MEDIA_EMPTY </dt>
+<dd class="description">Paper out condition</dd>
+<dt>CUPS_SC_STATE_MEDIA_LOW </dt>
+<dd class="description">Paper low condition</dd>
+<dt>CUPS_SC_STATE_OFFLINE </dt>
+<dd class="description">Device is off-line</dd>
+<dt>CUPS_SC_STATE_ONLINE </dt>
+<dd class="description">Device is on-line</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_sc_status_e">cups_sc_status_e</a></h3>
+<p class="description">Response status codes</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_SC_STATUS_BAD_MESSAGE </dt>
+<dd class="description">The command/response message was invalid</dd>
+<dt>CUPS_SC_STATUS_IO_ERROR </dt>
+<dd class="description">An I/O error occurred</dd>
+<dt>CUPS_SC_STATUS_NONE </dt>
+<dd class="description">No status</dd>
+<dt>CUPS_SC_STATUS_NOT_IMPLEMENTED </dt>
+<dd class="description">Command not implemented</dd>
+<dt>CUPS_SC_STATUS_NO_RESPONSE </dt>
+<dd class="description">The device did not respond</dd>
+<dt>CUPS_SC_STATUS_OK </dt>
+<dd class="description">Operation succeeded</dd>
+<dt>CUPS_SC_STATUS_TIMEOUT </dt>
+<dd class="description">The backend did not respond</dd>
+<dt>CUPS_SC_STATUS_TOO_BIG </dt>
+<dd class="description">Response too big</dd>
+</dl>
 </div>
 </body>
 </html>
