@@ -15,8 +15,185 @@
 
 <h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
 
-<p>The CUPS PPD API provides read-only access the data in
-PostScript Printer Description ("PPD") files. With it you can
-display printer options to users, mark option choices and check
-for conflicting choices, and output marked choices in PostScript
-output.</p>
+<p>The CUPS PPD API provides read-only access the data in PostScript Printer
+Description ("PPD") files which are used for all printers with a driver. With
+it you can display printer options to users, mark option choices and check for
+conflicting choices, and output marked choices in PostScript output. The
+<a href="#ppd_file_t"><code>ppd_file_t</code></a> structure contains all of
+the information in a PPD file.</p>
+
+<h3><a name="LOADING">Loading a PPD File</a></h3>
+
+<p>The <a href="#ppdOpenFile"><code>ppdOpenFile</code></a> function "opens" a
+PPD file and loads it into memory. For example, the following code opens the
+current printer's PPD file in a CUPS filter:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd = <a href="#ppdOpenFile">ppdOpenFile</a>(getenv("PPD"));
+</pre>
+
+<p>The return value is a pointer to a new
+<a href="#ppd_file_t"><code>ppd_file_t</code></a> structure or <code>NULL</code>
+if the PPD file does not exist or cannot be loaded. The
+<a href="#ppdClose"><code>ppdClose</code></a> function frees the memory used
+by the structure:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+
+<a href="#ppdClose">ppdClose</a>(ppd);
+</pre>
+
+<h3><a name="OPTIONS_AND_GROUPS">Options and Groups</a></h3>
+
+<p>PPD files support multiple options, which are stored in arrays of
+<a href="#ppd_option_t"><code>ppd_option_t</code></a> and
+<a href="#ppd_choice_t"><code>ppd_choice_t</code></a> structures.</p>
+
+<p>Each option in turn is associated with a group stored in a
+<a href="#ppd_group_t"><code>ppd_group_t</code></a> structure. Groups can be
+specified in the PPD file; if an option is not associated with a group
+then it is put in an automatically-generated "General" group. Groups can also
+have sub-groups, however CUPS currently ignores sub-groups because of past
+abuses of this functionality.</p>
+
+<p>Options are selected by marking them using one of three functions. The
+first is <a href="#ppdMarkDefaults"><code>ppdMarkDefaults</code></a> which
+selects all of the default options in the PPD file:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+
+<a href="#ppdMarkDefaults">ppdMarkDefaults</a>(ppd);
+</pre>
+
+<p>The second is <a href="#ppdMarkOption"><code>ppdMarkOption</code></a>
+which selects a single option choice in the PPD file. For example, the following
+code selects the manual feed media source:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+
+<a href="#ppdMarkOption">ppdMarkOption</a>(ppd, "InputSlot", "ManualFeed");
+</pre>
+
+<p>The last function is
+<a href="#cupsMarkOptions"><code>cupsMarkOptions</code></a> which selects
+multiple option choices in the PPD file from an array of CUPS options, mapping
+IPP attributes like "media" and "sides" to their corresponding PPD options. You
+typically use this function in a print filter with
+<code>cupsParseOptions</code> and
+<a href="#ppdMarkDefaults"><code>ppdMarkDefaults</code></a> to select all of
+the option choices needed for the job, for example:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd = <a href="#ppdOpenFile">ppdOpenFile</a>(getenv("PPD"));
+cups_option_t *options = NULL;
+int num_options = cupsParseOptions(argv[5], 0, &amp;options);
+
+<a href="#ppdMarkDefaults">ppdMarkDefaults</a>(ppd);
+<a href="#cupsMarkOptions">cupsMarkOptions</a>(ppd, num_options, options);
+</pre>
+
+<h3><a name="CONSTRAINTS">Constraints</a></h3>
+
+<p>PPD files support specification of conflict conditions, called
+constraints, between different options. Constraints are stored in an array of
+<a href="#ppd_const_t"><code>ppd_const_t</code></a> structures which specify
+the options and choices that conflict with each other. The
+<a href="#ppdConflicts"><code>ppdConflicts</code></a> function tells you
+how many of the selected options are incompatible.</p>
+
+<h3><a name="PAGE_SIZES">Page Sizes</a></h3>
+
+<p>Page sizes are special options which have physical dimensions and margins
+associated with them. The size information is stored in
+<a href="#ppd_size_t"><code>ppd_size_t</code></a> structures and is available
+by looking up the named size with the
+<a href="#ppdPageSize"><code>ppdPageSize</code></a> function. The page size and
+margins are returned in units called points; there are 72 points per inch. If
+you pass <code>NULL</code> for the size, the currently selected size is
+returned:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+<a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, NULL);
+</pre>
+
+<p>Besides the standard page sizes listed in a PPD file, some printers
+support variable or custom page sizes. Custom page sizes are supported if the
+<code>variables_sizes</code> member of the
+<a href="#ppd_file_t"><code>ppd_file_t</code></a> structure is non-zero.
+The <code>custom_min</code>, <code>custom_max</code>, and
+<code>custom_margins</code> members of the
+<a href="#ppd_file_t"><code>ppd_file_t</code></a> structure define the limits
+of the printable area. To get the resulting media size, use a page size string
+of the form "Custom.<I>width</I>x<I>length</I>", where "width" and "length" are
+in points. Custom page size names can also be specified in inches
+("Custom.<i>width</i>x<i>height</i>in"), centimeters
+("Custom.<i>width</i>x<i>height</i>cm"), or millimeters
+("Custom.<i>width</i>x<i>height</i>mm"):</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+
+/* Get an 576x720 point custom page size */
+<a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, "Custom.576x720");
+
+/* Get an 8x10 inch custom page size */
+<a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, "Custom.8x10in");
+
+/* Get a 100x200 millimeter custom page size */
+<a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, "Custom.100x200mm");
+
+/* Get a 12.7x34.5 centimeter custom page size */
+<a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, "Custom.12.7x34.5cm");
+</pre>
+
+<h3><a name="ATTRIBUTES">Attributes</a></h3>
+
+<p>Every PPD file is composed of one or more attributes. Most of these
+attributes are used to define groups, options, choices, and page sizes,
+however several informations attributes are available which you may need
+to access in your program or filter. Attributes normally look like one of
+the following examples in a PPD file:</p>
+
+<pre class="example">
+*name: "value"
+*name spec: "value"
+*name spec/text: "value"
+</pre>
+
+<p>The <a href="#ppdFindAttr"><code>ppdFindAttr</code></a> and
+<a href="#ppdFindNextAttr"><code>ppdFindNextAttr</code></a> functions find the
+first and next instances, respectively, of the named attribute with the given
+"spec" string and return a <a href="#ppd_attr_t"><code>ppd_attr_t</code></a>
+structure. If you provide a NULL specifier string, all attributes with the
+given name will be returned. For example, the following code lists all of the
+<code>Product</code> attributes in a PPD file:</p>
+
+<pre class="example">
+#include &lt;cups/ppd.h&gt;
+
+<a href="#ppd_file_t">ppd_file_t</a> *ppd;
+<a href="#ppd_attr_t">ppd_attr_t</a> *attr;
+
+for (attr = <a href="#ppdFindAttr">ppdFindAttr</a>(ppd, "Product", NULL);
+     attr != NULL;
+     attr = <a href="#ppdFindNextAttr">ppdFindNextAttr</a>(ppd, "Product", NULL))
+  puts(attr->value);
+</pre>

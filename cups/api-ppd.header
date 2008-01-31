@@ -12,7 +12,7 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h1 class="title">CUPS API</h1>
+<h1 class="title">PPD API</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>

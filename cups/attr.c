@@ -4,7 +4,7 @@
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,8 +15,8 @@
  *
  * Contents:
  *
- *   ppdFindAttr()     - Find the first matching attribute...
- *   ppdFindNextAttr() - Find the next matching attribute...
+ *   ppdFindAttr()     - Find the first matching attribute.
+ *   ppdFindNextAttr() - Find the next matching attribute.
  */
 
 /*
@@ -30,15 +30,15 @@
 
 
 /*
- * 'ppdFindAttr()' - Find the first matching attribute...
+ * 'ppdFindAttr()' - Find the first matching attribute.
  *
  * @since CUPS 1.1.19@
  */
 
-ppd_attr_t *				/* O - Attribute or NULL if not found */
+ppd_attr_t *				/* O - Attribute or @code NULL@ if not found */
 ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
             const char *name,		/* I - Attribute name */
-            const char *spec)		/* I - Specifier string or NULL */
+            const char *spec)		/* I - Specifier string or @code NULL@ */
 {
   ppd_attr_t	key,			/* Search key */
 		*attr;			/* Current attribute */
@@ -102,15 +102,15 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 
 
 /*
- * 'ppdFindNextAttr()' - Find the next matching attribute...
+ * 'ppdFindNextAttr()' - Find the next matching attribute.
  *
  * @since CUPS 1.1.19@
  */
 
-ppd_attr_t *				/* O - Attribute or NULL if not found */
+ppd_attr_t *				/* O - Attribute or @code NULL@ if not found */
 ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
                 const char *name,	/* I - Attribute name */
-		const char *spec)	/* I - Specifier string or NULL */
+		const char *spec)	/* I - Specifier string or @code NULL@ */
 {
   ppd_attr_t	*attr;			/* Current attribute */
 
