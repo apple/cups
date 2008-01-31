@@ -27,6 +27,7 @@
  *   cupsdSaveAllPrinters()      - Save all printer definitions to the
  *                                 printers.conf file.
  *   cupsdSetAuthInfoRequired()  - Set the required authentication info.
+ *   cupsdSetPrinterAttr()       - Set a printer attribute.
  *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
  *                                 file.
  *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
@@ -1647,6 +1648,120 @@ cupsdSetAuthInfoRequired(
   }
 
   return (1);
+}
+
+
+/*
+ * 'cupsdSetPrinterAttr()' - Set a printer attribute.
+ */
+
+void
+cupsdSetPrinterAttr(
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *name,		/* I - Attribute name */
+    char            *value)		/* I - Attribute value string */
+{
+  ipp_attribute_t	*attr;		/* Attribute */
+  int			i,		/* Looping var */
+			count;		/* Number of values */
+  char			*ptr;		/* Pointer into value */
+  ipp_tag_t		value_tag;	/* Value tag for this attribute */
+
+
+ /*
+  * Count the number of values...
+  */
+
+  for (count = 1, ptr = value;
+       (ptr = strchr(ptr, ',')) != NULL;
+       ptr ++, count ++);
+
+ /*
+  * Then add or update the attribute as needed...
+  */
+
+  if (!strcmp(name, "marker-levels"))
+  {
+   /*
+    * Integer values...
+    */
+
+    if ((attr = ippFindAttribute(p->attrs, name, IPP_TAG_INTEGER)) != NULL &&
+        attr->num_values < count)
+    {
+      ippDeleteAttribute(p->attrs, attr);
+      attr = NULL;
+    }
+
+    if (attr)
+      attr->num_values = count;
+    else
+      attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER, name,
+                            count, NULL);
+
+    if (!attr)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for printer attribute "
+		      "(%d values)", count);
+      return;
+    }
+
+    for (i = 0; i < count; i ++)
+    {
+      if ((ptr = strchr(value, ',')) != NULL)
+        *ptr++ = '\0';
+
+      attr->values[i].integer = strtol(value, NULL, 10);
+
+      if (ptr)
+        value = ptr;
+    }
+  }
+  else
+  {
+   /*
+    * Name or keyword values...
+    */
+
+    if (!strcmp(name, "marker-types"))
+      value_tag = IPP_TAG_KEYWORD;
+    else
+      value_tag = IPP_TAG_NAME;
+
+    if ((attr = ippFindAttribute(p->attrs, name, value_tag)) != NULL &&
+        attr->num_values < count)
+    {
+      ippDeleteAttribute(p->attrs, attr);
+      attr = NULL;
+    }
+
+    if (attr)
+      attr->num_values = count;
+    else
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, value_tag, name,
+                           count, NULL, NULL);
+
+    if (!attr)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for printer attribute "
+		      "(%d values)", count);
+      return;
+    }
+
+    for (i = 0; i < count; i ++)
+    {
+      if ((ptr = strchr(value, ',')) != NULL)
+        *ptr++ = '\0';
+
+      _cupsStrFree(attr->values[i].string.text);
+      attr->values[i].string.text = _cupsStrAlloc(value);
+
+      if (ptr)
+        value = ptr;
+    }
+  }
 }
 
 

@@ -49,7 +49,7 @@ the <VAR>cupsd.conf</VAR> file from the console, make sure to <A
 HREF="ref-cupsd-conf.html">restart the cupsd process</A> before
 trying to use the new policy.</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 <EM>Listing 1: <A NAME="LISTING01">Default Operation Policy</A></EM>
 
  1    &lt;Policy default>
@@ -106,14 +106,14 @@ trying to use the new policy.</P>
 <P>The policy definition starts with an opening <TT>Policy</TT>
 directive:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
  1    &lt;Policy default>
 </PRE>
 
 <P>The first <TT>Limit</TT> subsection defines the rules for IPP
 job operations:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
  3      &lt;Limit Send-Document Send-URI Hold-Job Release-Job
       Restart-Job Purge-Jobs Set-Job-Attributes
       Create-Job-Subscription Renew-Subscription
@@ -146,7 +146,7 @@ request. The administrative operations starting on line 9,
 however, <em>do</em> use the <TT>AuthType</TT> directive, and so
 administrative operations need to be authenticated:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
  9      &lt;Limit CUPS-Add-Printer CUPS-Delete-Printer CUPS-Add-Class
       CUPS-Delete-Class CUPS-Set-Default>
 10        AuthType Default
@@ -180,7 +180,7 @@ more easily edit their policy without disturbing the rest. Like
 the rest of the job operations, we want the job's owner
 ("@OWNER") or an administrator ("@SYSTEM") to do it:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 16      &lt;Limit Cancel-Job CUPS-Authenticate-Job>
 17        Require user @OWNER @SYSTEM
 18        Order deny,allow
@@ -193,7 +193,7 @@ this subsection for any operation you don't list specifically in
 the policy. In this case, all other operations are allowed
 without a username or authentication:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 21      &lt;Limit All>
 22        Order deny,allow
 23      &lt;/Limit>
@@ -521,7 +521,7 @@ change you'll make is to give the policy a new name. Policy names
 can use the same characters as a printer name, specifically all
 printable characters except space, slash (/), and pound (#):</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 &lt;Policy mypolicy>
 </PRE>
 
@@ -530,7 +530,7 @@ policy. For example, if you want to allow any user to cancel any
 other users' jobs, you can change the <TT>Cancel-Job</TT> limits
 to:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 &lt;Limit Cancel-Job>
   Order deny,allow
 &lt;/Limit>
@@ -613,7 +613,7 @@ the lab technicians, who are members of a special UNIX group for
 that lab called "lab999", to do job, printer, and subscription
 management operations.</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 <EM>Listing 2: <A NAME="LISTING02">Operation Policy for a Lab</A></EM>
 
  1    &lt;Policy lab999>
@@ -664,7 +664,7 @@ directive in the <VAR>cupsd.conf</VAR> file. For example, add the
 following line to the <VAR>cupsd.conf</VAR> file to use the
 "lab999" policy from the previous section:</P>
 
-<PRE CLASS="command">
+<PRE CLASS="example">
 DefaultPolicy lab999
 </PRE>
 

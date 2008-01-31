@@ -123,19 +123,22 @@ static void		DEBUG_stack(_cups_ps_stack_t *st);
  * 'cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
  *
  * This function does not mark the options in the PPD using the "num_options"
- * and "options" arguments.  Instead, mark the options prior to calling
- * cupsRasterInterpretPPD() - this allows you to do per-page options
+ * and "options" arguments.  Instead, mark the options with
+ * @code cupsMarkOptions@ and @code ppdMarkOption@ prior to calling
+ * @code cupsRasterInterpretPPD@ - this allows you to do per-page options
  * without manipulating the options array.
  *
  * The "func" argument specifies an optional callback function that is
  * called prior to the computation of the final raster data.  The function
- * can make changes to the cups_page_header2_t data as needed to use a
+ * can make changes to the @link cups_page_header2_t@ data as needed to use a
  * supported raster format and then returns 0 on success and -1 if the
  * requested attributes cannot be supported.
  *
- * cupsRasterInterpretPPD() supports a subset of the PostScript language.
- * Currently only the [, ], <<, >>, {, }, cleartomark, copy, dup, index,
- * pop, roll, setpagedevice, and stopped operators are supported.
+ * @code cupsRasterInterpretPPD@ supports a subset of the PostScript language.
+ * Currently only the @code [@, @code ]@, @code <<@, @code >>@, @code {@,
+ * @code }@, @code cleartomark@, @code copy@, @code dup@, @code index@,
+ * @code pop@, @code roll@, @code setpagedevice@, and @code stopped@ operators
+ * are supported.
  *
  * @since CUPS 1.2@
  */

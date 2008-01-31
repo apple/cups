@@ -344,7 +344,7 @@ cupsLangFlush(void)
 /*
  * 'cupsLangFree()' - Free language data.
  *
- * This does not actually free anything; use cupsLangFlush() for that.
+ * This does not actually free anything; use @link cupsLangFlush@ for that.
  */
 
 void

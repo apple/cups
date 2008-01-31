@@ -3,7 +3,7 @@
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -45,13 +45,13 @@
 /*
  * 'cupsGetFd()' - Get a file from the server.
  *
- * This function returns HTTP_OK when the file is successfully retrieved.
+ * This function returns @code HTTP_OK@ when the file is successfully retrieved.
  *
  * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - HTTP status */
-cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
+cupsGetFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
 	  const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
@@ -69,13 +69,16 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
   DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)\n", http,
                 resource, fd));
 
-  if (!http || !resource || fd < 0)
+  if (!resource || fd < 0)
   {
     if (http)
       http->error = EINVAL;
 
     return (HTTP_ERROR);
   }
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Then send GET requests to the HTTP server...
@@ -182,13 +185,13 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server */
 /*
  * 'cupsGetFile()' - Get a file from the server.
  *
- * This function returns HTTP_OK when the file is successfully retrieved.
+ * This function returns @code HTTP_OK@ when the file is successfully retrieved.
  *
  * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - HTTP status */
-cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
+cupsGetFile(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
 	    const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
 {
@@ -249,13 +252,14 @@ cupsGetFile(http_t     *http,		/* I - HTTP connection to server */
 /*
  * 'cupsPutFd()' - Put a file on the server.
  *
- * This function returns HTTP_CREATED when the file is stored successfully.
+ * This function returns @code HTTP_CREATED@ when the file is stored
+ * successfully.
  *
  * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - HTTP status */
-cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
+cupsPutFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
           const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
@@ -272,13 +276,16 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
   DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)\n", http,
                 resource, fd));
 
-  if (!http || !resource || fd < 0)
+  if (!resource || fd < 0)
   {
     if (http)
       http->error = EINVAL;
 
     return (HTTP_ERROR);
   }
+
+  if (!http)
+    http = _cupsConnect();
 
  /*
   * Then send PUT requests to the HTTP server...
@@ -430,13 +437,14 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server */
 /*
  * 'cupsPutFile()' - Put a file on the server.
  *
- * This function returns HTTP_CREATED when the file is stored successfully.
+ * This function returns @code HTTP_CREATED@ when the file is stored
+ * successfully.
  *
  * @since CUPS 1.1.20@
  */
 
 http_status_t				/* O - HTTP status */
-cupsPutFile(http_t     *http,		/* I - HTTP connection to server */
+cupsPutFile(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
             const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
 {

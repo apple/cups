@@ -444,29 +444,86 @@ testsnmp:	testsnmp.o libcups.a
 
 apihelp:
 	echo Generating CUPS API help files...
+	mxmldoc --section "Programming" \
+		--title "Introduction to CUPS Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-overview.header --intro api-overview.shtml \
+		>../doc/help/api-overview.html
 	mxmldoc --section "Programming" --title "Array API" \
-		--intro api-array.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-array.header --intro api-array.shtml \
 		array.h array.c >../doc/help/api-array.html
 	mxmldoc --section "Programming" --title "CUPS API" \
-		--intro api-cups.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-cups.header --intro api-cups.shtml \
 		cups.h dest.c getputfile.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --section "Programming" --title "File and Directory APIs" \
-		--intro api-filedir.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-filedir.header --intro api-filedir.shtml \
 		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
 	mxmldoc --section "Programming" --title "PPD API" \
-		--intro api-ppd.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-ppd.header --intro api-ppd.shtml \
 		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
 		ppd.c >../doc/help/api-ppd.html
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
-		--intro api-httpipp.shtml \
+		--css ../doc/cups-printable.css \
+		--header api-httpipp.header --intro api-httpipp.shtml \
 		http.h ipp.h auth.c encode.c http.c http-addr.c \
 		http-support.c ipp.c ipp-support.c md5passwd.c \
 		request.c >../doc/help/api-httpipp.html
-	mxmldoc --section "Programming" --title "Filter and Backend APIs" \
-		--intro api-filter.shtml \
-		backchannel.c sidechannel.c sidechannel.h >../doc/help/api-filter.html
+	mxmldoc --section "Programming" \
+		--title "Filter and Backend Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-filter.header --intro api-filter.shtml \
+		backchannel.c backend.h sidechannel.c sidechannel.h \
+		>../doc/help/api-filter.html
+
+framedhelp:
+	echo Generating CUPS API help files...
+	mxmldoc --framed api-overview \
+		--section "Programming" \
+		--title "Introduction to CUPS Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-overview.header --intro api-overview.shtml
+	mxmldoc --framed api-array \
+		--section "Programming" --title "Array API" \
+		--css ../doc/cups-printable.css \
+		--header api-array.header --intro api-array.shtml \
+		array.h array.c
+	mxmldoc --framed api-cups \
+		--section "Programming" --title "CUPS API" \
+		--css ../doc/cups-printable.css \
+		--header api-cups.header --intro api-cups.shtml \
+		cups.h dest.c getputfile.c language.c notify.c \
+		options.c tempfile.c usersys.c \
+		util.c >../doc/help/api-cups.html
+	mxmldoc --framed api-filedir \
+		--section "Programming" --title "File and Directory APIs" \
+		--css ../doc/cups-printable.css \
+		--header api-filedir.header --intro api-filedir.shtml \
+		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
+	mxmldoc --framed api-ppd \
+		--section "Programming" --title "PPD API" \
+		--css ../doc/cups-printable.css \
+		--header api-ppd.header --intro api-ppd.shtml \
+		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
+		ppd.c >../doc/help/api-ppd.html
+	mxmldoc --framed api-httpipp \
+		--section "Programming" --title "HTTP and IPP APIs" \
+		--css ../doc/cups-printable.css \
+		--header api-httpipp.header --intro api-httpipp.shtml \
+		http.h ipp.h auth.c encode.c http.c http-addr.c \
+		http-support.c ipp.c ipp-support.c md5passwd.c \
+		request.c >../doc/help/api-httpipp.html
+	mxmldoc --framed api-filter \
+		--section "Programming" \
+		--title "Filter and Backend Programming" \
+		--css ../doc/cups-printable.css \
+		--header api-filter.header --intro api-filter.shtml \
+		backchannel.c backend.h sidechannel.c sidechannel.h
 
 
 #

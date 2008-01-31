@@ -3,7 +3,7 @@
  *
  *   Side-channel API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -45,22 +45,26 @@ extern "C" {
  * Enumerations...
  */
 
-typedef enum				/**** Bidirectional capabilities ****/
+enum cups_sc_bidi_e			/**** Bidirectional capabilities ****/
 {
   CUPS_SC_BIDI_NOT_SUPPORTED = 0,	/* Bidirectional I/O is not supported */
   CUPS_SC_BIDI_SUPPORTED = 1		/* Bidirectional I/O is supported */
-} cups_sc_bidi_t;
+};
+typedef enum cups_sc_bidi_e cups_sc_bidi_t;
+					/**** Bidirectional capabilities ****/
 
-typedef enum				/**** Request command codes ****/
+enum cups_sc_command_e			/**** Request command codes ****/
 {
   CUPS_SC_CMD_SOFT_RESET = 1,		/* Do a soft reset */
   CUPS_SC_CMD_DRAIN_OUTPUT = 2,		/* Drain all pending output */
   CUPS_SC_CMD_GET_BIDI = 3,		/* Return bidirectional capabilities */
   CUPS_SC_CMD_GET_DEVICE_ID = 4,	/* Return the IEEE-1284 device ID */
   CUPS_SC_CMD_GET_STATE = 5		/* Return the device state */
-} cups_sc_command_t;
+};
+typedef enum cups_sc_command_e cups_sc_command_t;
+					/**** Request command codes ****/
 
-typedef enum				/**** Printer state bits ****/
+enum cups_sc_state_e			/**** Printer state bits ****/
 {
   CUPS_SC_STATE_OFFLINE = 0,		/* Device is off-line */
   CUPS_SC_STATE_ONLINE = 1,		/* Device is on-line */
@@ -70,9 +74,11 @@ typedef enum				/**** Printer state bits ****/
   CUPS_SC_STATE_MEDIA_EMPTY = 32,	/* Paper out condition */
   CUPS_SC_STATE_MARKER_LOW = 64,	/* Toner/ink low condition */
   CUPS_SC_STATE_MARKER_EMPTY = 128	/* Toner/ink out condition */
-} cups_sc_state_t;
+};
+typedef enum cups_sc_state_e cups_sc_state_t;
+					/**** Printer state bits ****/
 
-typedef enum				/**** Response status codes ****/
+enum cups_sc_status_e			/**** Response status codes ****/
 {
   CUPS_SC_STATUS_NONE,			/* No status */
   CUPS_SC_STATUS_OK,			/* Operation succeeded */
@@ -82,7 +88,9 @@ typedef enum				/**** Response status codes ****/
   CUPS_SC_STATUS_BAD_MESSAGE,		/* The command/response message was invalid */
   CUPS_SC_STATUS_TOO_BIG,		/* Response too big */
   CUPS_SC_STATUS_NOT_IMPLEMENTED	/* Command not implemented */
-} cups_sc_status_t;
+};
+typedef enum cups_sc_status_e cups_sc_status_t;
+					/**** Response status codes ****/
 
 
 /*

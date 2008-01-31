@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,8 +26,8 @@
  *   cupsFileFlush()       - Flush pending output.
  *   cupsFileGetChar()     - Get a single character from a file.
  *   cupsFileGetConf()     - Get a line from a configuration file...
- *   cupsFileGetLine()     - Get a CR and/or LF-terminated line that may
- *                           contain binary data.
+ *   cupsFileGetLine()     - Get a CR and/or LF-terminated line that may contain
+ *                           binary data.
  *   cupsFileGets()        - Get a CR and/or LF-terminated line.
  *   cupsFileLock()        - Temporarily lock access to a file.
  *   cupsFileNumber()      - Return the file descriptor associated with a CUPS
@@ -39,7 +39,8 @@
  *   cupsFilePutChar()     - Write a character.
  *   cupsFilePuts()        - Write a string.
  *   cupsFileRead()        - Read from a file.
- *   cupsFileRewind()      - Rewind a file.
+ *   cupsFileRewind()      - Set the current file position to the beginning of
+ *                           the file.
  *   cupsFileSeek()        - Seek in a file.
  *   cupsFileStderr()      - Return a CUPS file associated with stderr.
  *   cupsFileStdin()       - Return a CUPS file associated with stdin.
@@ -134,6 +135,8 @@ static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
 
 /*
  * 'cupsFileClose()' - Close a CUPS file.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -261,9 +264,11 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
 
 /*
  * 'cupsFileCompression()' - Return whether a file is compressed.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - CUPS_FILE_NONE or CUPS_FILE_GZIP */
+int					/* O - @code CUPS_FILE_NONE@ or @code CUPS_FILE_GZIP@ */
 cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
 {
   return (fp ? fp->compressed : CUPS_FILE_NONE);
@@ -272,9 +277,11 @@ cupsFileCompression(cups_file_t *fp)	/* I - CUPS file */
 
 /*
  * 'cupsFileEOF()' - Return the end-of-file status.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - 1 on EOF, 0 otherwise */
+int					/* O - 1 on end of file, 0 otherwise */
 cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
 {
   return (fp ? fp->eof : 1);
@@ -287,11 +294,13 @@ cupsFileEOF(cups_file_t *fp)		/* I - CUPS file */
  * This function allows the paths in the path string to be separated by
  * colons (UNIX standard) or semicolons (Windows standard) and stores the
  * result in the buffer supplied.  If the file cannot be found in any of
- * the supplied paths, NULL is returned. A NULL path only matches the
- * current directory.
+ * the supplied paths, @code NULL@ is returned. A @code NULL@ path only
+ * matches the current directory.
+ *
+ * @since CUPS 1.2@
  */
 
-const char *				/* O - Full path to file or NULL */
+const char *				/* O - Full path to file or @code NULL@ if not found */
 cupsFileFind(const char *filename,	/* I - File to find */
              const char *path,		/* I - Colon/semicolon-separated path */
              int        executable,	/* I - 1 = executable files, 0 = any file/dir */
@@ -386,6 +395,8 @@ cupsFileFind(const char *filename,	/* I - File to find */
 
 /*
  * 'cupsFileFlush()' - Flush pending output.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -431,9 +442,11 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
 /*
  * 'cupsFileGetChar()' - Get a single character from a file.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - Character or -1 on EOF */
+int					/* O - Character or -1 on end of file */
 cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 {
  /*
@@ -469,9 +482,11 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 
 /*
  * 'cupsFileGetConf()' - Get a line from a configuration file...
+ *
+ * @since CUPS 1.2@
  */
 
-char *					/* O  - Line read or NULL on eof/error */
+char *					/* O  - Line read or @code NULL@ on end of file or error */
 cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
                 char        *buf,	/* O  - String buffer */
 		size_t      buflen,	/* I  - Size of string buffer */
@@ -603,13 +618,15 @@ cupsFileGetConf(cups_file_t *fp,	/* I  - CUPS file */
  * 'cupsFileGetLine()' - Get a CR and/or LF-terminated line that may
  *                       contain binary data.
  *
- * This function differs from cupsFileGets() in that the trailing CR and LF
- * are preserved, as is any binary data on the line. The buffer is nul-
- * terminated, however you should use the returned length to determine
+ * This function differs from @link cupsFileGets@ in that the trailing CR
+ * and LF are preserved, as is any binary data on the line. The buffer is
+ * nul-terminated, however you should use the returned length to determine
  * the number of bytes on the line.
+ *
+ * @since CUPS 1.2@
  */
 
-size_t					/* O - Number of bytes on line or 0 on EOF */
+size_t					/* O - Number of bytes on line or 0 on end of file */
 cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
                 char        *buf,	/* I - Buffer */
                 size_t      buflen)	/* I - Size of buffer */
@@ -671,9 +688,11 @@ cupsFileGetLine(cups_file_t *fp,	/* I - File to read from */
 
 /*
  * 'cupsFileGets()' - Get a CR and/or LF-terminated line.
+ *
+ * @since CUPS 1.2@
  */
 
-char *					/* O - Line read or NULL on eof/error */
+char *					/* O - Line read or @code NULL@ on end of file or error */
 cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - String buffer */
 	     size_t      buflen)	/* I - Size of string buffer */
@@ -742,10 +761,12 @@ cupsFileGets(cups_file_t *fp,		/* I - CUPS file */
 
 /*
  * 'cupsFileLock()' - Temporarily lock access to a file.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsFileLock(cups_file_t *fp,		/* I - File to lock */
+cupsFileLock(cups_file_t *fp,		/* I - CUPS file */
              int         block)		/* I - 1 to wait for the lock, 0 to fail right away */
 {
  /*
@@ -769,20 +790,39 @@ cupsFileLock(cups_file_t *fp,		/* I - File to lock */
 
 /*
  * 'cupsFileNumber()' - Return the file descriptor associated with a CUPS file.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - File descriptor */
 cupsFileNumber(cups_file_t *fp)		/* I - CUPS file */
 {
-  return (fp->fd);
+  if (fp)
+    return (fp->fd);
+  else
+    return (-1);
 }
 
 
 /*
  * 'cupsFileOpen()' - Open a CUPS file.
+ *
+ * The "mode" parameter can be "r" to read, "w" to write, overwriting any
+ * existing file, "a" to append to an existing file or create a new file,
+ * or "s" to open a socket connection.
+ *
+ * When opening for writing ("w") or appending ("a"), an optional number from
+ * 1 to 9 can be supplied which enables Flate compression of the file.
+ *
+ * When opening a socket connection, the filename is a string of the form
+ * "address:port" or "hostname:port". The socket will make an IPv4 or IPv6
+ * connection as needed, generally preferring IPv6 connections when there is
+ * a choice.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_file_t *				/* O - CUPS file or NULL */
+cups_file_t *				/* O - CUPS file or @code NULL@ if the file or socket cannot be opened */
 cupsFileOpen(const char *filename,	/* I - Name of file */
              const char *mode)		/* I - Open mode */
 {
@@ -877,9 +917,17 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 
 /*
  * 'cupsFileOpenFd()' - Open a CUPS file using a file descriptor.
+ *
+ * The "mode" parameter can be "r" to read, "a" or "w" to write, or "s"
+ * to treat the file descriptor as a bidirectional socket connection.
+ *
+ * When opening for writing ("w") or appending ("a"), an optional number from
+ * 1 to 9 can be supplied which enables Flate compression of the file.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_file_t *				/* O - CUPS file or NULL */
+cups_file_t *				/* O - CUPS file or @code NULL@ if the file could not be opened */
 cupsFileOpenFd(int        fd,		/* I - File descriptor */
 	       const char *mode)	/* I - Open mode */
 {
@@ -984,9 +1032,11 @@ cupsFileOpenFd(int        fd,		/* I - File descriptor */
 
 /*
  * 'cupsFilePeekChar()' - Peek at the next character from a file.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - Character or -1 on EOF */
+int					/* O - Character or -1 on end of file */
 cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
 {
  /*
@@ -1014,9 +1064,11 @@ cupsFilePeekChar(cups_file_t *fp)	/* I - CUPS file */
 
 /*
  * 'cupsFilePrintf()' - Write a formatted string.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - Number of bytes written or -1 */
+int					/* O - Number of bytes written or -1 on error */
 cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
                const char  *format,	/* I - Printf-style format string */
 	       ...)			/* I - Additional args as necessary */
@@ -1067,6 +1119,8 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 
 /*
  * 'cupsFilePutChar()' - Write a character.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -1115,9 +1169,13 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
 
 /*
  * 'cupsFilePuts()' - Write a string.
+ *
+ * Like the @code fputs@ function, no newline is appended to the string.
+ *
+ * @since CUPS 1.2@
  */
 
-int					/* O - Number of bytes written or -1 */
+int					/* O - Number of bytes written or -1 on error */
 cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
              const char  *s)		/* I - String to write */
 {
@@ -1173,9 +1231,11 @@ cupsFilePuts(cups_file_t *fp,		/* I - CUPS file */
 
 /*
  * 'cupsFileRead()' - Read from a file.
+ *
+ * @since CUPS 1.2@
  */
 
-ssize_t					/* O - Number of bytes read or -1 */
+ssize_t					/* O - Number of bytes read or -1 on error */
 cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
              char        *buf,		/* O - Buffer */
 	     size_t      bytes)		/* I - Number of bytes to read */
@@ -1242,10 +1302,13 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
 
 
 /*
- * 'cupsFileRewind()' - Rewind a file.
+ * 'cupsFileRewind()' - Set the current file position to the beginning of the
+ *                      file.
+ *
+ * @since CUPS 1.2@
  */
 
-off_t					/* O - New file position or -1 */
+off_t					/* O - New file position or -1 on error */
 cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
 {
  /*
@@ -1299,9 +1362,11 @@ cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
 
 /*
  * 'cupsFileSeek()' - Seek in a file.
+ *
+ * @since CUPS 1.2@
  */
 
-off_t					/* O - New file position or -1 */
+off_t					/* O - New file position or -1 on error */
 cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
              off_t       pos)		/* I - Position in file */
 {
@@ -1454,9 +1519,11 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
 
 /*
  * 'cupsFileStderr()' - Return a CUPS file associated with stderr.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_file_t *
+cups_file_t *				/* O - CUPS file */
 cupsFileStderr(void)
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
@@ -1488,9 +1555,11 @@ cupsFileStderr(void)
 
 /*
  * 'cupsFileStdin()' - Return a CUPS file associated with stdin.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_file_t *
+cups_file_t *				/* O - CUPS file */
 cupsFileStdin(void)
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
@@ -1516,9 +1585,11 @@ cupsFileStdin(void)
 
 /*
  * 'cupsFileStdout()' - Return a CUPS file associated with stdout.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_file_t *
+cups_file_t *				/* O - CUPS file */
 cupsFileStdout(void)
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals... */
@@ -1550,6 +1621,8 @@ cupsFileStdout(void)
 
 /*
  * 'cupsFileTell()' - Return the current file position.
+ *
+ * @since CUPS 1.2@
  */
 
 off_t					/* O - File position */
@@ -1561,10 +1634,12 @@ cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
 
 /*
  * 'cupsFileUnlock()' - Unlock access to a file.
+ *
+ * @since CUPS 1.2@
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsFileUnlock(cups_file_t *fp)		/* I - File to lock */
+cupsFileUnlock(cups_file_t *fp)		/* I - CUPS file */
 {
  /*
   * Range check...
@@ -1587,9 +1662,11 @@ cupsFileUnlock(cups_file_t *fp)		/* I - File to lock */
 
 /*
  * 'cupsFileWrite()' - Write to a file.
+ *
+ * @since CUPS 1.2@
  */
 
-ssize_t					/* O - Number of bytes written */
+ssize_t					/* O - Number of bytes written or -1 on error */
 cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
               const char  *buf,		/* I - Buffer */
 	      size_t      bytes)	/* I - Number of bytes to write */

@@ -99,6 +99,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		conflicts;		/* Number of conflicts */
   char		*s;			/* String */
   char		buffer[8192];		/* String buffer */
+  const char	*text;			/* Localized text */
 
 
   status = 0;
@@ -234,6 +235,60 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       status ++;
       printf("FAIL (\"%s\" instead of \"Number 1 Foo Reason\")\n", buffer);
+    }
+
+   /*
+    * cupsMarkerName localization...
+    */
+
+    putenv("LANG=en");
+
+    fputs("ppdLocalizeMarkerName(bogus): ", stdout);
+
+    if ((text = ppdLocalizeMarkerName(ppd, "bogus")) != NULL)
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of NULL)\n", text);
+    }
+    else
+      puts("PASS");
+
+    fputs("ppdLocalizeMarkerName(cyan): ", stdout);
+
+    if ((text = ppdLocalizeMarkerName(ppd, "cyan")) != NULL &&
+        !strcmp(text, "Cyan Toner"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"Cyan Toner\")\n",
+             text ? text : "(null)");
+    }
+
+    putenv("LANG=fr");
+
+    fputs("ppdLocalizeMarkerName(fr cyan): ", stdout);
+    if ((text = ppdLocalizeMarkerName(ppd, "cyan")) != NULL &&
+        !strcmp(text, "La Toner Cyan"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"La Toner Cyan\")\n",
+             text ? text : "(null)");
+    }
+
+    putenv("LANG=zh_TW");
+
+    fputs("ppdLocalizeMarkerName(zh_TW cyan): ", stdout);
+    if ((text = ppdLocalizeMarkerName(ppd, "cyan")) != NULL &&
+        !strcmp(text, "Number 1 Cyan Toner"))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (\"%s\" instead of \"Number 1 Cyan Toner\")\n",
+             text ? text : "(null)");
     }
   }
   else

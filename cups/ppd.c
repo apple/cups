@@ -428,7 +428,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
  * @since CUPS 1.2@
  */
 
-ppd_file_t *				/* O - PPD file record */
+ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
 ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 {
   int			i, j, k;	/* Looping vars */
@@ -2020,7 +2020,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
  * 'ppdOpenFd()' - Read a PPD file into memory.
  */
 
-ppd_file_t *				/* O - PPD file record */
+ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
 ppdOpenFd(int fd)			/* I - File to read from */
 {
   cups_file_t		*fp;		/* CUPS file pointer */
@@ -2070,7 +2070,7 @@ ppdOpenFd(int fd)			/* I - File to read from */
  * 'ppdOpenFile()' - Read a PPD file into memory.
  */
 
-ppd_file_t *				/* O - PPD file record */
+ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
 ppdOpenFile(const char *filename)	/* I - File to read from */
 {
   cups_file_t		*fp;		/* File pointer */

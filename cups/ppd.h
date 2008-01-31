@@ -4,7 +4,7 @@
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -118,11 +118,14 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19@ ****/
   PPD_BAD_CUSTOM_PARAM			/* Bad custom parameter */
 } ppd_status_t;
 
-typedef enum ppd_conform_e		/**** Conformance Levels @since CUPS 1.1.19@ ****/
+enum ppd_conform_e			/**** Conformance Levels @since CUPS 1.1.19@ ****/
 {
   PPD_CONFORM_RELAXED,			/* Relax whitespace and control char */
   PPD_CONFORM_STRICT			/* Require strict conformance */
-} ppd_conform_t;
+};
+
+typedef enum ppd_conform_e ppd_conform_t;
+					/**** Conformance Levels @since CUPS 1.1.19@ ****/
 
 typedef struct ppd_attr_s		/**** PPD Attribute Structure @since CUPS 1.1.19@ ****/
 {
@@ -172,7 +175,7 @@ typedef struct ppd_group_s		/**** Groups ****/
   struct ppd_group_s *subgroups;	/* Sub-groups (max depth = 1) */
 } ppd_group_t;
 
-typedef struct				/**** Constraints ****/
+typedef struct ppd_const_s		/**** Constraints ****/
 {
   char		option1[PPD_MAX_NAME];	/* First keyword */
   char		choice1[PPD_MAX_NAME];	/* First option/choice (blank for all) */
@@ -392,7 +395,12 @@ extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _CUPS_API_1_2;
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
-					      char *buffer, size_t bufsize) _CUPS_API_1_3;
+					      char *buffer,
+					      size_t bufsize) _CUPS_API_1_3;
+
+/**** New in CUPS 1.4 ****/
+extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
+			                       const char *name) _CUPS_API_1_4;
 
 
 /*

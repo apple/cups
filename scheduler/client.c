@@ -2369,7 +2369,11 @@ cupsdSendHeader(
     char           *type,		/* I - MIME type of document */
     int            auth_type)		/* I - Type of authentication */
 {
-  char	auth_str[1024];			/* Authorization string */
+  char		auth_str[1024];		/* Authorization string */
+#ifdef HAVE_GSSAPI
+  static char	*gss_buf = NULL;	/* Kerberos auth data buffer */
+  static int	gss_bufsize = 0;	/* Size of Kerberos auth data buffer */
+#endif /* HAVE_GSSAPI */
 
 
  /*
@@ -2478,22 +2482,56 @@ cupsdSendHeader(
   * non-401 replies...
   */
 
-  if (con->gss_output_token.length > 0)
+  if (con->gss_output_token.length > 0 && con->gss_output_token.length <= 65536)
   {
-    char	buf[2048];		/* Output token buffer */
     OM_uint32	minor_status;		/* Minor status code */
+    int		bufsize;		/* Size of output token buffer */
 
 
-    httpEncode64_2(buf, sizeof(buf),
-    	           con->gss_output_token.value,
+    bufsize = con->gss_output_token.length * 4 / 3 + 2;
+
+    if (bufsize > gss_bufsize)
+    {
+      char	*buf;			/* New buffer */
+
+
+      bufsize = (bufsize + 1023) & 1023;/* Round up */
+
+      if (gss_buf)
+        buf = realloc(gss_buf, bufsize);
+      else
+        buf = malloc(bufsize);
+
+      if (!buf)
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to allocate %d bytes for Kerberos credentials!",
+			bufsize);
+	return (0);
+      }
+
+      gss_buf     = buf;
+      gss_bufsize = bufsize;
+    }
+
+    httpEncode64_2(gss_buf, gss_bufsize,
+		   con->gss_output_token.value,
 		   con->gss_output_token.length);
     gss_release_buffer(&minor_status, &con->gss_output_token);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdSendHeader: WWW-Authenticate: Negotiate %s", buf);
+		    "cupsdSendHeader: WWW-Authenticate: Negotiate %s", gss_buf);
 
-    if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n", buf) < 0)
+    if (httpPrintf(HTTP(con), "WWW-Authenticate: Negotiate %s\r\n",
+                   gss_buf) < 0)
       return (0);
+  }
+  else if (con->gss_output_token.length > 65536)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Kerberos credentials larger than 64k (%d)!",
+		    con->gss_output_token.length);
+    return (0);
   }
 #endif /* HAVE_GSSAPI */
 

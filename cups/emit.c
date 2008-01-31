@@ -68,6 +68,9 @@ static const char ppd_custom_code[] =
 /*
  * 'ppdCollect()' - Collect all marked options that reside in the specified
  *                  section.
+ *
+ * The choices array should be freed using @code free@ when you are
+ * finished with it.
  */
 
 int					/* O - Number of options marked */
@@ -82,6 +85,9 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
 /*
  * 'ppdCollect2()' - Collect all marked options that reside in the
  *                   specified section and minimum order.
+ *
+ * The choices array should be freed using @code free@ when you are
+ * finished with it.
  *
  * @since CUPS 1.2@
  */
@@ -545,12 +551,12 @@ ppdEmitJCLEnd(ppd_file_t *ppd,		/* I - PPD file record */
  * returned string.
  *
  * The return string is allocated on the heap and should be freed using
- * free() when you are done with it.
+ * @code free@ when you are done with it.
  *
  * @since CUPS 1.2@
  */
 
-char *					/* O - String containing option code */
+char *					/* O - String containing option code or @code NULL@ if there is no option code */
 ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
               ppd_section_t section,	/* I - Section to write */
 	      float         min_order)	/* I - Lowest OrderDependency */

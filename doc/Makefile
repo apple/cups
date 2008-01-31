@@ -54,6 +54,7 @@ HELPFILES	=	\
 			help/api-filedir.html \
 			help/api-filter.html \
 			help/api-httpipp.html \
+			help/api-overview.html \
 			help/api-ppd.html \
 			help/api-raster.html \
 			help/cgi.html \

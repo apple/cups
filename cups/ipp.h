@@ -265,7 +265,7 @@ typedef enum ipp_status_e		/**** IPP status codes... ****/
   IPP_OK_TOO_MANY_EVENTS,		/* successful-ok-too-many-events */
   IPP_OK_BUT_CANCEL_SUBSCRIPTION,	/* successful-ok-but-cancel-subscription */
   IPP_OK_EVENTS_COMPLETE,		/* successful-ok-events-complete */
-  IPP_REDIRECTION_OTHER_SITE = 0x200,	/*  */
+  IPP_REDIRECTION_OTHER_SITE = 0x200,	/* redirection-other-site @private@ */
   CUPS_SEE_OTHER = 0x280,		/* cups-see-other */
   IPP_BAD_REQUEST = 0x0400,		/* client-error-bad-request */
   IPP_FORBIDDEN,			/* client-error-forbidden */

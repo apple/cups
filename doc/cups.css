@@ -1,21 +1,21 @@
 BODY {
   background: #e8e8e8;
   color: #000000;
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 H1, H2, H3, H4, H5, H6, P, TD, TH {
-  font-family: sans-serif;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 KBD {
   color: #006600;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   font-weight: bold;
 }
 
 PRE {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 PRE.command {
@@ -23,13 +23,21 @@ PRE.command {
   margin-left: 36pt;
 }
 
-PRE.command EM {
+PRE.example {
+  background: white;
+  border: dotted thin #999999;
+  margin-left: 36pt;
+  padding: 10px;
+}
+
+PRE.command EM, PRE.example EM {
   color: #3f0000;
+  font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
 P.command {
   color: #7f0000;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
   margin-left: 36pt;
 }
 
@@ -137,7 +145,7 @@ FORM {
 }
 
 INPUT[TYPE="TEXT"], TEXTAREA {
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 INPUT[TYPE="IMAGE"] {
@@ -164,6 +172,7 @@ TR.data TH {
 
 DIV.table TABLE {
   border: solid thin #999999;
+  border-collapse: collapse;
   border-spacing: 0;
   margin-left: auto;
   margin-right: auto;
@@ -179,12 +188,13 @@ DIV.table CAPTION {
 }
 
 DIV.table TABLE TD {
+  background: white;
   border: solid thin #bbbbbb;
   padding-top: 5pt;
 }
 
 DIV.table TABLE TH {
-  background: #bbbbbb;
+  background: #eeeeee;
   border: none;
   border-bottom: solid thin #999999;
 }
@@ -304,10 +314,80 @@ DL.category DT {
 
 P.summary {
   margin-left: 36pt;
-  font-family: monospace;
+  font-family: monaco, courier, monospace;
 }
 
 SPAN.message {
   font-style: italic;
   font-size: smaller;
+}
+
+DIV.summary TABLE {
+  border: solid thin #999999;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 10px;
+}
+
+DIV.summary TABLE TD, DIV.summary TABLE TH {
+  background: white;
+  border: solid thin #999999;
+  border-spacing: 0;
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+}
+
+DIV.summary TABLE THEAD TH {
+  background: #eeeeee;
+}
+
+/* API documentation styles... */
+div.body h1 {
+  margin: 0;
+}
+div.body h2 {
+  margin-top: 1.5em;
+}
+div.body h3, div.body h4, div.body h5 {
+  margin-bottom: 0.5em;
+  margin-top: 1.5em;
+}
+.class, .enumeration, .function, .struct, .typedef, .union {
+  border-bottom: solid thin #999999;
+  margin-bottom: 0;
+  margin-top: 2em;
+}
+.description {
+  margin-top: 0.5em;
+}
+code, p.code, pre, ul.code li {
+  font-family: monaco, courier, monospace;
+  font-size: 90%;
+}
+ul.code, ul.contents, ul.subcontents {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+ul.code li {
+  margin: 0;
+}
+ul.contents > li {
+  margin-top: 1em;
+}
+ul.contents li ul.code, ul.contents li ul.subcontents {
+  padding-left: 2em;
+}
+div.body dl {
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dt {
+  font-style: italic;
+  margin-left: 0;
+  margin-top: 0;
+}
+div.body dd {
+  margin-bottom: 0.5em;
 }

@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-01-23
+CHANGES.txt - 2008-01-30
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added a new ppdLocalizeMarkerName() function to get
+	  the localized version of a marker-names value.
 	- The scheduler now provides the printer-dns-sd-name
 	  attribute for printers shared via DNS-SD/Bonjour.
 	- The pdftops filter now executes the Xpdf or poppler
