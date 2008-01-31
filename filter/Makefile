@@ -175,7 +175,7 @@ apihelp:
 framedhelp:
 	echo Generating CUPS API help files...
 	mxmldoc --section "Programming" --title "Raster API" \
-		--framed api-raster \
+		--framed ../cups/api-raster \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
 		raster.h interpret.c raster.c
