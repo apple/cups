@@ -5,7 +5,7 @@
  *
  *   This set of APIs abstracts enumeration of directory entries.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -80,10 +80,12 @@ _cups_dir_time(FILETIME ft)		/* I - File time */
 
 /*
  * 'cupsDirClose()' - Close a directory.
+ *
+ * @since CUPS 1.2@
  */
 
 void
-cupsDirClose(cups_dir_t *dp)		/* I - Directory */
+cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 {
  /*
   * Range check input...
@@ -109,9 +111,11 @@ cupsDirClose(cups_dir_t *dp)		/* I - Directory */
 
 /*
  * 'cupsDirOpen()' - Open a directory.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_dir_t *				/* O - Directory */
+cups_dir_t *				/* O - Directory pointer or @code NULL@ if the directory could not be opened. */
 cupsDirOpen(const char *directory)	/* I - Directory name */
 {
   cups_dir_t	*dp;			/* Directory */
@@ -150,10 +154,12 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 
 /*
  * 'cupsDirRead()' - Read the next directory entry.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_dentry_t *			/* O - Directory entry */
-cupsDirRead(cups_dir_t *dp)		/* I - Directory */
+cups_dentry_t *				/* O - Directory entry or @code NULL@ if there are no more */
+cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 {
   WIN32_FIND_DATA	entry;		/* Directory entry data */
 
@@ -208,10 +214,12 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
 /*
  * 'cupsDirRewind()' - Rewind to the start of the directory.
+ *
+ * @since CUPS 1.2@
  */
 
 void
-cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
+cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 {
  /*
   * Range check input...
@@ -256,10 +264,12 @@ struct _cups_dir_s			/**** Directory data structure ****/
 
 /*
  * 'cupsDirClose()' - Close a directory.
+ *
+ * @since CUPS 1.2@
  */
 
 void
-cupsDirClose(cups_dir_t *dp)		/* I - Directory */
+cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 {
   DEBUG_printf(("cupsDirClose(dp=%p)\n", dp));
 
@@ -281,9 +291,11 @@ cupsDirClose(cups_dir_t *dp)		/* I - Directory */
 
 /*
  * 'cupsDirOpen()' - Open a directory.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_dir_t *				/* O - Directory */
+cups_dir_t *				/* O - Directory pointer or @code NULL@ if the directory could not be opened. */
 cupsDirOpen(const char *directory)	/* I - Directory name */
 {
   cups_dir_t	*dp;			/* Directory */
@@ -333,10 +345,12 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
 
 /*
  * 'cupsDirRead()' - Read the next directory entry.
+ *
+ * @since CUPS 1.2@
  */
 
-cups_dentry_t *				/* O - Directory entry */
-cupsDirRead(cups_dir_t *dp)		/* I - Directory */
+cups_dentry_t *				/* O - Directory entry or @code NULL@ when there are no more */
+cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 {
   struct dirent	*entry;			/* Pointer to entry */
   char		filename[1024];		/* Full filename */
@@ -428,10 +442,12 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory */
 
 /*
  * 'cupsDirRewind()' - Rewind to the start of the directory.
+ *
+ * @since CUPS 1.2@
  */
 
 void
-cupsDirRewind(cups_dir_t *dp)		/* I - Directory */
+cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 {
   DEBUG_printf(("cupsDirRewind(dp=%p)\n", dp));
 

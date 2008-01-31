@@ -1,0 +1,36 @@
+<!--
+  "$Id$"
+
+  File and Directory API header for the Common UNIX Printing System (CUPS).
+
+  Copyright 2008 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class="title">File and Directory APIs</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Headers</th>
+	<th>cups/file.h<br>
+	cups/dir.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcups</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
+	Programming: <a href='api-cups.html' target='_top'>CUPS API</a></td>
+</tr>
+</tbody>
+</table></div>
