@@ -175,9 +175,9 @@ static cups_array_t	*Addresses = NULL;
 static cups_array_t	*Communities = NULL;
 static cups_array_t	*Devices = NULL;
 static int		DebugLevel = 0;
-static int		DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, 0 };
+static int		DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, -1 };
 static unsigned		DeviceDescRequest;
-static int		DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, 0 };
+static int		DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, -1 };
 static unsigned		DeviceTypeRequest;
 static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
@@ -719,7 +719,8 @@ probe_device(snmp_cache_t *device)	/* I - Device */
   for (device_uri = (device_uri_t *)cupsArrayFirst(DeviceURIs);
        device_uri;
        device_uri = (device_uri_t *)cupsArrayNext(DeviceURIs))
-    if (!regexec(&(device_uri->re), device->make_and_model, 0, NULL, 0))
+    if (device->make_and_model &&
+        !regexec(&(device_uri->re), device->make_and_model, 0, NULL, 0))
     {
      /*
       * Found a match, add the URIs...

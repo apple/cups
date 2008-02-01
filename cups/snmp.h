@@ -51,14 +51,22 @@ enum cups_asn1_e			/**** ASN1 request/object types ****/
   CUPS_ASN1_NULL_VALUE = 0x05,		/* NULL VALUE */
   CUPS_ASN1_OID = 0x06,			/* OBJECT IDENTIFIER */
   CUPS_ASN1_SEQUENCE = 0x30,		/* SEQUENCE */
-  CUPS_ASN1_APPLICATION = 0x40,		/* Application-specific bit */
+  CUPS_ASN1_HEX_STRING = 0x40,		/* Binary string aka Hex-STRING */
   CUPS_ASN1_COUNTER = 0x41,		/* 32-bit unsigned aka Counter32 */
   CUPS_ASN1_GAUGE = 0x42,		/* 32-bit unsigned aka Gauge32 */
+  CUPS_ASN1_TIMETICKS = 0x43,		/* 32-bit unsigned aka Timeticks32 */
   CUPS_ASN1_GET_REQUEST = 0xa0,		/* GetRequest-PDU */
   CUPS_ASN1_GET_NEXT_REQUEST = 0xa1,	/* GetNextRequest-PDU */
   CUPS_ASN1_GET_RESPONSE = 0xa2		/* GetResponse-PDU */
 };
 typedef enum cups_asn1_e cups_asn1_t;	/**** ASN1 request/object types ****/
+
+typedef struct cups_hexstring_s		/**** Hex-STRING value ****/
+{
+  unsigned char	bytes[CUPS_SNMP_MAX_STRING];
+					/* Bytes in string */
+  int		num_bytes;		/* Number of bytes */
+} cups_hexstring_t;
 
 typedef struct cups_snmp_s		/**** SNMP data packet ****/
 {
@@ -80,8 +88,11 @@ typedef struct cups_snmp_s		/**** SNMP data packet ****/
     int		integer;		/* Integer value */
     unsigned	counter;		/* Counter value */
     unsigned	gauge;			/* Gauge value */
+    unsigned	timeticks;		/* Timeticks  value */
     int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
-    char	string[CUPS_SNMP_MAX_STRING];/* String value */
+    char	string[CUPS_SNMP_MAX_STRING];
+					/* String value */
+    cups_hexstring_t hex_string;	/* Hex string value */
   }		object_value;		/* object-value value */
 } cups_snmp_t;
 

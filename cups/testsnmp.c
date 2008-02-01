@@ -81,7 +81,9 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     for (i = 2; i < argc; i ++)
-      if (!show_oid(fd, argv[i], &(host->addr)))
+      if (!strcmp(argv[i], "-d"))
+        cupsSNMPSetDebug(10);
+      else if (!show_oid(fd, argv[i], &(host->addr)))
         return (1);
   }
   else if (!show_oid(fd, (char *)"1.3.6.1.2.1.43.10.2.1.4.1.1", &(host->addr)))
@@ -117,7 +119,7 @@ scan_oid(char *s,			/* I - OID string */
   if (i >= oidsize)
     return (NULL);
 
-  oid[i] = 0;
+  oid[i] = -1;
 
   return (oid);
 }
@@ -133,89 +135,146 @@ show_oid(int         fd,		/* I - SNMP socket */
 	 http_addr_t *addr)		/* I - Address to query */
 {
   int		i;			/* Looping var */
-  int		oid[255];		/* OID */
+  int		root[CUPS_SNMP_MAX_OID],/* Root OID */
+		oid[CUPS_SNMP_MAX_OID];	/* OID */
   cups_snmp_t	packet;			/* SNMP packet */
+  int		walk = 0;		/* Walk all OIDs? */
 
 
-  printf("cupsSNMPWrite(%s): ", s);
-
-  if (!scan_oid(s, oid, sizeof(oid) / sizeof(oid[0])))
+  if (!strcmp(s, "-w"))
+  {
+    scan_oid("1.3.6.1.2.1.43", oid, sizeof(oid) / sizeof(oid[0]));
+    walk = 1;
+  }
+  else if (!scan_oid(s, oid, sizeof(oid) / sizeof(oid[0])))
   {
     puts("FAIL (bad OID)");
     return (0);
   }
 
-  if (!cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, "public",
-                     CUPS_ASN1_GET_REQUEST, 1, oid))
+  memcpy(root, oid, sizeof(root));
+
+  do
   {
-    puts("FAIL");
-    return (0);
+    printf("cupsSNMPWrite(%d", oid[0]);
+    for (i = 1; oid[i] >= 0; i ++)
+      printf(".%d", oid[i]);
+    fputs("): ", stdout);
+
+    if (!cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, "public",
+		       walk ? CUPS_ASN1_GET_NEXT_REQUEST :
+		              CUPS_ASN1_GET_REQUEST, 1, oid))
+    {
+      puts("FAIL");
+      return (0);
+    }
+
+    puts("PASS");
+
+    fputs("cupsSNMPRead(5000): ", stdout);
+
+    if (!cupsSNMPRead(fd, &packet, 5000))
+    {
+      puts("FAIL (timeout)");
+      return (0);
+    }
+
+    if (walk)
+    {
+      if (!cupsSNMPIsOIDPrefixed(&packet, root))
+      {
+        puts("PASS (end-of-MIB)");
+	return (0);
+      }
+    }
+    else if (!cupsSNMPIsOID(&packet, oid))
+    {
+      puts("FAIL (bad OID)");
+      return (0);
+    }
+
+    if (packet.error)
+    {
+      printf("FAIL (%s)\n", packet.error);
+      return (0);
+    }
+
+    if (walk)
+    {
+      if (cupsSNMPIsOID(&packet, oid))
+      {
+        puts("FAIL (same OID!)");
+	return (0);
+      }
+
+      cupsSNMPCopyOID(oid, packet.object_name, sizeof(oid) / sizeof(oid[0]));
+    }
+
+    printf("PASS (%d", packet.object_name[0]);
+    for (i = 1; packet.object_name[i] >= 0; i ++)
+      printf(".%d", packet.object_name[i]);
+    fputs(" = ", stdout);
+
+    switch (packet.object_type)
+    {
+      case CUPS_ASN1_BOOLEAN :
+	  printf("BOOLEAN %s)\n",
+		 packet.object_value.boolean ? "TRUE" : "FALSE");
+	  break;
+
+      case CUPS_ASN1_INTEGER :
+	  printf("INTEGER %d)\n", packet.object_value.integer);
+	  break;
+
+      case CUPS_ASN1_BIT_STRING :
+	  printf("BIT-STRING \"%s\")\n", packet.object_value.string);
+	  break;
+
+      case CUPS_ASN1_OCTET_STRING :
+	  printf("OCTET-STRING \"%s\")\n", packet.object_value.string);
+	  break;
+
+      case CUPS_ASN1_NULL_VALUE :
+	  puts("NULL-VALUE)");
+	  break;
+
+      case CUPS_ASN1_OID :
+	  printf("OID %d", packet.object_value.oid[0]);
+	  for (i = 1; packet.object_value.oid[i] >= 0; i ++)
+	    printf(".%d", packet.object_value.oid[i]);
+	  puts(")");
+	  break;
+
+      case CUPS_ASN1_HEX_STRING :
+          fputs("Hex-STRING", stdout);
+	  for (i = 0; i < packet.object_value.hex_string.num_bytes; i ++)
+	    printf(" %02X", packet.object_value.hex_string.bytes[i]);
+	  puts(")");
+	  break;
+
+      case CUPS_ASN1_COUNTER :
+	  printf("Counter %d)\n", packet.object_value.counter);
+	  break;
+
+      case CUPS_ASN1_GAUGE :
+	  printf("Gauge %u)\n", packet.object_value.gauge);
+	  break;
+
+      case CUPS_ASN1_TIMETICKS :
+	  printf("Timeticks %u days, %u:%02u:%02u.%02u)\n",
+	         packet.object_value.timeticks / 8640000,
+	         (packet.object_value.timeticks / 360000) % 24,
+		 (packet.object_value.timeticks / 6000) % 60,
+		 (packet.object_value.timeticks / 100) % 60,
+		 packet.object_value.timeticks % 100);
+	  break;
+
+      default :
+	  printf("Unknown-%X)\n", packet.object_type);
+	  break;
+    }
   }
-
-  puts("PASS");
-
-  fputs("cupsSNMPRead(5000): ", stdout);
-
-  if (!cupsSNMPRead(fd, &packet, 5000))
-  {
-    puts("FAIL (timeout)");
-    return (0);
-  }
-
-  if (!cupsSNMPIsOID(&packet, oid))
-  {
-    puts("FAIL (bad OID)");
-    return (0);
-  }
-
-  if (packet.error)
-  {
-    printf("FAIL (%s)\n", packet.error);
-    return (0);
-  }
-
-  switch (packet.object_type)
-  {
-    case CUPS_ASN1_BOOLEAN :
-        printf("PASS (BOOLEAN %s)\n",
-	       packet.object_value.boolean ? "TRUE" : "FALSE");
-        break;
-
-    case CUPS_ASN1_INTEGER :
-        printf("PASS (INTEGER %d)\n", packet.object_value.integer);
-        break;
-
-    case CUPS_ASN1_BIT_STRING :
-        printf("PASS (BIT-STRING \"%s\")\n", packet.object_value.string);
-        break;
-
-    case CUPS_ASN1_OCTET_STRING :
-        printf("PASS (OCTET-STRING \"%s\")\n", packet.object_value.string);
-        break;
-
-    case CUPS_ASN1_NULL_VALUE :
-        puts("PASS (NULL-VALUE)");
-        break;
-
-    case CUPS_ASN1_OID :
-        printf("PASS (OID %d", packet.object_value.oid[0]);
-	for (i = 1; packet.object_value.oid[i]; i ++)
-	  printf(".%d", packet.object_value.oid[i]);
-	puts(")");
-        break;
-
-    case CUPS_ASN1_COUNTER :
-        printf("PASS (Counter %d)\n", packet.object_value.counter);
-        break;
-
-    case CUPS_ASN1_GAUGE:
-        printf("PASS (Gauge %u)\n", packet.object_value.gauge);
-        break;
-
-    default :
-        printf("PASS (Unknown-%X)\n", packet.object_type);
-	break;
-  }
+  while (walk);
 
   return (1);
 }

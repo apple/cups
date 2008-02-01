@@ -18,7 +18,7 @@
 <div class='summary'><table summary='General Information'>
 <thead>
 <tr>
-	<th>Header</th>
+	<th>Headers</th>
 	<th>cups/backend.h<br>
 	cups/sidechannel.h<br>
 	cups/snmp.h</th>

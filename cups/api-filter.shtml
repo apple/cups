@@ -297,7 +297,53 @@ if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;s
 
 <h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
 
-<p>CUPS provides a simple API for querying network printers using version 1 of
-the Simple Network Management Protocol (SNMP). Among other things, SNMP allows
-you to get the current status, page counter, and supply levels from a
-printer.</p>
+<p>The Simple Network Management Protocol (SNMP) allows you to get the current
+status, page counter, and supply levels from most network printers. Every
+piece of information is associated with an Object Identifier (OID), and
+every printer has a <em>community</em> name associated with it. OIDs can be
+queried directly or by "walking" over a range of OIDs with a common prefix.</p>
+
+<p>The CUPS SNMP functions provide a simple API for querying network printers.
+Queries are made using a datagram socket that is created using
+<a href="#cupsSNMPOpen"><code>cupsSNMPOpen</code></a> and destroyed using
+<a href="#cupsSNMPClose"><code>cupsSNMPClose</code></a>:</p>
+
+<pre class="example">
+#include &lt;cups/snmp.h&gt;
+
+int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>();
+
+/* do some queries */
+
+<a href="#cupsSNMPClose">cupsSNMPClose</a>(snmp);
+</pre>
+
+<p>OIDs are simple C arrays of integers, terminated by a value of -1. For
+example, the page counter OID .1.3.6.1.2.1.43.10.2.1.4.1.1 would be:</p>
+
+<pre class="example">
+int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
+</pre>
+
+<p>You send a query using the
+<a href="#cupsSNMPWrite"><code>cupsSNMPWrite</code></a> function, which
+needs the datagram socket from
+<a href="#cupsSNMPOpen"><code>cupsSNMPOpen</code></a>, an address from
+<code>httpAddrGetList</code>, the protocol version number
+(<code>CUPS_SNMP_VERSION_1</code>), the community name, the request
+type (<code>CUPS_ASN1_GET_REQUEST</code> or
+<code>CUPS_ASN1_GET_NEXT_REQUEST</code>), a request number, and the OID:</p>
+
+<pre class="example">
+#include &lt;cups/snmp.h&gt;
+
+int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>();
+int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
+http_addrlist_t *host = httpAddrGetList("myprinter", AF_UNSPEC, "161");
+
+<a href="#cupsSNMPWrite">cupsSNMPWrite</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
+                <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), CUPS_ASN1_GET_REQUEST, 1,
+                page_counter_oid);
+</pre>
+
+
