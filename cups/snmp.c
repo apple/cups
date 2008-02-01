@@ -23,7 +23,7 @@
  *   cupsSNMPIsOIDPrefixed() - Test whether a SNMP response uses the specified
  *                             OID prefix.
  *   cupsSNMPOpen()          - Open a SNMP socket.
- *   cupsSNMPRead()          - Read and parse a SNMP response...
+ *   cupsSNMPRead()          - Read and parse a SNMP response.
  *   cupsSNMPSetDebug()      - Enable/disable debug logging to stderr.
  *   cupsSNMPWrite()         - Send an SNMP query packet.
  *   asn1_decode_snmp()      - Decode a SNMP packet.
@@ -123,6 +123,10 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 
 /*
  * 'cupsSNMPCopyOID()' - Copy an OID.
+ *
+ * The array pointed to by "src" is 0-terminated.
+ *
+ * @since CUPS 1.4@
  */
 
 int *					/* O - New OID */
@@ -252,15 +256,15 @@ cupsSNMPOpen(void)
 
 
 /*
- * 'cupsSNMPRead()' - Read and parse a SNMP response...
+ * 'cupsSNMPRead()' - Read and parse a SNMP response.
  *
- * If "timeout" is negative, cupsSNMPRead() will wait for a response
+ * If "timeout" is negative, @code cupsSNMPRead@ will wait for a response
  * indefinitely.
  *
  * @since CUPS 1.4@
  */
 
-cups_snmp_t *				/* O - SNMP packet or NULL if none */
+cups_snmp_t *				/* O - SNMP packet or @code NULL@ if none */
 cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
              cups_snmp_t *packet,	/* I - SNMP packet buffer */
 	     int         msec)		/* I - Timeout in milliseconds */

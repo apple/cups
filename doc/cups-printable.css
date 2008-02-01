@@ -237,3 +237,7 @@ div.contents h2 {
 div.contents ul.contents {
   font-size: 80%;
 }
+div.contents ul.subcontents li {
+  margin-left: 1em;
+  text-indent: -1em;
+}

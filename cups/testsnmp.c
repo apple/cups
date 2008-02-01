@@ -15,7 +15,9 @@
  *
  * Contents:
  *
- *   main() - Main entry.
+ *   main()     - Main entry.
+ *   scan_oid() - Scan an OID value.
+ *   show_oid() - Show the specified OID.
  */
 
 /*

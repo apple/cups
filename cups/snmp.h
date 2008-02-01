@@ -41,7 +41,7 @@
  * Types...
  */
 
-typedef enum cups_asn1_e		/**** ASN1 request/object types ****/
+enum cups_asn1_e			/**** ASN1 request/object types ****/
 {
   CUPS_ASN1_END_OF_CONTENTS = 0x00,	/* End-of-contents */
   CUPS_ASN1_BOOLEAN = 0x01,		/* BOOLEAN */
@@ -57,7 +57,8 @@ typedef enum cups_asn1_e		/**** ASN1 request/object types ****/
   CUPS_ASN1_GET_REQUEST = 0xa0,		/* GetRequest-PDU */
   CUPS_ASN1_GET_NEXT_REQUEST = 0xa1,	/* GetNextRequest-PDU */
   CUPS_ASN1_GET_RESPONSE = 0xa2		/* GetResponse-PDU */
-} cups_asn1_t;
+};
+typedef enum cups_asn1_e cups_asn1_t;	/**** ASN1 request/object types ****/
 
 typedef struct cups_snmp_s		/**** SNMP data packet ****/
 {

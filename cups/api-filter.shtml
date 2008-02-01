@@ -294,3 +294,10 @@ if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;s
   <a href="#cupsSideChannelWrite">cupsSideChannelWrite</a>(command, status, data, datalen, 1.0);
 }
 </pre>
+
+<h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
+
+<p>CUPS provides a simple API for querying network printers using version 1 of
+the Simple Network Management Protocol (SNMP). Among other things, SNMP allows
+you to get the current status, page counter, and supply levels from a
+printer.</p>
