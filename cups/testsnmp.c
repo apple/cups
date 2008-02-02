@@ -112,7 +112,7 @@ scan_oid(char *s,			/* I - OID string */
       return (NULL);
 
     oid[i] = strtol(ptr, &ptr, 10);
-    if (*ptr == '.')
+    if (ptr && *ptr == '.')
       ptr ++;
   }
 
@@ -189,7 +189,10 @@ show_oid(int         fd,		/* I - SNMP socket */
     }
     else if (!cupsSNMPIsOID(&packet, oid))
     {
-      puts("FAIL (bad OID)");
+      printf("FAIL (bad OID %d", packet.object_name[0]);
+      for (i = 1; packet.object_name[i] >= 0; i ++)
+	printf(".%d", packet.object_name[i]);
+      puts(")");
       return (0);
     }
 
