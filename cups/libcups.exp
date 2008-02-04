@@ -148,11 +148,13 @@ _cupsRemoveDest
 _cupsRemoveOption
 _cupsSNMPClose
 _cupsSNMPCopyOID
+_cupsSNMPDefaultCommunity
 _cupsSNMPIsOID
 _cupsSNMPIsOIDPrefixed
 _cupsSNMPOpen
 _cupsSNMPRead
 _cupsSNMPSetDebug
+_cupsSNMPWalk
 _cupsSNMPWrite
 _cupsSendRequest
 _cupsServer

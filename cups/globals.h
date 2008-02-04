@@ -98,6 +98,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   ppd_conform_t		ppd_conform;	/* Level of conformance required */
 
   /* snmp.c */
+  char			snmp_community[255];
+					/* Default SNMP community name */
   int			snmp_debug;	/* Log SNMP IO to stderr? */
 
   /* tempfile.c */

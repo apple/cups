@@ -47,6 +47,52 @@ the remaining filters read from the standard input and write to the standard
 output. The backend is the last filter in the chain and writes to the
 device.</p>
 
+<h3><a name="SECURITY">Security Considerations</a></h3>
+
+<p>It is always important to use security programming practices. Filters and
+most backends are run as a non-priviledged user, so the major security
+consideration is resource utilization - filters should not depend on unlimited
+amounts of CPU, memory, or disk space, and should protect against conditions
+that could lead to excess usage of any resource like infinite loops and
+unbounded recursion. In addition, filters must <em>never</em> allow the user to
+specify an arbitrary file path to a separator page, template, or other file
+used by the filter since that can lead to an unauthorized disclosure of
+information. <em>Always</em> treat input as suspect and validate it!</p>
+
+<p>If you are developing a backend that runs as root, make sure to check for
+potential buffer overflows, integer under/overflow conditions, and file
+accesses since these can lead to privilege escalations. When writing files,
+always validate the file path and <em>never</em> allow a user to determine
+where to store a file.</p>
+
+<blockquote><b>Note:</b>
+
+<p><em>Never</em> write files to a user's home directory. Aside from the
+security implications, CUPS is a network print service and as such the network
+user may not be the same as the local user and/or there may not be a local home
+directory to write to.</p>
+
+<p>In addition, some operating systems provide additional security mechanisms
+that further limit file system access, even for backends running as root.  On
+Mac OS X, for example, no backend may write to a user's home directory.</p>
+</blockquote>
+
+<h3><a name="TEMPFILES">Temporary Files</a></h3>
+
+<p>Temporary files should be created in the directory specified by the
+"TMPDIR" environment variable. The
+<a href="#cupsTempFile2"><code>cupsTempFile2</code></a> function can be
+used to safely create temporary files in this directory.</p>
+
+<h3><a name="COPIES">Copy Generation</a></h3>
+
+<p>The <code>argv[4]</code> argument specifies the number of copies to produce
+of the input file. In general, you should only generate copies if the
+<em>filename</em> argument is supplied. The only exception to this are
+filters that produce device-independent PostScript output, since the PostScript
+filter <var>pstops</var> is responsible for generating copies of PostScript
+files.</p>
+
 <h3><a name="EXITCODES">Exit Codes</a></h3>
 
 <p>Filters must exit with status 0 when they successfully generate print data
@@ -325,14 +371,10 @@ example, the page counter OID .1.3.6.1.2.1.43.10.2.1.4.1.1 would be:</p>
 int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
 </pre>
 
-<p>You send a query using the
-<a href="#cupsSNMPWrite"><code>cupsSNMPWrite</code></a> function, which
-needs the datagram socket from
-<a href="#cupsSNMPOpen"><code>cupsSNMPOpen</code></a>, an address from
-<code>httpAddrGetList</code>, the protocol version number
-(<code>CUPS_SNMP_VERSION_1</code>), the community name, the request
-type (<code>CUPS_ASN1_GET_REQUEST</code> or
-<code>CUPS_ASN1_GET_NEXT_REQUEST</code>), a request number, and the OID:</p>
+<p>You send a query using
+<a href="#cupsSNMPWrite"><code>cupsSNMPWrite</code></a> and read the value back
+using <a href="#cupsSNMPRead"><code>cupsSNMPRead</code></a>. The value is read
+into a structure called <a href="#cups_snmp_t"><code>cups_snmp_t</code></a>:</p>
 
 <pre class="example">
 #include &lt;cups/snmp.h&gt;
@@ -340,10 +382,36 @@ type (<code>CUPS_ASN1_GET_REQUEST</code> or
 int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>();
 int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
 http_addrlist_t *host = httpAddrGetList("myprinter", AF_UNSPEC, "161");
+<a href="#cups_snmp_t">cups_snmp_t</a> packet;
 
 <a href="#cupsSNMPWrite">cupsSNMPWrite</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
                 <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), CUPS_ASN1_GET_REQUEST, 1,
                 page_counter_oid);
+if (<a href="#cupsSNMPRead">cupsSNMPRead</a>(snmp, &amp;packet, 5000))
+{
+  /* Do something with the value */
+  printf("Page counter is: %d\n", packet.object_value.integer);
+}
 </pre>
 
+<p>The <a href="#cupsSNMPWalk"><code>cupsSNMPWalk</code></a> function allows you
+to query a whole group of OIDs, calling a function of your choice for each OID
+that is found:</p>
 
+<pre class="example">
+#include &lt;cups/snmp.h&gt;
+
+void
+my_callback(<a href="#cups_snmp_t">cups_snmp_t</a> *packet, void *data)
+{
+  /* Do something with the value */
+}
+
+int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>();
+int printer_mib_oid[] = { 1, 3, 6, 1, 2, 1, 43, -1 };
+http_addrlist_t *host = httpAddrGetList("myprinter", AF_UNSPEC, "161");
+void *my_data;
+
+<a href="#cupsSNMPWalk">cupsSNMPWalk</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
+               <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), printer_mib_oid, my_callback, my_data);
+</pre>

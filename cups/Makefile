@@ -478,7 +478,7 @@ apihelp:
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
-		backchannel.c backend.h sidechannel.c sidechannel.h \
+		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		snmp.c snmp.h >../doc/help/api-filter.html
 
 framedhelp:
@@ -523,7 +523,7 @@ framedhelp:
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
-		backchannel.c backend.h sidechannel.c sidechannel.h \
+		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		snmp.c snmp.h
 
 

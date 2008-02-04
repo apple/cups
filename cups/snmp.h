@@ -61,12 +61,26 @@ enum cups_asn1_e			/**** ASN1 request/object types ****/
 };
 typedef enum cups_asn1_e cups_asn1_t;	/**** ASN1 request/object types ****/
 
-typedef struct cups_hexstring_s		/**** Hex-STRING value ****/
+struct cups_snmp_hexstring_s		/**** Hex-STRING value ****/
 {
   unsigned char	bytes[CUPS_SNMP_MAX_STRING];
 					/* Bytes in string */
   int		num_bytes;		/* Number of bytes */
-} cups_hexstring_t;
+};
+
+union cups_snmp_value_u			/**** Object value ****/
+{
+  int		boolean;		/* Boolean value */
+  int		integer;		/* Integer value */
+  unsigned	counter;		/* Counter value */
+  unsigned	gauge;			/* Gauge value */
+  unsigned	timeticks;		/* Timeticks  value */
+  int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
+  char		string[CUPS_SNMP_MAX_STRING];
+					/* String value */
+  struct cups_snmp_hexstring_s hex_string;
+					/* Hex string value */
+};
 
 typedef struct cups_snmp_s		/**** SNMP data packet ****/
 {
@@ -82,20 +96,11 @@ typedef struct cups_snmp_s		/**** SNMP data packet ****/
   int		object_name[CUPS_SNMP_MAX_OID];
 					/* object-name value */
   cups_asn1_t	object_type;		/* object-value type */
-  union
-  {
-    int		boolean;		/* Boolean value */
-    int		integer;		/* Integer value */
-    unsigned	counter;		/* Counter value */
-    unsigned	gauge;			/* Gauge value */
-    unsigned	timeticks;		/* Timeticks  value */
-    int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
-    char	string[CUPS_SNMP_MAX_STRING];
-					/* String value */
-    cups_hexstring_t hex_string;	/* Hex string value */
-  }		object_value;		/* object-value value */
+  union cups_snmp_value_u
+		object_value;		/* object-value value */
 } cups_snmp_t;
 
+typedef void (*cups_snmp_cb_t)(cups_snmp_t *packet, void *data);
 
 /*
  * Prototypes...
@@ -108,6 +113,7 @@ extern "C" {
 extern void		cupsSNMPClose(int fd) _CUPS_API_1_4;
 extern int		*cupsSNMPCopyOID(int *dst, const int *src, int dstsize)
 			    _CUPS_API_1_4;
+extern const char	*cupsSNMPDefaultCommunity(void) _CUPS_API_1_4;
 extern int		cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
 			    _CUPS_API_1_4;
 extern int		cupsSNMPIsOIDPrefixed(cups_snmp_t *packet,
@@ -116,7 +122,11 @@ extern int		cupsSNMPOpen(void) _CUPS_API_1_4;
 extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet, int msec)
 			    _CUPS_API_1_4;
 extern void		cupsSNMPSetDebug(int level) _CUPS_API_1_4;
-extern int		cupsSNMPWrite(int fd, http_addr_t *addr, int version,
+extern int		cupsSNMPWalk(int fd, http_addr_t *address, int version,
+			             const char *community, const int *prefix,
+				     int msec, cups_snmp_cb_t cb, void *data)
+			    _CUPS_API_1_4;
+extern int		cupsSNMPWrite(int fd, http_addr_t *address, int version,
 				      const char *community,
 				      cups_asn1_t request_type,
 				      const unsigned request_id,
