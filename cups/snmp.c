@@ -271,7 +271,7 @@ cupsSNMPIsOIDPrefixed(
  */
 
 int					/* O - SNMP socket file descriptor */
-cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @AF_INET6@ */
+cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INET6@ */
 {
   int		fd;			/* SNMP socket file descriptor */
   int		val;			/* Socket option value */
