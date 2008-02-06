@@ -271,7 +271,7 @@ cupsSNMPIsOIDPrefixed(
  */
 
 int					/* O - SNMP socket file descriptor */
-cupsSNMPOpen(void)
+cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @AF_INET6@ */
 {
   int		fd;			/* SNMP socket file descriptor */
   int		val;			/* Socket option value */
@@ -281,7 +281,7 @@ cupsSNMPOpen(void)
   * Create the SNMP socket...
   */
 
-  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((fd = socket(family, SOCK_DGRAM, 0)) < 0)
     return (-1);
 
  /*

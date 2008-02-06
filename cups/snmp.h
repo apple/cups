@@ -118,7 +118,7 @@ extern int		cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
 			    _CUPS_API_1_4;
 extern int		cupsSNMPIsOIDPrefixed(cups_snmp_t *packet,
 			                      const int *prefix) _CUPS_API_1_4;
-extern int		cupsSNMPOpen(void) _CUPS_API_1_4;
+extern int		cupsSNMPOpen(int family) _CUPS_API_1_4;
 extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet, int msec)
 			    _CUPS_API_1_4;
 extern void		cupsSNMPSetDebug(int level) _CUPS_API_1_4;

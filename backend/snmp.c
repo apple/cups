@@ -236,7 +236,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Open the SNMP socket...
   */
 
-  if ((fd = cupsSNMPOpen()) < 0)
+  if ((fd = cupsSNMPOpen(AF_INET)) < 0)
     return (1);
 
  /*

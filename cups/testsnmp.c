@@ -52,22 +52,12 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int			i;		/* Looping var */
-  int			fd;		/* SNMP socket */
+  int			fd = -1;	/* SNMP socket */
   http_addrlist_t	*host = NULL;	/* Address of host */
   int			walk = 0;	/* Walk OIDs? */
   char			*oid = NULL;	/* Last OID shown */
   const char		*community;	/* Community name */
 
-
-  fputs("cupsSNMPOpen: ", stdout);
-
-  if ((fd = cupsSNMPOpen()) < 0)
-  {
-    printf("FAIL (%s)\n", strerror(errno));
-    return (1);
-  }
-
-  puts("PASS");
 
   fputs("cupsSNMPDefaultCommunity: ", stdout);
 
@@ -104,9 +94,24 @@ main(int  argc,				/* I - Number of command-line args */
 	printf("testsnmp: Unable to find \"%s\"!\n", argv[1]);
 	return (1);
       }
+
+      if (fd < 0)
+      {
+	fputs("cupsSNMPOpen: ", stdout);
+
+	if ((fd = cupsSNMPOpen(host->addr.addr.sa_family)) < 0)
+	{
+	  printf("FAIL (%s)\n", strerror(errno));
+	  return (1);
+	}
+
+	puts("PASS");
+      }
     }
     else if (!show_oid(fd, community, &(host->addr), argv[i], walk))
       return (1);
+    else
+      oid = argv[i];
 
   if (!host)
     usage();
@@ -266,7 +271,7 @@ show_oid(int         fd,		/* I - SNMP socket */
     if (cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5000,
                      print_packet, NULL) < 0)
     {
-      puts("FAIL");
+      printf("FAIL (%s)\n", strerror(errno));
       return (0);
     }
   }
@@ -280,7 +285,7 @@ show_oid(int         fd,		/* I - SNMP socket */
     if (!cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, community,
 		       CUPS_ASN1_GET_REQUEST, 1, oid))
     {
-      puts("FAIL");
+      printf("FAIL (%s)\n", strerror(errno));
       return (0);
     }
 
