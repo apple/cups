@@ -365,7 +365,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
  /*
   * Print a page log entry of the form:
   *
-  *    printer job-id user [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies \
+  *    printer user job-id [DD/MON/YYYY:HH:MM:SS +TTTT] page num-copies \
   *        billing hostname
   */
 
