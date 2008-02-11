@@ -3209,7 +3209,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 
       parent->limit &= ~loc->limit;
     }
-    else if (!strcasecmp(line, "</Limit>"))
+    else if (!strcasecmp(line, "</Limit>") ||
+             !strcasecmp(line, "</LimitExcept>"))
       loc = parent;
     else if (!parse_aaa(loc, line, value, linenum))
     {
