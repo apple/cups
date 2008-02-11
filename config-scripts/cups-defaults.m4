@@ -4,7 +4,7 @@ dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -336,6 +336,14 @@ AC_ARG_WITH(snmp-community, [  --with-snmp-community   set SNMP community, defau
 
 AC_SUBST(CUPS_SNMP_ADDRESS)
 AC_SUBST(CUPS_SNMP_COMMUNITY)
+
+dnl New default port definition for IPP...
+AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
+	DEFAULT_IPP_PORT="$withval",
+	DEFAULT_IPP_PORT="631")
+
+AC_SUBST(DEFAULT_IPP_PORT)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
 dnl End of "$Id$".

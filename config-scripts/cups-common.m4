@@ -19,7 +19,7 @@ AC_PREREQ(2.60)
 dnl Set the name of the config header file...
 AC_CONFIG_HEADER(config.h)
 
-dnl Versio number information...
+dnl Version number information...
 CUPS_VERSION="1.4svn"
 CUPS_REVISION=""
 if test -z "$CUPS_REVISION" -a -d .svn; then
@@ -178,26 +178,58 @@ esac
 
 AC_SUBST(ARFLAGS)
 
-dnl Extra platform-specific libraries...
+dnl Prep libraries specifically for cupsd and backends...
 BACKLIBS=""
 CUPSDLIBS=""
-DBUSDIR=""
+AC_SUBST(BACKLIBS)
+AC_SUBST(CUPSDLIBS)
+
+dnl See if we have POSIX ACL support...
+SAVELIBS="$LIBS"
+LIBS=""
+AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
+CUPSDLIBS="$CUPSDLIBS $LIBS"
+LIBS="$SAVELIBS"
+
+dnl Check for DBUS support
+AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
+AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
+	DBUSDIR="$withval"
+	DBUSDIR="/etc/dbus-1")
+
+if test "x$enable_dbus" != xno; then
+	AC_PATH_PROG(PKGCONFIG, pkg-config)
+	if test "x$PKGCONFIG" != x; then
+		AC_MSG_CHECKING(for DBUS)
+		if $PKGCONFIG --exists dbus-1; then
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_DBUS)
+			CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+			CUPSDLIBS="$CUPSDLIBS `$PKGCONFIG --libs dbus-1`"
+			AC_CHECK_LIB(dbus-1,
+			    dbus_message_iter_init_append,
+			    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
+		else
+			AC_MSG_RESULT(no)
+			DBUSDIR=""
+		fi
+	fi
+fi
+
+AC_SUBST(DBUSDIR)
+
+dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTADMIN_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
-
-AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
-
 FONTS="fonts"
-AC_SUBST(FONTS)
 LEGACY_BACKENDS="parallel scsi"
-AC_SUBST(LEGACY_BACKENDS)
 
 case $uname in
         Darwin*)
 		FONTS=""
 		LEGACY_BACKENDS=""
-                BACKLIBS="-framework IOKit"
-                CUPSDLIBS="-sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
+                BACKLIBS="$BACKLIBS -framework IOKit"
+                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation $LIBS"
 
 		dnl Check for framework headers...
@@ -227,53 +259,13 @@ case $uname in
 		dnl Check for sandbox/Seatbelt support
 		AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
                 ;;
-
-	Linux*)
-		dnl Check for DBUS support
-		if test "x$enable_dbus" != xno; then
-			AC_PATH_PROG(PKGCONFIG, pkg-config)
-			if test "x$PKGCONFIG" != x; then
-				AC_MSG_CHECKING(for DBUS)
-				if $PKGCONFIG --exists dbus-1; then
-					AC_MSG_RESULT(yes)
-					AC_DEFINE(HAVE_DBUS)
-					CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-					CUPSDLIBS="`$PKGCONFIG --libs dbus-1`"
-					AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ], dbusdir="$withval", dbusdir="/etc/dbus-1")
-					DBUSDIR="$dbusdir"
-					AC_CHECK_LIB(dbus-1,
-					    dbus_message_iter_init_append,
-					    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
-				else
-					AC_MSG_RESULT(no)
-				fi
-			fi
-		fi
-		;;
 esac
 
 AC_SUBST(CUPS_DEFAULT_PRINTADMIN_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTADMIN_AUTH, "$CUPS_DEFAULT_PRINTADMIN_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
-
-dnl See if we have POSIX ACL support...
-SAVELIBS="$LIBS"
-LIBS=""
-AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
-CUPSDLIBS="$CUPSDLIBS $LIBS"
-LIBS="$SAVELIBS"
-
-AC_SUBST(BACKLIBS)
-AC_SUBST(CUPSDLIBS)
-AC_SUBST(DBUSDIR)
-
-dnl New default port definition for IPP...
-AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
-	DEFAULT_IPP_PORT="$withval",
-	DEFAULT_IPP_PORT="631")
-
-AC_SUBST(DEFAULT_IPP_PORT)
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
+AC_SUBST(FONTS)
+AC_SUBST(LEGACY_BACKENDS)
 
 dnl
 dnl End of "$Id$".
