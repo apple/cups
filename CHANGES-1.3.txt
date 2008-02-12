@@ -4,6 +4,10 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- The scheduler unconditionally overwrote the printer-state-
+	  message with "process-name failed" when a filter or backend
+	  failed, preventing a useful error message from being shown
+	  to the user.
 	- Policies on CUPS-Move-Job didn't work as expected (STR
 	  #2699)
 	- The configure script only supported D-BUS on Linux
