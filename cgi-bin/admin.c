@@ -1370,12 +1370,12 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 			*remote_printers,
 					/* REMOTE_PRINTERS value */
 			*share_printers,/* SHARE_PRINTERS value */
-#ifdef HAVE_GSSAPI
-			*default_auth_type,
-					/* DefaultAuthType value */
-#endif /* HAVE_GSSAPI */
 			*user_cancel_any;
 					/* USER_CANCEL_ANY value */
+#ifdef HAVE_GSSAPI
+    char		default_auth_type[255];
+					/* DefaultAuthType value */
+#endif /* HAVE_GSSAPI */
 
 
    /*
@@ -1410,13 +1410,16 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     */
 
     if (cgiGetVariable("KERBEROS"))
-      default_auth_type = "Negotiate";
+      strlcpy(default_auth_type, "Negotiate", sizeof(default_auth_type));
     else
     {
-      default_auth_type = cupsGetOption("DefaultAuthType", num_settings,
-                                        settings);
-      if (!strcasecmp(default_auth_type, "Negotiate"))
-        default_auth_type = "Basic";
+      const char *val = cupsGetOption("DefaultAuthType", num_settings,
+                                      settings);
+
+      if (val && !strcasecmp(val, "Negotiate"))
+        strlcpy(default_auth_type, "Basic", sizeof(default_auth_type));
+      else
+        strlcpy(default_auth_type, val, sizeof(default_auth_type));
     }
 
     fprintf(stderr, "DEBUG: DefaultAuthType %s\n", default_auth_type);

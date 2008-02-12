@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Fixed a problem with the web interface "Use Kerberos
+	  Authentication" check box (STR #2703)
 	- The scheduler unconditionally overwrote the printer-state-
 	  message with "process-name failed" when a filter or backend
 	  failed, preventing a useful error message from being shown
