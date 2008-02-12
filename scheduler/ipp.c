@@ -7220,17 +7220,6 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
  /*
-  * Check policy...
-  */
-
-  if ((status = cupsdCheckPolicy(dprinter->op_policy_ptr, con,
-                                 NULL)) != HTTP_OK)
-  {
-    send_http_error(con, status, dprinter);
-    return;
-  }
-
- /*
   * See if we have a job URI or a printer URI...
   */
 
@@ -7335,6 +7324,17 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       src      = NULL;
       sprinter = NULL;
     }
+  }
+
+ /*
+  * Check the policy of the destination printer...
+  */
+
+  if ((status = cupsdCheckPolicy(dprinter->op_policy_ptr, con,
+                                 job ? job->username : NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, dprinter);
+    return;
   }
 
  /*

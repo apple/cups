@@ -4,6 +4,10 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
+	- Policies on CUPS-Move-Job didn't work as expected (STR
+	  #2699)
+	- The configure script only supported D-BUS on Linux
+	  (STR #2702)
 	- The scheduler did not support </LimitExcept> (STR #2701)
 	- The scheduler did not reset the job-hold-until attribute
 	  after a job's hold time was reached.
