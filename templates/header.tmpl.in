@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
-	<TITLE>{title} - CUPS 1.4svn-r6854</TITLE>
+	<TITLE>{title} - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
 	<LINK REL="SHORTCUT ICON" HREF="/favicon.png" TYPE="image/png">
 	{refresh_page?<META HTTP-EQUIV="Refresh" CONTENT="{refresh_page}">:}
