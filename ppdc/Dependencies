@@ -1,0 +1,26 @@
+# DO NOT DELETE
+
+ppdc-array.o: ppdc.h ../cups/string.h ../config.h
+ppdc-attr.o: ppdc.h ../cups/string.h ../config.h
+ppdc-catalog.o: ppdc.h ../cups/string.h ../config.h
+ppdc-choice.o: ppdc.h ../cups/string.h ../config.h
+ppdc-constraint.o: ppdc.h ../cups/string.h ../config.h
+ppdc.o: ppdc.h ../cups/string.h ../config.h
+ppdc-driver.o: ppdc.h ../cups/string.h ../config.h
+ppdc-file.o: ppdc.h ../cups/string.h ../config.h
+ppdc-filter.o: ppdc.h ../cups/string.h ../config.h
+ppdc-font.o: ppdc.h ../cups/string.h ../config.h
+ppdc-group.o: ppdc.h ../cups/string.h ../config.h
+ppdc-import.o: ppdc.h ../cups/string.h ../config.h
+ppdc-mediasize.o: ppdc.h ../cups/string.h ../config.h
+ppdc-message.o: ppdc.h ../cups/string.h ../config.h
+ppdc-option.o: ppdc.h ../cups/string.h ../config.h
+ppdc-profile.o: ppdc.h ../cups/string.h ../config.h
+ppdc-shared.o: ppdc.h ../cups/string.h ../config.h
+ppdc-source.o: ppdc.h ../cups/string.h ../config.h ../data/epson.h
+ppdc-source.o: ../data/escp.h ../data/hp.h ../data/label.h ../data/pcl.h
+ppdc-string.o: ppdc.h ../cups/string.h ../config.h
+ppdc-variable.o: ppdc.h ../cups/string.h ../config.h
+ppdhtml.o: ppdc.h ../cups/string.h ../config.h
+ppdi.o: ppdc.h ../cups/string.h ../config.h
+ppdpo.o: ppdc.h ../cups/string.h ../config.h

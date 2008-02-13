@@ -34,12 +34,14 @@ AC_DEFINE_UNQUOTED(CUPS_MINIMAL, "CUPS/$CUPS_VERSION$CUPS_REVISION")
 dnl Default compiler flags...
 CFLAGS="${CFLAGS:=}"
 CPPFLAGS="${CPPFLAGS:=}"
+CXXFLAGS="${CXXFLAGS:=}"
 LDFLAGS="${LDFLAGS:=}"
 
 dnl Checks for programs...
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_CXX
 AC_PROG_INSTALL
 if test "$INSTALL" = "$ac_install_sh"; then
 	# Use full path to install-sh script...
