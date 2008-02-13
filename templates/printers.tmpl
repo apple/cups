@@ -1,7 +1,6 @@
 {printer_type?:}{#printer_name=0?:
 {[printer_name]
-{#printer_name=1?:<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}}
-{?printer_state_message=?:<SPAN CLASS="message">"{printer_state_message}"</SPAN>}</H2>
+{_SINGLE_DEST?:<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>{default_name={printer_name}? (Default Printer):}</H2>}
 
 <TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="{printer_name}">
 <TR>
@@ -10,7 +9,7 @@
 <TD VALIGN="TOP"><B>Description:</B> {printer_info}<BR>
 <B>Location:</B> {printer_location}<BR>
 <B>Printer Driver:</B> {printer_make_and_model} ({color_supported=1?color:grayscale}{sides_supported?, 2-sided printing:})<BR>
-<B>Printer State:</B> {printer_state=3?idle:{printer_state=4?processing:paused}},
+<B>Printer State:</B> {printer_state=3?Idle:{printer_state=4?Processing:Paused}{?printer_state_message=?: ("{printer_state_message}")}},
 {printer_is_accepting_jobs=0?rejecting jobs:accepting jobs}, {server_is_sharing_printers=0?not:{printer_is_shared=0?not:}} shared{default_name={printer_name}?, server default:}.<BR>
 <B>Default Options:</B> job-sheets={job_sheets_default}
 media={media_default?{media_default}:unknown}
