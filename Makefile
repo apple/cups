@@ -20,7 +20,7 @@ include Makedefs
 #
 
 DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier ppdc scheduler systemv test \
+		notifier scheduler systemv test \
 		$(PHPDIR) \
 		conf data doc $(FONTS) ppd templates
 

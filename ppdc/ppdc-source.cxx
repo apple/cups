@@ -3,7 +3,7 @@
 //
 //   Source class for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -58,6 +58,7 @@
 //
 
 #include "ppdc.h"
+#include <cups/globals.h>
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>
@@ -219,19 +220,13 @@ ppdcSource::find_include(
   }
 
   // Search the standard include directories...
-  const char *env;			// Directory environment variable
+  _cups_globals_t *cg = _cupsGlobals();	// Global data
 
-  if ((env = getenv("PPDC_INCLUDE_DIR")) == NULL)
-    env = PPDC_INCLUDE_DIR;
-
-  snprintf(n, nlen, "%s/%s", env, f);
+  snprintf(n, nlen, "%s/ppdc/%s", cg->cups_datadir, f);
   if (!access(n, 0))
     return (n);
 
-  if ((env = getenv("PPDC_PO_DIR")) == NULL)
-    env = PPDC_PO_DIR;
-
-  snprintf(n, nlen, "%s/%s", env, f);
+  snprintf(n, nlen, "%s/po/%s", cg->cups_datadir, f);
   if (!access(n, 0))
     return (n);
   else
@@ -2842,7 +2837,7 @@ ppdcSource::write_file(const char *f)	// I - File to write
     return (-1);
   }
 
-  cupsFilePuts(fp, "// CUPS PPD Compiler " DDK_VERSION "\n\n");
+  cupsFilePuts(fp, "// CUPS PPD Compiler " CUPS_SVERSION "\n\n");
 
   // Include standard files...
   cupsFilePuts(fp, "// Include necessary files...\n");

@@ -387,7 +387,8 @@ ppdcDriver::write_ppd_file(
   // Write the standard header stuff...
   cupsFilePrintf(fp, "*PPD-Adobe: \"4.3\"%s", lf);
   cupsFilePrintf(fp, "*%% PPD file for %s with CUPS.%s", model_name->value, lf);
-  cupsFilePrintf(fp, "*%% Created by the CUPS PPD Compiler " DDK_VERSION ".%s",
+  cupsFilePrintf(fp,
+                 "*%% Created by the CUPS PPD Compiler " CUPS_SVERSION ".%s",
 		 lf);
   for (s = (ppdcString *)copyright->first();
        s;

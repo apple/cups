@@ -553,6 +553,15 @@
 #undef HAVE_SANDBOX_H
 
 
+/*
+ * Which random number generator function to use...
+ */
+
+#undef HAVE_RANDOM
+#undef HAVE_MRAND48
+#undef HAVE_LRAND48
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

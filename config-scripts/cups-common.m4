@@ -132,6 +132,9 @@ else
 	AC_CHECK_FUNCS(snprintf vsnprintf)
 fi
 
+dnl Check for random number functions...
+AC_CHECK_FUNCS(random mrand48 lrand48)
+
 dnl Checks for mkstemp and mkstemps functions.
 AC_CHECK_FUNCS(mkstemp mkstemps)
 

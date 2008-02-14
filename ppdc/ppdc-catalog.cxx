@@ -3,7 +3,7 @@
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -27,6 +27,7 @@
 //
 
 #include "ppdc.h"
+#include <cups/globals.h>
 
 
 //
@@ -37,6 +38,10 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
                          const char *f)	// I - Message catalog file
   : ppdcShared()
 {
+  _cups_globals_t	*cg = _cupsGlobals();
+					// Global information
+
+
   locale   = new ppdcString(l);
   filename = new ppdcString(f);
   messages = new ppdcArray();
@@ -44,14 +49,10 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
   if (l)
   {
     // Try loading the base messages for this locale...
-    const char	*podir;			// Message catalog directory
     char	pofile[1024];		// Message catalog file
 
 
-    if ((podir = getenv("PPDC_PO_DIR")) == NULL)
-      podir = PPDC_PO_DIR;
-
-    snprintf(pofile, sizeof(pofile), "%s/%s.po", podir, l);
+    snprintf(pofile, sizeof(pofile), "%s/po/%s.po", cg->cups_datadir, l);
 
     if (load_messages(pofile) && strchr(l, '_'))
     {
@@ -60,7 +61,8 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 
       strlcpy(baseloc, l, sizeof(baseloc));
-      snprintf(pofile, sizeof(pofile), "%s/%s.po", podir, baseloc);
+      snprintf(pofile, sizeof(pofile), "%s/po/%s.po", cg->cups_datadir,
+               baseloc);
 
       load_messages(pofile);
     }
