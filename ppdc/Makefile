@@ -89,7 +89,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -f Dependencies *.cxx
+	makedepend -Y -I.. -fDependencies *.cxx >/dev/null 2>&1
 
 
 #
@@ -126,27 +126,24 @@ uninstall:
 # drv, the CUPS driver interface program.
 #
 
-drv:			drv.o libppdc.a ../cups/libcupsdriver.a
+drv:			drv.o libppdc.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ drv.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ drv.o libppdc.a $(LIBS)
 
 
 #
 # ppdc, the PPD compiler.
 #
 
-ppdc:			ppdc.o libppdc.a ../cups/libcupsdriver.a
+ppdc:			ppdc.o libppdc.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdc.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ ppdc.o libppdc.a $(LIBS)
 
 
-ppdc-static:		ppdc.o libppdc.a ../cups/libcupsdriver.a \
-			foo.drv foo-fr.po
+ppdc-static:		ppdc.o libppdc.a  ../cups/libcups.a foo.drv foo-fr.po
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o ppdc-static ppdc.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS_ST) $(LIBS)
+	$(CXX) $(LDFLAGS) -o ppdc-static ppdc.o libppdc.a ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -156,40 +153,36 @@ ppdc-static:		ppdc.o libppdc.a ../cups/libcupsdriver.a \
 # ppdhtml, the PPD to HTML utility.
 #
 
-ppdhtml:			ppdhtml.o libppdc.a ../cups/libcupsdriver.a
+ppdhtml:			ppdhtml.o libppdc.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdhtml.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ ppdhtml.o libppdc.a $(LIBS)
 
 
 #
 # ppdi, import PPD files.
 #
 
-ppdi:			ppdi.o libppdc.a ../cups/libcupsdriver.a
+ppdi:			ppdi.o libppdc.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdi.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ ppdi.o libppdc.a $(LIBS)
 
 
 #
 # ppdmerge, merge PPD files.
 #
 
-ppdmerge:			ppdmerge.o ../cups/libcupsdriver.a
+ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdmerge.o \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ ppdmerge.o $(LIBS)
 
 
 #
 # ppdpo, create message catalog files.
 #
 
-ppdpo:			ppdpo.o libppdc.a ../cups/libcupsdriver.a
+ppdpo:			ppdpo.o libppdc.a ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ ppdpo.o libppdc.a \
-		../cups/libcupsdriver.a $(CUPSLIBS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ ppdpo.o libppdc.a $(LIBS)
 
 
 #
