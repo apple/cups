@@ -258,6 +258,7 @@ f 0755 root sys $SERVERBIN/daemon/cups-deviced scheduler/cups-deviced
 f 0755 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
 f 0755 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0755 root sys $SERVERBIN/driver -
+f 0755 root sys $SERVERBIN/driver/drv ppdc/drv
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
 f 0755 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
@@ -469,6 +470,10 @@ f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
 
 d 0755 root sys $DATADIR/model -
 f 0644 root sys $DATADIR/model ppd/*.ppd
+
+d 0755 root sys $DATADIR/ppdc -
+f 0644 root sys $DATADIR/ppdc data/*.defs
+f 0644 root sys $DATADIR/ppdc data/*.h
 
 d 0755 root sys $DATADIR/templates -
 f 0644 root sys $DATADIR/templates templates/*.tmpl

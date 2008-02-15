@@ -368,6 +368,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-driverd
 /usr/lib/cups/daemon/cups-polld
 %dir /usr/lib/cups/driver
+/usr/lib/cups/driver/drv
 %dir /usr/lib/cups/filter
 /usr/lib/cups/filter/*
 %dir /usr/lib/cups/monitor
@@ -389,6 +390,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/fonts/*
 %dir /usr/share/cups/model
 /usr/share/cups/model/*
+%dir /usr/share/cups/ppdc
+/usr/share/cups/ppdc/*
 %dir /usr/share/cups/templates
 /usr/share/cups/templates/*.tmpl
 %dir /usr/share/doc/cups
