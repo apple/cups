@@ -3,7 +3,7 @@
 #
 #   Makefile for the CUPS PPD Compiler.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 2002-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -98,15 +98,15 @@ depend:
 
 install:
 	echo Installing PPD compiler programs...
-	$(INSTALL_DIR) $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ppdc $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ppdhtml $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ppdi $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ppdmerge $(BUILDROOT)$(bindir)
-	$(INSTALL_BIN) ppdpo $(BUILDROOT)$(bindir)
-	$(INSTALL_DIR) $(BUILDROOT)$(CUPS_SERVERBIN)/driver
-	$(INSTALL_BIN) drv $(BUILDROOT)$(CUPS_SERVERBIN)/driver
-	$(INSTALL_DIR) $(BUILDROOT)$(CUPS_DATADIR)/drv
+	$(INSTALL_DIR) $(BINDIR)
+	$(INSTALL_BIN) ppdc $(BINDIR)
+	$(INSTALL_BIN) ppdhtml $(BINDIR)
+	$(INSTALL_BIN) ppdi $(BINDIR)
+	$(INSTALL_BIN) ppdmerge $(BINDIR)
+	$(INSTALL_BIN) ppdpo $(BINDIR)
+	$(INSTALL_DIR) $(SERVERBIN)/driver
+	$(INSTALL_BIN) drv $(SERVERBIN)/driver
+	$(INSTALL_DIR) $(DATADIR)/drv
 
 
 #
@@ -114,16 +114,18 @@ install:
 #
 
 uninstall:
-	$(RM) $(BUILDROOT)$(bindir)/ppdc
-	$(RM) $(BUILDROOT)$(bindir)/ppdhtml
-	$(RM) $(BUILDROOT)$(bindir)/ppdi
-	$(RM) $(BUILDROOT)$(bindir)/ppdmerge
-	$(RM) $(BUILDROOT)$(bindir)/ppdpo
-	$(RM) $(BUILDROOT)$(CUPS_SERVERBIN)/driver/drv
+	$(RM) $(BINDIR)/ppdc
+	$(RM) $(BINDIR)/ppdhtml
+	$(RM) $(BINDIR)/ppdi
+	$(RM) $(BINDIR)/ppdmerge
+	$(RM) $(BINDIR)/ppdpo
+	$(RM) $(SERVERBIN)/driver/drv
+	$(RMDIR) $(SERVERBIN)/driver
+	$(RMDIR) $(DATADIR)/drv
 
 
 #
-# drv, the CUPS driver interface program.
+# drv, the CUPS driver interface program to the PPD compiler.
 #
 
 drv:			drv.o libppdc.a ../cups/$(LIBCUPS)

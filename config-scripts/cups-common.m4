@@ -197,10 +197,15 @@ CUPSDLIBS="$CUPSDLIBS $LIBS"
 LIBS="$SAVELIBS"
 
 dnl Check for DBUS support
+if test -d /etc/dbus-1; then
+	DBUSDIR="/etc/dbus-1"
+else
+	DBUSDIR=""
+fi
+
 AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
 AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
-	DBUSDIR="$withval"
-	DBUSDIR="/etc/dbus-1")
+	DBUSDIR="$withval")
 
 if test "x$enable_dbus" != xno; then
 	AC_PATH_PROG(PKGCONFIG, pkg-config)
@@ -216,7 +221,6 @@ if test "x$enable_dbus" != xno; then
 			    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
 		else
 			AC_MSG_RESULT(no)
-			DBUSDIR=""
 		fi
 	fi
 fi

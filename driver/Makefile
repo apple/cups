@@ -87,12 +87,12 @@ depend:
 #
 
 install:
-	$(INSTALL_DIR) $(BUILDROOT)$(CUPS_SERVERBIN)/filter
+	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
-		$(INSTALL_BIN) $$file $(BUILDROOT)$(CUPS_SERVERBIN)/filter; \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
-	$(INSTALL_DIR) $(BUILDROOT)$(includedir)/cups
-	$(INSTALL_DATA) driver.h $(BUILDROOT)$(includedir)/cups
+	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	$(INSTALL_DATA) driver.h $(INCLUDEDIR)/cups
 
 
 #
@@ -101,9 +101,9 @@ install:
 
 uninstall:
 	for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
-		$(RM) $(BUILDROOT)$(CUPS_SERVERBIN)/filter/$$file; \
+		$(RM) $(SERVERBIN)/filter/$$file; \
 	done
-	$(RM) $(BUILDROOT)$(includedir)/cups/driver.h
+	$(RM) $(INCLUDEDIR)/cups/driver.h
 
 
 #

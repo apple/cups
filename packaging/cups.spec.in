@@ -465,7 +465,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/man/man1
 /usr/share/man/man1/cups-config.1.gz
-/usr/share/man/man1/ppdc*.1.gz
+/usr/share/man/man1/ppd*.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/ppdcfile.5.gz
 /usr/share/man/man7/backend.7.gz
