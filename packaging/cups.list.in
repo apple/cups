@@ -16,7 +16,7 @@
 
 # Product information
 %product Common UNIX Printing System
-%copyright 2007 by Apple Inc.
+%copyright 2007-2008 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -429,7 +429,7 @@ f 0644 root sys $LOCALEDIR/pl/ppdc_pl.po locale/ppdc_pl.po
 f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
 f 0644 root sys $LOCALEDIR/pt/ppdc_pt.po locale/ppdc_pt.po
 f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
-f 0644 root sys $LOCALEDIR/pt_BR/ppdc_pr_BR.po locale/ppdc_pr_BR.po
+f 0644 root sys $LOCALEDIR/pt_BR/ppdc_pt_BR.po locale/ppdc_pt_BR.po
 %subpackage ru
 f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
 f 0644 root sys $LOCALEDIR/ru/ppdc_ru.po locale/ppdc_ru.po
@@ -535,7 +535,7 @@ f 0644 root sys $INCLUDEDIR/cups/array.h cups/array.h
 f 0644 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0644 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
 f 0644 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
-f 0644 root sys $INCLUDEDIR/cups/driver.h cups/driver.h
+f 0644 root sys $INCLUDEDIR/cups/driver.h driver/driver.h
 f 0644 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
