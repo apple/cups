@@ -97,6 +97,7 @@ HEADERS	=	\
 		ipp.h \
 		language.h \
 		ppd.h \
+		raster.h \
 		sidechannel.h \
 		snmp.h \
 		transcode.h \
@@ -499,25 +500,25 @@ framedhelp:
 		--header api-cups.header --intro api-cups.shtml \
 		cups.h dest.c getputfile.c language.c notify.c \
 		options.c tempfile.c usersys.c \
-		util.c >../doc/help/api-cups.html
+		util.c
 	mxmldoc --framed api-filedir \
 		--section "Programming" --title "File and Directory APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-filedir.header --intro api-filedir.shtml \
-		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
+		file.h file.c dir.h dir.c
 	mxmldoc --framed api-ppd \
 		--section "Programming" --title "PPD API" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
 		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
-		ppd.c >../doc/help/api-ppd.html
+		ppd.c
 	mxmldoc --framed api-httpipp \
 		--section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-httpipp.header --intro api-httpipp.shtml \
 		http.h ipp.h auth.c encode.c http.c http-addr.c \
 		http-support.c ipp.c ipp-support.c md5passwd.c \
-		request.c >../doc/help/api-httpipp.html
+		request.c
 	mxmldoc --framed api-filter \
 		--section "Programming" \
 		--title "Filter and Backend Programming" \

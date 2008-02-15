@@ -29,7 +29,7 @@
  */
 
 #include <stdio.h>
-#include <string.h>
+#include <cups/string.h>
 #include <cups/cups.h>
 
 

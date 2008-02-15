@@ -33,7 +33,7 @@
 #include <cups/cups.h>
 #include <cups/string.h>
 #include <cups/i18n.h>
-#include "raster.h"
+#include <cups/raster.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
