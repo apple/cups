@@ -72,7 +72,7 @@ typedef struct
  * Local globals...
  */
 
-static cupsd_var_t	variables[] =
+static const cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
 #ifdef __APPLE__
@@ -175,11 +175,11 @@ static cupsd_var_t	variables[] =
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
 
-static unsigned		ones[4] =
+static const unsigned	ones[4] =
 			{
 			  0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
 			};
-static unsigned		zeros[4] =
+static const unsigned	zeros[4] =
 			{
 			  0x00000000, 0x00000000, 0x00000000, 0x00000000
 			};
@@ -2073,7 +2073,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
   int			valuelen;	/* Length of value */
-  cupsd_var_t		*var;		/* Current variable */
+  cupsd_var_t const	*var;		/* Current variable */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Current address */
   unsigned		ip[4],		/* Address value */

@@ -308,9 +308,10 @@ cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
  */
 
 void
-cupsdAllowIP(cupsd_location_t *loc,	/* I - Location to add to */
-             unsigned   address[4],	/* I - IP address to add */
-             unsigned   netmask[4])	/* I - Netmask of address */
+cupsdAllowIP(
+    cupsd_location_t *loc,		/* I - Location to add to */
+    const unsigned   address[4],	/* I - IP address to add */
+    const unsigned   netmask[4])	/* I - Netmask of address */
 {
   cupsd_authmask_t	*temp;		/* New host/domain mask */
 
@@ -1703,8 +1704,8 @@ cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
 
 void
 cupsdDenyIP(cupsd_location_t *loc,	/* I - Location to add to */
-	    unsigned         address[4],/* I - IP address to add */
-	    unsigned         netmask[4])/* I - Netmask of address */
+	    const unsigned   address[4],/* I - IP address to add */
+	    const unsigned   netmask[4])/* I - Netmask of address */
 {
   cupsd_authmask_t	*temp;		/* New host/domain mask */
 

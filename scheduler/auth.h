@@ -131,8 +131,9 @@ VAR http_encryption_t	DefaultEncryption VALUE(HTTP_ENCRYPT_REQUIRED);
 extern cupsd_location_t	*cupsdAddLocation(const char *location);
 extern void		cupsdAddName(cupsd_location_t *loc, char *name);
 extern void		cupsdAllowHost(cupsd_location_t *loc, char *name);
-extern void		cupsdAllowIP(cupsd_location_t *loc, unsigned address[4],
-			             unsigned netmask[4]);
+extern void		cupsdAllowIP(cupsd_location_t *loc, 
+				     const unsigned address[4],
+			             const unsigned netmask[4]);
 extern void		cupsdAuthorize(cupsd_client_t *con);
 extern int		cupsdCheckAccess(unsigned ip[4], char *name,
 			                 int namelen, cupsd_location_t *loc);
@@ -145,8 +146,9 @@ extern cupsd_location_t	*cupsdCopyLocation(cupsd_location_t **loc);
 extern void		cupsdDeleteAllLocations(void);
 extern void		cupsdDeleteLocation(cupsd_location_t *loc);
 extern void		cupsdDenyHost(cupsd_location_t *loc, char *name);
-extern void		cupsdDenyIP(cupsd_location_t *loc, unsigned address[4],
-			            unsigned netmask[4]);
+extern void		cupsdDenyIP(cupsd_location_t *loc, 
+				    const unsigned address[4],
+			            const unsigned netmask[4]);
 extern cupsd_location_t	*cupsdFindBest(const char *path, http_state_t state);
 extern cupsd_location_t	*cupsdFindLocation(const char *location);
 extern http_status_t	cupsdIsAuthorized(cupsd_client_t *con, const char *owner);
