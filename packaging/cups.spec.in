@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -424,7 +424,11 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/lprm.1.gz
 /usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
-/usr/share/man/man5/*
+/usr/share/man/man5/*.conf.5.gz
+/usr/share/man/man5/mime.*.5.gz
+%dir /usr/share/man/man7
+/usr/share/man/man7/commandto*
+/usr/share/man/man7/rasterto*
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
@@ -458,10 +462,14 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %dir /usr/share/man/man1
 /usr/share/man/man1/cups-config.1.gz
-%dir /usr/share/man/man7
-/usr/share/man/man7/*
+/usr/share/man/man1/ppdc*.1.gz
+%dir /usr/share/man/man5
+/usr/share/man/man5/ppdcfile.5.gz
+/usr/share/man/man7/backend.7.gz
+/usr/share/man/man7/filter.7.gz
 
 /usr/bin/cups-config
+/usr/bin/ppd*
 %dir /usr/include/cups
 /usr/include/cups/*
 /usr/lib*/*.so
@@ -489,7 +497,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files da
 %defattr(-,root,root)
-/usr/share/locale/da/cups_da.po
+/usr/share/locale/da/*
 
 %files de
 %defattr(-,root,root)
@@ -497,7 +505,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/de/index.html
 #%dir /usr/share/cups/templates/de
 #/usr/share/cups/templates/de/*
-/usr/share/locale/de/cups_de.po
+/usr/share/locale/de/*
 
 %files es
 %defattr(-,root,root)
@@ -505,7 +513,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/es/index.html
 #%dir /usr/share/cups/templates/es
 #/usr/share/cups/templates/es/*
-/usr/share/locale/es/cups_es.po
+/usr/share/locale/es/*
 
 %files et
 %defattr(-,root,root)
@@ -513,11 +521,11 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/et/index.html
 #%dir /usr/share/cups/templates/et
 #/usr/share/cups/templates/et/*
-/usr/share/locale/et/cups_et.po
+/usr/share/locale/et/*
 
 %files fi
 %defattr(-,root,root)
-/usr/share/locale/fi/cups_fi.po
+/usr/share/locale/fi/*
 
 %files fr
 %defattr(-,root,root)
@@ -525,7 +533,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/fr/index.html
 #%dir /usr/share/cups/templates/fr
 #/usr/share/cups/templates/fr/*
-/usr/share/locale/fr/cups_fr.po
+/usr/share/locale/fr/*
 
 %files he
 %defattr(-,root,root)
@@ -534,7 +542,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/he/cups.css
 #%dir /usr/share/cups/templates/he
 #/usr/share/cups/templates/he/*
-/usr/share/locale/he/cups_he.po
+/usr/share/locale/he/*
 
 %files it
 %defattr(-,root,root)
@@ -542,7 +550,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/it/index.html
 #%dir /usr/share/cups/templates/it
 #/usr/share/cups/templates/it/*
-/usr/share/locale/it/cups_it.po
+/usr/share/locale/it/*
 
 %files ja
 %defattr(-,root,root)
@@ -550,19 +558,19 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/ja/index.html
 #%dir /usr/share/cups/templates/ja
 #/usr/share/cups/templates/ja/*
-/usr/share/locale/ja/cups_ja.po
+/usr/share/locale/ja/*
 
 %files ko
 %defattr(-,root,root)
-/usr/share/locale/ko/cups_ko.po
+/usr/share/locale/ko/*
 
 %files nl
 %defattr(-,root,root)
-/usr/share/locale/nl/cups_nl.po
+/usr/share/locale/nl/*
 
 %files no
 %defattr(-,root,root)
-/usr/share/locale/no/cups_no.po
+/usr/share/locale/no/*
 
 %files pl
 %defattr(-,root,root)
@@ -570,17 +578,16 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/pl/index.html
 #%dir /usr/share/cups/templates/pl
 #/usr/share/cups/templates/pl/*
-/usr/share/locale/pl/cups_pl.po
+/usr/share/locale/pl/*
 
 %files pt
 %defattr(-,root,root)
-/usr/share/locale/pt/cups_pt.po
-/usr/share/locale/pt_BR/cups_pt_BR.po
-/usr/share/locale/pt_PT/cups_pt_PT.po
+/usr/share/locale/pt/*
+/usr/share/locale/pt_BR/*
 
 %files ru
 %defattr(-,root,root)
-/usr/share/locale/ru/cups_ru.po
+/usr/share/locale/ru/*
 
 %files sv
 %defattr(-,root,root)
@@ -588,7 +595,7 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/sv/index.html
 #%dir /usr/share/cups/templates/sv
 #/usr/share/cups/templates/sv/*
-/usr/share/locale/sv/cups_sv.po
+/usr/share/locale/sv/*
 
 %files zh
 %defattr(-,root,root)
@@ -596,8 +603,8 @@ rm -rf $RPM_BUILD_ROOT
 #/usr/share/doc/cups/zh_TW/index.html
 #%dir /usr/share/cups/templates/zh_TW
 #/usr/share/cups/templates/zh_TW/*
-/usr/share/locale/zh/cups_zh.po
-/usr/share/locale/zh_TW/cups_zh_TW.po
+/usr/share/locale/zh/*
+/usr/share/locale/zh_TW/*
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %files php

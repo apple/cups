@@ -4,7 +4,7 @@
 #   ESP Package Manager (EPM) file list for the Common UNIX Printing
 #   System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -209,6 +209,7 @@ $CUPS_PERM=0@CUPS_CONFIG_FILE_PERM@
 $INSTALLSTATIC=@INSTALLSTATIC@
 
 $MAN1EXT=@MAN1EXT@
+$MAN3EXT=@MAN3EXT@
 $MAN5EXT=@MAN5EXT@
 $MAN7EXT=@MAN7EXT@
 $MAN8EXT=@MAN8EXT@
@@ -258,6 +259,8 @@ f 0755 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
 f 0755 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
+f 0755 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
+f 0755 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
 %if IMGFILTERS
@@ -268,10 +271,12 @@ f 0755 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
 f 0755 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
 %endif
 f 0755 root sys $SERVERBIN/filter/pstops filter/pstops
+f 0755 root sys $SERVERBIN/filter/rastertoespcx driver/rastertoescpx
 f 0755 root sys $SERVERBIN/filter/rastertolabel filter/rastertolabel
 l 0755 root sys $SERVERBIN/filter/rastertodymo rastertolabel
 f 0755 root sys $SERVERBIN/filter/rastertoepson filter/rastertoepson
 f 0755 root sys $SERVERBIN/filter/rastertohp filter/rastertohp
+f 0755 root sys $SERVERBIN/filter/rastertopclx driver/rastertopclx
 f 0755 root sys $SERVERBIN/filter/texttops filter/texttops
 d 0755 root sys $SERVERBIN/notifier -
 f 0755 root sys $SERVERBIN/notifier/mailto notifier/mailto
@@ -382,40 +387,59 @@ d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 # Data files
 %subpackage da
 f 0644 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
+f 0644 root sys $LOCALEDIR/da/ppdc_da.po locale/ppdc_da.po
 %subpackage de
 f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
+f 0644 root sys $LOCALEDIR/de/ppdc_de.po locale/ppdc_de.po
 %subpackage es
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
+f 0644 root sys $LOCALEDIR/es/ppdc_es.po locale/ppdc_es.po
 %subpackage et
 f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
+f 0644 root sys $LOCALEDIR/et/ppdc_et.po locale/ppdc_et.po
 %subpackage fi
 f 0644 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
+f 0644 root sys $LOCALEDIR/fi/ppdc_fi.po locale/ppdc_fi.po
 %subpackage fr
 f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+f 0644 root sys $LOCALEDIR/fr/ppdc_fr.po locale/ppdc_fr.po
 %subpackage he
 f 0644 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
+f 0644 root sys $LOCALEDIR/he/ppdc_he.po locale/ppdc_he.po
 %subpackage it
 f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
+f 0644 root sys $LOCALEDIR/it/ppdc_it.po locale/ppdc_it.po
 %subpackage ja
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+f 0644 root sys $LOCALEDIR/ja/ppdc_ja.po locale/ppdc_ja.po
 %subpackage ko
 f 0644 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
+f 0644 root sys $LOCALEDIR/ko/ppdc_ko.po locale/ppdc_ko.po
 %subpackage nl
 f 0644 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
+f 0644 root sys $LOCALEDIR/nl/ppdc_nl.po locale/ppdc_nl.po
 %subpackage no
 f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
+f 0644 root sys $LOCALEDIR/no/ppdc_no.po locale/ppdc_no.po
 %subpackage pl
 f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
+f 0644 root sys $LOCALEDIR/pl/ppdc_pl.po locale/ppdc_pl.po
 %subpackage pt
 f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
+f 0644 root sys $LOCALEDIR/pt/ppdc_pt.po locale/ppdc_pt.po
 f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
+f 0644 root sys $LOCALEDIR/pt_BR/ppdc_pr_BR.po locale/ppdc_pr_BR.po
 %subpackage ru
 f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
+f 0644 root sys $LOCALEDIR/ru/ppdc_ru.po locale/ppdc_ru.po
 %subpackage sv
 f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+f 0644 root sys $LOCALEDIR/sv/ppdc_sv.po locale/ppdc_sv.po
 %subpackage zh
 f 0644 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
+f 0644 root sys $LOCALEDIR/zh/ppdc_zh.po locale/ppdc_zh.po
 f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
+f 0644 root sys $LOCALEDIR/zh_TW/ppdc_zh_TW.po locale/ppdc_zh_TW.po
 %subpackage
 
 d 0755 root sys $DATADIR -
@@ -506,19 +530,22 @@ f 0644 root sys $INCLUDEDIR/cups/array.h cups/array.h
 f 0644 root sys $INCLUDEDIR/cups/backend.h cups/backend.h
 f 0644 root sys $INCLUDEDIR/cups/cups.h cups/cups.h
 f 0644 root sys $INCLUDEDIR/cups/dir.h cups/dir.h
+f 0644 root sys $INCLUDEDIR/cups/driver.h cups/driver.h
 f 0644 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0644 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
 f 0644 root sys $INCLUDEDIR/cups/language.h cups/language.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
-f 0644 root sys $INCLUDEDIR/cups/raster.h filter/raster.h
+f 0644 root sys $INCLUDEDIR/cups/raster.h cups/raster.h
 f 0644 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
 
 %if INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a
 f 0644 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
 %endif
+
+f 0644 root sys $LIBDIR/libcupsdriver.a driver/libcupsdriver.a
 
 d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help doc/help/api*.html
@@ -612,7 +639,11 @@ f 0644 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT
 f 0644 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
 
 f 0644 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
+f 0644 root sys $MANDIR/man7/commandtoescpx.$MAN7EXT man/commandtoescpx.$MAN7EXT
+f 0644 root sys $MANDIR/man7/commandtopclx.$MAN7EXT man/commandtopclx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
+f 0644 root sys $MANDIR/man7/rastertoescpx.$MAN7EXT man/rastertoescpx.$MAN7EXT
+f 0644 root sys $MANDIR/man7/rastertopclx.$MAN7EXT man/rastertopclx.$MAN7EXT
 
 f 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
@@ -630,6 +661,8 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.$MAN8EXT
 
 %subpackage devel
 f 0644 root sys $MANDIR/man1/cups-config.$MAN1EXT man/cups-config.$MAN1EXT
+f 0644 root sys $MANDIR/man1/ man/ppd*.$MAN1EXT
+f 0644 root sys $MANDIR/man5/ppdcfile.$MAN5EXT man/ppdcfile.$MAN5EXT
 
 %subpackage lpd
 d 0755 root sys $AMANDIR/man$MAN8DIR -

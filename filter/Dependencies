@@ -134,6 +134,9 @@ pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.o: ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
+rasterbench.o: ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rasterbench.o: ../cups/file.h ../cups/language.h
 rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.o: ../cups/file.h ../cups/language.h ../cups/ppd.h
@@ -300,6 +303,9 @@ pstops.32.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.32.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.32.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.32.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
+rasterbench.32.o: rasterbench.c  ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.32.o: rasterbench.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rasterbench.32.o: rasterbench.c  ../cups/file.h ../cups/language.h
 rastertoepson.32.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.32.o: rastertoepson.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.32.o: rastertoepson.c  ../cups/file.h ../cups/language.h ../cups/ppd.h
@@ -466,6 +472,9 @@ pstops.64.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.64.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.64.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.64.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
+rasterbench.64.o: rasterbench.c  ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rasterbench.64.o: rasterbench.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rasterbench.64.o: rasterbench.c  ../cups/file.h ../cups/language.h
 rastertoepson.64.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.64.o: rastertoepson.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.64.o: rastertoepson.c  ../cups/file.h ../cups/language.h ../cups/ppd.h

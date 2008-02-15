@@ -1,0 +1,47 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   ppdmerge man page for the CUPS Driver Development Kit.
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdmerge 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.SH NAME
+ppdmerge \- merge ppd files
+.SH SYNOPSIS
+.B ppdmerge
+[ \-o
+.I output-ppd-file
+]
+.I ppd-file
+.I ppd-file2
+[
+.I ... ppd-fileN
+]
+.SH DESCRIPTION
+\fIppdmerge\fR merges two or more PPD files into a single, multi-language
+PPD file.
+.PP
+The \fI-o\fR option specifies the PPD file to create. If not specified,
+the merged PPD file is written to the standard output. If the output file
+already exists, the new 
+.SH NOTES
+\fIppdmerge\fR does not check whether the merged PPD files are for the
+same device. Merging of different device PPDs will yield unpredictable
+results.
+.SH SEE ALSO
+cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdpo(1), ppdcfile(5),
+.br
+CUPS Driver Developer Kit Manual.
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

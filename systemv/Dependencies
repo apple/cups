@@ -23,7 +23,7 @@ cupstestdsc.o: ../cups/file.h ../cups/i18n.h ../cups/transcode.h
 cupstestppd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cupstestppd.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 cupstestppd.o: ../cups/array.h ../cups/file.h ../cups/language.h
-cupstestppd.o: ../cups/i18n.h ../cups/transcode.h
+cupstestppd.o: ../cups/i18n.h ../cups/transcode.h ../cups/raster.h
 lp.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lp.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 lp.o: ../cups/file.h ../cups/language.h ../cups/i18n.h ../cups/transcode.h

@@ -1,0 +1,44 @@
+.\"
+.\" "$Id: ppdi.man 343 2007-07-13 19:52:48Z mike $"
+.\"
+.\"   ppdi man page for the CUPS Driver Development Kit.
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdi 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.SH NAME
+ppdi \- import ppd files
+.SH SYNOPSIS
+.B ppdi
+[ \-I
+.I include-directory
+] [ \-o
+.I source-file
+]
+.I ppd-file
+[
+.I ppd-file2 ... ppd-fileN
+]
+.SH DESCRIPTION
+\fIppdi\fR imports one or more PPD files into a PPD compiler source file.
+Multiple languages of the same PPD file are merged into a single printer
+definition to facilitate accurate changes for all localizations.
+.PP
+The \fI-o\fR option specifies the PPD source file to update. If the source
+file does not exist, a new source file is created. Otherwise the existing
+file is merged with the new PPD file(s) on the command-line. If no source
+file is specified, the filename "ppdi.drv" is used.
+.SH SEE ALSO
+cupsprofile(1), ppdc(1), ppdhtml(1), ppdmerge(1), ppdpo(1), ppdcfile(5), CUPS Driver Developer Kit Manual.
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id: ppdi.man 343 2007-07-13 19:52:48Z mike $".
+.\"

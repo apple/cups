@@ -1,0 +1,585 @@
+msgid "Color Mode"
+msgstr "Modo de color"
+
+msgid "2-Sided Printing"
+msgstr "Dúplex"
+
+msgid "Media Source"
+msgstr "Media Source"
+
+msgid "Options Installed"
+msgstr "Opciones instaladas"
+
+msgid "Paper Type"
+msgstr "Tipo de papel"
+
+msgid "Duplex Unit"
+msgstr "Unidad de impresión dúplex"
+
+msgid "Optional Input Tray"
+msgstr "Bandeja opcional de alimentación"
+
+msgid "Optional Hard Disk"
+msgstr "Disco Duro Opcional"
+
+msgid "Media Size"
+msgstr "Media Size"
+
+msgid "8 x 10\""
+msgstr "8 x 10 pulg."
+
+msgid "9 x 11\""
+msgstr "9x11 pulg."
+
+msgid "9x12 Closed Booklet Envelope"
+msgstr "Sobre de 9x12 pulg., cerrado, solapa larga"
+
+msgid "A3 (297 x 420 mm)"
+msgstr "A3 (297 x 420 mm)"
+
+msgid "A3 (Oversize)"
+msgstr "A3 (extragrande)"
+
+msgid "Full Bleed A3"
+msgstr "A3 sin margen"
+
+msgid "A3 Oversize Tray"
+msgstr "Bandeja para A3 extendido "
+
+msgid "A4 (210 x 297 mm)"
+msgstr "A4 (210 x 297 mm)"
+
+msgid "Full Bleed A4"
+msgstr "A4 sin margen"
+
+msgid "A4 (Small)"
+msgstr "A4 (pequeño)"
+
+msgid "A5 (148 x 210 mm)"
+msgstr "A5 (148 x 210 mm)"
+
+msgid "A6 (105 x 148 mm)"
+msgstr "A6 (105 x 148 mm)"
+
+msgid "A6 Card"
+msgstr "Tarjeta A6"
+
+msgid "C"
+msgstr "C"
+
+msgid "D"
+msgstr "D"
+
+msgid "E"
+msgstr "E"
+
+msgid "ARCH A"
+msgstr "ARCH A"
+
+msgid "ARCH B"
+msgstr "ARCH B"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "Adhesive Paper"
+msgstr "Adhesivo"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "Auto Select"
+msgstr "Selección automática"
+
+msgid "JB0"
+msgstr "JB0"
+
+msgid "JB1"
+msgstr "JB1"
+
+msgid "JB2"
+msgstr "JB2"
+
+msgid "JB3"
+msgstr "JB3"
+
+msgid "B4 (JIS)"
+msgstr "JIS B4"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "B6 (JIS)"
+msgstr "B6 (JIS)"
+
+msgid "Black"
+msgstr "Negro"
+
+msgid "Bond Paper"
+msgstr "Papel de cartas"
+
+msgid "Bin 1"
+msgstr "Bandeja de Salida 1"
+
+msgid "Bin 10"
+msgstr "Bandeja de Salida 10"
+
+msgid "Bin 2"
+msgstr "Bandeja de Salida 2"
+
+msgid "Bin 3"
+msgstr "Bandeja de Salida 3"
+
+msgid "Bin 4"
+msgstr "Bandeja de Salida 4"
+
+msgid "Bin 5"
+msgstr "Bandeja de Salida 5"
+
+msgid "Bin 6"
+msgstr "Bandeja de Salida 6"
+
+msgid "Bin 7"
+msgstr "Bandeja de Salida 7"
+
+msgid "Bin 8"
+msgstr "Bandeja de Salida 8"
+
+msgid "Bin 9"
+msgstr "Bandeja de Salida 9"
+
+msgid "Black Only"
+msgstr "Negro"
+
+msgid "Bypass Tray"
+msgstr "Bandeja 1 (MPT)"
+
+msgid "9 Envelope"
+msgstr "Sobres 9"
+
+msgid "C5 Envelope"
+msgstr "Sobres C5"
+
+msgid "Envelope C6"
+msgstr "Sobre C6"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Card Stock"
+msgstr "Tarjetas"
+
+msgid "Paper Cassette"
+msgstr "Casete para papel"
+
+msgid "Heavy Weight Matte"
+msgstr "Couché"
+
+msgid "Colored Paper"
+msgstr "Colores"
+
+msgid "Env Comm10"
+msgstr "Sobre Comm10"
+
+msgid "Printer Default"
+msgstr "Impresora por defecto"
+
+msgid "Long Edge"
+msgstr "Borde largo"
+
+msgid "Short Edge"
+msgstr "Borde corto"
+
+msgid "#10 Envelope"
+msgstr "Sobre n゜10"
+
+msgid "C4 Envelope"
+msgstr "Sobre C4"
+
+msgid "C5 Envelope"
+msgstr "Sobre C5"
+
+msgid "C6 Env."
+msgstr "Sobre C6"
+
+msgid "Envelope MAX"
+msgstr "Envelope MAX"
+
+msgid "Choukei 4 Gou"
+msgstr "Couche 4 Gou"
+
+msgid "DL Envelope"
+msgstr "Sobre DL"
+
+msgid "B4 Envelope"
+msgstr "Sobres B4"
+
+msgid "Env ISO B5"
+msgstr "Sobre ISO B5"
+
+msgid "B6 "
+msgstr "B6 "
+
+msgid "Kaku #2 envelope"
+msgstr "Sobre kaku nº 2"
+
+msgid "Monarch Envelope"
+msgstr "Sobre Monarch"
+
+msgid "#6 3/4 Envelope"
+msgstr "Sobre de tamaño 6 3/4"
+
+msgid "Envelope #4"
+msgstr "Envelope #4"
+
+msgid "Envelope Feeder"
+msgstr "Sobre"
+
+msgid "7.25 x 10.5\""
+msgstr "Ejecutivo"
+
+msgid "Off"
+msgstr "Desactivado"
+
+msgid "Finisher Tray"
+msgstr "Finalizador"
+
+msgid "Glossy Paper"
+msgstr "Satinado"
+
+msgid "Glossy Film"
+msgstr "Transp. Satinada"
+
+msgid "Black and White"
+msgstr "Blanco y negro"
+
+msgid "Statement"
+msgstr "Declaración"
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "ISO B3"
+msgstr "ISO B3"
+
+msgid "ISO B4"
+msgstr "ISO B4"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "Tab Stock"
+msgstr "Hojas tabuladoras"
+
+msgid "Inkjet Paper"
+msgstr "Papel inyección de tinta"
+
+msgid "Installed"
+msgstr "Instalada"
+
+msgid "Iron-On Transfer"
+msgstr "Transferencia térmica"
+
+msgid "JB0"
+msgstr "JB0"
+
+msgid "JB1"
+msgstr "JB1"
+
+msgid "JB2"
+msgstr "JB2"
+
+msgid "JB3"
+msgstr "JB3"
+
+msgid "JB4"
+msgstr "JB4"
+
+msgid "Ofuku Hagaki"
+msgstr "Ofuku Hagaki 200 x 148 mm"
+
+msgid "Labels"
+msgstr "Etiquetas"
+
+msgid "Tray 4"
+msgstr "Bandeja 4"
+
+msgid "US Legal"
+msgstr "Oficio"
+
+msgid "Legal (Small)"
+msgstr "Legal (pequeño)"
+
+msgid "US Letter"
+msgstr "Carta"
+
+msgid "Full Bleed US Letter"
+msgstr "Carta EE.UU. sin margen"
+
+msgid "Letter Plus"
+msgstr "Carta Plus"
+
+msgid "Letter (Small)"
+msgstr "Letter (pequeño)"
+
+msgid "Lower Tray"
+msgstr "Bandeja 3"
+
+msgid "Manual Feed"
+msgstr "Alimentación manual"
+
+msgid "Manual Envelope"
+msgstr "Sobre manual"
+
+msgid "Middle Tray"
+msgstr "Bandeja 2"
+
+msgid "Off"
+msgstr "Ninguno"
+
+msgid "Not Installed"
+msgstr "No Instalado"
+
+msgid "On"
+msgstr "Activado"
+
+msgid "Oversize A0"
+msgstr "Mayor A0"
+
+msgid "Oversize A1"
+msgstr "Mayor A1"
+
+msgid "Oversize A2"
+msgstr "Mayor A2"
+
+msgid "None"
+msgstr "Desactivado"
+
+msgid "Bin 1"
+msgstr "Bandeja 1"
+
+msgid "Bin 2"
+msgstr "Bandeja 2"
+
+msgid "Bin 3"
+msgstr "Bandeja 3"
+
+msgid "Bin 4"
+msgstr "Bandeja 4"
+
+msgid "Bin 5"
+msgstr "Bandeja 5"
+
+msgid "Bin 6"
+msgstr "Bandeja 6"
+
+msgid "Bin 7"
+msgstr "Bandeja 7"
+
+msgid "Bin 8"
+msgstr "Bandeja 8"
+
+msgid "Mailbox Tray 1"
+msgstr "Bandeja MX1 (buzón)"
+
+msgid "Mailbox Tray 10"
+msgstr "Bandeja MX10 (buzón)"
+
+msgid "Mailbox Tray 2"
+msgstr "Bandeja MX2 (buzón)"
+
+msgid "Mailbox Tray 3"
+msgstr "Bandeja MX3 (buzón)"
+
+msgid "Mailbox Tray 4"
+msgstr "Bandeja MX4 (buzón)"
+
+msgid "Mailbox Tray 5"
+msgstr "Bandeja MX5 (buzón)"
+
+msgid "Mailbox Tray 6"
+msgstr "Bandeja MX6 (buzón)"
+
+msgid "Mailbox Tray 7"
+msgstr "Bandeja MX7 (buzón)"
+
+msgid "Mailbox Tray 8"
+msgstr "Bandeja MX8 (buzón)"
+
+msgid "Mailbox Tray 9"
+msgstr "Bandeja MX9 (buzón)"
+
+msgid "24\" x 108\""
+msgstr "24\" x 108\""
+
+msgid "24\" x 48\""
+msgstr "24\" x 48\""
+
+msgid "24\" x 60\""
+msgstr "24\" x 60\""
+
+msgid "24\" x 72\""
+msgstr "24\" x 72\""
+
+msgid "24\" x 84\""
+msgstr "24\" x 84\""
+
+msgid "24\" x 96\""
+msgstr "24\" x 96\""
+
+msgid "36\" x 108\""
+msgstr "36\" x 108\""
+
+msgid "36\" x 60\""
+msgstr "36\" x 60\""
+
+msgid "36\" x 72\""
+msgstr "36\" x 72\""
+
+msgid "36\" x 84\""
+msgstr "36\" x 84\""
+
+msgid "36\" x 96\""
+msgstr "36\" x 96\""
+
+msgid "42\" x 60\""
+msgstr "42\" x 60\""
+
+msgid "42\" x 72\""
+msgstr "42\" x 72\""
+
+msgid "42\" x 84\""
+msgstr "42\" x 84\""
+
+msgid "54\" x 72\""
+msgstr "54 x 72"
+
+msgid "54\" x 84\""
+msgstr "54 x 84"
+
+msgid "54\" x 96\""
+msgstr "54 x 96"
+
+msgid "60\" x 72\""
+msgstr "60 x 72"
+
+msgid "60\" x 84\""
+msgstr "60 x 84"
+
+msgid "60\" x 96\""
+msgstr "60 x 96"
+
+msgid "Photo Paper"
+msgstr "Papel de fotografía"
+
+msgid "Plain Paper"
+msgstr "Papel normal"
+
+msgid "Letterhead"
+msgstr "Preimpreso"
+
+msgid "Printer Default"
+msgstr "Valor prefijado de la impresora"
+
+msgid "Color"
+msgstr "Color"
+
+msgid "Recycled Paper"
+msgstr "Reciclado"
+
+msgid "Roll Feed"
+msgstr "Rollo"
+
+msgid "Roll 1"
+msgstr "Rollo 1"
+
+msgid "Roll 2"
+msgstr "Rollo 2"
+
+msgid "Cut Sheet"
+msgstr "Hoja"
+
+msgid "Super B"
+msgstr "Super B (13 x 19  pulg.)"
+
+msgid "Toyo"
+msgstr "Toyo"
+
+msgid "Tab Stock"
+msgstr "Separadores"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "11x17 (Oversize)"
+msgstr "11x17 (extragrande)"
+
+msgid "12x18"
+msgstr "12x18 pulg."
+
+msgid "Full Bleed Tabloid"
+msgstr "Tabloide sin margen"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "Thick Paper"
+msgstr "Grueso"
+
+msgid "Top Output Tray"
+msgstr "Bandeja de salida superior"
+
+msgid "Top Output Tray"
+msgstr "Bandeja de salida superior"
+
+msgid "Transparency"
+msgstr "Transparencias"
+
+msgid "Tray 1"
+msgstr "Bandeja 1"
+
+msgid "Tray 2"
+msgstr "Bandeja 2"
+
+msgid "Tray 3"
+msgstr "Bandeja 3"
+
+msgid "Tray 4"
+msgstr "Bandeja 4"
+
+msgid "Tray 5"
+msgstr "Bandeja 5"
+
+msgid "Tray 6"
+msgstr "Bandeja 6"
+
+msgid "Upper Tray"
+msgstr "Bandeja 1"
+

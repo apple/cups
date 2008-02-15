@@ -1,0 +1,471 @@
+msgid "Color Mode"
+msgstr "カラー モデル"
+
+msgid "2-Sided Printing"
+msgstr "両面印刷"
+
+msgid "Media Source"
+msgstr "Media Source"
+
+msgid "Options Installed"
+msgstr "装着済みオプション"
+
+msgid "Paper Type"
+msgstr "用紙の種類"
+
+msgid "Media Size"
+msgstr "Media Size"
+
+msgid "A3 (Oversize)"
+msgstr "A3 (大)"
+
+msgid "Full Bleed A3"
+msgstr "A3 ノビ"
+
+msgid "Full Bleed A4"
+msgstr "A4 ノビ"
+
+msgid "A4 (Small)"
+msgstr "A4 (小)"
+
+msgid "A5 (148 x 210 mm)"
+msgstr "A5 (148 x 210 mm)"
+
+msgid "C"
+msgstr "ANSI C"
+
+msgid "D"
+msgstr "ANSI D"
+
+msgid "E"
+msgstr "ANSI E"
+
+msgid "ARCH A"
+msgstr "ARCH A"
+
+msgid "ARCH B"
+msgstr "ARCH B"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "Adhesive Paper"
+msgstr "粘着紙"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "Auto Select"
+msgstr "自動給紙"
+
+msgid "JB0"
+msgstr "B0 (JIS)"
+
+msgid "JB1"
+msgstr "JB1"
+
+msgid "JB2"
+msgstr "JB2"
+
+msgid "JB3"
+msgstr "JB3"
+
+msgid "B4 (JIS)"
+msgstr "B4 (JIS)"
+
+msgid "JIS B5"
+msgstr "B5 (JIS)"
+
+msgid "B6 (JIS)"
+msgstr "B6 (JIS)"
+
+msgid "Bond Paper"
+msgstr "ボンド紙"
+
+msgid "Bin 1"
+msgstr "排紙トレイ 1"
+
+msgid "Bin 10"
+msgstr "排紙トレイ 10"
+
+msgid "Bin 2"
+msgstr "排紙トレイ 2"
+
+msgid "Bin 3"
+msgstr "排紙トレイ 3"
+
+msgid "Bin 4"
+msgstr "排紙トレイ 4"
+
+msgid "Bin 5"
+msgstr "排紙トレイ 5"
+
+msgid "Bin 6"
+msgstr "排紙トレイ 6"
+
+msgid "Bin 7"
+msgstr "排紙トレイ 7"
+
+msgid "Bin 8"
+msgstr "排紙トレイ 8"
+
+msgid "Bin 9"
+msgstr "排紙トレイ 9"
+
+msgid "Black Only"
+msgstr "黒のみ"
+
+msgid "9 Envelope"
+msgstr "封筒（C9号）"
+
+msgid "C5 Envelope"
+msgstr "封筒（C5号）"
+
+msgid "Color"
+msgstr "カラー"
+
+msgid "Card Stock"
+msgstr "カード ストック"
+
+msgid "Heavy Weight Matte"
+msgstr "マット紙"
+
+msgid "Colored Paper"
+msgstr "カラー"
+
+msgid "Printer Default"
+msgstr "システムデフォルト"
+
+msgid "Long Edge"
+msgstr "長辺とじ"
+
+msgid "Short Edge"
+msgstr "短辺とじ"
+
+msgid "#10 Envelope"
+msgstr "Com-10"
+
+msgid "C5 Envelope"
+msgstr "C5"
+
+msgid "C6 Env."
+msgstr "C6 封筒"
+
+msgid "Envelope MAX"
+msgstr "洋形定形最大封筒"
+
+msgid "DL Envelope"
+msgstr "DL"
+
+msgid "Env ISO B5"
+msgstr "封筒 ISO B5"
+
+msgid "B6 "
+msgstr "B6"
+
+msgid "Kaku #2 envelope"
+msgstr "封筒 角 2 号"
+
+msgid "Monarch Envelope"
+msgstr "Monarch"
+
+msgid "Envelope #4"
+msgstr "洋形4号封筒"
+
+msgid "Envelope Feeder"
+msgstr "封筒"
+
+msgid "7.25 x 10.5\""
+msgstr "エグゼクティブ"
+
+msgid "Off"
+msgstr "オフ"
+
+msgid "Finisher Tray"
+msgstr "フィニッシャー"
+
+msgid "Glossy Paper"
+msgstr "光沢紙"
+
+msgid "Glossy Film"
+msgstr "光沢フィルム"
+
+msgid "Black and White"
+msgstr "モノクロ"
+
+msgid "Statement"
+msgstr "Statement"
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "B5"
+msgstr "ISO B5"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "Tab Stock"
+msgstr "インデックス紙"
+
+msgid "Inkjet Paper"
+msgstr "インクジェット紙"
+
+msgid "Installed"
+msgstr "インストール済み"
+
+msgid "Iron-On Transfer"
+msgstr "アイロンプリント紙"
+
+msgid "JB0"
+msgstr "B0(JIS)"
+
+msgid "JB1"
+msgstr "B1(JIS)"
+
+msgid "JB2"
+msgstr "B2(JIS)"
+
+msgid "JB3"
+msgstr "B3(JIS)"
+
+msgid "JB4"
+msgstr "B4(JIS)"
+
+msgid "Hagaki"
+msgstr "ハガキ"
+
+msgid "Ofuku Hagaki"
+msgstr "往復ハガキ"
+
+msgid "Tray 4"
+msgstr "トレイ 4"
+
+msgid "US Legal"
+msgstr "リーガル"
+
+msgid "Legal (Small)"
+msgstr "リーガル (小)"
+
+msgid "US Letter"
+msgstr "レター"
+
+msgid "Full Bleed US Letter"
+msgstr "US レター ノビ"
+
+msgid "Letter (Small)"
+msgstr "レター (小)"
+
+msgid "Lower Tray"
+msgstr "下"
+
+msgid "Mailbox"
+msgstr "プリントポスト"
+
+msgid "Manual Feed"
+msgstr "手差し"
+
+msgid "Manual Envelope"
+msgstr "手差し封筒"
+
+msgid "Middle Tray"
+msgstr "トレイ 2"
+
+msgid "Off"
+msgstr "なし"
+
+msgid "Not Installed"
+msgstr "インストールされていません"
+
+msgid "On"
+msgstr "オン"
+
+msgid "Oversize A0"
+msgstr "オーバーサイズ A0"
+
+msgid "Oversize A1"
+msgstr "オーバーサイズ A1"
+
+msgid "Oversize A2"
+msgstr "オーバーサイズ A2"
+
+msgid "None"
+msgstr "オフ"
+
+msgid "Bin 1"
+msgstr "ビン 1"
+
+msgid "Bin 2"
+msgstr "ビン 2"
+
+msgid "Bin 3"
+msgstr "ビン 3"
+
+msgid "Bin 4"
+msgstr "ビン 4"
+
+msgid "Bin 5"
+msgstr "ビン 5"
+
+msgid "Bin 6"
+msgstr "ビン 6"
+
+msgid "Bin 7"
+msgstr "ビン 7"
+
+msgid "Bin 8"
+msgstr "ビン 8"
+
+msgid "24\" x 108\""
+msgstr "24\" x 108\""
+
+msgid "24\" x 48\""
+msgstr "24\" x 48\""
+
+msgid "24\" x 60\""
+msgstr "24\" x 60\""
+
+msgid "24\" x 72\""
+msgstr "24\" x 72\""
+
+msgid "24\" x 84\""
+msgstr "24\" x 84\""
+
+msgid "24\" x 96\""
+msgstr "24\" x 96\""
+
+msgid "36\" x 108\""
+msgstr "36\" x 108\""
+
+msgid "36\" x 60\""
+msgstr "36\" x 60\""
+
+msgid "36\" x 72\""
+msgstr "36\" x 72\""
+
+msgid "36\" x 84\""
+msgstr "36\" x 84\""
+
+msgid "36\" x 96\""
+msgstr "36\" x 96\""
+
+msgid "42\" x 60\""
+msgstr "42\" x 60\""
+
+msgid "42\" x 72\""
+msgstr "42\" x 72\""
+
+msgid "42\" x 84\""
+msgstr "42\" x 84\""
+
+msgid "54\" x 72\""
+msgstr "54\" x 72\""
+
+msgid "54\" x 84\""
+msgstr "54\" x 84\""
+
+msgid "54\" x 96\""
+msgstr "54\" x 96\""
+
+msgid "60\" x 72\""
+msgstr "60\" x 72\""
+
+msgid "60\" x 84\""
+msgstr "60\" x 84\""
+
+msgid "60\" x 96\""
+msgstr "60\" x 96\""
+
+msgid "Plain Paper"
+msgstr "普通紙"
+
+msgid "Letterhead"
+msgstr "印刷フォーム"
+
+msgid "Printer Default"
+msgstr "プリンタの現在の設定"
+
+msgid "Color"
+msgstr "カラー"
+
+msgid "Recycled Paper"
+msgstr "再生紙"
+
+msgid "Roll Feed"
+msgstr "ｶｯﾄ紙"
+
+msgid "Roll 1"
+msgstr "ロール紙 1"
+
+msgid "Roll 2"
+msgstr "ロール紙 2"
+
+msgid "Cut Sheet"
+msgstr "ﾛｰﾙ紙"
+
+msgid "Super B"
+msgstr "スーパー B/A3"
+
+msgid "Toyo"
+msgstr "Toyo"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "11x17 (Oversize)"
+msgstr "11x17 (大)"
+
+msgid "Full Bleed Tabloid"
+msgstr "タブロイド ノビ"
+
+msgid "Thick Paper"
+msgstr "厚紙"
+
+msgid "Transparency"
+msgstr "ＯＨＰフィルム"
+
+msgid "Tray 1"
+msgstr "カセット 1"
+
+msgid "Tray 2"
+msgstr "カセット 2"
+
+msgid "Tray 3"
+msgstr "カセット 3"
+
+msgid "Tray 4"
+msgstr "カセット 4"
+
+msgid "Tray 5"
+msgstr "カセット 5"
+
+msgid "Tray 6"
+msgstr "トレイ 6"
+
+msgid "Upper Tray"
+msgstr "上"
+

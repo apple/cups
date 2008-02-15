@@ -3,7 +3,7 @@
  *
  *   Raster benchmark program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,7 +26,7 @@
  * Include necessary headers...
  */
 
-#include "raster.h"
+#include <cups/raster.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include <signal.h>

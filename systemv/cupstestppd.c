@@ -37,7 +37,7 @@
 #include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/i18n.h>
-#include <filter/raster.h>
+#include <cups/raster.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/stat.h>

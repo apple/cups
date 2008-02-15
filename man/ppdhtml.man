@@ -1,0 +1,38 @@
+.\"
+.\" "$Id: ppdhtml.man 343 2007-07-13 19:52:48Z mike $"
+.\"
+.\"   ppdhtml man page for the CUPS Driver Development Kit.
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdhtml 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.SH NAME
+ppdhtml \- cups html summary generator
+.SH SYNOPSIS
+.B ppdhtml
+[ \-I
+.I include-directory
+]
+.I source-file
+.SH DESCRIPTION
+\fIppdhtml\fR reads a driver information file and produces a
+HTML summary page that lists all of the drivers in a file and
+the supported options.
+.PP
+The \fI-I\fR option specifies an alternate include directory;
+multiple \fI-I\fR options can be supplied to add additional
+directories.
+.SH SEE ALSO
+cupsprofile(1), ppdc(1), ppdcfile(5), ppdi(1), ppdmerge(1), ppdpo(1), CUPS Driver Developer Kit Manual.
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id: ppdhtml.man 343 2007-07-13 19:52:48Z mike $".
+.\"

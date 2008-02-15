@@ -1,0 +1,33 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   rastertopclx man page for the CUPS Driver Development Kit.
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH rastertopclx 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.SH NAME
+rastertopclx \- enhanced pcl raster driver for cups
+.SH SYNOPSIS
+.B rastertopclx
+jobid user title copies options [
+.I filename.ras
+]
+.SH DESCRIPTION
+\fIrastertopclx\fR converts a CUPS raster stream to HP-PCL. It is
+used to support printing to a variety of HP and HP-compatible
+printers and plotters.
+.SH SEE ALSO
+cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5), CUPS Driver Developer Kit Manual.
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

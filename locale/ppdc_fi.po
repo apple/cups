@@ -1,0 +1,273 @@
+msgid "Color Mode"
+msgstr "Tulosta värit harmaasävyinä"
+
+msgid "2-Sided Printing"
+msgstr "Kaksipuolinen tulostus"
+
+msgid "Media Source"
+msgstr "Paperilähde"
+
+msgid "Options Installed"
+msgstr "Asennetut lisävarusteet"
+
+msgid "Paper Type"
+msgstr "Tulostusmateriaali"
+
+msgid "Media Size"
+msgstr "Media Size"
+
+msgid "8 x 10\""
+msgstr "8 x 10\""
+
+msgid "9 x 11\""
+msgstr "9 x 11\""
+
+msgid "A3 (297 x 420 mm)"
+msgstr "A3 (297 x 420 mm)"
+
+msgid "A3 (Oversize)"
+msgstr "A3 (Oversize)"
+
+msgid "A4 (210 x 297 mm)"
+msgstr "A4 (210 x 297 mm)"
+
+msgid "A4 (Small)"
+msgstr "A4 (pieni)"
+
+msgid "A5 (148 x 210 mm)"
+msgstr "A5 (148 x 210 mm)"
+
+msgid "A6 (105 x 148 mm)"
+msgstr "A6 (105 x 148 mm)"
+
+msgid "Auto Select"
+msgstr "Autom. valinta"
+
+msgid "B4 (JIS)"
+msgstr "JIS B4"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "B6 (JIS)"
+msgstr "JIS B6"
+
+msgid "Bond Paper"
+msgstr "Hienopaperi"
+
+msgid "Bin 1"
+msgstr "Lokero 1"
+
+msgid "Bin 2"
+msgstr "Lokero 2"
+
+msgid "Bin 3"
+msgstr "Lokero 3"
+
+msgid "Bin 4"
+msgstr "Lokero 4"
+
+msgid "Bin 5"
+msgstr "Lokero 5"
+
+msgid "Bin 6"
+msgstr "Lokero 6"
+
+msgid "Bin 7"
+msgstr "Lokero 7"
+
+msgid "Bin 8"
+msgstr "Lokero 8"
+
+msgid "Black Only"
+msgstr "Vain musta"
+
+msgid "C5 Envelope"
+msgstr "C5 kirjekuori"
+
+msgid "Color"
+msgstr "Pois"
+
+msgid "Card Stock"
+msgstr "Korttipaperi"
+
+msgid "Paper Cassette"
+msgstr "Paperikasetti"
+
+msgid "Colored Paper"
+msgstr "Väri"
+
+msgid "Env Comm10"
+msgstr "Comm10 kirjekuori"
+
+msgid "Printer Default"
+msgstr "Nopea"
+
+msgid "Long Edge"
+msgstr "Pitkän reunan sidonta"
+
+msgid "Short Edge"
+msgstr "Lyhyen reunan sidonta"
+
+msgid "#10 Envelope"
+msgstr "#10 kirjekuori"
+
+msgid "C4 Envelope"
+msgstr "Kirjekuori, C4 (324 x 229)"
+
+msgid "C5 Envelope"
+msgstr "C5 kirjekuori"
+
+msgid "C6 Env."
+msgstr "C6-kirjekuori"
+
+msgid "Envelope MAX"
+msgstr "Kirjekuori MAX"
+
+msgid "DL Envelope"
+msgstr "DL kirjekuori"
+
+msgid "Env ISO B5"
+msgstr "Kirjekuori ISO B5"
+
+msgid "B6 "
+msgstr "B6 "
+
+msgid "Monarch Envelope"
+msgstr "Monarch kirjekuori"
+
+msgid "Envelope #4"
+msgstr "Kirjekuori nro 4"
+
+msgid "Envelope Feeder"
+msgstr "Kirjekuori"
+
+msgid "7.25 x 10.5\""
+msgstr "7.25 x 10.5\""
+
+msgid "Off"
+msgstr "Ei käytössä"
+
+msgid "Glossy Paper"
+msgstr "Muu valokuvapaperi"
+
+msgid "Black and White"
+msgstr "Harmaa"
+
+msgid "Statement"
+msgstr "Statement"
+
+msgid "B5"
+msgstr "B5"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "Inkjet Paper"
+msgstr "Mustesuihkupaperi"
+
+msgid "Tray 4"
+msgstr "Lokero 4"
+
+msgid "US Legal"
+msgstr "US Legal"
+
+msgid "Legal (Small)"
+msgstr "Legal (pieni)"
+
+msgid "US Letter"
+msgstr "US Letter"
+
+msgid "Letter (Small)"
+msgstr "Letter (pieni)"
+
+msgid "Lower Tray"
+msgstr "Lokero 3"
+
+msgid "Manual Feed"
+msgstr "Käsinsyöttö"
+
+msgid "Middle Tray"
+msgstr "Lokero 2"
+
+msgid "Off"
+msgstr "Ei"
+
+msgid "None"
+msgstr "Ei"
+
+msgid "Bin 1"
+msgstr "Lokero 1"
+
+msgid "Bin 2"
+msgstr "Lokero 2"
+
+msgid "Bin 3"
+msgstr "Lokero 3"
+
+msgid "Bin 4"
+msgstr "Lokero 4"
+
+msgid "Bin 5"
+msgstr "Lokero 5"
+
+msgid "Bin 6"
+msgstr "Lokero 6"
+
+msgid "Bin 7"
+msgstr "Lokero 7"
+
+msgid "Bin 8"
+msgstr "Lokero 8"
+
+msgid "Plain Paper"
+msgstr "Tavallinen paperi"
+
+msgid "Letterhead"
+msgstr "Esipainettu"
+
+msgid "Printer Default"
+msgstr "Kirjoittimen nykyinen asetus"
+
+msgid "Recycled Paper"
+msgstr "Uusiopaperi"
+
+msgid "Tab Stock"
+msgstr "Hakulehdet"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "11x17 (Oversize)"
+msgstr "11x17 (Oversize)"
+
+msgid "12x18"
+msgstr "12 x 18\""
+
+msgid "Thick Paper"
+msgstr "Paksu paperi"
+
+msgid "Top Output Tray"
+msgstr "Yläluovutusalusta"
+
+msgid "Tray 1"
+msgstr "Kasetti1"
+
+msgid "Tray 2"
+msgstr "Kasetti2"
+
+msgid "Tray 3"
+msgstr "Alusta 3"
+
+msgid "Tray 4"
+msgstr "Alusta 4"
+
+msgid "Tray 5"
+msgstr "Lokero 5"
+
+msgid "Tray 6"
+msgstr "Alusta 6 (iso)"
+
+msgid "Upper Tray"
+msgstr "Lokero 1"
+
