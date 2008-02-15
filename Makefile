@@ -31,9 +31,10 @@ DIRS	=	cups filter backend berkeley cgi-bin driver locale man monitor \
 
 all:
 	chmod +x cups-config
-	echo Using CFLAGS="$(CFLAGS)"
-	echo Using CXXFLAGS="$(CFLAGS)"
-	echo Using LDFLAGS="$(CFLAGS)"
+	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
+	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using LDFLAGS="$(LDFLAGS)"
+	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
 		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
