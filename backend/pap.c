@@ -1,7 +1,7 @@
 /*
 * "$Id$"
 *
-* © Copyright 2004-2008 Apple Computer, Inc. All rights reserved.
+* Copyright 2004-2008 Apple Inc. All rights reserved.
 * 
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following

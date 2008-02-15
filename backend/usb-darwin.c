@@ -1,7 +1,7 @@
 /*
 * "$Id$"
 *
-* Copyright � 2005-2008 Apple Inc. All rights reserved.
+* Copyright 2005-2008 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -83,6 +83,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <libgen.h>
 #include <mach/mach.h>
@@ -314,7 +315,8 @@ print_device(const char *uri,		/* I - Device URI */
   OSStatus	  status;		/* Function results */
   pthread_t	  read_thread_id,	/* Read thread */
 		  sidechannel_thread_id;/* Side-channel thread */
-  int		  sidechannel_started = 0;/* Was the side-channel thread started? */
+  int		  have_sidechannel = 0;	/* Was the side-channel thread started? */
+  struct stat     sidechannel_info;	/* Side-channel file descriptor info */
   char		  print_buffer[8192],	/* Print data buffer */
 		  *print_ptr;		/* Pointer into print data buffer */
   UInt32	  location;		/* Unique location in bus topology */
@@ -328,6 +330,17 @@ print_device(const char *uri,		/* I - Device URI */
 		  stimeout;		/* Timeout for select() */
   struct timespec cond_timeout;		/* pthread condition timeout */
 
+
+ /*
+  * See if the side-channel descriptor is valid...
+  */
+
+  have_sidechannel = !fstat(CUPS_SC_FD, &sidechannel_info) &&
+                     S_ISSOCK(sidechannel_info.st_mode);
+
+ /*
+  * Localize using CoreFoundation...
+  */
 
   setup_cfLanguage();
 
@@ -442,21 +455,14 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
  /*
-  * Start the side channel thread only if the descriptor is valid
-  * (i.e. it's not when the backend is used for auto-setup)...
+  * Start the side channel thread if the descriptor is valid...
   */
 
   pthread_mutex_init(&g.readwrite_lock_mutex, NULL);
   pthread_cond_init(&g.readwrite_lock_cond, NULL);
   g.readwrite_lock = 1;
 
-  FD_ZERO(&input_set);
-  FD_SET(CUPS_SC_FD, &input_set);
-
-  stimeout.tv_sec  = 0;
-  stimeout.tv_usec = 0;
-
-  if ((select(CUPS_SC_FD+1, &input_set, NULL, NULL, &stimeout)) >= 0)
+  if (have_sidechannel)
   {
     g.sidechannel_thread_stop = 0;
     g.sidechannel_thread_done = 0;
@@ -469,8 +475,6 @@ print_device(const char *uri,		/* I - Device URI */
       _cupsLangPuts(stderr, _("WARNING: Couldn't create side channel\n"));
       return CUPS_BACKEND_STOP;
     }
-
-    sidechannel_started = 1;
   }
 
  /*
@@ -669,7 +673,7 @@ print_device(const char *uri,		/* I - Device URI */
   * Wait for the side channel thread to exit...
   */
 
-  if (sidechannel_started)
+  if (have_sidechannel)
   {
     close(CUPS_SC_FD);
     pthread_mutex_lock(&g.readwrite_lock_mutex);
@@ -1679,7 +1683,7 @@ static void parse_options(char *options,
 
 /*!
  * @function	setup_cfLanguage
- * @abstract	Convert the contents of the CUPS 'LANG' environment
+ * @abstract	Convert the contents of the CUPS 'APPLE_LANGUAGE' environment
  *		variable into a one element CF array of languages.
  *
  * @discussion	Each submitted job comes with a natural language. CUPS passes
@@ -1695,7 +1699,9 @@ static void setup_cfLanguage(void)
   CFArrayRef	langArray = NULL;
   const char	*requestedLang = NULL;
 
-  requestedLang = getenv("LANG");
+  if ((requestedLang = getenv("APPLE_LANGUAGE")) == NULL)
+    requestedLang = getenv("LANG");
+
   if (requestedLang != NULL)
   {
     lang[0] = CFStringCreateWithCString(kCFAllocatorDefault, requestedLang, kCFStringEncodingUTF8);
@@ -1708,7 +1714,7 @@ static void setup_cfLanguage(void)
     CFRelease(langArray);
   }
   else
-    fputs("DEBUG: usb: LANG environment variable missing.\n", stderr);
+    fputs("DEBUG: usb: LANG and APPLE_LANGUAGE environment variables missing.\n", stderr);
 }
 
 #pragma mark -
