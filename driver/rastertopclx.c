@@ -4,7 +4,7 @@
  *   Advanced HP Page Control Language and Raster Transfer Language
  *   filter for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1507,7 +1507,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
   * Set the length of the data and write a raster plane...
   */
 
-  printf("\033*b%d%c", line_end - line_ptr, pend);
+  printf("\033*b%d%c", (int)(line_end - line_ptr), pend);
   cupsWritePrintData(line_ptr, line_end - line_ptr);
 }
 

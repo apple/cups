@@ -62,18 +62,18 @@ main(int  argc,					/* I - Number of command-line arguments */
 
 
  /*
-  * Make the "images" test directory...
+  * Make the test directory...
   */
 
-  mkdir("images", 0700);
+  mkdir("test", 0755);
 
  /*
   * Run tests for CMYK and CMYK separations...
   */
 
-  test_rgb(CMYK, 8, 2, 4, "images/rgb-cmyk");
+  test_rgb(CMYK, 8, 2, 4, "test/rgb-cmyk");
 
-  test_gray(CMYK, 8, 2, 4, "images/gray-cmyk");
+  test_gray(CMYK, 8, 2, 4, "test/gray-cmyk");
 
  /*
   * Return with no errors...

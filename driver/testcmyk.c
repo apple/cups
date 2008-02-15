@@ -41,28 +41,28 @@ main(int  argc,					/* I - Number of command-line arguments */
      char *argv[])				/* I - Command-line arguments */
 {
  /*
-  * Make the "images" test directory...
+  * Make the test directory...
   */
 
-  mkdir("images", 0700);
+  mkdir("test", 0755);
 
  /*
   * Run tests for K, Kk, CMY, CMYK, CcMmYK, and CcMmYKk separations...
   */
 
-  test_rgb(1, "images/K-rgb");
-  test_rgb(2, "images/Kk-rgb");
-  test_rgb(3, "images/CMY-rgb");
-  test_rgb(4, "images/CMYK-rgb");
-  test_rgb(6, "images/CcMmYK-rgb");
-  test_rgb(7, "images/CcMmYKk-rgb");
+  test_rgb(1, "test/K-rgb");
+  test_rgb(2, "test/Kk-rgb");
+  test_rgb(3, "test/CMY-rgb");
+  test_rgb(4, "test/CMYK-rgb");
+  test_rgb(6, "test/CcMmYK-rgb");
+  test_rgb(7, "test/CcMmYKk-rgb");
 
-  test_gray(1, "images/K-gray");
-  test_gray(2, "images/Kk-gray");
-  test_gray(3, "images/CMY-gray");
-  test_gray(4, "images/CMYK-gray");
-  test_gray(6, "images/CcMmYK-gray");
-  test_gray(7, "images/CcMmYKk-gray");
+  test_gray(1, "test/K-gray");
+  test_gray(2, "test/Kk-gray");
+  test_gray(3, "test/CMY-gray");
+  test_gray(4, "test/CMYK-gray");
+  test_gray(6, "test/CcMmYK-gray");
+  test_gray(7, "test/CcMmYKk-gray");
 
  /*
   * Return with no errors...

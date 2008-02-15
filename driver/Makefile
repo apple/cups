@@ -173,7 +173,10 @@ testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testcmyk.o libcupsdriver.a ../cups/libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	./testcmyk
+	if test ! -d test; then \
+		mkdir test; \
+	fi
+	./testcmyk > test/testcmyk.log 2>&1
 
 
 #
@@ -184,17 +187,17 @@ testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testdither.o libcupsdriver.a ../cups/libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	if test ! -d images; then \
-		mkdir images; \
+	if test ! -d test; then \
+		mkdir test; \
 	fi
-	./testdither > images/0-255.pgm
-	./testdither 0 127 255 > images/0-127-255.pgm
-	./testdither 0 85 170 255 > images/0-85-170-255.pgm
-	./testdither 0 63 127 170 198 227 255 > images/0-63-127-170-198-227-255.pgm
-	./testdither 0 210 383 > images/0-210-383.pgm
-	./testdither 0 82 255 > images/0-82-255.pgm
-	./testdither 0 510 > images/0-510.pgm
-	./testdither 0 1020 > images/0-1020.pgm
+	./testdither > test/0-255.pgm 2>test/0-255.log
+	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log
+	./testdither 0 85 170 255 > test/0-85-170-255.pgm 2>test/0-85-170-255.log
+	./testdither 0 63 127 170 198 227 255 > test/0-63-127-170-198-227-255.pgm 2>test/0-63-127-170-198-227-255.log
+	./testdither 0 210 383 > test/0-210-383.pgm 2>test/0-210-383.log
+	./testdither 0 82 255 > test/0-82-255.pgm 2>test/0-82-255.log
+	./testdither 0 510 > test/0-510.pgm 2>test/0-510.log
+	./testdither 0 1020 > test/0-1020.pgm 2>test/0-1020.log
 
 
 #
@@ -205,7 +208,10 @@ testrgb:		testrgb.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testrgb.o libcupsdriver.a ../cups/libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	./testrgb
+	if test ! -d test; then \
+		mkdir test; \
+	fi
+	./testrgb > test/testrgb.log 2>&1
 
 
 #
