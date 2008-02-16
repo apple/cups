@@ -23,7 +23,7 @@
  */
 
 #  include <stdio.h>
-#  include "raster.h"
+#  include <cups/raster.h>
 
 #  ifdef __cplusplus
 extern "C" {

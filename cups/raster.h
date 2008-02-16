@@ -1,5 +1,5 @@
 /*
- * "$Id: raster.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
@@ -342,5 +342,5 @@ extern const char	*cupsRasterErrorString(void) _CUPS_API_1_3;
 #endif /* !_CUPS_RASTER_H_ */
 
 /*
- * End of "$Id: raster.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

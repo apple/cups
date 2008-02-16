@@ -1283,7 +1283,7 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
 		 const char *term,	/* I - Terminating characters */
 		 int        encode)	/* I - %-encode reserved chars? */
 {
-  static const char *hex = "0123456789ABCDEF";
+  static const char hex[] = "0123456789ABCDEF";
 
 
   while (*src && dst < dstend)

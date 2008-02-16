@@ -317,11 +317,6 @@ P.summary {
   font-family: monaco, courier, monospace;
 }
 
-SPAN.message {
-  font-style: italic;
-  font-size: smaller;
-}
-
 DIV.summary TABLE {
   border: solid thin #999999;
   border-collapse: collapse;

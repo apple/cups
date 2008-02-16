@@ -122,12 +122,12 @@ install: all $(INSTALL_LANGUAGES)
 
 install-languages:
 	for lang in $(LANGUAGES); do \
-		$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
-		for file in $(FILES); do \
-			if test -f $$lang/$$file; then \
-				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang; \
-			fi \
-		done \
+		if test -d $$lang; then \
+			$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
+			for file in $(FILES); do \
+				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang || true; \
+			done \
+		fi \
 	done
 
 

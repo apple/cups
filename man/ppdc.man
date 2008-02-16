@@ -1,0 +1,73 @@
+.\"
+.\" "$Id: ppdc.man 343 2007-07-13 19:52:48Z mike $"
+.\"
+.\"   ppdc man page for the CUPS Driver Development Kit.
+.\"
+.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 1997-2007 by Easy Software Products.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdc 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.SH NAME
+ppdc \- cups ppd compiler
+.SH SYNOPSIS
+.B ppdc
+[ -D
+.I name=value
+] [ -I
+.I include-directory
+] [ -c
+.I message-catalog
+] [ -d
+.I output-directory
+] [ -l
+.I language(s)
+] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
+.I source-file
+.SH DESCRIPTION
+\fIppdc\fR compiles PPDC source files into one or more PPD
+files.
+.PP
+The \fI-D\fR option sets the named variable for use in the
+source file. It is equivalent to using the #define directive
+in the source file.
+.PP
+The \fI-I\fR option specifies an alternate include directory;
+multiple \fI-I\fR options can be supplied to add additional
+directories.
+.PP
+The \fI-c\fR option specifies a single message catalog file in GNU
+gettext source format (filename.po) to be used for localization.
+.PP
+The \fI-d\fR option specifies the output directory for PPD
+files. The default output directory is "ppd".
+.PP
+The \fI-l\fR option specifies one or more languages to use when
+localizing the PPD file(s). The default language is "en"
+(English). Separate multiple languages with commas, for example
+"de_DE,en_UK,es_ES,es_MX,es_US,fr_CA,fr_FR,it_IT" will create PPD
+files with German, UK English, Spanish (Spain, Mexico, and US),
+French (France and Canada), and Italian languages in each file.
+.PP
+The \fI-v\fR option provides more verbose output, basically a
+running status of which files are being loaded or written.
+.PP
+The \fI-z\fR option generates compressed PPD files (filename.ppd.gz).
+The default is to generate uncompressed PPD files.
+.PP
+The \fI--cr\fR, \fI--crlf\fR, and \fI--lf\fR options specify the
+line ending to use - carriage return, carriage return and line feed,
+or line feed. The default is to use the line feed character alone.
+.SH SEE ALSO
+cupsprofile(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5),
+CUPS Driver Developer Kit Manual
+.SH COPYRIGHT
+Copyright 2007 by Apple Inc.
+.\"
+.\" End of "$Id: ppdc.man 343 2007-07-13 19:52:48Z mike $".
+.\"

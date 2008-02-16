@@ -3,7 +3,7 @@
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -30,7 +30,12 @@ MAN1	=	cancel.$(MAN1EXT) \
 		lpq.$(MAN1EXT) \
 		lprm.$(MAN1EXT) \
 		lpr.$(MAN1EXT) \
-		lpstat.$(MAN1EXT)
+		lpstat.$(MAN1EXT) \
+		ppdc.$(MAN1EXT) \
+		ppdhtml.$(MAN1EXT) \
+		ppdi.$(MAN1EXT) \
+		ppdmerge.$(MAN1EXT) \
+		ppdpo.$(MAN1EXT)
 MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
 		cups-snmp.conf.$(MAN5EXT) \
@@ -38,10 +43,15 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		mailto.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
 		mime.types.$(MAN5EXT) \
+		ppdcfile.$(MAN5EXT) \
 		printers.conf.$(MAN5EXT) \
 		subscriptions.conf.$(MAN5EXT)
 MAN7	=	backend.$(MAN7EXT) \
-		filter.$(MAN7EXT)
+		commandtoescpx.$(MAN7EXT) \
+		commandtopclx.$(MAN7EXT) \
+		filter.$(MAN7EXT) \
+		rastertoescpx.$(MAN7EXT) \
+		rastertopclx.$(MAN7EXT)
 MAN8	=	accept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \

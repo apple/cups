@@ -1,0 +1,94 @@
+/*
+ * "$Id: raster.defs 343 2007-07-13 19:52:48Z mike $"
+ *
+ *   This file contains the standard definitions for enumerated attributes
+ *   in the CUPS raster page device dictionary.
+ *
+ *   Copyright 2007 by Apple Inc.
+ *   Copyright 1997-2005 by Easy Software Products.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
+ */
+
+/* Jog values */
+#define CUPS_JOG_NONE		0	/* Never move pages */
+#define CUPS_JOG_FILE		1	/* Move pages after this file */
+#define CUPS_JOG_JOB		2	/* Move pages after this job */
+#define CUPS_JOG_SET		3	/* Move pages after this set */
+
+/* Orientation values */
+#define CUPS_ORIENT_0		0	/* Don't rotate the page */
+#define CUPS_ORIENT_90		1	/* Rotate the page counter-clockwise */
+#define CUPS_ORIENT_180		2	/* Turn the page upside down */
+#define CUPS_ORIENT_270		3	/* Rotate the page clockwise */
+
+/* CutMedia values */
+#define CUPS_CUT_NONE		0	/* Never cut the roll */
+#define CUPS_CUT_FILE		1	/* Cut the roll after this file */
+#define CUPS_CUT_JOB		2	/* Cut the roll after this job */
+#define CUPS_CUT_SET		3	/* Cut the roll after this set */
+#define CUPS_CUT_PAGE		4	/* Cut the roll after this page */
+
+/* AdvanceMedia values */
+#define CUPS_ADVANCE_NONE	0	/* Never advance the roll */
+#define CUPS_ADVANCE_FILE	1	/* Advance the roll after this file */
+#define CUPS_ADVANCE_JOB	2	/* Advance the roll after this job */
+#define CUPS_ADVANCE_SET	3	/* Advance the roll after this set */
+#define CUPS_ADVANCE_PAGE	4	/* Advance the roll after this page */
+
+/* LeadingEdge values */
+#define CUPS_EDGE_TOP		0	/* Leading edge is the top of the page */
+#define CUPS_EDGE_RIGHT		1	/* Leading edge is the right of the page */
+#define CUPS_EDGE_BOTTOM	2	/* Leading edge is the bottom of the page */
+#define CUPS_EDGE_LEFT		3	/* Leading edge is the left of the page */
+
+/* cupsColorOrder values */
+#define CUPS_ORDER_CHUNKED	0	/* CMYK CMYK CMYK ... */
+#define CUPS_ORDER_BANDED	1	/* CCC MMM YYY KKK ... */
+#define CUPS_ORDER_PLANAR	2	/* CCC ... MMM ... YYY ... KKK ... */
+
+/* cupsColorSpace values */
+#define CUPS_CSPACE_W		0	/* Luminance */
+#define CUPS_CSPACE_RGB		1	/* Red, green, blue */
+#define CUPS_CSPACE_RGBA	2	/* Red, green, blue, alpha */
+#define CUPS_CSPACE_K		3	/* Black */
+#define CUPS_CSPACE_CMY		4	/* Cyan, magenta, yellow */
+#define CUPS_CSPACE_YMC		5	/* Yellow, magenta, cyan */
+#define CUPS_CSPACE_CMYK	6	/* Cyan, magenta, yellow, black */
+#define CUPS_CSPACE_YMCK	7	/* Yellow, magenta, cyan, black */
+#define CUPS_CSPACE_KCMY	8	/* Black, cyan, magenta, yellow */
+#define CUPS_CSPACE_KCMYcm	9	/* Black, cyan, magenta, yellow, *
+				         * light-cyan, light-magenta     */
+#define CUPS_CSPACE_GMCK	10	/* Gold, magenta, yellow, black */
+#define CUPS_CSPACE_GMCS	11	/* Gold, magenta, yellow, silver */
+#define CUPS_CSPACE_WHITE	12	/* White ink (as black) */
+#define CUPS_CSPACE_GOLD	13	/* Gold foil */
+#define CUPS_CSPACE_SILVER	14	/* Silver foil */
+
+#define CUPS_CSPACE_CIEXYZ	15	/* CIE XYZ */
+#define CUPS_CSPACE_CIELab	16	/* CIE Lab */
+
+#define CUPS_CSPACE_ICC1	32	/* ICC-based, 1 color */
+#define CUPS_CSPACE_ICC2	33	/* ICC-based, 2 colors */
+#define CUPS_CSPACE_ICC3	34	/* ICC-based, 3 colors */
+#define CUPS_CSPACE_ICC4	35	/* ICC-based, 4 colors */
+#define CUPS_CSPACE_ICC5	36	/* ICC-based, 5 colors */
+#define CUPS_CSPACE_ICC6	37	/* ICC-based, 6 colors */
+#define CUPS_CSPACE_ICC7	38	/* ICC-based, 7 colors */
+#define CUPS_CSPACE_ICC8	39	/* ICC-based, 8 colors */
+#define CUPS_CSPACE_ICC9	40	/* ICC-based, 9 colors */
+#define CUPS_CSPACE_ICCA	41	/* ICC-based, 10 colors */
+#define CUPS_CSPACE_ICCB	42	/* ICC-based, 11 colors */
+#define CUPS_CSPACE_ICCC	43	/* ICC-based, 12 colors */
+#define CUPS_CSPACE_ICCD	44	/* ICC-based, 13 colors */
+#define CUPS_CSPACE_ICCE	45	/* ICC-based, 14 colors */
+#define CUPS_CSPACE_ICCF	46	/* ICC-based, 15 colors */
+
+
+/*
+ * End of "$Id: raster.defs 343 2007-07-13 19:52:48Z mike $".
+ */

@@ -154,7 +154,8 @@ typedef void (*cupsd_selfunc_t)(void *data);
 
 VAR int			TestConfigFile	VALUE(0);
 					/* Test the cupsd.conf file? */
-VAR int			MaxFDs;		/* Maximum number of files */
+VAR int			MaxFDs		VALUE(0);
+					/* Maximum number of files */
 
 VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
@@ -164,7 +165,8 @@ VAR void		*DefaultProfile	VALUE(0);
 					/* Default security profile */
 
 #ifdef HAVE_GSSAPI
-VAR krb5_context	KerberosContext;/* Kerberos context for credentials */
+VAR krb5_context	KerberosContext VALUE(NULL);
+					/* Kerberos context for credentials */
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_LAUNCH_H

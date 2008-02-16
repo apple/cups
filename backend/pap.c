@@ -1,7 +1,7 @@
 /*
 * "$Id: pap.c 7010 2007-10-10 21:08:51Z mike $"
 *
-* © Copyright 2004-2008 Apple Computer, Inc. All rights reserved.
+* Copyright 2004-2008 Apple Inc. All rights reserved.
 * 
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following

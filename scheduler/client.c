@@ -2530,7 +2530,7 @@ cupsdSendHeader(
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Kerberos credentials larger than 64k (%d)!",
-		    con->gss_output_token.length);
+		    (int)con->gss_output_token.length);
     return (0);
   }
 #endif /* HAVE_GSSAPI */

@@ -34,8 +34,10 @@ typedef struct cupsd_cert_s
  * Globals...
  */
 
-VAR cupsd_cert_t	*Certs;		/* List of certificates */
-VAR time_t		RootCertTime;	/* Root certificate update time */
+VAR cupsd_cert_t	*Certs		/* List of certificates */
+				VALUE(NULL);
+VAR time_t		RootCertTime	/* Root certificate update time */
+				VALUE(0);
 
 
 /*

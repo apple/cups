@@ -1,0 +1,276 @@
+msgid "Color Mode"
+msgstr "Fargemodus"
+
+msgid "2-Sided Printing"
+msgstr "Tosidig"
+
+msgid "Media Source"
+msgstr "Media Source"
+
+msgid "Options Installed"
+msgstr "Installerbart ekstrautstyr"
+
+msgid "Paper Type"
+msgstr "Papirtype"
+
+msgid "Optional Input Tray"
+msgstr "Optionele invoerlade"
+
+msgid "Optional Hard Disk"
+msgstr "Optionele vaste schijf"
+
+msgid "Media Size"
+msgstr "Media Size"
+
+msgid "8 x 10\""
+msgstr "8 x 10 t."
+
+msgid "9 x 11\""
+msgstr "9 x 11 t."
+
+msgid "A3 (297 x 420 mm)"
+msgstr "A3 (297 x 420 mm)"
+
+msgid "A3 (Oversize)"
+msgstr "A3 (ekstra stort)"
+
+msgid "A4 (210 x 297 mm)"
+msgstr "A4 (210 x 297 mm)"
+
+msgid "A4 (Small)"
+msgstr "A4 (lite)"
+
+msgid "A5 (148 x 210 mm)"
+msgstr "A5 (148 x 210 mm)"
+
+msgid "A6 (105 x 148 mm)"
+msgstr "A6 (105 x 148 mm)"
+
+msgid "B4 (JIS)"
+msgstr "B4 (JIS)"
+
+msgid "JIS B5"
+msgstr "JIS B5"
+
+msgid "B6 (JIS)"
+msgstr "B6 (JIS)"
+
+msgid "Black"
+msgstr "Svart"
+
+msgid "Bin 1"
+msgstr "Internt brett 2"
+
+msgid "Bin 2"
+msgstr "Utskuff 2"
+
+msgid "Bin 3"
+msgstr "Utskuff 3"
+
+msgid "Bin 4"
+msgstr "Utskuff 4"
+
+msgid "Bin 5"
+msgstr "Utskuff 5"
+
+msgid "Bin 6"
+msgstr "Utskuff 6"
+
+msgid "Bin 7"
+msgstr "Utskuff 7"
+
+msgid "Bin 8"
+msgstr "Utskuff 8"
+
+msgid "Black Only"
+msgstr "Svart"
+
+msgid "C5 Envelope"
+msgstr "C5-konvolutt"
+
+msgid "Color"
+msgstr "Farge"
+
+msgid "Card Stock"
+msgstr "Indekskort"
+
+msgid "Paper Cassette"
+msgstr "Papirkassett"
+
+msgid "Heavy Weight Matte"
+msgstr "Bestrøket"
+
+msgid "Colored Paper"
+msgstr "Farge"
+
+msgid "Env Comm10"
+msgstr "Comm10-konvolutt"
+
+msgid "Printer Default"
+msgstr "Skriverstandard"
+
+msgid "Long Edge"
+msgstr "Langsiden"
+
+msgid "Short Edge"
+msgstr "Kortsiden"
+
+msgid "#10 Envelope"
+msgstr "Comm10-konvolutt"
+
+msgid "C4 Envelope"
+msgstr "Konvolutt, C4 (324 x 229 mm)"
+
+msgid "C5 Envelope"
+msgstr "C5-konvolutt"
+
+msgid "C6 Env."
+msgstr "C6-konv."
+
+msgid "DL Envelope"
+msgstr "DL-konvolutt"
+
+msgid "Env ISO B5"
+msgstr "B5-konvolutt"
+
+msgid "Monarch Envelope"
+msgstr "Monarch-konvolutt"
+
+msgid "Envelope Feeder"
+msgstr "Konvolutt"
+
+msgid "7.25 x 10.5\""
+msgstr "7,25 x 10,5 t."
+
+msgid "Off"
+msgstr "Av"
+
+msgid "Glossy Paper"
+msgstr "Glanset"
+
+msgid "Black and White"
+msgstr "Svart-hvitt"
+
+msgid "Statement"
+msgstr "1/2 Letter"
+
+msgid "B5"
+msgstr "B5 (ISO)"
+
+msgid "B6"
+msgstr "B6 (ISO)"
+
+msgid "Tab Stock"
+msgstr "Faneark"
+
+msgid "Iron-On Transfer"
+msgstr "Påstrykningspapir"
+
+msgid "Tray 4"
+msgstr "Skuff 4"
+
+msgid "US Legal"
+msgstr "US Legal"
+
+msgid "Legal (Small)"
+msgstr "Legal (lite)"
+
+msgid "US Letter"
+msgstr "Tekst"
+
+msgid "Letter Plus"
+msgstr "SP Folio"
+
+msgid "Letter (Small)"
+msgstr "Letter (lite)"
+
+msgid "Lower Tray"
+msgstr "Skuff 3"
+
+msgid "Manual Feed"
+msgstr "Handmatig"
+
+msgid "Middle Tray"
+msgstr "Skuff 2"
+
+msgid "Off"
+msgstr "Ingen"
+
+msgid "None"
+msgstr "Av"
+
+msgid "Bin 1"
+msgstr "Skuff 1"
+
+msgid "Bin 2"
+msgstr "Skuff 2"
+
+msgid "Bin 3"
+msgstr "Skuff 3"
+
+msgid "Bin 4"
+msgstr "Skuff 4"
+
+msgid "Bin 5"
+msgstr "Skuff 5"
+
+msgid "Bin 6"
+msgstr "Skuff 6"
+
+msgid "Bin 7"
+msgstr "Skuff 7"
+
+msgid "Bin 8"
+msgstr "Skuff 8"
+
+msgid "Plain Paper"
+msgstr "Vanlig"
+
+msgid "Letterhead"
+msgstr "Fortrykt"
+
+msgid "Printer Default"
+msgstr "Skriverens gjeldende innstilling"
+
+msgid "Recycled Paper"
+msgstr "Resirkulert"
+
+msgid "Tab Stock"
+msgstr "Skillekort med fane"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "11x17 (Oversize)"
+msgstr "11x17 (ekstra stort)"
+
+msgid "12x18"
+msgstr "12 x 18 tommer"
+
+msgid "Thick Paper"
+msgstr "Tykt"
+
+msgid "Top Output Tray"
+msgstr "Øvre mottaker"
+
+msgid "Tray 1"
+msgstr "Skuff 1"
+
+msgid "Tray 2"
+msgstr "Skuff 2"
+
+msgid "Tray 3"
+msgstr "Magasin 3"
+
+msgid "Tray 4"
+msgstr "Magasin 4"
+
+msgid "Tray 5"
+msgstr "Skuff 5"
+
+msgid "Tray 6"
+msgstr "Magasin 6 (stormagasin)"
+
+msgid "Upper Tray"
+msgstr "Skuff 1"
+

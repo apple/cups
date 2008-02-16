@@ -407,6 +407,7 @@ show_class(http_t     *http,		/* I - Connection to server */
     * Show the class status...
     */
 
+    cgiSetVariable("_SINGLE_DEST", "1");
     cgiCopyTemplateLang("classes.tmpl");
 
    /*

@@ -1,0 +1,417 @@
+msgid "Color Mode"
+msgstr "色彩模式"
+
+msgid "2-Sided Printing"
+msgstr "2-Sided Printing"
+
+msgid "Media Source"
+msgstr "Paper Source"
+
+msgid "Options Installed"
+msgstr "Installed Options"
+
+msgid "Paper Type"
+msgstr "Media Type"
+
+msgid "Media Size"
+msgstr "Page Size"
+
+msgid "A3 (Oversize)"
+msgstr "A3 (Oversize)"
+
+msgid "Full Bleed A3"
+msgstr "Full Bleed A3"
+
+msgid "Full Bleed A4"
+msgstr "Full Bleed A4"
+
+msgid "A4 (Small)"
+msgstr "A4 (Small)"
+
+msgid "C"
+msgstr "C"
+
+msgid "D"
+msgstr "D"
+
+msgid "E"
+msgstr "E"
+
+msgid "ARCH A"
+msgstr "ARCH A"
+
+msgid "ARCH B"
+msgstr "ARCH B"
+
+msgid "ARCH C"
+msgstr "ARCH C"
+
+msgid "ARCH D"
+msgstr "ARCH D"
+
+msgid "ARCH E"
+msgstr "ARCH E"
+
+msgid "Adhesive Paper"
+msgstr "Adhesive Paper"
+
+msgid "ANSI C"
+msgstr "ANSI C"
+
+msgid "ANSI D"
+msgstr "ANSI D"
+
+msgid "ANSI E"
+msgstr "ANSI E"
+
+msgid "Auto Select"
+msgstr "自动选择"
+
+msgid "JB0"
+msgstr "JB0"
+
+msgid "JB1"
+msgstr "JB1"
+
+msgid "JB2"
+msgstr "JB2"
+
+msgid "JB3"
+msgstr "JB3"
+
+msgid "B4 (JIS)"
+msgstr "B4 (JIS)"
+
+msgid "JIS B5"
+msgstr "B5 (JIS)"
+
+msgid "B6 (JIS)"
+msgstr "B6 (JIS)"
+
+msgid "Bond Paper"
+msgstr "铜板纸"
+
+msgid "Bin 1"
+msgstr "Output Bin 1"
+
+msgid "Bin 2"
+msgstr "Output Bin 2"
+
+msgid "Bin 3"
+msgstr "Output Bin 3"
+
+msgid "Bin 4"
+msgstr "Output Bin 4"
+
+msgid "Bin 5"
+msgstr "Output Bin 5"
+
+msgid "Bin 6"
+msgstr "Output Bin 6"
+
+msgid "Bin 7"
+msgstr "Output Bin 7"
+
+msgid "Bin 8"
+msgstr "Output Bin 8"
+
+msgid "Black Only"
+msgstr "Black Only"
+
+msgid "Color"
+msgstr "Off"
+
+msgid "Card Stock"
+msgstr "Card Stock 164-200 g"
+
+msgid "Colored Paper"
+msgstr "彩色"
+
+msgid "Long Edge"
+msgstr "Long-Edge Binding"
+
+msgid "Short Edge"
+msgstr "Short-Edge Binding"
+
+msgid "#10 Envelope"
+msgstr "Com-10"
+
+msgid "C5 Envelope"
+msgstr "Env C5"
+
+msgid "C6 Env."
+msgstr "C6 信封"
+
+msgid "Envelope MAX"
+msgstr "Envelope MAX"
+
+msgid "DL Envelope"
+msgstr "DL 信封"
+
+msgid "Env ISO B5"
+msgstr "Env ISO B5"
+
+msgid "Kaku #2 envelope"
+msgstr "Kaku #2 信封"
+
+msgid "Monarch Envelope"
+msgstr "Monarch"
+
+msgid "Envelope #4"
+msgstr "JE4 信封"
+
+msgid "Envelope Feeder"
+msgstr "Envelope Feeder"
+
+msgid "Off"
+msgstr "No"
+
+msgid "Glossy Paper"
+msgstr "光面纸"
+
+msgid "Glossy Film"
+msgstr "Glossy Film"
+
+msgid "Black and White"
+msgstr "On"
+
+msgid "Statement"
+msgstr "Statement"
+
+msgid "A0"
+msgstr "A0"
+
+msgid "A1"
+msgstr "A1"
+
+msgid "A2"
+msgstr "A2"
+
+msgid "A3"
+msgstr "A3"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "B5"
+msgstr "B5 (ISO)"
+
+msgid "B6"
+msgstr "B6"
+
+msgid "Inkjet Paper"
+msgstr "喷墨专用纸"
+
+msgid "JB0"
+msgstr "JB0"
+
+msgid "JB1"
+msgstr "JB1"
+
+msgid "JB2"
+msgstr "JB2"
+
+msgid "JB3"
+msgstr "JB3"
+
+msgid "JB4"
+msgstr "JB4"
+
+msgid "Ofuku Hagaki"
+msgstr "Ofuku Hagaki"
+
+msgid "Tray 4"
+msgstr "Tray 4"
+
+msgid "US Legal"
+msgstr "美国法定用纸"
+
+msgid "Legal (Small)"
+msgstr "Legal (Small)"
+
+msgid "US Letter"
+msgstr "美国信纸"
+
+msgid "Full Bleed US Letter"
+msgstr "Full Bleed US Letter"
+
+msgid "Letter (Small)"
+msgstr "Letter (Small)"
+
+msgid "Lower Tray"
+msgstr "Tray 3"
+
+msgid "Manual Feed"
+msgstr "手动"
+
+msgid "Middle Tray"
+msgstr "Tray 2"
+
+msgid "Off"
+msgstr "Off"
+
+msgid "On"
+msgstr "开"
+
+msgid "Oversize A0"
+msgstr "Oversize A0"
+
+msgid "Oversize A1"
+msgstr "Oversize A1"
+
+msgid "Oversize A2"
+msgstr "Oversize A2"
+
+msgid "None"
+msgstr "None"
+
+msgid "Bin 1"
+msgstr "Mailbox 1 (Face Down)"
+
+msgid "Bin 2"
+msgstr "Mailbox 2 (Face Down)"
+
+msgid "Bin 3"
+msgstr "Mailbox 3 (Face Down)"
+
+msgid "Bin 4"
+msgstr "Mailbox 4 (Face Down)"
+
+msgid "Bin 5"
+msgstr "Mailbox 5 (Face Down)"
+
+msgid "Bin 6"
+msgstr "Mailbox 6 (Face Down)"
+
+msgid "Bin 7"
+msgstr "Mailbox 7 (Face Down)"
+
+msgid "Bin 8"
+msgstr "Mailbox 8 (Face Down)"
+
+msgid "24\" x 108\""
+msgstr "24\" x 108\""
+
+msgid "24\" x 48\""
+msgstr "24\" x 48\""
+
+msgid "24\" x 60\""
+msgstr "24\" x 60\""
+
+msgid "24\" x 72\""
+msgstr "24\" x 72\""
+
+msgid "24\" x 84\""
+msgstr "24\" x 84\""
+
+msgid "24\" x 96\""
+msgstr "24\" x 96\""
+
+msgid "36\" x 108\""
+msgstr "36\" x 108\""
+
+msgid "36\" x 60\""
+msgstr "36\" x 60\""
+
+msgid "36\" x 72\""
+msgstr "36\" x 72\""
+
+msgid "36\" x 84\""
+msgstr "36\" x 84\""
+
+msgid "36\" x 96\""
+msgstr "36\" x 96\""
+
+msgid "42\" x 60\""
+msgstr "42\" x 60\""
+
+msgid "42\" x 72\""
+msgstr "42\" x 72\""
+
+msgid "42\" x 84\""
+msgstr "42\" x 84\""
+
+msgid "54\" x 72\""
+msgstr "54\" x 72\""
+
+msgid "54\" x 84\""
+msgstr "54\" x 84\""
+
+msgid "54\" x 96\""
+msgstr "54\" x 96\""
+
+msgid "60\" x 72\""
+msgstr "60\" x 72\""
+
+msgid "60\" x 84\""
+msgstr "60\" x 84\""
+
+msgid "60\" x 96\""
+msgstr "60\" x 96\""
+
+msgid "Plain Paper"
+msgstr "普通纸"
+
+msgid "Printer Default"
+msgstr "Printer's Current Setting"
+
+msgid "Color"
+msgstr "颜色"
+
+msgid "Recycled Paper"
+msgstr "再生纸"
+
+msgid "Roll Feed"
+msgstr "Roll Feed"
+
+msgid "Roll 1"
+msgstr "Roll 1"
+
+msgid "Roll 2"
+msgstr "Roll 2"
+
+msgid "Cut Sheet"
+msgstr "Cut Sheet"
+
+msgid "Super B"
+msgstr "Super B"
+
+msgid "Toyo"
+msgstr "Toyo"
+
+msgid "11x17"
+msgstr "11x17"
+
+msgid "11x17 (Oversize)"
+msgstr "11x17 (Oversize)"
+
+msgid "Full Bleed Tabloid"
+msgstr "Full Bleed Tabloid"
+
+msgid "Thick Paper"
+msgstr "厚"
+
+msgid "Transparency"
+msgstr "Transparency"
+
+msgid "Tray 1"
+msgstr "Tray 1"
+
+msgid "Tray 2"
+msgstr "Tray 2"
+
+msgid "Tray 3"
+msgstr "Tray 3"
+
+msgid "Tray 4"
+msgstr "Tray 4"
+
+msgid "Tray 5"
+msgstr "Tray 5"
+
+msgid "Tray 6"
+msgstr "Tray 6 "
+
+msgid "Upper Tray"
+msgstr "Tray 1"
+

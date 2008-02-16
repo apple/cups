@@ -68,9 +68,11 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 VAR int			ServerNameIsIP		VALUE(0);
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
-VAR char		*SystemGroups[MAX_SYSTEM_GROUPS];
+VAR char		*SystemGroups[MAX_SYSTEM_GROUPS]
+						VALUE({0});
 					/* System group names */
-VAR gid_t		SystemGroupIDs[MAX_SYSTEM_GROUPS];
+VAR gid_t		SystemGroupIDs[MAX_SYSTEM_GROUPS]
+						VALUE({0});
 					/* System group IDs */
 VAR char		*AccessLog		VALUE(NULL),
 					/* Access log filename */
@@ -160,7 +162,8 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Timeout before reload from SIGHUP */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
-			RunUser,	/* User to run as, used for files */
+			RunUser			VALUE(0),
+					/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
 			DefaultShared		VALUE(TRUE);

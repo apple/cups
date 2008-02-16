@@ -1684,8 +1684,11 @@ process_children(void)
 	    else
  	      job->status = -status;	/* Backend failed */
 
-            if (job->printer && !(job->printer->type & CUPS_PRINTER_FAX))
+            if (job->printer && !(job->printer->type & CUPS_PRINTER_FAX) &&
+	        job->status_level > CUPSD_LOG_ERROR)
 	    {
+	      job->status_level = CUPSD_LOG_ERROR;
+
               snprintf(job->printer->state_message,
 	               sizeof(job->printer->state_message), "%s failed", name);
               cupsdAddPrinterHistory(job->printer);

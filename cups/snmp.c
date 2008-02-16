@@ -16,38 +16,40 @@
  *
  * Contents:
  *
- *   cupsSNMPClose()         - Close a SNMP socket.
- *   cupsSNMPCopyOID()       - Copy an OID.
- *   cupsSNMPIsOID()         - Test whether a SNMP response contains the
- *                             specified OID.
- *   cupsSNMPIsOIDPrefixed() - Test whether a SNMP response uses the specified
- *                             OID prefix.
- *   cupsSNMPOpen()          - Open a SNMP socket.
- *   cupsSNMPRead()          - Read and parse a SNMP response...
- *   cupsSNMPSetDebug()      - Enable/disable debug logging to stderr.
- *   cupsSNMPWrite()         - Send an SNMP query packet.
- *   asn1_decode_snmp()      - Decode a SNMP packet.
- *   asn1_debug()            - Decode an ASN1-encoded message.
- *   asn1_encode_snmp()      - Encode a SNMP packet.
- *   asn1_get_integer()      - Get an integer value.
- *   asn1_get_length()       - Get a value length.
- *   asn1_get_oid()          - Get an OID value.
- *   asn1_get_packed()       - Get a packed integer value.
- *   asn1_get_string()       - Get a string value.
- *   asn1_get_type()         - Get a value type.
- *   asn1_set_integer()      - Set an integer value.
- *   asn1_set_length()       - Set a value length.
- *   asn1_set_oid()          - Set an OID value.
- *   asn1_set_packed()       - Set a packed integer value.
- *   asn1_size_integer()     - Figure out the number of bytes needed for an
- *                             integer value.
- *   asn1_size_length()      - Figure out the number of bytes needed for a
- *                             length value.
- *   asn1_size_oid()         - Figure out the numebr of bytes needed for an OID
- *                             value.
- *   asn1_size_packed()      - Figure out the number of bytes needed for a
- *                             packed integer value.
- *   snmp_set_error()        - Set the localized error for a packet.
+ *   cupsSNMPClose()            - Close a SNMP socket.
+ *   cupsSNMPCopyOID()          - Copy an OID.
+ *   cupsSNMPDefaultCommunity() - Get the default SNMP community name.
+ *   cupsSNMPIsOID()            - Test whether a SNMP response contains the
+ *                                specified OID.
+ *   cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
+ *                                specified OID prefix.
+ *   cupsSNMPOpen()             - Open a SNMP socket.
+ *   cupsSNMPRead()             - Read and parse a SNMP response.
+ *   cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
+ *   cupsSNMPWalk()             - Enumerate a group of OIDs.
+ *   cupsSNMPWrite()            - Send an SNMP query packet.
+ *   asn1_debug()               - Decode an ASN1-encoded message.
+ *   asn1_decode_snmp()         - Decode a SNMP packet.
+ *   asn1_encode_snmp()         - Encode a SNMP packet.
+ *   asn1_get_integer()         - Get an integer value.
+ *   asn1_get_length()          - Get a value length.
+ *   asn1_get_oid()             - Get an OID value.
+ *   asn1_get_packed()          - Get a packed integer value.
+ *   asn1_get_string()          - Get a string value.
+ *   asn1_get_type()            - Get a value type.
+ *   asn1_set_integer()         - Set an integer value.
+ *   asn1_set_length()          - Set a value length.
+ *   asn1_set_oid()             - Set an OID value.
+ *   asn1_set_packed()          - Set a packed integer value.
+ *   asn1_size_integer()        - Figure out the number of bytes needed for an
+ *                                integer value.
+ *   asn1_size_length()         - Figure out the number of bytes needed for a
+ *                                length value.
+ *   asn1_size_oid()            - Figure out the numebr of bytes needed for an
+ *                                OID value.
+ *   asn1_size_packed()         - Figure out the number of bytes needed for a
+ *                                packed integer value.
+ *   snmp_set_error()           - Set the localized error for a packet.
  */
 
 /*
@@ -66,10 +68,10 @@
  * Local functions...
  */
 
-static int		asn1_decode_snmp(unsigned char *buffer, size_t len,
-			                 cups_snmp_t *packet);
 static void		asn1_debug(const char *prefix, unsigned char *buffer,
 			           size_t len, int indent);
+static int		asn1_decode_snmp(unsigned char *buffer, size_t len,
+			                 cups_snmp_t *packet);
 static int		asn1_encode_snmp(unsigned char *buffer, size_t len,
 			                 cups_snmp_t *packet);
 static int		asn1_get_integer(unsigned char **buffer,
@@ -123,6 +125,10 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 
 /*
  * 'cupsSNMPCopyOID()' - Copy an OID.
+ *
+ * The array pointed to by "src" is terminated by the value -1.
+ *
+ * @since CUPS 1.4@
  */
 
 int *					/* O - New OID */
@@ -133,19 +139,61 @@ cupsSNMPCopyOID(int       *dst,		/* I - Destination OID */
   int	i;				/* Looping var */
 
 
-  for (i = 0, dstsize --; src[i] && i < dstsize; i ++)
+  for (i = 0, dstsize --; src[i] >= 0 && i < dstsize; i ++)
     dst[i] = src[i];
 
-  dst[i] = 0;
+  dst[i] = -1;
 
   return (dst);
 }
 
 
 /*
+ * 'cupsSNMPDefaultCommunity()' - Get the default SNMP community name.
+ *
+ * The default community name is the first community name found in the
+ * snmp.conf file. If no community name is defined there, "public" is used.
+ *
+ * @since CUPS 1.4@
+ */
+
+const char *				/* O - Default community name */
+cupsSNMPDefaultCommunity(void)
+{
+  cups_file_t	*fp;			/* snmp.conf file */
+  char		line[1024],		/* Line from file */
+		*value;			/* Value from file */
+  int		linenum;		/* Line number in file */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->snmp_community[0])
+  {
+    strlcpy(cg->snmp_community, "public", sizeof(cg->snmp_community));
+
+    snprintf(line, sizeof(line), "%s/snmp.conf", cg->cups_serverroot);
+    if ((fp = cupsFileOpen(line, "r")) != NULL)
+    {
+      linenum = 0;
+      while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+	if (!strcasecmp(line, "Community") && value)
+	{
+	  strlcpy(cg->snmp_community, value, sizeof(cg->snmp_community));
+	  break;
+	}
+
+      cupsFileClose(fp);
+    }
+  }
+
+  return (cg->snmp_community);
+}
+
+
+/*
  * 'cupsSNMPIsOID()' - Test whether a SNMP response contains the specified OID.
  *
- * The array pointed to by "oid" is 0-terminated.
+ * The array pointed to by "oid" is terminated by the value -1.
  *
  * @since CUPS 1.4@
  */
@@ -168,7 +216,9 @@ cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
   * Compare OIDs...
   */
 
-  for (i = 0; i < CUPS_SNMP_MAX_OID && oid[i] && packet->object_name[i]; i ++)
+  for (i = 0;
+       i < CUPS_SNMP_MAX_OID && oid[i] >= 0 && packet->object_name[i] >= 0;
+       i ++)
     if (oid[i] != packet->object_name[i])
       return (0);
 
@@ -180,7 +230,7 @@ cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
  * 'cupsSNMPIsOIDPrefixed()' - Test whether a SNMP response uses the specified
  *                             OID prefix.
  *
- * The array pointed to by "prefix" is 0-terminated.
+ * The array pointed to by "prefix" is terminated by the value -1.
  *
  * @since CUPS 1.4@
  */
@@ -205,7 +255,7 @@ cupsSNMPIsOIDPrefixed(
   */
 
   for (i = 0;
-       i < CUPS_SNMP_MAX_OID && prefix[i] && packet->object_name[i];
+       i < CUPS_SNMP_MAX_OID && prefix[i] >= 0 && packet->object_name[i] >= 0;
        i ++)
     if (prefix[i] != packet->object_name[i])
       return (0);
@@ -221,7 +271,7 @@ cupsSNMPIsOIDPrefixed(
  */
 
 int					/* O - SNMP socket file descriptor */
-cupsSNMPOpen(void)
+cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INET6@ */
 {
   int		fd;			/* SNMP socket file descriptor */
   int		val;			/* Socket option value */
@@ -231,7 +281,7 @@ cupsSNMPOpen(void)
   * Create the SNMP socket...
   */
 
-  if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((fd = socket(family, SOCK_DGRAM, 0)) < 0)
     return (-1);
 
  /*
@@ -252,15 +302,15 @@ cupsSNMPOpen(void)
 
 
 /*
- * 'cupsSNMPRead()' - Read and parse a SNMP response...
+ * 'cupsSNMPRead()' - Read and parse a SNMP response.
  *
- * If "timeout" is negative, cupsSNMPRead() will wait for a response
+ * If "timeout" is negative, @code cupsSNMPRead@ will wait for a response
  * indefinitely.
  *
  * @since CUPS 1.4@
  */
 
-cups_snmp_t *				/* O - SNMP packet or NULL if none */
+cups_snmp_t *				/* O - SNMP packet or @code NULL@ if none */
 cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
              cups_snmp_t *packet,	/* I - SNMP packet buffer */
 	     int         msec)		/* I - Timeout in milliseconds */
@@ -269,6 +319,7 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 					/* Data packet */
   int		bytes;			/* Number of bytes received */
   socklen_t	addrlen;		/* Source address length */
+  http_addr_t	address;		/* Source address */
 
 
  /*
@@ -326,10 +377,10 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Read the response data...
   */
 
-  addrlen = sizeof(packet->address);
+  addrlen = sizeof(address);
 
-  if ((bytes = recvfrom(fd, buffer, sizeof(buffer), 0,
-                        (void *)&(packet->address), &addrlen)) < 0)
+  if ((bytes = recvfrom(fd, buffer, sizeof(buffer), 0, (void *)&address,
+                        &addrlen)) < 0)
     return (NULL);
 
  /*
@@ -339,6 +390,8 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   asn1_debug("DEBUG: IN ", buffer, bytes, 0);
 
   asn1_decode_snmp(buffer, bytes, packet);
+
+  memcpy(&(packet->address), &address, sizeof(packet->address));
 
  /*
   * Return decoded data packet...
@@ -365,9 +418,74 @@ cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
 
 
 /*
+ * 'cupsSNMPWalk()' - Enumerate a group of OIDs.
+ *
+ * This function queries all of the OIDs with the specified OID prefix,
+ * calling the "cb" function for every response that is received.
+ *
+ * The array pointed to by "prefix" is terminated by the value -1.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - Number of OIDs found or -1 on error */
+cupsSNMPWalk(int            fd,		/* I - SNMP socket */
+             http_addr_t    *address,	/* I - Address to query */
+	     int            version,	/* I - SNMP version */
+	     const char     *community,	/* I - Community name */
+             const int      *prefix,	/* I - OID prefix */
+	     int            msec,	/* I - Timeout for each response in milliseconds */
+	     cups_snmp_cb_t cb,		/* I - Function to call for each response */
+	     void           *data)	/* I - User data pointer that is passed to the callback function */
+{
+  int		count = 0;		/* Number of OIDs found */
+  int		request_id = 0;		/* Current request ID */
+  cups_snmp_t	packet;			/* Current response packet */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (fd < 0 || !address || version != CUPS_SNMP_VERSION_1 || !community ||
+      !prefix || !cb)
+    return (-1);
+
+ /*
+  * Copy the OID prefix and then loop until we have no more OIDs...
+  */
+
+  cupsSNMPCopyOID(packet.object_name, prefix, CUPS_SNMP_MAX_OID);
+
+  for (;;)
+  {
+    request_id ++;
+
+    if (!cupsSNMPWrite(fd, address, version, community,
+                       CUPS_ASN1_GET_NEXT_REQUEST, request_id,
+		       packet.object_name))
+      return (-1);
+
+    if (!cupsSNMPRead(fd, &packet, msec))
+      return (-1);
+
+    if (!cupsSNMPIsOIDPrefixed(&packet, prefix))
+      return (count);
+
+    if (packet.error || packet.error_status)
+      return (count > 0 ? count : -1);
+
+    count ++;
+
+    (*cb)(&packet, data);
+  }
+}
+
+
+/*
  * 'cupsSNMPWrite()' - Send an SNMP query packet.
  *
- * The array pointed to by "oid" is 0-terminated.
+ * The array pointed to by "oid" is terminated by the value -1.
  *
  * @since CUPS 1.4@
  */
@@ -390,6 +508,15 @@ cupsSNMPWrite(
 
 
  /*
+  * Range check input...
+  */
+
+  if (fd < 0 || !address || version != CUPS_SNMP_VERSION_1 || !community ||
+      (request_type != CUPS_ASN1_GET_REQUEST &&
+       request_type != CUPS_ASN1_GET_NEXT_REQUEST) || request_id < 1 || !oid)
+    return (0);
+
+ /*
   * Create the SNMP message...
   */
 
@@ -402,15 +529,21 @@ cupsSNMPWrite(
   
   strlcpy(packet.community, community, sizeof(packet.community));
 
-  for (i = 0; oid[i]; i ++)
+  for (i = 0; oid[i] >= 0 && i < (CUPS_SNMP_MAX_OID - 1); i ++)
     packet.object_name[i] = oid[i];
+  packet.object_name[i] = -1;
+
+  if (oid[i] >= 0)
+  {
+    errno = E2BIG;
+    return (0);
+  }
 
   bytes = asn1_encode_snmp(buffer, sizeof(buffer), &packet);
 
   if (bytes < 0)
   {
     errno = E2BIG;
-
     return (0);
   }
 
@@ -433,6 +566,203 @@ cupsSNMPWrite(
 
 
 /*
+ * 'asn1_debug()' - Decode an ASN1-encoded message.
+ */
+
+static void
+asn1_debug(const char    *prefix,	/* I - Prefix string */
+           unsigned char *buffer,	/* I - Buffer */
+           size_t        len,		/* I - Length of buffer */
+           int           indent)	/* I - Indentation */
+{
+  int		i;			/* Looping var */
+  unsigned char	*bufend;		/* End of buffer */
+  int		integer;		/* Number value */
+  int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
+  char		string[CUPS_SNMP_MAX_STRING];
+					/* String value */
+  unsigned char	value_type;		/* Type of value */
+  int		value_length;		/* Length of value */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (cg->snmp_debug <= 0)
+    return;
+
+  if (cg->snmp_debug > 1 && indent == 0)
+  {
+   /*
+    * Do a hex dump of the packet...
+    */
+
+    int j;
+
+    fprintf(stderr, "%sHex Dump (%d bytes):\n", prefix, (int)len);
+
+    for (i = 0; i < len; i += 16)
+    {
+      fprintf(stderr, "%s%04x:", prefix, i);
+
+      for (j = 0; j < 16 && (i + j) < len; j ++)
+      {
+        if (j && !(j & 3))
+	  fprintf(stderr, "  %02x", buffer[i + j]);
+        else
+	  fprintf(stderr, " %02x", buffer[i + j]);
+      }
+
+      while (j < 16)
+      {
+        if (j && !(j & 3))
+	  fputs("    ", stderr);
+	else
+	  fputs("   ", stderr);
+
+        j ++;
+      }
+
+      fputs("    ", stderr);
+
+      for (j = 0; j < 16 && (i + j) < len; j ++)
+        if (buffer[i + j] < ' ' || buffer[i + j] >= 0x7f)
+	  putc('.', stderr);
+	else
+	  putc(buffer[i + j], stderr);
+
+      putc('\n', stderr);
+    }
+  }
+
+  if (indent == 0)
+    fprintf(stderr, "%sMessage:\n", prefix);
+
+  bufend = buffer + len;
+
+  while (buffer < bufend)
+  {
+   /*
+    * Get value type...
+    */
+
+    value_type   = asn1_get_type(&buffer, bufend);
+    value_length = asn1_get_length(&buffer, bufend);
+
+    switch (value_type)
+    {
+      case CUPS_ASN1_BOOLEAN :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sBOOLEAN %d bytes %d\n", prefix, indent, "",
+	          value_length, integer);
+          break;
+
+      case CUPS_ASN1_INTEGER :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sINTEGER %d bytes %d\n", prefix, indent, "",
+	          value_length, integer);
+          break;
+
+      case CUPS_ASN1_COUNTER :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sCOUNTER %d bytes %u\n", prefix, indent, "",
+	          value_length, (unsigned)integer);
+          break;
+
+      case CUPS_ASN1_GAUGE :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sGAUGE %d bytes %u\n", prefix, indent, "",
+	          value_length, (unsigned)integer);
+          break;
+
+      case CUPS_ASN1_TIMETICKS :
+          integer = asn1_get_integer(&buffer, bufend, value_length);
+
+          fprintf(stderr, "%s%*sTIMETICKS %d bytes %u\n", prefix, indent, "",
+	          value_length, (unsigned)integer);
+          break;
+
+      case CUPS_ASN1_OCTET_STRING :
+          fprintf(stderr, "%s%*sOCTET STRING %d bytes \"%s\"\n", prefix,
+	          indent, "", value_length,
+		  asn1_get_string(&buffer, bufend, value_length, string,
+				  sizeof(string)));
+          break;
+
+      case CUPS_ASN1_HEX_STRING :
+	  asn1_get_string(&buffer, bufend, value_length, string,
+			  sizeof(string));
+          fprintf(stderr, "%s%*sHex-STRING %d bytes", prefix,
+	          indent, "", value_length);
+          for (i = 0; i < value_length; i ++)
+	    fprintf(stderr, " %02X", string[i] & 255);
+	  putc('\n', stderr);
+          break;
+
+      case CUPS_ASN1_NULL_VALUE :
+          fprintf(stderr, "%s%*sNULL VALUE %d bytes\n", prefix, indent, "",
+	          value_length);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_OID :
+          integer = asn1_get_oid(&buffer, bufend, value_length, oid,
+	                         CUPS_SNMP_MAX_OID);
+
+          fprintf(stderr, "%s%*sOID %d bytes ", prefix, indent, "",
+	          value_length);
+	  for (i = 0; i < integer; i ++)
+	    fprintf(stderr, ".%d", oid[i]);
+	  putc('\n', stderr);
+          break;
+
+      case CUPS_ASN1_SEQUENCE :
+          fprintf(stderr, "%s%*sSEQUENCE %d bytes\n", prefix, indent, "",
+	          value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_GET_NEXT_REQUEST :
+          fprintf(stderr, "%s%*sGet-Next-Request-PDU %d bytes\n", prefix,
+	          indent, "", value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_GET_REQUEST :
+          fprintf(stderr, "%s%*sGet-Request-PDU %d bytes\n", prefix, indent, "",
+	          value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      case CUPS_ASN1_GET_RESPONSE :
+          fprintf(stderr, "%s%*sGet-Response-PDU %d bytes\n", prefix, indent,
+	          "", value_length);
+          asn1_debug(prefix, buffer, value_length, indent + 4);
+
+	  buffer += value_length;
+          break;
+
+      default :
+          fprintf(stderr, "%s%*sUNKNOWN(%x) %d bytes\n", prefix, indent, "",
+	          value_type, value_length);
+
+	  buffer += value_length;
+          break;
+    }
+  }
+}
+          
+
+/*
  * 'asn1_decode_snmp()' - Decode a SNMP packet.
  */
 
@@ -451,6 +781,7 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
   */
 
   memset(packet, 0, sizeof(cups_snmp_t));
+  packet->object_name[0] = -1;
 
   bufptr = buffer;
   bufend = buffer + len;
@@ -556,6 +887,14 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 		                 packet->object_value.oid, CUPS_SNMP_MAX_OID);
 	            break;
 
+	        case CUPS_ASN1_HEX_STRING :
+		    packet->object_value.hex_string.num_bytes = length;
+
+		    asn1_get_string(&bufptr, bufend, length,
+		                    (char *)packet->object_value.hex_string.bytes,
+				    CUPS_SNMP_MAX_STRING);
+		    break;
+
 	        case CUPS_ASN1_COUNTER :
 		    packet->object_value.counter =
 		        asn1_get_integer(&bufptr, bufend, length);
@@ -563,6 +902,11 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 
 	        case CUPS_ASN1_GAUGE :
 		    packet->object_value.gauge =
+		        asn1_get_integer(&bufptr, bufend, length);
+	            break;
+
+	        case CUPS_ASN1_TIMETICKS :
+		    packet->object_value.timeticks =
 		        asn1_get_integer(&bufptr, bufend, length);
 	            break;
 
@@ -580,116 +924,6 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
   return (packet->error ? -1 : 0);
 }
 
-
-/*
- * 'asn1_debug()' - Decode an ASN1-encoded message.
- */
-
-static void
-asn1_debug(const char    *prefix,	/* I - Prefix string */
-           unsigned char *buffer,	/* I - Buffer */
-           size_t        len,		/* I - Length of buffer */
-           int           indent)	/* I - Indentation */
-{
-  int		i;			/* Looping var */
-  unsigned char	*bufend;		/* End of buffer */
-  int		integer;		/* Number value */
-  int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
-  char		string[CUPS_SNMP_MAX_STRING];
-					/* String value */
-  unsigned char	value_type;		/* Type of value */
-  int		value_length;		/* Length of value */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
-
-
-  if (cg->snmp_debug <= 0)
-    return;
-
-  bufend = buffer + len;
-
-  while (buffer < bufend)
-  {
-   /*
-    * Get value type...
-    */
-
-    value_type   = asn1_get_type(&buffer, bufend);
-    value_length = asn1_get_length(&buffer, bufend);
-
-    switch (value_type)
-    {
-      case CUPS_ASN1_BOOLEAN :
-          integer = asn1_get_integer(&buffer, bufend, value_length);
-
-          fprintf(stderr, "%s%*sBOOLEAN %d bytes %d\n", prefix, indent, "",
-	          value_length, integer);
-          break;
-
-      case CUPS_ASN1_INTEGER :
-          integer = asn1_get_integer(&buffer, bufend, value_length);
-
-          fprintf(stderr, "%s%*sINTEGER %d bytes %d\n", prefix, indent, "",
-	          value_length, integer);
-          break;
-
-      case CUPS_ASN1_OCTET_STRING :
-          fprintf(stderr, "%s%*sOCTET STRING %d bytes \"%s\"\n", prefix,
-	          indent, "", value_length,
-		  asn1_get_string(&buffer, bufend, value_length, string,
-				  sizeof(string)));
-          break;
-
-      case CUPS_ASN1_NULL_VALUE :
-          fprintf(stderr, "%s%*sNULL VALUE %d bytes\n", prefix, indent, "",
-	          value_length);
-
-	  buffer += value_length;
-          break;
-
-      case CUPS_ASN1_OID :
-          asn1_get_oid(&buffer, bufend, value_length, oid, CUPS_SNMP_MAX_OID);
-
-          fprintf(stderr, "%s%*sOID %d bytes ", prefix, indent, "",
-	          value_length);
-	  for (i = 0; oid[i]; i ++)
-	    fprintf(stderr, ".%d", oid[i]);
-	  putc('\n', stderr);
-          break;
-
-      case CUPS_ASN1_SEQUENCE :
-          fprintf(stderr, "%s%*sSEQUENCE %d bytes\n", prefix, indent, "",
-	          value_length);
-          asn1_debug(prefix, buffer, value_length, indent + 4);
-
-	  buffer += value_length;
-          break;
-
-      case CUPS_ASN1_GET_REQUEST :
-          fprintf(stderr, "%s%*sGet-Request-PDU %d bytes\n", prefix, indent, "",
-	          value_length);
-          asn1_debug(prefix, buffer, value_length, indent + 4);
-
-	  buffer += value_length;
-          break;
-
-      case CUPS_ASN1_GET_RESPONSE :
-          fprintf(stderr, "%s%*sGet-Response-PDU %d bytes\n", prefix, indent,
-	          "", value_length);
-          asn1_debug(prefix, buffer, value_length, indent + 4);
-
-	  buffer += value_length;
-          break;
-
-      default :
-          fprintf(stderr, "%s%*sUNKNOWN(%x) %d bytes\n", prefix, indent, "",
-	          value_type, value_length);
-
-	  buffer += value_length;
-          break;
-    }
-  }
-}
-          
 
 /*
  * 'asn1_encode_snmp()' - Encode a SNMP packet.
@@ -714,6 +948,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
  /*
   * Get the lengths of the community string, OID, and message...
   */
+
 
   namelen = asn1_size_oid(packet->object_name);
 
@@ -780,7 +1015,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
   memcpy(bufptr, packet->community, commlen);
   bufptr += commlen;
 
-  *bufptr++ = packet->request_type;	/* Get-Request-PDU */
+  *bufptr++ = packet->request_type;	/* Get-Request-PDU/Get-Next-Request-PDU */
   asn1_set_length(&bufptr, reqlen);
 
   asn1_set_integer(&bufptr, packet->request_id);
@@ -880,7 +1115,7 @@ asn1_get_length(unsigned char **buffer,	/* IO - Pointer in buffer */
  * 'asn1_get_oid()' - Get an OID value.
  */
 
-static int				/* O  - Last OID number */
+static int				/* O  - Number of OIDs */
 asn1_get_oid(
     unsigned char **buffer,		/* IO - Pointer in buffer */
     unsigned char *bufend,		/* I  - End of buffer */
@@ -889,11 +1124,13 @@ asn1_get_oid(
     int           oidsize)		/* I  - Size of OID buffer */
 {
   unsigned char	*valend;		/* End of value */
-  int		*oidend;		/* End of OID buffer */
+  int		*oidptr,		/* Current OID */
+		*oidend;		/* End of OID buffer */
   int		number;			/* OID number */
 
 
   valend = *buffer + length;
+  oidptr = oid;
   oidend = oid + oidsize - 1;
 
   if (valend > bufend)
@@ -903,28 +1140,28 @@ asn1_get_oid(
 
   if (number < 80)
   {
-    *oid++ = number / 40;
-    number = number % 40;
-    *oid++ = number;
+    *oidptr++ = number / 40;
+    number    = number % 40;
+    *oidptr++ = number;
   }
   else
   {
-    *oid++ = 2;
-    number -= 80;
-    *oid++ = number;
+    *oidptr++ = 2;
+    number    -= 80;
+    *oidptr++ = number;
   }
 
   while (*buffer < valend)
   {
     number = asn1_get_packed(buffer, bufend);
 
-    if (oid < oidend)
-      *oid++ = number;
+    if (oidptr < oidend)
+      *oidptr++ = number;
   }
 
-  *oid = 0;
+  *oidptr = -1;
 
-  return (number);
+  return (oidptr - oid);
 }
 
 
@@ -1126,9 +1363,15 @@ asn1_set_oid(unsigned char **buffer,	/* IO - Pointer in buffer */
 
   asn1_set_length(buffer, asn1_size_oid(oid));
 
+  if (oid[1] < 0)
+  {
+    asn1_set_packed(buffer, oid[0] * 40);
+    return;
+  }
+
   asn1_set_packed(buffer, oid[0] * 40 + oid[1]);
 
-  for (oid += 2; *oid; oid ++)
+  for (oid += 2; *oid >= 0; oid ++)
     asn1_set_packed(buffer, *oid);
 }
 
@@ -1143,25 +1386,25 @@ asn1_set_packed(unsigned char **buffer,	/* IO - Pointer in buffer */
 {
   if (integer > 0xfffffff)
   {
-    **buffer = (integer >> 28) & 0x7f;
+    **buffer = ((integer >> 28) & 0x7f) | 0x80;
     (*buffer) ++;
   }
 
   if (integer > 0x1fffff)
   {
-    **buffer = (integer >> 21) & 0x7f;
+    **buffer = ((integer >> 21) & 0x7f) | 0x80;
     (*buffer) ++;
   }
 
   if (integer > 0x3fff)
   {
-    **buffer = (integer >> 14) & 0x7f;
+    **buffer = ((integer >> 14) & 0x7f) | 0x80;
     (*buffer) ++;
   }
 
   if (integer > 0x7f)
   {
-    **buffer = (integer >> 7) & 0x7f;
+    **buffer = ((integer >> 7) & 0x7f) | 0x80;
     (*buffer) ++;
   }
 
@@ -1217,7 +1460,12 @@ asn1_size_oid(const int *oid)		/* I - OID value */
   int	length;				/* Length of value */
 
 
-  for (length = asn1_size_packed(oid[0] * 40 + oid[1]), oid += 2; *oid; oid ++)
+  if (oid[1] < 0)
+    return (asn1_size_packed(oid[0] * 40));
+
+  for (length = asn1_size_packed(oid[0] * 40 + oid[1]), oid += 2;
+       *oid >= 0;
+       oid ++)
     length += asn1_size_packed(*oid);
 
   return (length);

@@ -37,7 +37,6 @@
 
 #include "common.h"
 #include "image-private.h"
-#include "raster.h"
 #include <unistd.h>
 #include <math.h>
 #include <cups/i18n.h>

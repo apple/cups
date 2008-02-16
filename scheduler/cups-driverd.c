@@ -60,7 +60,7 @@ extern cups_encoding_t	_ppdGetEncoding(const char *name);
 #define PPD_TYPE_FAX		3	/* Facsimile/MFD PPD */
 #define PPD_TYPE_UNKNOWN	4	/* Other/hybrid PPD */
 
-static const char *ppd_types[] =
+static const char * const ppd_types[] =	/* ppd-type values */
 {
   "postscript",
   "pdf",

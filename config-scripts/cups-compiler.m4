@@ -60,6 +60,9 @@ dnl Read-only data/program support on Linux...
 AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
 
 dnl Update compiler options...
+CXXLIBS="${CXXLIBS:=}"
+AC_SUBST(CXXLIBS)
+
 PIEFLAGS=""
 AC_SUBST(PIEFLAGS)
 

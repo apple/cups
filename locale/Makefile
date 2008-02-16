@@ -3,7 +3,7 @@
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -55,6 +55,7 @@ install-languages:
 		if test -f cups_$$loc.po; then \
 			$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
 			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+			$(INSTALL_DATA) ppdc_$$loc.po $(LOCALEDIR)/$$loc/ppdc_$$loc.po ; \
 		fi ; \
 	done
 
@@ -68,6 +69,7 @@ uninstall: $(UNINSTALL_LANGUAGES)
 uninstall-languages:
 	-for loc in $(LANGUAGES) ; do \
 		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
+		$(RM) $(LOCALEDIR)/$$loc/ppdc_$$loc.po ; \
 	done
 
 

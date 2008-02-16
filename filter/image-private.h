@@ -24,7 +24,6 @@
  */
 
 #  include "image.h"
-#  include "raster.h"
 #  include <cups/cups.h>
 #  include <cups/debug.h>
 #  include <cups/string.h>

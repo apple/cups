@@ -587,6 +587,7 @@ show_printer(http_t     *http,		/* I - Connection to server */
     * Show the printer status...
     */
 
+    cgiSetVariable("_SINGLE_DEST", "1");
     cgiCopyTemplateLang("printers.tmpl");
 
    /*

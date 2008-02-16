@@ -3,7 +3,7 @@
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -74,6 +74,16 @@ DATAFILES =	\
 		psglyphs \
 		testprint.ps
 
+PPDCFILES =	\
+		epson.h \
+		escp.h \
+		font.defs \
+		hp.h \
+		label.h \
+		media.defs \
+		pcl.h \
+		raster.defs
+
 
 #
 # Make everything...
@@ -117,6 +127,10 @@ install:	all
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
+	$(INSTALL_DIR) -m 755 $(DATADIR)/ppdc
+	for file in $(PPDCFILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/ppdc; \
+	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/profiles
 
 
@@ -137,7 +151,11 @@ uninstall:
 	for file in $(DATAFILES); do \
 		$(RM) $(DATADIR)/data/$$file; \
 	done
+	for file in $(PPDCFILES); do \
+		$(RM) $(DATADIR)/ppdc/$$file; \
+	done
 	-$(RMDIR) $(DATADIR)/profiles
+	-$(RMDIR) $(DATADIR)/ppdc
 	-$(RMDIR) $(DATADIR)/data
 	-$(RMDIR) $(DATADIR)/charsets
 	-$(RMDIR) $(DATADIR)/charmaps

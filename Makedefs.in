@@ -20,6 +20,7 @@
 AR		=	@AR@
 AWK		=	@AWK@
 CC		=	@LIBTOOL@ @CC@
+CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@
 HTMLDOC		=	@HTMLDOC@
 INSTALL		=	@INSTALL@
@@ -109,12 +110,16 @@ INSTALLSTATIC	=	@INSTALLSTATIC@
 
 ALL_CFLAGS	=	-I.. -D_CUPS_SOURCE $(CFLAGS) $(SSLFLAGS) \
 			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
+ALL_CXXFLAGS	=	-I.. -D_CUPS_SOURCE $(CXXFLAGS) $(SSLFLAGS) \
+			@LARGEFILE@ @PTHREAD_FLAGS@ $(OPTIONS)
 ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
 CFLAGS		=	@CPPFLAGS@ @CFLAGS@
 COMMONLIBS	=	@LIBS@
 CUPSDLIBS	=	@CUPSDLIBS@
+CXXFLAGS	=	@CPPFLAGS@ @CXXFLAGS@
+CXXLIBS		=	@CXXLIBS@
 DSOFLAGS	=	@DSOFLAGS@
 DSOLIBS		=	@DSOLIBS@ $(COMMONLIBS)
 DNSSDLIBS	=	@DNSSDLIBS@
@@ -237,7 +242,7 @@ DBUSDIR		=	@DBUSDIR@
 #
 
 .SILENT:
-.SUFFIXES:	.1 .1.gz .1m .1m.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .h .man .o .32.o .64.o .gz
+.SUFFIXES:	.1 .1.gz .1m .1m.gz .3 .3.gz .5 .5.gz .7 .7.gz .8 .8.gz .a .c .cxx .h .man .o .32.o .64.o .gz
 
 .c.o:
 	echo Compiling $<...
@@ -251,12 +256,16 @@ DBUSDIR		=	@DBUSDIR@
 	echo Compiling 64-bit $<...
 	$(CC) $(ARCH64FLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
-.man.1 .man.1m .man.5 .man.7 .man.8:
+.cxx.o:
+	echo Compiling $<...
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(ALL_CXXFLAGS) -c $<
+
+.man.1 .man.1m .man.3 .man.5 .man.7 .man.8:
 	echo Linking $<...
 	$(RM) $@
 	$(LN) $< $@
 
-.man.1.gz .man.1m.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
+.man.1.gz .man.1m.gz .man.3.gz .man.5.gz .man.7.gz .man.8.gz .man.gz:
 	echo -n Compressing $<...
 	$(RM) $@
 	gzip -v9 <$< >$@

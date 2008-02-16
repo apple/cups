@@ -71,8 +71,8 @@ depend:
 	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
 	$(RM) Dependencies
 	cp Dependencies.tmp Dependencies
-	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
-	sed -r -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
 	$(RM) Dependencies.tmp
 
 
@@ -113,7 +113,6 @@ installstatic:
 installhdrs:
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) raster.h $(INCLUDEDIR)/cups
 
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
@@ -147,7 +146,6 @@ uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(LIBDIR)/libcupsimage.so.2
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/image.h
-	$(RM) $(INCLUDEDIR)/cups/raster.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
 
 uninstall32bit:
@@ -170,7 +168,8 @@ apihelp:
 	mxmldoc --section "Programming" --title "Raster API" \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
-		raster.h interpret.c raster.c >../doc/help/api-raster.html
+		../cups/raster.h interpret.c raster.c \
+		>../doc/help/api-raster.html
 
 framedhelp:
 	echo Generating CUPS API help files...
@@ -178,7 +177,7 @@ framedhelp:
 		--framed ../cups/api-raster \
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
-		raster.h interpret.c raster.c
+		../cups/raster.h interpret.c raster.c
 
 
 #

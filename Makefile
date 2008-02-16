@@ -19,8 +19,8 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
-		notifier scheduler systemv test \
+DIRS	=	cups filter backend berkeley cgi-bin driver locale man monitor \
+		notifier ppdc scheduler systemv test \
 		$(PHPDIR) \
 		conf data doc $(FONTS) ppd templates
 
@@ -31,6 +31,10 @@ DIRS	=	cups backend berkeley cgi-bin filter locale man monitor \
 
 all:
 	chmod +x cups-config
+	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
+	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using LDFLAGS="$(LDFLAGS)"
+	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
 		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\

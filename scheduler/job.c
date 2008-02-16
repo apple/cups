@@ -352,6 +352,7 @@ cupsdCheckJobs(void)
   cupsd_job_t		*job;		/* Current job in queue */
   cupsd_printer_t	*printer,	/* Printer destination */
 			*pclass;	/* Printer class destination */
+  ipp_attribute_t	*attr;		/* Job attribute */
 
 
   DEBUG_puts("cupsdCheckJobs()");
@@ -385,6 +386,17 @@ cupsdCheckJobs(void)
 
       job->state->values[0].integer = IPP_JOB_PENDING;
       job->state_value              = IPP_JOB_PENDING;
+
+      if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+				   IPP_TAG_KEYWORD)) == NULL)
+	attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+      if (attr)
+      {
+	attr->value_tag = IPP_TAG_KEYWORD;
+	cupsdSetString(&(attr->values[0].string.text), "no-hold");
+	cupsdSaveJob(job);
+      }
     }
 
    /*
@@ -443,9 +455,6 @@ cupsdCheckJobs(void)
 	  * Add/update a job-actual-printer-uri attribute for this job
 	  * so that we know which printer actually printed the job...
 	  */
-
-          ipp_attribute_t	*attr;	/* job-actual-printer-uri attribute */
-
 
           if ((attr = ippFindAttribute(job->attrs, "job-actual-printer-uri",
 	                               IPP_TAG_URI)) != NULL)
