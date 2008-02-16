@@ -1019,7 +1019,7 @@ ippReadIO(void       *src,		/* I - Data source */
           ipp_t      *ipp)		/* I - IPP data */
 {
   int			n;		/* Length of data */
-  unsigned char		buffer[IPP_MAX_LENGTH],
+  unsigned char		buffer[IPP_MAX_LENGTH + 1],
 					/* Data buffer */
 			string[IPP_MAX_NAME],
 					/* Small string buffer */
