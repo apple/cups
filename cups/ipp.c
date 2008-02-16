@@ -2415,7 +2415,8 @@ ippWriteIO(void       *dst,		/* I - Destination */
 	    return (IPP_ERROR);
 	  }
 
-          DEBUG_printf(("ippWriteIO: wrote %d bytes\n", bufptr - buffer));
+          DEBUG_printf(("ippWriteIO: wrote %d bytes\n",
+	                (int)(bufptr - buffer)));
 
 	 /*
           * If blocking is disabled, stop here...
@@ -2743,7 +2744,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   
 
   DEBUG_printf(("ipp_read_http(http=%p, buffer=%p, length=%d)\n",
-                http, buffer, length));
+                http, buffer, (int)length));
 
  /*
   * Loop until all bytes are read...
