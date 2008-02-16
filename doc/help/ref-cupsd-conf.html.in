@@ -31,7 +31,8 @@ process using the startup script for your operating system:</P>
 
 	<LI>MacOS X:
 	<PRE CLASS="command">
-/System/Library/StartupItems/PrintingServices/PrintingServices restart
+sudo launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist
+sudo launchctl load /System/Library/LaunchDaemons/org.cups.cupsd.plist
 	</PRE></LI>
 
 </UL>
