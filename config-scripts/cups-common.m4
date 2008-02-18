@@ -218,7 +218,8 @@ if test "x$enable_dbus" != xno; then
 			CUPSDLIBS="$CUPSDLIBS `$PKGCONFIG --libs dbus-1`"
 			AC_CHECK_LIB(dbus-1,
 			    dbus_message_iter_init_append,
-			    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
+			    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
+			    `$PKGCONFIG --libs dbus-1`)
 		else
 			AC_MSG_RESULT(no)
 		fi
