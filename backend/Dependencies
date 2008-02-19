@@ -46,6 +46,12 @@ test1284.o: ../cups/backend.h ../cups/versioning.h ../cups/sidechannel.h
 test1284.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 test1284.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 test1284.o: ../cups/i18n.h ../cups/transcode.h ../cups/snmp.h
+testsupplies.o: backend-private.h ../cups/backend.h ../cups/versioning.h
+testsupplies.o: ../cups/sidechannel.h ../cups/cups.h ../cups/ipp.h
+testsupplies.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+testsupplies.o: ../cups/language.h ../cups/debug.h ../cups/i18n.h
+testsupplies.o: ../cups/transcode.h ../cups/snmp.h ../cups/string.h
+testsupplies.o: ../config.h
 usb.o: ../cups/backend.h ../cups/versioning.h ../cups/cups.h ../cups/ipp.h
 usb.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 usb.o: ../cups/language.h ../cups/string.h ../config.h ../cups/i18n.h
