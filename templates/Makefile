@@ -125,7 +125,7 @@ install-languages:
 		if test -d $$lang; then \
 			$(INSTALL_DIR) -m 755 $(DATADIR)/templates/$$lang; \
 			for file in $(FILES); do \
-				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang || true; \
+				$(INSTALL_DATA) $$lang/$$file $(DATADIR)/templates/$$lang 2>/dev/null || true; \
 			done \
 		fi \
 	done
