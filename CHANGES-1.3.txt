@@ -1,6 +1,12 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.7
+
+	- The scheduler incorrectly complained about missing LSB
+	  PPD directories.
+
+
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)
