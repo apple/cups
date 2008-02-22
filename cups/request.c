@@ -247,6 +247,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       status   = http->status;
     }
 
+    if (status == HTTP_FORBIDDEN)
+      break;
+
     if (response)
     {
       if (outfile >= 0)
@@ -399,10 +402,14 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * See if we can do authentication...
       */
 
+      int auth_result;
+
       DEBUG_puts("cupsGetResponse: Need authorization...");
 
-      if (!cupsDoAuthentication(http, "POST", resource))
+      if ((auth_result =cupsDoAuthentication(http, "POST", resource)) == 0)
 	httpReconnect(http);
+      else if (auth_result < 0)
+        http->status = status = HTTP_FORBIDDEN;
     }
 
 #ifdef HAVE_SSL
