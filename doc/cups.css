@@ -66,6 +66,7 @@ A:link:hover IMG {
 }
 
 A:link, A:visited {
+  font-weight: normal;
   text-decoration: none;
   color: #000099;
 }

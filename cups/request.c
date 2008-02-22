@@ -51,15 +51,15 @@
  * 'cupsDoFileRequest()' - Do an IPP request with a file.
  *
  * This function sends the IPP request to the specified server, retrying
- * and authenticating as necessary.  The request is freed with ippDelete()
+ * and authenticating as necessary.  The request is freed with @link ippDelete@
  * after receiving a valid IPP response.
  */
 
 ipp_t *					/* O - Response data */
-cupsDoFileRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                   ipp_t      *request,	/* I - IPP request */
                   const char *resource,	/* I - HTTP resource for POST */
-		  const char *filename)	/* I - File to send or NULL for none */
+		  const char *filename)	/* I - File to send or @code NULL@ for none */
 {
   ipp_t		*response;		/* IPP response data */
   int		infile;			/* Input file */
@@ -110,7 +110,7 @@ cupsDoFileRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT 
  */
 
 ipp_t *					/* O - Response data */
-cupsDoIORequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                 ipp_t      *request,	/* I - IPP request */
                 const char *resource,	/* I - HTTP resource for POST */
 		int        infile,	/* I - File to read from or -1 for none */
@@ -289,7 +289,7 @@ cupsDoIORequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
  */
 
 ipp_t *					/* O - Response data */
-cupsDoRequest(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
               ipp_t      *request,	/* I - IPP request */
               const char *resource)	/* I - HTTP resource for POST */
 {
@@ -307,8 +307,8 @@ cupsDoRequest(http_t     *http,		/* I - HTTP connection or CUPS_HTTP_DEFAULT */
  * @since CUPS 1.4@
  */
 
-ipp_t *					/* O - Response or NULL on HTTP error */
-cupsGetResponse(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+ipp_t *					/* O - Response or @code NULL@ on HTTP error */
+cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                 const char *resource)	/* I - HTTP resource for POST */
 {
   http_status_t	status;			/* HTTP status */
@@ -449,7 +449,7 @@ cupsGetResponse(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
 
 ssize_t					/* O - Bytes read, 0 on EOF, -1 on error */
 cupsReadResponseData(
-    http_t *http,			/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    http_t *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     char   *buffer,			/* I - Buffer to use */
     size_t length)			/* I - Number of bytes to read */
 {
@@ -492,7 +492,7 @@ cupsReadResponseData(
  */
 
 http_status_t				/* O - Initial HTTP status */
-cupsSendRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                 ipp_t      *request,	/* I - IPP request */
                 const char *resource,	/* I - Resource path */
 		size_t     length)	/* I - Length of data to follow or CUPS_LENGTH_VARIABLE */
@@ -662,15 +662,15 @@ cupsSendRequest(http_t     *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
 /*
  * 'cupsWriteRequestData()' - Write additional data after an IPP request.
  *
- * This function is used after cupsSendRequest() or cupsStartDocument()
- * to provide a PPD or document file as needed.
+ * This function is used after @link cupsSendRequest@ to provide a PPD and
+ * after @link cupsStartDocument@ to provide a document file.
  *
  * @since CUPS 1.4@
  */
 
-http_status_t				/* O - HTTP_CONTINUE if OK or HTTP status on error */
+http_status_t				/* O - @code HTTP_CONTINUE@ if OK or HTTP status on error */
 cupsWriteRequestData(
-    http_t     *http,			/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+    http_t     *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     const char *buffer,			/* I - Bytes to write */
     size_t     length)			/* I - Number of bytes to write */
 {

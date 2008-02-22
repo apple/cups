@@ -55,13 +55,12 @@ BLOCKQUOTE {
 }
 
 A:link, A:visited {
+  font-weight: normal;
   text-decoration: none;
-  font-weight: bold;
 }
 
 A:link:hover, A:visited:hover, A:active {
   text-decoration: underline;
-  font-weight: bold;
 }
 
 SUB, SUP {
@@ -810,7 +809,7 @@ int cupsDoAuthentication (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection to server</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>method</dt>
 <dd class="description">Request method (&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;)</dd>
 <dt>resource</dt>
@@ -835,19 +834,19 @@ status, prior to resubmitting your request.
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>request</dt>
 <dd class="description">IPP request</dd>
 <dt>resource</dt>
 <dd class="description">HTTP resource for POST</dd>
 <dt>filename</dt>
-<dd class="description">File to send or NULL for none</dd>
+<dd class="description">File to send or <code>NULL</code> for none</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Response data</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function sends the IPP request to the specified server, retrying
-and authenticating as necessary.  The request is freed with ippDelete()
+and authenticating as necessary.  The request is freed with <a href="#ippDelete"><code>ippDelete</code></a>
 after receiving a valid IPP response.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsDoIORequest">cupsDoIORequest</a></h3>
 <p class="description">Do an IPP request with file descriptors.</p>
@@ -862,7 +861,7 @@ after receiving a valid IPP response.</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>request</dt>
 <dd class="description">IPP request</dd>
 <dt>resource</dt>
@@ -897,7 +896,7 @@ all of the data after the IPP response message to the file.
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>request</dt>
 <dd class="description">IPP request</dd>
 <dt>resource</dt>
@@ -966,12 +965,12 @@ to add the standard groups.
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>resource</dt>
 <dd class="description">HTTP resource for POST</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Response or NULL on HTTP error</p>
+<p class="description">Response or <code>NULL</code> on HTTP error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use this function to get the response for an IPP request sent using
 cupsSendDocument() or cupsSendRequest(). For requests that return
@@ -989,7 +988,7 @@ ssize_t cupsReadResponseData (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>buffer</dt>
 <dd class="description">Buffer to use</dd>
 <dt>length</dt>
@@ -1014,7 +1013,7 @@ http_status_t cupsSendRequest (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>request</dt>
 <dd class="description">IPP request</dd>
 <dt>resource</dt>
@@ -1045,17 +1044,17 @@ http_status_t cupsWriteRequestData (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or CUPS_HTTP_DEFAULT</dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>buffer</dt>
 <dd class="description">Bytes to write</dd>
 <dt>length</dt>
 <dd class="description">Number of bytes to write</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">HTTP_CONTINUE if OK or HTTP status on error</p>
+<p class="description"><code>HTTP_CONTINUE</code> if OK or HTTP status on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function is used after cupsSendRequest() or cupsStartDocument()
-to provide a PPD or document file as needed.
+<p class="discussion">This function is used after <a href="#cupsSendRequest"><code>cupsSendRequest</code></a> to provide a PPD and
+after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="httpAddrAny">httpAddrAny</a></h3>
@@ -1249,7 +1248,7 @@ void httpBlocking (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>b</dt>
 <dd class="description">1 = blocking, 0 = non-blocking</dd>
 </dl>
@@ -1262,7 +1261,7 @@ int httpCheck (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 = no data, 1 = data available</p>
@@ -1275,7 +1274,7 @@ void httpClearCookie (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h3 class="function"><a name="httpClearFields">httpClearFields</a></h3>
 <p class="description">Clear HTTP request fields.</p>
@@ -1286,7 +1285,7 @@ void httpClearFields (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h3 class="function"><a name="httpClose">httpClose</a></h3>
 <p class="description">Close an HTTP connection...</p>
@@ -1297,7 +1296,7 @@ void httpClose (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h3 class="function"><a name="httpConnect">httpConnect</a></h3>
 <p class="description">Connect to a HTTP server.</p>
@@ -1384,7 +1383,7 @@ int httpDelete (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI to delete</dd>
 </dl>
@@ -1443,7 +1442,7 @@ int httpEncryption (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>e</dt>
 <dd class="description">New encryption preference</dd>
 </dl>
@@ -1458,7 +1457,7 @@ int httpError (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Error code (errno) value</p>
@@ -1471,7 +1470,7 @@ void httpFlush (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="httpFlushWrite">httpFlushWrite</a></h3>
 <p class="description">Flush data in write buffer.</p>
@@ -1482,7 +1481,7 @@ int httpFlushWrite (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Bytes written or -1 on error</p>
@@ -1496,7 +1495,7 @@ int httpGet (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI to get</dd>
 </dl>
@@ -1511,7 +1510,7 @@ char *httpGetAuthString (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Authorization string</p>
@@ -1531,7 +1530,7 @@ int httpGetBlocking (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 if blocking, 0 if non-blocking</p>
@@ -1602,7 +1601,7 @@ int httpGetFd (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">File descriptor or -1 if none</p>
@@ -1616,7 +1615,7 @@ const char *httpGetField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>field</dt>
 <dd class="description">Field to get</dd>
 </dl>
@@ -1672,7 +1671,7 @@ int httpGetLength (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Content length</p>
@@ -1691,7 +1690,7 @@ off_t httpGetLength2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Content length</p>
@@ -1709,7 +1708,7 @@ http_status_t httpGetStatus (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
@@ -1725,7 +1724,7 @@ char *httpGetSubField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>name</dt>
@@ -1748,7 +1747,7 @@ char *httpGetSubField2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>name</dt>
@@ -1775,7 +1774,7 @@ char *httpGets (<br>
 <dt>length</dt>
 <dd class="description">Max length of buffer</dd>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Line or NULL</p>
@@ -1789,7 +1788,7 @@ int httpHead (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI for head</dd>
 </dl>
@@ -1872,7 +1871,7 @@ int httpOptions (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI for options</dd>
 </dl>
@@ -1888,7 +1887,7 @@ int httpPost (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI for post</dd>
 </dl>
@@ -1904,7 +1903,7 @@ int httpPut (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI to put</dd>
 </dl>
@@ -1921,7 +1920,7 @@ int httpRead (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -1945,7 +1944,7 @@ ssize_t httpRead2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -1962,7 +1961,7 @@ int httpReconnect (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, non-zero on failure</p>
@@ -2096,7 +2095,7 @@ void httpSetAuthString (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>scheme</dt>
 <dd class="description">Auth scheme (NULL to clear it)</dd>
 <dt>data</dt>
@@ -2133,7 +2132,7 @@ void httpSetExpect (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>expect</dt>
 <dd class="description">HTTP status to expect (HTTP_CONTINUE)</dd>
 </dl>
@@ -2152,7 +2151,7 @@ void httpSetField (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>field</dt>
 <dd class="description">Field index</dd>
 <dt>value</dt>
@@ -2168,7 +2167,7 @@ void httpSetLength (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>length</dt>
 <dd class="description">Length (0 for chunked)</dd>
 </dl>
@@ -2195,7 +2194,7 @@ int httpTrace (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>uri</dt>
 <dd class="description">URI for trace</dd>
 </dl>
@@ -2210,7 +2209,7 @@ http_status_t httpUpdate (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">HTTP status</p>
@@ -2224,7 +2223,7 @@ int httpWait (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>msec</dt>
 <dd class="description">Milliseconds to wait</dd>
 </dl>
@@ -2241,7 +2240,7 @@ int httpWrite (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>
@@ -2265,7 +2264,7 @@ ssize_t httpWrite2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>buffer</dt>
 <dd class="description">Buffer for data</dd>
 <dt>length</dt>

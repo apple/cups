@@ -47,13 +47,12 @@ BLOCKQUOTE {
 }
 
 A:link, A:visited {
+  font-weight: normal;
   text-decoration: none;
-  font-weight: bold;
 }
 
 A:link:hover, A:visited:hover, A:active {
   text-decoration: underline;
-  font-weight: bold;
 }
 
 SUB, SUP {

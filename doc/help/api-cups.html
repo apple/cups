@@ -55,13 +55,12 @@ BLOCKQUOTE {
 }
 
 A:link, A:visited {
+  font-weight: normal;
   text-decoration: none;
-  font-weight: bold;
 }
 
 A:link:hover, A:visited:hover, A:active {
   text-decoration: underline;
-  font-weight: bold;
 }
 
 SUB, SUP {
@@ -297,6 +296,7 @@ div.contents ul.subcontents li {
 <ul class="contents">
 </li>
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
+<li><a href="#CLIENTS_AND_SERVERS">Clients and Servers</a></li>
 <li><a href="#PRINTERS_AND_CLASSES">Printers and Classes</a></li>
 <li><a href="#OPTIONS">Options</a></li>
 <li><a href="#PRINT_JOBS">Print Jobs</a></li>
@@ -308,7 +308,7 @@ div.contents ul.subcontents li {
 <li><a href="#cupsAddOption" title="Add an option to an option array.">cupsAddOption</a></li>
 <li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
 <li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
-<li><a href="#cupsCreateJob" title="Create an empty job.">cupsCreateJob</a></li>
+<li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
 <li><a href="#cupsEncryption" title="Get the default encryption settings.">cupsEncryption</a></li>
 <li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
 <li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
@@ -406,13 +406,24 @@ specified server.">cupsPrintFiles2</a></li>
 applications, filters, printer drivers, and backends that need to interface
 with the CUPS scheduler.</p>
 
+<h3><a name='CLIENTS_AND_SERVERS'>Clients and Servers</a></h3>
+
+<p>CUPS is based on the Internet Printing Protocol ("IPP"), which allows
+clients (applications) to communicate with a server (the scheduler) to get a
+list of printers, send print jobs, and so forth. You identify which server
+you want to communicate with using a pointer to the opaque structure
+<code>http_t</code>. All of the examples in this document use the
+<code>CUPS_HTTP_DEFAULT</code> constant, referring to the default connection
+to the scheduler. The <a href='api-httpipp.html' target='_top'>HTTP and IPP
+APIs</a> document provides more information on server connections.</p>
+
 <h3><a name='PRINTERS_AND_CLASSES'>Printers and Classes</a></h3>
 
 <p>Printers and classes (collections of printers) are accessed through
 the <a href="#cups_dest_t"><code>cups_dest_t</code></a> structure which
 includes the name (<code>name</code>), instance (<code>instance</code> -
-a way of selected certain saved options), and the options and attributes
-associated with that destination (<code>num_options</code> and
+a way of selecting certain saved options/settings), and the options and
+attributes associated with that destination (<code>num_options</code> and
 <code>options</code>). Destinations are created using the
 <a href="#cupsGetDests"><code>cupsGetDests</code></a> function and freed
 using the <a href='#cupsFreeDests'><code>cupsFreeDests</code></a> function.
@@ -559,7 +570,8 @@ int num_options = 0;
 <a href='#cups_dest_t'>cups_dest_t</a> *dest;
 
 for (i = 0; i < dest->num_options; i ++)
-  num_options = <a href='#cupsAddOption'>cupsAddOption</a>(dest->options[i].name, dest->options[i].value, num_options, &amp;options);
+  num_options = <a href='#cupsAddOption'>cupsAddOption</a>(dest->options[i].name, dest->options[i].value,
+                              num_options, &amp;options);
 </pre>
 
 <p>Use the <a href='#cupsFreeOptions'><code>cupsFreeOptions</code></a>
@@ -586,7 +598,8 @@ int num_options;
 int job_id;
 
 /* Print a single file */
-job_id = <a href='#cupsPrintFile'>cupsPrintFile</a>(dest->name, "/usr/share/cups/data/testprint.ps", "Test Print", num_options, options);
+job_id = <a href='#cupsPrintFile'>cupsPrintFile</a>(dest->name, "/usr/share/cups/data/testprint.ps",
+                        "Test Print", num_options, options);
 </pre>
 
 <p>The <a href='#cupsPrintFiles'><code>cupsPrintFiles</code></a> function
@@ -624,7 +637,8 @@ int i;
 char buffer[1024];
 
 /* Create the job */
-job_id = <a href='#cupsCreateJob'>cupsCreateJob</a>(CUPS_HTTP_DEFAULT, dest->name, "10 Text Files", num_options, options);
+job_id = <a href='#cupsCreateJob'>cupsCreateJob</a>(CUPS_HTTP_DEFAULT, dest->name, "10 Text Files",
+                       num_options, options);
 
 /* If the job is created, add 10 files */
 if (job_id > 0)
@@ -633,7 +647,8 @@ if (job_id > 0)
   {
     snprintf(buffer, sizeof(buffer), "file%d.txt", i);
 
-    <a href='#cupsStartDocument'>cupsStartDocument</a>(CUPS_HTTP_DEFAULT, dest->name, job_id, buffer, CUPS_FORMAT_TEXT, i == 10);
+    <a href='#cupsStartDocument'>cupsStartDocument</a>(CUPS_HTTP_DEFAULT, dest->name, job_id, buffer,
+                      CUPS_FORMAT_TEXT, i == 10);
 
     snprintf(buffer, sizeof(buffer),
              "File %d\n"
@@ -725,7 +740,7 @@ while (job_state &lt; IPP_JOB_STOPPED)
 <a href='#cupsCancelJob'><code>cupsCancelJob</code></a> function with the
 job ID:</p>
 
-<pre class='exmaple'>
+<pre class='example'>
 #include &lt;cups/cups.h&gt;
 
 <a href='#cups_dest_t'>cups_dest_t</a> *dest;
@@ -883,7 +898,7 @@ int cupsCancelJob (<br>
 <dt>name</dt>
 <dd class="description">Name of printer or class</dd>
 <dt>job_id</dt>
-<dd class="description">Job ID</dd>
+<dd class="description">Job ID, <code>CUPS_JOBID_CURRENT</code> for the current job, or <code>CUPS_JOBID_ALL</code> for all jobs</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
@@ -905,11 +920,11 @@ ipp_status_t cupsCancelJob2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
 <dd class="description">Name of printer or class</dd>
 <dt>job_id</dt>
-<dd class="description">Job ID or 0 for the current job, -1 for all jobs</dd>
+<dd class="description">Job ID, <code>CUPS_JOBID_CURRENT</code> for the current job, or <code>CUPS_JOBID_ALL</code> for all jobs</dd>
 <dt>purge</dt>
 <dd class="description">1 to purge, 0 to cancel</dd>
 </dl>
@@ -927,7 +942,7 @@ the cause of any failure.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsCreateJob">cupsCreateJob</a></h3>
-<p class="description">Create an empty job.</p>
+<p class="description">Create an empty job for streaming.</p>
 <p class="code">
 int cupsCreateJob (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
@@ -939,9 +954,9 @@ int cupsCreateJob (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>title</dt>
 <dd class="description">Title of job</dd>
 <dt>num_options</dt>
@@ -952,8 +967,11 @@ int cupsCreateJob (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Job ID or 0 on error</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Submit files for printing to the job using the <a href="#cupsStartDocument"><code>cupsStartDocument</code></a>,
-<a href="#cupsWriteRequestData"><code>cupsWriteRequestData</code></a>, and <a href="#cupsFinishDocument"><code>cupsFinishDocument</code></a> functions.
+<p class="discussion">Use this function when you want to stream print data using the
+<a href="#cupsStartDocument"><code>cupsStartDocument</code></a>, <a href="#cupsWriteRequestData"><code>cupsWriteRequestData</code></a>, and
+<a href="#cupsFinishDocument"><code>cupsFinishDocument</code></a> functions.  If you have one or more files to
+print, use the <a href="#cupsPrintFile2"><code>cupsPrintFile2</code></a> or <a href="#cupsPrintFiles2"><code>cupsPrintFiles2</code></a> function
+instead.
 
 </p>
 <h3 class="function"><a name="cupsEncryption">cupsEncryption</a></h3>
@@ -964,7 +982,7 @@ http_encryption_t cupsEncryption (void);</p>
 <p class="description">Encryption settings</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
-environment variable, then the ~/.cupsrc file, and finally the
+environment variable, then the ~/.cups/client.conf file, and finally the
 /etc/cups/client.conf file. If not set, the default is
 <code>HTTP_ENCRYPT_IF_REQUESTED</code>.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
@@ -977,9 +995,9 @@ ipp_status_t cupsFinishDocument (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status of document submission</p>
@@ -1068,7 +1086,7 @@ const char *cupsGetDefault2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Default printer or <code>NULL</code></p>
@@ -1137,7 +1155,7 @@ int cupsGetDests2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>dests</dt>
 <dd class="description">Destinations</dd>
 </dl>
@@ -1164,7 +1182,7 @@ http_status_t cupsGetFd (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>resource</dt>
 <dd class="description">Resource name</dd>
 <dt>fd</dt>
@@ -1187,7 +1205,7 @@ http_status_t cupsGetFile (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>resource</dt>
 <dd class="description">Resource name</dd>
 <dt>filename</dt>
@@ -1213,7 +1231,7 @@ int cupsGetJobs (<br>
 <dt>jobs</dt>
 <dd class="description">Job data</dd>
 <dt>name</dt>
-<dd class="description"><code>NULL</code> = all destinations, otherwise show jobs for mydest</dd>
+<dd class="description"><code>NULL</code> = all destinations, otherwise show jobs for named destination</dd>
 <dt>myjobs</dt>
 <dd class="description">0 = all users, 1 = mine</dd>
 <dt>whichjobs</dt>
@@ -1239,11 +1257,11 @@ int cupsGetJobs2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>jobs</dt>
 <dd class="description">Job data</dd>
 <dt>name</dt>
-<dd class="description"><code>NULL</code> = all destinations, otherwise show jobs for mydest</dd>
+<dd class="description"><code>NULL</code> = all destinations, otherwise show jobs for named destination</dd>
 <dt>myjobs</dt>
 <dd class="description">0 = all users, 1 = mine</dd>
 <dt>whichjobs</dt>
@@ -1269,9 +1287,9 @@ jobs that are stopped, canceled, aborted, or completed.
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Destination name or <code>NULL</code></dd>
+<dd class="description">Destination name or <code>NULL</code> for the default destination</dd>
 <dt>instance</dt>
 <dd class="description">Instance name or <code>NULL</code></dd>
 </dl>
@@ -1322,13 +1340,16 @@ const char *cupsGetPPD (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>name</dt>
-<dd class="description">Printer name</dd>
+<dd class="description">Destination name</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Filename for PPD file</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">For classes, <code>cupsGetPPD</code> returns the PPD file for the first printer
-in the class.</p>
+in the class.<br>
+<br>
+The returned filename is stored in a static buffer and is overwritten with
+each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.21&nbsp;</span><a name="cupsGetPPD2">cupsGetPPD2</a></h3>
 <p class="description">Get the PPD file for a printer from the specified server.</p>
 <p class="code">
@@ -1339,18 +1360,21 @@ const char *cupsGetPPD2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer name</dd>
+<dd class="description">Destination name</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Filename for PPD file</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">For classes, <code>cupsGetPPD2</code> returns the PPD file for the first printer
-in the class.
+in the class.<br>
+<br>
+The returned filename is stored in a static buffer and is overwritten with
+each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.
 
 </p>
-<h3 class="function"><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
 <p class="description">Get the PPD file for a printer on the specified
 server if it has changed.</p>
 <p class="code">
@@ -1366,7 +1390,7 @@ http_status_t cupsGetPPD3 (<br>
 <dt>http</dt>
 <dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer name</dd>
+<dd class="description">Destination name</dd>
 <dt>modtime</dt>
 <dd class="description">Modification time</dd>
 <dt>buffer</dt>
@@ -1390,7 +1414,9 @@ On success, <code>HTTP_OK</code> is returned for a new PPD file and
 status is an error.<br>
 <br>
 For classes, <code>cupsGetPPD3</code> returns the PPD file for the first printer
-in the class.</p>
+in the class.
+
+</p>
 <h3 class="function"><a name="cupsGetPassword">cupsGetPassword</a></h3>
 <p class="description">Get a password from the user.</p>
 <p class="code">
@@ -1434,7 +1460,7 @@ char *cupsGetServerPPD (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
 <dd class="description">Name of PPD file (&quot;ppd-name&quot;)</dd>
 </dl>
@@ -1530,7 +1556,7 @@ char *cupsNotifySubject (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Subject string or <code>NULL</code></p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The returned string must be freed by the caller using free().
+<p class="discussion">The returned string must be freed by the caller using <code>free</code>.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsNotifyText">cupsNotifyText</a></h3>
@@ -1591,7 +1617,7 @@ int cupsPrintFile (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>filename</dt>
 <dd class="description">File to print</dd>
 <dt>title</dt>
@@ -1618,9 +1644,9 @@ int cupsPrintFile2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection</dd>
+<dd class="description">Connection to server</dd>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>filename</dt>
 <dd class="description">File to print</dd>
 <dt>title</dt>
@@ -1647,7 +1673,7 @@ int cupsPrintFiles (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>num_files</dt>
 <dd class="description">Number of files</dd>
 <dt>files</dt>
@@ -1677,9 +1703,9 @@ int cupsPrintFiles2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>num_files</dt>
 <dd class="description">Number of files</dd>
 <dt>files</dt>
@@ -1704,7 +1730,7 @@ http_status_t cupsPutFd (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>resource</dt>
 <dd class="description">Resource name</dd>
 <dt>fd</dt>
@@ -1728,7 +1754,7 @@ http_status_t cupsPutFile (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>resource</dt>
 <dd class="description">Resource name</dd>
 <dt>filename</dt>
@@ -1846,7 +1872,7 @@ int cupsSetDests2 (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>num_dests</dt>
 <dd class="description">Number of destinations</dd>
 <dt>dests</dt>
@@ -1925,9 +1951,9 @@ http_status_t cupsStartDocument (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>http</dt>
-<dd class="description">HTTP connection or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>name</dt>
-<dd class="description">Printer or class name</dd>
+<dd class="description">Destination name</dd>
 <dt>job_id</dt>
 <dd class="description">Job ID from <a href="#cupsCreateJob"><code>cupsCreateJob</code></a></dd>
 <dt>docname</dt>
@@ -1983,7 +2009,7 @@ char *cupsTempFile (<br>
 <dd class="description">Size of buffer</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Filename or NULL on error</p>
+<p class="description">Filename or <code>NULL</code> on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The temporary filename is returned in the filename buffer.
 This function is deprecated - use <a href="#cupsTempFd"><code>cupsTempFd</code></a> or
@@ -2005,7 +2031,7 @@ cups_file_t *cupsTempFile2 (<br>
 <dd class="description">Size of buffer</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">CUPS file or NULL on error</p>
+<p class="description">CUPS file or <code>NULL</code> on error</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The temporary filename is returned in the filename buffer.
 The temporary file is opened for writing.

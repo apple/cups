@@ -31,7 +31,7 @@
 /*
  * 'cupsNotifySubject()' - Return the subject for the given notification message.
  *
- * The returned string must be freed by the caller using free().
+ * The returned string must be freed by the caller using @code free@.
  *
  * @since CUPS 1.2@
  */

@@ -54,7 +54,7 @@ static cups_file_t	*cups_open_client_conf(void);
  * 'cupsEncryption()' - Get the default encryption settings.
  *
  * The default encryption setting comes from the CUPS_ENCRYPTION
- * environment variable, then the ~/.cupsrc file, and finally the
+ * environment variable, then the ~/.cups/client.conf file, and finally the
  * /etc/cups/client.conf file. If not set, the default is
  * @code HTTP_ENCRYPT_IF_REQUESTED@.
  */

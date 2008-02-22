@@ -161,7 +161,7 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
  * @deprecated@
  */
 
-char *					/* O - Filename or NULL on error */
+char *					/* O - Filename or @code NULL@ on error */
 cupsTempFile(char *filename,		/* I - Pointer to buffer */
              int  len)			/* I - Size of buffer */
 {
@@ -209,7 +209,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
  * @since CUPS 1.2@
  */
 
-cups_file_t *				/* O - CUPS file or NULL on error */
+cups_file_t *				/* O - CUPS file or @code NULL@ on error */
 cupsTempFile2(char *filename,		/* I - Pointer to buffer */
               int  len)			/* I - Size of buffer */
 {
