@@ -15,6 +15,9 @@
  *
  * Contents:
  *
+ *   backendSNMPSupplies()   - Get the current supplies for a device.
+ *   backend_init_supplies() - Initialize the supplies list.
+ *   backend_walk_cb()       - Interpret the supply value responses...
  */
 
 /*
@@ -57,9 +60,15 @@ static int		num_supplies = 0;
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
 					/* Supply information */
 
+static const int	hrDeviceDescr[] =
+			{ CUPS_OID_hrDeviceDescr, 1, -1 };
+					/* Device description OID */
 static const int	hrPrinterStatus[] =
 			{ CUPS_OID_hrPrinterStatus, 1, -1 };
 					/* Current state OID */
+static const int	hrPrinterDetectedErrorState[] =
+			{ CUPS_OID_hrPrinterDetectedErrorState, 1, -1 };
+					/* Current printer state bits OID */
 static const int	prtMarkerColorantValue[] =
 			{ CUPS_OID_prtMarkerColorantValue, -1 },
 					/* Colorant OID */
@@ -128,15 +137,14 @@ backendSNMPSupplies(
     http_addr_t *addr,			/* I - Printer address */
     int         *printer_state)		/* O - Printer state */
 {
-  if (num_supplies == 0 && !httpAddrEqual(addr, &current_addr))
-    num_supplies = 0;
-
-  if (num_supplies == 0)
+  if (!httpAddrEqual(addr, &current_addr))
     backend_init_supplies(snmp_fd, addr);
   else if (num_supplies > 0)
     cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 1000,
+		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 500,
 		 backend_walk_cb, NULL);
+
+  *printer_state = -1;
 
   if (num_supplies > 0)
   {
@@ -162,23 +170,98 @@ backendSNMPSupplies(
     fprintf(stderr, "ATTR: marker-levels=%s\n", value);
 
    /*
+    * Get the current printer status bits...
+    */
+
+    if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+                       cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+                       hrPrinterDetectedErrorState))
+      return (-1);
+
+    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+        packet.object_type != CUPS_ASN1_OCTET_STRING)
+      return (-1);
+
+    i = ((packet.object_value.string[0] & 255) << 8) |
+        (packet.object_value.string[1] & 255);
+
+    if (i & CUPS_TC_lowPaper)
+      fputs("STATE: +media-low-warning\n", stderr);
+    else
+      fputs("STATE: -media-low-warning\n", stderr);
+
+    if (i & (CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty))
+      fputs("STATE: +media-empty-error\n", stderr);
+    else
+      fputs("STATE: -media-empty-error\n", stderr);
+
+    if (i & CUPS_TC_lowToner)
+      fputs("STATE: +toner-low-warning\n", stderr);
+    else
+      fputs("STATE: -toner-low-warning\n", stderr);
+
+    if (i & CUPS_TC_noToner)
+      fputs("STATE: +toner-empty-error\n", stderr);
+    else
+      fputs("STATE: -toner-empty-error\n", stderr);
+
+    if (i & CUPS_TC_doorOpen)
+      fputs("STATE: +door-open-report\n", stderr);
+    else
+      fputs("STATE: -door-open-report\n", stderr);
+
+    if (i & CUPS_TC_jammed)
+      fputs("STATE: +media-jam-error\n", stderr);
+    else
+      fputs("STATE: -media-jam-error\n", stderr);
+
+    if (i & CUPS_TC_offline)
+      fputs("STATE: +offline-report\n", stderr);
+    else
+      fputs("STATE: -offline-report\n", stderr);
+
+    if (i & (CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint))
+      fputs("STATE: +service-needed-error\n", stderr);
+    else
+      fputs("STATE: -service-needed-error\n", stderr);
+
+    if (i & CUPS_TC_inputTrayMissing)
+      fputs("STATE: +input-tray-missing-error\n", stderr);
+    else
+      fputs("STATE: -input-tray-missing-error\n", stderr);
+
+    if (i & CUPS_TC_outputTrayMissing)
+      fputs("STATE: +output-tray-missing-error\n", stderr);
+    else
+      fputs("STATE: -output-tray-missing-error\n", stderr);
+
+    if (i & CUPS_TC_markerSupplyMissing)
+      fputs("STATE: +marker-supply-missing-error\n", stderr);
+    else
+      fputs("STATE: -marker-supply-missing-error\n", stderr);
+
+    if (i & CUPS_TC_outputNearFull)
+      fputs("STATE: +output-area-almost-full-warning\n", stderr);
+    else
+      fputs("STATE: -output-area-almost-full-warning\n", stderr);
+
+    if (i & CUPS_TC_outputFull)
+      fputs("STATE: +output-area-full-error\n", stderr);
+    else
+      fputs("STATE: -output-area-full-error\n", stderr);
+
+   /*
     * Get the current printer state...
     */
 
     if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
                        cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
                        hrPrinterStatus))
-    {
-      *printer_state = -1;
       return (-1);
-    }
 
-    if (!cupsSNMPRead(snmp_fd, &packet, 1000) ||
+    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
         packet.object_type != CUPS_ASN1_INTEGER)
-    {
-      *printer_state = -1;
       return (-1);
-    }
 
     *printer_state = packet.object_value.integer;
 
@@ -191,17 +274,14 @@ backendSNMPSupplies(
                        prtMarkerLifeCount))
       return (-1);
 
-    if (!cupsSNMPRead(snmp_fd, &packet, 1000) ||
+    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
         packet.object_type != CUPS_ASN1_COUNTER)
       return (-1);
 
     return (packet.object_value.counter);
   }
   else
-  {
-    *printer_state = -1;
     return (-1);
-  }
 }
 
 
@@ -214,47 +294,56 @@ backend_init_supplies(
     int         snmp_fd,		/* I - SNMP socket */
     http_addr_t *addr)			/* I - Printer address */
 {
-  int	i,				/* Looping var */
-	type;				/* Current marker type */
-  char	value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 2 + 3)],
+  int		i,			/* Looping var */
+		type;			/* Current marker type */
+  cups_file_t	*cachefile;		/* Cache file */
+  const char	*cachedir;		/* CUPS_CACHEDIR value */
+  char		addrstr[1024],		/* Address string */
+		cachefilename[1024],	/* Cache filename */
+		description[CUPS_SNMP_MAX_STRING],
+					/* Device description string */
+		value[CUPS_MAX_SUPPLIES * (CUPS_SNMP_MAX_STRING * 2 + 3)],
 					/* Value string */
-	*ptr,				/* Pointer into value string */
-	*name_ptr;			/* Pointer into name string */
+		*ptr,			/* Pointer into value string */
+		*name_ptr;		/* Pointer into name string */
+  cups_snmp_t	packet;			/* SNMP response packet */
   static const char * const types[] =	/* Supply types */
-  {
-    "toner",
-    "wasteToner",
-    "ink",
-    "inkCartridge",
-    "inkRibbon",
-    "wasteInk",
-    "opc",
-    "developer",
-    "fuserOil",
-    "solidWax",
-    "ribbonWax",
-    "wasteWax",
-    "fuser",
-    "coronaWire",
-    "fuserOilWick",
-    "cleanerUnit",
-    "fuserCleaningPad",
-    "transferUnit",
-    "tonerCartridge",
-    "fuserOiler",
-    "water",
-    "wasteWater",
-    "glueWaterAdditive",
-    "wastePaper",
-    "bindingSupply",
-    "bandingSupply",
-    "stitchingWire",
-    "shrinkWrap",
-    "paperWrap",
-    "staples",
-    "inserts",
-    "covers"
-  };
+		{
+		  "other",
+		  "unknown",
+		  "toner",
+		  "wasteToner",
+		  "ink",
+		  "inkCartridge",
+		  "inkRibbon",
+		  "wasteInk",
+		  "opc",
+		  "developer",
+		  "fuserOil",
+		  "solidWax",
+		  "ribbonWax",
+		  "wasteWax",
+		  "fuser",
+		  "coronaWire",
+		  "fuserOilWick",
+		  "cleanerUnit",
+		  "fuserCleaningPad",
+		  "transferUnit",
+		  "tonerCartridge",
+		  "fuserOiler",
+		  "water",
+		  "wasteWater",
+		  "glueWaterAdditive",
+		  "wastePaper",
+		  "bindingSupply",
+		  "bandingSupply",
+		  "stitchingWire",
+		  "shrinkWrap",
+		  "paperWrap",
+		  "staples",
+		  "inserts",
+		  "covers"
+		};
 
 
  /*
@@ -267,12 +356,100 @@ backend_init_supplies(
   memset(supplies, 0, sizeof(supplies));
 
  /*
-  * Walk the printer configuration information...
+  * Get the device description...
   */
 
-  cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-               cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 1000,
-	       backend_walk_cb, NULL);
+  if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+		     cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+		     hrDeviceDescr))
+    return;
+
+  if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+      packet.object_type != CUPS_ASN1_OCTET_STRING)
+  {
+    strlcpy(description, "Unknown", sizeof(description));
+    num_supplies = 0;
+  }
+  else
+    strlcpy(description, packet.object_value.string, sizeof(description));
+
+ /*
+  * See if we have already queried this device...
+  */
+
+  httpAddrString(addr, addrstr, sizeof(addrstr));
+
+  if ((cachedir = getenv("CUPS_CACHEDIR")) == NULL)
+    cachedir = CUPS_CACHEDIR;
+
+  snprintf(cachefilename, sizeof(cachefilename), "%s/%s.snmp", cachedir,
+           addrstr);
+
+  if ((cachefile = cupsFileOpen(cachefilename, "r")) != NULL)
+  {
+   /*
+    * Yes, read the cache file:
+    *
+    *     1 num_supplies
+    *     device description
+    *     supply structures...
+    */
+
+    if (cupsFileGets(cachefile, value, sizeof(value)))
+    {
+      if (sscanf(value, "1 %d", &num_supplies) == 1 &&
+          num_supplies <= CUPS_MAX_SUPPLIES &&
+          cupsFileGets(cachefile, value, sizeof(value)))
+      {
+        if ((ptr = value + strlen(value) - 1) >= value && *ptr == '\n')
+	  *ptr = '\n';
+
+        if (!strcmp(description, value))
+	  cupsFileRead(cachefile, (char *)supplies,
+	               num_supplies * sizeof(backend_supplies_t));
+        else
+	  num_supplies = -1;
+      }
+      else
+        num_supplies = -1;
+    }
+
+    cupsFileClose(cachefile);
+  }
+
+ /*
+  * If the cache information isn't correct, scan for supplies...
+  */
+
+  if (num_supplies < 0)
+  {
+   /*
+    * Walk the printer configuration information...
+    */
+
+    cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 500,
+		 backend_walk_cb, NULL);
+  }
+
+ /*
+  * Save the cached information...
+  */
+
+  if (num_supplies < 0)
+    num_supplies = 0;
+
+  if ((cachefile = cupsFileOpen(cachefilename, "w")) != NULL)
+  {
+    cupsFilePrintf(cachefile, "1 %d\n", num_supplies);
+    cupsFilePrintf(cachefile, "%s\n", description);
+
+    if (num_supplies > 0)
+      cupsFileWrite(cachefile, (char *)supplies,
+                    num_supplies * sizeof(backend_supplies_t));
+
+    cupsFileClose(cachefile);
+  }
 
   if (num_supplies <= 0)
     return;
@@ -285,7 +462,7 @@ backend_init_supplies(
     strcpy(supplies[i].color, "none");
 
   cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-               cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 1000,
+               cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 500,
 	       backend_walk_cb, NULL);
 
  /*
@@ -337,10 +514,10 @@ backend_init_supplies(
 
     type = supplies[i].type;
 
-    if (type < CUPS_TC_toner || type > CUPS_TC_covers)
+    if (type < CUPS_TC_other || type > CUPS_TC_covers)
       strcpy(ptr, "unknown");
     else
-      strcpy(ptr, types[type - CUPS_TC_toner]);
+      strcpy(ptr, types[type - CUPS_TC_other]);
   }
 
   fprintf(stderr, "ATTR: marker-types=%s\n", value);

@@ -62,7 +62,7 @@ main(int  argc,				/* I - Number of command-line args */
     page_count = backendSNMPSupplies(snmp_fd, &(host->addr), &printer_state);
 
     printf("backendSNMPSupplies: %s (page_count=%d, printer_state=%d)\n",
-	   page_count < 0 || printer_state < CUPS_TC_idle ||
+	   page_count < 0 || printer_state < CUPS_TC_other ||
 	       printer_state > CUPS_TC_warmup ? "FAIL" : "PASS",
 	   page_count, printer_state);
 
