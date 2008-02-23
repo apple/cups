@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.7
 
+	- The job-sheets option was not encoded properly (STR #2715)
 	- The scheduler incorrectly complained about missing LSB
 	  PPD directories.
 
