@@ -318,7 +318,7 @@ f 0755 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
 f 0755 root sys $BINDIR/cupstestppd systemv/cupstestppd
 f 0755 root sys $BINDIR/lp systemv/lp
 f 0755 root sys $BINDIR/lpoptions systemv/lpoptions
-f 4755 root sys $BINDIR/lppasswd systemv/lppasswd
+f 0755 root sys $BINDIR/lppasswd systemv/lppasswd
 f 0755 root sys $BINDIR/lpq berkeley/lpq
 f 0755 root sys $BINDIR/lpr berkeley/lpr
 f 0755 root sys $BINDIR/lprm berkeley/lprm

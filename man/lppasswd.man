@@ -3,7 +3,7 @@
 .\"
 .\"   lpadmin man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lppasswd 1 "Common UNIX Printing System" "20 March 2006" "Apple Inc."
+.TH lppasswd 1 "Common UNIX Printing System" "22 February 2008" "Apple Inc."
 .SH NAME
 lppasswd \- add, change, or delete digest passwords.
 .SH SYNOPSIS
@@ -45,17 +45,24 @@ file. Digest usernames do not have to match local UNIX usernames.
 .br
 Specifies a group other than the default system group.
 .SH SECURITY ISSUES
-The \fIlppasswd\fR command is installed setuid to root. While
-every attempt has been made to make it secure against exploits
-that could grant super-user privileges to unprivileged users,
-paranoid system administrators may wish to disable or change the
-ownership of the program to an unprivileged account.
+By default, the \fIlppasswd\fR program is not installed to allow ordinary
+users to change their passwords. To enable this, the \fIlppasswd\fR command
+must be made setuid to root with the command:
+.br
+.nf
+chmod u+s lppasswd
+.fi
+.PP
+While every attempt has been made to make \fIlppasswd\fR secure against
+exploits that could grant super-user privileges to unprivileged users,
+paranoid system administrators may wish to use Basic authentication with
+accounts managed by PAM instead.
 .SH SEE ALSO
 \fIlp(1)\fR, \fIlpr(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

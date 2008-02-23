@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-01-30
+CHANGES.txt - 2008-02-22
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The lppasswd program is no longer installed setuid to
+	  root to make the default installation more secure.
 	- Added a new ppdLocalizeMarkerName() function to get
 	  the localized version of a marker-names value.
 	- The scheduler now provides the printer-dns-sd-name
