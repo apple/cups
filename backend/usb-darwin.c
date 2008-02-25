@@ -1017,16 +1017,14 @@ static Boolean list_device_cb(void *refcon,
       CFStringGetCString(deviceIDString, idstr, sizeof(idstr),
                          kCFStringEncodingUTF8);
 
-      if (make)
-        CFStringGetCString(make, makestr, sizeof(makestr),
-	                   kCFStringEncodingUTF8);
-      else
+      if (!make ||
+	  !CFStringGetCString(make, makestr, sizeof(makestr),
+			      kCFStringEncodingUTF8))
         strcpy(makestr, "Unknown");
 
-      if (model)
-	CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
-      			   kCFStringEncodingUTF8);
-      else
+      if (!model ||
+	  !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
+			      kCFStringEncodingUTF8))
         strcpy(modelstr + 1, "Printer");
 
       optionsstr[0] = '\0';
