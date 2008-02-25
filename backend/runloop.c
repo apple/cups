@@ -25,6 +25,7 @@
  */
 
 #include "backend-private.h"
+#include <limits.h>
 #ifdef __hpux
 #  include <sys/time.h>
 #else
@@ -136,15 +137,83 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
 
 /*
+ * 'backendNetworkSideCB()' - Handle common network side-channel commands.
+ */
+
+void
+backendNetworkSideCB(
+    int         print_fd,		/* I - Print file or -1 */
+    int         device_fd,		/* I - Device file or -1 */
+    int         snmp_fd,		/* I - SNMP socket */
+    http_addr_t *addr,			/* I - Address of device */
+    int         use_bc)			/* I - Use back-channel data? */
+{
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+  const char		*device_id;	/* 1284DEVICEID env var */
+
+
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
+    return;
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+       /*
+        * Our sockets disable the Nagle algorithm and data is sent immediately.
+	*/
+
+        if (backendDrainOutput(print_fd, device_fd))
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else 
+          status = CUPS_SC_STATUS_OK;
+
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = use_bc;
+        datalen = 1;
+        break;
+
+    case CUPS_SC_CMD_GET_DEVICE_ID :
+        if ((device_id = getenv("1284DEVICEID")) != NULL)
+	{
+	  strlcpy(data, device_id, sizeof(data));
+	  datalen = (int)strlen(data);
+	  break;
+	}
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+}
+
+
+/*
  * 'backendRunLoop()' - Read and write print and back-channel data.
  */
 
 ssize_t					/* O - Total bytes on success, -1 on error */
 backendRunLoop(
-    int  print_fd,			/* I - Print file descriptor */
-    int  device_fd,			/* I - Device file descriptor */
-    int  use_bc,			/* I - Use back-channel? */
-    void (*side_cb)(int, int, int))	/* I - Side-channel callback */
+    int         print_fd,		/* I - Print file descriptor */
+    int         device_fd,		/* I - Device file descriptor */
+    int         snmp_fd,		/* I - SNMP socket or -1 if none */
+    http_addr_t *addr,			/* I - Address of device */
+    int         use_bc,			/* I - Use back-channel? */
+    void        (*side_cb)(int, int, int, http_addr_t *, int))
+					/* I - Side-channel callback */
 {
   int		nfds;			/* Maximum file descriptor value + 1 */
   fd_set	input,			/* Input set for reading */
@@ -158,15 +227,18 @@ backendRunLoop(
   char		print_buffer[8192],	/* Print data buffer */
 		*print_ptr,		/* Pointer into print data buffer */
 		bc_buffer[1024];	/* Back-channel data buffer */
+  struct timeval timeout;		/* Timeout for select() */
+  time_t	curtime,		/* Current time */
+		snmp_update = 0;
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   fprintf(stderr,
-          "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, use_bc=%d, "
-	  "side_cb=%p)\n",
-          print_fd, device_fd, use_bc, side_cb);
+          "DEBUG: backendRunLoop(print_fd=%d, device_fd=%d, snmp_fd=%d, "
+	  "addr=%p, use_bc=%d, side_cb=%p)\n",
+          print_fd, device_fd, snmp_fd, addr, use_bc, side_cb);
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
@@ -221,7 +293,10 @@ backendRunLoop(
 
     if (use_bc || side_cb)
     {
-      if (select(nfds, &input, &output, NULL, NULL) < 0)
+      timeout.tv_sec  = 5;
+      timeout.tv_usec = 0;
+
+      if (select(nfds, &input, &output, NULL, &timeout) < 0)
       {
        /*
 	* Pause printing to clear any pending errors...
@@ -250,7 +325,7 @@ backendRunLoop(
     */
 
     if (side_cb && FD_ISSET(CUPS_SC_FD, &input))
-      (*side_cb)(print_fd, device_fd, use_bc);
+      (*side_cb)(print_fd, device_fd, snmp_fd, addr, use_bc);
 
    /*
     * Check if we have back-channel data ready...
@@ -362,6 +437,18 @@ backendRunLoop(
 	print_ptr   += bytes;
 	total_bytes += bytes;
       }
+    }
+
+   /*
+    * Do SNMP updates periodically...
+    */
+
+    if (snmp_fd >= 0 && time(&curtime) >= snmp_update)
+    {
+      if (backendSNMPSupplies(snmp_fd, addr, NULL, NULL))
+        snmp_update = INT_MAX;
+      else
+        snmp_update = curtime + 5;
     }
   }
 

@@ -131,10 +131,11 @@ static void	backend_walk_cb(cups_snmp_t *packet, void *data);
  * 'backendSNMPSupplies()' - Get the current supplies for a device.
  */
 
-int					/* O - Page count */
+int					/* O - 0 on success, -1 on error */
 backendSNMPSupplies(
     int         snmp_fd,		/* I - SNMP socket */
     http_addr_t *addr,			/* I - Printer address */
+    int         *page_count,		/* O - Page count */
     int         *printer_state)		/* O - Printer state */
 {
   if (!httpAddrEqual(addr, &current_addr))
@@ -144,7 +145,11 @@ backendSNMPSupplies(
 		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 500,
 		 backend_walk_cb, NULL);
 
-  *printer_state = -1;
+  if (page_count)
+    *page_count = -1;
+
+  if (printer_state)
+    *printer_state = -1;
 
   if (num_supplies > 0)
   {
@@ -254,31 +259,39 @@ backendSNMPSupplies(
     * Get the current printer state...
     */
 
-    if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-                       cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
-                       hrPrinterStatus))
-      return (-1);
+    if (printer_state)
+    {
+      if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+			 cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			 hrPrinterStatus))
+	return (-1);
 
-    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
-        packet.object_type != CUPS_ASN1_INTEGER)
-      return (-1);
+      if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+	  packet.object_type != CUPS_ASN1_INTEGER)
+	return (-1);
 
-    *printer_state = packet.object_value.integer;
+      *printer_state = packet.object_value.integer;
+    }
 
    /*
     * Get the current page count...
     */
 
-    if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-                       cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
-                       prtMarkerLifeCount))
-      return (-1);
+    if (page_count)
+    {
+      if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+			 cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			 prtMarkerLifeCount))
+	return (-1);
 
-    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
-        packet.object_type != CUPS_ASN1_COUNTER)
-      return (-1);
+      if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+	  packet.object_type != CUPS_ASN1_COUNTER)
+	return (-1);
 
-    return (packet.object_value.counter);
+      *page_count = packet.object_value.counter;
+    }
+
+    return (0);
   }
   else
     return (-1);

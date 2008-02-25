@@ -59,7 +59,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   for (;;)
   {
-    page_count = backendSNMPSupplies(snmp_fd, &(host->addr), &printer_state);
+    fputs("backendSNMPSupplies: ", stdout);
+
+    if (backendSNMPSupplies(snmp_fd, &(host->addr), &page_count,
+                            &printer_state))
+    {
+      puts("FAIL");
+      return (1);
+    }
 
     printf("backendSNMPSupplies: %s (page_count=%d, printer_state=%d)\n",
 	   page_count < 0 || printer_state < CUPS_TC_other ||

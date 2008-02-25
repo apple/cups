@@ -59,7 +59,8 @@
  */
 
 static void	list_devices(void);
-static void	side_cb(int print_fd, int device_fd, int use_bc);
+static void	side_cb(int print_fd, int device_fd, int snmp_fd,
+		        http_addr_t *addr, int use_bc);
 
 
 /*
@@ -283,7 +284,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, use_bc, side_cb);
+    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintf(stderr,
@@ -609,15 +610,20 @@ list_devices(void)
  */
 
 static void
-side_cb(int print_fd,			/* I - Print file */
-        int device_fd,			/* I - Device file */
-	int use_bc)			/* I - Using back-channel? */
+side_cb(int         print_fd,		/* I - Print file */
+        int         device_fd,		/* I - Device file */
+        int         snmp_fd,		/* I - SNMP socket (unused) */
+	http_addr_t *addr,		/* I - Device address (unused) */
+	int         use_bc)		/* I - Using back-channel? */
 {
   cups_sc_command_t	command;	/* Request command */
   cups_sc_status_t	status;		/* Request/response status */
   char			data[2048];	/* Request/response data */
   int			datalen;	/* Request/response data size */
 
+
+  (void)snmp_fd;
+  (void)addr;
 
   datalen = sizeof(data);
 
