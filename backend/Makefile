@@ -19,11 +19,11 @@ include ../Makedefs
 
 RBACKENDS =	ipp lpd
 UBACKENDS =	$(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
-TARGETS	=	betest test1284 testsupplies libbackend.a $(RBACKENDS) \
-		$(UBACKENDS)
+TARGETS	=	test1284 testbackend testsupplies \
+		libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o runloop.o snmp-supplies.o
-OBJS	=	betest.o ipp.o lpd.o pap.o parallel.o scsi.o \
-		serial.o snmp.o socket.o test1284.o testsupplies.o usb.o
+OBJS	=	ipp.o lpd.o pap.o parallel.o scsi.o serial.o snmp.o socket.o \
+		test1284.o testbackend.o testsupplies.o usb.o
 
 
 #
@@ -85,21 +85,22 @@ uninstall:
 
 
 #
-# betest
-#
-
-betest:	betest.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o betest betest.o $(LIBS)
-
-
-#
 # test1284
 #
 
 test1284:	test1284.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
+		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+
+
+#
+# testbackend
+#
+
+testbackend:	testbackend.o ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/libcups.a \
 		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
