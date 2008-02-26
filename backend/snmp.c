@@ -902,7 +902,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Read the response data...
   */
 
-  if (!cupsSNMPRead(fd, &packet, -1))
+  if (!cupsSNMPRead(fd, &packet, -1.0))
   {
     fprintf(stderr, "ERROR: Unable to read data from socket: %s\n",
             strerror(errno));

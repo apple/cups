@@ -943,7 +943,7 @@ int cupsSNMPOpen (<br>
 <a href="#cups_snmp_t">cups_snmp_t</a> *cupsSNMPRead (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_t">cups_snmp_t</a> *packet,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int msec<br>
+&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -951,8 +951,8 @@ int cupsSNMPOpen (<br>
 <dd class="description">SNMP socket file descriptor</dd>
 <dt>packet</dt>
 <dd class="description">SNMP packet buffer</dd>
-<dt>msec</dt>
-<dd class="description">Timeout in milliseconds</dd>
+<dt>timeout</dt>
+<dd class="description">Timeout in seconds</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">SNMP packet or <code>NULL</code> if none</p>
@@ -981,7 +981,7 @@ int cupsSNMPWalk (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int version,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *community,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *prefix,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int msec,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;double timeout,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_cb_t">cups_snmp_cb_t</a> cb,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *data<br>
 );</p>
@@ -997,8 +997,8 @@ int cupsSNMPWalk (<br>
 <dd class="description">Community name</dd>
 <dt>prefix</dt>
 <dd class="description">OID prefix</dd>
-<dt>msec</dt>
-<dd class="description">Timeout for each response in milliseconds</dd>
+<dt>timeout</dt>
+<dd class="description">Timeout for each response in seconds</dd>
 <dt>cb</dt>
 <dd class="description">Function to call for each response</dd>
 <dt>data</dt>
@@ -1010,7 +1010,10 @@ int cupsSNMPWalk (<br>
 <p class="discussion">This function queries all of the OIDs with the specified OID prefix,
 calling the &quot;cb&quot; function for every response that is received.<br>
 <br>
-The array pointed to by &quot;prefix&quot; is terminated by the value -1.
+The array pointed to by &quot;prefix&quot; is terminated by the value -1.<br>
+<br>
+If &quot;timeout&quot; is negative, <code>cupsSNMPWalk</code> will wait for a response
+indefinitely.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPWrite">cupsSNMPWrite</a></h3>
