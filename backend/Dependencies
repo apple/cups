@@ -1,6 +1,5 @@
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-betest.o: ../cups/string.h ../config.h
 ipp.o: ../cups/http-private.h ../config.h ../cups/http.h ../cups/versioning.h
 ipp.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/backend.h
 ipp.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
@@ -46,6 +45,10 @@ test1284.o: ../cups/backend.h ../cups/versioning.h ../cups/sidechannel.h
 test1284.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/ppd.h
 test1284.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 test1284.o: ../cups/i18n.h ../cups/transcode.h ../cups/snmp.h
+testbackend.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+testbackend.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+testbackend.o: ../cups/array.h ../cups/file.h ../cups/language.h
+testbackend.o: ../cups/sidechannel.h
 testsupplies.o: backend-private.h ../cups/backend.h ../cups/versioning.h
 testsupplies.o: ../cups/sidechannel.h ../cups/cups.h ../cups/ipp.h
 testsupplies.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h

@@ -16,7 +16,8 @@
  *
  * Contents:
  *
- *   main() - Run the named backend.
+ *   main()  - Run the named backend.
+ *   usage() - Show usage information.
  */
 
 /*
@@ -35,44 +36,54 @@
 
 
 /*
+ * Local functions...
+ */
+
+static void	usage(void);
+
+
+/*
  * 'main()' - Run the named backend.
  *
  * Usage:
  *
- *    betest [-s] device-uri job-id user title copies options [file]
+ *    betest [-s] [-t] device-uri job-id user title copies options [file]
  */
 
 int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		first_arg = 1,		/* First argument for backend */
-		do_side_tests = 0;	/* Test side-channel ops? */
+  int		first_arg,		/* First argument for backend */
+		do_side_tests = 0,	/* Test side-channel ops? */
+		do_trickle = 0;		/* Trickle data to backend */
   char		scheme[255],		/* Scheme in URI == backend */
 		backend[1024];		/* Backend path */
   const char	*serverbin;		/* CUPS_SERVERBIN environment variable */
   int		back_fds[2],		/* Back-channel pipe */
 		side_fds[2],		/* Side-channel socket */
+		data_fds[2],		/* Data pipe */
 		pid,			/* Process ID */
 		status;			/* Exit status */
 
-
-  if (argc < 7 || argc > 9)
-  {
-    fputs("Usage: betest [-s] device-uri job-id user title copies options [file]\n",
-          stderr);
-    return (1);
-  }
 
  /*
   * See if we have side-channel tests to do...
   */
 
-  if (!strcmp(argv[first_arg], "-s"))
-  {
-    first_arg ++;
-    do_side_tests = 1;
-  }
+  for (first_arg = 1;
+       argv[first_arg] && argv[first_arg][0] == '-';
+       first_arg ++)
+    if (!strcmp(argv[first_arg], "-s"))
+      do_side_tests = 1;
+    else if (!strcmp(argv[first_arg], "-t"))
+      do_trickle = 1;
+    else
+      usage();
+
+  argc -= first_arg;
+  if (argc < 6 || argc > 7 || (argc == 7 && do_trickle))
+    usage();
 
  /*
   * Extract the scheme from the device-uri - that's the program we want to
@@ -93,6 +104,11 @@ main(int  argc,				/* I - Number of command-line args */
       serverbin = CUPS_SERVERBIN;
 
     snprintf(backend, sizeof(backend), "%s/backend/%s", serverbin, scheme);
+    if (access(backend, X_OK))
+    {
+      fprintf(stderr, "testbackend: Unknown device scheme \"%s\"!\n", scheme);
+      return (1);
+    }
   }
 
  /*
@@ -111,7 +127,45 @@ main(int  argc,				/* I - Number of command-line args */
   fcntl(side_fds[1], F_SETFL, fcntl(side_fds[1], F_GETFL) | O_NONBLOCK);
 
  /*
-  * Execute and return
+  * Execute the trickle process as needed...
+  */
+
+  if (do_trickle)
+  {
+    pipe(data_fds);
+
+    if ((pid = fork()) == 0)
+    {
+     /*
+      * Trickle child comes here...
+      */
+
+      int i;				/* Looping var */
+
+      close(data_fds[0]);
+      for (i = 0; i < 10; i ++)
+      {
+       /*
+        * Write 10 spaces, 1 per second...
+	*/
+
+        write(data_fds[1], " ", 1);
+	sleep(1);
+      }
+
+      exit(0);
+    }
+    else if (pid < 0)
+    {
+      perror("testbackend: Unable to fork");
+      return (1);
+    }
+  }
+  else
+    data_fds[0] = data_fds[1] = -1;
+
+ /*
+  * Execute the backend...
   */
 
   if ((pid = fork()) == 0)
@@ -119,6 +173,14 @@ main(int  argc,				/* I - Number of command-line args */
    /*
     * Child comes here...
     */
+
+    if (do_trickle)
+    {
+      close(0);
+      dup(data_fds[0]);
+      close(data_fds[0]);
+      close(data_fds[1]);
+    }
 
     close(3);
     dup(back_fds[1]);
@@ -144,6 +206,12 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Parent comes here, setup back and side channel file descriptors...
   */
+
+  if (do_trickle)
+  {
+    close(data_fds[0]);
+    close(data_fds[1]);
+  }
 
   close(3);
   dup(back_fds[0]);
@@ -221,6 +289,19 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   return (status != 0);
+}
+
+
+/*
+ * 'usage()' - Show usage information.
+ */
+
+static void
+usage(void)
+{
+  fputs("Usage: betest [-s] [-t] device-uri job-id user title copies options "
+	"[file]\n", stderr);
+  exit(1);
 }
 
 
