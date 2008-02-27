@@ -1017,13 +1017,11 @@ static Boolean list_device_cb(void *refcon,
       CFStringGetCString(deviceIDString, idstr, sizeof(idstr),
                          kCFStringEncodingUTF8);
 
-      if (!make ||
-	  !CFStringGetCString(make, makestr, sizeof(makestr),
+      if (!CFStringGetCString(make, makestr, sizeof(makestr),
 			      kCFStringEncodingUTF8))
         strcpy(makestr, "Unknown");
 
-      if (!model ||
-	  !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
+      if (!CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
 			      kCFStringEncodingUTF8))
         strcpy(modelstr + 1, "Printer");
 
@@ -1038,16 +1036,6 @@ static Boolean list_device_cb(void *refcon,
 
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
-
-     /*
-      * Fix common HP 1284 bug...
-      */
-
-      if (!strcasecmp(makestr, "Hewlett-Packard"))
-        strcpy(makestr, "HP");
-
-      if (!strncasecmp(modelstr + 1, "hp ", 3))
-        _cups_strcpy(modelstr + 1, modelstr + 4);
 
       printf("direct %s \"%s %s\" \"%s %s USB\" \"%s\"\n", uristr, makestr,
              &modelstr[1], makestr, &modelstr[1], idstr);
@@ -1184,11 +1172,48 @@ static void copy_deviceinfo(CFStringRef deviceIDString,
   CFStringRef modelKeys[]  = { CFSTR("MDL:"), CFSTR("MODEL:"), NULL };
   CFStringRef makeKeys[]   = { CFSTR("MFG:"), CFSTR("MANUFACTURER:"), NULL };
   CFStringRef serialKeys[] = { CFSTR("SN:"),  CFSTR("SERN:"), NULL };
+  CFRange hpRange = { 0, 3 };
 
   if (make != NULL)
-    *make = copy_value_for_key(deviceIDString, makeKeys);
+  {
+    if ((*make = copy_value_for_key(deviceIDString, makeKeys)) == NULL)
+      *make = CFStringCreateWithCString(kCFAllocatorDefault, "Unknown",
+                                        kCFStringEncodingUTF8);
+    else if (!CFStringCompare(*make, CFSTR("Hewlett-Packard"),
+                              kCFCompareCaseInsensitive))
+    {
+     /*
+      * Fix a common HP 1284 bug...
+      */
+
+      CFRelease(*make);
+      *make = CFStringCreateWithCString(kCFAllocatorDefault, "HP",
+                                        kCFStringEncodingUTF8);
+    }
+  }
+
   if (model != NULL)
-    *model = copy_value_for_key(deviceIDString, modelKeys);
+  {
+    if ((*model = copy_value_for_key(deviceIDString, modelKeys)) == NULL)
+      *model = CFStringCreateWithCString(kCFAllocatorDefault, "Printer",
+                                         kCFStringEncodingUTF8);
+    else if (!CFStringCompareWithOptions(*model, CFSTR("hp "), hpRange,
+                                         kCFCompareCaseInsensitive |
+					     kCFCompareAnchored))
+    {
+     /*
+      * Fix a common HP 1284 bug...
+      */
+
+      CFRange subRange = { 3, CFStringGetLength(*model) - 3 };
+      CFStringRef sub = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                    *model, subRange);
+
+      CFRelease(*model);
+      *model = sub;
+    }
+  }
+
   if (serial != NULL)
     *serial = copy_value_for_key(deviceIDString, serialKeys);
 }
