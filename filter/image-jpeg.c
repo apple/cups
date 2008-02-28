@@ -47,8 +47,8 @@ _cupsImageReadJPEG(
   struct jpeg_error_mgr	jerr;		/* Error handler info */
   cups_ib_t		*in,		/* Input pixels */
 			*out;		/* Output pixels */
-  char			header[16];	/* Photoshop JPEG header */
-  int			psjpeg;		/* Non-zero if Photoshop JPEG */
+  jpeg_saved_marker_ptr	marker;		/* Pointer to marker data */
+  int			psjpeg = 0;	/* Non-zero if Photoshop CMYK JPEG */
   static const char	*cspaces[] =
 			{		/* JPEG colorspaces... */
 			  "JCS_UNKNOWN",
@@ -61,22 +61,29 @@ _cupsImageReadJPEG(
 
 
  /*
-  * Read the first 16 bytes to determine if this is a Photoshop JPEG file...
-  */
-
-  fread(header, sizeof(header), 1, fp);
-  rewind(fp);
-
-  psjpeg = memcmp(header + 6, "Photoshop ", 10) == 0;
-
- /*
   * Read the JPEG header...
   */
 
   cinfo.err = jpeg_std_error(&jerr);
   jpeg_create_decompress(&cinfo);
+  jpeg_save_markers(&cinfo, JPEG_APP0 + 14, 0xffff); /* Adobe JPEG */
   jpeg_stdio_src(&cinfo, fp);
   jpeg_read_header(&cinfo, 1);
+
+ /*
+  * Parse any Adobe APPE data embedded in the JPEG file.  Since Adobe doesn't
+  * bother following standards, we have to invert the CMYK JPEG data written by
+  * Adobe apps...
+  */
+
+  for (marker = cinfo.marker_list; marker; marker = marker->next)
+    if (marker->marker == (JPEG_APP0 + 14) && marker->data_length >= 12 &&
+        !memcmp(marker->data, "Adobe", 5) && marker->data[11] == 2)
+    {
+      fputs("DEBUG: Adobe CMYK JPEG detected (inverting color values)\n",
+	    stderr);
+      psjpeg = 1;
+    }
 
   cinfo.quantize_colors = 0;
 
