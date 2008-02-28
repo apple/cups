@@ -1,9 +1,0 @@
-#!/bin/sh
-rm -f cups.jar
-for x in `cat class.list`; do
-  javac -classpath /usr/java/classes $x.java
-  cp -f $x.class classes/
-  mv -f $x.class ../../../../classes/com/easysw/cups
-done
-jar cvf cups.jar ../../../../classes/com/easysw/cups
-mv cups.jar ../../../..

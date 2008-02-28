@@ -289,6 +289,55 @@ fi
 
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
+dnl Default LPD config file...
+AC_ARG_WITH(lpdconfigfile, [  --with-lpdconfigfile    set default LPDConfigFile URI],
+	default_lpdconfigfile="$withval",
+	default_lpdconfigfile="default")
+
+if test x$default_lpdconfigfile != xno; then
+	if test "x$default_lpdconfigfile" = "xdefault"; then
+		case $uname in
+			Darwin*)
+				CUPS_DEFAULT_LPD_CONFIG_FILE="launchd:///System/Library/LaunchDaemons/org.cups.cups-lpd.plist"
+				;;
+			*)
+				if test -d /etc/xinetd.d; then
+					CUPS_DEFAULT_LPD_CONFIG_FILE="xinetd:///etc/xinetd.d/cups-lpd"
+				else
+					CUPS_DEFAULT_LPD_CONFIG_FILE=""
+				fi
+				;;
+		esac
+	else
+		CUPS_DEFAULT_LPD_CONFIG_FILE="$default_lpdconfigfile"
+	fi
+else
+	CUPS_DEFAULT_LPD_CONFIG_FILE=""
+fi
+
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LPD_CONFIG_FILE, "$CUPS_DEFAULT_LPD_CONFIG_FILE")
+
+dnl Default SMB config file...
+AC_ARG_WITH(smbconfigfile, [  --with-smbconfigfile    set default SMBConfigFile URI],
+	default_smbconfigfile="$withval",
+	default_smbconfigfile="default")
+
+if test x$default_smbconfigfile != xno; then
+	if test "x$default_smbconfigfile" = "xdefault"; then
+		if test -f /etc/smb.conf; then
+			CUPS_DEFAULT_SMB_CONFIG_FILE="samba:///etc/smb.conf"
+		else
+			CUPS_DEFAULT_SMB_CONFIG_FILE=""
+		fi
+	else
+		CUPS_DEFAULT_SMB_CONFIG_FILE="$default_smbconfigfile"
+	fi
+else
+	CUPS_DEFAULT_SMB_CONFIG_FILE=""
+fi
+
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SMB_CONFIG_FILE, "$CUPS_DEFAULT_SMB_CONFIG_FILE")
+
 dnl Default MaxCopies value...
 AC_ARG_WITH(max-copies, [  --with-max-copies       set max copies value, default=100 ],
 	CUPS_MAX_COPIES="$withval",

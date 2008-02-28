@@ -141,6 +141,11 @@ if test -n "$GCC"; then
 			# CUPS since we already use buffer-limited calls, but
 			# this will catch any additions that are broken.		
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+
+			if test x$enable_pie = xyes; then
+				# GCC 4 on Mac OS X needs -Wl,-pie as well
+				LDFLAGS="$LDFLAGS -Wl,-pie"
+			fi
 			;;
 
 		HP-UX*)

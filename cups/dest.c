@@ -310,7 +310,7 @@ cupsGetDests(cups_dest_t **dests)	/* O - Destinations */
  */
 
 int					/* O - Number of destinations */
-cupsGetDests2(http_t      *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
+cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
               cups_dest_t **dests)	/* O - Destinations */
 {
   int		i;			/* Looping var */
@@ -495,8 +495,8 @@ cupsGetDests2(http_t      *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAU
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */
-cupsGetNamedDest(http_t     *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
-                 const char *name,	/* I - Destination name or @code NULL@ */
+cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
+                 const char *name,	/* I - Destination name or @code NULL@ for the default destination */
                  const char *instance)	/* I - Instance name or @code NULL@ */
 {
   cups_dest_t	*dest;			/* Destination */
@@ -704,7 +704,7 @@ cupsSetDests(int         num_dests,	/* I - Number of destinations */
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsSetDests2(http_t      *http,	/* I - HTTP connection or @code CUPS_HTTP_DEFAULT@ */
+cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
               int         num_dests,	/* I - Number of destinations */
               cups_dest_t *dests)	/* I - Destinations */
 {
@@ -1473,7 +1473,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
  */
 
 static int				/* O - Number of destinations */
-cups_get_sdests(http_t      *http,	/* I - HTTP connection or CUPS_HTTP_DEFAULT */
+cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFAULT */
                 ipp_op_t    op,		/* I - IPP operation */
 		const char  *name,	/* I - Name of destination */
                 int         num_dests,	/* I - Number of destinations */

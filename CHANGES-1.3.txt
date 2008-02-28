@@ -1,6 +1,17 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.7
+
+	- The image filters did not work with some CMYK JPEG files
+	  produced by Adobe applications (STR #2727)
+	- The Mac OS X USB backend did not work with printers that
+	  did not report a make or model.
+	- The job-sheets option was not encoded properly (STR #2715)
+	- The scheduler incorrectly complained about missing LSB
+	  PPD directories.
+
+
 CHANGES IN CUPS V1.3.6
 
 	- Documentation updates (STR #2646, STR #2647, STR #2649)

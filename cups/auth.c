@@ -83,7 +83,7 @@ static int	cups_local_auth(http_t *http);
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsDoAuthentication(http_t     *http,	/* I - HTTP connection to server */
+cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                      const char *method,/* I - Request method ("GET", "POST", "PUT") */
 		     const char *resource)
 					/* I - Resource path */

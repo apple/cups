@@ -3912,16 +3912,15 @@ update_lpd(int onoff)			/* - 1 = turn on, 0 = turn off */
         snprintf(line, sizeof(line), "\tdisable = %s",
 	         onoff ? "no" : "yes");
       }
-      else if (strstr(line, "disable ="))
-        continue;
-
-      cupsFilePrintf(nfp, "%s\n", line);
+      else if (!strstr(line, "disable ="))
+        cupsFilePrintf(nfp, "%s\n", line);
     }
 
     cupsFileClose(nfp);
     cupsFileClose(ofp);
     rename(newfile, LPDConfigFile + 9);
   }
+#ifdef __APPLE__
   else if (!strncmp(LPDConfigFile, "launchd:///", 11))
   {
    /*
@@ -3943,6 +3942,9 @@ update_lpd(int onoff)			/* - 1 = turn on, 0 = turn off */
     cupsdStartProcess("/bin/launchctl", argv, envp, -1, -1, -1, -1, -1, 1,
                       NULL, &pid);
   }
+#endif /* __APPLE__ */
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO, "Unknown LPDConfigFile scheme!");
 }
 
 
@@ -4038,27 +4040,8 @@ update_smb(int onoff)			/* I - 1 = turn on, 0 = turn off */
     cupsFileClose(ofp);
     rename(newfile, SMBConfigFile + 8);
   }
-  else if (!strncmp(SMBConfigFile, "launchd:///", 11))
-  {
-   /*
-    * Enable/disable SMB via the launchctl command...
-    */
-
-    char	*argv[5],		/* Arguments for command */
-		*envp[MAX_ENV];		/* Environment for command */
-    int		pid;			/* Process ID */
-
-
-    cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
-    argv[0] = (char *)"launchctl";
-    argv[1] = (char *)(onoff ? "load" : "unload");
-    argv[2] = (char *)"-w";
-    argv[3] = SMBConfigFile + 10;
-    argv[4] = NULL;
-
-    cupsdStartProcess("/bin/launchctl", argv, envp, -1, -1, -1, -1, -1, 1,
-                      NULL, &pid);
-  }
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO, "Unknown SMBConfigFile scheme!");
 }
 
 

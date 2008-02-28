@@ -313,7 +313,7 @@ cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INE
 cups_snmp_t *				/* O - SNMP packet or @code NULL@ if none */
 cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
              cups_snmp_t *packet,	/* I - SNMP packet buffer */
-	     int         msec)		/* I - Timeout in milliseconds */
+	     double      timeout)	/* I - Timeout in seconds */
 {
   unsigned char	buffer[CUPS_SNMP_MAX_PACKET];
 					/* Data packet */
@@ -333,7 +333,7 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Optionally wait for a response...
   */
 
-  if (msec >= 0)
+  if (timeout >= 0.0)
   {
     int			ready;		/* Data ready on socket? */
 #ifdef HAVE_POLL
@@ -342,21 +342,22 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
     pfd.fd     = fd;
     pfd.events = POLLIN;
 
-    while ((ready = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+    while ((ready = poll(&pfd, 1, (int)(timeout * 1000.0))) < 0 &&
+           errno == EINTR);
 
 #else
     fd_set		input_set;	/* select() input set */
-    struct timeval	timeout;	/* select() timeout */
+    struct timeval	stimeout;	/* select() timeout */
 
     do
     {
       FD_ZERO(&input_set);
       FD_SET(fd, &input_set);
 
-      timeout.tv_sec  = msec / 1000;
-      timeout.tv_usec = (msec % 1000) * 1000;
+      stimeout.tv_sec  = (int)timeout;
+      stimeout.tv_usec = (int)((timeout - stimeout.tv_usec) * 1000000);
 
-      ready = select(fd + 1, &input_set, NULL, NULL, &timeout);
+      ready = select(fd + 1, &input_set, NULL, NULL, &stimeout);
     }
 #  ifdef WIN32
     while (ready < 0 && WSAGetLastError() == WSAEINTR);
@@ -425,6 +426,9 @@ cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
  *
  * The array pointed to by "prefix" is terminated by the value -1.
  *
+ * If "timeout" is negative, @code cupsSNMPWalk@ will wait for a response
+ * indefinitely.
+ *
  * @since CUPS 1.4@
  */
 
@@ -434,7 +438,7 @@ cupsSNMPWalk(int            fd,		/* I - SNMP socket */
 	     int            version,	/* I - SNMP version */
 	     const char     *community,	/* I - Community name */
              const int      *prefix,	/* I - OID prefix */
-	     int            msec,	/* I - Timeout for each response in milliseconds */
+	     double         timeout,	/* I - Timeout for each response in seconds */
 	     cups_snmp_cb_t cb,		/* I - Function to call for each response */
 	     void           *data)	/* I - User data pointer that is passed to the callback function */
 {
@@ -466,7 +470,7 @@ cupsSNMPWalk(int            fd,		/* I - SNMP socket */
 		       packet.object_name))
       return (-1);
 
-    if (!cupsSNMPRead(fd, &packet, msec))
+    if (!cupsSNMPRead(fd, &packet, timeout))
       return (-1);
 
     if (!cupsSNMPIsOIDPrefixed(&packet, prefix))

@@ -51,7 +51,7 @@
  */
 
 http_status_t				/* O - HTTP status */
-cupsGetFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
+cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
 	  const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
@@ -191,7 +191,7 @@ cupsGetFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP
  */
 
 http_status_t				/* O - HTTP status */
-cupsGetFile(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
+cupsGetFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
 	    const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
 {
@@ -259,7 +259,7 @@ cupsGetFile(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HT
  */
 
 http_status_t				/* O - HTTP status */
-cupsPutFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
+cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
           const char *resource,		/* I - Resource name */
 	  int        fd)		/* I - File descriptor */
 {
@@ -444,7 +444,7 @@ cupsPutFd(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP
  */
 
 http_status_t				/* O - HTTP status */
-cupsPutFile(http_t     *http,		/* I - HTTP connection to server or @code CUPS_HTTP_DEFAULT@ */
+cupsPutFile(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
             const char *resource,	/* I - Resource name */
 	    const char *filename)	/* I - Filename */
 {

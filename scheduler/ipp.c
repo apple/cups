@@ -17,81 +17,6 @@
  *
  * Contents:
  *
- *   cupsdProcessIPPRequest()    - Process an incoming IPP request.
- *   cupsdTimeoutJob()           - Timeout a job waiting on job files.
- *   accept_jobs()               - Accept print jobs to a printer.
- *   add_class()                 - Add a class to the system.
- *   add_file()                  - Add a file to a job.
- *   add_job()                   - Add a job to a print queue.
- *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
- *                                 upon the job and printer state...
- *   add_job_subscriptions()     - Add any subcriptions for a job.
- *   add_job_uuid()              - Add job-uuid attribute to a job.
- *   add_printer()               - Add a printer to the system.
- *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
- *                                 based upon the printer state...
- *   add_queued_job_count()      - Add the "queued-job-count" attribute for
- *   apply_printer_defaults()    - Apply printer default options to a job.
- *   authenticate_job()          - Set job authentication info.
- *   cancel_all_jobs()           - Cancel all print jobs.
- *   cancel_job()                - Cancel a print job.
- *   cancel_subscription()       - Cancel a subscription.
- *   check_quotas()              - Check quotas for a printer and user.
- *   copy_attribute()            - Copy a single attribute.
- *   copy_attrs()                - Copy attributes from one request to another.
- *   copy_banner()               - Copy a banner file to the requests directory
- *                                 for the specified job.
- *   copy_file()                 - Copy a PPD file or interface script...
- *   copy_model()                - Copy a PPD model file, substituting default
- *                                 values as needed...
- *   copy_job_attrs()            - Copy job attributes.
- *   copy_printer_attrs()        - Copy printer attributes.
- *   copy_subscription_attrs()   - Copy subscription attributes.
- *   create_job()                - Print a file to a printer or class.
- *   create_requested_array()    - Create an array for the requested-attributes.
- *   create_subscription()       - Create a notification subscription.
- *   delete_printer()            - Remove a printer or class from the system.
- *   get_default()               - Get the default destination.
- *   get_devices()               - Get the list of available devices on the
- *                                 local system.
- *   get_document()              - Get a copy of a job file.
- *   get_job_attrs()             - Get job attributes.
- *   get_jobs()                  - Get a list of jobs for the specified printer.
- *   get_notifications()         - Get events for a subscription.
- *   get_ppd()                   - Get a named PPD from the local system.
- *   get_ppds()                  - Get the list of PPD files on the local
- *                                 system.
- *   get_printer_attrs()         - Get printer attributes.
- *   get_printers()              - Get a list of printers.
- *   get_subscription_attrs()    - Get subscription attributes.
- *   get_subscriptions()         - Get subscriptions.
- *   get_username()              - Get the username associated with a request.
- *   hold_job()                  - Hold a print job.
- *   move_job()                  - Move a job to a new destination.
- *   ppd_parse_line()            - Parse a PPD default line.
- *   print_job()                 - Print a file to a printer or class.
- *   read_ps_line()              - Read a line from a PS file...
- *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
- *   reject_jobs()               - Reject print jobs to a printer.
- *   release_job()               - Release a held print job.
- *   restart_job()               - Restart an old print job.
- *   save_auth_info()            - Save authentication information for a job.
- *   save_krb5_creds()           - Save Kerberos credentials for a job.
- *   send_document()             - Send a file to a printer or class.
- *   send_http_error()           - Send a HTTP error back to the IPP client.
- *   send_ipp_status()           - Send a status back to the IPP client.
- *   set_default()               - Set the default destination...
- *   set_job_attrs()             - Set job attributes.
- *   set_printer_defaults()      - Set printer default options from a request.
- *   start_printer()             - Start a printer.
- *   stop_printer()              - Stop a printer.
- *   url_encode_attr()           - URL-encode a string attribute.
- *   url_encode_string()         - URL-encode a string.
- *   user_allowed()              - See if a user is allowed to print to a queue.
- *   validate_job()              - Validate printer options and destination.
- *   validate_name()             - Make sure the printer name only contains
- *                                 valid chars.
- *   validate_user()             - Validate the user for the request.
  */
 
 /*
@@ -105,6 +30,8 @@
 #endif /* HAVE_LIBPAPER */
 
 #ifdef __APPLE__
+#  include <ApplicationServices/ApplicationServices.h>
+#  include <CoreFoundation/CoreFoundation.h>
 #  ifdef HAVE_MEMBERSHIP_H
 #    include <membership.h>
 #  endif /* HAVE_MEMBERSHIP_H */
@@ -135,6 +62,13 @@ static void	add_printer(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	add_printer_state_reasons(cupsd_client_t *con,
 		                          cupsd_printer_t *p);
 static void	add_queued_job_count(cupsd_client_t *con, cupsd_printer_t *p);
+#ifdef __APPLE__
+static unsigned	apple_hash_name(const char *name);
+static void	apple_init_profile(CMDeviceProfileInfo *profile, unsigned id,
+		                   const char *name, const char *iccfile);
+static void	apple_register_profiles(cupsd_printer_t *p);
+static void	apple_unregister_profiles(cupsd_printer_t *p);
+#endif /* __APPLE__ */
 static void	apply_printer_defaults(cupsd_printer_t *printer,
 				       cupsd_job_t *job);
 static void	authenticate_job(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -2556,12 +2490,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	                  strerror(errno));
 	  return;
 	}
-	else
-	{
-          cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Copied interface script successfully!");
-          chmod(dstfile, 0755);
-	}
+
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+			"Copied interface script successfully!");
+	chmod(dstfile, 0755);
       }
 
       snprintf(dstfile, sizeof(dstfile), "%s/ppd/%s.ppd", ServerRoot,
@@ -2581,12 +2513,19 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	                  strerror(errno));
 	  return;
 	}
-	else
-	{
-          cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Copied PPD file successfully!");
-          chmod(dstfile, 0644);
-	}
+
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+			"Copied PPD file successfully!");
+	chmod(dstfile, 0644);
+
+#ifdef __APPLE__
+       /*
+        * (Re)register color profiles...
+	*/
+
+        apple_unregister_profiles(printer);
+	apple_register_profiles(printer);
+#endif /* __APPLE__ */
       }
       else
       {
@@ -2636,12 +2575,19 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         send_ipp_status(con, IPP_INTERNAL_ERROR, _("Unable to copy PPD file!"));
 	return;
       }
-      else
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Copied PPD file successfully!");
-        chmod(dstfile, 0644);
-      }
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "Copied PPD file successfully!");
+      chmod(dstfile, 0644);
+
+#ifdef __APPLE__
+     /*
+      * (Re)register color profiles...
+      */
+
+      apple_unregister_profiles(printer);
+      apple_register_profiles(printer);
+#endif /* __APPLE__ */
     }
   }
 
@@ -2787,6 +2733,339 @@ add_queued_job_count(
                 "queued-job-count", count);
 }
 
+
+#ifdef __APPLE__
+/*
+ * 'apple_hash_name()' - Calculate a 32-bit hash of a printer/profile name.
+ */
+
+static unsigned				/* O - Hash value */
+apple_hash_name(const char *name)	/* I - Printer/profile name */
+{
+  int		mult;			/* Multiplier */
+  unsigned	hash = 0;		/* Hash value */
+
+
+  for (mult = 1; *name && mult <= 128; mult ++, name ++)
+    hash += (*name & 255) & mult;
+
+  return (hash);
+}
+
+
+/*
+ * 'apple_init_profile()' - Initialize a color profile.
+ */
+
+static void
+apple_init_profile(
+    CMDeviceProfileInfo *profile,	/* I - Profile record */
+    unsigned            id,		/* I - Profile ID */
+    const char          *name,		/* I - Profile name */
+    const char          *iccfile)	/* I - ICC filename */
+{
+  char			url[1024];	/* URL for profile filename */
+  CFMutableDictionaryRef dict;		/* Dictionary for name */
+
+
+  if (iccfile)
+    httpAssembleURI(HTTP_URI_CODING_ALL, url, sizeof(url), "file", NULL, "", 0,
+		    iccfile);
+
+  dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+				   &kCFTypeDictionaryKeyCallBacks,
+				   &kCFTypeDictionaryValueCallBacks);
+
+  profile->dataVersion        = cmDeviceProfileInfoVersion1;
+  profile->profileID          = id;
+  profile->profileLoc.locType = iccfile ? cmPathBasedProfile : cmNoProfileBase;
+  profile->profileName        = dict;
+
+  if (iccfile)
+    strlcpy(profile->profileLoc.u.pathLoc.path, iccfile,
+	    sizeof(profile->profileLoc.u.pathLoc.path));
+
+  CFDictionarySetValue(dict, CFSTR("PMColorDeviceProfileID"),
+		       CFNumberCreate(kCFAllocatorDefault,
+				      kCFNumberSInt32Type,
+				      &profile->profileID));
+  CFDictionarySetValue(dict, CFSTR("PMColorDeviceProfileName"),
+		       CFStringCreateWithCString(kCFAllocatorDefault,
+						 name,
+						 kCFStringEncodingUTF8));
+  if (iccfile)
+    CFDictionarySetValue(dict, CFSTR("PMColorDeviceProfileURL"),
+			 CFStringCreateWithCString(kCFAllocatorDefault,
+						   url,
+						   kCFStringEncodingUTF8));
+}
+
+
+/*
+ * 'apple_register_profiles()' - Register color profiles for a printer.
+ */
+
+static void
+apple_register_profiles(
+    cupsd_printer_t *p)			/* I - Printer */
+{
+  int			i;		/* Looping var */
+  char			ppdfile[1024],	/* PPD filename */
+			iccfile[1024];	/* ICC filename */
+  ppd_file_t		*ppd;		/* PPD file */
+  ppd_attr_t		*attr;		/* cupsICCProfile attributes */
+  ppd_option_t		*cm_option;	/* Color model option */
+  ppd_choice_t		*cm_choice;	/* Color model choice */
+  int			num_profiles;	/* Number of profiles */
+  CMError		error;		/* Last error */
+  unsigned		id;		/* Printer device ID */
+  CFMutableDictionaryRef name;		/* Printer device name dictionary */
+  CMDeviceScope		scope =		/* Scope of the registration */
+			{
+			  kCFPreferencesAnyUser,
+			  kCFPreferencesCurrentHost
+			};
+  CMDeviceProfileArrayPtr profiles;	/* Profiles */
+  CMDeviceProfileInfo	*profile;	/* Current profile */
+
+
+ /*
+  * Try opening the PPD file for this printer...
+  */
+
+  snprintf(ppdfile, sizeof(ppdfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
+  if ((ppd = ppdOpenFile(ppdfile)) == NULL)
+    return;
+
+ /*
+  * See if we have any profiles...
+  */
+
+  for (num_profiles = 0, attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+    if (attr->spec[0] && attr->value && attr->value[0])
+    {
+      if (attr->value[0] != '/')
+	snprintf(iccfile, sizeof(iccfile), "%s/profiles/%s", DataDir,
+		 attr->value);
+      else
+	strlcpy(iccfile, attr->value, sizeof(iccfile));
+
+      if (access(iccfile, 0))
+	continue;
+
+      num_profiles ++;
+    }
+
+ /*
+  * If we have profiles, add them...
+  */
+
+  if (num_profiles > 0)
+  {
+   /*
+    * Build the array of profiles...
+    *
+    * Note: This calloc actually requests slightly more memory than needed.
+    */
+
+    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for %d profiles!",
+		      num_profiles);
+      ppdClose(ppd);
+      return;
+    }
+
+    profiles->profileCount = num_profiles;
+
+    for (profile = profiles->profiles,
+             attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+	 attr;
+	 attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+      if (attr->spec[0] && attr->value && attr->value[0])
+      {
+       /*
+        * Add this profile...
+	*/
+
+        if (attr->value[0] != '/')
+	  snprintf(iccfile, sizeof(iccfile), "%s/profiles/%s", DataDir,
+	           attr->value);
+        else
+	  strlcpy(iccfile, attr->value, sizeof(iccfile));
+
+        if (access(iccfile, 0))
+	  continue;
+
+        apple_init_profile(profile, apple_hash_name(attr->spec), attr->spec,
+	                   iccfile);
+
+	profile ++;
+      }
+  }
+  else if ((cm_option = ppdFindOption(ppd, "ColorModel")) != NULL)
+  {
+   /*
+    * Extract standard grayscale, RGB, or CMYK profiles...
+    */
+
+    for (num_profiles = 0, i = cm_option->num_choices,
+             cm_choice = cm_option->choices;
+         i > 0;
+	 i --, cm_choice ++)
+      if (!strcmp(cm_choice->choice, "Gray") ||
+          !strcmp(cm_choice->choice, "RGB") ||
+          !strcmp(cm_choice->choice, "CMYK"))
+        num_profiles ++; 
+
+   /*
+    * Build the array of profiles...
+    *
+    * Note: This calloc actually requests slightly more memory than needed.
+    */
+
+    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for %d profiles!",
+		      num_profiles);
+      ppdClose(ppd);
+      return;
+    }
+
+    profiles->profileCount = num_profiles;
+
+    for (profile = profiles->profiles, i = cm_option->num_choices,
+             cm_choice = cm_option->choices;
+         i > 0;
+	 i --, cm_choice ++)
+      if (!strcmp(cm_choice->choice, "Gray"))
+      {
+        apple_init_profile(profile, apple_hash_name("Gray.."), "Gray", NULL);
+	profile ++;
+      }
+      else if (!strcmp(cm_choice->choice, "RGB"))
+      {
+        apple_init_profile(profile, apple_hash_name("RGB.."), "RGB", NULL);
+	profile ++;
+      }
+      else if (!strcmp(cm_choice->choice, "CMYK"))
+      {
+        apple_init_profile(profile, apple_hash_name("CMYK.."), "CMYK", NULL);
+	profile ++;
+      }
+  }
+  else
+  {
+   /*
+    * Use the default colorspace...
+    */
+
+    num_profiles = 1;
+    
+    if ((profiles = calloc(1, sizeof(CMDeviceProfileArray))) == NULL)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to allocate memory for %d profiles!",
+		      num_profiles);
+      ppdClose(ppd);
+      return;
+    }
+
+    profiles->profileCount = 1;
+
+    switch (ppd->colorspace)
+    {
+      case PPD_CS_GRAY :
+          apple_init_profile(profiles->profiles, apple_hash_name("Gray.."),
+	                     "Gray", NULL);
+          break;
+      case PPD_CS_RGB :
+          apple_init_profile(profiles->profiles, apple_hash_name("RGB.."),
+	                     "RGB", NULL);
+          break;
+      case PPD_CS_CMYK :
+          apple_init_profile(profiles->profiles, apple_hash_name("CMYK.."),
+	                     "CMYK", NULL);
+          break;
+
+      default :
+          free(profiles);
+	  num_profiles = 0;
+	  break;
+    }
+  }
+
+  if (num_profiles > 0)
+  {
+   /*
+    * Get the device ID hash and pathelogical name dictionary.
+    */
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "Registering ICC color profiles for \"%s\"",
+		    p->name);
+
+    id   = apple_hash_name(p->name);
+    name = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+				     &kCFTypeDictionaryKeyCallBacks,
+				     &kCFTypeDictionaryValueCallBacks);
+
+    CFDictionarySetValue(name, CFSTR("en"),
+			 CFStringCreateWithCString(kCFAllocatorDefault, p->name,
+						   kCFStringEncodingUTF8));
+
+   /*
+    * Register the device with ColorSync...
+    */
+
+    error = CMRegisterColorDevice(cmPrinterDeviceClass, id, name, &scope);
+
+   /*
+    * Register the profiles...
+    */
+
+    if (error == noErr)
+      error = CMSetDeviceFactoryProfiles(cmPrinterDeviceClass, id,
+					 profiles->profiles[0].profileID,
+					 profiles);
+
+   /*
+    * Clean up...
+    */
+
+    if (error != noErr)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to register ICC color profiles for \"%s\" - %d",
+		      p->name, (int)error);
+
+    for (profile = profiles->profiles;
+	 num_profiles > 0;
+	 profile ++, num_profiles --)
+      CFRelease(profile->profileName);
+
+    free(profiles);
+    CFRelease(name);
+  }
+
+  ppdClose(ppd);
+}
+
+
+/*
+ * 'apple_unregister_profiles()' - Remove color profiles for the specified
+ *                                 printer.
+ */
+
+static void
+apple_unregister_profiles(
+    cupsd_printer_t *p)			/* I - Printer */
+{
+  CMUnregisterColorDevice(cmPrinterDeviceClass, apple_hash_name(p->name));
+}
+#endif /* __APPLE__ */
 
 /*
  * 'apply_printer_defaults()' - Apply printer default options to a job.
@@ -5564,6 +5843,14 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
            printer->name);
   unlink(filename);
+
+#ifdef __APPLE__
+ /*
+  * Unregister color profiles...
+  */
+
+  apple_unregister_profiles(printer);
+#endif /* __APPLE__ */
 
   if (dtype & CUPS_PRINTER_CLASS)
   {

@@ -17,7 +17,6 @@
  * Contents:
  *
  *   main()    - Send a file to the printer or server.
- *   side_cb() - Handle side-channel requests...
  *   wait_bc() - Wait for back-channel data...
  */
 
@@ -47,7 +46,6 @@
  * Local functions...
  */
 
-static void	side_cb(int print_fd, int device_fd, int use_bc);
 static int	wait_bc(int device_fd, int secs);
 
 
@@ -85,6 +83,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   http_addrlist_t *addrlist,		/* Address list */
 		*addr;			/* Connected address */
   char		addrname[256];		/* Address name */
+  int		snmp_fd,		/* SNMP socket */
+		start_count,		/* Page count via SNMP at start */
+		page_count;		/* Page count via SNMP */
   ssize_t	tbytes;			/* Total number of bytes written */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -359,6 +360,21 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      ntohs(addr->addr.ipv4.sin_port));
 
  /*
+  * See if the printer supports SNMP...
+  */
+
+  if ((snmp_fd = cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+    if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
+    {
+     /*
+      * No, close it...
+      */
+
+      cupsSNMPClose(snmp_fd);
+      snmp_fd = -1;
+    }
+
+ /*
   * Print everything...
   */
 
@@ -374,7 +390,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, 1, side_cb);
+    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addr->addr), 1,
+                            backendNetworkSideCB);
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintf(stderr,
@@ -407,6 +424,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
+  * Collect the final page count as needed...
+  */
+
+  if (snmp_fd >= 0 && 
+      !backendSNMPSupplies(snmp_fd, &(addr->addr), &page_count, NULL) &&
+      page_count > start_count)
+    fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
+
+ /*
   * Close the socket connection...
   */
 
@@ -425,68 +451,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
 
   return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
-}
-
-
-/*
- * 'side_cb()' - Handle side-channel requests...
- */
-
-static void
-side_cb(int print_fd,			/* I - Print file */
-        int device_fd,			/* I - Device file */
-	int use_bc)			/* I - Using back-channel? */
-{
-  cups_sc_command_t	command;	/* Request command */
-  cups_sc_status_t	status;		/* Request/response status */
-  char			data[2048];	/* Request/response data */
-  int			datalen;	/* Request/response data size */
-  const char		*device_id;	/* 1284DEVICEID env var */
-
-
-  datalen = sizeof(data);
-
-  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
-    return;
-  }
-
-  switch (command)
-  {
-    case CUPS_SC_CMD_DRAIN_OUTPUT :
-       /*
-        * Our sockets disable the Nagle algorithm and data is sent immediately.
-	*/
-
-        if (backendDrainOutput(print_fd, device_fd))
-	  status = CUPS_SC_STATUS_IO_ERROR;
-	else 
-          status = CUPS_SC_STATUS_OK;
-
-	datalen = 0;
-        break;
-
-    case CUPS_SC_CMD_GET_BIDI :
-        data[0] = use_bc;
-        datalen = 1;
-        break;
-
-    case CUPS_SC_CMD_GET_DEVICE_ID :
-        if ((device_id = getenv("1284DEVICEID")) != NULL)
-	{
-	  strlcpy(data, device_id, sizeof(data));
-	  datalen = (int)strlen(data);
-	  break;
-	}
-
-    default :
-        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
-	datalen = 0;
-	break;
-  }
-
-  cupsSideChannelWrite(command, status, data, datalen, 1.0);
 }
 
 

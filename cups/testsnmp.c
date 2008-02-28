@@ -268,7 +268,7 @@ show_oid(int         fd,		/* I - SNMP socket */
       printf(".%d", oid[i]);
     puts("):");
 
-    if (cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5000,
+    if (cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5.0,
                      print_packet, NULL) < 0)
     {
       printf("FAIL (%s)\n", strerror(errno));
@@ -291,9 +291,9 @@ show_oid(int         fd,		/* I - SNMP socket */
 
     puts("PASS");
 
-    fputs("cupsSNMPRead(5000): ", stdout);
+    fputs("cupsSNMPRead(5.0): ", stdout);
 
-    if (!cupsSNMPRead(fd, &packet, 5000))
+    if (!cupsSNMPRead(fd, &packet, 5.0))
     {
       puts("FAIL (timeout)");
       return (0);

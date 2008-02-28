@@ -119,13 +119,13 @@ extern int		cupsSNMPIsOID(cups_snmp_t *packet, const int *oid)
 extern int		cupsSNMPIsOIDPrefixed(cups_snmp_t *packet,
 			                      const int *prefix) _CUPS_API_1_4;
 extern int		cupsSNMPOpen(int family) _CUPS_API_1_4;
-extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet, int msec)
-			    _CUPS_API_1_4;
+extern cups_snmp_t	*cupsSNMPRead(int fd, cups_snmp_t *packet,
+			              double timeout) _CUPS_API_1_4;
 extern void		cupsSNMPSetDebug(int level) _CUPS_API_1_4;
 extern int		cupsSNMPWalk(int fd, http_addr_t *address, int version,
 			             const char *community, const int *prefix,
-				     int msec, cups_snmp_cb_t cb, void *data)
-			    _CUPS_API_1_4;
+				     double timeout, cups_snmp_cb_t cb,
+				     void *data) _CUPS_API_1_4;
 extern int		cupsSNMPWrite(int fd, http_addr_t *address, int version,
 				      const char *community,
 				      cups_asn1_t request_type,

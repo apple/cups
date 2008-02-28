@@ -97,8 +97,8 @@ extern "C" {
 #define CUPS_OID_prtMarkerSuppliesType		CUPS_OID_prtMarkerSuppliesEntry,5
 #define CUPS_OID_prtMarkerSuppliesDescription	CUPS_OID_prtMarkerSuppliesEntry,6
 #define CUPS_OID_prtMarkerSuppliesSupplyUnit	CUPS_OID_prtMarkerSuppliesEntry,7
-#define CUPS_OID_prtMarkerSuppliesMaxCapacity	CUPS_OID_prtMarkerSupliesEntry,8
-#define CUPS_OID_prtMarkerSuppliesLevel		CUPS_OID_prtMarkerSupliesEntry,9
+#define CUPS_OID_prtMarkerSuppliesMaxCapacity	CUPS_OID_prtMarkerSuppliesEntry,8
+#define CUPS_OID_prtMarkerSuppliesLevel		CUPS_OID_prtMarkerSuppliesEntry,9
 
 #define CUPS_OID_prtMarkerColorant		CUPS_OID_printmib,12
 #define CUPS_OID_prtMarkerColorantTable		CUPS_OID_prtMarkerColorant,1
@@ -211,10 +211,15 @@ extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
 				   const char *scheme, char *uri, int uri_size);
 extern int	backendGetMakeModel(const char *device_id, char *make_model,
 			            int make_model_size);
-extern ssize_t	backendRunLoop(int print_fd, int device_fd, int use_bc,
-		               void (*side_cb)(int print_fd, int device_fd,
-			                       int use_bc));
-
+extern void	backendNetworkSideCB(int print_fd, int device_fd, int snmp_fd,
+		                     http_addr_t *addr, int use_bc);
+extern ssize_t	backendRunLoop(int print_fd, int device_fd, int snmp_fd,
+		               http_addr_t *addr, int use_bc,
+			       void (*side_cb)(int print_fd, int device_fd,
+					       int snmp_fd, http_addr_t *addr,
+					       int use_bc));
+extern int	backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
+		                    int *page_count, int *printer_state);
 
 #  ifdef __cplusplus
 }

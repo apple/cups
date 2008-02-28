@@ -93,7 +93,6 @@ HEADERS	=	\
 		dir.h \
 		file.h \
 		http.h \
-		i18n.h \
 		ipp.h \
 		language.h \
 		ppd.h \
