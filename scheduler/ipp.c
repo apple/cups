@@ -17,6 +17,88 @@
  *
  * Contents:
  *
+ *   cupsdProcessIPPRequest()    - Process an incoming IPP request.
+ *   cupsdTimeoutJob()           - Timeout a job waiting on job files.
+ *   accept_jobs()               - Accept print jobs to a printer.
+ *   add_class()                 - Add a class to the system.
+ *   add_file()                  - Add a file to a job.
+ *   add_job()                   - Add a job to a print queue.
+ *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
+ *                                 upon the job and printer state...
+ *   add_job_subscriptions()     - Add any subcriptions for a job.
+ *   add_job_uuid()              - Add job-uuid attribute to a job.
+ *   add_printer()               - Add a printer to the system.
+ *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
+ *                                 based upon the printer state...
+ *   add_queued_job_count()      - Add the "queued-job-count" attribute for the
+ *                                 specified printer or class.
+ *   apple_hash_name()           - Calculate a 32-bit hash of a printer/profile
+ *                                 name.
+ *   apple_init_profile()        - Initialize a color profile.
+ *   apple_register_profiles()   - Register color profiles for a printer.
+ *   apple_unregister_profiles() - Remove color profiles for the specified
+ *                                 printer.
+ *   apply_printer_defaults()    - Apply printer default options to a job.
+ *   authenticate_job()          - Set job authentication info.
+ *   cancel_all_jobs()           - Cancel all print jobs.
+ *   cancel_job()                - Cancel a print job.
+ *   cancel_subscription()       - Cancel a subscription.
+ *   check_quotas()              - Check quotas for a printer and user.
+ *   copy_attribute()            - Copy a single attribute.
+ *   copy_attrs()                - Copy attributes from one request to another.
+ *   copy_banner()               - Copy a banner file to the requests directory
+ *                                 for the specified job.
+ *   copy_file()                 - Copy a PPD file or interface script...
+ *   copy_model()                - Copy a PPD model file, substituting default
+ *                                 values as needed...
+ *   copy_job_attrs()            - Copy job attributes.
+ *   copy_printer_attrs()        - Copy printer attributes.
+ *   copy_subscription_attrs()   - Copy subscription attributes.
+ *   create_job()                - Print a file to a printer or class.
+ *   create_requested_array()    - Create an array for the requested-attributes.
+ *   create_subscription()       - Create a notification subscription.
+ *   delete_printer()            - Remove a printer or class from the system.
+ *   get_default()               - Get the default destination.
+ *   get_devices()               - Get the list of available devices on the
+ *                                 local system.
+ *   get_document()              - Get a copy of a job file.
+ *   get_job_attrs()             - Get job attributes.
+ *   get_jobs()                  - Get a list of jobs for the specified printer.
+ *   get_notifications()         - Get events for a subscription.
+ *   get_ppd()                   - Get a named PPD from the local system.
+ *   get_ppds()                  - Get the list of PPD files on the local
+ *                                 system.
+ *   get_printer_attrs()         - Get printer attributes.
+ *   get_printers()              - Get a list of printers or classes.
+ *   get_subscription_attrs()    - Get subscription attributes.
+ *   get_subscriptions()         - Get subscriptions.
+ *   get_username()              - Get the username associated with a request.
+ *   hold_job()                  - Hold a print job.
+ *   move_job()                  - Move a job to a new destination.
+ *   ppd_parse_line()            - Parse a PPD default line.
+ *   print_job()                 - Print a file to a printer or class.
+ *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
+ *   reject_jobs()               - Reject print jobs to a printer.
+ *   release_job()               - Release a held print job.
+ *   renew_subscription()        - Renew an existing subscription...
+ *   restart_job()               - Restart an old print job.
+ *   save_auth_info()            - Save authentication information for a job.
+ *   save_krb5_creds()           - Save Kerberos credentials for the job.
+ *   send_document()             - Send a file to a printer or class.
+ *   send_http_error()           - Send a HTTP error back to the IPP client.
+ *   send_ipp_status()           - Send a status back to the IPP client.
+ *   set_default()               - Set the default destination...
+ *   set_job_attrs()             - Set job attributes.
+ *   set_printer_defaults()      - Set printer default options from a request.
+ *   start_printer()             - Start a printer.
+ *   stop_printer()              - Stop a printer.
+ *   url_encode_attr()           - URL-encode a string attribute.
+ *   url_encode_string()         - URL-encode a string.
+ *   user_allowed()              - See if a user is allowed to print to a queue.
+ *   validate_job()              - Validate printer options and destination.
+ *   validate_name()             - Make sure the printer name only contains
+ *                                 valid chars.
+ *   validate_user()             - Validate the user for the request.
  */
 
 /*
