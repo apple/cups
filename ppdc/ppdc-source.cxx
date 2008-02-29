@@ -1183,8 +1183,8 @@ ppdcSource::get_installable(ppdcFile *fp)
 int					// O - Integer value
 ppdcSource::get_integer(const char *v)	// I - Value string
 {
-  int	val;				// Value
-  int	temp;				// Temporary value
+  long	val;				// Value
+  long	temp;				// Temporary value
   char	*newv;				// New value string pointer
 
 
@@ -1199,7 +1199,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
     if (*v || val == LONG_MIN)
       return (-1);
     else
-      return (val);
+      return ((int)val);
   }
   else if (*v == '(')
   {
@@ -1220,7 +1220,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
     }
 
     if (*v == ')')
-      return (val);
+      return ((int)val);
     else
       return (-1);
   }
