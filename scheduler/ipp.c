@@ -2747,7 +2747,7 @@ apple_hash_name(const char *name)	/* I - Printer/profile name */
 
 
   for (mult = 1; *name && mult <= 128; mult ++, name ++)
-    hash += (*name & 255) & mult;
+    hash += (*name & 255) * mult;
 
   return (hash);
 }
