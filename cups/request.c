@@ -146,7 +146,8 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   */
 
   if (!http)
-    http = _cupsConnect();
+    if ((http = _cupsConnect()) == NULL)
+      return (NULL);
 
  /*
   * See if we have a file to send...
@@ -530,7 +531,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   */
 
   if (!http)
-    http = _cupsConnect();
+    if ((http = _cupsConnect()) == NULL)
+      return (HTTP_SERVICE_UNAVAILABLE);
 
 #ifdef HAVE_SSL
  /*

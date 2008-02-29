@@ -78,7 +78,8 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   }
 
   if (!http)
-    http = _cupsConnect();
+    if ((http = _cupsConnect()) == NULL)
+      return (HTTP_SERVICE_UNAVAILABLE);
 
  /*
   * Then send GET requests to the HTTP server...
@@ -285,7 +286,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   }
 
   if (!http)
-    http = _cupsConnect();
+    if ((http = _cupsConnect()) == NULL)
+      return (HTTP_SERVICE_UNAVAILABLE);
 
  /*
   * Then send PUT requests to the HTTP server...
