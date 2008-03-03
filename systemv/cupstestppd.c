@@ -18,16 +18,6 @@
  *
  * Contents:
  *
- *   main()               - Main entry for test program.
- *   check_basics()       - Check for CR LF, mixed line endings, and blank lines.
- *   check_constraints()  - Check UIConstraints in the PPD file.
- *   check_defaults()     - Check default option keywords in the PPD file.
- *   check_filters()      - Check filters in the PPD file.
- *   check_translations() - Check translations in the PPD file.
- *   show_conflicts()     - Show option conflicts in a PPD file.
- *   test_raster()        - Test PostScript commands for raster printers.
- *   usage()              - Show program usage...
- *   valid_utf8()         - Check whether a string contains valid UTF-8 text.
  */
 
 /*
@@ -36,6 +26,7 @@
 
 #include <cups/string.h>
 #include <cups/cups.h>
+#include <cups/ppd-private.h>
 #include <cups/i18n.h>
 #include <cups/raster.h>
 #include <errno.h>
@@ -53,8 +44,9 @@ enum
   WARN_CONSTRAINTS = 1,
   WARN_DEFAULTS = 2,
   WARN_FILTERS = 4,
-  WARN_TRANSLATIONS = 8,
-  WARN_ALL = 15
+  WARN_PROFILES = 8,
+  WARN_TRANSLATIONS = 16,
+  WARN_ALL = 31
 };
 
 
@@ -96,6 +88,8 @@ static int	check_defaults(ppd_file_t *ppd, int errors, int verbose,
 		               int warn);
 static int	check_filters(ppd_file_t *ppd, const char *root, int errors,
 		              int verbose, int warn);
+static int	check_profiles(ppd_file_t *ppd, const char *root, int errors,
+		               int verbose, int warn);
 static int	check_translations(ppd_file_t *ppd, int errors, int verbose,\
 		                   int warn);
 static void	show_conflicts(ppd_file_t *ppd);
@@ -125,8 +119,7 @@ main(int  argc,				/* I - Number of command-line args */
   ppd_status_t	error;			/* Status of ppdOpen*() */
   int		line;			/* Line number for error */
   struct stat	statbuf;		/* File information */
-  char		pathprog[1024],		/* Complete path to program/filter */
-		*root;			/* Root directory */
+  char		*root;			/* Root directory */
   int		xdpi,			/* X resolution */
 		ydpi;			/* Y resolution */
   ppd_file_t	*ppd;			/* PPD file record */
@@ -186,6 +179,8 @@ main(int  argc,				/* I - Number of command-line args */
 	        warn |= WARN_DEFAULTS;
 	      else if (!strcmp(argv[i], "filters"))
 	        warn |= WARN_FILTERS;
+	      else if (!strcmp(argv[i], "profiles"))
+	        warn |= WARN_PROFILES;
 	      else if (!strcmp(argv[i], "translations"))
 	        warn |= WARN_TRANSLATIONS;
 	      else if (!strcmp(argv[i], "all"))
@@ -1072,6 +1067,9 @@ main(int  argc,				/* I - Number of command-line args */
       if (!(warn & WARN_FILTERS))
         errors = check_filters(ppd, root, errors, verbose, 0);
 
+      if (!(warn & WARN_PROFILES))
+        errors = check_profiles(ppd, root, errors, verbose, 0);
+
       if (!(warn & WARN_TRANSLATIONS))
         errors = check_translations(ppd, errors, verbose, 0);
 
@@ -1196,6 +1194,9 @@ main(int  argc,				/* I - Number of command-line args */
 
 	if (warn & WARN_DEFAULTS)
 	  errors = check_defaults(ppd, errors, verbose, 1);
+
+	if (warn & WARN_PROFILES)
+	  errors = check_profiles(ppd, root, errors, verbose, 1);
 
 	if (warn & WARN_FILTERS)
 	  errors = check_filters(ppd, root, errors, verbose, 1);
@@ -1358,43 +1359,6 @@ main(int  argc,				/* I - Number of command-line args */
 		                  option->keyword, option2->keyword);
         	}
 	  }
-      }
-
-     /*
-      * cupsICCProfile
-      */
-
-      for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL); 
-	   attr != NULL; 
-	   attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
-      {
-	if (attr->value)
-	{
-	  if (attr->value[0] == '/')
-	    snprintf(pathprog, sizeof(pathprog), "%s%s", root, attr->value);
-	  else
-	  {
-	    if ((ptr = getenv("CUPS_DATADIR")) == NULL)
-	      ptr = CUPS_DATADIR;
-
-            if (*ptr == '/' || !*root)
-	      snprintf(pathprog, sizeof(pathprog), "%s%s/profiles/%s", root,
-	               ptr, attr->value);
-            else
-	      snprintf(pathprog, sizeof(pathprog), "%s/%s/profiles/%s", root,
-	               ptr, attr->value);
-          }
-	}
-
-	if (!attr->value || !attr->value[0] || stat(pathprog, &statbuf))
-	{
-	  if (verbose >= 0)
-	    _cupsLangPrintf(stdout,
-			    _("        WARN    Missing cupsICCProfile "
-			      "file \"%s\"\n"),
-			    !attr->value || !attr->value[0] ? "<NULL>" :
-							      attr->value);
-	}
       }
 
 #ifdef __APPLE__
@@ -1856,7 +1820,6 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 {
   ppd_attr_t	*attr;			/* PPD attribute */
   const char	*ptr;			/* Pointer into string */
-  struct stat	statbuf;		/* File information */
   char		super[16],		/* Super-type for filter */
 		type[256],		/* Type for filter */
 		program[256],		/* Program/filter name */
@@ -1903,7 +1866,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 		   program);
       }
 
-      if (stat(pathprog, &statbuf))
+      if (access(pathprog, X_OK))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1954,7 +1917,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 		   program);
       }
 
-      if (stat(pathprog, &statbuf))
+      if (access(pathprog, X_OK))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1966,6 +1929,133 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
         if (!warn)
 	  errors ++;
       }
+    }
+  }
+
+  return (errors);
+}
+
+
+/*
+ * 'check_profiles()' - Check ICC color profiles in the PPD file.
+ */
+
+static int				/* O - Errors found */
+check_profiles(ppd_file_t *ppd,		/* I - PPD file */
+               const char *root,	/* I - Root directory */
+	       int        errors,	/* I - Errors found */
+	       int        verbose,	/* I - Verbosity level */
+	       int        warn)		/* I - Warnings only? */
+{
+  int		i;			/* Looping var */
+  ppd_attr_t	*attr;			/* PPD attribute */
+  const char	*ptr;			/* Pointer into string */
+  const char	*prefix;		/* WARN/FAIL prefix */
+  char		filename[1024];		/* Profile filename */
+  int		num_profiles = 0;	/* Number of profiles */
+  unsigned	hash,			/* Current hash value */
+		hashes[1000];		/* Hash values of profile names */
+  const char	*specs[1000];		/* Specifiers for profiles */
+
+
+  prefix = warn ? "  WARN  " : "**FAIL**";
+
+  for (attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+       attr;
+       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+  {
+   /*
+    * Check for valid selector...
+    */
+
+    for (i = 0, ptr = strchr(attr->spec, '.'); ptr; ptr = strchr(ptr + 1, '.'))
+      i ++;
+
+    if (!attr->value || i < 2)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad cupsICCProfile %s!\n"),
+			prefix, attr->spec);
+
+      if (!warn)
+        errors ++;
+
+      continue;
+    }
+
+   /*
+    * Check for valid profile filename...
+    */
+
+    if (attr->value[0] == '/')
+      snprintf(filename, sizeof(filename), "%s%s", root, attr->value);
+    else
+    {
+      if ((ptr = getenv("CUPS_DATADIR")) == NULL)
+	ptr = CUPS_DATADIR;
+
+      if (*ptr == '/' || !*root)
+	snprintf(filename, sizeof(filename), "%s%s/profiles/%s", root, ptr,
+		 attr->value);
+      else
+	snprintf(filename, sizeof(filename), "%s/%s/profiles/%s", root, ptr,
+		 attr->value);
+    }
+
+    if (access(filename, 0))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Missing cupsICCProfile "
+				  "file \"%s\"!\n"), prefix, attr->value);
+
+      if (!warn)
+	errors ++;
+    }
+
+   /*
+    * Check for hash collisions...
+    */
+
+    hash = _ppdHashName(attr->spec);
+
+    if (num_profiles > 0)
+    {
+      for (i = 0; i < num_profiles; i ++)
+	if (hashes[i] == hash)
+	  break;
+
+      if (i < num_profiles)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout,
+			  _("      %s  cupsICCProfile %s hash value "
+			    "collides with %s!\n"), prefix, attr->spec,
+			  specs[i]);
+
+	if (!warn)
+	  errors ++;
+      }
+    }
+
+   /*
+    * Remember up to 1000 profiles...
+    */
+
+    if (num_profiles < 1000)
+    {
+      hashes[num_profiles] = hash;
+      specs[num_profiles]  = attr->spec;
+      num_profiles ++;
     }
   }
 
