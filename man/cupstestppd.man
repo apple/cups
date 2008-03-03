@@ -141,7 +141,7 @@ http://localhost:631/help
 .br
 Adobe PostScript Printer Description File Format Specification, Version 4.3.
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
