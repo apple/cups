@@ -31,4 +31,8 @@ _cups_strlcpy
 _httpBIOMethods
 _ippAddAttr
 _ippFreeAttr
+_ppdFreeLanguages
 _ppdGetEncoding
+_ppdGetLanguages
+_ppdHashName
+_ppdLocalizedAttr

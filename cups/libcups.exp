@@ -31,7 +31,11 @@ __httpWriteCDSA
 __ippAddAttr
 __ippFindOption
 __ippFreeAttr
+__ppdFreeLanguages
 __ppdGetEncoding
+__ppdGetLanguages
+__ppdHashName
+__ppdLocalizedAttr
 _cupsAddDest
 _cupsAddOption
 _cupsAdminCreateWindowsPPD

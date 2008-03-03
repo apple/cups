@@ -1985,9 +1985,9 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 {
   int		j;			/* Looping var */
   ppd_attr_t	*attr;			/* PPD attribute */
-  char		*languages,		/* Copy of attribute value */
-		*langstart,		/* Start of current language */
-		*langptr,		/* Pointer into languages */
+  cups_array_t	*languages;		/* Array of languages */
+  int		langlen;		/* Length of language */
+  char		*language,		/* Current language */
 		keyword[PPD_MAX_NAME],	/* Localization keyword (full) */
 		llkeyword[PPD_MAX_NAME],/* Localization keyword (base) */
 		ckeyword[PPD_MAX_NAME],	/* Custom option keyword (full) */
@@ -1996,50 +1996,24 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
   ppd_option_t	*option;		/* Standard UI option */
   ppd_coption_t	*coption;		/* Custom option */
   ppd_cparam_t	*cparam;		/* Custom parameter */
-  cups_array_t	*langlist;		/* List of languages so far */
   char		ll[3];			/* Base language */
   const char	*prefix;		/* WARN/FAIL prefix */
 
 
   prefix = warn ? "  WARN  " : "**FAIL**";
 
-  if ((attr = ppdFindAttr(ppd, "cupsLanguages", NULL)) != NULL &&
-      attr->value)
+  if ((languages = _ppdGetLanguages(ppd)) != NULL)
   {
    /*
     * This file contains localizations, check them...
     */
 
-    if ((languages = strdup(attr->value)) == NULL)
-      return (1);
-
-    langlist = cupsArrayNew((cups_array_func_t)strcmp, NULL);
-
-    for (langptr = languages; *langptr;)
+    for (language = (char *)cupsArrayFirst(languages);
+         language;
+	 language = (char *)cupsArrayNext(languages))
     {
-     /*
-      * Skip leading whitespace...
-      */
-
-      while (isspace(*langptr & 255))
-	langptr ++;
-
-      if (!*langptr)
-	break;
-
-     /*
-      * Find the end of this language name...
-      */
-
-      for (langstart = langptr;
-	   *langptr && !isspace(*langptr & 255);
-	   langptr ++);
-
-      if (*langptr)
-	*langptr++ = '\0';
-
-      j = strlen(langstart);
-      if (j != 2 && j != 5)
+      langlen = strlen(language);
+      if (langlen != 2 && langlen != 5)
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2047,7 +2021,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
 			  _("      %s  Bad language \"%s\"!\n"),
-			  prefix, langstart);
+			  prefix, language);
 
 	if (!warn)
 	  errors ++;
@@ -2055,12 +2029,10 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	continue;
       }
 
-      if (!strcmp(langstart, "en"))
+      if (!strcmp(language, "en"))
         continue;
 
-      cupsArrayAdd(langlist, langstart);
-
-      strlcpy(ll, langstart, sizeof(ll));
+      strlcpy(ll, language, sizeof(ll));
 
      /*
       * Loop through all options and choices...
@@ -2073,7 +2045,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
         if (!strcmp(option->keyword, "PageRegion"))
 	  continue;
 
-	snprintf(keyword, sizeof(keyword), "%s.Translation", langstart);
+	snprintf(keyword, sizeof(keyword), "%s.Translation", language);
 	snprintf(llkeyword, sizeof(llkeyword), "%s.Translation", ll);
 
 	if ((attr = ppdFindAttr(ppd, keyword, option->keyword)) == NULL &&
@@ -2086,7 +2058,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	    _cupsLangPrintf(stdout,
 			    _("      %s  Missing \"%s\" translation "
 			      "string for option %s!\n"),
-			    prefix, langstart, option->keyword);
+			    prefix, language, option->keyword);
 
           if (!warn)
 	    errors ++;
@@ -2100,13 +2072,13 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	    _cupsLangPrintf(stdout,
 			    _("      %s  Bad UTF-8 \"%s\" translation "
 			      "string for option %s!\n"),
-			    prefix, langstart, option->keyword);
+			    prefix, language, option->keyword);
 
 	  if (!warn)
 	    errors ++;
 	}
 
-	snprintf(keyword, sizeof(keyword), "%s.%s", langstart,
+	snprintf(keyword, sizeof(keyword), "%s.%s", language,
 		 option->keyword);
 	snprintf(llkeyword, sizeof(llkeyword), "%s.%s", ll,
 		 option->keyword);
@@ -2118,7 +2090,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 					     option->keyword)) != NULL)
 	  {
 	    snprintf(ckeyword, sizeof(ckeyword), "%s.Custom%s",
-		     langstart, option->keyword);
+		     language, option->keyword);
 
 	    if ((attr = ppdFindAttr(ppd, ckeyword, "True")) != NULL &&
 		!valid_utf8(attr->text))
@@ -2131,8 +2103,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 				_("      %s  Bad UTF-8 \"%s\" "
 				  "translation string for option %s, "
 				  "choice %s!\n"),
-				prefix, langstart,
-				ckeyword + 1 + strlen(langstart),
+				prefix, language,
+				ckeyword + 1 + strlen(language),
 				"True");
 
               if (!warn)
@@ -2146,7 +2118,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 		   cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
 	      {
 		snprintf(ckeyword, sizeof(ckeyword), "%s.ParamCustom%s",
-			 langstart, option->keyword);
+			 language, option->keyword);
 		snprintf(cllkeyword, sizeof(cllkeyword), "%s.ParamCustom%s",
 			 ll, option->keyword);
 
@@ -2163,8 +2135,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 				    _("      %s  Missing \"%s\" "
 				      "translation string for option %s, "
 				      "choice %s!\n"),
-				    prefix, langstart,
-				    ckeyword + 1 + strlen(langstart),
+				    prefix, language,
+				    ckeyword + 1 + strlen(language),
 				    cparam->name);
 
                   if (!warn)
@@ -2180,8 +2152,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 				    _("      %s  Bad UTF-8 \"%s\" "
 				      "translation string for option %s, "
 				      "choice %s!\n"),
-				    prefix, langstart,
-				    ckeyword + 1 + strlen(langstart),
+				    prefix, language,
+				    ckeyword + 1 + strlen(language),
 				    cparam->name);
 
 		  if (!warn)
@@ -2203,7 +2175,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 			      _("      %s  Missing \"%s\" "
 				"translation string for option %s, "
 				"choice %s!\n"),
-			      prefix, langstart, option->keyword,
+			      prefix, language, option->keyword,
 			      option->choices[j].choice);
 
 	    if (!warn)
@@ -2219,7 +2191,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 			      _("      %s  Bad UTF-8 \"%s\" "
 				"translation string for option %s, "
 				"choice %s!\n"),
-			      prefix, langstart, option->keyword,
+			      prefix, language, option->keyword,
 			      option->choices[j].choice);
 
 	    if (!warn)
@@ -2233,20 +2205,20 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
     * Verify that we have the base language for each localized one...
     */
 
-    for (langptr = (char *)cupsArrayFirst(langlist);
-	 langptr;
-	 langptr = (char *)cupsArrayNext(langlist))
-      if (langptr[2])
+    for (language = (char *)cupsArrayFirst(languages);
+	 language;
+	 language = (char *)cupsArrayNext(languages))
+      if (language[2])
       {
        /*
 	* Lookup the base language...
 	*/
 
-	cupsArraySave(langlist);
+	cupsArraySave(languages);
 
-	strlcpy(ll, langptr, sizeof(ll));
+	strlcpy(ll, language, sizeof(ll));
 
-	if (!cupsArrayFind(langlist, ll) && strcmp(ll, "zh"))
+	if (!cupsArrayFind(languages, ll) && strcmp(ll, "zh"))
 	{
 	  if (!warn && !errors && !verbose)
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2260,15 +2232,14 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	    errors ++;
 	}
 
-	cupsArrayRestore(langlist);
+	cupsArrayRestore(languages);
       }
 
    /*
     * Free memory used for the languages...
     */
 
-    cupsArrayDelete(langlist);
-    free(languages);
+    _ppdFreeLanguages(languages);
   }
 
   return (errors);

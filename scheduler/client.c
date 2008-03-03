@@ -45,7 +45,6 @@
  * Include necessary headers...
  */
 
-#include <cups/http-private.h>
 #include "cupsd.h"
 
 #ifdef HAVE_CDSASSL

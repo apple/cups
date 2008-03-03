@@ -30,8 +30,12 @@
  *                             attribute.
  *   ppdLocalizeMarkerName() - Get the localized version of a marker-names
  *                             attribute value.
+ *   _ppdFreeLanguages()     - Free an array of languages from _ppdGetLanguages.
+ *   _ppdGetLanguages()      - Get an array of languages from a PPD file.
+ *   _ppdHashName()          - Generate a hash value for a device or profile
+ *                             name.
+ *   _ppdLocalizedAttr()     - Find a localized attribute.
  *   ppd_ll_CC()             - Get the current locale names.
- *   ppd_localized_attr()    - Find a localized attribute.
  */
 
 /*
@@ -39,6 +43,7 @@
  */
 
 #include "globals.h"
+#include "ppd-private.h"
 #include "debug.h"
 
 
@@ -46,12 +51,7 @@
  * Local functions...
  */
 
-static void		ppd_ll_CC(char *ll_CC, int ll_CC_size,
-			          char *ll, int ll_size);
-static ppd_attr_t	*ppd_localized_attr(ppd_file_t *ppd,
-			                    const char *keyword,
-			                    const char *spec, const char *ll_CC,
-				            const char *ll);
+static void		ppd_ll_CC(char *ll_CC, int ll_CC_size);
 
 
 /*
@@ -76,8 +76,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   ppd_attr_t	*attr,			/* Current attribute */
 		*locattr;		/* Localized attribute */
   char		ckeyword[PPD_MAX_NAME],	/* Custom keyword */
-		ll_CC[6],		/* Language + country locale */
-		ll[3];			/* Language locale */
+		ll_CC[6];		/* Language + country locale */
 
 
  /*
@@ -93,7 +92,7 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
+  ppd_ll_CC(ll_CC, sizeof(ll_CC));
 
  /*
   * Now lookup all of the groups, options, choices, etc.
@@ -101,14 +100,14 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
 
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
   {
-    if ((locattr = ppd_localized_attr(ppd, "Translation", group->name,
-                                      ll_CC, ll)) != NULL)
+    if ((locattr = _ppdLocalizedAttr(ppd, "Translation", group->name,
+                                     ll_CC)) != NULL)
       strlcpy(group->text, locattr->text, sizeof(group->text));
 
     for (j = group->num_options, option = group->options; j > 0; j --, option ++)
     {
-      if ((locattr = ppd_localized_attr(ppd, "Translation", option->keyword,
-                                        ll_CC, ll)) != NULL)
+      if ((locattr = _ppdLocalizedAttr(ppd, "Translation", option->keyword,
+                                       ll_CC)) != NULL)
 	strlcpy(option->text, locattr->text, sizeof(option->text));
 
       for (k = option->num_choices, choice = option->choices;
@@ -116,13 +115,13 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
 	   k --, choice ++)
       {
         if (strcmp(choice->choice, "Custom"))
-	  locattr = ppd_localized_attr(ppd, option->keyword, choice->choice,
-	                               ll_CC, ll);
+	  locattr = _ppdLocalizedAttr(ppd, option->keyword, choice->choice,
+	                              ll_CC);
 	else
 	{
 	  snprintf(ckeyword, sizeof(ckeyword), "Custom%s", option->keyword);
 
-	  locattr = ppd_localized_attr(ppd, ckeyword, "True", ll_CC, ll);
+	  locattr = _ppdLocalizedAttr(ppd, ckeyword, "True", ll_CC);
 	}
 
         if (locattr)
@@ -145,8 +144,8 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
     {
       snprintf(ckeyword, sizeof(ckeyword), "ParamCustom%s", coption->keyword);
 
-      if ((locattr = ppd_localized_attr(ppd, ckeyword, cparam->name,
-                                        ll_CC, ll)) != NULL)
+      if ((locattr = _ppdLocalizedAttr(ppd, ckeyword, cparam->name,
+                                       ll_CC)) != NULL)
         strlcpy(cparam->text, locattr->text, sizeof(cparam->text));
     }
   }
@@ -157,8 +156,8 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
 
   if ((attr = ppdFindAttr(ppd, "APCustomColorMatchingName", NULL)) != NULL)
   {
-    if ((locattr = ppd_localized_attr(ppd, "APCustomColorMatchingName",
-                                      attr->spec, ll_CC, ll)) != NULL)
+    if ((locattr = _ppdLocalizedAttr(ppd, "APCustomColorMatchingName",
+                                     attr->spec, ll_CC)) != NULL)
       strlcpy(attr->text, locattr->text, sizeof(attr->text));
   }
 
@@ -168,8 +167,8 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   {
     cupsArraySave(ppd->sorted_attrs);
 
-    if ((locattr = ppd_localized_attr(ppd, "cupsICCProfile", attr->spec,
-                                      ll_CC, ll)) != NULL)
+    if ((locattr = _ppdLocalizedAttr(ppd, "cupsICCProfile", attr->spec,
+                                     ll_CC)) != NULL)
       strlcpy(attr->text, locattr->text, sizeof(attr->text));
 
     cupsArrayRestore(ppd->sorted_attrs);
@@ -185,8 +184,8 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   {
     cupsArraySave(ppd->sorted_attrs);
 
-    if ((locattr = ppd_localized_attr(ppd, "APPrinterPreset", attr->spec,
-                                      ll_CC, ll)) != NULL)
+    if ((locattr = _ppdLocalizedAttr(ppd, "APPrinterPreset", attr->spec,
+                                     ll_CC)) != NULL)
       strlcpy(attr->text, locattr->text, sizeof(attr->text));
 
     cupsArrayRestore(ppd->sorted_attrs);
@@ -220,7 +219,6 @@ ppdLocalizeIPPReason(
 {
   ppd_attr_t	*locattr;		/* Localized attribute */
   char		ll_CC[6],		/* Language + country locale */
-		ll[3],			/* Language locale */
 		*bufptr,		/* Pointer into buffer */
 		*bufend,		/* Pointer to end of buffer */
 		*valptr;		/* Pointer into value */
@@ -243,14 +241,14 @@ ppdLocalizeIPPReason(
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
+  ppd_ll_CC(ll_CC, sizeof(ll_CC));
 
  /*
   * Find the localized attribute...
   */
 
-  if ((locattr = ppd_localized_attr(ppd, "cupsIPPReason", reason,
-                                    ll_CC, ll)) == NULL)
+  if ((locattr = _ppdLocalizedAttr(ppd, "cupsIPPReason", reason,
+                                   ll_CC)) == NULL)
     locattr = ppdFindAttr(ppd, "cupsIPPReason", reason);
 
   if (!locattr)
@@ -405,8 +403,7 @@ ppdLocalizeMarkerName(
     const char *name)			/* I - Marker name to look up */
 {
   ppd_attr_t	*locattr;		/* Localized attribute */
-  char		ll_CC[6],		/* Language + country locale */
-		ll[3];			/* Language locale */
+  char		ll_CC[6];		/* Language + country locale */
 
 
  /*
@@ -420,17 +417,203 @@ ppdLocalizeMarkerName(
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, sizeof(ll_CC), ll, sizeof(ll));
+  ppd_ll_CC(ll_CC, sizeof(ll_CC));
 
  /*
   * Find the localized attribute...
   */
 
-  if ((locattr = ppd_localized_attr(ppd, "cupsMarkerName", name,
-                                    ll_CC, ll)) == NULL)
+  if ((locattr = _ppdLocalizedAttr(ppd, "cupsMarkerName", name,
+                                   ll_CC)) == NULL)
     locattr = ppdFindAttr(ppd, "cupsMarkerName", name);
 
   return (locattr ? locattr->text : NULL);
+}
+
+
+/*
+ * '_ppdFreeLanguages()' - Free an array of languages from _ppdGetLanguages.
+ */
+
+void
+_ppdFreeLanguages(
+    cups_array_t *languages)		/* I - Languages array */
+{
+  char	*language;			/* Current language */
+
+
+  for (language = (char *)cupsArrayFirst(languages);
+       language;
+       language = (char *)cupsArrayNext(languages))
+    free(language);
+
+  cupsArrayDelete(languages);
+}
+
+
+/*
+ * '_ppdGetLanguages()' - Get an array of languages from a PPD file.
+ */
+
+cups_array_t *				/* O - Languages array */
+_ppdGetLanguages(ppd_file_t *ppd)	/* I - PPD file */
+{
+  cups_array_t	*languages;		/* Languages array */
+  ppd_attr_t	*attr;			/* cupsLanguages attribute */
+  char		*value,			/* Copy of attribute value */
+		*start,			/* Start of current language */
+		*ptr;			/* Pointer into languages */
+
+
+ /*
+  * See if we have a cupsLanguages attribute...
+  */
+
+  if ((attr = ppdFindAttr(ppd, "cupsLanguages", NULL)) == NULL || !attr->value)
+    return (NULL);
+
+ /*
+  * Yes, load the list...
+  */
+
+  if ((languages = cupsArrayNew((cups_array_func_t)strcmp, NULL)) == NULL)
+    return (NULL);
+
+  if ((value = strdup(attr->value)) == NULL)
+  {
+    cupsArrayDelete(languages);
+    return (NULL);
+  }
+
+  for (ptr = value; *ptr;)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*ptr & 255))
+      ptr ++;
+
+    if (!*ptr)
+      break;
+
+   /*
+    * Find the end of this language name...
+    */
+
+    for (start = ptr; *ptr && !isspace(*ptr & 255); ptr ++);
+
+    if (*ptr)
+      *ptr++ = '\0';
+
+    if (!strcmp(start, "en"))
+      continue;
+
+    cupsArrayAdd(languages, strdup(start));
+  }
+
+ /*
+  * Free the temporary string and return either an array with one or more
+  * values or a NULL pointer...
+  */
+
+  free(value);
+
+  if (cupsArrayCount(languages) == 0)
+  {
+    cupsArrayDelete(languages);
+    return (NULL);
+  }
+  else
+    return (languages);
+}
+
+
+/*
+ * '_ppdHashName()' - Generate a hash value for a device or profile name.
+ *
+ * This function is primarily used on Mac OS X, but is generally accessible
+ * since cupstestppd needs to check for profile name collisions in PPD files...
+ */
+
+unsigned				/* O - Hash value */
+_ppdHashName(const char *name)		/* I - Name to hash */
+{
+  int		mult;			/* Multiplier */
+  unsigned	hash = 0;		/* Hash value */
+
+
+  for (mult = 1; *name && mult <= 128; mult ++, name ++)
+    hash += (*name & 255) * mult;
+
+  return (hash);
+}
+
+
+/*
+ * '_ppdLocalizedAttr()' - Find a localized attribute.
+ */
+
+ppd_attr_t *				/* O - Localized attribute or NULL */
+_ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
+		  const char *keyword,	/* I - Main keyword */
+		  const char *spec,	/* I - Option keyword */
+		  const char *ll_CC)	/* I - Language + country locale */
+{
+  char		lkeyword[PPD_MAX_NAME];	/* Localization keyword */
+  ppd_attr_t	*attr;			/* Current attribute */
+
+
+  DEBUG_printf(("_ppdLocalizedAttr(ppd=%p, keyword=\"%s\", spec=\"%s\", "
+                "ll_CC=\"%s\")\n", ppd, keyword, spec, ll_CC));
+
+ /*
+  * Look for Keyword.ll_CC, then Keyword.ll...
+  */
+
+  snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll_CC, keyword);
+  if ((attr = ppdFindAttr(ppd, lkeyword, spec)) == NULL)
+  {
+    snprintf(lkeyword, sizeof(lkeyword), "%2s.%s", ll_CC, keyword);
+    attr = ppdFindAttr(ppd, lkeyword, spec);
+
+    if (!attr)
+    {
+      if (!strncmp(ll_CC, "ja", 2))
+      {
+       /*
+	* Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
+	* PPD files were incorrectly assigned "jp" as the locale name
+	* instead of "ja".  Support both the old (incorrect) and new
+	* locale names for Japanese...
+	*/
+
+	snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
+      else if (!strncmp(ll_CC, "no", 2))
+      {
+       /*
+	* Norway has two languages, "Bokmal" (the primary one)
+	* and "Nynorsk" (new Norwegian); we map "no" to "nb" here as
+	* recommended by the locale folks...
+	*/
+
+	snprintf(lkeyword, sizeof(lkeyword), "nb.%s", keyword);
+	attr = ppdFindAttr(ppd, lkeyword, spec);
+      }
+    }
+  }
+
+#ifdef DEBUG
+  if (attr)
+    printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec, attr->text,
+           attr->value ? attr->value : "");
+  else
+    puts("    NOT FOUND");
+#endif /* DEBUG */
+
+  return (attr);
 }
 
 
@@ -440,9 +623,7 @@ ppdLocalizeMarkerName(
 
 static void
 ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
-          int  ll_CC_size,		/* I - Size of country-specific name */
-          char *ll,			/* O - Generic locale name */
-          int  ll_size)			/* I - Size of generic name */
+          int  ll_CC_size)		/* I - Size of country-specific name */
 {
   cups_lang_t	*lang;			/* Current language */
 
@@ -454,7 +635,6 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
   if ((lang = cupsLangDefault()) == NULL)
   {
     strlcpy(ll_CC, "en_US", ll_CC_size);
-    strlcpy(ll, "en", ll_size);
     return;
   }
 
@@ -463,9 +643,6 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
   */
 
   strlcpy(ll_CC, lang->language, ll_CC_size);
-  strlcpy(ll, lang->language, ll_size);
-
-  DEBUG_printf(("ll_CC=\"%s\", ll=\"%s\"\n", ll_CC, ll));
 
   if (strlen(ll_CC) == 2)
   {
@@ -493,77 +670,8 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
     }
   }
 
-  DEBUG_printf(("ppd_ll_CC: lang->language=\"%s\", ll=\"%s\", ll_CC=\"%s\"...\n",
-                lang->language, ll, ll_CC));
-}
-
-
-/*
- * 'ppd_localized_attr()' - Find a localized attribute.
- */
-
-static ppd_attr_t *			/* O - Localized attribute or NULL */
-ppd_localized_attr(ppd_file_t *ppd,	/* I - PPD file */
-		   const char *keyword,	/* I - Main keyword */
-		   const char *spec,	/* I - Option keyword */
-		   const char *ll_CC,	/* I - Language + country locale */
-		   const char *ll)	/* I - Language locale */
-{
-  char		lkeyword[PPD_MAX_NAME];	/* Localization keyword */
-  ppd_attr_t	*attr;			/* Current attribute */
-
-
-  DEBUG_printf(("ppd_text(ppd=%p, keyword=\"%s\", spec=\"%s\", "
-                "ll_CC=\"%s\", ll=\"%s\")\n",
-                ppd, keyword, spec, ll_CC, ll));
-
- /*
-  * Look for Keyword.ll_CC, then Keyword.ll...
-  */
-
-  snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll_CC, keyword);
-  if ((attr = ppdFindAttr(ppd, lkeyword, spec)) == NULL)
-  {
-    snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll, keyword);
-    attr = ppdFindAttr(ppd, lkeyword, spec);
-
-    if (!attr)
-    {
-      if (!strcmp(ll, "ja"))
-      {
-       /*
-	* Due to a bug in the CUPS DDK 1.1.0 ppdmerge program, Japanese
-	* PPD files were incorrectly assigned "jp" as the locale name
-	* instead of "ja".  Support both the old (incorrect) and new
-	* locale names for Japanese...
-	*/
-
-	snprintf(lkeyword, sizeof(lkeyword), "jp.%s", keyword);
-	attr = ppdFindAttr(ppd, lkeyword, spec);
-      }
-      else if (!strcmp(ll, "no"))
-      {
-       /*
-	* Norway has two languages, "Bokmal" (the primary one)
-	* and "Nynorsk" (new Norwegian); we map "no" to "nb" here as
-	* recommended by the locale folks...
-	*/
-
-	snprintf(lkeyword, sizeof(lkeyword), "nb.%s", keyword);
-	attr = ppdFindAttr(ppd, lkeyword, spec);
-      }
-    }
-  }
-
-#ifdef DEBUG
-  if (attr)
-    printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec, attr->text,
-           attr->value ? attr->value : "");
-  else
-    puts("    NOT FOUND");
-#endif /* DEBUG */
-
-  return (attr);
+  DEBUG_printf(("ppd_ll_CC: lang->language=\"%s\", ll_CC=\"%s\"...\n",
+                lang->language, ll_CC));
 }
 
 
