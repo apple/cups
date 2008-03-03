@@ -1292,8 +1292,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead(http=%p, buffer=%p, length=%d)\n",
-                http, buffer, length));
+  DEBUG_printf(("httpRead(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n",
+                http, buffer, CUPS_LLCAST length));
 
   if (http == NULL || buffer == NULL)
     return (-1);
@@ -1372,12 +1372,12 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #endif /* HAVE_SSL */
     {
       DEBUG_printf(("httpRead2: reading %d bytes from socket into buffer...\n",
-                    bytes));
+                    (int)bytes));
 
       bytes = recv(http->fd, http->buffer, bytes, 0);
 
       DEBUG_printf(("httpRead2: read %d bytes from socket into buffer...\n",
-                    bytes));
+                    (int)bytes));
     }
 
     if (bytes > 0)
@@ -1409,7 +1409,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
 
     bytes = (ssize_t)length;
 
-    DEBUG_printf(("httpRead2: grabbing %d bytes from input buffer...\n", bytes));
+    DEBUG_printf(("httpRead2: grabbing %d bytes from input buffer...\n",
+                  (int)bytes));
 
     memcpy(buffer, http->buffer, length);
     http->used -= (int)length;
@@ -1431,7 +1432,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
     if (!http->blocking && !httpWait(http, 10000))
       return (0);
 
-    DEBUG_printf(("httpRead2: reading %d bytes from socket...\n", length));
+    DEBUG_printf(("httpRead2: reading " CUPS_LLFMT " bytes from socket...\n",
+                  CUPS_LLCAST length));
 
 #ifdef WIN32
     bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0);
@@ -1441,7 +1443,8 @@ httpRead2(http_t *http,			/* I - Connection to server */
         break;
 #endif /* WIN32 */
 
-    DEBUG_printf(("httpRead2: read %d bytes from socket...\n", bytes));
+    DEBUG_printf(("httpRead2: read " CUPS_LLFMT " bytes from socket...\n",
+                  CUPS_LLCAST bytes));
   }
 
   if (bytes > 0)
@@ -1487,7 +1490,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #ifdef DEBUG
   {
     int i, j, ch;
-    printf("httpRead2: Read %d bytes:\n", bytes);
+    printf("httpRead2: Read " CUPS_LLFMT " bytes:\n", CUPS_LLCAST bytes);
     for (i = 0; i < bytes; i += 16)
     {
       printf("   ");
@@ -2122,8 +2125,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   ssize_t	bytes;			/* Bytes written */
 
 
-  DEBUG_printf(("httpWrite(http=%p, buffer=%p, length=%d)\n", http,
-                buffer, length));
+  DEBUG_printf(("httpWrite(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n", http,
+                buffer, CUPS_LLCAST length));
 
  /*
   * Range check input...
@@ -2146,8 +2149,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   {
     if (http->wused && (length + http->wused) > sizeof(http->wbuffer))
     {
-      DEBUG_printf(("    flushing buffer (wused=%d, length=%d)\n",
-                    http->wused, length));
+      DEBUG_printf(("    flushing buffer (wused=%d, length=" CUPS_LLFMT ")\n",
+                    http->wused, CUPS_LLCAST length));
 
       httpFlushWrite(http);
     }
@@ -2158,7 +2161,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Write to buffer...
       */
 
-      DEBUG_printf(("    copying %d bytes to wbuffer...\n", length));
+      DEBUG_printf(("    copying " CUPS_LLFMT " bytes to wbuffer...\n",
+                    CUPS_LLCAST length));
 
       memcpy(http->wbuffer + http->wused, buffer, length);
       http->wused += (int)length;
@@ -2170,14 +2174,15 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Otherwise write the data directly...
       */
 
-      DEBUG_printf(("    writing %d bytes to socket...\n", length));
+      DEBUG_printf(("    writing " CUPS_LLFMT " bytes to socket...\n",
+                    CUPS_LLCAST length));
 
       if (http->data_encoding == HTTP_ENCODE_CHUNKED)
 	bytes = (ssize_t)http_write_chunk(http, buffer, (int)length);
       else
 	bytes = (ssize_t)http_write(http, buffer, (int)length);
 
-      DEBUG_printf(("    wrote %d bytes...\n", bytes));
+      DEBUG_printf(("    wrote " CUPS_LLFMT " bytes...\n", CUPS_LLCAST bytes));
     }
 
     if (http->data_encoding == HTTP_ENCODE_LENGTH)

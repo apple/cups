@@ -65,6 +65,12 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
   int		infile;			/* Input file */
 
 
+  DEBUG_printf(("cupsDoFileRequest(http=%p, request=%p(%s), resource=\"%s\", "
+                "filename=\"%s\")\n", http, request,
+		request ? ippOpString(request->request.op.operation_id) : "?",
+		resource ? resource : "(null)",
+		filename ? filename : "(null)"));
+
   if (filename)
   {
     if ((infile = open(filename, O_RDONLY | O_BINARY)) < 0)
@@ -124,8 +130,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   char		buffer[32768];		/* Output buffer */
 
 
-  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p, resource=\"%s\""
+  DEBUG_printf(("cupsDoIORequest(http=%p, request=%p(%s), resource=\"%s\", "
                 "infile=%d, outfile=%d)\n", http, request,
+		request ? ippOpString(request->request.op.operation_id) : "?",
 		resource ? resource : "(null)", infile, outfile));
 
  /*
@@ -297,6 +304,11 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
               ipp_t      *request,	/* I - IPP request */
               const char *resource)	/* I - HTTP resource for POST */
 {
+  DEBUG_printf(("cupsDoRequest(http=%p, request=%p(%s), resource=\"%s\")\n",
+                http, request,
+		request ? ippOpString(request->request.op.operation_id) : "?",
+		resource ? resource : "(null)"));
+
   return (cupsDoFileRequest(http, request, resource, NULL));
 }
 
@@ -320,7 +332,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   ipp_t		*response = NULL;	/* IPP response */
 
 
-  DEBUG_printf(("cupsGetReponse(http=%p)\n", http));
+  DEBUG_printf(("cupsGetReponse(http=%p, resource=\"%s\")\n", http,
+                resource ? resource : "(null)"));
 
  /*
   * Connect to the default server as needed...
@@ -352,12 +365,12 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Wait for a response from the server...
   */
 
-  DEBUG_puts("cupsGetResponse: update...");
+  DEBUG_puts("cupsGetResponse: Update loop...");
 
   while ((status = httpUpdate(http)) == HTTP_CONTINUE)
     /* Do nothing but update */;
 
-  DEBUG_printf(("cupsGetResponse: status = %d\n", status));
+  DEBUG_printf(("cupsGetResponse: status=%d\n", status));
 
   if (status == HTTP_OK)
   {
@@ -377,7 +390,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * Delete the response...
       */
 
-      DEBUG_puts("IPP read error!");
+      DEBUG_puts("cupsGetResponse: IPP read error!");
 
       ippDelete(response);
       response = NULL;
@@ -435,6 +448,10 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
 
+    DEBUG_printf(("cupsGetResponse: status-code=%s, status-message=\"%s\"\n",
+                  ippErrorString(response->request.status.status_code),
+                  attr ? attr->values[0].string.text : ""));
+
     _cupsSetError(response->request.status.status_code,
                    attr ? attr->values[0].string.text :
 		       ippErrorString(response->request.status.status_code));
@@ -464,6 +481,9 @@ cupsReadResponseData(
  /*
   * Get the default connection as needed...
   */
+
+  DEBUG_printf(("cupsReadResponseData(http=%p, buffer=%p, "
+                "length=" CUPS_LLFMT ")\n", http, buffer, CUPS_LLCAST length));
 
   if (!http)
   {
@@ -511,8 +531,9 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   http_status_t	expect;			/* Expect: header to use */
 
 
-  DEBUG_printf(("cupsSendRequest(http=%p, request=%p, resource=\"%s\", "
+  DEBUG_printf(("cupsSendRequest(http=%p, request=%p(%s), resource=\"%s\", "
                 "length=" CUPS_LLFMT ")\n", http, request,
+		request ? ippOpString(request->request.op.operation_id) : "?",
 		resource ? resource : "(null)", CUPS_LLCAST length));
 
  /*
@@ -556,7 +577,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   for (;;)
   {
-    DEBUG_puts("cupsSendRequest: setup...");
+    DEBUG_puts("cupsSendRequest: Setup...");
 
    /*
     * Setup the HTTP variables needed...
@@ -574,7 +595,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Try the request...
     */
 
-    DEBUG_puts("cupsSendRequest: post...");
+    DEBUG_puts("cupsSendRequest: Sending HTTP POST...");
 
     if (httpPost(http, resource))
     {
@@ -588,7 +609,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Send the IPP data...
     */
 
-    DEBUG_puts("cupsSendRequest: ipp write...");
+    DEBUG_puts("cupsSendRequest: Writing IPP request...");
 
     request->state = IPP_IDLE;
     status         = HTTP_CONTINUE;
@@ -611,11 +632,17 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     if (!got_status && expect == HTTP_CONTINUE)
     {
+      DEBUG_puts("cupsSendRequest: Waiting for 100-continue...");
+
       if (httpWait(http, 1000))
         status = httpUpdate(http);
+      else
+        status = HTTP_EXPECTATION_FAILED;
     }
     else if (httpCheck(http))
       status = httpUpdate(http);
+
+    DEBUG_printf(("cupsSendRequest: status=%d\n", status));
 
    /*
     * Process the current HTTP status...
@@ -656,6 +683,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  */
 
 	  expect = (http_status_t)0;
+	  break;
 
       default :
          /*
@@ -686,6 +714,9 @@ cupsWriteRequestData(
  /*
   * Get the default connection as needed...
   */
+
+  DEBUG_printf(("cupsWriteRequestData(http=%p, buffer=%p, "
+                "length=" CUPS_LLFMT ")\n", http, buffer, CUPS_LLCAST length));
 
   if (!http)
   {
@@ -740,6 +771,9 @@ _cupsSetError(ipp_status_t status,	/* I - IPP status code */
 
   if (message)
     cg->last_status_message = strdup(message);
+
+  DEBUG_printf(("_cupsSetError: last_error=%s, last_status_message=\"%s\"\n",
+                ippErrorString(cg->last_error), message ? message : ""));
 }
 
 
