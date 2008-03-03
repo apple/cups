@@ -58,7 +58,7 @@ language.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 language.o: i18n.h transcode.h debug.h
 localize.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 localize.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-localize.o: i18n.h transcode.h debug.h
+localize.o: i18n.h transcode.h ppd-private.h debug.h
 mark.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 mark.o: string.h ../config.h debug.h
 md5.o: md5.h string.h ../config.h
@@ -170,7 +170,7 @@ language.32.o: language.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
 language.32.o: language.c  i18n.h transcode.h debug.h
 localize.32.o: localize.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 localize.32.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-localize.32.o: localize.c  i18n.h transcode.h debug.h
+localize.32.o: localize.c  i18n.h transcode.h ppd-private.h debug.h
 mark.32.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 mark.32.o: mark.c  string.h ../config.h debug.h
 md5.32.o: md5.c  md5.h string.h ../config.h
@@ -282,7 +282,7 @@ language.64.o: language.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
 language.64.o: language.c  i18n.h transcode.h debug.h
 localize.64.o: localize.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 localize.64.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-localize.64.o: localize.c  i18n.h transcode.h debug.h
+localize.64.o: localize.c  i18n.h transcode.h ppd-private.h debug.h
 mark.64.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 mark.64.o: mark.c  string.h ../config.h debug.h
 md5.64.o: md5.c  md5.h string.h ../config.h

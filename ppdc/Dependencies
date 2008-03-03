@@ -4,6 +4,17 @@ drv.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 drv.o: ../cups/versioning.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 drv.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 drv.o: ../cups/dir.h
+ppdc.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdc.o: ../cups/versioning.h
+ppdhtml.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdhtml.o: ../cups/versioning.h
+ppdi.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdi.o: ../cups/versioning.h
+ppdmerge.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+ppdmerge.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+ppdmerge.o: ../cups/array.h ../cups/string.h ../config.h
+ppdpo.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+ppdpo.o: ../cups/versioning.h
 ppdc-array.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc-array.o: ../cups/versioning.h
 ppdc-attr.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
@@ -49,20 +60,9 @@ ppdc-source.o: ../cups/http-private.h ../cups/http.h ../cups/md5.h
 ppdc-source.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
 ppdc-source.o: ../cups/ppd.h ../cups/array.h ../cups/file.h
 ppdc-source.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-ppdc-source.o: ../data/epson.h ../data/escp.h ../data/hp.h ../data/label.h
-ppdc-source.o: ../data/pcl.h
+ppdc-source.o: ../cups/raster.h ../cups/cups.h ../data/epson.h ../data/escp.h
+ppdc-source.o: ../data/hp.h ../data/label.h ../data/pcl.h
 ppdc-string.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc-string.o: ../cups/versioning.h
 ppdc-variable.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc-variable.o: ../cups/versioning.h
-ppdc.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
-ppdc.o: ../cups/versioning.h
-ppdhtml.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
-ppdhtml.o: ../cups/versioning.h
-ppdi.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
-ppdi.o: ../cups/versioning.h
-ppdmerge.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
-ppdmerge.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
-ppdmerge.o: ../cups/array.h ../cups/string.h ../config.h
-ppdpo.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
-ppdpo.o: ../cups/versioning.h
