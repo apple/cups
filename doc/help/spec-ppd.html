@@ -1336,21 +1336,6 @@ PPD file extensions was used. Currently it must be the string
 
 <h2 class='title'><a name='MACOSX'>Mac OS X Attributes</a></h2>
 
-<h3><a name='APBookFile'>APBookFile</a></h3>
-
-<p class='summary'>*APBookFile: "file URL"</p>
-
-<p>This string attribute specifies the Apple help book file to use when
-looking up IPP reason codes for this printer driver. The
-<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute maps
-"help" URIs to this file.</p>
-
-<p>Example:</p>
-
-<pre class='command'>
-*APBookFile: "file:///Library/Printers/vendor/Help/filename"
-</pre>
-
 <h3><span class='info'>Mac OS X 10.3</span><a name='APDialogExtension'>APDialogExtension</a></h3>
 
 <p class='summary'>*APDialogExtension: "/Library/Printers/vendor/filename.plugin"</p>
@@ -1458,6 +1443,21 @@ and the <tt>Tumble</tt> page attribute.</p>
 
 <p>Also see the related <a href='#cupsBackSide'><tt>cupsBackSide</tt></a>
 attribute.</p>
+
+<h3><a name='APHelpBook'>APHelpBook</a></h3>
+
+<p class='summary'>*APHelpBook: "file URL"</p>
+
+<p>This string attribute specifies the Apple help book file to use when
+looking up IPP reason codes for this printer driver. The
+<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute maps
+"help" URIs to this file.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+*APHelpBook: "file:///Library/Printers/vendor/Help/filename"
+</pre>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
 
