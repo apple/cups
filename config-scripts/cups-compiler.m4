@@ -27,19 +27,24 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
 dnl Setup general architecture flags...
 AC_ARG_WITH(archflags, [  --with-archflags="flags"
                           set default architecture flags ])
+AC_ARG_WITH(ldarchflags, [  --with-ldarchflags="flags"
+                          set default program architecture flags ])
 
 if test -z "$with_archflags"; then
 	ARCHFLAGS=""
-	LDARCHFLAGS=""
 else
 	ARCHFLAGS="$with_archflags"
+fi
+
+if test -z "$with_ldarchflags"; then
 	if test "$uname" = Darwin; then
-		# Only link 32-bit programs - 64-bit is for the shared
-		# libraries...
+		# Only create 32-bit programs by default
 		LDARCHFLAGS="`echo $ARCHFLAGS | sed -e '1,$s/-arch x86_64//' -e '1,$s/-arch ppc64//'`"
 	else
 		LDARCHFLAGS="$ARCHFLAGS"
 	fi
+else
+	LDARCHFLAGS="$with_archflags"
 fi
 
 AC_SUBST(ARCHFLAGS)

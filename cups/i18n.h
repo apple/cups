@@ -103,6 +103,7 @@ extern cups_array_t	*_cupsMessageLoad(const char *filename);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 extern void		_cupsSetLocale(char *argv[]);
 
+
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */

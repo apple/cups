@@ -33,6 +33,7 @@
  *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
  *   cupsdUpdateSLPBrowse()     - Get browsing information via SLP.
  *   dequote()                  - Remote quotes from a string.
+ *   get_hostconfig()           - Get an /etc/hostconfig service setting.
  *   is_local_queue()           - Determine whether the URI points at a local
  *                                queue.
  *   process_browse_data()      - Process new browse data.
@@ -87,6 +88,9 @@
  */
 
 static char	*dequote(char *d, const char *s, int dlen);
+#ifdef __APPLE__
+static int	get_hostconfig(const char *name);
+#endif /* __APPLE__ */
 static int	is_local_queue(const char *uri, char *host, int hostlen,
 		               char *resource, int resourcelen);
 static void	process_browse_data(const char *uri, const char *host,
@@ -1622,6 +1626,58 @@ dequote(char       *d,			/* I - Destination string */
 
   return (d);
 }
+
+
+#ifdef __APPLE__
+/*
+ * 'get_hostconfig()' - Get an /etc/hostconfig service setting.
+ */
+
+static int				/* O - 1 for YES or AUTOMATIC, 0 for NO */
+get_hostconfig(const char *name)	/* I - Name of service */
+{
+  cups_file_t	*fp;			/* Hostconfig file */
+  char		line[1024],		/* Line from file */
+		*ptr;			/* Pointer to value */
+  int		state = 1;		/* State of service */
+
+
+ /*
+  * Try opening the /etc/hostconfig file; if we can't open it, assume that
+  * the service is enabled/auto.
+  */
+
+  if ((fp = cupsFileOpen("/etc/hostconfig", "r")) != NULL)
+  {
+   /*
+    * Read lines from the file until we find the service...
+    */
+
+    while (cupsFileGets(fp, line, sizeof(line)))
+    {
+      if (line[0] == '#' || (ptr = strchr(line, '=')) == NULL)
+        continue;
+
+      *ptr++ = '\0';
+
+      if (!strcasecmp(line, name))
+      {
+       /*
+        * Found the service, see if it is set to "-NO-"...
+	*/
+
+	if (!strncasecmp(ptr, "-NO-", 4))
+	  state = 0;
+        break;
+      }
+    }
+
+    cupsFileClose(fp);
+  }
+
+  return (state);
+}
+#endif /* __APPLE__ */
 
 
 /*
@@ -3870,6 +3926,16 @@ update_lpd(int onoff)			/* - 1 = turn on, 0 = turn off */
 {
   if (!LPDConfigFile)
     return;
+
+#ifdef __APPLE__
+ /*
+  * Allow /etc/hostconfig CUPS_LPD service setting to override cupsd.conf
+  * setting for backwards-compatibility.
+  */
+
+  if (onoff && !get_hostconfig("CUPS_LPD"))
+    onoff = 0;
+#endif /* __APPLE__ */
 
   if (!strncmp(LPDConfigFile, "xinetd:///", 10))
   {

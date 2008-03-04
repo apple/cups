@@ -942,7 +942,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   if (!http)
-    http = _cupsConnect();
+    if ((http = _cupsConnect()) == NULL)
+      return (HTTP_SERVICE_UNAVAILABLE);
 
   if (!cups_get_printer_uri(http, name, hostname, sizeof(hostname), &port,
                             resource, sizeof(resource), 0))
