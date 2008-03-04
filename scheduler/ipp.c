@@ -2924,6 +2924,13 @@ apple_register_profiles(
 
 
  /*
+  * Make sure ColorSync is available...
+  */
+
+  if (CMRegisterColorDevice == NULL)
+    return;
+
+ /*
   * Try opening the PPD file for this printer...
   */
 
@@ -3164,7 +3171,12 @@ static void
 apple_unregister_profiles(
     cupsd_printer_t *p)			/* I - Printer */
 {
-  CMUnregisterColorDevice(cmPrinterDeviceClass, _ppdHashName(p->name));
+ /*
+  * Make sure ColorSync is available...
+  */
+
+  if (CMUnregisterColorDevice != NULL)
+    CMUnregisterColorDevice(cmPrinterDeviceClass, _ppdHashName(p->name));
 }
 #endif /* __APPLE__ */
 
