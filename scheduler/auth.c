@@ -662,7 +662,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdAuthorize: pam_start() returned %d (%s)!\n",
         	              pamerr, pam_strerror(pamh, pamerr));
-	      pam_end(pamh, 0);
 	      return;
 	    }
 

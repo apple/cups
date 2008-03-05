@@ -239,7 +239,7 @@ case $uname in
 		FONTS=""
 		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
-                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration -framework ApplicationServices"
+                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration -weak_framework ApplicationServices"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation $LIBS"
 
 		dnl Check for framework headers...
