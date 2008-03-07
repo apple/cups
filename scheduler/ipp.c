@@ -2835,6 +2835,8 @@ apple_init_profile(
   CFMutableDictionaryRef dict;		/* Dictionary for name */
   char			*language;	/* Current language */
   ppd_attr_t		*attr;		/* Profile attribute */
+  CFStringRef		cflang,		/* Language string */
+			cftext;		/* Localized text */
 
 
  /*
@@ -2845,11 +2847,16 @@ apple_init_profile(
 				   &kCFTypeDictionaryKeyCallBacks,
 				   &kCFTypeDictionaryValueCallBacks);
 
-  CFDictionarySetValue(dict, CFSTR("en"),
-		       CFStringCreateWithCString(kCFAllocatorDefault,
-						 text, kCFStringEncodingUTF8));
+  cftext = CFStringCreateWithCString(kCFAllocatorDefault, text,
+				     kCFStringEncodingUTF8);
 
-  if (iccfile && languages)
+  if (cftext)
+  {
+    CFDictionarySetValue(dict, CFSTR("en"), cftext);
+    CFRelease(cftext);
+  }
+
+  if (languages)
   {
    /*
     * Find localized names for the color profiles...
@@ -2861,15 +2868,27 @@ apple_init_profile(
 	 language;
 	 language = (char *)cupsArrayNext(languages))
     {
-      if ((attr = _ppdLocalizedAttr(ppd, "cupsICCProfile", name,
-				    language)) != NULL && attr->text[0])
-	CFDictionarySetValue(dict,
-			     CFStringCreateWithCString(kCFAllocatorDefault,
-						       language,
-						       kCFStringEncodingUTF8),
-			     CFStringCreateWithCString(kCFAllocatorDefault,
-						       attr->text,
-						       kCFStringEncodingUTF8));
+      if (iccfile)
+        attr = _ppdLocalizedAttr(ppd, "cupsICCProfile", name, language);
+      else
+        attr = _ppdLocalizedAttr(ppd, "ColorModel", name, language);
+
+      if (attr && attr->text[0])
+      {
+	cflang = CFStringCreateWithCString(kCFAllocatorDefault, language,
+					   kCFStringEncodingUTF8);
+	cftext = CFStringCreateWithCString(kCFAllocatorDefault, attr->text,
+					   kCFStringEncodingUTF8);
+
+        if (cflang && cftext)
+	  CFDictionarySetValue(dict, cflang, cftext);
+
+        if (cflang)
+	  CFRelease(cflang);
+
+        if (cftext)
+	  CFRelease(cftext);
+      }
     }
 
     cupsArrayRestore(ppd->sorted_attrs);
@@ -2904,15 +2923,25 @@ apple_register_profiles(
 {
   int			i;		/* Looping var */
   char			ppdfile[1024],	/* PPD filename */
-			iccfile[1024];	/* ICC filename */
+			iccfile[1024],	/* ICC filename */
+			selector[PPD_MAX_NAME];
+					/* Profile selection string */
   ppd_file_t		*ppd;		/* PPD file */
-  ppd_attr_t		*attr;		/* cupsICCProfile attributes */
+  ppd_attr_t		*attr,		/* cupsICCProfile attributes */
+			*profileid_attr;/* cupsProfileID attribute */
   ppd_option_t		*cm_option;	/* Color model option */
-  ppd_choice_t		*cm_choice;	/* Color model choice */
+  ppd_choice_t		*cm_choice,	/* Color model choice */
+			*q1_choice,	/* ColorModel (or other) qualifier */
+			*q2_choice,	/* MediaType (or other) qualifier */
+			*q3_choice;	/* Resolution (or other) qualifier */
   int			num_profiles;	/* Number of profiles */
   CMError		error;		/* Last error */
-  unsigned		id;		/* Printer device ID */
-  CFMutableDictionaryRef name;		/* Printer device name dictionary */
+  unsigned		device_id,	/* Printer device ID */
+			profile_id,	/* Profile ID */
+			default_profile_id = 0;
+					/* Default profile ID */
+  CFMutableDictionaryRef device_name;	/* Printer device name dictionary */
+  CFStringRef		printer_name;	/* Printer name string */
   CMDeviceScope		scope =		/* Scope of the registration */
 			{
 			  kCFPreferencesAnyUser,
@@ -2937,6 +2966,8 @@ apple_register_profiles(
   snprintf(ppdfile, sizeof(ppdfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
   if ((ppd = ppdOpenFile(ppdfile)) == NULL)
     return;
+
+  ppdMarkDefaults(ppd);
 
  /*
   * See if we have any profiles...
@@ -2965,6 +2996,28 @@ apple_register_profiles(
 
   if (num_profiles > 0)
   {
+   /*
+    * Figure out the default profile selectors...
+    */
+
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL &&
+        attr->value && attr->value[0])
+      q1_choice = ppdFindMarkedChoice(ppd, attr->value);
+    else
+      q1_choice = ppdFindMarkedChoice(ppd, "ColorModel");
+
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL &&
+        attr->value && attr->value[0])
+      q2_choice = ppdFindMarkedChoice(ppd, attr->value);
+    else
+      q2_choice = ppdFindMarkedChoice(ppd, "MediaType");
+
+    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL &&
+        attr->value && attr->value[0])
+      q3_choice = ppdFindMarkedChoice(ppd, attr->value);
+    else
+      q3_choice = ppdFindMarkedChoice(ppd, "Resolution");
+
    /*
     * Build the array of profiles...
     *
@@ -3002,11 +3055,62 @@ apple_register_profiles(
         if (access(iccfile, 0))
 	  continue;
 
-        apple_init_profile(ppd, languages, profile, _ppdHashName(attr->spec),
-	                   attr->spec, attr->text[0] ? attr->text : attr->spec,
-	                   iccfile);
+        cupsArraySave(ppd->sorted_attrs);
+
+	if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
+	                                  attr->spec)) != NULL &&
+            profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
+          profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
+	else
+	  profile_id = _ppdHashName(attr->spec);
+
+	cupsArrayRestore(ppd->sorted_attrs);
+
+        apple_init_profile(ppd, languages, profile, profile_id, attr->spec,
+	                   attr->text[0] ? attr->text : attr->spec, iccfile);
 
 	profile ++;
+
+       /*
+        * See if this is the default profile...
+	*/
+
+        if (!default_profile_id && q1_choice)
+	{
+	  if (q2_choice)
+	  {
+	    if (q3_choice)
+	    {
+	      snprintf(selector, sizeof(selector), "%s.%s.%s",
+	               q1_choice->choice, q2_choice->choice, q3_choice->choice);
+              if (!strcmp(selector, attr->spec))
+	        default_profile_id = profile_id;
+            }
+
+            if (!default_profile_id)
+	    {
+	      snprintf(selector, sizeof(selector), "%s.%s.", q1_choice->choice,
+	               q2_choice->choice);
+              if (!strcmp(selector, attr->spec))
+	        default_profile_id = profile_id;
+	    }
+          }
+
+          if (!default_profile_id && q3_choice)
+	  {
+	    snprintf(selector, sizeof(selector), "%s..%s", q1_choice->choice,
+	             q3_choice->choice);
+	    if (!strcmp(selector, attr->spec))
+	      default_profile_id = profile_id;
+	  }
+
+          if (!default_profile_id)
+	  {
+	    snprintf(selector, sizeof(selector), "%s..", q1_choice->choice);
+	    if (!strcmp(selector, attr->spec))
+	      default_profile_id = profile_id;
+	  }
+	}
       }
 
     _ppdFreeLanguages(languages);
@@ -3014,23 +3118,13 @@ apple_register_profiles(
   else if ((cm_option = ppdFindOption(ppd, "ColorModel")) != NULL)
   {
    /*
-    * Extract standard grayscale, RGB, or CMYK profiles...
+    * Extract profiles from ColorModel option...
     */
 
-    for (num_profiles = 0, i = cm_option->num_choices,
-             cm_choice = cm_option->choices;
-         i > 0;
-	 i --, cm_choice ++)
-      if (!strcmp(cm_choice->choice, "Gray") ||
-          !strcmp(cm_choice->choice, "RGB") ||
-          !strcmp(cm_choice->choice, "CMYK"))
-        num_profiles ++; 
+    const char *profile_name;		/* Name of generic profile */
 
-   /*
-    * Build the array of profiles...
-    *
-    * Note: This calloc actually requests slightly more memory than needed.
-    */
+
+    num_profiles = cm_option->num_choices;
 
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
@@ -3046,25 +3140,29 @@ apple_register_profiles(
     for (profile = profiles->profiles, i = cm_option->num_choices,
              cm_choice = cm_option->choices;
          i > 0;
-	 i --, cm_choice ++)
-      if (!strcmp(cm_choice->choice, "Gray"))
-      {
-        apple_init_profile(ppd, NULL, profile, _ppdHashName("Gray.."),
-	                   "Gray", "Gray", NULL);
-	profile ++;
-      }
-      else if (!strcmp(cm_choice->choice, "RGB"))
-      {
-        apple_init_profile(ppd, NULL, profile, _ppdHashName("RGB.."),
-	                   "RGB", "RGB", NULL);
-	profile ++;
-      }
-      else if (!strcmp(cm_choice->choice, "CMYK"))
-      {
-        apple_init_profile(ppd, NULL, profile, _ppdHashName("CMYK.."),
-	                   "CMYK", "CMYK", NULL);
-	profile ++;
-      }
+	 i --, cm_choice ++, profile ++)
+    {
+      if (!strcmp(cm_choice->choice, "Gray") ||
+          !strcmp(cm_choice->choice, "Black"))
+        profile_name = "Gray";
+      else if (!strcmp(cm_choice->choice, "RGB") ||
+               !strcmp(cm_choice->choice, "CMY"))
+        profile_name = "RGB";
+      else if (!strcmp(cm_choice->choice, "CMYK") ||
+               !strcmp(cm_choice->choice, "KCMY"))
+        profile_name = "CMYK";
+      else
+        profile_name = "DeviceN";
+
+      snprintf(selector, sizeof(selector), "%s..", profile_name);
+      profile_id = _ppdHashName(selector);
+
+      apple_init_profile(ppd, NULL, profile, profile_id, cm_choice->choice,
+                         cm_choice->text, NULL);
+
+      if (cm_choice->marked)
+        default_profile_id = profile_id;
+    }
   }
   else
   {
@@ -3072,9 +3170,9 @@ apple_register_profiles(
     * Use the default colorspace...
     */
 
-    num_profiles = 1;
+    num_profiles = 1 + ppd->colorspace != PPD_CS_GRAY;
     
-    if ((profiles = calloc(1, sizeof(CMDeviceProfileArray))) == NULL)
+    if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unable to allocate memory for %d profiles!",
@@ -3083,26 +3181,31 @@ apple_register_profiles(
       return;
     }
 
-    profiles->profileCount = 1;
+    profiles->profileCount = num_profiles;
+
+    apple_init_profile(ppd, NULL, profiles->profiles, _ppdHashName("Gray.."),
+                       "Gray", "Gray", NULL);
 
     switch (ppd->colorspace)
     {
-      case PPD_CS_GRAY :
-          apple_init_profile(ppd, NULL, profiles->profiles,
-	                     _ppdHashName("Gray.."), "Gray", "Gray", NULL);
-          break;
       case PPD_CS_RGB :
-          apple_init_profile(ppd, NULL, profiles->profiles,
+      case PPD_CS_CMY :
+          apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("RGB.."), "RGB", "RGB", NULL);
           break;
+      case PPD_CS_RGBK :
       case PPD_CS_CMYK :
-          apple_init_profile(ppd, NULL, profiles->profiles,
+          apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("CMYK.."), "CMYK", "CMYK", NULL);
           break;
 
+      case PPD_CS_N :
+          apple_init_profile(ppd, NULL, profiles->profiles + 1,
+	                     _ppdHashName("DeviceN.."), "DeviceN", "DeviceN",
+			     NULL);
+          break;
+
       default :
-          free(profiles);
-	  num_profiles = 0;
 	  break;
     }
   }
@@ -3110,35 +3213,47 @@ apple_register_profiles(
   if (num_profiles > 0)
   {
    /*
+    * Make sure we have a default profile ID...
+    */
+
+    if (!default_profile_id)
+      default_profile_id = profiles->profiles[num_profiles - 1].profileID;
+
+   /*
     * Get the device ID hash and pathelogical name dictionary.
     */
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Registering ICC color profiles for \"%s\"",
 		    p->name);
 
-    id   = _ppdHashName(p->name);
-    name = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-				     &kCFTypeDictionaryKeyCallBacks,
-				     &kCFTypeDictionaryValueCallBacks);
+    device_id    = _ppdHashName(p->name);
+    device_name  = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+					     &kCFTypeDictionaryKeyCallBacks,
+					     &kCFTypeDictionaryValueCallBacks);
+    printer_name = CFStringCreateWithCString(kCFAllocatorDefault, p->name,
+					    kCFStringEncodingUTF8);
 
-    CFDictionarySetValue(name, CFSTR("en"),
-			 CFStringCreateWithCString(kCFAllocatorDefault, p->name,
-						   kCFStringEncodingUTF8));
+    if (device_name && printer_name)
+    {
+      CFDictionarySetValue(device_name, CFSTR("en"), printer_name);
 
-   /*
-    * Register the device with ColorSync...
-    */
+     /*
+      * Register the device with ColorSync...
+      */
 
-    error = CMRegisterColorDevice(cmPrinterDeviceClass, id, name, &scope);
+      error = CMRegisterColorDevice(cmPrinterDeviceClass, device_id,
+                                    device_name, &scope);
 
-   /*
-    * Register the profiles...
-    */
+     /*
+      * Register the profiles...
+      */
 
-    if (error == noErr)
-      error = CMSetDeviceFactoryProfiles(cmPrinterDeviceClass, id,
-					 profiles->profiles[0].profileID,
-					 profiles);
+      if (error == noErr)
+	error = CMSetDeviceFactoryProfiles(cmPrinterDeviceClass, device_id,
+					   default_profile_id, profiles);
+    }
+    else
+      error = 1000;
 
    /*
     * Clean up...
@@ -3155,7 +3270,12 @@ apple_register_profiles(
       CFRelease(profile->profileName);
 
     free(profiles);
-    CFRelease(name);
+
+    if (printer_name)
+      CFRelease(printer_name);
+
+    if (device_name)
+      CFRelease(device_name);
   }
 
   ppdClose(ppd);
