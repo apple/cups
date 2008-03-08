@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.7
 
+	- The scheduler could crash when printing using a port
+	  monitor (STR #2742)
 	- The scheduler would crash if PAM was broken (STR #2734)
 	- The image filters did not work with some CMYK JPEG files
 	  produced by Adobe applications (STR #2727)

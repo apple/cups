@@ -2672,6 +2672,13 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     if (!filters)
       filters = cupsArrayNew(NULL, NULL);
 
+    port_monitor.src  = NULL;
+    port_monitor.dst  = NULL;
+    port_monitor.cost = 0;
+
+    snprintf(port_monitor.filter, sizeof(port_monitor.filter),
+             "%s/monitor/%s", ServerBin, printer->port_monitor);
+
     if (!cupsArrayAdd(filters, &port_monitor))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2687,9 +2694,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
       return;
     }
-
-    snprintf(port_monitor.filter, sizeof(port_monitor.filter),
-             "%s/monitor/%s", ServerBin, printer->port_monitor);
   }
 
  /*
@@ -3108,14 +3112,20 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
 
-  if (!printer->remote && !printer->raw &&
-      (filter = (mime_filter_t *)cupsArrayLast(filters)) != NULL &&
-      filter->dst)
+  if (!printer->remote && !printer->raw)
   {
-    snprintf(final_content_type, sizeof(final_content_type),
-             "FINAL_CONTENT_TYPE=%s/%s",
-	     filter->dst->super, filter->dst->type);
-    envp[envc ++] = final_content_type;
+    filter = (mime_filter_t *)cupsArrayLast(filters);
+
+    if (printer->port_monitor)
+      filter = (mime_filter_t *)cupsArrayPrev(filters);
+
+    if (filter && filter->dst)
+    {
+      snprintf(final_content_type, sizeof(final_content_type),
+	       "FINAL_CONTENT_TYPE=%s/%s",
+	       filter->dst->super, filter->dst->type);
+      envp[envc ++] = final_content_type;
+    }
   }
 
   if (Classification && !banner_page)
