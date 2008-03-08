@@ -178,6 +178,11 @@ _cupsImageReadPNM(
     switch (format)
     {
       case 1 :
+          for (x = img->xsize, inptr = in; x > 0; x --, inptr ++)
+            if (fscanf(fp, "%d", &val) == 1)
+              *inptr = val ? 0 : 255;
+          break;
+
       case 2 :
           for (x = img->xsize, inptr = in; x > 0; x --, inptr ++)
             if (fscanf(fp, "%d", &val) == 1)
@@ -203,9 +208,9 @@ _cupsImageReadPNM(
                x --, inptr ++)
           {
             if (*outptr & bit)
-              *inptr = 255;
-            else
               *inptr = 0;
+            else
+              *inptr = 255;
 
             if (bit > 1)
               bit >>= 1;

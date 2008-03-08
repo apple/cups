@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.7
 
+	- The image filters inverted PBM files (STR #2746)
 	- cupsctl would crash if the scheduler was not running
 	  (STR #2741)
 	- The scheduler could crash when printing using a port
