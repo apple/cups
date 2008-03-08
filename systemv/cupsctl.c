@@ -3,7 +3,7 @@
  *
  *   CUPS control program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -27,6 +27,7 @@
 #include <cups/adminutil.h>
 #include <cups/string.h>
 #include <cups/i18n.h>
+#include <errno.h>
 
 
 /*
@@ -146,7 +147,13 @@ main(int  argc,				/* I - Number of command-line args */
   * Connect to the server using the defaults...
   */
 
-  http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
+  if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                 cupsEncryption())) == NULL)
+  {
+    _cupsLangPrintf(stderr, _("cupsctl: Unable to connect to server: %s\n"),
+                    strerror(errno));
+    return (1);
+  }
 
  /*
   * Set the current configuration if we have anything on the command-line...
