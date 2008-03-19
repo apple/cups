@@ -3,7 +3,7 @@
  *
  *   Raster file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -21,14 +21,14 @@
  *   cupsRasterClose()         - Close a raster stream.
  *   cupsRasterOpen()          - Open a raster stream.
  *   cupsRasterReadHeader()    - Read a raster page header and store it in a
- *                               V1 page header structure.
+ *                               version 1 page header structure.
  *   cupsRasterReadHeader2()   - Read a raster page header and store it in a
- *                               V2 page header structure.
+ *                               version 2 page header structure.
  *   cupsRasterReadPixels()    - Read raster pixels.
- *   cupsRasterWriteHeader()   - Write a raster page header from a V1 page
- *                               header structure.
- *   cupsRasterWriteHeader2()  - Write a raster page header from a V2 page
- *                               header structure.
+ *   cupsRasterWriteHeader()   - Write a raster page header from a version 1
+ *                               page header structure.
+ *   cupsRasterWriteHeader2()  - Write a raster page header from a version 2
+ *                               page header structure.
  *   cupsRasterWritePixels()   - Write raster pixels.
  *   cups_raster_read()        - Read through the raster buffer.
  *   cups_raster_read_header() - Read a raster page header.
@@ -98,6 +98,9 @@ static int	cups_write(int fd, const unsigned char *buf, int bytes);
 
 /*
  * 'cupsRasterClose()' - Close a raster stream.
+ *
+ * The file descriptor associated with the raster stream must be closed
+ * separately as needed.
  */
 
 void
@@ -118,11 +121,20 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
 
 /*
  * 'cupsRasterOpen()' - Open a raster stream.
+ *
+ * This function associates a raster stream with the given file descriptor.
+ * For most printer driver filters, "fd" will be 0 (stdin).  For most raster
+ * image processor (RIP) filters that generate raster data, "fd" will be 1
+ * (stdout).
+ *
+ * When writing raster data, the @code CUPS_RASTER_WRITE@ or
+ * @code CUPS_RASTER_WRITE_COMPRESS@ mode can be used - compressed output
+ * is generally 25-50% smaller but adds a 100-300% execution time overhead.
  */
 
 cups_raster_t *				/* O - New stream */
 cupsRasterOpen(int         fd,		/* I - File descriptor */
-               cups_mode_t mode)	/* I - Mode */
+               cups_mode_t mode)	/* I - Mode - @code CUPS_RASTER_READ@, @code CUPS_RASTER_WRITE@, or @code CUPS_RASTER_WRITE_COMPRESSED@ */
 {
   cups_raster_t	*r;			/* New stream */
 
@@ -206,7 +218,11 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
 
 /*
  * 'cupsRasterReadHeader()' - Read a raster page header and store it in a
- *                            V1 page header structure.
+ *                            version 1 page header structure.
+ *
+ * This function is deprecated. Use @link cupsRasterReadHeader2@ instead.
+ *
+ * @deprecated@
  */
 
 unsigned				/* O - 1 on success, 0 on fail */
@@ -233,9 +249,9 @@ cupsRasterReadHeader(
 
 /*
  * 'cupsRasterReadHeader2()' - Read a raster page header and store it in a
- *                             V2 page header structure.
+ *                             version 2 page header structure.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 unsigned				/* O - 1 on success, 0 on fail */
@@ -463,8 +479,12 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
 
 /*
- * 'cupsRasterWriteHeader()' - Write a raster page header from a V1 page
+ * 'cupsRasterWriteHeader()' - Write a raster page header from a version 1 page
  *                             header structure.
+ *
+ * This function is deprecated. Use @link cupsRasterWriteHeader2@ instead.
+ *
+ * @deprecated@
  */
  
 unsigned				/* O - 1 on success, 0 on failure */
@@ -495,10 +515,12 @@ cupsRasterWriteHeader(
 
 
 /*
- * 'cupsRasterWriteHeader2()' - Write a raster page header from a V2 page
- *                              header structure.
+ * 'cupsRasterWriteHeader2()' - Write a raster page header from a version 2
+ *                              page header structure.
  *
- * @since CUPS 1.2@
+ * The page header can be initialized using @link cupsRasterInterpretPPD@.
+ *
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
  
 unsigned				/* O - 1 on success, 0 on failure */
