@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.7
 
+	- "make check" didn't return a non-zero exit code on
+	  error (STR #2758)
 	- The scheduler incorrectly logged AUTH_foo environment
 	  variables in debug mode (STR #2751)
 	- The image filters inverted PBM files (STR #2746)
