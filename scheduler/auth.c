@@ -343,7 +343,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   char		*ptr,			/* Pointer into string */
 		username[256],		/* Username string */
 		password[33];		/* Password string */
-  const char	*localuser;		/* Certificate username */
+  cupsd_cert_t	*localuser;		/* Certificate username */
   char		nonce[HTTP_MAX_VALUE],	/* Nonce value from client */
 		md5[33],		/* MD5 password */
 		basicmd5[33];		/* MD5 of Basic password */
@@ -545,7 +545,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     if ((localuser = cupsdFindCert(authorization)) != NULL)
     {
-      strlcpy(username, localuser, sizeof(username));
+      strlcpy(username, localuser->username, sizeof(username));
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Local",
@@ -559,9 +559,11 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
+#ifdef HAVE_GSSAPI
     if (localuser->ccache)
       con->type = CUPSD_AUTH_NEGOTIATE;
     else
+#endif /* HAVE_GSSAPI */
       con->type = CUPSD_AUTH_BASIC;
   }
   else if (!strncmp(authorization, "Basic", 5))
