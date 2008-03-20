@@ -559,7 +559,10 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
-    con->type = CUPSD_AUTH_BASIC;
+    if (localuser->ccache)
+      con->type = CUPSD_AUTH_NEGOTIATE;
+    else
+      con->type = CUPSD_AUTH_BASIC;
   }
   else if (!strncmp(authorization, "Basic", 5))
   {
