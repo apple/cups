@@ -9541,6 +9541,7 @@ send_http_error(
   {
     char	resource[HTTP_MAX_URI];	/* Resource portion of URI */
     cupsd_location_t *auth;		/* Pointer to authentication element */
+    int		auth_type;		/* Type of authentication required */
 
 
     if (printer->type & CUPS_PRINTER_CLASS)
@@ -9550,9 +9551,19 @@ send_http_error(
 
     if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
         auth->type == CUPSD_AUTH_NONE)
-      auth = cupsdFindPolicyOp(printer->op_policy_ptr, IPP_PRINT_JOB);
+      auth = cupsdFindPolicyOp(printer->op_policy_ptr,
+                               con->request ?
+			           con->request->request.op.operation_id :
+				   IPP_PRINT_JOB);
 
-    cupsdSendError(con, status, auth ? auth->type : CUPSD_AUTH_NONE);
+    if (!auth)
+      auth_type = CUPSD_AUTH_NONE;
+    else if (auth->type == CUPSD_AUTH_DEFAULT)
+      auth_type = DefaultAuthType;
+    else
+      auth_type = auth->type;
+
+    cupsdSendError(con, status, auth_type);
   }
   else
     cupsdSendError(con, status, CUPSD_AUTH_NONE);
