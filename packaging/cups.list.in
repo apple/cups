@@ -336,21 +336,49 @@ l 0755 root sys /usr/bsd/lprm $BINDIR/lprm
 %system hpux
 f 0755 root sys $LIBDIR/libcups.sl.2 cups/libcups.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.sl libcups.sl.2
+f 0755 root sys $LIBDIR/libcupscgi.sl.1 cgi-bin/libcupscgi.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.sl libcupscgi.sl.1
+f 0755 root sys $LIBDIR/libcupsdriver.sl.1 driver/libcupsdriver.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsdriver.sl libcupsdriver.sl.1
 f 0755 root sys $LIBDIR/libcupsimage.sl.2 filter/libcupsimage.sl.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.sl libcupsimage.sl.2
+f 0755 root sys $LIBDIR/libcupsmime.sl.1 scheduler/libcupsmime.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.sl libcupsmime.sl.1
+f 0755 root sys $LIBDIR/libcupsppdc.sl.1 ppdc/libcupsppdc.sl.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.sl libcupsppdc.sl.1
 %system aix
 f 0755 root sys $LIBDIR/libcups_s.a cups/libcups_s.a nostrip()
+f 0755 root sys $LIBDIR/libcupscgi_s.a cgi-bin/libcupscgi_s.a nostrip()
+f 0755 root sys $LIBDIR/libcupsdriver_s.a driver/libcupsdriver_s.a nostrip()
 f 0755 root sys $LIBDIR/libcupsimage_s.a filter/libcupsimage_s.a nostrip()
+f 0755 root sys $LIBDIR/libcupsmime_s.a scheduler/libcupsmime_s.a nostrip()
+f 0755 root sys $LIBDIR/libcupsppdc_s.a ppdc/libcupsppdc_s.a nostrip()
 %system darwin
 f 0755 root sys $LIBDIR/libcups.2.dylib cups/libcups.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcups.dylib libcups.2.dylib
+f 0755 root sys $LIBDIR/libcupscgi.1.dylib cgi-bin/libcupscgi.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.dylib libcupscgi.1.dylib
+f 0755 root sys $LIBDIR/libcupsdriver.1.dylib driver/libcupsdriver.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsdriver.dylib libcupsdriver.1.dylib
 f 0755 root sys $LIBDIR/libcupsimage.2.dylib filter/libcupsimage.2.dylib nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.dylib libcupsimage.2.dylib
+f 0755 root sys $LIBDIR/libcupsmime.1.dylib scheduler/libcupsmime.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.dylib libcupsmime.1.dylib
+f 0755 root sys $LIBDIR/libcupsppdc.1.dylib ppdc/libcupsppdc.1.dylib nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.dylib libcupsppdc.1.dylib
 %system !hpux !aix !darwin
 f 0755 root sys $LIBDIR/libcups.so.2 cups/libcups.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcups.so libcups.so.2
+f 0755 root sys $LIBDIR/libcupscgi.so.1 cgi-bin/libcupscgi.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupscgi.so libcupscgi.so.1
+f 0755 root sys $LIBDIR/libcupsdriver.so.1 driver/libcupsdriver.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsdriver.so libcupsdriver.so.1
 f 0755 root sys $LIBDIR/libcupsimage.so.2 filter/libcupsimage.so.2 nostrip()
 l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
+f 0755 root sys $LIBDIR/libcupsmime.so.1 scheduler/libcupsmime.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsmime.so libcupsmime.so.1
+f 0755 root sys $LIBDIR/libcupsppdc.so.1 ppdc/libcupsppdc.so.1 nostrip()
+l 0755 root sys $LIBDIR/libcupsppdc.so libcupsppdc.so.1
 %system all
 %subpackage
 %endif
@@ -359,8 +387,16 @@ l 0755 root sys $LIBDIR/libcupsimage.so libcupsimage.so.2
 %subpackage libs
 f 0755 root sys $LIB32DIR/libcups.so.2 cups/libcups.32.so.2 nostrip()
 l 0755 root sys $LIB32DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB32DIR/libcupscgi.so.1 cgi-bin/libcupscgi.32.so.1 nostrip()
+l 0755 root sys $LIB32DIR/libcupscgi.so libcupscgi.so.1
+f 0755 root sys $LIB32DIR/libcupsdriver.so.1 driver/libcupsdriver.32.so.1 nostrip()
+l 0755 root sys $LIB32DIR/libcupsdriver.so libcupsdriver.so.1
 f 0755 root sys $LIB32DIR/libcupsimage.so.2 filter/libcupsimage.32.so.2 nostrip()
 l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
+f 0755 root sys $LIB32DIR/libcupsmime.so.1 scheduler/libcupsmime.32.so.1 nostrip()
+l 0755 root sys $LIB32DIR/libcupsmime.so libcupsmime.so.1
+f 0755 root sys $LIB32DIR/libcupsppdc.so.1 ppdc/libcupsppdc.32.so.1 nostrip()
+l 0755 root sys $LIB32DIR/libcupsppdc.so libcupsppdc.so.1
 %system all
 %subpackage
 %endif
@@ -369,8 +405,16 @@ l 0755 root sys $LIB32DIR/libcupsimage.so libcupsimage.so.2
 %subpackage libs
 f 0755 root sys $LIB64DIR/libcups.so.2 cups/libcups.64.so.2 nostrip()
 l 0755 root sys $LIB64DIR/libcups.so libcups.so.2
+f 0755 root sys $LIB64DIR/libcupscgi.so.1 cgi-bin/libcupscgi.64.so.1 nostrip()
+l 0755 root sys $LIB64DIR/libcupscgi.so libcupscgi.so.1
+f 0755 root sys $LIB64DIR/libcupsdriver.so.1 driver/libcupsdriver.64.so.1 nostrip()
+l 0755 root sys $LIB64DIR/libcupsdriver.so libcupsdriver.so.1
 f 0755 root sys $LIB64DIR/libcupsimage.so.2 filter/libcupsimage.64.so.2 nostrip()
 l 0755 root sys $LIB64DIR/libcupsimage.so libcupsimage.so.2
+f 0755 root sys $LIB64DIR/libcupsmime.so.1 scheduler/libcupsmime.64.so.1 nostrip()
+l 0755 root sys $LIB64DIR/libcupsmime.so libcupsmime.so.1
+f 0755 root sys $LIB64DIR/libcupsppdc.so.1 ppdc/libcupsppdc.64.so.1 nostrip()
+l 0755 root sys $LIB64DIR/libcupsppdc.so libcupsppdc.so.1
 %system all
 %subpackage
 %endif
@@ -540,6 +584,7 @@ f 0644 root sys $INCLUDEDIR/cups/file.h cups/file.h
 f 0644 root sys $INCLUDEDIR/cups/http.h cups/http.h
 f 0644 root sys $INCLUDEDIR/cups/image.h filter/image.h
 f 0644 root sys $INCLUDEDIR/cups/ipp.h cups/ipp.h
+f 0644 root sys $INCLUDEDIR/cups/mime.h scheduler/mime.h
 f 0644 root sys $INCLUDEDIR/cups/language.h cups/language.h
 f 0644 root sys $INCLUDEDIR/cups/ppd.h cups/ppd.h
 f 0644 root sys $INCLUDEDIR/cups/raster.h cups/raster.h
@@ -547,10 +592,12 @@ f 0644 root sys $INCLUDEDIR/cups/transcode.h cups/transcode.h
 
 %if INSTALLSTATIC
 f 0644 root sys $LIBDIR/libcups.a cups/libcups.a
-f 0644 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
-%endif
-
+f 0644 root sys $LIBDIR/libcupscgi.a cgi-bin/libcupscgi.a
 f 0644 root sys $LIBDIR/libcupsdriver.a driver/libcupsdriver.a
+f 0644 root sys $LIBDIR/libcupsimage.a filter/libcupsimage.a
+f 0644 root sys $LIBDIR/libcupsmime.a scheduler/libcupsmime.a
+f 0644 root sys $LIBDIR/libcupsppdc.a ppdc/libcupsppdc.a
+%endif
 
 d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help doc/help/api*.html

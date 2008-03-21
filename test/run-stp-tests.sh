@@ -374,28 +374,28 @@ cp $root/conf/mime.convs /tmp/cups-$user/mime.convs
 echo "Setting up environment variables for test..."
 
 if test "x$LD_LIBRARY_PATH" = x; then
-	LD_LIBRARY_PATH="$root/cups:$root/filter"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
 else
-	LD_LIBRARY_PATH="$root/cups:$root/filter:$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$LD_LIBRARY_PATH"
 fi
 
 export LD_LIBRARY_PATH
 
-LD_PRELOAD="$root/cups/libcups.so.2:$root/filter/libcupsimage.so.2"
+LD_PRELOAD="$root/cups/libcups.so.2:$root/filter/libcupsimage.so.2:$root/cgi-bin/libcupscgi.so.1:$root/scheduler/libcupsmime.so.1:$root/driver/libcupsdriver.so.1:$root/ppdc/libcupsppdc.so.1"
 export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
 else
-	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$DYLD_LIBRARY_PATH"
+	DYLD_LIBRARY_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$DYLD_LIBRARY_PATH"
 fi
 
 export DYLD_LIBRARY_PATH
 
 if test "x$SHLIB_PATH" = x; then
-	SHLIB_PATH="$root/cups:$root/filter"
+	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc"
 else
-	SHLIB_PATH="$root/cups:$root/filter:$SHLIB_PATH"
+	SHLIB_PATH="$root/cups:$root/filter:$root/cgi-bin:$root/scheduler:$root/driver:$root/ppdc:$SHLIB_PATH"
 fi
 
 export SHLIB_PATH

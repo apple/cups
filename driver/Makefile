@@ -33,6 +33,8 @@ LIBOBJS	= \
 		pack.o \
 		rgb.o \
 		srgb.o
+LIB32OBJS	= $(LIBOBJS:.o=.32.o)
+LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 
 OBJS		= \
 		commandtoescpx.o \
@@ -43,9 +45,14 @@ OBJS		= \
 		testcmyk.o \
 		testdither.o \
 		testrgb.o \
-		$(LIBOBJS)
+		$(LIBOBJS) \
+		$(LIB32OBJS) \
+		$(LIB64OBJS)
 
 TARGETS		= \
+		$(LIBCUPSDRIVER) \
+		$(LIB32CUPSDRIVER) \
+		$(LIB64CUPSDRIVER) \
 		libcupsdriver.a \
 		commandtoescpx \
 		commandtopclx \
@@ -72,6 +79,8 @@ clean:
 	$(RM) *.bck core.*
 	$(RM) $(TARGETS)
 	$(RM) -r images
+	$(RM) libcupsdriver.so libcupsdriver.sl libcupsdriver.dylib
+	$(RM) -r 32bit 64bit
 
 
 #
@@ -79,7 +88,13 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+	touch Dependencies.tmp
+	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	$(RM) Dependencies
+	cp Dependencies.tmp Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
+	$(RM) Dependencies.tmp
 
 
 #
@@ -118,7 +133,8 @@ install-exec:
 #
 
 install-headers:
-	$(INSTALL_DIR) $(INCLUDEDIR)/cups
+	echo Installing header files in $(INCLUDEDIR)/cups...
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) driver.h $(INCLUDEDIR)/cups
 
 
@@ -126,18 +142,71 @@ install-headers:
 # Install libraries...
 #
 
-install-libs:
+install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+	echo Installing libraries in $(LIBDIR)...
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
+	$(INSTALL_LIB) $(LIBCUPSDRIVER) $(LIBDIR)
+	if test $(LIBCUPSDRIVER) = "libcupsdriver.so.1" -o $(LIBCUPSDRIVER) = "libcupsdriver.sl.1"; then \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPSDRIVER) .1`; \
+		$(LN) $(LIBCUPSDRIVER) $(LIBDIR)/`basename $(LIBCUPSDRIVER) .1`; \
+	fi
+	if test $(LIBCUPSDRIVER) = "libcupsdriver.1.dylib"; then \
+		$(STRIP) -x $(LIBDIR)/$(LIBCUPSDRIVER); \
+		$(RM) $(LIBDIR)/libcupsdriver.dylib; \
+		$(LN) $(LIBCUPSDRIVER) $(LIBDIR)/libcupsdriver.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSDRIVER) $(SYMROOT); \
+	fi
+
+installstatic:
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
+	$(INSTALL_LIB) libcupsdriver.a $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/libcupsdriver.a
+
+install32bit:
+	echo Installing libraries in $(LIB32DIR)...
+	$(INSTALL_DIR) -m 755 $(LIB32DIR)
+	$(INSTALL_LIB) 32bit/libcupsdriver.so.1 $(LIB32DIR)/libcupsdriver.so.1
+	$(LN) libcupsdriver.so.1 $(LIB32DIR)/libcupsdriver.so
+
+install64bit:
+	echo Installing libraries in $(LIB64DIR)...
+	$(INSTALL_DIR) -m 755 $(LIB64DIR)
+	$(INSTALL_LIB) 64bit/libcupsdriver.so.1 $(LIB64DIR)/libcupsdriver.so.1
+	$(LN) libcupsdriver.so.1 $(LIB64DIR)/libcupsdriver.so
 
 
 #
 # Uninstall...
 #
 
-uninstall:
+uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
 		$(RM) $(SERVERBIN)/filter/$$file; \
 	done
+	$(RM) $(LIBDIR)/libcupsdriver.1.dylib
+	$(RM) $(LIBDIR)/libcupsdriver.a
+	$(RM) $(LIBDIR)/libcupsdriver.dylib
+	$(RM) $(LIBDIR)/libcupsdriver_s.a
+	$(RM) $(LIBDIR)/libcupsdriver.sl
+	$(RM) $(LIBDIR)/libcupsdriver.sl.1
+	$(RM) $(LIBDIR)/libcupsdriver.so
+	$(RM) $(LIBDIR)/libcupsdriver.so.1
+	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/driver.h
+	-$(RMDIR) $(INCLUDEDIR)/cups
+
+uninstall32bit:
+	$(RM) $(LIB32DIR)/libcupsdriver.so
+	$(RM) $(LIB32DIR)/libcupsdriver.so.1
+	-$(RMDIR) $(LIB32DIR)
+
+uninstall64bit:
+	$(RM) $(LIB64DIR)/libcupsdriver.so
+	$(RM) $(LIB64DIR)/libcupsdriver.so.1
+	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -164,27 +233,27 @@ framedhelp:
 # commandtopclx, the PCL command printer driver.
 #
 
-commandtopclx:		commandtopclx.o libcupsdriver.a ../cups/$(LIBCUPS)
+commandtopclx:		commandtopclx.o $(LIBCUPSDRIVER) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ commandtopclx.o libcupsdriver.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ commandtopclx.o -L. -lcupsdriver $(LIBS)
 
 
 #
 # commandtoescpx, the ESC/P command printer driver.
 #
 
-commandtoescpx:		commandtoescpx.o libcupsdriver.a ../cups/$(LIBCUPS)
+commandtoescpx:		commandtoescpx.o $(LIBCUPSDRIVER) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ commandtoescpx.o libcupsdriver.a $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ commandtoescpx.o -L. -lcupsdriver $(LIBS)
 
 
 #
 # rastertoescpx, the ESC/P raster printer driver.
 #
 
-rastertoescpx:		rastertoescpx.o libcupsdriver.a ../cups/$(LIBCUPS)
+rastertoescpx:		rastertoescpx.o $(LIBCUPSDRIVER) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertoescpx.o libcupsdriver.a \
+	$(CC) $(LDFLAGS) -o $@ rastertoescpx.o -L. -lcupsdriver \
 		$(LINKCUPSIMAGE) $(LIBS)
 
 
@@ -192,10 +261,10 @@ rastertoescpx:		rastertoescpx.o libcupsdriver.a ../cups/$(LIBCUPS)
 # rastertopclx, the ESC/P raster printer driver.
 #
 
-rastertopclx:		rastertopclx.o pcl-common.o libcupsdriver.a \
+rastertopclx:		rastertopclx.o pcl-common.o $(LIBCUPSDRIVER) \
 			../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ rastertopclx.o pcl-common.o libcupsdriver.a \
+	$(CC) $(LDFLAGS) -o $@ rastertopclx.o pcl-common.o -L. -lcupsdriver \
 		$(LINKCUPSIMAGE) $(LIBS)
 
 
@@ -249,7 +318,79 @@ testrgb:		testrgb.o libcupsdriver.a ../cups/libcups.a
 
 
 #
-# libcupsdriver.a, the CUPS driver library...
+# libcupsdriver.so.1, libcupsdriver.sl.1
+#
+
+libcupsdriver.so.1 libcupsdriver.sl.1:	$(LIBOBJS)
+	echo Linking $@...
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
+	$(RM) `basename $@ .1`
+	$(LN) $@ `basename $@ .1`
+
+
+#
+# 32bit/libcupsdriver.so.1
+#
+
+32bit/libcupsdriver.so.1:	$(LIB32OBJS)
+	echo Linking 32-bit $@...
+	-mkdir 32bit
+	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
+	$(RM) 32bit/libcupsdriver.so
+	$(LN) libcupsdriver.so.1 32bit/libcupsdriver.so
+
+
+#
+# 64bit/libcupsdriver.so.1
+#
+
+64bit/libcupsdriver.so.1:	$(LIB64OBJS)
+	echo Linking 64-bit $@...
+	-mkdir 64bit
+	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
+	$(RM) 64bit/libcupsdriver.so
+	$(LN) libcupsdriver.so.1 64bit/libcupsdriver.so
+
+
+#
+# libcupsdriver.1.dylib
+#
+
+libcupsdriver.1.dylib:	$(LIBOBJS) libcupsdriver.exp
+	echo Linking $@...
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+		-install_name $(libdir)/$@ \
+		-current_version 1.0.0 \
+		-compatibility_version 1.0.0 \
+		-exported_symbols_list libcupsdriver.exp \
+		$(LIBOBJS) $(LIBS)
+	$(RM) libcupsdriver.dylib
+	$(LN) $@ libcupsdriver.dylib
+
+
+#
+# libcupsdriver_s.a
+#
+
+libcupsdriver_s.a:	$(LIBOBJS)
+	echo Creating $@...
+	$(DSO) $(DSOFLAGS) -o libcupsdriver_s.o $(LIBOBJS) $(LIBS)
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ libcupsdriver_s.o
+
+
+#
+# libcupsdriver.la
+#
+
+libcupsdriver.la:    $(LIBOBJS)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+		-version-info 1:0 $(LIBS)
+
+
+#
+# libcupsdriver.a
 #
 
 libcupsdriver.a:	$(LIBOBJS)

@@ -40,13 +40,17 @@ CUPSDOBJS =	\
 		statbuf.o \
 		subscriptions.o \
 		sysman.o
-MIMEOBJS =	\
+LIBOBJS =	\
 		filter.o \
 		mime.o \
 		type.o
+LIB32OBJS	= $(LIBOBJS:.o=.32.o)
+LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 OBJS	=	\
 		$(CUPSDOBJS) \
-		$(MIMEOBJS) \
+		$(LIBOBJS) \
+		$(LIB32OBJS) \
+		$(LIB64OBJS) \
 		cupsfilter.o \
 		cups-deviced.o \
 		cups-driverd.o \
@@ -65,7 +69,10 @@ TARGETS	=	\
 		cups-driverd \
 		cups-lpd \
 		cups-polld \
-		libmime.a \
+		$(LIBCUPSMIME) \
+		$(LIB32CUPSMIME) \
+		$(LIB64CUPSMIME) \
+		libcupsmime.a \
 		testdirsvc \
 		testlpd \
 		testmime \
@@ -87,6 +94,8 @@ all:		$(TARGETS)
 clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGETS) convert
+	$(RM) libcupsmime.so libcupsmime.sl libcupsmime.dylib
+	$(RM) -r 32bit 64bit
 
 
 #
@@ -94,7 +103,13 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+	touch Dependencies.tmp
+	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	$(RM) Dependencies
+	cp Dependencies.tmp Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
+	$(RM) Dependencies.tmp
 
 
 #
@@ -151,21 +166,17 @@ install-data:
 #
 
 install-exec:
-	echo Creating $(SBINDIR)...
+	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	echo Installing cupsd in $(SBINDIR)...
 	$(INSTALL_BIN) cupsd $(SBINDIR)
-	echo Installing cupsfilter in $(SBINDIR)...
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	-if test "x`uname`" = xDarwin; then \
 		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
 		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
 	fi
-	echo Creating $(SERVERBIN)...
+	echo Installing programs in $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)
-	echo Creating $(SERVERBIN)/daemon...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/daemon
-	echo Installing cups-deviced, cups-driverd, cups-lpd, and cups-polld in $(SERVERBIN)/daemon...
 	$(INSTALL_BIN) cups-deviced $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-driverd $(SERVERBIN)/daemon
 	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
@@ -183,20 +194,56 @@ install-exec:
 #
 
 install-headers:
+	echo Installing header files in $(INCLUDEDIR)/cups...
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
+	$(INSTALL_DATA) mime.h $(INCLUDEDIR)/cups
 
 
 #
 # Install libraries...
 #
 
-install-libs:
+install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+	echo Installing libraries in $(LIBDIR)...
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
+	$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR)
+	if test $(LIBCUPSMIME) = "libcupsmime.so.1" -o $(LIBCUPSMIME) = "libcupsmime.sl.1"; then \
+		$(RM) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
+		$(LN) $(LIBCUPSMIME) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
+	fi
+	if test $(LIBCUPSMIME) = "libcupsmime.1.dylib"; then \
+		$(STRIP) -x $(LIBDIR)/$(LIBCUPSMIME); \
+		$(RM) $(LIBDIR)/libcupsmime.dylib; \
+		$(LN) $(LIBCUPSMIME) $(LIBDIR)/libcupsmime.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSMIME) $(SYMROOT); \
+	fi
+
+installstatic:
+	$(INSTALL_DIR) -m 755 $(LIBDIR)
+	$(INSTALL_LIB) libcupsmime.a $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/libcupsmime.a
+
+install32bit:
+	echo Installing libraries in $(LIB32DIR)...
+	$(INSTALL_DIR) -m 755 $(LIB32DIR)
+	$(INSTALL_LIB) 32bit/libcupsmime.so.1 $(LIB32DIR)/libcupsmime.so.1
+	$(LN) libcupsmime.so.1 $(LIB32DIR)/libcupsmime.so
+
+install64bit:
+	echo Installing libraries in $(LIB64DIR)...
+	$(INSTALL_DIR) -m 755 $(LIB64DIR)
+	$(INSTALL_LIB) 64bit/libcupsmime.so.1 $(LIB64DIR)/libcupsmime.so.1
+	$(LN) libcupsmime.so.1 $(LIB64DIR)/libcupsmime.so
 
 
 #
 # Uninstall the scheduler...
 #
 
-uninstall:	all
+uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(SBINDIR)/cupsd
 	$(RM) $(SBINDIR)/cupsfilter
 	$(RM) $(SERVERBIN)/daemon/cups-deviced
@@ -217,22 +264,63 @@ uninstall:	all
 	-$(RMDIR) $(REQUESTS)
 	-$(RMDIR) $(LOGDIR)
 	-$(RMDIR) $(CACHEDIR)
+	$(RM) $(LIBDIR)/libcupsmime.1.dylib
+	$(RM) $(LIBDIR)/libcupsmime.a
+	$(RM) $(LIBDIR)/libcupsmime.dylib
+	$(RM) $(LIBDIR)/libcupsmime_s.a
+	$(RM) $(LIBDIR)/libcupsmime.sl
+	$(RM) $(LIBDIR)/libcupsmime.sl.1
+	$(RM) $(LIBDIR)/libcupsmime.so
+	$(RM) $(LIBDIR)/libcupsmime.so.1
+	-$(RMDIR) $(LIBDIR)
+	$(RM) $(INCLUDEDIR)/cups/mime.h
+	-$(RMDIR) $(INCLUDEDIR)/cups
+
+uninstall32bit:
+	$(RM) $(LIB32DIR)/libcupsmime.so
+	$(RM) $(LIB32DIR)/libcupsmime.so.1
+	-$(RMDIR) $(LIB32DIR)
+
+uninstall64bit:
+	$(RM) $(LIB64DIR)/libcupsmime.so
+	$(RM) $(LIB64DIR)/libcupsmime.so.1
+	-$(RMDIR) $(LIB64DIR)
+
+
+#
+# Automatic API help files...
+#
+
+apihelp:
+	mxmldoc --section "Programming" \
+		--title "MIME API" \
+		--css ../doc/cups-printable.css \
+		--header api-mime.header --intro api-mime.shtml \
+		mime.h $(LIBOBJS:.o=.c) >../doc/help/api-mime.html
+
+framedhelp:
+	mxmldoc --framed api-mime \
+		--section "Programming" \
+		--title "MIME API" \
+		--css ../doc/cups-printable.css \
+		--header api-mime.header --intro api-mime.shtml \
+		mime.h $(LIBOBJS:.o=.c)
 
 
 #
 # Make the scheduler executable, "cupsd".
 #
 
-cupsd:	$(CUPSDOBJS) libmime.a ../cups/$(LIBCUPS)
+cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) libmime.a \
+	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) -L. -lcupsmime \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBS) \
 		$(LIBGSSAPI)
 
-cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
+cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libmime.a \
+	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
@@ -242,9 +330,9 @@ cupsd-static:	$(CUPSDOBJS) libmime.a ../cups/libcups.a
 # Make the cupsfilter utility.
 #
 
-cupsfilter:	cupsfilter.o libmime.a ../cups/$(LIBCUPS)
+cupsfilter:	cupsfilter.o $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cupsfilter cupsfilter.o libmime.a $(LIBS)
+	$(CC) $(LDFLAGS) -o cupsfilter cupsfilter.o -L. -lcupsmime $(LIBS)
 	$(RM) convert
 	$(LN) cupsfilter convert
 
@@ -286,13 +374,85 @@ cups-polld:	cups-polld.o ../cups/$(LIBCUPS)
 
 
 #
-# libmime.a
+# libcupsmime.so.1, libcupsmime.sl.1
 #
 
-libmime.a:	$(MIMEOBJS)
+libcupsmime.so.1 libcupsmime.sl.1:	$(LIBOBJS)
+	echo Linking $@...
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
+	$(RM) `basename $@ .1`
+	$(LN) $@ `basename $@ .1`
+
+
+#
+# 32bit/libcupsmime.so.1
+#
+
+32bit/libcupsmime.so.1:	$(LIB32OBJS)
+	echo Linking 32-bit $@...
+	-mkdir 32bit
+	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
+	$(RM) 32bit/libcupsmime.so
+	$(LN) libcupsmime.so.1 32bit/libcupsmime.so
+
+
+#
+# 64bit/libcupsmime.so.1
+#
+
+64bit/libcupsmime.so.1:	$(LIB64OBJS)
+	echo Linking 64-bit $@...
+	-mkdir 64bit
+	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
+	$(RM) 64bit/libcupsmime.so
+	$(LN) libcupsmime.so.1 64bit/libcupsmime.so
+
+
+#
+# libcupsmime.1.dylib
+#
+
+libcupsmime.1.dylib:	$(LIBOBJS) libcupsmime.exp
+	echo Linking $@...
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
+		-install_name $(libdir)/$@ \
+		-current_version 1.0.0 \
+		-compatibility_version 1.0.0 \
+		-exported_symbols_list libcupsmime.exp \
+		$(LIBOBJS) $(LIBS)
+	$(RM) libcupsmime.dylib
+	$(LN) $@ libcupsmime.dylib
+
+
+#
+# libcupsmime_s.a
+#
+
+libcupsmime_s.a:	$(LIBOBJS)
+	echo Creating $@...
+	$(DSO) $(DSOFLAGS) -o libcupsmime_s.o $(LIBOBJS) $(LIBS)
+	$(RM) $@
+	$(AR) $(ARFLAGS) $@ libcupsmime_s.o
+
+
+#
+# libcupsmime.la
+#
+
+libcupsmime.la:    $(LIBOBJS)
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
+		-version-info 1:0 $(LIBS)
+
+
+#
+# libcupsmime.a
+#
+
+libcupsmime.a:	$(LIBOBJS)
 	echo Archiving $@...
 	$(RM) $@
-	$(AR) $(ARFLAGS) $@ $(MIMEOBJS)
+	$(AR) $(ARFLAGS) $@ $(LIBOBJS)
 	$(RANLIB) $@
 
 
@@ -319,9 +479,9 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 # testmime
 #
 
-testmime:	testmime.o libmime.a ../cups/libcups.a
+testmime:	testmime.o libcupsmime.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libmime.a ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testmime.o libcupsmime.a ../cups/libcups.a \
 		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
 
 

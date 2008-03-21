@@ -181,6 +181,7 @@ install-exec:
 #
 
 install-headers:
+	echo Installing header files into $(INCLUDEDIR)/cups...
 	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
 	for file in $(HEADERS); do \
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
@@ -192,6 +193,7 @@ install-headers:
 #
 
 install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -205,9 +207,7 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
-			cp $$file $(SYMROOT); \
-		done \
+		cp $(LIBCUPS) $(SYMROOT); \
 	fi
 
 installstatic:
@@ -216,11 +216,13 @@ installstatic:
 	$(RANLIB) $(LIBDIR)/libcups.a
 
 install32bit:
+	echo Installing libraries in $(LIB32DIR)...
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
 	$(INSTALL_LIB) 32bit/libcups.so.2 $(LIB32DIR)/libcups.so.2
 	$(LN) libcups.so.2 $(LIB32DIR)/libcups.so
 
 install64bit:
+	echo Installing libraries in $(LIB64DIR)...
 	$(INSTALL_DIR) -m 755 $(LIB64DIR)
 	$(INSTALL_LIB) 64bit/libcups.so.2 $(LIB64DIR)/libcups.so.2
 	$(LN) libcups.so.2 $(LIB64DIR)/libcups.so
