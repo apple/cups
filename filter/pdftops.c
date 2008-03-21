@@ -211,13 +211,13 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (orientation & 1)
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "%.1f", size->length);
-	snprintf(pdfheight, sizeof(pdfheight), "%.1f", size->width);
+	snprintf(pdfwidth, sizeof(pdfwidth), "%.0f", size->length);
+	snprintf(pdfheight, sizeof(pdfheight), "%.0f", size->width);
       }
       else
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "%.1f", size->width);
-	snprintf(pdfheight, sizeof(pdfheight), "%.1f", size->length);
+	snprintf(pdfwidth, sizeof(pdfwidth), "%.0f", size->width);
+	snprintf(pdfheight, sizeof(pdfheight), "%.0f", size->length);
       }
 
       pdfargv[pdfargc++] = (char *)"-paperw";
@@ -242,7 +242,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Child comes here...
     */
 
-    execv(CUPS_PDFTOPS, argv);
+    execv(CUPS_PDFTOPS, pdfargv);
     _cupsLangPrintError(_("ERROR: Unable to execute pdftops filter"));
     exit(1);
   }
