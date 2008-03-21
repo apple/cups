@@ -3,7 +3,7 @@
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -98,25 +98,17 @@ depend:
 
 
 #
-# Install the scheduler...
+# Install all targets...
 #
 
-install:	all
-	echo Creating $(SBINDIR)...
-	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	echo Installing cupsd in $(SBINDIR)...
-	$(INSTALL_BIN) cupsd $(SBINDIR)
-	echo Installing cupsfilter in $(SBINDIR)...
-	$(INSTALL_BIN) cupsfilter $(SBINDIR)
-	echo Creating $(SERVERBIN)...
-	$(INSTALL_DIR) -m 755 $(SERVERBIN)
-	echo Creating $(SERVERBIN)/daemon...
-	$(INSTALL_DIR) -m 755 $(SERVERBIN)/daemon
-	echo Installing cups-deviced, cups-driverd, cups-lpd, and cups-polld in $(SERVERBIN)/daemon...
-	$(INSTALL_BIN) cups-deviced $(SERVERBIN)/daemon
-	$(INSTALL_BIN) cups-driverd $(SERVERBIN)/daemon
-	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
-	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	echo Creating $(SERVERBIN)/driver...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/driver
 	echo Creating $(SERVERROOT)...
@@ -128,10 +120,7 @@ install:	all
 	echo Creating $(SERVERROOT)/ppd...
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
-	-if test "x`uname`" = xDarwin; then \
-		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
-		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
-	else \
+	-if test "x`uname`" != xDarwin; then \
 		echo Creating $(SERVERROOT)/ssl...; \
 		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl; \
 		chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl || true; \
@@ -155,12 +144,52 @@ install:	all
 #	echo Creating $(CACHEDIR)/ppd...
 #	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
 #	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
+
+
+#
+# Install programs...
+#
+
+install-exec:
+	echo Creating $(SBINDIR)...
+	$(INSTALL_DIR) -m 755 $(SBINDIR)
+	echo Installing cupsd in $(SBINDIR)...
+	$(INSTALL_BIN) cupsd $(SBINDIR)
+	echo Installing cupsfilter in $(SBINDIR)...
+	$(INSTALL_BIN) cupsfilter $(SBINDIR)
+	-if test "x`uname`" = xDarwin; then \
+		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
+		$(LN) $(sbindir)/cupsfilter $(BUILDROOT)/System/Library/Printers/Libraries/convert; \
+	fi
+	echo Creating $(SERVERBIN)...
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)
+	echo Creating $(SERVERBIN)/daemon...
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/daemon
+	echo Installing cups-deviced, cups-driverd, cups-lpd, and cups-polld in $(SERVERBIN)/daemon...
+	$(INSTALL_BIN) cups-deviced $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-driverd $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-lpd $(SERVERBIN)/daemon
+	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(TARGETS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

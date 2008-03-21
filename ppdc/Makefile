@@ -93,10 +93,25 @@ depend:
 
 
 #
-# Install...
+# Install all targets...
 #
 
-install:
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+	$(INSTALL_DIR) $(DATADIR)/drv
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	echo Installing PPD compiler programs...
 	$(INSTALL_DIR) $(BINDIR)
 	$(INSTALL_BIN) ppdc $(BINDIR)
@@ -106,7 +121,26 @@ install:
 	$(INSTALL_BIN) ppdpo $(BINDIR)
 	$(INSTALL_DIR) $(SERVERBIN)/driver
 	$(INSTALL_BIN) drv $(SERVERBIN)/driver
-	$(INSTALL_DIR) $(DATADIR)/drv
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

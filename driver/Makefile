@@ -83,16 +83,50 @@ depend:
 
 
 #
-# Install...
+# Install all targets...
 #
 
-install:
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	$(INSTALL_DIR) $(SERVERBIN)/filter
 	for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
 	$(INSTALL_DIR) $(INCLUDEDIR)/cups
 	$(INSTALL_DATA) driver.h $(INCLUDEDIR)/cups
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

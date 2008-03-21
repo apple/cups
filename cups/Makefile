@@ -156,10 +156,42 @@ depend:
 
 
 #
-# Install object and target files...
+# Install all targets...
 #
 
-install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
+	done
+
+
+#
+# Install libraries...
+#
+
+install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPS) $(LIBDIR)
 	if test $(LIBCUPS) = "libcups.so.2" -o $(LIBCUPS) = "libcups.sl.2"; then \
@@ -182,12 +214,6 @@ installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) libcups.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcups.a
-
-installhdrs:
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	for file in $(HEADERS); do \
-		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
-	done
 
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)

@@ -39,11 +39,14 @@ clean:
 # Install all targets...
 #
 
-install:	all
-	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
-	for file in $(TARGETS); do \
-		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
-	done
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	$(INSTALL_DIR) -m 775 $(CACHEDIR)/rss
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 	if test "x$(SYMROOT)" != "x"; then \
@@ -52,6 +55,31 @@ install:	all
 			cp $$file $(SYMROOT); \
 		done \
 	fi
+
+
+#
+# Install programs...
+#
+
+install-exec:
+	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
+	for file in $(TARGETS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
+	done
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

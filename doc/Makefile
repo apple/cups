@@ -3,7 +3,7 @@
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -140,10 +140,17 @@ depend:
 
 
 #
-# Install all documentation files...
+# Install all targets...
 #
 
-install:	all $(INSTALL_LANGUAGES)
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	$(INSTALL_DIR) -m 755 $(DOCDIR)
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \
@@ -161,10 +168,35 @@ install-languages:
 	for lang in $(LANGUAGES); do \
 		if test -d $$lang; then \
 			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
-			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang 2>/dev/null || true; \
+			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 			$(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang 2>/dev/null || true; \
+			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
+			for file in $(WEBIMAGES); do \
+				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images 2>/dev/null || true; \
+			done; \
 		fi; \
 	done
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #
@@ -176,10 +208,10 @@ uninstall: $(UNINSTALL_LANGUAGES)
 		$(RM) $(DOCDIR)/$$file; \
 	done
 	for file in $(HELPFILES); do \
-		$(INSTALL_MAN) $(DOCDIR)/help/$$file; \
+		$(RM) $(DOCDIR)/$$file; \
 	done
 	for file in $(WEBIMAGES); do \
-		$(INSTALL_MAN) $(DOCDIR)/images/$$file; \
+		$(RM) $(DOCDIR)/$$file; \
 	done
 	-$(RMDIR) $(DOCDIR)/images
 	-$(RMDIR) $(DOCDIR)/help
@@ -189,6 +221,9 @@ uninstall-languages:
 	-for lang in $(LANGUAGES); do \
 		$(RM) $(DOCDIR)/$$lang/index.html; \
 		$(RM) $(DOCDIR)/$$lang/cups.css; \
+		for file in $(WEBIMAGES); do \
+			$(RM) $(DOCDIR)/$$lang/$$file; \
+		done; \
 		$(RMDIR) $(DOCDIR)/$$lang/images; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done

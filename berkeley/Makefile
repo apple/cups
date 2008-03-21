@@ -3,7 +3,7 @@
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -46,7 +46,21 @@ depend:
 # Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) lpq $(BINDIR)
 	$(INSTALL_BIN) lpr $(BINDIR)
@@ -59,6 +73,20 @@ install:	all
 			cp $$file $(SYMROOT); \
 		done \
 	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #
