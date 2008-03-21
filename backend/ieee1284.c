@@ -64,19 +64,23 @@ backendGetDeviceID(
     char       *uri,			/* O - Device URI */
     int        uri_size)		/* I - Size of buffer */
 {
+#ifdef __APPLE__ /* This function is a no-op */
+  return (-1);
+
+#else /* Get the device ID from the specified file descriptor... */
   char	*attr,				/* 1284 attribute */
   	*delim,				/* 1284 delimiter */
 	*uriptr,			/* Pointer into URI */
 	manufacturer[256],		/* Manufacturer string */
 	serial_number[1024];		/* Serial number string */
   int	manulen;			/* Length of manufacturer string */
-#ifdef __linux
+#  ifdef __linux
   int	length;				/* Length of device ID info */
   int   got_id = 0;
-#endif /* __linux */
-#if defined(__sun) && defined(ECPPIOC_GETDEVID)
+#  endif /* __linux */
+#  if defined(__sun) && defined(ECPPIOC_GETDEVID)
   struct ecpp_device_id did;		/* Device ID buffer */
-#endif /* __sun && ECPPIOC_GETDEVID */
+#  endif /* __sun && ECPPIOC_GETDEVID */
 
 
   DEBUG_printf(("backendGetDeviceID(fd=%d, device_id=%p, device_id_size=%d, "
@@ -106,7 +110,7 @@ backendGetDeviceID(
 
     *device_id = '\0';
 
-#ifdef __linux
+#  ifdef __linux
   if (ioctl(fd, LPIOC_GET_DEVICE_ID(device_id_size), device_id))
   {
    /*
@@ -213,13 +217,13 @@ backendGetDeviceID(
       memmove(device_id, device_id + 2, length);
       device_id[length] = '\0';
     }
-#  ifdef DEBUG
+#    ifdef DEBUG
     else
       printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
-#  endif /* DEBUG */
-#endif /* __linux */
+#    endif /* DEBUG */
+#  endif /* __linux */
 
-#if defined(__sun) && defined(ECPPIOC_GETDEVID)
+#   if defined(__sun) && defined(ECPPIOC_GETDEVID)
     did.mode = ECPP_CENTRONICS;
     did.len  = device_id_size - 1;
     did.rlen = 0;
@@ -236,11 +240,11 @@ backendGetDeviceID(
       else
 	device_id[device_id_size - 1] = '\0';
     }
-#  ifdef DEBUG
+#    ifdef DEBUG
     else
       printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
-#  endif /* DEBUG */
-#endif /* __sun && ECPPIOC_GETDEVID */
+#    endif /* DEBUG */
+#  endif /* __sun && ECPPIOC_GETDEVID */
   }
 
   DEBUG_printf(("backendGetDeviceID: device_id=\"%s\"\n", device_id));
@@ -369,6 +373,7 @@ backendGetDeviceID(
   }
 
   return (0);
+#endif /* __APPLE__ */
 }
 
 
@@ -474,15 +479,41 @@ backendGetMakeModel(
 
     if (mfg)
     {
+     /*
+      * Skip leading whitespace...
+      */
+
+      while (isspace(*mfg & 255))
+        mfg ++;
+
+     /*
+      * Map common bad names to the ones we use for driver selection...
+      */
+
       if (!strncasecmp(mfg, "Hewlett-Packard", 15))
 	strlcpy(make_model, "HP", make_model_size);
       else if (!strncasecmp(mfg, "Lexmark International", 21))
 	strlcpy(make_model, "Lexmark", make_model_size);
       else
+      {
+       /*
+        * Use the manufacturer that is supplied...
+	*/
+
 	strlcpy(make_model, mfg, make_model_size);
 
-      if ((delim = strchr(make_model, ';')) != NULL)
-	*delim = '\0';
+	if ((delim = strchr(make_model, ';')) != NULL)
+	  *delim = '\0';
+
+       /*
+        * But strip trailing whitespace...
+	*/
+
+	for (delim = make_model + strlen(make_model) - 1;
+	     delim > make_model && *delim == ' ';
+	     delim --)
+	  *delim = '\0';
+      }
 
       if (!strncasecmp(make_model, mdl, strlen(make_model)))
       {
@@ -498,6 +529,9 @@ backendGetMakeModel(
 	* Concatenate the make and model...
 	*/
 
+        while (isspace(*mdl & 255))
+	  mdl ++;
+
 	strlcat(make_model, " ", make_model_size);
 	strlcat(make_model, mdl, make_model_size);
       }
@@ -508,6 +542,9 @@ backendGetMakeModel(
       * Just copy model string, since it has the manufacturer...
       */
 
+      while (isspace(*mdl & 255))
+	mdl ++;
+
       strlcpy(make_model, mdl, make_model_size);
     }
   }
@@ -516,6 +553,9 @@ backendGetMakeModel(
    /*
     * Use description...
     */
+
+    while (isspace(*attr & 255))
+      attr ++;
 
     if (!strncasecmp(attr, "Hewlett-Packard hp ", 19))
     {
@@ -550,6 +590,11 @@ backendGetMakeModel(
   */
 
   if ((delim = strchr(make_model, ';')) != NULL)
+    *delim = '\0';
+
+  for (delim = make_model + strlen(make_model) - 1;
+       delim > make_model && *delim == ' ';
+       delim --)
     *delim = '\0';
 
  /*

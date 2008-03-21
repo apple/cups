@@ -362,7 +362,7 @@ cupsdDeleteAllCerts(void)
  * 'cupsdFindCert()' - Find a certificate.
  */
 
-const char *				/* O - Matching username or NULL */
+cupsd_cert_t *				/* O - Matching certificate or NULL */
 cupsdFindCert(const char *certificate)	/* I - Certificate */
 {
   cupsd_cert_t	*cert;			/* Current certificate */
@@ -373,7 +373,7 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
     if (!strcasecmp(certificate, cert->certificate))
     {
       DEBUG_printf(("    returning %s...\n", cert->username));
-      return (cert->username);
+      return (cert);
     }
 
   DEBUG_puts("    certificate not found!");

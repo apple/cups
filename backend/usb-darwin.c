@@ -92,6 +92,7 @@
 #include <cups/debug.h>
 #include <cups/sidechannel.h>
 #include <cups/i18n.h>
+#include "backend-private.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
@@ -1008,14 +1009,14 @@ static Boolean list_device_cb(void *refcon,
     {
       CFStringRef make = NULL,  model = NULL, serial = NULL;
       char uristr[1024], makestr[1024], modelstr[1024], serialstr[1024];
-      char optionsstr[1024], idstr[1024];
+      char optionsstr[1024], idstr[1024], make_modelstr[1024];
 
       copy_deviceinfo(deviceIDString, &make, &model, &serial);
-
-      modelstr[0] = '/';
-
       CFStringGetCString(deviceIDString, idstr, sizeof(idstr),
                          kCFStringEncodingUTF8);
+      backendGetMakeModel(idstr, make_modelstr, sizeof(make_modelstr));
+
+      modelstr[0] = '/';
 
       if (!CFStringGetCString(make, makestr, sizeof(makestr),
 			      kCFStringEncodingUTF8))
@@ -1037,8 +1038,8 @@ static Boolean list_device_cb(void *refcon,
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
 
-      printf("direct %s \"%s %s\" \"%s %s USB\" \"%s\"\n", uristr, makestr,
-             &modelstr[1], makestr, &modelstr[1], idstr);
+      printf("direct %s \"%s\" \"%s USB\" \"%s\"\n", uristr, make_modelstr,
+             make_modelstr, idstr);
 
       release_deviceinfo(&make, &model, &serial);
       CFRelease(deviceIDString);
@@ -1172,24 +1173,12 @@ static void copy_deviceinfo(CFStringRef deviceIDString,
   CFStringRef modelKeys[]  = { CFSTR("MDL:"), CFSTR("MODEL:"), NULL };
   CFStringRef makeKeys[]   = { CFSTR("MFG:"), CFSTR("MANUFACTURER:"), NULL };
   CFStringRef serialKeys[] = { CFSTR("SN:"),  CFSTR("SERN:"), NULL };
-  CFRange hpRange = { 0, 3 };
 
   if (make != NULL)
   {
     if ((*make = copy_value_for_key(deviceIDString, makeKeys)) == NULL)
       *make = CFStringCreateWithCString(kCFAllocatorDefault, "Unknown",
                                         kCFStringEncodingUTF8);
-    else if (!CFStringCompare(*make, CFSTR("Hewlett-Packard"),
-                              kCFCompareCaseInsensitive))
-    {
-     /*
-      * Fix a common HP 1284 bug...
-      */
-
-      CFRelease(*make);
-      *make = CFStringCreateWithCString(kCFAllocatorDefault, "HP",
-                                        kCFStringEncodingUTF8);
-    }
   }
 
   if (model != NULL)
@@ -1197,21 +1186,6 @@ static void copy_deviceinfo(CFStringRef deviceIDString,
     if ((*model = copy_value_for_key(deviceIDString, modelKeys)) == NULL)
       *model = CFStringCreateWithCString(kCFAllocatorDefault, "Printer",
                                          kCFStringEncodingUTF8);
-    else if (!CFStringCompareWithOptions(*model, CFSTR("hp "), hpRange,
-                                         kCFCompareCaseInsensitive |
-					     kCFCompareAnchored))
-    {
-     /*
-      * Fix a common HP 1284 bug...
-      */
-
-      CFRange subRange = { 3, CFStringGetLength(*model) - 3 };
-      CFStringRef sub = CFStringCreateWithSubstring(kCFAllocatorDefault,
-                                                    *model, subRange);
-
-      CFRelease(*model);
-      *model = sub;
-    }
   }
 
   if (serial != NULL)

@@ -3,7 +3,7 @@
  *
  *   Raster file definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -103,7 +103,7 @@ typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
 
   CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19@ */
   CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19@ */
-  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white @since CUPS 1.2@ */
+  CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white @since CUPS 1.2/Mac OS X 10.5@ */
 
   CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19@ */
   CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19@ */
@@ -181,7 +181,7 @@ typedef enum cups_orient_e		/**** Orientation attribute values ****/
  * (from CUPS 1.2 and higher) page header, for binary compatibility.
  */
 
-typedef struct cups_page_header_s	/**** Version 1 page header ****/
+typedef struct cups_page_header_s	/**** Version 1 page header @deprecated@ ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -191,15 +191,15 @@ typedef struct cups_page_header_s	/**** Version 1 page header ****/
 
   /**** Standard Page Device Dictionary Integer Values ****/
   unsigned	AdvanceDistance;	/* AdvanceDistance value in points */
-  cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (see above) */
+  cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (@link cups_adv_t@) */
   cups_bool_t	Collate;		/* Collated copies value */
-  cups_cut_t	CutMedia;		/* CutMedia value (see above) */
+  cups_cut_t	CutMedia;		/* CutMedia value (@link cups_cut_t@) */
   cups_bool_t	Duplex;			/* Duplexed (double-sided) value */
   unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
-  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points) */
+  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points, left, bottom, right, top) */
   cups_bool_t	InsertSheet;		/* InsertSheet value */
-  cups_jog_t	Jog;			/* Jog value (see above) */
-  cups_edge_t	LeadingEdge;		/* LeadingEdge value (see above) */
+  cups_jog_t	Jog;			/* Jog value (@link cups_jog_t@) */
+  cups_edge_t	LeadingEdge;		/* LeadingEdge value (@link cups_edge_t@) */
   unsigned	Margins[2];		/* Lower-lefthand margins in points */
   cups_bool_t	ManualFeed;		/* ManualFeed value */
   unsigned	MediaPosition;		/* MediaPosition value */
@@ -207,7 +207,7 @@ typedef struct cups_page_header_s	/**** Version 1 page header ****/
   cups_bool_t	MirrorPrint;		/* MirrorPrint value */
   cups_bool_t	NegativePrint;		/* NegativePrint value */
   unsigned	NumCopies;		/* Number of copies to produce */
-  cups_orient_t	Orientation;		/* Orientation value (see above) */
+  cups_orient_t	Orientation;		/* Orientation value (@link cups_orient_t@) */
   cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
   unsigned	PageSize[2];		/* Width and length of page in points */
   cups_bool_t	Separations;		/* Separations value */
@@ -230,7 +230,7 @@ typedef struct cups_page_header_s	/**** Version 1 page header ****/
 } cups_page_header_t;
 
 /**** New in CUPS 1.2 ****/
-typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2@ ****/
+typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2/Mac OS X 10.5@ ****/
 {
   /**** Standard Page Device Dictionary String Values ****/
   char		MediaClass[64];		/* MediaClass string */
@@ -240,15 +240,15 @@ typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2@ 
 
   /**** Standard Page Device Dictionary Integer Values ****/
   unsigned	AdvanceDistance;	/* AdvanceDistance value in points */
-  cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (see above) */
+  cups_adv_t	AdvanceMedia;		/* AdvanceMedia value (@link cups_adv_t@) */
   cups_bool_t	Collate;		/* Collated copies value */
-  cups_cut_t	CutMedia;		/* CutMedia value (see above) */
+  cups_cut_t	CutMedia;		/* CutMedia value (@link cups_cut_t@) */
   cups_bool_t	Duplex;			/* Duplexed (double-sided) value */
   unsigned	HWResolution[2];	/* Resolution in dots-per-inch */
-  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points) */
+  unsigned	ImagingBoundingBox[4];	/* Pixel region that is painted (points, left, bottom, right, top) */
   cups_bool_t	InsertSheet;		/* InsertSheet value */
-  cups_jog_t	Jog;			/* Jog value (see above) */
-  cups_edge_t	LeadingEdge;		/* LeadingEdge value (see above) */
+  cups_jog_t	Jog;			/* Jog value (@link cups_jog_t@) */
+  cups_edge_t	LeadingEdge;		/* LeadingEdge value (@link cups_edge_t@) */
   unsigned	Margins[2];		/* Lower-lefthand margins in points */
   cups_bool_t	ManualFeed;		/* ManualFeed value */
   unsigned	MediaPosition;		/* MediaPosition value */
@@ -256,7 +256,7 @@ typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2@ 
   cups_bool_t	MirrorPrint;		/* MirrorPrint value */
   cups_bool_t	NegativePrint;		/* NegativePrint value */
   unsigned	NumCopies;		/* Number of copies to produce */
-  cups_orient_t	Orientation;		/* Orientation value (see above) */
+  cups_orient_t	Orientation;		/* Orientation value (@link cups_orient_t@) */
   cups_bool_t	OutputFaceUp;		/* OutputFaceUp value */
   unsigned	PageSize[2];		/* Width and length of page in points */
   cups_bool_t	Separations;		/* Separations value */
@@ -278,19 +278,20 @@ typedef struct cups_page_header2_s	/**** Version 2 page header @since CUPS 1.2@ 
   unsigned	cupsRowStep;		/* Spacing between lines */
 
   /**** Version 2 Dictionary Values ****/
-  unsigned	cupsNumColors;		/* Number of colors @since CUPS 1.2@ */
+  unsigned	cupsNumColors;		/* Number of color compoents @since CUPS 1.2/Mac OS X 10.5@ */
   float		cupsBorderlessScalingFactor;
-					/* Scaling that was applied to page data @since CUPS 1.2@ */
+					/* Scaling that was applied to page data @since CUPS 1.2/Mac OS X 10.5@ */
   float		cupsPageSize[2];	/* Floating point PageSize (scaling *
-  					 * factor not applied) @since CUPS 1.2@ */
-  float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox *
-					 * (scaling factor not applied) @since CUPS 1.2@ */
-  unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2@ */
-  float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2@ */
-  char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2@ */
-  char		cupsMarkerType[64];	/* Ink/toner type @since CUPS 1.2@ */
-  char		cupsRenderingIntent[64];/* Color rendering intent @since CUPS 1.2@ */
-  char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2@ */
+  					 * factor not applied) @since CUPS 1.2/Mac OS X 10.5@ */
+  float		cupsImagingBBox[4];	/* Floating point ImagingBoundingBox
+					 * (scaling factor not applied, left,
+					 * bottom, right, top) @since CUPS 1.2/Mac OS X 10.5@ */
+  unsigned	cupsInteger[16];	/* User-defined integer values @since CUPS 1.2/Mac OS X 10.5@ */
+  float		cupsReal[16];		/* User-defined floating-point values @since CUPS 1.2/Mac OS X 10.5@ */
+  char		cupsString[16][64];	/* User-defined string values @since CUPS 1.2/Mac OS X 10.5@ */
+  char		cupsMarkerType[64];	/* Ink/toner type @since CUPS 1.2/Mac OS X 10.5@ */
+  char		cupsRenderingIntent[64];/* Color rendering intent @since CUPS 1.2/Mac OS X 10.5@ */
+  char		cupsPageSizeName[64];	/* PageSize name @since CUPS 1.2/Mac OS X 10.5@ */
 } cups_page_header2_t;
 
 typedef struct _cups_raster_s cups_raster_t;
@@ -302,7 +303,12 @@ typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bi
 					 * This function is called by
 					 * @link cupsRasterInterpretPPD@ to
 					 * validate (and update, as needed)
-					 * the page header attributes.
+					 * the page header attributes. The
+					 * "preferred_bits" argument provides
+					 * the value of the
+					 * @code cupsPreferredBitsPerColor@
+					 * key from the PostScript page device
+					 * dictionary and is 0 if undefined.
 					 ****/
 
 
@@ -313,11 +319,11 @@ typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bi
 extern void		cupsRasterClose(cups_raster_t *r);
 extern cups_raster_t	*cupsRasterOpen(int fd, cups_mode_t mode);
 extern unsigned		cupsRasterReadHeader(cups_raster_t *r,
-			                     cups_page_header_t *h);
+			                     cups_page_header_t *h) _CUPS_DEPRECATED;
 extern unsigned		cupsRasterReadPixels(cups_raster_t *r,
 			                     unsigned char *p, unsigned len);
 extern unsigned		cupsRasterWriteHeader(cups_raster_t *r,
-			                      cups_page_header_t *h);
+			                      cups_page_header_t *h) _CUPS_DEPRECATED;
 extern unsigned		cupsRasterWritePixels(cups_raster_t *r,
 			                      unsigned char *p, unsigned len);
 

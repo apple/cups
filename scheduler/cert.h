@@ -48,7 +48,7 @@ extern void		cupsdAddCert(int pid, const char *username,
 			             void *ccache);
 extern void		cupsdDeleteCert(int pid);
 extern void		cupsdDeleteAllCerts(void);
-extern const char	*cupsdFindCert(const char *certificate);
+extern cupsd_cert_t	*cupsdFindCert(const char *certificate);
 extern void		cupsdInitCerts(void);
 
 

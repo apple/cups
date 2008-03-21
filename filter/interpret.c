@@ -122,11 +122,16 @@ static void		DEBUG_stack(_cups_ps_stack_t *st);
 /*
  * 'cupsRasterInterpretPPD()' - Interpret PPD commands to create a page header.
  *
- * This function does not mark the options in the PPD using the "num_options"
- * and "options" arguments.  Instead, mark the options with
- * @code cupsMarkOptions@ and @code ppdMarkOption@ prior to calling
- * @code cupsRasterInterpretPPD@ - this allows you to do per-page options
- * without manipulating the options array.
+ * This function is used by raster image processing (RIP) filters like
+ * cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
+ * It is not used by raster printer driver filters which only read CUPS
+ * raster data.
+ *
+ *
+ * @code cupsRasterInterpretPPD@ does not mark the options in the PPD using
+ * the "num_options" and "options" arguments.  Instead, mark the options with
+ * @code cupsMarkOptions@ and @code ppdMarkOption@ prior to calling it -
+ * this allows for per-page options without manipulating the options array.
  *
  * The "func" argument specifies an optional callback function that is
  * called prior to the computation of the final raster data.  The function
@@ -134,22 +139,23 @@ static void		DEBUG_stack(_cups_ps_stack_t *st);
  * supported raster format and then returns 0 on success and -1 if the
  * requested attributes cannot be supported.
  *
+ *
  * @code cupsRasterInterpretPPD@ supports a subset of the PostScript language.
  * Currently only the @code [@, @code ]@, @code <<@, @code >>@, @code {@,
  * @code }@, @code cleartomark@, @code copy@, @code dup@, @code index@,
  * @code pop@, @code roll@, @code setpagedevice@, and @code stopped@ operators
  * are supported.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on failure */
 cupsRasterInterpretPPD(
-    cups_page_header2_t *h,		/* O - Page header */
+    cups_page_header2_t *h,		/* O - Page header to create */
     ppd_file_t          *ppd,		/* I - PPD file */
     int                 num_options,	/* I - Number of options */
     cups_option_t       *options,	/* I - Options */
-    cups_interpret_cb_t func)		/* I - Optional page header callback */
+    cups_interpret_cb_t func)		/* I - Optional page header callback (@code NULL@ for none) */
 {
   int		status;			/* Cummulative status */
   char		*code;			/* Code to run */

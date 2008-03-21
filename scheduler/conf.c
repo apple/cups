@@ -113,6 +113,7 @@ static const cupsd_var_t	variables[] =
 #ifdef HAVE_GSSAPI
   { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
 #endif /* HAVE_GSSAPI */
+  { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },

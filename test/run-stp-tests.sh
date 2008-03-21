@@ -598,6 +598,10 @@ echo "Log files can be found in /tmp/cups-$user/log."
 echo "A HTML report was created in test/$strfile."
 echo ""
 
+if test $fail != 0; then
+	exit 1
+fi
+
 #
 # End of "$Id: run-stp-tests.sh 6649 2007-07-11 21:46:42Z mike $"
 #

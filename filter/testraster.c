@@ -3,7 +3,7 @@
  *
  *   Raster test program routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,8 +16,11 @@
  *
  * Contents:
  *
- *   main()          - Test the raster functions.
- *   print_changes() - Print differences in the page header.
+ *   main()            - Test the raster functions.
+ *   do_ppd_tests()    - Test the default option commands in a PPD file.
+ *   do_ps_tests()     - Test standard PostScript commands.
+ *   do_raster_tests() - Test reading and writing of raster data.
+ *   print_changes()   - Print differences in the page header.
  */
 
 /*
@@ -192,7 +195,7 @@ static cups_page_header2_t setpagedevice_header =
 static int	do_ppd_tests(const char *filename, int num_options,
 		             cups_option_t *options);
 static int	do_ps_tests(void);
-static int	do_raster_tests(void);
+static int	do_raster_tests(cups_mode_t mode);
 static void	print_changes(cups_page_header2_t *header,
 		              cups_page_header2_t *expected);
 
@@ -211,7 +214,8 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc == 1)
   {
     errors = do_ps_tests();
-    errors += do_raster_tests();
+    errors += do_raster_tests(CUPS_RASTER_WRITE);
+    errors += do_raster_tests(CUPS_RASTER_WRITE_COMPRESSED);
   }
   else
   {
@@ -524,7 +528,7 @@ do_ps_tests(void)
  */
 
 static int				/* O - Number of errors */
-do_raster_tests(void)
+do_raster_tests(cups_mode_t mode)	/* O - Write mode */
 {
   int			page, x, y;	/* Looping vars */
   FILE			*fp;		/* Raster file */
@@ -539,7 +543,9 @@ do_raster_tests(void)
   * Test writing...
   */
 
-  fputs("cupsRasterOpen(CUPS_RASTER_WRITE): ", stdout);
+  printf("cupsRasterOpen(%s): ",
+         mode == CUPS_RASTER_WRITE ? "CUPS_RASTER_WRITE" :
+	                             "CUPS_RASTER_WRITE_COMPRESSED");
   fflush(stdout);
 
   if ((fp = fopen("test.raster", "wb")) == NULL)
@@ -548,7 +554,7 @@ do_raster_tests(void)
     return (1);
   }
 
-  if ((r = cupsRasterOpen(fileno(fp), CUPS_RASTER_WRITE)) == NULL)
+  if ((r = cupsRasterOpen(fileno(fp), mode)) == NULL)
   {
     printf("FAIL (%s)\n", strerror(errno));
     fclose(fp);

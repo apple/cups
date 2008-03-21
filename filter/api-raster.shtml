@@ -20,6 +20,12 @@ CUPS raster streams which are used for printing to raster printers. Because the
 raster format is updated from time to time, it is important to use this API to
 avoid incompatibilities with newer versions of CUPS.</p>
 
+<p>Two kinds of CUPS filters use the CUPS raster API - raster image processor
+(RIP) filters such as <code>pstoraster</code> and <code>cgpdftoraster</code>
+(Mac OS X) that produce CUPS raster files and printer driver filters that
+convert CUPS raster files into a format usable by the printer. Printer
+driver filters are by far the most common.</p>
+
 <p>CUPS raster files (<code>application/vnd.cups-raster</code>) consists of
 a stream of raster page descriptions produced by one of the RIP filters such as
 <var>pstoraster</var>, <var>imagetoraster</var>, or
@@ -38,8 +44,21 @@ file descriptor 0:</p>
 <p>Each page of data begins with a page dictionary structure called
 <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a>. This
 structure contains the colorspace, bits per color, media size, media type,
-hardware resolution, and so forth used for the page. You read the page header
-using the
+hardware resolution, and so forth used for the page.</p>
+
+<blockquote><b>Note:</b>
+
+  <p>Do not confuse the colorspace in the page header with the PPD
+  <tt>ColorModel</tt> keyword. <tt>ColorModel</tt> refers to the general type of
+  color used for a device (Gray, RGB, CMYK, DeviceN) and is often used to
+  select a particular colorspace for the page header along with the associate
+  color profile. The page header colorspace (<tt>cupsColorSpace</tt>) describes
+  both the type and organization of the color data, for example KCMY (black
+  first) instead of CMYK and RGBA (RGB + alpha) instead of RGB.</p>
+
+</blockquote>
+
+<p>You read the page header using the
 <a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a>
 function:</p>
 
@@ -90,7 +109,7 @@ while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;head
     if (<a href="#cupsRasterReadPixels">cupsRasterReadPixels</a>(ras, buffer, header.cupsBytesPerLine) == 0)
       break;
 
-    /* write raster data to printer */
+    /* write raster data to printer on stdout */
   }
 
   /* finish this page */
@@ -106,3 +125,36 @@ the memory used to read the raster file:</p>
 
 <a href="#cupsRasterClose">cupsRasterClose</a>(ras);
 </pre>
+
+
+<h2 class='title'><a name="TASKS">Functions by Task</a></h2>
+
+<h3><a name="OPENCLOSE">Opening and Closing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
+	<li><a href="#cupsRasterOpen" title="Open a raster stream.">cupsRasterOpen</a></li>
+
+</ul>
+
+<h3><a name="READING">Reading Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a version 2 page header structure.">cupsRasterReadHeader2</a></li>
+	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
+
+</ul>
+
+<h3><a name="WRITING">Writing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a></li>
+	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
+	
+</ul>
