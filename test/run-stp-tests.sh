@@ -238,7 +238,7 @@ ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/cups-$user/bin/filter
 ln -s $root/filter/texttops /tmp/cups-$user/bin/filter
-ln -s $root/pdftops/pdftops /tmp/cups-$user/bin/filter
+ln -s $root/filter/pdftops /tmp/cups-$user/bin/filter
 
 ln -s $root/data/classified /tmp/cups-$user/share/banners
 ln -s $root/data/confidential /tmp/cups-$user/share/banners
