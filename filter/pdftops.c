@@ -273,7 +273,7 @@ main(int  argc,				/* I - Number of command-line args */
         pdfstatus = WEXITSTATUS(pdfstatus);
 
         _cupsLangPrintf(stderr,
-	                _("ERROR: pdftops filter exited with status %d!"),
+	                _("ERROR: pdftops filter exited with status %d!\n"),
 			pdfstatus);
       }
       else
@@ -281,7 +281,7 @@ main(int  argc,				/* I - Number of command-line args */
         pdfstatus = WTERMSIG(pdfstatus);
 
         _cupsLangPrintf(stderr,
-	                _("ERROR: pdftops filter crashed on signal %d!"),
+	                _("ERROR: pdftops filter crashed on signal %d!\n"),
 			pdfstatus);
       }
     }
