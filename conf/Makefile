@@ -3,7 +3,7 @@
 #
 #   Configuration file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -45,10 +45,17 @@ depend:
 
 
 #
-# Install files...
+# Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	$(INSTALL_DIR) -m 755 $(SERVERROOT)
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
@@ -75,6 +82,27 @@ install:	all
 			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups ; \
 		fi ; \
 	fi
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

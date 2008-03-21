@@ -49,7 +49,21 @@ depend:
 # Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) accept $(SBINDIR)
 	$(RM) $(SBINDIR)/reject
@@ -77,6 +91,20 @@ install:	all
 			cp $$file $(SYMROOT); \
 		done \
 	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

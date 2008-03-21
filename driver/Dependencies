@@ -55,3 +55,117 @@ rgb.o: ../cups/language.h ../cups/raster.h
 srgb.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 srgb.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 srgb.o: ../cups/language.h ../cups/raster.h
+# DO NOT DELETE
+
+commandtoescpx.32.o: commandtoescpx.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtoescpx.32.o: commandtoescpx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtoescpx.32.o: commandtoescpx.c  ../cups/file.h ../cups/language.h driver.h ../cups/raster.h
+commandtoescpx.32.o: commandtoescpx.c  ../cups/string.h ../config.h ../data/escp.h
+commandtopclx.32.o: commandtopclx.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtopclx.32.o: commandtopclx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtopclx.32.o: commandtopclx.c  ../cups/file.h ../cups/language.h driver.h ../cups/raster.h
+commandtopclx.32.o: commandtopclx.c  ../cups/string.h ../config.h ../data/pcl.h
+rastertoescpx.32.o: rastertoescpx.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rastertoescpx.32.o: rastertoescpx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rastertoescpx.32.o: rastertoescpx.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+rastertoescpx.32.o: rastertoescpx.c  ../cups/string.h ../config.h ../data/escp.h
+rastertopclx.32.o: rastertopclx.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rastertopclx.32.o: rastertopclx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rastertopclx.32.o: rastertopclx.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+rastertopclx.32.o: rastertopclx.c  pcl-common.h ../data/pcl.h
+pcl-common.32.o: pcl-common.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pcl-common.32.o: pcl-common.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+pcl-common.32.o: pcl-common.c  ../cups/file.h ../cups/language.h ../cups/raster.h pcl-common.h
+pcl-common.32.o: pcl-common.c  ../data/pcl.h
+testcmyk.32.o: testcmyk.c  ../cups/string.h ../config.h driver.h ../cups/cups.h
+testcmyk.32.o: testcmyk.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+testcmyk.32.o: testcmyk.c  ../cups/array.h ../cups/file.h ../cups/language.h
+testcmyk.32.o: testcmyk.c  ../cups/raster.h
+testdither.32.o: testdither.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+testdither.32.o: testdither.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testdither.32.o: testdither.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+testdither.32.o: testdither.c  ../cups/string.h ../config.h
+testrgb.32.o: testrgb.c  ../cups/string.h ../config.h driver.h ../cups/cups.h ../cups/ipp.h
+testrgb.32.o: testrgb.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testrgb.32.o: testrgb.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+attr.32.o: attr.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+attr.32.o: attr.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+attr.32.o: attr.c  ../cups/language.h ../cups/raster.h ../cups/string.h ../config.h
+check.32.o: check.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+check.32.o: check.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+check.32.o: check.c  ../cups/language.h ../cups/raster.h
+cmyk.32.o: cmyk.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cmyk.32.o: cmyk.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+cmyk.32.o: cmyk.c  ../cups/language.h ../cups/raster.h ../cups/string.h ../config.h
+dither.32.o: dither.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+dither.32.o: dither.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+dither.32.o: dither.c  ../cups/language.h ../cups/raster.h
+lut.32.o: lut.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+lut.32.o: lut.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+lut.32.o: lut.c  ../cups/language.h ../cups/raster.h
+pack.32.o: pack.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pack.32.o: pack.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+pack.32.o: pack.c  ../cups/language.h ../cups/raster.h
+rgb.32.o: rgb.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rgb.32.o: rgb.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+rgb.32.o: rgb.c  ../cups/language.h ../cups/raster.h
+srgb.32.o: srgb.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+srgb.32.o: srgb.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+srgb.32.o: srgb.c  ../cups/language.h ../cups/raster.h
+# DO NOT DELETE
+
+commandtoescpx.64.o: commandtoescpx.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtoescpx.64.o: commandtoescpx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtoescpx.64.o: commandtoescpx.c  ../cups/file.h ../cups/language.h driver.h ../cups/raster.h
+commandtoescpx.64.o: commandtoescpx.c  ../cups/string.h ../config.h ../data/escp.h
+commandtopclx.64.o: commandtopclx.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtopclx.64.o: commandtopclx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtopclx.64.o: commandtopclx.c  ../cups/file.h ../cups/language.h driver.h ../cups/raster.h
+commandtopclx.64.o: commandtopclx.c  ../cups/string.h ../config.h ../data/pcl.h
+rastertoescpx.64.o: rastertoescpx.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rastertoescpx.64.o: rastertoescpx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rastertoescpx.64.o: rastertoescpx.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+rastertoescpx.64.o: rastertoescpx.c  ../cups/string.h ../config.h ../data/escp.h
+rastertopclx.64.o: rastertopclx.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rastertopclx.64.o: rastertopclx.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+rastertopclx.64.o: rastertopclx.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+rastertopclx.64.o: rastertopclx.c  pcl-common.h ../data/pcl.h
+pcl-common.64.o: pcl-common.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pcl-common.64.o: pcl-common.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+pcl-common.64.o: pcl-common.c  ../cups/file.h ../cups/language.h ../cups/raster.h pcl-common.h
+pcl-common.64.o: pcl-common.c  ../data/pcl.h
+testcmyk.64.o: testcmyk.c  ../cups/string.h ../config.h driver.h ../cups/cups.h
+testcmyk.64.o: testcmyk.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+testcmyk.64.o: testcmyk.c  ../cups/array.h ../cups/file.h ../cups/language.h
+testcmyk.64.o: testcmyk.c  ../cups/raster.h
+testdither.64.o: testdither.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+testdither.64.o: testdither.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testdither.64.o: testdither.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+testdither.64.o: testdither.c  ../cups/string.h ../config.h
+testrgb.64.o: testrgb.c  ../cups/string.h ../config.h driver.h ../cups/cups.h ../cups/ipp.h
+testrgb.64.o: testrgb.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testrgb.64.o: testrgb.c  ../cups/file.h ../cups/language.h ../cups/raster.h
+attr.64.o: attr.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+attr.64.o: attr.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+attr.64.o: attr.c  ../cups/language.h ../cups/raster.h ../cups/string.h ../config.h
+check.64.o: check.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+check.64.o: check.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+check.64.o: check.c  ../cups/language.h ../cups/raster.h
+cmyk.64.o: cmyk.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cmyk.64.o: cmyk.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+cmyk.64.o: cmyk.c  ../cups/language.h ../cups/raster.h ../cups/string.h ../config.h
+dither.64.o: dither.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+dither.64.o: dither.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+dither.64.o: dither.c  ../cups/language.h ../cups/raster.h
+lut.64.o: lut.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+lut.64.o: lut.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+lut.64.o: lut.c  ../cups/language.h ../cups/raster.h
+pack.64.o: pack.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pack.64.o: pack.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+pack.64.o: pack.c  ../cups/language.h ../cups/raster.h
+rgb.64.o: rgb.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+rgb.64.o: rgb.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+rgb.64.o: rgb.c  ../cups/language.h ../cups/raster.h
+srgb.64.o: srgb.c  driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+srgb.64.o: srgb.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+srgb.64.o: srgb.c  ../cups/language.h ../cups/raster.h

@@ -1,4 +1,4 @@
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+# DO NOT DELETE
 
 auth.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 auth.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
@@ -241,3 +241,489 @@ testsub.o: ../cups/debug.h ../cups/string.h ../config.h
 util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 util.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 util.o: ../cups/language.h ../cups/file.h ../cups/string.h ../config.h
+# DO NOT DELETE
+
+auth.32.o: auth.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+auth.32.o: auth.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+auth.32.o: auth.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+auth.32.o: auth.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+auth.32.o: auth.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+auth.32.o: auth.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+auth.32.o: auth.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+auth.32.o: auth.c  dirsvc.h network.h subscriptions.h
+banners.32.o: banners.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+banners.32.o: banners.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+banners.32.o: banners.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+banners.32.o: banners.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+banners.32.o: banners.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+banners.32.o: banners.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+banners.32.o: banners.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+banners.32.o: banners.c  banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
+cert.32.o: cert.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+cert.32.o: cert.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cert.32.o: cert.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+cert.32.o: cert.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+cert.32.o: cert.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+cert.32.o: cert.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+cert.32.o: cert.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+cert.32.o: cert.c  dirsvc.h network.h subscriptions.h
+classes.32.o: classes.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+classes.32.o: classes.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+classes.32.o: classes.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+classes.32.o: classes.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+classes.32.o: classes.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+classes.32.o: classes.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+classes.32.o: classes.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+classes.32.o: classes.c  banners.h dirsvc.h network.h subscriptions.h
+client.32.o: client.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+client.32.o: client.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+client.32.o: client.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+client.32.o: client.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+client.32.o: client.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+client.32.o: client.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+client.32.o: client.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+client.32.o: client.c  banners.h dirsvc.h network.h subscriptions.h
+conf.32.o: conf.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+conf.32.o: conf.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+conf.32.o: conf.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+conf.32.o: conf.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+conf.32.o: conf.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+conf.32.o: conf.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+conf.32.o: conf.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+conf.32.o: conf.c  dirsvc.h network.h subscriptions.h
+dirsvc.32.o: dirsvc.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+dirsvc.32.o: dirsvc.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+dirsvc.32.o: dirsvc.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+dirsvc.32.o: dirsvc.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+dirsvc.32.o: dirsvc.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+dirsvc.32.o: dirsvc.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+dirsvc.32.o: dirsvc.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+dirsvc.32.o: dirsvc.c  banners.h dirsvc.h network.h subscriptions.h
+env.32.o: env.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+env.32.o: env.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+env.32.o: env.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+env.32.o: env.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+env.32.o: env.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+env.32.o: env.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+env.32.o: env.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+env.32.o: env.c  subscriptions.h
+main.32.o: main.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+main.32.o: main.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+main.32.o: main.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+main.32.o: main.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+main.32.o: main.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+main.32.o: main.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+main.32.o: main.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+main.32.o: main.c  dirsvc.h network.h subscriptions.h ../cups/dir.h
+ipp.32.o: ipp.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+ipp.32.o: ipp.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ipp.32.o: ipp.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+ipp.32.o: ipp.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+ipp.32.o: ipp.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+ipp.32.o: ipp.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+ipp.32.o: ipp.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+ipp.32.o: ipp.c  subscriptions.h ../cups/ppd-private.h
+listen.32.o: listen.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+listen.32.o: listen.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+listen.32.o: listen.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+listen.32.o: listen.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+listen.32.o: listen.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+listen.32.o: listen.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+listen.32.o: listen.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+listen.32.o: listen.c  banners.h dirsvc.h network.h subscriptions.h
+job.32.o: job.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+job.32.o: job.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+job.32.o: job.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+job.32.o: job.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+job.32.o: job.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+job.32.o: job.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+job.32.o: job.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+job.32.o: job.c  subscriptions.h ../cups/backend.h ../cups/dir.h
+log.32.o: log.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+log.32.o: log.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+log.32.o: log.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+log.32.o: log.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+log.32.o: log.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+log.32.o: log.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+log.32.o: log.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+log.32.o: log.c  subscriptions.h
+network.32.o: network.c  ../cups/http-private.h ../config.h ../cups/http.h
+network.32.o: network.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+network.32.o: network.c  ../cups/ipp.h cupsd.h ../cups/string.h ../cups/array.h
+network.32.o: network.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+network.32.o: network.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+network.32.o: network.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+network.32.o: network.c  sysman.h statbuf.h cert.h auth.h client.h policy.h printers.h
+network.32.o: network.c  classes.h job.h conf.h banners.h dirsvc.h network.h
+network.32.o: network.c  subscriptions.h
+policy.32.o: policy.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+policy.32.o: policy.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+policy.32.o: policy.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+policy.32.o: policy.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+policy.32.o: policy.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+policy.32.o: policy.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+policy.32.o: policy.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+policy.32.o: policy.c  banners.h dirsvc.h network.h subscriptions.h
+printers.32.o: printers.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+printers.32.o: printers.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+printers.32.o: printers.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+printers.32.o: printers.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+printers.32.o: printers.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+printers.32.o: printers.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+printers.32.o: printers.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+printers.32.o: printers.c  banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
+process.32.o: process.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+process.32.o: process.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+process.32.o: process.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+process.32.o: process.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+process.32.o: process.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+process.32.o: process.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+process.32.o: process.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+process.32.o: process.c  banners.h dirsvc.h network.h subscriptions.h
+quotas.32.o: quotas.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+quotas.32.o: quotas.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+quotas.32.o: quotas.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+quotas.32.o: quotas.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+quotas.32.o: quotas.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+quotas.32.o: quotas.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+quotas.32.o: quotas.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+quotas.32.o: quotas.c  banners.h dirsvc.h network.h subscriptions.h
+removefile.32.o: removefile.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+removefile.32.o: removefile.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+removefile.32.o: removefile.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+removefile.32.o: removefile.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+removefile.32.o: removefile.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
+removefile.32.o: removefile.c  ../cups/i18n.h ../cups/transcode.h ../cups/debug.h sysman.h
+removefile.32.o: removefile.c  statbuf.h cert.h auth.h client.h policy.h printers.h classes.h
+removefile.32.o: removefile.c  job.h conf.h banners.h dirsvc.h network.h subscriptions.h
+select.32.o: select.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+select.32.o: select.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+select.32.o: select.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+select.32.o: select.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+select.32.o: select.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+select.32.o: select.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+select.32.o: select.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+select.32.o: select.c  banners.h dirsvc.h network.h subscriptions.h
+server.32.o: server.c  ../cups/http-private.h ../config.h ../cups/http.h
+server.32.o: server.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+server.32.o: server.c  ../cups/ipp.h cupsd.h ../cups/string.h ../cups/array.h
+server.32.o: server.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+server.32.o: server.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+server.32.o: server.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+server.32.o: server.c  sysman.h statbuf.h cert.h auth.h client.h policy.h printers.h
+server.32.o: server.c  classes.h job.h conf.h banners.h dirsvc.h network.h subscriptions.h
+statbuf.32.o: statbuf.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+statbuf.32.o: statbuf.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+statbuf.32.o: statbuf.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+statbuf.32.o: statbuf.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+statbuf.32.o: statbuf.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+statbuf.32.o: statbuf.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+statbuf.32.o: statbuf.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+statbuf.32.o: statbuf.c  banners.h dirsvc.h network.h subscriptions.h
+subscriptions.32.o: subscriptions.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+subscriptions.32.o: subscriptions.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+subscriptions.32.o: subscriptions.c  ../cups/ipp.h ../cups/string.h ../cups/array.h
+subscriptions.32.o: subscriptions.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+subscriptions.32.o: subscriptions.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+subscriptions.32.o: subscriptions.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+subscriptions.32.o: subscriptions.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h
+subscriptions.32.o: subscriptions.c  policy.h printers.h classes.h job.h conf.h banners.h
+subscriptions.32.o: subscriptions.c  dirsvc.h network.h subscriptions.h
+sysman.32.o: sysman.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+sysman.32.o: sysman.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+sysman.32.o: sysman.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+sysman.32.o: sysman.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+sysman.32.o: sysman.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+sysman.32.o: sysman.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+sysman.32.o: sysman.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+sysman.32.o: sysman.c  banners.h dirsvc.h network.h subscriptions.h
+filter.32.o: filter.c  ../cups/debug.h ../cups/string.h ../config.h mime.h ../cups/array.h
+filter.32.o: filter.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h
+mime.32.o: mime.c  ../cups/debug.h ../cups/dir.h ../cups/versioning.h ../cups/string.h
+mime.32.o: mime.c  ../config.h mime.h ../cups/array.h ../cups/ipp.h ../cups/file.h
+type.32.o: type.c  ../cups/string.h ../config.h mime.h ../cups/array.h
+type.32.o: type.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h ../cups/debug.h
+cupsfilter.32.o: cupsfilter.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cupsfilter.32.o: cupsfilter.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cupsfilter.32.o: cupsfilter.c  ../cups/file.h ../cups/language.h ../cups/i18n.h
+cupsfilter.32.o: cupsfilter.c  ../cups/transcode.h ../cups/string.h ../config.h mime.h
+cupsfilter.32.o: cupsfilter.c  ../cups/array.h ../cups/ipp.h ../cups/file.h
+cups-deviced.32.o: cups-deviced.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cups-deviced.32.o: cups-deviced.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cups-deviced.32.o: cups-deviced.c  ../cups/file.h ../cups/language.h ../cups/file.h
+cups-deviced.32.o: cups-deviced.c  ../cups/string.h ../config.h ../cups/array.h ../cups/dir.h
+cups-driverd.32.o: cups-driverd.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cups-driverd.32.o: cups-driverd.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cups-driverd.32.o: cups-driverd.c  ../cups/file.h ../cups/language.h ../cups/file.h
+cups-driverd.32.o: cups-driverd.c  ../cups/string.h ../config.h ../cups/dir.h
+cups-driverd.32.o: cups-driverd.c  ../cups/transcode.h
+cups-lpd.32.o: cups-lpd.c  ../cups/http-private.h ../config.h ../cups/http.h
+cups-lpd.32.o: cups-lpd.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cups-lpd.32.o: cups-lpd.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
+cups-lpd.32.o: cups-lpd.c  ../cups/file.h ../cups/language.h ../cups/string.h
+cups-lpd.32.o: cups-lpd.c  ../cups/language.h
+cups-polld.32.o: cups-polld.c  ../cups/http-private.h ../config.h ../cups/http.h
+cups-polld.32.o: cups-polld.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cups-polld.32.o: cups-polld.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
+cups-polld.32.o: cups-polld.c  ../cups/file.h ../cups/language.h ../cups/language.h
+cups-polld.32.o: cups-polld.c  ../cups/string.h
+testdirsvc.32.o: testdirsvc.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+testdirsvc.32.o: testdirsvc.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testdirsvc.32.o: testdirsvc.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
+testlpd.32.o: testlpd.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testlpd.32.o: testlpd.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testlpd.32.o: testlpd.c  ../cups/string.h ../config.h
+testmime.32.o: testmime.c  ../cups/string.h ../config.h mime.h ../cups/array.h
+testmime.32.o: testmime.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h ../cups/dir.h
+testspeed.32.o: testspeed.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testspeed.32.o: testspeed.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testspeed.32.o: testspeed.c  ../cups/language.h ../cups/debug.h
+testsub.32.o: testsub.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testsub.32.o: testsub.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testsub.32.o: testsub.c  ../cups/debug.h ../cups/string.h ../config.h
+util.32.o: util.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+util.32.o: util.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+util.32.o: util.c  ../cups/language.h ../cups/file.h ../cups/string.h ../config.h
+# DO NOT DELETE
+
+auth.64.o: auth.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+auth.64.o: auth.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+auth.64.o: auth.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+auth.64.o: auth.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+auth.64.o: auth.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+auth.64.o: auth.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+auth.64.o: auth.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+auth.64.o: auth.c  dirsvc.h network.h subscriptions.h
+banners.64.o: banners.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+banners.64.o: banners.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+banners.64.o: banners.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+banners.64.o: banners.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+banners.64.o: banners.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+banners.64.o: banners.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+banners.64.o: banners.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+banners.64.o: banners.c  banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
+cert.64.o: cert.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+cert.64.o: cert.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cert.64.o: cert.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+cert.64.o: cert.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+cert.64.o: cert.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+cert.64.o: cert.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+cert.64.o: cert.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+cert.64.o: cert.c  dirsvc.h network.h subscriptions.h
+classes.64.o: classes.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+classes.64.o: classes.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+classes.64.o: classes.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+classes.64.o: classes.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+classes.64.o: classes.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+classes.64.o: classes.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+classes.64.o: classes.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+classes.64.o: classes.c  banners.h dirsvc.h network.h subscriptions.h
+client.64.o: client.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+client.64.o: client.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+client.64.o: client.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+client.64.o: client.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+client.64.o: client.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+client.64.o: client.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+client.64.o: client.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+client.64.o: client.c  banners.h dirsvc.h network.h subscriptions.h
+conf.64.o: conf.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+conf.64.o: conf.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+conf.64.o: conf.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+conf.64.o: conf.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+conf.64.o: conf.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+conf.64.o: conf.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+conf.64.o: conf.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+conf.64.o: conf.c  dirsvc.h network.h subscriptions.h
+dirsvc.64.o: dirsvc.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+dirsvc.64.o: dirsvc.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+dirsvc.64.o: dirsvc.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+dirsvc.64.o: dirsvc.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+dirsvc.64.o: dirsvc.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+dirsvc.64.o: dirsvc.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+dirsvc.64.o: dirsvc.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+dirsvc.64.o: dirsvc.c  banners.h dirsvc.h network.h subscriptions.h
+env.64.o: env.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+env.64.o: env.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+env.64.o: env.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+env.64.o: env.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+env.64.o: env.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+env.64.o: env.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+env.64.o: env.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+env.64.o: env.c  subscriptions.h
+main.64.o: main.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+main.64.o: main.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+main.64.o: main.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+main.64.o: main.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+main.64.o: main.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+main.64.o: main.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h auth.h
+main.64.o: main.c  client.h policy.h printers.h classes.h job.h conf.h banners.h
+main.64.o: main.c  dirsvc.h network.h subscriptions.h ../cups/dir.h
+ipp.64.o: ipp.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+ipp.64.o: ipp.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+ipp.64.o: ipp.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+ipp.64.o: ipp.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+ipp.64.o: ipp.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+ipp.64.o: ipp.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+ipp.64.o: ipp.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+ipp.64.o: ipp.c  subscriptions.h ../cups/ppd-private.h
+listen.64.o: listen.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+listen.64.o: listen.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+listen.64.o: listen.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+listen.64.o: listen.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+listen.64.o: listen.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+listen.64.o: listen.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+listen.64.o: listen.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+listen.64.o: listen.c  banners.h dirsvc.h network.h subscriptions.h
+job.64.o: job.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+job.64.o: job.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+job.64.o: job.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+job.64.o: job.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+job.64.o: job.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+job.64.o: job.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+job.64.o: job.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+job.64.o: job.c  subscriptions.h ../cups/backend.h ../cups/dir.h
+log.64.o: log.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+log.64.o: log.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h
+log.64.o: log.c  ../cups/string.h ../cups/array.h ../cups/cups.h ../cups/ppd.h
+log.64.o: log.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
+log.64.o: log.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+log.64.o: log.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
+log.64.o: log.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
+log.64.o: log.c  subscriptions.h
+network.64.o: network.c  ../cups/http-private.h ../config.h ../cups/http.h
+network.64.o: network.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+network.64.o: network.c  ../cups/ipp.h cupsd.h ../cups/string.h ../cups/array.h
+network.64.o: network.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+network.64.o: network.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+network.64.o: network.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+network.64.o: network.c  sysman.h statbuf.h cert.h auth.h client.h policy.h printers.h
+network.64.o: network.c  classes.h job.h conf.h banners.h dirsvc.h network.h
+network.64.o: network.c  subscriptions.h
+policy.64.o: policy.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+policy.64.o: policy.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+policy.64.o: policy.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+policy.64.o: policy.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+policy.64.o: policy.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+policy.64.o: policy.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+policy.64.o: policy.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+policy.64.o: policy.c  banners.h dirsvc.h network.h subscriptions.h
+printers.64.o: printers.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+printers.64.o: printers.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+printers.64.o: printers.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+printers.64.o: printers.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+printers.64.o: printers.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+printers.64.o: printers.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+printers.64.o: printers.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+printers.64.o: printers.c  banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
+process.64.o: process.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+process.64.o: process.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+process.64.o: process.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+process.64.o: process.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+process.64.o: process.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+process.64.o: process.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+process.64.o: process.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+process.64.o: process.c  banners.h dirsvc.h network.h subscriptions.h
+quotas.64.o: quotas.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+quotas.64.o: quotas.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+quotas.64.o: quotas.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+quotas.64.o: quotas.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+quotas.64.o: quotas.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+quotas.64.o: quotas.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+quotas.64.o: quotas.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+quotas.64.o: quotas.c  banners.h dirsvc.h network.h subscriptions.h
+removefile.64.o: removefile.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+removefile.64.o: removefile.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+removefile.64.o: removefile.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+removefile.64.o: removefile.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+removefile.64.o: removefile.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h
+removefile.64.o: removefile.c  ../cups/i18n.h ../cups/transcode.h ../cups/debug.h sysman.h
+removefile.64.o: removefile.c  statbuf.h cert.h auth.h client.h policy.h printers.h classes.h
+removefile.64.o: removefile.c  job.h conf.h banners.h dirsvc.h network.h subscriptions.h
+select.64.o: select.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+select.64.o: select.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+select.64.o: select.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+select.64.o: select.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+select.64.o: select.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+select.64.o: select.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+select.64.o: select.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+select.64.o: select.c  banners.h dirsvc.h network.h subscriptions.h
+server.64.o: server.c  ../cups/http-private.h ../config.h ../cups/http.h
+server.64.o: server.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+server.64.o: server.c  ../cups/ipp.h cupsd.h ../cups/string.h ../cups/array.h
+server.64.o: server.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+server.64.o: server.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+server.64.o: server.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h ../cups/debug.h
+server.64.o: server.c  sysman.h statbuf.h cert.h auth.h client.h policy.h printers.h
+server.64.o: server.c  classes.h job.h conf.h banners.h dirsvc.h network.h subscriptions.h
+statbuf.64.o: statbuf.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+statbuf.64.o: statbuf.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+statbuf.64.o: statbuf.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+statbuf.64.o: statbuf.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+statbuf.64.o: statbuf.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+statbuf.64.o: statbuf.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+statbuf.64.o: statbuf.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+statbuf.64.o: statbuf.c  banners.h dirsvc.h network.h subscriptions.h
+subscriptions.64.o: subscriptions.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+subscriptions.64.o: subscriptions.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+subscriptions.64.o: subscriptions.c  ../cups/ipp.h ../cups/string.h ../cups/array.h
+subscriptions.64.o: subscriptions.c  ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+subscriptions.64.o: subscriptions.c  ../cups/language.h mime.h ../cups/ipp.h ../cups/file.h
+subscriptions.64.o: subscriptions.c  ../cups/http.h ../cups/i18n.h ../cups/transcode.h
+subscriptions.64.o: subscriptions.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h
+subscriptions.64.o: subscriptions.c  policy.h printers.h classes.h job.h conf.h banners.h
+subscriptions.64.o: subscriptions.c  dirsvc.h network.h subscriptions.h
+sysman.64.o: sysman.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
+sysman.64.o: sysman.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+sysman.64.o: sysman.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
+sysman.64.o: sysman.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+sysman.64.o: sysman.c  mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
+sysman.64.o: sysman.c  ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
+sysman.64.o: sysman.c  auth.h client.h policy.h printers.h classes.h job.h conf.h
+sysman.64.o: sysman.c  banners.h dirsvc.h network.h subscriptions.h
+filter.64.o: filter.c  ../cups/debug.h ../cups/string.h ../config.h mime.h ../cups/array.h
+filter.64.o: filter.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h
+mime.64.o: mime.c  ../cups/debug.h ../cups/dir.h ../cups/versioning.h ../cups/string.h
+mime.64.o: mime.c  ../config.h mime.h ../cups/array.h ../cups/ipp.h ../cups/file.h
+type.64.o: type.c  ../cups/string.h ../config.h mime.h ../cups/array.h
+type.64.o: type.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h ../cups/debug.h
+cupsfilter.64.o: cupsfilter.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cupsfilter.64.o: cupsfilter.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cupsfilter.64.o: cupsfilter.c  ../cups/file.h ../cups/language.h ../cups/i18n.h
+cupsfilter.64.o: cupsfilter.c  ../cups/transcode.h ../cups/string.h ../config.h mime.h
+cupsfilter.64.o: cupsfilter.c  ../cups/array.h ../cups/ipp.h ../cups/file.h
+cups-deviced.64.o: cups-deviced.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cups-deviced.64.o: cups-deviced.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cups-deviced.64.o: cups-deviced.c  ../cups/file.h ../cups/language.h ../cups/file.h
+cups-deviced.64.o: cups-deviced.c  ../cups/string.h ../config.h ../cups/array.h ../cups/dir.h
+cups-driverd.64.o: cups-driverd.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+cups-driverd.64.o: cups-driverd.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+cups-driverd.64.o: cups-driverd.c  ../cups/file.h ../cups/language.h ../cups/file.h
+cups-driverd.64.o: cups-driverd.c  ../cups/string.h ../config.h ../cups/dir.h
+cups-driverd.64.o: cups-driverd.c  ../cups/transcode.h
+cups-lpd.64.o: cups-lpd.c  ../cups/http-private.h ../config.h ../cups/http.h
+cups-lpd.64.o: cups-lpd.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cups-lpd.64.o: cups-lpd.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
+cups-lpd.64.o: cups-lpd.c  ../cups/file.h ../cups/language.h ../cups/string.h
+cups-lpd.64.o: cups-lpd.c  ../cups/language.h
+cups-polld.64.o: cups-polld.c  ../cups/http-private.h ../config.h ../cups/http.h
+cups-polld.64.o: cups-polld.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
+cups-polld.64.o: cups-polld.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
+cups-polld.64.o: cups-polld.c  ../cups/file.h ../cups/language.h ../cups/language.h
+cups-polld.64.o: cups-polld.c  ../cups/string.h
+testdirsvc.64.o: testdirsvc.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+testdirsvc.64.o: testdirsvc.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+testdirsvc.64.o: testdirsvc.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
+testlpd.64.o: testlpd.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testlpd.64.o: testlpd.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testlpd.64.o: testlpd.c  ../cups/string.h ../config.h
+testmime.64.o: testmime.c  ../cups/string.h ../config.h mime.h ../cups/array.h
+testmime.64.o: testmime.c  ../cups/versioning.h ../cups/ipp.h ../cups/file.h ../cups/dir.h
+testspeed.64.o: testspeed.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testspeed.64.o: testspeed.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testspeed.64.o: testspeed.c  ../cups/language.h ../cups/debug.h
+testsub.64.o: testsub.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+testsub.64.o: testsub.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+testsub.64.o: testsub.c  ../cups/debug.h ../cups/string.h ../config.h
+util.64.o: util.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+util.64.o: util.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+util.64.o: util.c  ../cups/language.h ../cups/file.h ../cups/string.h ../config.h

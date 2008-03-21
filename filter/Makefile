@@ -80,13 +80,49 @@ depend:
 # Install all targets...
 #
 
-install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/filter
 	for file in $(FILTERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/filter; \
 	done
 	$(RM) $(SERVERBIN)/filter/rastertodymo
 	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		for file in $(TARGETS); do \
+			cp $$file $(SYMROOT); \
+		done \
+	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
+	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
+
+
+#
+# Install libraries...
+#
+
+install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSIMAGE) $(LIBDIR)
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.so.2" -o $(LIBCUPSIMAGE) = "libcupsimage.sl.2"; then \
@@ -98,21 +134,11 @@ install:	all installhdrs $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
-			cp $$file $(SYMROOT); \
-		done \
-	fi
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) libcupsimage.a $(LIBDIR);
 	$(RANLIB) $(LIBDIR)/libcupsimage.a;
-
-installhdrs:
-	$(INSTALL_DIR) -m 755 $(INCLUDEDIR)/cups
-	$(INSTALL_DATA) image.h $(INCLUDEDIR)/cups
 
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)

@@ -93,13 +93,20 @@ ctags:
 
 
 #
-# Install object and target files...
+# Install everything...
 #
 
-install:	installhdrs
+install:	install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	for dir in $(DIRS); do\
-		echo Installing in $$dir... ;\
-		(cd $$dir; $(MAKE) $(MFLAGS) install) || exit 1;\
+		echo Installing data files in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) install-data) || exit 1;\
 	done
 	echo Installing cups-config script...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
@@ -167,17 +174,37 @@ install:	installhdrs
 		$(INSTALL_DATA) desktop/cups-128.png $(BUILDROOT)$(ICONDIR)/hicolor/128x128/apps/cups.png; \
 	fi
 
+#
+# Install header files...
+#
+
+install-headers:
+	for dir in $(DIRS); do\
+		echo Installing header files in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) install-headers) || exit 1;\
+	done
+
 
 #
-# Install source and header files...
+# Install programs...
 #
 
-installsrc:
-	gnutar --dereference --exclude=.svn -cf - . | gnutar -C $(SRCROOT) -xf -
+install-exec:
+	for dir in $(DIRS); do\
+		echo Installing programs in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) all install-exec) || exit 1;\
+	done
 
-installhdrs:
-	(cd cups ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;\
-	(cd filter ; $(MAKE) $(MFLAGS) installhdrs) || exit 1;
+
+#
+# Install libraries...
+#
+
+install-libs:
+	for dir in $(DIRS); do\
+		echo Installing libraries in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) all install-libs) || exit 1;\
+	done
 
 
 #

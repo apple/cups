@@ -1,8 +1,12 @@
-CHANGES.txt - 2008-02-26
+CHANGES.txt - 2008-03-21
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The build system has been updated to support separate
+	  installation of data, program, header, and library files.
+	- All support libraries are now built as shared libraries
+	  by default.
 	- The scheduler now manages ICC color profiles on Mac OS X.
 	- The network backends (ipp, lpd, socket) now support
 	  SNMP-based supply and page count monitoring (STR #1655)

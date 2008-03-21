@@ -133,7 +133,8 @@ main(int  argc,				/* I - Number of command-line args */
 			browse_time,	/* Next browse send time */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
-			report_time;	/* Malloc/client/job report time */
+			report_time,	/* Malloc/client/job report time */
+			event_time;	/* Last time an event notification was done */
   long			timeout;	/* Timeout for cupsdDoSelect() */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -663,11 +664,13 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop forever...
   */
 
-  browse_time   = time(NULL);
-  expire_time   = time(NULL);
+  current_time  = time(NULL);
+  browse_time   = current_time;
+  event_time    = current_time;
+  expire_time   = current_time;
   fds           = 1;
   report_time   = 0;
-  senddoc_time  = time(NULL);
+  senddoc_time  = current_time;
 
   while (!stop_scheduler)
   {
@@ -771,7 +774,8 @@ main(int  argc,				/* I - Number of command-line args */
     * times.
     */
 
-    timeout = select_timeout(fds);
+    if ((timeout = select_timeout(fds)) > 1 && LastEvent)
+      timeout = 1;
 
 #if HAVE_LAUNCHD
    /*
@@ -1044,7 +1048,7 @@ main(int  argc,				/* I - Number of command-line args */
     * accumulated.  Don't send these more than once a second...
     */
 
-    if (LastEvent)
+    if (LastEvent && (current_time - event_time) >= 1)
     {
 #ifdef HAVE_NOTIFY_POST
       if (LastEvent & (CUPSD_EVENT_PRINTER_ADDED |
@@ -1077,7 +1081,8 @@ main(int  argc,				/* I - Number of command-line args */
       * Reset the accumulated events...
       */
 
-      LastEvent = CUPSD_EVENT_NONE;
+      LastEvent  = CUPSD_EVENT_NONE;
+      event_time = current_time;
     }
   }
 

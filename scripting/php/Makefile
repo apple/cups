@@ -3,7 +3,7 @@
 #
 #   PHP Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -62,10 +62,24 @@ depend:
 
 
 #
-# Install object and target files...
+# Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
+
+
+#
+# Install programs...
+#
+
+install-exec:
 	echo Installing $(PHPCUPS) in $(PHPDIR)
 	$(INSTALL_DIR) $(PHPDIR)
 	$(INSTALL_BIN) $(PHPCUPS) $(PHPDIR)
@@ -73,6 +87,20 @@ install:	all
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(PHPCUPS) $(SYMROOT); \
 	fi
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

@@ -107,10 +107,17 @@ depend:
 
 
 #
-# Install files...
+# Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	$(INSTALL_DIR) -m 755 $(DATADIR)/banners
 	for file in $(BANNERS); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/banners; \
@@ -132,6 +139,27 @@ install:	all
 		$(INSTALL_DATA) $$file $(DATADIR)/ppdc; \
 	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/profiles
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

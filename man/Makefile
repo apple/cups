@@ -104,10 +104,17 @@ depend:
 
 
 #
-# Install files...
+# Install all targets...
 #
 
-install:	all
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data:
 	$(INSTALL_DIR) -m 755 $(MANDIR)/man1
 	for file in $(MAN1); do \
 		echo Installing $$file in $(MANDIR)/man1...; \
@@ -132,6 +139,27 @@ install:	all
 	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

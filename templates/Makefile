@@ -3,7 +3,7 @@
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -111,10 +111,17 @@ depend:
 
 
 #
-# Install files...
+# Install all targets...
 #
 
-install: all $(INSTALL_LANGUAGES)
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data: $(INSTALL_LANGUAGES)
 	$(INSTALL_DIR) -m 755 $(DATADIR)/templates
 	for file in $(FILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/templates; \
@@ -129,6 +136,28 @@ install-languages:
 			done \
 		fi \
 	done
+
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #

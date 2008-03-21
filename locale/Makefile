@@ -44,10 +44,17 @@ depend:
 
 
 #
-# Install files...
+# Install all targets...
 #
 
-install:	all $(INSTALL_LANGUAGES)
+install:	all install-data install-headers install-libs install-exec
+
+
+#
+# Install data files...
+#
+
+install-data: $(INSTALL_LANGUAGES)
 
 install-languages:
 	$(INSTALL_DIR) -m 755 $(LOCALEDIR)
@@ -58,6 +65,27 @@ install-languages:
 			$(INSTALL_DATA) ppdc_$$loc.po $(LOCALEDIR)/$$loc/ppdc_$$loc.po ; \
 		fi ; \
 	done
+
+
+#
+# Install programs...
+#
+
+install-exec:
+
+
+#
+# Install headers...
+#
+
+install-headers:
+
+
+#
+# Install libraries...
+#
+
+install-libs:
 
 
 #
