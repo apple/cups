@@ -590,7 +590,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
   ppd->language_level = 2;
   ppd->color_device   = 0;
-  ppd->colorspace     = PPD_CS_GRAY;
+  ppd->colorspace     = PPD_CS_N;
   ppd->landscape      = -90;
   ppd->coptions       = cupsArrayNew((cups_array_func_t)ppd_compare_coptions,
                                      NULL);

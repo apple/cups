@@ -1,8 +1,11 @@
-CHANGES.txt - 2008-03-21
+CHANGES.txt - 2008-03-24
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- ppdOpen*() now default the colorspace member to PPD_CS_N
+	  when no DefaultColorSpace attribute is present in the PPD
+	  file.
 	- The build system has been updated to support separate
 	  installation of data, program, header, and library files.
 	- All support libraries are now built as shared libraries
