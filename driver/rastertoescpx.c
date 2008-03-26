@@ -3,7 +3,7 @@
  *
  *   Advanced EPSON ESC/P raster driver for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -89,18 +89,18 @@ int		OutputFeed;		/* Number of lines to skip */
  */
 
 void	Setup(ppd_file_t *);
-void	StartPage(ppd_file_t *, cups_page_header_t *);
-void	EndPage(ppd_file_t *, cups_page_header_t *);
+void	StartPage(ppd_file_t *, cups_page_header2_t *);
+void	EndPage(ppd_file_t *, cups_page_header2_t *);
 void	Shutdown(ppd_file_t *);
 
 void	AddBand(cups_weave_t *band);
 void	CompressData(ppd_file_t *, const unsigned char *, const int,
 	             int, int, const int, const int, const int,
 		     const int);
-void	OutputBand(ppd_file_t *, cups_page_header_t *,
+void	OutputBand(ppd_file_t *, cups_page_header2_t *,
 	           cups_weave_t *band);
 void	ProcessLine(ppd_file_t *, cups_raster_t *,
-	            cups_page_header_t *, const int y);
+	            cups_page_header2_t *, const int y);
 
 
 /*
@@ -126,7 +126,7 @@ Setup(ppd_file_t *ppd)		/* I - PPD file */
 
 void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header)	/* I - Page header */
+          cups_page_header2_t *header)	/* I - Page header */
 {
   int		i, y;			/* Looping vars */
   int		subrow,			/* Current subrow */
@@ -1043,7 +1043,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
 void
 EndPage(ppd_file_t         *ppd,	/* I - PPD file */
-        cups_page_header_t *header)	/* I - Page header */
+        cups_page_header2_t *header)	/* I - Page header */
 {
   int		i;			/* Looping var */
   cups_weave_t	*band,			/* Current band */
@@ -1467,7 +1467,7 @@ CompressData(ppd_file_t          *ppd,	/* I - PPD file information */
 
 void
 OutputBand(ppd_file_t         *ppd,	/* I - PPD file */
-           cups_page_header_t *header,	/* I - Page header */
+           cups_page_header2_t *header,	/* I - Page header */
            cups_weave_t       *band)	/* I - Current band */
 {
   int	xstep,				/* Spacing between columns */
@@ -1529,7 +1529,7 @@ OutputBand(ppd_file_t         *ppd,	/* I - PPD file */
 void
 ProcessLine(ppd_file_t         *ppd,	/* I - PPD file */
             cups_raster_t      *ras,	/* I - Raster stream */
-            cups_page_header_t *header,	/* I - Page header */
+            cups_page_header2_t *header,	/* I - Page header */
             const int          y)	/* I - Current scanline */
 {
   int		plane,			/* Current color plane */
@@ -1725,7 +1725,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
-  cups_page_header_t	header;		/* Page header from file */
+  cups_page_header2_t	header;		/* Page header from file */
   int			page;		/* Current page */
   int			y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
@@ -1795,7 +1795,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   page = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
     page ++;
 

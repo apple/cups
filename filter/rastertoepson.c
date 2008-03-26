@@ -85,15 +85,15 @@ int		DotBit,			/* Bit in buffers */
  */
 
 void	Setup(void);
-void	StartPage(const ppd_file_t *ppd, const cups_page_header_t *header);
-void	EndPage(const cups_page_header_t *header);
+void	StartPage(const ppd_file_t *ppd, const cups_page_header2_t *header);
+void	EndPage(const cups_page_header2_t *header);
 void	Shutdown(void);
 
 void	CancelJob(int sig);
 void	CompressData(const unsigned char *line, int length, int plane,
 	             int type, int xstep, int ystep);
-void	OutputLine(const cups_page_header_t *header);
-void	OutputRows(const cups_page_header_t *header, int row);
+void	OutputLine(const cups_page_header2_t *header);
+void	OutputRows(const cups_page_header2_t *header, int row);
 
 
 /*
@@ -123,7 +123,7 @@ Setup(void)
 
 void
 StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
-          const cups_page_header_t *header)	/* I - Page header */
+          const cups_page_header2_t *header)	/* I - Page header */
 {
   int	n, t;					/* Numbers */
   int	plane;					/* Looping var */
@@ -339,7 +339,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
  */
 
 void
-EndPage(const cups_page_header_t *header)	/* I - Page header */
+EndPage(const cups_page_header2_t *header)	/* I - Page header */
 {
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;			/* Actions for POSIX signals */
@@ -670,7 +670,7 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
  */
 
 void
-OutputLine(const cups_page_header_t *header)	/* I - Page header */
+OutputLine(const cups_page_header2_t *header)	/* I - Page header */
 {
   if (header->cupsRowCount)
   {
@@ -838,7 +838,7 @@ OutputLine(const cups_page_header_t *header)	/* I - Page header */
  */
 
 void
-OutputRows(const cups_page_header_t *header,	/* I - Page image header */
+OutputRows(const cups_page_header2_t *header,	/* I - Page image header */
            int                      row)	/* I - Row number (0 or 1) */
 {
   unsigned	i, n;				/* Looping vars */
@@ -1018,7 +1018,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 {
   int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
-  cups_page_header_t	header;	/* Page header from file */
+  cups_page_header2_t	header;	/* Page header from file */
   ppd_file_t		*ppd;	/* PPD file */
   int			page;	/* Current page */
   int			y;	/* Current line */
@@ -1080,7 +1080,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
   page = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
    /*
     * Write a status message with the page number and number of copies.

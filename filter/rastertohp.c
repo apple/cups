@@ -60,13 +60,13 @@ int		NumPlanes,		/* Number of color planes */
  */
 
 void	Setup(void);
-void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	StartPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	EndPage(void);
 void	Shutdown(void);
 
 void	CancelJob(int sig);
 void	CompressData(unsigned char *line, int length, int plane, int type);
-void	OutputLine(cups_page_header_t *header);
+void	OutputLine(cups_page_header2_t *header);
 
 
 /*
@@ -91,7 +91,7 @@ Setup(void)
 
 void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header)	/* I - Page header */
+          cups_page_header2_t *header)	/* I - Page header */
 {
   int	plane;				/* Looping var */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -648,7 +648,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
  */
 
 void
-OutputLine(cups_page_header_t *header)	/* I - Page header */
+OutputLine(cups_page_header2_t *header)	/* I - Page header */
 {
   int		plane,			/* Current plane */
 		bytes,			/* Bytes to write */
@@ -737,7 +737,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 {
   int			fd;	/* File descriptor */
   cups_raster_t		*ras;	/* Raster stream for printing */
-  cups_page_header_t	header;	/* Page header from file */
+  cups_page_header2_t	header;	/* Page header from file */
   int			y;	/* Current line */
   ppd_file_t		*ppd;	/* PPD file */
 
@@ -796,7 +796,7 @@ main(int  argc,		/* I - Number of command-line arguments */
 
   Page = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
    /*
     * Write a status message with the page number and number of copies.

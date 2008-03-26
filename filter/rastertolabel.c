@@ -3,7 +3,7 @@
  *
  *   Label printer filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -90,10 +90,10 @@ int		ModelNumber,		/* cupsModelNumber attribute */
  */
 
 void	Setup(ppd_file_t *ppd);
-void	StartPage(ppd_file_t *ppd, cups_page_header_t *header);
-void	EndPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	StartPage(ppd_file_t *ppd, cups_page_header2_t *header);
+void	EndPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	CancelJob(int sig);
-void	OutputLine(ppd_file_t *ppd, cups_page_header_t *header, int y);
+void	OutputLine(ppd_file_t *ppd, cups_page_header2_t *header, int y);
 void	PCLCompress(unsigned char *line, int length);
 void	ZPLCompress(char repeat_char, int repeat_count);
 
@@ -166,7 +166,7 @@ Setup(ppd_file_t *ppd)			/* I - PPD file */
 
 void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header)	/* I - Page header */
+          cups_page_header2_t *header)	/* I - Page header */
 {
   ppd_choice_t	*choice;		/* Marked choice */
   int		length;			/* Actual label length */
@@ -498,7 +498,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
 void
 EndPage(ppd_file_t *ppd,		/* I - PPD file */
-        cups_page_header_t *header)	/* I - Page header */
+        cups_page_header2_t *header)	/* I - Page header */
 {
   int		val;			/* Option value */
   ppd_choice_t	*choice;		/* Marked choice */
@@ -779,7 +779,7 @@ CancelJob(int sig)			/* I - Signal */
 
 void
 OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
-           cups_page_header_t *header,	/* I - Page header */
+           cups_page_header2_t *header,	/* I - Page header */
            int                y)	/* I - Line number */
 {
   int		i;			/* Looping var */
@@ -1145,7 +1145,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
-  cups_page_header_t	header;		/* Page header from file */
+  cups_page_header2_t	header;		/* Page header from file */
   int			y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
   int			num_options;	/* Number of options */
@@ -1217,7 +1217,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   Page      = 0;
   Canceled = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
    /*
     * Write a status message with the page number and number of copies.

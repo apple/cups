@@ -86,17 +86,17 @@ const int	ColorOrders[7][7] =	/* Order of color planes */
  * Prototypes...
  */
 
-void	StartPage(ppd_file_t *ppd, cups_page_header_t *header, int job_id,
+void	StartPage(ppd_file_t *ppd, cups_page_header2_t *header, int job_id,
 	          const char *user, const char *title, int num_options,
 		  cups_option_t *options);
-void	EndPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	EndPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	Shutdown(ppd_file_t *ppd, int job_id, const char *user,
 	         const char *title, int num_options, cups_option_t *options);
 
 void	CompressData(unsigned char *line, int length, int plane, int pend,
 	             int type);
-void	OutputLine(ppd_file_t *ppd, cups_page_header_t *header);
-int	ReadLine(cups_raster_t *ras, cups_page_header_t *header);
+void	OutputLine(ppd_file_t *ppd, cups_page_header2_t *header);
+int	ReadLine(cups_raster_t *ras, cups_page_header2_t *header);
 
 
 /*
@@ -105,7 +105,7 @@ int	ReadLine(cups_raster_t *ras, cups_page_header_t *header);
 
 void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header,	/* I - Page header */
+          cups_page_header2_t *header,	/* I - Page header */
 	  int                job_id,	/* I - Job ID */
 	  const char         *user,	/* I - User printing job */
 	  const char         *title,	/* I - Title of job */
@@ -807,7 +807,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
 void
 EndPage(ppd_file_t         *ppd,	/* I - PPD file */
-        cups_page_header_t *header)	/* I - Page header */
+        cups_page_header2_t *header)	/* I - Page header */
 {
   int	plane;				/* Current plane */
 
@@ -1518,7 +1518,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 
 void
 OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
-           cups_page_header_t *header)	/* I - Page header */
+           cups_page_header2_t *header)	/* I - Page header */
 {
   int			i, j;		/* Looping vars */
   int			plane;		/* Current plane */
@@ -1657,7 +1657,7 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 
 int					/* O - Number of lines (0 if blank) */
 ReadLine(cups_raster_t      *ras,	/* I - Raster stream */
-         cups_page_header_t *header)	/* I - Page header */
+         cups_page_header2_t *header)	/* I - Page header */
 {
   int	plane,				/* Current color plane */
 	width;				/* Width of line */
@@ -1755,7 +1755,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
-  cups_page_header_t	header;		/* Page header from file */
+  cups_page_header2_t	header;		/* Page header from file */
   int			y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
   int			job_id;		/* Job ID */
@@ -1821,7 +1821,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   Page = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
     Page ++;
 
