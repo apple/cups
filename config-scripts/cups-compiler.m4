@@ -21,12 +21,14 @@ AC_SUBST(INSTALL_STRIP)
 AC_SUBST(OPTIM)
 
 AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
-AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no],
-	[if test x$enable_debug = xyes; then
-		OPTIM="-g"
-	else
-		INSTALL_STRIP="-s"
-	fi])
+AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
+
+dnl For debugging, keep symbols, otherwise strip them...
+if test x$enable_debug = xyes; then
+	OPTIM="-g"
+else
+	INSTALL_STRIP="-s"
+fi
 
 dnl Setup general architecture flags...
 AC_ARG_WITH(archflags, [  --with-archflags="flags"

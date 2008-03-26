@@ -165,7 +165,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/`basename $(LIBCUPSPPDC) .1`; \
 	fi
 	if test $(LIBCUPSPPDC) = "libcupsppdc.1.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPSPPDC); \
 		$(RM) $(LIBDIR)/libcupsppdc.dylib; \
 		$(LN) $(LIBCUPSPPDC) $(LIBDIR)/libcupsppdc.dylib; \
 	fi

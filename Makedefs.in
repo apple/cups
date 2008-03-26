@@ -35,7 +35,7 @@ RM		=	@RM@ -f
 RMDIR		=	@RMDIR@
 SED		=	@SED@
 SHELL		=	/bin/sh
-STRIP		=	@STRIP@
+
 
 #
 # Installation programs...

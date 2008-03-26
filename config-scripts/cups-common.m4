@@ -56,7 +56,6 @@ AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(RMDIR,rmdir)
 AC_PATH_PROG(SED,sed)
-AC_PATH_PROG(STRIP,strip)
 
 if test "x$AR" = x; then
 	AC_MSG_ERROR([Unable to find required library archive command.])

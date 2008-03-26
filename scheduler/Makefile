@@ -212,7 +212,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPSMIME) $(LIBDIR)/`basename $(LIBCUPSMIME) .1`; \
 	fi
 	if test $(LIBCUPSMIME) = "libcupsmime.1.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPSMIME); \
 		$(RM) $(LIBDIR)/libcupsmime.dylib; \
 		$(LN) $(LIBCUPSMIME) $(LIBDIR)/libcupsmime.dylib; \
 	fi
