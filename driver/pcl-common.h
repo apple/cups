@@ -17,7 +17,7 @@
  * Include necessary headers...
  */
 
-#include "string.h"
+#include <cups/string.h>
 #include "data/pcl.h"
 
 
