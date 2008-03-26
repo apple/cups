@@ -77,7 +77,8 @@ int		DotBit,			/* Bit in buffers */
 		LineCount,		/* # of lines processed */
 		EvenOffset,		/* Offset into 'even' buffers */
 		OddOffset,		/* Offset into 'odd' buffers */
-		Shingling;		/* Shingle output? */
+		Shingling,		/* Shingle output? */
+		Canceled;		/* Has the current job been canceled? */
 
 
 /*
@@ -127,27 +128,7 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 {
   int	n, t;					/* Numbers */
   int	plane;					/* Looping var */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;			/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
-
- /*
-  * Register a signal handler to eject the current page if the
-  * job is cancelled.
-  */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, CancelJob);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = CancelJob;
-  sigaction(SIGTERM, &action, NULL);
-#else
-  signal(SIGTERM, CancelJob);
-#endif /* HAVE_SIGSET */
 
  /*
   * Send a reset sequence.
@@ -378,22 +359,6 @@ EndPage(const cups_page_header2_t *header)	/* I - Page header */
   fflush(stdout);
 
  /*
-  * Unregister the signal handler...
-  */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
-#else
-  signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-
- /*
   * Free memory...
   */
 
@@ -429,31 +394,9 @@ Shutdown(void)
 void
 CancelJob(int sig)			/* I - Signal */
 {
-  int	i;				/* Looping var */
-
-
   (void)sig;
 
- /*
-  * Send out lots of NUL bytes to clear out any pending raster data...
-  */
-
-  if (DotBytes)
-    i = DotBytes * 360 * 8;
-  else
-    i = 720;
-
-  for (; i > 0; i --)
-    putchar(0);
-
- /*
-  * End the current page and exit...
-  */
-
-  EndPage(NULL);
-  Shutdown();
-
-  exit(0);
+  Canceled = 1;
 }
 
 
@@ -1012,16 +955,19 @@ OutputRows(const cups_page_header2_t *header,	/* I - Page image header */
  * 'main()' - Main entry and processing of driver.
  */
 
-int				/* O - Exit status */
-main(int  argc,			/* I - Number of command-line arguments */
-     char *argv[])		/* I - Command-line arguments */
+int					/* O - Exit status */
+main(int  argc,				/* I - Number of command-line arguments */
+     char *argv[])			/* I - Command-line arguments */
 {
-  int			fd;	/* File descriptor */
-  cups_raster_t		*ras;	/* Raster stream for printing */
-  cups_page_header2_t	header;	/* Page header from file */
-  ppd_file_t		*ppd;	/* PPD file */
-  int			page;	/* Current page */
-  int			y;	/* Current line */
+  int			fd;		/* File descriptor */
+  cups_raster_t		*ras;		/* Raster stream for printing */
+  cups_page_header2_t	header;		/* Page header from file */
+  ppd_file_t		*ppd;		/* PPD file */
+  int			page;		/* Current page */
+  int			y;		/* Current line */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -1065,6 +1011,25 @@ main(int  argc,			/* I - Number of command-line arguments */
   ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
 
  /*
+  * Register a signal handler to eject the current page if the
+  * job is cancelled.
+  */
+
+  Canceled = 0;
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, CancelJob);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = CancelJob;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, CancelJob);
+#endif /* HAVE_SIGSET */
+
+ /*
   * Initialize the print device...
   */
 
@@ -1086,6 +1051,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     * Write a status message with the page number and number of copies.
     */
 
+    if (Canceled)
+      break;
+
     page ++;
 
     fprintf(stderr, "PAGE: %d %d\n", page, header.NumCopies);
@@ -1105,6 +1073,9 @@ main(int  argc,			/* I - Number of command-line arguments */
      /*
       * Let the user know how far we have progressed...
       */
+
+      if (Canceled)
+	break;
 
       if ((y & 127) == 0)
         fprintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"), page,
@@ -1129,6 +1100,9 @@ main(int  argc,			/* I - Number of command-line arguments */
     */
 
     EndPage(&header);
+
+    if (Canceled)
+      break;
   }
 
  /*

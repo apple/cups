@@ -170,9 +170,6 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 {
   ppd_choice_t	*choice;		/* Marked choice */
   int		length;			/* Actual label length */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -225,23 +222,6 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
   fprintf(stderr, "DEBUG: cupsRowCount = %d\n", header->cupsRowCount);
   fprintf(stderr, "DEBUG: cupsRowFeed = %d\n", header->cupsRowFeed);
   fprintf(stderr, "DEBUG: cupsRowStep = %d\n", header->cupsRowStep);
-
- /*
-  * Register a signal handler to eject the current page if the
-  * job is canceled.
-  */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, CancelJob);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = CancelJob;
-  sigaction(SIGTERM, &action, NULL);
-#else
-  signal(SIGTERM, CancelJob);
-#endif /* HAVE_SIGSET */
 
   switch (ModelNumber)
   {
@@ -733,22 +713,6 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
   fflush(stdout);
 
  /*
-  * Unregister the signal handler...
-  */
-
-#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
-  sigset(SIGTERM, SIG_IGN);
-#elif defined(HAVE_SIGACTION)
-  memset(&action, 0, sizeof(action));
-
-  sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, NULL);
-#else
-  signal(SIGTERM, SIG_IGN);
-#endif /* HAVE_SIGSET */
-
- /*
   * Free memory...
   */
 
@@ -1150,6 +1114,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   ppd_file_t		*ppd;		/* PPD file */
   int			num_options;	/* Number of options */
   cups_option_t		*options;	/* Options */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -1193,6 +1160,25 @@ main(int  argc,				/* I - Number of command-line arguments */
   ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
 
  /*
+  * Register a signal handler to eject the current page if the
+  * job is cancelled.
+  */
+
+  Canceled = 0;
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, CancelJob);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = CancelJob;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, CancelJob);
+#endif /* HAVE_SIGSET */
+
+ /*
   * Open the PPD file and apply options...
   */
 
@@ -1214,14 +1200,16 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Process pages as needed...
   */
 
-  Page      = 0;
-  Canceled = 0;
+  Page = 0;
 
   while (cupsRasterReadHeader2(ras, &header))
   {
    /*
     * Write a status message with the page number and number of copies.
     */
+
+    if (Canceled)
+      break;
 
     Page ++;
 
@@ -1242,6 +1230,9 @@ main(int  argc,				/* I - Number of command-line arguments */
      /*
       * Let the user know how far we have progressed...
       */
+
+      if (Canceled)
+	break;
 
       if ((y & 15) == 0)
         fprintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"), Page,

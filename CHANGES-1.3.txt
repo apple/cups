@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.7
 
+	- The sample raster drivers did not properly handle SIGTERM
+	  (STR #2770)
 	- The scheduler sent notify_post() messages too often on
 	  Mac OS X.
 	- Kerberos access to the web interface did not work
