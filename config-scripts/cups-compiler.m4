@@ -48,7 +48,7 @@ if test -z "$with_ldarchflags"; then
 		LDARCHFLAGS="$ARCHFLAGS"
 	fi
 else
-	LDARCHFLAGS="$with_archflags"
+	LDARCHFLAGS="$with_ldarchflags"
 fi
 
 AC_SUBST(ARCHFLAGS)
