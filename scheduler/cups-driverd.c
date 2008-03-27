@@ -1079,6 +1079,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   }		languages[] =
   {
     { "chinese",	"zh" },
+    { "czech",		"cs" },
     { "danish",		"da" },
     { "dutch",		"nl" },
     { "english",	"en" },
@@ -1086,6 +1087,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     { "french",		"fr" },
     { "german",		"de" },
     { "greek",		"el" },
+    { "hungarian",	"hu" },
     { "italian",	"it" },
     { "japanese",	"ja" },
     { "korean",		"ko" },
