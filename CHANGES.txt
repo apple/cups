@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-03-24
+CHANGES.txt - 2008-03-27
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The PPD compiler tools now support Mac OS X .strings files
+	  for localization (STR #2737)
 	- ppdOpen*() now default the colorspace member to PPD_CS_N
 	  when no DefaultColorSpace attribute is present in the PPD
 	  file.

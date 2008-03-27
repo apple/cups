@@ -3,7 +3,7 @@
 .\"
 .\"   ppdpo man page for the CUPS Driver Development Kit.
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,9 +12,9 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdpo 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.TH ppdpo 1 "Common UNIX Printing System" "27 March 2008" "Apple Inc."
 .SH NAME
-ppdpo \- cups message catalog generator
+ppdpo \- ppd message catalog generator
 .SH SYNOPSIS
 .B ppdpo
 [ \-I
@@ -24,18 +24,22 @@ ppdpo \- cups message catalog generator
 ]
 .I source-file
 .SH DESCRIPTION
-\fIppdpo\fR extracts UI strings from PPDC source files and writes them in
-a GNU gettext format message catalog source file for translation.
+\fIppdpo\fR extracts UI strings from PPDC source files and updates either
+a GNU gettext or Mac OS X strings format message catalog source file for
+translation.
 .PP
 The \fI-I\fR option specifies an alternate include directory;
 multiple \fI-I\fR options can be supplied to add additional
 directories.
 .PP
-The \fI-o\fR option specifies the output file.
+The \fI-o\fR option specifies the output file. The supported extensions are
+".po" or ".po.gz" for GNU gettext format message catalogs and ".strings" for
+Mac OS X strings files.
 .SH SEE ALSO
-cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5), CUPS Driver Developer Kit Manual.
+ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5),
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id: ppdpo.man 343 2007-07-13 19:52:48Z mike $".
 .\"
