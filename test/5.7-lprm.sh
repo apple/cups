@@ -16,6 +16,8 @@
 
 echo "LPRM Current Test"
 echo ""
+echo "    lpr -o job-hold-until=indefinite testfile.jpg"
+../berkeley/lpr -o job-hold-until=indefinite testfile.jpg 2>&1
 echo "    lprm"
 ../berkeley/lprm 2>&1
 if test $? != 0; then
@@ -28,6 +30,8 @@ echo ""
 
 echo "LPRM Destination Test"
 echo ""
+echo "    lpr -P Test1 -o job-hold-until=indefinite testfile.jpg"
+../berkeley/lpr -P Test1 -o job-hold-until=indefinite testfile.jpg 2>&1
 echo "    lprm Test1"
 ../berkeley/lprm Test1 2>&1
 if test $? != 0; then
