@@ -1583,9 +1583,10 @@ load_drivers(void)
 
   if ((dir = cupsDirOpen(drivers)) == NULL)
   {
-    fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory "
-                    "\"%s\": %s\n",
-            drivers, strerror(errno));
+    if (errno != ENOENT)
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory "
+		      "\"%s\": %s\n",
+	      drivers, strerror(errno));
     return (0);
   }
 
