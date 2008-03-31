@@ -41,7 +41,7 @@ echo ""
 echo "LP Options Test"
 echo ""
 echo "    lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf"
-../systemv/lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf testfile.jpg 2>&1
+../systemv/lp -d Test1 -P 1-4 -o job-sheets=classified,classified testfile.pdf 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
