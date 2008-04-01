@@ -182,7 +182,9 @@ while [ $# -ne 0 ] ; do
 
 	if [ ! -d "${pathcomp}" ] ;
         then
-		$mkdirprog "${pathcomp}"
+		$mkdirprog "${pathcomp}" &&
+		if [ x"$chowncmd" != x ]; then $doit $chowncmd "$pathcomp"; else : ; fi &&
+		if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd "$pathcomp"; else : ; fi
 	else
 		:
 	fi
