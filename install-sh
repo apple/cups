@@ -3,6 +3,7 @@
 # install - install a program, script, or datafile
 # This comes from X11R5 (mit/util/scripts/install.sh).
 #
+# Library stripping changes Copyright 2008 by Apple Inc.
 # Copyright 1991 by the Massachusetts Institute of Technology
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
@@ -196,7 +197,6 @@ then
 
 	if [ x"$chowncmd" != x ]; then $doit $chowncmd $dst; else : ; fi &&
 	if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd $dst; else : ; fi &&
-	if [ x"$stripcmd" != x ]; then $doit $stripcmd $dst; else : ; fi &&
 	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd $dst; else : ; fi
 else
 
@@ -219,6 +219,16 @@ else
 		:
 	fi
 
+# Check the destination file - for libraries just use the "-x" option to strip
+	case "$dstfile" in
+		*.a | *.dylib | *.sl | *.sl.* | *.so | *.so.*)
+			stripopt="-x"
+			;;
+		*)
+			stripopt=""
+			;;
+	esac
+
 # Make a temp file name in the proper directory.
 
 	dsttmp=$dstdir/#inst.$$#
@@ -237,7 +247,7 @@ else
 
 	if [ x"$chowncmd" != x ]; then $doit $chowncmd $dsttmp; else :;fi &&
 	if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd $dsttmp; else :;fi &&
-	if [ x"$stripcmd" != x ]; then $doit $stripcmd $dsttmp; else :;fi &&
+	if [ x"$stripcmd" != x ]; then $doit $stripcmd $stripopt $dsttmp; else :;fi &&
 	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd $dsttmp; else :;fi &&
 
 # Now rename the file to the real destination.

@@ -42,11 +42,6 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
-AC_PROG_INSTALL
-if test "$INSTALL" = "$ac_install_sh"; then
-	# Use full path to install-sh script...
-	INSTALL="`pwd`/install-sh -c"
-fi
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(HTMLDOC,htmldoc)
@@ -56,6 +51,11 @@ AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(RMDIR,rmdir)
 AC_PATH_PROG(SED,sed)
+
+AC_MSG_CHECKING(for install-sh script)
+INSTALL="`pwd`/install-sh -c"
+AC_SUBST(INSTALL)
+AC_MSG_RESULT(using $INSTALL)
 
 if test "x$AR" = x; then
 	AC_MSG_ERROR([Unable to find required library archive command.])
