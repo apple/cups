@@ -1450,7 +1450,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      break;
             }
-	    else if (con->http.data_remaining < 0)
+	    else if (con->http.data_remaining < 0 ||
+	             (!con->http.fields[HTTP_FIELD_CONTENT_LENGTH][0] &&
+		      con->http.data_encoding == HTTP_ENCODE_LENGTH))
 	    {
 	     /*
 	      * Negative content lengths are invalid!
