@@ -28,6 +28,7 @@
 #include <cups/i18n.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 
 /*
@@ -35,6 +36,13 @@
  */
 
 static void		cancel_job(int sig);
+
+
+/*
+ * Local globals...
+ */
+
+static int		job_canceled = 0;
 
 
 /*
@@ -57,6 +65,7 @@ main(int  argc,				/* I - Number of command-line args */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_size_t	*size;			/* Current page size */
   int		pdfpid,			/* Process ID for pdftops */
+		pdfwaitpid,		/* Process ID from wait() */
 		pdfstatus,		/* Status from pdftops */
 		pdfargc;		/* Number of args for pdftops */
   char		*pdfargv[100],		/* Arguments for pdftops */
@@ -261,7 +270,17 @@ main(int  argc,				/* I - Number of command-line args */
     * Parent comes here...
     */
 
-    if (wait(&pdfstatus) != pdfpid)
+    while ((pdfwaitpid = wait(&pdfstatus)) < 0 && errno == EINTR)
+    {
+     /*
+      * Wait until we get a valid process ID or the job is canceled...
+      */
+
+      if (job_canceled)
+	break;
+    }
+
+    if (pdfwaitpid != pdfpid)
     {
       kill(pdfpid, SIGTERM);
       pdfstatus = 1;
@@ -270,18 +289,18 @@ main(int  argc,				/* I - Number of command-line args */
     {
       if (WIFEXITED(pdfstatus))
       {
-        pdfstatus = WEXITSTATUS(pdfstatus);
+	pdfstatus = WEXITSTATUS(pdfstatus);
 
-        _cupsLangPrintf(stderr,
-	                _("ERROR: pdftops filter exited with status %d!\n"),
+	_cupsLangPrintf(stderr,
+			_("ERROR: pdftops filter exited with status %d!\n"),
 			pdfstatus);
       }
       else
       {
-        pdfstatus = WTERMSIG(pdfstatus);
+	pdfstatus = WTERMSIG(pdfstatus);
 
-        _cupsLangPrintf(stderr,
-	                _("ERROR: pdftops filter crashed on signal %d!\n"),
+	_cupsLangPrintf(stderr,
+			_("ERROR: pdftops filter crashed on signal %d!\n"),
 			pdfstatus);
       }
     }
@@ -306,6 +325,8 @@ static void
 cancel_job(int sig)			/* I - Signal number (unused) */
 {
   (void)sig;
+
+  job_canceled = 1;
 }
 
 
