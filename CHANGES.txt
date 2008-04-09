@@ -1,8 +1,9 @@
-CHANGES.txt - 2008-04-01
+CHANGES.txt - 2008-04-08
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added --enable-pap configure option.
 	- The default cupsd.conf file now includes an "authenticated"
 	  policy which requires authentication for remote print jobs.
 	- Added support for Czech and Hungarian in PPD files
