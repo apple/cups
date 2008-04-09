@@ -1,6 +1,13 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.8
+
+	- The scheduler did not log the current date and time and
+	  did not escape special characters in request URIs when
+	  logging bad requests to the access_log file (STR #2788)
+
+
 CHANGES IN CUPS V1.3.7
 
 	- CVE-2008-0047: cgiCompileSearch buffer overflow (STR #2729)

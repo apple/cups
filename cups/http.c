@@ -2527,8 +2527,7 @@ http_send(http_t       *http,	/* I - Connection to server */
 	  const char   *uri)	/* I - URI */
 {
   int		i;		/* Looping var */
-  char		*ptr,		/* Pointer in buffer */
-		buf[1024];	/* Encoded URI buffer */
+  char		buf[1024];	/* Encoded URI buffer */
   static const char * const codes[] =
 		{		/* Request code strings */
 		  NULL,
@@ -2566,20 +2565,7 @@ http_send(http_t       *http,	/* I - Connection to server */
   * Encode the URI as needed...
   */
 
-  for (ptr = buf; *uri != '\0' && ptr < (buf + sizeof(buf) - 1); uri ++)
-    if (*uri <= ' ' || *uri >= 127)
-    {
-      if (ptr < (buf + sizeof(buf) - 1))
-        *ptr ++ = '%';
-      if (ptr < (buf + sizeof(buf) - 1))
-        *ptr ++ = hex[(*uri >> 4) & 15];
-      if (ptr < (buf + sizeof(buf) - 1))
-        *ptr ++ = hex[*uri & 15];
-    }
-    else
-      *ptr ++ = *uri;
-
-  *ptr = '\0';
+  _httpEncodeURI(buf, uri, sizeof(buf));
 
  /*
   * See if we had an error the last time around; if so, reconnect...

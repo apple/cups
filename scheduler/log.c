@@ -65,6 +65,13 @@ cupsdGetDateTime(time_t t)		/* I - Time value */
 		};
 
 
+ /*
+  * Make sure we have a valid time...
+  */
+
+  if (!t)
+    t = time(NULL);
+
   if (t != last_time)
   {
     last_time = t;
@@ -174,7 +181,7 @@ cupsdLogMessage(int        level,	/* I - Log level */
 		  'd'
 		};
 #ifdef HAVE_VSYSLOG
-  static const int syslevels[] =	/* SYSLOG levels... */
+  static const int	syslevels[] =	/* SYSLOG levels... */
 		{
 		  0,
 		  LOG_EMERG,
@@ -188,8 +195,8 @@ cupsdLogMessage(int        level,	/* I - Log level */
 		  LOG_DEBUG
 		};
 #endif /* HAVE_VSYSLOG */
-  static int	linesize = 0;		/* Size of line for output file */
-  static char	*line = NULL;		/* Line for output file */
+  static int		linesize = 0;	/* Size of line for output file */
+  static char		*line = NULL;	/* Line for output file */
 
 
  /*
@@ -388,6 +395,7 @@ int					/* O - 1 on success, 0 on error */
 cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
                 http_status_t  code)	/* I - Response code */
 {
+  char	temp[2048];			/* Temporary string for URI */
   static const char * const states[] =	/* HTTP client states... */
 		{
 		  "WAITING",
@@ -417,7 +425,7 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
     syslog(LOG_INFO,
            "REQUEST %s - %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
            con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-	   states[con->operation], con->uri,
+	   states[con->operation], _httpEncodeURI(temp, con->uri, sizeof(temp)),
 	   con->http.version / 100, con->http.version % 100,
 	   code, CUPS_LLCAST con->bytes,
 	   con->request ?
@@ -443,7 +451,8 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   cupsFilePrintf(AccessFile,
                  "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
         	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-		 cupsdGetDateTime(con->start), states[con->operation], con->uri,
+		 cupsdGetDateTime(con->start), states[con->operation],
+		 _httpEncodeURI(temp, con->uri, sizeof(temp)),
 		 con->http.version / 100, con->http.version % 100,
 		 code, CUPS_LLCAST con->bytes,
 		 con->request ?
