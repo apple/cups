@@ -2544,8 +2544,6 @@ http_send(http_t       *http,	/* I - Connection to server */
 		  "TRACE",
 		  "CLOSE"
 		};
-  static const char hex[] = "0123456789ABCDEF";
-				/* Hex digits */
 
 
   DEBUG_printf(("http_send(http=%p, request=HTTP_%s, uri=\"%s\")\n",
