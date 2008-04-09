@@ -3,7 +3,7 @@
  *
  *   PNG image routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -170,15 +170,55 @@ _cupsImageReadPNG(
     * Interlaced images must be loaded all at once...
     */
 
+    size_t bufsize;			/* Size of buffer */
+
+
     if (color_type == PNG_COLOR_TYPE_GRAY ||
 	color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-      in = malloc(img->xsize * img->ysize);
+    {
+      bufsize = img->xsize * img->ysize;
+
+      if ((bufsize / img->ysize) != img->xsize)
+      {
+	fprintf(stderr, "DEBUG: PNG image dimensions (%ux%u) too large!\n",
+		(unsigned)width, (unsigned)height);
+	fclose(fp);
+	return (1);
+      }
+    }
     else
-      in = malloc(img->xsize * img->ysize * 3);
+    {
+      bufsize = img->xsize * img->ysize * 3;
+
+      if ((bufsize / (img->ysize * 3)) != img->xsize)
+      {
+	fprintf(stderr, "DEBUG: PNG image dimensions (%ux%u) too large!\n",
+		(unsigned)width, (unsigned)height);
+	fclose(fp);
+	return (1);
+      }
+    }
+
+    in = malloc(bufsize);
   }
 
   bpp = cupsImageGetDepth(img);
   out = malloc(img->xsize * bpp);
+
+  if (!in || !out)
+  {
+    fputs("DEBUG: Unable to allocate memory for PNG image!\n", stderr);
+
+    if (in)
+      free(in);
+
+    if (out)
+      free(out);
+
+    fclose(fp);
+
+    return (1);
+  }
 
  /*
   * Read the image, interlacing as needed...
