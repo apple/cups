@@ -1185,7 +1185,7 @@ text:for%20all%20good%20men%20to%20come%20to%20the%20aid%20of%20their%20country.
 *cupsIPPReason com.vendor-error/A serious error occurred: "http://www.vendor.com/help"
 
 <em>*% Map com.vendor-error to text and a local, Apple help book, and remote page</em>
-*APHelpBook: "file:///Library/Printers/vendor/Help/filename"
+*APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
 *cupsIPPReason com.vendor-error/A serious error occurred: "/help/com.vendor/error.html
 help:anchor='com.vendor-error'%20bookID=Vendor%20Help
 http://www.vendor.com/help"
@@ -1446,9 +1446,9 @@ attribute.</p>
 
 <h3><a name='APHelpBook'>APHelpBook</a></h3>
 
-<p class='summary'>*APHelpBook: "file URL"</p>
+<p class='summary'>*APHelpBook: "bundle URL"</p>
 
-<p>This string attribute specifies the Apple help book file to use when
+<p>This string attribute specifies the Apple help book bundle to use when
 looking up IPP reason codes for this printer driver. The
 <a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute maps
 "help" URIs to this file.</p>
@@ -1456,7 +1456,7 @@ looking up IPP reason codes for this printer driver. The
 <p>Example:</p>
 
 <pre class='command'>
-*APHelpBook: "file:///Library/Printers/vendor/Help/filename"
+*APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
 </pre>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
@@ -1634,7 +1634,7 @@ the device.</p>
 
 	<li>Added custom option values support</li>
 
-	<li>Added <tt>APBookFile</tt> attribute</li>
+	<li>Added <tt>APHelpBook</tt> attribute</li>
 
 	<li>Added <tt>APDuplexRequiresFlippedMargin</tt> attribute</li>
 

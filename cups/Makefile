@@ -201,7 +201,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPS) $(LIBDIR)/`basename $(LIBCUPS) .2`; \
 	fi
 	if test $(LIBCUPS) = "libcups.2.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPS); \
 		$(RM) $(LIBDIR)/libcups.dylib; \
 		$(LN) $(LIBCUPS) $(LIBDIR)/libcups.dylib; \
 	fi

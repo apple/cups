@@ -1079,6 +1079,7 @@ load_ppds(const char *d,		/* I - Actual directory */
   }		languages[] =
   {
     { "chinese",	"zh" },
+    { "czech",		"cs" },
     { "danish",		"da" },
     { "dutch",		"nl" },
     { "english",	"en" },
@@ -1086,6 +1087,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     { "french",		"fr" },
     { "german",		"de" },
     { "greek",		"el" },
+    { "hungarian",	"hu" },
     { "italian",	"it" },
     { "japanese",	"ja" },
     { "korean",		"ko" },
@@ -1102,9 +1104,11 @@ load_ppds(const char *d,		/* I - Actual directory */
 
   if ((dir = cupsDirOpen(d)) == NULL)
   {
-    fprintf(stderr,
-            "ERROR: [cups-driverd] Unable to open PPD directory \"%s\": %s\n",
-            d, strerror(errno));
+    if (errno != ENOENT)
+      fprintf(stderr,
+	      "ERROR: [cups-driverd] Unable to open PPD directory \"%s\": %s\n",
+	      d, strerror(errno));
+
     return (0);
   }
 
@@ -1582,8 +1586,8 @@ load_drivers(void)
   if ((dir = cupsDirOpen(drivers)) == NULL)
   {
     fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory "
-                    "\"%s\": %s\n",
-            drivers, strerror(errno));
+		    "\"%s\": %s\n",
+	    drivers, strerror(errno));
     return (0);
   }
 

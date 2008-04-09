@@ -415,11 +415,10 @@ open_device(const char *uri,		/* I - Device URI */
       */
 
       if (busy)
-      {
 	_cupsLangPuts(stderr,
 	              _("INFO: Printer busy; will retry in 5 seconds...\n"));
-	sleep(5);
-      }
+
+      sleep(5);
     }
   }
 #elif defined(__sun) && defined(ECPPIOC_GETDEVID)

@@ -297,6 +297,7 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
   }		languages[] =
   {
     { "chinese",	"zh" },
+    { "czech",		"cs" },
     { "danish",		"da" },
     { "dutch",		"nl" },
     { "english",	"en" },
@@ -304,6 +305,7 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
     { "french",		"fr" },
     { "german",		"de" },
     { "greek",		"el" },
+    { "hungarian",	"hu" },
     { "italian",	"it" },
     { "japanese",	"ja" },
     { "korean",		"ko" },

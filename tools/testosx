@@ -105,7 +105,7 @@ done
 
 # Install CUPS into the Package directory...
 #make INSTALL=$topdir/install-sh BUILDROOT=$pkgdir/Package install
-make BUILDROOT=$pkgdir/Package install
+make BUILDROOT=$pkgdir/Package install || exit 1
 
 # Figure out where PackageMaker is installled...
 if test -d /Developer/Applications/Utilities/PackageMaker.app; then

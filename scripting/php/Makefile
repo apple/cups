@@ -82,7 +82,7 @@ install-data:
 install-exec:
 	echo Installing $(PHPCUPS) in $(PHPDIR)
 	$(INSTALL_DIR) $(PHPDIR)
-	$(INSTALL_BIN) $(PHPCUPS) $(PHPDIR)
+	$(INSTALL_LIB) $(PHPCUPS) $(PHPDIR)
 	if test "x$(SYMROOT)" != x; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		cp $(PHPCUPS) $(SYMROOT); \

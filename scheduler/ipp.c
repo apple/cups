@@ -8970,13 +8970,13 @@ save_auth_info(
       cupsFilePrintf(fp, "%s\n", line);
 
       if (!strcmp(dest->auth_info_required[i], "username"))
-        cupsdSetStringf(&job->auth_username, "CUPSD_AUTH_USERNAME=%s",
+        cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "domain"))
-        cupsdSetStringf(&job->auth_domain, "CUPSD_AUTH_DOMAIN=%s",
+        cupsdSetStringf(&job->auth_domain, "AUTH_DOMAIN=%s",
 	                auth_info->values[i].string.text);
       else if (!strcmp(dest->auth_info_required[i], "password"))
-        cupsdSetStringf(&job->auth_password, "CUPSD_AUTH_PASSWORD=%s",
+        cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s",
 	                auth_info->values[i].string.text);
     }
   }
@@ -8989,7 +8989,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->username, strlen(con->username));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_username, "CUPSD_AUTH_USERNAME=%s", con->username);
+    cupsdSetStringf(&job->auth_username, "AUTH_USERNAME=%s", con->username);
     cupsdClearString(&job->auth_domain);
 
    /*
@@ -8999,7 +8999,7 @@ save_auth_info(
     httpEncode64_2(line, sizeof(line), con->password, strlen(con->password));
     cupsFilePrintf(fp, "%s\n", line);
 
-    cupsdSetStringf(&job->auth_password, "CUPSD_AUTH_PASSWORD=%s", con->password);
+    cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", con->password);
   }
 
  /*

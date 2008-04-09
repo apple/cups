@@ -808,6 +808,9 @@ cupsAdminExportSamba(
   if (have_drivers == 0)
   {
     _cupsSetError(IPP_NOT_FOUND, message);
+
+    unlink(authfile);
+
     return (0);
   }
 

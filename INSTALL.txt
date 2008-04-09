@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.4svn - 2008-01-22
+INSTALL - CUPS v1.4svn - 2008-04-08
 -----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -33,7 +33,7 @@ BEFORE YOU BEGIN
     many of the features provided by CUPS.
 
     Kerberos support requires MIT Kerberos 1.6.3 or later or
-    or Heimdal Kerberos, along with the corresponding GSSAPI
+    Heimdal Kerberos, along with the corresponding GSSAPI
     pieces.
 
     Also, please note that CUPS no longer includes the

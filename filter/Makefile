@@ -130,7 +130,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/`basename $(LIBCUPSIMAGE) .2`; \
 	fi
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPSIMAGE); \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
 	fi

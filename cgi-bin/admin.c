@@ -309,6 +309,16 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
   }
 
  /*
+  * Make sure we have a username...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+
+ /*
   * Validate the subscription name...
   */
 
@@ -351,9 +361,6 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
   else
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, printer_uri);
-
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, user);
@@ -1306,6 +1313,16 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
   }
 
  /*
+  * Require a username...
+  */
+
+  if ((user = getenv("REMOTE_USER")) == NULL)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+
+ /*
   * Cancel the subscription...
   */
 
@@ -1315,9 +1332,6 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
                NULL, "ipp://localhost/");
   ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER,
                 "notify-subscription-id", id);
-
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
                NULL, user);

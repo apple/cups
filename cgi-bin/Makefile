@@ -139,7 +139,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPSCGI) $(LIBDIR)/`basename $(LIBCUPSCGI) .1`; \
 	fi
 	if test $(LIBCUPSCGI) = "libcupscgi.1.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPSCGI); \
 		$(RM) $(LIBDIR)/libcupscgi.dylib; \
 		$(LN) $(LIBCUPSCGI) $(LIBDIR)/libcupscgi.dylib; \
 	fi

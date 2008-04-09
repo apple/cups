@@ -151,7 +151,6 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 		$(LN) $(LIBCUPSDRIVER) $(LIBDIR)/`basename $(LIBCUPSDRIVER) .1`; \
 	fi
 	if test $(LIBCUPSDRIVER) = "libcupsdriver.1.dylib"; then \
-		$(STRIP) -x $(LIBDIR)/$(LIBCUPSDRIVER); \
 		$(RM) $(LIBDIR)/libcupsdriver.dylib; \
 		$(LN) $(LIBCUPSDRIVER) $(LIBDIR)/libcupsdriver.dylib; \
 	fi

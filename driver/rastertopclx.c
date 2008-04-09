@@ -15,10 +15,10 @@
  *
  * Contents:
  *
- *   Setup()        - Prepare a printer for graphics output.
  *   StartPage()    - Start a page of graphics.
  *   EndPage()      - Finish a page of graphics.
  *   Shutdown()     - Shutdown a printer.
+ *   CancelJob()    - Cancel the current job...
  *   CompressData() - Compress a line of graphics.
  *   OutputLine()   - Output the specified number of lines of graphics.
  *   ReadLine()     - Read graphics from the page stream.
@@ -31,6 +31,7 @@
 
 #include "driver.h"
 #include "pcl-common.h"
+#include <signal.h>
 
 
 /*
@@ -80,23 +81,25 @@ const int	ColorOrders[7][7] =	/* Order of color planes */
 		  { 5, 0, 1, 2, 3, 4, 0 },	/* KCMYcm */
 		  { 5, 0, 1, 2, 3, 4, 6 }	/* KCMYcmk */
 		};
+int		Canceled;		/* Is the job canceled? */
 
 
 /*
  * Prototypes...
  */
 
-void	StartPage(ppd_file_t *ppd, cups_page_header_t *header, int job_id,
+void	StartPage(ppd_file_t *ppd, cups_page_header2_t *header, int job_id,
 	          const char *user, const char *title, int num_options,
 		  cups_option_t *options);
-void	EndPage(ppd_file_t *ppd, cups_page_header_t *header);
+void	EndPage(ppd_file_t *ppd, cups_page_header2_t *header);
 void	Shutdown(ppd_file_t *ppd, int job_id, const char *user,
 	         const char *title, int num_options, cups_option_t *options);
 
+void	CancelJob(int sig);
 void	CompressData(unsigned char *line, int length, int plane, int pend,
 	             int type);
-void	OutputLine(ppd_file_t *ppd, cups_page_header_t *header);
-int	ReadLine(cups_raster_t *ras, cups_page_header_t *header);
+void	OutputLine(ppd_file_t *ppd, cups_page_header2_t *header);
+int	ReadLine(cups_raster_t *ras, cups_page_header2_t *header);
 
 
 /*
@@ -105,7 +108,7 @@ int	ReadLine(cups_raster_t *ras, cups_page_header_t *header);
 
 void
 StartPage(ppd_file_t         *ppd,	/* I - PPD file */
-          cups_page_header_t *header,	/* I - Page header */
+          cups_page_header2_t *header,	/* I - Page header */
 	  int                job_id,	/* I - Job ID */
 	  const char         *user,	/* I - User printing job */
 	  const char         *title,	/* I - Title of job */
@@ -807,7 +810,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
 void
 EndPage(ppd_file_t         *ppd,	/* I - PPD file */
-        cups_page_header_t *header)	/* I - Page header */
+        cups_page_header2_t *header)	/* I - Page header */
 {
   int	plane;				/* Current plane */
 
@@ -913,6 +916,19 @@ Shutdown(ppd_file_t         *ppd,	/* I - PPD file */
 
     pjl_escape();
   }
+}
+
+
+/*
+ * 'CancelJob()' - Cancel the current job...
+ */
+
+void
+CancelJob(int sig)			/* I - Signal */
+{
+  (void)sig;
+
+  Canceled = 1;
 }
 
 
@@ -1518,7 +1534,7 @@ CompressData(unsigned char *line,	/* I - Data to compress */
 
 void
 OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
-           cups_page_header_t *header)	/* I - Page header */
+           cups_page_header2_t *header)	/* I - Page header */
 {
   int			i, j;		/* Looping vars */
   int			plane;		/* Current plane */
@@ -1657,7 +1673,7 @@ OutputLine(ppd_file_t         *ppd,	/* I - PPD file */
 
 int					/* O - Number of lines (0 if blank) */
 ReadLine(cups_raster_t      *ras,	/* I - Raster stream */
-         cups_page_header_t *header)	/* I - Page header */
+         cups_page_header2_t *header)	/* I - Page header */
 {
   int	plane,				/* Current color plane */
 	width;				/* Width of line */
@@ -1755,12 +1771,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int			fd;		/* File descriptor */
   cups_raster_t		*ras;		/* Raster stream for printing */
-  cups_page_header_t	header;		/* Page header from file */
+  cups_page_header2_t	header;		/* Page header from file */
   int			y;		/* Current line */
   ppd_file_t		*ppd;		/* PPD file */
   int			job_id;		/* Job ID */
   int			num_options;	/* Number of options */
   cups_option_t		*options;	/* Options */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
  /*
@@ -1814,6 +1833,25 @@ main(int  argc,				/* I - Number of command-line arguments */
   ras = cupsRasterOpen(fd, CUPS_RASTER_READ);
 
  /*
+  * Register a signal handler to eject the current page if the
+  * job is cancelled.
+  */
+
+  Canceled = 0;
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, CancelJob);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = CancelJob;
+  sigaction(SIGTERM, &action, NULL);
+#else
+  signal(SIGTERM, CancelJob);
+#endif /* HAVE_SIGSET */
+
+ /*
   * Process pages as needed...
   */
 
@@ -1821,8 +1859,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   Page = 0;
 
-  while (cupsRasterReadHeader(ras, &header))
+  while (cupsRasterReadHeader2(ras, &header))
   {
+   /*
+    * Write a status message with the page number and number of copies.
+    */
+
+    if (Canceled)
+      break;
+
     Page ++;
 
     fprintf(stderr, "PAGE: %d %d\n", Page, header.NumCopies);
@@ -1833,9 +1878,20 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     for (y = 0; y < (int)header.cupsHeight; y ++)
     {
+     /*
+      * Let the user know how far we have progressed...
+      */
+
+      if (Canceled)
+	break;
+
       if ((y & 127) == 0)
         fprintf(stderr, "INFO: Printing page %d, %d%% complete...\n", Page,
 	        100 * y / header.cupsHeight);
+
+     /*
+      * Read and write a line of graphics or whitespace...
+      */
 
       if (ReadLine(ras, &header))
         OutputLine(ppd, &header);
@@ -1843,9 +1899,16 @@ main(int  argc,				/* I - Number of command-line arguments */
         OutputFeed ++;
     }
 
+   /*
+    * Eject the page...
+    */
+
     fprintf(stderr, "INFO: Finished page %d...\n", Page);
 
     EndPage(ppd, &header);
+
+    if (Canceled)
+      break;
   }
 
   Shutdown(ppd, job_id, argv[2], argv[3], num_options, options);

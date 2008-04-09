@@ -167,7 +167,9 @@ cgiCompileSearch(const char *query)	/* I - Query string */
       * string + RE overhead...
       */
 
-      wlen = (sptr - s) + 4 * wlen + 2 * strlen(prefix) + 4;
+      wlen = (sptr - s) + 2 * 4 * wlen + 2 * strlen(prefix) + 11;
+      if (lword)
+        wlen += strlen(lword);
 
       if (wlen > slen)
       {

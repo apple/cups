@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -97,7 +97,7 @@ case "$testtype" in
 		echo "Running the timid tests (1)"
 		nprinters1=0
 		nprinters2=0
-		pjobs=0
+		pjobs=10
 		;;
 esac
 
@@ -207,6 +207,7 @@ rm -rf /tmp/cups-$user
 mkdir /tmp/cups-$user
 mkdir /tmp/cups-$user/bin
 mkdir /tmp/cups-$user/bin/backend
+mkdir /tmp/cups-$user/bin/driver
 mkdir /tmp/cups-$user/bin/filter
 mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
@@ -228,17 +229,15 @@ ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
+ln -s $root/ppdc/drv /tmp/cups-$user/bin/driver
 ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
 ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
-ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
-ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
 ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertohp /tmp/cups-$user/bin/filter
 ln -s $root/filter/texttops /tmp/cups-$user/bin/filter
-ln -s $root/filter/pdftops /tmp/cups-$user/bin/filter
 
 ln -s $root/data/classified /tmp/cups-$user/share/banners
 ln -s $root/data/confidential /tmp/cups-$user/share/banners
@@ -272,8 +271,11 @@ if test `uname` = Darwin; then
 	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
 
 	ln -s /private/etc/cups/apple.* /tmp/cups-$user
+else
+	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
+	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
+	ln -s $root/filter/pdftops /tmp/cups-$user/bin/filter
 fi
-
 
 #
 # Then create the necessary config files...
@@ -430,11 +432,6 @@ echo ""
 $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/log/debug_log 2>&1 &
 cupsd=$!
 
-#if test -x /usr/bin/strace; then
-#	# Trace system calls in cupsd if we have strace...
-#	/usr/bin/strace -tt -o /tmp/cups-$user/log/cupsd.trace -p $cupsd &
-#fi
-
 if test "x$testtype" = x0; then
 	echo "Scheduler is PID $cupsd and is listening on port 8631."
 	echo ""
@@ -469,7 +466,7 @@ done
 # Create the test report source file...
 #
 
-strfile=cups-str-1.4-`date +%Y-%m-%d`-$user.html
+strfile=/tmp/cups-$user/cups-str-1.4-`date +%Y-%m-%d`-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -492,7 +489,7 @@ for file in 4*.test; do
 	echo "Performing $file..."
 	echo "" >>$strfile
 
-	./ipptest ipp://localhost:$port/printers $file >>$strfile
+	./ipptest ipp://localhost:$port/printers $file | tee -a $strfile
 	status=$?
 
 	if test $status != 0; then
@@ -521,7 +518,7 @@ for file in 5*.sh; do
 	echo "" >>$strfile
 	echo "\"$file\":" >>$strfile
 
-	sh $file $pjobs >>$strfile
+	sh $file $pjobs | tee -a $strfile
 	status=$?
 
 	if test $status != 0; then
@@ -531,20 +528,6 @@ for file in 5*.sh; do
 done
 
 echo "</PRE>" >>$strfile
-
-#
-# Wait for jobs to complete...
-#
-
-while true; do
-	jobs=`../systemv/lpstat 2>/dev/null`
-	if test "x$jobs" = "x"; then
-		break
-	fi
-
-	echo "Waiting for jobs to complete..."
-	sleep 10
-done
 
 #
 # Stop the server...
@@ -558,27 +541,181 @@ kill $cupsd
 
 echo "<H1>3 - Log Files</H1>" >>$strfile
 
+#
+# Verify counts...
+#
+
+echo "Test Summary"
+echo ""
+echo "<H2>Summary</H2>" >>$strfile
+
+# Pages printed on Test1
+count=`grep '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+expected=`expr $pjobs \* 2 + 35`
+if test $count != $expected; then
+	echo "FAIL: Printer 'Test1' produced $count page(s), expected $expected."
+	echo "<P>FAIL: Printer 'Test1' produced $count page(s), expected $expected.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: Printer 'Test1' correctly produced $count page(s)."
+	echo "<P>PASS: Printer 'Test1' correctly produced $count page(s).</P>" >>$strfile
+fi
+
+# Paged printed on Test2
+count=`grep '^Test2 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+expected=`expr $pjobs \* 2 + 3`
+if test $count != $expected; then
+	echo "FAIL: Printer 'Test2' produced $count page(s), expected $expected."
+	echo "<P>FAIL: Printer 'Test2' produced $count page(s), expected $expected.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: Printer 'Test2' correctly produced $count page(s)."
+	echo "<P>PASS: Printer 'Test2' correctly produced $count page(s).</P>" >>$strfile
+fi
+
+# Requested processed
+count=`wc -l /tmp/cups-$user/log/access_log | awk '{print $1}'`
+echo "PASS: $count requests processed."
+echo "<P>PASS: $count requests processed.</P>" >>$strfile
+
+# Emergency log messages
+count=`grep '^X ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count emergency messages, expected 0."
+	grep '^X ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count emergency messages, expected 0.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^X ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count emergency messages."
+	echo "<P>PASS: $count emergency messages.</P>" >>$strfile
+fi
+
+# Alert log messages
+count=`grep '^A ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count alert messages, expected 0."
+	grep '^A ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count alert messages, expected 0.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^A ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count alert messages."
+	echo "<P>PASS: $count alert messages.</P>" >>$strfile
+fi
+
+# Critical log messages
+count=`grep '^C ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count critical messages, expected 0."
+	grep '^C ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count critical messages, expected 0.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^C ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count critical messages."
+	echo "<P>PASS: $count critical messages.</P>" >>$strfile
+fi
+
+# Error log messages
+count=`grep '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 9; then
+	echo "FAIL: $count error messages, expected 9."
+	grep '^E ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count error messages, expected 9.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count error messages."
+	echo "<P>PASS: $count error messages.</P>" >>$strfile
+fi
+
+# Warning log messages
+count=`grep '^W ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count warning messages, expected 0."
+	grep '^W ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count warning messages, expected 0.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^W ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count warning messages."
+	echo "<P>PASS: $count warning messages.</P>" >>$strfile
+fi
+
+# Notice log messages
+count=`grep '^N ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count notice messages, expected 0."
+	grep '^N ' /tmp/cups-$user/log/error_log
+	echo "<P>FAIL: $count notice messages, expected 0.</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep '^N ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count notice messages."
+	echo "<P>PASS: $count notice messages.</P>" >>$strfile
+fi
+
+# Info log messages
+count=`grep '^I ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count = 0; then
+	echo "FAIL: $count info messages, expected more than 0."
+	echo "<P>FAIL: $count info messages, expected more than 0.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count info messages."
+	echo "<P>PASS: $count info messages.</P>" >>$strfile
+fi
+
+# Debug log messages
+count=`grep '^D ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count = 0; then
+	echo "FAIL: $count debug messages, expected more than 0."
+	echo "<P>FAIL: $count debug messages, expected more than 0.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count debug messages."
+	echo "<P>PASS: $count debug messages.</P>" >>$strfile
+fi
+
+# Debug2 log messages
+count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+if test $count != 0; then
+	echo "FAIL: $count debug2 messages, expected 0."
+	echo "<P>FAIL: $count debug2 messages, expected 0.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count debug2 messages."
+	echo "<P>PASS: $count debug2 messages.</P>" >>$strfile
+fi
+
+# Log files...
 echo "<H2>access_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/cups-$user/log/access_log >>$strfile
+sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' /tmp/cups-$user/log/access_log >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/cups-$user/log/error_log >>$strfile
+sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' /tmp/cups-$user/log/error_log >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-cat /tmp/cups-$user/log/page_log >>$strfile
+sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' /tmp/cups-$user/log/page_log >>$strfile
 echo "</PRE>" >>$strfile
-
-if test -f /tmp/cups-$user/log/cupsd.trace; then
-	echo "<H2>cupsd.trace</H2>" >>$strfile
-	echo "<PRE>" >>$strfile
-	cat /tmp/cups-$user/log/cupsd.trace >>$strfile
-	echo "</PRE>" >>$strfile
-fi
 
 #
 # Format the reports and tell the user where to find them...
@@ -595,7 +732,7 @@ else
 fi
 
 echo "Log files can be found in /tmp/cups-$user/log."
-echo "A HTML report was created in test/$strfile."
+echo "A HTML report was created in $strfile."
 echo ""
 
 if test $fail != 0; then
