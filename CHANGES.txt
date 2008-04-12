@@ -3,6 +3,8 @@ CHANGES.txt - 2008-04-08
 
 CHANGES IN CUPS V1.4b1
 
+	- The cups-deviced helper application now runs backends in
+	  parallel to get the list of devices faster.
 	- Added --enable-pap configure option.
 	- The default cupsd.conf file now includes an "authenticated"
 	  policy which requires authentication for remote print jobs.
