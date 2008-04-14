@@ -3,7 +3,7 @@
  *
  *   File test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,6 +34,7 @@
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
+#include <fcntl.h>
 
 
 /*
@@ -51,8 +52,10 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  int	status;				/* Exit status */
-  char	filename[1024];			/* Filename buffer */
+  int		status;			/* Exit status */
+  char		filename[1024];		/* Filename buffer */
+  int		fd;			/* Open file descriptor */
+  cups_file_t	*fdfile;		/* File opened with cupsFileOpenFd() */
 
 
   if (argc == 1)
@@ -72,6 +75,39 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     status += read_write_tests(1);
 #endif /* HAVE_LIBZ */
+
+   /*
+    * Test fdopen and close without reading...
+    */
+
+    fd = open("/dev/null", O_RDONLY);
+
+    fputs("cupsFileOpenFd(fd, \"r\"): ", stdout);
+    fflush(stdout);
+
+    if ((fdfile = cupsFileOpenFd(fd, "r")) == NULL)
+    {
+      puts("FAIL");
+      status ++;
+    }
+    else
+    {
+     /*
+      * Able to open file, now close without reading.  If we don't return
+      * before the alarm fires, that is a failure and we will crash on the
+      * alarm signal...
+      */
+
+      puts("PASS");
+      fputs("cupsFileClose(no read): ", stdout);
+      fflush(stdout);
+
+      alarm(5);
+      cupsFileClose(fdfile);
+      alarm(0);
+
+      puts("PASS");
+    }
 
    /*
     * Test path functions...
