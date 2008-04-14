@@ -4,14 +4,16 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The scheduler now ensures that the RSS directory has
+	  the correct permissions.
 	- The RSS notifier did not quote the feed URL in the RSS
 	  file it created (STR #2801)
+	- The web interface allowed the creation and cancellation
+	  of RSS subscriptions without a username (STR #2774)
 	- Increased the default MaxCopies value on Mac OS X to
 	  9999 to match the limit imposed by the print dialog.
 	- The scheduler did not reject requests with an empty
 	  Content-Length field (STR #2787)
-	- The web interface allowed the creation and cancellation
-	  of RSS subscriptions without a username (STR #2774)
 	- The PNG image loading code would crash with large images
 	  (STR #2790)
 	- The scheduler did not log the current date and time and

@@ -783,9 +783,13 @@ cupsdReadConfiguration(void)
   * writable by the user and group in the cupsd.conf file...
   */
 
+  snprintf(temp, sizeof(temp), "%s/rss", CacheDir);
+
   if (cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
 			    Group, 1, 1) < 0 ||
       cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
+			    Group, 1, 1) < 0 ||
+      cupsdCheckPermissions(temp, NULL, 0775, RunUser,
 			    Group, 1, 1) < 0 ||
       cupsdCheckPermissions(StateDir, NULL, 0755, RunUser,
 			    Group, 1, 1) < 0 ||
