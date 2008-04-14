@@ -41,7 +41,7 @@
 
 typedef struct
 {
-  char		*backend;		/* Name of backend */
+  char		*name;		/* Name of backend */
   int		pid,			/* Process ID */
 		status;			/* Exit status */
   cups_file_t	*pipe;			/* Pipe from backend stdout */
@@ -84,6 +84,8 @@ static int		send_class,	/* Send device-class attribute? */
 					/* Send device-make-and-model attribute? */
 			send_uri,	/* Send device-uri attribute? */
 			send_id;	/* Send device-id attribute? */
+static int		dead_children = 0;
+					/* Dead children? */
 
 
 /*
@@ -99,8 +101,9 @@ static int		compare_devices(cupsd_device_t *p0,
 			                cupsd_device_t *p1);
 static double		get_current_time(void);
 static void		get_device(cupsd_backend_t *backend);
+static void		process_children(void);
+static void		sigchld_handler(int sig);
 static int		start_backend(const char *backend, int root);
-static void		stop_backend(cupsd_backend_t *backend);
 
 
 /*
@@ -192,6 +195,23 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * Listen to child signals...
+  */
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGCHLD, sigchld_handler);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGCHLD);
+  action.sa_handler = sigchld_handler;
+  sigaction(SIGCHLD, &action, NULL);
+#else
+  signal(SIGCLD, sigchld_handler);	/* No, SIGCLD isn't a typo... */
+#endif /* HAVE_SIGSET */
+
+ /*
   * Try opening the backend directory...
   */
 
@@ -268,6 +288,13 @@ main(int  argc,				/* I - Number of command-line args */
         if (backend_fds[i].revents)
 	  get_device(backends + i);
     }
+
+   /*
+    * Get exit status from children...
+    */
+
+    if (dead_children)
+      process_children();
   }
 
   cupsdSendIPPTrailer();
@@ -280,7 +307,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     for (i = 0; i < num_backends; i ++)
       if (backends[i].pid)
-        stop_backend(backends + i);
+	kill(backends[i].pid, SIGTERM);
   }
 
   return (0);
@@ -447,7 +474,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
 	line[strlen(line) - 1] = '\0';
 
       fprintf(stderr, "ERROR: [cups-deviced] Bad line from \"%s\": %s\n",
-	      backend->backend, line);
+	      backend->name, line);
     }
     else
     {
@@ -456,7 +483,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
       */
 
       if (!add_device(dclass, make_model, info, uri, device_id))
-        fprintf(stderr, "DEBUG: [cups-deviced] Added device \"%s\"...\n", uri);
+        fprintf(stderr, "DEBUG: [cups-deviced] Found device \"%s\"...\n", uri);
     }
   }
   else
@@ -465,15 +492,103 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
     * End of file...
     */
 
-    if (waitpid(backend->pid, &(backend->status), WNOHANG) == backend->pid)
-    {
-      backend->pid = 0;
-      cupsFileClose(backend->pipe);
-      backend_fds[backend - backends].events = 0;
-      active_backends --;
-      // TODO: report status...
-    }
+    cupsFileClose(backend->pipe);
+    backend_fds[backend - backends].events = 0;
   }
+}
+
+
+/*
+ * 'process_children()' - Process all dead children...
+ */
+
+static void
+process_children(void)
+{
+  int			i;		/* Looping var */
+  int			status;		/* Exit status of child */
+  int			pid;		/* Process ID of child */
+  cupsd_backend_t	*backend;	/* Current backend */
+  const char		*name;		/* Name of process */
+
+
+ /*
+  * Reset the dead_children flag...
+  */
+
+  dead_children = 0;
+
+ /*
+  * Collect the exit status of some children...
+  */
+
+#ifdef HAVE_WAITPID
+  while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+#elif defined(HAVE_WAIT3)
+  while ((pid = wait3(&status, WNOHANG, NULL)) > 0)
+#else
+  if ((pid = wait(&status)) > 0)
+#endif /* HAVE_WAITPID */
+  {
+    if (status == SIGTERM)
+      status = 0;
+
+    for (i = num_backends, backend = backends; i > 0; i --, backend ++)
+      if (backend->pid == pid)
+        break;
+
+    if (i > 0)
+    {
+      name            = backend->name;
+      backend->pid    = 0;
+      backend->status = status;
+
+      active_backends --;
+    }
+    else
+      name = "Unknown";
+
+    if (status)
+    {
+      if (WIFEXITED(status))
+	fprintf(stderr,
+	        "ERROR: [cups-deviced] PID %d (%s) stopped with status %d!\n",
+		pid, name, WEXITSTATUS(status));
+      else
+	fprintf(stderr,
+	        "ERROR: [cups-deviced] PID %d (%s) crashed on signal %d!\n",
+		pid, name, WTERMSIG(status));
+    }
+    else
+      fprintf(stderr,
+              "DEBUG: [cups-deviced] PID %d (%s) exited with no errors.\n",
+	      pid, name);
+  }
+}
+
+
+/*
+ * 'sigchld_handler()' - Handle 'child' signals from old processes.
+ */
+
+static void
+sigchld_handler(int sig)		/* I - Signal number */
+{
+  (void)sig;
+
+ /*
+  * Flag that we have dead children...
+  */
+
+  dead_children = 1;
+
+ /*
+  * Reset the signal handler as needed...
+  */
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGCLD, sigchld_handler);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
 }
 
 
@@ -552,33 +667,23 @@ start_backend(const char *name,		/* I - Backend to run */
   * pipe...
   */
 
+  fprintf(stderr, "DEBUG: [cups-deviced] Started backend %s (PID %d)\n",
+          program, backend->pid);
+
   close(fds[1]);
 
   backend_fds[num_backends].fd     = fds[0];
   backend_fds[num_backends].events = POLLIN;
 
-  backend->backend = strdup(name);
-  backend->status  = 0;
-  backend->pipe    = cupsFileOpenFd(fds[0], "r");
-  backend->count   = 0;
+  backend->name   = strdup(name);
+  backend->status = 0;
+  backend->pipe   = cupsFileOpenFd(fds[0], "r");
+  backend->count  = 0;
 
   active_backends ++;
   num_backends ++;
 
   return (0);
-}
-
-
-/*
- * 'stop_backend()' - Stop a backend.
- */
-
-static void
-stop_backend(cupsd_backend_t *backend)	/* I - Backend to stop */
-{
-  kill(backend->pid, SIGTERM);
-
-  free(backend->backend);
 }
 
 
