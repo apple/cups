@@ -68,9 +68,13 @@ main(int  argc,				/* I - Number of command-line args */
 		pdfwaitpid,		/* Process ID from wait() */
 		pdfstatus,		/* Status from pdftops */
 		pdfargc;		/* Number of args for pdftops */
-  char		*pdfargv[100],		/* Arguments for pdftops */
+  char		*pdfargv[100],		/* Arguments for pdftops/gs */
+#ifdef HAVE_PDFTOPS
 		pdfwidth[255],		/* Paper width */
 		pdfheight[255];		/* Paper height */
+#else
+		pdfgeometry[255];	/* Paper width and height */
+#endif /* HAVE_PDFTOPS */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -157,11 +161,22 @@ main(int  argc,				/* I - Number of command-line args */
   cupsMarkOptions(ppd, num_options, options);
 
  /*
-  * Build the command-line for the pdftops filter...
+  * Build the command-line for the pdftops or gs filter...
   */
 
+#ifdef HAVE_PDFTOPS
   pdfargv[0] = (char *)"pdftops";
   pdfargc    = 1;
+#else
+  pdfargv[0] = (char *)"gs";
+  pdfargv[1] = (char *)"-q";
+  pdfargv[2] = (char *)"-dNOPAUSE";
+  pdfargv[3] = (char *)"-dBATCH";
+  pdfargv[4] = (char *)"-dSAFER";
+  pdfargv[5] = (char *)"-sDEVICE=pswrite";
+  pdfargv[6] = (char *)"-sOUTPUTFILE=%stdout";
+  pdfargc    = 7;
+#endif /* HAVE_PDFTOPS */
 
   if (ppd)
   {
@@ -171,17 +186,29 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (ppd->language_level == 1)
     {
+#ifdef HAVE_PDFTOPS
       pdfargv[pdfargc++] = (char *)"-level1";
       pdfargv[pdfargc++] = (char *)"-noembtt";
+#else
+      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=1";
+#endif /* HAVE_PDFTOPS */
     }
     else if (ppd->language_level == 2)
     {
+#ifdef HAVE_PDFTOPS
       pdfargv[pdfargc++] = (char *)"-level2";
       if (!ppd->ttrasterizer)
 	pdfargv[pdfargc++] = (char *)"-noembtt";
+#else
+      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=2";
+#endif /* HAVE_PDFTOPS */
     }
     else
+#ifdef HAVE_PDFTOPS
       pdfargv[pdfargc++] = (char *)"-level3";
+#else
+      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=3";
+#endif /* HAVE_PDFTOPS */
 
    /*
     * Set output page size...
@@ -218,6 +245,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  orientation ^= 1;
       }
 
+#ifdef HAVE_PDFTOPS
       if (orientation & 1)
       {
 	snprintf(pdfwidth, sizeof(pdfwidth), "%.0f", size->length);
@@ -233,9 +261,20 @@ main(int  argc,				/* I - Number of command-line args */
       pdfargv[pdfargc++] = pdfwidth;
       pdfargv[pdfargc++] = (char *)"-paperh";
       pdfargv[pdfargc++] = pdfheight;
+#else
+      if (orientation & 1)
+	snprintf(pdfgeometry, sizeof(pdfgeometry), "-g%.0fx%.0f", size->length,
+	         size->width);
+      else
+	snprintf(pdfgeometry, sizeof(pdfgeometry), "-g%.0fx%.0f", size->width,
+	         size->length);
+
+      pdfargv[pdfargc++] = pdfgeometry;
+#endif /* HAVE_PDFTOPS */
     }
   }
 
+#ifdef HAVE_PDFTOPS
   if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
       strcasecmp(val, "no") && strcasecmp(val, "off") &&
       strcasecmp(val, "false"))
@@ -243,7 +282,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   pdfargv[pdfargc++] = filename;
   pdfargv[pdfargc++] = (char *)"-";
-  pdfargv[pdfargc]   = NULL;
+#else
+  pdfargv[pdfargc++] = (char *)"-c";
+  pdfargv[pdfargc++] = (char *)"save pop";
+  pdfargv[pdfargc++] = (char *)"-f";
+  pdfargv[pdfargc++] = filename;
+#endif /* HAVE_PDFTOPS */
+
+  pdfargv[pdfargc] = NULL;
 
   if ((pdfpid = fork()) == 0)
   {
@@ -251,8 +297,14 @@ main(int  argc,				/* I - Number of command-line args */
     * Child comes here...
     */
 
+#ifdef HAVE_PDFTOPS
     execv(CUPS_PDFTOPS, pdfargv);
-    _cupsLangPrintError(_("ERROR: Unable to execute pdftops filter"));
+    _cupsLangPrintError(_("ERROR: Unable to execute pdftops program"));
+#else
+    execv(CUPS_GHOSTSCRIPT, pdfargv);
+    _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
+#endif /* HAVE_PDFTOPS */
+
     exit(1);
   }
   else if (pdfpid < 0)
@@ -261,7 +313,12 @@ main(int  argc,				/* I - Number of command-line args */
     * Unable to fork!
     */
 
-    _cupsLangPrintError(_("ERROR: Unable to execute pdftops filter"));
+#ifdef HAVE_PDFTOPS
+    _cupsLangPrintError(_("ERROR: Unable to execute pdftops program"));
+#else
+    _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
+#endif /* HAVE_PDFTOPS */
+
     pdfstatus = 1;
   }
   else
