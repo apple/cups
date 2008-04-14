@@ -41,7 +41,7 @@
 
 typedef struct
 {
-  char		*name;		/* Name of backend */
+  char		*name;			/* Name of backend */
   int		pid,			/* Process ID */
 		status;			/* Exit status */
   cups_file_t	*pipe;			/* Pipe from backend stdout */
@@ -100,7 +100,7 @@ static int		add_device(const char *device_class,
 static int		compare_devices(cupsd_device_t *p0,
 			                cupsd_device_t *p1);
 static double		get_current_time(void);
-static void		get_device(cupsd_backend_t *backend);
+static int		get_device(cupsd_backend_t *backend);
 static void		process_children(void);
 static void		sigchld_handler(int sig);
 static int		start_backend(const char *backend, int root);
@@ -285,8 +285,12 @@ main(int  argc,				/* I - Number of command-line args */
     if (poll(backend_fds, num_backends, timeout) > 0)
     {
       for (i = 0; i < num_backends; i ++)
-        if (backend_fds[i].revents)
-	  get_device(backends + i);
+        if (backend_fds[i].revents && backends[i].pipe)
+	  if (get_device(backends + i))
+	  {
+	    backend_fds[i].fd     = 0;
+	    backend_fds[i].events = 0;
+	  }
     }
 
    /*
@@ -440,7 +444,7 @@ get_current_time(void)
  * 'get_device()' - Get a device from a backend.
  */
 
-static void
+static int				/* O - 0 on success, -1 on error */
 get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
 {
   char	line[2048],			/* Line from backend */
@@ -485,16 +489,18 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
       if (!add_device(dclass, make_model, info, uri, device_id))
         fprintf(stderr, "DEBUG: [cups-deviced] Found device \"%s\"...\n", uri);
     }
-  }
-  else
-  {
-   /*
-    * End of file...
-    */
 
-    cupsFileClose(backend->pipe);
-    backend_fds[backend - backends].events = 0;
+    return (0);
   }
+
+ /*
+  * End of file...
+  */
+
+  cupsFileClose(backend->pipe);
+  backend->pipe = NULL;
+
+  return (-1);
 }
 
 
