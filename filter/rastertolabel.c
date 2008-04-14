@@ -482,9 +482,6 @@ EndPage(ppd_file_t *ppd,		/* I - PPD file */
 {
   int		val;			/* Option value */
   ppd_choice_t	*choice;		/* Marked choice */
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;		/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
   switch (ModelNumber)

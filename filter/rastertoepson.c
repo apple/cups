@@ -322,11 +322,6 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 void
 EndPage(const cups_page_header2_t *header)	/* I - Page header */
 {
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction action;			/* Actions for POSIX signals */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-
   if (DotBytes && header)
   {
    /*
