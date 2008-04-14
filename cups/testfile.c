@@ -54,7 +54,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		status;			/* Exit status */
   char		filename[1024];		/* Filename buffer */
-  int		fd;			/* Open file descriptor */
+  int		fds[2];			/* Open file descriptors */
   cups_file_t	*fdfile;		/* File opened with cupsFileOpenFd() */
 
 
@@ -80,12 +80,13 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Test fdopen and close without reading...
     */
 
-    fd = open("/dev/null", O_RDONLY);
+    pipe(fds);
+    close(fds[1]);
 
     fputs("cupsFileOpenFd(fd, \"r\"): ", stdout);
     fflush(stdout);
 
-    if ((fdfile = cupsFileOpenFd(fd, "r")) == NULL)
+    if ((fdfile = cupsFileOpenFd(fds[0], "r")) == NULL)
     {
       puts("FAIL");
       status ++;
