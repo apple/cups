@@ -1,8 +1,11 @@
-CHANGES.txt - 2008-04-08
+CHANGES.txt - 2008-04-14
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The CUPS-Get-Devices operation now supports the
+	  exclude-schemes and timeout attributes to control which
+	  backends are polled and for how long.
 	- The cups-deviced helper application now runs backends in
 	  parallel to get the list of devices faster.
 	- Added --enable-pap configure option.

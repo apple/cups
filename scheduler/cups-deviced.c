@@ -14,6 +14,15 @@
  *
  * Contents:
  *
+ *   main()                 - Scan for devices and return an IPP response.
+ *   add_device()           - Add a new device to the list.
+ *   compare_devices()      - Compare device names to eliminate duplicates.
+ *   create_strings_array() - Create a CUPS array of strings.
+ *   get_current_time()     - Get the current time as a double value in seconds.
+ *   get_device()           - Get a device from a backend.
+ *   process_children()     - Process all dead children...
+ *   sigchld_handler()      - Handle 'child' signals from old processes.
+ *   start_backend()        - Run a backend to gather the available devices.
  */
 
 /*
@@ -99,6 +108,7 @@ static int		add_device(const char *device_class,
 				   const char *device_id);
 static int		compare_devices(cupsd_device_t *p0,
 			                cupsd_device_t *p1);
+static cups_array_t	*create_strings_array(const char *s);
 static double		get_current_time(void);
 static int		get_device(cupsd_backend_t *backend);
 static void		process_children(void);
@@ -129,7 +139,8 @@ main(int  argc,				/* I - Number of command-line args */
 		end_time;		/* Ending time */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
-  const char	*requested;		/* requested-attributes option */
+  cups_array_t	*requested,		/* requested-attributes values */
+		*exclude;		/* exclude-schemes values */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -141,9 +152,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Check the command-line...
   */
 
-  if (argc != 5)
+  if (argc != 6)
   {
-    fputs("Usage: cups-deviced request-id limit user-id options\n", stderr);
+    fputs("Usage: cups-deviced request-id limit timeout user-id options\n", stderr);
 
     return (1);
   }
@@ -151,7 +162,7 @@ main(int  argc,				/* I - Number of command-line args */
   request_id = atoi(argv[1]);
   if (request_id < 1)
   {
-    fprintf(stderr, "cups-deviced: Bad request ID %d!\n", request_id);
+    fprintf(stderr, "ERROR: [cups-deviced] Bad request ID %d!\n", request_id);
 
     return (1);
   }
@@ -159,39 +170,42 @@ main(int  argc,				/* I - Number of command-line args */
   device_limit = atoi(argv[2]);
   if (device_limit < 0)
   {
-    fprintf(stderr, "cups-deviced: Bad limit %d!\n", device_limit);
+    fprintf(stderr, "ERROR: [cups-deviced] Bad limit %d!\n", device_limit);
 
     return (1);
   }
 
-  normal_user = atoi(argv[3]);
+  timeout = atoi(argv[3]);
+  if (timeout < 1)
+  {
+    fprintf(stderr, "ERROR: [cups-deviced] Bad timeout %d!\n", timeout);
+
+    return (1);
+  }
+
+  normal_user = atoi(argv[4]);
   if (normal_user <= 0)
   {
-    fprintf(stderr, "cups-deviced: Bad user %d!\n", normal_user);
+    fprintf(stderr, "ERROR: [cups-deviced] Bad user %d!\n", normal_user);
 
     return (1);
   }
 
-  timeout = 10; // TODO: Add timeout argument
+  num_options = cupsParseOptions(argv[5], 0, &options);
+  requested   = create_strings_array(cupsGetOption("requested-attributes",
+                                                   num_options, options));
+  exclude     = create_strings_array(cupsGetOption("exclude-schemes",
+                                                   num_options, options));
 
-  num_options = cupsParseOptions(argv[4], 0, &options);
-  requested   = cupsGetOption("requested-attributes", num_options, options);
-
-  if (!requested || strstr(requested, "all"))
-  {
-    send_class          = 1;
-    send_info           = 1;
-    send_make_and_model = 1;
-    send_uri            = 1;
-    send_id             = 1;
-  }
+  if (!requested || cupsArrayFind(requested, "all") != NULL)
+    send_class = send_info = send_make_and_model = send_uri = send_id = 1;
   else
   {
-    send_class          = strstr(requested, "device-class") != NULL;
-    send_info           = strstr(requested, "device-info") != NULL;
-    send_make_and_model = strstr(requested, "device-make-and-model") != NULL;
-    send_uri            = strstr(requested, "device-uri") != NULL;
-    send_id             = strstr(requested, "device-id") != NULL;
+    send_class          = cupsArrayFind(requested, "device-class") != NULL;
+    send_info           = cupsArrayFind(requested, "device-info") != NULL;
+    send_make_and_model = cupsArrayFind(requested, "device-make-and-model") != NULL;
+    send_uri            = cupsArrayFind(requested, "device-uri") != NULL;
+    send_id             = cupsArrayFind(requested, "device-id") != NULL;
   }
 
  /*
@@ -247,6 +261,9 @@ main(int  argc,				/* I - Number of command-line args */
     if (!S_ISREG(dent->fileinfo.st_mode) ||
         !isalnum(dent->filename[0] & 255) ||
         (dent->fileinfo.st_mode & (S_IRUSR | S_IXUSR)) != (S_IRUSR | S_IXUSR))
+      continue;
+
+    if (cupsArrayFind(exclude, dent->filename))
       continue;
 
    /*
@@ -421,6 +438,49 @@ compare_devices(cupsd_device_t *d0,	/* I - First device */
     return (diff);
   else
     return (strcasecmp(d0->device_uri, d1->device_uri));
+}
+
+
+/*
+ * 'create_strings_array()' - Create a CUPS array of strings.
+ */
+
+static cups_array_t *			/* O - CUPS array */
+create_strings_array(const char *s)	/* I - Comma-delimited strings */
+{
+  cups_array_t	*a;			/* CUPS array */
+  const char	*start,			/* Start of string */
+		*end;			/* End of string */
+  char		*ptr;			/* New string */
+
+
+  if (!s)
+    return (NULL);
+
+  if ((a = cupsArrayNew((cups_array_func_t)strcmp, NULL)) != NULL)
+  {
+    for (start = end = s; *end; start = end + 1)
+    {
+     /*
+      * Find the end of the current delimited string...
+      */
+
+      if ((end = strchr(start, ',')) == NULL)
+        end = start + strlen(start);
+
+     /*
+      * Duplicate the string and add it to the array...
+      */
+
+      if ((ptr = calloc(1, end - start + 1)) == NULL)
+        break;
+
+      memcpy(ptr, start, end - start);
+      cupsArrayAdd(a, ptr);
+    }
+  }
+
+  return (a);
 }
 
 
