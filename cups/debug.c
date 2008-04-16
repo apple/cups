@@ -108,7 +108,8 @@ _cups_debug_puts(const char *s)		/* I - String to output */
 }
 
 
-#elif 0 /* defined(__APPLE__) */
+#elif defined(__APPLE__)
+/* Mac OS X needs these stubbed since we reference them in the libcups.exp file */
 void	_cups_debug_printf(const char *format, ...) {}
 void	_cups_debug_puts(const char *s) {}
 #endif /* DEBUG */
