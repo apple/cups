@@ -917,7 +917,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
   DEBUG_printf(("cupsGetPPD3(http=%p, name=\"%s\", modtime=%p(%d), buffer=%p, "
                 "bufsize=%d)\n", http, name ? name : "(null)", modtime,
-		modtime ? *modtime : 0, buffer, (int)bufsize));
+		modtime ? (int)*modtime : 0, buffer, (int)bufsize));
 
   if (!name)
   {

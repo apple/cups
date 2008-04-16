@@ -3,7 +3,7 @@
  *
  *   "lpq" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -355,8 +355,8 @@ show_jobs(const char *command,		/* I - Command name */
 		};
 
 
-  DEBUG_printf(("show_jobs(%08x, %08x, %08x, %d, %d)\n", http, dest, user, id,
-                longstatus));
+  DEBUG_printf(("show_jobs(http=%p, dest=%p, user=%p, id=%d, longstatus%d)\n",
+                http, dest, user, id, longstatus));
 
   if (http == NULL)
     return (0);

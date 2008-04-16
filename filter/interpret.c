@@ -468,9 +468,8 @@ _cupsRasterExecPS(
   while ((obj = scan_ps(st, &codeptr)) != NULL)
   {
 #ifdef DEBUG
-    printf("    (%d): ", st->num_objs);
+    DEBUG_printf(("_cupsRasterExecPS: Stack (%d objects)\n", st->num_objs));
     DEBUG_object(obj);
-    putchar('\n');
 #endif /* DEBUG */
 
     switch (obj->type)
@@ -486,7 +485,7 @@ _cupsRasterExecPS(
 	    _cupsRasterAddError("cleartomark: Stack underflow!\n");
 
 #ifdef DEBUG
-          fputs("    dup: ", stdout);
+          DEBUG_puts("    dup: ");
 	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
@@ -498,7 +497,7 @@ _cupsRasterExecPS(
 	    copy_stack(st, (int)obj->value.number);
 
 #ifdef DEBUG
-            fputs("    copy: ", stdout);
+            DEBUG_puts("_cupsRasterExecPS: copy");
 	    DEBUG_stack(st);
 #endif /* DEBUG */
           }
@@ -509,7 +508,7 @@ _cupsRasterExecPS(
 	  copy_stack(st, 1);
 
 #ifdef DEBUG
-          fputs("    dup: ", stdout);
+          DEBUG_puts("_cupsRasterExecPS: dup");
 	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
@@ -521,7 +520,7 @@ _cupsRasterExecPS(
 	    index_stack(st, (int)obj->value.number);
 
 #ifdef DEBUG
-            fputs("    index: ", stdout);
+            DEBUG_puts("_cupsRasterExecPS: index");
 	    DEBUG_stack(st);
 #endif /* DEBUG */
           }
@@ -532,7 +531,7 @@ _cupsRasterExecPS(
           pop_stack(st);
 
 #ifdef DEBUG
-          fputs("    pop: ", stdout);
+          DEBUG_puts("_cupsRasterExecPS: pop");
 	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
@@ -551,7 +550,7 @@ _cupsRasterExecPS(
 	      roll_stack(st, (int)obj->value.number, c);
 
 #ifdef DEBUG
-              fputs("    roll:", stdout);
+              DEBUG_puts("_cupsRasterExecPS: roll");
 	      DEBUG_stack(st);
 #endif /* DEBUG */
             }
@@ -563,7 +562,7 @@ _cupsRasterExecPS(
 	  setpagedevice(st, h, preferred_bits);
 
 #ifdef DEBUG
-          fputs("    setpagedevice: ", stdout);
+          DEBUG_puts("_cupsRasterExecPS: setpagedevice");
 	  DEBUG_stack(st);
 #endif /* DEBUG */
           break;
@@ -576,7 +575,8 @@ _cupsRasterExecPS(
 
       case CUPS_PS_OTHER :
           _cupsRasterAddError("Unknown operator \"%s\"!\n", obj->value.other);
-          DEBUG_printf(("    Unknown operator \"%s\"!\n", obj->value.other));
+          DEBUG_printf(("_cupsRasterExecPS: Unknown operator \"%s\"!\n",
+	                obj->value.other));
           break;
     }
 
@@ -595,7 +595,7 @@ _cupsRasterExecPS(
     error_stack(st, "Stack not empty:");
 
 #ifdef DEBUG
-    fputs("    Stack not empty:", stdout);
+    DEBUG_puts("_cupsRasterExecPS: Stack not empty:");
     DEBUG_stack(st);
 #endif /* DEBUG */
 
@@ -1353,7 +1353,7 @@ setpagedevice(
   * Now pull /name and value pairs from the dictionary...
   */
 
-  DEBUG_puts("    Dictionary:");
+  DEBUG_puts("setpagedevice: Dictionary:");
 
   for (obj ++; obj < end; obj ++)
   {
@@ -1368,9 +1368,8 @@ setpagedevice(
     obj ++;
 
 #ifdef DEBUG
-    printf("        /%s ", name);
+    DEBUG_printf(("setpagedevice: /%s ", name));
     DEBUG_object(obj);
-    putchar('\n');
 #endif /* DEBUG */
 
    /*
@@ -1542,86 +1541,86 @@ DEBUG_object(_cups_ps_obj_t *obj)	/* I - Object to print */
   switch (obj->type)
   {
     case CUPS_PS_NAME :
-	printf("/%s", obj->value.name);
+	DEBUG_printf(("/%s\n", obj->value.name));
 	break;
 
     case CUPS_PS_NUMBER :
-	printf("%g", obj->value.number);
+	DEBUG_printf(("%g\n", obj->value.number));
 	break;
 
     case CUPS_PS_STRING :
-	printf("(%s)", obj->value.string);
+	DEBUG_printf(("(%s)\n", obj->value.string));
 	break;
 
     case CUPS_PS_BOOLEAN :
 	if (obj->value.boolean)
-	  fputs("true", stdout);
+	  DEBUG_puts("true");
 	else
-	  fputs("false", stdout);
+	  DEBUG_puts("false");
 	break;
 
     case CUPS_PS_NULL :
-	fputs("null", stdout);
+	DEBUG_puts("null");
 	break;
 
     case CUPS_PS_START_ARRAY :
-	fputs("[", stdout);
+	DEBUG_puts("[");
 	break;
 
     case CUPS_PS_END_ARRAY :
-	fputs("]", stdout);
+	DEBUG_puts("]");
 	break;
 
     case CUPS_PS_START_DICT :
-	fputs("<<", stdout);
+	DEBUG_puts("<<");
 	break;
 
     case CUPS_PS_END_DICT :
-	fputs(">>", stdout);
+	DEBUG_puts(">>");
 	break;
 
     case CUPS_PS_START_PROC :
-	fputs("{", stdout);
+	DEBUG_puts("{");
 	break;
 
     case CUPS_PS_END_PROC :
-	fputs("}", stdout);
+	DEBUG_puts("}");
 	break;
 
     case CUPS_PS_CLEARTOMARK :
-	fputs("--cleartomark--", stdout);
+	DEBUG_puts("--cleartomark--");
         break;
 
     case CUPS_PS_COPY :
-	fputs("--copy--", stdout);
+	DEBUG_puts("--copy--");
         break;
 
     case CUPS_PS_DUP :
-	fputs("--dup--", stdout);
+	DEBUG_puts("--dup--");
         break;
 
     case CUPS_PS_INDEX :
-	fputs("--index--", stdout);
+	DEBUG_puts("--index--");
         break;
 
     case CUPS_PS_POP :
-	fputs("--pop--", stdout);
+	DEBUG_puts("--pop--");
         break;
 
     case CUPS_PS_ROLL :
-	fputs("--roll--", stdout);
+	DEBUG_puts("--roll--");
         break;
 
     case CUPS_PS_SETPAGEDEVICE :
-	fputs("--setpagedevice--", stdout);
+	DEBUG_puts("--setpagedevice--");
         break;
 
     case CUPS_PS_STOPPED :
-	fputs("--stopped--", stdout);
+	DEBUG_puts("--stopped--");
         break;
 
     case CUPS_PS_OTHER :
-	printf("--%s--", obj->value.other);
+	DEBUG_printf(("--%s--\n", obj->value.other));
 	break;
   }
 }
@@ -1639,12 +1638,7 @@ DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 
 
   for (obj = st->objs, c = st->num_objs; c > 0; c --, obj ++)
-  {
-    putchar(' ');
     DEBUG_object(obj);
-  }
-
-  putchar('\n');
 }
 #endif /* DEBUG */
 

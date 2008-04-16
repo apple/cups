@@ -2606,7 +2606,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdWriteClient(con=%p) %d response=%p(%d), file=%d "
 		  "pipe_pid=%d state=%d",
-                  con, con->http.fd, con->response, con->response->state,
+                  con, con->http.fd, con->response,
+		  con->response ? con->response->state : -1,
 		  con->file, con->pipe_pid, con->http.state);
 #endif /* DEBUG */
 

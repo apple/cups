@@ -3,7 +3,7 @@
  *
  *   "mailto" notifier for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -315,7 +315,7 @@ email_message(const char *to,		/* I - Recipient of message */
   cupsFilePrintf(fp, "Content-Type: text/plain%s", nl);
   cupsFilePuts(fp, nl);
   cupsFilePrintf(fp, "%s%s", text, nl);
-  cupsFilePrintf(fp, ".\n", nl);
+  cupsFilePrintf(fp, ".%s", nl);
 
  /*
   * Close the connection to the mail server...

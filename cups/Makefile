@@ -29,11 +29,13 @@ LIBOBJS	=	\
 		backchannel.o \
 		backend.o \
 		custom.o \
+		debug.o \
 		dest.o \
 		dir.o \
 		emit.o \
 		encode.o \
 		file.o \
+		getdevices.o \
 		getifaddrs.o \
 		getputfile.o \
 		globals.o \

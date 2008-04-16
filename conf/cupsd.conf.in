@@ -53,7 +53,7 @@ DefaultAuthType Basic
   </Limit>
 
   # All administration operations require an administrator to authenticate...
-  <Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default>
+  <Limit CUPS-Add-Modify-Printer CUPS-Delete-Printer CUPS-Add-Modify-Class CUPS-Delete-Class CUPS-Set-Default CUPS-Get-Devices>
     AuthType Default
     Require user @SYSTEM
     Order deny,allow

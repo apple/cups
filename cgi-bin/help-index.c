@@ -3,7 +3,7 @@
  *
  *   On-line help index routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -500,7 +500,7 @@ helpSaveIndex(help_index_t *hi,		/* I - Index */
     else
     {
       if (cupsFilePrintf(fp, "%s %d " CUPS_LLFMT " " CUPS_LLFMT " \"%s\" \"%s\"\n",
-                         node->filename, node->mtime,
+                         node->filename, (int)node->mtime,
                          CUPS_LLCAST node->offset, CUPS_LLCAST node->length,
 			 node->section ? node->section : "", node->text) < 0)
         break;

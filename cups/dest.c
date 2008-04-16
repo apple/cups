@@ -965,7 +965,7 @@ appleGetDefault(char *name,		/* I - Name buffer */
 
 #ifdef DEBUG
   CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-  printf("appleGetDefault: network=\"%s\"\n", name);
+  DEBUG_printf(("appleGetDefault: network=\"%s\"\n", name));
 #endif /* DEBUG */
 
  /*

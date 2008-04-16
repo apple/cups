@@ -325,7 +325,7 @@ ippPort(void)
 
 #ifdef DEBUG
     if (cg->ipp_port)
-      puts("ippPort: Set via cupsServer()...");
+      DEBUG_puts(("ippPort: Set via cupsServer()..."));
 #endif /* DEBUG */
   }
 

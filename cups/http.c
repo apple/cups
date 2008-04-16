@@ -1490,21 +1490,28 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #ifdef DEBUG
   {
     int i, j, ch;
-    printf("httpRead2: Read " CUPS_LLFMT " bytes:\n", CUPS_LLCAST bytes);
+    char line[255], *ptr;
+
+    DEBUG_printf(("httpRead2: Read " CUPS_LLFMT " bytes:\n",
+                  CUPS_LLCAST bytes));
+
+    strcpy(line, "httpRead2:");
+
     for (i = 0; i < bytes; i += 16)
     {
-      printf("   ");
-
-      for (j = 0; j < 16 && (i + j) < bytes; j ++)
-        printf(" %02X", buffer[i + j] & 255);
+      for (j = 0, ptr = line + 10; j < 16 && (i + j) < bytes; j ++, ptr += 3)
+        sprintf(ptr, " %02X", buffer[i + j] & 255);
 
       while (j < 16)
       {
-        printf("   ");
+        strcpy(ptr, "   ");
+	ptr += 3;
 	j ++;
       }
 
-      printf("    ");
+      strcpy(ptr, "    ");
+      ptr += 4;
+
       for (j = 0; j < 16 && (i + j) < bytes; j ++)
       {
         ch = buffer[i + j] & 255;
@@ -1512,9 +1519,11 @@ httpRead2(http_t *http,			/* I - Connection to server */
 	if (ch < ' ' || ch >= 127)
 	  ch = '.';
 
-        putchar(ch);
+        *ptr++ = ch;
       }
-      putchar('\n');
+
+      *ptr = '\0';
+      DEBUG_puts(line);
     }
   }
 #endif /* DEBUG */
@@ -3102,31 +3111,39 @@ http_write(http_t     *http,		/* I - Connection to server */
 #ifdef DEBUG
   {
     int i, j, ch;
-    printf("http_write: wrote %d bytes: \n", tbytes);
+    char line[255], *ptr;
+
+    DEBUG_printf(("http_write: Wrote %d bytes:\n", tbytes));
+
+    strcpy(line, "http_write:");
+
     for (i = 0, buffer -= tbytes; i < tbytes; i += 16)
     {
-      printf("   ");
-
-      for (j = 0; j < 16 && (i + j) < tbytes; j ++)
-        printf(" %02X", buffer[i + j] & 255);
+      for (j = 0, ptr = line + 11; j < 16 && (i + j) < bytes; j ++, ptr += 3)
+        sprintf(ptr, " %02X", buffer[i + j] & 255);
 
       while (j < 16)
       {
-        printf("   ");
+        strcpy(ptr, "   ");
+	ptr += 3;
 	j ++;
       }
 
-      printf("    ");
-      for (j = 0; j < 16 && (i + j) < tbytes; j ++)
+      strcpy(ptr, "    ");
+      ptr += 4;
+
+      for (j = 0; j < 16 && (i + j) < bytes; j ++)
       {
         ch = buffer[i + j] & 255;
 
-	if (ch < ' ' || ch == 127)
+	if (ch < ' ' || ch >= 127)
 	  ch = '.';
 
-        putchar(ch);
+        *ptr++ = ch;
       }
-      putchar('\n');
+
+      *ptr = '\0';
+      DEBUG_puts(line);
     }
   }
 #endif /* DEBUG */

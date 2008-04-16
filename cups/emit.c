@@ -667,7 +667,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   * Allocate memory...
   */
 
-  DEBUG_printf(("ppdEmitString: Allocating %d bytes for string...\n", bufsize));
+  DEBUG_printf(("ppdEmitString: Allocating %d bytes for string...\n",
+                (int)bufsize));
 
   if ((buffer = calloc(1, bufsize)) == NULL)
   {
@@ -894,7 +895,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       bufptr += strlen(bufptr);
 
       DEBUG_printf(("ppdEmitString: Offset in string is %d...\n",
-                    bufptr - buffer));
+                    (int)(bufptr - buffer)));
     }
     else
     {

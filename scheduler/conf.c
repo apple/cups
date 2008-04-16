@@ -416,7 +416,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);
   cupsdSetString(&RemoteRoot, "remroot");
-  cupsdSetString(&ServerHeader, "CUPS/1.2");
+  cupsdSetString(&ServerHeader, "CUPS/1.4");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
 #ifdef HAVE_GSSAPI
   cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
@@ -2969,7 +2969,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       else if (!strcasecmp(value, "Major"))
 	cupsdSetString(&ServerHeader, "CUPS/1");
       else if (!strcasecmp(value, "Minor"))
-	cupsdSetString(&ServerHeader, "CUPS/1.2");
+	cupsdSetString(&ServerHeader, "CUPS/1.4");
       else if (!strcasecmp(value, "Minimal"))
 	cupsdSetString(&ServerHeader, CUPS_MINIMAL);
       else if (!strcasecmp(value, "OS"))

@@ -328,7 +328,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     else
     {
       DEBUG_printf(("cupsDoAuthentication: Kerberos credentials too large - "
-                    "%d bytes!\n", output_token.length));
+                    "%d bytes!\n", (int)output_token.length));
 
       major_status = gss_release_buffer(&minor_status, &output_token);
 

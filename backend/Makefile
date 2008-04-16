@@ -119,7 +119,7 @@ uninstall:
 test1284:	test1284.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -129,7 +129,7 @@ test1284:	test1284.o ../cups/libcups.a
 testbackend:	testbackend.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

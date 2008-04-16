@@ -934,7 +934,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
   }
 #ifdef DEBUG
   else
-    printf("cups_array_add: append element at %d...\n", current);
+    DEBUG_printf(("cups_array_add: append element at %d...\n", current));
 #endif /* DEBUG */
 
   a->elements[current] = e;
@@ -943,7 +943,8 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 
 #ifdef DEBUG
   for (current = 0; current < a->num_elements; current ++)
-    printf("cups_array_add: a->elements[%d]=%p\n", current, a->elements[current]);
+    DEBUG_printf(("cups_array_add: a->elements[%d]=%p\n", current,
+                  a->elements[current]));
 #endif /* DEBUG */
 
   DEBUG_puts("cups_array_add: returning 1");

@@ -607,10 +607,10 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
 
 #ifdef DEBUG
   if (attr)
-    printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec, attr->text,
-           attr->value ? attr->value : "");
+    DEBUG_printf(("_ppdLocalizedAttr: *%s %s/%s: \"%s\"\n", attr->name,
+                  attr->spec, attr->text, attr->value ? attr->value : ""));
   else
-    puts("    NOT FOUND");
+    DEBUG_puts("_ppdLocalizedAttr: NOT FOUND");
 #endif /* DEBUG */
 
   return (attr);

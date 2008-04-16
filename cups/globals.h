@@ -64,6 +64,12 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Number of server settings */
   cups_option_t		*cupsd_settings;/* Server settings */
 
+#ifdef DEBUG
+  /* debug.c */
+  int			debug_init,	/* Did we initialize debugging? */
+			debug_fd;	/* Debug log file descriptor */
+#endif /* DEBUG */
+
   /* file.c */
   cups_file_t		*stdio_files[3];/* stdin, stdout, stderr */
 

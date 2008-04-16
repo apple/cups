@@ -410,6 +410,7 @@ add_device(
 	cupsdSendIPPString(IPP_TAG_TEXT, "device-id", device->device_id);
 
       fflush(stdout);
+      fputs("DEBUG: Flushed attributes...\n", stderr);
     }
   }
 

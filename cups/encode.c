@@ -55,6 +55,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "document-format",	IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
   { 0, "document-format-default", IPP_TAG_MIMETYPE,	IPP_TAG_PRINTER },
+  { 1, "exclude-schemes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
   { 1, "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
   { 1, "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
   { 0, "fitplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
@@ -125,6 +126,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "printer-uri",		IPP_TAG_URI,		IPP_TAG_OPERATION },
   { 0, "queued-job-count",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "raw",			IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
+  { 1, "requested-attributes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
   { 1, "requesting-user-name-allowed", IPP_TAG_NAME,	IPP_TAG_PRINTER },
   { 1, "requesting-user-name-denied", IPP_TAG_NAME,	IPP_TAG_PRINTER },
   { 0, "resolution",		IPP_TAG_RESOLUTION,	IPP_TAG_JOB },
@@ -522,8 +524,8 @@ cupsEncodeOptions2(
             attr->values[j].unknown.length = (int)strlen(val);
 	    attr->values[j].unknown.data   = strdup(val);
 
-            DEBUG_printf(("cupsEncodeOptions2: Added octet-string value \"%s\"...\n",
-	                  attr->values[j].unknown.data));
+            DEBUG_printf(("cupsEncodeOptions2: Added octet-string value "
+	                  "\"%s\"...\n", (char *)attr->values[j].unknown.data));
             break;
 
 	default :
