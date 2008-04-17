@@ -30,7 +30,8 @@
  *
  * This function sends a CUPS-Get-Devices request and streams the discovered
  * devices to the specified callback function. The "timeout" parameter controls
- * how long the request lasts, while the "exclude
+ * how long the request lasts, while the "exclude_schemes" parameter provides
+ * a comma-delimited list of backends to omit from the request.
  *
  * @since CUPS 1.4@
  */

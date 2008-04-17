@@ -485,7 +485,7 @@ apihelp:
 	mxmldoc --section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h dest.c getputfile.c language.c notify.c \
+		cups.h dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --section "Programming" --title "File and Directory APIs" \
@@ -500,9 +500,9 @@ apihelp:
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-httpipp.header --intro api-httpipp.shtml \
-		http.h ipp.h auth.c encode.c http.c http-addr.c \
-		http-support.c ipp.c ipp-support.c md5passwd.c \
-		request.c >../doc/help/api-httpipp.html
+		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
+		http.c http-addr.c http-support.c ipp.c ipp-support.c \
+		md5passwd.c request.c >../doc/help/api-httpipp.html
 	mxmldoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
@@ -526,7 +526,7 @@ framedhelp:
 		--section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h dest.c getputfile.c language.c notify.c \
+		cups.h dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c
 	mxmldoc --framed api-filedir \
@@ -544,9 +544,9 @@ framedhelp:
 		--section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-httpipp.header --intro api-httpipp.shtml \
-		http.h ipp.h auth.c encode.c http.c http-addr.c \
-		http-support.c ipp.c ipp-support.c md5passwd.c \
-		request.c
+		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
+		http.c http-addr.c http-support.c ipp.c ipp-support.c \
+		md5passwd.c request.c
 	mxmldoc --framed api-filter \
 		--section "Programming" \
 		--title "Filter and Backend Programming" \
