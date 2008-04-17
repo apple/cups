@@ -723,7 +723,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       * No generic localization, so use POSIX...
       */
 
-      DEBUG_printf(("access(\"%s\", 0): %s\n", filename, strerror(errno)));
+      DEBUG_printf(("cupsLangGet: access(\"%s\", 0): %s\n", filename,
+                    strerror(errno)));
 
       snprintf(filename, sizeof(filename), "%s/C/cups_C.po", cg->localedir);
     }

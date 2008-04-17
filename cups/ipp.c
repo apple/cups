@@ -982,10 +982,11 @@ ippRead(http_t *http,			/* I - HTTP connection */
   if (http == NULL)
     return (IPP_ERROR);
 
-  DEBUG_printf(("http->state = %d\n", http->state));
+  DEBUG_printf(("ippRead: http->state=%d, http->used=%d\n", http->state,
+                http->used));
 
-  return (ippReadIO(http, (ipp_iocb_t)ipp_read_http,
-                    http->blocking || http->used != 0, NULL, ipp));
+  return (ippReadIO(http, (ipp_iocb_t)ipp_read_http, http->blocking, NULL,
+                    ipp));
 }
 
 
@@ -1030,8 +1031,8 @@ ippReadIO(void       *src,		/* I - Data source */
   ipp_value_t		*value;		/* Current value */
 
 
-  DEBUG_printf(("ippReadIO(%p, %p, %d, %p, %p)\n", src, cb, blocking,
-                parent, ipp));
+  DEBUG_printf(("ippReadIO(src=%p, cb=%p, blocking=%d, parent=%p, ipp=%p)\n",
+                src, cb, blocking, parent, ipp));
   DEBUG_printf(("ippReadIO: ipp->state=%d\n", ipp->state));
 
   if (src == NULL || ipp == NULL)
@@ -2632,8 +2633,8 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
     if (!attr->name)
       continue;
 
-    DEBUG_printf(("attr->name = %s, attr->num_values = %d, bytes = %d\n",
-                  attr->name, attr->num_values, bytes));
+    DEBUG_printf(("ipp_length: attr->name=\"%s\", attr->num_values=%d, "
+                  "bytes=%d\n", attr->name, attr->num_values, bytes));
 
     bytes += (int)strlen(attr->name);	/* Name */
     bytes += attr->num_values;		/* Value tag for each value */
@@ -2723,7 +2724,7 @@ ipp_length(ipp_t *ipp,			/* I - IPP message or collection */
   else
     bytes ++;
 
-  DEBUG_printf(("bytes = %d\n", bytes));
+  DEBUG_printf(("ipp_length: bytes=%d\n", bytes));
 
   return (bytes);
 }
@@ -2750,9 +2751,12 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   * Loop until all bytes are read...
   */
 
-  for (tbytes = 0, bytes = 0; tbytes < (int)length; tbytes += bytes, buffer += bytes)
+  for (tbytes = 0, bytes = 0;
+       tbytes < (int)length;
+       tbytes += bytes, buffer += bytes)
   {
-    DEBUG_printf(("tbytes = %d, http->state = %d\n", tbytes, http->state));
+    DEBUG_printf(("ipp_read_http: tbytes=%d, http->state=%d\n", tbytes,
+                  http->state));
 
     if (http->state == HTTP_WAITING)
       break;
@@ -2840,7 +2844,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   if (tbytes == 0 && bytes < 0)
     tbytes = -1;
 
-  DEBUG_printf(("returning %d bytes...\n", tbytes));
+  DEBUG_printf(("ipp_read_http: returning %d bytes...\n", tbytes));
 
   return (tbytes);
 }

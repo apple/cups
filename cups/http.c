@@ -77,6 +77,7 @@
  *   http_bio_puts()      - Send a string for OpenSSL.
  *   http_bio_read()      - Read data for OpenSSL.
  *   http_bio_write()     - Write data for OpenSSL.
+ *   http_debug_hex()     - Do a hex dump of a buffer.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
@@ -123,6 +124,10 @@
  * Local functions...
  */
 
+#ifdef DEBUG
+static void		http_debug_hex(const char *prefix, const char *buffer,
+			               int bytes);
+#endif /* DEBUG */
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
@@ -1292,7 +1297,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   char		len[32];		/* Length string */
 
 
-  DEBUG_printf(("httpRead(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n",
+  DEBUG_printf(("httpRead2(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n",
                 http, buffer, CUPS_LLCAST length));
 
   if (http == NULL || buffer == NULL)
@@ -1488,44 +1493,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
   }
 
 #ifdef DEBUG
-  {
-    int i, j, ch;
-    char line[255], *ptr;
-
-    DEBUG_printf(("httpRead2: Read " CUPS_LLFMT " bytes:\n",
-                  CUPS_LLCAST bytes));
-
-    strcpy(line, "httpRead2:");
-
-    for (i = 0; i < bytes; i += 16)
-    {
-      for (j = 0, ptr = line + 10; j < 16 && (i + j) < bytes; j ++, ptr += 3)
-        sprintf(ptr, " %02X", buffer[i + j] & 255);
-
-      while (j < 16)
-      {
-        strcpy(ptr, "   ");
-	ptr += 3;
-	j ++;
-      }
-
-      strcpy(ptr, "    ");
-      ptr += 4;
-
-      for (j = 0; j < 16 && (i + j) < bytes; j ++)
-      {
-        ch = buffer[i + j] & 255;
-
-	if (ch < ' ' || ch >= 127)
-	  ch = '.';
-
-        *ptr++ = ch;
-      }
-
-      *ptr = '\0';
-      DEBUG_puts(line);
-    }
-  }
+  http_debug_hex("httpRead2", buffer, (int)bytes);
 #endif /* DEBUG */
 
   return (bytes);
@@ -2134,7 +2102,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   ssize_t	bytes;			/* Bytes written */
 
 
-  DEBUG_printf(("httpWrite(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n", http,
+  DEBUG_printf(("httpWrite2(http=%p, buffer=%p, length=" CUPS_LLFMT ")\n", http,
                 buffer, CUPS_LLCAST length));
 
  /*
@@ -2158,8 +2126,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
   {
     if (http->wused && (length + http->wused) > sizeof(http->wbuffer))
     {
-      DEBUG_printf(("    flushing buffer (wused=%d, length=" CUPS_LLFMT ")\n",
-                    http->wused, CUPS_LLCAST length));
+      DEBUG_printf(("httpWrite2: Flushing buffer (wused=%d, length="
+                    CUPS_LLFMT ")\n", http->wused, CUPS_LLCAST length));
 
       httpFlushWrite(http);
     }
@@ -2170,7 +2138,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Write to buffer...
       */
 
-      DEBUG_printf(("    copying " CUPS_LLFMT " bytes to wbuffer...\n",
+      DEBUG_printf(("httpWrite2: Copying " CUPS_LLFMT " bytes to wbuffer...\n",
                     CUPS_LLCAST length));
 
       memcpy(http->wbuffer + http->wused, buffer, length);
@@ -2183,7 +2151,7 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       * Otherwise write the data directly...
       */
 
-      DEBUG_printf(("    writing " CUPS_LLFMT " bytes to socket...\n",
+      DEBUG_printf(("httpWrite2: Writing " CUPS_LLFMT " bytes to socket...\n",
                     CUPS_LLCAST length));
 
       if (http->data_encoding == HTTP_ENCODE_CHUNKED)
@@ -2191,7 +2159,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       else
 	bytes = (ssize_t)http_write(http, buffer, (int)length);
 
-      DEBUG_printf(("    wrote " CUPS_LLFMT " bytes...\n", CUPS_LLCAST bytes));
+      DEBUG_printf(("httpWrite2: Wrote " CUPS_LLFMT " bytes...\n",
+                    CUPS_LLCAST bytes));
     }
 
     if (http->data_encoding == HTTP_ENCODE_LENGTH)
@@ -2455,14 +2424,68 @@ http_bio_write(BIO        *h,		/* I - BIO data */
 #endif /* HAVE_SSL && HAVE_LIBSSL */
 
 
+#ifdef DEBUG
+/*
+ * 'http_debug_hex()' - Do a hex dump of a buffer.
+ */
+
+static void
+http_debug_hex(const char *prefix,	/* I - Prefix for line */
+               const char *buffer,	/* I - Buffer to dump */
+               int        bytes)	/* I - Bytes to dump */
+{
+  int	i, j,				/* Looping vars */
+	ch;				/* Current character */
+  char	line[255],			/* Line buffer */
+	*start,				/* Start of line after prefix */
+	*ptr;				/* Pointer into line */
+
+
+  DEBUG_printf(("%s: %d bytes:\n", prefix, bytes));
+
+  snprintf(line, sizeof(line), "%s: ", prefix);
+  start = line + strlen(line);
+
+  for (i = 0; i < bytes; i += 16)
+  {
+    for (j = 0, ptr = start; j < 16 && (i + j) < bytes; j ++, ptr += 2)
+      sprintf(ptr, "%02X", buffer[i + j] & 255);
+
+    while (j < 16)
+    {
+      strcpy(ptr, "  ");
+      ptr += 2;
+      j ++;
+    }
+
+    strcpy(ptr, "  ");
+    ptr += 2;
+
+    for (j = 0; j < 16 && (i + j) < bytes; j ++)
+    {
+      ch = buffer[i + j] & 255;
+
+      if (ch < ' ' || ch >= 127)
+	ch = '.';
+
+      *ptr++ = ch;
+    }
+
+    *ptr = '\0';
+    DEBUG_puts(line);
+  }
+}
+#endif /* DEBUG */
+
+
 /*
  * 'http_field()' - Return the field index for a field name.
  */
 
-static http_field_t		/* O - Field index */
-http_field(const char *name)	/* I - String name */
+static http_field_t			/* O - Field index */
+http_field(const char *name)		/* I - String name */
 {
-  int	i;			/* Looping var */
+  int	i;				/* Looping var */
 
 
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
@@ -2618,7 +2641,8 @@ http_send(http_t       *http,	/* I - Connection to server */
   for (i = 0; i < HTTP_FIELD_MAX; i ++)
     if (http->fields[i][0] != '\0')
     {
-      DEBUG_printf(("%s: %s\n", http_fields[i], httpGetField(http, i)));
+      DEBUG_printf(("http_send: %s: %s\n", http_fields[i],
+                    httpGetField(http, i)));
 
       if (httpPrintf(http, "%s: %s\r\n", http_fields[i], 
 		     httpGetField(http, i)) < 1)
@@ -3109,43 +3133,7 @@ http_write(http_t     *http,		/* I - Connection to server */
   }
 
 #ifdef DEBUG
-  {
-    int i, j, ch;
-    char line[255], *ptr;
-
-    DEBUG_printf(("http_write: Wrote %d bytes:\n", tbytes));
-
-    strcpy(line, "http_write:");
-
-    for (i = 0, buffer -= tbytes; i < tbytes; i += 16)
-    {
-      for (j = 0, ptr = line + 11; j < 16 && (i + j) < bytes; j ++, ptr += 3)
-        sprintf(ptr, " %02X", buffer[i + j] & 255);
-
-      while (j < 16)
-      {
-        strcpy(ptr, "   ");
-	ptr += 3;
-	j ++;
-      }
-
-      strcpy(ptr, "    ");
-      ptr += 4;
-
-      for (j = 0; j < 16 && (i + j) < bytes; j ++)
-      {
-        ch = buffer[i + j] & 255;
-
-	if (ch < ' ' || ch >= 127)
-	  ch = '.';
-
-        *ptr++ = ch;
-      }
-
-      *ptr = '\0';
-      DEBUG_puts(line);
-    }
-  }
+  http_debug_hex("http_write", buffer - tbytes, tbytes);
 #endif /* DEBUG */
 
   return (tbytes);

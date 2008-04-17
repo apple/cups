@@ -32,6 +32,338 @@
 
 #ifdef DEBUG
 /*
+ * 'debug_vsnprintf()' - Format a string into a fixed size buffer.
+ */
+
+int					/* O - Number of bytes formatted */
+debug_vsnprintf(char       *buffer,	/* O - Output buffer */
+                size_t     bufsize,	/* O - Size of output buffer */
+	        const char *format,	/* I - printf-style format string */
+	        va_list    ap)		/* I - Pointer to additional arguments */
+{
+  char		*bufptr,		/* Pointer to position in buffer */
+		*bufend,		/* Pointer to end of buffer */
+		sign,			/* Sign of format width */
+		size,			/* Size character (h, l, L) */
+		type;			/* Format type character */
+  int		width,			/* Width of field */
+		prec;			/* Number of characters of precision */
+  char		tformat[100],		/* Temporary format string for sprintf() */
+		*tptr,			/* Pointer into temporary format */
+		temp[1024];		/* Buffer for formatted numbers */
+  char		*s;			/* Pointer to string */
+  int		bytes;			/* Total number of bytes needed */
+
+
+ /*
+  * Loop through the format string, formatting as needed...
+  */
+
+  bufptr = buffer;
+  bufend = buffer + bufsize - 1;
+  bytes  = 0;
+
+  while (*format)
+  {
+    if (*format == '%')
+    {
+      tptr = tformat;
+      *tptr++ = *format++;
+
+      if (*format == '%')
+      {
+        if (bufptr && bufptr < bufend) *bufptr++ = *format;
+        bytes ++;
+        format ++;
+	continue;
+      }
+      else if (strchr(" -+#\'", *format))
+      {
+        *tptr++ = *format;
+        sign = *format++;
+      }
+      else
+        sign = 0;
+
+      if (*format == '*')
+      {
+       /*
+        * Get width from argument...
+	*/
+
+	format ++;
+	width = va_arg(ap, int);
+
+	snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", width);
+	tptr += strlen(tptr);
+      }
+      else
+      {
+	width = 0;
+
+	while (isdigit(*format & 255))
+	{
+	  if (tptr < (tformat + sizeof(tformat) - 1))
+	    *tptr++ = *format;
+
+	  width = width * 10 + *format++ - '0';
+	}
+      }
+
+      if (*format == '.')
+      {
+	if (tptr < (tformat + sizeof(tformat) - 1))
+	  *tptr++ = *format;
+
+        format ++;
+
+        if (*format == '*')
+	{
+         /*
+	  * Get precision from argument...
+	  */
+
+	  format ++;
+	  prec = va_arg(ap, int);
+
+	  snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", prec);
+	  tptr += strlen(tptr);
+	}
+	else
+	{
+	  prec = 0;
+
+	  while (isdigit(*format & 255))
+	  {
+	    if (tptr < (tformat + sizeof(tformat) - 1))
+	      *tptr++ = *format;
+
+	    prec = prec * 10 + *format++ - '0';
+	  }
+	}
+      }
+      else
+        prec = -1;
+
+      if (*format == 'l' && format[1] == 'l')
+      {
+        size = 'L';
+
+	if (tptr < (tformat + sizeof(tformat) - 2))
+	{
+	  *tptr++ = 'l';
+	  *tptr++ = 'l';
+	}
+
+	format += 2;
+      }
+      else if (*format == 'h' || *format == 'l' || *format == 'L')
+      {
+	if (tptr < (tformat + sizeof(tformat) - 1))
+	  *tptr++ = *format;
+
+        size = *format++;
+      }
+
+      if (!*format)
+        break;
+
+      if (tptr < (tformat + sizeof(tformat) - 1))
+        *tptr++ = *format;
+
+      type  = *format++;
+      *tptr = '\0';
+
+      switch (type)
+      {
+	case 'E' : /* Floating point formats */
+	case 'G' :
+	case 'e' :
+	case 'f' :
+	case 'g' :
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+	    sprintf(temp, tformat, va_arg(ap, double));
+
+            bytes += (int)strlen(temp);
+
+            if (bufptr)
+	    {
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
+		bufptr = bufend;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
+	    }
+	    break;
+
+        case 'B' : /* Integer formats */
+	case 'X' :
+	case 'b' :
+        case 'd' :
+	case 'i' :
+	case 'o' :
+	case 'u' :
+	case 'x' :
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+#ifdef HAVE_LONG_LONG
+            if (size == 'L')
+	      sprintf(temp, tformat, va_arg(ap, long long));
+	    else
+#endif /* HAVE_LONG_LONG */
+            if (size == 'l')
+	      sprintf(temp, tformat, va_arg(ap, long));
+	    else
+	      sprintf(temp, tformat, va_arg(ap, int));
+
+            bytes += (int)strlen(temp);
+
+	    if (bufptr)
+	    {
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
+		bufptr = bufend;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
+	    }
+	    break;
+
+	case 'p' : /* Pointer value */
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+	    sprintf(temp, tformat, va_arg(ap, void *));
+
+            bytes += (int)strlen(temp);
+
+	    if (bufptr)
+	    {
+	      if ((bufptr + strlen(temp)) > bufend)
+	      {
+		strncpy(bufptr, temp, (size_t)(bufend - bufptr));
+		bufptr = bufend;
+	      }
+	      else
+	      {
+		strcpy(bufptr, temp);
+		bufptr += strlen(temp);
+	      }
+	    }
+	    break;
+
+        case 'c' : /* Character or character array */
+	    bytes += width;
+
+	    if (bufptr)
+	    {
+	      if (width <= 1)
+	        *bufptr++ = va_arg(ap, int);
+	      else
+	      {
+		if ((bufptr + width) > bufend)
+		  width = (int)(bufend - bufptr);
+
+		memcpy(bufptr, va_arg(ap, char *), (size_t)width);
+		bufptr += width;
+	      }
+	    }
+	    break;
+
+	case 's' : /* String */
+	    if ((s = va_arg(ap, char *)) == NULL)
+	      s = "(null)";
+
+           /*
+	    * Copy the C string, replacing control chars and \ with
+	    * C character escapes...
+	    */
+
+            for (bufend --; *s && bufptr < bufend; s ++)
+	    {
+	      if (*s == '\n')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = 'n';
+	      }
+	      else if (*s == '\r')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = 'r';
+	      }
+	      else if (*s == '\t')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = 't';
+	      }
+	      else if (*s == '\\')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = '\\';
+	      }
+	      else if (*s == '\'')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = '\'';
+	      }
+	      else if (*s == '\"')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = '\"';
+	      }
+	      else if ((*s & 255) < ' ')
+	      {
+	        *bufptr++ = '\\';
+		*bufptr++ = '0';
+		*bufptr++ = '0' + *s / 8;
+		*bufptr++ = '0' + (*s & 7);
+	      }
+	      else
+	        *bufptr++ = *s;
+            }
+
+            bufend ++;
+	    break;
+
+	case 'n' : /* Output number of chars so far */
+	    *(va_arg(ap, int *)) = bytes;
+	    break;
+      }
+    }
+    else
+    {
+      bytes ++;
+
+      if (bufptr && bufptr < bufend)
+        *bufptr++ = *format;
+
+      format ++;
+    }
+  }
+
+ /*
+  * Nul-terminate the string and return the number of characters needed.
+  */
+
+  *bufptr = '\0';
+
+  return (bytes);
+}
+
+
+/*
  * '_cups_debug_printf()' - Write a formatted line to the log.
  */
 
@@ -78,7 +410,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 	   (int)(curtime.tv_sec % 60), (int)(curtime.tv_usec / 1000));
 
   va_start(ap, format);
-  vsnprintf(buffer + 13, sizeof(buffer) - 14, format, ap);
+  debug_vsnprintf(buffer + 13, sizeof(buffer) - 14, format, ap);
   va_end(ap);
 
   bytes = strlen(buffer);

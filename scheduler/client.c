@@ -2769,6 +2769,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	return;
       }
 
+      httpFlushWrite(HTTP(con));
+
       con->bytes += bytes;
 
       if (con->http.state == HTTP_WAITING)

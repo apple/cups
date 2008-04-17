@@ -85,7 +85,7 @@
  *     Community public
  *     DebugLevel 0
  *     HostNameLookups off
- *     MaxRunTime 10
+ *     MaxRunTime 120
  *
  * This backend is known to work with the following network printers and
  * print servers:
@@ -181,7 +181,7 @@ static int		DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, -1 };
 static unsigned		DeviceTypeRequest;
 static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
-static int		MaxRunTime = 10;
+static int		MaxRunTime = 120;
 static struct timeval	StartTime;
 
 
@@ -657,11 +657,14 @@ static void
 list_device(snmp_cache_t *cache)	/* I - Cached device */
 {
   if (cache->uri)
+  {
     printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
            cache->uri,
 	   cache->make_and_model ? cache->make_and_model : "Unknown",
 	   cache->make_and_model ? cache->make_and_model : "Unknown",
 	   cache->addrname, cache->id ? cache->id : "");
+    fflush(stdout);
+  }
 }
 
 
@@ -1013,6 +1016,8 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
       free(device->make_and_model);
 
     device->make_and_model = strdup(make_model);
+
+    probe_device(device);
   }
 }
 
@@ -1109,13 +1114,13 @@ scan_devices(int fd)			/* I - SNMP socket */
   * Then read any responses that come in over the next 3 seconds...
   */
 
-  endtime = time(NULL) + 3;
+  endtime = time(NULL) + MaxRunTime;
 
   FD_ZERO(&input);
 
   while (time(NULL) < endtime)
   {
-    timeout.tv_sec  = 1;
+    timeout.tv_sec  = 2;
     timeout.tv_usec = 0;
 
     FD_SET(fd, &input);
