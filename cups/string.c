@@ -175,8 +175,8 @@ _cupsStrFlush(void)
   _cups_sp_item_t	*item;		/* Current item */
 
 
-  DEBUG_printf(("_cupsStrFlush(cg=%p)\n", cg));
-  DEBUG_printf(("    %d strings in array\n", cupsArrayCount(stringpool)));
+  DEBUG_printf(("_cupsStrFlush: %d strings in array\n",
+                cupsArrayCount(stringpool)));
 
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_lock(&sp_mutex);

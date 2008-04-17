@@ -1730,7 +1730,7 @@ process_children(void)
  */
 
 static void
-sigchld_handler(int sig)	/* I - Signal number */
+sigchld_handler(int sig)		/* I - Signal number */
 {
   (void)sig;
 
@@ -1755,7 +1755,7 @@ sigchld_handler(int sig)	/* I - Signal number */
  */
 
 static void
-sighup_handler(int sig)	/* I - Signal number */
+sighup_handler(int sig)			/* I - Signal number */
 {
   (void)sig;
 
@@ -1773,7 +1773,7 @@ sighup_handler(int sig)	/* I - Signal number */
  */
 
 static void
-sigterm_handler(int sig)		/* I - Signal */
+sigterm_handler(int sig)		/* I - Signal number */
 {
   (void)sig;	/* remove compiler warnings... */
 

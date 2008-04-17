@@ -1,3 +1,5 @@
+__cups_debug_printf
+__cups_debug_puts
 __cups_strcpy
 __cupsAdminGetServerSettings
 __cupsAdminSetServerSettings
@@ -118,6 +120,7 @@ _cupsGetDefault2
 _cupsGetDest
 _cupsGetDests
 _cupsGetDests2
+_cupsGetDevices
 _cupsGetFd
 _cupsGetFile
 _cupsGetJobs

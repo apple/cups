@@ -1018,12 +1018,12 @@ debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
   ppd_choice_t	*c;			/* Current choice */
 
 
-  printf("cupsMarkOptions: %s\n", title);
+  DEBUG_printf(("cupsMarkOptions: %s\n", title));
 
   for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
        c;
        c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
-    printf("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice);
+    DEBUG_printf(("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice));
 }
 #endif /* DEBUG */
 

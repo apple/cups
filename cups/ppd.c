@@ -615,25 +615,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
   while ((mask = ppd_read(fp, &line, keyword, name, text, &string, 1, cg)) != 0)
   {
-#ifdef DEBUG
-    printf("mask = %x, keyword = \"%s\"", mask, keyword);
-
-    if (name[0] != '\0')
-      printf(", name = \"%s\"", name);
-
-    if (text[0] != '\0')
-      printf(", text = \"%s\"", text);
-
-    if (string != NULL)
-    {
-      if (strlen(string) > 40)
-        printf(", string = %p", string);
-      else
-        printf(", string = \"%s\"", string);
-    }
-
-    puts("");
-#endif /* DEBUG */
+    DEBUG_printf(("mask=%x, keyword=\"%s\", name=\"%s\", text=\"%s\", "
+                  "string=%d chars...", mask, keyword, name, text,
+		  (int)strlen(string)));
 
     if (strcmp(keyword, "CloseUI") && strcmp(keyword, "CloseGroup") &&
 	strcmp(keyword, "CloseSubGroup") && strncmp(keyword, "Default", 7) &&
@@ -1199,7 +1183,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Add an option record to the current sub-group, group, or file...
       */
 
-      DEBUG_printf(("name=\"%s\" (%d)\n", name, strlen(name)));
+      DEBUG_printf(("name=\"%s\" (%d)\n", name, (int)strlen(name)));
 
       if (name[0] == '*')
         _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
@@ -1933,7 +1917,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
 #ifdef DEBUG
   if (!cupsFileEOF(fp))
-    printf("Premature EOF at %lu...\n", (unsigned long)cupsFileTell(fp));
+    DEBUG_printf(("Premature EOF at %lu...\n",
+                  (unsigned long)cupsFileTell(fp)));
 #endif /* DEBUG */
 
   if (cg->ppd_status != PPD_OK)
@@ -2965,7 +2950,7 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 
     *lineptr = '\0';
 
-    DEBUG_printf(("LINE = \"%s\"\n", line));
+    DEBUG_printf(("LINE=\"%s\"\n", line->buffer));
 
    /*
     * The dynamically created PPDs for older style Mac OS X

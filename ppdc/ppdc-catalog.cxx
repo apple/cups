@@ -178,7 +178,7 @@ ppdcCatalog::load_messages(
   if ((fp = cupsFileOpen(f, "r")) == NULL)
     return (-1);
 
-  if ((ptr = strrchr(f, '.')) == NULL)
+  if ((ptr = (char *)strrchr(f, '.')) == NULL)
     goto unknown_load_format;
   else if (!strcmp(ptr, ".strings"))
   {
@@ -305,7 +305,7 @@ ppdcCatalog::load_messages(
 	continue;
 
       // Strip the trailing quote...
-      if ((ptr = strrchr(line, '\"')) == NULL)
+      if ((ptr = (char *)strrchr(line, '\"')) == NULL)
       {
 	fprintf(stderr, "ERROR: Expected quoted string on line %d of %s!\n",
 		linenum, f);
@@ -451,7 +451,7 @@ ppdcCatalog::save_messages(
 
 
   // Open the file...
-  if ((ptr = strrchr(f, '.')) == NULL)
+  if ((ptr = (char *)strrchr(f, '.')) == NULL)
     return (-1);
 
   if (!strcmp(ptr, ".gz"))

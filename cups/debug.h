@@ -3,7 +3,7 @@
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -19,12 +19,6 @@
 #  define _CUPS_DEBUG_H_
 
 /*
- * Include necessary headers...
- */
-
-#  include <stdio.h>
-
-/*
  * The debug macros are used if you compile with DEBUG defined.
  *
  * Usage:
@@ -36,12 +30,25 @@
  */
 
 #  ifdef DEBUG
-#    define DEBUG_puts(x) puts(x)
-#    define DEBUG_printf(x) printf x
+#    define DEBUG_puts(x) _cups_debug_puts(x)
+#    define DEBUG_printf(x) _cups_debug_printf x
 #  else
 #    define DEBUG_puts(x)
 #    define DEBUG_printf(x)
 #  endif /* DEBUG */
+
+
+/*
+ * Prototypes...
+ */
+
+extern void	_cups_debug_printf(const char *format, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 1, 2)))
+#endif /* __GNUC__ */
+;
+extern void	_cups_debug_puts(const char *s);
+
 
 #endif /* !_CUPS_DEBUG_H_ */
 

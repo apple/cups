@@ -339,10 +339,10 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SMB_CONFIG_FILE, "$CUPS_DEFAULT_SMB_CONFIG_FILE")
 
 dnl Default MaxCopies value...
-AC_ARG_WITH(max-copies, [  --with-max-copies       set max copies value, default=100 ],
+AC_ARG_WITH(max-copies, [  --with-max-copies       set default max copies value, default=auto ],
 	CUPS_MAX_COPIES="$withval",
 	if test "x$uname" = xDarwin; then
-		CUPS_MAX_COPIES="999"
+		CUPS_MAX_COPIES="9999"
 	else
 		CUPS_MAX_COPIES="100"
 	fi)

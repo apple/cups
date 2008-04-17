@@ -420,7 +420,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       DEBUG_puts("cupsGetResponse: Need authorization...");
 
-      if ((auth_result =cupsDoAuthentication(http, "POST", resource)) == 0)
+      if ((auth_result = cupsDoAuthentication(http, "POST", resource)) == 0)
 	httpReconnect(http);
       else if (auth_result < 0)
         http->status = status = HTTP_FORBIDDEN;
@@ -523,7 +523,7 @@ http_status_t				/* O - Initial HTTP status */
 cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
                 ipp_t      *request,	/* I - IPP request */
                 const char *resource,	/* I - Resource path */
-		size_t     length)	/* I - Length of data to follow or CUPS_LENGTH_VARIABLE */
+		size_t     length)	/* I - Length of data to follow or @code CUPS_LENGTH_VARIABLE@ */
 {
   http_status_t	status;			/* Status of HTTP request */
   int		got_status;		/* Did we get the status? */

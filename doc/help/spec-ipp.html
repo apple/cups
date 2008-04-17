@@ -1571,6 +1571,12 @@ CUPS-Get-Devices request:
 	<dd>The client OPTIONALLY supplies a device class keyword to select
 	which devices are returned.
 
+	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+
+	<dd>The client OPTIONALLY supplies a set of scheme names that the
+	requestor does not want to discover. If the client omits this attribute,
+	the server responds with devices of all schemes.
+
 	<dt>"limit" (integer (1:MAX)):
 
 	<dd>The client OPTIONALLY supplies this attribute limiting the number of
@@ -1582,6 +1588,11 @@ CUPS-Get-Devices request:
 	attribute group names in whose values the requester is interested. If
 	the client omits this attribute, the server responds as if this
 	attribute had been supplied with a value of 'all'.
+
+	<dt>"timeout" (integer (1:MAX)) :<span class='info'>CUPS 1.4</span>
+
+	<dd>The client OPTIONALLY supplies this attribute limiting the number of
+	devices that are returned.
 
 </dl>
 

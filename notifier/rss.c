@@ -579,6 +579,7 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
   FILE		*fp;			/* File pointer */
   _cups_rss_t	*msg;			/* Current message */
   char		date[1024];		/* Current date */
+  char		*href;			/* Escaped base URL */
 
 
   if ((fp = fopen(filename, "w")) == NULL)
@@ -592,7 +593,11 @@ save_rss(cups_array_t *rss,		/* I - RSS messages */
   fputs("<rss version=\"2.0\">\n", fp);
   fputs("  <channel>\n", fp);
   fputs("    <title>CUPS RSS Feed</title>\n", fp);
-  fprintf(fp, "    <link>%s</link>\n", baseurl);
+
+  href = xml_escape(baseurl);
+  fprintf(fp, "    <link>%s</link>\n", href);
+  free(href);
+
   fputs("    <description>CUPS RSS Feed</description>\n", fp);
   fputs("    <generator>" CUPS_SVERSION "</generator>\n", fp);
   fputs("    <ttl>1</ttl>\n", fp);

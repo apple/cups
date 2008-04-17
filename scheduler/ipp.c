@@ -6158,12 +6158,16 @@ static void
 get_devices(cupsd_client_t *con)	/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
-  ipp_attribute_t	*limit,		/* Limit attribute */
-			*requested;	/* requested-attributes attribute */
+  ipp_attribute_t	*limit,		/* limit attribute */
+			*timeout,	/* timeout attribute */
+			*requested,	/* requested-attributes attribute */
+			*exclude;	/* exclude-schemes attribute */
   char			command[1024],	/* cups-deviced command */
 			options[1024],	/* Options to pass to command */
-			requested_str[256];
+			requested_str[256],
 					/* String for requested attributes */
+			exclude_str[512];
+					/* String for excluded attributes */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_devices(%p[%d])", con, con->http.fd);
@@ -6182,21 +6186,31 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   * Run cups-deviced command with the given options...
   */
 
-  limit = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  limit     = ippFindAttribute(con->request, "limit", IPP_TAG_INTEGER);
+  timeout   = ippFindAttribute(con->request, "timeout", IPP_TAG_INTEGER);
   requested = ippFindAttribute(con->request, "requested-attributes",
                                IPP_TAG_KEYWORD);
+  exclude   = ippFindAttribute(con->request, "exclude-schemes", IPP_TAG_NAME);
 
   if (requested)
     url_encode_attr(requested, requested_str, sizeof(requested_str));
   else
     strlcpy(requested_str, "requested-attributes=all", sizeof(requested_str));
 
+  if (exclude)
+    url_encode_attr(exclude, exclude_str, sizeof(exclude_str));
+  else
+    exclude_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
   snprintf(options, sizeof(options),
-           "%d+%d+%d+%s",
+           "%d+%d+%d+%d+%s%s%s",
            con->request->request.op.request_id,
-           limit ? limit->values[0].integer : 0, (int)User,
-	   requested_str);
+           limit ? limit->values[0].integer : 0,
+	   timeout ? timeout->values[0].integer : 10,
+	   (int)User,
+	   requested_str,
+	   exclude_str[0] ? "%20" : "", exclude_str);
 
   if (cupsdSendCommand(con, command, options, 1))
   {

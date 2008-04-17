@@ -26,6 +26,7 @@ AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
 dnl For debugging, keep symbols, otherwise strip them...
 if test x$enable_debug = xyes; then
 	OPTIM="-g"
+	CFLAGS="$CFLAGS -DDEBUG"
 else
 	INSTALL_STRIP="-s"
 fi

@@ -203,10 +203,10 @@ cgiGetVariable(const char *name)	/* I - Name of variable */
 
 #ifdef DEBUG
   if (var == NULL)
-    printf("cgiGetVariable(\"%s\") is returning NULL...\n", name);
+    DEBUG_printf(("cgiGetVariable(\"%s\") is returning NULL...\n", name));
   else
-    printf("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name,
-           var->values[var->nvalues - 1]);
+    DEBUG_printf(("cgiGetVariable(\"%s\") is returning \"%s\"...\n", name,
+		  var->values[var->nvalues - 1]));
 #endif /* DEBUG */
 
   return ((var == NULL) ? NULL : var->values[var->nvalues - 1]);
@@ -242,7 +242,6 @@ cgiInitialize(void)
   */
 
   setbuf(stdout, NULL);
-  puts("Content-type: text/plain\n");
 #endif /* DEBUG */
 
  /*
@@ -444,9 +443,8 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   if (name == NULL || value == NULL || element < 0 || element > 100000)
     return;
 
-#ifdef DEBUG
-  printf("Adding variable \'%s\' with value \'%s\'...\n", name, value);
-#endif /* DEBUG */
+  DEBUG_printf(("cgi_add_variable: Adding variable \'%s\' with value "
+                "\'%s\'...\n", name, value));
 
   if (form_count >= form_alloc)
   {
@@ -522,9 +520,7 @@ cgi_initialize_get(void)
   char	*data;				/* Pointer to form data string */
 
 
-#ifdef DEBUG
-  puts("Initializing variables using GET method...");
-#endif /* DEBUG */
+  DEBUG_puts("cgi_initialize_get: Initializing variables using GET method...");
 
  /*
   * Check to see if there is anything for us to read...
@@ -778,9 +774,7 @@ cgi_initialize_post(void)
 	status;				/* Return status */
 
 
-#ifdef DEBUG
-  puts("Initializing variables using POST method...");
-#endif /* DEBUG */
+  DEBUG_puts("cgi_initialize_post: Initializing variables using POST method...");
 
  /*
   * Check to see if there is anything for us to read...
@@ -996,7 +990,7 @@ cgi_sort_variables(void)
   int	i;
 
 
-  puts("Sorting variables...");
+  DEBUG_puts("cgi_sort_variables: Sorting variables...");
 #endif /* DEBUG */
 
   if (form_count < 2)
@@ -1006,10 +1000,11 @@ cgi_sort_variables(void)
         (int (*)(const void *, const void *))cgi_compare_variables);
 
 #ifdef DEBUG
-  puts("Sorted variable list is:");
+  DEBUG_puts("cgi_sort_variables: Sorted variable list is:");
   for (i = 0; i < form_count; i ++)
-    printf("%d: %s (%d) = \"%s\" ...\n", i, form_vars[i].name,
-           form_vars[i].nvalues, form_vars[i].values[0]);
+    DEBUG_printf(("cgi_sort_variables: %d: %s (%d) = \"%s\" ...\n", i,
+                  form_vars[i].name, form_vars[i].nvalues,
+		  form_vars[i].values[0]));
 #endif /* DEBUG */
 }
 

@@ -304,7 +304,12 @@ div.contents ul.subcontents li {
 <li><a href="#cupsDoRequest" title="Do an IPP request.">cupsDoRequest</a></li>
 <li><a href="#cupsEncodeOptions" title="Encode printer options into IPP attributes.">cupsEncodeOptions</a></li>
 <li><a href="#cupsEncodeOptions2" title="Encode printer options into IPP attributes for a group.">cupsEncodeOptions2</a></li>
+<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
+<li><a href="#cupsGetFd" title="Get a file from the server.">cupsGetFd</a></li>
+<li><a href="#cupsGetFile" title="Get a file from the server.">cupsGetFile</a></li>
 <li><a href="#cupsGetResponse" title="Get a response to an IPP request.">cupsGetResponse</a></li>
+<li><a href="#cupsPutFd" title="Put a file on the server.">cupsPutFd</a></li>
+<li><a href="#cupsPutFile" title="Put a file on the server.">cupsPutFile</a></li>
 <li><a href="#cupsReadResponseData" title="Read additional data after the IPP response.">cupsReadResponseData</a></li>
 <li><a href="#cupsSendRequest" title="Send an IPP request.">cupsSendRequest</a></li>
 <li><a href="#cupsWriteRequestData" title="Write additional data after an IPP request.">cupsWriteRequestData</a></li>
@@ -955,6 +960,84 @@ function multiple times for each group, or use cupsEncodeOptions()
 to add the standard groups.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
+<p class="description">Get available printer devices.</p>
+<p class="code">
+ipp_status_t cupsGetDevices (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *exclude_schemes,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_device_cb_t callback,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>timeout</dt>
+<dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
+<dt>exclude_schemes</dt>
+<dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
+<dt>callback</dt>
+<dd class="description">Callback function</dd>
+<dt>user_data</dt>
+<dd class="description">User data pointer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Request status - <code>IPP_OK</code> on success.</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
+devices to the specified callback function. The &quot;timeout&quot; parameter controls
+how long the request lasts, while the &quot;exclude_schemes&quot; parameter provides
+a comma-delimited list of backends to omit from the request.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsGetFd">cupsGetFd</a></h3>
+<p class="description">Get a file from the server.</p>
+<p class="code">
+http_status_t cupsGetFd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>resource</dt>
+<dd class="description">Resource name</dd>
+<dt>fd</dt>
+<dd class="description">File descriptor</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP status</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
+<p class="description">Get a file from the server.</p>
+<p class="code">
+http_status_t cupsGetFile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>resource</dt>
+<dd class="description">Resource name</dd>
+<dt>filename</dt>
+<dd class="description">Filename</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP status</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
 <p class="description">Get a response to an IPP request.</p>
 <p class="code">
@@ -975,6 +1058,54 @@ to add the standard groups.
 <p class="discussion">Use this function to get the response for an IPP request sent using
 cupsSendDocument() or cupsSendRequest(). For requests that return
 additional data, use httpRead() after getting a successful response.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsPutFd">cupsPutFd</a></h3>
+<p class="description">Put a file on the server.</p>
+<p class="code">
+http_status_t cupsPutFd (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>resource</dt>
+<dd class="description">Resource name</dd>
+<dt>fd</dt>
+<dd class="description">File descriptor</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP status</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns <code>HTTP_CREATED</code> when the file is stored
+successfully.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsPutFile">cupsPutFile</a></h3>
+<p class="description">Put a file on the server.</p>
+<p class="code">
+http_status_t cupsPutFile (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>resource</dt>
+<dd class="description">Resource name</dd>
+<dt>filename</dt>
+<dd class="description">Filename</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">HTTP status</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns <code>HTTP_CREATED</code> when the file is stored
+successfully.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsReadResponseData">cupsReadResponseData</a></h3>
@@ -1019,7 +1150,7 @@ http_status_t cupsSendRequest (<br>
 <dt>resource</dt>
 <dd class="description">Resource path</dd>
 <dt>length</dt>
-<dd class="description">Length of data to follow or CUPS_LENGTH_VARIABLE</dd>
+<dd class="description">Length of data to follow or <code>CUPS_LENGTH_VARIABLE</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Initial HTTP status</p>

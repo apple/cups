@@ -81,7 +81,11 @@ extern int		cupsFileNumber(cups_file_t *fp) _CUPS_API_1_2;
 extern cups_file_t	*cupsFileOpen(const char *filename, const char *mode) _CUPS_API_1_2;
 extern cups_file_t	*cupsFileOpenFd(int fd, const char *mode) _CUPS_API_1_2;
 extern int		cupsFilePeekChar(cups_file_t *fp) _CUPS_API_1_2;
-extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...) _CUPS_API_1_2;
+extern int		cupsFilePrintf(cups_file_t *fp, const char *format, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#endif /* __GNUC__ */
+_CUPS_API_1_2;
 extern int		cupsFilePutChar(cups_file_t *fp, int c) _CUPS_API_1_2;
 extern int		cupsFilePuts(cups_file_t *fp, const char *s) _CUPS_API_1_2;
 extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes) _CUPS_API_1_2;

@@ -65,6 +65,7 @@ extern "C" {
 #  define CUPS_VERSION_PATCH	-1
 
 #  define CUPS_DATE_ANY		(time_t)-1
+#  define CUPS_EXCLUDE_NONE	(const char *)0
 #  define CUPS_FORMAT_AUTO	"application/octet-stream"
 #  define CUPS_FORMAT_PDF	"application/pdf"
 #  define CUPS_FORMAT_POSTSCRIPT "application/postscript"
@@ -74,6 +75,7 @@ extern "C" {
 #  define CUPS_JOBID_ALL	-1
 #  define CUPS_JOBID_CURRENT	0
 #  define CUPS_LENGTH_VARIABLE	(ssize_t)0
+#  define CUPS_TIMEOUT_DEFAULT	0
 #  define CUPS_WHICHJOBS_ALL	-1
 #  define CUPS_WHICHJOBS_ACTIVE	0
 #  define CUPS_WHICHJOBS_COMPLETED 1
@@ -115,8 +117,14 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */
 };
 
-typedef const char *(*cups_password_cb_t)(const char *);
+typedef const char *(*cups_password_cb_t)(const char *prompt);
 					/**** Password callback ****/
+
+typedef void (*cups_device_cb_t)(const char *device_class,
+                                 const char *device_id, const char *device_info,
+                                 const char *device_make_and_model,
+                                 const char *device_uri, void *user_data);
+					/**** Device callback @since CUPS 1.4@ ****/
 
 typedef struct cups_option_s		/**** Printer Options ****/
 {
@@ -269,6 +277,10 @@ extern int		cupsCreateJob(http_t *http, const char *name,
 				      cups_option_t *options) _CUPS_API_1_4;
 extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
+extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
+			               const char *exclude_schemes,
+				       cups_device_cb_t callback,
+				       void *user_data) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
 			                  const char *instance) _CUPS_API_1_4;
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
