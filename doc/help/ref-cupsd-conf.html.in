@@ -1007,6 +1007,22 @@ HREF="#Location"><CODE>Location</CODE></A> or <A
 HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
 
 
+<H2 CLASS="title"><A NAME="DirtyCleanInterval">DirtyCleanInterval</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DirtyCleanInterval 60
+DirtyCleanInterval 0
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DirtyCleanInterval</CODE> directive specifies the number of
+seconds to wait before updating configuration and state files for printers,
+classes, subscriptions, and jobs. The default is 60 seconds.</P>
+
+
 <H2 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H2>
 
 <H3>Examples</H3>

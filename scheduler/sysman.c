@@ -3,7 +3,7 @@
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,6 +14,9 @@
  *
  * Contents:
  *
+ *   cupsdCleanDirty()               - Write dirty config and state files.
+ *   cupsdMarkDirty()                - Mark config or state files as needing a
+ *                                     write.
  *   cupsdStartSystemMonitor()       - Start monitoring for system change.
  *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
  *   cupsdUpdateSystemMonitor()      - Update the current system state.
@@ -34,14 +37,90 @@
 
 
 /*
- * Power management is a new addition to CUPS.  Right now it is only
- * implemented on MacOS X, but essentially we use these three functions
- * to let the OS know when it is OK to put the system to sleep, typically
- * when we are not in the middle of printing a job.
+ * The system management functions cover disk and power management which
+ * are primarily used on portable computers.
  *
- * Once put to sleep, we invalidate all remote printers since it is
- * common to wake up in a new location.
+ * Disk management involves delaying the write of certain configuration
+ * and state files to minimize the number of times the disk has to spin
+ * up.
+ *
+ * Power management support is currently only implemented on MacOS X, but
+ * essentially we use four functions to let the OS know when it is OK to
+ * put the system to idle sleep, typically when we are not in the middle of
+ * printing a job.
+ *
+ * Once put to sleep, we invalidate all remote printers since it is common
+ * to wake up in a new location/on a new wireless network.
  */
+
+
+/*
+ * 'cupsdCleanDirty()' - Write dirty config and state files.
+ */
+
+void
+cupsdCleanDirty(void)
+{
+  if (DirtyFiles & CUPSD_DIRTY_PRINTERS)
+    cupsdSaveAllPrinters();
+
+  if (DirtyFiles & CUPSD_DIRTY_CLASSES)
+    cupsdSaveAllClasses();
+
+  if (DirtyFiles & CUPSD_DIRTY_REMOTE)
+    cupsdSaveRemoteCache();
+
+  if (DirtyFiles & CUPSD_DIRTY_PRINTCAP)
+    cupsdWritePrintcap();
+
+  if (DirtyFiles & CUPSD_DIRTY_JOBS)
+  {
+    cupsd_job_t	*job;			/* Current job */
+
+    cupsdSaveAllJobs();
+
+    for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
+         job;
+	 job = (cupsd_job_t *)cupsArrayNext(Jobs))
+      if (job->dirty)
+        cupsdSaveJob(job);
+  }
+
+  if (DirtyFiles & CUPSD_DIRTY_SUBSCRIPTIONS)
+    cupsdSaveAllSubscriptions();
+
+  DirtyFiles     = CUPSD_DIRTY_NONE;
+  DirtyCleanTime = 0;
+}
+
+
+/*
+ * 'cupsdMarkDirty()' - Mark config or state files as needing a write.
+ */
+
+void
+cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
+{
+  cupsdSetBusy(1);
+
+  DirtyFiles |= what;
+
+  if (!DirtyCleanTime)
+    DirtyCleanTime = time(NULL) + DirtyCleanInterval;
+}
+
+
+/*
+ * 'cupsdSetBusy()' - Let the system know when we are busy doing something.
+ */
+
+void
+cupsdSetBusy(int busy)			/* I - 1 = busy, 0 = idle */
+{
+  /* TODO */
+  (void)busy;
+}
+
 
 #ifdef __APPLE__
 /*

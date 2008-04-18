@@ -297,7 +297,7 @@ cupsdAddEvent(
   }
 
   if (temp)
-    cupsdSaveAllSubscriptions();
+    cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
   else
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Discarding unused %s event...",
                     cupsdEventName(event));
@@ -463,7 +463,7 @@ cupsdDeleteSubscription(
   */
 
   if (update)
-    cupsdSaveAllSubscriptions();
+    cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
 }
 
 
@@ -646,7 +646,7 @@ cupsdExpireSubscriptions(
     }
 
   if (update)
-    cupsdSaveAllSubscriptions();
+    cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
 }
 
 

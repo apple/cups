@@ -211,10 +211,11 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   cupsdExpireSubscriptions(NULL, job);
 
  /*
-  * Remove the job from the active list...
+  * Remove the job from the active and printing lists...
   */
 
   cupsArrayRemove(ActiveJobs, job);
+  cupsArrayRemove(PrintingJobs, job);
 
  /*
   * Remove any authentication data...
@@ -277,7 +278,8 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     * Save job state info...
     */
 
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else
   {
@@ -301,6 +303,9 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
 
     free_job(job);
   }
+
+  if (!cupsArrayCount(PrintingJobs) && !DirtyCleanTime)
+    cupsdSetBusy(0);
 }
 
 
@@ -395,7 +400,8 @@ cupsdCheckJobs(void)
       {
 	attr->value_tag = IPP_TAG_KEYWORD;
 	cupsdSetString(&(attr->values[0].string.text), "no-hold");
-	cupsdSaveJob(job);
+	job->dirty = 1;
+	cupsdMarkDirty(CUPSD_DIRTY_JOBS);
       }
     }
 
@@ -462,6 +468,9 @@ cupsdCheckJobs(void)
 	  else
 	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI,
 	                 "job-actual-printer-uri", NULL, printer->uri);
+
+          job->dirty = 1;
+          cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
 
         if ((!(printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is local */
@@ -608,7 +617,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	    job->state_value              = IPP_JOB_PENDING;
           }
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	 /*
 	  * If the job was queued to a class, try requeuing it...  For
@@ -686,7 +696,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_HELD;
 	  job->state_value              = IPP_JOB_HELD;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
 			"Job held due to backend errors; please consult "
@@ -703,7 +714,9 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_PENDING;
 	  job->state_value              = IPP_JOB_PENDING;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+
 	  cupsdSetPrinterState(printer, IPP_PRINTER_STOPPED, 1);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
@@ -730,7 +743,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_HELD;
 	  job->state_value              = IPP_JOB_HELD;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
 	                "Authentication is required for job %d.", job->id);
@@ -752,7 +766,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Job %d] Job stopped due to filter errors.", job->id);
     cupsdStopJob(job, 1);
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
                   "Job stopped due to filter errors; please consult the "
 		  "error_log file for details.");
@@ -812,6 +827,7 @@ cupsdFreeAllJobs(void)
   {
     cupsArrayRemove(Jobs, job);
     cupsArrayRemove(ActiveJobs, job);
+    cupsArrayRemove(PrintingJobs, job);
 
     free_job(job);
   }
@@ -902,7 +918,8 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
   job->state_value              = IPP_JOB_HELD;
   job->current_file             = 0;
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
   cupsdCheckJobs();
 }
@@ -930,6 +947,9 @@ cupsdLoadAllJobs(void)
 
   if (!ActiveJobs)
     ActiveJobs = cupsArrayNew(compare_active_jobs, NULL);
+
+  if (!PrintingJobs)
+    PrintingJobs = cupsArrayNew(compare_jobs, NULL);
 
  /*
   * See whether the job.cache file is older than the RequestRoot directory...
@@ -1317,7 +1337,8 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
                 "Job #%d moved from %s to %s.", job->id, olddest,
 		p->name);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -1336,7 +1357,8 @@ cupsdReleaseJob(cupsd_job_t *job)	/* I - Job */
 
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     cupsdCheckJobs();
   }
 }
@@ -1364,7 +1386,8 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
 
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
     if (old_state > IPP_JOB_STOPPED)
       cupsArrayAdd(ActiveJobs, job);
@@ -1479,6 +1502,8 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
                     "[Job %d] Unable to write job control file!", job->id);
 
   cupsFileClose(fp);
+
+  job->dirty = 0;
 }
 
 
@@ -1654,7 +1679,8 @@ cupsdSetJobPriority(
 
   cupsArrayAdd(ActiveJobs, job);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -1780,7 +1806,12 @@ cupsdUnloadCompletedJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->attrs && job->state_value >= IPP_JOB_STOPPED &&
         job->access_time < expire)
+    {
+      if (job->dirty)
+        cupsdSaveJob(job);
+
       unload_job(job);
+    }
 }
 
 
@@ -2426,7 +2457,8 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   else
     cupsdSetString(&attr->values[0].string.text, holdstr);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -2727,6 +2759,14 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->current_file == 0)
   {
+   /*
+    * Add to the printing list...
+    */
+
+    cupsArrayAdd(PrintingJobs, job);
+
+    cupsdSetBusy(1);
+
    /*
     * Set the processing time...
     */
@@ -3692,7 +3732,11 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
 	cupsdSetPrinterAttrs(job->printer);
-	cupsdSaveAllPrinters();
+
+	if (job->printer->type & CUPS_PRINTER_DISCOVERED)
+	  cupsdMarkDirty(CUPSD_DIRTY_REMOTE);
+	else
+	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)

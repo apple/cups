@@ -20,7 +20,8 @@
 typedef struct cupsd_job_s
 {
   int			id,		/* Job ID */
-			priority;	/* Job priority */
+			priority,	/* Job priority */
+			dirty;		/* Do we need to write the "c" file? */
   ipp_jstate_t		state_value;	/* Cached job-state */
   int			pending_timeout;/* Non-zero if the job was created and waiting on files */
   char			*username;	/* Printing user */
@@ -84,8 +85,10 @@ VAR int			JobAutoPurge	VALUE(0);
 					/* Automatically purge jobs */
 VAR cups_array_t	*Jobs		VALUE(NULL),
 					/* List of current jobs */
-			*ActiveJobs	VALUE(NULL);
+			*ActiveJobs	VALUE(NULL),
 					/* List of active jobs */
+			*PrintingJobs	VALUE(NULL);
+					/* List of jobs that are printing */
 VAR int			NextJobId	VALUE(1);
 					/* Next job ID to use */
 VAR int			JobRetryLimit	VALUE(5),

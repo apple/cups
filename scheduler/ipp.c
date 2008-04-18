@@ -858,14 +858,14 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (dtype & CUPS_PRINTER_CLASS)
   {
-    cupsdSaveAllClasses();
+    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" now accepting jobs (\"%s\").",
                     printer->name, get_username(con));
   }
   else
   {
-    cupsdSaveAllPrinters();
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Printer \"%s\" now accepting jobs (\"%s\").",
@@ -1162,7 +1162,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   cupsdSetPrinterAttrs(pclass);
-  cupsdSaveAllClasses();
+  cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
 
   if (need_restart_job && pclass->job)
   {
@@ -1183,7 +1183,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   if (need_restart_job)
     cupsdCheckJobs();
 
-  cupsdWritePrintcap();
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
   if (modify)
   {
@@ -1264,6 +1264,9 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
   job->filetypes[job->num_files]    = filetype;
 
   job->num_files ++;
+
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
   return (0);
 }
@@ -1487,7 +1490,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   job->dtype   = printer->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT |
                                   CUPS_PRINTER_REMOTE);
   job->attrs   = con->request;
+  job->dirty   = 1;
   con->request = ippNewRequest(job->attrs->request.op.operation_id);
+
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
   add_job_uuid(con, job);
   apply_printer_defaults(printer, job);
@@ -2071,7 +2077,7 @@ add_job_subscriptions(
       attr = attr->next;
   }
 
-  cupsdSaveAllSubscriptions();
+  cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
 
  /*
   * Remove all of the subscription attributes from the job request...
@@ -2720,7 +2726,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSetPrinterAttrs(printer);
-  cupsdSaveAllPrinters();
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
   if (need_restart_job && printer->job)
   {
@@ -2741,7 +2747,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if (need_restart_job)
     cupsdCheckJobs();
 
-  cupsdWritePrintcap();
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
   if (modify)
   {
@@ -5453,8 +5459,6 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Save and log the job...
   */
 
-  cupsdSaveJob(job);
-
   cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Queued on \"%s\" by \"%s\".",
                   job->id, job->dest, job->username);
 }
@@ -6001,8 +6005,7 @@ create_subscription(
       attr = attr->next;
   }
 
-  cupsdSaveAllSubscriptions();
-
+  cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
 }
 
 
@@ -6091,7 +6094,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
                     printer->name, get_username(con));
 
     cupsdDeletePrinter(printer, 0);
-    cupsdSaveAllClasses();
+    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
   }
   else
   {
@@ -6099,10 +6102,10 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
                     printer->name, get_username(con));
 
     cupsdDeletePrinter(printer, 0);
-    cupsdSaveAllPrinters();
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
   }
 
-  cupsdWritePrintcap();
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
  /*
   * Return with no errors...
@@ -6597,6 +6600,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     completed = 0;
     list      = Jobs;
   }
+  else if (attr && !strcmp(attr->values[0].string.text, "printing"))
+  {
+    completed = 0;
+    list      = PrintingJobs;
+  }
   else
   {
     completed = 0;
@@ -6611,7 +6619,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
                                IPP_TAG_INTEGER)) != NULL)
     limit = attr->values[0].integer;
   else
-    limit = 1000000;
+    limit = 0;
 
   if ((attr = ippFindAttribute(con->request, "first-job-id",
                                IPP_TAG_INTEGER)) != NULL)
@@ -6637,7 +6645,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   for (count = 0, job = (cupsd_job_t *)cupsArrayFirst(list);
-       count < limit && job;
+       (limit <= 0 || count < limit) && job;
        job = (cupsd_job_t *)cupsArrayNext(list))
   {
    /*
@@ -8271,8 +8279,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] hold_until = %d", job->id,
                   (int)job->hold_until);
 
-  cupsdSaveJob(job);
-
  /*
   * Start the job if possible...
   */
@@ -8525,14 +8531,14 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (dtype & CUPS_PRINTER_CLASS)
   {
-    cupsdSaveAllClasses();
+    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" rejecting jobs (\"%s\").",
                     printer->name, get_username(con));
   }
   else
   {
-    cupsdSaveAllPrinters();
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" rejecting jobs (\"%s\").",
                     printer->name, get_username(con));
@@ -8761,7 +8767,7 @@ renew_subscription(
 
   sub->expire = sub->lease ? time(NULL) + sub->lease : 0;
 
-  cupsdSaveAllSubscriptions();
+  cupsdMarkDirty(CUPSD_DIRTY_SUBSCRIPTIONS);
 
   con->response->request.status.status_code = IPP_OK;
 
@@ -9485,7 +9491,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       }
     }
 
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
    /*
     * Start the job if possible...  Since cupsdCheckJobs() can cancel a
@@ -9509,7 +9516,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       job->state->values[0].integer = IPP_JOB_HELD;
       job->state_value              = IPP_JOB_HELD;
       job->hold_until               = time(NULL) + 60;
-      cupsdSaveJob(job);
+      job->dirty                    = 1;
+
+      cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     }
   }
 
@@ -9676,10 +9685,8 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 
   DefaultPrinter = printer;
 
-  cupsdSaveAllPrinters();
-  cupsdSaveAllClasses();
-
-  cupsdWritePrintcap();
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS | CUPSD_DIRTY_CLASSES |
+                 CUPSD_DIRTY_REMOTE | CUPSD_DIRTY_PRINTCAP);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
                   "Default destination set to \"%s\" by \"%s\".",
@@ -10025,7 +10032,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Save the job...
   */
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
  /*
   * Send events as needed...

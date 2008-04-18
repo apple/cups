@@ -862,6 +862,18 @@ main(int  argc,				/* I - Number of command-line args */
 
     current_time = time(NULL);
 
+   /*
+    * Write dirty config/state files...
+    */
+
+    if (DirtyCleanTime && current_time >= DirtyCleanTime)
+    {
+      cupsdCleanDirty();
+
+      if (!cupsArrayCount(PrintingJobs))
+        cupsdSetBusy(0);
+    }
+
 #ifndef __APPLE__
    /*
     * Update the network interfaces once a minute...
@@ -1904,6 +1916,16 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
 	}
       }
     }
+  }
+
+ /*
+  * Check for any active jobs...
+  */
+
+  if (DirtyCleanTime && timeout > DirtyCleanTime)
+  {
+    timeout = DirtyCleanTime;
+    why     = "write dirty config/state files";
   }
 
  /*
