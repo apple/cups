@@ -34,9 +34,6 @@
 #  include <fcntl.h>
 #endif /* WIN32 */
 
-#ifndef DEBUG
-#  define DEBUG
-#endif /* !DEBUG */
 #include "ieee1284.c"
 
 
