@@ -359,7 +359,6 @@ cupsdUpdateSystemMonitor(void)
       Sleeping = 1;
 
       cupsdStopAllJobs(0);
-      cupsdSaveAllJobs();
 
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
            p;
@@ -380,6 +379,8 @@ cupsdUpdateSystemMonitor(void)
 	  cupsdDeregisterPrinter(p, 0);
 	}
       }
+
+      cupsdCleanDirty();
 
       IOAllowPowerChange(sysevent.powerKernelPort,
                          sysevent.powerNotificationID);
