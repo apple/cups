@@ -2697,6 +2697,22 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   }
 
  /*
+  * Make sure we don't go over the "MAX_FILTERS" limit...
+  */
+
+  if (cupsArrayCount(filters) > MAX_FILTERS)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Too many filters (%d > %d), unable to print!",
+		    job->id, cupsArrayCount(filters), MAX_FILTERS);
+
+    cupsArrayDelete(filters);
+    cupsdCancelJob(job, 0, IPP_JOB_STOPPED);
+
+    return;
+  }
+
+ /*
   * Update the printer and job state to "processing"...
   */
 

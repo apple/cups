@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The scheduler did not limit the total number of filters.
 	- The scheduler now ensures that the RSS directory has
 	  the correct permissions.
 	- The RSS notifier did not quote the feed URL in the RSS
