@@ -304,8 +304,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     free_job(job);
   }
 
-  if (!cupsArrayCount(PrintingJobs) && !DirtyCleanTime)
-    cupsdSetBusy(0);
+  cupsdSetBusyState();
 }
 
 
@@ -2764,8 +2763,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     */
 
     cupsArrayAdd(PrintingJobs, job);
-
-    cupsdSetBusy(1);
+    cupsdSetBusyState();
 
    /*
     * Set the processing time...

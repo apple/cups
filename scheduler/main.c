@@ -869,9 +869,7 @@ main(int  argc,				/* I - Number of command-line args */
     if (DirtyCleanTime && current_time >= DirtyCleanTime)
     {
       cupsdCleanDirty();
-
-      if (!cupsArrayCount(PrintingJobs))
-        cupsdSetBusy(0);
+      cupsdSetBusyState();
     }
 
 #ifndef __APPLE__

@@ -50,7 +50,7 @@ VAR int			SysEventPipes[2] VALUE2(-1,-1);
 
 extern void	cupsdCleanDirty(void);
 extern void	cupsdMarkDirty(int what);
-extern void	cupsdSetBusy(int busy);
+extern void	cupsdSetBusyState(void);
 extern void	cupsdStartSystemMonitor(void);
 extern void	cupsdStopSystemMonitor(void);
 extern void	cupsdUpdateSystemMonitor(void);

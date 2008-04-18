@@ -17,6 +17,8 @@
  *   cupsdCleanDirty()               - Write dirty config and state files.
  *   cupsdMarkDirty()                - Mark config or state files as needing a
  *                                     write.
+ *   cupsdSetBusyState()             - Let the system know when we are busy
+ *                                     doing something.
  *   cupsdStartSystemMonitor()       - Start monitoring for system change.
  *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
  *   cupsdUpdateSystemMonitor()      - Update the current system state.
@@ -101,24 +103,41 @@ cupsdCleanDirty(void)
 void
 cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
 {
-  cupsdSetBusy(1);
-
   DirtyFiles |= what;
 
   if (!DirtyCleanTime)
     DirtyCleanTime = time(NULL) + DirtyCleanInterval;
+
+  cupsdSetBusyState();
 }
 
 
 /*
- * 'cupsdSetBusy()' - Let the system know when we are busy doing something.
+ * 'cupsdSetBusyState()' - Let the system know when we are busy doing something.
  */
 
 void
-cupsdSetBusy(int busy)			/* I - 1 = busy, 0 = idle */
+cupsdSetBusyState(void)
 {
-  /* TODO */
-  (void)busy;
+  int		newbusy;		/* New busy state */
+  static int	busy = 0;		/* Current busy state */
+
+
+  newbusy = DirtyCleanTime ||
+            cupsArrayCount(PrintingJobs) ||
+	    cupsArrayCount(ActiveClients);
+
+  if (newbusy != busy)
+  {
+    busy = newbusy;
+
+    if (busy)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetBusyState: Server no longer busy...");
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetBusyState: Server is now busy...");
+  }
 }
 
 
