@@ -2793,9 +2793,9 @@ cupsdSetPrinterState(
       update)
   {
     if (p->type & CUPS_PRINTER_CLASS)
-      cupsdSaveAllClasses();
+      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
     else
-      cupsdSaveAllPrinters();
+      cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
   }
 }
 
@@ -2841,8 +2841,9 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
 
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
+    job->dirty                    = 1;
 
-    cupsdSaveJob(job);
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
     cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
 		  "Job stopped due to printer being paused");

@@ -21,6 +21,7 @@
  *   cupsdCheckJobs()           - Check the pending jobs and start any if
  *                                the destination is available.
  *   cupsdCleanJobs()           - Clean out old jobs.
+ *   cupsdDeleteJob()           - Free all memory used by a job.
  *   cupsdFinishJob()           - Finish a job.
  *   cupsdFreeAllJobs()         - Free all jobs from memory.
  *   cupsdFindJob()             - Find the specified job.
@@ -44,7 +45,6 @@
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
- *   free_job()                 - Free all memory used by a job.
  *   ipp_length()               - Compute the size of the buffer needed to
  *                                hold the textual IPP attributes.
  *   load_job_cache()           - Load jobs from the job.cache file.
@@ -89,7 +89,6 @@ static mime_filter_t	gziptoany_filter =
 
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
-static void	free_job(cupsd_job_t *job);
 static int	ipp_length(ipp_t *ipp);
 static void	load_job_cache(const char *filename);
 static void	load_next_job_id(const char *filename);
@@ -211,10 +210,11 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   cupsdExpireSubscriptions(NULL, job);
 
  /*
-  * Remove the job from the active list...
+  * Remove the job from the active and printing lists...
   */
 
   cupsArrayRemove(ActiveJobs, job);
+  cupsArrayRemove(PrintingJobs, job);
 
  /*
   * Remove any authentication data...
@@ -277,7 +277,8 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     * Save job state info...
     */
 
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else
   {
@@ -299,8 +300,10 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     * Free all memory used...
     */
 
-    free_job(job);
+    cupsdDeleteJob(job);
   }
+
+  cupsdSetBusyState();
 }
 
 
@@ -395,7 +398,8 @@ cupsdCheckJobs(void)
       {
 	attr->value_tag = IPP_TAG_KEYWORD;
 	cupsdSetString(&(attr->values[0].string.text), "no-hold");
-	cupsdSaveJob(job);
+	job->dirty = 1;
+	cupsdMarkDirty(CUPSD_DIRTY_JOBS);
       }
     }
 
@@ -462,6 +466,9 @@ cupsdCheckJobs(void)
 	  else
 	    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI,
 	                 "job-actual-printer-uri", NULL, printer->uri);
+
+          job->dirty = 1;
+          cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
 
         if ((!(printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is local */
@@ -507,6 +514,45 @@ cupsdCleanJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->state_value >= IPP_JOB_CANCELED)
       cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
+}
+
+
+/*
+ * 'cupsdDeleteJob()' - Free all memory used by a job.
+ */
+
+void
+cupsdDeleteJob(cupsd_job_t *job)	/* I - Job */
+{
+  cupsdClearString(&job->username);
+  cupsdClearString(&job->dest);
+  cupsdClearString(&job->auth_username);
+  cupsdClearString(&job->auth_domain);
+  cupsdClearString(&job->auth_password);
+
+#ifdef HAVE_GSSAPI
+ /*
+  * Destroy the credential cache and clear the KRB5CCNAME env var string.
+  */
+
+  if (job->ccache)
+  {
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    job->ccache = NULL;
+  }
+
+  cupsdClearString(&job->ccname);
+#endif /* HAVE_GSSAPI */
+
+  if (job->num_files > 0)
+  {
+    free(job->compressions);
+    free(job->filetypes);
+  }
+
+  ippDelete(job->attrs);
+
+  free(job);
 }
 
 
@@ -608,7 +654,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	    job->state_value              = IPP_JOB_PENDING;
           }
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	 /*
 	  * If the job was queued to a class, try requeuing it...  For
@@ -686,7 +733,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_HELD;
 	  job->state_value              = IPP_JOB_HELD;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
 			"Job held due to backend errors; please consult "
@@ -703,7 +751,9 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_PENDING;
 	  job->state_value              = IPP_JOB_PENDING;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+
 	  cupsdSetPrinterState(printer, IPP_PRINTER_STOPPED, 1);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
@@ -730,7 +780,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  job->state->values[0].integer = IPP_JOB_HELD;
 	  job->state_value              = IPP_JOB_HELD;
 
-	  cupsdSaveJob(job);
+	  job->dirty = 1;
+	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	  cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
 	                "Authentication is required for job %d.", job->id);
@@ -752,7 +803,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Job %d] Job stopped due to filter errors.", job->id);
     cupsdStopJob(job, 1);
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, printer, job,
                   "Job stopped due to filter errors; please consult the "
 		  "error_log file for details.");
@@ -812,8 +864,9 @@ cupsdFreeAllJobs(void)
   {
     cupsArrayRemove(Jobs, job);
     cupsArrayRemove(ActiveJobs, job);
+    cupsArrayRemove(PrintingJobs, job);
 
-    free_job(job);
+    cupsdDeleteJob(job);
   }
 
   cupsdReleaseSignals();
@@ -902,7 +955,8 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
   job->state_value              = IPP_JOB_HELD;
   job->current_file             = 0;
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
   cupsdCheckJobs();
 }
@@ -930,6 +984,9 @@ cupsdLoadAllJobs(void)
 
   if (!ActiveJobs)
     ActiveJobs = cupsArrayNew(compare_active_jobs, NULL);
+
+  if (!PrintingJobs)
+    PrintingJobs = cupsArrayNew(compare_jobs, NULL);
 
  /*
   * See whether the job.cache file is older than the RequestRoot directory...
@@ -1317,7 +1374,8 @@ cupsdMoveJob(cupsd_job_t     *job,	/* I - Job */
                 "Job #%d moved from %s to %s.", job->id, olddest,
 		p->name);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -1336,7 +1394,8 @@ cupsdReleaseJob(cupsd_job_t *job)	/* I - Job */
 
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     cupsdCheckJobs();
   }
 }
@@ -1364,7 +1423,8 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
 
-    cupsdSaveJob(job);
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
     if (old_state > IPP_JOB_STOPPED)
       cupsArrayAdd(ActiveJobs, job);
@@ -1479,6 +1539,8 @@ cupsdSaveJob(cupsd_job_t *job)		/* I - Job */
                     "[Job %d] Unable to write job control file!", job->id);
 
   cupsFileClose(fp);
+
+  job->dirty = 0;
 }
 
 
@@ -1654,7 +1716,8 @@ cupsdSetJobPriority(
 
   cupsArrayAdd(ActiveJobs, job);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -1780,7 +1843,12 @@ cupsdUnloadCompletedJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->attrs && job->state_value >= IPP_JOB_STOPPED &&
         job->access_time < expire)
+    {
+      if (job->dirty)
+        cupsdSaveJob(job);
+
       unload_job(job);
+    }
 }
 
 
@@ -1814,45 +1882,6 @@ compare_jobs(void *first,		/* I - First job */
 	     void *data)		/* I - App data (not used) */
 {
   return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
-}
-
-
-/*
- * 'free_job()' - Free all memory used by a job.
- */
-
-static void
-free_job(cupsd_job_t *job)		/* I - Job */
-{
-  cupsdClearString(&job->username);
-  cupsdClearString(&job->dest);
-  cupsdClearString(&job->auth_username);
-  cupsdClearString(&job->auth_domain);
-  cupsdClearString(&job->auth_password);
-
-#ifdef HAVE_GSSAPI
- /*
-  * Destroy the credential cache and clear the KRB5CCNAME env var string.
-  */
-
-  if (job->ccache)
-  {
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    job->ccache = NULL;
-  }
-
-  cupsdClearString(&job->ccname);
-#endif /* HAVE_GSSAPI */
-
-  if (job->num_files > 0)
-  {
-    free(job->compressions);
-    free(job->filetypes);
-  }
-
-  ippDelete(job->attrs);
-
-  free(job);
 }
 
 
@@ -2426,7 +2455,8 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   else
     cupsdSetString(&attr->values[0].string.text, holdstr);
 
-  cupsdSaveJob(job);
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
@@ -2697,6 +2727,22 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   }
 
  /*
+  * Make sure we don't go over the "MAX_FILTERS" limit...
+  */
+
+  if (cupsArrayCount(filters) > MAX_FILTERS)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Too many filters (%d > %d), unable to print!",
+		    job->id, cupsArrayCount(filters), MAX_FILTERS);
+
+    cupsArrayDelete(filters);
+    cupsdCancelJob(job, 0, IPP_JOB_STOPPED);
+
+    return;
+  }
+
+ /*
   * Update the printer and job state to "processing"...
   */
 
@@ -2711,6 +2757,13 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   if (job->current_file == 0)
   {
+   /*
+    * Add to the printing list...
+    */
+
+    cupsArrayAdd(PrintingJobs, job);
+    cupsdSetBusyState();
+
    /*
     * Set the processing time...
     */
@@ -3676,7 +3729,11 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
         cupsdSetAuthInfoRequired(job->printer, attr, NULL);
 	cupsdSetPrinterAttrs(job->printer);
-	cupsdSaveAllPrinters();
+
+	if (job->printer->type & CUPS_PRINTER_DISCOVERED)
+	  cupsdMarkDirty(CUPSD_DIRTY_REMOTE);
+	else
+	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)

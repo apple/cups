@@ -28,6 +28,7 @@
  *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
  *   cupsdWriteClient()      - Write data to a client as needed.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
+ *   compare_clients()       - Compare two client connections.
  *   encrypt_client()        - Enable encryption for the client...
  *   get_cdsa_certificate()  - Convert a keychain name into the CFArrayRef
  *			       required by SSLSetCertificate.
@@ -82,6 +83,8 @@ extern const char *cssmErrorString(int error);
 
 static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
+static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
+			                void *data);
 #ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
 #endif /* HAVE_SSL */
@@ -145,7 +148,18 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   if (!Clients)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to allocate memory for client array!");
+                    "Unable to allocate memory for clients array!");
+    cupsdPauseListening();
+    return;
+  }
+
+  if (!ActiveClients)
+    ActiveClients = cupsArrayNew((cups_array_func_t)compare_clients, NULL);
+
+  if (!ActiveClients)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to allocate memory for active clients array!");
     cupsdPauseListening();
     return;
   }
@@ -607,8 +621,11 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
   * Close the socket and clear the file from the input set for select()...
   */
 
-  if (con->http.fd > 0)
+  if (con->http.fd >= 0)
   {
+    cupsArrayRemove(ActiveClients, con);
+    cupsdSetBusyState();
+
     if (partial)
     {
      /*
@@ -972,6 +989,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		        con->http.version / 100, con->http.version % 100);
 
 	con->http.status = HTTP_OK;
+
+        cupsArrayAdd(ActiveClients, con);
+	cupsdSetBusyState();
 
     case HTTP_OPTIONS :
     case HTTP_DELETE :
@@ -2144,8 +2164,16 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         break; /* Anti-compiler-warning-code */
   }
 
-  if (!con->http.keep_alive && con->http.state == HTTP_WAITING)
-    cupsdCloseClient(con);
+  if (con->http.state == HTTP_WAITING)
+  {
+    if (!con->http.keep_alive)
+      cupsdCloseClient(con);
+    else
+    {
+      cupsArrayRemove(ActiveClients, con);
+      cupsdSetBusyState();
+    }
+  }
 }
 
 
@@ -2913,6 +2941,26 @@ check_if_modified(
 }
 
 
+/*
+ * 'compare_clients()' - Compare two client connections.
+ */
+
+static int				/* O - Result of comparison */
+compare_clients(cupsd_client_t *a,	/* I - First client */
+                cupsd_client_t *b,	/* I - Second client */
+                void           *data)	/* I - User data (not used) */
+{
+  (void)data;
+
+  if (a == b)
+    return (0);
+  else if (a < b)
+    return (-1);
+  else
+    return (1);
+}
+
+
 #ifdef HAVE_SSL
 /*
  * 'encrypt_client()' - Enable encryption for the client...
@@ -3649,12 +3697,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   */
 
   if ((options = strchr(con->uri, '?')) != NULL)
-  {
-    options ++;
-
-    if (strchr(options, '='))
-      cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options);
-  }
+    cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options + 1);
 
  /*
   * Check for known types...
@@ -3677,7 +3720,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
 
     filename = strrchr(filename, '/') + 1; /* Filename always absolute */
 
-    cupsdSetString(&con->options, options);
+    cupsdSetStringf(&con->options, " %s", options);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -4678,6 +4721,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
       envp[envc ++] = con->query_string;
     }
+    else
+      envp[envc ++] = "QUERY_STRING=";
   }
   else
   {

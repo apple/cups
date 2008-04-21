@@ -93,8 +93,10 @@ VAR cups_array_t	*Listeners	VALUE(NULL);
 					/* Listening sockets */
 VAR time_t		ListeningPaused	VALUE(0);
 					/* Time when listening was paused */
-VAR cups_array_t	*Clients	VALUE(NULL);
+VAR cups_array_t	*Clients	VALUE(NULL),
 					/* HTTP clients */
+			*ActiveClients	VALUE(NULL);
+					/* Active HTTP clients */
 VAR http_addrlist_t	*ServerAddrs	VALUE(NULL);
 					/* Server address(es) */
 VAR char		*ServerHeader	VALUE(NULL);

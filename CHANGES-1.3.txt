@@ -4,6 +4,24 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The scheduler did not set QUERY_STRING all of the time
+	  for CGI scripts (STR #2781)
+	- The scheduler now returns an error for bad job-sheets
+	  values (STR #2775)
+	- Authenticated remote printing did not work over domain
+	  sockets (STR #2750)
+	- The scheduler incorrectly logged errors for print filters
+	  when a job was canceled (STR #2806, #2808)
+	- The scheduler not long allows multiple RSS subscriptions
+	  with the same URI (STR #2789)
+	- The scheduler now supports Kerberized printing with
+	  multiple server names (STR #2783)
+	- "Satisfy any" did not work in IPP policies (STR #2782)
+	- The CUPS imaging library would crash with very large
+	  images - more than 16Mx16M pixels (STR #2805)
+	- The PNG image loading code would crash with large images
+	  (STR #2790)
+	- The scheduler did not limit the total number of filters.
 	- The scheduler now ensures that the RSS directory has
 	  the correct permissions.
 	- The RSS notifier did not quote the feed URL in the RSS
@@ -14,8 +32,6 @@ CHANGES IN CUPS V1.3.8
 	  9999 to match the limit imposed by the print dialog.
 	- The scheduler did not reject requests with an empty
 	  Content-Length field (STR #2787)
-	- The PNG image loading code would crash with large images
-	  (STR #2790)
 	- The scheduler did not log the current date and time and
 	  did not escape special characters in request URIs when
 	  logging bad requests to the access_log file (STR #2788)

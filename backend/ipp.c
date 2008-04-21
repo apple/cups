@@ -1410,7 +1410,7 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
-  if (password && password_tries < 3)
+  if (password && *password && password_tries < 3)
   {
     password_tries ++;
 

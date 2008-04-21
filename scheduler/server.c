@@ -3,7 +3,7 @@
  *
  *   Server start/stop routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -137,7 +137,6 @@ cupsdStopServer(void)
   cupsdStopPolling();
   cupsdStopBrowsing();
   cupsdStopAllNotifiers();
-  cupsdSaveRemoteCache();
   cupsdDeleteAllCerts();
 
   if (Clients)
@@ -202,6 +201,13 @@ cupsdStopServer(void)
 
   cupsdDestroyProfile(DefaultProfile);
   DefaultProfile = NULL;
+
+ /*
+  * Write out any dirty files...
+  */
+
+  if (DirtyFiles)
+    cupsdCleanDirty();
 
   started = 0;
 }

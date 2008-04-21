@@ -327,22 +327,20 @@ main(int  argc,				/* I - Number of command-line args */
     * Parent comes here...
     */
 
-    while ((pdfwaitpid = wait(&pdfstatus)) < 0 && errno == EINTR)
+    while ((pdfwaitpid = wait(&pdfstatus)) != pdfpid && errno == EINTR)
     {
      /*
       * Wait until we get a valid process ID or the job is canceled...
       */
 
       if (job_canceled)
-	break;
+      {
+        kill(pdfpid, SIGTERM);
+	job_canceled = 0;
+      }
     }
 
-    if (pdfwaitpid != pdfpid)
-    {
-      kill(pdfpid, SIGTERM);
-      pdfstatus = 1;
-    }
-    else if (pdfstatus)
+    if (pdfstatus)
     {
       if (WIFEXITED(pdfstatus))
       {

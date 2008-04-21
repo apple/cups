@@ -103,6 +103,7 @@ static const cupsd_var_t	variables[] =
   { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
+  { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_INTEGER },
   { "DocumentRoot",		&DocumentRoot,		CUPSD_VARTYPE_STRING },
   { "ErrorLog",			&ErrorLog,		CUPSD_VARTYPE_STRING },
   { "ErrorPolicy",		&ErrorPolicy,		CUPSD_VARTYPE_STRING },
@@ -516,6 +517,7 @@ cupsdReadConfiguration(void)
 #ifdef HAVE_SSL
   DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_SSL */
+  DirtyCleanInterval    = 60;
   JobRetryLimit         = 5;
   JobRetryInterval      = 300;
   FileDevice            = FALSE;
@@ -1188,7 +1190,7 @@ cupsdReadConfiguration(void)
     cupsdLoadAllPrinters();
     cupsdLoadAllClasses();
     cupsdLoadRemoteCache();
-    cupsdWritePrintcap();
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
     cupsdCreateCommonData();
 
@@ -1219,7 +1221,7 @@ cupsdReadConfiguration(void)
     */
 
     cupsdUpdatePrinters();
-    cupsdWritePrintcap();
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Partial reload complete.");
   }

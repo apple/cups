@@ -19,7 +19,8 @@
 <TD>{job_media_sheets_completed=0?Unknown:{?job_media_sheets_completed}}&nbsp;</TD>
 <TD>{job_state=3?pending since<BR>{time_at_creation}:{job_state=4?held since<BR>{time_at_creation}:
 {job_state=5?processing since<BR>{time_at_processing}:{job_state=6?stopped:
-{job_state=7?canceled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;</TD>
+{job_state=7?canceled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;{job_printer_state_message?<BR>
+<EM>"{job_printer_state_message}"</EM>:}</TD>
 <TD>
 {job_preserved>0?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
