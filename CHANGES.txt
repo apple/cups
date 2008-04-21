@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-04-18
+CHANGES.txt - 2008-04-21
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The CUPS image library now supports reading images larger
+	  than 2GB.
 	- The scheduler now delays writing config and state files to
 	  reduce disk activity (STR #2684)
 	- The CUPS-Get-Devices operation now supports the

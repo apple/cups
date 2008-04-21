@@ -63,11 +63,11 @@ cupsImageClose(cups_image_t *img)	/* I - Image to close */
   * Wipe the tile cache file (if any)...
   */
 
-  if (img->cachefile != NULL)
+  if (img->cachefile >= 0)
   {
     DEBUG_printf(("Closing/removing swap file \"%s\"...\n", img->cachename));
 
-    fclose(img->cachefile);
+    close(img->cachefile);
     unlink(img->cachename);
   }
 
@@ -620,7 +620,6 @@ cupsImageSetMaxTiles(
 static void
 flush_tile(cups_image_t *img)		/* I - Image */
 {
-  int		fd;			/* Cache file descriptor */
   int		bpp;			/* Bytes per pixel */
   cups_itile_t	*tile;			/* Pointer to tile */
 
@@ -634,64 +633,40 @@ flush_tile(cups_image_t *img)		/* I - Image */
     return;
   }
 
-  if (img->cachefile == NULL)
+  if (img->cachefile < 0)
   {
-    if ((fd = cupsTempFd(img->cachename, sizeof(img->cachename))) < 0)
+    if ((img->cachefile = cupsTempFd(img->cachename,
+                                     sizeof(img->cachename))) < 0)
     {
-/*      perror("ERROR: Unable to create image swap file");
-*/      tile->ic    = NULL;
+      tile->ic    = NULL;
       tile->dirty = 0;
       return;
     }
 
     DEBUG_printf(("Created swap file \"%s\"...\n", img->cachename));
+  }
 
-    if ((img->cachefile = fdopen(fd, "wb+")) == NULL)
+  if (tile->pos >= 0)
+  {
+    if (lseek(img->cachefile, tile->pos, SEEK_SET) != tile->pos)
     {
-/*      perror("ERROR: Unable to create image swap file");
-*/      close(fd);
-      unlink(img->cachename);
+      tile->ic    = NULL;
+      tile->dirty = 0;
+      return;
+    }
+  }
+  else
+  {
+    if ((tile->pos = lseek(img->cachefile, 0, SEEK_END)) < 0)
+    {
       tile->ic    = NULL;
       tile->dirty = 0;
       return;
     }
   }
 
-  if (tile->pos >= 0)
-  {
-    if (ftell(img->cachefile) != tile->pos)
-      if (fseek(img->cachefile, tile->pos, SEEK_SET))
-      {
-/*        perror("ERROR: Unable to seek in swap file");
-*/	tile->ic    = NULL;
-	tile->dirty = 0;
-	return;
-      }
-  }
-  else
-  {
-    if (fseek(img->cachefile, 0, SEEK_END))
-    {
-/*      perror("ERROR: Unable to append to swap file");
-*/      tile->ic    = NULL;
-      tile->dirty = 0;
-      return;
-    }
+  write(img->cachefile, tile->ic->pixels, bpp * CUPS_TILE_SIZE * CUPS_TILE_SIZE);
 
-    tile->pos = ftell(img->cachefile);
-  }
-
-
-/*  if (fwrite(tile->ic->pixels, bpp, CUPS_TILE_SIZE * CUPS_TILE_SIZE,
-             img->cachefile) < 1)
-    perror("ERROR: Unable to write tile to swap file");
-  else
-    DEBUG_printf(("Wrote tile at position %ld...\n", tile->pos));
-*/
-
-  fwrite(tile->ic->pixels, bpp, CUPS_TILE_SIZE * CUPS_TILE_SIZE,
-         img->cachefile);
-  
   tile->ic    = NULL;
   tile->dirty = 0;
 }
@@ -778,16 +753,11 @@ get_tile(cups_image_t *img,		/* I - Image */
 
     if (tile->pos >= 0)
     {
-      DEBUG_printf(("Loading cache tile from file position %ld...\n",
-                    tile->pos));
+      DEBUG_printf(("Loading cache tile from file position " CUPS_LLFMT "...\n",
+                    CUPS_LLCAST tile->pos));
 
-      if (ftell(img->cachefile) != tile->pos)
-        fseek(img->cachefile, tile->pos, SEEK_SET);
-/*        if (fseek(img->cachefile, tile->pos, SEEK_SET))
-	  perror("get_tile:");
-*/
-
-      fread(ic->pixels, bpp, CUPS_TILE_SIZE * CUPS_TILE_SIZE, img->cachefile);
+      lseek(img->cachefile, tile->pos, SEEK_SET);
+      read(img->cachefile, ic->pixels, bpp * CUPS_TILE_SIZE * CUPS_TILE_SIZE);
     }
     else
     {

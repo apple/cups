@@ -4,7 +4,7 @@
  *   Private image library definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -78,7 +78,7 @@ struct cups_ic_s;
 typedef struct cups_itile_s		/**** Image tile ****/
 {
   int			dirty;		/* True if tile is dirty */
-  long			pos;		/* Position of tile on disk (-1 if not written) */
+  off_t			pos;		/* Position of tile on disk (-1 if not written) */
   struct cups_ic_s	*ic;		/* Pixel data */
 } cups_itile_t;
 
@@ -102,7 +102,7 @@ struct cups_image_s			/**** Image file data ****/
   cups_itile_t		**tiles;	/* Tiles in image */
   cups_ic_t		*first,		/* First cached tile in image */
 			*last;		/* Last cached tile in image */
-  FILE			*cachefile;	/* Tile cache file */
+  int			cachefile;	/* Tile cache file */
   char			cachename[256];	/* Tile cache filename */
 };
 
