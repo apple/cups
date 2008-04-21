@@ -269,7 +269,7 @@ f 0755 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0755 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
 %endif
 %if PDFTOPS
-f 0755 root sys $SERVERBIN/filter/pdftops pdftops/pdftops
+f 0755 root sys $SERVERBIN/filter/pdftops filter/pdftops
 %endif
 f 0755 root sys $SERVERBIN/filter/pstops filter/pstops
 f 0755 root sys $SERVERBIN/filter/rastertoespcx driver/rastertoescpx
