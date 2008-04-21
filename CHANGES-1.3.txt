@@ -4,6 +4,10 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The CUPS imaging library would crash with very large
+	  images - more than 16Mx16M pixels (STR #2805)
+	- The PNG image loading code would crash with large images
+	  (STR #2790)
 	- The scheduler did not limit the total number of filters.
 	- The scheduler now ensures that the RSS directory has
 	  the correct permissions.
@@ -15,8 +19,6 @@ CHANGES IN CUPS V1.3.8
 	  9999 to match the limit imposed by the print dialog.
 	- The scheduler did not reject requests with an empty
 	  Content-Length field (STR #2787)
-	- The PNG image loading code would crash with large images
-	  (STR #2790)
 	- The scheduler did not log the current date and time and
 	  did not escape special characters in request URIs when
 	  logging bad requests to the access_log file (STR #2788)

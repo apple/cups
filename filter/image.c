@@ -725,7 +725,7 @@ get_tile(cups_image_t *img,		/* I - Image */
     if ((img->tiles = calloc(sizeof(cups_itile_t *), ytiles)) == NULL)
       return (NULL);
 
-    if ((tile = calloc(sizeof(cups_itile_t), xtiles * ytiles)) == NULL)
+    if ((tile = calloc(xtiles * sizeof(cups_itile_t), ytiles)) == NULL)
       return (NULL);
 
     for (tiley = 0; tiley < ytiles; tiley ++)
