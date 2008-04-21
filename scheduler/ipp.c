@@ -1323,7 +1323,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     send_http_error(con, status, printer);
     return (NULL);
   }
-  else if ((printer->type & CUPS_PRINTER_AUTHENTICATED) &&
+  else if (printer->num_auth_info_required > 0 &&
+           strcmp(printer->auth_info_required[0], "none") &&
            !con->username[0] && !auth_info)
   {
     send_http_error(con, HTTP_UNAUTHORIZED, printer);

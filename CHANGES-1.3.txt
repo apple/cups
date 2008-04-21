@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- "Satisfy any" did not work in IPP policies (STR #2782)
 	- The CUPS imaging library would crash with very large
 	  images - more than 16Mx16M pixels (STR #2805)
 	- The PNG image loading code would crash with large images
