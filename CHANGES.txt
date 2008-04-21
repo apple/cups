@@ -3,6 +3,8 @@ CHANGES.txt - 2008-04-21
 
 CHANGES IN CUPS V1.4b1
 
+	- Driver information files can now be installed in
+	  /Library/Printers/PPDs.drv on Mac OS X.
 	- The CUPS image library now supports reading images larger
 	  than 2GB.
 	- The scheduler now delays writing config and state files to

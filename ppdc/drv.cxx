@@ -3,7 +3,7 @@
 //
 //   DDK driver interface main entry for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -66,6 +66,11 @@ main(int  argc,				// I - Number of command-line arguments
   // List all available PPDs or cat a single PPD...
   if (argc == 2 && !strcmp(argv[1], "list"))
   {
+#ifdef __APPLE__
+    if (!access("/Library/Printers/PPDs.drv", 0))
+      list_drvs("/Library/Printers/PPDs.drv", "/Library/Printers/PPDs.drv");
+#endif // __APPLE__
+
     snprintf(filename, sizeof(filename), "%s/drv", datadir);
     return (list_drvs(filename, "/"));
   }
@@ -84,6 +89,12 @@ main(int  argc,				// I - Number of command-line arguments
     }
 
     *pc_file_name++ = '\0';
+
+#ifdef __APPLE__
+    if (!strncmp(resource, "/Library/Printers/PPDs.drv/", 27))
+      strlcpy(filename, resource, sizeof(filename));
+    else
+#endif // __APPLE__
 
     snprintf(filename, sizeof(filename), "%s/drv%s", datadir, resource);
 
