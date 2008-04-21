@@ -1632,27 +1632,6 @@ process_children(void)
 
     cupsdFinishProcess(pid, name, sizeof(name));
 
-    if (status == SIGTERM)
-      status = 0;
-
-    if (status)
-    {
-      if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
-	                pid, name, WEXITSTATUS(status));
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
-	                pid, name, WTERMSIG(status));
-
-      if (LogLevel < CUPSD_LOG_DEBUG)
-        cupsdLogMessage(CUPSD_LOG_INFO,
-	                "Hint: Try setting the LogLevel to \"debug\" to find "
-			"out more.");
-    }
-    else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
-                      pid, name);
-
    /*
     * Delete certificates for CGI processes...
     */
@@ -1683,6 +1662,9 @@ process_children(void)
 	    job->filters[i] = -pid;
 	  else
 	    job->backend = -pid;
+
+          if (job->state_value == IPP_JOB_CANCELED)
+	    status = 0;			/* Ignore errors when canceling jobs */
 
           if (status && job->status >= 0)
 	  {
@@ -1731,6 +1713,31 @@ process_children(void)
 	  break;
 	}
       }
+
+   /*
+    * Show the exit status as needed...
+    */
+
+    if (status == SIGTERM)
+      status = 0;
+
+    if (status)
+    {
+      if (WIFEXITED(status))
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
+	                pid, name, WEXITSTATUS(status));
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
+	                pid, name, WTERMSIG(status));
+
+      if (LogLevel < CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Hint: Try setting the LogLevel to \"debug\" to find "
+			"out more.");
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
+                      pid, name);
   }
 }
 
