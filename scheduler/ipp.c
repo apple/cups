@@ -1395,6 +1395,34 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     }
   }
 
+  if ((attr = ippFindAttribute(con->request, "job-sheets",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->value_tag != IPP_TAG_KEYWORD &&
+        attr->value_tag != IPP_TAG_NAME)
+    {
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value type!"));
+      return (NULL);
+    }
+
+    if (attr->num_values > 2)
+    {
+      send_ipp_status(con, IPP_BAD_REQUEST,
+                      _("Too many job-sheets values (%d > 2)!"),
+		      attr->num_values);
+      return (NULL);
+    }
+
+    for (i = 0; i < attr->num_values; i ++)
+      if (strcmp(attr->values[i].string.text, "none") &&
+          !cupsdFindBanner(attr->values[i].string.text))
+      {
+	send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value \"%s\"!"),
+			attr->values[i].string.text);
+	return (NULL);
+      }
+  }
+
   if ((attr = ippFindAttribute(con->request, "number-up",
                                IPP_TAG_INTEGER)) != NULL)
   {
@@ -1822,7 +1850,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                       job->id, attr->values[0].string.text);
 
       if ((kbytes = copy_banner(con, job, attr->values[0].string.text)) < 0)
+      {
+        cupsdDeleteJob(job);
         return (NULL);
+      }
 
       cupsdUpdateQuota(printer, job->username, 0, kbytes);
     }
@@ -4540,7 +4571,8 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
   ipp_attribute_t *attr;		/* Attribute */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "copy_banner(%p[%d], %p[%d], %s)",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "copy_banner(con=%p[%d], job=%p[%d], name=\"%s\")",
                   con, con ? con->http.fd : -1, job, job->id,
 		  name ? name : "(null)");
 
@@ -4564,7 +4596,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
   if ((out = cupsFileOpen(filename, "w")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "copy_banner: Unable to create banner job file %s - %s",
+                    "Unable to create banner job file %s - %s",
                     filename, strerror(errno));
     job->num_files --;
     return (0);
@@ -4620,7 +4652,7 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
     cupsFileClose(out);
     unlink(filename);
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "copy_banner: Unable to open banner template file %s - %s",
+                    "Unable to open banner template file %s - %s",
                     filename, strerror(errno));
     job->num_files --;
     return (0);

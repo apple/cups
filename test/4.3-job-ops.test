@@ -5,6 +5,27 @@
 #
 {
 	# The name of the test...
+	NAME "Print PostScript Job with bad job-sheets value to Test1"
+
+	# The operation to use
+	OPERATION print-job
+	RESOURCE /printers/Test1
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
+	ATTR name job-sheets "none\,none"
+
+	FILE testfile.ps
+
+	# What statuses are OK?
+	STATUS client-error-bad-request
+}
+{
+	# The name of the test...
 	NAME "Print PostScript Job to Test1"
 
 	# The operation to use
@@ -69,7 +90,7 @@
 	ATTR name requesting-user-name $user
 
         GROUP subscription
-	ATTR uri notify-recipient-uri testnotify
+	ATTR uri notify-recipient-uri testnotify:///
 
 	FILE testfile.jpg
 

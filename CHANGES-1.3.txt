@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The scheduler now returns an error for bad job-sheets
+	  values (STR #2775)
 	- Authenticated remote printing did not work over domain
 	  sockets (STR #2750)
 	- The scheduler incorrectly logged errors for print filters

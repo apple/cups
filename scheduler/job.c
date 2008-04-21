@@ -21,6 +21,7 @@
  *   cupsdCheckJobs()           - Check the pending jobs and start any if
  *                                the destination is available.
  *   cupsdCleanJobs()           - Clean out old jobs.
+ *   cupsdDeleteJob()           - Free all memory used by a job.
  *   cupsdFinishJob()           - Finish a job.
  *   cupsdFreeAllJobs()         - Free all jobs from memory.
  *   cupsdFindJob()             - Find the specified job.
@@ -44,7 +45,6 @@
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
- *   free_job()                 - Free all memory used by a job.
  *   ipp_length()               - Compute the size of the buffer needed to
  *                                hold the textual IPP attributes.
  *   load_job_cache()           - Load jobs from the job.cache file.
@@ -89,7 +89,6 @@ static mime_filter_t	gziptoany_filter =
 
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
-static void	free_job(cupsd_job_t *job);
 static int	ipp_length(ipp_t *ipp);
 static void	load_job_cache(const char *filename);
 static void	load_next_job_id(const char *filename);
@@ -301,7 +300,7 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
     * Free all memory used...
     */
 
-    free_job(job);
+    cupsdDeleteJob(job);
   }
 
   cupsdSetBusyState();
@@ -515,6 +514,45 @@ cupsdCleanJobs(void)
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->state_value >= IPP_JOB_CANCELED)
       cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
+}
+
+
+/*
+ * 'cupsdDeleteJob()' - Free all memory used by a job.
+ */
+
+void
+cupsdDeleteJob(cupsd_job_t *job)	/* I - Job */
+{
+  cupsdClearString(&job->username);
+  cupsdClearString(&job->dest);
+  cupsdClearString(&job->auth_username);
+  cupsdClearString(&job->auth_domain);
+  cupsdClearString(&job->auth_password);
+
+#ifdef HAVE_GSSAPI
+ /*
+  * Destroy the credential cache and clear the KRB5CCNAME env var string.
+  */
+
+  if (job->ccache)
+  {
+    krb5_cc_destroy(KerberosContext, job->ccache);
+    job->ccache = NULL;
+  }
+
+  cupsdClearString(&job->ccname);
+#endif /* HAVE_GSSAPI */
+
+  if (job->num_files > 0)
+  {
+    free(job->compressions);
+    free(job->filetypes);
+  }
+
+  ippDelete(job->attrs);
+
+  free(job);
 }
 
 
@@ -828,7 +866,7 @@ cupsdFreeAllJobs(void)
     cupsArrayRemove(ActiveJobs, job);
     cupsArrayRemove(PrintingJobs, job);
 
-    free_job(job);
+    cupsdDeleteJob(job);
   }
 
   cupsdReleaseSignals();
@@ -1844,45 +1882,6 @@ compare_jobs(void *first,		/* I - First job */
 	     void *data)		/* I - App data (not used) */
 {
   return (((cupsd_job_t *)first)->id - ((cupsd_job_t *)second)->id);
-}
-
-
-/*
- * 'free_job()' - Free all memory used by a job.
- */
-
-static void
-free_job(cupsd_job_t *job)		/* I - Job */
-{
-  cupsdClearString(&job->username);
-  cupsdClearString(&job->dest);
-  cupsdClearString(&job->auth_username);
-  cupsdClearString(&job->auth_domain);
-  cupsdClearString(&job->auth_password);
-
-#ifdef HAVE_GSSAPI
- /*
-  * Destroy the credential cache and clear the KRB5CCNAME env var string.
-  */
-
-  if (job->ccache)
-  {
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    job->ccache = NULL;
-  }
-
-  cupsdClearString(&job->ccname);
-#endif /* HAVE_GSSAPI */
-
-  if (job->num_files > 0)
-  {
-    free(job->compressions);
-    free(job->filetypes);
-  }
-
-  ippDelete(job->attrs);
-
-  free(job);
 }
 
 
