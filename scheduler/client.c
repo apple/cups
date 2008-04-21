@@ -3697,12 +3697,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   */
 
   if ((options = strchr(con->uri, '?')) != NULL)
-  {
-    options ++;
-
-    if (strchr(options, '='))
-      cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options);
-  }
+    cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options + 1);
 
  /*
   * Check for known types...
@@ -3725,7 +3720,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
 
     filename = strrchr(filename, '/') + 1; /* Filename always absolute */
 
-    cupsdSetString(&con->options, options);
+    cupsdSetStringf(&con->options, " %s", options);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
@@ -4726,6 +4721,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
       envp[envc ++] = con->query_string;
     }
+    else
+      envp[envc ++] = "QUERY_STRING=";
   }
   else
   {
