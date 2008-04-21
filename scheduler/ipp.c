@@ -42,6 +42,8 @@
  *   cancel_job()                - Cancel a print job.
  *   cancel_subscription()       - Cancel a subscription.
  *   check_quotas()              - Check quotas for a printer and user.
+ *   check_rss_recipient()       - Check that we do not have a duplicate RSS
+ *                                 feed URI.
  *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   copy_banner()               - Copy a banner file to the requests directory
@@ -157,6 +159,7 @@ static void	authenticate_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	cancel_all_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	cancel_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	cancel_subscription(cupsd_client_t *con, int id);
+static int	check_rss_recipient(const char *recipient);
 static int	check_quotas(cupsd_client_t *con, cupsd_printer_t *p);
 static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
 		                        int quickcopy);
@@ -1993,10 +1996,70 @@ add_job_subscriptions(
     {
       if (!strcmp(attr->name, "notify-recipient-uri") &&
           attr->value_tag == IPP_TAG_URI)
+      {
+       /*
+        * Validate the recipient scheme against the ServerBin/notifier
+	* directory...
+	*/
+
+	char	notifier[1024],		/* Notifier filename */
+		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
+		userpass[HTTP_MAX_URI],	/* Username portion of URI */
+		host[HTTP_MAX_URI],	/* Host portion of URI */
+		resource[HTTP_MAX_URI];	/* Resource portion of URI */
+        int	port;			/* Port portion of URI */
+
+
         recipient = attr->values[0].string.text;
+
+	if (httpSeparateURI(HTTP_URI_CODING_ALL, recipient,
+	                    scheme, sizeof(scheme), userpass, sizeof(userpass),
+			    host, sizeof(host), &port,
+			    resource, sizeof(resource)) < HTTP_URI_OK)
+        {
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("Bad notify-recipient-uri URI \"%s\"!"), recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_URI_SCHEME);
+	  return;
+	}
+
+        snprintf(notifier, sizeof(notifier), "%s/notifier/%s", ServerBin,
+	         scheme);
+        if (access(notifier, X_OK))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("notify-recipient-uri URI \"%s\" uses unknown "
+			    "scheme!"), recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_URI_SCHEME);
+	  return;
+	}
+
+        if (!strcmp(scheme, "rss") && !check_rss_recipient(recipient))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("notify-recipient-uri URI \"%s\" is already used!"),
+			  recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_ATTRIBUTES);
+	  return;
+	}
+      }
       else if (!strcmp(attr->name, "notify-pull-method") &&
                attr->value_tag == IPP_TAG_KEYWORD)
+      {
         pullmethod = attr->values[0].string.text;
+
+        if (strcmp(pullmethod, "ippget"))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("Bad notify-pull-method \"%s\"!"), pullmethod);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_ATTRIBUTES);
+	  return;
+	}
+      }
       else if (!strcmp(attr->name, "notify-charset") &&
                attr->value_tag == IPP_TAG_CHARSET &&
 	       strcmp(attr->values[0].string.text, "us-ascii") &&
@@ -3921,6 +3984,40 @@ cancel_subscription(
 
 
 /*
+ * 'check_rss_recipient()' - Check that we do not have a duplicate RSS feed URI.
+ */
+
+static int				/* O - 1 if OK, 0 if not */
+check_rss_recipient(
+    const char *recipient)		/* I - Recipient URI */
+{
+  cupsd_subscription_t	*sub;		/* Current subscription */
+
+
+  for (sub = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions);
+       sub;
+       sub = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
+    if (sub->recipient)
+    {
+     /*
+      * Compare the URIs up to the first ?...
+      */
+
+      const char *r1, *r2;
+
+      for (r1 = recipient, r2 = sub->recipient;
+           *r1 == *r2 && *r1 && *r1 != '?' && *r2 && *r2 != '?';
+	   r1 ++, r2 ++);
+
+      if (*r1 == *r2)
+        return (0);
+    }
+
+  return (1);
+}
+
+
+/*
  * 'check_quotas()' - Check quotas for a printer and user.
  */
 
@@ -5699,10 +5796,10 @@ create_subscription(
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
     if (attr->group_tag != IPP_TAG_ZERO)
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "g%04x v%04x %s", attr->group_tag,
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "g%04x v%04x %s", attr->group_tag,
                       attr->value_tag, attr->name);
     else
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "----SEP----");
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "----SEP----");
   }
 #endif /* DEBUG */
 
@@ -5854,6 +5951,16 @@ create_subscription(
 			    "scheme!"), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
+	  return;
+	}
+
+        if (!strcmp(scheme, "rss") && !check_rss_recipient(recipient))
+	{
+          send_ipp_status(con, IPP_NOT_POSSIBLE,
+	                  _("notify-recipient-uri URI \"%s\" is already used!"),
+			  recipient);
+	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
+	                "notify-status-code", IPP_ATTRIBUTES);
 	  return;
 	}
       }
