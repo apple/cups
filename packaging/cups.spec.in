@@ -67,91 +67,6 @@ Summary: Common UNIX Printing System - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
-%package da
-Summary: Common UNIX Printing System - Danish support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package de
-Summary: Common UNIX Printing System - German support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package es
-Summary: Common UNIX Printing System - Spanish support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package et
-Summary: Common UNIX Printing System - Estonian support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package fi
-Summary: Common UNIX Printing System - Finnish support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package fr
-Summary: Common UNIX Printing System - French support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package he
-Summary: Common UNIX Printing System - Hebrew support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package it
-Summary: Common UNIX Printing System - Italian support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package ja
-Summary: Common UNIX Printing System - Japanese support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package ko
-Summary: Common UNIX Printing System - Korean support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package nl
-Summary: Common UNIX Printing System - Dutch support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package no
-Summary: Common UNIX Printing System - Nowegian support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package pl
-Summary: Common UNIX Printing System - Polish support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package pt
-Summary: Common UNIX Printing System - Portuguese support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package ru
-Summary: Common UNIX Printing System - Russian support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package sv
-Summary: Common UNIX Printing System - Swedish support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
-%package zh
-Summary: Common UNIX Printing System - Chinese support
-Group: System Environment/Daemons
-Requires: %{name} = %{epoch}:%{version}
-
 %if %{?_with_php:1}%{!?_with_php:0}
 %package php
 Summary: Common UNIX Printing System - PHP support
@@ -386,14 +301,15 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/charsets/*
 %dir /usr/share/cups/data
 /usr/share/cups/data/*
+%dir /usr/share/cups/drv
+/usr/share/cups/drv/*
 %dir /usr/share/cups/fonts
 /usr/share/cups/fonts/*
 %dir /usr/share/cups/model
-/usr/share/cups/model/*
 %dir /usr/share/cups/ppdc
 /usr/share/cups/ppdc/*
 %dir /usr/share/cups/templates
-/usr/share/cups/templates/*.tmpl
+/usr/share/cups/templates/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
 %dir /usr/share/doc/cups/help
@@ -414,6 +330,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
+/usr/share/locale/*
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
@@ -497,117 +414,6 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/cups/daemon/cups-lpd
 %dir /usr/share/man/man8
 /usr/share/man/man8/cups-lpd.8.gz
-
-%files da
-%defattr(-,root,root)
-/usr/share/locale/da/*
-
-%files de
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/de
-#/usr/share/doc/cups/de/index.html
-#%dir /usr/share/cups/templates/de
-#/usr/share/cups/templates/de/*
-/usr/share/locale/de/*
-
-%files es
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/es
-#/usr/share/doc/cups/es/index.html
-#%dir /usr/share/cups/templates/es
-#/usr/share/cups/templates/es/*
-/usr/share/locale/es/*
-
-%files et
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/et
-#/usr/share/doc/cups/et/index.html
-#%dir /usr/share/cups/templates/et
-#/usr/share/cups/templates/et/*
-/usr/share/locale/et/*
-
-%files fi
-%defattr(-,root,root)
-/usr/share/locale/fi/*
-
-%files fr
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/fr
-#/usr/share/doc/cups/fr/index.html
-#%dir /usr/share/cups/templates/fr
-#/usr/share/cups/templates/fr/*
-/usr/share/locale/fr/*
-
-%files he
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/he
-#/usr/share/doc/cups/he/index.html
-#/usr/share/doc/cups/he/cups.css
-#%dir /usr/share/cups/templates/he
-#/usr/share/cups/templates/he/*
-/usr/share/locale/he/*
-
-%files it
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/it
-#/usr/share/doc/cups/it/index.html
-#%dir /usr/share/cups/templates/it
-#/usr/share/cups/templates/it/*
-/usr/share/locale/it/*
-
-%files ja
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/ja
-#/usr/share/doc/cups/ja/index.html
-#%dir /usr/share/cups/templates/ja
-#/usr/share/cups/templates/ja/*
-/usr/share/locale/ja/*
-
-%files ko
-%defattr(-,root,root)
-/usr/share/locale/ko/*
-
-%files nl
-%defattr(-,root,root)
-/usr/share/locale/nl/*
-
-%files no
-%defattr(-,root,root)
-/usr/share/locale/no/*
-
-%files pl
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/pl
-#/usr/share/doc/cups/pl/index.html
-#%dir /usr/share/cups/templates/pl
-#/usr/share/cups/templates/pl/*
-/usr/share/locale/pl/*
-
-%files pt
-%defattr(-,root,root)
-/usr/share/locale/pt/*
-/usr/share/locale/pt_BR/*
-
-%files ru
-%defattr(-,root,root)
-/usr/share/locale/ru/*
-
-%files sv
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/sv
-#/usr/share/doc/cups/sv/index.html
-#%dir /usr/share/cups/templates/sv
-#/usr/share/cups/templates/sv/*
-/usr/share/locale/sv/*
-
-%files zh
-%defattr(-,root,root)
-#%dir /usr/share/doc/cups/zh_TW
-#/usr/share/doc/cups/zh_TW/index.html
-#%dir /usr/share/cups/templates/zh_TW
-#/usr/share/cups/templates/zh_TW/*
-/usr/share/locale/zh/*
-/usr/share/locale/zh_TW/*
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %files php
