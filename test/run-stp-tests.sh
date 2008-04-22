@@ -164,8 +164,8 @@ root=`dirname $cwd`
 # will usually cause tests to fail erroneously...
 #
 
-typeset +x LPDEST
-typeset +x PRINTER
+unset LPDEST
+unset PRINTER
 
 #
 # See if we want to use valgrind...
