@@ -55,6 +55,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		first_arg,		/* First argument for backend */
+		do_query = 0,		/* Do PostScript query? */
 		do_side_tests = 0,	/* Test side-channel ops? */
 		do_trickle = 0;		/* Trickle data to backend */
   char		scheme[255],		/* Scheme in URI == backend */
@@ -74,7 +75,9 @@ main(int  argc,				/* I - Number of command-line args */
   for (first_arg = 1;
        argv[first_arg] && argv[first_arg][0] == '-';
        first_arg ++)
-    if (!strcmp(argv[first_arg], "-s"))
+    if (!strcmp(argv[first_arg], "-ps"))
+      do_query = 1;
+    else if (!strcmp(argv[first_arg], "-s"))
       do_side_tests = 1;
     else if (!strcmp(argv[first_arg], "-t"))
       do_trickle = 1;
@@ -130,27 +133,97 @@ main(int  argc,				/* I - Number of command-line args */
   * Execute the trickle process as needed...
   */
 
-  if (do_trickle)
+  if (do_trickle || do_query)
   {
     pipe(data_fds);
 
     if ((pid = fork()) == 0)
     {
      /*
-      * Trickle child comes here...
+      * Trickle/query child comes here...  Rearrange file descriptors so that
+      * FD 
       */
 
-      int i;				/* Looping var */
+      close(0);
+      open("/dev/null", O_RDONLY);
 
+      close(1);
+      dup(data_fds[1]);
       close(data_fds[0]);
-      for (i = 0; i < 10; i ++)
+      close(data_fds[1]);
+
+      close(3);
+      dup(back_fds[0]);
+      close(back_fds[0]);
+      close(back_fds[1]);
+
+      close(4);
+      dup(side_fds[0]);
+      close(side_fds[0]);
+      close(side_fds[1]);
+
+      if (do_trickle)
       {
        /*
-        * Write 10 spaces, 1 per second...
+	* Write 10 spaces, 1 per second...
 	*/
 
-        write(data_fds[1], " ", 1);
-	sleep(1);
+	int i;				/* Looping var */
+
+	for (i = 0; i < 10; i ++)
+	{
+	  write(1, " ", 1);
+	  sleep(1);
+	}
+      }
+      else
+      {
+       /*
+        * Do a simple PostScript query job to get the default page size.
+	*/
+
+        char	buffer[1024];		/* Buffer for response data */
+	ssize_t	bytes;			/* Number of bytes of response data */
+        static const char *ps_query =	/* PostScript query file */
+		"%!\n"
+		"save\n"
+		"currentpagedevice /PageSize get aload pop\n"
+		"2 copy gt {exch} if\n"
+		"(Unknown)\n"
+		"19 dict\n"
+		"dup [612 792] (Letter) put\n"
+		"dup [612 1008] (Legal) put\n"
+		"dup [612 935] (w612h935) put\n"
+		"dup [522 756] (Executive) put\n"
+		"dup [595 842] (A4) put\n"
+		"dup [420 595] (A5) put\n"
+		"dup [499 709] (ISOB5) put\n"
+		"dup [516 728] (B5) put\n"
+		"dup [612 936] (w612h936) put\n"
+		"dup [284 419] (Postcard) put\n"
+		"dup [419.5 567] (DoublePostcard) put\n"
+		"dup [558 774] (w558h774) put\n"
+		"dup [553 765] (w553h765) put\n"
+		"dup [522 737] (w522h737) put\n"
+		"dup [499 709] (EnvISOB5) put\n"
+		"dup [297 684] (Env10) put\n"
+		"dup [459 649] (EnvC5) put\n"
+		"dup [312 624] (EnvDL) put\n"
+		"dup [279 540] (EnvMonarch) put\n"
+		"{ exch aload pop 4 index sub abs 5 le exch\n"
+		"  5 index sub abs 5 le and\n"
+		"  {exch pop exit} {pop} ifelse\n"
+		"} bind forall\n"
+		"= flush pop pop\n"
+		"restore\n"
+		"\004";
+
+
+        write(1, ps_query, strlen(ps_query));
+	write(2, "DEBUG: START\n", 13);
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 30.0)) > 0)
+	  write(2, buffer, bytes);
+	write(2, "\nDEBUG: END\n", 12);
       }
 
       exit(0);
@@ -174,7 +247,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Child comes here...
     */
 
-    if (do_trickle)
+    if (do_trickle || do_query)
     {
       close(0);
       dup(data_fds[0]);
@@ -207,7 +280,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Parent comes here, setup back and side channel file descriptors...
   */
 
-  if (do_trickle)
+  if (do_trickle || do_query)
   {
     close(data_fds[0]);
     close(data_fds[1]);
@@ -299,8 +372,8 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 usage(void)
 {
-  fputs("Usage: betest [-s] [-t] device-uri job-id user title copies options "
-	"[file]\n", stderr);
+  fputs("Usage: betest [-ps] [-s] [-t] device-uri job-id user title copies "
+        "options [file]\n", stderr);
   exit(1);
 }
 
