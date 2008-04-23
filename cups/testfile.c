@@ -187,6 +187,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   unsigned char	readbuf[8192],		/* Read buffer */
 		writebuf[8192];		/* Write buffer */
   int		byte;			/* Byte from file */
+  off_t		length;			/* Length of file */
   static const char *partial_line = "partial line";
 					/* Partial line */
 
@@ -258,7 +259,7 @@ read_write_tests(int compression)	/* I - Use compression? */
     fputs("cupsFilePrintf(): ", stdout);
 
     for (i = 0; i < 1000; i ++)
-      if (cupsFilePrintf(fp, "TestLine %d\n", i) < 0)
+      if (cupsFilePrintf(fp, "TestLine %03d\n", i) < 0)
         break;
 
     if (i >= 1000)
@@ -320,6 +321,20 @@ read_write_tests(int compression)	/* I - Use compression? */
     }
 
    /*
+    * cupsFileTell()
+    */
+
+    fputs("cupsFileTell(): ", stdout);
+
+    if ((length = cupsFileTell(fp)) == 81933283)
+      puts("PASS");
+    else
+    {
+      printf("FAIL (" CUPS_LLFMT " instead of 81933283)\n", CUPS_LLCAST length);
+      status ++;
+    }
+
+   /*
     * cupsFileClose()
     */
 
@@ -343,7 +358,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   * cupsFileOpen(read)
   */
 
-  fputs("cupsFileOpen(read): ", stdout);
+  fputs("\ncupsFileOpen(read): ", stdout);
 
   fp = cupsFileOpen(compression ? "testfile.dat.gz" : "testfile.dat", "r");
   if (fp)
@@ -422,23 +437,9 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileGetChar(): ", stdout);
 
-#ifdef DEBUG
-    puts("\ni     byte\n----- -----");
-
-    for (i = 0; i < 256; i ++)
-    {
-      byte = cupsFileGetChar(fp);
-
-      printf("%-5d %-5d\n", i, byte);
-
-      if (byte != i)
-        break;
-    }
-#else
     for (i = 0; i < 256; i ++)
       if ((byte = cupsFileGetChar(fp)) != i)
         break;
-#endif /* DEBUG */
 
     if (i >= 256)
       puts("PASS");
@@ -501,6 +502,20 @@ read_write_tests(int compression)	/* I - Use compression? */
     else
     {
       printf("FAIL (got '%c', expected '%c')\n", byte, partial_line[i]);
+      status ++;
+    }
+
+   /*
+    * cupsFileTell()
+    */
+
+    fputs("cupsFileTell(): ", stdout);
+
+    if ((length = cupsFileTell(fp)) == 81933283)
+      puts("PASS");
+    else
+    {
+      printf("FAIL (" CUPS_LLFMT " instead of 81933283)\n", CUPS_LLCAST length);
       status ++;
     }
 
