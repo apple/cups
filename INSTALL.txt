@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.4svn - 2008-04-08
+INSTALL - CUPS v1.4svn - 2008-04-23
 -----------------------------------
 
 This file describes how to compile and install CUPS from source
@@ -14,10 +14,10 @@ code. For more information on CUPS see the file called
 
 BEFORE YOU BEGIN
 
-    You'll need an ANSI-compliant C compiler, plus a make program
-    and Bourne shell.  The GNU compiler tools work well - we've
-    tested the current CUPS code against several versions of GCC
-    with excellent results.
+    You'll need ANSI-compliant C and C++ compilers, plus a make
+    program and Bourne shell.  The GNU compiler tools work well -
+    we've tested the current CUPS code against several versions
+    of GCC with excellent results.
 
     The makefiles used by the project should work with most
     versions of make.  We've tested them with GNU make as well as
@@ -96,6 +96,10 @@ CONFIGURATION
 	LDFLAGS="-L/some/directory" \
 	./configure ...
 
+    The "--enable-debug" option compiles CUPS with debugging enabled,
+    as well as support for debug logging via the CUPS_DEBUG_LOG
+    environment variable at run-time.
+
     Once you have configured things, just type:
 
 	make ENTER
@@ -162,6 +166,15 @@ CREATING BINARY DISTRIBUTIONS WITH EPM
 	slackware - Build a Slackware package
 	swinstall - Build a HP-UX package (also depot)
 	tardist   - Builds an IRIX package (also inst)
+
+
+GETTING DEBUG LOGGING FROM CUPS
+
+    When configured with the "--enable-debug" option, CUPS compiles
+    in additional debug logging support in the scheduler, CUPS API,
+    and CUPS Imaging API.  Set the CUPS_DEBUG_LOG environment
+    variable to a filename to append logging information at run-time.
+    Use the name "-" to send the messages to stderr.
 
 
 REPORTING PROBLEMS

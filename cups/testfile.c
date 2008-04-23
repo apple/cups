@@ -41,6 +41,7 @@
  * Local functions...
  */
 
+static int	random_tests(void);
 static int	read_write_tests(int compression);
 
 
@@ -77,13 +78,19 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* HAVE_LIBZ */
 
    /*
+    * Do uncompressed random I/O tests...
+    */
+
+    status = random_tests();
+
+   /*
     * Test fdopen and close without reading...
     */
 
     pipe(fds);
     close(fds[1]);
 
-    fputs("cupsFileOpenFd(fd, \"r\"): ", stdout);
+    fputs("\ncupsFileOpenFd(fd, \"r\"): ", stdout);
     fflush(stdout);
 
     if ((fdfile = cupsFileOpenFd(fds[0], "r")) == NULL)
@@ -114,7 +121,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Test path functions...
     */
 
-    fputs("cupsFileFind: ", stdout);
+    fputs("\ncupsFileFind: ", stdout);
 #ifdef WIN32
     if (cupsFileFind("notepad.exe", "C:/WINDOWS", 1, filename, sizeof(filename)) &&
 	cupsFileFind("notepad.exe", "C:/WINDOWS;C:/WINDOWS/SYSTEM32", 1, filename, sizeof(filename)))
@@ -172,6 +179,190 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
+ * 'random_tests()' - Do random access tests.
+ */
+
+static int				/* O - Status */
+random_tests(void)
+{
+  int		status,			/* Status of tests */
+		pass,			/* Current pass */
+		count,			/* Number of records read */
+		record,			/* Current record */
+		num_records;		/* Number of records */
+  ssize_t	pos,			/* Position in file */
+		expected;		/* Expected position in file */
+  cups_file_t	*fp;			/* File */
+  char		buffer[512];		/* Data buffer */
+
+
+ /*
+  * Run 4 passes, each time appending to a data file and then reopening the
+  * file for reading to validate random records in the file.
+  */
+
+  for (status = 0, pass = 0; pass < 4; pass ++)
+  {
+   /*
+    * cupsFileOpen(append)
+    */
+
+    printf("\ncupsFileOpen(append %d): ", pass);
+
+    if ((fp = cupsFileOpen("testfile.dat", "a")) == NULL)
+    {
+      printf("FAIL (%s)\n", strerror(errno));
+      status ++;
+      break;
+    }
+    else
+      puts("PASS");
+
+   /*
+    * cupsFileTell()
+    */
+
+    expected = 256 * sizeof(buffer) * pass;
+
+    fputs("cupsFileTell(): ", stdout);
+    if ((pos = cupsFileTell(fp)) != expected)
+    {
+      printf("FAIL (" CUPS_LLFMT " instead of " CUPS_LLFMT ")\n",
+	     CUPS_LLCAST pos, CUPS_LLCAST expected);
+      status ++;
+      break;
+    }
+    else
+      puts("PASS");
+
+   /*
+    * cupsFileWrite()
+    */
+
+    fputs("cupsFileWrite(256 512-byte records): ", stdout);
+    for (record = 0; record < 256; record ++)
+    {
+      memset(buffer, record, sizeof(buffer));
+      if (cupsFileWrite(fp, buffer, sizeof(buffer)) < sizeof(buffer))
+        break;
+    }
+
+    if (record < 256)
+    {
+      printf("FAIL (%d: %s)\n", record, strerror(errno));
+      status ++;
+      break;
+    }
+    else
+      puts("PASS");
+
+   /*
+    * cupsFileTell()
+    */
+
+    expected += 256 * sizeof(buffer);
+
+    fputs("cupsFileTell(): ", stdout);
+    if ((pos = cupsFileTell(fp)) != expected)
+    {
+      printf("FAIL (" CUPS_LLFMT " instead of " CUPS_LLFMT ")\n",
+             CUPS_LLCAST pos, CUPS_LLCAST expected);
+      status ++;
+      break;
+    }
+    else
+      puts("PASS");
+
+    cupsFileClose(fp);
+
+   /*
+    * cupsFileOpen(read)
+    */
+
+    printf("\ncupsFileOpen(read %d): ", pass);
+
+    if ((fp = cupsFileOpen("testfile.dat", "r")) == NULL)
+    {
+      printf("FAIL (%s)\n", strerror(errno));
+      status ++;
+      break;
+    }
+    else
+      puts("PASS");
+
+   /*
+    * cupsFileSeek, cupsFileRead
+    */
+
+    fputs("cupsFileSeek(), cupsFileRead(): ", stdout);
+
+    for (num_records = (pass + 1) * 256, count = (pass + 1) * 256,
+             record = rand() % num_records;
+         count > 0;
+	 count --, record = (record + (rand() & 31) - 16 + num_records) %
+	                    num_records)
+    {
+     /*
+      * The last record is always the first...
+      */
+
+      if (count == 1)
+        record = 0;
+
+     /*
+      * Try reading the data for the specified record, and validate the
+      * contents...
+      */
+
+      expected = sizeof(buffer) * record;
+
+      if ((pos = cupsFileSeek(fp, expected)) != expected)
+      {
+        printf("FAIL (" CUPS_LLFMT " instead of " CUPS_LLFMT ")\n",
+	       CUPS_LLCAST pos, CUPS_LLCAST expected);
+        status ++;
+	break;
+      }
+      else
+      {
+	if (cupsFileRead(fp, buffer, sizeof(buffer)) != sizeof(buffer))
+	{
+	  printf("FAIL (%s)\n", strerror(errno));
+	  status ++;
+	  break;
+	}
+	else if ((buffer[0] & 255) != (record & 255) ||
+	         memcmp(buffer, buffer + 1, sizeof(buffer) - 1))
+	{
+	  printf("FAIL (Bad Data - %d instead of %d)\n", buffer[0] & 255,
+	         record & 255);
+	  status ++;
+	  break;
+	}
+      }
+    }
+
+    if (count == 0)
+      puts("PASS");
+
+    cupsFileClose(fp);
+  }
+
+ /*
+  * Remove the test file...
+  */
+
+  unlink("testfile.dat");
+                    
+ /*
+  * Return the test status...
+  */
+
+  return (status);
+}
+
+
+/*
  * 'read_write_tests()' - Perform read/write tests.
  */
 
@@ -179,7 +370,7 @@ static int				/* O - Status */
 read_write_tests(int compression)	/* I - Use compression? */
 {
   int		i;			/* Looping var */
-  cups_file_t	*fp;			/* First file */
+  cups_file_t	*fp;			/* File */
   int		status;			/* Exit status */
   char		line[1024],		/* Line from file */
 		*value;			/* Directive value from line */
@@ -539,6 +730,12 @@ read_write_tests(int compression)	/* I - Use compression? */
     status ++;
   }
 
+ /*
+  * Remove the test file...
+  */
+
+  unlink(compression ? "testfile.dat.gz" : "testfile.dat");
+                    
  /*
   * Return the test status...
   */
