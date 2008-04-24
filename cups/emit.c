@@ -413,12 +413,19 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     */
 
     ppd_attr_t	*charset;		/* PJL charset */
+    ppd_attr_t	*display;		/* PJL display command */
 
 
     if ((charset = ppdFindAttr(ppd, "cupsPJLCharset", NULL)) != NULL)
     {
       if (!charset->value || strcasecmp(charset->value, "UTF-8"))
         charset = NULL;
+    }
+
+    if ((display = ppdFindAttr(ppd, "cupsPJLDisplay", NULL)) != NULL)
+    {
+      if (!display->value)
+        display = NULL;
     }
 
     fputs("\033%-12345X@PJL\n", fp);
@@ -477,9 +484,16 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
     * Send PJL JOB and PJL RDYMSG commands before we enter PostScript mode...
     */
 
-    fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", temp,
-            job_id, user, temp);
-    fprintf(fp, "@PJL RDYMSG DISPLAY = \"%d %s %s\"\n", job_id, user, temp);
+    if (display && strcmp(display->value, "job"))
+    {
+      fprintf(fp, "@PJL JOB NAME = \"%s\"\n", temp);
+
+      if (display && !strcmp(display->value, "rdymsg"))
+        fprintf(fp, "@PJL RDYMSG DISPLAY = \"%d %s %s\"\n", job_id, user, temp);
+    }
+    else
+      fprintf(fp, "@PJL JOB NAME = \"%s\" DISPLAY = \"%d %s %s\"\n", temp,
+	      job_id, user, temp);
   }
   else
     fputs(ppd->jcl_begin, fp);
