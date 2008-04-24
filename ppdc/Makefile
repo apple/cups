@@ -118,6 +118,10 @@ install:	all install-data install-headers install-libs install-exec
 
 install-data:
 	$(INSTALL_DIR) $(DATADIR)/drv
+	$(INSTALL_DATA) sample.drv $(DATADIR)/drv
+	if test `uname` = Darwin; then \
+		$(INSTALL_DIR) /Library/Printers/PPDs.drv; \
+	fi
 
 
 #
@@ -203,7 +207,11 @@ uninstall:
 	$(RM) $(BINDIR)/ppdpo
 	$(RM) $(SERVERBIN)/driver/drv
 	$(RMDIR) $(SERVERBIN)/driver
+	$(RM) $(DATADIR)/drv/sample.drv
 	$(RMDIR) $(DATADIR)/drv
+	if test `uname` = Darwin; then \
+		$(RMDIR) /Library/Printers/PPDs.drv; \
+	fi
 	$(RM) $(LIBDIR)/libcupsppdc.1.dylib
 	$(RM) $(LIBDIR)/libcupsppdc.a
 	$(RM) $(LIBDIR)/libcupsppdc.dylib

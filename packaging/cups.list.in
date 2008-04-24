@@ -95,57 +95,6 @@
 %subpackage lpd
 %description LPD support
 
-%subpackage da
-%description Danish support
-
-%subpackage de
-%description German support
-
-%subpackage es
-%description Spanish support
-
-%subpackage et
-%description Estonian support
-
-%subpackage fi
-%description Finish support
-
-%subpackage fr
-%description French support
-
-%subpackage he
-%description Hebrew support
-
-%subpackage it
-%description Italian support
-
-%subpackage ja
-%description Japanese support
-
-%subpackage ko
-%description Korean support
-
-%subpackage nl
-%description Dutch support
-
-%subpackage no
-%description Norwegian support
-
-%subpackage pl
-%description Polish support
-
-%subpackage pt
-%description Portuguese support
-
-%subpackage ru
-%description Russian support
-
-%subpackage sv
-%description Swedish support
-
-%subpackage zh
-%description Chinese support
-
 %subpackage
 
 
@@ -430,62 +379,60 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
-%subpackage da
 f 0644 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
 f 0644 root sys $LOCALEDIR/da/ppdc_da.po locale/ppdc_da.po
-%subpackage de
+
 f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
 f 0644 root sys $LOCALEDIR/de/ppdc_de.po locale/ppdc_de.po
-%subpackage es
+
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 f 0644 root sys $LOCALEDIR/es/ppdc_es.po locale/ppdc_es.po
-%subpackage et
+
 f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
 f 0644 root sys $LOCALEDIR/et/ppdc_et.po locale/ppdc_et.po
-%subpackage fi
+
 f 0644 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
 f 0644 root sys $LOCALEDIR/fi/ppdc_fi.po locale/ppdc_fi.po
-%subpackage fr
+
 f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
 f 0644 root sys $LOCALEDIR/fr/ppdc_fr.po locale/ppdc_fr.po
-%subpackage he
+
 f 0644 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
 f 0644 root sys $LOCALEDIR/he/ppdc_he.po locale/ppdc_he.po
-%subpackage it
+
 f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
 f 0644 root sys $LOCALEDIR/it/ppdc_it.po locale/ppdc_it.po
-%subpackage ja
+
 f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
 f 0644 root sys $LOCALEDIR/ja/ppdc_ja.po locale/ppdc_ja.po
-%subpackage ko
+
 f 0644 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
 f 0644 root sys $LOCALEDIR/ko/ppdc_ko.po locale/ppdc_ko.po
-%subpackage nl
+
 f 0644 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
 f 0644 root sys $LOCALEDIR/nl/ppdc_nl.po locale/ppdc_nl.po
-%subpackage no
+
 f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
 f 0644 root sys $LOCALEDIR/no/ppdc_no.po locale/ppdc_no.po
-%subpackage pl
+
 f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
 f 0644 root sys $LOCALEDIR/pl/ppdc_pl.po locale/ppdc_pl.po
-%subpackage pt
+
 f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
 f 0644 root sys $LOCALEDIR/pt/ppdc_pt.po locale/ppdc_pt.po
 f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
 f 0644 root sys $LOCALEDIR/pt_BR/ppdc_pt_BR.po locale/ppdc_pt_BR.po
-%subpackage ru
+
 f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
 f 0644 root sys $LOCALEDIR/ru/ppdc_ru.po locale/ppdc_ru.po
-%subpackage sv
+
 f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
 f 0644 root sys $LOCALEDIR/sv/ppdc_sv.po locale/ppdc_sv.po
-%subpackage zh
+
 f 0644 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
 f 0644 root sys $LOCALEDIR/zh/ppdc_zh.po locale/ppdc_zh.po
 f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
 f 0644 root sys $LOCALEDIR/zh_TW/ppdc_zh_TW.po locale/ppdc_zh_TW.po
-%subpackage
 
 d 0755 root sys $DATADIR -
 
@@ -508,12 +455,14 @@ f 0644 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0644 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0644 root sys $DATADIR/data/testprint.ps data/testprint.ps
 
+d 0755 root sys $DATADIR/drv -
+f 0644 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
+
 d 0755 root sys $DATADIR/fonts -
 f 0644 root sys $DATADIR/fonts fonts/Courier*
 f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
 
 d 0755 root sys $DATADIR/model -
-f 0644 root sys $DATADIR/model ppd/*.ppd
 
 d 0755 root sys $DATADIR/ppdc -
 f 0644 root sys $DATADIR/ppdc data/*.defs
@@ -523,37 +472,35 @@ d 0755 root sys $DATADIR/templates -
 f 0644 root sys $DATADIR/templates templates/*.tmpl
 
 ## Template files
-#%subpackage de
 #d 0755 root sys $DATADIR/templates/de
 #f 0644 root sys $DATADIR/templates/de templates/de/*.tmpl
-#%subpackage es
+
 #d 0755 root sys $DATADIR/templates/es
 #f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
-#%subpackage et
+
 #d 0755 root sys $DATADIR/templates/et
 #f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
-#%subpackage fr
+
 #d 0755 root sys $DATADIR/templates/fr
 #f 0644 root sys $DATADIR/templates/fr templates/fr/*.tmpl
-#%subpackage he
+
 #d 0755 root sys $DATADIR/templates/he
 #f 0644 root sys $DATADIR/templates/he templates/he/*.tmpl
-#%subpackage it
+
 #d 0755 root sys $DATADIR/templates/it
 #f 0644 root sys $DATADIR/templates/it templates/it/*.tmpl
-#%subpackage ja
+
 #d 0755 root sys $DATADIR/templates/ja
 #f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
-#%subpackage pl
+
 #d 0755 root sys $DATADIR/templates/pl
 #f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
-#%subpackage sv
+
 #d 0755 root sys $DATADIR/templates/sv
 #f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
-#%subpackage zh
+
 #d 0755 root sys $DATADIR/templates/zh_TW
 #f 0644 root sys $DATADIR/templates/zh_TW templates/zh_TW/*.tmpl
-#%subpackage
 
 # Config files
 d 0755 root sys $SERVERROOT -
@@ -631,38 +578,36 @@ f 0644 root sys $DOCDIR/images doc/images/*.png
 f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 
 # Localized documentation files
-#%subpackage de
 #d 0755 root sys $DOCDIR/de
 #f 0644 root sys $DOCDIR/de doc/de/*.html
-#%subpackage es
+
 #d 0755 root sys $DOCDIR/es
 #f 0644 root sys $DOCDIR/es doc/es/*.html
-#%subpackage et
+
 #d 0755 root sys $DOCDIR/et
 #f 0644 root sys $DOCDIR/et doc/et/*.html
-#%subpackage fr
+
 #d 0755 root sys $DOCDIR/fr
 #f 0644 root sys $DOCDIR/fr doc/fr/*.html
-#%subpackage he
+
 #d 0755 root sys $DOCDIR/he
 #f 0644 root sys $DOCDIR/he doc/he/*.html
 #f 0644 root sys $DOCDIR/he/cups.css doc/he/cups.css
-#%subpackage it
+
 #d 0755 root sys $DOCDIR/it
 #f 0644 root sys $DOCDIR/it doc/it/*.html
-#%subpackage ja
+
 #d 0755 root sys $DOCDIR/ja
 #f 0644 root sys $DOCDIR/ja doc/ja/*.html
-#%subpackage pl
+
 #d 0755 root sys $DOCDIR/pl
 #f 0644 root sys $DOCDIR/pl doc/pl/*.html
-#%subpackage sv
+
 #d 0755 root sys $DOCDIR/sv
 #f 0644 root sys $DOCDIR/sv doc/sv/*.html
-#%subpackage zh
+
 #d 0755 root sys $DOCDIR/zh_TW
 #f 0644 root sys $DOCDIR/zh_TW doc/zh_TW/*.html
-%subpackage
 
 # Man pages
 d 0755 root sys $AMANDIR -
