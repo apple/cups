@@ -1652,21 +1652,21 @@ process_children(void)
           if (job->filters[i] == pid)
 	    break;
 
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PID %d status %d state %d",
-	                job->id, pid, status, job->state_value);
-
 	if (job->filters[i] || job->backend == pid)
 	{
 	 /*
           * OK, this process has gone away; what's left?
 	  */
 
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PID %d status %d state %d",
+			  job->id, pid, status, job->state_value);
+
           if (job->filters[i])
 	    job->filters[i] = -pid;
 	  else
 	    job->backend = -pid;
 
-          if (job->state_value == IPP_JOB_CANCELED)
+          if (job->state_value >= IPP_JOB_STOPPED)
 	    status = 0;			/* Ignore errors when canceling jobs */
 
           if (status && job->status >= 0)

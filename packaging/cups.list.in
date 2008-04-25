@@ -211,6 +211,7 @@ f 0755 root sys $SERVERBIN/driver/drv ppdc/drv
 d 0755 root sys $SERVERBIN/filter -
 f 0755 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
 f 0755 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
+f 0755 root sys $SERVERBIN/filter/commandtops filter/commandtops
 f 0755 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
 f 0755 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
 %if IMGFILTERS

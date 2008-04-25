@@ -2297,11 +2297,15 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	if (ppd->num_filters == 0)
 	{
 	 /*
-	  * If there are no filters, add a PostScript printing filter.
+	  * If there are no filters, add PostScript printing filters.
 	  */
 
           add_printer_filter(p, p->filetype,
+	                     "application/vnd.cups-command 0 commandtops");
+          add_printer_filter(p, p->filetype,
 	                     "application/vnd.cups-postscript 0 -");
+
+          p->type |= CUPS_PRINTER_COMMANDS;
         }
 
        /*
