@@ -1646,11 +1646,14 @@ process_children(void)
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value == IPP_JOB_PROCESSING)
+      if (job->state_value >= IPP_JOB_HELD && job->filters[0])
       {
 	for (i = 0; job->filters[i]; i ++)
           if (job->filters[i] == pid)
 	    break;
+
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PID %d status %d state %d",
+	                job->id, pid, status, job->state_value);
 
 	if (job->filters[i] || job->backend == pid)
 	{

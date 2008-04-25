@@ -212,7 +212,9 @@ mkdir /tmp/cups-$user/bin/filter
 mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
 mkdir /tmp/cups-$user/share/banners
+mkdir /tmp/cups-$user/share/drv
 mkdir /tmp/cups-$user/share/model
+mkdir /tmp/cups-$user/share/ppdc
 mkdir /tmp/cups-$user/interfaces
 mkdir /tmp/cups-$user/log
 mkdir /tmp/cups-$user/ppd
@@ -249,7 +251,9 @@ ln -s $root/data /tmp/cups-$user/share/charmaps
 ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
 ln -s $root/fonts /tmp/cups-$user/share
-ln -s $root/ppd/*.ppd /tmp/cups-$user/share/model
+ln -s $root/ppdc/sample.drv /tmp/cups-$user/share/drv
+ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
+ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
 if test $ssltype != 0; then
@@ -308,7 +312,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug
+LogLevel debug2
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
@@ -692,9 +696,9 @@ fi
 
 # Debug2 log messages
 count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 0; then
-	echo "FAIL: $count debug2 messages, expected 0."
-	echo "<P>FAIL: $count debug2 messages, expected 0.</P>" >>$strfile
+if test $count = 0; then
+	echo "FAIL: $count debug2 messages, expected more than 0."
+	echo "<P>FAIL: $count debug2 messages, expected more than 0.</P>" >>$strfile
 	fail=`expr $fail + 1`
 else
 	echo "PASS: $count debug2 messages."
@@ -709,7 +713,7 @@ echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' /tmp/cups-$user/log/error_log >>$strfile
+grep -v '^[dD]' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile

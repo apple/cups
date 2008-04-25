@@ -16,8 +16,8 @@
 
 echo "Add Printer Test"
 echo ""
-echo "    lpadmin -p Test3 -v file:/dev/null -E -m deskjet.ppd"
-../systemv/lpadmin -p Test3 -v file:/dev/null -E -m deskjet.ppd 2>&1
+echo "    lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/DESKJET.PPD"
+../systemv/lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/DESKJET.PPD 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
