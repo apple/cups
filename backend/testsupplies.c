@@ -51,7 +51,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
-  if ((snmp_fd = cupsSNMPOpen(host->addr.addr.sa_family)) < 0)
+  if ((snmp_fd = _cupsSNMPOpen(host->addr.addr.sa_family)) < 0)
   {
     perror(argv[1]);
     return (1);

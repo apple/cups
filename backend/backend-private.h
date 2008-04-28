@@ -28,7 +28,7 @@
 #  include <cups/cups.h>
 #  include <cups/debug.h>
 #  include <cups/i18n.h>
-#  include <cups/snmp.h>
+#  include <cups/snmp-private.h>
 #  include <stdlib.h>
 #  include <errno.h>
 #  include <cups/string.h>

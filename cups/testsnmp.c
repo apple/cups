@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "string.h"
-#include "snmp.h"
+#include "snmp-private.h"
 
 
 /*
@@ -59,9 +59,9 @@ main(int  argc,				/* I - Number of command-line args */
   const char		*community;	/* Community name */
 
 
-  fputs("cupsSNMPDefaultCommunity: ", stdout);
+  fputs("_cupsSNMPDefaultCommunity: ", stdout);
 
-  if ((community = cupsSNMPDefaultCommunity()) == NULL)
+  if ((community = _cupsSNMPDefaultCommunity()) == NULL)
   {
     puts("FAIL (NULL community name)");
     return (1);
@@ -84,7 +84,7 @@ main(int  argc,				/* I - Number of command-line args */
         community = argv[i];
     }
     else if (!strcmp(argv[i], "-d"))
-      cupsSNMPSetDebug(10);
+      _cupsSNMPSetDebug(10);
     else if (!strcmp(argv[i], "-w"))
       walk = 1;
     else if (!host)
@@ -97,9 +97,9 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (fd < 0)
       {
-	fputs("cupsSNMPOpen: ", stdout);
+	fputs("_cupsSNMPOpen: ", stdout);
 
-	if ((fd = cupsSNMPOpen(host->addr.addr.sa_family)) < 0)
+	if ((fd = _cupsSNMPOpen(host->addr.addr.sa_family)) < 0)
 	{
 	  printf("FAIL (%s)\n", strerror(errno));
 	  return (1);
@@ -263,12 +263,12 @@ show_oid(int         fd,		/* I - SNMP socket */
 
   if (walk)
   {
-    printf("cupsSNMPWalk(%d", oid[0]);
+    printf("_cupsSNMPWalk(%d", oid[0]);
     for (i = 1; oid[i] >= 0; i ++)
       printf(".%d", oid[i]);
     puts("):");
 
-    if (cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5.0,
+    if (_cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5.0,
                      print_packet, NULL) < 0)
     {
       printf("FAIL (%s)\n", strerror(errno));
@@ -277,12 +277,12 @@ show_oid(int         fd,		/* I - SNMP socket */
   }
   else
   {
-    printf("cupsSNMPWrite(%d", oid[0]);
+    printf("_cupsSNMPWrite(%d", oid[0]);
     for (i = 1; oid[i] >= 0; i ++)
       printf(".%d", oid[i]);
     fputs("): ", stdout);
 
-    if (!cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, community,
+    if (!_cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, community,
 		       CUPS_ASN1_GET_REQUEST, 1, oid))
     {
       printf("FAIL (%s)\n", strerror(errno));
@@ -291,15 +291,15 @@ show_oid(int         fd,		/* I - SNMP socket */
 
     puts("PASS");
 
-    fputs("cupsSNMPRead(5.0): ", stdout);
+    fputs("_cupsSNMPRead(5.0): ", stdout);
 
-    if (!cupsSNMPRead(fd, &packet, 5.0))
+    if (!_cupsSNMPRead(fd, &packet, 5.0))
     {
       puts("FAIL (timeout)");
       return (0);
     }
 
-    if (!cupsSNMPIsOID(&packet, oid))
+    if (!_cupsSNMPIsOID(&packet, oid))
     {
       printf("FAIL (bad OID %d", packet.object_name[0]);
       for (i = 1; packet.object_name[i] >= 0; i ++)

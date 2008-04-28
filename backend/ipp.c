@@ -599,14 +599,14 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports SNMP...
   */
 
-  if ((snmp_fd = cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
+  if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
     if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
     {
      /*
       * No, close it...
       */
 
-      cupsSNMPClose(snmp_fd);
+      _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
 

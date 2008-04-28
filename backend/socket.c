@@ -363,14 +363,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * See if the printer supports SNMP...
   */
 
-  if ((snmp_fd = cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+  if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
     if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
     {
      /*
       * No, close it...
       */
 
-      cupsSNMPClose(snmp_fd);
+      _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
 

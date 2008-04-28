@@ -17,6 +17,16 @@ _cupsMessageLoad
 _cupsMessageLookup
 _cupsSetError
 _cupsSetLocale
+_cupsSNMPClose
+_cupsSNMPCopyOID
+_cupsSNMPDefaultCommunity
+_cupsSNMPIsOID
+_cupsSNMPIsOIDPrefixed
+_cupsSNMPOpen
+_cupsSNMPRead
+_cupsSNMPSetDebug
+_cupsSNMPWalk
+_cupsSNMPWrite
 _cupsStrAlloc
 _cupsStrFlush
 _cupsStrFormatd

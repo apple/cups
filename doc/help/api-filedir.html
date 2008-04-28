@@ -634,8 +634,9 @@ int cupsFileNumber (<br>
 existing file, &quot;a&quot; to append to an existing file or create a new file,
 or &quot;s&quot; to open a socket connection.<br>
 <br>
-When opening for writing (&quot;w&quot;) or appending (&quot;a&quot;), an optional number from
-1 to 9 can be supplied which enables Flate compression of the file.<br>
+When opening for writing (&quot;w&quot;), an optional number from 1 to 9 can be
+supplied which enables Flate compression of the file.  Compression is
+not supported for the &quot;a&quot; (append) mode.<br>
 <br>
 When opening a socket connection, the filename is a string of the form
 &quot;address:port&quot; or &quot;hostname:port&quot;. The socket will make an IPv4 or IPv6
@@ -660,11 +661,12 @@ a choice.
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">CUPS file or <code>NULL</code> if the file could not be opened</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The &quot;mode&quot; parameter can be &quot;r&quot; to read, &quot;a&quot; or &quot;w&quot; to write, or &quot;s&quot;
-to treat the file descriptor as a bidirectional socket connection.<br>
+<p class="discussion">The &quot;mode&quot; parameter can be &quot;r&quot; to read, &quot;w&quot; to write, &quot;a&quot; to append,
+or &quot;s&quot; to treat the file descriptor as a bidirectional socket connection.<br>
 <br>
-When opening for writing (&quot;w&quot;) or appending (&quot;a&quot;), an optional number from
-1 to 9 can be supplied which enables Flate compression of the file.
+When opening for writing (&quot;w&quot;), an optional number from 1 to 9 can be
+supplied which enables Flate compression of the file.  Compression is
+not supported for the &quot;a&quot; (append) mode.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePeekChar">cupsFilePeekChar</a></h3>

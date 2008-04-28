@@ -343,6 +343,9 @@ if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;s
 
 <h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
 
+<p>Re-write for side-channel-based SNMP queries.</p>
+
+<!--
 <p>The Simple Network Management Protocol (SNMP) allows you to get the current
 status, page counter, and supply levels from most network printers. Every
 piece of information is associated with an Object Identifier (OID), and
@@ -415,3 +418,4 @@ void *my_data;
 <a href="#cupsSNMPWalk">cupsSNMPWalk</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
                <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), printer_mib_oid, my_callback, my_data);
 </pre>
+-->

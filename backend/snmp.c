@@ -236,7 +236,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Open the SNMP socket...
   */
 
-  if ((fd = cupsSNMPOpen(AF_INET)) < 0)
+  if ((fd = _cupsSNMPOpen(AF_INET)) < 0)
     return (1);
 
  /*
@@ -245,7 +245,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   read_snmp_conf(argv[1]);
 
-  cupsSNMPSetDebug(DebugLevel);
+  _cupsSNMPSetDebug(DebugLevel);
 
   Devices = cupsArrayNew((cups_array_func_t)compare_cache, NULL);
 
@@ -259,7 +259,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Close, free, and return with no errors...
   */
 
-  cupsSNMPClose(fd);
+  _cupsSNMPClose(fd);
 
   free_array(Addresses);
   free_array(Communities);
@@ -905,7 +905,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Read the response data...
   */
 
-  if (!cupsSNMPRead(fd, &packet, -1.0))
+  if (!_cupsSNMPRead(fd, &packet, -1.0))
   {
     fprintf(stderr, "ERROR: Unable to read data from socket: %s\n",
             strerror(errno));
@@ -968,7 +968,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
     add_cache(&(packet.address), addrname, NULL, NULL, NULL);
 
-    cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
+    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
                   CUPS_ASN1_GET_REQUEST, DeviceDescRequest, DeviceDescOID);
   }
   else if (packet.request_id == DeviceDescRequest &&
@@ -1103,7 +1103,7 @@ scan_devices(int fd)			/* I - SNMP socket */
         	   community, address);
 
       for (addr = addrs; addr; addr = addr->next)
-        cupsSNMPWrite(fd, &(addr->addr), CUPS_SNMP_VERSION_1, community,
+        _cupsSNMPWrite(fd, &(addr->addr), CUPS_SNMP_VERSION_1, community,
 	              CUPS_ASN1_GET_REQUEST, DeviceTypeRequest, DeviceTypeOID);
     }
 
