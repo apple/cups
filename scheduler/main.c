@@ -1658,16 +1658,10 @@ process_children(void)
           * OK, this process has gone away; what's left?
 	  */
 
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PID %d status %d state %d",
-			  job->id, pid, status, job->state_value);
-
           if (job->filters[i])
 	    job->filters[i] = -pid;
 	  else
 	    job->backend = -pid;
-
-          if (job->state_value >= IPP_JOB_STOPPED)
-	    status = 0;			/* Ignore errors when canceling jobs */
 
           if (status && job->status >= 0)
 	  {
@@ -1727,7 +1721,7 @@ process_children(void)
     if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) stopped with status %d!",
 	                pid, name, WEXITSTATUS(status));
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",
