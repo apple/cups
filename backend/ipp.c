@@ -33,17 +33,9 @@
  */
 
 #include <cups/http-private.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#include "backend-private.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <cups/backend.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
-#include <signal.h>
 #include <sys/wait.h>
 
 /*
@@ -105,6 +97,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*name,			/* Name of option */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
+  int		snmp_fd,		/* SNMP socket */
+		start_count,		/* Page count via SNMP at start */
+		page_count;		/* Page count via SNMP */
   int		num_files;		/* Number of files to print */
   char		**files,		/* Files to print */
 		*filename;		/* Pointer to single filename */
@@ -599,6 +594,21 @@ main(int  argc,				/* I - Number of command-line args */
       fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
 	      httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
 	      ntohs(http->hostaddr->ipv4.sin_port));
+
+ /*
+  * See if the printer supports SNMP...
+  */
+
+  if ((snmp_fd = cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
+    if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
+    {
+     /*
+      * No, close it...
+      */
+
+      cupsSNMPClose(snmp_fd);
+      snmp_fd = -1;
+    }
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -1181,6 +1191,15 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   check_printer_state(http, uri, resource, argv[2], version, job_id);
+
+ /*
+  * Collect the final page count as needed...
+  */
+
+  if (snmp_fd >= 0 && 
+      !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
+      page_count > start_count)
+    fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 
  /*
   * Free memory...

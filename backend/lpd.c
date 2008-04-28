@@ -29,19 +29,11 @@
  * Include necessary headers.
  */
 
-#include <cups/backend.h>
 #include <cups/http-private.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "backend-private.h"
 #include <stdarg.h>
-#include <ctype.h>
-#include <cups/string.h>
-#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <signal.h>
 
 #ifdef WIN32
 #  include <winsock.h>
@@ -120,31 +112,31 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
-  char			method[255],	/* Method in URI */
-			hostname[1024],	/* Hostname */
-			username[255],	/* Username info */
-			resource[1024],	/* Resource info (printer name) */
-			*options,	/* Pointer to options */
-			*name,		/* Name of option */
-			*value,		/* Value of option */
-			sep,		/* Separator character */
-			*filename,	/* File to print */
-			title[256];	/* Title string */
-  int			port;		/* Port number */
-  int			fd;		/* Print file */
-  int			status;		/* Status of LPD job */
-  int			mode;		/* Print mode */
-  int			banner;		/* Print banner page? */
-  int			format;		/* Print format */
-  int			order;		/* Order of control/data files */
-  int			reserve;	/* Reserve priviledged port? */
-  int			sanitize_title;	/* Sanitize title string? */
-  int			manual_copies,	/* Do manual copies? */
-			timeout,	/* Timeout */
-			contimeout,	/* Connection timeout */
-			copies;		/* Number of copies */
+  char		method[255],		/* Method in URI */
+		hostname[1024],		/* Hostname */
+		username[255],		/* Username info */
+		resource[1024],		/* Resource info (printer name) */
+		*options,		/* Pointer to options */
+		*name,			/* Name of option */
+		*value,			/* Value of option */
+		sep,			/* Separator character */
+		*filename,		/* File to print */
+		title[256];		/* Title string */
+  int		port;			/* Port number */
+  int		fd;			/* Print file */
+  int		status;			/* Status of LPD job */
+  int		mode;			/* Print mode */
+  int		banner;			/* Print banner page? */
+  int		format;			/* Print format */
+  int		order;			/* Order of control/data files */
+  int		reserve;		/* Reserve priviledged port? */
+  int		sanitize_title;		/* Sanitize title string? */
+  int		manual_copies,		/* Do manual copies? */
+		timeout,		/* Timeout */
+		contimeout,		/* Connection timeout */
+		copies;			/* Number of copies */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  struct sigaction	action;		/* Actions for POSIX signals */
+  struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
 
@@ -642,6 +634,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			addrname[256];	/* Address name */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Socket address */
+  int			snmp_fd,	/* SNMP socket */
+			start_count,	/* Page count via SNMP at start */
+			page_count;	/* Page count via SNMP */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
   int			recoverable;	/* Recoverable error shown? */
@@ -882,6 +877,21 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4) (local port %d)...\n",
 		httpAddrString(&addr->addr, addrname, sizeof(addrname)),
 		ntohs(addr->addr.ipv4.sin_port), lport);
+
+   /*
+    * See if the printer supports SNMP...
+    */
+
+    if ((snmp_fd = cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+      if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
+      {
+       /*
+	* No, close it...
+	*/
+
+	cupsSNMPClose(snmp_fd);
+	snmp_fd = -1;
+      }
 
    /*
     * Next, open the print file and figure out its size...
@@ -1135,6 +1145,24 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 			  "(%d)\n"), status);
       else
 	_cupsLangPuts(stderr, _("INFO: Control file sent successfully\n"));
+    }
+
+   /*
+    * Collect the final page count as needed...
+    */
+
+    if (snmp_fd >= 0)
+    {
+      int printer_state;		/* State of printer */
+
+
+      while (!backendSNMPSupplies(snmp_fd, &(addr->addr), &page_count,
+                                  &printer_state) &&
+	     printer_state != CUPS_TC_idle)
+	sleep(3);
+
+      if (page_count > start_count)
+        fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
     }
 
    /*

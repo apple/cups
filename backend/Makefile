@@ -157,9 +157,9 @@ libbackend.a:	$(LIBOBJS)
 # ipp
 #
 
-ipp:	ipp.o ../cups/$(LIBCUPS)
+ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o ipp ipp.o $(LIBS)
+	$(CC) $(LDFLAGS) -o ipp ipp.o libbackend.a $(LIBS)
 	$(RM) http
 	$(LN) ipp http
 
@@ -168,9 +168,9 @@ ipp:	ipp.o ../cups/$(LIBCUPS)
 # lpd
 #
 
-lpd:	lpd.o ../cups/$(LIBCUPS)
+lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o lpd lpd.o $(LIBS)
+	$(CC) $(LDFLAGS) -o lpd lpd.o libbackend.a $(LIBS)
 
 
 #
