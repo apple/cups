@@ -894,6 +894,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
 
    /*
+    * Check for side-channel requests...
+    */
+
+    backendCheckSideChannel(snmp_fd, &(addr->addr));
+
+   /*
     * Next, open the print file and figure out its size...
     */
 
@@ -976,6 +982,16 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (order == ORDER_CONTROL_DATA)
     {
+     /*
+      * Check for side-channel requests...
+      */
+
+      backendCheckSideChannel(snmp_fd, &(addr->addr));
+
+     /*
+      * Send the control file...
+      */
+
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       (int)getpid() % 1000, localhost))
       {
@@ -1020,6 +1036,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (status == 0)
     {
+     /*
+      * Check for side-channel requests...
+      */
+
+      backendCheckSideChannel(snmp_fd, &(addr->addr));
+
      /*
       * Send the print file...
       */
@@ -1107,6 +1129,16 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if (status == 0 && order == ORDER_DATA_CONTROL)
     {
+     /*
+      * Check for side-channel requests...
+      */
+
+      backendCheckSideChannel(snmp_fd, &(addr->addr));
+
+     /*
+      * Send control file...
+      */
+
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       (int)getpid() % 1000, localhost))
       {

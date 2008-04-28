@@ -16,8 +16,10 @@
  *
  * Contents:
  *
- *   backendDrainOutput() - Drain pending print data to the device.
- *   backendRunLoop()     - Read and write print and back-channel data.
+ *   backendCheckSideChannel() - Check the side-channel for pending requests.
+ *   backendDrainOutput()      - Drain pending print data to the device.
+ *   backendNetworkSideCB()    - Handle common network side-channel commands.
+ *   backendRunLoop()          - Read and write print and back-channel data.
  */
 
 /*
@@ -31,6 +33,30 @@
 #else
 #  include <sys/select.h>
 #endif /* __hpux */
+
+
+/*
+ * 'backendCheckSideChannel()' - Check the side-channel for pending requests.
+ */
+
+
+void
+backendCheckSideChannel(
+    int         snmp_fd,		/* I - SNMP socket */
+    http_addr_t *addr)			/* I - Address of device */
+{
+  fd_set	input;			/* Select input set */
+  struct timeval timeout;		/* Select timeout */
+
+
+  FD_ZERO(&input);
+  FD_SET(CUPS_SC_FD, &input);
+
+  timeout.tv_sec = timeout.tv_usec = 0;
+
+  if (select(CUPS_SC_FD + 1, &input, NULL, NULL, &timeout) > 0)
+    backendNetworkSideCB(-1, -1, snmp_fd, addr, 0);
+}
 
 
 /*
@@ -170,7 +196,9 @@ backendNetworkSideCB(
         * Our sockets disable the Nagle algorithm and data is sent immediately.
 	*/
 
-        if (backendDrainOutput(print_fd, device_fd))
+        if (device_fd < 0)
+	  status = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	else if (backendDrainOutput(print_fd, device_fd))
 	  status = CUPS_SC_STATUS_IO_ERROR;
 	else 
           status = CUPS_SC_STATUS_OK;
@@ -184,7 +212,26 @@ backendNetworkSideCB(
         break;
 
     case CUPS_SC_CMD_GET_DEVICE_ID :
-        if ((device_id = getenv("1284DEVICEID")) != NULL)
+        if (snmp_fd >= 0)
+	{
+	  cups_snmp_t	packet;		/* Packet from printer */
+	  static const int ppmPrinterIEEE1284DeviceId[] =
+	  		{ CUPS_OID_ppmPrinterIEEE1284DeviceId,1,-1 };
+
+          if (_cupsSNMPWrite(snmp_fd, addr, 1, _cupsSNMPDefaultCommunity(),
+	                     CUPS_ASN1_GET_REQUEST, 1,
+			     ppmPrinterIEEE1284DeviceId))
+          {
+	    if (_cupsSNMPRead(snmp_fd, &packet, 1.0) &&
+	        packet.object_type == CUPS_ASN1_OCTET_STRING)
+	    {
+	      strlcpy(data, packet.object_value.string, sizeof(data));
+	      datalen = (int)strlen(data);
+	      break;
+	    }
+	  }
+        }
+	else if ((device_id = getenv("1284DEVICEID")) != NULL)
 	{
 	  strlcpy(data, device_id, sizeof(data));
 	  datalen = (int)strlen(data);

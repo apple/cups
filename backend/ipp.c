@@ -631,6 +631,12 @@ main(int  argc,				/* I - Number of command-line args */
   do
   {
    /*
+    * Check for side-channel requests...
+    */
+
+    backendCheckSideChannel(snmp_fd, http->hostaddr);
+
+   /*
     * Build the IPP request...
     */
 
@@ -824,6 +830,12 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (copies_remaining > 0)
   {
+   /*
+    * Check for side-channel requests...
+    */
+
+    backendCheckSideChannel(snmp_fd, http->hostaddr);
+
    /*
     * Build the IPP request...
     */
@@ -1023,6 +1035,16 @@ main(int  argc,				/* I - Number of command-line args */
     {
       for (i = 0; i < num_files; i ++)
       {
+       /*
+	* Check for side-channel requests...
+	*/
+
+	backendCheckSideChannel(snmp_fd, http->hostaddr);
+
+       /*
+        * Send the next file in the job...
+	*/
+
 	request = ippNewRequest(IPP_SEND_DOCUMENT);
 
 	request->request.op.version[1] = version;
@@ -1079,6 +1101,12 @@ main(int  argc,				/* I - Number of command-line args */
 
     for (delay = 1; !job_cancelled;)
     {
+     /*
+      * Check for side-channel requests...
+      */
+
+      backendCheckSideChannel(snmp_fd, http->hostaddr);
+
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
       */

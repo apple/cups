@@ -48,6 +48,7 @@ extern "C" {
  * OID constants...
  */
 
+/* Host MIB */
 #define CUPS_OID_mib2				1,3,6,1,2,1
 
 #define CUPS_OID_host				CUPS_OID_mib2,25
@@ -68,6 +69,7 @@ extern "C" {
 #define CUPS_OID_hrPrinterStatus		CUPS_OID_hrPrinterEntry,1
 #define CUPS_OID_hrPrinterDetectedErrorState	CUPS_OID_hrPrinterEntry,2
 
+/* Printer MIB */
 #define CUPS_OID_printmib			CUPS_OID_mib2,43
 
 #define CUPS_OID_prtGeneral			CUPS_OID_printmib,5
@@ -114,6 +116,39 @@ extern "C" {
 #define CUPS_OID_prtInterpreterEntry		CUPS_OID_prtInterpreterTable,1
 #define CUPS_OID_prtInterpreterLangFamily	CUPS_OID_prtInterpreterEntry,2
 #define CUPS_OID_prtInterpreterLangLevel	CUPS_OID_prtInterpreterEntry,3
+
+/* Printer Port Monitor MIB */
+#define CUPS_OID_enterprises			1,3,6,1,4,1
+#define CUPS_OID_pwg				CUPS_OID_enterprises,2699,1
+#define CUPS_OID_ppmMIB				CUPS_OID_pwg,2
+#define CUPS_OID_ppmMIBObjects			CUPS_OID_ppmMIB,1
+
+#define CUPS_OID_ppmGeneral			CUPS_OID_ppmMIBObjects,1
+
+#define CUPS_OID_ppmPrinter			CUPS_OID_ppmMIBObjects,2
+#define CUPS_OID_ppmPrinterTable		CUPS_OID_ppmPrinter,1
+#define CUPS_OID_ppmPrinterEntry		CUPS_OID_ppmPrinterTable,1
+#define CUPS_OID_ppmPrinterIndex		CUPS_OID_ppmPrinterEntry,1
+#define CUPS_OID_ppmPrinterName			CUPS_OID_ppmPrinterEntry,2
+#define CUPS_OID_ppmPrinterIEEE1284DeviceId	CUPS_OID_ppmPrinterEntry,3
+#define CUPS_OID_ppmPrinterNumberOfPorts	CUPS_OID_ppmPrinterEntry,4
+#define CUPS_OID_ppmPrinterPreferredPortIndex	CUPS_OID_ppmPrinterEntry,5
+#define CUPS_OID_ppmPrinterHrDeviceIndex	CUPS_OID_ppmPrinterEntry,6
+#define CUPS_OID_ppmPrinterSnmpCommunityName	CUPS_OID_ppmPrinterEntry,7
+#define CUPS_OID_ppmPrinterSnmpQueryEnabled	CUPS_OID_ppmPrinterEntry,8
+
+#define CUPS_OID_ppmPort			CUPS_OID_ppmMIBObjects,3
+#define CUPS_OID_ppmPortTable			CUPS_OID_ppmPort,1
+#define CUPS_OID_ppmPortEntry			CUPS_OID_ppmPortTable,1
+#define CUPS_OID_ppmPortIndex			CUPS_OID_ppmPortEntry,1
+#define CUPS_OID_ppmPortEnabled			CUPS_OID_ppmPortEntry,2
+#define CUPS_OID_ppmPortName			CUPS_OID_ppmPortEntry,3
+#define CUPS_OID_ppmPortServiceNameOrURI	CUPS_OID_ppmPortEntry,4
+#define CUPS_OID_ppmPortProtocolType		CUPS_OID_ppmPortEntry,5
+#define CUPS_OID_ppmPortProtocolTargetPort	CUPS_OID_ppmPortEntry,6
+#define CUPS_OID_ppmPortProtocolAltSourceEnabled CUPS_OID_ppmPortEntry,7
+#define CUPS_OID_ppmPortPrtChannelIndex		CUPS_OID_ppmPortEntry,8
+#define CUPS_OID_ppmPortLprByteCountEnabled	CUPS_OID_ppmPortEntry,9
 
 
 /*
@@ -205,6 +240,7 @@ extern "C" {
  * Prototypes...
  */
 
+extern void	backendCheckSideChannel(int snmp_fd, http_addr_t *addr);
 extern int	backendDrainOutput(int print_fd, int device_fd);
 extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
 		                   char *make_model, int make_model_size,
