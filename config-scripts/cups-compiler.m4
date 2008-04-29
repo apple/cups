@@ -96,6 +96,9 @@ AC_ARG_WITH(libcupsimageorder, [  --with-libcupsimagesorder
 	fi)
 AC_SUBST(LIBCUPSIMAGEORDER)
 
+PHPOPTIONS=""
+AC_SUBST(PHPOPTIONS)
+
 if test -n "$GCC"; then
 	# Add GCC-specific compiler options...
 	if test -z "$OPTIM"; then
@@ -142,6 +145,7 @@ if test -n "$GCC"; then
 		# Additional warning options for development testing...
 		if test -d .svn; then
 			OPTIM="-Wshadow -Wunused $OPTIM"
+			PHPOPTIONS="-Wno-shadow"
 		fi
 	fi
 
