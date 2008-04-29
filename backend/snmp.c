@@ -48,7 +48,6 @@
 #include "backend-private.h"
 #include <cups/array.h>
 #include <cups/file.h>
-#include <cups/snmp.h>
 #include <cups/http-private.h>
 #include <regex.h>
 
