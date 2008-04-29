@@ -56,14 +56,12 @@
 /*
  * This backend implements SNMP printer discovery.  It uses a broadcast-
  * based approach to get SNMP response packets from potential printers,
- * tries a mDNS lookup (Mac OS X only at present), a URI lookup based on
- * the device description string, and finally a probe of port 9100
- * (AppSocket) and 515 (LPD).
+ * requesting OIDs from the Host and Port Monitor MIBs, does a URI
+ * lookup based on the device description string, and finally a probe of
+ * port 9100 (AppSocket) and 515 (LPD).
  *
  * The current focus is on printers with internal network cards, although
- * the code also works with many external print servers as well.  Future
- * versions will support scanning for vendor-specific SNMP OIDs and the
- * new PWG Port Monitor MIB and not just the Host MIB OIDs.
+ * the code also works with many external print servers as well.
  *
  * The backend reads the snmp.conf file from the CUPS_SERVERROOT directory
  * which can contain comments, blank lines, or any number of the following
@@ -91,6 +89,7 @@
  * print servers:
  *
  *     Axis OfficeBasic, 5400, 5600
+ *     Brother
  *     EPSON
  *     Genicom
  *     HP JetDirect
@@ -125,6 +124,7 @@ typedef struct snmp_cache_s		/**** SNMP scan cache ****/
   char		*addrname,		/* Name of device */
 		*uri,			/* device-uri */
 		*id,			/* device-id */
+		*info,			/* device-info */
 		*make_and_model;	/* device-make-and-model */
 } snmp_cache_t;
 
@@ -133,7 +133,7 @@ typedef struct snmp_cache_s		/**** SNMP scan cache ****/
  * Private CUPS API to set the last error...
  */
 
-extern void	_cupsSetError(ipp_status_t status, const char *message);
+extern void		_cupsSetError(ipp_status_t status, const char *message);
 
 
 /*
@@ -175,10 +175,14 @@ static cups_array_t	*Addresses = NULL;
 static cups_array_t	*Communities = NULL;
 static cups_array_t	*Devices = NULL;
 static int		DebugLevel = 0;
-static int		DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, -1 };
+static const int	DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, -1 };
 static unsigned		DeviceDescRequest;
-static int		DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, -1 };
+static const int	DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, -1 };
 static unsigned		DeviceTypeRequest;
+static const int	DeviceIdOID[] = { CUPS_OID_ppmPrinterIEEE1284DeviceId, 1, -1 };
+static unsigned		DeviceIdRequest;
+static const int	DeviceUriOID[] = { CUPS_OID_ppmPortServiceNameOrURI, 1, 1, -1 };
+static unsigned		DeviceUriRequest;
 static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
 static int		MaxRunTime = 120;
@@ -661,8 +665,9 @@ list_device(snmp_cache_t *cache)	/* I - Cached device */
     printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
            cache->uri,
 	   cache->make_and_model ? cache->make_and_model : "Unknown",
-	   cache->make_and_model ? cache->make_and_model : "Unknown",
-	   cache->addrname, cache->id ? cache->id : "");
+	   cache->info ? cache->info : "Unknown",
+	   cache->addrname,
+	   cache->id ? cache->id : "");
     fflush(stdout);
   }
 }
@@ -970,6 +975,10 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
     _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
                   CUPS_ASN1_GET_REQUEST, DeviceDescRequest, DeviceDescOID);
+    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
+                  CUPS_ASN1_GET_REQUEST, DeviceIdRequest, DeviceIdOID);
+    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
+                  CUPS_ASN1_GET_REQUEST, DeviceUriRequest, DeviceUriOID);
   }
   else if (packet.request_id == DeviceDescRequest &&
            packet.object_type == CUPS_ASN1_OCTET_STRING)
@@ -988,19 +997,19 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
       return;
     }
 
-   /*
-    * Convert the description to a make and model string...
-    */
-
     if (strchr(packet.object_value.string, ':') &&
-        strchr(packet.object_value.string, ';'))
+	strchr(packet.object_value.string, ';'))
     {
      /*
       * Description is the IEEE-1284 device ID...
       */
 
+      if (!device->id)
+	device->id = strdup(packet.object_value.string);
+
       backendGetMakeModel(packet.object_value.string, make_model,
-                	  sizeof(make_model));
+			  sizeof(make_model));
+      device->info = strdup(make_model);
     }
     else
     {
@@ -1009,15 +1018,92 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
       */
 
       fix_make_model(make_model, packet.object_value.string,
-                     sizeof(make_model));
+		     sizeof(make_model));
+
+      device->info = strdup(packet.object_value.string);
     }
 
+    if (!device->make_and_model)
+      device->make_and_model = strdup(make_model);
+
+   /*
+    * List the device now if we have all the info...
+    */
+
+    if (device->id && device->info && device->make_and_model && device->uri)
+      list_device(device);
+  }
+  else if (packet.request_id == DeviceIdRequest &&
+           packet.object_type == CUPS_ASN1_OCTET_STRING)
+  {
+   /*
+    * Update an existing cache entry...
+    */
+
+    char	make_model[256];	/* Make and model */
+
+
+    if (!device)
+    {
+      debug_printf("DEBUG: Discarding device ID for \"%s\"...\n",
+	           addrname);
+      return;
+    }
+
+    if (device->id)
+      free(device->id);
+
+    device->id = strdup(packet.object_value.string);
+
+   /*
+    * Convert the ID to a make and model string...
+    */
+
+    backendGetMakeModel(packet.object_value.string, make_model,
+			sizeof(make_model));
     if (device->make_and_model)
       free(device->make_and_model);
 
     device->make_and_model = strdup(make_model);
 
-    probe_device(device);
+   /*
+    * List the device now if we have all the info...
+    */
+
+    if (device->id && device->info && device->make_and_model && device->uri)
+      list_device(device);
+  }
+  else if (packet.request_id == DeviceUriRequest &&
+           packet.object_type == CUPS_ASN1_OCTET_STRING)
+  {
+   /*
+    * Update an existing cache entry...
+    */
+
+    if (!device)
+    {
+      debug_printf("DEBUG: Discarding device URI for \"%s\"...\n",
+	           addrname);
+      return;
+    }
+
+    if (!strncmp(packet.object_value.string, "lpr:", 4))
+    {
+     /*
+      * We want "lpd://..." for the URI...
+      */
+
+      packet.object_value.string[2] = 'd';
+    }
+
+    device->uri = strdup(packet.object_value.string);
+
+   /*
+    * List the device now if we have all the info...
+    */
+
+    if (device->id && device->info && device->make_and_model && device->uri)
+      list_device(device);
   }
 }
 

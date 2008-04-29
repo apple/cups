@@ -231,7 +231,8 @@ backendNetworkSideCB(
 	    }
 	  }
         }
-	else if ((device_id = getenv("1284DEVICEID")) != NULL)
+
+	if ((device_id = getenv("1284DEVICEID")) != NULL)
 	{
 	  strlcpy(data, device_id, sizeof(data));
 	  datalen = (int)strlen(data);
