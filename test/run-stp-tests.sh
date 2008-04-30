@@ -554,10 +554,11 @@ echo "Test Summary"
 echo ""
 echo "<H2>Summary</H2>" >>$strfile
 
-# Pages printed on Test1
+# Pages printed on Test1 (within 1 page for timing-dependent cancel issues)
 count=`grep '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=`expr $pjobs \* 2 + 35`
-if test $count != $expected; then
+expected2=`expr $expected + 1`
+if test $count != $expected -a $count != $expected2; then
 	echo "FAIL: Printer 'Test1' produced $count page(s), expected $expected."
 	echo "<P>FAIL: Printer 'Test1' produced $count page(s), expected $expected.</P>" >>$strfile
 	fail=`expr $fail + 1`
