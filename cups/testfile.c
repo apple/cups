@@ -17,6 +17,7 @@
  * Contents:
  *
  *   main()             - Main entry.
+ *   random_tests()     - Do random access tests.
  *   read_write_tests() - Perform read/write tests.
  */
 
@@ -34,6 +35,7 @@
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
+#include <unistd.h>
 #include <fcntl.h>
 
 

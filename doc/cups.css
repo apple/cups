@@ -1,6 +1,6 @@
 BODY {
-  background: #e8e8e8;
-  color: #000000;
+  background: white;
+  color: black;
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
 }
 
@@ -47,8 +47,8 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #e1e1e1;
-  border: inset 1px #dddddd;
+  background: #f0f0f0;
+  border: inset 1px #eeeeee;
   padding: 10px;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 5px;
@@ -60,7 +60,7 @@ A IMG {
 }
 
 A:link:hover IMG {
-  background: #e0e0e0;
+  background: #f0f0f0;
   border-radius: 10px;
   -moz-border-radius: 10px;
 }
@@ -108,7 +108,7 @@ TD.unsel {
 }
 
 TD.sel A, TD.sel A:hover {
-  color: #ffffff;
+  color: white;
   font-weight: normal;
   text-decoration: none;
 }
@@ -120,18 +120,18 @@ TD.unsel A, TD.unsel A:visited {
 
 TD.unsel:hover {
   background: url(images/unsel-hover.gif);
-  color: #ffffff;
+  color: white;
 }
 
 TD.unsel A:link:hover, TD.unsel A:visited:hover, TD.unsel A:active {
-  color: #ffffff;
+  color: white;
   font-weight: normal;
   text-decoration: none;
 }
 
 TD.trailer {
-  background: #e1e1e1;
-  border: solid thin #cccccc;
+  background: #f0f0f0;
+  border: solid thin #e0e0e0;
   color: #666666;
   font-size: 80%;
   padding: 5px;
@@ -195,7 +195,7 @@ DIV.table TABLE TD {
 }
 
 DIV.table TABLE TH {
-  background: #eeeeee;
+  background: #f0f0f0;
   border: none;
   border-bottom: solid thin #999999;
 }
@@ -225,9 +225,9 @@ HR {
 }
 
 SPAN.info {
-  background: #000000;
-  border: thin solid #000000;
-  color: #ffffff;
+  background: black;
+  border: thin solid black;
+  color: white;
   font-size: 80%;
   font-style: italic;
   font-weight: bold;
@@ -279,8 +279,8 @@ DIV.sidebar P.l2 {
 }
 
 TABLE.inset {
-  background: #e1e1e1;
-  border: inset 1px #dddddd;
+  background: #f0f0f0;
+  border: inset 1px #eeeeee;
   padding: 0;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 5px;
@@ -335,7 +335,7 @@ DIV.summary TABLE TD, DIV.summary TABLE TH {
 }
 
 DIV.summary TABLE THEAD TH {
-  background: #eeeeee;
+  background: #f0f0f0;
 }
 
 /* API documentation styles... */

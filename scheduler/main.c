@@ -853,8 +853,8 @@ main(int  argc,				/* I - Number of command-line args */
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	   p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
-        cupsdLogMessage(CUPSD_LOG_EMERG, "printer[%s] %d", p->name,
-	                p->dnssd_ipp_fd);
+        cupsdLogMessage(CUPSD_LOG_EMERG, "printer[%s] reg_name=\"%s\"", p->name,
+	                p->reg_name ? p->reg_name : "(null)");
 #endif /* HAVE_DNSSD */
 
       break;
@@ -1646,7 +1646,7 @@ process_children(void)
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value == IPP_JOB_PROCESSING)
+      if (job->state_value >= IPP_JOB_HELD && job->filters[0])
       {
 	for (i = 0; job->filters[i]; i ++)
           if (job->filters[i] == pid)
@@ -1662,9 +1662,6 @@ process_children(void)
 	    job->filters[i] = -pid;
 	  else
 	    job->backend = -pid;
-
-          if (job->state_value == IPP_JOB_CANCELED)
-	    status = 0;			/* Ignore errors when canceling jobs */
 
           if (status && job->status >= 0)
 	  {
@@ -1724,7 +1721,7 @@ process_children(void)
     if (status)
     {
       if (WIFEXITED(status))
-	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) stopped with status %d!",
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) stopped with status %d!",
 	                pid, name, WEXITSTATUS(status));
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR, "PID %d (%s) crashed on signal %d!",

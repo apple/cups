@@ -160,7 +160,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and port number from the URI...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  httpSeparateURI(HTTP_URI_CODING_ALL, backendResolveURI(argv),
                   method, sizeof(method), username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
@@ -363,14 +363,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * See if the printer supports SNMP...
   */
 
-  if ((snmp_fd = cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+  if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
     if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
     {
      /*
       * No, close it...
       */
 
-      cupsSNMPClose(snmp_fd);
+      _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
 

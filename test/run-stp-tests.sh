@@ -212,7 +212,9 @@ mkdir /tmp/cups-$user/bin/filter
 mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
 mkdir /tmp/cups-$user/share/banners
+mkdir /tmp/cups-$user/share/drv
 mkdir /tmp/cups-$user/share/model
+mkdir /tmp/cups-$user/share/ppdc
 mkdir /tmp/cups-$user/interfaces
 mkdir /tmp/cups-$user/log
 mkdir /tmp/cups-$user/ppd
@@ -223,6 +225,7 @@ mkdir /tmp/cups-$user/ssl
 ln -s $root/backend/http /tmp/cups-$user/bin/backend
 ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
+ln -s $root/backend/mdns /tmp/cups-$user/bin/backend
 ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
 ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
@@ -233,6 +236,7 @@ ln -s $root/ppdc/drv /tmp/cups-$user/bin/driver
 ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
+ln -s $root/filter/commandtops /tmp/cups-$user/bin/filter
 ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
 ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
@@ -249,7 +253,9 @@ ln -s $root/data /tmp/cups-$user/share/charmaps
 ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
 ln -s $root/fonts /tmp/cups-$user/share
-ln -s $root/ppd/*.ppd /tmp/cups-$user/share/model
+ln -s $root/ppdc/sample.drv /tmp/cups-$user/share/drv
+ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
+ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
 if test $ssltype != 0; then
@@ -308,7 +314,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug
+LogLevel debug2
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
@@ -549,10 +555,11 @@ echo "Test Summary"
 echo ""
 echo "<H2>Summary</H2>" >>$strfile
 
-# Pages printed on Test1
+# Pages printed on Test1 (within 1 page for timing-dependent cancel issues)
 count=`grep '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=`expr $pjobs \* 2 + 35`
-if test $count != $expected; then
+expected2=`expr $expected + 1`
+if test $count != $expected -a $count != $expected2; then
 	echo "FAIL: Printer 'Test1' produced $count page(s), expected $expected."
 	echo "<P>FAIL: Printer 'Test1' produced $count page(s), expected $expected.</P>" >>$strfile
 	fail=`expr $fail + 1`
@@ -692,9 +699,9 @@ fi
 
 # Debug2 log messages
 count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 0; then
-	echo "FAIL: $count debug2 messages, expected 0."
-	echo "<P>FAIL: $count debug2 messages, expected 0.</P>" >>$strfile
+if test $count = 0; then
+	echo "FAIL: $count debug2 messages, expected more than 0."
+	echo "<P>FAIL: $count debug2 messages, expected more than 0.</P>" >>$strfile
 	fail=`expr $fail + 1`
 else
 	echo "PASS: $count debug2 messages."
@@ -709,7 +716,7 @@ echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' /tmp/cups-$user/log/error_log >>$strfile
+grep -v '^[dD]' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile

@@ -16,40 +16,40 @@
  *
  * Contents:
  *
- *   cupsSNMPClose()            - Close a SNMP socket.
- *   cupsSNMPCopyOID()          - Copy an OID.
- *   cupsSNMPDefaultCommunity() - Get the default SNMP community name.
- *   cupsSNMPIsOID()            - Test whether a SNMP response contains the
- *                                specified OID.
- *   cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
- *                                specified OID prefix.
- *   cupsSNMPOpen()             - Open a SNMP socket.
- *   cupsSNMPRead()             - Read and parse a SNMP response.
- *   cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
- *   cupsSNMPWalk()             - Enumerate a group of OIDs.
- *   cupsSNMPWrite()            - Send an SNMP query packet.
- *   asn1_debug()               - Decode an ASN1-encoded message.
- *   asn1_decode_snmp()         - Decode a SNMP packet.
- *   asn1_encode_snmp()         - Encode a SNMP packet.
- *   asn1_get_integer()         - Get an integer value.
- *   asn1_get_length()          - Get a value length.
- *   asn1_get_oid()             - Get an OID value.
- *   asn1_get_packed()          - Get a packed integer value.
- *   asn1_get_string()          - Get a string value.
- *   asn1_get_type()            - Get a value type.
- *   asn1_set_integer()         - Set an integer value.
- *   asn1_set_length()          - Set a value length.
- *   asn1_set_oid()             - Set an OID value.
- *   asn1_set_packed()          - Set a packed integer value.
- *   asn1_size_integer()        - Figure out the number of bytes needed for an
- *                                integer value.
- *   asn1_size_length()         - Figure out the number of bytes needed for a
- *                                length value.
- *   asn1_size_oid()            - Figure out the numebr of bytes needed for an
- *                                OID value.
- *   asn1_size_packed()         - Figure out the number of bytes needed for a
- *                                packed integer value.
- *   snmp_set_error()           - Set the localized error for a packet.
+ *   _cupsSNMPClose()            - Close a SNMP socket.
+ *   _cupsSNMPCopyOID()          - Copy an OID.
+ *   _cupsSNMPDefaultCommunity() - Get the default SNMP community name.
+ *   _cupsSNMPIsOID()            - Test whether a SNMP response contains the
+ *                                 specified OID.
+ *   _cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
+ *                                 specified OID prefix.
+ *   _cupsSNMPOpen()             - Open a SNMP socket.
+ *   _cupsSNMPRead()             - Read and parse a SNMP response.
+ *   _cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
+ *   _cupsSNMPWalk()             - Enumerate a group of OIDs.
+ *   _cupsSNMPWrite()            - Send an SNMP query packet.
+ *   asn1_debug()                - Decode an ASN1-encoded message.
+ *   asn1_decode_snmp()          - Decode a SNMP packet.
+ *   asn1_encode_snmp()          - Encode a SNMP packet.
+ *   asn1_get_integer()          - Get an integer value.
+ *   asn1_get_length()           - Get a value length.
+ *   asn1_get_oid()              - Get an OID value.
+ *   asn1_get_packed()           - Get a packed integer value.
+ *   asn1_get_string()           - Get a string value.
+ *   asn1_get_type()             - Get a value type.
+ *   asn1_set_integer()          - Set an integer value.
+ *   asn1_set_length()           - Set a value length.
+ *   asn1_set_oid()              - Set an OID value.
+ *   asn1_set_packed()           - Set a packed integer value.
+ *   asn1_size_integer()         - Figure out the number of bytes needed for an
+ *                                 integer value.
+ *   asn1_size_length()          - Figure out the number of bytes needed for a
+ *                                 length value.
+ *   asn1_size_oid()             - Figure out the numebr of bytes needed for an
+ *                                 OID value.
+ *   asn1_size_packed()          - Figure out the number of bytes needed for a
+ *                                 packed integer value.
+ *   snmp_set_error()            - Set the localized error for a packet.
  */
 
 /*
@@ -57,7 +57,7 @@
  */
 
 #include "globals.h"
-#include "snmp.h"
+#include "snmp-private.h"
 #include <errno.h>
 #ifdef HAVE_POLL
 #  include <sys/poll.h>
@@ -107,13 +107,13 @@ static void		snmp_set_error(cups_snmp_t *packet,
 
 
 /*
- * 'cupsSNMPClose()' - Close a SNMP socket.
+ * '_cupsSNMPClose()' - Close a SNMP socket.
  *
  * @since CUPS 1.4@
  */
 
 void
-cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
+_cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 {
 #ifdef WIN32
   closesocket(fd);
@@ -124,7 +124,7 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 
 
 /*
- * 'cupsSNMPCopyOID()' - Copy an OID.
+ * '_cupsSNMPCopyOID()' - Copy an OID.
  *
  * The array pointed to by "src" is terminated by the value -1.
  *
@@ -132,9 +132,9 @@ cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
  */
 
 int *					/* O - New OID */
-cupsSNMPCopyOID(int       *dst,		/* I - Destination OID */
-                const int *src,		/* I - Source OID */
-		int       dstsize)	/* I - Number of integers in dst */
+_cupsSNMPCopyOID(int       *dst,	/* I - Destination OID */
+                 const int *src,	/* I - Source OID */
+		 int       dstsize)	/* I - Number of integers in dst */
 {
   int	i;				/* Looping var */
 
@@ -149,7 +149,7 @@ cupsSNMPCopyOID(int       *dst,		/* I - Destination OID */
 
 
 /*
- * 'cupsSNMPDefaultCommunity()' - Get the default SNMP community name.
+ * '_cupsSNMPDefaultCommunity()' - Get the default SNMP community name.
  *
  * The default community name is the first community name found in the
  * snmp.conf file. If no community name is defined there, "public" is used.
@@ -158,7 +158,7 @@ cupsSNMPCopyOID(int       *dst,		/* I - Destination OID */
  */
 
 const char *				/* O - Default community name */
-cupsSNMPDefaultCommunity(void)
+_cupsSNMPDefaultCommunity(void)
 {
   cups_file_t	*fp;			/* snmp.conf file */
   char		line[1024],		/* Line from file */
@@ -191,7 +191,7 @@ cupsSNMPDefaultCommunity(void)
 
 
 /*
- * 'cupsSNMPIsOID()' - Test whether a SNMP response contains the specified OID.
+ * '_cupsSNMPIsOID()' - Test whether a SNMP response contains the specified OID.
  *
  * The array pointed to by "oid" is terminated by the value -1.
  *
@@ -199,8 +199,8 @@ cupsSNMPDefaultCommunity(void)
  */
 
 int					/* O - 1 if equal, 0 if not equal */
-cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
-              const int   *oid)		/* I - OID */
+_cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
+               const int   *oid)	/* I - OID */
 {
   int	i;				/* Looping var */
 
@@ -227,8 +227,8 @@ cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
 
 
 /*
- * 'cupsSNMPIsOIDPrefixed()' - Test whether a SNMP response uses the specified
- *                             OID prefix.
+ * '_cupsSNMPIsOIDPrefixed()' - Test whether a SNMP response uses the specified
+ *                              OID prefix.
  *
  * The array pointed to by "prefix" is terminated by the value -1.
  *
@@ -236,7 +236,7 @@ cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
  */
 
 int					/* O - 1 if prefixed, 0 if not prefixed */
-cupsSNMPIsOIDPrefixed(
+_cupsSNMPIsOIDPrefixed(
     cups_snmp_t *packet,		/* I - Response packet */
     const int   *prefix)		/* I - OID prefix */
 {
@@ -265,13 +265,13 @@ cupsSNMPIsOIDPrefixed(
 
 
 /*
- * 'cupsSNMPOpen()' - Open a SNMP socket.
+ * '_cupsSNMPOpen()' - Open a SNMP socket.
  *
  * @since CUPS 1.4@
  */
 
 int					/* O - SNMP socket file descriptor */
-cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INET6@ */
+_cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INET6@ */
 {
   int		fd;			/* SNMP socket file descriptor */
   int		val;			/* Socket option value */
@@ -302,16 +302,16 @@ cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_INE
 
 
 /*
- * 'cupsSNMPRead()' - Read and parse a SNMP response.
+ * '_cupsSNMPRead()' - Read and parse a SNMP response.
  *
- * If "timeout" is negative, @code cupsSNMPRead@ will wait for a response
+ * If "timeout" is negative, @code _cupsSNMPRead@ will wait for a response
  * indefinitely.
  *
  * @since CUPS 1.4@
  */
 
 cups_snmp_t *				/* O - SNMP packet or @code NULL@ if none */
-cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
+_cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
              cups_snmp_t *packet,	/* I - SNMP packet buffer */
 	     double      timeout)	/* I - Timeout in seconds */
 {
@@ -403,13 +403,13 @@ cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
 
 /*
- * 'cupsSNMPSetDebug()' - Enable/disable debug logging to stderr.
+ * '_cupsSNMPSetDebug()' - Enable/disable debug logging to stderr.
  *
  * @since CUPS 1.4@
  */
 
 void
-cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
+_cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
@@ -419,28 +419,28 @@ cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
 
 
 /*
- * 'cupsSNMPWalk()' - Enumerate a group of OIDs.
+ * '_cupsSNMPWalk()' - Enumerate a group of OIDs.
  *
  * This function queries all of the OIDs with the specified OID prefix,
  * calling the "cb" function for every response that is received.
  *
  * The array pointed to by "prefix" is terminated by the value -1.
  *
- * If "timeout" is negative, @code cupsSNMPWalk@ will wait for a response
+ * If "timeout" is negative, @code _cupsSNMPWalk@ will wait for a response
  * indefinitely.
  *
  * @since CUPS 1.4@
  */
 
 int					/* O - Number of OIDs found or -1 on error */
-cupsSNMPWalk(int            fd,		/* I - SNMP socket */
-             http_addr_t    *address,	/* I - Address to query */
-	     int            version,	/* I - SNMP version */
-	     const char     *community,	/* I - Community name */
-             const int      *prefix,	/* I - OID prefix */
-	     double         timeout,	/* I - Timeout for each response in seconds */
-	     cups_snmp_cb_t cb,		/* I - Function to call for each response */
-	     void           *data)	/* I - User data pointer that is passed to the callback function */
+_cupsSNMPWalk(int            fd,	/* I - SNMP socket */
+              http_addr_t    *address,	/* I - Address to query */
+	      int            version,	/* I - SNMP version */
+	      const char     *community,/* I - Community name */
+              const int      *prefix,	/* I - OID prefix */
+	      double         timeout,	/* I - Timeout for each response in seconds */
+	      cups_snmp_cb_t cb,	/* I - Function to call for each response */
+	      void           *data)	/* I - User data pointer that is passed to the callback function */
 {
   int		count = 0;		/* Number of OIDs found */
   int		request_id = 0;		/* Current request ID */
@@ -459,21 +459,21 @@ cupsSNMPWalk(int            fd,		/* I - SNMP socket */
   * Copy the OID prefix and then loop until we have no more OIDs...
   */
 
-  cupsSNMPCopyOID(packet.object_name, prefix, CUPS_SNMP_MAX_OID);
+  _cupsSNMPCopyOID(packet.object_name, prefix, CUPS_SNMP_MAX_OID);
 
   for (;;)
   {
     request_id ++;
 
-    if (!cupsSNMPWrite(fd, address, version, community,
+    if (!_cupsSNMPWrite(fd, address, version, community,
                        CUPS_ASN1_GET_NEXT_REQUEST, request_id,
 		       packet.object_name))
       return (-1);
 
-    if (!cupsSNMPRead(fd, &packet, timeout))
+    if (!_cupsSNMPRead(fd, &packet, timeout))
       return (-1);
 
-    if (!cupsSNMPIsOIDPrefixed(&packet, prefix))
+    if (!_cupsSNMPIsOIDPrefixed(&packet, prefix))
       return (count);
 
     if (packet.error || packet.error_status)
@@ -487,7 +487,7 @@ cupsSNMPWalk(int            fd,		/* I - SNMP socket */
 
 
 /*
- * 'cupsSNMPWrite()' - Send an SNMP query packet.
+ * '_cupsSNMPWrite()' - Send an SNMP query packet.
  *
  * The array pointed to by "oid" is terminated by the value -1.
  *
@@ -495,7 +495,7 @@ cupsSNMPWalk(int            fd,		/* I - SNMP socket */
  */
 
 int					/* O - 1 on success, 0 on error */
-cupsSNMPWrite(
+_cupsSNMPWrite(
     int            fd,			/* I - SNMP socket */
     http_addr_t    *address,		/* I - Address to send to */
     int            version,		/* I - SNMP version */

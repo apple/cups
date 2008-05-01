@@ -309,40 +309,18 @@ div.contents ul.subcontents li {
 <li><a href="#cupsBackChannelRead" title="Read data from the backchannel.">cupsBackChannelRead</a></li>
 <li><a href="#cupsBackChannelWrite" title="Write data to the backchannel.">cupsBackChannelWrite</a></li>
 <li><a href="#cupsBackendDeviceURI" title="Get the device URI for a backend.">cupsBackendDeviceURI</a></li>
-<li><a href="#cupsSNMPClose" title="Close a SNMP socket.">cupsSNMPClose</a></li>
-<li><a href="#cupsSNMPCopyOID" title="Copy an OID.">cupsSNMPCopyOID</a></li>
-<li><a href="#cupsSNMPDefaultCommunity" title="Get the default SNMP community name.">cupsSNMPDefaultCommunity</a></li>
-<li><a href="#cupsSNMPIsOID" title="Test whether a SNMP response contains the specified OID.">cupsSNMPIsOID</a></li>
-<li><a href="#cupsSNMPIsOIDPrefixed" title="Test whether a SNMP response uses the specified
-OID prefix.">cupsSNMPIsOIDPrefixed</a></li>
-<li><a href="#cupsSNMPOpen" title="Open a SNMP socket.">cupsSNMPOpen</a></li>
-<li><a href="#cupsSNMPRead" title="Read and parse a SNMP response.">cupsSNMPRead</a></li>
-<li><a href="#cupsSNMPSetDebug" title="Enable/disable debug logging to stderr.">cupsSNMPSetDebug</a></li>
-<li><a href="#cupsSNMPWalk" title="Enumerate a group of OIDs.">cupsSNMPWalk</a></li>
-<li><a href="#cupsSNMPWrite" title="Send an SNMP query packet.">cupsSNMPWrite</a></li>
 <li><a href="#cupsSideChannelDoRequest" title="Send a side-channel command to a backend and wait for a response.">cupsSideChannelDoRequest</a></li>
 <li><a href="#cupsSideChannelRead" title="Read a side-channel message.">cupsSideChannelRead</a></li>
 <li><a href="#cupsSideChannelWrite" title="Write a side-channel message.">cupsSideChannelWrite</a></li>
 </ul>
 <li><a href="#TYPES">Data Types</a><ul class="code">
-	<li><a href="#cups_asn1_t" title="ASN1 request/object types">cups_asn1_t</a></li>
 	<li><a href="#cups_backend_t" title="Backend exit codes">cups_backend_t</a></li>
 	<li><a href="#cups_sc_bidi_t" title="Bidirectional capabilities">cups_sc_bidi_t</a></li>
 	<li><a href="#cups_sc_command_t" title="Request command codes">cups_sc_command_t</a></li>
 	<li><a href="#cups_sc_state_t" title="Printer state bits">cups_sc_state_t</a></li>
 	<li><a href="#cups_sc_status_t" title="Response status codes">cups_sc_status_t</a></li>
-	<li><a href="#cups_snmp_cb_t" title="Prototypes...">cups_snmp_cb_t</a></li>
-	<li><a href="#cups_snmp_t" title="SNMP data packet">cups_snmp_t</a></li>
-</ul></li>
-<li><a href="#STRUCTURES">Structures</a><ul class="code">
-	<li><a href="#cups_snmp_hexstring_s" title="Hex-STRING value">cups_snmp_hexstring_s</a></li>
-	<li><a href="#cups_snmp_s" title="SNMP data packet">cups_snmp_s</a></li>
-</ul></li>
-<li><a href="#UNIONS">Unions</a><ul class="code">
-	<li><a href="#cups_snmp_value_u" title="Object value">cups_snmp_value_u</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
-	<li><a href="#cups_asn1_e" title="ASN1 request/object types">cups_asn1_e</a></li>
 	<li><a href="#cups_backend_e" title="Backend exit codes">cups_backend_e</a></li>
 	<li><a href="#cups_sc_bidi_e" title="Bidirectional capabilities">cups_sc_bidi_e</a></li>
 	<li><a href="#cups_sc_command_e" title="Request command codes">cups_sc_command_e</a></li>
@@ -695,6 +673,9 @@ if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;s
 
 <h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
 
+<p>Re-write for side-channel-based SNMP queries.</p>
+
+<!--
 <p>The Simple Network Management Protocol (SNMP) allows you to get the current
 status, page counter, and supply levels from most network printers. Every
 piece of information is associated with an Object Identifier (OID), and
@@ -767,7 +748,7 @@ void *my_data;
 <a href="#cupsSNMPWalk">cupsSNMPWalk</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
                <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), printer_mib_oid, my_callback, my_data);
 </pre>
-<h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+--><h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsBackChannelRead">cupsBackChannelRead</a></h3>
 <p class="description">Read data from the backchannel.</p>
 <p class="code">
@@ -838,219 +819,6 @@ const char *cupsBackendDeviceURI (<br>
 function returns the device URI passed in the DEVICE_URI environment
 variable or the device URI passed in argv[0], whichever is found
 first.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPClose">cupsSNMPClose</a></h3>
-<p class="description">Close a SNMP socket.</p>
-<p class="code">
-void cupsSNMPClose (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-<dd class="description">SNMP socket file descriptor</dd>
-</dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPCopyOID">cupsSNMPCopyOID</a></h3>
-<p class="description">Copy an OID.</p>
-<p class="code">
-int *cupsSNMPCopyOID (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int *dst,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const int *src,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int dstsize<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>dst</dt>
-<dd class="description">Destination OID</dd>
-<dt>src</dt>
-<dd class="description">Source OID</dd>
-<dt>dstsize</dt>
-<dd class="description">Number of integers in dst</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">New OID</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The array pointed to by &quot;src&quot; is terminated by the value -1.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a></h3>
-<p class="description">Get the default SNMP community name.</p>
-<p class="code">
-const char *cupsSNMPDefaultCommunity (void);</p>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Default community name</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The default community name is the first community name found in the
-snmp.conf file. If no community name is defined there, &quot;public&quot; is used.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPIsOID">cupsSNMPIsOID</a></h3>
-<p class="description">Test whether a SNMP response contains the specified OID.</p>
-<p class="code">
-int cupsSNMPIsOID (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_t">cups_snmp_t</a> *packet,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const int *oid<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>packet</dt>
-<dd class="description">Response packet</dd>
-<dt>oid</dt>
-<dd class="description">OID</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">1 if equal, 0 if not equal</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The array pointed to by &quot;oid&quot; is terminated by the value -1.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPIsOIDPrefixed">cupsSNMPIsOIDPrefixed</a></h3>
-<p class="description">Test whether a SNMP response uses the specified
-OID prefix.</p>
-<p class="code">
-int cupsSNMPIsOIDPrefixed (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_t">cups_snmp_t</a> *packet,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const int *prefix<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>packet</dt>
-<dd class="description">Response packet</dd>
-<dt>prefix</dt>
-<dd class="description">OID prefix</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">1 if prefixed, 0 if not prefixed</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The array pointed to by &quot;prefix&quot; is terminated by the value -1.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPOpen">cupsSNMPOpen</a></h3>
-<p class="description">Open a SNMP socket.</p>
-<p class="code">
-int cupsSNMPOpen (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int family<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>family</dt>
-<dd class="description">Address family - <code>AF_INET</code> or <code>AF_INET6</code></dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">SNMP socket file descriptor</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPRead">cupsSNMPRead</a></h3>
-<p class="description">Read and parse a SNMP response.</p>
-<p class="code">
-<a href="#cups_snmp_t">cups_snmp_t</a> *cupsSNMPRead (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_t">cups_snmp_t</a> *packet,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-<dd class="description">SNMP socket file descriptor</dd>
-<dt>packet</dt>
-<dd class="description">SNMP packet buffer</dd>
-<dt>timeout</dt>
-<dd class="description">Timeout in seconds</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">SNMP packet or <code>NULL</code> if none</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">If &quot;timeout&quot; is negative, <code>cupsSNMPRead</code> will wait for a response
-indefinitely.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPSetDebug">cupsSNMPSetDebug</a></h3>
-<p class="description">Enable/disable debug logging to stderr.</p>
-<p class="code">
-void cupsSNMPSetDebug (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int level<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>level</dt>
-<dd class="description">1 to enable debug output, 0 otherwise</dd>
-</dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPWalk">cupsSNMPWalk</a></h3>
-<p class="description">Enumerate a group of OIDs.</p>
-<p class="code">
-int cupsSNMPWalk (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_addr_t *address,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int version,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *community,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const int *prefix,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;double timeout,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_snmp_cb_t">cups_snmp_cb_t</a> cb,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *data<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-<dd class="description">SNMP socket</dd>
-<dt>address</dt>
-<dd class="description">Address to query</dd>
-<dt>version</dt>
-<dd class="description">SNMP version</dd>
-<dt>community</dt>
-<dd class="description">Community name</dd>
-<dt>prefix</dt>
-<dd class="description">OID prefix</dd>
-<dt>timeout</dt>
-<dd class="description">Timeout for each response in seconds</dd>
-<dt>cb</dt>
-<dd class="description">Function to call for each response</dd>
-<dt>data</dt>
-<dd class="description">User data pointer that is passed to the callback function</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">Number of OIDs found or -1 on error</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">This function queries all of the OIDs with the specified OID prefix,
-calling the &quot;cb&quot; function for every response that is received.<br>
-<br>
-The array pointed to by &quot;prefix&quot; is terminated by the value -1.<br>
-<br>
-If &quot;timeout&quot; is negative, <code>cupsSNMPWalk</code> will wait for a response
-indefinitely.
-
-</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSNMPWrite">cupsSNMPWrite</a></h3>
-<p class="description">Send an SNMP query packet.</p>
-<p class="code">
-int cupsSNMPWrite (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_addr_t *address,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int version,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *community,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_asn1_t">cups_asn1_t</a> request_type,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const unsigned request_id,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const int *oid<br>
-);</p>
-<h4 class="parameters">Parameters</h4>
-<dl>
-<dt>fd</dt>
-<dd class="description">SNMP socket</dd>
-<dt>address</dt>
-<dd class="description">Address to send to</dd>
-<dt>version</dt>
-<dd class="description">SNMP version</dd>
-<dt>community</dt>
-<dd class="description">Community name</dd>
-<dt>request_type</dt>
-<dd class="description">Request type</dd>
-<dt>request_id</dt>
-<dd class="description">Request ID</dd>
-<dt>oid</dt>
-<dd class="description">OID</dd>
-</dl>
-<h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on error</p>
-<h4 class="discussion">Discussion</h4>
-<p class="discussion">The array pointed to by &quot;oid&quot; is terminated by the value -1.
-
-</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
 <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">
@@ -1152,11 +920,6 @@ responses to a filter, driver, or port monitor program.
 
 </p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><a name="cups_asn1_t">cups_asn1_t</a></h3>
-<p class="description">ASN1 request/object types</p>
-<p class="code">
-typedef enum <a href="#cups_asn1_e">cups_asn1_e</a> cups_asn1_t;
-</p>
 <h3 class="typedef"><a name="cups_backend_t">cups_backend_t</a></h3>
 <p class="description">Backend exit codes</p>
 <p class="code">
@@ -1182,138 +945,7 @@ typedef enum <a href="#cups_sc_state_e">cups_sc_state_e</a> cups_sc_state_t;
 <p class="code">
 typedef enum <a href="#cups_sc_status_e">cups_sc_status_e</a> cups_sc_status_t;
 </p>
-<h3 class="typedef"><a name="cups_snmp_cb_t">cups_snmp_cb_t</a></h3>
-<p class="description">Prototypes...</p>
-<p class="code">
-typedef void (*cups_snmp_cb_t)(<a href="#cups_snmp_t">cups_snmp_t</a> *packet, void *data);
-</p>
-<h3 class="typedef"><a name="cups_snmp_t">cups_snmp_t</a></h3>
-<p class="description">SNMP data packet</p>
-<p class="code">
-typedef struct <a href="#cups_snmp_s">cups_snmp_s</a> cups_snmp_t;
-</p>
-<h2 class="title"><a name="STRUCTURES">Structures</a></h2>
-<h3 class="struct"><a name="cups_snmp_hexstring_s">cups_snmp_hexstring_s</a></h3>
-<p class="description">Hex-STRING value</p>
-<p class="code">struct cups_snmp_hexstring_s {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;unsigned char bytes[CUPS_SNMP_MAX_STRING];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int num_bytes;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>bytes[CUPS_SNMP_MAX_STRING] </dt>
-<dd class="description">Bytes in string</dd>
-<dt>num_bytes </dt>
-<dd class="description">Number of bytes</dd>
-</dl>
-<h3 class="struct"><a name="cups_snmp_s">cups_snmp_s</a></h3>
-<p class="description">SNMP data packet</p>
-<p class="code">struct cups_snmp_s {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;http_addr_t address;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char community[CUPS_SNMP_MAX_STRING];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;const char *error;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int error_index;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int error_status;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int object_name[CUPS_SNMP_MAX_OID];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_asn1_t">cups_asn1_t</a> object_type;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;union <a href="#cups_snmp_value_u">cups_snmp_value_u</a> object_value;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int request_id;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_asn1_t">cups_asn1_t</a> request_type;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int version;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>address </dt>
-<dd class="description">Source address</dd>
-<dt>community[CUPS_SNMP_MAX_STRING] </dt>
-<dd class="description">Community name</dd>
-<dt>error </dt>
-<dd class="description">Encode/decode error</dd>
-<dt>error_index </dt>
-<dd class="description">error-index value</dd>
-<dt>error_status </dt>
-<dd class="description">error-status value</dd>
-<dt>object_name[CUPS_SNMP_MAX_OID] </dt>
-<dd class="description">object-name value</dd>
-<dt>object_type </dt>
-<dd class="description">object-value type</dd>
-<dt>object_value </dt>
-<dd class="description">object-value value</dd>
-<dt>request_id </dt>
-<dd class="description">request-id value</dd>
-<dt>request_type </dt>
-<dd class="description">Request type</dd>
-<dt>version </dt>
-<dd class="description">Version number</dd>
-</dl>
-<h2 class="title"><a name="UNIONS">Unions</a></h2>
-<h3 class="union"><a name="cups_snmp_value_u">cups_snmp_value_u</a></h3>
-<p class="description">Object value</p>
-<p class="code">union cups_snmp_value_u {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int boolean;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;unsigned counter;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;unsigned gauge;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;struct <a href="#cups_snmp_hexstring_s">cups_snmp_hexstring_s</a> hex_string;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int integer;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;int oid[CUPS_SNMP_MAX_OID];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;char string[CUPS_SNMP_MAX_STRING];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;unsigned timeticks;<br>
-};</p>
-<h4 class="members">Members</h4>
-<dl>
-<dt>boolean </dt>
-<dd class="description">Boolean value</dd>
-<dt>counter </dt>
-<dd class="description">Counter value</dd>
-<dt>gauge </dt>
-<dd class="description">Gauge value</dd>
-<dt>hex_string </dt>
-<dd class="description">Hex string value</dd>
-<dt>integer </dt>
-<dd class="description">Integer value</dd>
-<dt>oid[CUPS_SNMP_MAX_OID] </dt>
-<dd class="description">OID value</dd>
-<dt>string[CUPS_SNMP_MAX_STRING] </dt>
-<dd class="description">String value</dd>
-<dt>timeticks </dt>
-<dd class="description">Timeticks  value</dd>
-</dl>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
-<h3 class="enumeration"><a name="cups_asn1_e">cups_asn1_e</a></h3>
-<p class="description">ASN1 request/object types</p>
-<h4 class="constants">Constants</h4>
-<dl>
-<dt>CUPS_ASN1_BIT_STRING </dt>
-<dd class="description">BIT STRING</dd>
-<dt>CUPS_ASN1_BOOLEAN </dt>
-<dd class="description">BOOLEAN</dd>
-<dt>CUPS_ASN1_COUNTER </dt>
-<dd class="description">32-bit unsigned aka Counter32</dd>
-<dt>CUPS_ASN1_END_OF_CONTENTS </dt>
-<dd class="description">End-of-contents</dd>
-<dt>CUPS_ASN1_GAUGE </dt>
-<dd class="description">32-bit unsigned aka Gauge32</dd>
-<dt>CUPS_ASN1_GET_NEXT_REQUEST </dt>
-<dd class="description">GetNextRequest-PDU</dd>
-<dt>CUPS_ASN1_GET_REQUEST </dt>
-<dd class="description">GetRequest-PDU</dd>
-<dt>CUPS_ASN1_GET_RESPONSE </dt>
-<dd class="description">GetResponse-PDU</dd>
-<dt>CUPS_ASN1_HEX_STRING </dt>
-<dd class="description">Binary string aka Hex-STRING</dd>
-<dt>CUPS_ASN1_INTEGER </dt>
-<dd class="description">INTEGER or ENUMERATION</dd>
-<dt>CUPS_ASN1_NULL_VALUE </dt>
-<dd class="description">NULL VALUE</dd>
-<dt>CUPS_ASN1_OCTET_STRING </dt>
-<dd class="description">OCTET STRING</dd>
-<dt>CUPS_ASN1_OID </dt>
-<dd class="description">OBJECT IDENTIFIER</dd>
-<dt>CUPS_ASN1_SEQUENCE </dt>
-<dd class="description">SEQUENCE</dd>
-<dt>CUPS_ASN1_TIMETICKS </dt>
-<dd class="description">32-bit unsigned aka Timeticks32</dd>
-</dl>
 <h3 class="enumeration"><a name="cups_backend_e">cups_backend_e</a></h3>
 <p class="description">Backend exit codes</p>
 <h4 class="constants">Constants</h4>

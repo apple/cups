@@ -21,7 +21,7 @@ include ../../Makedefs
 #
 
 PHPDIR	=	$(BUILDROOT)`$(PHPCONFIG) --extension-dir`
-OPTIONS	=	-I../.. `$(PHPCONFIG) --includes`
+OPTIONS	=	$(PHPOPTIONS)
 
 
 #

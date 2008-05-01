@@ -18,6 +18,18 @@
  *
  * Contents:
  *
+ *   main()               - Main entry for test program.
+ *   check_basics()       - Check for CR LF, mixed line endings, and blank
+ *                          lines.
+ *   check_constraints()  - Check UIConstraints in the PPD file.
+ *   check_defaults()     - Check default option keywords in the PPD file.
+ *   check_filters()      - Check filters in the PPD file.
+ *   check_profiles()     - Check ICC color profiles in the PPD file.
+ *   check_translations() - Check translations in the PPD file.
+ *   show_conflicts()     - Show option conflicts in a PPD file.
+ *   test_raster()        - Test PostScript commands for raster printers.
+ *   usage()              - Show program usage...
+ *   valid_utf8()         - Check whether a string contains valid UTF-8 text.
  */
 
 /*
@@ -118,7 +130,6 @@ main(int  argc,				/* I - Number of command-line args */
   int		ppdversion;		/* PPD spec version in PPD file */
   ppd_status_t	error;			/* Status of ppdOpen*() */
   int		line;			/* Line number for error */
-  struct stat	statbuf;		/* File information */
   char		*root;			/* Root directory */
   int		xdpi,			/* X resolution */
 		ydpi;			/* Y resolution */
@@ -1370,7 +1381,7 @@ main(int  argc,				/* I - Number of command-line args */
 	   attr != NULL; 
 	   attr = ppdFindNextAttr(ppd, "APDialogExtension", NULL))
       {
-	if ((!attr->value || stat(attr->value, &statbuf)) && verbose >= 0)
+	if ((!attr->value || access(attr->value, 0)) && verbose >= 0)
 	  _cupsLangPrintf(stdout, _("        WARN    Missing "
 				    "APDialogExtension file \"%s\"\n"),
 			  attr->value ? attr->value : "<NULL>");
@@ -1384,7 +1395,7 @@ main(int  argc,				/* I - Number of command-line args */
 	   attr != NULL; 
 	   attr = ppdFindNextAttr(ppd, "APPrinterIconPath", NULL))
       {
-	if ((!attr->value || stat(attr->value, &statbuf)) && verbose >= 0)
+	if ((!attr->value || access(attr->value, 0)) && verbose >= 0)
 	  _cupsLangPrintf(stdout, _("        WARN    Missing "
 				    "APPrinterIconPath file \"%s\"\n"),
 			  attr->value ? attr->value : "<NULL>");

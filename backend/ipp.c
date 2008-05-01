@@ -33,17 +33,9 @@
  */
 
 #include <cups/http-private.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#include "backend-private.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <cups/backend.h>
-#include <cups/cups.h>
-#include <cups/language.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
-#include <signal.h>
 #include <sys/wait.h>
 
 /*
@@ -105,6 +97,9 @@ main(int  argc,				/* I - Number of command-line args */
 		*name,			/* Name of option */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
+  int		snmp_fd,		/* SNMP socket */
+		start_count,		/* Page count via SNMP at start */
+		page_count;		/* Page count via SNMP */
   int		num_files;		/* Number of files to print */
   char		**files,		/* Files to print */
 		*filename;		/* Pointer to single filename */
@@ -225,7 +220,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, backendResolveURI(argv),
                       method, sizeof(method), username, sizeof(username),
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
@@ -601,6 +596,21 @@ main(int  argc,				/* I - Number of command-line args */
 	      ntohs(http->hostaddr->ipv4.sin_port));
 
  /*
+  * See if the printer supports SNMP...
+  */
+
+  if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
+    if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
+    {
+     /*
+      * No, close it...
+      */
+
+      _cupsSNMPClose(snmp_fd);
+      snmp_fd = -1;
+    }
+
+ /*
   * Build a URI for the printer and fill the standard IPP attributes for
   * an IPP_PRINT_FILE request.  We can't use the URI in argv[0] because it
   * might contain username:password information...
@@ -620,6 +630,12 @@ main(int  argc,				/* I - Number of command-line args */
 
   do
   {
+   /*
+    * Check for side-channel requests...
+    */
+
+    backendCheckSideChannel(snmp_fd, http->hostaddr);
+
    /*
     * Build the IPP request...
     */
@@ -814,6 +830,12 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (copies_remaining > 0)
   {
+   /*
+    * Check for side-channel requests...
+    */
+
+    backendCheckSideChannel(snmp_fd, http->hostaddr);
+
    /*
     * Build the IPP request...
     */
@@ -1013,6 +1035,16 @@ main(int  argc,				/* I - Number of command-line args */
     {
       for (i = 0; i < num_files; i ++)
       {
+       /*
+	* Check for side-channel requests...
+	*/
+
+	backendCheckSideChannel(snmp_fd, http->hostaddr);
+
+       /*
+        * Send the next file in the job...
+	*/
+
 	request = ippNewRequest(IPP_SEND_DOCUMENT);
 
 	request->request.op.version[1] = version;
@@ -1069,6 +1101,12 @@ main(int  argc,				/* I - Number of command-line args */
 
     for (delay = 1; !job_cancelled;)
     {
+     /*
+      * Check for side-channel requests...
+      */
+
+      backendCheckSideChannel(snmp_fd, http->hostaddr);
+
      /*
       * Build an IPP_GET_JOB_ATTRIBUTES request...
       */
@@ -1181,6 +1219,15 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   check_printer_state(http, uri, resource, argv[2], version, job_id);
+
+ /*
+  * Collect the final page count as needed...
+  */
+
+  if (snmp_fd >= 0 && 
+      !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
+      page_count > start_count)
+    fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 
  /*
   * Free memory...

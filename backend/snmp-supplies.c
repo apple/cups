@@ -141,8 +141,8 @@ backendSNMPSupplies(
   if (!httpAddrEqual(addr, &current_addr))
     backend_init_supplies(snmp_fd, addr);
   else if (num_supplies > 0)
-    cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 500,
+    _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 500,
 		 backend_walk_cb, NULL);
 
   if (page_count)
@@ -178,12 +178,12 @@ backendSNMPSupplies(
     * Get the current printer status bits...
     */
 
-    if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-                       cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+    if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+                       _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
                        hrPrinterDetectedErrorState))
       return (-1);
 
-    if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+    if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
         packet.object_type != CUPS_ASN1_OCTET_STRING)
       return (-1);
 
@@ -261,12 +261,12 @@ backendSNMPSupplies(
 
     if (printer_state)
     {
-      if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-			 cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+      if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+			 _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
 			 hrPrinterStatus))
 	return (-1);
 
-      if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+      if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
 	  packet.object_type != CUPS_ASN1_INTEGER)
 	return (-1);
 
@@ -279,12 +279,12 @@ backendSNMPSupplies(
 
     if (page_count)
     {
-      if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-			 cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+      if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+			 _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
 			 prtMarkerLifeCount))
 	return (-1);
 
-      if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+      if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
 	  packet.object_type != CUPS_ASN1_COUNTER)
 	return (-1);
 
@@ -372,12 +372,12 @@ backend_init_supplies(
   * Get the device description...
   */
 
-  if (!cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
-		     cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+  if (!_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+		     _cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
 		     hrDeviceDescr))
     return;
 
-  if (!cupsSNMPRead(snmp_fd, &packet, 500) ||
+  if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
       packet.object_type != CUPS_ASN1_OCTET_STRING)
   {
     strlcpy(description, "Unknown", sizeof(description));
@@ -440,8 +440,8 @@ backend_init_supplies(
     * Walk the printer configuration information...
     */
 
-    cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		 cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 500,
+    _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 500,
 		 backend_walk_cb, NULL);
   }
 
@@ -474,8 +474,8 @@ backend_init_supplies(
   for (i = 0; i < num_supplies; i ++)
     strcpy(supplies[i].color, "none");
 
-  cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-               cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 500,
+  _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+               _cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 500,
 	       backend_walk_cb, NULL);
 
  /*
@@ -561,7 +561,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
   (void)data;
 
-  if (cupsSNMPIsOIDPrefixed(packet, prtMarkerColorantValue) &&
+  if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerColorantValue) &&
       packet->object_type == CUPS_ASN1_OCTET_STRING)
   {
    /*
@@ -584,7 +584,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 	  }
       }
   }
-  else if (cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesColorantIndex))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesColorantIndex))
   {
    /*
     * Get colorant index...
@@ -603,7 +603,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
     supplies[i - 1].colorant = packet->object_value.integer;
   }
-  else if (cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesDescription))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesDescription))
   {
    /*
     * Get supply name/description...
@@ -623,7 +623,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
     strlcpy(supplies[i - 1].name, packet->object_value.string,
             sizeof(supplies[0].name));
   }
-  else if (cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesLevel))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesLevel))
   {
    /*
     * Get level...
@@ -642,7 +642,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
     supplies[i - 1].level = packet->object_value.integer;
   }
-  else if (cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesMaxCapacity))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesMaxCapacity))
   {
    /*
     * Get max capacity...
@@ -661,7 +661,7 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
     supplies[i - 1].max_capacity = packet->object_value.integer;
   }
-  else if (cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesType))
+  else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesType))
   {
    /*
     * Get marker type...

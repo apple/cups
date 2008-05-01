@@ -25,6 +25,7 @@ AC_ARG_WITH(dnssd-includes, [  --with-dnssd-includes   set directory for DNS Ser
 	CPPFLAGS="-I$withval $CPPFLAGS",)
 
 DNSSDLIBS=""
+MDNS=""
 
 if test x$enable_dnssd != xno; then
 	AC_CHECK_HEADER(dns_sd.h, [
@@ -35,10 +36,11 @@ if test x$enable_dnssd != xno; then
 				AC_DEFINE(HAVE_DNSSD)
 				AC_DEFINE(HAVE_COREFOUNDATION)
 				AC_DEFINE(HAVE_SYSTEMCONFIGURATION)
+				MDNS="mdns"
 				;;
 			*)
 				# All others...
-				AC_CHECK_LIB(dns_sd,DNSServiceProcessResult,
+				AC_CHECK_LIB(dns_sd,DNSServiceCreateConnection,
 					AC_DEFINE(HAVE_DNSSD)
 					DNSSDLIBS="-ldns_sd")
 				;;
@@ -47,6 +49,7 @@ if test x$enable_dnssd != xno; then
 fi
 
 AC_SUBST(DNSSDLIBS)
+AC_SUBST(MDNS)
 
 dnl
 dnl End of "$Id$".

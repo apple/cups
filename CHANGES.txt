@@ -1,8 +1,16 @@
-CHANGES.txt - 2008-04-23
+CHANGES.txt - 2008-04-30
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added a mdns backend for discovery and printing to printers
+	  that advertise themselves via DNS-SD (Bonjour)
+	- The ipp, lpd, and socket backends now support DNS-SD service
+	  name resolution.
+	- The scheduler now uses a single shared file descriptor for
+	  all DNS-SD registrations (STR #2674)
+	- The ipp, lpd, and socket backends now support SNMP-based
+	  page accounting and supply level monitoring (STR #1655)
 	- Added support for cupsPJLDisplay attribute to control what
 	  PJL commands are used to display the job information.
 	- Driver information files can now be installed in
