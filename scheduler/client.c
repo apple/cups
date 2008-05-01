@@ -3720,7 +3720,8 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
 
     filename = strrchr(filename, '/') + 1; /* Filename always absolute */
 
-    cupsdSetStringf(&con->options, " %s", options);
+    if (options)
+      cupsdSetStringf(&con->options, " %s", options);
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "is_cgi: Returning 1 with command=\"%s\" and options=\"%s\"",
