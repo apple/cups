@@ -188,7 +188,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  httpSeparateURI(HTTP_URI_CODING_ALL, backendResolveURI(argv),
                   method, sizeof(method), username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));

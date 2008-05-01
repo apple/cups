@@ -853,8 +853,8 @@ main(int  argc,				/* I - Number of command-line args */
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
 	   p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
-        cupsdLogMessage(CUPSD_LOG_EMERG, "printer[%s] %d", p->name,
-	                p->dnssd_ipp_fd);
+        cupsdLogMessage(CUPSD_LOG_EMERG, "printer[%s] reg_name=\"%s\"", p->name,
+	                p->reg_name ? p->reg_name : "(null)");
 #endif /* HAVE_DNSSD */
 
       break;

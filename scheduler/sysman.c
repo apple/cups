@@ -456,6 +456,12 @@ cupsdUpdateSystemMonitor(void)
 	  cupsdDeregisterPrinter(p, 1);
 
        /*
+        * Update the computer name...
+	*/
+
+	cupsdUpdateDNSSDName();
+
+       /*
 	* Now re-register them...
 	*/
 

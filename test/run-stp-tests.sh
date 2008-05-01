@@ -225,6 +225,7 @@ mkdir /tmp/cups-$user/ssl
 ln -s $root/backend/http /tmp/cups-$user/bin/backend
 ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
+ln -s $root/backend/mdns /tmp/cups-$user/bin/backend
 ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
 ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/snmp /tmp/cups-$user/bin/backend

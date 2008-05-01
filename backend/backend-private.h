@@ -240,22 +240,31 @@ extern "C" {
  * Prototypes...
  */
 
-extern void	backendCheckSideChannel(int snmp_fd, http_addr_t *addr);
-extern int	backendDrainOutput(int print_fd, int device_fd);
-extern int	backendGetDeviceID(int fd, char *device_id, int device_id_size,
-		                   char *make_model, int make_model_size,
-				   const char *scheme, char *uri, int uri_size);
-extern int	backendGetMakeModel(const char *device_id, char *make_model,
-			            int make_model_size);
-extern void	backendNetworkSideCB(int print_fd, int device_fd, int snmp_fd,
-		                     http_addr_t *addr, int use_bc);
-extern ssize_t	backendRunLoop(int print_fd, int device_fd, int snmp_fd,
-		               http_addr_t *addr, int use_bc,
-			       void (*side_cb)(int print_fd, int device_fd,
-					       int snmp_fd, http_addr_t *addr,
-					       int use_bc));
-extern int	backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
-		                    int *page_count, int *printer_state);
+extern void		backendCheckSideChannel(int snmp_fd, http_addr_t *addr);
+extern int		backendDrainOutput(int print_fd, int device_fd);
+extern int		backendGetDeviceID(int fd, char *device_id,
+			                   int device_id_size,
+			                   char *make_model,
+					   int make_model_size,
+					   const char *scheme, char *uri,
+					   int uri_size);
+extern int		backendGetMakeModel(const char *device_id,
+			                    char *make_model,
+				            int make_model_size);
+extern void		backendNetworkSideCB(int print_fd, int device_fd,
+			                     int snmp_fd, http_addr_t *addr,
+					     int use_bc);
+extern const char	*backendResolveURI(char **argv);
+extern ssize_t		backendRunLoop(int print_fd, int device_fd, int snmp_fd,
+			               http_addr_t *addr, int use_bc,
+				       void (*side_cb)(int print_fd,
+				                       int device_fd,
+						       int snmp_fd,
+						       http_addr_t *addr,
+						       int use_bc));
+extern int		backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
+			                    int *page_count,
+					    int *printer_state);
 
 #  ifdef __cplusplus
 }

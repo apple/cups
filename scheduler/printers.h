@@ -96,10 +96,12 @@ typedef struct cupsd_printer_s
   char		*reg_name,		/* Name used for service registration */
 		*product,		/* PPD Product string */
 		*pdl,			/* pdl value for TXT record */
-		*txt_record;		/* TXT record contents */
-  int		txt_len;		/* TXT record length */
-  DNSServiceRef	dnssd_ipp_ref;		/* DNSServiceRegister ref for _ipp */
-  int		dnssd_ipp_fd;		/* File descriptor for DNSServiceRegister reference */
+		*ipp_txt,		/* IPP TXT record contents */
+		*printer_txt;		/* LPD TXT record contents */
+  int		ipp_len,		/* IPP TXT record length */
+		printer_len;		/* LPD TXT record length */
+  DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp,_cups */
+		printer_ref;		/* Reference for _printer._tcp */
 #endif /* HAVE_DNSSD */
 } cupsd_printer_t;
 

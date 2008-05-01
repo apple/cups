@@ -127,6 +127,21 @@ VAR int			PollPipe	VALUE(0);
 VAR cupsd_statbuf_t	*PollStatusBuffer VALUE(NULL);
 					/* Status buffer for pollers */
 
+#ifdef HAVE_DNSSD
+VAR char		*DNSSDName	VALUE(NULL);
+					/* Computer/server name */
+VAR int			DNSSDPort	VALUE(0);
+					/* Port number to register */
+VAR cups_array_t	*DNSSDPrinters	VALUE(NULL);
+					/* Printers we have registered */
+VAR DNSServiceRef	DNSSDRef	VALUE(NULL),
+					/* Master DNS-SD service reference */
+			WebIFRef	VALUE(NULL),
+					/* Service reference for the web interface */
+			RemoteRef	VALUE(NULL);
+					/* Remote printer browse reference */
+#endif /* HAVE_DNSSD */
+
 #ifdef HAVE_LIBSLP
 VAR SLPHandle		BrowseSLPHandle	VALUE(NULL);
 					/* SLP API handle */
@@ -173,7 +188,8 @@ extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
 #ifdef HAVE_DNSSD
-extern void	cupsdUpdateDNSSDBrowse(cupsd_printer_t *p);
+extern void	cupsdUpdateDNSSDBrowse(void);
+extern void	cupsdUpdateDNSSDName(void);
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_LDAP
 extern void	cupsdUpdateLDAPBrowse(void);

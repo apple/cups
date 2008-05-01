@@ -12,6 +12,11 @@ lpd.o: ../cups/backend.h ../cups/sidechannel.h ../cups/cups.h ../cups/ppd.h
 lpd.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 lpd.o: ../cups/i18n.h ../cups/transcode.h ../cups/snmp-private.h
 lpd.o: ../cups/string.h
+mdns.o: backend-private.h ../cups/backend.h ../cups/versioning.h
+mdns.o: ../cups/sidechannel.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+mdns.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+mdns.o: ../cups/debug.h ../cups/i18n.h ../cups/transcode.h
+mdns.o: ../cups/snmp-private.h ../cups/string.h ../config.h ../cups/array.h
 pap.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pap.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pap.o: ../cups/language.h ../cups/backend.h ../cups/sidechannel.h

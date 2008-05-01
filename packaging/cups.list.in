@@ -148,6 +148,7 @@ $LIB32DIR=@LIB32DIR@
 $LIB64DIR=@LIB64DIR@
 
 $IMGFILTERS=@IMGFILTERS@
+$MDNS=@MDNS@
 $PDFTOPS=@PDFTOPS@
 
 $CUPS_USER=@CUPS_USER@
@@ -188,6 +189,9 @@ d 0755 root sys $SERVERBIN/backend -
 f 0700 root sys $SERVERBIN/backend/ipp backend/ipp
 l 0700 root sys $SERVERBIN/backend/http ipp
 f 0700 root sys $SERVERBIN/backend/lpd backend/lpd
+%if MDNS
+f 0700 root sys $SERVERBIN/backend/mdns backend/mdns
+%endif
 %system !darwin
 f 0755 root sys $SERVERBIN/backend/parallel backend/parallel
 f 0755 root sys $SERVERBIN/backend/scsi backend/scsi

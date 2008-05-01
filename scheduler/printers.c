@@ -2786,7 +2786,8 @@ cupsdSetPrinterState(
   * Let the browse protocols reflect the change...
   */
 
-  cupsdRegisterPrinter(p);
+  if (update)
+    cupsdRegisterPrinter(p);
 
  /*
   * Save the printer configuration if a printer goes from idle or processing
