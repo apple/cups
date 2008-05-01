@@ -16,6 +16,10 @@
  *
  * Contents:
  *
+ *   backendCheckSideChannel() - Check the side-channel for pending requests.
+ *   backendNetworkSideCB()    - Handle common network side-channel commands.
+ *   backendResolveURI()       - Get the device URI, resolving as needed.
+ *   resolve_callback()        - Build a device URI for the given service name.
  */
 
 /*
@@ -309,7 +313,7 @@ resolve_callback(
     */
 
     rp[0] = '/';
-    memcpy(rp, value, valueLen);
+    memcpy(rp + 1, value, valueLen);
     rp[valueLen + 1] = '\0';
   }
   else
