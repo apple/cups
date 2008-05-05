@@ -8309,7 +8309,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     ipp_attribute_t	*doc_name;	/* document-name attribute */
 
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "print_job: auto-typing file...");
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job ???] Auto-typing file...");
 
     doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
     filetype = mimeFileType(MimeDatabase, con->filename,
@@ -8318,6 +8318,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (!filetype)
       filetype = mimeType(MimeDatabase, super, type);
+
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job ???] Request file type is %s/%s.",
+		    filetype->super, filetype->type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
@@ -8343,6 +8346,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     else
       ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else if (!filetype)
   {
@@ -8372,9 +8378,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((job = add_job(con, printer, filetype)) == NULL)
     return;
-
-  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Adding job file of type %s/%s.",
-                  job->id, filetype->super, filetype->type);
 
  /*
   * Update quota data...
@@ -8414,9 +8417,10 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   * Log and save the job...
   */
 
-  cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Queued on \"%s\" by \"%s\".",
-                  job->id, job->dest, job->username);
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] hold_until = %d", job->id,
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "[Job %d] File of type %s/%s queued by \"%s\".", job->id,
+		  filetype->super, filetype->type, job->username);
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] hold_until=%d", job->id,
                   (int)job->hold_until);
 
  /*
@@ -9305,7 +9309,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 	      ipp_attribute_t *uri)	/* I - Printer URI */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_attribute_t	*format;	/* Document-format attribute */
+  ipp_attribute_t	*format;	/* Request's document-format attribute */
+  ipp_attribute_t	*jformat;	/* Job's document-format attribute */
   const char		*default_format;/* document-format-default value */
   int			jobid;		/* Job ID number */
   cupsd_job_t		*job;		/* Current job */
@@ -9510,12 +9515,18 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
     if (!filetype)
       filetype = mimeType(MimeDatabase, super, type);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "[Job %d] Request file type is %s/%s.", job->id,
+		    filetype->super, filetype->type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);
 
+  jformat = ippFindAttribute(job->attrs, "document-format", IPP_TAG_MIMETYPE);
+
   if (filetype &&
-      (!format ||
+      (!jformat ||
        (!strcmp(super, "application") && !strcmp(type, "octet-stream"))))
   {
    /*
@@ -9526,18 +9537,15 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
              filetype->type);
 
-    if (format)
+    if (jformat)
     {
-      _cupsStrFree(format->values[0].string.text);
+      _cupsStrFree(jformat->values[0].string.text);
 
-      format->values[0].string.text = _cupsStrAlloc(mimetype);
+      jformat->values[0].string.text = _cupsStrAlloc(mimetype);
     }
     else
-      ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+      ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
-
-    job->dirty = 1;
-    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else if (!filetype)
   {
@@ -9567,10 +9575,6 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     return;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "[Job %d] Request file type is %s/%s.", job->id,
-	          filetype->super, filetype->type);
-
  /*
   * Add the file to the job...
   */
@@ -9598,8 +9602,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   cupsdClearString(&con->filename);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
-                  "File of type %s/%s queued in job #%d by \"%s\".",
-                  filetype->super, filetype->type, job->id, job->username);
+                  "[Job %d] File of type %s/%s queued by \"%s\".", job->id,
+                  filetype->super, filetype->type, job->username);
 
  /*
   * Start the job if this is the last document...
