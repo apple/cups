@@ -54,6 +54,7 @@ extern cups_encoding_t	_ppdGetEncoding(const char *name);
 #define PPD_MAX_PROD	8		/* Maximum products */
 #define PPD_MAX_VERS	8		/* Maximum versions */
 
+#define PPD_TYPE_NONE		-1	/* PPD type not set */
 #define PPD_TYPE_POSTSCRIPT	0	/* PostScript PPD */
 #define PPD_TYPE_PDF		1	/* PDF PPD */
 #define PPD_TYPE_RASTER		2	/* CUPS raster PPD */
@@ -1210,7 +1211,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     lang_encoding[0] = '\0';
     strcpy(lang_version, "en");
     model_number     = 0;
-    type             = PPD_TYPE_POSTSCRIPT;
+    type             = PPD_TYPE_NONE;
 
     while (cupsFileGets(fp, line, sizeof(line)) != NULL)
     {
@@ -1271,15 +1272,14 @@ load_ppds(const char *d,		/* I - Actual directory */
 	if (!strncasecmp(ptr, "true", 4))
           type = PPD_TYPE_FAX;
       }
-      else if (!strncmp(line, "*cupsFilter:", 12) &&
-               (type == PPD_TYPE_POSTSCRIPT || type == PPD_TYPE_UNKNOWN))
+      else if (!strncmp(line, "*cupsFilter:", 12))
       {
         if (strstr(line + 12, "application/vnd.cups-raster"))
 	  type = PPD_TYPE_RASTER;
         else if (strstr(line + 12, "application/vnd.cups-pdf"))
 	  type = PPD_TYPE_PDF;
-	else
-	  type = PPD_TYPE_UNKNOWN;
+        else if (strstr(line + 12, "application/vnd.cups-postscript"))
+	  type = PPD_TYPE_POSTSCRIPT;
       }
       else if (!strncmp(line, "*cupsModelNumber:", 17))
         sscanf(line, "*cupsModelNumber:%d", &model_number);
@@ -1295,6 +1295,9 @@ load_ppds(const char *d,		/* I - Actual directory */
 	  break;
       }
     }
+
+    if (type == PPD_TYPE_NONE)
+      type = PPD_TYPE_POSTSCRIPT;
 
    /*
     * Close the file...

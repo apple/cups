@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The scheduler did not report PostScript printer PPDs with
+	  filters as PostScript devices.
 	- The scheduler did not set the job document-format attribute
 	  for jobs submitted using Create-Job and Send-Document.
 	- cupsFileTell() did not work for log files opened in append
