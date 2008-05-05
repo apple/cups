@@ -134,6 +134,7 @@ install-data:
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \
 	done
+	$(INSTALL_DIR) -m 755 $(DATADIR)/model
 	$(INSTALL_DIR) -m 755 $(DATADIR)/ppdc
 	for file in $(PPDCFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/ppdc; \
@@ -184,6 +185,7 @@ uninstall:
 	done
 	-$(RMDIR) $(DATADIR)/profiles
 	-$(RMDIR) $(DATADIR)/ppdc
+	-$(RMDIR) $(DATADIR)/model
 	-$(RMDIR) $(DATADIR)/data
 	-$(RMDIR) $(DATADIR)/charsets
 	-$(RMDIR) $(DATADIR)/charmaps
