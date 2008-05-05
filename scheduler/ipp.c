@@ -8346,9 +8346,6 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     else
       ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
-
-    job->dirty = 1;
-    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else if (!filetype)
   {
