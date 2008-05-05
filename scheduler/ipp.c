@@ -9501,7 +9501,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     ipp_attribute_t	*doc_name;	/* document-name attribute */
 
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "send_document: auto-typing file...");
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] Auto-typing file...", job->id);
 
     doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
     filetype = mimeFileType(MimeDatabase, con->filename,
@@ -9535,6 +9535,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     else
       ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
 	           "document-format", NULL, mimetype);
+
+    job->dirty = 1;
+    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
   }
   else if (!filetype)
   {
@@ -9565,7 +9568,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   }
 
   cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "send_document: request file type is %s/%s.",
+                  "[Job %d] Request file type is %s/%s.", job->id,
 	          filetype->super, filetype->type);
 
  /*
