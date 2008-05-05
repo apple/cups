@@ -15,7 +15,7 @@ CHANGES IN CUPS V1.3.8
 	- cupsFileTell() did not work for log files opened in append
 	  mode (STR #2810)
 	- The scheduler did not set QUERY_STRING all of the time
-	  for CGI scripts (STR #2781)
+	  for CGI scripts (STR #2781, STR #2816)
 	- The scheduler now returns an error for bad job-sheets
 	  values (STR #2775)
 	- Authenticated remote printing did not work over domain

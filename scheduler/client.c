@@ -3697,7 +3697,10 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
   */
 
   if ((options = strchr(con->uri, '?')) != NULL)
-    cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options + 1);
+  {
+    options ++;
+    cupsdSetStringf(&(con->query_string), "QUERY_STRING=%s", options);
+  }
 
  /*
   * Check for known types...
