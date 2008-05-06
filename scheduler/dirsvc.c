@@ -14,6 +14,55 @@
  *
  * Contents:
  *
+ *   cupsdDeregisterPrinter()   - Stop sending broadcast information for a local
+ *                                printer and remove any pending references to
+ *                                remote printers.
+ *   cupsdLoadRemoteCache()     - Load the remote printer cache.
+ *   cupsdRegisterPrinter()     - Start sending broadcast information for a
+ *                                printer or update the broadcast contents.
+ *   cupsdRestartPolling()      - Restart polling servers as needed.
+ *   cupsdSaveRemoteCache()     - Save the remote printer cache.
+ *   cupsdSendBrowseList()      - Send new browsing information as necessary.
+ *   cupsdStartBrowsing()       - Start sending and receiving broadcast
+ *                                information.
+ *   cupsdStartPolling()        - Start polling servers as needed.
+ *   cupsdStopBrowsing()        - Stop sending and receiving broadcast
+ *                                information.
+ *   cupsdStopPolling()         - Stop polling servers as needed.
+ *   cupsdUpdateDNSSDBrowse()   - Handle DNS-SD queries.
+ *   cupsdUpdateDNSSDName()     - Update the computer name we use for
+ *                                browsing...
+ *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
+ *   cupsdUpdateSLPBrowse()     - Get browsing information via SLP.
+ *   dequote()                  - Remote quotes from a string.
+ *   dnssdBuildTxtRecord()      - Build a TXT record from printer info.
+ *   dnssdComparePrinters()     - Compare the registered names of two printers.
+ *   dnssdDeregisterPrinter()   - Stop sending broadcast information for a
+ *                                printer.
+ *   dnssdPackTxtRecord()       - Pack an array of key/value pairs into the TXT
+ *                                record format.
+ *   dnssdRegisterCallback()    - DNSServiceRegister callback.
+ *   dnssdRegisterPrinter()     - Start sending broadcast information for a
+ *                                printer or update the broadcast contents.
+ *   get_hostconfig()           - Get an /etc/hostconfig service setting.
+ *   is_local_queue()           - Determine whether the URI points at a local
+ *                                queue.
+ *   process_browse_data()      - Process new browse data.
+ *   process_implicit_classes() - Create/update implicit classes as needed.
+ *   send_cups_browse()         - Send new browsing information using the CUPS
+ *                                protocol.
+ *   send_ldap_browse()         - Send LDAP printer registrations.
+ *   send_slp_browse()          - Register the specified printer with SLP.
+ *   slp_attr_callback()        - SLP attribute callback
+ *   slp_dereg_printer()        - SLPDereg() the specified printer
+ *   slp_get_attr()             - Get an attribute from an SLP registration.
+ *   slp_reg_callback()         - Empty SLPRegReport.
+ *   slp_url_callback()         - SLP service url callback
+ *   update_cups_browse()       - Update the browse lists using the CUPS
+ *                                protocol.
+ *   update_lpd()               - Update the LPD configuration as needed.
+ *   update_polling()           - Read status messages from the poll daemons.
+ *   update_smb()               - Update the SMB configuration as needed.
  */
 
 /*
