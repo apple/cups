@@ -1271,15 +1271,12 @@ load_ppds(const char *d,		/* I - Actual directory */
 	if (!strncasecmp(ptr, "true", 4))
           type = PPD_TYPE_FAX;
       }
-      else if (!strncmp(line, "*cupsFilter:", 12) &&
-               (type == PPD_TYPE_POSTSCRIPT || type == PPD_TYPE_UNKNOWN))
+      else if (!strncmp(line, "*cupsFilter:", 12) && type == PPD_TYPE_POSTSCRIPT)
       {
         if (strstr(line + 12, "application/vnd.cups-raster"))
 	  type = PPD_TYPE_RASTER;
         else if (strstr(line + 12, "application/vnd.cups-pdf"))
 	  type = PPD_TYPE_PDF;
-	else
-	  type = PPD_TYPE_UNKNOWN;
       }
       else if (!strncmp(line, "*cupsModelNumber:", 17))
         sscanf(line, "*cupsModelNumber:%d", &model_number);

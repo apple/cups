@@ -278,7 +278,7 @@ testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
 	if test ! -d test; then \
 		mkdir test; \
 	fi
-	./testcmyk > test/testcmyk.log 2>&1
+	./testcmyk > test/testcmyk.log 2>&1 || echo "CMYK tests failed!"
 
 
 #
@@ -292,14 +292,14 @@ testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
 	if test ! -d test; then \
 		mkdir test; \
 	fi
-	./testdither > test/0-255.pgm 2>test/0-255.log
-	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log
-	./testdither 0 85 170 255 > test/0-85-170-255.pgm 2>test/0-85-170-255.log
-	./testdither 0 63 127 170 198 227 255 > test/0-63-127-170-198-227-255.pgm 2>test/0-63-127-170-198-227-255.log
-	./testdither 0 210 383 > test/0-210-383.pgm 2>test/0-210-383.log
-	./testdither 0 82 255 > test/0-82-255.pgm 2>test/0-82-255.log
-	./testdither 0 510 > test/0-510.pgm 2>test/0-510.log
-	./testdither 0 1020 > test/0-1020.pgm 2>test/0-1020.log
+	./testdither > test/0-255.pgm 2>test/0-255.log || echo "Dither 0-255 test failed!"
+	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log || echo "Dither 0-127-255 test failed!"
+	./testdither 0 85 170 255 > test/0-85-170-255.pgm 2>test/0-85-170-255.log || echo "Dither 0-85-170-255 test failed!"
+	./testdither 0 63 127 170 198 227 255 > test/0-63-127-170-198-227-255.pgm 2>test/0-63-127-170-198-227-255.log || echo "Dither 0-63-127-170-198-227-255 test failed!"
+	./testdither 0 210 383 > test/0-210-383.pgm 2>test/0-210-383.log || echo "Dither 0-210-383 test failed!"
+	./testdither 0 82 255 > test/0-82-255.pgm 2>test/0-82-255.log || echo "Dither 0-82-255 test failed!"
+	./testdither 0 510 > test/0-510.pgm 2>test/0-510.log || echo "Dither 0-510 test failed!"
+	./testdither 0 1020 > test/0-1020.pgm 2>test/0-1020.log || echo "Dither 0-1020 test failed!"
 
 
 #
@@ -313,7 +313,7 @@ testrgb:		testrgb.o libcupsdriver.a ../cups/libcups.a
 	if test ! -d test; then \
 		mkdir test; \
 	fi
-	./testrgb > test/testrgb.log 2>&1
+	./testrgb > test/testrgb.log 2>&1 || echo "RGB tests failed!"
 
 
 #

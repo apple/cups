@@ -474,10 +474,16 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
 
     if (cupsLastError() <= IPP_OK_CONFLICT)
     {
-      cgiRewriteURL(job_printer_uri, resource, sizeof(resource), NULL);
-      cgiFormEncode(uri, resource, sizeof(uri));
-      snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
-      cgiSetVariable("refresh_page", refresh);
+      const char *path = strstr(job_printer_uri, "/printers/");
+      if (!path)
+        path = strstr(job_printer_uri, "/classes/");
+
+      if (path)
+      {
+        cgiFormEncode(uri, path, sizeof(uri));
+        snprintf(refresh, sizeof(refresh), "2;URL=%s", uri);
+	cgiSetVariable("refresh_page", refresh);
+      }
     }
 
     if (job_id)

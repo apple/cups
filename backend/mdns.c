@@ -269,6 +269,7 @@ main(int  argc,				/* I - Number of command-line args */
           printf("network %s \"%s\" \"%s\"\n", device_uri,
 	         device->make_and_model ? device->make_and_model : "Unknown",
 		 device->name);
+          fflush(stdout);
 
 	  device->sent = 1;
         }
@@ -649,7 +650,8 @@ query_callback(
     else
       device->make_and_model = strdup(model);
 
-    if (device->type == CUPS_DEVICE_IPP &&
+    if ((device->type == CUPS_DEVICE_IPP ||
+         device->type == CUPS_DEVICE_PRINTER) &&
         (value = TXTRecordGetValuePtr(rdlen, rdata, "printer-type",
                                       &valueLen)) != NULL)
     {
@@ -658,6 +660,9 @@ query_callback(
       */
 
       device->cups_shared = 1;
+
+      if (device->type == CUPS_DEVICE_PRINTER)
+        device->sent = 1;
     }
   }
   else
