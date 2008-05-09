@@ -599,6 +599,7 @@ main(int  argc,				/* I - Number of command-line args */
   * See if the printer supports SNMP...
   */
 
+#if 0 /* Need to only use SNMP for non-CUPS queues, and then it shouldn't hang */
   if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
     if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
     {
@@ -609,6 +610,9 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
+#else
+  snmp_fd = -1;
+#endif /* 0 */
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
