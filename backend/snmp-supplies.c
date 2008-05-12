@@ -142,7 +142,7 @@ backendSNMPSupplies(
     backend_init_supplies(snmp_fd, addr);
   else if (num_supplies > 0)
     _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 500,
+		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesLevel, 0.5,
 		 backend_walk_cb, NULL);
 
   if (page_count)
@@ -183,7 +183,7 @@ backendSNMPSupplies(
                        hrPrinterDetectedErrorState))
       return (-1);
 
-    if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
+    if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
         packet.object_type != CUPS_ASN1_OCTET_STRING)
       return (-1);
 
@@ -266,7 +266,7 @@ backendSNMPSupplies(
 			 hrPrinterStatus))
 	return (-1);
 
-      if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
+      if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
 	  packet.object_type != CUPS_ASN1_INTEGER)
 	return (-1);
 
@@ -284,7 +284,7 @@ backendSNMPSupplies(
 			 prtMarkerLifeCount))
 	return (-1);
 
-      if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
+      if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
 	  packet.object_type != CUPS_ASN1_COUNTER)
 	return (-1);
 
@@ -377,7 +377,7 @@ backend_init_supplies(
 		     hrDeviceDescr))
     return;
 
-  if (!_cupsSNMPRead(snmp_fd, &packet, 500) ||
+  if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
       packet.object_type != CUPS_ASN1_OCTET_STRING)
   {
     strlcpy(description, "Unknown", sizeof(description));
@@ -441,7 +441,7 @@ backend_init_supplies(
     */
 
     _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 500,
+		 _cupsSNMPDefaultCommunity(), prtMarkerSuppliesEntry, 0.5,
 		 backend_walk_cb, NULL);
   }
 
@@ -475,7 +475,7 @@ backend_init_supplies(
     strcpy(supplies[i].color, "none");
 
   _cupsSNMPWalk(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
-               _cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 500,
+               _cupsSNMPDefaultCommunity(), prtMarkerColorantValue, 0.5,
 	       backend_walk_cb, NULL);
 
  /*
