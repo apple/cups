@@ -1692,7 +1692,7 @@ off_t					/* O - File position */
 cupsFileTell(cups_file_t *fp)		/* I - CUPS file */
 {
   DEBUG_printf(("cupsFileTell(fp=%p)\n", fp));
-  DEBUG_printf(("cupsFileTell: pos=" CUPS_LLFMT "\n", CUPS_LLCAST fp->pos));
+  DEBUG_printf(("cupsFileTell: pos=" CUPS_LLFMT "\n", CUPS_LLCAST (fp ? fp->pos : -1)));
 
   return (fp ? fp->pos : 0);
 }
