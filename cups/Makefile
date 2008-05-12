@@ -108,20 +108,23 @@ HEADERS	=	\
 # Targets in this directory...
 #
 
-TARGETS	=	\
+LIBTARGETS =	\
 		$(LIBCUPS) \
 		$(LIB32CUPS) \
 		$(LIB64CUPS) \
 		libcups.a \
-		testadmin \
 		testarray \
-		testcups \
 		testfile \
 		testhttp \
 		testi18n \
 		testipp \
 		testlang \
-		testppd \
+		testppd
+
+TARGETS	=	\
+		$(LIBTARGETS) \
+		testadmin \
+		testcups \
 		testsnmp
 
 
@@ -130,6 +133,13 @@ TARGETS	=	\
 #
 
 all:	$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -382,8 +392,10 @@ testadmin:	testadmin.o libcups.a
 
 testarray:	testarray.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testarray.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testarray.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running array API tests...
+	./testarray
 
 
 #
@@ -402,8 +414,10 @@ testcups:	testcups.o libcups.a
 
 testfile:	testfile.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testfile.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testfile.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running file API tests...
+	./testfile
 
 
 #
@@ -412,8 +426,10 @@ testfile:	testfile.o libcups.a
 
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhttp.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhttp.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running HTTP API tests...
+	./testhttp
 
 
 #
@@ -422,8 +438,10 @@ testhttp:	testhttp.o libcups.a
 
 testipp:	testipp.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testipp.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testipp.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running IPP API tests...
+	./testipp
 
 
 #
@@ -432,8 +450,10 @@ testipp:	testipp.o libcups.a
 
 testi18n:	testi18n.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testi18n.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running internationalization API tests...
+	./testi18n || echo I18N test failed!
 
 
 #
@@ -442,8 +462,10 @@ testi18n:	testi18n.o libcups.a
 
 testlang:	testlang.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testlang.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testlang.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running language API tests...
+	./testlang
 
 
 #
@@ -452,8 +474,10 @@ testlang:	testlang.o libcups.a
 
 testppd:	testppd.o libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testppd.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running PPD API tests...
+	./testppd
 
 
 #

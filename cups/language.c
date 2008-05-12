@@ -441,8 +441,13 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * preference so we have to look it up this way...
   */
 
-  if (!language && (language = getenv("LANG")) == NULL)
-    language = appleLangDefault();
+  if (!language)
+  {
+    if ((language = getenv("LANG")) == NULL)
+      language = appleLangDefault();
+
+    DEBUG_printf(("cupsLangGet: language=\"%s\"\n", language));
+  }
 
 #else
  /*
@@ -705,6 +710,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     pthread_mutex_unlock(&lang_mutex);
 #endif /* HAVE_PTHREAD_H */
 
+    DEBUG_printf(("cupsLangGet: Using cached copy of \"%s\"...\n", real));
+
     return (lang);
   }
 
@@ -892,14 +899,21 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
   */
 
   if ((a = cupsArrayNew((cups_array_func_t)cups_message_compare, NULL)) == NULL)
+  {
+    DEBUG_puts("_cupsMessageLoad: Unable to allocate array!");
     return (NULL);
+  }
 
  /*
   * Open the message catalog file...
   */
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    DEBUG_printf(("_cupsMessageLoad: Unable to open file: %s\n",
+                  strerror(errno)));
     return (a);
+  }
 
  /*
   * Read messages from the catalog file until EOF...
@@ -1049,6 +1063,9 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
   */
 
   cupsFileClose(fp);
+
+  DEBUG_printf(("_cupsMessageLoad: Returning %d messages...\n",
+                cupsArrayCount(a)));
 
   return (a);
 }

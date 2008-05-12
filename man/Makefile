@@ -76,6 +76,13 @@ all:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) html
 
 
 #
+# Make library targets...
+#
+
+libs:
+
+
+#
 # Clean all config and object files...
 #
 

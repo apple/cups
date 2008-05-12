@@ -574,7 +574,7 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
   snprintf(lkeyword, sizeof(lkeyword), "%s.%s", ll_CC, keyword);
   if ((attr = ppdFindAttr(ppd, lkeyword, spec)) == NULL)
   {
-    snprintf(lkeyword, sizeof(lkeyword), "%2s.%s", ll_CC, keyword);
+    snprintf(lkeyword, sizeof(lkeyword), "%2.2s.%s", ll_CC, keyword);
     attr = ppdFindAttr(ppd, lkeyword, spec);
 
     if (!attr)

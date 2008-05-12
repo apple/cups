@@ -69,6 +69,13 @@ all:	rfctohtml $(RFCS:.txt=.html)
 
 
 #
+# Make library targets...
+#
+
+libs:
+
+
+#
 # Clean all config and object files...
 #
 
@@ -131,7 +138,7 @@ uninstall:
 #
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
-	$(CC) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
 		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 

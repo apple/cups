@@ -18,16 +18,28 @@
 include ../Makedefs
 
 
-FILTERS	=	commandtops gziptoany hpgltops texttops pstops $(IMGFILTERS) \
-		$(PDFTOPS) rastertolabel rastertoepson rastertohp
-TARGETS	=	$(FILTERS) \
+FILTERS	=	\
+		commandtops \
+		gziptoany \
+		hpgltops \
+		texttops \
+		pstops \
+		$(IMGFILTERS) \
+		$(PDFTOPS) \
+		rastertolabel \
+		rastertoepson \
+		rastertohp
+LIBTARGETS =	\
 		$(LIBCUPSIMAGE) \
 		libcupsimage.a \
 		$(LIB32CUPSIMAGE) \
 		$(LIB64CUPSIMAGE) \
-		rasterbench \
-		testimage \
 		testraster
+TARGETS	=	\
+		$(LIBTARGETS) \
+		$(FILTERS) \
+		rasterbench \
+		testimage
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -50,6 +62,13 @@ OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 #
 
 all:	$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -408,8 +427,11 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 
 testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testraster.o libcupsimage.a ../cups/libcups.a \
-		$(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) $(SSLLIBS) $(LIBGSSAPI)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
+		../cups/libcups.a $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
+		$(SSLLIBS) $(LIBGSSAPI)
+	echo Running raster API tests...
+	./testraster
 
 
 #

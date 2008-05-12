@@ -56,13 +56,15 @@ OBJS =		\
 		ppdi.o \
 		ppdmerge.o \
 		ppdpo.o
-TARGETS	=	\
+LIBTARGETS =	\
 		$(LIBCUPSPPDC) \
 		$(LIB32CUPSPPDC) \
 		$(LIB64CUPSPPDC) \
 		libcupsppdc.a \
+		ppdc-static
+TARGETS	=	\
+		$(LIBTARGETS) \
 		drv \
-		ppdc-static \
 		ppdc \
 		ppdhtml \
 		ppdi \
@@ -75,6 +77,13 @@ TARGETS	=	\
 #
 
 all:		$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -275,8 +284,8 @@ ppdc:			ppdc.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 
 ppdc-static:		ppdc.o libcupsppdc.a  ../cups/libcups.a foo.drv foo-fr.po
 	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
