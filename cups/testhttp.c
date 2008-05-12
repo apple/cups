@@ -93,6 +93,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "ipp", "username:password", "fe80::200:1234:5678:9abc%eth0", "/ipp", 999, 999 },
 			  { HTTP_URI_OK, "http://server/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400",
 			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0 },
+			  { HTTP_URI_OK, "lpd://Acme%20Laser%20(01%3A23%3A45).local._tcp._printer/",
+			    "lpd", "", "Acme Laser (01:23:45).local._tcp._printer", "/", 515, 0 },
 
 			  /* Missing scheme */
 			  { HTTP_URI_MISSING_SCHEME, "/path/to/file/index.html",
