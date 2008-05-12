@@ -168,6 +168,9 @@
 	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
 	ATTR name requesting-user-name $user
 
+	GROUP job
+	ATTR keyword job-hold-until weekend
+
 	FILE testfile.pdf
 
 	# What statuses are OK?

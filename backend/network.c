@@ -197,11 +197,12 @@ backendResolveURI(char **argv)		/* I - Command-line arguments */
   * Resolve it as needed...
   */
 
-  if (strstr(hostname, "._tcp"))
+  if (strstr(resource, "._tcp") || strstr(hostname, "._tcp"))
   {
 #ifdef HAVE_DNSSD
     DNSServiceRef	ref;		/* DNS-SD service reference */
-    char		*regtype,	/* Pointer to type in hostname */
+    char		*full_name,	/* Full (service) name */
+			*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     static char		resolved_uri[HTTP_MAX_URI];
     					/* Resolved device URI */
@@ -210,7 +211,12 @@ backendResolveURI(char **argv)		/* I - Command-line arguments */
     * Separate the hostname into service name, registration type, and domain...
     */
 
-    regtype = strchr(hostname, '.');
+    if (strstr(resource, "._tcp"))
+      full_name = resource + 1;
+    else
+      full_name = hostname;
+
+    regtype = strchr(full_name, '.');
     *regtype++ = '\0';
 
     domain = regtype + strlen(regtype) - 1;
@@ -228,9 +234,9 @@ backendResolveURI(char **argv)		/* I - Command-line arguments */
 
     fprintf(stderr,
             "DEBUG: Resolving service \"%s\", regtype \"%s\", domain \"%s\"\n",
-	    hostname, regtype, domain ? domain : "(null)");
+	    full_name, regtype, domain ? domain : "(null)");
 
-    if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
+    if (DNSServiceResolve(&ref, 0, 0, full_name, regtype, domain,
 			  resolve_callback,
 			  resolved_uri) == kDNSServiceErr_NoError)
     {

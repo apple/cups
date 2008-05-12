@@ -262,9 +262,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  DNSServiceRefDeallocate(device->ref);
 	  device->ref = 0;
 
-          httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-	                  schemes[device->type], NULL, device->fullName, 0,
-			  device->cups_shared ? "/cups" : "");
+          httpAssembleURIf(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
+	                  schemes[device->type], NULL,
+			  device->cups_shared ? "cups" : "", 0,
+			  "/%s", device->fullName);
 
           printf("network %s \"%s\" \"%s\"\n", device_uri,
 	         device->make_and_model ? device->make_and_model : "Unknown",

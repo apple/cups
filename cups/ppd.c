@@ -617,13 +617,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   {
     DEBUG_printf(("mask=%x, keyword=\"%s\", name=\"%s\", text=\"%s\", "
                   "string=%d chars...", mask, keyword, name, text,
-		  (int)strlen(string)));
+		  string ? (int)strlen(string) : 0));
 
-    if (strcmp(keyword, "CloseUI") && strcmp(keyword, "CloseGroup") &&
-	strcmp(keyword, "CloseSubGroup") && strncmp(keyword, "Default", 7) &&
-        strcmp(keyword, "JCLCloseUI") && strcmp(keyword, "JCLOpenUI") &&
-	strcmp(keyword, "OpenUI") && strcmp(keyword, "OpenGroup") &&
-	strcmp(keyword, "OpenSubGroup") && string == NULL)
+    if (strncmp(keyword, "Default", 7) && !string)
     {
      /*
       * Need a string value!
