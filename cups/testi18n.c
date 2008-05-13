@@ -322,6 +322,11 @@ main(int  argc,				/* I - Argument Count */
       puts("PASS");
   }
 
+  fputs("legdest:", stdout);
+  for (legptr = legdest; *legptr; legptr ++)
+    printf(" %02X", *legptr & 255);
+  putchar('\n');
+
   fputs("cupsCharsetToUTF8(CUPS_WINDOWS_932): ", stdout);
 
   strcpy(legsrc, legdest);

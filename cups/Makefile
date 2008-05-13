@@ -453,7 +453,7 @@ testi18n:	testi18n.o libcups.a
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running internationalization API tests...
-	./testi18n || echo I18N test failed!
+	./testi18n || echo ERROR: I18N tests failed!
 
 
 #
