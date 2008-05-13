@@ -1197,6 +1197,9 @@ conv_vbcs_to_utf8(
     if (legchar < 0x80)
     {
       *workptr++ = (cups_utf32_t)legchar;
+
+      DEBUG_printf(("conv_vbcs_to_utf8: %02X => %08X\n", src[-1],
+                    (unsigned)legchar));
       continue;
     }
 
@@ -1227,6 +1230,9 @@ conv_vbcs_to_utf8(
 	*workptr++ = 0xfffd;
       else
 	*workptr++ = (cups_utf32_t)*crow;
+
+      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X => %08X\n",
+                    src[-2], src[-1], (unsigned)workptr[-1]));
       continue;
     }
 
@@ -1284,6 +1290,13 @@ conv_vbcs_to_utf8(
       *workptr++ = 0xfffd;
     else
       *workptr++ = wide2uni->unichar;
+
+    if (vmap->lead3char[(int)leadchar] == leadchar)
+      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X %02X => %08X\n",
+		    src[-3], src[-2], src[-1], (unsigned)workptr[-1]));
+    else
+      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X %02X %02X => %08X\n",
+		    src[-4], src[-3], src[-2], src[-1], (unsigned)workptr[-1]));
   }
 
   *workptr = 0;
@@ -1683,22 +1696,20 @@ get_vbcs_charmap(
     * Save lead char of 2/3/4-byte legacy char...
     */
 
-    if (legchar > 0xff && legchar <= 0xffff)
-    {
-      leadchar                  = (cups_sbcs_t)(legchar >> 8);
-      vmap->lead2char[leadchar] = leadchar;
-    }
-
-    if (legchar > 0xffff && legchar <= 0xffffff)
-    {
-      leadchar                  = (cups_sbcs_t)(legchar >> 16);
-      vmap->lead3char[leadchar] = leadchar;
-    }
-
     if (legchar > 0xffffff)
     {
       leadchar                  = (cups_sbcs_t)(legchar >> 24);
       vmap->lead4char[leadchar] = leadchar;
+    }
+    else if (legchar > 0xffff)
+    {
+      leadchar                  = (cups_sbcs_t)(legchar >> 16);
+      vmap->lead3char[leadchar] = leadchar;
+    }
+    else if (legchar > 0xff)
+    {
+      leadchar                  = (cups_sbcs_t)(legchar >> 8);
+      vmap->lead2char[leadchar] = leadchar;
     }
 
    /*
@@ -1785,7 +1796,7 @@ get_vbcs_charmap(
   * Add it to the cache and return...
   */
 
-  vmap->next     = vmap_cache;
+  vmap->next = vmap_cache;
   vmap_cache = vmap;
 
   DEBUG_printf(("get_vbcs_charmap: Returning new vmap=%p\n", vmap));

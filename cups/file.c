@@ -1413,7 +1413,11 @@ cupsFileRewind(cups_file_t *fp)		/* I - CUPS file */
   }
 #endif /* HAVE_LIBZ */
 
-  lseek(fp->fd, 0, SEEK_SET);
+  if (lseek(fp->fd, 0, SEEK_SET))
+  {
+    DEBUG_printf(("cupsFileRewind: lseek failed: %s\n", strerror(errno)));
+    return (-1);
+  }
 
   fp->bufpos = 0;
   fp->pos    = 0;
@@ -1867,7 +1871,7 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
                 fp->ptr, fp->end, fp->buf, CUPS_LLCAST fp->bufpos, fp->eof));
 
   if (fp->ptr && fp->end)
-    fp->bufpos += fp->end - fp->ptr;
+    fp->bufpos += fp->end - fp->buf;
 
 #ifdef HAVE_LIBZ
   DEBUG_printf(("cups_fill: fp->compressed=%d\n", fp->compressed));
@@ -1915,7 +1919,8 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
 	fp->ptr = fp->buf;
 	fp->end = fp->buf + bytes;
 
-        DEBUG_printf(("    returning " CUPS_LLFMT "!\n", CUPS_LLCAST bytes));
+        DEBUG_printf(("cups_fill: Returning " CUPS_LLFMT "!\n",
+	              CUPS_LLCAST bytes));
 
 	return (bytes);
       }
