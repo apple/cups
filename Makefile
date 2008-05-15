@@ -31,13 +31,32 @@ DIRS	=	cups filter backend berkeley cgi-bin driver locale man monitor \
 
 all:
 	chmod +x cups-config
+	echo Using ARCHFLAGS="$(ARCHFLAGS)"
 	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
 	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using DSOFLAGS="$(DSOFLAGS)"
 	echo Using LDFLAGS="$(LDFLAGS)"
 	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
-		(cd $$dir ; $(MAKE) $(MFLAGS)) || exit 1;\
+		(cd $$dir ; $(MAKE) $(MFLAGS) all) || exit 1;\
+	done
+
+
+#
+# Make library targets...
+#
+
+libs:
+	echo Using ARCHFLAGS="$(ARCHFLAGS)"
+	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
+	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using DSOFLAGS="$(DSOFLAGS)"
+	echo Using LDFLAGS="$(LDFLAGS)"
+	echo Using LIBS="$(LIBS)"
+	for dir in $(DIRS); do\
+		echo Making all in $$dir... ;\
+		(cd $$dir ; $(MAKE) $(MFLAGS) libs) || exit 1;\
 	done
 
 
@@ -189,10 +208,10 @@ install-headers:
 # Install programs...
 #
 
-install-exec:
+install-exec:	all
 	for dir in $(DIRS); do\
 		echo Installing programs in $$dir... ;\
-		(cd $$dir; $(MAKE) $(MFLAGS) all install-exec) || exit 1;\
+		(cd $$dir; $(MAKE) $(MFLAGS) install-exec) || exit 1;\
 	done
 
 
@@ -200,10 +219,10 @@ install-exec:
 # Install libraries...
 #
 
-install-libs:
+install-libs:	libs
 	for dir in $(DIRS); do\
 		echo Installing libraries in $$dir... ;\
-		(cd $$dir; $(MAKE) $(MFLAGS) all install-libs) || exit 1;\
+		(cd $$dir; $(MAKE) $(MFLAGS) install-libs) || exit 1;\
 	done
 
 

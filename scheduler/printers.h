@@ -162,6 +162,9 @@ extern void		cupsdSetPrinterState(cupsd_printer_t *p, ipp_pstate_t s,
 			                     int update);
 #define			cupsdStartPrinter(p,u) cupsdSetPrinterState((p), IPP_PRINTER_IDLE, (u))
 extern void		cupsdStopPrinter(cupsd_printer_t *p, int update);
+extern int		cupsdUpdatePrinterPPD(cupsd_printer_t *p,
+			                      int num_keywords,
+					      cups_option_t *keywords);
 extern void		cupsdUpdatePrinters(void);
 extern cupsd_quota_t	*cupsdUpdateQuota(cupsd_printer_t *p,
 			                  const char *username, int pages,

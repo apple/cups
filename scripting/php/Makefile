@@ -46,6 +46,13 @@ all:	$(PHPCUPS)
 
 
 #
+# Make library targets...
+#
+
+libs:
+
+
+#
 # Remove object and target files...
 #
 

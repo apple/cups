@@ -17,6 +17,7 @@
  * Contents:
  *
  *   main()             - Main entry.
+ *   count_lines()      - Count the number of lines in a file.
  *   random_tests()     - Do random access tests.
  *   read_write_tests() - Perform read/write tests.
  */
@@ -43,6 +44,7 @@
  * Local functions...
  */
 
+static int	count_lines(cups_file_t *fp);
 static int	random_tests(void);
 static int	read_write_tests(int compression);
 
@@ -57,8 +59,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		status;			/* Exit status */
   char		filename[1024];		/* Filename buffer */
+  cups_file_t	*fp;			/* File pointer */
   int		fds[2];			/* Open file descriptors */
   cups_file_t	*fdfile;		/* File opened with cupsFileOpenFd() */
+  int		count;			/* Number of lines in file */
 
 
   if (argc == 1)
@@ -120,6 +124,55 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
    /*
+    * Count lines in euc-jp.txt, rewind, then count again.
+    */
+
+    fputs("\ncupsFileOpen(\"../data/euc-jp.txt\", \"r\"): ", stdout);
+
+    if ((fp = cupsFileOpen("../data/euc-jp.txt", "r")) == NULL)
+    {
+      puts("FAIL");
+      status ++;
+    }
+    else
+    {
+      puts("PASS");
+      fputs("cupsFileGets: ", stdout);
+
+      if ((count = count_lines(fp)) != 15184)
+      {
+        printf("FAIL (got %d lines, expected 15184)\n", count);
+	status ++;
+      }
+      else
+      {
+        puts("PASS");
+	fputs("cupsFileRewind: ", stdout);
+
+	if (cupsFileRewind(fp) != 0)
+	{
+	  puts("FAIL");
+	  status ++;
+	}
+	else
+	{
+	  puts("PASS");
+	  fputs("cupsFileGets: ", stdout);
+
+	  if ((count = count_lines(fp)) != 15184)
+	  {
+	    printf("FAIL (got %d lines, expected 15184)\n", count);
+	    status ++;
+	  }
+	  else
+	    puts("PASS");
+        }
+      }
+
+      cupsFileClose(fp);
+    }
+
+   /*
     * Test path functions...
     */
 
@@ -153,9 +206,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Cat the filename on the command-line...
     */
 
-    cups_file_t	*fp;			/* File pointer */
     char	line[1024];		/* Line from file */
-
 
     if ((fp = cupsFileOpen(argv[1], "r")) == NULL)
     {
@@ -177,6 +228,23 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   return (status);
+}
+
+
+/*
+ * 'count_lines()' - Count the number of lines in a file.
+ */
+
+static int				/* O - Number of lines */
+count_lines(cups_file_t *fp)		/* I - File to read from */
+{
+  int	count;				/* Number of lines */
+  char	line[1024];			/* Line buffer */
+
+
+  for (count = 0; cupsFileGets(fp, line, sizeof(line)); count ++);
+
+  return (count);
 }
 
 

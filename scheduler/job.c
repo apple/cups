@@ -3779,6 +3779,23 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsFreeOptions(num_attrs, attrs);
     }
+    else if (loglevel == CUPSD_LOG_PPD)
+    {
+     /*
+      * Set attribute(s)...
+      */
+
+      int		num_keywords;	/* Number of keywords */
+      cups_option_t	*keywords;	/* Keywords */
+
+
+      num_keywords = cupsParseOptions(message, 0, &keywords);
+
+      if (cupsdUpdatePrinterPPD(job->printer, num_keywords, keywords))
+        cupsdSetPrinterAttrs(job->printer);
+
+      cupsFreeOptions(num_keywords, keywords);
+    }
 #ifdef __APPLE__
     else if (!strncmp(message, "recoverable:", 12))
     {

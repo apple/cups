@@ -91,8 +91,7 @@ TD.body {
 }
 
 TD.sel, TD.unsel {
-  border-left: thin solid #aaaaaa;
-  font-size: 120%;
+  border-left: thin solid #cccccc;
   padding: 0px 5px;
   text-align: center;
   vertical-align: middle;
@@ -107,24 +106,9 @@ TD.unsel {
   background: url(images/unsel.gif);
 }
 
-TD.sel A, TD.sel A:hover {
-  color: white;
-  font-weight: normal;
-  text-decoration: none;
-}
-
-TD.unsel A, TD.unsel A:visited {
-  color: #333333;
-  font-weight: normal;
-}
-
-TD.unsel:hover {
-  background: url(images/unsel-hover.gif);
-  color: white;
-}
-
-TD.unsel A:link:hover, TD.unsel A:visited:hover, TD.unsel A:active {
-  color: white;
+TD.sel A, TD.sel A:hover, TD.unsel A:link:hover, TD.unsel A:visited:hover,
+TD.unsel A:active, TD.unsel A, TD.unsel A:visited {
+  color: #666666;
   font-weight: normal;
   text-decoration: none;
 }
@@ -280,7 +264,7 @@ DIV.sidebar P.l2 {
 
 TABLE.inset {
   background: #f0f0f0;
-  border: inset 1px #eeeeee;
+  border: thin solid #e0e0e0;
   padding: 0;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 5px;

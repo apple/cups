@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/string.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include "ppd.h"
 #ifdef WIN32
@@ -106,6 +107,25 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc == 1)
   {
+   /*
+    * Setup directories for locale stuff...
+    */
+
+    if (access("locale", 0))
+    {
+      mkdir("locale", 0777);
+      mkdir("locale/fr", 0777);
+      symlink("../../../locale/cups_fr.po", "locale/fr/cups_fr.po");
+      mkdir("locale/zh_TW", 0777);
+      symlink("../../../locale/cups_zh_TW.po", "locale/zh_TW/cups_zh_TW.po");
+    }
+
+    putenv("LOCALEDIR=locale");
+
+   /*
+    * Do tests with test.ppd...
+    */
+
     fputs("ppdOpenFile: ", stdout);
 
     if ((ppd = ppdOpenFile("test.ppd")) != NULL)

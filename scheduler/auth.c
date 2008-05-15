@@ -1404,12 +1404,24 @@ cupsdCheckGroup(
   * Check group membership through MacOS X membership API...
   */
 
-  if (user && group)
+  if (group)
+  {
+    if (mbr_gid_to_uuid(group->gr_gid, groupuuid))
+      uuid_clear(groupuuid);
+  }
+  else if (groupname[0] == '#')
+  {
+    if (uuid_parse((char *)groupname + 1, groupuuid))
+      uuid_clear(groupuuid);
+  }
+  else
+    uuid_clear(groupuuid);
+
+  if (user && !uuid_is_null(groupuuid))
     if (!mbr_uid_to_uuid(user->pw_uid, useruuid))
-      if (!mbr_gid_to_uuid(group->gr_gid, groupuuid))
-	if (!mbr_check_membership(useruuid, groupuuid, &is_member))
-	  if (is_member)
-	    return (1);
+      if (!mbr_check_membership(useruuid, groupuuid, &is_member))
+	if (is_member)
+	  return (1);
 #endif /* HAVE_MBR_UID_TO_UUID */
 
  /*

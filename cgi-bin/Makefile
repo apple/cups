@@ -42,14 +42,17 @@ CGIS	=	\
 		help.cgi \
 		jobs.cgi \
 		printers.cgi
-TARGETS	=	\
+LIBTARGETS =	\
 		libcupscgi.a \
 		$(LIBCUPSCGI) \
 		$(LIB32CUPSCGI) \
 		$(LIB32CUPSCGI) \
-		$(CGIS) \
 		testcgi \
-		testhi \
+		testhi
+
+TARGETS	=	\
+		$(LIBTARGETS) \
+		$(CGIS) \
 		testtemplate
 
 
@@ -58,6 +61,13 @@ TARGETS	=	\
 #
 
 all:	$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -352,8 +362,10 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 
 testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a \
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+	echo Testing CGI API...
+	./testcgi
 
 
 #
@@ -362,8 +374,10 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 
 testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testhi.o libcupscgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhi.o libcupscgi.a \
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+	echo Testing help index API...
+	./testhi
 
 
 #

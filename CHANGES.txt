@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-04-30
+CHANGES.txt - 2008-05-14
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Filters can now send PPD: messages to stderr to set PPD
+	  keywords like DefaultPageSize while a job is printing.
 	- Added a mdns backend for discovery and printing to printers
 	  that advertise themselves via DNS-SD (Bonjour)
 	- The ipp, lpd, and socket backends now support DNS-SD service

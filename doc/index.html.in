@@ -10,9 +10,9 @@
 <TABLE CLASS="page" SUMMARY="{title}">
 <TR><TD CLASS="body">
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
-<TR HEIGHT="32">
+<TR HEIGHT="36">
 <TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
-SRC="/images/left.gif" WIDTH="64" HEIGHT="32" BORDER="0" ALT=""></A></TD>
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
 <TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Home&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administration&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Classes&nbsp;&nbsp;</A></TD>
@@ -22,10 +22,9 @@ SRC="/images/left.gif" WIDTH="64" HEIGHT="32" BORDER="0" ALT=""></A></TD>
 <TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
 TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
 AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
-<TD><IMG SRC="/images/right.gif" WIDTH="16" HEIGHT="32" ALT=""></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
 </TR>
 </TABLE>
-<IMG SRC="/images/shadow.png" WIDTH="100%" HEIGHT="4" ALT="">
 
 <H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1>
 

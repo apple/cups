@@ -62,20 +62,24 @@ OBJS	=	\
 		testspeed.o \
 		testsub.o \
 		util.o
+
+LIBTARGETS =	\
+		$(LIBCUPSMIME) \
+		$(LIB32CUPSMIME) \
+		$(LIB64CUPSMIME) \
+		libcupsmime.a \
+		testmime
+
 TARGETS	=	\
+		$(LIBTARGETS) \
 		cupsd \
 		cupsfilter \
 		cups-deviced \
 		cups-driverd \
 		cups-lpd \
 		cups-polld \
-		$(LIBCUPSMIME) \
-		$(LIB32CUPSMIME) \
-		$(LIB64CUPSMIME) \
-		libcupsmime.a \
 		testdirsvc \
 		testlpd \
-		testmime \
 		testspeed \
 		testsub
 
@@ -85,6 +89,13 @@ TARGETS	=	\
 #
 
 all:		$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -480,8 +491,10 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 
 testmime:	testmime.o libcupsmime.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testmime.o libcupsmime.a ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testmime.o libcupsmime.a \
+		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
+	echo Running MIME tests...
+	./testmime
 
 
 #

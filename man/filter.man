@@ -3,7 +3,7 @@
 .\"
 .\"   filter man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "Common UNIX Printing System" "6 July 2007" "Apple Inc."
+.TH filter 7 "Common UNIX Printing System" "14 May 2008" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -100,6 +100,13 @@ PAGE: total #-pages
 Adds an entry to the current \fIPageLog\fR. The first form adds
 #-copies to the job-media-sheets-completed attribute. The second
 form sets the job-media-sheets-completed attribute to #-pages.
+
+.TP 5
+PPD: Keyword=Value ... KeywordN=Value
+.br
+Sets the named keywords in the printer's PPD file. This is typically
+used to update default option keywords such as DefaultPageSize and
+the various installable options in the PPD file.
 
 .TP 5
 STATE: printer-state-reason [printer-state-reason ...]

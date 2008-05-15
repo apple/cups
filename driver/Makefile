@@ -49,18 +49,20 @@ OBJS		= \
 		$(LIB32OBJS) \
 		$(LIB64OBJS)
 
-TARGETS		= \
+LIBTARGETS =	\
 		$(LIBCUPSDRIVER) \
 		$(LIB32CUPSDRIVER) \
 		$(LIB64CUPSDRIVER) \
 		libcupsdriver.a \
-		commandtoescpx \
-		commandtopclx \
-		rastertoescpx \
-		rastertopclx \
 		testcmyk \
 		testdither \
 		testrgb
+TARGETS =	\
+		$(LIBTARGETS) \
+		commandtoescpx \
+		commandtopclx \
+		rastertoescpx \
+		rastertopclx
 
 
 #
@@ -68,6 +70,13 @@ TARGETS		= \
 #
 
 all:		$(TARGETS)
+
+
+#
+# Make library targets...
+#
+
+libs:		$(LIBTARGETS)
 
 
 #
@@ -273,12 +282,13 @@ rastertopclx:		rastertopclx.o pcl-common.o $(LIBCUPSDRIVER) \
 
 testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testcmyk.o libcupsdriver.a ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcmyk.o libcupsdriver.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	if test ! -d test; then \
 		mkdir test; \
 	fi
-	./testcmyk > test/testcmyk.log 2>&1 || echo "CMYK tests failed!"
+	echo Running CMYK API tests...
+	./testcmyk > test/testcmyk.log
 
 
 #
@@ -287,19 +297,20 @@ testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
 
 testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testdither.o libcupsdriver.a ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testdither.o libcupsdriver.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	if test ! -d test; then \
 		mkdir test; \
 	fi
-	./testdither > test/0-255.pgm 2>test/0-255.log || echo "Dither 0-255 test failed!"
-	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log || echo "Dither 0-127-255 test failed!"
-	./testdither 0 85 170 255 > test/0-85-170-255.pgm 2>test/0-85-170-255.log || echo "Dither 0-85-170-255 test failed!"
-	./testdither 0 63 127 170 198 227 255 > test/0-63-127-170-198-227-255.pgm 2>test/0-63-127-170-198-227-255.log || echo "Dither 0-63-127-170-198-227-255 test failed!"
-	./testdither 0 210 383 > test/0-210-383.pgm 2>test/0-210-383.log || echo "Dither 0-210-383 test failed!"
-	./testdither 0 82 255 > test/0-82-255.pgm 2>test/0-82-255.log || echo "Dither 0-82-255 test failed!"
-	./testdither 0 510 > test/0-510.pgm 2>test/0-510.log || echo "Dither 0-510 test failed!"
-	./testdither 0 1020 > test/0-1020.pgm 2>test/0-1020.log || echo "Dither 0-1020 test failed!"
+	echo Running dither API tests...
+	./testdither > test/0-255.pgm 2>test/0-255.log
+	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log
+	./testdither 0 85 170 255 > test/0-85-170-255.pgm 2>test/0-85-170-255.log
+	./testdither 0 63 127 170 198 227 255 > test/0-63-127-170-198-227-255.pgm 2>test/0-63-127-170-198-227-255.log
+	./testdither 0 210 383 > test/0-210-383.pgm 2>test/0-210-383.log
+	./testdither 0 82 255 > test/0-82-255.pgm 2>test/0-82-255.log
+	./testdither 0 510 > test/0-510.pgm 2>test/0-510.log
+	./testdither 0 1020 > test/0-1020.pgm 2>test/0-1020.log
 
 
 #
@@ -308,11 +319,12 @@ testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
 
 testrgb:		testrgb.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testrgb.o libcupsdriver.a ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testrgb.o libcupsdriver.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	if test ! -d test; then \
 		mkdir test; \
 	fi
+	echo Running RGB API tests...
 	./testrgb > test/testrgb.log 2>&1 || echo "RGB tests failed!"
 
 

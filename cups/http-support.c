@@ -195,15 +195,17 @@ httpAssembleURI(
 
    /*
     * Then add the hostname.  Since IPv6 is a particular pain to deal
-    * with, we have several special cases to deal with...  If we get
+    * with, we have several special cases to deal with.  If we get
     * an IPv6 address with brackets around it, assume it is already in
-    * URI format...
+    * URI format.  Since DNS-SD service names can sometimes look like
+    * raw IPv6 addresses, we specifically look for "._tcp" in the name,
+    * too...
     */
 
-    if (host[0] != '[' && strchr(host, ':'))
+    if (host[0] != '[' && strchr(host, ':') && !strstr(host, "._tcp"))
     {
      /*
-      * We have an IPv6 address...
+      * We have a raw IPv6 address...
       */
 
       if (strchr(host, '%'))
@@ -263,7 +265,7 @@ httpAssembleURI(
       * Otherwise, just copy the host string...
       */
 
-      ptr = http_copy_encode(ptr, host, end, NULL, NULL,
+      ptr = http_copy_encode(ptr, host, end, ":/?#[]@", NULL,
                              encoding & HTTP_URI_CODING_HOSTNAME);
 
       if (!ptr)
