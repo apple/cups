@@ -37,9 +37,7 @@ WEBIMAGES	=	\
 			images/raster.png \
 			images/right.gif \
 			images/sel.gif \
-			images/shadow.png \
 			images/smiley.jpg \
-			images/unsel-hover.gif \
 			images/unsel.gif \
 			images/web-add-this-printer.gif \
 			images/web-password.gif \
