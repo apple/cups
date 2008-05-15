@@ -5760,8 +5760,10 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "pdl-override-supported");
       cupsArrayAdd(ra, "printer-alert");
       cupsArrayAdd(ra, "printer-alert-description");
+      cupsArrayAdd(ra, "printer-commands");
       cupsArrayAdd(ra, "printer-current-time");
       cupsArrayAdd(ra, "printer-driver-installer");
+      cupsArrayAdd(ra, "printer-dns-sd-name");
       cupsArrayAdd(ra, "printer-info");
       cupsArrayAdd(ra, "printer-is-accepting-jobs");
       cupsArrayAdd(ra, "printer-location");
@@ -5773,6 +5775,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "printer-state");
       cupsArrayAdd(ra, "printer-state-message");
       cupsArrayAdd(ra, "printer-state-reasons");
+      cupsArrayAdd(ra, "printer-type");
       cupsArrayAdd(ra, "printer-up-time");
       cupsArrayAdd(ra, "printer-uri-supported");
       cupsArrayAdd(ra, "queued-job-count");
