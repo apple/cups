@@ -4183,8 +4183,13 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	*/
 
 #ifdef HAVE_MBR_UID_TO_UUID
-	if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
-	                                      grp_uuid)) != 0)
+        if (p->users[i][1] == '#')
+	{
+	  if (uuid_parse((char *)p->users[i] + 2, grp_uuid))
+	    uuid_clear(grp_uuid);
+	}
+	else if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
+	                                           grp_uuid)) != 0)
 	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4198,28 +4203,27 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	                  "Access control entry \"%s\" not a valid group name; "
 			  "entry ignored", p->users[i]);
 	}
-	else
+
+	if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
+					    &is_member)) != 0)
 	{
-	  if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
-	                                      &is_member)) != 0)
-	  {
-	   /*
-	    * At this point, there should be no errors, but check anyways...
-	    */
-
-	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                    "check_quotas: group \"%s\" membership check "
-			    "failed (err=%d)", p->users[i] + 1, mbr_err);
-            is_member = 0;
-	  }
-
-         /*
-	  * Stop if we found a match...
+	 /*
+	  * At this point, there should be no errors, but check anyways...
 	  */
 
-	  if (is_member)
-	    break;
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "check_quotas: group \"%s\" membership check "
+			  "failed (err=%d)", p->users[i] + 1, mbr_err);
+	  is_member = 0;
 	}
+
+       /*
+	* Stop if we found a match...
+	*/
+
+	if (is_member)
+	  break;
+
 #else
         if (cupsdCheckGroup(username, pw, p->users[i] + 1))
 	  break;
@@ -4228,8 +4232,13 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 #ifdef HAVE_MBR_UID_TO_UUID
       else
       {
-        if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
-					     usr2_uuid)) != 0)
+        if (p->users[i][0] == '#')
+	{
+	  if (uuid_parse((char *)p->users[i] + 1, usr2_uuid))
+	    uuid_clear(usr2_uuid);
+        }
+        else if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
+					          usr2_uuid)) != 0)
     	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4243,20 +4252,18 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	                  "Access control entry \"%s\" not a valid user name; "
 			  "entry ignored", p->users[i]);
 	}
-	else
-	{
-	  if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
-	                                      &is_member)) != 0)
-          {
-	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-			    "check_quotas: User \"%s\" identity check failed "
-			    "(err=%d)", p->users[i], mbr_err);
-	    is_member = 0;
-	  }
 
-	  if (is_member)
-	    break;
+	if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
+					    &is_member)) != 0)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+			  "check_quotas: User \"%s\" identity check failed "
+			  "(err=%d)", p->users[i], mbr_err);
+	  is_member = 0;
 	}
+
+	if (is_member)
+	  break;
       }
 #else
       else if (!strcasecmp(username, p->users[i]))
