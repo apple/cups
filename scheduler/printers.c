@@ -2857,6 +2857,118 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
 
 
 /*
+ * 'cupsdUpdatePrinterPPD()' - Update keywords in a printer's PPD file.
+ */
+
+int					/* O - 1 if successful, 0 otherwise */
+cupsdUpdatePrinterPPD(
+    cupsd_printer_t *p,			/* I - Printer */
+    int             num_keywords,	/* I - Number of keywords */
+    cups_option_t   *keywords)		/* I - Keywords */
+{
+  int		i;			/* Looping var */
+  cups_file_t	*src,			/* Original file */
+		*dst;			/* New file */
+  char		srcfile[1024],		/* Original filename */
+		dstfile[1024],		/* New filename */
+		line[1024],		/* Line from file */
+		keystring[41];		/* Keyword from line */
+  cups_option_t	*keyword;		/* Current keyword */
+
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Updating keywords in PPD file for %s...",
+                  p->name);
+
+ /*
+  * Get the old and new PPD filenames...
+  */
+
+  snprintf(srcfile, sizeof(srcfile), "%s/ppd/%s.ppd.O", ServerRoot, p->name);
+  snprintf(dstfile, sizeof(srcfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
+
+ /*
+  * Rename the old file and open the old and new...
+  */
+
+  if (rename(dstfile, srcfile))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to backup PPD file for %s: %s",
+                    p->name, strerror(errno));
+    return (0);
+  }
+
+  if ((src = cupsFileOpen(srcfile, "r")) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open PPD file \"%s\": %s",
+                    srcfile, strerror(errno));
+    rename(srcfile, dstfile);
+    return (0);
+  }
+
+  if ((dst = cupsFileOpen(dstfile, "w")) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create PPD file \"%s\": %s",
+                    dstfile, strerror(errno));
+    cupsFileClose(src);
+    rename(srcfile, dstfile);
+    return (0);
+  }
+
+ /*
+  * Copy the first line and then write out all of the keywords...
+  */
+
+  if (!cupsFileGets(src, line, sizeof(line)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to read PPD file \"%s\": %s",
+                    srcfile, strerror(errno));
+    cupsFileClose(src);
+    cupsFileClose(dst);
+    rename(srcfile, dstfile);
+    return (0);
+  }
+
+  cupsFilePrintf(dst, "%s\n", line);
+
+  for (i = num_keywords, keyword = keywords; i > 0; i --, keyword ++)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "*%s: %s", keyword->name, keyword->value);
+    cupsFilePrintf(dst, "*%s: %s\n", keyword->name, keyword->value);
+  }
+
+ /*
+  * Then copy the rest of the PPD file, dropping any keywords we changed.
+  */
+
+  while (cupsFileGets(src, line, sizeof(line)))
+  {
+   /*
+    * Skip keywords we've already set...
+    */
+
+    if (sscanf(line, "*%40[^:]:", keystring) == 1 &&
+        cupsGetOption(keystring, num_keywords, keywords))
+      continue;
+
+   /*
+    * Otherwise write the line...
+    */
+
+    cupsFilePrintf(dst, "%s\n", line);
+  }
+
+ /*
+  * Close files and return...
+  */
+
+  cupsFileClose(src);
+  cupsFileClose(dst);
+
+  return (1);
+}
+
+
+/*
  * 'cupsdUpdatePrinters()' - Update printers after a partial reload.
  */
 

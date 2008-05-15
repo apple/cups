@@ -21,7 +21,8 @@
 
 typedef enum
 {
-  CUPSD_LOG_ATTR = -3,			/* Used internally for attributes */
+  CUPSD_LOG_PPD = -4,			/* Used internally for PPD keywords */
+  CUPSD_LOG_ATTR,			/* Used internally for attributes */
   CUPSD_LOG_STATE,			/* Used internally for state-reasons */
   CUPSD_LOG_PAGE,			/* Used internally for page logging */
   CUPSD_LOG_NONE,

@@ -266,6 +266,11 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
     *loglevel = CUPSD_LOG_ATTR;
     message   = sb->buffer + 5;
   }
+  else if (!strncmp(sb->buffer, "PPD:", 4))
+  {
+    *loglevel = CUPSD_LOG_PPD;
+    message   = sb->buffer + 4;
+  }
   else
   {
     *loglevel = CUPSD_LOG_DEBUG;
