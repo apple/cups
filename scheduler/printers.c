@@ -1816,6 +1816,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		{			/* No authentication */
 		  "none"
 		};
+  static const char * const standard_commands[] =
+		{			/* Standard CUPS commands */
+		  "AutoConfigure",
+		  "Clean",
+		  "PrintSelfTestPage",
+		  "ReportLevels"
+		};
 
 
   DEBUG_printf(("cupsdSetPrinterAttrs: entering name = %s, type = %x\n", p->name,
@@ -2306,6 +2313,88 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	                     "application/vnd.cups-postscript 0 -");
 
           p->type |= CUPS_PRINTER_COMMANDS;
+        }
+
+        if (p->type & CUPS_PRINTER_COMMANDS)
+	{
+	  char	*commands,		/* Copy of commands */
+	  	*start,			/* Start of name */
+		*end;			/* End of name */
+          int	count;			/* Number of commands */
+
+
+          if ((ppdattr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
+	      ppdattr->value && ppdattr->value[0])
+	  {
+	    for (count = 0, start = ppdattr->value; *start; count ++)
+	    {
+	      while (isspace(*start & 255))
+		start ++;
+
+	      if (!*start)
+		break;
+
+	      while (!isspace(*start & 255))
+		start ++;
+	    }
+	  }
+	  else
+	    count = 0;
+
+          if (count > 0)
+	  {
+	   /*
+	    * Make a copy of the commands string and count how many ...
+	    */
+
+	    attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                         "printer-commands", count, NULL, NULL);
+
+	    commands = strdup(ppdattr->value);
+
+	    for (count = 0, start = commands; *start; count ++)
+	    {
+	      while (isspace(*start & 255))
+		start ++;
+
+	      if (!*start)
+		break;
+
+              end = start;
+	      while (!isspace(*end & 255))
+		end ++;
+
+              if (*end)
+	        *end++ = '\0';
+
+              attr->values[count].string.text = _cupsStrAlloc(start);
+
+              start = end;
+	    }
+
+	    free(commands);
+          }
+	  else
+	  {
+	   /*
+	    * Add the standard list of commands...
+	    */
+
+	    ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	                  "printer-commands",
+			  (int)(sizeof(standard_commands) /
+			        sizeof(standard_commands[0])), NULL,
+			  standard_commands);
+	  }
+	}
+	else
+	{
+	 /*
+	  * No commands supported...
+	  */
+
+	  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	               "printer-commands", NULL, "none");
         }
 
        /*
