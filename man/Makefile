@@ -218,7 +218,7 @@ html:	$(MAN1) $(MAN5) $(MAN7) $(MAN8) mantohtml
 	done
 
 mantohtml:	mantohtml.o
-	$(CC) $(LDFLAGS) -o $@ mantohtml.o
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ mantohtml.o
 
 
 #
