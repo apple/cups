@@ -2970,7 +2970,11 @@ apple_init_profile(
 	 language = (char *)cupsArrayNext(languages))
     {
       if (iccfile)
-        attr = _ppdLocalizedAttr(ppd, "cupsICCProfile", name, language);
+      {
+        if ((attr = _ppdLocalizedAttr(ppd, "cupsICCProfile", name,
+	                              language)) == NULL)
+	  attr = _ppdLocalizedAttr(ppd, "APTiogaProfile", name, language);
+      }
       else
         attr = _ppdLocalizedAttr(ppd, "ColorModel", name, language);
 
@@ -3030,6 +3034,7 @@ apple_register_profiles(
   ppd_file_t		*ppd;		/* PPD file */
   ppd_attr_t		*attr,		/* cupsICCProfile attributes */
 			*profileid_attr;/* cupsProfileID attribute */
+  const char		*profile_key;	/* Profile keyword */
   ppd_option_t		*cm_option;	/* Color model option */
   ppd_choice_t		*cm_choice,	/* Color model choice */
 			*q1_choice,	/* ColorModel (or other) qualifier */
@@ -3074,9 +3079,15 @@ apple_register_profiles(
   * See if we have any profiles...
   */
 
-  for (num_profiles = 0, attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
-       attr;
-       attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+  if ((attr = ppdFindAttr(ppd, "APTiogaProfile", NULL)) != NULL)
+    profile_key = "APTiogaProfile";
+  else
+  {
+    attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+    profile_key = "cupsICCProfile";
+  }
+
+  for (num_profiles = 0; attr; attr = ppdFindNextAttr(ppd, profile_key, NULL))
     if (attr->spec[0] && attr->value && attr->value[0])
     {
       if (attr->value[0] != '/')
@@ -3091,6 +3102,7 @@ apple_register_profiles(
       num_profiles ++;
     }
 
+  
  /*
   * If we have profiles, add them...
   */
@@ -3138,9 +3150,9 @@ apple_register_profiles(
     languages              = _ppdGetLanguages(ppd);
 
     for (profile = profiles->profiles,
-             attr = ppdFindAttr(ppd, "cupsICCProfile", NULL);
+             attr = ppdFindAttr(ppd, profile_key, NULL);
 	 attr;
-	 attr = ppdFindNextAttr(ppd, "cupsICCProfile", NULL))
+	 attr = ppdFindNextAttr(ppd, profile_key, NULL))
       if (attr->spec[0] && attr->value && attr->value[0])
       {
        /*
@@ -3156,16 +3168,21 @@ apple_register_profiles(
         if (access(iccfile, 0))
 	  continue;
 
-        cupsArraySave(ppd->sorted_attrs);
+        if (profile_key[0] == 'c')
+	{
+	  cupsArraySave(ppd->sorted_attrs);
 
-	if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
-	                                  attr->spec)) != NULL &&
-            profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
-          profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
+	  if ((profileid_attr = ppdFindAttr(ppd, "cupsProfileID",
+					    attr->spec)) != NULL &&
+	      profileid_attr->value && isdigit(profileid_attr->value[0] & 255))
+	    profile_id = (unsigned)strtoul(profileid_attr->value, NULL, 10);
+	  else
+	    profile_id = _ppdHashName(attr->spec);
+
+	  cupsArrayRestore(ppd->sorted_attrs);
+        }
 	else
-	  profile_id = _ppdHashName(attr->spec);
-
-	cupsArrayRestore(ppd->sorted_attrs);
+	  profile_id = atoi(attr->spec);
 
         apple_init_profile(ppd, languages, profile, profile_id, attr->spec,
 	                   attr->text[0] ? attr->text : attr->spec, iccfile);
