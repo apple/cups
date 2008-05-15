@@ -2797,7 +2797,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	return;
       }
 
-      httpFlushWrite(HTTP(con));
+      if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
+        httpFlushWrite(HTTP(con));
 
       con->bytes += bytes;
 
