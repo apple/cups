@@ -7869,7 +7869,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   cupsdHoldJob(job);
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
                 "Job held by user.");
 
   if ((newattr = ippFindAttribute(con->request, "job-hold-until",
@@ -7906,7 +7906,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
     cupsdSetJobHoldUntil(job, attr->values[0].string.text);
 
-    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job job-hold-until value changed by user.");
   }
 
@@ -8882,7 +8882,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     attr->value_tag = IPP_TAG_KEYWORD;
     attr->values[0].string.text = _cupsStrAlloc("no-hold");
 
-    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job job-hold-until value changed by user.");
   }
 
@@ -8892,7 +8892,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
                 "Job released by user.");
 
   cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Released by \"%s\".", jobid,
@@ -10254,16 +10254,17 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   if (event & CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED)
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED,
+                  cupsdFindDest(job->dest), job,
                   "Job priority changed by user.");
 
   if (event & CUPSD_EVENT_JOB_STATE)
-    cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
                   job->state_value == IPP_JOB_HELD ?
 		      "Job held by user." : "Job restarted by user.");
 
   if (event & CUPSD_EVENT_JOB_CONFIG_CHANGED)
-    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, job->printer, job,
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
                   "Job options changed by user.");
 
  /*
