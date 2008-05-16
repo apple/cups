@@ -64,6 +64,10 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Number of server settings */
   cups_option_t		*cupsd_settings;/* Server settings */
 
+  /* backend.c */
+  char			resolved_uri[1024];
+					/* Buffer for cupsBackendDeviceURI */
+
 #ifdef DEBUG
   /* debug.c */
   int			debug_init,	/* Did we initialize debugging? */

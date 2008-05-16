@@ -254,7 +254,6 @@ extern int		backendGetMakeModel(const char *device_id,
 extern void		backendNetworkSideCB(int print_fd, int device_fd,
 			                     int snmp_fd, http_addr_t *addr,
 					     int use_bc);
-extern const char	*backendResolveURI(char **argv);
 extern ssize_t		backendRunLoop(int print_fd, int device_fd, int snmp_fd,
 			               http_addr_t *addr, int use_bc,
 				       void (*side_cb)(int print_fd,

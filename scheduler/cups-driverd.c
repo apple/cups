@@ -1228,8 +1228,8 @@ load_ppds(const char *d,		/* I - Actual directory */
 	sscanf(line, "%*[^\"]\"%255[^\"]", device_id);
       else if (!strncmp(line, "*Product:", 9))
       {
-	sscanf(line, "%*[^\"]\"(%255[^)]", product);
-	cupsArrayAdd(products, strdup(product));
+	if (sscanf(line, "%*[^\"]\"(%255[^)]", product) == 1)
+	  cupsArrayAdd(products, strdup(product));
       }
       else if (!strncmp(line, "*PSVersion:", 11))
       {

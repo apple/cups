@@ -25,7 +25,7 @@
 
 #include <stdlib.h>
 #include "backend.h"
-#include "string.h"
+#include "globals.h"
 
 
 /*
@@ -41,15 +41,19 @@ const char *				/* O - Device URI or @code NULL@ */
 cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
 {
   const char	*device_uri;		/* Device URI */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global info */
 
 
-  if ((device_uri = getenv("DEVICE_URI")) != NULL)
-    return (device_uri);
+  if ((device_uri = getenv("DEVICE_URI")) == NULL)
+  {
+    if (!argv || !argv[0] || !strchr(argv[0], ':'))
+      return (NULL);
 
-  if (!argv || !argv[0] || !strchr(argv[0], ':'))
-    return (NULL);
-  else
-    return (argv[0]);
+    device_uri = argv[0];
+  }
+
+  return (_httpResolveURI(device_uri, cg->resolved_uri,
+                          sizeof(cg->resolved_uri)));
 }
 
 

@@ -37,8 +37,10 @@
  *   _cups_hstrerror()    - hstrerror() emulation function for Solaris and
  *                          others...
  *   _httpEncodeURI()     - Percent-encode a HTTP request URI.
+ *   _httpResolveURI()    - Resolve a DNS-SD URI.
  *   http_copy_decode()   - Copy and decode a URI.
  *   http_copy_encode()   - Copy and encode a URI.
+ *   resolve_callback()   - Build a device URI for the given service name.
  */
 
 /*
@@ -48,6 +50,20 @@
 #include "debug.h"
 #include "globals.h"
 #include <stdlib.h>
+#ifdef HAVE_DNSSD
+#  include <dns_sd.h>
+#endif /* HAVE_DNSSD */
+
+
+/*
+ * Local types...
+ */
+
+typedef struct _http_uribuf_s		/* URI buffer */
+{
+  char		*buffer;		/* Pointer to buffer */
+  size_t	bufsize;		/* Size of buffer */
+} _http_uribuf_t;
 
 
 /*
@@ -91,6 +107,17 @@ static const char	*http_copy_decode(char *dst, const char *src,
 static char		*http_copy_encode(char *dst, const char *src,
 			                  char *dstend, const char *reserved,
 					  const char *term, int encode);
+#ifdef HAVE_DNSSD
+static void		resolve_callback(DNSServiceRef sdRef,
+					 DNSServiceFlags flags,
+					 uint32_t interfaceIndex,
+					 DNSServiceErrorType errorCode,
+					 const char *fullName,
+					 const char *hostTarget,
+					 uint16_t port, uint16_t txtLen,
+					 const unsigned char *txtRecord,
+					 void *context);
+#endif /* HAVE_DNSSD */
 
 
 /*
@@ -1221,6 +1248,91 @@ _httpEncodeURI(char       *dst,		/* I - Destination buffer */
 
 
 /*
+ * '_httpResolveURI()' - Resolve a DNS-SD URI.
+ */
+
+const char *				/* O - Resolved URI */
+_httpResolveURI(
+    const char *uri,			/* I - DNS-SD URI */
+    char       *resolved_uri,		/* I - Buffer for resolved URI */
+    size_t     resolved_size)		/* I - Size of URI buffer */
+{
+  char			scheme[32],	/* URI components... */
+			userpass[256],
+			hostname[1024],
+			resource[1024];
+  int			port;
+
+
+ /*
+  * Get the device URI...
+  */
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
+                      userpass, sizeof(userpass), hostname, sizeof(hostname),
+		      &port, resource, sizeof(resource)) < HTTP_URI_OK)
+    return (NULL);
+
+ /*
+  * Resolve it as needed...
+  */
+
+  if (strstr(hostname, "._tcp"))
+  {
+#ifdef HAVE_DNSSD
+    DNSServiceRef	ref;		/* DNS-SD service reference */
+    char		*regtype,	/* Pointer to type in hostname */
+			*domain;	/* Pointer to domain in hostname */
+    _http_uribuf_t	uribuf;		/* URI buffer */
+
+   /*
+    * Separate the hostname into service name, registration type, and domain...
+    */
+
+    regtype = strchr(hostname, '.');
+    *regtype++ = '\0';
+
+    domain = regtype + strlen(regtype) - 1;
+    if (domain > regtype && *domain == '.')
+      *domain = '\0';
+
+    for (domain = strchr(regtype, '.');
+         domain;
+	 domain = strchr(domain + 1, '.'))
+      if (domain[1] != '_')
+        break;
+
+    if (domain)
+      *domain++ = '\0';
+
+    uribuf.buffer  = resolved_uri;
+    uribuf.bufsize = resolved_size;
+
+    resolved_uri[0] = '\0';
+
+    if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
+			  resolve_callback,
+			  &uribuf) == kDNSServiceErr_NoError)
+    {
+      if (DNSServiceProcessResult(ref) != kDNSServiceErr_NoError &&
+          resolved_uri[0])
+        uri = NULL;
+      else
+        uri = resolved_uri;
+
+      DNSServiceRefDeallocate(ref);
+    }
+    else
+#endif /* HAVE_DNSSD */
+
+    uri = NULL;
+  }
+
+  return (uri);
+}
+
+
+/*
  * 'http_copy_decode()' - Copy and decode a URI.
  */
 
@@ -1335,6 +1447,83 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
   else
     return (dst);
 }
+
+
+#ifdef HAVE_DNSSD
+/*
+ * 'resolve_callback()' - Build a device URI for the given service name.
+ */
+
+static void
+resolve_callback(
+    DNSServiceRef       sdRef,		/* I - Service reference */
+    DNSServiceFlags     flags,		/* I - Results flags */
+    uint32_t            interfaceIndex,	/* I - Interface number */
+    DNSServiceErrorType errorCode,	/* I - Error, if any */
+    const char          *fullName,	/* I - Full service name */
+    const char          *hostTarget,	/* I - Hostname */
+    uint16_t            port,		/* I - Port number */
+    uint16_t            txtLen,		/* I - Length of TXT record */
+    const unsigned char *txtRecord,	/* I - TXT record data */
+    void                *context)	/* I - Pointer to URI buffer */
+{
+  const char		*scheme;	/* URI scheme */
+  char			rp[257];	/* Remote printer */
+  const void		*value;		/* Value from TXT record */
+  uint8_t		valueLen;	/* Length of value */
+  _http_uribuf_t	*uribuf;	/* URI buffer */
+
+
+  DEBUG_printf(("resolve_callback(sdRef=%p, flags=%x, interfaceIndex=%u, "
+	        "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
+	        "txtLen=%u, txtRecord=%p, context=%p)\n", sdRef, flags,
+	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
+	        txtRecord, context));
+
+ /*
+  * Figure out the scheme from the full name...
+  */
+
+  if (strstr(fullName, "._ipp"))
+    scheme = "ipp";
+  else if (strstr(fullName, "._printer."))
+    scheme = "lpd";
+  else if (strstr(fullName, "._pdl-datastream."))
+    scheme = "socket";
+  else
+    scheme = "riousbprint";
+
+ /*
+  * Extract the "remote printer" key from the TXT record...
+  */
+
+  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, "rp",
+                                    &valueLen)) != NULL)
+  {
+   /*
+    * Convert to resource by concatenating with a leading "/"...
+    */
+
+    rp[0] = '/';
+    memcpy(rp + 1, value, valueLen);
+    rp[valueLen + 1] = '\0';
+  }
+  else
+    rp[0] = '\0';
+
+ /*
+  * Assemble the final device URI...
+  */
+
+  uribuf = (_http_uribuf_t *)context;
+
+  httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
+                  NULL, hostTarget, ntohs(port), rp);
+
+  DEBUG_printf(("resolve_callback: Resolved URI is \"%s\"...\n",
+                uribuf->buffer));
+}
+#endif /* HAVE_DNSSD */
 
 
 /*

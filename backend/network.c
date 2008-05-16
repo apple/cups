@@ -18,8 +18,6 @@
  *
  *   backendCheckSideChannel() - Check the side-channel for pending requests.
  *   backendNetworkSideCB()    - Handle common network side-channel commands.
- *   backendResolveURI()       - Get the device URI, resolving as needed.
- *   resolve_callback()        - Build a device URI for the given service name.
  */
 
 /*
@@ -33,23 +31,12 @@
 #else
 #  include <sys/select.h>
 #endif /* __hpux */
-#ifdef HAVE_DNSSD
-#  include <dns_sd.h>
-#endif /* HAVE_DNSSD */
 
 
 /*
  * Local functions...
  */
 
-#ifdef HAVE_DNSSD
-static void	resolve_callback(DNSServiceRef sdRef, DNSServiceFlags flags,
-				 uint32_t interfaceIndex,
-				 DNSServiceErrorType errorCode,
-				 const char *fullName, const char *hostTarget,
-				 uint16_t port, uint16_t txtLen,
-				 const unsigned char *txtRecord, void *context);
-#endif /* HAVE_DNSSD */
 
 
 /*
@@ -161,174 +148,6 @@ backendNetworkSideCB(
 
   cupsSideChannelWrite(command, status, data, datalen, 1.0);
 }
-
-
-/*
- * 'backendResolveURI()' - Get the device URI, resolving as needed.
- */
-
-const char *				/* O - Device URI */
-backendResolveURI(char **argv)		/* I - Command-line arguments */
-{
-  const char		*uri;		/* Device URI */
-  char			scheme[32],	/* URI components... */
-			userpass[256],
-			hostname[1024],
-			resource[1024];
-  int			port;
-  http_uri_status_t	status;		/* URI decode status */
-
- /*
-  * Get the device URI...
-  */
-
-  uri = cupsBackendDeviceURI(argv);
-
-  if ((status = httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme,
-                                sizeof(scheme), userpass, sizeof(userpass),
-				hostname, sizeof(hostname), &port,
-				resource, sizeof(resource))) < HTTP_URI_OK)
-  {
-    fprintf(stderr, "ERROR: Bad device URI \"%s\" (%d)!\n", uri, status);
-    exit (CUPS_BACKEND_STOP);
-  }
-
- /*
-  * Resolve it as needed...
-  */
-
-  if (strstr(hostname, "._tcp"))
-  {
-#ifdef HAVE_DNSSD
-    DNSServiceRef	ref;		/* DNS-SD service reference */
-    char		*regtype,	/* Pointer to type in hostname */
-			*domain;	/* Pointer to domain in hostname */
-    static char		resolved_uri[HTTP_MAX_URI];
-    					/* Resolved device URI */
-
-   /*
-    * Separate the hostname into service name, registration type, and domain...
-    */
-
-    regtype = strchr(hostname, '.');
-    *regtype++ = '\0';
-
-    domain = regtype + strlen(regtype) - 1;
-    if (domain > regtype && *domain == '.')
-      *domain = '\0';
-
-    for (domain = strchr(regtype, '.');
-         domain;
-	 domain = strchr(domain + 1, '.'))
-      if (domain[1] != '_')
-        break;
-
-    if (domain)
-      *domain++ = '\0';
-
-    fprintf(stderr,
-            "DEBUG: Resolving service \"%s\", regtype \"%s\", domain \"%s\"\n",
-	    hostname, regtype, domain ? domain : "(null)");
-
-    if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
-			  resolve_callback,
-			  resolved_uri) == kDNSServiceErr_NoError)
-    {
-      if (DNSServiceProcessResult(ref) != kDNSServiceErr_NoError)
-        uri = NULL;
-      else
-        uri = resolved_uri;
-
-      DNSServiceRefDeallocate(ref);
-    }
-    else
-#endif /* HAVE_DNSSD */
-
-    uri = NULL;
-
-    if (!uri)
-    {
-      fprintf(stderr, "ERROR: Unable to resolve DNS-SD service \"%s\"!\n", uri);
-      exit(CUPS_BACKEND_STOP);
-    }
-  }
-
-  return (uri);
-}
-
-
-#ifdef HAVE_DNSSD
-/*
- * 'resolve_callback()' - Build a device URI for the given service name.
- */
-
-static void
-resolve_callback(
-    DNSServiceRef       sdRef,		/* I - Service reference */
-    DNSServiceFlags     flags,		/* I - Results flags */
-    uint32_t            interfaceIndex,	/* I - Interface number */
-    DNSServiceErrorType errorCode,	/* I - Error, if any */
-    const char          *fullName,	/* I - Full service name */
-    const char          *hostTarget,	/* I - Hostname */
-    uint16_t            port,		/* I - Port number */
-    uint16_t            txtLen,		/* I - Length of TXT record */
-    const unsigned char *txtRecord,	/* I - TXT record data */
-    void                *context)	/* I - Pointer to URI buffer */
-{
-  const char	*scheme;		/* URI scheme */
-  char		rp[257];		/* Remote printer */
-  const void	*value;			/* Value from TXT record */
-  uint8_t	valueLen;		/* Length of value */
-
-
-  fprintf(stderr,
-          "DEBUG2: resolve_callback(sdRef=%p, flags=%x, interfaceIndex=%u, "
-	  "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
-	  "txtLen=%u, txtRecord=%p, context=%p)\n", sdRef, flags,
-	  interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
-	  txtRecord, context);
-
- /*
-  * Figure out the scheme from the full name...
-  */
-
-  if (strstr(fullName, "._ipp"))
-    scheme = "ipp";
-  else if (strstr(fullName, "._printer."))
-    scheme = "lpd";
-  else if (strstr(fullName, "._pdl-datastream."))
-    scheme = "socket";
-  else
-    scheme = "riousbprint";
-
- /*
-  * Extract the "remote printer" key from the TXT record...
-  */
-
-  if ((value = TXTRecordGetValuePtr(txtLen, txtRecord, "rp",
-                                    &valueLen)) != NULL)
-  {
-   /*
-    * Convert to resource by concatenating with a leading "/"...
-    */
-
-    rp[0] = '/';
-    memcpy(rp + 1, value, valueLen);
-    rp[valueLen + 1] = '\0';
-  }
-  else
-    rp[0] = '\0';
-
- /*
-  * Assemble the final device URI...
-  */
-
-  httpAssembleURI(HTTP_URI_CODING_ALL, (char *)context, HTTP_MAX_URI, scheme,
-                  NULL, hostTarget, ntohs(port), rp);
-
-  fprintf(stderr, "DEBUG: Resolved URI is \"%s\"...\n", (char *)context);
-}
-#endif /* HAVE_DNSSD */
 
 
 /*

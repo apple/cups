@@ -160,7 +160,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and port number from the URI...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, backendResolveURI(argv),
+  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
                   method, sizeof(method), username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));

@@ -39,6 +39,8 @@ _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
 _httpBIOMethods
+_httpEncodeURI
+_httpResolveURI
 _ippAddAttr
 _ippFreeAttr
 _ppdFreeLanguages
