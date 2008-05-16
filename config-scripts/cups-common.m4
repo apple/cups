@@ -261,8 +261,13 @@ case $uname in
 		dnl Check for Authorization Services support
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
-			CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
-			CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"])
+			if grep -q system.print.operator /etc/authorization; then
+				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
+				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
+			else
+				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
+				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
+			fi])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
 		dnl Check for sandbox/Seatbelt support

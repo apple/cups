@@ -2134,6 +2134,48 @@ default page log file is <VAR>@CUPS_LOGDIR@/page_log</VAR>.</P>
 information to the system log instead of a plain file.</P>
 
 
+<H2 CLASS="title"><A NAME="PageLogFormat">PageLogFormat</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+PageLogFormat %p %j %u %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}
+PageLogFormat PAGE %p %j %u %P %C %{job-billing} %{job-originating-host-name}
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>PageLogFormat</CODE> directive sets the format of lines
+that are logged to the page log file. Sequences beginning with percent (%)
+characters are replaced with the corresponding information, while all other
+characters are copied literally. The following percent sequences are
+recognized:</P>
+
+<UL>
+
+	<LI><CODE>%%</CODE>: Inserts a single percent character.</LI>
+
+	<LI><CODE>%{name}</CODE>: Inserts the value of the specified IPP
+	attribute.</LI>
+
+	<LI><CODE>%C</CODE>: Inserts the number of copies for the current page.</LI>
+
+	<LI><CODE>%P</CODE>: Inserts the current page number.</LI>
+
+	<LI><CODE>%T</CODE>: Inserts the current date and time in common log
+	format.</LI>
+
+	<LI><CODE>%j</CODE>: Inserts the job ID.</LI>
+
+	<LI><CODE>%p</CODE>: Inserts the printer name.</LI>
+
+	<LI><CODE>%u</CODE>: Inserts the username.</LI>
+
+</UL>
+
+<P>The default is "%p %j %u %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}".</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PassEnv">PassEnv</A></H2>
 
 <H3>Examples</H3>

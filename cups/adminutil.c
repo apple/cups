@@ -79,7 +79,7 @@ static void		write_option(cups_file_t *dstfp, int order,
 
 char *					/* O - PPD file or NULL */
 cupsAdminCreateWindowsPPD(
-    http_t     *http,			/* I - Connection to server */
+    http_t     *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     const char *dest,			/* I - Printer or class */
     char       *buffer,			/* I - Filename buffer */
     int        bufsize)			/* I - Size of filename buffer */
@@ -120,6 +120,9 @@ cupsAdminCreateWindowsPPD(
 
   if (buffer)
     *buffer = '\0';
+
+  if (!http)
+    http = _cupsConnect();
 
   if (!http || !dest || !buffer || bufsize < 2)
     return (NULL);
@@ -855,7 +858,7 @@ cupsAdminExportSamba(
 
 int					/* O - 1 on success, 0 on failure */
 cupsAdminGetServerSettings(
-    http_t        *http,		/* I - Connection to server */
+    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     int           *num_settings,	/* O - Number of settings */
     cups_option_t **settings)		/* O - Settings */
 {
@@ -874,7 +877,7 @@ cupsAdminGetServerSettings(
 
 int					/* O - 1 on success, 0 on failure */
 _cupsAdminGetServerSettings(
-    http_t        *http,		/* I - Connection to server */
+    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     int           *num_settings,	/* O - Number of settings */
     cups_option_t **settings)		/* O - Settings */
 {
@@ -892,6 +895,9 @@ _cupsAdminGetServerSettings(
  /*
   * Range check input...
   */
+
+  if (!http)
+    http = _cupsConnect();
 
   if (!http || !num_settings || !settings)
   {
@@ -1144,7 +1150,7 @@ _cupsAdminGetServerSettings(
 
 int					/* O - 1 on success, 0 on failure */
 cupsAdminSetServerSettings(
-    http_t        *http,		/* I - Connection to server */
+    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     int           num_settings,		/* I - Number of settings */
     cups_option_t *settings)		/* I - Settings */
 {
@@ -1160,7 +1166,7 @@ cupsAdminSetServerSettings(
 
 int					/* O - 1 on success, 0 on failure */
 _cupsAdminSetServerSettings(
-    http_t        *http,		/* I - Connection to server */
+    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     int           num_settings,		/* I - Number of settings */
     cups_option_t *settings)		/* I - Settings */
 {
@@ -1212,6 +1218,9 @@ _cupsAdminSetServerSettings(
  /*
   * Range check input...
   */
+
+  if (!http)
+    http = _cupsConnect();
 
   if (!http || !num_settings || !settings)
   {

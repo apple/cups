@@ -146,6 +146,7 @@ static const cupsd_var_t	variables[] =
   { "MaxSubscriptionsPerPrinter",&MaxSubscriptionsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerUser",	&MaxSubscriptionsPerUser,	CUPSD_VARTYPE_INTEGER },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
+  { "PageLogFormat",		&PageLogFormat,		CUPSD_VARTYPE_STRING },
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_BOOLEAN },
   { "PreserveJobHistory",	&JobHistory,		CUPSD_VARTYPE_BOOLEAN },
   { "Printcap",			&Printcap,		CUPSD_VARTYPE_STRING },
@@ -413,6 +414,9 @@ cupsdReadConfiguration(void)
   cupsdSetString(&AccessLog, CUPS_LOGDIR "/access_log");
   cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
+  cupsdSetString(&PageLogFormat,
+                 "%p %j %u %T %P %C %{job-billing} "
+		 "%{job-originating-host-name} %{job-name} %{media} %{sides}");
   cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
   cupsdSetString(&FontPath, CUPS_FONTPATH);

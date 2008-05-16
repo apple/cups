@@ -338,14 +338,160 @@ int					/* O - 1 on success, 0 on error */
 cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
              const char  *page)		/* I - Page being printed */
 {
-  ipp_attribute_t *billing,		/* job-billing attribute */
-                  *hostname;		/* job-originating-host-name attribute */
+  int			i;		/* Looping var */
+  char			buffer[2048],	/* Buffer for page log */
+			*bufptr,	/* Pointer into buffer */
+			name[256];	/* Attribute name */
+  const char		*format,	/* Pointer into PageLogFormat */
+			*nameend;	/* End of attribute name */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			number;		/* Page number */
+  char			copies[256];	/* Number of copies */
 
 
-  billing  = ippFindAttribute(job->attrs, "job-billing", IPP_TAG_ZERO);
-  hostname = ippFindAttribute(job->attrs, "job-originating-host-name",
-                              IPP_TAG_ZERO);
+ /*
+  * Format the line going into the page log...
+  */
 
+  if (!PageLogFormat)
+    return (1);
+
+  number = 1;
+  strcpy(copies, "1");
+  sscanf(page, "%d%255s", &number, copies);
+
+  for (format = PageLogFormat, bufptr = buffer; *format; format ++)
+  {
+    if (*format == '%')
+    {
+      format ++;
+
+      switch (*format)
+      {
+        case '%' :			/* Literal % */
+	    if (bufptr < (buffer + sizeof(buffer) - 1))
+	      *bufptr++ = '%';
+	    break;
+
+        case 'p' :			/* Printer name */
+	    strlcpy(bufptr, job->printer->name,
+	            sizeof(buffer) - (bufptr - buffer));
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case 'j' :			/* Job ID */
+	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", job->id);
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case 'u' :			/* Username */
+	    strlcpy(bufptr, job->username ? job->username : "-",
+	            sizeof(buffer) - (bufptr - buffer));
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case 'T' :			/* Date and time */
+	    strlcpy(bufptr, cupsdGetDateTime(time(NULL)),
+	            sizeof(buffer) - (bufptr - buffer));
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case 'P' :			/* Page number */
+	    snprintf(bufptr, sizeof(buffer) - (bufptr - buffer), "%d", number);
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case 'C' :			/* Number of copies */
+	    strlcpy(bufptr, copies, sizeof(buffer) - (bufptr - buffer));
+	    bufptr += strlen(bufptr);
+	    break;
+
+        case '{' :			/* {attribute} */
+	    if ((nameend = strchr(format, '}')) != NULL &&
+	        (nameend - format - 2) < (sizeof(name) - 1))
+	    {
+	     /*
+	      * Pull the name from inside the brackets...
+	      */
+
+	      memcpy(name, format + 1, nameend - format - 2);
+	      name[nameend - format - 2] = '\0';
+
+	      if ((attr = ippFindAttribute(job->attrs, name,
+	                                   IPP_TAG_ZERO)) != NULL)
+	      {
+	       /*
+	        * Add the attribute value...
+		*/
+
+	        format = nameend;
+
+                for (i = 0;
+		     i < attr->num_values &&
+		         bufptr < (buffer + sizeof(buffer) - 1);
+		     i ++)
+		{
+		  if (i)
+		    *bufptr++ = ',';
+
+		  switch (attr->value_tag)
+		  {
+		    case IPP_TAG_INTEGER :
+		    case IPP_TAG_ENUM :
+			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
+			         "%d", attr->values[i].integer);
+			bufptr += strlen(bufptr);
+			break;
+
+                    case IPP_TAG_BOOLEAN :
+			snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
+			         "%d", attr->values[i].boolean);
+			bufptr += strlen(bufptr);
+		        break;
+
+		    case IPP_TAG_TEXTLANG :
+		    case IPP_TAG_NAMELANG :
+		    case IPP_TAG_TEXT :
+		    case IPP_TAG_NAME :
+		    case IPP_TAG_KEYWORD :
+		    case IPP_TAG_URI :
+		    case IPP_TAG_URISCHEME :
+		    case IPP_TAG_CHARSET :
+		    case IPP_TAG_LANGUAGE :
+		    case IPP_TAG_MIMETYPE :
+		        strlcpy(bufptr, attr->values[i].string.text,
+			        sizeof(buffer) - (bufptr - buffer));
+			bufptr += strlen(bufptr);
+		        break;
+
+		    default :
+			strlcpy(bufptr, "???",
+			        sizeof(buffer) - (bufptr - buffer));
+			bufptr += strlen(bufptr);
+		        break;
+		  }
+		}
+	      }
+	      else if (bufptr < (buffer + sizeof(buffer) - 1))
+	        *bufptr++ = '-';
+	      break;
+	    }
+
+        default :
+	    if (bufptr < (buffer + sizeof(buffer) - 2))
+	    {
+	      *bufptr++ = '%';
+	      *bufptr++ = *format;
+	    }
+	    break;
+      }
+    }
+    else if (bufptr < (buffer + sizeof(buffer) - 1))
+      *bufptr++ = *format;
+  }
+
+  *bufptr = '\0';
+      
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging pages via syslog...
@@ -353,10 +499,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 
   if (!strcmp(PageLog, "syslog"))
   {
-    syslog(LOG_INFO, "PAGE %s %s %d %s %s %s", job->printer->name,
-           job->username ? job->username : "-",
-           job->id, page, billing ? billing->values[0].string.text : "-",
-           hostname->values[0].string.text);
+    syslog(LOG_INFO, "%s", buffer);
 
     return (1);
   }
@@ -376,11 +519,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
   *        billing hostname
   */
 
-  cupsFilePrintf(PageFile, "%s %s %d %s %s %s %s\n", job->printer->name,
-        	 job->username ? job->username : "-",
-        	 job->id, cupsdGetDateTime(time(NULL)), page,
-		 billing ? billing->values[0].string.text : "-",
-        	 hostname->values[0].string.text);
+  cupsFilePrintf(PageFile, "%s\n", buffer);
   cupsFileFlush(PageFile);
 
   return (1);
