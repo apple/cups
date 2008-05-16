@@ -3032,14 +3032,19 @@ apple_register_profiles(
 			selector[PPD_MAX_NAME];
 					/* Profile selection string */
   ppd_file_t		*ppd;		/* PPD file */
-  ppd_attr_t		*attr,		/* cupsICCProfile attributes */
-			*profileid_attr;/* cupsProfileID attribute */
+  ppd_attr_t		*attr,		/* Profile attributes */
+			*profileid_attr,/* cupsProfileID attribute */
+			*q1_attr,	/* ColorModel (or other) qualifier */
+			*q2_attr,	/* MediaType (or other) qualifier */
+			*q3_attr;	/* Resolution (or other) qualifier */
+  char			q_keyword[PPD_MAX_NAME];
+					/* Qualifier keyword */
+  const char		*q1_choice,	/* ColorModel (or other) choice */
+			*q2_choice,	/* MediaType (or other) choice */
+			*q3_choice;	/* Resolution (or other) choice */
   const char		*profile_key;	/* Profile keyword */
   ppd_option_t		*cm_option;	/* Color model option */
-  ppd_choice_t		*cm_choice,	/* Color model choice */
-			*q1_choice,	/* ColorModel (or other) qualifier */
-			*q2_choice,	/* MediaType (or other) qualifier */
-			*q3_choice;	/* Resolution (or other) qualifier */
+  ppd_choice_t		*cm_choice;	/* Color model choice */
   int			num_profiles;	/* Number of profiles */
   CMError		error;		/* Last error */
   unsigned		device_id,	/* Printer device ID */
@@ -3072,8 +3077,6 @@ apple_register_profiles(
   snprintf(ppdfile, sizeof(ppdfile), "%s/ppd/%s.ppd", ServerRoot, p->name);
   if ((ppd = ppdOpenFile(ppdfile)) == NULL)
     return;
-
-  ppdMarkDefaults(ppd);
 
  /*
   * See if we have any profiles...
@@ -3109,27 +3112,67 @@ apple_register_profiles(
 
   if (num_profiles > 0)
   {
-   /*
-    * Figure out the default profile selectors...
-    */
+    if (profile_key[0] == 'A')
+    {
+     /*
+      * For Tioga PPDs, get the default profile using the DefaultAPTiogaProfile
+      * attribute...
+      */
 
-    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL &&
-        attr->value && attr->value[0])
-      q1_choice = ppdFindMarkedChoice(ppd, attr->value);
-    else
-      q1_choice = ppdFindMarkedChoice(ppd, "ColorModel");
+      if ((attr = ppdFindAttr(ppd, "DefaultAPTiogaProfile", NULL)) != NULL &&
+	  attr->value)
+        default_profile_id = atoi(attr->value);
 
-    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL &&
-        attr->value && attr->value[0])
-      q2_choice = ppdFindMarkedChoice(ppd, attr->value);
+      q1_choice = q2_choice = q3_choice = NULL;
+    }
     else
-      q2_choice = ppdFindMarkedChoice(ppd, "MediaType");
+    {
+     /*
+      * For CUPS PPDs, figure out the default profile selector values...
+      */
 
-    if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL &&
-        attr->value && attr->value[0])
-      q3_choice = ppdFindMarkedChoice(ppd, attr->value);
-    else
-      q3_choice = ppdFindMarkedChoice(ppd, "Resolution");
+      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier1", NULL)) != NULL &&
+	  attr->value && attr->value[0])
+      {
+	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+	q1_attr = ppdFindAttr(ppd, q_keyword, NULL);
+      }
+      else if ((q1_attr = ppdFindAttr(ppd, "DefaultColorModel", NULL)) == NULL)
+	q1_attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
+
+      if (q1_attr && q1_attr->value && q1_attr->value[0])
+	q1_choice = q1_attr->value;
+      else
+	q1_choice = "";
+
+      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier2", NULL)) != NULL &&
+	  attr->value && attr->value[0])
+      {
+	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+	q2_attr = ppdFindAttr(ppd, q_keyword, NULL);
+      }
+      else 
+	q2_attr = ppdFindAttr(ppd, "DefaultMediaType", NULL);
+
+      if (q2_attr && q2_attr->value && q2_attr->value[0])
+	q2_choice = q2_attr->value;
+      else
+	q2_choice = NULL;
+
+      if ((attr = ppdFindAttr(ppd, "cupsICCQualifier3", NULL)) != NULL &&
+	  attr->value && attr->value[0])
+      {
+	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
+	q3_attr = ppdFindAttr(ppd, q_keyword, NULL);
+      }
+      else 
+	q3_attr = ppdFindAttr(ppd, "DefaultResolution", NULL);
+
+      if (q3_attr && q3_attr->value && q3_attr->value[0])
+	q3_choice = q3_attr->value;
+      else
+	q3_choice = NULL;
+    }
 
    /*
     * Build the array of profiles...
@@ -3193,22 +3236,22 @@ apple_register_profiles(
         * See if this is the default profile...
 	*/
 
-        if (!default_profile_id && q1_choice)
+        if (!default_profile_id)
 	{
 	  if (q2_choice)
 	  {
 	    if (q3_choice)
 	    {
 	      snprintf(selector, sizeof(selector), "%s.%s.%s",
-	               q1_choice->choice, q2_choice->choice, q3_choice->choice);
+	               q1_choice, q2_choice, q3_choice);
               if (!strcmp(selector, attr->spec))
 	        default_profile_id = profile_id;
             }
 
             if (!default_profile_id)
 	    {
-	      snprintf(selector, sizeof(selector), "%s.%s.", q1_choice->choice,
-	               q2_choice->choice);
+	      snprintf(selector, sizeof(selector), "%s.%s.", q1_choice,
+	               q2_choice);
               if (!strcmp(selector, attr->spec))
 	        default_profile_id = profile_id;
 	    }
@@ -3216,15 +3259,15 @@ apple_register_profiles(
 
           if (!default_profile_id && q3_choice)
 	  {
-	    snprintf(selector, sizeof(selector), "%s..%s", q1_choice->choice,
-	             q3_choice->choice);
+	    snprintf(selector, sizeof(selector), "%s..%s", q1_choice,
+	             q3_choice);
 	    if (!strcmp(selector, attr->spec))
 	      default_profile_id = profile_id;
 	  }
 
           if (!default_profile_id)
 	  {
-	    snprintf(selector, sizeof(selector), "%s..", q1_choice->choice);
+	    snprintf(selector, sizeof(selector), "%s..", q1_choice);
 	    if (!strcmp(selector, attr->spec))
 	      default_profile_id = profile_id;
 	  }
