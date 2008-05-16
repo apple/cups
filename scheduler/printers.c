@@ -2334,7 +2334,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	      if (!*start)
 		break;
 
-	      while (!isspace(*start & 255))
+	      while (*start && !isspace(*start & 255))
 		start ++;
 	    }
 	  }
@@ -2361,7 +2361,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		break;
 
               end = start;
-	      while (!isspace(*end & 255))
+	      while (*end && !isspace(*end & 255))
 		end ++;
 
               if (*end)
