@@ -228,12 +228,13 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       char	device_uri[1024];	/* Device URI */
+      int	count;			/* Number of queries */
       static const char * const schemes[] =
       		{ "lpd", "ipp", "ipp", "socket", "riousbprint" };
 					/* URI schemes for devices */
 
 
-      for (device = (cups_device_t *)cupsArrayFirst(devices);
+      for (device = (cups_device_t *)cupsArrayFirst(devices), count = 0;
            device;
 	   device = (cups_device_t *)cupsArrayNext(devices))
         if (!device->ref && !device->sent)
@@ -242,16 +243,21 @@ main(int  argc,				/* I - Number of command-line args */
 	  * Found the device, now get the TXT record(s) for it...
 	  */
 
-	  device->ref = main_ref;
+          if (count < 10)
+	  {
+	    device->ref = main_ref;
 
-          fprintf(stderr, "DEBUG: Querying \"%s\"...\n", device->fullName);
+	    fprintf(stderr, "DEBUG: Querying \"%s\"...\n", device->fullName);
 
-	  if (DNSServiceQueryRecord(&(device->ref),
-	                            kDNSServiceFlagsShareConnection,
-	                            0, device->fullName, kDNSServiceType_TXT,
-				    kDNSServiceClass_IN, query_callback,
-				    devices) != kDNSServiceErr_NoError)
-            fputs("ERROR: Unable to query for TXT records!\n", stderr);
+	    if (DNSServiceQueryRecord(&(device->ref),
+				      kDNSServiceFlagsShareConnection,
+				      0, device->fullName, kDNSServiceType_TXT,
+				      kDNSServiceClass_IN, query_callback,
+				      devices) != kDNSServiceErr_NoError)
+	      fputs("ERROR: Unable to query for TXT records!\n", stderr);
+            else
+	      count ++;
+          }
 	}
 	else if (!device->sent)
 	{
@@ -404,7 +410,7 @@ exec_backend(char **argv)		/* I - Command-line arguments */
   * Resolve the device URI...
   */
 
-  resolved_uri = backendResolveURI(argv);
+  resolved_uri = cupsBackendDeviceURI(argv);
 
  /*
   * Extract the scheme from the URI...
@@ -615,8 +621,20 @@ query_callback(
     else if ((value = TXTRecordGetValuePtr(rdlen, rdata, "product",
                                            &valueLen)) != NULL && valueLen > 2)
     {
-      memcpy(model, value + 1, valueLen - 2);
-      model[valueLen - 2] = '\0';
+      if (((char *)value)[0] == '(')
+      {
+       /*
+        * Strip parenthesis...
+	*/
+
+	memcpy(model, value + 1, valueLen - 2);
+	model[valueLen - 2] = '\0';
+      }
+      else
+      {
+	memcpy(model, value, valueLen);
+	model[valueLen] = '\0';
+      }
 
       if (!strcasecmp(model, "GPL Ghostscript") ||
           !strcasecmp(model, "GNU Ghostscript") ||

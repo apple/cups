@@ -258,11 +258,13 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 #  endif /* !WIN32 */
 
 /*
- * Common URI encoding function...
+ * Common URI functions...
  */
 
-extern char	*_httpEncodeURI(char *dst, const char *src, size_t dstsize);
-
+extern char		*_httpEncodeURI(char *dst, const char *src,
+			                size_t dstsize);
+extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
+			                 size_t resolved_size);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*

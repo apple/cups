@@ -220,7 +220,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, backendResolveURI(argv),
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
                       method, sizeof(method), username, sizeof(username),
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
