@@ -44,7 +44,9 @@ _httpResolveURI
 _ippAddAttr
 _ippFreeAttr
 _ppdFreeLanguages
+_ppdGet1284Values
 _ppdGetEncoding
 _ppdGetLanguages
 _ppdHashName
 _ppdLocalizedAttr
+_ppdNormalizeMakeAndModel

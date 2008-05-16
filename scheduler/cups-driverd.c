@@ -36,13 +36,7 @@
 #include "util.h"
 #include <cups/dir.h>
 #include <cups/transcode.h>
-
-
-/*
- * Private PPD functions...
- */
-
-extern cups_encoding_t	_ppdGetEncoding(const char *name);
+#include <cups/ppd-private.h>
 
 
 /*
@@ -1063,7 +1057,8 @@ load_ppds(const char *d,		/* I - Actual directory */
 		nick_name[256],		/* NickName */
 		device_id[256],		/* 1284DeviceID */
 		product[256],		/* Product */
-		psversion[256];		/* PSVersion */
+		psversion[256],		/* PSVersion */
+		temp[512];		/* Temporary make and model */
   int		model_number,		/* cupsModelNumber */
 		type;			/* ppd-type */
   cups_array_t	*products,		/* Product array */
@@ -1340,11 +1335,22 @@ load_ppds(const char *d,		/* I - Actual directory */
       cupsArrayAdd(products, strdup(model_name));
 
    /*
-    * See if we got a manufacturer...
+    * Normalize the make and model string...
     */
 
     while (isspace(manufacturer[0] & 255))
       _cups_strcpy(manufacturer, manufacturer + 1);
+
+    if (!strncasecmp(make_model, manufacturer, strlen(manufacturer)))
+      strlcpy(temp, make_model, sizeof(temp));
+    else
+      snprintf(temp, sizeof(temp), "%s %s", manufacturer, make_model);
+
+    _ppdNormalizeMakeAndModel(temp, make_model, sizeof(make_model));
+
+   /*
+    * See if we got a manufacturer...
+    */
 
     if (!manufacturer[0] || !strcmp(manufacturer, "ESP"))
     {
@@ -1365,39 +1371,14 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       if (*ptr && ptr > manufacturer)
 	*ptr = '\0';
-      else if (!strncasecmp(manufacturer, "agfa", 4))
-	strcpy(manufacturer, "AGFA");
-      else if (!strncasecmp(manufacturer, "herk", 4) ||
-               !strncasecmp(manufacturer, "linotype", 8))
-	strcpy(manufacturer, "LHAG");
       else
 	strcpy(manufacturer, "Other");
-
-     /*
-      * Hack for various vendors...
-      */
-
-      if (!strcasecmp(manufacturer, "XPrint"))
-	strcpy(manufacturer, "Xerox");
-      else if (!strcasecmp(manufacturer, "Eastman"))
-	strcpy(manufacturer, "Kodak");
-      else if (!strcasecmp(manufacturer, "laserwriter"))
-	strcpy(manufacturer, "Apple");
-      else if (!strcasecmp(manufacturer, "colorpoint"))
-	strcpy(manufacturer, "Seiko");
-      else if (!strcasecmp(manufacturer, "fiery"))
-	strcpy(manufacturer, "EFI");
-      else if (!strcasecmp(manufacturer, "ps") ||
-               !strcasecmp(manufacturer, "colorpass"))
-	strcpy(manufacturer, "Canon");
-      else if (!strncasecmp(manufacturer, "primera", 7))
-	strcpy(manufacturer, "Fargo");
-      else if (!strcasecmp(manufacturer, "designjet"))
-	strcpy(manufacturer, "HP");
     }
     else if (!strncasecmp(manufacturer, "LHAG", 4) ||
              !strncasecmp(manufacturer, "linotype", 8))
       strcpy(manufacturer, "LHAG");
+    else if (!strncasecmp(manufacturer, "Hewlett", 7))
+      strcpy(manufacturer, "HP");
 
    /*
     * Fix the lang_version as needed...
@@ -1449,7 +1430,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
    /*
-    * Add the PPD file...
+    * Record the PPD file...
     */
 
     new_ppd = !ppd;

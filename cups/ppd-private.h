@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#  include "ppd.h"
+#  include "cups.h"
 
 
 /*
@@ -44,10 +44,16 @@ extern "C" {
 
 
 extern void		_ppdFreeLanguages(cups_array_t *languages);
+extern int		_ppdGet1284Values(const char *device_id,
+			                  cups_option_t **values);
+extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);
 extern unsigned		_ppdHashName(const char *name);
 extern ppd_attr_t	*_ppdLocalizedAttr(ppd_file_t *ppd, const char *keyword,
 			                   const char *spec, const char *ll_CC);
+extern char		*_ppdNormalizeMakeAndModel(const char *make_and_model,
+			                           char *buffer,
+						   size_t bufsize);
 
 
 /*
