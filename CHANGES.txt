@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-05-14
+CHANGES.txt - 2008-05-15
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added a PageLogFormat directive to the cupsd.conf file to
+	  control the format of lines in the page_log file.
 	- Filters can now send PPD: messages to stderr to set PPD
 	  keywords like DefaultPageSize while a job is printing.
 	- Added a mdns backend for discovery and printing to printers

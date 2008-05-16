@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "2 January 2008" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "15 May 2008" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -452,6 +452,10 @@ PageLog filename
 PageLog syslog
 .br
 Specifies the page log filename.
+.TP 5
+PageLogFormat format string
+.br
+Specifies the format of page log lines.
 .TP 5
 PassEnv variable [... variable]
 .br

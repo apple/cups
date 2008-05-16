@@ -175,6 +175,8 @@ VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Error log file */
 			*PageFile		VALUE(NULL);
 					/* Page log file */
+VAR char		*PageLogFormat		VALUE(NULL);
+					/* Page log format */
 VAR mime_t		*MimeDatabase		VALUE(NULL);
 					/* MIME type database */
 VAR int			NumMimeTypes		VALUE(0);
