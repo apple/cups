@@ -25,7 +25,7 @@
 
 #  include <cups/backend.h>
 #  include <cups/sidechannel.h>
-#  include <cups/cups.h>
+#  include <cups/ppd-private.h>
 #  include <cups/debug.h>
 #  include <cups/i18n.h>
 #  include <cups/snmp-private.h>
