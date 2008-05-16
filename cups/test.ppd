@@ -144,19 +144,19 @@
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/foo/bar.html"
 *End
-*fr.cupsIPPReason foo/La Foo Reason: "text:La%20Long
+*fr.cupsIPPReason foo/La Foo Reason: "text:La%20Long%20
 text:Foo%20Reason
 http://foo/fr/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/fr/foo/bar.html"
 *End
-*zh_TW.cupsIPPReason foo/Number 1 Foo Reason: "text:Number%201
+*zh_TW.cupsIPPReason foo/Number 1 Foo Reason: "text:Number%201%20
 text:Foo%20Reason
 http://foo/zh_TW/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help
 /help/zh_TW/foo/bar.html"
 *End
-*zh.cupsIPPReason foo/Number 2 Foo Reason: "text:Number%202
+*zh.cupsIPPReason foo/Number 2 Foo Reason: "text:Number%202%20
 text:Foo%20Reason
 http://foo/zh/bar.html
 help:anchor='foo'%20bookID=Vendor%20Help

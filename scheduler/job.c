@@ -3837,7 +3837,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
               sizeof(job->printer->state_message));
       cupsdAddPrinterHistory(job->printer);
 
-      if (loglevel < CUPD_LOG_INFO)
+      if (loglevel < CUPSD_LOG_INFO)
         event |= CUPSD_EVENT_PRINTER_STATE;
 
       update_job_attrs(job);
