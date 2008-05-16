@@ -40,7 +40,7 @@ if test x$enable_dnssd != xno; then
 				;;
 			*)
 				# All others...
-				AC_CHECK_LIB(dns_sd,DNSServiceCreateConnection,
+				AC_CHECK_LIB(dns_sd,TXTRecordGetValuePtr,
 					AC_DEFINE(HAVE_DNSSD)
 					DNSSDLIBS="-ldns_sd")
 				;;
