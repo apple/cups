@@ -110,6 +110,10 @@ form-tree.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-tree.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.o: ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.o: ../cups/string.h ../config.h
+commandtops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtops.o: ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
+commandtops.o: ../cups/sidechannel.h
 gziptoany.o: ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
 gziptoany.o: ../cups/i18n.h ../cups/transcode.h ../cups/language.h
 gziptoany.o: ../cups/array.h
@@ -279,6 +283,10 @@ form-tree.32.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cup
 form-tree.32.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.32.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.32.o: form-tree.c  ../cups/string.h ../config.h
+commandtops.32.o: commandtops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtops.32.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtops.32.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
+commandtops.32.o: commandtops.c  ../cups/sidechannel.h
 gziptoany.32.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
 gziptoany.32.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h ../cups/language.h
 gziptoany.32.o: gziptoany.c  ../cups/array.h
@@ -448,6 +456,10 @@ form-tree.64.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cup
 form-tree.64.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.64.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.64.o: form-tree.c  ../cups/string.h ../config.h
+commandtops.64.o: commandtops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
+commandtops.64.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+commandtops.64.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
+commandtops.64.o: commandtops.c  ../cups/sidechannel.h
 gziptoany.64.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
 gziptoany.64.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h ../cups/language.h
 gziptoany.64.o: gziptoany.c  ../cups/array.h

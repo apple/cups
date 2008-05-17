@@ -2782,7 +2782,10 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
         return;
       }
       else if (bytes == 0)
+      {
         con->http.activity = time(NULL);
+        return;
+      }
     }
 
     if (bytes > 0)

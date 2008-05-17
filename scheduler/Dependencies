@@ -79,7 +79,7 @@ ipp.o: ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cups/ipp.h
 ipp.o: ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
 ipp.o: ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
 ipp.o: printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
-ipp.o: subscriptions.h ../cups/ppd-private.h
+ipp.o: subscriptions.h ../cups/ppd-private.h ../cups/cups.h
 listen.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 listen.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 listen.o: ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
@@ -213,7 +213,7 @@ cups-driverd.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 cups-driverd.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 cups-driverd.o: ../cups/file.h ../cups/language.h ../cups/file.h
 cups-driverd.o: ../cups/string.h ../config.h ../cups/dir.h
-cups-driverd.o: ../cups/transcode.h
+cups-driverd.o: ../cups/transcode.h ../cups/ppd-private.h ../cups/cups.h
 cups-lpd.o: ../cups/http-private.h ../config.h ../cups/http.h
 cups-lpd.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 cups-lpd.o: ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
@@ -322,7 +322,7 @@ ipp.32.o: ipp.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cup
 ipp.32.o: ipp.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
 ipp.32.o: ipp.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
 ipp.32.o: ipp.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
-ipp.32.o: ipp.c  subscriptions.h ../cups/ppd-private.h
+ipp.32.o: ipp.c  subscriptions.h ../cups/ppd-private.h ../cups/cups.h
 listen.32.o: listen.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 listen.32.o: listen.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 listen.32.o: listen.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
@@ -456,7 +456,7 @@ cups-driverd.32.o: cups-driverd.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/h
 cups-driverd.32.o: cups-driverd.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 cups-driverd.32.o: cups-driverd.c  ../cups/file.h ../cups/language.h ../cups/file.h
 cups-driverd.32.o: cups-driverd.c  ../cups/string.h ../config.h ../cups/dir.h
-cups-driverd.32.o: cups-driverd.c  ../cups/transcode.h
+cups-driverd.32.o: cups-driverd.c  ../cups/transcode.h ../cups/ppd-private.h ../cups/cups.h
 cups-lpd.32.o: cups-lpd.c  ../cups/http-private.h ../config.h ../cups/http.h
 cups-lpd.32.o: cups-lpd.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 cups-lpd.32.o: cups-lpd.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
@@ -565,7 +565,7 @@ ipp.64.o: ipp.c  ../cups/array.h ../cups/file.h ../cups/language.h mime.h ../cup
 ipp.64.o: ipp.c  ../cups/file.h ../cups/http.h ../cups/i18n.h ../cups/transcode.h
 ipp.64.o: ipp.c  ../cups/debug.h sysman.h statbuf.h cert.h auth.h client.h policy.h
 ipp.64.o: ipp.c  printers.h classes.h job.h conf.h banners.h dirsvc.h network.h
-ipp.64.o: ipp.c  subscriptions.h ../cups/ppd-private.h
+ipp.64.o: ipp.c  subscriptions.h ../cups/ppd-private.h ../cups/cups.h
 listen.64.o: listen.c  cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 listen.64.o: listen.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 listen.64.o: listen.c  ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
@@ -699,7 +699,7 @@ cups-driverd.64.o: cups-driverd.c  util.h ../cups/cups.h ../cups/ipp.h ../cups/h
 cups-driverd.64.o: cups-driverd.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 cups-driverd.64.o: cups-driverd.c  ../cups/file.h ../cups/language.h ../cups/file.h
 cups-driverd.64.o: cups-driverd.c  ../cups/string.h ../config.h ../cups/dir.h
-cups-driverd.64.o: cups-driverd.c  ../cups/transcode.h
+cups-driverd.64.o: cups-driverd.c  ../cups/transcode.h ../cups/ppd-private.h ../cups/cups.h
 cups-lpd.64.o: cups-lpd.c  ../cups/http-private.h ../config.h ../cups/http.h
 cups-lpd.64.o: cups-lpd.c  ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 cups-lpd.64.o: cups-lpd.c  ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
