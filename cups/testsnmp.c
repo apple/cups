@@ -37,7 +37,6 @@
  */
 
 static void	print_packet(cups_snmp_t *packet, void *data);
-static int	*scan_oid(const char *s, int *oid, int oidsize);
 static int	show_oid(int fd, const char *community,
 		         http_addr_t *addr, const char *s, int walk);
 static void	usage(void);
@@ -119,8 +118,8 @@ main(int  argc,				/* I - Number of command-line args */
   if (!oid)
   {
     if (!show_oid(fd, community,  &(host->addr),
-                  walk ? "1.3.6.1.2.1.43" :
-		         "1.3.6.1.2.1.43.10.2.1.4.1.1", walk))
+                  walk ? ".1.3.6.1.2.1.43" :
+		         ".1.3.6.1.2.1.43.10.2.1.4.1.1", walk))
       return (1);
   }
   
@@ -137,14 +136,12 @@ print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
              void        *data)		/* I - User data pointer (not used) */
 {
   int	i;				/* Looping var */
+  char	temp[1024];			/* Temporary OID string */
 
 
   (void)data;
 
-  printf("%d", packet->object_name[0]);
-  for (i = 1; packet->object_name[i] >= 0; i ++)
-    printf(".%d", packet->object_name[i]);
-  fputs(" = ", stdout);
+  printf("%s = ", _cupsSNMPOIDToString(packet->object_name, temp, sizeof(temp)));
 
   switch (packet->object_type)
   {
@@ -170,10 +167,8 @@ print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
 	break;
 
     case CUPS_ASN1_OID :
-	printf("OID %d", packet->object_value.oid[0]);
-	for (i = 1; packet->object_value.oid[i] >= 0; i ++)
-	  printf(".%d", packet->object_value.oid[i]);
-	putchar('\n');
+	printf("OID %s\n", _cupsSNMPOIDToString(packet->object_value.oid,
+	                                        temp, sizeof(temp)));
 	break;
 
     case CUPS_ASN1_HEX_STRING :
@@ -208,38 +203,6 @@ print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
 
 
 /*
- * 'scan_oid()' - Scan an OID value.
- */
-
-static int *				/* O - OID or NULL on error */
-scan_oid(const char *s,			/* I - OID string */
-         int        *oid,		/* I - OID array */
-	 int        oidsize)		/* I - Size of OID array in integers */
-{
-  int	i;				/* Index into OID array */
-  char	*ptr;				/* Pointer into string */
-
-
-  for (ptr = (char *)s, i = 0, oidsize --; ptr && *ptr && i < oidsize; i ++)
-  {
-    if (!isdigit(*ptr & 255))
-      return (NULL);
-
-    oid[i] = strtol(ptr, &ptr, 10);
-    if (ptr && *ptr == '.')
-      ptr ++;
-  }
-
-  if (i >= oidsize)
-    return (NULL);
-
-  oid[i] = -1;
-
-  return (oid);
-}
-
-
-/*
  * 'show_oid()' - Show the specified OID.
  */
 
@@ -253,9 +216,10 @@ show_oid(int         fd,		/* I - SNMP socket */
   int		i;			/* Looping var */
   int		oid[CUPS_SNMP_MAX_OID];	/* OID */
   cups_snmp_t	packet;			/* SNMP packet */
+  char		temp[1024];		/* Temporary OID string */
 
 
-  if (!scan_oid(s, oid, sizeof(oid) / sizeof(oid[0])))
+  if (!_cupsSNMPStringToOID(s, oid, sizeof(oid) / sizeof(oid[0])))
   {
     puts("testsnmp: Bad OID");
     return (0);
@@ -263,10 +227,7 @@ show_oid(int         fd,		/* I - SNMP socket */
 
   if (walk)
   {
-    printf("_cupsSNMPWalk(%d", oid[0]);
-    for (i = 1; oid[i] >= 0; i ++)
-      printf(".%d", oid[i]);
-    puts("):");
+    printf("_cupsSNMPWalk(%s): ", _cupsSNMPOIDToString(oid, temp, sizeof(temp)));
 
     if (_cupsSNMPWalk(fd, addr, CUPS_SNMP_VERSION_1, community, oid, 5.0,
                      print_packet, NULL) < 0)
@@ -277,10 +238,7 @@ show_oid(int         fd,		/* I - SNMP socket */
   }
   else
   {
-    printf("_cupsSNMPWrite(%d", oid[0]);
-    for (i = 1; oid[i] >= 0; i ++)
-      printf(".%d", oid[i]);
-    fputs("): ", stdout);
+    printf("_cupsSNMPWrite(%s): ", _cupsSNMPOIDToString(oid, temp, sizeof(temp)));
 
     if (!_cupsSNMPWrite(fd, addr, CUPS_SNMP_VERSION_1, community,
 		       CUPS_ASN1_GET_REQUEST, 1, oid))

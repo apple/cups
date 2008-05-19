@@ -3,7 +3,7 @@
  *
  *   Side-channel API code for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,9 +16,11 @@
  *
  * Contents:
  *
- *   cupsSideChannelDoRequest() - Send a side-channel command to a backend
- *                                and wait for a response.
+ *   cupsSideChannelDoRequest() - Send a side-channel command to a backend and
+ *                                wait for a response.
  *   cupsSideChannelRead()      - Read a side-channel message.
+ *   cupsSideChannelSNMPGet()   - Query a SNMP OID's value.
+ *   cupsSideChannelSNMPWalk()  - Query multiple SNMP OID values.
  *   cupsSideChannelWrite()     - Write a side-channel message.
  */
 
@@ -28,6 +30,7 @@
 
 #include "sidechannel.h"
 #include "string.h"
+#include "debug.h"
 #include <unistd.h>
 #include <errno.h>
 #ifdef __hpux
@@ -117,6 +120,10 @@ cupsSideChannelRead(
 #endif /* HAVE_POLL */
 
 
+  DEBUG_printf(("cupsSideChannelRead(command=%p, status=%p, data=%p, "
+                "datalen=%p(%d), timeout=%.3f)\n", command, status, data,
+		datalen, datalen ? *datalen : -1, timeout));
+
  /*
   * Range check input...
   */
@@ -147,7 +154,10 @@ cupsSideChannelRead(
   if (timeout < 0.0)
   {
     if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, NULL) < 1)
+    {
+      DEBUG_printf(("cupsSideChannelRead: Select error: %s\n", strerror(errno)));
       return (-1);
+    }
   }
   else
   {
@@ -155,7 +165,10 @@ cupsSideChannelRead(
     stimeout.tv_usec = (int)(timeout * 1000000) % 1000000;
 
     if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, &stimeout) < 1)
+    {
+      DEBUG_puts("cupsSideChannelRead: Select timeout");
       return (-1);
+    }
   }
 #endif /* HAVE_POLL */
 
@@ -172,14 +185,21 @@ cupsSideChannelRead(
 
   while ((bytes = read(CUPS_SC_FD, buffer, sizeof(buffer))) < 0)
     if (errno != EINTR && errno != EAGAIN)
+    {
+      DEBUG_printf(("cupsSideChannelRead: Read error: %s\n", strerror(errno)));
       return (-1);
+    }
 
  /*
   * Validate the command code in the message...
   */
 
-  if (buffer[0] < CUPS_SC_CMD_SOFT_RESET || buffer[0] > CUPS_SC_CMD_GET_STATE)
+  if (buffer[0] < CUPS_SC_CMD_SOFT_RESET ||
+      buffer[0] > CUPS_SC_CMD_SNMP_GET_NEXT)
+  {
+    DEBUG_printf(("cupsSideChannelRead: Bad command %d!\n", buffer[0]));
     return (-1);
+  }
 
   *command = (cups_sc_command_t)buffer[0];
 
@@ -220,7 +240,217 @@ cupsSideChannelRead(
     memcpy(data, buffer + 4, templen);
   }
 
+  DEBUG_printf(("cupsSideChannelRead: Returning status=%d\n", *status));
+
   return (0);
+}
+
+
+/*
+ * 'cupsSideChannelSNMPGet()' - Query a SNMP OID's value.
+ *
+ * This function asks the backend to do a SNMP OID query on behalf of the
+ * filter, port monitor, or backend using the default community name.
+ *
+ * "oid" contains a numeric OID consisting of integers separated by periods,
+ * for example ".1.3.6.1.2.1.43".  Symbolic names from SNMP MIBs are not
+ * supported and must be converted to their numeric forms.
+ *
+ * On input, "data" and "datalen" provide the location and size of the
+ * buffer to hold the OID value. For number OIDs, the returned data holds
+ * the value converted to a string, otherwise the data buffer holds the raw
+ * data with a trailing nul appended.  The returned "datalen" value does not
+ * include the trailing nul.
+ *
+ * @code CUPS_SC_STATUS_NOT_IMPLEMENTED@ is returned by backends that do not
+ * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
+ * the printer does not respond to the SNMP query.
+ *
+ * @since CUPS 1.4@ 
+ */
+
+cups_sc_status_t			/* O  - Query status */
+cupsSideChannelSNMPGet(
+    const char *oid,			/* I  - OID to query */
+    char       *data,			/* I  - Buffer for OID value */
+    int        *datalen,		/* IO - Size of OID buffer on entry, size of value on return */
+    double     timeout)			/* I  - Timeout in seconds */
+{
+  cups_sc_status_t	status;		/* Status of command */
+  cups_sc_command_t	rcommand;	/* Response command */
+  char			real_data[2048];/* Real data buffer for response */
+  int			real_datalen,	/* Real length of data buffer */
+			real_oidlen;	/* Length of returned OID string */
+
+
+  DEBUG_printf(("cupsSideChannelSNMPGet(oid=\"%s\", data=%p, datalen=%p(%d), "
+                "timeout=%.3f)\n", oid, data, datalen, datalen ? *datalen : -1,
+		timeout));
+
+ /*
+  * Range check input...
+  */
+
+  if (!oid || !*oid || !data || !datalen || *datalen < 2)
+    return (CUPS_SC_STATUS_BAD_MESSAGE);
+
+  *data = '\0';
+
+ /*
+  * Send the request to the backend and wait for a response...
+  */
+
+  if (cupsSideChannelWrite(CUPS_SC_CMD_SNMP_GET, CUPS_SC_STATUS_NONE, oid,
+                           (int)strlen(oid), timeout))
+    return (CUPS_SC_STATUS_TIMEOUT);
+
+  real_datalen = sizeof(real_data);
+  if (cupsSideChannelRead(&rcommand, &status, real_data, &real_datalen, timeout))
+    return (CUPS_SC_STATUS_TIMEOUT);
+
+  if (rcommand != CUPS_SC_CMD_SNMP_GET)
+    return (CUPS_SC_STATUS_BAD_MESSAGE);
+
+  if (status == CUPS_SC_STATUS_OK)
+  {
+   /*
+    * Parse the response of the form "oid\0value"...
+    */
+
+    real_oidlen  = strlen(real_data) + 1;
+    real_datalen -= real_oidlen;
+
+    if ((real_datalen + 1) > *datalen)
+      return (CUPS_SC_STATUS_TOO_BIG);
+
+    memcpy(data, real_data + real_oidlen, real_datalen);
+    data[real_datalen] = '\0';
+
+    *datalen = real_datalen;
+  }
+
+  return (status);
+}
+
+
+/*
+ * 'cupsSideChannelSNMPWalk()' - Query multiple SNMP OID values.
+ *
+ * This function asks the backend to do multiple SNMP OID queries on behalf
+ * of the filter, port monitor, or backend using the default community name.
+ * All OIDs under the "parent" OID are queried and the results are sent to
+ * the callback function you provide.
+ *
+ * "oid" contains a numeric OID consisting of integers separated by periods,
+ * for example ".1.3.6.1.2.1.43".  Symbolic names from SNMP MIBs are not
+ * supported and must be converted to their numeric forms.
+ *
+ * "timeout" specifies the timeout for each OID query. The total amount of
+ * time will depend on the number of OID values found and the time required
+ * for each query.
+ *
+ * "data" and "datalen" provide the location and size of the buffer to hold
+ * the OID values. "cb" provides a function to call for every value that is
+ * found. "context" is an application-defined pointer that is sent to the
+ * callback function along with the OID and current data.
+ *
+ * For number OIDs, the data passed to the callback function holds the value
+ * converted to a string, otherwise the data buffer holds the raw data with a
+ * trailing nul appended.  The passed "datalen" value does not include the
+ * trailing nul.
+ *
+ * @code CUPS_SC_STATUS_NOT_IMPLEMENTED@ is returned by backends that do not
+ * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
+ * the printer does not respond to the first SNMP query.
+ *
+ * @since CUPS 1.4@ 
+ */
+
+cups_sc_status_t			/* O - Status of first query of @code CUPS_SC_STATUS_OK@ on success */
+cupsSideChannelSNMPWalk(
+    const char          *oid,		/* I - First numeric OID to query */
+    double              timeout,	/* I - Timeout for each query in seconds */
+    cups_sc_walk_func_t cb,		/* I - Function to call with each value */
+    void                *context)	/* I - Application-defined pointer to send to callback */
+{
+  cups_sc_status_t	status;		/* Status of command */
+  cups_sc_command_t	rcommand;	/* Response command */
+  char			real_data[2048];/* Real data buffer for response */
+  int			real_datalen,	/* Real length of data buffer */
+			real_oidlen,	/* Length of returned OID string */
+			oidlen;		/* Length of first OID */
+  const char		*current_oid;	/* Current OID */
+
+
+  DEBUG_printf(("cupsSideChannelSNMPWalk(oid=\"%s\", timeout=%.3f, cb=%p, "
+                "context=%p)\n", oid, timeout, cb, context));
+
+ /*
+  * Range check input...
+  */
+
+  if (!oid || !*oid || !cb)
+    return (CUPS_SC_STATUS_BAD_MESSAGE);
+
+ /*
+  * Loop until the OIDs don't match...
+  */
+
+  current_oid = oid;
+  oidlen      = (int)strlen(oid);
+
+  do
+  {
+   /*
+    * Send the request to the backend and wait for a response...
+    */
+
+    if (cupsSideChannelWrite(CUPS_SC_CMD_SNMP_GET_NEXT, CUPS_SC_STATUS_NONE,
+                             current_oid, (int)strlen(current_oid), timeout))
+      return (CUPS_SC_STATUS_TIMEOUT);
+
+    real_datalen = sizeof(real_data);
+    if (cupsSideChannelRead(&rcommand, &status, real_data, &real_datalen,
+                            timeout))
+      return (CUPS_SC_STATUS_TIMEOUT);
+
+    if (rcommand != CUPS_SC_CMD_SNMP_GET_NEXT)
+      return (CUPS_SC_STATUS_BAD_MESSAGE);
+
+    if (status == CUPS_SC_STATUS_OK)
+    {
+     /*
+      * Parse the response of the form "oid\0value"...
+      */
+
+      if (strncmp(real_data, oid, oidlen) || real_data[oidlen] != '.')
+      {
+       /*
+        * Done with this set of OIDs...
+	*/
+
+        return (CUPS_SC_STATUS_OK);
+      }
+
+      real_oidlen  = strlen(real_data) + 1;
+      real_datalen -= real_oidlen;
+
+     /*
+      * Call the callback with the OID and data...
+      */
+
+      (*cb)(real_data, real_data + real_oidlen, real_datalen, context); 
+
+     /*
+      * Update the current OID...
+      */
+
+      current_oid = real_data;
+    }
+  }
+  while (status == CUPS_SC_STATUS_OK);
+
+  return (status);
 }
 
 
@@ -255,7 +485,7 @@ cupsSideChannelWrite(
   * Range check input...
   */
 
-  if (command < CUPS_SC_CMD_SOFT_RESET || command > CUPS_SC_CMD_GET_STATE ||
+  if (command < CUPS_SC_CMD_SOFT_RESET || command > CUPS_SC_CMD_SNMP_GET_NEXT ||
       datalen < 0 || datalen > 16384 || (datalen > 0 && !data))
     return (-1);
 

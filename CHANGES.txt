@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-05-15
+CHANGES.txt - 2008-05-19
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The side-channel API now supports SNMP queries for the
+	  standard network backends.
 	- Added a PageLogFormat directive to the cupsd.conf file to
 	  control the format of lines in the page_log file.
 	- Filters can now send PPD: messages to stderr to set PPD

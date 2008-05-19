@@ -59,7 +59,9 @@ enum cups_sc_command_e			/**** Request command codes ****/
   CUPS_SC_CMD_DRAIN_OUTPUT = 2,		/* Drain all pending output */
   CUPS_SC_CMD_GET_BIDI = 3,		/* Return bidirectional capabilities */
   CUPS_SC_CMD_GET_DEVICE_ID = 4,	/* Return the IEEE-1284 device ID */
-  CUPS_SC_CMD_GET_STATE = 5		/* Return the device state */
+  CUPS_SC_CMD_GET_STATE = 5,		/* Return the device state */
+  CUPS_SC_CMD_SNMP_GET = 6,		/* Query an SNMP OID @since CUPS 1.4@ */
+  CUPS_SC_CMD_SNMP_GET_NEXT = 7		/* Query the next SNMP OID @since CUPS 1.4@ */
 };
 typedef enum cups_sc_command_e cups_sc_command_t;
 					/**** Request command codes ****/
@@ -92,6 +94,10 @@ enum cups_sc_status_e			/**** Response status codes ****/
 typedef enum cups_sc_status_e cups_sc_status_t;
 					/**** Response status codes ****/
 
+typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data,
+                                    int datalen, void *context);
+					/**** SNMP walk callback ****/
+
 
 /*
  * Prototypes...
@@ -108,6 +114,14 @@ extern int		cupsSideChannelWrite(cups_sc_command_t command,
 			                     cups_sc_status_t status,
 					     const char *data, int datalen,
 					     double timeout) _CUPS_API_1_3;
+
+/**** New in CUPS 1.4 ****/
+extern cups_sc_status_t	cupsSideChannelSNMPGet(const char *oid, char *data,
+			                       int *datalen, double timeout)
+					       _CUPS_API_1_4;
+extern cups_sc_status_t	cupsSideChannelSNMPWalk(const char *oid, double timeout,
+						cups_sc_walk_func_t cb,
+						void *context) _CUPS_API_1_4;
 
 
 #  ifdef __cplusplus
