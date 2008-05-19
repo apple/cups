@@ -2374,6 +2374,28 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
           p->type |= CUPS_PRINTER_COMMANDS;
         }
+	else if (!(p->type & CUPS_PRINTER_COMMANDS))
+	{
+	 /*
+	  * See if this is a PostScript device without a command filter...
+	  */
+
+	  for (i = 0; i < ppd->num_filters; i ++)
+	    if (!strncasecmp(ppd->filters[i],
+	                     "application/vnd.cups-postscript", 31))
+	      break;
+
+          if (i < ppd->num_filters)
+	  {
+	   /*
+	    * Add the generic PostScript command filter...
+	    */
+
+	    add_printer_filter(p, p->filetype,
+			       "application/vnd.cups-command 0 commandtops");
+	    p->type |= CUPS_PRINTER_COMMANDS;
+	  }
+	}
 
         if (p->type & CUPS_PRINTER_COMMANDS)
 	{
