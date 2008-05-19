@@ -318,6 +318,8 @@ main(int  argc,				/* I - Number of command-line args */
     };
 
 
+    sleep(2);
+
     length   = 0;
     scstatus = cupsSideChannelDoRequest(CUPS_SC_CMD_DRAIN_OUTPUT, buffer,
                                         &length, 5.0);
@@ -340,6 +342,12 @@ main(int  argc,				/* I - Number of command-line args */
                                         &length, 5.0);
     printf("CUPS_SC_CMD_GET_STATE returned %s, %02X\n", statuses[scstatus],
            buffer[0] & 255);
+
+    length   = sizeof(buffer);
+    scstatus = cupsSideChannelSNMPGet(".1.3.6.1.2.1.43.10.2.1.4.1.1", buffer,
+                                      &length, 5.0);
+    printf("CUPS_SC_CMD_SNMP_GET returned %s, %s\n", statuses[scstatus],
+           buffer);
 
     length   = 0;
     scstatus = cupsSideChannelDoRequest(CUPS_SC_CMD_SOFT_RESET, buffer,
@@ -372,7 +380,7 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 usage(void)
 {
-  fputs("Usage: betest [-ps] [-s] [-t] device-uri job-id user title copies "
+  fputs("Usage: testbackend [-ps] [-s] [-t] device-uri job-id user title copies "
         "options [file]\n", stderr);
   exit(1);
 }

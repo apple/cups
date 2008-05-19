@@ -34,12 +34,6 @@
 
 
 /*
- * Local functions...
- */
-
-
-
-/*
  * 'backendCheckSideChannel()' - Check the side-channel for pending requests.
  */
 
@@ -112,6 +106,126 @@ backendNetworkSideCB(
         datalen = 1;
         break;
 
+    case CUPS_SC_CMD_SNMP_GET :
+    case CUPS_SC_CMD_SNMP_GET_NEXT :
+        fprintf(stderr, "DEBUG: CUPS_SC_CMD_SNMP_%s: %d (%s)\n",
+	        command == CUPS_SC_CMD_SNMP_GET ? "GET" : "GET_NEXT", datalen,
+		data);
+
+        if (datalen < 2)
+	{
+	  status  = CUPS_SC_STATUS_BAD_MESSAGE;
+	  datalen = 0;
+	  break;
+	}
+
+        if (snmp_fd >= 0)
+	{
+	  cups_snmp_t	packet;		/* Packet from printer */
+
+
+          if (!_cupsSNMPStringToOID(data, packet.object_name, CUPS_SNMP_MAX_OID))
+	  {
+	    status  = CUPS_SC_STATUS_BAD_MESSAGE;
+	    datalen = 0;
+	    break;
+	  }
+
+          status  = CUPS_SC_STATUS_IO_ERROR;
+	  datalen = 0;
+
+          if (_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+	                     _cupsSNMPDefaultCommunity(),
+	                     command == CUPS_SC_CMD_SNMP_GET ?
+			         CUPS_ASN1_GET_REQUEST :
+				 CUPS_ASN1_GET_NEXT_REQUEST, 1,
+			     packet.object_name))
+          {
+	    if (_cupsSNMPRead(snmp_fd, &packet, 1.0))
+	    {
+	      char	*dataptr;	/* Pointer into data */
+	      int	i;		/* Looping var */
+
+
+              if (!_cupsSNMPOIDToString(packet.object_name, data, sizeof(data)))
+	      {
+	        fputs("DEBUG: Bad OID returned!\n", stderr);
+	        break;
+	      }
+
+	      datalen = (int)strlen(data) + 1;
+              dataptr = data + datalen;
+
+	      switch (packet.object_type)
+	      {
+	        case CUPS_ASN1_BOOLEAN :
+		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
+		             packet.object_value.boolean);
+		    break;
+
+	        case CUPS_ASN1_INTEGER :
+		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
+		             packet.object_value.integer);
+		    break;
+
+	        case CUPS_ASN1_BIT_STRING :
+	        case CUPS_ASN1_OCTET_STRING :
+		    strlcpy(dataptr, packet.object_value.string,
+		            sizeof(data) - (dataptr - data));
+		    break;
+
+	        case CUPS_ASN1_OID :
+		    _cupsSNMPOIDToString(packet.object_value.oid, dataptr,
+		                         sizeof(data) - (dataptr - data));
+		    break;
+
+                case CUPS_ASN1_HEX_STRING :
+		    for (i = 0;
+		         i < packet.object_value.hex_string.num_bytes &&
+			     dataptr < (data + sizeof(data) - 3);
+			 i ++, dataptr += 2)
+		      sprintf(dataptr, "%02X",
+		              packet.object_value.hex_string.bytes[i]);
+		    break;
+
+                case CUPS_ASN1_COUNTER :
+		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
+		             packet.object_value.counter);
+		    break;
+
+                case CUPS_ASN1_GAUGE :
+		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%u",
+		             packet.object_value.gauge);
+		    break;
+
+                case CUPS_ASN1_TIMETICKS :
+		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%u",
+		             packet.object_value.timeticks);
+		    break;
+
+                default :
+	            fprintf(stderr, "DEBUG: Unknown OID value type %02X!\n",
+		            packet.object_type);
+		    break;
+              }
+
+	      fprintf(stderr, "DEBUG: Returning %s %s\n", data, data + datalen);
+
+	      status  = CUPS_SC_STATUS_OK;
+	      datalen += (int)strlen(data + datalen);
+	    }
+	    else
+	      fputs("DEBUG: SNMP read error...\n", stderr);
+	  }
+	  else
+	    fputs("DEBUG: SNMP write error...\n", stderr);
+	  break;
+        }
+
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+
     case CUPS_SC_CMD_GET_DEVICE_ID :
         if (snmp_fd >= 0)
 	{
@@ -119,7 +233,12 @@ backendNetworkSideCB(
 	  static const int ppmPrinterIEEE1284DeviceId[] =
 	  		{ CUPS_OID_ppmPrinterIEEE1284DeviceId,1,-1 };
 
-          if (_cupsSNMPWrite(snmp_fd, addr, 1, _cupsSNMPDefaultCommunity(),
+
+          status  = CUPS_SC_STATUS_IO_ERROR;
+	  datalen = 0;
+
+          if (_cupsSNMPWrite(snmp_fd, addr, CUPS_SNMP_VERSION_1,
+	                     _cupsSNMPDefaultCommunity(),
 	                     CUPS_ASN1_GET_REQUEST, 1,
 			     ppmPrinterIEEE1284DeviceId))
           {
@@ -128,9 +247,11 @@ backendNetworkSideCB(
 	    {
 	      strlcpy(data, packet.object_value.string, sizeof(data));
 	      datalen = (int)strlen(data);
-	      break;
+	      status  = CUPS_SC_STATUS_OK;
 	    }
 	  }
+
+	  break;
         }
 
 	if ((device_id = getenv("1284DEVICEID")) != NULL)

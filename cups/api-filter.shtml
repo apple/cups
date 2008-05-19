@@ -218,6 +218,11 @@ prefix strings:</p>
 	#-copies to the job-media-sheets-completed attribute. The second
 	form sets the job-media-sheets-completed attribute to #-pages.</dd>
 
+	<dt>PPD: keyword=value [keyword=value ...]</dt>
+	<dd>Changes or adds keywords to the printer's PPD file. Typically
+	this is used to update installable options or default media settings
+	based on the printer configuration.</dd>
+
 	<dt>STATE: printer-state-reason [printer-state-reason ...]</dt>
 	<dt>STATE: + printer-state-reason [printer-state-reason ...]</dt>
 	<dt>STATE: - printer-state-reason [printer-state-reason ...]</dt>
@@ -235,7 +240,7 @@ prefix strings:</p>
 <p>Messages without one of these prefixes are treated as if they began with
 the "DEBUG:" prefix string.</p>
 
-<h3><a name="COMMUNICATING">Communicating with the Backend</a></h3>
+<h3><a name="COMMUNICATING_BACKEND">Communicating with the Backend</a></h3>
 
 <p>Filters can communicate with the backend via the
 <a href="#cupsBackChannelRead"><code>cupsBackChannelRead</code></a> and
@@ -282,6 +287,8 @@ else
   data[0] = '\0';
 </pre>
 
+<h3><a name="COMMUNICATING_FILTER">Communicating with Filters</a></h3>
+
 <p>Backends communicate with filters using the reciprocal functions
 <a href="#cupsBackChannelWrite"><code>cupsBackChannelWrite</code></a>,
 <a href="#cupsSideChannelRead"><code>cupsSideChannelRead</code></a>, and
@@ -304,10 +311,7 @@ Backends can either poll for commands using a <code>timeout</code> of 0.0, wait
 indefinitely for commands using a <code>timeout</code> of -1.0 (probably in a
 separate thread for that purpose), or use <code>select</code> or
 <code>poll</code> on the <code>CUPS_SC_FD</code> file descriptor (4) to handle
-input and output on several file descriptors at the same time. Backends can pass
-<code>NULL</code> for the <code>data</code> and <code>datalen</code> parameters
-since none of the commands sent by upstream filters contain any data at this
-time.</p>
+input and output on several file descriptors at the same time.</p>
 
 <p>Once a command is processed, the backend uses the
 <a href="#cupsSideChannelWrite"><code>cupsSideChannelWrite</code></a> function
@@ -319,16 +323,15 @@ side-channel command and respond to it:</p>
 
 <a href="#cups_sc_command_t">cups_sc_command_t</a> command;
 <a href="#cups_sc_status_t">cups_sc_status_t</a> status;
+char data[2048];
+int datalen = sizeof(data);
 
 /* Poll for a command... */
-if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;status, NULL, NULL, 0.0))
+if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;status, data, &amp;datalen, 0.0))
 {
-  char data[2048];
-  int datalen;
-
   switch (command)
   {
-    /* handle supported commands, file data/datalen/status with values as needed */
+    /* handle supported commands, fill data/datalen/status with values as needed */
 
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
@@ -343,79 +346,53 @@ if (!<a href="#cupsSideChannelRead">cupsSideChannelRead</a>(&amp;command, &amp;s
 
 <h3><a name="SNMP">Doing SNMP Queries with Network Printers</a></h3>
 
-<p>Re-write for side-channel-based SNMP queries.</p>
-
-<!--
 <p>The Simple Network Management Protocol (SNMP) allows you to get the current
 status, page counter, and supply levels from most network printers. Every
 piece of information is associated with an Object Identifier (OID), and
 every printer has a <em>community</em> name associated with it. OIDs can be
 queried directly or by "walking" over a range of OIDs with a common prefix.</p>
 
-<p>The CUPS SNMP functions provide a simple API for querying network printers.
-Queries are made using a datagram socket that is created using
-<a href="#cupsSNMPOpen"><code>cupsSNMPOpen</code></a> and destroyed using
-<a href="#cupsSNMPClose"><code>cupsSNMPClose</code></a>:</p>
+<p>The two CUPS SNMP functions provide a simple API for querying network
+printers through the side-channel interface. Each accepts a string containing
+an OID like ".1.3.6.1.2.1.43.10.2.1.4.1.1" (the standard page counter OID)
+along with a timeout for the query.</p>
+
+<p>The <a href="#cupsSideChannelSNMPGet"><code>cupsSideChannelSNMPGet</code></a>
+function queries a single OID and returns the value as a string in a buffer
+you supply:</p>
 
 <pre class="example">
-#include &lt;cups/snmp.h&gt;
+#include &lt;cups/sidechannel.h&gt;
 
-int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>(AF_INET);
+char data[512];
+int datalen = sizeof(data);
 
-/* do some queries */
-
-<a href="#cupsSNMPClose">cupsSNMPClose</a>(snmp);
-</pre>
-
-<p>OIDs are simple C arrays of integers, terminated by a value of -1. For
-example, the page counter OID .1.3.6.1.2.1.43.10.2.1.4.1.1 would be:</p>
-
-<pre class="example">
-int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
-</pre>
-
-<p>You send a query using
-<a href="#cupsSNMPWrite"><code>cupsSNMPWrite</code></a> and read the value back
-using <a href="#cupsSNMPRead"><code>cupsSNMPRead</code></a>. The value is read
-into a structure called <a href="#cups_snmp_t"><code>cups_snmp_t</code></a>:</p>
-
-<pre class="example">
-#include &lt;cups/snmp.h&gt;
-
-int page_counter_oid[] = { 1, 3, 6, 1, 2, 1, 43, 10, 2, 1, 4, 1, 1, -1 };
-http_addrlist_t *host = httpAddrGetList("myprinter", AF_UNSPEC, "161");
-int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>(host->addr.addr.sa_family);
-<a href="#cups_snmp_t">cups_snmp_t</a> packet;
-
-<a href="#cupsSNMPWrite">cupsSNMPWrite</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
-                <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), CUPS_ASN1_GET_REQUEST, 1,
-                page_counter_oid);
-if (<a href="#cupsSNMPRead">cupsSNMPRead</a>(snmp, &amp;packet, 5000))
+if (<a href="#cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a>(".1.3.6.1.2.1.43.10.2.1.4.1.1", data, &amp;datalen, 5.0)
+        == CUPS_SC_STATUS_OK)
 {
   /* Do something with the value */
-  printf("Page counter is: %d\n", packet.object_value.integer);
+  printf("Page counter is: %s\n", data);
 }
 </pre>
 
-<p>The <a href="#cupsSNMPWalk"><code>cupsSNMPWalk</code></a> function allows you
-to query a whole group of OIDs, calling a function of your choice for each OID
-that is found:</p>
+<p>The
+<a href="#cupsSideChannelSNMPWalk"><code>cupsSideChannelSNMPWalk</code></a>
+function allows you to query a whole group of OIDs, calling a function of your
+choice for each OID that is found:</p>
 
 <pre class="example">
-#include &lt;cups/snmp.h&gt;
+#include &lt;cups/sidechannel.h&gt;
 
 void
-my_callback(<a href="#cups_snmp_t">cups_snmp_t</a> *packet, void *data)
+my_callback(const char *oid, const char *data, int datalen, void *context)
 {
   /* Do something with the value */
+  printf("%s=%s\n", oid, data);
 }
 
-int printer_mib_oid[] = { 1, 3, 6, 1, 2, 1, 43, -1 };
-http_addrlist_t *host = httpAddrGetList("myprinter", AF_UNSPEC, "161");
-int snmp = <a href="#cupsSNMPOpen">cupsSNMPOpen</a>(host->addr.addr.sa_family);
+...
+
 void *my_data;
 
-<a href="#cupsSNMPWalk">cupsSNMPWalk</a>(snmp, &amp;(host->addr), CUPS_SNMP_VERSION_1,
-               <a href="#cupsSNMPDefaultCommunity">cupsSNMPDefaultCommunity</a>(), printer_mib_oid, my_callback, my_data);
+<a href="#cupsSideChannelSNMPWalk">cupsSNMPSideChannelWalk</a>(".1.3.6.1.2.1.43", 5.0, my_callback, my_data);
 </pre>
--->

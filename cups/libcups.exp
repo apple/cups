@@ -27,9 +27,11 @@ __cupsSNMPCopyOID
 __cupsSNMPDefaultCommunity
 __cupsSNMPIsOID
 __cupsSNMPIsOIDPrefixed
+__cupsSNMPOIDToString
 __cupsSNMPOpen
 __cupsSNMPRead
 __cupsSNMPSetDebug
+__cupsSNMPStringToOID
 __cupsSNMPWalk
 __cupsSNMPWrite
 __cupsStrAlloc

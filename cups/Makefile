@@ -77,6 +77,7 @@ OBJS	=	\
 		testhttp.o \
 		testi18n.o \
 		testipp.o \
+		testoptions.o \
 		testlang.o \
 		testppd.o \
 		testsnmp.o \
@@ -119,6 +120,7 @@ LIBTARGETS =	\
 		testi18n \
 		testipp \
 		testlang \
+		testoptions \
 		testppd
 
 TARGETS	=	\
@@ -466,6 +468,18 @@ testlang:	testlang.o libcups.a
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running language API tests...
 	./testlang
+
+
+#
+# testoptions (dependency on static CUPS library is intentional)
+#
+
+testoptions:	testoptions.o libcups.a
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testoptions.o libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running option API tests...
+	./testoptions
 
 
 #

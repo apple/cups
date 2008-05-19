@@ -23,9 +23,11 @@
  *                                 specified OID.
  *   _cupsSNMPIsOIDPrefixed()    - Test whether a SNMP response uses the
  *                                 specified OID prefix.
+ *   _cupsSNMPOIDToString()      - Convert an OID to a string.
  *   _cupsSNMPOpen()             - Open a SNMP socket.
  *   _cupsSNMPRead()             - Read and parse a SNMP response.
  *   _cupsSNMPSetDebug()         - Enable/disable debug logging to stderr.
+ *   _cupsSNMPStringToOID()      - Convert a numeric OID string to an OID array.
  *   _cupsSNMPWalk()             - Enumerate a group of OIDs.
  *   _cupsSNMPWrite()            - Send an SNMP query packet.
  *   asn1_debug()                - Decode an ASN1-encoded message.
@@ -303,6 +305,48 @@ _cupsSNMPIsOIDPrefixed(
 
 
 /*
+ * '_cupsSNMPOIDToString()' - Convert an OID to a string.
+ *
+ * @since CUPS 1.4@
+ */
+
+
+char *					/* O - New string or @code NULL@ on error */
+_cupsSNMPOIDToString(const int *src,	/* I - OID */
+                     char      *dst,	/* I - String buffer */
+                     size_t    dstsize)	/* I - Size of string buffer */
+{
+  char	*dstptr,			/* Pointer into string buffer */
+	*dstend;			/* End of string buffer */
+
+
+  DEBUG_printf(("_cupsSNMPOIDToString(src=%p, dst=%p, dstsize=" CUPS_LLFMT ")\n",
+                src, dst, CUPS_LLCAST dstsize));
+
+ /*
+  * Range check input...
+  */
+
+  if (!src || !dst || dstsize < 4)
+    return (NULL);
+
+ /*
+  * Loop through the OID array and build a string...
+  */
+
+  for (dstptr = dst, dstend = dstptr + dstsize - 1;
+       *src >= 0 && dstptr < dstend;
+       src ++, dstptr += strlen(dstptr))
+    snprintf(dstptr, dstend - dstptr + 1, ".%d", *src);
+
+  if (*src >= 0)
+    return (NULL);
+  else
+    return (dst);
+}
+
+
+/*
  * '_cupsSNMPOpen()' - Open a SNMP socket.
  *
  * @since CUPS 1.4@
@@ -482,6 +526,76 @@ _cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
   DEBUG_printf(("_cupsSNMPSetDebug(level=%d)\n", level));
 
   cg->snmp_debug = level;
+}
+
+
+/*
+ * '_cupsSNMPStringToOID()' - Convert a numeric OID string to an OID array.
+ *
+ * This function converts a string of the form ".N.N.N.N.N" to the
+ * corresponding OID array terminated by -1.
+ *
+ * @code NULL@ is returned if the array is not large enough or the string is
+ * not a valid OID number.
+ *
+ * @since CUPS 1.4@
+ */
+
+int *					/* O - Pointer to OID array or @code NULL@ on error */
+_cupsSNMPStringToOID(const char *src,	/* I - OID string */
+                     int        *dst,	/* I - OID array */
+		     int        dstsize)/* I - Number of integers in OID array */
+{
+  int	*dstptr,			/* Pointer into OID array */
+	*dstend;			/* End of OID array */
+
+
+  DEBUG_printf(("_cupsSNMPStringToOID(src=\"%s\", dst=%p, dstsize=%d)\n",
+                src, dst, dstsize));
+
+ /*
+  * Range check input...
+  */
+
+  if (!src || !dst || dstsize < 2)
+    return (NULL);
+
+ /*
+  * Skip leading "."...
+  */
+
+  if (*src == '.')
+    src ++;
+
+ /*
+  * Loop to the end of the string...
+  */
+
+  for (dstend = dst + dstsize - 1, dstptr = dst, *dstptr = 0;
+       *src && dstptr < dstend;
+       src ++)
+  {
+    if (*src == '.')
+    {
+      dstptr ++;
+      *dstptr = 0;
+    }
+    else if (isdigit(*src & 255))
+      *dstptr = *dstptr * 10 + *src - '0';
+    else
+      break;
+  }
+
+  if (*src)
+    return (NULL);
+
+ /*
+  * Terminate the end of the OID array and return...
+  */
+
+  dstptr[1] = -1;
+
+  return (dst);
 }
 
 
