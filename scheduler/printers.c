@@ -1236,6 +1236,23 @@ cupsdLoadAllPrinters(void)
 	break;
       }
     }
+    else if (!strcasecmp(line, "Attribute") && value)
+    {
+      for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+
+      if (!*valueptr)
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+      else
+      {
+        for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
+
+        cupsdSetPrinterAttr(p, value, valueptr);
+
+	if (!strncmp(value, "marker-", 7))
+	  p->marker_time = time(NULL);
+      }
+    }
     else
     {
      /*
@@ -1320,6 +1337,7 @@ cupsdSaveAllPrinters(void)
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
   const char		*ptr;		/* Pointer into info/location */
+  ipp_attribute_t	*marker;	/* Current marker attribute */
 
 
  /*
@@ -1482,6 +1500,46 @@ cupsdSaveAllPrinters(void)
          i > 0;
 	 i --, option ++)
       cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+
+    if ((marker = ippFindAttribute(printer->attrs, "marker-colors",
+                                   IPP_TAG_NAME)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
+                     marker->values[0].string.text);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePuts(fp, "\n");
+    }
+
+    if ((marker = ippFindAttribute(printer->attrs, "marker-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %d", marker->name,
+                     marker->values[0].integer);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%d", marker->values[i].integer);
+      cupsFilePuts(fp, "\n");
+    }
+
+    if ((marker = ippFindAttribute(printer->attrs, "marker-names",
+                                   IPP_TAG_NAME)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
+                     marker->values[0].string.text);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePuts(fp, "\n");
+    }
+
+    if ((marker = ippFindAttribute(printer->attrs, "marker-types",
+                                   IPP_TAG_KEYWORD)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
+                     marker->values[0].string.text);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePuts(fp, "\n");
+    }
 
     cupsFilePuts(fp, "</Printer>\n");
 
@@ -1762,6 +1820,8 @@ cupsdSetPrinterAttr(
         value = ptr;
     }
   }
+
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 }
 
 
