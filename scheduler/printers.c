@@ -2705,7 +2705,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     ippDelete(oldattrs);
   }
 
-
  /*
   * Force sharing off for remote queues...
   */
