@@ -1247,6 +1247,9 @@ cupsdLoadAllPrinters(void)
       {
         for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
 
+        if (!p->attrs)
+	  cupsdSetPrinterAttrs(p);
+
         cupsdSetPrinterAttr(p, value, valueptr);
 
 	if (!strncmp(value, "marker-", 7))
@@ -1850,6 +1853,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		*media_quality,		/* EFMediaQualityMode options */
 		*duplex;		/* Duplex options */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
+  ipp_t		*oldattrs;		/* Old printer attributes */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
@@ -1971,9 +1975,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   * Create the required IPP attributes for a printer...
   */
 
-  if (p->attrs)
-    ippDelete(p->attrs);
-
+  oldattrs = p->attrs;
   p->attrs = ippNew();
 
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -2639,6 +2641,70 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                     "finishings-default", IPP_FINISHINGS_NONE);
     }
   }
+
+ /*
+  * Copy marker attributes as needed...
+  */
+
+  if (oldattrs)
+  {
+    ipp_attribute_t *oldattr;		/* Old attribute */
+
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-colors",
+                                    IPP_TAG_NAME)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                                "marker-colors", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-names",
+                                    IPP_TAG_NAME)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                                "marker-names", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-types",
+                                    IPP_TAG_KEYWORD)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                                "marker-types", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    ippDelete(oldattrs);
+  }
+
 
  /*
   * Force sharing off for remote queues...
