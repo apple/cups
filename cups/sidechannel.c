@@ -257,10 +257,10 @@ cupsSideChannelRead(
  * supported and must be converted to their numeric forms.
  *
  * On input, "data" and "datalen" provide the location and size of the
- * buffer to hold the OID value. For number OIDs, the returned data holds
- * the value converted to a string, otherwise the data buffer holds the raw
- * data with a trailing nul appended.  The returned "datalen" value does not
- * include the trailing nul.
+ * buffer to hold the OID value as a string. HEX-String (binary) values are
+ * converted to hexadecimal strings representing the binary data, while
+ * NULL-Value and unknown OID types are returned as the empty string.
+ * The returned "datalen" does not include the trailing nul.
  *
  * @code CUPS_SC_STATUS_NOT_IMPLEMENTED@ is returned by backends that do not
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
@@ -349,15 +349,10 @@ cupsSideChannelSNMPGet(
  * time will depend on the number of OID values found and the time required
  * for each query.
  *
- * "data" and "datalen" provide the location and size of the buffer to hold
- * the OID values. "cb" provides a function to call for every value that is
- * found. "context" is an application-defined pointer that is sent to the
- * callback function along with the OID and current data.
- *
- * For number OIDs, the data passed to the callback function holds the value
- * converted to a string, otherwise the data buffer holds the raw data with a
- * trailing nul appended.  The passed "datalen" value does not include the
- * trailing nul.
+ * "cb" provides a function to call for every value that is found. "context"
+ * is an application-defined pointer that is sent to the callback function
+ * along with the OID and current data. The data passed to the callback is the
+ * same as returned by @link cupsSideChannelSNMPGet@.
  *
  * @code CUPS_SC_STATUS_NOT_IMPLEMENTED@ is returned by backends that do not
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
