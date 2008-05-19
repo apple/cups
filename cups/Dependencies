@@ -114,6 +114,8 @@ testi18n.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testi18n.o: ../config.h
 testipp.o: ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
 testipp.o: versioning.h
+testoptions.o: string.h ../config.h cups.h ipp.h http.h versioning.h ppd.h
+testoptions.o: array.h file.h language.h
 testlang.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.o: ../config.h
 testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
@@ -235,6 +237,8 @@ testi18n.32.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h st
 testi18n.32.o: testi18n.c  ../config.h
 testipp.32.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
 testipp.32.o: testipp.c  versioning.h
+testoptions.32.o: testoptions.c  string.h ../config.h cups.h ipp.h http.h versioning.h ppd.h
+testoptions.32.o: testoptions.c  array.h file.h language.h
 testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.32.o: testlang.c  ../config.h
 testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
@@ -356,6 +360,8 @@ testi18n.64.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h st
 testi18n.64.o: testi18n.c  ../config.h
 testipp.64.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
 testipp.64.o: testipp.c  versioning.h
+testoptions.64.o: testoptions.c  string.h ../config.h cups.h ipp.h http.h versioning.h ppd.h
+testoptions.64.o: testoptions.c  array.h file.h language.h
 testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.64.o: testlang.c  ../config.h
 testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
