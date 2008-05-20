@@ -23,6 +23,7 @@
 //
 
 #include "ppdc.h"
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -50,23 +51,28 @@ main(int  argc,				// I - Number of command-line arguments
   cups_file_t		*fp;		// PPD file
   char			*opt,		// Current option
 			*value,		// Value in option
+			*outname,	// Output filename
 			pcfilename[1024],
 					// Lowercase pcfilename
 			filename[1024];	// PPD filename
-  int			verbose;	// Verbosity
-  ppdcArray		*locales;	// List of locales
-  int			comp;		// Compress
+  int			comp,		// Compress
+			do_test,	// Test PPD files
+			use_model_name,	// Use ModelName for filename
+			verbose;	// Verbosity
   ppdcLineEnding	le;		// Line ending to use
+  ppdcArray		*locales;	// List of locales
 
 
   // Scan the command-line...
-  catalog = NULL;
-  outdir  = "ppd";
-  src     = new ppdcSource();
-  verbose = 0;
-  locales = NULL;
-  comp    = 0;
-  le      = PPDC_LFONLY;
+  catalog        = NULL;
+  comp           = 0;
+  do_test        = 0;
+  le             = PPDC_LFONLY;
+  locales        = NULL;
+  outdir         = "ppd";
+  src            = new ppdcSource();
+  use_model_name = 0;
+  verbose        = 0;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -74,6 +80,32 @@ main(int  argc,				// I - Number of command-line arguments
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
+          case 'D' :			// Define variable
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+              if ((value = strchr(argv[i], '=')) != NULL)
+	      {
+	        *value++ = '\0';
+
+	        src->set_variable(argv[i], value);
+	      }
+	      else
+	        src->set_variable(argv[i], "1");
+              break;
+
+          case 'I' :			// Include directory...
+	      i ++;
+	      if (i >= argc)
+        	usage();
+
+              if (verbose > 1)
+	        printf("ppdc: Adding include directory \"%s\"...\n", argv[i]);
+
+	      ppdcSource::add_include(argv[i]);
+	      break;
+
 	  case 'c' :			// Message catalog...
 	      i ++;
               if (i >= argc)
@@ -154,30 +186,12 @@ main(int  argc,				// I - Number of command-line arguments
 	      }
 	      break;
 
-          case 'D' :			// Define variable
-	      i ++;
-	      if (i >= argc)
-	        usage();
+          case 'm' :			// Use ModelName for filename
+	      use_model_name = 1;
+	      break;
 
-              if ((value = strchr(argv[i], '=')) != NULL)
-	      {
-	        *value++ = '\0';
-
-	        src->set_variable(argv[i], value);
-	      }
-	      else
-	        src->set_variable(argv[i], "1");
-              break;
-
-          case 'I' :			// Include directory...
-	      i ++;
-	      if (i >= argc)
-        	usage();
-
-              if (verbose > 1)
-	        printf("ppdc: Adding include directory \"%s\"...\n", argv[i]);
-
-	      ppdcSource::add_include(argv[i]);
+          case 't' :			// Test PPDs instead of generating them
+	      do_test = 1;
 	      break;
 
           case 'v' :			// Be verbose...
@@ -241,39 +255,92 @@ main(int  argc,				// I - Number of command-line arguments
          d;
 	 d = (ppdcDriver *)src->drivers->next())
     {
-      // Write the PPD file for this driver...
-      if (strstr(d->pc_file_name->value, ".PPD"))
+      if (do_test)
       {
-	// Convert PCFileName to lowercase...
-	for (j = 0;
-	     d->pc_file_name->value[j] && j < (int)(sizeof(pcfilename) - 1);
-	     j ++)
-	  pcfilename[j] = tolower(d->pc_file_name->value[j]);
+        // Test the PPD file for this driver...
+	int	pid,			// Process ID
+		fds[2];			// Pipe file descriptors
 
-	pcfilename[j] = '\0';
+
+        if (pipe(fds))
+	{
+	  fprintf(stderr, "ppdc: Unable to create output pipes: %s\n",
+	          strerror(errno));
+	  return (1);
+	}
+
+	if ((pid = fork()) == 0)
+	{
+	  // Child process comes here...
+	  close(0);
+	  dup(fds[0]);
+
+	  close(fds[0]);
+	  close(fds[1]);
+
+	  execlp("cupstestppd", "cupstestppd", "-", (char *)0);
+
+	  fprintf(stderr, "ppdc: Unable to execute cupstestppd: %s\n",
+	          strerror(errno));
+	  return (errno);
+	}
+	else if (pid < 0)
+	{
+	  fprintf(stderr, "ppdc: Unable to execute cupstestppd: %s\n",
+	          strerror(errno));
+	  return (errno);
+	}
+
+	close(fds[0]);
+	fp = cupsFileOpenFd(fds[1], "w");
       }
       else
       {
-	// Leave PCFileName as-is...
-	strlcpy(pcfilename, d->pc_file_name->value, sizeof(pcfilename));
+	// Write the PPD file for this driver...
+	if (use_model_name)
+	  outname = d->model_name->value;
+	else if (d->file_name)
+	  outname = d->file_name->value;
+	else
+	  outname = d->pc_file_name->value;
+
+	if (strstr(outname, ".PPD"))
+	{
+	  // Convert PCFileName to lowercase...
+	  for (j = 0;
+	       outname[j] && j < (int)(sizeof(pcfilename) - 1);
+	       j ++)
+	    pcfilename[j] = tolower(outname[j] & 255);
+
+	  pcfilename[j] = '\0';
+	}
+	else
+	{
+	  // Leave PCFileName as-is...
+	  strlcpy(pcfilename, outname, sizeof(pcfilename));
+	}
+
+	// Open the PPD file for writing...
+	if (comp)
+	  snprintf(filename, sizeof(filename), "%s/%s.gz", outdir, pcfilename);
+	else
+	  snprintf(filename, sizeof(filename), "%s/%s", outdir, pcfilename);
+
+	fp = cupsFileOpen(filename, comp ? "w9" : "w");
+	if (!fp)
+	{
+	  fprintf(stderr, "ppdc: Unable to create PPD file \"%s\" - %s.\n",
+		  filename, strerror(errno));
+	  return (1);
+	}
+
+	if (verbose)
+	  printf("ppdc: Writing %s...\n", filename);
       }
 
-      // Open the PPD file for writing...
-      if (comp)
-	snprintf(filename, sizeof(filename), "%s/%s.gz", outdir, pcfilename);
-      else
-	snprintf(filename, sizeof(filename), "%s/%s", outdir, pcfilename);
-
-      fp = cupsFileOpen(filename, comp ? "w9" : "w");
-      if (!fp)
-      {
-	fprintf(stderr, "ppdc: Unable to create PPD file \"%s\" - %s.\n",
-		filename, strerror(errno));
-	return (1);
-      }
-
-      if (verbose)
-	printf("ppdc: Writing %s...\n", filename);
+     /*
+      * Write the PPD file...
+      */
 
       if (d->write_ppd_file(fp, catalog, locales, src, le))
       {
@@ -313,6 +380,8 @@ usage(void)
   puts("  -c catalog.po        Load the specified message catalog.");
   puts("  -d output-dir        Specify the output directory.");
   puts("  -l lang[,lang,...]   Specify the output language(s) (locale).");
+  puts("  -m                   Use the ModelName value as the filename.");
+  puts("  -t                   Test PPDs instead of generating them.");
   puts("  -v                   Be verbose (more v's for more verbosity).");
   puts("  -z                   Compress PPD files using GNU zip.");
   puts("  --cr                 End lines with CR (Mac OS 9).");

@@ -3,6 +3,12 @@ CHANGES.txt - 2008-05-19
 
 CHANGES IN CUPS V1.4b1
 
+	- The ppdc utility now supports a "-t" option to test PPD
+	  files (STR #2739)
+	- The ppdc utility now supports a "-m" option to use the
+	  ModelName value as the output filename.
+	- The ppdc utility now supports a FileName directive to
+	  set an alternate output filename (STR #2740)
 	- The side-channel API now supports SNMP queries for the
 	  standard network backends.
 	- Added a PageLogFormat directive to the cupsd.conf file to

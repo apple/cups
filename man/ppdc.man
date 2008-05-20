@@ -3,7 +3,7 @@
 .\"
 .\"   ppdc man page for the CUPS Driver Development Kit.
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdc 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.TH ppdc 1 "CUPS Driver Development Kit" "19 May 2008" "Apple Inc."
 .SH NAME
 ppdc \- cups ppd compiler
 .SH SYNOPSIS
@@ -27,7 +27,7 @@ ppdc \- cups ppd compiler
 .I output-directory
 ] [ -l
 .I language(s)
-] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
+] [-m] [-t] [ -v ] [ -z ] [ --cr ] [ --crlf ] [ --lf ]
 .I source-file
 .SH DESCRIPTION
 \fIppdc\fR compiles PPDC source files into one or more PPD
@@ -54,6 +54,12 @@ localizing the PPD file(s). The default language is "en"
 files with German, UK English, Spanish (Spain, Mexico, and US),
 French (France and Canada), and Italian languages in each file.
 .PP
+The \fI-m\fR option specifies that the output filename should be
+based on the ModelName value instead of FileName or PCFilenName.
+.PP
+The \fI-t\fR option specifies that PPD files should be tested instead
+of generated.
+.PP
 The \fI-v\fR option provides more verbose output, basically a
 running status of which files are being loaded or written.
 .PP
@@ -64,10 +70,10 @@ The \fI--cr\fR, \fI--crlf\fR, and \fI--lf\fR options specify the
 line ending to use - carriage return, carriage return and line feed,
 or line feed. The default is to use the line feed character alone.
 .SH SEE ALSO
-cupsprofile(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5),
-CUPS Driver Developer Kit Manual
+ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5),
+http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id: ppdc.man 343 2007-07-13 19:52:48Z mike $".
 .\"

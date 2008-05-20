@@ -250,10 +250,10 @@ main(int  argc,				/* I - Number of command-line args */
         * Read from stdin...
 	*/
 
-        if (verbose >= 0)
-          printf("(stdin):");
-
         ppd = ppdOpen(stdin);
+
+        if (verbose >= 0)
+          printf("%s:", (ppd && ppd->pcfilename) ? ppd->pcfilename : "(stdin)");
       }
       else
       {

@@ -2575,7 +2575,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
       if (get_token(fp, name, sizeof(name)) == NULL)
       {
-        fprintf(stderr, "ppdc: Expected name after MediaSize on line %d of %s!\n",
+        fprintf(stderr,
+	        "ppdc: Expected name after MediaSize on line %d of %s!\n",
 	        fp->line, fp->filename);
 	break;
       }
@@ -2656,15 +2657,32 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       if (!o)
         break;
     }
-    else if (!strcasecmp(temp, "PCFileName"))
+    else if (!strcasecmp(temp, "FileName"))
     {
-      // PCFileName name
-      char	name[256];		// Model name string
+      // FileName name
+      char	name[256];		// Filename string
 
 
       if (!get_token(fp, name, sizeof(name)))
       {
-        fprintf(stderr, "ppdc: Expected name after PCFileName on line %d of %s!\n",
+        fprintf(stderr,
+	        "ppdc: Expected name after FileName on line %d of %s!\n",
+	        fp->line, fp->filename);
+	break;
+      }
+
+      d->set_file_name(name);
+    }
+    else if (!strcasecmp(temp, "PCFileName"))
+    {
+      // PCFileName name
+      char	name[256];		// PC filename string
+
+
+      if (!get_token(fp, name, sizeof(name)))
+      {
+        fprintf(stderr,
+	        "ppdc: Expected name after PCFileName on line %d of %s!\n",
 	        fp->line, fp->filename);
 	break;
       }
@@ -2682,7 +2700,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       if ((o = d->find_option("Resolution")) == NULL)
       {
 	// Create the Resolution option...
-	o = new ppdcOption(PPDC_PICKONE, "Resolution", NULL, PPDC_SECTION_ANY, 10.0f);
+	o = new ppdcOption(PPDC_PICKONE, "Resolution", NULL, PPDC_SECTION_ANY,
+	                   10.0f);
 	g = general;
 	g->add_option(o);
       }
@@ -2733,7 +2752,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
       if (!get_token(fp, name, sizeof(name)))
       {
-        fprintf(stderr, "ppdc: Expected string after Version on line %d of %s!\n",
+        fprintf(stderr,
+	        "ppdc: Expected string after Version on line %d of %s!\n",
 	        fp->line, fp->filename);
 	break;
       }
@@ -2871,6 +2891,8 @@ ppdcSource::write_file(const char *f)	// I - File to write
       quotef(fp, "  Manufacturer \"%s\"\n", d->manufacturer->value);
     if (d->model_name->value)
       quotef(fp, "  ModelName \"%s\"\n", d->model_name->value);
+    if (d->file_name->value)
+      quotef(fp, "  FileName \"%s\"\n", d->file_name->value);
     if (d->pc_file_name->value)
       quotef(fp, "  PCFileName \"%s\"\n", d->pc_file_name->value);
     if (d->version->value)

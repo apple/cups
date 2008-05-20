@@ -3,7 +3,7 @@
 //
 //   Definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -323,6 +323,7 @@ class ppdcDriver			//// Printer Driver Data
   ppdcArray	*copyright;		// Copyright strings
   ppdcString	*manufacturer,		// Manufacturer
 		*model_name,		// Name of printer model
+		*file_name,		// Output filename for PPD
 		*pc_file_name,		// 8 character PC filename for PPD
 		*version;		// Version number
   int		model_number,		// Model number for driver
@@ -370,6 +371,7 @@ class ppdcDriver			//// Printer Driver Data
   void		set_custom_size_code(const char *c);
   void		set_default_font(ppdcFont *f);
   void		set_default_size(ppdcMediaSize *m);
+  void		set_file_name(const char *f);
   void		set_manufacturer(const char *m);
   void		set_model_name(const char *m);
   void		set_pc_file_name(const char *f);
