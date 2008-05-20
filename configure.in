@@ -68,7 +68,7 @@ AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
 	  init/org.cups.cups-lpd.plist
 	  man/client.conf.man man/cups-deviced.man man/cups-driverd.man
 	  man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
-	  man/cupsd.conf.man man/lpoptions.man
+	  man/cupsd.conf.man man/drv.man man/lpoptions.man
 	  templates/header.tmpl
 	  $LANGFILES)
 

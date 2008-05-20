@@ -1,7 +1,7 @@
 .\"
-.\" "$Id: ppdpo.man 343 2007-07-13 19:52:48Z mike $"
+.\" "$Id$"
 .\"
-.\"   ppdpo man page for the CUPS Driver Development Kit.
+.\"   ppdpo man page for the Common UNIX Printing System.
 .\"
 .\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdpo 1 "Common UNIX Printing System" "27 March 2008" "Apple Inc."
+.TH ppdpo 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
 .SH NAME
 ppdpo \- ppd message catalog generator
 .SH SYNOPSIS
@@ -36,10 +36,11 @@ The \fI-o\fR option specifies the output file. The supported extensions are
 ".po" or ".po.gz" for GNU gettext format message catalogs and ".strings" for
 Mac OS X strings files.
 .SH SEE ALSO
-ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5),
+ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdcfile(5)
+.br
 http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id: ppdpo.man 343 2007-07-13 19:52:48Z mike $".
+.\" End of "$Id$".
 .\"

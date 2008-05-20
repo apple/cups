@@ -1,0 +1,40 @@
+.\"
+.\" "$Id$"
+.\"
+.\"   drv man page for the Common UNIX Printing System.
+.\"
+.\"   Copyright 2008 by Apple Inc.
+.\"
+.\"   These coded instructions, statements, and computer programs are the
+.\"   property of Apple Inc. and are protected by Federal copyright
+.\"   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+.\"   which should have been included with this file.  If this file is
+.\"   file is missing or damaged, see the license at "http://www.cups.org/".
+.\"
+.TH ppdc 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.SH NAME
+drv \- cups driver interface for ppd compiler files
+.SH SYNOPSIS
+.B drv list
+.br
+.B drv cat
+.I drv:///filename.drv/pcfilename
+.SH DESCRIPTION
+\fIdrv\fR lists and compiles PPDC source files installed in the
+@CUPS_DATADIR@/drv and (on Mac OS X) /Library/Printers/PPDs.drv
+directories on behalf of the scheduler, \fIcupsd(8)\fR.
+.PP
+The first form of the command lists all of the PPD files that can be produced
+by the driver information files in the two directories.
+.PP
+The second form of the command compiles the requested PPD and sends it to the
+standard output.
+.SH SEE ALSO
+ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
+.br
+http://localhost:631/help
+.SH COPYRIGHT
+Copyright 2008 by Apple Inc.
+.\"
+.\" End of "$Id$".
+.\"

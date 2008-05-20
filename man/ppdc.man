@@ -1,7 +1,7 @@
 .\"
-.\" "$Id: ppdc.man 343 2007-07-13 19:52:48Z mike $"
+.\" "$Id$"
 .\"
-.\"   ppdc man page for the CUPS Driver Development Kit.
+.\"   ppdc man page for the Common UNIX Printing System.
 .\"
 .\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdc 1 "CUPS Driver Development Kit" "19 May 2008" "Apple Inc."
+.TH ppdc 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
 .SH NAME
 ppdc \- cups ppd compiler
 .SH SYNOPSIS
@@ -70,10 +70,11 @@ The \fI--cr\fR, \fI--crlf\fR, and \fI--lf\fR options specify the
 line ending to use - carriage return, carriage return and line feed,
 or line feed. The default is to use the line feed character alone.
 .SH SEE ALSO
-ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5),
+ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
+.br
 http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id: ppdc.man 343 2007-07-13 19:52:48Z mike $".
+.\" End of "$Id$".
 .\"

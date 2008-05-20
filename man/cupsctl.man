@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsctl.man 5969 2006-09-19 20:09:24Z mike $"
+.\" "$Id$"
 .\"
 .\"   cupsctl man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -101,5 +101,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007 by Apple Inc.
 .\"
-.\" End of "$Id: cupsctl.man 5969 2006-09-19 20:09:24Z mike $".
+.\" End of "$Id$".
 .\"
