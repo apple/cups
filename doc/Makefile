@@ -73,6 +73,7 @@ HELPFILES	=	\
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
+			help/man-drv.html \
 			help/man-filter.html \
 			help/man-lp.html \
 			help/man-lpadmin.html \
@@ -99,6 +100,7 @@ HELPFILES	=	\
 			help/ref-error_log.html \
 			help/ref-mailto-conf.html \
 			help/ref-page_log.html \
+			help/ref-ppdcfile.html \
 			help/ref-printers-conf.html \
 			help/ref-snmp-conf.html \
 			help/ref-subscriptions-conf.html \
