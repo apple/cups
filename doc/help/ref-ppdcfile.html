@@ -31,50 +31,39 @@ mechanisms.</p>
 	(01234), or hexidecimal number (0x1234) using the same rules as C and
 	C++.</dd>
 
-	<dt>"string"</dt>
-
-	<dd>Evaluates to the specified string using the same rules as C and
-	C++ for character escapes.</dd>
-
 	<dt>(NAME NAME ... number number ...)</dt>
 	<dd>Evaluates to the bitwise OR of each named #define constant or
 	number.</dd>
 
-	<dt>(NAME == "string")</dt>
 	<dt>(NAME == OTHERNAME)</dt>
 	<dt>(NAME == number)</dt>
-	<dd>Evaluates to 1 if NAME is equal to the string, other named
-	constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is equal to the other named constant or
+	number, otherwise 0.</dd>
 
-	<dt>(NAME != "string")</dt>
 	<dt>(NAME != OTHERNAME)</dt>
 	<dt>(NAME != number)</dt>
-	<dd>Evaluates to 1 if NAME is not equal to the string, other named
-	constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is not equal to the other named constant or
+	number, otherwise 0.</dd>
 
-	<dt>(NAME &lt; "string")</dt>
 	<dt>(NAME &lt; OTHERNAME)</dt>
 	<dt>(NAME &lt; number)</dt>
-	<dd>Evaluates to 1 if NAME is less than to the string, other named
-	constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is less than to the other named constant or
+	number, otherwise 0.</dd>
 
-	<dt>(NAME &lt;= "string")</dt>
 	<dt>(NAME &lt;= OTHERNAME)</dt>
 	<dt>(NAME &lt;= number)</dt>
-	<dd>Evaluates to 1 if NAME is less than or equal to the string, other
-	named constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is less than or equal to the other named
+	constant or number, otherwise 0.</dd>
 
-	<dt>(NAME &gt; "string")</dt>
 	<dt>(NAME &gt; OTHERNAME)</dt>
 	<dt>(NAME &gt; number)</dt>
-	<dd>Evaluates to 1 if NAME is greater than to the string, other named
-	constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is greater than to the other named constant
+	or number, otherwise 0.</dd>
 
-	<dt>(NAME &gt;= "string")</dt>
 	<dt>(NAME &gt;= OTHERNAME)</dt>
 	<dt>(NAME &gt;= number)</dt>
-	<dd>Evaluates to 1 if NAME is greater than or equal to the string, other
-	named constant, or number, otherwise 0.</dd>
+	<dd>Evaluates to 1 if NAME is greater than or equal to the other named
+	constant or number, otherwise 0.</dd>
 
 </dl>
 
@@ -290,7 +279,7 @@ defining the standard raster fonts in the
 <p>The <code>#if</code> directive allows portions of a driver information file
 to be used conditionally. When followed by a name, the data that follows is
 used only when the name is defined, otherwise the data is ignored.
-<code>#if</code> directives can be nested to any depth.</p>
+<code>#if</code> directives can be nested up to 100 times.</p>
 
 <h3>See Also</h3>
 
@@ -1480,7 +1469,7 @@ automatically for you. The maximum length of the name string is
 <h3>Syntax</h3>
 
 <pre>
-ModelNumber <i>number</i>
+ModelNumber <i>expression</i>
 </pre>
 
 <h3>Examples</h3>

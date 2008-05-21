@@ -93,12 +93,15 @@ const char	*ppdcSource::driver_types[] =
 
 ppdcSource::ppdcSource(const char *f)	// I - File to read
 {
-  filename   = new ppdcString(f);
-  base_fonts = new ppdcArray();
-  drivers    = new ppdcArray();
-  po_files   = new ppdcArray();
-  sizes      = new ppdcArray();
-  vars       = new ppdcArray();
+  filename      = new ppdcString(f);
+  base_fonts    = new ppdcArray();
+  drivers       = new ppdcArray();
+  po_files      = new ppdcArray();
+  sizes         = new ppdcArray();
+  vars          = new ppdcArray();
+  cond_state    = PPDC_COND_NORMAL;
+  cond_current  = cond_stack;
+  cond_stack[0] = PPDC_COND_NORMAL;
 
   if (f)
     read_file(f);
@@ -778,6 +781,9 @@ ppdcSource::get_duplex(ppdcFile   *fp,	// I - File to read from
     return;
   }
 
+  if (cond_state)
+    return;
+
   if (!strcasecmp(temp, "none") || !strcasecmp(temp, "false") ||
       !strcasecmp(temp, "no") || !strcasecmp(temp, "off"))
   {
@@ -1130,7 +1136,6 @@ ppdcSource::get_group(ppdcFile   *fp,	// I - File to read
   {
     // Nope, add a new one...
     g = new ppdcGroup(name, text);
-    d->add_group(g);
   }
 
   return (g);
@@ -1180,19 +1185,31 @@ ppdcSource::get_installable(ppdcFile *fp)
 // 'ppdcSource::get_integer()' - Get an integer value from a string.
 //
 
+#define PPDC_XX	-1			// Bad
+#define PPDC_EQ	0			// ==
+#define PPDC_NE	1			// !=
+#define PPDC_LT	2			// <
+#define PPDC_LE	3			// <=
+#define PPDC_GT	4			// >
+#define PPDC_GE	5			// >=
+
 int					// O - Integer value
 ppdcSource::get_integer(const char *v)	// I - Value string
 {
-  long	val;				// Value
-  long	temp;				// Temporary value
-  char	*newv;				// New value string pointer
+  long		val;			// Value
+  long		temp,			// Temporary value
+		temp2;			// Second temporary value
+  char		*newv,			// New value string pointer
+		ch;			// Temporary character
+  ppdcVariable	*var;			// #define variable
+  int		compop;			// Comparison operator
 
 
   // Parse the value string...
   if (!v)
     return (-1);
 
-  if (isdigit(*v) || *v == '-' || *v == '+')
+  if (isdigit(*v & 255) || *v == '-' || *v == '+')
   {
     // Return a simple integer value
     val = strtol(v, (char **)&v, 0);
@@ -1203,29 +1220,187 @@ ppdcSource::get_integer(const char *v)	// I - Value string
   }
   else if (*v == '(')
   {
-    // Return the bitwise OR of each integer in parenthesis...
+    // Evaluate and expression in any of the following formats:
+    //
+    // (number number ... number)   Bitwise OR of all numbers
+    // (NAME == value)              1 if equal, 0 otherwise
+    // (NAME != value)              1 if not equal, 0 otherwise
+    // (NAME < value)               1 if less than, 0 otherwise
+    // (NAME <= value)              1 if less than or equal, 0 otherwise
+    // (NAME > value)               1 if greater than, 0 otherwise
+    // (NAME >= value)              1 if greater than or equal, 0 otherwise
+
     v ++;
     val = 0;
 
     while (*v && *v != ')')
     {
-      temp = strtol(v, &newv, 0);
+      // Skip leading whitespace...
+      while (*v && isspace(*v & 255));
+        v ++;
 
-      if (!*newv || newv == v || !(isspace(*newv) || *newv == ')') ||
-          temp == LONG_MIN)
-        return (-1);
+      if (!*v || *v == ')')
+        break;
+
+      if (isdigit(*v & 255) || *v == '-' || *v == '+')
+      {
+        // Bitwise OR a number...
+	temp = strtol(v, &newv, 0);
+
+	if (!*newv || newv == v || !(isspace(*newv) || *newv == ')') ||
+	    temp == LONG_MIN)
+	  return (-1);
+      }
+      else
+      {
+        // NAME logicop value
+	for (newv = (char *)v + 1;
+	     *newv && (isalnum(*newv & 255) || *newv == '_');
+	     newv ++);
+
+        ch    = *newv;
+	*newv = '\0';
+
+        if ((var = find_variable(v)) != NULL)
+	{
+	  if (!var->value || !var->value->value || !var->value->value[0])
+	    temp = 0;
+	  else if (isdigit(var->value->value[0] & 255) ||
+	           var->value->value[0] == '-' ||
+	           var->value->value[0] == '+')
+            temp = strtol(var->value->value, NULL, 0);
+	  else
+	    temp = 1;
+	}
+	else
+	  temp = 0;
+
+        *newv = ch;
+	while (isspace(*newv & 255))
+	  newv ++;
+
+        if (strncmp(newv, "==", 2))
+	{
+	  compop = PPDC_EQ;
+	  newv += 2;
+	}
+        else if (strncmp(newv, "!=", 2))
+        {
+	  compop = PPDC_NE;
+	  newv += 2;
+	}
+        else if (strncmp(newv, "<=", 2))
+        {
+	  compop = PPDC_LE;
+	  newv += 2;
+	}
+	else if (*newv == '<')
+        {
+	  compop = PPDC_LT;
+	  newv ++;
+	}
+        else if (strncmp(newv, ">=", 2))
+        {
+	  compop = PPDC_GE;
+	  newv += 2;
+	}
+	else if (*newv == '>')
+	{
+	  compop = PPDC_GT;
+	  newv ++;
+	}
+	else
+	  compop = PPDC_XX;
+
+        if (compop != PPDC_XX)
+	{
+	  while (isspace(*newv & 255))
+	    newv ++;
+
+          if (*newv == ')' || !*newv)
+	    return (-1);
+
+	  if (isdigit(*v & 255) || *v == '-' || *v == '+')
+	  {
+	    // Get the second number...
+	    temp2 = strtol(newv, &newv, 0);
+	    if (!*newv || newv == v || !(isspace(*newv) || *newv == ')') ||
+		temp == LONG_MIN)
+	      return (-1);
+          }
+	  else
+	  {
+	    // Lookup the second name...
+	    for (v = newv, newv ++;
+		 *newv && (isalnum(*newv & 255) || *newv == '_');
+		 newv ++);
+
+	    ch    = *newv;
+	    *newv = '\0';
+
+	    if ((var = find_variable(v)) != NULL)
+	    {
+	      if (!var->value || !var->value->value || !var->value->value[0])
+		temp2 = 0;
+	      else if (isdigit(var->value->value[0] & 255) ||
+		       var->value->value[0] == '-' ||
+		       var->value->value[0] == '+')
+		temp2 = strtol(var->value->value, NULL, 0);
+	      else
+		temp2 = 1;
+	    }
+	    else
+	      temp2 = 0;
+
+	    *newv = ch;
+          }
+
+	  // Do the comparison...
+	  switch (compop)
+	  {
+	    case PPDC_EQ :
+	        temp = temp == temp2;
+		break;
+	    case PPDC_NE :
+	        temp = temp != temp2;
+		break;
+	    case PPDC_LT :
+	        temp = temp < temp2;
+		break;
+	    case PPDC_LE :
+	        temp = temp <= temp2;
+		break;
+	    case PPDC_GT :
+	        temp = temp > temp2;
+		break;
+	    case PPDC_GE :
+	        temp = temp >= temp2;
+		break;
+	  }
+	}
+      }
 
       val |= temp;
       v   = newv;
     }
 
-    if (*v == ')')
+    if (*v == ')' && !v[1])
       return ((int)val);
     else
       return (-1);
   }
+  else if ((var = find_variable(v)) != NULL)
+  {
+    // NAME by itself returns 1 if the #define variable is not blank and
+    // not "0"...
+    return (var->value->value && var->value->value[0] &&
+            strcmp(var->value->value, "0"));
+  }
   else
+  {
+    // Anything else is an error...
     return (-1);
+  }
 }
 
 
@@ -1374,13 +1549,13 @@ ppdcSource::get_option(ppdcFile   *fp,	// I - File to read
   {
     // Nope, add a new one...
     o = new ppdcOption(ot, name, text, section, order);
-    g->add_option(o);
   }
   else if (o->type != ot)
   {
 //    printf("o=%p, o->type=%d, o->name=%s, ot=%d, name=%s\n",
 //           o, o->type, o->name->value, ot, name);
-    fprintf(stderr, "ppdc: Option already defined with a different type on line %d of %s!\n",
+    fprintf(stderr,
+            "ppdc: Option redefined with a different type on line %d of %s!\n",
             fp->line, fp->filename);
     return (NULL);
   }
@@ -2111,6 +2286,9 @@ ppdcSource::read_file(const char *f)	// I - File to read
   ppdcFile *fp = new ppdcFile(f);
   scan_file(fp);
   delete fp;
+
+  if (cond_current != cond_stack)
+    fprintf(stderr, "ppdc: Missing #endif at end of \"%s\"!\n", f);
 }
 
 
@@ -2155,6 +2333,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
   // Loop until EOF or }
   o = 0;
   g = general;
+
   while (get_token(fp, temp, sizeof(temp)))
   {
     if (temp[0] == '*')
@@ -2183,6 +2362,113 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Open a new child...
       scan_file(fp, d);
     }
+    else if (!strcasecmp(temp, "#if"))
+    {
+      if ((cond_current - cond_stack) >= 100)
+      {
+        fprintf(stderr, "ppdc: Too many nested #if's on line %d of %s!\n",
+	        fp->line, fp->filename);
+	break;
+      }
+
+      cond_current ++;
+      if (get_integer(fp))
+        *cond_current = PPDC_COND_SATISFIED;
+      else
+      {
+        *cond_current = PPDC_COND_SKIP;
+	cond_state    |= PPDC_COND_SKIP;
+      }
+    }
+    else if (!strcasecmp(temp, "#elif"))
+    {
+      if (cond_current == cond_stack)
+      {
+        fprintf(stderr, "ppdc: Missing #if on line %d of %s!\n", fp->line,
+	        fp->filename);
+        break;
+      }
+
+      if (*cond_current & PPDC_COND_SATISFIED)
+      {
+        get_integer(fp);
+	*cond_current |= PPDC_COND_SKIP;
+      }
+      else if (get_integer(fp))
+      {
+        *cond_current |= PPDC_COND_SATISFIED;
+	*cond_current &= ~PPDC_COND_SKIP;
+      }
+      else
+        *cond_current |= PPDC_COND_SKIP;
+
+      // Update the current state
+      int *cond_temp = cond_current;	// Temporary stack pointer
+
+      cond_state = PPDC_COND_NORMAL;
+      while (cond_temp > cond_stack)
+        if (*cond_temp & PPDC_COND_SKIP)
+	{
+	  cond_state = PPDC_COND_SKIP;
+	  break;
+	}
+	else
+	  cond_temp --;
+    }
+    else if (!strcasecmp(temp, "#else"))
+    {
+      if (cond_current == cond_stack)
+      {
+        fprintf(stderr, "ppdc: Missing #if on line %d of %s!\n", fp->line,
+	        fp->filename);
+        break;
+      }
+
+      if (*cond_current & PPDC_COND_SATISFIED)
+	*cond_current |= PPDC_COND_SKIP;
+      else
+      {
+        *cond_current |= PPDC_COND_SATISFIED;
+	*cond_current &= ~PPDC_COND_SKIP;
+      }
+
+      // Update the current state
+      int *cond_temp = cond_current;	// Temporary stack pointer
+
+      cond_state = PPDC_COND_NORMAL;
+      while (cond_temp > cond_stack)
+        if (*cond_temp & PPDC_COND_SKIP)
+	{
+	  cond_state = PPDC_COND_SKIP;
+	  break;
+	}
+	else
+	  cond_temp --;
+    }
+    else if (!strcasecmp(temp, "#endif"))
+    {
+      if (cond_current == cond_stack)
+      {
+        fprintf(stderr, "ppdc: Missing #if on line %d of %s!\n", fp->line,
+	        fp->filename);
+        break;
+      }
+
+      cond_current --;
+
+      // Update the current state
+      int *cond_temp = cond_current;	// Temporary stack pointer
+
+      cond_state = PPDC_COND_NORMAL;
+      while (cond_temp > cond_stack)
+        if (*cond_temp & PPDC_COND_SKIP)
+	{
+	  cond_state = PPDC_COND_SKIP;
+	  break;
+	}
+	else
+	  cond_temp --;
+    }
     else if (!strcasecmp(temp, "#define"))
     {
       // Get the variable...
@@ -2196,6 +2482,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 		inctemp[1024],		// Initial filename
 		incname[1024];		// Include filename
       ppdcFile	*incfile;		// Include file
+      int	*old_current = cond_current;
+					// Previous current stack
 
 
       // Get the include name...
@@ -2206,13 +2494,16 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
         break;
       }
 
+      if (cond_state)
+        continue;
+
       // Figure out the current directory...
       strlcpy(basedir, fp->filename, sizeof(basedir));
 
       if ((baseptr = strrchr(basedir, '/')) != NULL)
-        *baseptr = '\0';
+	*baseptr = '\0';
       else
-        strcpy(basedir, ".");
+	strcpy(basedir, ".");
 
       // Find the include file...
       if (find_include(inctemp, basedir, incname, sizeof(incname)))
@@ -2221,13 +2512,16 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	incfile = new ppdcFile(incname);
 	scan_file(incfile, d, true);
 	delete incfile;
+
+	if (cond_current != old_current)
+	  fprintf(stderr, "ppdc: Missing #endif at end of \"%s\"!\n", incname);
       }
       else
       {
-        // Can't find it!
+	// Can't find it!
 	fprintf(stderr,
-	        "ppdc: Unable to find include file \"%s\" on line %d of %s!\n",
-	        inctemp, fp->line, fp->filename);
+		"ppdc: Unable to find include file \"%s\" on line %d of %s!\n",
+		inctemp, fp->line, fp->filename);
 	break;
       }
     }
@@ -2239,7 +2533,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Get a media size...
       m = get_size(fp);
       if (m)
-        sizes->add(m);
+      {
+        if (cond_state)
+	  m->release();
+	else
+          sizes->add(m);
+      }
     }
     else if (!strcasecmp(temp, "#po"))
     {
@@ -2249,7 +2548,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Get a message catalog...
       cat = get_po(fp);
       if (cat)
-        po_files->add(cat);
+      {
+        if (cond_state)
+	  cat->release();
+	else
+	  po_files->add(cat);
+      }
     }
     else if (!strcasecmp(temp, "Attribute"))
     {
@@ -2259,11 +2563,27 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Get an attribute...
       a = get_attr(fp);
       if (a)
-        d->add_attr(a);
+      {
+        if (cond_state)
+	  a->release();
+	else
+          d->add_attr(a);
+      }
     }
     else if (!strcasecmp(temp, "Choice"))
     {
       // Get a choice...
+      c = get_choice(fp);
+      if (!c)
+        break;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
+
+      // Add it to the current option...
       if (!o)
       {
         fprintf(stderr, "ppdc: Choice found on line %d of %s with no Option!\n",
@@ -2271,11 +2591,6 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
         break;
       }
 
-      c = get_choice(fp);
-      if (!c)
-        break;
-
-      // Add it to the current option...
       o->add_choice(c);
 
       if (isdefault)
@@ -2284,7 +2599,10 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
     else if (!strcasecmp(temp, "ColorDevice"))
     {
       // ColorDevice boolean
-      d->color_device = get_boolean(fp);
+      if (cond_state)
+        get_boolean(fp);
+      else
+        d->color_device = get_boolean(fp);
     }
     else if (!strcasecmp(temp, "ColorModel"))
     {
@@ -2292,6 +2610,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       c = get_color_model(fp);
       if (!c)
         continue;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
 
       // Add the choice to the ColorModel option...
       if ((o = d->find_option("ColorModel")) == NULL)
@@ -2318,7 +2642,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       p = get_color_profile(fp);
 
       if (p)
-        d->profiles->add(p);
+      {
+        if (cond_state)
+	  p->release();
+	else
+          d->profiles->add(p);
+      }
     }
     else if (!strcasecmp(temp, "Copyright"))
     {
@@ -2337,6 +2666,9 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
+      if (cond_state)
+        continue;
+
       // Break it up into individual lines...
       for (copyptr = copytemp; copyptr; copyptr = copyend)
       {
@@ -2353,6 +2685,13 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
       // Get a custom media size...
       m = get_custom_size(fp);
+
+      if (cond_state)
+      {
+        m->release();
+        continue;
+      }
+
       if (m)
         d->sizes->add(m);
 
@@ -2366,7 +2705,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
 
       have_cutter = get_boolean(fp);
-      if (have_cutter <= 0)
+      if (have_cutter <= 0 || cond_state)
         continue;
 
       if ((o = d->find_option("CutMedia")) == NULL)
@@ -2392,6 +2731,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       c = get_generic(fp, "Darkness", NULL, "cupsCompression");
       if (!c)
         continue;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
 
       // Add the choice to the cupsDarkness option...
       if ((o = d->find_option("cupsDarkness")) == NULL)
@@ -2422,6 +2767,9 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
         continue;
       }
 
+      if (cond_state)
+        continue;
+
       for (i = 0; i < (int)(sizeof(driver_types) / sizeof(driver_types[0])); i ++)
         if (!strcasecmp(temp, driver_types[i]))
 	  break;
@@ -2444,7 +2792,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Get the filter value...
       f = get_filter(fp);
       if (f)
-        d->filters->add(f);
+      {
+        if (cond_state)
+	  f->release();
+	else
+          d->filters->add(f);
+      }
     }
     else if (!strcasecmp(temp, "Finishing"))
     {
@@ -2452,6 +2805,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       c = get_generic(fp, "Finishing", "OutputType", NULL);
       if (!c)
         continue;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
 
       // Add the choice to the cupsFinishing option...
       if ((o = d->find_option("cupsFinishing")) == NULL)
@@ -2479,21 +2838,40 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       f = get_font(fp);
       if (f)
       {
-	if (!strcasecmp(temp, "#font"))
-	  base_fonts->add(f);
-        else
-	  d->add_font(f);
+        if (cond_state)
+	  f->release();
+	else
+	{
+	  if (!strcasecmp(temp, "#font"))
+	    base_fonts->add(f);
+	  else
+	    d->add_font(f);
 
-        if (isdefault)
-          d->set_default_font(f);
+	  if (isdefault)
+	    d->set_default_font(f);
+	}
       }
     }
     else if (!strcasecmp(temp, "Group"))
     {
       // Get a group...
-      g = get_group(fp, d);
-      if (!g)
+      ppdcGroup *tempg = get_group(fp, d);
+
+      if (!tempg)
         break;
+
+      if (cond_state)
+      {
+        if (!d->find_group(tempg->name->value))
+          tempg->release();
+      }
+      else
+      {
+	if (!d->find_group(tempg->name->value))
+	  d->add_group(tempg);
+
+        g = tempg;
+      }
     }
     else if (!strcasecmp(temp, "HWMargins"))
     {
@@ -2509,6 +2887,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       c = get_generic(fp, "InputSlot", NULL, "MediaPosition");
       if (!c)
         continue;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
 
       // Add the choice to the InputSlot option...
       if ((o = d->find_option("InputSlot")) == NULL)
@@ -2535,14 +2919,21 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       // Add it as needed...
       if (o)
       {
-        install->add_option(o);
+        if (cond_state)
+	  o->release();
+	else
+          install->add_option(o);
+
         o = NULL;
       }
     }
     else if (!strcasecmp(temp, "ManualCopies"))
     {
       // ManualCopies boolean
-      d->manual_copies = get_boolean(fp);
+      if (cond_state)
+        get_boolean(fp);
+      else
+        d->manual_copies = get_boolean(fp);
     }
     else if (!strcasecmp(temp, "Manufacturer"))
     {
@@ -2557,13 +2948,22 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
-      d->set_manufacturer(name);
+      if (!cond_state)
+        d->set_manufacturer(name);
     }
     else if (!strcasecmp(temp, "MaxSize"))
     {
       // MaxSize width length
-      d->max_width  = get_measurement(fp);
-      d->max_length = get_measurement(fp);
+      if (cond_state)
+      {
+        get_measurement(fp);
+	get_measurement(fp);
+      }
+      else
+      {
+	d->max_width  = get_measurement(fp);
+	d->max_length = get_measurement(fp);
+      }
     }
     else if (!strcasecmp(temp, "MediaSize"))
     {
@@ -2580,6 +2980,9 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	        fp->line, fp->filename);
 	break;
       }
+
+      if (cond_state)
+        continue;
 
       m = find_size(name);
 
@@ -2607,6 +3010,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       if (!c)
         continue;
 
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
+
       // Add the choice to the MediaType option...
       if ((o = d->find_option("MediaType")) == NULL)
       {
@@ -2627,8 +3036,16 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
     else if (!strcasecmp(temp, "MinSize"))
     {
       // MinSize width length
-      d->min_width  = get_measurement(fp);
-      d->min_length = get_measurement(fp);
+      if (cond_state)
+      {
+        get_measurement(fp);
+	get_measurement(fp);
+      }
+      else
+      {
+	d->min_width  = get_measurement(fp);
+	d->min_length = get_measurement(fp);
+      }
     }
     else if (!strcasecmp(temp, "ModelName"))
     {
@@ -2643,19 +3060,37 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
-      d->set_model_name(name);
+      if (!cond_state)
+        d->set_model_name(name);
     }
     else if (!strcasecmp(temp, "ModelNumber"))
     {
       // ModelNumber number
-      d->model_number = get_integer(fp);
+      if (cond_state)
+        get_integer(fp);
+      else
+        d->model_number = get_integer(fp);
     }
     else if (!strcasecmp(temp, "Option"))
     {
       // Get an option...
-      o = get_option(fp, d, g);
-      if (!o)
+      ppdcOption *tempo = get_option(fp, d, g);
+
+      if (!tempo)
         break;
+
+      if (cond_state)
+      {
+        if (!g->find_option(tempo->name->value))
+	  tempo->release();
+      }
+      else
+      {
+        if (!g->find_option(tempo->name->value))
+	  g->add_option(tempo);
+
+        o = tempo;
+      }
     }
     else if (!strcasecmp(temp, "FileName"))
     {
@@ -2671,7 +3106,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
-      d->set_file_name(name);
+      if (!cond_state)
+        d->set_file_name(name);
     }
     else if (!strcasecmp(temp, "PCFileName"))
     {
@@ -2687,7 +3123,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
-      d->set_pc_file_name(name);
+      if (!cond_state)
+        d->set_pc_file_name(name);
     }
     else if (!strcasecmp(temp, "Resolution"))
     {
@@ -2695,6 +3132,12 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       c = get_resolution(fp);
       if (!c)
         continue;
+
+      if (cond_state)
+      {
+        c->release();
+        continue;
+      }
 
       // Add the choice to the Resolution option...
       if ((o = d->find_option("Resolution")) == NULL)
@@ -2722,12 +3165,20 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       p = get_simple_profile(fp);
 
       if (p)
-        d->profiles->add(p);
+      {
+        if (cond_state)
+	  p->release();
+	else
+          d->profiles->add(p);
+      }
     }
     else if (!strcasecmp(temp, "Throughput"))
     {
       // Throughput number
-      d->throughput = get_integer(fp);
+      if (cond_state)
+        get_integer(fp);
+      else
+        d->throughput = get_integer(fp);
     }
     else if (!strcasecmp(temp, "UIConstraints"))
     {
@@ -2737,12 +3188,20 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       con = get_constraint(fp);
 
       if (con)
-        d->constraints->add(con);
+      {
+        if (cond_state)
+	  con->release();
+	else
+	  d->constraints->add(con);
+      }
     }
     else if (!strcasecmp(temp, "VariablePaperSize"))
     {
       // VariablePaperSize boolean
-      d->variable_paper_size = get_boolean(fp);
+      if (cond_state)
+        get_boolean(fp);
+      else
+	d->variable_paper_size = get_boolean(fp);
     }
     else if (!strcasecmp(temp, "Version"))
     {
@@ -2758,7 +3217,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	break;
       }
 
-      d->set_version(name);
+      if (!cond_state)
+        d->set_version(name);
     }
     else
     {

@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-05-19
+CHANGES.txt - 2008-05-20
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The PPD compiler now supports conditional directives
+	  (STR #2636)
 	- The ppdc utility now supports a "-t" option to test PPD
 	  files (STR #2739)
 	- The ppdc utility now supports a "-m" option to use the

@@ -73,6 +73,13 @@ enum ppdcLineEnding			//// Line endings
   PPDC_CRLF				// CR + LF
 };
 
+enum ppdcCondFlags			//// Condition flags
+{
+  PPDC_COND_NORMAL = 0,			// Normal state
+  PPDC_COND_SKIP = 1,			// Skip state
+  PPDC_COND_SATISFIED = 2		// At least one condition satisfied
+};
+
 
 //
 // Printer description data...
@@ -425,6 +432,10 @@ class ppdcSource			//// Source File
 		*po_files,		// Message catalogs
 		*sizes,			// Predefined media sizes
 		*vars;			// Defined variables
+  int		cond_state,		// Cummulative conditional state
+		*cond_current,		// Current #if state
+		cond_stack[101];	// #if state stack
+
 
   ppdcSource(const char *f = 0);
   ~ppdcSource();
