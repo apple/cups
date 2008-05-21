@@ -1491,8 +1491,24 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
-      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
-              printer->users[i]);
+    {
+      if ((ptr = strchr(printer->users[i], '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the user string...
+	*/
+
+        cupsFilePrintf(fp, "%sUser ", printer->deny_users ? "Deny" : "Allow");
+	cupsFileWrite(fp, printer->users[i], ptr - printer->users[i]);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "%sUser %s\n",
+	               printer->deny_users ? "Deny" : "Allow",
+                       printer->users[i]);
+    }
 
     if (printer->op_policy)
       cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
@@ -1502,15 +1518,44 @@ cupsdSaveAllPrinters(void)
     for (i = printer->num_options, option = printer->options;
          i > 0;
 	 i --, option ++)
-      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    {
+      if ((ptr = strchr(option->value, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the option string...
+	*/
+
+        cupsFilePrintf(fp, "Option %s ", option->name);
+	cupsFileWrite(fp, option->value, ptr - option->value);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-colors",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
@@ -1527,20 +1572,48 @@ cupsdSaveAllPrinters(void)
     if ((marker = ippFindAttribute(printer->attrs, "marker-names",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-types",
                                    IPP_TAG_KEYWORD)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
