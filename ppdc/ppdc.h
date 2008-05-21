@@ -3,7 +3,7 @@
 //
 //   Definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -71,6 +71,13 @@ enum ppdcLineEnding			//// Line endings
   PPDC_LFONLY,				// LF only
   PPDC_CRONLY,				// CR only
   PPDC_CRLF				// CR + LF
+};
+
+enum ppdcCondFlags			//// Condition flags
+{
+  PPDC_COND_NORMAL = 0,			// Normal state
+  PPDC_COND_SKIP = 1,			// Skip state
+  PPDC_COND_SATISFIED = 2		// At least one condition satisfied
 };
 
 
@@ -173,8 +180,10 @@ class ppdcAttr				//// Attribute
 		*selector,		// Selector string
 		*text,			// Text string
 		*value;			// Value string
+  bool		localizable;		// Should this attribute be localized?
 
-  ppdcAttr(const char *n, const char *s, const char *t, const char *v);
+  ppdcAttr(const char *n, const char *s, const char *t, const char *v,
+           bool loc = false);
   ~ppdcAttr();
 };
 
@@ -323,6 +332,7 @@ class ppdcDriver			//// Printer Driver Data
   ppdcArray	*copyright;		// Copyright strings
   ppdcString	*manufacturer,		// Manufacturer
 		*model_name,		// Name of printer model
+		*file_name,		// Output filename for PPD
 		*pc_file_name,		// 8 character PC filename for PPD
 		*version;		// Version number
   int		model_number,		// Model number for driver
@@ -370,6 +380,7 @@ class ppdcDriver			//// Printer Driver Data
   void		set_custom_size_code(const char *c);
   void		set_default_font(ppdcFont *f);
   void		set_default_size(ppdcMediaSize *m);
+  void		set_file_name(const char *f);
   void		set_manufacturer(const char *m);
   void		set_model_name(const char *m);
   void		set_pc_file_name(const char *f);
@@ -423,6 +434,10 @@ class ppdcSource			//// Source File
 		*po_files,		// Message catalogs
 		*sizes,			// Predefined media sizes
 		*vars;			// Defined variables
+  int		cond_state,		// Cummulative conditional state
+		*cond_current,		// Current #if state
+		cond_stack[101];	// #if state stack
+
 
   ppdcSource(const char *f = 0);
   ~ppdcSource();
@@ -434,7 +449,7 @@ class ppdcSource			//// Source File
   ppdcCatalog	*find_po(const char *l);
   ppdcMediaSize	*find_size(const char *s);
   ppdcVariable	*find_variable(const char *n);
-  ppdcAttr	*get_attr(ppdcFile *fp);
+  ppdcAttr	*get_attr(ppdcFile *fp, bool loc = false);
   int		get_boolean(ppdcFile *fp);
   ppdcChoice	*get_choice(ppdcFile *fp);
   ppdcChoice	*get_color_model(ppdcFile *fp);

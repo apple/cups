@@ -224,7 +224,7 @@ cupsdDeregisterPrinter(
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_DNSSD
-  if (removeit && (BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDPort)
+  if (removeit && (BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDRef)
     dnssdDeregisterPrinter(p);
 #endif /* HAVE_DNSSD */
 }
@@ -636,7 +636,7 @@ cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_DNSSD
-  if ((BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDPort)
+  if ((BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDRef)
     dnssdRegisterPrinter(p);
 #endif /* HAVE_DNSSD */
 }
@@ -1407,6 +1407,8 @@ cupsdStopBrowsing(void)
 
     cupsArrayDelete(DNSSDPrinters);
     DNSSDPrinters = NULL;
+
+    DNSSDPort = 0;
   }
 #endif /* HAVE_DNSSD */
 

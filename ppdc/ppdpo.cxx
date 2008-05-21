@@ -3,7 +3,7 @@
 //
 //   PPD file message catalog program for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -198,13 +198,21 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
        a;
        a = (ppdcAttr *)d->attrs->next())
     if (a->text->value && a->text->value[0] &&
-        (!strncmp(a->name->value, "Custom", 6) ||
+        (a->localizable ||
+	 !strncmp(a->name->value, "Custom", 6) ||
          !strncmp(a->name->value, "ParamCustom", 11) ||
          !strcmp(a->name->value, "APCustomColorMatchingName") ||
          !strcmp(a->name->value, "APPrinterPreset") ||
          !strcmp(a->name->value, "cupsICCProfile") ||
-         !strcmp(a->name->value, "cupsIPPReason")))
+         !strcmp(a->name->value, "cupsIPPReason") ||
+         !strcmp(a->name->value, "cupsMarkerName")))
+    {
       catalog->add_message(a->text->value);
+
+      if ((a->localizable && a->value->value[0]) ||
+          !strcmp(a->name->value, "cupsIPPReason"))
+        catalog->add_message(a->value->value);
+    }
     else if (!strncmp(a->name->value, "Custom", 6) ||
              !strncmp(a->name->value, "ParamCustom", 11))
       catalog->add_message(a->name->value);

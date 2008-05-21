@@ -3,7 +3,7 @@
 //
 //   PPD file compiler definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -20,6 +20,7 @@
 //   ppdcDriver::find_group()       - Find a group.
 //   ppdcDriver::find_option()      - Find an option.
 //   ppdcDriver::set_default_size() - Set the default size name.
+//   ppdcDriver::set_file_name()    - Set the full filename.
 //   ppdcDriver::set_manufacturer() - Set the manufacturer name.
 //   ppdcDriver::set_model_name()   - Set the model name.
 //   ppdcDriver::set_pc_file_name() - Set the PC filename.
@@ -62,6 +63,7 @@ ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
     copyright           = new ppdcArray(d->copyright);
     manufacturer        = d->manufacturer;
     model_name          = 0;
+    file_name           = 0;
     pc_file_name        = 0;
     type                = d->type;
     version             = d->version;
@@ -101,6 +103,7 @@ ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
     copyright           = new ppdcArray();
     manufacturer        = 0;
     model_name          = 0;
+    file_name           = 0;
     pc_file_name        = 0;
     version             = 0;
     type                = PPDC_DRIVER_CUSTOM;
@@ -143,6 +146,8 @@ ppdcDriver::~ppdcDriver()
     manufacturer->release();
   if (model_name)
     model_name->release();
+  if (file_name)
+    file_name->release();
   if (pc_file_name)
     pc_file_name->release();
   if (version)
@@ -228,8 +233,8 @@ ppdcDriver::find_option(const char *n)	// I - Option name
 //
 
 void
-ppdcDriver::set_custom_size_code(const char *c)
-					// I - CustomPageSize code
+ppdcDriver::set_custom_size_code(
+    const char *c)			// I - CustomPageSize code
 {
   if (custom_size_code)
     custom_size_code->release();
@@ -243,8 +248,8 @@ ppdcDriver::set_custom_size_code(const char *c)
 //
 
 void
-ppdcDriver::set_default_font(ppdcFont *f)
-					// I - Font
+ppdcDriver::set_default_font(
+    ppdcFont *f)			// I - Font
 {
   if (default_font)
     default_font->release();
@@ -264,8 +269,8 @@ ppdcDriver::set_default_font(ppdcFont *f)
 //
 
 void
-ppdcDriver::set_default_size(ppdcMediaSize *m)
-					// I - Media size
+ppdcDriver::set_default_size(
+    ppdcMediaSize *m)			// I - Media size
 {
   if (default_size)
     default_size->release();
@@ -281,12 +286,26 @@ ppdcDriver::set_default_size(ppdcMediaSize *m)
 
 
 //
+// 'ppdcDriver::set_file_name()' - Set the full filename.
+//
+
+void
+ppdcDriver::set_file_name(const char *f)// I - Filename
+{
+  if (file_name)
+    file_name->release();
+
+  file_name = new ppdcString(f);
+}
+
+
+//
 // 'ppdcDriver::set_manufacturer()' - Set the manufacturer name.
 //
 
 void
-ppdcDriver::set_manufacturer(const char *m)
-					// I - Model name
+ppdcDriver::set_manufacturer(
+    const char *m)			// I - Model name
 {
   if (manufacturer)
     manufacturer->release();
@@ -300,8 +319,8 @@ ppdcDriver::set_manufacturer(const char *m)
 //
 
 void
-ppdcDriver::set_model_name(const char *m)
-					// I - Model name
+ppdcDriver::set_model_name(
+    const char *m)			// I - Model name
 {
   if (model_name)
     model_name->release();
@@ -315,8 +334,8 @@ ppdcDriver::set_model_name(const char *m)
 //
 
 void
-ppdcDriver::set_pc_file_name(const char *f)
-					// I - Filename
+ppdcDriver::set_pc_file_name(
+    const char *f)			// I - Filename
 {
   if (pc_file_name)
     pc_file_name->release();
@@ -418,11 +437,7 @@ ppdcDriver::write_ppd_file(
 	cupsFilePrintf(fp, "*Product: \"%s\"%s", a->value->value, lf);
   }
   else
-  {
-    cupsFilePrintf(fp, "*Product: \"(ESP Ghostscript)\"%s", lf);
-    cupsFilePrintf(fp, "*Product: \"(GPL Ghostscript)\"%s", lf);
-    cupsFilePrintf(fp, "*Product: \"(GNU Ghostscript)\"%s", lf);
-  }
+    cupsFilePrintf(fp, "*Product: \"(%s)\"%s", model_name->value, lf);
 
   cupsFilePrintf(fp, "*Manufacturer: \"%s\"%s",
         	 catalog->find_message(manufacturer->value), lf);
@@ -476,12 +491,7 @@ ppdcDriver::write_ppd_file(
 	cupsFilePrintf(fp, "*PSVersion: \"%s\"%s", a->value->value, lf);
   }
   else
-  {
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 705\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 707\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 815\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 853\"%s", lf);
-  }
+    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 0\"%s", lf);
 
   if ((a = find_attr("LanguageLevel", NULL)) != NULL)
     cupsFilePrintf(fp, "*LanguageLevel: \"%s\"%s", a->value->value, lf);
@@ -1152,10 +1162,12 @@ ppdcDriver::write_ppd_file(
 	    strncmp(a->name->value, "ParamCustom", 11))
 	  continue;
 
-        if (strcmp(a->name->value, "APCustomColorMatchingName") &&
+        if (!a->localizable &&
+	    strcmp(a->name->value, "APCustomColorMatchingName") &&
 	    strcmp(a->name->value, "APPrinterPreset") &&
 	    strcmp(a->name->value, "cupsICCProfile") &&
 	    strcmp(a->name->value, "cupsIPPReason") &&
+	    strcmp(a->name->value, "cupsMarkerName") &&
 	    strncmp(a->name->value, "Custom", 6) &&
 	    strncmp(a->name->value, "ParamCustom", 11))
           continue;
@@ -1164,7 +1176,8 @@ ppdcDriver::write_ppd_file(
 	               a->name->value, a->selector->value,
 		       locatalog->find_message(a->text && a->text->value ?
 		                               a->text->value : a->name->value),
-		       !strcmp(a->name->value, "cupsIPPReason") ?
+		       ((a->localizable && a->value->value[0]) ||
+		        !strcmp(a->name->value, "cupsIPPReason")) ?
 		           locatalog->find_message(a->value->value) : "",
 		       lf);
       }

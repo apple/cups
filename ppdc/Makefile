@@ -44,12 +44,8 @@ LIBOBJS =	\
 		ppdc-source.o \
 		ppdc-string.o \
 		ppdc-variable.o
-LIB32OBJS	= $(LIBOBJS:.o=.32.o)
-LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 OBJS =		\
 		$(LIBOBJS) \
-		$(LIB32OBJS) \
-		$(LIB64OBJS) \
 		drv.o \
 		ppdc.o \
 		ppdhtml.o \
@@ -58,8 +54,6 @@ OBJS =		\
 		ppdpo.o
 LIBTARGETS =	\
 		$(LIBCUPSPPDC) \
-		$(LIB32CUPSPPDC) \
-		$(LIB64CUPSPPDC) \
 		libcupsppdc.a \
 		ppdc-static
 TARGETS	=	\
@@ -97,7 +91,6 @@ clean:
 	$(RM) -r ppd
 	$(RM) test.drv
 	$(RM) libcupsppdc.so libcupsppdc.sl libcupsppdc.dylib
-	$(RM) -r 32bit 64bit
 
 
 #
@@ -105,13 +98,7 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
-	$(RM) Dependencies
-	cp Dependencies.tmp Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
-	$(RM) Dependencies.tmp
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.cxx) >/dev/null 2>&1
 
 
 #
@@ -191,18 +178,6 @@ installstatic:
 	$(INSTALL_LIB) libcupsppdc.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsppdc.a
 
-install32bit:
-	echo Installing libraries in $(LIB32DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB32DIR)
-	$(INSTALL_LIB) 32bit/libcupsppdc.so.1 $(LIB32DIR)/libcupsppdc.so.1
-	$(LN) libcupsppdc.so.1 $(LIB32DIR)/libcupsppdc.so
-
-install64bit:
-	echo Installing libraries in $(LIB64DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB64DIR)
-	$(INSTALL_LIB) 64bit/libcupsppdc.so.1 $(LIB64DIR)/libcupsppdc.so.1
-	$(LN) libcupsppdc.so.1 $(LIB64DIR)/libcupsppdc.so
-
 
 #
 # Uninstall...
@@ -232,16 +207,6 @@ uninstall:
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/ppdc.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
-
-uninstall32bit:
-	$(RM) $(LIB32DIR)/libcupsppdc.so
-	$(RM) $(LIB32DIR)/libcupsppdc.so.1
-	-$(RMDIR) $(LIB32DIR)
-
-uninstall64bit:
-	$(RM) $(LIB64DIR)/libcupsppdc.so
-	$(RM) $(LIB64DIR)/libcupsppdc.so.1
-	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -339,40 +304,15 @@ libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS)
 
 
 #
-# 32bit/libcupsppdc.so.1
-#
-
-32bit/libcupsppdc.so.1:	$(LIB32OBJS)
-	echo Linking 32-bit $@...
-	-mkdir 32bit
-	$(DSOXX) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
-	$(RM) 32bit/libcupsppdc.so
-	$(LN) libcupsppdc.so.1 32bit/libcupsppdc.so
-
-
-#
-# 64bit/libcupsppdc.so.1
-#
-
-64bit/libcupsppdc.so.1:	$(LIB64OBJS)
-	echo Linking 64-bit $@...
-	-mkdir 64bit
-	$(DSOXX) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
-	$(RM) 64bit/libcupsppdc.so
-	$(LN) libcupsppdc.so.1 64bit/libcupsppdc.so
-
-
-#
 # libcupsppdc.1.dylib
 #
 
-libcupsppdc.1.dylib:	$(LIBOBJS) libcupsppdc.exp
+libcupsppdc.1.dylib:	$(LIBOBJS)
 	echo Linking $@...
 	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
-		-exported_symbols_list libcupsppdc.exp \
 		$(LIBOBJS) $(LIBS)
 	$(RM) libcupsppdc.dylib
 	$(LN) $@ libcupsppdc.dylib

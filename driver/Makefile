@@ -87,7 +87,7 @@ clean:
 	$(RM) $(OBJS) core
 	$(RM) *.bck core.*
 	$(RM) $(TARGETS)
-	$(RM) -r images
+	$(RM) -r test
 	$(RM) libcupsdriver.so libcupsdriver.sl libcupsdriver.dylib
 	$(RM) -r 32bit 64bit
 
@@ -277,16 +277,24 @@ rastertopclx:		rastertopclx.o pcl-common.o $(LIBCUPSDRIVER) \
 
 
 #
+# test, make a common test subdirectory for the other test programs.
+#
+
+test:
+	if test ! -d test; then \
+		rm -rf test; \
+		mkdir test; \
+	fi
+
+
+#
 # testcmyk, test cmyk separation functions.
 #
 
-testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
+testcmyk:		test testcmyk.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcmyk.o libcupsdriver.a \
 		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	if test ! -d test; then \
-		mkdir test; \
-	fi
 	echo Running CMYK API tests...
 	./testcmyk > test/testcmyk.log
 
@@ -295,13 +303,10 @@ testcmyk:		testcmyk.o libcupsdriver.a ../cups/libcups.a
 # testdither, test dithering functions.
 #
 
-testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
+testdither:		test testdither.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testdither.o libcupsdriver.a \
 		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	if test ! -d test; then \
-		mkdir test; \
-	fi
 	echo Running dither API tests...
 	./testdither > test/0-255.pgm 2>test/0-255.log
 	./testdither 0 127 255 > test/0-127-255.pgm 2>test/0-127-255.log
@@ -317,13 +322,10 @@ testdither:		testdither.o libcupsdriver.a ../cups/libcups.a
 # testrgb, test RGB separation functions.
 #
 
-testrgb:		testrgb.o libcupsdriver.a ../cups/libcups.a
+testrgb:		test testrgb.o libcupsdriver.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testrgb.o libcupsdriver.a \
 		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
-	if test ! -d test; then \
-		mkdir test; \
-	fi
 	echo Running RGB API tests...
 	./testrgb > test/testrgb.log 2>&1 || echo "RGB tests failed!"
 

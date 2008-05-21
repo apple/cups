@@ -507,11 +507,14 @@ ppdFindChoice(ppd_option_t *o,		/* I - Pointer to option */
   ppd_choice_t	*c;			/* Current choice */
 
 
-  if (o == NULL || choice == NULL)
+  if (!o || !choice)
     return (NULL);
 
+  if (choice[0] == '{' || !strncasecmp(choice, "Custom.", 7))
+    choice = "Custom";
+
   for (i = o->num_choices, c = o->choices; i > 0; i --, c ++)
-    if (strcasecmp(c->choice, choice) == 0)
+    if (!strcasecmp(c->choice, choice))
       return (c);
 
   return (NULL);

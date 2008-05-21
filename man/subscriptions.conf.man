@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $"
+.\" "$Id$"
 .\"
 .\"   subscriptions.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -85,5 +85,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007 by Apple Inc.
 .\"
-.\" End of "$Id: subscriptions.conf.man 5099 2006-02-13 02:46:10Z mike $".
+.\" End of "$Id$".
 .\"
