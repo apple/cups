@@ -115,6 +115,8 @@ directives and the values they accept:
 .TP 5
 \fBInstallable\fR "name/text"
 .TP 5
+\fBLocAttribute\fR name "keyword/text" value
+.TP 5
 \fBManualCopies\fR boolean-value
 .TP 5
 \fBManufacturer\fR "name"

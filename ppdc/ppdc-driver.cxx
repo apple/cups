@@ -3,7 +3,7 @@
 //
 //   PPD file compiler definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -437,11 +437,7 @@ ppdcDriver::write_ppd_file(
 	cupsFilePrintf(fp, "*Product: \"%s\"%s", a->value->value, lf);
   }
   else
-  {
-    cupsFilePrintf(fp, "*Product: \"(ESP Ghostscript)\"%s", lf);
-    cupsFilePrintf(fp, "*Product: \"(GPL Ghostscript)\"%s", lf);
-    cupsFilePrintf(fp, "*Product: \"(GNU Ghostscript)\"%s", lf);
-  }
+    cupsFilePrintf(fp, "*Product: \"(%s)\"%s", model_name->value, lf);
 
   cupsFilePrintf(fp, "*Manufacturer: \"%s\"%s",
         	 catalog->find_message(manufacturer->value), lf);
@@ -495,12 +491,7 @@ ppdcDriver::write_ppd_file(
 	cupsFilePrintf(fp, "*PSVersion: \"%s\"%s", a->value->value, lf);
   }
   else
-  {
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 705\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 707\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 815\"%s", lf);
-    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 853\"%s", lf);
-  }
+    cupsFilePrintf(fp, "*PSVersion: \"(3010.000) 0\"%s", lf);
 
   if ((a = find_attr("LanguageLevel", NULL)) != NULL)
     cupsFilePrintf(fp, "*LanguageLevel: \"%s\"%s", a->value->value, lf);
@@ -1171,10 +1162,12 @@ ppdcDriver::write_ppd_file(
 	    strncmp(a->name->value, "ParamCustom", 11))
 	  continue;
 
-        if (strcmp(a->name->value, "APCustomColorMatchingName") &&
+        if (!a->localizable &&
+	    strcmp(a->name->value, "APCustomColorMatchingName") &&
 	    strcmp(a->name->value, "APPrinterPreset") &&
 	    strcmp(a->name->value, "cupsICCProfile") &&
 	    strcmp(a->name->value, "cupsIPPReason") &&
+	    strcmp(a->name->value, "cupsMarkerName") &&
 	    strncmp(a->name->value, "Custom", 6) &&
 	    strncmp(a->name->value, "ParamCustom", 11))
           continue;
@@ -1183,7 +1176,8 @@ ppdcDriver::write_ppd_file(
 	               a->name->value, a->selector->value,
 		       locatalog->find_message(a->text && a->text->value ?
 		                               a->text->value : a->name->value),
-		       !strcmp(a->name->value, "cupsIPPReason") ?
+		       ((a->localizable && a->value->value[0]) ||
+		        !strcmp(a->name->value, "cupsIPPReason")) ?
 		           locatalog->find_message(a->value->value) : "",
 		       lf);
       }

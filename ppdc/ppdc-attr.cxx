@@ -32,13 +32,15 @@
 ppdcAttr::ppdcAttr(const char *n,	// I - Name
                    const char *s,	// I - Spec string
 		   const char *t,	// I - Human-readable text
-		   const char *v)	// I - Value
+		   const char *v,	// I - Value
+		   bool       loc)	// I - Localize this attribute?
   : ppdcShared()
 {
-  name     = new ppdcString(n);
-  selector = new ppdcString(s);
-  text     = new ppdcString(t);
-  value    = new ppdcString(v);
+  name        = new ppdcString(n);
+  selector    = new ppdcString(s);
+  text        = new ppdcString(t);
+  value       = new ppdcString(v);
+  localizable = loc;
 }
 
 

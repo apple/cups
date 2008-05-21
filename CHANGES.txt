@@ -3,6 +3,10 @@ CHANGES.txt - 2008-05-20
 
 CHANGES IN CUPS V1.4b1
 
+	- The PPD compiler now supports localizable attributes
+	  (STR #2738)
+	- The ppdpo utility now includes cupsIPPReasons values in
+	  the message catalogs it generates (STR #2754)
 	- The PPD compiler now supports conditional directives
 	  (STR #2636)
 	- The ppdc utility now supports a "-t" option to test PPD

@@ -180,8 +180,10 @@ class ppdcAttr				//// Attribute
 		*selector,		// Selector string
 		*text,			// Text string
 		*value;			// Value string
+  bool		localizable;		// Should this attribute be localized?
 
-  ppdcAttr(const char *n, const char *s, const char *t, const char *v);
+  ppdcAttr(const char *n, const char *s, const char *t, const char *v,
+           bool loc = false);
   ~ppdcAttr();
 };
 
@@ -447,7 +449,7 @@ class ppdcSource			//// Source File
   ppdcCatalog	*find_po(const char *l);
   ppdcMediaSize	*find_size(const char *s);
   ppdcVariable	*find_variable(const char *n);
-  ppdcAttr	*get_attr(ppdcFile *fp);
+  ppdcAttr	*get_attr(ppdcFile *fp, bool loc = false);
   int		get_boolean(ppdcFile *fp);
   ppdcChoice	*get_choice(ppdcFile *fp);
   ppdcChoice	*get_color_model(ppdcFile *fp);

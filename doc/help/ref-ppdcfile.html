@@ -440,6 +440,10 @@ characters.</p>
 multiple lines, however no one line may exceed 255
 characters.</p>
 
+<h3>See Also</h3>
+
+<p><a href="#LocAttribute"><code>LocAttribute</code></a></p>
+
 
 <h2 class="title"><a name='Choice'>Choice</a></h2>
 
@@ -1231,6 +1235,40 @@ and the underscore and can be up to 40 characters in length.</p>
 
 <p>If provided, the text can be any string up to 80 characters
 in length. If no text is provided, the name is used.</p>
+
+
+<h2 class="title"><a name='LocAttribute'>LocAttribute</a></h2>
+
+<h3>Syntax</h3>
+
+<pre>
+LocAttribute <i>name "keyword/text" value</i>
+</pre>
+
+<h3>Examples</h3>
+
+<pre>
+LocAttribute fooProfile "Photo/Photographic Profile" "photopro.icc"
+</pre>
+
+<h3>Description</h3>
+
+<p>The <code>LocAttribute</code> directive creates a localized PPD
+attribute. The name is any combination of letters, numbers, and the
+underscore and can be up to 40 characters in length.</p>
+
+<p>The selector can be the empty string (<code>""</code>), a keyword
+consisting of up to 40 letters, numbers, and the underscore, or
+a string composed of a keyword and user text of up to 80
+characters.</p>
+
+<p>The value is any string or number; the string may contain
+multiple lines, however no one line may exceed 255
+characters.</p>
+
+<h3>See Also</h3>
+
+<p><a href="#Attribute"><code>Attribute</code></a></p>
 
 
 <h2 class="title"><a name='ManualCopies'>ManualCopies</a></h2>

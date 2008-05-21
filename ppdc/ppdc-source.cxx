@@ -298,7 +298,8 @@ ppdcSource::find_variable(const char *n)// I - Variable name
 //
 
 ppdcAttr *				// O - Attribute
-ppdcSource::get_attr(ppdcFile *fp)	// I - File to read
+ppdcSource::get_attr(ppdcFile *fp, 	// I - File to read
+                     bool     loc)	// I - Localize this attribute?
 {
   char	name[1024],			// Name string
 	selector[1024],			// Selector string
@@ -311,15 +312,16 @@ ppdcSource::get_attr(ppdcFile *fp)	// I - File to read
   // Attribute name selector value
   if (!get_token(fp, name, sizeof(name)))
   {
-    fprintf(stderr, "ppdc: Expected name after Attribute on line %d of %s!\n",
-            fp->line, fp->filename);
+    fprintf(stderr, "ppdc: Expected name after %sAttribute on line %d of %s!\n",
+            loc ? "Loc" : "", fp->line, fp->filename);
     return (0);
   }
 
   if (!get_token(fp, selector, sizeof(selector)))
   {
-    fprintf(stderr, "ppdc: Expected selector after Attribute on line %d of %s!\n",
-            fp->line, fp->filename);
+    fprintf(stderr,
+            "ppdc: Expected selector after %sAttribute on line %d of %s!\n",
+            loc ? "Loc" : "", fp->line, fp->filename);
     return (0);
   }
 
@@ -328,14 +330,15 @@ ppdcSource::get_attr(ppdcFile *fp)	// I - File to read
 
   if (!get_token(fp, value, sizeof(value)))
   {
-    fprintf(stderr, "ppdc: Expected value after Attribute on line %d of %s!\n",
-            fp->line, fp->filename);
+    fprintf(stderr,
+            "ppdc: Expected value after %sAttribute on line %d of %s!\n",
+            loc ? "Loc" : "", fp->line, fp->filename);
     return (0);
   }
 
 //  printf("name=\"%s\", selector=\"%s\", value=\"%s\"\n", name, selector, value);
 
-  return (new ppdcAttr(name, selector, text, value));
+  return (new ppdcAttr(name, selector, text, value, loc));
 }
 
 
@@ -2555,13 +2558,14 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 	  po_files->add(cat);
       }
     }
-    else if (!strcasecmp(temp, "Attribute"))
+    else if (!strcasecmp(temp, "Attribute") ||
+             !strcasecmp(temp, "LocAttribute"))
     {
       ppdcAttr	*a;			// Attribute
 
 
       // Get an attribute...
-      a = get_attr(fp);
+      a = get_attr(fp, !strcasecmp(temp, "LocAttribute"));
       if (a)
       {
         if (cond_state)
