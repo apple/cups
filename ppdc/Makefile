@@ -308,13 +308,16 @@ libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS)
 #
 
 libcupsppdc.1.dylib:	$(LIBOBJS)
+	echo Creating export list for $@...
+	nm $(LIBOBJS) | grep "T __" | awk '{print $$3}' | sort >t.exp
 	echo Linking $@...
 	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
+		-exported_symbols_list t.exp \
 		$(LIBOBJS) $(LIBS)
-	$(RM) libcupsppdc.dylib
+	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 
 
