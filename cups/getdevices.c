@@ -232,6 +232,7 @@ cupsGetDevices(
   */
 
   httpBlocking(http, blocking);
+  httpFlush(http);
 
   if (status == IPP_ERROR)
     _cupsSetError(IPP_ERROR, NULL);
