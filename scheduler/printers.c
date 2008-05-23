@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 6970 2007-09-17 23:58:28Z mike $"
+ * "$Id: printers.c 7608 2008-05-21 01:37:21Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -1247,6 +1247,9 @@ cupsdLoadAllPrinters(void)
       {
         for (; *valueptr && isspace(*valueptr & 255); *valueptr++ = '\0');
 
+        if (!p->attrs)
+	  cupsdSetPrinterAttrs(p);
+
         cupsdSetPrinterAttr(p, value, valueptr);
 
 	if (!strncmp(value, "marker-", 7))
@@ -1488,8 +1491,24 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
-      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
-              printer->users[i]);
+    {
+      if ((ptr = strchr(printer->users[i], '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the user string...
+	*/
+
+        cupsFilePrintf(fp, "%sUser ", printer->deny_users ? "Deny" : "Allow");
+	cupsFileWrite(fp, printer->users[i], ptr - printer->users[i]);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "%sUser %s\n",
+	               printer->deny_users ? "Deny" : "Allow",
+                       printer->users[i]);
+    }
 
     if (printer->op_policy)
       cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
@@ -1499,15 +1518,44 @@ cupsdSaveAllPrinters(void)
     for (i = printer->num_options, option = printer->options;
          i > 0;
 	 i --, option ++)
-      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    {
+      if ((ptr = strchr(option->value, '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the option string...
+	*/
+
+        cupsFilePrintf(fp, "Option %s ", option->name);
+	cupsFileWrite(fp, option->value, ptr - option->value);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-colors",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
@@ -1524,20 +1572,48 @@ cupsdSaveAllPrinters(void)
     if ((marker = ippFindAttribute(printer->attrs, "marker-names",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-types",
                                    IPP_TAG_KEYWORD)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s %s", marker->name,
-                     marker->values[0].string.text);
-      for (i = 1; i < marker->num_values; i ++)
-        cupsFilePrintf(fp, ",%s", marker->values[i].string.text);
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      {
+        if (i)
+	  cupsFilePutChar(fp, ',');
+
+        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
+	{
+	  cupsFileWrite(fp, marker->values[i].string.text,
+	                ptr - marker->values[i].string.text);
+	  cupsFilePutChar(fp, '\\');
+	  cupsFilePuts(fp, ptr);
+	}
+	else
+          cupsFilePuts(fp, marker->values[i].string.text);
+      }
+
       cupsFilePuts(fp, "\n");
     }
 
@@ -1850,6 +1926,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 		*media_quality,		/* EFMediaQualityMode options */
 		*duplex;		/* Duplex options */
   ppd_attr_t	*ppdattr;		/* PPD attribute */
+  ipp_t		*oldattrs;		/* Old printer attributes */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
@@ -1971,9 +2048,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   * Create the required IPP attributes for a printer...
   */
 
-  if (p->attrs)
-    ippDelete(p->attrs);
-
+  oldattrs = p->attrs;
   p->attrs = ippNew();
 
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -2638,6 +2713,69 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                     "finishings-default", IPP_FINISHINGS_NONE);
     }
+  }
+
+ /*
+  * Copy marker attributes as needed...
+  */
+
+  if (oldattrs)
+  {
+    ipp_attribute_t *oldattr;		/* Old attribute */
+
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-colors",
+                                    IPP_TAG_NAME)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                                "marker-colors", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-names",
+                                    IPP_TAG_NAME)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                                "marker-names", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-types",
+                                    IPP_TAG_KEYWORD)) != NULL)
+    {
+      if ((attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                                "marker-types", oldattr->num_values, NULL,
+				NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].string.text =
+	      _cupsStrAlloc(oldattr->values[i].string.text);
+      }
+    }
+
+    ippDelete(oldattrs);
   }
 
  /*
@@ -4182,5 +4320,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 6970 2007-09-17 23:58:28Z mike $".
+ * End of "$Id: printers.c 7608 2008-05-21 01:37:21Z mike $".
  */

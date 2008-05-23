@@ -10793,13 +10793,22 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
 
   for (i = 0; i < p->num_users; i ++)
   {
-    if (p->users[i][0] == '@' || p->users[i][0] == '#')
+    if (p->users[i][0] == '@')
     {
      /*
       * Check group membership...
       */
 
       if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+        break;
+    }
+    else if (p->users[i][0] == '#')
+    {
+     /*
+      * Check UUID...
+      */
+
+      if (cupsdCheckGroup(username, pw, p->users[i]))
         break;
     }
     else if (!strcasecmp(username, p->users[i]))

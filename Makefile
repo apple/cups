@@ -55,7 +55,7 @@ libs:
 	echo Using LDFLAGS="$(LDFLAGS)"
 	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
-		echo Making all in $$dir... ;\
+		echo Making libraries in $$dir... ;\
 		(cd $$dir ; $(MAKE) $(MFLAGS) libs) || exit 1;\
 	done
 

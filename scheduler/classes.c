@@ -880,8 +880,25 @@ cupsdSaveAllClasses(void)
     cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
                    pclass->job_sheets[1]);
 
-    for (i = 0; i < pclass->num_printers; i ++)
-      cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
+    for (i = 0; i < pclass->num_users; i ++)
+    {
+      if ((ptr = strchr(pclass->users[i], '#')) != NULL)
+      {
+       /*
+        * Need to quote the first # in the user string...
+	*/
+
+        cupsFilePrintf(fp, "%sUser ", pclass->deny_users ? "Deny" : "Allow");
+	cupsFileWrite(fp, pclass->users[i], ptr - pclass->users[i]);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+	cupsFilePutChar(fp, '\n');
+      }
+      else
+        cupsFilePrintf(fp, "%sUser %s\n",
+	               pclass->deny_users ? "Deny" : "Allow",
+                       pclass->users[i]);
+    }
 
     cupsFilePrintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
     cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
