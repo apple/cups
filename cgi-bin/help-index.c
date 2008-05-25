@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   On-line help index routines for the Common UNIX Printing System (CUPS).
+ *   Online help index routines for the Common UNIX Printing System (CUPS).
  *
  *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.

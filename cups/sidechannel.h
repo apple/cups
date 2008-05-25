@@ -68,8 +68,8 @@ typedef enum cups_sc_command_e cups_sc_command_t;
 
 enum cups_sc_state_e			/**** Printer state bits ****/
 {
-  CUPS_SC_STATE_OFFLINE = 0,		/* Device is off-line */
-  CUPS_SC_STATE_ONLINE = 1,		/* Device is on-line */
+  CUPS_SC_STATE_OFFLINE = 0,		/* Device is offline */
+  CUPS_SC_STATE_ONLINE = 1,		/* Device is online */
   CUPS_SC_STATE_BUSY = 2,		/* Device is busy */
   CUPS_SC_STATE_ERROR = 4,		/* Other error condition */
   CUPS_SC_STATE_MEDIA_LOW = 16,		/* Paper low condition */

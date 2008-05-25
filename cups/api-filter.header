@@ -20,8 +20,7 @@
 <tr>
 	<th>Headers</th>
 	<th>cups/backend.h<br>
-	cups/sidechannel.h<br>
-	cups/snmp.h</th>
+	cups/sidechannel.h</th>
 </tr>
 </thead>
 <tbody>
