@@ -1646,7 +1646,7 @@ process_children(void)
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value >= IPP_JOB_HELD && job->filters[0])
+      if (job->state_value >= IPP_JOB_HELD && (job->filters[0] || job->backend))
       {
 	for (i = 0; job->filters[i]; i ++)
           if (job->filters[i] == pid)
