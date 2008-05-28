@@ -33,7 +33,8 @@
 	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a><br>
 	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
 	Programming: <a href='api-ppd.html' target='_top'>PPD API</a><br>
-	Programming: <a href='api-raster.html' target='_top'>Raster API</a></td>
+	Programming: <a href='api-raster.html' target='_top'>Raster API</a><br>
+	Specifications: <a href='spec-design' target='_top'>CUPS Design Description</a></td>
 </tr>
 </tbody>
 </table></div>

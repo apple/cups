@@ -312,8 +312,8 @@ div.contents ul.subcontents li {
 <li><a href="#cupsArrayNext" title="Get the next element in the array.">cupsArrayNext</a></li>
 <li><a href="#cupsArrayPrev" title="Get the previous element in the array.">cupsArrayPrev</a></li>
 <li><a href="#cupsArrayRemove" title="Remove an element from the array.">cupsArrayRemove</a></li>
-<li><a href="#cupsArrayRestore" title="Reset the current element to the last cupsArraySave.">cupsArrayRestore</a></li>
-<li><a href="#cupsArraySave" title="Mark the current element for a later cupsArrayRestore.">cupsArraySave</a></li>
+<li><a href="#cupsArrayRestore" title="Reset the current element to the last <a href="#cupsArraySave"><code>cupsArraySave</code></a>.">cupsArrayRestore</a></li>
+<li><a href="#cupsArraySave" title="Mark the current element for a later <a href="#cupsArrayRestore"><code>cupsArrayRestore</code></a>.">cupsArraySave</a></li>
 <li><a href="#cupsArrayUserData" title="Return the user data for an array.">cupsArrayUserData</a></li>
 </ul>
 <li><a href="#TYPES">Data Types</a><ul class="code">
@@ -397,7 +397,7 @@ void *user_data;
 </pre>
 
 <p>The hash function (type
-<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) returns a
+<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) should return a
 number from 0 to (hash_size-1) that (hopefully) uniquely identifies the
 element and is called whenever you look up an element in the array with
 <a href='#cupsArrayFind'><code>cupsArrayFind</code></a>. The hash size is
@@ -410,7 +410,7 @@ only limited by available memory, but generally should not be larger than
 The first function adds an element to the array, adding the new element
 after any elements that have the same order, while the second inserts the
 element before others with the same order. For unsorted arrays,
-<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the elemnt to
+<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the element to
 the end of the array while
 <a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> inserts the
 element at the beginning of the array. For example, the following code
@@ -463,11 +463,11 @@ future lookups will start where the last one left off:</p>
 
 <dl>
 	<dt><a href='#cupsArrayFind'><code>cupsArrayFind</code></a></dt>
-	<dd>Returns the first matching element .</dd>
+	<dd>Returns the first matching element.</dd>
 	<dt><a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a></dt>
 	<dd>Returns the first element in the array.</dd>
 	<dt><a href='#cupsArrayIndex'><code>cupsArrayIndex</code></a></dt>
-	<dd>Returns the Nth element in the array.</dd>
+	<dd>Returns the Nth element in the array, starting at 0.</dd>
 	<dt><a href='#cupsArrayLast'><code>cupsArrayLast</code></a></dt>
 	<dd>Returns the last element in the array.</dd>
 	<dt><a href='#cupsArrayNext'><code>cupsArrayNext</code></a></dt>
@@ -518,8 +518,8 @@ int cupsArrayAdd (<br>
 <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">When adding an element to a sorted array, non-unique elements are
-appended at the end of the run.  For unsorted arrays, the element
-is inserted at the end of the array.
+appended at the end of the run of identical elements.  For unsorted arrays,
+the element is appended to the end of the array.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayClear">cupsArrayClear</a></h3>
@@ -533,6 +533,12 @@ void cupsArrayClear (<br>
 <dt>a</dt>
 <dd class="description">Array</dd>
 </dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is equivalent to removing all elements in the array.
+The caller is responsible for freeing the memory used by the
+elements themselves.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayCount">cupsArrayCount</a></h3>
 <p class="description">Get the number of elements in the array.</p>
 <p class="code">
@@ -559,6 +565,11 @@ void *cupsArrayCurrent (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Element</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayDelete">cupsArrayDelete</a></h3>
 <p class="description">Free all memory used by the array.</p>
 <p class="code">
@@ -570,6 +581,11 @@ void cupsArrayDelete (<br>
 <dt>a</dt>
 <dd class="description">Array</dd>
 </dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The caller is responsible for freeing the memory used by the
+elements themselves.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayDup">cupsArrayDup</a></h3>
 <p class="description">Duplicate the array.</p>
 <p class="code">
@@ -611,7 +627,7 @@ void *cupsArrayFirst (<br>
 <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">First element or <code>NULL</code></p>
+<p class="description">First element or <code>NULL</code> if the array is empty</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsArrayGetIndex">cupsArrayGetIndex</a></h3>
 <p class="description">Get the index of the current element.</p>
 <p class="code">
@@ -624,7 +640,12 @@ int cupsArrayGetIndex (<br>
 <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Index of the current element</p>
+<p class="description">Index of the current element, starting at 0</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsArrayGetInsert">cupsArrayGetInsert</a></h3>
 <p class="description">Get the index of the last inserted element.</p>
 <p class="code">
@@ -637,7 +658,7 @@ int cupsArrayGetInsert (<br>
 <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Index of the last inserted element</p>
+<p class="description">Index of the last inserted element, starting at 0</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayIndex">cupsArrayIndex</a></h3>
 <p class="description">Get the N-th element in the array.</p>
 <p class="code">
@@ -672,8 +693,8 @@ int cupsArrayInsert (<br>
 <p class="description">0 on failure, 1 on success</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">When inserting an element in a sorted array, non-unique elements are
-inserted at the beginning of the run.  For unsorted arrays, the element
-is inserted at the beginning of the array.
+inserted at the beginning of the run of identical elements.  For unsorted
+arrays, the element is inserted at the beginning of the array.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayLast">cupsArrayLast</a></h3>
@@ -688,7 +709,7 @@ void *cupsArrayLast (<br>
 <dd class="description">Array</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">Last element or <code>NULL</code></p>
+<p class="description">Last element or <code>NULL</code> if the array is empty</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayNew">cupsArrayNew</a></h3>
 <p class="description">Create a new array.</p>
 <p class="code">
@@ -699,12 +720,19 @@ void *cupsArrayLast (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>f</dt>
-<dd class="description">Comparison function</dd>
+<dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
 <dt>d</dt>
-<dd class="description">User data</dd>
+<dd class="description">User data pointer or <code>NULL</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Array</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
+receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
+data pointer argument can safely be omitted when not required so functions
+like <code>strcmp</code> can be used for sorted string arrays.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsArrayNew2">cupsArrayNew2</a></h3>
 <p class="description">Create a new array with hash.</p>
 <p class="code">
@@ -717,16 +745,26 @@ void *cupsArrayLast (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>f</dt>
-<dd class="description">Comparison function</dd>
+<dd class="description">Comparison function or <code>NULL</code> for an unsorted array</dd>
 <dt>d</dt>
-<dd class="description">User data</dd>
+<dd class="description">User data or <code>NULL</code></dd>
 <dt>h</dt>
-<dd class="description">Hash function</dd>
+<dd class="description">Hash function or <code>NULL</code> for unhashed lookups</dd>
 <dt>hsize</dt>
-<dd class="description">Hash size</dd>
+<dd class="description">Hash size (&gt;= 0)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Array</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The comparison function (&quot;f&quot;) is used to create a sorted array. The function
+receives pointers to two elements and the user data pointer (&quot;d&quot;) - the user
+data pointer argument can safely be omitted when not required so functions
+like <code>strcmp</code> can be used for sorted string arrays.<br>
+<br>
+The hash function (&quot;h&quot;) is used to implement cached lookups with the
+specified hash size (&quot;hsize&quot;).
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayNext">cupsArrayNext</a></h3>
 <p class="description">Get the next element in the array.</p>
 <p class="code">
@@ -740,6 +778,14 @@ void *cupsArrayNext (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Next element or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)&quot;.<br>
+<br>
+The next element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
+to set the current element.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayPrev">cupsArrayPrev</a></h3>
 <p class="description">Get the previous element in the array.</p>
 <p class="code">
@@ -753,6 +799,14 @@ void *cupsArrayPrev (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Previous element or <code>NULL</code></p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is equivalent to &quot;cupsArrayIndex(a, cupsArrayGetIndex(a) - 1)&quot;.<br>
+<br>
+The previous element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
+to set the current element.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayRemove">cupsArrayRemove</a></h3>
 <p class="description">Remove an element from the array.</p>
 <p class="code">
@@ -769,8 +823,16 @@ int cupsArrayRemove (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">If more than one element matches &quot;e&quot;, only the first matching element is
+removed.<br>
+<br>
+The caller is responsible for freeing the memory used by the
+removed element.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayRestore">cupsArrayRestore</a></h3>
-<p class="description">Reset the current element to the last cupsArraySave.</p>
+<p class="description">Reset the current element to the last <a href="#cupsArraySave"><code>cupsArraySave</code></a>.</p>
 <p class="code">
 void *cupsArrayRestore (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
@@ -783,7 +845,7 @@ void *cupsArrayRestore (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New current element</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArraySave">cupsArraySave</a></h3>
-<p class="description">Mark the current element for a later cupsArrayRestore.</p>
+<p class="description">Mark the current element for a later <a href="#cupsArrayRestore"><code>cupsArrayRestore</code></a>.</p>
 <p class="code">
 int cupsArraySave (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_array_t">cups_array_t</a> *a<br>
@@ -796,7 +858,11 @@ int cupsArraySave (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The save/restore stack is guaranteed to be at least 32 elements deep.
+<p class="discussion">The current element is undefined until you call <a href="#cupsArrayFind"><code>cupsArrayFind</code></a>,
+<a href="#cupsArrayFirst"><code>cupsArrayFirst</code></a>, or <a href="#cupsArrayIndex"><code>cupsArrayIndex</code></a>, or <a href="#cupsArrayLast"><code>cupsArrayLast</code></a>
+to set the current element.<br>
+<br>
+The save/restore stack is guaranteed to be at least 32 elements deep.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsArrayUserData">cupsArrayUserData</a></h3>

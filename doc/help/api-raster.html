@@ -55,13 +55,12 @@ BLOCKQUOTE {
 }
 
 A:link, A:visited {
+  font-weight: normal;
   text-decoration: none;
-  font-weight: bold;
 }
 
 A:link:hover, A:visited:hover, A:active {
   text-decoration: underline;
-  font-weight: bold;
 }
 
 SUB, SUP {
@@ -294,31 +293,46 @@ div.contents ul.subcontents li {
 <ul class="contents">
 </li>
 <li><a href="#OVERVIEW">Overview</a></li>
+<li><a href="#TASKS">Functions by Task</a><ul class="subcontents">
+<li><a href="#OPENCLOSE">Opening and Closing Raster Streams</a></li>
+<li><a href="#READING">Reading Raster Streams</a></li>
+<li><a href="#WRITING">Writing Raster Streams</a></li>
+</ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
 <li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
 <li><a href="#cupsRasterOpen" title="Open a raster stream.">cupsRasterOpen</a></li>
 <li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a
-V1 page header structure.">cupsRasterReadHeader</a></li>
+version 1 page header structure.">cupsRasterReadHeader</a></li>
 <li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a
-V2 page header structure.">cupsRasterReadHeader2</a></li>
+version 2 page header structure.">cupsRasterReadHeader2</a></li>
 <li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
-<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a V1 page
+<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page
 header structure.">cupsRasterWriteHeader</a></li>
-<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a V2 page
-header structure.">cupsRasterWriteHeader2</a></li>
+<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2
+page header structure.">cupsRasterWriteHeader2</a></li>
 <li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
 </ul>
 <li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#cups_adv_t" title="AdvanceMedia attribute values">cups_adv_t</a></li>
+	<li><a href="#cups_bool_t" title="Types...">cups_bool_t</a></li>
+	<li><a href="#cups_cspace_t" title="CutMedia attribute values">cups_cspace_t</a></li>
+	<li><a href="#cups_cut_t" title="LeadingEdge attribute values">cups_cut_t</a></li>
+	<li><a href="#cups_edge_t" title="Jog attribute values">cups_edge_t</a></li>
 	<li><a href="#cups_interpret_cb_t" title="cupsRasterInterpretPPD callback function">cups_interpret_cb_t</a></li>
+	<li><a href="#cups_jog_t" title="cupsRasterOpen modes">cups_jog_t</a></li>
 	<li><a href="#cups_mode_t" title="cupsRasterOpen modes">cups_mode_t</a></li>
+	<li><a href="#cups_order_t" title="cupsColorOrder attribute values">cups_order_t</a></li>
+	<li><a href="#cups_orient_t" title="The page header structure contains the standard PostScript page device
+dictionary, along with some CUPS-specific parameters that are provided
+by the RIPs...">cups_orient_t</a></li>
 	<li><a href="#cups_page_header2_t" title="Version 2 page header ">cups_page_header2_t</a></li>
-	<li><a href="#cups_page_header_t" title="Version 1 page header">cups_page_header_t</a></li>
+	<li><a href="#cups_page_header_t" title="Version 1 page header ">cups_page_header_t</a></li>
 	<li><a href="#cups_raster_t" title="Raster stream data">cups_raster_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#cups_page_header2_s" title="Version 2 page header ">cups_page_header2_s</a></li>
-	<li><a href="#cups_page_header_s" title="Version 1 page header">cups_page_header_s</a></li>
+	<li><a href="#cups_page_header_s" title="Version 1 page header ">cups_page_header_s</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#cups_adv_e" title="AdvanceMedia attribute values">cups_adv_e</a></li>
@@ -354,6 +368,12 @@ CUPS raster streams which are used for printing to raster printers. Because the
 raster format is updated from time to time, it is important to use this API to
 avoid incompatibilities with newer versions of CUPS.</p>
 
+<p>Two kinds of CUPS filters use the CUPS raster API - raster image processor
+(RIP) filters such as <code>pstoraster</code> and <code>cgpdftoraster</code>
+(Mac OS X) that produce CUPS raster files and printer driver filters that
+convert CUPS raster files into a format usable by the printer. Printer
+driver filters are by far the most common.</p>
+
 <p>CUPS raster files (<code>application/vnd.cups-raster</code>) consists of
 a stream of raster page descriptions produced by one of the RIP filters such as
 <var>pstoraster</var>, <var>imagetoraster</var>, or
@@ -372,8 +392,21 @@ file descriptor 0:</p>
 <p>Each page of data begins with a page dictionary structure called
 <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a>. This
 structure contains the colorspace, bits per color, media size, media type,
-hardware resolution, and so forth used for the page. You read the page header
-using the
+hardware resolution, and so forth used for the page.</p>
+
+<blockquote><b>Note:</b>
+
+  <p>Do not confuse the colorspace in the page header with the PPD
+  <tt>ColorModel</tt> keyword. <tt>ColorModel</tt> refers to the general type of
+  color used for a device (Gray, RGB, CMYK, DeviceN) and is often used to
+  select a particular colorspace for the page header along with the associate
+  color profile. The page header colorspace (<tt>cupsColorSpace</tt>) describes
+  both the type and organization of the color data, for example KCMY (black
+  first) instead of CMYK and RGBA (RGB + alpha) instead of RGB.</p>
+
+</blockquote>
+
+<p>You read the page header using the
 <a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a>
 function:</p>
 
@@ -424,7 +457,7 @@ while (<a href="#cupsRasterReadHeader2">cupsRasterReadHeader2</a>(ras, &amp;head
     if (<a href="#cupsRasterReadPixels">cupsRasterReadPixels</a>(ras, buffer, header.cupsBytesPerLine) == 0)
       break;
 
-    /* write raster data to printer */
+    /* write raster data to printer on stdout */
   }
 
   /* finish this page */
@@ -440,6 +473,39 @@ the memory used to read the raster file:</p>
 
 <a href="#cupsRasterClose">cupsRasterClose</a>(ras);
 </pre>
+
+
+<h2 class='title'><a name="TASKS">Functions by Task</a></h2>
+
+<h3><a name="OPENCLOSE">Opening and Closing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
+	<li><a href="#cupsRasterOpen" title="Open a raster stream.">cupsRasterOpen</a></li>
+
+</ul>
+
+<h3><a name="READING">Reading Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a version 1 page header structure.">cupsRasterReadHeader</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a version 2 page header structure.">cupsRasterReadHeader2</a></li>
+	<li><a href="#cupsRasterReadPixels" title="Read raster pixels.">cupsRasterReadPixels</a></li>
+
+</ul>
+
+<h3><a name="WRITING">Writing Raster Streams</a></h3>
+
+<ul class="code">
+
+	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
+	<li><a href="#cupsRasterWriteHeader" title="Write a raster page header from a version 1 page header structure.">cupsRasterWriteHeader</a></li>
+	<li><a href="#cupsRasterWriteHeader2" title="Write a raster page header from a version 2 page header structure.">cupsRasterWriteHeader2</a> <span class="info">Deprecated in CUPS 1.2/Mac OS X 10.5</span></li>
+	<li><a href="#cupsRasterWritePixels" title="Write raster pixels.">cupsRasterWritePixels</a></li>
+	
+</ul>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><a name="cupsRasterClose">cupsRasterClose</a></h3>
 <p class="description">Close a raster stream.</p>
@@ -452,7 +518,10 @@ void cupsRasterClose (<br>
 <dt>r</dt>
 <dd class="description">Stream to close</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The file descriptor associated with the raster stream must be closed
+separately as needed.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterInterpretPPD">cupsRasterInterpretPPD</a></h3>
 <p class="description">Interpret PPD commands to create a page header.</p>
 <p class="code">
 int cupsRasterInterpretPPD (<br>
@@ -465,7 +534,7 @@ int cupsRasterInterpretPPD (<br>
 <h4 class="parameters">Parameters</h4>
 <dl>
 <dt>h</dt>
-<dd class="description">Page header</dd>
+<dd class="description">Page header to create</dd>
 <dt>ppd</dt>
 <dd class="description">PPD file</dd>
 <dt>num_options</dt>
@@ -473,22 +542,28 @@ int cupsRasterInterpretPPD (<br>
 <dt>options</dt>
 <dd class="description">Options</dd>
 <dt>func</dt>
-<dd class="description">Optional page header callback</dd>
+<dd class="description">Optional page header callback (<code>NULL</code> for none)</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on failure</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">This function does not mark the options in the PPD using the &quot;num_options&quot;
-and &quot;options&quot; arguments.  Instead, mark the options with
-<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling
-<code>cupsRasterInterpretPPD</code> - this allows you to do per-page options
-without manipulating the options array.<br>
+<p class="discussion">This function is used by raster image processing (RIP) filters like
+cgpdftoraster and imagetoraster when writing CUPS raster data for a page.
+It is not used by raster printer driver filters which only read CUPS
+raster data.<br>
+<br>
+
+<code>cupsRasterInterpretPPD</code> does not mark the options in the PPD using
+the &quot;num_options&quot; and &quot;options&quot; arguments.  Instead, mark the options with
+<code>cupsMarkOptions</code> and <code>ppdMarkOption</code> prior to calling it -
+this allows for per-page options without manipulating the options array.<br>
 <br>
 The &quot;func&quot; argument specifies an optional callback function that is
 called prior to the computation of the final raster data.  The function
 can make changes to the <a href="#cups_page_header2_t"><code>cups_page_header2_t</code></a> data as needed to use a
 supported raster format and then returns 0 on success and -1 if the
-requested attributes cannot be supported.
+requested attributes cannot be supported.<br>
+<br>
 
 <code>cupsRasterInterpretPPD</code> supports a subset of the PostScript language.
 Currently only the <code>[</code>, <code>]</code>, <code><<</code>, <code>>></code>, <code>{</code>,
@@ -509,13 +584,22 @@ are supported.
 <dt>fd</dt>
 <dd class="description">File descriptor</dd>
 <dt>mode</dt>
-<dd class="description">Mode</dd>
+<dd class="description">Mode - <code>CUPS_RASTER_READ</code>, <code>CUPS_RASTER_WRITE</code>, or <code>CUPS_RASTER_WRITE_COMPRESSED</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New stream</p>
-<h3 class="function"><a name="cupsRasterReadHeader">cupsRasterReadHeader</a></h3>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function associates a raster stream with the given file descriptor.
+For most printer driver filters, &quot;fd&quot; will be 0 (stdin).  For most raster
+image processor (RIP) filters that generate raster data, &quot;fd&quot; will be 1
+(stdout).<br>
+<br>
+When writing raster data, the <code>CUPS_RASTER_WRITE</code> or
+<code>CUPS_RASTER_WRITE_COMPRESS</code> mode can be used - compressed output
+is generally 25-50% smaller but adds a 100-300% execution time overhead.</p>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsRasterReadHeader">cupsRasterReadHeader</a></h3>
 <p class="description">Read a raster page header and store it in a
-V1 page header structure.</p>
+version 1 page header structure.</p>
 <p class="code">
 unsigned cupsRasterReadHeader (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
@@ -529,10 +613,18 @@ unsigned cupsRasterReadHeader (<br>
 <dd class="description">Pointer to header data</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on fail</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsRasterReadHeader2">cupsRasterReadHeader2</a></h3>
+<p class="description">1 on success, 0 on failure/end-of-file</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is deprecated. Use <a href="#cupsRasterReadHeader2"><code>cupsRasterReadHeader2</code></a> instead.<br>
+<br>
+Version 1 page headers were used in CUPS 1.0 and 1.1 and contain a subset
+of the version 2 page header data. This function handles reading version 2
+page headers and copying only the version 1 data into the provided buffer.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterReadHeader2">cupsRasterReadHeader2</a></h3>
 <p class="description">Read a raster page header and store it in a
-V2 page header structure.</p>
+version 2 page header structure.</p>
 <p class="code">
 unsigned cupsRasterReadHeader2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
@@ -546,7 +638,7 @@ unsigned cupsRasterReadHeader2 (<br>
 <dd class="description">Pointer to header data</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 on success, 0 on fail</p>
+<p class="description">1 on success, 0 on failure/end-of-file</p>
 <h3 class="function"><a name="cupsRasterReadPixels">cupsRasterReadPixels</a></h3>
 <p class="description">Read raster pixels.</p>
 <p class="code">
@@ -566,8 +658,12 @@ unsigned cupsRasterReadPixels (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes read</p>
-<h3 class="function"><a name="cupsRasterWriteHeader">cupsRasterWriteHeader</a></h3>
-<p class="description">Write a raster page header from a V1 page
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For best performance, filters should read one or more whole lines.
+The &quot;cupsBytesPerLine&quot; value from the page header can be used to allocate
+the line buffer and as the number of bytes to read.</p>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsRasterWriteHeader">cupsRasterWriteHeader</a></h3>
+<p class="description">Write a raster page header from a version 1 page
 header structure.</p>
 <p class="code">
 unsigned cupsRasterWriteHeader (<br>
@@ -583,9 +679,13 @@ unsigned cupsRasterWriteHeader (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsRasterWriteHeader2">cupsRasterWriteHeader2</a></h3>
-<p class="description">Write a raster page header from a V2 page
-header structure.</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is deprecated. Use <a href="#cupsRasterWriteHeader2"><code>cupsRasterWriteHeader2</code></a> instead.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsRasterWriteHeader2">cupsRasterWriteHeader2</a></h3>
+<p class="description">Write a raster page header from a version 2
+page header structure.</p>
 <p class="code">
 unsigned cupsRasterWriteHeader2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_t">cups_raster_t</a> *r,<br>
@@ -600,6 +700,10 @@ unsigned cupsRasterWriteHeader2 (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The page header can be initialized using <a href="#cupsRasterInterpretPPD"><code>cupsRasterInterpretPPD</code></a>.
+
+</p>
 <h3 class="function"><a name="cupsRasterWritePixels">cupsRasterWritePixels</a></h3>
 <p class="description">Write raster pixels.</p>
 <p class="code">
@@ -619,24 +723,70 @@ unsigned cupsRasterWritePixels (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes written</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">For best performance, filters should write one or more whole lines.
+The &quot;cupsBytesPerLine&quot; value from the page header can be used to allocate
+the line buffer and as the number of bytes to write.</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><a name="cups_adv_t">cups_adv_t</a></h3>
+<p class="description">AdvanceMedia attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_adv_e">cups_adv_e</a> cups_adv_t;
+</p>
+<h3 class="typedef"><a name="cups_bool_t">cups_bool_t</a></h3>
+<p class="description">Types...</p>
+<p class="code">
+typedef enum <a href="#cups_bool_e">cups_bool_e</a> cups_bool_t;
+</p>
+<h3 class="typedef"><a name="cups_cspace_t">cups_cspace_t</a></h3>
+<p class="description">CutMedia attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_cspace_e">cups_cspace_e</a> cups_cspace_t;
+</p>
+<h3 class="typedef"><a name="cups_cut_t">cups_cut_t</a></h3>
+<p class="description">LeadingEdge attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_cut_e">cups_cut_e</a> cups_cut_t;
+</p>
+<h3 class="typedef"><a name="cups_edge_t">cups_edge_t</a></h3>
+<p class="description">Jog attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_edge_e">cups_edge_e</a> cups_edge_t;
+</p>
 <h3 class="typedef"><a name="cups_interpret_cb_t">cups_interpret_cb_t</a></h3>
 <p class="description">cupsRasterInterpretPPD callback function</p>
 <p class="code">
 typedef int (*cups_interpret_cb_t)(<a href="#cups_page_header2_t">cups_page_header2_t</a> *header, int preferred_bits);
+</p>
+<h3 class="typedef"><a name="cups_jog_t">cups_jog_t</a></h3>
+<p class="description">cupsRasterOpen modes</p>
+<p class="code">
+typedef enum <a href="#cups_jog_e">cups_jog_e</a> cups_jog_t;
 </p>
 <h3 class="typedef"><a name="cups_mode_t">cups_mode_t</a></h3>
 <p class="description">cupsRasterOpen modes</p>
 <p class="code">
 typedef enum <a href="#cups_mode_e">cups_mode_e</a> cups_mode_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
+<h3 class="typedef"><a name="cups_order_t">cups_order_t</a></h3>
+<p class="description">cupsColorOrder attribute values</p>
+<p class="code">
+typedef enum <a href="#cups_order_e">cups_order_e</a> cups_order_t;
+</p>
+<h3 class="typedef"><a name="cups_orient_t">cups_orient_t</a></h3>
+<p class="description">The page header structure contains the standard PostScript page device
+dictionary, along with some CUPS-specific parameters that are provided
+by the RIPs...</p>
+<p class="code">
+typedef enum <a href="#cups_orient_e">cups_orient_e</a> cups_orient_t;
+</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cups_page_header2_t">cups_page_header2_t</a></h3>
 <p class="description">Version 2 page header </p>
 <p class="code">
 typedef struct <a href="#cups_page_header2_s">cups_page_header2_s</a> cups_page_header2_t;
 </p>
-<h3 class="typedef"><a name="cups_page_header_t">cups_page_header_t</a></h3>
-<p class="description">Version 1 page header</p>
+<h3 class="typedef"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cups_page_header_t">cups_page_header_t</a></h3>
+<p class="description">Version 1 page header </p>
 <p class="code">
 typedef struct <a href="#cups_page_header_s">cups_page_header_s</a> cups_page_header_t;
 </p>
@@ -646,42 +796,42 @@ typedef struct <a href="#cups_page_header_s">cups_page_header_s</a> cups_page_he
 typedef struct _cups_raster_s cups_raster_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cups_page_header2_s">cups_page_header2_s</a></h3>
 <p class="description">Version 2 page header </p>
 <p class="code">struct cups_page_header2_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_adv_t AdvanceMedia;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Collate;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_cut_t CutMedia;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Duplex;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned HWResolution[2];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned ImagingBoundingBox[4];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t InsertSheet;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_jog_t Jog;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_edge_t LeadingEdge;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t ManualFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned Margins[2];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaClass[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaColor[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaPosition;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaType[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaWeight;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t MirrorPrint;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t NegativePrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned NumCopies;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_orient_t Orientation;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t OutputFaceUp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char OutputType[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned PageSize[2];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Separations;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t TraySwitch;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Tumble;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerColor;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerPixel;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;float cupsBorderlessScalingFactor;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBytesPerLine;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_order_t cupsColorOrder;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_cspace_t cupsColorSpace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsCompression;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsHeight;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;float cupsImagingBBox[4];<br>
@@ -704,23 +854,23 @@ typedef struct _cups_raster_s cups_raster_t;
 <dt>AdvanceDistance </dt>
 <dd class="description">AdvanceDistance value in points</dd>
 <dt>AdvanceMedia </dt>
-<dd class="description">AdvanceMedia value (see above)</dd>
+<dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
 <dt>Collate </dt>
 <dd class="description">Collated copies value</dd>
 <dt>CutMedia </dt>
-<dd class="description">CutMedia value (see above)</dd>
+<dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
 <dt>Duplex </dt>
 <dd class="description">Duplexed (double-sided) value</dd>
 <dt>HWResolution[2] </dt>
 <dd class="description">Resolution in dots-per-inch</dd>
 <dt>ImagingBoundingBox[4] </dt>
-<dd class="description">Pixel region that is painted (points)</dd>
+<dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
 <dt>InsertSheet </dt>
 <dd class="description">InsertSheet value</dd>
 <dt>Jog </dt>
-<dd class="description">Jog value (see above)</dd>
+<dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
 <dt>LeadingEdge </dt>
-<dd class="description">LeadingEdge value (see above)</dd>
+<dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
 <dt>ManualFeed </dt>
 <dd class="description">ManualFeed value</dd>
 <dt>Margins[2] </dt>
@@ -742,7 +892,7 @@ typedef struct _cups_raster_s cups_raster_t;
 <dt>NumCopies </dt>
 <dd class="description">Number of copies to produce</dd>
 <dt>Orientation </dt>
-<dd class="description">Orientation value (see above)</dd>
+<dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
 <dt>OutputFaceUp </dt>
 <dd class="description">OutputFaceUp value</dd>
 <dt>OutputType[64] </dt>
@@ -759,7 +909,7 @@ typedef struct _cups_raster_s cups_raster_t;
 <dd class="description">Number of bits for each color</dd>
 <dt>cupsBitsPerPixel </dt>
 <dd class="description">Number of bits for each pixel</dd>
-<dt>cupsBorderlessScalingFactor <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsBorderlessScalingFactor <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Scaling that was applied to page data </dd>
 <dt>cupsBytesPerLine </dt>
 <dd class="description">Number of bytes per line</dd>
@@ -771,25 +921,26 @@ typedef struct _cups_raster_s cups_raster_t;
 <dd class="description">Device compression to use</dd>
 <dt>cupsHeight </dt>
 <dd class="description">Height of page image in pixels</dd>
-<dt>cupsImagingBBox[4] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
-<dd class="description">Floating point ImagingBoundingBox *
-(scaling factor not applied) </dd>
-<dt>cupsInteger[16] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsImagingBBox[4] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dd class="description">Floating point ImagingBoundingBox
+(scaling factor not applied, left,
+bottom, right, top) </dd>
+<dt>cupsInteger[16] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined integer values </dd>
-<dt>cupsMarkerType[64] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsMarkerType[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Ink/toner type </dd>
 <dt>cupsMediaType </dt>
 <dd class="description">Media type code</dd>
-<dt>cupsNumColors <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
-<dd class="description">Number of colors </dd>
-<dt>cupsPageSizeName[64] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsNumColors <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
+<dd class="description">Number of color compoents </dd>
+<dt>cupsPageSizeName[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">PageSize name </dd>
-<dt>cupsPageSize[2] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsPageSize[2] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Floating point PageSize (scaling *
 factor not applied) </dd>
-<dt>cupsReal[16] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsReal[16] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined floating-point values </dd>
-<dt>cupsRenderingIntent[64] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsRenderingIntent[64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Color rendering intent </dd>
 <dt>cupsRowCount </dt>
 <dd class="description">Rows per band</dd>
@@ -797,46 +948,46 @@ factor not applied) </dd>
 <dd class="description">Feed between bands</dd>
 <dt>cupsRowStep </dt>
 <dd class="description">Spacing between lines</dd>
-<dt>cupsString[16][64] <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>cupsString[16][64] <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">User-defined string values </dd>
 <dt>cupsWidth </dt>
 <dd class="description">Width of page image in pixels</dd>
 </dl>
-<h3 class="struct"><a name="cups_page_header_s">cups_page_header_s</a></h3>
-<p class="description">Version 1 page header</p>
+<h3 class="struct"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cups_page_header_s">cups_page_header_s</a></h3>
+<p class="description">Version 1 page header </p>
 <p class="code">struct cups_page_header_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned AdvanceDistance;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_adv_t AdvanceMedia;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Collate;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_cut_t CutMedia;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Duplex;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_adv_t">cups_adv_t</a> AdvanceMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Collate;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cut_t">cups_cut_t</a> CutMedia;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Duplex;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned HWResolution[2];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned ImagingBoundingBox[4];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t InsertSheet;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_jog_t Jog;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_edge_t LeadingEdge;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t ManualFeed;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> InsertSheet;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_jog_t">cups_jog_t</a> Jog;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_edge_t">cups_edge_t</a> LeadingEdge;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> ManualFeed;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned Margins[2];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaClass[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaColor[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaPosition;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char MediaType[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned MediaWeight;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t MirrorPrint;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t NegativePrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> MirrorPrint;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> NegativePrint;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned NumCopies;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_orient_t Orientation;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t OutputFaceUp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_orient_t">cups_orient_t</a> Orientation;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> OutputFaceUp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char OutputType[64];<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned PageSize[2];<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Separations;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t TraySwitch;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_bool_t Tumble;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Separations;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> TraySwitch;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_bool_t">cups_bool_t</a> Tumble;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerColor;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBitsPerPixel;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsBytesPerLine;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_order_t cupsColorOrder;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;cups_cspace_t cupsColorSpace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_order_t">cups_order_t</a> cupsColorOrder;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_cspace_t">cups_cspace_t</a> cupsColorSpace;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsCompression;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsHeight;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;unsigned cupsMediaType;<br>
@@ -850,23 +1001,23 @@ factor not applied) </dd>
 <dt>AdvanceDistance </dt>
 <dd class="description">AdvanceDistance value in points</dd>
 <dt>AdvanceMedia </dt>
-<dd class="description">AdvanceMedia value (see above)</dd>
+<dd class="description">AdvanceMedia value (<a href="#cups_adv_t"><code>cups_adv_t</code></a>)</dd>
 <dt>Collate </dt>
 <dd class="description">Collated copies value</dd>
 <dt>CutMedia </dt>
-<dd class="description">CutMedia value (see above)</dd>
+<dd class="description">CutMedia value (<a href="#cups_cut_t"><code>cups_cut_t</code></a>)</dd>
 <dt>Duplex </dt>
 <dd class="description">Duplexed (double-sided) value</dd>
 <dt>HWResolution[2] </dt>
 <dd class="description">Resolution in dots-per-inch</dd>
 <dt>ImagingBoundingBox[4] </dt>
-<dd class="description">Pixel region that is painted (points)</dd>
+<dd class="description">Pixel region that is painted (points, left, bottom, right, top)</dd>
 <dt>InsertSheet </dt>
 <dd class="description">InsertSheet value</dd>
 <dt>Jog </dt>
-<dd class="description">Jog value (see above)</dd>
+<dd class="description">Jog value (<a href="#cups_jog_t"><code>cups_jog_t</code></a>)</dd>
 <dt>LeadingEdge </dt>
-<dd class="description">LeadingEdge value (see above)</dd>
+<dd class="description">LeadingEdge value (<a href="#cups_edge_t"><code>cups_edge_t</code></a>)</dd>
 <dt>ManualFeed </dt>
 <dd class="description">ManualFeed value</dd>
 <dt>Margins[2] </dt>
@@ -888,7 +1039,7 @@ factor not applied) </dd>
 <dt>NumCopies </dt>
 <dd class="description">Number of copies to produce</dd>
 <dt>Orientation </dt>
-<dd class="description">Orientation value (see above)</dd>
+<dd class="description">Orientation value (<a href="#cups_orient_t"><code>cups_orient_t</code></a>)</dd>
 <dt>OutputFaceUp </dt>
 <dd class="description">OutputFaceUp value</dd>
 <dt>OutputType[64] </dt>
@@ -1010,7 +1161,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Red, green, blue</dd>
 <dt>CUPS_CSPACE_RGBA </dt>
 <dd class="description">Red, green, blue, alpha</dd>
-<dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2&nbsp;</span></dt>
+<dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Red, green, blue, white </dd>
 <dt>CUPS_CSPACE_SILVER </dt>
 <dd class="description">Silver foil</dd>

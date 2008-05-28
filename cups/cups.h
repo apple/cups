@@ -64,6 +64,7 @@ extern "C" {
 #  define CUPS_VERSION_MINOR	4
 #  define CUPS_VERSION_PATCH	-1
 
+#  define CUPS_BC_FD		3	/* Back-channel file descriptor for select/poll */
 #  define CUPS_DATE_ANY		(time_t)-1
 #  define CUPS_EXCLUDE_NONE	(const char *)0
 #  define CUPS_FORMAT_AUTO	"application/octet-stream"

@@ -222,10 +222,14 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
  *
  * This function is deprecated. Use @link cupsRasterReadHeader2@ instead.
  *
+ * Version 1 page headers were used in CUPS 1.0 and 1.1 and contain a subset
+ * of the version 2 page header data. This function handles reading version 2
+ * page headers and copying only the version 1 data into the provided buffer.
+ *
  * @deprecated@
  */
 
-unsigned				/* O - 1 on success, 0 on fail */
+unsigned				/* O - 1 on success, 0 on failure/end-of-file */
 cupsRasterReadHeader(
     cups_raster_t      *r,		/* I - Raster stream */
     cups_page_header_t *h)		/* I - Pointer to header data */
@@ -254,7 +258,7 @@ cupsRasterReadHeader(
  * @since CUPS 1.2/Mac OS X 10.5@
  */
 
-unsigned				/* O - 1 on success, 0 on fail */
+unsigned				/* O - 1 on success, 0 on failure/end-of-file */
 cupsRasterReadHeader2(
     cups_raster_t       *r,		/* I - Raster stream */
     cups_page_header2_t *h)		/* I - Pointer to header data */
@@ -278,6 +282,10 @@ cupsRasterReadHeader2(
 
 /*
  * 'cupsRasterReadPixels()' - Read raster pixels.
+ *
+ * For best performance, filters should read one or more whole lines.
+ * The "cupsBytesPerLine" value from the page header can be used to allocate
+ * the line buffer and as the number of bytes to read.
  */
 
 unsigned				/* O - Number of bytes read */
@@ -551,6 +559,10 @@ cupsRasterWriteHeader2(
 
 /*
  * 'cupsRasterWritePixels()' - Write raster pixels.
+ *
+ * For best performance, filters should write one or more whole lines.
+ * The "cupsBytesPerLine" value from the page header can be used to allocate
+ * the line buffer and as the number of bytes to write.
  */
 
 unsigned				/* O - Number of bytes written */

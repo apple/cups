@@ -3,7 +3,7 @@
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -46,18 +46,17 @@ static void	cups_setup(fd_set *set, struct timeval *tval,
 /*
  * 'cupsBackChannelRead()' - Read data from the backchannel.
  *
- * Reads up to "bytes" bytes from the backchannel. The "timeout"
- * parameter controls how many seconds to wait for the data - use
- * 0.0 to return immediately if there is no data, -1.0 to wait
- * for data indefinitely.
+ * Reads up to "bytes" bytes from the backchannel/backend. The "timeout"
+ * parameter controls how many seconds to wait for the data - use 0.0 to
+ * return immediately if there is no data, -1.0 to wait for data indefinitely.
  *
  * @since CUPS 1.2@
  */
 
 ssize_t					/* O - Bytes read or -1 on error */
-cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
+cupsBackChannelRead(char   *buffer,	/* I - Buffer to read into */
                     size_t bytes,	/* I - Bytes to read */
-		    double timeout)	/* I - Timeout in seconds */
+		    double timeout)	/* I - Timeout in seconds, typically 0.0 to poll */
 {
   fd_set	input;			/* Input set */
   struct timeval tval;			/* Timeout value */
@@ -97,7 +96,7 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read */
 /*
  * 'cupsBackChannelWrite()' - Write data to the backchannel.
  *
- * Writes "bytes" bytes to the backchannel. The "timeout" parameter
+ * Writes "bytes" bytes to the backchannel/filter. The "timeout" parameter
  * controls how many seconds to wait for the data to be written - use
  * 0.0 to return immediately if the data cannot be written, -1.0 to wait
  * indefinitely.
@@ -109,7 +108,7 @@ ssize_t					/* O - Bytes written or -1 on error */
 cupsBackChannelWrite(
     const char *buffer,			/* I - Buffer to write */
     size_t     bytes,			/* I - Bytes to write */
-    double     timeout)			/* I - Timeout in seconds */
+    double     timeout)			/* I - Timeout in seconds, typically 1.0 */
 {
   fd_set	output;			/* Output set */
   struct timeval tval;			/* Timeout value */

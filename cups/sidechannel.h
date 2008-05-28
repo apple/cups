@@ -45,7 +45,7 @@ extern "C" {
  * Enumerations...
  */
 
-enum cups_sc_bidi_e			/**** Bidirectional capabilities ****/
+enum cups_sc_bidi_e			/**** Bidirectional capability values ****/
 {
   CUPS_SC_BIDI_NOT_SUPPORTED = 0,	/* Bidirectional I/O is not supported */
   CUPS_SC_BIDI_SUPPORTED = 1		/* Bidirectional I/O is supported */

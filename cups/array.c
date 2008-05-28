@@ -99,8 +99,8 @@ static int	cups_array_find(cups_array_t *a, void *e, int prev, int *rdiff);
  * 'cupsArrayAdd()' - Add an element to the array.
  *
  * When adding an element to a sorted array, non-unique elements are
- * appended at the end of the run.  For unsorted arrays, the element
- * is inserted at the end of the array.
+ * appended at the end of the run of identical elements.  For unsorted arrays,
+ * the element is appended to the end of the array.
  *
  * @since CUPS 1.2@
  */
@@ -131,6 +131,10 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
 /*
  * 'cupsArrayClear()' - Clear the array.
+ *
+ * This function is equivalent to removing all elements in the array.
+ * The caller is responsible for freeing the memory used by the
+ * elements themselves.
  *
  * @since CUPS 1.2@
  */
@@ -185,6 +189,9 @@ cupsArrayCount(cups_array_t *a)		/* I - Array */
 /*
  * 'cupsArrayCurrent()' - Return the current element in the array.
  *
+ * The current element is undefined until you call @link cupsArrayFind@,
+ * @link cupsArrayFirst@, or @link cupsArrayIndex@, or @link cupsArrayLast@.
+ *
  * @since CUPS 1.2@
  */
 
@@ -211,6 +218,9 @@ cupsArrayCurrent(cups_array_t *a)	/* I - Array */
 
 /*
  * 'cupsArrayDelete()' - Free all memory used by the array.
+ *
+ * The caller is responsible for freeing the memory used by the
+ * elements themselves.
  *
  * @since CUPS 1.2@
  */
@@ -407,7 +417,7 @@ cupsArrayFind(cups_array_t *a,		/* I - Array */
  * @since CUPS 1.2@
  */
 
-void *					/* O - First element or @code NULL@ */
+void *					/* O - First element or @code NULL@ if the array is empty */
 cupsArrayFirst(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -430,10 +440,13 @@ cupsArrayFirst(cups_array_t *a)		/* I - Array */
 /*
  * 'cupsArrayGetIndex()' - Get the index of the current element.
  *
+ * The current element is undefined until you call @link cupsArrayFind@,
+ * @link cupsArrayFirst@, or @link cupsArrayIndex@, or @link cupsArrayLast@.
+ *
  * @since CUPS 1.3@
  */
 
-int					/* O - Index of the current element */
+int					/* O - Index of the current element, starting at 0 */
 cupsArrayGetIndex(cups_array_t *a)	/* I - Array */
 {
   if (!a)
@@ -449,7 +462,7 @@ cupsArrayGetIndex(cups_array_t *a)	/* I - Array */
  * @since CUPS 1.3@
  */
 
-int					/* O - Index of the last inserted element */
+int					/* O - Index of the last inserted element, starting at 0 */
 cupsArrayGetInsert(cups_array_t *a)	/* I - Array */
 {
   if (!a)
@@ -482,8 +495,8 @@ cupsArrayIndex(cups_array_t *a,		/* I - Array */
  * 'cupsArrayInsert()' - Insert an element in the array.
  *
  * When inserting an element in a sorted array, non-unique elements are
- * inserted at the beginning of the run.  For unsorted arrays, the element
- * is inserted at the beginning of the array.
+ * inserted at the beginning of the run of identical elements.  For unsorted
+ * arrays, the element is inserted at the beginning of the array.
  *
  * @since CUPS 1.2@
  */
@@ -518,7 +531,7 @@ cupsArrayInsert(cups_array_t *a,	/* I - Array */
  * @since CUPS 1.2@
  */
 
-void *					/* O - Last element or @code NULL@ */
+void *					/* O - Last element or @code NULL@ if the array is empty */
 cupsArrayLast(cups_array_t *a)		/* I - Array */
 {
  /*
@@ -541,12 +554,17 @@ cupsArrayLast(cups_array_t *a)		/* I - Array */
 /*
  * 'cupsArrayNew()' - Create a new array.
  *
+ * The comparison function ("f") is used to create a sorted array. The function
+ * receives pointers to two elements and the user data pointer ("d") - the user
+ * data pointer argument can safely be omitted when not required so functions
+ * like @code strcmp@ can be used for sorted string arrays.
+ *
  * @since CUPS 1.2@
  */
 
 cups_array_t *				/* O - Array */
-cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
-             void              *d)	/* I - User data */
+cupsArrayNew(cups_array_func_t f,	/* I - Comparison function or @code NULL@ for an unsorted array */
+             void              *d)	/* I - User data pointer or @code NULL@ */
 {
   return (cupsArrayNew2(f, d, 0, 0));
 }
@@ -555,14 +573,22 @@ cupsArrayNew(cups_array_func_t f,	/* I - Comparison function */
 /*
  * 'cupsArrayNew2()' - Create a new array with hash.
  *
+ * The comparison function ("f") is used to create a sorted array. The function
+ * receives pointers to two elements and the user data pointer ("d") - the user
+ * data pointer argument can safely be omitted when not required so functions
+ * like @code strcmp@ can be used for sorted string arrays.
+ *
+ * The hash function ("h") is used to implement cached lookups with the
+ * specified hash size ("hsize").
+ *
  * @since CUPS 1.3@
  */
 
 cups_array_t *				/* O - Array */
-cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function */
-              void               *d,	/* I - User data */
-              cups_ahash_func_t  h,	/* I - Hash function*/
-	      int                hsize)	/* I - Hash size */
+cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ for an unsorted array */
+              void               *d,	/* I - User data or @code NULL@ */
+              cups_ahash_func_t  h,	/* I - Hash function or @code NULL@ for unhashed lookups */
+	      int                hsize)	/* I - Hash size (>= 0) */
 {
   cups_array_t	*a;			/* Array  */
 
@@ -604,6 +630,12 @@ cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function */
 /*
  * 'cupsArrayNext()' - Get the next element in the array.
  *
+ * This function is equivalent to "cupsArrayIndex(a, cupsArrayGetIndex(a) + 1)".
+ *
+ * The next element is undefined until you call @link cupsArrayFind@,
+ * @link cupsArrayFirst@, or @link cupsArrayIndex@, or @link cupsArrayLast@
+ * to set the current element.
+ *
  * @since CUPS 1.2@
  */
 
@@ -631,6 +663,12 @@ cupsArrayNext(cups_array_t *a)		/* I - Array */
 /*
  * 'cupsArrayPrev()' - Get the previous element in the array.
  *
+ * This function is equivalent to "cupsArrayIndex(a, cupsArrayGetIndex(a) - 1)".
+ *
+ * The previous element is undefined until you call @link cupsArrayFind@,
+ * @link cupsArrayFirst@, or @link cupsArrayIndex@, or @link cupsArrayLast@
+ * to set the current element.
+ *
  * @since CUPS 1.2@
  */
 
@@ -657,6 +695,12 @@ cupsArrayPrev(cups_array_t *a)		/* I - Array */
 
 /*
  * 'cupsArrayRemove()' - Remove an element from the array.
+ *
+ * If more than one element matches "e", only the first matching element is
+ * removed.
+ *
+ * The caller is responsible for freeing the memory used by the
+ * removed element.
  *
  * @since CUPS 1.2@
  */
@@ -718,7 +762,7 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
 
 
 /*
- * 'cupsArrayRestore()' - Reset the current element to the last cupsArraySave.
+ * 'cupsArrayRestore()' - Reset the current element to the last @link cupsArraySave@.
  *
  * @since CUPS 1.2@
  */
@@ -743,7 +787,11 @@ cupsArrayRestore(cups_array_t *a)	/* I - Array */
 
 
 /*
- * 'cupsArraySave()' - Mark the current element for a later cupsArrayRestore.
+ * 'cupsArraySave()' - Mark the current element for a later @link cupsArrayRestore@.
+ *
+ * The current element is undefined until you call @link cupsArrayFind@,
+ * @link cupsArrayFirst@, or @link cupsArrayIndex@, or @link cupsArrayLast@
+ * to set the current element.
  *
  * The save/restore stack is guaranteed to be at least 32 elements deep.
  *
