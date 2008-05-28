@@ -25,6 +25,5 @@ TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
 VALUE="{SECTION=help?{?QUERY}:}" AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
 </TR>
+<TR><TD COLSPAN="9">&nbsp;</TD></TR>
 </TABLE>
-
-<H1>{title}</H1>

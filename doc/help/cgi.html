@@ -5,28 +5,21 @@
 </HEAD>
 <BODY>
 
-<P>CUPS has traditionally provided a dynamic web interface
-through dedicated CGI programs that are executed when users open
-special directories on the CUPS server. Each CGI performs
-administration, class, help, job, and printer functions as
-directed by the user, but the actual programs that are run and
-functions that are available are limited to those that were
-originally designed into the scheduler.</P>
+<P>CUPS provides a dynamic web interface through dedicated CGI programs that
+are executed when users open special directories on the CUPS server. Each CGI
+performs administration, class, help, job, and printer functions as directed by
+the user, but the actual programs that are run and functions that are available
+are limited to those that were originally designed into the scheduler.</P>
 
-<P>Support is now available for CGI programs and specific
-scripting languages, currently Java, Perl, PHP, and Python.  The
-interpreters for these languages are currently configured at
-compile time.  Future versions may expand the interface to allow
-for generic support of scripting languages similar to the Apache
-"AddHandler" directive, but with external programs instead of
-modules.</P>
-
-<P>Table 1 shows the MIME media types that are reserved for the
-CGI support in CUPS. The names have been chosen to mirror those
-used by Apache:</P>
+<P>CUPS also supports CGI programs and specific scripting languages (Java, Perl,
+PHP, and Python) for pages you want to provide.  The interpreters for these
+languages are currently configured at compile time and are associated with
+MIME media types. <a href="#TABLE1">Table 1</a> shows the MIME media types that
+are reserved for each type of page and are the same as those used by the Apache
+web server.</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="CGI MIME Media Types">
-<CAPTION>Table 1: CGI MIME Media Types</CAPTION>
+<CAPTION><A NAME="TABLE1">Table 1</A>: CGI MIME Media Types</CAPTION>
 <TR>
 	<TH>MIME Media Type</TH>
 	<TH>Description</TH>
@@ -57,7 +50,7 @@ used by Apache:</P>
 
 <P>In order to enable the corresponding type, you must create a
 new <VAR>/etc/cups/cgi.types</VAR> file which maps the filename
-extensions to the appropriate MIME type, for example:</P>
+extensions to the appropriate MIME types, for example:</P>
 
 <PRE CLASS="command">
 application/x-httpd-cgi cgi
@@ -67,9 +60,8 @@ application/x-httpd-php php
 application/x-httpd-python py
 </PRE>
 
-<P>CGI scripts/programs (application/x-httpd-cgi) also must have
-execution permissions to be treated as a CGI script or
-program.</P>
+<P>CGI scripts/programs (application/x-httpd-cgi) also must have execution
+permissions to be treated as a CGI script or program.</P>
 
 <H2><A NAME="LIMITS">Limitations</A></H2>
 

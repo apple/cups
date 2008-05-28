@@ -54,7 +54,7 @@
  * The Zebra portion of the driver has been tested with the LP-2844,
  * LP-2844Z, QL-320, and QL-420 label printers; it may also work with
  * other models.  The driver supports EPL line mode, EPL page mode,
- * ZPL, and CPCL as defined in Zebra's on-line developer documentation.
+ * ZPL, and CPCL as defined in Zebra's online developer documentation.
  */
 
 /*

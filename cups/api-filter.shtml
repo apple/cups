@@ -16,9 +16,11 @@
 
 <h2 class='title'><a name="OVERVIEW">Overview</a></h2>
 
-<p>Filters, printer drivers, port monitors, and backends use a common interface
-for processing print jobs and communicating status information to the scheduler.
-Each filter is run with a standard set of command-line arguments:<p>
+<p>Filters (which include printer drivers and port monitors) and backends
+are used to convert job files to a printable format and send that data to the
+printer itself. All of these programs use a common interface for processing
+print jobs and communicating status information to the scheduler. Each is run
+with a standard set of command-line arguments:<p>
 
 <dl class="code">
 
@@ -38,7 +40,7 @@ Each filter is run with a standard set of command-line arguments:<p>
 	<dd>The options that were provided when the job was submitted</dd>
 
 	<dt>argv[6]</dt>
-	<dd>The file to print (first filter only)</dd>
+	<dd>The file to print (first program only)</dd>
 </dl>
 
 <p>The scheduler runs one or more of these programs to print any given job. The
@@ -101,7 +103,8 @@ or 1 when they encounter an error. Backends can return any of the
 
 <h3><a name="ENVIRONMENT">Environment Variables</a></h3>
 
-<p>The following environment variables are defined by the printing system:</p>
+<p>The following environment variables are defined by the printing system
+when running print filters and backends:</p>
 
 <dl class="code">
 
@@ -122,10 +125,11 @@ or 1 when they encounter an error. Backends can return any of the
 	application/postscript).</dd>
 
 	<dt>CUPS_CACHEDIR</dt>
-	<dd>The directory where cache files can be stored.</dd>
+	<dd>The directory where cache files can be stored. Cache files can be
+	used to retain information between jobs or files in a job.</dd>
 
 	<dt>CUPS_DATADIR</dt>
-	<dd>The directory where data files can be found.</dd>
+	<dd>The directory where (read-only) CUPS data files can be found.</dd>
 
 	<dt>CUPS_SERVERROOT</dt>
 	<dd>The root directory of the server.</dd>
@@ -145,19 +149,23 @@ or 1 when they encounter an error. Backends can return any of the
 	file for this printer.</dd>
 
 	<dt>PRINTER</dt>
-	<dd>The name of the printer.</dd>
+	<dd>The queue name of the class or printer.</dd>
 
 	<dt>RIP_CACHE</dt>
 	<dd>The recommended amount of memory to use for Raster Image
 	Processors (RIPs).</dd>
 
+	<dt>TMPDIR</dt>
+	<dd>The directory where temporary files should be created.</dd>
+
 </dl>
 
 <h3><a name="MESSAGES">Communicating with the Scheduler</a></h3>
 
-<p>Filters and backends communicate wih the scheduler by writing messages
-to the standard error file. For example, the following code sets the current
-printer state message to "Printing page 5":</p>
+<p>Filters and backends communicate with the scheduler by writing messages
+to the standard error file. The scheduler reads messages from all filters in
+a job and processes the message based on its prefix. For example, the following
+code sets the current printer state message to "Printing page 5":</p>
 
 <pre class="example">
 int page = 5;
@@ -179,7 +187,8 @@ prefix strings:</p>
 	to set the <code>marker-colors</code>, <code>marker-levels</code>,
 	<code>marker-names</code>, <code>marker-types</code>,
 	<code>printer-alert</code>, and <code>printer-alert-description</code>
-	printer attributes.</dd>
+	printer attributes. Standard <code>marker-types</code> values are
+	listed in <a href='#TABLE1'>Table 1</a>.</dd>
 
 	<dt>CRIT: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
@@ -201,7 +210,8 @@ prefix strings:</p>
 
 	<dt>ERROR: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
-	message to the current error log file using the "error" log level.</dd>
+	message to the current error log file using the "error" log level.
+	Use "ERROR:" messages for non-persistent processing errors.</dd>
 
 	<dt>INFO: message</dt>
 	<dd>Sets the printer-state-message attribute. If the current log level
@@ -227,8 +237,10 @@ prefix strings:</p>
 	<dt>STATE: + printer-state-reason [printer-state-reason ...]</dt>
 	<dt>STATE: - printer-state-reason [printer-state-reason ...]</dt>
 	<dd>Sets, adds, or removes printer-state-reason keywords to the
-	current queue. Typically this is used to indicate media, ink, and
-	toner conditions on a printer.</dd>
+	current queue. Typically this is used to indicate persistent media,
+	ink, toner, and configuration conditions or errors on a printer.
+	<a href='#TABLE2'>Table 2</a> lists the standard state keywords -
+	use vendor-prefixed ("com.acme.foo") keywords for custom states.</dd>
 
 	<dt>WARNING: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
@@ -239,6 +251,141 @@ prefix strings:</p>
 
 <p>Messages without one of these prefixes are treated as if they began with
 the "DEBUG:" prefix string.</p>
+
+
+<div class='table'><table width='80%' summary='Table 1: Standard marker-types Values'>
+<caption>Table 1: <a name='TABLE1'>Standard marker-types Values</a></caption>
+<thead>
+<tr>
+	<th>marker-type</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>developer</td>
+	<td>Developer unit</td>
+</tr>
+<tr>
+	<td>fuser</td>
+	<td>Fuser unit</td>
+</tr>
+<tr>
+	<td>fuserCleaningPad</td>
+	<td>Fuser cleaning pad</td>
+</tr>
+<tr>
+	<td>fuserOil</td>
+	<td>Fuser oil</td>
+</tr>
+<tr>
+	<td>ink</td>
+	<td>Ink supply</td>
+</tr>
+<tr>
+	<td>opc</td>
+	<td>Photo conductor</td>
+</tr>
+<tr>
+	<td>solidWax</td>
+	<td>Wax supply</td>
+</tr>
+<tr>
+	<td>staples</td>
+	<td>Staple supply</td>
+</tr>
+<tr>
+	<td>toner</td>
+	<td>Toner supply</td>
+</tr>
+<tr>
+	<td>transferUnit</td>
+	<td>Transfer unit</td>
+</tr>
+<tr>
+	<td>wasteInk</td>
+	<td>Waste ink tank</td>
+</tr>
+<tr>
+	<td>wasteToner</td>
+	<td>Waste toner tank</td>
+</tr>
+<tr>
+	<td>wasteWax</td>
+	<td>Waste wax tank</td>
+</tr>
+</tbody>
+</table></div>
+
+<br>
+
+<div class='table'><table width='80%' summary='Table 2: Standard State Keywords'>
+<caption>Table 2: <a name='TABLE2'>Standard State Keywords</a></caption>
+<thead>
+<tr>
+	<th>Keyword</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>connecting-to-device</td>
+	<td>Connecting to printer but not printing yet</td>
+</tr>
+<tr>
+	<td>cover-open</td>
+	<td>A cover is open on the printer</td>
+</tr>
+<tr>
+	<td>input-tray-missing</td>
+	<td>An input tray is missing from the printer</td>
+</tr>
+<tr>
+	<td>marker-supply-empty</td>
+	<td>Out of ink</td>
+</tr>
+<tr>
+	<td>marker-supply-low</td>
+	<td>Low on ink</td>
+</tr>
+<tr>
+	<td>marker-waste-almost-full</td>
+	<td>Waste tank almost full</td>
+</tr>
+<tr>
+	<td>marker-waste-full</td>
+	<td>Waste tank full</td>
+</tr>
+<tr>
+	<td>media-empty</td>
+	<td>Out of media</td>
+</tr>
+<tr>
+	<td>media-jam</td>
+	<td>Media is jammed in the printer</td>
+</tr>
+<tr>
+	<td>media-low</td>
+	<td>Low on media</td>
+</tr>
+<tr>
+	<td>paused</td>
+	<td>Stop the printer</td>
+</tr>
+<tr>
+	<td>timed-out</td>
+	<td>Unable to connect to printer</td>
+</tr>
+<tr>
+	<td>toner-empty</td>
+	<td>Out of toner</td>
+</tr>
+<tr>
+	<td>toner-low</td>
+	<td>Low on toner</td>
+</tr>
+</tbody>
+</table></div>
 
 <h3><a name="COMMUNICATING_BACKEND">Communicating with the Backend</a></h3>
 
@@ -261,7 +408,11 @@ ssize_t bytes;
 bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0.0);
 </pre>
 
-The
+<p>Filters can also use <code>select()</code> or <code>poll()</code> on the
+back-channel file descriptor (3 or <code>CUPS_BC_FD</code>) to read data only
+when it is available.</p>
+
+<p>The
 <a href="#cupsSideChannelDoRequest"><code>cupsSideChannelDoRequest</code></a>
 function allows you to get out-of-band status information and do synchronization
 with the device. For example, the following code gets the current IEEE-1284
@@ -274,7 +425,8 @@ char data[2049];
 int datalen;
 <a href="#cups_sc_status_t">cups_sc_status_t</a> status;
 
-/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for nul-termination... */
+/* Tell cupsSideChannelDoRequest() how big our buffer is, less 1 byte for
+   nul-termination... */
 datalen = sizeof(data) - 1;
 
 /* Get the IEEE-1284 device ID, waiting for up to 1 second */
@@ -300,6 +452,9 @@ recommend writing back-channel data using a timeout of 1.0 seconds:</p>
 
 char buffer[8192];
 ssize_t bytes;
+
+/* Obtain data from printer/device */
+...
 
 /* Use a timeout of 1.0 seconds to give filters a chance to read */
 cupsBackChannelWrite(buffer, bytes, 1.0);

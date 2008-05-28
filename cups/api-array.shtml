@@ -73,7 +73,7 @@ void *user_data;
 </pre>
 
 <p>The hash function (type
-<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) returns a
+<a href="#cups_ahash_func_t"><code>cups_ahash_func_t</code></a>) should return a
 number from 0 to (hash_size-1) that (hopefully) uniquely identifies the
 element and is called whenever you look up an element in the array with
 <a href='#cupsArrayFind'><code>cupsArrayFind</code></a>. The hash size is
@@ -86,7 +86,7 @@ only limited by available memory, but generally should not be larger than
 The first function adds an element to the array, adding the new element
 after any elements that have the same order, while the second inserts the
 element before others with the same order. For unsorted arrays,
-<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the elemnt to
+<a href='#cupsArrayAdd'><code>cupsArrayAdd</code></a> appends the element to
 the end of the array while
 <a href='#cupsArrayInsert'><code>cupsArrayInsert</code></a> inserts the
 element at the beginning of the array. For example, the following code
@@ -139,11 +139,11 @@ future lookups will start where the last one left off:</p>
 
 <dl>
 	<dt><a href='#cupsArrayFind'><code>cupsArrayFind</code></a></dt>
-	<dd>Returns the first matching element .</dd>
+	<dd>Returns the first matching element.</dd>
 	<dt><a href='#cupsArrayFirst'><code>cupsArrayFirst</code></a></dt>
 	<dd>Returns the first element in the array.</dd>
 	<dt><a href='#cupsArrayIndex'><code>cupsArrayIndex</code></a></dt>
-	<dd>Returns the Nth element in the array.</dd>
+	<dd>Returns the Nth element in the array, starting at 0.</dd>
 	<dt><a href='#cupsArrayLast'><code>cupsArrayLast</code></a></dt>
 	<dd>Returns the last element in the array.</dd>
 	<dt><a href='#cupsArrayNext'><code>cupsArrayNext</code></a></dt>

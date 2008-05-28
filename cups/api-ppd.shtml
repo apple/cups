@@ -3,7 +3,7 @@
 
   PPD API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007 by Apple Inc.
+  Copyright 2007-2008 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -17,10 +17,19 @@
 
 <p>The CUPS PPD API provides read-only access the data in PostScript Printer
 Description ("PPD") files which are used for all printers with a driver. With
-it you can display printer options to users, mark option choices and check for
-conflicting choices, and output marked choices in PostScript output. The
-<a href="#ppd_file_t"><code>ppd_file_t</code></a> structure contains all of
-the information in a PPD file.</p>
+it you can obtain the data necessary to display printer options to users, mark
+option choices and check for conflicting choices, and output marked choices in
+PostScript output. The <a href="#ppd_file_t"><code>ppd_file_t</code></a>
+structure contains all of the information in a PPD file.</p>
+
+<blockquote><b>Note:</b>
+
+<p>The CUPS PPD API uses the terms "option" and "choice" instead of the Adobe
+terms "MainKeyword" and "OptionKeyword" to refer to specific printer options and
+features. CUPS also treats option ("MainKeyword") and choice ("OptionKeyword")
+values as case-insensitive strings, so option "InputSlot" and choice "Upper"
+are equivalent to "inputslot" and "upper", respectively.</p>
+</blockquote>
 
 <h3><a name="LOADING">Loading a PPD File</a></h3>
 
@@ -48,6 +57,9 @@ by the structure:</p>
 <a href="#ppdClose">ppdClose</a>(ppd);
 </pre>
 
+<p>Once closed, pointers to the <a href="#ppd_file_t"><code>ppd_file_t</code></a>
+structure and any data in it will no longer be valid.</p>
+
 <h3><a name="OPTIONS_AND_GROUPS">Options and Groups</a></h3>
 
 <p>PPD files support multiple options, which are stored in arrays of
@@ -61,7 +73,7 @@ then it is put in an automatically-generated "General" group. Groups can also
 have sub-groups, however CUPS currently ignores sub-groups because of past
 abuses of this functionality.</p>
 
-<p>Options are selected by marking them using one of three functions. The
+<p>Option choices are selected by marking them using one of three functions. The
 first is <a href="#ppdMarkDefaults"><code>ppdMarkDefaults</code></a> which
 selects all of the default options in the PPD file:</p>
 
@@ -75,14 +87,14 @@ selects all of the default options in the PPD file:</p>
 
 <p>The second is <a href="#ppdMarkOption"><code>ppdMarkOption</code></a>
 which selects a single option choice in the PPD file. For example, the following
-code selects the manual feed media source:</p>
+code selects the upper paper tray:</p>
 
 <pre class="example">
 #include &lt;cups/ppd.h&gt;
 
 <a href="#ppd_file_t">ppd_file_t</a> *ppd;
 
-<a href="#ppdMarkOption">ppdMarkOption</a>(ppd, "InputSlot", "ManualFeed");
+<a href="#ppdMarkOption">ppdMarkOption</a>(ppd, "InputSlot", "Upper");
 </pre>
 
 <p>The last function is
@@ -103,6 +115,7 @@ int num_options = cupsParseOptions(argv[5], 0, &amp;options);
 
 <a href="#ppdMarkDefaults">ppdMarkDefaults</a>(ppd);
 <a href="#cupsMarkOptions">cupsMarkOptions</a>(ppd, num_options, options);
+cupsFreeOptions(num_options, options);
 </pre>
 
 <h3><a name="CONSTRAINTS">Constraints</a></h3>
@@ -112,7 +125,8 @@ constraints, between different options. Constraints are stored in an array of
 <a href="#ppd_const_t"><code>ppd_const_t</code></a> structures which specify
 the options and choices that conflict with each other. The
 <a href="#ppdConflicts"><code>ppdConflicts</code></a> function tells you
-how many of the selected options are incompatible.</p>
+how many of the selected options are incompatible. Since constraints are
+normally specified in pairs, the returned value is typically an even number.</p>
 
 <h3><a name="PAGE_SIZES">Page Sizes</a></h3>
 
@@ -164,13 +178,17 @@ in points. Custom page size names can also be specified in inches
 <a href="#ppd_size_t">ppd_size_t</a> *size = <a href="#ppdPageSize">ppdPageSize</a>(ppd, "Custom.12.7x34.5cm");
 </pre>
 
+<p>If the PPD does not support variable page sizes, the
+<a href="#ppdPageSize"><code>ppdPageSize</code></a> function will return
+<code>NULL</code>.</p>
+
 <h3><a name="ATTRIBUTES">Attributes</a></h3>
 
 <p>Every PPD file is composed of one or more attributes. Most of these
 attributes are used to define groups, options, choices, and page sizes,
-however several informations attributes are available which you may need
-to access in your program or filter. Attributes normally look like one of
-the following examples in a PPD file:</p>
+however several informational attributes may be present which you can access
+in your program or filter. Attributes normally look like one of the following
+examples in a PPD file:</p>
 
 <pre class="example">
 *name: "value"
