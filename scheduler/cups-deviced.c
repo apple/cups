@@ -671,18 +671,12 @@ start_backend(const char *name,		/* I - Backend to run */
   char			program[1024];	/* Full path to backend */
   int			fds[2];		/* Pipe file descriptors */
   cupsd_backend_t	*backend;	/* Current backend */
+  char			*argv[2];	/* Command-line arguments */
 
 
   if (num_backends >= MAX_BACKENDS)
   {
     fprintf(stderr, "ERROR: Too many backends (%d)!\n", num_backends);
-    return (-1);
-  }
-
-  if (pipe(fds))
-  {
-    fprintf(stderr, "ERROR: Unable to create a pipe for \"%s\" - %s\n",
-            name, strerror(errno));
     return (-1);
   }
 
@@ -693,58 +687,29 @@ start_backend(const char *name,		/* I - Backend to run */
 
   backend = backends + num_backends;
 
-  if ((backend->pid = fork()) < 0)
+  argv[0] = (char *)name;
+  argv[1] = NULL;
+
+  if ((backend->pipe = cupsdPipeCommand(&(backend->pid), program, argv,
+                                        root ? 0 : normal_user)) == NULL)
   {
-   /*
-    * Error!
-    */
-
-    fprintf(stderr, "ERROR: [cups-deviced] Unable to fork for \"%s\" - %s\n",
-            program, strerror(errno));
-    close(fds[0]);
-    close(fds[1]);
-    return (-1);
-  }
-  else if (!backend->pid)
-  {
-   /*
-    * Child comes here...
-    */
-
-    if (!getuid() && !root)
-      setuid(normal_user);		/* Run as restricted user */
-
-    close(0);				/* </dev/null */
-    open("/dev/null", O_RDONLY);
-
-    close(1);				/* >pipe */
-    dup(fds[1]);
-
-    close(fds[0]);			/* Close copies of pipes */
-    close(fds[1]);
-
-    execl(program, name, (char *)0);	/* Run it! */
     fprintf(stderr, "ERROR: [cups-deviced] Unable to execute \"%s\" - %s\n",
             program, strerror(errno));
-    exit(1);
+    return (-1);
   }
 
  /*
-  * Parent comes here, allocate a backend and open the input side of the
-  * pipe...
+  * Fill in the rest of the backend information...
   */
 
   fprintf(stderr, "DEBUG: [cups-deviced] Started backend %s (PID %d)\n",
           program, backend->pid);
 
-  close(fds[1]);
-
-  backend_fds[num_backends].fd     = fds[0];
+  backend_fds[num_backends].fd     = cupsFileNumber(backend->pipe);
   backend_fds[num_backends].events = POLLIN;
 
   backend->name   = strdup(name);
   backend->status = 0;
-  backend->pipe   = cupsFileOpenFd(fds[0], "r");
   backend->count  = 0;
 
   active_backends ++;

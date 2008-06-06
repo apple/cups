@@ -294,6 +294,7 @@ cat_ppd(const char *name,		/* I - PPD name */
     */
 
     const char	*serverbin;		/* CUPS_SERVERBIN env var */
+    char	*argv[4];		/* Arguments for program */
 
 
     if ((serverbin = getenv("CUPS_SERVERBIN")) == NULL)
@@ -340,7 +341,12 @@ cat_ppd(const char *name,		/* I - PPD name */
       cupsdSendIPPTrailer();
     }
 
-    if (execl(line, scheme, "cat", name, (char *)NULL))
+    argv[0] = scheme;
+    argv[1] = (char *)"cat";
+    argv[2] = (char *)name;
+    argv[3] = NULL;
+
+    if (cupsdExec(line, argv))
     {
      /*
       * Unable to execute driver...
@@ -1535,10 +1541,12 @@ load_drivers(void)
 		*ptr;			/* Pointer into string */
   const char	*server_bin;		/* CUPS_SERVERBIN env variable */
   char		drivers[1024];		/* Location of driver programs */
-  FILE		*fp;			/* Pipe to driver program */
+  int		pid;			/* Process ID for driver program */
+  cups_file_t	*fp;			/* Pipe to driver program */
   cups_dir_t	*dir;			/* Directory pointer */
   cups_dentry_t *dent;			/* Directory entry */
-  char		filename[1024],		/* Name of driver */
+  char		*argv[3],		/* Arguments for command */
+		filename[1024],		/* Name of driver */
 		line[2048],		/* Line from driver */
 		name[512],		/* ppd-name */
 		make[128],		/* ppd-make */
@@ -1573,6 +1581,9 @@ load_drivers(void)
   * Loop through all of the device drivers...
   */
 
+  argv[1] = (char *)"list";
+  argv[2] = NULL;
+
   while ((dent = cupsDirRead(dir)) != NULL)
   {
    /*
@@ -1586,10 +1597,12 @@ load_drivers(void)
     * Run the driver with no arguments and collect the output...
     */
 
-    snprintf(filename, sizeof(filename), "%s/%s list", drivers, dent->filename);
-    if ((fp = popen(filename, "r")) != NULL)
+    argv[0] = dent->filename;
+    snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
+
+    if ((fp = cupsdPipeCommand(&pid, filename, argv, 0)) != NULL)
     {
-      while (fgets(line, sizeof(line), fp) != NULL)
+      while (cupsFileGets(fp, line, sizeof(line)))
       {
        /*
         * Each line is of the form:
@@ -1638,7 +1651,8 @@ load_drivers(void)
 
 	  if (type >= (int)(sizeof(ppd_types) / sizeof(ppd_types[0])))
 	  {
-	    fprintf(stderr, "ERROR: [cups-driverd] Bad ppd-type \"%s\" ignored!\n",
+	    fprintf(stderr,
+	            "ERROR: [cups-driverd] Bad ppd-type \"%s\" ignored!\n",
         	    type_str);
 	    type = PPD_TYPE_UNKNOWN;
 	  }
@@ -1649,7 +1663,7 @@ load_drivers(void)
           if (!ppd)
 	  {
             cupsDirClose(dir);
-	    pclose(fp);
+	    cupsFileClose(fp);
 	    return (0);
 	  }
 
@@ -1674,7 +1688,7 @@ load_drivers(void)
 	}
       }
 
-      pclose(fp);
+      cupsFileClose(fp);
     }
     else
       fprintf(stderr, "WARNING: [cups-driverd] Unable to execute \"%s\": %s\n",
