@@ -22,7 +22,7 @@ CHANGES IN CUPS V1.3.8
 	  sockets (STR #2750)
 	- The scheduler incorrectly logged errors for print filters
 	  when a job was canceled (STR #2806, #2808)
-	- The scheduler not long allows multiple RSS subscriptions
+	- The scheduler no longer allows multiple RSS subscriptions
 	  with the same URI (STR #2789)
 	- The scheduler now supports Kerberized printing with
 	  multiple server names (STR #2783)

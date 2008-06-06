@@ -536,15 +536,15 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     switch (SSL_shutdown(conn))
     {
       case 1 :
-          cupsdLogMessage(CUPSD_LOG_INFO,
-	                  "cupsdCloseClient: SSL shutdown successful!");
+          cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "SSL shutdown successful!");
 	  break;
       case -1 :
           cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "cupsdCloseClient: Fatal error during SSL shutdown!");
+	                  "Fatal error during SSL shutdown!");
       default :
 	  while ((error = ERR_get_error()) != 0)
-	    cupsdLogMessage(CUPSD_LOG_ERROR, "cupsdCloseClient: %s",
+	    cupsdLogMessage(CUPSD_LOG_ERROR, "SSL shutdown failed: %s",
 	                    ERR_error_string(error, NULL));
           break;
     }
@@ -560,12 +560,12 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
     switch (error)
     {
       case GNUTLS_E_SUCCESS:
-	cupsdLogMessage(CUPSD_LOG_INFO,
-	                "cupsdCloseClient: SSL shutdown successful!");
+	cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "SSL shutdown successful!");
 	break;
       default:
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdCloseClient: %s", gnutls_strerror(error));
+	                "SSL shutdown failed: %s", gnutls_strerror(error));
 	break;
     }
 
@@ -866,11 +866,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         switch (sscanf(line, "%63s%1023s%63s", operation, con->uri, version))
 	{
 	  case 1 :
-	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Bad request line \"%s\" from %s!", line,
-	                      con->http.hostname);
-	      cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
-	      cupsdCloseClient(con);
+	      if (line[0])
+	      {
+		cupsdLogMessage(CUPSD_LOG_ERROR,
+				"Bad request line \"%s\" from %s!", line,
+				con->http.hostname);
+		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
+		cupsdCloseClient(con);
+              }
 	      return;
 	  case 2 :
 	      con->http.version = HTTP_0_9;
