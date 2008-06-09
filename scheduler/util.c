@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,6 +15,8 @@
  * Contents:
  *
  *   cupsdCompareNames()   - Compare two names.
+ *   cupsdExec()           - Run a program with the correct environment.
+ *   cupsdPipeCommand()    - Read output from a command.
  *   cupsdSendIPPGroup()   - Send a group tag.
  *   cupsdSendIPPHeader()  - Send the IPP response header.
  *   cupsdSendIPPInteger() - Send an integer attribute.
@@ -27,6 +29,13 @@
  */
 
 #include "util.h"
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#ifdef __APPLE__
+#  include <libgen.h>
+extern char **environ;
+#endif /* __APPLE__ */ 
 
 
 /*
@@ -140,6 +149,174 @@ cupsdCompareNames(const char *s,	/* I - First string */
     return (-1);
   else
     return (0);
+}
+
+
+/*
+ * 'cupsdExec()' - Run a program with the correct environment.
+ *
+ * On Mac OS X, we need to update the CFProcessPath environment variable that
+ * is passed in the environment so the child can access its bundled resources.
+ */
+
+int					/* O - exec() status */
+cupsdExec(const char *command,		/* I - Full path to program */
+          char       **argv)		/* I - Command-line arguments */
+{
+#ifdef __APPLE__
+  int	i, j;				/* Looping vars */
+  char	*envp[500],			/* Array of environment variables */
+	cfprocesspath[1024],		/* CFProcessPath environment variable */
+	linkpath[1024];			/* Link path for symlinks... */
+  int	linkbytes;			/* Bytes for link path */
+
+
+ /*
+  * Some Mac OS X programs are bundled and need the CFProcessPath environment
+  * variable defined.  If the command is a symlink, resolve the link and point
+  * to the resolved location, otherwise, use the command path itself.
+  */
+
+  if ((linkbytes = readlink(command, linkpath, sizeof(linkpath) - 1)) > 0)
+  {
+   /*
+    * Yes, this is a symlink to the actual program, nul-terminate and
+    * use it...
+    */
+
+    linkpath[linkbytes] = '\0';
+
+    if (linkpath[0] == '/')
+      snprintf(cfprocesspath, sizeof(cfprocesspath), "CFProcessPath=%s",
+	       linkpath);
+    else
+      snprintf(cfprocesspath, sizeof(cfprocesspath), "CFProcessPath=%s/%s",
+	       dirname((char *)command), linkpath);
+  }
+  else
+    snprintf(cfprocesspath, sizeof(cfprocesspath), "CFProcessPath=%s", command);
+
+  envp[0] = cfprocesspath;
+
+ /*
+  * Copy the rest of the environment except for any CFProcessPath that may
+  * already be there...
+  */
+
+  for (i = 1, j = 0;
+       environ[j] && i < (int)(sizeof(envp) / sizeof(envp[0]) - 1);
+       j ++)
+    if (strncmp(environ[j], "CFProcessPath=", 14))
+      envp[i ++] = environ[j];
+
+  envp[i] = NULL;
+
+ /*
+  * Use execve() to run the program...
+  */
+
+  return (execve(command, argv, envp));
+
+#else
+ /*
+  * On other operating systems, just call execv() to use the same environment
+  * variables as the parent...
+  */
+
+  return (execv(command, argv));
+#endif /* __APPLE__ */
+}
+
+
+/*
+ * 'cupsdPipeCommand()' - Read output from a command.
+ */
+
+cups_file_t *				/* O - CUPS file or NULL on error */
+cupsdPipeCommand(int        *pid,	/* O - Process ID or 0 on error */
+                 const char *command,	/* I - Command to run */
+                 char       **argv,	/* I - Arguments to pass to command */
+		 int        user)	/* I - User to run as or 0 for current */
+{
+  int	fds[2];				/* Pipe file descriptors */
+
+
+ /*
+  * First create the pipe...
+  */
+
+  if (pipe(fds))
+  {
+    *pid = 0;
+    return (NULL);
+  }
+
+ /*
+  * Set the "close on exec" flag on each end of the pipe...
+  */
+
+  if (fcntl(fds[0], F_SETFD, fcntl(fds[0], F_GETFD) | FD_CLOEXEC))
+  {
+    close(fds[0]);
+    close(fds[1]);
+
+    *pid = 0;
+
+    return (NULL);
+  }
+
+  if (fcntl(fds[1], F_SETFD, fcntl(fds[1], F_GETFD) | FD_CLOEXEC))
+  {
+    close(fds[0]);
+    close(fds[1]);
+
+    *pid = 0;
+
+    return (NULL);
+  }
+
+ /*
+  * Then run the command...
+  */
+
+  if ((*pid = fork()) < 0)
+  {
+   /*
+    * Unable to fork!
+    */
+
+    *pid = 0;
+    close(fds[0]);
+    close(fds[1]);
+
+    return (NULL);
+  }
+  else if (!*pid)
+  {
+   /*
+    * Child comes here...
+    */
+
+    if (!getuid() && user)
+      setuid(user);			/* Run as restricted user */
+
+    close(0);				/* </dev/null */
+    open("/dev/null", O_RDONLY);
+
+    close(1);				/* >pipe */
+    dup(fds[1]);
+
+    cupsdExec(command, argv);
+    exit(errno);
+  }
+
+ /*
+  * Parent comes here, open the input side of the pipe...
+  */
+
+  close(fds[1]);
+
+  return (cupsFileOpenFd(fds[0], "r"));
 }
 
 

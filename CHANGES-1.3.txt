@@ -4,6 +4,16 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The CUPS PHP extension was not thread-safe (STR #2828)
+	- The scheduler incorrectly added the document-format-default
+	  attribute to the list of "common" printer attributes, which
+	  over time would slow down the printing system (STR #2755,
+	  STR #2836)
+	- The cups-deviced and cups-driverd helper programs did not set
+	  the CFProcessPath environment variable on Mac OS X (STR #2837)
+	- "lpstat -p" could report the wrong job as printing (STR #2845)
+	- The scheduler would crash when some cupsd.conf directives
+	  were missing values (STR #2849)
 	- The web interface "move jobs" operation redirected users to
 	  the wrong URL (STR #2815)
 	- The Polish web interface translation contained errors
@@ -22,7 +32,7 @@ CHANGES IN CUPS V1.3.8
 	  sockets (STR #2750)
 	- The scheduler incorrectly logged errors for print filters
 	  when a job was canceled (STR #2806, #2808)
-	- The scheduler not long allows multiple RSS subscriptions
+	- The scheduler no longer allows multiple RSS subscriptions
 	  with the same URI (STR #2789)
 	- The scheduler now supports Kerberized printing with
 	  multiple server names (STR #2783)
