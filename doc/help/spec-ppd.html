@@ -44,8 +44,9 @@ file:</p>
 <pre class='command'>
 PPD-FILE = HEADER +(DATA / COMMENT / LINE-END)
 
-HEADER   = "*" 0x50.50.44.2D.41.64.6F.62.65 ":"   ; *PPD-Adobe:
-           *WSP DQUOTE "4.3" DQUOTE LINE-END
+HEADER   = "*PPD-Adobe:" *WSP DQUOTE VERSION DQUOTE LINE-END
+
+VERSION  = "4.0" / "4.1" / "4.2" / "4.3"
 
 COMMENT  = "*%" *TCHAR LINE-END
 
