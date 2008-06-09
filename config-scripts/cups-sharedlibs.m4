@@ -20,7 +20,18 @@ AC_ARG_ENABLE(shared, [  --enable-shared         turn on shared libraries, defau
 
 if test x$enable_shared != xno; then
 	case "$uname" in
-		SunOS* | UNIX_S*)
+		SunOS*)
+			LIBCUPS="libcups.so.2"
+			LIBCUPSCGI="libcupscgi.so.1"
+			LIBCUPSDRIVER="libcupsdriver.so.1"
+			LIBCUPSIMAGE="libcupsimage.so.2"
+			LIBCUPSMIME="libcupsmime.so.1"
+			LIBCUPSPPDC="libcupsppdc.so.1"
+			DSO="\$(CC)"
+			DSOXX="\$(CXX)"
+			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
+			;;
+		UNIX_S*)
 			LIBCUPS="libcups.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
