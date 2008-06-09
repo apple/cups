@@ -3757,7 +3757,7 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
                   1);
 
   if (!cupsGetOption("document-format", p->num_options, p->options))
-    ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
         	 "document-format-default", NULL, "application/octet-stream");
 
   if (!cupsGetOption("job-hold-until", p->num_options, p->options))
