@@ -280,6 +280,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man7
 /usr/share/man/man7/commandto*
+/usr/share/man/man7/drv*
 /usr/share/man/man7/rasterto*
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
