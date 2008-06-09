@@ -223,7 +223,7 @@ PHP_FUNCTION(cups_cancel_job)
 
 
   if (ZEND_NUM_ARGS() != 2 ||
-      zend_parse_parameters(2, "sl", &dest, &dest_len, &id))
+      zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sl", &dest, &dest_len, &id))
   {
     WRONG_PARAM_COUNT;
   }
@@ -320,7 +320,7 @@ PHP_FUNCTION(cups_get_jobs)
 
 
   if (ZEND_NUM_ARGS() != 3 ||
-      zend_parse_parameters(3, "sll", &dest, &dest_len, &myjobs, &completed))
+      zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sll", &dest, &dest_len, &myjobs, &completed))
   {
     WRONG_PARAM_COUNT;
   }
@@ -416,7 +416,7 @@ PHP_FUNCTION(cups_print_file)
 
 
   if (ZEND_NUM_ARGS() != 4 ||
-      zend_parse_parameters(4, "sssa", &dest, &dest_len,
+      zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sssa", &dest, &dest_len,
                             &filename, &filename_len,
 			    &title, &title_len, &optionsobj))
   {
@@ -455,7 +455,7 @@ PHP_FUNCTION(cups_print_files)
 
 
   if (ZEND_NUM_ARGS() != 4 ||
-      zend_parse_parameters(4, "sasa", &dest, &dest_len, &filesobj,
+      zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sasa", &dest, &dest_len, &filesobj,
 			    &title, &title_len, &optionsobj))
   {
     WRONG_PARAM_COUNT;

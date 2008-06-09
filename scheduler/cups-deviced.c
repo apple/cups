@@ -669,7 +669,6 @@ start_backend(const char *name,		/* I - Backend to run */
 {
   const char		*server_bin;	/* CUPS_SERVERBIN environment variable */
   char			program[1024];	/* Full path to backend */
-  int			fds[2];		/* Pipe file descriptors */
   cupsd_backend_t	*backend;	/* Current backend */
   char			*argv[2];	/* Command-line arguments */
 
