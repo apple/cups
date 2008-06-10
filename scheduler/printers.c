@@ -2156,28 +2156,19 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       if (p->num_printers > 0)
       {
        /*
-	* Add a list of member URIs and names...
+	* Add a list of member names; URIs are added in copy_printer_attrs...
 	*/
 
-	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-                             "member-uris", p->num_printers, NULL, NULL);
+	attr    = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                                "member-names", p->num_printers, NULL, NULL);
         p->type |= CUPS_PRINTER_OPTIONS;
 
 	for (i = 0; i < p->num_printers; i ++)
 	{
           if (attr != NULL)
-            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->uri);
+            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
 
 	  p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
-        }
-
-	attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                             "member-names", p->num_printers, NULL, NULL);
-
-	if (attr != NULL)
-	{
-	  for (i = 0; i < p->num_printers; i ++)
-            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
         }
       }
     }
