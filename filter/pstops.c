@@ -1506,11 +1506,56 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   */
 
   if (first_page)
+    doc_puts(doc, "%%BeginPageSetup\n");
+
+  if (!strncmp(line, "%%BeginPageSetup", 16))
+  {
+    int	feature = 0;			/* In a Begin/EndFeature block? */
+
+    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
+    {
+      if (!strncmp(line, "%%EndPageSetup", 14))
+	break;
+      else if (!strncmp(line, "%%BeginFeature:", 15))
+      {
+	feature = 1;
+
+	if (doc->number_up > 1 || doc->fitplot)
+	  continue;
+      }
+      else if (!strncmp(line, "%%EndFeature", 12))
+      {
+	feature = 0;
+
+	if (doc->number_up > 1 || doc->fitplot)
+	  continue;
+      }
+      else if (!strncmp(line, "%%IncludeFeature:", 17))
+      {
+	pageinfo->num_options = include_feature(ppd, line,
+						pageinfo->num_options,
+						&(pageinfo->options));
+	continue;
+      }
+      else if (!strncmp(line, "%%Include", 9))
+	continue;
+
+      if (!feature || (doc->number_up == 1 && !doc->fitplot))
+	doc_write(doc, line, linelen);
+    }
+
+   /*
+    * Skip %%EndPageSetup...
+    */
+
+    if (linelen > 0)
+      linelen = cupsFileGetLine(fp, line, linesize);
+  }
+
+  if (first_page)
   {
     char	*page_setup;		/* PageSetup commands to send */
 
-
-    doc_puts(doc, "%%BeginPageSetup\n");
 
     if (pageinfo->num_options > 0)
     {
@@ -1579,48 +1624,6 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
   */
 
   start_nup(doc, number, 1, bounding_box);
-
- /*
-  * Copy page setup commands as needed...
-  */
-
-  if (!strncmp(line, "%%BeginPageSetup", 16))
-  {
-    int	feature = 0;			/* In a Begin/EndFeature block? */
-
-
-    while ((linelen = cupsFileGetLine(fp, line, linesize)) > 0)
-    {
-      if (!strncmp(line, "%%EndPageSetup", 14))
-        break;
-      else if (!strncmp(line, "%%BeginFeature:", 15))
-      {
-        feature = 1;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%EndFeature", 12))
-      {
-        feature = 0;
-
-	if (doc->number_up > 1 || doc->fitplot)
-	  continue;
-      }
-      else if (!strncmp(line, "%%Include", 9))
-        continue;
-
-      if (!feature || (doc->number_up == 1 && !doc->fitplot))
-	doc_write(doc, line, linelen);
-    }
-
-   /*
-    * Skip %%EndPageSetup...
-    */
-
-    if (linelen > 0)
-      linelen = cupsFileGetLine(fp, line, linesize);
-  }
 
  /*
   * Finish the PageSetup section as needed...
@@ -1789,8 +1792,6 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 
   doc_puts(doc, "%%BeginSetup\n");
   
-  do_setup(doc, ppd);
-
   if (!strncmp(line, "%%BeginSetup", 12))
   {
     while (strncmp(line, "%%EndSetup", 10))
@@ -1819,6 +1820,8 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     else
       fputs(_("ERROR: Missing %%EndSetup!\n"), stderr);
   }
+
+  do_setup(doc, ppd);
 
   doc_puts(doc, "%%EndSetup\n");
 

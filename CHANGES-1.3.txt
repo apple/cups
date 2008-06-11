@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785)
+	- The PostScript filter did not support %%IncludeFeature lines
+	  in the page setup section of each page (STR #2831)
 	- The scheduler did not generate printer-state events when the
 	  default printer was changed (STR #2764)
 	- cupstestppd incorrectly reported a warning about the PPD format
