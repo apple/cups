@@ -7556,7 +7556,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       * access...
       */
 
-      if (printer->num_users && username && !user_allowed(printer, username))
+      if (!(printer->type & CUPS_PRINTER_AUTHENTICATED) &&
+          printer->num_users && username && !user_allowed(printer, username))
         continue;
 
      /*
