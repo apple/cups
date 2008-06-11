@@ -9896,7 +9896,8 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
-  cupsd_printer_t	*printer;	/* Printer */
+  cupsd_printer_t	*printer,	/* Printer */
+			*oldprinter;	/* Old default printer */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_default(%p[%d], %s)", con,
@@ -9931,7 +9932,15 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
   * Set it as the default...
   */
 
+  oldprinter     = DefaultPrinter;
   DefaultPrinter = printer;
+
+  if (oldprinter)
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, oldprinter, NULL,
+                  "%s is no longer the default printer.", oldprinter->name);
+
+  cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+		"%s is now the default printer.", printer->name);
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS | CUPSD_DIRTY_CLASSES |
                  CUPSD_DIRTY_REMOTE | CUPSD_DIRTY_PRINTCAP);
