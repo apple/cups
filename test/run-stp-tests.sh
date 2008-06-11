@@ -472,7 +472,8 @@ done
 # Create the test report source file...
 #
 
-strfile=/tmp/cups-$user/cups-str-1.4-`date +%Y-%m-%d`-$user.html
+date=`date "+%Y-%m-%d"`
+strfile=/tmp/cups-$user/cups-str-1.4-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -516,7 +517,7 @@ echo "Running command tests..."
 echo "<H1>2 - Command Tests</H1>" >>$strfile
 echo "<P>This section provides the results to the command tests" >>$strfile
 echo "outlined in the CUPS Software Test Plan. These tests were run on" >>$strfile
-echo `date "+%Y-%m-%d"` by $user on `hostname`. >>$strfile
+echo $date by $user on `hostname`. >>$strfile
 echo "<PRE>" >>$strfile
 
 for file in 5*.sh; do
@@ -734,6 +735,8 @@ echo ""
 
 if test $fail != 0; then
 	echo "$fail tests failed."
+	cp /tmp/cups-$user/log/error_log error_log-$date-$user
+	cp $strfile .
 else
 	echo "All tests were successful."
 fi
@@ -743,6 +746,10 @@ echo "A HTML report was created in $strfile."
 echo ""
 
 if test $fail != 0; then
+	echo "Copies of the error_log and `basename $strfile` files are in"
+	echo "`pwd`."
+	echo ""
+
 	exit 1
 fi
 
