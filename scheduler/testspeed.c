@@ -291,8 +291,7 @@ do_test(const char        *server,	/* I - Server to use */
     gettimeofday(&start, NULL);
 
     if (verbose)
-      printf("testspeed(%d): %d.%06d %s ", (int)getpid(),
-             (int)(start.tv_sec % 86400), (int)start.tv_usec,
+      printf("testspeed(%d): %.6f %s ", (int)getpid(), elapsed,
 	     ippOpString(op));
 
     switch (op)
