@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-05-20
+CHANGES.txt - 2008-06-16
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The ppdmerge program did not support Simplified Chinese
+	  or Traditional Chinese language version strings (STR #2851)
 	- The PPD compiler now supports localizable attributes
 	  (STR #2738)
 	- The ppdpo utility now includes cupsIPPReasons values in
