@@ -132,17 +132,19 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Then create child processes to act as clients...
   */
 
-  printf("testspeed: Simulating %d clients with %d requests to %s with %sencryption...\n",
-         children, requests, server,
-	 encryption == HTTP_ENCRYPT_IF_REQUESTED ? "no " : "");
+  if (children > 0)
+  {
+    printf("testspeed: Simulating %d clients with %d requests to %s with "
+           "%sencryption...\n", children, requests, server,
+	   encryption == HTTP_ENCRYPT_IF_REQUESTED ? "no " : "");
+  }
 
   start = time(NULL);
 
-  if (children == 1)
-  {
-    do_test(server, port, encryption, requests, verbose);
-    good_children = 1;
-  }
+  if (children < 1)
+    return (do_test(server, port, encryption, requests, verbose));
+  else if (children == 1)
+    good_children = do_test(server, port, encryption, requests, verbose) ? 0 : 1;
   else
   {
     for (i = 0; i < children; i ++)
@@ -155,7 +157,24 @@ main(int  argc,				/* I - Number of command-line arguments */
 	* Child goes here...
 	*/
 
-	exit(do_test(server, port, encryption, requests, verbose));
+        char	options[255],
+		reqstr[255],
+		serverstr[255];
+
+        snprintf(reqstr, sizeof(reqstr), "%d", requests);
+	snprintf(serverstr, sizeof(serverstr), "%s:%d", server, port);
+	strcpy(options, "-cr");
+
+	if (encryption == HTTP_ENCRYPT_REQUIRED)
+	  strcat(options, "E");
+
+	if (verbose > 1)
+	  strcat(options, "vv");
+	else if (verbose > 0)
+	  strcat(options, "v");
+
+        execlp(argv[0], argv[0], options, "0", reqstr, serverstr, (char *)NULL);
+	exit(errno);
       }
       else if (pid < 0)
       {
@@ -190,12 +209,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Compute the total run time...
   */
 
-  end     = time(NULL);
-  elapsed = end - start;
-  i       = good_children * requests;
+  if (good_children > 0)
+  {
+    end     = time(NULL);
+    elapsed = end - start;
+    i       = good_children * requests;
 
-  printf("testspeed: %dx%d=%d requests in %.1fs (%.3fs/r, %.1fr/s)\n",
-         good_children, requests, i, elapsed, elapsed / i, i / elapsed);
+    printf("testspeed: %dx%d=%d requests in %.1fs (%.3fs/r, %.1fr/s)\n",
+	   good_children, requests, i, elapsed, elapsed / i, i / elapsed);
+  }
 
  /*
   * Exit with no errors...
