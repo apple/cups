@@ -15,7 +15,7 @@ dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Default languages...
-LANGUAGES="`ls -1 locale/*.po | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
+LANGUAGES="`ls -1 locale/cups_*.po | sed -e '1,$s/locale\/cups_//' -e '1,$s/\.po//' | tr '\n' ' '`"
 
 AC_ARG_WITH(languages, [  --with-languages        set installed languages, default=all ],[
 	case "$withval" in

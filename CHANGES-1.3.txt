@@ -4,6 +4,7 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
+	- Added an Indonesian translation (STR #2792)
 	- Fixed a timing issue in the backends that could cause data
 	  corruption with the CUPS_SC_CMD_DRAIN_OUTPUT side-channel
 	  command (STR #2858)
