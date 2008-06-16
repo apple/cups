@@ -3,7 +3,7 @@
 .\"
 .\"   cups-config man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-config 1 "Common UNIX Printing System" "11 February 2006" "Apple Inc."
+.TH cups-config 1 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
 .SH NAME
 cups-config \- get cups api, compiler, directory, and link information.
 .SH SYNOPSIS
@@ -73,7 +73,7 @@ Displays the program usage message.
 --image
 .br
 When used with \fI--libs\fR, adds the CUPS imaging library to the
-list or displayed libraries.
+list of displayed libraries.
 .TP 5
 --ldflags
 .br
@@ -104,7 +104,7 @@ Displays the full version number of the CUPS installation
 .SH SEE ALSO
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

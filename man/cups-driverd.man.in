@@ -3,7 +3,7 @@
 .\"
 .\"   cups-driverd man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-driverd 8 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH cups-driverd 8 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
 .SH NAME
 cups-driverd \- cups driver daemon
 .SH SYNOPSIS
@@ -33,10 +33,10 @@ The second form lists the available manufacturers or PPD files to
 stdout as indicated by the \fIoptions\fR argument. The output
 format is an IPP response message. The \fIrequest_id\fR argument
 is the request ID from the original IPP request, typically 1. The
-\Ilimit\fR argument is the limit value from the original IPP
+\fIlimit\fR argument is the limit value from the original IPP
 request - 0 means no limit. Finally, the \fIoptions\fR argument
 is a space-delimited list of attributes ("name=value name=value
-\...") that were passed in with the request. Currently
+\&...") that were passed in with the request. Currently
 \fIcups-driverd\fR looks for the \fIppd-make\fR and
 \fIrequested-attributes\fR attributes and tailors the output
 accordingly.
@@ -99,7 +99,7 @@ cupsd(8), cupsd.conf(5), cupstestppd(1),
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
