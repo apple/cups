@@ -3,7 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.8
 
-	- Documentation updates (STR #2785)
+	- Documentation updates (STR #2785, STR #2861)
+	- The scheduler did not support "HostNameLookups" with all of
+	  the boolean names (STR #2861)
 	- Fixed a compile problem with glibc 2.8 (STR #2860)
 	- The scheduler incorrectly filtered out queues with ACLs and
 	  authentication.

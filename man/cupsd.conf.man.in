@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "15 May 2008" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -306,9 +306,9 @@ HideImplicitMembers No
 .br
 Specifies whether to hide members of implicit classes.
 .TP 5
-HostNameLookups Yes
+HostNameLookups On
 .TP 5
-HostNameLookups No
+HostNameLookups Off
 .TP 5
 HostNameLookups Double
 .br

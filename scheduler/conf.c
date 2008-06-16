@@ -2868,9 +2868,11 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       * Do hostname lookups?
       */
 
-      if (!strcasecmp(value, "off"))
+      if (!strcasecmp(value, "off") || !strcasecmp(value, "no") ||
+          !strcasecmp(value, "false"))
         HostNameLookups = 0;
-      else if (!strcasecmp(value, "on"))
+      else if (!strcasecmp(value, "on") || !strcasecmp(value, "yes") ||
+          !strcasecmp(value, "true"))
         HostNameLookups = 1;
       else if (!strcasecmp(value, "double"))
         HostNameLookups = 2;
