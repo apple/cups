@@ -121,7 +121,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       server = argv[i];
 
-      if ((ptr = strrchr(server, ':')) != NULL)
+      if (server[0] != '/' && (ptr = strrchr(server, ':')) != NULL)
       {
         *ptr++ = '\0';
 	port   = atoi(ptr);
@@ -147,6 +147,26 @@ main(int  argc,				/* I - Number of command-line arguments */
     good_children = do_test(server, port, encryption, requests, verbose) ? 0 : 1;
   else
   {
+    char	options[255],		/* Command-line options for child */
+		reqstr[255],		/* Requests string for child */
+		serverstr[255];		/* Server:port string for child */
+
+
+    snprintf(reqstr, sizeof(reqstr), "%d", requests);
+
+    if (port == 631 || server[0] == '/')
+      strlcpy(serverstr, server, sizeof(serverstr));
+    else
+      snprintf(serverstr, sizeof(serverstr), "%s:%d", server, port);
+
+    strlcpy(options, "-cr", sizeof(options));
+
+    if (encryption == HTTP_ENCRYPT_REQUIRED)
+      strlcat(options, "E", sizeof(options));
+
+    if (verbose)
+      strlcat(options, "v", sizeof(options));
+
     for (i = 0; i < children; i ++)
     {
       fflush(stdout);
@@ -156,22 +176,6 @@ main(int  argc,				/* I - Number of command-line arguments */
        /*
 	* Child goes here...
 	*/
-
-        char	options[255],
-		reqstr[255],
-		serverstr[255];
-
-        snprintf(reqstr, sizeof(reqstr), "%d", requests);
-	snprintf(serverstr, sizeof(serverstr), "%s:%d", server, port);
-	strcpy(options, "-cr");
-
-	if (encryption == HTTP_ENCRYPT_REQUIRED)
-	  strcat(options, "E");
-
-	if (verbose > 1)
-	  strcat(options, "vv");
-	else if (verbose > 0)
-	  strcat(options, "v");
 
         execlp(argv[0], argv[0], options, "0", reqstr, serverstr, (char *)NULL);
 	exit(errno);
@@ -272,13 +276,6 @@ do_test(const char        *server,	/* I - Server to use */
 
   for (elapsed = 0.0, i = 0; i < requests; i ++)
   {
-    if (verbose && (i % 10) == 0)
-    {
-      printf("testspeed(%d): %d%% complete...\n", (int)getpid(),
-             i * 100 / requests);
-      fflush(stdout);
-    }
-
    /*
     * Build a request which requires the following attributes:
     *
@@ -293,7 +290,7 @@ do_test(const char        *server,	/* I - Server to use */
 
     gettimeofday(&start, NULL);
 
-    if (verbose > 1)
+    if (verbose)
       printf("testspeed(%d): %d.%06d %s ", (int)getpid(),
              (int)(start.tv_sec % 86400), (int)start.tv_usec,
 	     ippOpString(op));
@@ -328,7 +325,7 @@ do_test(const char        *server,	/* I - Server to use */
     {
       case IPP_OK :
       case IPP_NOT_FOUND :
-          if (verbose > 1)
+          if (verbose)
 	  {
 	    printf("succeeded: %s (%.6f)\n", cupsLastErrorString(), reqtime);
 	    fflush(stdout);
@@ -336,7 +333,7 @@ do_test(const char        *server,	/* I - Server to use */
           break;
 
       default :
-          if (verbose <= 1)
+          if (!verbose)
 	    printf("testspeed(%d): %s ", (int)getpid(),
 	           ippOpString(ops[i & 3]));
 
