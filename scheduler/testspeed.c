@@ -146,6 +146,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
   {
     for (i = 0; i < children; i ++)
+    {
+      fflush(stdout);
+
       if ((pid = fork()) == 0)
       {
        /*
@@ -161,6 +164,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else
 	printf("testspeed: Started child %d...\n", pid);
+    }
 
    /*
     * Wait for children to finish...
