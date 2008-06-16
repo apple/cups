@@ -223,6 +223,7 @@ do_test(const char        *server,	/* I - Server to use */
 		end;			/* End time */
   double	reqtime,		/* Time for this request */
 		elapsed;		/* Elapsed time */
+  int		op;			/* Current operation */
   static ipp_op_t ops[4] =		/* Operations to test... */
 		{
 		  IPP_PRINT_JOB,
@@ -250,8 +251,11 @@ do_test(const char        *server,	/* I - Server to use */
   for (elapsed = 0.0, i = 0; i < requests; i ++)
   {
     if (verbose && (i % 10) == 0)
+    {
       printf("testspeed(%d): %d%% complete...\n", (int)getpid(),
              i * 100 / requests);
+      fflush(stdout);
+    }
 
    /*
     * Build a request which requires the following attributes:
@@ -262,16 +266,17 @@ do_test(const char        *server,	/* I - Server to use */
     * In addition, IPP_GET_JOBS needs a printer-uri attribute.
     */
 
-    request = ippNewRequest(ops[i & 3]);
+    op      = ops[i & 3];
+    request = ippNewRequest(op);
 
     gettimeofday(&start, NULL);
 
     if (verbose > 1)
       printf("testspeed(%d): %d.%06d %s ", (int)getpid(),
              (int)(start.tv_sec % 86400), (int)start.tv_usec,
-	     ippOpString(ops[i & 3]));
+	     ippOpString(op));
 
-    switch (request->request.op.operation_id)
+    switch (op)
     {
       case IPP_GET_JOBS :
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
@@ -302,7 +307,10 @@ do_test(const char        *server,	/* I - Server to use */
       case IPP_OK :
       case IPP_NOT_FOUND :
           if (verbose > 1)
+	  {
 	    printf("succeeded: %s (%.6f)\n", cupsLastErrorString(), reqtime);
+	    fflush(stdout);
+	  }
           break;
 
       default :
