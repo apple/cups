@@ -4,6 +4,9 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
+	- Fixed a timing issue in the backends that could cause data
+	  corruption with the CUPS_SC_CMD_DRAIN_OUTPUT side-channel
+	  command (STR #2858)
 	- The scheduler did not support "HostNameLookups" with all of
 	  the boolean names (STR #2861)
 	- Fixed a compile problem with glibc 2.8 (STR #2860)
