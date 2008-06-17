@@ -412,6 +412,9 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
   {
+    if (!strcasecmp(option->keyword, "PageRegion"))
+      continue;
+
     _cupsLangPrintf(stdout, "%s/%s:", option->keyword, option->text);
 
     for (j = option->num_choices, choice = option->choices;
