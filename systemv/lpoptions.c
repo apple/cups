@@ -35,9 +35,9 @@
  * Local functions...
  */
 
-void	list_group(ppd_group_t *group);
-void	list_options(cups_dest_t *dest);
-void	usage(void);
+static void	list_group(ppd_file_t *ppd, ppd_group_t *group);
+static void	list_options(cups_dest_t *dest);
+static void	usage(void);
 
 
 /*
@@ -400,21 +400,77 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'list_group()' - List printer-specific options from the PPD group.
  */
 
-void
-list_group(ppd_group_t *group)	/* I - Group to show */
+static void
+list_group(ppd_file_t  *ppd,		/* I - PPD file */
+           ppd_group_t *group)		/* I - Group to show */
 {
-  int		i, j;		/* Looping vars */
-  ppd_option_t	*option;	/* Current option */
-  ppd_choice_t	*choice;	/* Current choice */
-  ppd_group_t	*subgroup;	/* Current subgroup */
+  int		i, j;			/* Looping vars */
+  ppd_option_t	*option;		/* Current option */
+  ppd_choice_t	*choice;		/* Current choice */
+  ppd_group_t	*subgroup;		/* Current subgroup */
 
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
   {
     _cupsLangPrintf(stdout, "%s/%s:", option->keyword, option->text);
 
-    for (j = option->num_choices, choice = option->choices; j > 0; j --, choice ++)
-      if (choice->marked)
+    for (j = option->num_choices, choice = option->choices;
+         j > 0;
+	 j --, choice ++)
+      if (!strcasecmp(choice->choice, "Custom"))
+      {
+        ppd_coption_t	*coption;	/* Custom option */
+        ppd_cparam_t	*cparam;	/* Custom parameter */
+	static const char * const types[] =
+	{				/* Parameter types */
+	  "CURVE",
+	  "INTEGER",
+	  "INVCURVE",
+	  "PASSCODE",
+	  "PASSWORD",
+	  "POINTS",
+	  "REAL",
+	  "STRING"
+	};
+
+
+        if ((coption = ppdFindCustomOption(ppd, option->keyword)) == NULL ||
+	    cupsArrayCount(coption->params) == 0)
+	  _cupsLangPrintf(stdout, " %sCustom", choice->marked ? "*" : "");
+        else if (!strcasecmp(option->keyword, "PageSize") ||
+	        !strcasecmp(option->keyword, "PageRegion"))
+	  _cupsLangPrintf(stdout, " %sCustom.WIDTHxHEIGHT",
+	                  choice->marked ? "*" : "");
+        else
+	{
+	  cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+
+	  if (cupsArrayCount(coption->params) == 1)
+	    _cupsLangPrintf(stdout, " %sCustom.%s", choice->marked ? "*" : "",
+	                    types[cparam->type]);
+	  else
+	  {
+	    const char	*prefix;	/* Prefix string */
+
+
+            if (choice->marked)
+	      prefix = " *{";
+	    else
+	      prefix = " {";
+
+	    while (cparam)
+	    {
+	      _cupsLangPrintf(stdout, "%s%s=%s", choice->marked ? "*" : "",
+			      cparam->name, types[cparam->type]);
+	      cparam = (ppd_cparam_t *)cupsArrayNext(coption->params);
+	      prefix = " ";
+	    }
+
+	    _cupsLangPuts(stdout, "}");
+	  }
+	}
+      }
+      else if (choice->marked)
         _cupsLangPrintf(stdout, " *%s", choice->choice);
       else
         _cupsLangPrintf(stdout, " %s", choice->choice);
@@ -423,7 +479,7 @@ list_group(ppd_group_t *group)	/* I - Group to show */
   }
 
   for (i = group->num_subgroups, subgroup = group->subgroups; i > 0; i --, subgroup ++)
-    list_group(subgroup);
+    list_group(ppd, subgroup);
 }
 
 
@@ -431,13 +487,13 @@ list_group(ppd_group_t *group)	/* I - Group to show */
  * 'list_options()' - List printer-specific options from the PPD file.
  */
 
-void
-list_options(cups_dest_t *dest)	/* I - Destination to list */
+static void
+list_options(cups_dest_t *dest)		/* I - Destination to list */
 {
-  int		i;		/* Looping var */
-  const char	*filename;	/* PPD filename */
-  ppd_file_t	*ppd;		/* PPD data */
-  ppd_group_t	*group;		/* Current group */
+  int		i;			/* Looping var */
+  const char	*filename;		/* PPD filename */
+  ppd_file_t	*ppd;			/* PPD data */
+  ppd_group_t	*group;			/* Current group */
 
 
   if ((filename = cupsGetPPD(dest->name)) == NULL)
@@ -461,7 +517,7 @@ list_options(cups_dest_t *dest)	/* I - Destination to list */
   cupsMarkOptions(ppd, dest->num_options, dest->options);
 
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-    list_group(group);
+    list_group(ppd, group);
 
   ppdClose(ppd);
   unlink(filename);
@@ -472,7 +528,7 @@ list_options(cups_dest_t *dest)	/* I - Destination to list */
  * 'usage()' - Show program usage and exit.
  */
 
-void
+static void
 usage(void)
 {
   _cupsLangPuts(stdout,

@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-06-16
+CHANGES.txt - 2008-06-17
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The lpoptions command now describes custom options and
+	  the necessary parameters (STR #2660)
 	- The ppdmerge program did not support Simplified Chinese
 	  or Traditional Chinese language version strings (STR #2851)
 	- The PPD compiler now supports localizable attributes
