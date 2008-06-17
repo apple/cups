@@ -48,7 +48,7 @@ conform to the Adobe PPD File Format Specification version 4.3
 and may be compressed using the \fIgzip(1)\fR program. Driver
 programs must implement the command-line interface shown in the
 next section.
-.Sh DRIVER PROGRAMS
+.SS DRIVER PROGRAMS
 Driver programs provide an interface to dynamically-generated PPD
 files. The following arguments are currently defined:
 .TP 5
@@ -59,7 +59,7 @@ Lists the supported PPD files to stdout.
 drivername cat ppdname
 .br
 Writes the named PPD file to stdout.
-.Sh LISTING FILES (drivername list)
+.SS LISTING FILES (drivername list)
 When run with the single argument "list", the program must list
 the available PPD files it can generate to stdout using the
 following format:
@@ -74,12 +74,12 @@ typically "en". \fIMake\fR is the Manufacturer name from the PPD
 file. \fIMake and model\fR is the NickName name from the PPD
 file. \fI1284 device id\fR is the 1284DeviceId from the PPD file,
 if any.
-.Sh WRITING FILES (drivername cat ppdname)
+.SS WRITING FILES (drivername cat ppdname)
 When the driver program is run with the "cat ppdname" arguments,
 it must write the named PPD file to stdout, uncompressed. If the
 named PPD file does not exist, the driver program must not write
 any output to stdout and report the error to stderr instead.
-.Sh DRIVER ERROR MESSAGES
+.SS DRIVER ERROR MESSAGES
 Error messages can be relayed back to \fIcupsd\fR by writing them
 to stderr. The following prefixes are recognized:
 .TP 5
