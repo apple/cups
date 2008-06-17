@@ -3,7 +3,7 @@
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -102,6 +102,7 @@ mimeAddType(mime_t     *mime,		/* I - MIME database */
 
   strlcpy(temp->super, super, sizeof(temp->super));
   strcpy(temp->type, type);		/* Safe: temp->type is allocated */
+  temp->priority = 100;
 
   cupsArrayAdd(mime->types, temp);
 
@@ -396,6 +397,11 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  op = MIME_MAGIC_LOCALE;
 	else if (!strcmp(name, "contains"))
 	  op = MIME_MAGIC_CONTAINS;
+	else if (!strcmp(name, "priority") && num_values == 1)
+	{
+	  mt->priority = atoi(value[0]);
+	  continue;
+	}
 	else
 	  return (-1);
       }
@@ -532,7 +538,8 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
 {
   _mime_filebuf_t	fb;		/* File buffer */
   const char		*base;		/* Base filename of file */
-  mime_type_t		*type;		/* File type */
+  mime_type_t		*type,		/* File type */
+			*best;		/* Best match */
 
 
   DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", filename=\"%s\", "
@@ -578,11 +585,14 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
   * Then check it against all known types...
   */
 
-  for (type = (mime_type_t *)cupsArrayFirst(mime->types);
+  for (type = (mime_type_t *)cupsArrayFirst(mime->types), best = NULL;
        type;
        type = (mime_type_t *)cupsArrayNext(mime->types))
     if (checkrules(base, &fb, type->rules))
-      break;
+    {
+      if (!best || type->priority > best->priority)
+        best = type;
+    }
 
  /*
   * Finally, close the file and return a match (if any)...
@@ -593,7 +603,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
 
   cupsFileClose(fb.fp);
 
-  return (type);
+  return (best);
 }
 
 

@@ -110,6 +110,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		compression;		/* Compression of file */
   int		cost;			/* Cost of filters */
   mime_t	*mime;			/* MIME database */
+  char		mimedir[1024];		/* MIME directory */
   char		*infile,		/* File to filter */
 		*outfile;		/* File to create */
   char		cupsdconf[1024];	/* cupsd.conf file */
@@ -359,6 +360,10 @@ main(int  argc,				/* I - Number of command-line args */
 		    command, ServerRoot);
     return (1);
   }
+
+  snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
+  if (!access(mimedir, 0))
+    mime = mimeMerge(mime, mimedir, Path);
 
  /*
   * Get the source and destination types...

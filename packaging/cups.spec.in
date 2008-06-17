@@ -157,8 +157,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/cups/*.conf
 /etc/cups/cupsd.conf.default
 %dir /etc/cups/interfaces
-/etc/cups/mime.types
-/etc/cups/mime.convs
 %dir /etc/cups/ppd
 %attr(0700,root,root) %dir /etc/cups/ssl
 
@@ -237,6 +235,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/drv/*
 %dir /usr/share/cups/fonts
 /usr/share/cups/fonts/*
+%dir /usr/share/cups/mime
+/usr/share/cups/mime/*
 %dir /usr/share/cups/model
 %dir /usr/share/cups/ppdc
 /usr/share/cups/ppdc/*

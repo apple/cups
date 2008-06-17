@@ -3,7 +3,7 @@
 .\"
 .\"   mime.types man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH mime.types 5 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH mime.types 5 "Common UNIX Printing System" "17 June 2008" "Apple Inc."
 .SH NAME
 mime.types \- mime type description file for cups
 .SH DESCRIPTION
@@ -51,6 +51,11 @@ printable(offset,length)
 .br
 True if bytes are printable 8-bit chars (CR, NL, TAB, BS, 32-126, 128-254)
 .TP 5
+priority(number)
+.br
+Specifies the relative priority of this MIME type. The default priority is 100.
+Larger values have higher priority while smaller values have lower priority.
+.TP 5
 string(offset,"string")
 .br
 True if bytes are identical to string
@@ -88,7 +93,7 @@ strings.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

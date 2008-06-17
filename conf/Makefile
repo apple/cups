@@ -75,11 +75,15 @@ install-data:
 	done
 	$(INSTALL_CONFIG) cupsd.conf $(SERVERROOT)/cupsd.conf.default
 	-chgrp $(CUPS_GROUP) $(SERVERROOT)/cupsd.conf.default
+	$(INSTALL_DIR) -m 755 $(DATADIR)/mime
 	for file in $(REPLACE); do \
-		if test -r $(SERVERROOT)/$$file ; then \
-			$(MV) $(SERVERROOT)/$$file $(SERVERROOT)/$$file.O ; \
+		if test -r $(DATADIR)/mime/$$file ; then \
+			$(MV) $(DATADIR)/mime/$$file $(DATADIR)/mime/$$file.O ; \
 		fi ; \
-		$(INSTALL_DATA) $$file $(SERVERROOT) ; \
+		if test -r $(SERVERROOT)/$$file ; then \
+			$(MV) $(SERVERROOT)/$$file $(DATADIR)/mime/$$file.O ; \
+		fi ; \
+		$(INSTALL_DATA) $$file $(DATADIR)/mime ; \
 	done
 	-if test x$(PAMDIR) != x; then \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(PAMDIR); \
@@ -121,6 +125,10 @@ uninstall:
 		$(RM) $(SERVERROOT)/$$file; \
 	done
 	-$(RMDIR) $(SERVERROOT)
+	for file in $(REPLACE); do \
+		$(RM) $(DATADIR)/mime/$$file; \
+	done
+	-$(RMDIR) $(DATADIR)/mime
 	-if test x$(PAMDIR) != x; then \
 		$(RM) $(BUILDROOT)$(PAMDIR)/cups; \
 		$(RMDIR) $(BUILDROOT)$(PAMDIR); \

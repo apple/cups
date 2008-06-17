@@ -346,6 +346,7 @@ cupsdReadConfiguration(void)
   cups_file_t	*fp;			/* Configuration file */
   int		status;			/* Return status */
   char		temp[1024],		/* Temporary buffer */
+		mimedir[1024],		/* MIME directory */
 		*slash;			/* Directory separator */
   cups_lang_t	*language;		/* Language */
   struct passwd	*user;			/* Default user */
@@ -1113,6 +1114,7 @@ cupsdReadConfiguration(void)
     */
 
     snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
+    snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
 
     MimeDatabase = mimeLoad(ServerRoot, temp);
 
@@ -1122,6 +1124,9 @@ cupsdReadConfiguration(void)
                       "Unable to load MIME database from \'%s\'!", ServerRoot);
       exit(errno);
     }
+
+    if (!access(mimedir, 0))
+      MimeDatabase = mimeMerge(MimeDatabase, mimedir, temp);
 
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Loaded MIME database from \'%s\': %d types, %d filters...",

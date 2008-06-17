@@ -3,6 +3,9 @@ CHANGES.txt - 2008-06-17
 
 CHANGES IN CUPS V1.4b1
 
+	- MIME types now support a priority() attribute (STR #2719)
+	- The standard MIME types are now installed in
+	  DataDir/mime (STR #2719)
 	- The lpoptions command now describes custom options and
 	  the necessary parameters (STR #2660)
 	- The ppdmerge program did not support Simplified Chinese

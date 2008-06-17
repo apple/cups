@@ -467,6 +467,10 @@ d 0755 root sys $DATADIR/fonts -
 f 0644 root sys $DATADIR/fonts fonts/Courier*
 f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
 
+d 0755 root sys $DATADIR/mime -
+f 0644 root sys $DATADIR/mime/mime.convs conf/mime.convs
+f 0644 root sys $DATADIR/mime/mime.types conf/mime.types
+
 d 0755 root sys $DATADIR/model -
 
 d 0755 root sys $DATADIR/ppdc -
@@ -514,8 +518,6 @@ d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
-f 0644 root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
-f 0644 root $CUPS_GROUP $SERVERROOT/mime.types conf/mime.types
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -

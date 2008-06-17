@@ -7,7 +7,7 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.types" file that
 #   reflects your local configuration changes.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -33,6 +33,8 @@
 #   extension				Pattern match on "*.extension"
 #   ascii(offset,length)		True if bytes are valid printable ASCII
 #					(CR, NL, TAB, BS, 32-126)
+#   priority(number)                    Sets priority of type (0=lowest,
+#                                       100=default, 200=highest)
 #   printable(offset,length)		True if bytes are printable 8-bit chars
 #					(CR, NL, TAB, BS, 32-126, 128-254)
 #   string(offset,"string")		True if bytes are identical to string
