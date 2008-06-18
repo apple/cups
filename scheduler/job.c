@@ -3795,23 +3795,28 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       event |= CUPSD_EVENT_PRINTER_STATE;
     }
 #endif /* __APPLE__ */
-    else if (loglevel <= job->status_level)
+    else
     {
-     /*
-      * Some message to show in the printer-state-message attribute...
-      */
+      cupsdLogJob(job, loglevel, "%s", message);
 
-      if (loglevel != CUPSD_LOG_NOTICE)
-        job->status_level = loglevel;
+      if (loglevel <= job->status_level)
+      {
+       /*
+	* Some messages show in the printer-state-message attribute...
+	*/
 
-      strlcpy(job->printer->state_message, message,
-              sizeof(job->printer->state_message));
-      cupsdAddPrinterHistory(job->printer);
+	if (loglevel != CUPSD_LOG_NOTICE)
+	  job->status_level = loglevel;
 
-      if (loglevel <= CUPSD_LOG_INFO)
-        event |= CUPSD_EVENT_PRINTER_STATE;
+	strlcpy(job->printer->state_message, message,
+		sizeof(job->printer->state_message));
+	cupsdAddPrinterHistory(job->printer);
 
-      update_job_attrs(job);
+	if (loglevel <= CUPSD_LOG_INFO)
+	  event |= CUPSD_EVENT_PRINTER_STATE;
+
+	update_job_attrs(job);
+      }
     }
 
     if (!strchr(job->status_buffer->buffer, '\n'))
