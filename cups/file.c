@@ -119,6 +119,9 @@ struct _cups_file_s			/**** CUPS file structure... ****/
   Bytef		cbuf[4096];		/* (De)compression buffer */
   uLong		crc;			/* (De)compression CRC */
 #endif /* HAVE_LIBZ */
+
+  char		*printf_buffer;		/* cupsFilePrintf buffer */
+  size_t	printf_size;		/* Size of cupsFilePrintf buffer */
 };
 
 
@@ -241,6 +244,9 @@ cupsFileClose(cups_file_t *fp)		/* I - CUPS file */
   fd       = fp->fd;
   mode     = fp->mode;
   is_stdio = fp->is_stdio;
+
+  if (fp->printf_buffer)
+    free(fp->printf_buffer);
 
   free(fp);
 
@@ -1111,7 +1117,6 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
 {
   va_list	ap;			/* Argument list */
   ssize_t	bytes;			/* Formatted size */
-  char		buf[8192];		/* Formatted text */
 
 
   DEBUG_printf(("cupsFilePrintf(fp=%p, format=\"%s\", ...)\n", fp, format));
@@ -1119,16 +1124,48 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   if (!fp || !format || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
+  if (!fp->printf_buffer)
+  {
+   /*
+    * Start with an 1k printf buffer...
+    */
+
+    if ((fp->printf_buffer = malloc(1024)) == NULL)
+      return (-1);
+
+    fp->printf_size = 1024;
+  }
+
   va_start(ap, format);
-  bytes = vsnprintf(buf, sizeof(buf), format, ap);
+  bytes = vsnprintf(fp->printf_buffer, fp->printf_size, format, ap);
   va_end(ap);
 
-  if (bytes >= sizeof(buf))
-    return (-1);
+  if (bytes >= fp->printf_size)
+  {
+   /*
+    * Expand the printf buffer...
+    */
+
+    char	*temp;			/* Temporary buffer pointer */
+
+
+    if (bytes > 65535)
+      return (-1);
+
+    if ((temp = realloc(fp->printf_buffer, bytes + 1)) == NULL)
+      return (-1);
+
+    fp->printf_buffer = temp;
+    fp->printf_size   = bytes + 1;
+
+    va_start(ap, format);
+    bytes = vsnprintf(fp->printf_buffer, fp->printf_size, format, ap);
+    va_end(ap);
+  }
 
   if (fp->mode == 's')
   {
-    if (cups_write(fp, buf, bytes) < 0)
+    if (cups_write(fp, fp->printf_buffer, bytes) < 0)
       return (-1);
 
     fp->pos += bytes;
@@ -1150,14 +1187,14 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   {
 #ifdef HAVE_LIBZ
     if (fp->compressed)
-      return (cups_compress(fp, buf, bytes));
+      return (cups_compress(fp, fp->printf_buffer, bytes));
     else
 #endif /* HAVE_LIBZ */
-      return (cups_write(fp, buf, bytes));
+      return (cups_write(fp, fp->printf_buffer, bytes));
   }
   else
   {
-    memcpy(fp->ptr, buf, bytes);
+    memcpy(fp->ptr, fp->printf_buffer, bytes);
     fp->ptr += bytes;
     return (bytes);
   }
