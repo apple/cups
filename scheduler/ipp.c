@@ -796,8 +796,8 @@ cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
     * Yes...
     */
 
-    cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Adding end banner page \"%s\".",
-                job->id, attr->values[1].string.text);
+    cupsdLogJob(job, CUPSD_LOG_INFO, "Adding end banner page \"%s\".",
+                attr->values[1].string.text);
 
     if ((kbytes = copy_banner(NULL, job, attr->values[1].string.text)) < 0)
       return (-1);
@@ -1754,10 +1754,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
           cupsdSetString(&attr->values[0].string.text, Classification);
 
-	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "CLASSIFICATION FORCED "
 	                		     "job-sheets=\"%s,none\", "
 					     "job-originating-user-name=\"%s\"",
-	              job->id, Classification, job->username);
+	              Classification, job->username);
 	}
 	else if (attr->num_values == 2 &&
 	         strcmp(attr->values[0].string.text,
@@ -1771,10 +1771,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
           cupsdSetString(&attr->values[1].string.text, attr->values[0].string.text);
 
-	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "[Job %d] CLASSIFICATION FORCED "
+	  cupsdLogJob(job, CUPSD_LOG_NOTICE, "CLASSIFICATION FORCED "
 	                		     "job-sheets=\"%s,%s\", "
 					     "job-originating-user-name=\"%s\"",
-		      job->id, attr->values[0].string.text,
+		      attr->values[0].string.text,
 		      attr->values[1].string.text, job->username);
 	}
 	else if (strcmp(attr->values[0].string.text, Classification) &&
@@ -1785,16 +1785,16 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
         {
 	  if (attr->num_values == 1)
             cupsdLogJob(job, CUPSD_LOG_NOTICE,
-			"[Job %d] CLASSIFICATION OVERRIDDEN "
+			"CLASSIFICATION OVERRIDDEN "
 			"job-sheets=\"%s\", "
 			"job-originating-user-name=\"%s\"",
-	                job->id, attr->values[0].string.text, job->username);
+	                attr->values[0].string.text, job->username);
           else
             cupsdLogJob(job, CUPSD_LOG_NOTICE,
-			"[Job %d] CLASSIFICATION OVERRIDDEN "
+			"CLASSIFICATION OVERRIDDEN "
 			"job-sheets=\"%s,%s\",fffff "
 			"job-originating-user-name=\"%s\"",
-			job->id, attr->values[0].string.text,
+			attr->values[0].string.text,
 			attr->values[1].string.text, job->username);
         }
       }
@@ -1825,17 +1825,17 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
         if (attr->num_values > 1)
 	  cupsdLogJob(job, CUPSD_LOG_NOTICE,
-		      "[Job %d] CLASSIFICATION FORCED "
+		      "CLASSIFICATION FORCED "
 		      "job-sheets=\"%s,%s\", "
 		      "job-originating-user-name=\"%s\"",
-		      job->id, attr->values[0].string.text,
+		      attr->values[0].string.text,
 		      attr->values[1].string.text, job->username);
         else
 	  cupsdLogJob(job, CUPSD_LOG_NOTICE,
-		      "[Job %d] CLASSIFICATION FORCED "
+		      "CLASSIFICATION FORCED "
 		      "job-sheets=\"%s\", "
 		      "job-originating-user-name=\"%s\"",
-		      job->id, Classification, job->username);
+		      Classification, job->username);
       }
     }
 
@@ -1845,9 +1845,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (!(printer->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     {
-      cupsdLogJob(job, CUPSD_LOG_INFO,
-		  "[Job %d] Adding start banner page \"%s\".",
-		  job->id, attr->values[0].string.text);
+      cupsdLogJob(job, CUPSD_LOG_INFO, "Adding start banner page \"%s\".",
+		  attr->values[0].string.text);
 
       if ((kbytes = copy_banner(con, job, attr->values[0].string.text)) < 0)
       {
@@ -3669,8 +3668,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Authenticated by \"%s\".", jobid,
-	      con->username);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Authenticated by \"%s\".", con->username);
 }
 
 
@@ -4010,11 +4008,11 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdCheckJobs();
 
   if (purge)
-    cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Purged by \"%s\".", jobid,
-		username);
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Purged by \"%s\".", jobid,
+		    username);
   else
-    cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
-		username);
+    cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Canceled by \"%s\".", jobid,
+		    username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -5690,8 +5688,8 @@ create_job(cupsd_client_t  *con,	/* I - Client connection */
   * Save and log the job...
   */
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Queued on \"%s\" by \"%s\".",
-	      job->id, job->dest, job->username);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Queued on \"%s\" by \"%s\".",
+	      job->dest, job->username);
 }
 
 
@@ -7945,8 +7943,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
                   "Job job-hold-until value changed by user.");
   }
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Held by \"%s\".", jobid,
-	      username);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Held by \"%s\".", username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -8520,10 +8517,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   cupsdLogJob(job, CUPSD_LOG_INFO,
-	      "[Job %d] File of type %s/%s queued by \"%s\".", job->id,
+	      "File of type %s/%s queued by \"%s\".",
 	      filetype->super, filetype->type, job->username);
-  cupsdLogJob(job, CUPSD_LOG_DEBUG, "[Job %d] hold_until=%d", job->id,
-	      (int)job->hold_until);
+  cupsdLogJob(job, CUPSD_LOG_DEBUG, "hold_until=%d", (int)job->hold_until);
 
  /*
   * Start the job if possible...
@@ -8930,8 +8926,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
                 "Job released by user.");
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Released by \"%s\".", jobid,
-	      username);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Released by \"%s\".", username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -9150,8 +9145,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdRestartJob(job);
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "[Job %d] Restarted by \"%s\".", jobid,
-	      username);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Restarted by \"%s\".", username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -9395,8 +9389,7 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
   cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
                   krb5_cc_get_name(KerberosContext, job->ccache));
 
-  cupsdLogJob(job, CUPSD_LOG_DEBUG2, "[Job %d] save_krb5_creds: %s", job->id,
-	      job->ccname);
+  cupsdLogJob(job, CUPSD_LOG_DEBUG2, "save_krb5_creds: %s", job->ccname);
 #  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
@@ -9608,7 +9601,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     ipp_attribute_t	*doc_name;	/* document-name attribute */
 
 
-    cupsdLogJob(job, CUPSD_LOG_DEBUG, "[Job %d] Auto-typing file...", job->id);
+    cupsdLogJob(job, CUPSD_LOG_DEBUG, "Auto-typing file...");
 
     doc_name = ippFindAttribute(con->request, "document-name", IPP_TAG_NAME);
     filetype = mimeFileType(MimeDatabase, con->filename,
@@ -9618,8 +9611,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (!filetype)
       filetype = mimeType(MimeDatabase, super, type);
 
-    cupsdLogJob(job, CUPSD_LOG_DEBUG,
-		"[Job %d] Request file type is %s/%s.", job->id,
+    cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
 		filetype->super, filetype->type);
   }
   else
@@ -9703,8 +9695,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdClearString(&con->filename);
 
-  cupsdLogJob(job, CUPSD_LOG_INFO,
-	      "[Job %d] File of type %s/%s queued by \"%s\".", job->id,
+  cupsdLogJob(job, CUPSD_LOG_INFO, "File of type %s/%s queued by \"%s\".",
 	      filetype->super, filetype->type, job->username);
 
  /*

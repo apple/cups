@@ -4,7 +4,7 @@
  *   Status buffer definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -39,8 +39,8 @@ typedef struct				/**** Status buffer */
  * Prototypes...
  */
 
-extern cupsd_statbuf_t	*cupsdStatBufNew(int fd, const char *prefix, ...);
 extern void		cupsdStatBufDelete(cupsd_statbuf_t *sb);
+extern cupsd_statbuf_t	*cupsdStatBufNew(int fd, const char *prefix, ...);
 extern char		*cupsdStatBufUpdate(cupsd_statbuf_t *sb, int *loglevel,
 			                    char *line, int linelen);
 

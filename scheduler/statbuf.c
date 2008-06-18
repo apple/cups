@@ -4,7 +4,7 @@
  *   Status buffer routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,8 +15,8 @@
  *
  * Contents:
  *
- *   cupsdStatBufNew()    - Create a new status buffer.
  *   cupsdStatBufDelete() - Destroy a status buffer.
+ *   cupsdStatBufNew()    - Create a new status buffer.
  *   cupsdStatBufUpdate() - Update the status buffer.
  */
 
@@ -26,6 +26,30 @@
 
 #include "cupsd.h"
 #include <stdarg.h>
+
+
+/*
+ * 'cupsdStatBufDelete()' - Destroy a status buffer.
+ */
+
+void
+cupsdStatBufDelete(cupsd_statbuf_t *sb)	/* I - Status buffer */
+{
+ /*
+  * Range check input...
+  */
+
+  if (!sb)
+    return;
+
+ /*
+  * Close the status pipe and free memory used...
+  */
+
+  close(sb->fd);
+
+  free(sb);
+}
 
 
 /*
@@ -86,30 +110,6 @@ cupsdStatBufNew(int fd,			/* I - File descriptor of pipe */
   }
 
   return (sb);
-}
-
-
-/*
- * 'cupsdStatBufDelete()' - Destroy a status buffer.
- */
-
-void
-cupsdStatBufDelete(cupsd_statbuf_t *sb)	/* I - Status buffer */
-{
- /*
-  * Range check input...
-  */
-
-  if (!sb)
-    return;
-
- /*
-  * Close the status pipe and free memory used...
-  */
-
-  close(sb->fd);
-
-  free(sb);
 }
 
 
@@ -288,20 +288,23 @@ cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
   * Send it to the log file as needed...
   */
 
-  if (*loglevel > CUPSD_LOG_NONE &&
-      (*loglevel != CUPSD_LOG_INFO || LogLevel == CUPSD_LOG_DEBUG2))
+  if (sb->prefix[0])
   {
-   /*
-    * General status message; send it to the error_log file...
-    */
+    if (*loglevel > CUPSD_LOG_NONE &&
+	(*loglevel != CUPSD_LOG_INFO || LogLevel == CUPSD_LOG_DEBUG2))
+    {
+     /*
+      * General status message; send it to the error_log file...
+      */
 
-    if (message[0] == '[')
-      cupsdLogMessage(*loglevel, "%s", message);
-    else
-      cupsdLogMessage(*loglevel, "%s %s", sb->prefix, message);
+      if (message[0] == '[')
+	cupsdLogMessage(*loglevel, "%s", message);
+      else
+	cupsdLogMessage(*loglevel, "%s %s", sb->prefix, message);
+    }
+    else if (*loglevel < CUPSD_LOG_NONE && LogLevel == CUPSD_LOG_DEBUG2)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "%s %s", sb->prefix, sb->buffer);
   }
-  else if (*loglevel < CUPSD_LOG_NONE && LogLevel == CUPSD_LOG_DEBUG2)
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "%s %s", sb->prefix, sb->buffer);
 
  /*
   * Copy the message to the line buffer...

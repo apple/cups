@@ -16,10 +16,13 @@
  *
  *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
  *   cupsdLogGSSMessage() - Log a GSSAPI error...
+ *   cupsdLogJob()        - Log a job message.
  *   cupsdLogMessage()    - Log a message to the error log file.
  *   cupsdLogPage()       - Log a page to the page log file.
  *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
+ *   cupsdWriteErrorLog() - Write a line to the ErrorLog.
  *   check_log_file()     - Open/rotate a log file if it needs it.
+ *   format_log_line()    - Format a line for a log file.
  */
 
 /*
@@ -45,7 +48,6 @@ static char	*log_line = NULL;	/* Line for output file */
 
 static int	check_log_file(cups_file_t **lf, const char *logname);
 static char	*format_log_line(const char *message, va_list ap);
-static int	write_error_log(int level, const char *message);
 
 
 /*
@@ -177,10 +179,9 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 	    ...)			/* I - Additional arguments as needed */
 {
   va_list		ap;		/* Argument pointer */
-  char			*line;		/* Message line */
+  char			jobmsg[1024],	/* Format string for job message */
+			*line;		/* Message line */
 
-
-  (void)job;
 
  /*
   * See if we want to log this message...
@@ -196,15 +197,17 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   * Format and write the log message...
   */
 
+  snprintf(jobmsg, sizeof(jobmsg), "[Job %d] %s", job->id, message);
+
   va_start(ap, message);
-  line = format_log_line(message, ap);
+  line = format_log_line(jobmsg, ap);
   va_end(ap);
 
   if (line)
-    return (write_error_log(level, line));
+    return (cupsdWriteErrorLog(level, line));
   else
-    return (write_error_log(CUPSD_LOG_ERROR,
-                            "Unable to allocate memory for log line!"));
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line!"));
 }
 
 
@@ -250,10 +253,10 @@ cupsdLogMessage(int        level,	/* I - Log level */
   va_end(ap);
 
   if (line)
-    return (write_error_log(level, line));
+    return (cupsdWriteErrorLog(level, line));
   else
-    return (write_error_log(CUPSD_LOG_ERROR,
-                            "Unable to allocate memory for log line!"));
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line!"));
 }
 
 
@@ -534,6 +537,75 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
 
 /*
+ * 'cupsdWriteErrorLog()' - Write a line to the ErrorLog.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsdWriteErrorLog(int        level,	/* I - Log level */
+                   const char *message)	/* I - Message string */
+{
+  static const char	levels[] =	/* Log levels... */
+		{
+		  ' ',
+		  'X',
+		  'A',
+		  'C',
+		  'E',
+		  'W',
+		  'N',
+		  'I',
+		  'D',
+		  'd'
+		};
+#ifdef HAVE_VSYSLOG
+  static const int	syslevels[] =	/* SYSLOG levels... */
+		{
+		  0,
+		  LOG_EMERG,
+		  LOG_ALERT,
+		  LOG_CRIT,
+		  LOG_ERR,
+		  LOG_WARNING,
+		  LOG_NOTICE,
+		  LOG_INFO,
+		  LOG_DEBUG,
+		  LOG_DEBUG
+		};
+#endif /* HAVE_VSYSLOG */
+
+
+#ifdef HAVE_VSYSLOG
+ /*
+  * See if we are logging errors via syslog...
+  */
+
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    syslog(syslevels[level], "%s", message);
+    return (1);
+  }
+#endif /* HAVE_VSYSLOG */
+
+ /*
+  * Not using syslog; check the log file...
+  */
+
+  if (!check_log_file(&ErrorFile, ErrorLog))
+    return (0);
+
+ /*
+  * Write the log message...
+  */
+
+  cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
+                 cupsdGetDateTime(time(NULL)), message);
+  cupsFileFlush(ErrorFile);
+
+  return (1);
+}
+
+
+/*
  * 'check_log_file()' - Open/rotate a log file if it needs it.
  */
 
@@ -753,75 +825,6 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   }
 
   return (log_line);
-}
-
-
-/*
- * 'write_error_log()' - Write a line to the ErrorLog.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-write_error_log(int        level,	/* I - Log level */
-                const char *message)	/* I - Message string */
-{
-  static const char	levels[] =	/* Log levels... */
-		{
-		  ' ',
-		  'X',
-		  'A',
-		  'C',
-		  'E',
-		  'W',
-		  'N',
-		  'I',
-		  'D',
-		  'd'
-		};
-#ifdef HAVE_VSYSLOG
-  static const int	syslevels[] =	/* SYSLOG levels... */
-		{
-		  0,
-		  LOG_EMERG,
-		  LOG_ALERT,
-		  LOG_CRIT,
-		  LOG_ERR,
-		  LOG_WARNING,
-		  LOG_NOTICE,
-		  LOG_INFO,
-		  LOG_DEBUG,
-		  LOG_DEBUG
-		};
-#endif /* HAVE_VSYSLOG */
-
-
-#ifdef HAVE_VSYSLOG
- /*
-  * See if we are logging errors via syslog...
-  */
-
-  if (!strcmp(ErrorLog, "syslog"))
-  {
-    syslog(syslevels[level], "%s", message);
-    return (1);
-  }
-#endif /* HAVE_VSYSLOG */
-
- /*
-  * Not using syslog; check the log file...
-  */
-
-  if (!check_log_file(&ErrorFile, ErrorLog))
-    return (0);
-
- /*
-  * Write the log message...
-  */
-
-  cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
-                 cupsdGetDateTime(time(NULL)), message);
-  cupsFileFlush(ErrorFile);
-
-  return (1);
 }
 
 
