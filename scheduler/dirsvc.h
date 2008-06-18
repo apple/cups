@@ -188,7 +188,6 @@ extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
 #ifdef HAVE_DNSSD
-extern void	cupsdUpdateDNSSDBrowse(void);
 extern void	cupsdUpdateDNSSDName(void);
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_LDAP

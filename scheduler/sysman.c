@@ -21,13 +21,13 @@
  *                                     doing something.
  *   cupsdStartSystemMonitor()       - Start monitoring for system change.
  *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
- *   cupsdUpdateSystemMonitor()      - Update the current system state.
  *   sysEventThreadEntry()           - A thread to receive power and computer
  *                                     name change notifications.
  *   sysEventPowerNotifier()         - Handle power notification events.
  *   sysEventConfigurationNotifier() - Computer name changed notification
  *                                     callback.
  *   sysEventTimerNotifier()         - Handle delayed event notifications.
+ *   sysUpdate()                     - Update the current system state.
  */
 
 
@@ -230,6 +230,7 @@ static void	sysEventConfigurationNotifier(SCDynamicStoreRef store,
 		                              CFArrayRef changedKeys,
 					      void *context);
 static void	sysEventTimerNotifier(CFRunLoopTimerRef timer, void *context);
+static void	sysUpdate(void);
 
 
 /*
@@ -249,8 +250,7 @@ cupsdStartSystemMonitor(void)
     return;
   }
 
-  cupsdAddSelect(SysEventPipes[0], (cupsd_selfunc_t)cupsdUpdateSystemMonitor,
-                 NULL, NULL);
+  cupsdAddSelect(SysEventPipes[0], (cupsd_selfunc_t)sysUpdate, NULL, NULL);
 
  /*
   * Set non-blocking mode on the descriptor we will be receiving notification
@@ -309,174 +309,6 @@ cupsdStopSystemMonitor(void)
   {
     cupsdRemoveSelect(SysEventPipes[0]);
     cupsdClosePipe(SysEventPipes);
-  }
-}
-
-
-/*
- * 'cupsdUpdateSystemMonitor()' - Update the current system state.
- */
-
-void
-cupsdUpdateSystemMonitor(void)
-{
-  int			i;		/* Looping var */
-  cupsd_sysevent_t	sysevent;	/* The system event */
-  cupsd_printer_t	*p;		/* Printer information */
-
-
- /*
-  * Drain the event pipe...
-  */
-
-  while (read((int)SysEventPipes[0], &sysevent, sizeof(sysevent))
-             == sizeof(sysevent))
-  {
-    if (sysevent.event & SYSEVENT_CANSLEEP)
-    {
-     /*
-      * If there are active printers that don't have the connecting-to-device
-      * printer-state-reason then cancel the sleep request (i.e. this reason
-      * indicates a job that is not yet connected to the printer)...
-      */
-
-      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-           p;
-	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      {
-        if (p->job)
-        {
-	  for (i = 0; i < p->num_reasons; i ++)
-	    if (!strcmp(p->reasons[i], "connecting-to-device"))
-	      break;
-
-	  if (!p->num_reasons || i >= p->num_reasons)
-	    break;
-        }
-      }
-
-      if (p)
-      {
-        cupsdLogMessage(CUPSD_LOG_INFO,
-	                "System sleep canceled because printer %s is active",
-	                p->name);
-        IOCancelPowerChange(sysevent.powerKernelPort,
-	                    sysevent.powerNotificationID);
-      }
-      else
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, "System wants to sleep");
-        IOAllowPowerChange(sysevent.powerKernelPort,
-	                   sysevent.powerNotificationID);
-      }
-    }
-
-    if (sysevent.event & SYSEVENT_WILLSLEEP)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep");
-
-      Sleeping = 1;
-
-      cupsdStopAllJobs(0);
-
-      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-           p;
-	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      {
-	if (p->type & CUPS_PRINTER_DISCOVERED)
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Deleting remote destination \"%s\"", p->name);
-	  cupsArraySave(Printers);
-	  cupsdDeletePrinter(p, 0);
-	  cupsArrayRestore(Printers);
-	}
-	else
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                  "Deregistering local printer \"%s\"", p->name);
-	  cupsdDeregisterPrinter(p, 0);
-	}
-      }
-
-      cupsdCleanDirty();
-
-      IOAllowPowerChange(sysevent.powerKernelPort,
-                         sysevent.powerNotificationID);
-    }
-
-    if (sysevent.event & SYSEVENT_WOKE)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "System woke from sleep");
-      IOAllowPowerChange(sysevent.powerKernelPort,
-                         sysevent.powerNotificationID);
-      Sleeping = 0;
-      cupsdCheckJobs();
-    }
-
-    if (sysevent.event & SYSEVENT_NETCHANGED)
-    {
-      if (!Sleeping)
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "System network configuration changed");
-
-       /*
-        * Resetting browse_time before calling cupsdSendBrowseList causes
-	* browse packets to be sent for local shared printers.
-        */
-
-	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	     p;
-	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  p->browse_time = 0;
-
-        cupsdSendBrowseList();
-	cupsdRestartPolling();
-      }
-      else
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "System network configuration changed; "
-			"ignored while sleeping");
-    }
-
-    if (sysevent.event & SYSEVENT_NAMECHANGED)
-    {
-      if (!Sleeping)
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "Computer name changed");
-
-       /*
-	* De-register the individual printers...
-	*/
-
-	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	     p;
-	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	  cupsdDeregisterPrinter(p, 1);
-
-       /*
-        * Update the computer name...
-	*/
-
-	cupsdUpdateDNSSDName();
-
-       /*
-	* Now re-register them...
-	*/
-
-	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	     p;
-	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	{
-	  p->browse_time = 0;
-	  cupsdRegisterPrinter(p);
-	}
-      }
-      else
-        cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Computer name changed; ignored while sleeping");
-    }
   }
 }
 
@@ -841,6 +673,174 @@ sysEventTimerNotifier(
     write(SysEventPipes[1], &threadData->sysevent,
           sizeof(threadData->sysevent));
     threadData->sysevent.event = 0;
+  }
+}
+
+
+/*
+ * 'sysUpdate()' - Update the current system state.
+ */
+
+static void
+sysUpdate(void)
+{
+  int			i;		/* Looping var */
+  cupsd_sysevent_t	sysevent;	/* The system event */
+  cupsd_printer_t	*p;		/* Printer information */
+
+
+ /*
+  * Drain the event pipe...
+  */
+
+  while (read((int)SysEventPipes[0], &sysevent, sizeof(sysevent))
+             == sizeof(sysevent))
+  {
+    if (sysevent.event & SYSEVENT_CANSLEEP)
+    {
+     /*
+      * If there are active printers that don't have the connecting-to-device
+      * printer-state-reason then cancel the sleep request (i.e. this reason
+      * indicates a job that is not yet connected to the printer)...
+      */
+
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+           p;
+	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      {
+        if (p->job)
+        {
+	  for (i = 0; i < p->num_reasons; i ++)
+	    if (!strcmp(p->reasons[i], "connecting-to-device"))
+	      break;
+
+	  if (!p->num_reasons || i >= p->num_reasons)
+	    break;
+        }
+      }
+
+      if (p)
+      {
+        cupsdLogMessage(CUPSD_LOG_INFO,
+	                "System sleep canceled because printer %s is active",
+	                p->name);
+        IOCancelPowerChange(sysevent.powerKernelPort,
+	                    sysevent.powerNotificationID);
+      }
+      else
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG, "System wants to sleep");
+        IOAllowPowerChange(sysevent.powerKernelPort,
+	                   sysevent.powerNotificationID);
+      }
+    }
+
+    if (sysevent.event & SYSEVENT_WILLSLEEP)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep");
+
+      Sleeping = 1;
+
+      cupsdStopAllJobs(0);
+
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+           p;
+	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
+      {
+	if (p->type & CUPS_PRINTER_DISCOVERED)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Deleting remote destination \"%s\"", p->name);
+	  cupsArraySave(Printers);
+	  cupsdDeletePrinter(p, 0);
+	  cupsArrayRestore(Printers);
+	}
+	else
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                  "Deregistering local printer \"%s\"", p->name);
+	  cupsdDeregisterPrinter(p, 0);
+	}
+      }
+
+      cupsdCleanDirty();
+
+      IOAllowPowerChange(sysevent.powerKernelPort,
+                         sysevent.powerNotificationID);
+    }
+
+    if (sysevent.event & SYSEVENT_WOKE)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "System woke from sleep");
+      IOAllowPowerChange(sysevent.powerKernelPort,
+                         sysevent.powerNotificationID);
+      Sleeping = 0;
+      cupsdCheckJobs();
+    }
+
+    if (sysevent.event & SYSEVENT_NETCHANGED)
+    {
+      if (!Sleeping)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "System network configuration changed");
+
+       /*
+        * Resetting browse_time before calling cupsdSendBrowseList causes
+	* browse packets to be sent for local shared printers.
+        */
+
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	  p->browse_time = 0;
+
+        cupsdSendBrowseList();
+	cupsdRestartPolling();
+      }
+      else
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "System network configuration changed; "
+			"ignored while sleeping");
+    }
+
+    if (sysevent.event & SYSEVENT_NAMECHANGED)
+    {
+      if (!Sleeping)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "Computer name changed");
+
+       /*
+	* De-register the individual printers...
+	*/
+
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	  cupsdDeregisterPrinter(p, 1);
+
+       /*
+        * Update the computer name...
+	*/
+
+	cupsdUpdateDNSSDName();
+
+       /*
+	* Now re-register them...
+	*/
+
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	{
+	  p->browse_time = 0;
+	  cupsdRegisterPrinter(p);
+	}
+      }
+      else
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "Computer name changed; ignored while sleeping");
+    }
   }
 }
 #endif	/* __APPLE__ */

@@ -29,7 +29,6 @@
  *   cupsdStopBrowsing()        - Stop sending and receiving broadcast
  *                                information.
  *   cupsdStopPolling()         - Stop polling servers as needed.
- *   cupsdUpdateDNSSDBrowse()   - Handle DNS-SD queries.
  *   cupsdUpdateDNSSDName()     - Update the computer name we use for
  *                                browsing...
  *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
@@ -44,6 +43,7 @@
  *   dnssdRegisterCallback()    - DNSServiceRegister callback.
  *   dnssdRegisterPrinter()     - Start sending broadcast information for a
  *                                printer or update the broadcast contents.
+ *   dnssdUpdate()              - Handle DNS-SD queries.
  *   get_hostconfig()           - Get an /etc/hostconfig service setting.
  *   is_local_queue()           - Determine whether the URI points at a local
  *                                queue.
@@ -128,6 +128,7 @@ static void	dnssdRegisterCallback(DNSServiceRef sdRef,
 				      const char *name, const char *regtype,
 				      const char *domain, void *context);
 static void	dnssdRegisterPrinter(cupsd_printer_t *p);
+static void	dnssdUpdate(void);
 #endif /* HAVE_DNSSD */
 
 #ifdef HAVE_OPENLDAP
@@ -1058,7 +1059,7 @@ cupsdStartBrowsing(void)
       */
 
       cupsdAddSelect(DNSServiceRefSockFD(DNSSDRef),
-		     (cupsd_selfunc_t)cupsdUpdateDNSSDBrowse, NULL, NULL);
+		     (cupsd_selfunc_t)dnssdUpdate, NULL, NULL);
 
      /*
       * Then get the port we use for registrations.  If we are not listening
@@ -1475,23 +1476,6 @@ cupsdStopPolling(void)
 
 
 #ifdef HAVE_DNSSD
-/*
- * 'cupsdUpdateDNSSDBrowse()' - Handle DNS-SD queries.
- */
-
-void
-cupsdUpdateDNSSDBrowse(void)
-{
-  DNSServiceErrorType	sdErr;		/* Service discovery error */
-
-
-  if ((sdErr = DNSServiceProcessResult(DNSSDRef)) != kDNSServiceErr_NoError)
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "DNS Service Discovery registration error %d!",
-	            sdErr);
-}
-
-
 /*
  * 'cupsdUpdateDNSSDName()' - Update the computer name we use for browsing...
  */
@@ -2307,6 +2291,23 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     if (printer_txt)
       free(printer_txt);
   }
+}
+
+
+/*
+ * 'dnssdUpdate()' - Handle DNS-SD queries.
+ */
+
+static void
+dnssdUpdate(void)
+{
+  DNSServiceErrorType	sdErr;		/* Service discovery error */
+
+
+  if ((sdErr = DNSServiceProcessResult(DNSSDRef)) != kDNSServiceErr_NoError)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "DNS Service Discovery registration error %d!",
+	            sdErr);
 }
 #endif /* HAVE_DNSSD */
 

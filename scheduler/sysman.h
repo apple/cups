@@ -53,7 +53,6 @@ extern void	cupsdMarkDirty(int what);
 extern void	cupsdSetBusyState(void);
 extern void	cupsdStartSystemMonitor(void);
 extern void	cupsdStopSystemMonitor(void);
-extern void	cupsdUpdateSystemMonitor(void);
 
 
 /*
