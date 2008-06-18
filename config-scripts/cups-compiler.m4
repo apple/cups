@@ -529,6 +529,12 @@ case $uname in
 		OPTIM="$OPTIM -D_HPUX_SOURCE"
 		;;
 
+	Linux*)
+		# glibc 2.8 and higher breaks peer credentials unless you
+		# define _GNU_SOURCE...
+		OPTIM="$OPTIM -D_GNU_SOURCE"
+		;;
+
 	OSF*)
 		# Tru64 UNIX aka Digital UNIX aka OSF/1 need to be told
 		# to be POSIX-compliant...

@@ -141,12 +141,14 @@ main(int  argc,				/* I - Number of command-line args */
   ppd_group_t	*group2;		/* UI group */
   ppd_option_t	*option2;		/* Standard UI option */
   ppd_choice_t	*choice;		/* Standard UI option choice */
+  struct lconv	*loc;			/* Locale data */
   static char	*uis[] = { "BOOLEAN", "PICKONE", "PICKMANY" };
   static char	*sections[] = { "ANY", "DOCUMENT", "EXIT",
                                 "JCL", "PAGE", "PROLOG" };
 
 
   _cupsSetLocale(argv);
+  loc = localeconv();
 
  /*
   * Display PPD files for each file listed on the command-line...
@@ -370,7 +372,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL &&
           attr->value)
-        ppdversion = (int)(10 * atof(attr->value) + 0.5);
+        ppdversion = (int)(10 * _cupsStrScand(attr->value, NULL, loc) + 0.5);
 
       for (j = 0; j < ppd->num_filters; j ++)
         if (strstr(ppd->filters[j], "application/vnd.cups-raster"))

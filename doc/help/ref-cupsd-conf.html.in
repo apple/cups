@@ -988,7 +988,7 @@ printers are shared (published) by default. The default is
 <H3>Description</H3>
 
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP
-address, or network that is allowed access to the server.
+address, or network that is denied access to the server.
 <CODE>Deny</CODE> directives are cummulative, so multiple
 <CODE>Deny</CODE> directives can be used to allow access for
 multiple hosts or networks. The <CODE>/mm</CODE> notation

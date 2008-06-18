@@ -467,6 +467,10 @@ d 0755 root sys $DATADIR/fonts -
 f 0644 root sys $DATADIR/fonts fonts/Courier*
 f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
 
+d 0755 root sys $DATADIR/mime -
+f 0644 root sys $DATADIR/mime/mime.convs conf/mime.convs
+f 0644 root sys $DATADIR/mime/mime.types conf/mime.types
+
 d 0755 root sys $DATADIR/model -
 
 d 0755 root sys $DATADIR/ppdc -
@@ -514,8 +518,6 @@ d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
 c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
-f 0644 root $CUPS_GROUP $SERVERROOT/mime.convs conf/mime.convs
-f 0644 root $CUPS_GROUP $SERVERROOT/mime.types conf/mime.types
 
 %if PAMDIR
 d 0755 root sys $PAMDIR -
@@ -643,6 +645,7 @@ f 0644 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
 f 0644 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
 f 0644 root sys $MANDIR/man7/commandtoescpx.$MAN7EXT man/commandtoescpx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/commandtopclx.$MAN7EXT man/commandtopclx.$MAN7EXT
+f 0644 root sys $MANDIR/man7/drv.$MAN7EXT man/drv.$MAN7EXT
 f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertoescpx.$MAN7EXT man/rastertoescpx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertopclx.$MAN7EXT man/rastertopclx.$MAN7EXT

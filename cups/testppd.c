@@ -28,7 +28,7 @@
 #include <cups/string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "ppd.h"
+#include "cups.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -313,7 +313,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
   {
-    if ((ppd = ppdOpenFile(argv[1])) == NULL)
+    const char	*filename;		/* PPD filename */
+
+
+    if (!strncmp(argv[1], "-d", 2))
+      filename = cupsGetPPD(argv[1] + 2);
+    else
+      filename = argv[1];
+
+    if ((ppd = ppdOpenFile(filename)) == NULL)
     {
       ppd_status_t	err;		/* Last error in file */
       int		line;		/* Line number in file */
@@ -436,6 +444,9 @@ main(int  argc,				/* I - Number of command-line arguments */
         printf("    *%s %s/%s: \"%s\"\n", attr->name, attr->spec,
 	       attr->text, attr->value ? attr->value : "");
     }
+
+    if (!strncmp(argv[1], "-d", 2))
+      unlink(filename);
   }
 
 #ifdef __APPLE__

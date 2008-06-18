@@ -5387,6 +5387,40 @@ copy_printer_attrs(
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "marker-change-time", printer->marker_time);
 
+  if (printer->num_printers > 0 &&
+      (!ra || cupsArrayFind(ra, "member-uris")))
+  {
+    ipp_attribute_t	*member_uris;	/* member-uris attribute */
+    cupsd_printer_t	*p2;		/* Printer in class */
+    ipp_attribute_t	*p2_uri;	/* printer-uri-supported for class printer */
+
+
+    if ((member_uris = ippAddStrings(con->response, IPP_TAG_PRINTER,
+                                     IPP_TAG_URI, "member-uris",
+				     printer->num_printers, NULL,
+				     NULL)) != NULL)
+    {
+      for (i = 0; i < printer->num_printers; i ++)
+      {
+        p2 = printer->printers[i];
+
+        if ((p2_uri = ippFindAttribute(p2->attrs, "printer-uri-supported",
+	                               IPP_TAG_URI)) != NULL)
+          member_uris->values[i].string.text =
+	      _cupsStrAlloc(p2_uri->values[0].string.text);
+        else
+	{
+	  httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri,
+	                   sizeof(printer_uri), "ipp", NULL, con->servername,
+			   con->serverport,
+			   (p2->type & CUPS_PRINTER_CLASS) ?
+			       "/classes/%s" : "/printers/%s", p2->name);
+	  member_uris->values[i].string.text = _cupsStrAlloc(printer_uri);
+        }
+      }
+    }
+  }
+
   if (printer->alert && (!ra || cupsArrayFind(ra, "printer-alert")))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_STRING,
                  "printer-alert", NULL, printer->alert);
@@ -7522,7 +7556,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       * access...
       */
 
-      if (printer->num_users && username && !user_allowed(printer, username))
+      if (!(printer->type & CUPS_PRINTER_AUTHENTICATED) &&
+          printer->num_users && username && !user_allowed(printer, username))
         continue;
 
      /*
@@ -9862,7 +9897,8 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
 {
   http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
-  cupsd_printer_t	*printer;	/* Printer */
+  cupsd_printer_t	*printer,	/* Printer */
+			*oldprinter;	/* Old default printer */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_default(%p[%d], %s)", con,
@@ -9897,7 +9933,15 @@ set_default(cupsd_client_t  *con,	/* I - Client connection */
   * Set it as the default...
   */
 
+  oldprinter     = DefaultPrinter;
   DefaultPrinter = printer;
+
+  if (oldprinter)
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, oldprinter, NULL,
+                  "%s is no longer the default printer.", oldprinter->name);
+
+  cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+		"%s is now the default printer.", printer->name);
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS | CUPSD_DIRTY_CLASSES |
                  CUPSD_DIRTY_REMOTE | CUPSD_DIRTY_PRINTCAP);

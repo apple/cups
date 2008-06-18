@@ -1404,7 +1404,7 @@ cupsdCheckGroup(
   * Check group membership through MacOS X membership API...
   */
 
-  if (!mbr_uid_to_uuid(user->pw_uid, useruuid))
+  if (user && !mbr_uid_to_uuid(user->pw_uid, useruuid))
   {
     if (group)
     {

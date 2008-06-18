@@ -3,7 +3,7 @@
  *
  *   MIME type/conversion database definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -86,6 +86,7 @@ typedef struct _mime_magic_s		/**** MIME Magic Data ****/
 typedef struct _mime_type_s		/**** MIME Type Data ****/
 {
   mime_magic_t	*rules;			/* Rules used to detect this type */
+  int		priority;		/* Priority of this type */
   char		super[MIME_MAX_SUPER],	/* Super-type name ("image", "application", etc.) */
 		type[MIME_MAX_TYPE];	/* Type name ("png", "postscript", etc.) */
 } mime_type_t;

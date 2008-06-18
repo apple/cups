@@ -3646,6 +3646,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       * job sheet count...
       */
 
+      if (LogLevel >= CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PAGE: %s", job->id, message);
+
       if (job->sheets)
       {
         if (!strncasecmp(message, "total ", 6))
@@ -3697,6 +3700,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     }
     else if (loglevel == CUPSD_LOG_STATE)
     {
+      if (LogLevel >= CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] STATE: %s", job->id,
+	                message);
+
       if (!strcmp(message, "paused"))
       {
         cupsdStopPrinter(job->printer, 1);
@@ -3721,6 +3728,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cups_option_t	*attrs;		/* Attributes */
       const char	*attr;		/* Attribute */
 
+
+      if (LogLevel >= CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] ATTR: %s", job->id, message);
 
       num_attrs = cupsParseOptions(message, 0, &attrs);
 
@@ -3788,6 +3798,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       int		num_keywords;	/* Number of keywords */
       cups_option_t	*keywords;	/* Keywords */
 
+
+      if (LogLevel >= CUPSD_LOG_DEBUG)
+        cupsdLogMessage(CUPSD_LOG_DEBUG, "[Job %d] PPD: %s", job->id, message);
 
       num_keywords = cupsParseOptions(message, 0, &keywords);
 

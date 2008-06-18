@@ -949,7 +949,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
                             resource, sizeof(resource), 0))
     return (HTTP_NOT_FOUND);
 
-  DEBUG_printf(("Printer hostname=\"%s\", port=%d\n", hostname, port));
+  DEBUG_printf(("cupsGetPPD3: Printer hostname=\"%s\", port=%d\n", hostname, port));
 
  /*
   * Remap local hostname to localhost...
@@ -1775,6 +1775,16 @@ cups_get_printer_uri(
 		      host, hostsize, port, resource, resourcesize);
       ippDelete(response);
 
+      if (!strncmp(resource, "/classes/", 9))
+      {
+        _cupsSetError(IPP_INTERNAL_ERROR, _("No printer-uri found for class!"));
+
+	*host     = '\0';
+	*resource = '\0';
+
+	return (0);
+      }
+
       return (1);
     }
 
@@ -1782,7 +1792,7 @@ cups_get_printer_uri(
   }
 
   if (cupsLastError() != IPP_NOT_FOUND)
-    _cupsSetError(IPP_INTERNAL_ERROR, "No printer-uri found!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("No printer-uri found!"));
 
   *host     = '\0';
   *resource = '\0';

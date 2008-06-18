@@ -158,7 +158,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (section < 0)
         continue;
-      else if (!strncmp(line, ".SH ", 4) || !strncmp(line, ".Sh ", 4))
+      else if (!strncmp(line, ".SH ", 4) || !strncmp(line, ".SS ", 4))
       {
        /*
         * Grab heading...

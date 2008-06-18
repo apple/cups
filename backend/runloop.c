@@ -219,7 +219,7 @@ backendRunLoop(
       FD_SET(print_fd, &input);
     if (use_bc)
       FD_SET(device_fd, &input);
-    if (side_cb)
+    if (!print_bytes && side_cb)
       FD_SET(CUPS_SC_FD, &input);
 
     FD_ZERO(&output);
@@ -260,7 +260,15 @@ backendRunLoop(
     */
 
     if (side_cb && FD_ISSET(CUPS_SC_FD, &input))
+    {
+     /*
+      * Do the side-channel request, then start back over in the select
+      * loop since it may have read from print_fd...
+      */
+
       (*side_cb)(print_fd, device_fd, snmp_fd, addr, use_bc);
+      continue;
+    }
 
    /*
     * Check if we have back-channel data ready...

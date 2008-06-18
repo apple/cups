@@ -1,4 +1,4 @@
-CREDITS.txt - 2007-09-10
+CREDITS.txt - 2008-06-16
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -30,6 +30,7 @@ like to thank the following individuals for their contributions:
     Daniel Nylander                - Swedish localization.
     Giulio Orsero                  - Bug fixes and testing.
     Michal Osowiecki               - Polish localization.
+    Citra Paska                    - Indonesian localization.
     Kurt Pfeifle                   - Bug fixes, beta testing, evangelism.
     Vincenzo Reale                 - Italian localization.
     Petter Reinholdtsen            - HP-UX compiler stuff.

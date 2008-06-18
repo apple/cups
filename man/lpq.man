@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpq 1 "Common UNIX Printing System" "2 January 2008" "Apple Inc."
+.TH lpq 1 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
 .SH NAME
 lpq \- show printer queue status
 .SH SYNOPSIS
@@ -33,7 +33,7 @@ no printer or class is specified on the command-line.
 .LP
 The \fI+interval\fR option allows you to continuously report the
 jobs in the queue until the queue is empty; the list of jobs is
-show once every \fIinterval\fR seconds.
+shown once every \fIinterval\fR seconds.
 .SH OPTIONS
 \fIlpq\fR supports the following options:
 .TP 5

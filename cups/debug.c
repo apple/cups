@@ -393,7 +393,10 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
     else if (!strcmp(cups_debug_log, "-"))
       cg->debug_fd = 2;
     else
-      cg->debug_fd = open(cups_debug_log, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    {
+      snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
+      cg->debug_fd = open(buffer, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    }
   }
 
   if (cg->debug_fd < 0)
