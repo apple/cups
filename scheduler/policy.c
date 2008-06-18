@@ -276,7 +276,7 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 			*po;		/* Current policy operation */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))",
                   p, op, ippOpString(op));
 
  /*

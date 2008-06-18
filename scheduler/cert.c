@@ -311,7 +311,7 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
       snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
       if (unlink(filename))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdDeleteCert: Unable to remove %s!\n", filename);
+	                "cupsdDeleteCert: Unable to remove %s!", filename);
 
       return;
     }
@@ -343,7 +343,7 @@ cupsdDeleteAllCerts(void)
     snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, cert->pid);
     if (unlink(filename))
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdDeleteAllCerts: Unable to remove %s!\n", filename);
+                      "cupsdDeleteAllCerts: Unable to remove %s!", filename);
 
    /*
     * Free memory...

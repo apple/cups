@@ -1214,7 +1214,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       if ((status = cupsdIsAuthorized(con, NULL)) != HTTP_OK)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                "cupsdReadClient: Unauthorized request for %s...\n",
+	                "cupsdReadClient: Unauthorized request for %s...",
 	                con->uri);
 	cupsdSendError(con, status, CUPSD_AUTH_NONE);
 	cupsdCloseClient(con);
@@ -3695,7 +3695,7 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "is_cgi(con=%p, filename=\"%s\", filestats=%p, type=%s/%s)\n",
+                  "is_cgi(con=%p, filename=\"%s\", filestats=%p, type=%s/%s)",
         	  con, filename, filestats, type ? type->super : "unknown",
 		  type ? type->type : "unknown");
 

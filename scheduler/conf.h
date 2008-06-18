@@ -225,6 +225,11 @@ extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,
 		                   const char *message, ...);
 #endif /* HAVE_GSSAPI */
+extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#endif /* __GNUC__ */
+;
 extern int	cupsdLogMessage(int level, const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))

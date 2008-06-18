@@ -151,7 +151,7 @@ cupsdStartListening(void)
 
   if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to find IP address for server name \"%s\"!\n",
+                    "Unable to find IP address for server name \"%s\"!",
 		    ServerName);
 
  /*

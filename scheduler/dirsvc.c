@@ -3324,7 +3324,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 		  NULL
 		};
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: %s\n", p->name);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: %s", p->name);
 
  /*
   * Everything in ldap is ** so we fudge around it...

@@ -666,7 +666,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    if (pamerr != PAM_SUCCESS)
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdAuthorize: pam_start() returned %d (%s)!\n",
+	                      "cupsdAuthorize: pam_start() returned %d (%s)!",
         	              pamerr, pam_strerror(pamh, pamerr));
 	      return;
 	    }
@@ -676,7 +676,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    if (pamerr != PAM_SUCCESS)
 	      cupsdLogMessage(CUPSD_LOG_WARN,
 	                      "cupsdAuthorize: pam_set_item() returned %d "
-			      "(%s)!\n", pamerr, pam_strerror(pamh, pamerr));
+			      "(%s)!", pamerr, pam_strerror(pamh, pamerr));
 #  endif /* HAVE_PAM_SET_ITEM && PAM_RHOST */
 
 	    pamerr = pam_authenticate(pamh, PAM_SILENT);
@@ -684,7 +684,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdAuthorize: pam_authenticate() returned %d "
-			      "(%s)!\n",
+			      "(%s)!",
         	              pamerr, pam_strerror(pamh, pamerr));
 	      pam_end(pamh, 0);
 	      return;
@@ -695,7 +695,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "cupsdAuthorize: pam_acct_mgmt() returned %d "
-			      "(%s)!\n",
+			      "(%s)!",
         	              pamerr, pam_strerror(pamh, pamerr));
 	      pam_end(pamh, 0);
 	      return;
@@ -713,8 +713,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
 
 	    cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                    "cupsdAuthorize: AIX authenticate of username \"%s\"",
-                            username);
+	                    "cupsdAuthorize: AIX authenticate of username "
+			    "\"%s\"", username);
 
 	    reenter = 1;
 	    if (authenticate(username, password, &reenter, &authmsg) != 0)

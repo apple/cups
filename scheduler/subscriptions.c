@@ -1363,7 +1363,7 @@ cupsd_send_notification(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsd_send_notification(sub=%p(%d), event=%p(%s))\n",
+                  "cupsd_send_notification(sub=%p(%d), event=%p(%s))",
                   sub, sub->id, event, cupsdEventName(event->event));
 
  /*
