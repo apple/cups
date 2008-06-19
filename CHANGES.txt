@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-06-17
+CHANGES.txt - 2008-06-18
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added ppdLocalizeAttr function to get the localized version
+	  of an attribute.
 	- MIME types now support a priority() attribute (STR #2719)
 	- The standard MIME types are now installed in
 	  DataDir/mime (STR #2719)

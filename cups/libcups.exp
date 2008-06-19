@@ -319,6 +319,7 @@ _ppdFirstOption
 _ppdIsMarked
 _ppdLastError
 _ppdLocalize
+_ppdLocalizeAttr
 _ppdLocalizeIPPReason
 _ppdLocalizeMarkerName
 _ppdMarkDefaults

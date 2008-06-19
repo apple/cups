@@ -436,30 +436,12 @@ with a hostname. ">http_addrlist_t</a></li>
 	<li><a href="#http_auth_t" title="HTTP authentication types">http_auth_t</a></li>
 	<li><a href="#http_encoding_t" title="HTTP transfer encoding values">http_encoding_t</a></li>
 	<li><a href="#http_encryption_t" title="HTTP encryption values">http_encryption_t</a></li>
-	<li><a href="#http_field_t" title="HTTP field names">http_field_t</a></li>
-	<li><a href="#http_keepalive_t" title="Types and structures...">http_keepalive_t</a></li>
-	<li><a href="#http_status_t" title="HTTP status codes">http_status_t</a></li>
 	<li><a href="#http_t" title="HTTP connection type">http_t</a></li>
-	<li><a href="#http_uri_coding_t" title="HTTP version numbers">http_uri_coding_t</a></li>
-	<li><a href="#http_uri_status_t" title="URI en/decode flags">http_uri_status_t</a></li>
-	<li><a href="#http_version_t" title="Socket address union, which
-makes using IPv6 and other
-address types easier and
-more portable. ">http_version_t</a></li>
 	<li><a href="#ipp_attribute_t" title="Attribute">ipp_attribute_t</a></li>
-	<li><a href="#ipp_finish_t" title="Orientation...">ipp_finish_t</a></li>
 	<li><a href="#ipp_iocb_t" title="IPP IO Callback Function ">ipp_iocb_t</a></li>
-	<li><a href="#ipp_jstate_t" title="Printer States....">ipp_jstate_t</a></li>
-	<li><a href="#ipp_op_t" title="Old names for the operations">ipp_op_t</a></li>
-	<li><a href="#ipp_orient_t" title="Qualities...">ipp_orient_t</a></li>
-	<li><a href="#ipp_pstate_t" title="IPP states...">ipp_pstate_t</a></li>
-	<li><a href="#ipp_quality_t" title="Job States....">ipp_quality_t</a></li>
 	<li><a href="#ipp_request_t" title="Request Header">ipp_request_t</a></li>
-	<li><a href="#ipp_res_t" title="Types and structures...">ipp_res_t</a></li>
-	<li><a href="#ipp_state_t" title="IPP operations...">ipp_state_t</a></li>
 	<li><a href="#ipp_t" title="Attribute Value">ipp_t</a></li>
 	<li><a href="#ipp_uchar_t" title="IPP status codes...">ipp_uchar_t</a></li>
-	<li><a href="#ipp_tag_t" title="Format tags for attributes...">ipp_tag_t</a></li>
 	<li><a href="#ipp_value_t" title="New in CUPS 1.1.19">ipp_value_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
@@ -959,7 +941,7 @@ void cupsEncodeOptions2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_options,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_option_t *options,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group_tag<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group_tag<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1013,7 +995,7 @@ a comma-delimited list of backends to omit from the request.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsGetFd">cupsGetFd</a></h3>
 <p class="description">Get a file from the server.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsGetFd (<br>
+http_status_t cupsGetFd (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
@@ -1036,7 +1018,7 @@ a comma-delimited list of backends to omit from the request.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsGetFile">cupsGetFile</a></h3>
 <p class="description">Get a file from the server.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsGetFile (<br>
+http_status_t cupsGetFile (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
@@ -1081,7 +1063,7 @@ additional data, use httpRead() after getting a successful response.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsPutFd">cupsPutFd</a></h3>
 <p class="description">Put a file on the server.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsPutFd (<br>
+http_status_t cupsPutFd (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd<br>
@@ -1105,7 +1087,7 @@ successfully.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsPutFile">cupsPutFile</a></h3>
 <p class="description">Put a file on the server.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsPutFile (<br>
+http_status_t cupsPutFile (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *filename<br>
@@ -1153,7 +1135,7 @@ files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
 <p class="description">Send an IPP request.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsSendRequest (<br>
+http_status_t cupsSendRequest (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *request,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *resource,<br>
@@ -1185,7 +1167,7 @@ request is not freed.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>
 <p class="description">Write additional data after an IPP request.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> cupsWriteRequestData (<br>
+http_status_t cupsWriteRequestData (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *buffer,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;size_t length<br>
@@ -1303,8 +1285,8 @@ char *httpAddrString (<br>
 <p class="description">Assemble a uniform resource identifier from its
 components.</p>
 <p class="code">
-<a href="#http_uri_status_t">http_uri_status_t</a> httpAssembleURI (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_uri_coding_t">http_uri_coding_t</a> encoding,<br>
+http_uri_status_t httpAssembleURI (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_uri_coding_t encoding,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *uri,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int urilen,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *scheme,<br>
@@ -1345,8 +1327,8 @@ URI string.
 <p class="description">Assemble a uniform resource identifier from its
 components with a formatted resource.</p>
 <p class="code">
-<a href="#http_uri_status_t">http_uri_status_t</a> httpAssembleURIf (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_uri_coding_t">http_uri_coding_t</a> encoding,<br>
+http_uri_status_t httpAssembleURIf (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_uri_coding_t encoding,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *uri,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int urilen,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *scheme,<br>
@@ -1759,7 +1741,7 @@ int httpGetFd (<br>
 <p class="code">
 const char *httpGetField (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_field_t">http_field_t</a> field<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_field_t field<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1851,7 +1833,7 @@ content larger than 2^31 - 1.
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="httpGetStatus">httpGetStatus</a></h3>
 <p class="description">Get the status of the last HTTP request.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> httpGetStatus (<br>
+http_status_t httpGetStatus (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -1866,7 +1848,7 @@ content larger than 2^31 - 1.
 <p class="code">
 char *httpGetSubField (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_field_t">http_field_t</a> field,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_field_t field,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *value<br>
 );</p>
@@ -1888,7 +1870,7 @@ char *httpGetSubField (<br>
 <p class="code">
 char *httpGetSubField2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_field_t">http_field_t</a> field,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_field_t field,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *value,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int valuelen<br>
@@ -2193,8 +2175,8 @@ void httpSeparate2 (<br>
 <p class="description">Separate a Universal Resource Identifier into its
 components.</p>
 <p class="code">
-<a href="#http_uri_status_t">http_uri_status_t</a> httpSeparateURI (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_uri_coding_t">http_uri_coding_t</a> decoding,<br>
+http_uri_status_t httpSeparateURI (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_uri_coding_t decoding,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *uri,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *scheme,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int schemelen,<br>
@@ -2276,7 +2258,7 @@ void httpSetCookie (<br>
 <p class="code">
 void httpSetExpect (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_status_t">http_status_t</a> expect<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_status_t expect<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2294,7 +2276,7 @@ void httpSetExpect (<br>
 <p class="code">
 void httpSetField (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_field_t">http_field_t</a> field,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_field_t field,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -2324,7 +2306,7 @@ void httpSetLength (<br>
 <p class="description">Return a short string describing a HTTP status code.</p>
 <p class="code">
 const char *httpStatus (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_status_t">http_status_t</a> status<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_status_t status<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2352,7 +2334,7 @@ int httpTrace (<br>
 <h3 class="function"><a name="httpUpdate">httpUpdate</a></h3>
 <p class="description">Update the current HTTP state for incoming data.</p>
 <p class="code">
-<a href="#http_status_t">http_status_t</a> httpUpdate (<br>
+http_status_t httpUpdate (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -2426,7 +2408,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddBoolean (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char value<br>
 );</p>
@@ -2448,7 +2430,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddBooleans (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *values<br>
@@ -2473,7 +2455,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollection (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *value<br>
 );</p>
@@ -2495,7 +2477,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddCollections (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const <a href="#ipp_t">ipp_t</a> **values<br>
@@ -2520,7 +2502,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddDate (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const <a href="#ipp_uchar_t">ipp_uchar_t</a> *value<br>
 );</p>
@@ -2542,8 +2524,8 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddInteger (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int value<br>
 );</p>
@@ -2567,8 +2549,8 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddIntegers (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *values<br>
@@ -2595,7 +2577,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddOctetString (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const void *data,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int datalen<br>
@@ -2620,7 +2602,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddRange (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int lower,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int upper<br>
@@ -2645,7 +2627,7 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddRanges (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *lower,<br>
@@ -2673,9 +2655,9 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddResolution (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> units,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_res_t units,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int xres,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int yres<br>
 );</p>
@@ -2701,10 +2683,10 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddResolutions (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_res_t">ipp_res_t</a> units,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_res_t units,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *xres,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const int *yres<br>
 );</p>
@@ -2745,8 +2727,8 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddString (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *charset,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
@@ -2773,8 +2755,8 @@ ssize_t httpWrite2 (<br>
 <p class="code">
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippAddStrings (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *charset,<br>
@@ -2870,7 +2852,7 @@ ipp_status_t ippErrorValue (<br>
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2889,7 +2871,7 @@ ipp_status_t ippErrorValue (<br>
 <a href="#ipp_attribute_t">ipp_attribute_t</a> *ippFindNextAttribute (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> type<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t type<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2925,7 +2907,7 @@ size_t ippLength (<br>
 <p class="description">Allocate a new IPP request message.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *ippNewRequest (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_op_t">ipp_op_t</a> op<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_op_t op<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2944,7 +2926,7 @@ attributes-natural-language value is derived from the current locale.
 <p class="description">Return a name for the given operation id.</p>
 <p class="code">
 const char *ippOpString (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_op_t">ipp_op_t</a> op<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_op_t op<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -2956,7 +2938,7 @@ const char *ippOpString (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ippOpValue">ippOpValue</a></h3>
 <p class="description">Return an operation id for the given name.</p>
 <p class="code">
-<a href="#ipp_op_t">ipp_op_t</a> ippOpValue (<br>
+ipp_op_t ippOpValue (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -2975,7 +2957,7 @@ int ippPort (void);</p>
 <h3 class="function"><a name="ippRead">ippRead</a></h3>
 <p class="description">Read data for an IPP message from a HTTP connection.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippRead (<br>
+ipp_state_t ippRead (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
 );</p>
@@ -2991,7 +2973,7 @@ int ippPort (void);</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ippReadFile">ippReadFile</a></h3>
 <p class="description">Read data for an IPP message from a file.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippReadFile (<br>
+ipp_state_t ippReadFile (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
 );</p>
@@ -3007,7 +2989,7 @@ int ippPort (void);</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ippReadIO">ippReadIO</a></h3>
 <p class="description">Read data for an IPP message.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippReadIO (<br>
+ipp_state_t ippReadIO (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *src,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_iocb_t">ipp_iocb_t</a> cb,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int blocking,<br>
@@ -3056,7 +3038,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <h3 class="function"><a name="ippWrite">ippWrite</a></h3>
 <p class="description">Write data for an IPP message to a HTTP connection.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippWrite (<br>
+ipp_state_t ippWrite (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
 );</p>
@@ -3072,7 +3054,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ippWriteFile">ippWriteFile</a></h3>
 <p class="description">Write data for an IPP message to a file.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippWriteFile (<br>
+ipp_state_t ippWriteFile (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *ipp<br>
 );</p>
@@ -3088,7 +3070,7 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ippWriteIO">ippWriteIO</a></h3>
 <p class="description">Write data for an IPP message.</p>
 <p class="code">
-<a href="#ipp_state_t">ipp_state_t</a> ippWriteIO (<br>
+ipp_state_t ippWriteIO (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *dst,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_iocb_t">ipp_iocb_t</a> cb,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int blocking,<br>
@@ -3134,98 +3116,25 @@ typedef enum <a href="#http_encoding_e">http_encoding_e</a> http_encoding_t;
 <p class="code">
 typedef enum <a href="#http_encryption_e">http_encryption_e</a> http_encryption_t;
 </p>
-<h3 class="typedef"><a name="http_field_t">http_field_t</a></h3>
-<p class="description">HTTP field names</p>
-<p class="code">
-typedef enum <a href="#http_field_e">http_field_e</a> http_field_t;
-</p>
-<h3 class="typedef"><a name="http_keepalive_t">http_keepalive_t</a></h3>
-<p class="description">Types and structures...</p>
-<p class="code">
-typedef enum <a href="#http_keepalive_e">http_keepalive_e</a> http_keepalive_t;
-</p>
-<h3 class="typedef"><a name="http_status_t">http_status_t</a></h3>
-<p class="description">HTTP status codes</p>
-<p class="code">
-typedef enum <a href="#http_status_e">http_status_e</a> http_status_t;
-</p>
 <h3 class="typedef"><a name="http_t">http_t</a></h3>
 <p class="description">HTTP connection type</p>
 <p class="code">
 typedef struct _http_s http_t;
-</p>
-<h3 class="typedef"><a name="http_uri_coding_t">http_uri_coding_t</a></h3>
-<p class="description">HTTP version numbers</p>
-<p class="code">
-typedef enum <a href="#http_uri_coding_e">http_uri_coding_e</a> http_uri_coding_t;
-</p>
-<h3 class="typedef"><a name="http_uri_status_t">http_uri_status_t</a></h3>
-<p class="description">URI en/decode flags</p>
-<p class="code">
-typedef enum <a href="#http_uri_status_e">http_uri_status_e</a> http_uri_status_t;
-</p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="http_version_t">http_version_t</a></h3>
-<p class="description">Socket address union, which
-makes using IPv6 and other
-address types easier and
-more portable. </p>
-<p class="code">
-typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 </p>
 <h3 class="typedef"><a name="ipp_attribute_t">ipp_attribute_t</a></h3>
 <p class="description">Attribute</p>
 <p class="code">
 typedef struct <a href="#ipp_attribute_s">ipp_attribute_s</a> ipp_attribute_t;
 </p>
-<h3 class="typedef"><a name="ipp_finish_t">ipp_finish_t</a></h3>
-<p class="description">Orientation...</p>
-<p class="code">
-typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
-</p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ipp_iocb_t">ipp_iocb_t</a></h3>
 <p class="description">IPP IO Callback Function </p>
 <p class="code">
 typedef ssize_t (*ipp_iocb_t)(void *, <a href="#ipp_uchar_t">ipp_uchar_t</a> *, size_t);
 </p>
-<h3 class="typedef"><a name="ipp_jstate_t">ipp_jstate_t</a></h3>
-<p class="description">Printer States....</p>
-<p class="code">
-typedef enum <a href="#ipp_jstate_e">ipp_jstate_e</a> ipp_jstate_t;
-</p>
-<h3 class="typedef"><a name="ipp_op_t">ipp_op_t</a></h3>
-<p class="description">Old names for the operations</p>
-<p class="code">
-typedef enum <a href="#ipp_op_e">ipp_op_e</a> ipp_op_t;
-</p>
-<h3 class="typedef"><a name="ipp_orient_t">ipp_orient_t</a></h3>
-<p class="description">Qualities...</p>
-<p class="code">
-typedef enum <a href="#ipp_orient_e">ipp_orient_e</a> ipp_orient_t;
-</p>
-<h3 class="typedef"><a name="ipp_pstate_t">ipp_pstate_t</a></h3>
-<p class="description">IPP states...</p>
-<p class="code">
-typedef enum <a href="#ipp_pstate_e">ipp_pstate_e</a> ipp_pstate_t;
-</p>
-<h3 class="typedef"><a name="ipp_quality_t">ipp_quality_t</a></h3>
-<p class="description">Job States....</p>
-<p class="code">
-typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
-</p>
 <h3 class="typedef"><a name="ipp_request_t">ipp_request_t</a></h3>
 <p class="description">Request Header</p>
 <p class="code">
 typedef union <a href="#ipp_request_u">ipp_request_u</a> ipp_request_t;
-</p>
-<h3 class="typedef"><a name="ipp_res_t">ipp_res_t</a></h3>
-<p class="description">Types and structures...</p>
-<p class="code">
-typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
-</p>
-<h3 class="typedef"><a name="ipp_state_t">ipp_state_t</a></h3>
-<p class="description">IPP operations...</p>
-<p class="code">
-typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 </p>
 <h3 class="typedef"><a name="ipp_t">ipp_t</a></h3>
 <p class="description">Attribute Value</p>
@@ -3236,11 +3145,6 @@ typedef struct <a href="#ipp_s">ipp_s</a> ipp_t;
 <p class="description">IPP status codes...</p>
 <p class="code">
 typedef typedef unsigned char ipp_uchar_t;
-</p>
-<h3 class="typedef"><a name="ipp_tag_t">ipp_tag_t</a></h3>
-<p class="description">Format tags for attributes...</p>
-<p class="code">
-typedef enum <a href="#ipp_tag_e">ipp_tag_e</a> ipp_tag_t;
 </p>
 <h3 class="typedef"><a name="ipp_value_t">ipp_value_t</a></h3>
 <p class="description">New in CUPS 1.1.19</p>
@@ -3270,7 +3174,7 @@ with a hostname. </p>
 &nbsp;&nbsp;&nbsp;&nbsp;char *name;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;struct <a href="#ipp_attribute_s">ipp_attribute_s</a> *next;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int num_values;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> group_tag, value_tag;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t group_tag, value_tag;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_value_t">ipp_value_t</a> values[1];<br>
 };</p>
 <h4 class="members">Members</h4>
@@ -3291,11 +3195,11 @@ with a hostname. </p>
 <p class="code">struct ipp_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *attrs;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *current;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> curtag;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_tag_t curtag;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *last;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *prev;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_request_t">ipp_request_t</a> request;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_state_t">ipp_state_t</a> state;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ipp_state_t state;<br>
 };</p>
 <h4 class="members">Members</h4>
 <dl>

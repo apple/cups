@@ -253,7 +253,7 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-ppd.header 7278 2008-01-31 01:23:09Z mike $"
+  "$Id: api-ppd.header 7616 2008-05-28 00:34:13Z mike $"
 
   PPD API header for the Common UNIX Printing System (CUPS).
 
@@ -326,6 +326,7 @@ marked option choices.">ppdConflicts</a></li>
 <li><a href="#ppdIsMarked" title="Check to see if an option is marked.">ppdIsMarked</a></li>
 <li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
 <li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
+<li><a href="#ppdLocalizeAttr" title="Localize an attribute.">ppdLocalizeAttr</a></li>
 <li><a href="#ppdLocalizeIPPReason" title="Get the localized version of a cupsIPPReason
 attribute.">ppdLocalizeIPPReason</a></li>
 <li><a href="#ppdLocalizeMarkerName" title="Get the localized version of a marker-names
@@ -353,7 +354,6 @@ attribute value.">ppdLocalizeMarkerName</a></li>
 	<li><a href="#ppd_cplimit_t" title="Custom Parameter Limit ">ppd_cplimit_t</a></li>
 	<li><a href="#ppd_cptype_t" title="Custom Parameter Type ">ppd_cptype_t</a></li>
 	<li><a href="#ppd_cpvalue_t" title="Custom Parameter Value ">ppd_cpvalue_t</a></li>
-	<li><a href="#ppd_cs_t" title="Colorspaces">ppd_cs_t</a></li>
 	<li><a href="#ppd_emul_t" title="Emulators">ppd_emul_t</a></li>
 	<li><a href="#ppd_file_t" title="PPD File">ppd_file_t</a></li>
 	<li><a href="#ppd_group_t" title="Groups">ppd_group_t</a></li>
@@ -361,7 +361,6 @@ attribute value.">ppdLocalizeMarkerName</a></li>
 	<li><a href="#ppd_profile_t" title="sRGB Color Profiles">ppd_profile_t</a></li>
 	<li><a href="#ppd_section_t" title="Order dependency sections">ppd_section_t</a></li>
 	<li><a href="#ppd_size_t" title="Page Sizes">ppd_size_t</a></li>
-	<li><a href="#ppd_status_t" title="Types and structures...">ppd_status_t</a></li>
 	<li><a href="#ppd_ui_t" title="UI Types">ppd_ui_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
@@ -391,7 +390,7 @@ attribute value.">ppdLocalizeMarkerName</a></li>
 </ul></li>
 </ul>
 <!--
-  "$Id: api-ppd.shtml 7278 2008-01-31 01:23:09Z mike $"
+  "$Id: api-ppd.shtml 7616 2008-05-28 00:34:13Z mike $"
 
   PPD API introduction for the Common UNIX Printing System (CUPS).
 
@@ -853,7 +852,7 @@ The return string is allocated on the heap and should be freed using
 <p class="description">Returns the text assocated with a status.</p>
 <p class="code">
 const char *ppdErrorString (<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_status_t">ppd_status_t</a> status<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_status_t status<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
 <dl>
@@ -1032,7 +1031,7 @@ int ppdIsMarked (<br>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdLastError">ppdLastError</a></h3>
 <p class="description">Return the status from the last ppdOpen*().</p>
 <p class="code">
-<a href="#ppd_status_t">ppd_status_t</a> ppdLastError (<br>
+ppd_status_t ppdLastError (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int *line<br>
 );</p>
 <h4 class="parameters">Parameters</h4>
@@ -1061,6 +1060,29 @@ descriptions, printer presets, and custom option parameters.  Each
 localized string uses the UTF-8 character encoding.
 
 </p>
+<h3 class="function"><a name="ppdLocalizeAttr">ppdLocalizeAttr</a></h3>
+<p class="description">Localize an attribute.</p>
+<p class="code">
+<a href="#ppd_attr_t">ppd_attr_t</a> *ppdLocalizeAttr (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *keyword,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *spec<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>keyword</dt>
+<dd class="description">Main keyword</dd>
+<dt>spec</dt>
+<dd class="description">Option keyword or <code>NULL</code> for none</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Localized attribute or <code>NULL</code> if none exists</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function uses the current locale to find the localized attribute for
+the given main and option keywords.  If no localized version of the
+attribute exists for the current locale, the unlocalized version is returned.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="ppdLocalizeIPPReason">ppdLocalizeIPPReason</a></h3>
 <p class="description">Get the localized version of a cupsIPPReason
 attribute.</p>
@@ -1336,11 +1358,6 @@ typedef enum <a href="#ppd_cptype_e">ppd_cptype_e</a> ppd_cptype_t;
 <p class="code">
 typedef union <a href="#ppd_cpvalue_u">ppd_cpvalue_u</a> ppd_cpvalue_t;
 </p>
-<h3 class="typedef"><a name="ppd_cs_t">ppd_cs_t</a></h3>
-<p class="description">Colorspaces</p>
-<p class="code">
-typedef enum <a href="#ppd_cs_e">ppd_cs_e</a> ppd_cs_t;
-</p>
 <h3 class="typedef"><a name="ppd_emul_t">ppd_emul_t</a></h3>
 <p class="description">Emulators</p>
 <p class="code">
@@ -1375,11 +1392,6 @@ typedef enum <a href="#ppd_section_e">ppd_section_e</a> ppd_section_t;
 <p class="description">Page Sizes</p>
 <p class="code">
 typedef struct <a href="#ppd_size_s">ppd_size_s</a> ppd_size_t;
-</p>
-<h3 class="typedef"><a name="ppd_status_t">ppd_status_t</a></h3>
-<p class="description">Types and structures...</p>
-<p class="code">
-typedef enum <a href="#ppd_status_e">ppd_status_e</a> ppd_status_t;
 </p>
 <h3 class="typedef"><a name="ppd_ui_t">ppd_ui_t</a></h3>
 <p class="description">UI Types</p>
@@ -1512,7 +1524,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <p class="code">struct ppd_file_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int accurate_screens;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int color_device;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_cs_t">ppd_cs_t</a> colorspace;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ppd_cs_t colorspace;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_const_t">ppd_const_t</a> *consts;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int contone_only;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;float custom_margins[4];<br>

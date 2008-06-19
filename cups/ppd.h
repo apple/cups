@@ -399,6 +399,8 @@ extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 					      size_t bufsize) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
+extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
+			                 const char *spec);
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
 			                       const char *name) _CUPS_API_1_4;
 

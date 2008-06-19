@@ -26,6 +26,7 @@
  * Contents:
  *
  *   ppdLocalize()           - Localize the PPD file to the current locale.
+ *   ppdLocalizeAttr()       - Localize an attribute.
  *   ppdLocalizeIPPReason()  - Get the localized version of a cupsIPPReason
  *                             attribute.
  *   ppdLocalizeMarkerName() - Get the localized version of a marker-names
@@ -192,6 +193,45 @@ ppdLocalize(ppd_file_t *ppd)		/* I - PPD file */
   }
 
   return (0);
+}
+
+
+/*
+ * 'ppdLocalizeAttr()' - Localize an attribute.
+ *
+ * This function uses the current locale to find the localized attribute for
+ * the given main and option keywords.  If no localized version of the
+ * attribute exists for the current locale, the unlocalized version is returned.
+ */
+
+ppd_attr_t *				/* O - Localized attribute or @code NULL@ if none exists */
+ppdLocalizeAttr(ppd_file_t *ppd,	/* I - PPD file */
+		const char *keyword,	/* I - Main keyword */
+		const char *spec)	/* I - Option keyword or @code NULL@ for none */
+{
+  ppd_attr_t	*locattr;		/* Localized attribute */
+  char		ll_CC[6];		/* Language + country locale */
+
+
+ /*
+  * Get the default language...
+  */
+
+  ppd_ll_CC(ll_CC, sizeof(ll_CC));
+
+ /*
+  * Find the localized attribute...
+  */
+
+  if (spec)
+    locattr = _ppdLocalizedAttr(ppd, keyword, spec, ll_CC);
+  else
+    locattr = _ppdLocalizedAttr(ppd, "Translation", keyword, ll_CC);
+
+  if (!locattr)
+    locattr = ppdFindAttr(ppd, keyword, spec);
+
+  return (locattr);
 }
 
 
