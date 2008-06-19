@@ -2473,8 +2473,8 @@ There will always be at least one banner file available called "none".
 <h4><a name="marker-change-time">marker-change-time (integer)</a></h4>
 
 <p>The marker-change-time attribute specifies the printer-up-time value when
-the last change to the marker-colors, marker-levels, marker-names, or
-marker-types attributes was made.</p>
+the last change to the marker-colors, marker-levels, marker-message,
+marker-names, or marker-types attributes was made.</p>
 
 <h4><a name="marker-colors">marker-colors (1setof name(MAX))</a></h4>
 
@@ -2489,6 +2489,12 @@ color is either "none" or one or more hex-encoded sRGB colors of the form
 printer. It is only available when the driver provides supply levels. A
 value of -1 indicates the level is unknown, while values from 0 to 100
 indicate the corresponding percentage.</p>
+
+<h4><a name="marker-message">marker-message (text(MAX))</a></h4>
+
+<p>The marker-message attribute provides a human-readable status message
+for the current supply levels, e.g. "12 pages of ink remaining." It is only
+available when the driver provides supply levels.</p>
 
 <h4><a name="marker-names">marker-names (1setof name(MAX))</a></h4>
 

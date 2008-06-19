@@ -3732,6 +3732,13 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
+      if ((attr = cupsGetOption("marker-message", num_attrs, attrs)) != NULL)
+      {
+        cupsdSetPrinterAttr(job->printer, "marker-message", (char *)attr);
+	job->printer->marker_time = time(NULL);
+	event |= CUPSD_EVENT_PRINTER_STATE;
+      }
+
       if ((attr = cupsGetOption("marker-names", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-names", (char *)attr);

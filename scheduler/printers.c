@@ -1569,6 +1569,24 @@ cupsdSaveAllPrinters(void)
       cupsFilePuts(fp, "\n");
     }
 
+    if ((marker = ippFindAttribute(printer->attrs, "marker-message",
+                                   IPP_TAG_TEXT)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+
+      if (!ptr && (ptr = strchr(marker->values[0].string.text, '#')) != NULL)
+      {
+	cupsFileWrite(fp, marker->values[0].string.text,
+		      ptr - marker->values[0].string.text);
+	cupsFilePutChar(fp, '\\');
+	cupsFilePuts(fp, ptr);
+      }
+      else
+	cupsFilePuts(fp, marker->values[0].string.text);
+
+      cupsFilePuts(fp, "\n");
+    }
+
     if ((marker = ippFindAttribute(printer->attrs, "marker-names",
                                    IPP_TAG_NAME)) != NULL)
     {
@@ -1860,6 +1878,8 @@ cupsdSetPrinterAttr(
 
     if (!strcmp(name, "marker-types"))
       value_tag = IPP_TAG_KEYWORD;
+    else if (!strcmp(name, "marker-message"))
+      value_tag = IPP_TAG_TEXT;
     else
       value_tag = IPP_TAG_NAME;
 
@@ -1871,7 +1891,12 @@ cupsdSetPrinterAttr(
     }
 
     if (attr)
+    {
+      for (i = 0; i < attr->num_values; i ++)
+	_cupsStrFree(attr->values[i].string.text);
+
       attr->num_values = count;
+    }
     else
       attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, value_tag, name,
                            count, NULL, NULL);
@@ -1889,7 +1914,6 @@ cupsdSetPrinterAttr(
       if ((ptr = strchr(value, ',')) != NULL)
         *ptr++ = '\0';
 
-      _cupsStrFree(attr->values[i].string.text);
       attr->values[i].string.text = _cupsStrAlloc(value);
 
       if (ptr)
