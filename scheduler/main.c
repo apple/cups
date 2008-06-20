@@ -489,7 +489,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         snprintf(tempfile, sizeof(tempfile), "%s/%s", TempDir, dent->filename);
 
-	if (cupsdRemoveFile(tempfile))
+	if (unlink(tempfile))
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unable to remove temporary file \"%s\" - %s",
 	                  tempfile, strerror(errno));
