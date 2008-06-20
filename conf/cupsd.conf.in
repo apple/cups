@@ -82,10 +82,9 @@ DefaultAuthType Basic
 <Policy authenticated>
   # Job-related operations must be done by the owner or an administrator...
   <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job CUPS-Get-Document>
+    AuthType Default
     Require user @OWNER @SYSTEM
     Order deny,allow
-    AuthType Default
-    Satisfy any
   </Limit>
 
   # All administration operations require an administrator to authenticate...
@@ -104,16 +103,14 @@ DefaultAuthType Basic
 
   # Only the owner or an administrator can cancel or authenticate a job...
   <Limit Cancel-Job CUPS-Authenticate-Job>
+    AuthType Default
     Require user @OWNER @CUPS_DEFAULT_PRINTADMIN_AUTH@
     Order deny,allow
-    AuthType Default
-    Satisfy any
   </Limit>
 
   <Limit All>
-    Order deny,allow
     AuthType Default
-    Satisfy any
+    Order deny,allow
   </Limit>
 </Policy>
 
