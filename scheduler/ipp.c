@@ -9432,6 +9432,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   struct stat		fileinfo;	/* File information */
   int			kbytes;		/* Size of file */
   int			compression;	/* Type of compression */
+  int			start_job;	/* Start the job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_document(%p[%d], %s)", con,
@@ -9734,16 +9735,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     job->dirty = 1;
     cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
-   /*
-    * Start the job if possible...  Since cupsdCheckJobs() can cancel a
-    * job if it doesn't print, we need to re-find the job afterwards...
-    */
-
-    jobid = job->id;
-
-    cupsdCheckJobs();
-
-    job = cupsdFindJob(jobid);
+    start_job = 1;
   }
   else
   {
@@ -9760,6 +9752,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);
     }
+
+    start_job = 0;
   }
 
  /*
@@ -9775,10 +9769,17 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", jobid);
 
   ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
-                job ? job->state_value : IPP_JOB_CANCELED);
+                job->state_value);
   add_job_state_reasons(con, job);
 
   con->response->request.status.status_code = IPP_OK;
+
+ /*
+  * Start the job if necessary...
+  */
+
+  if (start_job)
+    cupsdCheckJobs();
 }
 
 

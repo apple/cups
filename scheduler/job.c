@@ -3390,6 +3390,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   }
 
   cupsArrayDelete(filters);
+  filters = NULL;
 
  /*
   * Finally, pipe the final output into a backend process if needed...
