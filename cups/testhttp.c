@@ -301,7 +301,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * httpAddrGetList()
     */
 
-    fputs("httpAddrGetList(): ", stdout);
+    printf("httpAddrGetList(%s): ", hostname);
 
     addrlist = httpAddrGetList(hostname, AF_UNSPEC, NULL);
     if (addrlist)
