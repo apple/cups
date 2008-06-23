@@ -293,7 +293,7 @@ tempfd = cupsTempFd(tempfile, sizeof(tempfile));
 /* Loop for authentication */
 do
 {
-  status = a href='#cupsSendRequest'>cupsSendRequest</a>(CUPS_HTTP_DEFAULT, request, "/");
+  status = <a href='#cupsSendRequest'>cupsSendRequest</a>(CUPS_HTTP_DEFAULT, request, "/");
 
   if (status == HTTP_UNAUTHORIZED)
   {
