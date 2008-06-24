@@ -37,7 +37,8 @@ typedef struct usb_printer_s		/**** USB Printer Data ****/
   struct usb_dev_handle	*handle;	/* Open handle to device */
 } usb_printer_t;
 
-typedef int (*usb_cb_t)(usb_printer_t *, const char *, const void *);
+typedef int (*usb_cb_t)(usb_printer_t *, const char *, const char *,
+                        const void *);
 
 
 /*
@@ -48,14 +49,14 @@ static int		close_device(usb_printer_t *printer);
 static usb_printer_t	*find_device(usb_cb_t cb, const void *data);
 static int		get_device_id(usb_printer_t *printer, char *buffer,
 			              size_t bufsize);
-static int		list_cb(usb_printer_t *printer, const char *device_id,
-			        const void *data);
+static int		list_cb(usb_printer_t *printer, const char *device_uri,
+			        const char *device_id, const void *data);
 static char		*make_device_uri(usb_printer_t *printer,
 			                 const char *device_id,
 					 char *uri, size_t uri_size);
-static int		open_device(usb_printer_t *printer);
-static int		print_cb(usb_printer_t *printer, const char *device_id,
-			         const void *data);
+static int		open_device(usb_printer_t *printer, int verbose);
+static int		print_cb(usb_printer_t *printer, const char *device_uri,
+			         const char *device_id, const void *data);
 
 
 /*
@@ -84,7 +85,21 @@ print_device(const char *uri,		/* I - Device URI */
 	     int	argc,		/* I - Number of command-line arguments (6 or 7) */
 	     char	*argv[])	/* I - Command-line arguments */
 {
-  return (CUPS_BACKEND_FAILED);
+  usb_printer_t	*printer;		/* Printer */
+
+
+  fputs("DEBUG: print_device\n", stderr);
+
+  while ((printer = find_device(print_cb, uri)) == NULL)
+  {
+    _cupsLangPuts(stderr,
+		  _("INFO: Waiting for printer to become available...\n"));
+    sleep(5);
+  }
+
+  close_device(printer);
+
+  return (CUPS_BACKEND_OK);
 }
 
 
@@ -128,7 +143,9 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 			endp,		/* Current endpoint */
 			read_endp,	/* Current read endpoint */
 			write_endp;	/* Current write endpoint */
-  char			device_id[1024];/* IEEE-1284 device ID */
+  char			device_id[1024],/* IEEE-1284 device ID */
+			device_uri[1024];
+					/* Device URI */
   static usb_printer_t	printer;	/* Current printer */
 
 
@@ -151,8 +168,6 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
       * Ignore devices with no configuration data and anything that is not
       * a printer...
       */
-
-      fprintf(stderr, "DEBUG: device=%p\n", device);
 
       if (!device->config || !device->descriptor.idVendor ||
           !device->descriptor.idProduct)
@@ -223,11 +238,16 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 	    printer.iface  = iface;
 	    printer.handle = NULL;
 
-            if (!open_device(&printer))
+            if (!open_device(&printer, data != NULL))
 	    {
 	      if (!get_device_id(&printer, device_id, sizeof(device_id)))
-	        if ((*cb)(&printer, device_id, data))
+	      {
+                make_device_uri(&printer, device_id, device_uri,
+		                sizeof(device_uri));
+
+	        if ((*cb)(&printer, device_uri, device_id, data))
 		  return (&printer);
+              }
 
               close_device(&printer);
 	    }
@@ -308,26 +328,25 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
 
 static int				/* O - 0 to continue, 1 to stop */
 list_cb(usb_printer_t *printer,		/* I - Printer */
+        const char    *device_uri,	/* I - Device URI */
         const char    *device_id,	/* I - IEEE-1284 device ID */
         const void    *data)		/* I - User data (not used) */
 {
-  char	device_uri[1024],		/* Device URI */
-	make_model[1024];		/* Make and model */
+  char	make_model[1024];		/* Make and model */
 
 
  /*
   * Get the device URI and make/model strings...
   */
 
-  make_device_uri(printer, device_id, device_uri, sizeof(device_uri));
   backendGetMakeModel(device_id, make_model, sizeof(make_model));
 
  /*
   * Report the printer...
   */
 
-  printf("direct %s \"%s\" \"%s\" \"%s\"\n", device_uri, make_model, make_model,
-         device_id);
+  printf("direct %s \"%s\" \"%s USB\" \"%s\"\n", device_uri, make_model,
+         make_model, device_id);
   fflush(stdout);
 
  /*
@@ -356,7 +375,8 @@ make_device_uri(
 		*mdl,			/* Model */
 		*des,			/* Description */
 		*sern;			/* Serial number */
-  char		temp[256],		/* Temporary manufacturer string */
+  char		tempmfg[256],		/* Temporary manufacturer string */
+		tempsern[256],		/* Temporary serial number string */
 		*tempptr;		/* Pointer into temp string */
 
 
@@ -368,13 +388,42 @@ make_device_uri(
 
   if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
     if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
-      sern = cupsGetOption("SN", num_values, values);
+      if ((sern = cupsGetOption("SN", num_values, values)) == NULL)
+      {
+       /*
+        * Try getting the serial number from the device itself...
+	*/
+
+        int length = usb_get_string_simple(printer->handle,
+	                                   printer->device->descriptor.
+					       iSerialNumber,
+				           tempsern, sizeof(tempsern) - 1);
+        if (length > 0)
+	{
+	  tempsern[length] = '\0';
+	  sern             = tempsern;
+	}
+      }
 
   if ((mfg = cupsGetOption("MANUFACTURER", num_values, values)) == NULL)
     mfg = cupsGetOption("MFG", num_values, values);
 
   if ((mdl = cupsGetOption("MODEL", num_values, values)) == NULL)
     mdl = cupsGetOption("MDL", num_values, values);
+
+#ifdef __APPLE__
+ /*
+  * To maintain compatibility with the original IOKit-based backend on Mac OS X,
+  * don't map manufacturer names...
+  */
+
+  if (!mfg)
+
+#else
+ /*
+  * To maintain compatibility with the original character device backend on
+  * Linux and *BSD, map manufacturer names...
+  */
 
   if (mfg)
   {
@@ -384,23 +433,24 @@ make_device_uri(
       mfg = "Lexmark";
   }
   else
+#endif /* __APPLE__ */
   {
    /*
     * No manufacturer?  Use the model string or description...
     */
 
     if (mdl)
-      _ppdNormalizeMakeAndModel(mdl, temp, sizeof(temp));
+      _ppdNormalizeMakeAndModel(mdl, tempmfg, sizeof(tempmfg));
     else if ((des = cupsGetOption("DESCRIPTION", num_values, values)) != NULL ||
              (des = cupsGetOption("DES", num_values, values)) != NULL)
-      _ppdNormalizeMakeAndModel(des, temp, sizeof(temp));
+      _ppdNormalizeMakeAndModel(des, tempmfg, sizeof(tempmfg));
     else
-      strlcpy(temp, "Unknown", sizeof(temp));
+      strlcpy(tempmfg, "Unknown", sizeof(tempmfg));
 
-    if ((tempptr = strchr(temp, ' ')) != NULL)
+    if ((tempptr = strchr(tempmfg, ' ')) != NULL)
       *tempptr = '\0';
 
-    mfg = temp;
+    mfg = tempmfg;
   }
 
  /*
@@ -435,7 +485,8 @@ make_device_uri(
  */
 
 static int				/* O - 0 on success, -1 on error */
-open_device(usb_printer_t *printer)	/* I - Printer */
+open_device(usb_printer_t *printer,	/* I - Printer */
+            int           verbose)	/* I - Update connecting-to-device state? */
 {
   int	number;				/* Configuration/interface/altset numbers */
 
@@ -458,27 +509,18 @@ open_device(usb_printer_t *printer)	/* I - Printer */
   * Then set the desired configuration...
   */
 
-  fputs("STATE: +connecting-to-device\n", stderr);
+  if (verbose)
+    fputs("STATE: +connecting-to-device\n", stderr);
 
   number = printer->device->config[printer->conf].bConfigurationValue;
   while (usb_set_configuration(printer->handle, number) < 0)
   {
-    if (errno == EBUSY)
-    {
-      _cupsLangPuts(stderr,
-		    _("INFO: Printer is busy; will retry in 5 seconds...\n"));
-      sleep(5);
-    }
-    else
-    {
-      _cupsLangPuts(stderr, _("INFO: Unable to connect to printer!\n"));
-
+    if (errno != EBUSY)
       fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
               number, printer->device->descriptor.idVendor,
 	      printer->device->descriptor.idProduct);
 
-      goto error;
-    }
+    goto error;
   }
 
  /*
@@ -489,43 +531,23 @@ open_device(usb_printer_t *printer)	/* I - Printer */
                altsetting[printer->altset].bInterfaceNumber;
   while (usb_claim_interface(printer->handle, number) < 0)
   {
-    if (errno == EBUSY)
-    {
-      _cupsLangPuts(stderr,
-		    _("INFO: Printer is busy; will retry in 5 seconds...\n"));
-      sleep(5);
-    }
-    else
-    {
-      _cupsLangPuts(stderr, _("INFO: Unable to connect to printer!\n"));
-
+    if (errno != EBUSY)
       fprintf(stderr, "DEBUG: Failed to claim interface %d for %04x:%04x\n",
               number, printer->device->descriptor.idVendor,
 	      printer->device->descriptor.idProduct);
 
-      goto error;
-    }
+    goto error;
   }
 
   if (number != 0)
     while (usb_claim_interface(printer->handle, 0) < 0)
     {
-      if (errno == EBUSY)
-      {
-	_cupsLangPuts(stderr,
-		      _("INFO: Printer is busy; will retry in 5 seconds...\n"));
-	sleep(5);
-      }
-      else
-      {
-	_cupsLangPuts(stderr, _("INFO: Unable to connect to printer!\n"));
-
+      if (errno != EBUSY)
 	fprintf(stderr, "DEBUG: Failed to claim interface 0 for %04x:%04x\n",
 		printer->device->descriptor.idVendor,
 		printer->device->descriptor.idProduct);
 
-        goto error;
-      }
+      goto error;
     }
 
  /*
@@ -536,26 +558,17 @@ open_device(usb_printer_t *printer)	/* I - Printer */
                altsetting[printer->altset].bAlternateSetting;
   while (usb_set_altinterface(printer->handle, number) < 0)
   {
-    if (errno == EBUSY)
-    {
-      _cupsLangPuts(stderr,
-		    _("INFO: Printer is busy; will retry in 5 seconds...\n"));
-      sleep(5);
-    }
-    else
-    {
-      _cupsLangPuts(stderr, _("INFO: Unable to connect to printer!\n"));
-
+    if (errno != EBUSY)
       fprintf(stderr,
               "DEBUG: Failed to set alternate interface %d for %04x:%04x\n",
               number, printer->device->descriptor.idVendor,
 	      printer->device->descriptor.idProduct);
 
-      goto error;
-    }
+    goto error;
   }
 
-  fputs("STATE: -connecting-to-device\n", stderr);
+  if (verbose)
+    fputs("STATE: -connecting-to-device\n", stderr);
 
   return (0);
 
@@ -565,10 +578,12 @@ open_device(usb_printer_t *printer)	/* I - Printer */
 
   error:
 
-  fputs("STATE: -connecting-to-device\n", stderr);
+  if (verbose)
+    fputs("STATE: -connecting-to-device\n", stderr);
 
   usb_close(printer->handle);
   printer->handle = NULL;
+
   return (-1);
 }
 
@@ -579,10 +594,11 @@ open_device(usb_printer_t *printer)	/* I - Printer */
 
 static int				/* O - 0 to continue, 1 to stop (found) */
 print_cb(usb_printer_t *printer,	/* I - Printer */
+         const char    *device_uri,	/* I - Device URI */
          const char    *device_id,	/* I - IEEE-1284 device ID */
          const void    *data)		/* I - User data (make, model, S/N) */
 {
-  return (0);
+  return (!strcmp((char *)data, device_uri));
 }
 
 
