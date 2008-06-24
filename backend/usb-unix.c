@@ -5,7 +5,7 @@
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,7 +28,6 @@
  * Include necessary headers.
  */
 
-#include "ieee1284.c"
 #include <sys/select.h>
 
 

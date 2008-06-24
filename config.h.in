@@ -571,6 +571,13 @@
 #undef HAVE_LRAND48
 
 
+/*
+ * Do we have libusb?
+ */
+
+#undef HAVE_USB_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

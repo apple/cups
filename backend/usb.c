@@ -3,7 +3,7 @@
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -30,14 +30,7 @@
 #  include <ApplicationServices/ApplicationServices.h>
 #endif /* __APPLE__ */
 
-#include <cups/backend.h>
-#include <cups/cups.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
-#include <signal.h>
+#include "backend-private.h"
 
 #ifdef WIN32
 #  include <io.h>
@@ -62,7 +55,9 @@ int	print_device(const char *uri, const char *hostname,
  * Include the vendor-specific USB implementation...
  */
 
-#ifdef __APPLE__
+#ifdef HAVE_USB_H
+#  include "usb-libusb.c"
+#elif defined(__APPLE__)
 #  include "usb-darwin.c"
 #elif defined(__linux) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
 #  include "usb-unix.c"
