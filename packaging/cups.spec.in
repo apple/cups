@@ -51,6 +51,9 @@ BuildRoot: /tmp/%{name}-root
 Requires: %{name}-libs = %{epoch}:%{version}
 Obsoletes: lpd, lpr, LPRng
 Provides: lpd, lpr, LPRng
+Obsoletes: cups-da, cups-de, cups-es, cups-et, cups-fi, cups-fr, cups-he
+Obsoletes: cups-id, cups-it, cups-ja, cups-ko, cups-nl, cups-no, cups-pl
+Obsoletes: cups-pt, cups-ru, cups-sv, cups-zh
 
 %package devel
 Summary: Common UNIX Printing System - development environment

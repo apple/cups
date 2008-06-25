@@ -41,11 +41,53 @@
 %replaces LPRng
 %requires cups-libs 1:@CUPS_VERSION@
 
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
+
+
 %format deb
 %provides cupsys
 %provides cupsys-client
 %provides cupsys-bsd
 %requires cups-libs
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
+
 
 %format pkg
 %replaces SUNWlpmsg LP Alerts
@@ -71,8 +113,48 @@
 %incompat fw_cups 0 0 1289999999 1289999999
 %requires cups.sw.libs
 
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups.sw.da
+%replaces cups.sw.de
+%replaces cups.sw.es
+%replaces cups.sw.et
+%replaces cups.sw.fi
+%replaces cups.sw.fr
+%replaces cups.sw.he
+%replaces cups.sw.id
+%replaces cups.sw.it
+%replaces cups.sw.ja
+%replaces cups.sw.ko
+%replaces cups.sw.nl
+%replaces cups.sw.no
+%replaces cups.sw.pl
+%replaces cups.sw.pt
+%replaces cups.sw.ru
+%replaces cups.sw.sv
+%replaces cups.sw.zh
+
 %format portable
 %requires cups-libs
+
+# Replace all of the old localization subpackages from CUPS 1.2/1.3
+%replaces cups-da
+%replaces cups-de
+%replaces cups-es
+%replaces cups-et
+%replaces cups-fi
+%replaces cups-fr
+%replaces cups-he
+%replaces cups-id
+%replaces cups-it
+%replaces cups-ja
+%replaces cups-ko
+%replaces cups-nl
+%replaces cups-no
+%replaces cups-pl
+%replaces cups-pt
+%replaces cups-ru
+%replaces cups-sv
+%replaces cups-zh
 
 %format all
 
