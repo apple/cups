@@ -173,7 +173,15 @@ AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing, de
 LIBUSB=""
 AC_SUBST(LIBUSB)
 
-if test x$enable_libusb != xno; then
+if test x$enable_libusb = xyes; then
+	check_libusb=yes
+elif test x$enable_libusb != xno -a $uname != Darwin; then
+	check_libusb=yes
+else
+	check_libusb=no
+fi
+
+if test $check_libusb = yes; then
 	AC_CHECK_LIB(usb, usb_init,[
 		AC_CHECK_HEADER(usb.h,
 			AC_DEFINE(HAVE_USB_H)

@@ -1,8 +1,9 @@
-CHANGES.txt - 2008-06-18
+CHANGES.txt - 2008-06-25
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The USB backend now uses libusb when available (STR #1575)
 	- Added ppdLocalizeAttr function to get the localized version
 	  of an attribute.
 	- MIME types now support a priority() attribute (STR #2719)

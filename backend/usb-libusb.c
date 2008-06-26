@@ -86,9 +86,19 @@ print_device(const char *uri,		/* I - Device URI */
 	     char	*argv[])	/* I - Command-line arguments */
 {
   usb_printer_t	*printer;		/* Printer */
+  ssize_t	bytes,			/* Bytes read/written */
+		tbytes;			/* Total bytes written */
+  char		buffer[8192];		/* Print data buffer */
+  struct sigaction action;		/* Actions for POSIX signals */
+  int		read_endp,		/* Read endpoint */
+		write_endp;		/* Write endpoint */
 
 
   fputs("DEBUG: print_device\n", stderr);
+
+ /*
+  * Connect to the printer...
+  */
 
   while ((printer = find_device(print_cb, uri)) == NULL)
   {
@@ -96,6 +106,68 @@ print_device(const char *uri,		/* I - Device URI */
 		  _("INFO: Waiting for printer to become available...\n"));
     sleep(5);
   }
+
+  read_endp  = printer->device->config[printer->conf].
+                   interface[printer->iface].
+		   altsetting[printer->altset].
+		   endpoint[printer->read_endp].bEndpointAddress;
+  write_endp = printer->device->config[printer->conf].
+                   interface[printer->iface].
+		   altsetting[printer->altset].
+		   endpoint[printer->write_endp].bEndpointAddress;
+
+ /*
+  * If we are printing data from a print driver on stdin, ignore SIGTERM
+  * so that the driver can finish out any page data, e.g. to eject the
+  * current page.  We only do this for stdin printing as otherwise there
+  * is no way to cancel a raw print job...
+  */
+
+  if (!print_fd)
+  {
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_IGN;
+    sigaction(SIGTERM, &action, NULL);
+  }
+
+  tbytes = 0;
+
+  while (copies > 0 && tbytes >= 0)
+  {
+    copies --;
+
+    if (print_fd != 0)
+    {
+      fputs("PAGE: 1 1\n", stderr);
+      lseek(print_fd, 0, SEEK_SET);
+    }
+
+   /*
+    * TODO: Add side-channel and back-channel support, along with better
+    * error handling for writes.
+    */
+
+    while ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
+    {
+      while (usb_bulk_write(printer->handle, write_endp, buffer, bytes,
+                            5000) < 0)
+      {
+        _cupsLangPrintf(stderr,
+	                _("ERROR: Unable to write %d bytes to printer!\n"),
+	                (int)bytes);
+        tbytes = -1;
+	break;
+      }
+
+      tbytes += bytes;
+    }
+  }
+
+ /*
+  * Close our connection and return...
+  */
 
   close_device(printer);
 
