@@ -213,6 +213,7 @@ mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
 mkdir /tmp/cups-$user/share/banners
 mkdir /tmp/cups-$user/share/drv
+mkdir /tmp/cups-$user/share/mime
 mkdir /tmp/cups-$user/share/model
 mkdir /tmp/cups-$user/share/ppdc
 mkdir /tmp/cups-$user/interfaces
@@ -254,6 +255,8 @@ ln -s $root/data /tmp/cups-$user/share/charsets
 ln -s $root/data /tmp/cups-$user/share
 ln -s $root/fonts /tmp/cups-$user/share
 ln -s $root/ppdc/sample.drv /tmp/cups-$user/share/drv
+ln -s $root/conf/mime.types /tmp/cups-$user/share/mime
+ln -s $root/conf/mime.convs /tmp/cups-$user/share/mime
 ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
 ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
@@ -326,11 +329,8 @@ $encryption
 </Policy>
 EOF
 
-touch /tmp/cups-$user/classes.conf
-touch /tmp/cups-$user/printers.conf
-
 #
-# Setup lots of test queues - 500 with PPD files, 500 without...
+# Setup lots of test queues - half with PPD files, half without...
 #
 
 echo "Creating printers.conf for test..."
@@ -371,9 +371,6 @@ EOF
 done
 
 cp /tmp/cups-$user/printers.conf /tmp/cups-$user/printers.conf.orig
-
-cp $root/conf/mime.types /tmp/cups-$user/mime.types
-cp $root/conf/mime.convs /tmp/cups-$user/mime.convs
 
 #
 # Setup the paths...

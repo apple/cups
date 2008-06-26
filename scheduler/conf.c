@@ -1116,22 +1116,23 @@ cupsdReadConfiguration(void)
     snprintf(temp, sizeof(temp), "%s/filter", ServerBin);
     snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
 
-    MimeDatabase = mimeLoad(ServerRoot, temp);
+    MimeDatabase = mimeLoadTypes(NULL, mimedir);
+    MimeDatabase = mimeLoadTypes(MimeDatabase, ServerRoot);
+    MimeDatabase = mimeLoadFilters(MimeDatabase, mimedir, temp);
+    MimeDatabase = mimeLoadFilters(MimeDatabase, ServerRoot, temp);
 
     if (!MimeDatabase)
     {
       cupsdLogMessage(CUPSD_LOG_EMERG,
-                      "Unable to load MIME database from \'%s\'!", ServerRoot);
+                      "Unable to load MIME database from \"%s\" or \"%s\"!",
+		      mimedir, ServerRoot);
       exit(errno);
     }
 
-    if (!access(mimedir, 0))
-      MimeDatabase = mimeMerge(MimeDatabase, mimedir, temp);
-
     cupsdLogMessage(CUPSD_LOG_INFO,
-                    "Loaded MIME database from \'%s\': %d types, %d filters...",
-                    ServerRoot, mimeNumTypes(MimeDatabase),
-		    mimeNumFilters(MimeDatabase));
+                    "Loaded MIME database from \"%s\" and \"%s\": %d types, "
+		    "%d filters...", mimedir, ServerRoot,
+		    mimeNumTypes(MimeDatabase), mimeNumFilters(MimeDatabase));
 
    /*
     * Create a list of MIME types for the document-format-supported

@@ -113,9 +113,9 @@ typedef struct _mime_s			/**** MIME Database ****/
 
 extern void		mimeDelete(mime_t *mime);
 extern mime_t		*mimeLoad(const char *pathname, const char *filterpath);
-extern mime_t		*mimeMerge(mime_t *mime, const char *pathname,
-			           const char *filterpath);
-extern mime_t		*mimeNew(void);
+extern mime_t		*mimeLoadFilters(mime_t *mime, const char *pathname,
+			                 const char *filterpath);
+extern mime_t		*mimeLoadTypes(mime_t *mime, const char *pathname);
 
 extern mime_type_t	*mimeAddType(mime_t *mime, const char *super,
 			             const char *type);

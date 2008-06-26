@@ -157,7 +157,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
   logic  = MIME_MAGIC_NOP;
   invert = 0;
 
-  DEBUG_printf(("%s/%s: %s\n", mt->super, mt->type, rule));
+  DEBUG_printf(("mimeAddTypeRule: %s/%s: %s\n", mt->super, mt->type, rule));
 
   while (*rule != '\0')
   {
@@ -166,13 +166,13 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
     if (*rule == '(')
     {
-      DEBUG_puts("new parenthesis group");
+      DEBUG_puts("mimeAddTypeRule: New parenthesis group");
       logic = MIME_MAGIC_NOP;
       rule ++;
     }
     else if (*rule == ')')
     {
-      DEBUG_puts("close paren...");
+      DEBUG_puts("mimeAddTypeRule: Close paren...");
       if (current == NULL || current->parent == NULL)
         return (-1);
 
@@ -208,11 +208,12 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         current->prev   = NULL;
 	current->parent = temp;
 
-        DEBUG_printf(("creating new AND group %p...\n", temp));
+        DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p...\n", temp));
       }
       else
       {
-        DEBUG_printf(("setting group %p op to AND...\n", current->parent));
+        DEBUG_printf(("mimeAddTypeRule: Setting group %p op to AND...\n",
+	              current->parent));
         current->parent->op = MIME_MAGIC_AND;
       }
 
@@ -238,7 +239,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  if ((temp = calloc(1, sizeof(mime_magic_t))) == NULL)
 	    return (-1);
 
-          DEBUG_printf(("creating new AND group %p inside OR group\n", temp));
+          DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p inside OR "
+	                "group\n", temp));
 
           while (current->prev != NULL)
 	  {
@@ -258,7 +260,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  * This isn't the top rule, so go up one level...
 	  */
 
-          DEBUG_puts("going up one level");
+          DEBUG_puts("mimeAddTypeRule: Going up one level");
 	  current = current->parent;
 	}
       }
@@ -268,7 +270,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
     }
     else if (*rule == '!')
     {
-      DEBUG_puts("NOT");
+      DEBUG_puts("mimeAddTypeRule: NOT");
       invert = 1;
       rule ++;
     }
@@ -441,7 +443,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         * Add parenthetical grouping...
 	*/
 
-        DEBUG_printf(("making new OR group %p for parenthesis...\n", temp));
+        DEBUG_printf(("mimeAddTypeRule: Making new OR group %p for "
+	              "parenthesis...\n", temp));
 
         temp->op = MIME_MAGIC_OR;
 
@@ -454,8 +457,8 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         logic = MIME_MAGIC_OR;
       }
 
-      DEBUG_printf(("adding %p: %s, op = %d, logic = %d, invert = %d\n",
-                    temp, name, op, logic, invert));
+      DEBUG_printf(("mimeAddTypeRule: adding %p: %s, op=%d, logic=%d, "
+                    "invert=%d\n", temp, name, op, logic, invert));
 
      /*
       * Fill in data for the rule...
@@ -543,10 +546,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
 
 
   DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", filename=\"%s\", "
-                "compression=%p)\n",
-                mime, pathname ? pathname : "(nil)",
-		filename ? filename : "(nil)",
-		compression));
+                "compression=%p)\n", mime, pathname, filename, compression));
 
  /*
   * Range check input parameters...
@@ -803,7 +803,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	  break;
 
       case MIME_MAGIC_STRING :
-          DEBUG_printf(("    string(%d, \"%s\")\n", rules->offset,
+          DEBUG_printf(("checkrules: string(%d, \"%s\")\n", rules->offset,
 	                rules->value.stringv));
 
          /*
@@ -822,7 +822,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	                              sizeof(fb->buffer));
 	    fb->offset = rules->offset;
 
-            DEBUG_printf(("        loaded %d byte fb->buffer at %d, starts "
+            DEBUG_printf(("checkrules: loaded %d byte fb->buffer at %d, starts "
 	                  "with \"%c%c%c%c\"...\n",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
 			  fb->buffer[2], fb->buffer[3]));
@@ -838,7 +838,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	  else
             result = (memcmp(fb->buffer + rules->offset - fb->offset,
 	                     rules->value.stringv, rules->length) == 0);
-          DEBUG_printf(("    result=%d\n", result));
+          DEBUG_printf(("checkrules: result=%d\n", result));
 	  break;
 
       case MIME_MAGIC_ISTRING :
@@ -1039,8 +1039,8 @@ checkrules(const char      *filename,	/* I - Filename */
     * the the rule set is false...
     */
 
-    DEBUG_printf(("    result of test %p (MIME_MAGIC_%s) is %d\n", rules,
-                  debug_tests[rules->op], result));
+    DEBUG_printf(("checkrules: result of test %p (MIME_MAGIC_%s) is %d\n",
+                  rules, debug_tests[rules->op], result));
 
     if ((result && logic == MIME_MAGIC_OR) ||
         (!result && logic == MIME_MAGIC_AND))

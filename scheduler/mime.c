@@ -72,6 +72,7 @@ static void	load_convs(mime_t *mime, const char *filename,
 		           const char *filterpath,
 			   cups_array_t *filtercache);
 static void	load_types(mime_t *mime, const char *filename);
+static mime_t	*mime_new(void);
 
 
 /*
@@ -192,73 +193,50 @@ mimeFirstType(mime_t *mime)		/* I - MIME database */
 
 /*
  * 'mimeLoad()' - Create a new MIME database from disk.
+ *
+ * This function uses @link mimeLoadFilters@ and @link mimeLoadTypes@ to
+ * create a MIME database from a single directory.
  */
 
 mime_t *				/* O - New MIME database */
 mimeLoad(const char *pathname,		/* I - Directory to load */
          const char *filterpath)	/* I - Directory to load */
 {
-  return (mimeMerge(NULL, pathname, filterpath));
+  return (mimeLoadFilters(mimeLoadTypes(NULL, pathname), pathname, filterpath));
 }
 
 
 /*
- * 'mimeMerge()' - Merge a MIME database from disk with the current one.
+ * 'mimeLoadFilters()' - Load filter definitions from disk.
+ *
+ * This function loads all of the .convs files from the specified directory.
+ * Use @link mimeLoadTypes@ to load all types before you load the filters.
  */
 
-mime_t *				/* O - Updated MIME database */
-mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
-          const char *pathname,		/* I - Directory to load */
-          const char *filterpath)	/* I - Directory to load */
+mime_t *				/* O - MIME database */
+mimeLoadFilters(mime_t     *mime,	/* I - MIME database */
+                const char *pathname,	/* I - Directory to load from */
+                const char *filterpath)	/* I - Default filter program directory */
 {
   cups_dir_t	*dir;			/* Directory */
   cups_dentry_t	*dent;			/* Directory entry */
-  char		filename[1024];		/* Full filename of types/converts file */
+  char		filename[1024];		/* Full filename of .convs file */
   cups_array_t	*filtercache;		/* Filter cache */
 
 
  /*
-  * First open the directory specified by pathname...  Return NULL if nothing
-  * was read or if the pathname is NULL...
+  * Range check input...
   */
 
-  if (!pathname)
-    return (NULL);
+  if (!mime || !pathname || !filterpath)
+    return (mime);
+
+ /*
+  * Then open the directory specified by pathname...
+  */
 
   if ((dir = cupsDirOpen(pathname)) == NULL)
-    return (NULL);
-
- /*
-  * If "mime" is NULL, make a new, blank database...
-  */
-
-  if (!mime)
-    mime = mimeNew();
-  if (!mime)
-  {
-    cupsDirClose(dir);
-    return (NULL);
-  }
-
- /*
-  * Read all the .types files...
-  */
-
-  while ((dent = cupsDirRead(dir)) != NULL)
-  {
-    if (strlen(dent->filename) > 6 &&
-        !strcmp(dent->filename + strlen(dent->filename) - 6, ".types"))
-    {
-     /*
-      * Load a mime.types file...
-      */
-
-      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->filename);
-      load_types(mime, filename);
-    }
-  }
-
-  cupsDirRewind(dir);
+    return (mime);
 
  /*
   * Read all the .convs files...
@@ -289,13 +267,62 @@ mimeMerge(mime_t     *mime,		/* I - MIME database to add to */
 
 
 /*
- * 'mimeNew()' - Create a new, empty MIME database.
+ * 'mimeLoadTypes()' - Load type definitions from disk.
+ *
+ * This function loads all of the .types files from the specified directory.
+ * Use @link mimeLoadFilters@ to load all filters after you load the types.
  */
 
 mime_t *				/* O - MIME database */
-mimeNew(void)
+mimeLoadTypes(mime_t     *mime,		/* I - MIME database or @code NULL@ to create a new one */
+              const char *pathname)	/* I - Directory to load from */
 {
-  return ((mime_t *)calloc(1, sizeof(mime_t)));
+  cups_dir_t	*dir;			/* Directory */
+  cups_dentry_t	*dent;			/* Directory entry */
+  char		filename[1024];		/* Full filename of .types file */
+
+
+ /*
+  * First open the directory specified by pathname...
+  */
+
+  if ((dir = cupsDirOpen(pathname)) == NULL)
+    return (mime);
+
+ /*
+  * If "mime" is NULL, make a new, empty database...
+  */
+
+  if (!mime)
+    mime = mime_new();
+
+  if (!mime)
+  {
+    cupsDirClose(dir);
+    return (NULL);
+  }
+
+ /*
+  * Read all the .types files...
+  */
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+  {
+    if (strlen(dent->filename) > 6 &&
+        !strcmp(dent->filename + strlen(dent->filename) - 6, ".types"))
+    {
+     /*
+      * Load a mime.types file...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/%s", pathname, dent->filename);
+      load_types(mime, filename);
+    }
+  }
+
+  cupsDirClose(dir);
+
+  return (mime);
 }
 
 
@@ -474,14 +501,16 @@ load_convs(mime_t       *mime,		/* I - MIME database */
   int		cost;			/* Cost of filter */
 
 
+  DEBUG_printf(("load_convs(mime=%p, filename=\"%s\", filterpath=\"%s\", "
+                "filtercache=%p)\n", mime, filename, filterpath, filtercache));
+
+
  /*
   * First try to open the file...
   */
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
-
-  DEBUG_printf(("\"%s\":\n", filename));
 
  /*
   * Then read each line from the file, skipping any comments in the file...
@@ -492,8 +521,6 @@ load_convs(mime_t       *mime,		/* I - MIME database */
    /*
     * Skip blank lines and lines starting with a #...
     */
-
-    DEBUG_puts(line);
 
     if (!line[0] || line[0] == '#')
       continue;
@@ -544,7 +571,8 @@ load_convs(mime_t       *mime,		/* I - MIME database */
 
     if ((dsttype = mimeType(mime, super, type)) == NULL)
     {
-      DEBUG_printf(("    Destination type %s/%s not found!\n", super, type));
+      DEBUG_printf(("load_convs: Destination type %s/%s not found!\n",
+                    super, type));
       continue;
     }
 
@@ -578,7 +606,8 @@ load_convs(mime_t       *mime,		/* I - MIME database */
 
       if (!add_fcache(filtercache, filter, filterpath))
       {
-        DEBUG_printf(("    Filter %s not found in %s!\n", filter, filterpath)); 
+        DEBUG_printf(("load_convs: Filter %s not found in %s!\n", filter,
+	              filterpath)); 
         continue;
       }
     }
@@ -653,14 +682,14 @@ load_types(mime_t     *mime,		/* I - MIME database */
   mime_type_t	*typeptr;		/* New MIME type */
 
 
+  DEBUG_printf(("load_types(mime=%p, filename=\"%s\")\n", mime, filename));
+
  /*
   * First try to open the file...
   */
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return;
-
-  DEBUG_printf(("\"%s\":\n", filename));
 
  /*
   * Then read each line from the file, skipping any comments in the file...
@@ -671,8 +700,6 @@ load_types(mime_t     *mime,		/* I - MIME database */
    /*
     * Skip blank lines and lines starting with a #...
     */
-
-    DEBUG_puts(line);
 
     if (!line[0] || line[0] == '#')
       continue;
@@ -728,6 +755,17 @@ load_types(mime_t     *mime,		/* I - MIME database */
   }
 
   cupsFileClose(fp);
+}
+
+
+/*
+ * 'mime_new()' - Create a new, empty MIME database.
+ */
+
+static mime_t *				/* O - MIME database */
+mime_new(void)
+{
+  return ((mime_t *)calloc(1, sizeof(mime_t)));
 }
 
 
