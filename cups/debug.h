@@ -30,6 +30,7 @@
  */
 
 #  ifdef DEBUG
+extern int _cups_debug_fd;
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
 #  else

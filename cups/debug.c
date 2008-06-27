@@ -32,6 +32,20 @@
 
 #ifdef DEBUG
 /*
+ * Local globals...
+ */
+
+int			_cups_debug_fd = -1;
+					/* Debug log file descriptor */
+
+static int		debug_init = 0;	/* Did we initialize debugging? */
+#  ifdef HAVE_PTHREAD_H
+static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
+					/* Mutex to control initialization */
+#  endif /* HAVE_PTHREAD_H */
+
+
+/*
  * 'debug_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
@@ -376,30 +390,40 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   char			buffer[2048];	/* Output buffer */
   size_t		bytes;		/* Number of bytes in buffer */
   const char		*cups_debug_log;/* CUPS_DEBUG_LOG environment variable */
-  _cups_globals_t	*cg = _cupsGlobals();
-					/* Global data */
 
 
  /*
   * See if we need to do any logging...
   */
 
-  if (!cg->debug_init)
+  if (!debug_init)
   {
-    cg->debug_init = 1;
+   /*
+    * Get a lock on the debug initializer, then re-check in case another
+    * thread already did it...
+    */
 
-    if ((cups_debug_log = getenv("CUPS_DEBUG_LOG")) == NULL)
-      cg->debug_fd = -1;
-    else if (!strcmp(cups_debug_log, "-"))
-      cg->debug_fd = 2;
-    else
+    pthread_mutex_lock(&debug_mutex);
+
+    if (!debug_init)
     {
-      snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
-      cg->debug_fd = open(buffer, O_WRONLY | O_APPEND | O_CREAT, 0644);
+      debug_init = 1;
+
+      if ((cups_debug_log = getenv("CUPS_DEBUG_LOG")) == NULL)
+	_cups_debug_fd = -1;
+      else if (!strcmp(cups_debug_log, "-"))
+	_cups_debug_fd = 2;
+      else
+      {
+	snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
+	_cups_debug_fd = open(buffer, O_WRONLY | O_APPEND | O_CREAT, 0644);
+      }
     }
+
+    pthread_mutex_unlock(&debug_mutex);
   }
 
-  if (cg->debug_fd < 0)
+  if (_cups_debug_fd < 0)
     return;
 
  /*
@@ -428,7 +452,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   * Write it out...
   */
 
-  write(cg->debug_fd, buffer, bytes);
+  write(_cups_debug_fd, buffer, bytes);
 }
 
 
