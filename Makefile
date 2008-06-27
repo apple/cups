@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6897 2007-08-30 06:11:59Z mike $"
+# "$Id: Makefile 7613 2008-05-22 23:27:52Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -325,5 +325,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 6897 2007-08-30 06:11:59Z mike $".
+# End of "$Id: Makefile 7613 2008-05-22 23:27:52Z mike $".
 #

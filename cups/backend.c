@@ -1,5 +1,5 @@
 /*
- * "$Id: backend.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: backend.c 7583 2008-05-16 17:47:16Z mike $"
  *
  *   Backend functions for the Common UNIX Printing System (CUPS).
  *
@@ -58,5 +58,5 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
 
 
 /*
- * End of "$Id: backend.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: backend.c 7583 2008-05-16 17:47:16Z mike $".
  */

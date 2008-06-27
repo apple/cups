@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 6875 2007-08-27 23:25:06Z mike $"
+ * "$Id: log.c 7697 2008-06-27 15:56:00Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -16,10 +16,13 @@
  *
  *   cupsdGetDateTime()   - Returns a pointer to a date/time string.
  *   cupsdLogGSSMessage() - Log a GSSAPI error...
+ *   cupsdLogJob()        - Log a job message.
  *   cupsdLogMessage()    - Log a message to the error log file.
  *   cupsdLogPage()       - Log a page to the page log file.
  *   cupsdLogRequest()    - Log an HTTP request in Common Log Format.
+ *   cupsdWriteErrorLog() - Write a line to the ErrorLog.
  *   check_log_file()     - Open/rotate a log file if it needs it.
+ *   format_log_line()    - Format a line for a log file.
  */
 
 /*
@@ -32,10 +35,19 @@
 
 
 /*
+ * Local globals...
+ */
+
+static int	log_linesize = 0;	/* Size of line for output file */
+static char	*log_line = NULL;	/* Line for output file */
+
+
+/*
  * Local functions...
  */
 
-static int	check_log_file(cups_file_t **, const char *);
+static int	check_log_file(cups_file_t **lf, const char *logname);
+static char	*format_log_line(const char *message, va_list ap);
 
 
 /*
@@ -157,6 +169,49 @@ cupsdLogGSSMessage(
 
 
 /*
+ * 'cupsdLogJob()' - Log a job message.
+ */
+
+int					/* O - 1 on success, 0 on error */
+cupsdLogJob(cupsd_job_t *job,		/* I - Job */
+            int         level,		/* I - Log level */
+	    const char  *message,	/* I - Printf-style message string */
+	    ...)			/* I - Additional arguments as needed */
+{
+  va_list		ap;		/* Argument pointer */
+  char			jobmsg[1024],	/* Format string for job message */
+			*line;		/* Message line */
+
+
+ /*
+  * See if we want to log this message...
+  */
+
+  if (TestConfigFile || level > LogLevel || !ErrorLog)
+    return (1);
+
+  if (level > LogLevel || !ErrorLog)
+    return (1);
+
+ /*
+  * Format and write the log message...
+  */
+
+  snprintf(jobmsg, sizeof(jobmsg), "[Job %d] %s", job->id, message);
+
+  va_start(ap, message);
+  line = format_log_line(jobmsg, ap);
+  va_end(ap);
+
+  if (line)
+    return (cupsdWriteErrorLog(level, line));
+  else
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line!"));
+}
+
+
+/*
  * 'cupsdLogMessage()' - Log a message to the error log file.
  */
 
@@ -165,38 +220,8 @@ cupsdLogMessage(int        level,	/* I - Log level */
                 const char *message,	/* I - printf-style message string */
 	        ...)			/* I - Additional args as needed */
 {
-  int			len;		/* Length of message */
   va_list		ap;		/* Argument pointer */
-  static const char	levels[] =	/* Log levels... */
-		{
-		  ' ',
-		  'X',
-		  'A',
-		  'C',
-		  'E',
-		  'W',
-		  'N',
-		  'I',
-		  'D',
-		  'd'
-		};
-#ifdef HAVE_VSYSLOG
-  static const int	syslevels[] =	/* SYSLOG levels... */
-		{
-		  0,
-		  LOG_EMERG,
-		  LOG_ALERT,
-		  LOG_CRIT,
-		  LOG_ERR,
-		  LOG_WARNING,
-		  LOG_NOTICE,
-		  LOG_INFO,
-		  LOG_DEBUG,
-		  LOG_DEBUG
-		};
-#endif /* HAVE_VSYSLOG */
-  static int		linesize = 0;	/* Size of line for output file */
-  static char		*line = NULL;	/* Line for output file */
+  char			*line;		/* Message line */
 
 
  /*
@@ -219,114 +244,19 @@ cupsdLogMessage(int        level,	/* I - Log level */
   if (level > LogLevel || !ErrorLog)
     return (1);
 
-#ifdef HAVE_VSYSLOG
  /*
-  * See if we are logging errors via syslog...
-  */
-
-  if (!strcmp(ErrorLog, "syslog"))
-  {
-    va_start(ap, message);
-    vsyslog(syslevels[level], message, ap);
-    va_end(ap);
-
-    return (1);
-  }
-#endif /* HAVE_VSYSLOG */
-
- /*
-  * Not using syslog; check the log file...
-  */
-
-  if (!check_log_file(&ErrorFile, ErrorLog))
-    return (0);
-
- /*
-  * Print the log level and date/time...
-  */
-
-  cupsFilePrintf(ErrorFile, "%c %s ", levels[level], cupsdGetDateTime(time(NULL)));
-
- /*
-  * Allocate the line buffer as needed...
-  */
-
-  if (!linesize)
-  {
-    linesize = 8192;
-    line     = malloc(linesize);
-
-    if (!line)
-    {
-      cupsFilePrintf(ErrorFile,
-                     "ERROR: Unable to allocate memory for line - %s\n",
-                     strerror(errno));
-      cupsFileFlush(ErrorFile);
-
-      return (0);
-    }
-  }
-
- /*
-  * Format the log message...
+  * Format and write the log message...
   */
 
   va_start(ap, message);
-  len = vsnprintf(line, linesize, message, ap);
+  line = format_log_line(message, ap);
   va_end(ap);
 
- /*
-  * Resize the buffer as needed...
-  */
-
-  if (len >= linesize)
-  {
-    char	*temp;			/* Temporary string pointer */
-
-
-    len ++;
-
-    if (len < 8192)
-      len = 8192;
-    else if (len > 65536)
-      len = 65536;
-
-    temp = realloc(line, len);
-
-    if (temp)
-    {
-      line     = temp;
-      linesize = len;
-    }
-
-    va_start(ap, message);
-    len = vsnprintf(line, linesize, message, ap);
-    va_end(ap);
-  }
-
-  if (len >= linesize)
-    len = linesize - 1;
-
- /*
-  * Then the log message...
-  */
-
-  cupsFilePuts(ErrorFile, line);
-
- /*
-  * Then a newline...
-  */
-
-  if (len > 0 && line[len - 1] != '\n')
-    cupsFilePutChar(ErrorFile, '\n');
-
- /*
-  * Flush the line to the file and return...
-  */
-
-  cupsFileFlush(ErrorFile);
-
-  return (1);
+  if (line)
+    return (cupsdWriteErrorLog(level, line));
+  else
+    return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
+                               "Unable to allocate memory for log line!"));
 }
 
 
@@ -414,8 +344,10 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	      * Pull the name from inside the brackets...
 	      */
 
-	      memcpy(name, format + 1, nameend - format - 2);
-	      name[nameend - format - 2] = '\0';
+	      memcpy(name, format + 1, nameend - format - 1);
+	      name[nameend - format - 1] = '\0';
+
+	      format = nameend;
 
 	      if ((attr = ippFindAttribute(job->attrs, name,
 	                                   IPP_TAG_ZERO)) != NULL)
@@ -423,8 +355,6 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	       /*
 	        * Add the attribute value...
 		*/
-
-	        format = nameend;
 
                 for (i = 0;
 		     i < attr->num_values &&
@@ -607,6 +537,75 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
 
 /*
+ * 'cupsdWriteErrorLog()' - Write a line to the ErrorLog.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+cupsdWriteErrorLog(int        level,	/* I - Log level */
+                   const char *message)	/* I - Message string */
+{
+  static const char	levels[] =	/* Log levels... */
+		{
+		  ' ',
+		  'X',
+		  'A',
+		  'C',
+		  'E',
+		  'W',
+		  'N',
+		  'I',
+		  'D',
+		  'd'
+		};
+#ifdef HAVE_VSYSLOG
+  static const int	syslevels[] =	/* SYSLOG levels... */
+		{
+		  0,
+		  LOG_EMERG,
+		  LOG_ALERT,
+		  LOG_CRIT,
+		  LOG_ERR,
+		  LOG_WARNING,
+		  LOG_NOTICE,
+		  LOG_INFO,
+		  LOG_DEBUG,
+		  LOG_DEBUG
+		};
+#endif /* HAVE_VSYSLOG */
+
+
+#ifdef HAVE_VSYSLOG
+ /*
+  * See if we are logging errors via syslog...
+  */
+
+  if (!strcmp(ErrorLog, "syslog"))
+  {
+    syslog(syslevels[level], "%s", message);
+    return (1);
+  }
+#endif /* HAVE_VSYSLOG */
+
+ /*
+  * Not using syslog; check the log file...
+  */
+
+  if (!check_log_file(&ErrorFile, ErrorLog))
+    return (0);
+
+ /*
+  * Write the log message...
+  */
+
+  cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
+                 cupsdGetDateTime(time(NULL)), message);
+  cupsFileFlush(ErrorFile);
+
+  return (1);
+}
+
+
+/*
  * 'check_log_file()' - Open/rotate a log file if it needs it.
  */
 
@@ -765,5 +764,70 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
 
 /*
- * End of "$Id: log.c 6875 2007-08-27 23:25:06Z mike $".
+ * 'format_log_line()' - Format a line for a log file.
+ *
+ * This function resizes a global string buffer as needed.  Each call returns
+ * a pointer to this buffer, so the contents are only good until the next call
+ * to format_log_line()...
+ */
+
+static char *				/* O - Text or NULL on error */
+format_log_line(const char *message,	/* I - Printf-style format string */
+                va_list    ap)		/* I - Argument list */
+{
+  int	len;				/* Length of formatted line */
+
+
+ /*
+  * Allocate the line buffer as needed...
+  */
+
+  if (!log_linesize)
+  {
+    log_linesize = 8192;
+    log_line     = malloc(log_linesize);
+
+    if (!log_line)
+      return (NULL);
+  }
+
+ /*
+  * Format the log message...
+  */
+
+  len = vsnprintf(log_line, log_linesize, message, ap);
+
+ /*
+  * Resize the buffer as needed...
+  */
+
+  if (len >= log_linesize)
+  {
+    char	*temp;			/* Temporary string pointer */
+
+
+    len ++;
+
+    if (len < 8192)
+      len = 8192;
+    else if (len > 65536)
+      len = 65536;
+
+    temp = realloc(log_line, len);
+
+    if (temp)
+    {
+      log_line     = temp;
+      log_linesize = len;
+    }
+
+    len = vsnprintf(log_line, log_linesize, message, ap);
+  }
+
+  return (log_line);
+}
+
+
+/*
+ * End of "$Id: log.c 7697 2008-06-27 15:56:00Z mike $".
  */

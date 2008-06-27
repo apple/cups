@@ -1,11 +1,11 @@
 /*
- * "$Id: usb-unix.c 6910 2007-09-04 20:34:29Z mike $"
+ * "$Id: usb-unix.c 7687 2008-06-24 01:28:36Z mike $"
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,7 +28,6 @@
  * Include necessary headers.
  */
 
-#include "ieee1284.c"
 #include <sys/select.h>
 
 
@@ -611,5 +610,5 @@ side_cb(int         print_fd,		/* I - Print file */
 
 
 /*
- * End of "$Id: usb-unix.c 6910 2007-09-04 20:34:29Z mike $".
+ * End of "$Id: usb-unix.c 7687 2008-06-24 01:28:36Z mike $".
  */

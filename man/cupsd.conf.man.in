@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: cupsd.conf.man.in 7002 2007-10-01 23:07:37Z mike $"
+.\" "$Id: cupsd.conf.man.in 7645 2008-06-16 17:21:10Z mike $"
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -618,5 +618,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id: cupsd.conf.man.in 7002 2007-10-01 23:07:37Z mike $".
+.\" End of "$Id: cupsd.conf.man.in 7645 2008-06-16 17:21:10Z mike $".
 .\"

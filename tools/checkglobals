@@ -4,8 +4,6 @@
 #
 
 for file in *.o; do
-	echo -n "$file: "
-
 	functions=""
 
 	for function in `nm -g $file | grep "T " | awk '{print $3}'`; do
@@ -27,8 +25,8 @@ for file in *.o; do
 	done
 
 	if test -z "$functions"; then
-		echo "OK"
+		echo "$file: OK"
 	else
-		echo $functions
+		echo "$file: $functions"
 	fi
 done

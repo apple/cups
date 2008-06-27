@@ -1,5 +1,5 @@
 /*
- * "$Id: policy.c 6895 2007-08-30 00:09:27Z mike $"
+ * "$Id: policy.c 7673 2008-06-18 22:31:26Z mike $"
  *
  *   Policy routines for the Common UNIX Printing System (CUPS).
  *
@@ -276,7 +276,7 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 			*po;		/* Current policy operation */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))\n",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindPolicyOp(p=%p, op=%x(%s))",
                   p, op, ippOpString(op));
 
  /*
@@ -348,5 +348,5 @@ hash_op(cupsd_location_t *op)		/* I - Operation */
 
 
 /*
- * End of "$Id: policy.c 6895 2007-08-30 00:09:27Z mike $".
+ * End of "$Id: policy.c 7673 2008-06-18 22:31:26Z mike $".
  */

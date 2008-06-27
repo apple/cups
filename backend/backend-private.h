@@ -1,5 +1,5 @@
 /*
- * "$Id: backend-private.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: backend-private.h 7586 2008-05-16 23:39:39Z mike $"
  *
  *   Backend support definitions for the Common UNIX Printing System (CUPS).
  *
@@ -272,5 +272,5 @@ extern int		backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
 
 
 /*
- * End of "$Id: backend-private.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: backend-private.h 7586 2008-05-16 23:39:39Z mike $".
  */

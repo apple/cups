@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: subscriptions.c 7673 2008-06-18 22:31:26Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1363,7 +1363,7 @@ cupsd_send_notification(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsd_send_notification(sub=%p(%d), event=%p(%s))\n",
+                  "cupsd_send_notification(sub=%p(%d), event=%p(%s))",
                   sub, sub->id, event, cupsdEventName(event->event));
 
  /*
@@ -1616,5 +1616,5 @@ cupsd_update_notifier(void)
 
 
 /*
- * End of "$Id: subscriptions.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: subscriptions.c 7673 2008-06-18 22:31:26Z mike $".
  */

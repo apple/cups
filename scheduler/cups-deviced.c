@@ -1,5 +1,5 @@
 /*
- * "$Id: cups-deviced.c 7011 2007-10-10 21:13:35Z mike $"
+ * "$Id: cups-deviced.c 7624 2008-06-09 15:55:04Z mike $"
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
@@ -719,5 +719,5 @@ start_backend(const char *name,		/* I - Backend to run */
 
 
 /*
- * End of "$Id: cups-deviced.c 7011 2007-10-10 21:13:35Z mike $".
+ * End of "$Id: cups-deviced.c 7624 2008-06-09 15:55:04Z mike $".
  */

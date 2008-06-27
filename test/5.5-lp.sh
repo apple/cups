@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: 5.5-lp.sh 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: 5.5-lp.sh 7415 2008-03-31 22:33:20Z mike $"
 #
 #   Test the lp command.
 #
@@ -74,5 +74,5 @@ echo ""
 ./waitjobs.sh
 
 #
-# End of "$Id: 5.5-lp.sh 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id: 5.5-lp.sh 7415 2008-03-31 22:33:20Z mike $".
 #

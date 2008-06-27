@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgi.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: image-sgi.c 7223 2008-01-16 23:41:19Z mike $"
  *
  *   SGI image file routines for the Common UNIX Printing System (CUPS).
  *
@@ -291,5 +291,5 @@ _cupsImageReadSGI(
 
 
 /*
- * End of "$Id: image-sgi.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: image-sgi.c 7223 2008-01-16 23:41:19Z mike $".
  */

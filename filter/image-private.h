@@ -1,5 +1,5 @@
 /*
- * "$Id: image-private.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: image-private.h 7473 2008-04-21 17:51:58Z mike $"
  *
  *   Private image library definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -213,5 +213,5 @@ extern void		_cupsRasterClearError(void);
 #endif /* !_CUPS_IMAGE_PRIVATE_H_ */
 
 /*
- * End of "$Id: image-private.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: image-private.h 7473 2008-04-21 17:51:58Z mike $".
  */

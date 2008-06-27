@@ -1,5 +1,5 @@
 /*
- * "$Id: ppd.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: ppd.h 7679 2008-06-19 23:37:45Z mike $"
  *
  *   PostScript Printer Description definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -399,6 +399,8 @@ extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 					      size_t bufsize) _CUPS_API_1_3;
 
 /**** New in CUPS 1.4 ****/
+extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
+			                 const char *spec);
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
 			                       const char *name) _CUPS_API_1_4;
 
@@ -413,5 +415,5 @@ extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
 #endif /* !_CUPS_PPD_H_ */
 
 /*
- * End of "$Id: ppd.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: ppd.h 7679 2008-06-19 23:37:45Z mike $".
  */

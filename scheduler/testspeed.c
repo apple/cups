@@ -1,5 +1,5 @@
 /*
- * "$Id: testspeed.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: testspeed.c 7688 2008-06-24 04:34:52Z mike $"
  *
  *   Scheduler speed test for the Common UNIX Printing System (CUPS).
  *
@@ -24,15 +24,13 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/wait.h>
+#include <cups/string.h>
 #include <cups/cups.h>
 #include <cups/language.h>
 #include <cups/debug.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/wait.h>
 #include <errno.h>
 
 
@@ -366,5 +364,5 @@ usage(void)
 
 
 /*
- * End of "$Id: testspeed.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: testspeed.c 7688 2008-06-24 04:34:52Z mike $".
  */

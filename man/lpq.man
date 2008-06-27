@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lpq.man 6649 2007-07-11 21:46:42Z mike $"
+.\" "$Id: lpq.man 7646 2008-06-16 17:26:20Z mike $"
 .\"
 .\"   lpq man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -68,5 +68,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id: lpq.man 6649 2007-07-11 21:46:42Z mike $".
+.\" End of "$Id: lpq.man 7646 2008-06-16 17:26:20Z mike $".
 .\"

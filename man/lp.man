@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: lp.man 6649 2007-07-11 21:46:42Z mike $"
+.\" "$Id: lp.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
 .\"   lp man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -239,5 +239,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007 by Apple Inc.
 .\"
-.\" End of "$Id: lp.man 6649 2007-07-11 21:46:42Z mike $".
+.\" End of "$Id: lp.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

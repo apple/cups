@@ -1,5 +1,5 @@
 /*
- * "$Id: test1284.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: test1284.c 7465 2008-04-18 16:20:11Z mike $"
  *
  *   IEEE-1284 support functions test program for the Common UNIX Printing
  *   System (CUPS).
@@ -83,5 +83,5 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * End of "$Id: test1284.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: test1284.c 7465 2008-04-18 16:20:11Z mike $".
  */

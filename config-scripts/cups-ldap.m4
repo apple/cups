@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ldap.m4 6649 2007-07-11 21:46:42Z mike $"
+dnl "$Id: cups-ldap.m4 7241 2008-01-22 22:34:52Z mike $"
 dnl
 dnl   LDAP configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -36,5 +36,5 @@ AC_SUBST(LIBLDAP)
 
 
 dnl
-dnl End of "$Id: cups-ldap.m4 6649 2007-07-11 21:46:42Z mike $".
+dnl End of "$Id: cups-ldap.m4 7241 2008-01-22 22:34:52Z mike $".
 dnl

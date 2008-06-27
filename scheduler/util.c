@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: util.c 7621 2008-06-06 18:55:35Z mike $"
  *
  *   Mini-daemon utility functions for the Common UNIX Printing System (CUPS).
  *
@@ -446,5 +446,5 @@ cupsdSendIPPTrailer(void)
 
 
 /*
- * End of "$Id: util.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: util.c 7621 2008-06-06 18:55:35Z mike $".
  */

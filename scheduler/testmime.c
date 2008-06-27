@@ -1,5 +1,5 @@
 /*
- * "$Id: testmime.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: testmime.c 7670 2008-06-17 22:42:08Z mike $"
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
@@ -322,5 +322,5 @@ type_dir(mime_t     *mime,		/* I - MIME database */
 
 
 /*
- * End of "$Id: testmime.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: testmime.c 7670 2008-06-17 22:42:08Z mike $".
  */

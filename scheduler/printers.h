@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: printers.h 7564 2008-05-15 00:57:43Z mike $"
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -176,5 +176,5 @@ extern void		cupsdWritePrintcap(void);
 
 
 /*
- * End of "$Id: printers.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: printers.h 7564 2008-05-15 00:57:43Z mike $".
  */

@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: ppdcfile.man 7607 2008-05-21 01:06:23Z mike $"
 .\"
 .\"   ppdcfile man page for the Common UNIX Printing System.
 .\"
@@ -167,5 +167,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: ppdcfile.man 7607 2008-05-21 01:06:23Z mike $".
 .\"

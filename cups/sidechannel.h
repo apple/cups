@@ -1,5 +1,5 @@
 /*
- * "$Id: sidechannel.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: sidechannel.h 7616 2008-05-28 00:34:13Z mike $"
  *
  *   Side-channel API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -131,5 +131,5 @@ extern cups_sc_status_t	cupsSideChannelSNMPWalk(const char *oid, double timeout,
 #endif /* !_CUPS_SIDECHANNEL_H_ */
 
 /*
- * End of "$Id: sidechannel.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: sidechannel.h 7616 2008-05-28 00:34:13Z mike $".
  */

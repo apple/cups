@@ -1,5 +1,5 @@
 /*
- * "$Id: help-index.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: help-index.c 7615 2008-05-25 07:17:07Z mike $"
  *
  *   Online help index routines for the Common UNIX Printing System (CUPS).
  *
@@ -1327,5 +1327,5 @@ help_sort_words(help_word_t *w1,	/* I - Second word */
 
 
 /*
- * End of "$Id: help-index.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: help-index.c 7615 2008-05-25 07:17:07Z mike $".
  */

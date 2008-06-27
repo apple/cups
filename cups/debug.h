@@ -1,5 +1,5 @@
 /*
- * "$Id: debug.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: debug.h 7460 2008-04-16 02:19:54Z mike $"
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
@@ -53,5 +53,5 @@ extern void	_cups_debug_puts(const char *s);
 #endif /* !_CUPS_DEBUG_H_ */
 
 /*
- * End of "$Id: debug.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: debug.h 7460 2008-04-16 02:19:54Z mike $".
  */

@@ -10,8 +10,8 @@ _mimeFilterLookup
 _mimeFirstFilter
 _mimeFirstType
 _mimeLoad
-_mimeMerge
-_mimeNew
+_mimeLoadFilters
+_mimeLoadTypes
 _mimeNextFilter
 _mimeNextType
 _mimeNumFilters

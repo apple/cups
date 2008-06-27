@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7014 2007-10-10 21:57:43Z mike $"
+# "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $"
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
@@ -201,5 +201,5 @@ uninstall:
 
 
 #
-# End of "$Id: Makefile 7014 2007-10-10 21:57:43Z mike $".
+# End of "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $".
 #

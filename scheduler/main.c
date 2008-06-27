@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 6914 2007-09-05 21:05:04Z mike $"
+ * "$Id: main.c 7681 2008-06-20 21:06:02Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -489,7 +489,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         snprintf(tempfile, sizeof(tempfile), "%s/%s", TempDir, dent->filename);
 
-	if (cupsdRemoveFile(tempfile))
+	if (unlink(tempfile))
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "Unable to remove temporary file \"%s\" - %s",
 	                  tempfile, strerror(errno));
@@ -2019,5 +2019,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 6914 2007-09-05 21:05:04Z mike $".
+ * End of "$Id: main.c 7681 2008-06-20 21:06:02Z mike $".
  */

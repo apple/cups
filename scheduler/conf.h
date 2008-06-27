@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: conf.h 7674 2008-06-18 23:18:32Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -225,6 +225,11 @@ extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,
 		                   const char *message, ...);
 #endif /* HAVE_GSSAPI */
+extern int	cupsdLogJob(cupsd_job_t *job, int level, const char *message, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#endif /* __GNUC__ */
+;
 extern int	cupsdLogMessage(int level, const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
@@ -233,8 +238,9 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 extern int	cupsdLogPage(cupsd_job_t *job, const char *page);
 extern int	cupsdLogRequest(cupsd_client_t *con, http_status_t code);
 extern int	cupsdReadConfiguration(void);
+extern int	cupsdWriteErrorLog(int level, const char *message);
 
 
 /*
- * End of "$Id: conf.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: conf.h 7674 2008-06-18 23:18:32Z mike $".
  */

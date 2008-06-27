@@ -1,5 +1,5 @@
 /*
- * "$Id: auth.c 6779 2007-08-08 19:49:48Z mike $"
+ * "$Id: auth.c 7460 2008-04-16 02:19:54Z mike $"
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
@@ -683,5 +683,5 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: auth.c 6779 2007-08-08 19:49:48Z mike $".
+ * End of "$Id: auth.c 7460 2008-04-16 02:19:54Z mike $".
  */

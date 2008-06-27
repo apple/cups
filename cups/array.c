@@ -1,5 +1,5 @@
 /*
- * "$Id: array.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: array.c 7616 2008-05-28 00:34:13Z mike $"
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
@@ -1142,5 +1142,5 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 
 
 /*
- * End of "$Id: array.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: array.c 7616 2008-05-28 00:34:13Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: backchannel.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: backchannel.c 7616 2008-05-28 00:34:13Z mike $"
  *
  *   Backchannel functions for the Common UNIX Printing System (CUPS).
  *
@@ -195,5 +195,5 @@ cups_setup(fd_set         *set,		/* I - Set for select() */
 
 
 /*
- * End of "$Id: backchannel.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: backchannel.c 7616 2008-05-28 00:34:13Z mike $".
  */

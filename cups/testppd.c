@@ -1,5 +1,5 @@
 /*
- * "$Id: testppd.c 6936 2007-09-10 18:15:36Z mike $"
+ * "$Id: testppd.c 7633 2008-06-10 23:07:29Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -468,5 +468,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testppd.c 6936 2007-09-10 18:15:36Z mike $".
+ * End of "$Id: testppd.c 7633 2008-06-10 23:07:29Z mike $".
  */

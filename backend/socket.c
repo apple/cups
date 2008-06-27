@@ -1,5 +1,5 @@
 /*
- * "$Id: socket.c 6910 2007-09-04 20:34:29Z mike $"
+ * "$Id: socket.c 7583 2008-05-16 17:47:16Z mike $"
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
@@ -499,5 +499,5 @@ wait_bc(int device_fd,			/* I - Socket */
 
 
 /*
- * End of "$Id: socket.c 6910 2007-09-04 20:34:29Z mike $".
+ * End of "$Id: socket.c 7583 2008-05-16 17:47:16Z mike $".
  */

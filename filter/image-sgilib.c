@@ -1,5 +1,5 @@
 /*
- * "$Id: image-sgilib.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: image-sgilib.c 7221 2008-01-16 22:20:08Z mike $"
  *
  *   SGI image file format library routines for the Common UNIX Printing
  *   System (CUPS).
@@ -885,5 +885,5 @@ write_rle16(FILE           *fp,		/* I - File to write to */
 
 
 /*
- * End of "$Id: image-sgilib.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: image-sgilib.c 7221 2008-01-16 22:20:08Z mike $".
  */

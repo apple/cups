@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.h 6930 2007-09-08 00:28:06Z mike $"
+ * "$Id: dirsvc.h 7676 2008-06-18 23:42:37Z mike $"
  *
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
@@ -188,7 +188,6 @@ extern void	cupsdStartPolling(void);
 extern void	cupsdStopBrowsing(void);
 extern void	cupsdStopPolling(void);
 #ifdef HAVE_DNSSD
-extern void	cupsdUpdateDNSSDBrowse(void);
 extern void	cupsdUpdateDNSSDName(void);
 #endif /* HAVE_DNSSD */
 #ifdef HAVE_LDAP
@@ -198,5 +197,5 @@ extern void	cupsdUpdateSLPBrowse(void);
 
 
 /*
- * End of "$Id: dirsvc.h 6930 2007-09-08 00:28:06Z mike $".
+ * End of "$Id: dirsvc.h 7676 2008-06-18 23:42:37Z mike $".
  */

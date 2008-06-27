@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 6754 2007-08-01 19:00:07Z mike $"
+dnl "$Id: cups-defaults.m4 7649 2008-06-16 17:46:57Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -395,5 +395,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 6754 2007-08-01 19:00:07Z mike $".
+dnl End of "$Id: cups-defaults.m4 7649 2008-06-16 17:46:57Z mike $".
 dnl

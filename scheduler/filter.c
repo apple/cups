@@ -1,9 +1,9 @@
 /*
- * "$Id: filter.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: filter.c 7694 2008-06-26 00:23:20Z mike $"
  *
  *   File type conversion routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -403,5 +403,5 @@ find_filters(mime_t           *mime,	/* I - MIME database */
 
 
 /*
- * End of "$Id: filter.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: filter.c 7694 2008-06-26 00:23:20Z mike $".
  */

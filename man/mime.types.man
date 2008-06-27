@@ -1,5 +1,5 @@
 .\"
-.\" "$Id: mime.types.man 6649 2007-07-11 21:46:42Z mike $"
+.\" "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $"
 .\"
 .\"   mime.types man page for the Common UNIX Printing System (CUPS).
 .\"
@@ -95,5 +95,5 @@ http://localhost:631/help
 .SH COPYRIGHT
 Copyright 2007-2008 by Apple Inc.
 .\"
-.\" End of "$Id: mime.types.man 6649 2007-07-11 21:46:42Z mike $".
+.\" End of "$Id: mime.types.man 7670 2008-06-17 22:42:08Z mike $".
 .\"

@@ -1,5 +1,5 @@
 #
-# "$Id: cups.spec.in 6889 2007-08-29 22:23:35Z mike $"
+# "$Id: cups.spec.in 7693 2008-06-25 17:12:28Z mike $"
 #
 #   RPM "spec" file for the Common UNIX Printing System (CUPS).
 #
@@ -51,6 +51,9 @@ BuildRoot: /tmp/%{name}-root
 Requires: %{name}-libs = %{epoch}:%{version}
 Obsoletes: lpd, lpr, LPRng
 Provides: lpd, lpr, LPRng
+Obsoletes: cups-da, cups-de, cups-es, cups-et, cups-fi, cups-fr, cups-he
+Obsoletes: cups-id, cups-it, cups-ja, cups-ko, cups-nl, cups-no, cups-pl
+Obsoletes: cups-pt, cups-ru, cups-sv, cups-zh
 
 %package devel
 Summary: Common UNIX Printing System - development environment
@@ -356,5 +359,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 #
-# End of "$Id: cups.spec.in 6889 2007-08-29 22:23:35Z mike $".
+# End of "$Id: cups.spec.in 7693 2008-06-25 17:12:28Z mike $".
 #

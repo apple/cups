@@ -14,6 +14,11 @@
  *
  * Contents:
  *
+ *   main()                 - Process a CUPS command file.
+ *   auto_configure()       - Automatically configure the printer using
+ *                            PostScript query commands and/or SNMP lookups.
+ *   print_self_test_page() - Print a self-test page.
+ *   report_levels()        - Report supply levels.
  */
 
 /*
@@ -309,7 +314,13 @@ report_levels(ppd_file_t *ppd,		/* I - PPD file */
     fputs(ppd->jcl_ps, stdout);
   }
 
+ /*
+  * Send a query job that just reports the product string - network backends
+  * will gather the supply levels via SNMP.
+  */
+
   puts("%!");
+  puts("product =");
 
  /*
   * Finish the job...

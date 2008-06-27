@@ -1,5 +1,5 @@
 /*
- * "$Id: image-pix.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: image-pix.c 7221 2008-01-16 22:20:08Z mike $"
  *
  *   Alias PIX image routines for the Common UNIX Printing System (CUPS).
  *
@@ -236,5 +236,5 @@ read_short(FILE *fp)			/* I - File to read from */
 
 
 /*
- * End of "$Id: image-pix.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: image-pix.c 7221 2008-01-16 22:20:08Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6900 2007-08-30 17:17:51Z mike $"
+# "$Id: Makefile 7601 2008-05-20 21:08:08Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #

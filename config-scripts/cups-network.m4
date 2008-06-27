@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-network.m4 6649 2007-07-11 21:46:42Z mike $"
+dnl "$Id: cups-network.m4 7127 2007-12-17 18:05:32Z mike $"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -66,5 +66,5 @@ AC_CHECK_HEADERS(AppleTalk/at_proto.h,AC_DEFINE(HAVE_APPLETALK_AT_PROTO_H),,
 	[#include <netat/appletalk.h>])
 
 dnl
-dnl End of "$Id: cups-network.m4 6649 2007-07-11 21:46:42Z mike $".
+dnl End of "$Id: cups-network.m4 7127 2007-12-17 18:05:32Z mike $".
 dnl

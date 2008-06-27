@@ -1,5 +1,5 @@
 /*
- * "$Id: process.c 6987 2007-09-25 15:43:44Z mike $"
+ * "$Id: process.c 7256 2008-01-25 00:48:54Z mike $"
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
@@ -494,5 +494,5 @@ cupsd_requote(char       *dst,		/* I - Destination buffer */
 
 
 /*
- * End of "$Id: process.c 6987 2007-09-25 15:43:44Z mike $".
+ * End of "$Id: process.c 7256 2008-01-25 00:48:54Z mike $".
  */

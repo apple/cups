@@ -1,5 +1,5 @@
 /*
- * "$Id: lpstat.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: lpstat.c 7620 2008-06-06 17:24:22Z mike $"
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
@@ -2266,5 +2266,5 @@ show_scheduler(http_t *http)	/* I - HTTP connection to server */
 
 
 /*
- * End of "$Id: lpstat.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: lpstat.c 7620 2008-06-06 17:24:22Z mike $".
  */

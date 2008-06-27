@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-ssl.m4 6649 2007-07-11 21:46:42Z mike $"
+dnl "$Id: cups-ssl.m4 7241 2008-01-22 22:34:52Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -123,5 +123,5 @@ AC_SUBST(EXPORT_SSLLIBS)
 
 
 dnl
-dnl End of "$Id: cups-ssl.m4 6649 2007-07-11 21:46:42Z mike $".
+dnl End of "$Id: cups-ssl.m4 7241 2008-01-22 22:34:52Z mike $".
 dnl

@@ -1,5 +1,5 @@
 /*
- * "$Id: encode.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: encode.c 7696 2008-06-26 00:54:42Z mike $"
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
@@ -64,6 +64,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "gamma-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-page-limit",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-priority",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -588,5 +589,5 @@ compare_ipp_options(_ipp_option_t *a,	/* I - First option */
 
 
 /*
- * End of "$Id: encode.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: encode.c 7696 2008-06-26 00:54:42Z mike $".
  */

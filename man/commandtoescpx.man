@@ -1,5 +1,5 @@
 .\"
-.\" "$Id$"
+.\" "$Id: commandtoescpx.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
 .\"   rastertoescpx man page for the CUPS Driver Development Kit.
 .\"
@@ -29,5 +29,5 @@ cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
 .SH COPYRIGHT
 Copyright 2007 by Apple Inc.
 .\"
-.\" End of "$Id$".
+.\" End of "$Id: commandtoescpx.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

@@ -1,5 +1,5 @@
 /*
- * "$Id: cups.h 6870 2007-08-27 21:13:35Z mike $"
+ * "$Id: cups.h 7616 2008-05-28 00:34:13Z mike $"
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
@@ -308,5 +308,5 @@ extern http_status_t	cupsWriteRequestData(http_t *http, const char *buffer,
 #endif /* !_CUPS_CUPS_H_ */
 
 /*
- * End of "$Id: cups.h 6870 2007-08-27 21:13:35Z mike $".
+ * End of "$Id: cups.h 7616 2008-05-28 00:34:13Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: hpgl-input.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: hpgl-input.c 7219 2008-01-14 22:00:02Z mike $"
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
@@ -268,5 +268,5 @@ FreeParameters(int     num_params,	/* I - Number of parameters */
 
 
 /*
- * End of "$Id: hpgl-input.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: hpgl-input.c 7219 2008-01-14 22:00:02Z mike $".
  */

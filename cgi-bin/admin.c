@@ -1,5 +1,5 @@
 /*
- * "$Id: admin.c 7012 2007-10-10 21:22:45Z mike $"
+ * "$Id: admin.c 7438 2008-04-09 03:27:37Z mike $"
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
@@ -3449,5 +3449,5 @@ match_string(const char *a,		/* I - First string */
 
     
 /*
- * End of "$Id: admin.c 7012 2007-10-10 21:22:45Z mike $".
+ * End of "$Id: admin.c 7438 2008-04-09 03:27:37Z mike $".
  */

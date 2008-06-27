@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in 6720 2007-07-25 00:40:03Z mike $"
+# "$Id: cupsd.conf.in 7680 2008-06-20 17:37:43Z mike $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.  See "man cupsd.conf" for a complete description of this
@@ -82,10 +82,9 @@ DefaultAuthType Basic
 <Policy authenticated>
   # Job-related operations must be done by the owner or an administrator...
   <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job CUPS-Get-Document>
+    AuthType Default
     Require user @OWNER @SYSTEM
     Order deny,allow
-    AuthType Default
-    Satisfy any
   </Limit>
 
   # All administration operations require an administrator to authenticate...
@@ -104,19 +103,17 @@ DefaultAuthType Basic
 
   # Only the owner or an administrator can cancel or authenticate a job...
   <Limit Cancel-Job CUPS-Authenticate-Job>
+    AuthType Default
     Require user @OWNER @CUPS_DEFAULT_PRINTADMIN_AUTH@
     Order deny,allow
-    AuthType Default
-    Satisfy any
   </Limit>
 
   <Limit All>
-    Order deny,allow
     AuthType Default
-    Satisfy any
+    Order deny,allow
   </Limit>
 </Policy>
 
 #
-# End of "$Id: cupsd.conf.in 6720 2007-07-25 00:40:03Z mike $".
+# End of "$Id: cupsd.conf.in 7680 2008-06-20 17:37:43Z mike $".
 #

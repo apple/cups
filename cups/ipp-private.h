@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-private.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: ipp-private.h 7259 2008-01-28 22:26:04Z mike $"
  *
  *   Private IPP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -66,5 +66,5 @@ extern void		_ippFreeAttr(ipp_attribute_t *);
 #endif /* !_CUPS_IPP_H_ */
 
 /*
- * End of "$Id: ipp-private.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: ipp-private.h 7259 2008-01-28 22:26:04Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: adminutil.c 6930 2007-09-08 00:28:06Z mike $"
+ * "$Id: adminutil.c 7576 2008-05-15 21:05:14Z mike $"
  *
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
@@ -2382,5 +2382,5 @@ write_option(cups_file_t     *dstfp,	/* I - PPD file */
 
 
 /*
- * End of "$Id: adminutil.c 6930 2007-09-08 00:28:06Z mike $".
+ * End of "$Id: adminutil.c 7576 2008-05-15 21:05:14Z mike $".
  */

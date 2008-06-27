@@ -1,5 +1,5 @@
 /*
- * "$Id: http.c 6724 2007-07-25 20:39:33Z mike $"
+ * "$Id: http.c 7661 2008-06-16 21:46:51Z mike $"
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
@@ -3239,5 +3239,5 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 
 
 /*
- * End of "$Id: http.c 6724 2007-07-25 20:39:33Z mike $".
+ * End of "$Id: http.c 7661 2008-06-16 21:46:51Z mike $".
  */

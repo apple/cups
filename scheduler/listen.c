@@ -1,5 +1,5 @@
 /*
- * "$Id: listen.c 6788 2007-08-13 17:20:14Z mike $"
+ * "$Id: listen.c 7673 2008-06-18 22:31:26Z mike $"
  *
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -151,7 +151,7 @@ cupsdStartListening(void)
 
   if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to find IP address for server name \"%s\"!\n",
+                    "Unable to find IP address for server name \"%s\"!",
 		    ServerName);
 
  /*
@@ -428,5 +428,5 @@ cupsdStopListening(void)
 
 
 /*
- * End of "$Id: listen.c 6788 2007-08-13 17:20:14Z mike $".
+ * End of "$Id: listen.c 7673 2008-06-18 22:31:26Z mike $".
  */

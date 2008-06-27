@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 6964 2007-09-17 21:33:57Z mike $"
+dnl "$Id: cups-common.m4 7695 2008-06-26 00:46:24Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -83,14 +83,11 @@ LIBMALLOC=""
 AC_ARG_ENABLE(mallinfo, [  --enable-mallinfo       turn on malloc debug information, default=no])
 
 if test x$enable_mallinfo = xyes; then
-	AC_CHECK_LIB(c,mallinfo,LIBS="$LIBS"; AC_DEFINE(HAVE_MALLINFO),LIBS="$LIBS")
-	if test "$ac_cv_lib_c_mallinfo" = "no"; then
-		AC_CHECK_LIB(malloc,mallinfo,
-	        	     LIBS="$LIBS"
-			     LIBMALLOC="-lmalloc"
-			     AC_DEFINE(HAVE_MALLINFO),
-			     LIBS="$LIBS")
-	fi
+	SAVELIBS="$LIBS"
+	LIBS=""
+	AC_SEARCH_LIBS(mallinfo, malloc, AC_DEFINE(HAVE_MALLINFO))
+	LIBMALLOC="$LIBS"
+	LIBS="$SAVELIBS"
 fi
 
 AC_SUBST(LIBMALLOC)
@@ -169,6 +166,27 @@ AC_TRY_COMPILE([#include <time.h>],[struct tm t;
 
 dnl See if we have the removefile(3) function for securely removing files
 AC_CHECK_FUNCS(removefile)
+
+dnl See if we have libusb...
+AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing, default=auto])
+
+LIBUSB=""
+AC_SUBST(LIBUSB)
+
+if test x$enable_libusb = xyes; then
+	check_libusb=yes
+elif test x$enable_libusb != xno -a $uname != Darwin; then
+	check_libusb=yes
+else
+	check_libusb=no
+fi
+
+if test $check_libusb = yes; then
+	AC_CHECK_LIB(usb, usb_init,[
+		AC_CHECK_HEADER(usb.h,
+			AC_DEFINE(HAVE_USB_H)
+			LIBUSB="-lusb")])
+fi
 
 dnl Flags for "ar" command...
 case $uname in
@@ -282,5 +300,5 @@ AC_SUBST(FONTS)
 AC_SUBST(LEGACY_BACKENDS)
 
 dnl
-dnl End of "$Id: cups-common.m4 6964 2007-09-17 21:33:57Z mike $".
+dnl End of "$Id: cups-common.m4 7695 2008-06-26 00:46:24Z mike $".
 dnl

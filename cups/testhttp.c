@@ -1,5 +1,5 @@
 /*
- * "$Id: testhttp.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: testhttp.c 7685 2008-06-23 16:49:18Z mike $"
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
@@ -301,7 +301,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * httpAddrGetList()
     */
 
-    fputs("httpAddrGetList(): ", stdout);
+    printf("httpAddrGetList(%s): ", hostname);
 
     addrlist = httpAddrGetList(hostname, AF_UNSPEC, NULL);
     if (addrlist)
@@ -526,5 +526,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: testhttp.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: testhttp.c 7685 2008-06-23 16:49:18Z mike $".
  */

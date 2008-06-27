@@ -1,5 +1,5 @@
 /*
- * "$Id: image-jpeg.c 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: image-jpeg.c 7355 2008-02-28 20:49:40Z mike $"
  *
  *   JPEG image routines for the Common UNIX Printing System (CUPS).
  *
@@ -318,5 +318,5 @@ _cupsImageReadJPEG(
 
 
 /*
- * End of "$Id: image-jpeg.c 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: image-jpeg.c 7355 2008-02-28 20:49:40Z mike $".
  */

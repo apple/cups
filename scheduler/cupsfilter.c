@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsfilter.c 6879 2007-08-29 20:26:50Z mike $"
+ * "$Id: cupsfilter.c 7694 2008-06-26 00:23:20Z mike $"
  *
  *   CUPS filtering program for the Common UNIX Printing System (CUPS).
  *
@@ -353,17 +353,21 @@ main(int  argc,				/* I - Number of command-line args */
   if (read_cupsd_conf(cupsdconf))
     return (1);
 
-  if ((mime = mimeLoad(ServerRoot, Path)) == NULL)
+  snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
+
+  mime = mimeLoadTypes(NULL, mimedir);
+  mime = mimeLoadTypes(mime, ServerRoot);
+  mime = mimeLoadFilters(mime, mimedir, Path);
+  mime = mimeLoadFilters(mime, ServerRoot, Path);
+
+  if (!mime)
   {
     _cupsLangPrintf(stderr,
-                    _("%s: Unable to read MIME database from \"%s\"!\n"),
-		    command, ServerRoot);
+                    _("%s: Unable to read MIME database from \"%s\" or "
+		      "\"%s\"!\n"),
+		    command, mimedir, ServerRoot);
     return (1);
   }
-
-  snprintf(mimedir, sizeof(mimedir), "%s/mime", DataDir);
-  if (!access(mimedir, 0))
-    mime = mimeMerge(mime, mimedir, Path);
 
  /*
   * Get the source and destination types...
@@ -1140,5 +1144,5 @@ usage(const char *command,		/* I - Command name */
 
 
 /*
- * End of "$Id: cupsfilter.c 6879 2007-08-29 20:26:50Z mike $".
+ * End of "$Id: cupsfilter.c 7694 2008-06-26 00:23:20Z mike $".
  */

@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $"
 #
 #   Standards makefile for the Common UNIX Printing System (CUPS).
 #
@@ -143,5 +143,5 @@ rfctohtml:	rfctohtml.o ../cups/libcups.a
 
 
 #
-# End of "$Id: Makefile 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $".
 #
