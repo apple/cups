@@ -706,6 +706,16 @@ else
 	echo "<P>PASS: $count debug2 messages.</P>" >>$strfile
 fi
 
+# Page log file...
+if grep -q 'testfile.pdf Letter' /tmp/cups-$user/log/page_log; then
+	echo "PASS: page_log formatted correctly."
+	echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
+else
+	echo "FAIL: page_log formatted incorrectly."
+	echo "<P>FAIL: page_log formatted incorrectly.</P>" >>$strfile
+	fail=`expr $fail + 1`
+fi
+
 # Log files...
 echo "<H2>access_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile

@@ -344,8 +344,10 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	      * Pull the name from inside the brackets...
 	      */
 
-	      memcpy(name, format + 1, nameend - format - 2);
-	      name[nameend - format - 2] = '\0';
+	      memcpy(name, format + 1, nameend - format - 1);
+	      name[nameend - format - 1] = '\0';
+
+	      format = nameend;
 
 	      if ((attr = ippFindAttribute(job->attrs, name,
 	                                   IPP_TAG_ZERO)) != NULL)
@@ -353,8 +355,6 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	       /*
 	        * Add the attribute value...
 		*/
-
-	        format = nameend;
 
                 for (i = 0;
 		     i < attr->num_values &&
