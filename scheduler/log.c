@@ -190,9 +190,6 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   if (TestConfigFile || level > LogLevel || !ErrorLog)
     return (1);
 
-  if (level > LogLevel || !ErrorLog)
-    return (1);
-
  /*
   * Format and write the log message...
   */
