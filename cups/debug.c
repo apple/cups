@@ -30,13 +30,18 @@
 #include <unistd.h>
 
 
-#ifdef DEBUG
 /*
- * Local globals...
+ * Globals...
  */
 
 int			_cups_debug_fd = -1;
 					/* Debug log file descriptor */
+
+
+#ifdef DEBUG
+/*
+ * Local globals...
+ */
 
 static int		debug_init = 0;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
