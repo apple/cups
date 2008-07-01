@@ -30,6 +30,15 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
  * Prototypes...
  */
 
@@ -46,6 +55,10 @@ extern void		cupsdSendIPPString(ipp_tag_t value_tag,
 			                   const char *name, const char *value);
 extern void		cupsdSendIPPTrailer(void);
 
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPSD_UTIL_H_ */
 
