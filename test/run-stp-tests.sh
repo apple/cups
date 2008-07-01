@@ -279,7 +279,11 @@ if test `uname` = Darwin; then
 	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
 
-	ln -s /private/etc/cups/apple.* /tmp/cups-$user
+	if test -f /private/etc/cups/apple.types; then
+		ln -s /private/etc/cups/apple.* /tmp/cups-$user/share/mime
+	elif test -f /usr/share/cups/mime/apple.types; then
+		ln -s /usr/share/cups/mime/apple.* /tmp/cups-$user/share/mime
+	fi
 else
 	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
 	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
