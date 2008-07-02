@@ -213,6 +213,13 @@ mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
 mkdir /tmp/cups-$user/share/banners
 mkdir /tmp/cups-$user/share/drv
+mkdir /tmp/cups-$user/share/locale
+for file in ../locale/cups_*.po; do
+	loc=`basename $file .po | cut -c 6-`
+	mkdir /tmp/cups-$user/share/locale/$loc
+	ln -s $root/locale/cups_$loc.po /tmp/cups-$user/share/locale/$loc
+	ln -s $root/locale/ppdc_$loc.po /tmp/cups-$user/share/locale/$loc
+done
 mkdir /tmp/cups-$user/share/mime
 mkdir /tmp/cups-$user/share/model
 mkdir /tmp/cups-$user/share/ppdc
@@ -313,6 +320,7 @@ ServerBin /tmp/cups-$user/bin
 CacheDir /tmp/cups-$user/share
 DataDir /tmp/cups-$user/share
 FontPath /tmp/cups-$user/share/fonts
+PassEnv LOCALEDIR
 DocumentRoot $root/doc
 RequestRoot /tmp/cups-$user/spool
 TempDir /tmp/cups-$user/spool/temp
@@ -412,6 +420,7 @@ CUPS_SERVER=localhost; export CUPS_SERVER
 CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
 CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR
 CUPS_DATADIR=/tmp/cups-$user/share; export CUPS_DATADIR
+LOCALEDIR=/tmp/cups-$user/share/locale; export LOCALEDIR
 
 #
 # Set a new home directory to avoid getting user options mixed in...

@@ -51,10 +51,6 @@ ppdc-string.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc-string.o: ../cups/versioning.h
 ppdc-variable.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc-variable.o: ../cups/versioning.h
-drv.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
-drv.o: ../cups/versioning.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-drv.o: ../cups/string.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-drv.o: ../cups/language.h ../cups/dir.h
 ppdc.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdc.o: ../cups/versioning.h
 ppdhtml.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
@@ -66,3 +62,5 @@ ppdmerge.o: ../cups/string.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 ppdmerge.o: ../cups/language.h ../cups/array.h ../cups/string.h ../config.h
 ppdpo.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdpo.o: ../cups/versioning.h
+testcatalog.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
+testcatalog.o: ../cups/versioning.h

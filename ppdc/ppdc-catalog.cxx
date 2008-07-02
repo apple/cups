@@ -210,13 +210,19 @@ ppdcCatalog::load_messages(
 	  if ((ch = get_utf16(fp, cs)) == 0)
 	    break;
 
-          if (ch == 'n')
+	  if (ch == 'n')
 	    ch = '\n';
 	  else if (ch == 't')
 	    ch = '\t';
         }
+	else if (ch == '\"')
+	{
+	  *ptr = '\0';
+	  ptr  = NULL;
+	}
 
-        put_utf8(ch, ptr, end);
+        if (ptr)
+	  put_utf8(ch, ptr, end);
       }
       else if (ch == '/')
       {
@@ -247,13 +253,8 @@ ppdcCatalog::load_messages(
       }
       else if (ch == '\"')
       {
-        // Start or finish quoted string...
-	if (ptr)
-	{
-	  *ptr = '\0';
-	  ptr  = NULL;
-	}
-	else if (id[0])
+        // Start quoted string...
+	if (id[0])
 	{
 	  ptr = str;
 	  end = str + sizeof(str) - 1;
@@ -697,7 +698,8 @@ get_utf16(cups_file_t *fp,		// I  - File to read from
   if (cs == PPDC_CS_UTF8)
   {
     // UTF-8 character...
-    ch = cupsFileGetChar(fp);
+    if ((ch = cupsFileGetChar(fp)) < 0)
+      return (0);
 
     if ((ch & 0xe0) == 0xc0)
     {

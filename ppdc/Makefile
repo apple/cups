@@ -50,7 +50,8 @@ OBJS =		\
 		ppdhtml.o \
 		ppdi.o \
 		ppdmerge.o \
-		ppdpo.o
+		ppdpo.o \
+		testcatalog.o
 LIBTARGETS =	\
 		$(LIBCUPSPPDC) \
 		libcupsppdc.a \
@@ -61,7 +62,8 @@ TARGETS	=	\
 		ppdhtml \
 		ppdi \
 		ppdmerge \
-		ppdpo
+		ppdpo \
+		testcatalog
 
 
 #
@@ -269,6 +271,16 @@ ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ ppdpo.o -L. -lcupsppdc $(LIBS)
+
+
+#
+# testcatalog, test ppdcCatalog class.
+#
+
+testcatalog:		testcatalog.o libcupsppdc.a ../cups/libcups.a
+	echo Linking $@...
+	$(CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
