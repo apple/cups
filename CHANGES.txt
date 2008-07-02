@@ -1,8 +1,12 @@
-CHANGES.txt - 2008-06-25
+CHANGES.txt - 2008-07-02
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The PPD compiler did not include OID query keywords in PPD
+	  files (STR #2871)
+	- The cups-driverd helper program now directly supports driver
+	  information files.
 	- The USB backend now uses libusb when available (STR #1575)
 	- Added ppdLocalizeAttr function to get the localized version
 	  of an attribute.
