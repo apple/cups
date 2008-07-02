@@ -46,14 +46,13 @@ LIBOBJS =	\
 		type.o
 LIB32OBJS	= $(LIBOBJS:.o=.32.o)
 LIB64OBJS	= $(LIBOBJS:.o=.64.o)
-OBJS	=	\
+COBJS	=	\
 		$(CUPSDOBJS) \
 		$(LIBOBJS) \
 		$(LIB32OBJS) \
 		$(LIB64OBJS) \
 		cupsfilter.o \
 		cups-deviced.o \
-		cups-driverd.o \
 		cups-lpd.o \
 		cups-polld.o \
 		testdirsvc.o \
@@ -62,7 +61,11 @@ OBJS	=	\
 		testspeed.o \
 		testsub.o \
 		util.o
-
+CXXOBJS	=	\
+		cups-driverd.o
+OBJS	=	\
+		$(COBJS) \
+		$(CXXOBJS)
 LIBTARGETS =	\
 		$(LIBCUPSMIME) \
 		$(LIB32CUPSMIME) \
@@ -114,13 +117,17 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
+	touch Dependencies.tmp Dependencies.tmplib
+	makedepend -Y -I.. -fDependencies.tmp $(COBJS:.o=.c) \
+		$(CXXOBJS:.o=.cxx) >/dev/null 2>&1
+	makedepend -Y -I.. -fDependencies.tmplib $(LIBOBJS:.o=.c) >/dev/null 2>&1
 	$(RM) Dependencies
 	cp Dependencies.tmp Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
-	$(RM) Dependencies.tmp
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' \
+		Dependencies.tmplib >>Dependencies
+	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' \
+		Dependencies.tmplib >>Dependencies
+	$(RM) Dependencies.tmp Dependencies.tmplib
 
 
 #
@@ -360,9 +367,10 @@ cups-deviced:	cups-deviced.o util.o ../cups/$(LIBCUPS)
 # Make the driver daemon, "cups-driverd".
 #
 
-cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS)
+cups-driverd:	cups-driverd.o util.o ../cups/$(LIBCUPS) ../ppdc/$(LIBCUPSPPDC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o cups-driverd cups-driverd.o util.o $(LIBS)
+	$(CXX) $(LDFLAGS) -o cups-driverd cups-driverd.o util.o \
+		-L../ppdc -lcupsppdc $(LIBS)
 
 
 #

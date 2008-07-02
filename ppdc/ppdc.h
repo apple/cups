@@ -413,7 +413,7 @@ class ppdcFile				//// File
   const char	*filename;		// Filename
   int		line;			// Line in file
 
-  ppdcFile(const char *f);
+  ppdcFile(const char *f, cups_file_t *ffp = (cups_file_t *)0);
   ~ppdcFile();
 
   int		get();
@@ -439,7 +439,7 @@ class ppdcSource			//// Source File
 		cond_stack[101];	// #if state stack
 
 
-  ppdcSource(const char *f = 0);
+  ppdcSource(const char *f = 0, cups_file_t *ffp = (cups_file_t *)0);
   ~ppdcSource();
 
   static void	add_include(const char *d);
@@ -478,7 +478,7 @@ class ppdcSource			//// Source File
   ppdcVariable	*get_variable(ppdcFile *fp);
   int		import_ppd(const char *f);
   int		quotef(cups_file_t *fp, const char *format, ...);
-  void		read_file(const char *f);
+  void		read_file(const char *f, cups_file_t *ffp = (cups_file_t *)0);
   void		scan_file(ppdcFile *fp, ppdcDriver *td = 0, bool inc = false);
   ppdcVariable	*set_variable(const char *name, const char *value);
   int		write_file(const char *f);

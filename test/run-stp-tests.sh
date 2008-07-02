@@ -233,7 +233,6 @@ ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
-ln -s $root/ppdc/drv /tmp/cups-$user/bin/driver
 ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon

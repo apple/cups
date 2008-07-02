@@ -20,12 +20,15 @@
  *
  *   main()          - Scan for drivers and return an IPP response.
  *   add_ppd()       - Add a PPD file.
+ *   cat_drv()       - Generate a PPD from a driver info file.
  *   cat_ppd()       - Copy a PPD file to stdout.
+ *   copy_static()   - Copy a static PPD file to stdout.
  *   compare_names() - Compare PPD filenames for sorting.
  *   compare_ppds()  - Compare PPD file make and model names for sorting.
  *   free_array()    - Free an array of strings.
  *   list_ppds()     - List PPD files.
  *   load_ppds()     - Load PPD files recursively.
+ *   load_drv()      - Load the PPDs from a driver information file.
  *   load_drivers()  - Load driver-generated PPD files.
  */
 
@@ -37,6 +40,7 @@
 #include <cups/dir.h>
 #include <cups/transcode.h>
 #include <cups/ppd-private.h>
+#include <ppdc/ppdc.h>
 
 
 /*
@@ -113,7 +117,9 @@ static ppd_info_t	*add_ppd(const char *name, const char *language,
 				 const char *device_id, const char *product,
 				 const char *psversion, time_t mtime,
 				 size_t size, int model_number, int type);
+static int		cat_drv(const char *name, int request_id);
 static int		cat_ppd(const char *name, int request_id);
+static int		cat_static(const char *name, int request_id);
 static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
@@ -121,6 +127,8 @@ static int		compare_ppds(const ppd_info_t *p0,
 static void		free_array(cups_array_t *a);
 static int		list_ppds(int request_id, int limit, const char *opt);
 static int		load_drivers(void);
+static int		load_drv(const char *filename, const char *name,
+			         cups_file_t *fp, time_t mtime, off_t size);
 static int		load_ppds(const char *d, const char *p, int descend);
 
 
@@ -190,9 +198,9 @@ add_ppd(const char *name,		/* I - PPD name */
     AllocPPDs += 128;
 
     if (!PPDs)
-      ppd = malloc(sizeof(ppd_info_t) * AllocPPDs);
+      ppd = (ppd_info_t *)malloc(sizeof(ppd_info_t) * AllocPPDs);
     else
-      ppd = realloc(PPDs, sizeof(ppd_info_t) * AllocPPDs);
+      ppd = (ppd_info_t *)realloc(PPDs, sizeof(ppd_info_t) * AllocPPDs);
 
     if (ppd == NULL)
     {
@@ -249,6 +257,140 @@ add_ppd(const char *name,		/* I - PPD name */
 
 
 /*
+ * 'cat_drv()' - Generate a PPD from a driver info file.
+ */
+
+static int				/* O - Exit code */
+cat_drv(const char *name,		/* I - PPD name */
+        int        request_id)		/* I - Request ID for response? */
+{
+  const char	*datadir;		// CUPS_DATADIR env var
+  ppdcSource	*src;			// PPD source file data
+  ppdcDriver	*d;			// Current driver
+  cups_file_t	*out;			// Stdout via CUPS file API 
+  char		message[2048],		// status-message
+		filename[1024],		// Full path to .drv file(s)
+		scheme[32],		// URI scheme ("drv")
+		userpass[256],		// User/password info (unused)
+		host[2],		// Hostname (unused)
+		resource[1024],		// Resource path (/dir/to/filename.drv)
+		*pc_file_name;		// Filename portion of URI
+  int		port;			// Port number (unused)
+
+
+  // Determine where CUPS has installed the data files...
+  if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+    datadir = CUPS_DATADIR;
+
+  // Pull out the 
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, name, scheme, sizeof(scheme),
+                      userpass, sizeof(userpass), host, sizeof(host), &port,
+		      resource, sizeof(resource)) < HTTP_URI_OK ||
+      strstr(resource, "../") ||
+      (pc_file_name = strrchr(resource, '/')) == NULL ||
+      pc_file_name == resource)
+  {
+    fprintf(stderr, "ERROR: Bad PPD name \"%s\"!\n", name);
+
+    if (request_id)
+    {
+      snprintf(message, sizeof(message), "Bad PPD name \"%s\"!", name);
+
+      cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+      cupsdSendIPPTrailer();
+    }
+
+    return (1);
+  }
+
+  *pc_file_name++ = '\0';
+
+#ifdef __APPLE__
+  if (!strncmp(resource, "/Library/Printers/PPDs.drv/", 27))
+    strlcpy(filename, resource, sizeof(filename));
+  else
+#endif // __APPLE__
+  {
+    snprintf(filename, sizeof(filename), "%s/drv%s", datadir, resource);
+    if (access(filename, 0))
+      snprintf(filename, sizeof(filename), "%s/model%s", datadir, resource);
+  }
+
+  src = new ppdcSource(filename);
+
+  for (d = (ppdcDriver *)src->drivers->first();
+       d;
+       d = (ppdcDriver *)src->drivers->next())
+    if (!strcasecmp(pc_file_name, d->pc_file_name->value) ||
+        (d->file_name && !strcasecmp(pc_file_name, d->file_name->value)))
+      break;
+
+  if (d)
+  {
+    ppdcArray	*locales;		// Locale names
+    ppdcCatalog	*catalog;		// Message catalog in .drv file
+
+
+    fprintf(stderr, "DEBUG: %d locales defined in \"%s\"...\n",
+            src->po_files->count, filename);
+
+    locales = new ppdcArray();
+    for (catalog = (ppdcCatalog *)src->po_files->first();
+         catalog;
+	 catalog = (ppdcCatalog *)src->po_files->next())
+    {
+      fprintf(stderr, "DEBUG: Adding locale \"%s\"...\n",
+              catalog->locale->value);
+      locales->add(catalog->locale);
+    }
+
+    if (request_id)
+    {
+      cupsdSendIPPHeader(IPP_OK, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPTrailer();
+      fflush(stdout);
+    }
+
+    out = cupsFileStdout();
+    d->write_ppd_file(out, NULL, locales, src, PPDC_LFONLY);
+    cupsFileClose(out);
+
+    delete locales;
+  }
+  else
+  {
+    fprintf(stderr, "ERROR: PPD \"%s\" not found!\n", name);
+
+    if (request_id)
+    {
+      snprintf(message, sizeof(message), "PPD \"%s\" not found!", name);
+
+      cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+      cupsdSendIPPTrailer();
+    }
+  }
+
+  delete src;
+
+  return (!d);
+}
+
+
+/*
  * 'cat_ppd()' - Copy a PPD file to stdout.
  */
 
@@ -257,9 +399,9 @@ cat_ppd(const char *name,		/* I - PPD name */
         int        request_id)		/* I - Request ID for response? */
 {
   char		scheme[256],		/* Scheme from PPD name */
-		*sptr;			/* Pointer into scheme */
-  char		line[1024];		/* Line/filename */
-  char		message[2048];		/* status-message */
+		*sptr,			/* Pointer into scheme */
+		line[1024],		/* Line/filename */
+		message[2048];		/* status-message */
 
 
  /*
@@ -287,7 +429,11 @@ cat_ppd(const char *name,		/* I - PPD name */
   if (request_id > 0)
     puts("Content-Type: application/ipp\n");
 
-  if (scheme[0])
+  if (!scheme[0])
+    return (cat_static(name, request_id));
+  else if (!strcmp(scheme, "drv"))
+    return (cat_drv(name, request_id));
+  else
   {
    /*
     * Dynamic PPD, see if we have a driver program to support it...
@@ -357,136 +503,144 @@ cat_ppd(const char *name,		/* I - PPD name */
       return (1);
     }
   }
-  else
-  {
-   /*
-    * Static PPD, see if we have a valid path and it exists...
-    */
-
-    cups_file_t	*fp;			/* PPD file */
-    const char	*datadir;		/* CUPS_DATADIR env var */
-
-
-    if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
-    {
-     /*
-      * Bad name...
-      */
-
-      fprintf(stderr, "ERROR: [cups-driverd] Bad PPD name \"%s\"!\n", name);
-
-      if (request_id)
-      {
-	snprintf(message, sizeof(message), "Bad PPD name \"%s\"!", name);
-
-	cupsdSendIPPHeader(IPP_OK, request_id);
-	cupsdSendIPPGroup(IPP_TAG_OPERATION);
-	cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-	cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-			   "en-US");
-        cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
-	cupsdSendIPPTrailer();
-      }
-
-      return (1);
-    }
-
-   /*
-    * Try opening the file...
-    */
-
-#ifdef __APPLE__
-    if (!strncmp(name, "System/Library/Printers/PPDs/Contents/Resources/", 48) ||
-        !strncmp(name, "Library/Printers/PPDs/Contents/Resources/", 41))
-    {
-     /*
-      * Map ppd-name to Mac OS X standard locations...
-      */
-
-      snprintf(line, sizeof(line), "/%s", name);
-    }
-    else
-
-#elif defined(__linux)
-    if (!strncmp(name, "lsb/usr/", 8))
-    {
-     /*
-      * Map ppd-name to LSB standard /usr/share/ppd location...
-      */
-
-      snprintf(line, sizeof(line), "/usr/share/ppd/%s", name + 8);
-    }
-    else if (!strncmp(name, "lsb/opt/", 8))
-    {
-     /*
-      * Map ppd-name to LSB standard /opt/share/ppd location...
-      */
-
-      snprintf(line, sizeof(line), "/opt/share/ppd/%s", name + 8);
-    }
-    else if (!strncmp(name, "lsb/local/", 10))
-    {
-     /*
-      * Map ppd-name to LSB standard /usr/local/share/ppd location...
-      */
-
-      snprintf(line, sizeof(line), "/usr/local/share/ppd/%s", name + 10);
-    }
-    else
-
-#endif /* __APPLE__ */
-    {
-      if ((datadir = getenv("CUPS_DATADIR")) == NULL)
-	datadir = CUPS_DATADIR;
-
-      snprintf(line, sizeof(line), "%s/model/%s", datadir, name);
-    }
-
-    if ((fp = cupsFileOpen(line, "r")) == NULL)
-    {
-      fprintf(stderr, "ERROR: [cups-driverd] Unable to open \"%s\" - %s\n",
-              line, strerror(errno));
-
-      if (request_id)
-      {
-	snprintf(message, sizeof(message), "Unable to open \"%s\" - %s",
-		 line, strerror(errno));
-
-	cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
-	cupsdSendIPPGroup(IPP_TAG_OPERATION);
-	cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-	cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-			   "en-US");
-        cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
-	cupsdSendIPPTrailer();
-      }
-
-      return (1);
-    }
-
-    if (request_id)
-    {
-      cupsdSendIPPHeader(IPP_OK, request_id);
-      cupsdSendIPPGroup(IPP_TAG_OPERATION);
-      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
-                         "en-US");
-      cupsdSendIPPTrailer();
-    }
-
-   /*
-    * Now copy the file to stdout...
-    */
-
-    while (cupsFileGets(fp, line, sizeof(line)))
-      puts(line);
-
-    cupsFileClose(fp);
-  }
 
  /*
   * Return with no errors...
   */
+
+  return (0);
+}
+
+
+/*
+ * 'copy_static()' - Copy a static PPD file to stdout.
+ */
+
+static int				/* O - Exit code */
+cat_static(const char *name,		/* I - PPD name */
+           int        request_id)	/* I - Request ID for response? */
+{
+  cups_file_t	*fp;			/* PPD file */
+  const char	*datadir;		/* CUPS_DATADIR env var */
+  char		line[1024],		/* Line/filename */
+		message[2048];		/* status-message */
+
+
+  if (name[0] == '/' || strstr(name, "../") || strstr(name, "/.."))
+  {
+   /*
+    * Bad name...
+    */
+
+    fprintf(stderr, "ERROR: [cups-driverd] Bad PPD name \"%s\"!\n", name);
+
+    if (request_id)
+    {
+      snprintf(message, sizeof(message), "Bad PPD name \"%s\"!", name);
+
+      cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+      cupsdSendIPPTrailer();
+    }
+
+    return (1);
+  }
+
+ /*
+  * Try opening the file...
+  */
+
+#ifdef __APPLE__
+  if (!strncmp(name, "System/Library/Printers/PPDs/Contents/Resources/", 48) ||
+      !strncmp(name, "Library/Printers/PPDs/Contents/Resources/", 41))
+  {
+   /*
+    * Map ppd-name to Mac OS X standard locations...
+    */
+
+    snprintf(line, sizeof(line), "/%s", name);
+  }
+  else
+
+#elif defined(__linux)
+  if (!strncmp(name, "lsb/usr/", 8))
+  {
+   /*
+    * Map ppd-name to LSB standard /usr/share/ppd location...
+    */
+
+    snprintf(line, sizeof(line), "/usr/share/ppd/%s", name + 8);
+  }
+  else if (!strncmp(name, "lsb/opt/", 8))
+  {
+   /*
+    * Map ppd-name to LSB standard /opt/share/ppd location...
+    */
+
+    snprintf(line, sizeof(line), "/opt/share/ppd/%s", name + 8);
+  }
+  else if (!strncmp(name, "lsb/local/", 10))
+  {
+   /*
+    * Map ppd-name to LSB standard /usr/local/share/ppd location...
+    */
+
+    snprintf(line, sizeof(line), "/usr/local/share/ppd/%s", name + 10);
+  }
+  else
+
+#endif /* __APPLE__ */
+  {
+    if ((datadir = getenv("CUPS_DATADIR")) == NULL)
+      datadir = CUPS_DATADIR;
+
+    snprintf(line, sizeof(line), "%s/model/%s", datadir, name);
+  }
+
+  if ((fp = cupsFileOpen(line, "r")) == NULL)
+  {
+    fprintf(stderr, "ERROR: [cups-driverd] Unable to open \"%s\" - %s\n",
+	    line, strerror(errno));
+
+    if (request_id)
+    {
+      snprintf(message, sizeof(message), "Unable to open \"%s\" - %s",
+	       line, strerror(errno));
+
+      cupsdSendIPPHeader(IPP_NOT_FOUND, request_id);
+      cupsdSendIPPGroup(IPP_TAG_OPERATION);
+      cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+			 "en-US");
+      cupsdSendIPPString(IPP_TAG_TEXT, "status-message", message);
+      cupsdSendIPPTrailer();
+    }
+
+    return (1);
+  }
+
+  if (request_id)
+  {
+    cupsdSendIPPHeader(IPP_OK, request_id);
+    cupsdSendIPPGroup(IPP_TAG_OPERATION);
+    cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
+    cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+		       "en-US");
+    cupsdSendIPPTrailer();
+  }
+
+ /*
+  * Now copy the file to stdout...
+  */
+
+  while (cupsFileGets(fp, line, sizeof(line)))
+    puts(line);
+
+  cupsFileClose(fp);
 
   return (0);
 }
@@ -631,7 +785,7 @@ list_ppds(int        request_id,	/* I - Request ID */
       * We have a ppds.dat file, so read it!
       */
 
-      if ((PPDs = malloc(sizeof(ppd_info_t) * NumPPDs)) == NULL)
+      if ((PPDs = (ppd_info_t *)malloc(sizeof(ppd_info_t) * NumPPDs)) == NULL)
 	fprintf(stderr,
 		"ERROR: [cups-driverd] Unable to allocate memory for %d "
 		"PPD files!\n", NumPPDs);
@@ -663,6 +817,9 @@ list_ppds(int        request_id,	/* I - Request ID */
     cups_datadir = CUPS_DATADIR;
 
   snprintf(model, sizeof(model), "%s/model", cups_datadir);
+  load_ppds(model, "", 1);
+
+  snprintf(model, sizeof(model), "%s/drv", cups_datadir);
   load_ppds(model, "", 1);
 
 #ifdef __APPLE__
@@ -1105,6 +1262,8 @@ load_ppds(const char *d,		/* I - Actual directory */
   };
 
 
+  fprintf(stderr, "DEBUG: [cups-driverd] Loading \"%s\"...\n", d);
+
   if ((dir = cupsDirOpen(d)) == NULL)
   {
     if (errno != ENOENT)
@@ -1159,8 +1318,8 @@ load_ppds(const char *d,		/* I - Actual directory */
     {
       strcpy(key.record.name, name);
 
-      ppd = bsearch(&key, PPDs, SortedPPDs, sizeof(ppd_info_t),
-                    (int (*)(const void *, const void *))compare_names);
+      ppd = (ppd_info_t *)bsearch(&key, PPDs, SortedPPDs, sizeof(ppd_info_t),
+                                  (cupsd_compare_func_t)compare_names);
 
       if (ppd &&
           ppd->record.size == dent->fileinfo.st_size &&
@@ -1190,11 +1349,11 @@ load_ppds(const char *d,		/* I - Actual directory */
     if (strncmp(line, "*PPD-Adobe:", 11))
     {
      /*
-      * Nope, close the file and continue...
+      * Nope, treat it as a driver information file...
       */
 
-      cupsFileClose(fp);
-
+      load_drv(filename, name, fp, dent->fileinfo.st_mtime,
+               dent->fileinfo.st_size);
       continue;
     }
 
@@ -1526,6 +1685,114 @@ load_ppds(const char *d,		/* I - Actual directory */
   }
 
   cupsDirClose(dir);
+
+  return (1);
+}
+
+
+/*
+ * 'load_drv()' - Load the PPDs from a driver information file.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+load_drv(const char  *filename,		/* I - Actual filename */
+         const char  *name,		/* I - Name to the rest of the world */
+         cups_file_t *fp,		/* I - File to read from */
+	 time_t      mtime,		/* I - Mod time of driver info file */
+	 off_t       size)		/* I - Size of driver info file */
+{
+  ppdcSource	*src;			// Driver information file
+  ppdcDriver	*d;			// Current driver
+  ppdcAttr	*device_id,		// 1284DeviceID attribute
+		*product,		// Current product value
+		*ps_version,		// PSVersion attribute
+		*cups_fax,		// cupsFax attribute
+		*nick_name;		// NickName attribute
+  ppdcFilter	*filter;		// Current filter
+  bool		product_found;		// Found product?
+  char		uri[1024],		// Driver URI
+		make_model[1024];	// Make and model
+  int		type;			// Driver type
+
+
+  src = new ppdcSource(filename, fp);
+
+  if (src->drivers->count == 0)
+  {
+    fprintf(stderr,
+            "ERROR: [cups-driverd] Bad driver information file \"%s\"!\n",
+	    filename);
+    delete src;
+    return (0);
+  }
+
+  for (d = (ppdcDriver *)src->drivers->first();
+       d;
+       d = (ppdcDriver *)src->drivers->next())
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "drv", "", "", 0,
+                     "/%s/%s", name,
+		     d->file_name ? d->file_name->value :
+		                    d->pc_file_name->value);
+
+    device_id  = d->find_attr("1284DeviceID", NULL);
+    ps_version = d->find_attr("PSVersion", NULL);
+    nick_name  = d->find_attr("NickName", NULL);
+
+    if (nick_name)
+      strlcpy(make_model, nick_name->value->value, sizeof(make_model));
+    else if (strncasecmp(d->model_name->value, d->manufacturer->value,
+                         strlen(d->manufacturer->value)))
+      snprintf(make_model, sizeof(make_model), "%s %s, %s",
+               d->manufacturer->value, d->model_name->value,
+	       d->version->value);
+    else
+      snprintf(make_model, sizeof(make_model), "%s, %s", d->model_name->value,
+               d->version->value);
+
+    if ((cups_fax = d->find_attr("cupsFax", NULL)) != NULL &&
+        !strcasecmp(cups_fax->value->value, "true"))
+      type = PPD_TYPE_FAX;
+    else if (d->type == PPDC_DRIVER_PS)
+      type = PPD_TYPE_POSTSCRIPT;
+    else if (d->type != PPDC_DRIVER_CUSTOM)
+      type = PPD_TYPE_RASTER;
+    else
+    {
+      for (filter = (ppdcFilter *)d->filters->first(),
+               type = PPD_TYPE_POSTSCRIPT;
+	   filter;
+	   filter = (ppdcFilter *)d->filters->next())
+        if (strcasecmp(filter->mime_type->value, "application/vnd.cups-raster"))
+	  type = PPD_TYPE_RASTER;
+        else if (strcasecmp(filter->mime_type->value,
+	                    "application/vnd.cups-pdf"))
+	  type = PPD_TYPE_PDF;
+    }
+
+    for (product = (ppdcAttr *)d->attrs->first(), product_found = false;
+         product;
+	 product = (ppdcAttr *)d->attrs->next())
+      if (!strcmp(product->name->value, "Product"))
+      {
+        product_found = true;
+
+	add_ppd(uri, "en", d->manufacturer->value, make_model,
+		device_id ? device_id->value->value : "",
+		product->value->value,
+		ps_version ? ps_version->value->value : "(3010) 0",
+		mtime, size, d->model_number, type);
+      }
+
+    if (!product_found)
+      add_ppd(uri, "en", d->manufacturer->value, make_model,
+	      device_id ? device_id->value->value : "",
+	      d->model_name->value,
+	      ps_version ? ps_version->value->value : "(3010) 0",
+	      mtime, size, d->model_number, type);
+  }
+
+  delete src;
 
   return (1);
 }

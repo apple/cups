@@ -91,7 +91,8 @@ const char	*ppdcSource::driver_types[] =
 // 'ppdcSource::ppdcSource()' - Load a driver source file.
 //
 
-ppdcSource::ppdcSource(const char *f)	// I - File to read
+ppdcSource::ppdcSource(const char  *f,	// I - File to read
+                       cups_file_t *ffp)// I - File pointer to use
 {
   filename      = new ppdcString(f);
   base_fonts    = new ppdcArray();
@@ -104,7 +105,7 @@ ppdcSource::ppdcSource(const char *f)	// I - File to read
   cond_stack[0] = PPDC_COND_NORMAL;
 
   if (f)
-    read_file(f);
+    read_file(f, ffp);
 }
 
 
@@ -1616,7 +1617,8 @@ ppdcSource::get_po(ppdcFile *fp)	// I - File to read
     strcpy(basedir, ".");
 
   // Find the po file...
-  if (find_include(poname, basedir, pofilename, sizeof(pofilename)))
+  if (!pofilename[0] ||
+      find_include(poname, basedir, pofilename, sizeof(pofilename)))
   {
     // Found it, so load it...
     cat = new ppdcCatalog(locale, pofilename);
@@ -2284,9 +2286,10 @@ ppdcSource::quotef(cups_file_t *fp,	// I - File to write to
 //
 
 void
-ppdcSource::read_file(const char *f)	// I - File to read
+ppdcSource::read_file(const char  *f,	// I - File to read
+                      cups_file_t *ffp)	// I - File pointer to use
 {
-  ppdcFile *fp = new ppdcFile(f);
+  ppdcFile *fp = new ppdcFile(f, ffp);
   scan_file(fp);
   delete fp;
 

@@ -31,9 +31,17 @@
 // 'ppdcFile::ppdcFile()' - Create (open) a file.
 //
 
-ppdcFile::ppdcFile(const char *f)		// I - File to open
+ppdcFile::ppdcFile(const char  *f,		// I - File to open
+                   cups_file_t *ffp)		// I - File pointer to use
 {
-  fp       = cupsFileOpen(f, "r");
+  if (ffp)
+  {
+    fp = ffp;
+    cupsFileRewind(fp);
+  }
+  else
+    fp = cupsFileOpen(f, "r");
+
   filename = f;
   line     = 1;
 
