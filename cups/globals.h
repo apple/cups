@@ -68,12 +68,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			resolved_uri[1024];
 					/* Buffer for cupsBackendDeviceURI */
 
-#ifdef DEBUG
-  /* debug.c */
-  int			debug_init,	/* Did we initialize debugging? */
-			debug_fd;	/* Debug log file descriptor */
-#endif /* DEBUG */
-
   /* file.c */
   cups_file_t		*stdio_files[3];/* stdin, stdout, stderr */
 

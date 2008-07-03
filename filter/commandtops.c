@@ -17,6 +17,8 @@
  *   main()                 - Process a CUPS command file.
  *   auto_configure()       - Automatically configure the printer using
  *                            PostScript query commands and/or SNMP lookups.
+ *   begin_ps()             - Send the standard PostScript prolog.
+ *   end_ps()               - Send the standard PostScript trailer.
  *   print_self_test_page() - Print a self-test page.
  *   report_levels()        - Report supply levels.
  */
@@ -35,6 +37,8 @@
  */
 
 static void	auto_configure(ppd_file_t *ppd, const char *user);
+static void	begin_ps(ppd_file_t *ppd, const char *user);
+static void	end_ps(ppd_file_t *ppd);
 static void	print_self_test_page(ppd_file_t *ppd, const char *user);
 static void	report_levels(ppd_file_t *ppd, const char *user);
 
@@ -155,14 +159,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
   * Put the printer in PostScript mode...
   */
 
-  if (ppd->jcl_begin)
-  {
-    fputs(ppd->jcl_begin, stdout);
-    fputs(ppd->jcl_ps, stdout);
-  }
-
-  puts("%!");
-  fflush(stdout);
+  begin_ps(ppd, user);
 
  /*
   * Then loop through every option in the PPD file and ask for the current
@@ -237,6 +234,39 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
   * Finish the job...
   */
 
+  end_ps(ppd);
+}
+
+
+/*
+ * 'begin_ps()' - Send the standard PostScript prolog.
+ */
+
+static void
+begin_ps(ppd_file_t *ppd,		/* I - PPD file */
+         const char *user)		/* I - Username */
+{
+  (void)user;
+
+  if (ppd->jcl_begin)
+  {
+    fputs(ppd->jcl_begin, stdout);
+    fputs(ppd->jcl_ps, stdout);
+  }
+
+  puts("%!");
+  puts("userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put\n");
+  fflush(stdout);
+}
+
+
+/*
+ * 'end_ps()' - Send the standard PostScript trailer.
+ */
+
+static void
+end_ps(ppd_file_t *ppd)			/* I - PPD file */
+{
   if (ppd->jcl_begin)
     fputs(ppd->jcl_begin, stdout);
   else
@@ -258,13 +288,7 @@ print_self_test_page(ppd_file_t *ppd,	/* I - PPD file */
   * Put the printer in PostScript mode...
   */
 
-  if (ppd->jcl_begin)
-  {
-    fputs(ppd->jcl_begin, stdout);
-    fputs(ppd->jcl_ps, stdout);
-  }
-
-  puts("%!");
+  begin_ps(ppd, user);
 
  /*
   * Send a simple file the draws a box around the imageable area and shows
@@ -287,12 +311,7 @@ print_self_test_page(ppd_file_t *ppd,	/* I - PPD file */
   * Finish the job...
   */
 
-  if (ppd->jcl_begin)
-    fputs(ppd->jcl_begin, stdout);
-  else
-    putchar(0x04);
-
-  fflush(stdout);
+  end_ps(ppd);
 }
 
 
@@ -308,30 +327,18 @@ report_levels(ppd_file_t *ppd,		/* I - PPD file */
   * Put the printer in PostScript mode...
   */
 
-  if (ppd->jcl_begin)
-  {
-    fputs(ppd->jcl_begin, stdout);
-    fputs(ppd->jcl_ps, stdout);
-  }
+  begin_ps(ppd, user);
 
  /*
-  * Send a query job that just reports the product string - network backends
-  * will gather the supply levels via SNMP.
+  * Don't bother sending any additional PostScript commands, since we just
+  * want the backend to have enough time to collect the supply info.
   */
-
-  puts("%!");
-  puts("product =");
 
  /*
   * Finish the job...
   */
 
-  if (ppd->jcl_begin)
-    fputs(ppd->jcl_begin, stdout);
-  else
-    putchar(0x04);
-
-  fflush(stdout);
+  end_ps(ppd);
 }
 
 

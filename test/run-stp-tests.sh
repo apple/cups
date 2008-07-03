@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 7697 2008-06-27 15:56:00Z mike $"
+# "$Id: run-stp-tests.sh 7712 2008-07-02 06:09:39Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -213,6 +213,13 @@ mkdir /tmp/cups-$user/certs
 mkdir /tmp/cups-$user/share
 mkdir /tmp/cups-$user/share/banners
 mkdir /tmp/cups-$user/share/drv
+mkdir /tmp/cups-$user/share/locale
+for file in ../locale/cups_*.po; do
+	loc=`basename $file .po | cut -c 6-`
+	mkdir /tmp/cups-$user/share/locale/$loc
+	ln -s $root/locale/cups_$loc.po /tmp/cups-$user/share/locale/$loc
+	ln -s $root/locale/ppdc_$loc.po /tmp/cups-$user/share/locale/$loc
+done
 mkdir /tmp/cups-$user/share/mime
 mkdir /tmp/cups-$user/share/model
 mkdir /tmp/cups-$user/share/ppdc
@@ -233,7 +240,6 @@ ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
 ln -s $root/backend/usb /tmp/cups-$user/bin/backend
 ln -s $root/cgi-bin /tmp/cups-$user/bin
-ln -s $root/ppdc/drv /tmp/cups-$user/bin/driver
 ln -s $root/monitor /tmp/cups-$user/bin
 ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
@@ -279,7 +285,11 @@ if test `uname` = Darwin; then
 	ln -s /usr/libexec/cups/filter/pstocupsraster /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/pstopdffilter /tmp/cups-$user/bin/filter
 
-	ln -s /private/etc/cups/apple.* /tmp/cups-$user
+	if test -f /private/etc/cups/apple.types; then
+		ln -s /private/etc/cups/apple.* /tmp/cups-$user/share/mime
+	elif test -f /usr/share/cups/mime/apple.types; then
+		ln -s /usr/share/cups/mime/apple.* /tmp/cups-$user/share/mime
+	fi
 else
 	ln -s $root/filter/imagetops /tmp/cups-$user/bin/filter
 	ln -s $root/filter/imagetoraster /tmp/cups-$user/bin/filter
@@ -310,6 +320,7 @@ ServerBin /tmp/cups-$user/bin
 CacheDir /tmp/cups-$user/share
 DataDir /tmp/cups-$user/share
 FontPath /tmp/cups-$user/share/fonts
+PassEnv LOCALEDIR
 DocumentRoot $root/doc
 RequestRoot /tmp/cups-$user/spool
 TempDir /tmp/cups-$user/spool/temp
@@ -409,6 +420,7 @@ CUPS_SERVER=localhost; export CUPS_SERVER
 CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
 CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR
 CUPS_DATADIR=/tmp/cups-$user/share; export CUPS_DATADIR
+LOCALEDIR=/tmp/cups-$user/share/locale; export LOCALEDIR
 
 #
 # Set a new home directory to avoid getting user options mixed in...
@@ -761,5 +773,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 7697 2008-06-27 15:56:00Z mike $"
+# End of "$Id: run-stp-tests.sh 7712 2008-07-02 06:09:39Z mike $"
 #

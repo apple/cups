@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# "$Id: 5.9-lpinfo.sh 6649 2007-07-11 21:46:42Z mike $"
+# "$Id: 5.9-lpinfo.sh 7711 2008-07-02 04:39:27Z mike $"
 #
 #   Test the lpinfo command.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -38,6 +38,18 @@ else
 fi
 echo ""
 
+echo "LPINFO Drivers Test"
+echo ""
+echo "    lpinfo -m | grep -q sample.drv"
+../systemv/lpinfo -m | grep -q sample.drv 2>&1
+if test $? != 0; then
+	echo "    FAILED"
+	exit 1
+else
+	echo "    PASSED"
+fi
+echo ""
+
 #
-# End of "$Id: 5.9-lpinfo.sh 6649 2007-07-11 21:46:42Z mike $".
+# End of "$Id: 5.9-lpinfo.sh 7711 2008-07-02 04:39:27Z mike $".
 #

@@ -3,7 +3,7 @@
 //
 //   Driver info file for CUPS-supplied PPDs.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 1993-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -19,6 +19,29 @@
 #include <hp.h>
 #include <epson.h>
 #include <label.h>
+
+// Localizations are provided for all of the base languages supported by
+// CUPS...
+#po da ""
+#po de ""
+#po es ""
+#po et ""
+#po fi ""
+#po fr ""
+#po he ""
+#po id ""
+#po it ""
+#po ja ""
+#po ko ""
+#po nl ""
+#po no ""
+#po pl ""
+#po pt ""
+#po pt_BR ""
+#po ru ""
+#po sv ""
+#po zh ""
+#po zh_TW ""
 
 // MediaSize sizes used by label drivers...
 #media "w81h252/Address - 1 1/8 x 3 1/2\"" 81 252
@@ -92,14 +115,9 @@
 Attribute "cupsVersion" "" "1.4"
 Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
-Attribute "LanguageLevel" "" "3"
-Attribute "Product" "" "(ESP Ghostscript)"
-Attribute "Product" "" "(GPL Ghostscript)"
-Attribute "PSVersion" "" "(3010.000) 81504"
-Attribute "PSVersion" "" "(3010.000) 860"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright 2007 by Apple Inc."
+Copyright "Copyright 2007-2008 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "These coded instructions, statements, and computer programs are the"
@@ -116,7 +134,7 @@ Version "1.4"
 {
   Manufacturer "Dymo"
   ModelName "Label Printer"
-  PCFileName "DYMO.PPD"
+  PCFileName "dymo.ppd"
   DriverType label
   ModelNumber $DYMO_3x0
   Throughput 8
@@ -167,7 +185,7 @@ Version "1.4"
   // Epson 24-Pin Series
   {
     ModelName "24-Pin Series"
-    PCFileName "EPSON24.PPD"
+    PCFileName "epson24.ppd"
     ModelNumber $EPSON_24PIN
 
     Resolution k 1 8 0 0 60dpi
@@ -180,7 +198,7 @@ Version "1.4"
   // Epson 9-Pin Series
   {
     ModelName "9-Pin Series"
-    PCFileName "EPSON9.PPD"
+    PCFileName "epson9.ppd"
     ModelNumber $EPSON_9PIN
     ColorDevice No
 
@@ -192,7 +210,7 @@ Version "1.4"
   // Epson Stylus Color Series
   {
     ModelName "Stylus Color Series"
-    PCFileName "STCOLOR.PPD"
+    PCFileName "stcolor.ppd"
     ModelNumber $EPSON_COLOR
     ColorDevice Yes
 
@@ -212,7 +230,7 @@ Version "1.4"
   // Epson New Stylus Color Series
   {
     ModelName "New Stylus Color Series"
-    PCFileName "STCOLOR2.PPD"
+    PCFileName "stcolor2.ppd"
     ModelNumber $EPSON_ICOLOR
     ColorDevice Yes
 
@@ -232,7 +250,7 @@ Version "1.4"
   // Epson Stylus Color Series
   {
     ModelName "Stylus Photo Series"
-    PCFileName "STPHOTO.PPD"
+    PCFileName "stphoto.ppd"
     ModelNumber $EPSON_PHOTO
     ColorDevice Yes
 
@@ -252,7 +270,7 @@ Version "1.4"
   // Epson New Stylus Color Series
   {
     ModelName "New Stylus Photo Series"
-    PCFileName "STPHOTO2.PPD"
+    PCFileName "stphoto2.ppd"
     ModelNumber $EPSON_IPHOTO
     ColorDevice Yes
 
@@ -279,7 +297,7 @@ Version "1.4"
     DriverType hp
 
     ModelName "PCL Laser Printer"
-    PCFileName "GENERPCL.PPD"
+    PCFileName "generpcl.ppd"
     Throughput 8
     ModelNumber $HP_LASERJET
     ColorDevice No
@@ -329,7 +347,7 @@ Version "1.4"
     DriverType ps
 
     ModelName "PostScript Printer"
-    PCFileName "GENERIC.PPD"
+    PCFileName "generic.ppd"
     Throughput 8
     ColorDevice No
     Attribute PSVersion "" "(2016.0) 0"
@@ -370,7 +388,7 @@ Version "1.4"
   // HP DeskJet Series
   {
     ModelName "DeskJet Series"
-    PCFileName "DESKJET.PPD"
+    PCFileName "deskjet.ppd"
     ModelNumber $HP_DESKJET
     ManualCopies Yes
     ColorDevice Yes
@@ -423,7 +441,7 @@ Version "1.4"
   // HP LaserJet Series PCL 4/5
   {
     ModelName "LaserJet Series PCL 4/5"
-    PCFileName "LASERJET.PPD"
+    PCFileName "laserjet.ppd"
     Throughput 8
     ModelNumber $HP_LASERJET
     ColorDevice No
@@ -475,7 +493,7 @@ Version "1.4"
   Manufacturer "Intellitech"
   ModelName "IntelliBar Label Printer"
   Attribute ShortNickName "" "Intellibar Label Printer"
-  PCFileName "INTELBAR.PPD"
+  PCFileName "intelbar.ppd"
   DriverType label
   ModelNumber $INTELLITECH_PCL
   Throughput 8
@@ -600,7 +618,7 @@ Version "1.4"
   // Oki 24-Pin Series
   {
     ModelName "24-Pin Series"
-    PCFileName "OKIDAT24.PPD"
+    PCFileName "okidat24.ppd"
     ModelNumber $EPSON_24PIN
 
     Resolution k 1 8 0 0 60dpi
@@ -613,7 +631,7 @@ Version "1.4"
   // Oki 9-Pin Series
   {
     ModelName "9-Pin Series"
-    PCFileName "OKIDATA9.PPD"
+    PCFileName "okidata9.ppd"
     ModelNumber $EPSON_9PIN
     ColorDevice No
 
@@ -634,7 +652,7 @@ Version "1.4"
   // Zebra CPCL Label Printer
   {
     ModelName "CPCL Label Printer"
-    PCFileName "ZEBRACPL.PPD"
+    PCFileName "zebracpl.ppd"
     ModelNumber $ZEBRA_CPCL
 
     HWMargins 0 0 0 0
@@ -763,7 +781,7 @@ Version "1.4"
   // Zebra EPL1 Label Printer
   {
     ModelName "EPL1 Label Printer"
-    PCFileName "ZEBRAEP1.PPD"
+    PCFileName "zebraep1.ppd"
     ModelNumber $ZEBRA_EPL_LINE
 
     HWMargins 0 0 0 0
@@ -860,7 +878,7 @@ Version "1.4"
   // Zebra EPL2 Label Printer
   {
     ModelName "EPL2 Label Printer"
-    PCFileName "ZEBRAEP2.PPD"
+    PCFileName "zebraep2.ppd"
     ModelNumber $ZEBRA_EPL_PAGE
 
     HWMargins 0 0 0 0
@@ -966,7 +984,7 @@ Version "1.4"
   // Zebra ZPL Label Printer
   {
     ModelName "ZPL Label Printer"
-    PCFileName "ZEBRA.PPD"
+    PCFileName "zebra.ppd"
     ModelNumber $ZEBRA_ZPL
 
     HWMargins 0 0 0 0

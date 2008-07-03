@@ -46,24 +46,24 @@ LIBOBJS =	\
 		ppdc-variable.o
 OBJS =		\
 		$(LIBOBJS) \
-		drv.o \
 		ppdc.o \
 		ppdhtml.o \
 		ppdi.o \
 		ppdmerge.o \
-		ppdpo.o
+		ppdpo.o \
+		testcatalog.o
 LIBTARGETS =	\
 		$(LIBCUPSPPDC) \
 		libcupsppdc.a \
 		ppdc-static
 TARGETS	=	\
 		$(LIBTARGETS) \
-		drv \
 		ppdc \
 		ppdhtml \
 		ppdi \
 		ppdmerge \
-		ppdpo
+		ppdpo \
+		testcatalog
 
 
 #
@@ -115,9 +115,6 @@ install:	all install-data install-headers install-libs install-exec
 install-data:
 	$(INSTALL_DIR) $(DATADIR)/drv
 	$(INSTALL_DATA) sample.drv $(DATADIR)/drv
-	if test `uname` = Darwin; then \
-		$(INSTALL_DIR) /Library/Printers/PPDs.drv; \
-	fi
 
 
 #
@@ -132,8 +129,6 @@ install-exec:
 	$(INSTALL_BIN) ppdi $(BINDIR)
 	$(INSTALL_BIN) ppdmerge $(BINDIR)
 	$(INSTALL_BIN) ppdpo $(BINDIR)
-	$(INSTALL_DIR) $(SERVERBIN)/driver
-	$(INSTALL_BIN) drv $(SERVERBIN)/driver
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(TARGETS); do \
@@ -189,13 +184,8 @@ uninstall:
 	$(RM) $(BINDIR)/ppdi
 	$(RM) $(BINDIR)/ppdmerge
 	$(RM) $(BINDIR)/ppdpo
-	$(RM) $(SERVERBIN)/driver/drv
-	$(RMDIR) $(SERVERBIN)/driver
 	$(RM) $(DATADIR)/drv/sample.drv
 	$(RMDIR) $(DATADIR)/drv
-	if test `uname` = Darwin; then \
-		$(RMDIR) /Library/Printers/PPDs.drv; \
-	fi
 	$(RM) $(LIBDIR)/libcupsppdc.1.dylib
 	$(RM) $(LIBDIR)/libcupsppdc.a
 	$(RM) $(LIBDIR)/libcupsppdc.dylib
@@ -227,15 +217,6 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header api-ppdc.header --intro api-ppdc.shtml \
 		ppdc.h $(LIBOBJS:.o=.cxx)
-
-
-#
-# drv, the CUPS driver interface program to the PPD compiler.
-#
-
-drv:			drv.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CXX) $(LDFLAGS) -o $@ drv.o -L. -lcupsppdc $(LIBS)
 
 
 #
@@ -290,6 +271,16 @@ ppdmerge:			ppdmerge.o ../cups/$(LIBCUPS)
 ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ ppdpo.o -L. -lcupsppdc $(LIBS)
+
+
+#
+# testcatalog, test ppdcCatalog class.
+#
+
+testcatalog:		testcatalog.o libcupsppdc.a ../cups/libcups.a
+	echo Linking $@...
+	$(CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

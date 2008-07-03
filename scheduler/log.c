@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 7697 2008-06-27 15:56:00Z mike $"
+ * "$Id: log.c 7699 2008-06-27 20:44:23Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -188,9 +188,6 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   */
 
   if (TestConfigFile || level > LogLevel || !ErrorLog)
-    return (1);
-
-  if (level > LogLevel || !ErrorLog)
     return (1);
 
  /*
@@ -829,5 +826,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 7697 2008-06-27 15:56:00Z mike $".
+ * End of "$Id: log.c 7699 2008-06-27 20:44:23Z mike $".
  */

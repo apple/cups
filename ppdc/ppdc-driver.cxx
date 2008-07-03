@@ -541,9 +541,16 @@ ppdcDriver::write_ppd_file(
           !strcmp(a->name->value, "ModelName") ||
           !strcmp(a->name->value, "NickName") ||
           !strcmp(a->name->value, "ShortNickName") ||
-	  !strcmp(a->name->value, "cupsVersion") ||
-          a->name->value[0] == '?')
+	  !strcmp(a->name->value, "cupsVersion"))
 	continue;
+
+      if (a->name->value[0] == '?' &&
+          (find_option(a->name->value + 1) ||
+	   !strcmp(a->name->value, "?ImageableArea") ||
+	   !strcmp(a->name->value, "?PageRegion") ||
+	   !strcmp(a->name->value, "?PageSize") ||
+	   !strcmp(a->name->value, "?PaperDimension")))
+        continue;
 
       if (!a->selector->value || !a->selector->value[0])
 	cupsFilePrintf(fp, "*%s", a->name->value);

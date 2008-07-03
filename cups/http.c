@@ -2439,10 +2439,9 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
   char	line[255],			/* Line buffer */
 	*start,				/* Start of line after prefix */
 	*ptr;				/* Pointer into line */
-  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
-  if (cg->debug_init && cg->debug_fd < 0)
+  if (_cups_debug_fd < 0)
     return;
 
   DEBUG_printf(("%s: %d bytes:\n", prefix, bytes));

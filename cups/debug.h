@@ -42,6 +42,7 @@
  * Prototypes...
  */
 
+extern int	_cups_debug_fd;
 extern void	_cups_debug_printf(const char *format, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 1, 2)))
