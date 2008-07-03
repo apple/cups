@@ -98,7 +98,7 @@ static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
 static void	unload_job(cupsd_job_t *job);
 static void	update_job(cupsd_job_t *job);
-static void	update_job_attrs(cupsd_job_t *job);
+static void	update_job_attrs(cupsd_job_t *job, int do_message);
 
 
 /*
@@ -595,7 +595,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
   printer = job->printer;
 
-  update_job_attrs(job);
+  update_job_attrs(job, 0);
 
   if (job->status < 0)
   {
@@ -3677,7 +3677,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
-      update_job_attrs(job);
+      update_job_attrs(job, 0);
     }
     else if (loglevel == CUPSD_LOG_ATTR)
     {
@@ -3807,6 +3807,13 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     {
       cupsdLogJob(job, loglevel, "%s", message);
 
+      strlcpy(job->printer->state_message, message,
+	      sizeof(job->printer->state_message));
+      cupsdAddPrinterHistory(job->printer);
+
+      if (loglevel <= CUPSD_LOG_INFO)
+	event |= CUPSD_EVENT_PRINTER_STATE;
+
       if (loglevel <= job->status_level)
       {
        /*
@@ -3816,14 +3823,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	if (loglevel != CUPSD_LOG_NOTICE)
 	  job->status_level = loglevel;
 
-	strlcpy(job->printer->state_message, message,
-		sizeof(job->printer->state_message));
-	cupsdAddPrinterHistory(job->printer);
-
-	if (loglevel <= CUPSD_LOG_INFO)
-	  event |= CUPSD_EVENT_PRINTER_STATE;
-
-	update_job_attrs(job);
+	update_job_attrs(job, 1);
       }
     }
 
@@ -3867,7 +3867,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
  */
 
 void
-update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
+update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
+                 int         do_message)/* I - 1 = update job-printer-state message */
 {
   int			i;		/* Looping var */
   int			num_reasons;	/* Actual number of reasons */
@@ -3907,7 +3908,8 @@ update_job_attrs(cupsd_job_t *job)	/* I - Job to update */
   * Otherwise copy the printer-state-message value...
   */
 
-  if (job->printer->state_message[0])
+  if (job->printer->state_message[0] &&
+      (do_message || !job->printer_message->values[0].string.text[0]))
     cupsdSetString(&(job->printer_message->values[0].string.text),
 		   job->printer->state_message);
 
