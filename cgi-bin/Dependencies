@@ -56,6 +56,9 @@ testtemplate.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 testtemplate.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 testtemplate.o: ../cups/file.h ../cups/language.h ../cups/array.h
 testtemplate.o: help-index.h
+websearch.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+websearch.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+websearch.o: ../cups/file.h ../cups/language.h ../cups/array.h help-index.h
 # DO NOT DELETE
 
 help-index.32.o: help-index.c  cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
@@ -114,6 +117,9 @@ testtemplate.32.o: testtemplate.c  cgi.h ../cups/cups.h ../cups/ipp.h ../cups/ht
 testtemplate.32.o: testtemplate.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 testtemplate.32.o: testtemplate.c  ../cups/file.h ../cups/language.h ../cups/array.h
 testtemplate.32.o: testtemplate.c  help-index.h
+websearch.32.o: websearch.c  cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+websearch.32.o: websearch.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+websearch.32.o: websearch.c  ../cups/file.h ../cups/language.h ../cups/array.h help-index.h
 # DO NOT DELETE
 
 help-index.64.o: help-index.c  cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
@@ -172,3 +178,6 @@ testtemplate.64.o: testtemplate.c  cgi.h ../cups/cups.h ../cups/ipp.h ../cups/ht
 testtemplate.64.o: testtemplate.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 testtemplate.64.o: testtemplate.c  ../cups/file.h ../cups/language.h ../cups/array.h
 testtemplate.64.o: testtemplate.c  help-index.h
+websearch.64.o: websearch.c  cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+websearch.64.o: websearch.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+websearch.64.o: websearch.c  ../cups/file.h ../cups/language.h ../cups/array.h help-index.h

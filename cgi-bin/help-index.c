@@ -1297,7 +1297,7 @@ help_sort_by_score(help_node_t *n1,	/* I - First node */
                 n2, n2->score, n2->section ? n2->section : "", n2->text));
 
   if (n1->score != n2->score)
-    return (n1->score - n2->score);
+    return (n2->score - n1->score);
 
   if (n1->section && !n2->section)
     return (1);
