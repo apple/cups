@@ -3807,23 +3807,25 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     {
       cupsdLogJob(job, loglevel, "%s", message);
 
-      strlcpy(job->printer->state_message, message,
-	      sizeof(job->printer->state_message));
-      cupsdAddPrinterHistory(job->printer);
+      if (loglevel < CUPSD_LOG_DEBUG)
+      {
+	strlcpy(job->printer->state_message, message,
+		sizeof(job->printer->state_message));
+	cupsdAddPrinterHistory(job->printer);
 
-      if (loglevel <= CUPSD_LOG_INFO)
 	event |= CUPSD_EVENT_PRINTER_STATE;
 
-      if (loglevel <= job->status_level)
-      {
-       /*
-	* Some messages show in the printer-state-message attribute...
-	*/
+	if (loglevel <= job->status_level)
+	{
+	 /*
+	  * Some messages show in the printer-state-message attribute...
+	  */
 
-	if (loglevel != CUPSD_LOG_NOTICE)
-	  job->status_level = loglevel;
+	  if (loglevel != CUPSD_LOG_NOTICE)
+	    job->status_level = loglevel;
 
-	update_job_attrs(job, 1);
+	  update_job_attrs(job, 1);
+	}
       }
     }
 
