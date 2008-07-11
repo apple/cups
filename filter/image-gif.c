@@ -372,7 +372,6 @@ gif_get_code(FILE *fp,			/* I - File to read from */
     lastbit   = last_byte * 8;
   }
 
-  ret = 0;
   for (ret = 0, i = curbit + code_size - 1, j = code_size;
        j > 0;
        i --, j --)
@@ -611,6 +610,8 @@ gif_read_lzw(FILE *fp,			/* I - File to read from */
 
     return (firstcode);
   }
+  else if (!table)
+    return (0);
 
   if (sp > stack)
     return (*--sp);

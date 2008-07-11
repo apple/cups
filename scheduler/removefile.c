@@ -196,8 +196,9 @@ overwrite_data(int        fd,		/* I - File descriptor */
 
 
 #ifdef TEST
+#  define testmain main
 int
-main(void)
+testmain(void)
 {
   FILE	*fp;
 

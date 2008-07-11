@@ -150,12 +150,8 @@ cupsdLogGSSMessage(
 					   &major_status_string);
 
   if (!GSS_ERROR(err_major_status))
-    err_major_status = gss_display_status(&err_minor_status,
-	                        	  minor_status,
-					  GSS_C_MECH_CODE,
-					  GSS_C_NULL_OID,
-					  &msg_ctx,
-					  &minor_status_string);
+    gss_display_status(&err_minor_status, minor_status, GSS_C_MECH_CODE,
+                       GSS_C_NULL_OID, &msg_ctx, &minor_status_string);
 
   ret = cupsdLogMessage(level, "%s: %s, %s", message,
 			(char *)major_status_string.value,
@@ -818,7 +814,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
       log_linesize = len;
     }
 
-    len = vsnprintf(log_line, log_linesize, message, ap);
+    vsnprintf(log_line, log_linesize, message, ap);
   }
 
   return (log_line);

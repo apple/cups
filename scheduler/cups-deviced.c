@@ -347,8 +347,7 @@ add_device(
     const char *device_uri,		/* I - Device URI */
     const char *device_id)		/* I - 1284 device ID */
 {
-  cupsd_device_t	*device,	/* New device */
-			*temp;		/* Found device */
+  cupsd_device_t	*device;	/* New device */
 
 
  /*
@@ -377,7 +376,7 @@ add_device(
   * Add the device to the array and return...
   */
 
-  if ((temp = cupsArrayFind(devices, device)) != NULL)
+  if (cupsArrayFind(devices, device))
   {
    /*
     * Avoid duplicates!

@@ -1088,7 +1088,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       else if (!strcmp(string, "Plus90"))
         ppd->landscape = 90;
     }
-    else if (!strcmp(keyword, "Emulators"))
+    else if (!strcmp(keyword, "Emulators") && string)
     {
       for (count = 1, sptr = string; sptr != NULL;)
         if ((sptr = strchr(sptr, ' ')) != NULL)
@@ -2850,8 +2850,6 @@ ppd_read(cups_file_t    *fp,		/* I - File to read from */
 	    if (ch == 0x0a)
 	      cupsFileGetChar(fp);
 	  }
-
-	  ch = '\n';
 	}
 	else if (ch < ' ' && ch != '\t' && cg->ppd_conform == PPD_CONFORM_STRICT)
 	{

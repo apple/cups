@@ -120,7 +120,7 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
   if (!name || !dests)
     return (0);
 
-  if ((dest = cupsGetDest(name, instance, num_dests, *dests)) != NULL)
+  if (cupsGetDest(name, instance, num_dests, *dests))
     return (num_dests);
 
  /*
@@ -980,7 +980,6 @@ appleGetDefault(char *name,		/* I - Name buffer */
 
     DEBUG_puts("appleGetDefault: Missing or bad location history array...");
 
-    CFRelease(network);
     return (NULL);
   }
   
@@ -991,9 +990,6 @@ appleGetDefault(char *name,		/* I - Name buffer */
     CFStringGetCString(locprinter, name, namesize, kCFStringEncodingUTF8);
   else
     name[0] = '\0';
-
-  CFRelease(locations);
-  CFRelease(network);
 
   DEBUG_printf(("appleGetDefault: Returning \"%s\"...\n", name));
 
@@ -1206,9 +1202,6 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
       CFRelease(newlocation);
   }
 
-  if (locations)
-    CFRelease(locations);
-  CFRelease(network);
   CFRelease(newprinter);
 }
 

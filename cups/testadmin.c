@@ -61,7 +61,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc > 1)
   {
-    for (i = 1, num_settings = 0; i < argc; i ++)
+    for (i = 1, num_settings = 0, settings = NULL; i < argc; i ++)
       num_settings = cupsParseOptions(argv[i], num_settings, &settings);
 
     if (cupsAdminSetServerSettings(http, num_settings, settings))

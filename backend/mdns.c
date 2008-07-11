@@ -670,8 +670,7 @@ query_callback(
 
     if ((device->type == CUPS_DEVICE_IPP ||
          device->type == CUPS_DEVICE_PRINTER) &&
-        (value = TXTRecordGetValuePtr(rdlen, rdata, "printer-type",
-                                      &valueLen)) != NULL)
+        TXTRecordGetValuePtr(rdlen, rdata, "printer-type", &valueLen))
     {
      /*
       * This is a CUPS printer!

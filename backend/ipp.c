@@ -600,6 +600,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
+  {
     if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
     {
      /*
@@ -609,6 +610,9 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
+  }
+  else
+    start_count = 0;
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for

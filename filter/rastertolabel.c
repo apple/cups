@@ -1030,9 +1030,6 @@ PCLCompress(unsigned char *line,	/* I - Line to compress */
     comp_ptr += count;
   }
 
-  line_ptr = CompBuffer;
-  line_end = comp_ptr;
-
  /*
   * Set the length of the data and write it...
   */

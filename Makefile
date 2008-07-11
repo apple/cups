@@ -104,6 +104,20 @@ depend:
 
 
 #
+# Run the clang.llvm.org static code analysis tool on the C sources.
+#
+
+.PHONY: clang
+clang:
+	if test ! -d clang; then \
+		mkdir clang; \
+	else \
+		rm -rf clang/*; \
+	fi
+	$(MAKE) $(MFLAGS) CC="scan-build -o ../clang $(CC)" clean all
+
+
+#
 # Generate a ctags file...
 #
 

@@ -3,7 +3,7 @@
  *
  *   Colorspace conversions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   The color saturation/hue matrix stuff is provided thanks to Mr. Paul
@@ -507,8 +507,7 @@ cupsImageRGBAdjust(cups_ib_t *pixels,	/* IO - Input/output pixels */
   static cups_clut_t	*lut = NULL;	/* Lookup table for matrix */
 
 
-  if (saturation != last_sat ||
-      hue != last_hue)
+  if (saturation != last_sat || hue != last_hue || !lut)
   {
    /*
     * Build the color adjustment matrix...

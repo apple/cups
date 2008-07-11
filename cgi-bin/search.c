@@ -47,7 +47,14 @@ cgiCompileSearch(const char *query)	/* I - Query string */
   char		*lword;			/* Last word in query */
 
 
-  DEBUG_printf(("help_compile_search(query=\"%s\")\n", query ? query : "(nil)"));
+  DEBUG_printf(("cgiCompileSearch(query=\"%s\")\n", query));
+
+ /*
+  * Range check input...
+  */
+
+  if (!query)
+    return (NULL);
 
  /*
   * Allocate a regular expression storage structure...

@@ -364,6 +364,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+  {
     if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
     {
      /*
@@ -373,6 +374,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
+  }
+  else
+    start_count = 0;
 
  /*
   * Print everything...

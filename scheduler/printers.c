@@ -1128,7 +1128,7 @@ cupsdLoadAllPrinters(void)
           for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	  if (*valueptr)
-            *valueptr++ = '\0';
+            *valueptr = '\0';
 
 	  cupsdSetString(&p->job_sheets[1], value);
 	}
@@ -1574,7 +1574,7 @@ cupsdSaveAllPrinters(void)
     {
       cupsFilePrintf(fp, "Attribute %s ", marker->name);
 
-      if (!ptr && (ptr = strchr(marker->values[0].string.text, '#')) != NULL)
+      if ((ptr = strchr(marker->values[0].string.text, '#')) != NULL)
       {
 	cupsFileWrite(fp, marker->values[0].string.text,
 		      ptr - marker->values[0].string.text);
@@ -3740,7 +3740,7 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   * Add all of the default options from the .conf files...
   */
 
-  for (num_options = 0, i = p->num_options, option = p->options;
+  for (num_options = 0, options = NULL, i = p->num_options, option = p->options;
        i > 0;
        i --, option ++)
   {

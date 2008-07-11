@@ -240,7 +240,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "Possible DoS attack - more than %d clients connecting "
 		      "from %s!",
-	              MaxClientsPerHost, tempcon->http.hostname);
+	              MaxClientsPerHost, con->http.hostname);
     }
 
 #ifdef WIN32
@@ -3246,15 +3246,15 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
 			ssl_options;	/* SSL Option for hostname */
 
 
-  if ((err = SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL, 
-			      NULL, &policy_search)))
+  if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL, 
+			    NULL, &policy_search))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create a policy search reference");
     CFRelease(keychain);
     return (NULL);
   }
 
-  if ((err = SecPolicySearchCopyNext(policy_search, &policy)))
+  if (SecPolicySearchCopyNext(policy_search, &policy))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, 
 		    "Cannot find a policy to use for searching");
@@ -3271,7 +3271,7 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
   options.Data = (uint8 *)&ssl_options;
   options.Length = sizeof(ssl_options);
 
-  if ((err = SecPolicySetValue(policy, &options)))
+  if (SecPolicySetValue(policy, &options))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, 
 		    "Cannot set policy value to use for searching");
@@ -3727,8 +3727,6 @@ is_cgi(cupsd_client_t *con,		/* I - Client connection */
     */
 
     cupsdSetString(&con->command, filename);
-
-    filename = strrchr(filename, '/') + 1; /* Filename always absolute */
 
     if (options)
       cupsdSetStringf(&con->options, " %s", options);

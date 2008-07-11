@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -259,7 +259,9 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
 	       void            *data)	/* I - Data to pass to callback */
 {
   _cupsd_fd_t	*fdptr;			/* File descriptor record */
+#ifdef HAVE_EPOLL
   int		added;			/* 1 if added, 0 if modified */
+#endif /* HAVE_EPOLL */
 
 
  /*
@@ -296,10 +298,14 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
       return (0);
     }
 
+#ifdef HAVE_EPOLL
     added = 1;
   }
   else
     added = 0;
+#else
+  }
+#endif /* HAVE_EPOLL */
 
 #ifdef HAVE_KQUEUE
   {

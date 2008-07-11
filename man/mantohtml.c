@@ -3,7 +3,7 @@
  *
  *   Man page to HTML conversion program.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2004-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -648,7 +648,6 @@ process_text:
   if (blist)
   {
     fputs("</li>\n</ul>\n", outfile);
-    blist = 0;
   }
 
   if (list)
@@ -659,7 +658,6 @@ process_text:
       fputs("</dd>\n", outfile);
 
     fputs("</dl>\n", outfile);
-    list = 0;
   }
 
   fputs("</body>\n"

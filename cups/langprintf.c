@@ -71,9 +71,8 @@ _cupsLangPrintError(const char *message)/* I - Message */
   * Format the message...
   */
 
-  bytes = snprintf(buffer, sizeof(buffer), "%s: %s",
-		   _cupsLangString(cg->lang_default, message),
-		   strerror(last_errno));
+  snprintf(buffer, sizeof(buffer), "%s: %s",
+	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
 
  /*
   * Convert and write to stderr...
@@ -120,8 +119,8 @@ _cupsLangPrintf(FILE        *fp,	/* I - File to write to */
   */
 
   va_start(ap, message);
-  bytes = vsnprintf(buffer, sizeof(buffer),
-                    _cupsLangString(cg->lang_default, message), ap);
+  vsnprintf(buffer, sizeof(buffer),
+            _cupsLangString(cg->lang_default, message), ap);
   va_end(ap);
 
  /*

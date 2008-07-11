@@ -600,7 +600,7 @@ cupsdLoadAllClasses(void)
 	       valueptr ++);
 
 	  if (*valueptr)
-            *valueptr++ = '\0';
+            *valueptr = '\0';
 
 	  cupsdSetString(&p->job_sheets[1], value);
 	}

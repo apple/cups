@@ -913,6 +913,12 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
       band->buffer = calloc(DotRowCount, DotBufferSize);
     }
 
+    if (!DotAvailList)
+    {
+      fputs("ERROR: Unable to allocate band list!\n", stderr);
+      exit(1);
+    }
+
     fputs("DEBUG: Pointer list at start of page...\n", stderr);
 
     for (band = DotAvailList; band != NULL; band = band->next)
@@ -1571,7 +1577,6 @@ ProcessLine(ppd_file_t         *ppd,	/* I - PPD file */
   * Perform the color separation...
   */
 
-  offset   = 0;
   width    = header->cupsWidth;
   subwidth = header->cupsWidth / DotColStep;
   xstep    = 3600 / header->HWResolution[0];

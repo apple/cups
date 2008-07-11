@@ -3,7 +3,7 @@
  *
  *   CUPS API test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -155,7 +155,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((dest = cupsGetDest(dests[num_dests / 2].name, NULL, num_dests,
                           dests)) == NULL)
   {
-    status = 1;
     puts("FAIL");
     return (1);
   }
@@ -201,8 +200,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (cupsPrintFile(dest->name, "../data/testprint.ps", "Test Page",
                     dest->num_options, dest->options) <= 0)
   {
-    status = 1;
     puts("FAIL");
+    return (1);
   }
   else
     puts("PASS");
@@ -216,7 +215,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if ((ppdfile = cupsGetPPD(dest->name)) == NULL)
   {
-    status = 1;
     puts("FAIL");
   }
   else
@@ -282,7 +280,7 @@ dests_equal(cups_dest_t *a,		/* I - First destination */
   if (a == b)
     return (1);
 
-  if ((!a && b) || (a && !b))
+  if (!a || !b)
     return (0);
 
   if (strcasecmp(a->name, b->name) ||
@@ -345,5 +343,5 @@ show_diffs(cups_dest_t *a,		/* I - First destination */
 
 
 /*
- * End of "$Id: testfile.c 6192 2007-01-10 19:26:48Z mike $".
+ * End of "$Id$".
  */

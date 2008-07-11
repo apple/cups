@@ -2436,8 +2436,8 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   */
 
   if (attr == NULL)
-    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-                        "job-hold-until", NULL, holdstr);
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-hold-until",
+                 NULL, holdstr);
   else
     cupsdSetString(&attr->values[0].string.text, holdstr);
 
@@ -2821,7 +2821,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   i = ipp_length(job->attrs);
 
-  if (i > optlength)
+  if (i > optlength || !options)
   {
     if (optlength == 0)
       optptr = malloc(i);

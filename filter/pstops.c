@@ -1054,7 +1054,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
   */
 
   if (!JobCanceled)
-    linelen = copy_trailer(fp, doc, ppd, number, line, linelen, linesize);
+    copy_trailer(fp, doc, ppd, number, line, linelen, linesize);
 }
 
 
@@ -2227,7 +2227,6 @@ include_feature(
   char		name[255],		/* Option name */
 		value[255];		/* Option value */
   ppd_option_t	*option;		/* Option in file */
-  ppd_choice_t	*choice;		/* Choice */
 
 
  /*
@@ -2258,7 +2257,7 @@ include_feature(
     return (num_options);
   }
 
-  if ((choice = ppdFindChoice(option, value)) == NULL)
+  if (!ppdFindChoice(option, value))
   {
     fprintf(stderr, _("WARNING: Unknown choice \"%s\" for option \"%s\"!\n"),
             value, name + 1);
@@ -2917,10 +2916,7 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
 	             w / bboxw, l / bboxl);
 	}
 	else
-	{
           w = PageWidth;
-	  l = PageLength;
-	}
 	break;
 
     case 2 :
