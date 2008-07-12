@@ -1831,11 +1831,12 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 	      int        verbose,	/* I - Verbosity level */
 	      int        warn)		/* I - Warnings only? */
 {
+  int		i;			/* Looping var */
   ppd_attr_t	*attr;			/* PPD attribute */
   const char	*ptr;			/* Pointer into string */
   char		super[16],		/* Super-type for filter */
 		type[256],		/* Type for filter */
-		program[256],		/* Program/filter name */
+		program[1024],		/* Program/filter name */
 		pathprog[1024];		/* Complete path to program/filter */
   int		cost;			/* Cost of filter */
   const char	*prefix;		/* WARN/FAIL prefix */
@@ -1843,13 +1844,10 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
   prefix = warn ? "  WARN  " : "**FAIL**";
 
-  for (attr = ppdFindAttr(ppd, "cupsFilter", NULL);
-       attr;
-       attr = ppdFindNextAttr(ppd, "cupsFilter", NULL))
+  for (i = 0; i < ppd->num_filters; i ++)
   {
-    if (!attr->value ||
-	sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
-	       program) != 4)
+    if (sscanf(ppd->filters[i], "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
+               &cost, program) != 4)
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1857,7 +1855,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  Bad cupsFilter value \"%s\"!\n"),
-			prefix, attr->value ? attr->value : "");
+			prefix, ppd->filters[i]);
 
       if (!warn)
         errors ++;
@@ -1899,8 +1897,8 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
        attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL))
   {
     if (!attr->value ||
-	sscanf(attr->value, "%15[^/]/%255s%d%255s", super, type, &cost,
-	       program) != 4)
+	sscanf(attr->value, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
+	       &cost, program) != 4)
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));

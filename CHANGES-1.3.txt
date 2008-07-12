@@ -4,6 +4,9 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
+	- The scheduler and cupstestppd utilities did not support
+	  cupsFilter and cupsPreFilter programs with spaces in their
+	  names (STR #2866)
 	- Removed unused variables and assignments found by the
 	  LLVM "clang" tool.
 	- Added NULL checks recommended by the LLVM "clang" tool.

@@ -3825,7 +3825,8 @@ add_printer_filter(
   *     super/type cost program
   */
 
-  if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
+  if (sscanf(filter, "%15[^/]/%31s%d%*[ \t]%1023[^\n]", super, type, &cost,
+             program) != 4)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
                     p->name, filter);
