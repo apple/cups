@@ -1262,16 +1262,26 @@ _httpResolveURI(
 			hostname[1024],
 			resource[1024];
   int			port;
+  http_uri_status_t	status;		/* URI decode status */
 
+
+  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
+                "resolved_size=" CUPS_LLFMT ")\n", uri, resolved_uri,
+		CUPS_LLCAST resolved_size));
 
  /*
   * Get the device URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-                      userpass, sizeof(userpass), hostname, sizeof(hostname),
-		      &port, resource, sizeof(resource)) < HTTP_URI_OK)
+  if ((status = httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme,
+                                sizeof(scheme), userpass, sizeof(userpass),
+				hostname, sizeof(hostname), &port, resource,
+				sizeof(resource))) < HTTP_URI_OK)
+  {
+    DEBUG_printf(("_httpResolveURI: httpSeparateURI returned %d!\n", status));
+    DEBUG_puts("_httpResolveURI: Returning NULL");
     return (NULL);
+  }
 
  /*
   * Resolve it as needed...
@@ -1289,8 +1299,24 @@ _httpResolveURI(
     * Separate the hostname into service name, registration type, and domain...
     */
 
-    regtype = strchr(hostname, '.');
-    *regtype++ = '\0';
+    for (regtype = strstr(hostname, "._tcp") - 2;
+         regtype > hostname;
+	 regtype --)
+      if (regtype[0] == '.' && regtype[1] == '_')
+      {
+       /*
+        * Found ._servicetype in front of ._tcp...
+	*/
+
+        *regtype++ = '\0';
+	break;
+      }
+
+    if (regtype <= hostname)
+    {
+      DEBUG_puts("_httpResolveURI: Bad hostname, returning NULL");
+      return (NULL);
+    }
 
     domain = regtype + strlen(regtype) - 1;
     if (domain > regtype && *domain == '.')
@@ -1310,6 +1336,9 @@ _httpResolveURI(
 
     resolved_uri[0] = '\0';
 
+    DEBUG_printf(("_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
+                  "domain=\"%s\"\n", hostname, regtype, domain));
+
     if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
 			  resolve_callback,
 			  &uribuf) == kDNSServiceErr_NoError)
@@ -1327,6 +1356,8 @@ _httpResolveURI(
 
     uri = NULL;
   }
+
+  DEBUG_printf(("_httpResolveURI: Returning \"%s\"\n", uri));
 
   return (uri);
 }
