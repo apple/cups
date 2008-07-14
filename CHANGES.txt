@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-07-02
+CHANGES.txt - 2008-07-14
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The default LogLevel is now "warn" instead of "info" to reduce
+	  the amount of logging that is done to disk by default.
 	- The PPD compiler did not include OID query keywords in PPD
 	  files (STR #2871)
 	- The cups-driverd helper program now directly supports driver

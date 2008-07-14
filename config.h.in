@@ -43,6 +43,13 @@
 
 
 /*
+ * Default logging settings...
+ */
+
+#define CUPS_DEFAULT_LOG_LEVEL	"warn"
+
+
+/*
  * Default browsing settings...
  */
 

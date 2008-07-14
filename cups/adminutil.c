@@ -1561,7 +1561,7 @@ _cupsAdminSetServerSettings(
       else
       {
         cupsFilePuts(temp, "# Show general information in error_log.\n");
-	cupsFilePuts(temp, "LogLevel info\n");
+	cupsFilePuts(temp, "LogLevel " CUPS_DEFAULT_LOG_LEVEL "\n");
       }
     }
     else if (!strcasecmp(line, "<Policy"))
@@ -1841,7 +1841,7 @@ _cupsAdminSetServerSettings(
     else
     {
       cupsFilePuts(temp, "# Show general information in error_log.\n");
-      cupsFilePuts(temp, "LogLevel info\n");
+      cupsFilePuts(temp, "LogLevel " CUPS_DEFAULT_LOG_LEVEL "\n");
     }
   }
 

@@ -1884,7 +1884,7 @@ everything under the preceding levels):</P>
 	<LI><CODE>notice</CODE> - Log temporary error conditions</LI>
 
 	<LI><CODE>info</CODE> - Log all requests and state
-	changes (default)</LI>
+	changes</LI>
 
 	<LI><CODE>debug</CODE> - Log basic debugging
 	information</LI>
@@ -1893,6 +1893,8 @@ everything under the preceding levels):</P>
 	information</LI>
 
 </UL>
+
+<p>The default <code>LogLevel</code> is <code>@CUPS_LOG_LEVEL@</code>.</p>
 
 
 <H2 CLASS="title"><A NAME="MaxClients">MaxClients</A></H2>
