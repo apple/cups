@@ -1628,12 +1628,12 @@ check_basics(const char *filename)	/* I - PPD file to check */
 
           if (eol == EOL_NONE)
 	    eol = EOL_CRLF;
-	  else
+	  else if (eol != EOL_CRLF)
 	    mixed = 1;
 	}
 	else if (eol == EOL_NONE)
 	  eol = EOL_CR;
-        else
+        else if (eol != EOL_CR)
 	  mixed = 1;
       }
       

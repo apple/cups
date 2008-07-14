@@ -305,8 +305,6 @@ do_test(const char        *server,	/* I - Server to use */
       case IPP_PRINT_JOB :
 	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                        NULL, "ipp://localhost/printers/test");
-          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-hold-until",
-	               NULL, "indefinite");
 	  ippDelete(cupsDoFileRequest(http, request, "/printers/test",
 	                              "../data/testprint.ps"));
           break;

@@ -4,6 +4,10 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
+	- The cupstestppd utility reported mixed line endings for
+	  Mac OS and Windows PPD files (STR #2874)
+	- The pdftops filter did not print landscape orientation PDF
+	  pages correctly on all printers (STR #2850)
 	- The scheduler did not handle expiring of implicit classes
 	  or their members properly, leading to a configuration where
 	  one of the members would have a short name (STR #2766)
