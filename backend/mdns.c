@@ -55,7 +55,8 @@ typedef struct
 		*fullName,		/* Full name */
 		*make_and_model;	/* Make and model from TXT record */
   cups_devtype_t type;			/* Device registration type */
-  int		cups_shared,		/* CUPS shared printer? */
+  int		priority,		/* Priority associated with type */
+		cups_shared,		/* CUPS shared printer? */
 		sent;			/* Did we list the device? */
 } cups_device_t;
 
@@ -227,6 +228,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Announce any devices we've found...
       */
 
+      cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
       static const char * const schemes[] =
@@ -234,7 +236,8 @@ main(int  argc,				/* I - Number of command-line args */
 					/* URI schemes for devices */
 
 
-      for (device = (cups_device_t *)cupsArrayFirst(devices), count = 0;
+      for (device = (cups_device_t *)cupsArrayFirst(devices),
+               best = NULL, count = 0;
            device;
 	   device = (cups_device_t *)cupsArrayNext(devices))
         if (!device->ref && !device->sent)
@@ -268,17 +271,47 @@ main(int  argc,				/* I - Number of command-line args */
 	  DNSServiceRefDeallocate(device->ref);
 	  device->ref = 0;
 
-          httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-	                  schemes[device->type], NULL, device->fullName, 0,
-			  device->cups_shared ? "/cups" : "/");
+          if (!best)
+	    best = device;
+	  else if (strcasecmp(best->name, device->name) ||
+	           strcasecmp(best->domain, device->domain))
+          {
+	    httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
+			    schemes[best->type], NULL, best->fullName, 0,
+			    best->cups_shared ? "/cups" : "/");
 
-          printf("network %s \"%s\" \"%s\"\n", device_uri,
-	         device->make_and_model ? device->make_and_model : "Unknown",
-		 device->name);
-          fflush(stdout);
+	    printf("network %s \"%s\" \"%s\"\n", device_uri,
+		   best->make_and_model ? best->make_and_model : "Unknown",
+		   best->name);
+	    fflush(stdout);
 
-	  device->sent = 1;
+	    best->sent = 1;
+	    best       = device;
+	  }
+	  else if (best->priority > device->priority ||
+	           (best->priority == device->priority &&
+		    best->type < device->type))
+          {
+	    best->sent = 1;
+	    best       = device;
+	  }
+	  else
+	    device->sent = 1;
         }
+
+      if (best)
+      {
+	httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
+			schemes[best->type], NULL, best->fullName, 0,
+			best->cups_shared ? "/cups" : "/");
+
+	printf("network %s \"%s\" \"%s\"\n", device_uri,
+	       best->make_and_model ? best->make_and_model : "Unknown",
+	       best->name);
+	fflush(stdout);
+
+	best->sent = 1;
+      }
     }
   }
 }
@@ -481,47 +514,36 @@ get_device(cups_array_t *devices,	/* I - Device array */
   else
     key.type = CUPS_DEVICE_RIOUSBPRINT;
 
-  if ((device = cupsArrayFind(devices, &key)) != NULL)
-  {
-   /*
-    * No, see if this registration is a higher priority protocol...
-    */
-
-    if (key.type > device->type)
-    {
-      fprintf(stderr, "DEBUG: Updating \"%s\" to \"%s.%s%s\"...\n",
-              device->fullName, serviceName, regtype, replyDomain);
-
-      device->type = key.type;
-    }
-  }
-  else
-  {
-   /*
-    * Yes, add the device...
-    */
-
-    fprintf(stderr, "DEBUG: Found \"%s.%s%s\"...\n", serviceName, regtype,
-            replyDomain);
-
-    device         = calloc(sizeof(cups_device_t), 1);
-    device->name   = strdup(serviceName);
-    device->domain = strdup(replyDomain);
-    device->type   = key.type;
-
-    cupsArrayAdd(devices, device);
-  }
+  for (device = cupsArrayFind(devices, &key);
+       device;
+       device = cupsArrayNext(devices))
+    if (strcasecmp(device->name, key.name) ||
+        strcasecmp(device->domain, key.domain))
+      break;
+    else if (device->type == key.type)
+      return (device);
 
  /*
-  * Update the "full name" of this service, which is used for queries...
+  * Yes, add the device...
+  */
+
+  fprintf(stderr, "DEBUG: Found \"%s.%s%s\"...\n", serviceName, regtype,
+	  replyDomain);
+
+  device           = calloc(sizeof(cups_device_t), 1);
+  device->name     = strdup(serviceName);
+  device->domain   = strdup(replyDomain);
+  device->type     = key.type;
+  device->priority = 50;
+
+  cupsArrayAdd(devices, device);
+
+ /*
+  * Set the "full name" of this service, which is used for queries...
   */
 
   snprintf(fullName, sizeof(fullName), "%s.%s%s", serviceName, regtype,
            replyDomain);
-
-  if (device->fullName)
-    free(device->fullName);
-
   device->fullName = strdup(fullName);
 
   return (device);
@@ -585,104 +607,142 @@ query_callback(
   if ((ptr = strstr(name, "._")) != NULL)
     *ptr = '\0';
 
-  if ((device = cupsArrayFind(devices, &key)) != NULL)
+  if (strstr(fullName, "_ipp._tcp.") ||
+      strstr(fullName, "_ipp-tls._tcp."))
+    key.type = CUPS_DEVICE_IPP;
+  else if (strstr(fullName, "_fax-ipp._tcp."))
+    key.type = CUPS_DEVICE_FAX_IPP;
+  else if (strstr(fullName, "_printer._tcp."))
+    key.type = CUPS_DEVICE_PRINTER;
+  else if (strstr(fullName, "_pdl-datastream._tcp."))
+    key.type = CUPS_DEVICE_PDL_DATASTREAM;
+  else
+    key.type = CUPS_DEVICE_RIOUSBPRINT;
+
+  for (device = cupsArrayFind(devices, &key);
+       device;
+       device = cupsArrayNext(devices))
   {
-   /*
-    * Found it, pull out the make and model from the TXT record and save it...
-    */
-
-    const void	*value;			/* Pointer to value */
-    uint8_t	valueLen;		/* Length of value (max 255) */
-    char	make_and_model[512],	/* Manufacturer and model */
-		model[256];		/* Model */
-
-
-    if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MFG",
-                                      &valueLen)) == NULL)
-      value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MANUFACTURER", &valueLen);
-
-    if (value && valueLen)
+    if (strcasecmp(device->name, key.name) ||
+        strcasecmp(device->domain, key.domain))
     {
-      memcpy(make_and_model, value, valueLen);
-      make_and_model[valueLen] = '\0';
+      device = NULL;
+      break;
     }
-    else
-      make_and_model[0] = '\0';
-
-    if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MDL",
-                                      &valueLen)) == NULL)
-      value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MODEL", &valueLen);
-
-    if (value && valueLen)
+    else if (device->type == key.type)
     {
-      memcpy(model, value, valueLen);
-      model[valueLen] = '\0';
-    }
-    else if ((value = TXTRecordGetValuePtr(rdlen, rdata, "product",
-                                           &valueLen)) != NULL && valueLen > 2)
-    {
-      if (((char *)value)[0] == '(')
+     /*
+      * Found it, pull out the priority and make and model from the TXT
+      * record and save it...
+      */
+
+      const void *value;		/* Pointer to value */
+      uint8_t	valueLen;		/* Length of value (max 255) */
+      char	make_and_model[512],	/* Manufacturer and model */
+		model[256],		/* Model */
+		priority[256];		/* Priority */
+
+
+      value = TXTRecordGetValuePtr(rdlen, rdata, "priority", &valueLen);
+
+      if (value && valueLen)
       {
-       /*
-        * Strip parenthesis...
-	*/
+	memcpy(priority, value, valueLen);
+	priority[valueLen] = '\0';
+	device->priority = atoi(priority);
+      }
 
-	memcpy(model, value + 1, valueLen - 2);
-	model[valueLen - 2] = '\0';
+      if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MFG",
+					&valueLen)) == NULL)
+	value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MANUFACTURER",
+	                             &valueLen);
+
+      if (value && valueLen)
+      {
+	memcpy(make_and_model, value, valueLen);
+	make_and_model[valueLen] = '\0';
       }
       else
+	make_and_model[0] = '\0';
+
+      if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MDL",
+					&valueLen)) == NULL)
+	value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MODEL", &valueLen);
+
+      if (value && valueLen)
       {
 	memcpy(model, value, valueLen);
 	model[valueLen] = '\0';
       }
-
-      if (!strcasecmp(model, "GPL Ghostscript") ||
-          !strcasecmp(model, "GNU Ghostscript") ||
-          !strcasecmp(model, "ESP Ghostscript"))
+      else if ((value = TXTRecordGetValuePtr(rdlen, rdata, "product",
+					     &valueLen)) != NULL && valueLen > 2)
       {
-        if ((value = TXTRecordGetValuePtr(rdlen, rdata, "ty",
-                                          &valueLen)) != NULL)
-        {
-	  memcpy(model, value, valueLen);
-	  model[valueLen] = '\0';
+	if (((char *)value)[0] == '(')
+	{
+	 /*
+	  * Strip parenthesis...
+	  */
 
-	  if ((ptr = strchr(model, ',')) != NULL)
-	    *ptr = '\0';
+	  memcpy(model, value + 1, valueLen - 2);
+	  model[valueLen - 2] = '\0';
 	}
 	else
-	  strcpy(model, "Unknown");
+	{
+	  memcpy(model, value, valueLen);
+	  model[valueLen] = '\0';
+	}
+
+	if (!strcasecmp(model, "GPL Ghostscript") ||
+	    !strcasecmp(model, "GNU Ghostscript") ||
+	    !strcasecmp(model, "ESP Ghostscript"))
+	{
+	  if ((value = TXTRecordGetValuePtr(rdlen, rdata, "ty",
+					    &valueLen)) != NULL)
+	  {
+	    memcpy(model, value, valueLen);
+	    model[valueLen] = '\0';
+
+	    if ((ptr = strchr(model, ',')) != NULL)
+	      *ptr = '\0';
+	  }
+	  else
+	    strcpy(model, "Unknown");
+	}
       }
-    }
-    else
-      strcpy(model, "Unknown");
+      else
+	strcpy(model, "Unknown");
 
-    if (device->make_and_model)
-      free(device->make_and_model);
+      if (device->make_and_model)
+	free(device->make_and_model);
 
-    if (make_and_model[0])
-    {
-      strlcat(make_and_model, " ", sizeof(make_and_model));
-      strlcat(make_and_model, model, sizeof(make_and_model));
-      device->make_and_model = strdup(make_and_model);
-    }
-    else
-      device->make_and_model = strdup(model);
+      if (make_and_model[0])
+      {
+	strlcat(make_and_model, " ", sizeof(make_and_model));
+	strlcat(make_and_model, model, sizeof(make_and_model));
+	device->make_and_model = strdup(make_and_model);
+      }
+      else
+	device->make_and_model = strdup(model);
 
-    if ((device->type == CUPS_DEVICE_IPP ||
-         device->type == CUPS_DEVICE_PRINTER) &&
-        TXTRecordGetValuePtr(rdlen, rdata, "printer-type", &valueLen))
-    {
-     /*
-      * This is a CUPS printer!
-      */
+      if ((device->type == CUPS_DEVICE_IPP ||
+	   device->type == CUPS_DEVICE_PRINTER) &&
+	  TXTRecordGetValuePtr(rdlen, rdata, "printer-type", &valueLen))
+      {
+       /*
+	* This is a CUPS printer!
+	*/
 
-      device->cups_shared = 1;
+	device->cups_shared = 1;
 
-      if (device->type == CUPS_DEVICE_PRINTER)
-        device->sent = 1;
+	if (device->type == CUPS_DEVICE_PRINTER)
+	  device->sent = 1;
+      }
+
+      break;
     }
   }
-  else
+
+  if (!device)
     fprintf(stderr, "DEBUG: Ignoring TXT record for \"%s\"...\n", fullName);
 }
 
