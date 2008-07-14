@@ -405,6 +405,7 @@ main(int  argc,				/* I - Number of command-line args */
     cups_file_t	*fp;			/* Temporary file */
     char	buffer[8192];		/* Buffer for copying */
     int		bytes;			/* Number of bytes read */
+    off_t	tbytes;			/* Total bytes copied */
 
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
@@ -421,6 +422,8 @@ main(int  argc,				/* I - Number of command-line args */
       return (CUPS_BACKEND_FAILED);
     }
 
+    tbytes = 0;
+
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (cupsFileWrite(fp, buffer, bytes) < bytes)
       {
@@ -429,8 +432,21 @@ main(int  argc,				/* I - Number of command-line args */
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
       }
+      else
+        tbytes += bytes;
 
     cupsFileClose(fp);
+
+   /*
+    * Don't try printing files less than 2 bytes...
+    */
+
+    if (tbytes <= 1)
+    {
+      _cupsLangPuts(_("ERROR: Empty print file!\n"));
+      unlink(tmpfilename);
+      return (CUPS_BACKEND_FAILED);
+    }
 
    /*
     * Point to the single file from stdin...
