@@ -22,6 +22,7 @@
  *   compress_files()       - Compress print files...
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
+ *   report_attr()          - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
  *   run_pictwps_filter()   - Convert PICT files to PostScript when printing
  *                            remotely.
@@ -64,6 +65,7 @@ static void	check_printer_state(http_t *http, const char *uri,
 static void	compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
 static const char *password_cb(const char *);
+static void	report_attr(ipp_attribute_t *attr);
 static int	report_printer_state(ipp_t *ipp, int job_id);
 
 #ifdef __APPLE__
@@ -137,6 +139,11 @@ main(int  argc,				/* I - Number of command-line args */
 		{			/* Printer attributes we want */
 		  "copies-supported",
 		  "document-format-supported",
+		  "marker-colors",
+		  "marker-levels",
+		  "marker-message",
+		  "marker-names",
+		  "marker-types",
 		  "printer-is-accepting-jobs",
 		  "printer-state",
 		  "printer-state-message",
@@ -1339,6 +1346,11 @@ check_printer_state(
 	*response;			/* IPP response */
   static const char * const attrs[] =	/* Attributes we want */
   {
+    "marker-colors",
+    "marker-levels",
+    "marker-message",
+    "marker-names",
+    "marker-types",
     "printer-state-message",
     "printer-state-reasons"
   };
@@ -1492,6 +1504,74 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 
 
 /*
+ * 'report_attr()' - Report an IPP attribute value.
+ */
+
+static void
+report_attr(ipp_attribute_t *attr)	/* I - Attribute */
+{
+  int	i;				/* Looping var */
+  char	value[1024],			/* Value string */
+	*valptr,			/* Pointer into value string */
+	*attrptr;			/* Pointer into attribute value */
+
+
+ /*
+  * Convert the attribute values into quoted strings...
+  */
+
+  for (i = 0, valptr = value;
+       i < attr->num_values && valptr < (value + sizeof(value) - 10);
+       i ++)
+  {
+    if (i > 0)
+      *valptr++ = ',';
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+          snprintf(valptr, sizeof(value) - (valptr - value), "%d",
+	           attr->values[i].integer);
+	  valptr += strlen(valptr);
+	  break;
+
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_KEYWORD :
+          *valptr++ = '\"';
+	  for (attrptr = attr->values[i].string.text;
+	       *attrptr && valptr < (value + sizeof(value) - 10);
+	       attrptr ++)
+	  {
+	    if (*attrptr == '\\' || *attrptr == '\"')
+	      *valptr++ = '\\';
+
+	    *valptr++ = *attrptr;
+	  }
+          *valptr++ = '\"';
+          break;
+
+      default :
+         /*
+	  * Unsupported value type...
+	  */
+
+          return;
+    }
+  }
+
+  *valptr = '\0';
+
+ /*
+  * Tell the scheduler about the new values...
+  */
+
+  fprintf(stderr, "ATTR: %s=%s\n", attr->name, value);
+}
+
+
+/*
  * 'report_printer_state()' - Report the printer state.
  */
 
@@ -1501,8 +1581,9 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*psm,		/* pritner-state-message */
-			*reasons;	/* printer-state-reasons */
+  ipp_attribute_t	*psm,		/* printer-state-message */
+			*reasons,	/* printer-state-reasons */
+			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
   const char		*message;	/* Message to show */
   char			unknown[1024];	/* Unknown message string */
@@ -1608,6 +1689,22 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   }
 
   fprintf(stderr, "%s\n", state);
+
+ /*
+  * Relay the current marker-* attribute values...
+  */
+
+  if ((marker = ippFindAttribute(ipp, "marker-colors", IPP_TAG_NAME)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-levels",
+                                 IPP_TAG_INTEGER)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-message", IPP_TAG_TEXT)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-names", IPP_TAG_NAME)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-types", IPP_TAG_KEYWORD)) != NULL)
+    report_attr(marker);
 
   return (count);
 }
