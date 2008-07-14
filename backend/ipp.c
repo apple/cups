@@ -443,7 +443,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (tbytes <= 1)
     {
-      _cupsLangPuts(_("ERROR: Empty print file!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
       unlink(tmpfilename);
       return (CUPS_BACKEND_FAILED);
     }
