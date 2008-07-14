@@ -133,6 +133,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   if (!Printers)
     Printers = cupsArrayNew(compare_printers, NULL);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddPrinter: Adding %s to Printers", p->name);
   cupsArrayAdd(Printers, p);
 
   if (!ImplicitPrinters)
@@ -640,10 +642,17 @@ cupsdDeletePrinter(
   * Remove the printer from the list...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdDeletePrinter: Removing %s from Printers", p->name);
   cupsArrayRemove(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdDeletePrinter: Removing %s from ImplicitPrinters",
+		    p->name);
     cupsArrayRemove(ImplicitPrinters, p);
+  }
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -1285,10 +1294,17 @@ cupsdRenamePrinter(
   * Remove the printer from the array(s) first...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdRenamePrinter: Removing %s from Printers", p->name);
   cupsArrayRemove(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdRenamePrinter: Removing %s from ImplicitPrinters",
+		    p->name);
     cupsArrayRemove(ImplicitPrinters, p);
+  }
 
  /*
   * Rename the printer type...
@@ -1316,10 +1332,17 @@ cupsdRenamePrinter(
   * Add the printer back to the printer array(s)...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdRenamePrinter: Adding %s to Printers", p->name);
   cupsArrayAdd(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdRenamePrinter: Adding %s to ImplicitPrinters",
+		    p->name);
     cupsArrayAdd(ImplicitPrinters, p);
+  }
 }
 
 

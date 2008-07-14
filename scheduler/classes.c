@@ -210,7 +210,8 @@ cupsdDeletePrinterFromClasses(
        c = (cupsd_printer_t *)cupsArrayNext(ImplicitPrinters))
     if (c->num_printers == 0)
     {
-      cupsArrayRemove(ImplicitPrinters, c);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Deleting implicit class \"%s\"...",
+                      c->name);
       cupsdDeletePrinter(c, 0);
     }
 }

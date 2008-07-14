@@ -941,7 +941,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_LDAP */
     }
 
-    if (Browsing && BrowseLocalProtocols && current_time > browse_time)
+    if (Browsing && current_time > browse_time)
     {
       cupsdSendBrowseList();
       browse_time = current_time;
