@@ -443,7 +443,8 @@ exec_backend(char **argv)		/* I - Command-line arguments */
   * Resolve the device URI...
   */
 
-  resolved_uri = cupsBackendDeviceURI(argv);
+  if ((resolved_uri = cupsBackendDeviceURI(argv)) == NULL)
+    exit(CUPS_BACKEND_FAILED);
 
  /*
   * Extract the scheme from the URI...

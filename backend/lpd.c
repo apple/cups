@@ -112,6 +112,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
+  const char	*device_uri;		/* Device URI */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
@@ -188,7 +189,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+    return (CUPS_BACKEND_FAILED);
+
+  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
                   method, sizeof(method), username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));

@@ -90,6 +90,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		send_options;		/* Send job options? */
   int		num_options;		/* Number of printer options */
   cups_option_t	*options;		/* Printer options */
+  const char	*device_uri;		/* Device URI */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
@@ -227,7 +228,10 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+    return (CUPS_BACKEND_FAILED);
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
                       method, sizeof(method), username, sizeof(username),
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
