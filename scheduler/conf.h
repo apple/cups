@@ -4,7 +4,7 @@
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -36,6 +36,13 @@ typedef enum
   CUPSD_LOG_DEBUG,			/* General debugging */
   CUPSD_LOG_DEBUG2			/* Detailed debugging */
 } cupsd_loglevel_t;
+
+typedef enum
+{
+  CUPSD_ACCESSLOG_CONFIG,		/* Log config requests */
+  CUPSD_ACCESSLOG_ACTIONS,		/* Log config, print, and job management requests */
+  CUPSD_ACCESSLOG_ALL			/* Log everything */
+} cupsd_accesslog_t;
 
 
 /*
@@ -117,14 +124,16 @@ VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
 					/* Group ID for server */
-VAR int			ClassifyOverride	VALUE(0),
+VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
+					/* Access log level */
+			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
 			ConfigFilePerm		VALUE(0640),
 					/* Permissions for config files */
 			LogFilePerm		VALUE(0644),
 					/* Permissions for log files */
-			LogLevel		VALUE(CUPSD_LOG_ERROR),
-					/* Log level */
+			LogLevel		VALUE(CUPSD_LOG_WARN),
+					/* Error log level */
 			MaxClients		VALUE(0),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),

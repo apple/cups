@@ -1255,23 +1255,37 @@ const char *				/* O - Resolved URI */
 _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
-    size_t     resolved_size)		/* I - Size of URI buffer */
+    size_t     resolved_size,		/* I - Size of URI buffer */
+    int        log)			/* I - Log progress to stderr? */
 {
   char			scheme[32],	/* URI components... */
 			userpass[256],
 			hostname[1024],
 			resource[1024];
   int			port;
+  http_uri_status_t	status;		/* URI decode status */
 
+
+  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
+                "resolved_size=" CUPS_LLFMT ")\n", uri, resolved_uri,
+		CUPS_LLCAST resolved_size));
 
  /*
   * Get the device URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme),
-                      userpass, sizeof(userpass), hostname, sizeof(hostname),
-		      &port, resource, sizeof(resource)) < HTTP_URI_OK)
+  if ((status = httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme,
+                                sizeof(scheme), userpass, sizeof(userpass),
+				hostname, sizeof(hostname), &port, resource,
+				sizeof(resource))) < HTTP_URI_OK)
+  {
+    if (log)
+      _cupsLangPrintf(stderr, _("Bad device URI \"%s\"!\n"), uri);
+
+    DEBUG_printf(("_httpResolveURI: httpSeparateURI returned %d!\n", status));
+    DEBUG_puts("_httpResolveURI: Returning NULL");
     return (NULL);
+  }
 
  /*
   * Resolve it as needed...
@@ -1289,8 +1303,24 @@ _httpResolveURI(
     * Separate the hostname into service name, registration type, and domain...
     */
 
-    regtype = strchr(hostname, '.');
-    *regtype++ = '\0';
+    for (regtype = strstr(hostname, "._tcp") - 2;
+         regtype > hostname;
+	 regtype --)
+      if (regtype[0] == '.' && regtype[1] == '_')
+      {
+       /*
+        * Found ._servicetype in front of ._tcp...
+	*/
+
+        *regtype++ = '\0';
+	break;
+      }
+
+    if (regtype <= hostname)
+    {
+      DEBUG_puts("_httpResolveURI: Bad hostname, returning NULL");
+      return (NULL);
+    }
 
     domain = regtype + strlen(regtype) - 1;
     if (domain > regtype && *domain == '.')
@@ -1310,6 +1340,14 @@ _httpResolveURI(
 
     resolved_uri[0] = '\0';
 
+    DEBUG_printf(("_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
+                  "domain=\"%s\"\n", hostname, regtype, domain));
+    if (log)
+    {
+      fputs("STATE: +connecting-to-device\n", stderr);
+      _cupsLangPrintf(stderr, _("INFO: Looking for \"%s\"...\n"), hostname);
+    }
+
     if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
 			  resolve_callback,
 			  &uribuf) == kDNSServiceErr_NoError)
@@ -1323,10 +1361,24 @@ _httpResolveURI(
       DNSServiceRefDeallocate(ref);
     }
     else
-#endif /* HAVE_DNSSD */
+      uri = NULL;
+
+    if (log)
+      fputs("STATE: -connecting-to-device\n", stderr);
+
+#else
+   /*
+    * No DNS-SD support...
+    */
 
     uri = NULL;
+#endif /* HAVE_DNSSD */
+
+    if (log && !uri)
+      _cupsLangPuts(stderr, _("Unable to find printer!\n"));
   }
+
+  DEBUG_printf(("_httpResolveURI: Returning \"%s\"\n", uri));
 
   return (uri);
 }

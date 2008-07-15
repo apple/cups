@@ -1670,8 +1670,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                                IPP_TAG_INTEGER)) != NULL)
     attr->values[0].integer = 0;
   else
-    attr = ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                         "job-k-octets", 0);
+    ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-k-octets", 0);
 
   if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
                                IPP_TAG_KEYWORD)) == NULL)
@@ -2001,9 +2000,7 @@ add_job_subscriptions(
   * none...
   */
 
-  for (attr = job->attrs->attrs, prev = NULL;
-       attr;
-       prev = attr, attr = attr->next)
+  for (attr = job->attrs->attrs; attr; attr = attr->next)
     if (attr->group_tag == IPP_TAG_SUBSCRIPTION)
       break;
 
@@ -2175,6 +2172,9 @@ add_job_subscriptions(
 
  /*
   * Remove all of the subscription attributes from the job request...
+  *
+  * TODO: Optimize this since subscription groups have to come at the
+  * end of the request...
   */
 
   for (attr = job->attrs->attrs, prev = NULL; attr; attr = next)
@@ -3480,7 +3480,8 @@ apply_printer_defaults(
   * job object...
   */
 
-  for (i = printer->num_options, num_options = 0, option = printer->options;
+  for (i = printer->num_options, num_options = 0, options = NULL,
+           option = printer->options;
        i > 0;
        i --, option ++)
     if (!ippFindAttribute(job->attrs, option->name, IPP_TAG_ZERO))
@@ -5032,8 +5033,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
    /*
     * See if we have data ready...
     */
-
-    bytes = 0;
 
     FD_ZERO(&input);
     FD_SET(temppipe[0], &input);
@@ -9845,9 +9844,9 @@ send_http_error(
 
 static void
 send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
-               ipp_status_t   status,	/* I - IPP status code */
-	       const char     *message,	/* I - Status message */
-	       ...)			/* I - Additional args as needed */
+                ipp_status_t   status,	/* I - IPP status code */
+	        const char     *message,/* I - Status message */
+	        ...)			/* I - Additional args as needed */
 {
   va_list	ap;			/* Pointer to additional args */
   char		formatted[1024];	/* Formatted errror message */

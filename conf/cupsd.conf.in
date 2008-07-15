@@ -6,9 +6,9 @@
 #   file.
 #
 
-# Log general information in error_log - change "info" to "debug" for
-# troubleshooting...
-LogLevel info
+# Log general information in error_log - change "@CUPS_LOG_LEVEL@" to "debug"
+# for troubleshooting...
+LogLevel @CUPS_LOG_LEVEL@
 
 # Administrator user group...
 SystemGroup @CUPS_SYSTEM_GROUPS@

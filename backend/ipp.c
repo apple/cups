@@ -22,6 +22,7 @@
  *   compress_files()       - Compress print files...
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
+ *   report_attr()          - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
  *   run_pictwps_filter()   - Convert PICT files to PostScript when printing
  *                            remotely.
@@ -64,6 +65,7 @@ static void	check_printer_state(http_t *http, const char *uri,
 static void	compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
 static const char *password_cb(const char *);
+static void	report_attr(ipp_attribute_t *attr);
 static int	report_printer_state(ipp_t *ipp, int job_id);
 
 #ifdef __APPLE__
@@ -88,6 +90,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		send_options;		/* Send job options? */
   int		num_options;		/* Number of printer options */
   cups_option_t	*options;		/* Printer options */
+  const char	*device_uri;		/* Device URI */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
@@ -137,6 +140,11 @@ main(int  argc,				/* I - Number of command-line args */
 		{			/* Printer attributes we want */
 		  "copies-supported",
 		  "document-format-supported",
+		  "marker-colors",
+		  "marker-levels",
+		  "marker-message",
+		  "marker-names",
+		  "marker-types",
 		  "printer-is-accepting-jobs",
 		  "printer-state",
 		  "printer-state-message",
@@ -220,7 +228,10 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+    return (CUPS_BACKEND_FAILED);
+
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
                       method, sizeof(method), username, sizeof(username),
 		      hostname, sizeof(hostname), &port,
 		      resource, sizeof(resource)) < HTTP_URI_OK)
@@ -398,6 +409,7 @@ main(int  argc,				/* I - Number of command-line args */
     cups_file_t	*fp;			/* Temporary file */
     char	buffer[8192];		/* Buffer for copying */
     int		bytes;			/* Number of bytes read */
+    off_t	tbytes;			/* Total bytes copied */
 
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
@@ -414,6 +426,8 @@ main(int  argc,				/* I - Number of command-line args */
       return (CUPS_BACKEND_FAILED);
     }
 
+    tbytes = 0;
+
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (cupsFileWrite(fp, buffer, bytes) < bytes)
       {
@@ -422,8 +436,21 @@ main(int  argc,				/* I - Number of command-line args */
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
       }
+      else
+        tbytes += bytes;
 
     cupsFileClose(fp);
+
+   /*
+    * Don't try printing files less than 2 bytes...
+    */
+
+    if (tbytes <= 1)
+    {
+      _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
+      unlink(tmpfilename);
+      return (CUPS_BACKEND_FAILED);
+    }
 
    /*
     * Point to the single file from stdin...
@@ -600,6 +627,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
+  {
     if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
     {
      /*
@@ -609,6 +637,9 @@ main(int  argc,				/* I - Number of command-line args */
       _cupsSNMPClose(snmp_fd);
       snmp_fd = -1;
     }
+  }
+  else
+    start_count = 0;
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -1335,6 +1366,11 @@ check_printer_state(
 	*response;			/* IPP response */
   static const char * const attrs[] =	/* Attributes we want */
   {
+    "marker-colors",
+    "marker-levels",
+    "marker-message",
+    "marker-names",
+    "marker-types",
     "printer-state-message",
     "printer-state-reasons"
   };
@@ -1488,6 +1524,74 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 
 
 /*
+ * 'report_attr()' - Report an IPP attribute value.
+ */
+
+static void
+report_attr(ipp_attribute_t *attr)	/* I - Attribute */
+{
+  int	i;				/* Looping var */
+  char	value[1024],			/* Value string */
+	*valptr,			/* Pointer into value string */
+	*attrptr;			/* Pointer into attribute value */
+
+
+ /*
+  * Convert the attribute values into quoted strings...
+  */
+
+  for (i = 0, valptr = value;
+       i < attr->num_values && valptr < (value + sizeof(value) - 10);
+       i ++)
+  {
+    if (i > 0)
+      *valptr++ = ',';
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+          snprintf(valptr, sizeof(value) - (valptr - value), "%d",
+	           attr->values[i].integer);
+	  valptr += strlen(valptr);
+	  break;
+
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_KEYWORD :
+          *valptr++ = '\"';
+	  for (attrptr = attr->values[i].string.text;
+	       *attrptr && valptr < (value + sizeof(value) - 10);
+	       attrptr ++)
+	  {
+	    if (*attrptr == '\\' || *attrptr == '\"')
+	      *valptr++ = '\\';
+
+	    *valptr++ = *attrptr;
+	  }
+          *valptr++ = '\"';
+          break;
+
+      default :
+         /*
+	  * Unsupported value type...
+	  */
+
+          return;
+    }
+  }
+
+  *valptr = '\0';
+
+ /*
+  * Tell the scheduler about the new values...
+  */
+
+  fprintf(stderr, "ATTR: %s=%s\n", attr->name, value);
+}
+
+
+/*
  * 'report_printer_state()' - Report the printer state.
  */
 
@@ -1497,8 +1601,9 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*psm,		/* pritner-state-message */
-			*reasons;	/* printer-state-reasons */
+  ipp_attribute_t	*psm,		/* printer-state-message */
+			*reasons,	/* printer-state-reasons */
+			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
   const char		*message;	/* Message to show */
   char			unknown[1024];	/* Unknown message string */
@@ -1604,6 +1709,22 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   }
 
   fprintf(stderr, "%s\n", state);
+
+ /*
+  * Relay the current marker-* attribute values...
+  */
+
+  if ((marker = ippFindAttribute(ipp, "marker-colors", IPP_TAG_NAME)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-levels",
+                                 IPP_TAG_INTEGER)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-message", IPP_TAG_TEXT)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-names", IPP_TAG_NAME)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-types", IPP_TAG_KEYWORD)) != NULL)
+    report_attr(marker);
 
   return (count);
 }

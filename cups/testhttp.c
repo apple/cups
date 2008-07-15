@@ -3,7 +3,7 @@
  *
  *   HTTP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "http.h"
+#include "http-private.h"
 #include "string.h"
 
 
@@ -451,6 +451,29 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("\nALL TESTS PASSED!");
 
     return (failures);
+  }
+  else if (strstr(argv[1], "._tcp"))
+  {
+   /*
+    * Test resolving an mDNS name.
+    */
+
+    char	resolved[1024];		/* Resolved URI */
+
+
+    printf("_httpResolveURI(%s): ", argv[1]);
+    fflush(stdout);
+
+    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved)))
+    {
+      puts("FAIL");
+      return (1);
+    }
+    else
+    {
+      printf("PASS (%s)\n", resolved);
+      return (0);
+    }
   }
 
  /*

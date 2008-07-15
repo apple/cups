@@ -3,7 +3,7 @@
  *
  *   CMYK color separation code for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -76,8 +76,6 @@ cupsCMYKDoBlack(const cups_cmyk_t   *cmyk,
 {
   int			k;		/* Current black value */
   const short		**channels;	/* Copy of channel LUTs */
-  const unsigned char	*black_lut,	/* Black LUT */
-			*color_lut;	/* Color LUT */
   int			ink,		/* Amount of ink */
 			ink_limit;	/* Ink limit from separation */
 
@@ -94,8 +92,6 @@ cupsCMYKDoBlack(const cups_cmyk_t   *cmyk,
   */
 
   channels  = (const short **)cmyk->channels;
-  black_lut = cmyk->black_lut;
-  color_lut = cmyk->color_lut;
   ink_limit = cmyk->ink_limit;
 
   switch (cmyk->num_channels)
@@ -266,8 +262,6 @@ cupsCMYKDoCMYK(const cups_cmyk_t   *cmyk,
 			y,		/* Current yellow value */
 			k;		/* Current black value */
   const short		**channels;	/* Copy of channel LUTs */
-  const unsigned char	*black_lut,	/* Black LUT */
-			*color_lut;	/* Color LUT */
   int			ink,		/* Amount of ink */
 			ink_limit;	/* Ink limit from separation */
 
@@ -284,8 +278,6 @@ cupsCMYKDoCMYK(const cups_cmyk_t   *cmyk,
   */
 
   channels  = (const short **)cmyk->channels;
-  black_lut = cmyk->black_lut;
-  color_lut = cmyk->color_lut;
   ink_limit = cmyk->ink_limit;
 
   switch (cmyk->num_channels)
@@ -540,8 +532,6 @@ cupsCMYKDoGray(const cups_cmyk_t   *cmyk,
   int			k,		/* Current black value */
 			kc;		/* Current black color value */
   const short		**channels;	/* Copy of channel LUTs */
-  const unsigned char	*black_lut,	/* Black LUT */
-			*color_lut;	/* Color LUT */
   int			ink,		/* Amount of ink */
 			ink_limit;	/* Ink limit from separation */
 
@@ -558,8 +548,6 @@ cupsCMYKDoGray(const cups_cmyk_t   *cmyk,
   */
 
   channels  = (const short **)cmyk->channels;
-  black_lut = cmyk->black_lut;
-  color_lut = cmyk->color_lut;
   ink_limit = cmyk->ink_limit;
 
   switch (cmyk->num_channels)
@@ -775,8 +763,6 @@ cupsCMYKDoRGB(const cups_cmyk_t   *cmyk,
 			kc,		/* Current black color value */
 			km;		/* Maximum black value */
   const short		**channels;	/* Copy of channel LUTs */
-  const unsigned char	*black_lut,	/* Black LUT */
-			*color_lut;	/* Color LUT */
   int			ink,		/* Amount of ink */
 			ink_limit;	/* Ink limit from separation */
 
@@ -793,8 +779,6 @@ cupsCMYKDoRGB(const cups_cmyk_t   *cmyk,
   */
 
   channels  = (const short **)cmyk->channels;
-  black_lut = cmyk->black_lut;
-  color_lut = cmyk->color_lut;
   ink_limit = cmyk->ink_limit;
 
   switch (cmyk->num_channels)

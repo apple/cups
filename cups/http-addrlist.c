@@ -529,8 +529,6 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
         if (addr)
 	  addr->next = temp;
-	else
-          addr = temp;
       }
     }
     else if (!hostname)
@@ -584,8 +582,6 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
         if (addr)
 	  addr->next = temp;
-	else
-          addr = temp;
       }
     }
   }

@@ -62,7 +62,6 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 {
   char		*bufptr,		/* Pointer to position in buffer */
 		*bufend,		/* Pointer to end of buffer */
-		sign,			/* Sign of format width */
 		size,			/* Size character (h, l, L) */
 		type;			/* Format type character */
   int		width,			/* Width of field */
@@ -73,6 +72,9 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
   char		*s;			/* Pointer to string */
   int		bytes;			/* Total number of bytes needed */
 
+
+  if (!buffer || bufsize < 2 || !format)
+    return (-1);
 
  /*
   * Loop through the format string, formatting as needed...
@@ -91,18 +93,14 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 
       if (*format == '%')
       {
-        if (bufptr && bufptr < bufend) *bufptr++ = *format;
+        if (bufptr < bufend)
+	  *bufptr++ = *format;
         bytes ++;
         format ++;
 	continue;
       }
       else if (strchr(" -+#\'", *format))
-      {
-        *tptr++ = *format;
-        sign = *format++;
-      }
-      else
-        sign = 0;
+        *tptr++ = *format++;
 
       if (*format == '*')
       {
@@ -161,8 +159,6 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	  }
 	}
       }
-      else
-        prec = -1;
 
       if (*format == 'l' && format[1] == 'l')
       {
@@ -183,6 +179,8 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 
         size = *format++;
       }
+      else
+        size = 0;
 
       if (!*format)
         break;
@@ -365,7 +363,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
     {
       bytes ++;
 
-      if (bufptr && bufptr < bufend)
+      if (bufptr < bufend)
         *bufptr++ = *format;
 
       format ++;

@@ -112,6 +112,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
+  const char	*device_uri;		/* Device URI */
   char		method[255],		/* Method in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
@@ -188,7 +189,10 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, cupsBackendDeviceURI(argv),
+  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+    return (CUPS_BACKEND_FAILED);
+
+  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
                   method, sizeof(method), username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
@@ -437,8 +441,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
       }
-
-    filename = tmpfilename;
   }
   else if (argc == 6)
   {
@@ -883,6 +885,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     */
 
     if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
+    {
       if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
       {
        /*
@@ -892,6 +895,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	_cupsSNMPClose(snmp_fd);
 	snmp_fd = -1;
       }
+    }
+    else
+      start_count = 0;
 
    /*
     * Check for side-channel requests...

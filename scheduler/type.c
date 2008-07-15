@@ -284,8 +284,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
       while (isalnum(*rule & 255) && (ptr - name) < (sizeof(name) - 1))
         *ptr++ = *rule++;
 
-      *ptr       = '\0';
-      num_values = 0;
+      *ptr = '\0';
 
       if (*rule == '(')
       {
@@ -415,7 +414,6 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
 	snprintf(value[0], sizeof(value[0]), "*.%s", name);
 	length[0]  = strlen(value[0]);
-	num_values = 1;
 	op         = MIME_MAGIC_MATCH;
       }
 

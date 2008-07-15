@@ -3,7 +3,7 @@
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -96,7 +96,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (num_dests == 0)
 	      num_dests = cupsGetDests(&dests);
 
-            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) == NULL)
+            if (num_dests == 0 || !dests ||
+	        (dest = cupsGetDest(printer, instance, num_dests,
+		                    dests)) == NULL)
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpoptions: Unknown printer or class!\n"));
@@ -463,8 +465,8 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
 	    while (cparam)
 	    {
-	      _cupsLangPrintf(stdout, "%s%s=%s", choice->marked ? "*" : "",
-			      cparam->name, types[cparam->type]);
+	      _cupsLangPrintf(stdout, "%s%s=%s", prefix, cparam->name,
+	                      types[cparam->type]);
 	      cparam = (ppd_cparam_t *)cupsArrayNext(coption->params);
 	      prefix = " ";
 	    }

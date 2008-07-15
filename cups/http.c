@@ -298,8 +298,7 @@ void
 httpClose(http_t *http)			/* I - Connection to server */
 {
 #ifdef HAVE_GSSAPI
-  OM_uint32	minor_status,		/* Minor status code */
-		major_status;		/* Major status code */
+  OM_uint32	minor_status;		/* Minor status code */
 #endif /* HAVE_GSSAPI */
 
 
@@ -326,11 +325,10 @@ httpClose(http_t *http)			/* I - Connection to server */
 
 #ifdef HAVE_GSSAPI
   if (http->gssctx != GSS_C_NO_CONTEXT)
-    major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
-                                          GSS_C_NO_BUFFER);
+    gss_delete_sec_context(&minor_status, &http->gssctx, GSS_C_NO_BUFFER);
 
   if (http->gssname != GSS_C_NO_NAME)
-    major_status = gss_release_name(&minor_status, &http->gssname);
+    gss_release_name(&minor_status, &http->gssname);
 #endif /* HAVE_GSSAPI */
 
 #ifdef HAVE_AUTHORIZATION_H

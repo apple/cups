@@ -218,7 +218,7 @@ cupsSideChannelRead(
 
     *status = CUPS_SC_STATUS_TOO_BIG;
   }
-  else if (templen > *datalen || templen > (bytes - 4))
+  else if (!datalen || templen > *datalen || templen > (bytes - 4))
   {
    /*
     * Either the response is bigger than the provided buffer or the

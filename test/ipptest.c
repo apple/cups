@@ -308,7 +308,6 @@ do_tests(const char *uri,		/* I - URI to connect on */
     request       = ippNew();
     op            = (ipp_op_t)0;
     group         = IPP_TAG_ZERO;
-    value         = IPP_TAG_ZERO;
     num_statuses  = 0;
     num_expects   = 0;
     num_displayed = 0;

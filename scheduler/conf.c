@@ -517,6 +517,7 @@ cupsdReadConfiguration(void)
   * Numeric options...
   */
 
+  AccessLogLevel        = CUPSD_ACCESSLOG_ACTIONS;
   ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
   DefaultAuthType       = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
@@ -537,7 +538,7 @@ cupsdReadConfiguration(void)
   KeepAliveTimeout      = DEFAULT_KEEPALIVE;
   ListenBackLog         = SOMAXCONN;
   LogFilePerm           = CUPS_DEFAULT_LOG_FILE_PERM;
-  LogLevel              = CUPSD_LOG_ERROR;
+  LogLevel              = CUPSD_LOG_WARN;
   MaxClients            = 100;
   MaxClientsPerHost     = 0;
   MaxLogSize            = 1024 * 1024;
@@ -2886,10 +2887,26 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	cupsdLogMessage(CUPSD_LOG_WARN, "Unknown HostNameLookups %s on line %d.",
 	                value, linenum);
     }
+    else if (!strcasecmp(line, "AccessLogLevel") && value)
+    {
+     /*
+      * Amount of logging to do to access log...
+      */
+
+      if (!strcasecmp(value, "all"))
+        AccessLogLevel = CUPSD_ACCESSLOG_ALL;
+      else if (!strcasecmp(value, "actions"))
+        AccessLogLevel = CUPSD_ACCESSLOG_ACTIONS;
+      else if (!strcasecmp(value, "config"))
+        AccessLogLevel = CUPSD_ACCESSLOG_CONFIG;
+      else
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown AccessLogLevel %s on line %d.",
+	                value, linenum);
+    }
     else if (!strcasecmp(line, "LogLevel") && value)
     {
      /*
-      * Amount of logging to do...
+      * Amount of logging to do to error log...
       */
 
       if (!strcasecmp(value, "debug2"))

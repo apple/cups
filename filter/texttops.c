@@ -3,7 +3,7 @@
  *
  *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1005,7 +1005,7 @@ write_line(int     row,		/* I - Row number (0 to N) */
   lchar_t	*start;		/* First character in sequence */
 
 
-  for (col = 0, start = line; col < SizeColumns;)
+  for (col = 0; col < SizeColumns;)
   {
     while (col < SizeColumns && (line->ch == ' ' || line->ch == 0))
     {

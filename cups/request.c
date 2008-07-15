@@ -572,7 +572,6 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Loop until we can send the request without authorization problems.
   */
 
-  status = HTTP_ERROR;
   expect = HTTP_CONTINUE;
 
   for (;;)

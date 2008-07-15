@@ -87,7 +87,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do uncompressed random I/O tests...
     */
 
-    status = random_tests();
+    status += random_tests();
 
    /*
     * Test fdopen and close without reading...

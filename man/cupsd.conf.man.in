@@ -33,6 +33,14 @@ AccessLog syslog
 .br
 Defines the access log filename.
 .TP 5
+AccessLogLevel config
+.TP 5
+AccessLogLevel actions
+.TP 5
+AccessLogLevel all
+.br
+Specifies the logging level for the AccessLog file.
+.TP 5
 Allow all
 .TP 5
 Allow none

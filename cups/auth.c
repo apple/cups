@@ -270,8 +270,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
 
     if (http->gssctx != GSS_C_NO_CONTEXT)
     {
-      major_status = gss_delete_sec_context(&minor_status, &http->gssctx,
-					    GSS_C_NO_BUFFER);
+      gss_delete_sec_context(&minor_status, &http->gssctx, GSS_C_NO_BUFFER);
       http->gssctx = GSS_C_NO_CONTEXT;
     }
 
@@ -323,14 +322,14 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
       httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
 		     output_token.length);
  
-      major_status = gss_release_buffer(&minor_status, &output_token);
+      gss_release_buffer(&minor_status, &output_token);
     }
     else
     {
       DEBUG_printf(("cupsDoAuthentication: Kerberos credentials too large - "
                     "%d bytes!\n", (int)output_token.length));
 
-      major_status = gss_release_buffer(&minor_status, &output_token);
+      gss_release_buffer(&minor_status, &output_token);
 
       return (-1);
     }
@@ -405,12 +404,8 @@ DEBUG_gss_printf(OM_uint32 major_status,/* I - Major status code */
 					&major_status_string);
 
   if (!GSS_ERROR(err_major_status))
-    err_major_status = gss_display_status(&err_minor_status,
-	                        	  minor_status,
-					  GSS_C_MECH_CODE,
-					  GSS_C_NULL_OID,
-					  &msg_ctx,
-					  &minor_status_string);
+    gss_display_status(&err_minor_status, minor_status, GSS_C_MECH_CODE,
+		       GSS_C_NULL_OID, &msg_ctx, &minor_status_string);
 
   printf("%s: %s, %s\n", message, (char *)major_status_string.value,
 	 (char *)minor_status_string.value);

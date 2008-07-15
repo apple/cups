@@ -264,7 +264,7 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size);
+			                 size_t resolved_size, int log);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*

@@ -133,6 +133,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   if (!Printers)
     Printers = cupsArrayNew(compare_printers, NULL);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddPrinter: Adding %s to Printers", p->name);
   cupsArrayAdd(Printers, p);
 
   if (!ImplicitPrinters)
@@ -640,10 +642,17 @@ cupsdDeletePrinter(
   * Remove the printer from the list...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdDeletePrinter: Removing %s from Printers", p->name);
   cupsArrayRemove(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdDeletePrinter: Removing %s from ImplicitPrinters",
+		    p->name);
     cupsArrayRemove(ImplicitPrinters, p);
+  }
 
  /*
   * Remove the dummy interface/icon/option files under IRIX...
@@ -1128,7 +1137,7 @@ cupsdLoadAllPrinters(void)
           for (value = valueptr; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
 	  if (*valueptr)
-            *valueptr++ = '\0';
+            *valueptr = '\0';
 
 	  cupsdSetString(&p->job_sheets[1], value);
 	}
@@ -1285,10 +1294,17 @@ cupsdRenamePrinter(
   * Remove the printer from the array(s) first...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdRenamePrinter: Removing %s from Printers", p->name);
   cupsArrayRemove(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdRenamePrinter: Removing %s from ImplicitPrinters",
+		    p->name);
     cupsArrayRemove(ImplicitPrinters, p);
+  }
 
  /*
   * Rename the printer type...
@@ -1316,10 +1332,17 @@ cupsdRenamePrinter(
   * Add the printer back to the printer array(s)...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdRenamePrinter: Adding %s to Printers", p->name);
   cupsArrayAdd(Printers, p);
 
   if (p->type & CUPS_PRINTER_IMPLICIT)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdRenamePrinter: Adding %s to ImplicitPrinters",
+		    p->name);
     cupsArrayAdd(ImplicitPrinters, p);
+  }
 }
 
 
@@ -1574,7 +1597,7 @@ cupsdSaveAllPrinters(void)
     {
       cupsFilePrintf(fp, "Attribute %s ", marker->name);
 
-      if (!ptr && (ptr = strchr(marker->values[0].string.text, '#')) != NULL)
+      if ((ptr = strchr(marker->values[0].string.text, '#')) != NULL)
       {
 	cupsFileWrite(fp, marker->values[0].string.text,
 		      ptr - marker->values[0].string.text);
@@ -3740,7 +3763,7 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   * Add all of the default options from the .conf files...
   */
 
-  for (num_options = 0, i = p->num_options, option = p->options;
+  for (num_options = 0, options = NULL, i = p->num_options, option = p->options;
        i > 0;
        i --, option ++)
   {
@@ -3825,7 +3848,8 @@ add_printer_filter(
   *     super/type cost program
   */
 
-  if (sscanf(filter, "%15[^/]/%31s%d%1023s", super, type, &cost, program) != 4)
+  if (sscanf(filter, "%15[^/]/%31s%d%*[ \t]%1023[^\n]", super, type, &cost,
+             program) != 4)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
                     p->name, filter);

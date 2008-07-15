@@ -277,14 +277,30 @@ case $uname in
 		AC_CHECK_FUNCS(notify_post)
 
 		dnl Check for Authorization Services support
+		AC_ARG_WITH(adminkey, [  --with-adminkey         set the default SystemAuthKey value],
+			default_adminkey="$withval",
+			default_adminkey="default")
+ 		AC_ARG_WITH(operkey, [  --with-operkey          set the default operator @AUTHKEY value],
+			default_operkey="$withval",
+			default_operkey="default")
+ 
 		AC_CHECK_HEADER(Security/Authorization.h, [
 			AC_DEFINE(HAVE_AUTHORIZATION_H)
-			if grep -q system.print.operator /etc/authorization; then
-				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
-				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
-			else
-				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
+
+			if test "x$default_adminkey" != xdefault; then
+				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey $default_adminkey"
+			elif grep -q system.print.operator /etc/authorization; then
 				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.print.admin"
+			else
+				CUPS_SYSTEM_AUTHKEY="SystemGroupAuthKey system.preferences"
+			fi
+
+			if test "x$default_operkey" != xdefault; then
+				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY($default_operkey) @admin @lpadmin"
+			elif grep -q system.print.operator /etc/authorization; then
+				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
+			else
+				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
 			fi])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 

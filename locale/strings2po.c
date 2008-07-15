@@ -148,7 +148,7 @@ read_strings(FILE   *strings,		/* I - .strings file */
     if (*bufptr != '\"')
       continue;
 
-    *bufptr++ = '\0';
+    *bufptr = '\0';
 
     return (1);
   }

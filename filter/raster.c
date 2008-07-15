@@ -1015,8 +1015,7 @@ cups_raster_write(
 			*plast;		/* Pointer to last pixel */
   unsigned char		*wptr;		/* Pointer into write buffer */
   int			bpp,		/* Bytes per pixel */
-			count,		/* Count */
-			maxrun;		/* Maximum run of 128 * bpp */
+			count;		/* Count */
 
 
   DEBUG_printf(("cups_raster_write(r=%p, pixels=%p)\n", r, pixels));
@@ -1049,7 +1048,6 @@ cups_raster_write(
   plast   = pend - bpp;
   wptr    = r->buffer;
   *wptr++ = r->count - 1;
-  maxrun  = 128 * bpp;
 
  /*
   * Write using a modified TIFF "packbits" compression...

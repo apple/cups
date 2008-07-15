@@ -35,7 +35,8 @@ OBJS	=	\
 		printers.o \
 		testcgi.o \
 		testhi.o \
-		testtemplate.o
+		testtemplate.o \
+		websearch.o
 CGIS	=	\
 		admin.cgi \
 		classes.cgi \
@@ -48,7 +49,8 @@ LIBTARGETS =	\
 		$(LIB32CUPSCGI) \
 		$(LIB32CUPSCGI) \
 		testcgi \
-		testhi
+		testhi \
+		websearch
 
 TARGETS	=	\
 		$(LIBTARGETS) \
@@ -388,6 +390,16 @@ testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/libcups.a \
 		$(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+
+
+#
+# websearch
+#
+
+websearch:	websearch.o ../Makedefs libcupscgi.a ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ websearch.o libcupscgi.a \
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #

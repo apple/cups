@@ -2436,8 +2436,8 @@ set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
   */
 
   if (attr == NULL)
-    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-                        "job-hold-until", NULL, holdstr);
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-hold-until",
+                 NULL, holdstr);
   else
     cupsdSetString(&attr->values[0].string.text, holdstr);
 
@@ -2821,7 +2821,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   i = ipp_length(job->attrs);
 
-  if (i > optlength)
+  if (i > optlength || !options)
   {
     if (optlength == 0)
       optptr = malloc(i);
@@ -3807,23 +3807,25 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     {
       cupsdLogJob(job, loglevel, "%s", message);
 
-      strlcpy(job->printer->state_message, message,
-	      sizeof(job->printer->state_message));
-      cupsdAddPrinterHistory(job->printer);
+      if (loglevel < CUPSD_LOG_DEBUG)
+      {
+	strlcpy(job->printer->state_message, message,
+		sizeof(job->printer->state_message));
+	cupsdAddPrinterHistory(job->printer);
 
-      if (loglevel <= CUPSD_LOG_INFO)
 	event |= CUPSD_EVENT_PRINTER_STATE;
 
-      if (loglevel <= job->status_level)
-      {
-       /*
-	* Some messages show in the printer-state-message attribute...
-	*/
+	if (loglevel <= job->status_level)
+	{
+	 /*
+	  * Some messages show in the printer-state-message attribute...
+	  */
 
-	if (loglevel != CUPSD_LOG_NOTICE)
-	  job->status_level = loglevel;
+	  if (loglevel != CUPSD_LOG_NOTICE)
+	    job->status_level = loglevel;
 
-	update_job_attrs(job, 1);
+	  update_job_attrs(job, 1);
+	}
       }
     }
 
