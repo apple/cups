@@ -71,6 +71,38 @@ information to the system log instead of a plain file.</P>
 <VAR>@CUPS_LOGDIR@/access_log</VAR>.</P>
 
 
+<H2 CLASS="title"><A NAME="AccessLogLevel">AccessLogLevel</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+AccessLogLevel config
+AccessLogLevel actions
+AccessLogLevel all
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>AccessLogLevel</CODE> directive controls which requests are logged
+to the access log file. The following levels are defined:</P>
+
+<UL>
+
+	<LI><CODE>config</CODE>; Log when printers and classes are added,
+	deleted, or modified and when configuration files are accessed or
+	updated.</LI>
+
+	<LI><CODE>actions</CODE>; Log when print jobs are submitted,
+	held, released, modified, or canceled, and any of the conditions
+	for <CODE>config</CODE>.</LI>
+
+	<LI><CODE>all</CODE>; Log all requests.</LI>
+
+</UL>
+
+<P>The default access log level is <CODE>@CUPS_ACCESS_LOG_LEVEL@</CODE>.</P>
+
+
 <H2 CLASS="title"><A NAME="Allow">Allow</A></H2>
 
 <H3>Examples</H3>

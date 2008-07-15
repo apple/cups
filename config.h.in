@@ -47,6 +47,7 @@
  */
 
 #define CUPS_DEFAULT_LOG_LEVEL	"warn"
+#define CUPS_DEFAULT_ACCESS_LOG_LEVEL "actions"
 
 
 /*

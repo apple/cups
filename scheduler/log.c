@@ -477,6 +477,112 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 		};
 
 
+ /*
+  * Filter requests as needed...
+  */
+
+  if (AccessLogLevel < CUPSD_ACCESSLOG_ALL)
+  {
+   /*
+    * Eliminate simple GET requests...
+    */
+
+    if ((con->operation == HTTP_GET &&
+         strncmp(con->uri, "/admin/conf", 11) &&
+	 strncmp(con->uri, "/admin/log", 10)) ||
+	(con->operation == HTTP_POST && !con->request &&
+	 strncmp(con->uri, "/admin", 6)) ||
+	(con->operation != HTTP_POST && con->operation != HTTP_PUT))
+      return (1);
+
+    if (con->request && con->response &&
+        con->response->request.status.status_code < IPP_REDIRECTION_OTHER_SITE)
+    {
+     /*
+      * Check successful requests...
+      */
+
+      ipp_op_t op = con->request->request.op.operation_id;
+      static cupsd_accesslog_t standard_ops[] =
+      {
+        CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_ACTIONS,/* Print-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Print-URI */
+        CUPSD_ACCESSLOG_ACTIONS,/* Validate-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Create-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Send-Document */
+        CUPSD_ACCESSLOG_ACTIONS,/* Send-URI */
+        CUPSD_ACCESSLOG_ACTIONS,/* Cancel-Job */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Job-Attributes */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Jobs */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Printer-Attributes */
+        CUPSD_ACCESSLOG_ACTIONS,/* Hold-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Release-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Restart-Job */
+	CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_CONFIG,	/* Pause-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Resume-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Purge-Jobs */
+        CUPSD_ACCESSLOG_CONFIG,	/* Set-Printer-Attributes */
+        CUPSD_ACCESSLOG_ACTIONS,/* Set-Job-Attributes */
+        CUPSD_ACCESSLOG_CONFIG,	/* Get-Printer-Supported-Values */
+        CUPSD_ACCESSLOG_ACTIONS,/* Create-Printer-Subscription */
+        CUPSD_ACCESSLOG_ACTIONS,/* Create-Job-Subscription */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Subscription-Attributes */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Subscriptions */
+        CUPSD_ACCESSLOG_ACTIONS,/* Renew-Subscription */
+        CUPSD_ACCESSLOG_ACTIONS,/* Cancel-Subscription */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Notifications */
+        CUPSD_ACCESSLOG_ACTIONS,/* Send-Notifications */
+        CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_ALL,	/* reserved */
+        CUPSD_ACCESSLOG_ALL,	/* Get-Print-Support-Files */
+        CUPSD_ACCESSLOG_CONFIG,	/* Enable-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Disable-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Pause-Printer-After-Current-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Hold-New-Jobs */
+        CUPSD_ACCESSLOG_ACTIONS,/* Release-Held-New-Jobs */
+        CUPSD_ACCESSLOG_CONFIG,	/* Deactivate-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Activate-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Restart-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Shutdown-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* Startup-Printer */
+        CUPSD_ACCESSLOG_ACTIONS,/* Reprocess-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Cancel-Current-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Suspend-Current-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Resume-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* Promote-Job */
+        CUPSD_ACCESSLOG_ACTIONS	/* Schedule-Job-After */
+      };
+      static cupsd_accesslog_t cups_ops[] =
+      {
+        CUPSD_ACCESSLOG_ALL,	/* CUPS-Get-Default */
+        CUPSD_ACCESSLOG_ALL,	/* CUPS-Get-Printers */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Add-Modify-Printer */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Delete-Printer */
+        CUPSD_ACCESSLOG_ALL,	/* CUPS-Get-Classes */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Add-Modify-Class */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Delete-Class */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Accept-Jobs */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Reject-Jobs */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Set-Default */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Get-Devices */
+        CUPSD_ACCESSLOG_CONFIG,	/* CUPS-Get-PPDs */
+        CUPSD_ACCESSLOG_ACTIONS,/* CUPS-Move-Job */
+        CUPSD_ACCESSLOG_ACTIONS,/* CUPS-Authenticate-Job */
+        CUPSD_ACCESSLOG_ALL	/* CUPS-Get-PPD */
+      };
+      
+
+      if ((op <= IPP_SCHEDULE_JOB_AFTER && standard_ops[op] > AccessLogLevel) ||
+          (op >= CUPS_GET_DEFAULT && op <= CUPS_GET_PPD &&
+	   cups_ops[op - CUPS_GET_DEFAULT] > AccessLogLevel))
+        return (1);
+    }
+  }
+
 #ifdef HAVE_VSYSLOG
  /*
   * See if we are logging accesses via syslog...

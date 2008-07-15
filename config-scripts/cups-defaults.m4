@@ -50,6 +50,12 @@ AC_ARG_WITH(log_level, [  --with-log-level        set default LogLevel value, de
 AC_SUBST(CUPS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_LEVEL, "$CUPS_LOG_LEVEL")
 
+dnl Default AccessLogLevel
+AC_ARG_WITH(log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
+	CUPS_LOG_LEVEL="$withval",
+	CUPS_LOG_LEVEL="actions")
+AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
 
 dnl Default Browsing
 AC_ARG_ENABLE(browsing, [  --enable-browsing       enable Browsing by default, default=yes])
