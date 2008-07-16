@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-07-14
+CHANGES.txt - 2008-07-15
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Increased the maximum size of 1284 device ID strings to
+	  256 bytes (STR #2877)
 	- Added an AccessLogLevel directive to cupsd.conf to control
 	  what is logged to the access_log file.
 	- The default LogLevel is now "warn" instead of "info" to reduce
