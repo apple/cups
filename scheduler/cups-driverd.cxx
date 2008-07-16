@@ -781,23 +781,25 @@ list_ppds(int        request_id,	/* I - Request ID */
       * We have a ppds.dat file, so read it!
       */
 
-      if ((ppd = (ppd_info_t *)calloc(num_ppds, sizeof(ppd_info_t))) == NULL)
+      for (; num_ppds > 0; num_ppds --)
       {
-        fprintf(stderr,
-	        "ERROR: [cups-driverd] Unable to allocate memory for %d PPDs!\n",
-		num_ppds);
-        exit(1);
-      }
+	if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
+	{
+	  fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
+	        stderr);
+	  exit(1);
+	}
 
-      for (; num_ppds > 0; num_ppds --, ppd ++)
-      {
 	if (cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t)) > 0)
 	{
 	  cupsArrayAdd(PPDsByName, ppd);
 	  cupsArrayAdd(PPDsByMakeModel, ppd);
 	}
 	else
+	{
+	  free(ppd);
 	  break;
+	}
       }
 
       fprintf(stderr, "INFO: [cups-driverd] Read \"%s\", %d PPDs...\n",
@@ -1027,7 +1029,8 @@ list_ppds(int        request_id,	/* I - Request ID */
     * Filter PPDs based on make, model, or device ID...
     */
 
-    if (ppd->record.type == PPD_TYPE_DRV)
+    if (ppd->record.type < PPD_TYPE_POSTSCRIPT ||
+        ppd->record.type >= PPD_TYPE_DRV)
       continue;
 
     if (device_id && strncasecmp(ppd->record.device_id, device_id,
