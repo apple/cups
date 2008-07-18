@@ -8,11 +8,11 @@
 *% used with any known printers.  Look at the PPD files in the "ppd"
 *% subdirectory as well as the CUPS web site for working PPD files.
 *%
-*% If you are a PPD file developer, consider using the CUPS DDK to
-*% create your PPD files - not only will it save you time, it produces
+*% If you are a PPD file developer, consider using the PPD compiler (ppdc)
+*% to create your PPD files - not only will it save you time, it produces
 *% consistently high-quality files.
 *%
-*% Copyright 2007 by Apple Inc.
+*% Copyright 2007-2008 by Apple Inc.
 *% Copyright 2002-2006 by Easy Software Products.
 *% 
 *% These coded instructions, statements, and computer programs are the
@@ -26,15 +26,12 @@
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TEST.PPD"
 *Manufacturer:	"ESP"
-*Product:	"(ESP Ghostscript)"
-*cupsVersion:	1.2
-*cupsManualCopies: True
-*cupsFilter:	"application/vnd.cups-raster 0 rastertotest"
-*cupsModelNumber: 1
+*Product:	"(Test)"
+*cupsVersion:	1.4
 *ModelName:     "Test"
 *ShortNickName: "Test"
-*NickName:      "Test for CUPS v1.3"
-*PSVersion:	"(3010.000) 81501"
+*NickName:      "Test for CUPS"
+*PSVersion:	"(3010.000) 0"
 *LanguageLevel:	"3"
 *ColorDevice:	True
 *DefaultColorSpace: RGB
@@ -43,9 +40,15 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer:	Type42
 
-*% These constraints are used to test ppdConflicts()
+*% These constraints are used to test ppdConflicts() and ppdResolveConflicts()
 *UIConstraints: *PageSize Letter *InputSlot Envelope
 *UIConstraints: *InputSlot Envelope *PageSize Letter
+*UIConstraints: *PageRegion Letter *InputSlot Envelope
+*UIConstraints: *InputSlot Envelope *PageRegion Letter
+
+*% These constraints are used to test ppdInstallableConflict()
+*UIConstraints: "*Duplex *InstalledDuplexer False"
+*UIConstraints: "*InstalledDuplexer False *Duplex"
 
 *% For PageSize, we have put all of the translations in-line...
 *OpenUI *PageSize/Page Size: PickOne
@@ -110,6 +113,23 @@
 *InputSlot Manual/Manual Feed: "InputSlot=Manual"
 *InputSlot Envelope/Envelope Feed: "InputSlot=Envelope"
 *CloseUI: *InputSlot
+
+*OpenUI *Duplex/2-Sided Printing: PickOne
+*OrderDependency: 10 DocumentSetup *Duplex
+*DefaultDuplex: None
+*Duplex None/Off: "Duplex=None"
+*Duplex DuplexNoTumble/Long Edge: "Duplex=DuplexNoTumble"
+*Duplex DuplexTumble/Short Edge: "Duplex=DuplexTumble"
+*CloseUI: *Duplex
+
+*% Installable option...
+*OpenGroup: InstallableOptions/Installable Options
+*OpenUI InstalledDuplexer/Duplexer Installed: Boolean
+*DefaultInstalledDuplexer: False
+*InstalledDuplexer False: ""
+*InstalledDuplexer True: ""
+*CloseUI: *InstalledDuplexer
+*CloseGroup: InstallableOptions
 
 *% Custom options...
 *OpenGroup: Extended/Extended Options

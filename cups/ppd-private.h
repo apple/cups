@@ -43,6 +43,30 @@ extern "C" {
 #  endif /* __cplusplus */
 
 
+/*
+ * Structures...
+ */
+
+typedef struct _ppd_cups_uiconst_s	/**** Constraint from cupsUIConstraints ****/
+{
+  ppd_option_t	*option;		/* Constrained option */
+  ppd_choice_t	*choice;		/* Constrained choice or @code NULL@ */
+  int		installable;		/* Installable option? */
+} _ppd_cups_uiconst_t;
+
+typedef struct _ppd_cups_uiconsts_s	/**** cupsUIConstraints ****/
+{
+  char		resolver[PPD_MAX_NAME];	/* Resolver name */
+  int		installable,		/* Constrained against any installable options? */
+		num_constraints;	/* Number of constraints */
+  _ppd_cups_uiconst_t *constraints;	/* Constraints */
+} _ppd_cups_uiconsts_t;
+
+
+/*
+ * Prototypes...
+ */
+
 extern void		_ppdFreeLanguages(cups_array_t *languages);
 extern int		_ppdGet1284Values(const char *device_id,
 			                  cups_option_t **values);
@@ -54,6 +78,8 @@ extern ppd_attr_t	*_ppdLocalizedAttr(ppd_file_t *ppd, const char *keyword,
 extern char		*_ppdNormalizeMakeAndModel(const char *make_and_model,
 			                           char *buffer,
 						   size_t bufsize);
+extern int		_ppdParseOptions(const char *s, int num_options,
+			                 cups_option_t **options);
 
 
 /*

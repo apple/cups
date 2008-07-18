@@ -195,6 +195,11 @@ cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../filter/$(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
+cupstestppd-static:	cupstestppd.o ../cups/libcups.a ../filter/libcupsimage.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ cupstestppd.o ../filter/libcupsimage.a \
+		../cups/libcups.a $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
+
 
 #
 # lp

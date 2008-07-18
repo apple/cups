@@ -55,6 +55,7 @@ __ppdGetLanguages
 __ppdHashName
 __ppdLocalizedAttr
 __ppdNormalizeMakeAndModel
+__ppdParseOptions
 _cupsAddDest
 _cupsAddOption
 _cupsAdminCreateWindowsPPD
@@ -170,6 +171,7 @@ _cupsPutFile
 _cupsReadResponseData
 _cupsRemoveDest
 _cupsRemoveOption
+_cupsResolveConflicts
 _cupsSendRequest
 _cupsServer
 _cupsSetDefaultDest
@@ -317,6 +319,7 @@ _ppdFindNextAttr
 _ppdFindOption
 _ppdFirstCustomParam
 _ppdFirstOption
+_ppdInstallableConflict
 _ppdIsMarked
 _ppdLastError
 _ppdLocalize

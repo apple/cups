@@ -291,6 +291,10 @@ extern ipp_t		*cupsGetResponse(http_t *http,
 			                 const char *resource) _CUPS_API_1_4;
 extern ssize_t		cupsReadResponseData(http_t *http, char *buffer,
 			                     size_t length) _CUPS_API_1_4;
+extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
+			                     const char *choice,
+					     int *num_options,
+					     cups_option_t **options);
 extern http_status_t	cupsSendRequest(http_t *http, ipp_t *request,
 			                const char *resource,
 					size_t length) _CUPS_API_1_4;

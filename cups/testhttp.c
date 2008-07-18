@@ -464,7 +464,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("_httpResolveURI(%s): ", argv[1]);
     fflush(stdout);
 
-    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved)))
+    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved), 0))
     {
       puts("FAIL");
       return (1);
