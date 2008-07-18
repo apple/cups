@@ -682,10 +682,9 @@ will do so if a resolver loop is detected.<br>
 <br>
 The backup constraint infomration is defined by the
 <code>UIConstraints</code> and <code>NonUIConstraints</code> attributes.  These
-constraints are resolved algorithmically by first testing the default
-choice for the conflicting option and then trying all other choices until
-a non-conflicting combination is found.  This method is far more likely
-to result in a failure...
+constraints are resolved algorithmically by selecting the default choice
+for the conflicting option.  Unfortunately, this method is far more likely
+to fail.
 
 </p>
 <h3 class="function"><a name="ppdClose">ppdClose</a></h3>
