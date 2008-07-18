@@ -114,7 +114,8 @@ clang:
 	else \
 		rm -rf clang/*; \
 	fi
-	$(MAKE) $(MFLAGS) CC="scan-build -o ../clang $(CC)" clean all
+	$(MAKE) $(MFLAGS) CC="scan-build -o ../clang $(CC)" \
+		CXX="scan-build -o ../clang $(CXX)" clean all
 
 
 #
