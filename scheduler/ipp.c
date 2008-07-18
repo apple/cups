@@ -10086,6 +10086,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	!strcmp(attr->name, "job-detailed-status-messages") ||
 	!strcmp(attr->name, "job-document-access-errors") ||
 	!strcmp(attr->name, "job-id") ||
+	!strcmp(attr->name, "job-impressions-completed") ||
 	!strcmp(attr->name, "job-k-octets") ||
         !strcmp(attr->name, "job-originating-host-name") ||
         !strcmp(attr->name, "job-originating-user-name") ||
@@ -10099,7 +10100,6 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	!strcmp(attr->name, "number-of-intervening-jobs") ||
 	!strcmp(attr->name, "output-device-assigned") ||
 	!strncmp(attr->name, "date-time-at-", 13) ||
-	!strncmp(attr->name, "job-impressions", 15) ||
 	!strncmp(attr->name, "job-k-octets", 12) ||
 	!strncmp(attr->name, "job-media-sheets", 16) ||
 	!strncmp(attr->name, "time-at-", 8))

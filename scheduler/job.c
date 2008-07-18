@@ -2890,18 +2890,22 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) && strcmp(attr->name, "job-uuid") &&
+          strcmp(attr->name, "job-impressions") &&
+          strcmp(attr->name, "job-originating-host-name") &&
           !(printer->type & CUPS_PRINTER_REMOTE))
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) &&
           strcmp(attr->name, "job-uuid") &&
           strcmp(attr->name, "job-billing") &&
+          strcmp(attr->name, "job-impressions") &&
           strcmp(attr->name, "job-sheets") &&
           strcmp(attr->name, "job-hold-until") &&
 	  strcmp(attr->name, "job-priority"))
 	continue;
 
-      if ((!strcmp(attr->name, "page-label") ||
+      if ((!strcmp(attr->name, "job-impressions") ||
+           !strcmp(attr->name, "page-label") ||
            !strcmp(attr->name, "page-border") ||
            !strncmp(attr->name, "number-up", 9) ||
 	   !strcmp(attr->name, "page-ranges") ||

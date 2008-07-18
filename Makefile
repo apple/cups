@@ -116,7 +116,7 @@ clang:
 	fi
 	$(MAKE) $(MFLAGS) CC="scan-build -o ../clang $(CC)" \
 		CXX="scan-build -o ../clang $(CXX)" clean all
-	test `ls -1 clang | wc -l` != 0 && exit 1
+	test `ls -1 clang | wc -l` != 0 || exit 1
 
 
 #
