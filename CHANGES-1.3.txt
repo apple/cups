@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.3.8
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
 	- The IPP backend did not relay marker-* attributes.
 	- The CUPS GNOME/KDE menu item was not localized for
+	  Chinese (STR #2880)
+	- The CUPS GNOME/KDE menu item was not localized for
 	  Japanese (STR #2876)
 	- The cupstestppd utility reported mixed line endings for
 	  Mac OS and Windows PPD files (STR #2874)
