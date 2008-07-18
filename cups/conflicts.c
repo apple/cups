@@ -254,7 +254,7 @@ cupsResolveConflicts(
     if (!resolvers)
       resolvers = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
 
-    for (consts = (_ppd_cups_uiconsts_t *)cupsArrayFirst(active);
+    for (consts = (_ppd_cups_uiconsts_t *)cupsArrayFirst(active), changed = 0;
          consts;
 	 consts = (_ppd_cups_uiconsts_t *)cupsArrayNext(active))
     {
@@ -301,6 +301,7 @@ cupsResolveConflicts(
 	cupsArrayAdd(resolvers, consts->resolver);
 
         num_newopts = _ppdParseOptions(resolver->value, num_newopts, &newopts);
+	changed     = 1;
       }
       else
       {
@@ -310,11 +311,13 @@ cupsResolveConflicts(
 	*/
 
         for (i = consts->num_constraints, constptr = consts->constraints,
-	         changed = 0, ignored = NULL;
+	         ignored = NULL;
 	     i > 0;
 	     i --, constptr ++)
 	{
-	  if (constptr->installable)
+	  if (constptr->installable ||
+	      !strcasecmp(constptr->option->keyword, "PageSize") ||
+	      !strcasecmp(constptr->option->keyword, "PageRegion"))
 	    continue;
 
 	  if (option && !strcasecmp(constptr->option->keyword, option))
@@ -359,13 +362,13 @@ cupsResolveConflicts(
             changed     = 1;
 	  }
 	}
+      }
 
-	if (!changed)
-	{
-	  DEBUG_puts("ppdResolveConflicts: Unable to automatically resolve "
-	             "constraint!");
-	  goto error;
-	}
+      if (!changed)
+      {
+	DEBUG_puts("ppdResolveConflicts: Unable to automatically resolve "
+		   "constraint!");
+	goto error;
       }
     }
 
@@ -556,6 +559,12 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 	  *ptr = '\0';
 	}
 
+        if (!strncasecmp(option, "Custom", 6) && !strcasecmp(choice, "True"))
+	{
+	  _cups_strcpy(option, option + 6);
+	  strcpy(choice, "Custom");
+	}
+
         constptr->option      = ppdFindOption(ppd, option);
         constptr->choice      = ppdFindChoice(constptr->option, choice);
         constptr->installable = ppd_is_installable(installable, option);
@@ -622,12 +631,23 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
       consts->num_constraints = 2;
       consts->constraints     = constptr;
-      
-      constptr[0].option      = ppdFindOption(ppd, oldconst->option1);
-      constptr[0].choice      = ppdFindChoice(constptr[0].option,
-                                              oldconst->choice1);
-      constptr[0].installable = ppd_is_installable(installable,
-                                                   oldconst->option1);
+
+      if (!strncasecmp(oldconst->option1, "Custom", 6) &&
+          !strcasecmp(oldconst->choice1, "True"))
+      {
+	constptr[0].option      = ppdFindOption(ppd, oldconst->option1 + 6);
+	constptr[0].choice      = ppdFindChoice(constptr[0].option, "Custom");
+        constptr[0].installable = 0;
+      }
+      else
+      {
+	constptr[0].option      = ppdFindOption(ppd, oldconst->option1);
+	constptr[0].choice      = ppdFindChoice(constptr[0].option,
+	                                        oldconst->choice1);
+	constptr[0].installable = ppd_is_installable(installable,
+						     oldconst->option1);
+      }
+
       if (!constptr[0].option)
       {
         DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
@@ -637,11 +657,22 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 	continue;
       }
 
-      constptr[1].option      = ppdFindOption(ppd, oldconst->option2);
-      constptr[1].choice      = ppdFindChoice(constptr[1].option,
-                                              oldconst->choice2);
-      constptr[1].installable = ppd_is_installable(installable,
-                                                   oldconst->option2);
+      if (!strncasecmp(oldconst->option2, "Custom", 6) &&
+          !strcasecmp(oldconst->choice2, "True"))
+      {
+	constptr[1].option      = ppdFindOption(ppd, oldconst->option2 + 6);
+	constptr[1].choice      = ppdFindChoice(constptr[1].option, "Custom");
+        constptr[1].installable = 0;
+      }
+      else
+      {
+	constptr[1].option      = ppdFindOption(ppd, oldconst->option2);
+	constptr[1].choice      = ppdFindChoice(constptr[1].option,
+	                                        oldconst->choice2);
+	constptr[1].installable = ppd_is_installable(installable,
+						     oldconst->option2);
+      }
+
       if (!constptr->option)
       {
         DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
@@ -700,7 +731,31 @@ ppd_test_constraints(
          i > 0;
 	 i --, constptr ++)
     {
-      if (constptr->choice)
+      if (constptr->choice &&
+          (!strcasecmp(constptr->option->keyword, "PageSize") ||
+           !strcasecmp(constptr->option->keyword, "PageRegion")))
+      {
+       /*
+        * PageSize and PageRegion are used depending on the selected input slot
+	* and manual feed mode.  Validate against the selected page size instead
+	* of an individual option...
+	*/
+
+        if ((value = cupsGetOption("PageSize", num_options, options)) == NULL)
+	  if ((value = cupsGetOption("PageRegion", num_options,
+	                             options)) == NULL)
+	    if ((value = cupsGetOption("media", num_options, options)) == NULL)
+	    {
+	      ppd_size_t *size = ppdPageSize(ppd, NULL);
+
+              if (size)
+	        value = size->name;
+	    }
+
+        if (!value || strcasecmp(value, constptr->choice->choice))
+	  break;
+      }
+      else if (constptr->choice)
       {
         if ((value = cupsGetOption(constptr->option->keyword, num_options,
 	                           options)) != NULL)

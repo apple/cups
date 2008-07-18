@@ -1796,6 +1796,12 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  *ptr = '\0';
 	}
 
+        if (!strncasecmp(option, "Custom", 6) && !strcasecmp(choice, "True"))
+	{
+	  _cups_strcpy(option, option + 6);
+	  strcpy(choice, "Custom");
+	}
+
         if ((o = ppdFindOption(ppd, option)) == NULL)
 	{
 	  if (!warn && !errors && !verbose)
@@ -1873,7 +1879,19 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
     for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
     {
-      if ((o = ppdFindOption(ppd, c->option1)) == NULL)
+      if (!strncasecmp(c->option1, "Custom", 6) &&
+          !strcasecmp(c->choice1, "True"))
+      {
+	strcpy(option, c->option1 + 6);
+	strcpy(choice, "Custom");
+      }
+      else
+      {
+	strcpy(option, c->option1);
+	strcpy(choice, c->choice1);
+      }
+
+      if ((o = ppdFindOption(ppd, option)) == NULL)
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1887,7 +1905,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	if (!warn)
 	  errors ++;
       }
-      else if (c->choice1[0] && !ppdFindChoice(o, c->choice1))
+      else if (choice[0] && !ppdFindChoice(o, choice))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1902,7 +1920,19 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  errors ++;
       }
 
-      if ((o = ppdFindOption(ppd, c->option2)) == NULL)
+      if (!strncasecmp(c->option2, "Custom", 6) &&
+          !strcasecmp(c->choice2, "True"))
+      {
+	strcpy(option, c->option2 + 6);
+	strcpy(choice, "Custom");
+      }
+      else
+      {
+	strcpy(option, c->option2);
+	strcpy(choice, c->choice2);
+      }
+
+      if ((o = ppdFindOption(ppd, option)) == NULL)
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -1916,7 +1946,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	if (!warn)
 	  errors ++;
       }
-      else if (c->choice2[0] && !ppdFindChoice(o, c->choice2))
+      else if (choice[0] && !ppdFindChoice(o, choice))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));

@@ -208,8 +208,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppdMarkOption(ppd, "PageSize", "Letter");
     ppdMarkOption(ppd, "InputSlot", "Envelope");
 
-    if ((conflicts = ppdConflicts(ppd)) == 1)
-      puts("PASS (1)");
+    if ((conflicts = ppdConflicts(ppd)) == 2)
+      puts("PASS (2)");
     else
     {
       printf("FAIL (%d)\n", conflicts);
@@ -220,7 +220,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     num_options = 0;
     options     = NULL;
     if (cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
-                            &options) &&
+                             &options) &&
         num_options == 1 && !strcasecmp(options->name, "InputSlot") &&
 	!strcasecmp(options->value, "Tray"))
       puts("PASS");
@@ -230,9 +230,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       for (i = 0; i < num_options; i ++)
         printf(" %s=%s", options[i].name, options[i].value);
       puts(")");
+      status ++;
     }
     else
+    {
       puts("FAIL (Unable to resolve!)");
+      status ++;
+    }
     cupsFreeOptions(num_options, options);
 
     fputs("ppdInstallableConflict(): ", stdout);
@@ -410,8 +414,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppdMarkOption(ppd, "InputSlot", "Envelope");
     ppdMarkOption(ppd, "Quality", "Photo");
 
-    if ((conflicts = ppdConflicts(ppd)) == 1)
-      puts("PASS (1)");
+    if ((conflicts = ppdConflicts(ppd)) == 2)
+      puts("PASS (2)");
     else
     {
       printf("FAIL (%d)\n", conflicts);
@@ -432,9 +436,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       for (i = 0; i < num_options; i ++)
         printf(" %s=%s", options[i].name, options[i].value);
       puts(")");
+      status ++;
     }
     else
+    {
       puts("FAIL (Unable to resolve!)");
+      status ++;
+    }
     cupsFreeOptions(num_options, options);
 
     fputs("cupsResolveConflicts(loop test): ", stdout);
@@ -499,6 +507,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       ppd_option_t	*option;	/* Option */
       ppd_coption_t	*coption;	/* Custom option */
       ppd_cparam_t	*cparam;	/* Custom parameter */
+      ppd_const_t	*c;		/* UIConstraints */
       char		lang[255];	/* LANG environment variable */
 
 
@@ -594,6 +603,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  }
 	}
       }
+
+      puts("Constraints:");
+
+      for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
+        printf("    *UIConstraints: *%s %s *%s %s\n", c->option1, c->choice1,
+	       c->option2, c->choice2);
 
       puts("Attributes:");
 

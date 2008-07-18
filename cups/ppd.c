@@ -1746,52 +1746,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       }
 
      /*
-      * For CustomPageSize and InputSlot/ManualFeed, create a duplicate
-      * constraint for PageRegion...
-      */
-
-      if (!strcasecmp(constraint->option1, "CustomPageSize") &&
-          (!strcasecmp(constraint->option2, "InputSlot") ||
-	   !strcasecmp(constraint->option2, "ManualFeed")))
-      {
-        ppd->num_consts ++;
-
-        strcpy(constraint[1].option1, "PageRegion");
-	strcpy(constraint[1].choice1, "Custom");
-	strcpy(constraint[1].option2, constraint->option2);
-	strcpy(constraint[1].choice2, constraint->choice2);
-      }
-      else if (!strcasecmp(constraint->option2, "CustomPageSize") &&
-               (!strcasecmp(constraint->option1, "InputSlot") ||
-	        !strcasecmp(constraint->option1, "ManualFeed")))
-      {
-        ppd->num_consts ++;
-
-	strcpy(constraint[1].option1, constraint->option1);
-	strcpy(constraint[1].choice1, constraint->choice1);
-        strcpy(constraint[1].option2, "PageRegion");
-	strcpy(constraint[1].choice2, "Custom");
-      }
-
-     /*
-      * Handle CustomFoo option constraints...
-      */
-
-      if (!strncasecmp(constraint->option1, "Custom", 6) &&
-          !strcasecmp(constraint->choice1, "True"))
-      {
-        _cups_strcpy(constraint->option1, constraint->option1 + 6);
-	strcpy(constraint->choice1, "Custom");
-      }
-
-      if (!strncasecmp(constraint->option2, "Custom", 6) &&
-          !strcasecmp(constraint->choice2, "True"))
-      {
-        _cups_strcpy(constraint->option2, constraint->option2 + 6);
-	strcpy(constraint->choice2, "Custom");
-      }
-
-     /*
       * Don't add this one as an attribute...
       */
 
