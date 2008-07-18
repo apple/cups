@@ -87,8 +87,6 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
   * Clear all conflicts...
   */
 
-  conflicts = 0;
-
   for (o = ppdFirstOption(ppd); o; o = ppdNextOption(ppd))
     o->conflicted = 0;
 
