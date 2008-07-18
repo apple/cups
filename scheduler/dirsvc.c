@@ -2645,7 +2645,7 @@ process_browse_data(
       }
     }
   }
-  else
+  else if (p)
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "process_browse_data: %s found, type=%x, hostname=%s...",
 		    name, p->type, p->hostname ? p->hostname : "(nil)");

@@ -722,7 +722,7 @@ ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
 		*option;		/* Current option */
 
 
-  if (!options)
+  if (!s)
     return;
 
   options     = NULL;
