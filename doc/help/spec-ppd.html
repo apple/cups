@@ -388,11 +388,14 @@ attribute which corrects the conflict condition. The same
 <p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
 *cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
 *cupsUIConstraints resolver: "*Keyword1 *Keyword2 OptionKeyword2 ..."<br>
-*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
+*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."<br>
+*cupsUIConstraints: "*InstallableKeyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
 <p>Lists two or more options which conflict. The "resolver" string is a
 (possibly unique) keyword which specifies which options to change when the
-constraint exists.</p>
+constraint exists. When no resolver is provided, a "revert to defaults"
+change is assumed - this type of constraint is typically only used for
+installable options.</p>
 
 <p>Examples:</p>
 
