@@ -300,6 +300,7 @@ div.contents ul.subcontents li {
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cupsMarkOptions" title="Mark command-line options in a PPD file.">cupsMarkOptions</a></li>
+<li><a href="#cupsResolveConflicts" title="Resolve conflicts in a marked PPD.">cupsResolveConflicts</a></li>
 <li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
 <li><a href="#ppdCollect" title="Collect all marked options that reside in the specified
 section.">ppdCollect</a></li>
@@ -323,6 +324,8 @@ marked option choices.">ppdConflicts</a></li>
 <li><a href="#ppdFindOption" title="Return a pointer to the specified option.">ppdFindOption</a></li>
 <li><a href="#ppdFirstCustomParam" title="Return the first parameter for a custom option.">ppdFirstCustomParam</a></li>
 <li><a href="#ppdFirstOption" title="Return the first option in the PPD file.">ppdFirstOption</a></li>
+<li><a href="#ppdInstallableConflict" title="Test whether an option choice conflicts with
+an installable option.">ppdInstallableConflict</a></li>
 <li><a href="#ppdIsMarked" title="Check to see if an option is marked.">ppdIsMarked</a></li>
 <li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
 <li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
@@ -332,7 +335,8 @@ attribute.">ppdLocalizeIPPReason</a></li>
 <li><a href="#ppdLocalizeMarkerName" title="Get the localized version of a marker-names
 attribute value.">ppdLocalizeMarkerName</a></li>
 <li><a href="#ppdMarkDefaults" title="Mark all default options in the PPD file.">ppdMarkDefaults</a></li>
-<li><a href="#ppdMarkOption" title="Mark an option in a PPD file.">ppdMarkOption</a></li>
+<li><a href="#ppdMarkOption" title="Mark an option in a PPD file and return the number of
+conflicts.">ppdMarkOption</a></li>
 <li><a href="#ppdNextCustomParam" title="Return the next parameter for a custom option.">ppdNextCustomParam</a></li>
 <li><a href="#ppdNextOption" title="Return the next option in the PPD file.">ppdNextOption</a></li>
 <li><a href="#ppdOpen" title="Read a PPD file into memory.">ppdOpen</a></li>
@@ -627,11 +631,63 @@ int cupsMarkOptions (<br>
 <dd class="description">Options</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">1 if conflicting</p>
+<p class="description">1 if conflicts exist, 0 otherwise</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function maps the IPP &quot;finishings&quot;, &quot;media&quot;, &quot;mirror&quot;,
 &quot;multiple-document-handling&quot;, &quot;output-bin&quot;, &quot;printer-resolution&quot;, and
 &quot;sides&quot; attributes to their corresponding PPD options and choices.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsResolveConflicts">cupsResolveConflicts</a></h3>
+<p class="description">Resolve conflicts in a marked PPD.</p>
+<p class="code">
+int cupsResolveConflicts (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int *num_options,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t **options<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>option</dt>
+<dd class="description">Newly selected option or <code>NULL</code> for none</dd>
+<dt>choice</dt>
+<dd class="description">Newly selected choice or <code>NULL</code> for none</dd>
+<dt>num_options</dt>
+<dd class="description">Number of additional selected options</dd>
+<dt>options</dt>
+<dd class="description">Additional selected options</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 on success, 0 on failure</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function attempts to resolve any conflicts in a marked PPD, returning
+a list of option changes that are required to resolve any conflicts.  On
+input, &quot;num_options&quot; and &quot;options&quot; contain any pending option changes that
+have not yet been marked, while &quot;option&quot; and &quot;choice&quot; contain the most recent
+selection which may or may not be in &quot;num_options&quot; or &quot;options&quot;.<br>
+<br>
+On successful return, &quot;num_options&quot; and &quot;options&quot; are updated to contain
+&quot;option&quot; and &quot;choice&quot; along with any changes required to resolve conflicts
+specified in the PPD file.  If option conflicts cannot be resolved,
+&quot;num_options&quot; and &quot;options&quot; are not changed.
+
+<code>ppdResolveConflicts</code> uses one of two sources of option constraint
+information.  The preferred constraint information is defined by
+<code>cupsUIConstraints</code> and <code>cupsUIResolver</code> attributes - in this
+case, the PPD file provides constraint resolution actions.  In this case,
+it should not be possible for @ppdResolveConflicts@ to fail, however it
+will do so if a resolver loop is detected.<br>
+<br>
+The backup constraint infomration is defined by the
+<code>UIConstraints</code> and <code>NonUIConstraints</code> attributes.  These
+constraints are resolved algorithmically by first testing the default
+choice for the conflicting option and then trying all other choices until
+a non-conflicting combination is found.  This method is far more likely
+to result in a failure...
+
+</p>
 <h3 class="function"><a name="ppdClose">ppdClose</a></h3>
 <p class="description">Free all memory used by the PPD file.</p>
 <p class="code">
@@ -1011,6 +1067,31 @@ const char *ppdErrorString (<br>
 <p class="discussion">Options are returned from all groups in ascending alphanumeric order.
 
 </p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ppdInstallableConflict">ppdInstallableConflict</a></h3>
+<p class="description">Test whether an option choice conflicts with
+an installable option.</p>
+<p class="code">
+int ppdInstallableConflict (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>option</dt>
+<dd class="description">Option</dd>
+<dt>choice</dt>
+<dd class="description">Choice</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if conflicting, 0 if not conflicting</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function tests whether a particular option choice is available based
+on constraints against options in the &quot;InstallableOptions&quot; group.
+
+</p>
 <h3 class="function"><a name="ppdIsMarked">ppdIsMarked</a></h3>
 <p class="description">Check to see if an option is marked.</p>
 <p class="code">
@@ -1155,7 +1236,8 @@ void ppdMarkDefaults (<br>
 <dd class="description">PPD file record</dd>
 </dl>
 <h3 class="function"><a name="ppdMarkOption">ppdMarkOption</a></h3>
-<p class="description">Mark an option in a PPD file.</p>
+<p class="description">Mark an option in a PPD file and return the number of
+conflicts.</p>
 <p class="code">
 int ppdMarkOption (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
@@ -1639,8 +1721,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Number of pre-loaded fonts</dd>
 <dt>num_groups </dt>
 <dd class="description">Number of UI groups</dd>
-<dt>num_profiles </dt>
-<dd class="description">Number of sRGB color profiles</dd>
+<dt>num_profiles <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Number of sRGB color profiles </dd>
 <dt>num_sizes </dt>
 <dd class="description">Number of page sizes</dd>
 <dt>patches </dt>
@@ -1649,8 +1731,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">PCFileName string </dd>
 <dt>product </dt>
 <dd class="description">Product name (from PS RIP/interpreter)</dd>
-<dt>profiles </dt>
-<dd class="description">sRGB color profiles</dd>
+<dt>profiles <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">sRGB color profiles </dd>
 <dt>protocols <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
 <dd class="description">Protocols (BCP, TBCP) string </dd>
 <dt>shortnickname </dt>

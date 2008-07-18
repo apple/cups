@@ -14,6 +14,8 @@ backchannel.o: language.h
 backend.o: backend.h versioning.h globals.h string.h ../config.h
 backend.o: http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h
 backend.o: array.h file.h language.h i18n.h transcode.h
+conflicts.o: ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h
+conflicts.o: file.h language.h string.h ../config.h debug.h
 custom.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 custom.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 custom.o: i18n.h transcode.h debug.h
@@ -85,7 +87,7 @@ ppd.o: i18n.h transcode.h debug.h
 request.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 request.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.o: i18n.h transcode.h debug.h
-sidechannel.o: sidechannel.h versioning.h string.h ../config.h
+sidechannel.o: sidechannel.h versioning.h string.h ../config.h debug.h
 snmp.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 snmp.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 snmp.o: i18n.h transcode.h debug.h snmp-private.h
@@ -109,7 +111,8 @@ testarray.o: ../cups/string.h ../config.h string.h array.h versioning.h dir.h
 testarray.o: debug.h
 testcups.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.o: string.h ../config.h file.h versioning.h debug.h
-testhttp.o: http.h versioning.h string.h ../config.h
+testhttp.o: http-private.h ../config.h http.h versioning.h md5.h
+testhttp.o: ipp-private.h ipp.h string.h
 testi18n.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testi18n.o: ../config.h
 testipp.o: ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
@@ -118,8 +121,8 @@ testoptions.o: string.h ../config.h cups.h ipp.h http.h versioning.h ppd.h
 testoptions.o: array.h file.h language.h
 testlang.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.o: ../config.h
-testppd.o: ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
-testppd.o: file.h
+testppd.o: ../cups/string.h ../config.h string.h cups.h ipp.h http.h
+testppd.o: versioning.h ppd.h array.h file.h language.h
 testsnmp.o: string.h ../config.h snmp-private.h http.h versioning.h
 # DO NOT DELETE
 
@@ -137,6 +140,8 @@ backchannel.32.o: backchannel.c  language.h
 backend.32.o: backend.c  backend.h versioning.h globals.h string.h ../config.h
 backend.32.o: backend.c  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h
 backend.32.o: backend.c  array.h file.h language.h i18n.h transcode.h
+conflicts.32.o: conflicts.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h
+conflicts.32.o: conflicts.c  file.h language.h string.h ../config.h debug.h
 custom.32.o: custom.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 custom.32.o: custom.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 custom.32.o: custom.c  i18n.h transcode.h debug.h
@@ -208,7 +213,7 @@ ppd.32.o: ppd.c  i18n.h transcode.h debug.h
 request.32.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.32.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.32.o: request.c  i18n.h transcode.h debug.h
-sidechannel.32.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h
+sidechannel.32.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h debug.h
 snmp.32.o: snmp.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 snmp.32.o: snmp.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 snmp.32.o: snmp.c  i18n.h transcode.h debug.h snmp-private.h
@@ -232,7 +237,8 @@ testarray.32.o: testarray.c  ../cups/string.h ../config.h string.h array.h versi
 testarray.32.o: testarray.c  debug.h
 testcups.32.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.32.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
-testhttp.32.o: testhttp.c  http.h versioning.h string.h ../config.h
+testhttp.32.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h
+testhttp.32.o: testhttp.c  ipp-private.h ipp.h string.h
 testi18n.32.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testi18n.32.o: testi18n.c  ../config.h
 testipp.32.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
@@ -241,8 +247,8 @@ testoptions.32.o: testoptions.c  string.h ../config.h cups.h ipp.h http.h versio
 testoptions.32.o: testoptions.c  array.h file.h language.h
 testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.32.o: testlang.c  ../config.h
-testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
-testppd.32.o: testppd.c  file.h
+testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h cups.h ipp.h http.h
+testppd.32.o: testppd.c  versioning.h ppd.h array.h file.h language.h
 testsnmp.32.o: testsnmp.c  string.h ../config.h snmp-private.h http.h versioning.h
 # DO NOT DELETE
 
@@ -260,6 +266,8 @@ backchannel.64.o: backchannel.c  language.h
 backend.64.o: backend.c  backend.h versioning.h globals.h string.h ../config.h
 backend.64.o: backend.c  http-private.h http.h md5.h ipp-private.h ipp.h cups.h ppd.h
 backend.64.o: backend.c  array.h file.h language.h i18n.h transcode.h
+conflicts.64.o: conflicts.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h
+conflicts.64.o: conflicts.c  file.h language.h string.h ../config.h debug.h
 custom.64.o: custom.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 custom.64.o: custom.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 custom.64.o: custom.c  i18n.h transcode.h debug.h
@@ -331,7 +339,7 @@ ppd.64.o: ppd.c  i18n.h transcode.h debug.h
 request.64.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.64.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.64.o: request.c  i18n.h transcode.h debug.h
-sidechannel.64.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h
+sidechannel.64.o: sidechannel.c  sidechannel.h versioning.h string.h ../config.h debug.h
 snmp.64.o: snmp.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 snmp.64.o: snmp.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 snmp.64.o: snmp.c  i18n.h transcode.h debug.h snmp-private.h
@@ -355,7 +363,8 @@ testarray.64.o: testarray.c  ../cups/string.h ../config.h string.h array.h versi
 testarray.64.o: testarray.c  debug.h
 testcups.64.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.64.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
-testhttp.64.o: testhttp.c  http.h versioning.h string.h ../config.h
+testhttp.64.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h
+testhttp.64.o: testhttp.c  ipp-private.h ipp.h string.h
 testi18n.64.o: testi18n.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testi18n.64.o: testi18n.c  ../config.h
 testipp.64.o: testipp.c  ../cups/string.h ../config.h string.h ipp-private.h ipp.h http.h
@@ -364,6 +373,6 @@ testoptions.64.o: testoptions.c  string.h ../config.h cups.h ipp.h http.h versio
 testoptions.64.o: testoptions.c  array.h file.h language.h
 testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.64.o: testlang.c  ../config.h
-testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h ppd.h array.h versioning.h
-testppd.64.o: testppd.c  file.h
+testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h cups.h ipp.h http.h
+testppd.64.o: testppd.c  versioning.h ppd.h array.h file.h language.h
 testsnmp.64.o: testsnmp.c  string.h ../config.h snmp-private.h http.h versioning.h

@@ -19,19 +19,21 @@
  * Contents:
  *
  *   cupsMarkOptions()     - Mark command-line options in a PPD file.
- *   ppdConflicts()        - Check to see if there are any conflicts among the
- *                           marked option choices.
  *   ppdFindChoice()       - Return a pointer to an option choice.
  *   ppdFindMarkedChoice() - Return the marked choice for the specified option.
  *   ppdFindOption()       - Return a pointer to the specified option.
  *   ppdIsMarked()         - Check to see if an option is marked.
  *   ppdMarkDefaults()     - Mark all default options in the PPD file.
- *   ppdMarkOption()       - Mark an option in a PPD file.
+ *   ppdMarkOption()       - Mark an option in a PPD file and return the number
+ *                           of conflicts.
  *   ppdFirstOption()      - Return the first option in the PPD file.
  *   ppdNextOption()       - Return the next option in the PPD file.
+ *   _ppdParseOptions()    - Parse options from a PPD file.
  *   debug_marked()        - Output the marked array to stdout...
  *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
  *   ppd_mark_choices()    - Mark one or more option choices from a string.
+ *   ppd_mark_option()     - Quick mark an option without checking for
+ *                           conflicts.
  */
 
 /*
@@ -50,10 +52,12 @@
 #ifdef DEBUG
 static void	debug_marked(ppd_file_t *ppd, const char *title);
 #else
-#  define debug_marked(ppd,title)
+#  define	debug_marked(ppd,title)
 #endif /* DEBUG */
 static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
-static int	ppd_mark_choices(ppd_file_t *ppd, const char *options);
+static void	ppd_mark_choices(ppd_file_t *ppd, const char *s);
+static void	ppd_mark_option(ppd_file_t *ppd, const char *option,
+		                const char *choice);
 
 
 /*
@@ -64,14 +68,13 @@ static int	ppd_mark_choices(ppd_file_t *ppd, const char *options);
  * "sides" attributes to their corresponding PPD options and choices.
  */
 
-int					/* O - 1 if conflicting */
+int					/* O - 1 if conflicts exist, 0 otherwise */
 cupsMarkOptions(
     ppd_file_t    *ppd,			/* I - PPD file */
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
   int		i, j, k;		/* Looping vars */
-  int		conflict;		/* Option conflicts */
   char		*val,			/* Pointer into value */
 		*ptr,			/* Pointer into string */
 		s[255];			/* Temporary string */
@@ -119,8 +122,6 @@ cupsMarkOptions(
   * Mark options...
   */
 
-  conflict  = 0;
-
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
     if (!strcasecmp(optptr->name, "media"))
     {
@@ -154,35 +155,31 @@ cupsMarkOptions(
 	*/
 
         if (!page_size || !page_size[0])
-	  if (ppdMarkOption(ppd, "PageSize", s))
-            conflict = 1;
+	  ppd_mark_option(ppd, "PageSize", s);
 
         if (cupsGetOption("InputSlot", num_options, options) == NULL)
-	  if (ppdMarkOption(ppd, "InputSlot", s))
-            conflict = 1;
+	  ppd_mark_option(ppd, "InputSlot", s);
 
         if (cupsGetOption("MediaType", num_options, options) == NULL)
-	  if (ppdMarkOption(ppd, "MediaType", s))
-            conflict = 1;
+	  ppd_mark_option(ppd, "MediaType", s);
 
         if (cupsGetOption("EFMediaType", num_options, options) == NULL)
-	  if (ppdMarkOption(ppd, "EFMediaType", s))		/* EFI */
-            conflict = 1;
+	  ppd_mark_option(ppd, "EFMediaType", s);		/* EFI */
 
         if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
-	  if (ppdMarkOption(ppd, "EFMediaQualityMode", s))	/* EFI */
-            conflict = 1;
+	  ppd_mark_option(ppd, "EFMediaQualityMode", s);	/* EFI */
 
-	if (strcasecmp(s, "manual") == 0 &&
-	    cupsGetOption("ManualFeed", num_options, options) == NULL)
-          if (ppdMarkOption(ppd, "ManualFeed", "True"))
-	    conflict = 1;
+	if (!strcasecmp(s, "manual") &&
+	    !cupsGetOption("ManualFeed", num_options, options))
+          ppd_mark_option(ppd, "ManualFeed", "True");
       }
     }
     else if (!strcasecmp(optptr->name, "sides"))
     {
-      for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
-        if (cupsGetOption(duplex_options[j], num_options, options) != NULL)
+      for (j = 0;
+           j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
+	   j ++)
+        if (cupsGetOption(duplex_options[j], num_options, options))
 	  break;
 
       if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
@@ -200,18 +197,20 @@ cupsMarkOptions(
         * Mark the appropriate duplex option for one-sided output...
 	*/
 
-        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+        for (j = 0;
+	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
+	     j ++)
 	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
 	    break;
 
 	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
 	{
-          for (k = 0; k < (int)(sizeof(duplex_one) / sizeof(duplex_one[0])); k ++)
+          for (k = 0;
+	       k < (int)(sizeof(duplex_one) / sizeof(duplex_one[0]));
+	       k ++)
             if (ppdFindChoice(option, duplex_one[k]))
 	    {
-	      if (ppdMarkOption(ppd, duplex_options[j], duplex_one[k]))
-		conflict = 1;
-
+	      ppd_mark_option(ppd, duplex_options[j], duplex_one[k]);
 	      break;
             }
         }
@@ -222,18 +221,20 @@ cupsMarkOptions(
         * Mark the appropriate duplex option for two-sided-long-edge output...
 	*/
 
-        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+        for (j = 0;
+	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
+	     j ++)
 	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
 	    break;
 
 	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
 	{
-          for (k = 0; k < (int)(sizeof(duplex_two_long) / sizeof(duplex_two_long[0])); k ++)
+          for (k = 0;
+	       k < (int)(sizeof(duplex_two_long) / sizeof(duplex_two_long[0]));
+	       k ++)
             if (ppdFindChoice(option, duplex_two_long[k]))
 	    {
-	      if (ppdMarkOption(ppd, duplex_options[j], duplex_two_long[k]))
-		conflict = 1;
-
+	      ppd_mark_option(ppd, duplex_options[j], duplex_two_long[k]);
 	      break;
             }
         }
@@ -244,18 +245,20 @@ cupsMarkOptions(
         * Mark the appropriate duplex option for two-sided-short-edge output...
 	*/
 
-        for (j = 0; j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])); j ++)
+        for (j = 0;
+	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
+	     j ++)
 	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
 	    break;
 
 	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
 	{
-          for (k = 0; k < (int)(sizeof(duplex_two_short) / sizeof(duplex_two_short[0])); k ++)
+          for (k = 0;
+	       k < (int)(sizeof(duplex_two_short) / sizeof(duplex_two_short[0]));
+	       k ++)
             if (ppdFindChoice(option, duplex_two_short[k]))
 	    {
-	      if (ppdMarkOption(ppd, duplex_options[j], duplex_two_short[k]))
-		conflict = 1;
-
+	      ppd_mark_option(ppd, duplex_options[j], duplex_two_short[k]);
 	      break;
             }
         }
@@ -264,21 +267,18 @@ cupsMarkOptions(
     else if (!strcasecmp(optptr->name, "resolution") ||
              !strcasecmp(optptr->name, "printer-resolution"))
     {
-      if (ppdMarkOption(ppd, "Resolution", optptr->value))
-        conflict = 1;
-      if (ppdMarkOption(ppd, "SetResolution", optptr->value))
+      ppd_mark_option(ppd, "Resolution", optptr->value);
+      ppd_mark_option(ppd, "SetResolution", optptr->value);
       	/* Calcomp, Linotype, QMS, Summagraphics, Tektronix, Varityper */
-        conflict = 1;
-      if (ppdMarkOption(ppd, "JCLResolution", optptr->value))	/* HP */
-        conflict = 1;
-      if (ppdMarkOption(ppd, "CNRes_PGP", optptr->value))	/* Canon */
-        conflict = 1;
+      ppd_mark_option(ppd, "JCLResolution", optptr->value);
+      	/* HP */
+      ppd_mark_option(ppd, "CNRes_PGP", optptr->value);
+      	/* Canon */
     }
     else if (!strcasecmp(optptr->name, "output-bin"))
     {
       if (!cupsGetOption("OutputBin", num_options, options))
-        if (ppdMarkOption(ppd, "OutputBin", optptr->value))
-          conflict = 1;
+        ppd_mark_option(ppd, "OutputBin", optptr->value);
     }
     else if (!strcasecmp(optptr->name, "multiple-document-handling"))
     {
@@ -286,15 +286,9 @@ cupsMarkOptions(
           ppdFindOption(ppd, "Collate"))
       {
         if (strcasecmp(optptr->value, "separate-documents-uncollated-copies"))
-	{
-	  if (ppdMarkOption(ppd, "Collate", "True"))
-            conflict = 1;
-        }
+	  ppd_mark_option(ppd, "Collate", "True");
 	else
-	{
-	  if (ppdMarkOption(ppd, "Collate", "False"))
-            conflict = 1;
-        }
+	  ppd_mark_option(ppd, "Collate", "False");
       }
     }
     else if (!strcasecmp(optptr->name, "finishings"))
@@ -335,163 +329,32 @@ cupsMarkOptions(
         * Apply "*Option Choice" settings from the attribute value...
 	*/
 
-        if (ppd_mark_choices(ppd, attr->value))
-	  conflict = 1;
+        ppd_mark_choices(ppd, attr->value);
+      }
+    }
+    else if (!strcasecmp(optptr->name, "APPrinterPreset"))
+    {
+     /*
+      * Lookup APPrinterPreset value...
+      */
+
+      if ((attr = ppdFindAttr(ppd, "APPrinterPreset", optptr->value)) != NULL)
+      {
+       /*
+        * Apply "*Option Choice" settings from the attribute value...
+	*/
+
+        ppd_mark_choices(ppd, attr->value);
       }
     }
     else if (!strcasecmp(optptr->name, "mirror"))
-    {
-      if (ppdMarkOption(ppd, "MirrorPrint", optptr->value))
-	conflict = 1;
-    }
-    else if (ppdMarkOption(ppd, optptr->name, optptr->value))
-      conflict = 1;
+      ppd_mark_option(ppd, "MirrorPrint", optptr->value);
+    else
+      ppd_mark_option(ppd, optptr->name, optptr->value);
 
   debug_marked(ppd, "After...");
 
-  return (conflict);
-}
-
-
-/*
- * 'ppdConflicts()' - Check to see if there are any conflicts among the
- *                    marked option choices.
- *
- * The returned value is the same as returned by @link ppdMarkOption@.
- */
-
-int					/* O - Number of conflicts found */
-ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
-{
-  int		i,			/* Looping variable */
-		conflicts;		/* Number of conflicts */
-  ppd_const_t	*c;			/* Current constraint */
-  ppd_option_t	*o1, *o2;		/* Options */
-  ppd_choice_t	*c1, *c2;		/* Choices */
-  ppd_choice_t	key;			/* Search key */
-
-
-  if (!ppd)
-    return (0);
-
- /*
-  * Clear all conflicts...
-  */
-
-  conflicts = 0;
-
-  for (o1 = ppdFirstOption(ppd); o1; o1 = ppdNextOption(ppd))
-    o1->conflicted = 0;
-
-  cupsArraySave(ppd->marked);
-
- /*
-  * Loop through all of the UI constraints and flag any options
-  * that conflict...
-  */
-
-  for (i = ppd->num_consts, c = ppd->consts, o1 = o2 = NULL, c1 = c2 = NULL;
-       i > 0;
-       i --, c ++)
-  {
-   /*
-    * Grab pointers to the first option...
-    */
-
-    if (!o1 || strcmp(c->option1, o1->keyword))
-    {
-      o1 = ppdFindOption(ppd, c->option1);
-      c1 = NULL;
-    }
-
-    if (!o1)
-      continue;
-    else if (c->choice1[0] && (!c1 || strcmp(c->choice1, c1->choice)))
-    {
-     /*
-      * This constraint maps to a specific choice.
-      */
-
-      key.option = o1;
-
-      if ((c1 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          (!c1->marked || strcmp(c->choice1, c1->choice)))
-        c1 = NULL;
-    }
-    else if (!c1)
-    {
-     /*
-      * This constraint applies to any choice for this option.
-      */
-
-      key.option = o1;
-
-      if ((c1 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          (!strcasecmp(c1->choice, "None") || !strcasecmp(c1->choice, "Off") ||
-           !strcasecmp(c1->choice, "False")))
-        c1 = NULL;
-    }
-
-   /*
-    * Grab pointers to the second option...
-    */
-
-    if (!o2 || strcmp(c->option2, o2->keyword))
-    {
-      o2 = ppdFindOption(ppd, c->option2);
-      c2 = NULL;
-    }
-
-    if (!o2)
-      continue;
-    else if (c->choice2[0] && (!c2 || strcmp(c->choice2, c2->choice)))
-    {
-     /*
-      * This constraint maps to a specific choice.
-      */
-
-      key.option = o2;
-
-      if ((c2 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          (!c2->marked || strcmp(c->choice2, c2->choice)))
-        c2 = NULL;
-    }
-    else if (!c2)
-    {
-     /*
-      * This constraint applies to any choice for this option.
-      */
-
-      key.option = o2;
-
-      if ((c2 = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key)) != NULL &&
-          (!strcasecmp(c2->choice, "None") || !strcasecmp(c2->choice, "Off") ||
-           !strcasecmp(c2->choice, "False")))
-        c2 = NULL;
-    }
-
-   /*
-    * If both options are marked then there is a conflict...
-    */
-
-    if (c1 && c1->marked && c2 && c2->marked)
-    {
-      DEBUG_printf(("%s->%s conflicts with %s->%s (%s %s %s %s)\n",
-                    o1->keyword, c1->choice, o2->keyword, c2->choice,
-		    c->option1, c->choice1, c->option2, c->choice2));
-      conflicts ++;
-      o1->conflicted = 1;
-      o2->conflicted = 1;
-    }
-  }
-
-  cupsArrayRestore(ppd->marked);
-
- /*
-  * Return the number of conflicts found...
-  */
-
-  return (conflicts);
+  return (ppdConflicts(ppd) > 0);
 }
 
 
@@ -650,7 +513,8 @@ ppdMarkDefaults(ppd_file_t *ppd)	/* I - PPD file record */
 
 
 /*
- * 'ppdMarkOption()' - Mark an option in a PPD file.
+ * 'ppdMarkOption()' - Mark an option in a PPD file and return the number of
+ *                     conflicts.
  */
 
 int					/* O - Number of conflicts */
@@ -658,14 +522,6 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
               const char *option,	/* I - Keyword */
               const char *choice)	/* I - Option name */
 {
-  int		i, j;			/* Looping vars */
-  ppd_option_t	*o;			/* Option pointer */
-  ppd_choice_t	*c,			/* Choice pointer */
-		*oldc,			/* Old choice pointer */
-		key;			/* Search key for choice */
-  struct lconv	*loc;			/* Locale data */
-
-
   DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")\n",
         	ppd, option, choice));
 
@@ -675,6 +531,229 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
   if (!ppd || !option || !choice)
     return (0);
+
+ /*
+  * Mark the option...
+  */
+
+  ppd_mark_option(ppd, option, choice);
+
+ /*
+  * Return the number of conflicts...
+  */
+
+  return (ppdConflicts(ppd));
+}
+
+
+/*
+ * 'ppdFirstOption()' - Return the first option in the PPD file.
+ *
+ * Options are returned from all groups in ascending alphanumeric order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - First option or @code NULL@ */
+ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayFirst(ppd->options));
+}
+
+
+/*
+ * 'ppdNextOption()' - Return the next option in the PPD file.
+ *
+ * Options are returned from all groups in ascending alphanumeric order.
+ *
+ * @since CUPS 1.2@
+ */
+
+ppd_option_t *				/* O - Next option or @code NULL@ */
+ppdNextOption(ppd_file_t *ppd)		/* I - PPD file */
+{
+  if (!ppd)
+    return (NULL);
+  else
+    return ((ppd_option_t *)cupsArrayNext(ppd->options));
+}
+
+
+/*
+ * '_ppdParseOptions()' - Parse options from a PPD file.
+ *
+ * This function looks for strings of the form:
+ *
+ *     *option choice ... *optionN choiceN
+ *
+ * It stops when it finds a string that doesn't match this format.
+ */
+
+int					/* O  - Number of options */
+_ppdParseOptions(
+    const char    *s,			/* I  - String to parse */
+    int           num_options,		/* I  - Number of options */
+    cups_option_t **options)		/* IO - Options */
+{
+  char	option[PPD_MAX_NAME],		/* Current option */
+	choice[PPD_MAX_NAME],		/* Current choice */
+	*ptr;				/* Pointer into option or choice */
+
+
+  if (!s)
+    return (num_options);
+
+ /*
+  * Read all of the "*Option Choice" pairs from the string, marking PPD
+  * options as we go...
+  */
+
+  while (*s)
+  {
+   /*
+    * Skip leading whitespace...
+    */
+
+    while (isspace(*s & 255))
+      s ++;
+
+    if (*s != '*')
+      break;
+
+   /*
+    * Get the option name...
+    */
+
+    s ++;
+    ptr = option;
+    while (*s && !isspace(*s & 255) && ptr < (option + sizeof(option) - 1))
+      *ptr++ = *s++;
+
+    if (ptr == s)
+      break;
+
+    *ptr = '\0';
+
+   /*
+    * Get the choice...
+    */
+
+    while (isspace(*s & 255))
+      s ++;
+
+    if (!*s)
+      break;
+
+    ptr = choice;
+    while (*s && !isspace(*s & 255) && ptr < (choice + sizeof(choice) - 1))
+      *ptr++ = *s++;
+
+    *ptr = '\0';
+
+   /*
+    * Add it to the options array...
+    */
+
+    num_options = cupsAddOption(option, choice, num_options, options);
+  }
+
+  return (num_options);
+}
+
+
+#ifdef DEBUG
+/*
+ * 'debug_marked()' - Output the marked array to stdout...
+ */
+
+static void
+debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
+             const char *title)		/* I - Title for list */
+{
+  ppd_choice_t	*c;			/* Current choice */
+
+
+  DEBUG_printf(("cupsMarkOptions: %s\n", title));
+
+  for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
+       c;
+       c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
+    DEBUG_printf(("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice));
+}
+#endif /* DEBUG */
+
+
+/*
+ * 'ppd_defaults()' - Set the defaults for this group and all sub-groups.
+ */
+
+static void
+ppd_defaults(ppd_file_t  *ppd,		/* I - PPD file */
+             ppd_group_t *g)		/* I - Group to default */
+{
+  int		i;			/* Looping var */
+  ppd_option_t	*o;			/* Current option */
+  ppd_group_t	*sg;			/* Current sub-group */
+
+
+  for (i = g->num_options, o = g->options; i > 0; i --, o ++)
+    if (strcasecmp(o->keyword, "PageRegion") != 0)
+      ppdMarkOption(ppd, o->keyword, o->defchoice);
+
+  for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
+    ppd_defaults(ppd, sg);
+}
+
+
+/*
+ * 'ppd_mark_choices()' - Mark one or more option choices from a string.
+ */
+
+static void
+ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
+                 const char *s)		/* I - "*Option Choice ..." string */
+{
+  int		i,			/* Looping var */
+		num_options;		/* Number of options */
+  cups_option_t	*options,		/* Options */
+		*option;		/* Current option */
+
+
+  if (!options)
+    return;
+
+  options     = NULL;
+  num_options = _ppdParseOptions(s, 0, &options);
+
+  for (i = num_options, option = options; i > 0; i --, option ++)
+    ppd_mark_option(ppd, option->name, option->value);
+
+  cupsFreeOptions(num_options, options);
+}
+
+
+/*
+ * 'ppd_mark_option()' - Quick mark an option without checking for conflicts.
+ */
+
+static void
+ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
+                const char *option,	/* I - Option name */
+                const char *choice)	/* I - Choice name */
+{
+  int		i, j;			/* Looping vars */
+  ppd_option_t	*o;			/* Option pointer */
+  ppd_choice_t	*c,			/* Choice pointer */
+		*oldc,			/* Old choice pointer */
+		key;			/* Search key for choice */
+  struct lconv	*loc;			/* Locale data */
+
+
+  DEBUG_printf(("ppd_mark_option(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+        	ppd, option, choice));
 
  /*
   * AP_D_InputSlot is the "default input slot" on MacOS X, and setting
@@ -699,7 +778,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   */
 
   if ((o = ppdFindOption(ppd, option)) == NULL)
-    return (0);
+    return;
 
   loc = localeconv();
 
@@ -710,7 +789,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
     */
 
     if ((c = ppdFindChoice(o, "Custom")) == NULL)
-      return (0);
+      return;
 
     if (!strcasecmp(option, "PageSize"))
     {
@@ -734,7 +813,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
       if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
       {
         if ((cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params)) == NULL)
-	  return (0);
+	  return;
 
         switch (cparam->type)
 	{
@@ -802,7 +881,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
 
 
     if ((c = ppdFindChoice(o, "Custom")) == NULL)
-      return (0);
+      return;
 
     if ((coption = ppdFindCustomOption(ppd, option)) != NULL)
     {
@@ -867,7 +946,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
         break;
 
     if (!i)
-      return (0);
+      return;
   }
 
  /*
@@ -964,174 +1043,6 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
   c->marked = 1;
 
   cupsArrayAdd(ppd->marked, c);
-
- /*
-  * Return the number of conflicts...
-  */
-
-  return (ppdConflicts(ppd));
-}
-
-
-/*
- * 'ppdFirstOption()' - Return the first option in the PPD file.
- *
- * Options are returned from all groups in ascending alphanumeric order.
- *
- * @since CUPS 1.2@
- */
-
-ppd_option_t *				/* O - First option or @code NULL@ */
-ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
-{
-  if (!ppd)
-    return (NULL);
-  else
-    return ((ppd_option_t *)cupsArrayFirst(ppd->options));
-}
-
-
-/*
- * 'ppdNextOption()' - Return the next option in the PPD file.
- *
- * Options are returned from all groups in ascending alphanumeric order.
- *
- * @since CUPS 1.2@
- */
-
-ppd_option_t *				/* O - Next option or @code NULL@ */
-ppdNextOption(ppd_file_t *ppd)		/* I - PPD file */
-{
-  if (!ppd)
-    return (NULL);
-  else
-    return ((ppd_option_t *)cupsArrayNext(ppd->options));
-}
-
-
-#ifdef DEBUG
-/*
- * 'debug_marked()' - Output the marked array to stdout...
- */
-
-static void
-debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
-             const char *title)		/* I - Title for list */
-{
-  ppd_choice_t	*c;			/* Current choice */
-
-
-  DEBUG_printf(("cupsMarkOptions: %s\n", title));
-
-  for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
-       c;
-       c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
-    DEBUG_printf(("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice));
-}
-#endif /* DEBUG */
-
-
-/*
- * 'ppd_defaults()' - Set the defaults for this group and all sub-groups.
- */
-
-static void
-ppd_defaults(ppd_file_t  *ppd,		/* I - PPD file */
-             ppd_group_t *g)		/* I - Group to default */
-{
-  int		i;			/* Looping var */
-  ppd_option_t	*o;			/* Current option */
-  ppd_group_t	*sg;			/* Current sub-group */
-
-
-  for (i = g->num_options, o = g->options; i > 0; i --, o ++)
-    if (strcasecmp(o->keyword, "PageRegion") != 0)
-      ppdMarkOption(ppd, o->keyword, o->defchoice);
-
-  for (i = g->num_subgroups, sg = g->subgroups; i > 0; i --, sg ++)
-    ppd_defaults(ppd, sg);
-}
-
-
-/*
- * 'ppd_mark_choices()' - Mark one or more option choices from a string.
- */
-
-static int				/* O - 1 if there are conflicts, 0 otherwise */
-ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
-                 const char *options)	/* I - "*Option Choice ..." string */
-{
-  char	option[PPD_MAX_NAME],		/* Current option */
-	choice[PPD_MAX_NAME],		/* Current choice */
-	*ptr;				/* Pointer into option or choice */
-  int	conflict = 0;			/* Do we have a conflict? */
-
-
-  if (!options)
-    return (0);
-
- /*
-  * Read all of the "*Option Choice" pairs from the string, marking PPD
-  * options as we go...
-  */
-
-  while (*options)
-  {
-   /*
-    * Skip leading whitespace...
-    */
-
-    while (isspace(*options & 255))
-      options ++;
-
-    if (*options != '*')
-      break;
-
-   /*
-    * Get the option name...
-    */
-
-    options ++;
-    ptr = option;
-    while (*options && !isspace(*options & 255) &&
-	       ptr < (option + sizeof(option) - 1))
-      *ptr++ = *options++;
-
-    if (ptr == option)
-      break;
-
-    *ptr = '\0';
-
-   /*
-    * Get the choice...
-    */
-
-    while (isspace(*options & 255))
-      options ++;
-
-    if (!*options)
-      break;
-
-    ptr = choice;
-    while (*options && !isspace(*options & 255) &&
-	       ptr < (choice + sizeof(choice) - 1))
-      *ptr++ = *options++;
-
-    *ptr = '\0';
-
-   /*
-    * Mark the option...
-    */
-
-    if (ppdMarkOption(ppd, option, choice))
-      conflict = 1;
-  }
-
- /*
-  * Return whether we had any conflicts...
-  */
-
-  return (conflict);
 }
 
 

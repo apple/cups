@@ -53,3 +53,4 @@ _ppdGetLanguages
 _ppdHashName
 _ppdLocalizedAttr
 _ppdNormalizeMakeAndModel
+_ppdParseOptions

@@ -28,6 +28,7 @@ LIBOBJS	=	\
 		auth.o \
 		backchannel.o \
 		backend.o \
+		conflicts.o \
 		custom.o \
 		debug.o \
 		dest.o \
@@ -532,7 +533,7 @@ apihelp:
 	mxmldoc --section "Programming" --title "PPD API" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
-		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
+		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c page.c \
 		ppd.c >../doc/help/api-ppd.html
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \
@@ -575,8 +576,8 @@ framedhelp:
 		--section "Programming" --title "PPD API" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
-		ppd.h attr.c custom.c emit.c localize.c mark.c page.c \
-		ppd.c
+		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c \
+		page.c ppd.c
 	mxmldoc --framed api-httpipp \
 		--section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \

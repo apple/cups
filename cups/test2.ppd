@@ -2,7 +2,7 @@
 *%
 *% "$Id$"
 *%
-*% Test PPD file for the Common UNIX Printing System (CUPS).
+*% Test PPD file #2 for the Common UNIX Printing System (CUPS).
 *%
 *% This file is used to test the CUPS PPD API functions and cannot be
 *% used with any known printers.  Look at the PPD files in the "ppd"
@@ -26,11 +26,11 @@
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TEST.PPD"
 *Manufacturer:	"ESP"
-*Product:	"(Test)"
+*Product:	"(Test2)"
 *cupsVersion:	1.4
-*ModelName:     "Test"
-*ShortNickName: "Test"
-*NickName:      "Test for CUPS"
+*ModelName:     "Test2"
+*ShortNickName: "Test2"
+*NickName:      "Test2 for CUPS"
 *PSVersion:	"(3010.000) 0"
 *LanguageLevel:	"3"
 *ColorDevice:	True
@@ -41,14 +41,24 @@
 *TTRasterizer:	Type42
 
 *% These constraints are used to test ppdConflicts() and ppdResolveConflicts()
-*UIConstraints: *PageSize Letter *InputSlot Envelope
-*UIConstraints: *InputSlot Envelope *PageSize Letter
-*UIConstraints: *PageRegion Letter *InputSlot Envelope
-*UIConstraints: *InputSlot Envelope *PageRegion Letter
+*cupsUIConstraints envelope: "*PageSize Letter *InputSlot Envelope"
+*cupsUIConstraints envelope: "*PageRegion Letter *InputSlot Envelope"
+*cupsUIResolver envelope: "*InputSlot Manual"
 
-*% These constraints are used to test ppdInstallableConflict()
-*UIConstraints: "*Duplex *InstalledDuplexer False"
-*UIConstraints: "*InstalledDuplexer False *Duplex"
+*cupsUIConstraints envphoto: "*PageSize Env10 *InputSlot Envelope *Quality Photo"
+*cupsUIConstraints envphoto: "*PageRegion Env10 *InputSlot Envelope *Quality Photo"
+*cupsUIResolver envphoto: "*Quality Normal"
+
+*% This constraint is used to test ppdInstallableConflict()
+*cupsUIConstraints: "*Duplex *InstalledDuplexer False"
+
+*% These constraints are used to test the loop detection code in ppdResolveConflicts()
+*cupsUIConstraints loop1: "*PageSize A4 *Quality Photo"
+*cupsUIResolver loop1: "*Quality Normal"
+*cupsUIConstraints loop2: "*PageSize A4 *Quality Normal"
+*cupsUIResolver loop2: "*PageSize Letter *Quality Draft"
+*cupsUIConstraints loop3: "*PageSize Letter *Quality Draft"
+*cupsUIResolver loop3: "*PageSize A4 *Quality Photo"
 
 *% For PageSize, we have put all of the translations in-line...
 *OpenUI *PageSize/Page Size: PickOne
@@ -113,6 +123,14 @@
 *InputSlot Manual/Manual Feed: "InputSlot=Manual"
 *InputSlot Envelope/Envelope Feed: "InputSlot=Envelope"
 *CloseUI: *InputSlot
+
+*OpenUI *Quality/Output Mode: PickOne
+*OrderDependency: 20 AnySetup *Quality
+*DefaultQuality: Normal
+*Quality Draft: "Quality=Draft"
+*Quality Normal: "Quality=Normal"
+*Quality Photo: "Quality=Photo"
+*CloseUI: *Quality
 
 *OpenUI *Duplex/2-Sided Printing: PickOne
 *OrderDependency: 10 DocumentSetup *Duplex

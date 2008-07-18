@@ -40,7 +40,6 @@
  *   ppd_add_size()         - Add a page size.
  *   ppd_compare_attrs()    - Compare two attributes.
  *   ppd_compare_choices()  - Compare two choices...
- *   ppd_compare_consts()   - Compare two constraints.
  *   ppd_compare_coptions() - Compare two custom options.
  *   ppd_compare_cparams()  - Compare two custom parameters.
  *   ppd_compare_options()  - Compare two options.
@@ -109,7 +108,6 @@ static ppd_choice_t	*ppd_add_choice(ppd_option_t *option, const char *name);
 static ppd_size_t	*ppd_add_size(ppd_file_t *ppd, const char *name);
 static int		ppd_compare_attrs(ppd_attr_t *a, ppd_attr_t *b);
 static int		ppd_compare_choices(ppd_choice_t *a, ppd_choice_t *b);
-static int		ppd_compare_consts(ppd_const_t *a, ppd_const_t *b);
 static int		ppd_compare_coptions(ppd_coption_t *a,
 			                     ppd_coption_t *b);
 static int		ppd_compare_cparams(ppd_cparam_t *a, ppd_cparam_t *b);
@@ -1959,14 +1957,6 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   }
 
  /*
-  * Sort the constraints...
-  */
-
-  if (ppd->num_consts > 1)
-    qsort(ppd->consts, ppd->num_consts, sizeof(ppd_const_t),
-          (int (*)(const void *, const void *))ppd_compare_consts);
-
- /*
   * Create an array to track the marked choices...
   */
 
@@ -2277,28 +2267,6 @@ ppd_compare_choices(ppd_choice_t *a,	/* I - First choice */
                     ppd_choice_t *b)	/* I - Second choice */
 {
   return (strcmp(a->option->keyword, b->option->keyword));
-}
-
-
-/*
- * 'ppd_compare_consts()' - Compare two constraints.
- */
-
-static int				/* O - Result of comparison */
-ppd_compare_consts(ppd_const_t *a,	/* I - First constraint */
-                   ppd_const_t *b)	/* I - Second constraint */
-{
-  int	ret;				/* Result of comparison */
-
-
-  if ((ret = strcmp(a->option1, b->option1)) != 0)
-    return (ret);
-  else if ((ret = strcmp(a->choice1, b->choice1)) != 0)
-    return (ret);
-  else if ((ret = strcmp(a->option2, b->option2)) != 0)
-    return (ret);
-  else
-    return (strcmp(a->choice2, b->choice2));
 }
 
 

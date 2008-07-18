@@ -1679,73 +1679,257 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
                   int        verbose,	/* I - Verbosity level */
                   int        warn)	/* I - Warnings only? */
 {
-  int		j;			/* Looping var */
-  ppd_const_t	*c;			/* Current constraint */
-  ppd_option_t	*option;		/* Standard UI option */
-  ppd_option_t	*option2;		/* Standard UI option */
-  const char	*prefix;		/* WARN/FAIL prefix */
+  int			i;		/* Looping var */
+  const char		*prefix;	/* WARN/FAIL prefix */
+  ppd_const_t		*c;		/* Current UIConstraints data */
+  ppd_attr_t		*constattr;	/* Current cupsUIConstraints attribute */
+  const char		*vptr;		/* Pointer into constraint value */
+  char			option[PPD_MAX_NAME],
+  					/* Option name/MainKeyword */
+			choice[PPD_MAX_NAME],
+					/* Choice/OptionKeyword */
+			*ptr;		/* Pointer into option or choice */
+  int			num_options;	/* Number of options */
+  cups_option_t		*options;	/* Options */
+  ppd_option_t		*o;		/* PPD option */
 
 
   prefix = warn ? "  WARN  " : "**FAIL**";
 
-  for (j = ppd->num_consts, c = ppd->consts; j > 0; j --, c ++)
+
+ /*
+  * See what kind of constraint data we have in the PPD...
+  */
+
+  if ((constattr = ppdFindAttr(ppd, "cupsUIConstraints", NULL)) != NULL)
   {
-    option  = ppdFindOption(ppd, c->option1);
-    option2 = ppdFindOption(ppd, c->option2);
+   /*
+    * Check new-style cupsUIConstraints data...
+    */
 
-    if (!option || !option2)
+    for (; constattr;
+         constattr = ppdFindNextAttr(ppd, "cupsUIConstraints", NULL))
     {
-      if (!warn && !errors && !verbose)
-	_cupsLangPuts(stdout, _(" FAIL\n"));
+      if (!constattr->value)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
-      if (!option)
+	_cupsLangPrintf(stdout,
+			_("      %s  Empty cupsUIConstraints %s!\n"),
+			prefix, constattr->spec);
+
+	if (!warn)
+	  errors ++;
+
+        continue;
+      }
+
+      for (i = 0, vptr = strchr(constattr->value, '*');
+           vptr;
+	   i ++, vptr = strchr(vptr + 1, '*'));
+
+      if (i == 0)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad cupsUIConstraints %s: \"%s\"!\n"),
+			prefix, constattr->spec, constattr->value);
+
+	if (!warn)
+	  errors ++;
+
+        continue;
+      }
+
+      cupsArraySave(ppd->sorted_attrs);
+
+      if (constattr->spec[0] &&
+          !ppdFindAttr(ppd, "cupsUIResolver", constattr->spec))
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	_cupsLangPrintf(stdout,
+			_("      %s  Missing cupsUIResolver %s!\n"),
+			prefix, constattr->spec);
+
+	if (!warn)
+	  errors ++;
+      }
+
+      cupsArrayRestore(ppd->sorted_attrs);
+
+      num_options = 0;
+      options     = NULL;
+
+      for (vptr = strchr(constattr->value, '*');
+           vptr;
+	   vptr = strchr(vptr + 1, '*'))
+      {
+       /*
+        * Extract "*Option Choice" or just "*Option"...
+	*/
+
+        for (vptr ++, ptr = option; *vptr && !isspace(*vptr & 255); vptr ++)
+	  if (ptr < (option + sizeof(option) - 1))
+	    *ptr++ = *vptr;
+
+        *ptr = '\0';
+
+        while (isspace(*vptr & 255))
+	  vptr ++;
+
+        if (*vptr == '*')
+	{
+	  vptr --;
+	  choice[0] = '\0';
+	}
+	else
+	{
+	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
+	    if (ptr < (choice + sizeof(choice) - 1))
+	      *ptr++ = *vptr;
+
+	  *ptr = '\0';
+	}
+
+        if ((o = ppdFindOption(ppd, option)) == NULL)
+	{
+	  if (!warn && !errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Missing option %s in "
+			    "cupsUIConstraints %s: \"%s\"!\n"),
+			  prefix, option, constattr->spec, constattr->value);
+	  
+	  if (!warn)
+	    errors ++;
+
+	  continue;
+	}
+
+        if (choice[0] && !ppdFindChoice(o, choice))
+	{
+	  if (!warn && !errors && !verbose)
+	    _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	  _cupsLangPrintf(stdout,
+			  _("      %s  Missing choice *%s %s in "
+			    "cupsUIConstraints %s: \"%s\"!\n"),
+			  prefix, option, choice, constattr->spec,
+			  constattr->value);
+
+	  if (!warn)
+	    errors ++;
+
+	  continue;
+	}
+
+        if (choice[0])
+	  num_options = cupsAddOption(option, choice, num_options, &options);
+	else
+	{
+	  for (i = 0; i < o->num_choices; i ++)
+	    if (strcasecmp(o->choices[i].choice, "None") &&
+	        strcasecmp(o->choices[i].choice, "Off") &&
+	        strcasecmp(o->choices[i].choice, "False"))
+            {
+	      num_options = cupsAddOption(option, o->choices[i].choice,
+	                                  num_options, &options);
+              break;
+	    }
+	}
+      }
+
+     /*
+      * Test the resolver...
+      */
+
+      if (!cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options))
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	_cupsLangPrintf(stdout,
+			_("      %s  cupsUIResolver %s causes a loop!\n"),
+			prefix, constattr->spec);
+
+	if (!warn)
+	  errors ++;
+      }
+
+      cupsFreeOptions(num_options, options);
+    }
+  }
+  else
+  {
+   /*
+    * Check old-style [Non]UIConstraints data...
+    */
+
+    for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
+    {
+      if ((o = ppdFindOption(ppd, c->option1)) == NULL)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing option %s in "
-			  "UIConstraint \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"!\n"),
 			prefix, c->option1,
 			c->option1, c->choice1, c->option2, c->choice2);
-      
-      if (!option2)
+
+	if (!warn)
+	  errors ++;
+      }
+      else if (c->choice1[0] && !ppdFindChoice(o, c->choice1))
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	_cupsLangPrintf(stdout,
+			_("      %s  Missing choice *%s %s in "
+			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			prefix, c->option1, c->choice1,
+			c->option1, c->choice1, c->option2, c->choice2);
+
+	if (!warn)
+	  errors ++;
+      }
+
+      if ((o = ppdFindOption(ppd, c->option2)) == NULL)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing option %s in "
-			  "UIConstraint \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"!\n"),
 			prefix, c->option2,
 			c->option1, c->choice1, c->option2, c->choice2);
 
-      if (!warn)
-        errors ++;
+	if (!warn)
+	  errors ++;
+      }
+      else if (c->choice2[0] && !ppdFindChoice(o, c->choice2))
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
-      continue;
-    }
+	_cupsLangPrintf(stdout,
+			_("      %s  Missing choice *%s %s in "
+			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			prefix, c->option2, c->choice2,
+			c->option1, c->choice1, c->option2, c->choice2);
 
-    if (c->choice1[0] && !ppdFindChoice(option, c->choice1))
-    {
-      if (!warn && !errors && !verbose)
-	_cupsLangPuts(stdout, _(" FAIL\n"));
-
-      _cupsLangPrintf(stdout,
-		      _("      %s  Missing choice *%s %s in "
-			"UIConstraint \"*%s %s *%s %s\"!\n"),
-		      prefix, c->option1, c->choice1,
-		      c->option1, c->choice1, c->option2, c->choice2);
-
-      if (!warn)
-        errors ++;
-    }
-
-    if (c->choice2[0] && !ppdFindChoice(option2, c->choice2))
-    {
-      if (!warn && !errors && !verbose)
-	_cupsLangPuts(stdout, _(" FAIL\n"));
-
-      _cupsLangPrintf(stdout,
-		      _("      %s  Missing choice *%s %s in "
-			"UIConstraint \"*%s %s *%s %s\"!\n"),
-		      prefix, c->option2, c->choice2,
-		      c->option1, c->choice1, c->option2, c->choice2);
-
-      if (!warn)
-        errors ++;
+	if (!warn)
+	  errors ++;
+      }
     }
   }
 

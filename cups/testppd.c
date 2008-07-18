@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -43,6 +43,10 @@
 
 static const char	*default_code =
 			"[{\n"
+			"%%BeginFeature: *InstalledDuplexer False\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
 			"%%BeginFeature: *PageRegion Letter\n"
 			"PageRegion=Letter\n"
 			"%%EndFeature\n"
@@ -62,6 +66,10 @@ static const char	*default_code =
 			"} stopped cleartomark\n";
 
 static const char	*custom_code =
+			"[{\n"
+			"%%BeginFeature: *InstalledDuplexer False\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
 			"[{\n"
 			"%%BeginFeature: *InputSlot Tray\n"
 			"InputSlot=Tray\n"
@@ -95,12 +103,15 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		i;			/* Looping var */
   ppd_file_t	*ppd;			/* PPD file loaded from disk */
   int		status;			/* Status of tests (0 = success, 1 = fail) */
   int		conflicts;		/* Number of conflicts */
   char		*s;			/* String */
   char		buffer[8192];		/* String buffer */
   const char	*text;			/* Localized text */
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
 
 
   status = 0;
@@ -126,7 +137,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do tests with test.ppd...
     */
 
-    fputs("ppdOpenFile: ", stdout);
+    fputs("ppdOpenFile(test.ppd): ", stdout);
 
     if ((ppd = ppdOpenFile("test.ppd")) != NULL)
       puts("PASS");
@@ -188,6 +199,56 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (s)
       free(s);
+
+   /*
+    * Test constraints...
+    */
+
+    fputs("ppdConflicts(): ", stdout);
+    ppdMarkOption(ppd, "PageSize", "Letter");
+    ppdMarkOption(ppd, "InputSlot", "Envelope");
+
+    if ((conflicts = ppdConflicts(ppd)) == 1)
+      puts("PASS (1)");
+    else
+    {
+      printf("FAIL (%d)\n", conflicts);
+      status ++;
+    }
+
+    fputs("cupsResolveConflicts(): ", stdout);
+    num_options = 0;
+    options     = NULL;
+    if (cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
+                            &options) &&
+        num_options == 1 && !strcasecmp(options->name, "InputSlot") &&
+	!strcasecmp(options->value, "Tray"))
+      puts("PASS");
+    else if (num_options > 0)
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
+    }
+    else
+      puts("FAIL (Unable to resolve!)");
+    cupsFreeOptions(num_options, options);
+
+    fputs("ppdInstallableConflict(): ", stdout);
+    if (ppdInstallableConflict(ppd, "Duplex", "DuplexNoTumble") &&
+        !ppdInstallableConflict(ppd, "Duplex", "None"))
+      puts("PASS");
+    else if (!ppdInstallableConflict(ppd, "Duplex", "DuplexNoTumble"))
+    {
+      puts("FAIL (Duplex=DuplexNoTumble did not conflict)");
+      status ++;
+    }
+    else
+    {
+      puts("FAIL (Duplex=None conflicted)");
+      status ++;
+    }
 
    /*
     * Test localization...
@@ -310,6 +371,104 @@ main(int  argc,				/* I - Number of command-line arguments */
       printf("FAIL (\"%s\" instead of \"Number 1 Cyan Toner\")\n",
              text ? text : "(null)");
     }
+
+    ppdClose(ppd);
+
+   /*
+    * Test new constraints...
+    */
+
+    fputs("ppdOpenFile(test2.ppd): ", stdout);
+
+    if ((ppd = ppdOpenFile("test2.ppd")) != NULL)
+      puts("PASS");
+    else
+    {
+      ppd_status_t	err;		/* Last error in file */
+      int		line;		/* Line number in file */
+
+
+      status ++;
+      err = ppdLastError(&line);
+
+      printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
+    }
+
+    fputs("ppdMarkDefaults: ", stdout);
+    ppdMarkDefaults(ppd);
+
+    if ((conflicts = ppdConflicts(ppd)) == 0)
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (%d conflicts)\n", conflicts);
+    }
+
+    fputs("ppdConflicts(): ", stdout);
+    ppdMarkOption(ppd, "PageSize", "Env10");
+    ppdMarkOption(ppd, "InputSlot", "Envelope");
+    ppdMarkOption(ppd, "Quality", "Photo");
+
+    if ((conflicts = ppdConflicts(ppd)) == 1)
+      puts("PASS (1)");
+    else
+    {
+      printf("FAIL (%d)\n", conflicts);
+      status ++;
+    }
+
+    fputs("cupsResolveConflicts(): ", stdout);
+    num_options = 0;
+    options     = NULL;
+    if (cupsResolveConflicts(ppd, "Quality", "Photo", &num_options,
+                            &options) &&
+        num_options == 1 && !strcasecmp(options->name, "Quality") &&
+	!strcasecmp(options->value, "Normal"))
+      puts("PASS");
+    else if (num_options > 0)
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
+    }
+    else
+      puts("FAIL (Unable to resolve!)");
+    cupsFreeOptions(num_options, options);
+
+    fputs("cupsResolveConflicts(loop test): ", stdout);
+    ppdMarkOption(ppd, "PageSize", "A4");
+    ppdMarkOption(ppd, "Quality", "Photo");
+    num_options = 0;
+    options     = NULL;
+    if (!cupsResolveConflicts(ppd, "Quality", "Photo", &num_options,
+                             &options))
+      puts("PASS");
+    else if (num_options > 0)
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
+    }
+    else
+      puts("FAIL (No conflicts!)");
+    
+    fputs("ppdInstallableConflict(): ", stdout);
+    if (ppdInstallableConflict(ppd, "Duplex", "DuplexNoTumble") &&
+        !ppdInstallableConflict(ppd, "Duplex", "None"))
+      puts("PASS");
+    else if (!ppdInstallableConflict(ppd, "Duplex", "DuplexNoTumble"))
+    {
+      puts("FAIL (Duplex=DuplexNoTumble did not conflict)");
+      status ++;
+    }
+    else
+    {
+      puts("FAIL (Duplex=None conflicted)");
+      status ++;
+    }
   }
   else
   {
@@ -334,7 +493,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
     {
-      int		i, j, k;	/* Looping vars */
+      int		j, k;		/* Looping vars */
       ppd_attr_t	*attr;		/* Current attribute */
       ppd_group_t	*group;		/* Option group */
       ppd_option_t	*option;	/* Option */

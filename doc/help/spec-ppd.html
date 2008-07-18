@@ -358,6 +358,73 @@ attribute can be used to override the default 3-component (RGB) colorspace.</p>
 </pre>
 
 
+<h2 class='title'><a name='CONSTRAINTS'>Constraints</a></h2>
+
+<p>Constraints are option choices that are not allowed by the driver or
+device, for example printing 2-sided transparencies. All versions of CUPS
+support constraints defined by the legacy Adobe <tt>UIConstraints</tt> and
+<tt>NonUIConstraints</tt> attributes which support conflicts between any two
+option choices, for example:</p>
+
+<pre class='command'>
+*% Do not allow 2-sided printing on transparency media
+*UIConstraints: "*Duplex *MediaType Transparency"
+*UIConstraints: "*MediaType Transparency *Duplex"
+</pre>
+
+<p>While nearly all constraints can be expressed using these attributes, there
+are valid scenarios requiring constraints between more than two option choices.
+In addition, resolution of constraints is problematic since users and software
+have to guess how a particular constraint is best resolved.</p>
+
+<p>CUPS 1.4 and higher define two new attributes for constraints,
+<tt>cupsUIConstraints</tt> and <tt>cupsUIResolver</tt>. Each
+<tt>cupsUIConstraints</tt> attribute points to a <tt>cupsUIResolver</tt>
+attribute which corrects the conflict condition. The same
+<tt>cupsUIResolver</tt> can be used by multiple <tt>cupsUIConstraints</tt>.</p>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
+
+<p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 *Keyword2 OptionKeyword2 ..."<br>
+*cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
+
+<p>Lists two or more options which conflict. The "resolver" string is a
+(possibly unique) keyword which specifies which options to change when the
+constraint exists.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify that 2-sided printing cannot happen on transparencies</em> 
+*cupsUIConstraints transparency: "*Duplex *MediaType Transparency"
+
+<em>*% Specify that photo printing cannot happen on plain paper or transparencies at 1200dpi</em> 
+*cupsUIConstraints photo: "*OutputMode Photo *MediaType Plain *Resolution 1200dpi"
+*cupsUIConstraints photo: "*OutputMode Photo *MediaType Transparency *Resolution 1200dpi"
+</pre>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
+
+<p class='summary'>*cupsUIResolution resolver: "*Keyword OptionKeyword ..."</p>
+
+<p>Specifies one or more options to mark/select to resolve a constraint. The
+"resolver" string identifies a particular action to take for one or more
+<a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>. The same action
+can be used for multiple constraints.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Specify the option to change for the 2-sided transparency constraint</em> 
+*cupsUIResolver transparency: "*Duplex None"
+
+<em>*% Specify the options to change for the photo printing constraints</em> 
+*cupsUIResolver photo: "*OutputMode Best *Resolution 600dpi"
+</pre>
+
+
 <h2 class='title'><a name='I18N'>Globalized PPD Support</a></h2>
 
 <p>CUPS 1.2 and higher adds support for PPD files containing multiple
@@ -1648,6 +1715,9 @@ the device.</p>
 	<li>Added <tt>cupsMarkerNotice</tt> attribute.</li>
 
 	<li>Added <tt>cupsPJLDisplay</tt> attribute.</li>
+
+	<li>Added <tt>cupsUIResolver</tt> and <tt>cupsUIConstraints</tt>
+	attributes.</li>
 
 </ul>
 
