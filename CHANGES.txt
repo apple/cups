@@ -1,8 +1,11 @@
-CHANGES.txt - 2008-07-15
+CHANGES.txt - 2008-07-18
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added support for new cupsUIConstraints and cupsUIResolver
+	  attributes for better option conflict detection and
+	  resolution.
 	- Increased the maximum size of 1284 device ID strings to
 	  256 bytes (STR #2877)
 	- Added an AccessLogLevel directive to cupsd.conf to control
