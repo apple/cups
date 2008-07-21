@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.8
 
 	- Documentation updates (STR #2785, STR #2861, STR #2862)
+	- The scheduler did not add the ending job sheet when the
+	  job was released.
 	- The IPP backend did not relay marker-* attributes.
 	- The CUPS GNOME/KDE menu item was not localized for
 	  Chinese (STR #2880)
