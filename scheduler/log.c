@@ -47,7 +47,7 @@ static char	*log_line = NULL;	/* Line for output file */
  */
 
 static int	check_log_file(cups_file_t **lf, const char *logname);
-static char	*format_log_line(const char *message, va_list ap);
+static int	format_log_line(const char *message, va_list ap);
 
 
 /*
@@ -175,8 +175,8 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 	    ...)			/* I - Additional arguments as needed */
 {
   va_list		ap;		/* Argument pointer */
-  char			jobmsg[1024],	/* Format string for job message */
-			*line;		/* Message line */
+  char			jobmsg[1024];	/* Format string for job message */
+  int			status;		/* Formatting status */
 
 
  /*
@@ -192,12 +192,16 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
 
   snprintf(jobmsg, sizeof(jobmsg), "[Job %d] %s", job->id, message);
 
-  va_start(ap, message);
-  line = format_log_line(jobmsg, ap);
-  va_end(ap);
+  do
+  {
+    va_start(ap, message);
+    status = format_log_line(jobmsg, ap);
+    va_end(ap);
+  }
+  while (status == 0);
 
-  if (line)
-    return (cupsdWriteErrorLog(level, line));
+  if (status > 0)
+    return (cupsdWriteErrorLog(level, log_line));
   else
     return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
                                "Unable to allocate memory for log line!"));
@@ -214,7 +218,7 @@ cupsdLogMessage(int        level,	/* I - Log level */
 	        ...)			/* I - Additional args as needed */
 {
   va_list		ap;		/* Argument pointer */
-  char			*line;		/* Message line */
+  int			status;		/* Formatting status */
 
 
  /*
@@ -241,12 +245,16 @@ cupsdLogMessage(int        level,	/* I - Log level */
   * Format and write the log message...
   */
 
-  va_start(ap, message);
-  line = format_log_line(message, ap);
-  va_end(ap);
+  do
+  {
+    va_start(ap, message);
+    status = format_log_line(message, ap);
+    va_end(ap);
+  }
+  while (status == 0);
 
-  if (line)
-    return (cupsdWriteErrorLog(level, line));
+  if (status > 0)
+    return (cupsdWriteErrorLog(level, log_line));
   else
     return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
                                "Unable to allocate memory for log line!"));
@@ -870,11 +878,11 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
  * to format_log_line()...
  */
 
-static char *				/* O - Text or NULL on error */
+static int				/* O - -1 for fatal, 0 for retry, 1 for success */
 format_log_line(const char *message,	/* I - Printf-style format string */
                 va_list    ap)		/* I - Argument list */
 {
-  int	len;				/* Length of formatted line */
+  int		len;			/* Length of formatted line */
 
 
  /*
@@ -887,7 +895,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
     log_line     = malloc(log_linesize);
 
     if (!log_line)
-      return (NULL);
+      return (-1);
   }
 
  /*
@@ -918,12 +926,12 @@ format_log_line(const char *message,	/* I - Printf-style format string */
     {
       log_line     = temp;
       log_linesize = len;
-    }
 
-    vsnprintf(log_line, log_linesize, message, ap);
+      return (0);
+    }
   }
 
-  return (log_line);
+  return (1);
 }
 
 
