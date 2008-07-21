@@ -955,8 +955,6 @@ cupsdHoldJob(cupsd_job_t *job)		/* I - Job data */
 
   job->dirty = 1;
   cupsdMarkDirty(CUPSD_DIRTY_JOBS);
-
-  cupsdCheckJobs();
 }
 
 
@@ -1380,13 +1378,19 @@ cupsdReleaseJob(cupsd_job_t *job)	/* I - Job */
 
   if (job->state_value == IPP_JOB_HELD)
   {
+   /*
+    * Add trailing banner as needed...
+    */
+
+    if (job->pending_timeout)
+      cupsdTimeoutJob(job);
+
     DEBUG_puts("cupsdReleaseJob: setting state to pending...");
 
     job->state->values[0].integer = IPP_JOB_PENDING;
     job->state_value              = IPP_JOB_PENDING;
     job->dirty = 1;
     cupsdMarkDirty(CUPSD_DIRTY_JOBS);
-    cupsdCheckJobs();
   }
 }
 
@@ -1418,8 +1422,6 @@ cupsdRestartJob(cupsd_job_t *job)	/* I - Job */
 
     if (old_state > IPP_JOB_STOPPED)
       cupsArrayAdd(ActiveJobs, job);
-
-    cupsdCheckJobs();
   }
 }
 
