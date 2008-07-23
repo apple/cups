@@ -2533,7 +2533,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 
 	strlcpy(ll, language, sizeof(ll));
 
-	if (!cupsArrayFind(languages, ll) && strcmp(ll, "zh"))
+	if (!cupsArrayFind(languages, ll) &&
+	    strcmp(ll, "zh") && strcmp(ll, "en"))
 	{
 	  if (!warn && !errors && !verbose)
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
