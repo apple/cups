@@ -361,9 +361,9 @@ print_device(const char *uri,		/* I - Device URI */
     _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
 
     if (!g.make)
-      fputs("DEBUG: USB make string is NULL!\n");
+      fputs("DEBUG: USB make string is NULL!\n", stderr);
     if (!g.model)
-      fputs("DEBUG: USB model string is NULL!\n");
+      fputs("DEBUG: USB model string is NULL!\n", stderr);
 
     return (CUPS_BACKEND_STOP);
   }
