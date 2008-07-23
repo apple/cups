@@ -1063,6 +1063,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 		sizeof(choice->text));
 
 	choice->code = _cupsStrAlloc(string);
+
+	if (custom_option->section == PPD_ORDER_JCL)
+	  ppd_decode(choice->code);
       }
 
      /*
