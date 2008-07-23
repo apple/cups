@@ -358,9 +358,14 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!g.make || !g.model)
   {
-    _cupsLangPrintf(stderr, 
-		    _("ERROR: Unable to create make and model strings\n"));
-    return CUPS_BACKEND_STOP;
+    _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+
+    if (!g.make)
+      fputs("DEBUG: USB make string is NULL!\n");
+    if (!g.model)
+      fputs("DEBUG: USB model string is NULL!\n");
+
+    return (CUPS_BACKEND_STOP);
   }
 
   fputs("STATE: +connecting-to-device\n", stderr);
@@ -410,12 +415,13 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      _cupsLangPrintf(stderr, _("FATAL: Could not load %s\n"), print_buffer);
+      _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+      fprintf(stderr, "DEBUG: Could not load %s\n", print_buffer);
 
       if (driverBundlePath)
 	CFRelease(driverBundlePath);
 
-      return CUPS_BACKEND_STOP;
+      return (CUPS_BACKEND_STOP);
     }
 
     if (driverBundlePath)
@@ -427,8 +433,9 @@ print_device(const char *uri,		/* I - Device URI */
       countdown -= PRINTER_POLLING_INTERVAL;
       if (countdown <= 0)
       {
-	_cupsLangPrintf(stderr, _("INFO: Printer busy (status:0x%08x)\n"),
-	                (int)status);
+	_cupsLangPuts(stderr,
+		      _("INFO: Waiting for printer to become available...\n"));
+	fprintf(stderr, "DEBUG: USB printer status: 0x%08x\n", (int)status);
 	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
       }
     }
@@ -473,8 +480,9 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      _cupsLangPuts(stderr, _("WARNING: Couldn't create side channel\n"));
-      return CUPS_BACKEND_STOP;
+      _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+      fputs("DEBUG: Couldn't create side-channel thread!\n", stderr);
+      return (CUPS_BACKEND_STOP);
     }
   }
 
@@ -490,8 +498,9 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    _cupsLangPuts(stderr, _("WARNING: Couldn't create read channel\n"));
-    return CUPS_BACKEND_STOP;
+    _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+    fputs("DEBUG: Couldn't create read thread!\n", stderr);
+    return (CUPS_BACKEND_STOP);
   }
 
  /*
@@ -505,7 +514,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   while (status == noErr && copies-- > 0)
   {
-    _cupsLangPuts(stderr, _("INFO: Sending data\n"));
+    _cupsLangPuts(stderr, _("INFO: Sending print data...\n"));
 
     if (print_fd != STDIN_FILENO)
     {
@@ -573,8 +582,9 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN)
 	{
-	 _cupsLangPrintf(stderr, _("ERROR: select() returned %d\n"), (int)errno);
-	 return CUPS_BACKEND_STOP;
+	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
+	  perror("DEBUG: select");
+	  return (CUPS_BACKEND_STOP);
 	}
       }
 
@@ -605,7 +615,8 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN || errno != EINTR)
 	  {
-	    _cupsLangPrintError(_("ERROR: Unable to read print data"));
+	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
+	    perror("DEBUG: read");
 	    return CUPS_BACKEND_STOP;
 	  }
 
@@ -649,8 +660,11 @@ print_device(const char *uri,		/* I - Device URI */
 	  */
 
 	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
-	  _cupsLangPrintf(stderr, _("ERROR: %ld: (canceled:%ld)\n"),
-	                  (long)status, (long)err);
+	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data!\n"));
+	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %ld\n",
+	          (long)status);
+	  fprintf(stderr, "DEBUG: USB class driver Abort returned %ld\n",
+	          (long)err);
 	  status = CUPS_BACKEND_STOP;
 	  break;
 	}
@@ -1705,7 +1719,7 @@ static void setup_cfLanguage(void)
     langArray = CFArrayCreate(kCFAllocatorDefault, (const void **)lang, sizeof(lang) / sizeof(lang[0]), &kCFTypeArrayCallBacks);
 
     CFPreferencesSetAppValue(CFSTR("AppleLanguages"), langArray, kCFPreferencesCurrentApplication);
-    fprintf(stderr, "DEBUG: usb: AppleLanguages = \"%s\"\n", requestedLang);
+    fprintf(stderr, "DEBUG: usb: AppleLanguages=\"%s\"\n", requestedLang);
 
     CFRelease(lang[0]);
     CFRelease(langArray);
@@ -1801,7 +1815,8 @@ static void run_ppc_backend(int argc,
 
       execv("/usr/libexec/cups/backend/usb", my_argv);
 
-      _cupsLangPrintError(_("ERROR: Unable to exec /usr/libexec/cups/backend/usb"));
+      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
+      perror("DEBUG: Unable to exec /usr/libexec/cups/backend/usb");
       exit(errno);
     }
     else if (child_pid < 0)
@@ -1810,7 +1825,8 @@ static void run_ppc_backend(int argc,
       * Error - couldn't fork a new process!
       */
 
-      _cupsLangPrintError(_("ERROR: Unable to fork"));
+      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
+      perror("DEBUG: Unable to fork");
       exit(errno);
     }
 
@@ -1827,7 +1843,8 @@ static void run_ppc_backend(int argc,
     close(fd);
     close(1);
 
-    fprintf(stderr, "DEBUG: Started usb(ppc) backend (PID %d)\n", (int)child_pid);
+    fprintf(stderr, "DEBUG: Started usb(legacy) backend (PID %d)\n",
+            (int)child_pid);
 
     while ((waitpid_status = waitpid(child_pid, &childstatus, 0)) == (pid_t)-1 && errno == EINTR)
       usleep(1000);
@@ -1835,19 +1852,23 @@ static void run_ppc_backend(int argc,
     if (WIFSIGNALED(childstatus))
     {
       exitstatus = WTERMSIG(childstatus);
-      fprintf(stderr, "DEBUG: usb(ppc) backend %d crashed on signal %d!\n", child_pid, exitstatus);
+      fprintf(stderr, "DEBUG: usb(legacy) backend %d crashed on signal %d!\n",
+              child_pid, exitstatus);
     }
     else
     {
       if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
-	fprintf(stderr, "DEBUG: usb(ppc) backend %d stopped with status %d!\n", child_pid, exitstatus);
+	fprintf(stderr,
+	        "DEBUG: usb(legacy) backend %d stopped with status %d!\n",
+		child_pid, exitstatus);
       else
-	fprintf(stderr, "DEBUG: PID %d exited with no errors\n", child_pid);
+	fprintf(stderr, "DEBUG: usb(legacy) backend %d exited with no errors\n",
+	        child_pid);
     }
   }
   else
   {
-    fputs("DEBUG: usb child running i386 again\n", stderr);
+    fputs("DEBUG: usb(legacy) backend running native again\n", stderr);
     exitstatus = ENOENT;
   }
 
