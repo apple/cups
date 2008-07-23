@@ -565,9 +565,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
         constptr->installable = ppd_is_installable(installable, option);
 	consts->installable   |= constptr->installable;
 
-        if (!constptr->option)
+        if (!constptr->option || (!constptr->choice && choice[0]))
 	{
-	  DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n", option));
+	  DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	                option, choice));
 	  break;
 	}
       }
@@ -643,10 +644,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 						     oldconst->option1);
       }
 
-      if (!constptr[0].option)
+      if (!constptr[0].option || (!constptr[0].choice && oldconst->choice1[0]))
       {
-        DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
-	              oldconst->option1));
+        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	              oldconst->option1, oldconst->choice1));
         free(consts->constraints);
 	free(consts);
 	continue;
@@ -668,10 +669,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 						     oldconst->option2);
       }
 
-      if (!constptr->option)
+      if (!constptr[1].option || (!constptr[1].choice && oldconst->choice2[0]))
       {
-        DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
-	              oldconst->option2));
+        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	              oldconst->option2, oldconst->choice2));
         free(consts->constraints);
 	free(consts);
 	continue;
