@@ -234,7 +234,7 @@ cupsResolveConflicts(
   for (i = 0; i < *num_options; i ++)
     num_newopts = cupsAddOption((*options)[i].name, (*options)[i].value,
                                 num_newopts, &newopts);
-  if (option)
+  if (option && strcasecmp(option, "Collate"))
     num_newopts = cupsAddOption(option, choice, num_newopts, &newopts);
 
  /*
@@ -375,18 +375,28 @@ cupsResolveConflicts(
   }
 
  /*
-  * Free either the old or the new options depending on whether we had to
-  * apply any resolvers...
+  * Free the caller's option array...
   */
 
-  if (resolvers)
-  {
-    cupsFreeOptions(*num_options, *options);
-    *num_options = num_newopts;
-    *options     = newopts;
-  }
+  cupsFreeOptions(*num_options, *options);
+
+ /*
+  * If Collate is the option we are testing, add it here.  Otherwise, remove
+  * any Collate option from the resolve list since the filters automatically
+  * handle manual collation...
+  */
+
+  if (option && !strcasecmp(option, "Collate"))
+    num_newopts = cupsAddOption(option, choice, num_newopts, &newopts);
   else
-    cupsFreeOptions(num_newopts, newopts);
+    num_newopts = cupsRemoveOption("Collate", num_newopts, &newopts);
+
+ /*
+  * Return the new list of options to the caller...
+  */
+
+  *num_options = num_newopts;
+  *options     = newopts;
 
   cupsArrayDelete(pass);
   cupsArrayDelete(resolvers);
