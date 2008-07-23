@@ -2402,7 +2402,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	      if ((duplex = ppdFindOption(ppd, "KD03Duplex")) == NULL)
 		duplex = ppdFindOption(ppd, "JCLDuplex");
 
-	if (duplex && duplex->num_choices > 1)
+	if (duplex && duplex->num_choices > 1 &&
+	    !ppdInstallableConflict(ppd, duplex->keyword, "DuplexTumble"))
 	{
 	  p->type |= CUPS_PRINTER_DUPLEX;
 
