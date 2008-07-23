@@ -59,6 +59,7 @@
  * Include necessary headers.
  */
 
+#include "ppd-private.h"
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
@@ -290,6 +291,26 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   }
 
   cupsArrayDelete(ppd->coptions);
+
+ /*
+  * Free constraints...
+  */
+
+  if (ppd->cups_uiconstraints)
+  {
+    _ppd_cups_uiconsts_t *consts;	/* Current constraints */
+
+
+    for (consts = (_ppd_cups_uiconsts_t *)cupsArrayFirst(ppd->cups_uiconstraints);
+         consts;
+	 consts = (_ppd_cups_uiconsts_t *)cupsArrayNext(ppd->cups_uiconstraints))
+    {
+      free(consts->constraints);
+      free(consts);
+    }
+
+    cupsArrayDelete(ppd->cups_uiconstraints);
+  }
 
  /*
   * Free the whole record...

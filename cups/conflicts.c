@@ -528,7 +528,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
       for (i = 0, vptr = strchr(constattr->value, '*');
            vptr;
-	   i ++, vptr = strchr(vptr + 1, '*'), constptr ++)
+	   i ++, vptr = strchr(vptr, '*'), constptr ++)
       {
        /*
         * Extract "*Option Choice" or just "*Option"...
