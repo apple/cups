@@ -373,8 +373,9 @@ cupsdCheckJobs(void)
     */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdCheckJobs: Job %d: state_value=%d, loaded=%s",
-                    job->id, job->state_value, job->attrs ? "yes" : "no");
+                    "cupsdCheckJobs: Job %d: dest=%s, dtype=%x, "
+		    "state_value=%d, loaded=%s", job->id, job->dest, job->dtype,
+		    job->state_value, job->attrs ? "yes" : "no");
 
     if (job->state_value == IPP_JOB_HELD &&
         job->hold_until &&

@@ -544,10 +544,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 	  vptr ++;
 
         if (*vptr == '*')
-	{
-	  vptr --;
 	  choice[0] = '\0';
-	}
 	else
 	{
 	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
