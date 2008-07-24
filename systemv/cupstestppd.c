@@ -1767,7 +1767,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
       for (vptr = strchr(constattr->value, '*');
            vptr;
-	   vptr = strchr(vptr + 1, '*'))
+	   vptr = strchr(vptr, '*'))
       {
        /*
         * Extract "*Option Choice" or just "*Option"...
@@ -1783,10 +1783,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  vptr ++;
 
         if (*vptr == '*')
-	{
-	  vptr --;
 	  choice[0] = '\0';
-	}
 	else
 	{
 	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
@@ -2533,7 +2530,8 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 
 	strlcpy(ll, language, sizeof(ll));
 
-	if (!cupsArrayFind(languages, ll) && strcmp(ll, "zh"))
+	if (!cupsArrayFind(languages, ll) &&
+	    strcmp(ll, "zh") && strcmp(ll, "en"))
 	{
 	  if (!warn && !errors && !verbose)
 	    _cupsLangPuts(stdout, _(" FAIL\n"));

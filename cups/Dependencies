@@ -81,9 +81,9 @@ notify.o: i18n.h transcode.h
 options.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.o: string.h ../config.h debug.h
 page.o: ppd.h array.h versioning.h file.h string.h ../config.h
-ppd.o: globals.h string.h ../config.h http-private.h http.h versioning.h
-ppd.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-ppd.o: i18n.h transcode.h debug.h
+ppd.o: ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+ppd.o: language.h globals.h string.h ../config.h http-private.h md5.h
+ppd.o: ipp-private.h i18n.h transcode.h debug.h
 request.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 request.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.o: i18n.h transcode.h debug.h
@@ -207,9 +207,9 @@ notify.32.o: notify.c  i18n.h transcode.h
 options.32.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.32.o: options.c  string.h ../config.h debug.h
 page.32.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
-ppd.32.o: ppd.c  globals.h string.h ../config.h http-private.h http.h versioning.h
-ppd.32.o: ppd.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-ppd.32.o: ppd.c  i18n.h transcode.h debug.h
+ppd.32.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+ppd.32.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
+ppd.32.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
 request.32.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.32.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.32.o: request.c  i18n.h transcode.h debug.h
@@ -333,9 +333,9 @@ notify.64.o: notify.c  i18n.h transcode.h
 options.64.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.64.o: options.c  string.h ../config.h debug.h
 page.64.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
-ppd.64.o: ppd.c  globals.h string.h ../config.h http-private.h http.h versioning.h
-ppd.64.o: ppd.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
-ppd.64.o: ppd.c  i18n.h transcode.h debug.h
+ppd.64.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+ppd.64.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
+ppd.64.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
 request.64.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.64.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.64.o: request.c  i18n.h transcode.h debug.h

@@ -13,6 +13,16 @@
  *
  * Contents:
  *
+ *   list_devices()    - List the available printers.
+ *   print_device()    - Print a file to a USB device.
+ *   close_device()    - Close the connection to the USB printer.
+ *   find_device()     - Find or enumerate USB printers.
+ *   get_device_id()   - Get the IEEE-1284 device ID for the printer.
+ *   list_cb()         - List USB printers for discovery.
+ *   make_device_uri() - Create a device URI for a USB printer.
+ *   open_device()     - Open a connection to the USB printer.
+ *   print_cb()        - Find a USB printer for printing.
+ *   side_cb()         - Handle side-channel requests.
  */
 
 /*
@@ -20,6 +30,7 @@
  */
 
 #include <usb.h>
+#include <poll.h>
 
 
 /*
@@ -57,6 +68,7 @@ static char		*make_device_uri(usb_printer_t *printer,
 static int		open_device(usb_printer_t *printer, int verbose);
 static int		print_cb(usb_printer_t *printer, const char *device_uri,
 			         const char *device_id, const void *data);
+static ssize_t		side_cb(usb_printer_t *printer, int print_fd);
 
 
 /*
@@ -90,8 +102,7 @@ print_device(const char *uri,		/* I - Device URI */
 		tbytes;			/* Total bytes written */
   char		buffer[8192];		/* Print data buffer */
   struct sigaction action;		/* Actions for POSIX signals */
-  int		read_endp,		/* Read endpoint */
-		write_endp;		/* Write endpoint */
+  struct pollfd	pfds[2];		/* Poll descriptors */
 
 
   fputs("DEBUG: print_device\n", stderr);
@@ -107,14 +118,6 @@ print_device(const char *uri,		/* I - Device URI */
     sleep(5);
   }
 
-  read_endp  = printer->device->config[printer->conf].
-                   interface[printer->iface].
-		   altsetting[printer->altset].
-		   endpoint[printer->read_endp].bEndpointAddress;
-  write_endp = printer->device->config[printer->conf].
-                   interface[printer->iface].
-		   altsetting[printer->altset].
-		   endpoint[printer->write_endp].bEndpointAddress;
 
  /*
   * If we are printing data from a print driver on stdin, ignore SIGTERM
@@ -134,6 +137,11 @@ print_device(const char *uri,		/* I - Device URI */
 
   tbytes = 0;
 
+  pfds[0].fd     = print_fd;
+  pfds[0].events = POLLIN;
+  pfds[1].fd     = CUPS_SC_FD;
+  pfds[1].events = POLLIN;
+
   while (copies > 0 && tbytes >= 0)
   {
     copies --;
@@ -145,23 +153,33 @@ print_device(const char *uri,		/* I - Device URI */
     }
 
    /*
-    * TODO: Add side-channel and back-channel support, along with better
-    * error handling for writes.
+    * TODO: Add back-channel support, along with better write error handling.
     */
 
-    while ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
+    if (poll(pfds, 2, -1) > 0)
     {
-      while (usb_bulk_write(printer->handle, write_endp, buffer, bytes,
-                            5000) < 0)
+      if (pfds[0].revents & POLLIN)
       {
-        _cupsLangPrintf(stderr,
-	                _("ERROR: Unable to write %d bytes to printer!\n"),
-	                (int)bytes);
-        tbytes = -1;
-	break;
+	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
+	{
+	  while (usb_bulk_write(printer->handle, printer->write_endp, buffer,
+	                        bytes, 5000) < 0)
+	  {
+	    _cupsLangPrintf(stderr,
+			    _("ERROR: Unable to write %d bytes to printer!\n"),
+			    (int)bytes);
+	    tbytes = -1;
+	    break;
+	  }
+
+	  tbytes += bytes;
+	}
+	else if (bytes < 0 && errno != EAGAIN && errno != EINTR)
+	  break;
       }
 
-      tbytes += bytes;
+      if (pfds[1].revents & POLLIN)
+        tbytes += side_cb(printer, print_fd);
     }
   }
 
@@ -318,7 +336,19 @@ find_device(usb_cb_t   cb,		/* I - Callback function */
 		                sizeof(device_uri));
 
 	        if ((*cb)(&printer, device_uri, device_id, data))
+		{
+		  printer.read_endp  = printer.device->config[printer.conf].
+				           interface[printer.iface].
+					   altsetting[printer.altset].
+					   endpoint[printer.read_endp].
+					   bEndpointAddress;
+		  printer.write_endp = printer.device->config[printer.conf].
+					   interface[printer.iface].
+					   altsetting[printer.altset].
+					   endpoint[printer.write_endp].
+					   bEndpointAddress;
 		  return (&printer);
+		}
               }
 
               close_device(&printer);
@@ -671,6 +701,97 @@ print_cb(usb_printer_t *printer,	/* I - Printer */
          const void    *data)		/* I - User data (make, model, S/N) */
 {
   return (!strcmp((char *)data, device_uri));
+}
+
+
+/*
+ * 'side_cb()' - Handle side-channel requests.
+ */
+
+static ssize_t				/* O - Number of bytes written */
+side_cb(usb_printer_t *printer,		/* I - Printer */
+        int           print_fd)		/* I - File to print */
+{
+  ssize_t		bytes,		/* Bytes read/written */
+			tbytes;		/* Total bytes written */
+  char			buffer[8192];	/* Print data buffer */
+  struct pollfd		pfd;		/* Poll descriptor */
+  cups_sc_command_t	command;	/* Request command */
+  cups_sc_status_t	status;		/* Request/response status */
+  char			data[2048];	/* Request/response data */
+  int			datalen;	/* Request/response data size */
+
+
+  tbytes  = 0;
+  datalen = sizeof(data);
+
+  if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
+  {
+    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
+    return (0);
+  }
+
+  switch (command)
+  {
+    case CUPS_SC_CMD_DRAIN_OUTPUT :
+	pfd.fd     = print_fd;
+	pfd.events = POLLIN;
+
+	while (poll(&pfd, 1, 1000) > 0)
+	{
+	  if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
+	  {
+	    while (usb_bulk_write(printer->handle, printer->write_endp, buffer,
+				  bytes, 5000) < 0)
+	    {
+	      _cupsLangPrintf(stderr,
+			      _("ERROR: Unable to write %d bytes to printer!\n"),
+			      (int)bytes);
+	      tbytes = -1;
+	      break;
+	    }
+
+	    tbytes += bytes;
+	  }
+	  else if (bytes < 0 && errno != EAGAIN && errno != EINTR)
+	    break;
+        }
+
+        if (tbytes < 0)
+	  status = CUPS_SC_STATUS_IO_ERROR;
+	else
+	  status = CUPS_SC_STATUS_OK;
+
+	datalen = 0;
+        break;
+
+    case CUPS_SC_CMD_GET_BIDI :
+        data[0] = 0;			/* TODO: Change to 1 when read supported */
+        datalen = 1;
+        break;
+
+    case CUPS_SC_CMD_GET_DEVICE_ID :
+	if (get_device_id(printer, data, sizeof(data)))
+        {
+	  status  = CUPS_SC_STATUS_IO_ERROR;
+	  datalen = 0;
+	}
+	else
+        {
+	  status  = CUPS_SC_STATUS_OK;
+	  datalen = strlen(data);
+	}
+        break;
+
+    default :
+        status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;
+	datalen = 0;
+	break;
+  }
+
+  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+
+  return (tbytes);
 }
 
 

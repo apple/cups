@@ -345,6 +345,7 @@ conflicts.">ppdMarkOption</a></li>
 <li><a href="#ppdOpenFile" title="Read a PPD file into memory.">ppdOpenFile</a></li>
 <li><a href="#ppdPageLength" title="Get the page length for the given size.">ppdPageLength</a></li>
 <li><a href="#ppdPageSize" title="Get the page size record for the given size.">ppdPageSize</a></li>
+<li><a href="#ppdPageSizeLimits" title="Return the custom page size limits.">ppdPageSizeLimits</a></li>
 <li><a href="#ppdPageWidth" title="Get the page width for the given size.">ppdPageWidth</a></li>
 <li><a href="#ppdSetConformance" title="Set the conformance level for PPD files.">ppdSetConformance</a></li>
 </ul>
@@ -1368,6 +1369,33 @@ float ppdPageLength (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Size record for page or NULL</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ppdPageSizeLimits">ppdPageSizeLimits</a></h3>
+<p class="description">Return the custom page size limits.</p>
+<p class="code">
+int ppdPageSizeLimits (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_size_t">ppd_size_t</a> *minimum,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_size_t">ppd_size_t</a> *maximum<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file record</dd>
+<dt>minimum</dt>
+<dd class="description">Minimum custom size</dd>
+<dt>maximum</dt>
+<dd class="description">Maximum custom size</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">1 if custom sizes are supported, 0 otherwise</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function returns the minimum and maximum custom page sizes and printable
+areas based on the currently-marked (selected) options.<br>
+<br>
+If the specified PPD file does not support custom page sizes, both
+&quot;minimum&quot; and &quot;maximum&quot; are filled with zeroes.
+
+</p>
 <h3 class="function"><a name="ppdPageWidth">ppdPageWidth</a></h3>
 <p class="description">Get the page width for the given size.</p>
 <p class="code">

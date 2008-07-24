@@ -112,6 +112,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   const char	*text;			/* Localized text */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
+  ppd_size_t	minsize,		/* Minimum size */
+		maxsize;		/* Maximum size */
 
 
   status = 0;
@@ -251,6 +253,30 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       puts("FAIL (Duplex=None conflicted)");
+      status ++;
+    }
+
+   /*
+    * ppdPageSizeLimits
+    */
+
+    fputs("ppdPageSizeLimits: ", stdout);
+    if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
+    {
+      if (minsize.width != 36 || minsize.length != 36 ||
+          maxsize.width != 1080 || maxsize.length != 86400)
+      {
+        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+	       "expected min=36x36, max=1080x86400)\n", minsize.width,
+	       minsize.length, maxsize.width, maxsize.length);
+        status ++;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (returned 0)");
       status ++;
     }
 
@@ -475,6 +501,98 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       puts("FAIL (Duplex=None conflicted)");
+      status ++;
+    }
+
+   /*
+    * ppdPageSizeLimits
+    */
+
+    ppdMarkDefaults(ppd);
+
+    fputs("ppdPageSizeLimits(default): ", stdout);
+    if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
+    {
+      if (minsize.width != 36 || minsize.length != 36 ||
+          maxsize.width != 1080 || maxsize.length != 86400)
+      {
+        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+	       "expected min=36x36, max=1080x86400)\n", minsize.width,
+	       minsize.length, maxsize.width, maxsize.length);
+        status ++;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (returned 0)");
+      status ++;
+    }
+
+    ppdMarkOption(ppd, "InputSlot", "Manual");
+
+    fputs("ppdPageSizeLimits(InputSlot=Manual): ", stdout);
+    if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
+    {
+      if (minsize.width != 100 || minsize.length != 100 ||
+          maxsize.width != 1000 || maxsize.length != 1000)
+      {
+        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+	       "expected min=100x100, max=1000x1000)\n", minsize.width,
+	       minsize.length, maxsize.width, maxsize.length);
+        status ++;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (returned 0)");
+      status ++;
+    }
+
+    ppdMarkOption(ppd, "Quality", "Photo");
+
+    fputs("ppdPageSizeLimits(Quality=Photo): ", stdout);
+    if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
+    {
+      if (minsize.width != 200 || minsize.length != 200 ||
+          maxsize.width != 1000 || maxsize.length != 1000)
+      {
+        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+	       "expected min=200x200, max=1000x1000)\n", minsize.width,
+	       minsize.length, maxsize.width, maxsize.length);
+        status ++;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (returned 0)");
+      status ++;
+    }
+
+    ppdMarkOption(ppd, "InputSlot", "Tray");
+
+    fputs("ppdPageSizeLimits(Quality=Photo): ", stdout);
+    if (ppdPageSizeLimits(ppd, &minsize, &maxsize))
+    {
+      if (minsize.width != 300 || minsize.length != 300 ||
+          maxsize.width != 1080 || maxsize.length != 86400)
+      {
+        printf("FAIL (got min=%.0fx%.0f, max=%.0fx%.0f, "
+	       "expected min=300x300, max=1080x86400)\n", minsize.width,
+	       minsize.length, maxsize.width, maxsize.length);
+        status ++;
+      }
+      else
+        puts("PASS");
+    }
+    else
+    {
+      puts("FAIL (returned 0)");
       status ++;
     }
   }

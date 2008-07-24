@@ -618,7 +618,40 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 
   for (i = 0, bufsize = 1; i < count; i ++)
   {
-    if (section != PPD_ORDER_EXIT && section != PPD_ORDER_JCL)
+    if (section == PPD_ORDER_JCL)
+    {
+      if (!strcasecmp(choices[i]->choice, "Custom") &&
+	  (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
+	      != NULL)
+      {
+       /*
+        * Add space to account for custom parameter substitution...
+	*/
+
+        for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+	     cparam;
+	     cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+	{
+          switch (cparam->type)
+	  {
+	    case PPD_CUSTOM_CURVE :
+	    case PPD_CUSTOM_INVCURVE :
+	    case PPD_CUSTOM_POINTS :
+	    case PPD_CUSTOM_REAL :
+	    case PPD_CUSTOM_INT :
+	        bufsize += 10;
+	        break;
+
+	    case PPD_CUSTOM_PASSCODE :
+	    case PPD_CUSTOM_PASSWORD :
+	    case PPD_CUSTOM_STRING :
+	        bufsize += strlen(cparam->current.custom_string);
+	        break;
+          }
+	}
+      }
+    }
+    else if (section != PPD_ORDER_EXIT)
     {
       bufsize += 3;			/* [{\n */
 
@@ -698,7 +731,89 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   */
 
   for (i = 0, bufptr = buffer; i < count; i ++, bufptr += strlen(bufptr))
-    if (section != PPD_ORDER_EXIT && section != PPD_ORDER_JCL)
+    if (section == PPD_ORDER_JCL)
+    {
+      if (!strcasecmp(choices[i]->choice, "Custom") &&
+          (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
+	      != NULL)
+      {
+       /*
+        * Handle substitutions in custom JCL options...
+	*/
+
+	char	*cptr;			/* Pointer into code */
+	int	pnum;			/* Parameter number */
+
+
+        for (cptr = choices[i]->code; *cptr && bufptr < bufend;)
+	{
+	  if (*cptr == '\\')
+	  {
+	    cptr ++;
+
+	    if (isdigit(*cptr & 255))
+	    {
+	     /*
+	      * Substitute parameter...
+	      */
+
+              pnum = *cptr++ - '0';
+	      while (isalnum(*cptr & 255))
+	        pnum = pnum * 10 + *cptr - '0';
+
+              for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+	           cparam;
+		   cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+		if (cparam->order == pnum)
+		  break;
+
+              if (cparam)
+	      {
+	        switch (cparam->type)
+		{
+		  case PPD_CUSTOM_CURVE :
+		  case PPD_CUSTOM_INVCURVE :
+		  case PPD_CUSTOM_POINTS :
+		  case PPD_CUSTOM_REAL :
+		      bufptr = _cupsStrFormatd(bufptr, bufend,
+					       cparam->current.custom_real,
+					       loc);
+		      break;
+
+		  case PPD_CUSTOM_INT :
+		      snprintf(bufptr, bufend - bufptr, "%d",
+		               cparam->current.custom_int);
+		      bufptr += strlen(bufptr);
+		      break;
+
+		  case PPD_CUSTOM_PASSCODE :
+		  case PPD_CUSTOM_PASSWORD :
+		  case PPD_CUSTOM_STRING :
+		      strlcpy(bufptr, cparam->current.custom_string,
+		              bufend - bufptr);
+		      bufptr += strlen(bufptr);
+		      break;
+		}
+	      }
+	    }
+	    else if (*cptr)
+	      *bufptr++ = *cptr++;
+	  }
+	  else
+	    *bufptr++ = *cptr++;
+	}
+      }
+      else
+      {
+       /*
+        * Otherwise just copy the option code directly...
+	*/
+
+        strlcpy(bufptr, choices[i]->code, bufend - bufptr + 1);
+        bufptr += strlen(bufptr);
+      }
+    }
+    else if (section != PPD_ORDER_EXIT)
     {
      /*
       * Add wrapper commands to prevent printer errors for unsupported
@@ -831,8 +946,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	}
       }
       else if (!strcasecmp(choices[i]->choice, "Custom") &&
-               (coption = ppdFindCustomOption(ppd,
-	                                      choices[i]->option->keyword))
+               (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
 	           != NULL)
       {
        /*

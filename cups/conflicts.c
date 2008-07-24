@@ -234,7 +234,7 @@ cupsResolveConflicts(
   for (i = 0; i < *num_options; i ++)
     num_newopts = cupsAddOption((*options)[i].name, (*options)[i].value,
                                 num_newopts, &newopts);
-  if (option)
+  if (option && strcasecmp(option, "Collate"))
     num_newopts = cupsAddOption(option, choice, num_newopts, &newopts);
 
  /*
@@ -375,18 +375,28 @@ cupsResolveConflicts(
   }
 
  /*
-  * Free either the old or the new options depending on whether we had to
-  * apply any resolvers...
+  * Free the caller's option array...
   */
 
-  if (resolvers)
-  {
-    cupsFreeOptions(*num_options, *options);
-    *num_options = num_newopts;
-    *options     = newopts;
-  }
+  cupsFreeOptions(*num_options, *options);
+
+ /*
+  * If Collate is the option we are testing, add it here.  Otherwise, remove
+  * any Collate option from the resolve list since the filters automatically
+  * handle manual collation...
+  */
+
+  if (option && !strcasecmp(option, "Collate"))
+    num_newopts = cupsAddOption(option, choice, num_newopts, &newopts);
   else
-    cupsFreeOptions(num_newopts, newopts);
+    num_newopts = cupsRemoveOption("Collate", num_newopts, &newopts);
+
+ /*
+  * Return the new list of options to the caller...
+  */
+
+  *num_options = num_newopts;
+  *options     = newopts;
 
   cupsArrayDelete(pass);
   cupsArrayDelete(resolvers);
@@ -528,7 +538,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
       for (i = 0, vptr = strchr(constattr->value, '*');
            vptr;
-	   i ++, vptr = strchr(vptr + 1, '*'), constptr ++)
+	   i ++, vptr = strchr(vptr, '*'), constptr ++)
       {
        /*
         * Extract "*Option Choice" or just "*Option"...
@@ -544,10 +554,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 	  vptr ++;
 
         if (*vptr == '*')
-	{
-	  vptr --;
 	  choice[0] = '\0';
-	}
 	else
 	{
 	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
@@ -568,9 +575,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
         constptr->installable = ppd_is_installable(installable, option);
 	consts->installable   |= constptr->installable;
 
-        if (!constptr->option)
+        if (!constptr->option || (!constptr->choice && choice[0]))
 	{
-	  DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n", option));
+	  DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	                option, choice));
 	  break;
 	}
       }
@@ -646,10 +654,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 						     oldconst->option1);
       }
 
-      if (!constptr[0].option)
+      if (!constptr[0].option || (!constptr[0].choice && oldconst->choice1[0]))
       {
-        DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
-	              oldconst->option1));
+        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	              oldconst->option1, oldconst->choice1));
         free(consts->constraints);
 	free(consts);
 	continue;
@@ -671,10 +679,10 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 						     oldconst->option2);
       }
 
-      if (!constptr->option)
+      if (!constptr[1].option || (!constptr[1].choice && oldconst->choice2[0]))
       {
-        DEBUG_printf(("ppd_load_constraints: Unknown option %s!\n",
-	              oldconst->option2));
+        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	              oldconst->option2, oldconst->choice2));
         free(consts->constraints);
 	free(consts);
 	continue;

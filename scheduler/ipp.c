@@ -8928,6 +8928,8 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsdLogJob(job, CUPSD_LOG_INFO, "Released by \"%s\".", username);
 
   con->response->request.status.status_code = IPP_OK;
+
+  cupsdCheckJobs();
 }
 
 
@@ -9971,6 +9973,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 					/* Resource portion of URI */
   int			port;		/* Port portion of URI */
   int			event;		/* Events? */
+  int			check_jobs;	/* Check jobs? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_job_attrs(%p[%d], %s)", con,
@@ -10072,7 +10075,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdLoadJob(job);
 
-  event = 0;
+  check_jobs = 0;
+  event      = 0;
 
   for (attr = con->request->attrs; attr; attr = attr->next)
   {
@@ -10138,9 +10142,13 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       }
       else if (con->response->request.status.status_code == IPP_OK)
       {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-priority to %d",
+	            attr->values[0].integer);
         cupsdSetJobPriority(job, attr->values[0].integer);
-        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED |
-	         CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED;
+
+	check_jobs = 1;
+        event      |= CUPSD_EVENT_JOB_CONFIG_CHANGED |
+	              CUPSD_EVENT_PRINTER_QUEUE_ORDER_CHANGED;
       }
     }
     else if (!strcmp(attr->name, "job-state"))
@@ -10170,10 +10178,14 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
 	      {
+		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
+			    attr->values[0].integer);
+
 		job->state->values[0].integer = attr->values[0].integer;
 		job->state_value = (ipp_jstate_t)attr->values[0].integer;
 
                 event |= CUPSD_EVENT_JOB_STATE;
+		check_jobs = 1;
 	      }
 	      break;
 
@@ -10197,7 +10209,13 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 		return;
 	      }
               else if (con->response->request.status.status_code == IPP_OK)
+	      {
+		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
+			    attr->values[0].integer);
                 cupsdCancelJob(job, 0, (ipp_jstate_t)attr->values[0].integer);
+
+                check_jobs = 1;
+	      }
 	      break;
 	}
       }
@@ -10233,6 +10251,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (!strcmp(attr->name, "job-hold-until"))
       {
+        cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-hold-until to %s",
+		    attr->values[0].string.text);
         cupsdSetJobHoldUntil(job, attr->values[0].string.text);
 
 	if (!strcmp(attr->values[0].string.text, "no-hold"))
@@ -10240,7 +10260,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	else
 	  cupsdHoldJob(job);
 
-        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
+        check_jobs = 1;
+        event      |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
       }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)
@@ -10306,7 +10327,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Start jobs if possible...
   */
 
-  cupsdCheckJobs();
+  if (check_jobs)
+    cupsdCheckJobs();
 }
 
 
