@@ -116,6 +116,13 @@
 *ParamCustomPageSize HeightOffset/Height Offset: 4 points 0 0
 *ParamCustomPageSize Orientation:  5 int 0 0
 
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+
 *OpenUI *InputSlot/Input Slot: PickOne
 *OrderDependency: 20 AnySetup *InputSlot
 *DefaultInputSlot: Tray

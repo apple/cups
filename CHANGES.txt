@@ -1,8 +1,12 @@
-CHANGES.txt - 2008-07-18
+CHANGES.txt - 2008-07-23
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added ppdPageSizeLimits API.
+	- Added support for new cupsMediaQualifier2, cupsMediaQualifier3,
+	  cupsMinSize, and cupsMaxSize attributes.
+	- Added cupsResolveConflicts and ppdInstallableConflict APIs.
 	- Added support for new cupsUIConstraints and cupsUIResolver
 	  attributes for better option conflict detection and
 	  resolution.

@@ -409,6 +409,9 @@ extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
 			                 const char *spec);
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
 			                       const char *name) _CUPS_API_1_4;
+extern int		ppdPageSizeLimits(ppd_file_t *ppd,
+			                  ppd_size_t *minimum,
+					  ppd_size_t *maximum) _CUPS_API_1_4;
 
 
 /*

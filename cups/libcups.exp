@@ -336,5 +336,6 @@ _ppdOpenFd
 _ppdOpenFile
 _ppdPageLength
 _ppdPageSize
+_ppdPageSizeLimits
 _ppdPageWidth
 _ppdSetConformance
