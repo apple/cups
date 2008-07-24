@@ -278,11 +278,11 @@ static void setup_cfLanguage(void);
 static void soft_reset();
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;					/* Child PID */
 static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
 static void sigterm_handler(int sig);				/* SIGTERM handler */
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -1891,7 +1891,7 @@ static void sigterm_handler(int sig)
   exit(1);
 }
 
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
 
 #ifdef PARSE_PS_ERRORS
