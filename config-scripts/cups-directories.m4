@@ -123,12 +123,14 @@ AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$w
 AC_ARG_WITH(rclevels, [  --with-rclevels         set run levels for rc scripts],rclevels="$withval",rclevels="2 3 5")
 AC_ARG_WITH(rcstart, [  --with-rcstart          set start number for rc scripts],rcstart="$withval",rcstart="99")
 AC_ARG_WITH(rcstop, [  --with-rcstop           set stop number for rc scripts],rcstop="$withval",rcstop="00")
+AC_ARG_WITH(smfmanifestdir, [  --with-smfmanifestdir   set path for Solaris SMF manifest],smfmanifestdir="$withval",smfmanifestdir="")
 
 INITDIR=""
 INITDDIR=""
 RCLEVELS="$rclevels"
 RCSTART="$rcstart"
 RCSTOP="$rcstop"
+SMFMANIFESTDIR=""
 
 if test x$rcdir = x; then
 	case "$uname" in
@@ -192,8 +194,12 @@ if test x$rcdir = x; then
 
 		SunOS*)
 			# Solaris
-			INITDIR="/etc"
-			RCSTART="81"
+			if test "x$smfmanifestdir" != x; then
+				SMFMANIFESTDIR=$smfmanifestdir
+			else
+				INITDIR="/etc"
+				RCSTART="81"
+			fi
 			;;
 
 		*)
@@ -214,6 +220,7 @@ AC_SUBST(INITDDIR)
 AC_SUBST(RCLEVELS)
 AC_SUBST(RCSTART)
 AC_SUBST(RCSTOP)
+AC_SUBST(SMFMANIFESTDIR)
 
 dnl Xinetd support...
 AC_ARG_WITH(xinetd, [  --with-xinetd           set path for xinetd config files],XINETD="$withval",XINETD="")

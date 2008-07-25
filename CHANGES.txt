@@ -3,6 +3,7 @@ CHANGES.txt - 2008-07-25
 
 CHANGES IN CUPS V1.4b1
 
+	- Added Solaris SMF support (STR #1477)
 	- Added optional support for using TCP wrappers to limit access
 	  to CUPS (STR #263)
 	- Added ppdPageSizeLimits API.

@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<!--
+    Service manifest for CUPS.
+
+    This service manifest introduces smf(5) services for CUPS.  The services
+    described in this file are as follows:
+
+    	svc:/application/cups/scheduler:default
+    	svc:/application/cups/in-lpd:default
+
+    NOTE:  This service manifest is not editable; its contents will be
+    overwritten by package or patch operations, including operating system
+    upgrade.  Make customizations in a different file.
+
+    Norm.Jacobs@Sun.COM
+
+    $Id$
+-->
+
+<service_bundle type='manifest' name='SUNWcups:services'>
+
+<service
+    name='application/cups/scheduler'
+    type='service'
+    version='1'>
+
+    <dependency
+        name='filesystem_minimal'
+        grouping='require_all'
+        restart_on='none'
+        type='service'>
+        <service_fmri value='svc:/system/filesystem/minimal' />
+    </dependency>
+
+    <dependency
+        name='loopback'
+        grouping='optional_all'
+        restart_on='error'
+        type='service'>
+        <service_fmri value='svc:/network/loopback' />
+    </dependency>
+
+
+    <dependency
+        name='network'
+        grouping='optional_all'
+        restart_on='error'
+        type='service'>
+        <service_fmri value='svc:/milestone/network' />
+    </dependency>
+
+    <dependency
+        name='lpsched'
+        grouping='exclude_all'
+        restart_on='none'
+        type='service'>
+        <service_fmri value='svc:/application/print/server' />
+    </dependency>
+
+    <exec_method
+        type='method'
+        name='stop'
+        exec=':kill'
+        timeout_seconds='60' />
+
+    <instance name='default' enabled='false' >
+
+        <dependency
+            name='config_data'
+            grouping='require_all'
+            restart_on='none'
+            type='path'>
+            <service_fmri value='file://localhost@sysconfdir@/cups/cupsd.conf' />
+        </dependency>
+
+        <exec_method
+            type='method'
+            name='start'
+            exec='@sbindir@/cupsd'
+            timeout_seconds='60' >
+            <method_context>
+                <method_credential user='root' group='@CUPS_GROUP@' />
+            </method_context>
+        </exec_method>
+
+        <property_group name='general' type='framework'>
+            <propval name='action_authorization' type='astring'
+                value='solaris.smf.manage.cups' />
+            <propval name='value_authorization' type='astring'
+                value='solaris.smf.value.cups' />
+        </property_group>
+
+        <template>
+            <common_name>
+                <loctext xml:lang='C'>
+                    CUPS Print Spooler
+                </loctext>
+            </common_name>
+            <documentation>
+                <manpage title='cupsd' section='8'
+                    manpath='@mandir@' />
+            </documentation>
+        </template>
+
+    </instance>
+
+    <stability value='Stable' />
+
+</service>
+
+<service
+    name='application/cups/in-lpd'
+    type='service'
+    version='1'>
+
+    <dependency
+        name='filesystem_minimal'
+        grouping='require_all'
+        restart_on='none'
+        type='service'>
+        <service_fmri value='svc:/system/filesystem/minimal' />
+    </dependency>
+
+    <dependency
+        name='loopback'
+        grouping='require_any'
+        restart_on='error'
+        type='service'>
+        <service_fmri value='svc:/network/loopback' />
+    </dependency>
+
+    <dependency
+        name='network'
+        grouping='optional_all'
+        restart_on='error'
+        type='service'>
+        <service_fmri value='svc:/milestone/network' />
+    </dependency>
+
+    <dependency
+        name='in-lpd'
+        grouping='exclude_all'
+        restart_on='none'
+        type='service'>
+        <service_fmri value='svc:/application/print/rfc1179' />
+    </dependency>
+
+    <exec_method
+        type='method'
+        name='stop'
+        exec=':kill'
+        timeout_seconds='60' />
+
+    <instance name='default' enabled='false' >
+        <restarter>
+            <service_fmri value='svc:/network/inetd:default' />
+        </restarter>
+
+        <dependency
+            name='cupsd'
+            grouping='require_all'
+            restart_on='none'
+            type='service'>
+            <service_fmri value='svc:/application/cups/scheduler' />
+        </dependency>
+
+        <exec_method
+            type='method'
+            name='inetd_start'
+            exec='@CUPS_SERVERBIN@/daemon/cups-lpd -o document-format=application/octet-stream'
+            timeout_seconds='0'>
+            <method_context>
+                <method_credential user='@CUPS_USER@' group='@CUPS_GROUP@' />
+            </method_context>
+        </exec_method>
+
+        <property_group name='inetd' type='framework'>
+            <stability value='Evolving' />
+            <propval name='endpoint_type' type='astring' value='stream' />
+            <propval name='name' type='astring' value='printer' />
+            <propval name='wait' type='boolean' value='false' />
+            <propval name='isrpc' type='boolean' value='false' />
+            <propval name='proto' type='astring' value='tcp6' />
+        </property_group>
+
+        <property_group name='general' type='framework'>
+            <propval name='action_authorization' type='astring'
+                value='solaris.smf.manage.cups' />
+            <propval name='value_authorization' type='astring'
+                value='solaris.smf.value.cups' />
+        </property_group>
+
+        <template>
+            <common_name>
+                <loctext xml:lang='C'>
+                    CUPS Line Printer Daemon mini-server
+                </loctext>
+            </common_name>
+            <documentation>
+                <manpage title='cups-lpd' section='8'
+                    manpath='@mandir@' />
+            </documentation>
+        </template>
+
+    </instance>
+
+    <stability value='Stable' />
+
+</service>
+
+</service_bundle>
