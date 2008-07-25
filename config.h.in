@@ -586,6 +586,13 @@
 #undef HAVE_USB_H
 
 
+/*
+ * Do we have libwrap and tcpd.h?
+ */
+
+#undef HAVE_TCPD_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-07-23
+CHANGES.txt - 2008-07-25
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added optional support for using TCP wrappers to limit access
+	  to CUPS (STR #263)
 	- Added ppdPageSizeLimits API.
 	- Added support for new cupsMediaQualifier2, cupsMediaQualifier3,
 	  cupsMinSize, and cupsMaxSize attributes.

@@ -333,14 +333,15 @@ cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 	$(CC) $(LDFLAGS) -o cupsd $(CUPSDOBJS) -L. -lcupsmime \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBS) \
-		$(LIBGSSAPI)
+		$(LIBGSSAPI) $(LIBWRAP)
 
 cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
 		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
-		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
+		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI) \
+		$(LIBWRAP)
 
 
 #
