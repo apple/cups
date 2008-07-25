@@ -204,6 +204,12 @@ TH.label {
   vertical-align: top;
 }
 
+TH.sublabel {
+  padding-top: 0pt;
+  text-align: right;
+  font-weight: normal;
+}
+
 HR {
   border: solid thin;
 }
