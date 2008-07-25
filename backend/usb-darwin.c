@@ -395,7 +395,7 @@ print_device(const char *uri,		/* I - Device URI */
 
     status = registry_open(&driverBundlePath);
 
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
     /*
      * If we were unable to load the class drivers for this printer it's
      * probably because they're ppc or i386. In this case try to run this
@@ -406,7 +406,7 @@ print_device(const char *uri,		/* I - Device URI */
       run_legacy_backend(argc, argv, print_fd);
       /* Never returns here */
     }
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
     if (status ==  -2)
     {
