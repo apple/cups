@@ -14,22 +14,34 @@ dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 AC_ARG_ENABLE(ldap, [  --enable-ldap           turn on LDAP support, default=yes])
-AC_ARG_WITH(openldap-libs, [  --with-openldap-libs    set directory for OpenLDAP library],
+AC_ARG_WITH(ldap-libs, [  --with-ldap-libs        set directory for LDAP library],
     LDFLAGS="-L$withval $LDFLAGS"
     DSOFLAGS="-L$withval $DSOFLAGS",)
-AC_ARG_WITH(openldap-includes, [  --with-openldap-includes
-                          set directory for OpenLDAP includes],
+AC_ARG_WITH(ldap-includes, [  --with-ldap-includes    set directory for LDAP includes],
     CFLAGS="-I$withval $CFLAGS"
     CPPFLAGS="-I$withval $CPPFLAGS",)
 
 LIBLDAP=""
 
 if test x$enable_ldap != xno; then
-    AC_CHECK_HEADER(ldap.h,
+    AC_CHECK_HEADER(ldap.h, [
 	AC_CHECK_LIB(ldap, ldap_initialize,
-            AC_DEFINE(HAVE_LDAP)
-            AC_DEFINE(HAVE_OPENLDAP)
-	    LIBLDAP="-lldap"))
+	    AC_DEFINE(HAVE_LDAP)
+	    AC_DEFINE(HAVE_OPENLDAP)
+	    LIBLDAP="-lldap"
+	    AC_CHECK_LIB(ldap, ldap_start_tls,
+		AC_DEFINE(HAVE_LDAP_SSL)),
+
+	    AC_CHECK_LIB(ldap, ldap_init,
+		AC_DEFINE(HAVE_LDAP)
+		AC_DEFINE(HAVE_MOZILLA_LDAP)
+		LIBLDAP="-lldap"
+		AC_CHECK_HEADER(ldap_ssl.h, AC_DEFINE(HAVE_LDAP_SSL_H),,[#include <ldap.h>])
+		AC_CHECK_LIB(ldap, ldapssl_init,
+		    AC_DEFINE(HAVE_LDAP_SSL)))
+	)
+	AC_CHECK_LIB(ldap, ldap_set_rebind_proc, AC_DEFINE(HAVE_LDAP_REBIND_PROC))
+    ])
 fi
 
 AC_SUBST(LIBLDAP)

@@ -14,55 +14,6 @@
  *
  * Contents:
  *
- *   cupsdDeregisterPrinter()   - Stop sending broadcast information for a local
- *                                printer and remove any pending references to
- *                                remote printers.
- *   cupsdLoadRemoteCache()     - Load the remote printer cache.
- *   cupsdRegisterPrinter()     - Start sending broadcast information for a
- *                                printer or update the broadcast contents.
- *   cupsdRestartPolling()      - Restart polling servers as needed.
- *   cupsdSaveRemoteCache()     - Save the remote printer cache.
- *   cupsdSendBrowseList()      - Send new browsing information as necessary.
- *   cupsdStartBrowsing()       - Start sending and receiving broadcast
- *                                information.
- *   cupsdStartPolling()        - Start polling servers as needed.
- *   cupsdStopBrowsing()        - Stop sending and receiving broadcast
- *                                information.
- *   cupsdStopPolling()         - Stop polling servers as needed.
- *   cupsdUpdateDNSSDName()     - Update the computer name we use for
- *                                browsing...
- *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
- *   cupsdUpdateSLPBrowse()     - Get browsing information via SLP.
- *   dequote()                  - Remote quotes from a string.
- *   dnssdBuildTxtRecord()      - Build a TXT record from printer info.
- *   dnssdComparePrinters()     - Compare the registered names of two printers.
- *   dnssdDeregisterPrinter()   - Stop sending broadcast information for a
- *                                printer.
- *   dnssdPackTxtRecord()       - Pack an array of key/value pairs into the TXT
- *                                record format.
- *   dnssdRegisterCallback()    - DNSServiceRegister callback.
- *   dnssdRegisterPrinter()     - Start sending broadcast information for a
- *                                printer or update the broadcast contents.
- *   dnssdUpdate()              - Handle DNS-SD queries.
- *   get_hostconfig()           - Get an /etc/hostconfig service setting.
- *   is_local_queue()           - Determine whether the URI points at a local
- *                                queue.
- *   process_browse_data()      - Process new browse data.
- *   process_implicit_classes() - Create/update implicit classes as needed.
- *   send_cups_browse()         - Send new browsing information using the CUPS
- *                                protocol.
- *   send_ldap_browse()         - Send LDAP printer registrations.
- *   send_slp_browse()          - Register the specified printer with SLP.
- *   slp_attr_callback()        - SLP attribute callback
- *   slp_dereg_printer()        - SLPDereg() the specified printer
- *   slp_get_attr()             - Get an attribute from an SLP registration.
- *   slp_reg_callback()         - Empty SLPRegReport.
- *   slp_url_callback()         - SLP service url callback
- *   update_cups_browse()       - Update the browse lists using the CUPS
- *                                protocol.
- *   update_lpd()               - Update the LPD configuration as needed.
- *   update_polling()           - Read status messages from the poll daemons.
- *   update_smb()               - Update the SMB configuration as needed.
  */
 
 /*
@@ -104,7 +55,36 @@ static void	process_browse_data(const char *uri, const char *host,
 static void	process_implicit_classes(void);
 static void	send_cups_browse(cupsd_printer_t *p);
 #ifdef HAVE_LDAP
+static LDAP	*ldap_connect(void);
+static void	ldap_reconnect(void);
+static void	ldap_disconnect(LDAP *ld);
+static int	ldap_search_rec(LDAP *ld, char *base, int scope,
+                                char *filter, char *attrs[],
+                                int attrsonly, LDAPMessage **res);
+static int	ldap_getval_firststring(LDAP *ld, LDAPMessage *entry,
+                                        char *attr, char *retval,
+                                        unsigned long maxsize);
+static void	ldap_freeres(LDAPMessage *entry);
+static void	send_ldap_ou(char *ou, char *basedn, char *descstring);
 static void	send_ldap_browse(cupsd_printer_t *p);
+static void	ldap_dereg_printer(cupsd_printer_t *p);
+static void	ldap_dereg_ou(char *ou, char *basedn);
+#  ifdef HAVE_LDAP_REBIND_PROC
+#    if defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000)
+static int	ldap_rebind_proc(LDAP *RebindLDAPHandle,
+                                 LDAP_CONST char *refsp,
+                                 ber_tag_t request,
+                                 ber_int_t msgid,
+                                 void *params);
+#    else
+static int	ldap_rebind_proc(LDAP *RebindLDAPHandle,
+                                 char **dnp,
+                                 char **passwdp,
+                                 int *authmethodp,
+                                 int freeit,
+                                 void *arg);
+#    endif /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
+#  endif /* HAVE_LDAP_REBIND_PROC */
 #endif /* HAVE_LDAP */
 #ifdef HAVE_LIBSLP
 static void	send_slp_browse(cupsd_printer_t *p);
@@ -131,7 +111,7 @@ static void	dnssdRegisterPrinter(cupsd_printer_t *p);
 static void	dnssdUpdate(void);
 #endif /* HAVE_DNSSD */
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
 static const char * const ldap_attrs[] =/* CUPS LDAP attributes */
 		{
 		  "printerDescription",
@@ -141,7 +121,7 @@ static const char * const ldap_attrs[] =/* CUPS LDAP attributes */
 		  "printerURI",
 		  NULL
 		};
-#endif /* HAVE_OPENLDAP */
+#endif /* HAVE_LDAP */
 
 #ifdef HAVE_LIBSLP 
 /*
@@ -223,6 +203,11 @@ cupsdDeregisterPrinter(
   if (BrowseLocalProtocols & BROWSE_SLP)
     slp_dereg_printer(p);
 #endif /* HAVE_LIBSLP */
+
+#ifdef HAVE_LDAP
+  if (BrowseLocalProtocols & BROWSE_LDAP)
+    ldap_dereg_printer(p);
+#endif /* HAVE_LDAP */
 
 #ifdef HAVE_DNSSD
   if (removeit && (BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDRef)
@@ -928,6 +913,425 @@ cupsdSendBrowseList(void)
 }
 
 
+#ifdef HAVE_LDAP_REBIND_PROC
+#  if defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000)
+/*
+ * 'ldap_rebind_proc()' - Callback function for LDAP rebind
+ */
+
+static int
+ldap_rebind_proc (LDAP *RebindLDAPHandle,
+                  LDAP_CONST char *refsp,
+                  ber_tag_t request,
+                  ber_int_t msgid,
+                  void *params)
+{
+  int               rc;
+
+ /*
+  * Bind to new LDAP server...
+  */
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "ldap_rebind_proc: Rebind to %s", refsp);
+
+#    if LDAP_API_VERSION > 3000
+  struct berval bval;
+  bval.bv_val = BrowseLDAPPassword;
+  bval.bv_len = (BrowseLDAPPassword == NULL) ? 0 : strlen(BrowseLDAPPassword);
+
+  rc = ldap_sasl_bind_s(RebindLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE, &bval, NULL, NULL, NULL);
+#    else
+  rc = ldap_bind_s(RebindLDAPHandle, BrowseLDAPBindDN,
+                   BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
+#    endif /* LDAP_API_VERSION > 3000 */
+
+  return (rc);
+}
+
+#  else /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
+
+/*
+ * 'ldap_rebind_proc()' - Callback function for LDAP rebind
+ */
+
+static int
+ldap_rebind_proc (LDAP *RebindLDAPHandle,
+                  char **dnp,
+                  char **passwdp,
+                  int *authmethodp,
+                  int freeit,
+                  void *arg)
+{
+  switch ( freeit ) {
+
+  case 1:
+
+     /*
+      * Free current values...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                     "ldap_rebind_proc: Free values...");
+
+      if ( dnp && *dnp ) {
+        free( *dnp );
+      }
+      if ( passwdp && *passwdp ) {
+        free( *passwdp );
+      }
+      break;
+
+  case 0:
+
+     /*
+      * Return credentials for LDAP referal...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                     "ldap_rebind_proc: Return necessary values...");
+
+      *dnp = strdup(BrowseLDAPBindDN);
+      *passwdp = strdup(BrowseLDAPPassword);
+      *authmethodp = LDAP_AUTH_SIMPLE;
+      break;
+
+  default:
+
+     /*
+      * Should never happen...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP rebind has been called with wrong freeit value!");
+      break;
+
+  }
+
+  return (LDAP_SUCCESS);
+}
+#  endif /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
+#endif /* HAVE_LDAP_REBIND_PROC */
+
+
+#ifdef HAVE_LDAP
+/*
+ * 'ldap_connect()' - Start new LDAP connection
+ */
+
+static LDAP *
+ldap_connect(void)
+{
+ /* 
+  * Open LDAP handle...
+  */
+
+  int		rc;				/* LDAP API status */
+  int		version = 3;			/* LDAP version */
+  struct berval	bv = {0, ""};			/* SASL bind value */
+  LDAP		*TempBrowseLDAPHandle=NULL;	/* Temporary LDAP Handle */
+#  if defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP)
+  int		ldap_ssl = 0;			/* LDAP SSL indicator */
+  int		ssl_err = 0;			/* LDAP SSL error value */
+#  endif /* defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP) */
+
+#  ifdef HAVE_OPENLDAP
+#    ifdef HAVE_LDAP_SSL
+
+ /*
+  * Set the certificate file to use for encrypted LDAP sessions...
+  */
+
+  if (BrowseLDAPCACertFile)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+	            "cupsdStartBrowsing: Setting CA certificate file \"%s\"",
+                    BrowseLDAPCACertFile);
+
+    if ((rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
+	                      (void *)BrowseLDAPCACertFile)) != LDAP_SUCCESS)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to set CA certificate file for LDAP "
+                      "connections: %d - %s", rc, ldap_err2string(rc));
+  }
+
+#    endif /* HAVE_LDAP_SSL */
+ /*
+  * Initialize OPENLDAP connection...
+  * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
+  */
+
+  if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost")) 
+    rc = ldap_initialize(&TempBrowseLDAPHandle, "ldapi:///");
+  else	
+    rc = ldap_initialize(&TempBrowseLDAPHandle, BrowseLDAPServer);
+
+#  else /* HAVE_OPENLDAP */
+
+  int		ldap_port = 0;			/* LDAP port */
+  char		ldap_protocol[11],		/* LDAP protocol */
+		ldap_host[255];			/* LDAP host */
+
+ /*
+  * Split LDAP URI into its components...
+  */
+
+  if (! BrowseLDAPServer)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "BrowseLDAPServer not configured! Disable LDAP browsing!");
+    BrowseLocalProtocols &= ~BROWSE_LDAP;
+    BrowseRemoteProtocols &= ~BROWSE_LDAP;
+    return (NULL);
+  }
+
+  sscanf(BrowseLDAPServer, "%10[^:]://%254[^:/]:%d", ldap_protocol, ldap_host, &ldap_port);
+
+  if (strcmp(ldap_protocol, "ldap") == 0) {
+    ldap_ssl = 0;
+  } else if (strcmp(ldap_protocol, "ldaps") == 0) {
+    ldap_ssl = 1;
+  } else {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "unrecognised ldap protocol (%s)!", ldap_protocol);
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Disable LDAP browsing!");
+    BrowseLocalProtocols &= ~BROWSE_LDAP;
+    BrowseRemoteProtocols &= ~BROWSE_LDAP;
+    return (NULL);
+  }
+
+  if (ldap_port == 0)
+  {
+    if (ldap_ssl)
+      ldap_port = LDAPS_PORT;
+    else
+      ldap_port = LDAP_PORT;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "LDAP Connection Details: PROT:%s HOST:%s PORT:%d",
+                  ldap_protocol, ldap_host, ldap_port);
+
+ /*
+  * Initialize LDAP connection...
+  */
+
+  if (! ldap_ssl)
+  {
+    if ((TempBrowseLDAPHandle = ldap_init(ldap_host, ldap_port)) == NULL)
+      rc = LDAP_OPERATIONS_ERROR;
+    else
+      rc = LDAP_SUCCESS;
+
+#    ifdef HAVE_LDAP_SSL
+  }
+  else
+  {
+
+   /*
+    * Initialize SSL LDAP connection...
+    */
+    if (BrowseLDAPCACertFile)
+    {
+      rc = ldapssl_client_init(BrowseLDAPCACertFile, (void *)NULL);
+      if (rc != LDAP_SUCCESS) {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "Failed to initialize LDAP SSL client!");
+        rc = LDAP_OPERATIONS_ERROR;
+      } else {
+        if ((TempBrowseLDAPHandle = ldapssl_init(ldap_host, ldap_port, 1)) == NULL)
+          rc = LDAP_OPERATIONS_ERROR;
+        else
+          rc = LDAP_SUCCESS;
+      }
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP SSL certificate file/database not configured!");
+      rc = LDAP_OPERATIONS_ERROR;
+    }
+
+#    else /* HAVE_LDAP_SSL */
+
+   /*
+    * Return error, because client libraries doesn't support SSL
+    */
+
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "LDAP client libraries does not support TLS");
+    rc = LDAP_OPERATIONS_ERROR;
+
+#    endif /* HAVE_LDAP_SSL */
+  }
+#  endif /* HAVE_OPENLDAP */
+
+ /*
+  * Check return code from LDAP initialize...
+  */
+
+  if (rc != LDAP_SUCCESS)
+  {
+    if ((rc == LDAP_SERVER_DOWN) || (rc == LDAP_CONNECT_ERROR))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to initialize LDAP! Temporary disable LDAP browsing...");
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unable to initialize LDAP! Disable LDAP browsing!");
+      BrowseLocalProtocols &= ~BROWSE_LDAP;
+      BrowseRemoteProtocols &= ~BROWSE_LDAP;
+    }
+
+    ldap_disconnect(TempBrowseLDAPHandle);
+    TempBrowseLDAPHandle = NULL;
+  }
+
+ /*
+  * Upgrade LDAP version...
+  */
+
+  else if (ldap_set_option(TempBrowseLDAPHandle, LDAP_OPT_PROTOCOL_VERSION,
+                           (const void *)&version) != LDAP_SUCCESS)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                   "Unable to set LDAP protocol version %d! Disable LDAP browsing!",
+                   version);
+    BrowseLocalProtocols &= ~BROWSE_LDAP;
+    BrowseRemoteProtocols &= ~BROWSE_LDAP;
+    ldap_disconnect(TempBrowseLDAPHandle);
+    TempBrowseLDAPHandle = NULL;
+  }
+  else
+  {
+
+   /*
+    * Register LDAP rebind procedure...
+    */
+
+#  ifdef HAVE_LDAP_REBIND_PROC
+#    if defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000)
+
+    rc = ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc, (void *)NULL);
+    if ( rc != LDAP_SUCCESS )
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Setting LDAP rebind function failed with status %d: %s",
+                      rc, ldap_err2string(rc));
+
+#    else
+
+    ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc, (void *)NULL);
+
+#    endif /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
+#  endif /* HAVE_LDAP_REBIND_PROC */
+
+   /*
+    * Start LDAP bind...
+    */
+
+#  if LDAP_API_VERSION > 3000
+    struct berval bval;
+    bval.bv_val = BrowseLDAPPassword;
+    bval.bv_len = (BrowseLDAPPassword == NULL) ? 0 : strlen(BrowseLDAPPassword);
+
+    if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost"))
+      rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, NULL, "EXTERNAL", &bv, NULL,
+                            NULL, NULL);
+    else
+      rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE, &bval, NULL, NULL, NULL);
+#  else
+      rc = ldap_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN,
+                       BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
+#  endif /* LDAP_API_VERSION > 3000 */
+
+    if (rc != LDAP_SUCCESS)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                     "LDAP bind failed with error %d: %s",
+                      rc, ldap_err2string(rc));
+#  if defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP)
+      if (ldap_ssl && ((rc == LDAP_SERVER_DOWN) || (rc == LDAP_CONNECT_ERROR)))
+      {
+        ssl_err = PORT_GetError();
+        if (ssl_err != 0)
+          cupsdLogMessage(CUPSD_LOG_ERROR,
+                          "LDAP SSL error %d: %s",
+                          ssl_err, ldapssl_err2string(ssl_err));
+      }
+#  endif /* defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP) */
+      ldap_disconnect(TempBrowseLDAPHandle);
+      TempBrowseLDAPHandle = NULL;
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                     "LDAP connection established");
+    }
+
+  }
+  return (TempBrowseLDAPHandle);
+}
+
+
+/*
+ * 'ldap_reconnect()' - Reconnect to LDAP Server
+ */
+
+static void
+ldap_reconnect(void)
+{
+  LDAP		*TempBrowseLDAPHandle = NULL;	/* Temp Handle to LDAP server */
+
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Try LDAP reconnect...");
+
+ /*
+  * Get a new LDAP Handle and replace the global Handle
+  * if the new connection was successful
+  */
+
+  TempBrowseLDAPHandle = ldap_connect();
+
+  if (TempBrowseLDAPHandle != NULL)
+  {
+    if (BrowseLDAPHandle != NULL)
+    {
+      ldap_disconnect(BrowseLDAPHandle);
+    }
+    BrowseLDAPHandle = TempBrowseLDAPHandle;
+  }
+}
+
+
+/*
+ * 'ldap_disconnect()' - Disconnect from LDAP Server
+ */
+
+static void
+ldap_disconnect(LDAP *ld)	/* I - LDAP handle */
+{
+  int	rc;	/* return code */
+
+ /*
+  * Close LDAP handle...
+  */
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+  rc = ldap_unbind_ext_s(ld, NULL, NULL);
+#  else
+  rc = ldap_unbind_s(ld);
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+  if (rc != LDAP_SUCCESS)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unbind from LDAP server failed with status %d: %s",
+                    rc, ldap_err2string(rc));
+}
+#endif /* HAVE_LDAP */
+
+
 /*
  * 'cupsdStartBrowsing()' - Start sending and receiving broadcast information.
  */
@@ -1125,7 +1529,7 @@ cupsdStartBrowsing(void)
     BrowseSLPHandle = NULL;
 #endif /* HAVE_LIBSLP */
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
   if ((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP)
   {
     if (!BrowseLDAPDN)
@@ -1137,84 +1541,13 @@ cupsdStartBrowsing(void)
     }
     else
     {
-     /* 
-      * Open LDAP handle...
-      */
-
-      int		rc;		/* LDAP API status */
-      int		version = 3;	/* LDAP version */
-      struct berval	bv = {0, ""};	/* SASL bind value */
-
-
-     /*
-      * Set the certificate file to use for encrypted LDAP sessions...
-      */
-
-      if (BrowseLDAPCACertFile)
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "cupsdStartBrowsing: Setting CA certificate file \"%s\"",
-			BrowseLDAPCACertFile);
-
-        if ((rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
-	                          (void *)BrowseLDAPCACertFile))
-	        != LDAP_SUCCESS)
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-                          "Unable to set CA certificate file for LDAP "
-			  "connections: %d - %s", rc, ldap_err2string(rc));
-      }
-
-     /*
-      * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
-      */
-
-      if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost")) 
-        rc = ldap_initialize(&BrowseLDAPHandle, "ldapi:///");
-      else	
-	rc = ldap_initialize(&BrowseLDAPHandle, BrowseLDAPServer);
-
-      if (rc != LDAP_SUCCESS)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to initialize LDAP; disabling LDAP browsing!");
-	BrowseLocalProtocols &= ~BROWSE_LDAP;
-	BrowseRemoteProtocols &= ~BROWSE_LDAP;
-      }
-      else if (ldap_set_option(BrowseLDAPHandle, LDAP_OPT_PROTOCOL_VERSION,
-                               (const void *)&version) != LDAP_SUCCESS)
-      {
-	ldap_unbind_ext(BrowseLDAPHandle, NULL, NULL);
-	BrowseLDAPHandle = NULL;
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to set LDAP protocol version; "
-			"disabling LDAP browsing!");
-	BrowseLocalProtocols &= ~BROWSE_LDAP;
-	BrowseRemoteProtocols &= ~BROWSE_LDAP;
-      }
-      else
-      {
-	if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost"))
-	  rc = ldap_sasl_bind_s(BrowseLDAPHandle, NULL, "EXTERNAL", &bv, NULL,
-	                        NULL, NULL);
-	else
-	  rc = ldap_bind_s(BrowseLDAPHandle, BrowseLDAPBindDN,
-	                   BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
-
-	if (rc != LDAP_SUCCESS)
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unable to bind to LDAP server; "
-			  "disabling LDAP browsing!");
-	  ldap_unbind_ext(BrowseLDAPHandle, NULL, NULL);
-	  BrowseLocalProtocols &= ~BROWSE_LDAP;
-	  BrowseRemoteProtocols &= ~BROWSE_LDAP;
-	}
-      }
+      /* Open LDAP handle... */
+      BrowseLDAPHandle = ldap_connect();
     }
 
     BrowseLDAPRefresh = 0;
   }
-#endif /* HAVE_OPENLDAP */
+#endif /* HAVE_LDAP */
 
  /*
   * Enable LPD and SMB printer sharing as needed through external programs...
@@ -1425,11 +1758,12 @@ cupsdStopBrowsing(void)
   }
 #endif /* HAVE_LIBSLP */
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
   if (((BrowseLocalProtocols | BrowseRemoteProtocols) & BROWSE_LDAP) &&
       BrowseLDAPHandle)
   {
-    ldap_unbind(BrowseLDAPHandle);
+    ldap_dereg_ou(ServerName, BrowseLDAPDN);
+    ldap_disconnect(BrowseLDAPHandle);
     BrowseLDAPHandle = NULL;
   }
 #endif /* HAVE_OPENLDAP */
@@ -1545,7 +1879,7 @@ cupsdUpdateDNSSDName(void)
 #endif /* HAVE_DNSSD */
 
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
 /*
  * 'cupsdUpdateLDAPBrowse()' - Scan for new printers via LDAP...
  */
@@ -1559,36 +1893,72 @@ cupsdUpdateLDAPBrowse(void)
 		location[1024],		/* Printer location */
 		info[1024],		/* Printer information */
 		make_model[1024],	/* Printer make and model */
-		**value;		/* Holds the returned data from LDAP */
+		type_num[30];		/* Printer type number */
   int		type;			/* Printer type */
   int		rc;			/* LDAP status */
   int		limit;			/* Size limit */
   LDAPMessage	*res,			/* LDAP search results */
 		  *e;			/* Current entry from search */
 
-
- /*
-  * Search for printers...
-  */
-
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "UpdateLDAPBrowse: %s", ServerName);
 
   BrowseLDAPRefresh = time(NULL) + BrowseInterval;
 
-  rc = ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
-                     "(objectclass=cupsPrinter)", (char **)ldap_attrs, 0, &res);
-  if (rc != LDAP_SUCCESS) 
+ /*
+  * Reconnect if LDAP Handle is invalid...
+  */
+
+  if (! BrowseLDAPHandle)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "LDAP search returned error %d: %s", rc,
-		    ldap_err2string(rc));
+    ldap_reconnect();
     return;
   }
+
+ /*
+  * Search for cups printers in LDAP directory...
+  */
+
+  rc = ldap_search_rec(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
+                       "(objectclass=cupsPrinter)", (char **)ldap_attrs, 0, &res);
+
+ /*
+  * If ldap search was successfull then exit function
+  * and temporary disable LDAP updates...
+  */
+
+  if (rc != LDAP_SUCCESS) 
+  {
+    if (BrowseLDAPUpdate && ((rc == LDAP_SERVER_DOWN) || (rc == LDAP_CONNECT_ERROR)))
+    {
+      BrowseLDAPUpdate = FALSE;
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "LDAP update temporary disabled");
+    }
+    return;
+  }
+
+ /*
+  * If LDAP updates were disabled, we will reenable them...
+  */
+
+  if (! BrowseLDAPUpdate)
+  {
+    BrowseLDAPUpdate = TRUE;
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "LDAP update enabled");
+  }
+
+ /*
+  * Count LDAP entries and return if no entry exist...
+  */
 
   limit = ldap_count_entries(BrowseLDAPHandle, res);
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "LDAP search returned %d entries", limit);
   if (limit < 1)
+  {
+    ldap_freeres(res);
     return;
+  }
 
  /*
   * Loop through the available printers...
@@ -1602,40 +1972,27 @@ cupsdUpdateLDAPBrowse(void)
     * Get the required values from this entry...
     */
 
-    if ((value = ldap_get_values(BrowseLDAPHandle, e,
-                                 "printerDescription")) == NULL)
+    if (ldap_getval_firststring(BrowseLDAPHandle, e,
+                                "printerDescription", info, sizeof(info)) == -1)
       continue;
 
-    strlcpy(info, *value, sizeof(info));
-    ldap_value_free(value);
-
-    if ((value = ldap_get_values(BrowseLDAPHandle, e,
-                                 "printerLocation")) == NULL)
+    if (ldap_getval_firststring(BrowseLDAPHandle, e,
+                                "printerLocation", location, sizeof(location)) == -1)
       continue;
 
-    strlcpy(location, *value, sizeof(location));
-    ldap_value_free(value);
-
-    if ((value = ldap_get_values(BrowseLDAPHandle, e,
-                                 "printerMakeAndModel")) == NULL)
+    if (ldap_getval_firststring(BrowseLDAPHandle, e,
+                                "printerMakeAndModel", make_model, sizeof(make_model)) == -1)
       continue;
 
-    strlcpy(make_model, *value, sizeof(make_model));
-    ldap_value_free(value);
-
-    if ((value = ldap_get_values(BrowseLDAPHandle, e,
-                                 "printerType")) == NULL)
+    if (ldap_getval_firststring(BrowseLDAPHandle, e,
+                                "printerType", type_num, sizeof(type_num)) == -1)
       continue;
 
-    type = atoi(*value);
-    ldap_value_free(value);
+    type = atoi(type_num);
 
-    if ((value = ldap_get_values(BrowseLDAPHandle, e,
-                                 "printerURI")) == NULL)
+    if (ldap_getval_firststring(BrowseLDAPHandle, e,
+                                "printerURI", uri, sizeof(uri)) == -1)
       continue;
-
-    strlcpy(uri, *value, sizeof(uri));
-    ldap_value_free(value);
 
    /*
     * Process the entry as browse data...
@@ -1646,8 +2003,10 @@ cupsdUpdateLDAPBrowse(void)
                           location, info, make_model, 0, NULL);
 
   }
+
+  ldap_freeres(res);
 }
-#endif /* HAVE_OPENLDAP */
+#endif /* HAVE_LDAP */
 
 
 #ifdef HAVE_LIBSLP 
@@ -3232,7 +3591,346 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 }
 
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
+/*
+ * 'ldap_search_rec()' - LDAP Search with reconnect
+ */
+
+static int
+ldap_search_rec(LDAP        *ld,	/* I - LDAP handler */
+                char        *base,	/* I - Base dn */
+                int         scope,	/* I - LDAP search scope */
+                char        *filter,	/* I - Filter string */
+                char        *attrs[],	/* I - Requested attributes */
+                int         attrsonly,	/* I - Return only attributes? */
+                LDAPMessage **res)	/* I - LDAP handler */
+{
+  int	rc;				/* Return code */
+
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+  rc = ldap_search_ext_s(ld, base, scope, filter, attrs, attrsonly, NULL, NULL,
+                         NULL, LDAP_NO_LIMIT, res);
+#  else
+  rc = ldap_search_s(ld, base, scope, filter, attrs, attrsonly, res);
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+
+ /*
+  * If we have a connection problem try again...
+  */
+
+  if (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "LDAP search failed with status %d: %s",
+                     rc, ldap_err2string(rc));
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "We try the LDAP search once again after reconnecting to "
+		    "the server");
+    ldap_freeres(*res);
+    ldap_reconnect();
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+    rc = ldap_search_ext_s(ld, base, scope, filter, attrs, attrsonly, NULL,
+                           NULL, NULL, LDAP_NO_LIMIT, res);
+#  else
+    rc = ldap_search_s(ld, base, scope, filter, attrs, attrsonly, res);
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+  }
+
+  if (rc == LDAP_NO_SUCH_OBJECT)
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "ldap_search_rec: LDAP entry/object not found");
+  else if (rc != LDAP_SUCCESS)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "ldap_search_rec: LDAP search failed with status %d: %s",
+                     rc, ldap_err2string(rc));
+
+  if (rc != LDAP_SUCCESS)
+    ldap_freeres(*res);
+
+  return (rc);
+}
+
+
+/*
+ * 'ldap_freeres()' - Free LDAPMessage
+ */
+
+static void
+ldap_freeres(LDAPMessage *entry)	/* I - LDAP handler */
+{
+  int	rc;				/* Return value */
+
+
+  rc = ldap_msgfree(entry);
+  if (rc == -1)
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Can't free LDAPMessage!");
+  else if (rc == 0)
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "Freeing LDAPMessage was unnecessary");
+}
+
+
+/*
+ * 'ldap_getval_char()' - Get first LDAP value and convert to string
+ */
+
+static int
+ldap_getval_firststring(
+    LDAP          *ld,			/* I - LDAP handler */
+    LDAPMessage   *entry,		/* I - LDAP message or search result */
+    char          *attr,		/* I - the wanted attribute  */
+    char          *retval,		/* O - String to return */
+    unsigned long maxsize)		/* I - Max string size */
+{
+  char			*dn;		/* LDAP DN */
+  int			rc = 0;		/* Return code */
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+  struct berval		**bval;		/* LDAP value array */
+  unsigned long		size;		/* String size */
+
+
+ /*
+  * Get value from LDAPMessage...
+  */
+
+  if ((bval = ldap_get_values_len(ld, entry, attr)) == NULL)
+  {
+    rc = -1;
+    dn = ldap_get_dn(ld, entry);
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Failed to get LDAP value %s for %s!",
+                    attr, dn);
+    ldap_memfree(dn);
+  }
+  else
+  {
+
+   /*
+    * Check size and copy value into our string...
+    */
+
+    size = maxsize;
+    if (size < bval[0]->bv_len)
+    {
+      rc = -1;
+      dn = ldap_get_dn(ld, entry);
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "Attribute %s is too big! (dn: %s)",
+                      attr, dn);
+      ldap_memfree(dn);
+    }
+    else
+      size = bval[0]->bv_len;
+
+    strlcpy(retval, bval[0]->bv_val, size);
+    ldap_value_free_len(bval);
+  }
+#  else
+  char			**value;	/* LDAP value */
+
+ /*
+  * Get value from LDAPMessage...
+  */
+
+  if ((value = (char **)ldap_get_values(ld, entry, attr)) == NULL)
+  {
+    rc = -1;
+    dn = ldap_get_dn(ld, entry);
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Failed to get LDAP value %s for %s!",
+                    attr, dn);
+    ldap_memfree(dn);
+  }
+  else
+  {
+    strlcpy(retval, *value, maxsize);
+    ldap_value_free(value);
+  }
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+
+  return (rc);
+}
+
+
+/*
+ * 'send_ldap_ou()' - Send LDAP ou registrations.
+ */
+
+static void
+send_ldap_ou(char *ou,			/* I - Servername/ou to register */
+             char *basedn,		/* I - Our base dn */
+             char *descstring)		/* I - Description for ou */
+{
+  int           i;                      /* Looping var... */
+  LDAPMod       mods[3];                /* The 3 attributes we will be adding */
+  LDAPMod       *pmods[4];              /* Pointers to the 3 attributes + NULL */
+  LDAPMessage   *res,                   /* Search result token */
+		*e;			/* Current entry from search */
+  int           rc;                     /* LDAP status */
+  char          dn[1024],               /* DN of the organizational unit we are adding */
+                *desc[2],               /* Change records */
+                *ou_value[2];
+  char		old_desc[1024];		/* Old description */
+  static const char * const objectClass_values[] =
+		{			/* The 2 objectClass's we use in */
+		  "top",		/* our LDAP entries              */
+		  "organizationalUnit",
+		  NULL
+		};
+  static const char * const ou_attrs[] =/* CUPS LDAP attributes */
+		{
+		  "description",
+		  NULL
+		};
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_ou: %s", ou);
+
+ /*
+  * Reconnect if LDAP Handle is invalid...
+  */
+
+  if (! BrowseLDAPHandle)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_ou: LDAP Handle is invalid. Try "
+		    "reconnecting...");
+    ldap_reconnect();
+    return;
+  }
+
+ /*
+  * Prepare ldap search...
+  */
+
+  snprintf(dn, sizeof(dn), "ou=%s, %s", ou, basedn);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_ou: dn=\"%s\"", dn);
+
+  ou_value[0] = ou;
+  ou_value[1] = NULL;
+  desc[0]     = descstring;
+  desc[1]     = NULL;
+  
+  mods[0].mod_type   = "ou";
+  mods[0].mod_values = ou_value;
+  mods[1].mod_type   = "description";
+  mods[1].mod_values = desc;
+  mods[2].mod_type   = "objectClass";
+  mods[2].mod_values = (char **)objectClass_values;
+
+  rc = ldap_search_rec(BrowseLDAPHandle, dn, LDAP_SCOPE_BASE, NULL,
+                       (char **)ou_attrs, 0, &res);
+
+ /*
+  * If ldap search was not successfull then exit function...
+  */
+
+  if (rc != LDAP_SUCCESS && rc != LDAP_NO_SUCH_OBJECT)
+    return;
+
+ /*
+  * Check if we need to insert or update the LDAP entry...
+  */
+
+  if (ldap_count_entries(BrowseLDAPHandle, res) > 0 &&
+      rc != LDAP_NO_SUCH_OBJECT)
+  {
+   /*
+    * Printserver has already been registered, check if
+    * modification is required...
+    */
+
+    e = ldap_first_entry(BrowseLDAPHandle, res);
+
+   /*
+    * Get the required values from this entry...
+    */
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "description", old_desc,
+                                sizeof(old_desc)) == -1)
+      old_desc[0] = '\0';
+
+   /*
+    * Check if modification is required...
+    */
+
+    if ( strcmp(desc[0], old_desc) == 0 )
+    {
+     /*
+      * LDAP entry for the printer exists.
+      * Printer has already been registered,
+      * no modifications required...
+      */
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "send_ldap_ou: No updates required for %s", ou);
+    }
+    else
+    {
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "send_ldap_ou: Replace entry for %s", ou);
+
+      for (i = 0; i < 3; i ++)
+      {
+        pmods[i]         = mods + i;
+        pmods[i]->mod_op = LDAP_MOD_REPLACE;
+      }
+      pmods[i] = NULL;
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+      if ((rc = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                  NULL)) != LDAP_SUCCESS)
+#  else
+      if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "LDAP modify for %s failed with status %d: %s",
+                        ou, rc, ldap_err2string(rc));
+        if ( LDAP_SERVER_DOWN == rc )
+          ldap_reconnect();
+      }
+    }
+  }
+  else
+  {
+   /*
+    * Printserver has never been registered,
+    * add registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_ou: Add entry for %s", ou);
+
+    for (i = 0; i < 3; i ++)
+    {
+      pmods[i]         = mods + i;
+      pmods[i]->mod_op = LDAP_MOD_ADD;
+    }
+    pmods[i] = NULL;
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+    if ((rc = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                             NULL)) != LDAP_SUCCESS)
+#  else
+    if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "LDAP add for %s failed with status %d: %s",
+                      ou, rc, ldap_err2string(rc));
+      if ( LDAP_SERVER_DOWN == rc )
+        ldap_reconnect();
+    }
+  }
+
+  ldap_freeres(res);
+}
+
+
 /*
  * 'send_ldap_browse()' - Send LDAP printer registrations.
  */
@@ -3243,7 +3941,8 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   int		i;			/* Looping var... */
   LDAPMod	mods[7];		/* The 7 attributes we will be adding */
   LDAPMod	*pmods[8];		/* Pointers to the 7 attributes + NULL */
-  LDAPMessage	*res;			/* Search result token */
+  LDAPMessage	*res,			/* Search result token */
+		*e;			/* Current entry from search */
   char		*cn_value[2],		/* Change records */
 		*uri[2],
 		*info[2],
@@ -3251,9 +3950,14 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 		*make_model[2],
 		*type[2],
 		typestring[255],	/* String to hold printer-type */
-		filter[256],		/* Search filter for possible UPDATEs */
 		dn[1024];		/* DN of the printer we are adding */
   int		rc;			/* LDAP status */
+  char		old_uri[HTTP_MAX_URI],	/* Printer URI */
+		old_location[1024],	/* Printer location */
+		old_info[1024],		/* Printer information */
+		old_make_model[1024],	/* Printer make and model */
+		old_type_string[30];	/* Temporary type number */
+  int		old_type;		/* Printer type */
   static const char * const objectClass_values[] =
 		{			/* The 3 objectClass's we use in */
 		  "top",		/* our LDAP entries              */
@@ -3262,7 +3966,33 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 		  NULL
 		};
 
+
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: %s", p->name);
+
+ /*
+  * Exit function if LDAP updates has been disabled...
+  */
+
+  if (!BrowseLDAPUpdate)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_browse: Updates temporary disabled; "
+		    "skipping...");
+    return;
+  }
+
+ /*
+  * Reconnect if LDAP Handle is invalid...
+  */
+
+  if (!BrowseLDAPHandle)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "send_ldap_browse: LDAP Handle is invalid. Try "
+		    "reconnecting...");
+    ldap_reconnect();
+    return;
+  }
 
  /*
   * Everything in ldap is ** so we fudge around it...
@@ -3283,63 +4013,153 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
   uri[0]        = p->uri;
   uri[1]        = NULL;
 
-  snprintf(filter, sizeof(filter),
-           "(&(objectclass=cupsPrinter)(printerURI=%s))", p->uri);
+ /*
+  * Get ldap entry for printer ...
+  */
 
-  ldap_search_s(BrowseLDAPHandle, BrowseLDAPDN, LDAP_SCOPE_SUBTREE,
-                filter, (char **)ldap_attrs, 0, &res);
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: Searching \"%s\"",
-                  filter);
-
-  mods[0].mod_type = "cn";
-  mods[0].mod_values = cn_value;
-  mods[1].mod_type = "printerDescription";
-  mods[1].mod_values = info;
-  mods[2].mod_type = "printerURI";
-  mods[2].mod_values = uri;
-  mods[3].mod_type = "printerLocation";
-  mods[3].mod_values = location;
-  mods[4].mod_type = "printerMakeAndModel";
-  mods[4].mod_values = make_model;
-  mods[5].mod_type = "printerType";
-  mods[5].mod_values = type;
-  mods[6].mod_type = "objectClass";
-  mods[6].mod_values = (char **)objectClass_values;
-
-  snprintf(dn, sizeof(dn), "cn=%s,ou=printers,%s", p->name, BrowseLDAPDN);
+  snprintf(dn, sizeof(dn), "cn=%s, ou=%s, %s", p->name, ServerName,
+           BrowseLDAPDN);
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "send_ldap_browse: dn=\"%s\"", dn);
 
-  if (ldap_count_entries(BrowseLDAPHandle, res) > 0)
+  rc = ldap_search_rec(BrowseLDAPHandle, dn, LDAP_SCOPE_BASE, NULL,
+                       (char **)ldap_attrs, 0, &res);
+
+ /*
+  * If ldap search was not successfull then exit function
+  * and temporary disable LDAP updates...
+  */
+
+  if (rc != LDAP_SUCCESS && rc != LDAP_NO_SUCH_OBJECT)
+  {
+    if (BrowseLDAPUpdate &&
+        (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR))
+    {
+      BrowseLDAPUpdate = FALSE;
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "LDAP update temporary disabled");
+    }
+
+    return;
+  }
+
+ /*
+  * Fill modification array...
+  */
+
+  mods[0].mod_type   = "cn";
+  mods[0].mod_values = cn_value;
+  mods[1].mod_type   = "printerDescription";
+  mods[1].mod_values = info;
+  mods[2].mod_type   = "printerURI";
+  mods[2].mod_values = uri;
+  mods[3].mod_type   = "printerLocation";
+  mods[3].mod_values = location;
+  mods[4].mod_type   = "printerMakeAndModel";
+  mods[4].mod_values = make_model;
+  mods[5].mod_type   = "printerType";
+  mods[5].mod_values = type;
+  mods[6].mod_type   = "objectClass";
+  mods[6].mod_values = (char **)objectClass_values;
+
+ /*
+  * Check if we need to insert or update the LDAP entry...
+  */
+
+  if (ldap_count_entries(BrowseLDAPHandle, res) > 0 &&
+      rc != LDAP_NO_SUCH_OBJECT)
   {
    /*
-    * Printer has already been registered, modify the current
-    * registration...
+    * Printer has already been registered, check if
+    * modification is required...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "send_ldap_browse: Replacing entry...");
+    e = ldap_first_entry(BrowseLDAPHandle, res);
 
-    for (i = 0; i < 7; i ++)
+   /*
+    * Get the required values from this entry...
+    */
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "printerDescription",
+                                old_info, sizeof(old_info)) == -1)
+      old_info[0] = '\0';
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "printerLocation",
+                                old_location, sizeof(old_location)) == -1)
+      old_info[0] = '\0';
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "printerMakeAndModel",
+                                old_make_model, sizeof(old_make_model)) == -1)
+      old_info[0] = '\0';
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "printerType",
+                                old_type_string, sizeof(old_type_string)) == -1)
+      old_info[0] = '\0';
+
+    old_type = atoi(old_type_string);
+
+    if (ldap_getval_firststring(BrowseLDAPHandle, e, "printerURI", old_uri,
+                                sizeof(old_uri)) == -1)
+      old_info[0] = '\0';
+
+   /*
+    * Check if modification is required...
+    */
+
+    if (!strcmp(info[0], old_info) && !strcmp(uri[0], old_uri) &&
+        !strcmp(location[0], old_location) &&
+	!strcmp(make_model[0], old_make_model) && p->type == old_type)
     {
-      pmods[i]         = mods + i;
-      pmods[i]->mod_op = LDAP_MOD_REPLACE;
-    }
-    pmods[i] = NULL;
+     /*
+      * LDAP entry for the printer exists. Printer has already been registered,
+      * no modifications required...
+      */
 
-    if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "LDAP modify for %s failed with status %d: %s",
-                      p->name, rc, ldap_err2string(rc));
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                       "send_ldap_browse: No updates required for %s", p->name);
+    }
+    else
+    {
+     /*
+      * LDAP entry for the printer exists.  Printer has already been registered,
+      * modify the current registration...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "send_ldap_browse: Replace entry for %s", p->name);
+
+      for (i = 0; i < 7; i ++)
+      {
+        pmods[i]         = mods + i;
+        pmods[i]->mod_op = LDAP_MOD_REPLACE;
+      }
+      pmods[i] = NULL;
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+      if ((rc = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                  NULL)) != LDAP_SUCCESS)
+#  else
+      if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "LDAP modify for %s failed with status %d: %s",
+                        p->name, rc, ldap_err2string(rc));
+        if (rc == LDAP_SERVER_DOWN)
+          ldap_reconnect();
+      }
+    }
   }
   else 
   {
    /*
-    * Printer has never been registered, add the current
-    * registration...
+    * No LDAP entry exists for the printer.  Printer has never been registered,
+    * add the current registration...
     */
 
+    send_ldap_ou(ServerName, BrowseLDAPDN, "CUPS Server");
+
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "send_ldap_browse: Adding entry...");
+                    "send_ldap_browse: Add entry for %s", p->name);
 
     for (i = 0; i < 7; i ++)
     {
@@ -3348,13 +4168,155 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
     }
     pmods[i] = NULL;
 
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+    if ((rc = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                             NULL)) != LDAP_SUCCESS)
+#  else
     if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+    {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "LDAP add for %s failed with status %d: %s",
                       p->name, rc, ldap_err2string(rc));
+      if (rc == LDAP_SERVER_DOWN)
+        ldap_reconnect();
+    }
+  }
+
+  ldap_freeres(res);
+}
+
+
+/*
+ * 'ldap_dereg_printer()' - Delete printer from directory
+ */
+
+static void
+ldap_dereg_printer(cupsd_printer_t *p)	/* I - Printer to deregister */
+{
+  char		dn[1024];		/* DN of the printer */
+  int		rc;			/* LDAP status */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_dereg_printer: Remove entry for %s",
+                  p->name);
+
+ /*
+  * Reconnect if LDAP Handle is invalid...
+  */
+
+  if (!BrowseLDAPHandle)
+  {
+    ldap_reconnect();
+    return;
+  }
+
+ /*
+  * Get dn for printer and delete LDAP entry...
+  */
+
+  snprintf(dn, sizeof(dn), "cn=%s, ou=%s, %s", p->name, ServerName,
+           BrowseLDAPDN);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_dereg_printer: dn=\"%s\"", dn);
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+  if ((rc = ldap_delete_ext_s(BrowseLDAPHandle, dn, NULL,
+                              NULL)) != LDAP_SUCCESS)
+#  else
+  if ((rc = ldap_delete_s(BrowseLDAPHandle, dn)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "LDAP delete for %s failed with status %d: %s",
+                    p->name, rc, ldap_err2string(rc));
+
+   /*
+    * If we had a connection problem (connection timed out, etc.)
+    * we should reconnect and try again to delete the entry...
+    */
+
+    if (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "Retry deleting LDAP entry for %s after a reconnect...", p->name);
+      ldap_reconnect();
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+      if ((rc = ldap_delete_ext_s(BrowseLDAPHandle, dn, NULL,
+                                  NULL)) != LDAP_SUCCESS)
+#  else
+      if ((rc = ldap_delete_s(BrowseLDAPHandle, dn)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+        cupsdLogMessage(CUPSD_LOG_WARN,
+                        "LDAP delete for %s failed with status %d: %s",
+                        p->name, rc, ldap_err2string(rc));
+    }
   }
 }
-#endif /* HAVE_OPENLDAP */
+
+
+static void
+ldap_dereg_ou(char *ou,			/* I - Organizational unit (servername) */
+              char *basedn)		/* I - Dase dn */
+{
+  char		dn[1024];		/* DN of the printer */
+  int		rc;			/* LDAP status */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_dereg_ou: Remove entry for %s", ou);
+
+ /*
+  * Reconnect if LDAP Handle is invalid...
+  */
+
+  if (!BrowseLDAPHandle)
+  {
+    ldap_reconnect();
+    return;
+  }
+
+ /*
+  * Get dn for printer and delete LDAP entry...
+  */
+
+  snprintf(dn, sizeof(dn), "ou=%s, %s", ou, basedn);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_dereg_ou: dn=\"%s\"", dn);
+
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+  if ((rc = ldap_delete_ext_s(BrowseLDAPHandle, dn, NULL,
+                              NULL)) != LDAP_SUCCESS)
+#  else
+  if ((rc = ldap_delete_s(BrowseLDAPHandle, dn)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "LDAP delete for %s failed with status %d: %s",
+                    ou, rc, ldap_err2string(rc));
+
+   /*
+    * If we had a connection problem (connection timed out, etc.)
+    * we should reconnect and try again to delete the entry...
+    */
+
+    if (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR)
+    {
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "Retry deleting LDAP entry for %s after a reconnect...", ou);
+      ldap_reconnect();
+#  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
+      if ((rc = ldap_delete_ext_s(BrowseLDAPHandle, dn, NULL,
+                                  NULL)) != LDAP_SUCCESS)
+#  else
+      if ((rc = ldap_delete_s(BrowseLDAPHandle, dn)) != LDAP_SUCCESS)
+#  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+        cupsdLogMessage(CUPSD_LOG_WARN,
+                        "LDAP delete for %s failed with status %d: %s",
+                        ou, rc, ldap_err2string(rc));
+    }
+
+  }
+}
+#endif /* HAVE_LDAP */
 
 
 #ifdef HAVE_LIBSLP

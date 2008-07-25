@@ -474,6 +474,20 @@ domain name to use when listening for printer registrations. The
 default is undefined.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="BrowseLDAPCACertFile">BrowseLDAPCACertFile</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+BrowseLDAPCACertFile /etc/cups/ssl/certs
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>BrowseLDAPCACertFile</CODE> directive specifies the SSL certificate
+authority file to use for LDAP + SSL. The default is undefined.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLDAPDN">BrowseLDAPDN</A></H2>
 
 <H3>Examples</H3>

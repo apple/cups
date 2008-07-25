@@ -307,6 +307,10 @@
 
 #undef HAVE_LDAP
 #undef HAVE_OPENLDAP
+#undef HAVE_MOZILLA_LDAP
+#undef HAVE_LDAP_SSL_H
+#undef HAVE_LDAP_SSL
+#undef HAVE_LDAP_REBIND_PROC
 
 
 /*

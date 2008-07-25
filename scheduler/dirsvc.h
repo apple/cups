@@ -22,12 +22,15 @@
 #  include <slp.h>
 #endif /* HAVE_LIBSLP */
 
-#ifdef HAVE_OPENLDAP
+#ifdef HAVE_LDAP
 #  ifdef __sun
 #    include <lber.h>
 #  endif /* __sun */
 #  include <ldap.h>
-#endif /* HAVE_OPENLDAP */
+#  ifdef HAVE_LDAP_SSL_H
+#    include <ldap_ssl.h>
+#  endif /* HAVE_LDAP_SSL_H */
+#endif /* HAVE_LDAP */
 
 /*
  * Browse protocols...
@@ -150,22 +153,26 @@ VAR time_t		BrowseSLPRefresh VALUE(0);
 #endif /* HAVE_LIBSLP */
 
 #ifdef HAVE_LDAP
-#  ifdef HAVE_OPENLDAP
 VAR LDAP		*BrowseLDAPHandle VALUE(NULL);
 					/* Handle to LDAP server */
-#  endif /* HAVE_OPENLDAP */
 VAR time_t		BrowseLDAPRefresh VALUE(0);
 					/* Next LDAP refresh time */
 VAR char		*BrowseLDAPBindDN VALUE(NULL),
 					/* LDAP login DN */
+			*BrowseLDAPCACertFile VALUE(NULL),
+					/* LDAP CA cert file */
 			*BrowseLDAPDN	VALUE(NULL),
 					/* LDAP search DN */
 			*BrowseLDAPPassword VALUE(NULL),
 					/* LDAP login password */
-			*BrowseLDAPServer VALUE(NULL),
+			*BrowseLDAPServer VALUE(NULL);
 					/* LDAP server to use */
-			*BrowseLDAPCACertFile VALUE(NULL);
+VAR int			BrowseLDAPUpdate VALUE(TRUE);
+					/* enables LDAP updates */
+#  ifdef HAVE_LDAP_SSL
+VAR char		*BrowseLDAPCACertFile VALUE(NULL);
 					/* LDAP CA CERT file to use */
+#  endif /* HAVE_LDAP_SSL */
 #endif /* HAVE_LDAP */
 VAR char		*LPDConfigFile	VALUE(NULL),
 					/* LPD configuration file */
