@@ -522,7 +522,7 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (print_fd != STDIN_FILENO)
     {
-      fputs("PAGE: 1 1", stderr);
+      fputs("PAGE: 1 1\n", stderr);
       lseek(print_fd, 0, SEEK_SET);
     }
 
@@ -1158,7 +1158,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
+  _cupsLangPuts(stderr, _("INFO: Printer is offline.\n"));
 
   if (getenv("CLASS") != NULL)
   {
