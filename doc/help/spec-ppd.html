@@ -1022,6 +1022,96 @@ PRE B {
 </table></div>
 
 
+<h2 class='title'><a name='MEDIA'>Media Attributes</a></h2>
+
+<p>The CUPS media attributes allow drivers to specify alternate custom page
+size limits based on up to two options.</p>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
+
+<p class='summary'>*cupsMediaQualifier2: MainKeyword</p>
+
+<p>This attribute specifies the second option to use for overriding the
+custom page size limits.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
+
+<p class='summary'>*cupsMediaQualifier3: MainKeyword</p>
+
+<p>This attribute specifies the third option to use for overriding the
+custom page size limits.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsMinSize'>cupsMinSize</a></h3>
+
+<p class='summary'>*cupsMinSize .Qualifier2.Qualifier3: "width length"<br>
+*cupsMinSize .Qualifier2.: "width length"<br>
+*cupsMinSize ..Qualifier3: "width length"</p>
+
+<p>This attribute specifies alternate minimum custom page sizes in points.
+The <a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a> and
+<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a> attributes
+are used to identify options to use for matching.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+<h3><span class='info'>CUPS 1.4</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
+
+<p class='summary'>*cupsMaxSize .Qualifier2.Qualifier3: "width length"<br>
+*cupsMaxSize .Qualifier2.: "width length"<br>
+*cupsMaxSize ..Qualifier3: "width length"</p>
+
+<p>This attribute specifies alternate maximum custom page sizes in points.
+The <a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a> and
+<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a> attributes
+are used to identify options to use for matching.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Specify alternate custom page size limits based on InputSlot and Quality</em>
+*cupsMediaQualifier2: InputSlot
+*cupsMediaQualifier3: Quality
+*cupsMaxSize .Manual.: "1000 1000"
+*cupsMinSize .Manual.: "100 100"
+*cupsMinSize .Manual.Photo: "200 200"
+*cupsMinSize ..Photo: "300 300"
+</pre>
+
+
 <h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
 
 <h3><span class='info'>CUPS 1.3</span><a name='cupsBackSide'>cupsBackSide</a></h3>
@@ -1711,16 +1801,27 @@ the device.</p>
 
 <ul>
 
-	<li>Added <tt>cupsCommands</tt> attribute.</li>
+	<li>Added <a href='#cupsCommands'><tt>cupsCommands</tt></a>
+	attribute.</li>
 
-	<li>Added <tt>cupsMarkerName</tt> attribute.</li>
+	<li>Added <a href='#cupsMarkerName'><tt>cupsMarkerName</tt></a>
+	attribute.</li>
 
-	<li>Added <tt>cupsMarkerNotice</tt> attribute.</li>
+	<li>Added <a href='#cupsMarkerNotice'><tt>cupsMarkerNotice</tt></a>
+	attribute.</li>
 
-	<li>Added <tt>cupsPJLDisplay</tt> attribute.</li>
+	<li>Added <a href='#cupsPJLDisplay'><tt>cupsPJLDisplay</tt></a>
+	attribute.</li>
 
-	<li>Added <tt>cupsUIResolver</tt> and <tt>cupsUIConstraints</tt>
+	<li>Added <a href='#cupsUIResolver'><tt>cupsUIResolver</tt></a> and
+	<a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>
 	attributes.</li>
+
+	<li>Added
+	<a href='#cupsMediaQualifier2'><tt>cupsMediaQualifier2</tt></a>,
+	<a href='#cupsMediaQualifier3'><tt>cupsMediaQualifier3</tt></a>,
+	<a href='#cupsMinSize'><tt>cupsMinSize</tt></a>, and
+	<a href='#cupsMaxSize'><tt>cupsMaxSize</tt></a> attributes.</li>
 
 </ul>
 
@@ -1744,13 +1845,18 @@ the device.</p>
 
 <ul>
 
-	<li>Added <tt>cupsBackSide</tt> and deprecated <tt>cupsFlipDuplex</tt>.</li>
+	<li>Added <a href='#cupsBackSide'><tt>cupsBackSide</tt></a> and
+	deprecated <a href='#cupsFlipDuplex'><tt>cupsFlipDuplex</tt></a>.</li>
 
-	<li>Added text URI information to <tt>cupsIPPReason</tt> documentation.</li>
+	<li>Added text URI information to
+	<a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> documentation.</li>
 
-	<li>Added <tt>APPrinterPreset</tt>, <tt>cupsIPPFinishings</tt>, and <tt>cupsPreFilter</tt> attributes.</li>
+	<li>Added <a href='#APPrinterPreset'><tt>APPrinterPreset</tt></a>,
+	<a href='#cupsIPPFinishings'><tt>cupsIPPFinishings</tt></a>, and
+	<a href='#cupsPreFilter'><tt>cupsPreFilter</tt></a> attributes.</li>
 
-	<li>Added discussion of custom option code, sample <tt>CustomPageSize</tt> code, and "do not use dict and put" note.</li>
+	<li>Added discussion of custom option code, sample
+	<tt>CustomPageSize</tt> code, and "do not use dict and put" note.</li>
 
 </ul>
 
@@ -1771,17 +1877,18 @@ the device.</p>
 
 	<li>Added custom option values support</li>
 
-	<li>Added <tt>APHelpBook</tt> attribute</li>
+	<li>Added <a href='#APHelpBook'><tt>APHelpBook</tt></a> attribute</li>
 
-	<li>Added <tt>APDuplexRequiresFlippedMargin</tt> attribute</li>
+	<li>Added <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
+	attribute</li>
 
-	<li>Added <tt>cupsICCProfile</tt> attribute</li>
+	<li>Added <a href='#cupsICCProfile'><tt>cupsICCProfile</tt></a> attribute</li>
 
-	<li>Added <tt>cupsIPPReason</tt> attribute</li>
+	<li>Added <a href='#cupsIPPReason'><tt>cupsIPPReason</tt></a> attribute</li>
 
-	<li>Added <tt>cupsLanguages</tt> attribute</li>
+	<li>Added <a href='#cupsLanguages'><tt>cupsLanguages</tt></a> attribute</li>
 
-	<li>Added <tt>cupsPortMonitor</tt> attribute</li>
+	<li>Added <a href='#cupsPortMonitor'><tt>cupsPortMonitor</tt></a> attribute</li>
 
 	<li>Removed <tt>cupsProtocol</tt> attribute</li>
 
@@ -1791,7 +1898,7 @@ the device.</p>
 
 <ul>
 
-	<li>Added <tt>cupsFlipDuplex</tt> attribute</li>
+	<li>Added <a href='#cupsFlipDuplex'><tt>cupsFlipDuplex</tt></a> attribute</li>
 
 	<li>Added <tt>cupsProtocol</tt> attribute</li>
 
