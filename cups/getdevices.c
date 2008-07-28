@@ -15,6 +15,7 @@
  *
  * Contents:
  *
+ *   cupsGetDevices() - Get available printer devices.
  */
 
 /*
@@ -235,7 +236,7 @@ cupsGetDevices(
   httpFlush(http);
 
   if (status == IPP_ERROR)
-    _cupsSetError(IPP_ERROR, NULL);
+    _cupsSetError(IPP_ERROR, NULL, 0);
   else
   {
     attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
@@ -245,8 +246,8 @@ cupsGetDevices(
 		  attr ? attr->values[0].string.text : ""));
 
     _cupsSetError(response->request.status.status_code,
-		   attr ? attr->values[0].string.text :
-		       ippErrorString(response->request.status.status_code));
+		  attr ? attr->values[0].string.text :
+		      ippErrorString(response->request.status.status_code), 0);
   }
 
   ippDelete(response);

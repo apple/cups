@@ -602,7 +602,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
     if (!strncmp(argv[1], "-d", 2))
+    {
       filename = cupsGetPPD(argv[1] + 2);
+      if (!filename)
+      {
+        printf("%s: %s\n", argv[1], cupsLastErrorString());
+        return (1);
+      }
+    }
     else
       filename = argv[1];
 

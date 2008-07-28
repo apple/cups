@@ -17,9 +17,11 @@
  *
  * Contents:
  *
- *   _cupsLangPrintf() - Print a formatted message string to a file.
- *   _cupsLangPuts()   - Print a static message string to a file.
- *   _cupsSetLocale()  - Set the current locale and transcode the command-line.
+ *   _cupsLangPrintError() - Print a message followed by a standard error.
+ *   _cupsLangPrintf()     - Print a formatted message string to a file.
+ *   _cupsLangPuts()       - Print a static message string to a file.
+ *   _cupsSetLocale()      - Set the current locale and transcode the
+ *                           command-line.
  */
 
 /*

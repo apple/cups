@@ -131,7 +131,7 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
 
   if (job_id < -1 || (!name && job_id == 0))
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -229,7 +229,7 @@ cupsCreateJob(
 
   if (!name)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -239,7 +239,7 @@ cupsCreateJob(
 
   if ((request = ippNewRequest(IPP_CREATE_JOB)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOMEM), 0);
     return (0);
   }
 
@@ -346,7 +346,7 @@ cupsGetClasses(char ***classes)		/* O - Classes */
 
   if (!classes)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (0);
   }
@@ -596,7 +596,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
 
   if (!jobs)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (-1);
   }
@@ -610,7 +610,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
     if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                          "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+      _cupsSetError(IPP_INTERNAL_ERROR, _("Unable to create printer-uri!"), 1);
 
       return (-1);
     }
@@ -764,7 +764,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
         * Ran out of memory!
         */
 
-        _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+        _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
 
 	cupsFreeJobs(n, *jobs);
 	*jobs = NULL;
@@ -921,19 +921,19 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
   if (!name)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, "No printer name!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("No printer name!"), 1);
     return (HTTP_NOT_ACCEPTABLE);
   }
 
   if (!modtime)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, "No modification time!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("No modification time!"), 1);
     return (HTTP_NOT_ACCEPTABLE);
   }
 
   if (!buffer || bufsize <= 1)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, "Bad filename buffer!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad filename buffer!"), 1);
     return (HTTP_NOT_ACCEPTABLE);
   }
 
@@ -1010,7 +1010,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     * Can't open file; close the server connection and return NULL...
     */
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
 
     if (http2 != http)
       httpClose(http2);
@@ -1043,17 +1043,17 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     switch (status)
     {
       case HTTP_NOT_FOUND :
-          _cupsSetError(IPP_NOT_FOUND, httpStatus(status));
+          _cupsSetError(IPP_NOT_FOUND, httpStatus(status), 0);
 	  break;
 
       case HTTP_UNAUTHORIZED :
-          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
+          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
 	  break;
 
       default :
 	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
                 	status));
-	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
+	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status), 0);
 	  break;
     }
 
@@ -1096,7 +1096,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
 
   if (!printers)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (0);
   }
@@ -1208,7 +1208,7 @@ cupsGetServerPPD(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!name)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, "No PPD name!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("No PPD name!"), 1);
 
     return (NULL);
   }
@@ -1227,7 +1227,7 @@ cupsGetServerPPD(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
     * Can't open file; close the server connection and return NULL...
     */
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
 
     return (NULL);
   }
@@ -1388,7 +1388,7 @@ cupsPrintFiles2(
 
   if (!name || num_files < 1 || !files)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (0);
   }
@@ -1490,7 +1490,7 @@ cupsStartDocument(
 
   if ((request = ippNewRequest(IPP_SEND_DOCUMENT)) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(ENOMEM), 0);
     return (0);
   }
 
@@ -1583,8 +1583,13 @@ _cupsConnect(void)
   {
     if ((cg->http = httpConnectEncrypt(cupsServer(), ippPort(),
                                        cupsEncryption())) == NULL)
-      _cupsSetError(IPP_SERVICE_UNAVAILABLE,
-                    errno ? strerror(errno) : "Unable to connect to host.");
+    {
+      if (errno)
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+      else
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE,
+	              _("Unable to connect to host."), 1);
+    }
   }
 
  /*
@@ -1642,7 +1647,7 @@ cups_get_printer_uri(
   if (httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                        "localhost", 0, "/printers/%s", name) != HTTP_URI_OK)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, "Unable to create printer-uri!");
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Unable to create printer-uri!"), 1);
 
     *host     = '\0';
     *resource = '\0';
@@ -1777,7 +1782,8 @@ cups_get_printer_uri(
 
       if (!strncmp(resource, "/classes/", 9))
       {
-        _cupsSetError(IPP_INTERNAL_ERROR, _("No printer-uri found for class!"));
+        _cupsSetError(IPP_INTERNAL_ERROR,
+	              _("No printer-uri found for class!"), 1);
 
 	*host     = '\0';
 	*resource = '\0';
@@ -1792,7 +1798,7 @@ cups_get_printer_uri(
   }
 
   if (cupsLastError() != IPP_NOT_FOUND)
-    _cupsSetError(IPP_INTERNAL_ERROR, _("No printer-uri found!"));
+    _cupsSetError(IPP_INTERNAL_ERROR, _("No printer-uri found!"), 1);
 
   *host     = '\0';
   *resource = '\0';
