@@ -70,9 +70,8 @@ install-data:
 
 install-exec:
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
-	for file in $(TARGETS); do \
-		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
-	done
+	$(INSTALL_BIN) mailto $(SERVERBIN)/notifier
+	$(INSTALL_BIN) rss $(SERVERBIN)/notifier
 
 
 #
