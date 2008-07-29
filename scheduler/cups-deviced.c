@@ -540,7 +540,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
 
     dclass = temp;
 
-    for (ptr = line; *ptr; ptr ++)
+    for (ptr = temp; *ptr; ptr ++)
       if (isspace(*ptr & 255))
         break;
 
