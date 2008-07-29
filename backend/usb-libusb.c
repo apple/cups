@@ -447,9 +447,8 @@ list_cb(usb_printer_t *printer,		/* I - Printer */
   * Report the printer...
   */
 
-  printf("direct %s \"%s\" \"%s USB\" \"%s\"\n", device_uri, make_model,
-         make_model, device_id);
-  fflush(stdout);
+  cupsBackendReport("direct", device_uri, make_model, make_model, device_id,
+                    NULL);
 
  /*
   * Keep going...

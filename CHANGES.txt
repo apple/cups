@@ -1,8 +1,12 @@
-CHANGES.txt - 2008-07-25
+CHANGES.txt - 2008-07-28
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Added support for a device-location attribute which provides
+	  the physical location of a printer device.
+	- Added a cupsBackendReport() API which handles quoting of the
+	  device data by a backend.
 	- Added support for custom options in the web interface
 	  (STR #1729)
 	- Added support for Mozilla LDAP, reconnection to LDAP servers,

@@ -51,6 +51,7 @@ cupsGetDevices(
   const char	*device_class,		/* device-class value */
 		*device_id,		/* device-id value */
 		*device_info,		/* device-info value */
+		*device_location,	/* device-location value */
 		*device_make_and_model,	/* device-make-and-model value */
 		*device_uri;		/* device-uri value */
   int		blocking;		/* Current blocking-IO mode */
@@ -161,6 +162,7 @@ cupsGetDevices(
   device_class          = NULL;
   device_id             = NULL;
   device_info           = NULL;
+  device_location       = "";
   device_make_and_model = NULL;
   device_uri            = NULL;
   attr                  = NULL;
@@ -193,11 +195,13 @@ cupsGetDevices(
         if (device_class && device_id && device_info && device_make_and_model &&
 	    device_uri)
           (*callback)(device_class, device_id, device_info,
-	              device_make_and_model, device_uri, user_data);
+	              device_make_and_model, device_uri, device_location,
+		      user_data);
 
 	device_class          = NULL;
 	device_id             = NULL;
 	device_info           = NULL;
+	device_location       = "";
 	device_make_and_model = NULL;
 	device_uri            = NULL;
       }
@@ -210,6 +214,9 @@ cupsGetDevices(
       else if (!strcmp(attr->name, "device-info") &&
                attr->value_tag == IPP_TAG_TEXT)
         device_info = attr->values[0].string.text;
+      else if (!strcmp(attr->name, "device-location") &&
+               attr->value_tag == IPP_TAG_TEXT)
+        device_location = attr->values[0].string.text;
       else if (!strcmp(attr->name, "device-make-and-model") &&
                attr->value_tag == IPP_TAG_TEXT)
         device_make_and_model = attr->values[0].string.text;
@@ -226,7 +233,7 @@ cupsGetDevices(
   if (device_class && device_id && device_info && device_make_and_model &&
       device_uri)
     (*callback)(device_class, device_id, device_info,
-		device_make_and_model, device_uri, user_data);
+		device_make_and_model, device_uri, device_location, user_data);
 
  /*
   * Set the IPP status and return...

@@ -86,6 +86,7 @@ _cupsArrayUserData
 _cupsBackChannelRead
 _cupsBackChannelWrite
 _cupsBackendDeviceURI
+_cupsBackendReport
 _cupsCancelJob
 _cupsCancelJob2
 _cupsCharsetToUTF8

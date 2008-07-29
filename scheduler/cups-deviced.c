@@ -65,10 +65,8 @@ typedef struct
 typedef struct
 {
   char	device_class[128],		/* Device class */
-	device_make_and_model[128],	/* Make and model, if known */
 	device_info[128],		/* Device info/description */
-	device_uri[1024],		/* Device URI */
-	device_id[1024];		/* 1284 Device ID */
+	device_uri[1024];		/* Device URI */
 } cupsd_device_t;
 
 
@@ -92,7 +90,8 @@ static int		send_class,	/* Send device-class attribute? */
 			send_make_and_model,
 					/* Send device-make-and-model attribute? */
 			send_uri,	/* Send device-uri attribute? */
-			send_id;	/* Send device-id attribute? */
+			send_id,	/* Send device-id attribute? */
+			send_location;	/* Send device-location attribute? */
 static int		dead_children = 0;
 					/* Dead children? */
 
@@ -105,7 +104,8 @@ static int		add_device(const char *device_class,
 				   const char *device_make_and_model,
 				   const char *device_info,
 				   const char *device_uri,
-				   const char *device_id);
+				   const char *device_id,
+				   const char *device_location);
 static int		compare_devices(cupsd_device_t *p0,
 			                cupsd_device_t *p1);
 static cups_array_t	*create_strings_array(const char *s);
@@ -198,7 +198,10 @@ main(int  argc,				/* I - Number of command-line args */
                                                    num_options, options));
 
   if (!requested || cupsArrayFind(requested, "all") != NULL)
-    send_class = send_info = send_make_and_model = send_uri = send_id = 1;
+  {
+    send_class = send_info = send_make_and_model = send_uri = send_id =
+        send_location = 1;
+  }
   else
   {
     send_class          = cupsArrayFind(requested, "device-class") != NULL;
@@ -206,6 +209,7 @@ main(int  argc,				/* I - Number of command-line args */
     send_make_and_model = cupsArrayFind(requested, "device-make-and-model") != NULL;
     send_uri            = cupsArrayFind(requested, "device-uri") != NULL;
     send_id             = cupsArrayFind(requested, "device-id") != NULL;
+    send_location       = cupsArrayFind(requested, "device-location") != NULL;
   }
 
  /*
@@ -345,7 +349,8 @@ add_device(
     const char *device_make_and_model,	/* I - Device make and model */
     const char *device_info,		/* I - Device information */
     const char *device_uri,		/* I - Device URI */
-    const char *device_id)		/* I - 1284 device ID */
+    const char *device_id,		/* I - 1284 device ID */
+    const char *device_location)	/* I - Physical location */
 {
   cupsd_device_t	*device;	/* New device */
 
@@ -366,11 +371,8 @@ add_device(
   */
 
   strlcpy(device->device_class, device_class, sizeof(device->device_class));
-  strlcpy(device->device_make_and_model, device_make_and_model,
-          sizeof(device->device_make_and_model));
   strlcpy(device->device_info, device_info, sizeof(device->device_info));
   strlcpy(device->device_uri, device_uri, sizeof(device->device_uri));
-  strlcpy(device->device_id, device_id, sizeof(device->device_id));
 
  /*
   * Add the device to the array and return...
@@ -397,16 +399,20 @@ add_device(
       cupsdSendIPPGroup(IPP_TAG_PRINTER);
       if (send_class)
 	cupsdSendIPPString(IPP_TAG_KEYWORD, "device-class",
-	                   device->device_class);
+	                   device_class);
       if (send_info)
-	cupsdSendIPPString(IPP_TAG_TEXT, "device-info", device->device_info);
+	cupsdSendIPPString(IPP_TAG_TEXT, "device-info", device_info);
       if (send_make_and_model)
 	cupsdSendIPPString(IPP_TAG_TEXT, "device-make-and-model",
-			   device->device_make_and_model);
+			   device_make_and_model);
       if (send_uri)
-	cupsdSendIPPString(IPP_TAG_URI, "device-uri", device->device_uri);
+	cupsdSendIPPString(IPP_TAG_URI, "device-uri", device_uri);
       if (send_id)
-	cupsdSendIPPString(IPP_TAG_TEXT, "device-id", device->device_id);
+	cupsdSendIPPString(IPP_TAG_TEXT, "device-id",
+	                   device_id ? device_id : "");
+      if (send_location)
+	cupsdSendIPPString(IPP_TAG_TEXT, "device-location",
+	                   device_location ? device_location : "");
 
       fflush(stdout);
       fputs("DEBUG: Flushed attributes...\n", stderr);
@@ -508,11 +514,14 @@ static int				/* O - 0 on success, -1 on error */
 get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
 {
   char	line[2048],			/* Line from backend */
-	dclass[64],			/* Device class */
-	uri[1024],			/* Device URI */
-	info[128],			/* Device info */
-	make_model[256],		/* Make and model */
-	device_id[1024];		/* 1284 device ID */
+	temp[2048],			/* Copy of line */
+	*ptr,				/* Pointer into line */
+	*dclass,			/* Device class */
+	*uri,				/* Device URI */
+	*make_model,			/* Make and model */
+	*info,				/* Device info */
+	*device_id,			/* 1284 device ID */
+	*location;			/* Physical location */
 
 
   if (cupsFileGets(backend->pipe, line, sizeof(line)))
@@ -520,35 +529,123 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
    /*
     * Each line is of the form:
     *
-    *   class URI "make model" "name" ["1284 device ID"]
+    *   class URI "make model" "name" ["1284 device ID"] ["location"]
     */
 
-    device_id[0] = '\0';
+    strlcpy(temp, line, sizeof(temp));
 
-    if (sscanf(line,
-	       "%63s%1023s%*[ \t]\"%255[^\"]\"%*[ \t]\"%127[^\"]\""
-	       "%*[ \t]\"%1023[^\"]",
-	       dclass, uri, make_model, info, device_id) < 4)
+   /*
+    * device-class
+    */
+
+    dclass = temp;
+
+    for (ptr = line; *ptr; ptr ++)
+      if (isspace(*ptr & 255))
+        break;
+
+    while (isspace(*ptr & 255))
+      *ptr++ = '\0';
+
+   /*
+    * device-uri
+    */
+
+    if (!*ptr)
+      goto error;
+
+    for (uri = ptr; *ptr; ptr ++)
+      if (isspace(*ptr & 255))
+        break;
+
+    while (isspace(*ptr & 255))
+      *ptr++ = '\0';
+
+   /*
+    * device-make-and-model
+    */
+
+    if (*ptr != '\"')
+      goto error;
+
+    for (ptr ++, make_model = ptr; *ptr && *ptr != '\"'; ptr ++)
     {
+      if (*ptr == '\\' && ptr[1])
+        _cups_strcpy(ptr, ptr + 1);
+    }
+
+    if (*ptr != '\"')
+      goto error;
+
+    for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+
+   /*
+    * device-info
+    */
+
+    if (*ptr != '\"')
+      goto error;
+
+    for (ptr ++, info = ptr; *ptr && *ptr != '\"'; ptr ++)
+    {
+      if (*ptr == '\\' && ptr[1])
+        _cups_strcpy(ptr, ptr + 1);
+    }
+
+    if (*ptr != '\"')
+      goto error;
+
+    for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+
+   /*
+    * device-id
+    */
+
+    if (*ptr == '\"')
+    {
+      for (ptr ++, device_id = ptr; *ptr && *ptr != '\"'; ptr ++)
+      {
+	if (*ptr == '\\' && ptr[1])
+	  _cups_strcpy(ptr, ptr + 1);
+      }
+
+      if (*ptr != '\"')
+	goto error;
+
+      for (*ptr++ = '\0'; isspace(*ptr & 255); *ptr++ = '\0');
+
      /*
-      * Bad format; strip trailing newline and write an error message.
+      * device-location
       */
 
-      if (line[strlen(line) - 1] == '\n')
-	line[strlen(line) - 1] = '\0';
+      if (*ptr == '\"')
+      {
+	for (ptr ++, location = ptr; *ptr && *ptr != '\"'; ptr ++)
+	{
+	  if (*ptr == '\\' && ptr[1])
+	    _cups_strcpy(ptr, ptr + 1);
+	}
 
-      fprintf(stderr, "ERROR: [cups-deviced] Bad line from \"%s\": %s\n",
-	      backend->name, line);
+	if (*ptr != '\"')
+	  goto error;
+
+	*ptr++ = '\0';
+      }
+      else
+        location = NULL;
     }
     else
     {
-     /*
-      * Add the device to the array of available devices...
-      */
-
-      if (!add_device(dclass, make_model, info, uri, device_id))
-        fprintf(stderr, "DEBUG: [cups-deviced] Found device \"%s\"...\n", uri);
+      device_id = NULL;
+      location  = NULL;
     }
+
+   /*
+    * Add the device to the array of available devices...
+    */
+
+    if (!add_device(dclass, make_model, info, uri, device_id, location))
+      fprintf(stderr, "DEBUG: [cups-deviced] Found device \"%s\"...\n", uri);
 
     return (0);
   }
@@ -561,6 +658,19 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
   backend->pipe = NULL;
 
   return (-1);
+
+ /*
+  * Bad format; strip trailing newline and write an error message.
+  */
+
+  error:
+
+  if (line[strlen(line) - 1] == '\n')
+    line[strlen(line) - 1] = '\0';
+
+  fprintf(stderr, "ERROR: [cups-deviced] Bad line from \"%s\": %s\n",
+	  backend->name, line);
+  return (0);
 }
 
 

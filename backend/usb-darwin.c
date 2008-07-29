@@ -1056,8 +1056,8 @@ static Boolean list_device_cb(void *refcon,
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
 
-      printf("direct %s \"%s\" \"%s USB\" \"%s\"\n", uristr, make_modelstr,
-             make_modelstr, idstr);
+      cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
+                        NULL);
 
       release_deviceinfo(&make, &model, &serial);
       CFRelease(deviceIDString);

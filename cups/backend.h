@@ -48,7 +48,14 @@ typedef enum cups_backend_e cups_backend_t;
  */
 
 extern const char	*cupsBackendDeviceURI(char **argv) _CUPS_API_1_2;
-
+extern void		cupsBackendReport(const char *device_scheme,
+			                  const char *device_uri,
+			                  const char *device_make_and_model,
+			                  const char *device_info,
+			                  const char *device_id,
+			                  const char *device_location)
+					  _CUPS_API_1_4;
+			                  
 
 #endif /* !_CUPS_BACKEND_H_ */
 

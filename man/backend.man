@@ -3,7 +3,7 @@
 .\"
 .\"   Backend man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH backend 7 "Common UNIX Printing System" "20 March 2006" "Apple Inc."
+.TH backend 7 "Common UNIX Printing System" "28 July 2008" "Apple Inc."
 
 .SH NAME
 backend \- cups backend transmission interfaces
@@ -59,6 +59,7 @@ forms:
     device-class scheme "Unknown" "device-info"
     device-class device-uri "device-make-and-model" "device-info"
     device-class device-uri "device-make-and-model" "device-info" "device-id"
+    device-class device-uri "device-make-and-model" "device-info" "device-id" "device-location"
 .fi
 
 .LP
@@ -110,6 +111,11 @@ along with the port number or network address, e.g. "Acme Foojet
 The optional \fIdevice-id\fR field specifies the IEEE-1284 device
 ID string for the device, which is used to select a matching
 driver.
+
+.LP
+The optional \fIdevice-location\fR field specifies the physical location of
+the device, which is often used to pre-populate the printer-location attribute
+when adding a printer.
 
 .SH PERMISSIONS
 Backends without world execute permissions are run as the root
@@ -173,7 +179,7 @@ All other exit code values are reserved.
 http://localhost:631/help
 
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

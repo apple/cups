@@ -280,11 +280,8 @@ main(int  argc,				/* I - Number of command-line args */
 			    schemes[best->type], NULL, best->fullName, 0,
 			    best->cups_shared ? "/cups" : "/");
 
-	    printf("network %s \"%s\" \"%s\"\n", device_uri,
-		   best->make_and_model ? best->make_and_model : "Unknown",
-		   best->name);
-	    fflush(stdout);
-
+	    cupsBackendReport("network", device_uri, best->make_and_model,
+	                      best->name, NULL, NULL);
 	    best->sent = 1;
 	    best       = device;
 	  }
@@ -305,11 +302,8 @@ main(int  argc,				/* I - Number of command-line args */
 			schemes[best->type], NULL, best->fullName, 0,
 			best->cups_shared ? "/cups" : "/");
 
-	printf("network %s \"%s\" \"%s\"\n", device_uri,
-	       best->make_and_model ? best->make_and_model : "Unknown",
-	       best->name);
-	fflush(stdout);
-
+	cupsBackendReport("network", device_uri, best->make_and_model,
+			  best->name, NULL, NULL);
 	best->sent = 1;
       }
     }
