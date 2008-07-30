@@ -629,7 +629,7 @@ get_device(cupsd_backend_t *backend)	/* I - Backend to read from */
 	if (*ptr != '\"')
 	  goto error;
 
-	*ptr++ = '\0';
+	*ptr = '\0';
       }
       else
         location = NULL;
