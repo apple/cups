@@ -2113,7 +2113,7 @@ of the device-class attribute:
 rendered entirely in black ink (blackplot=true) or using the colors and shades
 specified in the file (blackplot=false). The default value is false.
 
-<h4><a name="brightness">brightness (integer(0:200))</a></h4>
+<h4><a name="brightness">brightness (integer(0:200))</a><span class="info">Deprecated</span></h4>
 
 <p>The brightness attribute specifies the overall brightness of the printed
 output in percent. A brightness of 100 is normal, while 200 is twice as
@@ -2121,6 +2121,13 @@ bright and 50 is half as bright. The default value is 100.
 
 <p>Brightness is applied to the Cyan, Magenta, Yellow, and Black values using
 the function "f(x) = brightness / 100 * x".
+
+<blockquote><b>Note:</b>
+
+<p>This attribute is deprecated and will be removed from a future CUPS
+release.</p>
+
+</blockquote>
 
 <h4><a name="columns">columns (integer(1:4))</a></h4>
 
@@ -2144,7 +2151,7 @@ are present in the job.
 fit on the selected media (fitplot=true) or use the physical scale specified
 in the plot file (fitplot=false). The default value is false.
 
-<h4><a name="gamma">gamma (integer(1:10000))</a></h4>
+<h4><a name="gamma">gamma (integer(1:10000))</a><span class="info">Deprecated</span></h4>
 
 <p>The gamma attribute specifies the luminance correction for the output.
 A value of 1000 specifies no correction, while values of 2000 and 500 will
@@ -2152,12 +2159,26 @@ generate lighter and darker output, respectively. The default value is
 1000.
 
 <p>Gamma is applied to the Red, Green, and Blue values (or luminance for
-grayscale output) using the function "f(x) = x<SUp>(1000/gamma)</SUp>".
+grayscale output) using the function "f(x) = x<sup>(1000/gamma)</sup>".
 
-<h4><a name="hue">hue (integer(-180:180))</a></h4>
+<blockquote><b>Note:</b>
+
+<p>This attribute is deprecated and will be removed from a future CUPS
+release.</p>
+
+</blockquote>
+
+<h4><a name="hue">hue (integer(-180:180))</a><span class="info">Deprecated</span></h4>
 
 <p>The hue attribute specifies a color hue rotation when printing image
 files. The default value is 0.
+
+<blockquote><b>Note:</b>
+
+<p>This attribute is deprecated and will be removed from a future CUPS
+release.</p>
+
+</blockquote>
 
 <h4><a name="job-billing">job-billing (text(MAX))</a><span class='info'>CUPS 1.1</span></h4>
 
@@ -2349,12 +2370,19 @@ per inch. The default value is the resolution included with the file or
 with a shaded header and keyword highlighting (prettyprint=true) or without
 additional formatting (prettyprint=false). The default value is false.
 
-<h4><a name="saturation">saturation (integer(0:200))</a></h4>
+<h4><a name="saturation">saturation (integer(0:200))</a><span class="info">Deprecated</span></h4>
 
 <p>The saturation attribute specifies the color saturation when
 printing image files. A saturation of 100 is normal, while values of 50
 and 200 will be half and twice as colorful, respectively. The default
 value is 100.
+
+<blockquote><b>Note:</b>
+
+<p>This attribute is deprecated and will be removed from a future CUPS
+release.</p>
+
+</blockquote>
 
 <h4><a name="scaling">scaling (integer(1:1000))</a></h4>
 
