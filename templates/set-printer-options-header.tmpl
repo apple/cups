@@ -1,3 +1,16 @@
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<SCRIPT TYPE="text/javascript"><!--
+function update_paramtable(option)
+{
+  var cb = document.getElementById("select-" + option)
+  var paramstable = document.getElementById(option + "-params");
+  if (cb.value == "Custom")
+    paramstable.style.display = "table";
+  else
+    paramstable.style.display = "none";
+}
+--></SCRIPT>
+

@@ -80,7 +80,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
       */
 
       _cupsSetError(errno == ENOENT ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
-                    strerror(errno));
+                    NULL, 0);
 
       ippDelete(request);
 
@@ -143,7 +143,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   {
     ippDelete(request);
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (NULL);
   }
@@ -169,7 +169,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       */
 
       _cupsSetError(errno == EBADF ? IPP_NOT_FOUND : IPP_NOT_AUTHORIZED,
-                    strerror(errno));
+                    NULL, 0);
 
       ippDelete(request);
 
@@ -188,7 +188,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       ippDelete(request);
 
-      _cupsSetError(IPP_NOT_POSSIBLE, strerror(EISDIR));
+      _cupsSetError(IPP_NOT_POSSIBLE, strerror(EISDIR), 0);
 
       return (NULL);
     }
@@ -395,7 +395,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       ippDelete(response);
       response = NULL;
 
-      _cupsSetError(IPP_SERVICE_UNAVAILABLE, strerror(errno));
+      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
     }
   }
   else if (status != HTTP_ERROR)
@@ -453,8 +453,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
                   attr ? attr->values[0].string.text : ""));
 
     _cupsSetError(response->request.status.status_code,
-                   attr ? attr->values[0].string.text :
-		       ippErrorString(response->request.status.status_code));
+                  attr ? attr->values[0].string.text :
+		      ippErrorString(response->request.status.status_code), 0);
   }
   else if (status != HTTP_OK)
     _cupsSetHTTPError(status);
@@ -492,7 +492,7 @@ cupsReadResponseData(
 
     if ((http = cg->http) == NULL)
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, "No active connection");
+      _cupsSetError(IPP_INTERNAL_ERROR, _("No active connection"), 1);
       return (-1);
     }
   }
@@ -542,7 +542,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   if (!request || !resource)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL));
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (HTTP_ERROR);
   }
@@ -724,7 +724,7 @@ cupsWriteRequestData(
 
     if ((http = cg->http) == NULL)
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, "No active connection");
+      _cupsSetError(IPP_INTERNAL_ERROR, _("No active connection"), 1);
       return (HTTP_ERROR);
     }
   }
@@ -753,26 +753,49 @@ cupsWriteRequestData(
 
 void
 _cupsSetError(ipp_status_t status,	/* I - IPP status code */
-               const char   *message)	/* I - status-message value */
+              const char   *message,	/* I - status-message value */
+	      int          localize)	/* I - Localize the message? */
 {
   _cups_globals_t	*cg;		/* Global data */
 
+
+  if (!message && errno)
+  {
+    message  = strerror(errno);
+    localize = 0;
+  }
 
   cg             = _cupsGlobals();
   cg->last_error = status;
 
   if (cg->last_status_message)
   {
-    free(cg->last_status_message);
+    _cupsStrFree(cg->last_status_message);
 
     cg->last_status_message = NULL;
   }
 
   if (message)
-    cg->last_status_message = strdup(message);
+  {
+    if (localize)
+    {
+     /*
+      * Get the message catalog...
+      */
+
+      if (!cg->lang_default)
+	cg->lang_default = cupsLangDefault();
+
+      cg->last_status_message = _cupsStrAlloc(_cupsLangString(cg->lang_default,
+                                                              message));
+    }
+    else
+      cg->last_status_message = _cupsStrAlloc(message);
+  }
 
   DEBUG_printf(("_cupsSetError: last_error=%s, last_status_message=\"%s\"\n",
-                ippErrorString(cg->last_error), message ? message : ""));
+                ippErrorString(cg->last_error),
+		cg->last_status_message ? cg->last_status_message : ""));
 }
 
 
@@ -786,37 +809,37 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
   switch (status)
   {
     case HTTP_NOT_FOUND :
-	_cupsSetError(IPP_NOT_FOUND, httpStatus(status));
+	_cupsSetError(IPP_NOT_FOUND, httpStatus(status), 0);
 	break;
 
     case HTTP_UNAUTHORIZED :
-	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status));
+	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
 	break;
 
     case HTTP_FORBIDDEN :
-	_cupsSetError(IPP_FORBIDDEN, httpStatus(status));
+	_cupsSetError(IPP_FORBIDDEN, httpStatus(status), 0);
 	break;
 
     case HTTP_BAD_REQUEST :
-	_cupsSetError(IPP_BAD_REQUEST, httpStatus(status));
+	_cupsSetError(IPP_BAD_REQUEST, httpStatus(status), 0);
 	break;
 
     case HTTP_REQUEST_TOO_LARGE :
-	_cupsSetError(IPP_REQUEST_VALUE, httpStatus(status));
+	_cupsSetError(IPP_REQUEST_VALUE, httpStatus(status), 0);
 	break;
 
     case HTTP_NOT_IMPLEMENTED :
-	_cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status));
+	_cupsSetError(IPP_OPERATION_NOT_SUPPORTED, httpStatus(status), 0);
 	break;
 
     case HTTP_NOT_SUPPORTED :
-	_cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status));
+	_cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status), 0);
 	break;
 
     default :
 	DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
 		      status));
-	_cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status));
+	_cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status), 0);
 	break;
   }
 }

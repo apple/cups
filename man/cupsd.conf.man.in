@@ -146,6 +146,26 @@ BrowseInterval seconds
 .br
 Specifies the maximum interval between printer information broadcasts.
 .TP 5
+BrowseLDAPBindDN
+.br
+Specifies the LDAP domain name to use when registering printers.
+.TP 5
+BrowseLDAPCACertFile
+.br
+Specifies the SSL certificate authority file to use.
+.TP 5
+BrowseLDAPDN
+.br
+Specifies the LDAP domain name to use when discovering printers.
+.TP 5
+BrowseLDAPPassword
+.br
+Specifies the password to use when accessing the LDAP server.
+.TP 5
+BrowseLDAPServer
+.br
+Specifies the LDAP server to use.
+.TP 5
 BrowseOrder allow,deny
 .TP 5
 BrowseOrder deny,allow

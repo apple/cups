@@ -260,9 +260,9 @@ cupsAdminCreateWindowsPPD(
       if ((ptr = strchr(line, ':')) == NULL)
       {
         snprintf(line, sizeof(line),
-	          _cupsLangString(language, _("Missing value on line %d!")),
-		  linenum);
-        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
+	         _cupsLangString(language, _("Missing value on line %d!")),
+		 linenum);
+        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
         cupsFileClose(srcfp);
         cupsFileClose(dstfp);
@@ -281,7 +281,7 @@ cupsAdminCreateWindowsPPD(
 	         _cupsLangString(language,
 		                 _("Missing double quote on line %d!")),
 	         linenum);
-        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
+        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
         cupsFileClose(srcfp);
         cupsFileClose(dstfp);
@@ -300,7 +300,7 @@ cupsAdminCreateWindowsPPD(
 	         _cupsLangString(language,
 		                 _("Bad option + choice on line %d!")),
 	         linenum);
-        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
+        _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
         cupsFileClose(srcfp);
         cupsFileClose(dstfp);
@@ -343,10 +343,7 @@ cupsAdminCreateWindowsPPD(
 
   if (linenum == 0)
   {
-    snprintf(line, sizeof(line),
-             _cupsLangString(language, _("Empty PPD file!")),
-             linenum);
-    _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line);
+    _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, _("Empty PPD file!"), 1);
 
     cupsFileClose(dstfp);
     unlink(buffer);
@@ -434,7 +431,7 @@ cupsAdminExportSamba(
 
   if (!dest || !ppd || !samba_server || !samba_user || !samba_password)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
     return (0);
   }
 
@@ -444,7 +441,7 @@ cupsAdminExportSamba(
 
   if ((fp = cupsTempFile2(authfile, sizeof(authfile))) == NULL)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
     return (0);
   }
 
@@ -497,7 +494,7 @@ cupsAdminExportSamba(
 	                       _("Unable to copy Windows 2000 printer "
 	                         "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -532,7 +529,7 @@ cupsAdminExportSamba(
 	                         _("Unable to copy CUPS printer driver "
 				   "files (%d)!")), status);
 
-	_cupsSetError(IPP_INTERNAL_ERROR, message);
+	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
 	if (logfile)
 	  _cupsLangPrintf(logfile, "%s\n", message);
@@ -575,7 +572,7 @@ cupsAdminExportSamba(
                 	       _("Unable to install Windows 2000 printer "
 		        	 "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -620,7 +617,7 @@ cupsAdminExportSamba(
                 	       _("Unable to copy Windows 9x printer "
 		        	 "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -649,7 +646,7 @@ cupsAdminExportSamba(
                 	       _("Unable to install Windows 9x printer "
 		        	 "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -701,7 +698,7 @@ cupsAdminExportSamba(
 	                       _("Unable to copy 64-bit Windows printer "
 	                         "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -736,7 +733,7 @@ cupsAdminExportSamba(
 	                         _("Unable to copy 64-bit CUPS printer driver "
 				   "files (%d)!")), status);
 
-	_cupsSetError(IPP_INTERNAL_ERROR, message);
+	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
 	if (logfile)
 	  _cupsLangPrintf(logfile, "%s\n", message);
@@ -779,7 +776,7 @@ cupsAdminExportSamba(
                 	       _("Unable to install Windows 2000 printer "
 		        	 "driver files (%d)!")), status);
 
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
 	_cupsLangPrintf(logfile, "%s\n", message);
@@ -804,13 +801,13 @@ cupsAdminExportSamba(
 				"are installed!")),
               sizeof(message));
 
-    _cupsSetError(IPP_NOT_FOUND, message);
+    _cupsSetError(IPP_NOT_FOUND, message, 0);
     _cupsLangPrintf(logfile, "%s\n", message);
   }
 
   if (have_drivers == 0)
   {
-    _cupsSetError(IPP_NOT_FOUND, message);
+    _cupsSetError(IPP_NOT_FOUND, message, 0);
 
     unlink(authfile);
 
@@ -831,7 +828,7 @@ cupsAdminExportSamba(
         		     _("Unable to set Windows printer driver (%d)!")),
         		     status);
 
-    _cupsSetError(IPP_INTERNAL_ERROR, message);
+    _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
     if (logfile)
       _cupsLangPrintf(logfile, "%s\n", message);
@@ -901,7 +898,7 @@ _cupsAdminGetServerSettings(
 
   if (!http || !num_settings || !settings)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     if (num_settings)
       *num_settings = 0;
@@ -928,9 +925,9 @@ _cupsAdminGetServerSettings(
 
 
       snprintf(message, sizeof(message),
-               _cupsLangString(cupsLangDefault(), _("open of %s failed: %s")),
+               _cupsLangString(cupsLangDefault(), _("Open of %s failed: %s")),
                cupsdconf, strerror(errno));
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
     }
   }
   else
@@ -1224,7 +1221,7 @@ _cupsAdminSetServerSettings(
 
   if (!http || !num_settings || !settings)
   {
-    _cupsSetError(IPP_INTERNAL_ERROR, NULL);
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
 
     return (0);
   }
@@ -1238,7 +1235,7 @@ _cupsAdminSetServerSettings(
   {
     if ((cupsd = cupsFileOpen(cupsdconf, "r")) == NULL)
     {
-      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+      _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
       return (0);
     }
   }
@@ -1395,7 +1392,7 @@ _cupsAdminSetServerSettings(
     if (remote)
       unlink(cupsdconf);
 
-    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+    _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
     return (0);
   }
 
@@ -2203,7 +2200,7 @@ get_cupsd_conf(
       snprintf(message, sizeof(message),
                _cupsLangString(cupsLangDefault(), _("stat of %s failed: %s")),
                name, strerror(errno));
-      _cupsSetError(IPP_INTERNAL_ERROR, message);
+      _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       *name = '\0';
 
@@ -2225,7 +2222,7 @@ get_cupsd_conf(
     {
       *name = '\0';
 
-      _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno));
+      _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
 
       invalidate_cupsd_cache(cg);
 

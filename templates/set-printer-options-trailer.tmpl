@@ -1,1 +1,12 @@
+<SCRIPT TYPE="text/javascript"><!--
+// Hide custom options parameters for browsers that understand Javascript
+var paramtables = document.getElementsByName("paramtable");
+for (var i = 0; i < paramtables.length; i++)
+{
+  var opt = paramtables[i].id.substr(0, paramtables[i].id.lastIndexOf("-"));
+  var cb = document.getElementById("select-" + opt);
+  if (cb.value != "Custom")
+    paramtables[i].style.display = "none";
+}
+--></SCRIPT>
 </FORM>

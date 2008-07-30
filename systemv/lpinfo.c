@@ -40,7 +40,8 @@
 static void	device_cb(const char *device_clas, const char *device_id,
 		          const char *device_info,
 			  const char *device_make_and_model,
-			  const char *device_uri, void *user_data);
+			  const char *device_uri, const char *device_location,
+			  void *user_data);
 static int	show_devices(http_t *, int);
 static int	show_models(http_t *, int);
 
@@ -173,6 +174,7 @@ device_cb(
     const char *device_info,		/* I - device-info string */
     const char *device_make_and_model,	/* I - device-make-and-model string */
     const char *device_uri,		/* I - device-uri string */
+    const char *device_location,	/* I - device-location string */
     void       *user_data)		/* I - User data */
 {
   int	*long_status;			/* Show verbose info? */
@@ -191,9 +193,10 @@ device_cb(
 		      "        class = %s\n"
 		      "        info = %s\n"
 		      "        make-and-model = %s\n"
-		      "        device-id = %s\n"),
+		      "        device-id = %s\n"
+		      "        location = %s\n"),
 		    device_uri, device_class, device_info,
-		    device_make_and_model, device_id);
+		    device_make_and_model, device_id, device_location);
   }
   else
     _cupsLangPrintf(stdout, "%s %s\n", device_class, device_uri);

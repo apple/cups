@@ -182,6 +182,11 @@ install-data:
 			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
 		fi \
 	fi
+	if test "x$(SMFMANIFESTDIR)" != x; then \
+		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
+		$(INSTALL_DIR) $(BUILDROOT)/$(SMFMANIFESTDIR); \
+		$(INSTALL_SCRIPT) init/cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+	fi
 	if test "x$(DBUSDIR)" != x; then \
 		echo Installing cups.conf in $(DBUSDIR)...;\
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(DBUSDIR)/system.d; \

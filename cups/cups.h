@@ -124,7 +124,8 @@ typedef const char *(*cups_password_cb_t)(const char *prompt);
 typedef void (*cups_device_cb_t)(const char *device_class,
                                  const char *device_id, const char *device_info,
                                  const char *device_make_and_model,
-                                 const char *device_uri, void *user_data);
+                                 const char *device_uri,
+				 const char *device_location, void *user_data);
 					/**** Device callback @since CUPS 1.4@ ****/
 
 typedef struct cups_option_s		/**** Printer Options ****/

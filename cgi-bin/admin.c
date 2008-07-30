@@ -20,15 +20,17 @@
  *   do_am_printer()           - Add or modify a printer.
  *   do_cancel_subscription()  - Cancel a subscription.
  *   do_config_server()        - Configure server settings.
- *   do_delete_class()         - Delete a class...
- *   do_delete_printer()       - Delete a printer...
- *   do_export()               - Export printers to Samba...
- *   do_list_printers()        - List available printers...
- *   do_menu()                 - Show the main menu...
+ *   do_delete_class()         - Delete a class.
+ *   do_delete_printer()       - Delete a printer.
+ *   do_export()               - Export printers to Samba.
+ *   do_list_printers()        - List available printers.
+ *   do_menu()                 - Show the main menu.
  *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
  *   do_set_options()          - Configure the default options for a queue.
- *   do_set_sharing()          - Set printer-is-shared value...
+ *   do_set_sharing()          - Set printer-is-shared value.
+ *   get_option_value()        - Return the value of an option.
+ *   get_points()              - Get a value in points.
  *   match_string()            - Return the number of matching characters.
  */
 
@@ -43,6 +45,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <limits.h>
 
 
 /*
@@ -64,6 +67,9 @@ static void	do_printer_op(http_t *http,
 		              ipp_op_t op, const char *title);
 static void	do_set_allowed_users(http_t *http);
 static void	do_set_sharing(http_t *http);
+static char	*get_option_value(ppd_file_t *ppd, const char *name,
+		                  char *buffer, size_t bufsize);
+static double	get_points(double number, const char *uval);
 static int	match_string(const char *a, const char *b);
 
 
@@ -177,7 +183,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
      /*
-      * Bad operation code...  Display an error...
+      * Bad operation code - display an error...
       */
 
       cgiStartHTML(cgiText(_("Administration")));
@@ -206,7 +212,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
   {
    /*
-    * Form data but no operation code...  Display an error...
+    * Form data but no operation code - display an error...
     */
 
     cgiStartHTML(cgiText(_("Administration")));
@@ -1769,7 +1775,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'do_delete_class()' - Delete a class...
+ * 'do_delete_class()' - Delete a class.
  */
 
 static void
@@ -1854,7 +1860,7 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'do_delete_printer()' - Delete a printer...
+ * 'do_delete_printer()' - Delete a printer.
  */
 
 static void
@@ -1939,7 +1945,7 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'do_export()' - Export printers to Samba...
+ * 'do_export()' - Export printers to Samba.
  */
 
 static void
@@ -2075,7 +2081,7 @@ do_export(http_t *http)			/* I - HTTP connection */
 
 
 /*
- * 'do_list_printers()' - List available printers...
+ * 'do_list_printers()' - List available printers.
  */
 
 static void
@@ -2278,7 +2284,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 
 
 /*
- * 'do_menu()' - Show the main menu...
+ * 'do_menu()' - Show the main menu.
  */
 
 static void
@@ -2774,12 +2780,15 @@ do_set_options(http_t *http,		/* I - HTTP connection */
   char		tempfile[1024];		/* Temporary filename */
   cups_file_t	*in,			/* Input file */
 		*out;			/* Output file */
-  char		line[1024];		/* Line from PPD file */
-  char		keyword[1024],		/* Keyword from Default line */
+  char		line[1024],		/* Line from PPD file */
+		value[1024],		/* Option value */
+		keyword[1024],		/* Keyword from Default line */
 		*keyptr;		/* Pointer into keyword... */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_group_t	*group;			/* Option group */
   ppd_option_t	*option;		/* Option */
+  ppd_coption_t	*coption;		/* Custom option */
+  ppd_cparam_t	*cparam;		/* Custom parameter */
   ppd_attr_t	*protocol;		/* cupsProtocol attribute */
   const char	*title;			/* Page title */
 
@@ -2847,32 +2856,14 @@ do_set_options(http_t *http,		/* I - HTTP connection */
   {
     ppdMarkDefaults(ppd);
 
-    DEBUG_printf(("<P>ppd->num_groups = %d\n"
-		  "<UL>\n", ppd->num_groups));
-
-    for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
-    {
-      DEBUG_printf(("<LI>%s<UL>\n", group->text));
-
-      for (j = group->num_options, option = group->options;
-	   j > 0;
-	   j --, option ++)
-	if ((var = cgiGetVariable(option->keyword)) != NULL)
-	{
-	  DEBUG_printf(("<LI>%s = \"%s\"</LI>\n", option->keyword, var));
-	  have_options = 1;
-	  ppdMarkOption(ppd, option->keyword, var);
-	}
-#ifdef DEBUG
-	else
-	  printf("<LI>%s not defined!</LI>\n", option->keyword);
-#endif /* DEBUG */
-
-      DEBUG_puts("</UL></LI>");
-    }
-
-    DEBUG_printf(("</UL>\n"
-		  "<P>ppdConflicts(ppd) = %d\n", ppdConflicts(ppd)));
+    for (option = ppdFirstOption(ppd);
+         option;
+	 option = ppdNextOption(ppd))
+      if ((var = cgiGetVariable(option->keyword)) != NULL)
+      {
+	have_options = 1;
+	ppdMarkOption(ppd, option->keyword, var);
+      }
   }
 
   if (!have_options || ppdConflicts(ppd))
@@ -2928,7 +2919,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
 	  cgiSetVariable("KEYWORD", option->keyword);
 	  cgiSetVariable("KEYTEXT", option->text);
-	      
+
 	  if (option->conflicted)
 	    cgiSetVariable("CONFLICTED", "1");
 	  else
@@ -2938,13 +2929,6 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  cgiSetSize("TEXT", 0);
 	  for (k = 0, m = 0; k < option->num_choices; k ++)
 	  {
-	   /*
-	    * Hide custom option values...
-	    */
-
-	    if (!strcmp(option->choices[k].choice, "Custom"))
-	      continue;
-
 	    cgiSetArray("CHOICES", m, option->choices[k].choice);
 	    cgiSetArray("TEXT", m, option->choices[k].text);
 
@@ -2953,6 +2937,118 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	    if (option->choices[k].marked)
 	      cgiSetVariable("DEFCHOICE", option->choices[k].choice);
 	  }
+
+	  cgiSetSize("PARAMS", 0);
+	  cgiSetSize("PARAMTEXT", 0);
+	  cgiSetSize("PARAMVALUE", 0);
+	  cgiSetSize("INPUTTYPE", 0);
+
+	  if ((coption = ppdFindCustomOption(ppd, option->keyword)))
+	  {
+            const char *units = NULL;	/* Units value, if any */
+
+
+	    cgiSetVariable("ISCUSTOM", "1");
+
+	    for (cparam = ppdFirstCustomParam(coption), m = 0;
+		 cparam;
+		 cparam = ppdNextCustomParam(coption), m ++)
+	    {
+	      if (!strcasecmp(option->keyword, "PageSize") &&
+	          strcasecmp(cparam->name, "Width") &&
+		  strcasecmp(cparam->name, "Height"))
+              {
+	        m --;
+		continue;
+              }
+
+	      cgiSetArray("PARAMS", m, cparam->name);
+	      cgiSetArray("PARAMTEXT", m, cparam->text);
+	      cgiSetArray("INPUTTYPE", m, "text");
+
+	      switch (cparam->type)
+	      {
+		case PPD_CUSTOM_POINTS :
+		    if (!strncasecmp(option->defchoice, "Custom.", 7))
+		    {
+		      units = option->defchoice + strlen(option->defchoice) - 2;
+
+		      if (strcmp(units, "mm") && strcmp(units, "cm") &&
+		          strcmp(units, "in") && strcmp(units, "ft"))
+		      {
+		        if (units[1] == 'm')
+			  units ++;
+			else
+			  units = "pt";
+		      }
+		    }
+		    else
+		      units = "pt";
+
+                    if (!strcmp(units, "mm"))
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points / 72.0 * 25.4);
+                    else if (!strcmp(units, "cm"))
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points / 72.0 * 2.54);
+                    else if (!strcmp(units, "in"))
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points / 72.0);
+                    else if (!strcmp(units, "ft"))
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points / 72.0 / 12.0);
+                    else if (!strcmp(units, "m"))
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points / 72.0 * 0.0254);
+                    else
+		      snprintf(value, sizeof(value), "%g",
+		               cparam->current.custom_points);
+		    cgiSetArray("PARAMVALUE", m, value);
+		    break;
+
+		case PPD_CUSTOM_CURVE :
+		case PPD_CUSTOM_INVCURVE :
+		case PPD_CUSTOM_REAL :
+		    snprintf(value, sizeof(value), "%g",
+		             cparam->current.custom_real);
+		    cgiSetArray("PARAMVALUE", m, value);
+		    break;
+
+		case PPD_CUSTOM_INT:
+		    snprintf(value, sizeof(value), "%d",
+		             cparam->current.custom_int);
+		    cgiSetArray("PARAMVALUE", m, value);
+		    break;
+
+		case PPD_CUSTOM_PASSCODE:
+		case PPD_CUSTOM_PASSWORD:
+		    if (cparam->current.custom_password)
+		      cgiSetArray("PARAMVALUE", m,
+		                  cparam->current.custom_password);
+		    else
+		      cgiSetArray("PARAMVALUE", m, "");
+		    cgiSetArray("INPUTTYPE", m, "password");
+		    break;
+
+		case PPD_CUSTOM_STRING:
+		    if (cparam->current.custom_string)
+		      cgiSetArray("PARAMVALUE", m,
+		                  cparam->current.custom_string);
+		    else
+		      cgiSetArray("PARAMVALUE", m, "");
+		    break;
+	      }
+	    }
+
+            if (units)
+	    {
+	      cgiSetArray("PARAMS", m, "Units");
+	      cgiSetArray("PARAMTEXT", m, cgiText(_("Units")));
+	      cgiSetArray("PARAMVALUE", m, units);
+	    }
+	  }
+	  else
+	    cgiSetVariable("ISCUSTOM", "0");
 
 	  switch (option->ui)
 	  {
@@ -3199,16 +3295,20 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  if (!strcmp(keyword, "PageRegion") ||
 	      !strcmp(keyword, "PaperDimension") ||
 	      !strcmp(keyword, "ImageableArea"))
-	    var = cgiGetVariable("PageSize");
+	    var = get_option_value(ppd, "PageSize", value, sizeof(value));
 	  else
-	    var = cgiGetVariable(keyword);
+	    var = get_option_value(ppd, keyword, value, sizeof(value));
 
-	  if (var != NULL)
-	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
-	  else
+	  if (!var)
 	    cupsFilePrintf(out, "%s\n", line);
+	  else
+	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
 	}
       }
+
+     /*
+      * TODO: We need to set the port-monitor attribute!
+      */
 
       if ((var = cgiGetVariable("protocol")) != NULL)
 	cupsFilePrintf(out, "*cupsProtocol: %s\n", var);
@@ -3307,7 +3407,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
 
 /*
- * 'do_set_sharing()' - Set printer-is-shared value...
+ * 'do_set_sharing()' - Set printer-is-shared value.
  */
 
 static void
@@ -3396,6 +3496,294 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
   }
 
   cgiEndHTML();
+}
+
+
+/*
+ * 'get_option_value()' - Return the value of an option.
+ *
+ * This function also handles generation of custom option values.
+ */
+
+static char *				/* O - Value string or NULL on error */
+get_option_value(
+    ppd_file_t    *ppd,			/* I - PPD file */
+    const char    *name,		/* I - Option name */
+    char          *buffer,		/* I - String buffer */
+    size_t        bufsize)		/* I - Size of buffer */
+{
+  char		*bufptr,		/* Pointer into buffer */
+		*bufend;		/* End of buffer */
+  ppd_coption_t *coption;		/* Custom option */
+  ppd_cparam_t	*cparam;		/* Current custom parameter */
+  char		keyword[256];		/* Parameter name */
+  const char	*val,			/* Parameter value */
+		*uval;			/* Units value */
+  long		integer;		/* Integer value */
+  double	number,			/* Number value */
+		number_points;		/* Number in points */
+
+
+ /*
+  * See if we have a custom option choice...
+  */
+
+  if ((val = cgiGetVariable(name)) == NULL)
+  {
+   /*
+    * Option not found!
+    */
+
+    return (NULL);
+  }
+  else if (strcasecmp(val, "Custom") ||
+           (coption = ppdFindCustomOption(ppd, name)) == NULL)
+  {
+   /*
+    * Not a custom choice...
+    */
+
+    strlcpy(buffer, val, bufsize);
+    return (buffer);
+  }
+
+ /*
+  * OK, we have a custom option choice, format it...
+  */
+
+  *buffer = '\0';
+
+  if (!strcmp(coption->keyword, "PageSize"))
+  {
+    const char	*lval;			/* Length string value */
+    double	width,			/* Width value */
+		width_points,		/* Width in points */
+		length,			/* Length value */
+		length_points;		/* Length in points */
+
+
+    val  = cgiGetVariable("PageSize.Width");
+    lval = cgiGetVariable("PageSize.Height");
+    uval = cgiGetVariable("PageSize.Units");
+
+    if (!val || !lval || !uval ||
+        (width = strtod(val, NULL)) == 0.0 ||
+        (length = strtod(lval, NULL)) == 0.0 ||
+        (strcmp(uval, "pt") && strcmp(uval, "in") && strcmp(uval, "ft") &&
+	 strcmp(uval, "cm") && strcmp(uval, "mm") && strcmp(uval, "m")))
+      return (NULL);
+
+    width_points  = get_points(width, uval);
+    length_points = get_points(length, uval);
+
+    if (width_points < ppd->custom_min[0] ||
+        width_points > ppd->custom_max[0] ||
+        length_points < ppd->custom_min[1] ||
+	length_points > ppd->custom_max[1])
+      return (NULL);
+
+    snprintf(buffer, bufsize, "Custom.%gx%g%s", width, length, uval);
+  }
+  else if (cupsArrayCount(coption->params) == 1) 
+  {
+    cparam = ppdFirstCustomParam(coption);
+    snprintf(keyword, sizeof(keyword), "%s.%s", coption->keyword, cparam->name);
+
+    if ((val = cgiGetVariable(keyword)) == NULL)
+      return (NULL);
+
+    switch (cparam->type)
+    {
+      case PPD_CUSTOM_CURVE :
+      case PPD_CUSTOM_INVCURVE :
+      case PPD_CUSTOM_REAL :
+	  if ((number = strtod(val, NULL)) == 0.0 ||
+	      number < cparam->minimum.custom_real ||
+	      number > cparam->maximum.custom_real)
+	    return (NULL);
+
+          snprintf(buffer, bufsize, "Custom.%g", number);
+          break;
+
+      case PPD_CUSTOM_INT :
+          if (!*val || (integer = strtol(val, NULL, 10)) == LONG_MIN ||
+	      integer == LONG_MAX ||
+	      integer < cparam->minimum.custom_int ||
+	      integer > cparam->maximum.custom_int)
+            return (NULL);
+
+          snprintf(buffer, bufsize, "Custom.%ld", integer);
+          break;
+
+      case PPD_CUSTOM_POINTS :
+          snprintf(keyword, sizeof(keyword), "%s.Units", coption->keyword);
+
+	  if ((number = strtod(val, NULL)) == 0.0 ||
+	      (uval = cgiGetVariable(keyword)) == NULL ||
+	      (strcmp(uval, "pt") && strcmp(uval, "in") && strcmp(uval, "ft") &&
+	       strcmp(uval, "cm") && strcmp(uval, "mm") && strcmp(uval, "m")))
+	    return (NULL);
+
+	  number_points = get_points(number, uval);
+	  if (number_points < cparam->minimum.custom_points ||
+	      number_points > cparam->maximum.custom_points)
+	    return (NULL);
+
+	  snprintf(buffer, bufsize, "Custom.%g%s", number, uval);
+          break;
+
+      case PPD_CUSTOM_PASSCODE :
+          for (uval = val; *uval; uval ++)
+	    if (!isdigit(*uval & 255))
+	      return (NULL);
+
+      case PPD_CUSTOM_PASSWORD :
+      case PPD_CUSTOM_STRING :
+          integer = (long)strlen(val);
+	  if (integer < cparam->minimum.custom_string ||
+	      integer > cparam->maximum.custom_string)
+	    return (NULL);
+
+          snprintf(buffer, bufsize, "Custom.%s", val);
+	  break;
+    }
+  }
+  else
+  {
+    const char *prefix = "{";		/* Prefix string */
+
+
+    bufptr = buffer;
+    bufend = buffer + bufsize;
+
+    for (cparam = ppdFirstCustomParam(coption);
+	 cparam;
+	 cparam = ppdNextCustomParam(coption))
+    {
+      snprintf(keyword, sizeof(keyword), "%s.%s", coption->keyword,
+               cparam->name);
+
+      if ((val = cgiGetVariable(keyword)) == NULL)
+	return (NULL);
+
+      snprintf(bufptr, bufend - bufptr, "%s%s=", prefix, cparam->name);
+      bufptr += strlen(bufptr);
+      prefix = " ";
+
+      switch (cparam->type)
+      {
+	case PPD_CUSTOM_CURVE :
+	case PPD_CUSTOM_INVCURVE :
+	case PPD_CUSTOM_REAL :
+	    if ((number = strtod(val, NULL)) == 0.0 ||
+		number < cparam->minimum.custom_real ||
+		number > cparam->maximum.custom_real)
+	      return (NULL);
+
+	    snprintf(bufptr, bufend - bufptr, "%g", number);
+	    break;
+
+	case PPD_CUSTOM_INT :
+	    if (!*val || (integer = strtol(val, NULL, 10)) == LONG_MIN ||
+		integer == LONG_MAX ||
+		integer < cparam->minimum.custom_int ||
+		integer > cparam->maximum.custom_int)
+	      return (NULL);
+
+	    snprintf(bufptr, bufend - bufptr, "%ld", integer);
+	    break;
+
+	case PPD_CUSTOM_POINTS :
+	    snprintf(keyword, sizeof(keyword), "%s.Units", coption->keyword);
+
+	    if ((number = strtod(val, NULL)) == 0.0 ||
+		(uval = cgiGetVariable(keyword)) == NULL ||
+		(strcmp(uval, "pt") && strcmp(uval, "in") &&
+		 strcmp(uval, "ft") && strcmp(uval, "cm") &&
+		 strcmp(uval, "mm") && strcmp(uval, "m")))
+	      return (NULL);
+
+	    number_points = get_points(number, uval);
+	    if (number_points < cparam->minimum.custom_points ||
+		number_points > cparam->maximum.custom_points)
+	      return (NULL);
+
+	    snprintf(bufptr, bufend - bufptr, "%g%s", number, uval);
+	    break;
+
+	case PPD_CUSTOM_PASSCODE :
+	    for (uval = val; *uval; uval ++)
+	      if (!isdigit(*uval & 255))
+		return (NULL);
+
+	case PPD_CUSTOM_PASSWORD :
+	case PPD_CUSTOM_STRING :
+	    integer = (long)strlen(val);
+	    if (integer < cparam->minimum.custom_string ||
+		integer > cparam->maximum.custom_string)
+	      return (NULL);
+
+	    if ((bufptr + 2) > bufend)
+	      return (NULL);
+
+	    bufend --;
+	    *bufptr++ = '\"';
+
+	    while (*val && bufptr < bufend)
+	    {
+	      if (*val == '\\' || *val == '\"')
+	      {
+		if ((bufptr + 1) >= bufend)
+		  return (NULL);
+
+		*bufptr++ = '\\';
+	      }
+
+	      *bufptr++ = *val++;
+	    }
+
+	    if (bufptr >= bufend)
+	      return (NULL);
+
+	    *bufptr++ = '\"';
+	    *bufptr   = '\0';
+	    bufend ++;
+	    break;
+      }
+
+      bufptr += strlen(bufptr);
+    }
+
+    if (bufptr == buffer || (bufend - bufptr) < 2)
+      return (NULL);
+
+    strcpy(bufptr, "}");
+  }
+
+  return (buffer);
+}
+
+
+/*
+ * 'get_points()' - Get a value in points.
+ */
+
+static double				/* O - Number in points */
+get_points(double     number,		/* I - Original number */
+           const char *uval)		/* I - Units */
+{
+  if (!strcmp(uval, "mm"))		/* Millimeters */
+    return (number * 72.0 / 25.4);
+  else if (!strcmp(uval, "cm"))		/* Centimeters */
+    return (number * 72.0 / 2.54);
+  else if (!strcmp(uval, "in"))		/* Inches */
+    return (number * 72.0);
+  else if (!strcmp(uval, "ft"))		/* Feet */
+    return (number * 72.0 * 12.0);
+  else if (!strcmp(uval, "m"))		/* Meters */
+    return (number * 72.0 / 0.0254);
+  else					/* Points */
+    return (number);
 }
 
 

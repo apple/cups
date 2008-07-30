@@ -328,6 +328,7 @@ list_devices(void)
 	basedevice[255],	/* Base device filename for ports */
 	device_id[1024],	/* Device ID string */
 	make_model[1024],	/* Make and model */
+	info[1024],		/* Info string */
 	uri[1024];		/* Device URI */
 
 
@@ -359,10 +360,15 @@ list_devices(void)
       if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                               make_model, sizeof(make_model),
 			      NULL, uri, sizeof(uri)))
-	printf("direct %s \"%s\" \"%s LPT #%d\" \"%s\"\n", uri,
-	       make_model, make_model, i + 1, device_id);
+      {
+        snprintf(info, sizeof(info), "%s LPT #%d", make_model, i + 1);
+	cupsBackendReport("direct", uri, make_model, info, device_id, NULL);
+      }
       else
-	printf("direct %s \"Unknown\" \"LPT #%d\"\n", uri, i + 1);
+      {
+        snprintf(info, sizeof(info), "LPT #%d", i + 1);
+	cupsBackendReport("direct", uri, NULL, info, NULL, NULL);
+      }
 
       close(fd);
     }

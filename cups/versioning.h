@@ -3,7 +3,7 @@
  *
  *   API versioning definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -22,48 +22,33 @@
  * _CUPS_API_1_1, _CUPS_API_1_1_19, _CUPS_API_1_1_20, _CUPS_API_1_1_21,
  * _CUPS_API_1_2, _CUPS_API_1_3, _CUPS_API_1_4 - which add compiler-
  * specific attributes that flag functions that are deprecated or added
- * in particular releases.  On Mac OS X, the _CUPS_API_* constants are
- * defined based on the value of the MAC_OS_X_VERSION_MAX_ALLOWED constant
+ * in particular releases.
+ *
+ * On Mac OS X, the _CUPS_API_* constants are defined based on the values of
+ * the MAC_OS_X_VERSION_MIN_ALLOWED and MAC_OS_X_VERSION_MAX_ALLOWED constants
  * provided by the compiler.
  */
 
 #  if defined(__APPLE__) && !defined(_CUPS_SOURCE)
-#    if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_3
-#      define _CUPS_API_1_1_19 __attribute__((unavailable))
-#      define _CUPS_API_1_1_20 __attribute__((unavailable))
-#      define _CUPS_API_1_1_21 __attribute__((unavailable))
-#      define _CUPS_API_1_2 __attribute__((unavailable))
-#      define _CUPS_API_1_3 __attribute__((unavailable))
-#      define _CUPS_API_1_4 __attribute__((unavailable))
-#    elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_4
-#      define _CUPS_API_1_1_19
-#      define _CUPS_API_1_1_20 __attribute__((unavailable))
-#      define _CUPS_API_1_1_21 __attribute__((unavailable))
-#      define _CUPS_API_1_2 __attribute__((unavailable))
-#      define _CUPS_API_1_3 __attribute__((unavailable))
-#      define _CUPS_API_1_4 __attribute__((unavailable))
-#    elif MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_5
-#      define _CUPS_API_1_1_19
-#      define _CUPS_API_1_1_20
-#      define _CUPS_API_1_1_21
-#      define _CUPS_API_1_2 __attribute__((unavailable))
-#      define _CUPS_API_1_3 __attribute__((unavailable))
-#      define _CUPS_API_1_4 __attribute__((unavailable))
-#    elif MAC_OS_X_VERSION_MAX_ALLOWED == MAC_OS_X_VERSION_10_5
-#      define _CUPS_API_1_1_19
-#      define _CUPS_API_1_1_20
-#      define _CUPS_API_1_1_21
-#      define _CUPS_API_1_2
-#      define _CUPS_API_1_3
-#      define _CUPS_API_1_4 __attribute__((unavailable))
-#    else
-#      define _CUPS_API_1_1_19
-#      define _CUPS_API_1_1_20
-#      define _CUPS_API_1_1_21
-#      define _CUPS_API_1_2
-#      define _CUPS_API_1_3
-#      define _CUPS_API_1_4
-#    endif /* MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_x */
+#    include <AvailabilityMacros.h>
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER */
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER */
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER */
+#    ifndef AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
+#      define AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER __attribute__((unavailable))
+#    endif /* !AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER */
+#    define _CUPS_API_1_1_19 AVAILABLE_MAC_OS_X_VERSION_10_3_AND_LATER
+#    define _CUPS_API_1_1_20 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
+#    define _CUPS_API_1_1_21 AVAILABLE_MAC_OS_X_VERSION_10_4_AND_LATER
+#    define _CUPS_API_1_2 AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
+#    define _CUPS_API_1_3 AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
+#    define _CUPS_API_1_4 AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
 #  else
 #    define _CUPS_API_1_1_19
 #    define _CUPS_API_1_1_20

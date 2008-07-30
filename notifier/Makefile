@@ -58,9 +58,7 @@ install-data:
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
-			cp $$file $(SYMROOT); \
-		done \
+		cp mailto rss $(SYMROOT); \
 	fi
 
 
@@ -70,9 +68,8 @@ install-data:
 
 install-exec:
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
-	for file in $(TARGETS); do \
-		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
-	done
+	$(INSTALL_BIN) mailto $(SERVERBIN)/notifier
+	$(INSTALL_BIN) rss $(SERVERBIN)/notifier
 
 
 #

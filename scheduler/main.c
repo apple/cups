@@ -1418,6 +1418,7 @@ launchd_checkin(void)
 		    "launchd_checkin: launch_msg(\"" LAUNCH_KEY_CHECKIN
 		    "\") IPC failure");
     exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
   }
 
   if (launch_data_get_type(ld_resp) == LAUNCH_DATA_ERRNO)
@@ -1426,28 +1427,32 @@ launchd_checkin(void)
     cupsdLogMessage(CUPSD_LOG_ERROR, "launchd_checkin: Check-in failed: %s",
                     strerror(errno));
     exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
   }
 
  /*
   * Get the sockets dictionary...
   */
 
-  if (!(ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS)))
+  if ((ld_sockets = launch_data_dict_lookup(ld_resp, LAUNCH_JOBKEY_SOCKETS))
+          == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "launchd_checkin: No sockets found to answer requests on!");
     exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
   }
 
  /*
   * Get the array of listener sockets...
   */
 
-  if (!(ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")))
+  if ((ld_array = launch_data_dict_lookup(ld_sockets, "Listeners")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "launchd_checkin: No sockets found to answer requests on!");
     exit(EXIT_FAILURE);
+    return; /* anti-compiler-warning */
   }
 
  /*
@@ -1464,73 +1469,75 @@ launchd_checkin(void)
       * Get the launchd file descriptor and address...
       */
 
-      tmp     = launch_data_array_get_index(ld_array, i);
-      fd      = launch_data_get_fd(tmp);
-      addrlen = sizeof(addr);
-
-      if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
+      if ((tmp = launch_data_array_get_index(ld_array, i)) != NULL)
       {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "launchd_checkin: Unable to get local address - %s",
-			strerror(errno));
-	continue;
-      }
+	fd      = launch_data_get_fd(tmp);
+	addrlen = sizeof(addr);
 
-     /*
-      * Try to match the launchd socket address to one of the listeners...
-      */
-
-      for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
-	   lis;
-	   lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
-	if (httpAddrEqual(&lis->address, &addr))
-	  break;
-
-     /*
-      * Add a new listener If there's no match...
-      */
-
-      if (lis)
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		"launchd_checkin: Matched existing listener %s with fd %d...",
-		httpAddrString(&(lis->address), s, sizeof(s)), fd);
-      }
-      else
-      {
-	cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		"launchd_checkin: Adding new listener %s with fd %d...",
-		httpAddrString(&addr, s, sizeof(s)), fd);
-
-        if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
-        {
+	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen))
+	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-               	          "launchd_checkin: Unable to allocate listener - %s.",
-                	  strerror(errno));
-	  exit(EXIT_FAILURE);
-        }
+			  "launchd_checkin: Unable to get local address - %s",
+			  strerror(errno));
+	  continue;
+	}
 
-        cupsArrayAdd(Listeners, lis);
+       /*
+	* Try to match the launchd socket address to one of the listeners...
+	*/
 
-	memcpy(&lis->address, &addr, sizeof(lis->address));
-      }
+	for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	     lis;
+	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+	  if (httpAddrEqual(&lis->address, &addr))
+	    break;
 
-      lis->fd = fd;
+       /*
+	* Add a new listener If there's no match...
+	*/
+
+	if (lis)
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, 
+		  "launchd_checkin: Matched existing listener %s with fd %d...",
+		  httpAddrString(&(lis->address), s, sizeof(s)), fd);
+	}
+	else
+	{
+	  cupsdLogMessage(CUPSD_LOG_DEBUG, 
+		  "launchd_checkin: Adding new listener %s with fd %d...",
+		  httpAddrString(&addr, s, sizeof(s)), fd);
+
+	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
+	  {
+	    cupsdLogMessage(CUPSD_LOG_ERROR,
+			    "launchd_checkin: Unable to allocate listener - %s.",
+			    strerror(errno));
+	    exit(EXIT_FAILURE);
+	  }
+
+	  cupsArrayAdd(Listeners, lis);
+
+	  memcpy(&lis->address, &addr, sizeof(lis->address));
+	}
+
+	lis->fd = fd;
 
 #  ifdef HAVE_SSL
-      portnum = 0;
+	portnum = 0;
 
 #    ifdef AF_INET6
-      if (lis->address.addr.sa_family == AF_INET6)
-	portnum = ntohs(lis->address.ipv6.sin6_port);
-      else
+	if (lis->address.addr.sa_family == AF_INET6)
+	  portnum = ntohs(lis->address.ipv6.sin6_port);
+	else
 #    endif /* AF_INET6 */
-      if (lis->address.addr.sa_family == AF_INET)
-	portnum = ntohs(lis->address.ipv4.sin_port);
+	if (lis->address.addr.sa_family == AF_INET)
+	  portnum = ntohs(lis->address.ipv4.sin_port);
 
-      if (portnum == 443)
-	lis->encryption = HTTP_ENCRYPT_ALWAYS;
+	if (portnum == 443)
+	  lis->encryption = HTTP_ENCRYPT_ALWAYS;
 #  endif /* HAVE_SSL */
+      }
     }
   }
 

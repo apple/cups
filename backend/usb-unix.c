@@ -210,6 +210,7 @@ list_devices(void)
 	device_uri[1024],		/* Device URI string */
 	make_model[1024];		/* Make and model */
 
+
  /*
   * Try to open each USB device...
   */
@@ -245,8 +246,8 @@ list_devices(void)
     if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                             make_model, sizeof(make_model),
 			    "usb", device_uri, sizeof(device_uri)))
-      printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
-	     make_model, make_model, i + 1, device_id);
+      cupsBackendReport("direct", device_uri, make_model, make_model,
+                        device_id, NULL);
 
     close(fd);
   }
@@ -273,8 +274,8 @@ list_devices(void)
       if (!backendGetDeviceID(fd, device_id, sizeof(device_id),
                               make_model, sizeof(make_model),
 			      "usb", device_uri, sizeof(device_uri)))
-	printf("direct %s \"%s\" \"%s USB #%d\" \"%s\"\n", device_uri,
-	       make_model, make_model, i + 1, device_id);
+	cupsBackendReport("direct", device_uri, make_model, make_model,
+			  device_id, NULL);
 
       close(fd);
     }

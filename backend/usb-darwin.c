@@ -65,7 +65,7 @@
 *  cfstr_create_trim()	- Create CFString and trim whitespace characters.
 *  parse_options()	- Parse uri options.
 *  setup_cfLanguage()	- Create AppleLanguages array from LANG environment var.
-*  run_ppc_backend()	- Re-exec i386 backend as ppc.
+*  run_legacy_backend()	- Re-exec backend as ppc or i386.
 *  sigterm_handler()	- SIGTERM handler.
 *  next_line()		- Find the next line in a buffer.
 *  parse_pserror()	- Scan the backchannel data for postscript errors.
@@ -98,7 +98,10 @@
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 
+#include <spawn.h>
 #include <pthread.h>
+
+extern char **environ;
 
 
 /*
@@ -275,11 +278,11 @@ static void setup_cfLanguage(void);
 static void soft_reset();
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;					/* Child PID */
-static void run_ppc_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
+static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
 static void sigterm_handler(int sig);				/* SIGTERM handler */
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -392,17 +395,18 @@ print_device(const char *uri,		/* I - Device URI */
 
     status = registry_open(&driverBundlePath);
 
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
     /*
-     * If we were unable to load the class drivers for this printer it's probably because they're ppc-only.
-     * In this case try to fork & exec this backend as a ppc executable so we can use them...
+     * If we were unable to load the class drivers for this printer it's
+     * probably because they're ppc or i386. In this case try to run this
+     * backend as i386 or ppc executables so we can use them...
      */
     if (status == -2)
     {
-      run_ppc_backend(argc, argv, print_fd);
+      run_legacy_backend(argc, argv, print_fd);
       /* Never returns here */
     }
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
     if (status ==  -2)
     {
@@ -518,7 +522,7 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (print_fd != STDIN_FILENO)
     {
-      fputs("PAGE: 1 1", stderr);
+      fputs("PAGE: 1 1\n", stderr);
       lseek(print_fd, 0, SEEK_SET);
     }
 
@@ -1052,8 +1056,8 @@ static Boolean list_device_cb(void *refcon,
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
       strncat(uristr, optionsstr, sizeof(uristr));
 
-      printf("direct %s \"%s\" \"%s USB\" \"%s\"\n", uristr, make_modelstr,
-             make_modelstr, idstr);
+      cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
+                        NULL);
 
       release_deviceinfo(&make, &model, &serial);
       CFRelease(deviceIDString);
@@ -1154,7 +1158,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-error\n", stderr);
-  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
+  _cupsLangPuts(stderr, _("INFO: Printer is offline.\n"));
 
   if (getenv("CLASS") != NULL)
   {
@@ -1729,36 +1733,42 @@ static void setup_cfLanguage(void)
 }
 
 #pragma mark -
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 /*!
- * @function	run_ppc_backend
+ * @function	run_legacy_backend
  *
- * @abstract	Starts child backend process running as a ppc executable.
+ * @abstract	Starts child backend process running as a ppc or i386 executable.
  *
  * @result	Never returns; always calls exit().
  *
  * @discussion
  */
-static void run_ppc_backend(int argc,
-			    char *argv[],
-			    int fd)
+static void run_legacy_backend(int argc,
+			       char *argv[],
+			       int fd)
 {
   int	i;
   int	exitstatus = 0;
   int	childstatus;
   pid_t	waitpid_status;
   char	*my_argv[32];
-  char	*usb_ppc_status;
+  char	*usb_legacy_status;
 
-  /*
-   * If we're running as i386 and couldn't load the class driver (because they'it's
-   * ppc-only) then try to re-exec ourselves in ppc mode to try again. If we don't have
-   * a ppc architecture we may be running i386 again so guard against this by setting
-   * and testing an environment variable...
-   */
-  usb_ppc_status = getenv("USB_PPC_STATUS");
+ /*
+  * If we're running as x86_64 or i386 and couldn't load the class driver
+  * (because it's ppc or i386), then try to re-exec ourselves in ppc or i386
+  * mode to try again. If we don't have a ppc or i386 architecture we may be
+  * running with the same architecture again so guard against this by setting
+  * and testing an environment variable...
+  */
 
-  if (usb_ppc_status == NULL)
+#  ifdef __x86_64__
+  usb_legacy_status = getenv("USB_I386_STATUS");
+#  else
+  usb_legacy_status = getenv("USB_PPC_STATUS");
+#  endif /* __x86_64__ */
+
+  if (!usb_legacy_status)
   {
    /*
     * Setup a SIGTERM handler then block it before forking...
@@ -1777,57 +1787,49 @@ static void run_ppc_backend(int argc,
     sigaddset(&newmask, SIGTERM);
     sigprocmask(SIG_BLOCK, &newmask, &oldmask);
 
-    if ((child_pid = fork()) == 0)
+   /*
+    * Set the environment variable...
+    */
+
+#  ifdef __x86_64__
+    setenv("USB_I386_STATUS", "1", false);
+#  else
+    setenv("USB_PPC_STATUS", "1", false);
+#  endif /* __x86_64__ */
+
+   /*
+    * Tell the kernel to use the specified CPU architecture...
+    */
+
+#  ifdef __x86_64__
+    cpu_type_t cpu = CPU_TYPE_I386;
+#  else
+    cpu_type_t cpu = CPU_TYPE_POWERPC;
+#  endif /* __x86_64__ */
+    size_t ocount = 0;
+    posix_spawnattr_t attrs;
+
+    if (!posix_spawnattr_init(&attrs))
     {
-     /*
-      * Child comes here...
-      */
+      posix_spawnattr_setsigdefault(attrs, &oldmask);
+      posix_spawnattr_setbinpref_np(attrs, 1, &cpu, &ocount);
+    }
 
-      setenv("USB_PPC_STATUS", "1", false);
+   /*
+    * Set up the arguments and call posix_spawn...
+    */
 
-     /*
-      * Unblock signals before doing the exec...
-      */
+    for (i = 0; i < argc && i < (sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
+      my_argv[i] = argv[i];
 
-      memset(&action, 0, sizeof(action));
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_DFL;
-      sigaction(SIGTERM, &action, NULL);
+    my_argv[i] = NULL;
 
-      sigprocmask(SIG_SETMASK, &oldmask, NULL);
-
-     /*
-      * Tell the kernel the next exec call should favor the ppc architecture...
-      */
-
-      int mib[] = { CTL_KERN, KERN_AFFINITY, 1, 1 };
-      int namelen = 4;
-      sysctl(mib, namelen, NULL, NULL, NULL, 0);
-
-     /*
-      * Set up the arguments and call exec...
-      */
-
-      for (i = 0; i < argc && i < (sizeof(my_argv)/sizeof(my_argv[0])) - 1; i++)
-	my_argv[i] = argv[i];
-
-      my_argv[i] = NULL;
-
-      execv("/usr/libexec/cups/backend/usb", my_argv);
-
+    if (posix_spawn(&child_pid, "/usr/libexec/cups/backend/usb", NULL, &attrs,
+                    my_argv, environ))
+    {
       _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
       perror("DEBUG: Unable to exec /usr/libexec/cups/backend/usb");
-      exit(errno);
-    }
-    else if (child_pid < 0)
-    {
-     /*
-      * Error - couldn't fork a new process!
-      */
-
-      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
-      perror("DEBUG: Unable to fork");
-      exit(errno);
+      exit(CUPS_BACKEND_STOP);
     }
 
    /*
@@ -1851,9 +1853,9 @@ static void run_ppc_backend(int argc,
 
     if (WIFSIGNALED(childstatus))
     {
-      exitstatus = WTERMSIG(childstatus);
+      exitstatus = CUPS_BACKEND_STOP;
       fprintf(stderr, "DEBUG: usb(legacy) backend %d crashed on signal %d!\n",
-              child_pid, exitstatus);
+              child_pid, WTERMSIG(childstatus));
     }
     else
     {
@@ -1869,7 +1871,7 @@ static void run_ppc_backend(int argc,
   else
   {
     fputs("DEBUG: usb(legacy) backend running native again\n", stderr);
-    exitstatus = ENOENT;
+    exitstatus = CUPS_BACKEND_STOP;
   }
 
   exit(exitstatus);
@@ -1889,7 +1891,7 @@ static void sigterm_handler(int sig)
   exit(1);
 }
 
-#endif /* __i386__ */
+#endif /* __i386__ || __x86_64__ */
 
 
 #ifdef PARSE_PS_ERRORS

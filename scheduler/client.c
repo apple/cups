@@ -76,6 +76,10 @@ extern const char *cssmErrorString(int error);
 #  include <gnutls/x509.h>
 #endif /* HAVE_GNUTLS */
 
+#ifdef HAVE_TCPD_H
+#  include <tcpd.h>
+#endif /* HAVE_TCPD_H */
+
 
 /*
  * Local functions...
@@ -125,6 +129,9 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
   char			*hostname;	/* Hostname for address */
   http_addr_t		temp;		/* Temporary address variable */
   static time_t		last_dos = 0;	/* Time of last DoS attack */
+#ifdef HAVE_TCPD_H
+  struct request_info	wrap_req;	/* TCP wrappers request information */
+#endif /* HAVE_TCPD_H */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -240,7 +247,9 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
       cupsdLogMessage(CUPSD_LOG_WARN,
                       "Possible DoS attack - more than %d clients connecting "
 		      "from %s!",
-	              MaxClientsPerHost, con->http.hostname);
+	              MaxClientsPerHost,
+		      httpAddrString(con->http.hostaddr, con->http.hostname,
+		                     sizeof(con->http.hostname)));
     }
 
 #ifdef WIN32
@@ -322,7 +331,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     * Do double lookups as needed...
     */
 
-    if ((addrlist = httpAddrGetList(con->http.hostname, AF_UNSPEC, NULL)) != NULL)
+    if ((addrlist = httpAddrGetList(con->http.hostname, AF_UNSPEC, NULL))
+            != NULL)
     {
      /*
       * See if the hostname maps to the same IP address...
@@ -361,6 +371,34 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
       return;
     }
   }
+
+#ifdef HAVE_TCPD_H
+ /*
+  * See if the connection is denied by TCP wrappers...
+  */
+
+  request_init(&wrap_req, RQ_DAEMON, "cupsd", RQ_FILE, con->http.fd, NULL);
+  fromhost(&wrap_req);
+
+  if (!hosts_access(&wrap_req))
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdAcceptClient: Closing connection %d...",
+                    con->http.fd);
+
+#ifdef WIN32
+    closesocket(con->http.fd);
+#else
+    close(con->http.fd);
+#endif /* WIN32 */
+
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "Connection from %s refused by /etc/hosts.allow and "
+		    "/etc/hosts.deny rules.", con->http.hostname);
+    free(con);
+    return;
+  }
+#endif /* HAVE_TCPD_H */
 
 #ifdef AF_INET6
   if (con->http.hostaddr->addr.sa_family == AF_INET6)

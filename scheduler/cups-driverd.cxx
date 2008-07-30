@@ -76,7 +76,7 @@ static const char * const ppd_types[] =	/* ppd-type values */
 typedef struct				/**** PPD record ****/
 {
   time_t	mtime;			/* Modification time */
-  size_t	size;			/* Size in bytes */
+  off_t		size;			/* Size in bytes */
   int		model_number;		/* cupsModelNumber */
   int		type;			/* ppd-type */
   char		filename[512],		/* Filename */

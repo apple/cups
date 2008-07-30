@@ -111,6 +111,16 @@
  * Types...
  */
 
+enum					/**** Request IDs for each field ****/
+{
+  DEVICE_TYPE = 1,
+  DEVICE_DESCRIPTION,
+  DEVICE_LOCATION,
+  DEVICE_ID,
+  DEVICE_URI,
+  DEVICE_PRODUCT
+};
+
 typedef struct device_uri_s		/**** DeviceURI values ****/
 {
   regex_t	re;			/* Regular expression to match */
@@ -124,7 +134,9 @@ typedef struct snmp_cache_s		/**** SNMP scan cache ****/
 		*uri,			/* device-uri */
 		*id,			/* device-id */
 		*info,			/* device-info */
+		*location,		/* device-location */
 		*make_and_model;	/* device-make-and-model */
+  int		sent;			/* Has this device been listed? */
 } snmp_cache_t;
 
 
@@ -174,14 +186,15 @@ static cups_array_t	*Addresses = NULL;
 static cups_array_t	*Communities = NULL;
 static cups_array_t	*Devices = NULL;
 static int		DebugLevel = 0;
-static const int	DeviceDescOID[] = { CUPS_OID_hrDeviceDescr, 1, -1 };
-static unsigned		DeviceDescRequest;
+static const int	DescriptionOID[] = { CUPS_OID_hrDeviceDescr, 1, -1 };
+static const int	LocationOID[] = { CUPS_OID_sysLocation, 0, -1 };
 static const int	DeviceTypeOID[] = { CUPS_OID_hrDeviceType, 1, -1 };
-static unsigned		DeviceTypeRequest;
 static const int	DeviceIdOID[] = { CUPS_OID_ppmPrinterIEEE1284DeviceId, 1, -1 };
-static unsigned		DeviceIdRequest;
-static const int	DeviceUriOID[] = { CUPS_OID_ppmPortServiceNameOrURI, 1, 1, -1 };
-static unsigned		DeviceUriRequest;
+static const int	UriOID[] = { CUPS_OID_ppmPortServiceNameOrURI, 1, 1, -1 };
+static const int	LexmarkProductOID[] = { 1,3,6,1,4,1,641,2,1,2,1,2,1,-1 };
+static const int	LexmarkProductOID2[] = { 1,3,6,1,4,1,674,10898,100,2,1,2,1,2,1,-1 };
+static const int	LexmarkDeviceIdOID[] = { 1,3,6,1,4,1,641,2,1,2,1,3,1,-1 };
+static const int	XeroxProductOID[] = { 1,3,6,1,4,1,128,2,1,3,1,2,0,-1 };
 static cups_array_t	*DeviceURIs = NULL;
 static int		HostNameLookups = 0;
 static int		MaxRunTime = 120;
@@ -660,15 +673,8 @@ static void
 list_device(snmp_cache_t *cache)	/* I - Cached device */
 {
   if (cache->uri)
-  {
-    printf("network %s \"%s\" \"%s %s\" \"%s\"\n",
-           cache->uri,
-	   cache->make_and_model ? cache->make_and_model : "Unknown",
-	   cache->info ? cache->info : "Unknown",
-	   cache->addrname,
-	   cache->id ? cache->id : "");
-    fflush(stdout);
-  }
+    cupsBackendReport("network", cache->uri, cache->make_and_model,
+                      cache->info, cache->id, cache->location);
 }
 
 
@@ -953,156 +959,172 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
   * Process the message...
   */
 
-  if (packet.request_id == DeviceTypeRequest)
+  switch (packet.request_id)
   {
-   /*
-    * Got the device type response...
-    */
+    case DEVICE_TYPE :
+       /*
+	* Got the device type response...
+	*/
 
-    if (device)
-    {
-      debug_printf("DEBUG: Discarding duplicate device type for \"%s\"...\n",
-	           addrname);
-      return;
-    }
+	if (device)
+	{
+	  debug_printf("DEBUG: Discarding duplicate device type for \"%s\"...\n",
+		       addrname);
+	  return;
+	}
 
-   /*
-    * Add the device and request the device description...
-    */
+       /*
+	* Add the device and request the device data...
+	*/
 
-    add_cache(&(packet.address), addrname, NULL, NULL, NULL);
+	add_cache(&(packet.address), addrname, NULL, NULL, NULL);
 
-    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
-                  CUPS_ASN1_GET_REQUEST, DeviceDescRequest, DeviceDescOID);
-    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
-                  CUPS_ASN1_GET_REQUEST, DeviceIdRequest, DeviceIdOID);
-    _cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1, packet.community,
-                  CUPS_ASN1_GET_REQUEST, DeviceUriRequest, DeviceUriOID);
-  }
-  else if (packet.request_id == DeviceDescRequest &&
-           packet.object_type == CUPS_ASN1_OCTET_STRING)
-  {
-   /*
-    * Update an existing cache entry...
-    */
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_DESCRIPTION, DescriptionOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_ID, DeviceIdOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_URI, UriOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_LOCATION, LocationOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_PRODUCT, LexmarkProductOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_PRODUCT, LexmarkProductOID2);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_URI, LexmarkDeviceIdOID);
+	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
+	               packet.community, CUPS_ASN1_GET_REQUEST,
+		       DEVICE_PRODUCT, XeroxProductOID);
+        break;
 
-    char	make_model[256];	/* Make and model */
+    case DEVICE_DESCRIPTION :
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING)
+	{
+	 /*
+	  * Update an existing cache entry...
+	  */
 
-
-    if (!device)
-    {
-      debug_printf("DEBUG: Discarding device description for \"%s\"...\n",
-	           addrname);
-      return;
-    }
-
-    if (strchr(packet.object_value.string, ':') &&
-	strchr(packet.object_value.string, ';'))
-    {
-     /*
-      * Description is the IEEE-1284 device ID...
-      */
-
-      if (!device->id)
-	device->id = strdup(packet.object_value.string);
-
-      backendGetMakeModel(packet.object_value.string, make_model,
-			  sizeof(make_model));
-      device->info = strdup(make_model);
-    }
-    else
-    {
-     /*
-      * Description is plain text...
-      */
-
-      fix_make_model(make_model, packet.object_value.string,
-		     sizeof(make_model));
-
-      device->info = strdup(packet.object_value.string);
-    }
-
-    if (!device->make_and_model)
-      device->make_and_model = strdup(make_model);
-
-   /*
-    * List the device now if we have all the info...
-    */
-
-    if (device->id && device->info && device->make_and_model && device->uri)
-      list_device(device);
-  }
-  else if (packet.request_id == DeviceIdRequest &&
-           packet.object_type == CUPS_ASN1_OCTET_STRING)
-  {
-   /*
-    * Update an existing cache entry...
-    */
-
-    char	make_model[256];	/* Make and model */
+	  char	make_model[256];	/* Make and model */
 
 
-    if (!device)
-    {
-      debug_printf("DEBUG: Discarding device ID for \"%s\"...\n",
-	           addrname);
-      return;
-    }
+	  if (strchr(packet.object_value.string, ':') &&
+	      strchr(packet.object_value.string, ';'))
+	  {
+	   /*
+	    * Description is the IEEE-1284 device ID...
+	    */
 
-    if (device->id)
-      free(device->id);
+	    if (!device->id)
+	      device->id = strdup(packet.object_value.string);
 
-    device->id = strdup(packet.object_value.string);
+	    backendGetMakeModel(packet.object_value.string, make_model,
+				sizeof(make_model));
 
-   /*
-    * Convert the ID to a make and model string...
-    */
+            if (device->info)
+	      free(device->info);
 
-    backendGetMakeModel(packet.object_value.string, make_model,
-			sizeof(make_model));
-    if (device->make_and_model)
-      free(device->make_and_model);
+	    device->info = strdup(make_model);
+	  }
+	  else
+	  {
+	   /*
+	    * Description is plain text...
+	    */
 
-    device->make_and_model = strdup(make_model);
+	    fix_make_model(make_model, packet.object_value.string,
+			   sizeof(make_model));
 
-   /*
-    * List the device now if we have all the info...
-    */
+            if (device->info)
+	      free(device->info);
 
-    if (device->id && device->info && device->make_and_model && device->uri)
-      list_device(device);
-  }
-  else if (packet.request_id == DeviceUriRequest &&
-           packet.object_type == CUPS_ASN1_OCTET_STRING)
-  {
-   /*
-    * Update an existing cache entry...
-    */
+	    device->info = strdup(packet.object_value.string);
+	  }
 
-    if (!device)
-    {
-      debug_printf("DEBUG: Discarding device URI for \"%s\"...\n",
-	           addrname);
-      return;
-    }
+	  if (!device->make_and_model)
+	    device->make_and_model = strdup(make_model);
+        }
+	break;
 
-    if (!strncmp(packet.object_value.string, "lpr:", 4))
-    {
-     /*
-      * We want "lpd://..." for the URI...
-      */
+    case DEVICE_ID :
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING)
+	{
+	 /*
+	  * Update an existing cache entry...
+	  */
 
-      packet.object_value.string[2] = 'd';
-    }
+	  char	make_model[256];	/* Make and model */
 
-    device->uri = strdup(packet.object_value.string);
 
-   /*
-    * List the device now if we have all the info...
-    */
+	  if (device->id)
+	    free(device->id);
 
-    if (device->id && device->info && device->make_and_model && device->uri)
-      list_device(device);
+	  device->id = strdup(packet.object_value.string);
+
+	 /*
+	  * Convert the ID to a make and model string...
+	  */
+
+	  backendGetMakeModel(packet.object_value.string, make_model,
+			      sizeof(make_model));
+	  if (device->make_and_model)
+	    free(device->make_and_model);
+
+	  device->make_and_model = strdup(make_model);
+	}
+	break;
+
+    case DEVICE_LOCATION :
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
+	    !device->location)
+	  device->location = strdup(packet.object_value.string);
+	break;
+
+    case DEVICE_PRODUCT :
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
+	    !device->id)
+	{
+	 /*
+	  * Update an existing cache entry...
+	  */
+
+          if (!device->info)
+	    device->info = strdup(packet.object_value.string);
+
+          if (device->make_and_model)
+	    free(device->make_and_model);
+
+	  device->make_and_model = strdup(packet.object_value.string);
+	}
+	break;
+
+    case DEVICE_URI :
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
+	    !device->uri)
+	{
+	 /*
+	  * Update an existing cache entry...
+	  */
+
+	  if (!strncmp(packet.object_value.string, "lpr:", 4))
+	  {
+	   /*
+	    * We want "lpd://..." for the URI...
+	    */
+
+	    packet.object_value.string[2] = 'd';
+	  }
+
+	  device->uri = strdup(packet.object_value.string);
+	}
+	break;
   }
 }
 
@@ -1141,14 +1163,7 @@ scan_devices(int fd)			/* I - SNMP socket */
   snmp_cache_t		*device;	/* Current device */
 
 
- /*
-  * Setup the request IDs...
-  */
-
   gettimeofday(&StartTime, NULL);
-
-  DeviceTypeRequest = StartTime.tv_sec;
-  DeviceDescRequest = StartTime.tv_sec + 1;
 
  /*
   * First send all of the broadcast queries...
@@ -1189,7 +1204,7 @@ scan_devices(int fd)			/* I - SNMP socket */
 
       for (addr = addrs; addr; addr = addr->next)
         _cupsSNMPWrite(fd, &(addr->addr), CUPS_SNMP_VERSION_1, community,
-	              CUPS_ASN1_GET_REQUEST, DeviceTypeRequest, DeviceTypeOID);
+	               CUPS_ASN1_GET_REQUEST, DEVICE_TYPE, DeviceTypeOID);
     }
 
     httpAddrFreeList(addrs);
@@ -1219,21 +1234,30 @@ scan_devices(int fd)			/* I - SNMP socket */
     if (FD_ISSET(fd, &input))
       read_snmp_response(fd);
     else
-      break;
+    {
+     /*
+      * List devices with complete information...
+      */
+
+      int sent_something = 0;
+
+      for (device = (snmp_cache_t *)cupsArrayFirst(Devices);
+           device;
+	   device = (snmp_cache_t *)cupsArrayNext(Devices))
+        if (!device->sent && device->info && device->make_and_model)
+	{
+	  if (device->uri)
+	    list_device(device);
+	  else
+	    probe_device(device);
+
+	  device->sent = sent_something = 1;
+	}
+
+      if (!sent_something)
+        break;
+    }
   }
-
- /*
-  * Finally, probe all of the printers we discovered to see how they are
-  * connected...
-  */
-
-  for (device = (snmp_cache_t *)cupsArrayFirst(Devices);
-       device;
-       device = (snmp_cache_t *)cupsArrayNext(Devices))
-    if (MaxRunTime > 0 && run_time() >= MaxRunTime)
-      break;
-    else if (!device->uri)
-      probe_device(device);
 
   debug_printf("DEBUG: %.3f Scan complete!\n", run_time());
 }

@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.9
 
+	- Refined the cupstestppd utility.
 	- ppdEmit*() did not support custom JCL options (STR #2889)
 	- The cupstestppd utility incorrectly reported missing
 	  "en" base translations (STR #2887)

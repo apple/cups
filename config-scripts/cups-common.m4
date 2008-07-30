@@ -188,6 +188,19 @@ if test $check_libusb = yes; then
 			LIBUSB="-lusb")])
 fi
 
+dnl See if we have libwrap for TCP wrappers support...
+AC_ARG_ENABLE(tcp_wrappers, [  --enable-tcp-wrappers   use libwrap for TCP wrappers support, default=no])
+
+LIBWRAP=""
+AC_SUBST(LIBWRAP)
+
+if test x$enable_tcp_wrappers = xyes; then
+	AC_CHECK_LIB(wrap, hosts_access,[
+		AC_CHECK_HEADER(tcpd.h,
+			AC_DEFINE(HAVE_TCPD_H)
+			LIBWRAP="-lwrap")])
+fi
+
 dnl Flags for "ar" command...
 case $uname in
         Darwin* | *BSD*)

@@ -51,6 +51,9 @@ extern "C" {
 /* Host MIB */
 #define CUPS_OID_mib2				1,3,6,1,2,1
 
+#define CUPS_OID_system				CUPS_OID_mib2,1
+#define CUPS_OID_sysLocation			CUPS_OID_system,6
+
 #define CUPS_OID_host				CUPS_OID_mib2,25
 
 #define CUPS_OID_hrSystem			CUPS_OID_host,1
