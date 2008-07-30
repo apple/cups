@@ -145,6 +145,7 @@ if test -n "$GCC"; then
 		# Additional warning options for development testing...
 		if test -d .svn; then
 			OPTIM="-Wshadow -Wunused $OPTIM"
+			CFLAGS="-Werror-implicit-function-declaration $CFLAGS"
 			PHPOPTIONS="-Wno-shadow"
 		fi
 	fi
