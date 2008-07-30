@@ -31,9 +31,9 @@
  *                           server.
  *   cupsSetDests2()       - Save the list of destinations for the specified
  *                           server.
+ *   appleCopyNetwork()    - Get the network ID for the current location.
  *   appleGetDefault()     - Get the default printer for this location.
  *   appleGetLocations()   - Get the location history array.
- *   appleGetNetwork()     - Get the network ID for the current location.
  *   appleGetPrinter()     - Get a printer from the history array.
  *   appleSetDefault()     - Set the default printer for this location.
  *   appleUseLastPrinter() - Get the default printer preference value.
@@ -73,9 +73,9 @@
  */
 
 #ifdef __APPLE__
+static CFStringRef appleCopyNetwork(void);
 static char	*appleGetDefault(char *name, int namesize);
 static CFArrayRef appleGetLocations(void);
-static CFStringRef appleGetNetwork(void);
 static CFStringRef appleGetPrinter(CFArrayRef locations, CFStringRef network,
 		                   CFIndex *locindex);
 static void	appleSetDefault(const char *name);
@@ -930,6 +930,44 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
 #ifdef __APPLE__
 /*
+ * 'appleCopyNetwork()' - Get the network ID for the current location.
+ */
+
+static CFStringRef			/* O - Network ID */
+appleCopyNetwork(void)
+{
+  SCDynamicStoreRef	dynamicStore;	/* System configuration data */
+  CFStringRef		key;		/* Current network configuration key */
+  CFDictionaryRef	ip_dict;	/* Network configuration data */
+  CFStringRef		network = NULL;	/* Current network ID */
+  
+
+  if ((dynamicStore = SCDynamicStoreCreate(NULL, CFSTR("Printing"), NULL,
+                                           NULL)) != NULL)
+  {
+    if ((key = SCDynamicStoreKeyCreateNetworkGlobalEntity(
+                   NULL, kSCDynamicStoreDomainState, kSCEntNetIPv4)) != NULL)
+    {
+      if ((ip_dict = SCDynamicStoreCopyValue(dynamicStore, key)) != NULL)
+      {
+	if ((network = CFDictionaryGetValue(ip_dict,
+	                                    kSCPropNetIPv4Router)) != NULL)
+          CFRetain(network);
+
+        CFRelease(ip_dict);
+      }
+
+      CFRelease(key);
+    }
+
+    CFRelease(dynamicStore);
+  }
+
+  return (network);
+}
+
+
+/*
  * 'appleGetDefault()' - Get the default printer for this location.
  */
 
@@ -957,7 +995,7 @@ appleGetDefault(char *name,		/* I - Name buffer */
   * Get the current location...
   */
 
-  if ((network = appleGetNetwork()) == NULL)
+  if ((network = appleCopyNetwork()) == NULL)
   {
     DEBUG_puts("appleGetDefault: Unable to get current network...");
     return (NULL);
@@ -980,6 +1018,8 @@ appleGetDefault(char *name,		/* I - Name buffer */
 
     DEBUG_puts("appleGetDefault: Missing or bad location history array...");
 
+    CFRelease(network);
+
     return (NULL);
   }
   
@@ -990,6 +1030,8 @@ appleGetDefault(char *name,		/* I - Name buffer */
     CFStringGetCString(locprinter, name, namesize, kCFStringEncodingUTF8);
   else
     name[0] = '\0';
+
+  CFRelease(network);
 
   DEBUG_printf(("appleGetDefault: Returning \"%s\"...\n", name));
 
@@ -1022,44 +1064,6 @@ appleGetLocations(void)
   }
 
   return (locations);
-}
-
-
-/*
- * 'appleGetNetwork()' - Get the network ID for the current location.
- */
-
-static CFStringRef			/* O - Network ID */
-appleGetNetwork(void)
-{
-  SCDynamicStoreRef	dynamicStore;	/* System configuration data */
-  CFStringRef		key;		/* Current network configuration key */
-  CFDictionaryRef	ip_dict;	/* Network configuration data */
-  CFStringRef		network = NULL;	/* Current network ID */
-  
-
-  if ((dynamicStore = SCDynamicStoreCreate(NULL, CFSTR("Printing"), NULL,
-                                           NULL)) != NULL)
-  {
-    if ((key = SCDynamicStoreKeyCreateNetworkGlobalEntity(
-                   NULL, kSCDynamicStoreDomainState, kSCEntNetIPv4)) != NULL)
-    {
-      if ((ip_dict = SCDynamicStoreCopyValue(dynamicStore, key)) != NULL)
-      {
-	if ((network = CFDictionaryGetValue(ip_dict,
-	                                    kSCPropNetIPv4Router)) != NULL)
-          CFRetain(network);
-
-        CFRelease(ip_dict);
-      }
-
-      CFRelease(key);
-    }
-
-    CFRelease(dynamicStore);
-  }
-
-  return (network);
 }
 
 
@@ -1122,7 +1126,7 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
   * Get the current location...
   */
 
-  if ((network = appleGetNetwork()) == NULL)
+  if ((network = appleCopyNetwork()) == NULL)
   {
     DEBUG_puts("appleSetDefault: Unable to get current network...");
     return;
@@ -1202,6 +1206,7 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
       CFRelease(newlocation);
   }
 
+  CFRelease(network);
   CFRelease(newprinter);
 }
 
