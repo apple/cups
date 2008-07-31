@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
 <!--
+    $Id$
+
     Service manifest for CUPS.
 
     This service manifest introduces smf(5) services for CUPS.  The services
@@ -15,7 +17,7 @@
 
     Norm.Jacobs@Sun.COM
 
-    $Id$
+    CUPS data files in @datarootdir@...
 -->
 
 <service_bundle type='manifest' name='SUNWcups:services'>
