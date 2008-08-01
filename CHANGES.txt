@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-07-28
+CHANGES.txt - 2008-08-01
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- New RSS subscriptions now create their feed files immediately
+	  (STR #2853)
 	- Added support for a device-location attribute which provides
 	  the physical location of a printer device.
 	- Added a cupsBackendReport() API which handles quoting of the

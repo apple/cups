@@ -389,6 +389,13 @@ cupsdAddSubscription(
 
   cupsArrayAdd(Subscriptions, temp);
 
+ /*
+  * For RSS subscriptions, run the notifier immediately...
+  */
+
+  if (uri && !strncmp(uri, "rss:", 4))
+    cupsd_start_notifier(temp);
+
   return (temp);
 }
 
