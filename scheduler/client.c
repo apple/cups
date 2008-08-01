@@ -29,6 +29,7 @@
  *   cupsdWriteClient()      - Write data to a client as needed.
  *   check_if_modified()     - Decode an "If-Modified-Since" line.
  *   compare_clients()       - Compare two client connections.
+ *   data_ready()            - Check whether data is available from a client.
  *   encrypt_client()        - Enable encryption for the client...
  *   get_cdsa_certificate()  - Convert a keychain name into the CFArrayRef
  *			       required by SSLSetCertificate.
@@ -89,6 +90,7 @@ static int		check_if_modified(cupsd_client_t *con,
 			                  struct stat *filestats);
 static int		compare_clients(cupsd_client_t *a, cupsd_client_t *b,
 			                void *data);
+static int		data_ready(cupsd_client_t *con);
 #ifdef HAVE_SSL
 static int		encrypt_client(cupsd_client_t *con);
 #endif /* HAVE_SSL */
@@ -1046,8 +1048,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	*/
 
         while ((status = httpUpdate(HTTP(con))) == HTTP_CONTINUE)
-	  if (con->http.used == 0 ||
-	      !memchr(con->http.buffer, '\n', con->http.used))
+	  if (!data_ready(con))
 	    break;
 
 	if (status != HTTP_OK && status != HTTP_CONTINUE)
@@ -1946,7 +1947,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    }
 	  }
         }
-	while (con->http.state == HTTP_PUT_RECV && con->http.used > 0);
+	while (con->http.state == HTTP_PUT_RECV && data_ready(con));
 
         if (con->http.state == HTTP_WAITING)
 	{
@@ -2121,7 +2122,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    }
 	  }
         }
-	while (con->http.state == HTTP_POST_RECV && con->http.used > 0);
+	while (con->http.state == HTTP_POST_RECV && data_ready(con));
 
 	if (con->http.state == HTTP_POST_SEND)
 	{
@@ -3003,6 +3004,38 @@ compare_clients(cupsd_client_t *a,	/* I - First client */
     return (-1);
   else
     return (1);
+}
+
+
+/*
+ * 'data_ready()' - Check whether data is available from a client.
+ */
+
+static int				/* O - 1 if data is ready, 0 otherwise */
+data_ready(cupsd_client_t *con)		/* I - Client */
+{
+  if (con->http.used > 0)
+    return (1);
+#ifdef HAVE_SSL
+  else if (con->http.tls)
+  {
+#  ifdef HAVE_LIBSSL
+    if (SSL_pending((SSL *)(con->http.tls)))
+      return (1);
+#  elif defined(HAVE_GNUTLS)
+    if (gnutls_record_check_pending(((http_tls_t *)(con->http.tls))->session))
+      return (1);
+#  elif defined(HAVE_CDSASSL)
+    size_t bytes;			/* Bytes that are available */
+
+    if (!SSLGetBufferedReadSize(((http_tls_t *)(con->http.tls))->session,
+                                &bytes) && bytes > 0)
+      return (1);
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
+
+  return (0);
 }
 
 
