@@ -3,6 +3,9 @@ CHANGES.txt - 2008-08-04
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now returns a "forbidden" error when a user
+	  correctly authenticates but does not have permission to
+	  continue further (STR #2101)
 	- The scheduler now loads both the server and CA certificates
 	  (if present) from the ServerCertificate file (STR #2146)
 	- New RSS subscriptions now create their feed files immediately

@@ -2154,7 +2154,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 	  return (HTTP_OK);
       }
 
-      return (HTTP_UNAUTHORIZED);
+      return (HTTP_FORBIDDEN);
     }
 #endif /* HAVE_AUTHORIZATION_H */
 
@@ -2178,7 +2178,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
         return (HTTP_OK);
     }
 
-    return (HTTP_UNAUTHORIZED);
+    return (HTTP_FORBIDDEN);
   }
 
  /*
@@ -2215,7 +2215,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   cupsdLogMessage(CUPSD_LOG_DEBUG,
                   "cupsdIsAuthorized: User not in group(s)!");
 
-  return (HTTP_UNAUTHORIZED);
+  return (HTTP_FORBIDDEN);
 }
 
 
