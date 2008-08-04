@@ -3076,7 +3076,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
   SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
-  SSL_CTX_use_certificate_file(context, ServerCertificate, SSL_FILETYPE_PEM);
+  SSL_CTX_use_certificate_chain_file(context, ServerCertificate,
+                                     SSL_FILETYPE_PEM);
 
   bio = BIO_new(_httpBIOMethods());
   BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)HTTP(con));

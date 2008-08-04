@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-08-01
+CHANGES.txt - 2008-08-04
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now loads both the server and CA certificates
+	  (if present) from the ServerCertificate file (STR #2146)
 	- New RSS subscriptions now create their feed files immediately
 	  (STR #2853)
 	- Added support for a device-location attribute which provides
