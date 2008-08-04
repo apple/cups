@@ -10474,6 +10474,7 @@ set_printer_defaults(
         continue;
 
       if (strcmp(attr->values[0].string.text, "abort-job") &&
+          strcmp(attr->values[0].string.text, "retry-current-job") &&
           strcmp(attr->values[0].string.text, "retry-job") &&
           strcmp(attr->values[0].string.text, "stop-printer"))
       {
