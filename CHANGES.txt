@@ -3,6 +3,8 @@ CHANGES.txt - 2008-08-04
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now logs unsuccessful requests to the error_log
+	  file as errors (STR #2616)
 	- Added support for a "retry-current-job" error policy that
 	  retries the current job immediately when the backend encounters
 	  an error (STR #2555)

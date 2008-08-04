@@ -678,10 +678,12 @@ cupsdProcessIPPRequest(
     * Sending data from the scheduler...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "cupsdProcessIPPRequest: %d status_code=%x (%s)",
-                    con->http.fd, con->response->request.status.status_code,
-	            ippErrorString(con->response->request.status.status_code));
+    cupsdLogMessage(con->response->request.status.status_code
+                        >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
+                    "Returning %s for %s from %s",
+	            ippErrorString(con->response->request.status.status_code),
+		    ippOpString(con->request->request.op.operation_id),
+		    con->http.hostname);
 
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
