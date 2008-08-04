@@ -222,8 +222,11 @@ AC_SUBST(CUPSDLIBS)
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"
 LIBS=""
-AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
-CUPSDLIBS="$CUPSDLIBS $LIBS"
+AC_ARG_ENABLE(acl, [  --enable-acl            enable POSIX ACL support, default=auto])
+if test "x$enable_acl" != xno; then
+	AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
+	CUPSDLIBS="$CUPSDLIBS $LIBS"
+fi
 LIBS="$SAVELIBS"
 
 dnl Check for DBUS support
