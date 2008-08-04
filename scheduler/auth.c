@@ -671,13 +671,34 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      return;
 	    }
 
-#  if defined(HAVE_PAM_SET_ITEM) && defined(PAM_RHOST)
+#  ifdef HAVE_PAM_SET_ITEM
+#    ifdef PAM_RHOST
 	    pamerr = pam_set_item(pamh, PAM_RHOST, con->http.hostname);
 	    if (pamerr != PAM_SUCCESS)
 	      cupsdLogMessage(CUPSD_LOG_WARN,
-	                      "cupsdAuthorize: pam_set_item() returned %d "
-			      "(%s)!", pamerr, pam_strerror(pamh, pamerr));
-#  endif /* HAVE_PAM_SET_ITEM && PAM_RHOST */
+	                      "cupsdAuthorize: pam_set_item(PAM_RHOST) "
+			      "returned %d (%s)!", pamerr,
+			      pam_strerror(pamh, pamerr));
+#    endif /* PAM_RHOST */
+
+#    ifdef PAM_TTY
+	    pamerr = pam_set_item(pamh, PAM_TTY, "cups");
+	    if (pamerr != PAM_SUCCESS)
+	      cupsdLogMessage(CUPSD_LOG_WARN,
+	                      "cupsdAuthorize: pam_set_item(PAM_TTY) "
+			      "returned %d (%s)!", pamerr,
+			      pam_strerror(pamh, pamerr));
+#    endif /* PAM_TTY */
+#  endif /* HAVE_PAM_SET_ITEM */
+
+#  ifdef HAVE_PAM_SETCRED
+            pamerr = pam_setcred(pamh, PAM_ESTABLISH_CRED | PAM_SILENT);
+	    if (pamerr != PAM_SUCCESS)
+	      cupsdLogMessage(CUPSD_LOG_WARN,
+	                      "cupsdAuthorize: pam_setcred() "
+			      "returned %d (%s)!", pamerr,
+			      pam_strerror(pamh, pamerr));
+#  endif /* HAVE_PAM_SETCRED */
 
 	    pamerr = pam_authenticate(pamh, PAM_SILENT);
 	    if (pamerr != PAM_SUCCESS)
