@@ -3,6 +3,9 @@ CHANGES.txt - 2008-08-04
 
 CHANGES IN CUPS V1.4b1
 
+	- Added support for a "retry-current-job" error policy that
+	  retries the current job immediately when the backend encounters
+	  an error (STR #2555)
 	- The scheduler now returns a "forbidden" error when a user
 	  correctly authenticates but does not have permission to
 	  continue further (STR #2101)
