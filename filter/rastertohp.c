@@ -183,6 +183,10 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
           printf("\033&l80A");			/* Set page size */
 	  break;
 
+      case 595 : /* A5 */
+          printf("\033&l25A");			/* Set page size */
+	  break;
+
       case 624 : /* DL Envelope */
           printf("\033&l90A");			/* Set page size */
 	  break;
