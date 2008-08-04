@@ -3,6 +3,9 @@ CHANGES.txt - 2008-08-04
 
 CHANGES IN CUPS V1.4b1
 
+	- The CUPS web interface menu item now uses the xdg-open
+	  command, when available (STR #2724)
+	- The cups-lpd program now supports the -h option (STR #2794)
 	- The scheduler now sets the PAM_TTY parameter and the
 	  PAM_ESTABLISH_CRED credential flag (STR #2745)
 	- The scheduler now logs unsuccessful requests to the error_log
