@@ -33,6 +33,7 @@
 #include <cups/string.h>
 #include <cups/array.h>
 #include <errno.h>
+#include <sys/select.h>
 
 
 /*
@@ -109,6 +110,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_array_t	*rss;			/* RSS message array */
   _cups_rss_t	*msg;			/* RSS message */
   char		baseurl[1024];		/* Base URL */
+  fd_set	input;			/* Input set for select() */
+  struct timeval timeout;		/* Timeout for select() */
+  int		changed;		/* Has the RSS data changed? */
+  int		exit_status;		/* Exit status */
 
 
   fprintf(stderr, "DEBUG: argc=%d\n", argc);
@@ -229,6 +234,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   load_rss(rss, filename);
 
+  changed = cupsArrayCount(rss) == 0;
+
  /*
   * Localize for the user's chosen language...
   */
@@ -239,8 +246,59 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Read events and update the RSS file until we are out of events.
   */
 
-  for (;;)
+  for (exit_status = 0, event = NULL;;)
   {
+    if (changed)
+    {
+     /*
+      * Save the messages to the file again, uploading as needed...
+      */ 
+
+      if (save_rss(rss, newname, baseurl))
+      {
+	if (http)
+	{
+	 /*
+          * Upload the RSS file...
+	  */
+
+          if ((status = cupsPutFile(http, resource, filename)) != HTTP_CREATED)
+            fprintf(stderr, "ERROR: Unable to PUT %s from %s on port %d: %d %s\n",
+	            resource, host, port, status, httpStatus(status));
+	}
+	else
+	{
+	 /*
+          * Move the new RSS file over top the old one...
+	  */
+
+          if (rename(newname, filename))
+            fprintf(stderr, "ERROR: Unable to rename %s to %s: %s\n",
+	            newname, filename, strerror(errno));
+	}
+
+	changed = 0;
+      }
+    }
+
+   /*
+    * Wait up to 30 seconds for an event...
+    */
+
+    timeout.tv_sec  = 30;
+    timeout.tv_usec = 0;
+
+    FD_ZERO(&input);
+    FD_SET(0, &input);
+
+    if (select(1, &input, NULL, NULL, &timeout) < 0)
+      continue;
+    else if (!FD_ISSET(0, &input))
+    {
+      fprintf(stderr, "DEBUG: %s is bored, exiting...\n", argv[1]);
+      break;
+    }
+
    /*
     * Read the next event...
     */
@@ -256,16 +314,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       fputs("DEBUG: ippReadFile() returned IPP_ERROR!\n", stderr);
 
     if (state <= IPP_IDLE)
-    {
-      ippDelete(event);
-
-      if (http)
-        unlink(filename);
-
-      httpClose(http);
-
-      return (0);
-    }
+      break;
 
    /*
     * Collect the info from the event...
@@ -308,15 +357,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         fprintf(stderr, "ERROR: Unable to create message: %s\n",
 	        strerror(errno));
-
-        ippDelete(event);
-
-	if (http)
-          unlink(filename);
-
-        httpClose(http);
-
-	return (1);
+        exit_status = 1;
+	break;
       }
 
      /*
@@ -324,6 +366,8 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       cupsArrayAdd(rss, msg);
+
+      changed = 1;
 
      /*
       * Trim the array as needed...
@@ -337,34 +381,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	delete_message(msg);
       }
-
-     /*
-      * Save the messages to the file again, uploading as needed...
-      */ 
-
-      if (save_rss(rss, newname, baseurl))
-      {
-	if (http)
-	{
-	 /*
-          * Upload the RSS file...
-	  */
-
-          if ((status = cupsPutFile(http, resource, filename)) != HTTP_CREATED)
-            fprintf(stderr, "ERROR: Unable to PUT %s from %s on port %d: %d %s\n",
-	            resource, host, port, status, httpStatus(status));
-	}
-	else
-	{
-	 /*
-          * Move the new RSS file over top the old one...
-	  */
-
-          if (rename(newname, filename))
-            fprintf(stderr, "ERROR: Unable to rename %s to %s: %s\n",
-	            newname, filename, strerror(errno));
-	}
-      }
     }
 
     if (subject)
@@ -374,7 +390,22 @@ main(int  argc,				/* I - Number of command-line arguments */
       free(text);
 
     ippDelete(event);
+    event = NULL;
   }
+
+ /*
+  * We only get here when idle or error...
+  */
+
+  ippDelete(event);
+
+  if (http)
+  {
+    unlink(filename);
+    httpClose(http);
+  }
+
+  return (exit_status);
 }
 
 

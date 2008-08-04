@@ -51,6 +51,13 @@ AC_PATH_PROG(MV,mv)
 AC_PATH_PROG(RM,rm)
 AC_PATH_PROG(RMDIR,rmdir)
 AC_PATH_PROG(SED,sed)
+AC_PATH_PROG(XDGOPEN,xdg-open)
+if test "x$XDGOPEN" = x; then
+	CUPS_HTMLVIEW="htmlview"
+else
+	CUPS_HTMLVIEW="$XDGOPEN"
+fi
+AC_SUBST(CUPS_HTMLVIEW)
 
 AC_MSG_CHECKING(for install-sh script)
 INSTALL="`pwd`/install-sh -c"
@@ -222,8 +229,11 @@ AC_SUBST(CUPSDLIBS)
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"
 LIBS=""
-AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
-CUPSDLIBS="$CUPSDLIBS $LIBS"
+AC_ARG_ENABLE(acl, [  --enable-acl            enable POSIX ACL support, default=auto])
+if test "x$enable_acl" != xno; then
+	AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
+	CUPSDLIBS="$CUPSDLIBS $LIBS"
+fi
 LIBS="$SAVELIBS"
 
 dnl Check for DBUS support

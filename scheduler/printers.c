@@ -349,6 +349,7 @@ cupsdCreateCommonData(void)
   static const char * const errors[] =	/* printer-error-policy-supported values */
 		{
 		  "abort-job",
+		  "retry-current-job",
 		  "retry-job",
 		  "stop-printer"
 		};

@@ -148,6 +148,19 @@ main(int  argc,				/* I - Number of command-line arguments */
     {
       switch (argv[i][1])
       {
+        case 'h' : /* -h hostname[:port] */
+            if (argv[i][2])
+	      cupsSetServer(argv[i] + 2);
+	    else
+	    {
+	      i ++;
+	      if (i < argc)
+	        cupsSetServer(argv[i]);
+	      else
+	        syslog(LOG_WARNING, "Expected hostname string after -h option!");
+	    }
+	    break;
+
 	case 'o' : /* Option */
 	    if (argv[i][2])
 	      num_defaults = cupsParseOptions(argv[i] + 2, num_defaults,

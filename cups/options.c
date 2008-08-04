@@ -225,7 +225,22 @@ cupsParseOptions(
     return (num_options);
   }
 
-  ptr = copyarg;
+  if (*copyarg == '{')
+  {
+   /*
+    * Remove surrounding {} so we can parse "{name=value ... name=value}"...
+    */
+
+    if ((ptr = copyarg + strlen(copyarg) - 1) > copyarg && *ptr == '}')
+    {
+      *ptr = '\0';
+      ptr  = copyarg + 1;
+    }
+    else
+      ptr = copyarg;
+  }
+  else
+    ptr = copyarg;
 
  /*
   * Skip leading spaces...

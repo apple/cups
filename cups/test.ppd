@@ -155,7 +155,8 @@
 *CloseUI: *StringOption
 
 *CustomStringOption True/Custom String: "StringOption=Custom"
-*ParamCustomStringOption String: 1 string 1 10
+*ParamCustomStringOption String1: 2 string 1 10
+*ParamCustomStringOption String2: 1 string 1 10
 
 *CloseGroup: Extended
 

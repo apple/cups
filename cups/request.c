@@ -255,8 +255,12 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       status   = http->status;
     }
 
-    if (status == HTTP_FORBIDDEN)
+    if (status == HTTP_FORBIDDEN || status == HTTP_ERROR ||
+        status == HTTP_SERVICE_UNAVAILABLE)
+    {
+      _cupsSetHTTPError(status);
       break;
+    }
 
     if (response)
     {
@@ -565,7 +569,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   if (ippFindAttribute(request, "auth-info", IPP_TAG_TEXT) &&
       !httpAddrLocalhost(http->hostaddr) && !http->tls &&
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
-    return (HTTP_ERROR);
+    return (HTTP_SERVICE_UNAVAILABLE);
 #endif /* HAVE_SSL */
 
  /*
@@ -599,7 +603,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     if (httpPost(http, resource))
     {
       if (httpReconnect(http))
-        return (HTTP_ERROR);
+        return (HTTP_SERVICE_UNAVAILABLE);
       else
         continue;
     }

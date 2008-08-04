@@ -659,11 +659,13 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 
 	 /*
-	  * If the job was queued to a class, try requeuing it...  For
-	  * faxes and retry-job queues, hold the current job for 5 minutes.
+	  * If the job was queued to a class or the error policy is
+	  * "retry-current-job", try requeuing it...  For faxes and retry-job
+	  * queues, hold the current job for 5 minutes.
 	  */
 
-	  if (job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
+	  if ((job->dtype & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT)) ||
+	      !strcmp(printer->error_policy, "retry-current-job"))
 	    cupsdCheckJobs();
 	  else if ((printer->type & CUPS_PRINTER_FAX) ||
         	   !strcmp(printer->error_policy, "retry-job"))

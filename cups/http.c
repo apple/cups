@@ -3032,7 +3032,8 @@ http_wait(http_t *http,			/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
     size_t bytes;			/* Bytes that are available */
 
-    if (!SSLGetBufferedReadSize(((http_tls_t *)http->tls)->session, &bytes) && bytes > 0)
+    if (!SSLGetBufferedReadSize(((http_tls_t *)(http->tls))->session, &bytes) &&
+        bytes > 0)
       return (1);
 #  endif /* HAVE_LIBSSL */
   }

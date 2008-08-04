@@ -18,18 +18,20 @@
  *
  * Contents:
  *
- *   ppdCollect()        - Collect all marked options that reside in the
- *                         specified section.
- *   ppdCollect2()       - Collect all marked options that reside in the
- *                         specified section and minimum order.
- *   ppdEmit()           - Emit code for marked options to a file.
- *   ppdEmitAfterOrder() - Emit a subset of the code for marked options to a
- *                         file.
- *   ppdEmitFd()         - Emit code for marked options to a file.
- *   ppdEmitJCL()        - Emit code for JCL options to a file.
- *   ppdEmitJCLEnd()     - Emit JCLEnd code to a file.
- *   ppdEmitString()     - Get a string containing the code for marked options.
- *   ppd_handle_media()  - Handle media selection...
+ *   ppdCollect()          - Collect all marked options that reside in the
+ *                           specified section.
+ *   ppdCollect2()         - Collect all marked options that reside in the
+ *                           specified section and minimum order.
+ *   ppdEmit()             - Emit code for marked options to a file.
+ *   ppdEmitAfterOrder()   - Emit a subset of the code for marked options to a
+ *                           file.
+ *   ppdEmitFd()           - Emit code for marked options to a file.
+ *   ppdEmitJCL()          - Emit code for JCL options to a file.
+ *   ppdEmitJCLEnd()       - Emit JCLEnd code to a file.
+ *   ppdEmitString()       - Get a string containing the code for marked
+ *                           options.
+ *   ppd_compare_cparams() - Compare the order of two custom parameters.
+ *   ppd_handle_media()    - Handle media selection...
  */
 
 /*
@@ -53,6 +55,7 @@
  * Local functions...
  */
 
+static int	ppd_compare_cparams(ppd_cparam_t *a, ppd_cparam_t *b);
 static void	ppd_handle_media(ppd_file_t *ppd);
 
 
@@ -954,15 +957,23 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	*/
 
         const char	*s;		/* Pointer into string value */
+        cups_array_t	*params;	/* Parameters in the correct output order */
 
+
+        params = cupsArrayNew((cups_array_func_t)ppd_compare_cparams, NULL);
+
+        for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+	     cparam;
+	     cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+          cupsArrayAdd(params, cparam);
 
         snprintf(bufptr, bufend - bufptr + 1,
 	         "%%%%BeginFeature: *Custom%s True\n", coption->keyword);
         bufptr += strlen(bufptr);
 
-        for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
+        for (cparam = (ppd_cparam_t *)cupsArrayFirst(params);
 	     cparam;
-	     cparam = (ppd_cparam_t *)cupsArrayNext(coption->params))
+	     cparam = (ppd_cparam_t *)cupsArrayNext(params))
 	{
           switch (cparam->type)
 	  {
@@ -1000,6 +1011,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	        break;
           }
 	}
+
+	cupsArrayDelete(params);
       }
       else
       {
@@ -1044,11 +1057,23 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 
 
 /*
+ * 'ppd_compare_cparams()' - Compare the order of two custom parameters.
+ */
+
+static int				/* O - Result of comparison */
+ppd_compare_cparams(ppd_cparam_t *a,	/* I - First parameter */
+                    ppd_cparam_t *b)	/* I - Second parameter */
+{
+  return (a->order - b->order);
+}
+
+
+/*
  * 'ppd_handle_media()' - Handle media selection...
  */
 
 static void
-ppd_handle_media(ppd_file_t *ppd)
+ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 {
   ppd_choice_t	*manual_feed,		/* ManualFeed choice, if any */
 		*input_slot,		/* InputSlot choice, if any */

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Categories=Application;System;X-Red-Hat-Base;
 Encoding=UTF-8
-Exec=htmlview http://localhost:631/
+Exec=@CUPS_HTMLVIEW@ http://localhost:631/
 GenericName=
 Icon=cups
 MimeType=
