@@ -61,7 +61,7 @@ named \fI/etc/xinetd.d/cups\fR containing the following lines:
 .fi
 .SH OPTIONS
 .TP 5
-.h hostname[:port]
+-h hostname[:port]
 .br
 Sets the CUPS server (and port) to use.
 .TP 5
