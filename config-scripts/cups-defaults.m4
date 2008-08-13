@@ -51,9 +51,9 @@ AC_SUBST(CUPS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_LEVEL, "$CUPS_LOG_LEVEL")
 
 dnl Default AccessLogLevel
-AC_ARG_WITH(log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
-	CUPS_LOG_LEVEL="$withval",
-	CUPS_LOG_LEVEL="actions")
+AC_ARG_WITH(access_log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
+	CUPS_ACCESS_LOG_LEVEL="$withval",
+	CUPS_ACCESS_LOG_LEVEL="actions")
 AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
 
