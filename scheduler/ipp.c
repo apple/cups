@@ -680,7 +680,7 @@ cupsdProcessIPPRequest(
 
     cupsdLogMessage(con->response->request.status.status_code
                         >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
-                    "Returning %s for %s (%s) from %s",
+                    "Returning IPP %s for %s (%s) from %s",
 	            ippErrorString(con->response->request.status.status_code),
 		    ippOpString(con->request->request.op.operation_id),
 		    uri ? uri->values[0].string.text : "no URI",
@@ -9797,9 +9797,18 @@ send_http_error(
     http_status_t   status,		/* I - HTTP status code */
     cupsd_printer_t *printer)		/* I - Printer, if any */
 {
-  cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s",
-                  ippOpString(con->request->request.op.operation_id),
-		  httpStatus(status));
+  ipp_attribute_t	*uri;		/* Request URI, if any */
+
+
+  if ((uri = ippFindAttribute(con->request, "printer-uri",
+                              IPP_TAG_URI)) == NULL)
+    uri = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI);
+
+  cupsdLogMessage(CUPSD_LOG_ERROR, "Returning HTTP %s for %s (%s) from %s",
+                  httpStatus(status),
+		  ippOpString(con->request->request.op.operation_id),
+		  uri ? uri->values[0].string.text : "no URI",
+		  con->http.hostname);
 
   if (status == HTTP_UNAUTHORIZED &&
       printer && printer->num_auth_info_required > 0 &&
