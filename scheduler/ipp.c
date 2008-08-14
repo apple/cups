@@ -249,7 +249,7 @@ cupsdProcessIPPRequest(
   ipp_attribute_t	*attr;		/* Current attribute */
   ipp_attribute_t	*charset;	/* Character set attribute */
   ipp_attribute_t	*language;	/* Language attribute */
-  ipp_attribute_t	*uri;		/* Printer URI attribute */
+  ipp_attribute_t	*uri = NULL;	/* Printer or job URI attribute */
   ipp_attribute_t	*username;	/* requesting-user-name attr */
   int			sub_id;		/* Subscription ID */
 
