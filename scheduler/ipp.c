@@ -9804,7 +9804,8 @@ send_http_error(
                               IPP_TAG_URI)) == NULL)
     uri = ippFindAttribute(con->request, "job-uri", IPP_TAG_URI);
 
-  cupsdLogMessage(CUPSD_LOG_ERROR, "Returning HTTP %s for %s (%s) from %s",
+  cupsdLogMessage(status == HTTP_FORBIDDEN ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
+                  "Returning HTTP %s for %s (%s) from %s",
                   httpStatus(status),
 		  ippOpString(con->request->request.op.operation_id),
 		  uri ? uri->values[0].string.text : "no URI",
