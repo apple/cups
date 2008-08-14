@@ -1155,55 +1155,90 @@ httpSeparateURI(
 
 /*
  * 'httpStatus()' - Return a short string describing a HTTP status code.
+ *
+ * The returned string is localized to the current POSIX locale and is based
+ * on the status strings defined in RFC 2616.
  */
 
-const char *				/* O - String or NULL */
+const char *				/* O - Localized status string */
 httpStatus(http_status_t status)	/* I - HTTP status code */
 {
+  const char	*s;			/* Status string */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
+
+
+  if (!cg->lang_default)
+    cg->lang_default = cupsLangDefault();
+
   switch (status)
   {
     case HTTP_CONTINUE :
-        return ("Continue");
+        s = _("Continue");
+	break;
     case HTTP_SWITCHING_PROTOCOLS :
-        return ("Switching Protocols");
+        s = _("Switching Protocols");
+	break;
     case HTTP_OK :
-        return ("OK");
+        s = _("OK");
+	break;
     case HTTP_CREATED :
-        return ("Created");
+        s = _("Created");
+	break;
     case HTTP_ACCEPTED :
-        return ("Accepted");
+        s = _("Accepted");
+	break;
     case HTTP_NO_CONTENT :
-        return ("No Content");
+        s = _("No Content");
+	break;
     case HTTP_MOVED_PERMANENTLY :
-        return ("Moved Permanently");
+        s = _("Moved Permanently");
+	break;
     case HTTP_SEE_OTHER :
-        return ("See Other");
+        s = _("See Other");
+	break;
     case HTTP_NOT_MODIFIED :
-        return ("Not Modified");
+        s = _("Not Modified");
+	break;
     case HTTP_BAD_REQUEST :
-        return ("Bad Request");
+        s = _("Bad Request");
+	break;
     case HTTP_UNAUTHORIZED :
-        return ("Unauthorized");
+        s = _("Unauthorized");
+	break;
     case HTTP_FORBIDDEN :
-        return ("Forbidden");
+        s = _("Forbidden");
+	break;
     case HTTP_NOT_FOUND :
-        return ("Not Found");
+        s = _("Not Found");
+	break;
     case HTTP_REQUEST_TOO_LARGE :
-        return ("Request Entity Too Large");
+        s = _("Request Entity Too Large");
+	break;
     case HTTP_URI_TOO_LONG :
-        return ("URI Too Long");
+        s = _("URI Too Long");
+	break;
     case HTTP_UPGRADE_REQUIRED :
-        return ("Upgrade Required");
+        s = _("Upgrade Required");
+	break;
     case HTTP_NOT_IMPLEMENTED :
-        return ("Not Implemented");
+        s = _("Not Implemented");
+	break;
     case HTTP_NOT_SUPPORTED :
-        return ("Not Supported");
+        s = _("Not Supported");
+	break;
     case HTTP_EXPECTATION_FAILED :
-        return ("Expectation Failed");
+        s = _("Expectation Failed");
+	break;
+    case HTTP_SERVICE_UNAVAILABLE :
+        s = _("Service Unavailable");
+	break;
 
     default :
-        return ("Unknown");
+        s = _("Unknown");
+	break;
   }
+
+  return (_cupsLangString(cg->lang_default, s));
 }
 
 
