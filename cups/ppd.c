@@ -588,6 +588,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       cg->ppd_status = PPD_MISSING_PPDADOBE4;
 
     _cupsStrFree(string);
+    ppd_free(line.buffer);
 
     return (NULL);
   }
@@ -603,6 +604,9 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
   if ((ppd = calloc(1, sizeof(ppd_file_t))) == NULL)
   {
     cg->ppd_status = PPD_ALLOC_ERROR;
+
+    _cupsStrFree(string);
+    ppd_free(line.buffer);
 
     return (NULL);
   }
@@ -1881,8 +1885,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       _cupsStrFree(string);
   }
 
-  if (line.buffer)
-    free(line.buffer);
+  ppd_free(line.buffer);
 
  /*
   * Reset language preferences...
@@ -1955,10 +1958,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
   error:
 
-  if (line.buffer)
-    free(line.buffer);
-
   _cupsStrFree(string);
+  ppd_free(line.buffer);
 
   ppdClose(ppd);
 
