@@ -28,11 +28,7 @@ AC_SUBST(LANGUAGES)
 dnl Default ConfigFilePerm
 AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFilePerm value, default=0640],
 	CUPS_CONFIG_FILE_PERM="$withval",
-	if test "x$uname" = xDarwin; then
-		CUPS_CONFIG_FILE_PERM="644"
-	else
-		CUPS_CONFIG_FILE_PERM="640"
-	fi)
+	CUPS_CONFIG_FILE_PERM="640")
 AC_SUBST(CUPS_CONFIG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_CONFIG_FILE_PERM, 0$CUPS_CONFIG_FILE_PERM)
 
@@ -51,9 +47,9 @@ AC_SUBST(CUPS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_LEVEL, "$CUPS_LOG_LEVEL")
 
 dnl Default AccessLogLevel
-AC_ARG_WITH(log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
-	CUPS_LOG_LEVEL="$withval",
-	CUPS_LOG_LEVEL="actions")
+AC_ARG_WITH(access_log_level, [  --with-access-log-level set default AccessLogLevel value, default=actions],
+	CUPS_ACCESS_LOG_LEVEL="$withval",
+	CUPS_ACCESS_LOG_LEVEL="actions")
 AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
 

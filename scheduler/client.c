@@ -697,6 +697,7 @@ cupsdCloseClient(cupsd_client_t *con)	/* I - Client to close */
       free(con->http.input_set);
 
     httpClearCookie(HTTP(con));
+    httpClearFields(HTTP(con));
 
     cupsdClearString(&con->filename);
     cupsdClearString(&con->command);
