@@ -42,6 +42,7 @@ _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
 _httpBIOMethods
+_httpCreate
 _httpEncodeURI
 _httpResolveURI
 _ippAddAttr

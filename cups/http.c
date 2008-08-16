@@ -347,25 +347,17 @@ httpClose(http_t *http)			/* I - Connection to server */
 
 /*
  * 'httpConnect()' - Connect to a HTTP server.
+ *
+ * This function is deprecated - use @link httpConnectEncrypt@ instead.
+ *
+ * @deprecated@
  */
 
 http_t *				/* O - New HTTP connection */
 httpConnect(const char *host,		/* I - Host to connect to */
             int        port)		/* I - Port number */
 {
-  http_encryption_t	encryption;	/* Type of encryption to use */
-
-
- /*
-  * Set the default encryption status...
-  */
-
-  if (port == 443)
-    encryption = HTTP_ENCRYPT_ALWAYS;
-  else
-    encryption = HTTP_ENCRYPT_IF_REQUESTED;
-
-  return (httpConnectEncrypt(host, port, encryption));
+  return (httpConnectEncrypt(host, port, HTTP_ENCRYPT_IF_REQUESTED));
 }
 
 
@@ -379,13 +371,55 @@ httpConnectEncrypt(
     int               port,		/* I - Port number */
     http_encryption_t encryption)	/* I - Type of encryption to use */
 {
+  http_t	*http;			/* New HTTP connection */
+
+
+  DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encryption=%d)\n",
+                host, port, encryption));
+
+ /*
+  * Create the HTTP structure...
+  */
+
+  if ((http = _httpCreate(host, port, encryption)) == NULL)
+    return (NULL);
+
+ /*
+  * Connect to the remote system...
+  */
+
+  if (!httpReconnect(http))
+    return (http);
+
+ /*
+  * Could not connect to any known address - bail out!
+  */
+
+  httpAddrFreeList(http->addrlist);
+
+  free(http);
+
+  return (NULL);
+}
+
+
+/*
+ * '_httpCreate()' - Create an unconnected HTTP connection.
+ */
+
+http_t *				/* O - HTTP connection */
+_httpCreate(
+    const char        *host,		/* I - Hostname */
+    int               port,		/* I - Port number */
+    http_encryption_t encryption)	/* I - Encryption to use */
+{
   http_t		*http;		/* New HTTP connection */
   http_addrlist_t	*addrlist;	/* Host address data */
   char			service[255];	/* Service name */
 
 
-  DEBUG_printf(("httpConnectEncrypt(host=\"%s\", port=%d, encryption=%d)\n",
-                host ? host : "(null)", port, encryption));
+  DEBUG_printf(("_httpCreate(host=\"%s\", port=%d, encryption=%d)\n",
+                host, port, encryption));
 
   if (!host)
     return (NULL);
@@ -411,19 +445,21 @@ httpConnectEncrypt(
     return (NULL);
   }
 
-  http->version  = HTTP_1_1;
-  http->blocking = 1;
-  http->activity = time(NULL);
-  http->fd       = -1;
-
-#ifdef HAVE_GSSAPI
-  http->gssctx  = GSS_C_NO_CONTEXT;
-  http->gssname = GSS_C_NO_NAME;
-#endif /* HAVE_GSSAPI */
-
  /*
-  * Set the encryption status...
+  * Initialize the HTTP data...
   */
+
+  http->activity = time(NULL);
+  http->addrlist = addrlist;
+  http->blocking = 1;
+  http->fd       = -1;
+#ifdef HAVE_GSSAPI
+  http->gssctx   = GSS_C_NO_CONTEXT;
+  http->gssname  = GSS_C_NO_NAME;
+#endif /* HAVE_GSSAPI */
+  http->version  = HTTP_1_1;
+
+  strlcpy(http->hostname, host, sizeof(http->hostname));
 
   if (port == 443)			/* Always use encryption for https */
     http->encryption = HTTP_ENCRYPT_ALWAYS;
@@ -431,29 +467,10 @@ httpConnectEncrypt(
     http->encryption = encryption;
 
  /*
-  * Loop through the addresses we have until one of them connects...
+  * Return the new structure...
   */
 
-  strlcpy(http->hostname, host, sizeof(http->hostname));
-
- /*
-  * Connect to the remote system...
-  */
-
-  http->addrlist = addrlist;
-
-  if (!httpReconnect(http))
-    return (http);
-
- /*
-  * Could not connect to any known address - bail out!
-  */
-
-  httpAddrFreeList(addrlist);
-
-  free(http);
-
-  return (NULL);
+  return (http);
 }
 
 

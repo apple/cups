@@ -261,6 +261,8 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  * Common URI functions...
  */
 
+extern http_t		*_httpCreate(const char *host, int port,
+			             http_encryption_t encryption);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
