@@ -82,7 +82,9 @@ static const cupsd_var_t	variables[] =
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
+#  ifdef HAVE_LDAP_SSL
   { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_PATHNAME },
+#  endif /* HAVE_LDAP_SSL */
   { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
   { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
