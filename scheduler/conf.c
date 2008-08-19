@@ -573,7 +573,9 @@ cupsdReadConfiguration(void)
   cupsdClearString(&BrowseLDAPDN);
   cupsdClearString(&BrowseLDAPPassword);
   cupsdClearString(&BrowseLDAPServer);
+#  ifdef HAVE_LDAP_SSL
   cupsdClearString(&BrowseLDAPCACertFile);
+#  endif /* HAVE_LDAP_SSL */
 #endif /* HAVE_LDAP */
 
   JobHistory          = DEFAULT_HISTORY;
