@@ -642,8 +642,8 @@ fi
 
 # Error log messages
 count=`grep '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 9; then
-	echo "FAIL: $count error messages, expected 9."
+if test $count != 17; then
+	echo "FAIL: $count error messages, expected 17."
 	grep '^E ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count error messages, expected 9.</P>" >>$strfile
 	echo "<PRE>" >>$strfile

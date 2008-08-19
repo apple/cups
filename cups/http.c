@@ -1629,7 +1629,10 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
 #ifdef HAVE_SSL
   if (http->tls)
+  {
+    DEBUG_puts("httpReconnect: Shutting down SSL/TLS...");
     http_shutdown_ssl(http);
+  }
 #endif /* HAVE_SSL */
 
  /*
@@ -1638,11 +1641,15 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
   if (http->fd >= 0)
   {
+    DEBUG_printf(("httpReconnect: Closing socket %d...\n", http->fd));
+
 #ifdef WIN32
     closesocket(http->fd);
 #else
     close(http->fd);
 #endif /* WIN32 */
+
+    usleep(100000);
 
     http->fd = -1;
   }
@@ -1664,8 +1671,13 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 #endif /* WIN32 */
     http->status = HTTP_ERROR;
 
+    DEBUG_printf(("httpReconnect: httpAddrConnect failed: %s\n",
+                  strerror(http->error)));
+
     return (-1);
   }
+
+  DEBUG_printf(("httpReconnect: New socket=%d\n", http->fd));
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;

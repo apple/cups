@@ -295,7 +295,8 @@ extern ssize_t		cupsReadResponseData(http_t *http, char *buffer,
 extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
 			                     const char *choice,
 					     int *num_options,
-					     cups_option_t **options);
+					     cups_option_t **options)
+					     _CUPS_API_1_4;
 extern http_status_t	cupsSendRequest(http_t *http, ipp_t *request,
 			                const char *resource,
 					size_t length) _CUPS_API_1_4;

@@ -15,6 +15,7 @@
  *
  * Contents:
  *
+ *   debug_vsnprintf()    - Format a string into a fixed size buffer.
  *   _cups_debug_printf() - Write a formatted line to the log.
  *   _cups_debug_puts()   - Write a single line to the log.
  */

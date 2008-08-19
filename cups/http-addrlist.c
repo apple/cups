@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
+#include <errno.h>
 
 
 /*
@@ -41,7 +42,18 @@ httpAddrConnect(
     int             *sock)		/* O - Socket */
 {
   int	val;				/* Socket option value */
+#ifdef DEBUG
+  char	temp[256];			/* Temporary address string */
+#endif /* DEBUG */
 
+
+  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)\n", addrlist, sock));
+
+  if (!sock)
+  {
+    errno = EINVAL;
+    return (NULL);
+  }
 
  /*
   * Loop through each address until we connect or run out of addresses...
@@ -52,6 +64,23 @@ httpAddrConnect(
    /*
     * Create the socket...
     */
+
+#ifdef DEBUG
+#  ifdef AF_INET6
+    if (addrlist->addr.addr.sa_family == AF_INET6)
+      DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
+		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		    ntohs(addrlist->addr.ipv6.sin6_port)));
+    else
+#  endif /* AF_INET6 */
+    if (addrlist->addr.addr.sa_family == AF_INET)
+      DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
+		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		    ntohs(addrlist->addr.ipv4.sin_port)));
+    else
+      DEBUG_printf(("httpAddrConnect: Trying %s...\n",
+		    httpAddrString(&(addrlist->addr), temp, sizeof(temp))));
+#endif /* DEBUG */
 
     if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
     {
@@ -115,6 +144,8 @@ httpAddrConnect(
                  httpAddrLength(&(addrlist->addr))))
       break;
 
+    DEBUG_printf(("httpAddrConnect: connect() failed: %s\n", strerror(errno)));
+
    /*
     * Close this socket and move to the next address...
     */
@@ -125,6 +156,7 @@ httpAddrConnect(
     close(*sock);
 #endif /* WIN32 */
 
+    *sock    = -1;
     addrlist = addrlist->next;
   }
 
