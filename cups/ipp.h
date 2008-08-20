@@ -483,6 +483,10 @@ extern ipp_state_t	ippReadIO(void *src, ipp_iocb_t cb, int blocking,
 extern ipp_state_t	ippWriteIO(void *dst, ipp_iocb_t cb, int blocking,
 			           ipp_t *parent, ipp_t *ipp) _CUPS_API_1_2;
 
+/**** New in CUPS 1.4 ****/
+extern const char	*ippTagString(ipp_tag_t tag) _CUPS_API_1_4;
+extern ipp_tag_t	ippTagValue(const char *name) _CUPS_API_1_4;
+
 
 /*
  * C++ magic...

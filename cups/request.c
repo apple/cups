@@ -369,10 +369,12 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   * Wait for a response from the server...
   */
 
-  DEBUG_puts("cupsGetResponse: Update loop...");
+  DEBUG_printf(("cupsGetResponse: Update loop, http->status=%d...\n",
+                http->status));
 
-  while ((status = httpUpdate(http)) == HTTP_CONTINUE)
-    /* Do nothing but update */;
+  status = http->status;
+  while (status == HTTP_CONTINUE)
+    status = httpUpdate(http);
 
   DEBUG_printf(("cupsGetResponse: status=%d\n", status));
 
@@ -571,6 +573,14 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
     return (HTTP_SERVICE_UNAVAILABLE);
 #endif /* HAVE_SSL */
+
+ /*
+  * Reconnect if the last response had a "Connection: close"...
+  */
+
+  if (!strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
+    if (httpReconnect(http))
+      return (HTTP_SERVICE_UNAVAILABLE);
 
  /*
   * Loop until we can send the request without authorization problems.

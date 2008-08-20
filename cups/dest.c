@@ -331,7 +331,10 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   if (!dests)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad NULL dests pointer"), 1);
     return (0);
+  }
 
  /*
   * Initialize destination array...
@@ -468,6 +471,9 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
  /*
   * Return the number of destinations...
   */
+
+  if (num_dests > 0)
+    _cupsSetError(IPP_OK, NULL, 0);
 
   return (num_dests);
 }

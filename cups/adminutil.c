@@ -894,7 +894,58 @@ _cupsAdminGetServerSettings(
   */
 
   if (!http)
-    http = _cupsConnect();
+  {
+   /*
+    * See if we are connected to the same server...
+    */
+
+    if (cg->http)
+    {
+     /*
+      * Compare the connection hostname, port, and encryption settings to
+      * the cached defaults; these were initialized the first time we
+      * connected...
+      */
+
+      if (strcmp(cg->http->hostname, cg->server) ||
+          cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
+	  (cg->http->encryption != cg->encryption &&
+	   cg->http->encryption == HTTP_ENCRYPT_NEVER))
+      {
+       /*
+	* Need to close the current connection because something has changed...
+	*/
+
+	httpClose(cg->http);
+	cg->http = NULL;
+      }
+    }
+
+   /*
+    * (Re)connect as needed...
+    */
+
+    if (!cg->http)
+    {
+      if ((cg->http = _httpCreate(cupsServer(), ippPort(),
+                                  cupsEncryption())) == NULL)
+      {
+	if (errno)
+	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	else
+	  _cupsSetError(IPP_SERVICE_UNAVAILABLE,
+			_("Unable to connect to host."), 1);
+
+	if (num_settings)
+	  *num_settings = 0;
+
+	if (settings)
+	  *settings = NULL;
+
+	return (0);
+      }
+    }
+  }
 
   if (!http || !num_settings || !settings)
   {

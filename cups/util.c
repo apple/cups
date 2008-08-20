@@ -949,7 +949,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
                             resource, sizeof(resource), 0))
     return (HTTP_NOT_FOUND);
 
-  DEBUG_printf(("cupsGetPPD3: Printer hostname=\"%s\", port=%d\n", hostname, port));
+  DEBUG_printf(("cupsGetPPD3: Printer hostname=\"%s\", port=%d\n", hostname,
+                port));
 
  /*
   * Remap local hostname to localhost...
@@ -957,7 +958,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
   httpGetHostname(NULL, localhost, sizeof(localhost));
 
-  DEBUG_printf(("Local hostname=\"%s\"\n", localhost));
+  DEBUG_printf(("cupsGetPPD3: Local hostname=\"%s\"\n", localhost));
 
   if (!strcasecmp(localhost, hostname))
     strcpy(hostname, "localhost");
@@ -967,19 +968,10 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
+  http_port = _httpAddrPort(http->hostaddr);
 
-#ifdef AF_INET6
-  if (http->hostaddr->addr.sa_family == AF_INET6)
-    http_port = ntohs(http->hostaddr->ipv6.sin6_port);
-  else
-#endif /* AF_INET6 */
-  if (http->hostaddr->addr.sa_family == AF_INET)
-    http_port = ntohs(http->hostaddr->ipv4.sin_port);
-  else
-    http_port = ippPort(); 
-
-  DEBUG_printf(("Connection hostname=\"%s\", port=%d\n", http_hostname,
-                http_port));
+  DEBUG_printf(("cupsGetPPD3: Connection hostname=\"%s\", port=%d\n",
+                http_hostname, http_port));
 
  /*
   * Reconnect to the correct server as needed...
@@ -990,7 +982,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   else if ((http2 = httpConnectEncrypt(hostname, port,
                                        cupsEncryption())) == NULL)
   {
-    DEBUG_puts("Unable to connect to server!");
+    DEBUG_puts("cupsGetPPD3: Unable to connect to server!");
 
     return (HTTP_SERVICE_UNAVAILABLE);
   }
@@ -1051,8 +1043,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 	  break;
 
       default :
-	  DEBUG_printf(("HTTP error %d mapped to IPP_SERVICE_UNAVAILABLE!\n",
-                	status));
+	  DEBUG_printf(("cupsGetPPD3: HTTP error %d mapped to "
+	                "IPP_SERVICE_UNAVAILABLE!\n", status));
 	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status), 0);
 	  break;
     }
@@ -1539,30 +1531,14 @@ _cupsConnect(void)
 
   if (cg->http)
   {
-    int	port;				/* Port for connection */
-
-
-   /*
-    * Get the port associated with the current connection...
-    */
-
-#ifdef AF_INET6
-    if (cg->http->hostaddr->addr.sa_family == AF_INET6)
-      port = ntohs(cg->http->hostaddr->ipv6.sin6_port);
-    else
-#endif /* AF_INET6 */
-    if (cg->http->hostaddr->addr.sa_family == AF_INET)
-      port = ntohs(cg->http->hostaddr->ipv4.sin_port);
-    else
-      port = cg->ipp_port;
-
    /*
     * Compare the connection hostname, port, and encryption settings to
     * the cached defaults; these were initialized the first time we
     * connected...
     */
 
-    if (strcmp(cg->http->hostname, cg->server) || cg->ipp_port != port ||
+    if (strcmp(cg->http->hostname, cg->server) ||
+        cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
         (cg->http->encryption != cg->encryption &&
 	 cg->http->encryption == HTTP_ENCRYPT_NEVER))
     {
@@ -1662,16 +1638,7 @@ cups_get_printer_uri(
   */
 
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
-
-#ifdef AF_INET6
-  if (http->hostaddr->addr.sa_family == AF_INET6)
-    http_port = ntohs(http->hostaddr->ipv6.sin6_port);
-  else
-#endif /* AF_INET6 */
-  if (http->hostaddr->addr.sa_family == AF_INET)
-    http_port = ntohs(http->hostaddr->ipv4.sin_port);
-  else
-    http_port = ippPort(); 
+  http_port = _httpAddrPort(http->hostaddr);
 
  /*
   * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the following

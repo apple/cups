@@ -82,7 +82,9 @@ static const cupsd_var_t	variables[] =
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
+#  ifdef HAVE_LDAP_SSL
   { "BrowseLDAPCACertFile",	&BrowseLDAPCACertFile,	CUPSD_VARTYPE_PATHNAME },
+#  endif /* HAVE_LDAP_SSL */
   { "BrowseLDAPDN",		&BrowseLDAPDN,		CUPSD_VARTYPE_STRING },
   { "BrowseLDAPPassword",	&BrowseLDAPPassword,	CUPSD_VARTYPE_STRING },
   { "BrowseLDAPServer",		&BrowseLDAPServer,	CUPSD_VARTYPE_STRING },
@@ -571,7 +573,9 @@ cupsdReadConfiguration(void)
   cupsdClearString(&BrowseLDAPDN);
   cupsdClearString(&BrowseLDAPPassword);
   cupsdClearString(&BrowseLDAPServer);
+#  ifdef HAVE_LDAP_SSL
   cupsdClearString(&BrowseLDAPCACertFile);
+#  endif /* HAVE_LDAP_SSL */
 #endif /* HAVE_LDAP */
 
   JobHistory          = DEFAULT_HISTORY;

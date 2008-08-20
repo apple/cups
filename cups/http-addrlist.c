@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
+#include <errno.h>
 
 
 /*
@@ -41,7 +42,18 @@ httpAddrConnect(
     int             *sock)		/* O - Socket */
 {
   int	val;				/* Socket option value */
+#ifdef DEBUG
+  char	temp[256];			/* Temporary address string */
+#endif /* DEBUG */
 
+
+  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)\n", addrlist, sock));
+
+  if (!sock)
+  {
+    errno = EINVAL;
+    return (NULL);
+  }
 
  /*
   * Loop through each address until we connect or run out of addresses...
@@ -53,7 +65,12 @@ httpAddrConnect(
     * Create the socket...
     */
 
-    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
+    DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
+		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		  _httpAddrPort(&(addrlist->addr))));
+
+    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM,
+                             0)) < 0)
     {
      /*
       * Don't abort yet, as this could just be an issue with the local
@@ -113,7 +130,16 @@ httpAddrConnect(
 
     if (!connect(*sock, &(addrlist->addr.addr),
                  httpAddrLength(&(addrlist->addr))))
+    {
+      DEBUG_printf(("httpAddrConnect: Connected to %s:%d...\n",
+		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		    _httpAddrPort(&(addrlist->addr))));
       break;
+    }
+
+    DEBUG_printf(("httpAddrConnect: Unable to connect to %s:%d: %s\n",
+		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		  _httpAddrPort(&(addrlist->addr)), strerror(errno)));
 
    /*
     * Close this socket and move to the next address...
@@ -125,6 +151,7 @@ httpAddrConnect(
     close(*sock);
 #endif /* WIN32 */
 
+    *sock    = -1;
     addrlist = addrlist->next;
   }
 
