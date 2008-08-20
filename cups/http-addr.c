@@ -3,7 +3,7 @@
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -18,6 +18,7 @@
  *   httpAddrEqual()     - Compare two addresses.
  *   httpAddrLocalhost() - Check for the local loopback address.
  *   httpAddrLookup()    - Lookup the hostname associated with the address.
+ *   _httpAddrPort()     - Get the port number associated with an address.
  *   httpAddrString()    - Convert an IP address to a dotted string.
  *   httpGetHostByName() - Lookup a hostname or IP address, and return
  *                         address records for the specified name.
@@ -238,6 +239,25 @@ httpAddrLookup(
 #endif /* HAVE_GETNAMEINFO */
 
   return (name);
+}
+
+
+/*
+ * '_httpAddrPort()' - Get the port number associated with an address.
+ */
+
+int					/* O - Port number */
+_httpAddrPort(http_addr_t *addr)	/* I - Address */
+{
+#ifdef AF_INET6
+  if (addr->addr.sa_family == AF_INET6)
+    return (ntohs(addr->ipv6.sin6_port));
+  else
+#endif /* AF_INET6 */
+  if (addr->addr.sa_family == AF_INET)
+    return (ntohs(addr->ipv4.sin_port));
+  else
+    return (ippPort());
 }
 
 

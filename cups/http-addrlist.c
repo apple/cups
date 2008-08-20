@@ -65,24 +65,12 @@ httpAddrConnect(
     * Create the socket...
     */
 
-#ifdef DEBUG
-#  ifdef AF_INET6
-    if (addrlist->addr.addr.sa_family == AF_INET6)
-      DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
-		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-		    ntohs(addrlist->addr.ipv6.sin6_port)));
-    else
-#  endif /* AF_INET6 */
-    if (addrlist->addr.addr.sa_family == AF_INET)
-      DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
-		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
-		    ntohs(addrlist->addr.ipv4.sin_port)));
-    else
-      DEBUG_printf(("httpAddrConnect: Trying %s...\n",
-		    httpAddrString(&(addrlist->addr), temp, sizeof(temp))));
-#endif /* DEBUG */
+    DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
+		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		  _httpAddrPort(&(addrlist->addr))));
 
-    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
+    if ((*sock = (int)socket(addrlist->addr.addr.sa_family, SOCK_STREAM,
+                             0)) < 0)
     {
      /*
       * Don't abort yet, as this could just be an issue with the local
@@ -142,9 +130,16 @@ httpAddrConnect(
 
     if (!connect(*sock, &(addrlist->addr.addr),
                  httpAddrLength(&(addrlist->addr))))
+    {
+      DEBUG_printf(("httpAddrConnect: Connected to %s:%d...\n",
+		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		    _httpAddrPort(&(addrlist->addr))));
       break;
+    }
 
-    DEBUG_printf(("httpAddrConnect: connect() failed: %s\n", strerror(errno)));
+    DEBUG_printf(("httpAddrConnect: Unable to connect to %s:%d: %s\n",
+		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
+		  _httpAddrPort(&(addrlist->addr)), strerror(errno)));
 
    /*
     * Close this socket and move to the next address...

@@ -41,6 +41,7 @@ __cupsStrFormatd
 __cupsStrFree
 __cupsStrScand
 __cupsStrStatistics
+__httpAddrPort
 __httpCreate
 __httpEncodeURI
 __httpReadCDSA

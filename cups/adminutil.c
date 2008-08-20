@@ -901,30 +901,14 @@ _cupsAdminGetServerSettings(
 
     if (cg->http)
     {
-      int	port;			/* Port for connection */
-
-
-     /*
-      * Get the port associated with the current connection...
-      */
-
-#ifdef AF_INET6
-      if (cg->http->hostaddr->addr.sa_family == AF_INET6)
-	port = ntohs(cg->http->hostaddr->ipv6.sin6_port);
-      else
-#endif /* AF_INET6 */
-      if (cg->http->hostaddr->addr.sa_family == AF_INET)
-	port = ntohs(cg->http->hostaddr->ipv4.sin_port);
-      else
-	port = cg->ipp_port;
-
      /*
       * Compare the connection hostname, port, and encryption settings to
       * the cached defaults; these were initialized the first time we
       * connected...
       */
 
-      if (strcmp(cg->http->hostname, cg->server) || cg->ipp_port != port ||
+      if (strcmp(cg->http->hostname, cg->server) ||
+          cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
 	  (cg->http->encryption != cg->encryption &&
 	   cg->http->encryption == HTTP_ENCRYPT_NEVER))
       {

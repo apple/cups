@@ -1620,6 +1620,10 @@ int					/* O - 0 on success, non-zero on failure */
 httpReconnect(http_t *http)		/* I - Connection to server */
 {
   http_addrlist_t	*addr;		/* Connected address */
+#ifdef DEBUG
+  http_addrlist_t	*current;	/* Current address */
+  char			temp[256];	/* Temporary address string */
+#endif /* DEBUG */
 
 
   DEBUG_printf(("httpReconnect(http=%p)\n", http));
@@ -1657,6 +1661,13 @@ httpReconnect(http_t *http)		/* I - Connection to server */
  /*
   * Connect to the server...
   */
+
+#ifdef DEBUG
+  for (current = http->addrlist; current; current = current->next)
+    DEBUG_printf(("httpReconnect: Address %s:%d\n",
+                  httpAddrString(&(current->addr), temp, sizeof(temp)),
+                  _httpAddrPort(&(current->addr))));
+#endif /* DEBUG */
 
   if ((addr = httpAddrConnect(http->addrlist, &(http->fd))) == NULL)
   {
@@ -1704,6 +1715,10 @@ httpReconnect(http_t *http)		/* I - Connection to server */
   else if (http->encryption == HTTP_ENCRYPT_REQUIRED)
     return (http_upgrade(http));
 #endif /* HAVE_SSL */
+
+  DEBUG_printf(("httpReconnect: Connected to %s:%d...\n",
+		httpAddrString(http->hostaddr, temp, sizeof(temp)),
+		_httpAddrPort(http->hostaddr)));
 
   return (0);
 }

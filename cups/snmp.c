@@ -715,6 +715,7 @@ _cupsSNMPWrite(
   unsigned char	buffer[CUPS_SNMP_MAX_PACKET];
 					/* SNMP message buffer */
   int		bytes;			/* Size of message */
+  http_addr_t	temp;			/* Copy of address */
 
 
  /*
@@ -776,15 +777,17 @@ _cupsSNMPWrite(
   * Send the message...
   */
 
+  temp = *address;
+
 #ifdef AF_INET6
-  if (address->addr.sa_family == AF_INET6)
-    address->ipv6.sin6_port = htons(CUPS_SNMP_PORT);
+  if (temp.addr.sa_family == AF_INET6)
+    temp.ipv6.sin6_port = htons(CUPS_SNMP_PORT);
   else
 #endif /* AF_INET6 */
-  address->ipv4.sin_port = htons(CUPS_SNMP_PORT);
+  temp.ipv4.sin_port = htons(CUPS_SNMP_PORT);
 
-  return (sendto(fd, buffer, bytes, 0, (void *)address,
-                 httpAddrLength(address)) == bytes);
+  return (sendto(fd, buffer, bytes, 0, (void *)&temp,
+                 httpAddrLength(&temp)) == bytes);
 }
 
 
