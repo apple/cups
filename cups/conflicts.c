@@ -18,11 +18,11 @@
  *
  * Contents:
  *
+ *   cupsResolveConflicts()   - Resolve conflicts in a marked PPD.
  *   ppdConflicts()           - Check to see if there are any conflicts among
  *                              the marked option choices.
  *   ppdInstallableConflict() - Test whether an option choice conflicts with an
  *                              installable option.
- *   cupsResolveConflicts()   - Resolve conflicts in a marked PPD.
  *   ppd_is_installable()     - Determine whether an option is in the
  *                              InstallableOptions group.
  *   ppd_load_constraints()   - Load constraints from a PPD file.
@@ -60,108 +60,6 @@ static void		ppd_load_constraints(ppd_file_t *ppd);
 static cups_array_t	*ppd_test_constraints(ppd_file_t *ppd, int num_options,
 			                      cups_option_t *options,
 					      int which);
-
-
-/*
- * 'ppdConflicts()' - Check to see if there are any conflicts among the
- *                    marked option choices.
- *
- * The returned value is the same as returned by @link ppdMarkOption@.
- */
-
-int					/* O - Number of conflicts found */
-ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
-{
-  int			i,		/* Looping variable */
-			conflicts;	/* Number of conflicts */
-  cups_array_t		*active;	/* Active conflicts */
-  _ppd_cups_uiconsts_t	*c;		/* Current constraints */
-  _ppd_cups_uiconst_t	*cptr;		/* Current constraint */
-  ppd_option_t	*o;			/* Current option */
-
-
-  if (!ppd)
-    return (0);
-
- /*
-  * Clear all conflicts...
-  */
-
-  for (o = ppdFirstOption(ppd); o; o = ppdNextOption(ppd))
-    o->conflicted = 0;
-
- /*
-  * Test for conflicts...
-  */
-
-  active    = ppd_test_constraints(ppd, 0, NULL, _PPD_ALL_CONSTRAINTS);
-  conflicts = cupsArrayCount(active);
-
- /*
-  * Loop through all of the UI constraints and flag any options
-  * that conflict...
-  */
-
-  for (c = (_ppd_cups_uiconsts_t *)cupsArrayFirst(active);
-       c;
-       c = (_ppd_cups_uiconsts_t *)cupsArrayNext(active))
-  {
-    for (i = c->num_constraints, cptr = c->constraints;
-         i > 0;
-	 i --, cptr ++)
-      cptr->option->conflicted = 1;
-  }
-
-  cupsArrayDelete(active);
-
- /*
-  * Return the number of conflicts found...
-  */
-
-  return (conflicts);
-}
-
-
-/*
- * 'ppdInstallableConflict()' - Test whether an option choice conflicts with
- *                              an installable option.
- *
- * This function tests whether a particular option choice is available based
- * on constraints against options in the "InstallableOptions" group.
- *
- * @since CUPS 1.4@
- */
-
-int					/* O - 1 if conflicting, 0 if not conflicting */
-ppdInstallableConflict(
-    ppd_file_t *ppd,			/* I - PPD file */
-    const char *option,			/* I - Option */
-    const char *choice)			/* I - Choice */
-{
-  cups_array_t	*active;		/* Active conflicts */
-  cups_option_t	test;			/* Test against this option */
-
-
- /* 
-  * Range check input...
-  */
-
-  if (!ppd || !option || !choice)
-    return (0);
-
- /*
-  * Test constraints using the new option...
-  */
-
-  test.name  = (char *)option;
-  test.value = (char *)choice;
-  active     = ppd_test_constraints(ppd, 1, &test,
-                                    _PPD_INSTALLABLE_CONSTRAINTS);
-
-  cupsArrayDelete(active);
-
-  return (active != NULL);
-}
 
 
 /*
@@ -419,6 +317,108 @@ cupsResolveConflicts(
   cupsArrayRestore(ppd->sorted_attrs);
 
   return (0);
+}
+
+
+/*
+ * 'ppdConflicts()' - Check to see if there are any conflicts among the
+ *                    marked option choices.
+ *
+ * The returned value is the same as returned by @link ppdMarkOption@.
+ */
+
+int					/* O - Number of conflicts found */
+ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
+{
+  int			i,		/* Looping variable */
+			conflicts;	/* Number of conflicts */
+  cups_array_t		*active;	/* Active conflicts */
+  _ppd_cups_uiconsts_t	*c;		/* Current constraints */
+  _ppd_cups_uiconst_t	*cptr;		/* Current constraint */
+  ppd_option_t	*o;			/* Current option */
+
+
+  if (!ppd)
+    return (0);
+
+ /*
+  * Clear all conflicts...
+  */
+
+  for (o = ppdFirstOption(ppd); o; o = ppdNextOption(ppd))
+    o->conflicted = 0;
+
+ /*
+  * Test for conflicts...
+  */
+
+  active    = ppd_test_constraints(ppd, 0, NULL, _PPD_ALL_CONSTRAINTS);
+  conflicts = cupsArrayCount(active);
+
+ /*
+  * Loop through all of the UI constraints and flag any options
+  * that conflict...
+  */
+
+  for (c = (_ppd_cups_uiconsts_t *)cupsArrayFirst(active);
+       c;
+       c = (_ppd_cups_uiconsts_t *)cupsArrayNext(active))
+  {
+    for (i = c->num_constraints, cptr = c->constraints;
+         i > 0;
+	 i --, cptr ++)
+      cptr->option->conflicted = 1;
+  }
+
+  cupsArrayDelete(active);
+
+ /*
+  * Return the number of conflicts found...
+  */
+
+  return (conflicts);
+}
+
+
+/*
+ * 'ppdInstallableConflict()' - Test whether an option choice conflicts with
+ *                              an installable option.
+ *
+ * This function tests whether a particular option choice is available based
+ * on constraints against options in the "InstallableOptions" group.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - 1 if conflicting, 0 if not conflicting */
+ppdInstallableConflict(
+    ppd_file_t *ppd,			/* I - PPD file */
+    const char *option,			/* I - Option */
+    const char *choice)			/* I - Choice */
+{
+  cups_array_t	*active;		/* Active conflicts */
+  cups_option_t	test;			/* Test against this option */
+
+
+ /* 
+  * Range check input...
+  */
+
+  if (!ppd || !option || !choice)
+    return (0);
+
+ /*
+  * Test constraints using the new option...
+  */
+
+  test.name  = (char *)option;
+  test.value = (char *)choice;
+  active     = ppd_test_constraints(ppd, 1, &test,
+                                    _PPD_INSTALLABLE_CONSTRAINTS);
+
+  cupsArrayDelete(active);
+
+  return (active != NULL);
 }
 
 
