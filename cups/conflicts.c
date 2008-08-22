@@ -721,8 +721,14 @@ ppd_test_constraints(
   const char		*value;		/* Current value */
 
 
+  DEBUG_printf(("ppd_test_constraints(ppd=%p, num_options=%d, options=%p, "
+                "which=%d)\n", ppd, num_options, options, which));
+
   if (!ppd->cups_uiconstraints)
     ppd_load_constraints(ppd);
+
+  DEBUG_printf(("ppd_test_constraints: %d constraints!\n",
+	        cupsArrayCount(ppd->cups_uiconstraints)));
 
   cupsArraySave(ppd->marked);
 
@@ -730,13 +736,29 @@ ppd_test_constraints(
        consts;
        consts = (_ppd_cups_uiconsts_t *)cupsArrayNext(ppd->cups_uiconstraints))
   {
+    DEBUG_printf(("ppd_test_constraints: installable=%d, resolver=\"%s\", "
+                  "num_constraints=%d option1=\"%s\", choice1=\"%s\", "
+		  "option2=\"%s\", choice2=\"%s\", ...\n",
+		  consts->installable, consts->resolver, consts->num_constraints,
+		  consts->constraints[0].option->keyword,
+		  consts->constraints[0].choice ?
+		      consts->constraints[0].choice->choice : "",
+		  consts->constraints[1].option->keyword,
+		  consts->constraints[1].choice ?
+		      consts->constraints[1].choice->choice : ""));
+
     if (which != _PPD_ALL_CONSTRAINTS && which != consts->installable)
       continue;
+
+    DEBUG_puts("ppd_test_constraints: Testing...");
 
     for (i = consts->num_constraints, constptr = consts->constraints;
          i > 0;
 	 i --, constptr ++)
     {
+      DEBUG_printf(("ppd_test_constraints: %s=%s?\n", constptr->option->keyword,
+		    constptr->choice ? constptr->choice->choice : ""));
+
       if (constptr->choice &&
           (!strcasecmp(constptr->option->keyword, "PageSize") ||
            !strcasecmp(constptr->option->keyword, "PageRegion")))
@@ -759,7 +781,10 @@ ppd_test_constraints(
 	    }
 
         if (!value || strcasecmp(value, constptr->choice->choice))
+	{
+	  DEBUG_puts("ppd_test_constraints: NO");
 	  break;
+	}
       }
       else if (constptr->choice)
       {
@@ -767,17 +792,26 @@ ppd_test_constraints(
 	                           options)) != NULL)
         {
 	  if (strcasecmp(value, constptr->choice->choice))
+	  {
+	    DEBUG_puts("ppd_test_constraints: NO");
 	    break;
+	  }
 	}
         else if (!constptr->choice->marked)
-          break;
+	{
+	  DEBUG_puts("ppd_test_constraints: NO");
+	  break;
+	}
       }
       else if ((value = cupsGetOption(constptr->option->keyword, num_options,
 	                              options)) != NULL)
       {
 	if (!strcasecmp(value, "None") || !strcasecmp(value, "Off") ||
 	    !strcasecmp(value, "False"))
-          break;
+	{
+	  DEBUG_puts("ppd_test_constraints: NO");
+	  break;
+	}
       }
       else
       {
@@ -788,7 +822,10 @@ ppd_test_constraints(
 	    (!strcasecmp(marked->choice, "None") ||
 	     !strcasecmp(marked->choice, "Off") ||
 	     !strcasecmp(marked->choice, "False")))
+	{
+	  DEBUG_puts("ppd_test_constraints: NO");
 	  break;
+	}
       }
     }
 
@@ -798,10 +835,14 @@ ppd_test_constraints(
         active = cupsArrayNew(NULL, NULL);
 
       cupsArrayAdd(active, consts);
+      DEBUG_puts("ppd_test_constraints: Added...");
     }
   }
 
   cupsArrayRestore(ppd->marked);
+
+  DEBUG_printf(("ppd_test_constraints: Found %d active constraints!\n",
+                cupsArrayCount(active)));
 
   return (active);
 }
