@@ -104,8 +104,10 @@ cupsResolveConflicts(
     cups_option_t **options)		/* IO - Additional selected options */
 {
   int			i,		/* Looping var */
-			num_newopts;	/* Number of new options */
-  cups_option_t		*newopts;	/* New options */
+			num_newopts,	/* Number of new options */
+			num_resopts;	/* Number of resolver options */
+  cups_option_t		*newopts,	/* New options */
+			*resopts;	/* Resolver options */
   cups_array_t		*active,	/* Active constraints */
 			*pass,		/* Resolvers for this pass */
 			*resolvers;	/* Resolvers we have used */
@@ -115,7 +117,6 @@ cupsResolveConflicts(
   const char		*value;		/* Selected option value */
   int			changed;	/* Did we change anything? */
   ppd_choice_t		*marked;	/* Marked choice */
-  ppd_option_t		*ignored;	/* Ignored option */
 
 
  /*
@@ -199,8 +200,25 @@ cupsResolveConflicts(
         cupsArrayAdd(pass, consts->resolver);
 	cupsArrayAdd(resolvers, consts->resolver);
 
+        if (option && choice)
+	{
+	  resopts     = NULL;
+	  num_resopts = _ppdParseOptions(resolver->value, 0, &resopts);
+
+          if ((value = cupsGetOption(option, num_newopts, newopts)) != NULL &&
+	      !strcasecmp(value, choice))
+	  {
+	    DEBUG_printf(("cupsResolveConflicts: Resolver %s changes %s!\n",
+	                  consts->resolver, option));
+	    cupsFreeOptions(num_resopts, resopts);
+	    goto error;
+          }
+
+	  cupsFreeOptions(num_resopts, resopts);
+	}
+
         num_newopts = _ppdParseOptions(resolver->value, num_newopts, &newopts);
-	changed     = 1;
+        changed     = 1;
       }
       else
       {
@@ -214,8 +232,7 @@ cupsResolveConflicts(
         cups_array_t	*test;		/* Test array for conflicts */
 
 
-        for (i = consts->num_constraints, constptr = consts->constraints,
-	         ignored = NULL;
+        for (i = consts->num_constraints, constptr = consts->constraints;
 	     i > 0;
 	     i --, constptr ++)
 	{
@@ -225,10 +242,7 @@ cupsResolveConflicts(
 	    continue;
 
 	  if (option && !strcasecmp(constptr->option->keyword, option))
-	  {
-	    ignored = constptr->option;
 	    continue;
-	  }
 
           if ((value = cupsGetOption(constptr->option->keyword, num_newopts,
 	                             newopts)) == NULL)
@@ -295,75 +309,6 @@ cupsResolveConflicts(
 	    }
           }
         }
-
-        if (ignored && !changed)
-	{
-	 /*
-	  * No choice, have to back out this selection...
-	  */
-
-          if ((value = cupsGetOption(ignored->keyword, num_newopts,
-	                             newopts)) == NULL)
-          {
-	    marked = ppdFindMarkedChoice(ppd, ignored->keyword);
-	    value  = marked ? marked->choice : "";
-	  }
-
-         /*
-	  * Try the default choice...
-	  */
-
-          test = NULL;
-
-          if (strcasecmp(value, ignored->defchoice) &&
-	      (test = ppd_test_constraints(ppd, ignored->keyword,
-	                                   ignored->defchoice,
-					   num_newopts, newopts,
-					   _PPD_ALL_CONSTRAINTS)) == NULL)
-	  {
-	   /*
-	    * That worked...
-	    */
-
-	    num_newopts = cupsAddOption(ignored->keyword, ignored->defchoice,
-					num_newopts, &newopts);
-            changed     = 1;
-	  }
-	  else
-	  {
-	   /*
-	    * Try each choice instead...
-	    */
-
-            cupsArrayDelete(test);
-
-            for (j = ignored->num_choices, cptr = ignored->choices;
-		 j > 0;
-		 j --, cptr ++)
-            {
-	      test = NULL;
-
-	      if (strcasecmp(value, cptr->choice) &&
-	          strcasecmp(ignored->defchoice, cptr->choice) &&
-	          (test = ppd_test_constraints(ppd, ignored->keyword,
-	                                       cptr->choice, num_newopts,
-					       newopts,
-					       _PPD_ALL_CONSTRAINTS)) == NULL)
-	      {
-	       /*
-		* This choice works...
-		*/
-
-		num_newopts = cupsAddOption(ignored->keyword, cptr->choice,
-		                            num_newopts, &newopts);
-		changed     = 1;
-		break;
-	      }
-
-              cupsArrayDelete(test);
-	    }
-          }
-	}
       }
 
       if (!changed)
