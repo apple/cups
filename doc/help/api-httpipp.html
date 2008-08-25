@@ -423,6 +423,8 @@ in seconds.">ippDateToTime</a></li>
 <li><a href="#ippReadFile" title="Read data for an IPP message from a file.">ippReadFile</a></li>
 <li><a href="#ippReadIO" title="Read data for an IPP message.">ippReadIO</a></li>
 <li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
+<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
+<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
 <li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
 <li><a href="#ippWrite" title="Write data for an IPP message to a HTTP connection.">ippWrite</a></li>
 <li><a href="#ippWriteFile" title="Write data for an IPP message to a file.">ippWriteFile</a></li>
@@ -1447,7 +1449,7 @@ void httpClose (<br>
 <dt>http</dt>
 <dd class="description">Connection to server</dd>
 </dl>
-<h3 class="function"><a name="httpConnect">httpConnect</a></h3>
+<h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpConnect">httpConnect</a></h3>
 <p class="description">Connect to a HTTP server.</p>
 <p class="code">
 <a href="#http_t">http_t</a> *httpConnect (<br>
@@ -1463,6 +1465,10 @@ void httpClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New HTTP connection</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function is deprecated - use <a href="#httpConnectEncrypt"><code>httpConnectEncrypt</code></a> instead.
+
+</p>
 <h3 class="function"><a name="httpConnectEncrypt">httpConnectEncrypt</a></h3>
 <p class="description">Connect to a HTTP server using encryption.</p>
 <p class="code">
@@ -2332,7 +2338,10 @@ const char *httpStatus (<br>
 <dd class="description">HTTP status code</dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
-<p class="description">String or NULL</p>
+<p class="description">Localized status string</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned string is localized to the current POSIX locale and is based
+on the status strings defined in RFC 2616.</p>
 <h3 class="function"><a name="httpTrace">httpTrace</a></h3>
 <p class="description">Send an TRACE request to the server.</p>
 <p class="code">
@@ -3040,6 +3049,40 @@ void ippSetPort (<br>
 <dt>p</dt>
 <dd class="description">Port number to use</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
+<p class="description">Return the tag name corresponding to a tag value.</p>
+<p class="code">
+const char *ippTagString (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_tag_t">ipp_tag_t</a> tag<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>tag</dt>
+<dd class="description">Tag value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Tag name</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The returned names are defined in RFC 2911 and 3382.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
+<p class="description">Return the tag value corresponding to a tag name.</p>
+<p class="code">
+<a href="#ipp_tag_t">ipp_tag_t</a> ippTagValue (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Tag name</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Tag value</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The tag names are defined in RFC 2911 and 3382.
+
+</p>
 <h3 class="function"><a name="ippTimeToDate">ippTimeToDate</a></h3>
 <p class="description">Convert from UNIX time to RFC 1903 format.</p>
 <p class="code">

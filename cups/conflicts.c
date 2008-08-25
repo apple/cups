@@ -69,28 +69,35 @@ static cups_array_t	*ppd_test_constraints(ppd_file_t *ppd,
  * 'cupsResolveConflicts()' - Resolve conflicts in a marked PPD.
  *
  * This function attempts to resolve any conflicts in a marked PPD, returning
- * a list of option changes that are required to resolve any conflicts.  On
- * input, "num_options" and "options" contain any pending option changes that
- * have not yet been marked, while "option" and "choice" contain the most recent
+ * a list of option changes that are required to resolve them.  On input,
+ * "num_options" and "options" contain any pending option changes that have
+ * not yet been marked, while "option" and "choice" contain the most recent
  * selection which may or may not be in "num_options" or "options".
  *
  * On successful return, "num_options" and "options" are updated to contain
  * "option" and "choice" along with any changes required to resolve conflicts
- * specified in the PPD file.  If option conflicts cannot be resolved,
- * "num_options" and "options" are not changed.
+ * specified in the PPD file and 1 is returned.
  *
- * @code ppdResolveConflicts@ uses one of two sources of option constraint
- * information.  The preferred constraint information is defined by
+ * If option conflicts cannot be resolved, "num_options" and "options" are not
+ * changed and 0 is returned.
+ *
+ * When resolving conflicts, @code cupsResolveConflicts@ does not consider
+ * changes to the current page size (@code media@, @code PageSize@, and
+ * @code PageRegion@) or to the most recent option specified in "option".
+ * Thus, if the only way to resolve a conflict is to change the page size
+ * or the option the user most recently changed, @code cupsResolveConflicts@
+ * will return 0 to indicate it was unable to resolve the conflicts.
+ *
+ * The @code cupsResolveConflicts@ function uses one of two sources of option
+ * constraint information.  The preferred constraint information is defined by
  * @code cupsUIConstraints@ and @code cupsUIResolver@ attributes - in this
- * case, the PPD file provides constraint resolution actions.  In this case,
- * it should not be possible for @ppdResolveConflicts@ to fail, however it
- * will do so if a resolver loop is detected.
+ * case, the PPD file provides constraint resolution actions.
  *
- * The backup constraint infomration is defined by the
+ * The backup constraint information is defined by the
  * @code UIConstraints@ and @code NonUIConstraints@ attributes.  These
- * constraints are resolved algorithmically by selecting the default choice
- * for the conflicting option.  Unfortunately, this method is far more likely
- * to fail.
+ * constraints are resolved algorithmically by first selecting the default
+ * choice for the conflicting option, then iterating over all possible choices
+ * until a non-conflicting option choice is found.
  *
  * @since CUPS 1.4@
  */

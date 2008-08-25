@@ -310,6 +310,7 @@ div.contents ul.subcontents li {
 <li><a href="#cupsBackChannelRead" title="Read data from the backchannel.">cupsBackChannelRead</a></li>
 <li><a href="#cupsBackChannelWrite" title="Write data to the backchannel.">cupsBackChannelWrite</a></li>
 <li><a href="#cupsBackendDeviceURI" title="Get the device URI for a backend.">cupsBackendDeviceURI</a></li>
+<li><a href="#cupsBackendReport" title="Write a device line from a backend.">cupsBackendReport</a></li>
 <li><a href="#cupsSideChannelDoRequest" title="Send a side-channel command to a backend and wait for a response.">cupsSideChannelDoRequest</a></li>
 <li><a href="#cupsSideChannelRead" title="Read a side-channel message.">cupsSideChannelRead</a></li>
 <li><a href="#cupsSideChannelSNMPGet" title="Query a SNMP OID's value.">cupsSideChannelSNMPGet</a></li>
@@ -956,6 +957,36 @@ const char *cupsBackendDeviceURI (<br>
 function returns the device URI passed in the DEVICE_URI environment
 variable or the device URI passed in argv[0], whichever is found
 first.</p>
+<h3 class="function"><a name="cupsBackendReport">cupsBackendReport</a></h3>
+<p class="description">Write a device line from a backend.</p>
+<p class="code">
+void cupsBackendReport (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_scheme,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_uri,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_make_and_model,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_info,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *device_location<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>device_scheme</dt>
+<dd class="description">device-scheme string</dd>
+<dt>device_uri</dt>
+<dd class="description">device-uri string</dd>
+<dt>device_make_and_model</dt>
+<dd class="description">device-make-and-model string or <code>NULL</code></dd>
+<dt>device_info</dt>
+<dd class="description">device-info string or <code>NULL</code></dd>
+<dt>device_id</dt>
+<dd class="description">device-id string or <code>NULL</code></dd>
+<dt>device_location</dt>
+<dd class="description">device-location string or <code>NULL</code></dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function writes a single device line to stdout for a backend.
+It handles quoting of special characters in the device-make-and-model,
+device-info, device-id, and device-location strings.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
 <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">

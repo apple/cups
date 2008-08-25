@@ -1390,9 +1390,9 @@ cupsdSetStringf(char       **s,		/* O - New string */
 static void
 launchd_checkin(void)
 {
-  int			i,		/* Looping var */
-			count,		/* Numebr of listeners */
-			portnum;	/* Port number */
+  size_t		i,		/* Looping var */
+			count;		/* Numebr of listeners */
+  int			portnum;	/* Port number */
   launch_data_t		ld_msg,		/* Launch data message */
 			ld_resp,	/* Launch data response */
 			ld_array,	/* Launch data array */
