@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.9
 
+	- Fixed address matching for "BrowseAddress @IF(name)"
+	  (STR #2910)
+	- Fixed compiles on AIX.
 	- Firefox 3 did not work with the CUPS web interface in SSL
 	  mode (STR #2892)
 	- Custom options with multiple parameters were not emitted
