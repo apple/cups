@@ -222,14 +222,26 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
     }
 
-    fputs("cupsResolveConflicts(): ", stdout);
+    fputs("cupsResolveConflicts(InputSlot=Envelope): ", stdout);
     num_options = 0;
     options     = NULL;
     if (cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
-                             &options) &&
-        num_options == 1 && !strcasecmp(options->name, "InputSlot") &&
-	!strcasecmp(options->value, "Tray"))
-      puts("PASS");
+                             &options))
+    {
+      puts("FAIL (Resolved but shouldn't be able to!)");
+      status ++;
+    }
+    else
+      puts("PASS (Unable to resolve)");
+    cupsFreeOptions(num_options, options);
+
+    fputs("cupsResolveConflicts(No option/choice): ", stdout);
+    num_options = 0;
+    options     = NULL;
+    if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
+        num_options == 1 && !strcasecmp(options[0].name, "InputSlot") &&
+	!strcasecmp(options[0].value, "Manual"))
+      puts("PASS (Resolved)");
     else if (num_options > 0)
     {
       printf("FAIL (%d options:", num_options);
@@ -240,7 +252,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
     {
-      puts("FAIL (Unable to resolve!)");
+      puts("FAIL (Unable to resolve)");
       status ++;
     }
     cupsFreeOptions(num_options, options);
@@ -452,11 +464,26 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
     }
 
-    fputs("cupsResolveConflicts(): ", stdout);
+    fputs("cupsResolveConflicts(Quality=Photo): ", stdout);
     num_options = 0;
     options     = NULL;
     if (cupsResolveConflicts(ppd, "Quality", "Photo", &num_options,
-                            &options) &&
+                             &options))
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
+      status ++;
+    }
+    else
+      puts("PASS (Unable to resolve)");
+    cupsFreeOptions(num_options, options);
+
+    fputs("cupsResolveConflicts(No option/choice): ", stdout);
+    num_options = 0;
+    options     = NULL;
+    if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
         num_options == 1 && !strcasecmp(options->name, "Quality") &&
 	!strcasecmp(options->value, "Normal"))
       puts("PASS");
@@ -480,8 +507,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppdMarkOption(ppd, "Quality", "Photo");
     num_options = 0;
     options     = NULL;
-    if (!cupsResolveConflicts(ppd, "Quality", "Photo", &num_options,
-                             &options))
+    if (!cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options))
       puts("PASS");
     else if (num_options > 0)
     {

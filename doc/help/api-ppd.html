@@ -664,28 +664,35 @@ int cupsResolveConflicts (<br>
 <p class="description">1 on success, 0 on failure</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function attempts to resolve any conflicts in a marked PPD, returning
-a list of option changes that are required to resolve any conflicts.  On
-input, &quot;num_options&quot; and &quot;options&quot; contain any pending option changes that
-have not yet been marked, while &quot;option&quot; and &quot;choice&quot; contain the most recent
+a list of option changes that are required to resolve them.  On input,
+&quot;num_options&quot; and &quot;options&quot; contain any pending option changes that have
+not yet been marked, while &quot;option&quot; and &quot;choice&quot; contain the most recent
 selection which may or may not be in &quot;num_options&quot; or &quot;options&quot;.<br>
 <br>
 On successful return, &quot;num_options&quot; and &quot;options&quot; are updated to contain
 &quot;option&quot; and &quot;choice&quot; along with any changes required to resolve conflicts
-specified in the PPD file.  If option conflicts cannot be resolved,
-&quot;num_options&quot; and &quot;options&quot; are not changed.
-
-<code>ppdResolveConflicts</code> uses one of two sources of option constraint
-information.  The preferred constraint information is defined by
-<code>cupsUIConstraints</code> and <code>cupsUIResolver</code> attributes - in this
-case, the PPD file provides constraint resolution actions.  In this case,
-it should not be possible for @ppdResolveConflicts@ to fail, however it
-will do so if a resolver loop is detected.<br>
+specified in the PPD file and 1 is returned.<br>
 <br>
-The backup constraint infomration is defined by the
+If option conflicts cannot be resolved, &quot;num_options&quot; and &quot;options&quot; are not
+changed and 0 is returned.<br>
+<br>
+When resolving conflicts, <code>cupsResolveConflicts</code> does not consider
+changes to the current page size (<code>media</code>, <code>PageSize</code>, and
+<code>PageRegion</code>) or to the most recent option specified in &quot;option&quot;.
+Thus, if the only way to resolve a conflict is to change the page size
+or the option the user most recently changed, <code>cupsResolveConflicts</code>
+will return 0 to indicate it was unable to resolve the conflicts.<br>
+<br>
+The <code>cupsResolveConflicts</code> function uses one of two sources of option
+constraint information.  The preferred constraint information is defined by
+<code>cupsUIConstraints</code> and <code>cupsUIResolver</code> attributes - in this
+case, the PPD file provides constraint resolution actions.<br>
+<br>
+The backup constraint information is defined by the
 <code>UIConstraints</code> and <code>NonUIConstraints</code> attributes.  These
-constraints are resolved algorithmically by selecting the default choice
-for the conflicting option.  Unfortunately, this method is far more likely
-to fail.
+constraints are resolved algorithmically by first selecting the default
+choice for the conflicting option, then iterating over all possible choices
+until a non-conflicting option choice is found.
 
 </p>
 <h3 class="function"><a name="ppdClose">ppdClose</a></h3>

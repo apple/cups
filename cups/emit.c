@@ -549,7 +549,7 @@ ppdEmitJCLEnd(ppd_file_t *ppd,		/* I - PPD file record */
     */
 
     fputs("\033%-12345X@PJL\n", fp);
-    fputs("@PJL RDYMSG DISPLAY = \"READY\"\n", fp);
+    fputs("@PJL RDYMSG DISPLAY = \"\"\n", fp);
     fputs(ppd->jcl_end + 9, fp);
   }
   else

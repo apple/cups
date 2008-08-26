@@ -73,6 +73,7 @@ OBJS	=	\
 		$(LIB64OBJS) \
 		testadmin.o \
 		testarray.o \
+		testconflicts.o \
 		testcups.o \
 		testfile.o \
 		testhttp.o \
@@ -127,6 +128,7 @@ LIBTARGETS =	\
 TARGETS	=	\
 		$(LIBTARGETS) \
 		testadmin \
+		testconflicts \
 		testcups \
 		testsnmp
 
@@ -399,6 +401,16 @@ testarray:	testarray.o libcups.a
 		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running array API tests...
 	./testarray
+
+
+#
+# testconflicts (dependency on static CUPS library is intentional)
+#
+
+testconflicts:	testconflicts.o libcups.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ testconflicts.o libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

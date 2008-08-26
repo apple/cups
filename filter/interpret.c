@@ -258,7 +258,7 @@ cupsRasterInterpretPPD(
   {
     float sc = atof(val);
 
-    if (sc >= 0.5 && sc <= 2.0)
+    if (sc >= 0.1 && sc <= 2.0)
       h->cupsBorderlessScalingFactor = sc;
   }
 
@@ -328,7 +328,7 @@ cupsRasterInterpretPPD(
       (h->cupsBitsPerColor != 1 && h->cupsBitsPerColor != 2 &&
        h->cupsBitsPerColor != 4 && h->cupsBitsPerColor != 8 &&
        h->cupsBitsPerColor != 16) ||
-      h->cupsBorderlessScalingFactor < 0.5 ||
+      h->cupsBorderlessScalingFactor < 0.1 ||
       h->cupsBorderlessScalingFactor > 2.0)
   {
     _cupsRasterAddError("Page header uses unsupported values.\n");

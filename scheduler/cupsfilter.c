@@ -1053,7 +1053,7 @@ read_cupsd_conf(const char *filename)	/* I - File to read */
   }
 
   snprintf(line, sizeof(line),
-           "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR ":/bin/usr/bin",
+           "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR ":/bin:/usr/bin",
 	   ServerBin);
   set_string(&Path, line);
 

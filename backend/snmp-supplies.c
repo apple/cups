@@ -169,7 +169,10 @@ backendSNMPSupplies(
       if (i)
         *ptr++ = ',';
 
-      sprintf(ptr, "%d", 100 * supplies[i].level / supplies[i].max_capacity);
+      if (supplies[i].max_capacity > 0)
+        sprintf(ptr, "%d", 100 * supplies[i].level / supplies[i].max_capacity);
+      else
+        strcpy(ptr, "-1");
     }
 
     fprintf(stderr, "ATTR: marker-levels=%s\n", value);
