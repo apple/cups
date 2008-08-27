@@ -249,12 +249,13 @@ httpAddrLookup(
 int					/* O - Port number */
 _httpAddrPort(http_addr_t *addr)	/* I - Address */
 {
+  if (!addr)
+    return (ippPort());
 #ifdef AF_INET6
-  if (addr->addr.sa_family == AF_INET6)
+  else if (addr->addr.sa_family == AF_INET6)
     return (ntohs(addr->ipv6.sin6_port));
-  else
 #endif /* AF_INET6 */
-  if (addr->addr.sa_family == AF_INET)
+  else if (addr->addr.sa_family == AF_INET)
     return (ntohs(addr->ipv4.sin_port));
   else
     return (ippPort());
