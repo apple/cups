@@ -12,23 +12,14 @@
 
   CUPS PostScript file specification for the Common UNIX Printing System (CUPS).
 
+  Copyright 2007-2008 by Apple Inc.
   Copyright 2006 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
-  property of Easy Software Products and are protected by Federal
-  copyright law.  Distribution and use rights are outlined in the file
-  "LICENSE.txt" which should have been included with this file.  If this
-  file is missing or damaged please contact Easy Software Products
-  at:
-
-      Attn: CUPS Licensing Information
-      Easy Software Products
-      44141 Airport View Drive, Suite 204
-      Hollywood, Maryland 20636 USA
-
-      Voice: (301) 373-9600
-      EMail: cups-info@cups.org
-        WWW: http://www.cups.org
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
@@ -46,16 +37,16 @@ output will work reliably.</p>
 defacto-standard print job file format/language for UNIX-based
 applications, it is slowly being phased out in favor of Adobe's
 Portable Document Format ("PDF") which offers many advantages
-over PostScript. MacOS X uses PDF as the primary print job file
-format, and we expect Linux to soon follow. Both PostScript and
+over PostScript. Mac OS X uses PDF as the primary print job file
+format and Linux is making the transition. Both PostScript and
 PDF are complex formats, and we highly recommend using high-level
-toolkits whenever possible.</blockquote>
+toolkits whenever possible to create your print jobs.</blockquote>
 
 <h3>Anatomy of a PostScript File</h3>
 
 <p>PostScript files are ASCII text files starting with a header
 line (<tt>%!PS-Adobe-3.0</tt>) followed by a combination of
-comment lines starting with two percent signs (<tt>%%</tt>) and
+comment lines starting with the percent sign (<tt>%</tt>) and
 PostScript code lines. The lines themselves should not exceed 255
 characters to conform to the DSC. The following short PostScript
 file produces a box with a smiley face in it:</p>
@@ -66,7 +57,13 @@ file produces a box with a smiley face in it:</p>
 %%Pages: 1
 %%LanguageLevel: 2
 %%EndComments
+%%BeginSetup
+% this is where fonts would be embedded
+%%EndSetup
 %%Page: (1) 1
+%%BeginPageSetup
+% this is where page-specific features would be specified
+%%EndPageSetup
 % Draw a black box around the page
 0 setgray
 1 setlinewidth
@@ -98,23 +95,52 @@ width="445" height="570" alt="Sample PostScript File Output"></td></tr>
 </table></div>
 
 
-<h2>Embedding Printer Options</h2>
+<h2><a name='OPTIONS'>Embedding Printer Options</a></h2>
+
+<p>There are two main strategies for embedding printer options in PostScript
+files. The first is to list CUPS options using the <code>%cupsJobTicket</code>
+comment:</p>
+
+<pre>
+%!PS-Adobe-3.0
+%cupsJobTicket: media=A4 sides=two-sided-long-edge
+%cupsJobTicket: PrinterOption=foo PrinterOption2=bar
+...
+%%EndComments
+</pre>
+
+<p>CUPS options apply to the entire job. To apply options to individual pages,
+use the <code>%%IncludeFeature</code> comment instead:</p>
+
+<pre>
+%%Page: label 123
+%%BeginPageSetup
+%%IncludeFeature: *PageSize A4
+%%IncludeFeature: *PrinterOption Foo
+%%IncludeFeature: *PrinterOption2 Bar
+%%EndPageSetup
+...
+</pre>
 
 
-<h2>Embedding Fonts and Text</h2>
+<h2><a name='FONTS'>Embedding Fonts and Text</a></h2>
+
+<p>Always embed the fonts used by your print job, and for best performance
+embed the fonts and character encodings in the setup section of the PostScript
+file. Type 1 and Type 3 fonts are supported by all PostScript printers, while
+Type 42 (TrueType) and CID fonts are supported by most level 2 and all level 3
+PostScript printers. Binary font files should always be converted to the
+corresponding ASCII (hex) encoding to avoid problems when printing over
+interfaces that do not support binary PostScript.</p>
 
 
-<h2>Embedding Images</h2>
+<h2><a name='IMAGES'>Embedding Images</a></h2>
 
-
-<blockquote><b>Note:</b> While some printers support arbitrary
-binary data in PostScript files, we do not recommend this
-practice because it does not work with all printers or
-interfaces. In most cases, the Base-85 encoding and compression
-filters can be used to embed images with very little, if any,
-increase in data size.</blockquote>
-
-
+<p>The <code>image</code> operator should be used to embed images in PostScript
+files. Always use ASCII hex or Base-85 encoding for the image data to avoid
+problems when printing over interfaces that do not support binary PostScript.
+In most cases, the Base-85 encoding and compression filters can be used to
+embed images with very little, if any, increase in data size.</p>
 
 </body>
 </html>

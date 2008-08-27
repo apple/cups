@@ -9811,35 +9811,57 @@ send_http_error(
 		  uri ? uri->values[0].string.text : "no URI",
 		  con->http.hostname);
 
-  if (status == HTTP_UNAUTHORIZED &&
-      printer && printer->num_auth_info_required > 0 &&
-      !strcmp(printer->auth_info_required[0], "negotiate"))
-    cupsdSendError(con, status, CUPSD_AUTH_NEGOTIATE);
-  else if (printer)
+  if (printer)
   {
-    char	resource[HTTP_MAX_URI];	/* Resource portion of URI */
-    cupsd_location_t *auth;		/* Pointer to authentication element */
     int		auth_type;		/* Type of authentication required */
 
 
-    if (printer->type & CUPS_PRINTER_CLASS)
-      snprintf(resource, sizeof(resource), "/classes/%s", printer->name);
-    else
-      snprintf(resource, sizeof(resource), "/printers/%s", printer->name);
+    auth_type = CUPSD_AUTH_NONE;
 
-    if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
-        auth->type == CUPSD_AUTH_NONE)
-      auth = cupsdFindPolicyOp(printer->op_policy_ptr,
-                               con->request ?
-			           con->request->request.op.operation_id :
-				   IPP_PRINT_JOB);
+    if (status == HTTP_UNAUTHORIZED &&
+        printer->num_auth_info_required > 0 &&
+        !strcmp(printer->auth_info_required[0], "negotiate") &&
+	con->request &&
+	(con->request->request.op.operation_id == IPP_PRINT_JOB ||
+	 con->request->request.op.operation_id == IPP_CREATE_JOB ||
+	 con->request->request.op.operation_id == CUPS_AUTHENTICATE_JOB))
+    {
+     /*
+      * Creating and authenticating jobs requires Kerberos...
+      */
 
-    if (!auth)
-      auth_type = CUPSD_AUTH_NONE;
-    else if (auth->type == CUPSD_AUTH_DEFAULT)
-      auth_type = DefaultAuthType;
+      auth_type = CUPSD_AUTH_NEGOTIATE;
+    }
     else
-      auth_type = auth->type;
+    {
+     /*
+      * Use policy/location-defined authentication requirements...
+      */
+
+      char	resource[HTTP_MAX_URI];	/* Resource portion of URI */
+      cupsd_location_t *auth;		/* Pointer to authentication element */
+
+
+      if (printer->type & CUPS_PRINTER_CLASS)
+	snprintf(resource, sizeof(resource), "/classes/%s", printer->name);
+      else
+	snprintf(resource, sizeof(resource), "/printers/%s", printer->name);
+
+      if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
+	  auth->type == CUPSD_AUTH_NONE)
+	auth = cupsdFindPolicyOp(printer->op_policy_ptr,
+				 con->request ?
+				     con->request->request.op.operation_id :
+				     IPP_PRINT_JOB);
+
+      if (auth)
+      {
+        if (auth->type == CUPSD_AUTH_DEFAULT)
+	  auth_type = DefaultAuthType;
+	else
+	  auth_type = auth->type;
+      }
+    }
 
     cupsdSendError(con, status, auth_type);
   }

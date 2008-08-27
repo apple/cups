@@ -22,14 +22,28 @@ AC_SUBST(OPTIM)
 
 AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
+AC_ARG_ENABLE(debug_printfs, [  --enable-debug-printfs  turn on debug printfs, default=no])
+AC_ARG_ENABLE(unit_tests, [  --enable-unit-tests     turn on unit tests, default=no])
 
 dnl For debugging, keep symbols, otherwise strip them...
 if test x$enable_debug = xyes; then
 	OPTIM="-g"
-	CFLAGS="$CFLAGS -DDEBUG"
 else
 	INSTALL_STRIP="-s"
 fi
+
+dnl Debug printfs can slow things down, so provide a separate option for that
+if test x$enable_debug_printf = xyes; then
+	CFLAGS="$CFLAGS -DDEBUG"
+fi
+
+dnl Unit tests take up time during a compile...
+if test x$enable_unit_tests = xyes; then
+	UNITTESTS="unittests"
+else
+	UNITTESTS=""
+fi
+AC_SUBST(UNITTESTS)
 
 dnl Setup general architecture flags...
 AC_ARG_WITH(archflags, [  --with-archflags="flags"

@@ -33,13 +33,14 @@ LIBTARGETS =	\
 		$(LIBCUPSIMAGE) \
 		libcupsimage.a \
 		$(LIB32CUPSIMAGE) \
-		$(LIB64CUPSIMAGE) \
+		$(LIB64CUPSIMAGE)
+UNITTARGETS =	\
+		rasterbench \
+		testimage \
 		testraster
 TARGETS	=	\
 		$(LIBTARGETS) \
-		$(FILTERS) \
-		rasterbench \
-		testimage
+		$(FILTERS)
 
 HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
 		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
@@ -72,11 +73,18 @@ libs:		$(LIBTARGETS)
 
 
 #
+# Make unit tests...
+#
+
+unittests:	$(UNITTARGETS)
+
+
+#
 # Clean all object files...
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
 	$(RM) libcupsimage.so libcupsimage.sl libcupsimage.dylib
 	$(RM) -r 32bit 64bit
 

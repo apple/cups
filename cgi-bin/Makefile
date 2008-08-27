@@ -48,14 +48,16 @@ LIBTARGETS =	\
 		$(LIBCUPSCGI) \
 		$(LIB32CUPSCGI) \
 		$(LIB32CUPSCGI) \
+		websearch
+
+UNITTARGETS =	\
 		testcgi \
 		testhi \
-		websearch
+		testtemplate
 
 TARGETS	=	\
 		$(LIBTARGETS) \
-		$(CGIS) \
-		testtemplate
+		$(CGIS)
 
 
 #
@@ -69,7 +71,14 @@ all:	$(TARGETS)
 # Make library targets...
 #
 
-libs:		$(LIBTARGETS)
+libs:		$(LIBTARGETS) $(UNITTESTS)
+
+
+#
+# Make unit tests...
+#
+
+unittests:	$(UNITTARGETS)
 
 
 #
@@ -77,7 +86,7 @@ libs:		$(LIBTARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
 	$(RM) libcupscgi.so libcupscgi.sl libcupscgi.dylib
 	$(RM) -r 32bit 64bit
 
