@@ -72,7 +72,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		sep;			/* Option separator */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
-  time_t	start_time;		/* Time of first connect */
+  time_t	start_time,		/* Time of first connect */
+		wait_time;		/* Time to wait before shutting down socket */
   int		recoverable;		/* Recoverable error shown? */
   int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
@@ -412,10 +413,13 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Get any pending back-channel data...
+  * Wait up to 5 seconds to get any pending back-channel data...
   */
 
-  while (wait_bc(device_fd, 5) > 0);
+  wait_time = time(NULL) + 5;
+  while (wait_time >= time(NULL))
+    if (wait_bc(device_fd, 1) <= 0)
+      break;
 
   if (waiteof)
   {
