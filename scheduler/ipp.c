@@ -25,7 +25,7 @@
  *   add_job()                   - Add a job to a print queue.
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
- *   add_job_subscriptions()     - Add any subcriptions for a job.
+ *   add_job_subscriptions()     - Add any subscriptions for a job.
  *   add_job_uuid()              - Add job-uuid attribute to a job.
  *   add_printer()               - Add a printer to the system.
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
@@ -1978,7 +1978,7 @@ add_job_state_reasons(
 
 
 /*
- * 'add_job_subscriptions()' - Add any subcriptions for a job.
+ * 'add_job_subscriptions()' - Add any subscriptions for a job.
  */
 
 static void
@@ -3394,7 +3394,8 @@ apple_register_profiles(
 					     &kCFTypeDictionaryKeyCallBacks,
 					     &kCFTypeDictionaryValueCallBacks);
     printer_name = CFStringCreateWithCString(kCFAllocatorDefault,
-                                             p->info ? p->info : p->name,
+                                             p->info && p->info[0] ? p->info :
+					                             p->name,
 					     kCFStringEncodingUTF8);
 
     if (device_name && printer_name)
