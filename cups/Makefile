@@ -115,22 +115,24 @@ LIBTARGETS =	\
 		$(LIBCUPS) \
 		$(LIB32CUPS) \
 		$(LIB64CUPS) \
-		libcups.a \
+		libcups.a
+
+UNITTARGETS =	\
+		testadmin \
 		testarray \
+		testconflicts \
+		testcups \
 		testfile \
 		testhttp \
 		testi18n \
 		testipp \
 		testlang \
 		testoptions \
-		testppd
+		testppd \
+		testsnmp
 
 TARGETS	=	\
-		$(LIBTARGETS) \
-		testadmin \
-		testconflicts \
-		testcups \
-		testsnmp
+		$(LIBTARGETS)
 
 
 #
@@ -148,11 +150,18 @@ libs:		$(LIBTARGETS)
 
 
 #
+# Make unit tests...
+#
+
+unittests:	$(UNITTARGETS)
+
+
+#
 # Remove object and target files...
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
 	$(RM) libcups.so libcups.sl libcups.dylib
 	$(RM) -r 32bit 64bit
 

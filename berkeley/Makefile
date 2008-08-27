@@ -15,6 +15,7 @@
 
 include ../Makedefs
 
+
 TARGETS	=	lpc lpq lpr lprm
 OBJS	=	lpc.o lpq.o lpr.o lprm.o
 
@@ -31,6 +32,13 @@ all:	$(TARGETS)
 #
 
 libs:
+
+
+#
+# Make unit tests...
+#
+
+unittests:
 
 
 #

@@ -152,6 +152,8 @@ PHPDIR		=	@PHPDIR@
 PHPOPTIONS	=	@PHPOPTIONS@ -I../.. `$(PHPCONFIG) --includes`
 SSLFLAGS	=	@SSLFLAGS@
 SSLLIBS		=	@SSLLIBS@
+UNITTESTS	=	@UNITTESTS@
+
 
 #
 # Separate 32/64-bit library support...

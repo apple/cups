@@ -34,6 +34,8 @@ all:
 	echo Using ARCHFLAGS="$(ARCHFLAGS)"
 	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
 	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using CC="$(CC)"
+	echo Using CXX="$(CC)"
 	echo Using DSOFLAGS="$(DSOFLAGS)"
 	echo Using LDFLAGS="$(LDFLAGS)"
 	echo Using LIBS="$(LIBS)"
@@ -51,12 +53,33 @@ libs:
 	echo Using ARCHFLAGS="$(ARCHFLAGS)"
 	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
 	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using CC="$(CC)"
+	echo Using CXX="$(CC)"
 	echo Using DSOFLAGS="$(DSOFLAGS)"
 	echo Using LDFLAGS="$(LDFLAGS)"
 	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
 		echo Making libraries in $$dir... ;\
 		(cd $$dir ; $(MAKE) $(MFLAGS) libs) || exit 1;\
+	done
+
+
+#
+# Make unit test targets...
+#
+
+unittests:
+	echo Using ARCHFLAGS="$(ARCHFLAGS)"
+	echo Using ALL_CFLAGS="$(ALL_CFLAGS)"
+	echo Using ALL_CXXFLAGS="$(ALL_CXXFLAGS)"
+	echo Using CC="$(CC)"
+	echo Using CXX="$(CC)"
+	echo Using DSOFLAGS="$(DSOFLAGS)"
+	echo Using LDFLAGS="$(LDFLAGS)"
+	echo Using LIBS="$(LIBS)"
+	for dir in $(DIRS); do\
+		echo Making all in $$dir... ;\
+		(cd $$dir ; $(MAKE) $(MFLAGS) unittests) || exit 1;\
 	done
 
 

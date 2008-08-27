@@ -54,16 +54,17 @@ OBJS =		\
 		testcatalog.o
 LIBTARGETS =	\
 		$(LIBCUPSPPDC) \
-		libcupsppdc.a \
-		ppdc-static
+		libcupsppdc.a
+UNITTARGETS =	\
+		ppdc-static \
+		testcatalog
 TARGETS	=	\
 		$(LIBTARGETS) \
 		ppdc \
 		ppdhtml \
 		ppdi \
 		ppdmerge \
-		ppdpo \
-		testcatalog
+		ppdpo
 
 
 #
@@ -81,13 +82,20 @@ libs:		$(LIBTARGETS)
 
 
 #
+# Make unit tests...
+#
+
+unittests:	$(UNITTARGETS)
+
+
+#
 # Clean everything...
 #
 
 clean:
 	$(RM) $(OBJS) core
 	$(RM) *.bak *.bck core.*
-	$(RM) $(TARGETS)
+	$(RM) $(TARGETS) $(UNITTARGETS)
 	$(RM) -r ppd
 	$(RM) test.drv
 	$(RM) libcupsppdc.so libcupsppdc.sl libcupsppdc.dylib
