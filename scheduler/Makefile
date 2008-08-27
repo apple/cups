@@ -70,8 +70,14 @@ LIBTARGETS =	\
 		$(LIBCUPSMIME) \
 		$(LIB32CUPSMIME) \
 		$(LIB64CUPSMIME) \
-		libcupsmime.a \
-		testmime
+		libcupsmime.a
+
+UNITTARGETS =	\
+		testdirsvc \
+		testlpd \
+		testmime \
+		testspeed \
+		testsub
 
 TARGETS	=	\
 		$(LIBTARGETS) \
@@ -81,10 +87,6 @@ TARGETS	=	\
 		cups-driverd \
 		cups-lpd \
 		cups-polld \
-		testdirsvc \
-		testlpd \
-		testspeed \
-		testsub
 
 
 #
@@ -105,7 +107,7 @@ libs:		$(LIBTARGETS)
 # Make unit tests...
 #
 
-unittests:
+unittests:	$(UNITTARGETS)
 
 
 #
@@ -114,7 +116,7 @@ unittests:
 
 clean:
 	$(RM) $(OBJS)
-	$(RM) $(TARGETS) convert
+	$(RM) $(TARGETS) $(UNITTARGETS) convert
 	$(RM) libcupsmime.so libcupsmime.sl libcupsmime.dylib
 	$(RM) -r 32bit 64bit
 

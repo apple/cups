@@ -53,7 +53,8 @@ LIBTARGETS =	\
 		$(LIBCUPSDRIVER) \
 		$(LIB32CUPSDRIVER) \
 		$(LIB64CUPSDRIVER) \
-		libcupsdriver.a \
+		libcupsdriver.a
+UNITTARGETS =	\
 		testcmyk \
 		testdither \
 		testrgb
@@ -83,7 +84,7 @@ libs:		$(LIBTARGETS)
 # Make unit tests...
 #
 
-unittests:
+unittests:	$(UNITTARGETS)
 
 
 #
@@ -93,7 +94,7 @@ unittests:
 clean:
 	$(RM) $(OBJS) core
 	$(RM) *.bck core.*
-	$(RM) $(TARGETS)
+	$(RM) $(TARGETS) $(UNITTARGETS)
 	$(RM) -r test
 	$(RM) libcupsdriver.so libcupsdriver.sl libcupsdriver.dylib
 	$(RM) -r 32bit 64bit
