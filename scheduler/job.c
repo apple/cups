@@ -3715,6 +3715,17 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
+      if ((attr = cupsGetOption("job-media-progress", num_attrs,
+                                attrs)) != NULL)
+      {
+        job->progress = atoi(attr);
+
+	if (job->sheets)
+	  cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+			"Printing page %d, %d%%",
+			job->sheets->values[0].integer, job->progress);
+      }
+
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
       {
         cupsdSetString(&job->printer->alert, attr);

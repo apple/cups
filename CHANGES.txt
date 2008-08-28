@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-08-04
+CHANGES.txt - 2008-08-28
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now supports a job-media-progress attribute to
+	  track the progress of individual pages.
 	- The sample HP driver now supports A5 (STR #2798)
 	- The CUPS web interface menu item now uses the xdg-open
 	  command, when available (STR #2724)

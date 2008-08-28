@@ -23,7 +23,7 @@
 
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
 
-<p>CUPS 1.1 implements IPP/1.1 and the operations and attributes
+<p>CUPS implements IPP/1.1 and the operations and attributes
 defined in the "IPP: Job and Printer Set Operations", "IPP/1.1:
 Output-bin Attribute Extension", and "IPP/1.1: finishings
 'fold',' trim', and 'bale' attribute values extension"
@@ -2183,6 +2183,11 @@ standard IPP/1.1 keyword names, CUPS supports name values of the form
 Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the
 specified time is less than the current time, the job is held until the
 next day.
+
+<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+
+<p>The job-media-progress attribute specifies the percentage of completion of
+the current page.</p>
 
 <h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3</span></h4>
 

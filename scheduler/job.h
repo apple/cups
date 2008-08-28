@@ -58,6 +58,7 @@ typedef struct cupsd_job_s
 			*auth_domain,	/* AUTH_DOMAIN environment variable, if any */
 			*auth_password;	/* AUTH_PASSWORD environment variable, if any */
   void			*profile;	/* Security profile */
+  int			progress;	/* Printing progress */
 #ifdef HAVE_GSSAPI
   krb5_ccache		ccache;		/* Kerberos credential cache */
   char			*ccname;	/* KRB5CCNAME environment variable */

@@ -5327,6 +5327,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
         	  "document-count", job->num_files);
 
+  if (!ra || cupsArrayFind(ra, "job-media-progress"))
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+        	  "job-media-progress", job->progress);
+
   if (!ra || cupsArrayFind(ra, "job-more-info"))
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
@@ -5788,6 +5792,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "job-impressions-completed");
       cupsArrayAdd(ra, "job-k-octets");
       cupsArrayAdd(ra, "job-k-octets-processed");
+      cupsArrayAdd(ra, "job-media-progress");
       cupsArrayAdd(ra, "job-media-sheets");
       cupsArrayAdd(ra, "job-media-sheets-completed");
       cupsArrayAdd(ra, "job-message-from-operator");
