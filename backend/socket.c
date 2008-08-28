@@ -73,6 +73,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
   time_t	start_time,		/* Time of first connect */
+		current_time,		/* Current time */
 		wait_time;		/* Time to wait before shutting down socket */
   int		recoverable;		/* Recoverable error shown? */
   int		contimeout;		/* Connection timeout */
@@ -417,8 +418,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   wait_time = time(NULL) + 5;
-  while (wait_time >= time(NULL))
-    if (wait_bc(device_fd, 1) <= 0)
+  while (wait_time >= time(&current_time))
+    if (wait_bc(device_fd, wait_time - current_time) <= 0)
       break;
 
   if (waiteof)
