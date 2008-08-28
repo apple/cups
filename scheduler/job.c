@@ -2733,10 +2733,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   job->state->values[0].integer = IPP_JOB_PROCESSING;
   job->state_value              = IPP_JOB_PROCESSING;
-
-  job->status  = 0;
-  job->printer = printer;
-  printer->job = job;
+  job->progress                 = 0;
+  job->status                   = 0;
+  job->printer                  = printer;
+  printer->job                  = job;
 
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
 
@@ -3718,12 +3718,18 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       if ((attr = cupsGetOption("job-media-progress", num_attrs,
                                 attrs)) != NULL)
       {
-        job->progress = atoi(attr);
+        int progress = atoi(attr);
 
-	if (job->sheets)
-	  cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-			"Printing page %d, %d%%",
-			job->sheets->values[0].integer, job->progress);
+
+        if (progress >= 0 && progress <= 100)
+	{
+	  job->progress = progress;
+
+	  if (job->sheets)
+	    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+			  "Printing page %d, %d%%",
+			  job->sheets->values[0].integer, job->progress);
+        }
       }
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
