@@ -3394,9 +3394,7 @@ apple_register_profiles(
 					     &kCFTypeDictionaryKeyCallBacks,
 					     &kCFTypeDictionaryValueCallBacks);
     printer_name = CFStringCreateWithCString(kCFAllocatorDefault,
-                                             p->info && p->info[0] ? p->info :
-					                             p->name,
-					     kCFStringEncodingUTF8);
+                                             p->name, kCFStringEncodingUTF8);
 
     if (device_name && printer_name)
     {
