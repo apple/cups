@@ -1806,13 +1806,22 @@ static void run_legacy_backend(int argc,
 #  else
     cpu_type_t cpu = CPU_TYPE_POWERPC;
 #  endif /* __x86_64__ */
-    size_t ocount = 0;
+    size_t ocount = 1;
     posix_spawnattr_t attrs;
 
     if (!posix_spawnattr_init(&attrs))
     {
       posix_spawnattr_setsigdefault(attrs, &oldmask);
-      posix_spawnattr_setbinpref_np(attrs, 1, &cpu, &ocount);
+      if (posix_spawnattr_setbinpref_np(attrs, 1, &cpu, &ocount) || ocount != 1)
+      {
+#  ifdef __x86_64__
+	perror("DEBUG: Unable to set binary preference to i386");
+#  else
+	perror("DEBUG: Unable to set binary preference to ppc");
+#  endif /* __x86_64__ */
+	_cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
+	exit(CUPS_BACKEND_STOP);
+      }
     }
 
    /*
@@ -1827,8 +1836,8 @@ static void run_legacy_backend(int argc,
     if (posix_spawn(&child_pid, "/usr/libexec/cups/backend/usb", NULL, &attrs,
                     my_argv, environ))
     {
-      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
       perror("DEBUG: Unable to exec /usr/libexec/cups/backend/usb");
+      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
       exit(CUPS_BACKEND_STOP);
     }
 

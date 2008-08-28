@@ -2057,20 +2057,26 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
     if (auth)
     {
-      if (auth->type == CUPSD_AUTH_BASIC || auth->type == CUPSD_AUTH_BASICDIGEST)
+      int	auth_type;		/* Authentication type */
+
+
+      if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
+        auth_type = DefaultAuthType;
+
+      if (auth_type == CUPSD_AUTH_BASIC || auth_type == CUPSD_AUTH_BASICDIGEST)
       {
 	auth_supported = "basic";
 	num_air        = 2;
 	air            = air_userpass;
       }
-      else if (auth->type == CUPSD_AUTH_DIGEST)
+      else if (auth_type == CUPSD_AUTH_DIGEST)
       {
 	auth_supported = "digest";
 	num_air        = 2;
 	air            = air_userpass;
       }
 #ifdef HAVE_GSSAPI
-      else if (auth->type == CUPSD_AUTH_NEGOTIATE)
+      else if (auth_type == CUPSD_AUTH_NEGOTIATE)
       {
 	auth_supported = "negotiate";
 	num_air        = 1;
@@ -2078,7 +2084,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
 #endif /* HAVE_GSSAPI */
 
-      if (auth->type != CUPSD_AUTH_NONE)
+      if (auth_type != CUPSD_AUTH_NONE)
         p->type |= CUPS_PRINTER_AUTHENTICATED;
       else
         p->type &= ~CUPS_PRINTER_AUTHENTICATED;

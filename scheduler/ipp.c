@@ -25,7 +25,7 @@
  *   add_job()                   - Add a job to a print queue.
  *   add_job_state_reasons()     - Add the "job-state-reasons" attribute based
  *                                 upon the job and printer state...
- *   add_job_subscriptions()     - Add any subcriptions for a job.
+ *   add_job_subscriptions()     - Add any subscriptions for a job.
  *   add_job_uuid()              - Add job-uuid attribute to a job.
  *   add_printer()               - Add a printer to the system.
  *   add_printer_state_reasons() - Add the "printer-state-reasons" attribute
@@ -1978,7 +1978,7 @@ add_job_state_reasons(
 
 
 /*
- * 'add_job_subscriptions()' - Add any subcriptions for a job.
+ * 'add_job_subscriptions()' - Add any subscriptions for a job.
  */
 
 static void
@@ -3393,8 +3393,8 @@ apple_register_profiles(
     device_name  = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					     &kCFTypeDictionaryKeyCallBacks,
 					     &kCFTypeDictionaryValueCallBacks);
-    printer_name = CFStringCreateWithCString(kCFAllocatorDefault, p->name,
-					    kCFStringEncodingUTF8);
+    printer_name = CFStringCreateWithCString(kCFAllocatorDefault,
+                                             p->name, kCFStringEncodingUTF8);
 
     if (device_name && printer_name)
     {
@@ -5327,6 +5327,10 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
         	  "document-count", job->num_files);
 
+  if (!ra || cupsArrayFind(ra, "job-media-progress"))
+    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+        	  "job-media-progress", job->progress);
+
   if (!ra || cupsArrayFind(ra, "job-more-info"))
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-more-info", NULL, job_uri);
@@ -5788,6 +5792,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "job-impressions-completed");
       cupsArrayAdd(ra, "job-k-octets");
       cupsArrayAdd(ra, "job-k-octets-processed");
+      cupsArrayAdd(ra, "job-media-progress");
       cupsArrayAdd(ra, "job-media-sheets");
       cupsArrayAdd(ra, "job-media-sheets-completed");
       cupsArrayAdd(ra, "job-message-from-operator");
