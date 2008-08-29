@@ -3,7 +3,7 @@
 .\"
 .\"   lpr man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpr 1 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH lpr 1 "Common UNIX Printing System" "29 August 2008" "Apple Inc."
 .SH NAME
 lpr \- print files
 .SH SYNOPSIS
@@ -34,10 +34,14 @@ lpr \- print files
 ]
 .SH DESCRIPTION
 \fIlpr\fR submits files for printing. Files named on the command
-line are sent to the named printer (or the system default
-destination if no destination is specified). If no files are
-listed on the command-line, \fIlpr\fR reads the print file from
-the standard input.
+line are sent to the named printer (or the default destination if no
+destination is specified). If no files are listed on the command-line,
+\fIlpr\fR reads the print file from the standard input.
+.SH THE DEFAULT DESTINATION
+CUPS provides many ways to set the default destination. The "LPDEST" and
+"PRINTER" environment variables are consulted first. If neither are set,
+the current default set using the \fIlpoptions(1)\fR command is used,
+followed by the default set using the \fIlpadmin(8)\fR command.
 .SH OPTIONS
 The following options are recognized by \fIlpr\fR:
 .TP 5
@@ -107,12 +111,12 @@ printing them.
 The "c", "d", "f", "g", "i", "n", "t", "v", and "w" options
 are not supported by CUPS and produce a warning message if used.
 .SH SEE ALSO
-\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpq(1)\fR, \fIlprm(1)\fR,
-\fIlpstat(1)\fR,
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpadmin(8)\fR, \fIlpoptions(1)\fR,
+\fIlpq(1)\fR, \fIlprm(1)\fR, \fIlpstat(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

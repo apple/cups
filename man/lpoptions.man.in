@@ -3,7 +3,7 @@
 .\"
 .\"   lpoptions man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpoptions 1 "Common UNIX Printing System" "20 March 2006" "Apple Inc."
+.TH lpoptions 1 "Common UNIX Printing System" "29 August 2008" "Apple Inc."
 .SH NAME
 lpoptions \- display or set printer options and defaults
 .SH SYNOPSIS
@@ -74,7 +74,7 @@ Uses an alternate username.
 .TP 5
 -d destination[/instance]
 .br
-Sets the default printer to \fIdestination\fR. If \fIinstance\fR
+Sets the user default printer to \fIdestination\fR. If \fIinstance\fR
 is supplied then that particular instance is used. This option
 overrides the system default printer for the current user.
 .TP 5
@@ -125,11 +125,11 @@ users.
 @CUPS_SERVERROOT@/lpoptions - system-wide defaults and instances
 created by the root user.
 .SH SEE ALSO
-\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpr(1)\fR,
+\fIcancel(1)\fR, \fIlp(1)\fR, \fIlpadmin(8)\fR, \fIlpr(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
