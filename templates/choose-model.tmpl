@@ -4,7 +4,6 @@
 <INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
 <INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
 <INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
-
 <TABLE>
 <TR>
 <TH CLASS="label">Connection:</TH>
@@ -21,6 +20,11 @@
 <TR>
 <TH CLASS="label">Location:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Sharing:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_IS_SHARED" VALUE="{?printer_is_shared}">
+{?printer_is_shared=?Do Not:{?printer_is_shared=0?Do Not:}} Share This Printer</TD>
 </TR>
 <TR>
 <TH CLASS="label">Make:</TH>
