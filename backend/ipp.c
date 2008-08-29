@@ -138,6 +138,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		version;		/* IPP version */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
+                  "com.apple.print.recoverable-message",
 		  "copies-supported",
 		  "document-format-supported",
 		  "marker-colors",
@@ -1366,6 +1367,7 @@ check_printer_state(
 	*response;			/* IPP response */
   static const char * const attrs[] =	/* Attributes we want */
   {
+    "com.apple.print.recoverable-message",
     "marker-colors",
     "marker-levels",
     "marker-message",
@@ -1601,7 +1603,8 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*psm,		/* printer-state-message */
+  ipp_attribute_t	*caprm,		/* com.apple.print.recoverable-message */
+			*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
@@ -1610,6 +1613,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
   cups_lang_t		*language;	/* Current localization */
+  int			saw_caprw;	/* Saw com.apple.print.recoverable-warning state */
 
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
@@ -1620,9 +1624,10 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  state[0] = '\0';
-  prefix   = "STATE: ";
-  language = cupsLangDefault();
+  saw_caprw = 0;
+  state[0]  = '\0';
+  prefix    = "STATE: ";
+  language  = cupsLangDefault();
 
   for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
@@ -1688,6 +1693,8 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
       message = _("Developer almost empty.");
     else if (!strncmp(reason, "developer-empty", 15))
       message = _("Developer empty!");
+    else if (!strcmp(reason, "com.apple.print.recoverable-warning"))
+      saw_caprw = 1;
     else if (strstr(reason, "error") != NULL)
     {
       message = unknown;
@@ -1709,6 +1716,16 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   }
 
   fprintf(stderr, "%s\n", state);
+
+ /*
+  * Relay com.apple.print.recoverable-message...
+  */
+
+  if ((caprm = ippFindAttribute(ipp, "com.apple.print.recoverable-message",
+                                IPP_TAG_TEXT)) != NULL)
+    fprintf(stderr, "WARNING: %s: %s\n",
+            saw_caprw ? "recoverable" : "recovered",
+	    caprm->values[0].string.text);
 
  /*
   * Relay the current marker-* attribute values...

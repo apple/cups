@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-08-28
+CHANGES.txt - 2008-08-29
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The IPP backend did not relay com.apple.print.recoverable-message
+	  values.
 	- The scheduler now supports a job-media-progress attribute to
 	  track the progress of individual pages.
 	- The sample HP driver now supports A5 (STR #2798)
