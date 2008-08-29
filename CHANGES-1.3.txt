@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.9
 
 	- Documentation updates (STR #2904)
+	- The PostScript filter incorrectly mirrored landscape
+	  documents.
 	- The scheduler did not correctly update the
 	  auth-info-required value(s) if the AuthType was Default.
 	- The scheduler required Kerberos authentication for

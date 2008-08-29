@@ -2844,9 +2844,6 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
   if (doc->number_up > 1)
     doc_puts(doc, "userdict/ESPsave save put\n");
 
-  if (doc->mirror)
-    doc_printf(doc, "%.1f 0.0 translate -1 1 scale\n", PageWidth);
-
   pos   = (number - 1) % doc->number_up;
   pagew = PageRight - PageLeft;
   pagel = PageTop - PageBottom;
@@ -2894,6 +2891,9 @@ start_nup(pstops_doc_t *doc,		/* I - Document information */
     doc_printf(doc, "%.1f %.1f translate\n", PageWidth - PageRight, PageBottom);
   else if (doc->number_up > 1 || doc->fitplot)
     doc_printf(doc, "%.1f %.1f translate\n", PageLeft, PageBottom);
+
+  if (doc->mirror)
+    doc_printf(doc, "%.1f 0.0 translate -1 1 scale\n", PageWidth);
 
   switch (doc->number_up)
   {
