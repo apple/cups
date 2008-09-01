@@ -133,7 +133,7 @@ depend:
 .PHONY: clang
 clang:
 	$(RM) -r clang
-	scan-build -o `pwd`/clang $(MAKE) $(MFLAGS) \
+	scan-build -k -o `pwd`/clang $(MAKE) $(MFLAGS) \
 		CC=ccc-analyzer CXX=ccc-analyzer clean all
 
 
