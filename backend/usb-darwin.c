@@ -1139,7 +1139,7 @@ static Boolean find_device_cb(void *refcon,
 
   if (!keepLooking && g.status_timer != NULL)
   {
-    fputs("STATE: -offline-error\n", stderr);
+    fputs("STATE: -offline-report\n", stderr);
     _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
@@ -1157,7 +1157,7 @@ static Boolean find_device_cb(void *refcon,
 static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
-  fputs("STATE: +offline-error\n", stderr);
+  fputs("STATE: +offline-report\n", stderr);
   _cupsLangPuts(stderr, _("INFO: Printer is offline.\n"));
 
   if (getenv("CLASS") != NULL)
