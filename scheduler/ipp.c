@@ -679,7 +679,9 @@ cupsdProcessIPPRequest(
     */
 
     cupsdLogMessage(con->response->request.status.status_code
-                        >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
+                        >= IPP_BAD_REQUEST &&
+                    con->response->request.status.status_code
+		        != IPP_NOT_FOUND ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                     "Returning IPP %s for %s (%s) from %s",
 	            ippErrorString(con->response->request.status.status_code),
 		    ippOpString(con->request->request.op.operation_id),
