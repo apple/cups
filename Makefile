@@ -110,6 +110,8 @@ distclean:	clean
 	$(RM) man/cupsd.conf.man man/lpoptions.man
 	$(RM) packaging/cups.list
 	$(RM) templates/header.tmpl
+	$(RM) desktop/cups.desktop
+	$(RM) init/cups.xml
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
 	-$(RM) -r autom4te*.cache
