@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-08-29
+CHANGES.txt - 2008-09-02
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The LPD mini-daemon now passes the document name when queuing
+	  print jobs (STR #2482)
 	- The IPP backend did not relay com.apple.print.recoverable-message
 	  values.
 	- The scheduler now supports a job-media-progress attribute to

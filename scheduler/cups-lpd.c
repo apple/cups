@@ -81,8 +81,8 @@
  */
 
 static int	create_job(http_t *http, const char *dest, const char *title,
-		           const char *user, int num_options,
-			   cups_option_t *options);
+                           const char *docname, const char *user,
+			   int num_options, cups_option_t *options);
 static int	get_printer(http_t *http, const char *name, char *dest,
 		            int destsize, cups_option_t **options,
 			    int *accepting, int *shared, ipp_pstate_t *state);
@@ -338,6 +338,7 @@ static int				/* O - Job ID or -1 on error */
 create_job(http_t        *http,		/* I - HTTP connection */
            const char    *dest,		/* I - Destination name */
 	   const char    *title,	/* I - job-name */
+	   const char    *docname,	/* I - Name of job file */
            const char    *user,		/* I - requesting-user-name */
 	   int           num_options,	/* I - Number of options for job */
 	   cups_option_t *options)	/* I - Options for job */
@@ -364,9 +365,13 @@ create_job(http_t        *http,		/* I - HTTP connection */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, user);
 
-  if (title)
+  if (title[0])
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
                  NULL, title);
+
+  if (docname[0])
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name", 
+                 NULL, docname);
 
   cupsEncodeOptions(request, num_options, options);
 
@@ -1143,9 +1148,10 @@ recv_print_job(
       * Grab the job information...
       */
 
-      title[0] = '\0';
-      user[0]  = '\0';
-      doccount = 0;
+      title[0]   = '\0';
+      user[0]    = '\0';
+      docname[0] = '\0';
+      doccount   = 0;
 
       while (smart_gets(line, sizeof(line), fp) != NULL)
       {
@@ -1158,6 +1164,10 @@ recv_print_job(
 	  case 'J' : /* Job name */
 	      strlcpy(title, line + 1, sizeof(title));
 	      break;
+
+          case 'N' : /* Document name */
+              strlcpy(docname, line + 1, sizeof(docname));
+              break;
 
 	  case 'P' : /* User identification */
 	      strlcpy(user, line + 1, sizeof(user));
@@ -1222,7 +1232,8 @@ recv_print_job(
       * Create the job...
       */
 
-      if ((id = create_job(http, dest, title, user, num_options, options)) < 0)
+      if ((id = create_job(http, dest, title, docname, user, num_options,
+                           options)) < 0)
         status = 1;
       else
       {
