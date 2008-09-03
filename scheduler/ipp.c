@@ -77,7 +77,7 @@
  *   move_job()                  - Move a job to a new destination.
  *   ppd_parse_line()            - Parse a PPD default line.
  *   print_job()                 - Print a file to a printer or class.
- *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
+ *   read_job_ticket()           - Read a job ticket embedded in a print file.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
  *   renew_subscription()        - Renew an existing subscription...
@@ -201,7 +201,7 @@ static void	move_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	ppd_parse_line(const char *line, char *option, int olen,
 		               char *choice, int clen);
 static void	print_job(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	read_ps_job_ticket(cupsd_client_t *con);
+static void	read_job_ticket(cupsd_client_t *con);
 static void	reject_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
@@ -8477,8 +8477,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (!strcasecmp(filetype->super, "application") &&
-      !strcasecmp(filetype->type, "postscript"))
-    read_ps_job_ticket(con);
+      (!strcasecmp(filetype->type, "postscript") ||
+       !strcasecmp(filetype->type, "pdf")))
+    read_job_ticket(con);
 
  /*
   * Create the job object...
@@ -8539,16 +8540,16 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
 /*
- * 'read_ps_job_ticket()' - Reads a job ticket embedded in a PS file.
+ * 'read_job_ticket()' - Read a job ticket embedded in a print file.
  *
- * This function only gets called when printing a single PostScript
+ * This function only gets called when printing a single PDF or PostScript
  * file using the Print-Job operation.  It doesn't work for Create-Job +
  * Send-File, since the job attributes need to be set at job creation
- * time for banners to work.  The embedded PS job ticket stuff is here
- * only to allow the Windows printer driver for CUPS to pass in JCL
+ * time for banners to work.  The embedded job ticket stuff is here
+ * primarily to allow the Windows printer driver for CUPS to pass in JCL
  * options and IPP attributes which otherwise would be lost.
  *
- * The format of a PS job ticket is simple:
+ * The format of a job ticket is simple:
  *
  *     %cupsJobTicket: attr1=value1 attr2=value2 ... attrN=valueN
  *
@@ -8558,8 +8559,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
  *     %cupsJobTicket: attrN=valueN
  *
  * Job ticket lines must appear immediately after the first line that
- * specifies PostScript format (%!PS-Adobe-3.0), and CUPS will stop
- * looking for job ticket info when it finds a line that does not begin
+ * specifies PostScript (%!PS-Adobe-3.0) or PDF (%PDF) format, and CUPS
+ * stops looking for job ticket info when it finds a line that does not begin
  * with "%cupsJobTicket:".
  *
  * The maximum length of a job ticket line, including the prefix, is
@@ -8572,7 +8573,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
  */
 
 static void
-read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
+read_job_ticket(cupsd_client_t *con)	/* I - Client connection */
 {
   cups_file_t		*fp;		/* File to read from */
   char			line[256];	/* Line data */
@@ -8591,8 +8592,7 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
   if ((fp = cupsFileOpen(con->filename, "rb")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "read_ps_job_ticket: Unable to open PostScript print file "
-		    "- %s",
+                    "Unable to open print file for job ticket - %s",
                     strerror(errno));
     return;
   }
@@ -8604,14 +8604,13 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
   if (cupsFileGets(fp, line, sizeof(line)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "read_ps_job_ticket: Unable to read from PostScript print "
-		    "file - %s",
+                    "Unable to read from print file for job ticket - %s",
                     strerror(errno));
     cupsFileClose(fp);
     return;
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11))
+  if (strncmp(line, "%!PS-Adobe-", 11) && strncmp(line, "%PDF-", 5))
   {
    /*
     * Not a DSC-compliant file, so no job ticket info will be available...
