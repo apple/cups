@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-09-02
+CHANGES.txt - 2008-09-03
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now passes the job-originating-host-name
+	  value to filters in the options argument (STR #2558)
 	- CUPS now supports job tickets in PDF files (STR #2903)
 	- Added a DBUS notifier (STR #2529)
 	- The LPD mini-daemon now passes the document name when queuing
