@@ -4977,12 +4977,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   cups_option_t	*defaults;		/* Default options */
   char		cups_protocol[PPD_MAX_LINE];
 					/* cupsProtocol attribute */
-  int		have_letter,		/* Have Letter size */
-		have_a4;		/* Have A4 size */
-#ifdef HAVE_LIBPAPER
-  char		*paper_result;		/* Paper size name from libpaper */
-  char		system_paper[64];	/* Paper size name buffer */
-#endif /* HAVE_LIBPAPER */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -5107,9 +5101,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
     return (-1);
   }
 
-  have_letter = ppdPageSize(ppd, "Letter") != NULL;
-  have_a4     = ppdPageSize(ppd, "A4") != NULL;
-
  /*
   * Open the destination (if possible) and set the default options...
   */
@@ -5154,81 +5145,20 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
     cupsFileClose(dst);
   }
-#ifdef HAVE_LIBPAPER
-  else if ((paper_result = systempapername()) != NULL)
-  {
-   /*
-    * Set the default media sizes from the systemwide default...
-    */
-
-    strlcpy(system_paper, paper_result, sizeof(system_paper));
-    system_paper[0] = toupper(system_paper[0] & 255);
-
-    if ((!strcmp(system_paper, "Letter") && have_letter) ||
-        (!strcmp(system_paper, "A4") && have_a4))
-    {
-      num_defaults = cupsAddOption("PageSize", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("PageRegion", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("PaperDimension", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("ImageableArea", system_paper,
-				   num_defaults, &defaults);
-    }
-  }
-#endif /* HAVE_LIBPAPER */
-  else
+  else if (ppdPageSize(ppd, DefaultPaperSize))
   {
    /*
     * Add the default media sizes...
-    *
-    * Note: These values are generally not valid for large-format devices
-    *       like plotters, however it is probably safe to say that those
-    *       users will configure the media size after initially adding
-    *       the device anyways...
     */
 
-    if (!DefaultLanguage ||
-        !strcasecmp(DefaultLanguage, "C") ||
-        !strcasecmp(DefaultLanguage, "POSIX") ||
-	!strcasecmp(DefaultLanguage, "en") ||
-	!strncasecmp(DefaultLanguage, "en.", 3) ||
-	!strncasecmp(DefaultLanguage, "en_US", 5) ||
-	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
-	!strncasecmp(DefaultLanguage, "fr_CA", 5))
-    {
-     /*
-      * These are the only locales that will default to "letter" size...
-      */
-
-      if (have_letter)
-      {
-	num_defaults = cupsAddOption("PageSize", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("PageRegion", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("PaperDimension", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("ImageableArea", "Letter", num_defaults,
-                                     &defaults);
-      }
-    }
-    else if (have_a4)
-    {
-     /*
-      * The rest default to "a4" size...
-      */
-
-      num_defaults = cupsAddOption("PageSize", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("PageRegion", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("PaperDimension", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("ImageableArea", "A4", num_defaults,
-                                   &defaults);
-    }
+    num_defaults = cupsAddOption("PageSize", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("PageRegion", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("PaperDimension", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("ImageableArea", DefaultPaperSize,
+                                 num_defaults, &defaults);
   }
 
   ppdClose(ppd);
