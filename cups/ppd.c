@@ -642,7 +642,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
                   "string=%d chars...", mask, keyword, name, text,
 		  string ? (int)strlen(string) : 0));
 
-    if (strncmp(keyword, "Default", 7) && !string)
+    if (strncmp(keyword, "Default", 7) && !string &&
+        cg->ppd_conform != PPD_CONFORM_RELAXED)
     {
      /*
       * Need a string value!
