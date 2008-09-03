@@ -3,6 +3,7 @@ CHANGES.txt - 2008-09-02
 
 CHANGES IN CUPS V1.4b1
 
+	- Added a DBUS notifier (STR #2529)
 	- The LPD mini-daemon now passes the document name when queuing
 	  print jobs (STR #2482)
 	- The IPP backend did not relay com.apple.print.recoverable-message

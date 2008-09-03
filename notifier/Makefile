@@ -16,8 +16,9 @@
 include ../Makedefs
 
 
-TARGETS =	mailto rss testnotify
-OBJS	=	mailto.o rss.o testnotify.o
+NOTIFIERS =	$(DBUS_NOTIFIER) mailto rss
+TARGETS =	$(NOTIFIERS) testnotify
+OBJS	=	dbus.o mailto.o rss.o testnotify.o
 
 
 #
@@ -46,7 +47,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS)
+	$(RM) $(OBJS) $(TARGETS) dbus.h
 
 
 #
@@ -65,7 +66,7 @@ install-data:
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		cp mailto rss $(SYMROOT); \
+		cp $(NOTIFIERS) $(SYMROOT); \
 	fi
 
 
@@ -74,9 +75,11 @@ install-data:
 #
 
 install-exec:
+	echo Installing notifiers in $(SERVERBIN)/notifier...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/notifier
-	$(INSTALL_BIN) mailto $(SERVERBIN)/notifier
-	$(INSTALL_BIN) rss $(SERVERBIN)/notifier
+	for file in $(NOTIFIERS); do \
+		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
+	done
 
 
 #
@@ -98,7 +101,7 @@ install-libs:
 #
 
 uninstall:
-	for file in $(TARGETS); do \
+	for file in $(NOTIFIERS); do \
 		$(RM) $(SERVERBIN)/notifier/$$file; \
 	done
 	-$(RMDIR) $(SERVERBIN)/notifier
@@ -112,6 +115,19 @@ uninstall:
 
 depend:
 	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
+
+
+#
+# dbus
+#
+
+dbus:	dbus.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
+
+dbus.o:	dbus.h
+dbus.h:	dbus-notifier.xml
+	dbus-binding-tool --mode=glib-server $< >$@
 
 
 #
