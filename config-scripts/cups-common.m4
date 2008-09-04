@@ -247,6 +247,9 @@ AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto
 AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
 	DBUSDIR="$withval")
 
+DBUS_NOTIFIER=""
+DBUS_NOTIFIERLIBS=""
+
 if test "x$enable_dbus" != xno; then
 	AC_PATH_PROG(PKGCONFIG, pkg-config)
 	if test "x$PKGCONFIG" != x; then
@@ -257,9 +260,14 @@ if test "x$enable_dbus" != xno; then
 			CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
 			CUPSDLIBS="$CUPSDLIBS `$PKGCONFIG --libs dbus-1`"
 			AC_CHECK_LIB(dbus-1,
-			    dbus_message_iter_init_append,
-			    AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
-			    `$PKGCONFIG --libs dbus-1`)
+				dbus_message_iter_init_append,
+				AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
+				`$PKGCONFIG --libs dbus-1`)
+			if $PKGCONFIG --exists glib-2.0 && $PKGCONFIG --exists dbus-glib-1; then
+				DBUS_NOTIFIER="dbus"
+				DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs glib-2.0` `$PKGCONFIG --libs dbus-glib-1` `$PKGCONFIG --libs dbus-1`"
+				CFLAGS="$CFLAGS `$PKGCONFIG --cflags glib-2.0`"
+			fi
 		else
 			AC_MSG_RESULT(no)
 		fi
@@ -267,6 +275,8 @@ if test "x$enable_dbus" != xno; then
 fi
 
 AC_SUBST(DBUSDIR)
+AC_SUBST(DBUS_NOTIFIER)
+AC_SUBST(DBUS_NOTIFIERLIBS)
 
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTADMIN_AUTH="@SYSTEM"

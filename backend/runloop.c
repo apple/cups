@@ -239,7 +239,7 @@ backendRunLoop(
 
 	if (errno == ENXIO && offline != 1)
 	{
-	  fputs("STATE: +offline-error\n", stderr);
+	  fputs("STATE: +offline-report\n", stderr);
 	  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
 	  offline = 1;
 	}
@@ -338,7 +338,7 @@ backendRunLoop(
 	{
 	  if (paperout != 1)
 	  {
-	    fputs("STATE: +media-empty-error\n", stderr);
+	    fputs("STATE: +media-empty-warning\n", stderr);
 	    _cupsLangPuts(stderr, _("ERROR: Out of paper!\n"));
 	    paperout = 1;
 	  }
@@ -347,7 +347,7 @@ backendRunLoop(
 	{
 	  if (offline != 1)
 	  {
-	    fputs("STATE: +offline-error\n", stderr);
+	    fputs("STATE: +offline-report\n", stderr);
 	    _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
 	    offline = 1;
 	  }
@@ -363,13 +363,13 @@ backendRunLoop(
       {
         if (paperout)
 	{
-	  fputs("STATE: -media-empty-error\n", stderr);
+	  fputs("STATE: -media-empty-warning\n", stderr);
 	  paperout = 0;
 	}
 
 	if (offline)
 	{
-	  fputs("STATE: -offline-error\n", stderr);
+	  fputs("STATE: -offline-report\n", stderr);
 	  _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
 	  offline = 0;
 	}

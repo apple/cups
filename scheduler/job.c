@@ -2894,19 +2894,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       if (!strncmp(attr->name, "time-", 5))
 	continue;
 
-      if (!strncmp(attr->name, "job-", 4) && strcmp(attr->name, "job-uuid") &&
+      if (!strncmp(attr->name, "job-", 4) &&
+          strcmp(attr->name, "job-uuid") &&
           strcmp(attr->name, "job-impressions") &&
           strcmp(attr->name, "job-originating-host-name") &&
           !(printer->type & CUPS_PRINTER_REMOTE))
-	continue;
-
-      if (!strncmp(attr->name, "job-", 4) &&
-          strcmp(attr->name, "job-uuid") &&
-          strcmp(attr->name, "job-billing") &&
-          strcmp(attr->name, "job-impressions") &&
-          strcmp(attr->name, "job-sheets") &&
-          strcmp(attr->name, "job-hold-until") &&
-	  strcmp(attr->name, "job-priority"))
 	continue;
 
       if ((!strcmp(attr->name, "job-impressions") ||

@@ -1,8 +1,18 @@
-CHANGES.txt - 2008-08-28
+CHANGES.txt - 2008-09-03
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now supports a DefaultPaperSize directive
+	  (STR #2848)
+	- The scheduler now passes the job-originating-host-name
+	  value to filters in the options argument (STR #2558)
+	- CUPS now supports job tickets in PDF files (STR #2903)
+	- Added a DBUS notifier (STR #2529)
+	- The LPD mini-daemon now passes the document name when queuing
+	  print jobs (STR #2482)
+	- The IPP backend did not relay com.apple.print.recoverable-message
+	  values.
 	- The scheduler now supports a job-media-progress attribute to
 	  track the progress of individual pages.
 	- The sample HP driver now supports A5 (STR #2798)

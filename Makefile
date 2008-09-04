@@ -110,6 +110,8 @@ distclean:	clean
 	$(RM) man/cupsd.conf.man man/lpoptions.man
 	$(RM) packaging/cups.list
 	$(RM) templates/header.tmpl
+	$(RM) desktop/cups.desktop
+	$(RM) init/cups.xml
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
 	-$(RM) -r autom4te*.cache
@@ -132,14 +134,9 @@ depend:
 
 .PHONY: clang
 clang:
-	if test ! -d clang; then \
-		mkdir clang; \
-	else \
-		rm -rf clang/*; \
-	fi
-	$(MAKE) $(MFLAGS) CC="scan-build -o ../clang $(CC)" \
-		CXX="scan-build -o ../clang $(CXX)" clean all
-	test `ls -1 clang | wc -l` = 0
+	$(RM) -r clang
+	scan-build -k -o `pwd`/clang $(MAKE) $(MFLAGS) \
+		CC=ccc-analyzer CXX=ccc-analyzer clean all
 
 
 #

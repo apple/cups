@@ -98,6 +98,8 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Default charset */
 			*DefaultLocale		VALUE(NULL),
 					/* Default locale */
+			*DefaultPaperSize	VALUE(NULL),
+					/* Default paper size */
 			*ErrorPolicy		VALUE(NULL),
 					/* Default printer-error-policy */
 			*RIPCache		VALUE(NULL),

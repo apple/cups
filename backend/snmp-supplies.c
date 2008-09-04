@@ -194,24 +194,24 @@ backendSNMPSupplies(
         (packet.object_value.string[1] & 255);
 
     if (i & CUPS_TC_lowPaper)
-      fputs("STATE: +media-low-warning\n", stderr);
+      fputs("STATE: +media-low-report\n", stderr);
     else
-      fputs("STATE: -media-low-warning\n", stderr);
+      fputs("STATE: -media-low-report\n", stderr);
 
     if (i & (CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty))
-      fputs("STATE: +media-empty-error\n", stderr);
+      fputs("STATE: +media-empty-warning\n", stderr);
     else
-      fputs("STATE: -media-empty-error\n", stderr);
+      fputs("STATE: -media-empty-warning\n", stderr);
 
     if (i & CUPS_TC_lowToner)
-      fputs("STATE: +toner-low-warning\n", stderr);
+      fputs("STATE: +toner-low-report\n", stderr);
     else
-      fputs("STATE: -toner-low-warning\n", stderr);
+      fputs("STATE: -toner-low-report\n", stderr);
 
     if (i & CUPS_TC_noToner)
-      fputs("STATE: +toner-empty-error\n", stderr);
+      fputs("STATE: +toner-empty-warning\n", stderr);
     else
-      fputs("STATE: -toner-empty-error\n", stderr);
+      fputs("STATE: -toner-empty-warning\n", stderr);
 
     if (i & CUPS_TC_doorOpen)
       fputs("STATE: +door-open-report\n", stderr);
@@ -219,9 +219,9 @@ backendSNMPSupplies(
       fputs("STATE: -door-open-report\n", stderr);
 
     if (i & CUPS_TC_jammed)
-      fputs("STATE: +media-jam-error\n", stderr);
+      fputs("STATE: +media-jam-warning\n", stderr);
     else
-      fputs("STATE: -media-jam-error\n", stderr);
+      fputs("STATE: -media-jam-warning\n", stderr);
 
     if (i & CUPS_TC_offline)
       fputs("STATE: +offline-report\n", stderr);
@@ -229,34 +229,34 @@ backendSNMPSupplies(
       fputs("STATE: -offline-report\n", stderr);
 
     if (i & (CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint))
-      fputs("STATE: +service-needed-error\n", stderr);
+      fputs("STATE: +service-needed-warning\n", stderr);
     else
-      fputs("STATE: -service-needed-error\n", stderr);
+      fputs("STATE: -service-needed-warning\n", stderr);
 
     if (i & CUPS_TC_inputTrayMissing)
-      fputs("STATE: +input-tray-missing-error\n", stderr);
+      fputs("STATE: +input-tray-missing-warning\n", stderr);
     else
-      fputs("STATE: -input-tray-missing-error\n", stderr);
+      fputs("STATE: -input-tray-missing-warning\n", stderr);
 
     if (i & CUPS_TC_outputTrayMissing)
-      fputs("STATE: +output-tray-missing-error\n", stderr);
+      fputs("STATE: +output-tray-missing-warning\n", stderr);
     else
-      fputs("STATE: -output-tray-missing-error\n", stderr);
+      fputs("STATE: -output-tray-missing-warning\n", stderr);
 
     if (i & CUPS_TC_markerSupplyMissing)
-      fputs("STATE: +marker-supply-missing-error\n", stderr);
+      fputs("STATE: +marker-supply-missing-warning\n", stderr);
     else
-      fputs("STATE: -marker-supply-missing-error\n", stderr);
+      fputs("STATE: -marker-supply-missing-warning\n", stderr);
 
     if (i & CUPS_TC_outputNearFull)
-      fputs("STATE: +output-area-almost-full-warning\n", stderr);
+      fputs("STATE: +output-area-almost-full-report\n", stderr);
     else
-      fputs("STATE: -output-area-almost-full-warning\n", stderr);
+      fputs("STATE: -output-area-almost-full-report\n", stderr);
 
     if (i & CUPS_TC_outputFull)
-      fputs("STATE: +output-area-full-error\n", stderr);
+      fputs("STATE: +output-area-full-warning\n", stderr);
     else
-      fputs("STATE: -output-area-full-error\n", stderr);
+      fputs("STATE: -output-area-full-warning\n", stderr);
 
    /*
     * Get the current printer state...

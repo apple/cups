@@ -105,6 +105,7 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
+  const char	*name;			/* Backend name */
   DNSServiceRef	main_ref,		/* Main service reference */
 		fax_ipp_ref,		/* IPP fax service reference */
 		ipp_ref,		/* IPP service reference */
@@ -133,9 +134,22 @@ main(int  argc,				/* I - Number of command-line args */
     exec_backend(argv);
   else if (argc != 1)
   {
-    fputs("Usage: mdns job user title copies options [filename(s)]\n", stderr);
+    fprintf(stderr, "Usage: %s job user title copies options [filename(s)]\n",
+            argv[0]);
     return (1);
   }
+
+ /*
+  * Only do discovery when run as "dnssd"...
+  */
+
+  if ((name = strrchr(argv[0], '/')) != NULL)
+    name ++;
+  else
+    name = argv[0];
+
+  if (strcmp(name, "dnssd"))
+    return (0);
 
  /*
   * Create an array to track devices...

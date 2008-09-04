@@ -103,6 +103,7 @@ static const cupsd_var_t	variables[] =
   { "DefaultCharset",		&DefaultCharset,	CUPSD_VARTYPE_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
   { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
+  { "DefaultPaperSize",		&DefaultPaperSize,	CUPSD_VARTYPE_STRING },
   { "DefaultPolicy",		&DefaultPolicy,		CUPSD_VARTYPE_STRING },
   { "DefaultShared",		&DefaultShared,		CUPSD_VARTYPE_BOOLEAN },
   { "DirtyCleanInterval",	&DirtyCleanInterval,	CUPSD_VARTYPE_INTEGER },
@@ -461,6 +462,8 @@ cupsdReadConfiguration(void)
     cupsdSetString(&DefaultLanguage, language->language);
 
   cupsdSetString(&DefaultCharset, _cupsEncodingName(language->encoding));
+
+  cupsdClearString(&DefaultPaperSize);
 
   cupsdSetString(&RIPCache, "8m");
 
@@ -881,6 +884,48 @@ cupsdReadConfiguration(void)
   cupsdInitEnv();
 
  /*
+  * Update default paper size setting as needed...
+  */
+
+  if (!DefaultPaperSize)
+  {
+#ifdef HAVE_LIBPAPER
+    char	*paper_result;		/* Paper size name from libpaper */
+
+    if ((paper_result = systempapername()) != NULL)
+      cupsdSetString(&DefaultPaperSize, paper_result);
+    else
+#endif /* HAVE_LIBPAPER */
+    if (!DefaultLanguage ||
+        !strcasecmp(DefaultLanguage, "C") ||
+        !strcasecmp(DefaultLanguage, "POSIX") ||
+	!strcasecmp(DefaultLanguage, "en") ||
+	!strncasecmp(DefaultLanguage, "en.", 3) ||
+	!strncasecmp(DefaultLanguage, "en_US", 5) ||
+	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
+	!strncasecmp(DefaultLanguage, "fr_CA", 5))
+    {
+     /*
+      * These are the only locales that will default to "letter" size...
+      */
+
+      cupsdSetString(&DefaultPaperSize, "Letter");
+    }
+    else
+      cupsdSetString(&DefaultPaperSize, "A4");
+  }
+
+ /*
+  * Update classification setting as needed...
+  */
+
+  if (Classification && !strcasecmp(Classification, "none"))
+    cupsdClearString(&Classification);
+
+  if (Classification)
+    cupsdLogMessage(CUPSD_LOG_INFO, "Security set to \"%s\"", Classification);
+
+ /*
   * Check the MaxClients setting, and then allocate memory for it...
   */
 
@@ -903,12 +948,6 @@ cupsdReadConfiguration(void)
 
   if (MaxActiveJobs > (MaxFDs / 3))
     MaxActiveJobs = MaxFDs / 3;
-
-  if (Classification && !strcasecmp(Classification, "none"))
-    cupsdClearString(&Classification);
-
-  if (Classification)
-    cupsdLogMessage(CUPSD_LOG_INFO, "Security set to \"%s\"", Classification);
 
  /*
   * Update the MaxClientsPerHost value, as needed...

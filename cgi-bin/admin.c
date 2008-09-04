@@ -965,6 +965,13 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       * Get the name, location, and description for a new printer...
       */
 
+#ifdef __APPLE__
+      if (!strncmp(var, "usb:", 4))
+        cgiSetVariable("printer_is_shared", "1");
+      else
+#endif /* __APPLE__ */
+        cgiSetVariable("printer_is_shared", "0");
+
       cgiCopyTemplateLang("add-printer.tmpl");
     }
 
@@ -1175,6 +1182,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     *    ppd-name
     *    device-uri
     *    printer-is-accepting-jobs
+    *    printer-is-shared
     *    printer-state
     */
 
@@ -1224,6 +1232,10 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
                  NULL, uri);
 
     ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-accepting-jobs", 1);
+
+    var = cgiGetVariable("printer_is_shared");
+    ippAddBoolean(request, IPP_TAG_PRINTER, "printer-is-shared",
+                  var && (!strcmp(var, "1") || !strcmp(var, "on")));
 
     ippAddInteger(request, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
                   IPP_PRINTER_IDLE);

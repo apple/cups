@@ -1668,6 +1668,20 @@ looking up IPP reason codes for this printer driver. The
 *APHelpBook: "file:///Library/Printers/vendor/Help.bundle"
 </pre>
 
+<h3><span class='info'>Mac OS X 10.6</span><a name='APICADriver'>APICADriver</a></h3>
+
+<p class='summary'>*APICADriver: boolean</p>
+
+<p>This attribute specifies whether the device has a matching Image Capture
+Architecture (ICA) driver for scanning. The default is <tt>False</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APICADriver: True
+*APScanAppBundleID: "com.apple.ImageCaptureApp"
+</pre>
+
 <h3><span class='info'>Mac OS X 10.3</span><a name='APPrinterIconPath'>APPrinterIconPath</a></h3>
 
 <p class='summary'>*APPrinterIconPath: "/Library/Printers/vendor/filename"</p>
@@ -1791,6 +1805,7 @@ the device.</p>
 <p>Examples:</p>
 
 <pre class='command'>
+*APICADriver: True
 *APScanAppBundleID: "com.apple.ImageCaptureApp"
 </pre>
 
@@ -1800,6 +1815,9 @@ the device.</p>
 <h3>Changes in CUPS 1.4</a></h3>
 
 <ul>
+
+	<li>Added <a href='#APICADriver'><tt>APICADriver</tt></a>
+	attribute.</li>
 
 	<li>Added <a href='#cupsCommands'><tt>cupsCommands</tt></a>
 	attribute.</li>

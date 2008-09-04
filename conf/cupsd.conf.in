@@ -81,6 +81,11 @@ DefaultAuthType Basic
 # Set the authenticated printer/job policies...
 <Policy authenticated>
   # Job-related operations must be done by the owner or an administrator...
+  <Limit Create-Job Print-Job Print-URI>
+    AuthType Default
+    Order deny,allow
+  </Limit>
+
   <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job CUPS-Get-Document>
     AuthType Default
     Require user @OWNER @SYSTEM

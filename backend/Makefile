@@ -17,12 +17,12 @@
 
 include ../Makedefs
 
-RBACKENDS =	ipp lpd $(MDNS)
+RBACKENDS =	ipp lpd $(DNSSD_BACKEND)
 UBACKENDS =	$(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
 TARGETS	=	test1284 testbackend testsupplies \
 		libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o network.o runloop.o snmp-supplies.o
-OBJS	=	ipp.o lpd.o mdns.o pap.o parallel.o scsi.o serial.o snmp.o \
+OBJS	=	ipp.o lpd.o dnssd.o pap.o parallel.o scsi.o serial.o snmp.o \
 		socket.o test1284.o testbackend.o testsupplies.o usb.o
 
 
@@ -52,7 +52,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBOBJS) http
+	$(RM) $(OBJS) $(TARGETS) $(LIBOBJS) http mdns
 
 
 #
@@ -168,6 +168,17 @@ libbackend.a:	$(LIBOBJS)
 
 
 #
+# dnssd
+#
+
+dnssd:	dnssd.o ../cups/$(LIBCUPS) libbackend.a
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o dnssd dnssd.o libbackend.a $(LIBS)
+	$(RM) mdns
+	$(LN) dnssd mdns
+
+
+#
 # ipp
 #
 
@@ -185,15 +196,6 @@ ipp:	ipp.o ../cups/$(LIBCUPS) libbackend.a
 lpd:	lpd.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o lpd lpd.o libbackend.a $(LIBS)
-
-
-#
-# mdns
-#
-
-mdns:	mdns.o ../cups/$(LIBCUPS) libbackend.a
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o mdns mdns.o libbackend.a $(LIBS)
 
 
 #

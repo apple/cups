@@ -341,6 +341,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     putenv("LANG=fr");
+    putenv("LC_ALL=fr");
+    putenv("LC_CTYPE=fr");
+    putenv("LC_MESSAGES=fr");
 
     fputs("ppdLocalizeIPPReason(fr text): ", stdout);
     if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
@@ -353,6 +356,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     putenv("LANG=zh_TW");
+    putenv("LC_ALL=zh_TW");
+    putenv("LC_CTYPE=zh_TW");
+    putenv("LC_MESSAGES=zh_TW");
 
     fputs("ppdLocalizeIPPReason(zh_TW text): ", stdout);
     if (ppdLocalizeIPPReason(ppd, "foo", NULL, buffer, sizeof(buffer)) &&
@@ -369,6 +375,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     putenv("LANG=en");
+    putenv("LC_ALL=en");
+    putenv("LC_CTYPE=en");
+    putenv("LC_MESSAGES=en");
 
     fputs("ppdLocalizeMarkerName(bogus): ", stdout);
 
@@ -393,6 +402,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     putenv("LANG=fr");
+    putenv("LC_ALL=fr");
+    putenv("LC_CTYPE=fr");
+    putenv("LC_MESSAGES=fr");
 
     fputs("ppdLocalizeMarkerName(fr cyan): ", stdout);
     if ((text = ppdLocalizeMarkerName(ppd, "cyan")) != NULL &&
@@ -406,6 +418,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     putenv("LANG=zh_TW");
+    putenv("LC_ALL=zh_TW");
+    putenv("LC_CTYPE=zh_TW");
+    putenv("LC_MESSAGES=zh_TW");
 
     fputs("ppdLocalizeMarkerName(zh_TW cyan): ", stdout);
     if ((text = ppdLocalizeMarkerName(ppd, "cyan")) != NULL &&
@@ -663,13 +678,22 @@ main(int  argc,				/* I - Number of command-line arguments */
       ppd_coption_t	*coption;	/* Custom option */
       ppd_cparam_t	*cparam;	/* Custom parameter */
       ppd_const_t	*c;		/* UIConstraints */
-      char		lang[255];	/* LANG environment variable */
+      char		lang[255],	/* LANG environment variable */
+			lc_all[255],	/* LC_ALL environment variable */
+			lc_ctype[255],	/* LC_CTYPE environment variable */
+			lc_messages[255];/* LC_MESSAGES environment variable */
 
 
       if (argc > 2)
       {
         snprintf(lang, sizeof(lang), "LANG=%s", argv[2]);
 	putenv(lang);
+        snprintf(lc_all, sizeof(lc_all), "LC_ALL=%s", argv[2]);
+	putenv(lc_all);
+        snprintf(lc_ctype, sizeof(lc_ctype), "LC_CTYPE=%s", argv[2]);
+	putenv(lc_ctype);
+        snprintf(lc_messages, sizeof(lc_messages), "LC_MESSAGES=%s", argv[2]);
+	putenv(lc_messages);
       }
 
       ppdLocalize(ppd);

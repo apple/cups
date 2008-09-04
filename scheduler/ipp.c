@@ -77,7 +77,7 @@
  *   move_job()                  - Move a job to a new destination.
  *   ppd_parse_line()            - Parse a PPD default line.
  *   print_job()                 - Print a file to a printer or class.
- *   read_ps_job_ticket()        - Reads a job ticket embedded in a PS file.
+ *   read_job_ticket()           - Read a job ticket embedded in a print file.
  *   reject_jobs()               - Reject print jobs to a printer.
  *   release_job()               - Release a held print job.
  *   renew_subscription()        - Renew an existing subscription...
@@ -201,7 +201,7 @@ static void	move_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	ppd_parse_line(const char *line, char *option, int olen,
 		               char *choice, int clen);
 static void	print_job(cupsd_client_t *con, ipp_attribute_t *uri);
-static void	read_ps_job_ticket(cupsd_client_t *con);
+static void	read_job_ticket(cupsd_client_t *con);
 static void	reject_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
@@ -679,7 +679,9 @@ cupsdProcessIPPRequest(
     */
 
     cupsdLogMessage(con->response->request.status.status_code
-                        >= IPP_BAD_REQUEST ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
+                        >= IPP_BAD_REQUEST &&
+                    con->response->request.status.status_code
+		        != IPP_NOT_FOUND ? CUPSD_LOG_ERROR : CUPSD_LOG_DEBUG,
                     "Returning IPP %s for %s (%s) from %s",
 	            ippErrorString(con->response->request.status.status_code),
 		    ippOpString(con->request->request.op.operation_id),
@@ -4975,12 +4977,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   cups_option_t	*defaults;		/* Default options */
   char		cups_protocol[PPD_MAX_LINE];
 					/* cupsProtocol attribute */
-  int		have_letter,		/* Have Letter size */
-		have_a4;		/* Have A4 size */
-#ifdef HAVE_LIBPAPER
-  char		*paper_result;		/* Paper size name from libpaper */
-  char		system_paper[64];	/* Paper size name buffer */
-#endif /* HAVE_LIBPAPER */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -5105,9 +5101,6 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
     return (-1);
   }
 
-  have_letter = ppdPageSize(ppd, "Letter") != NULL;
-  have_a4     = ppdPageSize(ppd, "A4") != NULL;
-
  /*
   * Open the destination (if possible) and set the default options...
   */
@@ -5152,81 +5145,20 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
     cupsFileClose(dst);
   }
-#ifdef HAVE_LIBPAPER
-  else if ((paper_result = systempapername()) != NULL)
-  {
-   /*
-    * Set the default media sizes from the systemwide default...
-    */
-
-    strlcpy(system_paper, paper_result, sizeof(system_paper));
-    system_paper[0] = toupper(system_paper[0] & 255);
-
-    if ((!strcmp(system_paper, "Letter") && have_letter) ||
-        (!strcmp(system_paper, "A4") && have_a4))
-    {
-      num_defaults = cupsAddOption("PageSize", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("PageRegion", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("PaperDimension", system_paper,
-				   num_defaults, &defaults);
-      num_defaults = cupsAddOption("ImageableArea", system_paper,
-				   num_defaults, &defaults);
-    }
-  }
-#endif /* HAVE_LIBPAPER */
-  else
+  else if (ppdPageSize(ppd, DefaultPaperSize))
   {
    /*
     * Add the default media sizes...
-    *
-    * Note: These values are generally not valid for large-format devices
-    *       like plotters, however it is probably safe to say that those
-    *       users will configure the media size after initially adding
-    *       the device anyways...
     */
 
-    if (!DefaultLanguage ||
-        !strcasecmp(DefaultLanguage, "C") ||
-        !strcasecmp(DefaultLanguage, "POSIX") ||
-	!strcasecmp(DefaultLanguage, "en") ||
-	!strncasecmp(DefaultLanguage, "en.", 3) ||
-	!strncasecmp(DefaultLanguage, "en_US", 5) ||
-	!strncasecmp(DefaultLanguage, "en_CA", 5) ||
-	!strncasecmp(DefaultLanguage, "fr_CA", 5))
-    {
-     /*
-      * These are the only locales that will default to "letter" size...
-      */
-
-      if (have_letter)
-      {
-	num_defaults = cupsAddOption("PageSize", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("PageRegion", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("PaperDimension", "Letter", num_defaults,
-                                     &defaults);
-	num_defaults = cupsAddOption("ImageableArea", "Letter", num_defaults,
-                                     &defaults);
-      }
-    }
-    else if (have_a4)
-    {
-     /*
-      * The rest default to "a4" size...
-      */
-
-      num_defaults = cupsAddOption("PageSize", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("PageRegion", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("PaperDimension", "A4", num_defaults,
-                                   &defaults);
-      num_defaults = cupsAddOption("ImageableArea", "A4", num_defaults,
-                                   &defaults);
-    }
+    num_defaults = cupsAddOption("PageSize", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("PageRegion", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("PaperDimension", DefaultPaperSize,
+                                 num_defaults, &defaults);
+    num_defaults = cupsAddOption("ImageableArea", DefaultPaperSize,
+                                 num_defaults, &defaults);
   }
 
   ppdClose(ppd);
@@ -8475,8 +8407,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (!strcasecmp(filetype->super, "application") &&
-      !strcasecmp(filetype->type, "postscript"))
-    read_ps_job_ticket(con);
+      (!strcasecmp(filetype->type, "postscript") ||
+       !strcasecmp(filetype->type, "pdf")))
+    read_job_ticket(con);
 
  /*
   * Create the job object...
@@ -8537,16 +8470,16 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 
 
 /*
- * 'read_ps_job_ticket()' - Reads a job ticket embedded in a PS file.
+ * 'read_job_ticket()' - Read a job ticket embedded in a print file.
  *
- * This function only gets called when printing a single PostScript
+ * This function only gets called when printing a single PDF or PostScript
  * file using the Print-Job operation.  It doesn't work for Create-Job +
  * Send-File, since the job attributes need to be set at job creation
- * time for banners to work.  The embedded PS job ticket stuff is here
- * only to allow the Windows printer driver for CUPS to pass in JCL
+ * time for banners to work.  The embedded job ticket stuff is here
+ * primarily to allow the Windows printer driver for CUPS to pass in JCL
  * options and IPP attributes which otherwise would be lost.
  *
- * The format of a PS job ticket is simple:
+ * The format of a job ticket is simple:
  *
  *     %cupsJobTicket: attr1=value1 attr2=value2 ... attrN=valueN
  *
@@ -8556,8 +8489,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
  *     %cupsJobTicket: attrN=valueN
  *
  * Job ticket lines must appear immediately after the first line that
- * specifies PostScript format (%!PS-Adobe-3.0), and CUPS will stop
- * looking for job ticket info when it finds a line that does not begin
+ * specifies PostScript (%!PS-Adobe-3.0) or PDF (%PDF) format, and CUPS
+ * stops looking for job ticket info when it finds a line that does not begin
  * with "%cupsJobTicket:".
  *
  * The maximum length of a job ticket line, including the prefix, is
@@ -8570,7 +8503,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
  */
 
 static void
-read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
+read_job_ticket(cupsd_client_t *con)	/* I - Client connection */
 {
   cups_file_t		*fp;		/* File to read from */
   char			line[256];	/* Line data */
@@ -8589,8 +8522,7 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
   if ((fp = cupsFileOpen(con->filename, "rb")) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "read_ps_job_ticket: Unable to open PostScript print file "
-		    "- %s",
+                    "Unable to open print file for job ticket - %s",
                     strerror(errno));
     return;
   }
@@ -8602,14 +8534,13 @@ read_ps_job_ticket(cupsd_client_t *con)	/* I - Client connection */
   if (cupsFileGets(fp, line, sizeof(line)) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "read_ps_job_ticket: Unable to read from PostScript print "
-		    "file - %s",
+                    "Unable to read from print file for job ticket - %s",
                     strerror(errno));
     cupsFileClose(fp);
     return;
   }
 
-  if (strncmp(line, "%!PS-Adobe-", 11))
+  if (strncmp(line, "%!PS-Adobe-", 11) && strncmp(line, "%PDF-", 5))
   {
    /*
     * Not a DSC-compliant file, so no job ticket info will be available...
