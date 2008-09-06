@@ -394,6 +394,20 @@
 
 
 /*
+ * Do we have res_init()?
+ */
+
+#undef HAVE_RES_INIT
+
+
+/*
+ * Do we have <resolv.h>
+ */
+
+#undef HAVE_RESOLV_H
+
+
+/*
  * Do we have the <sys/sockio.h> header file?
  */
 

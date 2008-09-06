@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Networking stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -13,11 +13,14 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
+AC_CHECK_HEADER(resolv.h,AC_DEFINE(HAVE_RESOLV_H))
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(gethostbyaddr, nsl)
 AC_SEARCH_LIBS(getifaddrs, nsl, AC_DEFINE(HAVE_GETIFADDRS))
 AC_SEARCH_LIBS(hstrerror, nsl socket resolv, AC_DEFINE(HAVE_HSTRERROR))
 AC_SEARCH_LIBS(rresvport_af, nsl, AC_DEFINE(HAVE_RRESVPORT_AF))
+AC_SEARCH_LIBS(res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT),
+	AC_SEARCH_LIBS(__res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT)))
 
 # Tru64 5.1b leaks file descriptors with these functions; disable until
 # we can come up with a test for this...
