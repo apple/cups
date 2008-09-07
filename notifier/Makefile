@@ -125,10 +125,6 @@ dbus:	dbus.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o dbus dbus.o $(DBUS_NOTIFIERLIBS) $(LIBS)
 
-dbus.o:	dbus.h
-dbus.h:	dbus-notifier.xml
-	dbus-binding-tool --mode=glib-server $< >$@
-
 
 #
 # mailto

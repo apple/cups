@@ -16,6 +16,8 @@
  *
  * Contents:
  *
+ *   main()         - Read events and send DBUS notifications.
+ *   acquire_lock() - Acquire a lock so we only have a single notifier running.
  */
 
 /*
@@ -154,7 +156,7 @@ enum
  * Local functions...
  */
 
-static int	acquire_lock(int *fd);
+static int	acquire_lock(int *fd, char *lockfile, size_t locksize);
 
 
 /*
@@ -201,7 +203,7 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
-  if (strcmp(argv[1], "dbus:"))
+  if (strncmp(argv[1], "dbus:", 5))
   {
     fprintf(stderr, "ERROR: Bad URI \"%s\"!\n", argv[1]);
     return (1);
