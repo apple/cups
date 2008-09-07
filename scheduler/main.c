@@ -655,6 +655,23 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* __APPLE__ */
 
  /*
+  * Send server-started event...
+  */
+
+#ifdef HAVE_LAUNCHD
+  if (Launchd)
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
+                  "Scheduler started via launchd.");
+  else
+#endif /* HAVE_LAUNCHD */
+  if (fg)
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
+                  "Scheduler started in foreground.");
+  else
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STARTED, NULL, NULL,
+                  "Scheduler started in background.");
+
+ /*
   * Start any pending print jobs...
   */
 
@@ -762,6 +779,13 @@ main(int  argc,				/* I - Number of command-line args */
         */
 
         cupsdStartServer();
+
+       /*
+        * Send a server-restarted event...
+	*/
+
+        cupsdAddEvent(CUPSD_EVENT_SERVER_RESTARTED, NULL, NULL,
+                      "Scheduler restarted.");
       }
     }
 
@@ -1101,10 +1125,18 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (stop_scheduler)
+  {
     cupsdLogMessage(CUPSD_LOG_INFO, "Scheduler shutting down normally.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STOPPED, NULL, NULL,
+                  "Scheduler shutting down normally.");
+  }
   else
+  {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Scheduler shutting down due to program error.");
+    cupsdAddEvent(CUPSD_EVENT_SERVER_STOPPED, NULL, NULL,
+                  "Scheduler shutting down due to program error.");
+  }
 
  /*
   * Close all network clients...
