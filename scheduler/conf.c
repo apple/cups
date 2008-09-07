@@ -223,6 +223,7 @@ cupsdCheckPermissions(
   int		dir_created = 0;	/* Did we create a directory? */
   char		pathname[1024];		/* File name with prefix */
   struct stat	fileinfo;		/* Stat buffer */
+  int		is_symlink;		/* Is "filename" a symlink? */
 
 
  /*
@@ -239,7 +240,7 @@ cupsdCheckPermissions(
   * See if we can stat the file/directory...
   */
 
-  if (stat(filename, &fileinfo))
+  if (lstat(filename, &fileinfo))
   {
     if (errno == ENOENT && create_dir)
     {
@@ -266,8 +267,18 @@ cupsdCheckPermissions(
       return (create_dir ? -1 : 1);
   }
 
+  if ((is_symlink = S_ISLNK(fileinfo.st_mode)) != 0)
+  {
+    if (stat(filename, &fileinfo))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is a bad symlink - %s",
+                      filename, strerror(errno));
+      return (-1);
+    }
+  }
+
  /*
-  * Make sure it's a regular file...
+  * Make sure it's a regular file or a directory as needed...
   */
 
   if (!dir_created && !is_dir && !S_ISREG(fileinfo.st_mode))
@@ -285,6 +296,13 @@ cupsdCheckPermissions(
 
     return (-1);
   }
+
+ /*
+  * If the filename is a symlink, do not change permissions (STR #2937)...
+  */
+
+  if (is_symlink)
+    return (0);
 
  /*
   * Fix owner, group, and mode as needed...
@@ -775,21 +793,18 @@ cupsdReadConfiguration(void)
   if (ServerCertificate[0] != '/')
     cupsdSetStringf(&ServerCertificate, "%s/%s", ServerRoot, ServerCertificate);
 
-  if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)))
-  {
-    chown(ServerCertificate, RunUser, Group);
-    chmod(ServerCertificate, 0600);
-  }
+  if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)) &&
+      cupsdCheckPermissions(ServerCertificate, NULL, 0600, RunUser, Group,
+                            0, 0) < 0)
+    return (0);
 
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
   if (ServerKey[0] != '/')
     cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
-  if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)))
-  {
-    chown(ServerKey, RunUser, Group);
-    chmod(ServerKey, 0600);
-  }
+  if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)) &&
+      cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0)
+    return (0);
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
