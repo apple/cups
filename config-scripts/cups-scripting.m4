@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   Scripting configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2008 by Apple Inc.
 dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -51,8 +51,13 @@ AC_ARG_WITH(php, [  --with-php              set PHP interpreter for web interfac
 	CUPS_PHP="")
 
 if test "x$CUPS_PHP" = x; then
-	AC_PATH_PROG(PHP,php)
-	CUPS_PHP="$PHP"
+	AC_PATH_PROG(PHPCGI,php-cgi)
+	if test "x$PHPCGI" = x; then
+		AC_PATH_PROG(PHP,php)
+		CUPS_PHP="$PHP"
+	else
+		CUPS_PHP="$PHPCGI"
+	fi
 fi
 
 AC_DEFINE_UNQUOTED(CUPS_PHP, "$CUPS_PHP")

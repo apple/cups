@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-09-03
+CHANGES.txt - 2008-09-07
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The scheduler now uses the php-cgi program if it is available
+	  (STR #2923)
 	- The scheduler now supports a DefaultPaperSize directive
 	  (STR #2848)
 	- The scheduler now passes the job-originating-host-name
