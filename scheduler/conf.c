@@ -21,6 +21,7 @@
  *   get_addr_and_mask()      - Get an IP address and netmask.
  *   parse_aaa()              - Parse authentication, authorization, and
  *                              access control lines.
+ *   parse_fatal_errors()     - Parse FatalErrors values in a string.
  *   parse_groups()           - Parse system group names in a string.
  *   parse_protocols()        - Parse browse protocols in a string.
  *   read_configuration()     - Read a configuration file.
@@ -199,6 +200,7 @@ static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
 static int		parse_aaa(cupsd_location_t *loc, char *line,
 			          char *value, int linenum);
+static int		parse_fatal_errors(const char *s);
 static int		parse_groups(const char *s);
 static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
@@ -542,6 +544,7 @@ cupsdReadConfiguration(void)
 
   AccessLogLevel        = CUPSD_ACCESSLOG_ACTIONS;
   ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
+  FatalErrors           = parse_fatal_errors(CUPS_DEFAULT_FATAL_ERRORS);
   DefaultAuthType       = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
@@ -796,7 +799,8 @@ cupsdReadConfiguration(void)
 
   if (!strncmp(ServerRoot, ServerCertificate, strlen(ServerRoot)) &&
       cupsdCheckPermissions(ServerCertificate, NULL, 0600, RunUser, Group,
-                            0, 0) < 0)
+                            0, 0) < 0 &&
+      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 
 #  if defined(HAVE_LIBSSL) || defined(HAVE_GNUTLS)
@@ -804,7 +808,8 @@ cupsdReadConfiguration(void)
     cupsdSetStringf(&ServerKey, "%s/%s", ServerRoot, ServerKey);
 
   if (!strncmp(ServerRoot, ServerKey, strlen(ServerRoot)) &&
-      cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0)
+      cupsdCheckPermissions(ServerKey, NULL, 0600, RunUser, Group, 0, 0) < 0 &&
+      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
 #endif /* HAVE_SSL */
@@ -816,30 +821,31 @@ cupsdReadConfiguration(void)
 
   snprintf(temp, sizeof(temp), "%s/rss", CacheDir);
 
-  if (cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
-			    Group, 1, 1) < 0 ||
-      cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
-			    Group, 1, 1) < 0 ||
-      cupsdCheckPermissions(temp, NULL, 0775, RunUser,
-			    Group, 1, 1) < 0 ||
-      cupsdCheckPermissions(StateDir, NULL, 0755, RunUser,
-			    Group, 1, 1) < 0 ||
-      cupsdCheckPermissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
-			    SystemGroupIDs[0], 1, 1) < 0 ||
-      cupsdCheckPermissions(ServerRoot, NULL, 0755, RunUser, 
-			    Group, 1, 0) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "ppd", 0755, RunUser,
-			    Group, 1, 1) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "ssl", 0700, RunUser,
-			    Group, 1, 0) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
-			    Group, 0, 0) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "classes.conf", 0600, RunUser,
-			    Group, 0, 0) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "printers.conf", 0600, RunUser,
-			    Group, 0, 0) < 0 ||
-      cupsdCheckPermissions(ServerRoot, "passwd.md5", 0600, User,
-			    Group, 0, 0) < 0)
+  if ((cupsdCheckPermissions(RequestRoot, NULL, 0710, RunUser,
+			     Group, 1, 1) < 0 ||
+       cupsdCheckPermissions(CacheDir, NULL, 0775, RunUser,
+			     Group, 1, 1) < 0 ||
+       cupsdCheckPermissions(temp, NULL, 0775, RunUser,
+			     Group, 1, 1) < 0 ||
+       cupsdCheckPermissions(StateDir, NULL, 0755, RunUser,
+			     Group, 1, 1) < 0 ||
+       cupsdCheckPermissions(StateDir, "certs", RunUser ? 0711 : 0511, User,
+			     SystemGroupIDs[0], 1, 1) < 0 ||
+       cupsdCheckPermissions(ServerRoot, NULL, 0755, RunUser, 
+			     Group, 1, 0) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "ppd", 0755, RunUser,
+			     Group, 1, 1) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "ssl", 0700, RunUser,
+			     Group, 1, 0) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "cupsd.conf", ConfigFilePerm, RunUser,
+			     Group, 0, 0) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "classes.conf", 0600, RunUser,
+			     Group, 0, 0) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "printers.conf", 0600, RunUser,
+			     Group, 0, 0) < 0 ||
+       cupsdCheckPermissions(ServerRoot, "passwd.md5", 0600, User,
+			     Group, 0, 0) < 0) &&
+      (FatalErrors & CUPSD_FATAL_PERMISSIONS))
     return (0);
 
  /*
@@ -889,7 +895,8 @@ cupsdReadConfiguration(void)
     * is under the spool directory or does not exist...
     */
 
-    if (cupsdCheckPermissions(TempDir, NULL, 01770, RunUser, Group, 1, 1) < 0)
+    if (cupsdCheckPermissions(TempDir, NULL, 01770, RunUser, Group, 1, 1) < 0 &&
+	(FatalErrors & CUPSD_FATAL_PERMISSIONS))
       return (0);
   }
 
@@ -948,8 +955,10 @@ cupsdReadConfiguration(void)
   if (MaxClients > (MaxFDs / 3) || MaxClients <= 0)
   {
     if (MaxClients > 0)
-      cupsdLogMessage(CUPSD_LOG_INFO, "MaxClients limited to 1/3 (%d) of the file descriptor limit (%d)...",
-                 MaxFDs / 3, MaxFDs);
+      cupsdLogMessage(CUPSD_LOG_INFO,
+                      "MaxClients limited to 1/3 (%d) of the file descriptor "
+		      "limit (%d)...",
+                      MaxFDs / 3, MaxFDs);
 
     MaxClients = MaxFDs / 3;
   }
@@ -1186,7 +1195,8 @@ cupsdReadConfiguration(void)
       cupsdLogMessage(CUPSD_LOG_EMERG,
                       "Unable to load MIME database from \"%s\" or \"%s\"!",
 		      mimedir, ServerRoot);
-      exit(errno);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+        return (0);
     }
 
     cupsdLogMessage(CUPSD_LOG_INFO,
@@ -1983,6 +1993,86 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 
 
 /*
+ * 'parse_fatal_errors()' - Parse FatalErrors values in a string.
+ */
+
+static int				/* O - FatalErrors bits */
+parse_fatal_errors(const char *s)	/* I - FatalErrors string */
+{
+  int	fatal;				/* FatalErrors bits */
+  char	value[1024],			/* Value string */
+	*valstart,			/* Pointer into value */
+	*valend;			/* End of value */
+
+
+ /*
+  * Empty FatalErrors line yields NULL pointer...
+  */
+
+  if (!s)
+    return (CUPSD_FATAL_NONE);
+
+ /*
+  * Loop through the value string,...
+  */
+
+  strlcpy(value, s, sizeof(value));
+
+  fatal = CUPSD_FATAL_NONE;
+
+  for (valstart = value; *valstart;)
+  {
+   /*
+    * Get the current space/comma-delimited kind name...
+    */
+
+    for (valend = valstart; *valend; valend ++)
+      if (isspace(*valend & 255) || *valend == ',')
+	break;
+
+    if (*valend)
+      *valend++ = '\0';
+
+   /*
+    * Add the error to the bitmask...
+    */
+
+    if (!strcasecmp(valstart, "all"))
+      fatal = CUPSD_FATAL_ALL;
+    else if (!strcasecmp(valstart, "browse"))
+      fatal |= CUPSD_FATAL_BROWSE;
+    else if (!strcasecmp(valstart, "-browse"))
+      fatal &= ~CUPSD_FATAL_BROWSE;
+    else if (!strcasecmp(valstart, "config"))
+      fatal |= CUPSD_FATAL_CONFIG;
+    else if (!strcasecmp(valstart, "-config"))
+      fatal &= ~CUPSD_FATAL_CONFIG;
+    else if (!strcasecmp(valstart, "listen"))
+      fatal |= CUPSD_FATAL_LISTEN;
+    else if (!strcasecmp(valstart, "-listen"))
+      fatal &= ~CUPSD_FATAL_LISTEN;
+    else if (!strcasecmp(valstart, "log"))
+      fatal |= CUPSD_FATAL_LOG;
+    else if (!strcasecmp(valstart, "-log"))
+      fatal &= ~CUPSD_FATAL_LOG;
+    else if (!strcasecmp(valstart, "permissions"))
+      fatal |= CUPSD_FATAL_PERMISSIONS;
+    else if (!strcasecmp(valstart, "-permissions"))
+      fatal &= ~CUPSD_FATAL_PERMISSIONS;
+    else if (strcasecmp(valstart, "none"))
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Unknown FatalErrors kind \"%s\" ignored!", valstart);
+
+    for (valstart = valend; *valstart; valstart ++)
+      if (!isspace(*valstart & 255) || *valstart != ',')
+	break;
+  }
+
+  return (fatal);
+}
+
+
+/*
  * 'parse_groups()' - Parse system group names in a string.
  */
 
@@ -2216,6 +2306,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (linenum == 0)
 	return (0);
     }
+    else if (!strcasecmp(line, "FatalErrors"))
+      FatalErrors = parse_fatal_errors(value);
     else if (!strcasecmp(line, "FaxRetryInterval") && value)
     {
       JobRetryInterval = atoi(value);
@@ -2834,7 +2926,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	cupsdLogMessage(CUPSD_LOG_WARN,
 	                "Unknown default authorization type %s on line %d.",
 	                value, linenum);
-	return (0);
+	if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
       }
     }
 #ifdef HAVE_SSL
@@ -2855,7 +2948,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	cupsdLogMessage(CUPSD_LOG_WARN,
 	                "Unknown default encryption %s on line %d.",
 	                value, linenum);
-	return (0);
+	if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
       }
     }
 #endif /* HAVE_SSL */
@@ -3258,7 +3352,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       if (!value)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
-        return (0);
+        if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
       }
       
       if ((loc = cupsdCopyLocation(&parent)) == NULL)
@@ -3306,7 +3401,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Unknown Location directive %s on line %d.",
 	              line, linenum);
-      return (0);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+	return (0);
     }
   }
 
@@ -3314,7 +3410,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
                   "Unexpected end-of-file at line %d while reading location!",
                   linenum);
 
-  return (0);
+  return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
 }
 
 
@@ -3396,7 +3492,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       if (!value)
       {
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
-        return (0);
+        if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
       }
       
      /*
@@ -3470,7 +3567,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Missing <Limit ops> directive before %s on line %d.",
                       line, linenum);
-      return (0);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+	return (0);
     }
     else if (!parse_aaa(op, line, value, linenum))
     {
@@ -3483,7 +3581,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                "Unknown Policy directive %s on line %d.",
 	                line, linenum);
 
-      return (0);
+      if (FatalErrors & CUPSD_FATAL_CONFIG)
+	return (0);
     }
   }
 
@@ -3491,7 +3590,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
                   "Unexpected end-of-file at line %d while reading policy \"%s\"!",
                   linenum, policy);
 
-  return (0);
+  return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
 }
 
 

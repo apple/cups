@@ -150,9 +150,14 @@ cupsdStartListening(void)
     httpAddrFreeList(ServerAddrs);
 
   if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
+  {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to find IP address for server name \"%s\"!",
 		    ServerName);
+
+    if (FatalErrors & CUPSD_FATAL_LISTEN)
+      cupsdEndProcess(getpid(), 0);
+  }
 
  /*
   * Setup socket listeners...
@@ -194,6 +199,20 @@ cupsdStartListening(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 			"Unable to open listen socket for address %s:%d - %s.",
 			s, p, strerror(errno));
+
+#ifdef AF_INET6
+       /*
+        * IPv6 is often disabled while DNS returns IPv6 addresses...
+	*/
+
+	if (lis->address.addr.sa_family != AF_INET6 &&
+	    (FatalErrors & CUPSD_FATAL_LISTEN))
+	  cupsdEndProcess(getpid(), 0);
+#else
+	if (FatalErrors & CUPSD_FATAL_LISTEN)
+	  cupsdEndProcess(getpid(), 0);
+#endif /* AF_INET6 */
+
 	continue;
       }
 
@@ -278,6 +297,10 @@ cupsdStartListening(void)
 			s, p, strerror(errno));
 	close(lis->fd);
 	lis->fd = -1;
+
+	if (FatalErrors & CUPSD_FATAL_LISTEN)
+	  cupsdEndProcess(getpid(), 0);
+
 	continue;
       }
 
@@ -290,7 +313,14 @@ cupsdStartListening(void)
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 			"Unable to listen for clients on address %s:%d - %s.",
 			s, p, strerror(errno));
-	exit(errno);
+
+	close(lis->fd);
+	lis->fd = -1;
+
+	if (FatalErrors & CUPSD_FATAL_LISTEN)
+	  cupsdEndProcess(getpid(), 0);
+
+        continue;
       }
     }
 
@@ -339,11 +369,8 @@ cupsdStartListening(void)
                     "No Listen or Port lines were found to allow access via "
 		    "localhost!");
 
-   /*
-    * Commit suicide...
-    */
-
-    cupsdEndProcess(getpid(), 0);
+    if (FatalErrors & (CUPSD_FATAL_CONFIG | CUPSD_FATAL_LISTEN))
+      cupsdEndProcess(getpid(), 0);
   }
 
  /*

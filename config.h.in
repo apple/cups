@@ -51,6 +51,13 @@
 
 
 /*
+ * Default fatal error settings...
+ */
+
+#define CUPS_DEFAULT_FATAL_ERRORS	"config"
+
+
+/*
  * Default browsing settings...
  */
 

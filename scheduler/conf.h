@@ -46,6 +46,19 @@ typedef enum
 
 
 /*
+ * FatalErrors flags...
+ */
+
+#define CUPSD_FATAL_NONE	0	/* No errors are fatal */
+#define CUPSD_FATAL_BROWSE	1	/* Browse bind errors are fatal */
+#define CUPSD_FATAL_CONFIG	2	/* Config file syntax errors are fatal */
+#define CUPSD_FATAL_LISTEN	4	/* Listen/Port bind errors are fatal */
+#define CUPSD_FATAL_LOG		8	/* Log file errors are fatal */
+#define CUPSD_FATAL_PERMISSIONS	16	/* File permission errors are fatal */
+#define CUPSD_FATAL_ALL		~0	/* All errors are fatal */
+
+
+/*
  * Printcap formats...
  */
 
@@ -132,6 +145,8 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* Allow overrides? */
 			ConfigFilePerm		VALUE(0640),
 					/* Permissions for config files */
+			FatalErrors		VALUE(CUPSD_FATAL_CONFIG),
+					/* Which errors are fatal? */
 			LogFilePerm		VALUE(0644),
 					/* Permissions for log files */
 			LogLevel		VALUE(CUPSD_LOG_WARN),

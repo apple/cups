@@ -312,6 +312,15 @@ ErrorLog syslog
 .br
 Specifies the error log filename.
 .TP 5
+FatalErrors none
+.TP 5
+FatalErrors all -kind [... -kind]
+.TP 5
+FatalErrors kind [... kind]
+.br
+Specifies which errors are fatal, causing the scheduler to exit. "Kind" is
+"browse", "config", "listen", "log", or "permissions".
+.TP 5
 FileDevice Yes
 .TP 5
 FileDevice No

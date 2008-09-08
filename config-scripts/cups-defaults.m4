@@ -39,6 +39,14 @@ AC_ARG_WITH(log_file_perm, [  --with-log-file-perm    set default LogFilePerm va
 AC_SUBST(CUPS_LOG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_FILE_PERM, 0$CUPS_LOG_FILE_PERM)
 
+dnl Default FatalErrors
+AC_ARG_WITH(fatal_errors, [  --with-fatal-errors set default FatalErrors value, default=config],
+	CUPS_FATAL_ERRORS="$withval",
+	CUPS_FATAL_ERRORS="config")
+AC_SUBST(CUPS_FATAL_ERRORS)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_FATAL_ERRORS, "$CUPS_FATAL_ERRORS")
+
+
 dnl Default LogLevel
 AC_ARG_WITH(log_level, [  --with-log-level        set default LogLevel value, default=warn],
 	CUPS_LOG_LEVEL="$withval",

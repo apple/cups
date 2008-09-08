@@ -1197,6 +1197,57 @@ printer.</P>
 </UL>
 
 
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+FatalErrors none
+FatalErrors all
+FatalErrors browse
+FatalErrors config
+FatalErrors listen
+FatalErrors log
+FatalErrors permissions
+FatalErrors all -permissions
+FatalErrors config permissions log
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>FatalErrors</CODE> directive determines whether certain kinds of
+errors are fatal. The following kinds of errors are currently recognized:</P>
+
+<UL>
+
+	<LI><CODE>none</CODE> - No errors are fatal</LI>
+
+	<LI><CODE>all</CODE> - All of the errors below are fatal</LI>
+
+	<LI><CODE>browse</CODE> - Browsing initialization errors are fatal,
+	for example failed binding to the CUPS browse port or failed connections
+	to LDAP servers</LI>
+
+	<LI><CODE>config</CODE> - Configuration file syntax errors are
+	fatal</LI>
+
+	<LI><CODE>listen</CODE> - Listen or Port errors are fatal, except for
+	IPv6 failures on the loopback or "any" addresses</LI>
+
+	<LI><CODE>log</CODE> - Log file creation or write errors are fatal</LI>
+
+	<LI><CODE>permissions</CODE> - Bad startup file permissions are
+	fatal, for example shared SSL certificate and key files with world-
+	read permissions</LI>
+
+</UL>
+
+<P>Multiple errors can be listed, and the form "-kind" can be used with
+<CODE>all</CODE> to remove specific kinds of errors. The default setting is
+<CODE>@CUPS_FATAL_ERRORS@</CODE>.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.18</SPAN><A NAME="FileDevice">FileDevice</A></H2>
 
 <H3>Examples</H3>

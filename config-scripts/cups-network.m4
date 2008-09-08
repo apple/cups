@@ -19,8 +19,9 @@ AC_SEARCH_LIBS(gethostbyaddr, nsl)
 AC_SEARCH_LIBS(getifaddrs, nsl, AC_DEFINE(HAVE_GETIFADDRS))
 AC_SEARCH_LIBS(hstrerror, nsl socket resolv, AC_DEFINE(HAVE_HSTRERROR))
 AC_SEARCH_LIBS(rresvport_af, nsl, AC_DEFINE(HAVE_RRESVPORT_AF))
-AC_SEARCH_LIBS(res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT),
-	AC_SEARCH_LIBS(__res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT)))
+AC_SEARCH_LIBS(__res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT),
+	AC_SEARCH_LIBS(res_9_init, resolv bind, AC_DEFINE(HAVE_RES_INIT),
+	AC_SEARCH_LIBS(res_init, resolv bind, AC_DEFINE(HAVE_RES_INIT))))
 
 # Tru64 5.1b leaks file descriptors with these functions; disable until
 # we can come up with a test for this...
