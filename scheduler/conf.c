@@ -755,7 +755,8 @@ cupsdReadConfiguration(void)
     */
 
     cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "No valid Listen or Port lines were found in the configuration file!");
+                    "No valid Listen or Port lines were found in the "
+		    "configuration file!");
 
    /*
     * Commit suicide...
@@ -2261,6 +2262,25 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       for (addr = addrlist; addr; addr = addr->next)
       {
+       /*
+        * See if this address is already present...
+	*/
+
+        for (lis = (cupsd_listener_t *)cupsArrayFirst(Listeners);
+	     lis;
+	     lis = (cupsd_listener_t *)cupsArrayNext(Listeners))
+          if (httpAddrEqual(&(addr->addr), &(lis->address)) &&
+	      _httpAddrPort(&(addr->addr)) == _httpAddrPort(&(lis->address)))
+	    break;
+
+        if (lis)
+	{
+	  httpAddrString(&lis->address, temp, sizeof(temp));
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Duplicate listen address \"%s\" ignored!", temp);
+          continue;
+	}
+
        /*
         * Allocate another listener...
 	*/

@@ -4,7 +4,7 @@
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

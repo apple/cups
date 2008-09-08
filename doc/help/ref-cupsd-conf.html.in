@@ -975,6 +975,26 @@ language localization file exists for it. The default language
 is "en" for English.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DefaultPaperSize Letter
+DefaultPaperSize A4
+DefaultPaperSize Auto
+DefaultPaperSize None
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DefaultPaperSize</CODE> directive specifies the default paper
+size to use when creating new printers. The default is <CODE>Auto</CODE>
+which uses a paper size appropriate for the system default locale. A value
+of <CODE>None</CODE> tells the scheduler to not set the default paper
+size.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
 
 <H3>Examples</H3>
