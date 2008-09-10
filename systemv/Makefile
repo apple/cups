@@ -48,7 +48,8 @@ unittests:
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) cupsdisable cupsenable reject
+	$(RM) $(OBJS) $(TARGETS)
+	$(RM) cupsaccept cupsdisable cupsenable cupsreject reject
 
 
 #
@@ -91,10 +92,14 @@ install-exec:
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(INSTALL_BIN) cupstestdsc $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
+	$(RM) $(SBINDIR)/cupsaccept
+	$(LN) accept $(SBINDIR)/cupsaccept
 	$(RM) $(SBINDIR)/cupsdisable
 	$(LN) accept $(SBINDIR)/cupsdisable
 	$(RM) $(SBINDIR)/cupsenable
 	$(LN) accept $(SBINDIR)/cupsenable
+	$(RM) $(SBINDIR)/cupsreject
+	$(LN) accept $(SBINDIR)/cupsreject
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
@@ -136,8 +141,10 @@ uninstall:
 	-$(RMDIR) $(BINDIR)
 	$(RM) $(SBINDIR)/accept
 	$(RM) $(SBINDIR)/cupsaddsmb
+	$(RM) $(SBINDIR)/cupsaccept
 	$(RM) $(SBINDIR)/cupsdisable
 	$(RM) $(SBINDIR)/cupsenable
+	$(RM) $(SBINDIR)/cupsreject
 	$(RM) $(SBINDIR)/lpadmin
 	$(RM) $(SBINDIR)/lpinfo
 	$(RM) $(SBINDIR)/lpmove
@@ -152,10 +159,12 @@ uninstall:
 accept:	accept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
-	$(RM) reject cupsenable cupsdisable
+	$(RM) cupsaccept cupsenable cupsdisable cupsreject reject
 	$(LN) accept reject
+	$(LN) accept cupsaccept
 	$(LN) accept cupsenable
 	$(LN) accept cupsdisable
+	$(LN) accept cupsreject
 
 
 #
