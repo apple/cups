@@ -91,6 +91,10 @@ install-exec:
 	done
 	$(RM) $(SERVERBIN)/backend/http
 	$(LN) ipp $(SERVERBIN)/backend/http
+	if test "x$(DNSSD_BACKEND" != x; then \
+		$(RM) $(SERVERBIN)/backend/mdns; \
+		$(LN) $(DNSSD_BACKEND) $(SERVERBIN)/backend/mdns; \
+	fi
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
 		for file in $(TARGETS); do \
