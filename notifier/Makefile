@@ -64,10 +64,6 @@ install:	all install-data install-headers install-libs install-exec
 install-data:
 	$(INSTALL_DIR) -m 775 $(CACHEDIR)/rss
 	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
-	if test "x$(SYMROOT)" != "x"; then \
-		$(INSTALL_DIR) $(SYMROOT); \
-		cp $(NOTIFIERS) $(SYMROOT); \
-	fi
 
 
 #
@@ -80,6 +76,10 @@ install-exec:
 	for file in $(NOTIFIERS); do \
 		$(INSTALL_BIN) $$file $(SERVERBIN)/notifier; \
 	done
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(NOTIFIERS) $(SYMROOT); \
+	fi
 
 
 #

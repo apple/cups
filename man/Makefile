@@ -129,7 +129,7 @@ install:	all install-data install-headers install-libs install-exec
 # Install data files...
 #
 
-install-data:
+install-data: all
 	$(INSTALL_DIR) -m 755 $(MANDIR)/man1
 	for file in $(MAN1); do \
 		echo Installing $$file in $(MANDIR)/man1...; \
