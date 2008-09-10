@@ -3,7 +3,7 @@
 .\"
 .\"   lpstat man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,12 +12,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "23 March 2006" "Apple Inc."
+.TH lpstat 1 "Common UNIX Printing System" "10 September 2008" "Apple Inc."
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS
 .B lpstat
-[ -E ] [ -U
+[ -E ] [ -H ] [ -U
 .I username
 ] [ -h
 .I hostname[:port]
@@ -46,6 +46,10 @@ The \fIlpstat\fR command supports the following options:
 -E
 .br
 Forces encryption when connecting to the server.
+.TP 5
+-H
+.br
+Shows the server hostname and port.
 .TP 5
 -R
 .br
@@ -133,7 +137,7 @@ The Solaris "-f", "-P", and "-S" options are silently ignored.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"

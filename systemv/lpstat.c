@@ -3,7 +3,7 @@
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -111,6 +111,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
+
+	case 'H' : /* Show server and port */
+	    if (cupsServer()[0] == '/')
+	      _cupsLangPrintf(stdout, "%s\n", cupsServer());
+	    else
+	      _cupsLangPrintf(stdout, "%s:%d\n", cupsServer(), ippPort());
+            break;
 
         case 'P' : /* Show paper types */
 	    op = 'P';

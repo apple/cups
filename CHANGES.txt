@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-09-08
+CHANGES.txt - 2008-09-10
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- The lpstat command now supports a -H option to display the
+	  default server (STR #2833)
 	- The scheduler now supports a FatalErrors directive to control
 	  which errors should cause the scheduler to exit (STR #2536)
 	- The scheduler now uses the php-cgi program if it is available
