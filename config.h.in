@@ -51,6 +51,13 @@
 
 
 /*
+ * Default fatal error settings...
+ */
+
+#define CUPS_DEFAULT_FATAL_ERRORS	"config"
+
+
+/*
  * Default browsing settings...
  */
 
@@ -391,6 +398,20 @@
  */
 
 #undef HAVE_HSTRERROR
+
+
+/*
+ * Do we have res_init()?
+ */
+
+#undef HAVE_RES_INIT
+
+
+/*
+ * Do we have <resolv.h>
+ */
+
+#undef HAVE_RESOLV_H
 
 
 /*

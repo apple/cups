@@ -111,10 +111,11 @@ cupsdStartServer(void)
   * Mark that the server has started and printers and jobs may be changed...
   */
 
-  LastEvent     = CUPSD_EVENT_PRINTER_CHANGED | CUPSD_EVENT_JOB_STATE_CHANGED |
-                  CUPSD_EVENT_SERVER_STARTED;
+  LastEvent = CUPSD_EVENT_PRINTER_CHANGED | CUPSD_EVENT_JOB_STATE_CHANGED |
+              CUPSD_EVENT_SERVER_STARTED;
+  started   = 1;
 
-  started = 1;
+  cupsdSetBusyState();
 }
 
 

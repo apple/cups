@@ -1,5 +1,8 @@
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
+dbus.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
+dbus.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+dbus.o: ../cups/string.h ../config.h
 mailto.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 mailto.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 mailto.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h

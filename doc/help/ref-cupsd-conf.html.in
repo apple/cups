@@ -975,6 +975,26 @@ language localization file exists for it. The default language
 is "en" for English.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+DefaultPaperSize Letter
+DefaultPaperSize A4
+DefaultPaperSize Auto
+DefaultPaperSize None
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>DefaultPaperSize</CODE> directive specifies the default paper
+size to use when creating new printers. The default is <CODE>Auto</CODE>
+which uses a paper size appropriate for the system default locale. A value
+of <CODE>None</CODE> tells the scheduler to not set the default paper
+size.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
 
 <H3>Examples</H3>
@@ -1058,7 +1078,7 @@ HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-DirtyCleanInterval 60
+DirtyCleanInterval 30
 DirtyCleanInterval 0
 </PRE>
 
@@ -1066,7 +1086,7 @@ DirtyCleanInterval 0
 
 <P>The <CODE>DirtyCleanInterval</CODE> directive specifies the number of
 seconds to wait before updating configuration and state files for printers,
-classes, subscriptions, and jobs. The default is 60 seconds.</P>
+classes, subscriptions, and jobs. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H2>
@@ -1175,6 +1195,57 @@ printer.</P>
 	value</LI>
 
 </UL>
+
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+FatalErrors none
+FatalErrors all
+FatalErrors browse
+FatalErrors config
+FatalErrors listen
+FatalErrors log
+FatalErrors permissions
+FatalErrors all -permissions
+FatalErrors config permissions log
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>FatalErrors</CODE> directive determines whether certain kinds of
+errors are fatal. The following kinds of errors are currently recognized:</P>
+
+<UL>
+
+	<LI><CODE>none</CODE> - No errors are fatal</LI>
+
+	<LI><CODE>all</CODE> - All of the errors below are fatal</LI>
+
+	<LI><CODE>browse</CODE> - Browsing initialization errors are fatal,
+	for example failed binding to the CUPS browse port or failed connections
+	to LDAP servers</LI>
+
+	<LI><CODE>config</CODE> - Configuration file syntax errors are
+	fatal</LI>
+
+	<LI><CODE>listen</CODE> - Listen or Port errors are fatal, except for
+	IPv6 failures on the loopback or "any" addresses</LI>
+
+	<LI><CODE>log</CODE> - Log file creation or write errors are fatal</LI>
+
+	<LI><CODE>permissions</CODE> - Bad startup file permissions are
+	fatal, for example shared SSL certificate and key files with world-
+	read permissions</LI>
+
+</UL>
+
+<P>Multiple errors can be listed, and the form "-kind" can be used with
+<CODE>all</CODE> to remove specific kinds of errors. The default setting is
+<CODE>@CUPS_FATAL_ERRORS@</CODE>.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.18</SPAN><A NAME="FileDevice">FileDevice</A></H2>
@@ -1473,7 +1544,7 @@ KeepAliveTimeout 30
 
 <P>The <CODE>KeepAliveTimeout</CODE> directive controls how long
 a persistent HTTP connection will remain open after the last
-request. The default is 60 seconds.</P>
+request. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.7</SPAN><A NAME="Limit">Limit (Location)</A></H2>
@@ -2414,14 +2485,14 @@ There is no default program.</P>
 
 <PRE CLASS="command">
 ReloadTimeout 0
-ReloadTimeout 60
+ReloadTimeout 30
 </PRE>
 
 <H3>Description</H3>
 
 <P>The <CODE>ReloadTimeout</CODE> directive specifies the number
 of seconds the scheduler will wait for active jobs to complete
-before doing a restart. The default is 60 seconds.</P>
+before doing a restart. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.3</SPAN><A NAME="RemoteRoot">RemoteRoot</A></H2>

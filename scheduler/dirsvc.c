@@ -1422,9 +1422,14 @@ cupsdStartBrowsing(void)
 			strerror(errno));
 	BrowseLocalProtocols &= ~BROWSE_CUPS;
 	BrowseRemoteProtocols &= ~BROWSE_CUPS;
-	return;
-      }
 
+	if (FatalErrors & CUPSD_FATAL_BROWSE)
+	  cupsdEndProcess(getpid(), 0);
+      }
+    }
+
+    if (BrowseSocket >= 0)
+    {
      /*
       * Bind the socket to browse port...
       */
@@ -1449,50 +1454,60 @@ cupsdStartBrowsing(void)
 	BrowseSocket = -1;
 	BrowseLocalProtocols &= ~BROWSE_CUPS;
 	BrowseRemoteProtocols &= ~BROWSE_CUPS;
-	return;
+
+	if (FatalErrors & CUPSD_FATAL_BROWSE)
+	  cupsdEndProcess(getpid(), 0);
       }
     }
 
-   /*
-    * Set the "broadcast" flag...
-    */
-
-    val = 1;
-    if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to set broadcast mode - %s.",
-        	      strerror(errno));
-
-#ifdef WIN32
-      closesocket(BrowseSocket);
-#else
-      close(BrowseSocket);
-#endif /* WIN32 */
-
-      BrowseSocket = -1;
-      BrowseLocalProtocols &= ~BROWSE_CUPS;
-      BrowseRemoteProtocols &= ~BROWSE_CUPS;
-      return;
-    }
-
-   /*
-    * Close the socket on exec...
-    */
-
-    fcntl(BrowseSocket, F_SETFD, fcntl(BrowseSocket, F_GETFD) | FD_CLOEXEC);
-
-   /*
-    * Finally, add the socket to the input selection set as needed...
-    */
-
-    if (BrowseRemoteProtocols & BROWSE_CUPS)
+    if (BrowseSocket >= 0)
     {
      /*
-      * We only listen if we want remote printers...
+      * Set the "broadcast" flag...
       */
 
-      cupsdAddSelect(BrowseSocket, (cupsd_selfunc_t)update_cups_browse,
-                     NULL, NULL);
+      val = 1;
+      if (setsockopt(BrowseSocket, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to set broadcast mode - %s.",
+			strerror(errno));
+
+#ifdef WIN32
+	closesocket(BrowseSocket);
+#else
+	close(BrowseSocket);
+#endif /* WIN32 */
+
+	BrowseSocket = -1;
+	BrowseLocalProtocols &= ~BROWSE_CUPS;
+	BrowseRemoteProtocols &= ~BROWSE_CUPS;
+
+	if (FatalErrors & CUPSD_FATAL_BROWSE)
+	  cupsdEndProcess(getpid(), 0);
+      }
+    }
+
+    if (BrowseSocket >= 0)
+    {
+     /*
+      * Close the socket on exec...
+      */
+
+      fcntl(BrowseSocket, F_SETFD, fcntl(BrowseSocket, F_GETFD) | FD_CLOEXEC);
+
+     /*
+      * Finally, add the socket to the input selection set as needed...
+      */
+
+      if (BrowseRemoteProtocols & BROWSE_CUPS)
+      {
+       /*
+	* We only listen if we want remote printers...
+	*/
+
+	cupsdAddSelect(BrowseSocket, (cupsd_selfunc_t)update_cups_browse,
+		       NULL, NULL);
+      }
     }
   }
   else
@@ -1511,8 +1526,13 @@ cupsdStartBrowsing(void)
 
     if ((error = DNSServiceCreateConnection(&DNSSDRef))
 	    != kDNSServiceErr_NoError)
+    {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "Unable to create master DNS-SD reference: %d", error);
+
+      if (FatalErrors & CUPSD_FATAL_BROWSE)
+	cupsdEndProcess(getpid(), 0);
+    }
     else
     {
      /*
@@ -1579,6 +1599,10 @@ cupsdStartBrowsing(void)
                       "Unable to open an SLP handle; disabling SLP browsing!");
       BrowseLocalProtocols &= ~BROWSE_SLP;
       BrowseRemoteProtocols &= ~BROWSE_SLP;
+      BrowseSLPHandle = NULL;
+
+      if (FatalErrors & CUPSD_FATAL_BROWSE)
+	cupsdEndProcess(getpid(), 0);
     }
 
     BrowseSLPRefresh = 0;
@@ -1596,11 +1620,19 @@ cupsdStartBrowsing(void)
                       "Need to set BrowseLDAPDN to use LDAP browsing!");
       BrowseLocalProtocols &= ~BROWSE_LDAP;
       BrowseRemoteProtocols &= ~BROWSE_LDAP;
+
+      if (FatalErrors & CUPSD_FATAL_BROWSE)
+	cupsdEndProcess(getpid(), 0);
     }
     else
     {
-      /* Open LDAP handle... */
-      BrowseLDAPHandle = ldap_connect();
+     /*
+      * Open LDAP handle...
+      */
+
+      if ((BrowseLDAPHandle = ldap_connect()) == NULL &&
+          (FatalErrors & CUPSD_FATAL_BROWSE))
+	cupsdEndProcess(getpid(), 0);
     }
 
     BrowseLDAPRefresh = 0;
@@ -2321,7 +2353,7 @@ dnssdBuildTxtRecord(
     }
 
     keyvalue[i  ][0] = "air";
-    keyvalue[i++][1] = air;
+    keyvalue[i++][1] = air_str;
   }
 
  /*
@@ -2573,7 +2605,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   * Register IPP and (optionally) LPD...
   */
 
-  ipp_len    = 0;			/* anti-compiler-warning-code */
+  ipp_len = 0;				/* anti-compiler-warning-code */
   ipp_txt = dnssdBuildTxtRecord(&ipp_len, p, 0);
 
   if (!p->ipp_ref)
@@ -2654,7 +2686,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
   if (BrowseLocalProtocols & BROWSE_LPD)
   {
-    printer_len    = 0;			/* anti-compiler-warning-code */
+    printer_len = 0;			/* anti-compiler-warning-code */
     printer_txt = dnssdBuildTxtRecord(&printer_len, p, 1);
 
     if (!p->printer_ref)

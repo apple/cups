@@ -81,6 +81,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 #  ifdef HAVE_GETADDRINFO
   char			hostname[1024];	/* Hostname */
 #  endif /* HAVE_GETADDRINFO */
+  int			need_res_init;	/* Need to reinitialize resolver? */
 
   /* ipp.c */
   ipp_uchar_t		ipp_date[11];	/* RFC-1903 date/time data */

@@ -1,8 +1,18 @@
-CHANGES.txt - 2008-09-03
+CHANGES.txt - 2008-09-10
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
+	- Renamed the accept and reject commands to cupsaccept and
+	  cupsreject; the old names are still available (STR #2936)
+	- The locale/translate utility needed an update to work with
+	  Google (STR #2882)
+	- The lpstat command now supports a -H option to display the
+	  default server (STR #2833)
+	- The scheduler now supports a FatalErrors directive to control
+	  which errors should cause the scheduler to exit (STR #2536)
+	- The scheduler now uses the php-cgi program if it is available
+	  (STR #2923)
 	- The scheduler now supports a DefaultPaperSize directive
 	  (STR #2848)
 	- The scheduler now passes the job-originating-host-name

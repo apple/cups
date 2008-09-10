@@ -807,7 +807,20 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
 
       if (!strncmp(filename, CUPS_LOGDIR, strlen(CUPS_LOGDIR)))
       {
-        cupsdCheckPermissions(CUPS_LOGDIR, NULL, 0755, RunUser, Group, 1, -1);
+       /*
+        * Try updating the permissions of the containing log directory, using
+	* the log file permissions as a basis...
+	*/
+
+        int log_dir_perm = 0300 | LogFilePerm;
+					/* LogFilePerm + owner write/search */
+	if (log_dir_perm & 0040)
+	  log_dir_perm |= 0010;		/* Add group search */
+	if (log_dir_perm & 0004)
+	  log_dir_perm |= 0001;		/* Add other search */
+
+        cupsdCheckPermissions(CUPS_LOGDIR, NULL, log_dir_perm, RunUser, Group,
+	                      1, -1);
 
         *lf = cupsFileOpen(filename, "a");
       }
@@ -816,6 +829,10 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
       {
 	syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
 	       strerror(errno));
+
+        if (FatalErrors & CUPSD_FATAL_LOG)
+	  cupsdEndProcess(getpid(), 0);
+
 	return (0);
       }
     }
@@ -854,6 +871,9 @@ check_log_file(cups_file_t **lf,	/* IO - Log file */
     {
       syslog(LOG_ERR, "Unable to open log file \"%s\" - %s", filename,
              strerror(errno));
+
+      if (FatalErrors & CUPSD_FATAL_LOG)
+	cupsdEndProcess(getpid(), 0);
 
       return (0);
     }

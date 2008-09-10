@@ -59,7 +59,7 @@ HELPFILES	=	\
 			help/glossary.html \
 			help/kerberos.html \
 			help/license.html \
-			help/man-accept.html \
+			help/man-cupsaccept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
 			help/man-classes.conf.html \

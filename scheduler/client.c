@@ -524,7 +524,8 @@ cupsdCloseAllClients(void)
   for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
        con;
        con = (cupsd_client_t *)cupsArrayNext(Clients))
-    cupsdCloseClient(con);
+    if (cupsdCloseClient(con))
+      cupsdCloseClient(con);
 }
 
 
@@ -1034,8 +1035,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	con->http.status = HTTP_OK;
 
-        cupsArrayAdd(ActiveClients, con);
-	cupsdSetBusyState();
+        if (!cupsArrayFind(ActiveClients, con))
+	{
+	  cupsArrayAdd(ActiveClients, con);
+          cupsdSetBusyState();
+        }
 
     case HTTP_OPTIONS :
     case HTTP_DELETE :

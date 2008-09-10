@@ -28,6 +28,9 @@
 #include "debug.h"
 #include <stdlib.h>
 #include <errno.h>
+#ifdef HAVE_RESOLV_H
+#  include <resolv.h>
+#endif /* HAVE_RESOLV_H */
 
 
 /*
@@ -201,6 +204,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   http_addrlist_t	*first,		/* First address in list */
 			*addr,		/* Current address in list */
 			*temp;		/* New address */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Global data */
 
 
 #ifdef DEBUG
@@ -216,6 +221,28 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 #  endif /* AF_INET6 */
 	                 family == AF_INET ? "INET" : "???", service);
 #endif /* DEBUG */
+
+#ifdef HAVE_RES_INIT
+ /*
+  * STR #2920: Initialize resolver after failure in cups-polld
+  *
+  * If the previous lookup failed, re-initialize the resolver to prevent
+  * temporary network errors from persisting.  This *should* be handled by
+  * the resolver libraries, but apparently the glibc folks do not agree.
+  *
+  * We set a flag at the end of this function if we encounter an error that
+  * requires reinitialization of the resolver functions.  We then call
+  * res_init() if the flag is set on the next call here or in httpAddrLookup().
+  */
+
+  if (cg->need_res_init)
+  {
+    res_init();
+
+    cg->need_res_init = 0;
+  }
+#endif /* HAVE_RES_INIT */
+
 
  /*
   * Lookup the address the best way we can...
@@ -246,6 +273,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     char		ipv6[1024],	/* IPv6 address */
 			*ipv6zone;	/* Pointer to zone separator */
     int			ipv6len;	/* Length of IPv6 address */
+    int			error;		/* getaddrinfo() error */
+
 
    /*
     * Lookup the address as needed...
@@ -297,7 +326,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
       }
     }
 
-    if (!getaddrinfo(hostname, service, &hints, &results))
+    if ((error = getaddrinfo(hostname, service, &hints, &results)) == 0)
     {
      /*
       * Copy the results to our own address list structure...
@@ -343,6 +372,9 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 
       freeaddrinfo(results);
     }
+    else if (error == EAI_FAIL)
+      cg->need_res_init = 1;
+
 #else
     if (hostname)
     {
@@ -459,6 +491,8 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
 	  addr = temp;
 	}
       }
+      else if (h_errno == NO_RECOVERY)
+        cg->need_res_init = 1;
     }
 #endif /* HAVE_GETADDRINFO */
   }

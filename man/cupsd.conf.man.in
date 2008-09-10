@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "8 September 2008" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -254,6 +254,15 @@ DefaultLanguage locale
 .br
 Specifies the default language to use for text and web content.
 .TP 5
+DefaultPaperSize Auto
+.TP 5
+DefaultPaperSize None
+.TP 5
+DefaultPaperSize sizename
+.br
+Specifies the default paper size for new print queues. "Auto" uses a locale-
+specific default, while "None" specifies there is no default paper size.
+.TP 5
 DefaultPolicy policy-name
 .br
 Specifies the default access policy to use.
@@ -302,6 +311,15 @@ ErrorLog filename
 ErrorLog syslog
 .br
 Specifies the error log filename.
+.TP 5
+FatalErrors none
+.TP 5
+FatalErrors all -kind [... -kind]
+.TP 5
+FatalErrors kind [... kind]
+.br
+Specifies which errors are fatal, causing the scheduler to exit. "Kind" is
+"browse", "config", "listen", "log", or "permissions".
 .TP 5
 FileDevice Yes
 .TP 5

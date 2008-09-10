@@ -46,8 +46,8 @@ globals.o: i18n.h transcode.h
 http.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
 http.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
 http.o: i18n.h transcode.h debug.h
-http-addr.o: globals.h string.h ../config.h http-private.h http.h
-http-addr.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.o: http-private.h ../config.h http.h versioning.h md5.h
+http-addr.o: ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
 http-addr.o: file.h language.h i18n.h transcode.h debug.h
 http-addrlist.o: http-private.h ../config.h http.h versioning.h md5.h
 http-addrlist.o: ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
@@ -109,6 +109,8 @@ testadmin.o: adminutil.h cups.h ipp.h http.h versioning.h ppd.h array.h
 testadmin.o: file.h language.h string.h ../config.h
 testarray.o: ../cups/string.h ../config.h string.h array.h versioning.h dir.h
 testarray.o: debug.h
+testconflicts.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+testconflicts.o: language.h string.h ../config.h
 testcups.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.o: string.h ../config.h file.h versioning.h debug.h
 testhttp.o: http-private.h ../config.h http.h versioning.h md5.h
@@ -172,8 +174,8 @@ globals.32.o: globals.c  i18n.h transcode.h
 http.32.o: http.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
 http.32.o: http.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
 http.32.o: http.c  i18n.h transcode.h debug.h
-http-addr.32.o: http-addr.c  globals.h string.h ../config.h http-private.h http.h
-http-addr.32.o: http-addr.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.32.o: http-addr.c  http-private.h ../config.h http.h versioning.h md5.h
+http-addr.32.o: http-addr.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
 http-addr.32.o: http-addr.c  file.h language.h i18n.h transcode.h debug.h
 http-addrlist.32.o: http-addrlist.c  http-private.h ../config.h http.h versioning.h md5.h
 http-addrlist.32.o: http-addrlist.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
@@ -235,6 +237,8 @@ testadmin.32.o: testadmin.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h 
 testadmin.32.o: testadmin.c  file.h language.h string.h ../config.h
 testarray.32.o: testarray.c  ../cups/string.h ../config.h string.h array.h versioning.h dir.h
 testarray.32.o: testarray.c  debug.h
+testconflicts.32.o: testconflicts.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+testconflicts.32.o: testconflicts.c  language.h string.h ../config.h
 testcups.32.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.32.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
 testhttp.32.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h
@@ -298,8 +302,8 @@ globals.64.o: globals.c  i18n.h transcode.h
 http.64.o: http.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
 http.64.o: http.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
 http.64.o: http.c  i18n.h transcode.h debug.h
-http-addr.64.o: http-addr.c  globals.h string.h ../config.h http-private.h http.h
-http-addr.64.o: http-addr.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+http-addr.64.o: http-addr.c  http-private.h ../config.h http.h versioning.h md5.h
+http-addr.64.o: http-addr.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
 http-addr.64.o: http-addr.c  file.h language.h i18n.h transcode.h debug.h
 http-addrlist.64.o: http-addrlist.c  http-private.h ../config.h http.h versioning.h md5.h
 http-addrlist.64.o: http-addrlist.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h
@@ -361,6 +365,8 @@ testadmin.64.o: testadmin.c  adminutil.h cups.h ipp.h http.h versioning.h ppd.h 
 testadmin.64.o: testadmin.c  file.h language.h string.h ../config.h
 testarray.64.o: testarray.c  ../cups/string.h ../config.h string.h array.h versioning.h dir.h
 testarray.64.o: testarray.c  debug.h
+testconflicts.64.o: testconflicts.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
+testconflicts.64.o: testconflicts.c  language.h string.h ../config.h
 testcups.64.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 testfile.64.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
 testhttp.64.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h

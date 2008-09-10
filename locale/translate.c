@@ -293,16 +293,16 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
       *bufptr = '\0';
 
      /*
-      * Find the first textarea element - that will have the translation data...
+      * Find the div containing translation
       */
 
-      if ((bufptr = strstr(buffer, "<textarea")) == NULL)
+      if ((bufptr = strstr(buffer, "<div id=result_box")) == NULL)
       {
        /*
         * No textarea, abort!
 	*/
 
-        puts("NO TEXTAREA!");
+        puts("NO div id=result_box!");
 	ret = 0;
 	break;
       }
@@ -313,20 +313,20 @@ translate_messages(cups_array_t *cat,	/* I - Message catalog */
         * textarea doesn't end, abort!
 	*/
 
-        puts("TEXTAREA SHORT DATA!");
+        puts("DIV SHORT DATA!");
 	ret = 0;
 	break;
       }
 
       bufptr ++;
 
-      if ((bufend = strstr(bufptr, "</textarea>")) == NULL)
+      if ((bufend = strstr(bufptr, "</div>")) == NULL)
       {
        /*
         * textarea doesn't close, abort!
 	*/
 
-        puts("/TEXTAREA SHORT DATA!");
+        puts("/DIV SHORT DATA!");
 	ret = 0;
 	break;
       }

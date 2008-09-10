@@ -12,12 +12,12 @@ lpd.o: ../cups/backend.h ../cups/sidechannel.h ../cups/ppd-private.h
 lpd.o: ../cups/cups.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 lpd.o: ../cups/language.h ../cups/debug.h ../cups/i18n.h ../cups/transcode.h
 lpd.o: ../cups/snmp-private.h ../cups/string.h
-mdns.o: backend-private.h ../cups/backend.h ../cups/versioning.h
-mdns.o: ../cups/sidechannel.h ../cups/ppd-private.h ../cups/cups.h
-mdns.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
-mdns.o: ../cups/file.h ../cups/language.h ../cups/debug.h ../cups/i18n.h
-mdns.o: ../cups/transcode.h ../cups/snmp-private.h ../cups/string.h
-mdns.o: ../config.h ../cups/array.h
+dnssd.o: backend-private.h ../cups/backend.h ../cups/versioning.h
+dnssd.o: ../cups/sidechannel.h ../cups/ppd-private.h ../cups/cups.h
+dnssd.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
+dnssd.o: ../cups/file.h ../cups/language.h ../cups/debug.h ../cups/i18n.h
+dnssd.o: ../cups/transcode.h ../cups/snmp-private.h ../cups/string.h
+dnssd.o: ../config.h ../cups/array.h
 pap.o: ../config.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pap.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pap.o: ../cups/language.h ../cups/backend.h ../cups/sidechannel.h
@@ -68,7 +68,9 @@ testsupplies.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
 testsupplies.o: ../cups/file.h ../cups/language.h ../cups/debug.h
 testsupplies.o: ../cups/i18n.h ../cups/transcode.h ../cups/snmp-private.h
 testsupplies.o: ../cups/string.h ../config.h
-usb.o: ../cups/backend.h ../cups/versioning.h ../cups/cups.h ../cups/ipp.h
-usb.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-usb.o: ../cups/language.h ../cups/string.h ../config.h ../cups/i18n.h
-usb.o: ../cups/transcode.h
+usb.o: backend-private.h ../cups/backend.h ../cups/versioning.h
+usb.o: ../cups/sidechannel.h ../cups/ppd-private.h ../cups/cups.h
+usb.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
+usb.o: ../cups/file.h ../cups/language.h ../cups/debug.h ../cups/i18n.h
+usb.o: ../cups/transcode.h ../cups/snmp-private.h ../cups/string.h
+usb.o: ../config.h
