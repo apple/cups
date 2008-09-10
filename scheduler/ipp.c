@@ -9558,11 +9558,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   else
     filetype = mimeType(MimeDatabase, super, type);
 
-  jformat = ippFindAttribute(job->attrs, "document-format", IPP_TAG_MIMETYPE);
-
-  if (filetype &&
-      (!jformat ||
-       (!strcmp(super, "application") && !strcmp(type, "octet-stream"))))
+  if (filetype)
   {
    /*
     * Replace the document-format attribute value with the auto-typed or
@@ -9572,7 +9568,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     snprintf(mimetype, sizeof(mimetype), "%s/%s", filetype->super,
              filetype->type);
 
-    if (jformat)
+    if ((jformat = ippFindAttribute(job->attrs, "document-format",
+                                    IPP_TAG_MIMETYPE)) != NULL)
     {
       _cupsStrFree(jformat->values[0].string.text);
 
