@@ -185,7 +185,7 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* Current filter level */
 			FilterNice		VALUE(0),
 					/* Nice value for filters */
-			ReloadTimeout		VALUE(0),
+			ReloadTimeout		VALUE(DEFAULT_KEEPALIVE),
 					/* Timeout before reload from SIGHUP */
 			RootCertDuration	VALUE(300),
 					/* Root certificate update interval */
@@ -220,7 +220,7 @@ VAR char		*ServerKey		VALUE(NULL);
 #endif /* HAVE_SSL */
 
 #ifdef HAVE_LAUNCHD
-VAR int			LaunchdTimeout		VALUE(DEFAULT_TIMEOUT);
+VAR int			LaunchdTimeout		VALUE(DEFAULT_KEEPALIVE);
 					/* Time after which an idle cupsd will exit */
 VAR char		*LaunchdConf		VALUE(NULL);
 					/* launchd(8) configuration file */

@@ -92,7 +92,7 @@ extern const char *cups_hstrerror(int);
 #define DEFAULT_HISTORY		1	/* Preserve job history? */
 #define DEFAULT_FILES		0	/* Preserve job files? */
 #define DEFAULT_TIMEOUT		300	/* Timeout during requests/updates */
-#define DEFAULT_KEEPALIVE	60	/* Timeout between requests */
+#define DEFAULT_KEEPALIVE	30	/* Timeout between requests */
 #define DEFAULT_INTERVAL	30	/* Interval between browse updates */
 #define DEFAULT_CHARSET		"utf-8"	/* Default charset */
 

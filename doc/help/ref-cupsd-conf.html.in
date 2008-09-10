@@ -1078,7 +1078,7 @@ HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-DirtyCleanInterval 60
+DirtyCleanInterval 30
 DirtyCleanInterval 0
 </PRE>
 
@@ -1086,7 +1086,7 @@ DirtyCleanInterval 0
 
 <P>The <CODE>DirtyCleanInterval</CODE> directive specifies the number of
 seconds to wait before updating configuration and state files for printers,
-classes, subscriptions, and jobs. The default is 60 seconds.</P>
+classes, subscriptions, and jobs. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H2>
@@ -1544,7 +1544,7 @@ KeepAliveTimeout 30
 
 <P>The <CODE>KeepAliveTimeout</CODE> directive controls how long
 a persistent HTTP connection will remain open after the last
-request. The default is 60 seconds.</P>
+request. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.7</SPAN><A NAME="Limit">Limit (Location)</A></H2>
@@ -2485,14 +2485,14 @@ There is no default program.</P>
 
 <PRE CLASS="command">
 ReloadTimeout 0
-ReloadTimeout 60
+ReloadTimeout 30
 </PRE>
 
 <H3>Description</H3>
 
 <P>The <CODE>ReloadTimeout</CODE> directive specifies the number
 of seconds the scheduler will wait for active jobs to complete
-before doing a restart. The default is 60 seconds.</P>
+before doing a restart. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.3</SPAN><A NAME="RemoteRoot">RemoteRoot</A></H2>

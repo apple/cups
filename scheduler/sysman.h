@@ -31,7 +31,7 @@
 
 VAR int			DirtyFiles	VALUE(CUPSD_DIRTY_NONE),
 					/* What files are dirty? */
-			DirtyCleanInterval VALUE(60);
+			DirtyCleanInterval VALUE(DEFAULT_KEEPALIVE);
 					/* How often do we write dirty files? */
 VAR time_t		DirtyCleanTime	VALUE(0);
 					/* When to clean dirty files next */

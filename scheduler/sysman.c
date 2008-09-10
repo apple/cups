@@ -105,6 +105,9 @@ cupsdCleanDirty(void)
 void
 cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
 {
+  if (what == CUPSD_DIRTY_PRINTCAP && !Printcap)
+    return;
+
   DirtyFiles |= what;
 
   if (!DirtyCleanTime)

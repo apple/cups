@@ -549,7 +549,7 @@ cupsdReadConfiguration(void)
 #ifdef HAVE_SSL
   DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
 #endif /* HAVE_SSL */
-  DirtyCleanInterval    = 60;
+  DirtyCleanInterval    = DEFAULT_KEEPALIVE;
   JobRetryLimit         = 5;
   JobRetryInterval      = 300;
   FileDevice            = FALSE;
@@ -570,7 +570,7 @@ cupsdReadConfiguration(void)
   MaxLogSize            = 1024 * 1024;
   MaxPrinterHistory     = 10;
   MaxRequestSize        = 0;
-  ReloadTimeout	        = 60;
+  ReloadTimeout	        = DEFAULT_KEEPALIVE;
   RootCertDuration      = 300;
   Timeout               = DEFAULT_TIMEOUT;
   NumSystemGroups       = 0;
