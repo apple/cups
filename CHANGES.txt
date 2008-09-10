@@ -3,6 +3,8 @@ CHANGES.txt - 2008-09-10
 
 CHANGES IN CUPS V1.4b1
 
+	- The locale/translate utility needed an update to work with
+	  Google (STR #2882)
 	- The lpstat command now supports a -H option to display the
 	  default server (STR #2833)
 	- The scheduler now supports a FatalErrors directive to control
