@@ -123,22 +123,28 @@ cupsdSetBusyState(void)
 {
   int		newbusy;		/* New busy state */
   static int	busy = 0;		/* Current busy state */
+  static const char * const busy_text[] =
+  {					/* Text for busy states */
+    "Not busy",
+    "Dirty files",
+    "Printing jobs",
+    "Printing jobs and dirty files",
+    "Active clients",
+    "Active clients and dirty files",
+    "Active clients and printing jobs",
+    "Active clients, printing jobs, and dirty files"
+  };
 
 
-  newbusy = DirtyCleanTime ||
-            cupsArrayCount(PrintingJobs) ||
-	    cupsArrayCount(ActiveClients);
+  newbusy = (DirtyCleanTime ? 1 : 0) |
+            (cupsArrayCount(PrintingJobs) ? 2 : 0) |
+	    (cupsArrayCount(ActiveClients) ? 4 : 0);
 
   if (newbusy != busy)
   {
     busy = newbusy;
 
-    if (busy)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetBusyState: Server is now busy...");
-    else
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetBusyState: Server no longer busy...");
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetBusyState: %s", busy_text[busy]);
   }
 }
 
