@@ -2353,7 +2353,7 @@ dnssdBuildTxtRecord(
     }
 
     keyvalue[i  ][0] = "air";
-    keyvalue[i++][1] = air;
+    keyvalue[i++][1] = air_str;
   }
 
  /*
@@ -2605,7 +2605,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   * Register IPP and (optionally) LPD...
   */
 
-  ipp_len    = 0;			/* anti-compiler-warning-code */
+  ipp_len = 0;				/* anti-compiler-warning-code */
   ipp_txt = dnssdBuildTxtRecord(&ipp_len, p, 0);
 
   if (!p->ipp_ref)
@@ -2686,7 +2686,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
   if (BrowseLocalProtocols & BROWSE_LPD)
   {
-    printer_len    = 0;			/* anti-compiler-warning-code */
+    printer_len = 0;			/* anti-compiler-warning-code */
     printer_txt = dnssdBuildTxtRecord(&printer_len, p, 1);
 
     if (!p->printer_ref)
