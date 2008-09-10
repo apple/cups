@@ -93,6 +93,8 @@ cupsdCleanDirty(void)
 
   DirtyFiles     = CUPSD_DIRTY_NONE;
   DirtyCleanTime = 0;
+
+  cupsdSetBusyState();
 }
 
 
@@ -133,10 +135,10 @@ cupsdSetBusyState(void)
 
     if (busy)
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetBusyState: Server no longer busy...");
+                      "cupsdSetBusyState: Server is now busy...");
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetBusyState: Server is now busy...");
+                      "cupsdSetBusyState: Server no longer busy...");
   }
 }
 

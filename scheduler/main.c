@@ -891,10 +891,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (DirtyCleanTime && current_time >= DirtyCleanTime)
-    {
       cupsdCleanDirty();
-      cupsdSetBusyState();
-    }
 
 #ifndef __APPLE__
    /*
