@@ -734,8 +734,8 @@ f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertoescpx.$MAN7EXT man/rastertoescpx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertopclx.$MAN7EXT man/rastertopclx.$MAN7EXT
 
-f 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT man/accept.$MAN8EXT
-l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT accept.$MAN8EXT
+f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/cupsreject.$MAN8EXT cupsaccept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsctl.$MAN8EXT man/cupsctl.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsfilter.$MAN8EXT man/cupsfilter.$MAN8EXT

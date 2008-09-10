@@ -53,7 +53,7 @@ MAN7	=	backend.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
 		rastertoescpx.$(MAN7EXT) \
 		rastertopclx.$(MAN7EXT)
-MAN8	=	accept.$(MAN8EXT) \
+MAN8	=	cupsaccept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \
 		cupsfilter.$(MAN8EXT) \
@@ -150,8 +150,8 @@ install-data: all
 		echo Installing $$file in $(AMANDIR)/man$(MAN8DIR)...; \
 		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8DIR); \
 	done
-	$(RM) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
-	$(LN) accept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsreject.$(MAN8EXT)
+	$(LN) cupsaccept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsreject.$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 
