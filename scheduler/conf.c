@@ -549,6 +549,7 @@ cupsdReadConfiguration(void)
   DefaultAuthType       = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
+  SSLOptions            = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
   DirtyCleanInterval    = DEFAULT_KEEPALIVE;
   JobRetryLimit         = 5;
@@ -3199,6 +3200,21 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Missing value for SetEnv directive on line %d.",
 	                linenum);
+    }
+    else if (!strcasecmp(line, "SSLOptions"))
+    {
+     /*
+      * SSLOptions options
+      */
+
+      if (!value || !strcasecmp(value, "none"))
+        SSLOptions = CUPSD_SSL_NONE;
+      else if (!strcasecmp(value, "noemptyfragments"))
+        SSLOptions = CUPSD_SSL_NOEMPTY;
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown value \"%s\" for SSLOptions directive on "
+			"line %d.", value, linenum);
     }
     else
     {

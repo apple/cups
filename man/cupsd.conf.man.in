@@ -642,6 +642,12 @@ SSLListen
 .br
 Listens on the specified address and port for encrypted connections.
 .TP 5
+SSLOptions None
+.TP 5
+SSLOptions NoEmptyFragments
+.br
+Sets SSL/TLS protocol options for encrypted connections.
+.TP 5
 SSLPort
 .br
 Listens on the specified port for encrypted connections.

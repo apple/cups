@@ -67,6 +67,14 @@ typedef enum
 
 
 /*
+ * SSL options (bits)...
+ */
+
+#define CUPSD_SSL_NONE		0	/* No special options */
+#define CUPSD_SSL_NOEMPTY	1	/* Do not insert empty fragments */
+
+
+/*
  * Globals...
  */
 
@@ -217,6 +225,8 @@ VAR char		*ServerCertificate	VALUE(NULL);
 VAR char		*ServerKey		VALUE(NULL);
 					/* Server key file */
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
+					/* SSL/TLS options */
 #endif /* HAVE_SSL */
 
 #ifdef HAVE_LAUNCHD

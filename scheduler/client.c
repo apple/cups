@@ -3080,6 +3080,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   context = SSL_CTX_new(SSLv23_server_method());
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
+  if (SSLOptions & CUPSD_SSL_NOEMPTY)
+    SSL_CTX_set_options(context, SSL_OP_DONTS_INSERT_EMPTY_FRAGMENTS);
   SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
   SSL_CTX_use_certificate_chain_file(context, ServerCertificate,
                                      SSL_FILETYPE_PEM);
