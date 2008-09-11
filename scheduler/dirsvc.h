@@ -85,6 +85,8 @@ typedef struct
 
 VAR int			Browsing	VALUE(TRUE),
 					/* Whether or not browsing is enabled */
+			BrowseWebIF	VALUE(FALSE),
+					/* Whether the web interface is advertised */
 			BrowseLocalProtocols
 					VALUE(BROWSE_ALL),
 					/* Protocols to support for local printers */

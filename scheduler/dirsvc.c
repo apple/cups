@@ -1945,26 +1945,29 @@ cupsdUpdateDNSSDName(void)
 #endif	/* HAVE_COREFOUNDATION_H */
 
  /*
-  * Then (re)register the web interface...
+  * Then (re)register the web interface if enabled...
   */
 
-  if (DNSSDName)
-    snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDName);
-  else
-    strlcpy(webif, "CUPS Web Interface", sizeof(webif));
+  if (BrowseWebIF)
+  {
+    if (DNSSDName)
+      snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDName);
+    else
+      strlcpy(webif, "CUPS Web Interface", sizeof(webif));
 
-  if (WebIFRef)
-    DNSServiceRefDeallocate(WebIFRef);
+    if (WebIFRef)
+      DNSServiceRefDeallocate(WebIFRef);
 
-  WebIFRef = DNSSDRef;
-  if ((error = DNSServiceRegister(&WebIFRef,
-				  kDNSServiceFlagsShareConnection,
-				  0, webif, "_http._tcp", NULL,
-				  NULL, htons(DNSSDPort), 7,
-				  "\006path=/", dnssdRegisterCallback,
-				  NULL)) != kDNSServiceErr_NoError)
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "DNS-SD web interface registration failed: %d", error);
+    WebIFRef = DNSSDRef;
+    if ((error = DNSServiceRegister(&WebIFRef,
+				    kDNSServiceFlagsShareConnection,
+				    0, webif, "_http._tcp", NULL,
+				    NULL, htons(DNSSDPort), 7,
+				    "\006path=/", dnssdRegisterCallback,
+				    NULL)) != kDNSServiceErr_NoError)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "DNS-SD web interface registration failed: %d", error);
+  }
 }
 #endif /* HAVE_DNSSD */
 

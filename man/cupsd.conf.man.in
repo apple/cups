@@ -210,6 +210,12 @@ BrowseTimeout seconds
 Specifies the maximum interval between printer information updates before
 remote printers will be removed from the list of available printers.
 .TP 5
+BrowseWebIF Yes
+.TP 5
+BrowseWebIF No
+.br
+Specifies whether the CUPS web interface is advertised via DNS-SD.
+.TP 5
 Browsing Yes
 .TP 5
 Browsing No

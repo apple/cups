@@ -794,6 +794,22 @@ Otherwise printers and classes will disappear from client systems
 between updates.</P>
 
 
+<H2 CLASS="title"><A NAME="BrowseWebIF">BrowseWebIF</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+BrowseWebIF On
+BrowseWebIF Off
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>BrowseWebIF</CODE> directive controls whether the CUPS web
+interface is advertised via DNS-SD. The default setting is
+<CODE>Off</CODE>.</P>
+
+
 <H2 CLASS="title"><A NAME="Browsing">Browsing</A></H2>
 
 <H3>Examples</H3>

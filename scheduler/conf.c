@@ -95,6 +95,7 @@ static const cupsd_var_t	variables[] =
   { "BrowseRemoteOptions",	&BrowseRemoteOptions,	CUPSD_VARTYPE_STRING },
   { "BrowseShortNames",		&BrowseShortNames,	CUPSD_VARTYPE_BOOLEAN },
   { "BrowseTimeout",		&BrowseTimeout,		CUPSD_VARTYPE_INTEGER },
+  { "BrowseWebIF",		&BrowseWebIF,		CUPSD_VARTYPE_BOOLEAN },
   { "Browsing",			&Browsing,		CUPSD_VARTYPE_BOOLEAN },
   { "CacheDir",			&CacheDir,		CUPSD_VARTYPE_STRING },
   { "Classification",		&Classification,	CUPSD_VARTYPE_STRING },
@@ -581,6 +582,7 @@ cupsdReadConfiguration(void)
   BrowseRemoteProtocols = parse_protocols(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS);
   BrowseShortNames      = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
   BrowseTimeout         = DEFAULT_TIMEOUT;
+  BrowseWebIF           = FALSE;
   Browsing              = CUPS_DEFAULT_BROWSING;
   DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
 
