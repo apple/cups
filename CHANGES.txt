@@ -4,6 +4,8 @@ CHANGES.txt - 2008-09-10
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- Added support for printer filtering by the cupsfilter
+	  command (STR #2562)
 	- Added a SSLOptions directive to allow Windows clients to
 	  talk to CUPS in FIPS mode (STR #2827)
 	- Renamed the accept and reject commands to cupsaccept and

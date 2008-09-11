@@ -3,7 +3,7 @@
 .\"
 .\"   cupsfilter man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "Common UNIX Printing System" "19 October 2007" "Apple Inc."
+.TH cupsfilter 8 "Common UNIX Printing System" "10 September 2008" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
@@ -50,6 +50,8 @@ converted.
 -m mime/type
 .br
 Specifies the destination file type. The default file type is application/pdf.
+Use printer/foo to convert to the printer format defined by the filters in the
+PPD file.
 .TP 5
 -n copies
 .br
@@ -74,7 +76,7 @@ This will be addressed in a future CUPS release.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
