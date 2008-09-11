@@ -3,6 +3,7 @@ CHANGES.txt - 2008-09-10
 
 CHANGES IN CUPS V1.4b1
 
+	- Documentation updates (STR #2567)
 	- Renamed the accept and reject commands to cupsaccept and
 	  cupsreject; the old names are still available (STR #2936)
 	- The locale/translate utility needed an update to work with

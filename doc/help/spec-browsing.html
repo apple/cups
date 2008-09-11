@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS Browse Protocol</title>
+	<meta name='keywords' content='Programming'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  CUPS Browse Protocol specification for the Common UNIX Printing System (CUPS).
+
+  Copyright 2008 by Apple Inc.
+  Copyright 1997-2005 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<p>The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By default
+this service operates on IP service port 631.
+
+
+<h2><a name='FORMAT'>Browse Packet Format</a></h2>
+
+<p> Each broadcast packet describes
+the state of a single printer or class and is an ASCII text string of up to
+1450 bytes ending with a linefeed (0x0a). The string is formatted as
+follows:</p>
+
+<p class='summary'>
+type SP state SP uri SP "location" SP "info" SP "make-and-model" SP
+attr=value SP attr=value ... NL
+</p>
+
+<p><var>State, uri, location, info</var>, and <var>make-and-model</var>,
+correspond to the IPP <code>printer-state</code>,
+<code>printer-uri-supported</code>, <code>printer-location</code>,
+<code>printer-info</code>, and <code>printer-make-and-model</code>
+attributes. <var>Type</var> corresponds to the <code>printer-type</code>
+attribute and is a hexadecimal number string representing capability/type
+bits:</p>
+
+<div class='table'><table align='center' border='1' width='80%'
+summary='Printer Type Bits'>
+<thead>
+<tr>
+	<th>Bit</th>
+	<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td>0x00000001</td>
+	<td>Is a printer class.</td>
+</tr>
+<tr>
+	<td>0x00000002</td>
+	<td>Is a remote destination.</td>
+</tr>
+<tr>
+	<td>0x00000004</td>
+	<td>Can print in black.</td>
+</tr>
+<tr>
+	<td>0x00000008</td>
+	<td>Can print in color.</td>
+</tr>
+<tr>
+	<td>0x00000010</td>
+	<td>Can print on both sides of the page in hardware.</td>
+</tr>
+<tr>
+	<td>0x00000020</td>
+	<td>Can staple output.</td>
+</tr>
+<tr>
+	<td>0x00000040</td>
+	<td>Can do fast copies in hardware.</td>
+</tr>
+<tr>
+	<td>0x00000080</td>
+	<td>Can do fast copy collation in hardware.</td>
+</tr>
+<tr>
+	<td>0x00000100</td>
+	<td>Can punch output.</td>
+</tr>
+<tr>
+	<td>0x00000200</td>
+	<td>Can cover output.</td>
+</tr>
+<tr>
+	<td>0x00000400</td>
+	<td>Can bind output.</td>
+</tr>
+<tr>
+	<td>0x00000800</td>
+	<td>Can sort output.</td>
+</tr>
+<tr>
+	<td>0x00001000</td>
+	<td>Can handle media up to US-Legal/A4.</td>
+</tr>
+<tr>
+	<td>0x00002000</td>
+	<td>Can handle media from US-Legal/A4 to ISO-C/A2.</td>
+</tr>
+<tr>
+	<td>0x00004000</td>
+	<td>Can handle media larger than ISO-C/A2.</td>
+</tr>
+<tr>
+	<td>0x00008000</td>
+	<td>Can handle user-defined media sizes.</td>
+</tr>
+<tr>
+	<td>0x00010000</td>
+	<td>Is an implicit (server-generated) class.</td>
+</tr>
+<tr>
+	<td>0x00020000</td>
+	<td>Is the a default printer on the network.</td>
+</tr>
+<tr>
+	<td>0x00040000</td>
+	<td>Is a facsimile device.</td>
+</tr>
+<tr>
+	<td>0x00080000</td>
+	<td>Is rejecting jobs.</td>
+</tr>
+<tr>
+	<td>0x00100000</td>
+	<td>Delete this queue.</td>
+</tr>
+<tr>
+	<td>0x00200000</td>
+	<td>Queue is not shared.</td>
+</tr>
+<tr>
+	<td>0x00400000</td>
+	<td>Queue requires authentication.</td>
+</tr>
+<tr>
+	<td>0x00800000</td>
+	<td>Queue supports CUPS command files.</td>
+</tr>
+<tr>
+	<td>0x01000000</td>
+	<td>Queue was automatically discovered and added.</td>
+</tr>
+</tbody>
+</table></div>
+
+</body>
+</html>

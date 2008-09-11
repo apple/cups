@@ -105,6 +105,7 @@ HELPFILES	=	\
 			help/ref-snmp-conf.html \
 			help/ref-subscriptions-conf.html \
 			help/security.html \
+			help/spec-browsing.html \
 			help/spec-cmp.html \
 			help/spec-command.html \
 			help/spec-design.html \
