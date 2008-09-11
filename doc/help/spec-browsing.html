@@ -21,141 +21,89 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<p>The CUPS Browsing Protocol is a UDP/IP-based broadcast service. By default
-this service operates on IP service port 631.
+<h2><a name='INTRO'>Introduction</a></h2>
+
+<p>This specification describes the CUPS browsing protocol which is used for
+printer sharing. The protocol is a UDP/IP-based broadcast service that
+operates on IP service port 631 by default. Each broadcast packet describes
+a single printer or class being shared.</p>
+
+<p>For simple networks with a single subnet, a CUPS system sharing a printer
+(the <em>server</em>) will periodically broadcast that printer's availability
+and status information to the subnet. Every other CUPS system on the subnet
+(the <em>clients</em>) will receive the broadcast and make that printer
+available to local users. If a client stops receiving broadcasts from the
+server, or if the server sends a special "deleted" broadcast message, the
+client will remove its copy of the printer.</p>
+
+<p>For larger networks with multiple subnets, a relay configuration can be used
+where one or more client systems poll the server and then broadcast the
+availability and status information for the server's shared printers to the
+clients' local subnets.</p>
+
+<p>A key feature of CUPS printer sharing is support for <em>implicit
+classes</em>, which are automatically-created classes for printers that are
+shared by multiple servers. These implicit classes provide automatic load
+balancing and fail-safe printing functionality transparently to the user.</p>
+
+
+<h2><a name='SECURITY'>Security Considerations</a></h2>
+
+<p>Like most discovery protocols, CUPS browse packets are not encrypted or
+signed, so it is possible for malicious systems on a network to advertise
+or remove printers on that network to cause denial of service or information
+disclosure. In order to combat this, CUPS logs incoming browse packets and
+provides access controls to limit browse packet reception to known hosts.</p>
 
 
 <h2><a name='FORMAT'>Browse Packet Format</a></h2>
 
-<p> Each broadcast packet describes
-the state of a single printer or class and is an ASCII text string of up to
-1450 bytes ending with a linefeed (0x0a). The string is formatted as
-follows:</p>
+<p>Each broadcast packet is an ASCII text string of up to 1450 bytes ending
+with a line feed (0x0a). The general format is:</p>
 
 <p class='summary'>
-type SP state SP uri SP "location" SP "info" SP "make-and-model" SP
-attr=value SP attr=value ... NL
+printer-type printer-state printer-uri "printer-location" "printer-info"
+"printer-make-and-model" name=value name2=value2 ...
 </p>
 
-<p><var>State, uri, location, info</var>, and <var>make-and-model</var>,
-correspond to the IPP <code>printer-state</code>,
-<code>printer-uri-supported</code>, <code>printer-location</code>,
-<code>printer-info</code>, and <code>printer-make-and-model</code>
-attributes. <var>Type</var> corresponds to the <code>printer-type</code>
-attribute and is a hexadecimal number string representing capability/type
-bits:</p>
+<p>Each of the fields contains the value of the corresponding IPP attribute.
+The trailing "name=value" information is used to convey default job template
+attribute values (job-sheets-default, media-default, etc.), authentication
+requirements (auth-info-required), and additional IPP URI options that are
+requested by the server (ipp-options).</p>
 
-<div class='table'><table align='center' border='1' width='80%'
-summary='Printer Type Bits'>
-<thead>
-<tr>
-	<th>Bit</th>
-	<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-	<td>0x00000001</td>
-	<td>Is a printer class.</td>
-</tr>
-<tr>
-	<td>0x00000002</td>
-	<td>Is a remote destination.</td>
-</tr>
-<tr>
-	<td>0x00000004</td>
-	<td>Can print in black.</td>
-</tr>
-<tr>
-	<td>0x00000008</td>
-	<td>Can print in color.</td>
-</tr>
-<tr>
-	<td>0x00000010</td>
-	<td>Can print on both sides of the page in hardware.</td>
-</tr>
-<tr>
-	<td>0x00000020</td>
-	<td>Can staple output.</td>
-</tr>
-<tr>
-	<td>0x00000040</td>
-	<td>Can do fast copies in hardware.</td>
-</tr>
-<tr>
-	<td>0x00000080</td>
-	<td>Can do fast copy collation in hardware.</td>
-</tr>
-<tr>
-	<td>0x00000100</td>
-	<td>Can punch output.</td>
-</tr>
-<tr>
-	<td>0x00000200</td>
-	<td>Can cover output.</td>
-</tr>
-<tr>
-	<td>0x00000400</td>
-	<td>Can bind output.</td>
-</tr>
-<tr>
-	<td>0x00000800</td>
-	<td>Can sort output.</td>
-</tr>
-<tr>
-	<td>0x00001000</td>
-	<td>Can handle media up to US-Legal/A4.</td>
-</tr>
-<tr>
-	<td>0x00002000</td>
-	<td>Can handle media from US-Legal/A4 to ISO-C/A2.</td>
-</tr>
-<tr>
-	<td>0x00004000</td>
-	<td>Can handle media larger than ISO-C/A2.</td>
-</tr>
-<tr>
-	<td>0x00008000</td>
-	<td>Can handle user-defined media sizes.</td>
-</tr>
-<tr>
-	<td>0x00010000</td>
-	<td>Is an implicit (server-generated) class.</td>
-</tr>
-<tr>
-	<td>0x00020000</td>
-	<td>Is the a default printer on the network.</td>
-</tr>
-<tr>
-	<td>0x00040000</td>
-	<td>Is a facsimile device.</td>
-</tr>
-<tr>
-	<td>0x00080000</td>
-	<td>Is rejecting jobs.</td>
-</tr>
-<tr>
-	<td>0x00100000</td>
-	<td>Delete this queue.</td>
-</tr>
-<tr>
-	<td>0x00200000</td>
-	<td>Queue is not shared.</td>
-</tr>
-<tr>
-	<td>0x00400000</td>
-	<td>Queue requires authentication.</td>
-</tr>
-<tr>
-	<td>0x00800000</td>
-	<td>Queue supports CUPS command files.</td>
-</tr>
-<tr>
-	<td>0x01000000</td>
-	<td>Queue was automatically discovered and added.</td>
-</tr>
-</tbody>
-</table></div>
+<h3>ABNF Definition</h3>
+
+<p>The following ABNF definition [RFC4234, RFC3986] defines the format of each
+browse packet:</p>
+
+<pre class='command'>
+PACKET         = TYPE WSP STATE WSP URI WSP LOCATION WSP INFO WSP
+                 MAKE-AND-MODEL WSP *[ WSP ATTR-NAME "=" ATTR-VALUE ] LF
+
+TYPE           = 1*HEXDIG
+
+STATE          = "3" / "4" / "5"
+
+URI            = "ipp://" ( 1*NAMECHAR / IP-literal / IPv4address )
+                 [ ":" 1*DIGIT ] ( "/printers/" / "/classes/" ) 1*NAMECHAR
+NAMECHAR       = %x21.22.24.26-2E.30-7E / %x25 HEXDIG HEXDIG
+IP-literal     = See RFC 3986
+IPv4address    = See RFC 3986
+
+LOCATION       = QUOTED-STRING
+INFO           = QUOTED-STRING
+MAKE-AND-MODEL = QUOTED-STRING
+
+ATTR-NAME      = 1*( ALPHA / DIGIT / "-" / "." )
+ATTR-VALUE     = QUOTED-STRING / 1*UNQUOTE-CHAR
+
+QUOTED-STRING  = DQUOTE *QUOTED-CHAR DQUOTE
+QUOTED-CHAR    = %x20.21.23-5B.5D-7E / UTF8-CHAR / %x5C %x5C / %x5C %x22
+UNQUOTE-CHAR   = %x21.23-26.28-5B.5D-7E / UTF8-CHAR
+UTF8-CHAR      = %xC0.DF %x80.BF / %xE0.EF %x80.BF %x80.BF /
+                 %xF0.F7 %x80.BF %x80.BF %x80.BF
+</pre>
 
 </body>
 </html>

@@ -38,7 +38,7 @@ filtering.</p>
 <p>The PPD format is text-based and uses lines of up to 255
 characters terminated by a carriage return, linefeed, or
 combination of carriage return and line feed. The following ABNF
-definition [RFC2234] defines the general format of lines in a PPD
+definition [RFC4234] defines the general format of lines in a PPD
 file:</p>
 
 <pre class='command'>
@@ -57,9 +57,9 @@ VALUE    = 1*TCHAR / DQUOTE 1*SCHAR DQUOTE
 
 KCHAR    = ALPHA / DIGIT / "_" / "." / "-"
 
-SCHAR    = LINE-END / WSP / %x21 / %x23-7E / %xA0-FF
+SCHAR    = LINE-END / WSP / %x21.23-7E.A0-FF
 
-TCHAR    = %x20-7E / %xA0-FF
+TCHAR    = %x20-7E.A0-FF
 
 LINE-END = CR / LF / CR LF
 </pre>
