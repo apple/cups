@@ -209,7 +209,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   while (response == NULL)
   {
-    DEBUG_puts("cupsDoFileRequest: setup...");
+    DEBUG_puts("cupsDoIORequest: setup...");
 
    /*
     * Send the request...
@@ -217,11 +217,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     status = cupsSendRequest(http, request, resource, length);
 
-    DEBUG_printf(("cupsDoFileRequest: status=%d\n", status));
+    DEBUG_printf(("cupsDoIORequest: status=%d\n", status));
 
     if (status == HTTP_CONTINUE && request->state == IPP_DATA && infile >= 0)
     {
-      DEBUG_puts("cupsDoFileRequest: file write...");
+      DEBUG_puts("cupsDoIORequest: file write...");
 
      /*
       * Send the file with the request...
@@ -313,7 +313,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
 		request ? ippOpString(request->request.op.operation_id) : "?",
 		resource ? resource : "(null)"));
 
-  return (cupsDoFileRequest(http, request, resource, NULL));
+  return (cupsDoIORequest(http, request, resource, -1, -1));
 }
 
 
@@ -571,7 +571,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   if (ippFindAttribute(request, "auth-info", IPP_TAG_TEXT) &&
       !httpAddrLocalhost(http->hostaddr) && !http->tls &&
       httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
+  {
+    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
     return (HTTP_SERVICE_UNAVAILABLE);
+  }
 #endif /* HAVE_SSL */
 
  /*
@@ -580,7 +583,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   if (!strcasecmp(http->fields[HTTP_FIELD_CONNECTION], "close"))
     if (httpReconnect(http))
+    {
+      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
       return (HTTP_SERVICE_UNAVAILABLE);
+    }
 
  /*
   * Loop until we can send the request without authorization problems.
@@ -613,7 +619,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     if (httpPost(http, resource))
     {
       if (httpReconnect(http))
+      {
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
         return (HTTP_SERVICE_UNAVAILABLE);
+      }
       else
         continue;
     }
@@ -671,7 +680,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       case HTTP_UNAUTHORIZED :
           if (!cupsDoAuthentication(http, "POST", resource))
 	    if (httpReconnect(http))
-	      return (HTTP_ERROR);
+	    {
+	      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	      return (HTTP_SERVICE_UNAVAILABLE);
+	    }
 
           return (status);
 
@@ -683,7 +695,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  */
 
 	  if (httpReconnect(http))
-	    return (HTTP_ERROR);
+	  {
+	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    return (HTTP_SERVICE_UNAVAILABLE);
+	  }
 
 	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 
