@@ -8460,6 +8460,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 	      "File of type %s/%s queued by \"%s\".",
 	      filetype->super, filetype->type, job->username);
   cupsdLogJob(job, CUPSD_LOG_DEBUG, "hold_until=%d", (int)job->hold_until);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Queued on \"%s\" by \"%s\".",
+	      job->dest, job->username);
 
  /*
   * Start the job if possible...
