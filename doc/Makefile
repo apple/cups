@@ -26,14 +26,10 @@ WEBPAGES	=	\
 			index.html \
 			robots.txt
 WEBIMAGES	=	\
-			images/classes.png \
 			images/cups.png \
 			images/cups-block-diagram.gif \
 			images/cups-icon.png \
 			images/left.gif \
-			images/printer-idle.png \
-			images/printer-processing.png \
-			images/printer-stopped.png \
 			images/raster.png \
 			images/right.gif \
 			images/sel.gif \
