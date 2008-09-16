@@ -303,12 +303,12 @@ show_all_classes(http_t     *http,	/* I - Connection to server */
 
     cgiCopyTemplateLang("classes-header.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("classes.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
    /*
@@ -362,7 +362,7 @@ show_class(http_t     *http,		/* I - Connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                uri);
 
-  cgiGetAttributes(request, "classes.tmpl");
+  cgiGetAttributes(request, "class.tmpl");
 
  /*
   * Do the request and get back a response...
@@ -408,7 +408,7 @@ show_class(http_t     *http,		/* I - Connection to server */
     */
 
     cgiSetVariable("_SINGLE_DEST", "1");
-    cgiCopyTemplateLang("classes.tmpl");
+    cgiCopyTemplateLang("class.tmpl");
 
    /*
     * Show jobs for the specified class...

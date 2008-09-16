@@ -3,7 +3,7 @@
  *
  *   Online help CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -359,7 +359,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if (!printable)
+  {
+    cgiCopyTemplateLang("help-trailer.tmpl");
     cgiEndHTML();
+  }
   else
     puts("</BODY>\n</HTML>");
 

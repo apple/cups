@@ -1351,12 +1351,12 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     cgiCopyTemplateLang("jobs-header.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("jobs.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cupsArrayDelete(jobs);

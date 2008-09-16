@@ -27,7 +27,7 @@
  * Limits...
  */
 
-#define CUPS_PAGE_MAX	10		/* Maximum items per page */
+#define CUPS_PAGE_MAX	100		/* Maximum items per page */
 
 
 /*

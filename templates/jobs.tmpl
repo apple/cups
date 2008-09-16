@@ -1,17 +1,11 @@
 {#job_id=0?:
-<TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Job List">
-<TR CLASS="data">
-<TH>ID&nbsp;</TH>
-<TH>Name&nbsp;</TH>
-<TH>User&nbsp;</TH>
-<TH>Size&nbsp;</TH>
-<TH>Pages&nbsp;</TH>
-<TH>State&nbsp;</TH>
-<TH>Control&nbsp;</TH>
-</TR>
-
+<TABLE CLASS="list" SUMMARY="Job List">
+<THEAD>
+<TR><TH><A HREF="{THISURL}?QUERY={?QUERY}&amp;WHICH_JOBS={?WHICH_JOBS}&amp;FIRST={FIRST}&amp;ORDER={ORDER=dec?asc:dec}">{ORDER=dec?<SMALL>&#x25b2;</SMALL> ID <SMALL>&#x25b2;</SMALL>:<SMALL>&#x25bc;</SMALL> ID <SMALL>&#x25bc;</SMALL>}</A></TH><TH>Name</TH><TH>User</TH><TH>Size</TH><TH>Pages</TH><TH>State</TH><TH>Control</TH></TR>
+</THEAD>
+<TBODY>
 {[job_id]
-<TR CLASS="data" VALIGN="TOP">
+<TR VALIGN="TOP">
 <TD><A HREF="{job_printer_uri}">{job_printer_name}</A>-{job_id}&nbsp;</TD>
 <TD>{?job_name=?Unknown:{job_name}}&nbsp;</TD>
 <TD>{job_originating_user_name}&nbsp;</TD>
@@ -38,6 +32,6 @@
 &nbsp;</TD>
 </TR>
 }
+</TBODY>
 </TABLE>
 }
-<BR>

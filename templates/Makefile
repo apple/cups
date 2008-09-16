@@ -29,6 +29,7 @@ FILES	=	\
 		choose-model.tmpl \
 		choose-serial.tmpl \
 		choose-uri.tmpl \
+		class.tmpl \
 		class-added.tmpl \
 		class-confirm.tmpl \
 		class-deleted.tmpl \
@@ -41,6 +42,7 @@ FILES	=	\
 		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
+		help-trailer.tmpl \
 		help-printable.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
@@ -62,6 +64,7 @@ FILES	=	\
 		option-pickone.tmpl \
 		option-trailer.tmpl \
 		pager.tmpl \
+		printer.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \

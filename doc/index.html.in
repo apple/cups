@@ -26,51 +26,76 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 </TR>
 </TABLE>
 
-<H1>Common UNIX Printing System @CUPS_VERSION@@CUPS_REVISION@</H1>
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
 
-<H2 CLASS="title">Welcome!</H2>
+<H1>Common UNIX Printing System @CUPS_VERSION@</H1>
 
-<P>These web pages allow you to monitor your printers and jobs as well
-as perform system administration tasks. Click on any of the tabs above
-or on the buttons below to perform a task.</P>
+<P>CUPS is the standards-based, open source printing system developed by
+<A HREF="http://www.apple.com/">Apple Inc.</A> for Mac OS<SUP>&reg;</SUP> X and
+other UNIX<SUP>&reg;</SUP>-like operating systems.</P>
 
-<P>
-<FORM METHOD="GET" ACTION="/help/"><INPUT TYPE="submit" VALUE="Help"></FORM>
-<FORM METHOD="POST" ACTION="/admin"><INPUT TYPE="hidden" NAME="OP" VALUE="add-class"><INPUT TYPE="submit" VALUE="Add Class"></FORM>
-<FORM METHOD="POST" ACTION="/admin"><INPUT TYPE="hidden" NAME="OP" VALUE="add-printer"><INPUT TYPE="submit" VALUE="Add Printer"></FORM>
-<FORM METHOD="GET" ACTION="/classes"><INPUT TYPE="submit" VALUE="Manage Classes"></FORM>
-<FORM METHOD="GET" ACTION="/jobs"><INPUT TYPE="submit" VALUE="Manage Jobs"></FORM>
-<FORM METHOD="GET" ACTION="/printers"><INPUT TYPE="submit" VALUE="Manage Printers"></FORM>
-<FORM METHOD="GET" ACTION="/admin"><INPUT TYPE="submit" VALUE="Manage Server"></FORM>
-</P>
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
 
-<P><I>If you are asked for a username and password, enter your login
-username and password or the "root" username and password.</I></P>
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
 
-<H2 CLASS="title">About CUPS</H2>
+<H2>CUPS for Users</H2>
 
-<P><IMG SRC="/images/cups-icon.png" ALIGN="LEFT" WIDTH="128" HEIGHT="128" STYLE="padding-right: 10px;" ALT="CUPS Icon">
+<P><A HREF="help/overview.html">Overview of CUPS</A></P>
 
-CUPS provides a portable printing layer for
-UNIX<SUP>&reg;</SUP>-based operating systems. It is developed and
-maintained by <A HREF="http://www.apple.com">Apple Inc.</a> to promote a standard printing solution. CUPS is the
-standard printing system used on MacOS<SUP>&reg;</SUP> X and most
-Linux<SUP>&reg;</SUP> distributions.</P>
+<P><A HREF="help/options.html">Command-Line Printing and Options</A></P>
 
-<P>CUPS uses the <A HREF="http://www.pwg.org/ipp/"
-TARGET="_blank"> Internet Printing Protocol ("IPP")</A> as the
-basis for managing print jobs and queues and adds network
-printer browsing and PostScript Printer Description ("PPD")
-based printing options to support real-world printing.<BR CLEAR="ALL"></P>
+<P><A HREF="help/whatsnew.html">What's New in CUPS 1.4</A></P>
 
-<H2 CLASS="title">For Printer Drivers and Assistance</H2>
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">User Forum</A></P>
 
-<P>Visit the official CUPS site for printer drivers and
-assistance:</P>
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
-<PRE>
-    <A HREF="http://www.cups.org/" TARGET="_blank">www.cups.org</A>
-</PRE>
+<H2>CUPS for Administrators</H2>
+
+<P><A HREF="admin">Adding Printers and Classes</A></P>
+
+<P><A HREF="help/policies.html">Managing Operation Policies</A></P>
+
+<P><A HREF="help/accounting.html">Printer Accounting Basics</A></P>
+
+<P><A HREF="help/security.html">Server Security</A></P>
+
+<P><A HREF="help/kerberos.html">Using Kerberos Authentication</A></P>
+
+<P><A HREF="help/network.html">Using Network Printers</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">cupsd.conf Reference</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Find Printer Drivers</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS for Developers</H2>
+
+<P><A HREF="help/api-overview.html">Introduction to CUPS Programming</A></P>
+
+<P><A HREF="help/api-cups.html">CUPS API</A></P>
+
+<P><A HREF="help/api-filter.html">Filter and Backend Programming</A></P>
+
+<P><A HREF="help/api-httpipp.html">HTTP and IPP APIs</A></P>
+
+<P><A HREF="help/api-ppd.html">PPD API</A></P>
+
+<P><A HREF="help/api-raster.html">Raster API</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">PPD Compiler Driver Information File Reference</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Developer Forum</A></P>
+
+</TD></TR>
+</TABLE>
 
 </TD></TR>
 <TR><TD>&nbsp;</TD></TR>
