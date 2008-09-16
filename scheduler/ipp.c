@@ -7476,8 +7476,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   {
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
-	(!location || !printer->location ||
-	 !strcasecmp(printer->location, location)))
+	(!location ||
+	 (printer->location && !strcasecmp(printer->location, location))))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
