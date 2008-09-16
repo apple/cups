@@ -912,15 +912,15 @@ CUPS-Get-Printers request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
+	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2</span>
+
+	<dd>The client OPTIONALLY supplies this attribute to
+	select the first printer that is returned.
+
 	<dt>"limit" (integer (1:MAX)):
 
 	<dd>The client OPTIONALLY supplies this attribute limiting the
 	number of printers that are returned.
-
-	<dt>"printer-info" (text(127)):<span class='info'>CUPS 1.1</span>
-
-	<dd>The client OPTIONALLY supplies this attribute to
-	select which printers are returned.
 
 	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
 
@@ -945,6 +945,11 @@ CUPS-Get-Printers request:
 	interested. If the client omits this attribute, the server
 	responds as if this attribute had been supplied with a value of
 	'all'.
+
+	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2</span>
+
+	<dd>The client OPTIONALLY supplies a user name that is used to filter
+	the returned printers.
 
 </dl>
 
@@ -1171,14 +1176,15 @@ CUPS-Get-Classes request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
+	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2</span>
+
+	<dd>The client OPTIONALLY supplies this attribute to
+	select the first printer that is returned.
+
 	<dt>"limit" (integer (1:MAX)):
 
 	<dd>The client OPTIONALLY supplies this attribute limiting the
 	number of printer classes that are returned.
-
-	<dt>"printer-info" (text(127)): <span class='info'>CUPS 1.1.7</span>
-	<dd>The client OPTIONALLY supplies this attribute to
-	select which printer classes are returned.
 
 	<dt>"printer-location" (text(127)): <span class='info'>CUPS 1.1.7</span>
 	<dd>The client OPTIONALLY supplies this attribute to
@@ -1199,6 +1205,11 @@ CUPS-Get-Classes request:
 	and/or attribute group names in whose values the requester is
 	interested. If the client omits this attribute, the server responds as
 	if this attribute had been supplied with a value of 'all'.
+
+	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2</span>
+
+	<dd>The client OPTIONALLY supplies a user name that is used to filter
+	the returned printers.
 
 </dl>
 

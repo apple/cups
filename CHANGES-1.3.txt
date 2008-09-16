@@ -3,7 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.9
 
-	- Documentation updates (STR #2904)
+	- Documentation updates (STR #2904, STR #2944)
 	- The scheduler did not support destination filtering using
 	  the printer-location attribute properly (STR #2945)
 	- The scheduler did not send the server-started,
