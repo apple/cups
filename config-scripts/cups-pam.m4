@@ -61,8 +61,8 @@ if test x$enable_pam != xno; then
 	case "$uname" in
 		Darwin*)
 			# Darwin, MacOS X
-			if test "x$ac_with_pam_module" != x; then
-				PAMFILE="pam.$ac_with_module"
+			if test "x$with_pam_module" != x; then
+				PAMFILE="pam.$with_pam_module"
 			elif test -f /usr/lib/pam/pam_opendirectory.so; then
 				PAMFILE="pam.opendirectory"
 			else
@@ -78,8 +78,8 @@ if test x$enable_pam != xno; then
 		*)
 			# All others; this test might need to be updated
 			# as Linux distributors move things around...
-			if test "x$ac_with_pam_module" != x; then
-				PAMMOD="pam_${ac_with_module}.so"
+			if test "x$with_pam_module" != x; then
+				PAMMOD="pam_${with_pam_module}.so"
 			else
 				for mod in pam_unix2.so pam_unix.so pam_pwdb.so; do
 					if test -f /lib/security/$mod; then
