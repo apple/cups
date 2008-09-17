@@ -1633,7 +1633,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   {
     reason = reasons->values[i].string.text;
 
-    if (job_id == 0 || strcmp(reason, "paused"))
+    if (strcmp(reason, "paused"))
     {
       strlcat(state, prefix, sizeof(state));
       strlcat(state, reason, sizeof(state));
