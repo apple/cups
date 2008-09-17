@@ -230,6 +230,7 @@ mkdir /tmp/cups-$user/spool
 mkdir /tmp/cups-$user/spool/temp
 mkdir /tmp/cups-$user/ssl
 
+ln -s $root/backend/dnssd /tmp/cups-$user/bin/backend
 ln -s $root/backend/http /tmp/cups-$user/bin/backend
 ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
@@ -416,7 +417,7 @@ fi
 
 export SHLIB_PATH
 
-CUPS_SERVER=localhost; export CUPS_SERVER
+CUPS_SERVER=localhost:8631; export CUPS_SERVER
 CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
 CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR
 CUPS_DATADIR=/tmp/cups-$user/share; export CUPS_DATADIR
@@ -448,10 +449,34 @@ $valgrind ../scheduler/cupsd -c /tmp/cups-$user/cupsd.conf -f >/tmp/cups-$user/l
 cupsd=$!
 
 if test "x$testtype" = x0; then
+	# Not running tests...
 	echo "Scheduler is PID $cupsd and is listening on port 8631."
 	echo ""
-	echo "Set the IPP_PORT environment variable to 8631 to test the software"
-	echo "interactively from the command-line."
+
+	# Create a helper script to run programs with...
+	runcups="/tmp/cups-$user/runcups"
+
+	echo "#!/bin/sh" >$runcups
+	echo "# Helper script for running CUPS test instance." >>$runcups
+	echo "" >>$runcups
+	echo "# Set required environment variables..." >>$runcups
+	echo "CUPS_DATADIR=\"$CUPS_DATADIR\"; export CUPS_DATADIR" >>$runcups
+	echo "CUPS_SERVER=\"$CUPS_SERVER\"; export CUPS_SERVER" >>$runcups
+	echo "CUPS_SERVERROOT=\"$CUPS_SERVERROOT\"; export CUPS_SERVERROOT" >>$runcups
+	echo "CUPS_STATEDIR=\"$CUPS_STATEDIR\"; export CUPS_STATEDIR" >>$runcups
+	echo "DYLD_LIBRARY_PATH=\"$DYLD_LIBRARY_PATH\"; export DYLD_LIBRARY_PATH" >>$runcups
+	echo "LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\"; export LD_LIBRARY_PATH" >>$runcups
+	echo "LD_PRELOAD=\"$LD_PRELOAD\"; export LD_PRELOAD" >>$runcups
+	echo "LOCALEDIR=\"$LOCALEDIR\"; export LOCALEDIR" >>$runcups
+	echo "SHLIB_PATH=\"$SHLIB_PATH\"; export SHLIB_PATH" >>$runcups
+	echo "" >>$runcups
+	echo "# Run command..." >>$runcups
+	echo "exec \"\$@\"" >>$runcups
+
+	chmod +x $runcups
+
+	echo "The $runcups helper script can be used to test programs"
+	echo "with the server."
 	exit 0
 fi
 
