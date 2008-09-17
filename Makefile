@@ -115,7 +115,7 @@ distclean:	clean
 	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
-	$(RM) man/cupsd.conf.man man/lpoptions.man
+	$(RM) man/cupsd.conf.man man/drv.man man/lpoptions.man
 	$(RM) packaging/cups.list
 	$(RM) templates/header.tmpl
 	$(RM) desktop/cups.desktop
