@@ -5,7 +5,7 @@ CHANGES IN CUPS V1.3.9
 
 	- Documentation updates (STR #2904, STR #2944)
 	- The scheduler incorrectly resolved the client connection
-	  address when HostNameLookups was set to Off.
+	  address when HostNameLookups was set to Off (STR #2946)
 	- The IPP backend incorrectly stopped the local queue if
 	  the remote server reported the "paused" state.
 	- The cupsGetDests() function did not catch all types of
