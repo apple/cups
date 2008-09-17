@@ -1,5 +1,5 @@
 /*
- * "$Id: interpret.c 7460 2008-04-16 02:19:54Z mike $"
+ * "$Id: interpret.c 7852 2008-08-21 04:19:45Z mike $"
  *
  *   PPD command interpreter for the Common UNIX Printing System (CUPS).
  *
@@ -1644,5 +1644,5 @@ DEBUG_stack(_cups_ps_stack_t *st)	/* I - Stack */
 
 
 /*
- * End of "$Id: interpret.c 7460 2008-04-16 02:19:54Z mike $".
+ * End of "$Id: interpret.c 7852 2008-08-21 04:19:45Z mike $".
  */

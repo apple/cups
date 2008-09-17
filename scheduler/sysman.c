@@ -1,5 +1,5 @@
 /*
- * "$Id: sysman.c 7676 2008-06-18 23:42:37Z mike $"
+ * "$Id: sysman.c 7928 2008-09-10 22:14:22Z mike $"
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
@@ -858,5 +858,5 @@ sysUpdate(void)
 
 
 /*
- * End of "$Id: sysman.c 7676 2008-06-18 23:42:37Z mike $".
+ * End of "$Id: sysman.c 7928 2008-09-10 22:14:22Z mike $".
  */

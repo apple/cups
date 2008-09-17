@@ -1,5 +1,5 @@
 /*
- * "$Id: util.c 7634 2008-06-10 23:22:28Z mike $"
+ * "$Id: util.c 7850 2008-08-20 00:07:25Z mike $"
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
@@ -1775,5 +1775,5 @@ cups_get_printer_uri(
 
 
 /*
- * End of "$Id: util.c 7634 2008-06-10 23:22:28Z mike $".
+ * End of "$Id: util.c 7850 2008-08-20 00:07:25Z mike $".
  */

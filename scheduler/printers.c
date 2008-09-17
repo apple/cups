@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 7677 2008-06-19 23:22:19Z mike $"
+ * "$Id: printers.c 7879 2008-08-28 00:08:56Z mike $"
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
@@ -4367,5 +4367,5 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
 
 
 /*
- * End of "$Id: printers.c 7677 2008-06-19 23:22:19Z mike $".
+ * End of "$Id: printers.c 7879 2008-08-28 00:08:56Z mike $".
  */

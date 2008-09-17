@@ -1,5 +1,5 @@
 /*
- * "$Id: sidechannel.c 7594 2008-05-19 23:16:03Z mike $"
+ * "$Id: sidechannel.c 7720 2008-07-11 22:46:21Z mike $"
  *
  *   Side-channel API code for the Common UNIX Printing System (CUPS).
  *
@@ -552,5 +552,5 @@ cupsSideChannelWrite(
 
 
 /*
- * End of "$Id: sidechannel.c 7594 2008-05-19 23:16:03Z mike $".
+ * End of "$Id: sidechannel.c 7720 2008-07-11 22:46:21Z mike $".
  */

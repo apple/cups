@@ -1,5 +1,5 @@
 /*
- * "$Id: subscriptions.c 7673 2008-06-18 22:31:26Z mike $"
+ * "$Id: subscriptions.c 7824 2008-08-01 21:11:55Z mike $"
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -1623,5 +1623,5 @@ cupsd_update_notifier(void)
 
 
 /*
- * End of "$Id: subscriptions.c 7673 2008-06-18 22:31:26Z mike $".
+ * End of "$Id: subscriptions.c 7824 2008-08-01 21:11:55Z mike $".
  */

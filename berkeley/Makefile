@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $"
+# "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
@@ -161,5 +161,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $".
+# End of "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $".
 #

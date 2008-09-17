@@ -1,5 +1,5 @@
 /*
- * "$Id: printers.c 7301 2008-02-13 00:27:52Z mike $"
+ * "$Id: printers.c 7940 2008-09-16 00:45:16Z mike $"
  *
  *   Printer status CGI for the Common UNIX Printing System (CUPS).
  *
@@ -472,12 +472,12 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
 
     cgiCopyTemplateLang("printers-header.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("printers.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
    /*
@@ -534,7 +534,7 @@ show_printer(http_t     *http,		/* I - Connection to server */
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
                uri);
 
-  cgiGetAttributes(request, "printers.tmpl");
+  cgiGetAttributes(request, "printer.tmpl");
 
  /*
   * Do the request and get back a response...
@@ -588,7 +588,7 @@ show_printer(http_t     *http,		/* I - Connection to server */
     */
 
     cgiSetVariable("_SINGLE_DEST", "1");
-    cgiCopyTemplateLang("printers.tmpl");
+    cgiCopyTemplateLang("printer.tmpl");
 
    /*
     * Show jobs for the specified printer...
@@ -612,5 +612,5 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
 
 /*
- * End of "$Id: printers.c 7301 2008-02-13 00:27:52Z mike $".
+ * End of "$Id: printers.c 7940 2008-09-16 00:45:16Z mike $".
  */

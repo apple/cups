@@ -1,5 +1,5 @@
 /*
- * "$Id: http-addr.c 6814 2007-08-20 20:09:25Z mike $"
+ * "$Id: http-addr.c 7910 2008-09-06 00:25:17Z mike $"
  *
  *   HTTP address routines for the Common UNIX Printing System (CUPS).
  *
@@ -614,5 +614,5 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 
 /*
- * End of "$Id: http-addr.c 6814 2007-08-20 20:09:25Z mike $".
+ * End of "$Id: http-addr.c 7910 2008-09-06 00:25:17Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: type.c 7694 2008-06-26 00:23:20Z mike $"
+ * "$Id: type.c 7720 2008-07-11 22:46:21Z mike $"
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
@@ -1160,5 +1160,5 @@ patmatch(const char *s,		/* I - String to match against */
 
 
 /*
- * End of "$Id: type.c 7694 2008-06-26 00:23:20Z mike $".
+ * End of "$Id: type.c 7720 2008-07-11 22:46:21Z mike $".
  */

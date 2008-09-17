@@ -1,5 +1,5 @@
 /*
- * "$Id: cupsd.h 7317 2008-02-15 22:29:27Z mike $"
+ * "$Id: cupsd.h 7928 2008-09-10 22:14:22Z mike $"
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -234,5 +234,5 @@ extern void	cupsdStopSelect(void);
 extern int	cupsdRemoveFile(const char *filename);
 
 /*
- * End of "$Id: cupsd.h 7317 2008-02-15 22:29:27Z mike $".
+ * End of "$Id: cupsd.h 7928 2008-09-10 22:14:22Z mike $".
  */

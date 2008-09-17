@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-dnssd.m4 7585 2008-05-16 23:13:47Z mike $"
+dnl "$Id: cups-dnssd.m4 7890 2008-08-29 22:19:39Z mike $"
 dnl
 dnl   DNS Service Discovery (aka Bonjour) stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -52,5 +52,5 @@ AC_SUBST(DNSSDLIBS)
 AC_SUBST(DNSSD_BACKEND)
 
 dnl
-dnl End of "$Id: cups-dnssd.m4 7585 2008-05-16 23:13:47Z mike $".
+dnl End of "$Id: cups-dnssd.m4 7890 2008-08-29 22:19:39Z mike $".
 dnl

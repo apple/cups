@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-var.c 7541 2008-05-05 21:22:58Z mike $"
+ * "$Id: ipp-var.c 7940 2008-09-16 00:45:16Z mike $"
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
@@ -1351,12 +1351,12 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
 
     cgiCopyTemplateLang("jobs-header.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cgiCopyTemplateLang("jobs.tmpl");
 
-    if (count > 0)
+    if (count > CUPS_PAGE_MAX)
       cgiCopyTemplateLang("pager.tmpl");
 
     cupsArrayDelete(jobs);
@@ -1384,5 +1384,5 @@ cgiText(const char *message)		/* I - Message */
 
 
 /*
- * End of "$Id: ipp-var.c 7541 2008-05-05 21:22:58Z mike $".
+ * End of "$Id: ipp-var.c 7940 2008-09-16 00:45:16Z mike $".
  */

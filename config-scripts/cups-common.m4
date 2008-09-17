@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-common.m4 7695 2008-06-26 00:46:24Z mike $"
+dnl "$Id: cups-common.m4 7900 2008-09-03 13:47:57Z mike $"
 dnl
 dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -349,5 +349,5 @@ AC_SUBST(FONTS)
 AC_SUBST(LEGACY_BACKENDS)
 
 dnl
-dnl End of "$Id: cups-common.m4 7695 2008-06-26 00:46:24Z mike $".
+dnl End of "$Id: cups-common.m4 7900 2008-09-03 13:47:57Z mike $".
 dnl

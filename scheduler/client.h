@@ -1,5 +1,5 @@
 /*
- * "$Id: client.h 7470 2008-04-18 23:24:24Z mike $"
+ * "$Id: client.h 7935 2008-09-11 01:54:11Z mike $"
  *
  *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -16,6 +16,7 @@
 #ifdef HAVE_AUTHORIZATION_H
 #  include <Security/Authorization.h>
 #endif /* HAVE_AUTHORIZATION_H */
+
 
 /*
  * HTTP client structure...
@@ -134,5 +135,5 @@ extern void	cupsdWriteClient(cupsd_client_t *con);
 
 
 /*
- * End of "$Id: client.h 7470 2008-04-18 23:24:24Z mike $".
+ * End of "$Id: client.h 7935 2008-09-11 01:54:11Z mike $".
  */

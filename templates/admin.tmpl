@@ -1,4 +1,4 @@
-<TABLE CELLPADDING="0" CELLSPACING="0" WIDTH="100%" SUMMARY="Administration Tasks">
+<TABLE CLASS="indent" SUMMARY="Administration Tasks">
 <TR><TD VALIGN="TOP">
 
 <H2 CLASS="title">Printers</H2>
@@ -6,7 +6,7 @@
 <P>
 <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Add Printer"></FORM>
 <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Find New Printers"></FORM>
-<FORM ACTION="/printers/" METHOD="POST"><INPUT TYPE="SUBMIT" VALUE="Manage Printers"></FORM>
+<FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Printers"></FORM>
 {have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Export Printers to Samba"></FORM>:}
 </P>
 
@@ -14,7 +14,7 @@
 
 <P>
 <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Add Class"></FORM>
-<FORM ACTION="/classes/" METHOD="POST"><INPUT TYPE="SUBMIT" VALUE="Manage Classes"></FORM>
+<FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Manage Classes"></FORM>
 </P>
 
 <H2 CLASS="title">Jobs</H2>
@@ -57,15 +57,20 @@
 </TD></TR>
 </TABLE>
 
-<H2 CLASS="title">Subscriptions</H2>
+<DIV CLASS="indent">
+
+<H2 CLASS="title">RSS Subscriptions</H2>
 
 <P>
 <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Add RSS Subscription"></FORM>
 </P>
 
-{notify_subscription_id?<TABLE WIDTH="100%" CELLSPACING="0" CELLPADDING="0" SUMMARY="RSS Subscriptions">
-<THEAD><TR CLASS="data"><TH>ID</TH><TH>Name</TH><TH>Events</TH><TH>Queue</TH></TR></THEAD>
+</DIV>
+
+{notify_subscription_id?<TABLE CLASS="list" SUMMARY="RSS Subscriptions">
+<THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Queue Name</TH></TR></THEAD>
 <TBODY>{[notify_subscription_id]
-<TR><TD><A HREF="{notify_recipient_uri}">{notify_subscription_id}</A></TD><TD NOWRAP><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A> <FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
+<TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
 </TBODY>
 </TABLE>:}

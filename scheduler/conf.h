@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.h 7674 2008-06-18 23:18:32Z mike $"
+ * "$Id: conf.h 7935 2008-09-11 01:54:11Z mike $"
  *
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
@@ -64,6 +64,14 @@ typedef enum
 
 #define PRINTCAP_BSD		0	/* Berkeley LPD format */
 #define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
+
+
+/*
+ * SSL options (bits)...
+ */
+
+#define CUPSD_SSL_NONE		0	/* No special options */
+#define CUPSD_SSL_NOEMPTY	1	/* Do not insert empty fragments */
 
 
 /*
@@ -217,6 +225,8 @@ VAR char		*ServerCertificate	VALUE(NULL);
 VAR char		*ServerKey		VALUE(NULL);
 					/* Server key file */
 #  endif /* HAVE_LIBSSL || HAVE_GNUTLS */
+VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
+					/* SSL/TLS options */
 #endif /* HAVE_SSL */
 
 #ifdef HAVE_LAUNCHD
@@ -268,5 +278,5 @@ extern int	cupsdWriteErrorLog(int level, const char *message);
 
 
 /*
- * End of "$Id: conf.h 7674 2008-06-18 23:18:32Z mike $".
+ * End of "$Id: conf.h 7935 2008-09-11 01:54:11Z mike $".
  */

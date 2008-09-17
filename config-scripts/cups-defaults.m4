@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-defaults.m4 7649 2008-06-16 17:46:57Z mike $"
+dnl "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $"
 dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
@@ -40,7 +40,7 @@ AC_SUBST(CUPS_LOG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LOG_FILE_PERM, 0$CUPS_LOG_FILE_PERM)
 
 dnl Default FatalErrors
-AC_ARG_WITH(fatal_errors, [  --with-fatal-errors set default FatalErrors value, default=config],
+AC_ARG_WITH(fatal_errors, [  --with-fatal-errors     set default FatalErrors value, default=config],
 	CUPS_FATAL_ERRORS="$withval",
 	CUPS_FATAL_ERRORS="config")
 AC_SUBST(CUPS_FATAL_ERRORS)
@@ -413,5 +413,5 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl
-dnl End of "$Id: cups-defaults.m4 7649 2008-06-16 17:46:57Z mike $".
+dnl End of "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $".
 dnl

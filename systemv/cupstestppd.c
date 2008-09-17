@@ -1,5 +1,5 @@
 /*
- * "$Id: cupstestppd.c 7637 2008-06-11 17:25:36Z mike $"
+ * "$Id: cupstestppd.c 7807 2008-07-28 21:54:24Z mike $"
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
@@ -2978,5 +2978,5 @@ valid_utf8(const char *s)		/* I - String to check */
 
 
 /*
- * End of "$Id: cupstestppd.c 7637 2008-06-11 17:25:36Z mike $".
+ * End of "$Id: cupstestppd.c 7807 2008-07-28 21:54:24Z mike $".
  */

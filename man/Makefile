@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7601 2008-05-20 21:08:08Z mike $"
+# "$Id: Makefile 7930 2008-09-10 22:25:54Z mike $"
 #
 #   Man page makefile for the Common UNIX Printing System (CUPS).
 #
@@ -230,5 +230,5 @@ mantohtml:	mantohtml.o
 
 
 #
-# End of "$Id: Makefile 7601 2008-05-20 21:08:08Z mike $".
+# End of "$Id: Makefile 7930 2008-09-10 22:25:54Z mike $".
 #

@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp.c 7682 2008-06-21 00:06:02Z mike $"
+ * "$Id: ipp.c 7944 2008-09-16 22:32:42Z mike $"
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -7476,8 +7476,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   {
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
-	(!location || !printer->location ||
-	 !strcasecmp(printer->location, location)))
+	(!location ||
+	 (printer->location && !strcasecmp(printer->location, location))))
     {
      /*
       * If HideImplicitMembers is enabled, see if this printer or class
@@ -8460,6 +8460,8 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
 	      "File of type %s/%s queued by \"%s\".",
 	      filetype->super, filetype->type, job->username);
   cupsdLogJob(job, CUPSD_LOG_DEBUG, "hold_until=%d", (int)job->hold_until);
+  cupsdLogJob(job, CUPSD_LOG_INFO, "Queued on \"%s\" by \"%s\".",
+	      job->dest, job->username);
 
  /*
   * Start the job if possible...
@@ -11017,5 +11019,5 @@ validate_user(cupsd_job_t    *job,	/* I - Job */
 
 
 /*
- * End of "$Id: ipp.c 7682 2008-06-21 00:06:02Z mike $".
+ * End of "$Id: ipp.c 7944 2008-09-16 22:32:42Z mike $".
  */

@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *%
-*% "$Id$"
+*% "$Id: test2.ppd 7791 2008-07-24 00:55:30Z mike $"
 *%
 *% Test PPD file #2 for the Common UNIX Printing System (CUPS).
 *%
@@ -251,5 +251,5 @@ help:anchor='foo'%20bookID=Vendor%20Help
 *Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
 *Font ZapfDingbats: Special "(001.004S)" Standard ROM
 *%
-*% End of "$Id$".
+*% End of "$Id: test2.ppd 7791 2008-07-24 00:55:30Z mike $".
 *%

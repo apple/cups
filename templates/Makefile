@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $"
+# "$Id: Makefile 7940 2008-09-16 00:45:16Z mike $"
 #
 #   Template makefile for the Common UNIX Printing System (CUPS).
 #
@@ -29,6 +29,7 @@ FILES	=	\
 		choose-model.tmpl \
 		choose-serial.tmpl \
 		choose-uri.tmpl \
+		class.tmpl \
 		class-added.tmpl \
 		class-confirm.tmpl \
 		class-deleted.tmpl \
@@ -41,6 +42,7 @@ FILES	=	\
 		error-op.tmpl \
 		header.tmpl \
 		help-header.tmpl \
+		help-trailer.tmpl \
 		help-printable.tmpl \
 		job-cancel.tmpl \
 		job-hold.tmpl \
@@ -62,6 +64,7 @@ FILES	=	\
 		option-pickone.tmpl \
 		option-trailer.tmpl \
 		pager.tmpl \
+		printer.tmpl \
 		printer-accept.tmpl \
 		printer-added.tmpl \
 		printer-configured.tmpl \
@@ -194,5 +197,5 @@ uninstall-languages:
 
 
 #
-# End of "$Id: Makefile 7558 2008-05-12 23:46:44Z mike $".
+# End of "$Id: Makefile 7940 2008-09-16 00:45:16Z mike $".
 #

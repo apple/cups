@@ -1,5 +1,5 @@
 /*
-* "$Id: usb-darwin.c 7460 2008-04-16 02:19:54Z mike $"
+* "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $"
 *
 * Copyright 2005-2008 Apple Inc. All rights reserved.
 *
@@ -1811,8 +1811,8 @@ static void run_legacy_backend(int argc,
 
     if (!posix_spawnattr_init(&attrs))
     {
-      posix_spawnattr_setsigdefault(attrs, &oldmask);
-      if (posix_spawnattr_setbinpref_np(attrs, 1, &cpu, &ocount) || ocount != 1)
+      posix_spawnattr_setsigdefault(&attrs, &oldmask);
+      if (posix_spawnattr_setbinpref_np(&attrs, 1, &cpu, &ocount) || ocount != 1)
       {
 #  ifdef __x86_64__
 	perror("DEBUG: Unable to set binary preference to i386");
@@ -2068,5 +2068,5 @@ static void get_device_id(cups_sc_status_t *status,
 
 
 /*
- * End of "$Id: usb-darwin.c 7460 2008-04-16 02:19:54Z mike $".
+ * End of "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $".
  */

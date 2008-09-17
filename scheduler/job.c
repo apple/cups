@@ -1,5 +1,5 @@
 /*
- * "$Id: job.c 7682 2008-06-21 00:06:02Z mike $"
+ * "$Id: job.c 7902 2008-09-03 14:20:17Z mike $"
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
@@ -3964,5 +3964,5 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 
 
 /*
- * End of "$Id: job.c 7682 2008-06-21 00:06:02Z mike $".
+ * End of "$Id: job.c 7902 2008-09-03 14:20:17Z mike $".
  */

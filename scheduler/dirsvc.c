@@ -1,5 +1,5 @@
 /*
- * "$Id: dirsvc.c 7676 2008-06-18 23:42:37Z mike $"
+ * "$Id: dirsvc.c 7933 2008-09-11 00:44:58Z mike $"
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
@@ -1945,26 +1945,29 @@ cupsdUpdateDNSSDName(void)
 #endif	/* HAVE_COREFOUNDATION_H */
 
  /*
-  * Then (re)register the web interface...
+  * Then (re)register the web interface if enabled...
   */
 
-  if (DNSSDName)
-    snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDName);
-  else
-    strlcpy(webif, "CUPS Web Interface", sizeof(webif));
+  if (BrowseWebIF)
+  {
+    if (DNSSDName)
+      snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDName);
+    else
+      strlcpy(webif, "CUPS Web Interface", sizeof(webif));
 
-  if (WebIFRef)
-    DNSServiceRefDeallocate(WebIFRef);
+    if (WebIFRef)
+      DNSServiceRefDeallocate(WebIFRef);
 
-  WebIFRef = DNSSDRef;
-  if ((error = DNSServiceRegister(&WebIFRef,
-				  kDNSServiceFlagsShareConnection,
-				  0, webif, "_http._tcp", NULL,
-				  NULL, htons(DNSSDPort), 7,
-				  "\006path=/", dnssdRegisterCallback,
-				  NULL)) != kDNSServiceErr_NoError)
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-		    "DNS-SD web interface registration failed: %d", error);
+    WebIFRef = DNSSDRef;
+    if ((error = DNSServiceRegister(&WebIFRef,
+				    kDNSServiceFlagsShareConnection,
+				    0, webif, "_http._tcp", NULL,
+				    NULL, htons(DNSSDPort), 7,
+				    "\006path=/", dnssdRegisterCallback,
+				    NULL)) != kDNSServiceErr_NoError)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "DNS-SD web interface registration failed: %d", error);
+  }
 }
 #endif /* HAVE_DNSSD */
 
@@ -5268,5 +5271,5 @@ update_smb(int onoff)			/* I - 1 = turn on, 0 = turn off */
 
 
 /*
- * End of "$Id: dirsvc.c 7676 2008-06-18 23:42:37Z mike $".
+ * End of "$Id: dirsvc.c 7933 2008-09-11 00:44:58Z mike $".
  */

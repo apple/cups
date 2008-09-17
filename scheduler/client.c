@@ -1,5 +1,5 @@
 /*
- * "$Id: client.c 7673 2008-06-18 22:31:26Z mike $"
+ * "$Id: client.c 7950 2008-09-17 00:21:59Z mike $"
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
@@ -437,14 +437,22 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #ifdef AF_INET6
     if (temp.addr.sa_family == AF_INET6)
     {
-      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      if (HostNameLookups)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else
+        httpAddrString(&temp, con->servername, sizeof(con->servername));
+
       con->serverport = ntohs(lis->address.ipv6.sin6_port);
     }
     else
 #endif /* AF_INET6 */
     if (temp.addr.sa_family == AF_INET)
     {
-      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      if (HostNameLookups)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else
+        httpAddrString(&temp, con->servername, sizeof(con->servername));
+
       con->serverport = ntohs(lis->address.ipv4.sin_port);
     }
     else
@@ -3080,6 +3088,8 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   context = SSL_CTX_new(SSLv23_server_method());
 
   SSL_CTX_set_options(context, SSL_OP_NO_SSLv2); /* Only use SSLv3 or TLS */
+  if (SSLOptions & CUPSD_SSL_NOEMPTY)
+    SSL_CTX_set_options(context, SSL_OP_DONTS_INSERT_EMPTY_FRAGMENTS);
   SSL_CTX_use_PrivateKey_file(context, ServerKey, SSL_FILETYPE_PEM);
   SSL_CTX_use_certificate_chain_file(context, ServerCertificate,
                                      SSL_FILETYPE_PEM);
@@ -4968,5 +4978,5 @@ write_pipe(cupsd_client_t *con)		/* I - Client connection */
 
 
 /*
- * End of "$Id: client.c 7673 2008-06-18 22:31:26Z mike $".
+ * End of "$Id: client.c 7950 2008-09-17 00:21:59Z mike $".
  */

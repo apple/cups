@@ -1,5 +1,5 @@
 /*
- * "$Id: http-private.h 7583 2008-05-16 17:47:16Z mike $"
+ * "$Id: http-private.h 7850 2008-08-20 00:07:25Z mike $"
  *
  *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
  *
@@ -271,5 +271,5 @@ extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
- * End of "$Id: http-private.h 7583 2008-05-16 17:47:16Z mike $".
+ * End of "$Id: http-private.h 7850 2008-08-20 00:07:25Z mike $".
  */

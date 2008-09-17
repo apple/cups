@@ -66,7 +66,7 @@ A:link:hover IMG {
 }
 
 A:link, A:visited {
-  font-weight: normal;
+  font-weight: inherit;
   text-decoration: none;
   color: #000099;
 }
@@ -144,7 +144,8 @@ SUB, SUP {
 }
 
 TR.data, TD.data, TR.data TD {
-  padding: 5;
+  margin-top: 10pt;
+  padding: 5pt;
   border-bottom: solid 1pt #999999;
 }
 
@@ -230,11 +231,48 @@ H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
 }
 
 .conflict {
-  color: red;
+  background: red;
+  color: white;
 }
 
 H2.title, H3.title {
   border-bottom: solid 1pt #999999;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  white-space: nowrap;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
 }
 
 DIV.sidebar {
@@ -271,7 +309,11 @@ DIV.sidebar P.l2 {
 TABLE.inset {
   background: #f0f0f0;
   border: thin solid #e0e0e0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1em;
   padding: 0;
+  width: 90%;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -287,7 +329,7 @@ TABLE.inset CAPTION {
 }
 
 TABLE.inset TD {
-  padding: 5px;
+  padding: 2px;
 }
 
 DT {

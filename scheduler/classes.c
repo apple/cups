@@ -1,5 +1,5 @@
 /*
- * "$Id: classes.c 7608 2008-05-21 01:37:21Z mike $"
+ * "$Id: classes.c 7724 2008-07-14 06:06:06Z mike $"
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
@@ -957,5 +957,5 @@ cupsdUpdateImplicitClasses(void)
 
 
 /*
- * End of "$Id: classes.c 7608 2008-05-21 01:37:21Z mike $".
+ * End of "$Id: classes.c 7724 2008-07-14 06:06:06Z mike $".
  */

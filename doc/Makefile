@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7601 2008-05-20 21:08:08Z mike $"
+# "$Id: Makefile 7941 2008-09-16 00:46:13Z mike $"
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
@@ -26,14 +26,10 @@ WEBPAGES	=	\
 			index.html \
 			robots.txt
 WEBIMAGES	=	\
-			images/classes.png \
 			images/cups.png \
 			images/cups-block-diagram.gif \
 			images/cups-icon.png \
 			images/left.gif \
-			images/printer-idle.png \
-			images/printer-processing.png \
-			images/printer-stopped.png \
 			images/raster.png \
 			images/right.gif \
 			images/sel.gif \
@@ -105,6 +101,7 @@ HELPFILES	=	\
 			help/ref-snmp-conf.html \
 			help/ref-subscriptions-conf.html \
 			help/security.html \
+			help/spec-browsing.html \
 			help/spec-cmp.html \
 			help/spec-command.html \
 			help/spec-design.html \

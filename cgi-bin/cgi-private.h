@@ -1,5 +1,5 @@
 /*
- * "$Id: cgi-private.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id: cgi-private.h 7940 2008-09-16 00:45:16Z mike $"
  *
  *   Private CGI definitions for the Common UNIX Printing System (CUPS).
  *
@@ -27,9 +27,9 @@
  * Limits...
  */
 
-#define CUPS_PAGE_MAX	10		/* Maximum items per page */
+#define CUPS_PAGE_MAX	100		/* Maximum items per page */
 
 
 /*
- * End of "$Id: cgi-private.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id: cgi-private.h 7940 2008-09-16 00:45:16Z mike $".
  */

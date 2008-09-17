@@ -1,5 +1,5 @@
 /*
- * "$Id: ipptest.c 7219 2008-01-14 22:00:02Z mike $"
+ * "$Id: ipptest.c 7847 2008-08-19 04:22:14Z mike $"
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
@@ -866,5 +866,5 @@ usage(const char *option)		/* I - Option string or NULL */
 
 
 /*
- * End of "$Id: ipptest.c 7219 2008-01-14 22:00:02Z mike $".
+ * End of "$Id: ipptest.c 7847 2008-08-19 04:22:14Z mike $".
  */

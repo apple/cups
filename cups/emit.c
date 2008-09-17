@@ -1,5 +1,5 @@
 /*
- * "$Id: emit.c 7493 2008-04-24 00:10:34Z mike $"
+ * "$Id: emit.c 7863 2008-08-26 03:39:59Z mike $"
  *
  *   PPD code emission routines for the Common UNIX Printing System (CUPS).
  *
@@ -1149,5 +1149,5 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 
 
 /*
- * End of "$Id: emit.c 7493 2008-04-24 00:10:34Z mike $".
+ * End of "$Id: emit.c 7863 2008-08-26 03:39:59Z mike $".
  */

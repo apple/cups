@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7613 2008-05-22 23:27:52Z mike $"
+# "$Id: Makefile 7961 2008-09-17 19:52:46Z mike $"
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -115,7 +115,7 @@ distclean:	clean
 	$(RM) man/client.conf.man
 	$(RM) man/cups-deviced.man man/cups-driverd.man
 	$(RM) man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
-	$(RM) man/cupsd.conf.man man/lpoptions.man
+	$(RM) man/cupsd.conf.man man/drv.man man/lpoptions.man
 	$(RM) packaging/cups.list
 	$(RM) templates/header.tmpl
 	$(RM) desktop/cups.desktop
@@ -374,5 +374,5 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 7613 2008-05-22 23:27:52Z mike $".
+# End of "$Id: Makefile 7961 2008-09-17 19:52:46Z mike $".
 #

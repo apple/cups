@@ -1,5 +1,5 @@
 #
-# "$Id: cupsd.conf.in 7680 2008-06-20 17:37:43Z mike $"
+# "$Id: cupsd.conf.in 7888 2008-08-29 21:16:56Z mike $"
 #
 #   Sample configuration file for the Common UNIX Printing System (CUPS)
 #   scheduler.  See "man cupsd.conf" for a complete description of this
@@ -120,5 +120,5 @@ DefaultAuthType Basic
 </Policy>
 
 #
-# End of "$Id: cupsd.conf.in 7680 2008-06-20 17:37:43Z mike $".
+# End of "$Id: cupsd.conf.in 7888 2008-08-29 21:16:56Z mike $".
 #

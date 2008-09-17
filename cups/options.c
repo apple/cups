@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c 7589 2008-05-19 00:13:23Z mike $"
+ * "$Id: options.c 7819 2008-08-01 00:27:24Z mike $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -463,5 +463,5 @@ cupsRemoveOption(
 
 
 /*
- * End of "$Id: options.c 7589 2008-05-19 00:13:23Z mike $".
+ * End of "$Id: options.c 7819 2008-08-01 00:27:24Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: log.c 7699 2008-06-27 20:44:23Z mike $"
+ * "$Id: log.c 7918 2008-09-08 22:03:01Z mike $"
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
@@ -956,5 +956,5 @@ format_log_line(const char *message,	/* I - Printf-style format string */
 
 
 /*
- * End of "$Id: log.c 7699 2008-06-27 20:44:23Z mike $".
+ * End of "$Id: log.c 7918 2008-09-08 22:03:01Z mike $".
  */

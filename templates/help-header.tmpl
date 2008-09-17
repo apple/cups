@@ -1,3 +1,4 @@
+<DIV CLASS="indent">
 <FORM ACTION="/help/{?HELPFILE}" METHOD="GET">
 {TOPIC?<INPUT TYPE="HIDDEN" NAME="TOPIC" VALUE="{TOPIC}">:}
 
@@ -30,7 +31,10 @@ AUTOSAVE="org.cups.help" RESULTS="20">
 {QTEXT?</UL>:}
 :<P>No matches found.</P>}
 <HR NOSHADE>:}
-{HELPTITLE?<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="View Printable Version"></FORM>:
+{HELPTITLE?<H1>{HELPTITLE}</H1>
+<FORM ACTION="/help/{?HELPFILE}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="PRINTABLE" VALUE="YES"><INPUT TYPE="SUBMIT" VALUE="View Printable Version"></FORM>:
+
+<H1>Online Help</H1>
 
 <P>This is the CUPS online help interface. Enter search words
 above or click on any of the documentation links to display

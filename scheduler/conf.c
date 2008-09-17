@@ -1,5 +1,5 @@
 /*
- * "$Id: conf.c 7694 2008-06-26 00:23:20Z mike $"
+ * "$Id: conf.c 7952 2008-09-17 00:56:20Z mike $"
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
@@ -95,6 +95,7 @@ static const cupsd_var_t	variables[] =
   { "BrowseRemoteOptions",	&BrowseRemoteOptions,	CUPSD_VARTYPE_STRING },
   { "BrowseShortNames",		&BrowseShortNames,	CUPSD_VARTYPE_BOOLEAN },
   { "BrowseTimeout",		&BrowseTimeout,		CUPSD_VARTYPE_INTEGER },
+  { "BrowseWebIF",		&BrowseWebIF,		CUPSD_VARTYPE_BOOLEAN },
   { "Browsing",			&Browsing,		CUPSD_VARTYPE_BOOLEAN },
   { "CacheDir",			&CacheDir,		CUPSD_VARTYPE_STRING },
   { "Classification",		&Classification,	CUPSD_VARTYPE_STRING },
@@ -548,6 +549,7 @@ cupsdReadConfiguration(void)
   DefaultAuthType       = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
   DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
+  SSLOptions            = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
   DirtyCleanInterval    = DEFAULT_KEEPALIVE;
   JobRetryLimit         = 5;
@@ -581,6 +583,7 @@ cupsdReadConfiguration(void)
   BrowseRemoteProtocols = parse_protocols(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS);
   BrowseShortNames      = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
   BrowseTimeout         = DEFAULT_TIMEOUT;
+  BrowseWebIF           = FALSE;
   Browsing              = CUPS_DEFAULT_BROWSING;
   DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
 
@@ -3198,6 +3201,21 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Missing value for SetEnv directive on line %d.",
 	                linenum);
     }
+    else if (!strcasecmp(line, "SSLOptions"))
+    {
+     /*
+      * SSLOptions options
+      */
+
+      if (!value || !strcasecmp(value, "none"))
+        SSLOptions = CUPSD_SSL_NONE;
+      else if (!strcasecmp(value, "noemptyfragments"))
+        SSLOptions = CUPSD_SSL_NOEMPTY;
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unknown value \"%s\" for SSLOptions directive on "
+			"line %d.", value, linenum);
+    }
     else
     {
      /*
@@ -3354,6 +3372,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
+        else
+	  continue;
       }
       
       if ((loc = cupsdCopyLocation(&parent)) == NULL)
@@ -3494,6 +3514,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
+        else
+	  continue;
       }
       
      /*
@@ -3595,5 +3617,5 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 7694 2008-06-26 00:23:20Z mike $".
+ * End of "$Id: conf.c 7952 2008-09-17 00:56:20Z mike $".
  */

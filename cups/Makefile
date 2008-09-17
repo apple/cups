@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7589 2008-05-19 00:13:23Z mike $"
+# "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
@@ -622,5 +622,5 @@ include Dependencies
 
 
 #
-# End of "$Id: Makefile 7589 2008-05-19 00:13:23Z mike $".
+# End of "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $".
 #

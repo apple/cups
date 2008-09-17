@@ -1,5 +1,5 @@
 /*
- * "$Id: main.c 7681 2008-06-20 21:06:02Z mike $"
+ * "$Id: main.c 7925 2008-09-10 17:47:26Z mike $"
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
@@ -2055,5 +2055,5 @@ usage(int status)			/* O - Exit status */
 
 
 /*
- * End of "$Id: main.c 7681 2008-06-20 21:06:02Z mike $".
+ * End of "$Id: main.c 7925 2008-09-10 17:47:26Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: select.c 7093 2007-11-30 19:09:36Z mike $"
+ * "$Id: select.c 7720 2008-07-11 22:46:21Z mike $"
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
@@ -1024,5 +1024,5 @@ find_fd(int fd)				/* I - File descriptor */
 
 
 /*
- * End of "$Id: select.c 7093 2007-11-30 19:09:36Z mike $".
+ * End of "$Id: select.c 7720 2008-07-11 22:46:21Z mike $".
  */

@@ -1,5 +1,5 @@
 /*
- * "$Id: lpr.c 7170 2008-01-04 02:21:30Z mike $"
+ * "$Id: lpr.c 7720 2008-07-11 22:46:21Z mike $"
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
@@ -427,5 +427,5 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 
 /*
- * End of "$Id: lpr.c 7170 2008-01-04 02:21:30Z mike $".
+ * End of "$Id: lpr.c 7720 2008-07-11 22:46:21Z mike $".
  */

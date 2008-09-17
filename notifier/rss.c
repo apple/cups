@@ -1,5 +1,5 @@
 /*
- * "$Id: rss.c 7451 2008-04-14 20:02:39Z mike $"
+ * "$Id: rss.c 7824 2008-08-01 21:11:55Z mike $"
  *
  *   RSS notifier for the Common UNIX Printing System (CUPS).
  *
@@ -728,5 +728,5 @@ xml_escape(const char *s)		/* I - String to escape */
 
 
 /*
- * End of "$Id: rss.c 7451 2008-04-14 20:02:39Z mike $".
+ * End of "$Id: rss.c 7824 2008-08-01 21:11:55Z mike $".
  */
