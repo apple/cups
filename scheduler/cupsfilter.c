@@ -380,7 +380,8 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
-  add_printer_filters(command, mime, printer, ppdfile, &prefilter_type);
+  printer_type = add_printer_filters(command, mime, printer, ppdfile,
+                                     &prefilter_type);
 
  /*
   * Get the source and destination types...

@@ -3372,6 +3372,8 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
+        else
+	  continue;
       }
       
       if ((loc = cupsdCopyLocation(&parent)) == NULL)
@@ -3512,6 +3514,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
         cupsdLogMessage(CUPSD_LOG_ERROR, "Syntax error on line %d.", linenum);
         if (FatalErrors & CUPSD_FATAL_CONFIG)
 	  return (0);
+        else
+	  continue;
       }
       
      /*

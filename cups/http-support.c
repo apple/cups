@@ -1298,7 +1298,9 @@ _httpResolveURI(
 			hostname[1024],
 			resource[1024];
   int			port;
+#ifdef DEBUG
   http_uri_status_t	status;		/* URI decode status */
+#endif /* DEBUG */
 
 
   DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
@@ -1309,10 +1311,17 @@ _httpResolveURI(
   * Get the device URI...
   */
 
+#ifdef DEBUG
   if ((status = httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme,
                                 sizeof(scheme), userpass, sizeof(userpass),
 				hostname, sizeof(hostname), &port, resource,
 				sizeof(resource))) < HTTP_URI_OK)
+#else
+  if (httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme,
+		      sizeof(scheme), userpass, sizeof(userpass),
+		      hostname, sizeof(hostname), &port, resource,
+		      sizeof(resource)) < HTTP_URI_OK)
+#endif /* DEBUG */
   {
     if (log)
       _cupsLangPrintf(stderr, _("Bad device URI \"%s\"!\n"), uri);
