@@ -1811,8 +1811,8 @@ static void run_legacy_backend(int argc,
 
     if (!posix_spawnattr_init(&attrs))
     {
-      posix_spawnattr_setsigdefault(attrs, &oldmask);
-      if (posix_spawnattr_setbinpref_np(attrs, 1, &cpu, &ocount) || ocount != 1)
+      posix_spawnattr_setsigdefault(&attrs, &oldmask);
+      if (posix_spawnattr_setbinpref_np(&attrs, 1, &cpu, &ocount) || ocount != 1)
       {
 #  ifdef __x86_64__
 	perror("DEBUG: Unable to set binary preference to i386");
