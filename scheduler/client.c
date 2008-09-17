@@ -437,14 +437,22 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #ifdef AF_INET6
     if (temp.addr.sa_family == AF_INET6)
     {
-      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      if (HostNameLookups)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else
+        httpAddrString(&temp, con->servername, sizeof(con->servername));
+
       con->serverport = ntohs(lis->address.ipv6.sin6_port);
     }
     else
 #endif /* AF_INET6 */
     if (temp.addr.sa_family == AF_INET)
     {
-      httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      if (HostNameLookups)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else
+        httpAddrString(&temp, con->servername, sizeof(con->servername));
+
       con->serverport = ntohs(lis->address.ipv4.sin_port);
     }
     else
