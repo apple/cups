@@ -2484,7 +2484,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 16],
+			*envp[MAX_ENV + 17],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -3141,6 +3141,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
+  envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
+                                "CUPS_FILETYPE=document";
 
   if (!printer->remote && !printer->raw)
   {

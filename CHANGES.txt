@@ -1,9 +1,12 @@
-CHANGES.txt - 2008-09-10
+CHANGES.txt - 2008-09-18
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- Added CUPS_JOBTYPE environment variable for job filters so
+	  they know whether they are printing a banner or document
+	  file (STR #2799)
 	- Added support for printer filtering by the cupsfilter
 	  command (STR #2562)
 	- Added a SSLOptions directive to allow Windows clients to

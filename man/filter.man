@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "Common UNIX Printing System" "14 May 2008" "Apple Inc."
+.TH filter 7 "Common UNIX Printing System" "18 September 2008" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -148,9 +148,20 @@ The MIME type associated with the file (e.g.
 application/postscript).
 
 .TP 5
+CUPS_CACHEDIR
+.br
+The directory for semi-persistent cache files can be found.
+
+.TP 5
 CUPS_DATADIR
 .br
 The directory where data files can be found.
+
+.TP 5
+CUPS_FILETYPE
+.br
+The type of file being printed: "job-sheet" for a banner page and "document"
+for a regular print file.
 
 .TP 5
 CUPS_SERVERROOT
