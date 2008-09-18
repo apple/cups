@@ -4,6 +4,8 @@ CHANGES.txt - 2008-09-18
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The scheduler now supports multiple addresses in Allow and
+	  Deny lines, just like Apache (STR #2947)
 	- Added CUPS_JOBTYPE environment variable for job filters so
 	  they know whether they are printing a banner or document
 	  file (STR #2799)

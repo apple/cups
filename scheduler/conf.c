@@ -1690,92 +1690,113 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
     * Deny [From] host/ip...
     */
 
-    if (!strncasecmp(value, "from", 4))
+    while (*value)
     {
-     /*
-      * Strip leading "from"...
-      */
-
-      value += 4;
-
-      while (isspace(*value & 255))
-	value ++;
-    }
-
-   /*
-    * Figure out what form the allow/deny address takes:
-    *
-    *    All
-    *    None
-    *    *.domain.com
-    *    .domain.com
-    *    host.domain.com
-    *    nnn.*
-    *    nnn.nnn.*
-    *    nnn.nnn.nnn.*
-    *    nnn.nnn.nnn.nnn
-    *    nnn.nnn.nnn.nnn/mm
-    *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
-    */
-
-    if (!strcasecmp(value, "all"))
-    {
-     /*
-      * All hosts...
-      */
-
-      if (!strcasecmp(line, "Allow"))
-	cupsdAllowIP(loc, zeros, zeros);
-      else
-	cupsdDenyIP(loc, zeros, zeros);
-    }
-    else if (!strcasecmp(value, "none"))
-    {
-     /*
-      * No hosts...
-      */
-
-      if (!strcasecmp(line, "Allow"))
-	cupsdAllowIP(loc, ones, zeros);
-      else
-	cupsdDenyIP(loc, ones, zeros);
-    }
-#ifdef AF_INET6
-    else if (value[0] == '*' || value[0] == '.' || 
-             (!isdigit(value[0] & 255) && value[0] != '['))
-#else
-    else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
-#endif /* AF_INET6 */
-    {
-     /*
-      * Host or domain name...
-      */
-
-      if (value[0] == '*')
-	value ++;
-
-      if (!strcasecmp(line, "Allow"))
-	cupsdAllowHost(loc, value);
-      else
-	cupsdDenyHost(loc, value);
-    }
-    else
-    {
-     /*
-      * One of many IP address forms...
-      */
-
-      if (!get_addr_and_mask(value, ip, mask))
+      if (!strncasecmp(value, "from", 4))
       {
-        cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d.",
-	                value, linenum);
-        return (0);
+       /*
+	* Strip leading "from"...
+	*/
+
+	value += 4;
+
+	while (isspace(*value & 255))
+	  value ++;
+
+        if (!*value)
+	  break;
       }
 
-      if (!strcasecmp(line, "Allow"))
-	cupsdAllowIP(loc, ip, mask);
+     /*
+      * Find the end of the value...
+      */
+
+      for (valptr = value; *valptr && !isspace(*valptr & 255); valptr ++);
+
+      while (isspace(*valptr & 255))
+        *valptr++ = '\0';
+
+     /*
+      * Figure out what form the allow/deny address takes:
+      *
+      *    All
+      *    None
+      *    *.domain.com
+      *    .domain.com
+      *    host.domain.com
+      *    nnn.*
+      *    nnn.nnn.*
+      *    nnn.nnn.nnn.*
+      *    nnn.nnn.nnn.nnn
+      *    nnn.nnn.nnn.nnn/mm
+      *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+      */
+
+      if (!strcasecmp(value, "all"))
+      {
+       /*
+	* All hosts...
+	*/
+
+	if (!strcasecmp(line, "Allow"))
+	  cupsdAllowIP(loc, zeros, zeros);
+	else
+	  cupsdDenyIP(loc, zeros, zeros);
+      }
+      else if (!strcasecmp(value, "none"))
+      {
+       /*
+	* No hosts...
+	*/
+
+	if (!strcasecmp(line, "Allow"))
+	  cupsdAllowIP(loc, ones, zeros);
+	else
+	  cupsdDenyIP(loc, ones, zeros);
+      }
+#ifdef AF_INET6
+      else if (value[0] == '*' || value[0] == '.' || 
+	       (!isdigit(value[0] & 255) && value[0] != '['))
+#else
+      else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+#endif /* AF_INET6 */
+      {
+       /*
+	* Host or domain name...
+	*/
+
+	if (value[0] == '*')
+	  value ++;
+
+	if (!strcasecmp(line, "Allow"))
+	  cupsdAllowHost(loc, value);
+	else
+	  cupsdDenyHost(loc, value);
+      }
       else
-	cupsdDenyIP(loc, ip, mask);
+      {
+       /*
+	* One of many IP address forms...
+	*/
+
+	if (!get_addr_and_mask(value, ip, mask))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d.",
+			  value, linenum);
+	  return (0);
+	}
+
+	if (!strcasecmp(line, "Allow"))
+	  cupsdAllowIP(loc, ip, mask);
+	else
+	  cupsdDenyIP(loc, ip, mask);
+      }
+
+     /*
+      * Advance to next value...
+      */
+
+      value = valptr;
     }
   }
   else if (!strcasecmp(line, "AuthType"))
@@ -2579,93 +2600,114 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Unable to initialize browse access control list!");
       else
       {
-	if (!strncasecmp(value, "from ", 5))
+	while (*value)
 	{
+	  if (!strncasecmp(value, "from", 4))
+	  {
+	   /*
+	    * Strip leading "from"...
+	    */
+
+	    value += 4;
+
+	    while (isspace(*value & 255))
+	      value ++;
+
+	    if (!*value)
+	      break;
+	  }
+
 	 /*
-          * Strip leading "from"...
+	  * Find the end of the value...
 	  */
 
-	  value += 5;
+	  for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
 
-	  while (isspace(*value))
-	    value ++;
+	  while (isspace(*valueptr & 255))
+	    *valueptr++ = '\0';
+
+	 /*
+	  * Figure out what form the allow/deny address takes:
+	  *
+	  *    All
+	  *    None
+	  *    *.domain.com
+	  *    .domain.com
+	  *    host.domain.com
+	  *    nnn.*
+	  *    nnn.nnn.*
+	  *    nnn.nnn.nnn.*
+	  *    nnn.nnn.nnn.nnn
+	  *    nnn.nnn.nnn.nnn/mm
+	  *    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+	  */
+
+	  if (!strcasecmp(value, "all"))
+	  {
+	   /*
+	    * All hosts...
+	    */
+
+	    if (!strcasecmp(line, "BrowseAllow"))
+	      cupsdAllowIP(location, zeros, zeros);
+	    else
+	      cupsdDenyIP(location, zeros, zeros);
+	  }
+	  else if (!strcasecmp(value, "none"))
+	  {
+	   /*
+	    * No hosts...
+	    */
+
+	    if (!strcasecmp(line, "BrowseAllow"))
+	      cupsdAllowIP(location, ones, zeros);
+	    else
+	      cupsdDenyIP(location, ones, zeros);
+	  }
+#ifdef AF_INET6
+	  else if (value[0] == '*' || value[0] == '.' || 
+		   (!isdigit(value[0] & 255) && value[0] != '['))
+#else
+	  else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+#endif /* AF_INET6 */
+	  {
+	   /*
+	    * Host or domain name...
+	    */
+
+	    if (value[0] == '*')
+	      value ++;
+
+	    if (!strcasecmp(line, "BrowseAllow"))
+	      cupsdAllowHost(location, value);
+	    else
+	      cupsdDenyHost(location, value);
+	  }
+	  else
+	  {
+	   /*
+	    * One of many IP address forms...
+	    */
+
+	    if (!get_addr_and_mask(value, ip, mask))
+	    {
+	      cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d.",
+			      value, linenum);
+	      break;
+	    }
+
+	    if (!strcasecmp(line, "BrowseAllow"))
+	      cupsdAllowIP(location, ip, mask);
+	    else
+	      cupsdDenyIP(location, ip, mask);
+	  }
 	}
 
        /*
-	* Figure out what form the allow/deny address takes:
-	*
-	*    All
-	*    None
-	*    *.domain.com
-	*    .domain.com
-	*    host.domain.com
-	*    nnn.*
-	*    nnn.nnn.*
-	*    nnn.nnn.nnn.*
-	*    nnn.nnn.nnn.nnn
-	*    nnn.nnn.nnn.nnn/mm
-	*    nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
+        * Advance to next value...
 	*/
 
-	if (!strcasecmp(value, "all"))
-	{
-	 /*
-          * All hosts...
-	  */
-
-          if (!strcasecmp(line, "BrowseAllow"))
-	    cupsdAllowIP(location, zeros, zeros);
-	  else
-	    cupsdDenyIP(location, zeros, zeros);
-	}
-	else if (!strcasecmp(value, "none"))
-	{
-	 /*
-          * No hosts...
-	  */
-
-          if (!strcasecmp(line, "BrowseAllow"))
-	    cupsdAllowIP(location, ones, zeros);
-	  else
-	    cupsdDenyIP(location, ones, zeros);
-	}
-#ifdef AF_INET6
-	else if (value[0] == '*' || value[0] == '.' || 
-        	 (!isdigit(value[0] & 255) && value[0] != '['))
-#else
-	else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
-#endif /* AF_INET6 */
-	{
-	 /*
-          * Host or domain name...
-	  */
-
-	  if (value[0] == '*')
-	    value ++;
-
-          if (!strcasecmp(line, "BrowseAllow"))
-	    cupsdAllowHost(location, value);
-	  else
-	    cupsdDenyHost(location, value);
-	}
-	else
-	{
-	 /*
-          * One of many IP address forms...
-	  */
-
-          if (!get_addr_and_mask(value, ip, mask))
-	  {
-            cupsdLogMessage(CUPSD_LOG_ERROR, "Bad netmask value %s on line %d.",
-	                    value, linenum);
-	    break;
-	  }
-
-          if (!strcasecmp(line, "BrowseAllow"))
-	    cupsdAllowIP(location, ip, mask);
-	  else
-	    cupsdDenyIP(location, ip, mask);
-	}
+        value = valueptr;
       }
     }
     else if (!strcasecmp(line, "BrowseRelay") && value)
