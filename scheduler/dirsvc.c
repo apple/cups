@@ -3099,6 +3099,9 @@ process_browse_data(
     else
       p = cupsdAddPrinter(name);
 
+    if (!p)
+      return;
+
     cupsdClearString(&(p->hostname));
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Added remote %s \"%s\"...",
@@ -3117,9 +3120,6 @@ process_browse_data(
 
     cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
   }
-
-  if (!p)
-    return;
 
   if (!p->hostname)
   {

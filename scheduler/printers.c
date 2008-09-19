@@ -3007,9 +3007,6 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
-  if (PrintcapFormat == PRINTCAP_PLIST)
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-
   if (s[0] == '-' || s[0] == '+')
   {
    /*
@@ -3030,6 +3027,9 @@ cupsdSetPrinterReasons(
       _cupsStrFree(p->reasons[i]);
 
     p->num_reasons = 0;
+
+    if (PrintcapFormat == PRINTCAP_PLIST)
+      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
   }
 
   if (!strcmp(s, "none"))
@@ -3081,6 +3081,9 @@ cupsdSetPrinterReasons(
 
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
+
+	  if (PrintcapFormat == PRINTCAP_PLIST)
+	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 	}
     }
     else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
@@ -3100,6 +3103,9 @@ cupsdSetPrinterReasons(
 
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
+
+	if (PrintcapFormat == PRINTCAP_PLIST)
+	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
       }
     }
   }
