@@ -436,17 +436,13 @@ cupsdLoadRemoteCache(void)
         p = NULL;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-        break;
-      }
     }
     else if (!p)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of remote.cache.", linenum);
-      break;
     }
     else if (!strcasecmp(line, "Info"))
     {
@@ -476,11 +472,8 @@ cupsdLoadRemoteCache(void)
 	cupsdSetDeviceURI(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Option") && value)
     {
@@ -512,11 +505,8 @@ cupsdLoadRemoteCache(void)
       else if (value && !strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "StateMessage"))
     {
@@ -544,22 +534,16 @@ cupsdLoadRemoteCache(void)
         	!strcasecmp(value, "false")))
         p->accepting = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Type"))
     {
       if (value)
         p->type = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "BrowseTime"))
     {
@@ -571,11 +555,8 @@ cupsdLoadRemoteCache(void)
           p->browse_expire = t;
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "JobSheets"))
     {
@@ -606,11 +587,8 @@ cupsdLoadRemoteCache(void)
 	}
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "AllowUser"))
     {
@@ -620,11 +598,8 @@ cupsdLoadRemoteCache(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "DenyUser"))
     {
@@ -634,11 +609,8 @@ cupsdLoadRemoteCache(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else
     {

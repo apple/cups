@@ -919,11 +919,8 @@ cupsdLoadAllPrinters(void)
 	  DefaultPrinter = p;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "</Printer>"))
     {
@@ -964,17 +961,13 @@ cupsdLoadAllPrinters(void)
         p = NULL;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!p)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of printers.conf.", linenum);
-      break;
     }
     else if (!strcasecmp(line, "AuthInfoRequired"))
     {
@@ -998,11 +991,8 @@ cupsdLoadAllPrinters(void)
       if (value)
 	cupsdSetDeviceURI(p, value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Option") && value)
     {
@@ -1030,11 +1020,8 @@ cupsdLoadAllPrinters(void)
       else if (value)
         cupsdClearString(&p->port_monitor);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "State"))
     {
@@ -1047,11 +1034,8 @@ cupsdLoadAllPrinters(void)
       else if (value && !strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "StateMessage"))
     {
@@ -1088,11 +1072,8 @@ cupsdLoadAllPrinters(void)
         	!strcasecmp(value, "false")))
         p->accepting = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Shared"))
     {
@@ -1111,11 +1092,8 @@ cupsdLoadAllPrinters(void)
         	!strcasecmp(value, "false")))
         p->shared = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "JobSheets"))
     {
@@ -1146,11 +1124,8 @@ cupsdLoadAllPrinters(void)
 	}
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "AllowUser"))
     {
@@ -1160,11 +1135,8 @@ cupsdLoadAllPrinters(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "DenyUser"))
     {
@@ -1174,44 +1146,32 @@ cupsdLoadAllPrinters(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "OpPolicy"))
     {
@@ -1231,22 +1191,16 @@ cupsdLoadAllPrinters(void)
 			  value, linenum);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
         cupsdSetString(&p->error_policy, value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Attribute") && value)
     {

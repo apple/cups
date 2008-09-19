@@ -372,11 +372,8 @@ cupsdLoadAllClasses(void)
 	  DefaultPrinter = p;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-        break;
-      }
     }
     else if (!strcasecmp(line, "</Class>"))
     {
@@ -386,17 +383,13 @@ cupsdLoadAllClasses(void)
         p = NULL;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-        break;
-      }
     }
     else if (!p)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of classes.conf.", linenum);
-      break;
     }
     else if (!strcasecmp(line, "AuthInfoRequired"))
     {
@@ -437,11 +430,8 @@ cupsdLoadAllClasses(void)
     else if (!strcasecmp(line, "Printer"))
     {
       if (!value)
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
       else if ((temp = cupsdFindPrinter(value)) == NULL)
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
@@ -482,12 +472,9 @@ cupsdLoadAllClasses(void)
       else if (!strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "StateMessage"))
     {
@@ -524,12 +511,9 @@ cupsdLoadAllClasses(void)
         	!strcasecmp(value, "false")))
         p->accepting = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Shared"))
     {
@@ -548,12 +532,9 @@ cupsdLoadAllClasses(void)
         	!strcasecmp(value, "false")))
         p->shared = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",
 	                linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "JobSheets"))
     {
@@ -588,11 +569,8 @@ cupsdLoadAllClasses(void)
 	}
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "AllowUser"))
     {
@@ -602,11 +580,8 @@ cupsdLoadAllClasses(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "DenyUser"))
     {
@@ -616,44 +591,32 @@ cupsdLoadAllClasses(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "QuotaPeriod"))
     {
       if (value)
         p->quota_period = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "PageLimit"))
     {
       if (value)
         p->page_limit = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "KLimit"))
     {
       if (value)
         p->k_limit = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "OpPolicy"))
     {
@@ -673,22 +636,16 @@ cupsdLoadAllClasses(void)
 			  value, linenum);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
         cupsdSetString(&p->error_policy, value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
-	break;
-      }
     }
     else
     {
