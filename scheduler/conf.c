@@ -454,6 +454,9 @@ cupsdReadConfiguration(void)
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
     PrintcapFormat = PRINTCAP_SOLARIS;
+  else if (!strcmp(CUPS_DEFAULT_PRINTCAP,
+                   "/Library/Preferences/org.cups.printers.plist"))
+    PrintcapFormat = PRINTCAP_PLIST;
   else
     PrintcapFormat = PRINTCAP_BSD;
 
@@ -1165,7 +1168,6 @@ cupsdReadConfiguration(void)
 
     cupsdDeleteAllSubscriptions();
     cupsdFreeAllJobs();
-    cupsdDeleteAllClasses();
     cupsdDeleteAllPrinters();
 
     DefaultPrinter = NULL;
@@ -3158,6 +3160,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (!strcasecmp(value, "bsd"))
         PrintcapFormat = PRINTCAP_BSD;
+      else if (!strcasecmp(value, "plist"))
+        PrintcapFormat = PRINTCAP_PLIST;
       else if (!strcasecmp(value, "solaris"))
         PrintcapFormat = PRINTCAP_SOLARIS;
       else

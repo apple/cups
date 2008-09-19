@@ -1,9 +1,10 @@
-CHANGES.txt - 2008-09-18
+CHANGES.txt - 2008-09-19
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The scheduler now supports a plist PrintcapFormat.
 	- The scheduler now supports multiple addresses in Allow and
 	  Deny lines, just like Apache (STR #2947)
 	- Added CUPS_JOBTYPE environment variable for job filters so

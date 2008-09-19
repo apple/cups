@@ -473,7 +473,7 @@ cupsdLoadRemoteCache(void)
 
 	cupsdSetString(&p->hostname, host);
 	cupsdSetString(&p->uri, value);
-	cupsdSetString(&p->device_uri, value);
+	cupsdSetDeviceURI(p, value);
       }
       else
       {
@@ -794,8 +794,7 @@ cupsdSaveRemoteCache(void)
     if (printer->location)
       cupsFilePrintf(fp, "Location %s\n", printer->location);
 
-    if (printer->device_uri)
-      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 
     if (printer->state == IPP_PRINTER_STOPPED)
     {

@@ -2448,7 +2448,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     * Do we have a valid device URI?
     */
 
-    http_uri_status_t uri_status;	/* URI separation status */
+    http_uri_status_t	uri_status;	/* URI separation status */
+    char		old_device_uri[1024];
+					/* Old device URI */
 
 
     need_restart_job = 1;
@@ -2508,15 +2510,19 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       }
     }
 
+    if (printer->sanitized_device_uri)
+      strlcpy(old_device_uri, printer->sanitized_device_uri,
+              sizeof(old_device_uri));
+    else
+      old_device_uri[0] = '\0';
+
+    cupsdSetDeviceURI(printer, attr->values[0].string.text);
+
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s device-uri to \"%s\" (was \"%s\".)",
-        	    printer->name,
-		    cupsdSanitizeURI(attr->values[0].string.text, line,
-		                     sizeof(line)),
-		    cupsdSanitizeURI(printer->device_uri, resource,
-		                     sizeof(resource)));
+        	    printer->name, printer->sanitized_device_uri,
+		    old_device_uri);
 
-    cupsdSetString(&printer->device_uri, attr->values[0].string.text);
     set_device_uri = 1;
   }
 

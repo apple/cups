@@ -27,6 +27,7 @@
  *   cupsdSaveAllPrinters()      - Save all printer definitions to the
  *                                 printers.conf file.
  *   cupsdSetAuthInfoRequired()  - Set the required authentication info.
+ *   cupsdSetDeviceURI()         - Set the device URI for a printer.
  *   cupsdSetPrinterAttr()       - Set a printer attribute.
  *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
  *                                 file.
@@ -37,7 +38,6 @@
  *   cupsdValidateDest()         - Validate a printer/class destination.
  *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
  *                                 applications that need it...
- *   cupsdSanitizeURI()          - Sanitize a device URI...
  *   add_printer_defaults()      - Add name-default attributes to the printer
  *                                 attributes.
  *   add_printer_filter()        - Add a MIME filter for a printer.
@@ -49,6 +49,7 @@
  *                                 desktop tools.
  *   write_irix_state()          - Update the status files used by IRIX
  *                                 printing desktop tools.
+ *   write_xml_string()          - Write a string with XML escaping.
  */
 
 /*
@@ -73,6 +74,7 @@ static void	delete_printer_filters(cupsd_printer_t *p);
 static void	write_irix_config(cupsd_printer_t *p);
 static void	write_irix_state(cupsd_printer_t *p);
 #endif /* __sgi */
+static void	write_xml_string(cups_file_t *fp, const char *s);
 
 
 /*
@@ -107,7 +109,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetString(&p->hostname, ServerName);
 
   cupsdSetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, LocalPort, name);
-  cupsdSetStringf(&p->device_uri, "file:/dev/null");
+  cupsdSetDeviceURI(p, "file:/dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;
   p->state_time = time(NULL);
@@ -594,8 +596,7 @@ cupsdDeleteAllPrinters(void)
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (!(p->type & CUPS_PRINTER_CLASS))
-      cupsdDeletePrinter(p, 0);
+    cupsdDeletePrinter(p, 0);
 }
 
 
@@ -760,6 +761,7 @@ cupsdDeletePrinter(
   cupsdClearString(&p->job_sheets[0]);
   cupsdClearString(&p->job_sheets[1]);
   cupsdClearString(&p->device_uri);
+  cupsdClearString(&p->sanitized_device_uri);
   cupsdClearString(&p->port_monitor);
   cupsdClearString(&p->op_policy);
   cupsdClearString(&p->error_policy);
@@ -934,7 +936,7 @@ cupsdLoadAllPrinters(void)
         cupsdSetPrinterAttrs(p);
 	cupsdAddPrinterHistory(p);
 
-        if (p->device_uri && strncmp(p->device_uri, "file:", 5) &&
+        if (strncmp(p->device_uri, "file:", 5) &&
 	    p->state != IPP_PRINTER_STOPPED)
 	{
 	 /*
@@ -994,7 +996,7 @@ cupsdLoadAllPrinters(void)
     else if (!strcasecmp(line, "DeviceURI"))
     {
       if (value)
-	cupsdSetString(&p->device_uri, value);
+	cupsdSetDeviceURI(p, value);
       else
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1481,8 +1483,7 @@ cupsdSaveAllPrinters(void)
       else
         cupsFilePrintf(fp, "Location %s\n", printer->location);
     }
-    if (printer->device_uri)
-      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 
     if (printer->port_monitor)
       cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
@@ -1828,6 +1829,74 @@ cupsdSetAuthInfoRequired(
 
 
 /*
+ * 'cupsdSetDeviceURI()' - Set the device URI for a printer.
+ */
+
+void
+cupsdSetDeviceURI(cupsd_printer_t *p,	/* I - Printer */
+                  const char      *uri)	/* I - Device URI */
+{
+  char	buffer[1024],			/* URI buffer */
+	*start,				/* Start of data after scheme */
+	*slash,				/* First slash after scheme:// */
+	*ptr;				/* Pointer into user@host:port part */
+
+
+ /*
+  * Set the full device URI..
+  */
+
+  cupsdSetString(&(p->device_uri), uri);
+
+ /*
+  * Copy the device URI to a temporary buffer so we can sanitize any auth
+  * info in it...
+  */
+
+  strlcpy(buffer, uri, sizeof(buffer));
+
+ /*
+  * Find the end of the scheme:// part...
+  */
+
+  if ((ptr = strchr(buffer, ':')) != NULL)
+  {
+    for (start = ptr + 1; *start; start ++)
+      if (*start != '/')
+        break;
+
+   /*
+    * Find the next slash (/) in the URI...
+    */
+
+    if ((slash = strchr(start, '/')) == NULL)
+      slash = start + strlen(start);	/* No slash, point to the end */
+
+   /*
+    * Check for an @ sign before the slash...
+    */
+
+    if ((ptr = strchr(start, '@')) != NULL && ptr < slash)
+    {
+     /*
+      * Found an @ sign and it is before the resource part, so we have
+      * an authentication string.  Copy the remaining URI over the
+      * authentication string...
+      */
+
+      _cups_strcpy(start, ptr + 1);
+    }
+  }
+
+ /*
+  * Save the sanitized URI...
+  */
+
+  cupsdSetString(&(p->sanitized_device_uri), buffer);
+}
+
+
+/*
  * 'cupsdSetPrinterAttr()' - Set a printer attribute.
  */
 
@@ -1958,7 +2027,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 {
   int		i,			/* Looping var */
 		length;			/* Length of browse attributes */
-  char		uri[HTTP_MAX_URI];	/* URI for printer */
   char		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   char		filename[1024];		/* Name of PPD file */
   int		num_air;		/* Number of auth-info-required values */
@@ -2229,31 +2297,11 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     else
     {
      /*
-      * Add printer-specific attributes...  Start by sanitizing the device
-      * URI so it doesn't have a username or password in it...
+      * Add printer-specific attributes...
       */
 
-      if (!p->device_uri)
-        strcpy(uri, "file:/dev/null");
-      else if (strstr(p->device_uri, "://") != NULL)
-      {
-       /*
-        * http://..., ipp://..., etc.
-	*/
-
-        cupsdSanitizeURI(p->device_uri, uri, sizeof(uri));
-      }
-      else
-      {
-       /*
-        * file:..., serial:..., etc.
-	*/
-
-        strlcpy(uri, p->device_uri, sizeof(uri));
-      }
-
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "device-uri", NULL,
-        	   uri);
+		   p->sanitized_device_uri);
 
      /*
       * Assign additional attributes from the PPD file (if any)...
@@ -2707,8 +2755,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	           ServerRoot, p->name);
 	  add_printer_filter(p, p->filetype, filename);
 	}
-	else if (p->device_uri &&
-	         !strncmp(p->device_uri, "ipp://", 6) &&
+	else if (!strncmp(p->device_uri, "ipp://", 6) &&
 	         (strstr(p->device_uri, "/printers/") != NULL ||
 		  strstr(p->device_uri, "/classes/") != NULL))
         {
@@ -2991,6 +3038,9 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
+  if (PrintcapFormat == PRINTCAP_PLIST)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+
   if (s[0] == '-' || s[0] == '+')
   {
    /*
@@ -3008,7 +3058,7 @@ cupsdSetPrinterReasons(
     sptr = s;
 
     for (i = 0; i < p->num_reasons; i ++)
-      free(p->reasons[i]);
+      _cupsStrFree(p->reasons[i]);
 
     p->num_reasons = 0;
   }
@@ -3076,7 +3126,7 @@ cupsdSetPrinterReasons(
 
       if (i >= p->num_reasons)
       {
-        p->reasons[i] = strdup(reason);
+        p->reasons[i] = _cupsStrAlloc(reason);
 	p->num_reasons ++;
 
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
@@ -3110,6 +3160,9 @@ cupsdSetPrinterState(
  /*
   * Set the new state...
   */
+
+  if (PrintcapFormat == PRINTCAP_PLIST)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
   old_state = p->state;
   p->state  = s;
@@ -3542,7 +3595,8 @@ cupsdValidateDest(
 void
 cupsdWritePrintcap(void)
 {
-  cups_file_t		*fp;		/* printcap file */
+  int			i;		/* Looping var */
+  cups_file_t		*fp;		/* Printcap file */
   cupsd_printer_t	*p;		/* Current printer */
 
 
@@ -3575,11 +3629,11 @@ cupsdWritePrintcap(void)
   * data has come from...
   */
 
-  cupsFilePuts(fp,
-               "# This file was automatically generated by cupsd(8) from the\n");
-  cupsFilePrintf(fp, "# %s/printers.conf file.  All changes to this file\n",
-                 ServerRoot);
-  cupsFilePuts(fp, "# will be lost.\n");
+  if (PrintcapFormat != PRINTCAP_PLIST)
+    cupsFilePrintf(fp, "# This file was automatically generated by cupsd(8) "
+                       "from the\n"
+                       "# %s/printers.conf file.  All changes to this file\n"
+		       "# will be lost.\n", ServerRoot);
 
   if (Printers)
   {
@@ -3589,7 +3643,7 @@ cupsdWritePrintcap(void)
 
     switch (PrintcapFormat)
     {
-      case PRINTCAP_BSD:
+      case PRINTCAP_BSD :
 	 /*
           * Each printer is put in the file as:
 	  *
@@ -3613,7 +3667,68 @@ cupsdWritePrintcap(void)
 	                     ServerName, p->name);
           break;
 
-      case PRINTCAP_SOLARIS:
+      case PRINTCAP_PLIST :
+         /*
+	  * Each printer is written as a dictionary in a plist file.
+	  * Currently the printer-name, printer-info, printer-is-accepting-jobs,
+	  * printer-location, printer-make-and-model, printer-state,
+	  * printer-state-reasons, printer-type, and (sanitized) device-uri.
+	  */
+
+          cupsFilePuts(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	                   "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD "
+			   "PLIST 1.0//EN\" \"http://www.apple.com/DTDs/"
+			   "PropertyList-1.0.dtd\">\n"
+			   "<plist version=\"1.0\">\n"
+			   "<array>\n");
+
+	  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	       p;
+	       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+          {
+	    cupsFilePuts(fp, "\t<dict>\n"
+	                     "\t\t<key>printer-name</key>\n"
+			     "\t\t<string>");
+            write_xml_string(fp, p->name);
+	    cupsFilePuts(fp, "</string>\n"
+	                     "\t\t<key>printer-info</key>\n"
+			     "\t\t<string>");
+            write_xml_string(fp, p->info);
+	    cupsFilePrintf(fp, "</string>\n"
+	                       "\t\t<key>printer-is-accepting-jobs</key>\n"
+			       "\t\t<%s/>\n"
+			       "\t\t<key>printer-location</key>\n"
+			       "\t\t<string>", p->accepting ? "true" : "false");
+            write_xml_string(fp, p->location);
+	    cupsFilePuts(fp, "</string>\n"
+	                     "\t\t<key>printer-make-and-model</key>\n"
+			     "\t\t<string>");
+            write_xml_string(fp, p->make_model);
+	    cupsFilePrintf(fp, "</string>\n"
+	                       "\t\t<key>printer-state</key>\n"
+			       "\t\t<integer>%d</integer>\n"
+			       "\t\t<key>printer-state-reasons</key>\n"
+			       "\t\t<array>\n", p->state);
+            for (i = 0; i < p->num_reasons; i ++)
+	    {
+	      cupsFilePuts(fp, "\t\t\t<string>");
+	      write_xml_string(fp, p->reasons[i]);
+	      cupsFilePuts(fp, "</string>\n");
+	    }
+	    cupsFilePrintf(fp, "\t\t</array>\n"
+	                       "\t\t<key>printer-type</key>\n"
+			       "\t\t<integer>%d</integer>\n"
+	                       "\t\t<key>device-uri</key>\n"
+			       "\t\t<string>", p->type);
+            write_xml_string(fp, p->sanitized_device_uri);
+	    cupsFilePuts(fp, "</string>\n"
+	                     "\t</dict>\n");
+          }
+	  cupsFilePuts(fp, "</array>\n"
+	                   "</plist>\n");
+	  break;
+
+      case PRINTCAP_SOLARIS :
 	 /*
           * Each printer is put in the file as:
 	  *
@@ -3661,74 +3776,6 @@ cupsdWritePrintcap(void)
   */
 
   cupsFileClose(fp);
-}
-
-
-/*
- * 'cupsdSanitizeURI()' - Sanitize a device URI...
- */
-
-char *					/* O - New device URI */
-cupsdSanitizeURI(const char *uri,	/* I - Original device URI */
-                 char       *buffer,	/* O - New device URI */
-                 int        buflen)	/* I - Size of new device URI buffer */
-{
-  char	*start,				/* Start of data after scheme */
-	*slash,				/* First slash after scheme:// */
-	*ptr;				/* Pointer into user@host:port part */
-
-
- /*
-  * Range check input...
-  */
-
-  if (!uri || !buffer || buflen < 2)
-    return (NULL);
-
- /*
-  * Copy the device URI to the new buffer...
-  */
-
-  strlcpy(buffer, uri, buflen);
-
- /*
-  * Find the end of the scheme:// part...
-  */
-
-  if ((ptr = strchr(buffer, ':')) == NULL)
-    return (buffer);			/* No scheme: part... */
-
-  for (start = ptr + 1; *start; start ++)
-    if (*start != '/')
-      break;
-
- /*
-  * Find the next slash (/) in the URI...
-  */
-
-  if ((slash = strchr(start, '/')) == NULL)
-    slash = start + strlen(start);	/* No slash, point to the end */
-
- /*
-  * Check for an @ sign before the slash...
-  */
-
-  if ((ptr = strchr(start, '@')) != NULL && ptr < slash)
-  {
-   /*
-    * Found an @ sign and it is before the resource part, so we have
-    * an authentication string.  Copy the remaining URI over the
-    * authentication string...
-    */
-
-    _cups_strcpy(start, ptr + 1);
-  }
-
- /*
-  * Return the new device URI...
-  */
-
-  return (buffer);
 }
 
 
@@ -4224,7 +4271,7 @@ write_irix_config(cupsd_printer_t *p)	/* I - Printer to update */
     cupsFilePrintf(fp, "Printer Model      | %s\n", p->make_model ? p->make_model : "");
     cupsFilePrintf(fp, "Location Code      | %s\n", p->location ? p->location : "");
     cupsFilePrintf(fp, "Physical Location  | %s\n", p->info ? p->info : "");
-    cupsFilePrintf(fp, "Port Path          | %s\n", p->device_uri ? p->device_uri : "");
+    cupsFilePrintf(fp, "Port Path          | %s\n", p->device_uri);
     cupsFilePrintf(fp, "Config Path        | /var/spool/lp/pod/%s.config\n", p->name);
     cupsFilePrintf(fp, "Active Status Path | /var/spool/lp/pod/%s.status\n", p->name);
     cupsFilePuts(fp, "Status Update Wait | 10 seconds\n");
@@ -4269,7 +4316,7 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
                                                      "Faulted");
       cupsFilePrintf(fp, "Information        | 01 00 00 | %s\n", CUPS_SVERSION);
       cupsFilePrintf(fp, "Information        | 02 00 00 | Device URI: %s\n",
-              p->device_uri ? p->device_uri : "");
+              p->device_uri);
       cupsFilePrintf(fp, "Information        | 03 00 00 | %s jobs\n",
               p->accepting ? "Accepting" : "Not accepting");
       cupsFilePrintf(fp, "Information        | 04 00 00 | %s\n", p->state_message);
@@ -4364,6 +4411,45 @@ write_irix_state(cupsd_printer_t *p)	/* I - Printer to update */
     unlink(filename);
 }
 #endif /* __sgi */
+
+
+/*
+ * 'write_xml_string()' - Write a string with XML escaping.
+ */
+
+static void
+write_xml_string(cups_file_t *fp,	/* I - File to write to */
+                 const char  *s)	/* I - String to write */
+{
+  const char	*start;			/* Start of current sequence */
+
+
+  if (!s)
+    return;
+
+  for (start = s; *s; s ++)
+  {
+    if (*s == '&')
+    {
+      if (s > start)
+        cupsFileWrite(fp, start, s - start);
+
+      cupsFilePuts(fp, "&amp;");
+      start = s + 1;
+    }
+    else if (*s == '<')
+    {
+      if (s > start)
+        cupsFileWrite(fp, start, s - start);
+
+      cupsFilePuts(fp, "&lt;");
+      start = s + 1;
+    }
+  }
+
+  if (s > start)
+    cupsFilePuts(fp, start);
+}
 
 
 /*

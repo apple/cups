@@ -545,6 +545,8 @@ disables printcap generation.
 .TP 5
 PrintcapFormat bsd
 .TP 5
+PrintcapFormat plist
+.TP 5
 PrintcapFormat solaris
 .br
 Specifies the format of the printcap file.

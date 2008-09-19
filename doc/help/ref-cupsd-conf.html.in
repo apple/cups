@@ -2446,6 +2446,7 @@ files as soon as each job is completed, canceled, or aborted.</P>
 Printcap
 Printcap /etc/printcap
 Printcap /etc/printers.conf
+Printcap /Library/Preferences/org.cups.printers.plist
 </PRE>
 
 <H3>Description</H3>
@@ -2454,9 +2455,9 @@ Printcap /etc/printers.conf
 printcap file is automatically generated and updated with a list
 of available printers. If specified with no value, then no
 printcap file will be generated. The default is to generate a
-file named <VAR>/etc/printcap</VAR>.</P>
+file named <VAR>@CUPS_DEFAUL_PRINTCAP@</VAR>.</P>
 
-<P>When a filename is specified (e.g. <VAR>/etc/printcap</VAR>),
+<P>When a filename is specified (e.g. <VAR>@CUPS_DEFAULT_PRINTCAP@</VAR>),
 the printcap file is written whenever a printer is added or
 removed. The printcap file can then be used by applications that
 are hardcoded to look at the printcap file for the available
@@ -2470,13 +2471,14 @@ printers.</P>
 <PRE CLASS="command">
 PrintcapFormat BSD
 PrintcapFormat Solaris
+PrintcapFormat plist
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>PrintcapFormat</CODE> directive controls the output
-format of the printcap file. The default is to generate a BSD
-printcap file.</P>
+<P>The <CODE>PrintcapFormat</CODE> directive controls the output format of the
+printcap file. The default is to generate the plist format on Mac OS X, the
+Solaris format on Solaris, and the BSD format on other operating systems.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.13</SPAN><A NAME="PrintcapGUI">PrintcapGUI</A></H2>

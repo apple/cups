@@ -64,6 +64,7 @@ typedef enum
 
 #define PRINTCAP_BSD		0	/* Berkeley LPD format */
 #define PRINTCAP_SOLARIS	1	/* Solaris lpsched format */
+#define PRINTCAP_PLIST		2	/* Mac OS X plist format */
 
 
 /*

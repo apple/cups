@@ -3,7 +3,7 @@
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -18,7 +18,6 @@
  *   cupsdAddPrinterToClass()        - Add a printer to a class...
  *   cupsdDeletePrinterFromClass()   - Delete a printer from a class.
  *   cupsdDeletePrinterFromClasses() - Delete a printer from all classes.
- *   cupsdDeleteAllClasses()         - Remove all classes from the system.
  *   cupsdFindAvailablePrinter()     - Find an available printer in a class.
  *   cupsdFindClass()                - Find the named class.
  *   cupsdLoadAllClasses()           - Load classes from the classes.conf file.
@@ -214,24 +213,6 @@ cupsdDeletePrinterFromClasses(
                       c->name);
       cupsdDeletePrinter(c, 0);
     }
-}
-
-
-/*
- * 'cupsdDeleteAllClasses()' - Remove all classes from the system.
- */
-
-void
-cupsdDeleteAllClasses(void)
-{
-  cupsd_printer_t	*c;		/* Pointer to current printer/class */
-
-
-  for (c = (cupsd_printer_t *)cupsArrayFirst(Printers);
-       c;
-       c = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (c->type & CUPS_PRINTER_CLASS)
-      cupsdDeletePrinter(c, 0);
 }
 
 
