@@ -494,6 +494,18 @@ cupsdLoadRemoteCache(void)
 	                               &(p->options));
       }
     }
+    else if (!strcasecmp(line, "Reason"))
+    {
+      if (value &&
+          p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+      {
+        p->reasons[p->num_reasons] = _cupsStrAlloc(value);
+	p->num_reasons ++;
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of remote.cache.", linenum);
+    }
     else if (!strcasecmp(line, "State"))
     {
      /*
@@ -775,6 +787,9 @@ cupsdSaveRemoteCache(void)
     }
     else
       cupsFilePuts(fp, "State Idle\n");
+
+    for (i = 0; i < printer->num_reasons; i ++)
+      cupsFilePrintf(fp, "Reason %s\n", printer->reasons[i]);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");
