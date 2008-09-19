@@ -9264,6 +9264,23 @@ save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
     return;
 #    endif /* __APPLE__ */
 
+  if (!KerberosInitialized)
+  {
+   /*
+    * Setup a Kerberos context for the scheduler to use...
+    */
+
+    KerberosInitialized = 1;
+
+    if (krb5_init_context(&KerberosContext))
+    {
+      KerberosContext = NULL;
+
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+      return;
+    }
+  }
+
  /*
   * We MUST create a file-based cache because memory-based caches are
   * only valid for the current process/address space.

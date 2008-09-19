@@ -165,6 +165,8 @@ VAR void		*DefaultProfile	VALUE(0);
 					/* Default security profile */
 
 #ifdef HAVE_GSSAPI
+VAR int			KerberosInitialized	VALUE(0);
+					/* Has Kerberos been initialized? */
 VAR krb5_context	KerberosContext VALUE(NULL);
 					/* Kerberos context for credentials */
 #endif /* HAVE_GSSAPI */

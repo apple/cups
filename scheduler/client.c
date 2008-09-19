@@ -4691,6 +4691,22 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
       {
 #    endif /* __APPLE__ */
 
+      if (!KerberosInitialized)
+      {
+       /*
+	* Setup a Kerberos context for the scheduler to use...
+	*/
+
+        KerberosInitialized = 1;
+
+	if (krb5_init_context(&KerberosContext))
+	{
+	  KerberosContext = NULL;
+
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+	}
+      }
+
      /*
       * We MUST create a file-based cache because memory-based caches are
       * only valid for the current process/address space.
@@ -4703,70 +4719,73 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
       * are removed when we have successfully printed a job.
       */
 
+      if (KerberosContext)
+      {
 #    ifdef HAVE_KRB5_CC_NEW_UNIQUE
-      if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
-				      &ccache)) != 0)
+	if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
+					&ccache)) != 0)
 #    else /* HAVE_HEIMDAL */
-      if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
-				   &ccache)) != 0)
+	if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
+				     &ccache)) != 0)
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to create new credentials cache (%d/%s)",
-			error, strerror(errno));
-	ccache = NULL;
-      }
-      else if ((error = krb5_parse_name(KerberosContext, con->username,
-				        &principal)) != 0)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to parse kerberos username (%d/%s)", error,
-			strerror(errno));
-	krb5_cc_destroy(KerberosContext, ccache);
-	ccache = NULL;
-      }
-      else if ((error = krb5_cc_initialize(KerberosContext, ccache,
-                                           principal)))
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to initialize credentials cache (%d/%s)", error,
-			strerror(errno));
-	krb5_cc_destroy(KerberosContext, ccache);
-	krb5_free_principal(KerberosContext, principal);
-	ccache = NULL;
-      }
-      else
-      {
-	krb5_free_principal(KerberosContext, principal);
-
-       /*
-	* Copy the user's credentials to the new cache file...
-	*/
-
-	major_status = gss_krb5_copy_ccache(&minor_status,
-	                                    con->gss_delegated_cred, ccache);
-
-	if (GSS_ERROR(major_status))
 	{
-	  cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-			     "Unable to import client credentials cache");
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to create new credentials cache (%d/%s)",
+			  error, strerror(errno));
+	  ccache = NULL;
+	}
+	else if ((error = krb5_parse_name(KerberosContext, con->username,
+					  &principal)) != 0)
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to parse kerberos username (%d/%s)", error,
+			  strerror(errno));
 	  krb5_cc_destroy(KerberosContext, ccache);
+	  ccache = NULL;
+	}
+	else if ((error = krb5_cc_initialize(KerberosContext, ccache,
+					     principal)))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to initialize credentials cache (%d/%s)", error,
+			  strerror(errno));
+	  krb5_cc_destroy(KerberosContext, ccache);
+	  krb5_free_principal(KerberosContext, principal);
 	  ccache = NULL;
 	}
 	else
 	{
+	  krb5_free_principal(KerberosContext, principal);
+
 	 /*
-	  * Add the KRB5CCNAME environment variable to the job so that the
-	  * backend can use the credentials when printing.
+	  * Copy the user's credentials to the new cache file...
 	  */
 
-	  snprintf(krb5ccname, sizeof(krb5ccname), "KRB5CCNAME=FILE:%s",
-		   krb5_cc_get_name(KerberosContext, ccache));
-          envp[envc++] = krb5ccname;
+	  major_status = gss_krb5_copy_ccache(&minor_status,
+					      con->gss_delegated_cred, ccache);
 
-	  if (!RunUser)
-	    chown(krb5_cc_get_name(KerberosContext, ccache), User, Group);
-        }
+	  if (GSS_ERROR(major_status))
+	  {
+	    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
+			       "Unable to import client credentials cache");
+	    krb5_cc_destroy(KerberosContext, ccache);
+	    ccache = NULL;
+	  }
+	  else
+	  {
+	   /*
+	    * Add the KRB5CCNAME environment variable to the job so that the
+	    * backend can use the credentials when printing.
+	    */
+
+	    snprintf(krb5ccname, sizeof(krb5ccname), "KRB5CCNAME=FILE:%s",
+		     krb5_cc_get_name(KerberosContext, ccache));
+	    envp[envc++] = krb5ccname;
+
+	    if (!RunUser)
+	      chown(krb5_cc_get_name(KerberosContext, ccache), User, Group);
+	  }
+       }
      }
 #    ifdef __APPLE__
      }
@@ -4774,7 +4793,6 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 #  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
     }
 #endif /* HAVE_GSSAPI */
-
   }
 
   if (con->http.version == HTTP_1_1)
