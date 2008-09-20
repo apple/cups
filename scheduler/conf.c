@@ -2703,13 +2703,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    else
 	      cupsdDenyIP(location, ip, mask);
 	  }
+
+	 /*
+	  * Advance to next value...
+	  */
+
+	  value = valueptr;
 	}
-
-       /*
-        * Advance to next value...
-	*/
-
-        value = valueptr;
       }
     }
     else if (!strcasecmp(line, "BrowseRelay") && value)
