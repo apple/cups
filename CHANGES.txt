@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-09-19
+CHANGES.txt - 2008-09-20
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The web interface now provides an advanced server settings
+	  form.
 	- The web interface's "modify printer" pages now make it
 	  easier to change just one setting (STR #1919)
 	- The scheduler now supports a plist PrintcapFormat.

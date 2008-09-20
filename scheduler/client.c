@@ -439,6 +439,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     {
       if (HostNameLookups)
         httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else if (httpAddrLocalhost(&temp))
+        strlcpy(con->servername, "localhost", sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 
@@ -450,6 +452,8 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     {
       if (HostNameLookups)
         httpAddrLookup(&temp, con->servername, sizeof(con->servername));
+      else if (httpAddrLocalhost(&temp))
+        strlcpy(con->servername, "localhost", sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 

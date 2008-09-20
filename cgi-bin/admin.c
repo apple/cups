@@ -115,7 +115,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * See if we have form data...
   */
 
-  if (!cgiInitialize())
+  if (!cgiInitialize() || !cgiGetVariable("OP"))
   {
    /*
     * Nope, send the administration menu...
@@ -203,6 +203,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       snprintf(prefix, sizeof(prefix), "http://%s:%s",
 	       getenv("SERVER_NAME"), getenv("SERVER_PORT"));
+
+    fprintf(stderr, "DEBUG: redirecting with prefix %s!\n", prefix);
 
     if ((url = cgiGetVariable("URL")) != NULL)
       printf("Location: %s%s\n\n", prefix, url);
@@ -1400,14 +1402,28 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 
     int			num_settings;	/* Number of server settings */
     cups_option_t	*settings;	/* Server settings */
+    int			advanced,	/* Advanced settings shown? */
+			changed;	/* Have settings changed? */
     const char		*debug_logging,	/* DEBUG_LOGGING value */
 			*remote_admin,	/* REMOTE_ADMIN value */
 			*remote_any,	/* REMOTE_ANY value */
 			*remote_printers,
 					/* REMOTE_PRINTERS value */
 			*share_printers,/* SHARE_PRINTERS value */
-			*user_cancel_any;
+			*user_cancel_any,
 					/* USER_CANCEL_ANY value */
+			*browse_web_if,	/* BrowseWebIF value */
+			*preserve_job_history,
+					/* PreserveJobHistory value */
+			*preserve_job_files,
+					/* PreserveJobFiles value */
+			*max_jobs,	/* MaxJobs value */
+			*max_log_size,	/* MaxLogSize value */
+			*val;		/* Value for other setting */
+    char		local_protocols[255],
+					/* BrowseLocalProtocols */
+			remote_protocols[255];
+					/* BrowseRemoteProtocols */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
@@ -1418,12 +1434,92 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * Get the checkbox values from the form...
     */
 
-    debug_logging     = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
-    remote_admin      = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
-    remote_any        = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
-    remote_printers   = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
-    share_printers    = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
-    user_cancel_any   = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
+    debug_logging        = cgiGetVariable("DEBUG_LOGGING") ? "1" : "0";
+    remote_admin         = cgiGetVariable("REMOTE_ADMIN") ? "1" : "0";
+    remote_any           = cgiGetVariable("REMOTE_ANY") ? "1" : "0";
+    remote_printers      = cgiGetVariable("REMOTE_PRINTERS") ? "1" : "0";
+    share_printers       = cgiGetVariable("SHARE_PRINTERS") ? "1" : "0";
+    user_cancel_any      = cgiGetVariable("USER_CANCEL_ANY") ? "1" : "0";
+
+    advanced = cgiGetVariable("ADVANCEDSETTINGS") != NULL;
+    if (advanced)
+    {
+     /*
+      * Get advanced settings...
+      */
+
+      browse_web_if        = cgiGetVariable("BROWSE_WEB_IF") ? "Yes" : "No";
+      preserve_job_history = cgiGetVariable("PRESERVE_JOB_HISTORY") ? "Yes" : "No";
+      preserve_job_files   = cgiGetVariable("PRESERVE_JOB_FILES") ? "Yes" : "No";
+      max_jobs             = cgiGetVariable("MAX_JOBS");
+      max_log_size         = cgiGetVariable("MAX_LOG_SIZE");
+
+      if (!max_jobs || atoi(max_jobs) <= 0)
+	max_jobs = "500";
+
+      if (!max_log_size || atof(max_log_size) <= 0.0)
+	max_log_size = "1m";
+
+      if (cgiGetVariable("BROWSE_LOCAL_CUPS"))
+	strcpy(local_protocols, "cups");
+      else
+	local_protocols[0] = '\0';
+
+#ifdef HAVE_DNSSD
+      if (cgiGetVariable("BROWSE_LOCAL_DNSSD"))
+      {
+	if (local_protocols[0])
+	  strcat(local_protocols, " dnssd");
+	else
+	  strcat(local_protocols, "dnssd");
+      }
+#endif /* HAVE_DNSSD */
+
+#ifdef HAVE_LDAP
+      if (cgiGetVariable("BROWSE_LOCAL_LDAP"))
+      {
+	if (local_protocols[0])
+	  strcat(local_protocols, " ldap");
+	else
+	  strcat(local_protocols, "ldap");
+      }
+#endif /* HAVE_LDAP */
+
+#ifdef HAVE_LIBSLP
+      if (cgiGetVariable("BROWSE_LOCAL_SLP"))
+      {
+	if (local_protocols[0])
+	  strcat(local_protocols, " slp");
+	else
+	  strcat(local_protocols, "slp");
+      }
+#endif /* HAVE_SLP */
+      
+      if (cgiGetVariable("BROWSE_REMOTE_CUPS"))
+	strcpy(remote_protocols, "cups");
+      else
+	remote_protocols[0] = '\0';
+
+#ifdef HAVE_LDAP
+      if (cgiGetVariable("BROWSE_REMOTE_LDAP"))
+      {
+	if (remote_protocols[0])
+	  strcat(remote_protocols, " ldap");
+	else
+	  strcat(remote_protocols, "ldap");
+      }
+#endif /* HAVE_LDAP */
+
+#ifdef HAVE_LIBSLP
+      if (cgiGetVariable("BROWSE_REMOTE_SLP"))
+      {
+	if (remote_protocols[0])
+	  strcat(remote_protocols, " slp");
+	else
+	  strcat(remote_protocols, "slp");
+      }
+#endif /* HAVE_SLP */
+    }
 
    /*
     * Get the current server settings...
@@ -1449,8 +1545,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       strlcpy(default_auth_type, "Negotiate", sizeof(default_auth_type));
     else
     {
-      const char *val = cupsGetOption("DefaultAuthType", num_settings,
-                                      settings);
+      val = cupsGetOption("DefaultAuthType", num_settings, settings);
 
       if (val && !strcasecmp(val, "Negotiate"))
         strlcpy(default_auth_type, "Basic", sizeof(default_auth_type));
@@ -1465,23 +1560,44 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     * See if the settings have changed...
     */
 
-    if (strcmp(debug_logging, cupsGetOption(CUPS_SERVER_DEBUG_LOGGING,
-                                            num_settings, settings)) ||
-        strcmp(remote_admin, cupsGetOption(CUPS_SERVER_REMOTE_ADMIN,
-                                           num_settings, settings)) ||
-        strcmp(remote_any, cupsGetOption(CUPS_SERVER_REMOTE_ANY,
-                                         num_settings, settings)) ||
-        strcmp(remote_printers, cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS,
-                                              num_settings, settings)) ||
-        strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
-                                             num_settings, settings)) ||
+    changed = strcmp(debug_logging, cupsGetOption(CUPS_SERVER_DEBUG_LOGGING,
+                                                  num_settings, settings)) ||
+	      strcmp(remote_admin, cupsGetOption(CUPS_SERVER_REMOTE_ADMIN,
+						 num_settings, settings)) ||
+	      strcmp(remote_any, cupsGetOption(CUPS_SERVER_REMOTE_ANY,
+					       num_settings, settings)) ||
+	      strcmp(remote_printers, cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS,
+						    num_settings, settings)) ||
+	      strcmp(share_printers, cupsGetOption(CUPS_SERVER_SHARE_PRINTERS,
+						   num_settings, settings)) ||
 #ifdef HAVE_GSSAPI
-        !cupsGetOption("DefaultAuthType", num_settings, settings) ||
-	strcmp(default_auth_type, cupsGetOption("DefaultAuthType",
-	                                        num_settings, settings)) ||
+	      !cupsGetOption("DefaultAuthType", num_settings, settings) ||
+	      strcmp(default_auth_type, cupsGetOption("DefaultAuthType",
+						      num_settings, settings)) ||
 #endif /* HAVE_GSSAPI */
-        strcmp(user_cancel_any, cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY,
-                                              num_settings, settings)))
+	      strcmp(user_cancel_any, cupsGetOption(CUPS_SERVER_USER_CANCEL_ANY,
+						    num_settings, settings));
+
+    if (advanced && !changed)
+      changed = cupsGetOption("BrowseLocalProtocols", num_settings, settings) ||
+	        strcasecmp(local_protocols,
+		           CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS) ||
+		cupsGetOption("BrowseRemoteProtocols", num_settings,
+		              settings) ||
+		strcasecmp(remote_protocols,
+		           CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS) ||
+		cupsGetOption("BrowseWebIF", num_settings, settings) ||
+		strcasecmp(browse_web_if, "No") ||
+		cupsGetOption("PreserveJobHistory", num_settings, settings) ||
+		strcasecmp(preserve_job_history, "Yes") ||
+		cupsGetOption("PreserveJobFiles", num_settings, settings) ||
+		strcasecmp(preserve_job_files, "No") ||
+		cupsGetOption("MaxJobs", num_settings, settings) ||
+		strcasecmp(max_jobs, "500") ||
+		cupsGetOption("MaxLogSize", num_settings, settings) ||
+		strcasecmp(max_log_size, "1m");
+
+    if (changed)
     {
      /*
       * Settings *have* changed, so save the changes...
@@ -1506,6 +1622,43 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       num_settings = cupsAddOption("DefaultAuthType", default_auth_type,
                                    num_settings, &settings);
 #endif /* HAVE_GSSAPI */
+
+      if (advanced)
+      {
+       /*
+        * Add advanced settings...
+	*/
+
+	if (cupsGetOption("BrowseLocalProtocols", num_settings, settings) ||
+	    strcasecmp(local_protocols, CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS))
+	  num_settings = cupsAddOption("BrowseLocalProtocols", local_protocols,
+				       num_settings, &settings);
+	if (cupsGetOption("BrowseRemoteProtocols", num_settings, settings) ||
+	    strcasecmp(remote_protocols, CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS))
+	  num_settings = cupsAddOption("BrowseRemoteProtocols", remote_protocols,
+				       num_settings, &settings);
+	if (cupsGetOption("BrowseWebIF", num_settings, settings) ||
+	    strcasecmp(browse_web_if, "No"))
+	  num_settings = cupsAddOption("BrowseWebIF", browse_web_if,
+				       num_settings, &settings);
+	if (cupsGetOption("PreserveJobHistory", num_settings, settings) ||
+	    strcasecmp(preserve_job_history, "Yes"))
+	  num_settings = cupsAddOption("PreserveJobHistory",
+	                               preserve_job_history, num_settings,
+				       &settings);
+	if (cupsGetOption("PreserveJobFiles", num_settings, settings) ||
+	    strcasecmp(preserve_job_files, "No"))
+	  num_settings = cupsAddOption("PreserveJobFiles", preserve_job_files,
+	                               num_settings, &settings);
+        if (cupsGetOption("MaxJobs", num_settings, settings) ||
+	    strcasecmp(max_jobs, "500"))
+	  num_settings = cupsAddOption("MaxJobs", max_jobs, num_settings,
+	                               &settings);
+        if (cupsGetOption("MaxLogSize", num_settings, settings) ||
+	    strcasecmp(max_log_size, "1m"))
+	  num_settings = cupsAddOption("MaxLogSize", max_log_size, num_settings,
+	                               &settings);
+      }
 
       if (!cupsAdminSetServerSettings(http, num_settings, settings))
       {
@@ -2357,6 +2510,89 @@ do_menu(http_t *http)			/* I - HTTP connection */
                            settings)) != NULL && !strcasecmp(val, "Negotiate"))
     cgiSetVariable("KERBEROS", "CHECKED");
 #endif /* HAVE_GSSAPI */
+
+#ifdef HAVE_DNSSD
+  cgiSetVariable("HAVE_DNSSD", "1");
+#endif /* HAVE_DNSSD */
+
+#ifdef HAVE_LDAP
+  cgiSetVariable("HAVE_LDAP", "1");
+#endif /* HAVE_LDAP */
+
+#ifdef HAVE_LIBSLP
+  cgiSetVariable("HAVE_LIBSLP", "1");
+#endif /* HAVE_LIBSLP */
+
+  if ((val = cupsGetOption("BrowseRemoteProtocols", num_settings,
+                           settings)) == NULL)
+    if ((val = cupsGetOption("BrowseProtocols", num_settings,
+                           settings)) == NULL)
+      val = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
+
+  if (strstr(val, "cups") || strstr(val, "CUPS"))
+    cgiSetVariable("BROWSE_REMOTE_CUPS", "CHECKED");
+
+  if (strstr(val, "ldap") || strstr(val, "LDAP"))
+    cgiSetVariable("BROWSE_REMOTE_LDAP", "CHECKED");
+
+  if (strstr(val, "slp") || strstr(val, "SLP"))
+    cgiSetVariable("BROWSE_REMOTE_SLP", "CHECKED");
+
+  if ((val = cupsGetOption("BrowseLocalProtocols", num_settings,
+                           settings)) == NULL)
+    if ((val = cupsGetOption("BrowseProtocols", num_settings,
+                           settings)) == NULL)
+      val = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
+
+  if (strstr(val, "cups") || strstr(val, "CUPS"))
+    cgiSetVariable("BROWSE_LOCAL_CUPS", "CHECKED");
+
+  if (strstr(val, "dnssd") || strstr(val, "DNSSD") ||
+      strstr(val, "dns-sd") || strstr(val, "DNS-SD") ||
+      strstr(val, "bonjour") || strstr(val, "BONJOUR"))
+    cgiSetVariable("BROWSE_LOCAL_DNSSD", "CHECKED");
+
+  if (strstr(val, "ldap") || strstr(val, "LDAP"))
+    cgiSetVariable("BROWSE_LOCAL_LDAP", "CHECKED");
+
+  if (strstr(val, "slp") || strstr(val, "SLP"))
+    cgiSetVariable("BROWSE_LOCAL_SLP", "CHECKED");
+
+  if ((val = cupsGetOption("BrowseWebIF", num_settings,
+                           settings)) == NULL)
+    val = "No";
+
+  if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
+      !strcasecmp(val, "true"))
+    cgiSetVariable("BROWSE_WEB_IF", "CHECKED");
+
+  if ((val = cupsGetOption("PreserveJobHistory", num_settings,
+                           settings)) == NULL)
+    val = "Yes";
+
+  if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
+      !strcasecmp(val, "true"))
+  {
+    cgiSetVariable("PRESERVE_JOB_HISTORY", "CHECKED");
+
+    if ((val = cupsGetOption("PreserveJobFiles", num_settings,
+			     settings)) == NULL)
+      val = "No";
+
+    if (!strcasecmp(val, "yes") || !strcasecmp(val, "on") ||
+	!strcasecmp(val, "true"))
+      cgiSetVariable("PRESERVE_JOB_FILES", "CHECKED");
+  }
+
+  if ((val = cupsGetOption("MaxJobs", num_settings, settings)) == NULL)
+    val = "500";
+
+  cgiSetVariable("MAX_JOBS", val);
+
+  if ((val = cupsGetOption("MaxLogSize", num_settings, settings)) == NULL)
+    val = "1m";
+
+  cgiSetVariable("MAX_LOG_SIZE", val);
 
   cupsFreeOptions(num_settings, settings);
 
