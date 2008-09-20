@@ -1201,8 +1201,12 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
                  NULL, cgiGetVariable("PRINTER_INFO"));
 
     if (!file)
-      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
-                   NULL, cgiGetVariable("PPD_NAME"));
+    {
+      var = cgiGetVariable("PPD_NAME");
+      if (strcmp(var, "__no_change__"))
+	ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME, "ppd-name",
+		     NULL, var);
+    }
 
     strlcpy(uri, cgiGetVariable("DEVICE_URI"), sizeof(uri));
 

@@ -4,6 +4,8 @@ CHANGES.txt - 2008-09-19
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The web interface's "modify printer" pages now make it
+	  easier to change just one setting (STR #1919)
 	- The scheduler now supports a plist PrintcapFormat.
 	- The scheduler now supports multiple addresses in Allow and
 	  Deny lines, just like Apache (STR #2947)

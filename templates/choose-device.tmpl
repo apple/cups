@@ -1,11 +1,22 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Add Printer}</H2>
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
 
 <TABLE>
+{op=add-printer?:<TR>
+<TH CLASS="label">Current Connection:</TH>
+<TD><INPUT TYPE="RADIO" NAME="DEVICE_URI" VALUE="{current_device_uri}" CHECKED>
+{current_device_uri}</TD>
+</TR>:}
+<TR>
 <TH CLASS="label">Local Printers:</TH>
 <TD>
-{[device_uri]{device_class!network?<INPUT TYPE="radio" NAME="DEVICE_URI"
-VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{[device_uri]{device_class!network?<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
 {device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
 :}}
 </TD>
@@ -13,8 +24,8 @@ VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {
 <TR>
 <TH CLASS="label">Discovered Network Printers:</TH>
 <TD>
-{[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="radio" NAME="DEVICE_URI"
-VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
 {device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
 :}:}}
 </TD>
@@ -23,8 +34,8 @@ VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {
 <TR>
 <TH CLASS="label">Other Network Printers:</TH>
 <TD>
-{[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="radio" NAME="DEVICE_URI"
-VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {?current_device_uri={device_uri}?CHECKED:{current_device_scheme={device_uri}?CHECKED:}}>
+{[device_uri]{device_class=network?{device_uri~[a-z]+://?:<INPUT TYPE="RADIO" NAME="DEVICE_URI"
+VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}">
 {device_info} {?device_make_and_model!Unknown?({device_make_and_model}):}<BR>
 }:}}
 </TD>
@@ -36,3 +47,4 @@ VALUE="{device_uri}{?device_make_and_model!Unknown?|{device_make_and_model}:}" {
 </TABLE>
 
 </FORM>
+</DIV>

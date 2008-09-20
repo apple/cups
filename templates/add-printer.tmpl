@@ -1,13 +1,13 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Add Printer</H2>
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {?current_make!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE" VALUE="{current_make}">:}
 {?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}
 
 <TABLE>
-<TR>
-<TH CLASS="label">Connection:</TH>
-<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
-</TR>
 <TR>
 <TH CLASS="label">Name:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_NAME" SIZE="40" MAXLENGTH="127" VALUE="{?template_name}"><BR>
@@ -24,6 +24,10 @@
 <SMALL>(Human-readable location such as "Lab 1")</SMALL></TD>
 </TR>
 <TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
+</TR>
+<TR>
 <TH CLASS="label">Sharing:</TH>
 <TD><INPUT TYPE="CHECKBOX" NAME="PRINTER_IS_SHARED" {PRINTER_IS_SHARED=1?CHECKED:}">
 Share This Printer</TD>
@@ -35,3 +39,4 @@ Share This Printer</TD>
 </TABLE>
 
 </FORM>
+</DIV>

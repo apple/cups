@@ -1,19 +1,18 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Modify Class {printer_name}</H2>
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 
 <TABLE>
 <TR>
-<TH CLASS="label">Name:</TH>
-<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
-{printer_name}</TD>
+<TH CLASS="label">Description:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
 <TH CLASS="label">Location:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
-</TR>
-<TR>
-<TH CLASS="label">Description:</TH>
-<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
 </TR>
 <TR>
 <TH CLASS="label">Members:</TH>
@@ -30,3 +29,4 @@
 </TABLE>
 
 </FORM>
+</DIV>
