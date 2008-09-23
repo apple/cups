@@ -1036,11 +1036,13 @@ static Boolean list_device_cb(void *refcon,
 
       modelstr[0] = '/';
 
-      if (!CFStringGetCString(make, makestr, sizeof(makestr),
+      if (!make ||
+          !CFStringGetCString(make, makestr, sizeof(makestr),
 			      kCFStringEncodingUTF8))
         strcpy(makestr, "Unknown");
 
-      if (!CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
+      if (!model ||
+          !CFStringGetCString(model, &modelstr[1], sizeof(modelstr)-1,
 			      kCFStringEncodingUTF8))
         strcpy(modelstr + 1, "Printer");
 
@@ -1193,18 +1195,10 @@ static void copy_deviceinfo(CFStringRef deviceIDString,
   CFStringRef serialKeys[] = { CFSTR("SN:"),  CFSTR("SERN:"), NULL };
 
   if (make != NULL)
-  {
-    if ((*make = copy_value_for_key(deviceIDString, makeKeys)) == NULL)
-      *make = CFStringCreateWithCString(kCFAllocatorDefault, "Unknown",
-                                        kCFStringEncodingUTF8);
-  }
+    *make = copy_value_for_key(deviceIDString, makeKeys);
 
   if (model != NULL)
-  {
-    if ((*model = copy_value_for_key(deviceIDString, modelKeys)) == NULL)
-      *model = CFStringCreateWithCString(kCFAllocatorDefault, "Printer",
-                                         kCFStringEncodingUTF8);
-  }
+    *model = copy_value_for_key(deviceIDString, modelKeys);
 
   if (serial != NULL)
     *serial = copy_value_for_key(deviceIDString, serialKeys);
