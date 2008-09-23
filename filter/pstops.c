@@ -1820,8 +1820,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	*/
 
         if (doc->number_up == 1 && !doc->fitplot)
-	  doc->num_options = include_feature(ppd, line, num_options,
-                                             &options);
+	  num_options = include_feature(ppd, line, num_options, &options);
       }
       else if (strncmp(line, "%%BeginSetup", 12))
         doc_write(doc, line, linelen);
