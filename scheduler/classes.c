@@ -430,8 +430,11 @@ cupsdLoadAllClasses(void)
     else if (!strcasecmp(line, "Printer"))
     {
       if (!value)
+      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);
+        continue;
+      }
       else if ((temp = cupsdFindPrinter(value)) == NULL)
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
