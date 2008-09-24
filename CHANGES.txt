@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-09-20
+CHANGES.txt - 2008-09-24
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The "set printer options" page now supports auto-configuration
+	  of printer options (STR #1440)
 	- The web interface now provides an advanced server settings
 	  form.
 	- The web interface's "modify printer" pages now make it

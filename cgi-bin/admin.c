@@ -910,7 +910,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       */
 
       if (strncmp(attr->values[0].string.text, var, strlen(var)) == 0)
-	cgiSetVariable("DEVICE_URI", attr->values[0].string.text);
+	cgiSetVariable("CURRENT_DEVICE_URI", attr->values[0].string.text);
     }
 
    /*
@@ -957,7 +957,15 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       */
 
       if (oldinfo)
-	cgiSetIPPVars(oldinfo, NULL, NULL, NULL, 0);
+      {
+        if ((attr = ippFindAttribute(oldinfo, "printer-info",
+	                             IPP_TAG_TEXT)) != NULL)
+          cgiSetVariable("PRINTER_INFO", attr->values[0].string.text);
+
+        if ((attr = ippFindAttribute(oldinfo, "printer-location",
+	                             IPP_TAG_TEXT)) != NULL)
+          cgiSetVariable("PRINTER_LOCATION", attr->values[0].string.text);
+      }
 
       cgiCopyTemplateLang("modify-printer.tmpl");
     }
@@ -3041,7 +3049,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
   ppd_option_t	*option;		/* Option */
   ppd_coption_t	*coption;		/* Custom option */
   ppd_cparam_t	*cparam;		/* Custom parameter */
-  ppd_attr_t	*protocol;		/* cupsProtocol attribute */
+  ppd_attr_t	*ppdattr;		/* PPD attribute */
   const char	*title;			/* Page title */
 
 
@@ -3068,6 +3076,67 @@ do_set_options(http_t *http,		/* I - HTTP connection */
   }
 
   fprintf(stderr, "DEBUG: printer=\"%s\", uri=\"%s\"...\n", printer, uri);
+
+ /*
+  * If the user clicks on the Auto-Configure button, send an AutoConfigure
+  * command file to the printer...
+  */
+
+  if (cgiGetVariable("AUTOCONFIGURE"))
+  {
+    int			job_id;		/* Command file job */
+    char		refresh[1024];	/* Refresh URL */
+    http_status_t	status;		/* Document status */
+    static const char	*autoconfigure =/* Command file */
+			"#CUPS-COMMAND\n"
+			"AutoConfigure\n";
+
+
+    if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, printer, "Auto-Configure",
+                                0, NULL)) < 1)
+    {
+      cgiSetVariable("ERROR", cgiText(_("Unable to send auto-configure command "
+                                        "to printer driver!")));
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+      return;
+    }
+
+    status = cupsStartDocument(CUPS_HTTP_DEFAULT, printer, job_id,
+                               "AutoConfigure.command", CUPS_FORMAT_COMMAND, 1);
+    if (status == HTTP_CONTINUE)
+      status = cupsWriteRequestData(CUPS_HTTP_DEFAULT, autoconfigure,
+                                    strlen(autoconfigure));
+    if (status == HTTP_CONTINUE)
+      cupsFinishDocument(CUPS_HTTP_DEFAULT, printer);
+
+    if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
+    {
+      cgiSetVariable("ERROR", cupsLastErrorString());
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("error.tmpl");
+      cgiEndHTML();
+
+      cupsCancelJob(job_id);
+      return;
+    }
+
+   /*
+    * Redirect successful updates back to the printer page...
+    */
+
+    cgiFormEncode(uri, printer, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=/%s/%s",
+	     is_class ? "classes" : "printers", uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    cgiStartHTML(title);
+
+    cgiCopyTemplateLang("printer-configured.tmpl");
+    cgiEndHTML();
+    return;
+  }
 
  /*
   * Get the PPD file...
@@ -3125,6 +3194,23 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     */
 
     fputs("DEBUG: Showing options...\n", stderr);
+
+    if (ppd)
+    {
+      if (ppd->num_filters == 0 ||
+          ((ppdattr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
+           ppdattr->value && strstr(ppdattr->value, "AutoConfigure")))
+        cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
+      else 
+      {
+        for (i = 0; i < ppd->num_filters; i ++)
+	  if (!strncmp(ppd->filters[i], "application/vnd.cups-postscript", 31))
+	  {
+	    cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
+	    break;
+	  }
+      }
+    }
 
     cgiStartHTML(cgiText(_("Set Printer Options")));
     cgiCopyTemplateLang("set-printer-options-header.tmpl");
@@ -3458,7 +3544,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
     if (ppd && ppd->protocols && strstr(ppd->protocols, "BCP"))
     {
-      protocol = ppdFindAttr(ppd, "cupsProtocol", NULL);
+      ppdattr = ppdFindAttr(ppd, "cupsProtocol", NULL);
 
       cgiSetVariable("GROUP", cgiText(_("PS Binary Protocol")));
       cgiCopyTemplateLang("option-header.tmpl");
@@ -3481,7 +3567,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
       cgiSetVariable("KEYWORD", "protocol");
       cgiSetVariable("KEYTEXT", cgiText(_("PS Binary Protocol")));
-      cgiSetVariable("DEFCHOICE", protocol ? protocol->value : "None");
+      cgiSetVariable("DEFCHOICE", ppdattr ? ppdattr->value : "None");
 
       cgiCopyTemplateLang("option-pickone.tmpl");
 
