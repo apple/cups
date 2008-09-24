@@ -200,13 +200,11 @@ DIV.figure CAPTION {
 }
 
 TH.label {
-  padding-top: 5pt;
   text-align: right;
   vertical-align: top;
 }
 
 TH.sublabel {
-  padding-top: 0pt;
   text-align: right;
   font-weight: normal;
 }

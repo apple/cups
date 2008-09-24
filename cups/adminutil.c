@@ -1566,27 +1566,33 @@ _cupsAdminSetServerSettings(
 	  {
 	    cupsFilePuts(temp, "BrowseAllow all\n");
 
-	    if (!remotep || !*remotep)
-	      cupsFilePuts(temp, "BrowseRemoteProtocols "
-	                         CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS "\n");
-            else if (remotep)
-	      cupsFilePrintf(temp, "BrowseRemoteProtocols %s\n", remotep);
+	    if (!remotep)
+	      remotep = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
+
+	    cupsFilePrintf(temp, "BrowseRemoteProtocols %s\n", remotep);
           }
 	  else
 	    cupsFilePuts(temp, "BrowseRemoteProtocols\n");
+
+	  cupsd_num_settings = cupsAddOption("BrowseRemoteProtocols", remotep,
+					     cupsd_num_settings,
+					     &cupsd_settings);
 
 	  if (new_share_printers)
 	  {
 	    cupsFilePuts(temp, "BrowseAddress @LOCAL\n");
 
-	    if (!localp || !*localp)
-	      cupsFilePuts(temp, "BrowseLocalProtocols "
-	                         CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS "\n");
-            else if (localp)
-	      cupsFilePrintf(temp, "BrowseLocalProtocols %s\n", localp);
+	    if (!localp)
+	      localp = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
+
+	    cupsFilePrintf(temp, "BrowseLocalProtocols %s\n", localp);
 	  }
 	  else
 	    cupsFilePuts(temp, "BrowseLocalProtocols\n");
+
+	  cupsd_num_settings = cupsAddOption("BrowseLocalProtocols", localp,
+					     cupsd_num_settings,
+					     &cupsd_settings);
         }
 	else
 	{

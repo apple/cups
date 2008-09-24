@@ -1,5 +1,5 @@
 /*
- * "$Id: pstops.c 7886 2008-08-29 01:51:57Z mike $"
+ * "$Id: pstops.c 7977 2008-09-23 23:44:33Z mike $"
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
@@ -16,32 +16,36 @@
  *
  * Contents:
  *
- *   main()               - Main entry...
- *   add_page()           - Add a page to the pages array...
+ *   main()               - Main entry.
+ *   add_page()           - Add a page to the pages array.
  *   cancel_job()         - Flag the job as canceled.
  *   check_range()        - Check to see if the current page is selected for
- *   copy_bytes()         - Copy bytes from the input file to stdout...
- *   copy_comments()      - Copy all of the comments section...
- *   copy_dsc()           - Copy a DSC-conforming document...
- *   copy_non_dsc()       - Copy a document that does not conform to the DSC...
- *   copy_page()          - Copy a page description...
- *   copy_prolog()        - Copy the document prolog section...
- *   copy_setup()         - Copy the document setup section...
- *   copy_trailer()       - Copy the document trailer...
- *   do_prolog()          - Send the necessary document prolog commands...
- *   do_setup()           - Send the necessary document setup commands...
+ *                          printing.
+ *   copy_bytes()         - Copy bytes from the input file to stdout.
+ *   copy_comments()      - Copy all of the comments section.
+ *   copy_dsc()           - Copy a DSC-conforming document.
+ *   copy_non_dsc()       - Copy a document that does not conform to the DSC.
+ *   copy_page()          - Copy a page description.
+ *   copy_prolog()        - Copy the document prolog section.
+ *   copy_setup()         - Copy the document setup section.
+ *   copy_trailer()       - Copy the document trailer.
+ *   do_prolog()          - Send the necessary document prolog commands.
+ *   do_setup()           - Send the necessary document setup commands.
  *   doc_printf()         - Send a formatted string to stdout and/or the temp
  *                          file.
  *   doc_puts()           - Send a nul-terminated string to stdout and/or the
  *                          temp file.
  *   doc_write()          - Send data to stdout and/or the temp file.
- *   end_nup()            - End processing for N-up printing...
+ *   end_nup()            - End processing for N-up printing.
  *   include_feature()    - Include a printer option/feature command.
- *   parse_text()         - Parse a text value in a comment...
- *   set_pstops_options() - Set pstops options...
- *   skip_page()          - Skip past a page that won't be printed...
- *   start_nup()          - Start processing for N-up printing...
+ *   parse_text()         - Parse a text value in a comment.
+ *   set_pstops_options() - Set pstops options.
+ *   skip_page()          - Skip past a page that won't be printed.
+ *   start_nup()          - Start processing for N-up printing.
+ *   write_label_prolog() - Write the prolog with the classification and page
+ *                          label.
  *   write_labels()       - Write the actual page labels.
+ *   write_options()      - Write options provided via %%IncludeFeature.
  */
 
 /*
@@ -211,10 +215,12 @@ static void		write_label_prolog(pstops_doc_t *doc, const char *label,
 			                   float bottom, float top,
 					   float width);
 static void		write_labels(pstops_doc_t *doc, int orient);
+static void		write_options(pstops_doc_t  *doc, ppd_file_t *ppd,
+			              int num_options, cups_option_t *options);
 
 
 /*
- * 'main()' - Main entry...
+ * 'main()' - Main entry.
  */
 
 int					/* O - Exit status */
@@ -412,7 +418,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
- * 'add_page()' - Add a page to the pages array...
+ * 'add_page()' - Add a page to the pages array.
  */
 
 static pstops_page_t *			/* O - New page info object */
@@ -530,7 +536,7 @@ check_range(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * 'copy_bytes()' - Copy bytes from the input file to stdout...
+ * 'copy_bytes()' - Copy bytes from the input file to stdout.
  */
 
 static void
@@ -575,7 +581,7 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_comments()' - Copy all of the comments section...
+ * 'copy_comments()' - Copy all of the comments section.
  *
  * This function expects "line" to be filled with a comment line.
  * On return, "line" will contain the next line in the file, if any.
@@ -799,7 +805,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_dsc()' - Copy a DSC-conforming document...
+ * 'copy_dsc()' - Copy a DSC-conforming document.
  *
  * This function expects "line" to be filled with the %!PS-Adobe comment line.
  */
@@ -1059,7 +1065,7 @@ copy_dsc(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_non_dsc()' - Copy a document that does not conform to the DSC...
+ * 'copy_non_dsc()' - Copy a document that does not conform to the DSC.
  *
  * This function expects "line" to be filled with the %! comment line.
  */
@@ -1239,7 +1245,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_page()' - Copy a page description...
+ * 'copy_page()' - Copy a page description.
  *
  * This function expects "line" to be filled with a %%Page comment line.
  * On return, "line" will contain the next line in the file, if any.
@@ -1565,53 +1571,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
 
     if (pageinfo->num_options > 0)
-    {
-      int		i;		/* Looping var */
-      ppd_option_t	*option;	/* PPD option */
-      int		min_order;	/* Minimum OrderDependency value */
-      char		*doc_setup,	/* DocumentSetup commands to send */
-			*any_setup;	/* AnySetup commands to send */
-
-
-     /*
-      * Yes, figure out the minimum OrderDependency value...
-      */
-
-      if ((option = ppdFindOption(ppd, "PageRegion")) != NULL)
-	min_order = option->order;
-      else
-	min_order = 999.0f;
-
-      for (i = 0; i < pageinfo->num_options; i ++)
-	if ((option = ppdFindOption(ppd, pageinfo->options[i].name)) != NULL &&
-            option->order < min_order)
-          min_order = option->order;
-
-     /*
-      * Mark and extract them...
-      */
-
-      cupsMarkOptions(ppd, pageinfo->num_options, pageinfo->options);
-
-      doc_setup = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, min_order);
-      any_setup = ppdEmitString(ppd, PPD_ORDER_ANY, min_order);
-
-     /*
-      * Then send them out...
-      */
-
-      if (doc_setup)
-      {
-	doc_puts(doc, doc_setup);
-	free(doc_setup);
-      }
-
-      if (any_setup)
-      {
-	doc_puts(doc, any_setup);
-	free(any_setup);
-      }
-    }
+      write_options(doc, ppd, pageinfo->num_options, pageinfo->options);
 
    /*
     * Output commands for the current page...
@@ -1757,7 +1717,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_prolog()' - Copy the document prolog section...
+ * 'copy_prolog()' - Copy the document prolog section.
  *
  * This function expects "line" to be filled with a %%BeginProlog comment line.
  * On return, "line" will contain the next line in the file, if any.
@@ -1811,7 +1771,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_setup()' - Copy the document setup section...
+ * 'copy_setup()' - Copy the document setup section.
  *
  * This function expects "line" to be filled with a %%BeginSetup comment line.
  * On return, "line" will contain the next line in the file, if any.
@@ -1825,6 +1785,10 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	   ssize_t      linelen,	/* I - Length of initial line */
 	   size_t       linesize)	/* I - Size of line buffer */
 {
+  int		num_options;		/* Number of options */
+  cups_option_t	*options;		/* Options */
+
+
   while (strncmp(line, "%%BeginSetup", 12))
   {
     if (!strncmp(line, "%%Page:", 7))
@@ -1838,6 +1802,11 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 
   doc_puts(doc, "%%BeginSetup\n");
   
+  do_setup(doc, ppd);
+
+  num_options = 0;
+  options     = NULL;
+
   if (!strncmp(line, "%%BeginSetup", 12))
   {
     while (strncmp(line, "%%EndSetup", 10))
@@ -1851,8 +1820,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 	*/
 
         if (doc->number_up == 1 && !doc->fitplot)
-	  doc->num_options = include_feature(ppd, line, doc->num_options,
-                                             &(doc->options));
+	  num_options = include_feature(ppd, line, num_options, &options);
       }
       else if (strncmp(line, "%%BeginSetup", 12))
         doc_write(doc, line, linelen);
@@ -1867,7 +1835,11 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
       fputs(_("ERROR: Missing %%EndSetup!\n"), stderr);
   }
 
-  do_setup(doc, ppd);
+  if (num_options > 0)
+  {
+    write_options(doc, ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+  }
 
   doc_puts(doc, "%%EndSetup\n");
 
@@ -1876,7 +1848,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'copy_trailer()' - Copy the document trailer...
+ * 'copy_trailer()' - Copy the document trailer.
  *
  * This function expects "line" to be filled with a %%Trailer comment line.
  * On return, "line" will contain the next line in the file, if any.
@@ -1925,7 +1897,7 @@ copy_trailer(cups_file_t  *fp,		/* I - File to read from */
 
 
 /*
- * 'do_prolog()' - Send the necessary document prolog commands...
+ * 'do_prolog()' - Send the necessary document prolog commands.
  */
 
 static void
@@ -1964,7 +1936,7 @@ do_prolog(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * 'do_setup()' - Send the necessary document setup commands...
+ * 'do_setup()' - Send the necessary document setup commands.
  */
 
 static void
@@ -1983,7 +1955,7 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   doc_puts(doc, "userdict dup(\\004)cvn{}put (\\004\\004)cvn{}put\n");
 
  /*
-  * Mark any options from %%IncludeFeature: comments...
+  * Mark job options...
   */
 
   cupsMarkOptions(ppd, doc->num_options, doc->options);
@@ -2147,7 +2119,7 @@ doc_write(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * 'end_nup()' - End processing for N-up printing...
+ * 'end_nup()' - End processing for N-up printing.
  */
 
 static void
@@ -2273,7 +2245,7 @@ include_feature(
 
 
 /*
- * 'parse_text()' - Parse a text value in a comment...
+ * 'parse_text()' - Parse a text value in a comment.
  *
  * This function parses a DSC text value as defined on page 36 of the
  * DSC specification.  Text values are either surrounded by parenthesis
@@ -2362,7 +2334,7 @@ parse_text(const char *start,		/* I - Start of text value */
 
 
 /*
- * 'set_pstops_options()' - Set pstops options...
+ * 'set_pstops_options()' - Set pstops options.
  */
 
 static void
@@ -2757,7 +2729,7 @@ set_pstops_options(
 
 
 /*
- * 'skip_page()' - Skip past a page that won't be printed...
+ * 'skip_page()' - Skip past a page that won't be printed.
  */
 
 static ssize_t				/* O - Length of next line */
@@ -2819,7 +2791,7 @@ skip_page(cups_file_t *fp,		/* I - File to read from */
 
 
 /*
- * 'start_nup()' - Start processing for N-up printing...
+ * 'start_nup()' - Start processing for N-up printing.
  */
 
 static void
@@ -3411,5 +3383,64 @@ write_labels(pstops_doc_t *doc,		/* I - Document information */
 
 
 /*
- * End of "$Id: pstops.c 7886 2008-08-29 01:51:57Z mike $".
+ * 'write_options()' - Write options provided via %%IncludeFeature.
+ */
+
+static void
+write_options(
+    pstops_doc_t  *doc,		/* I - Document */
+    ppd_file_t    *ppd,		/* I - PPD file */
+    int           num_options,	/* I - Number of options */
+    cups_option_t *options)	/* I - Options */
+{
+  int		i;		/* Looping var */
+  ppd_option_t	*option;	/* PPD option */
+  int		min_order;	/* Minimum OrderDependency value */
+  char		*doc_setup,	/* DocumentSetup commands to send */
+		*any_setup;	/* AnySetup commands to send */
+
+
+ /*
+  * Figure out the minimum OrderDependency value...
+  */
+
+  if ((option = ppdFindOption(ppd, "PageRegion")) != NULL)
+    min_order = option->order;
+  else
+    min_order = 999.0f;
+
+  for (i = 0; i < num_options; i ++)
+    if ((option = ppdFindOption(ppd, options[i].name)) != NULL &&
+	option->order < min_order)
+      min_order = option->order;
+
+ /*
+  * Mark and extract them...
+  */
+
+  cupsMarkOptions(ppd, num_options, options);
+
+  doc_setup = ppdEmitString(ppd, PPD_ORDER_DOCUMENT, min_order);
+  any_setup = ppdEmitString(ppd, PPD_ORDER_ANY, min_order);
+
+ /*
+  * Then send them out...
+  */
+
+  if (doc_setup)
+  {
+    doc_puts(doc, doc_setup);
+    free(doc_setup);
+  }
+
+  if (any_setup)
+  {
+    doc_puts(doc, any_setup);
+    free(any_setup);
+  }
+}
+
+
+/*
+ * End of "$Id: pstops.c 7977 2008-09-23 23:44:33Z mike $".
  */

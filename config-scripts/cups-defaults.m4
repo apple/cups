@@ -286,7 +286,7 @@ if test x$default_printcap != xno; then
 		case $uname in
 			Darwin*)
 				if test $uversion -ge 90; then
-					CUPS_DEFAULT_PRINTCAP=""
+					CUPS_DEFAULT_PRINTCAP="/Library/Preferences/org.cups.printers.plist"
 				else
 					CUPS_DEFAULT_PRINTCAP="/etc/printcap"
 				fi
@@ -305,6 +305,7 @@ else
 	CUPS_DEFAULT_PRINTCAP=""
 fi
 
+AC_SUBST(CUPS_DEFAULT_PRINTCAP)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTCAP, "$CUPS_DEFAULT_PRINTCAP")
 
 dnl Default LPD config file...

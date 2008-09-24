@@ -1,18 +1,19 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Add Printer}</H2>
+
 <FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+{printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
 <INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
 <INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">
 <INPUT TYPE="HIDDEN" NAME="PARITY" VALUE="{?parity}">
 <INPUT TYPE="HIDDEN" NAME="FLOW" VALUE="{?flow}">
 <TABLE>
-<TR>
-<TH CLASS="label">Connection:</TH>
-<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
-</TR>
-<TR>
+{op=modify-printer?:<TR>
 <TH CLASS="label">Name:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
-</TR>
+</TR>}
 <TR>
 <TH CLASS="label">Description:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{printer_info}">{printer_info}</TD>
@@ -20,6 +21,10 @@
 <TR>
 <TH CLASS="label">Location:</TH>
 <TD><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="{printer_location}">{printer_location}</TD>
+</TR>
+<TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
 </TR>
 <TR>
 <TH CLASS="label">Sharing:</TH>
@@ -34,7 +39,8 @@
 <TH CLASS="label">Model:</TH>
 <TD>
 <SELECT NAME="PPD_NAME" SIZE="10">
-{[ppd_name]<OPTION VALUE="{ppd_name}" {?current_make_and_model={ppd_make_and_model}?SELECTED:}>{ppd_make_and_model} ({ppd_natural_language})
+{op=add-printer?:<OPTION VALUE="__no_change__" SELECTED>Current Driver - {current_make_and_model}</OPTION>:}
+{[ppd_name]<OPTION VALUE="{ppd_name}" {op=modify-printer?:{?current_make_and_model={ppd_make_and_model}?SELECTED:}}>{ppd_make_and_model} ({ppd_natural_language})
 }</SELECT>
 </TD>
 </TR>
@@ -50,3 +56,4 @@ TYPE="FILE" NAME="PPD_FILE"></TD>
 </TABLE>
 
 </FORM>
+</DIV>

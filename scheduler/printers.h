@@ -59,6 +59,7 @@ typedef struct cupsd_printer_s
   time_t	browse_expire;		/* Expiration time for printer */
   time_t	browse_time;		/* Last time update was sent/received */
   char		*device_uri;		/* Device URI */
+  char		*sanitized_device_uri;	/* Sanitized device URI */
   char		*port_monitor;		/* Port monitor */
   int		raw;			/* Raw queue? */
   int		remote;			/* Remote queue? */
@@ -153,6 +154,7 @@ extern void		cupsdSaveAllPrinters(void);
 extern int		cupsdSetAuthInfoRequired(cupsd_printer_t *p,
 			                         const char *values,
 						 ipp_attribute_t *attr);
+extern void		cupsdSetDeviceURI(cupsd_printer_t *p, const char *uri);
 extern void		cupsdSetPrinterAttr(cupsd_printer_t *p,
 			                    const char *name, char *value);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);

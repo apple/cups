@@ -39,7 +39,37 @@
 
 <FORM METHOD="POST" ACTION="/admin">
 
-<P><B>Basic Server Settings:</B></P>
+{ADVANCEDSETTINGS?<P><B>Advanced Server Settings\:</B>
+(<A HREF="/admin/">Show Basic Settings</A>)</P>
+
+<P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
+<INPUT TYPE="HIDDEN" NAME="ADVANCEDSETTINGS" VALUE="YES">
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocols\:
+<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_CUPS" {?browse_remote_cups}> CUPS
+{HAVE_LDAP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_LDAP" {?browse_remote_ldap}> LDAP:}
+{HAVE_LIBSLP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_REMOTE_SLP" {?browse_remote_slp}> SLP:}<BR>
+<INPUT TYPE="CHECKBOX" NAME="SHARE_PRINTERS" {?share_printers}> Share printers connected to this system<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocols\:
+<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_CUPS" {?browse_local_cups}> CUPS
+{HAVE_DNSSD?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_DNSSD" {?browse_local_dnssd}> DNS-SD:}
+{HAVE_LDAP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_LDAP" {?browse_local_ldap}> LDAP:}
+{HAVE_LIBSLP?<INPUT TYPE="CHECKBOX" NAME="BROWSE_LOCAL_SLP" {?browse_local_slp}> SLP:}<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="REMOTE_ANY" {?remote_any}> Allow printing from the Internet<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="BROWSE_WEB_IF" {?browse_web_if}> Advertise web interface<BR>
+<INPUT TYPE="CHECKBOX" NAME="REMOTE_ADMIN" {?remote_admin}> Allow remote administration<BR>
+{have_gssapi?<INPUT TYPE="CHECKBOX" NAME="KERBEROS" {?kerberos}> Use Kerberos authentication (<A HREF="/help/kerberos.html?TOPIC=Getting+Started">FAQ</A>)<BR>:}
+<INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
+<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOB_HISTORY" {?preserve_job_history}> Preserve job history<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of jobs\:
+<INPUT TYPE="TEXT" NAME="MAX_JOBS" VALUE="{?max_jobs}" SIZE="6"><BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<INPUT TYPE="CHECKBOX" NAME="PRESERVE_JOB_FILES" {?preserve_job_files}> Preserve job print files<BR>
+<INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Max log file size\:
+<INPUT TYPE="TEXT" NAME="MAX_LOG_SIZE" VALUE="{?max_log_size}" SIZE="6"></P>
+
+:<P><B>Basic Server Settings:</B>
+(<A HREF="/admin/?ADVANCEDSETTINGS=YES">Show Advanced Settings</A>)</P>
 
 <P><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 <INPUT TYPE="CHECKBOX" NAME="REMOTE_PRINTERS" {?remote_printers}> Show printers shared by other systems<BR>
@@ -50,6 +80,7 @@
 <INPUT TYPE="CHECKBOX" NAME="USER_CANCEL_ANY" {?user_cancel_any}> Allow users to cancel any job (not just their own)<BR>
 <INPUT TYPE="CHECKBOX" NAME="DEBUG_LOGGING" {?debug_logging}> Save debugging information for troubleshooting</P>
 
+}
 <P><INPUT TYPE="SUBMIT" NAME="CHANGESETTINGS" VALUE="Change Settings"></P>
 
 </FORM>}

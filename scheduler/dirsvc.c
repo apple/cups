@@ -436,17 +436,13 @@ cupsdLoadRemoteCache(void)
         p = NULL;
       }
       else
-      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-        break;
-      }
     }
     else if (!p)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of remote.cache.", linenum);
-      break;
     }
     else if (!strcasecmp(line, "Info"))
     {
@@ -473,14 +469,11 @@ cupsdLoadRemoteCache(void)
 
 	cupsdSetString(&p->hostname, host);
 	cupsdSetString(&p->uri, value);
-	cupsdSetString(&p->device_uri, value);
+	cupsdSetDeviceURI(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Option") && value)
     {
@@ -501,6 +494,18 @@ cupsdLoadRemoteCache(void)
 	                               &(p->options));
       }
     }
+    else if (!strcasecmp(line, "Reason"))
+    {
+      if (value &&
+          p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+      {
+        p->reasons[p->num_reasons] = _cupsStrAlloc(value);
+	p->num_reasons ++;
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of remote.cache.", linenum);
+    }
     else if (!strcasecmp(line, "State"))
     {
      /*
@@ -512,11 +517,8 @@ cupsdLoadRemoteCache(void)
       else if (value && !strcasecmp(value, "stopped"))
         p->state = IPP_PRINTER_STOPPED;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "StateMessage"))
     {
@@ -544,22 +546,16 @@ cupsdLoadRemoteCache(void)
         	!strcasecmp(value, "false")))
         p->accepting = 0;
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "Type"))
     {
       if (value)
         p->type = atoi(value);
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "BrowseTime"))
     {
@@ -571,11 +567,8 @@ cupsdLoadRemoteCache(void)
           p->browse_expire = t;
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "JobSheets"))
     {
@@ -606,11 +599,8 @@ cupsdLoadRemoteCache(void)
 	}
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "AllowUser"))
     {
@@ -620,11 +610,8 @@ cupsdLoadRemoteCache(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else if (!strcasecmp(line, "DenyUser"))
     {
@@ -634,11 +621,8 @@ cupsdLoadRemoteCache(void)
         cupsdAddPrinterUser(p, value);
       }
       else
-      {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
-	break;
-      }
     }
     else
     {
@@ -794,8 +778,7 @@ cupsdSaveRemoteCache(void)
     if (printer->location)
       cupsFilePrintf(fp, "Location %s\n", printer->location);
 
-    if (printer->device_uri)
-      cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
 
     if (printer->state == IPP_PRINTER_STOPPED)
     {
@@ -804,6 +787,9 @@ cupsdSaveRemoteCache(void)
     }
     else
       cupsFilePuts(fp, "State Idle\n");
+
+    for (i = 0; i < printer->num_reasons; i ++)
+      cupsFilePrintf(fp, "Reason %s\n", printer->reasons[i]);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");
@@ -3113,6 +3099,9 @@ process_browse_data(
     else
       p = cupsdAddPrinter(name);
 
+    if (!p)
+      return;
+
     cupsdClearString(&(p->hostname));
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Added remote %s \"%s\"...",
@@ -3131,9 +3120,6 @@ process_browse_data(
 
     cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
   }
-
-  if (!p)
-    return;
 
   if (!p->hostname)
   {

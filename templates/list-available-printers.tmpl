@@ -1,3 +1,5 @@
+<DIV CLASS="indent">
+
 <H2 CLASS="title">Available Printers</H2>
 
 {#device_uri=0?<P>No printers found.</P>
@@ -5,3 +7,5 @@
 <LI><FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="HIDDEN" NAME="TEMPLATE_NAME" VALUE="{template_name}"><INPUT TYPE="HIDDEN" NAME="PRINTER_LOCATION" VALUE="Local Printer"><INPUT TYPE="HIDDEN" NAME="PRINTER_INFO" VALUE="{device_make_and_model}"><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}"><INPUT TYPE="SUBMIT" VALUE="Add This Printer"></FORM>
 {device_make_and_model} ({device_info})</LI>
 }</UL>}
+
+</DIV>

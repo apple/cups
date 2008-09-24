@@ -1,16 +1,13 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Modify {printer_name}</H2>
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-{?printer_make_and_model=?{?current_make_and_model!?<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{current_make_and_model}">:}:<INPUT TYPE="HIDDEN" NAME="CURRENT_MAKE_AND_MODEL" VALUE="{printer_make_and_model}">}
+<INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 
 <TABLE>
 <TR>
-<TH CLASS="label">Connection:</TH>
-<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
-</TR>
-<TR>
-<TH CLASS="label">Name:</TH>
-<TD><INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">{printer_name}</TD>
-</TR>
 <TH CLASS="label">Description:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"><BR>
 <SMALL>(Human-readable description such as "HP LaserJet with Duplexer")</SMALL></TD>
@@ -19,6 +16,10 @@
 <TH CLASS="label">Location:</TH>
 <TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"><BR>
 <SMALL>(Human-readable location such as "Lab 1")</SMALL></TD>
+</TR>
+<TR>
+<TH CLASS="label">Connection:</TH>
+<TD><INPUT TYPE="HIDDEN" NAME="DEVICE_URI" VALUE="{device_uri}">{device_uri}</TD>
 </TR>
 <TR>
 <TH CLASS="label">Sharing:</TH>
@@ -33,3 +34,4 @@ Share This Printer</TD>
 </TABLE>
 
 </FORM>
+</DIV>

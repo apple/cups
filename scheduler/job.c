@@ -2477,14 +2477,13 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   int			filterfds[2][2];/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
   char			**argv,		/* Filter command-line arguments */
-			sani_uri[1024],	/* Sanitized DEVICE_URI env var */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
 			jobid[255],	/* Job ID string */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 16],
+			*envp[MAX_ENV + 17],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -3124,7 +3123,6 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
            job->filetypes[job->current_file]->type);
   snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s",
            printer->device_uri);
-  cupsdSanitizeURI(printer->device_uri, sani_uri, sizeof(sani_uri));
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
@@ -3141,6 +3139,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
   envp[envc ++] = printer_name;
+  envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
+                                "CUPS_FILETYPE=document";
 
   if (!printer->remote && !printer->raw)
   {
@@ -3203,7 +3203,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "envp[%d]=\"%s\"", i, envp[i]);
     else
       cupsdLogJob(job, CUPSD_LOG_DEBUG, "envp[%d]=\"DEVICE_URI=%s\"", i,
-                  sani_uri);
+                  printer->sanitized_device_uri);
 
   if (printer->remote)
     job->current_file = job->num_files;
@@ -3415,7 +3415,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       else
         backroot = !(backinfo.st_mode & (S_IRWXG | S_IRWXO));
 
-      argv[0] = sani_uri;
+      argv[0] = printer->sanitized_device_uri;
 
       filterfds[slot][0] = -1;
       filterfds[slot][1] = -1;
