@@ -1426,8 +1426,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 			*preserve_job_files,
 					/* PreserveJobFiles value */
 			*max_jobs,	/* MaxJobs value */
-			*max_log_size,	/* MaxLogSize value */
-			*val;		/* Value for other setting */
+			*max_log_size;	/* MaxLogSize value */
     char		local_protocols[255],
 					/* BrowseLocalProtocols */
 			remote_protocols[255];
@@ -3118,7 +3117,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
-      cupsCancelJob(job_id);
+      cupsCancelJob(printer, job_id);
       return;
     }
 
