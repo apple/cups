@@ -1434,6 +1434,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
+    const char		*val;		/* Setting value */ 
 #endif /* HAVE_GSSAPI */
 
 
