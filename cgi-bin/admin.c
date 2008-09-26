@@ -2868,6 +2868,9 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
       while (*ptr == ',' || isspace(*ptr & 255))
 	ptr ++;
 
+      if (!*ptr)
+        break;
+
       if (*ptr == '\'' || *ptr == '\"')
       {
        /*
@@ -2932,6 +2935,9 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
         while (*ptr == ',' || isspace(*ptr & 255))
 	  ptr ++;
+
+        if (!*ptr)
+	  break;
 
         if (*ptr == '\'' || *ptr == '\"')
 	{
