@@ -1425,6 +1425,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 					/* PreserveJobHistory value */
 			*preserve_job_files,
 					/* PreserveJobFiles value */
+			*max_clients,	/* MaxClients value */
 			*max_jobs,	/* MaxJobs value */
 			*max_log_size;	/* MaxLogSize value */
     char		local_protocols[255],
@@ -1459,8 +1460,12 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       browse_web_if        = cgiGetVariable("BROWSE_WEB_IF") ? "Yes" : "No";
       preserve_job_history = cgiGetVariable("PRESERVE_JOB_HISTORY") ? "Yes" : "No";
       preserve_job_files   = cgiGetVariable("PRESERVE_JOB_FILES") ? "Yes" : "No";
+      max_clients          = cgiGetVariable("MAX_CLIENTS");
       max_jobs             = cgiGetVariable("MAX_JOBS");
       max_log_size         = cgiGetVariable("MAX_LOG_SIZE");
+
+      if (!max_clients || atoi(max_clients) <= 0)
+	max_clients = "100";
 
       if (!max_jobs || atoi(max_jobs) <= 0)
 	max_jobs = "500";
@@ -1555,7 +1560,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     {
       val = cupsGetOption("DefaultAuthType", num_settings, settings);
 
-      if (val && !strcasecmp(val, "Negotiate"))
+      if (!val || !strcasecmp(val, "Negotiate"))
         strlcpy(default_auth_type, "Basic", sizeof(default_auth_type));
       else
         strlcpy(default_auth_type, val, sizeof(default_auth_type));
@@ -1600,6 +1605,8 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 		strcasecmp(preserve_job_history, "Yes") ||
 		cupsGetOption("PreserveJobFiles", num_settings, settings) ||
 		strcasecmp(preserve_job_files, "No") ||
+		cupsGetOption("MaxClients", num_settings, settings) ||
+		strcasecmp(max_clients, "100") ||
 		cupsGetOption("MaxJobs", num_settings, settings) ||
 		strcasecmp(max_jobs, "500") ||
 		cupsGetOption("MaxLogSize", num_settings, settings) ||
@@ -1658,6 +1665,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 	    strcasecmp(preserve_job_files, "No"))
 	  num_settings = cupsAddOption("PreserveJobFiles", preserve_job_files,
 	                               num_settings, &settings);
+        if (cupsGetOption("MaxClients", num_settings, settings) ||
+	    strcasecmp(max_clients, "100"))
+	  num_settings = cupsAddOption("MaxClients", max_clients, num_settings,
+	                               &settings);
         if (cupsGetOption("MaxJobs", num_settings, settings) ||
 	    strcasecmp(max_jobs, "500"))
 	  num_settings = cupsAddOption("MaxJobs", max_jobs, num_settings,
@@ -2591,6 +2602,11 @@ do_menu(http_t *http)			/* I - HTTP connection */
 	!strcasecmp(val, "true"))
       cgiSetVariable("PRESERVE_JOB_FILES", "CHECKED");
   }
+
+  if ((val = cupsGetOption("MaxClients", num_settings, settings)) == NULL)
+    val = "100";
+
+  cgiSetVariable("MAX_CLIENTS", val);
 
   if ((val = cupsGetOption("MaxJobs", num_settings, settings)) == NULL)
     val = "500";
