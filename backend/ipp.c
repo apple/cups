@@ -1118,7 +1118,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
 	     ipp_status == IPP_PRINTER_BUSY)
-      break;
+      continue;
     else
       copies_remaining --;
 
