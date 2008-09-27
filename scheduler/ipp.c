@@ -2504,8 +2504,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         * Could not find device in list!
 	*/
 
-	send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"!"),
-        	        attr->values[0].string.text);
+	send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri scheme \"%s\"!"),
+        	        scheme);
 	return;
       }
     }
@@ -2618,6 +2618,42 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
     cupsdAddPrinterHistory(printer);
+  }
+
+  if ((attr = ippFindAttribute(con->request, "printer-state-reasons",
+                               IPP_TAG_KEYWORD)) != NULL)
+  {
+    if (attr->num_values >
+            (int)(sizeof(printer->reasons) / sizeof(printer->reasons[0])))
+    {
+      send_ipp_status(con, IPP_NOT_POSSIBLE,
+                      _("Too many printer-state-reasons values (%d > %d)!"),
+		      attr->num_values,
+		      (int)(sizeof(printer->reasons) /
+		            sizeof(printer->reasons[0])));
+      return;
+    }
+
+    for (i = 0; i < printer->num_reasons; i ++)
+      _cupsStrFree(printer->reasons[i]);
+
+    printer->num_reasons = attr->num_values;
+    for (i = 0; i < attr->num_values; i ++)
+    {
+      printer->reasons[i] = _cupsStrAlloc(attr->values[i].string.text);
+
+      if (!strcmp(printer->reasons[i], "paused") &&
+          printer->state != IPP_PRINTER_STOPPED)
+      {
+	cupsdLogMessage(CUPSD_LOG_INFO,
+	                "Setting %s printer-state to %d (was %d.)",
+			printer->name, IPP_PRINTER_STOPPED, printer->state);
+	cupsdStopPrinter(printer, 0);
+      }
+    }
+
+    if (PrintcapFormat == PRINTCAP_PLIST)
+      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
   }
 
   set_printer_defaults(con, printer);
@@ -5763,6 +5799,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "job-impressions-supported");
       cupsArrayAdd(ra, "job-k-octets-supported");
       cupsArrayAdd(ra, "job-media-sheets-supported");
+      cupsArrayAdd(ra, "job-settable-attributes-supported");
       cupsArrayAdd(ra, "multiple-document-jobs-supported");
       cupsArrayAdd(ra, "multiple-operation-time-out");
       cupsArrayAdd(ra, "natural-language-configured");
@@ -5795,6 +5832,7 @@ create_requested_array(ipp_t *request)	/* I - IPP request */
       cupsArrayAdd(ra, "printer-state");
       cupsArrayAdd(ra, "printer-state-message");
       cupsArrayAdd(ra, "printer-state-reasons");
+      cupsArrayAdd(ra, "printer-settable-attributes-supported");
       cupsArrayAdd(ra, "printer-type");
       cupsArrayAdd(ra, "printer-up-time");
       cupsArrayAdd(ra, "printer-uri-supported");
