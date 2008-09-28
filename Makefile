@@ -49,7 +49,7 @@ all:
 	echo Using LIBS="$(LIBS)"
 	for dir in $(DIRS); do\
 		echo Making all in $$dir... ;\
-		(cd $$dir ; $(MAKE) $(MFLAGS) all) || exit 1;\
+		(cd $$dir ; $(MAKE) $(MFLAGS) all $(UNITTESTS)) || exit 1;\
 	done
 
 

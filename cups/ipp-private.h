@@ -35,8 +35,23 @@ extern "C" {
 
 
 /*
+ * Constants...
+ */
+
+#  define IPP_BUF_SIZE	(IPP_MAX_LENGTH + 2)
+					/* Size of buffer */
+
+
+/*
  * Structures...
  */
+
+typedef struct _ipp_buffer_s		/**** Read/write buffer ****/
+{
+  unsigned char		d[IPP_BUF_SIZE];/* Data buffer */
+  struct _ipp_buffer_s	*next;		/* Next buffer in list */
+  int			used;		/* Is this buffer used? */
+} _ipp_buffer_t;
 
 typedef struct				/**** Attribute mapping data ****/
 {

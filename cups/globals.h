@@ -85,6 +85,7 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
   /* ipp.c */
   ipp_uchar_t		ipp_date[11];	/* RFC-1903 date/time data */
+  _ipp_buffer_t		*ipp_buffers;	/* Buffer list */
 
   /* ipp-support.c */
   int			ipp_port;	/* IPP port number */

@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-09-26
+CHANGES.txt - 2008-09-27
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The ippRead*() and ippWrite*() functions no longer use a
+	  stack-based buffer (STR #2388)
 	- The CUPS-Add-Modify-Printer operation now allows you to set
 	  the printer-state-reasons attribute.
 	- The "set printer options" page now supports auto-configuration
