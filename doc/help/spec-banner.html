@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<!-- SECTION: Specifications -->
+<head>
+	<title>CUPS Banner File Format</title>
+	<meta name='keywords' content='job-sheets'>
+	<link rel='stylesheet' type='text/css' href='../cups.css'>
+</head>
+<body>
+<!--
+  "$Id$"
+
+  Banner file format specification for the Common UNIX Printing System (CUPS).
+
+  Copyright 2008 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
+
+<p>This specification describes the CUPS banner file format
+(application/vnd.cups-banner) which is used to generate print job cover pages.
+The format itself consists of a header followed by lines of UTF-8 text
+containing a comment or keyword and value:</p>
+
+<pre class='command'>
+#CUPS-BANNER
+
+# What to show on the cover page
+Show job-id job-name requesting-user-name time-at-creation notice
+
+# The header and footer text
+Header Cover Page
+Footer Cover Page
+
+# Arbitrary "notice" text
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+Notice All work and no play makes Johnny a dull boy.
+
+# Images to place below the rest
+Image /usr/share/doc/cups/images/cups-icon.png
+Image /usr/share/doc/cups/images/smiley.jpg
+</pre>
+
+<h2 class='title'><a name='KEYWORDS'>Standard Keywords</a></h2>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+<h3><a name=''></a></h3>
+
+<p class='example'>
+</p>
+
+</body>
+</html>
