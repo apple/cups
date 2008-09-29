@@ -52,8 +52,8 @@ IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
 IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
-		commandtops.o gziptoany.o imagetops.o imagetoraster.o common.o \
-		pdftops.o pstops.o \
+		bannertops.o commandtops.o gziptoany.o imagetops.o \
+		imagetoraster.o common.o pdftops.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
 		testimage.o testraster.o textcommon.o texttops.o
 
@@ -230,6 +230,15 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
 		../cups/raster.h interpret.c raster.c
+
+
+#
+# bannertops
+#
+
+bannertops:	bannertops.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ bannertops.o $(LIBS)
 
 
 #

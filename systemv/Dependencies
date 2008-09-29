@@ -1,13 +1,13 @@
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-accept.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-accept.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-accept.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-accept.o: ../cups/transcode.h
 cancel.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 cancel.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 cancel.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
 cancel.o: ../cups/transcode.h
+cupsaccept.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
+cupsaccept.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+cupsaccept.o: ../cups/array.h ../cups/file.h ../cups/language.h
+cupsaccept.o: ../cups/i18n.h ../cups/transcode.h
 cupsaddsmb.o: ../cups/string.h ../config.h ../cups/adminutil.h ../cups/cups.h
 cupsaddsmb.o: ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 cupsaddsmb.o: ../cups/array.h ../cups/file.h ../cups/language.h

@@ -325,15 +325,15 @@ f 0755 root sys $SERVERBIN/daemon/cups-lpd scheduler/cups-lpd
 
 # Admin commands
 d 0755 root sys $BINDIR -
-l 0755 root sys $BINDIR/enable $SBINDIR/accept
-l 0755 root sys $LIBDIR/accept $SBINDIR/accept
-l 0755 root sys $BINDIR/disable $SBINDIR/accept
+l 0755 root sys $BINDIR/enable $SBINDIR/cupsaccept
+l 0755 root sys $BINDIR/disable $SBINDIR/cupsaccept
 d 0755 root sys $LIBDIR -
+l 0755 root sys $LIBDIR/accept $SBINDIR/cupsaccept
 l 0755 root sys $LIBDIR/lpadmin $SBINDIR/lpadmin
-l 0755 root sys $LIBDIR/reject accept
+l 0755 root sys $LIBDIR/reject $SBINDIR/cupsaccept
 d 0755 root sys $SBINDIR -
-f 0755 root sys $SBINDIR/accept systemv/accept
-l 0755 root sys $SBINDIR/cupsaccept accept
+l 0755 root sys $SBINDIR/accept cupsaccept
+f 0755 root sys $SBINDIR/cupsaccept systemv/cupsaccept
 f 0755 root sys $SBINDIR/cupsaddsmb systemv/cupsaddsmb
 f 0755 root sys $SBINDIR/cupsctl systemv/cupsctl
 l 0755 root sys $SBINDIR/cupsdisable accept
@@ -343,7 +343,7 @@ f 0755 root sys $SBINDIR/lpadmin systemv/lpadmin
 f 0755 root sys $SBINDIR/lpc berkeley/lpc
 f 0755 root sys $SBINDIR/lpinfo systemv/lpinfo
 f 0755 root sys $SBINDIR/lpmove systemv/lpmove
-l 0755 root sys $SBINDIR/reject accept
+l 0755 root sys $SBINDIR/reject cupsaccept
 
 %system irix
 l 0755 root sys /usr/etc/lpc $SBINDIR/lpc
@@ -734,6 +734,7 @@ f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertoescpx.$MAN7EXT man/rastertoescpx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/rastertopclx.$MAN7EXT man/rastertopclx.$MAN7EXT
 
+l 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT cupsaccept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/cupsreject.$MAN8EXT cupsaccept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaddsmb.$MAN8EXT man/cupsaddsmb.$MAN8EXT
@@ -743,10 +744,13 @@ f 0644 root sys $AMANDIR/man$MAN8DIR/cups-polld.$MAN8EXT man/cups-polld.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsd.$MAN8EXT man/cupsd.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsenable.$MAN8EXT man/cupsenable.$MAN8EXT
 l 0644 root sys $AMANDIR/man$MAN8DIR/cupsdisable.$MAN8EXT cupsenable.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/disable.$MAN8EXT cupsenable.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/enable.$MAN8EXT cupsenable.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/lpadmin.$MAN8EXT man/lpadmin.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/lpc.$MAN8EXT man/lpc.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/lpinfo.$MAN8EXT man/lpinfo.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/lpmove.$MAN8EXT man/lpmove.$MAN8EXT
+l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT cupsaccept.$MAN8EXT
 
 %subpackage devel
 f 0644 root sys $MANDIR/man1/cups-config.$MAN1EXT man/cups-config.$MAN1EXT

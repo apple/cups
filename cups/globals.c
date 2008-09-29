@@ -144,6 +144,8 @@ static void
 globals_destructor(void *value)		/* I - Data to free */
 {
   int			i;		/* Looping var */
+  _ipp_buffer_t		*buffer,	/* Current IPP read/write buffer */
+			*next;		/* Next buffer */
   _cups_globals_t	*cg;		/* Global data */
 
 
@@ -158,6 +160,12 @@ globals_destructor(void *value)		/* I - Data to free */
     _cupsStrFree(cg->last_status_message);
 
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
+
+  for (buffer = cg->ipp_buffers; buffer; buffer = next)
+  {
+    next = buffer->next;
+    free(buffer);
+  }
 
   free(value);
 }

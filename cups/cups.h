@@ -68,6 +68,7 @@ extern "C" {
 #  define CUPS_DATE_ANY		(time_t)-1
 #  define CUPS_EXCLUDE_NONE	(const char *)0
 #  define CUPS_FORMAT_AUTO	"application/octet-stream"
+#  define CUPS_FORMAT_COMMAND	"application/vnd.cups-command"
 #  define CUPS_FORMAT_PDF	"application/pdf"
 #  define CUPS_FORMAT_POSTSCRIPT "application/postscript"
 #  define CUPS_FORMAT_RAW	"application/vnd.cups-raw"

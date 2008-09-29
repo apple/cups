@@ -1,9 +1,17 @@
-CHANGES.txt - 2008-09-20
+CHANGES.txt - 2008-09-27
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The scheduler now sets the PRINTER_INFO and PRINTER_LOCATION
+	  environment variables from the corresponding IPP attributes.
+	- The ippRead*() and ippWrite*() functions no longer use a
+	  stack-based buffer (STR #2388)
+	- The CUPS-Add-Modify-Printer operation now allows you to set
+	  the printer-state-reasons attribute.
+	- The "set printer options" page now supports auto-configuration
+	  of printer options (STR #1440)
 	- The web interface now provides an advanced server settings
 	  form.
 	- The web interface's "modify printer" pages now make it
