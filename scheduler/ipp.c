@@ -2637,12 +2637,16 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     for (i = 0; i < printer->num_reasons; i ++)
       _cupsStrFree(printer->reasons[i]);
 
-    printer->num_reasons = attr->num_values;
+    printer->num_reasons = 0;
     for (i = 0; i < attr->num_values; i ++)
     {
-      printer->reasons[i] = _cupsStrAlloc(attr->values[i].string.text);
+      if (!strcmp(attr->values[i].string.text, "none"))
+        continue;
 
-      if (!strcmp(printer->reasons[i], "paused") &&
+      printer->reasons[printer->num_reasons] =
+          _cupsStrAlloc(attr->values[i].string.text);
+
+      if (!strcmp(printer->reasons[printer->num_reasons], "paused") &&
           printer->state != IPP_PRINTER_STOPPED)
       {
 	cupsdLogMessage(CUPSD_LOG_INFO,
@@ -2650,6 +2654,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 			printer->name, IPP_PRINTER_STOPPED, printer->state);
 	cupsdStopPrinter(printer, 0);
       }
+
+      printer->num_reasons ++;
     }
 
     if (PrintcapFormat == PRINTCAP_PLIST)
