@@ -287,11 +287,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
+/usr/share/man/man8/cupsaccept.8.gz
 /usr/share/man/man8/cupsctl.8.gz
 /usr/share/man/man8/cupsfilter.8.gz
 /usr/share/man/man8/cupsd.8.gz
 /usr/share/man/man8/cupsdisable.8.gz
 /usr/share/man/man8/cupsenable.8.gz
+/usr/share/man/man8/cupsreject.8.gz
 /usr/share/man/man8/cups-deviced.8.gz
 /usr/share/man/man8/cups-driverd.8.gz
 /usr/share/man/man8/cups-polld.8.gz

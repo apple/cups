@@ -15,9 +15,9 @@
 
 include ../Makedefs
 
-TARGETS	=	accept cancel cupsaddsmb cupsctl cupstestdsc cupstestppd \
+TARGETS	=	cancel cupsaccept cupsaddsmb cupsctl cupstestdsc cupstestppd \
 		lp lpadmin lpinfo lpmove lpoptions lppasswd lpstat
-OBJS	=	accept.o cancel.o cupsaddsmb.o cupsctl.o cupstestdsc.o \
+OBJS	=	cancel.o cupsaccept.o cupsaddsmb.o cupsctl.o cupstestdsc.o \
 		cupstestppd.o lp.o lpadmin.o lpinfo.o lpmove.o lpoptions.o \
 		lppasswd.o lpstat.o
 
@@ -49,7 +49,7 @@ unittests:
 
 clean:
 	$(RM) $(OBJS) $(TARGETS)
-	$(RM) cupsaccept cupsdisable cupsenable cupsreject reject
+	$(RM) accept cupsdisable cupsenable cupsreject reject
 
 
 #
@@ -153,27 +153,25 @@ uninstall:
 
 
 #
-# accept
-#
-
-accept:	accept.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o accept accept.o $(LIBS)
-	$(RM) cupsaccept cupsenable cupsdisable cupsreject reject
-	$(LN) accept reject
-	$(LN) accept cupsaccept
-	$(LN) accept cupsenable
-	$(LN) accept cupsdisable
-	$(LN) accept cupsreject
-
-
-#
 # cancel
 #
 
 cancel:	cancel.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cancel cancel.o $(LIBS)
+
+
+#
+# cupsaccept
+#
+
+cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
+	for file in accept cupsenable cupsdisable cupsreject reject; do \
+		$(RM) $$file; \
+		$(LN) cupsaccept $$file; \
+	done
 
 
 #

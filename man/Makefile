@@ -150,8 +150,10 @@ install-data: all
 		echo Installing $$file in $(AMANDIR)/man$(MAN8DIR)...; \
 		$(INSTALL_MAN) $$file $(AMANDIR)/man$(MAN8DIR); \
 	done
-	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsreject.$(MAN8EXT)
-	$(LN) cupsaccept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsreject.$(MAN8EXT)
+	for file in accept cupsreject reject; do \
+		$(RM) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+		$(LN) cupsaccept.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/$$file.$(MAN8EXT); \
+	done
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	$(LN) cupsenable.$(MAN8EXT) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 
@@ -197,6 +199,8 @@ uninstall:
 	for file in $(MAN8); do \
 		$(RM) $(AMANDIR)/man$(MAN8DIR)/$$file; \
 	done
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/accept.$(MAN8EXT)
+	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsreject.$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/reject.$(MAN8EXT)
 	$(RM) $(AMANDIR)/man$(MAN8DIR)/cupsdisable.$(MAN8EXT)
 	-$(RMDIR) $(AMANDIR)/man$(MAN8DIR)
