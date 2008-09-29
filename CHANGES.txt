@@ -4,6 +4,8 @@ CHANGES.txt - 2008-09-27
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The scheduler now sets the PRINTER_INFO and PRINTER_LOCATION
+	  environment variables from the corresponding IPP attributes.
 	- The ippRead*() and ippWrite*() functions no longer use a
 	  stack-based buffer (STR #2388)
 	- The CUPS-Add-Modify-Printer operation now allows you to set

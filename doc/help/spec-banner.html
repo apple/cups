@@ -24,15 +24,15 @@
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
 
 <p>This specification describes the CUPS banner file format
-(application/vnd.cups-banner) which is used to generate print job cover pages.
-The format itself consists of a header followed by lines of UTF-8 text
-containing a comment or keyword and value:</p>
+(application/vnd.cups-banner) which is used to generate print job cover pages
+and the CUPS test page. The format itself consists of a header followed by
+lines of UTF-8 text containing comments or keywords and values:</p>
 
 <pre class='command'>
 #CUPS-BANNER
 
 # What to show on the cover page
-Show job-id job-name requesting-user-name time-at-creation notice
+Show job-id job-name job-originating-user-name time-at-creation
 
 # The header and footer text
 Header Cover Page
@@ -49,42 +49,100 @@ Image /usr/share/doc/cups/images/cups-icon.png
 Image /usr/share/doc/cups/images/smiley.jpg
 </pre>
 
+
 <h2 class='title'><a name='KEYWORDS'>Standard Keywords</a></h2>
 
-<h3><a name=''></a></h3>
+<h3><a name='Footer'>Footer</a></h3>
 
-<p class='example'>
+<p class='summary'>
+Footer text for footer
 </p>
 
-<h3><a name=''></a></h3>
+<p>The <code>Footer</code> key defines the text that is centered at the bottom
+of the page. Only one <code>Footer</code> key can be specified.</p>
 
-<p class='example'>
+
+<h3><a name='Header'>Header</a></h3>
+
+<p class='summary'>
+Header text for Header
 </p>
 
-<h3><a name=''></a></h3>
+<p>The <code>Header</code> key defines the text that is centered at the top
+of the page. Only one <code>Header</code> key can be specified.</p>
 
-<p class='example'>
+
+<h3><a name='Image'>Image</a></h3>
+
+<p class='summary'>
+Image /path/to/image/filename<br>
+Image relative/path/in/DocumentRoot/filename
 </p>
 
-<h3><a name=''></a></h3>
+<p>The <code>Image</code> key defines images that are centered above the footer
+text. Multiple images are centered as a group from left to right. Images are
+scaled as needed to fit on the page with a nominal size of 1"/25cm.</p>
 
-<p class='example'>
+
+<h3><a name='Notice'>Notice</a></h3>
+
+<p class='summary'>
+Notice Text to display below the job information.<br>
+Notice More text to display below the job information.
 </p>
 
-<h3><a name=''></a></h3>
+<p>The <code>Notice</code> key defines lines of text that are centered below
+the job information.</p>
 
-<p class='example'>
+
+<h3><a name='Show'>Show</a></h3>
+
+<p class='summary'>
+Show <em>keyword keyword ... keyword</em>
 </p>
 
-<h3><a name=''></a></h3>
+<p>The <code>Show</code> key lists the job information that is shown. The
+following keywords are supported:</p>
 
-<p class='example'>
-</p>
+<ul>
 
-<h3><a name=''></a></h3>
+	<li><code>imageable-area</code>: The imageable area of the current
+	page size</li>
 
-<p class='example'>
-</p>
+	<li><code>job-billing</code>: Billing information for the job</li>
+
+	<li><code>job-id</code>: The job ID</li>
+
+	<li><code>job-name</code>: The title of the job</li>
+
+	<li><code>job-originating-host-name</code>: The computer that printed
+	the job</li>
+
+	<li><code>job-originating-user-name</code>: The user that printed the
+	job</li>
+
+	<li><code>job-uuid</code>: The job UUID</li>
+
+	<li><code>options</code>: The options that were provided with the
+	job</li>
+
+	<li><code>printer-driver-name</code>: The printer driver used</li>
+
+	<li><code>printer-driver-version</code>: The driver version</li>
+
+	<li><code>printer-info</code>: The printer description</li>
+
+	<li><code>printer-location</code>: The location of the printer</li>
+
+	<li><code>printer-make-and-model</code>: The make and model strings
+	reported by the printer driver</li>
+
+	<li><code>printer-name</code>: The printer used</li>
+
+	<li><code>time-at-creation</code>: When the job was submitted</li>
+
+</ul>
+
 
 </body>
 </html>

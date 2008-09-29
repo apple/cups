@@ -19,8 +19,11 @@ include ../Makedefs
 # Font files...
 #
 
-FONTS	=	Courier Courier-Bold Courier-BoldOblique Courier-Oblique \
-		Symbol
+FONTS	=	\
+		Monospace \
+		Monospace-Bold \
+		Monospace-BoldOblique \
+		Monospace-Oblique
 
 
 #

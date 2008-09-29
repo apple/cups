@@ -16,24 +16,25 @@ charset utf8
 # right-to-left text.
 #
 # Width is the string "single" or "double"; double means that the glyphs
-# are twice as wide as ASCII characters in the Courier typeface.
+# are twice as wide as ASCII characters in the Monospace typeface.
 #
 # "Normal", "bold", "italic", and "bold-italic" are the typefaces to use
 # for each presentation.  If characters are only available in a single
-# style then only one typeface should be listed (e.g. "Symbol")
+# style then only one typeface should be listed, e.g.
 #
-# Each font that is listed will be used (and downloaded if needed) when
-# printing.
+#    1000 10ff ltor single Monospace
+#
+# Each font that is listed will be downloaded to the printer when used.
 #
 
-0000 00FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0100 01FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0200 02FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0300 03FF ltor single Symbol
-0400 04FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-0500 05FF rtol single Courier
-1E00 1EFF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-2000 20FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-2100 21FF ltor single Courier Courier-Bold Courier-Italic Courier-Bold-Italic
-2200 22FF ltor single Symbol
-2300 23FF ltor single Symbol
+0000 00FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+0100 01FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+0200 02FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+0300 03FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+0400 04FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+1E00 1EFF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+2000 20FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+2300 23FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+2400 24FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+2500 25FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+2600 26FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique

@@ -2483,7 +2483,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 			title[IPP_MAX_NAME],
 					/* Job title string */
 			copies[255],	/* # copies string */
-			*envp[MAX_ENV + 17],
+			*envp[MAX_ENV + 19],
 					/* Environment variables */
 			charset[255],	/* CHARSET env variable */
 			class_name[255],/* CLASS env variable */
@@ -2501,6 +2501,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 					/* APPLE_LANGUAGE env variable */
 #endif /* __APPLE__ */
 			ppd[1024],	/* PPD env variable */
+			printer_info[255],
+					/* PRINTER_INFO env variable */
+			printer_location[255],
+					/* PRINTER_LOCATION env variable */
 			printer_name[255],
 					/* PRINTER env variable */
 			rip_max_cache[255];
@@ -3124,6 +3128,10 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   snprintf(device_uri, sizeof(device_uri), "DEVICE_URI=%s",
            printer->device_uri);
   snprintf(ppd, sizeof(ppd), "PPD=%s/ppd/%s.ppd", ServerRoot, printer->name);
+  snprintf(printer_info, sizeof(printer_name), "PRINTER_INFO=%s",
+           printer->info ? printer->info : "");
+  snprintf(printer_location, sizeof(printer_name), "PRINTER_LOCATION=%s",
+           printer->location ? printer->location : "");
   snprintf(printer_name, sizeof(printer_name), "PRINTER=%s", printer->name);
   snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
 
@@ -3138,6 +3146,8 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   envp[envc ++] = rip_max_cache;
   envp[envc ++] = content_type;
   envp[envc ++] = device_uri;
+  envp[envc ++] = printer_info;
+  envp[envc ++] = printer_location;
   envp[envc ++] = printer_name;
   envp[envc ++] = banner_page ? "CUPS_FILETYPE=job-sheet" :
                                 "CUPS_FILETYPE=document";
