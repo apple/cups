@@ -19,6 +19,7 @@ include ../Makedefs
 
 
 FILTERS	=	\
+		bannertops \
 		commandtops \
 		gziptoany \
 		hpgltops \

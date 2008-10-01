@@ -15,6 +15,11 @@
  *
  * Contents:
  *
+ *   psTextEmbedFonts() - Embed PostScript fonts.
+ *   psTextListFonts()  - List PostScript fonts.
+ *   psTextInitialize() - Load and embed font data for UTF-8 text.
+ *   psTextUTF8()       - Output UTF-8 text at the current position.
+ *   psTextUTF32()      - Output UTF-32 text at the current position.
  */
 
 /*
@@ -445,6 +450,12 @@ psTextUTF8(ps_text_t  *fonts,		/* I - Font data */
   int		utf32len;		/* Number of characters */
 
 
+  if (!text)
+  {
+    puts("");
+    return;
+  }
+
   if ((utf32len = cupsUTF8ToUTF32(utf32, (cups_utf8_t *)text,
                                   (int)(sizeof(utf32) / sizeof(utf32[0])))) > 0)
     psTextUTF32(fonts, size, style, align, utf32, utf32len);
@@ -484,7 +495,6 @@ psTextUTF32(ps_text_t          *fonts,	/* I - Font data */
     puts(">showright");
   else
     puts(">showleft");
-    
 }
 
 
