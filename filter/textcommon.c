@@ -515,8 +515,9 @@ TextMain(const char *name,	/* I - Name of filter */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-            name);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+                    name);
     return (1);
   }
 

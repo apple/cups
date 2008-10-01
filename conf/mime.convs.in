@@ -7,7 +7,7 @@
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -38,62 +38,52 @@
 # PostScript filters
 #
 
-application/pdf		application/postscript	33	pdftops
-application/postscript	application/vnd.cups-postscript	66	pstops
-application/vnd.hp-HPGL	application/postscript	66	hpgltops
-application/x-cshell	application/postscript	33	texttops
-application/x-csource	application/postscript	33	texttops
-application/x-perl	application/postscript	33	texttops
-application/x-shell	application/postscript	33	texttops
-text/plain		application/postscript	33	texttops
-text/html		application/postscript	33	texttops
-image/gif		application/vnd.cups-postscript	66	imagetops
-image/png		application/vnd.cups-postscript	66	imagetops
-image/jpeg		application/vnd.cups-postscript	66	imagetops
-image/tiff		application/vnd.cups-postscript	66	imagetops
-image/x-bitmap		application/vnd.cups-postscript	66	imagetops
-image/x-photocd		application/vnd.cups-postscript	66	imagetops
-image/x-portable-anymap	application/vnd.cups-postscript	66	imagetops
-image/x-portable-bitmap	application/vnd.cups-postscript	66	imagetops
-image/x-portable-graymap application/vnd.cups-postscript	66	imagetops
-image/x-portable-pixmap	application/vnd.cups-postscript	66	imagetops
-image/x-sgi-rgb		application/vnd.cups-postscript	66	imagetops
-image/x-xbitmap		application/vnd.cups-postscript	66	imagetops
-image/x-xpixmap		application/vnd.cups-postscript	66	imagetops
-#image/x-xwindowdump	application/vnd.cups-postscript	66	imagetops
-image/x-sun-raster	application/vnd.cups-postscript	66	imagetops
-
-
-########################################################################
-#
-# Form filter...
-#
-# This filter does not currently exist, but the file format is defined
-# in the IDD and registered with the IANA for future use...
-#
-
-#application/vnd.cups-form application/vnd.cups-postscript 33 formtops
+application/pdf			application/postscript		33	pdftops
+application/postscript		application/vnd.cups-postscript	66	pstops
+application/vnd.hp-HPGL		application/postscript		66	hpgltops
+application/x-cshell		application/postscript		33	texttops
+application/x-csource		application/postscript		33	texttops
+application/x-perl		application/postscript		33	texttops
+application/x-shell		application/postscript		33	texttops
+text/plain			application/postscript		33	texttops
+text/html			application/postscript		33	texttops
+image/gif			application/vnd.cups-postscript	66	imagetops
+image/png			application/vnd.cups-postscript	66	imagetops
+image/jpeg			application/vnd.cups-postscript	66	imagetops
+image/tiff			application/vnd.cups-postscript	66	imagetops
+image/x-bitmap			application/vnd.cups-postscript	66	imagetops
+image/x-photocd			application/vnd.cups-postscript	66	imagetops
+image/x-portable-anymap		application/vnd.cups-postscript	66	imagetops
+image/x-portable-bitmap		application/vnd.cups-postscript	66	imagetops
+image/x-portable-graymap	application/vnd.cups-postscript	66	imagetops
+image/x-portable-pixmap		application/vnd.cups-postscript	66	imagetops
+image/x-sgi-rgb			application/vnd.cups-postscript	66	imagetops
+image/x-xbitmap			application/vnd.cups-postscript	66	imagetops
+image/x-xpixmap			application/vnd.cups-postscript	66	imagetops
+#image/x-xwindowdump		application/vnd.cups-postscript	66	imagetops
+image/x-sun-raster		application/vnd.cups-postscript	66	imagetops
+application/vnd.cups-banner	application/vnd.cups-postscript	33	bannertops
 
 ########################################################################
 #
 # Raster filters...
 #
 
-image/gif		application/vnd.cups-raster	100	imagetoraster
-image/png		application/vnd.cups-raster	100	imagetoraster
-image/jpeg		application/vnd.cups-raster	100	imagetoraster
-image/tiff		application/vnd.cups-raster	100	imagetoraster
-image/x-bitmap		application/vnd.cups-raster	100	imagetoraster
-image/x-photocd		application/vnd.cups-raster	100	imagetoraster
-image/x-portable-anymap	application/vnd.cups-raster	100	imagetoraster
-image/x-portable-bitmap	application/vnd.cups-raster	100	imagetoraster
-image/x-portable-graymap application/vnd.cups-raster	100	imagetoraster
-image/x-portable-pixmap	application/vnd.cups-raster	100	imagetoraster
-image/x-sgi-rgb		application/vnd.cups-raster	100	imagetoraster
-image/x-xbitmap		application/vnd.cups-raster	100	imagetoraster
-image/x-xpixmap		application/vnd.cups-raster	100	imagetoraster
-#image/x-xwindowdump	application/vnd.cups-raster	100	imagetoraster
-image/x-sun-raster	application/vnd.cups-raster	100	imagetoraster
+image/gif			application/vnd.cups-raster	100	imagetoraster
+image/png			application/vnd.cups-raster	100	imagetoraster
+image/jpeg			application/vnd.cups-raster	100	imagetoraster
+image/tiff			application/vnd.cups-raster	100	imagetoraster
+image/x-bitmap			application/vnd.cups-raster	100	imagetoraster
+image/x-photocd			application/vnd.cups-raster	100	imagetoraster
+image/x-portable-anymap		application/vnd.cups-raster	100	imagetoraster
+image/x-portable-bitmap		application/vnd.cups-raster	100	imagetoraster
+image/x-portable-graymap	application/vnd.cups-raster	100	imagetoraster
+image/x-portable-pixmap		application/vnd.cups-raster	100	imagetoraster
+image/x-sgi-rgb			application/vnd.cups-raster	100	imagetoraster
+image/x-xbitmap			application/vnd.cups-raster	100	imagetoraster
+image/x-xpixmap			application/vnd.cups-raster	100	imagetoraster
+#image/x-xwindowdump		application/vnd.cups-raster	100	imagetoraster
+image/x-sun-raster		application/vnd.cups-raster	100	imagetoraster
 
 # pstoraster is part of GPL Ghostscript...
 application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
