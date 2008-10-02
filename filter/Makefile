@@ -19,6 +19,7 @@ include ../Makedefs
 
 
 FILTERS	=	\
+		bannertops \
 		commandtops \
 		gziptoany \
 		hpgltops \
@@ -53,7 +54,7 @@ IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
 FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
 OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
 		bannertops.o commandtops.o gziptoany.o imagetops.o \
-		imagetoraster.o common.o pdftops.o pstops.o \
+		imagetoraster.o common.o pdftops.o pstext.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
 		testimage.o testraster.o textcommon.o texttops.o
 
@@ -236,9 +237,10 @@ framedhelp:
 # bannertops
 #
 
-bannertops:	bannertops.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
+bannertops:	bannertops.o pstext.o common.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ bannertops.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ bannertops.o pstext.o common.o $(LINKCUPSIMAGE) \
+		$(IMGLIBS) $(LIBS)
 
 
 #

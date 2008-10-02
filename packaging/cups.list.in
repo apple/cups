@@ -295,6 +295,7 @@ f 0755 root sys $SERVERBIN/daemon/cups-driverd scheduler/cups-driverd
 f 0755 root sys $SERVERBIN/daemon/cups-polld scheduler/cups-polld
 d 0755 root sys $SERVERBIN/driver -
 d 0755 root sys $SERVERBIN/filter -
+f 0755 root sys $SERVERBIN/filter/bannertops filter/bannertops
 f 0755 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
 f 0755 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
 f 0755 root sys $SERVERBIN/filter/commandtops filter/commandtops

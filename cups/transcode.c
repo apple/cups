@@ -487,10 +487,8 @@ cupsUTF8ToUTF32(
   }
 
  /*
-  * Convert input UTF-8 to output UTF-32 (and insert BOM)...
+  * Convert input UTF-8 to output UTF-32...
   */
-
-  *dest++ = 0xfeff;
 
   for (i = maxout - 1; *src && i > 0; i --)
   {

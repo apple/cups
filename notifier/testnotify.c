@@ -52,6 +52,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   fprintf(stderr, "DEBUG: argc=%d\n", argc);
   for (i = 0; i < argc; i ++)
     fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);
+  fprintf(stderr, "DEBUG: TMPDIR=\"%s\"\n", getenv("TMPDIR"));
 
   for (;;)
   {

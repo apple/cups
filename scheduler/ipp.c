@@ -2758,8 +2758,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         * (Re)register color profiles...
 	*/
 
-        apple_unregister_profiles(printer);
-	apple_register_profiles(printer);
+        if (!RunUser)
+	{
+	  apple_unregister_profiles(printer);
+	  apple_register_profiles(printer);
+        }
 #endif /* __APPLE__ */
       }
       else
@@ -2820,8 +2823,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       * (Re)register color profiles...
       */
 
-      apple_unregister_profiles(printer);
-      apple_register_profiles(printer);
+      if (!RunUser)
+      {
+	apple_unregister_profiles(printer);
+	apple_register_profiles(printer);
+      }
 #endif /* __APPLE__ */
     }
   }
