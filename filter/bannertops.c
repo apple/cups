@@ -345,6 +345,81 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
 
 
 /*
+ * 'ps_ascii85()' - Print binary data as a series of base-85 numbers.
+ */
+
+static void
+ps_ascii85(cups_ib_t *data,		/* I - Data to print */
+	   int       length,		/* I - Number of bytes to print */
+	   int       last_line)		/* I - Last line of raster data? */
+{
+  unsigned	b;			/* Binary data word */
+  unsigned char	c[5];			/* ASCII85 encoded chars */
+  static int	col = 0;		/* Current column */
+
+
+  while (length > 3)
+  {
+    b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
+
+    if (b == 0)
+    {
+      putchar('z');
+      col ++;
+    }
+    else
+    {
+      c[4] = (b % 85) + '!';
+      b /= 85;
+      c[3] = (b % 85) + '!';
+      b /= 85;
+      c[2] = (b % 85) + '!';
+      b /= 85;
+      c[1] = (b % 85) + '!';
+      b /= 85;
+      c[0] = b + '!';
+
+      fwrite(c, 5, 1, stdout);
+      col += 5;
+    }
+
+    data += 4;
+    length -= 4;
+
+    if (col >= 75)
+    {
+      putchar('\n');
+      col = 0;
+    }
+  }
+
+  if (last_line)
+  {
+    if (length > 0)
+    {
+      memset(data + length, 0, 4 - length);
+      b = (((((data[0] << 8) | data[1]) << 8) | data[2]) << 8) | data[3];
+
+      c[4] = (b % 85) + '!';
+      b /= 85;
+      c[3] = (b % 85) + '!';
+      b /= 85;
+      c[2] = (b % 85) + '!';
+      b /= 85;
+      c[1] = (b % 85) + '!';
+      b /= 85;
+      c[0] = b + '!';
+
+      fwrite(c, length + 1, 1, stdout);
+    }
+
+    puts("~>");
+    col = 0;
+  }
+}
+
+
+/*
  * 'write_banner()' - Write a banner page...
  */
 
@@ -361,6 +436,7 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
   char		*notice;		/* Current notice */
   char		*imagefile;		/* Current image file */
   cups_array_t	*images;		/* Images */
+  cups_image_t	*image;			/* Current image */
   const char	*option;		/* Option value */
   int		i, j;			/* Looping vars */
   float		x,			/* Current X position */
@@ -454,9 +530,33 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
   notices_height = cupsArrayCount(banner->notices) * line_height;
 
   if (cupsArrayCount(banner->images))
+  {
+    images        = cupsArrayNew(NULL, NULL);
     images_height = print_height / 10;	/* Nominally 1" */
+
+    for (imagefile = (char *)cupsArrayFirst(banner->images), images_width = 0.0;
+         imagefile;
+	 imagefile = (char *)cupsArrayNext(banner->images))
+    {
+      if ((image = cupsImageOpen(imagefile, ColorDevice ? CUPS_IMAGE_RGB_CMYK :
+                                                          CUPS_IMAGE_WHITE,
+				 CUPS_IMAGE_WHITE, 100, 0, NULL)) == NULL)
+      {
+        fprintf(stderr, "DEBUG: Unable to open image file \"%s\"!\n",
+	        imagefile);
+        continue;
+      }
+
+      images_width += cupsImageGetWidth(image) * images_height /
+                      cupsImageGetHeight(image);
+      cupsArrayAdd(images, image);
+    }
+  }
   else
+  {
+    images        = NULL;
     images_height = 0;
+  }
 
   total_height = info_height + notices_height + images_height;
   if (cupsArrayCount(banner->notices) && showlines)
@@ -792,7 +892,98 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
     * Images...
     */
 
-    /* TODO: write images */
+    if (cupsArrayCount(images))
+    {
+      if (banner->show || cupsArrayCount(banner->notices))
+        y -= 2 * line_height;
+
+      x = 0.5 * (print_width - images_width);
+
+      for (image = (cups_image_t *)cupsArrayFirst(images);
+           image;
+           image = (cups_image_t *)cupsArrayNext(images))
+      {
+        float		temp_width;	/* Width of this image */
+        int		depth,		/* Bytes per pixel */
+			num_cols,	/* Number of columns */
+			row,		/* Current row */
+			num_rows,	/* Number of rows */
+			out_length,	/* Length of data to write */
+			out_offset;	/* Offset in line buffer */
+        unsigned char	*line;		/* Data for current row */
+
+
+        depth      = cupsImageGetDepth(image);
+	num_cols   = cupsImageGetWidth(image);
+        num_rows   = cupsImageGetHeight(image);
+	line       = malloc(depth * num_cols + 3);
+        temp_width = num_cols * images_height / num_rows;
+	out_offset = 0;
+
+        printf("gsave %.1f %.1f translate %.3f %.3f scale\n", x, y,
+	       temp_width / num_cols, images_height / num_rows);
+        x += temp_width;
+
+	switch (cupsImageGetColorSpace(image))
+	{
+	  default :
+	  case CUPS_IMAGE_WHITE :
+	      printf("/DeviceGray setcolorspace"
+	             "<<"
+		     "/ImageType 1"
+		     "/Width %d"
+		     "/Height %d"
+		     "/BitsPerComponent 8"
+		     "/Decode[0 1]\n",
+		     num_cols, num_rows);
+	      break;
+
+	  case CUPS_IMAGE_RGB :
+	      printf("/DeviceRGB setcolorspace"
+	             "<<"
+		     "/ImageType 1"
+		     "/Width %d"
+		     "/Height %d"
+		     "/BitsPerComponent 8"
+		     "/Decode[0 1 0 1 0 1]\n",
+		     num_cols, num_rows);
+	      break;
+
+	  case CUPS_IMAGE_CMYK :
+	      printf("/DeviceCMYK setcolorspace"
+	             "<<"
+		     "/ImageType 1"
+		     "/Width %d"
+		     "/Height %d"
+		     "/BitsPerComponent 8"
+		     "/Decode[0 1 0 1 0 1 0 1]\n",
+		     num_cols, num_rows);
+	      break;
+	}
+
+        puts("/DataSource currentfile"
+	     "/ASCII85Decode filter"
+	     "/ImageMatrix[1 0 0 -1 0 1]>>image");
+
+	for (row = 0, out_offset = 0; row < num_rows; row ++)
+	{
+	  cupsImageGetRow(image, 0, row, num_cols, line + out_offset);
+
+	  out_length = num_cols * depth + out_offset;
+	  out_offset = out_length & 3;
+
+	  ps_ascii85(line, out_length, row == (num_rows - 1));
+
+	  if (out_offset > 0)
+	    memcpy(line, line + out_length - out_offset, out_offset);
+	}
+
+        puts("grestore");
+
+	if (i == num_pages)
+	  cupsImageClose(image);
+      }
+    }
 
    /*
     * Header and footer...

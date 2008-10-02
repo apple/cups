@@ -239,7 +239,8 @@ framedhelp:
 
 bannertops:	bannertops.o pstext.o common.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ bannertops.o pstext.o common.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ bannertops.o pstext.o common.o $(LINKCUPSIMAGE) \
+		$(IMGLIBS) $(LIBS)
 
 
 #

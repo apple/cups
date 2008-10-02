@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-09-27
+CHANGES.txt - 2008-10-01
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- Now support and use a new banner file format for better text
+	  support and easier customization (STR #2490)
 	- The scheduler now sets the PRINTER_INFO and PRINTER_LOCATION
 	  environment variables from the corresponding IPP attributes.
 	- The ippRead*() and ippWrite*() functions no longer use a
