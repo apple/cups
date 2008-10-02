@@ -953,7 +953,7 @@ conv_utf8_to_sbcs(
   * Convert internal UCS-4 to SBCS legacy charset (and delete BOM)...
   */
 
-  for (workptr = work + 1, start = dest; *workptr && maxout > 1; maxout --)
+  for (workptr = work, start = dest; *workptr && maxout > 0; maxout --)
   {
     unichar = *workptr++;
     if (!unichar)
@@ -1041,7 +1041,7 @@ conv_utf8_to_vbcs(
   * Convert internal UCS-4 to VBCS legacy charset (and delete BOM)...
   */
 
-  for (start = dest, workptr = work + 1; *workptr && maxout > 1; maxout --)
+  for (start = dest, workptr = work; *workptr && maxout > 0; maxout --)
   {
     unichar = *workptr++;
 
