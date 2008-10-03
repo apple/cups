@@ -286,7 +286,7 @@ LEGACY_BACKENDS="parallel scsi"
 
 case $uname in
         Darwin*)
-		FONTS=""
+#		FONTS=""
 		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration -weak_framework ApplicationServices"
