@@ -1432,6 +1432,22 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 					/* BrowseLocalProtocols */
 			remote_protocols[255];
 					/* BrowseRemoteProtocols */
+    const char		*current_browse_web_if,
+					/* BrowseWebIF value */
+			*current_preserve_job_history,
+					/* PreserveJobHistory value */
+			*current_preserve_job_files,
+					/* PreserveJobFiles value */
+			*current_max_clients,
+					/* MaxClients value */
+			*current_max_jobs,
+					/* MaxJobs value */
+			*current_max_log_size,
+					/* MaxLogSize value */
+			*current_local_protocols,
+					/* BrowseLocalProtocols */
+			*current_remote_protocols;
+					/* BrowseRemoteProtocols */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
@@ -1569,6 +1585,42 @@ do_config_server(http_t *http)		/* I - HTTP connection */
     fprintf(stderr, "DEBUG: DefaultAuthType %s\n", default_auth_type);
 #endif /* HAVE_GSSAPI */
 
+    if ((current_browse_web_if = cupsGetOption("BrowseWebIF", num_settings,
+                                               settings)) == NULL)
+      current_browse_web_if = "No";
+
+    if ((current_preserve_job_history = cupsGetOption("PreserveJobHistory",
+                                                      num_settings,
+						      settings)) == NULL)
+      current_preserve_job_history = "Yes";
+
+    if ((current_preserve_job_files = cupsGetOption("PreserveJobFiles",
+                                                    num_settings,
+						    settings)) == NULL)
+      current_preserve_job_files = "No";
+
+    if ((current_max_clients = cupsGetOption("MaxClients", num_settings,
+                                             settings)) == NULL)
+      current_max_clients = "100";
+
+    if ((current_max_jobs = cupsGetOption("MaxJobs", num_settings,
+                                          settings)) == NULL)
+      current_max_jobs = "500";
+
+    if ((current_max_log_size = cupsGetOption("MaxLogSize", num_settings,
+                                              settings)) == NULL)
+      current_max_log_size = "1m";
+
+    if ((current_local_protocols = cupsGetOption("BrowseLocalProtocols",
+                                                 num_settings,
+						settings)) == NULL)
+      current_local_protocols = CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS;
+
+    if ((current_remote_protocols = cupsGetOption("BrowseRemoteProtocols",
+                                                  num_settings,
+						  settings)) == NULL)
+      current_remote_protocols = CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS;
+
    /*
     * See if the settings have changed...
     */
@@ -1592,25 +1644,14 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 						    num_settings, settings));
 
     if (advanced && !changed)
-      changed = cupsGetOption("BrowseLocalProtocols", num_settings, settings) ||
-	        strcasecmp(local_protocols,
-		           CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS) ||
-		cupsGetOption("BrowseRemoteProtocols", num_settings,
-		              settings) ||
-		strcasecmp(remote_protocols,
-		           CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS) ||
-		cupsGetOption("BrowseWebIF", num_settings, settings) ||
-		strcasecmp(browse_web_if, "No") ||
-		cupsGetOption("PreserveJobHistory", num_settings, settings) ||
-		strcasecmp(preserve_job_history, "Yes") ||
-		cupsGetOption("PreserveJobFiles", num_settings, settings) ||
-		strcasecmp(preserve_job_files, "No") ||
-		cupsGetOption("MaxClients", num_settings, settings) ||
-		strcasecmp(max_clients, "100") ||
-		cupsGetOption("MaxJobs", num_settings, settings) ||
-		strcasecmp(max_jobs, "500") ||
-		cupsGetOption("MaxLogSize", num_settings, settings) ||
-		strcasecmp(max_log_size, "1m");
+      changed = strcasecmp(local_protocols, current_local_protocols) ||
+		strcasecmp(remote_protocols, current_remote_protocols) ||
+		strcasecmp(browse_web_if, current_browse_web_if) ||
+		strcasecmp(preserve_job_history, current_preserve_job_history) ||
+		strcasecmp(preserve_job_files, current_preserve_job_files) ||
+		strcasecmp(max_clients, current_max_clients) ||
+		strcasecmp(max_jobs, current_max_jobs) ||
+		strcasecmp(max_log_size, current_max_log_size);
 
     if (changed)
     {
@@ -1644,37 +1685,29 @@ do_config_server(http_t *http)		/* I - HTTP connection */
         * Add advanced settings...
 	*/
 
-	if (cupsGetOption("BrowseLocalProtocols", num_settings, settings) ||
-	    strcasecmp(local_protocols, CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS))
+	if (strcasecmp(local_protocols, current_local_protocols))
 	  num_settings = cupsAddOption("BrowseLocalProtocols", local_protocols,
 				       num_settings, &settings);
-	if (cupsGetOption("BrowseRemoteProtocols", num_settings, settings) ||
-	    strcasecmp(remote_protocols, CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS))
+	if (strcasecmp(remote_protocols, current_remote_protocols))
 	  num_settings = cupsAddOption("BrowseRemoteProtocols", remote_protocols,
 				       num_settings, &settings);
-	if (cupsGetOption("BrowseWebIF", num_settings, settings) ||
-	    strcasecmp(browse_web_if, "No"))
+	if (strcasecmp(browse_web_if, current_browse_web_if))
 	  num_settings = cupsAddOption("BrowseWebIF", browse_web_if,
 				       num_settings, &settings);
-	if (cupsGetOption("PreserveJobHistory", num_settings, settings) ||
-	    strcasecmp(preserve_job_history, "Yes"))
+	if (strcasecmp(preserve_job_history, current_preserve_job_history))
 	  num_settings = cupsAddOption("PreserveJobHistory",
 	                               preserve_job_history, num_settings,
 				       &settings);
-	if (cupsGetOption("PreserveJobFiles", num_settings, settings) ||
-	    strcasecmp(preserve_job_files, "No"))
+	if (strcasecmp(preserve_job_files, current_preserve_job_files))
 	  num_settings = cupsAddOption("PreserveJobFiles", preserve_job_files,
 	                               num_settings, &settings);
-        if (cupsGetOption("MaxClients", num_settings, settings) ||
-	    strcasecmp(max_clients, "100"))
+        if (strcasecmp(max_clients, current_max_clients))
 	  num_settings = cupsAddOption("MaxClients", max_clients, num_settings,
 	                               &settings);
-        if (cupsGetOption("MaxJobs", num_settings, settings) ||
-	    strcasecmp(max_jobs, "500"))
+        if (strcasecmp(max_jobs, current_max_jobs))
 	  num_settings = cupsAddOption("MaxJobs", max_jobs, num_settings,
 	                               &settings);
-        if (cupsGetOption("MaxLogSize", num_settings, settings) ||
-	    strcasecmp(max_log_size, "1m"))
+        if (strcasecmp(max_log_size, current_max_log_size))
 	  num_settings = cupsAddOption("MaxLogSize", max_log_size, num_settings,
 	                               &settings);
       }
