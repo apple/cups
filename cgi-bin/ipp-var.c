@@ -561,7 +561,6 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
   *    attributes-natural-language
   *    printer-uri
   *    requesting-user-name
-  *    document-format
   */
 
   request = ippNewRequest(IPP_PRINT_JOB);
@@ -575,9 +574,6 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name",
                NULL, "Test Page");
-
-  ippAddString(request, IPP_TAG_JOB, IPP_TAG_MIMETYPE, "document-format",
-               NULL, "application/postscript");
 
  /*
   * Do the request and get back a response...
