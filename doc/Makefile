@@ -36,6 +36,7 @@ WEBIMAGES	=	\
 			images/sel.gif \
 			images/smiley.jpg \
 			images/unsel.gif \
+			images/wait.gif \
 			images/web-add-this-printer.gif \
 			images/web-password.gif \
 			images/web-printer-driver.gif \

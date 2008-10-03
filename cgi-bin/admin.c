@@ -1695,7 +1695,10 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       }
       else
       {
-	cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
+        if (advanced)
+	  cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect&URL=/admin/?ADVANCEDSETTINGS=YES");
+        else
+	  cgiSetVariable("refresh_page", "5;URL=/admin/?OP=redirect");
 	cgiStartHTML(cgiText(_("Change Settings")));
 	cgiCopyTemplateLang("restart.tmpl");
       }
