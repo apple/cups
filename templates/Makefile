@@ -24,6 +24,7 @@ FILES	=	\
 		add-printer.tmpl \
 		add-rss-subscription.tmpl \
 		admin.tmpl \
+		autoconfigure.tmpl \
 		choose-device.tmpl \
 		choose-make.tmpl \
 		choose-model.tmpl \

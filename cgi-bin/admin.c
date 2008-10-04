@@ -3197,19 +3197,34 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     int			job_id;		/* Command file job */
     char		refresh[1024];	/* Refresh URL */
     http_status_t	status;		/* Document status */
+    cups_option_t	hold_option;	/* job-hold-until option */
     static const char	*autoconfigure =/* Command file */
 			"#CUPS-COMMAND\n"
 			"AutoConfigure\n";
+    static const char const *job_attrs[] =
+			{
+			  "job-state",
+			  "job-printer-state-message"
+			};
 
+    cgiStartMultipart();
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("autoconfigure.tmpl");
+    cgiEndHTML();
+    fflush(stdout);
+
+    hold_option.name  = "job-hold-until";
+    hold_option.value = "no-hold";
 
     if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, printer, "Auto-Configure",
-                                0, NULL)) < 1)
+                                1, &hold_option)) < 1)
     {
       cgiSetVariable("ERROR", cgiText(_("Unable to send auto-configure command "
                                         "to printer driver!")));
       cgiStartHTML(title);
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
+      cgiEndMultipart();
       return;
     }
 
@@ -3227,9 +3242,53 @@ do_set_options(http_t *http,		/* I - HTTP connection */
       cgiStartHTML(title);
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
+      cgiEndMultipart();
 
       cupsCancelJob(printer, job_id);
       return;
+    }
+
+   /*
+    * Wait for the job to complete...
+    */
+
+    for (;;)
+    {
+     /*
+      * Get the current job state...
+      */
+
+      snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+      request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+                   NULL, uri);
+      if (getenv("REMOTE_USER"))
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		     "requesting-user-name", NULL, getenv("REMOTE_USER"));
+      ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+                    "requested-attributes", 2, NULL, job_attrs);
+
+      response = cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/");
+      attr     = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
+      if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
+      {
+        ippDelete(response);
+	break;
+      }
+
+     /*
+      * Job not complete, so update the status...
+      */
+
+      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+      ippDelete(response);
+
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("autoconfigure.tmpl");
+      cgiEndHTML();
+      fflush(stdout);
+
+      sleep(5);
     }
 
    /*
@@ -3245,6 +3304,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
     cgiCopyTemplateLang("printer-configured.tmpl");
     cgiEndHTML();
+    cgiEndMultipart();
     return;
   }
 
