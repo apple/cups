@@ -15,6 +15,7 @@
  * Contents:
  *
  *   main()                    - Main entry for CGI.
+ *   choose_device_cb()        - Add a device to the device selection page.
  *   do_add_rss_subscription() - Add a RSS subscription.
  *   do_am_class()             - Add or modify a class.
  *   do_am_printer()           - Add or modify a printer.
@@ -49,9 +50,22 @@
 
 
 /*
+ * Local globals...
+ */
+
+static int	current_device = 0;
+
+
+/*
  * Local functions...
  */
 
+static void	choose_device_cb(const char *device_class,
+                                 const char *device_id, const char *device_info,
+                                 const char *device_make_and_model,
+                                 const char *device_uri,
+                                 const char *device_location,
+				 const char *title);
 static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
@@ -233,6 +247,44 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   return (0);
+}
+
+
+/*
+ * 'choose_device_cb()' - Add a device to the device selection page.
+ */
+
+static void
+choose_device_cb(
+    const char *device_class,		/* I - Class */
+    const char *device_id,		/* I - 1284 device ID */
+    const char *device_info,		/* I - Description */
+    const char *device_make_and_model,	/* I - Make and model */
+    const char *device_uri,		/* I - Device URI */
+    const char *device_location,	/* I - Location */
+    const char *title)			/* I - Page title */
+{
+ /*
+  * Add the device to the array...
+  */
+
+  cgiSetArray("device_class", current_device, device_class);
+  cgiSetArray("device_id", current_device, device_id);
+  cgiSetArray("device_info", current_device, device_info);
+  cgiSetArray("device_make_and_model", current_device, device_make_and_model);
+  cgiSetArray("device_uri", current_device, device_uri);
+  cgiSetArray("device_location", current_device, device_location);
+
+  current_device ++;
+
+ /*
+  * Update the page...
+  */
+
+  cgiStartHTML(title);
+  cgiCopyTemplateLang("choose-device.tmpl");
+  cgiEndHTML();
+  fflush(stdout);
 }
 
 
@@ -852,39 +904,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   if (!var)
   {
    /*
-    * Build a CUPS_GET_DEVICES request, which requires the following
-    * attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    fputs("DEBUG: Getting list of devices...\n", stderr);
-
-    request = ippNewRequest(CUPS_GET_DEVICES);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, "ipp://localhost/printers/");
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-    {
-      fputs("DEBUG: Got device list!\n", stderr);
-
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-      ippDelete(response);
-    }
-    else
-      fprintf(stderr,
-              "ERROR: CUPS-Get-Devices request failed with status %x: %s\n",
-	      cupsLastError(), cupsLastErrorString());
-
-   /*
-    * Let the user choose...
+    * Look for devices so the user can pick something...
     */
 
     if ((attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
@@ -897,9 +917,41 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       cgiSetVariable("CURRENT_DEVICE_SCHEME", uri);
     }
 
+   /*
+    * Prime the page with the current device listed...
+    */
+
+    cgiStartMultipart();
     cgiStartHTML(title);
     cgiCopyTemplateLang("choose-device.tmpl");
     cgiEndHTML();
+    fflush(stdout);
+
+   /*
+    * Scan for devices for up to 30 seconds, updating the page as we find
+    * them...
+    */
+
+    fputs("DEBUG: Getting list of devices...\n", stderr);
+
+    current_device = 0;
+    if (cupsGetDevices(http, 30, NULL, (cups_device_cb_t)choose_device_cb,
+                       (void *)title) == IPP_OK)
+      fputs("DEBUG: Got device list!\n", stderr);
+    else
+      fprintf(stderr,
+              "ERROR: CUPS-Get-Devices request failed with status %x: %s\n",
+	      cupsLastError(), cupsLastErrorString());
+
+   /*
+    * Show the final selection page...
+    */
+
+    cgiSetVariable("CUPS_GET_DEVICES_DONE", "1");
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("choose-device.tmpl");
+    cgiEndHTML();
+    cgiEndMultipart();
   }
   else if (strchr(var, '/') == NULL)
   {

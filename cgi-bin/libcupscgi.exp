@@ -4,6 +4,7 @@ _cgiCopyTemplateFile
 _cgiCopyTemplateLang
 _cgiDoSearch
 _cgiEndHTML
+_cgiEndMultipart
 _cgiFormEncode
 _cgiFreeSearch
 _cgiGetArray
@@ -27,6 +28,7 @@ _cgiSetVariable
 _cgiShowIPPError
 _cgiShowJobs
 _cgiStartHTML
+_cgiStartMultipart
 _cgiText
 _helpDeleteIndex
 _helpFindNode

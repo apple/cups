@@ -3,7 +3,7 @@
  *
  *   CGI support library definitions.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -59,6 +59,7 @@ extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
 extern void		cgiCopyTemplateLang(const char *tmpl);
 extern int		cgiDoSearch(void *search, const char *text);
 extern void		cgiEndHTML(void);
+extern void		cgiEndMultipart(void);
 extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
 extern void		cgiFreeSearch(void *search);
 extern const char	*cgiGetArray(const char *name, int element);
@@ -91,6 +92,7 @@ extern void		cgiSetVariable(const char *name, const char *value);
 extern void		cgiShowIPPError(const char *message);
 extern void		cgiShowJobs(http_t *http, const char *dest);
 extern void		cgiStartHTML(const char *title);
+extern void		cgiStartMultipart(void);
 extern const char	*cgiText(const char *message);
 
 #endif /* !_CUPS_CGI_H_ */

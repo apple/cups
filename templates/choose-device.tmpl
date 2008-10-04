@@ -2,6 +2,9 @@
 
 <H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Add Printer}</H2>
 
+{CUPS_GET_DEVICES_DONE?:<P><IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
+ALT="Busy Indicator"> Looking for printers...</P>}
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
@@ -11,7 +14,7 @@
 <TH CLASS="label">Current Connection:</TH>
 <TD><INPUT TYPE="RADIO" NAME="DEVICE_URI" VALUE="{current_device_uri}" CHECKED>
 {current_device_uri}</TD>
-</TR>:}
+</TR>}
 <TR>
 <TH CLASS="label">Local Printers:</TH>
 <TD>

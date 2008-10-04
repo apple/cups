@@ -3,7 +3,7 @@
  *
  *   HTML support functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,10 +14,12 @@
  *
  * Contents:
  *
- *   cgiEndHTML()      - End a HTML page.
- *   cgiFormEncode()   - Encode a string as a form variable...
- *   cgiStartHTML()    - Start a HTML page.
- *   cgi_null_passwd() - Return a NULL password for authentication.
+ *   cgiEndHTML()        - End a HTML page.
+ *   cgiEndMultipart()   - End the delivery of a multipart web page.
+ *   cgiFormEncode()     - Encode a string as a form variable...
+ *   cgiStartHTML()      - Start a HTML page.
+ *   cgiStartMultipart() - Start a multipart delivery of a web page...
+ *   cgi_null_passwd()   - Return a NULL password for authentication.
  */
 
 /*
@@ -25,6 +27,14 @@
  */
 
 #include "cgi-private.h"
+
+
+/*
+ * Local globals...
+ */
+
+static const char	*cgi_multipart = NULL;
+					/* Multipart separator, if any */
 
 
 /*
@@ -46,6 +56,18 @@ cgiEndHTML(void)
   */
 
   cgiCopyTemplateLang("trailer.tmpl");
+}
+
+
+/*
+ * 'cgiEndMultipart()' - End the delivery of a multipart web page.
+ */
+
+void
+cgiEndMultipart(void)
+{
+  if (cgi_multipart)
+    printf("\n%s--\n", cgi_multipart);
 }
 
 
@@ -144,6 +166,9 @@ cgiStartHTML(const char *title)		/* I - Title of page */
   * Tell the client to expect UTF-8 encoded HTML...
   */
 
+  if (cgi_multipart)
+    puts(cgi_multipart);
+
   puts("Content-Type: text/html;charset=utf-8\n");
 
  /*
@@ -154,6 +179,19 @@ cgiStartHTML(const char *title)		/* I - Title of page */
   cgiSetServerVersion();
 
   cgiCopyTemplateLang("header.tmpl");
+}
+
+
+/*
+ * 'cgiStartMultipart()' - Start a multipart delivery of a web page...
+ */
+
+void
+cgiStartMultipart(void)
+{
+  puts("MIME-Version: 1.0");
+  puts("Content-Type: multipart/x-mixed-replace; boundary=\"CUPS-MULTIPART\"\n");
+  cgi_multipart = "--CUPS-MULTIPART";
 }
 
 
