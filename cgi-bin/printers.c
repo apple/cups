@@ -502,14 +502,6 @@ show_printer(http_t     *http,		/* I - Connection to server */
 
     cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 
-    if ((attr = ippFindAttribute(response, "printer-type",
-                                 IPP_TAG_ENUM)) != NULL)
-    {
-      cgiSetVariable("cupscommand",
-                     (attr->values[0].integer & CUPS_PRINTER_COMMANDS) ?
-		         "1" : "0");
-    }
-
     if (printer && (attr = ippFindAttribute(response, "printer-state",
                                             IPP_TAG_ENUM)) != NULL &&
         attr->values[0].integer == IPP_PRINTER_PROCESSING)
