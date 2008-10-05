@@ -53,7 +53,8 @@
  * Local globals...
  */
 
-static int	current_device = 0;
+static int	current_device;		/* Current device for add/modify */
+static time_t	last_device_time;	/* Last update time for device list */
 
 
 /*
@@ -277,14 +278,19 @@ choose_device_cb(
 
   current_device ++;
 
- /*
-  * Update the page...
-  */
+  if (time(NULL) > last_device_time)
+  {
+   /*
+    * Update the page...
+    */
 
-  cgiStartHTML(title);
-  cgiCopyTemplateLang("choose-device.tmpl");
-  cgiEndHTML();
-  fflush(stdout);
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("choose-device.tmpl");
+    cgiEndHTML();
+    fflush(stdout);
+
+    time(&last_device_time);
+  }
 }
 
 
@@ -934,6 +940,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     fputs("DEBUG: Getting list of devices...\n", stderr);
 
+    time(&last_device_time);
     current_device = 0;
     if (cupsGetDevices(http, 30, NULL, (cups_device_cb_t)choose_device_cb,
                        (void *)title) == IPP_OK)
