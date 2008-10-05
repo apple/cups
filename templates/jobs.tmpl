@@ -16,9 +16,9 @@
 {job_state=7?canceled at<BR>{time_at_completed}:{job_state=8?aborted:completed at<BR>{time_at_completed}}}}}}}&nbsp;{job_printer_state_message?<BR>
 <EM>"{job_printer_state_message}"</EM>:}</TD>
 <TD>
-{job_preserved>0?
+{job_preserved>0?{job_state>5?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="restart-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
-<INPUT TYPE="SUBMIT" VALUE="Reprint Job"></FORM>:}
+<INPUT TYPE="SUBMIT" VALUE="Reprint Job"></FORM>:}:}
 {job_state=4?
 <FORM ACTION="/jobs/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="release-job"><INPUT TYPE="HIDDEN" NAME="job_id" VALUE="{job_id}"><INPUT TYPE="HIDDEN" NAME="job_printer_uri" VALUE="{job_printer_uri}">
 <INPUT TYPE="SUBMIT" VALUE="Release Job"></FORM>:}

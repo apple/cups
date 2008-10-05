@@ -73,6 +73,8 @@ extern const char	*cgiGetVariable(const char *name);
 extern int		cgiInitialize(void);
 extern int		cgiIsPOST(void);
 extern void		cgiMoveJobs(http_t *http, const char *dest, int job_id);
+extern void		cgiPrintCommand(http_t *http, const char *dest,
+			                const char *command, const char *title);
 extern void		cgiPrintTestPage(http_t *http, const char *dest);
 extern char		*cgiRewriteURL(const char *uri, char *url, int urlsize,
 			               const char *newresource);

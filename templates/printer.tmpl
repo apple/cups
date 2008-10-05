@@ -1,4 +1,5 @@
 <DIV CLASS="indent">
+
 <H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
 ({printer_state=3?Idle:{printer_state=4?Processing:Paused}},
 {printer_is_accepting_jobs=0?Rejecting Jobs:Accepting Jobs},
@@ -8,8 +9,8 @@
 <SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
 <OPTION VALUE="">Maintenance</OPTION>
 <OPTION VALUE="print-test-page">Print Test Page</OPTION>
-{?cupscommand=1?<OPTION VALUE="clean-print-heads">Clean Print Heads</OPTION>
-<OPTION VALUE="print-self-test-page">Print Self Test Page</OPTION>:}
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Clean Print Heads</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Print Self Test Page</OPTION>:}
 {printer_state=5?<OPTION VALUE="start-printer">Resume Printer</OPTION>:<OPTION VALUE="stop-printer">Pause Printer</OPTION>}
 {printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accept Jobs</OPTION>:<OPTION VALUE="reject-jobs">Reject Jobs</OPTION>}
 <OPTION VALUE="move-jobs">Move All Jobs</OPTION>
@@ -19,7 +20,7 @@
 </FORM>
 
 <FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
-<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
 <SELECT NAME="OP" ONCHANGE="document.administration.submit();">
 <OPTION VALUE="">Administration</OPTION>
 <OPTION VALUE="modify-printer">Modify Printer</OPTION>

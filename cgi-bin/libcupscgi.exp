@@ -17,6 +17,7 @@ _cgiGetVariable
 _cgiInitialize
 _cgiIsPOST
 _cgiMoveJobs
+_cgiPrintCommand
 _cgiPrintTestPage
 _cgiRewriteURL
 _cgiSetArray

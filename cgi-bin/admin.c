@@ -26,8 +26,8 @@
  *   do_export()               - Export printers to Samba.
  *   do_list_printers()        - List available printers.
  *   do_menu()                 - Show the main menu.
- *   do_printer_op()           - Do a printer operation.
  *   do_set_allowed_users()    - Set the allowed/denied users for a queue.
+ *   do_set_default()          - Set the server default printer/class.
  *   do_set_options()          - Configure the default options for a queue.
  *   do_set_sharing()          - Set printer-is-shared value.
  *   get_option_value()        - Return the value of an option.
@@ -71,16 +71,15 @@ static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
 static void	do_cancel_subscription(http_t *http);
-static void	do_set_options(http_t *http, int is_class);
 static void	do_config_server(http_t *http);
 static void	do_delete_class(http_t *http);
 static void	do_delete_printer(http_t *http);
 static void	do_export(http_t *http);
 static void	do_list_printers(http_t *http);
 static void	do_menu(http_t *http);
-static void	do_printer_op(http_t *http,
-		              ipp_op_t op, const char *title);
 static void	do_set_allowed_users(http_t *http);
+static void	do_set_default(http_t *http);
+static void	do_set_options(http_t *http, int is_class);
 static void	do_set_sharing(http_t *http);
 static char	*get_option_value(ppd_file_t *ppd, const char *name,
 		                  char *buffer, size_t bufsize);
@@ -148,24 +147,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
-    if (!strcmp(op, "start-printer"))
-      do_printer_op(http, IPP_RESUME_PRINTER, cgiText(_("Start Printer")));
-    else if (!strcmp(op, "stop-printer"))
-      do_printer_op(http, IPP_PAUSE_PRINTER, cgiText(_("Stop Printer")));
-    else if (!strcmp(op, "start-class"))
-      do_printer_op(http, IPP_RESUME_PRINTER, cgiText(_("Start Class")));
-    else if (!strcmp(op, "stop-class"))
-      do_printer_op(http, IPP_PAUSE_PRINTER, cgiText(_("Stop Class")));
-    else if (!strcmp(op, "accept-jobs"))
-      do_printer_op(http, CUPS_ACCEPT_JOBS, cgiText(_("Accept Jobs")));
-    else if (!strcmp(op, "reject-jobs"))
-      do_printer_op(http, CUPS_REJECT_JOBS, cgiText(_("Reject Jobs")));
-    else if (!strcmp(op, "purge-jobs"))
-      do_printer_op(http, IPP_PURGE_JOBS, cgiText(_("Purge Jobs")));
-    else if (!strcmp(op, "set-allowed-users"))
+    if (!strcmp(op, "set-allowed-users"))
       do_set_allowed_users(http);
     else if (!strcmp(op, "set-as-default"))
-      do_printer_op(http, CUPS_SET_DEFAULT, cgiText(_("Set As Default")));
+      do_set_default(http);
     else if (!strcmp(op, "set-sharing"))
       do_set_sharing(http);
     else if (!strcmp(op, "find-new-printers") ||
@@ -2777,101 +2762,6 @@ do_menu(http_t *http)			/* I - HTTP connection */
 
 
 /*
- * 'do_printer_op()' - Do a printer operation.
- */
-
-static void
-do_printer_op(http_t      *http,	/* I - HTTP connection */
-	      ipp_op_t    op,		/* I - Operation to perform */
-	      const char  *title)	/* I - Title of page */
-{
-  ipp_t		*request;		/* IPP request */
-  char		uri[HTTP_MAX_URI];	/* Printer URI */
-  const char	*printer,		/* Printer name (purge-jobs) */
-		*is_class;		/* Is a class? */
-
-
-  is_class = cgiGetVariable("IS_CLASS");
-  printer  = cgiGetVariable("PRINTER_NAME");
-
-  if (!printer)
-  {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("error.tmpl");
-    cgiEndHTML();
-    return;
-  }
-
- /*
-  * Build a printer request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
-  *    printer-uri
-  */
-
-  request = ippNewRequest(op);
-
-  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                   "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
-		   printer);
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
-
- /*
-  * Do the request and get back a response...
-  */
-
-  ippDelete(cupsDoRequest(http, request, "/admin/"));
-
-  if (cupsLastError() == IPP_NOT_AUTHORIZED)
-  {
-    puts("Status: 401\n");
-    exit(0);
-  }
-  else if (cupsLastError() > IPP_OK_CONFLICT)
-  {
-    cgiStartHTML(title);
-    cgiShowIPPError(_("Unable to change printer:"));
-  }
-  else
-  {
-   /*
-    * Redirect successful updates back to the printer page...
-    */
-
-    char	url[1024],		/* Printer/class URL */
-		refresh[1024];		/* Refresh URL */
-
-
-    cgiRewriteURL(uri, url, sizeof(url), NULL);
-    cgiFormEncode(uri, url, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=%s", uri);
-    cgiSetVariable("refresh_page", refresh);
-
-    cgiStartHTML(title);
-
-    if (op == IPP_PAUSE_PRINTER)
-      cgiCopyTemplateLang("printer-stop.tmpl");
-    else if (op == IPP_RESUME_PRINTER)
-      cgiCopyTemplateLang("printer-start.tmpl");
-    else if (op == CUPS_ACCEPT_JOBS)
-      cgiCopyTemplateLang("printer-accept.tmpl");
-    else if (op == CUPS_REJECT_JOBS)
-      cgiCopyTemplateLang("printer-reject.tmpl");
-    else if (op == IPP_PURGE_JOBS)
-      cgiCopyTemplateLang("printer-purge.tmpl");
-    else if (op == CUPS_SET_DEFAULT)
-      cgiCopyTemplateLang("printer-default.tmpl");
-  }
-
-  cgiEndHTML();
-}
-
-
-/*
  * 'do_set_allowed_users()' - Set the allowed/denied users for a queue.
  */
 
@@ -3138,6 +3028,89 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
 
 /*
+ * 'do_set_default()' - Set the server default printer/class.
+ */
+
+static void
+do_set_default(http_t *http)		/* I - HTTP connection */
+{
+  const char	*title;			/* Page title */
+  ipp_t		*request;		/* IPP request */
+  char		uri[HTTP_MAX_URI];	/* Printer URI */
+  const char	*printer,		/* Printer name (purge-jobs) */
+		*is_class;		/* Is a class? */
+
+
+  is_class = cgiGetVariable("IS_CLASS");
+  printer  = cgiGetVariable("PRINTER_NAME");
+  title    = cgiText(_("Set As Server Default"));
+
+  if (!printer)
+  {
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    return;
+  }
+
+ /*
+  * Build a printer request, which requires the following
+  * attributes:
+  *
+  *    attributes-charset
+  *    attributes-natural-language
+  *    printer-uri
+  */
+
+  request = ippNewRequest(CUPS_SET_DEFAULT);
+
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                   "localhost", 0, is_class ? "/classes/%s" : "/printers/%s",
+		   printer);
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, uri);
+
+ /*
+  * Do the request and get back a response...
+  */
+
+  ippDelete(cupsDoRequest(http, request, "/admin/"));
+
+  if (cupsLastError() == IPP_NOT_AUTHORIZED)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
+  else if (cupsLastError() > IPP_OK_CONFLICT)
+  {
+    cgiStartHTML(title);
+    cgiShowIPPError(_("Unable to set server default:"));
+  }
+  else
+  {
+   /*
+    * Redirect successful updates back to the printer page...
+    */
+
+    char	url[1024],		/* Printer/class URL */
+		refresh[1024];		/* Refresh URL */
+
+
+    cgiRewriteURL(uri, url, sizeof(url), NULL);
+    cgiFormEncode(uri, url, sizeof(uri));
+    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=%s", uri);
+    cgiSetVariable("refresh_page", refresh);
+
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("printer-default.tmpl");
+  }
+
+  cgiEndHTML();
+}
+
+
+/*
  * 'do_set_options()' - Configure the default options for a queue.
  */
 
@@ -3201,117 +3174,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
   if (cgiGetVariable("AUTOCONFIGURE"))
   {
-    int			job_id;		/* Command file job */
-    char		refresh[1024];	/* Refresh URL */
-    http_status_t	status;		/* Document status */
-    cups_option_t	hold_option;	/* job-hold-until option */
-    static const char	*autoconfigure =/* Command file */
-			"#CUPS-COMMAND\n"
-			"AutoConfigure\n";
-    static const char const *job_attrs[] =
-			{
-			  "job-state",
-			  "job-printer-state-message"
-			};
-
-    cgiStartMultipart();
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("autoconfigure.tmpl");
-    cgiEndHTML();
-    fflush(stdout);
-
-    hold_option.name  = "job-hold-until";
-    hold_option.value = "no-hold";
-
-    if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, printer, "Auto-Configure",
-                                1, &hold_option)) < 1)
-    {
-      cgiSetVariable("ERROR", cgiText(_("Unable to send auto-configure command "
-                                        "to printer driver!")));
-      cgiStartHTML(title);
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-      cgiEndMultipart();
-      return;
-    }
-
-    status = cupsStartDocument(CUPS_HTTP_DEFAULT, printer, job_id,
-                               "AutoConfigure.command", CUPS_FORMAT_COMMAND, 1);
-    if (status == HTTP_CONTINUE)
-      status = cupsWriteRequestData(CUPS_HTTP_DEFAULT, autoconfigure,
-                                    strlen(autoconfigure));
-    if (status == HTTP_CONTINUE)
-      cupsFinishDocument(CUPS_HTTP_DEFAULT, printer);
-
-    if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
-    {
-      cgiSetVariable("ERROR", cupsLastErrorString());
-      cgiStartHTML(title);
-      cgiCopyTemplateLang("error.tmpl");
-      cgiEndHTML();
-      cgiEndMultipart();
-
-      cupsCancelJob(printer, job_id);
-      return;
-    }
-
-   /*
-    * Wait for the job to complete...
-    */
-
-    for (;;)
-    {
-     /*
-      * Get the current job state...
-      */
-
-      snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
-      request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
-                   NULL, uri);
-      if (getenv("REMOTE_USER"))
-	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		     "requesting-user-name", NULL, getenv("REMOTE_USER"));
-      ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                    "requested-attributes", 2, NULL, job_attrs);
-
-      response = cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/");
-      attr     = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
-      if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
-      {
-        ippDelete(response);
-	break;
-      }
-
-     /*
-      * Job not complete, so update the status...
-      */
-
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-      ippDelete(response);
-
-      cgiStartHTML(title);
-      cgiCopyTemplateLang("autoconfigure.tmpl");
-      cgiEndHTML();
-      fflush(stdout);
-
-      sleep(5);
-    }
-
-   /*
-    * Redirect successful updates back to the printer page...
-    */
-
-    cgiFormEncode(uri, printer, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;URL=/admin/?OP=redirect&URL=/%s/%s",
-	     is_class ? "classes" : "printers", uri);
-    cgiSetVariable("refresh_page", refresh);
-
-    cgiStartHTML(title);
-
-    cgiCopyTemplateLang("printer-configured.tmpl");
-    cgiEndHTML();
-    cgiEndMultipart();
+    cgiPrintCommand(http, printer, "AutoConfigure", "Set Default Options");
     return;
   }
 

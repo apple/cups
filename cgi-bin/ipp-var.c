@@ -14,10 +14,11 @@
  *
  * Contents:
  *
- *   cgiGetAttributes()    - Get the list of attributes that are needed
- *                           by the template file.
+ *   cgiGetAttributes()    - Get the list of attributes that are needed by the
+ *                           template file.
  *   cgiGetIPPObjects()    - Get the objects in an IPP response.
  *   cgiMoveJobs()         - Move one or more jobs.
+ *   cgiPrintCommand()     - Print a CUPS command job.
  *   cgiPrintTestPage()    - Print a test page.
  *   cgiRewriteURL()       - Rewrite a printer URI into a web browser URL...
  *   cgiSetIPPObjectVars() - Set CGI variables from an IPP object.
@@ -113,7 +114,7 @@ cgiGetAttributes(ipp_t      *request,	/* I - IPP request */
       */
 
       for (nameptr = name; (ch = getc(in)) != EOF;)
-        if (strchr("}]<>=! \t\n", ch))
+        if (strchr("}]<>=!~ \t\n", ch))
           break;
         else if (nameptr > name && ch == '?')
 	  break;
@@ -506,6 +507,155 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
   }
 
   cgiEndHTML();
+}
+
+
+/*
+ * 'cgiPrintCommand()' - Print a CUPS command job.
+ */
+
+void
+cgiPrintCommand(http_t     *http,	/* I - Connection to server */
+                const char *dest,	/* I - Destination printer */
+                const char *command,	/* I - Command to send */
+		const char *title)	/* I - Page/job title */
+{
+  int		job_id;			/* Command file job */
+  char		uri[HTTP_MAX_URI],	/* Job URI */
+		resource[1024],		/* Printer resource path */
+		refresh[1024],		/* Refresh URL */
+		command_file[1024];	/* Command "file" */
+  http_status_t	status;			/* Document status */
+  cups_option_t	hold_option;		/* job-hold-until option */
+  const char	*user;			/* User name */
+  ipp_t		*request,		/* Get-Job-Attributes request */
+		*response;		/* Get-Job-Attributes response */
+  ipp_attribute_t *attr;		/* Current job attribute */
+  static const char const *job_attrs[] =/* Job attributes we want */
+		{
+		  "job-state",
+		  "job-printer-state-message"
+		};
+
+
+ /*
+  * Create the CUPS command file...
+  */
+
+  snprintf(command_file, sizeof(command_file), "#CUPS-COMMAND\n%s\n", command);
+
+ /*
+  * Show status...
+  */
+
+  cgiStartMultipart();
+  cgiStartHTML(title);
+  cgiCopyTemplateLang("command.tmpl");
+  cgiEndHTML();
+  fflush(stdout);
+
+ /*
+  * Send the command file job...
+  */
+
+  hold_option.name  = "job-hold-until";
+  hold_option.value = "no-hold";
+
+  if ((user = getenv("REMOTE_USER")) != NULL)
+    cupsSetUser(user);
+  else
+    cupsSetUser("anonymous");
+
+  if ((job_id = cupsCreateJob(http, dest, title,
+			      1, &hold_option)) < 1)
+  {
+    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver!")));
+    cgiSetVariable("ERROR", cupsLastErrorString());
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    cgiEndMultipart();
+    return;
+  }
+
+  status = cupsStartDocument(http, dest, job_id, NULL, CUPS_FORMAT_COMMAND, 1);
+  if (status == HTTP_CONTINUE)
+    status = cupsWriteRequestData(http, command_file,
+				  strlen(command_file));
+  if (status == HTTP_CONTINUE)
+    cupsFinishDocument(http, dest);
+
+  if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
+  {
+    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver!")));
+    cgiSetVariable("ERROR", cupsLastErrorString());
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("error.tmpl");
+    cgiEndHTML();
+    cgiEndMultipart();
+
+    cupsCancelJob(dest, job_id);
+    return;
+  }
+
+ /*
+  * Wait for the job to complete...
+  */
+
+  for (;;)
+  {
+   /*
+    * Get the current job state...
+    */
+
+    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+    request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+		 NULL, uri);
+    if (user)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		   "requesting-user-name", NULL, user);
+    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		  "requested-attributes", 2, NULL, job_attrs);
+
+    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+    attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
+    if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
+    {
+      ippDelete(response);
+      break;
+    }
+
+   /*
+    * Job not complete, so update the status...
+    */
+
+    ippDelete(response);
+
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("command.tmpl");
+    cgiEndHTML();
+    fflush(stdout);
+
+    sleep(5);
+  }
+
+ /*
+  * Send the final page that reloads the printer's page...
+  */
+
+  snprintf(resource, sizeof(resource), "/printers/%s", dest);
+
+  cgiFormEncode(uri, resource, sizeof(uri));
+  snprintf(refresh, sizeof(refresh), "5;URL=%s", uri);
+  cgiSetVariable("refresh_page", refresh);
+
+  cgiStartHTML(title);
+  cgiCopyTemplateLang("command.tmpl");
+  cgiEndHTML();
+  cgiEndMultipart();
 }
 
 

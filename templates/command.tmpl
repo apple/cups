@@ -1,9 +1,10 @@
 <DIV CLASS="indent">
 
-<H2 CLASS="title">Set Default Options for {printer_name}</H2>
+<H2 CLASS="title">{title} On {printer_name}</H2>
 
 <P><IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16" ALIGN="ABSMIDDLE"
-ALT="Busy Indicator"> Query job {job_state=3?pending:{job_state=4?held:
+ALT="Busy Indicator"> Printer command job
+{job_state=3?pending:{job_state=4?held:
 {job_state=5?processing:{job_state=6?stopped:
 {job_state=7?canceled:{job_state=8?aborted:completed}}}}}}{job_printer_state_message?,
 <EM>"{job_printer_state_message}"</EM>:}</P>
