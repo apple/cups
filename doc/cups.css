@@ -383,6 +383,18 @@ DIV.summary TABLE THEAD TH {
   background: #f0f0f0;
 }
 
+DIV.tabs {
+  height: 480px;
+  overflow: hidden;
+}
+
+DIV.tab {
+  float: left;
+  height: 100%;
+  overflow-y: auto;
+  width: 100%;
+}
+
 /* API documentation styles... */
 div.body h1 {
   margin: 0;

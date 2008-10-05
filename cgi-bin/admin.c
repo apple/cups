@@ -3365,6 +3365,10 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
     fputs("DEBUG: Showing options...\n", stderr);
 
+   /*
+    * Show auto-configure button if supported...
+    */
+
     if (ppd)
     {
       if (ppd->num_filters == 0 ||
@@ -3380,6 +3384,62 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	    break;
 	  }
       }
+    }
+
+   /*
+    * Get the printer attributes...
+    */
+
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", 0, "/printers/%s", printer);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+    response = cupsDoRequest(http, request, "/");
+
+   /*
+    * List the groups used as "tabs"...
+    */
+
+    i = 0;
+
+    if (ppd)
+    {
+      for (group = ppd->groups;
+	   i < ppd->num_groups;
+	   i ++, group ++)
+      {
+        cgiSetArray("GROUP_ID", i, group->name);
+
+	if (!strcmp(group->name, "InstallableOptions"))
+	  cgiSetArray("GROUP", i, cgiText(_("Options Installed")));
+	else
+	  cgiSetArray("GROUP", i, group->text);
+      }
+    }
+
+    if (ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO))
+    {
+      cgiSetArray("GROUP_ID", i, "CUPS_BANNERS");
+      cgiSetArray("GROUP", i ++, cgiText(_("Banners")));
+    }
+
+    if (ippFindAttribute(response, "printer-error-policy-supported",
+			 IPP_TAG_ZERO) ||
+	ippFindAttribute(response, "printer-op-policy-supported",
+			 IPP_TAG_ZERO))
+    {
+      cgiSetArray("GROUP_ID", i, "CUPS_POLICIES");
+      cgiSetArray("GROUP", i ++, cgiText(_("Policies")));
+    }
+
+    if ((attr = ippFindAttribute(response, "port-monitor-supported",
+                                 IPP_TAG_NAME)) != NULL && attr->num_values > 1)
+    {
+      cgiSetArray("GROUP_ID", i, "CUPS_PORT_MONITOR");
+      cgiSetArray("GROUP", i, cgiText(_("Port Monitor")));
     }
 
     cgiStartHTML(cgiText(_("Set Printer Options")));
@@ -3411,6 +3471,8 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	   i > 0;
 	   i --, group ++)
       {
+        cgiSetVariable("GROUP_ID", group->name);
+
 	if (!strcmp(group->name, "InstallableOptions"))
 	  cgiSetVariable("GROUP", cgiText(_("Options Installed")));
 	else
@@ -3576,38 +3638,66 @@ do_set_options(http_t *http,		/* I - HTTP connection */
       }
     }
 
-   /*
-    * Build an IPP_GET_PRINTER_ATTRIBUTES request, which requires the
-    * following attributes:
-    *
-    *    attributes-charset
-    *    attributes-natural-language
-    *    printer-uri
-    */
-
-    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-                     "localhost", 0, "/printers/%s", printer);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-                 NULL, uri);
-
-   /*
-    * Do the request and get back a response...
-    */
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
+    if ((attr = ippFindAttribute(response, "job-sheets-supported",
+				 IPP_TAG_ZERO)) != NULL)
     {
-      if ((attr = ippFindAttribute(response, "job-sheets-supported",
-                                   IPP_TAG_ZERO)) != NULL)
+     /*
+      * Add the job sheets options...
+      */
+
+      cgiSetVariable("GROUP_ID", "CUPS_BANNERS");
+      cgiSetVariable("GROUP", cgiText(_("Banners")));
+      cgiCopyTemplateLang("option-header.tmpl");
+
+      cgiSetSize("CHOICES", attr->num_values);
+      cgiSetSize("TEXT", attr->num_values);
+      for (k = 0; k < attr->num_values; k ++)
       {
-       /*
-	* Add the job sheets options...
-	*/
+	cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	cgiSetArray("TEXT", k, attr->values[k].string.text);
+      }
 
-	cgiSetVariable("GROUP", cgiText(_("Banners")));
-	cgiCopyTemplateLang("option-header.tmpl");
+      attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
 
+      cgiSetVariable("KEYWORD", "job_sheets_start");
+      cgiSetVariable("KEYTEXT", cgiText(_("Starting Banner")));
+      cgiSetVariable("DEFCHOICE", attr != NULL ?
+				  attr->values[0].string.text : "");
+
+      cgiCopyTemplateLang("option-pickone.tmpl");
+
+      cgiSetVariable("KEYWORD", "job_sheets_end");
+      cgiSetVariable("KEYTEXT", cgiText(_("Ending Banner")));
+      cgiSetVariable("DEFCHOICE", attr != NULL && attr->num_values > 1 ?
+				  attr->values[1].string.text : "");
+
+      cgiCopyTemplateLang("option-pickone.tmpl");
+
+      cgiCopyTemplateLang("option-trailer.tmpl");
+    }
+
+    if (ippFindAttribute(response, "printer-error-policy-supported",
+			 IPP_TAG_ZERO) ||
+	ippFindAttribute(response, "printer-op-policy-supported",
+			 IPP_TAG_ZERO))
+    {
+     /*
+      * Add the error and operation policy options...
+      */
+
+      cgiSetVariable("GROUP_ID", "CUPS_POLICIES");
+      cgiSetVariable("GROUP", cgiText(_("Policies")));
+      cgiCopyTemplateLang("option-header.tmpl");
+
+     /*
+      * Error policy...
+      */
+
+      attr = ippFindAttribute(response, "printer-error-policy-supported",
+			      IPP_TAG_ZERO);
+
+      if (attr)
+      {
 	cgiSetSize("CHOICES", attr->num_values);
 	cgiSetSize("TEXT", attr->num_values);
 	for (k = 0; k < attr->num_values; k ++)
@@ -3616,136 +3706,80 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  cgiSetArray("TEXT", k, attr->values[k].string.text);
 	}
 
-        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+	attr = ippFindAttribute(response, "printer-error-policy",
+				IPP_TAG_ZERO);
 
-        cgiSetVariable("KEYWORD", "job_sheets_start");
-	cgiSetVariable("KEYTEXT", cgiText(_("Starting Banner")));
-        cgiSetVariable("DEFCHOICE", attr != NULL ?
-	                            attr->values[0].string.text : "");
-
-	cgiCopyTemplateLang("option-pickone.tmpl");
-
-        cgiSetVariable("KEYWORD", "job_sheets_end");
-	cgiSetVariable("KEYTEXT", cgiText(_("Ending Banner")));
-        cgiSetVariable("DEFCHOICE", attr != NULL && attr->num_values > 1 ?
-	                            attr->values[1].string.text : "");
-
-	cgiCopyTemplateLang("option-pickone.tmpl");
-
-	cgiCopyTemplateLang("option-trailer.tmpl");
+	cgiSetVariable("KEYWORD", "printer_error_policy");
+	cgiSetVariable("KEYTEXT", cgiText(_("Error Policy")));
+	cgiSetVariable("DEFCHOICE", attr == NULL ?
+				    "" : attr->values[0].string.text);
       }
 
-      if (ippFindAttribute(response, "printer-error-policy-supported",
-                           IPP_TAG_ZERO) ||
-          ippFindAttribute(response, "printer-op-policy-supported",
-	                   IPP_TAG_ZERO))
+      cgiCopyTemplateLang("option-pickone.tmpl");
+
+     /*
+      * Operation policy...
+      */
+
+      attr = ippFindAttribute(response, "printer-op-policy-supported",
+			      IPP_TAG_ZERO);
+
+      if (attr)
       {
-       /*
-	* Add the error and operation policy options...
-	*/
-
-	cgiSetVariable("GROUP", cgiText(_("Policies")));
-	cgiCopyTemplateLang("option-header.tmpl");
-
-       /*
-        * Error policy...
-	*/
-
-        attr = ippFindAttribute(response, "printer-error-policy-supported",
-	                        IPP_TAG_ZERO);
-
-        if (attr)
+	cgiSetSize("CHOICES", attr->num_values);
+	cgiSetSize("TEXT", attr->num_values);
+	for (k = 0; k < attr->num_values; k ++)
 	{
-	  cgiSetSize("CHOICES", attr->num_values);
-	  cgiSetSize("TEXT", attr->num_values);
-	  for (k = 0; k < attr->num_values; k ++)
-	  {
-	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
-	    cgiSetArray("TEXT", k, attr->values[k].string.text);
-	  }
+	  cgiSetArray("CHOICES", k, attr->values[k].string.text);
+	  cgiSetArray("TEXT", k, attr->values[k].string.text);
+	}
 
-          attr = ippFindAttribute(response, "printer-error-policy",
-	                          IPP_TAG_ZERO);
+	attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
 
-          cgiSetVariable("KEYWORD", "printer_error_policy");
-	  cgiSetVariable("KEYTEXT", cgiText(_("Error Policy")));
-          cgiSetVariable("DEFCHOICE", attr == NULL ?
-	                              "" : attr->values[0].string.text);
-        }
+	cgiSetVariable("KEYWORD", "printer_op_policy");
+	cgiSetVariable("KEYTEXT", cgiText(_("Operation Policy")));
+	cgiSetVariable("DEFCHOICE", attr == NULL ?
+				    "" : attr->values[0].string.text);
 
 	cgiCopyTemplateLang("option-pickone.tmpl");
-
-       /*
-        * Operation policy...
-	*/
-
-        attr = ippFindAttribute(response, "printer-op-policy-supported",
-	                        IPP_TAG_ZERO);
-
-        if (attr)
-	{
-	  cgiSetSize("CHOICES", attr->num_values);
-	  cgiSetSize("TEXT", attr->num_values);
-	  for (k = 0; k < attr->num_values; k ++)
-	  {
-	    cgiSetArray("CHOICES", k, attr->values[k].string.text);
-	    cgiSetArray("TEXT", k, attr->values[k].string.text);
-	  }
-
-          attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
-
-          cgiSetVariable("KEYWORD", "printer_op_policy");
-	  cgiSetVariable("KEYTEXT", cgiText(_("Operation Policy")));
-          cgiSetVariable("DEFCHOICE", attr == NULL ?
-	                              "" : attr->values[0].string.text);
-
-	  cgiCopyTemplateLang("option-pickone.tmpl");
-        }
-
-	cgiCopyTemplateLang("option-trailer.tmpl");
       }
 
-      ippDelete(response);
+      cgiCopyTemplateLang("option-trailer.tmpl");
     }
 
    /*
     * Binary protocol support...
     */
 
-    if (ppd && ppd->protocols && strstr(ppd->protocols, "BCP"))
+    if ((attr = ippFindAttribute(response, "port-monitor-supported",
+                                 IPP_TAG_NAME)) != NULL && attr->num_values > 1)
     {
-      ppdattr = ppdFindAttr(ppd, "cupsProtocol", NULL);
+      cgiSetVariable("GROUP_ID", "CUPS_PORT_MONITOR");
+      cgiSetVariable("GROUP", cgiText(_("Port Monitor")));
 
-      cgiSetVariable("GROUP", cgiText(_("PS Binary Protocol")));
+      cgiSetSize("CHOICES", attr->num_values);
+      cgiSetSize("TEXT", attr->num_values);
+
+      for (i = 0; i < attr->num_values; i ++)
+      {
+        cgiSetArray("CHOICES", i, attr->values[i].string.text);
+        cgiSetArray("TEXT", i, attr->values[i].string.text);
+      }
+
+      attr = ippFindAttribute(response, "port-monitor", IPP_TAG_NAME);
+      cgiSetVariable("KEYWORD", "port_monitor");
+      cgiSetVariable("KEYTEXT", cgiText(_("Port Monitor")));
+      cgiSetVariable("DEFCHOICE", attr ? attr->values[0].string.text : "none");
+
       cgiCopyTemplateLang("option-header.tmpl");
-
-      cgiSetSize("CHOICES", 2);
-      cgiSetSize("TEXT", 2);
-      cgiSetArray("CHOICES", 0, "None");
-      cgiSetArray("TEXT", 0, cgiText(_("None")));
-
-      if (strstr(ppd->protocols, "TBCP"))
-      {
-	cgiSetArray("CHOICES", 1, "TBCP");
-	cgiSetArray("TEXT", 1, "TBCP");
-      }
-      else
-      {
-	cgiSetArray("CHOICES", 1, "BCP");
-	cgiSetArray("TEXT", 1, "BCP");
-      }
-
-      cgiSetVariable("KEYWORD", "protocol");
-      cgiSetVariable("KEYTEXT", cgiText(_("PS Binary Protocol")));
-      cgiSetVariable("DEFCHOICE", ppdattr ? ppdattr->value : "None");
-
       cgiCopyTemplateLang("option-pickone.tmpl");
-
       cgiCopyTemplateLang("option-trailer.tmpl");
     }
 
     cgiCopyTemplateLang("set-printer-options-trailer.tmpl");
     cgiEndHTML();
+
+    ippDelete(response);
   }
   else
   {
@@ -3782,7 +3816,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 
       while (cupsFileGets(in, line, sizeof(line)))
       {
-	if (!strncmp(line, "*cupsProtocol:", 14) && cgiGetVariable("protocol"))
+	if (!strncmp(line, "*cupsProtocol:", 14))
 	  continue;
 	else if (strncmp(line, "*Default", 8))
 	  cupsFilePrintf(out, "%s\n", line);
@@ -3813,13 +3847,6 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, var);
 	}
       }
-
-     /*
-      * TODO: We need to set the port-monitor attribute!
-      */
-
-      if ((var = cgiGetVariable("protocol")) != NULL)
-	cupsFilePrintf(out, "*cupsProtocol: %s\n", var);
 
       cupsFileClose(in);
       cupsFileClose(out);
@@ -3864,6 +3891,10 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     if ((var = cgiGetVariable("printer_op_policy")) != NULL)
       ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
 		   "printer-op-policy", NULL, var);
+
+    if ((var = cgiGetVariable("port_monitor")) != NULL)
+      ippAddString(request, IPP_TAG_PRINTER, IPP_TAG_NAME,
+		   "port-monitor", NULL, var);
 
    /*
     * Do the request and get back a response...
