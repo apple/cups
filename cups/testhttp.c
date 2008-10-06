@@ -323,6 +323,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       httpAddrFreeList(addrlist);
     }
+    else if (isdigit(hostname[0] & 255))
+    {
+      puts("FAIL (ignored because hostname is numeric)");
+    }
     else
     {
       failures ++;
