@@ -5,205 +5,188 @@
 </HEAD>
 <BODY>
 
-<P>CUPS 1.4 adds over ?? changes and new features to CUPS 1.3.x. This page provides a high-level outline of these changes. If you have never used CUPS before, read the <A HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
+<P>CUPS 1.4 adds over 64 changes and new features to CUPS 1.3.x. This page provides a high-level outline of these changes. If you have never used CUPS before, read the <A HREF="overview.html">"Overview of CUPS"</A> document instead.</P>
 
 <H2 CLASS="title"><A NAME="COMMANDS">Commands</A></H2>
 
 <OL START="1">
 
+	<LI><EM>accept and reject;</EM> the accept and reject commands have been officially renamed to cupsaccess and cupsreject. The old names are still supported via symlinks.</LI>
+
+	<LI><EM>cupsfilter;</EM> the cupsfilter program now supports filtering of already-queued print job files and can also run printer-specific filters specified in the PPD file.</LI>
+
+	<LI><EM>cupstestdsc;</EM> the cupstestdsc utility has been improved to better detect problems with PostScript print files.</LI>
+
+	<LI><EM>cupstestppd;</EM> the cupstestppd utility has been improved to test new PPD keywords and better detect impossible contraints.</LI>
+
+	<LI><EM>lpadmin;</EM> the lpadmin command now supports options to hold and release new jobs on a printer or all printers.</LI>
+
+	<LI><EM>lpoptions;</EM> the lpoptions command now describes custom options and their parameters.</LI>
+
 	<LI><EM>lppasswd;</EM> the lppasswd program is no longer installed setuid by default.</LI>
 
-	<LI><EM>cupsfilter;</EM> the cupsfilter program now supports filtering of already-queued print job files.</LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
+	<LI><EM>lpstat;</EM> the lpstat command now supports a -H option to show the current default server and no longer slows down when a printer is specified.</LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="WEBIF">Web Interface</A></H2>
 
-<OL START="1">
+<OL START="9">
 
 	<LI><EM>Look-n-feel;</EM> the web interface has been given a new look.</LI>
 
-	<LI><EM>Security;</EM> the web interface has been updated to support authentication for printing of test pages and RSS subscription operations.</LI>
-
-	<LI><EM>Printer sharing;</EM> the "share printer" and "unshare printer" buttons are now only shown when printer sharing is enabled in the scheduler.</LI>
+	<LI><EM>PHP support;</EM> the "php-cgi" program is used, when available, to process PHP pages in the CUPS web interface.</LI>
 
 	<LI><EM>Printer configuration;</EM> improvements have been made to the add and modify printer pages.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Printer options;</EM> the Set Default Options page now provides a "query" button that queries the default and installed options from the printer.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Printer sharing;</EM> the "share printer" and "unshare printer" buttons are now only shown when printer sharing is enabled in the scheduler.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Security;</EM> the web interface has been updated to support authentication for printing of test pages and RSS subscription operations.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Server settings;</EM> the Administration page now provides access to common "advanced" server settings.</LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="NETWORKING">Networking</A></H2>
 
-<OL START="1">
+<OL START="16">
 
 	<LI><EM>Bonjour (DNS-SD) printing support;</EM> a new mdns backend provides Bonjour-based printer discovery and the ipp, lpd, and socket backends now support Bonjour address resolution.</LI>
 
 	<LI><EM>Bonjour (DNS-SD) perforance tuning;</EM> the scheduler now only uses a single file descriptor for printer sharing. It previously used one per printer.</LI>
 
-	<LI><EM>Bonjour (DNS-SD) web interface registry;</EM> when remote access is enabled, the scheduler registers the web interface for easier access</LI>
+	<LI><EM>Bonjour (DNS-SD) web interface registry;</EM> when remote access is enabled, the scheduler can register the web interface for easier access.</LI>
+
+	<LI><EM>LPD client support;</EM> the cups-lpd mini-daemon now provides the document-name for print jobs and supports specification of a CUPS server.</LI>
+
+	<LI><EM>PWG Port Monitor MIB;</EM> the snmp backend now supports the PWG Port Monitor MIB to better choose the device URI to use.</LI>
 
 	<LI><EM>SNMP-based monitoring;</EM> the ipp, lpd, and socket backends now report supply levels and printer status using SNMP queries.</LI>
-
-	<LI><EM>SNMP port monitor MIB;</EM> the ipp, lpd, snmp, and socket now support the PWG port monitor MIB</LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="IPP">IPP Support</A></H2>
 
-<OL START="1"></EM></LI>
+<OL START="22">
+
+	<LI><EM>CUPS-Add-Modify-Printer operation;</EM> the scheduler now supports setting the printer-state-reasons attribute using this operation.</LI>
 
 	<LI><EM>CUPS-Get-Document operation;</EM> the scheduler now supports a "get document" operation to download files from a print job.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Device location;</EM> the scheduler and backend discovery interface now support a device-location attribute.</LI>
 
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Hold-New-Jobs and Release-Held-New-Jobs operations;</EM> the scheduler now supports the Hold-New-Jobs and Release-Held-New-Jobs operations.</LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="SCHEDULER">Scheduler</A></H2>
 
-<OL START="1">
+<OL START="26">
 
-	<LI><EM>Performance tuning;</EM> the scheduler now coalesces  configuration and state file changes to reduce the amount of disk activity.</LI>
+	<LI><EM>Access control;</EM> the scheduler now supports multiple addresses in Allow and Deny lines. It also now returns a HTTP 403 (forbidden) status when a user authenticates successfully but is not allowed to perform an operation.</LI>
+
+	<LI><EM>Access logging;</EM> the scheduler now supports an AccessLogLevel directive to control what is logged in the access_log file.</LI>
 
 	<LI><EM>Configuration files;</EM> the default cupsd.conf file now provides an "authenticated" policy for easy authenticated sharing of printers.</LI>
 
-	<LI><EM>Seatbelt support;</EM> the scheduler now runs child processes using restrictive policies on Mac OS X for improved security and job isolation.</LI>
+	<LI><EM>Default LogLevel;</EM> the default LogLevel is now "warn" instead of "info".</LI>
 
-	<LI><EM>PAM support;</EM> the scheduler now sets more PAM attributes to better support third-party authentication schemes.</LI>
+	<LI><EM>Default paper size;</EM> the scheduler now supports a DefaultPaperSize directive to override the default paper size defined by the locale or libpaper configuration.</LI>
 
-	<LI><EM>Test option;</EM> the scheduler now supports a test mode via the "-t" option.</LI>
+	<LI><EM>Encryption support;</EM> the scheduler now supports a SSLOptions directive to optionally support Windows clients in "FIPS" mode. It also now loads both the server and CA certificates (if present) from the ServerCertificate file.</LI>
+
+	<LI><EM>Error logging;</EM> the scheduler now logs unsuccessful operations as errors in the error_log file.</LI>
+
+	<LI><EM>Error policies;</EM> the scheduler now supports a retry-current-job error policy that retries the current job immediately.</LI>
+
+	<LI><EM>Fatal error handling;</EM> the scheduler now supports a FatalErrors directive to control which startup errors should be considered fatal.</LI>
+
+	<LI><EM>Filter command-line;</EM> the scheduer now passes the job-originating-host-name attribute as a CUPS option to filters and backends.</LI>
+
+	<LI><EM>Filter environment;</EM> the scheduler now includes CUPS_JOBTYPE, PRINTER_INFO, and PRINTER_LOCATION variables in the environment passed to filters and backends.</LI>
+
+	<LI><EM>Job progress;</EM> the scheduler now supports a job-media-progress attribute to track the printing progress of each page.</LI>
+
+	<LI><EM>MIME database;</EM> MIME types now support a priority attribute to override the default (alphabetical) rules of precedence.</LI>
 
 	<LI><EM>Page logging;</EM> the scheduler now supports a <code>PageLogFormat</code> directive to control the format of the page_log file.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>PAM support;</EM> the scheduler now sets more PAM attributes to better support third-party authentication schemes.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>PDF job ticket support;</EM> the scheduler now supports cupsJobTicket comments at the beginning of PDF print jobs.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Performance tuning;</EM> the scheduler now coalesces  configuration and state file changes to reduce the amount of disk activity and caches printer attributes to further reduce startup time.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Printcap support;</EM> the scheduler no longer clears the printcap file when shutting down, and can now create XML "plist" printcap files as well.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>RSS subscriptions;</EM> the scheduler now starts the notifier for RSS subscriptions after creation so the feed is available immediately.</LI>
+
+	<LI><EM>Sandbox support;</EM> the scheduler now runs child processes using restrictive policies on Mac OS X for improved security and job isolation.</LI>
+
+	<LI><EM>Test option;</EM> the scheduler now supports a test mode via the "-t" option.</LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="DRIVERS">Printer Drivers</A></H2>
 
-<OL START="1">
+<OL START="47">
 
-	<LI><EM>Dynamic PPD support;</EM> drivers can now set PPD keywords
-	dynamically using <code>PPD:</code> messages.</LI>
+	<LI><EM>Device discovery;</EM> the cups-deviced helper now runs backends in parallel for faster discovery and streams the results of discovery as the backends provide them.</LI>
+
+	<LI><EM>Driver development kit;</EM> the CUPS DDK is now a standard part of CUPS.</LI>
+
+	<LI><EM>Driver information file support;</EM> the cups-driverd helper program now directly supports PPD compiler driver information files.</LI>
+
+	<LI><EM>Dynamic PPD support;</EM> drivers can now set PPD keywords dynamically using <code>PPD:</code> messages.</LI>
 
 	<LI><EM>Generic PostScript command filter;</EM> a new CUPS command file filter for PostScript printers provides auto-configuration, self-test page, and status and supply level reporting functions.</LI>
 
+	<LI><EM>New printer drivers;</EM> new generic PostScript and PCL drivers provide improved support for laser printers, the CUPS DDK drivers offer support for many HP DesignJet printers, and new label drivers offer support for Seiko and Tharo label printers.</LI>
+
 	<LI><EM>PJL support;</EM> the cupsPJLDisplay PPD attribute controls the PJL commands used to display the current user and job on the printer.</LI>
 
-	<LI><EM>Driver development kit;</EM> the CUPS DDK is now a standard part of CUPS</LI>
+	<LI><EM>PPD compiler improvements;</EM> the PPD compiler now supports Mac OS X .strings files, OID query strings, conditional directives, long file names, and a test mode. It also fixes many other bugs from the CUPS DDK 1.2.3 release.</LI>
 
-	<LI><EM>PPD compiler improvements;</EM> the PPD compiler now supports Mac OS X .strings files for localization and ... </LI>
-
-	<LI><EM>Generic PostScript and PCL drivers;</EM> new generic PostScript and PCL drivers provide improved support for laser printers.</LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
+	<LI><EM>USB printer support;</EM> the usb backend now uses libusb when available to allow it to better work with third-party scanning and printing solutions.</LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="FILTERS">Print Filters</A></H2>
 
-<OL START="1">
+<OL START="56">
 
 	<LI><EM>Banner filter;</EM> the bundled banner ("job-sheets") pages are now generated using a new banner filter provides easier customization and better support for UTF-8 text.</LI>
 
 	<LI><EM>Image filters;</EM> the standard image filters now support image files larger than 2GB.</LI>
 
-	<LI><EM>Device discovery;</EM> the cups-deviced helper now runs backends in parallel for faster discovery and streams the results of discovery as the backends provide them.</LI>
-
 	<LI><EM>PDF filter;</EM> the pdftops filter has been replaced with a wrapper program that runs the Xpdf, poppler, or Ghostscript PDF to PostScript utilities.</LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
 
 </OL>
 
 
 <H2 CLASS="title"><A NAME="CUPSAPI">CUPS API</A></H2>
 
-<OL START="1">
+<OL START="59">
 
-	<LI><EM>Streaming API;</EM> a new streaming request API provides asynchronous job creation and request submission.</LI>
+	<LI><EM>Backend API;</EM> a new cupsBackendReport function is provided to report a device from a backend and handles any needed quoting of the make-and-model, info, device-id, and location strings.</LI>
 
 	<LI><EM>Device discovery;</EM> the new <code>cupsGetDevices</code> function streams discovered devices to an application-provided callback function.</LI>
 
-	<LI><EM>PPD support;</EM> two new functions are provided, cupsGetPPD3 and ppdLocalizeMarkerName, to update the local copy of a printers's PPD file and get a localized marker (supply) name, respectively.</LI>
+	<LI><EM>IPP API;</EM> the IPP read and write functions no longer use a large stack-based buffer when reading and writing IPP attributes.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>PPD support;</EM> several new functions are provided: cupsGetPPD3, cupsResolveConflicts, ppdInstallableConflict, ppdLocalizeAttr, ppdLocalizeMarkerName and ppdPageSizeLimits.</LI>
 
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Side-Channel API;</EM> new cupsSideChannelSNMPGet and cupsSideChannelSNMPWalk functions allow printer drivers to do SNMP queries via the standard network backends.</LI>
 
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
-
-	<LI><EM>;</EM> </LI>
+	<LI><EM>Streaming API;</EM> a new streaming request API provides asynchronous job creation and request submission.</LI>
 
 </OL>
 
