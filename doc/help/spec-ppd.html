@@ -1527,6 +1527,21 @@ before the filter that accepts the given MIME type.</p>
 *cupsPreFilter: "image/png 0 mypngprefilter"
 </pre>
 
+<h3><span class='info'>CUPS 1.4</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
+
+<p class='summary'>*cupsSNMPSupplies: boolean</p>
+
+<p>This attribute tells the standard network backends whether they should query
+the standard SNMP Printer MIB OIDs for supply levels. The default value is
+<code>True</code>.
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Do not use SNMP queries to report supply levels</em>
+*cupsSNMPSupplies: False
+</pre>
+
 <h3><a name='cupsVersion'>cupsVersion</a></h3>
 
 <p class='summary'>*cupsVersion: major.minor</p>
@@ -1829,6 +1844,9 @@ the device.</p>
 	attribute.</li>
 
 	<li>Added <a href='#cupsPJLDisplay'><tt>cupsPJLDisplay</tt></a>
+	attribute.</li>
+
+	<li>Added <a href='#cupsSNMPSupplies'><tt>cupsSNMPSupplies</tt></a>
 	attribute.</li>
 
 	<li>Added <a href='#cupsUIResolver'><tt>cupsUIResolver</tt></a> and
