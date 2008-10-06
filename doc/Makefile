@@ -36,13 +36,7 @@ WEBIMAGES	=	\
 			images/sel.gif \
 			images/smiley.jpg \
 			images/unsel.gif \
-			images/wait.gif \
-			images/web-add-this-printer.gif \
-			images/web-password.gif \
-			images/web-printer-driver.gif \
-			images/web-printer-status.gif \
-			images/web-set-printer-options.gif \
-			images/web-test-page.gif
+			images/wait.gif
 HELPFILES	=	\
 			help/accounting.html \
 			help/api-array.html \
