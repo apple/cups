@@ -1577,7 +1577,8 @@ _cupsConnect(void)
 
 
 /*
- * 'cups_get_printer_uri()' - Get the printer-uri-supported attribute for the first printer in a class.
+ * 'cups_get_printer_uri()' - Get the printer-uri-supported attribute for the
+ *                            first printer in a class.
  */
 
 static int				/* O - 1 on success, 0 on failure */
@@ -1605,9 +1606,9 @@ cups_get_printer_uri(
 					/* Hostname associated with connection */
   static const char * const requested_attrs[] =
 		{			/* Requested attributes */
+		  "member-uris",
 		  "printer-uri-supported",
-		  "printer-type",
-		  "member-uris"
+		  "printer-type"
 		};
 
 
@@ -1742,7 +1743,9 @@ cups_get_printer_uri(
     else if ((attr = ippFindAttribute(response, "printer-uri-supported",
                                       IPP_TAG_URI)) != NULL)
     {
-      httpSeparateURI(HTTP_URI_CODING_ALL, attr->values[0].string.text,
+      httpSeparateURI(HTTP_URI_CODING_ALL,
+                      _httpResolveURI(attr->values[0].string.text, uri,
+		                      sizeof(uri), 0),
                       scheme, sizeof(scheme), username, sizeof(username),
 		      host, hostsize, port, resource, resourcesize);
       ippDelete(response);

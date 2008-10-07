@@ -2176,8 +2176,6 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                NULL, p->location ? p->location : "");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info ? p->info : "");
-  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
-               NULL, p->uri);
 
   if (p->num_users)
   {
@@ -2229,6 +2227,9 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
 	         "printer-uri-supported", NULL, p->uri);
+
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
+		 NULL, p->uri);
 
     if (p->make_model)
       ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
@@ -2750,7 +2751,10 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	}
 	else if (!strncmp(p->device_uri, "ipp://", 6) &&
 	         (strstr(p->device_uri, "/printers/") != NULL ||
-		  strstr(p->device_uri, "/classes/") != NULL))
+		  strstr(p->device_uri, "/classes/") != NULL ||
+		  (strstr(p->device_uri, "._ipp.") != NULL &&
+		   !strcmp(p->device_uri + strlen(p->device_uri) - 5,
+		           "/cups"))))
         {
 	 /*
 	  * Tell the client this is really a hard-wired remote printer.

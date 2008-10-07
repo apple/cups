@@ -5449,6 +5449,17 @@ copy_printer_attrs(
     ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-shared",
                   printer->shared);
 
+  if ((!ra || cupsArrayFind(ra, "printer-more-info")) &&
+      !(printer->type & CUPS_PRINTER_DISCOVERED))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
+                     "http", NULL, con->servername, con->serverport,
+		     (printer->type & CUPS_PRINTER_CLASS) ?
+		         "/classes/%s" : "/printers/%s", printer->name);
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI,
+        	 "printer-more-info", NULL, printer_uri);
+  }
+
   if (!ra || cupsArrayFind(ra, "printer-op-policy"))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
         	 "printer-op-policy", NULL, printer->op_policy);
@@ -5514,8 +5525,7 @@ copy_printer_attrs(
                   "printer-up-time", curtime);
 
   if ((!ra || cupsArrayFind(ra, "printer-uri-supported")) &&
-      !ippFindAttribute(printer->attrs, "printer-uri-supported",
-                        IPP_TAG_URI))
+      !(printer->type & CUPS_PRINTER_DISCOVERED))
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri, sizeof(printer_uri),
                      "ipp", NULL, con->servername, con->serverport,
