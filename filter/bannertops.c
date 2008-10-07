@@ -562,6 +562,7 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
   {
     images        = NULL;
     images_height = 0;
+    images_width  = 0;
   }
 
   total_height = info_height + notices_height + images_height;
