@@ -242,6 +242,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Announce any devices we've found...
       */
 
+      DNSServiceErrorType status;	/* DNS query status */
       cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
@@ -266,13 +267,19 @@ main(int  argc,				/* I - Number of command-line args */
 
 	    fprintf(stderr, "DEBUG: Querying \"%s\"...\n", device->fullName);
 
-	    if (DNSServiceQueryRecord(&(device->ref),
-				      kDNSServiceFlagsShareConnection,
-				      0, device->fullName, kDNSServiceType_TXT,
-				      kDNSServiceClass_IN, query_callback,
-				      devices) != kDNSServiceErr_NoError)
+	    status = DNSServiceQueryRecord(&(device->ref),
+				           kDNSServiceFlagsShareConnection,
+				           0, device->fullName,
+					   kDNSServiceType_TXT,
+				           kDNSServiceClass_IN, query_callback,
+				           devices);
+            if (status != kDNSServiceErr_NoError)
+	    {
 	      fputs("ERROR: Unable to query for TXT records!\n", stderr);
-            else
+	      fprintf(stderr, "DEBUG: DNSServiceQueryRecord returned %d\n",
+	              status);
+            }
+	    else
 	      count ++;
           }
 	}
@@ -501,7 +508,8 @@ get_device(cups_array_t *devices,	/* I - Device array */
 {
   cups_device_t	key,			/* Search key */
 		*device;		/* Device */
-  char		fullName[1024];		/* Full name for query */
+  char		fullName[kDNSServiceMaxDomainName];
+					/* Full name for query */
 
 
  /*
@@ -551,8 +559,7 @@ get_device(cups_array_t *devices,	/* I - Device array */
   * Set the "full name" of this service, which is used for queries...
   */
 
-  snprintf(fullName, sizeof(fullName), "%s.%s%s", serviceName, regtype,
-           replyDomain);
+  DNSServiceConstructFullName(fullName, serviceName, regtype, replyDomain);
   device->fullName = strdup(fullName);
 
   return (device);
