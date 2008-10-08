@@ -32,7 +32,6 @@
  *   do_set_sharing()          - Set printer-is-shared value.
  *   get_option_value()        - Return the value of an option.
  *   get_points()              - Get a value in points.
- *   match_string()            - Return the number of matching characters.
  */
 
 /*
@@ -84,7 +83,6 @@ static void	do_set_sharing(http_t *http);
 static char	*get_option_value(ppd_file_t *ppd, const char *name,
 		                  char *buffer, size_t bufsize);
 static double	get_points(double number, const char *uval);
-static int	match_string(const char *a, const char *b);
 
 
 /*
@@ -1116,8 +1114,14 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     if ((var = cgiGetVariable("CURRENT_MAKE")) == NULL)
       var = cgiGetVariable("PPD_MAKE");
     if (var)
+    {
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
+
+      if ((var = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL)
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+		     "ppd-make-and-model", NULL, var);
+    }
     else
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                    "requested-attributes", NULL, "ppd-make");
@@ -1167,47 +1171,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	* Let the user choose a model...
 	*/
 
-        const char	*make_model;	/* Current make/model string */
-
-
-        if ((make_model = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL)
-	{
-	 /*
-	  * Scan for "close" matches...
-	  */
-
-          int		match,		/* Current match */
-			best_match,	/* Best match so far */
-			count;		/* Number of drivers */
-	  const char	*best,		/* Best matching string */
-			*current;	/* Current string */
-
-
-          count = cgiGetSize("PPD_MAKE_AND_MODEL");
-
-	  for (i = 0, best_match = 0, best = NULL; i < count; i ++)
-	  {
-	    current = cgiGetArray("PPD_MAKE_AND_MODEL", i);
-	    match   = match_string(make_model, current);
-
-	    if (match > best_match)
-	    {
-	      best_match = match;
-	      best       = current;
-	    }
-	  }
-
-          if (best_match > strlen(var))
-	  {
-	   /*
-	    * Found a match longer than the make...
-	    */
-
-            cgiSetVariable("CURRENT_MAKE_AND_MODEL", best);
-	  }
-	}
-
         cgiStartHTML(title);
+	cgiSetVariable("CURRENT_MAKE_AND_MODEL",
+	               cgiGetArray("PPD_MAKE_AND_MODEL", 0));
 	cgiCopyTemplateLang("choose-model.tmpl");
         cgiEndHTML();
       }
@@ -4196,55 +4162,6 @@ get_points(double     number,		/* I - Original number */
 }
 
 
-/*
- * 'match_string()' - Return the number of matching characters.
- */
-
-static int				/* O - Number of matching characters */
-match_string(const char *a,		/* I - First string */
-             const char *b)		/* I - Second string */
-{
-  int	count;				/* Number of matching characters */
-
-
- /*
-  * Loop through both strings until we hit the end of either or we find
-  * a non-matching character.  For the purposes of comparison, we ignore
-  * whitespace and do a case-insensitive comparison so that we have a
-  * better chance of finding a match...
-  */
-
-  for (count = 0; *a && *b; a++, b++, count ++)
-  {
-   /*
-    * Skip leading whitespace characters...
-    */
-
-    while (isspace(*a & 255))
-      a ++;
-
-    while (isspace(*b & 255))
-      b ++;
-
-   /*
-    * Break out if we run out of characters...
-    */
-
-    if (!*a || !*b)
-      break;
-
-   /*
-    * Do a case-insensitive comparison of the next two chars...
-    */
-
-    if (tolower(*a & 255) != tolower(*b & 255))
-      break;
-  }
-
-  return (count);
-}
-
-    
 /*
  * End of "$Id$".
  */
