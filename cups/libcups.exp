@@ -120,6 +120,7 @@ _cupsFileOpenFd
 _cupsFilePeekChar
 _cupsFilePrintf
 _cupsFilePutChar
+_cupsFilePutConf
 _cupsFilePuts
 _cupsFileRead
 _cupsFileRewind

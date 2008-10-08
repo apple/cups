@@ -1005,6 +1005,11 @@ cupsdLoadAllPrinters(void)
       if (value)
 	cupsdSetString(&p->info, value);
     }
+    else if (!strcasecmp(line, "MakeModel"))
+    {
+      if (value)
+	cupsdSetString(&p->make_model, value);
+    }
     else if (!strcasecmp(line, "Location"))
     {
       if (value)
@@ -1107,6 +1112,52 @@ cupsdLoadAllPrinters(void)
         	!strcasecmp(value, "off") ||
         	!strcasecmp(value, "false")))
         p->accepting = 0;
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+    }
+    else if (!strcasecmp(line, "Type"))
+    {
+      if (value)
+        p->type = atoi(value);
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+    }
+    else if (!strcasecmp(line, "Product"))
+    {
+      if (value)
+      {
+#ifdef HAVE_DNSSD
+        p->product = _cupsStrAlloc(value);
+#endif /* HAVE_DNSSD */
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+    }
+    else if (!strcasecmp(line, "Filter"))
+    {
+      if (value)
+      {
+        if (!p->filters)
+	  p->filters = cupsArrayNew(NULL, NULL);
+
+	cupsArrayAdd(p->filters, _cupsStrAlloc(value));
+      }
+      else
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Syntax error on line %d of printers.conf.", linenum);
+    }
+    else if (!strcasecmp(line, "PreFilter"))
+    {
+      if (value)
+      {
+        if (!p->pre_filters)
+	  p->pre_filters = cupsArrayNew(NULL, NULL);
+
+	cupsArrayAdd(p->pre_filters, _cupsStrAlloc(value));
+      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
@@ -1349,13 +1400,14 @@ cupsdSaveAllPrinters(void)
 {
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
-  char			temp[1024];	/* Temporary string */
-  char			backup[1024];	/* printers.conf.O file */
+  char			temp[1024],	/* Temporary string */
+			backup[1024],	/* printers.conf.O file */
+			value[2048],	/* Value string */
+			*ptr;		/* Pointer into value */
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
-  const char		*ptr;		/* Pointer into info/location */
   ipp_attribute_t	*marker;	/* Current marker attribute */
 
 
@@ -1432,56 +1484,50 @@ cupsdSaveAllPrinters(void)
 
     if (printer->num_auth_info_required > 0)
     {
-      cupsFilePrintf(fp, "AuthInfoRequired %s", printer->auth_info_required[0]);
-      for (i = 1; i < printer->num_auth_info_required; i ++)
-        cupsFilePrintf(fp, ",%s", printer->auth_info_required[i]);
-      cupsFilePutChar(fp, '\n');
+      switch (printer->num_auth_info_required)
+      {
+        case 1 :
+            strlcpy(value, printer->auth_info_required[0], sizeof(value));
+	    break;
+
+        case 2 :
+            snprintf(value, sizeof(value), "%s,%s",
+	             printer->auth_info_required[0],
+		     printer->auth_info_required[1]);
+	    break;
+
+        case 3 :
+	default :
+            snprintf(value, sizeof(value), "%s,%s,%s",
+	             printer->auth_info_required[0],
+		     printer->auth_info_required[1],
+		     printer->auth_info_required[2]);
+	    break;
+      }
+
+      cupsFilePutConf(fp, "AuthInfoRequired", value);
     }
 
     if (printer->info)
-    {
-      if ((ptr = strchr(printer->info, '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the info string...
-	*/
-
-        cupsFilePuts(fp, "Info ");
-	cupsFileWrite(fp, printer->info, ptr - printer->info);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "Info %s\n", printer->info);
-    }
+      cupsFilePutConf(fp, "Info", printer->info);
 
     if (printer->location)
-    {
-      if ((ptr = strchr(printer->info, '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the location string...
-	*/
+      cupsFilePutConf(fp, "Location", printer->location);
 
-        cupsFilePuts(fp, "Location ");
-	cupsFileWrite(fp, printer->location, ptr - printer->location);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "Location %s\n", printer->location);
-    }
-    cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    if (printer->make_model)
+      cupsFilePutConf(fp, "MakeModel", printer->make_model);
+
+    cupsFilePutConf(fp, "DeviceURI", printer->device_uri);
 
     if (printer->port_monitor)
-      cupsFilePrintf(fp, "PortMonitor %s\n", printer->port_monitor);
+      cupsFilePutConf(fp, "PortMonitor", printer->port_monitor);
 
     if (printer->state == IPP_PRINTER_STOPPED)
     {
       cupsFilePuts(fp, "State Stopped\n");
-      cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
+
+      if (printer->state_message)
+        cupsFilePutConf(fp, "StateMessage", printer->state_message);
     }
     else
       cupsFilePuts(fp, "State Idle\n");
@@ -1489,7 +1535,24 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      cupsFilePrintf(fp, "Reason %s\n", printer->reasons[i]);
+      cupsFilePutConf(fp, "Reason", printer->reasons[i]);
+
+    cupsFilePrintf(fp, "Type %d", printer->type);
+
+#ifdef HAVE_DNSSD
+    if (printer->product)
+      cupsFilePutConf(fp, "Product", printer->product);
+#endif /* HAVE_DNSSD */
+
+    for (ptr = (char *)cupsArrayFirst(printer->filters);
+         ptr;
+	 ptr = (char *)cupsArrayNext(printer->filters))
+      cupsFilePutConf(fp, "Filter", ptr);
+
+    for (ptr = (char *)cupsArrayFirst(printer->pre_filters);
+         ptr;
+	 ptr = (char *)cupsArrayNext(printer->pre_filters))
+      cupsFilePutConf(fp, "PreFilter", ptr);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");
@@ -1501,80 +1564,50 @@ cupsdSaveAllPrinters(void)
     else
       cupsFilePuts(fp, "Shared No\n");
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
-            printer->job_sheets[1]);
+    snprintf(value, sizeof(value), "%s %s", printer->job_sheets[0],
+             printer->job_sheets[1]);
+    cupsFilePutConf(fp, "JobSheets", value);
 
     cupsFilePrintf(fp, "QuotaPeriod %d\n", printer->quota_period);
     cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
     cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
     for (i = 0; i < printer->num_users; i ++)
-    {
-      if ((ptr = strchr(printer->users[i], '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the user string...
-	*/
-
-        cupsFilePrintf(fp, "%sUser ", printer->deny_users ? "Deny" : "Allow");
-	cupsFileWrite(fp, printer->users[i], ptr - printer->users[i]);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "%sUser %s\n",
-	               printer->deny_users ? "Deny" : "Allow",
-                       printer->users[i]);
-    }
+      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser",
+                      printer->users[i]);
 
     if (printer->op_policy)
-      cupsFilePrintf(fp, "OpPolicy %s\n", printer->op_policy);
+      cupsFilePutConf(fp, "OpPolicy", printer->op_policy);
     if (printer->error_policy)
-      cupsFilePrintf(fp, "ErrorPolicy %s\n", printer->error_policy);
+      cupsFilePutConf(fp, "ErrorPolicy", printer->error_policy);
 
     for (i = printer->num_options, option = printer->options;
          i > 0;
 	 i --, option ++)
     {
-      if ((ptr = strchr(option->value, '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the option string...
-	*/
-
-        cupsFilePrintf(fp, "Option %s ", option->name);
-	cupsFileWrite(fp, option->value, ptr - option->value);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+      snprintf(value, sizeof(value), "%s %s", option->name, option->value);
+      cupsFilePutConf(fp, "Option", value);
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-colors",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+      snprintf(value, sizeof(value), "%s ", marker->name);
 
-      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      for (i = 0, ptr = value + strlen(value);
+           i < marker->num_values && ptr < (value + sizeof(value) - 1);
+	   i ++)
       {
         if (i)
-	  cupsFilePutChar(fp, ',');
+	  *ptr++ = ',';
 
-        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
-	{
-	  cupsFileWrite(fp, marker->values[i].string.text,
-	                ptr - marker->values[i].string.text);
-	  cupsFilePutChar(fp, '\\');
-	  cupsFilePuts(fp, ptr);
-	}
-	else
-          cupsFilePuts(fp, marker->values[i].string.text);
+        strlcpy(ptr, marker->values[i].string.text,
+	        value + sizeof(value) - ptr);
+        ptr += strlen(ptr);
       }
 
-      cupsFilePuts(fp, "\n");
+      *ptr = '\0';
+      cupsFilePutConf(fp, "Attribute", value);
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-levels",
@@ -1590,67 +1623,52 @@ cupsdSaveAllPrinters(void)
     if ((marker = ippFindAttribute(printer->attrs, "marker-message",
                                    IPP_TAG_TEXT)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+      snprintf(value, sizeof(value), "%s %s", marker->name,
+               marker->values[0].string.text);
 
-      if ((ptr = strchr(marker->values[0].string.text, '#')) != NULL)
-      {
-	cupsFileWrite(fp, marker->values[0].string.text,
-		      ptr - marker->values[0].string.text);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-      }
-      else
-	cupsFilePuts(fp, marker->values[0].string.text);
-
-      cupsFilePuts(fp, "\n");
+      cupsFilePutConf(fp, "Attribute", value);
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-names",
                                    IPP_TAG_NAME)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+      snprintf(value, sizeof(value), "%s ", marker->name);
 
-      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      for (i = 0, ptr = value + strlen(value);
+           i < marker->num_values && ptr < (value + sizeof(value) - 1);
+	   i ++)
       {
         if (i)
-	  cupsFilePutChar(fp, ',');
+	  *ptr++ = ',';
 
-        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
-	{
-	  cupsFileWrite(fp, marker->values[i].string.text,
-	                ptr - marker->values[i].string.text);
-	  cupsFilePutChar(fp, '\\');
-	  cupsFilePuts(fp, ptr);
-	}
-	else
-          cupsFilePuts(fp, marker->values[i].string.text);
+        strlcpy(ptr, marker->values[i].string.text,
+	        value + sizeof(value) - ptr);
+        ptr += strlen(ptr);
       }
 
-      cupsFilePuts(fp, "\n");
+      *ptr = '\0';
+      cupsFilePutConf(fp, "Attribute", value);
     }
 
     if ((marker = ippFindAttribute(printer->attrs, "marker-types",
                                    IPP_TAG_KEYWORD)) != NULL)
     {
-      cupsFilePrintf(fp, "Attribute %s ", marker->name);
+      snprintf(value, sizeof(value), "%s ", marker->name);
 
-      for (i = 0, ptr = NULL; i < marker->num_values; i ++)
+      for (i = 0, ptr = value + strlen(value);
+           i < marker->num_values && ptr < (value + sizeof(value) - 1);
+	   i ++)
       {
         if (i)
-	  cupsFilePutChar(fp, ',');
+	  *ptr++ = ',';
 
-        if (!ptr && (ptr = strchr(marker->values[i].string.text, '#')) != NULL)
-	{
-	  cupsFileWrite(fp, marker->values[i].string.text,
-	                ptr - marker->values[i].string.text);
-	  cupsFilePutChar(fp, '\\');
-	  cupsFilePuts(fp, ptr);
-	}
-	else
-          cupsFilePuts(fp, marker->values[i].string.text);
+        strlcpy(ptr, marker->values[i].string.text,
+	        value + sizeof(value) - ptr);
+        ptr += strlen(ptr);
       }
 
-      cupsFilePuts(fp, "\n");
+      *ptr = '\0';
+      cupsFilePutConf(fp, "Attribute", value);
     }
 
     cupsFilePuts(fp, "</Printer>\n");

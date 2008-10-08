@@ -88,6 +88,8 @@ typedef struct cupsd_printer_s
   char		*alert,			/* PSX printer-alert value */
 		*alert_description;	/* PSX printer-alert-description value */
   time_t	marker_time;		/* Last time marker attributes were updated */
+  cups_array_t	*filters,		/* Filters for queue */
+		*pre_filters;		/* Pre-filters for queue */
 
 #ifdef __APPLE__
   char		*recoverable;		/* com.apple.print.recoverable-message */

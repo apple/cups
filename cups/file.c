@@ -1254,6 +1254,67 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
 
 
 /*
+ * 'cupsFilePutConf()' - Write a configuration line.
+ *
+ * This function handles any comment escaping of the value.
+ *
+ * @since CUPS 1.4@
+ */
+
+ssize_t					/* O - Number of bytes written or -1 on error */
+cupsFilePutConf(cups_file_t *fp,	/* I - CUPS file */
+                const char *directive,	/* I - Directive */
+		const char *value)	/* I - Value */
+{
+  ssize_t	bytes,			/* Number of bytes written */
+		temp;			/* Temporary byte count */
+  const char	*ptr;			/* Pointer into value */
+
+
+  if (!fp || !directive || !*directive)
+    return (-1);
+
+  if ((bytes = cupsFilePuts(fp, directive)) < 0)
+    return (-1);
+
+  if (cupsFilePutChar(fp, ' ') < 0)
+    return (-1);
+  bytes ++;
+
+  if (value && *value)
+  {
+    if ((ptr = strchr(value, '#')) != NULL)
+    {
+     /*
+      * Need to quote the first # in the info string...
+      */
+
+      if ((temp = cupsFileWrite(fp, value, ptr - value)) < 0)
+        return (-1);
+      bytes += temp;
+
+      if (cupsFilePutChar(fp, '\\') < 0)
+        return (-1);
+      bytes ++;
+
+      if ((temp = cupsFilePuts(fp, ptr)) < 0)
+        return (-1);
+      bytes += temp;
+    }
+    else if ((temp = cupsFilePuts(fp, value)) < 0)
+      return (-1);
+    else
+      bytes += temp;
+  }
+
+  if (cupsFilePutChar(fp, '\n') < 0)
+    return (-1);
+  else
+    return (bytes + 1);
+}
+
+
+/*
  * 'cupsFilePuts()' - Write a string.
  *
  * Like the @code fputs@ function, no newline is appended to the string.
