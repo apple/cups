@@ -122,7 +122,7 @@ distclean:	clean
 	$(RM) init/cups.xml
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
-	-$(RM) -r autom4te*.cache
+	-$(RM) -r autom4te*.cache clang
 
 
 #
