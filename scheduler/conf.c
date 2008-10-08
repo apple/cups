@@ -3247,6 +3247,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Missing value for SetEnv directive on line %d.",
 	                linenum);
     }
+#ifdef HAVE_SSL
     else if (!strcasecmp(line, "SSLOptions"))
     {
      /*
@@ -3262,6 +3263,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	                "Unknown value \"%s\" for SSLOptions directive on "
 			"line %d.", value, linenum);
     }
+#endif /* HAVE_SSL */
     else
     {
      /*
