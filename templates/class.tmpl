@@ -8,7 +8,7 @@
 <SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
 <OPTION VALUE="">Maintenance</OPTION>
 <OPTION VALUE="print-test-page">Print Test Page</OPTION>
-{printer_state=5?<OPTION VALUE="start-printer">Resume Class</OPTION>:<OPTION VALUE="stop-printer">Pause Class</OPTION>}
+{printer_state=5?<OPTION VALUE="start-class">Resume Class</OPTION>:<OPTION VALUE="stop-class">Pause Class</OPTION>}
 {printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Accept Jobs</OPTION>:<OPTION VALUE="reject-jobs">Reject Jobs</OPTION>}
 <OPTION VALUE="move-jobs">Move All Jobs</OPTION>
 <OPTION VALUE="purge-jobs">Cancel All Jobs</OPTION>
@@ -17,7 +17,7 @@
 </FORM>
 
 <FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
-<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{%printer_name}">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
 <SELECT NAME="OP" ONCHANGE="document.administration.submit();">
 <OPTION VALUE="">Administration</OPTION>
 <OPTION VALUE="modify-class">Modify Class</OPTION>

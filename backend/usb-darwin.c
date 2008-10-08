@@ -648,14 +648,12 @@ print_device(const char *uri,		/* I - Device URI */
 	status = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 
        /*
-	* Ignore timeout errors...
+	* Ignore timeout errors, but retain the number of bytes written to
+	* avoid sending duplicate data (<rdar://problem/6254911>)...
 	*/
 
 	if (status == kIOUSBTransactionTimeout)
-	{
 	  status = 0;
-	  bytes = 0;
-	}
 
 	if (status || bytes < 0)
 	{
@@ -1287,11 +1285,9 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
     }
   }
 
-#ifdef DEBUG
   char bundlestr[1024];
   CFStringGetCString(bundle, bundlestr, sizeof(bundlestr), kCFStringEncodingUTF8);
   fprintf(stderr, "DEBUG: load_classdriver(%s) (kr:0x%08x)\n", bundlestr, (int)kr);
-#endif /* DEBUG */
 
   return kr;
 }
@@ -1771,6 +1767,9 @@ static void run_legacy_backend(int argc,
     struct sigaction	action;		/* POSIX signal action */
     sigset_t		newmask,	/* New signal mask */
 			oldmask;	/* Old signal mask */
+    char		usbpath[1024];	/* Path to USB backend */
+    const char		*cups_serverbin;/* Path to CUPS binaries */
+
 
     memset(&action, 0, sizeof(action));
     sigaddset(&action.sa_mask, SIGTERM);
@@ -1822,15 +1821,19 @@ static void run_legacy_backend(int argc,
     * Set up the arguments and call posix_spawn...
     */
 
+    if ((cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+      cups_serverbin = CUPS_SERVERBIN;
+    snprintf(usbpath, sizeof(usbpath), "%s/backend/usb", cups_serverbin);
+
     for (i = 0; i < argc && i < (sizeof(my_argv) / sizeof(my_argv[0])) - 1; i ++)
       my_argv[i] = argv[i];
 
     my_argv[i] = NULL;
 
-    if (posix_spawn(&child_pid, "/usr/libexec/cups/backend/usb", NULL, &attrs,
-                    my_argv, environ))
+    if (posix_spawn(&child_pid, usbpath, NULL, &attrs, my_argv, environ))
     {
-      perror("DEBUG: Unable to exec /usr/libexec/cups/backend/usb");
+      fprintf(stderr, "DEBUG: Unable to exec %s: %s\n", usbpath,
+              strerror(errno));
       _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
       exit(CUPS_BACKEND_STOP);
     }

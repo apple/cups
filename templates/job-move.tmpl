@@ -1,3 +1,5 @@
+<DIV CLASS="indent">
+
 <FORM METHOD="POST" ACTION="/{SECTION}/{job_id?:{printer_name}}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {job_id?<INPUT TYPE="HIDDEN" NAME="JOB_ID" VALUE="{job_id}">:}
@@ -15,8 +17,10 @@
 </TR>
 <TR>
 <TD></TD>
-<TD><INPUT TYPE="SUBMIT" VALUE="Move Job{job_id?:s}"></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="{job_id?Move Job:Move Jobs}"></TD>
 </TR>
 </TABLE>
 
 </FORM>
+
+</DIV>

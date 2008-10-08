@@ -674,14 +674,14 @@ void
 cupsdSaveAllClasses(void)
 {
   cups_file_t		*fp;		/* classes.conf file */
-  char			temp[1024];	/* Temporary string */
-  char			backup[1024];	/* classes.conf.O file */
+  char			temp[1024],	/* Temporary string */
+			backup[1024],	/* printers.conf.O file */
+			value[2048];	/* Value string */
   cupsd_printer_t	*pclass;	/* Current printer class */
   int			i;		/* Looping var */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
   cups_option_t		*option;	/* Current option */
-  const char		*ptr;		/* Pointer into info/location */
 
 
  /*
@@ -757,53 +757,38 @@ cupsdSaveAllClasses(void)
 
     if (pclass->num_auth_info_required > 0)
     {
-      cupsFilePrintf(fp, "AuthInfoRequired %s", pclass->auth_info_required[0]);
-      for (i = 1; i < pclass->num_auth_info_required; i ++)
-        cupsFilePrintf(fp, ",%s", pclass->auth_info_required[i]);
-      cupsFilePutChar(fp, '\n');
+      switch (pclass->num_auth_info_required)
+      {
+        case 1 :
+            strlcpy(value, pclass->auth_info_required[0], sizeof(value));
+	    break;
+
+        case 2 :
+            snprintf(value, sizeof(value), "%s,%s",
+	             pclass->auth_info_required[0],
+		     pclass->auth_info_required[1]);
+	    break;
+
+        case 3 :
+	default :
+            snprintf(value, sizeof(value), "%s,%s,%s",
+	             pclass->auth_info_required[0],
+		     pclass->auth_info_required[1],
+		     pclass->auth_info_required[2]);
+	    break;
+      }
+
+      cupsFilePutConf(fp, "AuthInfoRequired", value);
     }
 
     if (pclass->info)
-    {
-      if ((ptr = strchr(pclass->info, '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the info string...
-	*/
-
-        cupsFilePuts(fp, "Info ");
-	cupsFileWrite(fp, pclass->info, ptr - pclass->info);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "Info %s\n", pclass->info);
-    }
+      cupsFilePutConf(fp, "Info", pclass->info);
 
     if (pclass->location)
-    {
-      if ((ptr = strchr(pclass->info, '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the location string...
-	*/
-
-        cupsFilePuts(fp, "Location ");
-	cupsFileWrite(fp, pclass->location, ptr - pclass->location);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "Location %s\n", pclass->location);
-    }
+      cupsFilePutConf(fp, "Location", pclass->location);
 
     if (pclass->state == IPP_PRINTER_STOPPED)
-    {
       cupsFilePuts(fp, "State Stopped\n");
-      cupsFilePrintf(fp, "StateMessage %s\n", pclass->state_message);
-    }
     else
       cupsFilePuts(fp, "State Idle\n");
 
@@ -819,46 +804,30 @@ cupsdSaveAllClasses(void)
     else
       cupsFilePuts(fp, "Shared No\n");
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", pclass->job_sheets[0],
-                   pclass->job_sheets[1]);
-
-    for (i = 0; i < pclass->num_users; i ++)
-    {
-      if ((ptr = strchr(pclass->users[i], '#')) != NULL)
-      {
-       /*
-        * Need to quote the first # in the user string...
-	*/
-
-        cupsFilePrintf(fp, "%sUser ", pclass->deny_users ? "Deny" : "Allow");
-	cupsFileWrite(fp, pclass->users[i], ptr - pclass->users[i]);
-	cupsFilePutChar(fp, '\\');
-	cupsFilePuts(fp, ptr);
-	cupsFilePutChar(fp, '\n');
-      }
-      else
-        cupsFilePrintf(fp, "%sUser %s\n",
-	               pclass->deny_users ? "Deny" : "Allow",
-                       pclass->users[i]);
-    }
+    snprintf(value, sizeof(value), "%s %s", pclass->job_sheets[0],
+             pclass->job_sheets[1]);
+    cupsFilePutConf(fp, "JobSheets", value);
 
     cupsFilePrintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
     cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
     cupsFilePrintf(fp, "KLimit %d\n", pclass->k_limit);
 
     for (i = 0; i < pclass->num_users; i ++)
-      cupsFilePrintf(fp, "%sUser %s\n", pclass->deny_users ? "Deny" : "Allow",
-        	     pclass->users[i]);
+      cupsFilePutConf(fp, pclass->deny_users ? "DenyUser" : "AllowUser",
+                      pclass->users[i]);
 
-    if (pclass->op_policy)
-      cupsFilePrintf(fp, "OpPolicy %s\n", pclass->op_policy);
+     if (pclass->op_policy)
+      cupsFilePutConf(fp, "OpPolicy", pclass->op_policy);
     if (pclass->error_policy)
-      cupsFilePrintf(fp, "ErrorPolicy %s\n", pclass->error_policy);
+      cupsFilePutConf(fp, "ErrorPolicy", pclass->error_policy);
 
     for (i = pclass->num_options, option = pclass->options;
          i > 0;
 	 i --, option ++)
-      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    {
+      snprintf(value, sizeof(value), "%s %s", option->name, option->value);
+      cupsFilePutConf(fp, "Option", value);
+    }
 
     cupsFilePuts(fp, "</Class>\n");
   }

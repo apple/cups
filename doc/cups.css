@@ -260,17 +260,32 @@ TABLE.list {
 }
 
 TABLE.list TH {
-  border-bottom: solid 1pt #999999;
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
   padding-top: 10pt;
   padding-left: 5pt;
   text-align: left;
+  vertical-align: bottom;
   white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
 }
 
 TABLE.list TD {
   border-bottom: solid thin #eeeeee;
   padding-top: 5pt;
   padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
 }
 
 DIV.sidebar {
@@ -366,6 +381,18 @@ DIV.summary TABLE TD, DIV.summary TABLE TH {
 
 DIV.summary TABLE THEAD TH {
   background: #f0f0f0;
+}
+
+DIV.tabs {
+  height: 480px;
+  overflow: hidden;
+}
+
+DIV.tab {
+  float: left;
+  height: 100%;
+  overflow-y: auto;
+  width: 100%;
 }
 
 /* API documentation styles... */

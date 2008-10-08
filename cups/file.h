@@ -8,7 +8,7 @@
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -87,6 +87,8 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 _CUPS_API_1_2;
 extern int		cupsFilePutChar(cups_file_t *fp, int c) _CUPS_API_1_2;
+extern ssize_t		cupsFilePutConf(cups_file_t *fp, const char *directive,
+			                const char *value) _CUPS_API_1_4;
 extern int		cupsFilePuts(cups_file_t *fp, const char *s) _CUPS_API_1_2;
 extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes) _CUPS_API_1_2;
 extern off_t		cupsFileRewind(cups_file_t *fp) _CUPS_API_1_2;

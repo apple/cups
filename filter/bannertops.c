@@ -15,6 +15,12 @@
  *
  * Contents:
  *
+ *   main()           - Generate PostScript cover pages.
+ *   load_banner()    - Load the banner file.
+ *   ps_ascii85()     - Print binary data as a series of base-85 numbers.
+ *   write_banner()   - Write a banner page...
+ *   write_epilogue() - Write the PostScript file epilogue.
+ *   write_prolog()   - Write the PostScript file prolog with options.
  */
 
 /*
@@ -556,6 +562,7 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
   {
     images        = NULL;
     images_height = 0;
+    images_width  = 0;
   }
 
   total_height = info_height + notices_height + images_height;
@@ -601,11 +608,11 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
 	y -= line_height;
 	psTextUTF8(fonts, fontsize, PS_BOLD, PS_RIGHT,
 	           _cupsLangString(language, _("Printer Name: ")));
-        psTextUTF8(fonts, fontsize, PS_NORMAL, PS_LEFT, getenv("PRINTER_NAME"));
+        psTextUTF8(fonts, fontsize, PS_NORMAL, PS_LEFT, getenv("PRINTER"));
       }
       if (banner->show & SHOW_JOB_ID)
       {
-        snprintf(text, sizeof(text), "%s-%d", getenv("PRINTER_NAME"), job_id);
+        snprintf(text, sizeof(text), "%s-%d", getenv("PRINTER"), job_id);
 	printf("%.1f %.1f moveto", x, y);
 	y -= line_height;
 	psTextUTF8(fonts, fontsize, PS_BOLD, PS_RIGHT,

@@ -42,8 +42,10 @@ static void	device_cb(const char *device_clas, const char *device_id,
 			  const char *device_make_and_model,
 			  const char *device_uri, const char *device_location,
 			  void *user_data);
-static int	show_devices(http_t *, int);
-static int	show_models(http_t *, int);
+static int	show_devices(http_t *http, int long_status, int timeout);
+static int	show_models(http_t *http, int long_status,
+			    const char *device_id, const char *language,
+			    const char *make_model, const char *product);
 
 
 /*
@@ -57,12 +59,22 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		i;			/* Looping var */
   http_t	*http;			/* Connection to server */
   int		long_status;		/* Long listing? */
+  const char	*device_id,		/* 1284 device ID */
+		*language,		/* Language */
+		*make_model,		/* Make and model */
+		*product;		/* Product */
+  int		timeout;		/* Device timeout */
 
 
   _cupsSetLocale(argv);
 
   http        = NULL;
   long_status = 0;
+  device_id   = NULL;
+  language    = NULL;
+  make_model  = NULL;
+  product     = NULL;
+  timeout     = CUPS_TIMEOUT_DEFAULT;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -79,48 +91,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 		            _("%s: Sorry, no encryption support compiled in!\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
-	    break;
-
-        case 'l' : /* Show long listing */
-	    long_status = 1;
-	    break;
-
-        case 'm' : /* Show models */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		_cupsLangPrintf(stderr,
-		                _("lpinfo: Unable to connect to server: %s\n"),
-				strerror(errno));
-		return (1);
-	      }
-            }
-
-            if (show_models(http, long_status))
-	      return (1);
-	    break;
-	    
-        case 'v' : /* Show available devices */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		_cupsLangPrintf(stderr,
-		                _("lpinfo: Unable to connect to server: %s\n"),
-				strerror(errno));
-		return (1);
-	      }
-            }
-
-            if (show_devices(http, long_status))
-	      return (1);
 	    break;
 
         case 'h' : /* Connect to host */
@@ -144,6 +114,143 @@ main(int  argc,				/* I - Number of command-line arguments */
               }
 
 	      cupsSetServer(argv[i]);
+	    }
+	    break;
+
+        case 'l' : /* Show long listing */
+	    long_status = 1;
+	    break;
+
+        case 'm' : /* Show models */
+	    if (!http)
+	    {
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
+
+	      if (http == NULL)
+	      {
+		_cupsLangPrintf(stderr,
+		                _("lpinfo: Unable to connect to server: %s\n"),
+				strerror(errno));
+		return (1);
+	      }
+            }
+
+            if (show_models(http, long_status, device_id, language, make_model,
+	                    product))
+	      return (1);
+	    break;
+	    
+        case 'v' : /* Show available devices */
+	    if (!http)
+	    {
+              http = httpConnectEncrypt(cupsServer(), ippPort(),
+	                                cupsEncryption());
+
+	      if (http == NULL)
+	      {
+		_cupsLangPrintf(stderr,
+		                _("lpinfo: Unable to connect to server: %s\n"),
+				strerror(errno));
+		return (1);
+	      }
+            }
+
+            if (show_devices(http, long_status, timeout))
+	      return (1);
+	    break;
+
+        case '-' : /* --something */
+            if (!strcmp(argv[i], "--device-id"))
+	    {
+	      i ++;
+
+	      if (i < argc)
+		device_id = argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected 1284 device ID string "
+				"after --device-id!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--device-id=", 12) && argv[i][12])
+	    {
+	      device_id = argv[i] + 12;
+	    }
+            else if (!strcmp(argv[i], "--language"))
+	    {
+	      i ++;
+	      if (i < argc)
+		language = argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected language after "
+				"--language!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--language=", 11) && argv[i][11])
+	    {
+	      language = argv[i] + 11;
+	    }
+            else if (!strcmp(argv[i], "--make-and-model"))
+	    {
+	      i ++;
+	      if (i < argc)
+		make_model= argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected make and model after "
+				"--make-and-model!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--make-and-model=", 17) && argv[i][17])
+	    {
+	      make_model = argv[i] + 17;
+	    }
+            else if (!strcmp(argv[i], "--product"))
+	    {
+	      i ++;
+	      if (i < argc)
+		product = argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected product string after "
+				"--product!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--product=", 10) && argv[i][10])
+	    {
+	      product = argv[i] + 10;
+	    }
+            else if (!strcmp(argv[i], "--timeout"))
+	    {
+	      i ++;
+	      if (i < argc)
+		timeout = atoi(argv[i]);
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected timeout after --timeout!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--timeout=", 10) && argv[i][10])
+	    {
+	      timeout = atoi(argv[i] + 10);
+	    }
+	    else
+	    {
+	      _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%s\'!\n"),
+			      argv[i]);
+	      return (1);
 	    }
 	    break;
 
@@ -209,9 +316,10 @@ device_cb(
 
 static int				/* O - 0 on success, 1 on failure */
 show_devices(http_t *http,		/* I - HTTP connection to server */
-             int    long_status)	/* I - Long status report? */
+             int    long_status,	/* I - Long status report? */
+	     int    timeout)		/* I - Timeout */
 {
-  if (cupsGetDevices(http, CUPS_TIMEOUT_DEFAULT, CUPS_EXCLUDE_NONE, device_cb,
+  if (cupsGetDevices(http, timeout, CUPS_EXCLUDE_NONE, device_cb,
                      &long_status) != IPP_OK)
   {
     _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
@@ -227,15 +335,19 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
  */
 
 static int				/* O - 0 on success, 1 on failure */
-show_models(http_t *http,		/* I - HTTP connection to server */
-            int    long_status)		/* I - Long status report? */
+show_models(http_t     *http,		/* I - HTTP connection to server */
+            int        long_status,	/* I - Long status report? */
+	    const char *device_id,	/* I - 1284 device ID */
+	    const char *language,	/* I - Language */
+	    const char *make_model,	/* I - Make and model */
+	    const char *product)	/* I - Product */
 {
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
   const char	*ppd_device_id,		/* Pointer to ppd-device-id */
 		*ppd_language,		/* Pointer to ppd-natural-language */
-		*ppd_make,		/* Pointer to ppd-make-and-model */
+		*ppd_make_model,	/* Pointer to ppd-make-and-model */
 		*ppd_name;		/* Pointer to ppd-name */
 
 
@@ -243,14 +355,23 @@ show_models(http_t *http,		/* I - HTTP connection to server */
     return (1);
 
  /*
-  * Build a CUPS_GET_PPDS request, which requires the following
-  * attributes:
-  *
-  *    attributes-charset
-  *    attributes-natural-language
+  * Build a CUPS_GET_PPDS request...
   */
 
   request = ippNewRequest(CUPS_GET_PPDS);
+
+  if (device_id)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT, "ppd-device-id",
+                 NULL, device_id);
+  if (language)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE, "ppd-language",
+                 NULL, language);
+  if (make_model)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT, "ppd-make-and-model",
+                 NULL, make_model);
+  if (product)
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT, "ppd-product",
+                 NULL, product);
 
  /*
   * Do the request and get back a response...
@@ -285,10 +406,10 @@ show_models(http_t *http,		/* I - HTTP connection to server */
       * Pull the needed attributes from this PPD...
       */
 
-      ppd_device_id = "NONE";
-      ppd_language  = NULL;
-      ppd_make      = NULL;
-      ppd_name      = NULL;
+      ppd_device_id  = "NONE";
+      ppd_language   = NULL;
+      ppd_make_model = NULL;
+      ppd_name       = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_PRINTER)
       {
@@ -300,7 +421,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 	  ppd_language = attr->values[0].string.text;
         else if (!strcmp(attr->name, "ppd-make-and-model") &&
 	         attr->value_tag == IPP_TAG_TEXT)
-	  ppd_make = attr->values[0].string.text;
+	  ppd_make_model = attr->values[0].string.text;
         else if (!strcmp(attr->name, "ppd-name") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  ppd_name = attr->values[0].string.text;
@@ -312,7 +433,7 @@ show_models(http_t *http,		/* I - HTTP connection to server */
       * See if we have everything needed...
       */
 
-      if (ppd_language == NULL || ppd_make == NULL || ppd_name == NULL)
+      if (ppd_language == NULL || ppd_make_model == NULL || ppd_name == NULL)
       {
         if (attr == NULL)
 	  break;
@@ -331,10 +452,10 @@ show_models(http_t *http,		/* I - HTTP connection to server */
 			  "        natural_language = %s\n"
 			  "        make-and-model = %s\n"
 			  "        device-id = %s\n"),
-			ppd_name, ppd_language, ppd_make, ppd_device_id);
+			ppd_name, ppd_language, ppd_make_model, ppd_device_id);
       }
       else
-        _cupsLangPrintf(stdout, "%s %s\n", ppd_name, ppd_make);
+        _cupsLangPrintf(stdout, "%s %s\n", ppd_name, ppd_make_model);
 
       if (attr == NULL)
         break;

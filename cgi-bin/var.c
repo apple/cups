@@ -925,7 +925,7 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
     if (s > value)
       s --;
 
-    while (s >= value && *s == ' ')
+    while (s >= value && isspace(*s & 255))
       *s-- = '\0';
 
    /*

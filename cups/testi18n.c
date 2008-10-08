@@ -3,7 +3,7 @@
  *
  *   Internationalization test for Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -537,11 +537,21 @@ static void
 print_utf8(const char	     *msg,	/* I - Message String */
 	   const cups_utf8_t *src)	/* I - UTF-8 Source String */
 {
+  const char	*prefix;		/* Prefix string */
+
+
   if (msg)
     printf("%s:", msg);
 
-  for (; *src; src ++)
-    printf(" %02x", *src);
+  for (prefix = " "; *src; src ++)
+  {
+    printf("%s%02x", prefix, *src);
+
+    if ((src[0] & 0x80) && (src[1] & 0x80))
+      prefix = "";
+    else
+      prefix = " ";
+  }
 
   putchar('\n');
 }

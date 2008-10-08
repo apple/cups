@@ -62,7 +62,7 @@ image/x-xbitmap			application/vnd.cups-postscript	66	imagetops
 image/x-xpixmap			application/vnd.cups-postscript	66	imagetops
 #image/x-xwindowdump		application/vnd.cups-postscript	66	imagetops
 image/x-sun-raster		application/vnd.cups-postscript	66	imagetops
-application/vnd.cups-banner	application/vnd.cups-postscript	33	bannertops
+application/vnd.cups-banner	application/postscript		33	bannertops
 
 ########################################################################
 #

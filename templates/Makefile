@@ -37,6 +37,7 @@ FILES	=	\
 		class-modified.tmpl \
 		classes.tmpl \
 		classes-header.tmpl \
+		command.tmpl \
 		edit-config.tmpl \
 		error.tmpl \
 		error-op.tmpl \
@@ -53,7 +54,6 @@ FILES	=	\
 		jobs.tmpl \
 		jobs-header.tmpl \
 		list-available-printers.tmpl \
-		maintenance.tmpl \
 		modify-class.tmpl \
 		modify-printer.tmpl \
 		norestart.tmpl \

@@ -328,7 +328,7 @@ libcupscgi.a:	$(LIBOBJS)
 
 admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ admin.o -L. -lcupscgi $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ admin.o -lcupscgi $(LIBS)
 
 
 #
@@ -337,7 +337,7 @@ admin.cgi:	admin.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 
 classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ classes.o -L. -lcupscgi $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ classes.o -lcupscgi $(LIBS)
 
 
 #
@@ -346,7 +346,7 @@ classes.cgi:	classes.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 
 help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ help.o -L. -lcupscgi $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ help.o -lcupscgi $(LIBS)
 
 
 #
@@ -355,7 +355,7 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 
 jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ jobs.o -L. -lcupscgi $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ jobs.o -lcupscgi $(LIBS)
 
 
 #

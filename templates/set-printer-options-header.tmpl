@@ -1,9 +1,11 @@
 <DIV CLASS="indent">
 
+<H2 CLASS="title">Set Default Options for {printer_name}</H2>
+
 <FORM METHOD="POST" ACTION="/admin">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
-{HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="Auto-Configure Options">:}
+{HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="Query Printer for Default Options">:}
 
 <SCRIPT TYPE="text/javascript"><!--
 function update_paramtable(option)
@@ -17,3 +19,7 @@ function update_paramtable(option)
 }
 --></SCRIPT>
 
+<H3 CLASS="title">{[group_id]
+<A HREF="#{group_id}">{group}</A>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</H3>
+
+<DIV CLASS="tabs">

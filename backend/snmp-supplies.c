@@ -323,6 +323,8 @@ backend_init_supplies(
 		*ptr,			/* Pointer into value string */
 		*name_ptr;		/* Pointer into name string */
   cups_snmp_t	packet;			/* SNMP response packet */
+  ppd_file_t	*ppd;			/* PPD file for this queue */
+  ppd_attr_t	*ppdattr;		/* cupsSNMPSupplies attribute */
   static const char * const types[] =	/* Supply types */
 		{
 		  "other",
@@ -370,6 +372,20 @@ backend_init_supplies(
   num_supplies = -1;
 
   memset(supplies, 0, sizeof(supplies));
+
+ /*
+  * See if we should be getting supply levels via SNMP...
+  */
+
+  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL &&
+      (ppdattr = ppdFindAttr(ppd, "cupsSNMPSupplies", NULL)) != NULL &&
+      ppdattr->value && strcasecmp(ppdattr->value, "true"))
+  {
+    ppdClose(ppd);
+    return;
+  }
+
+  ppdClose(ppd);
 
  /*
   * Get the device description...

@@ -696,7 +696,8 @@ cupsdSaveRemoteCache(void)
 {
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
-  char			temp[1024];	/* Temporary string */
+  char			temp[1024],	/* Temporary string */
+			value[2048];	/* Value string */
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
@@ -765,48 +766,49 @@ cupsdSaveRemoteCache(void)
     else
       cupsFilePrintf(fp, "Printer %s>\n", printer->name);
 
-    cupsFilePrintf(fp, "Type %d\n", printer->type);
-
     cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_expire);
 
     if (printer->info)
-      cupsFilePrintf(fp, "Info %s\n", printer->info);
-
-    if (printer->make_model)
-      cupsFilePrintf(fp, "MakeModel %s\n", printer->make_model);
+      cupsFilePutConf(fp, "Info", printer->info);
 
     if (printer->location)
-      cupsFilePrintf(fp, "Location %s\n", printer->location);
+      cupsFilePutConf(fp, "Location", printer->location);
 
-    cupsFilePrintf(fp, "DeviceURI %s\n", printer->device_uri);
+    if (printer->make_model)
+      cupsFilePutConf(fp, "MakeModel", printer->make_model);
+
+    cupsFilePutConf(fp, "DeviceURI", printer->device_uri);
 
     if (printer->state == IPP_PRINTER_STOPPED)
-    {
       cupsFilePuts(fp, "State Stopped\n");
-      cupsFilePrintf(fp, "StateMessage %s\n", printer->state_message);
-    }
     else
       cupsFilePuts(fp, "State Idle\n");
 
     for (i = 0; i < printer->num_reasons; i ++)
-      cupsFilePrintf(fp, "Reason %s\n", printer->reasons[i]);
+      cupsFilePutConf(fp, "Reason", printer->reasons[i]);
+
+    cupsFilePrintf(fp, "Type %d\n", printer->type);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");
     else
       cupsFilePuts(fp, "Accepting No\n");
 
-    cupsFilePrintf(fp, "JobSheets %s %s\n", printer->job_sheets[0],
-            printer->job_sheets[1]);
+    snprintf(value, sizeof(value), "%s %s", printer->job_sheets[0],
+             printer->job_sheets[1]);
+    cupsFilePutConf(fp, "JobSheets", value);
 
     for (i = 0; i < printer->num_users; i ++)
-      cupsFilePrintf(fp, "%sUser %s\n", printer->deny_users ? "Deny" : "Allow",
-              printer->users[i]);
+      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser",
+                      printer->users[i]);
 
     for (i = printer->num_options, option = printer->options;
          i > 0;
 	 i --, option ++)
-      cupsFilePrintf(fp, "Option %s %s\n", option->name, option->value);
+    {
+      snprintf(value, sizeof(value), "%s %s", option->name, option->value);
+      cupsFilePutConf(fp, "Option", value);
+    }
 
     if (printer->type & CUPS_PRINTER_CLASS)
       cupsFilePuts(fp, "</Class>\n");

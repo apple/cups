@@ -18,18 +18,23 @@
  *
  * Contents:
  *
- *   main()          - Scan for drivers and return an IPP response.
- *   add_ppd()       - Add a PPD file.
- *   cat_drv()       - Generate a PPD from a driver info file.
- *   cat_ppd()       - Copy a PPD file to stdout.
- *   copy_static()   - Copy a static PPD file to stdout.
- *   compare_names() - Compare PPD filenames for sorting.
- *   compare_ppds()  - Compare PPD file make and model names for sorting.
- *   free_array()    - Free an array of strings.
- *   list_ppds()     - List PPD files.
- *   load_ppds()     - Load PPD files recursively.
- *   load_drv()      - Load the PPDs from a driver information file.
- *   load_drivers()  - Load driver-generated PPD files.
+ *   main()            - Scan for drivers and return an IPP response.
+ *   add_ppd()         - Add a PPD file.
+ *   cat_drv()         - Generate a PPD from a driver info file.
+ *   cat_ppd()         - Copy a PPD file to stdout.
+ *   copy_static()     - Copy a static PPD file to stdout.
+ *   compare_matches() - Compare PPD match scores for sorting.
+ *   compare_names()   - Compare PPD filenames for sorting.
+ *   compare_ppds()    - Compare PPD file make and model names for sorting.
+ *   free_array()      - Free an array of strings.
+ *   list_ppds()       - List PPD files.
+ *   load_ppds()       - Load PPD files recursively.
+ *   load_drv()        - Load the PPDs from a driver information file.
+ *   load_drivers()    - Load driver-generated PPD files.
+ *   regex_device_id() - Compile a regular expression based on the 1284 device
+ *                       ID.
+ *   regex_string()    - Construct a regular expression to compare a simple
+ *                       string.
  */
 
 /*
@@ -41,6 +46,7 @@
 #include <cups/transcode.h>
 #include <cups/ppd-private.h>
 #include <ppdc/ppdc.h>
+#include <regex.h>
 
 
 /*
@@ -95,6 +101,7 @@ typedef struct				/**** PPD record ****/
 typedef struct				/**** In-memory record ****/
 {
   int		found;			/* 1 if PPD is found */
+  int		matches;		/* Match count */
   ppd_rec_t	record;			/* PPDs.dat record */
 } ppd_info_t;
 
@@ -121,6 +128,8 @@ static ppd_info_t	*add_ppd(const char *filename, const char *name,
 static int		cat_drv(const char *name, int request_id);
 static int		cat_ppd(const char *name, int request_id);
 static int		cat_static(const char *name, int request_id);
+static int		compare_matches(const ppd_info_t *p0,
+			                const ppd_info_t *p1);
 static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
@@ -131,6 +140,8 @@ static int		load_drivers(void);
 static int		load_drv(const char *filename, const char *name,
 			         cups_file_t *fp, time_t mtime, off_t size);
 static int		load_ppds(const char *d, const char *p, int descend);
+static regex_t		*regex_device_id(const char *device_id);
+static regex_t		*regex_string(const char *s);
 
 
 /*
@@ -325,7 +336,7 @@ cat_drv(const char *name,		/* I - PPD name */
     ppdcCatalog	*catalog;		// Message catalog in .drv file
 
 
-    fprintf(stderr, "DEBUG: %d locales defined in \"%s\"...\n",
+    fprintf(stderr, "DEBUG: [cups-driverd] %d locales defined in \"%s\"...\n",
             src->po_files->count, filename);
 
     locales = new ppdcArray();
@@ -333,7 +344,7 @@ cat_drv(const char *name,		/* I - PPD name */
          catalog;
 	 catalog = (ppdcCatalog *)src->po_files->next())
     {
-      fprintf(stderr, "DEBUG: Adding locale \"%s\"...\n",
+      fprintf(stderr, "DEBUG: [cups-driverd] Adding locale \"%s\"...\n",
               catalog->locale->value);
       locales->add(catalog->locale);
     }
@@ -636,6 +647,22 @@ cat_static(const char *name,		/* I - PPD name */
 
 
 /*
+ * 'compare_matches()' - Compare PPD match scores for sorting.
+ */
+
+static int
+compare_matches(const ppd_info_t *p0,	/* I - First PPD */
+                const ppd_info_t *p1)	/* I - Second PPD */
+{
+  if (p1->matches != p0->matches)
+    return (p1->matches - p0->matches);
+  else
+    return (cupsdCompareNames(p1->record.make_and_model,
+			      p0->record.make_and_model));
+}
+
+
+/*
  * 'compare_names()' - Compare PPD filenames for sorting.
  */
 
@@ -729,8 +756,8 @@ list_ppds(int        request_id,	/* I - Request ID */
 		*type_str;		/* ppd-type option */
   int		model_number,		/* ppd-model-number value */
 		type,			/* ppd-type value */
-		mam_len,		/* Length of ppd-make-and-model */
-		device_id_len,		/* Length of ppd-device-id */
+		make_and_model_len,	/* Length of ppd-make-and-model */
+		product_len,		/* Length of ppd-product */
 		send_device_id,		/* Send ppd-device-id? */
 		send_make,		/* Send ppd-make? */
 		send_make_and_model,	/* Send ppd-make-and-model? */
@@ -741,6 +768,10 @@ list_ppds(int        request_id,	/* I - Request ID */
 		send_psversion,		/* Send ppd-psversion? */
 		send_type,		/* Send ppd-type? */
 		sent_header;		/* Sent the IPP header? */
+  regex_t	*device_id_re,		/* Regular expression for matching device ID */
+		*make_and_model_re;	/* Regular expression for matching make and model */
+  regmatch_t	re_matches[6];		/* Regular expression matches */
+  cups_array_t	*matches;		/* Matching PPDs */
 
 
   fprintf(stderr,
@@ -926,14 +957,14 @@ list_ppds(int        request_id,	/* I - Request ID */
   type_str         = cupsGetOption("ppd-type", num_options, options);
 
   if (make_and_model)
-    mam_len = strlen(make_and_model);
+    make_and_model_len = strlen(make_and_model);
   else
-    mam_len = 0;
+    make_and_model_len = 0;
 
-  if (device_id)
-    device_id_len = strlen(device_id);
+  if (product)
+    product_len = strlen(product);
   else
-    device_id_len = 0;
+    product_len = 0;
 
   if (model_number_str)
     model_number = atoi(model_number_str);
@@ -1021,66 +1052,135 @@ list_ppds(int        request_id,	/* I - Request ID */
   else
     count = limit;
 
-  for (ppd = (ppd_info_t *)cupsArrayFirst(PPDsByMakeModel);
+  if (device_id || language || make || make_and_model || model_number_str ||
+      product)
+  {
+    matches = cupsArrayNew((cups_array_func_t)compare_matches, NULL);
+
+    if (device_id)
+      device_id_re = regex_device_id(device_id);
+    else
+      device_id_re = NULL;
+
+    if (make_and_model)
+      make_and_model_re = regex_string(make_and_model);
+    else
+      make_and_model_re = NULL;
+
+    for (ppd = (ppd_info_t *)cupsArrayFirst(PPDsByMakeModel);
+	 ppd;
+	 ppd = (ppd_info_t *)cupsArrayNext(PPDsByMakeModel))
+    {
+     /*
+      * Filter PPDs based on make, model, product, language, model number,
+      * and/or device ID using the "matches" score value.  An exact match
+      * for product, make-and-model, or device-id adds 3 to the score.
+      * Partial matches for make-and-model yield 1 or 2 points, and matches
+      * for the make and language add a single point.  Results are then sorted
+      * by score, highest score first.
+      */
+
+      if (ppd->record.type < PPD_TYPE_POSTSCRIPT ||
+	  ppd->record.type >= PPD_TYPE_DRV)
+	continue;
+
+      ppd->matches = 0;
+
+      if (device_id_re &&
+	  !regexec(device_id_re, ppd->record.device_id,
+                   (int)(sizeof(re_matches) / sizeof(re_matches[0])),
+		   re_matches, 0))
+      {
+       /*
+        * Add the number of matching values from the device ID - it will be
+	* at least 2 (manufacturer and model), and as much as 3 (command set).
+	*/
+
+        for (i = 1; i < (int)(sizeof(re_matches) / sizeof(re_matches[0])); i ++)
+	  if (re_matches[i].rm_so >= 0)
+	    ppd->matches ++;
+      }
+
+      if (language)
+      {
+	for (i = 0; i < PPD_MAX_LANG; i ++)
+	  if (!ppd->record.languages[i][0] ||
+	      !strcasecmp(ppd->record.languages[i], language))
+	  {
+	    ppd->matches ++;
+	    break;
+	  }
+      }
+
+      if (make && !strcasecmp(ppd->record.make, make))
+        ppd->matches ++;
+
+      if (make_and_model_re &&
+          !regexec(make_and_model_re, ppd->record.make_and_model,
+	           (int)(sizeof(re_matches) / sizeof(re_matches[0])),
+		   re_matches, 0))
+      {
+	// See how much of the make-and-model string we matched...
+	if (re_matches[0].rm_so == 0)
+	{
+	  if (re_matches[0].rm_eo == make_and_model_len)
+	    ppd->matches += 3;		// Exact match
+	  else
+	    ppd->matches += 2;		// Prefix match
+	}
+	else
+	  ppd->matches ++;		// Infix match
+      }
+
+      if (model_number_str && ppd->record.model_number == model_number)
+        ppd->matches ++;
+
+      if (product)
+      {
+	for (i = 0; i < PPD_MAX_PROD; i ++)
+	  if (!ppd->record.products[i][0] ||
+	      !strcasecmp(ppd->record.products[i], product))
+	  {
+	    ppd->matches += 3;
+	    break;
+	  }
+      }
+
+      if (psversion)
+      {
+	for (i = 0; i < PPD_MAX_VERS; i ++)
+	  if (!ppd->record.psversions[i][0] ||
+	      !strcasecmp(ppd->record.psversions[i], psversion))
+	  {
+	    ppd->matches ++;
+	    break;
+	  }
+      }
+
+      if (type_str && ppd->record.type == type)
+        ppd->matches ++;
+
+      if (ppd->matches)
+      {
+        fprintf(stderr, "DEBUG: [cups-driverd] %s matches with score %d!\n",
+	        ppd->record.name, ppd->matches);
+        cupsArrayAdd(matches, ppd);
+      }
+    }
+  }
+  else
+    matches = PPDsByMakeModel;
+
+  for (ppd = (ppd_info_t *)cupsArrayFirst(matches);
        count > 0 && ppd;
-       ppd = (ppd_info_t *)cupsArrayNext(PPDsByMakeModel))
+       ppd = (ppd_info_t *)cupsArrayNext(matches))
   {
    /*
-    * Filter PPDs based on make, model, or device ID...
+    * Skip invalid PPDs...
     */
 
     if (ppd->record.type < PPD_TYPE_POSTSCRIPT ||
         ppd->record.type >= PPD_TYPE_DRV)
-      continue;
-
-    if (device_id && strncasecmp(ppd->record.device_id, device_id,
-                                 device_id_len))
-      continue;				/* TODO: implement smart compare */
-
-    if (language)
-    {
-      for (i = 0; i < PPD_MAX_LANG; i ++)
-	if (!ppd->record.languages[i][0] ||
-	    !strcasecmp(ppd->record.languages[i], language))
-	  break;
-
-      if (i >= PPD_MAX_LANG || !ppd->record.languages[i][0])
-	continue;
-    }
-
-    if (make && strcasecmp(ppd->record.make, make))
-      continue;
-
-    if (make_and_model && strncasecmp(ppd->record.make_and_model,
-                                      make_and_model, mam_len))
-      continue;
-
-    if (model_number_str && ppd->record.model_number != model_number)
-      continue;
-
-    if (product)
-    {
-      for (i = 0; i < PPD_MAX_PROD; i ++)
-	if (!ppd->record.products[i][0] ||
-	    !strcasecmp(ppd->record.products[i], product))
-	  break;
-
-      if (i >= PPD_MAX_PROD || !ppd->record.products[i][0])
-	continue;
-    }
-
-    if (psversion)
-    {
-      for (i = 0; i < PPD_MAX_VERS; i ++)
-	if (!ppd->record.psversions[i][0] ||
-	    !strcasecmp(ppd->record.psversions[i], psversion))
-	  break;
-
-      if (i >= PPD_MAX_VERS || !ppd->record.psversions[i][0])
-	continue;
-    }
-
-    if (type_str && ppd->record.type != type)
       continue;
 
    /*
@@ -1094,7 +1194,8 @@ list_ppds(int        request_id,	/* I - Request ID */
       cupsdSendIPPHeader(IPP_OK, request_id);
       cupsdSendIPPGroup(IPP_TAG_OPERATION);
       cupsdSendIPPString(IPP_TAG_CHARSET, "attributes-charset", "utf-8");
-      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language", "en-US");
+      cupsdSendIPPString(IPP_TAG_LANGUAGE, "attributes-natural-language",
+                         "en-US");
     }
 
     fprintf(stderr, "DEBUG: [cups-driverd] Sending %s (%s)...\n",
@@ -1164,13 +1265,13 @@ list_ppds(int        request_id,	/* I - Request ID */
 
 
       for (this_make = ppd->record.make,
-               ppd = (ppd_info_t *)cupsArrayNext(PPDsByMakeModel);
+               ppd = (ppd_info_t *)cupsArrayNext(matches);
 	   ppd;
-	   ppd = (ppd_info_t *)cupsArrayNext(PPDsByMakeModel))
+	   ppd = (ppd_info_t *)cupsArrayNext(matches))
 	if (strcasecmp(this_make, ppd->record.make))
 	  break;
 
-      cupsArrayPrev(PPDsByMakeModel);
+      cupsArrayPrev(matches);
     }
   }
 
@@ -1382,7 +1483,13 @@ load_ppds(const char *d,		/* I - Actual directory */
       else if (!strncmp(line, "*NickName:", 10))
 	sscanf(line, "%*[^\"]\"%255[^\"]", nick_name);
       else if (!strncasecmp(line, "*1284DeviceID:", 14))
+      {
 	sscanf(line, "%*[^\"]\"%255[^\"]", device_id);
+
+        // Make sure device ID ends with a semicolon...
+	if (device_id[0] && device_id[strlen(device_id) - 1] != ';')
+	  strlcat(device_id, ";", sizeof(device_id));
+      }
       else if (!strncmp(line, "*Product:", 9))
       {
 	if (sscanf(line, "%*[^\"]\"(%255[^)]", product) == 1)
@@ -1977,6 +2084,144 @@ load_drivers(void)
   cupsDirClose(dir);
 
   return (1);
+}
+
+
+/*
+ * 'regex_device_id()' - Compile a regular expression based on the 1284 device
+ *                       ID.
+ */
+
+static regex_t *			/* O - Regular expression */
+regex_device_id(const char *device_id)	/* I - IEEE-1284 device ID */
+{
+  char		res[2048],		/* Regular expression string */
+		*ptr;			/* Pointer into string */
+  regex_t	*re;			/* Regular expression */
+  int		cmd;			/* Command set string? */
+
+
+  fprintf(stderr, "DEBUG: [cups-driverd] regex_device_id(\"%s\")\n", device_id);
+
+ /*
+  * Scan the device ID string and insert class, command set, manufacturer, and
+  * model attributes to match.  We assume that the device ID in the PPD and the
+  * device ID reported by the device itself use the same attribute names and
+  * order of attributes.
+  */
+
+  ptr = res;
+
+  while (*device_id && ptr < (res + sizeof(res) - 6))
+  {
+    cmd = !strncasecmp(device_id, "COMMAND SET:", 12) ||
+          !strncasecmp(device_id, "CMD:", 4);
+
+    if (cmd || !strncasecmp(device_id, "MANUFACTURER:", 13) ||
+        !strncasecmp(device_id, "MFG:", 4) ||
+        !strncasecmp(device_id, "MFR:", 4) ||
+        !strncasecmp(device_id, "MODEL:", 6) ||
+        !strncasecmp(device_id, "MDL:", 4))
+    {
+      if (ptr > res)
+      {
+        *ptr++ = '.';
+	*ptr++ = '*';
+      }
+
+      *ptr++ = '(';
+
+      while (*device_id && *device_id != ';' && ptr < (res + sizeof(res) - 4))
+      {
+        if (strchr("[]{}().*\\|", *device_id))
+	  *ptr++ = '\\';
+	*ptr++ = *device_id++;
+      }
+
+      if (*device_id == ';' || !*device_id)
+        *ptr++ = ';';
+      *ptr++ = ')';
+      if (cmd)
+        *ptr++ = '?';
+    }
+    else if ((device_id = strchr(device_id, ';')) == NULL)
+      break;
+    else
+      device_id ++;
+  }
+
+  *ptr = '\0';
+
+  fprintf(stderr, "DEBUG: [cups-driverd] regex_device_id: \"%s\"\n", res);
+
+ /*
+  * Compile the regular expression and return...
+  */
+
+  if (res[0] && (re = (regex_t *)calloc(1, sizeof(regex_t))) != NULL)
+  {
+    if (!regcomp(re, res, REG_EXTENDED | REG_ICASE))
+    {
+      fputs("DEBUG: [cups-driverd] regex_device_id: OK\n", stderr);
+      return (re);
+    }
+
+    free(re);
+  }
+
+  return (NULL);
+}
+
+
+/*
+ * 'regex_string()' - Construct a regular expression to compare a simple string.
+ */
+
+static regex_t *			/* O - Regular expression */
+regex_string(const char *s)		/* I - String to compare */
+{
+  char		res[2048],		/* Regular expression string */
+		*ptr;			/* Pointer into string */
+  regex_t	*re;			/* Regular expression */
+
+
+  fprintf(stderr, "DEBUG: [cups-driverd] regex_string(\"%s\")\n", s);
+
+ /*
+  * Convert the string to a regular expression, escaping special characters
+  * as needed.
+  */
+
+  ptr = res;
+
+  while (*s && ptr < (res + sizeof(res) - 2))
+  {
+    if (strchr("[]{}().*\\", *s))
+      *ptr++ = '\\';
+
+    *ptr++ = *s++;
+  }
+
+  *ptr = '\0';
+
+  fprintf(stderr, "DEBUG: [cups-driverd] regex_string: \"%s\"\n", res);
+
+ /*
+  * Create a case-insensitive regular expression...
+  */
+
+  if (res[0] && (re = (regex_t *)calloc(1, sizeof(regex_t))) != NULL)
+  {
+    if (!regcomp(re, res, REG_ICASE))
+    {
+      fputs("DEBUG: [cups-driverd] regex_string: OK\n", stderr);
+      return (re);
+    }
+
+    free(re);
+  }
+
+  return (NULL);
 }
 
 

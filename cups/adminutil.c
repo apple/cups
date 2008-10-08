@@ -1794,8 +1794,7 @@ _cupsAdminSetServerSettings(
     else if ((((in_admin_location || in_conf_location || in_root_location) &&
                remote_admin >= 0) ||
               (in_root_location && share_printers >= 0)) &&
-             (((!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny")) &&
-	       !strcasecmp(value, "@LOCAL")) ||
+             (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
 	      !strcasecmp(line, "Order")))
       continue;
     else if (in_cancel_job == 2)
