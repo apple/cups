@@ -26,6 +26,14 @@
 #  define M_PI	3.14159265358979323846
 #endif /* M_PI */
 
+
+/*
+ * Maximum number of pens we emulate...
+ */
+
+#define MAX_PENS	1024
+
+
 /*
  * Parameter value structure...
  */
@@ -108,10 +116,10 @@ VAR float	PenPosition[2]	VALUE2(0.0f, 0.0f),
 						/* Current pen position */
 		PenScaling	VALUE(1.0f),	/* Pen width scaling factor */
 		PenWidth	VALUE(1.0f);	/* Default pen width */
-VAR pen_t	Pens[1024];			/* State of each pen */
+VAR pen_t	Pens[MAX_PENS];			/* State of each pen */
 VAR int		PenMotion	VALUE(0), 	/* 0 = absolute, 1 = relative */
 		PenValid	VALUE(0),	/* 1 = valid position, 0 = undefined */
-		PenNumber	VALUE(1),	/* Current pen number */
+		PenNumber	VALUE(0),	/* Current pen number */
 		PenCount	VALUE(8),	/* Number of pens */
 		PenDown		VALUE(0),	/* 0 = pen up, 1 = pen down */
 		PolygonMode	VALUE(0),	/* Drawing polygons? */

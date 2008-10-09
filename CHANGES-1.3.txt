@@ -3,7 +3,14 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.9
 
+	- SECURITY: The HP-GL/2 filter did not range check pen numbers
+	  (STR #2911)
+	- SECURITY: The SGI image file reader did not range check
+	  16-bit run lengths (STR #2918)
+	- SECURITY: The text filter did not range check cpi, lpi, or
+	  column values (STR #2919)
 	- Documentation updates (STR #2904, STR #2944)
+	- The French web admin page was never updated (STR #2963)
 	- The IPP backend did not retry print jobs when the printer
 	  reported itself as busy or unavailable (STR #2951)
 	- The "Set Allowed Users" web interface did not handle trailing
