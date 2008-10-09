@@ -5541,6 +5541,8 @@ copy_printer_attrs(
     add_queued_job_count(con, printer);
 
   copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0);
+  if (printer->ppd_attrs)
+    copy_attrs(con->response, printer->ppd_attrs, ra, IPP_TAG_ZERO, 0);
   copy_attrs(con->response, CommonData, ra, IPP_TAG_ZERO, IPP_TAG_COPY);
 }
 
@@ -6324,6 +6326,10 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/ppd/%s.ppd", ServerRoot,
+           printer->name);
+  unlink(filename);
+
+  snprintf(filename, sizeof(filename), "%s/%s.ipp", ServerRoot,
            printer->name);
   unlink(filename);
 

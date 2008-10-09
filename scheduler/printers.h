@@ -67,7 +67,8 @@ typedef struct cupsd_printer_s
 		*prefiltertype;		/* Pseudo-filetype for pre-filters */
   cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */
-  ipp_t		*attrs;			/* Attributes supported by this printer */
+  ipp_t		*attrs,			/* Attributes supported by this printer */
+		*ppd_attrs;		/* Attributes based on the PPD */
   int		num_printers,		/* Number of printers in class */
 		last_printer;		/* Last printer job was sent to */
   struct cupsd_printer_s **printers;	/* Printers in class */
