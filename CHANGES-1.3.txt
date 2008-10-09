@@ -9,7 +9,7 @@ CHANGES IN CUPS V1.3.9
 	- The "Set Allowed Users" web interface did not handle trailing
 	  whitespace correctly (STR #2956)
 	- The PostScript filter did not work with Adobe applications
-	  using custom page sizes.
+	  using custom page sizes (STR #2968)
 	- The Mac OS X USB backend did not work with some printers
 	  that reported a bad 1284 device ID.
 	- The scheduler incorrectly resolved the client connection
