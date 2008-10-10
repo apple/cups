@@ -126,7 +126,6 @@ pot:
 		--copyright-holder="Apple Inc." \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c */*.cxx
-	cp cups.pot cups.pot.save
 	(cat cups.header; \
 	 cat cups.pot | sed -e '1,6d' -e '1,$$s/PACKAGE VERSION/CUPS 1.4/' \
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
