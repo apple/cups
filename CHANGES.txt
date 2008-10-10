@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-10-09
+CHANGES.txt - 2008-10-10
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The ppdmerge command did not merge custom option strings
+	  (STR #2863)
 	- The scheduler now supports the Hold-New-Jobs and
 	  Release-Held-New-Jobs operations; these are exposed via the
 	  cupsdisable and cupsenable commands (STR #2332)

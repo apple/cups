@@ -23,6 +23,7 @@
 // Include necessary headers...
 //
 
+#include <cups/ppd-private.h>
 #include <cups/cups.h>
 #include <cups/array.h>
 #include <cups/string.h>
@@ -54,17 +55,19 @@ main(int  argc,				// I - Number of command-line arguments
 		*outname;		// Output filename (if any)
   cups_file_t	*infile,		// Input file
 		*outfile;		// Output file
-  char		languages[1024];	// Languages in file
+  cups_array_t	*languages;		// Languages in file
+  const char	*locale;		// Current locale
+  char		line[1024];		// Line from file
 
 
   _cupsSetLocale(argv);
 
   // Scan the command-line...
-  inname       = NULL;
-  outname      = NULL;
-  outfile      = NULL;
-  languages[0] = '\0';
-  ppds         = cupsArrayNew(NULL, NULL);
+  inname    = NULL;
+  outname   = NULL;
+  outfile   = NULL;
+  languages = NULL;
+  ppds      = cupsArrayNew(NULL, NULL);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -90,12 +93,12 @@ main(int  argc,				// I - Number of command-line arguments
     }
     else
     {
-      // Open and load the driver info file...
+      // Open and load the PPD file...
       if ((infile = cupsFileOpen(argv[i], "r")) == NULL)
       {
         _cupsLangPrintf(stderr, _("%s: Unable to open %s - %s\n"), "ppdmerge",
 	                argv[i], strerror(errno));
-	goto error;
+	return (1);
       }
 
       // Open the PPD file...
@@ -103,7 +106,6 @@ main(int  argc,				// I - Number of command-line arguments
       {
         ppd_status_t	status;		// PPD open status
 	int		linenum;	// Line number
-        char		line[1024];	// First line from file
 	
 	
         status = ppdLastError(&linenum);
@@ -126,29 +128,26 @@ main(int  argc,				// I - Number of command-line arguments
 	_cupsLangPrintf(stderr, "%s\n", line);
 	
         cupsFileClose(infile);
-
-        goto error;
+	return (1);
       }
       
       // Figure out the locale...
-      const char *locale = ppd_locale(ppd);
-
-      if (!locale)
+      if ((locale = ppd_locale(ppd)) == NULL)
       {
         _cupsLangPrintf(stderr,
 	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"),
 			ppd->lang_version, argv[i]);
         cupsFileClose(infile);
 	ppdClose(ppd);
-
-	goto error;
+	return (1);
       }
-      
+
       if (!strcmp(locale, "en") && !inname && !outfile)
       {
         // Set the English PPD's filename...
-        inname = argv[i];
-	
+	inname    = argv[i];
+	languages = _ppdGetLanguages(ppd);
+
         if (outname && !strcmp(inname, outname))
 	{	
 	  // Rename input filename so that we don't overwrite it...
@@ -164,38 +163,11 @@ main(int  argc,				// I - Number of command-line arguments
 			    inname, bckname, strerror(errno));
 	    return (1);
 	  }
-	}
 
-        // Open the output stream...
-	if (outname)
-	{
-	  const char *ext = strrchr(outname, '.');
-	  if (ext && !strcmp(ext, ".ppd.gz"))
-	    outfile = cupsFileOpen(outname, "w9");
-	  else
-	    outfile = cupsFileOpen(outname, "w");
-	}
-	else
-	  outfile = cupsFileStdout();
-
-        // Copy the PPD file to the output stream...
-	char line[1024];		// Line from file
-	
-	cupsFileRewind(infile);
-
-	while (cupsFileGets(infile, line, sizeof(line)))
-	{
-	  if (!strncmp(line, "*cupsLanguages:", 15))
-	  {
-	    if (sscanf(line, "*cupsLanguages:%*[ \t]\"%1023[^\"]",
-		       languages) != 1)
-	      languages[0] = '\0';
-	  }
-	  else
-	    cupsFilePrintf(outfile, "%s\n", line);
+	  inname = bckname;
 	}
       }
-      else if (strcmp(locale, "en") && !strstr(languages, locale))
+      else if (strcmp(locale, "en"))
       {
 	// Save this PPD for later processing...
         cupsArrayAdd(ppds, ppd);
@@ -215,8 +187,58 @@ main(int  argc,				// I - Number of command-line arguments
   // If no PPDs have been loaded, display the program usage message.
   if (!inname)
     usage();
-      
-  // Loop through the PPD files we loaded to provide the translations...
+
+  // Loop through the PPD files we loaded to generate a new language list...
+  if (!languages)
+    languages = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+
+  for (ppd = (ppd_file_t *)cupsArrayFirst(ppds);
+       ppd;
+       ppd = (ppd_file_t *)cupsArrayNext(ppds))
+  {
+    locale = ppd_locale(ppd);
+
+    if (cupsArrayFind(languages, (void *)locale))
+    {
+      // Already have this language, remove the PPD from the list.
+      ppdClose(ppd);
+      cupsArrayRemove(ppds, ppd);
+    }
+    else
+      cupsArrayAdd(languages, (void *)locale);
+  }
+
+  // Copy the English PPD starting with a cupsLanguages line...
+  infile = cupsFileOpen(inname, "r");
+
+  if (outname)
+  {
+    const char *ext = strrchr(outname, '.');
+    if (ext && !strcmp(ext, ".gz"))
+      outfile = cupsFileOpen(outname, "w9");
+    else
+      outfile = cupsFileOpen(outname, "w");
+  }
+  else
+    outfile = cupsFileStdout();
+
+  cupsFileGets(infile, line, sizeof(line));
+  cupsFilePrintf(outfile, "%s\n", line);
+  if ((locale = (char *)cupsArrayFirst(languages)) != NULL)
+  {
+    cupsFilePrintf(outfile, "*cupsLanguages: \"%s", locale);
+    while ((locale = (char *)cupsArrayNext(languages)) != NULL)
+      cupsFilePrintf(outfile, " %s", locale);
+    cupsFilePuts(outfile, "\"\n");
+  }
+
+  while (cupsFileGets(infile, line, sizeof(line)))
+  {
+    if (strncmp(line, "*cupsLanguages:", 15))
+      cupsFilePrintf(outfile, "%s\n", line);
+  }
+
+  // Loop through the other PPD files we loaded to provide the translations...
   for (ppd = (ppd_file_t *)cupsArrayFirst(ppds);
        ppd;
        ppd = (ppd_file_t *)cupsArrayNext(ppds))
@@ -226,63 +248,52 @@ main(int  argc,				// I - Number of command-line arguments
     ppd_group_t		*g;		// Option group
     ppd_option_t	*o;		// Option
     ppd_choice_t	*c;		// Choice
-    const char		*locale = ppd_locale(ppd);
-					// Locale
+    ppd_coption_t	*co;		// Custom option
+    ppd_cparam_t	*cp;		// Custom parameter
+    ppd_attr_t		*attr;		// PPD attribute
 
-    
+    locale = ppd_locale(ppd);
+
     cupsFilePrintf(outfile, "*%% %s localization\n", ppd->lang_version);
-    
     cupsFilePrintf(outfile, "*%s.Translation ModelName/%s: \"\"\n", locale,
 		   ppd->modelname);
-    
+
     for (j = ppd->num_groups, g = ppd->groups; j > 0; j --, g ++)
     {
       cupsFilePrintf(outfile, "*%s.Translation %s/%s: \"\"\n", locale,
 		     g->name, g->text);
-      
+
       for (k = g->num_options, o = g->options; k > 0; k --, o ++)
       {
 	cupsFilePrintf(outfile, "*%s.Translation %s/%s: \"\"\n", locale,
 		       o->keyword, o->text);
-	
+
 	for (l = o->num_choices, c = o->choices; l > 0; l --, c ++)
 	  cupsFilePrintf(outfile, "*%s.%s %s/%s: \"\"\n", locale,
 			 o->keyword, c->choice, c->text);
+
+	if ((co = ppdFindCustomOption(ppd, o->keyword)) != NULL)
+	{
+	  snprintf(line, sizeof(line), "Custom%s", o->keyword);
+	  attr = ppdFindAttr(ppd, line, "True");
+	  cupsFilePrintf(outfile, "*%s.Custom%s True/%s: \"\"\n", locale,
+			 o->keyword, attr->text);
+	  for (cp = ppdFirstCustomParam(co); cp; cp = ppdNextCustomParam(co))
+	    cupsFilePrintf(outfile, "*%s.ParamCustom%s %s/%s: \"\"\n", locale,
+			   o->keyword, cp->name, cp->text);
+	}
       }
     }
-    
-    if (languages[0])
-      strlcat(languages, " ", sizeof(languages));
-    
-    strlcat(languages, locale, sizeof(languages));
 
     ppdClose(ppd);
   }
 
   cupsArrayDelete(ppds);
 
-  if (languages[0])
-    cupsFilePrintf(outfile, "*cupsLanguages: \"%s\"\n", languages);
-
   cupsFileClose(outfile);
 
   // Return with no errors.
   return (0);
-
-  // Error out...
-error:
-
-  for (ppd = (ppd_file_t *)cupsArrayFirst(ppds);
-       ppd;
-       ppd = (ppd_file_t *)cupsArrayNext(ppds))
-    ppdClose(ppd);
-
-  cupsArrayDelete(ppds);
-
-  if (outfile)
-    cupsFileClose(outfile);
-
-  return (1);
 }
 
 
