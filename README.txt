@@ -1,5 +1,18 @@
-*README - CUPS v1.4svn - 2008-01-02
-----------------------------------
+README - CUPS v1.4b1 - 2008-10-10
+---------------------------------
+
+**********************************************************************
+**********************************************************************
+**********                                                  **********
+**********  THIS IS BETA-RELEASE SOFTWARE.  DO NOT USE ON   **********
+**********  PRODUCTION SYSTEMS!  REPORT PROBLEMS TO THE     **********
+**********  CUPS FORUMS OR BUG REPORTING PAGES:             **********
+**********                                                  **********
+**********    http://www.cups.org/newsgroups.php (FORUMS)   **********
+**********    http://www.cups.org/str.php        (BUGS)     **********
+**********                                                  **********
+**********************************************************************
+**********************************************************************
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -85,25 +98,29 @@ SETTING UP PRINTER QUEUES FROM THE COMMAND-LINE
     CUPS includes several sample PPD files you can use:
 
 	Driver                         PPD File
-	-----------------------------  ------------
-	Dymo Label Printers            dymo.ppd
-	Intellitech Intellibar         intelbar.ppd
-	EPSON Stylus Color Series      stcolor.ppd
-	EPSON Stylus Photo Series      stphoto.ppd
-	EPSON Stylus New Color Series  stcolor2.ppd
-	EPSON Stylus New Photo Series  stphoto2.ppd
-	EPSON 9-pin Series             epson9.ppd
-	EPSON 24-pin Series            epson24.ppd
-	HP DeskJet Series              deskjet.ppd
-	HP LaserJet Series             laserjet.ppd
-	OKIDATA 9-Pin Series           okidata9.ppd
-	OKIDATA 24-Pin Series          okidat24.ppd
-	Zebra CPCL Label Printer       zebracpl.ppd
-	Zebra EPL1 Label Printer       zebraep1.ppd
-	Zebra EPL2 Label Printer       zebraep2.ppd
-	Zebra ZPL Label Printer        zebra.ppd
+	-----------------------------  ------------------------------
+	Dymo Label Printers            drv:///sample.drv/dymo.ppd
+	Intellitech Intellibar         drv:///sample.drv/intelbar.ppd
+	EPSON Stylus Color Series      drv:///sample.drv/stcolor.ppd
+	EPSON Stylus Photo Series      drv:///sample.drv/stphoto.ppd
+	EPSON Stylus New Color Series  drv:///sample.drv/stcolor2.ppd
+	EPSON Stylus New Photo Series  drv:///sample.drv/stphoto2.ppd
+	EPSON 9-pin Series             drv:///sample.drv/epson9.ppd
+	EPSON 24-pin Series            drv:///sample.drv/epson24.ppd
+	HP DeskJet Series              drv:///sample.drv/deskjet.ppd
+	HP LaserJet Series             drv:///sample.drv/laserjet.ppd
+	OKIDATA 9-Pin Series           drv:///sample.drv/okidata9.ppd
+	OKIDATA 24-Pin Series          drv:///sample.drv/okidat24.ppd
+	Zebra CPCL Label Printer       drv:///sample.drv/zebracpl.ppd
+	Zebra EPL1 Label Printer       drv:///sample.drv/zebraep1.ppd
+	Zebra EPL2 Label Printer       drv:///sample.drv/zebraep2.ppd
+	Zebra ZPL Label Printer        drv:///sample.drv/zebra.ppd
 
-    Run the "lpinfo" command to list the available printers:
+    Run the "lpinfo -m" command to list the available drivers:
+
+        lpinfo -m
+
+    Run the "lpinfo -v" command to list the available printers:
 
         lpinfo -v
 
@@ -154,18 +171,16 @@ PRINTING FILES
 LEGAL STUFF
 
     CUPS is Copyright 2007-2008 by Apple Inc.  CUPS, the CUPS logo,
-    and the Common UNIX Printing System are the trademark property
-    of Apple Inc.
+    and the Common UNIX Printing System are trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.
 
     This software is based in part on the work of the Independent
     JPEG Group.
 
-    CUPS is provided under the terms of the GNU General Public
-    License and GNU Library General Public License. This program
-    is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    "doc/help/license.html" or "LICENSE.txt" files for more
-    information.
+    CUPS is provided under the terms of version 2 of the GNU General
+    Public License and GNU Library General Public License. This program
+    is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the "doc/help/license.html"
+    or "LICENSE.txt" files for more information.
