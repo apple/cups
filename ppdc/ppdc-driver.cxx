@@ -33,7 +33,7 @@
 //
 
 #include "ppdc.h"
-#include <cups/cups.h>
+#include <cups/globals.h>
 
 
 //
@@ -679,8 +679,9 @@ ppdcDriver::write_ppd_file(
 	if (locatalog->messages->count == 0)
 	{
 	  // No, skip this one...
-          fprintf(stderr, "ppdc: No message catalog provided for locale %s!\n",
-	          locale->value);
+          _cupsLangPrintf(stderr,
+	                  _("ppdc: No message catalog provided for locale "
+			    "%s!\n"), locale->value);
           continue;
 	}
 
@@ -701,14 +702,14 @@ ppdcDriver::write_ppd_file(
     // First constrain 1 against 2...
     if (!strncmp(cn->option1->value, "*Custom", 7) ||
         !strncmp(cn->option2->value, "*Custom", 7))
-      cupsFilePrintf(fp, "*NonUIConstraints: ");
+      cupsFilePuts(fp, "*NonUIConstraints: ");
     else
-      cupsFilePrintf(fp, "*UIConstraints: ");
+      cupsFilePuts(fp, "*UIConstraints: ");
 
     if (cn->option1->value[0] != '*')
       cupsFilePutChar(fp, '*');
 
-    cupsFilePrintf(fp, cn->option1->value);
+    cupsFilePuts(fp, cn->option1->value);
 
     if (cn->choice1->value)
       cupsFilePrintf(fp, " %s", cn->choice1->value);
@@ -718,24 +719,24 @@ ppdcDriver::write_ppd_file(
     if (cn->option2->value[0] != '*')
       cupsFilePutChar(fp, '*');
 
-    cupsFilePrintf(fp, cn->option2->value);
+    cupsFilePuts(fp, cn->option2->value);
 
     if (cn->choice2->value)
       cupsFilePrintf(fp, " %s", cn->choice2->value);
 
-    cupsFilePrintf(fp, "%s", lf);
+    cupsFilePuts(fp, lf);
 
     // Then constrain 2 against 1...
     if (!strncmp(cn->option1->value, "*Custom", 7) ||
         !strncmp(cn->option2->value, "*Custom", 7))
-      cupsFilePrintf(fp, "*NonUIConstraints: ");
+      cupsFilePuts(fp, "*NonUIConstraints: ");
     else
-      cupsFilePrintf(fp, "*UIConstraints: ");
+      cupsFilePuts(fp, "*UIConstraints: ");
 
     if (cn->option2->value[0] != '*')
       cupsFilePutChar(fp, '*');
 
-    cupsFilePrintf(fp, cn->option2->value);
+    cupsFilePuts(fp, cn->option2->value);
 
     if (cn->choice2->value)
       cupsFilePrintf(fp, " %s", cn->choice2->value);
@@ -745,7 +746,7 @@ ppdcDriver::write_ppd_file(
     if (cn->option1->value[0] != '*')
       cupsFilePutChar(fp, '*');
 
-    cupsFilePrintf(fp, cn->option1->value);
+    cupsFilePuts(fp, cn->option1->value);
 
     if (cn->choice1->value)
       cupsFilePrintf(fp, " %s", cn->choice1->value);

@@ -3,7 +3,7 @@
 //
 //   PPD file import utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cups/i18n.h>
 
 
 //
@@ -48,6 +49,8 @@ main(int  argc,				// I - Number of command-line arguments
   const char	*srcfile;		// Output file
   ppdcSource	*src;			// PPD source file data
 
+
+  _cupsSetLocale(argv);
 
   // Scan the command-line...
   srcfile = NULL;
@@ -123,10 +126,11 @@ main(int  argc,				// I - Number of command-line arguments
 static void
 usage(void)
 {
-  puts("Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]");
-  puts("Options:");
-  puts("  -I include-dir");
-  puts("  -o filename.drv");
+  _cupsLangPuts(stdout,
+                _("Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]\n"
+		  "Options:\n"
+		  "  -I include-dir\n"
+		  "  -o filename.drv\n"));
 
   exit(1);
 }

@@ -638,7 +638,7 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdDoSelect: pollfds[%d]={fd=%d, revents=%x}",
-		      pfd - cupsd_pollfds, pfd->fd, pfd->revents);
+		      (int)(pfd - cupsd_pollfds), pfd->fd, pfd->revents);
 
       if (!pfd->revents)
         continue;

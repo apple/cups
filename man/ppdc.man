@@ -12,13 +12,13 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdc 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH ppdc 1 "Common UNIX Printing System" "10 October 2008" "Apple Inc."
 .SH NAME
 ppdc \- cups ppd compiler
 .SH SYNOPSIS
 .B ppdc
 [ -D
-.I name=value
+.I name[=value]
 ] [ -I
 .I include-directory
 ] [ -c

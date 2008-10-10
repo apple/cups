@@ -3,7 +3,7 @@
 //
 //   Variable class for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the

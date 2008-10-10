@@ -447,7 +447,7 @@ cupsdCheckJobs(void)
 
         cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
       }
-      else if (printer)
+      else if (printer && !printer->holding_new_jobs)
       {
        /*
         * See if the printer is available or remote and not printing a job;
@@ -473,7 +473,7 @@ cupsdCheckJobs(void)
 	}
 
         if ((!(printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is local */
-	     printer->state == IPP_PRINTER_IDLE) ||	/* and idle */
+	     printer->state == IPP_PRINTER_IDLE) ||	/* and idle, OR */
 	    ((printer->type & CUPS_PRINTER_DISCOVERED) && /* Printer is remote */
 	     !printer->job))				/* and not printing */
         {

@@ -1,8 +1,8 @@
 /*
  * "$Id$"
  *
- *   "accept", "disable", "enable", and "reject" commands for the Common
- *   UNIX Printing System (CUPS).
+ *   "cupsaccept", "cupsdisable", "cupsenable", and "cupsreject" commands for
+ *   the Common UNIX Printing System (CUPS).
  *
  *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
@@ -38,13 +38,11 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
-  http_t	*http;			/* HTTP connection to server */
   int		i;			/* Looping var */
   char		*command,		/* Command to do */
 		uri[1024],		/* Printer URI */
 		*reason;		/* Reason for reject/disable */
   ipp_t		*request;		/* IPP request */
-  ipp_t		*response;		/* IPP response */
   ipp_op_t	op;			/* Operation */
   int		cancel;			/* Cancel jobs? */
 
@@ -77,7 +75,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     return (1);
   }
 
-  http   = NULL;
   reason = NULL;
 
  /*
@@ -86,14 +83,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
+    {
       switch (argv[i][1])
       {
         case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-
-	    if (http)
-	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
 	                    _("%s: Sorry, no encryption support compiled in!\n"),
@@ -125,12 +120,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    if (http)
-	    {
-	      httpClose(http);
-	      http = NULL;
-	    }
-
 	    if (argv[i][2] != '\0')
 	      cupsSetServer(argv[i] + 2);
 	    else
@@ -168,36 +157,29 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 	    break;
 
+        case '-' :
+	    if (!strcmp(argv[i], "--hold"))
+	      op = IPP_HOLD_NEW_JOBS;
+	    else if (!strcmp(argv[i], "--release"))
+	      op = IPP_RELEASE_HELD_NEW_JOBS;
+	    else
+	    {
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%s\'!\n"),
+			      command, argv[i]);
+	      return (1);
+	    }
+	    break;
+
 	default :
 	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
 	                    command, argv[i][1]);
 	    return (1);
       }
+    }
     else
     {
      /*
       * Accept/disable/enable/reject a destination...
-      */
-
-      if (http == NULL)
-        http = httpConnectEncrypt(cupsServer(), ippPort(), cupsEncryption());
-
-      if (http == NULL)
-      {
-	_cupsLangPrintf(stderr,
-	                _("%s: Unable to connect to server: %s\n"),
-	                command, strerror(errno));
-	return (1);
-      }
-
-     /*
-      * Build an IPP request, which requires the following
-      * attributes:
-      *
-      *    attributes-charset
-      *    attributes-natural-language
-      *    printer-uri
-      *    printer-state-message [optional]
       */
 
       request = ippNewRequest(op);
@@ -218,21 +200,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Do the request and get back a response...
       */
 
-      if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
+      ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/admin/"));
+
+      if (cupsLastError() > IPP_OK_CONFLICT)
       {
-        if (response->request.status.status_code > IPP_OK_CONFLICT)
-	{
-          _cupsLangPrintf(stderr,
-	                  _("%s: Operation failed: %s\n"),
-			  command, ippErrorString(cupsLastError()));
-	  return (1);
-	}
-	
-        ippDelete(response);
-      }
-      else
-      {
-        _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+	_cupsLangPrintf(stderr,
+			_("%s: Operation failed: %s\n"),
+			command, ippErrorString(cupsLastError()));
 	return (1);
       }
 
@@ -256,26 +230,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI,
                      "printer-uri", NULL, uri);
 
-	if ((response = cupsDoRequest(http, request, "/admin/")) != NULL)
-	{
-          if (response->request.status.status_code > IPP_OK_CONFLICT)
-	  {
-            _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
-	    return (1);
-	  }
+	ippDelete(cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/admin/"));
 
-          ippDelete(response);
-	}
-	else
+        if (cupsLastError() > IPP_OK_CONFLICT)
 	{
-          _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+	  _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
 	  return (1);
 	}
       }
     }
-
-  if (http != NULL)
-    httpClose(http);
 
   return (0);
 }

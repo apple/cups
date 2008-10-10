@@ -640,13 +640,14 @@ read_rle8(FILE           *fp,		/* I - File to read from */
     if (ch & 128)
     {
       for (i = 0; i < count; i ++, row ++, xsize --, length ++)
-        *row = getc(fp);
+        if (xsize > 0)
+	  *row = getc(fp);
     }
     else
     {
       ch = getc(fp);
       length ++;
-      for (i = 0; i < count; i ++, row ++, xsize --)
+      for (i = 0; i < count && xsize > 0; i ++, row ++, xsize --)
         *row = ch;
     }
   }
@@ -685,14 +686,15 @@ read_rle16(FILE           *fp,		/* I - File to read from */
     if (ch & 128)
     {
       for (i = 0; i < count; i ++, row ++, xsize --, length ++)
-        *row = getshort(fp);
+        if (xsize > 0)
+	  *row = getshort(fp);
     }
     else
     {
       ch = getshort(fp);
       length ++;
-      for (i = 0; i < count; i ++, row ++, xsize --)
-        *row = ch;
+      for (i = 0; i < count && xsize > 0; i ++, row ++, xsize --)
+	*row = ch;
     }
   }
 

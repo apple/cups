@@ -3,7 +3,7 @@
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -47,6 +47,7 @@ typedef struct cupsd_printer_s
   cupsd_policy_t *op_policy_ptr;	/* Pointer to operation policy */
   int		shared;			/* Shared? */
   int		accepting;		/* Accepting jobs? */
+  int		holding_new_jobs;	/* Holding new jobs for printing? */
   int		in_implicit_class;	/* In an implicit class? */
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
@@ -67,7 +68,8 @@ typedef struct cupsd_printer_s
 		*prefiltertype;		/* Pseudo-filetype for pre-filters */
   cups_array_t	*filetypes;		/* Supported file types */
   void		*job;			/* Current job in queue */
-  ipp_t		*attrs;			/* Attributes supported by this printer */
+  ipp_t		*attrs,			/* Attributes supported by this printer */
+		*ppd_attrs;		/* Attributes based on the PPD */
   int		num_printers,		/* Number of printers in class */
 		last_printer;		/* Last printer job was sent to */
   struct cupsd_printer_s **printers;	/* Printers in class */

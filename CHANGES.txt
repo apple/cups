@@ -1,9 +1,21 @@
-CHANGES.txt - 2008-10-08
+CHANGES.txt - 2008-10-10
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The PPD compiler now allows local message catalogs to
+	  override the standard CUPS translations (STR #2642)
+	- The ppdmerge command did not merge custom option strings
+	  (STR #2863)
+	- The scheduler now supports the Hold-New-Jobs and
+	  Release-Held-New-Jobs operations; these are exposed via the
+	  cupsdisable and cupsenable commands (STR #2332)
+	- The lpstat command is now much faster when displaying the
+	  status of a single printer (STR #2843)
+	- The scheduler now caches information from PPD files to provide
+	  significantly faster startup time with large numbers of PPDs
+	  (STR #1293)
 	- CUPS-Get-Driver now provides much better driver matching based
 	  on the IEEE-1284 device ID and make/model strings (STR #2707)
 	- Now support the cupsSNMPSupplies keyword to control whether

@@ -14,12 +14,6 @@
 //
 // Contents:
 //
-//   ppdcCatalog::ppdcCatalog()   - Create a shared message catalog.
-//   ppdcCatalog::~ppdcCatalog()  - Destroy a shared message catalog.
-//   ppdcCatalog::add_message()   - Add a new message.
-//   ppdcCatalog::find_message()  - Find a message in a catalog...
-//   ppdcCatalog::load_messages() - Load messages from a .po file.
-//   ppdcCatalog::save_messages() - Save the messages to a .po file.
 //
 
 //
@@ -75,7 +69,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
     char	pofile[1024];		// Message catalog file
 
 
-    snprintf(pofile, sizeof(pofile), "%s/%s/ppdc_%s.po", cg->localedir, l, l);
+    snprintf(pofile, sizeof(pofile), "%s/%s/cups_%s.po", cg->localedir, l, l);
 
     if (load_messages(pofile) && strchr(l, '_'))
     {
@@ -84,7 +78,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 
       strlcpy(baseloc, l, sizeof(baseloc));
-      snprintf(pofile, sizeof(pofile), "%s/%s/ppdc_%s.po", cg->localedir,
+      snprintf(pofile, sizeof(pofile), "%s/%s/cups_%s.po", cg->localedir,
                baseloc, baseloc);
 
       load_messages(pofile);
@@ -113,14 +107,16 @@ ppdcCatalog::~ppdcCatalog()
 //
 
 void
-ppdcCatalog::add_message(const char *id)// I - Message ID to add
+ppdcCatalog::add_message(
+    const char *id,			// I - Message ID to add
+    const char *string)			// I - Translation string
 {
   ppdcMessage	*m;			// Current message
   char		text[1024];		// Text to translate
 
 
   // Range check input...
-  if (!id || !*id)
+  if (!id)
     return;
 
   // Verify that we don't already have the message ID...
@@ -128,10 +124,22 @@ ppdcCatalog::add_message(const char *id)// I - Message ID to add
        m;
        m = (ppdcMessage *)messages->next())
     if (!strcmp(m->id->value, id))
+    {
+      if (string)
+      {
+        m->string->release();
+	m->string = new ppdcString(string);
+      }
       return;
+    }
 
   // Add the message...
-  snprintf(text, sizeof(text), "TRANSLATE %s", id);
+  if (!string)
+  {
+    snprintf(text, sizeof(text), "TRANSLATE %s", id);
+    string = text;
+  }
+
   messages->add(new ppdcMessage(id, text));
 }
 
@@ -166,7 +174,6 @@ ppdcCatalog::load_messages(
     const char *f)			// I - Message catalog file
 {
   cups_file_t	*fp;			// Message file
-  ppdcMessage	*temp;			// Current message
   char		line[4096],		// Line buffer
 		*ptr,			// Pointer into buffer
 		id[4096],		// Translation ID
@@ -268,9 +275,7 @@ ppdcCatalog::load_messages(
       else if (ch == ';')
       {
         // Add string...
-	temp = new ppdcMessage(id, str);
-
-	messages->add(temp);
+	add_message(id, str);
       }
     }
   }
@@ -293,9 +298,16 @@ ppdcCatalog::load_messages(
     *     "multiple lines"
     */
 
+    int	which,				// In msgid?
+	haveid,				// Did we get a msgid string?
+	havestr;			// Did we get a msgstr string?
+		
     linenum = 0;
     id[0]   = '\0';
     str[0]  = '\0';
+    haveid  = 0;
+    havestr = 0;
+    which   = 0;
 
     while (cupsFileGets(fp, line, sizeof(line)))
     {
@@ -308,8 +320,9 @@ ppdcCatalog::load_messages(
       // Strip the trailing quote...
       if ((ptr = (char *)strrchr(line, '\"')) == NULL)
       {
-	fprintf(stderr, "ERROR: Expected quoted string on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Expected quoted string on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
@@ -319,8 +332,9 @@ ppdcCatalog::load_messages(
       // Find start of value...
       if ((ptr = strchr(line, '\"')) == NULL)
       {
-	fprintf(stderr, "ERROR: Expected quoted string on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Expected quoted string on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
@@ -370,48 +384,46 @@ ppdcCatalog::load_messages(
       // Create or add to a message...
       if (!strncmp(line, "msgid", 5))
       {
-	if (id[0] && str[0])
-	{
-	  temp = new ppdcMessage(id, str);
-
-	  messages->add(temp);
-	}
+	if (haveid && havestr)
+	  add_message(id, str);
 
 	strlcpy(id, ptr, sizeof(id));
 	str[0] = '\0';
+	haveid  = 1;
+	havestr = 0;
+	which   = 1;
       }
       else if (!strncmp(line, "msgstr", 6))
       {
-	if (!id[0])
+	if (!haveid)
 	{
-	  fprintf(stderr, "ERROR: Need a msgid line before any "
-			  "translation strings on line %d of %s!\n",
-		  linenum, f);
+	  _cupsLangPrintf(stderr,
+	                  _("ERROR: Need a msgid line before any "
+			    "translation strings on line %d of %s!\n"),
+			  linenum, f);
 	  cupsFileClose(fp);
 	  return (-1);
 	}
 
 	strlcpy(str, ptr, sizeof(str));
+	havestr = 1;
+	which   = 2;
       }
-      else if (line[0] == '\"' && str[0])
+      else if (line[0] == '\"' && which == 2)
 	strlcat(str, ptr, sizeof(str));
-      else if (line[0] == '\"' && id[0])
+      else if (line[0] == '\"' && which == 1)
 	strlcat(id, ptr, sizeof(id));
       else
       {
-	fprintf(stderr, "ERROR: Unexpected text on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr, _("ERROR: Unexpected text on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
     }
 
-    if (id[0] && str[0])
-    {
-      temp = new ppdcMessage(id, str);
-
-      messages->add(temp);
-    }
+    if (haveid && havestr)
+      add_message(id, str);
   }
   else
     goto unknown_load_format;
@@ -430,7 +442,8 @@ ppdcCatalog::load_messages(
 
   unknown_load_format:
 
-  fprintf(stderr, "ERROR: Unknown message catalog format for \"%s\"!\n", f);
+  _cupsLangPrintf(stderr,
+                  _("ERROR: Unknown message catalog format for \"%s\"!\n"), f);
   cupsFileClose(fp);
   return (-1);
 }
