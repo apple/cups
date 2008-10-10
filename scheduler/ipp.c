@@ -197,12 +197,15 @@ static void	get_subscription_attrs(cupsd_client_t *con, int sub_id);
 static void	get_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
 static const char *get_username(cupsd_client_t *con);
 static void	hold_job(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	hold_new_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	move_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static int	ppd_parse_line(const char *line, char *option, int olen,
 		               char *choice, int clen);
 static void	print_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	read_job_ticket(cupsd_client_t *con);
 static void	reject_jobs(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	release_held_new_jobs(cupsd_client_t *con,
+		                      ipp_attribute_t *uri);
 static void	release_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	renew_subscription(cupsd_client_t *con, int sub_id);
 static void	restart_job(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -564,6 +567,14 @@ cupsdProcessIPPRequest(
               set_job_attrs(con, uri);
               break;
 
+	  case IPP_HOLD_NEW_JOBS :
+              hold_new_jobs(con, uri);
+              break;
+
+	  case IPP_RELEASE_HELD_NEW_JOBS :
+              release_held_new_jobs(con, uri);
+              break;
+
 	  case CUPS_GET_DEFAULT :
               get_default(con);
               break;
@@ -898,7 +909,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 {
   http_status_t	status;			/* Policy status */
   int		i;			/* Looping var */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -919,8 +930,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   * Do we have a valid URI?
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                  sizeof(method), username, sizeof(username), host,
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                  sizeof(scheme), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
 
@@ -3570,7 +3581,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 			*auth_info;	/* auth-info attribute */
   int			jobid;		/* Job ID */
   cupsd_job_t		*job;		/* Current job */
-  char			method[HTTP_MAX_URI],
+  char			scheme[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
 					/* Username portion of URI */
@@ -3616,8 +3627,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -6503,7 +6514,7 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
   int		jobid;			/* Job ID */
   int		docnum;			/* Document number */
   cupsd_job_t	*job;			/* Current job */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -6541,8 +6552,8 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -6646,7 +6657,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -6683,8 +6694,8 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -7827,7 +7838,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   ipp_attribute_t *attr,		/* Current job-hold-until */
 		*newattr;		/* New job-hold-until */
   int		jobid;			/* Job ID */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -7864,8 +7875,8 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -7955,6 +7966,73 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   }
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Held by \"%s\".", username);
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
+ * 'hold_new_jobs()' - Hold pending/new jobs on a printer or class.
+ */
+
+static void
+hold_new_jobs(cupsd_client_t  *con,	/* I - Connection */
+              ipp_attribute_t *uri)	/* I - Printer URI */
+{
+  http_status_t		status;		/* Policy status */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
+  cupsd_printer_t	*printer;	/* Printer data */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "hold_new_jobs(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Is the destination valid?
+  */
+
+  if (!cupsdValidateDest(uri->values[0].string.text, &dtype, &printer))
+  {
+   /*
+    * Bad URI...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, printer);
+    return;
+  }
+
+ /*
+  * Hold pending/new jobs sent to the printer...
+  */
+
+  printer->holding_new_jobs = 1;
+
+  cupsdSetPrinterReasons(printer, "+hold-new-jobs");
+  cupsdAddPrinterHistory(printer);
+
+  if (dtype & CUPS_PRINTER_CLASS)
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Class \"%s\" now holding pending/new jobs (\"%s\").",
+                    printer->name, get_username(con));
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Printer \"%s\" now holding pending/new jobs (\"%s\").",
+                    printer->name, get_username(con));
+
+ /*
+  * Everything was ok, so return OK status...
+  */
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -8807,6 +8885,74 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
 
 /*
+ * 'release_held_new_jobs()' - Release pending/new jobs on a printer or class.
+ */
+
+static void
+release_held_new_jobs(
+    cupsd_client_t  *con,		/* I - Connection */
+    ipp_attribute_t *uri)		/* I - Printer URI */
+{
+  http_status_t		status;		/* Policy status */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
+  cupsd_printer_t	*printer;	/* Printer data */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "release_held_new_jobs(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Is the destination valid?
+  */
+
+  if (!cupsdValidateDest(uri->values[0].string.text, &dtype, &printer))
+  {
+   /*
+    * Bad URI...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, printer);
+    return;
+  }
+
+ /*
+  * Hold pending/new jobs sent to the printer...
+  */
+
+  printer->holding_new_jobs = 0;
+
+  cupsdSetPrinterReasons(printer, "-hold-new-jobs");
+  cupsdAddPrinterHistory(printer);
+
+  if (dtype & CUPS_PRINTER_CLASS)
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Class \"%s\" now printing pending/new jobs (\"%s\").",
+                    printer->name, get_username(con));
+  else
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Printer \"%s\" now printing pending/new jobs (\"%s\").",
+                    printer->name, get_username(con));
+
+ /*
+  * Everything was ok, so return OK status...
+  */
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'release_job()' - Release a held print job.
  */
 
@@ -8816,7 +8962,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 {
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -8853,8 +8999,8 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -9041,7 +9187,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 {
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
-  char		method[HTTP_MAX_URI],	/* Method portion of URI */
+  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
@@ -9078,8 +9224,8 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -9442,7 +9588,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_job_t		*job;		/* Current job */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
-			method[HTTP_MAX_URI],
+			scheme[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
 					/* Username portion of URI */
@@ -9495,8 +9641,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))
@@ -10022,7 +10168,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 			*attr2;		/* Job attribute */
   int			jobid;		/* Job ID */
   cupsd_job_t		*job;		/* Current job */
-  char			method[HTTP_MAX_URI],
+  char			scheme[HTTP_MAX_URI],
 					/* Method portion of URI */
 			username[HTTP_MAX_URI],
 					/* Username portion of URI */
@@ -10070,8 +10216,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     * Got a job URI; parse it to get the job ID...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, method,
-                    sizeof(method), username, sizeof(username), host,
+    httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
+                    sizeof(scheme), username, sizeof(username), host,
 		    sizeof(host), &port, resource, sizeof(resource));
 
     if (strncmp(resource, "/jobs/", 6))

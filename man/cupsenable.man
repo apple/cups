@@ -4,7 +4,7 @@
 .\"   cupsenable/cupsdisable man page for the Common UNIX Printing System
 .\"   (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsenable 8 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH cupsenable 8 "Common UNIX Printing System" "9 October 2008" "Apple Inc."
 .SH NAME
 cupsdisable, cupsenable \- stop/start printers and classes
 .SH SYNOPSIS
@@ -24,14 +24,14 @@ cupsdisable, cupsenable \- stop/start printers and classes
 .I server[:port]
 ] [ -r
 .I reason
-] destination(s)
+] [ --hold ] destination(s)
 .br
 .B cupsenable
 [ -E ] [-U
 .I username
 ] [ -c ] [ -h
 .I server[:port]
-] destination(s)
+] [ --release ] destination(s)
 .SH DESCRIPTION
 \fIcupsenable\fR starts the named printers or classes.
 .LP
@@ -54,10 +54,20 @@ Cancels all jobs on the named destination.
 .br
 Uses the specified server and port.
 .TP 5
+--hold
+.br
+Holds remaining jobs on the named printer.  Useful for allowing the current
+job to complete before performing maintenance.
+.TP 5
 -r "reason"
 .br
 Sets the message associated with the stopped state. If no reason is specified
 then the message is set to "Reason Unknown".
+.TP 5
+--release
+.br
+Releases pending jobs for printing. Use after running \fIcupsdisable\fR with
+the \fI--hold\fR option to resume printing.
 .SH COMPATIBILITY
 Unlike the System V printing system, CUPS allows printer names to
 contain any printable character except SPACE, TAB, "/", or "#".
@@ -65,19 +75,19 @@ Also, printer and class names are \fInot\fR case-sensitive.
 .LP
 The System V versions of these commands are \fIdisable\fR and
 \fIenable\fR. They have been renamed to avoid conflicts with the
-\fIbash(1)\fR build-in command of the same name.
+\fIbash(1)\fR build-in commands of the same name.
 .LP
 The CUPS versions of \fIdisable\fR and \fIenable\fR may ask the
 user for an access password depending on the printing system
 configuration.  This differs from the System V versions which
 require the root user to execute these commands.
 .SH SEE ALSO
-\fIaccept(8)\fR, \fIcancel(1)\fR, \fIlp(1)\fR, \fIlpadmin(8)\fR,
-\fIlpstat(1)\fR,
+\fIcupsaccept(8)\fR, \fIcupsreject(8)\fR, \fIcancel(1)\fR, \fIlp(1)\fR,
+\fIlpadmin(8)\fR, \fIlpstat(1)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 
 .\"
 .\" End of "$Id$".
