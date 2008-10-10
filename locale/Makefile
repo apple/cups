@@ -76,7 +76,6 @@ install-languages:
 		if test -f cups_$$loc.po; then \
 			$(INSTALL_DIR) -m 755 $(LOCALEDIR)/$$loc ; \
 			$(INSTALL_DATA) cups_$$loc.po $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
-			$(INSTALL_DATA) ppdc_$$loc.po $(LOCALEDIR)/$$loc/ppdc_$$loc.po ; \
 		fi ; \
 	done
 
@@ -111,7 +110,6 @@ uninstall: $(UNINSTALL_LANGUAGES)
 uninstall-languages:
 	-for loc in $(LANGUAGES) ; do \
 		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
-		$(RM) $(LOCALEDIR)/$$loc/ppdc_$$loc.po ; \
 	done
 
 
@@ -125,11 +123,12 @@ pot:
 	mv cups.pot cups.pot.bck
 	touch cups.pot
 	cd ..; xgettext -o locale/cups.pot -j -s --keyword=_ --no-wrap \
-		--copyright-holder="Easy Software Products" \
+		--copyright-holder="Apple Inc." \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
-		*/*.c
+		*/*.c */*.cxx
+	cp cups.pot cups.pot.save
 	(cat cups.header; \
-	 cat cups.pot | sed -e '1,6d' -e '1,$$s/PACKAGE VERSION/CUPS 1.3/' \
+	 cat cups.pot | sed -e '1,6d' -e '1,$$s/PACKAGE VERSION/CUPS 1.4/' \
 	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
 	 cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot

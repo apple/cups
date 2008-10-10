@@ -12,14 +12,16 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdpo 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH ppdpo 1 "Common UNIX Printing System" "10 October 2008" "Apple Inc."
 .SH NAME
 ppdpo \- ppd message catalog generator
 .SH SYNOPSIS
 .B ppdpo
-[ \-I
+[ -D
+.I name[=value]
+] [ -I
 .I include-directory
-] [ \-o
+] [ -o
 .I output-file
 ]
 .I source-file
@@ -27,6 +29,10 @@ ppdpo \- ppd message catalog generator
 \fIppdpo\fR extracts UI strings from PPDC source files and updates either
 a GNU gettext or Mac OS X strings format message catalog source file for
 translation.
+.PP
+The \fI-D\fR option sets the named variable for use in the
+source file. It is equivalent to using the #define directive
+in the source file.
 .PP
 The \fI-I\fR option specifies an alternate include directory;
 multiple \fI-I\fR options can be supplied to add additional

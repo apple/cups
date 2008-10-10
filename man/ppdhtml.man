@@ -12,12 +12,14 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdhtml 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH ppdhtml 1 "Common UNIX Printing System" "10 October 2008" "Apple Inc."
 .SH NAME
 ppdhtml \- cups html summary generator
 .SH SYNOPSIS
 .B ppdhtml
-[ \-I
+[ -D
+.I name[=value]
+] [ -I
 .I include-directory
 ]
 .I source-file
@@ -25,6 +27,10 @@ ppdhtml \- cups html summary generator
 \fIppdhtml\fR reads a driver information file and produces a
 HTML summary page that lists all of the drivers in a file and
 the supported options.
+.PP
+The \fI-D\fR option sets the named variable for use in the
+source file. It is equivalent to using the #define directive
+in the source file.
 .PP
 The \fI-I\fR option specifies an alternate include directory;
 multiple \fI-I\fR options can be supplied to add additional

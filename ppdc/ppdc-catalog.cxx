@@ -75,7 +75,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
     char	pofile[1024];		// Message catalog file
 
 
-    snprintf(pofile, sizeof(pofile), "%s/%s/ppdc_%s.po", cg->localedir, l, l);
+    snprintf(pofile, sizeof(pofile), "%s/%s/cups_%s.po", cg->localedir, l, l);
 
     if (load_messages(pofile) && strchr(l, '_'))
     {
@@ -84,7 +84,7 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 
       strlcpy(baseloc, l, sizeof(baseloc));
-      snprintf(pofile, sizeof(pofile), "%s/%s/ppdc_%s.po", cg->localedir,
+      snprintf(pofile, sizeof(pofile), "%s/%s/cups_%s.po", cg->localedir,
                baseloc, baseloc);
 
       load_messages(pofile);
