@@ -3,7 +3,7 @@
 //
 //   PPD file import methods for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -24,6 +24,7 @@
 
 #include "ppdc.h"
 #include <cups/ppd.h>
+#include <cups/i18n.h>
 
 
 //
@@ -226,7 +227,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
         if (sscanf(attr->value, "%s%*[^\"]\"%[^\"]\"%s%s", encoding, version,
 	           charset, status) != 4)
 	{
-	  fprintf(stderr, "Bad font attribute: %s\n", attr->value);
+	  _cupsLangPrintf(stderr, _("Bad font attribute: %s\n"), attr->value);
 	  continue;
 	}
 

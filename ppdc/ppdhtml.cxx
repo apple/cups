@@ -3,7 +3,7 @@
 //
 //   PPD to HTML utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -25,6 +25,7 @@
 #include "ppdc.h"
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cups/i18n.h>
 
 
 //
@@ -52,7 +53,10 @@ main(int  argc,				// I - Number of command-line arguments
   ppdcChoice	*c;			// Current choice
   char		*opt;			// Current option char
   ppdcMediaSize	*size;			// Current media size
+  char		*value;			// Value in option
 
+
+  _cupsSetLocale(argv);
 
   // Scan the command-line...
   src = 0;
@@ -63,6 +67,21 @@ main(int  argc,				// I - Number of command-line arguments
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
+          case 'D' :			// Define variable
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+              if ((value = strchr(argv[i], '=')) != NULL)
+	      {
+	        *value++ = '\0';
+
+	        src->set_variable(argv[i], value);
+	      }
+	      else
+	        src->set_variable(argv[i], "1");
+              break;
+
           case 'I' :			// Include directory...
 	      i ++;
 	      if (i >= argc)
@@ -151,9 +170,12 @@ main(int  argc,				// I - Number of command-line arguments
 static void
 usage(void)
 {
-  puts("Usage: ppdhtml [options] filename.drv >filename.html");
-  puts("Options:");
-  puts("  -I include-dir    Add include directory to search path.");
+  _cupsLangPuts(stdout,
+                _("Usage: ppdhtml [options] filename.drv >filename.html\n"
+		  "  -D name=value        Set named variable to value.\n"
+		  "Options:\n"
+		  "  -I include-dir    Add include directory to search "
+		  "path.\n"));
 
   exit(1);
 }

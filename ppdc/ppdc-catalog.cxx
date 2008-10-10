@@ -308,8 +308,9 @@ ppdcCatalog::load_messages(
       // Strip the trailing quote...
       if ((ptr = (char *)strrchr(line, '\"')) == NULL)
       {
-	fprintf(stderr, "ERROR: Expected quoted string on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Expected quoted string on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
@@ -319,8 +320,9 @@ ppdcCatalog::load_messages(
       // Find start of value...
       if ((ptr = strchr(line, '\"')) == NULL)
       {
-	fprintf(stderr, "ERROR: Expected quoted string on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Expected quoted string on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
@@ -384,9 +386,10 @@ ppdcCatalog::load_messages(
       {
 	if (!id[0])
 	{
-	  fprintf(stderr, "ERROR: Need a msgid line before any "
-			  "translation strings on line %d of %s!\n",
-		  linenum, f);
+	  _cupsLangPrintf(stderr,
+	                  _("ERROR: Need a msgid line before any "
+			    "translation strings on line %d of %s!\n"),
+			  linenum, f);
 	  cupsFileClose(fp);
 	  return (-1);
 	}
@@ -399,8 +402,8 @@ ppdcCatalog::load_messages(
 	strlcat(id, ptr, sizeof(id));
       else
       {
-	fprintf(stderr, "ERROR: Unexpected text on line %d of %s!\n",
-		linenum, f);
+	_cupsLangPrintf(stderr, _("ERROR: Unexpected text on line %d of %s!\n"),
+			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
       }
@@ -430,7 +433,8 @@ ppdcCatalog::load_messages(
 
   unknown_load_format:
 
-  fprintf(stderr, "ERROR: Unknown message catalog format for \"%s\"!\n", f);
+  _cupsLangPrintf(stderr,
+                  _("ERROR: Unknown message catalog format for \"%s\"!\n"), f);
   cupsFileClose(fp);
   return (-1);
 }

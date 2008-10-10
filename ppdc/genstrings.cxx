@@ -21,8 +21,10 @@
 //
 // Contents:
 //
-//   main()          - Main entry for the PPD compiler.
-//   write_cstring() - Write a translation string as a valid C string to stdout.
+//   main()           - Main entry for the PPD compiler.
+//   add_ui_strings() - Add all UI strings from the driver.
+//   write_cstring()  - Write a translation string as a valid C string to
+//                      stdout.
 //
 
 //
@@ -37,7 +39,8 @@
 // Local functions...
 //
 
-static void write_cstring(const char *s);
+static void	add_ui_strings(ppdcDriver *d, ppdcCatalog *catalog);
+static void	write_cstring(const char *s);
 
 
 //
@@ -47,10 +50,8 @@ static void write_cstring(const char *s);
 int					// O - Exit status
 main(void)
 {
-  int		i, j;			// Looping vars
   ppdcSource	*src;			// PPD source file data
-  ppdcMediaSize	*size;			// Current media size
-  ppdcDriver	*d;			// Current driver
+  ppdcCatalog	*catalog;		// Catalog to hold all of the UI strings
 
 
   // Make sure we are in the right place...
@@ -63,145 +64,113 @@ main(void)
   // Load the sample drivers...
   ppdcSource::add_include("../data");
 
-  src = new ppdcSource("sample.drv");
+  src     = new ppdcSource("sample.drv");
+  catalog = new ppdcCatalog(NULL);
 
-  // First write all of the defined media sizes...
+  // Add the media size strings...
+  ppdcMediaSize	*size;			// Current media size
+
   for (size = (ppdcMediaSize *)src->sizes->first();
        size;
        size = (ppdcMediaSize *)src->sizes->next())
-  {
-    printf("/* Page size %s */ ", size->name->value);
-    write_cstring(size->text->value);
-  }
+    catalog->add_message(size->text->value);
 
-#if 0
-  if (src->drivers->count > 0)
-  {
-    // Create the output directory...
-    if (mkdir(outdir, 0777))
-    {
-      if (errno != EEXIST)
-      {
-	fprintf(stderr, "ppdc: Unable to create output directory %s: %s\n",
-	        outdir, strerror(errno));
-        return (1);
-      }
-    }
+  // Then collect all of the UI strings from the sample drivers...
+  ppdcDriver	*d;			// Current driver
 
-    // Write PPD files...
-    for (d = (ppdcDriver *)src->drivers->first();
-         d;
-	 d = (ppdcDriver *)src->drivers->next())
-    {
-      if (do_test)
-      {
-        // Test the PPD file for this driver...
-	int	pid,			// Process ID
-		fds[2];			// Pipe file descriptors
+  for (d = (ppdcDriver *)src->drivers->first();
+       d;
+       d = (ppdcDriver *)src->drivers->next())
+    add_ui_strings(d, catalog);
 
+  // Finally, write all of the strings...
+  ppdcMessage *message;
 
-        if (pipe(fds))
-	{
-	  fprintf(stderr, "ppdc: Unable to create output pipes: %s\n",
-	          strerror(errno));
-	  return (1);
-	}
-
-	if ((pid = fork()) == 0)
-	{
-	  // Child process comes here...
-	  close(0);
-	  dup(fds[0]);
-
-	  close(fds[0]);
-	  close(fds[1]);
-
-	  execlp("cupstestppd", "cupstestppd", "-", (char *)0);
-
-	  fprintf(stderr, "ppdc: Unable to execute cupstestppd: %s\n",
-	          strerror(errno));
-	  return (errno);
-	}
-	else if (pid < 0)
-	{
-	  fprintf(stderr, "ppdc: Unable to execute cupstestppd: %s\n",
-	          strerror(errno));
-	  return (errno);
-	}
-
-	close(fds[0]);
-	fp = cupsFileOpenFd(fds[1], "w");
-      }
-      else
-      {
-	// Write the PPD file for this driver...
-	if (use_model_name)
-	  outname = d->model_name->value;
-	else if (d->file_name)
-	  outname = d->file_name->value;
-	else
-	  outname = d->pc_file_name->value;
-
-	if (strstr(outname, ".PPD"))
-	{
-	  // Convert PCFileName to lowercase...
-	  for (j = 0;
-	       outname[j] && j < (int)(sizeof(pcfilename) - 1);
-	       j ++)
-	    pcfilename[j] = tolower(outname[j] & 255);
-
-	  pcfilename[j] = '\0';
-	}
-	else
-	{
-	  // Leave PCFileName as-is...
-	  strlcpy(pcfilename, outname, sizeof(pcfilename));
-	}
-
-	// Open the PPD file for writing...
-	if (comp)
-	  snprintf(filename, sizeof(filename), "%s/%s.gz", outdir, pcfilename);
-	else
-	  snprintf(filename, sizeof(filename), "%s/%s", outdir, pcfilename);
-
-	fp = cupsFileOpen(filename, comp ? "w9" : "w");
-	if (!fp)
-	{
-	  fprintf(stderr, "ppdc: Unable to create PPD file \"%s\" - %s.\n",
-		  filename, strerror(errno));
-	  return (1);
-	}
-
-	if (verbose)
-	  printf("ppdc: Writing %s...\n", filename);
-      }
-
-     /*
-      * Write the PPD file...
-      */
-
-      if (d->write_ppd_file(fp, catalog, locales, src, le))
-      {
-	cupsFileClose(fp);
-	return (1);
-      }
-
-      cupsFileClose(fp);
-    }
-  }
-  else
-    usage();
-
-  // Delete the printer driver information...
-  delete src;
-
-  // Message catalog...
-  if (catalog)
-    delete catalog;
-#endif // 0
+  for (message = (ppdcMessage *)catalog->messages->first();
+       message;
+       message = (ppdcMessage *)catalog->messages->next())
+    write_cstring(message->id->value);
 
   // Return with no errors.
   return (0);
+}
+
+
+//
+// 'add_ui_strings()' - Add all UI strings from the driver.
+//
+
+static void
+add_ui_strings(ppdcDriver  *d,		// I - Driver data
+               ppdcCatalog *catalog)	// I - Message catalog
+{
+  // Add the make/model/language strings...
+  catalog->add_message(d->manufacturer->value);
+  catalog->add_message(d->model_name->value);
+
+  // Add the group/option/choice strings...
+  ppdcGroup	*g;			// Current group
+  ppdcOption	*o;			// Current option
+  ppdcChoice	*c;			// Current choice
+
+  for (g = (ppdcGroup *)d->groups->first();
+       g;
+       g = (ppdcGroup *)d->groups->next())
+  {
+    if (!g->options->count)
+      continue;
+
+    if (strcasecmp(g->name->value, "General"))
+      catalog->add_message(g->text->value);
+
+    for (o = (ppdcOption *)g->options->first();
+         o;
+	 o = (ppdcOption *)g->options->next())
+    {
+      if (!o->choices->count)
+        continue;
+
+      if (o->text->value && strcmp(o->name->value, o->text->value))
+        catalog->add_message(o->text->value);
+      else
+        catalog->add_message(o->name->value);
+
+      for (c = (ppdcChoice *)o->choices->first();
+           c;
+	   c = (ppdcChoice *)o->choices->next())
+	if (c->text->value && strcmp(c->name->value, c->text->value))
+          catalog->add_message(c->text->value);
+        else
+          catalog->add_message(c->name->value);
+    }
+  }
+
+  // Add profile and preset strings...
+  ppdcAttr *a;				// Current attribute
+  for (a = (ppdcAttr *)d->attrs->first();
+       a;
+       a = (ppdcAttr *)d->attrs->next())
+  {
+    if (a->text->value && a->text->value[0] &&
+        (a->localizable ||
+	 !strncmp(a->name->value, "Custom", 6) ||
+         !strncmp(a->name->value, "ParamCustom", 11) ||
+         !strcmp(a->name->value, "APCustomColorMatchingName") ||
+         !strcmp(a->name->value, "APPrinterPreset") ||
+         !strcmp(a->name->value, "cupsICCProfile") ||
+         !strcmp(a->name->value, "cupsIPPReason") ||
+         !strcmp(a->name->value, "cupsMarkerName")))
+    {
+      catalog->add_message(a->text->value);
+
+      if ((a->localizable && a->value->value[0]) ||
+          !strcmp(a->name->value, "cupsIPPReason"))
+        catalog->add_message(a->value->value);
+    }
+    else if (!strncmp(a->name->value, "Custom", 6) ||
+             !strncmp(a->name->value, "ParamCustom", 11))
+      catalog->add_message(a->name->value);
+  }
 }
 
 

@@ -3,7 +3,7 @@
 //
 //   PPD file merge utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -26,6 +26,7 @@
 #include <cups/cups.h>
 #include <cups/array.h>
 #include <cups/string.h>
+#include <cups/i18n.h>
 #include <errno.h>
 
 
@@ -55,6 +56,8 @@ main(int  argc,				// I - Number of command-line arguments
 		*outfile;		// Output file
   char		languages[1024];	// Languages in file
 
+
+  _cupsSetLocale(argv);
 
   // Scan the command-line...
   inname       = NULL;
@@ -90,8 +93,8 @@ main(int  argc,				// I - Number of command-line arguments
       // Open and load the driver info file...
       if ((infile = cupsFileOpen(argv[i], "r")) == NULL)
       {
-        fprintf(stderr, "ppdmerge: Unable to open %s - %s\n", argv[i],
-	        strerror(errno));
+        _cupsLangPrintf(stderr, _("%s: Unable to open %s - %s\n"), "ppdmerge",
+	                argv[i], strerror(errno));
 	goto error;
       }
 
@@ -105,10 +108,10 @@ main(int  argc,				// I - Number of command-line arguments
 	
         status = ppdLastError(&linenum);
 	
-	fprintf(stderr, "ppdmerge: Unable to open %s - %s on line %d.\n",
-	        argv[i], ppdErrorString(status), linenum);
+	_cupsLangPrintf(stderr, _("%s: Unable to open %s - %s on line %d.\n"),
+	                "ppdmerge", argv[i], ppdErrorString(status), linenum);
 	
-        fprintf(stderr, "%d: ", linenum);
+        _cupsLangPrintf(stderr, "%d: ", linenum);
         cupsFileRewind(infile);
 	
         line[0] = '\0';
@@ -120,7 +123,7 @@ main(int  argc,				// I - Number of command-line arguments
 	    break;
 	}
 	
-	fprintf(stderr, "%s\n", line);
+	_cupsLangPrintf(stderr, "%s\n", line);
 	
         cupsFileClose(infile);
 
@@ -132,8 +135,9 @@ main(int  argc,				// I - Number of command-line arguments
 
       if (!locale)
       {
-        fprintf(stderr, "ppdmerge: Bad LanguageVersion \"%s\" in %s!\n",
-	        ppd->lang_version, argv[i]);
+        _cupsLangPrintf(stderr,
+	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"),
+			ppd->lang_version, argv[i]);
         cupsFileClose(infile);
 	ppdClose(ppd);
 
@@ -155,8 +159,9 @@ main(int  argc,				// I - Number of command-line arguments
 	  
 	  if (rename(inname, bckname))
 	  {
-	    fprintf(stderr, "ppdmerge: Unable to backup %s to %s- %s\n",
-	            inname, bckname, strerror(errno));
+	    _cupsLangPrintf(stderr,
+	                    _("ppdmerge: Unable to backup %s to %s- %s\n"),
+			    inname, bckname, strerror(errno));
 	    return (1);
 	  }
 	}
@@ -198,7 +203,8 @@ main(int  argc,				// I - Number of command-line arguments
       else
       {
         // Don't need this PPD...
-	fprintf(stderr, "ppdmerge: Ignoring PPD file %s...\n", argv[i]);
+	_cupsLangPrintf(stderr, _("ppdmerge: Ignoring PPD file %s...\n"),
+	                argv[i]);
         ppdClose(ppd);
       }
       
@@ -349,9 +355,11 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
 static void
 usage(void)
 {
-  puts("Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]");
-  puts("Options:");
-  puts("  -o filename.ppd[.gz]");
+  _cupsLangPuts(stdout,
+                _("Usage: ppdmerge [options] filename.ppd "
+		  "[ ... filenameN.ppd ]\n"
+		  "Options:\n"
+                  "  -o filename.ppd[.gz]\n"));
 
   exit(1);
 }

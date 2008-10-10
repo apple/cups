@@ -26,6 +26,7 @@
 #include "ppdc.h"
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <cups/i18n.h>
 
 
 //
@@ -51,7 +52,10 @@ main(int  argc,				// I - Number of command-line arguments
   char		*opt;			// Current option
   int		verbose;		// Verbosity
   const char	*outfile;		// Output file
+  char		*value;			// Value in option
 
+
+  _cupsSetLocale(argv);
 
   // Scan the command-line...
   catalog = new ppdcCatalog("en");
@@ -65,13 +69,30 @@ main(int  argc,				// I - Number of command-line arguments
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
+          case 'D' :			// Define variable
+	      i ++;
+	      if (i >= argc)
+	        usage();
+
+              if ((value = strchr(argv[i], '=')) != NULL)
+	      {
+	        *value++ = '\0';
+
+	        src->set_variable(argv[i], value);
+	      }
+	      else
+	        src->set_variable(argv[i], "1");
+              break;
+
           case 'I' :			// Include directory...
 	      i ++;
 	      if (i >= argc)
         	usage();
 
               if (verbose > 1)
-	        printf("ppdc: Adding include directory \"%s\"...\n", argv[i]);
+	        _cupsLangPrintf(stdout,
+		                _("ppdc: Adding include directory \"%s\"...\n"),
+				argv[i]);
 
 	      ppdcSource::add_include(argv[i]);
 	      break;
@@ -99,7 +120,9 @@ main(int  argc,				// I - Number of command-line arguments
     {
       // Open and load the driver info file...
       if (verbose > 1)
-        printf("ppdc: Loading driver information file \"%s\"...\n", argv[i]);
+        _cupsLangPrintf(stdout,
+	                _("ppdc: Loading driver information file \"%s\"...\n"),
+			argv[i]);
 
       src = new ppdcSource(argv[i]);
 
@@ -109,7 +132,9 @@ main(int  argc,				// I - Number of command-line arguments
 	   d = (ppdcDriver *)src->drivers->next())
       {
 	if (verbose)
-	  printf("ppdc: Adding/updating UI text from %s...\n", argv[i]);
+	  _cupsLangPrintf(stderr,
+	                  _("ppdc: Adding/updating UI text from %s...\n"),
+			  argv[i]);
 
         add_ui_strings(d, catalog);
       }
@@ -226,10 +251,14 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
 static void
 usage(void)
 {
-  puts("Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]");
-  puts("Options:");
-  puts("  -I include-dir    Add include directory to search path.");
-  puts("  -v                Be verbose (more v's for more verbosity).");
+  _cupsLangPuts(stdout,
+                _("Usage: ppdpo [options] -o filename.po filename.drv [ ... "
+		  "filenameN.drv ]\n"
+		  "Options:\n"
+		  "  -D name=value        Set named variable to value.\n"
+		  "  -I include-dir    Add include directory to search path.\n"
+		  "  -v                Be verbose (more v's for more "
+		  "verbosity).\n"));
 
   exit(1);
 }

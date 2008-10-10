@@ -3,7 +3,7 @@
 //
 //   File class for the CUPS PPD Compiler.
 //
-//   Copyright 2007 by Apple Inc.
+//   Copyright 2007-2008 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -25,6 +25,7 @@
 //
 
 #include "ppdc.h"
+#include <cups/i18n.h>
 
 
 //
@@ -46,7 +47,8 @@ ppdcFile::ppdcFile(const char  *f,		// I - File to open
   line     = 1;
 
   if (!fp)
-    fprintf(stderr, "ppdc: Unable to open %s: %s\n", f, strerror(errno));
+    _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s\n"), "ppdc", f,
+                    strerror(errno));
 }
 
 
