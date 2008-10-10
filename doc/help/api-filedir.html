@@ -314,6 +314,7 @@ contain binary data.">cupsFileGetLine</a></li>
 <li><a href="#cupsFilePeekChar" title="Peek at the next character from a file.">cupsFilePeekChar</a></li>
 <li><a href="#cupsFilePrintf" title="Write a formatted string.">cupsFilePrintf</a></li>
 <li><a href="#cupsFilePutChar" title="Write a character.">cupsFilePutChar</a></li>
+<li><a href="#cupsFilePutConf" title="Write a configuration line.">cupsFilePutConf</a></li>
 <li><a href="#cupsFilePuts" title="Write a string.">cupsFilePuts</a></li>
 <li><a href="#cupsFileRead" title="Read from a file.">cupsFileRead</a></li>
 <li><a href="#cupsFileRewind" title="Set the current file position to the beginning of the
@@ -717,6 +718,29 @@ int cupsFilePutChar (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsFilePutConf">cupsFilePutConf</a></h3>
+<p class="description">Write a configuration line.</p>
+<p class="code">
+ssize_t cupsFilePutConf (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_file_t">cups_file_t</a> *fp,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *directive,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>fp</dt>
+<dd class="description">CUPS file</dd>
+<dt>directive</dt>
+<dd class="description">Directive</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of bytes written or -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function handles any comment escaping of the value.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePuts">cupsFilePuts</a></h3>
 <p class="description">Write a string.</p>
 <p class="code">
