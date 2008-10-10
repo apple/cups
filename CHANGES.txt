@@ -1,9 +1,12 @@
-CHANGES.txt - 2008-10-08
+CHANGES.txt - 2008-10-09
 ------------------------
 
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The scheduler now caches information from PPD files to provide
+	  significantly faster startup time with large numbers of PPDs
+	  (STR #1293)
 	- CUPS-Get-Driver now provides much better driver matching based
 	  on the IEEE-1284 device ID and make/model strings (STR #2707)
 	- Now support the cupsSNMPSupplies keyword to control whether
