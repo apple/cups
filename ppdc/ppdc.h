@@ -164,8 +164,7 @@ class ppdcCatalog			//// Translation catalog
   ppdcCatalog(const char *l, const char *f = 0);
   ~ppdcCatalog();
 
-  void		add_message(ppdcMessage *m) { messages->add(m); }
-  void		add_message(const char *id);
+  void		add_message(const char *id, const char *string = NULL);
   const char	*find_message(const char *id);
   int		load_messages(const char *f);
   int		save_messages(const char *f);

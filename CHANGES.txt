@@ -4,6 +4,8 @@ CHANGES.txt - 2008-10-10
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The PPD compiler now allows local message catalogs to
+	  override the standard CUPS translations (STR #2642)
 	- The ppdmerge command did not merge custom option strings
 	  (STR #2863)
 	- The scheduler now supports the Hold-New-Jobs and
