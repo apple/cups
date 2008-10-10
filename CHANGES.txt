@@ -4,6 +4,8 @@ CHANGES.txt - 2008-10-09
 CHANGES IN CUPS V1.4b1
 
 	- Documentation updates (STR #2567)
+	- The lpstat command is now much faster when displaying the
+	  status of a single printer (STR #2843)
 	- The scheduler now caches information from PPD files to provide
 	  significantly faster startup time with large numbers of PPDs
 	  (STR #1293)
