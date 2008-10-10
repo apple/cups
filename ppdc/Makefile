@@ -46,6 +46,7 @@ LIBOBJS =	\
 		ppdc-variable.o
 OBJS =		\
 		$(LIBOBJS) \
+		genstrings.o \
 		ppdc.o \
 		ppdhtml.o \
 		ppdi.o \
@@ -58,13 +59,17 @@ LIBTARGETS =	\
 UNITTARGETS =	\
 		ppdc-static \
 		testcatalog
-TARGETS	=	\
-		$(LIBTARGETS) \
+EXECTARGETS =	\
 		ppdc \
 		ppdhtml \
 		ppdi \
 		ppdmerge \
 		ppdpo
+
+TARGETS	=	\
+		$(LIBTARGETS) \
+		$(EXECTARGETS) \
+		genstrings
 
 
 #
@@ -97,7 +102,7 @@ clean:
 	$(RM) *.bak *.bck core.*
 	$(RM) $(TARGETS) $(UNITTARGETS)
 	$(RM) -r ppd
-	$(RM) test.drv
+	$(RM) sample.c test.drv
 	$(RM) libcupsppdc.so libcupsppdc.sl libcupsppdc.dylib
 
 
@@ -132,14 +137,12 @@ install-data:
 install-exec:
 	echo Installing PPD compiler programs...
 	$(INSTALL_DIR) $(BINDIR)
-	$(INSTALL_BIN) ppdc $(BINDIR)
-	$(INSTALL_BIN) ppdhtml $(BINDIR)
-	$(INSTALL_BIN) ppdi $(BINDIR)
-	$(INSTALL_BIN) ppdmerge $(BINDIR)
-	$(INSTALL_BIN) ppdpo $(BINDIR)
+	for file in $(EXECTARGETS); do \
+		$(INSTALL_BIN) $$file $(BINDIR); \
+	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(EXECTARGETS) $(LIBTARGETS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -187,11 +190,9 @@ installstatic:
 #
 
 uninstall:
-	$(RM) $(BINDIR)/ppdc
-	$(RM) $(BINDIR)/ppdhtml
-	$(RM) $(BINDIR)/ppdi
-	$(RM) $(BINDIR)/ppdmerge
-	$(RM) $(BINDIR)/ppdpo
+	for file in $(EXECTARGETS); do \
+		$(RM) $(BINDIR)/$$file; \
+	done
 	$(RM) $(DATADIR)/drv/sample.drv
 	$(RMDIR) $(DATADIR)/drv
 	$(RM) $(LIBDIR)/libcupsppdc.1.dylib
@@ -225,6 +226,20 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header api-ppdc.header --intro api-ppdc.shtml \
 		ppdc.h $(LIBOBJS:.o=.cxx)
+
+
+#
+# genstrings - generate GNU gettext strings.
+#
+
+genstrings:		genstrings.o libcupsppdc.a ../cups/libcups.a \
+			sample.drv ../data/media.defs
+	echo Linking $@...
+	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
+		libcupsppdc.a ../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) \
+		$(COMMONLIBS) $(LIBZ)
+	echo Generating localization strings...
+	./genstrings >sample.c
 
 
 #
