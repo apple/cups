@@ -3,7 +3,7 @@
 .\"
 .\"   accept/reject man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007 by Apple Inc.
+.\"   Copyright 2007-2008 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,18 +12,18 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH accept 8 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH cupsaccept 8 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
 .SH NAME
-accept/reject \- accept/reject jobs sent to a destination
+cupsaccept/cupsreject \- accept/reject jobs sent to a destination
 .SH SYNOPSIS
-.B accept
+.B cupsaccept
 [ -E ] [ -U
 .I username
 ] [ -h
 .I hostname[:port]
 ] destination(s)
 .br
-.B reject
+.B cupsreject
 [ -E ] [ -U
 .I username
 ] [ -h
@@ -32,15 +32,15 @@ accept/reject \- accept/reject jobs sent to a destination
 .I reason
 ] destination(s)
 .SH DESCRIPTION
-\fIaccept\fR instructs the printing system to accept print jobs to the
+\fIcupsaccept\fR instructs the printing system to accept print jobs to the
 specified destinations.
 .LP
-\fIreject\fR instructs the printing system to reject print jobs to the
+\fIcupsreject\fR instructs the printing system to reject print jobs to the
 specified destinations. The \fI-r\fR option sets the reason for rejecting
 print jobs. If not specified the reason defaults to "Reason Unknown".
 .SH OPTIONS
-The following options are supported by both \fIaccept\fR and
-\fIreject\fR:
+The following options are supported by both \fIcupsaccept\fR and
+\fIcupsreject\fR:
 .TP 5
 -E
 .br
@@ -73,7 +73,7 @@ require the root user to execute these commands.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
