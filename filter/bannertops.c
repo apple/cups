@@ -925,7 +925,6 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
         num_rows   = cupsImageGetHeight(image);
 	line       = malloc(depth * num_cols + 3);
         temp_width = num_cols * images_height / num_rows;
-	out_offset = 0;
 
         printf("gsave %.1f %.1f translate %.3f %.3f scale\n", x, y,
 	       temp_width / num_cols, images_height / num_rows);
