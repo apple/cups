@@ -334,7 +334,7 @@ div.contents ul.subcontents li {
 </ul></li>
 </ul>
 <!--
-  "$Id: api-filter.shtml 7677 2008-06-19 23:22:19Z mike $"
+  "$Id: api-filter.shtml 7962 2008-09-18 17:31:33Z mike $"
 
   Filter and backend programming introduction for the Common UNIX Printing
   System (CUPS).
@@ -465,6 +465,10 @@ when running print filters and backends:</p>
 
 	<dt>CUPS_DATADIR</dt>
 	<dd>The directory where (read-only) CUPS data files can be found.</dd>
+
+	<dt>CUPS_FILETYPE</dt>
+	<dd>The type of file being printed: "job-sheet" for a banner page and
+	"document" for a regular print file.</dd>
 
 	<dt>CUPS_SERVERROOT</dt>
 	<dd>The root directory of the server.</dd>
