@@ -1,6 +1,4 @@
 #CUPS-BANNER
-# While this file has a .ps extension, it is really just a special banner
-# page - we are retaining the original filename for backwards-compatibility.
 Show printer-name printer-info printer-location printer-make-and-model printer-driver-name printer-driver-version paper-size imageable-area
 Header Printer Test Page
 Footer Printer Test Page
