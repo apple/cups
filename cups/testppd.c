@@ -117,6 +117,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   cups_option_t	*options;		/* Options */
   ppd_size_t	minsize,		/* Minimum size */
 		maxsize;		/* Maximum size */
+  ppd_attr_t	*attr;			/* Current attribute */
 
 
   status = 0;
@@ -157,6 +158,57 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       printf("FAIL (%s on line %d)\n", ppdErrorString(err), line);
     }
+
+    fputs("ppdFindAttr(wildcard): ", stdout);
+    if ((attr = ppdFindAttr(ppd, "cupsTest", NULL)) == NULL)
+    {
+      status ++;
+      puts("FAIL (not found)");
+    }
+    else if (strcmp(attr->name, "cupsTest") || strcmp(attr->spec, "Foo"))
+    {
+      status ++;
+      printf("FAIL (got \"%s %s\")\n", attr->name, attr->spec);
+    }
+    else
+      puts("PASS");
+
+    fputs("ppdFindNextAttr(wildcard): ", stdout);
+    if ((attr = ppdFindNextAttr(ppd, "cupsTest", NULL)) == NULL)
+    {
+      status ++;
+      puts("FAIL (not found)");
+    }
+    else if (strcmp(attr->name, "cupsTest") || strcmp(attr->spec, "Bar"))
+    {
+      status ++;
+      printf("FAIL (got \"%s %s\")\n", attr->name, attr->spec);
+    }
+    else
+      puts("PASS");
+
+    fputs("ppdFindAttr(Foo): ", stdout);
+    if ((attr = ppdFindAttr(ppd, "cupsTest", "Foo")) == NULL)
+    {
+      status ++;
+      puts("FAIL (not found)");
+    }
+    else if (strcmp(attr->name, "cupsTest") || strcmp(attr->spec, "Foo"))
+    {
+      status ++;
+      printf("FAIL (got \"%s %s\")\n", attr->name, attr->spec);
+    }
+    else
+      puts("PASS");
+
+    fputs("ppdFindNextAttr(Foo): ", stdout);
+    if ((attr = ppdFindNextAttr(ppd, "cupsTest", "Foo")) != NULL)
+    {
+      status ++;
+      printf("FAIL (got \"%s %s\")\n", attr->name, attr->spec);
+    }
+    else
+      puts("PASS");
 
     fputs("ppdMarkDefaults: ", stdout);
     ppdMarkDefaults(ppd);
