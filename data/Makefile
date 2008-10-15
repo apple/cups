@@ -72,7 +72,7 @@ CHARSETS =	\
 DATAFILES =	\
 		HPGLprolog \
 		psglyphs \
-		testprint.ps
+		testprint
 
 PPDCFILES =	\
 		epson.h \

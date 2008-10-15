@@ -2231,13 +2231,7 @@ static int				/* O - Result of comparison */
 ppd_compare_attrs(ppd_attr_t *a,	/* I - First attribute */
                   ppd_attr_t *b)	/* I - Second attribute */
 {
-  int	ret;				/* Result of comparison */
-
-
-  if ((ret = strcasecmp(a->name, b->name)) != 0)
-    return (ret);
-  else
-    return (strcasecmp(a->spec, b->spec));
+  return (strcasecmp(a->name, b->name));
 }
 
 

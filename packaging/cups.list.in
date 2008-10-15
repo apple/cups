@@ -543,7 +543,7 @@ f 0644 root sys $DATADIR/charsets/utf-8 data/utf-8
 d 0755 root sys $DATADIR/data -
 f 0644 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0644 root sys $DATADIR/data/psglyphs data/psglyphs
-f 0644 root sys $DATADIR/data/testprint.ps data/testprint.ps
+f 0644 root sys $DATADIR/data/testprint data/testprint
 
 d 0755 root sys $DATADIR/drv -
 f 0644 root sys $DATADIR/drv/sample.drv ppdc/sample.drv

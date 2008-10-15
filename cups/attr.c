@@ -42,7 +42,6 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 {
   ppd_attr_t	key,			/* Search key */
 		*attr;			/* Current attribute */
-  int		diff;			/* Current difference */
 
 
   DEBUG_printf(("ppdFindAttr(ppd=%p, name=\"%s\", spec=\"%s\")\n", ppd,
@@ -61,39 +60,25 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 
   memset(&key, 0, sizeof(key));
   strlcpy(key.name, name, sizeof(key.name));
-  if (spec)
-    strlcpy(key.spec, spec, sizeof(key.spec));
 
  /*
   * Return the first matching attribute, if any...
   */
 
   if ((attr = (ppd_attr_t *)cupsArrayFind(ppd->sorted_attrs, &key)) != NULL)
-    return (attr);
-  else if (spec)
-    return (NULL);
-
- /*
-  * No match found, loop through the sorted attributes to see if we can
-  * find a "wildcard" match for the attribute...
-  */
-
-  for (attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs);
-       attr;
-       attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs))
   {
-    if ((diff = strcasecmp(attr->name, name)) == 0)
-      break;
-
-    if (diff > 0)
+    if (spec)
     {
      /*
-      * All remaining attributes are > than the one we are trying to find...
+      * Loop until we find the first matching attribute for "spec"...
       */
 
-      cupsArrayIndex(ppd->sorted_attrs, cupsArrayCount(ppd->sorted_attrs));
-
-      return (NULL);
+      while (attr && strcasecmp(spec, attr->spec))
+      {
+        if ((attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs)) != NULL &&
+	    strcasecmp(attr->name, name))
+	  attr = NULL;
+      }
     }
   }
 
@@ -119,32 +104,34 @@ ppdFindNextAttr(ppd_file_t *ppd,	/* I - PPD file data */
   * Range check input...
   */
 
-  if (!ppd || !name || ppd->num_attrs == 0 ||
-      !cupsArrayCurrent(ppd->sorted_attrs))
+  if (!ppd || !name || ppd->num_attrs == 0)
     return (NULL);
 
  /*
   * See if there are more attributes to return...
   */
 
-  if ((attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs)) == NULL)
-    return (NULL);
-
- /*
-  * Check the next attribute to see if it is a match...
-  */
-
-  if (strcasecmp(attr->name, name) || (spec && strcasecmp(attr->spec, spec)))
+  while ((attr = (ppd_attr_t *)cupsArrayNext(ppd->sorted_attrs)) != NULL)
   {
    /*
-    * Nope, reset the current pointer to the end of the array...
+    * Check the next attribute to see if it is a match...
     */
 
-    cupsArrayIndex(ppd->sorted_attrs, cupsArrayCount(ppd->sorted_attrs));
+    if (strcasecmp(attr->name, name))
+    {
+     /*
+      * Nope, reset the current pointer to the end of the array...
+      */
 
-    return (NULL);
+      cupsArrayIndex(ppd->sorted_attrs, cupsArrayCount(ppd->sorted_attrs));
+
+      return (NULL);
+    }
+
+    if (!spec || !strcasecmp(attr->spec, spec))
+      break;
   }
-  
+
  /*
   * Return the next attribute's value...
   */

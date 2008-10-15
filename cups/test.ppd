@@ -50,6 +50,10 @@
 *UIConstraints: "*Duplex *InstalledDuplexer False"
 *UIConstraints: "*InstalledDuplexer False *Duplex"
 
+*% These attributes test ppdFindAttr/ppdFindNext...
+*cupsTest Foo/I Love Foo: ""
+*cupsTest Bar/I Love Bar: ""
+
 *% For PageSize, we have put all of the translations in-line...
 *OpenUI *PageSize/Page Size: PickOne
 *fr.Translation PageSize/French Page Size: ""

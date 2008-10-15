@@ -690,7 +690,7 @@ cgiPrintTestPage(http_t     *http,	/* I - Connection to server */
   if ((datadir = getenv("CUPS_DATADIR")) == NULL)
     datadir = CUPS_DATADIR;
 
-  snprintf(filename, sizeof(filename), "%s/data/testprint.ps", datadir);
+  snprintf(filename, sizeof(filename), "%s/data/testprint", datadir);
 
  /*
   * Point to the printer/class...
