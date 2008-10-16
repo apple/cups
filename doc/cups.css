@@ -322,11 +322,9 @@ DIV.sidebar P.l2 {
 TABLE.inset {
   background: #f0f0f0;
   border: thin solid #e0e0e0;
-  margin-left: auto;
-  margin-right: auto;
   margin-top: 1em;
   padding: 0;
-  width: 90%;
+  width: 100%;
   /* These are not implemented by all browsers, but that's OK */
   border-radius: 5px;
   -moz-border-radius: 5px;

@@ -84,6 +84,9 @@ psTextEmbedFonts(ps_text_t *fonts)	/* I - Font data */
 
       fclose(fp);
     }
+    else
+      fprintf(stderr, "DEBUG: Unable to open font file \"%s\" - %s\n",
+              filename, strerror(errno));
 
     puts("\n%%EndResource");
   }
