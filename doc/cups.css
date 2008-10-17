@@ -23,6 +23,11 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+  
 PRE.example {
   background: white;
   border: dotted thin #999999;

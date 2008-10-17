@@ -54,13 +54,10 @@ HELPFILES	=	\
 			help/man-cupsaccept.html \
 			help/man-backend.html \
 			help/man-cancel.html \
-			help/man-classes.conf.html \
-			help/man-client.conf.html \
 			help/man-cups-config.html \
 			help/man-cups-lpd.html \
 			help/man-cups-polld.html \
 			help/man-cupsaddsmb.html \
-			help/man-cupsd.conf.html \
 			help/man-cupsd.html \
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
@@ -80,11 +77,16 @@ HELPFILES	=	\
 			help/man-lpstat.html \
 			help/man-mime.convs.html \
 			help/man-mime.types.html \
-			help/man-printers.conf.html \
+			help/man-ppdc.html \
+			help/man-ppdhtml.html \
+			help/man-ppdi.html \
+			help/man-ppdmerge.html \
+			help/man-ppdpo.html \
 			help/network.html \
 			help/options.html \
 			help/overview.html \
 			help/policies.html \
+			help/ppd-compiler.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \

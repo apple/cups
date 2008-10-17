@@ -548,9 +548,11 @@ f 0644 root sys $DATADIR/data/testprint data/testprint
 d 0755 root sys $DATADIR/drv -
 f 0644 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
 
+d 0755 root sys $DATADIR/examples -
+f 0644 root sys $DATADIR/examples examples/*.drv
+
 d 0755 root sys $DATADIR/fonts -
-f 0644 root sys $DATADIR/fonts fonts/Courier*
-f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
+f 0644 root sys $DATADIR/fonts fonts/Monospace*
 
 d 0755 root sys $DATADIR/mime -
 f 0644 root sys $DATADIR/mime/mime.convs conf/mime.convs

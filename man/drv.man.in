@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdc 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH drv 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
 .SH NAME
 drv \- cups driver interface for ppd compiler files
 .SH SYNOPSIS
