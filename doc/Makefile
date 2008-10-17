@@ -29,7 +29,10 @@ WEBIMAGES	=	\
 			images/cups.png \
 			images/cups.rgb \
 			images/cups-block-diagram.gif \
+			images/cups-command-chain.png \
 			images/cups-icon.png \
+			images/cups-postscript-chain.png \
+			images/cups-raster-chain.png \
 			images/left.gif \
 			images/raster.png \
 			images/right.gif \
