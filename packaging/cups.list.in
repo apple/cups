@@ -642,6 +642,9 @@ f 0644 root sys $LIBDIR/libcupsppdc.a ppdc/libcupsppdc.a
 
 d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help doc/help/api*.html
+f 0644 root sys $DOCDIR/help/postscript-driver.html doc/help/postscript-driver.html
+f 0644 root sys $DOCDIR/help/ppd-compiler.html doc/help/ppd-compiler.html
+f 0644 root sys $DOCDIR/help/raster-driver.html doc/help/raster-driver.html
 f 0644 root sys $DOCDIR/help doc/help/spec*.html
 %subpackage
 

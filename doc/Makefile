@@ -86,6 +86,7 @@ HELPFILES	=	\
 			help/options.html \
 			help/overview.html \
 			help/policies.html \
+			help/postscript-driver.html \
 			help/ppd-compiler.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \

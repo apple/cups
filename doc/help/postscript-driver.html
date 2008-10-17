@@ -1,0 +1,219 @@
+<HTML>
+<!-- SECTION: Programming -->
+<HEAD>
+	<TITLE>Developing PostScript Printer Drivers</TITLE>
+</HEAD>
+<BODY>
+
+<p>This document describes how to develop printer drivers for PostScript
+printers. </p>
+
+<div class='summary'><table summary='General Information'>
+<tbody>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='raster-driver.html'>Developing Raster Printer Drivers</a><br>
+	Programming: <a href='api-filter.html'>Filter and Backend Programming</a><br>
+	Programming: <a href='ppd-compiler.html'>Introduction to the PPD Compiler</a><br>
+	Programming: <a href='api-raster.html'>Raster API</a><br>
+	References: <a href='ref-ppdcfile.html'>PPD Compiler Driver Information File Reference</a><br>
+	Specifications: <a href='spec-ppd.html'>CUPS PPD Extensions</a></td>
+</tr>
+</tbody>
+</table></div>
+
+
+<h2 class='title'><a name='IMPORT'>Importing Existing PPD Files</a></h2>
+
+<P>The DDK includes a utility called <TT>ppdi(1)</TT> which
+allows you to import existing PPD files into the driver
+information file format. Once imported, you can modify,
+localize, and regenerate the PPD files easily. The PPD files can
+be for CUPS raster printer drivers or for PostScript printers -
+the DDK makes no distinction when managing driver information or
+PPD files.</P>
+
+<P>Type the following command to import the PPD file
+<VAR>mydevice.ppd</VAR> into the driver information file
+<VAR>mydevice.drv</VAR>:</P>
+
+<pre class='command'>
+ppdi -o mydevice.drv mydevice.ppd
+</pre>
+
+<P>If you have a whole directory of PPD files that you would
+like to import, you can list multiple filenames or use shell
+wildcards to import more than one PPD file on the
+command-line:</P>
+
+<pre class='command'>
+ppdi -o mydevice.drv mydevice1.ppd mydevice2.ppd
+ppdi -o mydevice.drv *.ppd
+</pre>
+
+<P>If the driver information file already exists, the new PPD
+file entries are appended to the end of the file. Each PPD file
+is placed in its own group of curly braces within the driver
+information file.</P>
+
+
+<h2 class='title'>Overview of PostScript Driver Development</h2>
+
+<p>The PPD compiler is capable of producing PPD files for
+PostScript printers just as easily as for non-PostScript
+printers. PostScript printer drivers use the <tt>ps</tt> driver
+type:</p>
+
+<pre>
+    DriverType ps
+</pre>
+
+<h3>Required Attributes</h3>
+
+<p>PostScript drivers require the attributes listed in <a
+href='#TABLE4-1'>Table 4-1</a>. If not specified, the defaults
+for CUPS drivers are used. A typical PostScript driver
+information file would include the following attributes:</p>
+
+<pre>
+    Attribute DefaultColorSpace "" Gray
+    Attribute LandscapeOrientation "" Minus90
+    Attribute LanguageLevel "" "3"
+    Attribute Product "" "(Foo LaserProofer 2000)"
+    Attribute PSVersion "" "(3010) 0"
+    Attribute TTRasterizer "" Type42
+</pre>
+
+<!-- NEW PAGE -->
+<center><table border='1' cellpadding='5' cellspacing='0' width='90%'>
+<caption align='bottom'><a name='TABLE4-1'><i>Table 4-1,
+Required PostScript printer driver attributes</i></a></caption>
+<tr bgcolor='#cccccc'>
+	<th>Attribute</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td valign='top'><tt>DefaultColorSpace</tt></td>
+	<td align='justify' valign='top'>The default colorspace:
+	<tt>Gray</tt>, <tt>RGB</tt>, <tt>CMY</tt>, or
+	<tt>CMYK</tt>. If not specified, then <tt>RGB</tt> is
+	assumed.</td>
+</tr>
+<tr>
+	<td valign='top'><tt>LandscapeOrientation</tt></td>
+	<td align='justify' valign='top'>The preferred landscape
+	orientation: <tt>Plus90</tt>, <tt>Minus90</tt>, or
+	<tt>Any</tt>. If not specified, <tt>Plus90</tt> is
+	assumed.</td>
+</tr>
+<tr>
+	<td valign='top'><tt>LanguageLevel</tt></td>
+	<td align='justify' valign='top'>The PostScript language
+	level supported by the device: 1, 2, or 3. If not
+	specified, 2 is assumed.</td>
+</tr>
+<tr>
+	<td valign='top'><tt>Product</tt></td>
+	<td align='justify' valign='top'>The string returned by
+	the PostScript <tt>product</tt> operator, which
+	<i>must</i> include parenthesis to conform with
+	PostScript syntax rules for strings. Multiple
+	<tt>Product</tt> attributes may be specified to support
+	multiple products with the same PPD file. If not
+	specified, "(ESP Ghostscript)" and "(GNU Ghostscript)"
+	are assumed.</td>
+</tr>
+<tr>
+	<td valign='top'><tt>PSVersion</tt></td>
+	<td align='justify' valign='top'>The PostScript
+	interpreter version numbers as returned by the
+	<tt>version</tt> and <tt>revision</tt> operators. The
+	required format is "(version) revision". Multiple
+	<tt>PSVersion</tt> attributes may be specified to
+	support multiple interpreter version numbers. If not
+	specified, "(3010) 705" and "(3010) 707" are
+	assumed.</td>
+</tr>
+<tr>
+	<td valign='top'><tt>TTRasterizer</tt></td>
+	<td align='justify' valign='top'>The type of TrueType
+	font rasterizer supported by the device, if any. The
+	supported values are <tt>None</tt>, <tt>Accept68k</tt>,
+	<tt>Type42</tt>, and <tt>TrueImage</tt>. If not
+	specified, <tt>None</tt> is assumed.</td>
+</tr>
+</table></center>
+
+<h3>Query Commands</h3>
+
+<p>Most PostScript printer PPD files include query commands
+(<tt>?PageSize</tt>, etc.) that allow applications to query the
+printer for its current settings and configuration. Query
+commands are included in driver information files as attributes.
+For example, the query command for the <tt>PageSize</tt> option
+might look like the following:</p>
+
+<pre>
+    Attribute "?PageSize" "" "
+          save
+          currentpagedevice /PageSize get aload pop
+          2 copy gt {exch} if (Unknown)
+          23 dict
+                  dup [612 792] (Letter) put
+                  dup [612 1008] (Legal) put
+                  dup [595 842] (A4) put
+                  {exch aload pop 4 index sub abs 5 le exch 
+                   5 index sub abs 5 le and
+                  {exch pop exit} {pop} ifelse
+          } bind forall = flush pop pop
+          restore"
+</pre>
+
+<p>Query commands can span multiple lines, however no single
+line may contain more than 255 characters.</p>
+
+<h3>Adding Filters</h3>
+
+<p>Normally a PostScript printer driver will not utilize any
+additional print filters. For drivers that provide additional
+filters such as a CUPS command file filter for doing printer
+maintenance, you must also list the following <tt>Filter</tt>
+directive to handle printing PostScript files:</p>
+
+<pre>
+    Filter application/vnd.cups-postscript 0 -
+</pre>
+
+<h2 class='title'>Importing Existing PostScript Drivers</h2>
+
+<p>The <tt>ppdi(1)</tt> utility included with the CUPS DDK
+imports existing PPD files into driver information files. This
+allows you to make modifications and localize PPD files for
+other languages with great ease. Use the following command to
+import a single PPD file called <var>filename.ppd</var> into a
+driver information file called <var>filename.drv</var>:</p>
+
+<pre>
+    <kbd>ppdi filename.drv filename.ppd ENTER</kbd>
+</pre>
+
+<p>The driver information file is created if it does not exist.
+Otherwise the PPD file information is appended to the end of the
+file. You can use shell wildcards to import whole directories of
+PPD files:</p>
+
+<pre>
+    <kbd>ppdi filename.drv *.ppd ENTER</kbd>
+</pre>
+
+<p>Once imported, you can edit the driver information file and
+use the <tt>ppdc</tt> program to regenerate the PPD files:</p>
+
+<pre>
+    <kbd>ppdc filename.drv ENTER</kbd>
+</pre>
+
+</div>
+
+</body>
+</html>

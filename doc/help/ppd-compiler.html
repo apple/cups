@@ -835,39 +835,5 @@ lines:</p>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsUIResolver DuplexOff "*Duplex None"
 </pre>
 
-
-<h2 class='title'><a name='IMPORT'>Importing Existing PPD Files</a></h2>
-
-<P>The DDK includes a utility called <TT>ppdi(1)</TT> which
-allows you to import existing PPD files into the driver
-information file format. Once imported, you can modify,
-localize, and regenerate the PPD files easily. The PPD files can
-be for CUPS raster printer drivers or for PostScript printers -
-the DDK makes no distinction when managing driver information or
-PPD files.</P>
-
-<P>Type the following command to import the PPD file
-<VAR>mydevice.ppd</VAR> into the driver information file
-<VAR>mydevice.drv</VAR>:</P>
-
-<pre class='command'>
-ppdi -o mydevice.drv mydevice.ppd
-</pre>
-
-<P>If you have a whole directory of PPD files that you would
-like to import, you can list multiple filenames or use shell
-wildcards to import more than one PPD file on the
-command-line:</P>
-
-<pre class='command'>
-ppdi -o mydevice.drv mydevice1.ppd mydevice2.ppd
-ppdi -o mydevice.drv *.ppd
-</pre>
-
-<P>If the driver information file already exists, the new PPD
-file entries are appended to the end of the file. Each PPD file
-is placed in its own group of curly braces within the driver
-information file.</P>
-
 </BODY>
 </HTML>
