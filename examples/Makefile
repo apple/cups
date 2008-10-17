@@ -32,6 +32,7 @@ EXAMPLES =	\
 		laserjet-basic.drv \
 		laserjet-pjl.drv \
 		minimum.drv \
+		postscript.drv \
 		r300-basic.drv \
 		r300-colorman.drv \
 		r300-remote.drv
