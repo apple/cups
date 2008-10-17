@@ -544,213 +544,205 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
     installable = NULL;
 
  /*
-  * See what kind of constraint data we have in the PPD...
+  * Load old-style [Non]UIConstraints data...
   */
 
-  if ((constattr = ppdFindAttr(ppd, "cupsUIConstraints", NULL)) != NULL)
+  for (i = ppd->num_consts, oldconst = ppd->consts; i > 0; i --, oldconst ++)
   {
    /*
-    * Load new-style cupsUIConstraints data...
+    * Weed out nearby duplicates, since the PPD spec requires that you
+    * define both "*Foo foo *Bar bar" and "*Bar bar *Foo foo"...
     */
 
-    for (; constattr;
-         constattr = ppdFindNextAttr(ppd, "cupsUIConstraints", NULL))
+    if (i > 1 &&
+	!strcasecmp(oldconst[0].option1, oldconst[1].option2) &&
+	!strcasecmp(oldconst[0].choice1, oldconst[1].choice2) &&
+	!strcasecmp(oldconst[0].option2, oldconst[1].option1) &&
+	!strcasecmp(oldconst[0].choice2, oldconst[1].choice1))
+      continue;
+
+   /*
+    * Allocate memory...
+    */
+
+    if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
     {
-      if (!constattr->value)
+      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+		 "UIConstraints!");
+      return;
+    }
+
+    if ((constptr = calloc(2, sizeof(_ppd_cups_uiconst_t))) == NULL)
+    {
+      free(consts);
+      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+		 "UIConstraints!");
+      return;
+    }
+
+   /*
+    * Fill in the information...
+    */
+
+    consts->num_constraints = 2;
+    consts->constraints     = constptr;
+
+    if (!strncasecmp(oldconst->option1, "Custom", 6) &&
+	!strcasecmp(oldconst->choice1, "True"))
+    {
+      constptr[0].option      = ppdFindOption(ppd, oldconst->option1 + 6);
+      constptr[0].choice      = ppdFindChoice(constptr[0].option, "Custom");
+      constptr[0].installable = 0;
+    }
+    else
+    {
+      constptr[0].option      = ppdFindOption(ppd, oldconst->option1);
+      constptr[0].choice      = ppdFindChoice(constptr[0].option,
+					      oldconst->choice1);
+      constptr[0].installable = ppd_is_installable(installable,
+						   oldconst->option1);
+    }
+
+    if (!constptr[0].option || (!constptr[0].choice && oldconst->choice1[0]))
+    {
+      DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+		    oldconst->option1, oldconst->choice1));
+      free(consts->constraints);
+      free(consts);
+      continue;
+    }
+
+    if (!strncasecmp(oldconst->option2, "Custom", 6) &&
+	!strcasecmp(oldconst->choice2, "True"))
+    {
+      constptr[1].option      = ppdFindOption(ppd, oldconst->option2 + 6);
+      constptr[1].choice      = ppdFindChoice(constptr[1].option, "Custom");
+      constptr[1].installable = 0;
+    }
+    else
+    {
+      constptr[1].option      = ppdFindOption(ppd, oldconst->option2);
+      constptr[1].choice      = ppdFindChoice(constptr[1].option,
+					      oldconst->choice2);
+      constptr[1].installable = ppd_is_installable(installable,
+						   oldconst->option2);
+    }
+
+    if (!constptr[1].option || (!constptr[1].choice && oldconst->choice2[0]))
+    {
+      DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+		    oldconst->option2, oldconst->choice2));
+      free(consts->constraints);
+      free(consts);
+      continue;
+    }
+
+    consts->installable = constptr[0].installable || constptr[1].installable;
+
+   /*
+    * Add it to the constraints array...
+    */
+
+    cupsArrayAdd(ppd->cups_uiconstraints, consts);
+  }
+
+ /*
+  * Then load new-style constraints...
+  */
+
+  for (constattr = ppdFindAttr(ppd, "cupsUIConstraints", NULL);
+       constattr;
+       constattr = ppdFindNextAttr(ppd, "cupsUIConstraints", NULL))
+  {
+    if (!constattr->value)
+    {
+      DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
+      continue;
+    }
+
+    for (i = 0, vptr = strchr(constattr->value, '*');
+	 vptr;
+	 i ++, vptr = strchr(vptr + 1, '*'));
+
+    if (i == 0)
+    {
+      DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
+      continue;
+    }
+
+    if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
+    {
+      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+		 "cupsUIConstraints!");
+      return;
+    }
+
+    if ((constptr = calloc(i, sizeof(_ppd_cups_uiconst_t))) == NULL)
+    {
+      free(consts);
+      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+		 "cupsUIConstraints!");
+      return;
+    }
+
+    consts->num_constraints = i;
+    consts->constraints     = constptr;
+
+    strlcpy(consts->resolver, constattr->spec, sizeof(consts->resolver));
+
+    for (i = 0, vptr = strchr(constattr->value, '*');
+	 vptr;
+	 i ++, vptr = strchr(vptr, '*'), constptr ++)
+    {
+     /*
+      * Extract "*Option Choice" or just "*Option"...
+      */
+
+      for (vptr ++, ptr = option; *vptr && !isspace(*vptr & 255); vptr ++)
+	if (ptr < (option + sizeof(option) - 1))
+	  *ptr++ = *vptr;
+
+      *ptr = '\0';
+
+      while (isspace(*vptr & 255))
+	vptr ++;
+
+      if (*vptr == '*')
+	choice[0] = '\0';
+      else
       {
-        DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
-        continue;
-      }
-
-      for (i = 0, vptr = strchr(constattr->value, '*');
-           vptr;
-	   i ++, vptr = strchr(vptr + 1, '*'));
-
-      if (i == 0)
-      {
-        DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
-        continue;
-      }
-
-      if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
-      {
-        DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
-	           "cupsUIConstraints!");
-        return;
-      }
-
-      if ((constptr = calloc(i, sizeof(_ppd_cups_uiconst_t))) == NULL)
-      {
-        free(consts);
-        DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
-	           "cupsUIConstraints!");
-        return;
-      }
-
-      consts->num_constraints = i;
-      consts->constraints     = constptr;
-
-      strlcpy(consts->resolver, constattr->spec, sizeof(consts->resolver));
-
-      for (i = 0, vptr = strchr(constattr->value, '*');
-           vptr;
-	   i ++, vptr = strchr(vptr, '*'), constptr ++)
-      {
-       /*
-        * Extract "*Option Choice" or just "*Option"...
-	*/
-
-        for (vptr ++, ptr = option; *vptr && !isspace(*vptr & 255); vptr ++)
-	  if (ptr < (option + sizeof(option) - 1))
+	for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
+	  if (ptr < (choice + sizeof(choice) - 1))
 	    *ptr++ = *vptr;
 
-        *ptr = '\0';
-
-        while (isspace(*vptr & 255))
-	  vptr ++;
-
-        if (*vptr == '*')
-	  choice[0] = '\0';
-	else
-	{
-	  for (ptr = choice; *vptr && !isspace(*vptr & 255); vptr ++)
-	    if (ptr < (choice + sizeof(choice) - 1))
-	      *ptr++ = *vptr;
-
-	  *ptr = '\0';
-	}
-
-        if (!strncasecmp(option, "Custom", 6) && !strcasecmp(choice, "True"))
-	{
-	  _cups_strcpy(option, option + 6);
-	  strcpy(choice, "Custom");
-	}
-
-        constptr->option      = ppdFindOption(ppd, option);
-        constptr->choice      = ppdFindChoice(constptr->option, choice);
-        constptr->installable = ppd_is_installable(installable, option);
-	consts->installable   |= constptr->installable;
-
-        if (!constptr->option || (!constptr->choice && choice[0]))
-	{
-	  DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
-	                option, choice));
-	  break;
-	}
+	*ptr = '\0';
       }
 
-      if (!vptr)
-        cupsArrayAdd(ppd->cups_uiconstraints, consts);
-      else
+      if (!strncasecmp(option, "Custom", 6) && !strcasecmp(choice, "True"))
       {
-        free(consts->constraints);
-	free(consts);
+	_cups_strcpy(option, option + 6);
+	strcpy(choice, "Custom");
+      }
+
+      constptr->option      = ppdFindOption(ppd, option);
+      constptr->choice      = ppdFindChoice(constptr->option, choice);
+      constptr->installable = ppd_is_installable(installable, option);
+      consts->installable   |= constptr->installable;
+
+      if (!constptr->option || (!constptr->choice && choice[0]))
+      {
+	DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+		      option, choice));
+	break;
       }
     }
-  }
-  else
-  {
-   /*
-    * Load old-style [Non]UIConstraints data...
-    */
 
-    for (i = ppd->num_consts, oldconst = ppd->consts; i > 0; i --, oldconst ++)
-    {
-     /*
-      * Weed out nearby duplicates, since the PPD spec requires that you
-      * define both "*Foo foo *Bar bar" and "*Bar bar *Foo foo"...
-      */
-
-      if (i > 1 &&
-          !strcasecmp(oldconst[0].option1, oldconst[1].option2) &&
-	  !strcasecmp(oldconst[0].choice1, oldconst[1].choice2) &&
-	  !strcasecmp(oldconst[0].option2, oldconst[1].option1) &&
-	  !strcasecmp(oldconst[0].choice2, oldconst[1].choice1))
-        continue;
-
-     /*
-      * Allocate memory...
-      */
-
-      if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
-      {
-        DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
-	           "UIConstraints!");
-        return;
-      }
-
-      if ((constptr = calloc(2, sizeof(_ppd_cups_uiconst_t))) == NULL)
-      {
-        free(consts);
-        DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
-	           "UIConstraints!");
-        return;
-      }
-
-     /*
-      * Fill in the information...
-      */
-
-      consts->num_constraints = 2;
-      consts->constraints     = constptr;
-
-      if (!strncasecmp(oldconst->option1, "Custom", 6) &&
-          !strcasecmp(oldconst->choice1, "True"))
-      {
-	constptr[0].option      = ppdFindOption(ppd, oldconst->option1 + 6);
-	constptr[0].choice      = ppdFindChoice(constptr[0].option, "Custom");
-        constptr[0].installable = 0;
-      }
-      else
-      {
-	constptr[0].option      = ppdFindOption(ppd, oldconst->option1);
-	constptr[0].choice      = ppdFindChoice(constptr[0].option,
-	                                        oldconst->choice1);
-	constptr[0].installable = ppd_is_installable(installable,
-						     oldconst->option1);
-      }
-
-      if (!constptr[0].option || (!constptr[0].choice && oldconst->choice1[0]))
-      {
-        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
-	              oldconst->option1, oldconst->choice1));
-        free(consts->constraints);
-	free(consts);
-	continue;
-      }
-
-      if (!strncasecmp(oldconst->option2, "Custom", 6) &&
-          !strcasecmp(oldconst->choice2, "True"))
-      {
-	constptr[1].option      = ppdFindOption(ppd, oldconst->option2 + 6);
-	constptr[1].choice      = ppdFindChoice(constptr[1].option, "Custom");
-        constptr[1].installable = 0;
-      }
-      else
-      {
-	constptr[1].option      = ppdFindOption(ppd, oldconst->option2);
-	constptr[1].choice      = ppdFindChoice(constptr[1].option,
-	                                        oldconst->choice2);
-	constptr[1].installable = ppd_is_installable(installable,
-						     oldconst->option2);
-      }
-
-      if (!constptr[1].option || (!constptr[1].choice && oldconst->choice2[0]))
-      {
-        DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
-	              oldconst->option2, oldconst->choice2));
-        free(consts->constraints);
-	free(consts);
-	continue;
-      }
-
-      consts->installable = constptr[0].installable || constptr[1].installable;
-
-     /*
-      * Add it to the constraints array...
-      */
-
+    if (!vptr)
       cupsArrayAdd(ppd->cups_uiconstraints, consts);
+    else
+    {
+      free(consts->constraints);
+      free(consts);
     }
   }
 }

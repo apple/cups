@@ -548,9 +548,11 @@ f 0644 root sys $DATADIR/data/testprint data/testprint
 d 0755 root sys $DATADIR/drv -
 f 0644 root sys $DATADIR/drv/sample.drv ppdc/sample.drv
 
+d 0755 root sys $DATADIR/examples -
+f 0644 root sys $DATADIR/examples examples/*.drv
+
 d 0755 root sys $DATADIR/fonts -
-f 0644 root sys $DATADIR/fonts fonts/Courier*
-f 0644 root sys $DATADIR/fonts/Symbol fonts/Symbol
+f 0644 root sys $DATADIR/fonts fonts/Monospace*
 
 d 0755 root sys $DATADIR/mime -
 f 0644 root sys $DATADIR/mime/mime.convs conf/mime.convs
@@ -640,6 +642,9 @@ f 0644 root sys $LIBDIR/libcupsppdc.a ppdc/libcupsppdc.a
 
 d 0755 root sys $DOCDIR/help -
 f 0644 root sys $DOCDIR/help doc/help/api*.html
+f 0644 root sys $DOCDIR/help/postscript-driver.html doc/help/postscript-driver.html
+f 0644 root sys $DOCDIR/help/ppd-compiler.html doc/help/ppd-compiler.html
+f 0644 root sys $DOCDIR/help/raster-driver.html doc/help/raster-driver.html
 f 0644 root sys $DOCDIR/help doc/help/spec*.html
 %subpackage
 

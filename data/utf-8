@@ -27,14 +27,14 @@ charset utf8
 # Each font that is listed will be downloaded to the printer when used.
 #
 
-0000 00FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-0100 01FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-0200 02FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-0300 03FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-0400 04FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-1E00 1EFF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-2000 20FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-2300 23FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-2400 24FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-2500 25FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
-2600 26FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-Bold-Oblique
+0000 00FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+0100 01FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+0200 02FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+0300 03FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+0400 04FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+1E00 1EFF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+2000 20FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+2300 23FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+2400 24FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+2500 25FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique
+2600 26FF ltor single Monospace Monospace-Bold Monospace-Oblique Monospace-BoldOblique

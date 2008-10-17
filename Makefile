@@ -30,7 +30,7 @@ include Makedefs
 DIRS	=	cups filter backend berkeley cgi-bin driver locale man monitor \
 		notifier ppdc scheduler systemv test \
 		$(PHPDIR) \
-		conf data doc $(FONTS) templates
+		conf data doc examples $(FONTS) templates
 
 
 #

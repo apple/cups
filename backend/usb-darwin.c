@@ -1712,7 +1712,7 @@ static void setup_cfLanguage(void)
     lang[0] = CFStringCreateWithCString(kCFAllocatorDefault, requestedLang, kCFStringEncodingUTF8);
     langArray = CFArrayCreate(kCFAllocatorDefault, (const void **)lang, sizeof(lang) / sizeof(lang[0]), &kCFTypeArrayCallBacks);
 
-    CFPreferencesSetAppValue(CFSTR("AppleLanguages"), langArray, kCFPreferencesCurrentApplication);
+    CFPreferencesSetValue(CFSTR("AppleLanguages"), langArray, kCFPreferencesCurrentApplication, kCFPreferencesAnyUser, kCFPreferencesAnyHost);
     fprintf(stderr, "DEBUG: usb: AppleLanguages=\"%s\"\n", requestedLang);
 
     CFRelease(lang[0]);
