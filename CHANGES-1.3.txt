@@ -1,6 +1,13 @@
 CHANGES-1.3.txt
 ---------------
 
+CHANGES IN CUPS V1.3.10
+
+	- SECURITY: The PNG image reading code did not validate the
+	  image size properly, leading to a potential buffer overflow
+	  (STR #2974)
+
+
 CHANGES IN CUPS V1.3.9
 
 	- SECURITY: The HP-GL/2 filter did not range check pen numbers

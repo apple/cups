@@ -178,7 +178,7 @@ _cupsImageReadPNG(
     {
       bufsize = img->xsize * img->ysize;
 
-      if ((bufsize / img->ysize) != img->xsize)
+      if ((bufsize / img->xsize) != img->ysize)
       {
 	fprintf(stderr, "DEBUG: PNG image dimensions (%ux%u) too large!\n",
 		(unsigned)width, (unsigned)height);
@@ -190,7 +190,7 @@ _cupsImageReadPNG(
     {
       bufsize = img->xsize * img->ysize * 3;
 
-      if ((bufsize / (img->ysize * 3)) != img->xsize)
+      if ((bufsize / (img->xsize * 3)) != img->ysize)
       {
 	fprintf(stderr, "DEBUG: PNG image dimensions (%ux%u) too large!\n",
 		(unsigned)width, (unsigned)height);
