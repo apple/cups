@@ -267,6 +267,9 @@ choose_device_cb(
     * Update the page...
     */
 
+    if (!last_device_time)
+      cgiStartMultipart();
+
     cgiStartHTML(title);
     cgiCopyTemplateLang("choose-device.tmpl");
     cgiEndHTML();
@@ -907,31 +910,36 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     }
 
    /*
-    * Prime the page with the current device listed...
-    */
-
-    cgiStartMultipart();
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("choose-device.tmpl");
-    cgiEndHTML();
-    fflush(stdout);
-
-   /*
     * Scan for devices for up to 30 seconds, updating the page as we find
     * them...
     */
 
     fputs("DEBUG: Getting list of devices...\n", stderr);
 
-    time(&last_device_time);
-    current_device = 0;
+    last_device_time = 0;
+    current_device   = 0;
     if (cupsGetDevices(http, 30, NULL, (cups_device_cb_t)choose_device_cb,
                        (void *)title) == IPP_OK)
       fputs("DEBUG: Got device list!\n", stderr);
     else
+    {
       fprintf(stderr,
               "ERROR: CUPS-Get-Devices request failed with status %x: %s\n",
 	      cupsLastError(), cupsLastErrorString());
+      if (cupsLastError() == IPP_NOT_AUTHORIZED)
+      {
+	puts("Status: 401\n");
+	exit(0);
+      }
+      else
+      {
+	cgiStartHTML(title);
+	cgiShowIPPError(modify ? _("Unable to modify printer:") :
+				 _("Unable to add printer:"));
+	cgiEndHTML();
+        return;
+      }
+    }
 
    /*
     * Show the final selection page...
