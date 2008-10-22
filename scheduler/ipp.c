@@ -2547,7 +2547,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     need_restart_job = 1;
 
-    supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
+    supported = ippFindAttribute(printer->ppd_attrs, "port-monitor-supported",
                                  IPP_TAG_NAME);
     if (supported)
     {

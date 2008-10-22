@@ -657,8 +657,8 @@ compare_matches(const ppd_info_t *p0,	/* I - First PPD */
   if (p1->matches != p0->matches)
     return (p1->matches - p0->matches);
   else
-    return (cupsdCompareNames(p1->record.make_and_model,
-			      p0->record.make_and_model));
+    return (cupsdCompareNames(p0->record.make_and_model,
+			      p1->record.make_and_model));
 }
 
 

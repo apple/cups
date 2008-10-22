@@ -1123,12 +1123,16 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       var = cgiGetVariable("PPD_MAKE");
     if (var)
     {
+      const char *make_model;		/* Make and model */
+
+
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
 
-      if ((var = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL)
+      if ((make_model = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL &&
+          !cgiGetVariable("SELECT_MAKE"))
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
-		     "ppd-make-and-model", NULL, var);
+		     "ppd-make-and-model", NULL, make_model);
     }
     else
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
