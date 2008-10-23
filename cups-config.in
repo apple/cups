@@ -4,7 +4,7 @@
 # 
 #   CUPS configuration utility.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2008 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -16,6 +16,7 @@
 
 VERSION="@CUPS_VERSION@"
 APIVERSION="1.4"
+BUILD="@CUPS_BUILD@"
 
 prefix=@prefix@
 exec_prefix=@exec_prefix@
@@ -62,6 +63,7 @@ fi
 usage ()
 {
     echo "Usage: cups-config --api-version"
+    echo "       cups-config --build"
     echo "       cups-config --cflags"
     echo "       cups-config --datadir"
     echo "       cups-config --help"
@@ -87,6 +89,9 @@ while test $# -gt 0; do
     case $1 in
 	--api-version)
 	    echo $APIVERSION
+	    ;;
+	--build)
+	    echo $BUILD
 	    ;;
 	--cflags)
 	    echo $CFLAGS
