@@ -171,12 +171,6 @@ Version "1.4"
   ColorDevice No
   Throughput 1
 
-  HWMargins 18 18 18 18
-  *MediaSize Letter
-  MediaSize Legal
-  MediaSize A4
-  MediaSize FanFoldUS
-
   HWMargins 0 0 0 0
   VariablePaperSize Yes
   MinSize 36 36
@@ -188,11 +182,17 @@ Version "1.4"
     PCFileName "epson24.ppd"
     ModelNumber $EPSON_24PIN
 
+    HWMargins 18 18 18 18
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize A4
+    MediaSize FanFoldUS
+
     Resolution k 1 8 0 0 60dpi
     *Resolution k 1 8 0 0 120x60dpi
     Resolution k 1 24 0 0 180dpi
     Resolution k 1 24 0 0 360x180dpi
-    Resolution k 1 48 0 0 360x180dpi
+    Resolution k 1 48 0 0 360dpi
   }
 
   // Epson 9-Pin Series
@@ -201,6 +201,12 @@ Version "1.4"
     PCFileName "epson9.ppd"
     ModelNumber $EPSON_9PIN
     ColorDevice No
+
+    HWMargins 18 18 18 18
+    *MediaSize Letter
+    MediaSize Legal
+    MediaSize A4
+    MediaSize FanFoldUS
 
     Resolution k 1 8 0 0 60x720dpi
     *Resolution k 1 8 0 0 120x72dpi
