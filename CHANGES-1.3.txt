@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.3.10
 	- SECURITY: The PNG image reading code did not validate the
 	  image size properly, leading to a potential buffer overflow
 	  (STR #2974)
+	- Fixed some configure script bugs with rc/xinetd directories
+	  (STR #2970)
 	- The Epson sample driver PPDs contained errors (STR #2979)
 
 
