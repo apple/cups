@@ -6340,8 +6340,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp", ServerRoot,
-           printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.ipp", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__
