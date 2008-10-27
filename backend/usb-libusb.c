@@ -380,11 +380,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
 
   if (usb_control_msg(printer->handle,
                       USB_TYPE_CLASS | USB_ENDPOINT_IN | USB_RECIP_INTERFACE,
-		      0, 0,
-		      (printer->iface << 8) |
-		          printer->device->config[printer->conf].
-			      interface[printer->iface].
-			      altsetting[printer->altset].bAlternateSetting,
+		      0, printer->conf, printer->iface,
 		      buffer, bufsize, 5000) < 0)
   {
     *buffer = '\0';
@@ -614,14 +610,19 @@ open_device(usb_printer_t *printer,	/* I - Printer */
     fputs("STATE: +connecting-to-device\n", stderr);
 
   number = printer->device->config[printer->conf].bConfigurationValue;
-  while (usb_set_configuration(printer->handle, number) < 0)
+
+  if (usb_set_configuration(printer->handle, number) < 0)
   {
+   /*
+    * If the set fails, chances are that the printer only supports a
+    * single configuration.  Technically these printers don't conform to
+    * the USB printer specification, but otherwise they'll work...
+    */
+
     if (errno != EBUSY)
       fprintf(stderr, "DEBUG: Failed to set configuration %d for %04x:%04x\n",
               number, printer->device->descriptor.idVendor,
 	      printer->device->descriptor.idProduct);
-
-    goto error;
   }
 
  /*
@@ -633,9 +634,9 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   while (usb_claim_interface(printer->handle, number) < 0)
   {
     if (errno != EBUSY)
-      fprintf(stderr, "DEBUG: Failed to claim interface %d for %04x:%04x\n",
+      fprintf(stderr, "DEBUG: Failed to claim interface %d for %04x:%04x: %s\n",
               number, printer->device->descriptor.idVendor,
-	      printer->device->descriptor.idProduct);
+	      printer->device->descriptor.idProduct, strerror(errno));
 
     goto error;
   }
@@ -644,9 +645,9 @@ open_device(usb_printer_t *printer,	/* I - Printer */
     while (usb_claim_interface(printer->handle, 0) < 0)
     {
       if (errno != EBUSY)
-	fprintf(stderr, "DEBUG: Failed to claim interface 0 for %04x:%04x\n",
+	fprintf(stderr, "DEBUG: Failed to claim interface 0 for %04x:%04x: %s\n",
 		printer->device->descriptor.idVendor,
-		printer->device->descriptor.idProduct);
+		printer->device->descriptor.idProduct, strerror(errno));
 
       goto error;
     }
@@ -661,9 +662,9 @@ open_device(usb_printer_t *printer,	/* I - Printer */
   {
     if (errno != EBUSY)
       fprintf(stderr,
-              "DEBUG: Failed to set alternate interface %d for %04x:%04x\n",
+              "DEBUG: Failed to set alternate interface %d for %04x:%04x: %s\n",
               number, printer->device->descriptor.idVendor,
-	      printer->device->descriptor.idProduct);
+	      printer->device->descriptor.idProduct, strerror(errno));
 
     goto error;
   }
