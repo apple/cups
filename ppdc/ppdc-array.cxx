@@ -99,6 +99,7 @@ ppdcArray::add(ppdcShared *d)
     data = temp;
   }
 
+  d->retain();
   data[count++] = d;
 }
 
