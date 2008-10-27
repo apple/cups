@@ -110,6 +110,11 @@ form-tree.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 form-tree.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.o: ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.o: ../cups/string.h ../config.h
+bannertops.o: pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+bannertops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+bannertops.o: ../cups/file.h ../cups/language.h ../cups/language.h
+bannertops.o: ../cups/string.h ../config.h ../cups/transcode.h image.h
+bannertops.o: ../cups/raster.h ../cups/i18n.h ../cups/transcode.h
 commandtops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h
 commandtops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 commandtops.o: ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
@@ -134,6 +139,10 @@ common.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pdftops.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 pdftops.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pdftops.o: ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
+pstext.o: pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pstext.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+pstext.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
+pstext.o: ../cups/transcode.h ../cups/i18n.h ../cups/transcode.h
 pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
@@ -283,6 +292,11 @@ form-tree.32.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cup
 form-tree.32.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.32.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.32.o: form-tree.c  ../cups/string.h ../config.h
+bannertops.32.o: bannertops.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+bannertops.32.o: bannertops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+bannertops.32.o: bannertops.c  ../cups/file.h ../cups/language.h ../cups/language.h
+bannertops.32.o: bannertops.c  ../cups/string.h ../config.h ../cups/transcode.h image.h
+bannertops.32.o: bannertops.c  ../cups/raster.h ../cups/i18n.h ../cups/transcode.h
 commandtops.32.o: commandtops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 commandtops.32.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 commandtops.32.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
@@ -307,6 +321,10 @@ common.32.o: common.c  ../cups/language.h ../cups/language.h ../cups/string.h ..
 pdftops.32.o: pdftops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 pdftops.32.o: pdftops.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pdftops.32.o: pdftops.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
+pstext.32.o: pstext.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pstext.32.o: pstext.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+pstext.32.o: pstext.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
+pstext.32.o: pstext.c  ../cups/transcode.h ../cups/i18n.h ../cups/transcode.h
 pstops.32.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.32.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.32.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
@@ -456,6 +474,11 @@ form-tree.64.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cup
 form-tree.64.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 form-tree.64.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
 form-tree.64.o: form-tree.c  ../cups/string.h ../config.h
+bannertops.64.o: bannertops.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+bannertops.64.o: bannertops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+bannertops.64.o: bannertops.c  ../cups/file.h ../cups/language.h ../cups/language.h
+bannertops.64.o: bannertops.c  ../cups/string.h ../config.h ../cups/transcode.h image.h
+bannertops.64.o: bannertops.c  ../cups/raster.h ../cups/i18n.h ../cups/transcode.h
 commandtops.64.o: commandtops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 commandtops.64.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 commandtops.64.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
@@ -480,6 +503,10 @@ common.64.o: common.c  ../cups/language.h ../cups/language.h ../cups/string.h ..
 pdftops.64.o: pdftops.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 pdftops.64.o: pdftops.c  ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 pdftops.64.o: pdftops.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
+pstext.64.o: pstext.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+pstext.64.o: pstext.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
+pstext.64.o: pstext.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
+pstext.64.o: pstext.c  ../cups/transcode.h ../cups/i18n.h ../cups/transcode.h
 pstops.64.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.64.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.64.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h

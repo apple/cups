@@ -243,23 +243,3 @@ cups-driverd.o: ../cups/file.h ../cups/language.h ../cups/file.h
 cups-driverd.o: ../cups/string.h ../config.h ../cups/dir.h
 cups-driverd.o: ../cups/transcode.h ../cups/ppd-private.h ../cups/cups.h
 cups-driverd.o: ../ppdc/ppdc.h
-# DO NOT DELETE
-
-filter.32.o: filter.c  ../cups/debug.h ../cups/string.h ../config.h mime.h ../cups/array.h
-filter.32.o: filter.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/file.h
-mime.32.o: mime.c  ../cups/debug.h ../cups/dir.h ../cups/versioning.h ../cups/string.h
-mime.32.o: mime.c  ../config.h mime.h ../cups/array.h ../cups/ipp.h ../cups/http.h
-mime.32.o: mime.c  ../cups/file.h
-type.32.o: type.c  ../cups/string.h ../config.h mime.h ../cups/array.h
-type.32.o: type.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/file.h
-type.32.o: type.c  ../cups/debug.h
-# DO NOT DELETE
-
-filter.64.o: filter.c  ../cups/debug.h ../cups/string.h ../config.h mime.h ../cups/array.h
-filter.64.o: filter.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/file.h
-mime.64.o: mime.c  ../cups/debug.h ../cups/dir.h ../cups/versioning.h ../cups/string.h
-mime.64.o: mime.c  ../config.h mime.h ../cups/array.h ../cups/ipp.h ../cups/http.h
-mime.64.o: mime.c  ../cups/file.h
-type.64.o: type.c  ../cups/string.h ../config.h mime.h ../cups/array.h
-type.64.o: type.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/file.h
-type.64.o: type.c  ../cups/debug.h

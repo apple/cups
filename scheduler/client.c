@@ -4443,7 +4443,9 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   ipp_attribute_t *attr;		/* attributes-natural-language attribute */
 #ifdef HAVE_GSSAPI
   krb5_ccache	ccache = NULL;		/* Kerberos credentials */
+#  if defined(HAVE_KRB5_CC_NEW_UNIQUE) || defined(HAVE_HEIMDAL)
   char		krb5ccname[1024];	/* KRB5CCNAME environment variable */
+#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
 #endif /* HAVE_GSSAPI */
 
 
