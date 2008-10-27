@@ -49,15 +49,15 @@ ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
   {
     // Bump the use count of any strings we inherit...
     if (d->manufacturer)
-      d->manufacturer->get();
+      d->manufacturer->retain();
     if (d->version)
-      d->version->get();
+      d->version->retain();
     if (d->default_font)
-      d->default_font->get();
+      d->default_font->retain();
     if (d->default_size)
-      d->default_size->get();
+      d->default_size->retain();
     if (d->custom_size_code)
-      d->custom_size_code->get();
+      d->custom_size_code->retain();
 
     // Copy all of the data from the driver template...
     copyright           = new ppdcArray(d->copyright);
@@ -140,7 +140,7 @@ ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
 
 ppdcDriver::~ppdcDriver()
 {
-  delete copyright;
+  copyright->release();
 
   if (manufacturer)
     manufacturer->release();
@@ -159,13 +159,13 @@ ppdcDriver::~ppdcDriver()
   if (custom_size_code)
     custom_size_code->release();
 
-  delete attrs;
-  delete constraints;
-  delete filters;
-  delete fonts;
-  delete groups;
-  delete profiles;
-  delete sizes;
+  attrs->release();
+  constraints->release();
+  filters->release();
+  fonts->release();
+  groups->release();
+  profiles->release();
+  sizes->release();
 }
 
 
@@ -256,7 +256,7 @@ ppdcDriver::set_default_font(
 
   if (f)
   {
-    f->name->get();
+    f->name->retain();
     default_font = f->name;
   }
   else
@@ -277,7 +277,7 @@ ppdcDriver::set_default_size(
 
   if (m)
   {
-    m->name->get();
+    m->name->retain();
     default_size = m->name;
   }
   else
@@ -1219,7 +1219,7 @@ ppdcDriver::write_ppd_file(
 		 lf);
 
   if (delete_cat)
-    delete catalog;
+    catalog->release();
 
   return (0);
 }

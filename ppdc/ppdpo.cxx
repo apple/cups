@@ -140,7 +140,7 @@ main(int  argc,				// I - Number of command-line arguments
       }
 
       // Delete the printer driver information...
-      delete src;
+      src->release();
     }
 
   // Write the message catalog...
@@ -149,7 +149,7 @@ main(int  argc,				// I - Number of command-line arguments
   else
     catalog->save_messages(outfile);
 
-  delete catalog;
+  catalog->release();
 
   // If no drivers have been loaded, display the program usage message.
   if (!src)

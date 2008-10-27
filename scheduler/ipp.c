@@ -2547,7 +2547,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     need_restart_job = 1;
 
-    supported = ippFindAttribute(printer->attrs, "port-monitor-supported",
+    supported = ippFindAttribute(printer->ppd_attrs, "port-monitor-supported",
                                  IPP_TAG_NAME);
     if (supported)
     {
@@ -6340,8 +6340,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp", ServerRoot,
-           printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.ipp", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__

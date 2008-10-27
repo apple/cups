@@ -57,10 +57,10 @@ ppdcOption::ppdcOption(ppdcOptType    ot,	// I - Option type
 
 ppdcOption::ppdcOption(ppdcOption *o)		// I - Template option
 {
-  o->name->get();
-  o->text->get();
+  o->name->retain();
+  o->text->retain();
   if (o->defchoice)
-    o->defchoice->get();
+    o->defchoice->retain();
 
   type      = o->type;
   name      = o->name;
@@ -82,7 +82,7 @@ ppdcOption::~ppdcOption()
   text->release();
   if (defchoice)
     defchoice->release();
-  delete choices;
+  choices->release();
 }
 
 
@@ -115,7 +115,7 @@ ppdcOption::set_defchoice(ppdcChoice *c)	// I - Choice
     defchoice->release();
 
   if (c->name)
-    c->name->get();
+    c->name->retain();
 
   defchoice = c->name;
 }

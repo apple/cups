@@ -48,7 +48,7 @@ ppdcArray::ppdcArray(ppdcArray *a)
       memcpy(data, a->data, count * sizeof(ppdcShared *));
 
       for (int i = 0; i < count; i ++)
-        data[i]->get();
+        data[i]->retain();
     }
     else
       data = 0;
@@ -99,6 +99,7 @@ ppdcArray::add(ppdcShared *d)
     data = temp;
   }
 
+  d->retain();
   data[count++] = d;
 }
 

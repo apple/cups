@@ -235,6 +235,40 @@ information file.</P>
 <a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-postscript 0 -
 </pre>
 
+<h3>Custom Command Filters</h3>
+
+<p>The <tt>application/vnd.cups-command</tt> file type is used for CUPS command files. Use the following <tt>Filter</tt> directive to handle CUPS command files:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-command 100 /path/to/command/filter
+</pre>
+
+<p>To use the standard PostScript command filter, specify <var>commandtops</var> as the path to the command filter.</p>
+
+<h3>Custom PDF Filters</h3>
+
+<p>The <tt>application/pdf</tt> file type is used for unfiltered PDF files while the <tt>application/vnd.cups-pdf</tt> file type is used for filtered PDF files. Use the following <tt>Filter</tt> directive to handle filtered PDF files:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-pdf 100 /path/to/pdf/filter
+</pre>
+
+<p>For unfiltered PDF files, use:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/pdf 100 /path/to/pdf/filter
+</pre>
+
+<p>Custom PDF filters that accept filtered data do not need to perform number-up processing and other types of page imposition, while those that accept unfiltered data MUST do the number-up processing themselves.</p>
+
+<h3>Custom PostScript Filters</h3>
+
+<p>The <tt>application/vnd.cups-postscript</tt> file type is used for filtered PostScript files. Use the following <tt>Filter</tt> directive to handle PostScript files:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Filter'>Filter</a> application/vnd.cups-postscript 100 /path/to/postscript/filter
+</pre>
+
 
 <h2 class='title'><a name='COLOR'>Implementing Color Management</a></h2>
 

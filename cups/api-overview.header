@@ -13,8 +13,6 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h1 class="title">Introduction to CUPS Programming</h1>
-
 <div class='summary'><table summary='General Information'>
 <thead>
 <tr>
@@ -37,13 +35,18 @@
 </tr>
 <tr>
 	<th>See Also</th>
-	<td>Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
-	Programming: <a href='api-array.html' target='_top'>Array API</a><br>
-	Programming: <a href='api-filedir.html' target='_top'>File and Directory APIs</a><br>
+	<td>Programming: <a href='raster-driver.html' target='_top'>Developing Raster Printer Drivers</a><br>
+	Programming: <a href='postscript-driver.html' target='_top'>Developing PostScript Printer Drivers</a><br>
 	Programming: <a href='api-filter.html' target='_top'>Filter and Backend Programming</a><br>
+	Programming: <a href='ppd-compiler.html' target='_top'>Introduction to the PPD Compiler</a><br>
+	Programming: <a href='api-array.html' target='_top'>Array API</a><br>
+	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='api-filedir.html' target='_top'>File and Directory APIs</a><br>
 	Programming: <a href='api-httpipp.html' target='_top'>HTTP and IPP APIs</a><br>
 	Programming: <a href='api-ppd.html' target='_top'>PPD API</a><br>
-	Programming: <a href='api-raster.html' target='_top'>Raster API</a></td>
+	Programming: <a href='api-raster.html' target='_top'>Raster API</a><br>
+	References: <a href='ref-ppdcfile.html' target='_top'>PPD Compiler Driver Information File Reference</a><br>
+	Specifications: <a href='spec-ppd.html' target='_top'>CUPS PPD Extensions</a></td>
 </tr>
 </tbody>
 </table></div>

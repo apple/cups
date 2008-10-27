@@ -49,8 +49,8 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
   ppdcOption	*o;			// Current option
 
 
-  g->name->get();
-  g->text->get();
+  g->name->retain();
+  g->text->retain();
 
   name = g->name;
   text = g->text;
@@ -69,7 +69,7 @@ ppdcGroup::~ppdcGroup()
 {
   name->release();
   text->release();
-  delete options;
+  options->release();
 }
 
 

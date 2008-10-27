@@ -514,6 +514,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     launchd_checkin();
+    launchd_checkout();
   }
 #endif /* HAVE_LAUNCHD */
 
@@ -749,6 +750,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  */
 
 	  launchd_checkin();
+	  launchd_checkout();
 	}
 #endif /* HAVE_LAUNCHD */
 

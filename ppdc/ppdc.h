@@ -96,8 +96,8 @@ class ppdcShared			//// Shared Data Value
   ppdcShared();
   virtual ~ppdcShared();
 
-  void		get(void);
-  void		release(void);
+  void		retain();
+  void		release();
 };
 
 class ppdcArray				//// Shared Array

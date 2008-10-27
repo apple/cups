@@ -530,7 +530,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     http->auth_ref = NULL;
   }
 
-  if (httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
+  if (!getenv("GATEWAY_INTERFACE") &&
+      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
 		       auth_key, sizeof(auth_key)))
   {
     status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 

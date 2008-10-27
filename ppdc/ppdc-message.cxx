@@ -44,8 +44,8 @@ ppdcMessage::ppdcMessage(const char *i,	// I - ID
 
 ppdcMessage::~ppdcMessage()
 {
-  delete id;
-  delete string;
+  id->release();
+  string->release();
 }
 
 

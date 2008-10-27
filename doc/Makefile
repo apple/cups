@@ -29,7 +29,10 @@ WEBIMAGES	=	\
 			images/cups.png \
 			images/cups.rgb \
 			images/cups-block-diagram.gif \
+			images/cups-command-chain.png \
 			images/cups-icon.png \
+			images/cups-postscript-chain.png \
+			images/cups-raster-chain.png \
 			images/left.gif \
 			images/raster.png \
 			images/right.gif \
@@ -88,6 +91,7 @@ HELPFILES	=	\
 			help/policies.html \
 			help/postscript-driver.html \
 			help/ppd-compiler.html \
+			help/raster-driver.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \

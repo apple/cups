@@ -16,8 +16,8 @@
 //
 //   ppdcShared::ppdcShared()  - Create shared data.
 //   ppdcShared::~ppdcShared() - Destroy shared data.
-//   ppdcShared::get()         - Increment the use count for this data.
 //   ppdcShared::release()     - Decrement the use count and delete as needed.
+//   ppdcShared::retain()      - Increment the use count for this data.
 //
 
 //
@@ -47,17 +47,6 @@ ppdcShared::~ppdcShared()
 
 
 //
-// 'ppdcShared::get()' - Increment the use count for this data.
-//
-
-void
-ppdcShared::get(void)
-{
-  use ++;
-}
-
-
-//
 // 'ppdcShared::release()' - Decrement the use count and delete as needed.
 //
 
@@ -67,6 +56,17 @@ ppdcShared::release(void)
   use --;
   if (!use)
     delete this;
+}
+
+
+//
+// 'ppdcShared::retain()' - Increment the use count for this data.
+//
+
+void
+ppdcShared::retain()
+{
+  use ++;
 }
 
 

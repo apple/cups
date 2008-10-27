@@ -207,7 +207,7 @@ if test x$rcdir = x; then
 			;;
 
 	esac
-else
+elif test "x$rcdir" != xno; then
 	if test "x$rclevels" = x; then
 		INITDDIR="$rcdir"
 	else
@@ -232,6 +232,8 @@ if test "x$XINETD" = x -a ! -x /sbin/launchd; then
 			break
 		fi
 	done
+elif test "x$XINETD" = xno; then
+	XINETD=""
 fi
 
 AC_SUBST(XINETD)

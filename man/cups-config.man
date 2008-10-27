@@ -12,12 +12,15 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-config 1 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
+.TH cups-config 1 "Common UNIX Printing System" "23 October 2008" "Apple Inc."
 .SH NAME
 cups-config \- get cups api, compiler, directory, and link information.
 .SH SYNOPSIS
 .B cups-config
 --api-version
+.br
+.B cups-config
+--build
 .br
 .B cups-config
 --cflags
@@ -57,6 +60,10 @@ directories for filters, configuration files, and drivers.
 --api-version
 .br
 Displays the current API version (major.minor).
+.TP 5
+--build
+.br
+Displays a system-specific build number.
 .TP 5
 --cflags
 .br
