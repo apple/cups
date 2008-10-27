@@ -91,6 +91,7 @@ HELPFILES	=	\
 			help/policies.html \
 			help/postscript-driver.html \
 			help/ppd-compiler.html \
+			help/raster-driver.html \
 			help/ref-access_log.html \
 			help/ref-classes-conf.html \
 			help/ref-client-conf.html \
