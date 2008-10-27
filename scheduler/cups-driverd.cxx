@@ -364,7 +364,7 @@ cat_drv(const char *name,		/* I - PPD name */
     d->write_ppd_file(out, NULL, locales, src, PPDC_LFONLY);
     cupsFileClose(out);
 
-    delete locales;
+    locales->release();
   }
   else
   {
@@ -384,7 +384,7 @@ cat_drv(const char *name,		/* I - PPD name */
     }
   }
 
-  delete src;
+  src->release();
 
   return (!d);
 }
@@ -1828,7 +1828,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
     fprintf(stderr,
             "ERROR: [cups-driverd] Bad driver information file \"%s\"!\n",
 	    filename);
-    delete src;
+    src->release();
     return (0);
   }
 
@@ -1909,7 +1909,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
 	      mtime, size, d->model_number, type);
   }
 
-  delete src;
+  src->release();
 
   return (1);
 }

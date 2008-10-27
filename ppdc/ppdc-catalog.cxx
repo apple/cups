@@ -96,9 +96,9 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 ppdcCatalog::~ppdcCatalog()
 {
-  delete locale;
-  delete filename;
-  delete messages;
+  locale->release();
+  filename->release();
+  messages->release();
 }
 
 

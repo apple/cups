@@ -112,7 +112,7 @@ main(int  argc,				// I - Number of command-line arguments
   src->write_file(srcfile);
 
   // Delete the printer driver information...
-  delete src;
+  src->release();
 
   // Return with no errors.
   return (0);

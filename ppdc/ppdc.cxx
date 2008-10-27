@@ -181,7 +181,7 @@ main(int  argc,				// I - Number of command-line arguments
 				    "\"%s\"...\n"), argv[i]);
 
         	if (catalog)
-	          delete catalog;
+	          catalog->release();
 
         	catalog = new ppdcCatalog(argv[i]);
 
@@ -371,11 +371,11 @@ main(int  argc,				// I - Number of command-line arguments
     usage();
 
   // Delete the printer driver information...
-  delete src;
+  src->release();
 
   // Message catalog...
   if (catalog)
-    delete catalog;
+    catalog->release();
 
   // Return with no errors.
   return (0);

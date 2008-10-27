@@ -115,12 +115,12 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
 
 ppdcSource::~ppdcSource()
 {
-  delete filename;
-  delete base_fonts;
-  delete drivers;
-  delete po_files;
-  delete sizes;
-  delete vars;
+  filename->release();
+  base_fonts->release();
+  drivers->release();
+  po_files->release();
+  sizes->release();
+  vars->release();
 }
 
 
@@ -1672,7 +1672,7 @@ ppdcSource::get_po(ppdcFile *fp)	// I - File to read
     cat = new ppdcCatalog(locale, pofilename);
 
     // Reset the filename to the name supplied by the user...
-    delete cat->filename;
+    cat->filename->release();
     cat->filename = new ppdcString(poname);
 
     // Return the catalog...

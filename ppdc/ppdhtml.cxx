@@ -150,8 +150,8 @@ main(int  argc,				// I - Number of command-line arguments
       puts("</body>");
       puts("</html>");
       // Delete the printer driver information...
-      delete composite;
-      delete src;
+      composite->release();
+      src->release();
     }
 
   // If no drivers have been loaded, display the program usage message.

@@ -51,7 +51,7 @@ main(int  argc,				// I - Number of command-line arguments
        m = (ppdcMessage *)catalog->messages->next())
     printf("%s: %s\n", m->id->value, m->string->value);
 
-  delete catalog;
+  catalog->release();
 
   // Return with no errors.
   return (0);
