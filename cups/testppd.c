@@ -724,7 +724,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
     {
       int		j, k;		/* Looping vars */
-      ppd_attr_t	*attr;		/* Current attribute */
       ppd_group_t	*group;		/* Option group */
       ppd_option_t	*option;	/* Option */
       ppd_coption_t	*coption;	/* Custom option */
@@ -749,6 +748,14 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
 
       ppdLocalize(ppd);
+
+      if (argc > 3)
+      {
+        text = ppdLocalizeIPPReason(ppd, argv[3], NULL, buffer, sizeof(buffer));
+	printf("ppdLocalizeIPPReason(%s)=%s\n", argv[3],
+	       text ? text : "(null)");
+	return (text == NULL);
+      }
 
       for (i = ppd->num_groups, group = ppd->groups;
 	   i > 0;
