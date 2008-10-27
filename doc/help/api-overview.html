@@ -27,6 +27,11 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.example {
+  font-style: italic;
+  margin-left: 36pt;
+}
+  
 PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
@@ -54,6 +59,16 @@ BLOCKQUOTE {
   padding: 10pt;
 }
 
+A IMG {
+  border: none;
+}
+
+A:link:hover IMG {
+  background: #f0f0f0;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+
 A:link, A:visited {
   font-weight: normal;
   text-decoration: none;
@@ -65,6 +80,19 @@ A:link:hover, A:visited:hover, A:active {
 
 SUB, SUP {
   font-size: 50%;
+}
+
+TR.data, TD.data, TR.data TD {
+  margin-top: 10pt;
+  padding: 5pt;
+  border-bottom: solid 1pt #999999;
+}
+
+TR.data TH {
+  border-bottom: solid 1pt #999999;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
 }
 
 DIV.table TABLE {
@@ -110,9 +138,13 @@ DIV.figure CAPTION {
 }
 
 TH.label {
-  padding-top: 5pt;
   text-align: right;
   vertical-align: top;
+}
+
+TH.sublabel {
+  text-align: right;
+  font-weight: normal;
 }
 
 HR {
@@ -120,9 +152,9 @@ HR {
 }
 
 SPAN.info {
-  background: #000000;
-  border: thin solid #000000;
-  color: #ffffff;
+  background: black;
+  border: thin solid black;
+  color: white;
   font-size: 80%;
   font-style: italic;
   font-weight: bold;
@@ -136,6 +168,57 @@ H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
 
 H2.title, H3.title {
   border-bottom: solid 2pt #000000;
+}
+
+DIV.indent, TABLE.indent {
+  margin-top: 2em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.indent {
+  border-collapse: collapse;
+}
+
+TABLE.indent TD, TABLE.indent TH {
+  padding: 0;
+}
+
+TABLE.list {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+TABLE.list TH {
+  background: white;
+  border-bottom: solid thin #cccccc;
+  color: #444444;
+  padding-top: 10pt;
+  padding-left: 5pt;
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+TABLE.list TH A {
+  color: #4444cc;
+}
+
+TABLE.list TD {
+  border-bottom: solid thin #eeeeee;
+  padding-top: 5pt;
+  padding-left: 5pt;
+}
+
+TABLE.list TR:nth-child(even) {
+  background: #f8f8f8;
+}
+
+TABLE.list TR:nth-child(odd) {
+  background: #f4f4f4;
 }
 
 DT {
@@ -154,11 +237,6 @@ DL.category DT {
 P.summary {
   margin-left: 36pt;
   font-family: monaco, courier, monospace;
-}
-
-SPAN.message {
-  font-style: italic;
-  font-size: smaller;
 }
 
 DIV.summary TABLE {
@@ -267,8 +345,6 @@ div.contents ul.subcontents li {
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h1 class="title">Introduction to CUPS Programming</h1>
-
 <div class='summary'><table summary='General Information'>
 <thead>
 <tr>
@@ -291,13 +367,18 @@ div.contents ul.subcontents li {
 </tr>
 <tr>
 	<th>See Also</th>
-	<td>Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
-	Programming: <a href='api-array.html' target='_top'>Array API</a><br>
-	Programming: <a href='api-filedir.html' target='_top'>File and Directory APIs</a><br>
+	<td>Programming: <a href='raster-driver.html' target='_top'>Developing Raster Printer Drivers</a><br>
+	Programming: <a href='postscript-driver.html' target='_top'>Developing PostScript Printer Drivers</a><br>
 	Programming: <a href='api-filter.html' target='_top'>Filter and Backend Programming</a><br>
+	Programming: <a href='ppd-compiler.html' target='_top'>Introduction to the PPD Compiler</a><br>
+	Programming: <a href='api-array.html' target='_top'>Array API</a><br>
+	Programming: <a href='api-cups.html' target='_top'>CUPS API</a><br>
+	Programming: <a href='api-filedir.html' target='_top'>File and Directory APIs</a><br>
 	Programming: <a href='api-httpipp.html' target='_top'>HTTP and IPP APIs</a><br>
 	Programming: <a href='api-ppd.html' target='_top'>PPD API</a><br>
-	Programming: <a href='api-raster.html' target='_top'>Raster API</a></td>
+	Programming: <a href='api-raster.html' target='_top'>Raster API</a><br>
+	References: <a href='ref-ppdcfile.html' target='_top'>PPD Compiler Driver Information File Reference</a><br>
+	Specifications: <a href='spec-ppd.html' target='_top'>CUPS PPD Extensions</a></td>
 </tr>
 </tbody>
 </table></div>
