@@ -264,7 +264,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/help/whatsnew.html
 %dir /usr/share/doc/cups/images
 /usr/share/doc/cups/images/*
-/usr/share/locale/*
+#/usr/share/locale/*
 
 %dir /usr/share/man/man1
 /usr/share/man/man1/cancel.1.gz
@@ -317,6 +317,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root)
+%dir /usr/share/cups/examples
+/usr/share/cups/examples/*
 %dir /usr/share/man/man1
 /usr/share/man/man1/cups-config.1.gz
 /usr/share/man/man1/ppd*.1.gz
@@ -337,6 +339,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/api*.html
+/usr/share/doc/cups/help/postscript-driver.html
+/usr/share/doc/cups/help/ppd-compiler.html
+/usr/share/doc/cups/help/raster-driver.html
 /usr/share/doc/cups/help/spec*.html
 
 %files libs

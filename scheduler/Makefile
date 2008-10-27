@@ -44,13 +44,9 @@ LIBOBJS =	\
 		filter.o \
 		mime.o \
 		type.o
-LIB32OBJS	= $(LIBOBJS:.o=.32.o)
-LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 COBJS	=	\
 		$(CUPSDOBJS) \
 		$(LIBOBJS) \
-		$(LIB32OBJS) \
-		$(LIB64OBJS) \
 		cupsfilter.o \
 		cups-deviced.o \
 		cups-lpd.o \
@@ -68,8 +64,6 @@ OBJS	=	\
 		$(CXXOBJS)
 LIBTARGETS =	\
 		$(LIBCUPSMIME) \
-		$(LIB32CUPSMIME) \
-		$(LIB64CUPSMIME) \
 		libcupsmime.a
 
 UNITTARGETS =	\
@@ -118,7 +112,6 @@ clean:
 	$(RM) $(OBJS)
 	$(RM) $(TARGETS) $(UNITTARGETS) convert
 	$(RM) libcupsmime.so libcupsmime.sl libcupsmime.dylib
-	$(RM) -r 32bit 64bit
 
 
 #
@@ -126,17 +119,8 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp Dependencies.tmplib
-	makedepend -Y -I.. -fDependencies.tmp $(COBJS:.o=.c) \
+	makedepend -Y -I.. -fDependencies $(COBJS:.o=.c) \
 		$(CXXOBJS:.o=.cxx) >/dev/null 2>&1
-	makedepend -Y -I.. -fDependencies.tmplib $(LIBOBJS:.o=.c) >/dev/null 2>&1
-	$(RM) Dependencies
-	cp Dependencies.tmp Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' \
-		Dependencies.tmplib >>Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' \
-		Dependencies.tmplib >>Dependencies
-	$(RM) Dependencies.tmp Dependencies.tmplib
 
 
 #
@@ -230,7 +214,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSMIME) $(LIBDIR)
@@ -252,24 +236,12 @@ installstatic:
 	$(INSTALL_LIB) libcupsmime.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsmime.a
 
-install32bit:
-	echo Installing libraries in $(LIB32DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB32DIR)
-	$(INSTALL_LIB) 32bit/libcupsmime.so.1 $(LIB32DIR)/libcupsmime.so.1
-	$(LN) libcupsmime.so.1 $(LIB32DIR)/libcupsmime.so
-
-install64bit:
-	echo Installing libraries in $(LIB64DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB64DIR)
-	$(INSTALL_LIB) 64bit/libcupsmime.so.1 $(LIB64DIR)/libcupsmime.so.1
-	$(LN) libcupsmime.so.1 $(LIB64DIR)/libcupsmime.so
-
 
 #
 # Uninstall the scheduler...
 #
 
-uninstall: $(UNINSTALL32) $(UNINSTALL64)
+uninstall:
 	$(RM) $(SBINDIR)/cupsd
 	$(RM) $(SBINDIR)/cupsfilter
 	$(RM) $(SERVERBIN)/daemon/cups-deviced
@@ -301,16 +273,6 @@ uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/mime.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
-
-uninstall32bit:
-	$(RM) $(LIB32DIR)/libcupsmime.so
-	$(RM) $(LIB32DIR)/libcupsmime.so.1
-	-$(RMDIR) $(LIB32DIR)
-
-uninstall64bit:
-	$(RM) $(LIB64DIR)/libcupsmime.so
-	$(RM) $(LIB64DIR)/libcupsmime.so.1
-	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -410,30 +372,6 @@ libcupsmime.so.1 libcupsmime.sl.1:	$(LIBOBJS)
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
-
-
-#
-# 32bit/libcupsmime.so.1
-#
-
-32bit/libcupsmime.so.1:	$(LIB32OBJS)
-	echo Linking 32-bit $@...
-	-mkdir 32bit
-	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
-	$(RM) 32bit/libcupsmime.so
-	$(LN) libcupsmime.so.1 32bit/libcupsmime.so
-
-
-#
-# 64bit/libcupsmime.so.1
-#
-
-64bit/libcupsmime.so.1:	$(LIB64OBJS)
-	echo Linking 64-bit $@...
-	-mkdir 64bit
-	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
-	$(RM) 64bit/libcupsmime.so
-	$(LN) libcupsmime.so.1 64bit/libcupsmime.so
 
 
 #

@@ -22,12 +22,8 @@ LIBOBJS	=	\
 		search.o \
 		template.o \
 		var.o
-LIB32OBJS	= $(LIBOBJS:.o=.32.o)
-LIB64OBJS	= $(LIBOBJS:.o=.64.o)
 OBJS	=	\
 		$(LIBOBJS) \
-		$(LIB32OBJS) \
-		$(LIB64OBJS) \
 		admin.o \
 		classes.o \
 		help.o \
@@ -46,8 +42,6 @@ CGIS	=	\
 LIBTARGETS =	\
 		libcupscgi.a \
 		$(LIBCUPSCGI) \
-		$(LIB32CUPSCGI) \
-		$(LIB32CUPSCGI) \
 		websearch
 
 UNITTARGETS =	\
@@ -88,7 +82,6 @@ unittests:	$(UNITTARGETS)
 clean:
 	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
 	$(RM) libcupscgi.so libcupscgi.sl libcupscgi.dylib
-	$(RM) -r 32bit 64bit
 
 
 #
@@ -96,13 +89,7 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
-	$(RM) Dependencies
-	cp Dependencies.tmp Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
-	$(RM) Dependencies.tmp
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -151,7 +138,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSCGI) $(LIBDIR)
@@ -173,24 +160,12 @@ installstatic:
 	$(INSTALL_LIB) libcupscgi.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupscgi.a
 
-install32bit:
-	echo Installing libraries in $(LIB32DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB32DIR)
-	$(INSTALL_LIB) 32bit/libcupscgi.so.1 $(LIB32DIR)/libcupscgi.so.1
-	$(LN) libcupscgi.so.1 $(LIB32DIR)/libcupscgi.so
-
-install64bit:
-	echo Installing libraries in $(LIB64DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB64DIR)
-	$(INSTALL_LIB) 64bit/libcupscgi.so.1 $(LIB64DIR)/libcupscgi.so.1
-	$(LN) libcupscgi.so.1 $(LIB64DIR)/libcupscgi.so
-
 
 #
 # Uninstall all targets...
 #
 
-uninstall: $(UNINSTALL32) $(UNINSTALL64)
+uninstall:
 	for file in $(CGIS); do \
 		$(RM) $(SERVERBIN)/cgi-bin/$$file; \
 	done
@@ -207,16 +182,6 @@ uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(INCLUDEDIR)/cups/cgi.h
 	$(RM) $(INCLUDEDIR)/cups/help-index.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
-
-uninstall32bit:
-	$(RM) $(LIB32DIR)/libcupscgi.so
-	$(RM) $(LIB32DIR)/libcupscgi.so.1
-	-$(RMDIR) $(LIB32DIR)
-
-uninstall64bit:
-	$(RM) $(LIB64DIR)/libcupscgi.so
-	$(RM) $(LIB64DIR)/libcupscgi.so.1
-	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -248,30 +213,6 @@ libcupscgi.so.1 libcupscgi.sl.1:	$(LIBOBJS)
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
-
-
-#
-# 32bit/libcupscgi.so.1
-#
-
-32bit/libcupscgi.so.1:	$(LIB32OBJS)
-	echo Linking 32-bit $@...
-	-mkdir 32bit
-	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
-	$(RM) 32bit/libcupscgi.so
-	$(LN) libcupscgi.so.1 32bit/libcupscgi.so
-
-
-#
-# 64bit/libcupscgi.so.1
-#
-
-64bit/libcupscgi.so.1:	$(LIB64OBJS)
-	echo Linking 64-bit $@...
-	-mkdir 64bit
-	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
-	$(RM) 64bit/libcupscgi.so
-	$(LN) libcupscgi.so.1 64bit/libcupscgi.so
 
 
 #
