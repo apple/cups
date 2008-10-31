@@ -26,12 +26,12 @@
  *   launchd_checkout()        - Check-out with launchd.
  *   parent_handler()          - Catch USR1/CHLD signals...
  *   process_children()        - Process all dead children...
+ *   select_timeout()          - Calculate the select timeout value.
  *   sigchld_handler()         - Handle 'child' signals from old processes.
  *   sighup_handler()          - Handle 'hangup' signals to reconfigure the
  *                               scheduler.
  *   sigterm_handler()         - Handle 'terminate' signals that stop the
  *                               scheduler.
- *   select_timeout()          - Calculate the select timeout value.
  *   usage()                   - Show scheduler usage.
  */
 
@@ -1770,66 +1770,6 @@ process_children(void)
 
 
 /*
- * 'sigchld_handler()' - Handle 'child' signals from old processes.
- */
-
-static void
-sigchld_handler(int sig)		/* I - Signal number */
-{
-  (void)sig;
-
- /*
-  * Flag that we have dead children...
-  */
-
-  dead_children = 1;
-
- /*
-  * Reset the signal handler as needed...
-  */
-
-#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
-  signal(SIGCLD, sigchld_handler);
-#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
-}
-
-
-/*
- * 'sighup_handler()' - Handle 'hangup' signals to reconfigure the scheduler.
- */
-
-static void
-sighup_handler(int sig)			/* I - Signal number */
-{
-  (void)sig;
-
-  NeedReload = RELOAD_ALL;
-  ReloadTime = time(NULL);
-
-#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
-  signal(SIGHUP, sighup_handler);
-#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
-}
-
-
-/*
- * 'sigterm_handler()' - Handle 'terminate' signals that stop the scheduler.
- */
-
-static void
-sigterm_handler(int sig)		/* I - Signal number */
-{
-  (void)sig;	/* remove compiler warnings... */
-
- /*
-  * Flag that we should stop and return...
-  */
-
-  stop_scheduler = 1;
-}
-
-
-/*
  * 'select_timeout()' - Calculate the select timeout value.
  *
  */
@@ -1873,6 +1813,18 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   now     = time(NULL);
   timeout = now + 86400;		/* 86400 == 1 day */
   why     = "do nothing";
+
+#ifdef __APPLE__
+ /*
+  * When going to sleep, wake up to cancel jobs that don't complete in time.
+  */
+
+  if (SleepJobs > 0 && SleepJobs < timeout)
+  {
+    timeout = SleepJobs;
+    why     = "cancel jobs before sleeping";
+  }
+#endif /* __APPLE__ */
 
  /*
   * Check whether we are accepting new connections...
@@ -2026,6 +1978,66 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
                   fds, timeout, why);
 
   return (timeout);
+}
+
+
+/*
+ * 'sigchld_handler()' - Handle 'child' signals from old processes.
+ */
+
+static void
+sigchld_handler(int sig)		/* I - Signal number */
+{
+  (void)sig;
+
+ /*
+  * Flag that we have dead children...
+  */
+
+  dead_children = 1;
+
+ /*
+  * Reset the signal handler as needed...
+  */
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGCLD, sigchld_handler);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
+}
+
+
+/*
+ * 'sighup_handler()' - Handle 'hangup' signals to reconfigure the scheduler.
+ */
+
+static void
+sighup_handler(int sig)			/* I - Signal number */
+{
+  (void)sig;
+
+  NeedReload = RELOAD_ALL;
+  ReloadTime = time(NULL);
+
+#if !defined(HAVE_SIGSET) && !defined(HAVE_SIGACTION)
+  signal(SIGHUP, sighup_handler);
+#endif /* !HAVE_SIGSET && !HAVE_SIGACTION */
+}
+
+
+/*
+ * 'sigterm_handler()' - Handle 'terminate' signals that stop the scheduler.
+ */
+
+static void
+sigterm_handler(int sig)		/* I - Signal number */
+{
+  (void)sig;	/* remove compiler warnings... */
+
+ /*
+  * Flag that we should stop and return...
+  */
+
+  stop_scheduler = 1;
 }
 
 

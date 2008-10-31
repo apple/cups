@@ -764,15 +764,11 @@ sysUpdate(void)
 
     if (sysevent.event & SYSEVENT_WILLSLEEP)
     {
-      int num_printing_jobs;		/* Number of jobs printing */
-
-
       cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep");
 
       Sleeping = 1;
 
-      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers),
-               num_printing_jobs = 0;
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
            p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
       {
@@ -789,36 +785,6 @@ sysUpdate(void)
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deregistering local printer \"%s\"", p->name);
 	  cupsdDeregisterPrinter(p, 0);
-
-	  if (p->job)
-	  {
-	    for (i = 0; i < p->num_reasons; i ++)
-	      if (!strcmp(p->reasons[i], "connecting-to-device"))
-		break;
-
-	    if (i < p->num_reasons)
-	    {
-	     /*
-	      * Job started but not connected to device, so force stop the
-	      * job...
-	      */
-
-              cupsd_job_t *job = p->job;/* Job */
-
-	      cupsdStopJob(job, 1);
-
-	      job->state->values[0].integer = IPP_JOB_PENDING;
-	      job->state_value              = IPP_JOB_PENDING;
-	    }
-	    else
-	    {
-	     /*
-	      * Job is printing, bump our num_printing_jobs count...
-	      */
-
-	      num_printing_jobs ++;
-	    }
-	  }
 	}
       }
 
@@ -830,7 +796,7 @@ sysUpdate(void)
       * we'll take more drastic measures...
       */
 
-      if (num_printing_jobs == 0)
+      if (cupsArrayCount(PrintingJobs) == 0)
 	IOAllowPowerChange(sysevent.powerKernelPort,
 			   sysevent.powerNotificationID);
       else
