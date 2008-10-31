@@ -1,5 +1,11 @@
-CHANGES.txt - 2008-10-10
+CHANGES.txt - 2008-10-31
 ------------------------
+
+CHANGES IN CUPS V1.4b2
+
+	- The IPP, LPD, and socket backends used different "connecting"
+	  progress messages.
+
 
 CHANGES IN CUPS V1.4b1
 

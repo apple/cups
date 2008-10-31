@@ -698,7 +698,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     fputs("STATE: +connecting-to-device\n", stderr);
     _cupsLangPrintf(stderr,
-		    _("INFO: Attempting to connect to host %s for printer %s\n"),
+		    _("INFO: Connecting to %s for printer %s\n"),
 		    hostname, printer);
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,
