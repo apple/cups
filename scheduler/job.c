@@ -216,6 +216,16 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   cupsArrayRemove(ActiveJobs, job);
   cupsArrayRemove(PrintingJobs, job);
 
+#ifdef __APPLE__
+ /*
+  * If we are going to sleep and the PrintingJobs count is now 0, allow the
+  * sleep to happen immediately...
+  */
+
+  if (Sleeping && cupsArrayCount(PrintingJobs) == 0)
+    cupsdAllowSleep();
+#endif /* __APPLE__ */
+
  /*
   * Remove any authentication data...
   */

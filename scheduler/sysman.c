@@ -19,6 +19,7 @@
  *                                     write.
  *   cupsdSetBusyState()             - Let the system know when we are busy
  *                                     doing something.
+ *   cupsdAllowSleep()               - Tell the OS it is now OK to sleep.
  *   cupsdStartSystemMonitor()       - Start monitoring for system change.
  *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
  *   sysEventThreadEntry()           - A thread to receive power and computer
@@ -227,6 +228,7 @@ static CFStringRef	ComputerNameKey = NULL,
 					/* Netowrk interface key */
 			NetworkInterfaceKeyIPv6 = NULL;
 					/* Netowrk interface key */
+static cupsd_sysevent_t	LastSysEvent;	/* Last system event (for delayed sleep) */
 
 
 /* 
@@ -242,6 +244,20 @@ static void	sysEventConfigurationNotifier(SCDynamicStoreRef store,
 					      void *context);
 static void	sysEventTimerNotifier(CFRunLoopTimerRef timer, void *context);
 static void	sysUpdate(void);
+
+
+/*
+ * 'cupsdAllowSleep()' - Tell the OS it is now OK to sleep.
+ */
+
+void
+cupsdAllowSleep(void)
+{
+  cupsdCleanDirty();
+
+  IOAllowPowerChange(LastSysEvent.powerKernelPort,
+		     LastSysEvent.powerNotificationID);
+}
 
 
 /*
@@ -748,13 +764,15 @@ sysUpdate(void)
 
     if (sysevent.event & SYSEVENT_WILLSLEEP)
     {
+      int num_printing_jobs;		/* Number of jobs printing */
+
+
       cupsdLogMessage(CUPSD_LOG_DEBUG, "System going to sleep");
 
       Sleeping = 1;
 
-      cupsdStopAllJobs(0);
-
-      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+      for (p = (cupsd_printer_t *)cupsArrayFirst(Printers),
+               num_printing_jobs = 0;
            p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
       {
@@ -771,13 +789,55 @@ sysUpdate(void)
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "Deregistering local printer \"%s\"", p->name);
 	  cupsdDeregisterPrinter(p, 0);
+
+	  if (p->job)
+	  {
+	    for (i = 0; i < p->num_reasons; i ++)
+	      if (!strcmp(p->reasons[i], "connecting-to-device"))
+		break;
+
+	    if (i < p->num_reasons)
+	    {
+	     /*
+	      * Job started but not connected to device, so force stop the
+	      * job...
+	      */
+
+              cupsd_job_t *job = p->job;/* Job */
+
+	      cupsdStopJob(job, 1);
+
+	      job->state->values[0].integer = IPP_JOB_PENDING;
+	      job->state_value              = IPP_JOB_PENDING;
+	    }
+	    else
+	    {
+	     /*
+	      * Job is printing, bump our num_printing_jobs count...
+	      */
+
+	      num_printing_jobs ++;
+	    }
+	  }
 	}
       }
 
       cupsdCleanDirty();
 
-      IOAllowPowerChange(sysevent.powerKernelPort,
-                         sysevent.powerNotificationID);
+     /*
+      * If we have no printing jobs, allow the power change immediately.
+      * Otherwise set the SleepJobs time to 20 seconds in the future when
+      * we'll take more drastic measures...
+      */
+
+      if (num_printing_jobs == 0)
+	IOAllowPowerChange(sysevent.powerKernelPort,
+			   sysevent.powerNotificationID);
+      else
+      {
+        LastSysEvent = sysevent;
+        SleepJobs    = time(NULL) + 20;
+      }
     }
 
     if (sysevent.event & SYSEVENT_WOKE)

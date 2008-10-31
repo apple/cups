@@ -873,6 +873,20 @@ main(int  argc,				/* I - Number of command-line args */
     if (DirtyCleanTime && current_time >= DirtyCleanTime)
       cupsdCleanDirty();
 
+#ifdef __APPLE__
+   /*
+    * If we are going to sleep and still have pending jobs, stop them after
+    * a period of time...
+    */
+
+    if (SleepJobs > 0 && current_time >= SleepJobs &&
+        cupsArrayCount(PrintingJobs) > 0)
+    {
+      SleepJobs = 0;
+      cupsdStopAllJobs(0);
+    }
+#endif /* __APPLE__ */
+
 #ifndef __APPLE__
    /*
     * Update the network interfaces once a minute...

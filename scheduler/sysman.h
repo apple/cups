@@ -38,6 +38,9 @@ VAR time_t		DirtyCleanTime	VALUE(0);
 VAR int			Sleeping	VALUE(0);
 					/* Non-zero if machine is entering or *
 					 * in a sleep state...                */
+VAR time_t		SleepJobs	VALUE(0);
+					/* Time when all jobs must be         *
+					 * canceled for system sleep.         */
 #ifdef __APPLE__
 VAR int			SysEventPipes[2] VALUE2(-1,-1);
 					/* System event notification pipes */
@@ -48,6 +51,7 @@ VAR int			SysEventPipes[2] VALUE2(-1,-1);
  * Prototypes...
  */
 
+extern void	cupsdAllowSleep(void);
 extern void	cupsdCleanDirty(void);
 extern void	cupsdMarkDirty(int what);
 extern void	cupsdSetBusyState(void);
