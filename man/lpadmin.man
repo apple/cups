@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "Common UNIX Printing System" "2 January 2008" "Apple Inc."
+.TH lpadmin 8 "Common UNIX Printing System" "3 November 2008" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -173,7 +173,7 @@ Provides a textual description of the printer.
 -E
 .br
 Enables the printer and accepts jobs; this is the same as running the
-\fIaccept(8)\fR and \fIcupsenable(8)\fR programs on the printer.
+\fIcupsaccept(8)\fR and \fIcupsenable(8)\fR programs on the printer.
 .TP 5
 -L "location"
 .br
@@ -196,7 +196,7 @@ requires the root user to execute this command.
 The CUPS version of \fIlpadmin\fR does not support all of the
 System V or Solaris printing system configuration options.
 .SH SEE ALSO
-\fIaccept(8)\fR, \fIcupsenable(8)\fR, \fIlpinfo(8)\fR,
+\fIcupsaccept(8)\fR, \fIcupsenable(8)\fR, \fIlpinfo(8)\fR,
 \fIlpoptions(1)\fR,
 .br
 http://localhost:631/help
