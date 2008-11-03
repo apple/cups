@@ -118,7 +118,7 @@ clients may be unreliable.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007 by Apple Inc.
+Copyright 2007-2008 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
