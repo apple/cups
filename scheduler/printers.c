@@ -1544,7 +1544,8 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      cupsFilePutConf(fp, "Reason", printer->reasons[i]);
+      if (strcmp(printer->reasons[i], "connecting-to-device"))
+        cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
 
