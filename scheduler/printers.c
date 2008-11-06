@@ -2633,7 +2633,8 @@ cupsdSetPrinterReasons(
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
-	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+          if (strcmp(reason, "connecting-to-device"))
+	    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
 	  if (PrintcapFormat == PRINTCAP_PLIST)
 	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
@@ -2657,7 +2658,8 @@ cupsdSetPrinterReasons(
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
 
-	cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+	if (strcmp(reason, "connecting-to-device"))
+	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
 	if (PrintcapFormat == PRINTCAP_PLIST)
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
