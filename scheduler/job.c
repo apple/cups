@@ -488,12 +488,10 @@ cupsdCheckJobs(void)
 	     !printer->job))				/* and not printing */
         {
 	 /* 
-	  * Clear any message and reasons for the queue...
+	  * Clear any message for the queue...
 	  */
 
           printer->state_message[0] = '\0';
-
-	  cupsdSetPrinterReasons(printer, "none");
 
 	 /*
 	  * Start the job...
