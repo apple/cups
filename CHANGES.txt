@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-10-31
+CHANGES.txt - 2008-11-06
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
+	- The cupsfilter utility did not set the CONTENT_TYPE environment
+	  variable when running filters.
 	- The scheduler now waits to allow system sleep until the jobs
 	  have all stopped.
 	- The IPP, LPD, and socket backends used different "connecting"
