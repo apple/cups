@@ -1077,6 +1077,15 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	break;
 
     default :
+        if (!data_ready(con) && recv(con->http.fd, buf, 1, MSG_PEEK) < 1)
+	{
+	 /*
+	  * Connection closed...
+	  */
+
+          cupsdCloseClient(con);
+	  return;
+	}
         break; /* Anti-compiler-warning-code */
   }
 
@@ -2522,7 +2531,7 @@ cupsdSendHeader(
       return (0);
   }
   if (code == HTTP_METHOD_NOT_ALLOWED)
-    if (httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST\r\n") < 0)
+    if (httpPrintf(HTTP(con), "Allow: GET, HEAD, OPTIONS, POST, PUT\r\n") < 0)
       return (0);
 
   if (code == HTTP_UNAUTHORIZED)
