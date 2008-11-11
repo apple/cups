@@ -966,7 +966,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
         if (strcmp(con->uri, "*"))
 	{
-	  char	method[HTTP_MAX_URI],	/* Method/scheme */
+	  char	scheme[HTTP_MAX_URI],	/* Method/scheme */
 		userpass[HTTP_MAX_URI],	/* Username:password */
 		hostname[HTTP_MAX_URI],	/* Hostname */
 		resource[HTTP_MAX_URI];	/* Resource path */
@@ -978,7 +978,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  */
 
           httpSeparateURI(HTTP_URI_CODING_MOST, con->uri,
-	                  method, sizeof(method),
+	                  scheme, sizeof(scheme),
 	                  userpass, sizeof(userpass),
 			  hostname, sizeof(hostname), &port,
 			  resource, sizeof(resource));
@@ -988,10 +988,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  * address...
 	  */
 
-	  if (strcmp(method, "file") &&
+	  if (strcmp(scheme, "file") &&
 	      strcasecmp(hostname, ServerName) &&
 	      strcasecmp(hostname, "localhost") &&
-	      !isdigit(hostname[0]))
+	      !isdigit(hostname[0]) && hostname[0] != '[')
 	  {
 	   /*
 	    * Nope, we don't do proxies...
@@ -1137,6 +1137,29 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
      /*
       * HTTP/1.1 and higher require the "Host:" field...
       */
+
+      if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
+      {
+	cupsdCloseClient(con);
+	return;
+      }
+    }
+    else if (httpAddrLocalhost(con->http.hostaddr) &&
+             strcasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost") &&
+	     strncasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost:", 10) &&
+	     strcmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1") &&
+	     strncmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1:", 10) &&
+	     strcmp(con->http.fields[HTTP_FIELD_HOST], "[::1]") &&
+	     strncmp(con->http.fields[HTTP_FIELD_HOST], "[::1]:", 6))
+    {
+     /*
+      * Access to localhost must use "localhost" or the corresponding IPv4
+      * or IPv6 values in the Host: field.
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+                      "Request from \"%s\" using invalid Host: field \"%s\"",
+		      con->http.hostname, con->http.fields[HTTP_FIELD_HOST]);
 
       if (!cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE))
       {

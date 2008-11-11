@@ -1,4 +1,4 @@
-CHANGES.txt - 2008-11-06
+CHANGES.txt - 2008-11-11
 ------------------------
 
 CHANGES IN CUPS V1.4b2
