@@ -19,11 +19,11 @@ include ../Makedefs
 
 
 FILTERS	=	\
-		bannertops \
+		$(BANNERTOPS) \
 		commandtops \
 		gziptoany \
 		hpgltops \
-		texttops \
+		$(TEXTTOPS) \
 		pstops \
 		$(IMGFILTERS) \
 		$(PDFTOPS) \

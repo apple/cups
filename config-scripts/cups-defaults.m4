@@ -413,6 +413,33 @@ AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP
 AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
+dnl Filters
+AC_ARG_ENABLE(bannertops, [  --enable-bannertops     build with default banner filter, default=auto ])
+AC_ARG_ENABLE(texttops, [  --enable-texttops       build with default text filter, default=auto ])
+
+if test "x$enable_bannertops" = xno; then
+	BANNERTOPS=""
+elif test "x$enable_bannertops" = xyes; then
+	BANNERTOPS="bannertops"
+elif test $uname = Darwin; then
+	BANNERTOPS=""
+else
+	BANNERTOPS="bannertops"
+fi
+
+if test "x$enable_texttops" = xno; then
+	TEXTTOPS=""
+elif test "x$enable_texttops" = xyes; then
+	TEXTTOPS="texttops"
+elif test $uname = Darwin; then
+	TEXTTOPS=""
+else
+	TEXTTOPS="texttops"
+fi
+
+AC_SUBST(BANNERTOPS)
+AC_SUBST(TEXTTOPS)
+
 dnl
 dnl End of "$Id$".
 dnl
