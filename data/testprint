@@ -4,3 +4,5 @@ Header Printer Test Page
 Footer Printer Test Page
 Notice This test page was produced by CUPS 1.4.
 Image images/cups.rgb
+Image images/color-wheel.rgb
+
