@@ -150,7 +150,7 @@ ppdcCatalog::add_message(
     string = text;
   }
 
-  messages->add(new ppdcMessage(id, text));
+  messages->add(new ppdcMessage(id, string));
 }
 
 
