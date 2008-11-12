@@ -19,6 +19,7 @@
  *                                     write.
  *   cupsdSetBusyState()             - Let the system know when we are busy
  *                                     doing something.
+ *   cupsdAllowSleep()               - Tell the OS it is now OK to sleep.
  *   cupsdStartSystemMonitor()       - Start monitoring for system change.
  *   cupsdStopSystemMonitor()        - Stop monitoring for system change.
  *   sysEventThreadEntry()           - A thread to receive power and computer
@@ -227,6 +228,7 @@ static CFStringRef	ComputerNameKey = NULL,
 					/* Netowrk interface key */
 			NetworkInterfaceKeyIPv6 = NULL;
 					/* Netowrk interface key */
+static cupsd_sysevent_t	LastSysEvent;	/* Last system event (for delayed sleep) */
 
 
 /* 
@@ -242,6 +244,20 @@ static void	sysEventConfigurationNotifier(SCDynamicStoreRef store,
 					      void *context);
 static void	sysEventTimerNotifier(CFRunLoopTimerRef timer, void *context);
 static void	sysUpdate(void);
+
+
+/*
+ * 'cupsdAllowSleep()' - Tell the OS it is now OK to sleep.
+ */
+
+void
+cupsdAllowSleep(void)
+{
+  cupsdCleanDirty();
+
+  IOAllowPowerChange(LastSysEvent.powerKernelPort,
+		     LastSysEvent.powerNotificationID);
+}
 
 
 /*
@@ -752,8 +768,6 @@ sysUpdate(void)
 
       Sleeping = 1;
 
-      cupsdStopAllJobs(0);
-
       for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
            p;
 	   p = (cupsd_printer_t *)cupsArrayNext(Printers))
@@ -776,8 +790,20 @@ sysUpdate(void)
 
       cupsdCleanDirty();
 
-      IOAllowPowerChange(sysevent.powerKernelPort,
-                         sysevent.powerNotificationID);
+     /*
+      * If we have no printing jobs, allow the power change immediately.
+      * Otherwise set the SleepJobs time to 20 seconds in the future when
+      * we'll take more drastic measures...
+      */
+
+      if (cupsArrayCount(PrintingJobs) == 0)
+	IOAllowPowerChange(sysevent.powerKernelPort,
+			   sysevent.powerNotificationID);
+      else
+      {
+        LastSysEvent = sysevent;
+        SleepJobs    = time(NULL) + 20;
+      }
     }
 
     if (sysevent.event & SYSEVENT_WOKE)

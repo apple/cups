@@ -1544,7 +1544,8 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      cupsFilePutConf(fp, "Reason", printer->reasons[i]);
+      if (strcmp(printer->reasons[i], "connecting-to-device"))
+        cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
 
@@ -1932,6 +1933,16 @@ cupsdSetPrinterAttr(
   char			*ptr;		/* Pointer into value */
   ipp_tag_t		value_tag;	/* Value tag for this attribute */
 
+
+ /*
+  * Don't allow empty values...
+  */
+
+  if (!*value)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Ignoring empty \"%s\" attribute", name);
+    return;
+  }
 
  /*
   * Count the number of values...
@@ -2576,6 +2587,8 @@ cupsdSetPrinterReasons(
 
     p->num_reasons = 0;
 
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
     if (PrintcapFormat == PRINTCAP_PLIST)
       cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
   }
@@ -2630,6 +2643,9 @@ cupsdSetPrinterReasons(
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
+          if (strcmp(reason, "connecting-to-device"))
+	    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
 	  if (PrintcapFormat == PRINTCAP_PLIST)
 	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 	}
@@ -2651,6 +2667,9 @@ cupsdSetPrinterReasons(
 
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
+
+	if (strcmp(reason, "connecting-to-device"))
+	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
 	if (PrintcapFormat == PRINTCAP_PLIST)
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);

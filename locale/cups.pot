@@ -3509,16 +3509,6 @@ msgstr ""
 msgid "INFO: AppleTalk disabled in System Preferences.\n"
 msgstr ""
 
-#: backend/lpd.c:701
-#, c-format
-msgid "INFO: Attempting to connect to host %s for printer %s\n"
-msgstr ""
-
-#: backend/socket.c:270
-#, c-format
-msgid "INFO: Attempting to connect to host %s on port %d\n"
-msgstr ""
-
 #: backend/ipp.c:1328
 msgid "INFO: Canceling print job...\n"
 msgstr ""
@@ -3528,7 +3518,12 @@ msgstr ""
 msgid "INFO: Connected to %s...\n"
 msgstr ""
 
-#: backend/ipp.c:526
+#: backend/lpd.c:701
+#, c-format
+msgid "INFO: Connecting to %s for printer %s\n"
+msgstr ""
+
+#: backend/ipp.c:526 backend/socket.c:270
 #, c-format
 msgid "INFO: Connecting to %s on port %d...\n"
 msgstr ""

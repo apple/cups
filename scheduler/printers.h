@@ -152,8 +152,6 @@ extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
 extern void		cupsdRenamePrinter(cupsd_printer_t *p,
 			                   const char *name);
-extern char		*cupsdSanitizeURI(const char *uri, char *buffer,
-			                  int buflen);
 extern void		cupsdSaveAllPrinters(void);
 extern int		cupsdSetAuthInfoRequired(cupsd_printer_t *p,
 			                         const char *values,

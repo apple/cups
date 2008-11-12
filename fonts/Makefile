@@ -74,9 +74,11 @@ install:	all install-data install-headers install-libs install-exec
 
 install-data:
 	$(INSTALL_DIR) -m 755 $(DATADIR)/fonts
-	for file in $(FONTS); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/fonts; \
-	done
+	if test "x$(BANNERTOPS)" != x -o "x$(TEXTTOPS)" != x; then \
+		for file in $(FONTS); do \
+			$(INSTALL_DATA) $$file $(DATADIR)/fonts; \
+		done \
+	fi
 
 
 #

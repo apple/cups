@@ -294,8 +294,7 @@ show_all_printers(http_t     *http,	/* I - Connection to server */
   ipp_t			*request,	/* IPP request */
 			*response;	/* IPP response */
   cups_array_t		*printers;	/* Array of printer objects */
-  ipp_attribute_t	*printer,	/* Printer object */
-			*attr;		/* Current attribute */
+  ipp_attribute_t	*printer;	/* Printer object */
   int			ascending,	/* Order of printers (0 = descending) */
 			first,		/* First printer to show */
 			count;		/* Number of printers */

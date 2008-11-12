@@ -66,9 +66,11 @@ ppdhtml.o: ../cups/language.h ../cups/array.h
 ppdi.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdi.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
 ppdi.o: ../cups/language.h ../cups/array.h
-ppdmerge.o: ../cups/cups.h ../cups/array.h ../cups/versioning.h
-ppdmerge.o: ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-ppdmerge.o: ../cups/language.h ../cups/array.h
+ppdmerge.o: ../cups/ppd-private.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+ppdmerge.o: ../cups/versioning.h ../cups/string.h ../cups/ppd.h
+ppdmerge.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/cups.h
+ppdmerge.o: ../cups/array.h ../cups/string.h ../config.h ../cups/i18n.h
+ppdmerge.o: ../cups/transcode.h
 ppdpo.o: ppdc.h ../cups/string.h ../config.h ../cups/file.h
 ppdpo.o: ../cups/versioning.h ../cups/i18n.h ../cups/transcode.h
 ppdpo.o: ../cups/language.h ../cups/array.h

@@ -801,9 +801,10 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
 {
   int		i;			/* Looping var */
   const char	*argv[8],		/* Command-line arguments */
-		*envp[11],		/* Environment variables */
+		*envp[12],		/* Environment variables */
 		*temp;			/* Temporary string */
   char		*optstr,		/* Filter options */
+		content_type[1024],	/* CONTENT_TYPE */
 		cups_datadir[1024],	/* CUPS_DATADIR */
 		cups_fontpath[1024],	/* CUPS_FONTPATH */
 		cups_serverbin[1024],	/* CUPS_SERVERBIN */
@@ -832,6 +833,9 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
 
   optstr = escape_options(num_options, options);
 
+  filter = cupsArrayFirst(filters);
+  snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
+           filter->src->super, filter->src->type);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(cups_fontpath, sizeof(cups_fontpath), "CUPS_FONTPATH=%s", FontPath);
   snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s",
@@ -876,16 +880,17 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
     argv[4] = "1";
 
   envp[0]  = "<CFProcessPath>";
-  envp[1]  = cups_datadir;
-  envp[2]  = cups_fontpath;
-  envp[3]  = cups_serverbin;
-  envp[4]  = cups_serverroot;
-  envp[5]  = lang;
-  envp[6]  = path;
-  envp[7]  = ppd;
-  envp[8]  = rip_cache;
-  envp[9]  = userenv;
-  envp[10] = NULL;
+  envp[1]  = content_type;
+  envp[2]  = cups_datadir;
+  envp[3]  = cups_fontpath;
+  envp[4]  = cups_serverbin;
+  envp[5]  = cups_serverroot;
+  envp[6]  = lang;
+  envp[7]  = path;
+  envp[8]  = ppd;
+  envp[9]  = rip_cache;
+  envp[10] = userenv;
+  envp[11] = NULL;
 
   for (i = 0; argv[i]; i ++)
     fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);

@@ -267,7 +267,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
   _cupsLangPrintf(stderr,
-                  _("INFO: Attempting to connect to host %s on port %d\n"),
+                  _("INFO: Connecting to %s on port %d\n"),
                   hostname, port);
 
   fputs("STATE: +connecting-to-device\n", stderr);

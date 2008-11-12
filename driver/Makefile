@@ -33,9 +33,6 @@ LIBOBJS	= \
 		pack.o \
 		rgb.o \
 		srgb.o
-LIB32OBJS	= $(LIBOBJS:.o=.32.o)
-LIB64OBJS	= $(LIBOBJS:.o=.64.o)
-
 OBJS		= \
 		commandtoescpx.o \
 		commandtopclx.o \
@@ -45,14 +42,10 @@ OBJS		= \
 		testcmyk.o \
 		testdither.o \
 		testrgb.o \
-		$(LIBOBJS) \
-		$(LIB32OBJS) \
-		$(LIB64OBJS)
+		$(LIBOBJS)
 
 LIBTARGETS =	\
 		$(LIBCUPSDRIVER) \
-		$(LIB32CUPSDRIVER) \
-		$(LIB64CUPSDRIVER) \
 		libcupsdriver.a
 UNITTARGETS =	\
 		testcmyk \
@@ -97,7 +90,6 @@ clean:
 	$(RM) $(TARGETS) $(UNITTARGETS)
 	$(RM) -r test
 	$(RM) libcupsdriver.so libcupsdriver.sl libcupsdriver.dylib
-	$(RM) -r 32bit 64bit
 
 
 #
@@ -105,13 +97,7 @@ clean:
 #
 
 depend:
-	touch Dependencies.tmp
-	makedepend -Y -I.. -fDependencies.tmp $(OBJS:.o=.c) >/dev/null 2>&1
-	$(RM) Dependencies
-	cp Dependencies.tmp Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.32.o: \1\.c /' Dependencies.tmp >>Dependencies
-	sed -E -e '1,$$s/^([^.]+)\.o:/\1\.64.o: \1\.c /' Dependencies.tmp >>Dependencies
-	$(RM) Dependencies.tmp
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -159,7 +145,7 @@ install-headers:
 # Install libraries...
 #
 
-install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
+install-libs: $(INSTALLSTATIC)
 	echo Installing libraries in $(LIBDIR)...
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
 	$(INSTALL_LIB) $(LIBCUPSDRIVER) $(LIBDIR)
@@ -181,24 +167,12 @@ installstatic:
 	$(INSTALL_LIB) libcupsdriver.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsdriver.a
 
-install32bit:
-	echo Installing libraries in $(LIB32DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB32DIR)
-	$(INSTALL_LIB) 32bit/libcupsdriver.so.1 $(LIB32DIR)/libcupsdriver.so.1
-	$(LN) libcupsdriver.so.1 $(LIB32DIR)/libcupsdriver.so
-
-install64bit:
-	echo Installing libraries in $(LIB64DIR)...
-	$(INSTALL_DIR) -m 755 $(LIB64DIR)
-	$(INSTALL_LIB) 64bit/libcupsdriver.so.1 $(LIB64DIR)/libcupsdriver.so.1
-	$(LN) libcupsdriver.so.1 $(LIB64DIR)/libcupsdriver.so
-
 
 #
 # Uninstall...
 #
 
-uninstall: $(UNINSTALL32) $(UNINSTALL64)
+uninstall:
 	for file in commandtoescpx commandtopclx rastertoescpx rastertopclx; do \
 		$(RM) $(SERVERBIN)/filter/$$file; \
 	done
@@ -213,16 +187,6 @@ uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/driver.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
-
-uninstall32bit:
-	$(RM) $(LIB32DIR)/libcupsdriver.so
-	$(RM) $(LIB32DIR)/libcupsdriver.so.1
-	-$(RMDIR) $(LIB32DIR)
-
-uninstall64bit:
-	$(RM) $(LIB64DIR)/libcupsdriver.so
-	$(RM) $(LIB64DIR)/libcupsdriver.so.1
-	-$(RMDIR) $(LIB64DIR)
 
 
 #
@@ -347,30 +311,6 @@ libcupsdriver.so.1 libcupsdriver.sl.1:	$(LIBOBJS)
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
-
-
-#
-# 32bit/libcupsdriver.so.1
-#
-
-32bit/libcupsdriver.so.1:	$(LIB32OBJS)
-	echo Linking 32-bit $@...
-	-mkdir 32bit
-	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBS)
-	$(RM) 32bit/libcupsdriver.so
-	$(LN) libcupsdriver.so.1 32bit/libcupsdriver.so
-
-
-#
-# 64bit/libcupsdriver.so.1
-#
-
-64bit/libcupsdriver.so.1:	$(LIB64OBJS)
-	echo Linking 64-bit $@...
-	-mkdir 64bit
-	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBS)
-	$(RM) 64bit/libcupsdriver.so
-	$(LN) libcupsdriver.so.1 64bit/libcupsdriver.so
 
 
 #

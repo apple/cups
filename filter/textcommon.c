@@ -45,7 +45,6 @@ lchar_t	**Page = NULL;		/* Page characters */
 int	NumPages = 0;		/* Number of pages in document */
 float	CharsPerInch = 10;	/* Number of character columns per inch */
 float	LinesPerInch = 6;	/* Number of lines per inch */
-int	UTF8 = 0;		/* Use UTF-8 encoding? */
 int	NumKeywords = 0;	/* Number of known keywords */
 char	**Keywords = NULL;	/* List of known keywords */
 
@@ -1167,7 +1166,7 @@ getutf8(FILE *fp)	/* I - File to read from */
   if ((ch = getc(fp)) == EOF)
     return (EOF);
 
-  if (ch < 0xc0 || !UTF8)	/* One byte character? */
+  if (ch < 0xc0)			/* One byte character? */
     return (ch);
   else if ((ch & 0xe0) == 0xc0)
   {
