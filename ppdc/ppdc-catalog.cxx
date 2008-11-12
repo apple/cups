@@ -14,6 +14,16 @@
 //
 // Contents:
 //
+//   ppdcCatalog::ppdcCatalog()   - Create a shared message catalog.
+//   ppdcCatalog::~ppdcCatalog()  - Destroy a shared message catalog.
+//   ppdcCatalog::add_message()   - Add a new message.
+//   ppdcCatalog::find_message()  - Find a message in a catalog...
+//   ppdcCatalog::load_messages() - Load messages from a .po file.
+//   ppdcCatalog::save_messages() - Save the messages to a .po file.
+//   get_utf8()                   - Get a UTF-8 character.
+//   get_utf16()                  - Get a UTF-16 character...
+//   put_utf8()                   - Add a UTF-8 character to a string.
+//   put_utf16()                  - Write a UTF-16 character to a file.
 //
 
 //
@@ -276,6 +286,7 @@ ppdcCatalog::load_messages(
       {
         // Add string...
 	add_message(id, str);
+	id[0] = '\0';
       }
     }
   }
