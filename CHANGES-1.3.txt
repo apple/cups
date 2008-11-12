@@ -3,6 +3,7 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.10
 
+	- The scheduler now rejects ATTR: messages with empty values.
 	- The scheduler could consume all CPU handling closed connections
 	  (STR #2988)
 	- The scheduler now protects against DNS rebinding attacks on

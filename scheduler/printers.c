@@ -1935,6 +1935,16 @@ cupsdSetPrinterAttr(
 
 
  /*
+  * Don't allow empty values...
+  */
+
+  if (!*value)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Ignoring empty \"%s\" attribute", name);
+    return;
+  }
+
+ /*
   * Count the number of values...
   */
 
