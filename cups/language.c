@@ -134,7 +134,8 @@ static const char * const lang_encodings[] =
 			  "unknown",		"unknown",
 			  "unknown",		"unknown",
 			  "euc-cn",		"euc-jp",
-			  "euc-kr",		"euc-tw"
+			  "euc-kr",		"euc-tw",
+			  "jis-x0213"
 			};
 
 #ifdef __APPLE__
@@ -423,7 +424,8 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		  "",		"",		"",		"",
 		  "",		"",		"",		"",
 
-		  "EUCCN",	"EUCJP",	"EUCKR",	"EUCTW"
+		  "EUCCN",	"EUCJP",	"EUCKR",	"EUCTW",
+		  "SHIFT_JISX0213"
 		};
 
 

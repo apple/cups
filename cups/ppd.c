@@ -377,7 +377,7 @@ _ppdGetEncoding(const char *name)	/* I - LanguageEncoding string */
   else if (!strcasecmp(name, "ISOLatin5"))
     return (CUPS_ISO8859_5);
   else if (!strcasecmp(name, "JIS83-RKSJ"))
-    return (CUPS_WINDOWS_932);
+    return (CUPS_JIS_X0213);
   else if (!strcasecmp(name, "MacStandard"))
     return (CUPS_MAC_ROMAN);
   else if (!strcasecmp(name, "WindowsANSI"))
