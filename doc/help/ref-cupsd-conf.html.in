@@ -2573,7 +2573,7 @@ authentication is required for the resource. The
 must be a member of one or more of the named groups that
 follow.</P>
 
-<P>The <CODE>user</CODE> keyboard specifies that the
+<P>The <CODE>user</CODE> keyword specifies that the
 authenticated user must be one of the named users or groups that
 follow. Group names are specified using the "@" prefix.</P>
 
