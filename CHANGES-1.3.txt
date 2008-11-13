@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995)
+	- The compression option was not being encoded properly
+	  (STR #2997)
 	- Added a missing character map for JIS-X0213/ShiftJIS.
 	- The scheduler now rejects ATTR: messages with empty values.
 	- The scheduler could consume all CPU handling closed connections

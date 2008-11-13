@@ -51,6 +51,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "brightness-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "columns",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "columns-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "compression",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "copies",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "copies-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "document-format",	IPP_TAG_MIMETYPE,	IPP_TAG_OPERATION },
