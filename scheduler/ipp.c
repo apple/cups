@@ -6785,12 +6785,17 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   * Is the destination valid?
   */
 
+  if (strcmp(uri->name, "printer-uri"))
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST, _("No printer-uri in request!"));
+    return;
+  }
+
   httpSeparateURI(HTTP_URI_CODING_ALL, uri->values[0].string.text, scheme,
                   sizeof(scheme), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
-  if (!strcmp(resource, "/") ||
-      (!strncmp(resource, "/jobs", 5) && strlen(resource) <= 6))
+  if (!strcmp(resource, "/"))
   {
     dest    = NULL;
     dtype   = (cups_ptype_t)0;

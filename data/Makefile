@@ -47,6 +47,7 @@ CHARMAPS =	\
 		iso-8859-7.txt \
 		iso-8859-8.txt \
 		iso-8859-9.txt \
+		jis-x0213.txt \
 		koi8-r.txt \
 		koi8-u.txt \
 		mac-roman.txt \
@@ -141,9 +142,11 @@ install-data:
 		$(INSTALL_DATA) $$file $(DATADIR)/charmaps; \
 	done
 	$(INSTALL_DIR) -m 755 $(DATADIR)/charsets
-	for file in $(CHARSETS); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
-	done
+	if test "x$(BANNERTOPS)" != x -o "x$(TEXTTOPS)" != x; then \
+		for file in $(CHARSETS); do \
+			$(INSTALL_DATA) $$file $(DATADIR)/charsets; \
+		done; \
+	fi
 	$(INSTALL_DIR) -m 755 $(DATADIR)/data
 	for file in $(DATAFILES); do \
 		$(INSTALL_DATA) $$file $(DATADIR)/data; \

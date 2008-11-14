@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 attribute processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -214,7 +214,7 @@ NP_number_pens(int     num_params,	/* I - Number of parameters */
             "DEBUG: HP-GL/2 \'NP\' command with invalid number of "
 	    "parameters (%d)!\n", num_params);
 
-  for (i = 0; i <= PenCount; i ++)
+  for (i = 0; i < PenCount; i ++)
     Pens[i].width = PenWidth;
 
   PC_pen_color(0, NULL);
@@ -232,14 +232,14 @@ PC_pen_color(int     num_params,	/* I - Number of parameters */
   int		i;			/* Looping var */
   static float	standard_colors[8][3] =	/* Standard colors for first 8 pens */
 		{
-		  { 1.0, 1.0, 1.0 },	/* White */
 		  { 0.0, 0.0, 0.0 },	/* Black */
 		  { 1.0, 0.0, 0.0 },	/* Red */
 		  { 0.0, 1.0, 0.0 },	/* Green */
 		  { 1.0, 1.0, 0.0 },	/* Yellow */
 		  { 0.0, 0.0, 1.0 },	/* Blue */
 		  { 1.0, 0.0, 1.0 },	/* Magenta */
-		  { 0.0, 1.0, 1.0 }	/* Cyan */
+		  { 0.0, 1.0, 1.0 },	/* Cyan */
+		  { 1.0, 1.0, 1.0 }	/* White */
 		};
 
 
