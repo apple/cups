@@ -26,9 +26,8 @@ WEBPAGES	=	\
 			index.html \
 			robots.txt
 WEBIMAGES	=	\
-			images/color-wheel.rgb \
+			images/color-wheel.png \
 			images/cups.png \
-			images/cups.rgb \
 			images/cups-block-diagram.gif \
 			images/cups-command-chain.png \
 			images/cups-icon.png \
