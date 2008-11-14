@@ -4,6 +4,8 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995)
+	- Backends could spin trying to read back-channel data
+	  (STR #3001)
 	- The HP-GL/2 filter was using the wrong default colors
 	  (STR #2966)
 	- The scheduler incorrectly allowed Get-Jobs operations without a

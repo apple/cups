@@ -283,6 +283,12 @@ backendRunLoop(
 	        CUPS_LLCAST bc_bytes);
         cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
       }
+      else if (bc_bytes < 0 && errno != EAGAIN && errno != EINTR)
+      {
+        fprintf(stderr, "DEBUG: Error reading back-channel data: %s\n",
+	        strerror(errno));
+	use_bc = 0;
+      }
     }
 
    /*
