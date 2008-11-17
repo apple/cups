@@ -661,8 +661,6 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       if (httpWait(http, 1000))
         status = httpUpdate(http);
-      else
-        status = HTTP_EXPECTATION_FAILED;
     }
     else if (httpCheck(http))
       status = httpUpdate(http);
