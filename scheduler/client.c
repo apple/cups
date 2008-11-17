@@ -1136,9 +1136,11 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
     cupsdAuthorize(con);
 
-    if (!strncmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) &&
+    if (!strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "Keep-Alive", 10) &&
         KeepAlive)
       con->http.keep_alive = HTTP_KEEPALIVE_ON;
+    else if (!strncasecmp(con->http.fields[HTTP_FIELD_CONNECTION], "close", 5))
+      con->http.keep_alive = HTTP_KEEPALIVE_OFF;
 
     if (!con->http.fields[HTTP_FIELD_HOST][0] &&
         con->http.version >= HTTP_1_1)
