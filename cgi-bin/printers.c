@@ -14,6 +14,10 @@
  *
  * Contents:
  *
+ *   main()              - Main entry for CGI.
+ *   do_printer_op()     - Do a printer operation.
+ *   show_all_printers() - Show all printers...
+ *   show_printer()      - Show a single printer.
  */
 
 /*
@@ -261,7 +265,7 @@ do_printer_op(http_t      *http,	/* I - HTTP connection */
 
     cgiRewriteURL(uri, url, sizeof(url), NULL);
     cgiFormEncode(uri, url, sizeof(uri));
-    snprintf(refresh, sizeof(refresh), "5;URL=q%s", uri);
+    snprintf(refresh, sizeof(refresh), "5;URL=%s", uri);
     cgiSetVariable("refresh_page", refresh);
 
     cgiStartHTML(title);
