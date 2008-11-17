@@ -20,11 +20,11 @@
 	GROUP job
 	ATTR integer copies 1
 
-	FILE ../data/testprint.ps
+	FILE testfile.ps
 
 	# What statuses are OK?
-	STATUS ok
-	STATUS ok-subst
+	STATUS successful-ok
+	STATUS successful-ok-ignored-or-substituted-attributes
 
 	# What attributes do we expect?
 	EXPECT job-id

@@ -16,7 +16,6 @@
  *
  *   main()       - Parse options and do tests.
  *   do_tests()   - Do tests as specified in the test file.
- *   ippTagValue()    - Get an IPP value or group tag from a name...
  *   get_token()  - Get a token from a file.
  *   print_attr() - Print an attribute on the screen.
  *   usage()      - Show program usage.

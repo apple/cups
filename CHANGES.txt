@@ -4,6 +4,8 @@ CHANGES.txt - 2008-11-17
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- Fixed a problem with printing to some IPP printers, including
+	  CUPS 1.1.x.
 	- Fixed a redirection problem with the printer web page (STR #3012)
 	- Fixed a PPD compiler problem with the loading of message
 	  catalogs (STR #2990)

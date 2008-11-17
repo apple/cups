@@ -203,6 +203,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   else
     length = ippLength(request);
 
+  DEBUG_printf(("cupsDoIORequest: Request length=%ld, total length=%ld",
+                (long)ippLength(request), (long)length));
+
  /*
   * Loop until we can send the request without authorization problems.
   */
@@ -711,6 +714,12 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	  */
 
 	  expect = (http_status_t)0;
+
+	  if (httpReconnect(http))
+	  {
+	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    return (HTTP_SERVICE_UNAVAILABLE);
+	  }
 	  break;
 
       default :
