@@ -15,7 +15,7 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
 
         GROUP subscription
 	ATTR uri notify-recipient-uri testnotify://
@@ -46,7 +46,7 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
 	ATTR integer notify-subscription-id $notify-subscription-id
 
 	# What statuses are OK?
@@ -68,7 +68,7 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
 
         GROUP subscription
 	ATTR uri notify-recipient-uri testnotify://
@@ -101,7 +101,7 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri printer-uri $method://$hostname:$port/printers/Test1
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -115,6 +115,32 @@
 	DISPLAY notify-printer-uri
 	EXPECT notify-events
 	DISPLAY notify-events
+}
+{
+	# The name of the test...
+	NAME "Check MaxSubscriptions limits"
+
+	# The operation to use
+	OPERATION Create-Printer-Subscription
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+
+        GROUP subscription
+	ATTR uri notify-recipient-uri testnotify://
+	ATTR keyword notify-events printer-state-changed
+	ATTR integer notify-lease-duration 5
+
+	# What statuses are OK?
+	STATUS client-error-too-many-subscriptions
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
 }
 
 #

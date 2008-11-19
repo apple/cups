@@ -309,7 +309,7 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri job-uri $method://$hostname:$port/jobs
+	ATTR uri printer-uri $scheme://$hostname:$port/
 
 	# What statuses are OK?
 	STATUS successful-ok

@@ -33,7 +33,7 @@ else
 fi
 
 dnl Debug printfs can slow things down, so provide a separate option for that
-if test x$enable_debug_printf = xyes; then
+if test x$enable_debug_printfs = xyes; then
 	CFLAGS="$CFLAGS -DDEBUG"
 fi
 

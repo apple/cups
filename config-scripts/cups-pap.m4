@@ -21,8 +21,9 @@ PAP=""
 AC_SUBST(PAP)
 
 if test x$enable_pap != xno -a $uname = Darwin; then
-	PAP="pap"
-	AC_CHECK_HEADER(AppleTalk/at_proto.h)
+	AC_CHECK_HEADER(netat/appletalk.h,[
+		PAP="pap"
+		AC_CHECK_HEADER(AppleTalk/at_proto.h)])
 fi
 
 dnl

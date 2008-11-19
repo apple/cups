@@ -2162,23 +2162,24 @@ add_job_subscriptions(
     if (mask == CUPSD_EVENT_NONE)
       mask = CUPSD_EVENT_JOB_COMPLETED;
 
-    sub = cupsdAddSubscription(mask, cupsdFindDest(job->dest), job, recipient,
-                               0);
-
-    sub->interval = interval;
-
-    cupsdSetString(&sub->owner, job->username);
-
-    if (user_data)
+    if ((sub = cupsdAddSubscription(mask, cupsdFindDest(job->dest), job,
+                                    recipient, 0)) != NULL)
     {
-      sub->user_data_len = user_data->values[0].unknown.length;
-      memcpy(sub->user_data, user_data->values[0].unknown.data,
-             sub->user_data_len);
-    }
+      sub->interval = interval;
 
-    ippAddSeparator(con->response);
-    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-subscription-id", sub->id);
+      cupsdSetString(&sub->owner, job->username);
+
+      if (user_data)
+      {
+	sub->user_data_len = user_data->values[0].unknown.length;
+	memcpy(sub->user_data, user_data->values[0].unknown.data,
+	       sub->user_data_len);
+      }
+
+      ippAddSeparator(con->response);
+      ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+		    "notify-subscription-id", sub->id);
+    }
 
     if (attr)
       attr = attr->next;
@@ -6229,7 +6230,12 @@ create_subscription(
     else
       job = NULL;
 
-    sub = cupsdAddSubscription(mask, printer, job, recipient, 0);
+    if ((sub = cupsdAddSubscription(mask, printer, job, recipient, 0)) == NULL)
+    {
+      send_ipp_status(con, IPP_TOO_MANY_SUBSCRIPTIONS,
+		      _("There are too many subscriptions."));
+      return;
+    }
 
     if (job)
       cupsdLogMessage(CUPSD_LOG_DEBUG, "Added subscription %d for job %d",

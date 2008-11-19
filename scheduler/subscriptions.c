@@ -341,8 +341,56 @@ cupsdAddSubscription(
   * Limit the number of subscriptions...
   */
 
-  if (cupsArrayCount(Subscriptions) >= MaxSubscriptions)
+  if (MaxSubscriptions > 0 && cupsArrayCount(Subscriptions) >= MaxSubscriptions)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdAddSubscription: Reached MaxSubscriptions %d "
+		    "(count=%d)", MaxSubscriptions,
+		    cupsArrayCount(Subscriptions));
     return (NULL);
+  }
+
+  if (MaxSubscriptionsPerJob > 0 && job)
+  {
+    int	count;				/* Number of job subscriptions */
+
+    for (temp = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions),
+             count = 0;
+         temp;
+	 temp = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
+      if (temp->job == job)
+        count ++;
+
+    if (count >= MaxSubscriptionsPerJob)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAddSubscription: Reached MaxSubscriptionsPerJob %d "
+		      "for job #%d (count=%d)", MaxSubscriptionsPerJob,
+		      job->id, count);
+      return (NULL);
+    }
+  }
+
+  if (MaxSubscriptionsPerPrinter > 0 && dest)
+  {
+    int	count;				/* Number of printer subscriptions */
+
+    for (temp = (cupsd_subscription_t *)cupsArrayFirst(Subscriptions),
+             count = 0;
+         temp;
+	 temp = (cupsd_subscription_t *)cupsArrayNext(Subscriptions))
+      if (temp->dest == dest)
+        count ++;
+
+    if (count >= MaxSubscriptionsPerPrinter)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAddSubscription: Reached "
+		      "MaxSubscriptionsPerPrinter %d for %s (count=%d)",
+		      MaxSubscriptionsPerPrinter, dest->name, count);
+      return (NULL);
+    }
+  }
 
  /*
   * Allocate memory for this subscription...
@@ -765,7 +813,6 @@ cupsdLoadAllSubscriptions(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of subscriptions.conf.",
 	              linenum);
-      break;
     }
     else if (!strcasecmp(line, "Events"))
     {

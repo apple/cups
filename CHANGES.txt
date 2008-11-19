@@ -1,9 +1,16 @@
-CHANGES.txt - 2008-11-14
+CHANGES.txt - 2008-11-19
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- The LPD backend no longer tries to collect page accounting
+	  information since the LPD protocol does not allow us to
+	  prevent race conditions.
+	- The scheduler did not save the last marker-change-time value.
+	- Fixed a problem with printing to some IPP printers, including
+	  CUPS 1.1.x.
+	- Fixed a redirection problem with the printer web page (STR #3012)
 	- Fixed a PPD compiler problem with the loading of message
 	  catalogs (STR #2990)
 	- Fixed a PPD compiler problem with the loading of .strings files

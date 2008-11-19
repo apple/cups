@@ -3761,6 +3761,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdSetPrinterAttr(job->printer, "marker-colors", (char *)attr);
 	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-levels", num_attrs, attrs)) != NULL)
@@ -3768,6 +3769,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdSetPrinterAttr(job->printer, "marker-levels", (char *)attr);
 	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-message", num_attrs, attrs)) != NULL)
@@ -3775,6 +3777,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdSetPrinterAttr(job->printer, "marker-message", (char *)attr);
 	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-names", num_attrs, attrs)) != NULL)
@@ -3782,6 +3785,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdSetPrinterAttr(job->printer, "marker-names", (char *)attr);
 	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-types", num_attrs, attrs)) != NULL)
@@ -3789,6 +3793,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdSetPrinterAttr(job->printer, "marker-types", (char *)attr);
 	job->printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       cupsFreeOptions(num_attrs, attrs);

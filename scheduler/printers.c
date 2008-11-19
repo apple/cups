@@ -1312,10 +1312,10 @@ cupsdLoadAllPrinters(void)
         if (!p->attrs)
 	  cupsdSetPrinterAttrs(p);
 
-        cupsdSetPrinterAttr(p, value, valueptr);
-
-	if (!strncmp(value, "marker-", 7))
-	  p->marker_time = time(NULL);
+        if (!strcmp(value, "marker-change-time"))
+	  p->marker_time = atoi(valueptr);
+	else
+          cupsdSetPrinterAttr(p, value, valueptr);
       }
     }
     else
@@ -1681,6 +1681,10 @@ cupsdSaveAllPrinters(void)
       cupsFilePutConf(fp, "Attribute", value);
     }
 
+    if (printer->marker_time)
+      cupsFilePrintf(fp, "Attribute marker-change-time %ld\n",
+                     (long)printer->marker_time);
+
     cupsFilePuts(fp, "</Printer>\n");
 
 #ifdef __sgi
@@ -2044,8 +2048,6 @@ cupsdSetPrinterAttr(
         value = ptr;
     }
   }
-
-  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 }
 
 

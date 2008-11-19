@@ -3,7 +3,7 @@
  *
  *   Class status CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,6 +14,10 @@
  *
  * Contents:
  *
+ *   main()             - Main entry for CGI.
+ *   do_class_op()      - Do a class operation.
+ *   show_all_classes() - Show all classes...
+ *   show_class()       - Show a single class.
  */
 
 /*
