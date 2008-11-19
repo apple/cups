@@ -326,6 +326,7 @@ PassEnv LOCALEDIR
 DocumentRoot $root/doc
 RequestRoot /tmp/cups-$user/spool
 TempDir /tmp/cups-$user/spool/temp
+MaxSubscriptions 3
 MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
@@ -668,10 +669,10 @@ fi
 
 # Error log messages
 count=`grep '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 16; then
-	echo "FAIL: $count error messages, expected 16."
+if test $count != 17; then
+	echo "FAIL: $count error messages, expected 17."
 	grep '^E ' /tmp/cups-$user/log/error_log
-	echo "<P>FAIL: $count error messages, expected 16.</P>" >>$strfile
+	echo "<P>FAIL: $count error messages, expected 17.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	grep '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
