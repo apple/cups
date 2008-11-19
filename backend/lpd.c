@@ -636,9 +636,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			addrname[256];	/* Address name */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Socket address */
-  int			snmp_fd,	/* SNMP socket */
-			start_count,	/* Page count via SNMP at start */
-			page_count;	/* Page count via SNMP */
+  int			snmp_fd;	/* SNMP socket */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
   int			recoverable;	/* Recoverable error shown? */
@@ -886,7 +884,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
     {
-      if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
+      if (backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL))
       {
        /*
 	* No, close it...
@@ -1186,22 +1184,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 
    /*
-    * Collect the final page count as needed...
+    * Collect the final supply levels as needed...
     */
 
     if (snmp_fd >= 0)
-    {
-      int printer_state;		/* State of printer */
-
-
-      while (!backendSNMPSupplies(snmp_fd, &(addr->addr), &page_count,
-                                  &printer_state) &&
-	     printer_state != CUPS_TC_idle)
-	sleep(3);
-
-      if (page_count > start_count)
-        fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
-    }
+      backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL);
 
    /*
     * Close the socket connection and input file...
