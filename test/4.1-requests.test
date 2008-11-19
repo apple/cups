@@ -1,5 +1,5 @@
 #
-# "$Id: 4.1-requests.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# "$Id$"
 #
 #   Verify that the server requires the following attributes:
 #
@@ -126,15 +126,15 @@
 	GROUP operation
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
-	ATTR uri job-uri $method://$hostname:$port/jobs
+	ATTR uri job-uri $scheme://$hostname:$port/jobs
 
 	# What statuses are OK?
-	STATUS successful-ok
+	STATUS client-error-bad-request
 
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
 }
 #
-# End of "$Id: 4.1-requests.test,v 1.1 2001/03/01 20:40:16 mike Exp $"
+# End of "$Id$"
 #

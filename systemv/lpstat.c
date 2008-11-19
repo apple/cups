@@ -1307,18 +1307,23 @@ show_jobs(const char *dests,		/* I - Destinations */
   *
   *    attributes-charset
   *    attributes-natural-language
-  *    job-uri
+  *    printer-uri
   *    requested-attributes
+  *    requesting-user-name
+  *    which-jobs
   */
 
   request = ippNewRequest(IPP_GET_JOBS);
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+               NULL, "ipp://localhost/");
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                 "requested-attributes", sizeof(jattrs) / sizeof(jattrs[0]),
 		NULL, jattrs);
 
-  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
-               NULL, "ipp://localhost/jobs/");
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "requesting-user-name",
+               NULL, cupsUser());
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",
                NULL, which);
