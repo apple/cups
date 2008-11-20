@@ -755,6 +755,7 @@ print_device(const char *uri,		/* I - Device URI */
       * Force the read thread to exit...
       */
 
+      g.wait_eof = 0;
       pthread_kill(read_thread_id, SIGTERM);
     }
   }
