@@ -3,7 +3,7 @@
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -106,9 +106,18 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 "#\"^/Library\" #\"^/System\" #\"^/Users\"))\n", root);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
-                 "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\" "
-		 "#\"^/Library/Caches/\"))\n",
+                 "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\""
+		 " #\"^/Library/Application Support/\""
+		 " #\"^/Library/Caches/\""
+		 " #\"^/Library/Preferences/\""
+		 " #\"^/Library/Printers/\""
+		 "))\n",
 		 temp, temp, cache, cache);
+  cupsFilePuts(fp,
+	       "(deny file-write*\n"
+	       "  (regex #\"^/Library/Printers/PPDs/\""
+	       " #\"^/Library/Printers/PPD Plugins/\""
+	       "))\n");
   if (job_id)
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"

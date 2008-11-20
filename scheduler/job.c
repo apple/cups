@@ -18,15 +18,17 @@
  *   cupsdCancelJob()           - Cancel the specified print job.
  *   cupsdCancelJobs()          - Cancel all jobs for the given
  *                                destination/user...
- *   cupsdCheckJobs()           - Check the pending jobs and start any if
- *                                the destination is available.
+ *   cupsdCheckJobs()           - Check the pending jobs and start any if the
+ *                                destination is available.
  *   cupsdCleanJobs()           - Clean out old jobs.
  *   cupsdDeleteJob()           - Free all memory used by a job.
  *   cupsdFinishJob()           - Finish a job.
  *   cupsdFreeAllJobs()         - Free all jobs from memory.
  *   cupsdFindJob()             - Find the specified job.
- *   cupsdGetPrinterJobCount()  - Get the number of pending, processing,
- *   cupsdGetUserJobCount()     - Get the number of pending, processing,
+ *   cupsdGetPrinterJobCount()  - Get the number of pending, processing, or held
+ *                                jobs in a printer or class.
+ *   cupsdGetUserJobCount()     - Get the number of pending, processing, or held
+ *                                jobs for a user.
  *   cupsdHoldJob()             - Hold the specified job.
  *   cupsdLoadAllJobs()         - Load all jobs from disk.
  *   cupsdLoadJob()             - Load a single job...
@@ -37,26 +39,26 @@
  *   cupsdSaveAllJobs()         - Save a summary of all jobs to disk.
  *   cupsdSaveJob()             - Save a job to disk.
  *   cupsdSetJobHoldUntil()     - Set the hold time for a job...
- *   cupsdSetJobPriority()      - Set the priority of a job, moving it
- *                                up/down in the list as needed.
+ *   cupsdSetJobPriority()      - Set the priority of a job, moving it up/down
+ *                                in the list as needed.
  *   cupsdStopAllJobs()         - Stop all print jobs.
  *   cupsdStopJob()             - Stop a print job.
  *   cupsdUnloadCompletedJobs() - Flush completed job history from memory.
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
- *   ipp_length()               - Compute the size of the buffer needed to
- *                                hold the textual IPP attributes.
+ *   ipp_length()               - Compute the size of the buffer needed to hold
+ *                                the textual IPP attributes.
  *   load_job_cache()           - Load jobs from the job.cache file.
- *   load_next_job_id()         - Load the NextJobId value from the
- *                                job.cache file.
+ *   load_next_job_id()         - Load the NextJobId value from the job.cache
+ *                                file.
  *   load_request_root()        - Load jobs from the RequestRoot directory.
  *   set_time()                 - Set one of the "time-at-xyz" attributes...
  *   set_hold_until()           - Set the hold time and update job-hold-until
  *                                attribute...
  *   start_job()                - Start a print job.
  *   unload_job()               - Unload a job from memory.
- *   update_job()               - Read a status update from a jobs filters.
+ *   update_job()               - Read a status update from a job's filters.
  *   update_job_attrs()         - Update the job-printer-* attributes.
  */
 
