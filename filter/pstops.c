@@ -2449,12 +2449,14 @@ set_pstops_options(
     doc->emit_jcl = 1;
 
  /*
-  * fitplot
+  * fitplot/fit-to-page
   */
 
   if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-      (!strcasecmp(val, "true") || !strcasecmp(val, "on") ||
-       !strcasecmp(val, "yes")))
+      !strcasecmp(val, "true"))
+    doc->fitplot = 1;
+  else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
+           !strcasecmp(val, "true"))
     doc->fitplot = 1;
 
  /*

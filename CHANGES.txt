@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-11-19
+CHANGES.txt - 2008-11-21
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- The print filters now support a replacement for the fitplot
+	  option called "fit-to-page".
 	- The LPD backend no longer tries to collect page accounting
 	  information since the LPD protocol does not allow us to
 	  prevent race conditions.
