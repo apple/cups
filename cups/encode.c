@@ -59,6 +59,8 @@ static const _ipp_option_t ipp_options[] =
   { 1, "exclude-schemes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
   { 1, "finishings",		IPP_TAG_ENUM,		IPP_TAG_JOB },
   { 1, "finishings-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 0, "fit-to-page",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 0, "fit-to-page-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "fitplot",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "fitplot-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "gamma",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
