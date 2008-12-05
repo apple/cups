@@ -80,6 +80,14 @@ print_device(const char *uri,		/* I - Device URI */
 
     use_bc = 0;
 
+#elif defined(__sun)
+   /*
+    * CUPS STR #3028: Solaris' usbprn driver apparently does not support
+    * select() or poll(), so we can't support backchannel...
+    */
+
+    use_bc = 0;
+
 #else
    /*
     * Disable backchannel data when printing to Brother, Canon, or
@@ -173,7 +181,17 @@ print_device(const char *uri,		/* I - Device URI */
       lseek(print_fd, 0, SEEK_SET);
     }
 
+#ifdef __sun
+   /*
+    * CUPS STR #3028: Solaris' usbprn driver apparently does not support
+    * select() or poll(), so we can't support the sidechannel either...
+    */
+
+    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, NULL);
+
+#else
     tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, side_cb);
+#endif /* __sun */
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintf(stderr,
