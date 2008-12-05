@@ -67,6 +67,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "gamma-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "hue",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "hue-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "include-schemes",	IPP_TAG_NAME,		IPP_TAG_OPERATION },
   { 0, "job-impressions",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-k-limit",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "job-page-limit",	IPP_TAG_INTEGER,	IPP_TAG_JOB },

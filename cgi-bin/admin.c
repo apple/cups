@@ -918,8 +918,9 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     last_device_time = 0;
     current_device   = 0;
-    if (cupsGetDevices(http, 30, NULL, (cups_device_cb_t)choose_device_cb,
-                       (void *)title) == IPP_OK)
+    if (cupsGetDevices(http, 30, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
+                       (cups_device_cb_t)choose_device_cb,
+		       (void *)title) == IPP_OK)
       fputs("DEBUG: Got device list!\n", stderr);
     else
     {

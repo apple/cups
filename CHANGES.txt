@@ -1,9 +1,17 @@
-CHANGES.txt - 2008-11-21
+CHANGES.txt - 2008-12-05
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- The cupsGetDevices() function now has an "include_schemes"
+	  parameter.
+	- The lpinfo command now supports --include-schemes and
+	  --exclude-schemes options.
+	- The CUPS-Get-PPDs operation now supports the include-schemes
+	  and exclude-schemes attributes.
+        - The CUPS-Get-Devices operation now supports the include-schemes
+	  attribute.
 	- The print filters now support a replacement for the fitplot
 	  option called "fit-to-page".
 	- The LPD backend no longer tries to collect page accounting

@@ -74,6 +74,7 @@ extern "C" {
 #  define CUPS_FORMAT_RAW	"application/vnd.cups-raw"
 #  define CUPS_FORMAT_TEXT	"text/plain"
 #  define CUPS_HTTP_DEFAULT	(http_t *)0
+#  define CUPS_INCLUDE_ALL	(const char *)0
 #  define CUPS_JOBID_ALL	-1
 #  define CUPS_JOBID_CURRENT	0
 #  define CUPS_LENGTH_VARIABLE	(ssize_t)0
@@ -282,6 +283,7 @@ extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
 extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
 			               const char *exclude_schemes,
+			               const char *include_schemes,
 				       cups_device_cb_t callback,
 				       void *user_data) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,

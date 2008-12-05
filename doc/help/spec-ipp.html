@@ -1576,7 +1576,15 @@ CUPS-Get-Devices request:
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the
 	requestor does not want to discover. If the client omits this attribute,
-	the server responds with devices of all schemes.
+	the server responds with devices of all schemes specified by
+	the "include-schemes" attribute.
+
+	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+
+	<dd>The client OPTIONALLY supplies a set of scheme names that the
+	requestor wants to discover. If the client omits this attribute,
+	the server responds with devices of all schemes except those specified
+	by the "exclude-schemes" attribute.
 
 	<dt>"limit" (integer (1:MAX)):
 
@@ -1646,6 +1654,20 @@ CUPS-Get-PPDs request:
 	<dd>The "attributes-charset" and "attributes-natural-language"
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
+
+	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+
+	<dd>The client OPTIONALLY supplies a set of scheme names that the
+	requestor does not want to list. If the client omits this attribute,
+	the server responds with PPDs of all schemes specified by the
+	"include-schemes" attribute.
+
+	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+
+	<dd>The client OPTIONALLY supplies a set of scheme names that the
+	requestor wants to list. If the client omits this attribute, the server
+	responds with PPDs of all schemes except those specified by the
+	"exclude-schemes" attribute.
 
 	<dt>"limit" (integer (1:MAX)):
 

@@ -31,8 +31,9 @@
  *
  * This function sends a CUPS-Get-Devices request and streams the discovered
  * devices to the specified callback function. The "timeout" parameter controls
- * how long the request lasts, while the "exclude_schemes" parameter provides
- * a comma-delimited list of backends to omit from the request.
+ * how long the request lasts, while the "include_schemes" and "exclude_schemes"
+ * parameters provide comma-delimited lists of backends to include or omit from
+ * the request respectively.
  *
  * @since CUPS 1.4@
  */
@@ -41,6 +42,7 @@ ipp_status_t				/* O - Request status - @code IPP_OK@ on success. */
 cupsGetDevices(
     http_t           *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
     int              timeout,		/* I - Timeout in seconds or @code CUPS_TIMEOUT_DEFAULT@ */
+    const char       *include_schemes,	/* I - Comma-separated URI schemes to include or @code CUPS_INCLUDE_ALL@ */
     const char       *exclude_schemes,	/* I - Comma-separated URI schemes to exclude or @code CUPS_EXCLUDE_NONE@ */
     cups_device_cb_t callback,		/* I - Callback function */
     void             *user_data)	/* I - User data pointer */
@@ -55,7 +57,7 @@ cupsGetDevices(
 		*device_make_and_model,	/* device-make-and-model value */
 		*device_uri;		/* device-uri value */
   int		blocking;		/* Current blocking-IO mode */
-  cups_option_t	option;			/* exclude-schemes option */
+  cups_option_t	option;			/* in/exclude-schemes option */
   http_status_t	status;			/* HTTP status of request */
   ipp_state_t	state;			/* IPP response state */
 
@@ -82,6 +84,14 @@ cupsGetDevices(
   if (timeout > 0)
     ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "timeout",
                   timeout);
+
+  if (include_schemes)
+  {
+    option.name  = "include-schemes";
+    option.value = (char *)include_schemes;
+
+    cupsEncodeOptions2(request, 1, &option, IPP_TAG_OPERATION);
+  }
 
   if (exclude_schemes)
   {

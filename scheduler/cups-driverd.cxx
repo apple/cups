@@ -53,7 +53,7 @@
  * Constants...
  */
 
-#define PPD_SYNC	0x50504435	/* Sync word for ppds.dat (PPD5) */
+#define PPD_SYNC	0x50504436	/* Sync word for ppds.dat (PPD6) */
 #define PPD_MAX_LANG	32		/* Maximum languages */
 #define PPD_MAX_PROD	8		/* Maximum products */
 #define PPD_MAX_VERS	8		/* Maximum versions */
@@ -95,7 +95,8 @@ typedef struct				/**** PPD record ****/
 					/* PSVersion strings */
 		make[128],		/* Manufacturer */
 		make_and_model[128],	/* NickName/ModelName */
-		device_id[256];		/* IEEE 1284 Device ID */
+		device_id[256],		/* IEEE 1284 Device ID */
+		scheme[128];		/* PPD scheme */
 } ppd_rec_t; 
 
 typedef struct				/**** In-memory record ****/
@@ -124,7 +125,8 @@ static ppd_info_t	*add_ppd(const char *filename, const char *name,
 				 const char *make_and_model,
 				 const char *device_id, const char *product,
 				 const char *psversion, time_t mtime,
-				 size_t size, int model_number, int type);
+				 size_t size, int model_number, int type,
+				 const char *scheme);
 static int		cat_drv(const char *name, int request_id);
 static int		cat_ppd(const char *name, int request_id);
 static int		cat_static(const char *name, int request_id);
@@ -136,7 +138,8 @@ static int		compare_ppds(const ppd_info_t *p0,
 			             const ppd_info_t *p1);
 static void		free_array(cups_array_t *a);
 static int		list_ppds(int request_id, int limit, const char *opt);
-static int		load_drivers(void);
+static int		load_drivers(cups_array_t *include,
+			             cups_array_t *exclude);
 static int		load_drv(const char *filename, const char *name,
 			         cups_file_t *fp, time_t mtime, off_t size);
 static int		load_ppds(const char *d, const char *p, int descend);
@@ -192,7 +195,8 @@ add_ppd(const char *filename,		/* I - PPD filename */
         time_t     mtime,		/* I - Modification time */
 	size_t     size,		/* I - File size */
 	int        model_number,	/* I - Model number */
-	int        type)		/* I - Driver type */
+	int        type,		/* I - Driver type */
+	const char *scheme)		/* I - PPD scheme */
 {
   ppd_info_t	*ppd;			/* PPD */
   char		*recommended;		/* Foomatic driver string */
@@ -231,6 +235,7 @@ add_ppd(const char *filename,		/* I - PPD filename */
   strlcpy(ppd->record.make_and_model, make_and_model,
           sizeof(ppd->record.make_and_model));
   strlcpy(ppd->record.device_id, device_id, sizeof(ppd->record.device_id));
+  strlcpy(ppd->record.scheme, scheme, sizeof(ppd->record.scheme));
 
  /*
   * Strip confusing (and often wrong) "recommended" suffix added by
@@ -745,8 +750,10 @@ list_ppds(int        request_id,	/* I - Request ID */
   const char	*cups_datadir;		/* CUPS_DATADIR environment variable */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
-  const char	*requested,		/* requested-attributes option */
-		*device_id,		/* ppd-device-id option */
+  cups_array_t	*requested,		/* requested-attributes values */
+		*include,		/* PPD schemes to include */
+		*exclude;		/* PPD schemes to exclude */
+  const char	*device_id,		/* ppd-device-id option */
 		*language,		/* ppd-natural-language option */
 		*make,			/* ppd-make option */
 		*make_and_model,	/* ppd-make-and-model option */
@@ -932,21 +939,28 @@ list_ppds(int        request_id,	/* I - Request ID */
   * Scan for dynamic PPD files...
   */
 
-  load_drivers();
+  num_options = cupsParseOptions(opt, 0, &options);
+  exclude     = cupsdCreateStringsArray(cupsGetOption("exclude-schemes",
+                                                      num_options, options));
+  include     = cupsdCreateStringsArray(cupsGetOption("exclude-schemes",
+						      num_options, options));
+
+  load_drivers(include, exclude);
 
  /*
   * Add the raw driver...
   */
 
   add_ppd("", "raw", "en", "Raw", "Raw Queue", "", "", "", 0, 0, 0,
-          PPD_TYPE_UNKNOWN);
+          PPD_TYPE_UNKNOWN, "raw");
 
  /*
   * Send IPP attributes...
   */
 
-  num_options      = cupsParseOptions(opt, 0, &options);
-  requested        = cupsGetOption("requested-attributes", num_options, options);
+  requested        = cupsdCreateStringsArray(
+                         cupsGetOption("requested-attributes", num_options,
+			               options));
   device_id        = cupsGetOption("ppd-device-id", num_options, options);
   language         = cupsGetOption("ppd-natural-language", num_options, options);
   make             = cupsGetOption("ppd-make", num_options, options);
@@ -989,34 +1003,11 @@ list_ppds(int        request_id,	/* I - Request ID */
   else
     type = 0;
 
-  if (requested)
-    fprintf(stderr, "DEBUG: [cups-driverd] requested-attributes=\"%s\"\n",
-	    requested);
-  if (device_id)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-device-id=\"%s\"\n",
-	    device_id);
-  if (language)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-natural-language=\"%s\"\n",
-	    language);
-  if (make)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-make=\"%s\"\n",
-	    make);
-  if (make_and_model)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-make-and-model=\"%s\"\n",
-	    make_and_model);
-  if (model_number_str)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-model-number=\"%s\"\n",
-	    model_number_str);
-  if (product)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-product=\"%s\"\n",
-	    product);
-  if (psversion)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-psversion=\"%s\"\n",
-	    psversion);
-  if (type_str)
-    fprintf(stderr, "DEBUG: [cups-driverd] ppd-type=\"%s\"\n", type_str);
+  for (i = 0; i < num_options; i ++)
+    fprintf(stderr, "DEBUG: [cups-driverd] %s=\"%s\"\n", options[i].name,
+            options[i].value);
 
-  if (!requested || strstr(requested, "all"))
+  if (!requested || cupsArrayFind(requested, (void *)"all") != NULL)
   {
     send_name             = 1;
     send_make             = 1;
@@ -1030,17 +1021,24 @@ list_ppds(int        request_id,	/* I - Request ID */
   }
   else
   {
-    send_name             = strstr(requested, "ppd-name") != NULL;
-    send_make             = strstr(requested, "ppd-make,") != NULL ||
-                            strstr(requested, ",ppd-make") != NULL ||
-                            !strcmp(requested, "ppd-make");
-    send_make_and_model   = strstr(requested, "ppd-make-and-model") != NULL;
-    send_model_number     = strstr(requested, "ppd-model-number") != NULL;
-    send_natural_language = strstr(requested, "ppd-natural-language") != NULL;
-    send_device_id        = strstr(requested, "ppd-device-id") != NULL;
-    send_product          = strstr(requested, "ppd-product") != NULL;
-    send_psversion        = strstr(requested, "ppd-psversion") != NULL;
-    send_type             = strstr(requested, "ppd-type") != NULL;
+    send_name             = cupsArrayFind(requested,
+                                          (void *)"ppd-name") != NULL;
+    send_make             = cupsArrayFind(requested,
+                                          (void *)"ppd-make") != NULL;
+    send_make_and_model   = cupsArrayFind(requested,
+                                          (void *)"ppd-make-and-model") != NULL;
+    send_model_number     = cupsArrayFind(requested,
+                                          (void *)"ppd-model-number") != NULL;
+    send_natural_language = cupsArrayFind(requested,
+                                          (void *)"ppd-natural-language") != NULL;
+    send_device_id        = cupsArrayFind(requested,
+                                          (void *)"ppd-device-id") != NULL;
+    send_product          = cupsArrayFind(requested,
+                                          (void *)"ppd-product") != NULL;
+    send_psversion        = cupsArrayFind(requested,
+                                          (void *)"ppd-psversion") != NULL;
+    send_type             = cupsArrayFind(requested,
+                                          (void *)"ppd-type") != NULL;
   }
 
   puts("Content-Type: application/ipp\n");
@@ -1053,7 +1051,7 @@ list_ppds(int        request_id,	/* I - Request ID */
     count = limit;
 
   if (device_id || language || make || make_and_model || model_number_str ||
-      product)
+      product || include || exclude)
   {
     matches = cupsArrayNew((cups_array_func_t)compare_matches, NULL);
 
@@ -1083,6 +1081,10 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (ppd->record.type < PPD_TYPE_POSTSCRIPT ||
 	  ppd->record.type >= PPD_TYPE_DRV)
 	continue;
+
+      if (cupsArrayFind(exclude, ppd->record.scheme) ||
+          (include && !cupsArrayFind(include, ppd->record.scheme)))
+        continue;
 
       ppd->matches = 0;
 
@@ -1259,7 +1261,8 @@ list_ppds(int        request_id,	/* I - Request ID */
     * the remaining PPDs with this make...
     */
 
-    if (requested && !strcmp(requested, "ppd-make"))
+    if (cupsArrayFind(requested, (void *)"ppd-make") &&
+        cupsArrayCount(requested) == 1)
     {
       const char	*this_make;	/* This ppd-make */
 
@@ -1716,7 +1719,7 @@ load_ppds(const char *d,		/* I - Actual directory */
                     device_id, (char *)cupsArrayFirst(products),
                     (char *)cupsArrayFirst(psversions),
                     dent->fileinfo.st_mtime, dent->fileinfo.st_size,
-		    model_number, type);
+		    model_number, type, "file");
 
       if (!ppd)
       {
@@ -1837,7 +1840,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
   */
 
   add_ppd(filename, filename, "", "", "", "", "", "", mtime, size, 0,
-          PPD_TYPE_DRV);
+          PPD_TYPE_DRV, "drv");
 
  /*
   * Then the drivers in the file...
@@ -1898,7 +1901,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
 		device_id ? device_id->value->value : "",
 		product->value->value,
 		ps_version ? ps_version->value->value : "(3010) 0",
-		mtime, size, d->model_number, type);
+		mtime, size, d->model_number, type, "drv");
       }
 
     if (!product_found)
@@ -1906,7 +1909,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
 	      device_id ? device_id->value->value : "",
 	      d->model_name->value,
 	      ps_version ? ps_version->value->value : "(3010) 0",
-	      mtime, size, d->model_number, type);
+	      mtime, size, d->model_number, type, "drv");
   }
 
   src->release();
@@ -1920,7 +1923,8 @@ load_drv(const char  *filename,		/* I - Actual filename */
  */
 
 static int				/* O - 1 on success, 0 on failure */
-load_drivers(void)
+load_drivers(cups_array_t *include,	/* I - Drivers to include */
+             cups_array_t *exclude)	/* I - Drivers to exclude */
 {
   int		i;			/* Looping var */
   char		*start,			/* Start of value */
@@ -1977,6 +1981,14 @@ load_drivers(void)
     */
 
     if (!(dent->fileinfo.st_mode & 0111) || !S_ISREG(dent->fileinfo.st_mode))
+      continue;
+
+   /*
+    * Include/exclude specific drivers...
+    */
+
+    if (cupsArrayFind(exclude, dent->filename) ||
+	(include && !cupsArrayFind(include, dent->filename)))
       continue;
 
    /*
@@ -2044,7 +2056,7 @@ load_drivers(void)
 	  }
 
           ppd = add_ppd("", name, languages, make, make_and_model, device_id,
-	                product, psversion, 0, 0, 0, type);
+	                product, psversion, 0, 0, 0, type, dent->filename);
 
           if (!ppd)
 	  {
