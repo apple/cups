@@ -1658,7 +1658,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
     curtime = time(NULL);
     curdate = localtime(&curtime);
 
-    if (curdate->tm_wday || curdate->tm_wday == 6)
+    if (curdate->tm_wday == 0 || curdate->tm_wday == 6)
       job->hold_until = curtime;
     else
       job->hold_until = curtime +

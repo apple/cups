@@ -4,6 +4,10 @@ CHANGES-1.3.txt
 CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008)
+	- The "-o job-hold-until=week-end" option did not work properly
+	  (STR #3025)
+	- The Solaris USB printer device does not support select or poll
+	  (STR #3028)
 	- The scheduler would crash if you exceeded the MaxSubscriptions
 	  limit.
 	- The lp "-H immediate" option did not specify that the job
