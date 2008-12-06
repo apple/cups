@@ -3787,6 +3787,22 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
+      if ((attr = cupsGetOption("marker-low-levels", num_attrs, attrs)) != NULL)
+      {
+        cupsdSetPrinterAttr(job->printer, "marker-low-levels", (char *)attr);
+	job->printer->marker_time = time(NULL);
+	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+      }
+
+      if ((attr = cupsGetOption("marker-high-levels", num_attrs, attrs)) != NULL)
+      {
+        cupsdSetPrinterAttr(job->printer, "marker-high-levels", (char *)attr);
+	job->printer->marker_time = time(NULL);
+	event |= CUPSD_EVENT_PRINTER_STATE;
+        cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+      }
+
       if ((attr = cupsGetOption("marker-message", num_attrs, attrs)) != NULL)
       {
         cupsdSetPrinterAttr(job->printer, "marker-message", (char *)attr);

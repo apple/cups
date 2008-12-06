@@ -4,6 +4,8 @@ CHANGES.txt - 2008-12-05
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- Added support for marker-low-levels and marker-high-levels
+	  attributes.
 	- The scheduler could hang writing a long log line.
 	- The cupsGetDevices() function now has an "include_schemes"
 	  parameter.

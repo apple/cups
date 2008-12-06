@@ -1630,6 +1630,26 @@ cupsdSaveAllPrinters(void)
       cupsFilePuts(fp, "\n");
     }
 
+    if ((marker = ippFindAttribute(printer->attrs, "marker-low-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %d", marker->name,
+                     marker->values[0].integer);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%d", marker->values[i].integer);
+      cupsFilePuts(fp, "\n");
+    }
+
+    if ((marker = ippFindAttribute(printer->attrs, "marker-high-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+    {
+      cupsFilePrintf(fp, "Attribute %s %d", marker->name,
+                     marker->values[0].integer);
+      for (i = 1; i < marker->num_values; i ++)
+        cupsFilePrintf(fp, ",%d", marker->values[i].integer);
+      cupsFilePuts(fp, "\n");
+    }
+
     if ((marker = ippFindAttribute(printer->attrs, "marker-message",
                                    IPP_TAG_TEXT)) != NULL)
     {
@@ -1960,7 +1980,8 @@ cupsdSetPrinterAttr(
   * Then add or update the attribute as needed...
   */
 
-  if (!strcmp(name, "marker-levels"))
+  if (!strcmp(name, "marker-levels") || !strcmp(name, "marker-low-levels") ||
+      !strcmp(name, "marker-high-levels"))
   {
    /*
     * Integer values...

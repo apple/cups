@@ -2538,38 +2538,50 @@ the system.
 <p>The job-sheets-supported attribute specifies the available banner files.
 There will always be at least one banner file available called "none".
 
-<h4><a name="marker-change-time">marker-change-time (integer)</a></h4>
+<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3</span></h4>
 
 <p>The marker-change-time attribute specifies the printer-up-time value when
 the last change to the marker-colors, marker-levels, marker-message,
 marker-names, or marker-types attributes was made.</p>
 
-<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a></h4>
+<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3</span></h4>
 
 <p>The marker-colors attribute specifies the color(s) for each supply in the
 printer. It is only available when the driver provides supply levels. The
 color is either "none" or one or more hex-encoded sRGB colors of the form
 "#RRGGBB".</p>
 
-<h4><a name="marker-levels">marker-levels (1setof integer(-1:100))</a></h4>
+<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+
+<p>The marker-high-levels attribute specifies the supply levels that indicate
+a near-full condition. A value of 100 should be used for supplies that are
+consumed/emptied, e.g. ink cartridges.</p>
+
+<h4><a name="marker-levels">marker-levels (1setof integer(-1:100))</a><span class='info'>CUPS 1.3</span></h4>
 
 <p>The marker-levels attribute specifies the current supply levels for the
 printer. It is only available when the driver provides supply levels. A
 value of -1 indicates the level is unknown, while values from 0 to 100
 indicate the corresponding percentage.</p>
 
-<h4><a name="marker-message">marker-message (text(MAX))</a></h4>
+<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+
+<p>The marker-low-levels attribute specifies the supply levels that indicate
+a near-empty condition. A value of 0 should be used for supplies that are
+filled, e.g. waste ink tanks.</p>
+
+<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4</span></h4>
 
 <p>The marker-message attribute provides a human-readable status message
 for the current supply levels, e.g. "12 pages of ink remaining." It is only
 available when the driver provides supply levels.</p>
 
-<h4><a name="marker-names">marker-names (1setof name(MAX))</a></h4>
+<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3</span></h4>
 
 <p>The marker-names attribute specifies the name(s) for each supply in the
 printer. It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-types">marker-types (1setof type3 keyword)</a></h4>
+<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3</span></h4>
 
 <p>The marker-types attribute specifies the type(s) of each supply in the
 printer. It is only available when the driver provides supply levels. The
