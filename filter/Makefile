@@ -232,6 +232,13 @@ framedhelp:
 		--header api-raster.header --intro api-raster.shtml \
 		../cups/raster.h interpret.c raster.c
 
+docsets:
+	echo Generating CUPS API documentation sets...
+	../tools/makedocset --docset org.cups.raster.docset \
+		--title "Raster API" \
+		--header api-raster.header --intro api-raster.shtml \
+		../cups/raster.h interpret.c raster.c
+
 
 #
 # bannertops

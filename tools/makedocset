@@ -1,0 +1,66 @@
+#!/bin/sh
+#
+# "$Id$"
+#
+# Script to make Xcode documentation sets.
+#
+
+docversion="1.4.`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`"
+docset=""
+sources=""
+header=""
+intro=""
+title=""
+
+while test $# -gt 0; do
+	arg="$1"
+	shift
+
+	case "$arg" in
+		--docset)
+			docset="$1"
+			shift
+			;;
+		--header)
+			header="$1"
+			shift
+			;;
+		--intro)
+			intro="$1"
+			shift
+			;;
+		--title)
+			title="$1"
+			shift
+			;;
+		*)
+			sources="$sources $arg"
+			;;
+	esac
+done
+
+echo "<h1>$title</h1>" >"$header.ds"
+cat "$header" >>"$header.ds"
+
+mxmldoc --docset "$docset" --docversion "$docversion" \
+	--feedname cups.org --feedurl http://www.cups.org/docsets.atom \
+	--title "$title" --css ../doc/cups-printable.css \
+	--header "$header.ds" --intro "$intro" $sources || exit 1
+rm -f "$header.ds"
+
+if test ! -d ../docsets; then
+	mkdir ../docsets
+fi
+
+xar="`basename \"$docset\" .docset`.xar"
+
+/Developer/usr/bin/docsetutil package --output "../docsets/$xar" \
+	--atom ../docsets/docsets.atom \
+	--download-url "http://www.cups.org/docsets/$xar" "$docset" || exit 1
+
+rm -rf "$docset"
+
+
+#
+# End of "$Id$".
+#

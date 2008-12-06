@@ -614,6 +614,42 @@ framedhelp:
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h
 
 
+docsets:
+	echo Generating CUPS API documentation sets...
+	../tools/makedocset --docset org.cups.overview.docset \
+		--title "Introduction to CUPS Programming" \
+		--header api-overview.header --intro api-overview.shtml
+	../tools/makedocset --docset org.cups.array.docset \
+		--title "Array API" \
+		--header api-array.header --intro api-array.shtml \
+		array.h array.c
+	../tools/makedocset --docset org.cups.cups.docset \
+		--title "CUPS API" \
+		--header api-cups.header --intro api-cups.shtml \
+		cups.h dest.c language.c notify.c \
+		options.c tempfile.c usersys.c \
+		util.c
+	../tools/makedocset --docset org.cups.filedir.docset \
+		--title "File and Directory APIs" \
+		--header api-filedir.header --intro api-filedir.shtml \
+		file.h file.c dir.h dir.c
+	../tools/makedocset --docset org.cups.ppd.docset \
+		--title "PPD API" \
+		--header api-ppd.header --intro api-ppd.shtml \
+		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c \
+		page.c ppd.c
+	../tools/makedocset --docset org.cups.httpipp.docset \
+		--title "HTTP and IPP APIs" \
+		--header api-httpipp.header --intro api-httpipp.shtml \
+		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
+		http.c http-addr.c http-support.c ipp.c ipp-support.c \
+		md5passwd.c request.c
+	../tools/makedocset --docset org.cups.filter.docset \
+		--title "Filter and Backend Programming" \
+		--header api-filter.header --intro api-filter.shtml \
+		backchannel.c backend.h backend.c sidechannel.c sidechannel.h
+
+
 #
 # Dependencies...
 #
