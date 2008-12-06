@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpinfo 8 "Common UNIX Printing System" "8 October 2008" "Apple Inc."
+.TH lpinfo 8 "Common UNIX Printing System" "5 December 2008" "Apple Inc."
 .SH NAME
 lpinfo \- show available devices or drivers
 .SH SYNOPSIS
@@ -23,6 +23,10 @@ lpinfo \- show available devices or drivers
 .I server[:port]
 ] [ -l ] [ --device-id
 .I device-id-string
+] [ --exclude-schemes
+.I scheme-list
+] [ --include-schemes
+.I scheme-list
 ] [ --language
 .I locale
 ] [ --make-and-model
@@ -36,7 +40,11 @@ lpinfo \- show available devices or drivers
 .I username
 ] [ -h
 .I server[:port]
-] [ -l ] [ --timeout
+] [ -l ] [ --exclude-schemes
+.I scheme-list
+] [ --include-schemes
+.I scheme-list
+] [ --timeout
 .I seconds
 ] -v
 .SH DESCRIPTION
@@ -67,6 +75,16 @@ Shows a "long" listing of devices or drivers.
 .br
 Specifies the IEEE-1284 device ID to match when listing drivers with the
 \fI-m\fR option.
+.TP 5
+--exclude-schemes scheme-list
+.br
+Specifies a comma-separated list of device or PPD schemes that should be
+excluded from the results. Static PPD files use the "file" scheme.
+.TP 5
+--include-schemes scheme-list
+.br
+Specifies a comma-separated list of device or PPD schemes that should be
+included in the results. Static PPD files use the "file" scheme.
 .TP 5
 --language locale
 .br

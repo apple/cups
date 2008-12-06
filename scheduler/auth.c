@@ -454,27 +454,18 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
+    strlcpy(username, "_AUTHREF_", sizeof(username));
+
     if ((status = AuthorizationCopyInfo(con->authref, 
 					kAuthorizationEnvironmentUsername, 
-					&authinfo)) != 0)
+					&authinfo)) == 0)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "AuthorizationCopyInfo returned %d (%s)",
-		      (int)status, cssmErrorString(status));
-      return;
-    }
-  
-    if (authinfo->count == 0 || !authinfo->items[0].value ||
-        authinfo->items[0].valueLength < 2)
-    {
-      AuthorizationFreeItemSet(authinfo);
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-		      "AuthorizationCopyInfo returned empty rights!");
-      return;
-    }
+      if (authinfo->count == 1 && authinfo->items[0].value &&
+          authinfo->items[0].valueLength >= 2)
+        strlcpy(username, authinfo->items[0].value, sizeof(username));
 
-    strlcpy(username, authinfo->items[0].value, sizeof(username));
-    AuthorizationFreeItemSet(authinfo);
+      AuthorizationFreeItemSet(authinfo);
+    }
 
     cupsdLogMessage(CUPSD_LOG_DEBUG,
 		    "cupsdAuthorize: Authorized as \"%s\" using AuthRef",

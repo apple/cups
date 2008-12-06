@@ -50,6 +50,7 @@ typedef int (*cupsd_compare_func_t)(const void *, const void *);
  */
 
 extern int		cupsdCompareNames(const char *s, const char *t);
+extern cups_array_t	*cupsdCreateStringsArray(const char *s);
 extern int		cupsdExec(const char *command, char **argv);
 extern cups_file_t	*cupsdPipeCommand(int *pid, const char *command,
 			                  char **argv, int user);

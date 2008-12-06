@@ -894,8 +894,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	snmp_fd = -1;
       }
     }
-    else
-      start_count = 0;
 
    /*
     * Check for side-channel requests...

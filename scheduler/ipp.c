@@ -6433,13 +6433,16 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   ipp_attribute_t	*limit,		/* limit attribute */
 			*timeout,	/* timeout attribute */
 			*requested,	/* requested-attributes attribute */
-			*exclude;	/* exclude-schemes attribute */
+			*exclude,	/* exclude-schemes attribute */
+			*include;	/* include-schemes attribute */
   char			command[1024],	/* cups-deviced command */
-			options[1024],	/* Options to pass to command */
+			options[2048],	/* Options to pass to command */
 			requested_str[256],
 					/* String for requested attributes */
-			exclude_str[512];
-					/* String for excluded attributes */
+			exclude_str[512],
+					/* String for excluded schemes */
+			include_str[512];
+					/* String for included schemes */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_devices(%p[%d])", con, con->http.fd);
@@ -6463,6 +6466,7 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   requested = ippFindAttribute(con->request, "requested-attributes",
                                IPP_TAG_KEYWORD);
   exclude   = ippFindAttribute(con->request, "exclude-schemes", IPP_TAG_NAME);
+  include   = ippFindAttribute(con->request, "include-schemes", IPP_TAG_NAME);
 
   if (requested)
     url_encode_attr(requested, requested_str, sizeof(requested_str));
@@ -6474,15 +6478,21 @@ get_devices(cupsd_client_t *con)	/* I - Client connection */
   else
     exclude_str[0] = '\0';
 
+  if (include)
+    url_encode_attr(include, include_str, sizeof(include_str));
+  else
+    include_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-deviced", ServerBin);
   snprintf(options, sizeof(options),
-           "%d+%d+%d+%d+%s%s%s",
+           "%d+%d+%d+%d+%s%s%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
 	   timeout ? timeout->values[0].integer : 10,
 	   (int)User,
 	   requested_str,
-	   exclude_str[0] ? "%20" : "", exclude_str);
+	   exclude_str[0] ? "%20" : "", exclude_str,
+	   include_str[0] ? "%20" : "", include_str);
 
   if (cupsdSendCommand(con, command, options, 1))
   {
@@ -7270,9 +7280,11 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 			*product,	/* ppd-product attribute */
 			*psversion,	/* ppd-psverion attribute */
 			*type,		/* ppd-type attribute */
-			*requested;	/* requested-attributes attribute */
+			*requested,	/* requested-attributes attribute */
+			*exclude,	/* exclude-schemes attribute */
+			*include;	/* include-schemes attribute */
   char			command[1024],	/* cups-driverd command */
-			options[1024],	/* Options to pass to command */
+			options[4096],	/* Options to pass to command */
 			device_str[256],/* Escaped ppd-device-id string */
 			language_str[256],
 					/* Escaped ppd-natural-language */
@@ -7285,8 +7297,12 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 			psversion_str[256],
 					/* Escaped ppd-psversion string */
 			type_str[256],	/* Escaped ppd-type string */
-			requested_str[256];
+			requested_str[256],
 					/* String for requested attributes */
+			exclude_str[512],
+					/* String for excluded schemes */
+			include_str[512];
+					/* String for included schemes */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_ppds(%p[%d])", con, con->http.fd);
@@ -7366,9 +7382,19 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   else
     type_str[0] = '\0';
 
+  if (exclude)
+    url_encode_attr(exclude, exclude_str, sizeof(exclude_str));
+  else
+    exclude_str[0] = '\0';
+
+  if (include)
+    url_encode_attr(include, include_str, sizeof(include_str));
+  else
+    include_str[0] = '\0';
+
   snprintf(command, sizeof(command), "%s/daemon/cups-driverd", ServerBin);
   snprintf(options, sizeof(options),
-           "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+           "list+%d+%d+%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
            con->request->request.op.request_id,
            limit ? limit->values[0].integer : 0,
 	   requested_str,
@@ -7379,7 +7405,9 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
 	   model_number ? "%20" : "", model_number_str,
 	   product ? "%20" : "", product_str,
 	   psversion ? "%20" : "", psversion_str,
-	   type ? "%20" : "", type_str);
+	   type ? "%20" : "", type_str,
+	   exclude_str[0] ? "%20" : "", exclude_str,
+	   include_str[0] ? "%20" : "", include_str);
 
   if (cupsdSendCommand(con, command, options, 0))
   {

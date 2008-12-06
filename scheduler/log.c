@@ -928,7 +928,7 @@ format_log_line(const char *message,	/* I - Printf-style format string */
   * Resize the buffer as needed...
   */
 
-  if (len >= log_linesize)
+  if (len >= log_linesize && log_linesize < 65536)
   {
     char	*temp;			/* Temporary string pointer */
 

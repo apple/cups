@@ -14,14 +14,15 @@
  *
  * Contents:
  *
- *   cupsdCompareNames()   - Compare two names.
- *   cupsdExec()           - Run a program with the correct environment.
- *   cupsdPipeCommand()    - Read output from a command.
- *   cupsdSendIPPGroup()   - Send a group tag.
- *   cupsdSendIPPHeader()  - Send the IPP response header.
- *   cupsdSendIPPInteger() - Send an integer attribute.
- *   cupsdSendIPPString()  - Send a string attribute.
- *   cupsdSendIPPTrailer() - Send the end-of-message tag.
+ *   cupsdCompareNames()       - Compare two names.
+ *   cupsdCreateStringsArray() - Create a CUPS array of strings.
+ *   cupsdExec()               - Run a program with the correct environment.
+ *   cupsdPipeCommand()        - Read output from a command.
+ *   cupsdSendIPPGroup()       - Send a group tag.
+ *   cupsdSendIPPHeader()      - Send the IPP response header.
+ *   cupsdSendIPPInteger()     - Send an integer attribute.
+ *   cupsdSendIPPString()      - Send a string attribute.
+ *   cupsdSendIPPTrailer()     - Send the end-of-message tag.
  */
 
 /*
@@ -149,6 +150,49 @@ cupsdCompareNames(const char *s,	/* I - First string */
     return (-1);
   else
     return (0);
+}
+
+
+/*
+ * 'cupsdCreateStringsArray()' - Create a CUPS array of strings.
+ */
+
+cups_array_t *				/* O - CUPS array */
+cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
+{
+  cups_array_t	*a;			/* CUPS array */
+  const char	*start,			/* Start of string */
+		*end;			/* End of string */
+  char		*ptr;			/* New string */
+
+
+  if (!s)
+    return (NULL);
+
+  if ((a = cupsArrayNew((cups_array_func_t)strcmp, NULL)) != NULL)
+  {
+    for (start = end = s; *end; start = end + 1)
+    {
+     /*
+      * Find the end of the current delimited string...
+      */
+
+      if ((end = strchr(start, ',')) == NULL)
+        end = start + strlen(start);
+
+     /*
+      * Duplicate the string and add it to the array...
+      */
+
+      if ((ptr = calloc(1, end - start + 1)) == NULL)
+        break;
+
+      memcpy(ptr, start, end - start);
+      cupsArrayAdd(a, ptr);
+    }
+  }
+
+  return (a);
 }
 
 

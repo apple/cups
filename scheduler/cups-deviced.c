@@ -17,7 +17,6 @@
  *   main()                 - Scan for devices and return an IPP response.
  *   add_device()           - Add a new device to the list.
  *   compare_devices()      - Compare device names to eliminate duplicates.
- *   create_strings_array() - Create a CUPS array of strings.
  *   get_current_time()     - Get the current time as a double value in seconds.
  *   get_device()           - Get a device from a backend.
  *   process_children()     - Process all dead children...
@@ -108,7 +107,6 @@ static int		add_device(const char *device_class,
 				   const char *device_location);
 static int		compare_devices(cupsd_device_t *p0,
 			                cupsd_device_t *p1);
-static cups_array_t	*create_strings_array(const char *s);
 static double		get_current_time(void);
 static int		get_device(cupsd_backend_t *backend);
 static void		process_children(void);
@@ -140,7 +138,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   cups_array_t	*requested,		/* requested-attributes values */
-		*exclude;		/* exclude-schemes values */
+		*exclude,		/* exclude-schemes values */
+		*include;		/* include-schemes values */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -192,10 +191,12 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   num_options = cupsParseOptions(argv[5], 0, &options);
-  requested   = create_strings_array(cupsGetOption("requested-attributes",
-                                                   num_options, options));
-  exclude     = create_strings_array(cupsGetOption("exclude-schemes",
-                                                   num_options, options));
+  requested   = cupsdCreateStringsArray(cupsGetOption("requested-attributes",
+                                                      num_options, options));
+  exclude     = cupsdCreateStringsArray(cupsGetOption("exclude-schemes",
+                                                      num_options, options));
+  include     = cupsdCreateStringsArray(cupsGetOption("include-schemes",
+                                                      num_options, options));
 
   if (!requested || cupsArrayFind(requested, "all") != NULL)
   {
@@ -267,7 +268,12 @@ main(int  argc,				/* I - Number of command-line args */
         (dent->fileinfo.st_mode & (S_IRUSR | S_IXUSR)) != (S_IRUSR | S_IXUSR))
       continue;
 
-    if (cupsArrayFind(exclude, dent->filename))
+   /*
+    * Skip excluded or not included backends...
+    */
+
+    if (cupsArrayFind(exclude, dent->filename) ||
+        (include && !cupsArrayFind(include, dent->filename)))
       continue;
 
    /*
@@ -444,49 +450,6 @@ compare_devices(cupsd_device_t *d0,	/* I - First device */
     return (diff);
   else
     return (strcasecmp(d0->device_uri, d1->device_uri));
-}
-
-
-/*
- * 'create_strings_array()' - Create a CUPS array of strings.
- */
-
-static cups_array_t *			/* O - CUPS array */
-create_strings_array(const char *s)	/* I - Comma-delimited strings */
-{
-  cups_array_t	*a;			/* CUPS array */
-  const char	*start,			/* Start of string */
-		*end;			/* End of string */
-  char		*ptr;			/* New string */
-
-
-  if (!s)
-    return (NULL);
-
-  if ((a = cupsArrayNew((cups_array_func_t)strcmp, NULL)) != NULL)
-  {
-    for (start = end = s; *end; start = end + 1)
-    {
-     /*
-      * Find the end of the current delimited string...
-      */
-
-      if ((end = strchr(start, ',')) == NULL)
-        end = start + strlen(start);
-
-     /*
-      * Duplicate the string and add it to the array...
-      */
-
-      if ((ptr = calloc(1, end - start + 1)) == NULL)
-        break;
-
-      memcpy(ptr, start, end - start);
-      cupsArrayAdd(a, ptr);
-    }
-  }
-
-  return (a);
 }
 
 

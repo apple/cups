@@ -1175,8 +1175,7 @@ main(int  argc,				/* I - Number of command-line args */
     krb5_free_context(KerberosContext);
 #endif /* HAVE_GSSAPI */
 
-#ifdef __APPLE__
-#ifdef HAVE_DLFCN_H
+#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
  /* 
   * Unload Print Service quota enforcement library (X Server only) 
   */
@@ -1187,8 +1186,7 @@ main(int  argc,				/* I - Number of command-line args */
     dlclose(PSQLibRef);
     PSQLibRef = NULL;
   }
-#endif /* HAVE_DLFCN_H */
-#endif	/* __APPLE__ */
+#endif /* __APPLE__ && HAVE_DLFCN_H */
 
 #ifdef __sgi
  /*

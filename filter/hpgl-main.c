@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 filter main entry for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -191,8 +191,10 @@ main(int  argc,		/* I - Number of command-line arguments */
     shading = 0;
 
   if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-      strcasecmp(val, "no") && strcasecmp(val, "off") &&
-      strcasecmp(val, "false"))
+      !strcasecmp(val, "true"))
+    FitPlot = 1;
+  else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
+      !strcasecmp(val, "true"))
     FitPlot = 1;
 
   if ((val = cupsGetOption("penwidth", num_options, options)) != NULL)

@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,6 +23,8 @@
  *   ippOpValue()     - Return an operation id for the given name.
  *   ippPort()        - Return the default IPP port number.
  *   ippSetPort()     - Set the default port number.
+ *   ippTagString()   - Return the tag name corresponding to a tag value.
+ *   ippTagValue()    - Return the tag value corresponding to a tag name.
  */
 
 /*
@@ -465,6 +467,8 @@ ippSetPort(int p)			/* I - Port number to use */
 const char *				/* O - Tag name */
 ippTagString(ipp_tag_t tag)		/* I - Tag value */
 {
+  tag &= IPP_TAG_MASK;
+
   if (tag < (ipp_tag_t)(sizeof(ipp_tag_names) / sizeof(ipp_tag_names[0])))
     return (ipp_tag_names[tag]);
   else

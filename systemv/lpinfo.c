@@ -42,10 +42,14 @@ static void	device_cb(const char *device_clas, const char *device_id,
 			  const char *device_make_and_model,
 			  const char *device_uri, const char *device_location,
 			  void *user_data);
-static int	show_devices(http_t *http, int long_status, int timeout);
-static int	show_models(http_t *http, int long_status,
+static int	show_devices(int long_status, int timeout,
+			     const char *include_schemes,
+			     const char *exclude_schemes);
+static int	show_models(int long_status,
 			    const char *device_id, const char *language,
-			    const char *make_model, const char *product);
+			    const char *make_model, const char *product,
+			    const char *include_schemes,
+			    const char *exclude_schemes);
 
 
 /*
@@ -57,24 +61,26 @@ main(int  argc,				/* I - Number of command-line arguments */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
-  http_t	*http;			/* Connection to server */
   int		long_status;		/* Long listing? */
   const char	*device_id,		/* 1284 device ID */
 		*language,		/* Language */
 		*make_model,		/* Make and model */
-		*product;		/* Product */
+		*product,		/* Product */
+		*include_schemes,	/* Schemes to include */
+		*exclude_schemes;	/* Schemes to exclude */
   int		timeout;		/* Device timeout */
 
 
   _cupsSetLocale(argv);
 
-  http        = NULL;
-  long_status = 0;
-  device_id   = NULL;
-  language    = NULL;
-  make_model  = NULL;
-  product     = NULL;
-  timeout     = CUPS_TIMEOUT_DEFAULT;
+  long_status     = 0;
+  device_id       = NULL;
+  language        = NULL;
+  make_model      = NULL;
+  product         = NULL;
+  include_schemes = CUPS_INCLUDE_ALL;
+  exclude_schemes = CUPS_EXCLUDE_NONE;
+  timeout         = CUPS_TIMEOUT_DEFAULT;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -83,9 +89,6 @@ main(int  argc,				/* I - Number of command-line arguments */
         case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
-
-	    if (http)
-	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
 		            _("%s: Sorry, no encryption support compiled in!\n"),
@@ -94,12 +97,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'h' : /* Connect to host */
-	    if (http)
-	    {
-	      httpClose(http);
-	      http = NULL;
-	    }
-
 	    if (argv[i][2] != '\0')
 	      cupsSetServer(argv[i] + 2);
 	    else
@@ -122,41 +119,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
         case 'm' : /* Show models */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		_cupsLangPrintf(stderr,
-		                _("lpinfo: Unable to connect to server: %s\n"),
-				strerror(errno));
-		return (1);
-	      }
-            }
-
-            if (show_models(http, long_status, device_id, language, make_model,
-	                    product))
+            if (show_models(long_status, device_id, language, make_model,
+	                    product, include_schemes, exclude_schemes))
 	      return (1);
 	    break;
 	    
         case 'v' : /* Show available devices */
-	    if (!http)
-	    {
-              http = httpConnectEncrypt(cupsServer(), ippPort(),
-	                                cupsEncryption());
-
-	      if (http == NULL)
-	      {
-		_cupsLangPrintf(stderr,
-		                _("lpinfo: Unable to connect to server: %s\n"),
-				strerror(errno));
-		return (1);
-	      }
-            }
-
-            if (show_devices(http, long_status, timeout))
+            if (show_devices(long_status, timeout, include_schemes,
+	                     exclude_schemes))
 	      return (1);
 	    break;
 
@@ -178,6 +148,42 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    else if (!strncmp(argv[i], "--device-id=", 12) && argv[i][12])
 	    {
 	      device_id = argv[i] + 12;
+	    }
+            else if (!strcmp(argv[i], "--exclude-schemes"))
+	    {
+	      i ++;
+
+	      if (i < argc)
+		exclude_schemes = argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected scheme list after "
+				"--exclude-schemes!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--exclude-schemes=", 18) && argv[i][18])
+	    {
+	      exclude_schemes = argv[i] + 18;
+	    }
+            else if (!strcmp(argv[i], "--include-schemes"))
+	    {
+	      i ++;
+
+	      if (i < argc)
+		include_schemes = argv[i];
+	      else
+	      {
+		_cupsLangPuts(stderr,
+			      _("lpinfo: Expected scheme list after "
+				"--include-schemes!\n"));
+		return (1);
+	      }
+	    }
+	    else if (!strncmp(argv[i], "--include-schemes=", 18) && argv[i][18])
+	    {
+	      include_schemes = argv[i] + 18;
 	    }
             else if (!strcmp(argv[i], "--language"))
 	    {
@@ -315,12 +321,14 @@ device_cb(
  */
 
 static int				/* O - 0 on success, 1 on failure */
-show_devices(http_t *http,		/* I - HTTP connection to server */
-             int    long_status,	/* I - Long status report? */
-	     int    timeout)		/* I - Timeout */
+show_devices(
+    int        long_status,		/* I - Long status report? */
+    int        timeout,			/* I - Timeout */
+    const char *include_schemes,	/* I - List of schemes to include */
+    const char *exclude_schemes)	/* I - List of schemes to exclude */
 {
-  if (cupsGetDevices(http, timeout, CUPS_EXCLUDE_NONE, device_cb,
-                     &long_status) != IPP_OK)
+  if (cupsGetDevices(CUPS_HTTP_DEFAULT, timeout, include_schemes,
+                     exclude_schemes, device_cb, &long_status) != IPP_OK)
   {
     _cupsLangPrintf(stderr, "lpinfo: %s\n", cupsLastErrorString());
     return (1);
@@ -335,12 +343,14 @@ show_devices(http_t *http,		/* I - HTTP connection to server */
  */
 
 static int				/* O - 0 on success, 1 on failure */
-show_models(http_t     *http,		/* I - HTTP connection to server */
-            int        long_status,	/* I - Long status report? */
-	    const char *device_id,	/* I - 1284 device ID */
-	    const char *language,	/* I - Language */
-	    const char *make_model,	/* I - Make and model */
-	    const char *product)	/* I - Product */
+show_models(
+    int        long_status,		/* I - Long status report? */
+    const char *device_id,		/* I - 1284 device ID */
+    const char *language,		/* I - Language */
+    const char *make_model,		/* I - Make and model */
+    const char *product,		/* I - Product */
+    const char *include_schemes,	/* I - List of schemes to include */
+    const char *exclude_schemes)	/* I - List of schemes to exclude */
 {
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -349,10 +359,8 @@ show_models(http_t     *http,		/* I - HTTP connection to server */
 		*ppd_language,		/* Pointer to ppd-natural-language */
 		*ppd_make_model,	/* Pointer to ppd-make-and-model */
 		*ppd_name;		/* Pointer to ppd-name */
+  cups_option_t	option;			/* in/exclude-schemes option */
 
-
-  if (http == NULL)
-    return (1);
 
  /*
   * Build a CUPS_GET_PPDS request...
@@ -373,11 +381,27 @@ show_models(http_t     *http,		/* I - HTTP connection to server */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT, "ppd-product",
                  NULL, product);
 
+  if (include_schemes)
+  {
+    option.name  = "include-schemes";
+    option.value = (char *)include_schemes;
+
+    cupsEncodeOptions2(request, 1, &option, IPP_TAG_OPERATION);
+  }
+
+  if (exclude_schemes)
+  {
+    option.name  = "exclude-schemes";
+    option.value = (char *)exclude_schemes;
+
+    cupsEncodeOptions2(request, 1, &option, IPP_TAG_OPERATION);
+  }
+
  /*
   * Do the request and get back a response...
   */
 
-  if ((response = cupsDoRequest(http, request, "/")) != NULL)
+  if ((response = cupsDoRequest(CUPS_HTTP_DEFAULT, request, "/")) != NULL)
   {
    /*
     * Loop through the device list and display them...
