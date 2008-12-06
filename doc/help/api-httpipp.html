@@ -4,7 +4,7 @@
 <head>
 <title>HTTP and IPP APIs</title>
 <meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.5">
+<meta name="creator" content="Mini-XML v2.6">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -331,7 +331,7 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-httpipp.header 7258 2008-01-28 00:15:05Z mike $"
+  "$Id: api-httpipp.header 8087 2008-10-27 21:37:05Z mike $"
 
   HTTP and IPP API header for the Common UNIX Printing System (CUPS).
 
@@ -367,7 +367,6 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-</li>
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 <li><a href="#CREATING_URI_STRINGS">Creating URI Strings</a></li>
 <li><a href="#SENDING_REQUESTS_WITH_FILES">Sending Requests with Files</a></li>
@@ -505,7 +504,7 @@ in seconds.">ippDateToTime</a></li>
 <li><a href="#ippWrite" title="Write data for an IPP message to a HTTP connection.">ippWrite</a></li>
 <li><a href="#ippWriteFile" title="Write data for an IPP message to a file.">ippWriteFile</a></li>
 <li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
-</ul>
+</ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#http_addrlist_t" title="Socket address list, which is
 used to enumerate all of the
@@ -1062,6 +1061,7 @@ to add the standard groups.
 ipp_status_t cupsGetDevices (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int timeout,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *include_schemes,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *exclude_schemes,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;cups_device_cb_t callback,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
@@ -1072,6 +1072,8 @@ ipp_status_t cupsGetDevices (<br>
 <dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
 <dt>timeout</dt>
 <dd class="description">Timeout in seconds or <code>CUPS_TIMEOUT_DEFAULT</code></dd>
+<dt>include_schemes</dt>
+<dd class="description">Comma-separated URI schemes to include or <code>CUPS_INCLUDE_ALL</code></dd>
 <dt>exclude_schemes</dt>
 <dd class="description">Comma-separated URI schemes to exclude or <code>CUPS_EXCLUDE_NONE</code></dd>
 <dt>callback</dt>
@@ -1084,8 +1086,9 @@ ipp_status_t cupsGetDevices (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function sends a CUPS-Get-Devices request and streams the discovered
 devices to the specified callback function. The &quot;timeout&quot; parameter controls
-how long the request lasts, while the &quot;exclude_schemes&quot; parameter provides
-a comma-delimited list of backends to omit from the request.
+how long the request lasts, while the &quot;include_schemes&quot; and &quot;exclude_schemes&quot;
+parameters provide comma-delimited lists of backends to include or omit from
+the request respectively.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="cupsGetFd">cupsGetFd</a></h3>
