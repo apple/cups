@@ -41,13 +41,14 @@ done
 
 echo "<h1>$title</h1>" >"$header.ds"
 sed -e '1,$s/<a href='"'"'/<a href='"'"'http:\/\/www.cups.org\/documentation.php\//g' < "$header" >>"$header.ds"
-sed -e '1,$s/\/images\///g' <"$intro" >"$intro.ds"
+sed -e '1,$s/\/images\///g' -e '1,$s/<a href='"'"'/<a href='"'"'http:\/\/www.cups.org\/documentation.php\//g'  <"$intro" >"$intro.tmp"
+sed -e '1,$s/http:\/\/www.cups.org\/documentation\.php\/#/#/g' <"$intro.tmp" >"$intro.ds"
 
 mxmldoc --docset "$docset" --docversion "$docversion" \
 	--feedname cups.org --feedurl http://www.cups.org/docsets.atom \
 	--title "$title" --css ../doc/cups-printable.css \
 	--header "$header.ds" --intro "$intro.ds" $sources || exit 1
-rm -f "$header.ds" "$intro.ds"
+rm -f "$header.ds" "$intro.ds" "$intro.tmp"
 
 if test ! -d ../docsets; then
 	mkdir ../docsets
