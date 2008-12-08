@@ -524,8 +524,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   do
   {
-    _cupsLangPrintf(stderr, _("INFO: Connecting to %s on port %d...\n"),
-		    hostname, port);
+    fprintf(stderr, "DEBUG: Connecting to %s:%d\n",
+	    hostname, port);
+    _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
@@ -610,7 +611,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
-  _cupsLangPrintf(stderr, _("INFO: Connected to %s...\n"), hostname);
+  _cupsLangPuts(stderr, _("INFO: Connected to printer...\n"));
 
 #ifdef AF_INET6
   if (http->hostaddr->addr.sa_family == AF_INET6)

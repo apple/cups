@@ -1389,7 +1389,9 @@ _httpResolveURI(
     if (log)
     {
       fputs("STATE: +connecting-to-device\n", stderr);
-      _cupsLangPrintf(stderr, _("INFO: Looking for \"%s\"...\n"), hostname);
+      fprintf(stderr, "DEBUG: Resolving %s, regtype=%s, domain=%s...\n",
+              hostname, regtype, domain);
+      _cupsLangPuts(stderr, _("INFO: Looking for printer...\n"));
     }
 
     if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,

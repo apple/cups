@@ -739,13 +739,13 @@ list_devices(void)
 					/* Funky hex numbering used for some *
 					 * devices                           */
 #endif /* __hpux || __sgi || __sun || __FreeBSD__ || __OpenBSD__ || __FreeBSD_kernel__ */
-  char			info[255];	/* Device info/description */
 
 
 #ifdef __linux
   int			i, j;		/* Looping vars */
   int			fd;		/* File descriptor */
   char			device[255];	/* Device filename */
+  char			info[255];	/* Device info/description */
 #  ifdef TIOCGSERIAL
   struct serial_struct	serinfo;	/* serial port info */
 #  endif /* TIOCGSERIAL */
@@ -925,8 +925,9 @@ list_devices(void)
 	}
       }
 #elif defined(__sun)
-  int		i, j, n;	/* Looping vars */
-  char		device[255];	/* Device filename */
+  int		i, j, n;		/* Looping vars */
+  char		device[255];		/* Device filename */
+  char		info[255];		/* Device info/description */
 
 
  /*
@@ -1044,9 +1045,10 @@ list_devices(void)
              device, i + 1);
   }
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
-  int	i, j;		/* Looping vars */
-  int	fd;		/* File descriptor */
-  char	device[255];	/* Device filename */
+  int	i, j;				/* Looping vars */
+  int	fd;				/* File descriptor */
+  char	device[255];			/* Device filename */
+  char	info[255];			/* Device info/description */
 
 
  /*
@@ -1137,9 +1139,10 @@ list_devices(void)
     }
   }
 #elif defined(__NetBSD__)
-  int	i, j;		/* Looping vars */
-  int	fd;		/* File descriptor */
-  char	device[255];	/* Device filename */
+  int	i, j;				/* Looping vars */
+  int	fd;				/* File descriptor */
+  char	device[255];			/* Device filename */
+  char	info[255];			/* Device info/description */
 
 
  /*

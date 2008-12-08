@@ -13,5 +13,18 @@
 #   file is missing or damaged, see the license at "http://www.cups.org/".
 #
 
-
-
+#
+# Notes for Translators:
+#
+# The following prefixes MUST NOT be translated: "ALERT:", "CRIT:", "INFO:",
+# "NOTICE:", and "WARNING:".
+#
+# The "checkpo" program located in the "lcoale" source directory can be used
+# to verify that your translations do not introduce formatting errors or other
+# problems.  Run with:
+#
+#    cd locale
+#    ./checkpo cups_LL.po
+#
+# where "LL" is your locale.
+#
