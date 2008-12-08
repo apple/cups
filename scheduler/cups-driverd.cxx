@@ -942,8 +942,12 @@ list_ppds(int        request_id,	/* I - Request ID */
   num_options = cupsParseOptions(opt, 0, &options);
   exclude     = cupsdCreateStringsArray(cupsGetOption("exclude-schemes",
                                                       num_options, options));
-  include     = cupsdCreateStringsArray(cupsGetOption("exclude-schemes",
+  include     = cupsdCreateStringsArray(cupsGetOption("include-schemes",
 						      num_options, options));
+
+  for (i = 0; i < num_options; i ++)
+    fprintf(stderr, "DEBUG: [cups-driverd] %s=%s\n", options[i].name,
+            options[i].value);
 
   load_drivers(include, exclude);
 
@@ -1051,7 +1055,7 @@ list_ppds(int        request_id,	/* I - Request ID */
     count = limit;
 
   if (device_id || language || make || make_and_model || model_number_str ||
-      product || include || exclude)
+      product)
   {
     matches = cupsArrayNew((cups_array_func_t)compare_matches, NULL);
 
@@ -1168,6 +1172,29 @@ list_ppds(int        request_id,	/* I - Request ID */
 	        ppd->record.name, ppd->matches);
         cupsArrayAdd(matches, ppd);
       }
+    }
+  }
+  else if (include || exclude)
+  {
+    matches = cupsArrayNew((cups_array_func_t)compare_ppds, NULL);
+
+    for (ppd = (ppd_info_t *)cupsArrayFirst(PPDsByMakeModel);
+	 ppd;
+	 ppd = (ppd_info_t *)cupsArrayNext(PPDsByMakeModel))
+    {
+     /*
+      * Filter PPDs based on the include/exclude lists.
+      */
+
+      if (ppd->record.type < PPD_TYPE_POSTSCRIPT ||
+	  ppd->record.type >= PPD_TYPE_DRV)
+	continue;
+
+      if (cupsArrayFind(exclude, ppd->record.scheme) ||
+          (include && !cupsArrayFind(include, ppd->record.scheme)))
+        continue;
+
+      cupsArrayAdd(matches, ppd);
     }
   }
   else
@@ -1929,7 +1956,9 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
   int		i;			/* Looping var */
   char		*start,			/* Start of value */
 		*ptr;			/* Pointer into string */
-  const char	*server_bin;		/* CUPS_SERVERBIN env variable */
+  const char	*server_bin,		/* CUPS_SERVERBIN env variable */
+		*scheme,		/* Scheme for this driver */
+		*scheme_end;		/* Pointer to end of scheme */
   char		drivers[1024];		/* Location of driver programs */
   int		pid;			/* Process ID for driver program */
   cups_file_t	*fp;			/* Pipe to driver program */
@@ -1987,9 +2016,61 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
     * Include/exclude specific drivers...
     */
 
-    if (cupsArrayFind(exclude, dent->filename) ||
-	(include && !cupsArrayFind(include, dent->filename)))
-      continue;
+    if (exclude)
+    {
+     /*
+      * Look for "scheme" or "scheme*" (prefix match), and skip any matches.
+      */
+
+      for (scheme = (char *)cupsArrayFirst(exclude);
+	   scheme;
+	   scheme = (char *)cupsArrayNext(exclude))
+      {
+        fprintf(stderr, "DEBUG: [cups-driverd] Exclude \"%s\" with \"%s\"?\n",
+		dent->filename, scheme);
+	scheme_end = scheme + strlen(scheme) - 1;
+
+	if ((scheme_end > scheme && *scheme_end == '*' &&
+	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	    !strcmp(scheme, dent->filename))
+	{
+	  fputs("DEBUG: [cups-driverd] Yes, exclude!\n", stderr);
+	  break;
+	}
+      }
+
+      if (scheme)
+        continue;
+    }
+
+    if (include)
+    {
+     /*
+      * Look for "scheme" or "scheme*" (prefix match), and skip any non-matches.
+      */
+
+      for (scheme = (char *)cupsArrayFirst(include);
+	   scheme;
+	   scheme = (char *)cupsArrayNext(include))
+      {
+        fprintf(stderr, "DEBUG: [cups-driverd] Include \"%s\" with \"%s\"?\n",
+		dent->filename, scheme);
+	scheme_end = scheme + strlen(scheme) - 1;
+
+	if ((scheme_end > scheme && *scheme_end == '*' &&
+	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	    !strcmp(scheme, dent->filename))
+	{
+	  fputs("DEBUG: [cups-driverd] Yes, include!\n", stderr);
+	  break;
+	}
+      }
+
+      if (!scheme)
+        continue;
+    }
+    else
+      scheme = dent->filename;
 
    /*
     * Run the driver with no arguments and collect the output...
@@ -2056,7 +2137,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	  }
 
           ppd = add_ppd("", name, languages, make, make_and_model, device_id,
-	                product, psversion, 0, 0, 0, type, dent->filename);
+	                product, psversion, 0, 0, 0, type, scheme);
 
           if (!ppd)
 	  {
