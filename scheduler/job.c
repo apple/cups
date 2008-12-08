@@ -1112,6 +1112,17 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   * Copy attribute data to the job object...
   */
 
+  if (!ippFindAttribute(job->attrs, "time-at-creation", IPP_TAG_INTEGER))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+		    "[Job %d] Missing or bad time-at-creation attribute in "
+		    "control file!", job->id);
+    ippDelete(job->attrs);
+    job->attrs = NULL;
+    unlink(jobfile);
+    return;
+  }
+
   if ((job->state = ippFindAttribute(job->attrs, "job-state",
                                      IPP_TAG_ENUM)) == NULL)
   {
