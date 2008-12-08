@@ -1,0 +1,45 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?inactiva:{printer_state=4?procesando:en pausa}},
+{printer_is_accepting_jobs=0?rechazando trabajos:aceptando trabajos},
+{server_is_sharing_printers=0?no:{printer_is_shared=0?no:}} compartida{default_name={printer_name}?, predeterminada del servidor:})</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Mantenimiento</OPTION>
+<OPTION VALUE="print-test-page">Imprimir p&aacute;gina de prueba</OPTION>
+{printer_commands~.*Clean.*?<OPTION VALUE="clean-print-heads">Limpiar cabezales de impresi&oacute;n</OPTION>:}
+{printer_commands~.*PrintSelfTestPage.*?<OPTION VALUE="print-self-test-page">Imprimir p&aacute;gina de auto prueba</OPTION>:}
+{printer_state=5?<OPTION VALUE="start-printer">Reanudar impresora</OPTION>:<OPTION VALUE="stop-printer">Pausar impresora</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Aceptar trabajos</OPTION>:<OPTION VALUE="reject-jobs">Rechazar trabajos</OPTION>}
+<OPTION VALUE="move-jobs">Mover todos los trabajos</OPTION>
+<OPTION VALUE="purge-jobs">Cancelar todos los trabajos</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administraci&oacute;n</OPTION>
+<OPTION VALUE="modify-printer">Modificar impresora</OPTION>
+<OPTION VALUE="delete-printer">Borrar impresora</OPTION>
+<OPTION VALUE="set-printer-options">Establecer opciones predeterminadas</OPTION>
+<OPTION VALUE="set-as-default">Poner como predeterminada del servidor</OPTION>
+<OPTION VALUE="set-allowed-users">Establecer usuarios permitidos</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Descripci&oacute;n:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Ubicaci&oacute;n:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Controlador:</TH><TD>{printer_make_and_model} ({color_supported=1?color:escala de grises}{sides_supported?, dúplex:})<BR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Conexi&oacute;n:</TH><TD>{device_uri}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Opciones predeterminadas:</TH><TD>job-sheets={job_sheets_default}
+media={media_default?{media_default}:desconocido}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>

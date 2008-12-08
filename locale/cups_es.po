@@ -1,0 +1,7227 @@
+#
+# "$Id$"
+#
+#   Spanish message catalog for the Common UNIX Printing System (CUPS).
+#
+#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2005-2007 by Easy Software Products.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+
+
+
+msgid ""
+msgstr ""
+"Project-Id-Version: CUPS 1.4\n"
+"Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
+"POT-Creation-Date: 2008-10-10 11:47-0700\n"
+"PO-Revision-Date: 2008-11-12 16:53+0100\n"
+"Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
+"Language-Team: Spanish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: systemv/lpstat.c:1843
+#: systemv/lpstat.c:1956
+msgid "\t\t(all)\n"
+msgstr "\t\t(todos)\n"
+
+#: systemv/lpstat.c:1846
+#: systemv/lpstat.c:1849
+#: systemv/lpstat.c:1959
+#: systemv/lpstat.c:1962
+msgid "\t\t(none)\n"
+msgstr "\t\t(ninguno)\n"
+
+#: berkeley/lpc.c:438
+#, c-format
+msgid "\t%d entries\n"
+msgstr "\t%d entradas\n"
+
+#: systemv/lpstat.c:1824
+#: systemv/lpstat.c:1937
+msgid "\tAfter fault: continue\n"
+msgstr "\tTras fallo: continuar\n"
+
+#: systemv/lpstat.c:1456
+#: systemv/lpstat.c:1790
+#: systemv/lpstat.c:1903
+msgid "\tAlerts:"
+msgstr "\tAlertas:"
+
+#: systemv/lpstat.c:1847
+#: systemv/lpstat.c:1960
+msgid "\tBanner required\n"
+msgstr "\tSe necesita un rótulo\n"
+
+#: systemv/lpstat.c:1848
+#: systemv/lpstat.c:1961
+msgid "\tCharset sets:\n"
+msgstr "\tAjustes del juego de caracteres:\n"
+
+#: systemv/lpstat.c:1813
+#: systemv/lpstat.c:1926
+msgid "\tConnection: direct\n"
+msgstr "\tConexión: directa\n"
+
+#: systemv/lpstat.c:1804
+#: systemv/lpstat.c:1917
+msgid "\tConnection: remote\n"
+msgstr "\tConexión: remota\n"
+
+#: systemv/lpstat.c:1851
+#: systemv/lpstat.c:1964
+msgid "\tDefault page size:\n"
+msgstr "\tTamaño de página predeterminado:\n"
+
+#: systemv/lpstat.c:1850
+#: systemv/lpstat.c:1963
+msgid "\tDefault pitch:\n"
+msgstr "\tPaso predeterminado:\n"
+
+#: systemv/lpstat.c:1852
+#: systemv/lpstat.c:1965
+msgid "\tDefault port settings:\n"
+msgstr "\tAjustes del puerto predeterminados:\n"
+
+#: systemv/lpstat.c:1785
+#: systemv/lpstat.c:1898
+#, c-format
+msgid "\tDescription: %s\n"
+msgstr "\tDescripción: %s\n"
+
+#: systemv/lpstat.c:1779
+#: systemv/lpstat.c:1892
+msgid ""
+"\tForm mounted:\n"
+"\tContent types: any\n"
+"\tPrinter types: unknown\n"
+msgstr ""
+"\tFormulario montado:\n"
+"\tTipos de contenido: cualquiera\n"
+"\tTipos de impresora: desconocido\n"
+
+#: systemv/lpstat.c:1845
+#: systemv/lpstat.c:1958
+msgid "\tForms allowed:\n"
+msgstr "\tFormularios permitidos:\n"
+
+#: systemv/lpstat.c:1808
+#: systemv/lpstat.c:1921
+#, c-format
+msgid "\tInterface: %s.ppd\n"
+msgstr "\tInterfaz: %s.ppd\n"
+
+#: systemv/lpstat.c:1817
+#: systemv/lpstat.c:1930
+#, c-format
+msgid "\tInterface: %s/interfaces/%s\n"
+msgstr "\tInterfaz: %s/interfaces/%s\n"
+
+#: systemv/lpstat.c:1821
+#: systemv/lpstat.c:1934
+#, c-format
+msgid "\tInterface: %s/ppd/%s.ppd\n"
+msgstr "\tInterfaz: %s/ppd/%s.ppd\n"
+
+#: systemv/lpstat.c:1799
+#: systemv/lpstat.c:1912
+#, c-format
+msgid "\tLocation: %s\n"
+msgstr "\tUbicación: %s\n"
+
+#: systemv/lpstat.c:1823
+#: systemv/lpstat.c:1936
+msgid "\tOn fault: no alert\n"
+msgstr "\tEn fallo: no alertar\n"
+
+#: systemv/lpstat.c:1828
+#: systemv/lpstat.c:1842
+#: systemv/lpstat.c:1941
+#: systemv/lpstat.c:1955
+msgid "\tUsers allowed:\n"
+msgstr "\tUsuarios permitidos:\n"
+
+#: systemv/lpstat.c:1835
+#: systemv/lpstat.c:1948
+msgid "\tUsers denied:\n"
+msgstr "\tUsuarios denegados:\n"
+
+#: berkeley/lpc.c:440
+msgid "\tdaemon present\n"
+msgstr "\tdemonio presente\n"
+
+#: berkeley/lpc.c:436
+msgid "\tno entries\n"
+msgstr "\tno hay entradas\n"
+
+#: berkeley/lpc.c:408
+#: berkeley/lpc.c:420
+#, c-format
+msgid "\tprinter is on device '%s' speed -1\n"
+msgstr "\tla impresora está conectada a '%s' velocidad -1\n"
+
+#: berkeley/lpc.c:433
+msgid "\tprinting is disabled\n"
+msgstr "\tla impresión está desactivada\n"
+
+#: berkeley/lpc.c:431
+msgid "\tprinting is enabled\n"
+msgstr "\tla impresión está activada\n"
+
+#: systemv/lpstat.c:1462
+#, c-format
+msgid "\tqueued for %s\n"
+msgstr "\ten cola para %s\n"
+
+#: berkeley/lpc.c:428
+msgid "\tqueuing is disabled\n"
+msgstr "\tla cola está desactivada\n"
+
+#: berkeley/lpc.c:426
+msgid "\tqueuing is enabled\n"
+msgstr "\tla cola está activada\n"
+
+#: systemv/lpstat.c:1772
+#: systemv/lpstat.c:1885
+msgid "\treason unknown\n"
+msgstr "\trazón desconocida\n"
+
+#: systemv/cupstestppd.c:380
+msgid ""
+"\n"
+"    DETAILED CONFORMANCE TEST RESULTS\n"
+msgstr ""
+"\n"
+"    RESULTADOS DETALLADOS DE LA PRUEBA DE CONFORMIDAD\n"
+
+#: systemv/cupstestppd.c:341
+#: systemv/cupstestppd.c:345
+msgid "                REF: Page 15, section 3.1.\n"
+msgstr "                REF: Página 15, sección 3.1.\n"
+
+#: systemv/cupstestppd.c:337
+msgid "                REF: Page 15, section 3.2.\n"
+msgstr "                REF: Página 15, sección 3.2.\n"
+
+#: systemv/cupstestppd.c:353
+msgid "                REF: Page 19, section 3.3.\n"
+msgstr "                REF: Página 19, sección 3.3.\n"
+
+#: systemv/cupstestppd.c:315
+msgid "                REF: Page 20, section 3.4.\n"
+msgstr "                REF: Página 20, sección 3.4.\n"
+
+#: systemv/cupstestppd.c:357
+msgid "                REF: Page 27, section 3.5.\n"
+msgstr "                REF: Página 27, sección 3.5.\n"
+
+#: systemv/cupstestppd.c:311
+msgid "                REF: Page 42, section 5.2.\n"
+msgstr "                REF: Página 42, sección 5.2.\n"
+
+#: systemv/cupstestppd.c:349
+msgid "                REF: Pages 16-17, section 3.2.\n"
+msgstr "                REF: Páginas 16-17, sección 3.2.\n"
+
+#: systemv/cupstestppd.c:325
+msgid "                REF: Pages 42-45, section 5.2.\n"
+msgstr "                REF: Páginas 42-45, sección 5.2.\n"
+
+#: systemv/cupstestppd.c:320
+msgid "                REF: Pages 45-46, section 5.2.\n"
+msgstr "                REF: Páginas 45-46, sección 5.2.\n"
+
+#: systemv/cupstestppd.c:329
+msgid "                REF: Pages 48-49, section 5.2.\n"
+msgstr "                REF: Páginas 48-49, sección 5.2.\n"
+
+#: systemv/cupstestppd.c:333
+msgid "                REF: Pages 52-54, section 5.2.\n"
+msgstr "                REF: Páginas 52-54, sección 5.2.\n"
+
+#: berkeley/lpq.c:547
+#, c-format
+msgid "        %-39.39s %.0f bytes\n"
+msgstr "        %-39.39s %.0f bytes\n"
+
+#: systemv/cupstestppd.c:497
+#, c-format
+msgid "        PASS    Default%s\n"
+msgstr "        PASA    %s predeterminado\n"
+
+#: systemv/cupstestppd.c:434
+msgid "        PASS    DefaultImageableArea\n"
+msgstr "        PASA    DefaultImageableArea\n"
+
+#: systemv/cupstestppd.c:468
+msgid "        PASS    DefaultPaperDimension\n"
+msgstr "        PASA    DefaultPaperDimension\n"
+
+#: systemv/cupstestppd.c:520
+msgid "        PASS    FileVersion\n"
+msgstr "        PASA    FileVersion\n"
+
+#: systemv/cupstestppd.c:540
+msgid "        PASS    FormatVersion\n"
+msgstr "        PASA    FormatVersion\n"
+
+#: systemv/cupstestppd.c:560
+msgid "        PASS    LanguageEncoding\n"
+msgstr "        PASA    LanguageEncoding\n"
+
+#: systemv/cupstestppd.c:580
+msgid "        PASS    LanguageVersion\n"
+msgstr "        PASA    LanguageVersion\n"
+
+#: systemv/cupstestppd.c:632
+msgid "        PASS    Manufacturer\n"
+msgstr "        PASA    Manufacturer\n"
+
+#: systemv/cupstestppd.c:672
+msgid "        PASS    ModelName\n"
+msgstr "        PASA    ModelName\n"
+
+#: systemv/cupstestppd.c:692
+msgid "        PASS    NickName\n"
+msgstr "        PASA    NickName\n"
+
+#: systemv/cupstestppd.c:752
+msgid "        PASS    PCFileName\n"
+msgstr "        PASA    PCFileName\n"
+
+#: systemv/cupstestppd.c:827
+msgid "        PASS    PSVersion\n"
+msgstr "        PASA    PSVersion\n"
+
+#: systemv/cupstestppd.c:732
+msgid "        PASS    PageRegion\n"
+msgstr "        PASA    PageRegion\n"
+
+#: systemv/cupstestppd.c:712
+msgid "        PASS    PageSize\n"
+msgstr "        PASA    PageSize\n"
+
+#: systemv/cupstestppd.c:787
+msgid "        PASS    Product\n"
+msgstr "        PASA    Product\n"
+
+#: systemv/cupstestppd.c:862
+msgid "        PASS    ShortNickName\n"
+msgstr "        PASA    ShortNickName\n"
+
+#: systemv/cupstestppd.c:2818
+#, c-format
+msgid ""
+"        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
+"                (constraint=\"%s %s %s %s\")\n"
+msgstr ""
+"        ADVERTENCIA    \"%s %s\" está en conflicto con \"%s %s\"\n"
+"                (restricción=\"%s %s %s %s\")\n"
+
+#: systemv/cupstestppd.c:1227
+#, c-format
+msgid "        WARN    %s has no corresponding options!\n"
+msgstr "        ADVERTENCIA    %s tiene opciones que no corresponden.\n"
+
+#: systemv/cupstestppd.c:1335
+#, c-format
+msgid ""
+"        WARN    %s shares a common prefix with %s\n"
+"                REF: Page 15, section 3.2.\n"
+msgstr ""
+"        ADVERTENCIA    %s comparte un prefijo común con %s\n"
+"                REF: Página 15, sección 3.2.\n"
+
+#: systemv/cupstestppd.c:1236
+msgid "        WARN    Default choices conflicting!\n"
+msgstr "        ADVERTENCIA    Las preferencias predeterminadas están en conflicto.\n"
+
+#: systemv/cupstestppd.c:1198
+#, c-format
+msgid ""
+"        WARN    Duplex option keyword %s may not work as expected and should be named Duplex!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"        ADVERTENCIA    La clave de opción Duplex %s puede que no funcione como se espera y debería llamarse Duplex.\n"
+"                REF: Página 122, sección 5.17\n"
+
+#: systemv/cupstestppd.c:1627
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+msgstr "        ADVERTENCIA    El archivo contiene una mezcla de líneas acabadas en CR, LF y CR LF.\n"
+
+#: systemv/cupstestppd.c:1252
+msgid ""
+"        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+"        ADVERTENCIA    Se necesita LanguageEncoding por especificación de PPD 4.3.\n"
+"                REF: Páginas 56-57, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:1609
+#, c-format
+msgid "        WARN    Line %d only contains whitespace!\n"
+msgstr "        ADVERTENCIA    La línea %d solo contiene espacios en blanco.\n"
+
+#: systemv/cupstestppd.c:1260
+msgid ""
+"        WARN    Manufacturer required by PPD 4.3 spec.\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"        ADVERTENCIA    Se necesita Manufacturer por especificación de PPD 4.3.\n"
+"                REF: Páginas 58-59, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:1354
+#, c-format
+msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+msgstr "        ADVERTENCIA    Falta el archivo APDialogExtension \"%s\"\n"
+
+#: systemv/cupstestppd.c:1368
+#, c-format
+msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+msgstr "        ADVERTENCIA    Falta el archivo APPrinterIconPath \"%s\"\n"
+
+#: systemv/cupstestppd.c:1632
+msgid "        WARN    Non-Windows PPD files should use lines ending with only LF, not CR LF!\n"
+msgstr "        ADVERTENCIA    Los archivos PPD que no sean de Windows deben tener líneas que acaben sólo en LF, no en CR LF.\n"
+
+#: systemv/cupstestppd.c:1244
+#, c-format
+msgid ""
+"        WARN    Obsolete PPD version %.1f!\n"
+"                REF: Page 42, section 5.2.\n"
+msgstr ""
+"        ADVERTENCIA    Versión de PPD %.1f anticuada.\n"
+"                REF: Página 42, sección 5.2.\n"
+
+#: systemv/cupstestppd.c:1273
+msgid ""
+"        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"        ADVERTENCIA    PCFileName es mas largo que 8.3 violando la especificación PPD.\n"
+"                REF: Páginas 61-62, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:1307
+msgid ""
+"        WARN    Protocols contains PJL but JCL attributes are not set.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        ADVERTENCIA    Los protocolos contienen PJL pero no se especifican los atributos JCL.\n"
+"                REF: Páginas 78-79, sección 5.7.\n"
+
+#: systemv/cupstestppd.c:1298
+msgid ""
+"        WARN    Protocols contains both PJL and BCP; expected TBCP.\n"
+"                REF: Pages 78-79, section 5.7.\n"
+msgstr ""
+"        ADVERTENCIA    Los protocolos contienen a ambos, PJL y BCP; se esperaba TBCP.\n"
+"                REF: Páginas 78-79, sección 5.7.\n"
+
+#: systemv/cupstestppd.c:1281
+msgid ""
+"        WARN    ShortNickName required by PPD 4.3 spec.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"        ADVERTENCIA    Se necesita ShortNickName por especificación de PPD 4.3.\n"
+"                REF: Páginas 64-65, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:2097
+#, c-format
+msgid "      %s  %s %s does not exist!\n"
+msgstr "      %s  %s %s no existe.\n"
+
+#: systemv/cupstestppd.c:2167
+#, c-format
+msgid ""
+"      %s  Bad %s choice %s!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"      %s  Preferencia %s incorrecta %s.\n"
+"                REF: Página 122, sección 5.17\n"
+
+#: systemv/cupstestppd.c:2533
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+msgstr "      %s  Cadena de traducción UTF-8 \"%s\" incorrecta para opción %s.\n"
+
+#: systemv/cupstestppd.c:2579
+#: systemv/cupstestppd.c:2628
+#: systemv/cupstestppd.c:2667
+#, c-format
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      %s  Cadena de traducción UTF-8 \"%s\" incorrecta para opción %s, preferencia %s.\n"
+
+#: systemv/cupstestppd.c:2215
+#, c-format
+msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+msgstr "      %s  Valor cupsFilter \"%s\" incorrecto.\n"
+
+#: systemv/cupstestppd.c:2350
+#, c-format
+msgid "      %s  Bad cupsICCProfile %s!\n"
+msgstr "      %s  cupsICCProfile %s incorrecto.\n"
+
+#: systemv/cupstestppd.c:2266
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+msgstr "      %s  Valor cupsPreFilter \"%s\" incorrecto.\n"
+
+#: systemv/cupstestppd.c:1705
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  cupsUIConstraints %s: \"%s\" incorrecto.\n"
+
+#: systemv/cupstestppd.c:2483
+#, c-format
+msgid "      %s  Bad language \"%s\"!\n"
+msgstr "      %s  Idioma incorrecto \"%s\".\n"
+
+#: systemv/cupstestppd.c:1686
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s!\n"
+msgstr "      %s  cupsUIConstraints %s vacío.\n"
+
+#: systemv/cupstestppd.c:2519
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+msgstr "      %s  Falta cadena de traducción \"%s\" para opción %s.\n"
+
+#: systemv/cupstestppd.c:2611
+#: systemv/cupstestppd.c:2651
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgstr "      %s  Falta cadena de traducción \"%s\" para opción %s, preferencia %s.\n"
+
+#: systemv/cupstestppd.c:1878
+#: systemv/cupstestppd.c:1919
+#, c-format
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgstr "      %s  Falta la preferencia *%s %s en UIConstraint \"*%s %s *%s %s\".\n"
+
+#: systemv/cupstestppd.c:1791
+#, c-format
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  Falta la preferencia *%s %s en cupsUIConstraints %s: \"%s\".\n"
+
+#: systemv/cupstestppd.c:2244
+#, c-format
+msgid "      %s  Missing cupsFilter file \"%s\"\n"
+msgstr "      %s  Falta archivo cupsFilter \"%s\"\n"
+
+#: systemv/cupstestppd.c:2384
+#, c-format
+msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
+msgstr "      %s Falta el archivo cupsICCProfile \"%s\".\n"
+
+#: systemv/cupstestppd.c:2295
+#, c-format
+msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
+msgstr "      %s  Falta archivo cupsPreFilter \"%s\"\n"
+
+#: systemv/cupstestppd.c:1723
+#, c-format
+msgid "      %s  Missing cupsUIResolver %s!\n"
+msgstr "      %s  Falta cupsUIResolver %s.\n"
+
+#: systemv/cupstestppd.c:1864
+#: systemv/cupstestppd.c:1905
+#, c-format
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgstr "      %s  Falta la opción %s en UIConstraints \"*%s %s *%s %s\".\n"
+
+#: systemv/cupstestppd.c:1775
+#, c-format
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"!\n"
+msgstr "      %s  Falta la opción %s en cupsUIConstraints %s: \"%s\".\n"
+
+#: systemv/cupstestppd.c:2705
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file!\n"
+msgstr "      %s  No hay traducción base \"%s\" incluida en el archivo.\n"
+
+#: systemv/cupstestppd.c:2143
+#, c-format
+msgid ""
+"      %s  REQUIRED %s does not define choice None!\n"
+"                REF: Page 122, section 5.17\n"
+msgstr ""
+"      %s  SE NECESITA %s no define preferencia Ninguna.\n"
+"                REF: Página 122, sección 5.17\n"
+
+#: systemv/cupstestppd.c:2410
+#, c-format
+msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
+msgstr "      %s  valor hash de cupsICCProfile %s colisiona con %s!\n"
+
+#: systemv/cupstestppd.c:1828
+#, c-format
+msgid "      %s  cupsUIResolver %s causes a loop!\n"
+msgstr "      %s  cupsUIResolver %s genera un bucle.\n"
+
+#: systemv/cupstestppd.c:2028
+#, c-format
+msgid "      **FAIL**  %s choice names %s and %s differ only by case!\n"
+msgstr "      **FALLO**  %s nombres de opción %s y %s se diferencian sólo en la capitalización.\n"
+
+#: systemv/cupstestppd.c:1029
+#, c-format
+msgid ""
+"      **FAIL**  %s must be 1284DeviceID!\n"
+"                REF: Page 72, section 5.5\n"
+msgstr ""
+"      **FALLO**  %s debe ser 1284DeviceID.\n"
+"                REF: Página 72, sección 5.5\n"
+
+#: systemv/cupstestppd.c:488
+#, c-format
+msgid ""
+"      **FAIL**  BAD Default%s %s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **FALLO**  Default%s %s incorrecto\n"
+"                REF: Página 40, sección 4.5.\n"
+
+#: systemv/cupstestppd.c:424
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultImageableArea %s!\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FALLO**  DefaultImageableArea %s incorrecto\n"
+"                REF: Página 102, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:460
+#, c-format
+msgid ""
+"      **FAIL**  BAD DefaultPaperDimension %s!\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FALLO**  DefaultPaperDimension %s incorrecto.\n"
+"                REF: Página 103, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:888
+msgid ""
+"      **FAIL**  BAD JobPatchFile attribute in file\n"
+"                REF: Page 24, section 3.4.\n"
+msgstr ""
+"      **FALLO**  Atributo JobPatchFile en archivo, incorrecto\n"
+"                REF: Página 24, sección 3.4.\n"
+
+#: systemv/cupstestppd.c:608
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"HP\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **FALLO**  Fabricante INCORRECTO (debería ser \"HP\")\n"
+"                REF: Página 211, tabla D.1.\n"
+
+#: systemv/cupstestppd.c:624
+msgid ""
+"      **FAIL**  BAD Manufacturer (should be \"Oki\")\n"
+"                REF: Page 211, table D.1.\n"
+msgstr ""
+"      **FALLO**  Fabricante INCORRECTO (debería ser \"Oki\")\n"
+"                REF: Página 211, tabla D.1.\n"
+
+#: systemv/cupstestppd.c:663
+#, c-format
+msgid ""
+"      **FAIL**  BAD ModelName - \"%c\" not allowed in string.\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **FALLO**  ModelName - \"%c\" incorrecto no permitido en la cadena.\n"
+"                REF: Páginas 59-60, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:819
+msgid ""
+"      **FAIL**  BAD PSVersion - not \"(string) int\".\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **FALLO**  PSVersion incorrecto- no es \"(string) int\".\n"
+"                REF: Páginas 62-64, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:780
+msgid ""
+"      **FAIL**  BAD Product - not \"(string)\".\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **FALLO**  Product incorrecto - no es \"(string)\".\n"
+"                REF: Página 62, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:854
+msgid ""
+"      **FAIL**  BAD ShortNickName - longer than 31 chars.\n"
+"                REF: Pages 64-65, section 5.3.\n"
+msgstr ""
+"      **FALLO**  ShortNickName incorrecto - mayor de 31 caracteres.\n"
+"                REF: Páginas 64-65, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:1010
+#, c-format
+msgid ""
+"      **FAIL**  Bad %s choice %s!\n"
+"                REF: Page 84, section 5.9\n"
+msgstr ""
+"      **FALLO**  Preferencia %s incorrecta %s.\n"
+"                REF: Página 84, sección 5.9\n"
+
+#: systemv/cupstestppd.c:1071
+#, c-format
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+msgstr "      **FALLO**  LanguageEncoding %s incorrecto: debería ser ISOLatin1.\n"
+
+#: systemv/cupstestppd.c:1085
+#, c-format
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+msgstr "      **FALLO**  LanguageVersion %s incorrecto: debería ser Inglés.\n"
+
+#: systemv/cupstestppd.c:2845
+#: systemv/cupstestppd.c:2867
+#, c-format
+msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
+msgstr "      **FALLO**  El código de opción predeterminado no puede ser interpretado: %s\n"
+
+#: systemv/cupstestppd.c:1144
+#, c-format
+msgid "      **FAIL**  Default translation string for option %s choice %s contains 8-bit characters!\n"
+msgstr "      **FALLO**  Cadena de traducción predeterminada para opción %s preferencia %s contiene caracteres de 8-bits.\n"
+
+#: systemv/cupstestppd.c:1117
+#, c-format
+msgid "      **FAIL**  Default translation string for option %s contains 8-bit characters!\n"
+msgstr "      **FALLO**  Cadena de traducción predeterminada para opción %s contiene caracteres de 8-bits.\n"
+
+#: systemv/cupstestppd.c:1966
+#, c-format
+msgid "      **FAIL**  Group names %s and %s differ only by case!\n"
+msgstr "      **FALLO**  Nombres de grupo %s y %s se diferencian sólo en la capitalización.\n"
+
+#: systemv/cupstestppd.c:2011
+#, c-format
+msgid "      **FAIL**  Multiple occurrences of %s choice name %s!\n"
+msgstr "      **FALLO**  Múltiples apariciones de %s nombre de opción %s.\n"
+
+#: systemv/cupstestppd.c:1988
+#, c-format
+msgid "      **FAIL**  Option names %s and %s differ only by case!\n"
+msgstr "      **FALLO**  Nombres de opción %s y %s se diferencian sólo en la capitalización.\n"
+
+#: systemv/cupstestppd.c:508
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED Default%s\n"
+"                REF: Page 40, section 4.5.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA Default%s\n"
+"                REF: Página 40, sección 4.5.\n"
+
+#: systemv/cupstestppd.c:409
+msgid ""
+"      **FAIL**  REQUIRED DefaultImageableArea\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA DefaultImageableArea\n"
+"                REF: Página 102, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:445
+msgid ""
+"      **FAIL**  REQUIRED DefaultPaperDimension\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA DefaultPaperDimension\n"
+"                REF: Página 103, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:530
+msgid ""
+"      **FAIL**  REQUIRED FileVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA FileVersion\n"
+"                REF: Página 56, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:550
+msgid ""
+"      **FAIL**  REQUIRED FormatVersion\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA FormatVersion\n"
+"                REF: Página 56, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:939
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED ImageableArea for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 102, section 5.15.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA ImageableArea para PageSize %s\n"
+"                REF: Página 41, sección 5.\n"
+"                REF: Página 102, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:570
+msgid ""
+"      **FAIL**  REQUIRED LanguageEncoding\n"
+"                REF: Pages 56-57, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA LanguageEncoding\n"
+"                REF: Páginas 56-57, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:590
+msgid ""
+"      **FAIL**  REQUIRED LanguageVersion\n"
+"                REF: Pages 57-58, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA LanguageVersion\n"
+"                REF: Páginas 57-58, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:642
+msgid ""
+"      **FAIL**  REQUIRED Manufacturer\n"
+"                REF: Pages 58-59, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA Manufacturer\n"
+"                REF: Páginas 58-59, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:682
+msgid ""
+"      **FAIL**  REQUIRED ModelName\n"
+"                REF: Pages 59-60, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA ModelName\n"
+"                REF: Páginas 59-60, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:702
+msgid ""
+"      **FAIL**  REQUIRED NickName\n"
+"                REF: Page 60, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA NickName\n"
+"                REF: Página 60, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:762
+msgid ""
+"      **FAIL**  REQUIRED PCFileName\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PCFileName\n"
+"                REF: Páginas 61-62, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:837
+msgid ""
+"      **FAIL**  REQUIRED PSVersion\n"
+"                REF: Pages 62-64, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PSVersion\n"
+"                REF: Páginas 62-64, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:742
+msgid ""
+"      **FAIL**  REQUIRED PageRegion\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PageRegion\n"
+"                REF: Página 100, sección 5.14.\n"
+
+#: systemv/cupstestppd.c:908
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PageSize\n"
+"                REF: Página 41, sección 5.\n"
+"                REF: Página 99, sección 5.14.\n"
+
+#: systemv/cupstestppd.c:722
+msgid ""
+"      **FAIL**  REQUIRED PageSize\n"
+"                REF: Pages 99-100, section 5.14.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PageSize\n"
+"                REF: Páginas 99-100, sección 5.14.\n"
+
+#: systemv/cupstestppd.c:961
+#, c-format
+msgid ""
+"      **FAIL**  REQUIRED PaperDimension for PageSize %s\n"
+"                REF: Page 41, section 5.\n"
+"                REF: Page 103, section 5.15.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA PaperDimension para PageSize %s\n"
+"                REF: Página 41, sección 5.\n"
+"                REF: Página 103, sección 5.15.\n"
+
+#: systemv/cupstestppd.c:797
+msgid ""
+"      **FAIL**  REQUIRED Product\n"
+"                REF: Page 62, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA Product\n"
+"                REF: Página 62, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:872
+msgid ""
+"      **FAIL**  REQUIRED ShortNickName\n"
+"                REF: Page 64-65, section 5.3.\n"
+msgstr ""
+"      **FALLO**  SE NECESITA ShortNickName\n"
+"                REF: Página 64-65, sección 5.3.\n"
+
+#: systemv/cupstestppd.c:1377
+#, c-format
+msgid "    %d ERRORS FOUND\n"
+msgstr "    %d ERRORES ENCONTRADOS\n"
+
+#: systemv/cupstestdsc.c:238
+#: systemv/cupstestdsc.c:280
+#, c-format
+msgid ""
+"    Bad %%%%BoundingBox: on line %d!\n"
+"        REF: Page 39, %%%%BoundingBox:\n"
+msgstr ""
+"    %%%%BoundingBox: incorrecto en línea %d.\n"
+"        REF: Página 39, %%%%BoundingBox:\n"
+
+#: systemv/cupstestdsc.c:309
+#, c-format
+msgid ""
+"    Bad %%%%Page: on line %d!\n"
+"        REF: Page 53, %%%%Page:\n"
+msgstr ""
+"    %%%%Page: incorrecto en línea %d.\n"
+"        REF: Página 53, %%%%Page:\n"
+
+#: systemv/cupstestdsc.c:222
+#: systemv/cupstestdsc.c:262
+#, c-format
+msgid ""
+"    Bad %%%%Pages: on line %d!\n"
+"        REF: Page 43, %%%%Pages:\n"
+msgstr ""
+"    %%%%Pages: incorrecto en línea %d.\n"
+"        REF: Página 43, %%%%Pages:\n"
+
+#: systemv/cupstestdsc.c:180
+#, c-format
+msgid ""
+"    Line %d is longer than 255 characters (%d)!\n"
+"        REF: Page 25, Line Length\n"
+msgstr ""
+"    La línea %d es más larga de 255 caracteres (%d).\n"
+"        REF: Página 25, Longitud de Línea\n"
+
+#: systemv/cupstestdsc.c:196
+msgid ""
+"    Missing %!PS-Adobe-3.0 on first line!\n"
+"        REF: Page 17, 3.1 Conforming Documents\n"
+msgstr ""
+"    Falta %!PS-Adobe-3.0 en la primera línea.\n"
+"        REF: Página 17, 3.1 Conformidad de documentos\n"
+
+#: systemv/cupstestdsc.c:366
+#, c-format
+msgid ""
+"    Missing %%EndComments comment!\n"
+"        REF: Page 41, %%EndComments\n"
+msgstr ""
+"    Falta comentario %%EndComments.\n"
+"        REF: Página 41, %%EndComments\n"
+
+#: systemv/cupstestdsc.c:346
+#, c-format
+msgid ""
+"    Missing or bad %%BoundingBox: comment!\n"
+"        REF: Page 39, %%BoundingBox:\n"
+msgstr ""
+"    Falta comentario %%BoundingBox: o incorrecto.\n"
+"        REF: Página 39, %%BoundingBox:\n"
+
+#: systemv/cupstestdsc.c:376
+#, c-format
+msgid ""
+"    Missing or bad %%Page: comments!\n"
+"        REF: Page 53, %%Page:\n"
+msgstr ""
+"    Falta comentario %%Page: o incorrecto.\n"
+"        REF: Página 53, %%Page:\n"
+
+#: systemv/cupstestdsc.c:356
+#, c-format
+msgid ""
+"    Missing or bad %%Pages: comment!\n"
+"        REF: Page 43, %%Pages:\n"
+msgstr ""
+"    Falta comentario %%Pages: o incorrecto.\n"
+"        REF: Página 43, %%Pages:\n"
+
+#: systemv/cupstestppd.c:1379
+msgid "    NO ERRORS FOUND\n"
+msgstr "    NO SE HAN ENCONTRADO ERRORES\n"
+
+#: systemv/cupstestdsc.c:399
+#, c-format
+msgid "    Saw %d lines that exceeded 255 characters!\n"
+msgstr "    Se han visto %d líneas que exceden de 255 caracteres.\n"
+
+#: systemv/cupstestdsc.c:394
+#, c-format
+msgid "    Too many %%BeginDocument comments!\n"
+msgstr "    Demasiados comentarios %%BeginDocument.\n"
+
+#: systemv/cupstestdsc.c:386
+#, c-format
+msgid "    Too many %%EndDocument comments!\n"
+msgstr "    Demasiados comentarios %%EndDocument.\n"
+
+#: systemv/cupstestdsc.c:406
+msgid "    Warning: file contains binary data!\n"
+msgstr "    Advertencia: el archivo contiene datos binarios.\n"
+
+#: systemv/cupstestdsc.c:414
+#, c-format
+msgid "    Warning: no %%EndComments comment in file!\n"
+msgstr "    Advertencia: no hay comentario %%EndComments en el archivo.\n"
+
+#: systemv/cupstestdsc.c:410
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file!\n"
+msgstr "    Advertencia: versión DSC %.1f obsoleta en el archivo.\n"
+
+#: systemv/cupstestppd.c:406
+#: systemv/cupstestppd.c:421
+#: systemv/cupstestppd.c:442
+#: systemv/cupstestppd.c:457
+#: systemv/cupstestppd.c:485
+#: systemv/cupstestppd.c:505
+#: systemv/cupstestppd.c:527
+#: systemv/cupstestppd.c:547
+#: systemv/cupstestppd.c:567
+#: systemv/cupstestppd.c:587
+#: systemv/cupstestppd.c:605
+#: systemv/cupstestppd.c:621
+#: systemv/cupstestppd.c:639
+#: systemv/cupstestppd.c:660
+#: systemv/cupstestppd.c:679
+#: systemv/cupstestppd.c:699
+#: systemv/cupstestppd.c:719
+#: systemv/cupstestppd.c:739
+#: systemv/cupstestppd.c:759
+#: systemv/cupstestppd.c:777
+#: systemv/cupstestppd.c:794
+#: systemv/cupstestppd.c:816
+#: systemv/cupstestppd.c:834
+#: systemv/cupstestppd.c:851
+#: systemv/cupstestppd.c:869
+#: systemv/cupstestppd.c:885
+#: systemv/cupstestppd.c:905
+#: systemv/cupstestppd.c:936
+#: systemv/cupstestppd.c:958
+#: systemv/cupstestppd.c:1007
+#: systemv/cupstestppd.c:1026
+#: systemv/cupstestppd.c:1067
+#: systemv/cupstestppd.c:1081
+#: systemv/cupstestppd.c:1113
+#: systemv/cupstestppd.c:1140
+#: systemv/cupstestppd.c:1683
+#: systemv/cupstestppd.c:1702
+#: systemv/cupstestppd.c:1720
+#: systemv/cupstestppd.c:1772
+#: systemv/cupstestppd.c:1788
+#: systemv/cupstestppd.c:1825
+#: systemv/cupstestppd.c:1861
+#: systemv/cupstestppd.c:1875
+#: systemv/cupstestppd.c:1902
+#: systemv/cupstestppd.c:1916
+#: systemv/cupstestppd.c:1962
+#: systemv/cupstestppd.c:1984
+#: systemv/cupstestppd.c:2007
+#: systemv/cupstestppd.c:2024
+#: systemv/cupstestppd.c:2093
+#: systemv/cupstestppd.c:2140
+#: systemv/cupstestppd.c:2164
+#: systemv/cupstestppd.c:2211
+#: systemv/cupstestppd.c:2241
+#: systemv/cupstestppd.c:2262
+#: systemv/cupstestppd.c:2292
+#: systemv/cupstestppd.c:2346
+#: systemv/cupstestppd.c:2381
+#: systemv/cupstestppd.c:2406
+#: systemv/cupstestppd.c:2479
+#: systemv/cupstestppd.c:2515
+#: systemv/cupstestppd.c:2529
+#: systemv/cupstestppd.c:2575
+#: systemv/cupstestppd.c:2607
+#: systemv/cupstestppd.c:2624
+#: systemv/cupstestppd.c:2647
+#: systemv/cupstestppd.c:2663
+#: systemv/cupstestppd.c:2701
+#: systemv/cupstestppd.c:2841
+#: systemv/cupstestppd.c:2863
+msgid " FAIL\n"
+msgstr " FALLO\n"
+
+#: systemv/cupstestppd.c:291
+#, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s\n"
+msgstr ""
+" FALLO\n"
+"      **FALLO**  No se ha podido abrir el archivo PPD - %s\n"
+
+#: systemv/cupstestppd.c:302
+#, c-format
+msgid ""
+" FAIL\n"
+"      **FAIL**  Unable to open PPD file - %s on line %d.\n"
+msgstr ""
+" FALLO\n"
+"      **FALLO**  No se ha podido abrir el archivo PPD - %s en la línea %d.\n"
+
+#: systemv/cupstestppd.c:1164
+msgid " PASS\n"
+msgstr " PASA\n"
+
+#: ppdc/sample.c:51
+msgid "#10 Envelope"
+msgstr "Sobre nº 10"
+
+#: ppdc/sample.c:52
+msgid "#11 Envelope"
+msgstr "Sobre nº 11"
+
+#: ppdc/sample.c:53
+msgid "#12 Envelope"
+msgstr "Sobre nº 12"
+
+#: ppdc/sample.c:54
+msgid "#14 Envelope"
+msgstr "Sobre nº 14"
+
+#: ppdc/sample.c:55
+msgid "#9 Envelope"
+msgstr "Sobre nº 9"
+
+#: berkeley/lpq.c:553
+#, c-format
+msgid "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
+msgstr "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"
+
+#: berkeley/lpq.c:558
+#, c-format
+msgid "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
+msgstr "%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"
+
+#: filter/bannertops.c:780
+#, c-format
+msgid "%.0f x %.0f millimeters"
+msgstr "%.0f x %.0f milímetros"
+
+#: filter/bannertops.c:801
+#, c-format
+msgid "%.0f x %.0f to %.0f x %.0f millimeters"
+msgstr "%.0f x %.0f a %.0f x %.0f milímetros"
+
+#: filter/bannertops.c:771
+#, c-format
+msgid "%.2f x %.2f inches"
+msgstr "%.2f x %.2f pulgadas"
+
+#: filter/bannertops.c:790
+#, c-format
+msgid "%.2f x %.2f to %.2f x %.2f inches"
+msgstr "%.2f x %.2f a %.2f x %.2f pulgadas"
+
+#: systemv/lpstat.c:754
+#, c-format
+msgid "%s accepting requests since %s\n"
+msgstr "%s aceptando peticiones desde %s\n"
+
+#: scheduler/ipp.c:10321
+#, c-format
+msgid "%s cannot be changed."
+msgstr "%s no puede ser cambiado."
+
+#: berkeley/lpc.c:194
+#, c-format
+msgid "%s is not implemented by the CUPS version of lpc.\n"
+msgstr "%s no está implementado en la versión de CUPS de lpc.\n"
+
+#: berkeley/lpq.c:644
+#, c-format
+msgid "%s is not ready\n"
+msgstr "%s no está preparada\n"
+
+#: berkeley/lpq.c:637
+#, c-format
+msgid "%s is ready\n"
+msgstr "%s está preparada\n"
+
+#: berkeley/lpq.c:640
+#, c-format
+msgid "%s is ready and printing\n"
+msgstr "%s está preparada e imprimiendo\n"
+
+#: systemv/lpstat.c:757
+#, c-format
+msgid ""
+"%s not accepting requests since %s -\n"
+"\t%s\n"
+msgstr ""
+"%s no acepta peticiones desde %s -\n"
+"\t%s\n"
+
+#: scheduler/ipp.c:677
+#, c-format
+msgid "%s not supported!"
+msgstr "No se admite el uso de %s."
+
+#: systemv/lpstat.c:767
+#, c-format
+msgid "%s/%s accepting requests since %s\n"
+msgstr "%s/%s aceptando peticiones desde %s\n"
+
+#: systemv/lpstat.c:770
+#, c-format
+msgid ""
+"%s/%s not accepting requests since %s -\n"
+"\t%s\n"
+msgstr ""
+"%s/%s no acepta peticiones desde %s -\n"
+"\t%s\n"
+
+#: berkeley/lpq.c:545
+#, c-format
+msgid "%s: %-33.33s [job %d localhost]\n"
+msgstr "%s: %-33.33s [trabajo %d localhost]\n"
+
+#: systemv/cancel.c:303
+#: systemv/cancel.c:367
+#, c-format
+msgid "%s: %s failed: %s\n"
+msgstr "%s: %s ha fallado: %s\n"
+
+#: systemv/cupsaccept.c:73
+#, c-format
+msgid "%s: Don't know what to do!\n"
+msgstr "%s: No sé que hay que hacer.\n"
+
+#: berkeley/lpr.c:356
+#: systemv/lp.c:599
+#, c-format
+msgid "%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: Error - %s nombres de variables de entorno no existen en destino \"%s\".\n"
+
+#: systemv/lp.c:240
+#, c-format
+msgid "%s: Error - bad job ID!\n"
+msgstr "%s: Error - ID de trabajo incorrecta.\n"
+
+#: systemv/lp.c:227
+#, c-format
+msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
+msgstr "%s: Error - no se pueden imprimir archivos y alterar trabajos al mismo tiempo.\n"
+
+#: systemv/lp.c:519
+#, c-format
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgstr "%s: Error - no se puede imprimir desde stdin si se proporcionan archivos o una ID de trabajo.\n"
+
+#: systemv/lp.c:473
+#, c-format
+msgid "%s: Error - expected character set after '-S' option!\n"
+msgstr "%s: Error - se esperaba un juego de caracteres tras la opción '-S'.\n"
+
+#: systemv/lp.c:493
+#, c-format
+msgid "%s: Error - expected content type after '-T' option!\n"
+msgstr "%s: Error - se esperaba un tipo de contenido tras la opción '-T'.\n"
+
+#: systemv/lp.c:273
+#, c-format
+msgid "%s: Error - expected copies after '-n' option!\n"
+msgstr "%s: Error -  se esperaba número de copias tras la opción '-n'.\n"
+
+#: berkeley/lpr.c:251
+#, c-format
+msgid "%s: Error - expected copy count after '-#' option!\n"
+msgstr "%s: Error - se esperaba un número de copias tras la opción '-#'.\n"
+
+#: berkeley/lpr.c:219
+#, c-format
+msgid "%s: Error - expected destination after '-P' option!\n"
+msgstr "%s: Error - se esperaba un destino tras la opción '-P'.\n"
+
+#: systemv/lpstat.c:238
+#, c-format
+msgid "%s: Error - expected destination after '-b' option!\n"
+msgstr "%s: Error - se esperaba un destino tras la opción '-b'.\n"
+
+#: systemv/lp.c:145
+#, c-format
+msgid "%s: Error - expected destination after '-d' option!\n"
+msgstr "%s: Error -  se esperaba un destino tras la opción '-d'.\n"
+
+#: systemv/lp.c:175
+#, c-format
+msgid "%s: Error - expected form after '-f' option!\n"
+msgstr "%s: Error - se esperaba un formulario tras la opción '-f'.\n"
+
+#: systemv/lp.c:404
+#, c-format
+msgid "%s: Error - expected hold name after '-H' option!\n"
+msgstr "%s: Error - se esperaba un nombre de retención tras la opción '-H'.\n"
+
+#: berkeley/lpr.c:111
+#, c-format
+msgid "%s: Error - expected hostname after '-H' option!\n"
+msgstr "%s: Error - se esperaba un nombre de ordenador tras la opción '-H'.\n"
+
+#: berkeley/lpq.c:188
+#: berkeley/lprm.c:130
+#: systemv/cancel.c:130
+#: systemv/cupsaccept.c:131
+#: systemv/lp.c:196
+#: systemv/lpstat.c:298
+#, c-format
+msgid "%s: Error - expected hostname after '-h' option!\n"
+msgstr "%s: Error - se esperaba un nombre de ordenador tras la opción '-h'.\n"
+
+#: systemv/lp.c:382
+#, c-format
+msgid "%s: Error - expected mode list after '-y' option!\n"
+msgstr "%s: Error - se esperaba una lista de modos tras la opción '-y'.\n"
+
+#: berkeley/lpr.c:275
+#, c-format
+msgid "%s: Error - expected name after '-%c' option!\n"
+msgstr "%s: Error - se esperaba un nombre tras la opción '%c'.\n"
+
+#: systemv/lp.c:296
+#, c-format
+msgid "%s: Error - expected option string after '-o' option!\n"
+msgstr "%s: Error - se esperaba una cadena de opciones tras la opción '-o'.\n"
+
+#: systemv/lp.c:452
+#, c-format
+msgid "%s: Error - expected page list after '-P' option!\n"
+msgstr "%s: Error - se esperaba una lista de páginas tras la opción '-P'.\n"
+
+#: systemv/lp.c:317
+#, c-format
+msgid "%s: Error - expected priority after '-%c' option!\n"
+msgstr "%s: Error - se esperaba un valor de prioridad tras la opción '-%c'.\n"
+
+#: systemv/cupsaccept.c:150
+#, c-format
+msgid "%s: Error - expected reason text after '-r' option!\n"
+msgstr "%s: Error - se esperaba un texto con una razón tras la opción '-r'.\n"
+
+#: systemv/lp.c:364
+#, c-format
+msgid "%s: Error - expected title after '-t' option!\n"
+msgstr "%s: Error - se esperaba un título tras la opción '-t'.\n"
+
+#: berkeley/lpq.c:117
+#: berkeley/lpr.c:91
+#: berkeley/lprm.c:110
+#: systemv/cancel.c:99
+#: systemv/cupsaccept.c:108
+#: systemv/lpadmin.c:471
+#: systemv/lp.c:122
+#: systemv/lpstat.c:144
+#, c-format
+msgid "%s: Error - expected username after '-U' option!\n"
+msgstr "%s: Error - se esperaba un nombre de usuario tras la opción '-U'.\n"
+
+#: systemv/cancel.c:152
+#, c-format
+msgid "%s: Error - expected username after '-u' option!\n"
+msgstr "%s: Error - se esperaba un nombre de usuario tras la opción '-u'.\n"
+
+#: berkeley/lpr.c:134
+#, c-format
+msgid "%s: Error - expected value after '-%c' option!\n"
+msgstr "%s: Error - se esperaba un valor tras la opción '%c'.\n"
+
+#: systemv/lpstat.c:164
+#: systemv/lpstat.c:178
+#, c-format
+msgid "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' option!\n"
+msgstr "%s: Error - se necesita \"completed\", \"not completed\", o \"all\" tras la opción '-W'.\n"
+
+#: berkeley/lpr.c:361
+#: systemv/lp.c:604
+#, c-format
+msgid "%s: Error - no default destination available.\n"
+msgstr "%s: Error - destino predeterminado no disponible.\n"
+
+#: systemv/lp.c:340
+#, c-format
+msgid "%s: Error - priority must be between 1 and 100.\n"
+msgstr "%s: Error - la prioridad debe estar entre 1 y 100.\n"
+
+#: berkeley/lpr.c:365
+#: systemv/lp.c:608
+#, c-format
+msgid "%s: Error - scheduler not responding!\n"
+msgstr "%s: Error - el programa planificador de tareas no responde.\n"
+
+#: berkeley/lpr.c:317
+#: systemv/lp.c:552
+#, c-format
+msgid "%s: Error - too many files - \"%s\"\n"
+msgstr "%s: Error - demasiados archivos - \"%s\"\n"
+
+#: berkeley/lpr.c:299
+#: systemv/lp.c:535
+#, c-format
+msgid "%s: Error - unable to access \"%s\" - %s\n"
+msgstr "%s: Error - no se ha podido acceder a \"%s\" - %s\n"
+
+#: berkeley/lpr.c:410
+#: systemv/lp.c:641
+#, c-format
+msgid "%s: Error - unable to queue from stdin - %s\n"
+msgstr "%s: Error - no se ha podido poner en cola desde stdin - %s\n"
+
+#: berkeley/lprm.c:93
+#: berkeley/lprm.c:182
+#: systemv/cancel.c:222
+#, c-format
+msgid "%s: Error - unknown destination \"%s\"!\n"
+msgstr "%s: Error - destino \"%s\" desconocido.\n"
+
+#: berkeley/lpq.c:157
+#, c-format
+msgid "%s: Error - unknown destination \"%s/%s\"!\n"
+msgstr "%s: Error - destino \"%s/%s\" desconocido.\n"
+
+#: berkeley/lpr.c:286
+#: berkeley/lprm.c:148
+#: systemv/cancel.c:164
+#: systemv/cupsaccept.c:174
+#: systemv/lp.c:510
+#: systemv/lpstat.c:459
+#, c-format
+msgid "%s: Error - unknown option '%c'!\n"
+msgstr "%s: Error - opción '%c' desconocida.\n"
+
+#: systemv/cupsaccept.c:167
+#, c-format
+msgid "%s: Error - unknown option '%s'!\n"
+msgstr "%s: Error: opción '%s' desconocida.\n"
+
+#: systemv/lp.c:216
+#, c-format
+msgid "%s: Expected job ID after '-i' option!\n"
+msgstr "%s : Se esperaba una ID de trabajo tras la opción '-i'.\n"
+
+#: scheduler/cupsfilter.c:540
+#, c-format
+msgid "%s: Filter \"%s\" not available: %s\n"
+msgstr "%s: Filtro \"%s\" no disponible: %s\n"
+
+#: systemv/lpstat.c:511
+#: systemv/lpstat.c:550
+#, c-format
+msgid "%s: Invalid destination name in list \"%s\"!\n"
+msgstr "%s: Nombre de destino no válido en la lista \"%s\".\n"
+
+#: scheduler/cupsfilter.c:521
+#, c-format
+msgid "%s: Invalid filter string \"%s\"\n"
+msgstr "%s: Cadena de filtro \"%s\" inválida\n"
+
+#: systemv/lp.c:428
+#, c-format
+msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
+msgstr "%s: Se necesita un ID de trabajo ('-i id_trabajo') antes de '-H restart'.\n"
+
+#: scheduler/cupsfilter.c:436
+#, c-format
+msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+msgstr "%s: No hay ningún filtro que convertir de %s/%s a %s/%s.\n"
+
+#: systemv/cupsaccept.c:208
+#, c-format
+msgid "%s: Operation failed: %s\n"
+msgstr "%s: La operación ha fallado: %s\n"
+
+#: berkeley/lpq.c:103
+#: berkeley/lpr.c:77
+#: berkeley/lprm.c:72
+#: systemv/cancel.c:85
+#: systemv/cupsaccept.c:94
+#: systemv/cupsaddsmb.c:91
+#: systemv/lpadmin.c:277
+#: systemv/lp.c:108
+#: systemv/lpinfo.c:91
+#: systemv/lpmove.c:79
+#: systemv/lpstat.c:109
+#, c-format
+msgid "%s: Sorry, no encryption support compiled in!\n"
+msgstr "%s: Lo siento, no está compilado con la opción de encriptación.\n"
+
+#: berkeley/lpq.c:304
+#: scheduler/cupsfilter.c:1068
+#: systemv/cupsaddsmb.c:149
+#: systemv/cupsaddsmb.c:175
+#, c-format
+msgid "%s: Unable to connect to server\n"
+msgstr "%s: No se ha podido conectar al servidor\n"
+
+#: systemv/cancel.c:245
+#: systemv/cancel.c:326
+#, c-format
+msgid "%s: Unable to contact server!\n"
+msgstr "%s: No se ha podido contactar con el servidor.\n"
+
+#: scheduler/cupsfilter.c:404
+#, c-format
+msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+msgstr "%s: No se ha podido determinar el tipo MIME de \"%s\".\n"
+
+#: ppdc/ppdmerge.cxx:96
+#, c-format
+msgid "%s: Unable to open %s - %s\n"
+msgstr "%s: No se pudo abrir %s - %s\n"
+
+#: ppdc/ppdmerge.cxx:111
+#, c-format
+msgid "%s: Unable to open %s - %s on line %d.\n"
+msgstr "%s: No se pudo abrir %s - %s en línea %d.\n"
+
+#: ppdc/ppdc-file.cxx:50
+#, c-format
+msgid "%s: Unable to open %s: %s\n"
+msgstr "%s: No se pudo abrir %s: %s\n"
+
+#: scheduler/cupsfilter.c:583
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d\n"
+msgstr "%s: No se pudo abrir archivo PPD: %s en línea %d\n"
+
+#: scheduler/cupsfilter.c:377
+#, c-format
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"!\n"
+msgstr "%s: No se pudo leer base de datos MIME desde \"%s\" o \"%s\".\n"
+
+#: berkeley/lpq.c:161
+#: systemv/lpstat.c:565
+#, c-format
+msgid "%s: Unknown destination \"%s\"!\n"
+msgstr "%s: Destino \"%s\" desconocido.\n"
+
+#: scheduler/cupsfilter.c:415
+#, c-format
+msgid "%s: Unknown destination MIME type %s/%s!\n"
+msgstr "%s: Tipo MIME de destino %s/%s desconocido.\n"
+
+#: scheduler/cupsfilter.c:1276
+#, c-format
+msgid "%s: Unknown option '%c'!\n"
+msgstr "%s: Opción '%c' desconocida.\n"
+
+#: scheduler/cupsfilter.c:396
+#, c-format
+msgid "%s: Unknown source MIME type %s/%s!\n"
+msgstr "%s: Tipo MIME de origen %s/%s desconocido.\n"
+
+#: berkeley/lpr.c:148
+#, c-format
+msgid "%s: Warning - '%c' format modifier not supported - output may not be correct!\n"
+msgstr "%s: Advertencia - no se admite el uso del modificador de formato '%c' - la salida puede no ser correcta.\n"
+
+#: systemv/lp.c:481
+#, c-format
+msgid "%s: Warning - character set option ignored!\n"
+msgstr "%s: Advertencia - opción de juego de caracteres no tenida en cuenta.\n"
+
+#: systemv/lp.c:501
+#, c-format
+msgid "%s: Warning - content type option ignored!\n"
+msgstr "%s: Advertencia - opción de tipo de contenido no tenida en cuenta.\n"
+
+#: systemv/lp.c:182
+#, c-format
+msgid "%s: Warning - form option ignored!\n"
+msgstr "%s: Advertencia - opción de formulario no tenida en cuenta.\n"
+
+#: systemv/lp.c:390
+#, c-format
+msgid "%s: Warning - mode option ignored!\n"
+msgstr "%s: Advertencia - opción de modo no tenida en cuenta.\n"
+
+#: berkeley/lpq.c:245
+#, c-format
+msgid "%s: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "%s: error - %s nombres de variables de entorno no existen en destino \"%s\".\n"
+
+#: berkeley/lpr.c:162
+#, c-format
+msgid "%s: error - expected option=value after '-o' option!\n"
+msgstr "%s: error - se esperaba opción=valor tras la opción '-o'.\n"
+
+#: berkeley/lpq.c:250
+#, c-format
+msgid "%s: error - no default destination available.\n"
+msgstr "%s: error - destino predeterminado no disponible.\n"
+
+#: ppdc/sample.c:282
+msgid "-1"
+msgstr "-1"
+
+#: ppdc/sample.c:273
+msgid "-10"
+msgstr "-10"
+
+#: ppdc/sample.c:365
+msgid "-100"
+msgstr "-100"
+
+#: ppdc/sample.c:364
+msgid "-105"
+msgstr "-105"
+
+#: ppdc/sample.c:272
+msgid "-11"
+msgstr "-11"
+
+#: ppdc/sample.c:363
+msgid "-110"
+msgstr "-110"
+
+#: ppdc/sample.c:362
+msgid "-115"
+msgstr "-115"
+
+#: ppdc/sample.c:271
+msgid "-12"
+msgstr "-12"
+
+#: ppdc/sample.c:361
+msgid "-120"
+msgstr "-120"
+
+#: ppdc/sample.c:270
+msgid "-13"
+msgstr "-13"
+
+#: ppdc/sample.c:269
+msgid "-14"
+msgstr "-14"
+
+#: ppdc/sample.c:268
+msgid "-15"
+msgstr "-15"
+
+#: ppdc/sample.c:281
+msgid "-2"
+msgstr "-2"
+
+#: ppdc/sample.c:381
+msgid "-20"
+msgstr "-20"
+
+#: ppdc/sample.c:380
+msgid "-25"
+msgstr "-25"
+
+#: ppdc/sample.c:280
+msgid "-3"
+msgstr "-3"
+
+#: ppdc/sample.c:379
+msgid "-30"
+msgstr "-30"
+
+#: ppdc/sample.c:378
+msgid "-35"
+msgstr "-35"
+
+#: ppdc/sample.c:279
+msgid "-4"
+msgstr "-4"
+
+#: ppdc/sample.c:377
+msgid "-40"
+msgstr "-40"
+
+#: ppdc/sample.c:376
+msgid "-45"
+msgstr "-45"
+
+#: ppdc/sample.c:278
+msgid "-5"
+msgstr "-5"
+
+#: ppdc/sample.c:375
+msgid "-50"
+msgstr "-50"
+
+#: ppdc/sample.c:374
+msgid "-55"
+msgstr "-55"
+
+#: ppdc/sample.c:277
+msgid "-6"
+msgstr "-6"
+
+#: ppdc/sample.c:373
+msgid "-60"
+msgstr "-60"
+
+#: ppdc/sample.c:372
+msgid "-65"
+msgstr "-65"
+
+#: ppdc/sample.c:276
+msgid "-7"
+msgstr "-7"
+
+#: ppdc/sample.c:371
+msgid "-70"
+msgstr "-70"
+
+#: ppdc/sample.c:370
+msgid "-75"
+msgstr "-75"
+
+#: ppdc/sample.c:275
+msgid "-8"
+msgstr "-8"
+
+#: ppdc/sample.c:369
+msgid "-80"
+msgstr "-80"
+
+#: ppdc/sample.c:368
+msgid "-85"
+msgstr "-85"
+
+#: ppdc/sample.c:274
+msgid "-9"
+msgstr "-9"
+
+#: ppdc/sample.c:367
+msgid "-90"
+msgstr "-90"
+
+#: ppdc/sample.c:366
+msgid "-95"
+msgstr "-95"
+
+#: ppdc/sample.c:283
+msgid "0"
+msgstr "0"
+
+#: ppdc/sample.c:284
+msgid "1"
+msgstr "1"
+
+#: ppdc/sample.c:356
+msgid "1 inch/sec."
+msgstr "1 pulg./seg"
+
+#: ppdc/sample.c:144
+msgid "1.25x0.25\""
+msgstr "1.25x0.25 pulg."
+
+#: ppdc/sample.c:145
+msgid "1.25x2.25\""
+msgstr "1.25x2.25 pulg."
+
+#: ppdc/sample.c:404
+msgid "1.5 inch/sec."
+msgstr "1.5 pulg./seg"
+
+#: ppdc/sample.c:146
+msgid "1.50x0.25\""
+msgstr "1.50x0.25 pulg."
+
+#: ppdc/sample.c:147
+msgid "1.50x0.50\""
+msgstr "1.50x0.50 pulg."
+
+#: ppdc/sample.c:148
+msgid "1.50x1.00\""
+msgstr "1.50x1.00 pulg."
+
+#: ppdc/sample.c:149
+msgid "1.50x2.00\""
+msgstr "1.50x2.00 pulg."
+
+#: ppdc/sample.c:293
+msgid "10"
+msgstr "10"
+
+#: ppdc/sample.c:415
+msgid "10 inches/sec."
+msgstr "10 pulg./seg"
+
+#: ppdc/sample.c:1
+msgid "10 x 11\""
+msgstr "10 x 11 pulg."
+
+#: ppdc/sample.c:2
+msgid "10 x 13\""
+msgstr "10 x 13 pulg."
+
+#: ppdc/sample.c:3
+msgid "10 x 14\""
+msgstr "10 x 14 pulg."
+
+#: ppdc/sample.c:395
+msgid "100"
+msgstr "100"
+
+#: ppdc/sample.c:306
+msgid "100 mm/sec."
+msgstr "100 mm/seg"
+
+#: ppdc/sample.c:396
+msgid "105"
+msgstr "105"
+
+#: ppdc/sample.c:294
+msgid "11"
+msgstr "11"
+
+#: ppdc/sample.c:416
+msgid "11 inches/sec."
+msgstr "11 pulg./seg"
+
+#: ppdc/sample.c:397
+msgid "110"
+msgstr "110"
+
+#: ppdc/sample.c:398
+msgid "115"
+msgstr "115"
+
+#: ppdc/sample.c:295
+msgid "12"
+msgstr "12"
+
+#: ppdc/sample.c:417
+msgid "12 inches/sec."
+msgstr "12 pulg./seg"
+
+#: ppdc/sample.c:4
+msgid "12 x 11\""
+msgstr "12 x 11 pulg."
+
+#: ppdc/sample.c:399
+msgid "120"
+msgstr "120"
+
+#: ppdc/sample.c:307
+msgid "120 mm/sec."
+msgstr "120 mm/seg"
+
+#: ppdc/sample.c:215
+msgid "120x60dpi"
+msgstr "120x60ppp"
+
+#: ppdc/sample.c:220
+msgid "120x72dpi"
+msgstr "120x72ppp"
+
+#: ppdc/sample.c:296
+msgid "13"
+msgstr "13"
+
+#: ppdc/sample.c:204
+msgid "136dpi"
+msgstr "136ppp"
+
+#: ppdc/sample.c:297
+msgid "14"
+msgstr "14"
+
+#: ppdc/sample.c:298
+msgid "15"
+msgstr "15"
+
+#: ppdc/sample.c:300
+msgid "15 mm/sec."
+msgstr "15 mm/seg"
+
+#: ppdc/sample.c:5
+msgid "15 x 11\""
+msgstr "15 x 11 pulg."
+
+#: ppdc/sample.c:308
+msgid "150 mm/sec."
+msgstr "150 mm/seg"
+
+#: ppdc/sample.c:254
+msgid "150dpi"
+msgstr "150ppp"
+
+#: ppdc/sample.c:340
+msgid "16"
+msgstr "16"
+
+#: ppdc/sample.c:341
+msgid "17"
+msgstr "17"
+
+#: ppdc/sample.c:342
+msgid "18"
+msgstr "18"
+
+#: ppdc/sample.c:216
+msgid "180dpi"
+msgstr "180ppp"
+
+#: ppdc/sample.c:343
+msgid "19"
+msgstr "19"
+
+#: ppdc/sample.c:285
+msgid "2"
+msgstr "2"
+
+#: ppdc/sample.c:357
+msgid "2 inches/sec."
+msgstr "2 pulg./seg"
+
+#: ppdc/sample.c:242
+msgid "2-Sided Printing"
+msgstr "Dúplex"
+
+#: ppdc/sample.c:150
+msgid "2.00x0.37\""
+msgstr "2.00x0.37 pulg."
+
+#: ppdc/sample.c:151
+msgid "2.00x0.50\""
+msgstr "2.00x0.50 pulg."
+
+#: ppdc/sample.c:152
+msgid "2.00x1.00\""
+msgstr "2.00x1.00 pulg."
+
+#: ppdc/sample.c:153
+msgid "2.00x1.25\""
+msgstr "2.00x1.25 pulg."
+
+#: ppdc/sample.c:154
+msgid "2.00x2.00\""
+msgstr "2.00x2.00 pulg."
+
+#: ppdc/sample.c:155
+msgid "2.00x3.00\""
+msgstr "2.00x3.00 pulg."
+
+#: ppdc/sample.c:156
+msgid "2.00x4.00\""
+msgstr "2.00x4.00 pulg."
+
+#: ppdc/sample.c:157
+msgid "2.00x5.50\""
+msgstr "2.00x5.50 pulg."
+
+#: ppdc/sample.c:158
+msgid "2.25x0.50\""
+msgstr "2.25x0.50 pulg."
+
+#: ppdc/sample.c:159
+msgid "2.25x1.25\""
+msgstr "2.25x1.25 pulg."
+
+#: ppdc/sample.c:160
+msgid "2.25x4.00\""
+msgstr "2.25x4.00 pulg."
+
+#: ppdc/sample.c:161
+msgid "2.25x5.50\""
+msgstr "2.25x5.50 pulg."
+
+#: ppdc/sample.c:162
+msgid "2.38x5.50\""
+msgstr "2.38x5.50 pulg."
+
+#: ppdc/sample.c:405
+msgid "2.5 inches/sec."
+msgstr "2.5 pulg./seg"
+
+#: ppdc/sample.c:163
+msgid "2.50x1.00\""
+msgstr "2.50x1.00 pulg."
+
+#: ppdc/sample.c:164
+msgid "2.50x2.00\""
+msgstr "2.50x2.00 pulg."
+
+#: ppdc/sample.c:165
+msgid "2.75x1.25\""
+msgstr "2.75x1.25 pulg."
+
+#: ppdc/sample.c:166
+msgid "2.9 x 1\""
+msgstr "2.9 x 1 pulg."
+
+#: ppdc/sample.c:344
+msgid "20"
+msgstr "20"
+
+#: ppdc/sample.c:301
+msgid "20 mm/sec."
+msgstr "20 mm/seg"
+
+#: ppdc/sample.c:309
+msgid "200 mm/sec."
+msgstr "200 mm/seg"
+
+#: ppdc/sample.c:205
+msgid "203dpi"
+msgstr "203ppp"
+
+#: ppdc/sample.c:345
+msgid "21"
+msgstr "21"
+
+#: ppdc/sample.c:346
+msgid "22"
+msgstr "22"
+
+#: ppdc/sample.c:347
+msgid "23"
+msgstr "23"
+
+#: ppdc/sample.c:348
+msgid "24"
+msgstr "24"
+
+#: ppdc/sample.c:213
+msgid "24-Pin Series"
+msgstr "24-Pin Series"
+
+#: ppdc/sample.c:221
+msgid "240x72dpi"
+msgstr "240x72ppp"
+
+#: ppdc/sample.c:349
+msgid "25"
+msgstr "25"
+
+#: ppdc/sample.c:310
+msgid "250 mm/sec."
+msgstr "250 mm/seg"
+
+#: ppdc/sample.c:350
+msgid "26"
+msgstr "26"
+
+#: ppdc/sample.c:351
+msgid "27"
+msgstr "27"
+
+#: ppdc/sample.c:352
+msgid "28"
+msgstr "28"
+
+#: ppdc/sample.c:353
+msgid "29"
+msgstr "29"
+
+#: ppdc/sample.c:286
+msgid "3"
+msgstr "3"
+
+#: ppdc/sample.c:358
+msgid "3 inches/sec."
+msgstr "3 pulg./seg"
+
+#: ppdc/sample.c:167
+msgid "3.00x1.00\""
+msgstr "3.00x1.00 pulg."
+
+#: ppdc/sample.c:168
+msgid "3.00x1.25\""
+msgstr "3.00x1.25 pulg."
+
+#: ppdc/sample.c:169
+msgid "3.00x2.00\""
+msgstr "3.00x2.00 pulg."
+
+#: ppdc/sample.c:170
+msgid "3.00x3.00\""
+msgstr "3.00x3.00 pulg."
+
+#: ppdc/sample.c:171
+msgid "3.00x5.00\""
+msgstr "3.00x5.00 pulg."
+
+#: ppdc/sample.c:172
+msgid "3.25x2.00\""
+msgstr "3.25x2.00 pulg."
+
+#: ppdc/sample.c:173
+msgid "3.25x5.00\""
+msgstr "3.25x5.00 pulg."
+
+#: ppdc/sample.c:174
+msgid "3.25x5.50\""
+msgstr "3.25x5.50 pulg."
+
+#: ppdc/sample.c:175
+msgid "3.25x5.83\""
+msgstr "3.25x5.83 pulg."
+
+#: ppdc/sample.c:176
+msgid "3.25x7.83\""
+msgstr "3.25x7.83 pulg."
+
+#: ppdc/sample.c:134
+msgid "3.5\" Disk"
+msgstr "Disco de 3.5 pulg."
+
+#: ppdc/sample.c:143
+msgid "3.5\" Disk - 2 1/8 x 2 3/4\""
+msgstr "Disco de 3.5 pulg. - 2 1/8 x 2 3/4 pulg."
+
+#: ppdc/sample.c:177
+msgid "3.50x1.00\""
+msgstr "3.50x1.00 pulg."
+
+#: ppdc/sample.c:354
+msgid "30"
+msgstr "30"
+
+#: ppdc/sample.c:302
+msgid "30 mm/sec."
+msgstr "30 mm/seg"
+
+#: ppdc/sample.c:311
+msgid "300 mm/sec."
+msgstr "300 mm/seg"
+
+#: ppdc/sample.c:206
+msgid "300dpi"
+msgstr "300ppp"
+
+#: ppdc/sample.c:382
+msgid "35"
+msgstr "35"
+
+#: ppdc/sample.c:223
+msgid "360dpi"
+msgstr "360ppp"
+
+#: ppdc/sample.c:217
+msgid "360x180dpi"
+msgstr "360x180ppp"
+
+#: ppdc/sample.c:287
+msgid "4"
+msgstr "4"
+
+#: ppdc/sample.c:359
+msgid "4 inches/sec."
+msgstr "4 pulg./seg"
+
+#: ppdc/sample.c:178
+msgid "4.00x1.00\""
+msgstr "4.00x1.00 pulg."
+
+#: ppdc/sample.c:186
+msgid "4.00x13.00\""
+msgstr "4.00x13.00 pulg."
+
+#: ppdc/sample.c:179
+msgid "4.00x2.00\""
+msgstr "4.00x2.00 pulg."
+
+#: ppdc/sample.c:180
+msgid "4.00x2.50\""
+msgstr "4.00x2.50 pulg."
+
+#: ppdc/sample.c:181
+msgid "4.00x3.00\""
+msgstr "4.00x3.00 pulg."
+
+#: ppdc/sample.c:182
+msgid "4.00x4.00\""
+msgstr "4.00x4.00 pulg."
+
+#: ppdc/sample.c:183
+msgid "4.00x5.00\""
+msgstr "4.00x5.00 pulg."
+
+#: ppdc/sample.c:184
+msgid "4.00x6.00\""
+msgstr "4.00x6.00 pulg."
+
+#: ppdc/sample.c:185
+msgid "4.00x6.50\""
+msgstr "4.00x6.50 pulg."
+
+#: ppdc/sample.c:383
+msgid "40"
+msgstr "40"
+
+#: ppdc/sample.c:303
+msgid "40 mm/sec."
+msgstr "40 mm/seg"
+
+#: ppdc/sample.c:384
+msgid "45"
+msgstr "45"
+
+#: ppdc/sample.c:288
+msgid "5"
+msgstr "5"
+
+#: ppdc/sample.c:409
+msgid "5 inches/sec."
+msgstr "5 pulg./seg"
+
+#: ppdc/sample.c:385
+msgid "50"
+msgstr "50"
+
+#: ppdc/sample.c:386
+msgid "55"
+msgstr "55"
+
+#: ppdc/sample.c:289
+msgid "6"
+msgstr "6"
+
+#: ppdc/sample.c:410
+msgid "6 inches/sec."
+msgstr "6 pulg./seg"
+
+#: ppdc/sample.c:187
+msgid "6.00x1.00\""
+msgstr "6.00x1.00 pulg."
+
+#: ppdc/sample.c:188
+msgid "6.00x2.00\""
+msgstr "6.00x2.00 pulg."
+
+#: ppdc/sample.c:189
+msgid "6.00x3.00\""
+msgstr "6.00x3.00 pulg."
+
+#: ppdc/sample.c:190
+msgid "6.00x4.00\""
+msgstr "6.00x4.00 pulg."
+
+#: ppdc/sample.c:191
+msgid "6.00x5.00\""
+msgstr "6.00x5.00 pulg."
+
+#: ppdc/sample.c:192
+msgid "6.00x6.00\""
+msgstr "6.00x6.00 pulg."
+
+#: ppdc/sample.c:193
+msgid "6.00x6.50\""
+msgstr "6.00x6.50 pulg."
+
+#: ppdc/sample.c:387
+msgid "60"
+msgstr "60"
+
+#: ppdc/sample.c:304
+msgid "60 mm/sec."
+msgstr "60 mm/seg"
+
+#: ppdc/sample.c:255
+msgid "600 DPI Grayscale"
+msgstr "600 PPP escala de grises"
+
+#: ppdc/sample.c:233
+msgid "600dpi"
+msgstr "600ppp"
+
+#: ppdc/sample.c:214
+msgid "60dpi"
+msgstr "60ppp"
+
+#: ppdc/sample.c:219
+msgid "60x720dpi"
+msgstr "60x720ppp"
+
+#: ppdc/sample.c:388
+msgid "65"
+msgstr "65"
+
+#: ppdc/sample.c:290
+msgid "7"
+msgstr "7"
+
+#: ppdc/sample.c:412
+msgid "7 inches/sec."
+msgstr "7 pulg./seg"
+
+#: ppdc/sample.c:6
+msgid "7 x 9\""
+msgstr "7 x 9 pulg."
+
+#: ppdc/sample.c:389
+msgid "70"
+msgstr "70"
+
+#: ppdc/sample.c:224
+msgid "720dpi"
+msgstr "720ppp"
+
+#: ppdc/sample.c:390
+msgid "75"
+msgstr "75"
+
+#: ppdc/sample.c:291
+msgid "8"
+msgstr "8"
+
+#: ppdc/sample.c:413
+msgid "8 inches/sec."
+msgstr "8 pulg./seg"
+
+#: ppdc/sample.c:7
+msgid "8 x 10\""
+msgstr "8 x 10 pulg."
+
+#: ppdc/sample.c:194
+msgid "8.00x1.00\""
+msgstr "8.00x1.00 pulg."
+
+#: ppdc/sample.c:195
+msgid "8.00x2.00\""
+msgstr "8.00x2.00 pulg."
+
+#: ppdc/sample.c:196
+msgid "8.00x3.00\""
+msgstr "8.00x3.00 pulg."
+
+#: ppdc/sample.c:197
+msgid "8.00x4.00\""
+msgstr "8.00x4.00 pulg."
+
+#: ppdc/sample.c:198
+msgid "8.00x5.00\""
+msgstr "8.00x5.00 pulg."
+
+#: ppdc/sample.c:199
+msgid "8.00x6.00\""
+msgstr "8.00x6.00 pulg."
+
+#: ppdc/sample.c:200
+msgid "8.00x6.50\""
+msgstr "8.00x6.50 pulg."
+
+#: ppdc/sample.c:391
+msgid "80"
+msgstr "80"
+
+#: ppdc/sample.c:305
+msgid "80 mm/sec."
+msgstr "80 mm/seg"
+
+#: ppdc/sample.c:392
+msgid "85"
+msgstr "85"
+
+#: ppdc/sample.c:292
+msgid "9"
+msgstr "9"
+
+#: ppdc/sample.c:414
+msgid "9 inches/sec."
+msgstr "9 pulg./seg"
+
+#: ppdc/sample.c:8
+msgid "9 x 11\""
+msgstr "9 x 11 pulg."
+
+#: ppdc/sample.c:9
+msgid "9 x 12\""
+msgstr "9 x 12 pulg."
+
+#: ppdc/sample.c:218
+msgid "9-Pin Series"
+msgstr "9-Pin Series"
+
+#: ppdc/sample.c:393
+msgid "90"
+msgstr "90"
+
+#: ppdc/sample.c:394
+msgid "95"
+msgstr "95"
+
+#: berkeley/lpc.c:218
+msgid "?Invalid help command unknown\n"
+msgstr "?Comando de ayuda inválido desconocido\n"
+
+#: cgi-bin/admin.c:2304
+msgid "A Samba password is required to export printer drivers!"
+msgstr "Se requiere una contraseña Samba para exportar los controladores de impresora."
+
+#: cgi-bin/admin.c:2300
+msgid "A Samba username is required to export printer drivers!"
+msgstr "Se requiere un nombre de usuario Samba para exportar los controladores de impresora."
+
+#: scheduler/ipp.c:2360
+#, c-format
+msgid "A class named \"%s\" already exists!"
+msgstr "Ya existe una clase llamada \"%s\"."
+
+#: scheduler/ipp.c:984
+#, c-format
+msgid "A printer named \"%s\" already exists!"
+msgstr "Ya existe una impresora llamada \"%s\"."
+
+#: ppdc/sample.c:10
+msgid "A0"
+msgstr "A0"
+
+#: ppdc/sample.c:11
+msgid "A1"
+msgstr "A1"
+
+#: ppdc/sample.c:24
+msgid "A10"
+msgstr "A10"
+
+#: ppdc/sample.c:12
+msgid "A2"
+msgstr "A2"
+
+#: ppdc/sample.c:13
+msgid "A3"
+msgstr "A3"
+
+#: ppdc/sample.c:14
+msgid "A3 (Oversize)"
+msgstr "A3 (extragrande)"
+
+#: ppdc/sample.c:15
+msgid "A4"
+msgstr "A4"
+
+#: ppdc/sample.c:16
+msgid "A4 (Oversize)"
+msgstr "A4 (extragrande)"
+
+#: ppdc/sample.c:17
+msgid "A4 (Small)"
+msgstr "A4 (pequeño)"
+
+#: ppdc/sample.c:18
+msgid "A5"
+msgstr "A5"
+
+#: ppdc/sample.c:19
+msgid "A5 (Oversize)"
+msgstr "A5 (extragrande)"
+
+#: ppdc/sample.c:20
+msgid "A6"
+msgstr "A6"
+
+#: ppdc/sample.c:21
+msgid "A7"
+msgstr "A7"
+
+#: ppdc/sample.c:22
+msgid "A8"
+msgstr "A8"
+
+#: ppdc/sample.c:23
+msgid "A9"
+msgstr "A9"
+
+#: ppdc/sample.c:25
+msgid "ANSI A"
+msgstr "ANSI A"
+
+#: ppdc/sample.c:26
+msgid "ANSI B"
+msgstr "ANSI B"
+
+#: ppdc/sample.c:27
+msgid "ANSI C"
+msgstr "ANSI C"
+
+#: ppdc/sample.c:28
+msgid "ANSI D"
+msgstr "ANSI D"
+
+#: ppdc/sample.c:29
+msgid "ANSI E"
+msgstr "ANSI E"
+
+#: ppdc/sample.c:30
+msgid "ARCH A"
+msgstr "ARCH A"
+
+#: ppdc/sample.c:31
+msgid "ARCH B"
+msgstr "ARCH B"
+
+#: ppdc/sample.c:32
+msgid "ARCH C"
+msgstr "ARCH C"
+
+#: ppdc/sample.c:33
+msgid "ARCH D"
+msgstr "ARCH D"
+
+#: ppdc/sample.c:34
+msgid "ARCH E"
+msgstr "ARCH E"
+
+#: cgi-bin/classes.c:150
+#: cgi-bin/printers.c:153
+msgid "Accept Jobs"
+msgstr "Aceptar trabajos"
+
+#: cups/http-support.c:1188
+msgid "Accepted"
+msgstr "Aceptado"
+
+#: cgi-bin/admin.c:477
+msgid "Add Class"
+msgstr "Añadir clase"
+
+#: cgi-bin/admin.c:769
+msgid "Add Printer"
+msgstr "Añadir impresora"
+
+#: cgi-bin/admin.c:352
+#: cgi-bin/admin.c:385
+#: cgi-bin/admin.c:433
+#: cgi-bin/admin.c:443
+msgid "Add RSS Subscription"
+msgstr "Añadir subscripción RSS"
+
+#: ppdc/sample.c:126
+msgid "Address"
+msgstr "Dirección"
+
+#: ppdc/sample.c:135
+msgid "Address - 1 1/8 x 3 1/2\""
+msgstr "Dirección - 1 1/8 x 3 1/2 pulg."
+
+#: cgi-bin/admin.c:187
+#: cgi-bin/admin.c:218
+#: cgi-bin/admin.c:2722
+msgid "Administration"
+msgstr "Administración"
+
+#: ppdc/sample.c:401
+msgid "Always"
+msgstr "Siempre"
+
+#: ppdc/sample.c:422
+msgid "Applicator"
+msgstr "Aplicador"
+
+#: scheduler/ipp.c:1106
+#, c-format
+msgid "Attempt to set %s printer-state to bad value %d!"
+msgstr "Se ha intentado cambiar el valor printer-state de %s a un valor incorrecto %d."
+
+#: scheduler/ipp.c:327
+#, c-format
+msgid "Attribute groups are out of order (%x < %x)!"
+msgstr "Los grupos de atributos están desordenados (%x < %x)."
+
+#: ppdc/sample.c:35
+msgid "B0"
+msgstr "B0"
+
+#: ppdc/sample.c:37
+msgid "B1"
+msgstr "B1"
+
+#: ppdc/sample.c:36
+msgid "B10"
+msgstr "B10"
+
+#: ppdc/sample.c:38
+msgid "B2"
+msgstr "B2"
+
+#: ppdc/sample.c:39
+msgid "B3"
+msgstr "B3"
+
+#: ppdc/sample.c:40
+msgid "B4"
+msgstr "B4"
+
+#: ppdc/sample.c:41
+msgid "B5"
+msgstr "B5"
+
+#: ppdc/sample.c:42
+msgid "B6"
+msgstr "B6"
+
+#: ppdc/sample.c:43
+msgid "B7"
+msgstr "B7"
+
+#: ppdc/sample.c:44
+msgid "B8"
+msgstr "B8"
+
+#: ppdc/sample.c:45
+msgid "B9"
+msgstr "B9"
+
+#: cups/dest.c:335
+msgid "Bad NULL dests pointer"
+msgstr "Puntero destino NULLincorrecto"
+
+#: cups/ppd.c:341
+msgid "Bad OpenGroup"
+msgstr "OpenGroup incorrecto"
+
+#: cups/ppd.c:343
+msgid "Bad OpenUI/JCLOpenUI"
+msgstr "OpenUI/JCLOpenUI incorrecto"
+
+#: cups/ppd.c:345
+msgid "Bad OrderDependency"
+msgstr "OrderDependency incorrecto"
+
+#: cups/http-support.c:1203
+msgid "Bad Request"
+msgstr "Petición incorrecta"
+
+#: cups/snmp.c:1025
+msgid "Bad SNMP version number"
+msgstr "Número de versión SNMP incorrecto"
+
+#: cups/ppd.c:346
+msgid "Bad UIConstraints"
+msgstr "UIConstraints incorrecto"
+
+#: scheduler/ipp.c:1406
+#, c-format
+msgid "Bad copies value %d."
+msgstr "Valor de copias %d incorrecto."
+
+#: cups/ppd.c:354
+msgid "Bad custom parameter"
+msgstr "Parámetro a medida incorrecto"
+
+#: cups/http-support.c:1327
+#, c-format
+msgid "Bad device URI \"%s\"!\n"
+msgstr "URI de dispositivoi \"%s\" incorrecto.\n"
+
+#: scheduler/ipp.c:2478
+#, c-format
+msgid "Bad device-uri \"%s\"!"
+msgstr "device-uri \"%s\" incorrecto."
+
+#: scheduler/ipp.c:2518
+#, c-format
+msgid "Bad device-uri scheme \"%s\"!"
+msgstr "Esquema device-uri \"%s\" incorrecto."
+
+#: scheduler/ipp.c:9742
+#: scheduler/ipp.c:11134
+#, c-format
+msgid "Bad document-format \"%s\"!"
+msgstr "document-format \"%s\" incorrecto."
+
+#: cups/util.c:936
+msgid "Bad filename buffer!"
+msgstr "Nombre de archivo del búfer incorrecto."
+
+#: ppdc/ppdc-import.cxx:230
+#, c-format
+msgid "Bad font attribute: %s\n"
+msgstr "Atributo de fuente: %s incorrecto\n"
+
+#: scheduler/ipp.c:10337
+msgid "Bad job-priority value!"
+msgstr "Valor job-priority incorrecto."
+
+#: scheduler/ipp.c:1436
+#, c-format
+msgid "Bad job-sheets value \"%s\"!"
+msgstr "Valor de job-sheets \"%s\" incorrecto."
+
+#: scheduler/ipp.c:1420
+msgid "Bad job-sheets value type!"
+msgstr "Tipo de valor de job-sheets incorrecto."
+
+#: scheduler/ipp.c:10367
+msgid "Bad job-state value!"
+msgstr "Valor job-state incorrecto."
+
+#: scheduler/ipp.c:3640
+#: scheduler/ipp.c:4001
+#: scheduler/ipp.c:6566
+#: scheduler/ipp.c:6708
+#: scheduler/ipp.c:7889
+#: scheduler/ipp.c:8170
+#: scheduler/ipp.c:9013
+#: scheduler/ipp.c:9238
+#: scheduler/ipp.c:9655
+#: scheduler/ipp.c:10230
+#, c-format
+msgid "Bad job-uri attribute \"%s\"!"
+msgstr "Atributo job-uri \"%s\" incorrecto."
+
+#: scheduler/ipp.c:2100
+#: scheduler/ipp.c:6127
+#, c-format
+msgid "Bad notify-pull-method \"%s\"!"
+msgstr "notify-pull-method \"%s\" incorrecto."
+
+#: scheduler/ipp.c:2064
+#: scheduler/ipp.c:6091
+#, c-format
+msgid "Bad notify-recipient-uri URI \"%s\"!"
+msgstr "URI notify-recipient-uri \"%s\" incorrecto."
+
+#: scheduler/ipp.c:1452
+#, c-format
+msgid "Bad number-up value %d."
+msgstr "Valor number-up (páginas por hoja) %d incorrecto."
+
+#: cups/adminutil.c:301
+#, c-format
+msgid "Bad option + choice on line %d!"
+msgstr "Opción + preferencia incorrectas en línea %d."
+
+#: scheduler/ipp.c:1469
+#, c-format
+msgid "Bad page-ranges values %d-%d."
+msgstr "Valores de page-ranges %d-%d incorrectos."
+
+#: scheduler/ipp.c:2562
+#, c-format
+msgid "Bad port-monitor \"%s\"!"
+msgstr "port-monitor \"%s\" incorrecto."
+
+#: scheduler/ipp.c:2610
+#, c-format
+msgid "Bad printer-state value %d!"
+msgstr "Valor printer-state %d incorrecto."
+
+#: scheduler/ipp.c:294
+#, c-format
+msgid "Bad request version number %d.%d!"
+msgstr "Petición incorrecta de número de versión %d.%d."
+
+#: cgi-bin/admin.c:1350
+msgid "Bad subscription ID!"
+msgstr "ID de subscripción incorrecto."
+
+#: cgi-bin/admin.c:3262
+#: cgi-bin/admin.c:3485
+msgid "Banners"
+msgstr "Rótulos"
+
+#: filter/bannertops.c:662
+msgid "Billing Information: "
+msgstr "Información de facturación:"
+
+#: ppdc/sample.c:259
+msgid "Bond Paper"
+msgstr "Papel de cartas"
+
+#: ppdc/sample.c:56
+msgid "C0 Envelope"
+msgstr "Sobre C0"
+
+#: ppdc/sample.c:57
+msgid "C1 Envelope"
+msgstr "Sobre C1"
+
+#: ppdc/sample.c:58
+msgid "C2 Envelope"
+msgstr "Sobre C2"
+
+#: ppdc/sample.c:59
+msgid "C3 Envelope"
+msgstr "Sobre C3"
+
+#: ppdc/sample.c:46
+msgid "C4"
+msgstr "C4"
+
+#: ppdc/sample.c:60
+msgid "C4 Envelope"
+msgstr "Sobre C4"
+
+#: ppdc/sample.c:47
+msgid "C5"
+msgstr "C5"
+
+#: ppdc/sample.c:61
+msgid "C5 Envelope"
+msgstr "Sobre C5"
+
+#: ppdc/sample.c:48
+msgid "C6"
+msgstr "C6"
+
+#: ppdc/sample.c:63
+msgid "C6 Envelope"
+msgstr "Sobre C6"
+
+#: ppdc/sample.c:62
+msgid "C65 Envelope"
+msgstr "Sobre C65"
+
+#: ppdc/sample.c:64
+msgid "C7 Envelope"
+msgstr "Sobre C7"
+
+#: ppdc/sample.c:226
+msgid "CMYK"
+msgstr "CMYK"
+
+#: ppdc/sample.c:335
+msgid "CPCL Label Printer"
+msgstr "Impresora de etiquetas CPCL"
+
+#: cgi-bin/admin.c:1351
+#: cgi-bin/admin.c:1390
+#: cgi-bin/admin.c:1400
+msgid "Cancel RSS Subscription"
+msgstr "Cancelar subscripción RSS"
+
+#: cgi-bin/admin.c:1569
+#: cgi-bin/admin.c:1733
+#: cgi-bin/admin.c:1745
+#: cgi-bin/admin.c:1756
+msgid "Change Settings"
+msgstr "Cambiar configuración"
+
+#: scheduler/ipp.c:2112
+#: scheduler/ipp.c:6139
+#, c-format
+msgid "Character set \"%s\" not supported!"
+msgstr "No se admite el uso del juego de caracteres \"%s\"."
+
+#: ppdc/sample.c:65
+msgid "Chou3 Envelope"
+msgstr "Sobre Chou3"
+
+#: ppdc/sample.c:66
+msgid "Chou4 Envelope"
+msgstr "Sobre Chou4"
+
+#: cgi-bin/classes.c:176
+#: cgi-bin/classes.c:303
+msgid "Classes"
+msgstr "Clases"
+
+#: cgi-bin/printers.c:163
+msgid "Clean Print Heads"
+msgstr "Limpiar cabezales de impresión"
+
+#: ppdc/sample.c:253
+msgid "Color"
+msgstr "Color"
+
+#: ppdc/sample.c:225
+msgid "Color Mode"
+msgstr "Modo de color"
+
+#: berkeley/lpc.c:209
+msgid ""
+"Commands may be abbreviated.  Commands are:\n"
+"\n"
+"exit    help    quit    status  ?\n"
+msgstr ""
+"Los comandos se pueden abreviar.  Los comandos son:\n"
+"\n"
+"exit    help    quit    status  ?\n"
+
+#: cups/snmp.c:1029
+msgid "Community name uses indefinite length"
+msgstr "Nombre de comunidad usa una longitud indefinida"
+
+#: cups/http-support.c:1176
+msgid "Continue"
+msgstr "Continuar"
+
+#: ppdc/sample.c:337
+msgid "Continuous"
+msgstr "Continuo"
+
+#: scheduler/ipp.c:8463
+#: scheduler/ipp.c:8479
+#: scheduler/ipp.c:9758
+#, c-format
+msgid "Could not scan type \"%s\"!"
+msgstr "No se puede analizar el tipo \"%s\"."
+
+#: backend/ipp.c:1659
+msgid "Cover open."
+msgstr "Cubierta abierta."
+
+#: cups/http-support.c:1185
+msgid "Created"
+msgstr "Creado"
+
+#: filter/bannertops.c:850
+msgid "Created On: "
+msgstr "Creado en:"
+
+#: cups/ppd.c:1068
+#: cups/ppd.c:1108
+#: cups/ppd.c:1322
+#: cups/ppd.c:1425
+msgid "Custom"
+msgstr "A medida"
+
+#: ppdc/sample.c:331
+msgid "CustominCutInterval"
+msgstr "CustominCutInterval"
+
+#: ppdc/sample.c:329
+msgid "CustominTearInterval"
+msgstr "CustominTearInterval"
+
+#: ppdc/sample.c:315
+msgid "Cut"
+msgstr "Cortar"
+
+#: ppdc/sample.c:423
+msgid "Cutter"
+msgstr "Cortadora"
+
+#: ppdc/sample.c:49
+msgid "DL"
+msgstr "DL"
+
+#: ppdc/sample.c:67
+msgid "DL Envelope"
+msgstr "Sobre DL"
+
+#: ppdc/sample.c:211
+msgid "Dark"
+msgstr "Oscuro"
+
+#: ppdc/sample.c:207
+msgid "Darkness"
+msgstr "Oscuridad"
+
+#: cgi-bin/admin.c:2029
+#: cgi-bin/admin.c:2040
+#: cgi-bin/admin.c:2085
+msgid "Delete Class"
+msgstr "Borrar clase"
+
+#: cgi-bin/admin.c:2114
+#: cgi-bin/admin.c:2125
+#: cgi-bin/admin.c:2170
+msgid "Delete Printer"
+msgstr "Borrar impresora"
+
+#: filter/bannertops.c:731
+msgid "Description: "
+msgstr "Descripción:"
+
+#: ppdc/sample.c:252
+msgid "DeskJet Series"
+msgstr "DeskJet Series"
+
+#: scheduler/ipp.c:1372
+#, c-format
+msgid "Destination \"%s\" is not accepting jobs."
+msgstr "El destino %s no acepta trabajos."
+
+#: backend/ipp.c:1693
+msgid "Developer almost empty."
+msgstr "Revelador casi vacío."
+
+#: backend/ipp.c:1695
+msgid "Developer empty!"
+msgstr "Revelador vacío."
+
+#: systemv/lpinfo.c:299
+#, c-format
+msgid ""
+"Device: uri = %s\n"
+"        class = %s\n"
+"        info = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+"        location = %s\n"
+msgstr ""
+"Dispositivo: uri = %s\n"
+"        clase = %s\n"
+"        info = %s\n"
+"        marca y modelo = %s\n"
+"        id dispositivo= %s\n"
+"        ubicación = %s\n"
+
+#: ppdc/sample.c:408
+msgid "Direct Thermal Media"
+msgstr "Soporte térmico directo"
+
+#: ppdc/sample.c:317
+msgid "Disabled"
+msgstr "Deshabilitado"
+
+#: scheduler/ipp.c:6613
+#, c-format
+msgid "Document %d not found in job %d."
+msgstr "No se encuentra el documento %d en el trabajo %d."
+
+#: backend/ipp.c:1663
+msgid "Door open."
+msgstr "Puerta abierta."
+
+#: ppdc/sample.c:50
+msgid "Double Postcard"
+msgstr "Postal doble"
+
+#: filter/bannertops.c:816
+msgid "Driver Name: "
+msgstr "Nombre de controlador:"
+
+#: filter/bannertops.c:827
+msgid "Driver Version: "
+msgstr "Versión de controlador:"
+
+#: ppdc/sample.c:247
+msgid "Duplexer"
+msgstr "Unidad de impresión dúplex"
+
+#: ppdc/sample.c:201
+msgid "Dymo"
+msgstr "Dymo"
+
+#: filter/pstops.c:443
+#, c-format
+msgid "EMERG: Unable to allocate memory for page info: %s\n"
+msgstr "EMERG: No se ha podido asignar memoria para la información de página: %s\n"
+
+#: filter/pstops.c:436
+#, c-format
+msgid "EMERG: Unable to allocate memory for pages array: %s\n"
+msgstr "EMERG: No se ha podido asignar memoria para la secuencia de páginas: %s\n"
+
+#: ppdc/sample.c:403
+msgid "EPL1 Label Printer"
+msgstr "Impresora de etiquetas EPL1"
+
+#: ppdc/sample.c:406
+msgid "EPL2 Label Printer"
+msgstr "Impresora de etiquetas EPL2"
+
+#: filter/pstops.c:703
+#, c-format
+msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
+msgstr "ERROR: Se ha detectado un comentario %%BoundingBox: incorrecto.\n"
+
+#: filter/pstops.c:2210
+#, c-format
+msgid "ERROR: Bad %%IncludeFeature: comment!\n"
+msgstr "ERROR: Comentario %%IncludeFeature: incorrecto.\n"
+
+#: filter/pstops.c:1280
+#: filter/pstops.c:1286
+#, c-format
+msgid "ERROR: Bad %%Page: comment in file!\n"
+msgstr "ERROR: Comentario %%Page: incorrecto en el archivo.\n"
+
+#: filter/pstops.c:1356
+#, c-format
+msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
+msgstr "ERROR: Comentario %%PageBoundingBox: incorrecto en el archivo.\n"
+
+#: backend/scsi-irix.c:99
+#: backend/scsi-linux.c:113
+#, c-format
+msgid "ERROR: Bad SCSI device file \"%s\"!\n"
+msgstr "ERROR: archivo de dispositivo SCSI \"%s\" incorrecto.\n"
+
+#: filter/pstext.c:273
+#: filter/texttops.c:284
+#: filter/texttops.c:295
+#, c-format
+msgid "ERROR: Bad charset file %s\n"
+msgstr "ERROR: Archivo de juego de caracteres incorrecto %s\n"
+
+#: filter/texttops.c:625
+#, c-format
+msgid "ERROR: Bad charset type %s\n"
+msgstr "ERROR: Tipo de juego de caracteres incorrecto %s\n"
+
+#: filter/textcommon.c:614
+#, c-format
+msgid "ERROR: Bad columns value %d!\n"
+msgstr "ERROR: Valor de columnas %d incorrecto.\n"
+
+#: filter/textcommon.c:625
+#, c-format
+msgid "ERROR: Bad cpi value %f!\n"
+msgstr "ERROR: Valor de cpi %f incorrecto.\n"
+
+#: filter/pstext.c:317
+#: filter/pstext.c:354
+#: filter/texttops.c:356
+#: filter/texttops.c:392
+#: filter/texttops.c:520
+#: filter/texttops.c:556
+#, c-format
+msgid "ERROR: Bad font description line: %s\n"
+msgstr "ERROR: Línea de descripción tipográfica incorrecta: %s\n"
+
+#: filter/textcommon.c:636
+#, c-format
+msgid "ERROR: Bad lpi value %f!\n"
+msgstr "ERROR: Valor de lpi %f incorrecto.\n"
+
+#: filter/imagetoraster.c:456
+msgid "ERROR: Bad page setup!\n"
+msgstr "ERROR: Ajuste de página incorrecto.\n"
+
+#: filter/pstext.c:331
+#: filter/texttops.c:369
+#: filter/texttops.c:533
+#, c-format
+msgid "ERROR: Bad text direction %s\n"
+msgstr "ERROR: Dirección de texto incorrecta %s\n"
+
+#: filter/pstext.c:368
+#: filter/texttops.c:405
+#: filter/texttops.c:569
+#, c-format
+msgid "ERROR: Bad text width %s\n"
+msgstr "ERROR: Anchura de texto incorrecta %s\n"
+
+#: backend/ipp.c:736
+msgid "ERROR: Destination printer does not exist!\n"
+msgstr "ERROR: La impresora destino no existe.\n"
+
+#: filter/pstops.c:692
+#, c-format
+msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
+msgstr "ERROR: Se ha detectado un comentario %%BoundingBox: duplicado.\n"
+
+#: filter/pstops.c:645
+#, c-format
+msgid "ERROR: Duplicate %%Pages: comment seen!\n"
+msgstr "ERROR: Se ha detectado un comentario %%Pages: duplicado.\n"
+
+#: backend/ipp.c:451
+#: filter/pstops.c:302
+msgid "ERROR: Empty print file!\n"
+msgstr "ERROR: Archivo de impresión vacío.\n"
+
+#: backend/pap.c:838
+#, c-format
+msgid "ERROR: Error %d sending PAPSendData request: %s\n"
+msgstr "ERROR: Error %d enviando petición PAPSendData: %s\n"
+
+#: ppdc/ppdc-catalog.cxx:312
+#: ppdc/ppdc-catalog.cxx:324
+#, c-format
+msgid "ERROR: Expected quoted string on line %d of %s!\n"
+msgstr "ERROR: Se esperaba una cadena entrecomillada en la línea %d de %s.\n"
+
+#: backend/usb-darwin.c:364
+#: backend/usb-darwin.c:422
+#: backend/usb-darwin.c:487
+#: backend/usb-darwin.c:505
+msgid "ERROR: Fatal USB error!\n"
+msgstr "ERROR: Error fatal de USB.\n"
+
+#: filter/hpgl-input.c:139
+msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
+msgstr "ERROR: Se ha detectado un comando HP-GL/2 no válido; no se puede imprimir el archivo.\n"
+
+#: filter/pstops.c:1764
+#, c-format
+msgid "ERROR: Missing %%EndProlog!\n"
+msgstr "ERROR: Falta %%EndProlog.\n"
+
+#: filter/pstops.c:1835
+#, c-format
+msgid "ERROR: Missing %%EndSetup!\n"
+msgstr "ERROR: Falta %%EndSetup.\n"
+
+#: backend/ipp.c:241
+msgid "ERROR: Missing device URI on command-line and no DEVICE_URI environment variable!\n"
+msgstr "ERROR: Falta URI del dispositivo en la línea de comandos y no hay variable de entorno DEVICE_URI.\n"
+
+#: filter/bannertops.c:222
+#, c-format
+msgid "ERROR: Missing value on line %d of banner file!\n"
+msgstr "ERROR: Falta el valor en la línea %d del archivo de rótulo.\n"
+
+#: ppdc/ppdc-catalog.cxx:390
+#, c-format
+msgid "ERROR: Need a msgid line before any translation strings on line %d of %s!\n"
+msgstr "ERROR: Se necesita una línea msgid antes de cualquier cadena de traducción en línea %d de %s.\n"
+
+#: filter/pstops.c:755
+#, c-format
+msgid "ERROR: No %%BoundingBox: comment in header!\n"
+msgstr "ERROR: No hay comentario %%BoundingBox: en la cabecera.\n"
+
+#: filter/pstops.c:758
+#, c-format
+msgid "ERROR: No %%Pages: comment in header!\n"
+msgstr "ERROR: No hay comentario %%Pages: en la cabecera.\n"
+
+#: backend/usb.c:200
+msgid "ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable!\n"
+msgstr "ERROR: No se ha encontrado el URI del dispositivo en argv[0] o en la variable de entorno DEVICE_URI.\n"
+
+#: filter/pstext.c:430
+#, c-format
+msgid "ERROR: No fonts in charset file %s\n"
+msgstr "ERROR: No hay fuentes en el archivo de juego de caracteres %s\n"
+
+#: filter/rastertoepson.c:1124
+#: filter/rastertohp.c:854
+#: filter/rastertolabel.c:1279
+msgid "ERROR: No pages found!\n"
+msgstr "ERROR: No se han encontrado páginas.\n"
+
+#: backend/runloop.c:342
+msgid "ERROR: Out of paper!\n"
+msgstr "ERROR: No hay papel.\n"
+
+#: backend/ipp.c:1783
+msgid "ERROR: PRINTER environment variable not defined!\n"
+msgstr "ERROR: Variable de entorno PRINTER no definida.\n"
+
+#: backend/ipp.c:1044
+#, c-format
+msgid "ERROR: Print file was not accepted (%s)!\n"
+msgstr "ERROR: No se ha aceptado la impresión del archivo (%s).\n"
+
+#: backend/pap.c:521
+msgid "ERROR: Printer not responding\n"
+msgstr "ERROR: La impresora no responde\n"
+
+#: backend/ipp.c:564
+#: backend/ipp.c:703
+#: backend/lpd.c:821
+#: backend/socket.c:309
+msgid "ERROR: Printer not responding!\n"
+msgstr "ERROR: La impresora no responde.\n"
+
+#: backend/pap.c:858
+msgid "ERROR: Printer sent unexpected EOF\n"
+msgstr "ERROR: La impresora envió un inesperado EOF\n"
+
+#: backend/lpd.c:1035
+#: backend/lpd.c:1182
+#, c-format
+msgid "ERROR: Remote host did not accept control file (%d)\n"
+msgstr "ERROR: El ordenador remoto no ha aceptado el archivo de control (%d)\n"
+
+#: backend/lpd.c:1130
+#, c-format
+msgid "ERROR: Remote host did not accept data file (%d)\n"
+msgstr "ERROR: El ordenador remoto no ha aceptado el archivo de datos (%d)\n"
+
+#: backend/pap.c:1694
+msgid "ERROR: There was a timeout error while sending data to the printer\n"
+msgstr "ERROR: Hay un error de tiempo de espera mientras se enviaban datos a la impresora\n"
+
+#: backend/ipp.c:1107
+#, c-format
+msgid "ERROR: Unable to add file %d to job: %s\n"
+msgstr "ERROR: No se ha podido añadir el archivo %d al trabajo: %s\n"
+
+#: backend/ipp.c:1348
+#, c-format
+msgid "ERROR: Unable to cancel job %d: %s\n"
+msgstr "ERROR: No se ha podido cancelar el trabajo %d: %s\n"
+
+#: filter/pdftops.c:129
+msgid "ERROR: Unable to copy PDF file"
+msgstr "ERROR: No se ha podido copiar el archivo PDF"
+
+#: backend/lpd.c:745
+msgid "ERROR: Unable to create socket"
+msgstr "ERROR: No se ha podido crear socket"
+
+#: backend/ipp.c:1437
+#, c-format
+msgid "ERROR: Unable to create temporary compressed print file: %s\n"
+msgstr "ERROR: No se ha podido crear el archivo de impresión temporal comprimido: %s\n"
+
+#: backend/ipp.c:418
+#: backend/lpd.c:432
+msgid "ERROR: Unable to create temporary file"
+msgstr "ERROR: No se ha podido crear el archivo temporal"
+
+#: backend/ipp.c:1805
+#, c-format
+msgid "ERROR: Unable to create temporary file - %s.\n"
+msgstr "ERROR: No se ha podido crear el archivo temporal - %s.\n"
+
+#: filter/pstops.c:2706
+#, c-format
+msgid "ERROR: Unable to create temporary file: %s\n"
+msgstr "ERROR: No se ha podido crear el archivo temporal: %s\n"
+
+#: backend/ipp.c:1862
+#, c-format
+msgid "ERROR: Unable to exec pictwpstops: %s\n"
+msgstr "ERROR: No se ha podido ejecutar pictwpstops: %s\n"
+
+#: filter/pdftops.c:305
+#: filter/pdftops.c:319
+msgid "ERROR: Unable to execute gs program"
+msgstr "ERROR: No se ha podido ejecutar el programa gs"
+
+#: filter/pdftops.c:302
+#: filter/pdftops.c:317
+msgid "ERROR: Unable to execute pdftops program"
+msgstr "ERROR: No se ha podido ejecutar el programa pdftops"
+
+#: backend/ipp.c:1875
+#, c-format
+msgid "ERROR: Unable to fork pictwpstops: %s\n"
+msgstr "ERROR: No se ha podido bifurcar (fork) pictwpstops: %s\n"
+
+#: backend/pap.c:712
+msgid "ERROR: Unable to get PAP request"
+msgstr "ERROR: No se ha podido obtener una petición PAP"
+
+#: backend/pap.c:701
+msgid "ERROR: Unable to get PAP response"
+msgstr "ERROR: No se ha podido obtener una respuesta PAP"
+
+#: backend/ipp.c:1790
+#, c-format
+msgid "ERROR: Unable to get PPD file for printer \"%s\" - %s.\n"
+msgstr "ERROR: No se ha podido obtener el archivo PPD para la impresora \"%s\" - %s.\n"
+
+#: backend/pap.c:302
+msgid "ERROR: Unable to get default AppleTalk zone"
+msgstr "ERROR: No se ha podido conseguir la zona AppleTalk predeterminada"
+
+#: backend/ipp.c:1193
+#, c-format
+msgid "ERROR: Unable to get job %d attributes (%s)!\n"
+msgstr "ERROR: No se han podido obtener los atributos del trabajo %d (%s).\n"
+
+#: backend/ipp.c:746
+#, c-format
+msgid "ERROR: Unable to get printer status (%s)!\n"
+msgstr "ERROR: No se ha podido obtener el estado de la impresora (%s).\n"
+
+#: backend/ipp.c:582
+#: backend/lpd.c:677
+#: backend/socket.c:264
+#, c-format
+msgid "ERROR: Unable to locate printer '%s'!\n"
+msgstr "ERROR: No se ha podido localizar la impresora '%s'.\n"
+
+#: backend/pap.c:688
+msgid "ERROR: Unable to look for PAP response"
+msgstr "ERROR: No se ha podido buscar una respuesta PAP"
+
+#: backend/pap.c:322
+msgid "ERROR: Unable to lookup AppleTalk printers"
+msgstr "ERROR: No se han podido mirar las impresoras AppleTalk"
+
+#: backend/pap.c:451
+msgid "ERROR: Unable to make AppleTalk address"
+msgstr "ERROR: No se ha podido crear la dirección AppleTalk"
+
+#: filter/pstext.c:244
+#: filter/texttops.c:248
+#, c-format
+msgid "ERROR: Unable to open \"%s\" - %s\n"
+msgstr "ERROR: No se ha podido abrir \"%s\" - %s\n"
+
+#: filter/pstext.c:261
+#: filter/texttops.c:268
+#, c-format
+msgid "ERROR: Unable to open %s: %s\n"
+msgstr "ERROR: No se ha podido abrir %s: %s\n"
+
+#: filter/bannertops.c:184
+#, c-format
+msgid "ERROR: Unable to open banner file \"%s\" - %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de rótulo \"%s\" - %s\n"
+
+#: backend/parallel.c:249
+#: backend/scsi-irix.c:139
+#: backend/scsi-linux.c:153
+#: backend/serial.c:262
+#: backend/usb-unix.c:138
+#, c-format
+msgid "ERROR: Unable to open device file \"%s\": %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de dispositivo \"%s\": %s\n"
+
+#: filter/pstops.c:290
+#, c-format
+msgid "ERROR: Unable to open file \"%s\" - %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo \"%s\" - %s\n"
+
+#: filter/gziptoany.c:74
+#, c-format
+msgid "ERROR: Unable to open file \"%s\": %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo \"%s\": %s\n"
+
+#: filter/imagetops.c:309
+#: filter/imagetoraster.c:633
+msgid "ERROR: Unable to open image file for printing!\n"
+msgstr "ERROR: No se ha podido abrir el archivo de imagen para imprimirlo.\n"
+
+#: backend/ipp.c:1453
+#: backend/pap.c:249
+#: backend/parallel.c:151
+#: backend/scsi.c:181
+#: backend/serial.c:189
+#: backend/socket.c:154
+#, c-format
+msgid "ERROR: Unable to open print file \"%s\": %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de impresión \"%s\": %s\n"
+
+#: backend/usb.c:237
+#, c-format
+msgid "ERROR: Unable to open print file %s - %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de impresión %s - %s\n"
+
+#: backend/lpd.c:461
+#, c-format
+msgid "ERROR: Unable to open print file %s: %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de impresión %s: %s\n"
+
+#: backend/ipp.c:1445
+#, c-format
+msgid "ERROR: Unable to open temporary compressed print file: %s\n"
+msgstr "ERROR: No se ha podido abrir el archivo de impresión temporal comprimido: %s\n"
+
+#: backend/ipp.c:424
+msgid "ERROR: Unable to open temporary file"
+msgstr "ERROR: No se ha podido abrir el archivo temporal"
+
+#: filter/texttops.c:200
+#, c-format
+msgid "ERROR: Unable to print %d text columns!\n"
+msgstr "ERROR: No se ha podido imprimir %d columnas de texto.\n"
+
+#: filter/texttops.c:179
+#, c-format
+msgid "ERROR: Unable to print %dx%d text page!\n"
+msgstr "ERROR: No se ha podido imprimir %dx%d páginas de texto.\n"
+
+#: backend/serial.c:615
+msgid "ERROR: Unable to read print data"
+msgstr "ERROR: No se han podido leer los datos de impresión"
+
+#: backend/usb-darwin.c:589
+#: backend/usb-darwin.c:622
+msgid "ERROR: Unable to read print data!\n"
+msgstr "ERROR: No se han podido leer los datos de impresión.\n"
+
+#: backend/lpd.c:762
+msgid "ERROR: Unable to reserve port"
+msgstr "ERROR: No se ha podido reservar puerto"
+
+#: filter/pstops.c:560
+#, c-format
+msgid "ERROR: Unable to seek to offset %ld in file - %s\n"
+msgstr "ERROR: No se ha podido alcanzar la posición %ld en el archivo - %s\n"
+
+#: filter/pstops.c:558
+#, c-format
+msgid "ERROR: Unable to seek to offset %lld in file - %s\n"
+msgstr "ERROR: No se ha podido alcanzar la posición %lld en el archivo - %s\n"
+
+#: backend/lpd.c:577
+msgid "ERROR: Unable to send LPD command"
+msgstr "ERROR: No se ha podido enviar comando LPD"
+
+#: backend/pap.c:571
+msgid "ERROR: Unable to send PAP tickle request"
+msgstr "ERROR: No se ha podido enviar una petición PAP"
+
+#: backend/pap.c:580
+msgid "ERROR: Unable to send initial PAP send data request"
+msgstr "ERROR: No se ha podido enviar la petición inicial de datos de envío PAP"
+
+#: backend/scsi-irix.c:218
+#: backend/scsi-linux.c:236
+#, c-format
+msgid "ERROR: Unable to send print data (%d)\n"
+msgstr "ERROR: No se han podido enviar los datos de impresión (%d)\n"
+
+#: backend/usb-darwin.c:665
+msgid "ERROR: Unable to send print data!\n"
+msgstr "ERROR: No se han podido enviar los datos de impresión.\n"
+
+#: backend/lpd.c:1086
+msgid "ERROR: Unable to send print file to printer"
+msgstr "ERROR: No se ha podido imprimir el archivo en la impresora"
+
+#: backend/lpd.c:1100
+msgid "ERROR: Unable to send trailing nul to printer"
+msgstr "ERROR: No se ha podido enviar carácter nulo del final a la impresora"
+
+#: backend/ipp.c:1888
+#, c-format
+msgid "ERROR: Unable to wait for pictwpstops: %s\n"
+msgstr "ERROR: No se puede esperar por pictwpstops: %s\n"
+
+#: backend/ipp.c:1464
+#, c-format
+msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
+msgstr "ERROR: No se han podido escribir %d bytes a \"%s\": %s\n"
+
+#: backend/usb-libusb.c:169
+#: backend/usb-libusb.c:747
+#, c-format
+msgid "ERROR: Unable to write %d bytes to printer!\n"
+msgstr "ERROR: No se han podido escribir %d bytes a la impresora.\n"
+
+#: backend/lpd.c:1016
+#: backend/lpd.c:1163
+msgid "ERROR: Unable to write control file"
+msgstr "ERROR: No se ha podido escribir el archivo de control"
+
+#: backend/serial.c:691
+msgid "ERROR: Unable to write print data"
+msgstr "ERROR: No se han podido escribir los datos de impresión"
+
+#: backend/runloop.c:122
+#: backend/runloop.c:357
+#, c-format
+msgid "ERROR: Unable to write print data: %s\n"
+msgstr "ERROR: No se han podido escribir los datos de impresión: %s\n"
+
+#: filter/imagetoraster.c:1195
+#: filter/imagetoraster.c:1291
+#: filter/imagetoraster.c:1331
+msgid "ERROR: Unable to write raster data to driver!\n"
+msgstr "ERROR: No se ha podido escribir la trama de datos (raster) al controlador.\n"
+
+#: backend/ipp.c:435
+#: backend/lpd.c:439
+msgid "ERROR: Unable to write to temporary file"
+msgstr "ERROR: No se ha podido escribir al archivo temporal"
+
+#: filter/gziptoany.c:96
+#, c-format
+msgid "ERROR: Unable to write uncompressed document data: %s\n"
+msgstr "ERROR: No se han podido escribir los datos de documento sin comprimir: %s\n"
+
+#: ppdc/ppdc-catalog.cxx:405
+#, c-format
+msgid "ERROR: Unexpected text on line %d of %s!\n"
+msgstr "ERROR: Texto inesperado en la línea %d del %s.\n"
+
+#: backend/ipp.c:349
+#, c-format
+msgid "ERROR: Unknown encryption option value \"%s\"!\n"
+msgstr "ERROR: Valor de opción de encriptación \"%s\" desconocida.\n"
+
+#: backend/lpd.c:354
+#, c-format
+msgid "ERROR: Unknown file order \"%s\"\n"
+msgstr "ERROR: Orden de archivos \"%s\" desconocido\n"
+
+#: backend/lpd.c:326
+#, c-format
+msgid "ERROR: Unknown format character \"%c\"\n"
+msgstr "ERROR: Carácter de formato \"%c\" desconocido\n"
+
+#: ppdc/ppdc-catalog.cxx:437
+#, c-format
+msgid "ERROR: Unknown message catalog format for \"%s\"!\n"
+msgstr "ERROR: Formato del catálogo de mensajes para \"%s\" desconocido.\n"
+
+#: backend/ipp.c:391
+#, c-format
+msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
+msgstr "ERROR: Opción \"%s\" con valor \"%s\" desconocida.\n"
+
+#: backend/lpd.c:340
+#, c-format
+msgid "ERROR: Unknown print mode \"%s\"\n"
+msgstr "ERROR: Modo de impresión \"%s\" desconocido\n"
+
+#: backend/ipp.c:362
+#, c-format
+msgid "ERROR: Unknown version option value \"%s\"!\n"
+msgstr "ERROR: Valor de opción de versión \"%s\" desconocida.\n"
+
+#: filter/pstops.c:2407
+#, c-format
+msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
+msgstr "ERROR: Valor de brillo %s no permitido; usando brillo=100.\n"
+
+#: filter/pstops.c:2474
+#, c-format
+msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
+msgstr "ERROR: Valor gamma %s no permitido; usando gamma=1000.\n"
+
+#: filter/pstops.c:2528
+#, c-format
+msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
+msgstr "ERROR: Valor de number-up (páginas por hoja) %d no permitido; usando number-up=1.\n"
+
+#: filter/pstops.c:2561
+#, c-format
+msgid "ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
+msgstr "ERROR: Valor de number-up-layout (disposición de páginas por hoja) %s no permitido; usando number-up-layout=lrtb.\n"
+
+#: filter/pstops.c:2611
+#, c-format
+msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
+msgstr "ERROR: Valor de page-border (borde de página) %s no permitido; usando page-border=none (ninguno).\n"
+
+#: filter/pstops.c:2080
+#, c-format
+msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
+msgstr "ERROR: Se ha detectado un desbordamiento de doc_printf (%d bytes); cancelando.\n"
+
+#: filter/pdftops.c:358
+#, c-format
+msgid "ERROR: pdftops filter crashed on signal %d!\n"
+msgstr "ERROR: filtro pdftops se ha colgado con la señal %d.\n"
+
+#: filter/pdftops.c:350
+#, c-format
+msgid "ERROR: pdftops filter exited with status %d!\n"
+msgstr "ERROR: filtro pdftops se ha cerrado con el estado %d.\n"
+
+#: backend/ipp.c:1907
+#, c-format
+msgid "ERROR: pictwpstops exited on signal %d!\n"
+msgstr "ERROR: pictwpstops se ha cerrado con la señal %d.\n"
+
+#: backend/ipp.c:1904
+#, c-format
+msgid "ERROR: pictwpstops exited with status %d!\n"
+msgstr "ERROR: pictwpstops se ha cerrado con el estado %d.\n"
+
+#: backend/ipp.c:592
+#: backend/lpd.c:850
+#: backend/socket.c:332
+msgid "ERROR: recoverable: Unable to connect to printer; will retry in 30 seconds...\n"
+msgstr "ERROR: recuperable: No se ha podido establecer conexión con la impresora; reintento en 30 segundos...\n"
+
+#: backend/pap.c:629
+msgid "ERROR: select() failed"
+msgstr "ERROR: select() ha fallado"
+
+#: backend/lpd.c:923
+msgid "ERROR: unable to stat print file"
+msgstr "ERROR: no se ha podido ejecutar 'stat' sobre el archivo de impresión"
+
+#: cgi-bin/admin.c:1784
+#: cgi-bin/admin.c:1796
+#: cgi-bin/admin.c:1850
+#: cgi-bin/admin.c:1857
+#: cgi-bin/admin.c:1892
+#: cgi-bin/admin.c:1905
+#: cgi-bin/admin.c:1929
+#: cgi-bin/admin.c:2002
+msgid "Edit Configuration File"
+msgstr "Editar archivo de configuración"
+
+#: cups/adminutil.c:346
+msgid "Empty PPD file!"
+msgstr "Archivo PPD vacío."
+
+#: cgi-bin/admin.c:3506
+msgid "Ending Banner"
+msgstr "Rótulo final"
+
+#: systemv/lppasswd.c:205
+msgid "Enter old password:"
+msgstr "Introduzca la contraseña antigua:"
+
+#: systemv/lppasswd.c:234
+msgid "Enter password again:"
+msgstr "Introduzca nuevamente la contraseña:"
+
+#: systemv/lppasswd.c:223
+msgid "Enter password:"
+msgstr "Introduzca la contraseña:"
+
+#: scheduler/client.c:2384
+msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
+msgstr "Introduzca su nombre de usuario y contraseña o el nombre de usuario y contraseña de root para poder acceder a esta página. Si está usando autentificación Kerberos, asegúrese de que tiene un ticket Kerberos válido."
+
+#: ppdc/sample.c:241
+msgid "Envelope Feed"
+msgstr "Alimentador de sobre"
+
+#: ppdc/sample.c:212
+msgid "Epson"
+msgstr "Epson"
+
+#: cgi-bin/admin.c:3549
+msgid "Error Policy"
+msgstr "Directiva de error"
+
+#: systemv/lpinfo.c:112
+#: systemv/lpmove.c:94
+msgid "Error: need hostname after '-h' option!\n"
+msgstr "Error: se necesita un nombre de ordenador tras la opción '-h'.\n"
+
+#: ppdc/sample.c:327
+msgid "Every 10 Labels"
+msgstr "Cada 10 etiquetas"
+
+#: ppdc/sample.c:319
+msgid "Every 2 Labels"
+msgstr "Cada 2 etiquetas"
+
+#: ppdc/sample.c:320
+msgid "Every 3 Labels"
+msgstr "Cada 3 etiquetas"
+
+#: ppdc/sample.c:321
+msgid "Every 4 Labels"
+msgstr "Cada 4 etiquetas"
+
+#: ppdc/sample.c:322
+msgid "Every 5 Labels"
+msgstr "Cada 5 etiquetas"
+
+#: ppdc/sample.c:323
+msgid "Every 6 Labels"
+msgstr "Cada 6 etiquetas"
+
+#: ppdc/sample.c:324
+msgid "Every 7 Labels"
+msgstr "Cada 7 etiquetas"
+
+#: ppdc/sample.c:325
+msgid "Every 8 Labels"
+msgstr "Cada 8 etiquetas"
+
+#: ppdc/sample.c:326
+msgid "Every 9 Labels"
+msgstr "Cada 9 etiquetas"
+
+#: ppdc/sample.c:318
+msgid "Every Label"
+msgstr "Cada etiqueta"
+
+#: cups/http-support.c:1230
+msgid "Expectation Failed"
+msgstr "Lo que se esperaba, falló."
+
+#: cgi-bin/admin.c:2292
+#: cgi-bin/admin.c:2311
+msgid "Export Printers to Samba"
+msgstr "Exportar impresoras a Samba"
+
+#: systemv/cupstestdsc.c:176
+#: systemv/cupstestdsc.c:193
+#: systemv/cupstestdsc.c:218
+#: systemv/cupstestdsc.c:235
+#: systemv/cupstestdsc.c:259
+#: systemv/cupstestdsc.c:277
+#: systemv/cupstestdsc.c:306
+#: systemv/cupstestdsc.c:343
+#: systemv/cupstestdsc.c:353
+#: systemv/cupstestdsc.c:363
+#: systemv/cupstestdsc.c:373
+#: systemv/cupstestdsc.c:383
+#: systemv/cupstestdsc.c:391
+msgid "FAIL\n"
+msgstr "FALLO\n"
+
+#: ppdc/sample.c:132
+msgid "File Folder"
+msgstr "Carpeta de archivos"
+
+#: ppdc/sample.c:141
+msgid "File Folder - 9/16 x 3 7/16\""
+msgstr "Carpeta de archivosr - 9/16 x 3 7/16 pulg."
+
+#: scheduler/ipp.c:2498
+#, c-format
+msgid "File device URIs have been disabled! To enable, see the FileDevice directive in \"%s/cupsd.conf\"."
+msgstr "Los URIs del dispositivo de archivo han sido deshabilitados. Para habilitarlos, vea la directiva FileDevice en \"%s/cupsd.conf\"."
+
+#: ppdc/sample.c:92
+msgid "Folio"
+msgstr "Folio"
+
+#: cups/http-support.c:1209
+msgid "Forbidden"
+msgstr "Prohibido"
+
+#: backend/ipp.c:1685
+msgid "Fuser temperature high!"
+msgstr "Temperatura del fusor alta."
+
+#: backend/ipp.c:1687
+msgid "Fuser temperature low!"
+msgstr "Temperatura del fusor baja."
+
+#: cups/ppd.c:697
+#: cups/ppd.c:1226
+msgid "General"
+msgstr "General"
+
+#: ppdc/sample.c:231
+msgid "Generic"
+msgstr "Genérico"
+
+#: ppdc/sample.c:89
+msgid "German FanFold"
+msgstr "FanFold alemán"
+
+#: ppdc/sample.c:90
+msgid "German FanFold Legal"
+msgstr "FanFold Legal alemán"
+
+#: cups/snmp.c:1039
+msgid "Get-Response-PDU uses indefinite length"
+msgstr "Get-Response-PDU usa una longitud indefinida"
+
+#: ppdc/sample.c:262
+msgid "Glossy Paper"
+msgstr "Papel satinado"
+
+#: scheduler/ipp.c:3618
+#: scheduler/ipp.c:3921
+#: scheduler/ipp.c:6543
+#: scheduler/ipp.c:6685
+#: scheduler/ipp.c:7866
+#: scheduler/ipp.c:8990
+#: scheduler/ipp.c:9215
+#: scheduler/ipp.c:9632
+#: scheduler/ipp.c:10207
+msgid "Got a printer-uri attribute but no job-id!"
+msgstr "Se ha obtenido el atributo printer-uri pero no el job-id."
+
+#: ppdc/sample.c:227
+msgid "Grayscale"
+msgstr "Escale de grises"
+
+#: ppdc/sample.c:251
+msgid "HP"
+msgstr "HP"
+
+#: ppdc/sample.c:133
+msgid "Hanging Folder"
+msgstr "Carpeta colgante"
+
+#: ppdc/sample.c:142
+msgid "Hanging Folder - 9/16 x 2\""
+msgstr "Carpeta colgante - 9/16 x 2 pulg."
+
+#: backend/pap.c:296
+msgid "INFO: AppleTalk disabled in System Preferences\n"
+msgstr "INFO: AppleTalk desactivado en Preferencias del sistema\n"
+
+#: backend/pap.c:511
+msgid "INFO: AppleTalk disabled in System Preferences.\n"
+msgstr "INFO: AppleTalk desactivado en Preferencias del sistema.\n"
+
+#: backend/lpd.c:701
+#, c-format
+msgid "INFO: Attempting to connect to host %s for printer %s\n"
+msgstr "INFO: Intentando conectar al ordenador %s para la impresora %s\n"
+
+#: backend/socket.c:270
+#, c-format
+msgid "INFO: Attempting to connect to host %s on port %d\n"
+msgstr "INFO: Intentando conectar al ordenador %s en el puerto %d\n"
+
+#: backend/ipp.c:1328
+msgid "INFO: Canceling print job...\n"
+msgstr "INFO: Cancelando trabajo de impresión...\n"
+
+#: backend/ipp.c:612
+#: backend/lpd.c:869
+#: backend/socket.c:354
+#, c-format
+msgid "INFO: Connected to %s...\n"
+msgstr "INFO: Conectado a %s...\n"
+
+#: backend/ipp.c:526
+#, c-format
+msgid "INFO: Connecting to %s on port %d...\n"
+msgstr "INFO: Conectando con %s en el puerto %d...\n"
+
+#: backend/lpd.c:1038
+#: backend/lpd.c:1185
+msgid "INFO: Control file sent successfully\n"
+msgstr "INFO: Archivo de control enviado correctamente\n"
+
+#: backend/lpd.c:1133
+msgid "INFO: Data file sent successfully\n"
+msgstr "INFO: Archivo de datos enviado correctamente\n"
+
+#: filter/imagetoraster.c:1138
+#, c-format
+msgid "INFO: Formatting page %d...\n"
+msgstr "INFO: Formateando página %d...\n"
+
+#: filter/imagetoraster.c:619
+msgid "INFO: Loading image file...\n"
+msgstr "INFO: Cargando archivo de imagen...\n"
+
+#: cups/http-support.c:1392
+#, c-format
+msgid "INFO: Looking for \"%s\"...\n"
+msgstr "INFO: Buscando \"%s\"...\n"
+
+#: backend/pap.c:928
+msgid "INFO: Opening connection\n"
+msgstr "INFO: Abriendo la conexión\n"
+
+#: backend/socket.c:432
+msgid "INFO: Print file sent, waiting for printer to finish...\n"
+msgstr "INFO: Archivo de impresión enviado; esperando a que finalice la impresora...\n"
+
+#: backend/ipp.c:1027
+#: backend/usb-unix.c:124
+msgid "INFO: Printer busy; will retry in 10 seconds...\n"
+msgstr "INFO: Impresora ocupada; reintento en 10 segundos...\n"
+
+#: backend/parallel.c:236
+#: backend/scsi-irix.c:146
+#: backend/scsi-linux.c:160
+#: backend/serial.c:256
+msgid "INFO: Printer busy; will retry in 30 seconds...\n"
+msgstr "INFO: Impresora ocupada; reintento en 30 segundos...\n"
+
+#: backend/usb-unix.c:419
+msgid "INFO: Printer busy; will retry in 5 seconds...\n"
+msgstr "INFO: Impresora ocupada; reintento en 5 segundos...\n"
+
+#: backend/ipp.c:729
+#: backend/ipp.c:1038
+msgid "INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"
+msgstr "INFO: La impresora no es compatible con IPP/1.1; probando IPP/1.0...\n"
+
+#: backend/usb-unix.c:503
+msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
+msgstr "INFO: La impresora está ocupada; reintento en 5 segundos...\n"
+
+#: backend/runloop.c:351
+msgid "INFO: Printer is currently off-line.\n"
+msgstr "INFO: La impresora está actualmente fuera de línea.\n"
+
+#: backend/runloop.c:243
+msgid "INFO: Printer is currently offline.\n"
+msgstr "INFO: La impresora está sin conexión en estos momentos.\n"
+
+#: backend/runloop.c:373
+#: backend/usb-darwin.c:1143
+msgid "INFO: Printer is now online.\n"
+msgstr "INFO: La impresora ya tiene conexión.\n"
+
+#: backend/usb-darwin.c:1161
+msgid "INFO: Printer is offline.\n"
+msgstr "INFO: La impresora está sin conexión.\n"
+
+#: backend/parallel.c:242
+#: backend/usb-unix.c:131
+msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
+msgstr "INFO: Impresora no conectada; reintento en 30 segundos...\n"
+
+#: filter/rastertoepson.c:1076
+#: filter/rastertohp.c:801
+#: filter/rastertolabel.c:1232
+#, c-format
+msgid "INFO: Printing page %d, %d%% complete...\n"
+msgstr "INFO: Imprimiendo página %d, %d%% completado...\n"
+
+#: filter/imagetops.c:804
+#, c-format
+msgid "INFO: Printing page %d...\n"
+msgstr "INFO: Imprimiendo página %d...\n"
+
+#: backend/socket.c:464
+#: filter/rastertoepson.c:1126
+#: filter/rastertohp.c:856
+#: filter/rastertolabel.c:1281
+msgid "INFO: Ready to print.\n"
+msgstr "INFO: Lista para imprimir.\n"
+
+#: backend/lpd.c:1157
+#, c-format
+msgid "INFO: Sending control file (%lu bytes)\n"
+msgstr "INFO: Enviando archivo de control (%lu bytes)\n"
+
+#: backend/lpd.c:1010
+#, c-format
+msgid "INFO: Sending control file (%u bytes)\n"
+msgstr "INFO: Enviando archivo de control (%u bytes)\n"
+
+#: backend/pap.c:564
+msgid "INFO: Sending data\n"
+msgstr "INFO: Enviando datos\n"
+
+#: backend/lpd.c:1069
+#, c-format
+msgid "INFO: Sending data file (%ld bytes)\n"
+msgstr "INFO: Enviando archivo de datos (%ld bytes)\n"
+
+#: backend/lpd.c:1067
+#, c-format
+msgid "INFO: Sending data file (%lld bytes)\n"
+msgstr "INFO: Enviando archivo de datos (%lld bytes)\n"
+
+#: backend/usb-darwin.c:521
+msgid "INFO: Sending print data...\n"
+msgstr "INFO: Enviando datos de impresión...\n"
+
+#: backend/parallel.c:294
+#: backend/socket.c:411
+#: backend/usb-unix.c:183
+#, c-format
+msgid "INFO: Sent print file, %ld bytes...\n"
+msgstr "INFO: Archivo de impresión enviado, %ld bytes...\n"
+
+#: backend/parallel.c:292
+#: backend/socket.c:409
+#: backend/usb-unix.c:181
+#, c-format
+msgid "INFO: Sent print file, %lld bytes...\n"
+msgstr "INFO: Archivo de impresión enviado, %lld bytes...\n"
+
+#: backend/lpd.c:1081
+#, c-format
+msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
+msgstr "INFO: Guardando trabajo LPR en cola, %.0f%% completado...\n"
+
+#: backend/ipp.c:544
+#: backend/ipp.c:810
+#: backend/lpd.c:802
+#: backend/parallel.c:221
+#: backend/scsi-irix.c:124
+#: backend/scsi-linux.c:138
+#: backend/serial.c:241
+#: backend/socket.c:292
+#: backend/usb-unix.c:109
+msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
+msgstr "INFO: No se ha podido contactar con la impresora; poniendo en cola en la siguiente impresora de la clase...\n"
+
+#: backend/pap.c:309
+#, c-format
+msgid "INFO: Using default AppleTalk zone \"%s\"\n"
+msgstr "INFO: Usando zona AppleTalk predeterminada \"%s\"\n"
+
+#: backend/ipp.c:1132
+msgid "INFO: Waiting for job to complete...\n"
+msgstr "INFO: Esperando a que finalice el trabajo...\n"
+
+#: backend/usb-darwin.c:441
+#: backend/usb-libusb.c:117
+msgid "INFO: Waiting for printer to become available...\n"
+msgstr "INFO: Esperando a que la impresora esté disponible...\n"
+
+#: ppdc/sample.c:93
+msgid "ISO B0"
+msgstr "ISO B0"
+
+#: ppdc/sample.c:94
+msgid "ISO B1"
+msgstr "ISO B1"
+
+#: ppdc/sample.c:104
+msgid "ISO B10"
+msgstr "ISO B10"
+
+#: ppdc/sample.c:95
+msgid "ISO B2"
+msgstr "ISO B2"
+
+#: ppdc/sample.c:96
+msgid "ISO B3"
+msgstr "ISO B3"
+
+#: ppdc/sample.c:97
+msgid "ISO B4"
+msgstr "ISO B4"
+
+#: ppdc/sample.c:69
+msgid "ISO B4 Envelope"
+msgstr "Sobre ISO B4"
+
+#: ppdc/sample.c:98
+msgid "ISO B5"
+msgstr "ISO B5"
+
+#: ppdc/sample.c:99
+msgid "ISO B5 (Oversize)"
+msgstr "ISO B5 (extragrande)"
+
+#: ppdc/sample.c:70
+msgid "ISO B5 Envelope"
+msgstr "Sobre ISO B5"
+
+#: ppdc/sample.c:100
+msgid "ISO B6"
+msgstr "ISO B6"
+
+#: ppdc/sample.c:71
+msgid "ISO B6 Envelope"
+msgstr "Sobre ISO B6"
+
+#: ppdc/sample.c:101
+msgid "ISO B7"
+msgstr "ISO B7"
+
+#: ppdc/sample.c:102
+msgid "ISO B8"
+msgstr "ISO B8"
+
+#: ppdc/sample.c:103
+msgid "ISO B9"
+msgstr "ISO B9"
+
+#: cups/ppd.c:349
+msgid "Illegal control character"
+msgstr "Carácter de control ilegal"
+
+#: cups/ppd.c:350
+msgid "Illegal main keyword string"
+msgstr "Cadena de clave principal ilegal"
+
+#: cups/ppd.c:351
+msgid "Illegal option keyword string"
+msgstr "Cadena de clave de opción ilegal"
+
+#: cups/ppd.c:352
+msgid "Illegal translation string"
+msgstr "Cadena de traducción ilegal"
+
+#: cups/ppd.c:353
+msgid "Illegal whitespace character"
+msgstr "Carácter de espacio en blanco ilegal"
+
+#: backend/ipp.c:1677
+msgid "Ink/toner almost empty."
+msgstr "Tinta/toner casi vacíos."
+
+#: backend/ipp.c:1679
+msgid "Ink/toner empty!"
+msgstr "Tinta/toner vacíos."
+
+#: backend/ipp.c:1681
+msgid "Ink/toner waste bin almost full."
+msgstr "Recipiente de residuos de tinta/tóner casi lleno."
+
+#: backend/ipp.c:1683
+msgid "Ink/toner waste bin full!"
+msgstr "Recipiente de residuos de tinta/tóner lleno."
+
+#: ppdc/sample.c:246
+msgid "Installable Options"
+msgstr "Opciones instalables"
+
+#: ppdc/sample.c:249
+msgid "Installed"
+msgstr "Instalada"
+
+#: ppdc/sample.c:265
+msgid "IntelliBar Label Printer"
+msgstr "Impresora de etiquetas IntelliBar"
+
+#: ppdc/sample.c:264
+msgid "Intellitech"
+msgstr "Intellitech"
+
+#: backend/ipp.c:1661
+msgid "Interlock open."
+msgstr "Dispositivo de seguridad abierto."
+
+#: cups/ppd.c:340
+msgid "Internal error"
+msgstr "Error interno"
+
+#: ppdc/sample.c:130
+msgid "Internet Postage 2-Part"
+msgstr "Correo por Internet Parte-2"
+
+#: ppdc/sample.c:139
+msgid "Internet Postage 2-Part - 2 1/4 x 7 1/2\""
+msgstr "Correo por Internet Parte-2 - 2 1/4 x 7 1/2 pulg."
+
+#: ppdc/sample.c:131
+msgid "Internet Postage 3-Part"
+msgstr "Correo por Internet Parte-3"
+
+#: ppdc/sample.c:140
+msgid "Internet Postage 3-Part - 2 1/4 x 7\""
+msgstr "Correo por Internet Parte-3 - 2 1/4 x 7 pulg."
+
+#: ppdc/sample.c:68
+msgid "Invite Envelope"
+msgstr "Sobre de invitación"
+
+#: ppdc/sample.c:72
+msgid "Italian Envelope"
+msgstr "Sobre Italiano"
+
+#: cups/ppd.c:1344
+msgid "JCL"
+msgstr "JCL"
+
+#: scheduler/ipp.c:9288
+#, c-format
+msgid "Job #%d cannot be restarted - no files!"
+msgstr "El trabajo #%d no puede ser reiniciado - no hay archivos."
+
+#: scheduler/ipp.c:3659
+#: scheduler/ipp.c:4029
+#: scheduler/ipp.c:6584
+#: scheduler/ipp.c:6726
+#: scheduler/ipp.c:7743
+#: scheduler/ipp.c:7907
+#: scheduler/ipp.c:8143
+#: scheduler/ipp.c:8188
+#: scheduler/ipp.c:9031
+#: scheduler/ipp.c:9256
+#: scheduler/ipp.c:9673
+#: scheduler/ipp.c:10248
+#, c-format
+msgid "Job #%d does not exist!"
+msgstr "El trabajo #%d no existe."
+
+#: scheduler/ipp.c:4060
+#, c-format
+msgid "Job #%d is already aborted - can't cancel."
+msgstr "El trabajo #%d ya está anulado - no se puede cancelar."
+
+#: scheduler/ipp.c:4054
+#, c-format
+msgid "Job #%d is already canceled - can't cancel."
+msgstr "El trabajo #%d ya está cancelado - no se puede cancelar."
+
+#: scheduler/ipp.c:4066
+#, c-format
+msgid "Job #%d is already completed - can't cancel."
+msgstr "El trabajo #%d ya ha sido completado - no se puede cancelar."
+
+#: scheduler/ipp.c:8230
+#: scheduler/ipp.c:10263
+#, c-format
+msgid "Job #%d is finished and cannot be altered!"
+msgstr "El trabajo #%d ha terminado y no puede ser modificado."
+
+#: scheduler/ipp.c:9270
+#, c-format
+msgid "Job #%d is not complete!"
+msgstr "El trabajo #%d no ha sido completado."
+
+#: scheduler/ipp.c:3674
+#, c-format
+msgid "Job #%d is not held for authentication!"
+msgstr "El trabajo #%d no está retenido para autentificación."
+
+#: scheduler/ipp.c:9045
+#, c-format
+msgid "Job #%d is not held!"
+msgstr "El trabajo #%d no está retenido."
+
+#: scheduler/ipp.c:7721
+#, c-format
+msgid "Job #%s does not exist!"
+msgstr "El trabajo #%s no existe."
+
+#: scheduler/ipp.c:6225
+#, c-format
+msgid "Job %d not found!"
+msgstr "No se ha encontrado el trabajo %d."
+
+#: cgi-bin/ipp-var.c:1017
+msgid "Job Completed"
+msgstr "Trabajo completado"
+
+#: cgi-bin/ipp-var.c:1015
+msgid "Job Created"
+msgstr "Trabajo creado"
+
+#: filter/bannertops.c:619
+msgid "Job ID: "
+msgstr "ID del trabajo: "
+
+#: cgi-bin/ipp-var.c:1021
+msgid "Job Options Changed"
+msgstr "Opciones de trabajo cambiadas"
+
+#: cgi-bin/ipp-var.c:1019
+msgid "Job Stopped"
+msgstr "Trabajo detenido"
+
+#: filter/bannertops.c:627
+msgid "Job UUID: "
+msgstr "UUID de trabajo:"
+
+#: scheduler/ipp.c:10345
+msgid "Job is completed and cannot be changed."
+msgstr "El trabajo está terminado y no puede ser cambiado."
+
+#: cgi-bin/jobs.c:197
+msgid "Job operation failed:"
+msgstr "La operación del trabajo ha fallado:"
+
+#: scheduler/ipp.c:10381
+#: scheduler/ipp.c:10402
+#: scheduler/ipp.c:10413
+msgid "Job state cannot be changed."
+msgstr "No se puede cambiar el estado del trabajo."
+
+#: scheduler/ipp.c:9135
+msgid "Job subscriptions cannot be renewed!"
+msgstr "Las suscripciones de trabajos no han podido ser renovadas."
+
+#: cgi-bin/jobs.c:102
+#: cgi-bin/jobs.c:113
+#: cgi-bin/jobs.c:194
+msgid "Jobs"
+msgstr "Trabajos"
+
+#: ppdc/sample.c:73
+msgid "Kaku2 Envelope"
+msgstr "Sobre Kaku2"
+
+#: ppdc/sample.c:74
+msgid "Kaku3 Envelope"
+msgstr "Sobre Kaku3"
+
+#: ppdc/sample.c:202
+msgid "Label Printer"
+msgstr "Impresora de etiquetas"
+
+#: ppdc/sample.c:418
+msgid "Label Top"
+msgstr "Parte superior de la etiqueta"
+
+#: scheduler/ipp.c:2121
+#: scheduler/ipp.c:6148
+#, c-format
+msgid "Language \"%s\" not supported!"
+msgstr "No se admite el uso del idioma \"%s\"."
+
+#: ppdc/sample.c:127
+msgid "Large Address"
+msgstr "Dirección grande"
+
+#: ppdc/sample.c:136
+msgid "Large Address - 1 4/10 x 3 1/2\""
+msgstr "Dirección grande - 1 4/10 x 3 1/2 pulg."
+
+#: ppdc/sample.c:263
+msgid "LaserJet Series PCL 4/5"
+msgstr "LaserJet Series PCL 4/5"
+
+#: ppdc/sample.c:208
+msgid "Light"
+msgstr "Ligero"
+
+#: cups/ppd.c:348
+msgid "Line longer than the maximum allowed (255 characters)"
+msgstr "Línea más larga que el máximo permitido (255 caracteres)"
+
+#: cgi-bin/admin.c:2329
+msgid "List Available Printers"
+msgstr "Listar impresoras disponibles"
+
+#: filter/bannertops.c:740
+msgid "Location: "
+msgstr "Ubicación:"
+
+#: ppdc/sample.c:244
+msgid "Long-Edge (Portrait)"
+msgstr "Lado largo (retrato)"
+
+#: filter/bannertops.c:749
+msgid "Make and Model: "
+msgstr "Marca y modelo:"
+
+#: ppdc/sample.c:240
+msgid "Manual Feed"
+msgstr "Alimentación manual"
+
+#: filter/bannertops.c:776
+msgid "Media Dimensions: "
+msgstr "Dimensiones del papel:"
+
+#: filter/bannertops.c:796
+msgid "Media Limits: "
+msgstr "Límites del papel:"
+
+#: filter/bannertops.c:765
+msgid "Media Name: "
+msgstr "Nombre del soporte"
+
+#: cups/ppd.c:744
+#: cups/ppd.c:1281
+msgid "Media Size"
+msgstr "Tamaño de papel"
+
+#: cups/ppd.c:748
+#: cups/ppd.c:1285
+#: ppdc/sample.c:234
+msgid "Media Source"
+msgstr "Fuente del papel"
+
+#: ppdc/sample.c:336
+msgid "Media Tracking"
+msgstr "Seguimiento del medio"
+
+#: cups/ppd.c:746
+#: cups/ppd.c:1283
+#: ppdc/sample.c:257
+msgid "Media Type"
+msgstr "Tipo de papel"
+
+#: backend/ipp.c:1649
+msgid "Media jam!"
+msgstr "Atasco de papel."
+
+#: backend/ipp.c:1667
+msgid "Media tray almost empty."
+msgstr "Bandeja de papel casi vacía."
+
+#: backend/ipp.c:1669
+msgid "Media tray empty!"
+msgstr "Bandeja de papel vacía."
+
+#: backend/ipp.c:1665
+msgid "Media tray missing!"
+msgstr "Falta la bandeja de papel."
+
+#: backend/ipp.c:1647
+msgid "Media tray needs to be filled."
+msgstr "Hay que poner papel en la bandeja."
+
+#: ppdc/sample.c:209
+msgid "Medium"
+msgstr "Media"
+
+#: cups/ppd.c:337
+msgid "Memory allocation error"
+msgstr "Error de reserva de memoria"
+
+#: cups/ppd.c:338
+msgid "Missing PPD-Adobe-4.x header"
+msgstr "Falta cabecera PPD-Adobe-4.x"
+
+#: cups/ppd.c:347
+msgid "Missing asterisk in column 1"
+msgstr "Falta un asterisco en la columna 1"
+
+#: scheduler/ipp.c:6606
+msgid "Missing document-number attribute!"
+msgstr "Falta el atributo document-number."
+
+#: cups/adminutil.c:282
+#, c-format
+msgid "Missing double quote on line %d!"
+msgstr "Faltan dobles comillas en línea %d."
+
+#: cgi-bin/admin.c:2041
+#: cgi-bin/admin.c:2126
+#: cgi-bin/admin.c:2762
+#: cgi-bin/admin.c:3016
+#: cgi-bin/admin.c:3127
+#: cgi-bin/admin.c:3805
+msgid "Missing form variable!"
+msgstr "Variable de formulario desaparecida."
+
+#: scheduler/ipp.c:6994
+msgid "Missing notify-subscription-ids attribute!"
+msgstr "Atributo notify-subscription-ids desaparecido."
+
+#: scheduler/ipp.c:3796
+msgid "Missing requesting-user-name attribute!"
+msgstr "Falta el atributo requesting-user-name."
+
+#: scheduler/ipp.c:461
+msgid "Missing required attributes!"
+msgstr "Faltan atributos necesarios."
+
+#: cups/adminutil.c:263
+#, c-format
+msgid "Missing value on line %d!"
+msgstr "Falta un valor en la línea %d."
+
+#: cups/ppd.c:339
+msgid "Missing value string"
+msgstr "Falta cadena de valores"
+
+#: systemv/lpinfo.c:451
+#, c-format
+msgid ""
+"Model:  name = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+msgstr ""
+"Modelo:  nombre = %s\n"
+"        natural_language = %s\n"
+"        make-and-model = %s\n"
+"        device-id = %s\n"
+
+#: cgi-bin/admin.c:477
+msgid "Modify Class"
+msgstr "Modificar clase"
+
+#: cgi-bin/admin.c:769
+msgid "Modify Printer"
+msgstr "Modificar impresora"
+
+#: ppdc/sample.c:111
+msgid "Monarch"
+msgstr "Monarch"
+
+#: ppdc/sample.c:75
+msgid "Monarch Envelope"
+msgstr "Sobre Monarch"
+
+#: cgi-bin/ipp-var.c:416
+#: cgi-bin/ipp-var.c:493
+msgid "Move All Jobs"
+msgstr "Mover todos los trabajos"
+
+#: cgi-bin/ipp-var.c:361
+#: cgi-bin/ipp-var.c:414
+#: cgi-bin/ipp-var.c:491
+msgid "Move Job"
+msgstr "Mover trabajo"
+
+#: cups/http-support.c:1194
+msgid "Moved Permanently"
+msgstr "Movido permanentemente"
+
+#: backend/ipp.c:1057
+#, c-format
+msgid "NOTICE: Print file accepted - job ID %d.\n"
+msgstr "NOTICE: Archivo de impresión aceptado: ID de trabajo %d.\n"
+
+#: backend/ipp.c:1051
+msgid "NOTICE: Print file accepted - job ID unknown.\n"
+msgstr "NOTICE: Archivo de impresión aceptado: ID de trabajo desconocido.\n"
+
+#: cups/ppd.c:336
+msgid "NULL PPD file pointer"
+msgstr "Puntero de archivo PPD NULO"
+
+#: cups/snmp.c:1076
+msgid "Name OID uses indefinite length"
+msgstr "Nombre OID usa una longitud indefinida"
+
+#: ppdc/sample.c:402
+msgid "Never"
+msgstr "Nunca"
+
+#: ppdc/sample.c:228
+msgid "New Stylus Color Series"
+msgstr "Nueva Stylus Color Series"
+
+#: ppdc/sample.c:230
+msgid "New Stylus Photo Series"
+msgstr "Nueva Stylus Photo Series"
+
+#: cups/ppd.c:1867
+msgid "No"
+msgstr "No"
+
+#: cups/http-support.c:1191
+msgid "No Content"
+msgstr "No hay contenido"
+
+#: cups/util.c:1203
+msgid "No PPD name!"
+msgstr "No hay nombre de PPD."
+
+#: cups/snmp.c:1070
+msgid "No VarBind SEQUENCE"
+msgstr "No hay Varbind SEQUENCE"
+
+#: cups/adminutil.c:795
+msgid "No Windows printer drivers are installed!"
+msgstr "No está instalado ningún controlador de impresora de Windows."
+
+#: cups/request.c:501
+#: cups/request.c:756
+msgid "No active connection"
+msgstr "No hay conexión activa"
+
+#: scheduler/ipp.c:3976
+#, c-format
+msgid "No active jobs on %s!"
+msgstr "No hay trabajos activos en %s."
+
+#: scheduler/ipp.c:304
+msgid "No attributes in request!"
+msgstr "No hay atributos en la solicitud."
+
+#: scheduler/ipp.c:3702
+msgid "No authentication information provided!"
+msgstr "No se ha proporcionado información de autentificación."
+
+#: cups/snmp.c:1027
+msgid "No community name"
+msgstr "No hay nombre de comunidad"
+
+#: scheduler/ipp.c:6416
+msgid "No default printer"
+msgstr "No hay impresora predeterminada"
+
+#: scheduler/ipp.c:7492
+msgid "No destinations added."
+msgstr "No se han añadido destinos."
+
+#: cups/snmp.c:1057
+msgid "No error-index"
+msgstr "No hay error-index"
+
+#: cups/snmp.c:1049
+msgid "No error-status"
+msgstr "No hay error-status"
+
+#: scheduler/ipp.c:8429
+#: scheduler/ipp.c:9724
+msgid "No file!?!"
+msgstr "¡¿¡No hay archivo!?!"
+
+#: cups/util.c:930
+msgid "No modification time!"
+msgstr "No hay tiempo de modificación."
+
+#: cups/snmp.c:1074
+msgid "No name OID"
+msgstr "No hay nombre OID"
+
+#: cups/util.c:924
+msgid "No printer name!"
+msgstr "No hay nombre de impresora."
+
+#: cups/util.c:1756
+msgid "No printer-uri found for class!"
+msgstr "No se encontró printer-uri para la clase."
+
+#: cups/util.c:1771
+msgid "No printer-uri found!"
+msgstr "No se encontró printer-uri."
+
+#: cups/snmp.c:1041
+msgid "No request-id"
+msgstr "No hay request-id"
+
+#: scheduler/ipp.c:6033
+msgid "No subscription attributes in request!"
+msgstr "No hay atributos de subscripción en la solicitud."
+
+#: scheduler/ipp.c:7806
+msgid "No subscriptions found."
+msgstr "No se han encontrado subscripciones."
+
+#: cups/snmp.c:1065
+msgid "No variable-bindings SEQUENCE"
+msgstr "No hay variable-bindings SEQUENCE"
+
+#: cups/snmp.c:1020
+msgid "No version number"
+msgstr "No hay número de versión"
+
+#: ppdc/sample.c:339
+msgid "Non-continuous (Mark sensing)"
+msgstr "No continuo (sensible a señal)"
+
+#: ppdc/sample.c:338
+msgid "Non-continuous (Web sensing)"
+msgstr "No continuo (sensible a web)"
+
+#: ppdc/sample.c:210
+msgid "Normal"
+msgstr "Normal"
+
+#: cups/http-support.c:1212
+msgid "Not Found"
+msgstr "No encontrado"
+
+#: cups/http-support.c:1224
+msgid "Not Implemented"
+msgstr "No implementado"
+
+#: ppdc/sample.c:248
+msgid "Not Installed"
+msgstr "No instalado"
+
+#: cups/http-support.c:1200
+msgid "Not Modified"
+msgstr "No modificado"
+
+#: cups/http-support.c:1227
+msgid "Not Supported"
+msgstr "No permitido"
+
+#: scheduler/ipp.c:1500
+msgid "Not allowed to print."
+msgstr "No se permite imprimir."
+
+#: ppdc/sample.c:112
+msgid "Note"
+msgstr "Nota"
+
+#: cups/http-support.c:1182
+#: cups/ppd.c:334
+msgid "OK"
+msgstr "OK"
+
+#: backend/ipp.c:1689
+msgid "OPC almost at end-of-life."
+msgstr "OPC prácticamente agotado."
+
+#: backend/ipp.c:1691
+msgid "OPC at end-of-life!"
+msgstr "OPC agotado."
+
+#: ppdc/sample.c:243
+msgid "Off (1-Sided)"
+msgstr "Desactivado (1 cara)"
+
+#: ppdc/sample.c:333
+msgid "Oki"
+msgstr "Oki"
+
+#: cgi-bin/help.c:89
+#: cgi-bin/help.c:130
+#: cgi-bin/help.c:140
+#: cgi-bin/help.c:171
+msgid "Online Help"
+msgstr "Ayuda en línea"
+
+#: cups/adminutil.c:979
+#, c-format
+msgid "Open of %s failed: %s"
+msgstr "La apertura de %s ha fallado: %s"
+
+#: cups/ppd.c:342
+msgid "OpenGroup without a CloseGroup first"
+msgstr "OpenGroup sin un CloseGroup previo"
+
+#: cups/ppd.c:344
+msgid "OpenUI/JCLOpenUI without a CloseUI/JCLCloseUI first"
+msgstr "OpenUI/JCLOpenUI sin un CloseUI/JCLCloseUI previo"
+
+#: cgi-bin/admin.c:3576
+msgid "Operation Policy"
+msgstr "Directiva de operación"
+
+#: cgi-bin/admin.c:3253
+#: cgi-bin/admin.c:3313
+msgid "Options Installed"
+msgstr "Opciones instaladas"
+
+#: filter/bannertops.c:670
+msgid "Options: "
+msgstr "Opciones:"
+
+#: backend/ipp.c:1657
+msgid "Out of toner!"
+msgstr "No hay toner."
+
+#: cups/ppd.c:750
+#: cups/ppd.c:1287
+msgid "Output Mode"
+msgstr "Modo de salida"
+
+#: backend/ipp.c:1673
+msgid "Output bin almost full."
+msgstr "Recipiente de salida casi lleno."
+
+#: backend/ipp.c:1675
+msgid "Output bin full!"
+msgstr "Recipiente de salida lleno."
+
+#: systemv/lpstat.c:1191
+#: systemv/lpstat.c:1195
+#, c-format
+msgid "Output for printer %s is sent to %s\n"
+msgstr "La salida de la impresora %s se ha enviado a %s\n"
+
+#: systemv/lpstat.c:1185
+#, c-format
+msgid "Output for printer %s is sent to remote printer %s on %s\n"
+msgstr "La salida de la impresora %s se ha enviado a la impresora remota %s en %s\n"
+
+#: systemv/lpstat.c:1209
+#: systemv/lpstat.c:1213
+#, c-format
+msgid "Output for printer %s/%s is sent to %s\n"
+msgstr "La salida de la impresora %s/%s se ha enviado a %s\n"
+
+#: systemv/lpstat.c:1203
+#, c-format
+msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
+msgstr "La salida de la impresora %s/%s se ha enviado a la impresora remota %s en %s\n"
+
+#: backend/ipp.c:1671
+msgid "Output tray missing!"
+msgstr "Falta la bandeja de salida."
+
+#: systemv/cupstestdsc.c:403
+msgid "PASS\n"
+msgstr "PASA\n"
+
+#: ppdc/sample.c:232
+msgid "PCL Laser Printer"
+msgstr "Impresora Laser PCL"
+
+#: ppdc/sample.c:77
+msgid "PRC1 Envelope"
+msgstr "Sobre PRC1"
+
+#: ppdc/sample.c:86
+msgid "PRC10 Envelope"
+msgstr "Sobre PRC10"
+
+#: ppdc/sample.c:114
+msgid "PRC16K"
+msgstr "PRC16K"
+
+#: ppdc/sample.c:78
+msgid "PRC2 Envelope"
+msgstr "Sobre PRC2"
+
+#: ppdc/sample.c:79
+msgid "PRC3 Envelope"
+msgstr "Sobre PRC3"
+
+#: ppdc/sample.c:115
+msgid "PRC32K"
+msgstr "PRC32K"
+
+#: ppdc/sample.c:116
+msgid "PRC32K (Oversize)"
+msgstr "PRC32K (extragrande)"
+
+#: ppdc/sample.c:80
+msgid "PRC4 Envelope"
+msgstr "Sobre PRC4"
+
+#: ppdc/sample.c:81
+msgid "PRC5 Envelope"
+msgstr "Sobre PRC5"
+
+#: ppdc/sample.c:82
+msgid "PRC6 Envelope"
+msgstr "Sobre PRC6"
+
+#: ppdc/sample.c:83
+msgid "PRC7 Envelope"
+msgstr "Sobre PRC7"
+
+#: ppdc/sample.c:84
+msgid "PRC8 Envelope"
+msgstr "Sobre PRC8"
+
+#: ppdc/sample.c:85
+msgid "PRC9 Envelope"
+msgstr "Sobre PRC9"
+
+#: cups/snmp.c:1037
+msgid "Packet does not contain a Get-Response-PDU"
+msgstr "El paquete no contiene un Get-Response-PDU"
+
+#: cups/snmp.c:1016
+msgid "Packet does not start with SEQUENCE"
+msgstr "El paquete no empieza por SEQUENCE"
+
+#: ppdc/sample.c:332
+msgid "ParamCustominCutInterval"
+msgstr "ParamCustominCutInterval"
+
+#: ppdc/sample.c:330
+msgid "ParamCustominTearInterval"
+msgstr "ParamCustominTearInterval"
+
+#: cups/auth.c:149
+#, c-format
+msgid "Password for %s on %s? "
+msgstr "¿Contraseña de %s en %s? "
+
+#: systemv/cupsaddsmb.c:256
+#, c-format
+msgid "Password for %s required to access %s via SAMBA: "
+msgstr "Se requiere la contraseña de %s para acceder a %s vía SAMBA: "
+
+#: cgi-bin/classes.c:148
+msgid "Pause Class"
+msgstr "Pausar clase"
+
+#: cgi-bin/printers.c:151
+msgid "Pause Printer"
+msgstr "Pausar impresora"
+
+#: ppdc/sample.c:420
+msgid "Peel-Off"
+msgstr "Despegar"
+
+#: ppdc/sample.c:76
+msgid "Personal Envelope"
+msgstr "Sobre personal"
+
+#: ppdc/sample.c:123
+msgid "Photo"
+msgstr "Foto"
+
+#: ppdc/sample.c:124
+msgid "Photo Labels"
+msgstr "Foto pequeña"
+
+#: ppdc/sample.c:258
+msgid "Plain Paper"
+msgstr "Papel normal"
+
+#: cgi-bin/admin.c:3271
+#: cgi-bin/admin.c:3525
+msgid "Policies"
+msgstr "Reglas"
+
+#: cgi-bin/admin.c:3278
+#: cgi-bin/admin.c:3594
+#: cgi-bin/admin.c:3607
+msgid "Port Monitor"
+msgstr "Monitor de puerto"
+
+#: ppdc/sample.c:250
+msgid "PostScript Printer"
+msgstr "Impresora PostScript"
+
+#: ppdc/sample.c:113
+msgid "Postcard"
+msgstr "Postal"
+
+#: ppdc/sample.c:267
+msgid "Print Density"
+msgstr "Densidad de impresión"
+
+#: cups/notify.c:82
+msgid "Print Job:"
+msgstr "Imprimir trabajo:"
+
+#: ppdc/sample.c:312
+msgid "Print Mode"
+msgstr "Modo de impresión"
+
+#: ppdc/sample.c:355
+msgid "Print Rate"
+msgstr "Tasa de impresión"
+
+#: cgi-bin/printers.c:160
+msgid "Print Self-Test Page"
+msgstr "Iimprimir página de auto-prueba"
+
+#: ppdc/sample.c:299
+msgid "Print Speed"
+msgstr "Velocidad de impresión"
+
+#: cgi-bin/ipp-var.c:756
+msgid "Print Test Page"
+msgstr "Imprimir página de prueba"
+
+#: ppdc/sample.c:328
+msgid "Print and Cut"
+msgstr "Imprimir y cortar"
+
+#: ppdc/sample.c:316
+msgid "Print and Tear"
+msgstr "Imprimir y romper"
+
+#: filter/bannertops.c:644
+msgid "Printed For: "
+msgstr "Impreso para:"
+
+#: filter/bannertops.c:652
+msgid "Printed From: "
+msgstr "Impreso desde:"
+
+#: filter/bannertops.c:872
+msgid "Printed On: "
+msgstr "Impreso en:"
+
+#: cgi-bin/ipp-var.c:1009
+msgid "Printer Added"
+msgstr "Impresora añadida"
+
+#: ppdc/sample.c:235
+msgid "Printer Default"
+msgstr "Predeterminado de la impresora"
+
+#: cgi-bin/ipp-var.c:1013
+msgid "Printer Deleted"
+msgstr "Impresora borrada"
+
+#: cgi-bin/ipp-var.c:1011
+msgid "Printer Modified"
+msgstr "Impresora modificada"
+
+#: filter/bannertops.c:610
+msgid "Printer Name: "
+msgstr "Nombre de la impresora:"
+
+#: cgi-bin/ipp-var.c:1007
+msgid "Printer Paused"
+msgstr "Impresora en pausa"
+
+#: ppdc/sample.c:266
+msgid "Printer Settings"
+msgstr "Configuración de la impresora"
+
+#: backend/ipp.c:1653
+msgid "Printer offline."
+msgstr "Impresora desconectada."
+
+#: cups/notify.c:126
+msgid "Printer:"
+msgstr "Impresora:"
+
+#: cgi-bin/printers.c:185
+#: cgi-bin/printers.c:314
+msgid "Printers"
+msgstr "Impresoras"
+
+#: cgi-bin/classes.c:154
+#: cgi-bin/printers.c:157
+msgid "Purge Jobs"
+msgstr "Purgar trabajos"
+
+#: ppdc/sample.c:117
+msgid "Quarto"
+msgstr "Quarto"
+
+#: scheduler/ipp.c:1495
+msgid "Quota limit reached."
+msgstr "Se ha alcanzado el límite de cuota."
+
+#: berkeley/lpq.c:508
+msgid "Rank    Owner   Job     File(s)                         Total Size\n"
+msgstr "Rango  Propiet. Trabajo Archivo(s)                      Tamaño total\n"
+
+#: berkeley/lpq.c:504
+msgid "Rank   Owner      Pri  Job        Files                       Total Size\n"
+msgstr "Rango  Propiet.   Pri  Trabajo    Archivos                    Tamaño total\n"
+
+#: cgi-bin/classes.c:152
+#: cgi-bin/printers.c:155
+msgid "Reject Jobs"
+msgstr "Rechazar trabajos"
+
+#: ppdc/sample.c:400
+msgid "Reprint After Error"
+msgstr "Volver a imprimir tras un error"
+
+#: cups/http-support.c:1215
+msgid "Request Entity Too Large"
+msgstr "La entidad requerida es demasiado larga"
+
+#: cups/ppd.c:752
+#: cups/ppd.c:1289
+#: ppdc/sample.c:203
+msgid "Resolution"
+msgstr "Resolución"
+
+#: cgi-bin/classes.c:146
+msgid "Resume Class"
+msgstr "Reanudar clase"
+
+#: cgi-bin/printers.c:148
+msgid "Resume Printer"
+msgstr "Reanudar impresora"
+
+#: ppdc/sample.c:128
+msgid "Return Address"
+msgstr "Remite"
+
+#: ppdc/sample.c:137
+msgid "Return Address - 3/4 x 2\""
+msgstr "Remite - 3/4 x 2 pulg."
+
+#: ppdc/sample.c:421
+msgid "Rewind"
+msgstr "Rebobinar"
+
+#: cups/adminutil.c:2155
+#, c-format
+msgid "Running command: %s %s -N -A %s -c '%s'\n"
+msgstr "Ejecutando comando: %s %s -N -A '%s -c '%s'\n"
+
+#: cups/snmp.c:1018
+msgid "SEQUENCE uses indefinite length"
+msgstr "SEQUENCE usa una longitud indefinida"
+
+#: cups/http-support.c:1197
+msgid "See Other"
+msgstr "Ver otros"
+
+#: cgi-bin/ipp-var.c:1023
+msgid "Server Restarted"
+msgstr "Servidor reiniciado"
+
+#: cgi-bin/ipp-var.c:1029
+msgid "Server Security Auditing"
+msgstr "Auditoría de seguridad del servidor"
+
+#: cgi-bin/ipp-var.c:1025
+msgid "Server Started"
+msgstr "Servidor iniciado"
+
+#: cgi-bin/ipp-var.c:1027
+msgid "Server Stopped"
+msgstr "Servidor parado"
+
+#: cups/http-support.c:1233
+msgid "Service Unavailable"
+msgstr "Servicio no disponible"
+
+#: cgi-bin/admin.c:2763
+#: cgi-bin/admin.c:2809
+#: cgi-bin/admin.c:2966
+#: cgi-bin/admin.c:2985
+msgid "Set Allowed Users"
+msgstr "Establecer usuarios permitidos"
+
+#: cgi-bin/admin.c:3012
+msgid "Set As Server Default"
+msgstr "Establecer como predeterminada del servidor"
+
+#: cgi-bin/admin.c:3112
+msgid "Set Class Options"
+msgstr "Cambiar opciones clase"
+
+#: cgi-bin/admin.c:3112
+#: cgi-bin/admin.c:3281
+#: cgi-bin/admin.c:3636
+msgid "Set Printer Options"
+msgstr "Cambiar opciones impresora"
+
+#: cgi-bin/admin.c:3806
+#: cgi-bin/admin.c:3850
+#: cgi-bin/admin.c:3868
+msgid "Set Publishing"
+msgstr "Hacer pública"
+
+#: ppdc/sample.c:129
+msgid "Shipping Address"
+msgstr "Dirección de envío"
+
+#: ppdc/sample.c:138
+msgid "Shipping Address - 2 5/16 x 4\""
+msgstr "Dirección de envío - 2 5/16 x 4 pulg."
+
+#: ppdc/sample.c:245
+msgid "Short-Edge (Landscape)"
+msgstr "Lado corto (apaisado)"
+
+#: ppdc/sample.c:260
+msgid "Special Paper"
+msgstr "Papel especial"
+
+#: ppdc/sample.c:313
+msgid "Standard"
+msgstr "Estándar"
+
+#: cgi-bin/admin.c:3499
+msgid "Starting Banner"
+msgstr "Rótulo inicial"
+
+#: ppdc/sample.c:118
+msgid "Statement"
+msgstr "Declaración"
+
+#: ppdc/sample.c:222
+msgid "Stylus Color Series"
+msgstr "Stylus Color Series"
+
+#: ppdc/sample.c:229
+msgid "Stylus Photo Series"
+msgstr "Stylus Photo Series"
+
+#: ppdc/sample.c:119
+msgid "Super A"
+msgstr "Super A"
+
+#: ppdc/sample.c:120
+msgid "Super B"
+msgstr "Super B (13 x 19  pulg.)"
+
+#: ppdc/sample.c:125
+msgid "Super B/A3"
+msgstr "Super B/A3"
+
+#: cups/http-support.c:1179
+msgid "Switching Protocols"
+msgstr "Protocolos de conexión"
+
+#: ppdc/sample.c:121
+msgid "Tabloid"
+msgstr "Tabloide"
+
+#: ppdc/sample.c:122
+msgid "Tabloid (Oversize)"
+msgstr "Tabloide (extragrande)"
+
+#: ppdc/sample.c:314
+msgid "Tear"
+msgstr "Pestaña"
+
+#: ppdc/sample.c:419
+msgid "Tear-Off"
+msgstr "Pestaña desprendible"
+
+#: ppdc/sample.c:360
+msgid "Tear-Off Adjust Position"
+msgstr "Ajuste de posición de la pestaña desprendible"
+
+#: scheduler/ipp.c:7241
+#, c-format
+msgid "The PPD file \"%s\" could not be found."
+msgstr "No se ha podido encontrar el archivo PPD \"%s\"."
+
+#: scheduler/ipp.c:7228
+#, c-format
+msgid "The PPD file \"%s\" could not be opened: %s"
+msgstr "No se ha podido abrir el archivo PPD \"%s\": %s"
+
+#: cgi-bin/admin.c:635
+msgid "The class name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
+msgstr "El nombre de la clase sólo puede contener hasta 127 caracteres imprimibles y no puede contener espacios, barras (/), o la almohadilla (#)."
+
+#: scheduler/ipp.c:2148
+msgid "The notify-lease-duration attribute cannot be used with job subscriptions."
+msgstr "El atributo notify-lease-duration no puede ser usado con subscripciones de trabajos."
+
+#: scheduler/ipp.c:2131
+#: scheduler/ipp.c:6158
+#, c-format
+msgid "The notify-user-data value is too large (%d > 63 octets)!"
+msgstr "El valor notify-user-data es demasiado grande (%d > 63 octetos)."
+
+#: cgi-bin/admin.c:818
+msgid "The printer name may only contain up to 127 printable characters and may not contain spaces, slashes (/), or the pound sign (#)."
+msgstr "El nombre de la impresora sólo puede contener hasta 127 caracteres imprimibles y no puede contener espacios, barras (/), o la almohadilla (#)."
+
+#: scheduler/ipp.c:1330
+msgid "The printer or class is not shared!"
+msgstr "La impresora o clase no está compartida."
+
+#: scheduler/ipp.c:855
+#: scheduler/ipp.c:1161
+#: scheduler/ipp.c:3832
+#: scheduler/ipp.c:3938
+#: scheduler/ipp.c:5689
+#: scheduler/ipp.c:5992
+#: scheduler/ipp.c:6300
+#: scheduler/ipp.c:6823
+#: scheduler/ipp.c:7424
+#: scheduler/ipp.c:7733
+#: scheduler/ipp.c:8001
+#: scheduler/ipp.c:8091
+#: scheduler/ipp.c:8124
+#: scheduler/ipp.c:8444
+#: scheduler/ipp.c:8835
+#: scheduler/ipp.c:8915
+#: scheduler/ipp.c:10116
+#: scheduler/ipp.c:10814
+#: scheduler/ipp.c:10881
+#: scheduler/ipp.c:11164
+msgid "The printer or class was not found."
+msgstr "No se ha encontrado la impresora o la clase."
+
+#: scheduler/ipp.c:961
+#: scheduler/ipp.c:2337
+#, c-format
+msgid "The printer-uri \"%s\" contains invalid characters."
+msgstr "El printer-uri \"%s\" contiene caracteres incorrectos."
+
+#: scheduler/ipp.c:3777
+msgid "The printer-uri attribute is required!"
+msgstr "Se necesita el atributo printer-uri."
+
+#: scheduler/ipp.c:945
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
+msgstr "El printer-uri debe ser de la forma \"ipp://NOMBRE_ORDENADOR/classes/NOMBRE_CLASE\"."
+
+#: scheduler/ipp.c:2321
+msgid "The printer-uri must be of the form \"ipp://HOSTNAME/printers/PRINTERNAME\"."
+msgstr "El printer-uri debe ser de la forma \"ipp://NOMBRE_ORDENADOR/printers/NOMBRE_IMPRESORA\"."
+
+#: cgi-bin/admin.c:382
+msgid "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)."
+msgstr "El nombre de la subscripción no puede contener espacios, barras (/), signos de interrogación (?), o la almohadilla (#)."
+
+#: ppdc/sample.c:407
+msgid "Thermal Transfer Media"
+msgstr "Soporte de transferencia térmica"
+
+#: filter/bannertops.c:636
+msgid "Title: "
+msgstr "Título:"
+
+#: backend/ipp.c:1655
+msgid "Toner low."
+msgstr "Toner bajo."
+
+#: scheduler/ipp.c:1489
+msgid "Too many active jobs."
+msgstr "Demasiados trabajos activos."
+
+#: scheduler/ipp.c:1427
+#, c-format
+msgid "Too many job-sheets values (%d > 2)!"
+msgstr "Demasiados valores de job-sheets (%d > 2)."
+
+#: scheduler/ipp.c:2641
+#, c-format
+msgid "Too many printer-state-reasons values (%d > %d)!"
+msgstr "Demasiados valores printer-state-reasons (%d > %d)."
+
+#: ppdc/sample.c:261
+msgid "Transparency"
+msgstr "Transparencia"
+
+#: ppdc/sample.c:256
+msgid "Tray"
+msgstr "Bandeja"
+
+#: ppdc/sample.c:236
+msgid "Tray 1"
+msgstr "Bandeja 1"
+
+#: ppdc/sample.c:237
+msgid "Tray 2"
+msgstr "Bandeja 2"
+
+#: ppdc/sample.c:238
+msgid "Tray 3"
+msgstr "Bandeja 3"
+
+#: ppdc/sample.c:239
+msgid "Tray 4"
+msgstr "Bandeja 4"
+
+#: cups/http-support.c:1218
+msgid "URI Too Long"
+msgstr "URI demasiado largo"
+
+#: ppdc/sample.c:88
+msgid "US Executive"
+msgstr "Ejecutivo de EE.UU"
+
+#: ppdc/sample.c:91
+msgid "US Fanfold"
+msgstr "FanFold de EE.UU"
+
+#: ppdc/sample.c:105
+msgid "US Ledger"
+msgstr "Libro Mayor, 17 x 11 pulg."
+
+#: ppdc/sample.c:106
+msgid "US Legal"
+msgstr "Legal EE.UU."
+
+#: ppdc/sample.c:107
+msgid "US Legal (Oversize)"
+msgstr "Legal EE.UU. (extragrande)"
+
+#: ppdc/sample.c:108
+msgid "US Letter"
+msgstr "Carta EE.UU."
+
+#: ppdc/sample.c:109
+msgid "US Letter (Oversize)"
+msgstr "Carta EE.UU. (extragrande)"
+
+#: ppdc/sample.c:110
+msgid "US Letter (Small)"
+msgstr "Carta EE.UU. (pequeña)"
+
+#: cgi-bin/admin.c:1894
+#: cgi-bin/admin.c:1907
+#: cgi-bin/admin.c:1931
+msgid "Unable to access cupsd.conf file:"
+msgstr "No se ha podido acceder al archivo cupsd.conf"
+
+#: cgi-bin/admin.c:434
+msgid "Unable to add RSS subscription:"
+msgstr "No se ha podido añadir la subscripción RSS:"
+
+#: cgi-bin/admin.c:701
+msgid "Unable to add class:"
+msgstr "No se ha podido añadir la clase:"
+
+#: scheduler/ipp.c:1533
+#, c-format
+msgid "Unable to add job for destination \"%s\"!"
+msgstr "No se ha podido añadir el trabajo para el destino \"%s\"."
+
+#: cgi-bin/admin.c:1285
+msgid "Unable to add printer:"
+msgstr "No se ha podido añadir la impresora:"
+
+#: scheduler/ipp.c:1275
+msgid "Unable to allocate memory for file types!"
+msgstr "No se ha podido reservar memoria para tipos de archivo."
+
+#: cgi-bin/admin.c:1391
+msgid "Unable to cancel RSS subscription:"
+msgstr "No se ha podido cancelar la subscripción RSS:"
+
+#: cgi-bin/admin.c:3851
+msgid "Unable to change printer-is-shared attribute:"
+msgstr "No se ha podido cambiar el atributo printer-is-shared:"
+
+#: cgi-bin/admin.c:2967
+msgid "Unable to change printer:"
+msgstr "No se ha podido cambiar la impresora:"
+
+#: cgi-bin/admin.c:1571
+#: cgi-bin/admin.c:1735
+msgid "Unable to change server settings:"
+msgstr "No se ha podido cambiar la configuración del servidor:"
+
+#: cups/adminutil.c:937
+#: cups/util.c:1567
+msgid "Unable to connect to host."
+msgstr "No se ha podido conectar al servidor."
+
+#: cups/adminutil.c:733
+#, c-format
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+msgstr "No se han podido copiar los archivos del controlador de impresora de 64-bit de CUPS (%d)."
+
+#: cups/adminutil.c:698
+#, c-format
+msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+msgstr "No se han podido copiar los archivos del controlador de impresora de 64-bit de Windows (%d)."
+
+#: cups/adminutil.c:529
+#, c-format
+msgid "Unable to copy CUPS printer driver files (%d)!"
+msgstr "No se han podido copiar los archivos del controlador de impresora de CUPS (%d)."
+
+#: scheduler/ipp.c:2758
+#, c-format
+msgid "Unable to copy PPD file - %s!"
+msgstr "No se ha podido copiar el archivo PPD - %s."
+
+#: scheduler/ipp.c:2824
+msgid "Unable to copy PPD file!"
+msgstr "No se ha podido copiar el archivo PPD."
+
+#: cups/adminutil.c:494
+#, c-format
+msgid "Unable to copy Windows 2000 printer driver files (%d)!"
+msgstr "No se han podido copiar los archivos del controlador de impresora de Windows 2000 (%d)."
+
+#: cups/adminutil.c:617
+#, c-format
+msgid "Unable to copy Windows 9x printer driver files (%d)!"
+msgstr "No se han podido copiar los archivos del controlador de impresora de Windows 9x (%d)."
+
+#: scheduler/ipp.c:2735
+#, c-format
+msgid "Unable to copy interface script - %s!"
+msgstr "No se ha podido copiar el script de interfaz - %s."
+
+#: cups/util.c:613
+#: cups/util.c:1627
+msgid "Unable to create printer-uri!"
+msgstr "No se ha podido crear printer-uri."
+
+#: cgi-bin/admin.c:1785
+#: cgi-bin/admin.c:1797
+msgid "Unable to create temporary file:"
+msgstr "No se ha podido crear el archivo temporal:"
+
+#: cgi-bin/admin.c:2088
+msgid "Unable to delete class:"
+msgstr "No se ha podido borrar la clase:"
+
+#: cgi-bin/admin.c:2173
+msgid "Unable to delete printer:"
+msgstr "No se ha podido borrar la impresora:"
+
+#: cgi-bin/classes.c:241
+#: cgi-bin/printers.c:250
+msgid "Unable to do maintenance command:"
+msgstr "No se ha podido realizar el comando de mantenimiento:"
+
+#: cgi-bin/admin.c:1909
+msgid "Unable to edit cupsd.conf files larger than 1MB!"
+msgstr "No se pueden editar archivos cupsd.conf mayores de 1MB."
+
+#: cgi-bin/ipp-var.c:362
+msgid "Unable to find destination for job!"
+msgstr "No se ha podido encontrar destino para el trabajo."
+
+#: cups/http-support.c:1422
+msgid "Unable to find printer!\n"
+msgstr "No se ha podido encontrar la impresora.\n"
+
+#: cgi-bin/classes.c:431
+msgid "Unable to get class list:"
+msgstr "No se ha podido obtener la lista de clases:"
+
+#: cgi-bin/classes.c:530
+msgid "Unable to get class status:"
+msgstr "No se ha podido obtener el estado de la clase:"
+
+#: cgi-bin/admin.c:1186
+msgid "Unable to get list of printer drivers:"
+msgstr "No se ha podido obtener la lista de controladores de impresora:"
+
+#: cgi-bin/admin.c:2817
+msgid "Unable to get printer attributes:"
+msgstr "No se han podido obtener los atributos de la impresora:"
+
+#: cgi-bin/printers.c:449
+msgid "Unable to get printer list:"
+msgstr "No se ha podido obtener la lista de impresoras:"
+
+#: cgi-bin/printers.c:551
+msgid "Unable to get printer status:"
+msgstr "No se ha podido obtener el estado de la impresora"
+
+#: cups/adminutil.c:572
+#: cups/adminutil.c:776
+#, c-format
+msgid "Unable to install Windows 2000 printer driver files (%d)!"
+msgstr "No se han podido instalar los archivos del controlador de impresora de Windows 2000 (%d)."
+
+#: cups/adminutil.c:646
+#, c-format
+msgid "Unable to install Windows 9x printer driver files (%d)!"
+msgstr "No se han podido instalar los archivos del controlador de impresora de Windows 9x (%d)."
+
+#: cgi-bin/admin.c:700
+msgid "Unable to modify class:"
+msgstr "No se ha podido modificar la clase:"
+
+#: cgi-bin/admin.c:1284
+msgid "Unable to modify printer:"
+msgstr "No se ha podido modificar la impresora:"
+
+#: cgi-bin/ipp-var.c:498
+msgid "Unable to move job"
+msgstr "No se ha podido mover el trabajo"
+
+#: cgi-bin/ipp-var.c:500
+msgid "Unable to move jobs"
+msgstr "No se han podido mover los trabajos"
+
+#: cups/ppd.c:335
+msgid "Unable to open PPD file"
+msgstr "No se ha podido abrir el archivo PPD"
+
+#: cgi-bin/admin.c:3163
+msgid "Unable to open PPD file:"
+msgstr "No se ha podido abrir el archivo PPD:"
+
+#: cgi-bin/admin.c:2543
+msgid "Unable to open cupsd.conf file:"
+msgstr "No se ha podido abrir el archivo cupsd.conf:"
+
+#: scheduler/ipp.c:6626
+#, c-format
+msgid "Unable to open document %d in job %d!"
+msgstr "No se ha podido abrir el documento %d del trabajo %d."
+
+#: cgi-bin/ipp-var.c:759
+msgid "Unable to print test page:"
+msgstr "No se ha podido imprimir la página de prueba:"
+
+#: cups/adminutil.c:2186
+#, c-format
+msgid "Unable to run \"%s\": %s\n"
+msgstr "No se ha podido ejecutar \"%s\": %s\n"
+
+#: cgi-bin/ipp-var.c:572
+#: cgi-bin/ipp-var.c:590
+msgid "Unable to send command to printer driver!"
+msgstr "No se ha podido enviar un comando al controlador de la impresora."
+
+#: cups/adminutil.c:828
+#, c-format
+msgid "Unable to set Windows printer driver (%d)!"
+msgstr "No se ha podido configurar el controlador de impresora de Windows (%d)."
+
+#: cgi-bin/admin.c:3752
+msgid "Unable to set options:"
+msgstr "No se han podido cambiar las opciones:"
+
+#: cgi-bin/admin.c:3054
+msgid "Unable to set server default:"
+msgstr "No se han podido cambiar los ajustes predeterminados del servidor:"
+
+#: cgi-bin/admin.c:1847
+msgid "Unable to upload cupsd.conf file:"
+msgstr "No se ha podido copiar el archivo cupsd.conf:"
+
+#: backend/usb-darwin.c:1815
+#: backend/usb-darwin.c:1837
+msgid "Unable to use legacy USB class driver!\n"
+msgstr "No se ha podido usar el controlador de dispositivo USB obsoleto.\n"
+
+#: cups/http-support.c:1206
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+#: cgi-bin/admin.c:3452
+msgid "Units"
+msgstr "Unidades"
+
+#: cups/http-support.c:1237
+#: cups/ppd.c:359
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: backend/ipp.c:1702
+#, c-format
+msgid "Unknown printer error (%s)!"
+msgstr "Error de impresión desconocido (%s)."
+
+#: scheduler/ipp.c:10687
+#, c-format
+msgid "Unknown printer-error-policy \"%s\"."
+msgstr "printer-error-policy \"%s\" incorrecto."
+
+#: scheduler/ipp.c:10671
+#, c-format
+msgid "Unknown printer-op-policy \"%s\"."
+msgstr "printer-op-policy \"%s\" incorrecto."
+
+#: scheduler/ipp.c:402
+#, c-format
+msgid "Unsupported character set \"%s\"!"
+msgstr "Juego de caracteres \"%s\" no permitido."
+
+#: scheduler/ipp.c:8410
+#: scheduler/ipp.c:9705
+#, c-format
+msgid "Unsupported compression \"%s\"!"
+msgstr "No se admite el uso de la compresión \"%s\"."
+
+#: scheduler/ipp.c:11117
+#, c-format
+msgid "Unsupported compression attribute %s!"
+msgstr "No se admite el uso del atributo de compresión %s."
+
+#: scheduler/ipp.c:11145
+#, c-format
+msgid "Unsupported format \"%s\"!"
+msgstr "No se admite el uso del formato \"%s\"."
+
+#: scheduler/ipp.c:1393
+#: scheduler/ipp.c:9839
+#, c-format
+msgid "Unsupported format '%s'!"
+msgstr "No se admite el uso del formato '%s'."
+
+#: scheduler/ipp.c:8544
+#: scheduler/ipp.c:9822
+#, c-format
+msgid "Unsupported format '%s/%s'!"
+msgstr "No se admite el uso del formato '%s/%s'."
+
+#: cups/snmp.c:1140
+msgid "Unsupported value type"
+msgstr "Tipo de valor no permitido"
+
+#: cups/http-support.c:1221
+msgid "Upgrade Required"
+msgstr "Se requiere actualización"
+
+#: systemv/lpadmin.c:805
+msgid ""
+"Usage:\n"
+"\n"
+"    lpadmin [-h server] -d destination\n"
+"    lpadmin [-h server] -x destination\n"
+"    lpadmin [-h server] -p printer [-c add-class] [-i interface] [-m model]\n"
+"                       [-r remove-class] [-v device] [-D description]\n"
+"                       [-P ppd-file] [-o name=value]\n"
+"                       [-u allow:user,user] [-u deny:user,user]\n"
+"\n"
+msgstr ""
+"Uso:\n"
+"\n"
+"    lpadmin [-h servidor] -d destino\n"
+"    lpadmin [-h servidor] -x destino\n"
+"    lpadmin [-h servidor] -p impresora [-c clase] [-i interfaz] [-m modelo]\n"
+"                       [-r clase] [-v dispositivo] [-D descripción]\n"
+"                       [-P archivo_ppd] [-o nombre=valor]\n"
+"                       [-u allow:usuario,usuario] [-u deny:usuario,usuario]\n"
+"\n"
+
+#: filter/pdftops.c:96
+#, c-format
+msgid "Usage: %s job user title copies options [filename]\n"
+msgstr "Uso: %s trabajo usuario título copias opciones [archivo]\n"
+
+#: backend/ipp.c:208
+#: backend/lpd.c:183
+#: backend/pap.c:228
+#: backend/parallel.c:127
+#: backend/scsi.c:157
+#: backend/serial.c:165
+#: backend/socket.c:130
+#: backend/usb.c:183
+#: filter/bannertops.c:118
+#: filter/hpgl-main.c:148
+#: filter/imagetops.c:115
+#: filter/imagetoraster.c:207
+#: filter/pstops.c:254
+#: filter/rastertoepson.c:985
+#: filter/rastertohp.c:712
+#: filter/rastertolabel.c:1133
+#: filter/textcommon.c:519
+#, c-format
+msgid "Usage: %s job-id user title copies options [file]\n"
+msgstr "Uso: %s job-id usuario título copias opciones [archivo]\n"
+
+#: filter/gziptoany.c:53
+#, c-format
+msgid "Usage: %s job-id user title copies options file\n"
+msgstr "Uso: %s job-id usuario título copias opciones archivo\n"
+
+#: scheduler/cupsfilter.c:1292
+msgid ""
+"Usage: convert [ options ]\n"
+"\n"
+"Options:\n"
+"\n"
+"  -f filename          Set file to be converted (otherwise stdin)\n"
+"  -o filename          Set file to be generated (otherwise stdout)\n"
+"  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+"  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+"  -P filename.ppd      Set PPD file\n"
+"  -a 'name=value ...'  Set option(s)\n"
+"  -U username          Set username for job\n"
+"  -J title             Set title\n"
+"  -c copies            Set number of copies\n"
+"  -u                   Remove the PPD file when finished\n"
+"  -D                   Remove the input file when finished\n"
+msgstr ""
+"Uso: convert [ opciones ]\n"
+"\n"
+"Opciones:\n"
+"\n"
+"  -f nombrearchivo          Establece el archivo a convertir (de otro modo, stdin)\n"
+"  -o nombrearchivo          Establece el archivo a generar (de otro modo, stdout)\n"
+"  -i tipo/mime         Establece el tipo MIME de entrada (de otro modo, auto-tipado)\n"
+"  -j tipo/mime         Establece el tipo MIME de salida (de otro modo, application/pdf)\n"
+"  -P nombrearchivo.ppd      Establece el archivo PPD\n"
+"  -a 'nombre=valor ...'  Establece opcion(es)\n"
+"  -U nombreusuario          Establece el nombre de usuario del trabajo\n"
+"  -J título             Establece el título\n"
+"  -c copias            Establece el número de copias\n"
+"  -u                   Borra el archivo PPD después de terminar\n"
+"  -D                   Borra el archivo de entrada después de terminar\n"
+
+#: systemv/cupsaddsmb.c:286
+msgid ""
+"Usage: cupsaddsmb [options] printer1 ... printerN\n"
+"       cupsaddsmb [options] -a\n"
+"\n"
+"Options:\n"
+"  -E               Encrypt the connection to the server\n"
+"  -H samba-server  Use the named SAMBA server\n"
+"  -U samba-user    Authenticate using the named SAMBA user\n"
+"  -a               Export all printers\n"
+"  -h cups-server   Use the named CUPS server\n"
+"  -v               Be verbose (show commands)\n"
+msgstr ""
+"Uso: cupsaddsmb [opciones] impresora1 ... impresoraN\n"
+"       cupsaddsmb [opciones] -a\n"
+"\n"
+"Opciones:\n"
+"  -E               Hace que se use encriptación en la conexión con el servidor\n"
+"  -H servidor_samba  Usa el servidor SAMBA especificado\n"
+"  -U usuario_samba    Autentifica usando el usuario SAMBA especificado\n"
+"  -a               Exporta todas las impresoras\n"
+"  -h servidor_cups   Usa el servidor CUPS especificado\n"
+"  -v               Ser detallado (mostrar comandos)\n"
+
+#: systemv/cupsctl.c:202
+msgid ""
+"Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
+"\n"
+"Options:\n"
+"\n"
+"    -E                      Enable encryption\n"
+"    -U username             Specify username\n"
+"    -h server[:port]        Specify server address\n"
+"\n"
+"    --[no-]debug-logging    Turn debug logging on/off\n"
+"    --[no-]remote-admin     Turn remote administration on/off\n"
+"    --[no-]remote-any       Allow/prevent access from the Internet\n"
+"    --[no-]remote-printers  Show/hide remote printers\n"
+"    --[no-]share-printers   Turn printer sharing on/off\n"
+"    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
+msgstr ""
+"Uso: cupsctl [opciones] [param=valor ... paramN=valorN]\n"
+"\n"
+"Opciones:\n"
+"\n"
+"    -E                      Activar encriptación\n"
+"    -U nombre_usuario             Especificar nombre de usuario\n"
+"    -h servidor[:puerto]        Especificar la dirección del servidor\n"
+"\n"
+"    --[no-]debug-logging    Activar o desactivar el registro de depuración\n"
+"    --[no-]remote-admin     Activar o desactivar la administración remota\n"
+"    --[no-]remote-any       Permitir o impedir el acceso desde Internet\n"
+"    --[no-]remote-printers  Mostrar u ocultar las impresoras remotas\n"
+"    --[no-]share-printers   Activar o desactivar la compartición de impresoras\n"
+"    --[no-]user-cancel-any  Permitir o impedir a los usuarios cancelar cualquier trabajo\n"
+
+#: scheduler/main.c:2024
+msgid ""
+"Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
+"\n"
+"-c config-file      Load alternate configuration file\n"
+"-f                  Run in the foreground\n"
+"-F                  Run in the foreground but detach\n"
+"-h                  Show this usage message\n"
+"-l                  Run cupsd from launchd(8)\n"
+msgstr ""
+"Uso: cupsd (-c archivo-configuración) (-f) (-F) (-h) (-l)\n"
+"\n"
+"-c archivo-configuración      Carga un archivo de configuración alternativo\n"
+"-f                  Se ejecuta en primer plano\n"
+"-F                  Se ejecuta en primer plano pero separado\n"
+"-h                  Muestra este mensaje de cómo se usa\n"
+"-l                  Ejecuta cupsd desde launchd(8)\n"
+
+#: scheduler/cupsfilter.c:1280
+msgid ""
+"Usage: cupsfilter -m mime/type [ options ] filename\n"
+"\n"
+"Options:\n"
+"\n"
+"  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
+"  -n copies        Set number of copies\n"
+"  -o name=value    Set option(s)\n"
+"  -p filename.ppd  Set PPD file\n"
+"  -t title         Set title\n"
+msgstr ""
+"Uso: cupsfilter -m tipo/mime [ opciones ] nombre_archivo\n"
+"\n"
+"Opciones:\n"
+"\n"
+"  -c cupsd.conf    Establecer el archivo cupsd.conf a usar\n"
+"  -j id-trabajo[,N]    Filtrar el archivo N del trabajo especificado (valor predeterminado 1)\n"
+"  -n copias        Establecer el número de copias\n"
+"  -o nombre=valor    Establecer las opciones\n"
+"  -p nombre_archivo.ppd  Especificar el archivo PPD\n"
+"  -t título         Establecer el título\n"
+
+#: systemv/cupstestdsc.c:430
+msgid ""
+"Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
+"       cupstestdsc [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -h       Show program usage\n"
+"\n"
+"    Note: this program only validates the DSC comments, not the PostScript itself.\n"
+msgstr ""
+"Uso: cupstestdsc [opciones] nombre_archivo.ps [... nombre_archivo.ps]\n"
+"       cupstestdsc [opciones] -\n"
+"\n"
+"Opciones:\n"
+"\n"
+"    -h       Muestra cómo se usa el programa\n"
+"\n"
+"    Nota: este programa sólo valida los comentarios DSC, no el PostScript en sí mismo.\n"
+
+#: systemv/cupstestppd.c:2885
+msgid ""
+"Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+"       program | cupstestppd [options] -\n"
+"\n"
+"Options:\n"
+"\n"
+"    -R root-directory    Set alternate root\n"
+"    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
+"                         Issue warnings instead of errors\n"
+"    -q                   Run silently\n"
+"    -r                   Use 'relaxed' open mode\n"
+"    -v                   Be slightly verbose\n"
+"    -vv                  Be very verbose\n"
+msgstr ""
+"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN.ppd[.gz]]\n"
+"       programa | cupstestppd [opciones] -\n"
+"\n"
+"Opciones:\n"
+"\n"
+"    -R directorio-raíz    Establecer el directorio raíz alternativo\n"
+"    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
+"                         Emitir avisos en vez de errores\n"
+"    -q                   Ejecutar en modo silencioso\n"
+"    -r                   Usar el modo de apertura 'relajado'\n"
+"    -v                   Ligeramente detallado\n"
+"    -vv                  Muy detallado\n"
+
+#: systemv/lpmove.c:132
+msgid "Usage: lpmove job/src dest\n"
+msgstr "Uso: lpmove trabajo/fuente destino\n"
+
+#: systemv/lpoptions.c:540
+msgid ""
+"Usage: lpoptions [-h server] [-E] -d printer\n"
+"       lpoptions [-h server] [-E] [-p printer] -l\n"
+"       lpoptions [-h server] [-E] -p printer -o option[=value] ...\n"
+"       lpoptions [-h server] [-E] -x printer\n"
+msgstr ""
+"Uso: lpoptions [-h servidor] [-E] -d impresora\n"
+"       lpoptions [-h servidor] [-E] [-p impresora] -l\n"
+"       lpoptions [-h servidor] [-E] -p impresora -o opción[=valor] ...\n"
+"       lpoptions [-h servidor] [-E] -x impresora\n"
+
+#: systemv/lppasswd.c:493
+msgid "Usage: lppasswd [-g groupname]\n"
+msgstr "Usage: lppasswd [-g nombre_grupo]\n"
+
+#: systemv/lppasswd.c:496
+msgid ""
+"Usage: lppasswd [-g groupname] [username]\n"
+"       lppasswd [-g groupname] -a [username]\n"
+"       lppasswd [-g groupname] -x [username]\n"
+msgstr ""
+"Usage: lppasswd [-g nombre_grupo] [nombre_usuario]\n"
+"       lppasswd [-g nombre_grupo] -a [nombre_usuario]\n"
+"       lppasswd [-g nombre_grupo] -x [nombre_usuario]\n"
+
+#: berkeley/lpq.c:663
+msgid "Usage: lpq [-P dest] [-U username] [-h hostname[:port]] [-l] [+interval]\n"
+msgstr "Uso: lpq (-P dest) (-U nombre_usuario) (-h nombre_ordenador(:puerto)) (-l) (+intervalo)\n"
+
+#: ppdc/ppdc.cxx:393
+msgid ""
+"Usage: ppdc [options] filename.drv [ ... filenameN.drv ]\n"
+"Options:\n"
+"  -D name=value        Set named variable to value.\n"
+"  -I include-dir       Add include directory to search path.\n"
+"  -c catalog.po        Load the specified message catalog.\n"
+"  -d output-dir        Specify the output directory.\n"
+"  -l lang[,lang,...]   Specify the output language(s) (locale).\n"
+"  -m                   Use the ModelName value as the filename.\n"
+"  -t                   Test PPDs instead of generating them.\n"
+"  -v                   Be verbose (more v's for more verbosity).\n"
+"  -z                   Compress PPD files using GNU zip.\n"
+"  --cr                 End lines with CR (Mac OS 9).\n"
+"  --crlf               End lines with CR + LF (Windows).\n"
+"  --lf                 End lines with LF (UNIX/Linux/Mac OS X).\n"
+msgstr ""
+"Uso: ppdc [opciones] nombre_archivo.drv [ ... nombre_archivoN.drv ]\n"
+"Options:\n"
+"  -D nombre=valor        Establece la variable nombre al valor.\n"
+"  -I include-dir    Añade el directorio include a la ruta de búsqueda.\n"
+"  -c catálogo.po        Carga el catálogo de mensajes especificado.\n"
+"  -d dir-salida        Especifica el directorio de salida.\n"
+"  -l idioma[,idioma,...]   Especifica el/los idioma(s) de salida.\n"
+"  -m                   Usa el valor ModelName como nombre de archivo.\n"
+"  -t                   Chequea el PPDs en vez de generarlo.\n"
+"  -v                   Detallado (más v's para más detalle).\n"
+"  -z                   Comprime los archivos PPD usando GNU zip.\n"
+"  --cr                 Termina las líneas con CR (Mac OS 9).\n"
+"  --crlf               Termina las líneas con CR + LF (Windows).\n"
+"  --lf                 Termina las líneas con LF (UNIX/Linux/Mac OS X).\n"
+
+#: ppdc/ppdhtml.cxx:174
+msgid ""
+"Usage: ppdhtml [options] filename.drv >filename.html\n"
+"  -D name=value        Set named variable to value.\n"
+"Options:\n"
+"  -I include-dir    Add include directory to search path.\n"
+msgstr ""
+"Uso: ppdhtml [opciones] nombre_archivo.drv >nombre_archivo.html\n"
+"Opciones:\n"
+"  -D nombre=valor        Establece la variable nombre al valor.\n"
+"  -I include-dir    Añade el directorio include a la ruta de búsqueda.\n"
+
+#: ppdc/ppdi.cxx:130
+msgid ""
+"Usage: ppdi [options] filename.ppd [ ... filenameN.ppd ]\n"
+"Options:\n"
+"  -I include-dir\n"
+"  -o filename.drv\n"
+msgstr ""
+"Uso: ppdi [opciones] nombre_archivo.ppd [ ... nombre_archivoN.ppd ]\n"
+"Opciones:\n"
+"  -I include-dir\n"
+"  -o nombre_archivo.drv\n"
+
+#: ppdc/ppdmerge.cxx:359
+msgid ""
+"Usage: ppdmerge [options] filename.ppd [ ... filenameN.ppd ]\n"
+"Options:\n"
+"  -o filename.ppd[.gz]\n"
+msgstr ""
+"Uso: ppdmerge [opciones] nombre_archivo.ppd [ ... nombre_archivoN.ppd ]\n"
+"Opciones:\n"
+"  -o nombre_archivo.ppd[.gz]\n"
+
+#: ppdc/ppdpo.cxx:255
+msgid ""
+"Usage: ppdpo [options] -o filename.po filename.drv [ ... filenameN.drv ]\n"
+"Options:\n"
+"  -D name=value        Set named variable to value.\n"
+"  -I include-dir    Add include directory to search path.\n"
+"  -v                Be verbose (more v's for more verbosity).\n"
+msgstr ""
+"Uso: ppdpo [opciones] -o nombre_archivo.po nombre_archivo.drv [ ... nombre_archivoN.drv ]\n"
+"Opciones:\n"
+"  -D nombre=valor        Establece la variable nombre al valor.\n"
+"  -I include-dir    Añade el directorio include a la ruta de búsqueda.\n"
+"  -v                Con detalle (más v's para más detalle).\n"
+
+#: backend/snmp.c:224
+msgid "Usage: snmp [host-or-ip-address]\n"
+msgstr "Uso: snmp [ordenador-o-dirección-ip]\n"
+
+#: cups/snmp.c:1087
+msgid "Value uses indefinite length"
+msgstr "Valor usa una longitud indefinida"
+
+#: cups/snmp.c:1072
+msgid "VarBind uses indefinite length"
+msgstr "VarBind usa una longitud indefinida"
+
+#: cups/snmp.c:1022
+msgid "Version uses indefinite length"
+msgstr "Versión usa una longitud indefinida"
+
+#: backend/pap.c:328
+#, c-format
+msgid "WARNING: Adding only the first %d printers found"
+msgstr "WARNING: Añadiendo sólo las primeras %d impresoras encontradas"
+
+#: backend/pap.c:1460
+#: backend/usb-darwin.c:1678
+#, c-format
+msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
+msgstr "WARNING: Se esperaba un valor booleano para la opción waiteof \"%s\".\n"
+
+#: backend/network.c:83
+#: backend/pap.c:1293
+#: backend/parallel.c:638
+#: backend/serial.c:1267
+#: backend/usb-libusb.c:729
+#: backend/usb-unix.c:565
+msgid "WARNING: Failed to read side-channel request!\n"
+msgstr "WARNING: No se ha podido leer la petición del canal lateral.\n"
+
+#: filter/pstops.c:2227
+#, c-format
+msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
+msgstr "WARNING: La opción \"%s\" no puede incluirse con IncludeFeature.\n"
+
+#: backend/pap.c:503
+msgid "WARNING: Printer not responding\n"
+msgstr "WARNING: La impresora no responde\n"
+
+#: backend/pap.c:831
+#: backend/pap.c:854
+msgid "WARNING: Printer sent unexpected EOF\n"
+msgstr "WARNING: La impresora envió un EOF inesperado\n"
+
+#: backend/lpd.c:592
+#, c-format
+msgid "WARNING: Remote host did not respond with command status byte after %d seconds!\n"
+msgstr "WARNING: El ordenador remoto no ha respondido con el byte de estado del comando después de %d segundos.\n"
+
+#: backend/lpd.c:1025
+#: backend/lpd.c:1172
+#, c-format
+msgid "WARNING: Remote host did not respond with control status byte after %d seconds!\n"
+msgstr "WARNING: El ordenador remoto no ha respondido con el byte de estado de control después de %d segundos.\n"
+
+#: backend/lpd.c:1117
+#, c-format
+msgid "WARNING: Remote host did not respond with data status byte after %d seconds!\n"
+msgstr "WARNING: El ordenador remoto no ha respondido con el byte de estado de los datos después de %d segundos.\n"
+
+#: backend/scsi-irix.c:209
+#: backend/scsi-linux.c:227
+#, c-format
+msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+msgstr "WARNING: Agotado el tiempo de espera para el comando SCSI (%d); reintentando...\n"
+
+#: filter/pstops.c:1091
+msgid "WARNING: This document does not conform to the Adobe Document Structuring Conventions and may not print correctly!\n"
+msgstr "WARNING: Este documento no se ajusta a las Convenciones de Estructuración de Documentos de Adobe y puede que no se imprima correctamente.\n"
+
+#: backend/pap.c:492
+#, c-format
+msgid "WARNING: Unable to open \"%s:%s\": %s\n"
+msgstr "WARNING: No se ha podido abrir \"%s:%s\": %s\n"
+
+#: backend/pap.c:637
+msgid "WARNING: Unable to send PAP status request"
+msgstr "WARNING: No se ha podido enviar la petición de estado PAP"
+
+#: backend/pap.c:867
+#, c-format
+msgid "WARNING: Unexpected PAP packet of type %d\n"
+msgstr "WARNING: Paquete PAP de tipo %d no esperado\n"
+
+#: backend/pap.c:872
+#, c-format
+msgid "WARNING: Unknown PAP packet of type %d\n"
+msgstr "WARNING: Paquete PAP de tipo %d desconocido\n"
+
+#: filter/pstops.c:2234
+#, c-format
+msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
+msgstr "WARNING: Preferencia \"%s\" desconocida para la opción \"%s\".\n"
+
+#: filter/pstops.c:2220
+#, c-format
+msgid "WARNING: Unknown option \"%s\"!\n"
+msgstr "WARNING: Opción \"%s\" desconocida.\n"
+
+#: backend/serial.c:380
+#, c-format
+msgid "WARNING: Unsupported baud rate %s!\n"
+msgstr "WARNING: No se admite el uso de la velocidad en baudios %s.\n"
+
+#: backend/pap.c:1474
+#, c-format
+msgid "WARNING: number expected for status option \"%s\"\n"
+msgstr "WARNING: se esperaba un número para la opción de estado \"%s\"\n"
+
+#: backend/ipp.c:571
+#: backend/ipp.c:710
+#: backend/lpd.c:828
+#: backend/socket.c:316
+#, c-format
+msgid "WARNING: recoverable: Network host '%s' is busy; will retry in %d seconds...\n"
+msgstr "WARNING: recuperable: El ordenador de red '%s' está ocupado; reintento en %d segundos...\n"
+
+#: cups/adminutil.c:800
+msgid "Warning, no Windows 2000 printer drivers are installed!"
+msgstr "Advertencia, no está instalado ningún controlador de impresora de Windows 2000."
+
+#: cups/ppd.c:1865
+msgid "Yes"
+msgstr "Si"
+
+#: scheduler/client.c:2394
+#, c-format
+msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
+msgstr "Debe acceder a esta página usando el URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
+
+#: ppdc/sample.c:87
+msgid "You4 Envelope"
+msgstr "Sobre You4"
+
+#: ppdc/sample.c:411
+msgid "ZPL Label Printer"
+msgstr "Impresora de etiquetas ZPL"
+
+#: ppdc/sample.c:334
+msgid "Zebra"
+msgstr "Zebra"
+
+#: cups/notify.c:102
+msgid "aborted"
+msgstr "cancelado"
+
+#: cups/notify.c:99
+msgid "canceled"
+msgstr "cancelado"
+
+#: cups/notify.c:105
+msgid "completed"
+msgstr "completado"
+
+#: scheduler/cupsfilter.c:335
+msgid "convert: Use the -f option to specify a file to convert.\n"
+msgstr "convert: Use la opción -f para especificar el fichero a convertir.\n"
+
+#: scheduler/ipp.c:6499
+msgid "cups-deviced failed to execute."
+msgstr "Ha fallado al ejecutarse cups-deviced."
+
+#: scheduler/ipp.c:7163
+#: scheduler/ipp.c:7391
+msgid "cups-driverd failed to execute."
+msgstr "Ha fallado al ejecutarse cups-driverd."
+
+#: systemv/cupsaddsmb.c:236
+#, c-format
+msgid "cupsaddsmb: No PPD file for printer \"%s\" - %s\n"
+msgstr "cupsaddsmb: No hay archivo PPD para la impresora \"%s\" - %s\n"
+
+#: systemv/cupsctl.c:153
+#, c-format
+msgid "cupsctl: Unable to connect to server: %s\n"
+msgstr "cupsctl: No se ha podido conectar al servidor: %s\n"
+
+#: systemv/cupsctl.c:196
+#, c-format
+msgid "cupsctl: Unknown option \"%s\"!\n"
+msgstr "cupsctl: Opción \"%s\" desconocida.\n"
+
+#: systemv/cupsctl.c:198
+#, c-format
+msgid "cupsctl: Unknown option \"-%c\"!\n"
+msgstr "cupsctl: Opción \"-%c\" desconocida.\n"
+
+#: scheduler/main.c:200
+msgid "cupsd: Expected config filename after \"-c\" option!\n"
+msgstr "cupsd: Se esperaba un nombre de archivo de configuración tras la opción \"-c\".\n"
+
+#: scheduler/main.c:232
+#: scheduler/main.c:239
+msgid "cupsd: Unable to get current directory!\n"
+msgstr "cupsd: No se ha podido obtener el directorio actual.\n"
+
+#: scheduler/main.c:291
+#, c-format
+msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
+msgstr "cupsd: Argumento \"%s\" desconocido - cancelando.\n"
+
+#: scheduler/main.c:284
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting!\n"
+msgstr "cupsd: Opción \"%c\" desconocida - cancelando.\n"
+
+#: scheduler/main.c:266
+msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
+msgstr "cupsd: el uso de launchd(8) no ha sido compilado, ejecutándose en modo normal.\n"
+
+#: scheduler/cupsfilter.c:1056
+#, c-format
+msgid "cupsfilter: Invalid document number %d!\n"
+msgstr "cupsfilter: Número de documento %d inválido.\n"
+
+#: scheduler/cupsfilter.c:1050
+#, c-format
+msgid "cupsfilter: Invalid job ID %d!\n"
+msgstr "cupsfilter: ID de trabajo %d inválida.\n"
+
+#: scheduler/cupsfilter.c:343
+msgid "cupsfilter: Only one filename can be specified!\n"
+msgstr "cupsfilter: Solo se puede especificar un nombre de archivo.\n"
+
+#: scheduler/cupsfilter.c:1084
+#, c-format
+msgid "cupsfilter: Unable to create temporary file: %s\n"
+msgstr "cupsfilter: No se ha podido crear el archivo temporal: %s\n"
+
+#: scheduler/cupsfilter.c:1100
+#, c-format
+msgid "cupsfilter: Unable to get job file - %s\n"
+msgstr "cupsfilter: No se ha podido obtener el archivo del trabajo - %s\n"
+
+#: systemv/cupstestppd.c:218
+msgid "cupstestppd: The -q option is incompatible with the -v option.\n"
+msgstr "cupstestppd: La opción -q es incompatible con la opción -v.\n"
+
+#: systemv/cupstestppd.c:234
+msgid "cupstestppd: The -v option is incompatible with the -q option.\n"
+msgstr "cupstestppd: La opción -v es incompatible con la opción -q.\n"
+
+#: systemv/lpstat.c:1231
+#: systemv/lpstat.c:1234
+#: systemv/lpstat.c:1237
+#, c-format
+msgid "device for %s/%s: %s\n"
+msgstr "tipo de conexión para %s/%s: %s\n"
+
+#: systemv/lpstat.c:1218
+#: systemv/lpstat.c:1221
+#: systemv/lpstat.c:1224
+#, c-format
+msgid "device for %s: %s\n"
+msgstr "tipo de conexión para %s: %s\n"
+
+#: cups/snmp.c:1059
+msgid "error-index uses indefinite length"
+msgstr "error-index usa una longitud indefinida"
+
+#: cups/snmp.c:1051
+msgid "error-status uses indefinite length"
+msgstr "error-status usa una longitud indefinida"
+
+#: cups/notify.c:90
+msgid "held"
+msgstr "retenido"
+
+#: berkeley/lpc.c:214
+msgid "help\t\tget help on commands\n"
+msgstr "help\t\tproporciona ayuda sobre los comandos\n"
+
+#: cups/notify.c:131
+msgid "idle"
+msgstr "inactiva"
+
+#: scheduler/ipp.c:8080
+msgid "job-printer-uri attribute missing!"
+msgstr "Falta el atributo job-printer-uri."
+
+#: systemv/lpadmin.c:141
+#: systemv/lpadmin.c:453
+msgid "lpadmin: Class name can only contain printable characters!\n"
+msgstr "lpadmin: El nombre de la clase sólo puede contener caracteres imprimibles.\n"
+
+#: systemv/lpadmin.c:750
+msgid "lpadmin: Expected PPD after '-P' option!\n"
+msgstr "lpadmin: Se esperaba un PPD tras la opción '-P'.\n"
+
+#: systemv/lpadmin.c:491
+msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
+msgstr "lpadmin: Se esperaba allow/deny:lista_usuarios tras la opción '-u'.\n"
+
+#: systemv/lpadmin.c:442
+msgid "lpadmin: Expected class after '-r' option!\n"
+msgstr "lpadmin: Se esperaba una clase tras la opción '-r'\n"
+
+#: systemv/lpadmin.c:130
+msgid "lpadmin: Expected class name after '-c' option!\n"
+msgstr "lpadmin: Se esperaba un nombre de clase tras la opción '-c'\n"
+
+#: systemv/lpadmin.c:643
+msgid "lpadmin: Expected description after '-D' option!\n"
+msgstr "lpadmin: Se esperaba una descripción tras la opción '-D'.\n"
+
+#: systemv/lpadmin.c:550
+msgid "lpadmin: Expected device URI after '-v' option!\n"
+msgstr "lpadmin: Se esperaba un URI de dispositivo tras la opción '-v'.\n"
+
+#: systemv/lpadmin.c:659
+msgid "lpadmin: Expected file type(s) after '-I' option!\n"
+msgstr "lpadmin: Se esperaba tipo(s) de archivo(s) tras la opción '-l'.\n"
+
+#: systemv/lpadmin.c:212
+msgid "lpadmin: Expected hostname after '-h' option!\n"
+msgstr "lpadmin: Se esperaba un nombre de ordenador tras la opción '-h'.\n"
+
+#: systemv/lpadmin.c:257
+msgid "lpadmin: Expected interface after '-i' option!\n"
+msgstr "lpadmin: Se esperaba una interfaz tras la opción '-i'.\n"
+
+#: systemv/lpadmin.c:704
+msgid "lpadmin: Expected location after '-L' option!\n"
+msgstr "lpadmin: Se esperaba una ubicación tras la opción '-L'.\n"
+
+#: systemv/lpadmin.c:338
+msgid "lpadmin: Expected model after '-m' option!\n"
+msgstr "lpadmin: Se esperaba un modelo tras la opción '-m'.\n"
+
+#: systemv/lpadmin.c:358
+msgid "lpadmin: Expected name=value after '-o' option!\n"
+msgstr "lpadmin: Se esperaba un nombre=valor tras la opción '-o'.\n"
+
+#: systemv/lpadmin.c:391
+msgid "lpadmin: Expected printer after '-p' option!\n"
+msgstr "lpadmin: Se esperaba una impresora tras la opción '-p'.\n"
+
+#: systemv/lpadmin.c:174
+msgid "lpadmin: Expected printer name after '-d' option!\n"
+msgstr "lpadmin: Se esperaba un nombre de impresora tras la opción '-d'\n"
+
+#: systemv/lpadmin.c:584
+msgid "lpadmin: Expected printer or class after '-x' option!\n"
+msgstr "lpadmin: Se esperaba una impresora o clase tras la opción '-x'.\n"
+
+#: systemv/lpadmin.c:1128
+msgid "lpadmin: No member names were seen!\n"
+msgstr "lpadmin: No se han visto nombres de miembros.\n"
+
+#: systemv/lpadmin.c:893
+#, c-format
+msgid "lpadmin: Printer %s is already a member of class %s.\n"
+msgstr "lpadmin: La impresora %s ya es miembro de la clase %s.\n"
+
+#: systemv/lpadmin.c:1142
+#, c-format
+msgid "lpadmin: Printer %s is not a member of class %s.\n"
+msgstr "lpadmin: La impresora %s no es miembro de la clase %s.\n"
+
+#: systemv/lpadmin.c:185
+#: systemv/lpadmin.c:402
+#: systemv/lpadmin.c:595
+msgid "lpadmin: Printer name can only contain printable characters!\n"
+msgstr "lpadmin: El nombre de la impresora sólo puede contener caracteres imprimibles.\n"
+
+#: systemv/lpadmin.c:115
+msgid ""
+"lpadmin: Unable to add a printer to the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido añadir una impresora a la clase:\n"
+"         Debe especificar un nombre de impresora primero.\n"
+
+#: systemv/lpadmin.c:106
+#: systemv/lpadmin.c:159
+#: systemv/lpadmin.c:230
+#: systemv/lpadmin.c:291
+#: systemv/lpadmin.c:310
+#: systemv/lpadmin.c:376
+#: systemv/lpadmin.c:417
+#: systemv/lpadmin.c:523
+#: systemv/lpadmin.c:569
+#: systemv/lpadmin.c:615
+#: systemv/lpadmin.c:677
+#: systemv/lpadmin.c:723
+#: systemv/lpadmin.c:784
+#, c-format
+msgid "lpadmin: Unable to connect to server: %s\n"
+msgstr "lpadmin: No se ha podido conectar al servidor: %s\n"
+
+#: systemv/lpadmin.c:1845
+#, c-format
+msgid "lpadmin: Unable to create temporary file - %s\n"
+msgstr "lpadmin: No se ha podido crear el archivo temporal - %s\n"
+
+#: systemv/lpadmin.c:1454
+#, c-format
+msgid "lpadmin: Unable to create temporary file: %s\n"
+msgstr "lpadmin: No se ha podido crear el archivo temporal: %s\n"
+
+#: systemv/lpadmin.c:1855
+#, c-format
+msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
+msgstr "lpadmin: No se ha podido abrir el archivo PPD \"%s\" - %s\n"
+
+#: systemv/lpadmin.c:1462
+#, c-format
+msgid "lpadmin: Unable to open file \"%s\": %s\n"
+msgstr "lpadmin: No se ha podido abrir el archivo \"%s\": %s\n"
+
+#: systemv/lpadmin.c:426
+msgid ""
+"lpadmin: Unable to remove a printer from the class:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido quitar una impresora de la clase:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:732
+msgid ""
+"lpadmin: Unable to set the PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido establecer el archivo PPD:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:532
+msgid ""
+"lpadmin: Unable to set the device URI:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido ajustar el URI de dispositivo:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:319
+msgid ""
+"lpadmin: Unable to set the interface script or PPD file:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido establecer el script de interfaz o el archivo PPD:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:239
+msgid ""
+"lpadmin: Unable to set the interface script:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido establecer el script de interfaz:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:624
+msgid ""
+"lpadmin: Unable to set the printer description:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido establecer la descripción de la impresora:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:686
+msgid ""
+"lpadmin: Unable to set the printer location:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se ha podido establecer la ubicación de la impresora:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:793
+msgid ""
+"lpadmin: Unable to set the printer options:\n"
+"         You must specify a printer name first!\n"
+msgstr ""
+"lpadmin: No se han podido establecer las opciones de impresora:\n"
+"         Primero debe especificar un nombre de impresora.\n"
+
+#: systemv/lpadmin.c:508
+#, c-format
+msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
+msgstr "lpadmin: Opción allow/deny desconocida \"%s\".\n"
+
+#: systemv/lpadmin.c:766
+#, c-format
+msgid "lpadmin: Unknown argument '%s'!\n"
+msgstr "lpadmin: Argumento '%s' desconocido.\n"
+
+#: systemv/lpadmin.c:761
+#, c-format
+msgid "lpadmin: Unknown option '%c'!\n"
+msgstr "lpadmin: Opción '%c' desconocida.\n"
+
+#: systemv/lpadmin.c:665
+msgid "lpadmin: Warning - content type list ignored!\n"
+msgstr "lpadmin: Advertencia - lista de tipo de contenido no tenida en cuenta.\n"
+
+#: berkeley/lpc.c:81
+#: berkeley/lpc.c:109
+#: berkeley/lpc.c:145
+msgid "lpc> "
+msgstr "lpc> "
+
+#: systemv/lpinfo.c:173
+msgid "lpinfo: Expected 1284 device ID string after --device-id!\n"
+msgstr "lpinfo: Se esperaba una cadena ID de dispositivo 1284 tras --device-id.\n"
+
+#: systemv/lpinfo.c:190
+msgid "lpinfo: Expected language after --language!\n"
+msgstr "lpinfo: Se esperaba un idioma tras --language.\n"
+
+#: systemv/lpinfo.c:207
+msgid "lpinfo: Expected make and model after --make-and-model!\n"
+msgstr "lpinfo: Se esperaba marca y modelo tras --make-and-model.\n"
+
+#: systemv/lpinfo.c:224
+msgid "lpinfo: Expected product string after --product!\n"
+msgstr "lpinfo: Se esperaba una cadena de producto tras --product.\n"
+
+#: systemv/lpinfo.c:241
+msgid "lpinfo: Expected timeout after --timeout!\n"
+msgstr "lpinfo: Se esperaba un tiempo tras --timeout.\n"
+
+#: systemv/lpinfo.c:133
+#: systemv/lpinfo.c:153
+#, c-format
+msgid "lpinfo: Unable to connect to server: %s\n"
+msgstr "lpinfo: No se ha podido conectar al servidor: %s\n"
+
+#: systemv/lpinfo.c:264
+#, c-format
+msgid "lpinfo: Unknown argument '%s'!\n"
+msgstr "lpinfo Argumento '%s' desconocido.\n"
+
+#: systemv/lpinfo.c:258
+#, c-format
+msgid "lpinfo: Unknown option '%c'!\n"
+msgstr "lpinfo: Opción '%c' desconocida.\n"
+
+#: systemv/lpinfo.c:251
+#, c-format
+msgid "lpinfo: Unknown option '%s'!\n"
+msgstr "lpinfo: Opción desconocida '%s'.\n"
+
+#: systemv/lpmove.c:141
+#, c-format
+msgid "lpmove: Unable to connect to server: %s\n"
+msgstr "lpmove: No se ha podido conectar al servidor: %s\n"
+
+#: systemv/lpmove.c:125
+#, c-format
+msgid "lpmove: Unknown argument '%s'!\n"
+msgstr "lpmove: Argumento '%s' desconocido.\n"
+
+#: systemv/lpmove.c:103
+#, c-format
+msgid "lpmove: Unknown option '%c'!\n"
+msgstr "lpmove: Opción '%c' desconocida.\n"
+
+#: systemv/lpoptions.c:154
+#: systemv/lpoptions.c:172
+#: systemv/lpoptions.c:248
+msgid "lpoptions: No printers!?!\n"
+msgstr "lpoptions: ¡¿¡No hay impresoras!?!\n"
+
+#: systemv/lpoptions.c:223
+#, c-format
+msgid "lpoptions: Unable to add printer or instance: %s\n"
+msgstr "lpoptions: No se ha podido añadir la impresora o la instancia: %s\n"
+
+#: systemv/lpoptions.c:507
+#, c-format
+msgid "lpoptions: Unable to get PPD file for %s: %s\n"
+msgstr "lpoptions: No se ha podido obtener el archivo PPD para %s: %s\n"
+
+#: systemv/lpoptions.c:516
+#, c-format
+msgid "lpoptions: Unable to open PPD file for %s!\n"
+msgstr "lpoptions: No se ha podido abrir el archivo PPD para %s.\n"
+
+#: systemv/lpoptions.c:104
+msgid "lpoptions: Unknown printer or class!\n"
+msgstr "lpoptions: Impresora o clase desconocida.\n"
+
+#: systemv/lppasswd.c:185
+msgid "lppasswd: Only root can add or delete passwords!\n"
+msgstr "lppasswd: Solo el usuario root puede añadir o borrar contraseñas.\n"
+
+#: systemv/lppasswd.c:314
+msgid "lppasswd: Password file busy!\n"
+msgstr "lppasswd: Archivo de contraseñas ocupado.\n"
+
+#: systemv/lppasswd.c:447
+msgid "lppasswd: Password file not updated!\n"
+msgstr "lppasswd: Archivo de contraseñas no actualizado.\n"
+
+#: systemv/lppasswd.c:414
+msgid "lppasswd: Sorry, password doesn't match!\n"
+msgstr "lppasswd: Lo siento, las contraseñas no coinciden.\n"
+
+#: systemv/lppasswd.c:264
+msgid ""
+"lppasswd: Sorry, password rejected.\n"
+"Your password must be at least 6 characters long, cannot contain\n"
+"your username, and must contain at least one letter and number.\n"
+msgstr ""
+"lppasswd: Lo siento, se ha rechazado la contraseña.\n"
+"Su contraseña debe tener al menos 6 caracteres, no puede contener\n"
+"su nombre de usuario, y debe tener al menos una letra y un número.\n"
+
+#: systemv/lppasswd.c:240
+msgid "lppasswd: Sorry, passwords don't match!\n"
+msgstr "lppasswd: Lo siento, las contraseñas no coinciden.\n"
+
+#: systemv/lppasswd.c:211
+#: systemv/lppasswd.c:229
+#, c-format
+msgid "lppasswd: Unable to copy password string: %s\n"
+msgstr "lppasswd: No se ha podido copiar la cadena de contraseña: %s\n"
+
+#: systemv/lppasswd.c:317
+#: systemv/lppasswd.c:326
+#: systemv/lppasswd.c:344
+#, c-format
+msgid "lppasswd: Unable to open password file: %s\n"
+msgstr "lppasswd: No se ha podido abrir el archivo de contraseñas: %s\n"
+
+#: systemv/lppasswd.c:379
+#: systemv/lppasswd.c:392
+#: systemv/lppasswd.c:424
+#, c-format
+msgid "lppasswd: Unable to write to password file: %s\n"
+msgstr "lppasswd: No se ha podido escribir en el archivo de contraseñas: %s\n"
+
+#: systemv/lppasswd.c:462
+#, c-format
+msgid "lppasswd: failed to backup old password file: %s\n"
+msgstr "lppasswd: falló al hacer una copia de seguridad del antiguo archivo de contraseñas: %s\n"
+
+#: systemv/lppasswd.c:475
+#, c-format
+msgid "lppasswd: failed to rename password file: %s\n"
+msgstr "lppasswd: falló al cambiar de nombre al archivo de contraseñas: %s\n"
+
+#: systemv/lppasswd.c:404
+#, c-format
+msgid "lppasswd: user \"%s\" and group \"%s\" do not exist.\n"
+msgstr "lppasswd: el usuario \"%s\" y el grupo \"%s\" no existen.\n"
+
+#: systemv/lpstat.c:1039
+#, c-format
+msgid "lpstat: error - %s environment variable names non-existent destination \"%s\"!\n"
+msgstr "lpstat: error - Los nombre de variable de entorno %s no existen en el destino \"%s\".\n"
+
+#: systemv/lpstat.c:969
+#, c-format
+msgid "members of class %s:\n"
+msgstr "miembros de la clase %s:\n"
+
+#: berkeley/lpq.c:575
+msgid "no entries\n"
+msgstr "no hay entradas\n"
+
+#: systemv/lpstat.c:1043
+msgid "no system default destination\n"
+msgstr "no hay un destino predeterminado del sistema\n"
+
+#: scheduler/ipp.c:6207
+msgid "notify-events not specified!"
+msgstr "notify-events no especificado."
+
+#: scheduler/ipp.c:2085
+#: scheduler/ipp.c:6112
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" is already used!"
+msgstr "El URI notify-recipient-uri \"%s\" ya está usado."
+
+#: scheduler/ipp.c:2075
+#: scheduler/ipp.c:6102
+#, c-format
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
+msgstr "El URI notify-recipient-uri \"%s\" usa un esquema desconocido."
+
+#: scheduler/ipp.c:4120
+#: scheduler/ipp.c:7011
+#: scheduler/ipp.c:7635
+#: scheduler/ipp.c:9124
+#, c-format
+msgid "notify-subscription-id %d no good!"
+msgstr "notify-subscription-id %d incorrecto."
+
+#: cups/notify.c:87
+msgid "pending"
+msgstr "pendiente"
+
+#: ppdc/ppdc.cxx:108
+#: ppdc/ppdpo.cxx:94
+#, c-format
+msgid "ppdc: Adding include directory \"%s\"...\n"
+msgstr "ppdc: Añadiendo directorio include \"%s\"...\n"
+
+#: ppdc/ppdpo.cxx:136
+#, c-format
+msgid "ppdc: Adding/updating UI text from %s...\n"
+msgstr "ppdc: Añadiendo/actualizando texto UI desde %s...\n"
+
+#: ppdc/ppdc-source.cxx:375
+#, c-format
+msgid "ppdc: Bad boolean value (%s) on line %d of %s.\n"
+msgstr "ppdc: Valor lógico (%s) incorrecto en línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1750
+#, c-format
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Resolución de nombre \"%s\" incorrecta en línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1078
+#, c-format
+msgid "ppdc: Bad status keyword %s on line %d of %s!\n"
+msgstr "ppdc: Clave de estado %s incorrecta en línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1987
+#, c-format
+msgid "ppdc: Bad variable substitution ($%c) on line %d of %s.\n"
+msgstr "ppdc: Sustitución de variable ($%c) errónea en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2657
+#, c-format
+msgid "ppdc: Choice found on line %d of %s with no Option!\n"
+msgstr "ppdc: Selección encontrada en línea %d de %s sin opciones.\n"
+
+#: ppdc/ppdc-source.cxx:1654
+#, c-format
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s!\n"
+msgstr "ppdc: #po duplicado para código regional %s en línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:897
+#, c-format
+msgid "ppdc: Expected a filter definition on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una definición de filtro en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:920
+#, c-format
+msgid "ppdc: Expected a program name on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre de programa en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:359
+#, c-format
+msgid "ppdc: Expected boolean value on line %d of %s.\n"
+msgstr "ppdc: Se esperaba un valor lógico en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1058
+#, c-format
+msgid "ppdc: Expected charset after Font on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un juego de caracteres tras Font en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:412
+#, c-format
+msgid "ppdc: Expected choice code on line %d of %s.\n"
+msgstr "ppdc: Se esperaba un código apropiado en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:400
+#, c-format
+msgid "ppdc: Expected choice name/text on line %d of %s.\n"
+msgstr "ppdc: Se esperaba un nombre/texto apropiado en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:468
+#, c-format
+msgid "ppdc: Expected color order for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un orden de color para ColorModel en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:457
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Se esperaba colorspace para ColorModel en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:479
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Se esperaba compresión para ColorModel en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:660
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una cadena de restricciones para UIConstraints en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2834
+#, c-format
+msgid "ppdc: Expected driver type keyword following DriverType on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una clave de tipo de controlador tras DriverType en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:791
+#, c-format
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un tipo dúplex tras Duplex en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1042
+#, c-format
+msgid "ppdc: Expected encoding after Font on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una codificación tras Font en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1645
+#, c-format
+msgid "ppdc: Expected filename after #po %s on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre de archivo tras #po %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1170
+#, c-format
+msgid "ppdc: Expected group name/text on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre/texto de grupo en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2557
+#, c-format
+msgid "ppdc: Expected include filename on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre de archivo include en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1466
+#, c-format
+msgid "ppdc: Expected integer on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un número entero en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1637
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un código regional tras #po en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:318
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3178
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras FileName en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1023
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras Font en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3018
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras Manufacturer en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3051
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras MediaSize en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3132
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras ModelName en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3195
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre tras PCFileName en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1121
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre/texto tras %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1210
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre/texto tras Installable en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1736
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un nombre/texto tras Resolution en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:444
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una combinación nombre/texto para ColorModel en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1537
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una opción de nombre/texto en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1571
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una sección de opciones en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1549
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un tipo de opción en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1719
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un campo de anulación tras Resolution en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:969
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un número real en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:537
+#, c-format
+msgid "ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s!\n"
+msgstr "ppdc: Se esperaba resolución/tipo de soporte tras ColorProfile en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1817
+#, c-format
+msgid "ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d of %s!\n"
+msgstr "ppdc: Se esperaba resolución/tipo de soporte tras SimpleColorProfile en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:326
+#, c-format
+msgid "ppdc: Expected selector after %s on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un selector tras %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1066
+#, c-format
+msgid "ppdc: Expected status after Font on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un estado tras Font en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2732
+#, c-format
+msgid "ppdc: Expected string after Copyright on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una cadena tras Copyright en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3289
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una cadena tras Version en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:693
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s!\n"
+msgstr "ppdc: Se esperaban dos nombres de opciones en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:337
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s!\n"
+msgstr "ppdc: Se esperaba un valor tras %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1050
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s!\n"
+msgstr "ppdc: Se esperaba una versión tras Font en la línea %d de %s'.\n"
+
+#: ppdc/ppdc-source.cxx:192
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"!\n"
+msgstr "ppdc: Nombre de fichero #include/#po incorrecto \"%s\".\n"
+
+#: ppdc/ppdc-source.cxx:937
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s!\n"
+msgstr "ppdc: Coste incorrecto para el filtro en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:929
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s!\n"
+msgstr "ppdc: Tipo MIME vacío incorrecto para el filtro en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:945
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s!\n"
+msgstr "ppdc: Nombre de programa vacío incorrecto para el filtro en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1591
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Sección de opción incorrecta \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:1563
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Tipo de opción incorrecta \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc.cxx:244
+#: ppdc/ppdpo.cxx:124
+#, c-format
+msgid "ppdc: Loading driver information file \"%s\"...\n"
+msgstr "ppdc: Cargando archivo de información de controlador \"%s\"...\n"
+
+#: ppdc/ppdc.cxx:180
+#, c-format
+msgid "ppdc: Loading messages for locale \"%s\"...\n"
+msgstr "ppdc: Cargando mensajes del idioma \"%s\"...\n"
+
+#: ppdc/ppdc.cxx:121
+#, c-format
+msgid "ppdc: Loading messages from \"%s\"...\n"
+msgstr "ppdc: Cargando mensajes desde \"%s\"...\n"
+
+#: ppdc/ppdc-source.cxx:2354
+#: ppdc/ppdc-source.cxx:2582
+#, c-format
+msgid "ppdc: Missing #endif at end of \"%s\"!\n"
+msgstr "ppdc: Falta un #endif al final de \"%s\".\n"
+
+#: ppdc/ppdc-source.cxx:2451
+#: ppdc/ppdc-source.cxx:2486
+#: ppdc/ppdc-source.cxx:2516
+#, c-format
+msgid "ppdc: Missing #if on line %d of %s!\n"
+msgstr "ppdc: Falta un #if en la línea %d de %s.\n"
+
+#: ppdc/ppdc-driver.cxx:683
+#, c-format
+msgid "ppdc: No message catalog provided for locale %s!\n"
+msgstr "ppdc: No se ha proporcionado catálogo de mensajes para el idioma %s.\n"
+
+#: ppdc/ppdc-source.cxx:1607
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
+msgstr "ppdc: La opción %s redefinida con un tipo diferente en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:670
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s!\n"
+msgstr "ppdc: Opción de restricción debe *name en línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2433
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s!\n"
+msgstr "ppdc: Demasiados #if anidados en la línea %d de %s.\n"
+
+#: ppdc/ppdc.cxx:348
+#, c-format
+msgid "ppdc: Unable to create PPD file \"%s\" - %s.\n"
+msgstr "ppdc: No se ha podido crear el archivo PPD \"%s\" - %s.\n"
+
+#: ppdc/ppdc.cxx:259
+#, c-format
+msgid "ppdc: Unable to create output directory %s: %s\n"
+msgstr "ppdc: No se ha podido crear el directorio de salida %s: %s\n"
+
+#: ppdc/ppdc.cxx:280
+#, c-format
+msgid "ppdc: Unable to create output pipes: %s\n"
+msgstr "ppdc: No se han podido crear canales (pipes) de salida: %s\n"
+
+#: ppdc/ppdc.cxx:297
+#: ppdc/ppdc.cxx:304
+#, c-format
+msgid "ppdc: Unable to execute cupstestppd: %s\n"
+msgstr "ppdc: No se ha podido ejecutar cupstestppd: %s\n"
+
+#: ppdc/ppdc-source.cxx:1684
+#, c-format
+msgid "ppdc: Unable to find #po file %s on line %d of %s!\n"
+msgstr "ppdc: No se ha podido encontrar el archivo #po %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2589
+#, c-format
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s!\n"
+msgstr "ppdc: No se ha podido encontrar el archivo include \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc.cxx:191
+#, c-format
+msgid "ppdc: Unable to find localization for \"%s\" - %s\n"
+msgstr "ppdc: No se ha podido encontrar localización para \"%s\" - %s\n"
+
+#: ppdc/ppdc.cxx:130
+#, c-format
+msgid "ppdc: Unable to load localization file \"%s\" - %s\n"
+msgstr "ppdc: No se ha podido cargar el archivo de localización \"%s\" - %s\n"
+
+#: ppdc/ppdc-source.cxx:2007
+#, c-format
+msgid "ppdc: Undefined variable (%s) on line %d of %s.\n"
+msgstr "ppdc: Variable no definida (%s) en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2853
+#, c-format
+msgid "ppdc: Unknown driver type %s on line %d of %s!\n"
+msgstr "ppdc: Tipo de controlador desconocido %s en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:871
+#, c-format
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Tipo dúplex desconocido \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3064
+#, c-format
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Tamaño de papel desconocido \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:3300
+#, c-format
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s!\n"
+msgstr "ppdc: Elemento desconocido \"%s\" visto en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:979
+#, c-format
+msgid "ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s!\n"
+msgstr "ppdc: Caracteres finales desconocidos en el número real \"%s\" en la línea %d de %s.\n"
+
+#: ppdc/ppdc-source.cxx:2116
+#, c-format
+msgid "ppdc: Unterminated string starting with %c on line %d of %s!\n"
+msgstr "ppdc: Cadena que comienza por %c sin terminar en la línea %d de %s.\n"
+
+#: ppdc/ppdc.cxx:354
+#, c-format
+msgid "ppdc: Writing %s...\n"
+msgstr "ppdc: Escribiendo %s...\n"
+
+#: ppdc/ppdc.cxx:143
+#, c-format
+msgid "ppdc: Writing PPD files to directory \"%s\"...\n"
+msgstr "ppdc: Escribiendo archivos PPD al directorio \"%s\"...\n"
+
+#: ppdc/ppdmerge.cxx:139
+#, c-format
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"
+msgstr "ppdmerge: LanguageVersion \"%s\" incorrecto en %s.\n"
+
+#: ppdc/ppdmerge.cxx:206
+#, c-format
+msgid "ppdmerge: Ignoring PPD file %s...\n"
+msgstr "ppdmerge: Ignorando archivo PPD %s...\n"
+
+#: ppdc/ppdmerge.cxx:163
+#, c-format
+msgid "ppdmerge: Unable to backup %s to %s- %s\n"
+msgstr "ppdmerge: No se ha podido hacer copia de seguridad de %s a %s- %s\n"
+
+#: systemv/lpstat.c:1764
+#, c-format
+msgid "printer %s disabled since %s -\n"
+msgstr "la impresora %s está deshabilitada desde %s -\n"
+
+#: systemv/lpstat.c:1753
+#, c-format
+msgid "printer %s is idle.  enabled since %s\n"
+msgstr "la impresora %s está inactiva.  activada desde %s\n"
+
+#: systemv/lpstat.c:1758
+#, c-format
+msgid "printer %s now printing %s-%d.  enabled since %s\n"
+msgstr "la impresora %s está imprimiendo %s-%d.  activada desde %s\n"
+
+#: systemv/lpstat.c:1876
+#, c-format
+msgid "printer %s/%s disabled since %s -\n"
+msgstr "la impresora %s/%s está desactivada desde %s -\n"
+
+#: systemv/lpstat.c:1862
+#, c-format
+msgid "printer %s/%s is idle.  enabled since %s\n"
+msgstr "la impresora %s/%s está inactiva.  activada desde %s\n"
+
+#: systemv/lpstat.c:1869
+#, c-format
+msgid "printer %s/%s now printing %s-%d.  enabled since %s\n"
+msgstr "la impresora %s/%s está imprimiendo %s-%d.  activada desde %s\n"
+
+#: cups/notify.c:93
+#: cups/notify.c:134
+msgid "processing"
+msgstr "en proceso"
+
+#: systemv/lp.c:656
+#, c-format
+msgid "request id is %s-%d (%d file(s))\n"
+msgstr "la id solicitada es %s-%d (%d archivo(s))\n"
+
+#: cups/snmp.c:1043
+msgid "request-id uses indefinite length"
+msgstr "request-id usa una longitud indefinida"
+
+#: systemv/lpstat.c:2003
+msgid "scheduler is not running\n"
+msgstr "el planificador de tareas no se está ejecutando\n"
+
+#: systemv/lpstat.c:1999
+msgid "scheduler is running\n"
+msgstr "el planificador de tareas se está ejecutando\n"
+
+#: cups/adminutil.c:2257
+#, c-format
+msgid "stat of %s failed: %s"
+msgstr "estado de %s ha fallado: %s"
+
+#: berkeley/lpc.c:216
+msgid "status\t\tshow status of daemon and queue\n"
+msgstr "status\t\tmuestra el estado del demonio y la cola\n"
+
+#: cups/notify.c:96
+#: cups/notify.c:137
+msgid "stopped"
+msgstr "parada"
+
+#: systemv/lpstat.c:1017
+#, c-format
+msgid "system default destination: %s\n"
+msgstr "destino predeterminado del sistema: %s\n"
+
+#: systemv/lpstat.c:1014
+#, c-format
+msgid "system default destination: %s/%s\n"
+msgstr "destino predeterminado del sistema: %s/%s\n"
+
+#: cups/notify.c:108
+#: cups/notify.c:140
+msgid "unknown"
+msgstr "desconocido"
+
+#: cups/notify.c:117
+msgid "untitled"
+msgstr "sin título"
+
+#: cups/snmp.c:1068
+msgid "variable-bindings uses indefinite length"
+msgstr "Variable-bindings usa una longitud indefinida"
+
+
+#
+# End of "$Id$".
+#

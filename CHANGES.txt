@@ -1,9 +1,10 @@
-CHANGES.txt - 2008-12-05
+CHANGES.txt - 2008-12-08
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998)
+	- Added a Spanish localization (STR #3015)
 	- Added support for marker-low-levels and marker-high-levels
 	  attributes.
 	- The scheduler could hang writing a long log line.

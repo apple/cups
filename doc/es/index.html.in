@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+	<TITLE>Inicio - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
+	<LINK REL="SHORTCUT ICON" HREF="/favicon.png" TYPE="image/png">
+</HEAD>
+<BODY>
+<TABLE CLASS="page" SUMMARY="{title}">
+<TR><TD CLASS="body">
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0" SUMMARY="">
+<TR HEIGHT="36">
+<TD><A HREF="http://www.cups.org/" TARGET="_blank"><IMG
+SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
+<TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Inicio&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Administraci&oacute;n&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Clases&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Ayuda&nbsp;en&nbsp;l&iacute;nea&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Trabajos&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Impresoras&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
+TYPE="SEARCH" NAME="QUERY" SIZE="20" PLACEHOLDER="Search Help"
+AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
+<TD><IMG SRC="/images/right.gif" WIDTH="4" HEIGHT="36" ALT=""></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD STYLE="padding-right: 20px;">
+
+<H1>Common UNIX Printing System @CUPS_VERSION@</H1>
+
+<P>CUPS es el sistema de impresi&oacute;n de c&oacute;digo abierto basado en
+est&aacute;ndares desarrollado por <A HREF="http://www.apple.com/">Apple Inc.</A> para Mac
+OS<SUP>&reg;</SUP> X y otros sistemas operativos tipo UNIX<SUP>&reg;</SUP>.</P>
+
+</TD>
+<TD><A HREF="http://www.cups.org/"><IMG SRC="images/cups-icon.png" WIDTH="128"
+HEIGHT="128" ALT="CUPS"></A></TD>
+</TR>
+</TABLE>
+
+<TABLE CLASS="indent" SUMMARY="">
+<TR><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-right: 20px;">
+
+<H2>CUPS para usuarios</H2>
+
+<P><A HREF="help/overview.html">Descripci&oacute;n de CUPS</A></P>
+
+<P><A HREF="help/options.html">Impresi&oacute;n desde la l&iacute;nea de comandos y opciones</A></P>
+
+<P><A HREF="help/whatsnew.html">Qu&eacute; hay de nuevo en CUPS 1.4</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Foro de usuarios</A></P>
+
+</TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
+
+<H2>CUPS para administradores</H2>
+
+<P><A HREF="admin">A&ntilde;adiendo impresoras y clases</A></P>
+
+<P><A HREF="help/policies.html">Gestionando pol&iacute;ticas de funcionamiento</A></P>
+
+<P><A HREF="help/accounting.html">Contabilidad b&aacute;sica de impresora</A></P>
+
+<P><A HREF="help/security.html">Seguridad del servidor</A></P>
+
+<P><A HREF="help/kerberos.html">Usando autentificaci&oacute;n Kerberos</A></P>
+
+<P><A HREF="help/network.html">Usando impresoras de red</A></P>
+
+<P><A HREF="help/ref-cupsd-conf.html">Referencia de cupsd.conf</A></P>
+
+<P><A HREF="http://www.cups.org/ppd.php">Encontrar controladores de impresora</A></P>
+
+</TD><TD VALIGN="top" STYLE="padding-left: 20px;">
+
+<H2>CUPS para desarrolladores</H2>
+
+<P><A HREF="help/api-overview.html">Introducci&oacute;n a la programación de CUPS</A></P>
+
+<P><A HREF="help/api-cups.html">La API de CUPS</A></P>
+
+<P><A HREF="help/api-filter.html">Programaci&oacute;n de filtros y programas de conexi&oacute;n</A></P>
+
+<P><A HREF="help/api-httpipp.html">Las APIs HTTP e IPP</A></P>
+
+<P><A HREF="help/api-ppd.html">La API PPD</A></P>
+
+<P><A HREF="help/api-raster.html">La API Raster</A></P>
+
+<P><A HREF="help/ref-ppdcfile.html">Referencia del archivo de informaci&oacute;n del compilador de controladores PPD</A></P>
+
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Foro de desarrollo</A></P>
+
+</TD></TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD></TR>
+<TR><TD CLASS="trailer">Common UNIX Printing System, CUPS, y el logo de CUPS son
+marcas registradas de <A HREF="http://www.apple.com">Apple Inc.</A> Los derechos
+de copia de CUPS 2007-2008 son de Apple Inc. Todos los derechos reservados.</TD></TR>
+</TABLE>
+</BODY>
+</HTML>
