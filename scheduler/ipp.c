@@ -7335,6 +7335,10 @@ get_ppds(cupsd_client_t *con)		/* I - Client connection */
   type         = ippFindAttribute(con->request, "ppd-type", IPP_TAG_KEYWORD);
   requested    = ippFindAttribute(con->request, "requested-attributes",
                                   IPP_TAG_KEYWORD);
+  exclude      = ippFindAttribute(con->request, "exclude-schemes",
+                                  IPP_TAG_NAME);
+  include      = ippFindAttribute(con->request, "include-schemes",
+                                  IPP_TAG_NAME);
 
   if (requested)
     url_encode_attr(requested, requested_str, sizeof(requested_str));

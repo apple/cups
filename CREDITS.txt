@@ -1,4 +1,4 @@
-CREDITS.txt - 2008-06-16
+CREDITS.txt - 2008-12-08
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -34,7 +34,7 @@ like to thank the following individuals for their contributions:
     Kurt Pfeifle                   - Bug fixes, beta testing, evangelism.
     Vincenzo Reale                 - Italian localization.
     Petter Reinholdtsen            - HP-UX compiler stuff.
-    Juan Pablo González Riopedre   - Spanish localization.
+    Juan Pablo Gonz‡lez Riopedre   - Spanish localization.
     Opher Shachar                  - Hebrew localization.
     Stuart Stevens                 - HP JetDirect IPP information.
     Andrea Suatoni                 - IRIX desktop integration and testing.

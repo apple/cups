@@ -79,7 +79,8 @@ int	print_device(const char *resource, int fd, int copies) { return (1); }
 void
 list_devices(void)
 {
-  puts("direct scsi \"Unknown\" \"SCSI Printer\"");
+  printf("direct scsi \"Unknown\" \"%s\"\n",
+         _cupsLangString(cupsLangDefault(), _("SCSI Printer")));
 }
 
 

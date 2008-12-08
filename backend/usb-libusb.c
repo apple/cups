@@ -766,6 +766,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
         break;
 
     case CUPS_SC_CMD_GET_BIDI :
+	status  = CUPS_SC_STATUS_OK;
         data[0] = 0;			/* TODO: Change to 1 when read supported */
         datalen = 1;
         break;

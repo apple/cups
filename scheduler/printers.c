@@ -3837,6 +3837,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Reload PPD attributes from disk...
   */
 
+  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
 
   delete_string_array(&(p->filters));

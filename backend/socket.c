@@ -121,7 +121,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
-    puts("network socket \"Unknown\" \"AppSocket/HP JetDirect\"");
+    printf("network socket \"Unknown\" \"%s\"\n",
+           _cupsLangString(cupsLangDefault(), _("AppSocket/HP JetDirect")));
     return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
@@ -266,9 +267,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     return (CUPS_BACKEND_STOP);
   }
 
-  _cupsLangPrintf(stderr,
-                  _("INFO: Connecting to %s on port %d\n"),
-                  hostname, port);
+  fprintf(stderr, "DEBUG: Connecting to %s:%d\n",
+	  hostname, port);
+  _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -351,7 +352,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
-  _cupsLangPrintf(stderr, _("INFO: Connected to %s...\n"), hostname);
+  _cupsLangPuts(stderr, _("INFO: Connected to printer...\n"));
 
 #ifdef AF_INET6
   if (addr->addr.addr.sa_family == AF_INET6)

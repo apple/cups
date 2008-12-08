@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "8 September 2008" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "8 December 2008" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -255,6 +255,14 @@ Specifies the default type of authentication to use.
 DefaultCharset charset
 .br
 Specifies the default character set to use for text.
+.TP 5
+DefaultEncryption Never
+.TP 5
+DefaultEncryption IfRequested
+.TP 5
+DefaultEncryption Required
+.br
+Specifies the type of encryption to use for authenticated requests.
 .TP 5
 DefaultLanguage locale
 .br

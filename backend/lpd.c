@@ -174,7 +174,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
-    puts("network lpd \"Unknown\" \"LPD/LPR Host or Printer\"");
+    printf("network lpd \"Unknown\" \"%s\"\n",
+           _cupsLangString(cupsLangDefault(), _("LPD/LPR Host or Printer")));
     return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)
@@ -695,9 +696,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     */
 
     fputs("STATE: +connecting-to-device\n", stderr);
-    _cupsLangPrintf(stderr,
-		    _("INFO: Connecting to %s for printer %s\n"),
-		    hostname, printer);
+    fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n",
+	    hostname, port, printer);
+    _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,
              delay = 5;;
@@ -864,7 +865,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     }
 
     fputs("STATE: -connecting-to-device\n", stderr);
-    _cupsLangPrintf(stderr, _("INFO: Connected to %s...\n"), hostname);
+    _cupsLangPuts(stderr, _("INFO: Connected to printer...\n"));
 
 #ifdef AF_INET6
     if (addr->addr.addr.sa_family == AF_INET6)

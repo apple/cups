@@ -102,6 +102,7 @@ backendNetworkSideCB(
         break;
 
     case CUPS_SC_CMD_GET_BIDI :
+	status  = CUPS_SC_STATUS_OK;
         data[0] = use_bc;
         datalen = 1;
         break;

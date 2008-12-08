@@ -223,6 +223,24 @@ apihelp:
 		--header api-raster.header --intro api-raster.shtml \
 		../cups/raster.h interpret.c raster.c \
 		>../doc/help/api-raster.html
+	mxmldoc --section "Programming" \
+		--title "Developing PostScript Printer Drivers" \
+		--css ../doc/cups-printable.css \
+		--header postscript-driver.header \
+		--intro postscript-driver.shtml \
+		>../doc/help/postscript-driver.html
+	mxmldoc --section "Programming" \
+		--title "Introduction to the PPD Compiler" \
+		--css ../doc/cups-printable.css \
+		--header ppd-compiler.header \
+		--intro ppd-compiler.shtml \
+		>../doc/help/ppd-compiler.html
+	mxmldoc --section "Programming" \
+		--title "Developing Raster Printer Drivers" \
+		--css ../doc/cups-printable.css \
+		--header raster-driver.header \
+		--intro raster-driver.shtml \
+		>../doc/help/raster-driver.html
 
 framedhelp:
 	echo Generating CUPS API help files...
@@ -231,6 +249,43 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header api-raster.header --intro api-raster.shtml \
 		../cups/raster.h interpret.c raster.c
+	mxmldoc --section "Programming" \
+		--title "Developing PostScript Printer Drivers" \
+		--framed ../cups/postscript-driver \
+		--css ../doc/cups-printable.css \
+		--header postscript-driver.header \
+		--intro postscript-driver.shtml
+	mxmldoc --section "Programming" \
+		--title "Introduction to the PPD Compiler" \
+		--framed ../cups/ppd-compiler \
+		--css ../doc/cups-printable.css \
+		--header ppd-compiler.header \
+		--intro ppd-compiler.shtml
+	mxmldoc --section "Programming" \
+		--title "Developing Raster Printer Drivers" \
+		--framed ../cups/raster-driver \
+		--css ../doc/cups-printable.css \
+		--header raster-driver.header \
+		--intro raster-driver.shtml
+
+docsets:
+	echo Generating CUPS API documentation sets...
+	../tools/makedocset --docset org.cups.raster.docset \
+		--title "Raster API" \
+		--header api-raster.header --intro api-raster.shtml \
+		../cups/raster.h interpret.c raster.c
+	../tools/makedocset --docset org.cups.postscript-driver.docset \
+		--title "Developing PostScript Printer Drivers" \
+		--header postscript-driver.header \
+		--intro postscript-driver.shtml
+	../tools/makedocset --docset org.cups.ppd-compiler.docset \
+		--title "Introduction to the PPD Compiler" \
+		--header ppd-compiler.header \
+		--intro ppd-compiler.shtml
+	../tools/makedocset --docset org.cups.raster-driver.docset \
+		--title "Developing Raster Printer Drivers" \
+		--header raster-driver.header \
+		--intro raster-driver.shtml
 
 
 #

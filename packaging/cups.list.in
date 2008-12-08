@@ -469,60 +469,25 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
-f 0644 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
-f 0644 root sys $LOCALEDIR/da/ppdc_da.po locale/ppdc_da.po
-
-f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
-f 0644 root sys $LOCALEDIR/de/ppdc_de.po locale/ppdc_de.po
-
+#f 0644 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
+#f 0644 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
 f 0644 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
-f 0644 root sys $LOCALEDIR/es/ppdc_es.po locale/ppdc_es.po
-
-f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
-f 0644 root sys $LOCALEDIR/et/ppdc_et.po locale/ppdc_et.po
-
-f 0644 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
-f 0644 root sys $LOCALEDIR/fi/ppdc_fi.po locale/ppdc_fi.po
-
-f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
-f 0644 root sys $LOCALEDIR/fr/ppdc_fr.po locale/ppdc_fr.po
-
-f 0644 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
-f 0644 root sys $LOCALEDIR/he/ppdc_he.po locale/ppdc_he.po
-
-f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
-f 0644 root sys $LOCALEDIR/it/ppdc_it.po locale/ppdc_it.po
-
-f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
-f 0644 root sys $LOCALEDIR/ja/ppdc_ja.po locale/ppdc_ja.po
-
-f 0644 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
-f 0644 root sys $LOCALEDIR/ko/ppdc_ko.po locale/ppdc_ko.po
-
-f 0644 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
-f 0644 root sys $LOCALEDIR/nl/ppdc_nl.po locale/ppdc_nl.po
-
-f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
-f 0644 root sys $LOCALEDIR/no/ppdc_no.po locale/ppdc_no.po
-
-f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
-f 0644 root sys $LOCALEDIR/pl/ppdc_pl.po locale/ppdc_pl.po
-
-f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
-f 0644 root sys $LOCALEDIR/pt/ppdc_pt.po locale/ppdc_pt.po
-f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
-f 0644 root sys $LOCALEDIR/pt_BR/ppdc_pt_BR.po locale/ppdc_pt_BR.po
-
-f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
-f 0644 root sys $LOCALEDIR/ru/ppdc_ru.po locale/ppdc_ru.po
-
-f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
-f 0644 root sys $LOCALEDIR/sv/ppdc_sv.po locale/ppdc_sv.po
-
-f 0644 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
-f 0644 root sys $LOCALEDIR/zh/ppdc_zh.po locale/ppdc_zh.po
-f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
-f 0644 root sys $LOCALEDIR/zh_TW/ppdc_zh_TW.po locale/ppdc_zh_TW.po
+#f 0644 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
+#f 0644 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
+#f 0644 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+#f 0644 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
+#f 0644 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
+#f 0644 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+#f 0644 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
+#f 0644 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
+#f 0644 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
+#f 0644 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
+#f 0644 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
+#f 0644 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
+#f 0644 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
+#f 0644 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+#f 0644 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
+#f 0644 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
 
 d 0755 root sys $DATADIR -
 
@@ -571,8 +536,8 @@ f 0644 root sys $DATADIR/templates templates/*.tmpl
 #d 0755 root sys $DATADIR/templates/de
 #f 0644 root sys $DATADIR/templates/de templates/de/*.tmpl
 
-#d 0755 root sys $DATADIR/templates/es
-#f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
+d 0755 root sys $DATADIR/templates/es
+f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
 
 #d 0755 root sys $DATADIR/templates/et
 #f 0644 root sys $DATADIR/templates/et templates/et/*.tmpl
@@ -678,8 +643,8 @@ f 0644 root sys $DOCDIR/robots.txt doc/robots.txt
 #d 0755 root sys $DOCDIR/de
 #f 0644 root sys $DOCDIR/de doc/de/*.html
 
-#d 0755 root sys $DOCDIR/es
-#f 0644 root sys $DOCDIR/es doc/es/*.html
+d 0755 root sys $DOCDIR/es
+f 0644 root sys $DOCDIR/es doc/es/*.html
 
 #d 0755 root sys $DOCDIR/et
 #f 0644 root sys $DOCDIR/et doc/et/*.html
