@@ -66,7 +66,8 @@
 void
 list_devices(void)
 {
-  puts("direct scsi \"Unknown\" \"SCSI Printer\"");
+  printf("direct scsi \"Unknown\" \"%s\"\n",
+         _cupsLangString(cupsLangDefault(), _("SCSI Printer")));
 }
 
 

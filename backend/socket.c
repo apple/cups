@@ -121,7 +121,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc == 1)
   {
-    puts("network socket \"Unknown\" \"AppSocket/HP JetDirect\"");
+    printf("network socket \"Unknown\" \"%s\"\n",
+           _cupsLangString(cupsLangDefault(), _("AppSocket/HP JetDirect")));
     return (CUPS_BACKEND_OK);
   }
   else if (argc < 6 || argc > 7)

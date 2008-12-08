@@ -198,8 +198,9 @@ main(int  argc,				/* I - Number of command-line args */
     else
       s = argv[0];
 
-    printf("network %s \"Unknown\" \"Internet Printing Protocol (%s)\"\n",
-           s, s);
+    printf("network %s \"Unknown\" \"%s (%s)\"\n",
+           s, _cupsLangString(cupsLangDefault(),
+	                      _("Internet Printing Protocol")), s);
     return (CUPS_BACKEND_OK);
   }
   else if (argc < 6)
