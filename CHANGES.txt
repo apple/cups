@@ -4,6 +4,8 @@ CHANGES.txt - 2008-12-08
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
+	- Side-channel SNMP lookups would not work when cupsSNMPSupplies
+	  was set to False in the PPD file.
 	- Localized the device descriptions for the SCSI, serial,
 	  and network backends (STR #3014)
 	- Added a Spanish localization (STR #3015)

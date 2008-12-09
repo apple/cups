@@ -88,7 +88,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   char		addrname[256];		/* Address name */
   int		snmp_fd,		/* SNMP socket */
 		start_count,		/* Page count via SNMP at start */
-		page_count;		/* Page count via SNMP */
+		page_count,		/* Page count via SNMP */
+		have_supplies;		/* Printer supports supply levels? */
   ssize_t	tbytes;			/* Total number of bytes written */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
@@ -372,18 +373,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
   {
-    if (backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count, NULL))
-    {
-     /*
-      * No, close it...
-      */
-
-      _cupsSNMPClose(snmp_fd);
-      snmp_fd = -1;
-    }
+    have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count,
+                                         NULL);
   }
   else
-    start_count = 0;
+    have_supplies = start_count = 0;
 
  /*
   * Print everything...
@@ -441,7 +435,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Collect the final page count as needed...
   */
 
-  if (snmp_fd >= 0 && 
+  if (have_supplies && 
       !backendSNMPSupplies(snmp_fd, &(addr->addr), &page_count, NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
