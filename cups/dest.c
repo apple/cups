@@ -1285,7 +1285,7 @@ cups_add_dest(const char  *name,	/* I  - Name of destination */
   */
 
   if (insert < *num_dests)
-    memmove(*dests + insert, *dests + insert + 1,
+    memmove(*dests + insert + 1, *dests + insert,
             (*num_dests - insert) * sizeof(cups_dest_t));
 
   (*num_dests) ++;
