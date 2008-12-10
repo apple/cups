@@ -384,7 +384,11 @@ EOF
 	i=`expr $i + 1`
 done
 
-cp /tmp/cups-$user/printers.conf /tmp/cups-$user/printers.conf.orig
+if test -f /tmp/cups-$user/printers.conf; then
+	cp /tmp/cups-$user/printers.conf /tmp/cups-$user/printers.conf.orig
+else
+	touch /tmp/cups-$user/printers.conf.orig
+fi
 
 #
 # Setup the paths...
