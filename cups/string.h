@@ -68,8 +68,8 @@ extern "C" {
 
 typedef struct _cups_sp_item_s		/**** String Pool Item ****/
 {
-  char		*str;			/* String */
   unsigned int	ref_count;		/* Reference count */
+  char		str[1];			/* String */
 } _cups_sp_item_t;
 
 

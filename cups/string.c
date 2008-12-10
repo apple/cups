@@ -72,7 +72,7 @@ char *					/* O - String pointer */
 _cupsStrAlloc(const char *s)		/* I - String */
 {
   _cups_sp_item_t	*item,		/* String pool item */
-			key;		/* Search key */
+			*key;		/* Search key */
 
 
  /*
@@ -106,9 +106,9 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * See if the string is already in the pool...
   */
 
-  key.str = (char *)s;
+  key = (char *)s - sizeof(unsigned int);
 
-  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, &key)) != NULL)
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL)
   {
    /*
     * Found it, return the cached string...
@@ -127,7 +127,7 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * Not found, so allocate a new one...
   */
 
-  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t));
+  item = (_cups_sp_item_t *)calloc(1, sizeof(_cups_sp_item_t) + strlen(s));
   if (!item)
   {
 #ifdef HAVE_PTHREAD_H
@@ -138,18 +138,7 @@ _cupsStrAlloc(const char *s)		/* I - String */
   }
 
   item->ref_count = 1;
-  item->str       = strdup(s);
-
-  if (!item->str)
-  {
-    free(item);
-
-#ifdef HAVE_PTHREAD_H
-    pthread_mutex_unlock(&sp_mutex);
-#endif /* HAVE_PTHREAD_H */
-
-    return (NULL);
-  }
+  strcpy(item->str, s);
 
  /*
   * Add the string to the pool and return it...
@@ -185,10 +174,7 @@ _cupsStrFlush(void)
   for (item = (_cups_sp_item_t *)cupsArrayFirst(stringpool);
        item;
        item = (_cups_sp_item_t *)cupsArrayNext(stringpool))
-  {
-    free(item->str);
     free(item);
-  }
 
   cupsArrayDelete(stringpool);
   stringpool = NULL;
@@ -287,7 +273,7 @@ void
 _cupsStrFree(const char *s)		/* I - String to free */
 {
   _cups_sp_item_t	*item,		/* String pool item */
-			key;		/* Search key */
+			*key;		/* Search key */
 
 
  /*
@@ -316,10 +302,10 @@ _cupsStrFree(const char *s)		/* I - String to free */
   pthread_mutex_lock(&sp_mutex);
 #endif /* HAVE_PTHREAD_H */
 
-  key.str = (char *)s;
+  key = (char *)s - sizeof(unsigned int);
 
-  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, &key)) != NULL &&
-      item->str == s)
+  if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL &&
+      item == key)
   {
    /*
     * Found it, dereference...
@@ -335,7 +321,6 @@ _cupsStrFree(const char *s)		/* I - String to free */
 
       cupsArrayRemove(stringpool, item);
 
-      free(item->str);
       free(item);
     }
   }
