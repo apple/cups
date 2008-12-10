@@ -34,6 +34,7 @@
  *   appleCopyLocations()  - Copy the location history array.
  *   appleCopyNetwork()    - Get the network ID for the current location.
  *   appleGetDefault()     - Get the default printer for this location.
+ *   appleGetPaperSize()   - Get the default paper size.
  *   appleGetPrinter()     - Get a printer from the history array.
  *   appleSetDefault()     - Set the default printer for this location.
  *   appleUseLastPrinter() - Get the default printer preference value.
@@ -65,6 +66,7 @@
 #  include <sys/cdefs.h>
 #  include <CoreFoundation/CoreFoundation.h>
 #  include <SystemConfiguration/SystemConfiguration.h>
+#  define kDefaultPaperIDKey CFSTR("DefaultPaperID")
 #  define kLocationHistoryArrayKey CFSTR("kLocationHistoryArrayKeyTMP")
 #  define kLocationNetworkKey CFSTR("kLocationNetworkKey")
 #  define kLocationPrinterIDKey CFSTR("kLocationPrinterIDKey")
@@ -81,6 +83,7 @@
 static CFArrayRef appleCopyLocations(void);
 static CFStringRef appleCopyNetwork(void);
 static char	*appleGetDefault(char *name, int namesize);
+static char	*appleGetPaperSize(char *name, int namesize);
 static CFStringRef appleGetPrinter(CFArrayRef locations, CFStringRef network,
 		                   CFIndex *locindex);
 static void	appleSetDefault(const char *name);
@@ -1064,6 +1067,35 @@ appleGetDefault(char *name,		/* I - Name buffer */
 
 
 /*
+ * 'appleGetPaperSize()' - Get the default paper size.
+ */
+
+static char *				/* O - Default paper size */
+appleGetPaperSize(char *name,		/* I - Paper size name buffer */
+                  int  namesize)	/* I - Size of buffer */
+{
+  CFStringRef	defaultPaperID;		/* Default paper ID */
+
+
+  defaultPaperID = CFPreferencesCopyAppValue(kDefaultPaperIDKey,
+                                             kPMPrintingPreferences);
+  if (!defaultPaperID ||
+      !CFStringGetCString(defaultPaperID, name, namesize,
+			  kCFStringEncodingUTF8))
+    name[0] = '\0';
+  else if (!strncmp(name, "na-", 3))
+    _cups_strcpy(name, name + 3);
+  else if (!strncmp(name, "iso-", 4))
+    _cups_strcpy(name, name + 4);
+
+  if (defaultPaperID)
+    CFRelease(defaultPaperID);
+
+  return (name);
+}
+
+
+/*
  * 'appleGetPrinter()' - Get a printer from the history array.
  */
 
@@ -1670,6 +1702,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
+  int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -1678,6 +1711,9 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
   char		uri[1024];		/* printer-uri value */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
+#ifdef __APPLE__
+  char		media_default[41];	/* Default paper size */
+#endif /* __APPLE__ */
   char		optname[1024],		/* Option name */
 		value[2048],		/* Option value */
 		*ptr;			/* Pointer into name/value */
@@ -1693,6 +1729,9 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 		  "marker-message",
 		  "marker-names",
 		  "marker-types",
+#ifdef __APPLE__
+		  "media-supported",
+#endif /* __APPLE__ */
 		  "printer-commands",
 		  "printer-info",
 		  "printer-is-accepting-jobs",
@@ -1707,6 +1746,14 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 		  "printer-defaults"
 		};
 
+
+#ifdef __APPLE__
+ /*
+  * Get the default paper size...
+  */
+
+  appleGetPaperSize(media_default, sizeof(media_default));
+#endif /* __APPLE__ */
 
  /*
   * Build a CUPS_GET_PRINTERS or IPP_GET_PRINTER_ATTRIBUTES request, which
@@ -1803,6 +1850,20 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 				                       sizeof(value)),
 				      num_options, &options);
 	}
+	else if (!strcmp(attr->name, "media-supported"))
+	{
+	 /*
+	  * See if we can set a default media size...
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	    if (!strcasecmp(media_default, attr->values[i].string.text))
+	    {
+	      num_options = cupsAddOption("media", media_default, num_options,
+	                                  &options);
+              break;
+	    }
+	}
         else if (!strcmp(attr->name, "printer-name") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  printer_name = attr->values[0].string.text;
@@ -1822,10 +1883,12 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
           strlcpy(optname, attr->name, sizeof(optname));
 	  optname[ptr - attr->name] = '\0';
 
-          num_options = cupsAddOption(optname,
-	                              cups_make_string(attr, value,
-						       sizeof(value)),
-				      num_options, &options);
+	  if (strcasecmp(optname, "media") ||
+	      !cupsGetOption("media", num_options, options))
+	    num_options = cupsAddOption(optname,
+					cups_make_string(attr, value,
+							 sizeof(value)),
+					num_options, &options);
 	}
       }
 
