@@ -1270,10 +1270,7 @@ cups_add_dest(const char  *name,	/* I  - Name of destination */
   */
 
   if (*num_dests == 0)
-  {
     insert = 0;
-    diff   = 0;
-  }
   else
   {
     insert = cups_find_dest(name, instance, *num_dests, *dests, *num_dests - 1,
@@ -1338,7 +1335,7 @@ cups_find_dest(const char  *name,	/* I - Destination name */
                int         num_dests,	/* I - Number of destinations */
 	       cups_dest_t *dests,	/* I - Destinations */
 	       int         prev,	/* I - Previous index */
-	       int         *rdiff)	/* O - Different of match */
+	       int         *rdiff)	/* O - Difference of match */
 {
   int		left,			/* Low mark for binary search */
 		right,			/* High mark for binary search */
@@ -1846,18 +1843,13 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
           continue;
       }
 
-      num_dests = cupsAddDest(printer_name, NULL, num_dests, dests);
-
-      if ((dest = cupsGetDest(printer_name, NULL, num_dests, *dests)) != NULL)
+      if ((dest = cups_add_dest(printer_name, NULL, &num_dests, dests)) != NULL)
       {
         dest->num_options = num_options;
 	dest->options     = options;
-
-        num_options = 0;
-	options     = NULL;
       }
-
-      cupsFreeOptions(num_options, options);
+      else
+        cupsFreeOptions(num_options, options);
 
       if (attr == NULL)
 	break;
