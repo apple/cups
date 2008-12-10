@@ -39,6 +39,7 @@ __cupsStrAlloc
 __cupsStrFlush
 __cupsStrFormatd
 __cupsStrFree
+__cupsStrRetain
 __cupsStrScand
 __cupsStrStatistics
 __httpAddrPort

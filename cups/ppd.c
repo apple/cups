@@ -1321,7 +1321,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	strlcpy(choice->text,
 	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
 		sizeof(choice->text));
-        choice->code = _cupsStrAlloc(custom_attr->value);
+        choice->code = _cupsStrRetain(custom_attr->value);
       }
     }
     else if (!strcmp(keyword, "JCLOpenUI"))
@@ -1424,7 +1424,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	strlcpy(choice->text,
 	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
 		sizeof(choice->text));
-        choice->code = _cupsStrAlloc(custom_attr->value);
+        choice->code = _cupsStrRetain(custom_attr->value);
       }
     }
     else if (!strcmp(keyword, "CloseUI") || !strcmp(keyword, "JCLCloseUI"))

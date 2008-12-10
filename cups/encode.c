@@ -354,15 +354,7 @@ cupsEncodeOptions2(
     * Copy the name over...
     */
 
-    if ((attr->name = _cupsStrAlloc(option->name)) == NULL)
-    {
-     /*
-      * Ran out of memory!
-      */
-
-      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for name!");
-      return;
-    }
+    attr->name = _cupsStrRetain(option->name);
 
     if (count > 1)
     {
@@ -543,7 +535,9 @@ cupsEncodeOptions2(
             break;
 
 	default :
-            if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
+	    if (count == 1)
+	      attr->values[0].string.text = _cupsStrRetain(val);
+	    else if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
 	    {
 	     /*
 	      * Ran out of memory!

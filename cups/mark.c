@@ -931,7 +931,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 	      if (cparam->current.custom_string)
 		_cupsStrFree(cparam->current.custom_string);
 
-	      cparam->current.custom_string = _cupsStrAlloc(val->value);
+	      cparam->current.custom_string = _cupsStrRetain(val->value);
 	      break;
 	}
       }

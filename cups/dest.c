@@ -159,8 +159,8 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
 	     i > 0;
 	     i --, doption ++, poption ++)
 	{
-	  doption->name  = _cupsStrAlloc(poption->name);
-	  doption->value = _cupsStrAlloc(poption->value);
+	  doption->name  = _cupsStrRetain(poption->name);
+	  doption->value = _cupsStrRetain(poption->value);
 	}
       }
     }
