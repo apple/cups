@@ -937,6 +937,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     return (HTTP_NOT_ACCEPTABLE);
   }
 
+#ifndef WIN32
  /*
   * See if the PPD file is available locally...
   */
@@ -1038,6 +1039,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
       }
     }
   }
+#endif /* !WIN32 */
 
  /*
   * Try finding a printer URI for this printer...
