@@ -206,7 +206,7 @@ cupsTempFile(char *filename,		/* I - Pointer to buffer */
  * The temporary filename is returned in the filename buffer.
  * The temporary file is opened for writing.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 cups_file_t *				/* O - CUPS file or @code NULL@ on error */

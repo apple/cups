@@ -197,10 +197,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   fputs("cupsPrintFile: ", stdout);
   fflush(stdout);
 
-  if (cupsPrintFile(dest->name, "../data/testprint.ps", "Test Page",
+  if (cupsPrintFile(dest->name, "../data/testprint", "Test Page",
                     dest->num_options, dest->options) <= 0)
   {
-    puts("FAIL");
+    printf("FAIL (%s)\n", cupsLastErrorString());
     return (1);
   }
   else

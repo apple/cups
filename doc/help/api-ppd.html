@@ -366,6 +366,7 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
+<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 <li><a href="#LOADING">Loading a PPD File</a></li>
 <li><a href="#OPTIONS_AND_GROUPS">Options and Groups</a></li>
@@ -470,7 +471,6 @@ conflicts.">ppdMarkOption</a></li>
 	<li><a href="#ppd_status_e" title="Types and structures...">ppd_status_e</a></li>
 	<li><a href="#ppd_ui_e" title="UI Types">ppd_ui_e</a></li>
 </ul></li>
-</ul>
 <!--
   "$Id: api-ppd.shtml 7616 2008-05-28 00:34:13Z mike $"
 
@@ -804,7 +804,7 @@ int ppdCollect (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The choices array should be freed using <code>free</code> when you are
 finished with it.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdCollect2">ppdCollect2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdCollect2">ppdCollect2</a></h3>
 <p class="description">Collect all marked options that reside in the
 specified section and minimum order.</p>
 <p class="code">
@@ -867,7 +867,7 @@ int ppdEmit (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitAfterOrder">ppdEmitAfterOrder</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdEmitAfterOrder">ppdEmitAfterOrder</a></h3>
 <p class="description">Emit a subset of the code for marked options to a file.</p>
 <p class="code">
 int ppdEmitAfterOrder (<br>
@@ -943,7 +943,7 @@ int ppdEmitJCL (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitJCLEnd">ppdEmitJCLEnd</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdEmitJCLEnd">ppdEmitJCLEnd</a></h3>
 <p class="description">Emit JCLEnd code to a file.</p>
 <p class="code">
 int ppdEmitJCLEnd (<br>
@@ -959,7 +959,7 @@ int ppdEmitJCLEnd (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on failure</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdEmitString">ppdEmitString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdEmitString">ppdEmitString</a></h3>
 <p class="description">Get a string containing the code for marked options.</p>
 <p class="code">
 char *ppdEmitString (<br>
@@ -988,7 +988,7 @@ The return string is allocated on the heap and should be freed using
 <code>free</code> when you are done with it.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdErrorString">ppdErrorString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppdErrorString">ppdErrorString</a></h3>
 <p class="description">Returns the text assocated with a status.</p>
 <p class="code">
 const char *ppdErrorString (<br>
@@ -1001,7 +1001,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status string</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdFindAttr">ppdFindAttr</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppdFindAttr">ppdFindAttr</a></h3>
 <p class="description">Find the first matching attribute.</p>
 <p class="code">
 <a href="#ppd_attr_t">ppd_attr_t</a> *ppdFindAttr (<br>
@@ -1036,7 +1036,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Choice pointer or <code>NULL</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFindCustomOption">ppdFindCustomOption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdFindCustomOption">ppdFindCustomOption</a></h3>
 <p class="description">Find a custom option.</p>
 <p class="code">
 <a href="#ppd_coption_t">ppd_coption_t</a> *ppdFindCustomOption (<br>
@@ -1052,7 +1052,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Custom option or NULL</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFindCustomParam">ppdFindCustomParam</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdFindCustomParam">ppdFindCustomParam</a></h3>
 <p class="description">Find a parameter for a custom option.</p>
 <p class="code">
 <a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdFindCustomParam (<br>
@@ -1084,7 +1084,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Pointer to choice or <code>NULL</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdFindNextAttr">ppdFindNextAttr</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppdFindNextAttr">ppdFindNextAttr</a></h3>
 <p class="description">Find the next matching attribute.</p>
 <p class="code">
 <a href="#ppd_attr_t">ppd_attr_t</a> *ppdFindNextAttr (<br>
@@ -1119,7 +1119,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Pointer to option or <code>NULL</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFirstCustomParam">ppdFirstCustomParam</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdFirstCustomParam">ppdFirstCustomParam</a></h3>
 <p class="description">Return the first parameter for a custom option.</p>
 <p class="code">
 <a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdFirstCustomParam (<br>
@@ -1132,7 +1132,7 @@ const char *ppdErrorString (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Custom parameter or NULL</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdFirstOption">ppdFirstOption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdFirstOption">ppdFirstOption</a></h3>
 <p class="description">Return the first option in the PPD file.</p>
 <p class="code">
 <a href="#ppd_option_t">ppd_option_t</a> *ppdFirstOption (<br>
@@ -1193,7 +1193,7 @@ int ppdIsMarked (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Non-zero if option is marked</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppdLastError">ppdLastError</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppdLastError">ppdLastError</a></h3>
 <p class="description">Return the status from the last ppdOpen*().</p>
 <p class="code">
 <a href="#ppd_status_t">ppd_status_t</a> ppdLastError (<br>
@@ -1206,7 +1206,7 @@ int ppdIsMarked (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Status code</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdLocalize">ppdLocalize</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdLocalize">ppdLocalize</a></h3>
 <p class="description">Localize the PPD file to the current locale.</p>
 <p class="code">
 int ppdLocalize (<br>
@@ -1248,7 +1248,7 @@ localized string uses the UTF-8 character encoding.
 <p class="discussion">This function uses the current locale to find the localized attribute for
 the given main and option keywords.  If no localized version of the
 attribute exists for the current locale, the unlocalized version is returned.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="ppdLocalizeIPPReason">ppdLocalizeIPPReason</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="ppdLocalizeIPPReason">ppdLocalizeIPPReason</a></h3>
 <p class="description">Get the localized version of a cupsIPPReason
 attribute.</p>
 <p class="code">
@@ -1337,7 +1337,7 @@ int ppdMarkOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of conflicts</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdNextCustomParam">ppdNextCustomParam</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdNextCustomParam">ppdNextCustomParam</a></h3>
 <p class="description">Return the next parameter for a custom option.</p>
 <p class="code">
 <a href="#ppd_cparam_t">ppd_cparam_t</a> *ppdNextCustomParam (<br>
@@ -1350,7 +1350,7 @@ int ppdMarkOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Custom parameter or NULL</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdNextOption">ppdNextOption</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdNextOption">ppdNextOption</a></h3>
 <p class="description">Return the next option in the PPD file.</p>
 <p class="code">
 <a href="#ppd_option_t">ppd_option_t</a> *ppdNextOption (<br>
@@ -1380,7 +1380,7 @@ int ppdMarkOption (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">PPD file record</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppdOpen2">ppdOpen2</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppdOpen2">ppdOpen2</a></h3>
 <p class="description">Read a PPD file into memory.</p>
 <p class="code">
 <a href="#ppd_file_t">ppd_file_t</a> *ppdOpen2 (<br>
@@ -1494,7 +1494,7 @@ float ppdPageWidth (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Width of page in points or 0.0</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20&nbsp;</span><a name="ppdSetConformance">ppdSetConformance</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="ppdSetConformance">ppdSetConformance</a></h3>
 <p class="description">Set the conformance level for PPD files.</p>
 <p class="code">
 void ppdSetConformance (<br>
@@ -1506,7 +1506,7 @@ void ppdSetConformance (<br>
 <dd class="description">Conformance level</dd>
 </dl>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppd_attr_t">ppd_attr_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_attr_t">ppd_attr_t</a></h3>
 <p class="description">PPD Attribute Structure </p>
 <p class="code">
 typedef struct <a href="#ppd_attr_s">ppd_attr_s</a> ppd_attr_t;
@@ -1516,7 +1516,7 @@ typedef struct <a href="#ppd_attr_s">ppd_attr_s</a> ppd_attr_t;
 <p class="code">
 typedef struct <a href="#ppd_choice_s">ppd_choice_s</a> ppd_choice_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppd_conform_t">ppd_conform_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_conform_t">ppd_conform_t</a></h3>
 <p class="description">Conformance Levels </p>
 <p class="code">
 typedef enum <a href="#ppd_conform_e">ppd_conform_e</a> ppd_conform_t;
@@ -1526,27 +1526,27 @@ typedef enum <a href="#ppd_conform_e">ppd_conform_e</a> ppd_conform_t;
 <p class="code">
 typedef struct <a href="#ppd_const_s">ppd_const_s</a> ppd_const_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_coption_t">ppd_coption_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_coption_t">ppd_coption_t</a></h3>
 <p class="description">Custom Option </p>
 <p class="code">
 typedef struct <a href="#ppd_coption_s">ppd_coption_s</a> ppd_coption_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cparam_t">ppd_cparam_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cparam_t">ppd_cparam_t</a></h3>
 <p class="description">Custom Parameter </p>
 <p class="code">
 typedef struct <a href="#ppd_cparam_s">ppd_cparam_s</a> ppd_cparam_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cplimit_t">ppd_cplimit_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cplimit_t">ppd_cplimit_t</a></h3>
 <p class="description">Custom Parameter Limit </p>
 <p class="code">
 typedef union <a href="#ppd_cplimit_u">ppd_cplimit_u</a> ppd_cplimit_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cptype_t">ppd_cptype_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cptype_t">ppd_cptype_t</a></h3>
 <p class="description">Custom Parameter Type </p>
 <p class="code">
 typedef enum <a href="#ppd_cptype_e">ppd_cptype_e</a> ppd_cptype_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cpvalue_t">ppd_cpvalue_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cpvalue_t">ppd_cpvalue_t</a></h3>
 <p class="description">Custom Parameter Value </p>
 <p class="code">
 typedef union <a href="#ppd_cpvalue_u">ppd_cpvalue_u</a> ppd_cpvalue_t;
@@ -1602,7 +1602,7 @@ typedef enum <a href="#ppd_status_e">ppd_status_e</a> ppd_status_t;
 typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 </p>
 <h2 class="title"><a name="STRUCTURES">Structures</a></h2>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.1.19&nbsp;</span><a name="ppd_attr_s">ppd_attr_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_attr_s">ppd_attr_s</a></h3>
 <p class="description">PPD Attribute Structure </p>
 <p class="code">struct ppd_attr_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char name[PPD_MAX_NAME];<br>
@@ -1662,7 +1662,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dt>option2[PPD_MAX_NAME] </dt>
 <dd class="description">Second keyword</dd>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_coption_s">ppd_coption_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_coption_s">ppd_coption_s</a></h3>
 <p class="description">Custom Option </p>
 <p class="code">struct ppd_coption_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char keyword[PPD_MAX_NAME];<br>
@@ -1681,7 +1681,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dt>params </dt>
 <dd class="description">Parameters</dd>
 </dl>
-<h3 class="struct"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cparam_s">ppd_cparam_s</a></h3>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cparam_s">ppd_cparam_s</a></h3>
 <p class="description">Custom Parameter </p>
 <p class="code">struct ppd_cparam_s {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_cpvalue_t">ppd_cpvalue_t</a> current;<br>
@@ -1836,13 +1836,13 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Number of page sizes</dd>
 <dt>patches </dt>
 <dd class="description">Patch commands to be sent to printer</dd>
-<dt>pcfilename <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>pcfilename <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">PCFileName string </dd>
 <dt>product </dt>
 <dd class="description">Product name (from PS RIP/interpreter)</dd>
 <dt>profiles <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
 <dd class="description">sRGB color profiles </dd>
-<dt>protocols <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>protocols <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">Protocols (BCP, TBCP) string </dd>
 <dt>shortnickname </dt>
 <dd class="description">Short version of nickname</dd>
@@ -1869,7 +1869,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dl>
 <dt>PPD_MAX_NAME] </dt>
 <dd class="description">Human-readable group name</dd>
-<dt>name[PPD_MAX_NAME] <span class="info">&nbsp;CUPS 1.1.18&nbsp;</span></dt>
+<dt>name[PPD_MAX_NAME] <span class="info">&nbsp;CUPS 1.1.18/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">Group name </dd>
 <dt>num_options </dt>
 <dd class="description">Number of options</dd>
@@ -1968,7 +1968,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Width of media in points</dd>
 </dl>
 <h2 class="title"><a name="UNIONS">Unions</a></h2>
-<h3 class="union"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cplimit_u">ppd_cplimit_u</a></h3>
+<h3 class="union"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cplimit_u">ppd_cplimit_u</a></h3>
 <p class="description">Custom Parameter Limit </p>
 <p class="code">union ppd_cplimit_u {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;float custom_curve;<br>
@@ -1999,7 +1999,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dt>custom_string </dt>
 <dd class="description">String length</dd>
 </dl>
-<h3 class="union"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cpvalue_u">ppd_cpvalue_u</a></h3>
+<h3 class="union"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cpvalue_u">ppd_cpvalue_u</a></h3>
 <p class="description">Custom Parameter Value </p>
 <p class="code">union ppd_cpvalue_u {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;float custom_curve;<br>
@@ -2040,7 +2040,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dt>PPD_CONFORM_STRICT </dt>
 <dd class="description">Require strict conformance</dd>
 </dl>
-<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="ppd_cptype_e">ppd_cptype_e</a></h3>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="ppd_cptype_e">ppd_cptype_e</a></h3>
 <p class="description">Custom Parameter Type </p>
 <h4 class="constants">Constants</h4>
 <dl>

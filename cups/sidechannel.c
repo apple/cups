@@ -59,7 +59,7 @@
  * pointed to by the "data" parameter.  cupsSideChannelDoRequest() will
  * update the value to contain the number of data bytes in the buffer.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 cups_sc_status_t			/* O  - Status of command */
@@ -98,7 +98,7 @@ cupsSideChannelDoRequest(
  * pointed to by the "data" parameter.  cupsSideChannelDoRequest() will
  * update the value to contain the number of data bytes in the buffer.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -455,7 +455,7 @@ cupsSideChannelSNMPWalk(
  * This function is normally only called by backend programs to send
  * responses to a filter, driver, or port monitor program.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */

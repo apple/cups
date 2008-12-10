@@ -551,7 +551,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ppd_option_t *				/* O - First option or @code NULL@ */
@@ -569,7 +569,7 @@ ppdFirstOption(ppd_file_t *ppd)		/* I - PPD file */
  *
  * Options are returned from all groups in ascending alphanumeric order.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ppd_option_t *				/* O - Next option or @code NULL@ */

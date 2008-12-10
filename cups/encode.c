@@ -77,6 +77,14 @@ static const _ipp_option_t ipp_options[] =
   { 1, "job-sheets-default",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { 0, "job-uuid",		IPP_TAG_URI,		IPP_TAG_JOB },
   { 0, "landscape",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
+  { 1, "marker-change-time",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "marker-colors",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 1, "marker-high-levels",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "marker-levels",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 1, "marker-low-levels",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
+  { 0, "marker-message",	IPP_TAG_TEXT,		IPP_TAG_PRINTER },
+  { 1, "marker-names",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 1, "marker-types",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 1, "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "mirror",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "mirror-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -115,6 +123,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "prettyprint-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "print-quality",		IPP_TAG_ENUM,		IPP_TAG_JOB },
   { 0, "print-quality-default",	IPP_TAG_ENUM,		IPP_TAG_PRINTER },
+  { 1, "printer-commands",	IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "printer-error-policy",	IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { 0, "printer-info",		IPP_TAG_TEXT,		IPP_TAG_PRINTER },
   { 0, "printer-is-accepting-jobs", IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
@@ -186,7 +195,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
  * function multiple times for each group, or use cupsEncodeOptions()
  * to add the standard groups.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 void

@@ -449,7 +449,7 @@ cupsGetDefault(void)
  * functions to get the user-defined default printer, as this function does
  * not support the lpoptions-defined default printer.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 const char *				/* O - Default printer or @code NULL@ */
@@ -546,7 +546,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
  * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
  * jobs that are stopped, canceled, aborted, or completed.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Number of jobs */
@@ -848,7 +848,7 @@ cupsGetPPD(const char *name)		/* I - Destination name */
  * The returned filename is stored in a static buffer and is overwritten with
  * each call to @link cupsGetPPD@ or @code cupsGetPPD2@.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 const char *				/* O - Filename for PPD file */
@@ -1181,7 +1181,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
  * overwritten on the next call to @link cupsGetPPD@, @link cupsGetPPD2@,
  * or @link cupsGetServerPPD@.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 char *					/* O - Name of PPD file or @code NULL@ on error */
@@ -1260,7 +1260,7 @@ cupsLastError(void)
 /*
  * 'cupsLastErrorString()' - Return the last IPP status-message.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 const char *				/* O - status-message text from last request */
@@ -1294,7 +1294,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
  * 'cupsPrintFile2()' - Print a file to a printer or class on the specified
  *                      server.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -1347,7 +1347,7 @@ cupsPrintFiles(
  * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the
  *                       specified server.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Job ID or 0 on error */

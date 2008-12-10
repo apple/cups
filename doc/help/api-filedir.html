@@ -366,6 +366,7 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
+<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cupsDirClose" title="Close a directory.">cupsDirClose</a></li>
@@ -410,7 +411,6 @@ file.">cupsFileRewind</a></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#cups_dentry_s" title="Directory entry type">cups_dentry_s</a></li>
 </ul></li>
-</ul>
 <!--
   "$Id: api-filedir.shtml 7279 2008-01-31 01:50:44Z mike $"
 
@@ -443,7 +443,7 @@ details of directory access/listing and provide a convenient way
 to get both a list of files and the information (permissions,
 size, timestamp, etc.) for each of those files.</p>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsDirClose">cupsDirClose</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsDirClose">cupsDirClose</a></h3>
 <p class="description">Close a directory.</p>
 <p class="code">
 void cupsDirClose (<br>
@@ -454,7 +454,7 @@ void cupsDirClose (<br>
 <dt>dp</dt>
 <dd class="description">Directory pointer</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsDirOpen">cupsDirOpen</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsDirOpen">cupsDirOpen</a></h3>
 <p class="description">Open a directory.</p>
 <p class="code">
 <a href="#cups_dir_t">cups_dir_t</a> *cupsDirOpen (<br>
@@ -467,7 +467,7 @@ void cupsDirClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Directory pointer or <code>NULL</code> if the directory could not be opened.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsDirRead">cupsDirRead</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsDirRead">cupsDirRead</a></h3>
 <p class="description">Read the next directory entry.</p>
 <p class="code">
 <a href="#cups_dentry_t">cups_dentry_t</a> *cupsDirRead (<br>
@@ -480,7 +480,7 @@ void cupsDirClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Directory entry or <code>NULL</code> when there are no more</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsDirRewind">cupsDirRewind</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsDirRewind">cupsDirRewind</a></h3>
 <p class="description">Rewind to the start of the directory.</p>
 <p class="code">
 void cupsDirRewind (<br>
@@ -491,7 +491,7 @@ void cupsDirRewind (<br>
 <dt>dp</dt>
 <dd class="description">Directory pointer</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileClose">cupsFileClose</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileClose">cupsFileClose</a></h3>
 <p class="description">Close a CUPS file.</p>
 <p class="code">
 int cupsFileClose (<br>
@@ -504,7 +504,7 @@ int cupsFileClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileCompression">cupsFileCompression</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileCompression">cupsFileCompression</a></h3>
 <p class="description">Return whether a file is compressed.</p>
 <p class="code">
 int cupsFileCompression (<br>
@@ -517,7 +517,7 @@ int cupsFileCompression (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description"><code>CUPS_FILE_NONE</code> or <code>CUPS_FILE_GZIP</code></p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileEOF">cupsFileEOF</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileEOF">cupsFileEOF</a></h3>
 <p class="description">Return the end-of-file status.</p>
 <p class="code">
 int cupsFileEOF (<br>
@@ -530,7 +530,7 @@ int cupsFileEOF (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">1 on end of file, 0 otherwise</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileFind">cupsFileFind</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileFind">cupsFileFind</a></h3>
 <p class="description">Find a file using the specified path.</p>
 <p class="code">
 const char *cupsFileFind (<br>
@@ -563,7 +563,7 @@ the supplied paths, <code>NULL</code> is returned. A <code>NULL</code> path only
 matches the current directory.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileFlush">cupsFileFlush</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileFlush">cupsFileFlush</a></h3>
 <p class="description">Flush pending output.</p>
 <p class="code">
 int cupsFileFlush (<br>
@@ -576,7 +576,7 @@ int cupsFileFlush (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileGetChar">cupsFileGetChar</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileGetChar">cupsFileGetChar</a></h3>
 <p class="description">Get a single character from a file.</p>
 <p class="code">
 int cupsFileGetChar (<br>
@@ -589,7 +589,7 @@ int cupsFileGetChar (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Character or -1 on end of file</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileGetConf">cupsFileGetConf</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileGetConf">cupsFileGetConf</a></h3>
 <p class="description">Get a line from a configuration file...</p>
 <p class="code">
 char *cupsFileGetConf (<br>
@@ -614,7 +614,7 @@ char *cupsFileGetConf (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Line read or <code>NULL</code> on end of file or error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileGetLine">cupsFileGetLine</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileGetLine">cupsFileGetLine</a></h3>
 <p class="description">Get a CR and/or LF-terminated line that may
 contain binary data.</p>
 <p class="code">
@@ -641,7 +641,7 @@ nul-terminated, however you should use the returned length to determine
 the number of bytes on the line.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileGets">cupsFileGets</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileGets">cupsFileGets</a></h3>
 <p class="description">Get a CR and/or LF-terminated line.</p>
 <p class="code">
 char *cupsFileGets (<br>
@@ -660,7 +660,7 @@ char *cupsFileGets (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Line read or <code>NULL</code> on end of file or error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileLock">cupsFileLock</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileLock">cupsFileLock</a></h3>
 <p class="description">Temporarily lock access to a file.</p>
 <p class="code">
 int cupsFileLock (<br>
@@ -676,7 +676,7 @@ int cupsFileLock (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileNumber">cupsFileNumber</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileNumber">cupsFileNumber</a></h3>
 <p class="description">Return the file descriptor associated with a CUPS file.</p>
 <p class="code">
 int cupsFileNumber (<br>
@@ -689,7 +689,7 @@ int cupsFileNumber (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">File descriptor</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileOpen">cupsFileOpen</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileOpen">cupsFileOpen</a></h3>
 <p class="description">Open a CUPS file.</p>
 <p class="code">
 <a href="#cups_file_t">cups_file_t</a> *cupsFileOpen (<br>
@@ -720,7 +720,7 @@ connection as needed, generally preferring IPv6 connections when there is
 a choice.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileOpenFd">cupsFileOpenFd</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileOpenFd">cupsFileOpenFd</a></h3>
 <p class="description">Open a CUPS file using a file descriptor.</p>
 <p class="code">
 <a href="#cups_file_t">cups_file_t</a> *cupsFileOpenFd (<br>
@@ -745,7 +745,7 @@ supplied which enables Flate compression of the file.  Compression is
 not supported for the &quot;a&quot; (append) mode.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePeekChar">cupsFilePeekChar</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFilePeekChar">cupsFilePeekChar</a></h3>
 <p class="description">Peek at the next character from a file.</p>
 <p class="code">
 int cupsFilePeekChar (<br>
@@ -758,7 +758,7 @@ int cupsFilePeekChar (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Character or -1 on end of file</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePrintf">cupsFilePrintf</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFilePrintf">cupsFilePrintf</a></h3>
 <p class="description">Write a formatted string.</p>
 <p class="code">
 int cupsFilePrintf (<br>
@@ -777,7 +777,7 @@ int cupsFilePrintf (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes written or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePutChar">cupsFilePutChar</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFilePutChar">cupsFilePutChar</a></h3>
 <p class="description">Write a character.</p>
 <p class="code">
 int cupsFilePutChar (<br>
@@ -816,7 +816,7 @@ ssize_t cupsFilePutConf (<br>
 <p class="discussion">This function handles any comment escaping of the value.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFilePuts">cupsFilePuts</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFilePuts">cupsFilePuts</a></h3>
 <p class="description">Write a string.</p>
 <p class="code">
 int cupsFilePuts (<br>
@@ -836,7 +836,7 @@ int cupsFilePuts (<br>
 <p class="discussion">Like the <code>fputs</code> function, no newline is appended to the string.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileRead">cupsFileRead</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileRead">cupsFileRead</a></h3>
 <p class="description">Read from a file.</p>
 <p class="code">
 ssize_t cupsFileRead (<br>
@@ -855,7 +855,7 @@ ssize_t cupsFileRead (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Number of bytes read or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileRewind">cupsFileRewind</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileRewind">cupsFileRewind</a></h3>
 <p class="description">Set the current file position to the beginning of the
 file.</p>
 <p class="code">
@@ -869,7 +869,7 @@ off_t cupsFileRewind (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New file position or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileSeek">cupsFileSeek</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileSeek">cupsFileSeek</a></h3>
 <p class="description">Seek in a file.</p>
 <p class="code">
 off_t cupsFileSeek (<br>
@@ -885,25 +885,25 @@ off_t cupsFileSeek (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New file position or -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileStderr">cupsFileStderr</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileStderr">cupsFileStderr</a></h3>
 <p class="description">Return a CUPS file associated with stderr.</p>
 <p class="code">
 <a href="#cups_file_t">cups_file_t</a> *cupsFileStderr (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileStdin">cupsFileStdin</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileStdin">cupsFileStdin</a></h3>
 <p class="description">Return a CUPS file associated with stdin.</p>
 <p class="code">
 <a href="#cups_file_t">cups_file_t</a> *cupsFileStdin (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileStdout">cupsFileStdout</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileStdout">cupsFileStdout</a></h3>
 <p class="description">Return a CUPS file associated with stdout.</p>
 <p class="code">
 <a href="#cups_file_t">cups_file_t</a> *cupsFileStdout (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">CUPS file</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileTell">cupsFileTell</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileTell">cupsFileTell</a></h3>
 <p class="description">Return the current file position.</p>
 <p class="code">
 off_t cupsFileTell (<br>
@@ -916,7 +916,7 @@ off_t cupsFileTell (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">File position</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileUnlock">cupsFileUnlock</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileUnlock">cupsFileUnlock</a></h3>
 <p class="description">Unlock access to a file.</p>
 <p class="code">
 int cupsFileUnlock (<br>
@@ -929,7 +929,7 @@ int cupsFileUnlock (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">0 on success, -1 on error</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsFileWrite">cupsFileWrite</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsFileWrite">cupsFileWrite</a></h3>
 <p class="description">Write to a file.</p>
 <p class="code">
 ssize_t cupsFileWrite (<br>

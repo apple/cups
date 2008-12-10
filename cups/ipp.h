@@ -4,7 +4,7 @@
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2008 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -207,13 +207,13 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   IPP_SET_PRINTER_ATTRIBUTES,		/* Set printer attributes @private@ */
   IPP_SET_JOB_ATTRIBUTES,		/* Set job attributes */
   IPP_GET_PRINTER_SUPPORTED_VALUES,	/* Get supported attribute values */
-  IPP_CREATE_PRINTER_SUBSCRIPTION,	/* Create a printer subscription @since CUPS 1.2@ */
-  IPP_CREATE_JOB_SUBSCRIPTION,		/* Create a job subscription @since CUPS 1.2@ */
-  IPP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2@ */
-  IPP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2@ */
-  IPP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2@ */
-  IPP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2@ */
-  IPP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2@ */
+  IPP_CREATE_PRINTER_SUBSCRIPTION,	/* Create a printer subscription @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_CREATE_JOB_SUBSCRIPTION,		/* Create a job subscription @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_GET_SUBSCRIPTION_ATTRIBUTES,	/* Get subscription attributes @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_GET_SUBSCRIPTIONS,		/* Get list of subscriptions @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_RENEW_SUBSCRIPTION,		/* Renew a printer subscription @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_CANCEL_SUBSCRIPTION,		/* Cancel a subscription @since CUPS 1.2/Mac OS X 10.5@ */
+  IPP_GET_NOTIFICATIONS,		/* Get notification events @since CUPS 1.2/Mac OS X 10.5@ */
   IPP_SEND_NOTIFICATIONS,		/* Send notification events @private@ */
   IPP_GET_PRINT_SUPPORT_FILES = 0x0021,	/* Get printer support files @private@ */
   IPP_ENABLE_PRINTER,			/* Start a printer */
@@ -246,8 +246,8 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   CUPS_GET_DEVICES,			/* Get a list of supported devices */
   CUPS_GET_PPDS,			/* Get a list of supported drivers */
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
-  CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2@ */
-  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3@ */
+  CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/Mac OS X 10.5@ */
   CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4@ */
 } ipp_op_t;
 
@@ -310,7 +310,7 @@ typedef unsigned char ipp_uchar_t;	/**** Unsigned 8-bit integer/character ****/
 
 /**** New in CUPS 1.2 ****/
 typedef ssize_t	(*ipp_iocb_t)(void *, ipp_uchar_t *, size_t);
-					/**** IPP IO Callback Function @since CUPS 1.2@ ****/
+					/**** IPP IO Callback Function @since CUPS 1.2/Mac OS X 10.5@ ****/
 
 typedef union ipp_request_u		/**** Request Header ****/
 {
@@ -336,7 +336,7 @@ typedef union ipp_request_u		/**** Request Header ****/
   }		status;
 
   /**** New in CUPS 1.1.19 ****/
-  struct				/* Event Header */
+  struct				/* Event Header @since CUPS 1.1.19/Mac OS X 10.3@ */
   {
     ipp_uchar_t	version[2];		/* Protocol version number */
     ipp_status_t status_code;		/* Status code */
@@ -381,7 +381,7 @@ typedef union ipp_value_u		/**** Attribute Value ****/
   }		unknown;		/* Unknown attribute type */
 
 /**** New in CUPS 1.1.19 ****/
-  ipp_t		*collection;		/* Collection value */
+  ipp_t		*collection;		/* Collection value @since CUPS 1.1.19/Mac OS X 10.3@ */
 } ipp_value_t;
 
 typedef struct ipp_attribute_s		/**** Attribute ****/
@@ -404,7 +404,7 @@ struct ipp_s				/**** IPP Request/Response/Notification ****/
   ipp_tag_t	curtag;			/* Current attribute group tag */
 
 /**** New in CUPS 1.2 ****/
-  ipp_attribute_t *prev;		/* Previous attribute (for read) */
+  ipp_attribute_t *prev;		/* Previous attribute (for read) @since CUPS 1.2/Mac OS X 10.5@ */
 };
 
 

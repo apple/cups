@@ -247,7 +247,7 @@ httpCheck(http_t *http)			/* I - Connection to server */
 /*
  * 'httpClearCookie()' - Clear the cookie value(s).
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 void
@@ -592,7 +592,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 /*
  * 'httpFlushWrite()' - Flush data in write buffer.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - Bytes written or -1 on error */
@@ -637,7 +637,7 @@ httpGet(http_t     *http,		/* I - Connection to server */
  * string to use with httpSetField() for the HTTP_FIELD_AUTHORIZATION
  * value.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 char *					/* O - Authorization string */
@@ -653,7 +653,7 @@ httpGetAuthString(http_t *http)		/* I - Connection to server */
 /*
  * 'httpGetBlocking()' - Get the blocking/non-block state of a connection.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 1 if blocking, 0 if non-blocking */
@@ -666,7 +666,7 @@ httpGetBlocking(http_t *http)		/* I - Connection to server */
 /*
  * 'httpGetCookie()' - Get any cookie data from the response.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 const char *				/* O - Cookie data or NULL */
@@ -679,7 +679,7 @@ httpGetCookie(http_t *http)		/* I - HTTP connecion */
 /*
  * 'httpGetFd()' - Get the file descriptor associated with a connection.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - File descriptor or -1 if none */
@@ -749,7 +749,7 @@ httpGetLength(http_t *http)		/* I - Connection to server */
  * This function returns the complete content length, even for
  * content larger than 2^31 - 1.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 off_t					/* O - Content length */
@@ -811,7 +811,7 @@ httpGetLength2(http_t *http)		/* I - Connection to server */
 /*
  * 'httpGetStatus()' - Get the status of the last HTTP request.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 http_status_t				/* O - HTTP status */
@@ -840,7 +840,7 @@ httpGetSubField(http_t       *http,	/* I - Connection to server */
 /*
  * 'httpGetSubField2()' - Get a sub-field value.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - Value or NULL */
@@ -1300,7 +1300,7 @@ httpRead(http_t *http,			/* I - Connection to server */
 /*
  * 'httpRead2()' - Read data from a HTTP connection.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ssize_t					/* O - Number of bytes read */
@@ -1732,7 +1732,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
  * HTTP_FIELD_AUTHORIZATION prior to issuing a HTTP request using httpGet(),
  * httpHead(), httpOptions(), httpPost, or httpPut().
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 void
@@ -1788,7 +1788,7 @@ httpSetAuthString(http_t     *http,	/* I - Connection to server */
 /*
  * 'httpSetCookie()' - Set the cookie value(s)...
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 void
@@ -1813,7 +1813,7 @@ httpSetCookie(http_t     *http,		/* I - Connection */
  *
  * Currently only HTTP_CONTINUE is supported for the "expect" argument.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 void
@@ -1860,7 +1860,7 @@ httpSetField(http_t       *http,	/* I - Connection to server */
 /*
  * 'httpSetLength()' - Set the content-length and content-encoding.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 void
@@ -2077,7 +2077,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 /*
  * 'httpWait()' - Wait for data available on a connection.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 int					/* O - 1 if data is available, 0 otherwise */
@@ -2133,7 +2133,7 @@ httpWrite(http_t     *http,		/* I - Connection to server */
 /*
  * 'httpWrite2()' - Write data to a HTTP connection.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
  
 ssize_t					/* O - Number of bytes written */

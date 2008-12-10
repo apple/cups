@@ -101,25 +101,25 @@ typedef enum cups_cspace_e		/**** cupsColorSpace attribute values ****/
   CUPS_CSPACE_GOLD = 13,		/* Gold foil */
   CUPS_CSPACE_SILVER = 14,		/* Silver foil */
 
-  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19@ */
-  CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19@ */
+  CUPS_CSPACE_CIEXYZ = 15,		/* CIE XYZ @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_CIELab = 16,		/* CIE Lab @since CUPS 1.1.19/Mac OS X 10.3@ */
   CUPS_CSPACE_RGBW = 17,		/* Red, green, blue, white @since CUPS 1.2/Mac OS X 10.5@ */
 
-  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19@ */
-  CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors @since CUPS 1.1.19@ */
+  CUPS_CSPACE_ICC1 = 32,		/* ICC-based, 1 color @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC2 = 33,		/* ICC-based, 2 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC3 = 34,		/* ICC-based, 3 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC4 = 35,		/* ICC-based, 4 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC5 = 36,		/* ICC-based, 5 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC6 = 37,		/* ICC-based, 6 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC7 = 38,		/* ICC-based, 7 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC8 = 39,		/* ICC-based, 8 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICC9 = 40,		/* ICC-based, 9 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCA = 41,		/* ICC-based, 10 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCB = 42,		/* ICC-based, 11 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCC = 43,		/* ICC-based, 12 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCD = 44,		/* ICC-based, 13 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCE = 45,		/* ICC-based, 14 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
+  CUPS_CSPACE_ICCF = 46			/* ICC-based, 15 colors @since CUPS 1.1.19/Mac OS X 10.3@ */
 } cups_cspace_t;
 
 typedef enum cups_cut_e			/**** CutMedia attribute values ****/
@@ -151,7 +151,7 @@ enum cups_mode_e			/**** cupsRasterOpen modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
-  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3@ */
+  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3/Mac OS X 10.5@ */
 };
 
 typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/

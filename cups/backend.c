@@ -44,6 +44,8 @@ static void	quote_string(const char *s);
  * function returns the device URI passed in the DEVICE_URI environment
  * variable or the device URI passed in argv[0], whichever is found
  * first.
+ *
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 const char *				/* O - Device URI or @code NULL@ */
@@ -72,6 +74,8 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
  * This function writes a single device line to stdout for a backend.
  * It handles quoting of special characters in the device-make-and-model,
  * device-info, device-id, and device-location strings.
+ *
+ * @since CUPS 1.4@
  */
 
 void
