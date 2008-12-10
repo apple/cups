@@ -4,6 +4,8 @@ CHANGES.txt - 2008-12-10
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
+	- The cupsGetPPD* APIs now create symlinks to local PPD files
+	  rather than copying them whenever possible.
 	- Various performance optimizations in the string pool, dests, and
 	  options implementations.
 	- The cupsGetDests* APIs now return the marker and printer-commands

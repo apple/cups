@@ -938,6 +938,108 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   }
 
  /*
+  * See if the PPD file is available locally...
+  */
+
+  if (!cg->servername[0])
+    cupsServer();
+
+  if (!strcasecmp(cg->servername, "localhost"))
+  {
+    char	ppdname[1024];		/* PPD filename */
+    struct stat	ppdinfo;		/* PPD file information */
+
+
+    snprintf(ppdname, sizeof(ppdname), "%s/%s.ppd", cg->cups_serverroot, name);
+    if (!stat(ppdname, &ppdinfo))
+    {
+     /*
+      * OK, the file exists, use it!
+      */
+
+      if (buffer[0])
+      {
+        unlink(buffer);
+
+	if (symlink(ppdname, buffer) && errno != EEXIST)
+        {
+          _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
+
+	  return (HTTP_SERVER_ERROR);
+	}
+      }
+      else
+      {
+        int		tries;		/* Number of tries */
+        const char	*tmpdir;	/* TMPDIR environment variable */
+	struct timeval	curtime;	/* Current time */
+
+       /*
+	* Previously we put root temporary files in the default CUPS temporary
+	* directory under /var/spool/cups.  However, since the scheduler cleans
+	* out temporary files there and runs independently of the user apps, we
+	* don't want to use it unless specifically told to by cupsd.
+	*/
+
+	if ((tmpdir = getenv("TMPDIR")) == NULL)
+#  ifdef __APPLE__
+	  tmpdir = "/private/tmp";	/* /tmp is a symlink to /private/tmp */
+#  else
+          tmpdir = "/tmp";
+#  endif /* __APPLE__ */
+
+       /*
+	* Make the temporary name using the specified directory...
+	*/
+
+	tries = 0;
+
+	do
+	{
+	 /*
+	  * Get the current time of day...
+	  */
+
+	  gettimeofday(&curtime, NULL);
+
+	 /*
+	  * Format a string using the hex time values...
+	  */
+
+	  snprintf(buffer, bufsize, "%s/%08lx%05lx", tmpdir,
+		   (unsigned long)curtime.tv_sec,
+		   (unsigned long)curtime.tv_usec);
+
+	 /*
+	  * Try to make a symlink...
+	  */
+
+	  if (!symlink(ppdname, buffer))
+	    break;
+
+	  tries ++;
+	}
+	while (tries < 1000);
+
+        if (tries >= 1000)
+	{
+          _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
+
+	  return (HTTP_SERVER_ERROR);
+	}
+      }
+
+      if (*modtime <= ppdinfo.st_mtime)
+        return (HTTP_NOT_MODIFIED);
+      else
+      {
+        *modtime = ppdinfo.st_mtime;
+	return (HTTP_OK);
+      }
+    }
+  }
+
+ /*
   * Try finding a printer URI for this printer...
   */
 
