@@ -207,8 +207,9 @@ close_device(usb_printer_t *printer)	/* I - Printer */
     * to the device...
     */
 
-    number = printer->device->config[printer->conf].interface[printer->iface].
-		 altsetting[printer->altset].bInterfaceNumber;
+    int number = printer->device->config[printer->conf].
+                     interface[printer->iface].
+		     altsetting[printer->altset].bInterfaceNumber;
     usb_release_interface(printer->handle, number);
 
     if (number != 0)

@@ -213,7 +213,8 @@ backendGetDeviceID(
     }
 #    ifdef DEBUG
     else
-      printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
+      DEBUG_printf(("backendGetDeviceID: ioctl failed - %s\n",
+                    strerror(errno)));
 #    endif /* DEBUG */
 #  endif /* __linux */
 
@@ -236,7 +237,8 @@ backendGetDeviceID(
     }
 #    ifdef DEBUG
     else
-      printf("backendGetDeviceID: ioctl failed - %s\n", strerror(errno));
+      DEBUG_printf(("backendGetDeviceID: ioctl failed - %s\n",
+                    strerror(errno)));
 #    endif /* DEBUG */
 #  endif /* __sun && ECPPIOC_GETDEVID */
   }

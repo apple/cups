@@ -1851,6 +1851,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 				                       sizeof(value)),
 				      num_options, &options);
 	}
+#ifdef __APPLE__
 	else if (!strcmp(attr->name, "media-supported"))
 	{
 	 /*
@@ -1865,6 +1866,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
               break;
 	    }
 	}
+#endif /* __APPLE__ */
         else if (!strcmp(attr->name, "printer-name") &&
 	         attr->value_tag == IPP_TAG_NAME)
 	  printer_name = attr->values[0].string.text;
