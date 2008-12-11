@@ -1,9 +1,17 @@
-CHANGES.txt - 2008-12-08
+CHANGES.txt - 2008-12-10
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
+	- The cupsGetPPD* APIs now create symlinks to local PPD files
+	  rather than copying them whenever possible.
+	- Various performance optimizations in the string pool, dests, and
+	  options implementations.
+	- The cupsGetDests* APIs now return the marker and printer-commands
+	  attributes.
+	- Side-channel SNMP lookups would not work when cupsSNMPSupplies
+	  was set to False in the PPD file.
 	- Localized the device descriptions for the SCSI, serial,
 	  and network backends (STR #3014)
 	- Added a Spanish localization (STR #3015)

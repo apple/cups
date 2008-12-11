@@ -637,7 +637,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			addrname[256];	/* Address name */
   http_addrlist_t	*addrlist,	/* Address list */
 			*addr;		/* Socket address */
-  int			snmp_fd;	/* SNMP socket */
+  int			snmp_fd,	/* SNMP socket */
+			have_supplies;	/* Printer supports supply levels? */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
   int			recoverable;	/* Recoverable error shown? */
@@ -884,17 +885,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     */
 
     if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
-    {
-      if (backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL))
-      {
-       /*
-	* No, close it...
-	*/
-
-	_cupsSNMPClose(snmp_fd);
-	snmp_fd = -1;
-      }
-    }
+      have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL);
+    else
+      have_supplies = 0;
 
    /*
     * Check for side-channel requests...
@@ -1186,7 +1179,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * Collect the final supply levels as needed...
     */
 
-    if (snmp_fd >= 0)
+    if (have_supplies)
       backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL);
 
    /*

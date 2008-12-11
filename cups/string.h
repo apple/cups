@@ -68,8 +68,8 @@ extern "C" {
 
 typedef struct _cups_sp_item_s		/**** String Pool Item ****/
 {
-  char		*str;			/* String */
   unsigned int	ref_count;		/* Reference count */
+  char		str[1];			/* String */
 } _cups_sp_item_t;
 
 
@@ -125,6 +125,7 @@ extern int	_cups_vsnprintf(char *, size_t, const char *, va_list);
 extern char	*_cupsStrAlloc(const char *s);
 extern void	_cupsStrFlush(void);
 extern void	_cupsStrFree(const char *s);
+extern char	*_cupsStrRetain(char *s);
 extern size_t	_cupsStrStatistics(size_t *alloc_bytes, size_t *total_bytes);
 
 

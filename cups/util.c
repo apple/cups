@@ -449,7 +449,7 @@ cupsGetDefault(void)
  * functions to get the user-defined default printer, as this function does
  * not support the lpoptions-defined default printer.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 const char *				/* O - Default printer or @code NULL@ */
@@ -546,7 +546,7 @@ cupsGetJobs(cups_job_t **jobs,		/* O - Job data */
  * pending, processing, or held and @code CUPS_WHICHJOBS_COMPLETED@ returns
  * jobs that are stopped, canceled, aborted, or completed.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Number of jobs */
@@ -848,7 +848,7 @@ cupsGetPPD(const char *name)		/* I - Destination name */
  * The returned filename is stored in a static buffer and is overwritten with
  * each call to @link cupsGetPPD@ or @code cupsGetPPD2@.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 const char *				/* O - Filename for PPD file */
@@ -936,6 +936,110 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     _cupsSetError(IPP_INTERNAL_ERROR, _("Bad filename buffer!"), 1);
     return (HTTP_NOT_ACCEPTABLE);
   }
+
+#ifndef WIN32
+ /*
+  * See if the PPD file is available locally...
+  */
+
+  if (!cg->servername[0])
+    cupsServer();
+
+  if (!strcasecmp(cg->servername, "localhost"))
+  {
+    char	ppdname[1024];		/* PPD filename */
+    struct stat	ppdinfo;		/* PPD file information */
+
+
+    snprintf(ppdname, sizeof(ppdname), "%s/%s.ppd", cg->cups_serverroot, name);
+    if (!stat(ppdname, &ppdinfo))
+    {
+     /*
+      * OK, the file exists, use it!
+      */
+
+      if (buffer[0])
+      {
+        unlink(buffer);
+
+	if (symlink(ppdname, buffer) && errno != EEXIST)
+        {
+          _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
+
+	  return (HTTP_SERVER_ERROR);
+	}
+      }
+      else
+      {
+        int		tries;		/* Number of tries */
+        const char	*tmpdir;	/* TMPDIR environment variable */
+	struct timeval	curtime;	/* Current time */
+
+       /*
+	* Previously we put root temporary files in the default CUPS temporary
+	* directory under /var/spool/cups.  However, since the scheduler cleans
+	* out temporary files there and runs independently of the user apps, we
+	* don't want to use it unless specifically told to by cupsd.
+	*/
+
+	if ((tmpdir = getenv("TMPDIR")) == NULL)
+#  ifdef __APPLE__
+	  tmpdir = "/private/tmp";	/* /tmp is a symlink to /private/tmp */
+#  else
+          tmpdir = "/tmp";
+#  endif /* __APPLE__ */
+
+       /*
+	* Make the temporary name using the specified directory...
+	*/
+
+	tries = 0;
+
+	do
+	{
+	 /*
+	  * Get the current time of day...
+	  */
+
+	  gettimeofday(&curtime, NULL);
+
+	 /*
+	  * Format a string using the hex time values...
+	  */
+
+	  snprintf(buffer, bufsize, "%s/%08lx%05lx", tmpdir,
+		   (unsigned long)curtime.tv_sec,
+		   (unsigned long)curtime.tv_usec);
+
+	 /*
+	  * Try to make a symlink...
+	  */
+
+	  if (!symlink(ppdname, buffer))
+	    break;
+
+	  tries ++;
+	}
+	while (tries < 1000);
+
+        if (tries >= 1000)
+	{
+          _cupsSetError(IPP_INTERNAL_ERROR, NULL, 0);
+
+	  return (HTTP_SERVER_ERROR);
+	}
+      }
+
+      if (*modtime <= ppdinfo.st_mtime)
+        return (HTTP_NOT_MODIFIED);
+      else
+      {
+        *modtime = ppdinfo.st_mtime;
+	return (HTTP_OK);
+      }
+    }
+  }
+#endif /* !WIN32 */
 
  /*
   * Try finding a printer URI for this printer...
@@ -1181,7 +1285,7 @@ cupsGetPrinters(char ***printers)	/* O - Printers */
  * overwritten on the next call to @link cupsGetPPD@, @link cupsGetPPD2@,
  * or @link cupsGetServerPPD@.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 char *					/* O - Name of PPD file or @code NULL@ on error */
@@ -1260,7 +1364,7 @@ cupsLastError(void)
 /*
  * 'cupsLastErrorString()' - Return the last IPP status-message.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 const char *				/* O - status-message text from last request */
@@ -1294,7 +1398,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
  * 'cupsPrintFile2()' - Print a file to a printer or class on the specified
  *                      server.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -1347,7 +1451,7 @@ cupsPrintFiles(
  * 'cupsPrintFiles2()' - Print one or more files to a printer or class on the
  *                       specified server.
  *
- * @since CUPS 1.1.21@
+ * @since CUPS 1.1.21/Mac OS X 10.4@
  */
 
 int					/* O - Job ID or 0 on error */

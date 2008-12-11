@@ -92,7 +92,7 @@ ppdCollect(ppd_file_t    *ppd,		/* I - PPD file data */
  * The choices array should be freed using @code free@ when you are
  * finished with it.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - Number of options marked */
@@ -265,7 +265,7 @@ ppdEmit(ppd_file_t    *ppd,		/* I - PPD file record */
  *
  * When "limit" is zero, this function is identical to ppdEmit().
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on failure */
@@ -511,7 +511,7 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
 /*
  * 'ppdEmitJCLEnd()' - Emit JCLEnd code to a file.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on failure */
@@ -570,7 +570,7 @@ ppdEmitJCLEnd(ppd_file_t *ppd,		/* I - PPD file record */
  * The return string is allocated on the heap and should be freed using
  * @code free@ when you are done with it.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - String containing option code or @code NULL@ if there is no option code */

@@ -42,7 +42,7 @@
 /*
  * 'httpAddrAny()' - Check for the "any" address.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 1 if "any", 0 otherwise */
@@ -68,7 +68,7 @@ httpAddrAny(const http_addr_t *addr)	/* I - Address to check */
 /*
  * 'httpAddrEqual()' - Compare two addresses.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int						/* O - 1 if equal, 0 if not */
@@ -101,7 +101,7 @@ httpAddrEqual(const http_addr_t *addr1,		/* I - First address */
 /*
  * 'httpAddrLength()' - Return the length of the address in bytes.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - Length in bytes */
@@ -132,7 +132,7 @@ httpAddrLength(const http_addr_t *addr)	/* I - Address */
 /*
  * 'httpAddrLocalhost()' - Check for the local loopback address.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 1 if local host, 0 otherwise */
@@ -171,7 +171,7 @@ httpAddrLocalhost(
 /*
  * 'httpAddrLookup()' - Lookup the hostname associated with the address.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - Host name */
@@ -306,7 +306,7 @@ _httpAddrPort(http_addr_t *addr)	/* I - Address */
 /*
  * 'httpAddrString()' - Convert an address to a numeric string.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - Numeric address string */
@@ -564,7 +564,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
  * Otherwise, return the FQDN for the local system using both gethostname()
  * and gethostbyname() to get the local hostname with domain.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 const char *				/* O - FQDN for connection or system */

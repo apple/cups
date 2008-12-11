@@ -544,7 +544,7 @@ apihelp:
 	mxmldoc --section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h dest.c language.c notify.c \
+		cups.h adminutil.c dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
 	mxmldoc --section "Programming" --title "File and Directory APIs" \
@@ -585,7 +585,7 @@ framedhelp:
 		--section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h dest.c language.c notify.c \
+		cups.h adminutil.c dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c
 	mxmldoc --framed api-filedir \
@@ -626,7 +626,7 @@ docsets:
 	../tools/makedocset --docset org.cups.cups.docset \
 		--title "CUPS API" \
 		--header api-cups.header --intro api-cups.shtml \
-		cups.h dest.c language.c notify.c \
+		cups.h adminutil.c dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c
 	../tools/makedocset --docset org.cups.filedir.docset \

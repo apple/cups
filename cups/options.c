@@ -1,5 +1,5 @@
 /*
- * "$Id: options.c 7819 2008-08-01 00:27:24Z mike $"
+ * "$Id: options.c 8181 2008-12-10 17:29:57Z mike $"
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
@@ -35,6 +35,15 @@
 
 
 /*
+ * Local functions...
+ */
+
+static int	cups_compare_options(cups_option_t *a, cups_option_t *b);
+static int	cups_find_option(const char *name, int num_options,
+	                         cups_option_t *option, int prev, int *rdiff);
+
+
+/*
  * 'cupsAddOption()' - Add an option to an option array.
  *
  * New option arrays can be initialized simply by passing 0 for the
@@ -47,8 +56,9 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 	      int           num_options,/* I  - Number of options */
               cups_option_t **options)	/* IO - Pointer to options */
 {
-  int		i;			/* Looping var */
   cups_option_t	*temp;			/* Pointer to new option */
+  int		insert,			/* Insertion point */
+		diff;			/* Result of search */
 
 
   DEBUG_printf(("cupsAddOption(name=\"%s\", value=\"%s\", num_options=%d, "
@@ -64,17 +74,28 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
   * Look for an existing option with the same name...
   */
 
-  for (i = 0, temp = *options; i < num_options; i ++, temp ++)
-    if (!strcasecmp(temp->name, name))
-      break;
+  if (num_options == 0)
+  {
+    insert = 0;
+    diff   = 1;
+  }
+  else
+  {
+    insert = cups_find_option(name, num_options, *options, num_options - 1,
+                              &diff);
 
-  if (i >= num_options)
+    if (diff > 0)
+      insert ++;
+  }
+
+  if (diff)
   {
    /*
     * No matching option name...
     */
 
-    DEBUG_puts("cupsAddOption: New option...");
+    DEBUG_printf(("cupsAddOption: New option inserted at index %d...\n",
+                  insert));
 
     if (num_options == 0)
       temp = (cups_option_t *)malloc(sizeof(cups_option_t));
@@ -88,8 +109,17 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
       return (0);
     }
 
-    *options    = temp;
-    temp        += num_options;
+    *options = temp;
+
+    if (insert < num_options)
+    {
+      DEBUG_printf(("cupsAddOption: Shifting %d options...\n",
+                    (int)(num_options - insert)));
+      memmove(temp + insert + 1, temp + insert,
+	      (num_options - insert) * sizeof(cups_option_t));
+    }
+
+    temp        += insert;
     temp->name  = _cupsStrAlloc(name);
     num_options ++;
   }
@@ -99,7 +129,10 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     * Match found; free the old value...
     */
 
-    DEBUG_puts("cupsAddOption: Option already exists...");
+    DEBUG_printf(("cupsAddOption: Option already exists at index %d...\n",
+                  insert));
+
+    temp = *options + insert;
     _cupsStrFree(temp->value);
   }
 
@@ -148,7 +181,8 @@ cupsGetOption(const char    *name,	/* I - Name of option */
               int           num_options,/* I - Number of options */
               cups_option_t *options)	/* I - Options */
 {
-  int	i;				/* Looping var */
+  int	diff,				/* Result of comparison */
+	match;				/* Matching index */
 
 
   DEBUG_printf(("cupsGetOption(name=\"%s\", num_options=%d, options=%p)\n",
@@ -160,12 +194,13 @@ cupsGetOption(const char    *name,	/* I - Name of option */
     return (NULL);
   }
 
-  for (i = 0; i < num_options; i ++)
-    if (!strcasecmp(options[i].name, name))
-    {
-      DEBUG_printf(("cupsGetOption: Returning \"%s\"\n", options[i].value));
-      return (options[i].value);
-    }
+  match = cups_find_option(name, num_options, options, -1, &diff);
+
+  if (!diff)
+  {
+    DEBUG_printf(("cupsGetOption: Returning \"%s\"\n", options[match].value));
+    return (options[match].value);
+  }
 
   DEBUG_puts("cupsGetOption: Returning NULL");
   return (NULL);
@@ -192,6 +227,7 @@ cupsParseOptions(
 	*ptr,				/* Pointer into string */
 	*name,				/* Pointer to name */
 	*value,				/* Pointer to value */
+	sep,				/* Separator character */
 	quote;				/* Quote character */
 
 
@@ -277,9 +313,12 @@ cupsParseOptions(
     while (isspace(*ptr & 255))
       *ptr++ = '\0';
 
+    if ((sep = *ptr) == '=')
+      *ptr++ = '\0';
+
     DEBUG_printf(("cupsParseOptions: name=\"%s\"\n", name));
 
-    if (*ptr != '=')
+    if (sep != '=')
     {
      /*
       * Boolean option...
@@ -298,8 +337,7 @@ cupsParseOptions(
     * Remove = and parse the value...
     */
 
-    *ptr++ = '\0';
-    value  = ptr;
+    value = ptr;
 
     while (*ptr && !isspace(*ptr & 255))
     {
@@ -401,7 +439,7 @@ cupsParseOptions(
 /*
  * 'cupsRemoveOption()' - Remove an option from an option array.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O  - New number of options */
@@ -463,5 +501,129 @@ cupsRemoveOption(
 
 
 /*
- * End of "$Id: options.c 7819 2008-08-01 00:27:24Z mike $".
+ * 'cups_compare_options()' - Compare two options.
+ */
+
+static int				/* O - Result of comparison */
+cups_compare_options(cups_option_t *a,	/* I - First option */
+		     cups_option_t *b)	/* I - Second option */
+{
+  return (strcasecmp(a->name, b->name));
+}
+
+
+/*
+ * 'cups_find_option()' - Find an option using a binary search.
+ */
+
+static int				/* O - Index of match */
+cups_find_option(
+    const char    *name,		/* I - Option name */
+    int           num_options,		/* I - Number of options */
+    cups_option_t *options,		/* I - Options */
+    int           prev,			/* I - Previous index */
+    int           *rdiff)		/* O - Difference of match */
+{
+  int		left,			/* Low mark for binary search */
+		right,			/* High mark for binary search */
+		current,		/* Current index */
+		diff;			/* Result of comparison */
+  cups_option_t	key;			/* Search key */
+
+
+  DEBUG_printf(("cups_find_option(name=\"%s\", num_options=%d, options=%p, "
+	        "prev=%d, rdiff=%p)\n", name, num_options, options, prev,
+		rdiff));
+
+#ifdef DEBUG
+  for (left = 0; left < num_options; left ++)
+    DEBUG_printf(("cups_find_option: options[%d].name=\"%s\", .value=\"%s\"\n",
+                  left, options[left].name, options[left].value));
+#endif /* DEBUG */
+
+  key.name = (char *)name;
+
+  if (prev >= 0)
+  {
+   /*
+    * Start search on either side of previous...
+    */
+
+    if ((diff = cups_compare_options(&key, options + prev)) == 0 ||
+        (diff < 0 && prev == 0) ||
+	(diff > 0 && prev == (num_options - 1)))
+    {
+      *rdiff = diff;
+      return (prev);
+    }
+    else if (diff < 0)
+    {
+     /*
+      * Start with previous on right side...
+      */
+
+      left  = 0;
+      right = prev;
+    }
+    else
+    {
+     /*
+      * Start wih previous on left side...
+      */
+
+      left  = prev;
+      right = num_options - 1;
+    }
+  }
+  else
+  {
+   /*
+    * Start search in the middle...
+    */
+
+    left  = 0;
+    right = num_options - 1;
+  }
+
+  do
+  {
+    current = (left + right) / 2;
+    diff    = cups_compare_options(&key, options + current);
+
+    if (diff == 0)
+      break;
+    else if (diff < 0)
+      right = current;
+    else
+      left = current;
+  }
+  while ((right - left) > 1);
+
+  if (diff != 0)
+  {
+   /*
+    * Check the last 1 or 2 elements...
+    */
+
+    if ((diff = cups_compare_options(&key, options + left)) <= 0)
+      current = left;
+    else
+    {
+      diff    = cups_compare_options(&key, options + right);
+      current = right;
+    }
+  }
+
+ /*
+  * Return the closest destination and the difference...
+  */
+
+  *rdiff = diff;
+
+  return (current);
+}
+
+
+/*
+ * End of "$Id: options.c 8181 2008-12-10 17:29:57Z mike $".
  */

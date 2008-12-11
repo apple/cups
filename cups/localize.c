@@ -62,7 +62,7 @@ static void		ppd_ll_CC(char *ll_CC, int ll_CC_size);
  * descriptions, printer presets, and custom option parameters.  Each
  * localized string uses the UTF-8 character encoding.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 int					/* O - 0 on success, -1 on error */
@@ -246,7 +246,7 @@ ppdLocalizeAttr(ppd_file_t *ppd,	/* I - PPD file */
  *
  * If no value of the requested scheme can be found, NULL is returned.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 const char *				/* O - Value or NULL if not found */

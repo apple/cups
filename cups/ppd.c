@@ -323,7 +323,7 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 /*
  * 'ppdErrorString()' - Returns the text assocated with a status.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 const char *				/* O - Status string */
@@ -390,7 +390,7 @@ _ppdGetEncoding(const char *name)	/* I - LanguageEncoding string */
 /*
  * 'ppdLastError()' - Return the status from the last ppdOpen*().
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 ppd_status_t				/* O - Status code */
@@ -444,7 +444,7 @@ ppdOpen(FILE *fp)			/* I - File to read from */
 /*
  * 'ppdOpen2()' - Read a PPD file into memory.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ppd_file_t *				/* O - PPD file record or @code NULL@ if the PPD file could not be opened. */
@@ -1321,7 +1321,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	strlcpy(choice->text,
 	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
 		sizeof(choice->text));
-        choice->code = _cupsStrAlloc(custom_attr->value);
+        choice->code = _cupsStrRetain(custom_attr->value);
       }
     }
     else if (!strcmp(keyword, "JCLOpenUI"))
@@ -1424,7 +1424,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	strlcpy(choice->text,
 	        custom_attr->text[0] ? custom_attr->text : _("Custom"),
 		sizeof(choice->text));
-        choice->code = _cupsStrAlloc(custom_attr->value);
+        choice->code = _cupsStrRetain(custom_attr->value);
       }
     }
     else if (!strcmp(keyword, "CloseUI") || !strcmp(keyword, "JCLCloseUI"))
@@ -2073,7 +2073,7 @@ ppdOpenFile(const char *filename)	/* I - File to read from */
 /*
  * 'ppdSetConformance()' - Set the conformance level for PPD files.
  *
- * @since CUPS 1.1.20@
+ * @since CUPS 1.1.20/Mac OS X 10.4@
  */
 
 void

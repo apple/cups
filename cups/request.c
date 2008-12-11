@@ -112,7 +112,7 @@ cupsDoFileRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HT
  * If "outfile" is a valid file descriptor, cupsDoIORequest() copies
  * all of the data after the IPP response message to the file.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 ipp_t *					/* O - Response data */

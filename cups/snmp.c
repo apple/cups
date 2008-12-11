@@ -111,8 +111,6 @@ static void		snmp_set_error(cups_snmp_t *packet,
 
 /*
  * '_cupsSNMPClose()' - Close a SNMP socket.
- *
- * @since CUPS 1.4@
  */
 
 void
@@ -132,8 +130,6 @@ _cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
  * '_cupsSNMPCopyOID()' - Copy an OID.
  *
  * The array pointed to by "src" is terminated by the value -1.
- *
- * @since CUPS 1.4@
  */
 
 int *					/* O - New OID */
@@ -161,8 +157,6 @@ _cupsSNMPCopyOID(int       *dst,	/* I - Destination OID */
  *
  * The default community name is the first community name found in the
  * snmp.conf file. If no community name is defined there, "public" is used.
- *
- * @since CUPS 1.4@
  */
 
 const char *				/* O - Default community name */
@@ -207,8 +201,6 @@ _cupsSNMPDefaultCommunity(void)
  * '_cupsSNMPIsOID()' - Test whether a SNMP response contains the specified OID.
  *
  * The array pointed to by "oid" is terminated by the value -1.
- *
- * @since CUPS 1.4@
  */
 
 int					/* O - 1 if equal, 0 if not equal */
@@ -257,8 +249,6 @@ _cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
  *                              OID prefix.
  *
  * The array pointed to by "prefix" is terminated by the value -1.
- *
- * @since CUPS 1.4@
  */
 
 int					/* O - 1 if prefixed, 0 if not prefixed */
@@ -306,8 +296,6 @@ _cupsSNMPIsOIDPrefixed(
 
 /*
  * '_cupsSNMPOIDToString()' - Convert an OID to a string.
- *
- * @since CUPS 1.4@
  */
 
 
@@ -348,8 +336,6 @@ _cupsSNMPOIDToString(const int *src,	/* I - OID */
 
 /*
  * '_cupsSNMPOpen()' - Open a SNMP socket.
- *
- * @since CUPS 1.4@
  */
 
 int					/* O - SNMP socket file descriptor */
@@ -398,8 +384,6 @@ _cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_IN
  *
  * If "timeout" is negative, @code _cupsSNMPRead@ will wait for a response
  * indefinitely.
- *
- * @since CUPS 1.4@
  */
 
 cups_snmp_t *				/* O - SNMP packet or @code NULL@ if none */
@@ -513,8 +497,6 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
 /*
  * '_cupsSNMPSetDebug()' - Enable/disable debug logging to stderr.
- *
- * @since CUPS 1.4@
  */
 
 void
@@ -537,8 +519,6 @@ _cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
  *
  * @code NULL@ is returned if the array is not large enough or the string is
  * not a valid OID number.
- *
- * @since CUPS 1.4@
  */
 
 int *					/* O - Pointer to OID array or @code NULL@ on error */
@@ -609,8 +589,6 @@ _cupsSNMPStringToOID(const char *src,	/* I - OID string */
  *
  * If "timeout" is negative, @code _cupsSNMPWalk@ will wait for a response
  * indefinitely.
- *
- * @since CUPS 1.4@
  */
 
 int					/* O - Number of OIDs found or -1 on error */
@@ -696,8 +674,6 @@ _cupsSNMPWalk(int            fd,	/* I - SNMP socket */
  * '_cupsSNMPWrite()' - Send an SNMP query packet.
  *
  * The array pointed to by "oid" is terminated by the value -1.
- *
- * @since CUPS 1.4@
  */
 
 int					/* O - 1 on success, 0 on error */

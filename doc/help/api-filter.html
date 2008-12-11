@@ -370,6 +370,7 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
+<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 <li><a href="#SECURITY">Security Considerations</a></li>
 <li><a href="#TEMPFILES">Temporary Files</a></li>
@@ -407,7 +408,6 @@ div.contents ul.subcontents li {
 	<li><a href="#cups_sc_state_e" title="Printer state bits">cups_sc_state_e</a></li>
 	<li><a href="#cups_sc_status_e" title="Response status codes">cups_sc_status_e</a></li>
 </ul></li>
-</ul>
 <!--
   "$Id: api-filter.shtml 7962 2008-09-18 17:31:33Z mike $"
 
@@ -967,7 +967,7 @@ void *my_data;
 <a href="#cupsSideChannelSNMPWalk">cupsSNMPSideChannelWalk</a>(".1.3.6.1.2.1.43", 5.0, my_callback, my_data);
 </pre>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsBackChannelRead">cupsBackChannelRead</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsBackChannelRead">cupsBackChannelRead</a></h3>
 <p class="description">Read data from the backchannel.</p>
 <p class="code">
 ssize_t cupsBackChannelRead (<br>
@@ -992,7 +992,7 @@ parameter controls how many seconds to wait for the data - use 0.0 to
 return immediately if there is no data, -1.0 to wait for data indefinitely.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="cupsBackChannelWrite">cupsBackChannelWrite</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsBackChannelWrite">cupsBackChannelWrite</a></h3>
 <p class="description">Write data to the backchannel.</p>
 <p class="code">
 ssize_t cupsBackChannelWrite (<br>
@@ -1018,7 +1018,7 @@ controls how many seconds to wait for the data to be written - use
 indefinitely.
 
 </p>
-<h3 class="function"><a name="cupsBackendDeviceURI">cupsBackendDeviceURI</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsBackendDeviceURI">cupsBackendDeviceURI</a></h3>
 <p class="description">Get the device URI for a backend.</p>
 <p class="code">
 const char *cupsBackendDeviceURI (<br>
@@ -1035,8 +1035,10 @@ const char *cupsBackendDeviceURI (<br>
 <p class="discussion">The &quot;argv&quot; argument is the argv argument passed to main(). This
 function returns the device URI passed in the DEVICE_URI environment
 variable or the device URI passed in argv[0], whichever is found
-first.</p>
-<h3 class="function"><a name="cupsBackendReport">cupsBackendReport</a></h3>
+first.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsBackendReport">cupsBackendReport</a></h3>
 <p class="description">Write a device line from a backend.</p>
 <p class="code">
 void cupsBackendReport (<br>
@@ -1065,8 +1067,10 @@ void cupsBackendReport (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function writes a single device line to stdout for a backend.
 It handles quoting of special characters in the device-make-and-model,
-device-info, device-id, and device-location strings.</p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
+device-info, device-id, and device-location strings.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="cupsSideChannelDoRequest">cupsSideChannelDoRequest</a></h3>
 <p class="description">Send a side-channel command to a backend and wait for a response.</p>
 <p class="code">
 <a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelDoRequest (<br>
@@ -1100,7 +1104,7 @@ pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsSideChannelRead">cupsSideChannelRead</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="cupsSideChannelRead">cupsSideChannelRead</a></h3>
 <p class="description">Read a side-channel message.</p>
 <p class="code">
 int cupsSideChannelRead (<br>
@@ -1223,7 +1227,7 @@ support SNMP queries.  <code>CUPS_SC_STATUS_NO_RESPONSE</code> is returned when
 the printer does not respond to the first SNMP query.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.3&nbsp;</span><a name="cupsSideChannelWrite">cupsSideChannelWrite</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="cupsSideChannelWrite">cupsSideChannelWrite</a></h3>
 <p class="description">Write a side-channel message.</p>
 <p class="code">
 int cupsSideChannelWrite (<br>

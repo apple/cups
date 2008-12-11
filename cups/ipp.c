@@ -160,7 +160,7 @@ ippAddBooleans(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddCollection()' - Add a collection value.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -193,7 +193,7 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
 /*
  * 'ippAddCollections()' - Add an array of collection values.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 ipp_attribute_t *			/* O - New attribute */
@@ -342,7 +342,7 @@ ippAddIntegers(ipp_t      *ipp,		/* I - IPP message */
 /*
  * 'ippAddOctetString()' - Add an octetString value to an IPP message.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ipp_attribute_t	*			/* O - New attribute */
@@ -789,7 +789,7 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
 /*
  * 'ippDeleteAttribute()' - Delete a single attribute in an IPP message.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 void
@@ -964,7 +964,7 @@ ippNew(void)
  * attributes-natural-language attributes added. The
  * attributes-natural-language value is derived from the current locale.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ipp_t *					/* O - IPP request message */
@@ -1039,7 +1039,7 @@ ippRead(http_t *http,			/* I - HTTP connection */
 /*
  * 'ippReadFile()' - Read data for an IPP message from a file.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 ipp_state_t				/* O - Current state */
@@ -1055,7 +1055,7 @@ ippReadFile(int   fd,			/* I - HTTP data */
 /*
  * 'ippReadIO()' - Read data for an IPP message.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ipp_state_t				/* O - Current state */
@@ -1798,7 +1798,7 @@ ippWrite(http_t *http,			/* I - HTTP connection */
 /*
  * 'ippWriteFile()' - Write data for an IPP message to a file.
  *
- * @since CUPS 1.1.19@
+ * @since CUPS 1.1.19/Mac OS X 10.3@
  */
 
 ipp_state_t				/* O - Current state */
@@ -1816,7 +1816,7 @@ ippWriteFile(int   fd,			/* I - HTTP data */
 /*
  * 'ippWriteIO()' - Write data for an IPP message.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 ipp_state_t				/* O - Current state */

@@ -367,6 +367,7 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
+<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#TASKS">Functions by Task</a><ul class="subcontents">
 <li><a href="#OPENCLOSE">Opening and Closing Raster Streams</a></li>
@@ -420,7 +421,6 @@ by the RIPs...">cups_orient_t</a></li>
 	<li><a href="#cups_order_e" title="cupsColorOrder attribute values">cups_order_e</a></li>
 	<li><a href="#cups_orient_e" title="">cups_orient_e</a></li>
 </ul></li>
-</ul>
 <!--
   "$Id$"
 
@@ -1181,9 +1181,9 @@ factor not applied) </dd>
 <p class="description"></p>
 <h4 class="constants">Constants</h4>
 <dl>
-<dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE Lab </dd>
-<dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE XYZ </dd>
 <dt>CUPS_CSPACE_CMY </dt>
 <dd class="description">Cyan, magenta, yellow</dd>
@@ -1195,35 +1195,35 @@ factor not applied) </dd>
 <dd class="description">Gold, magenta, yellow, silver</dd>
 <dt>CUPS_CSPACE_GOLD </dt>
 <dd class="description">Gold foil</dd>
-<dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 1 color </dd>
-<dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 2 colors </dd>
-<dt>CUPS_CSPACE_ICC3 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC3 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 3 colors </dd>
-<dt>CUPS_CSPACE_ICC4 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC4 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 4 colors </dd>
-<dt>CUPS_CSPACE_ICC5 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC5 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 5 colors </dd>
-<dt>CUPS_CSPACE_ICC6 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC6 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 6 colors </dd>
-<dt>CUPS_CSPACE_ICC7 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC7 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 7 colors </dd>
-<dt>CUPS_CSPACE_ICC8 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC8 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 8 colors </dd>
-<dt>CUPS_CSPACE_ICC9 <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICC9 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 9 colors </dd>
-<dt>CUPS_CSPACE_ICCA <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCA <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 10 colors </dd>
-<dt>CUPS_CSPACE_ICCB <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCB <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 11 colors </dd>
-<dt>CUPS_CSPACE_ICCC <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCC <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 12 colors </dd>
-<dt>CUPS_CSPACE_ICCD <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCD <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 13 colors </dd>
-<dt>CUPS_CSPACE_ICCE <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCE <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 14 colors </dd>
-<dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19&nbsp;</span></dt>
+<dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 15 colors </dd>
 <dt>CUPS_CSPACE_K </dt>
 <dd class="description">Black</dd>
@@ -1298,7 +1298,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Open stream for reading</dd>
 <dt>CUPS_RASTER_WRITE </dt>
 <dd class="description">Open stream for writing</dd>
-<dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3&nbsp;</span></dt>
+<dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Open stream for compressed writing </dd>
 </dl>
 <h3 class="enumeration"><a name="cups_order_e">cups_order_e</a></h3>

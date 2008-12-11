@@ -2317,7 +2317,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 	for (i = 0; i < p->num_printers; i ++)
 	{
           if (attr != NULL)
-            attr->values[i].string.text = _cupsStrAlloc(p->printers[i]->name);
+            attr->values[i].string.text = _cupsStrRetain(p->printers[i]->name);
 
 	  p->type &= ~CUPS_PRINTER_OPTIONS | p->printers[i]->type;
         }
@@ -2377,7 +2377,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrAlloc(oldattr->values[i].string.text);
+	      _cupsStrRetain(oldattr->values[i].string.text);
       }
     }
 
@@ -2402,7 +2402,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrAlloc(oldattr->values[i].string.text);
+	      _cupsStrRetain(oldattr->values[i].string.text);
       }
     }
 
@@ -2415,7 +2415,7 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       {
 	for (i = 0; i < oldattr->num_values; i ++)
 	  attr->values[i].string.text =
-	      _cupsStrAlloc(oldattr->values[i].string.text);
+	      _cupsStrRetain(oldattr->values[i].string.text);
       }
     }
 

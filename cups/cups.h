@@ -59,7 +59,7 @@ extern "C" {
  * Constants...
  */
 
-#  define CUPS_VERSION		1.0399
+#  define CUPS_VERSION		1.0400
 #  define CUPS_VERSION_MAJOR	1
 #  define CUPS_VERSION_MINOR	4
 #  define CUPS_VERSION_PATCH	-1
@@ -112,11 +112,11 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_DEFAULT = 0x20000,	/* Default printer on network */
   CUPS_PRINTER_FAX = 0x40000,		/* Fax queue */
   CUPS_PRINTER_REJECTING = 0x80000,	/* Printer is rejecting jobs */
-  CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer @since CUPS 1.2@ */
-  CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared @since CUPS 1.2@ */
-  CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2@ */
-  CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2@ */
-  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3@ */
+  CUPS_PRINTER_DELETE = 0x100000,	/* Delete printer @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_PRINTER_NOT_SHARED = 0x200000,	/* Printer is not shared @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2/Mac OS X 10.5@ */
+  CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3/Mac OS X 10.5@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */
 };
 

@@ -102,7 +102,8 @@ main(int  argc,				/* I - Number of command-line args */
 		sep;			/* Separator character */
   int		snmp_fd,		/* SNMP socket */
 		start_count,		/* Page count via SNMP at start */
-		page_count;		/* Page count via SNMP */
+		page_count,		/* Page count via SNMP */
+		have_supplies;		/* Printer supports supply levels? */
   int		num_files;		/* Number of files to print */
   char		**files,		/* Files to print */
 		*filename;		/* Pointer to single filename */
@@ -630,19 +631,10 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
-  {
-    if (backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count, NULL))
-    {
-     /*
-      * No, close it...
-      */
-
-      _cupsSNMPClose(snmp_fd);
-      snmp_fd = -1;
-    }
-  }
+    have_supplies = !backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count,
+                                         NULL);
   else
-    start_count = 0;
+    have_supplies = start_count = 0;
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -1258,7 +1250,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Collect the final page count as needed...
   */
 
-  if (snmp_fd >= 0 && 
+  if (have_supplies && 
       !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);

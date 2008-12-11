@@ -33,7 +33,7 @@
  *
  * The returned string must be freed by the caller using @code free@.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - Subject string or @code NULL@ */
@@ -164,7 +164,7 @@ cupsNotifySubject(cups_lang_t *lang,	/* I - Language data */
  *
  * The returned string must be freed by the caller using @code free@.
  *
- * @since CUPS 1.2@
+ * @since CUPS 1.2/Mac OS X 10.5@
  */
 
 char *					/* O - Message text or @code NULL@ */

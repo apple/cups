@@ -1740,8 +1740,8 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       attr = ippAddStrings(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-sheets",
                            2, NULL, NULL);
-      attr->values[0].string.text = _cupsStrAlloc(printer->job_sheets[0]);
-      attr->values[1].string.text = _cupsStrAlloc(printer->job_sheets[1]);
+      attr->values[0].string.text = _cupsStrRetain(printer->job_sheets[0]);
+      attr->values[1].string.text = _cupsStrRetain(printer->job_sheets[1]);
     }
 
     job->job_sheets = attr;
@@ -2656,7 +2656,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         continue;
 
       printer->reasons[printer->num_reasons] =
-          _cupsStrAlloc(attr->values[i].string.text);
+          _cupsStrRetain(attr->values[i].string.text);
 
       if (!strcmp(printer->reasons[printer->num_reasons], "paused") &&
           printer->state != IPP_PRINTER_STOPPED)
@@ -4543,11 +4543,17 @@ copy_attribute(
           for (i = 0; i < attr->num_values; i ++)
 	    toattr->values[i].string.text = attr->values[i].string.text;
         }
-	else
+	else if (attr->value_tag & IPP_TAG_COPY)
 	{
           for (i = 0; i < attr->num_values; i ++)
 	    toattr->values[i].string.text =
 	        _cupsStrAlloc(attr->values[i].string.text);
+	}
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	    toattr->values[i].string.text =
+	        _cupsStrRetain(attr->values[i].string.text);
 	}
         break;
 
@@ -4594,7 +4600,7 @@ copy_attribute(
 	    toattr->values[i].string.text    = attr->values[i].string.text;
           }
         }
-	else
+	else if (attr->value_tag & IPP_TAG_COPY)
 	{
           for (i = 0; i < attr->num_values; i ++)
 	  {
@@ -4607,6 +4613,21 @@ copy_attribute(
 
 	    toattr->values[i].string.text =
 	        _cupsStrAlloc(attr->values[i].string.text);
+          }
+        }
+	else
+	{
+          for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!i)
+              toattr->values[i].string.charset =
+	          _cupsStrRetain(attr->values[i].string.charset);
+	    else
+              toattr->values[i].string.charset =
+	          toattr->values[0].string.charset;
+
+	    toattr->values[i].string.text =
+	        _cupsStrRetain(attr->values[i].string.text);
           }
         }
         break;
@@ -5409,7 +5430,7 @@ copy_printer_attrs(
         if ((p2_uri = ippFindAttribute(p2->attrs, "printer-uri-supported",
 	                               IPP_TAG_URI)) != NULL)
           member_uris->values[i].string.text =
-	      _cupsStrAlloc(p2_uri->values[0].string.text);
+	      _cupsStrRetain(p2_uri->values[0].string.text);
         else
 	{
 	  httpAssembleURIf(HTTP_URI_CODING_ALL, printer_uri,
@@ -7989,7 +8010,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
     {
       attr->value_tag = newattr->value_tag;
       attr->values[0].string.text =
-          _cupsStrAlloc(newattr->values[0].string.text);
+          _cupsStrRetain(newattr->values[0].string.text);
     }
     else
     {

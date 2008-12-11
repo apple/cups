@@ -124,7 +124,7 @@ typedef enum http_auth_e		/**** HTTP authentication types ****/
   HTTP_AUTH_MD5_SESS,			/* MD5-session authentication in use */
   HTTP_AUTH_MD5_INT,			/* Digest authentication in use for body */
   HTTP_AUTH_MD5_SESS_INT,		/* MD5-session authentication in use for body */
-  HTTP_AUTH_NEGOTIATE			/* GSSAPI authentication in use @since CUPS 1.3@ */
+  HTTP_AUTH_NEGOTIATE			/* GSSAPI authentication in use @since CUPS 1.3/Mac OS X 10.5@ */
 } http_auth_t;
 
 typedef enum http_encoding_e		/**** HTTP transfer encoding values ****/
@@ -288,7 +288,7 @@ typedef enum http_version_e		/**** HTTP version numbers ****/
 typedef union _http_addr_u		/**** Socket address union, which
 					 **** makes using IPv6 and other
 					 **** address types easier and
-					 **** more portable. @since CUPS 1.2@
+					 **** more portable. @since CUPS 1.2/Mac OS X 10.5@
 					 ****/
 {
   struct sockaddr	addr;		/* Base structure for family value */
@@ -305,7 +305,7 @@ typedef union _http_addr_u		/**** Socket address union, which
 typedef struct http_addrlist_s		/**** Socket address list, which is
 					 **** used to enumerate all of the
 					 **** addresses that are associated
-					 **** with a hostname. @since CUPS 1.2@
+					 **** with a hostname. @since CUPS 1.2/Mac OS X 10.5@
 					 ****/
 {
   struct http_addrlist_s *next;		/* Pointer to next address in list */
