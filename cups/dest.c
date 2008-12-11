@@ -1080,6 +1080,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
   defaultPaperID = CFPreferencesCopyAppValue(kDefaultPaperIDKey,
                                              kPMPrintingPreferences);
   if (!defaultPaperID ||
+      CFGetTypeID(defaultPaperID) != CFStringGetTypeID() ||
       !CFStringGetCString(defaultPaperID, name, namesize,
 			  kCFStringEncodingUTF8))
     name[0] = '\0';
