@@ -514,9 +514,28 @@ main(int  argc,				/* I - Number of command-line args */
 	  }
 	}
 
-      if (ppdFindAttr(ppd, "FileVersion", NULL) != NULL)
+      if ((attr = ppdFindAttr(ppd, "FileVersion", NULL)) != NULL)
       {
-	if (verbose > 0)
+        for (ptr = attr->value; *ptr; ptr ++)
+	  if (!isdigit(*ptr & 255) && *ptr != '.')
+	    break;
+
+	if (*ptr)
+	{
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	    _cupsLangPrintf(stdout,
+			    _("      **FAIL**  Bad FileVersion \"%s\"\n"
+			      "                REF: Page 56, section 5.3.\n"),
+			    attr->value);
+	  }
+
+	  errors ++;
+	}
+	else if (verbose > 0)
 	  _cupsLangPuts(stdout, _("        PASS    FileVersion\n"));
       }
       else
@@ -534,9 +553,33 @@ main(int  argc,				/* I - Number of command-line args */
 	errors ++;
       }
 
-      if (ppdFindAttr(ppd, "FormatVersion", NULL) != NULL)
+      if ((attr = ppdFindAttr(ppd, "FormatVersion", NULL)) != NULL)
       {
-	if (verbose > 0)
+        ptr = attr->value;
+	if (*ptr == '4' && ptr[1] == '.')
+	{
+	  
+	  for (ptr += 2; *ptr; ptr ++)
+	    if (!isdigit(*ptr & 255))
+	      break;
+        }
+
+	if (*ptr)
+	{
+	  if (verbose >= 0)
+	  {
+	    if (!errors && !verbose)
+	      _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	    _cupsLangPrintf(stdout,
+			    _("      **FAIL**  Bad FormatVersion \"%s\"\n"
+			      "                REF: Page 56, section 5.3.\n"),
+			    attr->value);
+	  }
+
+	  errors ++;
+	}
+	else if (verbose > 0)
 	  _cupsLangPuts(stdout, _("        PASS    FormatVersion\n"));
       }
       else

@@ -22,7 +22,7 @@ Listen localhost:@DEFAULT_IPP_PORT@
 Browsing On
 BrowseOrder allow,deny
 BrowseAllow all
-BrowseLocalProtocols
+BrowseLocalProtocols @CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS@
 
 # Default authentication type, when authentication is required...
 DefaultAuthType Basic

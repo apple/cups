@@ -1,9 +1,13 @@
-CHANGES.txt - 2008-12-10
+CHANGES.txt - 2008-12-15
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
+	- The cupstestppd utility now validates the FileVersion and
+	  FormatVersion values in PPD files.
+	- The default cupsd.conf file did not reflect the
+	  --with-local-protocols value set at compile-time (STR #3037)
 	- The cupsGetPPD* APIs now create symlinks to local PPD files
 	  rather than copying them whenever possible.
 	- Various performance optimizations in the string pool, dests, and
@@ -271,4 +275,3 @@ CHANGES IN CUPS V1.4b1
 	- Added new cupsGetPPD3() API to allow applications to
 	  cache PPDs safely (STR #1473)
 	- Added generic PostScript and PCL printer driver PPDs.
-

@@ -163,7 +163,7 @@ print_device(const char *uri,		/* I - Device URI */
 	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
 	  while (usb_bulk_write(printer->handle, printer->write_endp, buffer,
-	                        bytes, 5000) < 0)
+	                        bytes, 45000) < 0)
 	  {
 	    _cupsLangPrintf(stderr,
 			    _("ERROR: Unable to write %d bytes to printer!\n"),
@@ -202,6 +202,23 @@ close_device(usb_printer_t *printer)	/* I - Printer */
 {
   if (printer->handle)
   {
+   /*
+    * Release interfaces before closing so that we know all data is written
+    * to the device...
+    */
+
+    int number = printer->device->config[printer->conf].
+                     interface[printer->iface].
+		     altsetting[printer->altset].bInterfaceNumber;
+    usb_release_interface(printer->handle, number);
+
+    if (number != 0)
+      usb_release_interface(printer->handle, 0);
+
+   /*
+    * Close the interface and return...
+    */
+
     usb_close(printer->handle);
     printer->handle = NULL;
   }
