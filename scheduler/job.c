@@ -608,6 +608,13 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
   update_job_attrs(job, 0);
 
+ /*
+  * Clear the "connecting-to-device" reason, which is only valid when a
+  * printer is processing...
+  */
+
+  cupsdSetPrinterReasons(printer, "-connecting-to-device");
+
   if (job->status < 0)
   {
    /*

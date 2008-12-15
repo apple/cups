@@ -1,6 +1,12 @@
 CHANGES.txt - 2008-12-15
 ------------------------
 
+CHANGES IN CUPS V1.4b3
+
+	- The scheduler did not clear the "connecting-to-device" reason keyword
+	  when a job finished.
+
+
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
