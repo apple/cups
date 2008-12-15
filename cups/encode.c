@@ -354,7 +354,7 @@ cupsEncodeOptions2(
     * Copy the name over...
     */
 
-    attr->name = _cupsStrRetain(option->name);
+    attr->name = _cupsStrAlloc(option->name);
 
     if (count > 1)
     {
@@ -535,9 +535,7 @@ cupsEncodeOptions2(
             break;
 
 	default :
-	    if (count == 1)
-	      attr->values[0].string.text = _cupsStrRetain(val);
-	    else if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
+	    if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
 	    {
 	     /*
 	      * Ran out of memory!
