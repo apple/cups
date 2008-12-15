@@ -1,9 +1,11 @@
-CHANGES.txt - 2008-12-11
+CHANGES.txt - 2008-12-15
 ------------------------
 
 CHANGES IN CUPS V1.4b2
 
 	- Documentation updates (STR #2983, STR #2998, STR #3021)
+	- The cupstestppd utility now validates the FileVersion and
+	  FormatVersion values in PPD files.
 	- The default cupsd.conf file did not reflect the
 	  --with-local-protocols value set at compile-time (STR #3037)
 	- The cupsGetPPD* APIs now create symlinks to local PPD files
