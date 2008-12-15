@@ -1809,14 +1809,19 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
     if (job->filters[i] > 0)
     {
       cupsdEndProcess(job->filters[i], force);
-      job->filters[i] = 0;
+      if (force)
+        job->filters[i] = 0;
     }
 
   if (job->backend > 0)
   {
     cupsdEndProcess(job->backend, force);
-    job->backend = 0;
+    if (force)
+      job->backend = 0;
   }
+
+  if (!force)
+    return;
 
   cupsdDestroyProfile(job->profile);
   job->profile = NULL;

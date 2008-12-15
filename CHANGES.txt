@@ -3,6 +3,8 @@ CHANGES.txt - 2008-12-15
 
 CHANGES IN CUPS V1.4b3
 
+	- The scheduler did not give filters a chance to log errors or update
+	  printer attributes when a job was canceled.
 	- The scheduler did not clear the "connecting-to-device" reason keyword
 	  when a job finished.
 
