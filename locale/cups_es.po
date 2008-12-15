@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2008-12-08 14:07-0800\n"
+"POT-Creation-Date: 2008-12-15 09:29-0800\n"
 "PO-Revision-Date: 2008-11-12 16:53+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -545,6 +545,18 @@ msgid ""
 msgstr ""
 "      **FALLO**  Preferencia %s incorrecta %s.\n"
 "                REF: Página 84, sección 5.9\n"
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FileVersion \"%s\"\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      **FAIL**  Bad FormatVersion \"%s\"\n"
+"                REF: Page 56, section 5.3.\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
