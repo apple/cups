@@ -1,8 +1,11 @@
-CHANGES.txt - 2008-12-15
+CHANGES.txt - 2008-12-19
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
+	- Since the commandtops filter does not actually support ReportLevels
+	  all on its own, don't list that printer command by default for PS
+	  printers.
 	- The scheduler did not give filters a chance to log errors or update
 	  printer attributes when a job was canceled.
 	- The scheduler did not clear the "connecting-to-device" reason keyword

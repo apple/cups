@@ -3794,8 +3794,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		{			/* Standard CUPS commands */
 		  "AutoConfigure",
 		  "Clean",
-		  "PrintSelfTestPage",
-		  "ReportLevels"
+		  "PrintSelfTestPage"
 		};
 
 
