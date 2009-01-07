@@ -3,7 +3,7 @@
 .\"
 .\"   drv man page for the Common UNIX Printing System.
 .\"
-.\"   Copyright 2008 by Apple Inc.
+.\"   Copyright 2008-2009 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -34,7 +34,7 @@ ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5)
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2008 by Apple Inc.
+Copyright 2008-2009 by Apple Inc.
 .\"
 .\" End of "$Id$".
 .\"
