@@ -189,6 +189,8 @@ _cupsSetUser
 _cupsSideChannelDoRequest
 _cupsSideChannelRead
 _cupsSideChannelWrite
+_cupsSideChannelSNMPGet
+_cupsSideChannelSNMPWalk
 _cupsStartDocument
 _cupsTempFd
 _cupsTempFile
