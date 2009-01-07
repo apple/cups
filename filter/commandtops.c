@@ -267,8 +267,8 @@ begin_ps(ppd_file_t *ppd,		/* I - PPD file */
 static void
 end_ps(ppd_file_t *ppd)			/* I - PPD file */
 {
-  if (ppd->jcl_begin)
-    fputs(ppd->jcl_begin, stdout);
+  if (ppd->jcl_end)
+    fputs(ppd->jcl_end, stdout);
   else
     putchar(0x04);
 

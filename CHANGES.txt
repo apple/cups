@@ -1,8 +1,10 @@
-CHANGES.txt - 2008-12-20
+CHANGES.txt - 2009-01-07
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
+	- The commandtops filter incorrectly used the JCLBegin code to end
+	  its jobs.
 	- The default BrowseLocalProtocols value was not set properly.
 	- Since the commandtops filter does not actually support ReportLevels
 	  all on its own, don't list that printer command by default for PS
