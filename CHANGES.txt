@@ -1,8 +1,9 @@
-CHANGES.txt - 2009-01-07
+CHANGES.txt - 2009-01-08
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
+	- The scheduler did not honor MIME type priorities.
 	- The commandtops filter incorrectly used the JCLBegin code to end
 	  its jobs.
 	- The default BrowseLocalProtocols value was not set properly.

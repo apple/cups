@@ -3,7 +3,7 @@
  *
  *   MIME test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -137,7 +137,7 @@ main(int  argc,				/* I - Number of command-line args */
     puts("MIME database types:");
     for (src = mimeFirstType(mime); src; src = mimeNextType(mime))
     {
-      printf("\t%s/%s:\n", src->super, src->type);
+      printf("\t%s/%s (%d):\n", src->super, src->type, src->priority);
       print_rules(src->rules);
       puts("");
     }
