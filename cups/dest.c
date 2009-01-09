@@ -1084,10 +1084,6 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
       !CFStringGetCString(defaultPaperID, name, namesize,
 			  kCFStringEncodingUTF8))
     name[0] = '\0';
-  else if (!strncmp(name, "na-", 3))
-    _cups_strcpy(name, name + 3);
-  else if (!strncmp(name, "iso-", 4))
-    _cups_strcpy(name, name + 4);
 
   if (defaultPaperID)
     CFRelease(defaultPaperID);
