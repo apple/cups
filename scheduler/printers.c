@@ -296,7 +296,9 @@ cupsdCreateCommonData(void)
   static const char * const versions[] =/* ipp-versions-supported values */
 		{
 		  "1.0",
-		  "1.1"
+		  "1.1",
+		  "2.0",
+		  "2.1"
 		};
   static const int	ops[] =		/* operations-supported values */
 		{
