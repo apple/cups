@@ -21,6 +21,9 @@ __cupsMD5Init
 __cupsMessageFree
 __cupsMessageLoad
 __cupsMessageLookup
+__cupsPWGMediaByName
+__cupsPWGMediaByLegacy
+__cupsPWGMediaBySize
 __cupsSetError
 __cupsSetLocale
 __cupsSNMPClose
@@ -189,6 +192,8 @@ _cupsSetUser
 _cupsSideChannelDoRequest
 _cupsSideChannelRead
 _cupsSideChannelWrite
+_cupsSideChannelSNMPGet
+_cupsSideChannelSNMPWalk
 _cupsStartDocument
 _cupsTempFd
 _cupsTempFile

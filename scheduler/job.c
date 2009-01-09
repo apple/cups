@@ -608,6 +608,13 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
   update_job_attrs(job, 0);
 
+ /*
+  * Clear the "connecting-to-device" reason, which is only valid when a
+  * printer is processing...
+  */
+
+  cupsdSetPrinterReasons(printer, "-connecting-to-device");
+
   if (job->status < 0)
   {
    /*
@@ -1802,14 +1809,19 @@ cupsdStopJob(cupsd_job_t *job,		/* I - Job */
     if (job->filters[i] > 0)
     {
       cupsdEndProcess(job->filters[i], force);
-      job->filters[i] = 0;
+      if (force)
+        job->filters[i] = 0;
     }
 
   if (job->backend > 0)
   {
     cupsdEndProcess(job->backend, force);
-    job->backend = 0;
+    if (force)
+      job->backend = 0;
   }
+
+  if (!force)
+    return;
 
   cupsdDestroyProfile(job->profile);
   job->profile = NULL;

@@ -3,7 +3,7 @@
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -315,7 +315,8 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		$(LIBZ) $(LIBGSSAPI)
 	echo Testing CGI API...
 	./testcgi
 
@@ -327,7 +328,8 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhi.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		$(LIBZ) $(LIBGSSAPI)
 	echo Testing help index API...
 	./testhi
 
@@ -339,7 +341,7 @@ testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/libcups.a \
-		$(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -349,7 +351,8 @@ testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/libcups.a
 websearch:	websearch.o ../Makedefs libcupscgi.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ websearch.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(LIBZ) $(LIBGSSAPI)
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		$(LIBZ) $(LIBGSSAPI)
 
 
 #

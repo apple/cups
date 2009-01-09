@@ -3,7 +3,7 @@
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -122,9 +122,7 @@ cupsdDeletePrinterFromClass(
     cupsd_printer_t *c,			/* I - Class to delete from */
     cupsd_printer_t *p)			/* I - Printer to delete */
 {
-  int		i;			/* Looping var */
-  cups_ptype_t	type,			/* Class type */
-		oldtype;		/* Old class type */
+  int	i;				/* Looping var */
 
 
  /*
@@ -154,27 +152,10 @@ cupsdDeletePrinterFromClass(
     return;
 
  /*
-  * Recompute the printer type mask as needed...
+  * Update the IPP attributes (have to do this for member-names)...
   */
 
-  if (c->num_printers > 0)
-  {
-    oldtype = c->type;
-    type    = c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT);
-    c->type = ~CUPS_PRINTER_REMOTE;
-
-    for (i = 0; i < c->num_printers; i ++)
-      c->type &= c->printers[i]->type;
-
-    c->type |= type;
-
-   /*
-    * Update the IPP attributes...
-    */
-
-    if (c->type != oldtype)
-      cupsdSetPrinterAttrs(c);
-  }
+  cupsdSetPrinterAttrs(c);
 }
 
 

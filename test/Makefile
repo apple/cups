@@ -3,7 +3,7 @@
 #
 #   IPP test makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -102,7 +102,7 @@ uninstall:
 ipptest:	ipptest.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o ipptest ipptest.o  ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

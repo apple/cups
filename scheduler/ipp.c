@@ -3,7 +3,7 @@
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -89,6 +89,7 @@
  *   send_ipp_status()           - Send a status back to the IPP client.
  *   set_default()               - Set the default destination...
  *   set_job_attrs()             - Set job attributes.
+ *   set_printer_attrs()         - Set printer attributes.
  *   set_printer_defaults()      - Set printer default options from a request.
  *   start_printer()             - Start a printer.
  *   stop_printer()              - Stop a printer.
@@ -193,6 +194,7 @@ static void	get_ppd(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_ppds(cupsd_client_t *con);
 static void	get_printers(cupsd_client_t *con, int type);
 static void	get_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	get_printer_supported(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	get_subscription_attrs(cupsd_client_t *con, int sub_id);
 static void	get_subscriptions(cupsd_client_t *con, ipp_attribute_t *uri);
 static const char *get_username(cupsd_client_t *con);
@@ -225,6 +227,7 @@ __attribute__ ((__format__ (__printf__, 3, 4)))
 ;
 static void	set_default(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_job_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
+static void	set_printer_attrs(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	set_printer_defaults(cupsd_client_t *con,
 		                     cupsd_printer_t *printer);
 static void	start_printer(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -278,10 +281,11 @@ cupsdProcessIPPRequest(
   * Then validate the request header and required attributes...
   */
 
-  if (con->request->request.any.version[0] != 1)
+  if (con->request->request.any.version[0] != 1 &&
+      con->request->request.any.version[0] != 2)
   {
    /*
-    * Return an error, since we only support IPP 1.x.
+    * Return an error, since we only support IPP 1.x and 2.x.
     */
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
@@ -539,6 +543,10 @@ cupsdProcessIPPRequest(
               get_printer_attrs(con, uri);
               break;
 
+	  case IPP_GET_PRINTER_SUPPORTED_VALUES :
+              get_printer_supported(con, uri);
+              break;
+
 	  case IPP_HOLD_JOB :
               hold_job(con, uri);
               break;
@@ -565,6 +573,10 @@ cupsdProcessIPPRequest(
 
 	  case IPP_SET_JOB_ATTRIBUTES :
               set_job_attrs(con, uri);
+              break;
+
+	  case IPP_SET_PRINTER_ATTRIBUTES :
+              set_printer_attrs(con, uri);
               break;
 
 	  case IPP_HOLD_NEW_JOBS :
@@ -7513,6 +7525,61 @@ get_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
 
 /*
+ * 'get_printer_supported()' - Get printer supported values.
+ */
+
+static void
+get_printer_supported(
+    cupsd_client_t  *con,		/* I - Client connection */
+    ipp_attribute_t *uri)		/* I - Printer URI */
+{
+  http_status_t		status;		/* Policy status */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
+  cupsd_printer_t	*printer;	/* Printer/class */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printer_supported(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Is the destination valid?
+  */
+
+  if (!cupsdValidateDest(uri->values[0].string.text, &dtype, &printer))
+  {
+   /*
+    * Bad URI...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, printer);
+    return;
+  }
+
+ /*
+  * Return a list of attributes that can be set via Set-Printer-Attributes.
+  */
+
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
+                "printer-info", 0);
+  ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_ADMINDEFINE,
+                "printer-location", 0);
+
+  con->response->request.status.status_code = IPP_OK;
+}
+
+
+/*
  * 'get_printers()' - Get a list of printers or classes.
  */
 
@@ -10597,6 +10664,89 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (check_jobs)
     cupsdCheckJobs();
+}
+
+
+/*
+ * 'set_printer_attrs()' - Set printer attributes.
+ */
+
+static void
+set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
+                  ipp_attribute_t *uri)	/* I - Printer */
+{
+  http_status_t		status;		/* Policy status */
+  cups_ptype_t		dtype;		/* Destination type (printer/class) */
+  cupsd_printer_t	*printer;	/* Printer/class */
+  ipp_attribute_t	*attr;		/* Printer attribute */
+  int			changed;	/* Was anything changed? */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_printer_attrs(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Is the destination valid?
+  */
+
+  if (!cupsdValidateDest(uri->values[0].string.text, &dtype, &printer))
+  {
+   /*
+    * Bad URI...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND,
+                    _("The printer or class was not found."));
+    return;
+  }
+
+ /*
+  * Check policy...
+  */
+
+  if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
+  {
+    send_http_error(con, status, printer);
+    return;
+  }
+
+ /*
+  * Return a list of attributes that can be set via Set-Printer-Attributes.
+  */
+
+  if ((attr = ippFindAttribute(con->request, "printer-location",
+                               IPP_TAG_TEXT)) != NULL)
+  {
+    cupsdSetString(&printer->location, attr->values[0].string.text);
+    changed = 1;
+  }
+
+  if ((attr = ippFindAttribute(con->request, "printer-info",
+                               IPP_TAG_TEXT)) != NULL)
+  {
+    cupsdSetString(&printer->info, attr->values[0].string.text);
+    changed = 1;
+  }
+
+ /*
+  * Update the printer attributes and return...
+  */
+
+  if (changed)
+  {
+    cupsdSetPrinterAttrs(printer);
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_CONFIG, printer, NULL,
+                  "Printer \"%s\" description or location changed by \"%s\".",
+		  printer->name, get_username(con));
+
+    cupsdLogMessage(CUPSD_LOG_INFO,
+                    "Printer \"%s\" description or location changed by \"%s\".",
+                    printer->name, get_username(con));
+  }
+
+  con->response->request.status.status_code = IPP_OK;
 }
 
 

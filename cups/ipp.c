@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1112,7 +1112,7 @@ ippReadIO(void       *src,		/* I - Data source */
           * Verify the major version number...
 	  */
 
-	  if (buffer[0] != 1)
+	  if (buffer[0] != 1 && buffer[0] != 2)
 	  {
 	    DEBUG_printf(("ippReadIO: version number (%d.%d) is bad.\n",
 	                  buffer[0], buffer[1]));
@@ -1440,6 +1440,9 @@ ippReadIO(void       *src,		/* I - Data source */
 	        break;
 
             case IPP_TAG_NOVALUE :
+	    case IPP_TAG_NOTSETTABLE :
+	    case IPP_TAG_DELETEATTR :
+	    case IPP_TAG_ADMINDEFINE :
 	        if (attr->value_tag == IPP_TAG_NOVALUE)
 		{
 		  if (n == 0)

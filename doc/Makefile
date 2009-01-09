@@ -165,7 +165,7 @@ install:	all install-data install-headers install-libs install-exec
 # Install data files...
 #
 
-install-data:
+install-data: $(INSTALL_LANGUAGES)
 	$(INSTALL_DIR) -m 755 $(DOCDIR)
 	for file in $(WEBPAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR); \
@@ -182,13 +182,9 @@ install-data:
 install-languages:
 	for lang in $(LANGUAGES); do \
 		if test -d $$lang; then \
-			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
+			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang; \
 			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
 			$(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang 2>/dev/null || true; \
-			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang/images; \
-			for file in $(WEBIMAGES); do \
-				$(INSTALL_MAN) $$lang/$$file $(DOCDIR)/$$lang/images 2>/dev/null || true; \
-			done; \
 		fi; \
 	done
 
@@ -215,7 +211,7 @@ install-libs:
 
 
 #
-# Unnstall all documentation files...
+# Uninstall all documentation files...
 #
 
 uninstall: $(UNINSTALL_LANGUAGES)
@@ -236,10 +232,6 @@ uninstall-languages:
 	-for lang in $(LANGUAGES); do \
 		$(RM) $(DOCDIR)/$$lang/index.html; \
 		$(RM) $(DOCDIR)/$$lang/cups.css; \
-		for file in $(WEBIMAGES); do \
-			$(RM) $(DOCDIR)/$$lang/$$file; \
-		done; \
-		$(RMDIR) $(DOCDIR)/$$lang/images; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done
 

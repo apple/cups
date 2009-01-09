@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "cups.h"
+#include "pwgmedia.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -116,8 +117,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   ppd_size_t	minsize,		/* Minimum size */
-		maxsize;		/* Maximum size */
+		maxsize,		/* Maximum size */
+		*size;			/* Current size */
   ppd_attr_t	*attr;			/* Current attribute */
+  _cups_pwg_media_t *pwgmedia;		/* PWG media size */
 
 
   status = 0;
@@ -277,14 +280,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("cupsResolveConflicts(InputSlot=Envelope): ", stdout);
     num_options = 0;
     options     = NULL;
-    if (cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
+    if (!cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
                              &options))
     {
-      puts("FAIL (Resolved but shouldn't be able to!)");
+      puts("FAIL (Unable to resolve)");
+      status ++;
+    }
+    else if (num_options != 2 ||
+             !cupsGetOption("PageSize", num_options, options))
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
       status ++;
     }
     else
-      puts("PASS (Unable to resolve)");
+      puts("PASS (Resolved by changing PageSize)");
+
     cupsFreeOptions(num_options, options);
 
     fputs("cupsResolveConflicts(No option/choice): ", stdout);
@@ -292,8 +305,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     options     = NULL;
     if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
         num_options == 1 && !strcasecmp(options[0].name, "InputSlot") &&
-	!strcasecmp(options[0].value, "Manual"))
-      puts("PASS (Resolved)");
+	!strcasecmp(options[0].value, "Tray"))
+      puts("PASS (Resolved by changing InputSlot)");
     else if (num_options > 0)
     {
       printf("FAIL (%d options:", num_options);
@@ -347,6 +360,52 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("FAIL (returned 0)");
       status ++;
     }
+
+   /*
+    * cupsMarkOptions with PWG and IPP size names.
+    */
+
+    fputs("cupsMarkOptions(media=iso-a4): ", stdout);
+    num_options = cupsAddOption("media", "iso-a4", 0, &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    size = ppdPageSize(ppd, NULL);
+    if (!size || strcmp(size->name, "A4"))
+    {
+      printf("FAIL (%s)\n", size ? size->name : "unknown");
+      status ++;
+    }
+    else
+      puts("PASS");
+
+    fputs("cupsMarkOptions(media=na_letter_8.5x11in): ", stdout);
+    num_options = cupsAddOption("media", "na_letter_8.5x11in", 0, &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    size = ppdPageSize(ppd, NULL);
+    if (!size || strcmp(size->name, "Letter"))
+    {
+      printf("FAIL (%s)\n", size ? size->name : "unknown");
+      status ++;
+    }
+    else
+      puts("PASS");
+
+    fputs("_cupsPWGMediaBySize(842, 1191): ", stdout);
+    if ((pwgmedia = _cupsPWGMediaBySize(842, 1191)) == NULL)
+    {
+      puts("FAIL (not found)");
+      status ++;
+    }
+    else if (strcmp(pwgmedia->pwg, "iso_a3_297x420mm"))
+    {
+      printf("FAIL (%s)\n", pwgmedia->pwg);
+      status ++;
+    }
+    else
+      puts("PASS");
 
    /*
     * Test localization...

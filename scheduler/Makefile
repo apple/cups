@@ -3,7 +3,7 @@
 #
 #   Scheduler Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -438,7 +438,7 @@ testdirsvc:	testdirsvc.o
 testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/libcups.a \
-		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
+		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
 #
@@ -448,7 +448,8 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 testmime:	testmime.o libcupsmime.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testmime.o libcupsmime.a \
-		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(LIBGSSAPI)
+		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		$(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running MIME tests...
 	./testmime
 
@@ -460,7 +461,7 @@ testmime:	testmime.o libcupsmime.a ../cups/libcups.a
 testspeed:	testspeed.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #
@@ -470,7 +471,7 @@ testspeed:	testspeed.o ../cups/libcups.a
 testsub:	testsub.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
 #

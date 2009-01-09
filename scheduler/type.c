@@ -3,7 +3,7 @@
  *
  *   MIME typing routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -364,7 +364,10 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  length[num_values] = ptr - value[num_values];
 
           if (*rule != ',')
+	  {
+	    num_values ++;
 	    break;
+	  }
 
           rule ++;
 	}

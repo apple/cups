@@ -3,7 +3,7 @@
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,42 +14,48 @@
  *
  * Contents:
  *
- *   cupsdAddPrinter()           - Add a printer to the system.
- *   cupsdAddPrinterHistory()    - Add the current printer state to the history.
- *   cupsdAddPrinterUser()       - Add a user to the ACL.
- *   cupsdCreateCommonData()     - Create the common printer data.
- *   cupsdDeleteAllPrinters()    - Delete all printers from the system.
- *   cupsdDeletePrinter()        - Delete a printer from the system.
- *   cupsdFindPrinter()          - Find a printer in the list.
- *   cupsdFreePrinterUsers()     - Free allow/deny users.
- *   cupsdLoadAllPrinters()      - Load printers from the printers.conf file.
- *   cupsdRenamePrinter()        - Rename a printer.
- *   cupsdSaveAllPrinters()      - Save all printer definitions to the
- *                                 printers.conf file.
- *   cupsdSetAuthInfoRequired()  - Set the required authentication info.
- *   cupsdSetDeviceURI()         - Set the device URI for a printer.
- *   cupsdSetPrinterAttr()       - Set a printer attribute.
- *   cupsdSetPrinterAttrs()      - Set printer attributes based upon the PPD
- *                                 file.
- *   cupsdSetPrinterReasons()    - Set/update the reasons strings.
- *   cupsdSetPrinterState()      - Update the current state of a printer.
- *   cupsdStopPrinter()          - Stop a printer from printing any jobs...
- *   cupsdUpdatePrinters()       - Update printers after a partial reload.
- *   cupsdValidateDest()         - Validate a printer/class destination.
- *   cupsdWritePrintcap()        - Write a pseudo-printcap file for older
- *                                 applications that need it...
- *   add_printer_defaults()      - Add name-default attributes to the printer
- *                                 attributes.
- *   add_printer_filter()        - Add a MIME filter for a printer.
- *   add_printer_formats()       - Add document-format-supported values for
- *                                 a printer.
- *   compare_printers()          - Compare two printers.
- *   delete_printer_filters()    - Delete all MIME filters for a printer.
- *   write_irix_config()         - Update the config files used by the IRIX
- *                                 desktop tools.
- *   write_irix_state()          - Update the status files used by IRIX
- *                                 printing desktop tools.
- *   write_xml_string()          - Write a string with XML escaping.
+ *   cupsdAddPrinter()          - Add a printer to the system.
+ *   cupsdAddPrinterHistory()   - Add the current printer state to the history.
+ *   cupsdAddPrinterUser()      - Add a user to the ACL.
+ *   cupsdCreateCommonData()    - Create the common printer data.
+ *   cupsdDeleteAllPrinters()   - Delete all printers from the system.
+ *   cupsdDeletePrinter()       - Delete a printer from the system.
+ *   cupsdFindDest()            - Find a destination in the list.
+ *   cupsdFindPrinter()         - Find a printer in the list.
+ *   cupsdFreePrinterUsers()    - Free allow/deny users.
+ *   cupsdLoadAllPrinters()     - Load printers from the printers.conf file.
+ *   cupsdRenamePrinter()       - Rename a printer.
+ *   cupsdSaveAllPrinters()     - Save all printer definitions to the
+ *                                printers.conf file.
+ *   cupsdSetAuthInfoRequired() - Set the required authentication info.
+ *   cupsdSetDeviceURI()        - Set the device URI for a printer.
+ *   cupsdSetPrinterAttr()      - Set a printer attribute.
+ *   cupsdSetPrinterAttrs()     - Set printer attributes based upon the PPD
+ *                                file.
+ *   cupsdSetPrinterReasons()   - Set/update the reasons strings.
+ *   cupsdSetPrinterState()     - Update the current state of a printer.
+ *   cupsdStopPrinter()         - Stop a printer from printing any jobs...
+ *   cupsdUpdatePrinterPPD()    - Update keywords in a printer's PPD file.
+ *   cupsdUpdatePrinters()      - Update printers after a partial reload.
+ *   cupsdValidateDest()        - Validate a printer/class destination.
+ *   cupsdWritePrintcap()       - Write a pseudo-printcap file for older
+ *                                applications that need it...
+ *   add_printer_defaults()     - Add name-default attributes to the printer
+ *                                attributes.
+ *   add_printer_filter()       - Add a MIME filter for a printer.
+ *   add_printer_formats()      - Add document-format-supported values for a
+ *                                printer.
+ *   add_string_array()         - Add a string to an array of CUPS strings.
+ *   compare_printers()         - Compare two printers.
+ *   delete_printer_filters()   - Delete all MIME filters for a printer.
+ *   delete_string_array()      - Delete an array of CUPS strings.
+ *   load_ppd()                 - Load a cached PPD file, updating the cache as
+ *                                needed.
+ *   write_irix_config()        - Update the config files used by the IRIX
+ *                                desktop tools.
+ *   write_irix_state()         - Update the status files used by IRIX printing
+ *                                desktop tools.
+ *   write_xml_string()         - Write a string with XML escaping.
  */
 
 /*
@@ -58,6 +64,7 @@
 
 #include "cupsd.h"
 #include <cups/dir.h>
+#include <cups/pwgmedia.h>
 
 
 /*
@@ -289,7 +296,9 @@ cupsdCreateCommonData(void)
   static const char * const versions[] =/* ipp-versions-supported values */
 		{
 		  "1.0",
-		  "1.1"
+		  "1.1",
+		  "2.0",
+		  "2.1"
 		};
   static const int	ops[] =		/* operations-supported values */
 		{
@@ -306,7 +315,9 @@ cupsdCreateCommonData(void)
 		  IPP_PAUSE_PRINTER,
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
+		  IPP_SET_PRINTER_ATTRIBUTES,
 		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_GET_PRINTER_SUPPORTED_VALUES,
 		  IPP_CREATE_PRINTER_SUBSCRIPTION,
 		  IPP_CREATE_JOB_SUBSCRIPTION,
 		  IPP_GET_SUBSCRIPTION_ATTRIBUTES,
@@ -405,6 +416,11 @@ cupsdCreateCommonData(void)
 		  "printer-resolution",
 		  "sides"
 		};
+  static const char * const printer_settable[] =
+		{			/* printer-settable-attributes-supported */
+		  "printer-info",
+		  "printer-location"
+	        };
 
 
   if (CommonData)
@@ -605,6 +621,12 @@ cupsdCreateCommonData(void)
        p;
        i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
     attr->values[i].string.text = p->name;
+
+  /* printer-settable-attributes-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "printer-settable-attributes-supported",
+		sizeof(printer_settable) / sizeof(printer_settable[0]),
+		NULL, printer_settable);
 
   /* server-is-sharing-printers */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "server-is-sharing-printers",
@@ -3773,13 +3795,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   char		ppd_name[1024];		/* PPD filename */
   struct stat	ppd_info;		/* PPD file info */
   int		num_media;		/* Number of media options */
-  ppd_option_t	*input_slot,		/* InputSlot options */
-		*media_type,		/* MediaType options */
-		*page_size,		/* PageSize options */
-		*output_bin,		/* OutputBin options */
-		*media_quality,		/* EFMediaQualityMode options */
+  char		custom_in[256],		/* Custom size name in inches */
+		custom_mm[256];		/* Custom size name in millimeters */
+  ppd_size_t	*size;			/* Current size */
+  ppd_option_t	*output_bin,		/* OutputBin options */
 		*duplex;		/* Duplex options */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
+  _cups_pwg_media_t *pwgmedia;		/* Matching PWG size name */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
@@ -3794,8 +3816,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		{			/* Standard CUPS commands */
 		  "AutoConfigure",
 		  "Clean",
-		  "PrintSelfTestPage",
-		  "ReportLevels"
+		  "PrintSelfTestPage"
 		};
 
 
@@ -3856,6 +3877,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Add make/model and other various attributes...
     */
 
+    ppdMarkDefaults(ppd);
+
     if (ppd->color_device)
       p->type |= CUPS_PRINTER_COLOR;
     if (ppd->variable_sizes)
@@ -3901,21 +3924,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Add media options from the PPD file...
     */
 
-    if ((input_slot = ppdFindOption(ppd, "InputSlot")) != NULL)
-      num_media = input_slot->num_choices;
-    else
-      num_media = 0;
-
-    if ((media_type = ppdFindOption(ppd, "MediaType")) != NULL)
-      num_media += media_type->num_choices;
-
-    if ((page_size = ppdFindOption(ppd, "PageSize")) != NULL)
-      num_media += page_size->num_choices;
-
-    if ((media_quality = ppdFindOption(ppd, "EFMediaQualityMode")) != NULL)
-      num_media += media_quality->num_choices;
-
-    if (num_media == 0)
+    if (ppd->num_sizes == 0)
     {
       cupsdLogMessage(CUPSD_LOG_CRIT,
 		      "The PPD file for printer %s contains no media "
@@ -3923,44 +3932,70 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
     else
     {
+      num_media = ppd->num_sizes;
+      if (ppd->variable_sizes)
+	num_media ++;
+
       attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 			   "media-supported", num_media, NULL, NULL);
       if (attr != NULL)
       {
 	val = attr->values;
 
-	if (input_slot != NULL)
-	  for (i = 0; i < input_slot->num_choices; i ++, val ++)
-	    val->string.text = _cupsStrAlloc(input_slot->choices[i].choice);
-
-	if (media_type != NULL)
-	  for (i = 0; i < media_type->num_choices; i ++, val ++)
-	    val->string.text = _cupsStrAlloc(media_type->choices[i].choice);
-
-	if (media_quality != NULL)
-	  for (i = 0; i < media_quality->num_choices; i ++, val ++)
-	    val->string.text = _cupsStrAlloc(media_quality->choices[i].choice);
-
-	if (page_size != NULL)
+        for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
 	{
-	  for (i = 0; i < page_size->num_choices; i ++, val ++)
-	    val->string.text = _cupsStrAlloc(page_size->choices[i].choice);
+	  if (strcasecmp(size->name, "Custom"))
+	  {
+	    if ((pwgmedia = _cupsPWGMediaBySize(size->width,
+						size->length)) != NULL)
+	    {
+	      val->string.text = _cupsStrAlloc(pwgmedia->pwg);
+	    }
+	    else
+	    {
+	      snprintf(custom_in, sizeof(custom_in), "adobe_%s_%gx%gin",
+		       size->name, size->width / 72.0, size->length / 72.0);
+	      snprintf(custom_mm, sizeof(custom_mm), "adobe_%s_%gx%gmm",
+		       size->name, size->width * 25.4 / 72.0,
+		       size->length * 25.4 / 72.0);
+              if (strlen(custom_in) < strlen(custom_mm))
+		val->string.text = _cupsStrAlloc(custom_in);
+	      else
+		val->string.text = _cupsStrAlloc(custom_mm);
+	    }
 
-	  ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		       "media-default", NULL, page_size->defchoice);
+	    if (size->marked)
+	      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+			   "media-default", NULL,
+			   _cupsStrRetain(val->string.text));
+
+            val ++;
+	  }
 	}
-	else if (input_slot != NULL)
-	  ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		       "media-default", NULL, input_slot->defchoice);
-	else if (media_type != NULL)
-	  ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		       "media-default", NULL, media_type->defchoice);
-	else if (media_quality != NULL)
-	  ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		       "media-default", NULL, media_quality->defchoice);
-	else
-	  ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		       "media-default", NULL, "none");
+
+        if (ppd->variable_sizes)
+	{
+	  snprintf(custom_in, sizeof(custom_in), "custom_min_%gx%gin",
+		   ppd->custom_min[0] / 72.0, ppd->custom_min[1] / 72.0);
+	  snprintf(custom_mm, sizeof(custom_mm), "custom_min_%gx%gmm",
+		   ppd->custom_min[0] * 25.4 / 72.0,
+		   ppd->custom_min[1] * 25.4 / 72.0);
+	  if (strlen(custom_in) < strlen(custom_mm))
+	    val->string.text = _cupsStrAlloc(custom_in);
+	  else
+	    val->string.text = _cupsStrAlloc(custom_mm);
+	  val ++;
+
+	  snprintf(custom_in, sizeof(custom_in), "custom_max_%gx%gin",
+		   ppd->custom_max[0] / 72.0, ppd->custom_max[1] / 72.0);
+	  snprintf(custom_mm, sizeof(custom_mm), "custom_max_%gx%gmm",
+		   ppd->custom_max[0] * 25.4 / 72.0,
+		   ppd->custom_max[1] * 25.4 / 72.0);
+	  if (strlen(custom_in) < strlen(custom_mm))
+	    val->string.text = _cupsStrAlloc(custom_in);
+	  else
+	    val->string.text = _cupsStrAlloc(custom_mm);
+	}
       }
     }
 
@@ -3981,6 +4016,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	     i ++, val ++)
 	  val->string.text = _cupsStrAlloc(output_bin->choices[i].choice);
       }
+
+      attr = ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+			  "output-bin-default", NULL, output_bin->defchoice);
     }
 
    /*

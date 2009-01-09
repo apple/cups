@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007-2008 by Apple Inc.
+.\"   Copyright 2007-2009 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -684,7 +684,7 @@ Specifies the user name or ID that is used when running external programs.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2008 by Apple Inc.
+Copyright 2007-2009 by Apple Inc.
 .\"
 .\" End of "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $".
 .\"

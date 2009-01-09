@@ -3,7 +3,7 @@
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -56,6 +56,7 @@ LIBOBJS	=	\
 		options.o \
 		page.o \
 		ppd.o \
+		pwgmedia.o \
 		request.o \
 		sidechannel.o \
 		snmp.o \
@@ -288,7 +289,8 @@ uninstall64bit:
 
 libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 	echo Linking $@...
-	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBGSSAPI) \
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) `basename $@ .2`
 	$(LN) $@ `basename $@ .2`
 
@@ -300,7 +302,8 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 32bit/libcups.so.2:	$(LIB32OBJS)
 	echo Linking 32-bit $@...
 	-mkdir 32bit
-	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH32FLAGS) $(DSO32FLAGS) -o $@ $(LIB32OBJS) $(LIBGSSAPI) \
+		$(DNSSDLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) 32bit/libcups.so
 	$(LN) libcups.so.2 32bit/libcups.so
 
@@ -312,7 +315,8 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 64bit/libcups.so.2:	$(LIB64OBJS)
 	echo Linking 64-bit $@...
 	-mkdir 64bit
-	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(DSO) $(ARCH64FLAGS) $(DSO64FLAGS) -o $@ $(LIB64OBJS) $(LIBGSSAPI) \
+		$(DNSSDLIBS) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
 	$(RM) 64bit/libcups.so
 	$(LN) libcups.so.2 64bit/libcups.so
 
@@ -329,7 +333,8 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER) libcups.exp
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list libcups.exp \
 		-sectorder __TEXT __text $(LIBCUPSORDER) \
-		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib
 	$(LN) $@ libcups.dylib
 
@@ -340,7 +345,9 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER) libcups.exp
 
 libcups_s.a:	$(LIBOBJS) libcups_s.exp
 	echo Creating $@...
-	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o $(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ) -lm
+	$(DSO) $(DSOFLAGS) -Wl,-bexport:libcups_s.exp -o libcups_s.o \
+		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ) -lm
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcups_s.o
 
@@ -351,8 +358,9 @@ libcups_s.a:	$(LIBOBJS) libcups_s.exp
 
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 2:8 $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
+		-rpath $(LIBDIR) -version-info 2:8 $(LIBGSSAPI) $(SSLLIBS) \
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -397,7 +405,7 @@ php_cups_wrap.c:	cups.h
 testadmin:	testadmin.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testadmin.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -407,7 +415,7 @@ testadmin:	testadmin.o libcups.a
 testarray:	testarray.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testarray.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running array API tests...
 	./testarray
 
@@ -419,7 +427,7 @@ testarray:	testarray.o libcups.a
 testconflicts:	testconflicts.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testconflicts.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -429,7 +437,7 @@ testconflicts:	testconflicts.o libcups.a
 testcups:	testcups.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testcups.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -439,7 +447,7 @@ testcups:	testcups.o libcups.a
 testfile:	testfile.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testfile.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running file API tests...
 	./testfile
 
@@ -451,7 +459,7 @@ testfile:	testfile.o libcups.a
 testhttp:	testhttp.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhttp.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running HTTP API tests...
 	./testhttp
 
@@ -463,7 +471,7 @@ testhttp:	testhttp.o libcups.a
 testipp:	testipp.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testipp.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running IPP API tests...
 	./testipp
 
@@ -475,7 +483,7 @@ testipp:	testipp.o libcups.a
 testi18n:	testi18n.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running internationalization API tests...
 	./testi18n
 
@@ -487,7 +495,7 @@ testi18n:	testi18n.o libcups.a
 testlang:	testlang.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testlang.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running language API tests...
 	./testlang
 
@@ -499,7 +507,7 @@ testlang:	testlang.o libcups.a
 testoptions:	testoptions.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testoptions.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running option API tests...
 	./testoptions
 
@@ -511,7 +519,7 @@ testoptions:	testoptions.o libcups.a
 testppd:	testppd.o libcups.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running PPD API tests...
 	./testppd
 
@@ -523,7 +531,7 @@ testppd:	testppd.o libcups.a
 testsnmp:	testsnmp.o libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ testsnmp.o libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

@@ -3,7 +3,7 @@
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -240,16 +240,26 @@ cupsResolveConflicts(
 
 
         for (i = consts->num_constraints, constptr = consts->constraints;
-	     i > 0;
+	     i > 0 && !changed;
 	     i --, constptr ++)
 	{
-	  if (constptr->installable ||
-	      !strcasecmp(constptr->option->keyword, "PageSize") ||
-	      !strcasecmp(constptr->option->keyword, "PageRegion"))
+	 /*
+	  * Can't resolve by changing an installable option...
+	  */
+
+	  if (constptr->installable)
 	    continue;
+
+         /*
+	  * Is this the option we are changing?
+	  */
 
 	  if (option && !strcasecmp(constptr->option->keyword, option))
 	    continue;
+
+         /*
+	  * Get the current option choice...
+	  */
 
           if ((value = cupsGetOption(constptr->option->keyword, num_newopts,
 	                             newopts)) == NULL)
@@ -285,13 +295,12 @@ cupsResolveConflicts(
 	    * Try each choice instead...
 	    */
 
-            cupsArrayDelete(test);
-
             for (j = constptr->option->num_choices,
 	             cptr = constptr->option->choices;
 		 j > 0;
 		 j --, cptr ++)
             {
+	      cupsArrayDelete(test);
 	      test = NULL;
 
 	      if (strcasecmp(value, cptr->choice) &&
@@ -311,9 +320,9 @@ cupsResolveConflicts(
 		changed     = 1;
 		break;
 	      }
-
-              cupsArrayDelete(test);
 	    }
+
+	    cupsArrayDelete(test);
           }
         }
       }

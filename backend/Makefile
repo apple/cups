@@ -3,7 +3,7 @@
 #
 #   Backend makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -137,7 +137,7 @@ uninstall:
 test1284:	test1284.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -147,7 +147,7 @@ test1284:	test1284.o ../cups/libcups.a
 testbackend:	testbackend.o ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/libcups.a \
-		$(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -157,7 +157,8 @@ testbackend:	testbackend.o ../cups/libcups.a
 testsupplies:	testsupplies.o libbackend.a ../cups/libcups.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
 
 
 #

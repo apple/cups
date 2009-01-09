@@ -24,7 +24,7 @@ debug.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 debug.o: i18n.h transcode.h debug.h
 dest.o: debug.h globals.h string.h ../config.h http-private.h http.h
 dest.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
-dest.o: language.h i18n.h transcode.h
+dest.o: language.h i18n.h transcode.h pwgmedia.h
 dir.o: dir.h versioning.h string.h ../config.h debug.h
 emit.o: ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
@@ -71,7 +71,7 @@ localize.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 localize.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 localize.o: i18n.h transcode.h ppd-private.h debug.h
 mark.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
-mark.o: string.h ../config.h debug.h
+mark.o: string.h ../config.h debug.h pwgmedia.h
 md5.o: md5.h string.h ../config.h
 md5passwd.o: http-private.h ../config.h http.h versioning.h md5.h
 md5passwd.o: ipp-private.h ipp.h string.h
@@ -84,6 +84,9 @@ page.o: ppd.h array.h versioning.h file.h string.h ../config.h
 ppd.o: ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.o: language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.o: ipp-private.h i18n.h transcode.h debug.h
+pwgmedia.o: pwgmedia.h globals.h string.h ../config.h http-private.h http.h
+pwgmedia.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+pwgmedia.o: file.h language.h i18n.h transcode.h debug.h
 request.o: globals.h string.h ../config.h http-private.h http.h versioning.h
 request.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.o: i18n.h transcode.h debug.h
@@ -124,7 +127,7 @@ testoptions.o: array.h file.h language.h
 testlang.o: i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.o: ../config.h
 testppd.o: ../cups/string.h ../config.h string.h cups.h ipp.h http.h
-testppd.o: versioning.h ppd.h array.h file.h language.h
+testppd.o: versioning.h ppd.h array.h file.h language.h pwgmedia.h
 testsnmp.o: string.h ../config.h snmp-private.h http.h versioning.h
 # DO NOT DELETE
 
@@ -152,7 +155,7 @@ debug.32.o: debug.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h langu
 debug.32.o: debug.c  i18n.h transcode.h debug.h
 dest.32.o: dest.c  debug.h globals.h string.h ../config.h http-private.h http.h
 dest.32.o: dest.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
-dest.32.o: dest.c  language.h i18n.h transcode.h
+dest.32.o: dest.c  language.h i18n.h transcode.h pwgmedia.h
 dir.32.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
 emit.32.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.32.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
@@ -199,7 +202,7 @@ localize.32.o: localize.c  globals.h string.h ../config.h http-private.h http.h 
 localize.32.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 localize.32.o: localize.c  i18n.h transcode.h ppd-private.h debug.h
 mark.32.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
-mark.32.o: mark.c  string.h ../config.h debug.h
+mark.32.o: mark.c  string.h ../config.h debug.h pwgmedia.h
 md5.32.o: md5.c  md5.h string.h ../config.h
 md5passwd.32.o: md5passwd.c  http-private.h ../config.h http.h versioning.h md5.h
 md5passwd.32.o: md5passwd.c  ipp-private.h ipp.h string.h
@@ -212,6 +215,9 @@ page.32.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
 ppd.32.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.32.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.32.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
+pwgmedia.32.o: pwgmedia.c  pwgmedia.h globals.h string.h ../config.h http-private.h http.h
+pwgmedia.32.o: pwgmedia.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+pwgmedia.32.o: pwgmedia.c  file.h language.h i18n.h transcode.h debug.h
 request.32.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.32.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.32.o: request.c  i18n.h transcode.h debug.h
@@ -252,7 +258,7 @@ testoptions.32.o: testoptions.c  array.h file.h language.h
 testlang.32.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.32.o: testlang.c  ../config.h
 testppd.32.o: testppd.c  ../cups/string.h ../config.h string.h cups.h ipp.h http.h
-testppd.32.o: testppd.c  versioning.h ppd.h array.h file.h language.h
+testppd.32.o: testppd.c  versioning.h ppd.h array.h file.h language.h pwgmedia.h
 testsnmp.32.o: testsnmp.c  string.h ../config.h snmp-private.h http.h versioning.h
 # DO NOT DELETE
 
@@ -280,7 +286,7 @@ debug.64.o: debug.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h langu
 debug.64.o: debug.c  i18n.h transcode.h debug.h
 dest.64.o: dest.c  debug.h globals.h string.h ../config.h http-private.h http.h
 dest.64.o: dest.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h
-dest.64.o: dest.c  language.h i18n.h transcode.h
+dest.64.o: dest.c  language.h i18n.h transcode.h pwgmedia.h
 dir.64.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
 emit.64.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.64.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
@@ -327,7 +333,7 @@ localize.64.o: localize.c  globals.h string.h ../config.h http-private.h http.h 
 localize.64.o: localize.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 localize.64.o: localize.c  i18n.h transcode.h ppd-private.h debug.h
 mark.64.o: mark.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
-mark.64.o: mark.c  string.h ../config.h debug.h
+mark.64.o: mark.c  string.h ../config.h debug.h pwgmedia.h
 md5.64.o: md5.c  md5.h string.h ../config.h
 md5passwd.64.o: md5passwd.c  http-private.h ../config.h http.h versioning.h md5.h
 md5passwd.64.o: md5passwd.c  ipp-private.h ipp.h string.h
@@ -340,6 +346,9 @@ page.64.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
 ppd.64.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.64.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.64.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
+pwgmedia.64.o: pwgmedia.c  pwgmedia.h globals.h string.h ../config.h http-private.h http.h
+pwgmedia.64.o: pwgmedia.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
+pwgmedia.64.o: pwgmedia.c  file.h language.h i18n.h transcode.h debug.h
 request.64.o: request.c  globals.h string.h ../config.h http-private.h http.h versioning.h
 request.64.o: request.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 request.64.o: request.c  i18n.h transcode.h debug.h
@@ -380,5 +389,5 @@ testoptions.64.o: testoptions.c  array.h file.h language.h
 testlang.64.o: testlang.c  i18n.h transcode.h language.h array.h versioning.h string.h
 testlang.64.o: testlang.c  ../config.h
 testppd.64.o: testppd.c  ../cups/string.h ../config.h string.h cups.h ipp.h http.h
-testppd.64.o: testppd.c  versioning.h ppd.h array.h file.h language.h
+testppd.64.o: testppd.c  versioning.h ppd.h array.h file.h language.h pwgmedia.h
 testsnmp.64.o: testsnmp.c  string.h ../config.h snmp-private.h http.h versioning.h

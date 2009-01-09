@@ -3,7 +3,7 @@
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -503,7 +503,7 @@ testraster:	testraster.o ../cups/libcups.a libcupsimage.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
 		../cups/libcups.a $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
-		$(SSLLIBS) $(LIBGSSAPI)
+		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running raster API tests...
 	./testraster
 

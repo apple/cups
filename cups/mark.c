@@ -1,9 +1,9 @@
 /*
- * "$Id: mark.c 7819 2008-08-01 00:27:24Z mike $"
+ * "$Id: mark.c 8210 2009-01-09 02:30:26Z mike $"
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -32,7 +32,9 @@
  *   debug_marked()        - Output the marked array to stdout...
  *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
  *   ppd_mark_choices()    - Mark one or more option choices from a string.
- *   ppd_mark_option()     - Quick mark an option without checking for
+ *   ppd_mark_option()     - Quickly mark an option without checking for
+ *                           conflicts.
+ *   ppd_mark_size()       - Quickly mark a page size without checking for
  *                           conflicts.
  */
 
@@ -43,6 +45,7 @@
 #include "cups.h"
 #include "string.h"
 #include "debug.h"
+#include "pwgmedia.h"
 
 
 /*
@@ -58,6 +61,7 @@ static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
 static void	ppd_mark_choices(ppd_file_t *ppd, const char *s);
 static void	ppd_mark_option(ppd_file_t *ppd, const char *option,
 		                const char *choice);
+static void	ppd_mark_size(ppd_file_t *ppd, const char *size);
 
 
 /*
@@ -155,7 +159,7 @@ cupsMarkOptions(
 	*/
 
         if (!page_size || !page_size[0])
-	  ppd_mark_option(ppd, "PageSize", s);
+	  ppd_mark_size(ppd, s);
 
         if (cupsGetOption("InputSlot", num_options, options) == NULL)
 	  ppd_mark_option(ppd, "InputSlot", s);
@@ -1047,5 +1051,106 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
 
 /*
- * End of "$Id: mark.c 7819 2008-08-01 00:27:24Z mike $".
+ * 'ppd_mark_size()' - Quickly mark a page size without checking for conflicts.
+ *
+ * This function is also responsible for mapping PWG/ISO/IPP size names to the
+ * PPD file...
+ */
+
+static void
+ppd_mark_size(ppd_file_t *ppd,		/* I - PPD file */
+              const char *size)		/* I - Size name */
+{
+  int			i;		/* Looping var */
+  _cups_pwg_media_t	*pwgmedia;	/* PWG media information */
+  ppd_size_t		*ppdsize;	/* Current PPD size */
+  double		dw, dl;		/* Difference in width and height */
+  double		width,		/* Width to find */
+			length;		/* Length to find */
+  char			width_str[256],	/* Width in size name */
+			length_str[256],/* Length in size name */
+			units[256],	/* Units in size name */
+			custom[256];	/* Custom size */
+  struct lconv		*loc;		/* Localization data */
+
+
+ /*
+  * See if this is a PPD size...
+  */
+
+  if (!strncasecmp(size, "Custom.", 7) || ppdPageSize(ppd, size))
+  {
+    ppd_mark_option(ppd, "PageSize", size);
+    return;
+  }
+
+ /*
+  * Nope, try looking up the PWG or legacy (IPP/ISO) size name...
+  */
+
+  if ((pwgmedia = _cupsPWGMediaByName(size)) == NULL)
+    pwgmedia = _cupsPWGMediaByLegacy(size);
+
+  if (pwgmedia)
+  {
+    width  = pwgmedia->width;
+    length = pwgmedia->length;
+  }
+  else if (sscanf(size, "%*[^_]_%*[^_]_%255[0-9.]x%255[0-9.]%s", width_str,
+                  length_str, units) == 3)
+  {
+   /*
+    * Got a "self-describing" name that isn't in our table...
+    */
+
+    loc    = localeconv();
+    width  = _cupsStrScand(width_str, NULL, loc);
+    length = _cupsStrScand(length_str, NULL, loc);
+
+    if (!strcmp(units, "in"))
+    {
+      width  *= 72.0;
+      length *= 72.0;
+    }
+    else if (!strcmp(units, "mm"))
+    {
+      width  *= 25.4 / 72.0;
+      length *= 25.4 / 72.0;
+    }
+    else
+      return;
+  }
+  else
+    return;    
+
+ /*
+  * Search the PPD file for a matching size...
+  */
+
+  for (i = ppd->num_sizes, ppdsize = ppd->sizes; i > 0; i --, ppdsize ++)
+  {
+    dw = ppdsize->width - width;
+    dl = ppdsize->length - length;
+
+    if (dw > -5.0 && dw < 5.0 && dl > -5.0 && dl < 5.0)
+    {
+      ppd_mark_option(ppd, "PageSize", ppdsize->name);
+      return;
+    }
+  }
+
+ /*
+  * No match found; if custom sizes are supported, set a custom size...
+  */
+
+  if (ppd->variable_sizes)
+  {
+    snprintf(custom, sizeof(custom), "Custom.%dx%d", (int)width, (int)length);
+    ppd_mark_option(ppd, "PageSize", custom);
+  }
+}
+
+
+/*
+ * End of "$Id: mark.c 8210 2009-01-09 02:30:26Z mike $".
  */

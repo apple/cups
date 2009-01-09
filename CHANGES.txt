@@ -1,5 +1,25 @@
-CHANGES.txt - 2008-12-15
+CHANGES.txt - 2009-01-09
 ------------------------
+
+CHANGES IN CUPS V1.4b3
+
+	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.
+	- Fixed build problems (STR #3040, STR #3047)
+	- cupsResolveConflicts() did not resolve using the default option
+	  choice in some cases due to the mirror UIConstraints that are
+	  present in most PPD files.
+	- The scheduler did not honor MIME type priorities.
+	- The commandtops filter incorrectly used the JCLBegin code to end
+	  its jobs.
+	- The default BrowseLocalProtocols value was not set properly.
+	- Since the commandtops filter does not actually support ReportLevels
+	  all on its own, don't list that printer command by default for PS
+	  printers.
+	- The scheduler did not give filters a chance to log errors or update
+	  printer attributes when a job was canceled.
+	- The scheduler did not clear the "connecting-to-device" reason keyword
+	  when a job finished.
+
 
 CHANGES IN CUPS V1.4b2
 

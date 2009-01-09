@@ -750,7 +750,7 @@ else
 fi
 
 # Page log file...
-if grep -q 'testfile.pdf Letter' /tmp/cups-$user/log/page_log; then
+if grep -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
 	echo "PASS: page_log formatted correctly."
 	echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
 else
