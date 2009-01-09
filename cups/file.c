@@ -1565,6 +1565,8 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   {
     bytes = (ssize_t)(fp->end - fp->buf);
 
+    DEBUG_printf(("cupsFileSeek: bytes=" CUPS_LLFMT "\n", CUPS_LLCAST bytes));
+
     if (pos >= fp->bufpos && pos < (fp->bufpos + bytes))
     {
      /*
@@ -1596,8 +1598,6 @@ cupsFileSeek(cups_file_t *fp,		/* I - CUPS file */
   */
 
   fp->eof = 0;
-
-  DEBUG_printf(("cupsFileSeek: bytes=" CUPS_LLFMT "\n", CUPS_LLCAST bytes));
 
   if (pos < fp->bufpos)
   {
