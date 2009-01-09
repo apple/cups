@@ -315,7 +315,9 @@ cupsdCreateCommonData(void)
 		  IPP_PAUSE_PRINTER,
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
+		  IPP_SET_PRINTER_ATTRIBUTES,
 		  IPP_SET_JOB_ATTRIBUTES,
+		  IPP_GET_PRINTER_SUPPORTED_VALUES,
 		  IPP_CREATE_PRINTER_SUBSCRIPTION,
 		  IPP_CREATE_JOB_SUBSCRIPTION,
 		  IPP_GET_SUBSCRIPTION_ATTRIBUTES,
@@ -414,6 +416,11 @@ cupsdCreateCommonData(void)
 		  "printer-resolution",
 		  "sides"
 		};
+  static const char * const printer_settable[] =
+		{			/* printer-settable-attributes-supported */
+		  "printer-info",
+		  "printer-location"
+	        };
 
 
   if (CommonData)
@@ -614,6 +621,12 @@ cupsdCreateCommonData(void)
        p;
        i ++, p = (cupsd_policy_t *)cupsArrayNext(Policies))
     attr->values[i].string.text = p->name;
+
+  /* printer-settable-attributes-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "printer-settable-attributes-supported",
+		sizeof(printer_settable) / sizeof(printer_settable[0]),
+		NULL, printer_settable);
 
   /* server-is-sharing-printers */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "server-is-sharing-printers",

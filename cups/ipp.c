@@ -1440,6 +1440,9 @@ ippReadIO(void       *src,		/* I - Data source */
 	        break;
 
             case IPP_TAG_NOVALUE :
+	    case IPP_TAG_NOTSETTABLE :
+	    case IPP_TAG_DELETEATTR :
+	    case IPP_TAG_ADMINDEFINE :
 	        if (attr->value_tag == IPP_TAG_NOVALUE)
 		{
 		  if (n == 0)
