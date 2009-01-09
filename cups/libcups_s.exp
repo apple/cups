@@ -16,6 +16,9 @@ _cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
+_cupsPWGMediaByName
+_cupsPWGMediaByLegacy
+_cupsPWGMediaBySize
 _cupsSetError
 _cupsSetLocale
 _cupsSNMPClose

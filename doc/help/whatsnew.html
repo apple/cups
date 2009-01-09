@@ -76,6 +76,8 @@
 
 <OL START="23">
 
+	<LI><EM>IPP/2.x support;</EM> CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specifications.</LI>
+
 	<LI><EM>CUPS-Add-Modify-Printer operation;</EM> the scheduler now supports setting the printer-state-reasons attribute using this operation.</LI>
 
 	<LI><EM>CUPS-Get-Document operation;</EM> the scheduler now supports a "get document" operation to download files from a print job.</LI>
@@ -89,7 +91,7 @@
 
 <H2 CLASS="title"><A NAME="SCHEDULER">Scheduler</A></H2>
 
-<OL START="27">
+<OL START="28">
 
 	<LI><EM>Access control;</EM> the scheduler now supports multiple addresses in Allow and Deny lines. It also now returns a HTTP 403 (forbidden) status when a user authenticates successfully but is not allowed to perform an operation.</LI>
 
@@ -138,7 +140,7 @@
 
 <H2 CLASS="title"><A NAME="DRIVERS">Printer Drivers</A></H2>
 
-<OL START="48">
+<OL START="49">
 
 	<LI><EM>Device discovery;</EM> the cups-deviced helper now runs backends in parallel for faster discovery and streams the results of discovery as the backends provide them.</LI>
 
@@ -163,7 +165,7 @@
 
 <H2 CLASS="title"><A NAME="FILTERS">Print Filters</A></H2>
 
-<OL START="57">
+<OL START="58">
 
 	<LI><EM>Banner filter;</EM> the bundled banner ("job-sheets") pages are now generated using a new banner filter provides easier customization and better support for UTF-8 text.</LI>
 
@@ -176,7 +178,7 @@
 
 <H2 CLASS="title"><A NAME="CUPSAPI">CUPS API</A></H2>
 
-<OL START="60">
+<OL START="61">
 
 	<LI><EM>Backend API;</EM> a new cupsBackendReport function is provided to report a device from a backend and handles any needed quoting of the make-and-model, info, device-id, and location strings.</LI>
 

@@ -3,7 +3,7 @@
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -278,10 +278,11 @@ cupsdProcessIPPRequest(
   * Then validate the request header and required attributes...
   */
 
-  if (con->request->request.any.version[0] != 1)
+  if (con->request->request.any.version[0] != 1 &&
+      con->request->request.any.version[0] != 2)
   {
    /*
-    * Return an error, since we only support IPP 1.x.
+    * Return an error, since we only support IPP 1.x and 2.x.
     */
 
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,

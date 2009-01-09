@@ -21,6 +21,9 @@ __cupsMD5Init
 __cupsMessageFree
 __cupsMessageLoad
 __cupsMessageLookup
+__cupsPWGMediaByName
+__cupsPWGMediaByLegacy
+__cupsPWGMediaBySize
 __cupsSetError
 __cupsSetLocale
 __cupsSNMPClose

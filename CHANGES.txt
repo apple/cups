@@ -3,6 +3,7 @@ CHANGES.txt - 2009-01-08
 
 CHANGES IN CUPS V1.4b3
 
+	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.
 	- The scheduler did not honor MIME type priorities.
 	- The commandtops filter incorrectly used the JCLBegin code to end
 	  its jobs.

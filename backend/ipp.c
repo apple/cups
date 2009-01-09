@@ -3,7 +3,7 @@
  *
  *   IPP backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -258,7 +258,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   compression = 0;
-  version     = 1;
+  version     = 11;
   waitjob     = 1;
   waitprinter = 1;
   contimeout  = 7 * 24 * 60 * 60;
@@ -355,9 +355,13 @@ main(int  argc,				/* I - Number of command-line args */
       else if (!strcasecmp(name, "version"))
       {
         if (!strcmp(value, "1.0"))
-	  version = 0;
+	  version = 10;
 	else if (!strcmp(value, "1.1"))
-	  version = 1;
+	  version = 11;
+	else if (!strcmp(value, "2.0"))
+	  version = 20;
+	else if (!strcmp(value, "2.1"))
+	  version = 21;
 	else
 	{
 	  _cupsLangPrintf(stderr,
@@ -667,7 +671,8 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-    request->request.op.version[1] = version;
+    request->request.op.version[0] = version / 10;
+    request->request.op.version[1] = version % 10;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -713,16 +718,16 @@ main(int  argc,				/* I - Number of command-line args */
 	  delay += 5;
       }
       else if ((ipp_status == IPP_BAD_REQUEST ||
-	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
+	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version > 10)
       {
        /*
 	* Switch to IPP/1.0...
 	*/
 
-	_cupsLangPuts(stderr,
-	              _("INFO: Printer does not support IPP/1.1, trying "
-		        "IPP/1.0...\n"));
-	version = 0;
+	_cupsLangPrintf(stderr,
+	                _("INFO: Printer does not support IPP/%d.%d, trying "
+		          "IPP/1.0...\n"), version / 10, version % 10);
+	version = 10;
 	httpReconnect(http);
       }
       else if (ipp_status == IPP_NOT_FOUND)
@@ -874,7 +879,8 @@ main(int  argc,				/* I - Number of command-line args */
     else
       request = ippNewRequest(IPP_PRINT_JOB);
 
-    request->request.op.version[1] = version;
+    request->request.op.version[0] = version / 10;
+    request->request.op.version[1] = version % 10;
 
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
@@ -967,7 +973,7 @@ main(int  argc,				/* I - Number of command-line args */
 	             "document-format", NULL, final_content_type);
     }
 
-    if (copies_sup && version > 0 && send_options)
+    if (copies_sup && version > 10 && send_options)
     {
      /*
       * Only send options if the destination printer supports the copies
@@ -1022,16 +1028,16 @@ main(int  argc,				/* I - Number of command-line args */
 	sleep(10);
       }
       else if ((ipp_status == IPP_BAD_REQUEST ||
-	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version == 1)
+	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version > 10)
       {
        /*
 	* Switch to IPP/1.0...
 	*/
 
-	_cupsLangPuts(stderr,
-	              _("INFO: Printer does not support IPP/1.1, trying "
-		        "IPP/1.0...\n"));
-	version = 0;
+	_cupsLangPrintf(stderr,
+	                _("INFO: Printer does not support IPP/%d.%d, trying "
+		          "IPP/1.0...\n"), version / 10, version % 10);
+	version = 10;
 	httpReconnect(http);
       }
       else
@@ -1072,8 +1078,8 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
 	request = ippNewRequest(IPP_SEND_DOCUMENT);
-
-	request->request.op.version[1] = version;
+	request->request.op.version[0] = version / 10;
+	request->request.op.version[1] = version % 10;
 
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	     NULL, uri);
@@ -1138,7 +1144,8 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
-      request->request.op.version[1] = version;
+      request->request.op.version[0] = version / 10;
+      request->request.op.version[1] = version % 10;
 
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	   NULL, uri);
@@ -1322,7 +1329,8 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   _cupsLangPuts(stderr, _("INFO: Canceling print job...\n"));
 
   request = ippNewRequest(IPP_CANCEL_JOB);
-  request->request.op.version[1] = version;
+  request->request.op.version[0] = version / 10;
+  request->request.op.version[1] = version % 10;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);
@@ -1377,7 +1385,8 @@ check_printer_state(
   */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
-  request->request.op.version[1] = version;
+  request->request.op.version[0] = version / 10;
+  request->request.op.version[1] = version % 10;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                NULL, uri);

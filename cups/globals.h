@@ -3,7 +3,7 @@
  *
  *   Global variable definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -102,6 +102,10 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   ppd_status_t		ppd_status;	/* Status of last ppdOpen*() */
   int			ppd_line;	/* Current line number */
   ppd_conform_t		ppd_conform;	/* Level of conformance required */
+
+  /* pwgmedia.c */
+  cups_array_t		*pwg_size_lut,	/* Lookup table for PWG names */
+			*leg_size_lut;	/* Lookup table for legacy names */
 
   /* snmp.c */
   char			snmp_community[255];
