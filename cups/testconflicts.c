@@ -3,7 +3,7 @@
  *
  *   PPD constraint test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -39,6 +39,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   char		line[256];		/* Input buffer */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
+  char		*option,		/* Current option */
+		*choice;		/* Current choice */
 
 
   if (argc != 2)
@@ -61,12 +63,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   ppdMarkDefaults(ppd);
 
+  option = NULL;
+  choice = NULL;
+
   for (;;)
   {
     num_options = 0;
     options     = NULL;
 
-    if (!cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options))
+    if (!cupsResolveConflicts(ppd, option, choice, &num_options, &options))
       puts("Unable to resolve conflicts!");
     else if (num_options > 0)
     {
@@ -78,12 +83,24 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsFreeOptions(num_options, options);
     }
 
+    if (option)
+    {
+      free(option);
+      free(choice);
+    }
+
     printf("\nNew Option(s): ");
     fflush(stdout);
     if (!fgets(line, sizeof(line), stdin) || line[0] == '\n')
       break;
 
     num_options = cupsParseOptions(line, 0, &options);
+    if (num_options > 0)
+    {
+      option = strdup(options[0].name);
+      choice = strdup(options[0].value);
+    }
+
     if (cupsMarkOptions(ppd, num_options, options))
       puts("Options Conflict!");
     cupsFreeOptions(num_options, options);
