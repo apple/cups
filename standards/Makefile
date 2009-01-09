@@ -3,7 +3,7 @@
 #
 #   Standards makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -146,7 +146,7 @@ uninstall:
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
-		$(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

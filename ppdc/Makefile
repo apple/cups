@@ -3,7 +3,7 @@
 #
 #   Makefile for the CUPS PPD Compiler.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 2002-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -237,7 +237,7 @@ genstrings:		genstrings.o libcupsppdc.a ../cups/libcups.a \
 	echo Linking $@...
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
 		libcupsppdc.a ../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) \
-		$(COMMONLIBS) $(LIBZ)
+		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Generating localization strings...
 	./genstrings >sample.c
 
@@ -254,7 +254,8 @@ ppdc:			ppdc.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 ppdc-static:		ppdc.o libcupsppdc.a  ../cups/libcups.a foo.drv foo-fr.po
 	echo Linking $@...
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
 	./ppdc-static -l en,fr -z -I ../data foo.drv
@@ -303,7 +304,8 @@ ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 testcatalog:		testcatalog.o libcupsppdc.a ../cups/libcups.a
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(COMMONLIBS) $(LIBZ)
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
 
 
 #

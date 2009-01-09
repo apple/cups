@@ -129,6 +129,7 @@ printers.o: mime.h ../cups/ipp.h ../cups/file.h ../cups/http.h ../cups/i18n.h
 printers.o: ../cups/transcode.h ../cups/debug.h sysman.h statbuf.h cert.h
 printers.o: auth.h client.h policy.h printers.h classes.h job.h conf.h
 printers.o: banners.h dirsvc.h network.h subscriptions.h ../cups/dir.h
+printers.o: ../cups/pwgmedia.h
 process.o: cupsd.h ../cups/http-private.h ../config.h ../cups/http.h
 process.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 process.o: ../cups/ipp.h ../cups/string.h ../cups/array.h ../cups/cups.h
