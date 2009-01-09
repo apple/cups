@@ -280,14 +280,24 @@ main(int  argc,				/* I - Number of command-line arguments */
     fputs("cupsResolveConflicts(InputSlot=Envelope): ", stdout);
     num_options = 0;
     options     = NULL;
-    if (cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
+    if (!cupsResolveConflicts(ppd, "InputSlot", "Envelope", &num_options,
                              &options))
     {
-      puts("FAIL (Resolved but shouldn't be able to!)");
+      puts("FAIL (Unable to resolve)");
+      status ++;
+    }
+    else if (num_options != 2 ||
+             !cupsGetOption("PageSize", num_options, options))
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
       status ++;
     }
     else
-      puts("PASS (Unable to resolve)");
+      puts("PASS (Resolved by changing PageSize)");
+
     cupsFreeOptions(num_options, options);
 
     fputs("cupsResolveConflicts(No option/choice): ", stdout);
@@ -295,8 +305,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     options     = NULL;
     if (cupsResolveConflicts(ppd, NULL, NULL, &num_options, &options) &&
         num_options == 1 && !strcasecmp(options[0].name, "InputSlot") &&
-	!strcasecmp(options[0].value, "Manual"))
-      puts("PASS (Resolved)");
+	!strcasecmp(options[0].value, "Tray"))
+      puts("PASS (Resolved by changing InputSlot)");
     else if (num_options > 0)
     {
       printf("FAIL (%d options:", num_options);
