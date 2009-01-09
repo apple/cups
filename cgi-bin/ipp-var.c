@@ -778,7 +778,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
 	      int        urlsize,	/* I - Size of URL buffer */
 	      const char *newresource)	/* I - Replacement resource */
 {
-  char			method[HTTP_MAX_URI],
+  char			scheme[HTTP_MAX_URI],
 			userpass[HTTP_MAX_URI],
 			hostname[HTTP_MAX_URI],
 			rawresource[HTTP_MAX_URI],
@@ -825,13 +825,13 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
   * Convert the URI to a URL...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, method, sizeof(method), userpass,
+  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass,
                   sizeof(userpass), hostname, sizeof(hostname), &port,
 		  rawresource, sizeof(rawresource));
 
-  if (!strcmp(method, "ipp") ||
-      !strcmp(method, "http") ||
-      !strcmp(method, "https"))
+  if (!strcmp(scheme, "ipp") ||
+      !strcmp(scheme, "http") ||
+      !strcmp(scheme, "https"))
   {
     if (newresource)
     {
@@ -870,7 +870,9 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
     * Map local access to a local URI...
     */
 
-    if (!strcasecmp(hostname, "localhost") ||
+    if (!strcasecmp(hostname, "127.0.0.1") ||
+	!strcasecmp(hostname, "[::1]") ||
+	!strcasecmp(hostname, "localhost") ||
 	!strncasecmp(hostname, "localhost.", 10) ||
 	!strcasecmp(hostname, server) ||
 	!strcasecmp(hostname, servername))
