@@ -3,7 +3,7 @@
 //
 //   PPD file compiler definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -945,7 +945,8 @@ ppdcDriver::write_ppd_file(
         continue;
 
       if (!o->text->value || !strcmp(o->name->value, o->text->value))
-	cupsFilePrintf(fp, "*OpenUI *%s: ", o->name->value);
+	cupsFilePrintf(fp, "*OpenUI *%s: ", o->name->value,
+	               catalog->find_message(o->name->value));
       else
 	cupsFilePrintf(fp, "*OpenUI *%s/%s: ", o->name->value,
 	               catalog->find_message(o->text->value));
@@ -1008,7 +1009,8 @@ ppdcDriver::write_ppd_file(
       {
         // Write this choice...
 	if (!c->text->value || !strcmp(c->name->value, c->text->value))
-          cupsFilePrintf(fp, "*%s %s: \"%s\"%s", o->name->value, c->name->value,
+          cupsFilePrintf(fp, "*%s %s: \"%s\"%s", o->name->value,
+	                 catalog->find_message(c->name->value),
 	        	 c->code->value, lf);
         else
           cupsFilePrintf(fp, "*%s %s/%s: \"%s\"%s", o->name->value,

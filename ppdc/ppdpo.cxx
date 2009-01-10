@@ -202,7 +202,7 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
       if (!o->choices->count)
         continue;
 
-      if (o->text->value && strcmp(o->name->value, o->text->value))
+      if (o->text->value)
         catalog->add_message(o->text->value);
       else
         catalog->add_message(o->name->value);
@@ -210,7 +210,7 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
       for (c = (ppdcChoice *)o->choices->first();
            c;
 	   c = (ppdcChoice *)o->choices->next())
-	if (c->text->value && strcmp(c->name->value, c->text->value))
+	if (c->text->value)
           catalog->add_message(c->text->value);
         else
           catalog->add_message(c->name->value);

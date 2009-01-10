@@ -4,6 +4,8 @@ CHANGES.txt - 2009-01-09
 CHANGES IN CUPS V1.4b3
 
 	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.
+	- The PPD compiler didn't localize options or choices that did not
+	  have associated translation text (STR #3045)
 	- Updated the Spanish localization (STR #3043)
 	- Fixed build problems (STR #3040, STR #3047)
 	- cupsResolveConflicts() did not resolve using the default option
