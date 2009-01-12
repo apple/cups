@@ -233,7 +233,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
   pass            = 1;
   job_id          = 0;
   subscription_id = 0;
-  version         = 1;
+  version         = 11;
   linenum         = 1;
 
   while (get_token(fp, token, sizeof(token), &linenum) != NULL)
@@ -292,8 +292,21 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * IPP version number for test...
 	*/
 
+        int major, minor;		/* Major/minor IPP version */
+
+
 	get_token(fp, temp, sizeof(temp), &linenum);
-	sscanf(temp, "%*d.%d", &version);
+	if (sscanf(temp, "%d.%d", &major, &minor) == 2 &&
+	    major >= 0 && minor >= 0 && minor < 10)
+	  version = major * 10 + minor;
+	else
+	{
+	  printf("Bad version %s seen on line %d - aborting test!\n", token,
+		 linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+	}
       }
       else if (!strcasecmp(token, "RESOURCE"))
       {
@@ -548,7 +561,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
-    request->request.op.version[1]   = version;
+    request->request.op.version[0]   = version / 10;
+    request->request.op.version[1]   = version % 10;
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
