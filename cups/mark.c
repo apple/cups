@@ -79,10 +79,12 @@ cupsMarkOptions(
     cups_option_t *options)		/* I - Options */
 {
   int		i, j, k;		/* Looping vars */
-  char		*val,			/* Pointer into value */
-		*ptr,			/* Pointer into string */
+  char		*ptr,			/* Pointer into string */
 		s[255];			/* Temporary string */
-  const char	*page_size;		/* PageSize option */
+  const char	*val,			/* Pointer into value */
+		*media,			/* media option */
+		*media_col,		/* media-col option */
+		*page_size;		/* PageSize option */
   cups_option_t	*optptr;		/* Current option */
   ppd_option_t	*option;		/* PPD option */
   ppd_attr_t	*attr;			/* PPD attribute */
@@ -123,61 +125,124 @@ cupsMarkOptions(
   debug_marked(ppd, "Before...");
 
  /*
-  * Mark options...
+  * Do special handling for media, media-col, and PageSize...
+  */
+
+  media     = cupsGetOption("media", num_options, options);
+  media_col = cupsGetOption("media-col", num_options, options);
+  page_size = cupsGetOption("PageSize", num_options, options);
+
+  if (media_col && (!page_size || !page_size[0]))
+  {
+   /*
+    * Pull out the corresponding media size from the media-col value...
+    */
+
+    int			num_media_cols,	/* Number of media-col values */
+    			num_media_sizes;/* Number of media-size values */
+    cups_option_t	*media_cols,	/* media-col values */
+			*media_sizes;	/* media-size values */
+
+
+    num_media_cols = cupsParseOptions(media_col, 0, &media_cols);
+
+    if ((val = cupsGetOption("media-key", num_media_cols, media_cols)) != NULL)
+      media = val;
+    else if ((val = cupsGetOption("media-size", num_media_cols,
+                                  media_cols)) != NULL)
+    {
+     /*
+      * Lookup by dimensions...
+      */
+
+      double		width,		/* Width in points */
+			length;		/* Length in points */
+      struct lconv	*loc;		/* Locale data */
+      _cups_pwg_media_t	*pwgmedia;	/* PWG media name */
+
+
+      num_media_sizes = cupsParseOptions(val, 0, &media_sizes);
+      loc             = localeconv();
+
+      if ((val = cupsGetOption("x-dimension", num_media_sizes,
+                               media_sizes)) != NULL)
+        width = _cupsStrScand(val, NULL, loc) * 2540.0 / 72.0;
+      else
+        width = 0.0;
+
+      if ((val = cupsGetOption("y-dimension", num_media_sizes,
+                               media_sizes)) != NULL)
+        length = _cupsStrScand(val, NULL, loc) * 2540.0 / 72.0;
+      else
+        length = 0.0;
+
+      if ((pwgmedia = _cupsPWGMediaBySize(width, length)) != NULL)
+        media = pwgmedia->pwg;
+
+      cupsFreeOptions(num_media_sizes, media_sizes);
+    }
+
+    cupsFreeOptions(num_media_cols, media_cols);
+  }
+
+  if (media)
+  {
+   /*
+    * Loop through the option string, separating it at commas and
+    * marking each individual option as long as the corresponding
+    * PPD option (PageSize, InputSlot, etc.) is not also set.
+    *
+    * For PageSize, we also check for an empty option value since
+    * some versions of MacOS X use it to specify auto-selection
+    * of the media based solely on the size.
+    */
+
+    for (val = media; *val;)
+    {
+     /*
+      * Extract the sub-option from the string...
+      */
+
+      for (ptr = s; *val && *val != ',' && (ptr - s) < (sizeof(s) - 1);)
+	*ptr++ = *val++;
+      *ptr++ = '\0';
+
+      if (*val == ',')
+	val ++;
+
+     /*
+      * Mark it...
+      */
+
+      if (!page_size || !page_size[0])
+	ppd_mark_size(ppd, s);
+
+      if (cupsGetOption("InputSlot", num_options, options) == NULL)
+	ppd_mark_option(ppd, "InputSlot", s);
+
+      if (cupsGetOption("MediaType", num_options, options) == NULL)
+	ppd_mark_option(ppd, "MediaType", s);
+
+      if (cupsGetOption("EFMediaType", num_options, options) == NULL)
+	ppd_mark_option(ppd, "EFMediaType", s);		/* EFI */
+
+      if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
+	ppd_mark_option(ppd, "EFMediaQualityMode", s);	/* EFI */
+
+      if (!strcasecmp(s, "manual") &&
+	  !cupsGetOption("ManualFeed", num_options, options))
+	ppd_mark_option(ppd, "ManualFeed", "True");
+    }
+  }
+
+ /*
+  * Mark other options...
   */
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
-    if (!strcasecmp(optptr->name, "media"))
-    {
-     /*
-      * Loop through the option string, separating it at commas and
-      * marking each individual option as long as the corresponding
-      * PPD option (PageSize, InputSlot, etc.) is not also set.
-      *
-      * For PageSize, we also check for an empty option value since
-      * some versions of MacOS X use it to specify auto-selection
-      * of the media based solely on the size.
-      */
-
-      page_size = cupsGetOption("PageSize", num_options, options);
-
-      for (val = optptr->value; *val;)
-      {
-       /*
-        * Extract the sub-option from the string...
-	*/
-
-        for (ptr = s; *val && *val != ',' && (ptr - s) < (sizeof(s) - 1);)
-	  *ptr++ = *val++;
-	*ptr++ = '\0';
-
-	if (*val == ',')
-	  val ++;
-
-       /*
-        * Mark it...
-	*/
-
-        if (!page_size || !page_size[0])
-	  ppd_mark_size(ppd, s);
-
-        if (cupsGetOption("InputSlot", num_options, options) == NULL)
-	  ppd_mark_option(ppd, "InputSlot", s);
-
-        if (cupsGetOption("MediaType", num_options, options) == NULL)
-	  ppd_mark_option(ppd, "MediaType", s);
-
-        if (cupsGetOption("EFMediaType", num_options, options) == NULL)
-	  ppd_mark_option(ppd, "EFMediaType", s);		/* EFI */
-
-        if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
-	  ppd_mark_option(ppd, "EFMediaQualityMode", s);	/* EFI */
-
-	if (!strcasecmp(s, "manual") &&
-	    !cupsGetOption("ManualFeed", num_options, options))
-          ppd_mark_option(ppd, "ManualFeed", "True");
-      }
-    }
+    if (!strcasecmp(optptr->name, "media") ||
+        !strcasecmp(optptr->name, "media-col"))
+      continue;
     else if (!strcasecmp(optptr->name, "sides"))
     {
       for (j = 0;
