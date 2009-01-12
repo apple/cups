@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -4035,9 +4035,14 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 					 "job-printer-state-reasons",
 					 num_reasons, NULL, NULL);
   }
+  else if (job->printer_reasons)
+  {
+    for (i = 0; i < job->printer_reasons->num_values; i ++)
+      _cupsStrFree(job->printer_reasons->values[i].string.text);
+  }
 
   for (i = 0; i < num_reasons; i ++)
-    cupsdSetString(&(job->printer_reasons->values[i].string.text), reasons[i]);
+    job->printer_reasons->values[i].string.text = _cupsStrAlloc(reasons[i]);
 }
 
 
