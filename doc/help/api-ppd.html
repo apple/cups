@@ -375,6 +375,7 @@ div.contents ul.subcontents li {
 <li><a href="#ATTRIBUTES">Attributes</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
+<li><a href="#cupsGetConflicts" title="Get a list of conflicting options in a marked PPD.">cupsGetConflicts</a></li>
 <li><a href="#cupsMarkOptions" title="Mark command-line options in a PPD file.">cupsMarkOptions</a></li>
 <li><a href="#cupsResolveConflicts" title="Resolve conflicts in a marked PPD.">cupsResolveConflicts</a></li>
 <li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
@@ -689,6 +690,39 @@ for (attr = <a href="#ppdFindAttr">ppdFindAttr</a>(ppd, "Product", NULL);
   puts(attr->value);
 </pre>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetConflicts">cupsGetConflicts</a></h3>
+<p class="description">Get a list of conflicting options in a marked PPD.</p>
+<p class="code">
+int cupsGetConflicts (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_file_t">ppd_file_t</a> *ppd,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *option,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *choice,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_option_t **options<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>ppd</dt>
+<dd class="description">PPD file</dd>
+<dt>option</dt>
+<dd class="description">Option to test</dd>
+<dt>choice</dt>
+<dd class="description">Choice to test</dd>
+<dt>options</dt>
+<dd class="description">Conflicting options</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Number of conflicting options</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function gets a list of options that would conflict if &quot;option&quot; and
+&quot;choice&quot; were marked in the PPD.  You would typically call this function
+after marking the currently selected options in the PPD in order to
+determine whether a new option selection would cause a conflict.<br>
+<br>
+The number of conflicting options are returned with &quot;options&quot; pointing to
+the conflicting options.  The returned option array must be freed using
+<a href="#cupsFreeOptions"><code>cupsFreeOptions</code></a>.
+
+</p>
 <h3 class="function"><a name="cupsMarkOptions">cupsMarkOptions</a></h3>
 <p class="description">Mark command-line options in a PPD file.</p>
 <p class="code">

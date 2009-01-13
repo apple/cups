@@ -113,7 +113,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		conflicts;		/* Number of conflicts */
   char		*s;			/* String */
   char		buffer[8192];		/* String buffer */
-  const char	*text;			/* Localized text */
+  const char	*text,			/* Localized text */
+		*val;			/* Option value */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   ppd_size_t	minsize,		/* Minimum size */
@@ -265,8 +266,26 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Test constraints...
     */
 
-    fputs("ppdConflicts(): ", stdout);
+    fputs("cupsGetConflicts(InputSlot=Envelope): ", stdout);
     ppdMarkOption(ppd, "PageSize", "Letter");
+
+    num_options = cupsGetConflicts(ppd, "InputSlot", "Envelope", &options);
+    if (num_options != 2 ||
+        (val = cupsGetOption("PageRegion", num_options, options)) == NULL ||
+	strcasecmp(val, "Letter") ||
+	(val = cupsGetOption("PageSize", num_options, options)) == NULL ||
+	strcasecmp(val, "Letter"))
+    {
+      printf("FAIL (%d options:", num_options);
+      for (i = 0; i < num_options; i ++)
+        printf(" %s=%s", options[i].name, options[i].value);
+      puts(")");
+      status ++;
+    }
+    else
+      puts("PASS");
+
+    fputs("ppdConflicts(): ", stdout);
     ppdMarkOption(ppd, "InputSlot", "Envelope");
 
     if ((conflicts = ppdConflicts(ppd)) == 2)

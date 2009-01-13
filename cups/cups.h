@@ -3,7 +3,7 @@
  *
  *   API definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -281,6 +281,10 @@ extern int		cupsCreateJob(http_t *http, const char *name,
 				      cups_option_t *options) _CUPS_API_1_4;
 extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
+extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
+					 const char *choice,
+					 cups_option_t **options)
+					     _CUPS_API_1_4;
 extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
 			               const char *exclude_schemes,
 			               const char *include_schemes,

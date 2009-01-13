@@ -18,6 +18,8 @@
  *
  * Contents:
  *
+ *   cupsGetConflicts()       - Get a list of conflicting options in a marked
+ *                              PPD.
  *   cupsResolveConflicts()   - Resolve conflicts in a marked PPD.
  *   ppdConflicts()           - Check to see if there are any conflicts among
  *                              the marked option choices.
@@ -63,6 +65,74 @@ static cups_array_t	*ppd_test_constraints(ppd_file_t *ppd,
 			                      int num_options,
 			                      cups_option_t *options,
 					      int which);
+
+
+/*
+ * 'cupsGetConflicts()' - Get a list of conflicting options in a marked PPD.
+ *
+ * This function gets a list of options that would conflict if "option" and
+ * "choice" were marked in the PPD.  You would typically call this function
+ * after marking the currently selected options in the PPD in order to
+ * determine whether a new option selection would cause a conflict.
+ *
+ * The number of conflicting options are returned with "options" pointing to
+ * the conflicting options.  The returned option array must be freed using
+ * @link cupsFreeOptions@.
+ *
+ * @since CUPS 1.4@
+ */
+
+int					/* O - Number of conflicting options */
+cupsGetConflicts(
+    ppd_file_t    *ppd,			/* I - PPD file */
+    const char    *option,		/* I - Option to test */
+    const char    *choice,		/* I - Choice to test */
+    cups_option_t **options)		/* O - Conflicting options */
+{
+  int			i,		/* Looping var */
+			num_options;	/* Number of conflicting options */
+  cups_array_t		*active;	/* Active conflicts */
+  _ppd_cups_uiconsts_t	*c;		/* Current constraints */
+  _ppd_cups_uiconst_t	*cptr;		/* Current constraint */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (options)
+    *options = NULL;
+
+  if (!ppd || !option || !choice || !options)
+    return (0);
+
+ /*
+  * Test for conflicts...
+  */
+
+  active = ppd_test_constraints(ppd, option, choice, 0, NULL,
+                                _PPD_ALL_CONSTRAINTS);
+
+ /*
+  * Loop through all of the UI constraints and add any options that conflict...
+  */
+
+  for (num_options = 0, c = (_ppd_cups_uiconsts_t *)cupsArrayFirst(active);
+       c;
+       c = (_ppd_cups_uiconsts_t *)cupsArrayNext(active))
+  {
+    for (i = c->num_constraints, cptr = c->constraints;
+         i > 0;
+	 i --, cptr ++)
+      if (strcasecmp(cptr->option->keyword, option))
+        num_options = cupsAddOption(cptr->option->keyword, cptr->choice->choice,
+				    num_options, options);
+  }
+
+  cupsArrayDelete(active);
+
+  return (num_options);
+}
 
 
 /*
