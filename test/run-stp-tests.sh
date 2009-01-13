@@ -673,10 +673,10 @@ fi
 
 # Error log messages
 count=`grep '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 17; then
-	echo "FAIL: $count error messages, expected 17."
+if test $count != 18; then
+	echo "FAIL: $count error messages, expected 18."
 	grep '^E ' /tmp/cups-$user/log/error_log
-	echo "<P>FAIL: $count error messages, expected 17.</P>" >>$strfile
+	echo "<P>FAIL: $count error messages, expected 18.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	grep '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile

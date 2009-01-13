@@ -152,7 +152,7 @@
 	ATTR uri printer-uri ipp://localhost/printers
 
 	# What statuses are OK?
-	STATUS client-error-bad-request
+	STATUS server-error-version-not-supported
 }
 #
 # End of "$Id$"

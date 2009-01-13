@@ -1109,18 +1109,6 @@ ippReadIO(void       *src,		/* I - Data source */
 	  }
 
 	 /*
-          * Verify the major version number...
-	  */
-
-	  if (buffer[0] != 1 && buffer[0] != 2)
-	  {
-	    DEBUG_printf(("ippReadIO: version number (%d.%d) is bad.\n",
-	                  buffer[0], buffer[1]));
-	    ipp_buffer_release(buffer);
-	    return (IPP_ERROR);
-	  }
-
-	 /*
           * Then copy the request header over...
 	  */
 

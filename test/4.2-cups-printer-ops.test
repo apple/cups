@@ -277,7 +277,7 @@
 	STATUS successful-ok
 
 	# What attributes do we expect?
-	EXPECT media-col
+	EXPECT media-col-default
 }
 
 #
