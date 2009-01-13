@@ -3,7 +3,7 @@
  *
  *   Option encoding routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -86,6 +86,13 @@ static const _ipp_option_t ipp_options[] =
   { 1, "marker-names",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { 1, "marker-types",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 1, "media",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "media-col",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB },
+  { 0, "media-col-default",	IPP_TAG_BEGIN_COLLECTION, IPP_TAG_PRINTER },
+  { 0, "media-color",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 1, "media-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
+  { 0, "media-key",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
+  { 0, "media-size",		IPP_TAG_BEGIN_COLLECTION, IPP_TAG_JOB },
+  { 0, "media-type",		IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "mirror",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
   { 0, "mirror-default",	IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
   { 0, "natural-scaling",	IPP_TAG_INTEGER,	IPP_TAG_JOB },
@@ -152,7 +159,9 @@ static const _ipp_option_t ipp_options[] =
   { 0, "sides",			IPP_TAG_KEYWORD,	IPP_TAG_JOB },
   { 0, "sides-default",		IPP_TAG_KEYWORD,	IPP_TAG_PRINTER },
   { 0, "wrap",			IPP_TAG_BOOLEAN,	IPP_TAG_JOB },
-  { 0, "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER }
+  { 0, "wrap-default",		IPP_TAG_BOOLEAN,	IPP_TAG_PRINTER },
+  { 0, "x-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
+  { 0, "y-dimension",		IPP_TAG_INTEGER,	IPP_TAG_JOB }
 };
 
 
@@ -215,6 +224,9 @@ cupsEncodeOptions2(
   ipp_attribute_t *attr;		/* IPP attribute */
   ipp_tag_t	value_tag;		/* IPP value tag */
   cups_option_t	*option;		/* Current option */
+  ipp_t		*collection;		/* Collection value */
+  int		num_cols;		/* Number of collection values */
+  cups_option_t	*cols;			/* Collection values */
 
 
   DEBUG_printf(("cupsEncodeOptions2(ipp=%p, num_options=%d, options=%p, "
@@ -369,6 +381,7 @@ cupsEncodeOptions2(
 	*/
 
 	DEBUG_puts("cupsEncodeOptions2: Ran out of memory for value copy!");
+	ippDeleteAttribute(ipp, attr);
 	return;
       }
 
@@ -534,6 +547,28 @@ cupsEncodeOptions2(
 	                  "\"%s\"...\n", (char *)attr->values[j].unknown.data));
             break;
 
+        case IPP_TAG_BEGIN_COLLECTION :
+	   /*
+	    * Collection value
+	    */
+
+	    num_cols   = cupsParseOptions(val, 0, &cols);
+	    if ((collection = ippNew()) == NULL)
+	    {
+	      cupsFreeOptions(num_cols, cols);
+
+	      if (copy)
+	        free(copy);
+
+	      ippDeleteAttribute(ipp, attr);
+	      return;
+            }
+
+	    attr->values[j].collection = collection;
+	    cupsEncodeOptions2(collection, num_cols, cols, IPP_TAG_JOB);
+            cupsFreeOptions(num_cols, cols);
+	    break;
+
 	default :
 	    if ((attr->values[j].string.text = _cupsStrAlloc(val)) == NULL)
 	    {
@@ -542,6 +577,11 @@ cupsEncodeOptions2(
 	      */
 
 	      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for string!");
+
+	      if (copy)
+	        free(copy);
+
+	      ippDeleteAttribute(ipp, attr);
 	      return;
 	    }
 
