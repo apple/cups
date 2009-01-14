@@ -945,7 +945,7 @@ ppdcDriver::write_ppd_file(
         continue;
 
       if (!o->text->value || !strcmp(o->name->value, o->text->value))
-	cupsFilePrintf(fp, "*OpenUI *%s: ", o->name->value,
+	cupsFilePrintf(fp, "*OpenUI *%s/%s: ", o->name->value,
 	               catalog->find_message(o->name->value));
       else
 	cupsFilePrintf(fp, "*OpenUI *%s/%s: ", o->name->value,
