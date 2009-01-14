@@ -1,9 +1,10 @@
-CHANGES.txt - 2009-01-13
+CHANGES.txt - 2009-01-14
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The ppdi utility did not work.
 	- The web interface no longer uses multi-part output with old or broken
 	  web browsers (STR #3049)
 	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.

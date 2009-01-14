@@ -3,7 +3,7 @@
 //
 //   Source class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -3422,15 +3422,15 @@ ppdcSource::write_file(const char *f)	// I - File to write
       quotef(fp, "  Copyright \"%s\"\n", st->value);
 
     // Write other strings and values...
-    if (d->manufacturer->value)
+    if (d->manufacturer && d->manufacturer->value)
       quotef(fp, "  Manufacturer \"%s\"\n", d->manufacturer->value);
     if (d->model_name->value)
       quotef(fp, "  ModelName \"%s\"\n", d->model_name->value);
-    if (d->file_name->value)
+    if (d->file_name && d->file_name->value)
       quotef(fp, "  FileName \"%s\"\n", d->file_name->value);
-    if (d->pc_file_name->value)
+    if (d->pc_file_name && d->pc_file_name->value)
       quotef(fp, "  PCFileName \"%s\"\n", d->pc_file_name->value);
-    if (d->version->value)
+    if (d->version && d->version->value)
       quotef(fp, "  Version \"%s\"\n", d->version->value);
 
     cupsFilePrintf(fp, "  DriverType %s\n", driver_types[d->type]);
