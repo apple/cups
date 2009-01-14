@@ -3,7 +3,7 @@
  *
  *   SNMP supplies functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -190,8 +190,8 @@ backendSNMPSupplies(
         packet.object_type != CUPS_ASN1_OCTET_STRING)
       return (-1);
 
-    i = ((packet.object_value.string[0] & 255) << 8) |
-        (packet.object_value.string[1] & 255);
+    i = (packet.object_value.string.bytes[0] << 8) |
+        packet.object_value.string.bytes[1];
 
     if (i & CUPS_TC_lowPaper)
       fputs("STATE: +media-low-report\n", stderr);
@@ -403,7 +403,8 @@ backend_init_supplies(
     num_supplies = 0;
   }
   else
-    strlcpy(description, packet.object_value.string, sizeof(description));
+    strlcpy(description, (char *)packet.object_value.string.bytes,
+            sizeof(description));
 
  /*
   * See if we have already queried this device...
@@ -590,13 +591,13 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
     i = packet->object_name[prtMarkerColorantValueOffset];
 
     fprintf(stderr, "DEBUG2: prtMarkerColorantValue.1.%d = \"%s\"\n", i,
-            packet->object_value.string);
+            (char *)packet->object_value.string.bytes);
 
     for (j = 0; j < num_supplies; j ++)
       if (supplies[j].colorant == i)
       {
 	for (k = 0; k < (int)(sizeof(colors) / sizeof(colors[0])); k ++)
-	  if (!strcmp(colors[k][0], packet->object_value.string))
+	  if (!strcmp(colors[k][0], (char *)packet->object_value.string.bytes))
 	  {
 	    strcpy(supplies[j].color, colors[k][1]);
 	    break;
@@ -634,12 +635,12 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       return;
 
     fprintf(stderr, "DEBUG2: prtMarkerSuppliesDescription.1.%d = \"%s\"\n", i,
-            packet->object_value.string);
+            (char *)packet->object_value.string.bytes);
 
     if (i > num_supplies)
       num_supplies = i;
 
-    strlcpy(supplies[i - 1].name, packet->object_value.string,
+    strlcpy(supplies[i - 1].name, (char *)packet->object_value.string.bytes,
             sizeof(supplies[0].name));
   }
   else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesLevel))
