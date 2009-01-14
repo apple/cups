@@ -36,7 +36,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 {
   int		i;			/* Looping var */
   ppd_file_t	*ppd;			/* PPD file loaded from disk */
-  char		line[256];		/* Input buffer */
+  char		line[256],		/* Input buffer */
+		*ptr,			/* Pointer into buffer */
+		*optr,			/* Pointer to first option name */
+		*cptr;			/* Pointer to first choice */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   char		*option,		/* Current option */
@@ -73,11 +76,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (!cupsResolveConflicts(ppd, option, choice, &num_options, &options))
       puts("Unable to resolve conflicts!");
-    else if (num_options > 0)
+    else if ((!option && num_options > 0) || (option && num_options > 1))
     {
       fputs("Resolved conflicts with the following options:\n   ", stdout);
       for (i = 0; i < num_options; i ++)
-	printf(" %s=%s", options[i].name, options[i].value);
+        if (!option || strcasecmp(option, options[i].name))
+	  printf(" %s=%s", options[i].name, options[i].value);
       putchar('\n');
 
       cupsFreeOptions(num_options, options);
@@ -94,13 +98,20 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!fgets(line, sizeof(line), stdin) || line[0] == '\n')
       break;
 
-    num_options = cupsParseOptions(line, 0, &options);
-    if (num_options > 0)
-    {
-      option = strdup(options[0].name);
-      choice = strdup(options[0].value);
-    }
+    for (ptr = line; isspace(*ptr & 255); ptr ++);
+    for (optr = ptr; *ptr && *ptr != '='; ptr ++);
+    if (!*ptr)
+      break;
+    for (*ptr++ = '\0', cptr = ptr; *ptr && !isspace(*ptr & 255); ptr ++);
+    if (!*ptr)
+      break;
+    *ptr++ = '\0';
 
+    option      = strdup(optr);
+    choice      = strdup(cptr);
+    num_options = cupsParseOptions(ptr, 0, &options);
+
+    ppdMarkOption(ppd, option, choice);
     if (cupsMarkOptions(ppd, num_options, options))
       puts("Options Conflict!");
     cupsFreeOptions(num_options, options);

@@ -307,6 +307,7 @@ cupsResolveConflicts(
         int		j;		/* Looping var */
 	ppd_choice_t	*cptr;		/* Current choice */
         cups_array_t	*test;		/* Test array for conflicts */
+        ppd_size_t	*size;		/* Current page size */
 
 
         for (i = consts->num_constraints, constptr = consts->constraints;
@@ -324,7 +325,12 @@ cupsResolveConflicts(
 	  * Is this the option we are changing?
 	  */
 
-	  if (option && !strcasecmp(constptr->option->keyword, option))
+	  if (option &&
+	      (!strcasecmp(constptr->option->keyword, option) ||
+	       (!strcasecmp(option, "PageSize") &&
+		!strcasecmp(constptr->option->keyword, "PageRegion")) ||
+	       (!strcasecmp(option, "PageRegion") &&
+		!strcasecmp(constptr->option->keyword, "PageSize"))))
 	    continue;
 
          /*
@@ -334,8 +340,26 @@ cupsResolveConflicts(
           if ((value = cupsGetOption(constptr->option->keyword, num_newopts,
 	                             newopts)) == NULL)
           {
-	    marked = ppdFindMarkedChoice(ppd, constptr->option->keyword);
-	    value  = marked ? marked->choice : "";
+	    if (!strcasecmp(constptr->option->keyword, "PageSize") ||
+	        !strcasecmp(constptr->option->keyword, "PageRegion"))
+	    {
+	      if ((value = cupsGetOption("PageSize", num_newopts,
+	                                 newopts)) == NULL)
+                value = cupsGetOption("PageRegion", num_newopts, newopts);
+
+              if (!value)
+	      {
+	        if ((size = ppdPageSize(ppd, NULL)) != NULL)
+		  value = size->name;
+		else
+		  value = "";
+	      }
+	    }
+	    else
+	    {
+	      marked = ppdFindMarkedChoice(ppd, constptr->option->keyword);
+	      value  = marked ? marked->choice : "";
+	    }
 	  }
 
          /*
