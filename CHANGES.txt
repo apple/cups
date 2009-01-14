@@ -4,6 +4,7 @@ CHANGES.txt - 2009-01-14
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The libusb-based USB backend did not work.
 	- The scheduler did not set the printer-commands attribute correctly
 	  for some PPDs.
 	- The ppdi utility did not work.
