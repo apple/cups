@@ -3,7 +3,7 @@
  *
  *   CGI <-> IPP variable routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -548,11 +548,14 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
   * Show status...
   */
 
-  cgiStartMultipart();
-  cgiStartHTML(title);
-  cgiCopyTemplateLang("command.tmpl");
-  cgiEndHTML();
-  fflush(stdout);
+  if (cgiSupportsMultipart())
+  {
+    cgiStartMultipart();
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("command.tmpl");
+    cgiEndHTML();
+    fflush(stdout);
+  }
 
  /*
   * Send the command file job...
@@ -574,7 +577,9 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
-    cgiEndMultipart();
+
+    if (cgiSupportsMultipart())
+      cgiEndMultipart();
     return;
   }
 
@@ -592,7 +597,9 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
-    cgiEndMultipart();
+
+    if (cgiSupportsMultipart())
+      cgiEndMultipart();
 
     cupsCancelJob(dest, job_id);
     return;
@@ -602,44 +609,47 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
   * Wait for the job to complete...
   */
 
-  for (;;)
+  if (cgiSupportsMultipart())
   {
-   /*
-    * Get the current job state...
-    */
-
-    snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
-    request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
-		 NULL, uri);
-    if (user)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-		   "requesting-user-name", NULL, user);
-    ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-		  "requested-attributes", 2, NULL, job_attrs);
-
-    if ((response = cupsDoRequest(http, request, "/")) != NULL)
-      cgiSetIPPVars(response, NULL, NULL, NULL, 0);
-
-    attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
-    if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
+    for (;;)
     {
+     /*
+      * Get the current job state...
+      */
+
+      snprintf(uri, sizeof(uri), "ipp://localhost/jobs/%d", job_id);
+      request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri",
+		   NULL, uri);
+      if (user)
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		     "requesting-user-name", NULL, user);
+      ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		    "requested-attributes", 2, NULL, job_attrs);
+
+      if ((response = cupsDoRequest(http, request, "/")) != NULL)
+	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
+
+      attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
+      if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
+      {
+	ippDelete(response);
+	break;
+      }
+
+     /*
+      * Job not complete, so update the status...
+      */
+
       ippDelete(response);
-      break;
+
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("command.tmpl");
+      cgiEndHTML();
+      fflush(stdout);
+
+      sleep(5);
     }
-
-   /*
-    * Job not complete, so update the status...
-    */
-
-    ippDelete(response);
-
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("command.tmpl");
-    cgiEndHTML();
-    fflush(stdout);
-
-    sleep(5);
   }
 
  /*
@@ -655,7 +665,9 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
   cgiStartHTML(title);
   cgiCopyTemplateLang("command.tmpl");
   cgiEndHTML();
-  cgiEndMultipart();
+
+  if (cgiSupportsMultipart())
+    cgiEndMultipart();
 }
 
 
