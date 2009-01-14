@@ -3537,15 +3537,6 @@ add_printer_filter(
   }
 
  /*
-  * Mark the CUPS_PRINTER_COMMANDS bit if we have a filter for
-  * application/vnd.cups-command...
-  */
-
-  if (!strcasecmp(super, "application") &&
-      !strcasecmp(type, "vnd.cups-command"))
-    p->type |= CUPS_PRINTER_COMMANDS;
-
- /*
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 
@@ -4146,6 +4137,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     {
       DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
       add_string_array(&(p->filters), ppd->filters[i]);
+
+      if (!strncasecmp(ppd->filters[i], "application/vnd.cups-command", 28) &&
+          isspace(ppd->filters[i][28] & 255))
+        p->type |= CUPS_PRINTER_COMMANDS;
     }
 
     if (ppd->num_filters == 0)
@@ -4169,7 +4164,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       for (i = 0; i < ppd->num_filters; i ++)
 	if (!strncasecmp(ppd->filters[i],
-			 "application/vnd.cups-postscript", 31))
+			 "application/vnd.cups-postscript", 31) &&
+            isspace(ppd->filters[i][31] & 255))
 	  break;
 
       if (i < ppd->num_filters)
