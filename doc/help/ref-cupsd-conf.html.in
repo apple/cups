@@ -559,7 +559,9 @@ BrowseLocalProtocols none
 BrowseLocalProtocols cups
 BrowseLocalProtocols dnssd
 BrowseLocalProtocols ldap
+BrowseLocalProtocols lpd
 BrowseLocalProtocols slp
+BrowseLocalProtocols smb
 BrowseLocalProtocols cups dnssd
 </PRE>
 
@@ -568,7 +570,7 @@ BrowseLocalProtocols cups dnssd
 <P>The <CODE>BrowseLocalProtocols</CODE> directive specifies the
 protocols to use when advertising local shared printers on the
 network. Multiple protocols can be specified by separating them
-with spaces. The default is <CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>.</P>
+with spaces. The default is "<CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE>".</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseOrder">BrowseOrder</A></H2>
@@ -652,7 +654,9 @@ BrowseProtocols none
 BrowseProtocols cups
 BrowseProtocols dnssd
 BrowseProtocols ldap
+BrowseProtocols lpd
 BrowseProtocols slp
+BrowseProtocols smb
 BrowseProtocols cups dnssd
 </PRE>
 
@@ -662,9 +666,9 @@ BrowseProtocols cups dnssd
 protocols to use when showing and advertising shared printers on
 the local network. Multiple protocols can be specified by
 separating them with spaces. The default protocol is
-<CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE> for
+"<CODE>@CUPS_BROWSE_LOCAL_PROTOCOLS@</CODE>" for
 <A HREF="#BrowseLocalProtocols"><CODE>BrowseLocalProtocols</CODE></A> and
-<CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE> for
+"<CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>" for
 <A HREF="#BrowseRemoteProtocols"><CODE>BrowseRemoteProtocols</CODE></A>.</P>
 
 <BLOCKQUOTE><B>Note:</B>
@@ -736,10 +740,8 @@ The default is to not include any options.</P>
 BrowseRemoteProtocols all
 BrowseRemoteProtocols none
 BrowseRemoteProtocols cups
-BrowseRemoteProtocols dnssd
 BrowseRemoteProtocols ldap
 BrowseRemoteProtocols slp
-BrowseRemoteProtocols cups dnssd
 </PRE>
 
 <H3>Description</H3>
@@ -747,7 +749,7 @@ BrowseRemoteProtocols cups dnssd
 <P>The <CODE>BrowseRemoteProtocols</CODE> directive specifies the
 protocols to use when finding remote shared printers on the
 network. Multiple protocols can be specified by separating them
-with spaces. The default is <CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>.</P>
+with spaces. The default is "<CODE>@CUPS_BROWSE_REMOTE_PROTOCOLS@</CODE>".</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseShortNames">BrowseShortNames</A></H2>

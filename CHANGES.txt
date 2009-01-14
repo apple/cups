@@ -3,6 +3,7 @@ CHANGES.txt - 2009-01-13
 
 CHANGES IN CUPS V1.4b3
 
+	- Documentation fixes (STR #3044, STR #3057)
 	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.
 	- Added a new cupsGetConflicts() API to get a list of conflicting
 	  options.
