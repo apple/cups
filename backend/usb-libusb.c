@@ -3,7 +3,7 @@
  *
  *   Libusb interface code for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -156,13 +156,13 @@ print_device(const char *uri,		/* I - Device URI */
     * TODO: Add back-channel support, along with better write error handling.
     */
 
-    if (poll(pfds, 2, -1) > 0)
+    while (poll(pfds, 2, -1) > 0)
     {
       if (pfds[0].revents & POLLIN)
       {
 	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
-	  while (usb_bulk_write(printer->handle, printer->write_endp, buffer,
+	  if (usb_bulk_write(printer->handle, printer->write_endp, buffer,
 	                        bytes, 45000) < 0)
 	  {
 	    _cupsLangPrintf(stderr,
@@ -174,7 +174,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  tbytes += bytes;
 	}
-	else if (bytes < 0 && errno != EAGAIN && errno != EINTR)
+	else if (bytes == 0 || (bytes < 0 && errno != EAGAIN && errno != EINTR))
 	  break;
       }
 

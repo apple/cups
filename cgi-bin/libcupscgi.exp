@@ -30,6 +30,7 @@ _cgiShowIPPError
 _cgiShowJobs
 _cgiStartHTML
 _cgiStartMultipart
+_cgiSupportsMultipart
 _cgiText
 _helpDeleteIndex
 _helpFindNode

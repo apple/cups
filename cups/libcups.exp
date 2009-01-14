@@ -140,6 +140,7 @@ _cupsFreeDests
 _cupsFreeJobs
 _cupsFreeOptions
 _cupsGetClasses
+_cupsGetConflicts
 _cupsGetDefault
 _cupsGetDefault2
 _cupsGetDest

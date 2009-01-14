@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -3874,16 +3874,18 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 #ifdef __APPLE__
     else if (!strncmp(message, "recoverable:", 12))
     {
-      cupsdSetPrinterReasons(job->printer,
-                             "+com.apple.print.recoverable-warning");
-
       ptr = message + 12;
       while (isspace(*ptr & 255))
         ptr ++;
 
-      cupsdSetString(&job->printer->recoverable, ptr);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE;
+      if (*ptr)
+      {
+	cupsdSetPrinterReasons(job->printer,
+			       "+com.apple.print.recoverable-warning");
+	cupsdSetString(&job->printer->recoverable, ptr);
+	cupsdAddPrinterHistory(job->printer);
+	event |= CUPSD_EVENT_PRINTER_STATE;
+      }
     }
     else if (!strncmp(message, "recovered:", 10))
     {
@@ -4035,9 +4037,14 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 					 "job-printer-state-reasons",
 					 num_reasons, NULL, NULL);
   }
+  else if (job->printer_reasons)
+  {
+    for (i = 0; i < job->printer_reasons->num_values; i ++)
+      _cupsStrFree(job->printer_reasons->values[i].string.text);
+  }
 
   for (i = 0; i < num_reasons; i ++)
-    cupsdSetString(&(job->printer_reasons->values[i].string.text), reasons[i]);
+    job->printer_reasons->values[i].string.text = _cupsStrAlloc(reasons[i]);
 }
 
 

@@ -3,7 +3,7 @@
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -261,7 +261,7 @@ choose_device_cb(
 
   current_device ++;
 
-  if (time(NULL) > last_device_time)
+  if (time(NULL) > last_device_time && cgiSupportsMultipart())
   {
    /*
     * Update the page...
@@ -921,7 +921,21 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     if (cupsGetDevices(http, 30, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
                        (cups_device_cb_t)choose_device_cb,
 		       (void *)title) == IPP_OK)
+    {
       fputs("DEBUG: Got device list!\n", stderr);
+
+      if (!cgiSupportsMultipart())
+      {
+       /*
+        * Non-modern browsers that don't support multi-part documents get
+	* everything at the end...
+	*/
+
+	cgiStartHTML(title);
+	cgiCopyTemplateLang("choose-device.tmpl");
+	cgiEndHTML();
+      }
+    }
     else
     {
       fprintf(stderr,

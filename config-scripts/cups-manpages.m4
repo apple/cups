@@ -51,14 +51,6 @@ AC_SUBST(PMANDIR)
 
 dnl Setup manpage extensions...
 case "$uname" in
-	*BSD* | Darwin*)
-		# *BSD
-		MAN1EXT=1
-		MAN5EXT=5
-		MAN7EXT=7
-		MAN8EXT=8
-		MAN8DIR=8
-		;;
 	IRIX*)
 		# SGI IRIX
 		MAN1EXT=1
@@ -75,8 +67,8 @@ case "$uname" in
 		MAN8EXT=1m
 		MAN8DIR=1m
 		;;
-	Linux* | GNU*)
-		# Linux and GNU Hurd
+	Linux* | GNU* | Darwin*)
+		# Linux, GNU Hurd, and Mac OS X
 		MAN1EXT=1.gz
 		MAN5EXT=5.gz
 		MAN7EXT=7.gz

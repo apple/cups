@@ -3,7 +3,7 @@
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -51,6 +51,7 @@ ipp_op_t	ippOpValue(const char *);
 ipp_status_t	ippErrorValue(const char *);
 char		*get_token(FILE *, char *, int, int *linenum);
 void		print_attr(ipp_attribute_t *);
+void		print_col(ipp_t *col);
 void		usage(const char *option);
 
 
@@ -233,7 +234,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
   pass            = 1;
   job_id          = 0;
   subscription_id = 0;
-  version         = 1;
+  version         = 11;
   linenum         = 1;
 
   while (get_token(fp, token, sizeof(token), &linenum) != NULL)
@@ -292,8 +293,21 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * IPP version number for test...
 	*/
 
+        int major, minor;		/* Major/minor IPP version */
+
+
 	get_token(fp, temp, sizeof(temp), &linenum);
-	sscanf(temp, "%*d.%d", &version);
+	if (sscanf(temp, "%d.%d", &major, &minor) == 2 &&
+	    major >= 0 && minor >= 0 && minor < 10)
+	  version = major * 10 + minor;
+	else
+	{
+	  printf("Bad version %s seen on line %d - aborting test!\n", token,
+		 linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+	}
       }
       else if (!strcasecmp(token, "RESOURCE"))
       {
@@ -548,7 +562,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Submit the IPP request...
     */
 
-    request->request.op.version[1]   = version;
+    request->request.op.version[0]   = version / 10;
+    request->request.op.version[1]   = version % 10;
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
@@ -837,11 +852,108 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 		 attr->values[i].string.charset);
 	break;
 
+    case IPP_TAG_BEGIN_COLLECTION :
+	for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (i)
+	    putchar(' ');
+
+	  print_col(attr->values[i].collection);
+	}
+	break;
+        
     default :
 	break; /* anti-compiler-warning-code */
   }
 
   putchar('\n');
+}
+
+
+/*
+ * 'print_col()' - Print a collection attribute on the screen.
+ */
+
+void
+print_col(ipp_t *col)			/* I - Collection attribute to print */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr;		/* Current attribute in collection */
+
+
+  putchar('{');
+  for (attr = col->attrs; attr; attr = attr->next)
+  {
+    printf("%s(%s%s)=", attr->name, attr->num_values > 1 ? "1setOf " : "",
+	   ippTagString(attr->value_tag));
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_INTEGER :
+      case IPP_TAG_ENUM :
+	  for (i = 0; i < attr->num_values; i ++)
+	    printf("%d ", attr->values[i].integer);
+	  break;
+
+      case IPP_TAG_BOOLEAN :
+	  for (i = 0; i < attr->num_values; i ++)
+	    if (attr->values[i].boolean)
+	      printf("true ");
+	    else
+	      printf("false ");
+	  break;
+
+      case IPP_TAG_NOVALUE :
+	  printf("novalue");
+	  break;
+
+      case IPP_TAG_RANGE :
+	  for (i = 0; i < attr->num_values; i ++)
+	    printf("%d-%d ", attr->values[i].range.lower,
+		   attr->values[i].range.upper);
+	  break;
+
+      case IPP_TAG_RESOLUTION :
+	  for (i = 0; i < attr->num_values; i ++)
+	    printf("%dx%d%s ", attr->values[i].resolution.xres,
+		   attr->values[i].resolution.yres,
+		   attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+		       "dpi" : "dpc");
+	  break;
+
+      case IPP_TAG_STRING :
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_KEYWORD :
+      case IPP_TAG_CHARSET :
+      case IPP_TAG_URI :
+      case IPP_TAG_MIMETYPE :
+      case IPP_TAG_LANGUAGE :
+	  for (i = 0; i < attr->num_values; i ++)
+	    printf("\"%s\" ", attr->values[i].string.text);
+	  break;
+
+      case IPP_TAG_TEXTLANG :
+      case IPP_TAG_NAMELANG :
+	  for (i = 0; i < attr->num_values; i ++)
+	    printf("\"%s\",%s ", attr->values[i].string.text,
+		   attr->values[i].string.charset);
+	  break;
+
+      case IPP_TAG_BEGIN_COLLECTION :
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    print_col(attr->values[i].collection);
+	    putchar(' ');
+	  }
+	  break;
+	  
+      default :
+	  break; /* anti-compiler-warning-code */
+    }
+  }
+
+  putchar('}');
 }
 
 

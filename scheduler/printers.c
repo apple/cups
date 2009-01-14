@@ -359,6 +359,13 @@ cupsdCreateCommonData(void)
 		  ,"gzip"
 #endif /* HAVE_LIBZ */
 		};
+  static const char * const media_col_supported[] =
+		{			/* media-col-supported values */
+		  "media-color",
+		  "media-key",
+		  "media-size",
+		  "media-type"
+		};
   static const char * const multiple_document_handling[] =
 		{			/* multiple-document-handling-supported values */
 		  "separate-documents-uncollated-copies",
@@ -516,6 +523,13 @@ cupsdCreateCommonData(void)
   else
     ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
                  "job-sheets-supported", NULL, "none");
+
+  /* media-col-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "media-col-supported",
+                sizeof(media_col_supported) /
+		    sizeof(media_col_supported[0]), NULL,
+	        media_col_supported);
 
   /* multiple-document-handling-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
@@ -3523,15 +3537,6 @@ add_printer_filter(
   }
 
  /*
-  * Mark the CUPS_PRINTER_COMMANDS bit if we have a filter for
-  * application/vnd.cups-command...
-  */
-
-  if (!strcasecmp(super, "application") &&
-      !strcasecmp(type, "vnd.cups-command"))
-    p->type |= CUPS_PRINTER_COMMANDS;
-
- /*
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 
@@ -3803,6 +3808,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
   _cups_pwg_media_t *pwgmedia;		/* Matching PWG size name */
   ipp_attribute_t *attr;		/* Attribute data */
+  ipp_t		*media_col_default,	/* media-col-default collection value */
+		*media_size;		/* media-size collection value */
   ipp_value_t	*val;			/* Attribute value */
   int		num_finishings;		/* Number of finishings */
   int		finishings[5];		/* finishings-supported values */
@@ -3965,9 +3972,39 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	    }
 
 	    if (size->marked)
+	    {
+	     /*
+	      * Add media-default...
+	      */
+
 	      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-			   "media-default", NULL,
-			   _cupsStrRetain(val->string.text));
+			   "media-default", NULL, val->string.text);
+
+             /*
+	      * Add media-col-default...
+	      */
+
+	      media_size = ippNew();
+	      ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+	                    "x-dimension", (int)(size->width * 2540.0 / 72.0));
+	      ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+	                    "y-dimension", (int)(size->length * 2540.0 / 72.0));
+
+	      media_col_default = ippNew();
+	      ippAddString(media_col_default, IPP_TAG_PRINTER,
+	                   IPP_TAG_KEYWORD | IPP_TAG_COPY, "media-color", NULL,
+			   "white");
+	      ippAddString(media_col_default, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+			   "media-key", NULL,val->string.text);
+	      ippAddCollection(media_col_default, IPP_TAG_PRINTER, "media-size",
+	                       media_size);
+	      ippAddString(media_col_default, IPP_TAG_PRINTER,
+	                   IPP_TAG_KEYWORD | IPP_TAG_COPY, "media-type", NULL,
+			   "stationary");
+
+              ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER,
+	                       "media-col-default", media_col_default);
+	    }
 
             val ++;
 	  }
@@ -4100,6 +4137,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     {
       DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
       add_string_array(&(p->filters), ppd->filters[i]);
+
+      if (!strncasecmp(ppd->filters[i], "application/vnd.cups-command", 28) &&
+          isspace(ppd->filters[i][28] & 255))
+        p->type |= CUPS_PRINTER_COMMANDS;
     }
 
     if (ppd->num_filters == 0)
@@ -4123,7 +4164,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       for (i = 0; i < ppd->num_filters; i ++)
 	if (!strncasecmp(ppd->filters[i],
-			 "application/vnd.cups-postscript", 31))
+			 "application/vnd.cups-postscript", 31) &&
+            isspace(ppd->filters[i][31] & 255))
 	  break;
 
       if (i < ppd->num_filters)

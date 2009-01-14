@@ -3,7 +3,11 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.10
 
-	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056)
+	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
+	  STR #3057)
+	- The scheduler did not always load MIME type rules correctly
+	  (STR #3059)
+	- The test page did not format correctly on A4 paper (STR #3060)
 	- The web interface sometimes incorrectly redirected users to
 	  127.0.0.1 (STR #3022)
 	- cupsPrintFile*() did not send the document filename for single

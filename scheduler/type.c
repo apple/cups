@@ -188,8 +188,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
     else if (*rule == '+' && current != NULL)
     {
       if (logic != MIME_MAGIC_AND &&
-          current != NULL && current->prev != NULL &&
-	  current->prev->prev != NULL)
+          current != NULL && current->prev != NULL)
       {
        /*
         * OK, we have more than 1 rule in the current tree level...  Make a

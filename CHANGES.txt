@@ -1,9 +1,21 @@
-CHANGES.txt - 2009-01-09
+CHANGES.txt - 2009-01-14
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
+	- Documentation fixes (STR #3044, STR #3057)
+	- The libusb-based USB backend did not work.
+	- The scheduler did not set the printer-commands attribute correctly
+	  for some PPDs.
+	- The ppdi utility did not work.
+	- The web interface no longer uses multi-part output with old or broken
+	  web browsers (STR #3049)
 	- CUPS now conforms to the draft IPP/2.0 and IPP/2.1 specification.
+	- Added a new cupsGetConflicts() API to get a list of conflicting
+	  options.
+	- The PPD compiler didn't localize options or choices that did not
+	  have associated translation text (STR #3045)
+	- Updated the Spanish localization (STR #3043)
 	- Fixed build problems (STR #3040, STR #3047)
 	- cupsResolveConflicts() did not resolve using the default option
 	  choice in some cases due to the mirror UIConstraints that are

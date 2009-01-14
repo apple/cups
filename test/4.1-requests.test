@@ -135,6 +135,25 @@
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
 }
+{
+	# The name of the test...
+	NAME "Bad IPP Version"
+
+	# The operation to use
+	OPERATION get-jobs
+
+	# The version number to use
+	VERSION 0.0
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+	ATTR uri printer-uri ipp://localhost/printers
+
+	# What statuses are OK?
+	STATUS server-error-version-not-supported
+}
 #
 # End of "$Id: 4.1-requests.test 8144 2008-11-19 19:23:12Z mike $"
 #

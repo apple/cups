@@ -4714,7 +4714,18 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
       continue;
 
     if (!ra || cupsArrayFind(ra, fromattr->name))
+    {
+     /*
+      * Don't send collection attributes by default to IPP/1.x clients
+      * since many do not support collections...
+      */
+
+      if (fromattr->value_tag == IPP_TAG_BEGIN_COLLECTION &&
+          !ra && to->request.status.version[0] == 1)
+	continue;
+
       copy_attribute(to, fromattr, quickcopy);
+    }
   }
 }
 
