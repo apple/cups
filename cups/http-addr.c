@@ -207,6 +207,16 @@ httpAddrLookup(
   }
 #endif /* AF_LOCAL */
 
+ /*
+  * Optimize lookups for localhost/loopback addresses...
+  */
+
+  if (httpAddrLocalhost(addr))
+  {
+    strlcpy(name, "localhost", namelen);
+    return (name);
+  }
+
 #ifdef HAVE_RES_INIT
  /*
   * STR #2920: Initialize resolver after failure in cups-polld

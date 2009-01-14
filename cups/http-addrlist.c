@@ -3,7 +3,7 @@
  *
  *   HTTP address list routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -265,6 +265,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   }
   else
 #endif /* AF_LOCAL */
+  if (!hostname || strcasecmp(hostname, "localhost"))
   {
 #ifdef HAVE_GETADDRINFO
     struct addrinfo	hints,		/* Address lookup hints */
@@ -501,7 +502,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
   * Detect some common errors and handle them sanely...
   */
 
-  if (!addr && (!hostname || !strcmp(hostname, "localhost")))
+  if (!addr && (!hostname || !strcasecmp(hostname, "localhost")))
   {
     struct servent	*port;		/* Port number for service */
     int			portnum;	/* Port number */
@@ -530,7 +531,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     else
       return (NULL);
 
-    if (hostname && !strcmp(hostname, "localhost"))
+    if (hostname && !strcasecmp(hostname, "localhost"))
     {
      /*
       * Unfortunately, some users ignore all of the warnings in the
