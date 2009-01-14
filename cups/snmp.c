@@ -3,7 +3,7 @@
  *
  *   SNMP functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1079,8 +1079,11 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 		    break;
 
 	        case CUPS_ASN1_OCTET_STRING :
+	        case CUPS_ASN1_BIT_STRING :
+	        case CUPS_ASN1_HEX_STRING :
+		    packet->object_value.string.num_bytes = length;
 		    asn1_get_string(&bufptr, bufend, length,
-		                    packet->object_value.string,
+		                    (char *)packet->object_value.string.bytes,
 				    CUPS_SNMP_MAX_STRING);
 	            break;
 
@@ -1088,14 +1091,6 @@ asn1_decode_snmp(unsigned char *buffer,	/* I - Buffer */
 		    asn1_get_oid(&bufptr, bufend, length,
 		                 packet->object_value.oid, CUPS_SNMP_MAX_OID);
 	            break;
-
-	        case CUPS_ASN1_HEX_STRING :
-		    packet->object_value.hex_string.num_bytes = length;
-
-		    asn1_get_string(&bufptr, bufend, length,
-		                    (char *)packet->object_value.hex_string.bytes,
-				    CUPS_SNMP_MAX_STRING);
-		    break;
 
 	        case CUPS_ASN1_COUNTER :
 		    packet->object_value.counter =
@@ -1169,7 +1164,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
 	break;
 
     case CUPS_ASN1_OCTET_STRING :
-        valuelen = strlen(packet->object_value.string);
+        valuelen = packet->object_value.string.num_bytes;
 	break;
 
     case CUPS_ASN1_OID :
@@ -1254,7 +1249,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
     case CUPS_ASN1_OCTET_STRING :
         *bufptr++ = CUPS_ASN1_OCTET_STRING;
 	asn1_set_length(&bufptr, valuelen);
-	memcpy(bufptr, packet->object_value.string, valuelen);
+	memcpy(bufptr, packet->object_value.string.bytes, valuelen);
 	bufptr += valuelen;
 	break;
 

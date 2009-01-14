@@ -3,7 +3,7 @@
  *
  *   Side-channel API code for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -426,6 +426,9 @@ cupsSideChannelSNMPWalk(
 
         return (CUPS_SC_STATUS_OK);
       }
+
+      if (real_datalen < sizeof(real_data))
+        real_data[real_datalen] = '\0';
 
       real_oidlen  = strlen(real_data) + 1;
       real_datalen -= real_oidlen;

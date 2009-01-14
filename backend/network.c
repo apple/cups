@@ -3,7 +3,7 @@
  *
  *   Common network APIs for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -162,58 +162,72 @@ backendNetworkSideCB(
 	        case CUPS_ASN1_BOOLEAN :
 		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
 		             packet.object_value.boolean);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
 	        case CUPS_ASN1_INTEGER :
 		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
 		             packet.object_value.integer);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
 	        case CUPS_ASN1_BIT_STRING :
 	        case CUPS_ASN1_OCTET_STRING :
-		    strlcpy(dataptr, packet.object_value.string,
-		            sizeof(data) - (dataptr - data));
+		    i = (int)(sizeof(data) - (dataptr - data));
+		    if (packet.object_value.string.num_bytes < i)
+		      i = packet.object_value.string.num_bytes;
+
+		    memcpy(dataptr, packet.object_value.string.bytes, i);
+
+                    datalen += i;
 		    break;
 
 	        case CUPS_ASN1_OID :
 		    _cupsSNMPOIDToString(packet.object_value.oid, dataptr,
 		                         sizeof(data) - (dataptr - data));
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_HEX_STRING :
 		    for (i = 0;
-		         i < packet.object_value.hex_string.num_bytes &&
+		         i < packet.object_value.string.num_bytes &&
 			     dataptr < (data + sizeof(data) - 3);
 			 i ++, dataptr += 2)
 		      sprintf(dataptr, "%02X",
-		              packet.object_value.hex_string.bytes[i]);
+		              packet.object_value.string.bytes[i]);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_COUNTER :
 		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%d",
 		             packet.object_value.counter);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_GAUGE :
 		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%u",
 		             packet.object_value.gauge);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 case CUPS_ASN1_TIMETICKS :
 		    snprintf(dataptr, sizeof(data) - (dataptr - data), "%u",
 		             packet.object_value.timeticks);
+	            datalen += (int)strlen(dataptr);
 		    break;
 
                 default :
 	            fprintf(stderr, "DEBUG: Unknown OID value type %02X!\n",
 		            packet.object_type);
+
+		case CUPS_ASN1_NULL_VALUE :
+		    dataptr[0] = '\0';
 		    break;
               }
 
 	      fprintf(stderr, "DEBUG: Returning %s %s\n", data, data + datalen);
 
-	      status  = CUPS_SC_STATUS_OK;
-	      datalen += (int)strlen(data + datalen);
+	      status = CUPS_SC_STATUS_OK;
 	    }
 	    else
 	      fputs("DEBUG: SNMP read error...\n", stderr);
@@ -246,7 +260,8 @@ backendNetworkSideCB(
 	    if (_cupsSNMPRead(snmp_fd, &packet, 1.0) &&
 	        packet.object_type == CUPS_ASN1_OCTET_STRING)
 	    {
-	      strlcpy(data, packet.object_value.string, sizeof(data));
+	      strlcpy(data, (char *)packet.object_value.string.bytes,
+	              sizeof(data));
 	      datalen = (int)strlen(data);
 	      status  = CUPS_SC_STATUS_OK;
 	    }
@@ -259,6 +274,7 @@ backendNetworkSideCB(
 	{
 	  strlcpy(data, device_id, sizeof(data));
 	  datalen = (int)strlen(data);
+	  status  = CUPS_SC_STATUS_OK;
 	  break;
 	}
 

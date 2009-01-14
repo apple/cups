@@ -3,7 +3,7 @@
  *
  *   SNMP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -155,11 +155,13 @@ print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
 	break;
 
     case CUPS_ASN1_BIT_STRING :
-	printf("BIT-STRING \"%s\"\n", packet->object_value.string);
+	printf("BIT-STRING \"%s\"\n",
+	       (char *)packet->object_value.string.bytes);
 	break;
 
     case CUPS_ASN1_OCTET_STRING :
-	printf("OCTET-STRING \"%s\"\n", packet->object_value.string);
+	printf("OCTET-STRING \"%s\"\n",
+	       (char *)packet->object_value.string.bytes);
 	break;
 
     case CUPS_ASN1_NULL_VALUE :
@@ -173,8 +175,8 @@ print_packet(cups_snmp_t *packet,	/* I - SNMP response packet */
 
     case CUPS_ASN1_HEX_STRING :
 	fputs("Hex-STRING", stdout);
-	for (i = 0; i < packet->object_value.hex_string.num_bytes; i ++)
-	  printf(" %02X", packet->object_value.hex_string.bytes[i]);
+	for (i = 0; i < packet->object_value.string.num_bytes; i ++)
+	  printf(" %02X", packet->object_value.string.bytes[i]);
 	putchar('\n');
 	break;
 

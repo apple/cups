@@ -3,7 +3,7 @@
  *
  *   SNMP discovery backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1015,18 +1015,18 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	  char	make_model[256];	/* Make and model */
 
 
-	  if (strchr(packet.object_value.string, ':') &&
-	      strchr(packet.object_value.string, ';'))
+	  if (strchr((char *)packet.object_value.string.bytes, ':') &&
+	      strchr((char *)packet.object_value.string.bytes, ';'))
 	  {
 	   /*
 	    * Description is the IEEE-1284 device ID...
 	    */
 
 	    if (!device->id)
-	      device->id = strdup(packet.object_value.string);
+	      device->id = strdup((char *)packet.object_value.string.bytes);
 
-	    backendGetMakeModel(packet.object_value.string, make_model,
-				sizeof(make_model));
+	    backendGetMakeModel((char *)packet.object_value.string.bytes,
+				make_model, sizeof(make_model));
 
             if (device->info)
 	      free(device->info);
@@ -1039,13 +1039,13 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	    * Description is plain text...
 	    */
 
-	    fix_make_model(make_model, packet.object_value.string,
+	    fix_make_model(make_model, (char *)packet.object_value.string.bytes,
 			   sizeof(make_model));
 
             if (device->info)
 	      free(device->info);
 
-	    device->info = strdup(packet.object_value.string);
+	    device->info = strdup((char *)packet.object_value.string.bytes);
 	  }
 
 	  if (!device->make_and_model)
@@ -1066,14 +1066,14 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	  if (device->id)
 	    free(device->id);
 
-	  device->id = strdup(packet.object_value.string);
+	  device->id = strdup((char *)packet.object_value.string.bytes);
 
 	 /*
 	  * Convert the ID to a make and model string...
 	  */
 
-	  backendGetMakeModel(packet.object_value.string, make_model,
-			      sizeof(make_model));
+	  backendGetMakeModel((char *)packet.object_value.string.bytes,
+	                      make_model, sizeof(make_model));
 	  if (device->make_and_model)
 	    free(device->make_and_model);
 
@@ -1084,7 +1084,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
     case DEVICE_LOCATION :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
 	    !device->location)
-	  device->location = strdup(packet.object_value.string);
+	  device->location = strdup((char *)packet.object_value.string.bytes);
 	break;
 
     case DEVICE_PRODUCT :
@@ -1096,12 +1096,12 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	  */
 
           if (!device->info)
-	    device->info = strdup(packet.object_value.string);
+	    device->info = strdup((char *)packet.object_value.string.bytes);
 
           if (device->make_and_model)
 	    free(device->make_and_model);
 
-	  device->make_and_model = strdup(packet.object_value.string);
+	  device->make_and_model = strdup((char *)packet.object_value.string.bytes);
 	}
 	break;
 
@@ -1113,16 +1113,16 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	  * Update an existing cache entry...
 	  */
 
-	  if (!strncmp(packet.object_value.string, "lpr:", 4))
+	  if (!strncmp((char *)packet.object_value.string.bytes, "lpr:", 4))
 	  {
 	   /*
 	    * We want "lpd://..." for the URI...
 	    */
 
-	    packet.object_value.string[2] = 'd';
+	    packet.object_value.string.bytes[2] = 'd';
 	  }
 
-	  device->uri = strdup(packet.object_value.string);
+	  device->uri = strdup((char *)packet.object_value.string.bytes);
 	}
 	break;
   }
