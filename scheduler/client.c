@@ -3,7 +3,7 @@
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -283,16 +283,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     * Map accesses from the same host to the server name.
     */
 
-    for (addr = ServerAddrs; addr; addr = addr->next)
-      if (httpAddrEqual(con->http.hostaddr, &(addr->addr)))
-        break;
-
-    if (addr)
-    {
-      strlcpy(con->http.hostname, ServerName, sizeof(con->http.hostname));
-      hostname = con->http.hostname;
-    }
-    else if (HostNameLookups)
+    if (HostNameLookups)
       hostname = httpAddrLookup(con->http.hostaddr, con->http.hostname,
                                 sizeof(con->http.hostname));
     else

@@ -4,7 +4,7 @@
  *   Server listening routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -141,23 +141,6 @@ cupsdStartListening(void)
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartListening: %d Listeners",
                   cupsArrayCount(Listeners));
-
- /*
-  * Get the server's IP address...
-  */
-
-  if (ServerAddrs)
-    httpAddrFreeList(ServerAddrs);
-
-  if ((ServerAddrs = httpAddrGetList(ServerName, AF_UNSPEC, NULL)) == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to find IP address for server name \"%s\"!",
-		    ServerName);
-
-    if (FatalErrors & CUPSD_FATAL_LISTEN)
-      cupsdEndProcess(getpid(), 0);
-  }
 
  /*
   * Setup socket listeners...

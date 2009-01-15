@@ -4,7 +4,7 @@
  *   Network interface functions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -169,17 +169,8 @@ cupsdNetIFUpdate(void)
       if (httpAddrLocalhost((http_addr_t *)(addr->ifa_addr)))
         strcpy(hostname, "localhost");
       else
-      {
-        for (saddr = ServerAddrs; saddr; saddr = saddr->next)
-	  if (httpAddrEqual((http_addr_t *)(addr->ifa_addr), &(saddr->addr)))
-	    break;
-
-	if (saddr)
-          strlcpy(hostname, ServerName, sizeof(hostname));
-	else
-          httpAddrString((http_addr_t *)(addr->ifa_addr), hostname,
-	        	 sizeof(hostname));
-      }
+	httpAddrString((http_addr_t *)(addr->ifa_addr), hostname,
+		       sizeof(hostname));
     }
 
    /*
