@@ -1,9 +1,10 @@
-CHANGES.txt - 2009-01-14
+CHANGES.txt - 2009-01-15
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- cupsGetPPD3() did not look for local PPDs in the right directory.
 	- SNMP lookups via side-channel did not work for NULL-VALUE and
 	  and OCTET-STRING OIDs containing nul characters.
 	- The libusb-based USB backend did not work.

@@ -3,7 +3,7 @@
  *
  *   Printing utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -951,7 +951,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     struct stat	ppdinfo;		/* PPD file information */
 
 
-    snprintf(ppdname, sizeof(ppdname), "%s/%s.ppd", cg->cups_serverroot, name);
+    snprintf(ppdname, sizeof(ppdname), "%s/ppd/%s.ppd", cg->cups_serverroot,
+             name);
     if (!stat(ppdname, &ppdinfo))
     {
      /*
@@ -1030,7 +1031,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 	}
       }
 
-      if (*modtime <= ppdinfo.st_mtime)
+      if (*modtime >= ppdinfo.st_mtime)
         return (HTTP_NOT_MODIFIED);
       else
       {
