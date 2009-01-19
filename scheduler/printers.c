@@ -2625,6 +2625,13 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
+  if (!p || !s)
+  {
+    cupsdLogMessage(CUPSD_LOG_EMERG,
+                    "cupsdSetPrinterReasons called with p=%p and s=%p!", p, s);
+    return;
+  }
+
   if (LogLevel == CUPSD_LOG_DEBUG2)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -2696,7 +2703,7 @@ cupsdSetPrinterReasons(
       */
 
       for (i = 0; i < p->num_reasons; i ++)
-        if (!strcasecmp(reason, p->reasons[i]))
+        if (!strcmp(reason, p->reasons[i]))
 	{
 	 /*
 	  * Found a match, so remove it...
@@ -2732,12 +2739,19 @@ cupsdSetPrinterReasons(
       */
 
       for (i = 0; i < p->num_reasons; i ++)
-        if (!strcasecmp(reason, p->reasons[i]))
+        if (!strcmp(reason, p->reasons[i]))
 	  break;
 
-      if (i >= p->num_reasons &&
-	  i < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+      if (i >= p->num_reasons)
       {
+        if (i >= (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ALERT,
+	                  "Too many printer-state-reasons values for %s (%d)",
+			  p->name, i + 1);
+          return;
+        }
+
 	cupsdLogMessage(CUPSD_LOG_DEBUG2,
 			"cupsdSetPrinterReasons: Adding \"%s\" at index %d",
 			reason, i);

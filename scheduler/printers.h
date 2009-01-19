@@ -52,7 +52,7 @@ typedef struct cupsd_printer_s
   ipp_pstate_t	state;			/* Printer state */
   char		state_message[1024];	/* Printer state message */
   int		num_reasons;		/* Number of printer-state-reasons */
-  char		*reasons[16];		/* printer-state-reasons strings */
+  char		*reasons[64];		/* printer-state-reasons strings */
   time_t	state_time;		/* Time at this state */
   char		*job_sheets[2];		/* Banners/job sheets */
   cups_ptype_t	type;			/* Printer type (color, small, etc.) */
