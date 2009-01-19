@@ -4,7 +4,7 @@
 #
 #   Test the lpadmin command.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -16,8 +16,8 @@
 
 echo "Add Printer Test"
 echo ""
-echo "    lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/DESKJET.PPD"
-../systemv/lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/DESKJET.PPD 2>&1
+echo "    lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/deskjet.ppd"
+../systemv/lpadmin -p Test3 -v file:/dev/null -E -m drv:///sample.drv/deskjet.ppd 2>&1
 if test $? != 0; then
 	echo "    FAILED"
 	exit 1
