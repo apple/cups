@@ -2625,6 +2625,18 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
+  if (LogLevel == CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetPrinterReasons: num_reasons=%d",
+                    p->num_reasons);
+    for (i = 0; i < p->num_reasons; i ++)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetPrinterReasons: reasons[%d]=%p(\"%s\")", i,
+		      p->reasons[i], p->reasons[i]);
+  }
+
   if (s[0] == '-' || s[0] == '+')
   {
    /*
@@ -2690,14 +2702,16 @@ cupsdSetPrinterReasons(
 	  * Found a match, so remove it...
 	  */
 
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSetPrinterReasons: Removing \"%s\" at index %d",
+			  reason, i);
+
 	  p->num_reasons --;
 	  _cupsStrFree(p->reasons[i]);
 
 	  if (i < p->num_reasons)
 	    memmove(p->reasons + i, p->reasons + i + 1,
 	            (p->num_reasons - i) * sizeof(char *));
-
-	  i --;
 
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
@@ -2707,6 +2721,8 @@ cupsdSetPrinterReasons(
 
 	  if (PrintcapFormat == PRINTCAP_PLIST)
 	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+
+	  break;
 	}
     }
     else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
@@ -2719,8 +2735,13 @@ cupsdSetPrinterReasons(
         if (!strcasecmp(reason, p->reasons[i]))
 	  break;
 
-      if (i >= p->num_reasons)
+      if (i >= p->num_reasons &&
+	  i < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
       {
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+			"cupsdSetPrinterReasons: Adding \"%s\" at index %d",
+			reason, i);
+
         p->reasons[i] = _cupsStrAlloc(reason);
 	p->num_reasons ++;
 
@@ -2734,6 +2755,17 @@ cupsdSetPrinterReasons(
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
       }
     }
+  }
+
+  if (LogLevel == CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdSetPrinterReasons: NEW num_reasons=%d",
+                    p->num_reasons);
+    for (i = 0; i < p->num_reasons; i ++)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetPrinterReasons: NEW reasons[%d]=%p(\"%s\")", i,
+		      p->reasons[i], p->reasons[i]);
   }
 }
 
