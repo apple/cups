@@ -160,7 +160,7 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* Permissions for log files */
 			LogLevel		VALUE(CUPSD_LOG_WARN),
 					/* Error log level */
-			MaxClients		VALUE(0),
+			MaxClients		VALUE(100),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),
 					/* Maximum number of clients per host */
