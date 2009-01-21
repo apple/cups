@@ -3063,7 +3063,18 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
 	}
       }
 
-      if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) <= 0)
+      if ((bytes = httpRead2(http, (char *)buffer, length - tbytes)) < 0)
+      {
+#ifdef WIN32
+        break;
+#else
+        if (errno != EAGAIN && errno != EINTR)
+	  break;
+
+	bytes = 0;
+#endif /* WIN32 */
+      }
+      else if (bytes == 0)
         break;
     }
   }

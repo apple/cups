@@ -1459,7 +1459,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0);
 #else
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
-      if (errno != EINTR)
+      if (errno != EINTR && errno != EAGAIN)
         break;
 #endif /* WIN32 */
 
@@ -1481,7 +1481,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #ifdef WIN32
     http->error = WSAGetLastError();
 #else
-    if (errno == EINTR)
+    if (errno == EINTR || errno == EAGAIN)
       bytes = 0;
     else
       http->error = errno;
