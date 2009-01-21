@@ -4378,16 +4378,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 			  "entry ignored", p->users[i]);
 	}
 
-	if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
-					    &is_member)) != 0)
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "check_quotas: User \"%s\" identity check failed "
-			  "(err=%d)", p->users[i], mbr_err);
-	  is_member = 0;
-	}
-
-	if (is_member)
+	if (!uuid_compare(usr_uuid, usr2_uuid))
 	  break;
       }
 #else
