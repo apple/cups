@@ -3413,8 +3413,8 @@ apple_register_profiles(
     * Use the default colorspace...
     */
 
-    num_profiles = 1 + ppd->colorspace != PPD_CS_GRAY;
-    
+    num_profiles = 2;
+
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3443,13 +3443,11 @@ apple_register_profiles(
           break;
 
       case PPD_CS_N :
+      default :
           apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("DeviceN.."), "DeviceN", "DeviceN",
 			     NULL);
           break;
-
-      default :
-	  break;
     }
   }
 
