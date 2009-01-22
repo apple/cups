@@ -1703,7 +1703,6 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
-  int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -1857,6 +1856,8 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 	 /*
 	  * See if we can set a default media size...
 	  */
+
+          int	i;			/* Looping var */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	    if (!strcasecmp(media_default, attr->values[i].string.text))
