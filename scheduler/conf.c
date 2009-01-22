@@ -264,7 +264,8 @@ cupsdCheckPermissions(
         return (-1);
       }
 
-      dir_created = 1;
+      dir_created      = 1;
+      fileinfo.st_mode = mode | S_IFDIR;
     }
     else
       return (create_dir ? -1 : 1);
