@@ -100,7 +100,6 @@ cupsdNetIFUpdate(void)
   cupsd_netif_t		*temp;		/* New interface */
   struct ifaddrs	*addrs,		/* Interface address list */
 			*addr;		/* Current interface address */
-  http_addrlist_t	*saddr;		/* Current server address */
   char			hostname[1024];	/* Hostname for address */
 
 
