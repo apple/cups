@@ -2769,6 +2769,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       buf[bytes] = '\0';
 
       for (bufptr = buf; !con->got_fields && *bufptr; bufptr ++)
+      {
         if (*bufptr == '\n')
 	{
 	 /*
@@ -2779,7 +2780,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    bufptr[-1] = '\0';
 	  *bufptr++ = '\0';
 
-          cupsdLogMessage(CUPSD_LOG_DEBUG2, "Script header: %s", buf);
+          cupsdLogMessage(CUPSD_LOG_DEBUG, "Script header: %s", buf);
 
           if (!con->sent_header)
 	  {
@@ -2824,7 +2825,12 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  */
 
 	  bytes -= (bufptr - buf);
-	  memmove(buf, bufptr, bytes + 1);
+
+	  if (bytes > 0)
+	    memmove(buf, bufptr, bytes + 1);
+	  else
+	    buf[0] = '\0';
+
 	  bufptr = buf - 1;
 
          /*
@@ -2849,6 +2855,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	}
 	else if (*bufptr != '\r')
 	  con->field_col ++;
+      }
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
                       "cupsdWriteClient: %d bytes=%d, got_fields=%d",

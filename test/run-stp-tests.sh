@@ -188,7 +188,7 @@ echo ""
 
 case "$usevalgrind" in
 	Y* | y*)
-		valgrind="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind --error-limit=no --leak-check=yes --trace-children=yes"
+		valgrind="valgrind --tool=memcheck --log-file=/tmp/cups-$user/log/valgrind.%p --error-limit=no --leak-check=yes --trace-children=yes --read-var-info=yes"
 		echo "Using Valgrind; log files can be found in /tmp/cups-$user/log..."
 		;;
 
