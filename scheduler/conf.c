@@ -426,12 +426,14 @@ cupsdReadConfiguration(void)
 
   cupsdDeleteAllListeners();
 
+  RemoteAccessEnabled = 0;
+
  /*
   * String options...
   */
 
-  cupsdSetString(&ServerName, httpGetHostname(NULL, temp, sizeof(temp)));
-  cupsdSetStringf(&ServerAdmin, "root@%s", temp);
+  cupsdClearString(&ServerName);
+  cupsdClearString(&ServerAdmin);
   cupsdSetString(&ServerBin, CUPS_SERVERBIN);
   cupsdSetString(&RequestRoot, CUPS_REQUESTS);
   cupsdSetString(&CacheDir, CUPS_CACHEDIR);
@@ -657,13 +659,37 @@ cupsdReadConfiguration(void)
 
   RunUser = getuid();
 
+  cupsdLogMessage(CUPSD_LOG_INFO, "Remote access is %s.",
+                  RemoteAccessEnabled ? "enabled" : "disabled");
+
  /*
   * See if the ServerName is an IP address...
   */
 
+  if (!ServerName)
+  {
+    if (HostNameLookups || RemoteAccessEnabled)
+      httpGetHostname(NULL, temp, sizeof(temp));
+    else if (gethostname(temp, sizeof(temp)))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get hostname: %s",
+                      strerror(errno));
+      strlcpy(temp, "localhost", sizeof(temp));
+    }
+
+    cupsdSetString(&ServerName, temp);
+  }
+
   for (slash = ServerName; isdigit(*slash & 255) || *slash == '.'; slash ++);
 
   ServerNameIsIP = !*slash;
+
+ /*
+  * Make sure ServerAdmin is initialized...
+  */
+
+  if (!ServerAdmin)
+    cupsdSetStringf(&ServerAdmin, "root@%s", ServerName);
 
  /*
   * Use the default system group if none was supplied in cupsd.conf...
@@ -2452,6 +2478,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 #endif /* AF_LOCAL */
 	cupsdLogMessage(CUPSD_LOG_INFO, "Listening to %s:%d (IPv4)", temp,
                         ntohs(lis->address.ipv4.sin_port));
+
+        if (!httpAddrLocalhost(&(lis->address)))
+	  RemoteAccessEnabled = 1;
       }
 
      /*
