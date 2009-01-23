@@ -1,9 +1,10 @@
-CHANGES.txt - 2009-01-20
+CHANGES.txt - 2009-01-23
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Fixed pdftops issues with Ghostscript (STR #3062)
 	- The scheduler incorrectly registered default profiles for PostScript
 	  printers with no specified colorspace.
 	- The scheduler incorrectly created an empty org.cups.printers.plist
