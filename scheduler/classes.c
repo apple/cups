@@ -287,7 +287,7 @@ cupsdLoadAllClasses(void)
 {
   cups_file_t		*fp;		/* classes.conf file */
   int			linenum;	/* Current line number */
-  char			line[1024],	/* Line from file */
+  char			line[4096],	/* Line from file */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
   cupsd_printer_t	*p,		/* Current printer class */

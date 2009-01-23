@@ -331,8 +331,8 @@ cat_drv(const char *name,		/* I - PPD name */
   for (d = (ppdcDriver *)src->drivers->first();
        d;
        d = (ppdcDriver *)src->drivers->next())
-    if (!strcasecmp(pc_file_name, d->pc_file_name->value) ||
-        (d->file_name && !strcasecmp(pc_file_name, d->file_name->value)))
+    if (!strcmp(pc_file_name, d->pc_file_name->value) ||
+        (d->file_name && !strcmp(pc_file_name, d->file_name->value)))
       break;
 
   if (d)
@@ -678,10 +678,10 @@ compare_names(const ppd_info_t *p0,	/* I - First PPD file */
   int	diff;				/* Difference between strings */
 
 
-  if ((diff = strcasecmp(p0->record.filename, p1->record.filename)) != 0)
+  if ((diff = strcmp(p0->record.filename, p1->record.filename)) != 0)
     return (diff);
   else
-    return (strcasecmp(p0->record.name, p1->record.name));
+    return (strcmp(p0->record.name, p1->record.name));
 }
 
 
@@ -706,8 +706,7 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
                                      p1->record.make_and_model)) != 0)
     return (diff);
   else
-    return (strcasecmp(p0->record.languages[0],
-                       p1->record.languages[0]));
+    return (strcmp(p0->record.languages[0], p1->record.languages[0]));
 }
 
 
@@ -1111,7 +1110,7 @@ list_ppds(int        request_id,	/* I - Request ID */
       {
 	for (i = 0; i < PPD_MAX_LANG; i ++)
 	  if (!ppd->record.languages[i][0] ||
-	      !strcasecmp(ppd->record.languages[i], language))
+	      !strcmp(ppd->record.languages[i], language))
 	  {
 	    ppd->matches ++;
 	    break;
@@ -1453,7 +1452,7 @@ load_ppds(const char *d,		/* I - Actual directory */
         ppd->found = 1;
       }
       while ((ppd = (ppd_info_t *)cupsArrayNext(PPDsByName)) != NULL &&
-	     !strcasecmp(ppd->record.filename, name));
+	     !strcmp(ppd->record.filename, name));
 
       continue;
     }
@@ -1725,7 +1724,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
     for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
-      if (!strcasecmp(languages[i].version, lang_version))
+      if (!strcmp(languages[i].version, lang_version))
         break;
 
     if (i < (int)(sizeof(languages) / sizeof(languages[0])))

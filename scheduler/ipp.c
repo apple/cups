@@ -711,6 +711,11 @@ cupsdProcessIPPRequest(
 		    uri ? uri->values[0].string.text : "no URI",
 		    con->http.hostname);
 
+    if (LogLevel == CUPSD_LOG_DEBUG2)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		      "cupsdProcessIPPRequest: ippLength(response)=%ld",
+		      (long)ippLength(con->response));
+
     if (cupsdSendHeader(con, HTTP_OK, "application/ipp", CUPSD_AUTH_NONE))
     {
 #ifdef CUPSD_USE_CHUNKING
@@ -3413,8 +3418,8 @@ apple_register_profiles(
     * Use the default colorspace...
     */
 
-    num_profiles = 1 + ppd->colorspace != PPD_CS_GRAY;
-    
+    num_profiles = 2;
+
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3443,13 +3448,11 @@ apple_register_profiles(
           break;
 
       case PPD_CS_N :
+      default :
           apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("DeviceN.."), "DeviceN", "DeviceN",
 			     NULL);
           break;
-
-      default :
-	  break;
     }
   }
 
@@ -4378,16 +4381,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 			  "entry ignored", p->users[i]);
 	}
 
-	if ((mbr_err = mbr_check_membership(usr_uuid, usr2_uuid,
-					    &is_member)) != 0)
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG,
-			  "check_quotas: User \"%s\" identity check failed "
-			  "(err=%d)", p->users[i], mbr_err);
-	  is_member = 0;
-	}
-
-	if (is_member)
+	if (!uuid_compare(usr_uuid, usr2_uuid))
 	  break;
       }
 #else
@@ -6928,7 +6922,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     completed = 0;
     list      = Jobs;
   }
-  else if (attr && !strcmp(attr->values[0].string.text, "printing"))
+  else if (attr && !strcmp(attr->values[0].string.text, "processing"))
   {
     completed = 0;
     list      = PrintingJobs;
@@ -6980,7 +6974,10 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     * Filter out jobs that don't match...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: job->id = %d", job->id);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "get_jobs: job->id=%d, dest=\"%s\", username=\"%s\", "
+		    "state_value=%d, attrs=%p", job->id, job->dest,
+		    job->username, job->state_value, job->attrs);
 
     if (!job->dest || !job->username)
       cupsdLoadJob(job);
@@ -7003,7 +7000,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     cupsdLoadJob(job);
 
     if (!job->attrs)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d!",
+                      job->id);
       continue;
+    }
 
     if (username[0] && strcasecmp(username, job->username))
       continue;
@@ -7013,10 +7014,10 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     count ++;
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count = %d", count);
-
     copy_job_attrs(con, job, ra);
   }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count=%d", count);
 
   cupsArrayDelete(ra);
 

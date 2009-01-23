@@ -5,6 +5,18 @@ CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
 	  STR #3057)
+	- Fixed a Valgrind-detected initialization error when creating a
+	  missing directory on startup.
+	- The scheduler did not always read all of the HTTP headers from a
+	  CGI script/program.
+        - The scheduler did not always set the "air" property in Bonjour/DNS-SD
+          registrations.
+	- The scheduler incorrectly compared Mac OS X UUIDs for access
+	  control, preventing access in certain configurations.
+        - The IPP backend incorrectly reset the required authentication
+	  to Kerberos when authentication failed.
+	- The scheduler no longer looks up the local hostname by default;
+	  turn on hostname lookups to restore the previous behavior.
 	- The scheduler did not always load MIME type rules correctly
 	  (STR #3059)
 	- The test page did not format correctly on A4 paper (STR #3060)

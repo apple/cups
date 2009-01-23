@@ -32,17 +32,29 @@ if test x$enable_dnssd != xno; then
 		case "$uname" in
 			Darwin*)
 				# Darwin and MacOS X...
-				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				AC_DEFINE(HAVE_DNSSD)
 				AC_DEFINE(HAVE_COREFOUNDATION)
 				AC_DEFINE(HAVE_SYSTEMCONFIGURATION)
+				DNSSDLIBS="-framework CoreFoundation -framework SystemConfiguration"
 				DNSSD_BACKEND="dnssd"
 				;;
 			*)
 				# All others...
-				AC_CHECK_LIB(dns_sd,TXTRecordGetValuePtr,
+				AC_MSG_CHECKING(for current version of dns_sd library)
+				SAVELIBS="$LIBS"
+				LIBS="$LIBS -ldns_sd"
+				AC_TRY_COMPILE([#include <dns_sd.h],
+					[int constant = kDNSServiceFlagsShareConnection;
+					unsigned char txtRecord[100];
+					uint8_t valueLen;
+					TXTRecordGetValuePtr(sizeof(txtRecord),
+					    txtRecord, "value", &valueLen);],
+					AC_MSG_RESULT(yes)
 					AC_DEFINE(HAVE_DNSSD)
-					DNSSDLIBS="-ldns_sd")
+					DNSSDLIBS="-ldns_sd"
+					DNSSD_BACKEND="dnssd",
+					AC_MSG_RESULT(no))
+				LIBS="$SAVELIBS"
 				;;
 		esac
 	])

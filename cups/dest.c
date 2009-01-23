@@ -1703,7 +1703,6 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
                 int         num_dests,	/* I - Number of destinations */
                 cups_dest_t **dests)	/* IO - Destinations */
 {
-  int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
@@ -1721,6 +1720,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
   static const char * const pattrs[] =	/* Attributes we're interested in */
 		{
 		  "auth-info-required",
+		  "device-uri",
 		  "job-sheets-default",
 		  "marker-change-time",
 		  "marker-colors",
@@ -1734,6 +1734,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 		  "media-supported",
 #endif /* __APPLE__ */
 		  "printer-commands",
+		  "printer-defaults",
 		  "printer-info",
 		  "printer-is-accepting-jobs",
 		  "printer-is-shared",
@@ -1744,7 +1745,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 		  "printer-state-change-time",
 		  "printer-state-reasons",
 		  "printer-type",
-		  "printer-defaults"
+		  "printer-uri-supported"
 		};
 
 
@@ -1819,10 +1820,12 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 	    attr->value_tag != IPP_TAG_NAME &&
 	    attr->value_tag != IPP_TAG_NAMELANG &&
 	    attr->value_tag != IPP_TAG_KEYWORD &&
-	    attr->value_tag != IPP_TAG_RANGE)
+	    attr->value_tag != IPP_TAG_RANGE &&
+	    attr->value_tag != IPP_TAG_URI)
           continue;
 
         if (!strcmp(attr->name, "auth-info-required") ||
+	    !strcmp(attr->name, "device-uri") ||
 	    !strcmp(attr->name, "marker-change-time") ||
 	    !strcmp(attr->name, "marker-colors") ||
 	    !strcmp(attr->name, "marker-high-levels") ||
@@ -1840,7 +1843,8 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 	    !strcmp(attr->name, "printer-type") ||
             !strcmp(attr->name, "printer-is-accepting-jobs") ||
             !strcmp(attr->name, "printer-location") ||
-            !strcmp(attr->name, "printer-state-reasons"))
+            !strcmp(attr->name, "printer-state-reasons") ||
+	    !strcmp(attr->name, "printer-uri-supported"))
         {
 	 /*
 	  * Add a printer description attribute...
@@ -1857,6 +1861,8 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
 	 /*
 	  * See if we can set a default media size...
 	  */
+
+          int	i;			/* Looping var */
 
 	  for (i = 0; i < attr->num_values; i ++)
 	    if (!strcasecmp(media_default, attr->values[i].string.text))

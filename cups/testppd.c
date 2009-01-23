@@ -774,6 +774,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   else
   {
     const char	*filename;		/* PPD filename */
+    struct stat	fileinfo;		/* File information */
 
 
     if (!strncmp(argv[1], "-d", 2))
@@ -787,6 +788,33 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
       filename = argv[1];
+
+    if (lstat(filename, &fileinfo))
+    {
+      printf("%s: %s\n", filename, strerror(errno));
+      return (1);
+    }
+
+    if (S_ISLNK(fileinfo.st_mode))
+    {
+      char	realfile[1024];		/* Real file path */
+      ssize_t	realsize;		/* Size of real file path */
+
+
+      if ((realsize = readlink(filename, realfile, sizeof(realfile) - 1)) < 0)
+        strcpy(realfile, "Unknown");
+      else
+        realfile[realsize] = '\0';
+
+      if (stat(realfile, &fileinfo))
+	printf("%s: symlink to \"%s\", %s\n", filename, realfile,
+	       strerror(errno));
+      else
+	printf("%s: symlink to \"%s\", %ld bytes\n", filename, realfile,
+	       (long)fileinfo.st_size);
+    }
+    else
+      printf("%s: regular file, %ld bytes\n", filename, (long)fileinfo.st_size);
 
     if ((ppd = ppdOpenFile(filename)) == NULL)
     {

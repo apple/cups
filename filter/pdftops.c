@@ -4,7 +4,7 @@
  *   PDF to PostScript filter front-end for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,12 +69,8 @@ main(int  argc,				/* I - Number of command-line args */
 		pdfstatus,		/* Status from pdftops */
 		pdfargc;		/* Number of args for pdftops */
   char		*pdfargv[100],		/* Arguments for pdftops/gs */
-#ifdef HAVE_PDFTOPS
 		pdfwidth[255],		/* Paper width */
 		pdfheight[255];		/* Paper height */
-#else
-		pdfgeometry[255];	/* Paper width and height */
-#endif /* HAVE_PDFTOPS */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -215,7 +211,11 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     size = ppdPageSize(ppd, NULL);
-    if (size)
+    if (size &&
+        (cupsGetOption("media", num_options, options) ||
+	 cupsGetOption("media-col", num_options, options) ||
+	 cupsGetOption("PageRegion", num_options, options) ||
+	 cupsGetOption("PageSize", num_options, options))
     {
      /*
       * Got the size, now get the orientation...
@@ -261,25 +261,35 @@ main(int  argc,				/* I - Number of command-line args */
       pdfargv[pdfargc++] = pdfwidth;
       pdfargv[pdfargc++] = (char *)"-paperh";
       pdfargv[pdfargc++] = pdfheight;
+
+      if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+	  strcasecmp(val, "no") && strcasecmp(val, "off") &&
+	  strcasecmp(val, "false"))
+	pdfargv[pdfargc++] = (char *)"-expand";
+
 #else
       if (orientation & 1)
-	snprintf(pdfgeometry, sizeof(pdfgeometry), "-g%.0fx%.0f", size->length,
-	         size->width);
-      else
-	snprintf(pdfgeometry, sizeof(pdfgeometry), "-g%.0fx%.0f", size->width,
+      {
+	snprintf(pdfwidth, sizeof(pdfwidth), "-dDEVICEWIDTHPOINTS=%.0f",
 	         size->length);
+	snprintf(pdfheight, sizeof(pdfheight), "-dDEVICEHEIGHTPOINTS=%.0f",
+	         size->width);
+      }
+      else
+      {
+	snprintf(pdfwidth, sizeof(pdfwidth), "-dDEVICEWIDTHPOINTS=%.0f",
+	         size->width);
+	snprintf(pdfheight, sizeof(pdfheight), "-dDEVICEHEIGHTPOINTS=%.0f",
+	         size->length);
+      }
 
-      pdfargv[pdfargc++] = pdfgeometry;
+      pdfargv[pdfargc++] = pdfwidth;
+      pdfargv[pdfargc++] = pdfheight;
 #endif /* HAVE_PDFTOPS */
     }
   }
 
 #ifdef HAVE_PDFTOPS
-  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-      strcasecmp(val, "no") && strcasecmp(val, "off") &&
-      strcasecmp(val, "false"))
-    pdfargv[pdfargc++] = (char *)"-expand";
-
   pdfargv[pdfargc++] = filename;
   pdfargv[pdfargc++] = (char *)"-";
 #else

@@ -63,7 +63,7 @@ if test x$enable_pam != xno; then
 			# Darwin, MacOS X
 			if test "x$with_pam_module" != x; then
 				PAMFILE="pam.$with_pam_module"
-			elif test -f /usr/lib/pam/pam_opendirectory.so; then
+			elif test -f /usr/lib/pam/pam_opendirectory.so.2; then
 				PAMFILE="pam.opendirectory"
 			else
 				PAMFILE="pam.securityserver"

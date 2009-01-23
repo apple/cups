@@ -68,7 +68,10 @@ void
 cgiEndMultipart(void)
 {
   if (cgi_multipart)
+  {
     printf("\n%s--\n", cgi_multipart);
+    fflush(stdout);
+  }
 }
 
 
@@ -190,8 +193,10 @@ cgiStartHTML(const char *title)		/* I - Title of page */
 void
 cgiStartMultipart(void)
 {
-  puts("MIME-Version: 1.0");
-  puts("Content-Type: multipart/x-mixed-replace; boundary=\"CUPS-MULTIPART\"\n");
+  puts("MIME-Version: 1.0\n"
+       "Content-Type: multipart/x-mixed-replace; boundary=\"CUPS-MULTIPART\"\n");
+  fflush(stdout);
+
   cgi_multipart = "--CUPS-MULTIPART";
 }
 

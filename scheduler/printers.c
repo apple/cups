@@ -929,7 +929,7 @@ cupsdLoadAllPrinters(void)
 {
   cups_file_t		*fp;		/* printers.conf file */
   int			linenum;	/* Current line number */
-  char			line[1024],	/* Line from file */
+  char			line[4096],	/* Line from file */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
   cupsd_printer_t	*p;		/* Current printer */
@@ -2625,6 +2625,25 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
+  if (!p || !s)
+  {
+    cupsdLogMessage(CUPSD_LOG_EMERG,
+                    "cupsdSetPrinterReasons called with p=%p and s=%p!", p, s);
+    return;
+  }
+
+  if (LogLevel == CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetPrinterReasons: num_reasons=%d",
+                    p->num_reasons);
+    for (i = 0; i < p->num_reasons; i ++)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetPrinterReasons: reasons[%d]=%p(\"%s\")", i,
+		      p->reasons[i], p->reasons[i]);
+  }
+
   if (s[0] == '-' || s[0] == '+')
   {
    /*
@@ -2684,11 +2703,15 @@ cupsdSetPrinterReasons(
       */
 
       for (i = 0; i < p->num_reasons; i ++)
-        if (!strcasecmp(reason, p->reasons[i]))
+        if (!strcmp(reason, p->reasons[i]))
 	{
 	 /*
 	  * Found a match, so remove it...
 	  */
+
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdSetPrinterReasons: Removing \"%s\" at index %d",
+			  reason, i);
 
 	  p->num_reasons --;
 	  _cupsStrFree(p->reasons[i]);
@@ -2696,8 +2719,6 @@ cupsdSetPrinterReasons(
 	  if (i < p->num_reasons)
 	    memmove(p->reasons + i, p->reasons + i + 1,
 	            (p->num_reasons - i) * sizeof(char *));
-
-	  i --;
 
           if (!strcmp(reason, "paused") && p->state == IPP_PRINTER_STOPPED)
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
@@ -2707,6 +2728,8 @@ cupsdSetPrinterReasons(
 
 	  if (PrintcapFormat == PRINTCAP_PLIST)
 	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+
+	  break;
 	}
     }
     else if (p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
@@ -2716,11 +2739,23 @@ cupsdSetPrinterReasons(
       */
 
       for (i = 0; i < p->num_reasons; i ++)
-        if (!strcasecmp(reason, p->reasons[i]))
+        if (!strcmp(reason, p->reasons[i]))
 	  break;
 
       if (i >= p->num_reasons)
       {
+        if (i >= (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ALERT,
+	                  "Too many printer-state-reasons values for %s (%d)",
+			  p->name, i + 1);
+          return;
+        }
+
+	cupsdLogMessage(CUPSD_LOG_DEBUG2,
+			"cupsdSetPrinterReasons: Adding \"%s\" at index %d",
+			reason, i);
+
         p->reasons[i] = _cupsStrAlloc(reason);
 	p->num_reasons ++;
 
@@ -2734,6 +2769,17 @@ cupsdSetPrinterReasons(
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
       }
     }
+  }
+
+  if (LogLevel == CUPSD_LOG_DEBUG2)
+  {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                    "cupsdSetPrinterReasons: NEW num_reasons=%d",
+                    p->num_reasons);
+    for (i = 0; i < p->num_reasons; i ++)
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                      "cupsdSetPrinterReasons: NEW reasons[%d]=%p(\"%s\")", i,
+		      p->reasons[i], p->reasons[i]);
   }
 }
 
@@ -3236,140 +3282,137 @@ cupsdWritePrintcap(void)
                        "# %s/printers.conf file.  All changes to this file\n"
 		       "# will be lost.\n", ServerRoot);
 
-  if (Printers)
+ /*
+  * Write a new printcap with the current list of printers.
+  */
+
+  switch (PrintcapFormat)
   {
-   /*
-    * Write a new printcap with the current list of printers.
-    */
+    case PRINTCAP_BSD :
+       /*
+	* Each printer is put in the file as:
+	*
+	*    Printer1:
+	*    Printer2:
+	*    Printer3:
+	*    ...
+	*    PrinterN:
+	*/
 
-    switch (PrintcapFormat)
-    {
-      case PRINTCAP_BSD :
-	 /*
-          * Each printer is put in the file as:
-	  *
-	  *    Printer1:
-	  *    Printer2:
-	  *    Printer3:
-	  *    ...
-	  *    PrinterN:
-	  */
+	if (DefaultPrinter)
+	  cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
+			 DefaultPrinter->info, ServerName,
+			 DefaultPrinter->name);
 
-          if (DefaultPrinter)
-	    cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", DefaultPrinter->name,
-	                   DefaultPrinter->info, ServerName,
-			   DefaultPrinter->name);
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	  if (p != DefaultPrinter)
+	    cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
+			   ServerName, p->name);
+	break;
 
-	  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	       p;
-	       p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	    if (p != DefaultPrinter)
-	      cupsFilePrintf(fp, "%s|%s:rm=%s:rp=%s:\n", p->name, p->info,
-	                     ServerName, p->name);
-          break;
+    case PRINTCAP_PLIST :
+       /*
+	* Each printer is written as a dictionary in a plist file.
+	* Currently the printer-name, printer-info, printer-is-accepting-jobs,
+	* printer-location, printer-make-and-model, printer-state,
+	* printer-state-reasons, printer-type, and (sanitized) device-uri.
+	*/
 
-      case PRINTCAP_PLIST :
-         /*
-	  * Each printer is written as a dictionary in a plist file.
-	  * Currently the printer-name, printer-info, printer-is-accepting-jobs,
-	  * printer-location, printer-make-and-model, printer-state,
-	  * printer-state-reasons, printer-type, and (sanitized) device-uri.
-	  */
+	cupsFilePuts(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			 "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD "
+			 "PLIST 1.0//EN\" \"http://www.apple.com/DTDs/"
+			 "PropertyList-1.0.dtd\">\n"
+			 "<plist version=\"1.0\">\n"
+			 "<array>\n");
 
-          cupsFilePuts(fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-	                   "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD "
-			   "PLIST 1.0//EN\" \"http://www.apple.com/DTDs/"
-			   "PropertyList-1.0.dtd\">\n"
-			   "<plist version=\"1.0\">\n"
-			   "<array>\n");
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	{
+	  cupsFilePuts(fp, "\t<dict>\n"
+			   "\t\t<key>printer-name</key>\n"
+			   "\t\t<string>");
+	  write_xml_string(fp, p->name);
+	  cupsFilePuts(fp, "</string>\n"
+			   "\t\t<key>printer-info</key>\n"
+			   "\t\t<string>");
+	  write_xml_string(fp, p->info);
+	  cupsFilePrintf(fp, "</string>\n"
+			     "\t\t<key>printer-is-accepting-jobs</key>\n"
+			     "\t\t<%s/>\n"
+			     "\t\t<key>printer-location</key>\n"
+			     "\t\t<string>", p->accepting ? "true" : "false");
+	  write_xml_string(fp, p->location);
+	  cupsFilePuts(fp, "</string>\n"
+			   "\t\t<key>printer-make-and-model</key>\n"
+			   "\t\t<string>");
+	  write_xml_string(fp, p->make_model);
+	  cupsFilePrintf(fp, "</string>\n"
+			     "\t\t<key>printer-state</key>\n"
+			     "\t\t<integer>%d</integer>\n"
+			     "\t\t<key>printer-state-reasons</key>\n"
+			     "\t\t<array>\n", p->state);
+	  for (i = 0; i < p->num_reasons; i ++)
+	  {
+	    cupsFilePuts(fp, "\t\t\t<string>");
+	    write_xml_string(fp, p->reasons[i]);
+	    cupsFilePuts(fp, "</string>\n");
+	  }
+	  cupsFilePrintf(fp, "\t\t</array>\n"
+			     "\t\t<key>printer-type</key>\n"
+			     "\t\t<integer>%d</integer>\n"
+			     "\t\t<key>device-uri</key>\n"
+			     "\t\t<string>", p->type);
+	  write_xml_string(fp, p->sanitized_device_uri);
+	  cupsFilePuts(fp, "</string>\n"
+			   "\t</dict>\n");
+	}
+	cupsFilePuts(fp, "</array>\n"
+			 "</plist>\n");
+	break;
 
-	  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	       p;
-	       p = (cupsd_printer_t *)cupsArrayNext(Printers))
-          {
-	    cupsFilePuts(fp, "\t<dict>\n"
-	                     "\t\t<key>printer-name</key>\n"
-			     "\t\t<string>");
-            write_xml_string(fp, p->name);
-	    cupsFilePuts(fp, "</string>\n"
-	                     "\t\t<key>printer-info</key>\n"
-			     "\t\t<string>");
-            write_xml_string(fp, p->info);
-	    cupsFilePrintf(fp, "</string>\n"
-	                       "\t\t<key>printer-is-accepting-jobs</key>\n"
-			       "\t\t<%s/>\n"
-			       "\t\t<key>printer-location</key>\n"
-			       "\t\t<string>", p->accepting ? "true" : "false");
-            write_xml_string(fp, p->location);
-	    cupsFilePuts(fp, "</string>\n"
-	                     "\t\t<key>printer-make-and-model</key>\n"
-			     "\t\t<string>");
-            write_xml_string(fp, p->make_model);
-	    cupsFilePrintf(fp, "</string>\n"
-	                       "\t\t<key>printer-state</key>\n"
-			       "\t\t<integer>%d</integer>\n"
-			       "\t\t<key>printer-state-reasons</key>\n"
-			       "\t\t<array>\n", p->state);
-            for (i = 0; i < p->num_reasons; i ++)
-	    {
-	      cupsFilePuts(fp, "\t\t\t<string>");
-	      write_xml_string(fp, p->reasons[i]);
-	      cupsFilePuts(fp, "</string>\n");
-	    }
-	    cupsFilePrintf(fp, "\t\t</array>\n"
-	                       "\t\t<key>printer-type</key>\n"
-			       "\t\t<integer>%d</integer>\n"
-	                       "\t\t<key>device-uri</key>\n"
-			       "\t\t<string>", p->type);
-            write_xml_string(fp, p->sanitized_device_uri);
-	    cupsFilePuts(fp, "</string>\n"
-	                     "\t</dict>\n");
-          }
-	  cupsFilePuts(fp, "</array>\n"
-	                   "</plist>\n");
-	  break;
+    case PRINTCAP_SOLARIS :
+       /*
+	* Each printer is put in the file as:
+	*
+	*    _all:all=Printer1,Printer2,Printer3,...,PrinterN
+	*    _default:use=DefaultPrinter
+	*    Printer1:\
+	*            :bsdaddr=ServerName,Printer1:\
+	*            :description=Description:
+	*    Printer2:
+	*            :bsdaddr=ServerName,Printer2:\
+	*            :description=Description:
+	*    Printer3:
+	*            :bsdaddr=ServerName,Printer3:\
+	*            :description=Description:
+	*    ...
+	*    PrinterN:
+	*            :bsdaddr=ServerName,PrinterN:\
+	*            :description=Description:
+	*/
 
-      case PRINTCAP_SOLARIS :
-	 /*
-          * Each printer is put in the file as:
-	  *
-	  *    _all:all=Printer1,Printer2,Printer3,...,PrinterN
-	  *    _default:use=DefaultPrinter
-	  *    Printer1:\
-	  *            :bsdaddr=ServerName,Printer1:\
-	  *            :description=Description:
-	  *    Printer2:
-	  *            :bsdaddr=ServerName,Printer2:\
-	  *            :description=Description:
-	  *    Printer3:
-	  *            :bsdaddr=ServerName,Printer3:\
-	  *            :description=Description:
-	  *    ...
-	  *    PrinterN:
-	  *            :bsdaddr=ServerName,PrinterN:\
-	  *            :description=Description:
-	  */
+	cupsFilePuts(fp, "_all:all=");
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayCurrent(Printers))
+	  cupsFilePrintf(fp, "%s%c", p->name,
+			 cupsArrayNext(Printers) ? ',' : '\n');
 
-          cupsFilePuts(fp, "_all:all=");
-	  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	       p;
-	       p = (cupsd_printer_t *)cupsArrayCurrent(Printers))
-	    cupsFilePrintf(fp, "%s%c", p->name,
-	                   cupsArrayNext(Printers) ? ',' : '\n');
+	if (DefaultPrinter)
+	  cupsFilePrintf(fp, "_default:use=%s\n", DefaultPrinter->name);
 
-          if (DefaultPrinter)
-	    cupsFilePrintf(fp, "_default:use=%s\n", DefaultPrinter->name);
-
-	  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
-	       p;
-	       p = (cupsd_printer_t *)cupsArrayNext(Printers))
-	    cupsFilePrintf(fp, "%s:\\\n"
-	        	       "\t:bsdaddr=%s,%s:\\\n"
-			       "\t:description=%s:\n",
-		           p->name, ServerName, p->name,
-			   p->info ? p->info : "");
-          break;
-    }
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	  cupsFilePrintf(fp, "%s:\\\n"
+			     "\t:bsdaddr=%s,%s:\\\n"
+			     "\t:description=%s:\n",
+			 p->name, ServerName, p->name,
+			 p->info ? p->info : "");
+	break;
   }
 
  /*

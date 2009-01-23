@@ -95,7 +95,10 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Directory for request files */
 			*DocumentRoot		VALUE(NULL);
 					/* Root directory for documents */
-VAR int			ServerNameIsIP		VALUE(0);
+VAR int			RemoteAccessEnabled	VALUE(0),
+					/* Are we listening on non-local addresses? */
+			ServerNameIsIP		VALUE(0);
+					/* Is the ServerName an IP address? */
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */
 VAR char		*SystemGroups[MAX_SYSTEM_GROUPS]
@@ -160,7 +163,7 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* Permissions for log files */
 			LogLevel		VALUE(CUPSD_LOG_WARN),
 					/* Error log level */
-			MaxClients		VALUE(0),
+			MaxClients		VALUE(100),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),
 					/* Maximum number of clients per host */

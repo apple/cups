@@ -1263,6 +1263,19 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 
  /*
+  * Update auth-info-required as needed...
+  */
+
+  if (ipp_status == IPP_NOT_AUTHORIZED)
+  {
+    if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
+                 "Negotiate", 9))
+      fputs("ATTR: auth-info-required=negotiate\n", stderr);
+    else
+      fputs("ATTR: auth-info-required=username,password\n", stderr);
+  }
+
+ /*
   * Free memory...
   */
 
@@ -1295,15 +1308,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (ipp_status == IPP_NOT_AUTHORIZED)
-  {
-   /*
-    * Authorization failures here mean that we need Kerberos.  Username +
-    * password authentication is handled in the password_cb function.
-    */
-
-    fputs("ATTR: auth-info-required=negotiate\n", stderr);
     return (CUPS_BACKEND_AUTH_REQUIRED);
-  }
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else

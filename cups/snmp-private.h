@@ -6,7 +6,7 @@
  *   This API is PRIVATE and subject to change.  No third-party applications
  *   should use the SNMP API defined in this file.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -64,12 +64,12 @@ enum cups_asn1_e			/**** ASN1 request/object types ****/
 };
 typedef enum cups_asn1_e cups_asn1_t;	/**** ASN1 request/object types ****/
 
-struct cups_snmp_hexstring_s		/**** Hex-STRING value ****/
+typedef struct cups_snmp_string_s	/**** String value ****/
 {
   unsigned char	bytes[CUPS_SNMP_MAX_STRING];
 					/* Bytes in string */
   int		num_bytes;		/* Number of bytes */
-};
+} cups_snmp_string_t;
 
 union cups_snmp_value_u			/**** Object value ****/
 {
@@ -79,10 +79,7 @@ union cups_snmp_value_u			/**** Object value ****/
   unsigned	gauge;			/* Gauge value */
   unsigned	timeticks;		/* Timeticks  value */
   int		oid[CUPS_SNMP_MAX_OID];	/* OID value */
-  char		string[CUPS_SNMP_MAX_STRING];
-					/* String value */
-  struct cups_snmp_hexstring_s hex_string;
-					/* Hex string value */
+  cups_snmp_string_t string;		/* String value */
 };
 
 typedef struct cups_snmp_s		/**** SNMP data packet ****/
