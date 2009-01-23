@@ -3,7 +3,7 @@
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -30,6 +30,7 @@
 #include "ppd.h"
 #include "string.h"
 #include <ctype.h>
+#include "debug.h"
 
 
 /*
@@ -49,8 +50,13 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
   ppd_cparam_t	*cparam;		/* Custom option parameter */
 
 
+  DEBUG_printf(("ppdPageSize(ppd=%p, name=\"%s\")", ppd, name));
+
   if (!ppd)
+  {
+    DEBUG_puts("ppdPageSize: Bad PPD pointer, returning NULL...");
     return (NULL);
+  }
 
   if (name)
   {
@@ -65,7 +71,10 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
           break;
 
       if (!i)
+      {
+	DEBUG_puts("ppdPageSize: No custom sizes, returning NULL...");
         return (NULL);
+      }
 
      /*
       * Variable size; size name can be one of the following:
@@ -135,6 +144,9 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Return the page size...
       */
 
+      DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+                    size->name, size->width, size->length));
+
       return (size);
     }
     else
@@ -144,8 +156,13 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       */
 
       for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
-	if (!strcmp(name, size->name))
+	if (!strcasecmp(name, size->name))
+	{
+	  DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+			size->name, size->width, size->length));
+
           return (size);
+	}
     }
   }
   else
@@ -156,8 +173,15 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 
     for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
       if (size->marked)
+      {
+	DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+		      size->name, size->width, size->length));
+
         return (size);
+      }
   }
+
+  DEBUG_puts("ppdPageSize: Size not found, returning NULL");
 
   return (NULL);
 }

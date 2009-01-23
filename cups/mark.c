@@ -461,13 +461,24 @@ ppd_choice_t *				/* O - Pointer to choice or @code NULL@ */
 ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
                     const char *option)	/* I - Keyword/option name */
 {
-  ppd_choice_t	key;			/* Search key for choice */
+  ppd_choice_t	key,			/* Search key for choice */
+		*marked;		/* Marked choice */
 
+
+  DEBUG_printf(("ppdFindMarkedChoice(ppd=%p, option=\"%s\")", ppd, option));
 
   if ((key.option = ppdFindOption(ppd, option)) == NULL)
+  {
+    DEBUG_puts("ppdFindMarkedChoice: Option not found, returning NULL");
     return (NULL);
+  }
 
-  return ((ppd_choice_t *)cupsArrayFind(ppd->marked, &key));
+  marked = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key);
+
+  DEBUG_printf(("ppdFindMarkedChoice: Returning %p(%s)...", marked,
+                marked ? marked->choice : "NULL"));
+
+  return (marked);
 }
 
 
