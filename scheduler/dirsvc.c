@@ -283,7 +283,7 @@ cupsdLoadRemoteCache(void)
 {
   cups_file_t		*fp;		/* remote.cache file */
   int			linenum;	/* Current line number */
-  char			line[1024],	/* Line from file */
+  char			line[4096],	/* Line from file */
 			*value,		/* Pointer to value */
 			*valueptr,	/* Pointer into value */
 			scheme[32],	/* Scheme portion of URI */

@@ -4,6 +4,8 @@ CHANGES.txt - 2009-01-23
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The web interface and scheduler did not support URIs up to 1024 bytes
+	  in length (STR #3072)
 	- Fixed pdftops issues with page sizes (STR #3063)
 	- Fixed pdftops issues with Ghostscript (STR #3062)
 	- The scheduler incorrectly registered default profiles for PostScript
