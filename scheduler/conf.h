@@ -165,9 +165,9 @@ VAR int			ClassifyOverride	VALUE(0),
 					/* Permissions for config files */
 			FatalErrors		VALUE(CUPSD_FATAL_CONFIG),
 					/* Which errors are fatal? */
-			LogFilePerm		VALUE(0644),
+			LogFilePerm		VALUE(0644);
 					/* Permissions for log files */
-			LogLevel		VALUE(CUPSD_LOG_WARN);
+VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
 VAR cupsd_time_t	LogTimeFormat		VALUE(CUPSD_TIME_STANDARD);
 					/* Log file time format */
