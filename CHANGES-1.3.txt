@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
 	  STR #3057)
+	- The scheduler did not enforce quotas after the job history was
+	  unloaded (STR #3078)
 	- The job-k-limit, job-page-limit, and job-quota-period attributes
 	  could not be set using the lpadmin command (STR #3077)
 	- httpSeparateURI() did not error out on URIs with a missing port

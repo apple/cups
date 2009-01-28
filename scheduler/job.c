@@ -1056,7 +1056,7 @@ cupsdLoadAllJobs(void)
  * 'cupsdLoadJob()' - Load a single job...
  */
 
-void
+int					/* O - 1 on success, 0 on failure */
 cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 {
   char			jobfile[1024];	/* Job filename */
@@ -1074,14 +1074,14 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     if (job->state_value > IPP_JOB_STOPPED)
       job->access_time = time(NULL);
 
-    return;
+    return (1);
   }
 
   if ((job->attrs = ippNew()) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "[Job %d] Ran out of memory for job attributes!", job->id);
-    return;
+    return (0);
   }
 
  /*
@@ -1096,9 +1096,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Unable to open job control file \"%s\" - %s!",
 		    job->id, jobfile, strerror(errno));
-    ippDelete(job->attrs);
-    job->attrs = NULL;
-    return;
+    goto error;
   }
 
   if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL, job->attrs) != IPP_DATA)
@@ -1107,10 +1105,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 		    "[Job %d] Unable to read job control file \"%s\"!", job->id,
 		    jobfile);
     cupsFileClose(fp);
-    ippDelete(job->attrs);
-    job->attrs = NULL;
-    unlink(jobfile);
-    return;
+    goto error;
   }
 
   cupsFileClose(fp);
@@ -1124,10 +1119,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Missing or bad time-at-creation attribute in "
 		    "control file!", job->id);
-    ippDelete(job->attrs);
-    job->attrs = NULL;
-    unlink(jobfile);
-    return;
+    goto error;
   }
 
   if ((job->state = ippFindAttribute(job->attrs, "job-state",
@@ -1136,10 +1128,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Missing or bad job-state attribute in control "
 		    "file!", job->id);
-    ippDelete(job->attrs);
-    job->attrs = NULL;
-    unlink(jobfile);
-    return;
+    goto error;
   }
 
   job->state_value = (ipp_jstate_t)job->state->values[0].integer;
@@ -1152,10 +1141,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] No job-printer-uri attribute in control file!",
 		      job->id);
-      ippDelete(job->attrs);
-      job->attrs = NULL;
-      unlink(jobfile);
-      return;
+      goto error;
     }
 
     if ((dest = cupsdValidateDest(attr->values[0].string.text, &(job->dtype),
@@ -1164,10 +1150,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] Unable to queue job for destination \"%s\"!",
 		      job->id, attr->values[0].string.text);
-      ippDelete(job->attrs);
-      job->attrs = NULL;
-      unlink(jobfile);
-      return;
+      goto error;
     }
 
     cupsdSetString(&job->dest, dest);
@@ -1177,10 +1160,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdLogMessage(CUPSD_LOG_ERROR,
 		    "[Job %d] Unable to queue job for destination \"%s\"!",
 		    job->id, job->dest);
-    ippDelete(job->attrs);
-    job->attrs = NULL;
-    unlink(jobfile);
-    return;
+    goto error;
   }
 
   job->sheets     = ippFindAttribute(job->attrs, "job-media-sheets-completed",
@@ -1195,10 +1175,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] Missing or bad job-priority attribute in "
 		      "control file!", job->id);
-      ippDelete(job->attrs);
-      job->attrs = NULL;
-      unlink(jobfile);
-      return;
+      goto error;
     }
 
     job->priority = attr->values[0].integer;
@@ -1212,10 +1189,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "[Job %d] Missing or bad job-originating-user-name "
 		      "attribute in control file!", job->id);
-      ippDelete(job->attrs);
-      job->attrs = NULL;
-      unlink(jobfile);
-      return;
+      goto error;
     }
 
     cupsdSetString(&job->username, attr->values[0].string.text);
@@ -1284,7 +1258,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
           cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "[Job %d] Ran out of memory for job file types!",
 			  job->id);
-	  return;
+	  return (1);
 	}
 
         job->compressions = compressions;
@@ -1342,6 +1316,18 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
   }
 
   job->access_time = time(NULL);
+  return (1);
+
+ /*
+  * If we get here then something bad happened...
+  */
+
+  error:
+
+  ippDelete(job->attrs);
+  job->attrs = NULL;
+  unlink(jobfile);
+  return (0);
 }
 
 
