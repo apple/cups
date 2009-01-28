@@ -3,7 +3,7 @@
  *
  *   Log file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -55,11 +55,14 @@ static int	format_log_line(const char *message, va_list ap);
  */
 
 char *					/* O - Date/time string */
-cupsdGetDateTime(time_t t)		/* I - Time value */
+cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
+                 cupsd_time_t   format)	/* I - Format to use */
 {
-  struct tm	*date;			/* Date/time value */
-  static time_t	last_time = -1;		/* Last time value */
-  static char	s[1024];		/* Date/time string */
+  struct timeval	curtime;	/* Current time value */
+  struct tm		*date;		/* Date/time value */
+  static struct timeval	last_time = { 0, 0 };
+	    				/* Last time we formatted */
+  static char		s[1024];	/* Date/time string */
   static const char * const months[12] =/* Months */
 		{
 		  "Jan",
@@ -82,11 +85,15 @@ cupsdGetDateTime(time_t t)		/* I - Time value */
   */
 
   if (!t)
-    t = time(NULL);
-
-  if (t != last_time)
   {
-    last_time = t;
+    gettimeofday(&curtime, NULL);
+    t = &curtime;
+  }
+
+  if (t->tv_sec != last_time.tv_sec ||
+      (LogTimeFormat == CUPSD_TIME_USECS && t->tv_usec != last_time.tv_usec))
+  {
+    last_time = *t;
 
    /*
     * Get the date and time from the UNIX time value, and then format it
@@ -102,15 +109,25 @@ cupsdGetDateTime(time_t t)		/* I - Time value */
     * (*BSD and Darwin store the timezone offset in the tm structure)
     */
 
-    date = localtime(&t);
+    date = localtime(&(t->tv_sec));
 
-    snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
-	     date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	     date->tm_hour, date->tm_min, date->tm_sec,
+    if (format == CUPSD_TIME_STANDARD)
+      snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d %+03ld%02ld]",
+	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	       date->tm_hour, date->tm_min, date->tm_sec,
 #ifdef HAVE_TM_GMTOFF
-             date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else
-             timezone / 3600, (timezone / 60) % 60);
+	       timezone / 3600, (timezone / 60) % 60);
+#endif /* HAVE_TM_GMTOFF */
+    else
+      snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d.%06d %+03ld%02ld]",
+	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
+	       date->tm_hour, date->tm_min, date->tm_sec, t->tv_usec,
+#ifdef HAVE_TM_GMTOFF
+	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
+#else
+	       timezone / 3600, (timezone / 60) % 60);
 #endif /* HAVE_TM_GMTOFF */
   }
 
@@ -322,7 +339,7 @@ cupsdLogPage(cupsd_job_t *job,		/* I - Job being printed */
 	    break;
 
         case 'T' :			/* Date and time */
-	    strlcpy(bufptr, cupsdGetDateTime(time(NULL)),
+	    strlcpy(bufptr, cupsdGetDateTime(NULL, LogTimeFormat),
 	            sizeof(buffer) - (bufptr - buffer));
 	    bufptr += strlen(bufptr);
 	    break;
@@ -627,7 +644,8 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
   cupsFilePrintf(AccessFile,
                  "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
         	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
-		 cupsdGetDateTime(con->start), states[con->operation],
+		 cupsdGetDateTime(&(con->start), LogTimeFormat),
+		 states[con->operation],
 		 _httpEncodeURI(temp, con->uri, sizeof(temp)),
 		 con->http.version / 100, con->http.version % 100,
 		 code, CUPS_LLCAST con->bytes,
@@ -705,7 +723,7 @@ cupsdWriteErrorLog(int        level,	/* I - Log level */
   */
 
   cupsFilePrintf(ErrorFile, "%c %s %s\n", levels[level],
-                 cupsdGetDateTime(time(NULL)), message);
+                 cupsdGetDateTime(NULL, LogTimeFormat), message);
   cupsFileFlush(ErrorFile);
 
   return (1);

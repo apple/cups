@@ -2032,6 +2032,23 @@ everything under the preceding levels):</P>
 <p>The default <code>LogLevel</code> is <code>@CUPS_LOG_LEVEL@</code>.</p>
 
 
+<H2 CLASS="title"><A NAME="LogTimeFormat">LogTimeFormat</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+LogTimeFormat standard
+LogTimeFormat usecs
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>LogTimeFormat</CODE> directive specifies the format used for the
+date and time in the log files. <CODE>Standard</CODE> uses the standard Apache
+Common Log Format date and time while <CODE>usecs</CODE> adds microseconds.
+The default is <CODE>standard</CODE>.</P>
+
+
 <H2 CLASS="title"><A NAME="MaxClients">MaxClients</A></H2>
 
 <H3>Examples</H3>

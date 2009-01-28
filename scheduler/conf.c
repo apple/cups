@@ -574,6 +574,7 @@ cupsdReadConfiguration(void)
   ListenBackLog            = SOMAXCONN;
   LogFilePerm              = CUPS_DEFAULT_LOG_FILE_PERM;
   LogLevel                 = CUPSD_LOG_WARN;
+  LogTimeFormat            = CUPSD_TIME_STANDARD;
   MaxClients               = 100;
   MaxClientsPerHost        = 0;
   MaxLogSize               = 1024 * 1024;
@@ -3182,6 +3183,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogLevel = CUPSD_LOG_NONE;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogLevel %s on line %d.",
+	                value, linenum);
+    }
+    else if (!strcasecmp(line, "LogTimeFormat") && value)
+    {
+     /*
+      * Amount of logging to do to error log...
+      */
+
+      if (!strcasecmp(value, "standard"))
+        LogTimeFormat = CUPSD_TIME_STANDARD;
+      else if (!strcasecmp(value, "usecs"))
+        LogTimeFormat = CUPSD_TIME_USECS;
+      else
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogTimeFormat %s on line %d.",
 	                value, linenum);
     }
     else if (!strcasecmp(line, "PrintcapFormat") && value)

@@ -4910,7 +4910,10 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strncmp(s, "time-at-", 8))
-	        cupsFilePuts(out, cupsdGetDateTime(attr->values[i].integer));
+	      {
+	        struct timeval tv = { attr->values[i].integer, 0 };
+	        cupsFilePuts(out, cupsdGetDateTime(&tv, CUPSD_TIME_STANDARD));
+	      }
 	      else
 	        cupsFilePrintf(out, "%d", attr->values[i].integer);
 	      break;

@@ -28,7 +28,7 @@ struct cupsd_client_s
   ipp_t			*request,	/* IPP request information */
 			*response;	/* IPP response information */
   cupsd_location_t	*best;		/* Best match for AAA */
-  time_t		start;		/* Request start time */
+  struct timeval	start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   off_t			bytes;		/* Bytes transferred for this request */
   int			type;		/* AuthType for username */

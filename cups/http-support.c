@@ -1297,7 +1297,7 @@ _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
     size_t     resolved_size,		/* I - Size of URI buffer */
-    int        log)			/* I - Log progress to stderr? */
+    int        logit)			/* I - Log progress to stderr? */
 {
   char			scheme[32],	/* URI components... */
 			userpass[256],
@@ -1329,7 +1329,7 @@ _httpResolveURI(
 		      sizeof(resource)) < HTTP_URI_OK)
 #endif /* DEBUG */
   {
-    if (log)
+    if (logit)
       _cupsLangPrintf(stderr, _("Bad device URI \"%s\"!\n"), uri);
 
     DEBUG_printf(("_httpResolveURI: httpSeparateURI returned %d!\n", status));
@@ -1392,7 +1392,7 @@ _httpResolveURI(
 
     DEBUG_printf(("_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
-    if (log)
+    if (logit)
     {
       fputs("STATE: +connecting-to-device\n", stderr);
       fprintf(stderr, "DEBUG: Resolving %s, regtype=%s, domain=%s...\n",
@@ -1415,7 +1415,7 @@ _httpResolveURI(
     else
       uri = NULL;
 
-    if (log)
+    if (logit)
       fputs("STATE: -connecting-to-device\n", stderr);
 
 #else
@@ -1426,7 +1426,7 @@ _httpResolveURI(
     uri = NULL;
 #endif /* HAVE_DNSSD */
 
-    if (log && !uri)
+    if (logit && !uri)
       _cupsLangPuts(stderr, _("Unable to find printer!\n"));
   }
 
