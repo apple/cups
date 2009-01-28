@@ -205,8 +205,10 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
-			DefaultShared		VALUE(TRUE);
+			DefaultShared		VALUE(TRUE),
 					/* Share printers by default? */
+			MultipleOperationTimeout VALUE(DEFAULT_TIMEOUT);
+					/* multiple-operation-time-out value */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),

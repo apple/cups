@@ -544,7 +544,7 @@ cupsdCreateCommonData(void)
 
   /* multiple-operation-time-out */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "multiple-operation-time-out", 60);
+                "multiple-operation-time-out", MultipleOperationTimeout);
 
   /* natural-language-configured */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_COPY,

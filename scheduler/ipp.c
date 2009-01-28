@@ -1731,7 +1731,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
   else if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
   {
-    job->hold_until               = time(NULL) + 60;
+    job->hold_until               = time(NULL) + MultipleOperationTimeout;
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
   }
@@ -10063,7 +10063,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     {
       job->state->values[0].integer = IPP_JOB_HELD;
       job->state_value              = IPP_JOB_HELD;
-      job->hold_until               = time(NULL) + 60;
+      job->hold_until               = time(NULL) + MultipleOperationTimeout;
       job->dirty                    = 1;
 
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);

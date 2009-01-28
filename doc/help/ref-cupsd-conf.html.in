@@ -2210,6 +2210,22 @@ HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 directive instead.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+MultipleOperationTimeout 60
+MultipleOperationTimeout 300
+MultipleOperationTimeout 86400
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>MultipleOperationTimeout</CODE> directive sets the maximum amount
+of time between files in a multi-file print job. The default is 300 seconds.</P>
+
+
 <H2 CLASS="title"><A NAME="Order">Order</A></H2>
 
 <H3>Examples</H3>

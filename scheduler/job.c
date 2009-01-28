@@ -395,7 +395,25 @@ cupsdCheckJobs(void)
     {
       if (job->pending_timeout)
       {
-       /* Add trailing banner as needed */
+       /*
+        * This job is pending; check that we don't have an active Send-Document
+	* operation in progress on any of the client connections, then timeout
+	* the job so we can start printing...
+	*/
+
+        cupsd_client_t	*con;		/* Current client connection */
+
+
+	for (con = (cupsd_client_t *)cupsArrayFirst(Clients);
+	     con;
+	     con = (cupsd_client_t *)cupsArrayNext(Clients))
+	  if (con->request &&
+	      con->request->request.op.operation_id == IPP_SEND_DOCUMENT)
+	    break;
+
+        if (con)
+	  continue;
+
         if (cupsdTimeoutJob(job))
 	  continue;
       }

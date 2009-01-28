@@ -1764,6 +1764,13 @@ process_children(void)
       cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
                       pid, name);
   }
+
+ /*
+  * If wait*() is interrupted by a signal, tell main() to call us again...
+  */
+
+  if (pid < 0 && errno == EINTR)
+    dead_children = 1;
 }
 
 
