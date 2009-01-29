@@ -3,7 +3,7 @@
  *
  *   Quota routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -155,8 +155,20 @@ cupsdUpdateQuota(
        job;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
   {
+   /*
+    * We only care about the current printer/class and user...
+    */
+
     if (strcasecmp(job->dest, p->name) != 0 ||
         strcasecmp(job->username, q->username) != 0)
+      continue;
+
+   /*
+    * Make sure attributes are loaded; we always call cupsdLoadJob() to ensure
+    * the access_time member is updated so the job isn't unloaded right away...
+    */
+
+    if (!cupsdLoadJob(job))
       continue;
 
     if ((attr = ippFindAttribute(job->attrs, "time-at-completion",
@@ -166,11 +178,22 @@ cupsdUpdateQuota(
         attr = ippFindAttribute(job->attrs, "time-at-creation",
                                 IPP_TAG_INTEGER);
 
-    if (attr == NULL)
-      break;
+    if (!attr)
+    {
+     /*
+      * This should never happen since cupsdLoadJob() checks for
+      * time-at-creation, but if it does just ignore this job...
+      */
+
+      continue;
+    }
 
     if (attr->values[0].integer < curtime)
     {
+     /*
+      * This job is too old to count towards the quota, ignore it...
+      */
+
       if (JobAutoPurge)
         cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
 

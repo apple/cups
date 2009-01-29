@@ -3,7 +3,7 @@
  *
  *   CUPS API test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cups.h"
+#include "string.h"
+#include <errno.h>
 
 
 /*
@@ -56,6 +58,74 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		num_jobs;		/* Number of jobs for queue */
   cups_job_t	*jobs;			/* Jobs for queue */
 
+
+  if (argc > 1)
+  {
+   /*
+    * ./testcups printer file interval
+    */
+
+    int		interval,		/* Interval between writes */
+		job_id;			/* Job ID */
+    cups_file_t	*fp;			/* Print file */
+    char	buffer[16384];		/* Read/write buffer */
+    ssize_t	bytes;			/* Bytes read/written */
+
+
+    if (argc != 4)
+    {
+      puts("Usage: ./testcups");
+      puts("       ./testcups printer file interval");
+      return (1);
+    }
+
+    if ((fp = cupsFileOpen(argv[2], "r")) == NULL)
+    {
+      printf("Unable to open \"%s\": %s\n", argv[2], strerror(errno));
+      return (1);
+    }
+
+    if ((job_id = cupsCreateJob(CUPS_HTTP_DEFAULT, argv[1], "testcups", 0,
+                                NULL)) <= 0)
+    {
+      printf("Unable to create print job on %s: %s\n", argv[1],
+             cupsLastErrorString());
+      return (1);
+    }
+              
+    interval = atoi(argv[3]);
+
+    if (cupsStartDocument(CUPS_HTTP_DEFAULT, argv[1], job_id, argv[2],
+                          CUPS_FORMAT_AUTO, 1) != HTTP_CONTINUE)
+    {
+      puts("Unable to start document!");
+      return (1);
+    }
+
+    while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
+    {
+      printf("Writing %d bytes...\n", (int)bytes);
+
+      if (cupsWriteRequestData(CUPS_HTTP_DEFAULT, buffer,
+			       bytes) != HTTP_CONTINUE)
+      {
+        puts("Unable to write bytes!");
+	return (1);
+      }
+
+      sleep(interval);
+    }
+
+    cupsFileClose(fp);
+
+    if (cupsFinishDocument(CUPS_HTTP_DEFAULT, argv[1]) != HTTP_OK)
+    {
+      puts("Unable to finish document!");
+      return (1);
+    }
+
+    return (0);
+  }
 
  /*
   * cupsGetDests()

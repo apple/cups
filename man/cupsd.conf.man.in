@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "Common UNIX Printing System" "8 December 2008" "Apple Inc."
+.TH cupsd.conf 5 "Common UNIX Printing System" "28 January 2009" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -467,6 +467,12 @@ LogLevel warn
 .br
 Specifies the logging level for the ErrorLog file.
 .TP 5
+LogTimeFormat standard
+.TP 5
+LogTimeFormat usecs
+.br
+Specifies the format of the date and time in the log files.
+.TP 5
 MaxClients number
 .br
 Specifies the maximum number of simultaneous clients to support.
@@ -500,6 +506,11 @@ rotated (0 to disable rotation)
 MaxRequestSize number-bytes
 .br
 Specifies the maximum request/file size in bytes (0 for no limit)
+.TP 5
+MultipleOperationTimeout seconds
+.br
+Specifies the maximum amount of time to allow between files in a multiple file
+print job.
 .TP 5
 Order allow,deny
 .TP 5

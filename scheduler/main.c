@@ -3,7 +3,7 @@
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1764,6 +1764,13 @@ process_children(void)
       cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) exited with no errors.",
                       pid, name);
   }
+
+ /*
+  * If wait*() is interrupted by a signal, tell main() to call us again...
+  */
+
+  if (pid < 0 && errno == EINTR)
+    dead_children = 1;
 }
 
 

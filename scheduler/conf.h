@@ -4,7 +4,7 @@
  *   Configuration file definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -43,6 +43,12 @@ typedef enum
   CUPSD_ACCESSLOG_ACTIONS,		/* Log config, print, and job management requests */
   CUPSD_ACCESSLOG_ALL			/* Log everything */
 } cupsd_accesslog_t;
+
+typedef enum
+{
+  CUPSD_TIME_STANDARD,			/* "Standard" Apache/CLF format */
+  CUPSD_TIME_USECS			/* Standard format with microseconds */
+} cupsd_time_t;
 
 
 /*
@@ -151,19 +157,21 @@ VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
 					/* Group ID for server */
-VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
+VAR cupsd_accesslog_t	AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS);
 					/* Access log level */
-			ClassifyOverride	VALUE(0),
+VAR int			ClassifyOverride	VALUE(0),
 					/* Allow overrides? */
 			ConfigFilePerm		VALUE(0640),
 					/* Permissions for config files */
 			FatalErrors		VALUE(CUPSD_FATAL_CONFIG),
 					/* Which errors are fatal? */
-			LogFilePerm		VALUE(0644),
+			LogFilePerm		VALUE(0644);
 					/* Permissions for log files */
-			LogLevel		VALUE(CUPSD_LOG_WARN),
+VAR cupsd_loglevel_t	LogLevel		VALUE(CUPSD_LOG_WARN);
 					/* Error log level */
-			MaxClients		VALUE(100),
+VAR cupsd_time_t	LogTimeFormat		VALUE(CUPSD_TIME_STANDARD);
+					/* Log file time format */
+VAR int			MaxClients		VALUE(100),
 					/* Maximum number of clients */
 			MaxClientsPerHost	VALUE(0),
 					/* Maximum number of clients per host */
@@ -205,8 +213,10 @@ VAR int			AccessLogLevel		VALUE(CUPSD_ACCESSLOG_ACTIONS),
 					/* User to run as, used for files */
 			PrintcapFormat		VALUE(PRINTCAP_BSD),
 					/* Format of printcap file? */
-			DefaultShared		VALUE(TRUE);
+			DefaultShared		VALUE(TRUE),
 					/* Share printers by default? */
+			MultipleOperationTimeout VALUE(DEFAULT_TIMEOUT);
+					/* multiple-operation-time-out value */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),
@@ -259,7 +269,7 @@ extern int	cupsdCheckPermissions(const char *filename,
 		                      const char *suffix, int mode,
 	 			      int user, int group, int is_dir,
 				      int create_dir);
-extern char	*cupsdGetDateTime(time_t t);
+extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
 #ifdef HAVE_GSSAPI
 extern int	cupsdLogGSSMessage(int level, int major_status,
 		                   int minor_status,

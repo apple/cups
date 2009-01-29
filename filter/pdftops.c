@@ -61,7 +61,8 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
   const char	*val;			/* Option value */
-  int		orientation;		/* Output orientation */
+  int		orientation,		/* Output orientation */
+		fit;			/* Fit output to default page size? */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_size_t	*size;			/* Current page size */
   int		pdfpid,			/* Process ID for pdftops */
@@ -206,16 +207,21 @@ main(int  argc,				/* I - Number of command-line args */
       pdfargv[pdfargc++] = (char *)"-dLanguageLevel=3";
 #endif /* HAVE_PDFTOPS */
 
+    if ((val = cupsGetOption("fitplot", num_options, options)) == NULL)
+      val = cupsGetOption("fit-to-page", num_options, options);
+
+    if (val && strcasecmp(val, "no") && strcasecmp(val, "off") &&
+	strcasecmp(val, "false"))
+      fit = 1;
+    else
+      fit = 0;
+
    /*
     * Set output page size...
     */
 
     size = ppdPageSize(ppd, NULL);
-    if (size &&
-        (cupsGetOption("media", num_options, options) ||
-	 cupsGetOption("media-col", num_options, options) ||
-	 cupsGetOption("PageRegion", num_options, options) ||
-	 cupsGetOption("PageSize", num_options, options))
+    if (size && fit)
     {
      /*
       * Got the size, now get the orientation...
@@ -261,11 +267,7 @@ main(int  argc,				/* I - Number of command-line args */
       pdfargv[pdfargc++] = pdfwidth;
       pdfargv[pdfargc++] = (char *)"-paperh";
       pdfargv[pdfargc++] = pdfheight;
-
-      if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-	  strcasecmp(val, "no") && strcasecmp(val, "off") &&
-	  strcasecmp(val, "false"))
-	pdfargv[pdfargc++] = (char *)"-expand";
+      pdfargv[pdfargc++] = (char *)"-expand";
 
 #else
       if (orientation & 1)

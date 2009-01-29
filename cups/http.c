@@ -1188,16 +1188,16 @@ httpInitialize(void)
   * it is the best we can do (on others, this seed isn't even used...)
   */
 
-#ifdef WIN32
-#else
+#  ifdef WIN32
+#  else
   gettimeofday(&curtime, NULL);
   srand(curtime.tv_sec + curtime.tv_usec);
-#endif /* WIN32 */
+#  endif /* WIN32 */
 
   for (i = 0; i < sizeof(data); i ++)
-    data[i] = rand(); /* Yes, this is a poor source of random data... */
+    data[i] = rand();
 
-  RAND_seed(&data, sizeof(data));
+  RAND_seed(data, sizeof(data));
 #endif /* HAVE_LIBSSL */
 }
 

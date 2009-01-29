@@ -1731,7 +1731,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
   else if (job->attrs->request.op.operation_id == IPP_CREATE_JOB)
   {
-    job->hold_until               = time(NULL) + 60;
+    job->hold_until               = time(NULL) + MultipleOperationTimeout;
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
   }
@@ -4910,7 +4910,10 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
 	      if (!strncmp(s, "time-at-", 8))
-	        cupsFilePuts(out, cupsdGetDateTime(attr->values[i].integer));
+	      {
+	        struct timeval tv = { attr->values[i].integer, 0 };
+	        cupsFilePuts(out, cupsdGetDateTime(&tv, CUPSD_TIME_STANDARD));
+	      }
 	      else
 	        cupsFilePrintf(out, "%d", attr->values[i].integer);
 	      break;
@@ -10063,7 +10066,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     {
       job->state->values[0].integer = IPP_JOB_HELD;
       job->state_value              = IPP_JOB_HELD;
-      job->hold_until               = time(NULL) + 60;
+      job->hold_until               = time(NULL) + MultipleOperationTimeout;
       job->dirty                    = 1;
 
       cupsdMarkDirty(CUPSD_DIRTY_JOBS);

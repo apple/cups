@@ -150,6 +150,7 @@ static const cupsd_var_t	variables[] =
   { "MaxSubscriptionsPerJob",	&MaxSubscriptionsPerJob,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerPrinter",&MaxSubscriptionsPerPrinter,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerUser",	&MaxSubscriptionsPerUser,	CUPSD_VARTYPE_INTEGER },
+  { "MultipleOperationTimeout",	&MultipleOperationTimeout,	CUPSD_VARTYPE_INTEGER },
   { "PageLog",			&PageLog,		CUPSD_VARTYPE_STRING },
   { "PageLogFormat",		&PageLogFormat,		CUPSD_VARTYPE_STRING },
   { "PreserveJobFiles",		&JobFiles,		CUPSD_VARTYPE_BOOLEAN },
@@ -549,49 +550,51 @@ cupsdReadConfiguration(void)
   * Numeric options...
   */
 
-  AccessLogLevel        = CUPSD_ACCESSLOG_ACTIONS;
-  ConfigFilePerm        = CUPS_DEFAULT_CONFIG_FILE_PERM;
-  FatalErrors           = parse_fatal_errors(CUPS_DEFAULT_FATAL_ERRORS);
-  DefaultAuthType       = CUPSD_AUTH_BASIC;
+  AccessLogLevel           = CUPSD_ACCESSLOG_ACTIONS;
+  ConfigFilePerm           = CUPS_DEFAULT_CONFIG_FILE_PERM;
+  FatalErrors              = parse_fatal_errors(CUPS_DEFAULT_FATAL_ERRORS);
+  DefaultAuthType          = CUPSD_AUTH_BASIC;
 #ifdef HAVE_SSL
-  DefaultEncryption     = HTTP_ENCRYPT_REQUIRED;
-  SSLOptions            = CUPSD_SSL_NONE;
+  DefaultEncryption        = HTTP_ENCRYPT_REQUIRED;
+  SSLOptions               = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
-  DirtyCleanInterval    = DEFAULT_KEEPALIVE;
-  JobRetryLimit         = 5;
-  JobRetryInterval      = 300;
-  FileDevice            = FALSE;
-  FilterLevel           = 0;
-  FilterLimit           = 0;
-  FilterNice            = 0;
-  HostNameLookups       = FALSE;
-  ImplicitClasses       = CUPS_DEFAULT_IMPLICIT_CLASSES;
-  ImplicitAnyClasses    = FALSE;
-  HideImplicitMembers   = TRUE;
-  KeepAlive             = TRUE;
-  KeepAliveTimeout      = DEFAULT_KEEPALIVE;
-  ListenBackLog         = SOMAXCONN;
-  LogFilePerm           = CUPS_DEFAULT_LOG_FILE_PERM;
-  LogLevel              = CUPSD_LOG_WARN;
-  MaxClients            = 100;
-  MaxClientsPerHost     = 0;
-  MaxLogSize            = 1024 * 1024;
-  MaxPrinterHistory     = 10;
-  MaxRequestSize        = 0;
-  ReloadTimeout	        = DEFAULT_KEEPALIVE;
-  RootCertDuration      = 300;
-  Timeout               = DEFAULT_TIMEOUT;
-  NumSystemGroups       = 0;
+  DirtyCleanInterval       = DEFAULT_KEEPALIVE;
+  JobRetryLimit            = 5;
+  JobRetryInterval         = 300;
+  FileDevice               = FALSE;
+  FilterLevel              = 0;
+  FilterLimit              = 0;
+  FilterNice               = 0;
+  HostNameLookups          = FALSE;
+  ImplicitClasses          = CUPS_DEFAULT_IMPLICIT_CLASSES;
+  ImplicitAnyClasses       = FALSE;
+  HideImplicitMembers      = TRUE;
+  KeepAlive                = TRUE;
+  KeepAliveTimeout         = DEFAULT_KEEPALIVE;
+  ListenBackLog            = SOMAXCONN;
+  LogFilePerm              = CUPS_DEFAULT_LOG_FILE_PERM;
+  LogLevel                 = CUPSD_LOG_WARN;
+  LogTimeFormat            = CUPSD_TIME_STANDARD;
+  MaxClients               = 100;
+  MaxClientsPerHost        = 0;
+  MaxLogSize               = 1024 * 1024;
+  MaxPrinterHistory        = 10;
+  MaxRequestSize           = 0;
+  MultipleOperationTimeout = DEFAULT_TIMEOUT;
+  ReloadTimeout	           = DEFAULT_KEEPALIVE;
+  RootCertDuration         = 300;
+  Timeout                  = DEFAULT_TIMEOUT;
+  NumSystemGroups          = 0;
 
-  BrowseInterval        = DEFAULT_INTERVAL;
-  BrowsePort            = ippPort();
-  BrowseLocalProtocols  = parse_protocols(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS);
-  BrowseRemoteProtocols = parse_protocols(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS);
-  BrowseShortNames      = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
-  BrowseTimeout         = DEFAULT_TIMEOUT;
-  BrowseWebIF           = FALSE;
-  Browsing              = CUPS_DEFAULT_BROWSING;
-  DefaultShared         = CUPS_DEFAULT_DEFAULT_SHARED;
+  BrowseInterval           = DEFAULT_INTERVAL;
+  BrowsePort               = ippPort();
+  BrowseLocalProtocols     = parse_protocols(CUPS_DEFAULT_BROWSE_LOCAL_PROTOCOLS);
+  BrowseRemoteProtocols    = parse_protocols(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS);
+  BrowseShortNames         = CUPS_DEFAULT_BROWSE_SHORT_NAMES;
+  BrowseTimeout            = DEFAULT_TIMEOUT;
+  BrowseWebIF              = FALSE;
+  Browsing                 = CUPS_DEFAULT_BROWSING;
+  DefaultShared            = CUPS_DEFAULT_DEFAULT_SHARED;
 
   cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);
   cupsdSetString(&SMBConfigFile, CUPS_DEFAULT_SMB_CONFIG_FILE);
@@ -3180,6 +3183,20 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         LogLevel = CUPSD_LOG_NONE;
       else
         cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogLevel %s on line %d.",
+	                value, linenum);
+    }
+    else if (!strcasecmp(line, "LogTimeFormat") && value)
+    {
+     /*
+      * Amount of logging to do to error log...
+      */
+
+      if (!strcasecmp(value, "standard"))
+        LogTimeFormat = CUPSD_TIME_STANDARD;
+      else if (!strcasecmp(value, "usecs"))
+        LogTimeFormat = CUPSD_TIME_USECS;
+      else
+        cupsdLogMessage(CUPSD_LOG_WARN, "Unknown LogTimeFormat %s on line %d.",
 	                value, linenum);
     }
     else if (!strcasecmp(line, "PrintcapFormat") && value)

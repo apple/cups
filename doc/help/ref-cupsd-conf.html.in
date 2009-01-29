@@ -2032,6 +2032,23 @@ everything under the preceding levels):</P>
 <p>The default <code>LogLevel</code> is <code>@CUPS_LOG_LEVEL@</code>.</p>
 
 
+<H2 CLASS="title"><A NAME="LogTimeFormat">LogTimeFormat</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+LogTimeFormat standard
+LogTimeFormat usecs
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>LogTimeFormat</CODE> directive specifies the format used for the
+date and time in the log files. <CODE>Standard</CODE> uses the standard Apache
+Common Log Format date and time while <CODE>usecs</CODE> adds microseconds.
+The default is <CODE>standard</CODE>.</P>
+
+
 <H2 CLASS="title"><A NAME="MaxClients">MaxClients</A></H2>
 
 <H3>Examples</H3>
@@ -2208,6 +2225,22 @@ check.</P>
 future CUPS release.</B> Use the <A
 HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 directive instead.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+MultipleOperationTimeout 60
+MultipleOperationTimeout 300
+MultipleOperationTimeout 86400
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>MultipleOperationTimeout</CODE> directive sets the maximum amount
+of time between files in a multi-file print job. The default is 300 seconds.</P>
 
 
 <H2 CLASS="title"><A NAME="Order">Order</A></H2>

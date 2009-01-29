@@ -1,9 +1,13 @@
-CHANGES.txt - 2009-01-23
+CHANGES.txt - 2009-01-28
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The scheduler now provides a LogTimeFormat directive to enable
+	  microseconds in the date and time that are logged.
+	- The scheduler now provides a MultipleOperationTimeout directive to
+	  control the timeout for multi-file print jobs.
 	- The configure script incorrectly allowed Avahi to be used for DNS-SD
 	  printer discovery (STR #3065)
 	- The web interface and scheduler did not support URIs up to 1024 bytes

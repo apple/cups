@@ -1029,7 +1029,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  return;
 	}
 
-        con->start     = time(NULL);
+        gettimeofday(&(con->start), NULL);
         con->operation = con->http.state;
 
         cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %s %s HTTP/%d.%d",
