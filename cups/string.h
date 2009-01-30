@@ -66,8 +66,13 @@ extern "C" {
  * String pool structures...
  */
 
+#  define _CUPS_STR_GUARD	0x12344321
+
 typedef struct _cups_sp_item_s		/**** String Pool Item ****/
 {
+#  ifdef DEBUG_GUARDS
+  unsigned int	guard;			/* Guard word */
+#  endif /* DEBUG_GUARDS */
   unsigned int	ref_count;		/* Reference count */
   char		str[1];			/* String */
 } _cups_sp_item_t;
