@@ -1665,7 +1665,9 @@ ppdcSource::get_po(ppdcFile *fp)	// I - File to read
     strcpy(basedir, ".");
 
   // Find the po file...
-  if (!pofilename[0] ||
+  pofilename[0] = '\0';
+
+  if (!poname[0] ||
       find_include(poname, basedir, pofilename, sizeof(pofilename)))
   {
     // Found it, so load it...

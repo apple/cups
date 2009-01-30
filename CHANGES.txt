@@ -4,6 +4,8 @@ CHANGES.txt - 2009-01-30
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The PPD compiler did not search for localization files properly
+	  (STR #3084)
 	- cupsGetNamedDest() did not use the fallback default like
 	  cupsGetDests*() (STR #3082)
 	- The scheduler now provides a LogTimeFormat directive to enable
