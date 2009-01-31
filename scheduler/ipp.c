@@ -3418,8 +3418,10 @@ apple_register_profiles(
     * Use the default colorspace...
     */
 
-    num_profiles = 2;
+    attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
 
+    num_profiles = (attr && ppd->colorspace == PPD_CS_GRAY) ? 1 : 2;
+      
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3447,8 +3449,11 @@ apple_register_profiles(
 	                     _ppdHashName("CMYK.."), "CMYK", "CMYK", NULL);
           break;
 
+      case PPD_CS_GRAY :
+          if (attr)
+	    break;
+
       case PPD_CS_N :
-      default :
           apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("DeviceN.."), "DeviceN", "DeviceN",
 			     NULL);

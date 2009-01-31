@@ -592,6 +592,13 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     }
 
  /*
+  * Clear any "Local" authentication data since it is probably stale...
+  */
+
+  if (http->authstring && !strncmp(http->authstring, "Local ", 6))
+    httpSetAuthString(http, NULL, NULL);
+
+ /*
   * Loop until we can send the request without authorization problems.
   */
 
