@@ -454,7 +454,10 @@ cupsdLoadAllClasses(void)
       if (!strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
       else if (!strcasecmp(value, "stopped"))
+      {
         p->state = IPP_PRINTER_STOPPED;
+	cupsdSetPrinterReasons(p, "+paused");
+      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.",

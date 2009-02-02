@@ -2674,8 +2674,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
       printer->reasons[printer->num_reasons] =
           _cupsStrRetain(attr->values[i].string.text);
+      printer->num_reasons ++;
 
-      if (!strcmp(printer->reasons[printer->num_reasons], "paused") &&
+      if (!strcmp(attr->values[i].string.text, "paused") &&
           printer->state != IPP_PRINTER_STOPPED)
       {
 	cupsdLogMessage(CUPSD_LOG_INFO,
@@ -2683,8 +2684,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 			printer->name, IPP_PRINTER_STOPPED, printer->state);
 	cupsdStopPrinter(printer, 0);
       }
-
-      printer->num_reasons ++;
     }
 
     if (PrintcapFormat == PRINTCAP_PLIST)
@@ -2972,8 +2971,7 @@ add_printer_state_reasons(
 
   if (p->num_reasons == 0)
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "printer-state-reasons", NULL,
-		 p->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+                 "printer-state-reasons", NULL, "none");
   else
     ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                   "printer-state-reasons", p->num_reasons, NULL,

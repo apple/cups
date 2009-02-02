@@ -211,8 +211,7 @@ cupsdAddPrinterHistory(
 #endif /* __APPLE__ */
   if (p->num_reasons == 0)
     ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "printer-state-reasons", NULL,
-		 p->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+                 "printer-state-reasons", NULL, "none");
   else
     ippAddStrings(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                   "printer-state-reasons", p->num_reasons, NULL,
@@ -927,6 +926,7 @@ cupsdFreePrinterUsers(
 void
 cupsdLoadAllPrinters(void)
 {
+  int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
   int			linenum;	/* Current line number */
   char			line[4096],	/* Line from file */
@@ -1099,11 +1099,18 @@ cupsdLoadAllPrinters(void)
     }
     else if (!strcasecmp(line, "Reason"))
     {
-      if (value &&
-          p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+      if (value)
       {
-        p->reasons[p->num_reasons] = _cupsStrAlloc(value);
-	p->num_reasons ++;
+        for (i = 0 ; i < p->num_reasons; i ++)
+	  if (!strcmp(value, p->reasons[i]))
+	    break;
+
+        if (i >= p->num_reasons &&
+	    p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+	{
+	  p->reasons[p->num_reasons] = _cupsStrAlloc(value);
+	  p->num_reasons ++;
+	}
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1118,7 +1125,10 @@ cupsdLoadAllPrinters(void)
       if (value && !strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
       else if (value && !strcasecmp(value, "stopped"))
+      {
         p->state = IPP_PRINTER_STOPPED;
+	cupsdSetPrinterReasons(p, "+paused");
+      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
@@ -1580,7 +1590,8 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      if (strcmp(printer->reasons[i], "connecting-to-device"))
+      if (strcmp(printer->reasons[i], "connecting-to-device") &&
+          strcmp(printer->reasons[i], "cups-missing-filter-error"))
         cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
@@ -2378,6 +2389,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       * Add filters for printer...
       */
 
+      cupsdSetPrinterReasons(p, "-cups-missing-filter-error");
+
       for (filter = (char *)cupsArrayFirst(p->filters);
 	   filter;
 	   filter = (char *)cupsArrayNext(p->filters))
@@ -2834,6 +2847,11 @@ cupsdSetPrinterState(
     write_irix_state(p);
 #endif /* __sgi */
   }
+
+  if (s == IPP_PRINTER_STOPPED)
+    cupsdSetPrinterReasons(p, "+paused");
+  else
+    cupsdSetPrinterReasons(p, "-paused");
 
   cupsdAddPrinterHistory(p);
 
@@ -3573,7 +3591,6 @@ add_printer_filter(
                "Filter \"%s\" for printer \"%s\" not available: %s",
 	       program, p->name, strerror(errno));
       cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
-      cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 0);
 
       cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
     }

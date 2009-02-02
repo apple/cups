@@ -633,6 +633,14 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
   cupsdSetPrinterReasons(printer, "-connecting-to-device");
 
+ /*
+  * Similarly, clear the "offline-report" reason for non-USB devices since we
+  * rarely have current information for network devices...
+  */
+
+  if (strncmp(printer->device_uri, "usb:", 4))
+    cupsdSetPrinterReasons(printer, "-offline-report");
+
   if (job->status < 0)
   {
    /*
