@@ -1,9 +1,12 @@
-CHANGES.txt - 2009-01-30
+CHANGES.txt - 2009-02-02
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Updated the HTML templates to use the HTML 4.01 DOCTYPE (STR #3086)
+	- The scheduler did not track the "paused" reason properly if a
+	  printer had other reasons associated with it.
 	- cupsSendRequest() did not clear old local certificate auth data.
 	- The PPD compiler did not search for localization files properly
 	  (STR #3084)
