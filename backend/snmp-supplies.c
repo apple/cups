@@ -129,15 +129,13 @@ static const int	prtMarkerSuppliesType[] =
 static const backend_state_t const printer_states[] =
 			{
 			  { CUPS_TC_lowPaper, "media-low-report" },
-			  { CUPS_TC_noPaper, "media-empty-warning" },
-			  { CUPS_TC_inputTrayEmpty, "media-empty-warning" },
+			  { CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty, "media-empty-warning" },
 			  { CUPS_TC_lowToner, "toner-low-report" },
 			  { CUPS_TC_noToner, "toner-empty-warning" },
 			  { CUPS_TC_doorOpen, "door-open-report" },
 			  { CUPS_TC_jammed, "media-jam-warning" },
 			  /* { CUPS_TC_offline, "offline-report" }, */ /* unreliable */
-			  { CUPS_TC_serviceRequested, "service-needed-warning" },
-			  { CUPS_TC_overduePreventMaint, "service-needed-warning" },
+			  { CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint, "service-needed-warning" },
 			  { CUPS_TC_inputTrayMissing, "input-tray-missing-warning" },
 			  { CUPS_TC_outputTrayMissing, "output-tray-missing-warning" },
 			  { CUPS_TC_markerSupplyMissing, "marker-supply-missing-warning" },
