@@ -4,6 +4,8 @@ CHANGES.txt - 2009-02-03
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- ppdOpen*() incorrectly loaded PPDs with multiple JobPatchFile
+	  keywords.
 	- The network backends no longer report the SNMP "offline" status bit
 	  since some printers report this status when the printer is busy
 	  printing, warming up, etc.
