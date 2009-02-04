@@ -1,9 +1,10 @@
-CHANGES.txt - 2009-02-03
+CHANGES.txt - 2009-02-04
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Updated the Spanish localization (STR #3090)
 	- The scheduler did not redo Bonjour/DNS-SD registrations when updating
 	  them failed.
 	- The "authenticated" policy incorrectly required authentication for
