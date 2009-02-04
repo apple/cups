@@ -2641,6 +2641,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       cupsdSetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
     }
   }
+
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) != NULL)
   {
