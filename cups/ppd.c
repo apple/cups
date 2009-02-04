@@ -161,7 +161,8 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
   _cupsStrFree(ppd->lang_encoding);
   _cupsStrFree(ppd->nickname);
-  _cupsStrFree(ppd->patches);
+  if (ppd->patches)
+    free(ppd->patches);
   _cupsStrFree(ppd->jcl_begin);
   _cupsStrFree(ppd->jcl_end);
   _cupsStrFree(ppd->jcl_ps);
@@ -1174,7 +1175,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "JobPatchFile"))
     {
       if (ppd->patches == NULL)
-        ppd->patches = _cupsStrAlloc(string);
+        ppd->patches = strdup(string);
       else
       {
         temp = realloc(ppd->patches, strlen(ppd->patches) +

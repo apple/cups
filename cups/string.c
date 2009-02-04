@@ -3,7 +3,7 @@
  *
  *   String functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -37,6 +37,7 @@
  */
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <limits.h>
 #include "array.h"
 #include "debug.h"
@@ -107,7 +108,7 @@ _cupsStrAlloc(const char *s)		/* I - String */
   * See if the string is already in the pool...
   */
 
-  key = (_cups_sp_item_t *)(s - sizeof(unsigned int));
+  key = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
 
   if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL)
   {
@@ -116,6 +117,15 @@ _cupsStrAlloc(const char *s)		/* I - String */
     */
 
     item->ref_count ++;
+
+#ifdef DEBUG_GUARDS
+    DEBUG_printf(("_cupsStrAlloc: Using string %p(%s) for \"%s\", guard=%08x, "
+                  "ref_count=%d\n", item, item->str, s, item->guard,
+		  item->ref_count));
+
+    if (item->guard != _CUPS_STR_GUARD)
+      abort();
+#endif /* DEBUG_GUARDS */
 
 #ifdef HAVE_PTHREAD_H
     pthread_mutex_unlock(&sp_mutex);
@@ -140,6 +150,14 @@ _cupsStrAlloc(const char *s)		/* I - String */
 
   item->ref_count = 1;
   strcpy(item->str, s);
+
+#ifdef DEBUG_GUARDS
+  item->guard = _CUPS_STR_GUARD;
+
+  DEBUG_printf(("_cupsStrAlloc: Created string %p(%s) for \"%s\", guard=%08x, "
+		"ref_count=%d\n", item, item->str, s, item->guard,
+		item->ref_count));
+#endif /* DEBUG_GUARDS */
 
  /*
   * Add the string to the pool and return it...
@@ -303,7 +321,16 @@ _cupsStrFree(const char *s)		/* I - String to free */
   pthread_mutex_lock(&sp_mutex);
 #endif /* HAVE_PTHREAD_H */
 
-  key = (_cups_sp_item_t *)(s - sizeof(unsigned int));
+  key = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
+
+#ifdef DEBUG_GUARDS
+  if (key->guard != _CUPS_STR_GUARD)
+  {
+    DEBUG_printf(("_cupsStrFree: Freeing string %p(%s), guard=%08x, "
+                  "ref_count=%d\n", key, key->str, key->guard, key->ref_count));
+    abort();
+  }
+#endif /* DEBUG_GUARDS */
 
   if ((item = (_cups_sp_item_t *)cupsArrayFind(stringpool, key)) != NULL &&
       item == key)
@@ -348,7 +375,16 @@ _cupsStrRetain(char *s)			/* I - String to retain */
 
   if (s)
   {
-    item = (_cups_sp_item_t *)(s - sizeof(unsigned int));
+    item = (_cups_sp_item_t *)(s - offsetof(_cups_sp_item_t, str));
+
+#ifdef DEBUG_GUARDS
+    if (item->guard != _CUPS_STR_GUARD)
+    {
+      DEBUG_printf(("_cupsStrRetain: Retaining string %p(%s), guard=%08x, "
+                    "ref_count=%d\n", item, s, item->guard, item->ref_count));
+      abort();
+    }
+#endif /* DEBUG_GUARDS */
 
 #ifdef HAVE_PTHREAD_H
     pthread_mutex_lock(&sp_mutex);

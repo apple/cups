@@ -107,12 +107,8 @@ UNIX® operating systems. This package provides PHP support.
 %setup
 
 %build
-%ifarch x86_64
-./configure --enable-32bit %{_dbus} %{_php} %{_static}
-%else
 CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_OPT_FLAGS" \
     ./configure %{_dbus} %{_php} %{_static}
-%endif
 # If we got this far, all prerequisite libraries must be here.
 make
 
@@ -246,6 +242,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
+%dir /usr/share/doc/cups/es
+/usr/share/doc/cups/es/*
 %dir /usr/share/doc/cups/help
 /usr/share/doc/cups/help/accounting.html
 /usr/share/doc/cups/help/cgi.html

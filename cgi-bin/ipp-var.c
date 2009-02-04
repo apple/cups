@@ -477,7 +477,10 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     {
       const char *path = strstr(job_printer_uri, "/printers/");
       if (!path)
+      {
         path = strstr(job_printer_uri, "/classes/");
+        cgiSetVariable("IS_CLASS", "YES");
+      }
 
       if (path)
       {

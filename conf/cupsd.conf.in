@@ -114,7 +114,6 @@ DefaultAuthType Basic
   </Limit>
 
   <Limit All>
-    AuthType Default
     Order deny,allow
   </Limit>
 </Policy>

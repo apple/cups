@@ -238,6 +238,10 @@ cupsdDeregisterPrinter(
   * Only deregister if browsing is enabled and it's a local printer...
   */
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsdDeregisterPrinter(p=%p(%s), removeit=%d)", p, p->name,
+		  removeit);
+
   if (!Browsing || !p->shared ||
       (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
@@ -281,6 +285,7 @@ cupsdDeregisterPrinter(
 void
 cupsdLoadRemoteCache(void)
 {
+  int			i;		/* Looping var */
   cups_file_t		*fp;		/* remote.cache file */
   int			linenum;	/* Current line number */
   char			line[4096],	/* Line from file */
@@ -496,11 +501,18 @@ cupsdLoadRemoteCache(void)
     }
     else if (!strcasecmp(line, "Reason"))
     {
-      if (value &&
-          p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+      if (value)
       {
-        p->reasons[p->num_reasons] = _cupsStrAlloc(value);
-	p->num_reasons ++;
+        for (i = 0 ; i < p->num_reasons; i ++)
+	  if (!strcmp(value, p->reasons[i]))
+	    break;
+
+        if (i >= p->num_reasons &&
+	    p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+	{
+	  p->reasons[p->num_reasons] = _cupsStrAlloc(value);
+	  p->num_reasons ++;
+	}
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -515,7 +527,10 @@ cupsdLoadRemoteCache(void)
       if (value && !strcasecmp(value, "idle"))
         p->state = IPP_PRINTER_IDLE;
       else if (value && !strcasecmp(value, "stopped"))
+      {
         p->state = IPP_PRINTER_STOPPED;
+	cupsdSetPrinterReasons(p, "+paused");
+      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of remote.cache.", linenum);
@@ -654,6 +669,9 @@ cupsdLoadRemoteCache(void)
 void
 cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdRegisterPrinter(p=%p(%s))", p,
+                  p->name);
+
   if (!Browsing || !BrowseLocalProtocols ||
       (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
     return;
@@ -2392,9 +2410,6 @@ dnssdDeregisterPrinter(
     p->ipp_ref = NULL;
   }
 
-  cupsArrayRemove(DNSSDPrinters, p);
-  cupsdClearString(&p->reg_name);
-
   if (p->ipp_txt)
   {
    /*
@@ -2404,6 +2419,30 @@ dnssdDeregisterPrinter(
     free(p->ipp_txt);
     p->ipp_txt = NULL;
   }
+
+  if (p->printer_ref)
+  {
+    DNSServiceRefDeallocate(p->printer_ref);
+    p->printer_ref = NULL;
+  }
+
+  if (p->printer_txt)
+  {
+   /*
+    * p->printer_txt is malloc'd, not _cupsStrAlloc'd...
+    */
+
+    free(p->printer_txt);
+    p->printer_txt = NULL;
+  }
+
+ /*
+  * Remove the printer from the array of DNS-SD printers, then clear the
+  * registered name...
+  */
+
+  cupsArrayRemove(DNSSDPrinters, p);
+  cupsdClearString(&p->reg_name);
 }
 
 
@@ -2487,8 +2526,9 @@ dnssdRegisterCallback(
 					/* Current printer */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterCallback(%s, %s) for %s",
-                  name, regtype, p ? p->name : "Web Interface");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterCallback(%s, %s) for %s (%s)",
+                  name, regtype, p ? p->name : "Web Interface",
+		  p ? (p->reg_name ? p->reg_name : "(null)") : "NA");
 
   if (errorCode)
   {
@@ -2496,7 +2536,7 @@ dnssdRegisterCallback(
 		    "DNSServiceRegister failed with error %d", (int)errorCode);
     return;
   }
-  else if (p && strcasecmp(name, p->reg_name))
+  else if (p && (!p->reg_name || strcasecmp(name, p->reg_name)))
   {
     cupsdLogMessage(CUPSD_LOG_INFO, "Using service name \"%s\" for \"%s\"",
                     name, p->name);
@@ -2603,6 +2643,39 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   ipp_len = 0;				/* anti-compiler-warning-code */
   ipp_txt = dnssdBuildTxtRecord(&ipp_len, p, 0);
 
+  if (p->ipp_ref &&
+      (ipp_len != p->ipp_len || memcmp(ipp_txt, p->ipp_txt, ipp_len)))
+  {
+   /*
+    * Update the existing registration...
+    */
+
+    /* A TTL of 0 means use record's original value (Radar 3176248) */
+    if ((se = DNSServiceUpdateRecord(p->ipp_ref, NULL, 0, ipp_len, ipp_txt,
+				     0)) == kDNSServiceErr_NoError)
+    {
+      if (p->ipp_txt)
+	free(p->ipp_txt);
+
+      p->ipp_txt = ipp_txt;
+      p->ipp_len = ipp_len;
+      ipp_txt    = NULL;
+    }
+    else
+    {
+     /*
+      * Failed to update record, lets close this reference and move on...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to update IPP DNS-SD record for %s - %d", p->name,
+		      se);
+
+      DNSServiceRefDeallocate(p->ipp_ref);
+      p->ipp_ref = NULL;
+    }
+  }
+
   if (!p->ipp_ref)
   {
    /*
@@ -2659,22 +2732,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
                       "DNS-SD IPP registration of \"%s\" failed: %d",
 		      p->name, se);
   }
-  else if (ipp_len != p->ipp_len || memcmp(ipp_txt, p->ipp_txt, ipp_len))
-  {
-   /*
-    * Update the existing registration...
-    */
-
-    /* A TTL of 0 means use record's original value (Radar 3176248) */
-    DNSServiceUpdateRecord(p->ipp_ref, NULL, 0, ipp_len, ipp_txt, 0);
-
-    if (p->ipp_txt)
-      free(p->ipp_txt);
-
-    p->ipp_txt = ipp_txt;
-    p->ipp_len = ipp_len;
-    ipp_txt    = NULL;
-  }
 
   if (ipp_txt)
     free(ipp_txt);
@@ -2684,6 +2741,41 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     printer_len = 0;			/* anti-compiler-warning-code */
     printer_txt = dnssdBuildTxtRecord(&printer_len, p, 1);
 
+    if (p->printer_ref &&
+	(printer_len != p->printer_len ||
+	 memcmp(printer_txt, p->printer_txt, printer_len)))
+    {
+     /*
+      * Update the existing registration...
+      */
+
+      /* A TTL of 0 means use record's original value (Radar 3176248) */
+      if ((se = DNSServiceUpdateRecord(p->printer_ref, NULL, 0, printer_len,
+			               printer_txt,
+				       0)) == kDNSServiceErr_NoError)
+      {
+	if (p->printer_txt)
+	  free(p->printer_txt);
+
+	p->printer_txt = printer_txt;
+	p->printer_len = printer_len;
+	printer_txt    = NULL;
+      }
+      else
+      {
+       /*
+	* Failed to update record, lets close this reference and move on...
+	*/
+
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+			"Unable to update LPD DNS-SD record for %s - %d",
+			p->name, se);
+
+	DNSServiceRefDeallocate(p->printer_ref);
+	p->printer_ref = NULL;
+      }
+    }
+    
     if (!p->printer_ref)
     {
      /*
@@ -2711,24 +2803,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 	cupsdLogMessage(CUPSD_LOG_WARN,
 	                "DNS-SD LPD registration of \"%s\" failed: %d",
 			p->name, se);
-    }
-    else if (printer_len != p->printer_len ||
-             memcmp(printer_txt, p->printer_txt, printer_len))
-    {
-     /*
-      * Update the existing registration...
-      */
-
-      /* A TTL of 0 means use record's original value (Radar 3176248) */
-      DNSServiceUpdateRecord(p->printer_ref, NULL, 0, printer_len,
-                             printer_txt, 0);
-
-      if (p->printer_txt)
-	free(p->printer_txt);
-
-      p->printer_txt = printer_txt;
-      p->printer_len = printer_len;
-      printer_txt    = NULL;
     }
 
     if (printer_txt)

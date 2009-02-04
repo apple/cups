@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cups/i18n.h>
+#include <cups/string.h>
 
 
 /*
@@ -47,15 +48,42 @@ int					/* O - Exit code */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
+  int			i;		/* Looping var */
   FILE			*strings;	/* .strings file */
   cups_array_t		*po;		/* .po file */
   char			iconv[1024];	/* iconv command */
   _cups_message_t	*msg;		/* Current message */
+  const char		*srcfile,	/* Source file */
+			*dstfile;	/* Destination file */
+  int			use_msgid;	/* Use msgid strings for msgstr? */
 
 
-  if (argc != 3)
+  srcfile   = NULL;
+  dstfile   = NULL;
+  use_msgid = 0;
+
+
+  for (i = 1; i < argc; i ++)
+    if (!strcmp(argv[i], "-m"))
+      use_msgid = 1;
+    else if (argv[i][0] == '-')
+    {
+      puts("Usage: po2strings [-m] filename.po filename.strings");
+      return (1);
+    }
+    else if (srcfile == NULL)
+      srcfile = argv[i];
+    else if (dstfile == NULL)
+      dstfile = argv[i];
+    else
+    {
+      puts("Usage: po2strings [-m] filename.po filename.strings");
+      return (1);
+    }
+
+  if (!srcfile || !dstfile)
   {
-    puts("Usage: po2strings filename.po filename.strings");
+    puts("Usage: po2strings [-m] filename.po filename.strings");
     return (1);
   }
 
@@ -63,9 +91,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Use the CUPS .po loader to get the message strings...
   */
 
-  if ((po = _cupsMessageLoad(argv[1])) == NULL)
+  if ((po = _cupsMessageLoad(srcfile)) == NULL)
   {
-    perror(argv[1]);
+    perror(srcfile);
     return (1);
   }
 
@@ -74,7 +102,7 @@ main(int  argc,				/* I - Number of command-line args */
   * The .po file uses UTF-8...
   */
 
-  snprintf(iconv, sizeof(iconv), "iconv -f utf-8 -t utf-16 >'%s'", argv[2]);
+  snprintf(iconv, sizeof(iconv), "iconv -f utf-8 -t utf-16 >'%s'", dstfile);
   if ((strings = popen(iconv, "w")) == NULL)
   {
     perror(argv[2]);
@@ -88,7 +116,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     write_string(strings, msg->id);
     fputs(" = ", strings);
-    write_string(strings, msg->str);
+    write_string(strings, use_msgid ? msg->id : msg->str);
     fputs(";\n", strings);
   }
 

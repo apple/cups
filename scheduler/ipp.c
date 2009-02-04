@@ -2641,6 +2641,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       cupsdSetPrinterState(printer, (ipp_pstate_t)(attr->values[0].integer), 0);
     }
   }
+
   if ((attr = ippFindAttribute(con->request, "printer-state-message",
                                IPP_TAG_TEXT)) != NULL)
   {
@@ -2674,8 +2675,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
       printer->reasons[printer->num_reasons] =
           _cupsStrRetain(attr->values[i].string.text);
+      printer->num_reasons ++;
 
-      if (!strcmp(printer->reasons[printer->num_reasons], "paused") &&
+      if (!strcmp(attr->values[i].string.text, "paused") &&
           printer->state != IPP_PRINTER_STOPPED)
       {
 	cupsdLogMessage(CUPSD_LOG_INFO,
@@ -2683,8 +2685,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 			printer->name, IPP_PRINTER_STOPPED, printer->state);
 	cupsdStopPrinter(printer, 0);
       }
-
-      printer->num_reasons ++;
     }
 
     if (PrintcapFormat == PRINTCAP_PLIST)
@@ -2972,8 +2972,7 @@ add_printer_state_reasons(
 
   if (p->num_reasons == 0)
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "printer-state-reasons", NULL,
-		 p->state == IPP_PRINTER_STOPPED ? "paused" : "none");
+                 "printer-state-reasons", NULL, "none");
   else
     ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                   "printer-state-reasons", p->num_reasons, NULL,
@@ -3418,8 +3417,10 @@ apple_register_profiles(
     * Use the default colorspace...
     */
 
-    num_profiles = 2;
+    attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
 
+    num_profiles = (attr && ppd->colorspace == PPD_CS_GRAY) ? 1 : 2;
+      
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3447,8 +3448,11 @@ apple_register_profiles(
 	                     _ppdHashName("CMYK.."), "CMYK", "CMYK", NULL);
           break;
 
+      case PPD_CS_GRAY :
+          if (attr)
+	    break;
+
       case PPD_CS_N :
-      default :
           apple_init_profile(ppd, NULL, profiles->profiles + 1,
 	                     _ppdHashName("DeviceN.."), "DeviceN", "DeviceN",
 			     NULL);

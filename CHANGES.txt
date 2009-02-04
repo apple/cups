@@ -1,9 +1,29 @@
-CHANGES.txt - 2009-01-28
+CHANGES.txt - 2009-02-03
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The scheduler did not redo Bonjour/DNS-SD registrations when updating
+	  them failed.
+	- The "authenticated" policy incorrectly required authentication for
+	  status operations.
+	- ppdOpen*() incorrectly loaded PPDs with multiple JobPatchFile
+	  keywords.
+	- The network backends no longer report the SNMP "offline" status bit
+	  since some printers report this status when the printer is busy
+	  printing, warming up, etc.
+	- The scheduler no longer logs child processes killed via SIGKILL as
+	  "crashed".
+	- The printer link shown on the "job moved" template was bad (STR #3085)
+	- Updated the HTML templates to use the HTML 4.01 DOCTYPE (STR #3086)
+	- The scheduler did not track the "paused" reason properly if a
+	  printer had other reasons associated with it.
+	- cupsSendRequest() did not clear old local certificate auth data.
+	- The PPD compiler did not search for localization files properly
+	  (STR #3084)
+	- cupsGetNamedDest() did not use the fallback default like
+	  cupsGetDests*() (STR #3082)
 	- The scheduler now provides a LogTimeFormat directive to enable
 	  microseconds in the date and time that are logged.
 	- The scheduler now provides a MultipleOperationTimeout directive to

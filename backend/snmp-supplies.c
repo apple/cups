@@ -39,7 +39,7 @@
  * Local structures...
  */
 
-typedef struct
+typedef struct				/**** Printer supply data ****/
 {
   char	name[CUPS_SNMP_MAX_STRING],	/* Name of supply */
 	color[8];			/* Color: "#RRGGBB" or "none" */
@@ -49,12 +49,20 @@ typedef struct
 	level;				/* Current level value */
 } backend_supplies_t;
 
+typedef struct				/**** Printer state table ****/
+{
+  int		bit;			/* State bit */
+  const char	*keyword;		/* IPP printer-state-reasons keyword */
+} backend_state_t;
+
 
 /*
  * Local globals...
  */
 
 static http_addr_t	current_addr;	/* Current address */
+static int		current_state = -1;
+					/* Current device state bits */
 static int		num_supplies = 0;
 					/* Number of supplies found */
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
@@ -118,6 +126,23 @@ static const int	prtMarkerSuppliesType[] =
 			 sizeof(prtMarkerSuppliesType[0]));
 			 		/* Offset to supply index */
 
+static const backend_state_t const printer_states[] =
+			{
+			  { CUPS_TC_lowPaper, "media-low-report" },
+			  { CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty, "media-empty-warning" },
+			  { CUPS_TC_lowToner, "toner-low-report" },
+			  { CUPS_TC_noToner, "toner-empty-warning" },
+			  { CUPS_TC_doorOpen, "door-open-report" },
+			  { CUPS_TC_jammed, "media-jam-warning" },
+			  /* { CUPS_TC_offline, "offline-report" }, */ /* unreliable */
+			  { CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint, "service-needed-warning" },
+			  { CUPS_TC_inputTrayMissing, "input-tray-missing-warning" },
+			  { CUPS_TC_outputTrayMissing, "output-tray-missing-warning" },
+			  { CUPS_TC_markerSupplyMissing, "marker-supply-missing-warning" },
+			  { CUPS_TC_outputNearFull, "output-area-almost-full-report" },
+			  { CUPS_TC_outputFull, "output-area-full-warning" }
+			};
+
 
 /*
  * Local functions...
@@ -153,12 +178,14 @@ backendSNMPSupplies(
 
   if (num_supplies > 0)
   {
-    int		i;			/* Looping var */
+    int		i,			/* Looping var */
+		new_state,		/* New state value */
+		change_state;		/* State change */
     char	value[CUPS_MAX_SUPPLIES * 4],
 					/* marker-levels value string */
 		*ptr;			/* Pointer into value string */
     cups_snmp_t	packet;			/* SNMP response packet */
-
+      
 
    /*
     * Generate the marker-levels value string...
@@ -190,73 +217,23 @@ backendSNMPSupplies(
         packet.object_type != CUPS_ASN1_OCTET_STRING)
       return (-1);
 
-    i = (packet.object_value.string.bytes[0] << 8) |
-        packet.object_value.string.bytes[1];
+    new_state = (packet.object_value.string.bytes[0] << 8) |
+		packet.object_value.string.bytes[1];
 
-    if (i & CUPS_TC_lowPaper)
-      fputs("STATE: +media-low-report\n", stderr);
+    if (current_state < 0)
+      change_state = 0xffff;
     else
-      fputs("STATE: -media-low-report\n", stderr);
+      change_state = current_state ^ new_state;
 
-    if (i & (CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty))
-      fputs("STATE: +media-empty-warning\n", stderr);
-    else
-      fputs("STATE: -media-empty-warning\n", stderr);
+    for (i = 0;
+         i < (int)(sizeof(printer_states) / sizeof(printer_states[0]));
+         i ++)
+      if (change_state & printer_states[i].bit)
+	fprintf(stderr, "STATE: %c%s\n",
+	        (new_state & printer_states[i].bit) ? '+' : '-',
+		printer_states[i].keyword);
 
-    if (i & CUPS_TC_lowToner)
-      fputs("STATE: +toner-low-report\n", stderr);
-    else
-      fputs("STATE: -toner-low-report\n", stderr);
-
-    if (i & CUPS_TC_noToner)
-      fputs("STATE: +toner-empty-warning\n", stderr);
-    else
-      fputs("STATE: -toner-empty-warning\n", stderr);
-
-    if (i & CUPS_TC_doorOpen)
-      fputs("STATE: +door-open-report\n", stderr);
-    else
-      fputs("STATE: -door-open-report\n", stderr);
-
-    if (i & CUPS_TC_jammed)
-      fputs("STATE: +media-jam-warning\n", stderr);
-    else
-      fputs("STATE: -media-jam-warning\n", stderr);
-
-    if (i & CUPS_TC_offline)
-      fputs("STATE: +offline-report\n", stderr);
-    else
-      fputs("STATE: -offline-report\n", stderr);
-
-    if (i & (CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint))
-      fputs("STATE: +service-needed-warning\n", stderr);
-    else
-      fputs("STATE: -service-needed-warning\n", stderr);
-
-    if (i & CUPS_TC_inputTrayMissing)
-      fputs("STATE: +input-tray-missing-warning\n", stderr);
-    else
-      fputs("STATE: -input-tray-missing-warning\n", stderr);
-
-    if (i & CUPS_TC_outputTrayMissing)
-      fputs("STATE: +output-tray-missing-warning\n", stderr);
-    else
-      fputs("STATE: -output-tray-missing-warning\n", stderr);
-
-    if (i & CUPS_TC_markerSupplyMissing)
-      fputs("STATE: +marker-supply-missing-warning\n", stderr);
-    else
-      fputs("STATE: -marker-supply-missing-warning\n", stderr);
-
-    if (i & CUPS_TC_outputNearFull)
-      fputs("STATE: +output-area-almost-full-report\n", stderr);
-    else
-      fputs("STATE: -output-area-almost-full-report\n", stderr);
-
-    if (i & CUPS_TC_outputFull)
-      fputs("STATE: +output-area-full-warning\n", stderr);
-    else
-      fputs("STATE: -output-area-full-warning\n", stderr);
+    current_state = new_state;
 
    /*
     * Get the current printer state...
@@ -368,8 +345,9 @@ backend_init_supplies(
   * Reset state information...
   */
 
-  current_addr = *addr;
-  num_supplies = -1;
+  current_addr  = *addr;
+  current_state = -1;
+  num_supplies  = -1;
 
   memset(supplies, 0, sizeof(supplies));
 

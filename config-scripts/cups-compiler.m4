@@ -3,7 +3,7 @@ dnl "$Id: cups-compiler.m4 7871 2008-08-27 21:12:43Z mike $"
 dnl
 dnl   Compiler stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -22,6 +22,7 @@ AC_SUBST(OPTIM)
 
 AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
 AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
+AC_ARG_ENABLE(debug_guards, [  --enable-debug-guards   turn on debug guards, default=no])
 AC_ARG_ENABLE(debug_printfs, [  --enable-debug-printfs  turn on debug printfs, default=no])
 AC_ARG_ENABLE(unit_tests, [  --enable-unit-tests     turn on unit tests, default=no])
 
@@ -35,6 +36,12 @@ fi
 dnl Debug printfs can slow things down, so provide a separate option for that
 if test x$enable_debug_printfs = xyes; then
 	CFLAGS="$CFLAGS -DDEBUG"
+fi
+
+dnl Debug guards use an extra 4 bytes for some structures like strings in the
+dnl string pool, so provide a separate option for that
+if test x$enable_debug_guards = xyes; then
+	CFLAGS="$CFLAGS -DDEBUG_GUARDS"
 fi
 
 dnl Unit tests take up time during a compile...

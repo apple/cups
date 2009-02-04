@@ -3,7 +3,7 @@
  *
  *   Man page to HTML conversion program.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2004-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -104,8 +104,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Read from input and write the output...
   */
 
-  fputs("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" "
-        "\"http://www.w3.org/TR/REC-html40/loose.dtd\">\n"
+  fputs("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" "
+        "\"http://www.w3.org/TR/html4/loose.dtd\">\n"
         "<html>\n"
 	"<!-- SECTION: Man Pages -->\n"
 	"<head>\n"

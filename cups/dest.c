@@ -4,7 +4,7 @@
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -555,7 +555,18 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   */
 
   if (!cups_get_sdests(http, op, name, 0, &dest))
-    return (NULL);
+  {
+    if (op == CUPS_GET_DEFAULT)
+      return (NULL);
+
+   /*
+    * The default printer from environment variables or from a
+    * configuration file does not exist.  Find out the real default.
+    */
+
+    if (!cups_get_sdests(http, CUPS_GET_DEFAULT, name, 0, &dest))
+      return (NULL);
+  }
 
   if (instance)
     dest->instance = _cupsStrAlloc(instance);

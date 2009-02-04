@@ -3,7 +3,7 @@
  *
  *   String definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -66,8 +66,13 @@ extern "C" {
  * String pool structures...
  */
 
+#  define _CUPS_STR_GUARD	0x12344321
+
 typedef struct _cups_sp_item_s		/**** String Pool Item ****/
 {
+#  ifdef DEBUG_GUARDS
+  unsigned int	guard;			/* Guard word */
+#  endif /* DEBUG_GUARDS */
   unsigned int	ref_count;		/* Reference count */
   char		str[1];			/* String */
 } _cups_sp_item_t;

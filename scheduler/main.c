@@ -1655,7 +1655,7 @@ process_children(void)
 #endif /* HAVE_WAITPID */
   {
    /*
-    * Ignore SIGTERM errors - that comes when a job is canceled...
+    * Collect the name of the process that finished...
     */
 
     cupsdFinishProcess(pid, name, sizeof(name));
@@ -1740,13 +1740,17 @@ process_children(void)
       }
 
    /*
-    * Show the exit status as needed...
+    * Show the exit status as needed, ignoring SIGTERM and SIGKILL errors
+    * since they come when we kill/end a process...
     */
 
-    if (status == SIGTERM)
-      status = 0;
-
-    if (status)
+    if (status == SIGTERM || status == SIGKILL)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "PID %d (%s) was terminated normally with signal %d.",
+                      pid, name, status);
+    }
+    else if (status)
     {
       if (WIFEXITED(status))
 	cupsdLogMessage(CUPSD_LOG_DEBUG, "PID %d (%s) stopped with status %d!",

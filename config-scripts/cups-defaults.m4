@@ -28,7 +28,11 @@ AC_SUBST(LANGUAGES)
 dnl Default ConfigFilePerm
 AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFilePerm value, default=0640],
 	CUPS_CONFIG_FILE_PERM="$withval",
-	CUPS_CONFIG_FILE_PERM="640")
+	if test "x$uname" = xDarwin; then
+		CUPS_CONFIG_FILE_PERM="644"
+	else
+		CUPS_CONFIG_FILE_PERM="640"
+	fi)
 AC_SUBST(CUPS_CONFIG_FILE_PERM)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_CONFIG_FILE_PERM, 0$CUPS_CONFIG_FILE_PERM)
 

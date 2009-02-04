@@ -3,7 +3,7 @@
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -590,6 +590,13 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
       return (HTTP_SERVICE_UNAVAILABLE);
     }
+
+ /*
+  * Clear any "Local" authentication data since it is probably stale...
+  */
+
+  if (http->authstring && !strncmp(http->authstring, "Local ", 6))
+    httpSetAuthString(http, NULL, NULL);
 
  /*
   * Loop until we can send the request without authorization problems.

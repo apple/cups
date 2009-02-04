@@ -3,7 +3,7 @@
  *
  *   RFC file to HTML conversion program.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -100,8 +100,8 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   cupsFilePuts(outfile,
-	       "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" "
-	       "\"http://www.w3.org/TR/REC-html40/loose.dtd\">\n"
+	       "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" "
+	       "\"http://www.w3.org/TR/html4/loose.dtd\">\n"
 	       "<html>\n"
 	       "<!-- SECTION: Specifications -->\n"
 	       "<head>\n"
