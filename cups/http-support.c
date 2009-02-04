@@ -292,7 +292,7 @@ httpAssembleURI(
       * Otherwise, just copy the host string...
       */
 
-      ptr = http_copy_encode(ptr, host, end, ":/?#[]@", NULL,
+      ptr = http_copy_encode(ptr, host, end, ":/?#[]@\\", NULL,
                              encoding & HTTP_URI_CODING_HOSTNAME);
 
       if (!ptr)

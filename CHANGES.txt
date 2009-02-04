@@ -4,6 +4,9 @@ CHANGES.txt - 2009-02-04
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- httpAssembleURI*() did not escape backslashes in hostnames.
+	- The dnssd backend did not unquote "full names" before creating the
+	  device URI.
 	- The scheduler now supports JobRetryInterval values less than 10
 	  seconds.
 	- Updated the Spanish localization (STR #3090)

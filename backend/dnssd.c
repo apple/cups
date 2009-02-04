@@ -3,7 +3,7 @@
  *
  *   DNS-SD discovery backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -122,6 +122,7 @@ main(int  argc,				/* I - Number of command-line args */
   struct timeval timeout;		/* Timeout for select() */
   cups_array_t	*devices;		/* Device array */
   cups_device_t	*device;		/* Current device */
+  char		uriName[1024];		/* Unquoted fullName for URI */
 
 
  /*
@@ -297,8 +298,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  else if (strcasecmp(best->name, device->name) ||
 	           strcasecmp(best->domain, device->domain))
           {
+	    unquote(uriName, best->fullName, sizeof(uriName));
+
 	    httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			    schemes[best->type], NULL, best->fullName, 0,
+			    schemes[best->type], NULL, uriName, 0,
 			    best->cups_shared ? "/cups" : "/");
 
 	    cupsBackendReport("network", device_uri, best->make_and_model,
@@ -319,8 +322,10 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (best)
       {
+	unquote(uriName, best->fullName, sizeof(uriName));
+
 	httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			schemes[best->type], NULL, best->fullName, 0,
+			schemes[best->type], NULL, uriName, 0,
 			best->cups_shared ? "/cups" : "/");
 
 	cupsBackendReport("network", device_uri, best->make_and_model,
