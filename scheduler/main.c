@@ -1912,7 +1912,7 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   }
 
  /*
-  * Check for any active jobs...
+  * Write out changes to configuration and state files...
   */
 
   if (DirtyCleanTime && timeout > DirtyCleanTime)
@@ -1925,15 +1925,20 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * Check for any active jobs...
   */
 
-  if (timeout > (now + 10) && ActiveJobs)
+  if (cupsArrayCount(ActiveJobs) > 0)
   {
     for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	 job;
 	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value <= IPP_JOB_PROCESSING)
+      if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
+      {
+        timeout = job->hold_until;
+	why     = "release held jobs";
+      }
+      else if (job->state_value == IPP_JOB_PENDING && timeout > (now + 10))
       {
 	timeout = now + 10;
-	why     = "process active jobs";
+	why     = "start pending jobs";
 	break;
       }
   }
