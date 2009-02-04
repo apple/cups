@@ -1540,8 +1540,8 @@ show_printers(const char  *printers,	/* I - Destinations */
 		};
 
 
-  DEBUG_printf(("show_printers(printer=\"%s\", num_dests=%d, dests=%p, "
-                "long_status=%d)\n", printer, num_dests, dests, long_status));
+  DEBUG_printf(("show_printers(printers=\"%s\", num_dests=%d, dests=%p, "
+                "long_status=%d)\n", printers, num_dests, dests, long_status));
 
   if ((root = getenv("CUPS_SERVERROOT")) == NULL)
     root = CUPS_SERVERROOT;

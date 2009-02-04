@@ -3,7 +3,7 @@
  *
  *   CUPS filtering program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -575,6 +575,8 @@ add_printer_filters(
   ppd_attr_t  *ppdattr;			/* Current prefilter */
 
 
+  *prefilter_type = NULL;
+
   if ((ppd = ppdOpenFile(ppdfile)) == NULL)
   {
     ppd_status_t  status;		/* PPD load status */
@@ -608,8 +610,6 @@ add_printer_filters(
       if (ppdattr->value)
 	add_printer_filter(command, mime, *prefilter_type, ppdattr->value);
   }
-  else
-    *prefilter_type = NULL;
 
   return (printer_type);
 }

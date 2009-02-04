@@ -1457,14 +1457,18 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 			*share_printers,/* SHARE_PRINTERS value */
 			*user_cancel_any,
 					/* USER_CANCEL_ANY value */
-			*browse_web_if,	/* BrowseWebIF value */
-			*preserve_job_history,
+			*browse_web_if = NULL,
+					/* BrowseWebIF value */
+			*preserve_job_history = NULL,
 					/* PreserveJobHistory value */
-			*preserve_job_files,
+			*preserve_job_files = NULL,
 					/* PreserveJobFiles value */
-			*max_clients,	/* MaxClients value */
-			*max_jobs,	/* MaxJobs value */
-			*max_log_size;	/* MaxLogSize value */
+			*max_clients = NULL,
+					/* MaxClients value */
+			*max_jobs = NULL,
+					/* MaxJobs value */
+			*max_log_size = NULL;
+					/* MaxLogSize value */
     char		local_protocols[255],
 					/* BrowseLocalProtocols */
 			remote_protocols[255];
