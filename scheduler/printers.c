@@ -3556,7 +3556,9 @@ add_printer_filter(
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
   mime_type_t	*temptype;		/* MIME type looping var */
-  char		filename[1024];		/* Full filter filename */
+  char		filename[1024],		/* Full filter filename */
+		*dirsep;		/* Pointer to directory separator */
+  struct stat	fileinfo;		/* File information */
 
 
  /*
@@ -3585,14 +3587,79 @@ add_printer_filter(
     else
       snprintf(filename, sizeof(filename), "%s/filter/%s", ServerBin, program);
 
-    if (access(filename, X_OK))
+    if (stat(filename, &fileinfo))
     {
       snprintf(p->state_message, sizeof(p->state_message),
                "Filter \"%s\" for printer \"%s\" not available: %s",
-	       program, p->name, strerror(errno));
+	       filename, p->name, strerror(errno));
       cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
 
       cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+      return;
+    }
+
+   /*
+    * When running as root, do additional security checks...
+    */
+
+    if (!RunUser)
+    {
+     /*
+      * Only use filters that are owned by root and do not have world write
+      * permissions.
+      */
+
+      if (fileinfo.st_uid || (fileinfo.st_mode & S_IWOTH) != 0)
+      {
+	if (fileinfo.st_uid)
+	  snprintf(p->state_message, sizeof(p->state_message),
+		   "Filter \"%s\" for printer \"%s\" not owned by root",
+		   filename, p->name);
+	else
+	  snprintf(p->state_message, sizeof(p->state_message),
+		   "Filter \"%s\" for printer \"%s\" has insecure permissions "
+		   "(0%o)", filename, p->name, fileinfo.st_mode);
+
+	cupsdSetPrinterReasons(p, "+cups-insecure-filter-error");
+
+	cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+	return;
+      }
+
+     /*
+      * Similarly, check that the parent directory is also owned by root and
+      * does not have world write permissions.
+      */
+
+      if ((dirsep = strrchr(filename, '/')) != NULL)
+        *dirsep = '\0';
+
+      if (stat(filename, &fileinfo))
+      {
+	snprintf(p->state_message, sizeof(p->state_message),
+		 "Filter directory \"%s\" for printer \"%s\" not accessible: %s",
+		 filename, p->name, strerror(errno));
+	cupsdSetPrinterReasons(p, "+cups-missing-filter-error");
+
+	cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+	return;
+      }
+      else if (fileinfo.st_uid || (fileinfo.st_mode & S_IWOTH) != 0)
+      {
+	if (fileinfo.st_uid)
+	  snprintf(p->state_message, sizeof(p->state_message),
+		   "Filter directory \"%s\" for printer \"%s\" not owned by "
+		   "root", filename, p->name);
+	else
+	  snprintf(p->state_message, sizeof(p->state_message),
+		   "Filter directory \"%s\" for printer \"%s\" has insecure "
+		   "permissions (0%o)", filename, p->name, fileinfo.st_mode);
+
+	cupsdSetPrinterReasons(p, "+cups-insecure-filter-error");
+
+	cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+	return;
+      }
     }
   }
 

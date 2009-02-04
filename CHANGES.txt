@@ -4,6 +4,8 @@ CHANGES.txt - 2009-02-04
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The scheduler no longer uses programs with insecure file
+	  permissions.
 	- httpAssembleURI*() did not escape backslashes in hostnames.
 	- The dnssd backend did not unquote "full names" before creating the
 	  device URI.
