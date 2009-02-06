@@ -1245,6 +1245,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
       * Protect against malicious users!
       */
 
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+                      "Request for non-absolute resource \"%s\"!", con->uri);
+
       if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
       {
 	cupsdCloseClient(con);
@@ -1449,9 +1452,12 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		       strlen(con->uri) == 11)))
 	    {
 	     /*
-	      * GET can only be done to configuration files under
+	      * GET can only be done to configuration files directly under
 	      * /admin/conf...
 	      */
+
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+			      "Request for subdirectory \"%s\"!", con->uri);
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
@@ -1697,6 +1703,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * /admin/conf...
 	      */
 
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+			      "Request for subdirectory \"%s\"!", con->uri);
+
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
 		cupsdCloseClient(con);
@@ -1850,6 +1859,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      * HEAD can only be done to configuration files under
 	      * /admin/conf...
 	      */
+
+	      cupsdLogMessage(CUPSD_LOG_ERROR,
+			      "Request for subdirectory \"%s\"!", con->uri);
 
 	      if (!cupsdSendError(con, HTTP_FORBIDDEN, CUPSD_AUTH_NONE))
 	      {
