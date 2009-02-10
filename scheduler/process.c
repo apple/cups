@@ -3,7 +3,7 @@
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -252,7 +252,8 @@ cupsdStartProcess(
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: insecure file permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid = 0;
+    *pid  = 0;
+    errno = EPERM;
     return (0);
   }
   else if ((commandinfo.st_uid != user || !(commandinfo.st_mode & S_IXUSR)) &&
@@ -262,7 +263,8 @@ cupsdStartProcess(
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: no execute permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid = 0;
+    *pid  = 0;
+    errno = EPERM;
     return (0);
   }
 
