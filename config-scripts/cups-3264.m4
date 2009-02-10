@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   32/64-bit library support stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -14,7 +14,7 @@ dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl Setup support for separate 32/64-bit library generation...
-AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems, default=no])
+AC_ARG_ENABLE(32bit, [  --enable-32bit          generate 32-bit libraries on 32/64-bit systems])
 
 INSTALL32=""
 LIB32CUPS=""
@@ -28,7 +28,7 @@ AC_SUBST(LIB32CUPSIMAGE)
 AC_SUBST(LIB32DIR)
 AC_SUBST(UNINSTALL32)
 
-AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems, default=no])
+AC_ARG_ENABLE(64bit, [  --enable-64bit          generate 64-bit libraries on 32/64-bit systems])
 
 INSTALL64=""
 LIB64CUPS=""

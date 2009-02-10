@@ -20,11 +20,11 @@ OPTIM=""
 AC_SUBST(INSTALL_STRIP)
 AC_SUBST(OPTIM)
 
-AC_ARG_WITH(optim, [  --with-optim="flags"    set optimization flags ])
-AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
-AC_ARG_ENABLE(debug_guards, [  --enable-debug-guards   turn on debug guards, default=no])
-AC_ARG_ENABLE(debug_printfs, [  --enable-debug-printfs  turn on debug printfs, default=no])
-AC_ARG_ENABLE(unit_tests, [  --enable-unit-tests     turn on unit tests, default=no])
+AC_ARG_WITH(optim, [  --with-optim            set optimization flags ])
+AC_ARG_ENABLE(debug, [  --enable-debug          build with debugging symbols])
+AC_ARG_ENABLE(debug_guards, [  --enable-debug-guards   build with memory allocation guards])
+AC_ARG_ENABLE(debug_printfs, [  --enable-debug-printfs  build with CUPS_DEBUG_LOG support])
+AC_ARG_ENABLE(unit_tests, [  --enable-unit-tests     build and run unit tests])
 
 dnl For debugging, keep symbols, otherwise strip them...
 if test x$enable_debug = xyes; then
@@ -53,10 +53,8 @@ fi
 AC_SUBST(UNITTESTS)
 
 dnl Setup general architecture flags...
-AC_ARG_WITH(archflags, [  --with-archflags="flags"
-                          set default architecture flags ])
-AC_ARG_WITH(ldarchflags, [  --with-ldarchflags="flags"
-                          set default program architecture flags ])
+AC_ARG_WITH(archflags, [  --with-archflags        set default architecture flags ])
+AC_ARG_WITH(ldarchflags, [  --with-ldarchflags      set program architecture flags ])
 
 if test -z "$with_archflags"; then
 	ARCHFLAGS=""
@@ -79,18 +77,16 @@ AC_SUBST(ARCHFLAGS)
 AC_SUBST(LDARCHFLAGS)
 
 dnl Setup support for separate 32/64-bit library generation...
-AC_ARG_WITH(arch32flags, [  --with-arch32flags="flags"
-                          specifies 32-bit architecture flags])
+AC_ARG_WITH(arch32flags, [  --with-arch32flags      set 32-bit architecture flags])
 ARCH32FLAGS=""
 AC_SUBST(ARCH32FLAGS)
 
-AC_ARG_WITH(arch64flags, [  --with-arch64flags="flags"
-                          specifies 64-bit architecture flags])
+AC_ARG_WITH(arch64flags, [  --with-arch64flags      set 64-bit architecture flags])
 ARCH64FLAGS=""
 AC_SUBST(ARCH64FLAGS)
 
 dnl Read-only data/program support on Linux...
-AC_ARG_ENABLE(relro, [  --enable-relro          use GCC relro option, default=no])
+AC_ARG_ENABLE(relro, [  --enable-relro          build with the GCC relro option])
 
 dnl Update compiler options...
 CXXLIBS="${CXXLIBS:=}"
@@ -103,7 +99,7 @@ RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
 LIBCUPSORDER="libcups.order"
-AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     libcups secorder file, default=libcups.order],
+AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     set libcups secorder file, default=libcups.order],
 	if test -f "$withval"; then
 		LIBCUPSORDER="$withval"
 	fi)
@@ -111,7 +107,7 @@ AC_SUBST(LIBCUPSORDER)
 
 LIBCUPSIMAGEORDER="libcupsimage.order"
 AC_ARG_WITH(libcupsimageorder, [  --with-libcupsimagesorder
-                          libcupsimage secorder file, default=libcupsimage.order],
+                          set libcupsimage secorder file, default=libcupsimage.order],
 	if test -f "$withval"; then
 		LIBCUPSIMAGEORDER="$withval"
 	fi)

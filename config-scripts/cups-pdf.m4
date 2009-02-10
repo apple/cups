@@ -13,7 +13,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_WITH(pdftops, [  --with-pdftops=foo      set which pdftops filter to use (gs,pdftops,none), default=pdftops ])
+AC_ARG_WITH(pdftops, [  --with-pdftops          set pdftops filter (gs,pdftops,none), default=pdftops ])
 
 PDFTOPS=""
 CUPS_PDFTOPS=""
