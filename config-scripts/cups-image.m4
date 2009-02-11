@@ -3,7 +3,7 @@ dnl "$Id: cups-image.m4 6649 2007-07-11 21:46:42Z mike $"
 dnl
 dnl   Image library/filter stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -14,7 +14,7 @@ dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
 dnl See if we want the image filters included at all...
-AC_ARG_ENABLE(image, [  --enable-image          turn on image filters, default=auto])
+AC_ARG_ENABLE(image, [  --enable-image          always build the image filters])
 
 IMGFILTERS=""
 if test "x$enable_image" != xno; then
@@ -30,9 +30,9 @@ fi
 AC_SUBST(IMGFILTERS)
 
 dnl Check for image libraries...
-AC_ARG_ENABLE(jpeg, [  --enable-jpeg           turn on JPEG support, default=yes])
-AC_ARG_ENABLE(png, [  --enable-png            turn on PNG support, default=yes])
-AC_ARG_ENABLE(tiff, [  --enable-tiff           turn on TIFF support, default=yes])
+AC_ARG_ENABLE(jpeg, [  --disable-jpeg          disable JPEG support])
+AC_ARG_ENABLE(png, [  --disable-png           disable PNG support])
+AC_ARG_ENABLE(tiff, [  --disable-tiff          disable TIFF support])
 
 LIBJPEG=""
 LIBPNG=""

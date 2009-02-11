@@ -7,7 +7,7 @@ dnl   http://www.dns-sd.org
 dnl   http://www.multicastdns.org/
 dnl   http://developer.apple.com/networking/bonjour/
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
 dnl   property of Apple Inc. and are protected by Federal copyright
@@ -16,7 +16,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(dnssd, [  --enable-dnssd          turn on DNS Service Discovery support, default=yes])
+AC_ARG_ENABLE(dnssd, [  --disable-dnssd         disable DNS Service Discovery support])
 AC_ARG_WITH(dnssd-libs, [  --with-dnssd-libs       set directory for DNS Service Discovery library],
 	LDFLAGS="-L$withval $LDFLAGS"
 	DSOFLAGS="-L$withval $DSOFLAGS",)

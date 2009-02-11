@@ -1057,9 +1057,10 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     return;
   }
-  else if (!file && !cgiGetVariable("PPD_NAME"))
+  else if (!file &&
+           (!cgiGetVariable("PPD_NAME") || cgiGetVariable("SELECT_MAKE")))
   {
-    if (modify)
+    if (modify && !cgiGetVariable("SELECT_MAKE"))
     {
      /*
       * Get the PPD file...
@@ -1136,7 +1137,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
     if ((var = cgiGetVariable("CURRENT_MAKE")) == NULL)
       var = cgiGetVariable("PPD_MAKE");
-    if (var)
+    if (var && !cgiGetVariable("SELECT_MAKE"))
     {
       const char *make_model;		/* Make and model */
 
@@ -1144,8 +1145,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
                    "ppd-make", NULL, var);
 
-      if ((make_model = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL &&
-          !cgiGetVariable("SELECT_MAKE"))
+      if ((make_model = cgiGetVariable("CURRENT_MAKE_AND_MODEL")) != NULL)
 	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_TEXT,
 		     "ppd-make-and-model", NULL, make_model);
     }
@@ -1457,14 +1457,18 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 			*share_printers,/* SHARE_PRINTERS value */
 			*user_cancel_any,
 					/* USER_CANCEL_ANY value */
-			*browse_web_if,	/* BrowseWebIF value */
-			*preserve_job_history,
+			*browse_web_if = NULL,
+					/* BrowseWebIF value */
+			*preserve_job_history = NULL,
 					/* PreserveJobHistory value */
-			*preserve_job_files,
+			*preserve_job_files = NULL,
 					/* PreserveJobFiles value */
-			*max_clients,	/* MaxClients value */
-			*max_jobs,	/* MaxJobs value */
-			*max_log_size;	/* MaxLogSize value */
+			*max_clients = NULL,
+					/* MaxClients value */
+			*max_jobs = NULL,
+					/* MaxJobs value */
+			*max_log_size = NULL;
+					/* MaxLogSize value */
     char		local_protocols[255],
 					/* BrowseLocalProtocols */
 			remote_protocols[255];

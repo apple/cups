@@ -1,7 +1,7 @@
 /*
 * "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $"
 *
-* Copyright 2005-2008 Apple Inc. All rights reserved.
+* Copyright 2005-2009 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -1241,56 +1241,83 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 				      printer_interface_t   intf,
 				      classdriver_t	    ***printerDriver)
 {
-  kern_return_t kr = kUSBPrinterClassDeviceNotOpen;
-  classdriver_t **driver = NULL;
-  CFStringRef bundle = (driverPath == NULL ? kUSBGenericTOPrinterClassDriver : driverPath);
+  kern_return_t	kr = kUSBPrinterClassDeviceNotOpen;
+  classdriver_t	**driver = NULL;
+  CFStringRef	bundle = driverPath ? driverPath : kUSBGenericTOPrinterClassDriver;
+  char 		bundlestr[1024];	/* Bundle path */
+  struct stat	bundleinfo;		/* File information for bundle */
+  CFURLRef	url;			/* URL for driver */
+  CFPlugInRef	plugin = NULL;		/* Plug-in address */
 
-  if (bundle != NULL)
+
+  CFStringGetCString(bundle, bundlestr, sizeof(bundlestr), kCFStringEncodingUTF8);
+
+ /*
+  * Validate permissions for the class driver...
+  */
+
+  if (stat(bundlestr, &bundleinfo))
   {
-    CFURLRef url = CFURLCreateWithFileSystemPath(NULL, bundle, kCFURLPOSIXPathStyle, true);
-    CFPlugInRef plugin = (url != NULL ? CFPlugInCreate(NULL, url) : NULL);
+    fprintf(stderr, "Unable to load class driver \"%s\": %s", bundlestr,
+	    strerror(errno));
+    return (kr);
+  }
+  else if (bundleinfo.st_mode & S_IWOTH)
+  {
+    fprintf(stderr, "Unable to load class driver \"%s\": insecure file "
+		    "permissions (0%o)", bundlestr, bundleinfo.st_mode);
+    return (kr);
+  }
 
-    if (url != NULL)
-      CFRelease(url);
+ /*
+  * Try loading the class driver...
+  */
 
-    if (plugin != NULL)
+  url = CFURLCreateWithFileSystemPath(NULL, bundle, kCFURLPOSIXPathStyle, true);
+
+  if (url)
+  {
+    plugin = CFPlugInCreate(NULL, url);
+    CFRelease(url);
+  }
+  else
+    plugin = NULL;
+
+  if (plugin)
+  {
+    CFArrayRef factories = CFPlugInFindFactoriesForPlugInTypeInPlugIn(kUSBPrinterClassTypeID, plugin);
+    if (factories != NULL && CFArrayGetCount(factories) > 0)
     {
-      CFArrayRef factories = CFPlugInFindFactoriesForPlugInTypeInPlugIn(kUSBPrinterClassTypeID, plugin);
-      if (factories != NULL && CFArrayGetCount(factories) > 0)
+      CFUUIDRef factoryID = CFArrayGetValueAtIndex(factories, 0);
+      IUnknownVTbl **iunknown = CFPlugInInstanceCreate(NULL, factoryID, kUSBPrinterClassTypeID);
+      if (iunknown != NULL)
       {
-	CFUUIDRef factoryID = CFArrayGetValueAtIndex(factories, 0);
-	IUnknownVTbl **iunknown = CFPlugInInstanceCreate(NULL, factoryID, kUSBPrinterClassTypeID);
-	if (iunknown != NULL)
+	kr = (*iunknown)->QueryInterface(iunknown, CFUUIDGetUUIDBytes(kUSBPrinterClassInterfaceID), (LPVOID *)&driver);
+	if (kr == kIOReturnSuccess && driver != NULL)
 	{
-	  kr = (*iunknown)->QueryInterface(iunknown, CFUUIDGetUUIDBytes(kUSBPrinterClassInterfaceID), (LPVOID *)&driver);
-	  if (kr == kIOReturnSuccess && driver != NULL)
+	  classdriver_t **genericDriver = NULL;
+	  if (driverPath != NULL && CFStringCompare(driverPath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo)
+	    kr = load_classdriver(NULL, intf, &genericDriver);
+
+	  if (kr == kIOReturnSuccess)
 	  {
-	    classdriver_t **genericDriver = NULL;
-	    if (driverPath != NULL && CFStringCompare(driverPath, kUSBGenericTOPrinterClassDriver, 0) != kCFCompareEqualTo)
-	      kr = load_classdriver(NULL, intf, &genericDriver);
+	    (*driver)->interface = intf;
+	    (*driver)->Initialize(driver, genericDriver);
 
-	    if (kr == kIOReturnSuccess)
-	    {
-	      (*driver)->interface = intf;
-	      (*driver)->Initialize(driver, genericDriver);
-
-	      (*driver)->plugin = plugin;
-	      (*driver)->interface = intf;
-	      *printerDriver = driver;
-	    }
+	    (*driver)->plugin = plugin;
+	    (*driver)->interface = intf;
+	    *printerDriver = driver;
 	  }
-	  (*iunknown)->Release(iunknown);
 	}
-	CFRelease(factories);
+	(*iunknown)->Release(iunknown);
       }
+      CFRelease(factories);
     }
   }
 
-  char bundlestr[1024];
-  CFStringGetCString(bundle, bundlestr, sizeof(bundlestr), kCFStringEncodingUTF8);
   fprintf(stderr, "DEBUG: load_classdriver(%s) (kr:0x%08x)\n", bundlestr, (int)kr);
 
-  return kr;
+  return (kr);
 }
 
 

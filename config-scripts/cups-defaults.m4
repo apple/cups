@@ -4,7 +4,7 @@ dnl
 dnl   Default cupsd configuration settings for the Common UNIX Printing System
 dnl   (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -66,7 +66,7 @@ AC_SUBST(CUPS_ACCESS_LOG_LEVEL)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_ACCESS_LOG_LEVEL, "$CUPS_ACCESS_LOG_LEVEL")
 
 dnl Default Browsing
-AC_ARG_ENABLE(browsing, [  --enable-browsing       enable Browsing by default, default=yes])
+AC_ARG_ENABLE(browsing, [  --disable-browsing      disable Browsing by default])
 if test "x$enable_browsing" = xno; then
 	CUPS_BROWSING="No"
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSING, 0)
@@ -123,8 +123,8 @@ AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_REMOTE_PROTOCOLS,
 	"$CUPS_BROWSE_REMOTE_PROTOCOLS")
 
 dnl Default BrowseShortNames
-AC_ARG_ENABLE(browse_short, [  --enable-browse-short-names
-                          enable BrowseShortNames by default, default=yes])
+AC_ARG_ENABLE(browse_short, [  --disable-browse-short-names
+			  disable BrowseShortNames by default])
 if test "x$enable_browse_short" = xno; then
 	CUPS_BROWSE_SHORT_NAMES="No"
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_BROWSE_SHORT_NAMES, 0)
@@ -135,7 +135,8 @@ fi
 AC_SUBST(CUPS_BROWSE_SHORT_NAMES)
 
 dnl Default DefaultShared
-AC_ARG_ENABLE(default_shared, [  --enable-default-shared enable DefaultShared by default, default=yes])
+AC_ARG_ENABLE(default_shared, [  --disable-default-shared
+			  disable DefaultShared by default])
 if test "x$enable_default_shared" = xno; then
 	CUPS_DEFAULT_SHARED="No"
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_DEFAULT_SHARED, 0)
@@ -146,8 +147,8 @@ fi
 AC_SUBST(CUPS_DEFAULT_SHARED)
 
 dnl Default ImplicitClasses
-AC_ARG_ENABLE(implicit, [  --enable-implicit-classes
-                          enable ImplicitClasses by default, default=yes])
+AC_ARG_ENABLE(implicit, [  --disable-implicit-classes
+                          disable ImplicitClasses by default])
 if test "x$enable_implicit" = xno; then
 	CUPS_IMPLICIT_CLASSES="No"
 	AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IMPLICIT_CLASSES, 0)
@@ -159,7 +160,7 @@ AC_SUBST(CUPS_IMPLICIT_CLASSES)
 
 dnl Default UseNetworkDefault
 AC_ARG_ENABLE(use_network_default, [  --enable-use-network-default
-                          enable UseNetworkDefault by default, default=auto])
+                          set UseNetworkDefault to Yes by default])
 if test "x$enable_use_network_default" != xno; then
 	AC_MSG_CHECKING(whether to use network default printers)
 	if test "x$enable_use_network_default" = xyes -o $uname != Darwin; then
@@ -362,28 +363,17 @@ fi
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_SMB_CONFIG_FILE, "$CUPS_DEFAULT_SMB_CONFIG_FILE")
 
 dnl Default MaxCopies value...
-AC_ARG_WITH(max-copies, [  --with-max-copies       set default max copies value, default=auto ],
+AC_ARG_WITH(max-copies, [  --with-max-copies       set default max copies value, default=9999 ],
 	CUPS_MAX_COPIES="$withval",
-	if test "x$uname" = xDarwin; then
-		CUPS_MAX_COPIES="9999"
-	else
-		CUPS_MAX_COPIES="100"
-	fi)
+	CUPS_MAX_COPIES="9999")
 
 AC_SUBST(CUPS_MAX_COPIES)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_MAX_COPIES, $CUPS_MAX_COPIES)
 
 dnl Default raw printing state
-AC_ARG_ENABLE(raw_printing, [  --enable-raw-printing   enable raw printing by default, default=auto])
+AC_ARG_ENABLE(raw_printing, [  --disable-raw-printing  do not allow raw printing by default])
 if test "x$enable_raw_printing" != xno; then
-	AC_MSG_CHECKING(whether to enable raw printing)
-	if test "x$enable_raw_printing" = xyes -o $uname = Darwin; then
-		DEFAULT_RAW_PRINTING=""
-		AC_MSG_RESULT(yes)
-	else
-		DEFAULT_RAW_PRINTING="#"
-		AC_MSG_RESULT(no)
-	fi
+	DEFAULT_RAW_PRINTING=""
 else
 	DEFAULT_RAW_PRINTING="#"
 fi
@@ -410,7 +400,7 @@ AC_SUBST(CUPS_SNMP_ADDRESS)
 AC_SUBST(CUPS_SNMP_COMMUNITY)
 
 dnl New default port definition for IPP...
-AC_ARG_WITH(ipp-port, [  --with-ipp-port         set default port number for IPP ],
+AC_ARG_WITH(ipp-port, [  --with-ipp-port         set port number for IPP, default=631 ],
 	DEFAULT_IPP_PORT="$withval",
 	DEFAULT_IPP_PORT="631")
 
@@ -418,8 +408,8 @@ AC_SUBST(DEFAULT_IPP_PORT)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_IPP_PORT,$DEFAULT_IPP_PORT)
 
 dnl Filters
-AC_ARG_ENABLE(bannertops, [  --enable-bannertops     build with default banner filter, default=auto ])
-AC_ARG_ENABLE(texttops, [  --enable-texttops       build with default text filter, default=auto ])
+AC_ARG_ENABLE(bannertops, [  --enable-bannertops     always build the banner filter ])
+AC_ARG_ENABLE(texttops, [  --enable-texttops       always build the text filter ])
 
 if test "x$enable_bannertops" = xno; then
 	BANNERTOPS=""

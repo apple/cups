@@ -3,7 +3,7 @@
  *
  *   Internationalization test for Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -32,6 +32,82 @@
 
 #include "i18n.h"
 #include "string.h"
+
+
+/*
+ * Local globals...
+ */
+
+static const char * const lang_encodings[] =
+			{		/* Encoding strings */
+			  "us-ascii",		"iso-8859-1",
+			  "iso-8859-2",		"iso-8859-3",
+			  "iso-8859-4",		"iso-8859-5",
+			  "iso-8859-6",		"iso-8859-7",
+			  "iso-8859-8",		"iso-8859-9",
+			  "iso-8859-10",	"utf-8",
+			  "iso-8859-13",	"iso-8859-14",
+			  "iso-8859-15",	"windows-874",
+			  "windows-1250",	"windows-1251",
+			  "windows-1252",	"windows-1253",
+			  "windows-1254",	"windows-1255",
+			  "windows-1256",	"windows-1257",
+			  "windows-1258",	"koi8-r",
+			  "koi8-u",		"iso-8859-11",
+			  "iso-8859-16",	"mac-roman",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "windows-932",	"windows-936",
+			  "windows-949",	"windows-950",
+			  "windows-1361",	"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "unknown",		"unknown",
+			  "euc-cn",		"euc-jp",
+			  "euc-kr",		"euc-tw",
+			  "jis-x0213"
+			};
 
 
 /*
@@ -77,6 +153,54 @@ main(int  argc,				/* I - Argument Count */
   cups_utf32_t	utf32dest[1024];	/* UTF-32 destination string */
 
 
+  if (argc > 1)
+  {
+    int			i;		/* Looping var */
+    cups_encoding_t	encoding;	/* Source encoding */
+
+
+    if (argc != 3)
+    {
+      puts("Usage: ./testi18n [filename charset]");
+      return (1);
+    }
+
+    if ((fp = fopen(argv[1], "rb")) == NULL)
+    {
+      perror(argv[1]);
+      return (1);
+    }
+
+    for (i = 0, encoding = CUPS_AUTO_ENCODING;
+         i < (int)(sizeof(lang_encodings) / sizeof(lang_encodings[0]));
+	 i ++)
+      if (!strcasecmp(lang_encodings[i], argv[2]))
+      {
+        encoding = (cups_encoding_t)i;
+	break;
+      }
+
+    if (encoding == CUPS_AUTO_ENCODING)
+    {
+      fprintf(stderr, "%s: Unknown character set!\n", argv[2]);
+      return (1);
+    }
+
+    while (fgets(line, sizeof(line), fp))
+    {
+      if (cupsCharsetToUTF8(utf8dest, line, sizeof(utf8dest), encoding) < 0)
+      {
+        fprintf(stderr, "%s: Unable to convert line: %s", argv[1], line);
+	return (1);
+      }
+
+      fputs((char *)utf8dest, stdout);
+    }
+
+    fclose(fp);
+    return (0);
+  }
+
  /*
   * Make sure we have a symbolic link from the data directory to a
   * "charmaps" directory, and then point the library at it...
@@ -93,7 +217,7 @@ main(int  argc,				/* I - Argument Count */
 
   errors = 0;
 
-  if ((fp = fopen("utf8demo.txt", "r")) == NULL)
+  if ((fp = fopen("utf8demo.txt", "rb")) == NULL)
   {
     perror("utf8demo.txt");
     return (1);

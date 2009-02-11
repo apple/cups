@@ -3,7 +3,7 @@ dnl "$Id: cups-sharedlibs.m4 7630 2008-06-09 22:31:44Z mike $"
 dnl
 dnl   Shared library support for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -16,7 +16,7 @@ dnl
 PICFLAG=1
 DSOFLAGS="${DSOFLAGS:=}"
 
-AC_ARG_ENABLE(shared, [  --enable-shared         turn on shared libraries, default=yes])
+AC_ARG_ENABLE(shared, [  --disable-shared        do not create shared libraries])
 
 if test x$enable_shared != xno; then
 	case "$uname" in

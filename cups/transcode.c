@@ -1506,7 +1506,7 @@ get_sbcs_charmap(
       goto sbcs_error;
 
     unichar = strtol(s, NULL, 16);
-    if (unichar < 0 || unichar > 0xffff)
+    if (unichar < 0 || unichar > 0x10ffff)
       goto sbcs_error;
 
    /*
@@ -1682,7 +1682,7 @@ get_vbcs_charmap(
       goto vbcs_error;
 
     unichar = strtol(s, NULL, 16);
-    if (unichar < 0 || unichar > 0xffff)
+    if (unichar < 0 || unichar > 0x10ffff)
       goto vbcs_error;
 
     i ++;
@@ -1704,7 +1704,7 @@ get_vbcs_charmap(
       leadchar                  = (cups_sbcs_t)(legchar >> 16);
       vmap->lead3char[leadchar] = leadchar;
     }
-    else if (legchar > 0xff)
+    else
     {
       leadchar                  = (cups_sbcs_t)(legchar >> 8);
       vmap->lead2char[leadchar] = leadchar;

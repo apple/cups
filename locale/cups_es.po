@@ -2991,7 +2991,7 @@ msgstr "INFO: Impresora ocupada; reintento en 5 segundos...\n"
 
 #, c-format
 msgid "INFO: Printer does not support IPP/%d.%d, trying IPP/1.0...\n"
-msgstr ""
+msgstr "INFO: La impresora no es compatible con IPP/%d.%d, probando IPP/1.0...\n"
 
 msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
 msgstr "INFO: La impresora está ocupada; reintento en 5 segundos...\n"
@@ -5622,7 +5622,3 @@ msgstr "sin título"
 
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
-
-#~ msgid "INFO: Printer does not support IPP/1.1, trying IPP/1.0...\n"
-#~ msgstr ""
-#~ "INFO: La impresora no es compatible con IPP/1.1; probando IPP/1.0...\n"

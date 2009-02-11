@@ -3,7 +3,7 @@ dnl "$Id: cups-threads.m4 6649 2007-07-11 21:46:42Z mike $"
 dnl
 dnl   Threading stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(threads, [  --enable-threads        enable multi-threading support])
+AC_ARG_ENABLE(threads, [  --disable-threads       disable multi-threading support])
 
 have_pthread=no
 PTHREAD_FLAGS=""

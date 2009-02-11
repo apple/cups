@@ -1,9 +1,19 @@
-CHANGES.txt - 2009-02-03
+CHANGES.txt - 2009-02-10
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Clicking on "Select Another Make/Manufacturer" in the web interface
+	  incorrectly added the printer (STR #3095)
+	- The scheduler no longer uses programs with insecure file
+	  permissions.
+	- httpAssembleURI*() did not escape backslashes in hostnames.
+	- The dnssd backend did not unquote "full names" before creating the
+	  device URI.
+	- The scheduler now supports JobRetryInterval values less than 10
+	  seconds.
+	- Updated the Spanish localization (STR #3090)
 	- The scheduler did not redo Bonjour/DNS-SD registrations when updating
 	  them failed.
 	- The "authenticated" policy incorrectly required authentication for

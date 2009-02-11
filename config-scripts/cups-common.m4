@@ -78,7 +78,7 @@ fi
 
 dnl Static library option...
 INSTALLSTATIC=""
-AC_ARG_ENABLE(static, [  --enable-static         install static libraries, default=no])
+AC_ARG_ENABLE(static, [  --enable-static         install static libraries])
 
 if test x$enable_static = xyes; then
 	echo Installing static libraries...
@@ -92,7 +92,7 @@ AC_SEARCH_LIBS(crypt, crypt)
 AC_SEARCH_LIBS(getspent, sec gen)
 
 LIBMALLOC=""
-AC_ARG_ENABLE(mallinfo, [  --enable-mallinfo       turn on malloc debug information, default=no])
+AC_ARG_ENABLE(mallinfo, [  --enable-mallinfo       build with malloc debug logging])
 
 if test x$enable_mallinfo = xyes; then
 	SAVELIBS="$LIBS"
@@ -105,7 +105,7 @@ fi
 AC_SUBST(LIBMALLOC)
 
 dnl Check for libpaper support...
-AC_ARG_ENABLE(libpaper, [  --enable-libpaper       turn on libpaper support, default=no])
+AC_ARG_ENABLE(libpaper, [  --enable-libpaper       build with libpaper support])
 
 if test x$enable_libpaper = xyes; then
 	AC_CHECK_LIB(paper,systempapername,
@@ -180,7 +180,7 @@ dnl See if we have the removefile(3) function for securely removing files
 AC_CHECK_FUNCS(removefile)
 
 dnl See if we have libusb...
-AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing, default=auto])
+AC_ARG_ENABLE(libusb, [  --enable-libusb         use libusb for USB printing])
 
 LIBUSB=""
 AC_SUBST(LIBUSB)
@@ -201,7 +201,7 @@ if test $check_libusb = yes; then
 fi
 
 dnl See if we have libwrap for TCP wrappers support...
-AC_ARG_ENABLE(tcp_wrappers, [  --enable-tcp-wrappers   use libwrap for TCP wrappers support, default=no])
+AC_ARG_ENABLE(tcp_wrappers, [  --enable-tcp-wrappers   use libwrap for TCP wrappers support])
 
 LIBWRAP=""
 AC_SUBST(LIBWRAP)
@@ -234,7 +234,7 @@ AC_SUBST(CUPSDLIBS)
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"
 LIBS=""
-AC_ARG_ENABLE(acl, [  --enable-acl            enable POSIX ACL support, default=auto])
+AC_ARG_ENABLE(acl, [  --enable-acl            build with POSIX ACL support])
 if test "x$enable_acl" != xno; then
 	AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
 	CUPSDLIBS="$CUPSDLIBS $LIBS"
@@ -248,7 +248,7 @@ else
 	DBUSDIR=""
 fi
 
-AC_ARG_ENABLE(dbus, [  --enable-dbus           enable DBUS support, default=auto])
+AC_ARG_ENABLE(dbus, [  --enable-dbus           build with DBUS support])
 AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory ],
 	DBUSDIR="$withval")
 

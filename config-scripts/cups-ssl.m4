@@ -3,7 +3,7 @@ dnl "$Id: cups-ssl.m4 7241 2008-01-22 22:34:52Z mike $"
 dnl
 dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -13,7 +13,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(ssl, [  --enable-ssl            turn on SSL/TLS support, default=yes])
+AC_ARG_ENABLE(ssl, [  --disable-ssl           disable SSL/TLS support])
 AC_ARG_ENABLE(cdsassl, [  --enable-cdsassl        use CDSA for SSL/TLS support, default=first])
 AC_ARG_ENABLE(gnutls, [  --enable-gnutls         use GNU TLS for SSL/TLS support, default=second])
 AC_ARG_ENABLE(openssl, [  --enable-openssl        use OpenSSL for SSL/TLS support, default=third])
@@ -26,7 +26,6 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
 
 SSLFLAGS=""
 SSLLIBS=""
-ENCRYPTION_REQUIRED=""
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
@@ -34,10 +33,6 @@ if test x$enable_ssl != xno; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h, [
 		SSLLIBS="-framework CoreFoundation -framework Security"
-		# MacOS X doesn't (yet) come with pre-installed encryption
-		# certificates for CUPS, so don't enable encryption on
-		# /admin just yet...
-		#ENCRYPTION_REQUIRED="  Encryption Required"
 		AC_DEFINE(HAVE_SSL)
 		AC_DEFINE(HAVE_CDSASSL)
 
@@ -68,7 +63,6 @@ if test x$enable_ssl != xno; then
 	if test "x$LIBGNUTLSCONFIG" != x; then
 	    SSLLIBS=`$LIBGNUTLSCONFIG --libs`
 	    SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
-	    ENCRYPTION_REQUIRED="  Encryption Required"
 	    AC_DEFINE(HAVE_SSL)
 	    AC_DEFINE(HAVE_GNUTLS)
 	fi
@@ -95,7 +89,6 @@ if test x$enable_ssl != xno; then
 		AC_CHECK_LIB(ssl,SSL_new,
 		    [SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
 		     SSLLIBS="-lssl $libcrypto"
-		     ENCRYPTION_REQUIRED="  Encryption Required"
 		     AC_DEFINE(HAVE_SSL)
 		     AC_DEFINE(HAVE_LIBSSL)],,
 		    $libcrypto)
@@ -116,7 +109,6 @@ fi
 
 AC_SUBST(SSLFLAGS)
 AC_SUBST(SSLLIBS)
-AC_SUBST(ENCRYPTION_REQUIRED)
 
 EXPORT_SSLLIBS="$SSLLIBS"
 AC_SUBST(EXPORT_SSLLIBS)

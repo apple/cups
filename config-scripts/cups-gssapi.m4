@@ -3,7 +3,7 @@ dnl   "$Id$"
 dnl
 dnl   GSSAPI/Kerberos library detection.
 dnl
-dnl   Copyright 2007 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products.
 dnl
 dnl   This file contains Kerberos support code, copyright 2006 by
@@ -16,7 +16,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(gssapi, [  --enable-gssapi         turn on GSSAPI support, default=yes])
+AC_ARG_ENABLE(gssapi, [  --disable-gssapi        disable GSSAPI support])
 
 LIBGSSAPI=""
 

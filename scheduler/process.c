@@ -3,7 +3,7 @@
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -216,6 +216,8 @@ cupsdStartProcess(
     void       *profile,		/* I - Security profile to use */
     int        *pid)			/* O - Process ID */
 {
+  int		user;			/* Command UID */
+  struct stat	commandinfo;		/* Command file information */
   cupsd_proc_t	*proc;			/* New process record */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* POSIX signal handler */
@@ -231,11 +233,38 @@ cupsdStartProcess(
                   "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
                   command, argv, envp, infd, outfd, errfd);
 
-  if (access(command, X_OK))
+  if (RunUser)
+    user = RunUser;
+  else if (root)
+    user = 0;
+  else
+    user = User;
+
+  if (stat(command, &commandinfo))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
     *pid = 0;
+    return (0);
+  }
+  else if (commandinfo.st_mode & S_IWOTH)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to execute %s: insecure file permissions (0%o)",
+		    command, commandinfo.st_mode);
+    *pid  = 0;
+    errno = EPERM;
+    return (0);
+  }
+  else if ((commandinfo.st_uid != user || !(commandinfo.st_mode & S_IXUSR)) &&
+           (commandinfo.st_gid != Group || !(commandinfo.st_mode & S_IXGRP)) &&
+           !(commandinfo.st_mode & S_IXOTH))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to execute %s: no execute permissions (0%o)",
+		    command, commandinfo.st_mode);
+    *pid  = 0;
+    errno = EPERM;
     return (0);
   }
 

@@ -10698,7 +10698,7 @@ set_printer_attrs(cupsd_client_t  *con,	/* I - Client connection */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer/class */
   ipp_attribute_t	*attr;		/* Printer attribute */
-  int			changed;	/* Was anything changed? */
+  int			changed = 0;	/* Was anything changed? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "set_printer_attrs(%p[%d], %s)", con,

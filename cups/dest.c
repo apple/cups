@@ -130,7 +130,7 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
 {
   int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Destination pointer */
-  cups_dest_t	*parent;		/* Parent destination */
+  cups_dest_t	*parent = NULL;		/* Parent destination */
   cups_option_t	*doption,		/* Current destination option */
 		*poption;		/* Current parent option */
 

@@ -123,7 +123,7 @@ cupsdGetDateTime(struct timeval *t,	/* I - Time value or NULL for current */
     else
       snprintf(s, sizeof(s), "[%02d/%s/%04d:%02d:%02d:%02d.%06d %+03ld%02ld]",
 	       date->tm_mday, months[date->tm_mon], 1900 + date->tm_year,
-	       date->tm_hour, date->tm_min, date->tm_sec, t->tv_usec,
+	       date->tm_hour, date->tm_min, date->tm_sec, (int)t->tv_usec,
 #ifdef HAVE_TM_GMTOFF
 	       date->tm_gmtoff / 3600, (date->tm_gmtoff / 60) % 60);
 #else

@@ -3,7 +3,7 @@ dnl "$Id: cups-pam.m4 7960 2008-09-17 19:42:02Z mike $"
 dnl
 dnl   PAM stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -13,8 +13,8 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(pam, [  --enable-pam            turn on PAM support, default=yes])
-AC_ARG_WITH(pam_module, [  --with-pam-module       specify the PAM module to use, default=auto])
+AC_ARG_ENABLE(pam, [  --disable-pam           disable PAM support])
+AC_ARG_WITH(pam_module, [  --with-pam-module       specify the PAM module to use])
 
 dnl Don't use PAM with AIX...
 if test $uname = AIX; then

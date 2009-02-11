@@ -13,37 +13,54 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_ENABLE(pdftops, [  --enable-pdftops        build pdftops filter, default=auto ])
+AC_ARG_WITH(pdftops, [  --with-pdftops          set pdftops filter (gs,pdftops,none), default=pdftops ])
 
 PDFTOPS=""
+CUPS_PDFTOPS=""
+CUPS_GHOSTSCRIPT=""
 
-if test "x$enable_pdftops" != xno; then
-	AC_PATH_PROG(CUPS_PDFTOPS, pdftops)
-	if test "x$CUPS_PDFTOPS" != x; then
-		AC_DEFINE(HAVE_PDFTOPS)
+case "x$with_pdftops" in
+	x) # Default/auto
+	if test $uname != Darwin; then
+		AC_PATH_PROG(CUPS_PDFTOPS, pdftops)
+		if test "x$CUPS_PDFTOPS" != x; then
+			AC_DEFINE(HAVE_PDFTOPS)
+			PDFTOPS="pdftops"
+		else
+			AC_PATH_PROG(CUPS_GHOSTSCRIPT, gs)
+			if test "x$CUPS_GHOSTSCRIPT" != x; then
+				AC_DEFINE(HAVE_GHOSTSCRIPT)
+				PDFTOPS="pdftops"
+			fi
+		fi
 	fi
-	AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
+	;;
 
+	xgs)
 	AC_PATH_PROG(CUPS_GHOSTSCRIPT, gs)
 	if test "x$CUPS_GHOSTSCRIPT" != x; then
 		AC_DEFINE(HAVE_GHOSTSCRIPT)
-	fi
-	AC_DEFINE_UNQUOTED(CUPS_GHOSTSCRIPT, "$CUPS_GHOSTSCRIPT")
-
-	if test "x$CUPS_PDFTOPS" != x -o "x$CUPS_GHOSTSCRIPT" != x; then
-		AC_MSG_CHECKING(whether to build pdftops filter)
-		if test x$enable_pdftops = xyes -o $uname != Darwin; then
-			PDFTOPS="pdftops"
-			AC_MSG_RESULT(yes)
-		else
-			AC_MSG_RESULT(no)
-		fi
-	elif test x$enable_pdftops = xyes; then
-		AC_MSG_ERROR(Unable to find pdftops or gs programs!)
+		PDFTOPS="pdftops"
+	else
+		AC_MSG_ERROR(Unable to find gs program!)
 		exit 1
 	fi
-fi
+	;;
 
+	xpdftops)
+	AC_PATH_PROG(CUPS_PDFTOPS, pdftops)
+	if test "x$CUPS_PDFTOPS" != x; then
+		AC_DEFINE(HAVE_PDFTOPS)
+		PDFTOPS="pdftops"
+	else
+		AC_MSG_ERROR(Unable to find pdftops program!)
+		exit 1
+	fi
+	;;
+esac
+
+AC_DEFINE_UNQUOTED(CUPS_PDFTOPS, "$CUPS_PDFTOPS")
+AC_DEFINE_UNQUOTED(CUPS_GHOSTSCRIPT, "$CUPS_GHOSTSCRIPT")
 AC_SUBST(PDFTOPS)
 
 dnl
