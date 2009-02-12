@@ -3509,6 +3509,18 @@ process_implicit_classes(void)
       else
 	len = strlen(p->name);
 
+      if (len >= sizeof(name))
+      {
+       /*
+	* If the printer name length somehow is greater than we normally allow,
+	* skip this printer...
+	*/
+
+	len = 0;
+	cupsArrayRestore(Printers);
+	continue;
+      }
+
       strncpy(name, p->name, len);
       name[len] = '\0';
       offset    = 0;
