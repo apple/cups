@@ -5265,8 +5265,13 @@ update_polling(void)
 
   while ((ptr = cupsdStatBufUpdate(PollStatusBuffer, &loglevel,
                                    message, sizeof(message))) != NULL)
+  {
+    if (loglevel == CUPSD_LOG_INFO)
+      cupsdLogMessage(CUPSD_LOG_INFO, "%s", message);
+
     if (!strchr(PollStatusBuffer->buffer, '\n'))
       break;
+  }
 
   if (ptr == NULL && !PollStatusBuffer->bufused)
   {

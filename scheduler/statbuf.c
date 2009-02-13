@@ -4,7 +4,7 @@
  *   Status buffer routines for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -118,13 +118,11 @@ cupsdStatBufNew(int fd,			/* I - File descriptor of pipe */
  */
 
 char *					/* O - Line from buffer, "", or NULL */
-cupsdStatBufUpdate(cupsd_statbuf_t *sb,	/* I - Status buffer */
-                   int             *loglevel,
-					/* O - Log level */ 
-                   char            *line,
-					/* I - Line buffer */
-                   int             linelen)
-					/* I - Size of line buffer */
+cupsdStatBufUpdate(
+    cupsd_statbuf_t *sb,		/* I - Status buffer */
+    int             *loglevel,		/* O - Log level */ 
+    char            *line,		/* I - Line buffer */
+    int             linelen)		/* I - Size of line buffer */
 {
   int		bytes;			/* Number of bytes read */
   char		*lineptr,		/* Pointer to end of line in buffer */

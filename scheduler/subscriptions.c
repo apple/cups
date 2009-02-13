@@ -1664,8 +1664,13 @@ cupsd_update_notifier(void)
 
   while (cupsdStatBufUpdate(NotifierStatusBuffer, &loglevel,
                             message, sizeof(message)))
+  {
+    if (loglevel == CUPSD_LOG_INFO)
+      cupsdLogMessage(CUPSD_LOG_INFO, "%s", message);
+
     if (!strchr(NotifierStatusBuffer->buffer, '\n'))
       break;
+  }
 }
 
 
