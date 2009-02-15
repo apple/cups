@@ -161,7 +161,8 @@ cupsdCancelJob(cupsd_job_t  *job,	/* I - Job to cancel */
   * Stop any processes that are working on the current job...
   */
 
-  printer = job->printer;
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
 
   if (job->state_value == IPP_JOB_PROCESSING)
     cupsdStopJob(job, 0);
@@ -622,7 +623,8 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
     job->status_buffer = NULL;
   }
 
-  printer = job->printer;
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
 
   update_job_attrs(job, 0);
 
@@ -741,7 +743,7 @@ cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
 
 	      set_hold_until(job, time(NULL) + JobRetryInterval);
 
-	      cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job,
+	      cupsdAddEvent(CUPSD_EVENT_JOB_STATE, printer, job,
 			    "Job held due to fax errors; please consult "
 			    "the error_log file for details.");
 	      cupsdSetPrinterState(printer, IPP_PRINTER_IDLE, 0);
@@ -3664,7 +3666,30 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		*ptr;			/* Pointer update... */
   int		loglevel,		/* Log level for message */
 		event = 0;		/* Events? */
+  cupsd_printer_t *printer;		/* Printer for job */
+  static const char * const levels[] =	/* Log levels */
+		{
+		  "NONE",
+		  "EMERG",
+		  "ALERT",
+		  "CRIT",
+		  "ERROR",
+		  "WARN",
+		  "NOTICE",
+		  "INFO",
+		  "DEBUG",
+		  "DEBUG2"
+		};
 
+
+ /*
+  * Get the printer associated with this job; if the printer is stopped for
+  * any reason then job->printer will be reset to NULL, so make sure we have
+  * a valid pointer...
+  */
+
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
 
   while ((ptr = cupsdStatBufUpdate(job->status_buffer, &loglevel,
                                    message, sizeof(message))) != NULL)
@@ -3698,9 +3723,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
         job->sheets->values[0].integer += copies;
 
-	if (job->printer->page_limit)
+	if (printer->page_limit)
 	{
-	  cupsd_quota_t *q = cupsdUpdateQuota(job->printer, job->username,
+	  cupsd_quota_t *q = cupsdUpdateQuota(printer, job->username,
 					      copies, 0);
 
 #ifdef __APPLE__
@@ -3713,8 +3738,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	    cupsdLogJob(job, CUPSD_LOG_INFO,
 			"Canceled because pages exceed user %s "
 			"quota limit on printer %s (%s).",
-			job->username, job->printer->name,
-			job->printer->info);
+			job->username, printer->name,
+			printer->info);
 
 	    cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
 	    return;
@@ -3728,7 +3753,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cupsdLogPage(job, message);
 
       if (job->sheets)
-	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+	cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, printer, job,
 		      "Printed %d page(s).", job->sheets->values[0].integer);
     }
     else if (loglevel == CUPSD_LOG_STATE)
@@ -3737,13 +3762,13 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if (!strcmp(message, "paused"))
       {
-        cupsdStopPrinter(job->printer, 1);
+        cupsdStopPrinter(printer, 1);
 	return;
       }
       else
       {
-	cupsdSetPrinterReasons(job->printer, message);
-	cupsdAddPrinterHistory(job->printer);
+	cupsdSetPrinterReasons(printer, message);
+	cupsdAddPrinterHistory(printer);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
@@ -3767,10 +3792,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       if ((attr = cupsGetOption("auth-info-required", num_attrs,
                                 attrs)) != NULL)
       {
-        cupsdSetAuthInfoRequired(job->printer, attr, NULL);
-	cupsdSetPrinterAttrs(job->printer);
+        cupsdSetAuthInfoRequired(printer, attr, NULL);
+	cupsdSetPrinterAttrs(printer);
 
-	if (job->printer->type & CUPS_PRINTER_DISCOVERED)
+	if (printer->type & CUPS_PRINTER_DISCOVERED)
 	  cupsdMarkDirty(CUPSD_DIRTY_REMOTE);
 	else
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
@@ -3787,7 +3812,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	  job->progress = progress;
 
 	  if (job->sheets)
-	    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+	    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, printer, job,
 			  "Printing page %d, %d%%",
 			  job->sheets->values[0].integer, job->progress);
         }
@@ -3795,69 +3820,69 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if ((attr = cupsGetOption("printer-alert", num_attrs, attrs)) != NULL)
       {
-        cupsdSetString(&job->printer->alert, attr);
+        cupsdSetString(&printer->alert, attr);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("printer-alert-description", num_attrs,
                                 attrs)) != NULL)
       {
-        cupsdSetString(&job->printer->alert_description, attr);
+        cupsdSetString(&printer->alert_description, attr);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
 
       if ((attr = cupsGetOption("marker-colors", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-colors", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-colors", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-levels", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-levels", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-levels", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-low-levels", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-low-levels", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-low-levels", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-high-levels", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-high-levels", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-high-levels", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-message", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-message", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-message", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-names", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-names", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-names", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
 
       if ((attr = cupsGetOption("marker-types", num_attrs, attrs)) != NULL)
       {
-        cupsdSetPrinterAttr(job->printer, "marker-types", (char *)attr);
-	job->printer->marker_time = time(NULL);
+        cupsdSetPrinterAttr(printer, "marker-types", (char *)attr);
+	printer->marker_time = time(NULL);
 	event |= CUPSD_EVENT_PRINTER_STATE;
         cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
       }
@@ -3878,8 +3903,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       num_keywords = cupsParseOptions(message, 0, &keywords);
 
-      if (cupsdUpdatePrinterPPD(job->printer, num_keywords, keywords))
-        cupsdSetPrinterAttrs(job->printer);
+      if (cupsdUpdatePrinterPPD(printer, num_keywords, keywords))
+        cupsdSetPrinterAttrs(printer);
 
       cupsFreeOptions(num_keywords, keywords);
     }
@@ -3892,24 +3917,22 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if (*ptr)
       {
-	cupsdSetPrinterReasons(job->printer,
-			       "+com.apple.print.recoverable-warning");
-	cupsdSetString(&job->printer->recoverable, ptr);
-	cupsdAddPrinterHistory(job->printer);
+	cupsdSetPrinterReasons(printer, "+com.apple.print.recoverable-warning");
+	cupsdSetString(&(printer->recoverable), ptr);
+	cupsdAddPrinterHistory(printer);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
     }
     else if (!strncmp(message, "recovered:", 10))
     {
-      cupsdSetPrinterReasons(job->printer,
-                             "-com.apple.print.recoverable-warning");
+      cupsdSetPrinterReasons(printer, "-com.apple.print.recoverable-warning");
 
       ptr = message + 10;
       while (isspace(*ptr & 255))
         ptr ++;
 
-      cupsdSetString(&job->printer->recoverable, ptr);
-      cupsdAddPrinterHistory(job->printer);
+      cupsdSetString(&(printer->recoverable), ptr);
+      cupsdAddPrinterHistory(printer);
       event |= CUPSD_EVENT_PRINTER_STATE;
     }
 #endif /* __APPLE__ */
@@ -3919,9 +3942,9 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {
-	strlcpy(job->printer->state_message, message,
-		sizeof(job->printer->state_message));
-	cupsdAddPrinterHistory(job->printer);
+	strlcpy(printer->state_message, message,
+		sizeof(printer->state_message));
+	cupsdAddPrinterHistory(printer);
 
 	event |= CUPSD_EVENT_PRINTER_STATE;
 
@@ -3935,6 +3958,12 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	    job->status_level = loglevel;
 
 	  update_job_attrs(job, 1);
+
+	  cupsdLogJob(job, CUPSD_LOG_DEBUG,
+	              "Set job-printer-state-message to \"%s\", "
+	              "current level=%s",
+	              job->printer_message->values[0].string.text,
+	              levels[job->status_level]);
 	}
       }
     }
@@ -3944,11 +3973,11 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
   }
 
   if (event & CUPSD_EVENT_PRINTER_STATE)
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		  (job->printer->type & CUPS_PRINTER_CLASS) ?
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+		  (printer->type & CUPS_PRINTER_CLASS) ?
 		      "Class \"%s\" state changed." :
 		      "Printer \"%s\" state changed.",
-		  job->printer->name);
+		  printer->name);
 
   if (ptr == NULL && !job->status_buffer->bufused)
   {
@@ -3983,11 +4012,10 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
                  int         do_message)/* I - 1 = update job-printer-state message */
 {
   int			i;		/* Looping var */
+  cupsd_printer_t	*printer;	/* Printer for job */
   int			num_reasons;	/* Actual number of reasons */
   const char * const	*reasons;	/* Reasons */
-  static const char	*none = "none",	/* "none" */
-			*paused = "paused";
-					/* "paused" */
+  static const char	*none = "none";	/* "none" reason */
 
 
  /*
@@ -4009,35 +4037,34 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
 					    "job-printer-state-reasons",
 					    IPP_TAG_KEYWORD);
 
- /*
-  * If the job isn't printing, return now...
-  */
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
 
-  if (!job->printer)
+  if (!printer)
     return;
 
  /*
   * Otherwise copy the printer-state-message value...
   */
 
-  if (job->printer->state_message[0] &&
+  if (printer->state_message[0] &&
       (do_message || !job->printer_message->values[0].string.text[0]))
     cupsdSetString(&(job->printer_message->values[0].string.text),
-		   job->printer->state_message);
+		   printer->state_message);
 
  /*
   * ... and the printer-state-reasons value...
   */
 
-  if (job->printer->num_reasons == 0)
+  if (printer->num_reasons == 0)
   {
     num_reasons = 1;
-    reasons     = job->printer->state == IPP_PRINTER_STOPPED ? &paused : &none;
+    reasons     = &none;
   }
   else
   {
-    num_reasons = job->printer->num_reasons;
-    reasons     = (const char * const *)job->printer->reasons;
+    num_reasons = printer->num_reasons;
+    reasons     = (const char * const *)printer->reasons;
   }
 
   if (!job->printer_reasons || job->printer_reasons->num_values != num_reasons)
