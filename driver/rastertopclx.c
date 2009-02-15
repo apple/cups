@@ -30,8 +30,11 @@
  */
 
 #include "driver.h"
+#include <cups/i18n.h>
+#include <cups/string.h>
 #include "pcl-common.h"
 #include <signal.h>
+#include <errno.h>
 
 
 /*
@@ -1794,7 +1797,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: rastertopclx job-id user title copies options [file]\n", stderr);
+    _cupsLangPrintf(stderr,
+                    _("ERROR: %s job-id user title copies options [file]\n"),
+                    "rastertopclx");
     return (1);
   }
 
@@ -1808,7 +1813,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!ppd)
   {
-    fputs("ERROR: Unable to open PPD file!\n", stderr);
+    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file!\n"));
     return (1);
   }
 
@@ -1823,7 +1828,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
-      perror("ERROR: Unable to open raster file - ");
+      _cupsLangPrintf(stderr, _("ERROR: Unable to open raster file - %s\n"),
+                      strerror(errno));
       return (1);
     }
   }
@@ -1871,7 +1877,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     Page ++;
 
     fprintf(stderr, "PAGE: %d %d\n", Page, header.NumCopies);
-    fprintf(stderr, "INFO: Starting page %d...\n", Page);
+    _cupsLangPrintf(stderr, _("INFO: Starting page %d...\n"), Page);
 
     StartPage(ppd, &header, atoi(argv[1]), argv[2], argv[3],
               num_options, options);
@@ -1886,8 +1892,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	break;
 
       if ((y & 127) == 0)
-        fprintf(stderr, "INFO: Printing page %d, %d%% complete...\n", Page,
-	        100 * y / header.cupsHeight);
+        _cupsLangPrintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"),
+                        Page, 100 * y / header.cupsHeight);
 
      /*
       * Read and write a line of graphics or whitespace...
@@ -1903,7 +1909,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Eject the page...
     */
 
-    fprintf(stderr, "INFO: Finished page %d...\n", Page);
+    _cupsLangPrintf(stderr, _("INFO: Finished page %d...\n"), Page);
 
     EndPage(ppd, &header);
 
@@ -1922,12 +1928,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    fputs("ERROR: No pages found!\n", stderr);
+    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
     return (1);
   }
   else
   {
-    fputs("INFO: Ready to print.\n", stderr);
+    _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
     return (0);
   }
 }
