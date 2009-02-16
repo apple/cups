@@ -299,6 +299,20 @@ cupsdProcessIPPRequest(
 		    con->request->request.any.version[0],
 	            con->request->request.any.version[1]);
   }
+  else if (con->request->request.any.request_id < 1)
+  {
+   /*
+    * Return an error, since request IDs must be between 1 and 2^31-1
+    */
+
+    cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
+                  "%04X %s Bad request ID %d",
+		  IPP_BAD_REQUEST, con->http.hostname,
+                  con->request->request.any.request_id);
+
+    send_ipp_status(con, IPP_BAD_REQUEST, _("Bad request ID %d!"),
+		    con->request->request.any.request_id);
+  }
   else if (!con->request->attrs)
   {
     cupsdAddEvent(CUPSD_EVENT_SERVER_AUDIT, NULL, NULL,
