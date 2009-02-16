@@ -166,6 +166,7 @@ static void	dnssdRegisterCallback(DNSServiceRef sdRef,
 				      const char *name, const char *regtype,
 				      const char *domain, void *context);
 static void	dnssdRegisterPrinter(cupsd_printer_t *p);
+static void	dnssdStop(void);
 static void	dnssdUpdate(void);
 #endif /* HAVE_DNSSD */
 
@@ -1816,29 +1817,7 @@ cupsdStopBrowsing(void)
 
 #ifdef HAVE_DNSSD
   if ((BrowseLocalProtocols & BROWSE_DNSSD) && DNSSDRef)
-  {
-    if (WebIFRef)
-    {
-      DNSServiceRefDeallocate(WebIFRef);
-      WebIFRef = NULL;
-    }
-
-    if (RemoteRef)
-    {
-      DNSServiceRefDeallocate(RemoteRef);
-      RemoteRef = NULL;
-    }
-
-    cupsdRemoveSelect(DNSServiceRefSockFD(DNSSDRef));
-
-    DNSServiceRefDeallocate(DNSSDRef);
-    DNSSDRef = NULL;
-
-    cupsArrayDelete(DNSSDPrinters);
-    DNSSDPrinters = NULL;
-
-    DNSSDPort = 0;
-  }
+    dnssdStop();
 #endif /* HAVE_DNSSD */
 
 #ifdef HAVE_LIBSLP
@@ -2812,6 +2791,53 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
 
 /*
+ * 'dnssdStop()' - Stop all DNS-SD registrations.
+ */
+
+static void
+dnssdStop(void)
+{
+  cupsd_printer_t	*p;		/* Current printer */
+
+
+ /*
+  * De-register the individual printers
+  */
+
+  for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       p;
+       p = (cupsd_printer_t *)cupsArrayNext(Printers))
+    dnssdDeregisterPrinter(p);
+
+ /*
+  * Shutdown the rest of the service refs...
+  */
+
+  if (WebIFRef)
+  {
+    DNSServiceRefDeallocate(WebIFRef);
+    WebIFRef = NULL;
+  }
+
+  if (RemoteRef)
+  {
+    DNSServiceRefDeallocate(RemoteRef);
+    RemoteRef = NULL;
+  }
+
+  cupsdRemoveSelect(DNSServiceRefSockFD(DNSSDRef));
+
+  DNSServiceRefDeallocate(DNSSDRef);
+  DNSSDRef = NULL;
+
+  cupsArrayDelete(DNSSDPrinters);
+  DNSSDPrinters = NULL;
+
+  DNSSDPort = 0;
+}
+
+
+/*
  * 'dnssdUpdate()' - Handle DNS-SD queries.
  */
 
@@ -2822,9 +2848,12 @@ dnssdUpdate(void)
 
 
   if ((sdErr = DNSServiceProcessResult(DNSSDRef)) != kDNSServiceErr_NoError)
+  {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "DNS Service Discovery registration error %d!",
 	            sdErr);
+    dnssdStop();
+  }
 }
 #endif /* HAVE_DNSSD */
 
