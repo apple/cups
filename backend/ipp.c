@@ -1811,8 +1811,7 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
 
   if ((fd = cupsTempFd(pstmpname, sizeof(pstmpname))) < 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to create temporary file - %s.\n"),
-		    strerror(errno));
+    _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
     if (ppdfile)
       unlink(ppdfile);
     return (-1);

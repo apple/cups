@@ -19,7 +19,7 @@
 # The following prefixes MUST NOT be translated: "ALERT:", "CRIT:", "INFO:",
 # "NOTICE:", and "WARNING:".
 #
-# The "checkpo" program located in the "lcoale" source directory can be used
+# The "checkpo" program located in the "locale" source directory can be used
 # to verify that your translations do not introduce formatting errors or other
 # problems.  Run with:
 #

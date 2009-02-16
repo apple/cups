@@ -3,7 +3,7 @@
 #
 #   Message catalog template for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 2005-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -19,7 +19,7 @@
 # The following prefixes MUST NOT be translated: "ALERT:", "CRIT:", "INFO:",
 # "NOTICE:", and "WARNING:".
 #
-# The "checkpo" program located in the "lcoale" source directory can be used
+# The "checkpo" program located in the "locale" source directory can be used
 # to verify that your translations do not introduce formatting errors or other
 # problems.  Run with:
 #

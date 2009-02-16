@@ -148,6 +148,11 @@ checkpo:	checkpo.o ../cups/$(LIBCUPS)
 	echo Linking $<...
 	$(CC) $(LDFLAGS) -o checkpo checkpo.o $(LIBS)
 
+checkall:	checkpo
+	for file in *.po; do \
+		./checkpo $$file; \
+	done
+
 
 #
 # po2strings - A simple utility which uses iconv to convert GNU gettext
