@@ -47,6 +47,7 @@
  *   dnssdRegisterCallback()    - DNSServiceRegister callback.
  *   dnssdRegisterPrinter()     - Start sending broadcast information for a
  *                                printer or update the broadcast contents.
+ *   dnssdStop()                - Stop all DNS-SD registrations.
  *   dnssdUpdate()              - Handle DNS-SD queries.
  *   get_hostconfig()           - Get an /etc/hostconfig service setting.
  *   is_local_queue()           - Determine whether the URI points at a local
