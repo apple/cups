@@ -1029,7 +1029,14 @@ list_ppds(int        request_id,	/* I - Request ID */
                                           (void *)"ppd-type") != NULL;
   }
 
-  puts("Content-Type: application/ipp\n");
+ /*
+  * Send the content type header to the scheduler; request_id can only be
+  * 0 when run manually since the scheduler enforces the IPP requirement for
+  * a request ID from 1 to 2^31-1...
+  */
+
+  if (request_id > 0)
+    puts("Content-Type: application/ipp\n");
 
   sent_header = 0;
 
