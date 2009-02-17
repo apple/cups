@@ -1,9 +1,13 @@
-CHANGES.txt - 2009-02-10
+CHANGES.txt - 2009-02-17
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Added complete localizations for Japanese and Russian and partial
+	  localizations for Chinese, Danish, German, Finnish, French, Italian,
+	  Korean, Norwegian, Polish, Portuguese, and Swedish (STR #3096,
+	  STR #3098)
 	- Clicking on "Select Another Make/Manufacturer" in the web interface
 	  incorrectly added the printer (STR #3095)
 	- The scheduler no longer uses programs with insecure file
@@ -26,7 +30,7 @@ CHANGES IN CUPS V1.4b3
 	- The scheduler no longer logs child processes killed via SIGKILL as
 	  "crashed".
 	- The printer link shown on the "job moved" template was bad (STR #3085)
-	- Updated the HTML templates to use the HTML 4.01 DOCTYPE (STR #3086)
+	- Updated the HTML templates to use the final HTML 4 DOCTYPE (STR #3086)
 	- The scheduler did not track the "paused" reason properly if a
 	  printer had other reasons associated with it.
 	- cupsSendRequest() did not clear old local certificate auth data.
