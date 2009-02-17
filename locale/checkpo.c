@@ -4,6 +4,15 @@
  * Verify that translations in the .po file have the same number and type of
  * printf-style format strings.
  *
+ * Copyright 2007-2009 by Apple Inc.
+ * Copyright 1997-2007 by Easy Software Products, all rights reserved.
+ *
+ * These coded instructions, statements, and computer programs are the
+ * property of Apple Inc. and are protected by Federal copyright
+ * law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ * which should have been included with this file.  If this file is
+ * file is missing or damaged, see the license at "http://www.cups.org/".
+ *
  * Usage:
  *
  *   checkpo filename.po [... filenameN.po]
@@ -158,6 +167,7 @@ main(int  argc,				/* I - Number of command-line args */
 	       idfmt = (char *)cupsArrayNext(idfmts))
 	    printf(" %s", idfmt);
           putchar('\n');
+          putchar('\n');
 	}
 
 	free_formats(idfmts);
@@ -180,7 +190,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  puts("FAIL");
 	}
 
-	printf("    Bad prefix on filter message \"%s\"\n      for \"%s\"\n",
+	printf("    Bad prefix on filter message \"%s\"\n      for \"%s\"\n\n",
 	       abbreviate(msg->str, strbuf, sizeof(strbuf)),
 	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
       }
@@ -196,14 +206,14 @@ main(int  argc,				/* I - Number of command-line args */
 
         pass = 0;
         puts("FAIL");
-	printf("    Too many untranslated messages (%d of %d)\n", untranslated,
-	       cupsArrayCount(po));
+	printf("    Too many untranslated messages (%d of %d)\n\n",
+	       untranslated, cupsArrayCount(po));
       }
       else if (untranslated > 0)
-        printf("PASS (%d of %d untranslated)\n", untranslated,
+        printf("PASS (%d of %d untranslated)\n\n", untranslated,
 	       cupsArrayCount(po));
       else
-        puts("PASS");
+        puts("PASS\n");
     }
 
     if (!pass)

@@ -280,6 +280,9 @@ fi
 
 if test `uname` = Darwin; then
 	ln -s /usr/libexec/cups/filter/cgpdfto* /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/cgbannertopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/cgimagetopdf /tmp/cups-$user/bin/filter
+	ln -s /usr/libexec/cups/filter/cgtexttopdf /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/nsimagetopdf /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/nstexttopdf /tmp/cups-$user/bin/filter
 	ln -s /usr/libexec/cups/filter/pictwpstops /tmp/cups-$user/bin/filter

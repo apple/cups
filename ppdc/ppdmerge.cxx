@@ -96,7 +96,7 @@ main(int  argc,				// I - Number of command-line arguments
       // Open and load the PPD file...
       if ((infile = cupsFileOpen(argv[i], "r")) == NULL)
       {
-        _cupsLangPrintf(stderr, _("%s: Unable to open %s - %s\n"), "ppdmerge",
+        _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s\n"), "ppdmerge",
 	                argv[i], strerror(errno));
 	return (1);
       }
@@ -110,8 +110,8 @@ main(int  argc,				// I - Number of command-line arguments
 	
         status = ppdLastError(&linenum);
 	
-	_cupsLangPrintf(stderr, _("%s: Unable to open %s - %s on line %d.\n"),
-	                "ppdmerge", argv[i], ppdErrorString(status), linenum);
+	_cupsLangPrintf(stderr, _("%s: Unable to open PPD file: %s on line %d.\n"),
+	                "ppdmerge", ppdErrorString(status), linenum);
 	
         _cupsLangPrintf(stderr, "%d: ", linenum);
         cupsFileRewind(infile);

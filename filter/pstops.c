@@ -251,8 +251,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+                    argv[0]);
     return (1);
   }
 
@@ -287,8 +288,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
-      fprintf(stderr, _("ERROR: Unable to open file \"%s\" - %s\n"),
-              argv[6], strerror(errno));
+      _cupsLangPrintf(stderr, _("ERROR: Unable to open file \"%s\" - %s\n"),
+                      argv[6], strerror(errno));
       return (1);
     }
   }
@@ -299,7 +300,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
   {
-    fputs(_("ERROR: Empty print file!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
     return (1);
   }
 
@@ -433,15 +434,17 @@ add_page(pstops_doc_t *doc,		/* I - Document information */
 
   if (!doc->pages)
   {
-    fprintf(stderr, _("EMERG: Unable to allocate memory for pages array: %s\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr,
+                    _("EMERG: Unable to allocate memory for pages array: %s\n"),
+                    strerror(errno));
     exit(1);
   }
 
   if ((pageinfo = calloc(1, sizeof(pstops_page_t))) == NULL)
   {
-    fprintf(stderr, _("EMERG: Unable to allocate memory for page info: %s\n"),
-            strerror(errno));
+    _cupsLangPrintf(stderr,
+                    _("EMERG: Unable to allocate memory for page info: %s\n"),
+                    strerror(errno));
     exit(1);
   }
 
@@ -553,13 +556,13 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 
   if (cupsFileSeek(fp, offset) < 0)
   {
-    fprintf(stderr,
+    _cupsLangPrintf(stderr,
 #ifdef HAVE_LONG_LONG
-            _("ERROR: Unable to seek to offset %lld in file - %s\n"),
+		    _("ERROR: Unable to seek to offset %lld in file - %s\n"),
 #else
-            _("ERROR: Unable to seek to offset %ld in file - %s\n"),
+		    _("ERROR: Unable to seek to offset %ld in file - %s\n"),
 #endif /* HAVE_LONG_LONG */
-            CUPS_LLCAST offset, strerror(errno));
+		    CUPS_LLCAST offset, strerror(errno));
     return;
   }
 
@@ -642,7 +645,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 
 
       if (saw_pages)
-        fputs(_("ERROR: Duplicate %%Pages: comment seen!\n"), stderr);
+        _cupsLangPuts(stderr, _("ERROR: Duplicate %%Pages: comment seen!\n"));
 
       saw_pages = 1;
 
@@ -689,7 +692,8 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     else if (!strncmp(line, "%%BoundingBox:", 14))
     {
       if (saw_bounding_box)
-        fputs(_("ERROR: Duplicate %%BoundingBox: comment seen!\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("ERROR: Duplicate %%BoundingBox: comment seen!\n"));
       else if (strstr(line + 14, "(atend)"))
       {
        /*
@@ -700,7 +704,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 	              doc->bounding_box + 1, doc->bounding_box + 2,
 		      doc->bounding_box + 3) != 4)
       {
-	fputs(_("ERROR: Bad %%BoundingBox: comment seen!\n"), stderr);
+	_cupsLangPuts(stderr, _("ERROR: Bad %%BoundingBox: comment seen!\n"));
 
 	doc->bounding_box[0] = (int)PageLeft;
 	doc->bounding_box[1] = (int)PageBottom;
@@ -752,10 +756,10 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
   }
 
   if (!saw_bounding_box)
-    fputs(_("ERROR: No %%BoundingBox: comment in header!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: No %%BoundingBox: comment in header!\n"));
 
   if (!saw_pages)
-    fputs(_("ERROR: No %%Pages: comment in header!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: No %%Pages: comment in header!\n"));
 
   if (!saw_for)
     WriteTextComment("For", doc->user);
@@ -1088,8 +1092,10 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   * that may not print correctly...
   */
 
-  fputs(_("WARNING: This document does not conform to the Adobe Document "
-          "Structuring Conventions and may not print correctly!\n"), stderr);
+  _cupsLangPuts(stderr,
+                _("WARNING: This document does not conform to the Adobe "
+		  "Document Structuring Conventions and may not print "
+		  "correctly!\n"));
 
  /*
   * Then write a standard DSC comment section...
@@ -1277,13 +1283,13 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (!parse_text(line + 7, &ptr, label, sizeof(label)))
   {
-    fputs(_("ERROR: Bad %%Page: comment in file!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file!\n"));
     label[0] = '\0';
     number   = doc->page;
   }
   else if (strtol(ptr, &ptr, 10) == LONG_MAX || !isspace(*ptr & 255))
   {
-    fputs(_("ERROR: Bad %%Page: comment in file!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file!\n"));
     number = doc->page;
   }
 
@@ -1353,7 +1359,8 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
                  bounding_box + 1, bounding_box + 2,
 		 bounding_box + 3) != 4)
       {
-        fputs(_("ERROR: Bad %%PageBoundingBox: comment in file!\n"), stderr);
+        _cupsLangPuts(stderr,
+	              _("ERROR: Bad %%PageBoundingBox: comment in file!\n"));
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
       }
@@ -1761,7 +1768,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%EndProlog", 11))
       linelen = cupsFileGetLine(fp, line, linesize);
     else
-      fputs(_("ERROR: Missing %%EndProlog!\n"), stderr);
+      _cupsLangPuts(stderr, _("ERROR: Missing %%EndProlog!\n"));
   }
 
   doc_puts(doc, "%%EndProlog\n");
@@ -1832,7 +1839,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%EndSetup", 10))
       linelen = cupsFileGetLine(fp, line, linesize);
     else
-      fputs(_("ERROR: Missing %%EndSetup!\n"), stderr);
+      _cupsLangPuts(stderr, _("ERROR: Missing %%EndSetup!\n"));
   }
 
   if (num_options > 0)
@@ -2076,9 +2083,9 @@ doc_printf(pstops_doc_t *doc,		/* I - Document information */
 
   if (bytes > sizeof(buffer))
   {
-    fprintf(stderr,
-            _("ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"),
-            (int)bytes);
+    _cupsLangPrintf(stderr,
+		    _("ERROR: doc_printf overflow (%d bytes) detected, "
+		      "aborting!\n"), (int)bytes);
     exit(1);
   }
 
@@ -2207,7 +2214,7 @@ include_feature(
 
   if (sscanf(line + 17, "%254s%254s", name, value) != 2)
   {
-    fputs(_("ERROR: Bad %%IncludeFeature: comment!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Bad %%IncludeFeature: comment!\n"));
     return (num_options);
   }
 
@@ -2217,22 +2224,23 @@ include_feature(
 
   if ((option = ppdFindOption(ppd, name + 1)) == NULL)
   {
-    fprintf(stderr, _("WARNING: Unknown option \"%s\"!\n"), name + 1);
+    _cupsLangPrintf(stderr, _("WARNING: Unknown option \"%s\"!\n"), name + 1);
     return (num_options);
   }
 
   if (option->section == PPD_ORDER_EXIT ||
       option->section == PPD_ORDER_JCL)
   {
-    fprintf(stderr, _("WARNING: Option \"%s\" cannot be included via "
-                      "IncludeFeature!\n"), name + 1);
+    _cupsLangPrintf(stderr, _("WARNING: Option \"%s\" cannot be included via "
+                              "IncludeFeature!\n"), name + 1);
     return (num_options);
   }
 
   if (!ppdFindChoice(option, value))
   {
-    fprintf(stderr, _("WARNING: Unknown choice \"%s\" for option \"%s\"!\n"),
-            value, name + 1);
+    _cupsLangPrintf(stderr,
+                    _("WARNING: Unknown choice \"%s\" for option \"%s\"!\n"),
+                    value, name + 1);
     return (num_options);
   }
 
@@ -2404,8 +2412,8 @@ set_pstops_options(
 
     if (intval < 10 || intval > 1000)
     {
-      fprintf(stderr, _("ERROR: Unsupported brightness value %s, using "
-                        "brightness=100!\n"), val);
+      _cupsLangPrintf(stderr, _("ERROR: Unsupported brightness value %s, using "
+                                "brightness=100!\n"), val);
       doc->brightness = 1.0f;
     }
     else
@@ -2473,8 +2481,8 @@ set_pstops_options(
 
     if (intval < 1 || intval > 10000)
     {
-      fprintf(stderr, _("ERROR: Unsupported gamma value %s, using "
-                        "gamma=1000!\n"), val);
+      _cupsLangPrintf(stderr, _("ERROR: Unsupported gamma value %s, using "
+                                "gamma=1000!\n"), val);
       doc->gamma = 1.0f;
     }
     else
@@ -2526,9 +2534,9 @@ set_pstops_options(
           doc->number_up = intval;
 	  break;
       default :
-          fprintf(stderr,
-	          _("ERROR: Unsupported number-up value %d, using "
-		    "number-up=1!\n"), intval);
+          _cupsLangPrintf(stderr,
+			  _("ERROR: Unsupported number-up value %d, using "
+			    "number-up=1!\n"), intval);
           doc->number_up = 1;
 	  break;
     }
@@ -2560,8 +2568,8 @@ set_pstops_options(
       doc->number_up_layout = PSTOPS_LAYOUT_BTRL;
     else
     {
-      fprintf(stderr, _("ERROR: Unsupported number-up-layout value %s, using "
-                        "number-up-layout=lrtb!\n"), val);
+      _cupsLangPrintf(stderr, _("ERROR: Unsupported number-up-layout value %s, "
+                                "using number-up-layout=lrtb!\n"), val);
       doc->number_up_layout = PSTOPS_LAYOUT_LRTB;
     }
   }
@@ -2610,8 +2618,8 @@ set_pstops_options(
       doc->page_border = PSTOPS_BORDERDOUBLE2;
     else
     {
-      fprintf(stderr, _("ERROR: Unsupported page-border value %s, using "
-                        "page-border=none!\n"), val);
+      _cupsLangPrintf(stderr, _("ERROR: Unsupported page-border value %s, "
+                                "using page-border=none!\n"), val);
       doc->page_border = PSTOPS_BORDERNONE;
     }
   }
@@ -2705,8 +2713,7 @@ set_pstops_options(
     if ((doc->temp = cupsTempFile2(doc->tempfile,
                                    sizeof(doc->tempfile))) == NULL)
     {
-      fprintf(stderr, _("ERROR: Unable to create temporary file: %s\n"),
-              strerror(errno));
+      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
       exit(1);
     }
   }

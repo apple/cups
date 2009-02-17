@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <errno.h>
 
 
 /*
@@ -982,8 +983,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and return.
     */
 
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]\n"),
+                    "rastertoepson");
     return (1);
   }
 
@@ -995,7 +997,8 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
-      perror("ERROR: Unable to open raster file - ");
+      _cupsLangPrintf(stderr, _("ERROR: Unable to open raster file - %s\n"),
+                      strerror(errno));
       sleep(1);
       return (1);
     }
@@ -1073,8 +1076,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	break;
 
       if ((y & 127) == 0)
-        fprintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"), page,
-	        100 * y / header.cupsHeight);
+        _cupsLangPrintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"),
+                        page, 100 * y / header.cupsHeight);
 
      /*
       * Read a line of graphics...
@@ -1121,11 +1124,15 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   if (page == 0)
-    fputs(_("ERROR: No pages found!\n"), stderr);
+  {
+    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
+    return (1);
+  }
   else
-    fputs(_("INFO: Ready to print.\n"), stderr);
-
-  return (page == 0);
+  {
+    _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
+    return (0);
+  }
 }
 
 

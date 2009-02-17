@@ -854,6 +854,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
 
       ppdLocalize(ppd);
+      ppdMarkDefaults(ppd);
 
       if (argc > 3)
       {
@@ -876,8 +877,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  printf("    %s (%s):\n", option->keyword, option->text);
 
 	  for (k = 0; k < option->num_choices; k ++)
-	    printf("        - %s (%s)\n", option->choices[k].choice,
-		   option->choices[k].text);
+	    printf("        - %s%s (%s)\n",
+	           option->choices[k].marked ? "*" : "",
+		   option->choices[k].choice, option->choices[k].text);
 
           if ((coption = ppdFindCustomOption(ppd, option->keyword)) != NULL)
 	  {

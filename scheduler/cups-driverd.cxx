@@ -26,11 +26,13 @@
  *   compare_matches() - Compare PPD match scores for sorting.
  *   compare_names()   - Compare PPD filenames for sorting.
  *   compare_ppds()    - Compare PPD file make and model names for sorting.
+ *   dump_ppds_dat()   - Dump the contents of the ppds.dat file.
  *   free_array()      - Free an array of strings.
  *   list_ppds()       - List PPD files.
  *   load_ppds()       - Load PPD files recursively.
  *   load_drv()        - Load the PPDs from a driver information file.
  *   load_drivers()    - Load driver-generated PPD files.
+ *   load_ppds_dat()   - Load the ppds.dat file.
  *   regex_device_id() - Compile a regular expression based on the 1284 device
  *                       ID.
  *   regex_string()    - Construct a regular expression to compare a simple
@@ -136,6 +138,7 @@ static int		compare_names(const ppd_info_t *p0,
 			              const ppd_info_t *p1);
 static int		compare_ppds(const ppd_info_t *p0,
 			             const ppd_info_t *p1);
+static int		dump_ppds_dat(void);
 static void		free_array(cups_array_t *a);
 static int		list_ppds(int request_id, int limit, const char *opt);
 static int		load_drivers(cups_array_t *include,
@@ -143,6 +146,8 @@ static int		load_drivers(cups_array_t *include,
 static int		load_drv(const char *filename, const char *name,
 			         cups_file_t *fp, time_t mtime, off_t size);
 static int		load_ppds(const char *d, const char *p, int descend);
+static void		load_ppds_dat(char *filename, size_t filesize,
+			              int verbose);
 static regex_t		*regex_device_id(const char *device_id);
 static regex_t		*regex_string(const char *s);
 
@@ -165,6 +170,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc == 3 && !strcmp(argv[1], "cat"))
     return (cat_ppd(argv[2], 0));
+  else if (argc == 2 && !strcmp(argv[1], "dump"))
+    return (dump_ppds_dat());
   else if (argc == 4 && !strcmp(argv[1], "get"))
     return (cat_ppd(argv[3], atoi(argv[2])));
   else if (argc == 5 && !strcmp(argv[1], "list"))
@@ -172,6 +179,7 @@ main(int  argc,				/* I - Number of command-line args */
   else
   {
     fputs("Usage: cups-driverd cat ppd-name\n", stderr);
+    fputs("Usage: cups-driverd dump\n", stderr);
     fputs("Usage: cups-driverd get request_id ppd-name\n", stderr);
     fputs("Usage: cups-driverd list request_id limit options\n", stderr);
     return (1);
@@ -341,7 +349,7 @@ cat_drv(const char *name,		/* I - PPD name */
     ppdcCatalog	*catalog;		// Message catalog in .drv file
 
 
-    fprintf(stderr, "DEBUG: [cups-driverd] %d locales defined in \"%s\"...\n",
+    fprintf(stderr, "DEBUG2: [cups-driverd] %d locales defined in \"%s\"...\n",
             src->po_files->count, filename);
 
     locales = new ppdcArray();
@@ -349,7 +357,7 @@ cat_drv(const char *name,		/* I - PPD name */
          catalog;
 	 catalog = (ppdcCatalog *)src->po_files->next())
     {
-      fprintf(stderr, "DEBUG: [cups-driverd] Adding locale \"%s\"...\n",
+      fprintf(stderr, "DEBUG2: [cups-driverd] Adding locale \"%s\"...\n",
               catalog->locale->value);
       locales->add(catalog->locale);
     }
@@ -711,6 +719,41 @@ compare_ppds(const ppd_info_t *p0,	/* I - First PPD file */
 
 
 /*
+ * 'dump_ppds_dat()' - Dump the contents of the ppds.dat file.
+ */
+
+static int				/* O - Exit status */
+dump_ppds_dat(void)
+{
+  char		filename[1024];		/* ppds.dat filename */
+  ppd_info_t	*ppd;			/* Current PPD */
+
+
+ /*
+  * See if we a PPD database file...
+  */
+
+  load_ppds_dat(filename, sizeof(filename), 0);
+
+  puts("mtime,size,model_number,type,filename,name,languages0,products0,"
+       "psversions0,make,make_and_model,device_id,scheme");
+  for (ppd = (ppd_info_t *)cupsArrayFirst(PPDsByName);
+       ppd;
+       ppd = (ppd_info_t *)cupsArrayNext(PPDsByName))
+    printf("%d,%ld,%d,%d,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\","
+           "\"%s\",\"%s\"\n",
+           (int)ppd->record.mtime, (long)ppd->record.size,
+	   ppd->record.model_number, ppd->record.type, ppd->record.filename,
+	   ppd->record.name, ppd->record.languages[0], ppd->record.products[0],
+	   ppd->record.psversions[0], ppd->record.make,
+	   ppd->record.make_and_model, ppd->record.device_id,
+	   ppd->record.scheme);
+
+  return (0);
+}
+
+
+/*
  * 'free_array()' - Free an array of strings.
  */
 
@@ -742,10 +785,8 @@ list_ppds(int        request_id,	/* I - Request ID */
   int		count;			/* Number of PPDs to send */
   ppd_info_t	*ppd;			/* Current PPD file */
   cups_file_t	*fp;			/* ppds.dat file */
-  struct stat	fileinfo;		/* ppds.dat information */
   char		filename[1024],		/* ppds.dat filename */
 		model[1024];		/* Model directory */
-  const char	*cups_cachedir;		/* CUPS_CACHEDIR environment variable */
   const char	*cups_datadir;		/* CUPS_DATADIR environment variable */
   int		num_options;		/* Number of options */
   cups_option_t	*options;		/* Options */
@@ -788,64 +829,8 @@ list_ppds(int        request_id,	/* I - Request ID */
   * See if we a PPD database file...
   */
 
-  PPDsByName      = cupsArrayNew((cups_array_func_t)compare_names, NULL);
-  PPDsByMakeModel = cupsArrayNew((cups_array_func_t)compare_ppds, NULL);
-  ChangedPPD      = 0;
+  load_ppds_dat(filename, sizeof(filename), 1);
 
-  if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
-    cups_cachedir = CUPS_CACHEDIR;
-
-  snprintf(filename, sizeof(filename), "%s/ppds.dat", cups_cachedir);
-  if ((fp = cupsFileOpen(filename, "r")) != NULL)
-  {
-   /*
-    * See if we have the right sync word...
-    */
-
-    unsigned ppdsync;			/* Sync word */
-    int      num_ppds;			/* Number of PPDs */
-
-
-    if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync))
-            == sizeof(ppdsync) &&
-        ppdsync == PPD_SYNC &&
-        !stat(filename, &fileinfo) &&
-	((fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
-	(num_ppds = (fileinfo.st_size - sizeof(ppdsync)) /
-	            sizeof(ppd_rec_t)) > 0)
-    {
-     /*
-      * We have a ppds.dat file, so read it!
-      */
-
-      for (; num_ppds > 0; num_ppds --)
-      {
-	if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
-	{
-	  fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
-	        stderr);
-	  exit(1);
-	}
-
-	if (cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t)) > 0)
-	{
-	  cupsArrayAdd(PPDsByName, ppd);
-	  cupsArrayAdd(PPDsByMakeModel, ppd);
-	}
-	else
-	{
-	  free(ppd);
-	  break;
-	}
-      }
-
-      fprintf(stderr, "INFO: [cups-driverd] Read \"%s\", %d PPDs...\n",
-	      filename, cupsArrayCount(PPDsByName));
-    }
-
-    cupsFileClose(fp);
-  }
-  
  /*
   * Load all PPDs in the specified directory and below...
   */
@@ -902,11 +887,15 @@ list_ppds(int        request_id,	/* I - Request ID */
       cupsArrayRemove(PPDsByName, ppd);
       cupsArrayRemove(PPDsByMakeModel, ppd);
       free(ppd);
+
+      ChangedPPD = 1;
     }
 
  /*
   * Write the new ppds.dat file...
   */
+
+  fprintf(stderr, "DEBUG: [cups-driverd] ChangedPPD=%d\n", ChangedPPD);
 
   if (ChangedPPD)
   {
@@ -943,10 +932,6 @@ list_ppds(int        request_id,	/* I - Request ID */
                                                       num_options, options));
   include     = cupsdCreateStringsArray(cupsGetOption("include-schemes",
 						      num_options, options));
-
-  for (i = 0; i < num_options; i ++)
-    fprintf(stderr, "DEBUG: [cups-driverd] %s=%s\n", options[i].name,
-            options[i].value);
 
   load_drivers(include, exclude);
 
@@ -1007,7 +992,7 @@ list_ppds(int        request_id,	/* I - Request ID */
     type = 0;
 
   for (i = 0; i < num_options; i ++)
-    fprintf(stderr, "DEBUG: [cups-driverd] %s=\"%s\"\n", options[i].name,
+    fprintf(stderr, "DEBUG2: [cups-driverd] %s=\"%s\"\n", options[i].name,
             options[i].value);
 
   if (!requested || cupsArrayFind(requested, (void *)"all") != NULL)
@@ -1044,7 +1029,14 @@ list_ppds(int        request_id,	/* I - Request ID */
                                           (void *)"ppd-type") != NULL;
   }
 
-  puts("Content-Type: application/ipp\n");
+ /*
+  * Send the content type header to the scheduler; request_id can only be
+  * 0 when run manually since the scheduler enforces the IPP requirement for
+  * a request ID from 1 to 2^31-1...
+  */
+
+  if (request_id > 0)
+    puts("Content-Type: application/ipp\n");
 
   sent_header = 0;
 
@@ -1167,7 +1159,7 @@ list_ppds(int        request_id,	/* I - Request ID */
 
       if (ppd->matches)
       {
-        fprintf(stderr, "DEBUG: [cups-driverd] %s matches with score %d!\n",
+        fprintf(stderr, "DEBUG2: [cups-driverd] %s matches with score %d!\n",
 	        ppd->record.name, ppd->matches);
         cupsArrayAdd(matches, ppd);
       }
@@ -1226,7 +1218,7 @@ list_ppds(int        request_id,	/* I - Request ID */
                          "en-US");
     }
 
-    fprintf(stderr, "DEBUG: [cups-driverd] Sending %s (%s)...\n",
+    fprintf(stderr, "DEBUG2: [cups-driverd] Sending %s (%s)...\n",
 	    ppd->record.name, ppd->record.make_and_model);
 
     count --;
@@ -1757,7 +1749,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Add new PPD file...
       */
 
-      fprintf(stderr, "DEBUG: [cups-driverd] Adding ppd \"%s\"...\n", name);
+      fprintf(stderr, "DEBUG2: [cups-driverd] Adding ppd \"%s\"...\n", name);
 
       ppd = add_ppd(name, name, lang_version, manufacturer, make_model,
                     device_id, (char *)cupsArrayFirst(products),
@@ -1777,7 +1769,7 @@ load_ppds(const char *d,		/* I - Actual directory */
       * Update existing record...
       */
 
-      fprintf(stderr, "DEBUG: [cups-driverd] Updating ppd \"%s\"...\n", name);
+      fprintf(stderr, "DEBUG2: [cups-driverd] Updating ppd \"%s\"...\n", name);
 
       memset(ppd, 0, sizeof(ppd_info_t));
 
@@ -1885,6 +1877,7 @@ load_drv(const char  *filename,		/* I - Actual filename */
 
   add_ppd(filename, filename, "", "", "", "", "", "", mtime, size, 0,
           PPD_TYPE_DRV, "drv");
+  ChangedPPD = 1;
 
  /*
   * Then the drivers in the file...
@@ -2153,8 +2146,8 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	    type = PPD_TYPE_UNKNOWN;
 	  }
 
-          ppd = add_ppd("", name, languages, make, make_and_model, device_id,
-	                product, psversion, 0, 0, 0, type, scheme);
+          ppd = add_ppd(filename, name, languages, make, make_and_model,
+                        device_id, product, psversion, 0, 0, 0, type, scheme);
 
           if (!ppd)
 	  {
@@ -2179,7 +2172,7 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
 	    }
           }
 
-          fprintf(stderr, "DEBUG: [cups-driverd] Added dynamic PPD \"%s\"...\n",
+          fprintf(stderr, "DEBUG2: [cups-driverd] Added dynamic PPD \"%s\"...\n",
 	          name);
 	}
       }
@@ -2194,6 +2187,83 @@ load_drivers(cups_array_t *include,	/* I - Drivers to include */
   cupsDirClose(dir);
 
   return (1);
+}
+
+
+/*
+ * 'load_ppds_dat()' - Load the ppds.dat file.
+ */
+
+static void
+load_ppds_dat(char   *filename,		/* I - Filename buffer */
+              size_t filesize,		/* I - Size of filename buffer */
+              int    verbose)		/* I - Be verbose? */
+{
+  ppd_info_t	*ppd;			/* Current PPD file */
+  cups_file_t	*fp;			/* ppds.dat file */
+  struct stat	fileinfo;		/* ppds.dat information */
+  const char	*cups_cachedir;		/* CUPS_CACHEDIR environment variable */
+
+
+  PPDsByName      = cupsArrayNew((cups_array_func_t)compare_names, NULL);
+  PPDsByMakeModel = cupsArrayNew((cups_array_func_t)compare_ppds, NULL);
+  ChangedPPD      = 0;
+
+  if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
+    cups_cachedir = CUPS_CACHEDIR;
+
+  snprintf(filename, filesize, "%s/ppds.dat", cups_cachedir);
+  if ((fp = cupsFileOpen(filename, "r")) != NULL)
+  {
+   /*
+    * See if we have the right sync word...
+    */
+
+    unsigned ppdsync;			/* Sync word */
+    int      num_ppds;			/* Number of PPDs */
+
+
+    if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync))
+            == sizeof(ppdsync) &&
+        ppdsync == PPD_SYNC &&
+        !stat(filename, &fileinfo) &&
+	((fileinfo.st_size - sizeof(ppdsync)) % sizeof(ppd_rec_t)) == 0 &&
+	(num_ppds = (fileinfo.st_size - sizeof(ppdsync)) /
+	            sizeof(ppd_rec_t)) > 0)
+    {
+     /*
+      * We have a ppds.dat file, so read it!
+      */
+
+      for (; num_ppds > 0; num_ppds --)
+      {
+	if ((ppd = (ppd_info_t *)calloc(1, sizeof(ppd_info_t))) == NULL)
+	{
+	  if (verbose)
+	    fputs("ERROR: [cups-driverd] Unable to allocate memory for PPD!\n",
+		  stderr);
+	  exit(1);
+	}
+
+	if (cupsFileRead(fp, (char *)&(ppd->record), sizeof(ppd_rec_t)) > 0)
+	{
+	  cupsArrayAdd(PPDsByName, ppd);
+	  cupsArrayAdd(PPDsByMakeModel, ppd);
+	}
+	else
+	{
+	  free(ppd);
+	  break;
+	}
+      }
+
+      if (verbose)
+	fprintf(stderr, "INFO: [cups-driverd] Read \"%s\", %d PPDs...\n",
+		filename, cupsArrayCount(PPDsByName));
+    }
+
+    cupsFileClose(fp);
+  }
 }
 
 
