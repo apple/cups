@@ -170,7 +170,7 @@ msgstr "      %s  Choix %s erroné %s.\n                REF  : page 122, rubr
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr "      %s  Chaîne de traduction UTF-8 « %s » incorrecte pour l’option %s.\n"
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
-msgstr "      %s  Chaîne de traduction UTF-8 « %s » incorrecte pour le choix %s.\n"
+msgstr "      %s  Chaîne de traduction UTF-8 « %s » incorrecte pour l’option %s, le choix %s.\n"
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
 msgstr "      %s  Valeur cupsFilter « %s » incorrecte.\n"
 msgid "      %s  Bad cupsICCProfile %s!\n"
