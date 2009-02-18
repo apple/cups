@@ -4,7 +4,7 @@
  *   Authentication certificate routines for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -54,7 +54,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAddCert: adding certificate for pid %d", pid);
+                  "cupsdAddCert: Adding certificate for PID %d", pid);
 
  /*
   * Allocate memory for the certificate...
@@ -84,7 +84,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
   if ((fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "cupsdAddCert: Unable to create certificate file %s - %s",
+                    "Unable to create certificate file %s - %s",
                     filename, strerror(errno));
     free(cert);
     return;
@@ -283,7 +283,7 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
       */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdDeleteCert: removing certificate for pid %d", pid);
+                      "cupsdDeleteCert: Removing certificate for PID %d", pid);
 
       DEBUG_printf(("DELETE pid=%d, username=%s, cert=%s\n", cert->pid,
                     cert->username, cert->certificate));
@@ -310,8 +310,7 @@ cupsdDeleteCert(int pid)		/* I - Process ID */
 
       snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, pid);
       if (unlink(filename))
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdDeleteCert: Unable to remove %s!", filename);
+	cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to remove %s!", filename);
 
       return;
     }
@@ -342,8 +341,7 @@ cupsdDeleteAllCerts(void)
 
     snprintf(filename, sizeof(filename), "%s/certs/%d", StateDir, cert->pid);
     if (unlink(filename))
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdDeleteAllCerts: Unable to remove %s!", filename);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to remove %s!", filename);
 
    /*
     * Free memory...
@@ -368,15 +366,17 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
   cupsd_cert_t	*cert;			/* Current certificate */
 
 
-  DEBUG_printf(("cupsdFindCert(certificate=%s)\n", certificate));
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert(certificate=%s)",
+                  certificate);
   for (cert = Certs; cert != NULL; cert = cert->next)
     if (!strcasecmp(certificate, cert->certificate))
     {
-      DEBUG_printf(("    returning %s...\n", cert->username));
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Returning %s...",
+                      cert->username);
       return (cert);
     }
 
-  DEBUG_puts("    certificate not found!");
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdFindCert: Certificate not found!");
 
   return (NULL);
 }
