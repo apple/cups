@@ -1664,7 +1664,6 @@ get_vbcs_charmap(
   * Save DBCS/VBCS charset map into memory for transcoding...
   */
 
-  leadchar = 0;
   wide2uni = NULL;
 
   cupsFileRewind(fp);
