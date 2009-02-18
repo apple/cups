@@ -44,8 +44,9 @@
 
 typedef struct
 {
-  int	pid;				/* Process ID */
-  char	name[1];			/* Name of process */
+  int		pid;			/* Process ID */
+  cupsd_job_t	*job;			/* Job associated with process */
+  char		name[1];		/* Name of process */
 } cupsd_proc_t;
 
 
@@ -175,9 +176,10 @@ cupsdEndProcess(int pid,		/* I - Process ID */
  */
 
 const char *				/* O - Process name */
-cupsdFinishProcess(int  pid,		/* I - Process ID */
-                   char *name,		/* I - Name buffer */
-		   int  namelen)	/* I - Size of name buffer */
+cupsdFinishProcess(int         pid,	/* I - Process ID */
+                   char        *name,	/* I - Name buffer */
+		   int         namelen,	/* I - Size of name buffer */
+		   cupsd_job_t **job)	/* O - Job data or NULL */
 {
   cupsd_proc_t	key,			/* Search key */
 		*proc;			/* Matching process */
@@ -187,6 +189,9 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
 
   if ((proc = (cupsd_proc_t *)cupsArrayFind(process_array, &key)) != NULL)
   {
+    if (job)
+      *job = proc->job;
+
     strlcpy(name, proc->name, namelen);
     cupsArrayRemove(process_array, proc);
     free(proc);
@@ -194,7 +199,12 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
     return (name);
   }
   else
+  {
+    if (job)
+      *job = NULL;
+
     return ("unknown");
+  }
 }
 
 
@@ -204,17 +214,18 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
 
 int					/* O - Process ID or 0 */
 cupsdStartProcess(
-    const char *command,		/* I - Full path to command */
-    char       *argv[],			/* I - Command-line arguments */
-    char       *envp[],			/* I - Environment */
-    int        infd,			/* I - Standard input file descriptor */
-    int        outfd,			/* I - Standard output file descriptor */
-    int        errfd,			/* I - Standard error file descriptor */
-    int        backfd,			/* I - Backchannel file descriptor */
-    int        sidefd,			/* I - Sidechannel file descriptor */
-    int        root,			/* I - Run as root? */
-    void       *profile,		/* I - Security profile to use */
-    int        *pid)			/* O - Process ID */
+    const char  *command,		/* I - Full path to command */
+    char        *argv[],		/* I - Command-line arguments */
+    char        *envp[],		/* I - Environment */
+    int         infd,			/* I - Standard input file descriptor */
+    int         outfd,			/* I - Standard output file descriptor */
+    int         errfd,			/* I - Standard error file descriptor */
+    int         backfd,			/* I - Backchannel file descriptor */
+    int         sidefd,			/* I - Sidechannel file descriptor */
+    int         root,			/* I - Run as root? */
+    void        *profile,		/* I - Security profile to use */
+    cupsd_job_t *job,			/* I - Job associated with process */
+    int         *pid)			/* O - Process ID */
 {
   int		user;			/* Command UID */
   struct stat	commandinfo;		/* Command file information */
@@ -471,6 +482,7 @@ cupsdStartProcess(
       if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
       {
         proc->pid = *pid;
+	proc->job = job;
 	strcpy(proc->name, command);
 
 	cupsArrayAdd(process_array, proc);

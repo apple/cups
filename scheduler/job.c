@@ -3429,7 +3429,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
 		            job->back_pipes[0], job->side_pipes[0], 0,
-			    job->profile, job->filters + i);
+			    job->profile, job, job->filters + i);
 
     cupsdLogJob(job, CUPSD_LOG_DEBUG2,
 		"start_job: Closing filter pipes for slot %d [ %d %d ]...",
@@ -3498,7 +3498,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
 			      job->back_pipes[1], job->side_pipes[1],
-			      backroot, job->profile, &(job->backend));
+			      backroot, job->profile, job, &(job->backend));
 
       if (pid == 0)
       {

@@ -4091,7 +4091,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc]   = NULL;
 
     if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
-                           &pid))
+                           NULL, &pid))
     {
       unlink(seedfile);
       return (0);
@@ -4104,7 +4104,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 	break;
       }
 
-    cupsdFinishProcess(pid, command, sizeof(command));
+    cupsdFinishProcess(pid, command, sizeof(command), NULL);
 
    /*
     * Remove the seed file, as it is no longer needed...
@@ -4169,7 +4169,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4186,7 +4186,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
       break;
     }
 
-  cupsdFinishProcess(pid, command, sizeof(command));
+  cupsdFinishProcess(pid, command, sizeof(command), NULL);
 
   if (status)
   {
@@ -4403,7 +4403,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4420,7 +4420,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
       break;
     }
 
-  cupsdFinishProcess(pid, command, sizeof(command));
+  cupsdFinishProcess(pid, command, sizeof(command), NULL);
 
   if (status)
   {
@@ -4943,7 +4943,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   */
 
   if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
-			-1, -1, root, DefaultProfile, &pid) < 0)
+			-1, -1, root, DefaultProfile, NULL, &pid) < 0)
   {
    /*
     * Error - can't fork!
