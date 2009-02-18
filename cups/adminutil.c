@@ -1133,7 +1133,13 @@ _cupsAdminGetServerSettings(
         else if (!strcasecmp(value, "all"))
 	  remote_any = 1;
       }
-      else if (line[0] != '<' && !in_location && !in_policy)
+      else if (line[0] != '<' && !in_location && !in_policy &&
+	       strcasecmp(line, "Allow") &&
+               strcasecmp(line, "AuthType") &&
+	       strcasecmp(line, "Deny") &&
+	       strcasecmp(line, "Order") &&
+	       strcasecmp(line, "Require") &&
+	       strcasecmp(line, "Satisfy"))
         cg->cupsd_num_settings = cupsAddOption(line, value,
 	                                       cg->cupsd_num_settings,
 					       &(cg->cupsd_settings));
