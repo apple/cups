@@ -3,7 +3,7 @@
  *
  *   Backend test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,8 +16,9 @@
  *
  * Contents:
  *
- *   main()  - Run the named backend.
- *   usage() - Show usage information.
+ *   main()    - Run the named backend.
+ *   usage()   - Show usage information.
+ *   walk_cb() - Show results of cupsSideChannelSNMPWalk...
  */
 
 /*
@@ -40,6 +41,8 @@
  */
 
 static void	usage(void);
+static void	walk_cb(const char *oid, const char *data, int datalen,
+		        void *context);
 
 
 /*
@@ -57,7 +60,10 @@ main(int  argc,				/* I - Number of command-line args */
   int		first_arg,		/* First argument for backend */
 		do_query = 0,		/* Do PostScript query? */
 		do_side_tests = 0,	/* Test side-channel ops? */
-		do_trickle = 0;		/* Trickle data to backend */
+		do_trickle = 0,		/* Trickle data to backend */
+		do_walk = 0;		/* Do OID lookup (0) or walking (1) */
+  const char	*oid = ".1.3.6.1.2.1.43.10.2.1.4.1.1";
+  					/* OID to lookup or walk */
   char		scheme[255],		/* Scheme in URI == backend */
 		backend[1024];		/* Backend path */
   const char	*serverbin;		/* CUPS_SERVERBIN environment variable */
@@ -81,6 +87,19 @@ main(int  argc,				/* I - Number of command-line args */
       do_side_tests = 1;
     else if (!strcmp(argv[first_arg], "-t"))
       do_trickle = 1;
+    else if (!strcmp(argv[first_arg], "-get") && (first_arg + 1) < argc)
+    {
+      first_arg ++;
+
+      oid = argv[first_arg];
+    }
+    else if (!strcmp(argv[first_arg], "-walk") && (first_arg + 1) < argc)
+    {
+      first_arg ++;
+
+      do_walk = 1;
+      oid     = argv[first_arg];
+    }
     else
       usage();
 
@@ -343,11 +362,31 @@ main(int  argc,				/* I - Number of command-line args */
     printf("CUPS_SC_CMD_GET_STATE returned %s, %02X\n", statuses[scstatus],
            buffer[0] & 255);
 
-    length   = sizeof(buffer);
-    scstatus = cupsSideChannelSNMPGet(".1.3.6.1.2.1.43.10.2.1.4.1.1", buffer,
-                                      &length, 5.0);
-    printf("CUPS_SC_CMD_SNMP_GET returned %s, %s\n", statuses[scstatus],
-           buffer);
+    if (do_walk)
+    {
+     /*
+      * Walk the OID tree...
+      */
+
+      scstatus = cupsSideChannelSNMPWalk(oid, 5.0, walk_cb, NULL);
+      printf("CUPS_SC_CMD_SNMP_WALK returned %s\n", statuses[scstatus]);
+    }
+    else
+    {
+     /*
+      * Lookup the same OID twice...
+      */
+
+      length   = sizeof(buffer);
+      scstatus = cupsSideChannelSNMPGet(oid, buffer, &length, 5.0);
+      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %s\n", oid,
+	     statuses[scstatus], buffer);
+
+      length   = sizeof(buffer);
+      scstatus = cupsSideChannelSNMPGet(oid, buffer, &length, 5.0);
+      printf("CUPS_SC_CMD_SNMP_GET %s returned %s, %s\n", oid,
+	     statuses[scstatus], buffer);
+    }
 
     length   = 0;
     scstatus = cupsSideChannelDoRequest(CUPS_SC_CMD_SOFT_RESET, buffer,
@@ -380,9 +419,23 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 usage(void)
 {
-  fputs("Usage: testbackend [-ps] [-s] [-t] device-uri job-id user title copies "
-        "options [file]\n", stderr);
+  fputs("Usage: testbackend [-ps] [-s [-oid OID] [-walk OID]] [-t] device-uri "
+        "job-id user title copies options [file]\n", stderr);
   exit(1);
+}
+
+
+/*
+ * 'walk_cb()' - Show results of cupsSideChannelSNMPWalk...
+ */
+
+static void
+walk_cb(const char *oid,		/* I - OID */
+        const char *data,		/* I - Data */
+	int        datalen,		/* I - Length of data */
+	void       *context)		/* I - Context (unused) */
+{
+  printf("CUPS_SC_CMD_SNMP_WALK %s=%s (%d bytes)\n", oid, data, datalen);
 }
 
 

@@ -1,9 +1,10 @@
-CHANGES.txt - 2009-02-17
+CHANGES.txt - 2009-02-19
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The cupsSideChannelSNMP* functions did not work.
 	- The scheduler could consume 100% CPU when jobs were canceled.
 	- Added complete localizations for Japanese and Russian and partial
 	  localizations for Chinese, Danish, German, Finnish, French, Italian,
