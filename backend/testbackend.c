@@ -61,7 +61,8 @@ main(int  argc,				/* I - Number of command-line args */
 		do_query = 0,		/* Do PostScript query? */
 		do_side_tests = 0,	/* Test side-channel ops? */
 		do_trickle = 0,		/* Trickle data to backend */
-		do_walk = 0;		/* Do OID lookup (0) or walking (1) */
+		do_walk = 0,		/* Do OID lookup (0) or walking (1) */
+		show_log = 0;		/* Show log messages from backends? */
   const char	*oid = ".1.3.6.1.2.1.43.10.2.1.4.1.1";
   					/* OID to lookup or walk */
   char		scheme[255],		/* Scheme in URI == backend */
@@ -81,7 +82,9 @@ main(int  argc,				/* I - Number of command-line args */
   for (first_arg = 1;
        argv[first_arg] && argv[first_arg][0] == '-';
        first_arg ++)
-    if (!strcmp(argv[first_arg], "-ps"))
+    if (!strcmp(argv[first_arg], "-d"))
+      show_log = 1;
+    else if (!strcmp(argv[first_arg], "-ps"))
       do_query = 1;
     else if (!strcmp(argv[first_arg], "-s"))
       do_side_tests = 1;
@@ -91,14 +94,16 @@ main(int  argc,				/* I - Number of command-line args */
     {
       first_arg ++;
 
-      oid = argv[first_arg];
+      do_side_tests = 1;
+      oid           = argv[first_arg];
     }
     else if (!strcmp(argv[first_arg], "-walk") && (first_arg + 1) < argc)
     {
       first_arg ++;
 
-      do_walk = 1;
-      oid     = argv[first_arg];
+      do_side_tests = 1;
+      do_walk       = 1;
+      oid           = argv[first_arg];
     }
     else
       usage();
@@ -206,6 +211,7 @@ main(int  argc,				/* I - Number of command-line args */
         static const char *ps_query =	/* PostScript query file */
 		"%!\n"
 		"save\n"
+		"product = flush\n"
 		"currentpagedevice /PageSize get aload pop\n"
 		"2 copy gt {exch} if\n"
 		"(Unknown)\n"
@@ -240,7 +246,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         write(1, ps_query, strlen(ps_query));
 	write(2, "DEBUG: START\n", 13);
-        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 30.0)) > 0)
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 5.0)) > 0)
 	  write(2, buffer, bytes);
 	write(2, "\nDEBUG: END\n", 12);
       }
@@ -272,6 +278,12 @@ main(int  argc,				/* I - Number of command-line args */
       dup(data_fds[0]);
       close(data_fds[0]);
       close(data_fds[1]);
+    }
+
+    if (!show_log)
+    {
+      close(2);
+      open("/dev/null", O_WRONLY);
     }
 
     close(3);
@@ -419,8 +431,17 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 usage(void)
 {
-  fputs("Usage: testbackend [-ps] [-s [-oid OID] [-walk OID]] [-t] device-uri "
-        "job-id user title copies options [file]\n", stderr);
+  puts("Usage: testbackend [-d] [-ps] [-s [-oid OID] [-walk OID]] [-t] "
+       "device-uri job-id user title copies options [file]");
+  puts("");
+  puts("Options:");
+  puts("  -d          Show log messages from backend.");
+  puts("  -oid OID    Lookup the specified SNMP OID.");
+  puts("  -ps         Send PostScript query code to backend.");
+  puts("  -s          Do SNMP tests.");
+  puts("  -t          Send spaces slowly to backend ('trickle').");
+  puts("  -walk OID   Walk the specified SNMP OID.");
+
   exit(1);
 }
 
