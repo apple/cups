@@ -1099,7 +1099,11 @@ cupsdLoadAllPrinters(void)
     }
     else if (!strcasecmp(line, "Reason"))
     {
-      if (value)
+      if (value &&
+          strcmp(value, "com.apple.print.recoverable-warning") &&
+          strcmp(value, "connecting-to-device") &&
+          strcmp(value, "cups-insecure-filter-error") &&
+          strcmp(value, "cups-missing-filter-error"))
       {
         for (i = 0 ; i < p->num_reasons; i ++)
 	  if (!strcmp(value, p->reasons[i]))
@@ -1590,7 +1594,9 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      if (strcmp(printer->reasons[i], "connecting-to-device") &&
+      if (strcmp(printer->reasons[i], "com.apple.print.recoverable-warning") &&
+          strcmp(printer->reasons[i], "connecting-to-device") &&
+          strcmp(printer->reasons[i], "cups-insecure-filter-error") &&
           strcmp(printer->reasons[i], "cups-missing-filter-error"))
         cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
@@ -3889,6 +3895,9 @@ delete_printer_filters(
 
       mimeDeleteFilter(MimeDatabase, filter);
     }
+
+  cupsdSetPrinterReasons(p, "-cups-insecure-filter-error"
+                            ",cups-missing-filter-error");
 }
 
 
