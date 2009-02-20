@@ -48,6 +48,7 @@ typedef struct cupsd_job_s
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			status_level;	/* Highest log level in a status message */
   int			cost;		/* Filtering cost */
+  char			*options;	/* Command-line options for filters */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */
   int			backend;	/* Backend process ID */
@@ -103,15 +104,13 @@ VAR int			JobRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void		cupsdCancelJob(cupsd_job_t *job, int purge,
-			               ipp_jstate_t newstate);
 extern void		cupsdCancelJobs(const char *dest, const char *username,
 			                int purge);
 extern void		cupsdCheckJobs(void);
 extern void		cupsdCleanJobs(void);
+extern void		cupsdContinueJob(cupsd_job_t *job);
 extern void		cupsdDeleteJob(cupsd_job_t *job);
 extern cupsd_job_t	*cupsdFindJob(int id);
-extern void		cupsdFinishJob(cupsd_job_t *job);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
@@ -125,6 +124,8 @@ extern void		cupsdSaveAllJobs(void);
 extern void		cupsdSaveJob(cupsd_job_t *job);
 extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
+extern void		cupsdSetJobState(cupsd_job_t *job,
+			                 ipp_jstate_t newstate, int purge);
 extern void		cupsdStopAllJobs(int force);
 extern void		cupsdStopJob(cupsd_job_t *job, int force);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);

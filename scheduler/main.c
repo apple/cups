@@ -1746,7 +1746,7 @@ process_children(void)
 	    * Process the next file...
 	    */
 
-	    cupsdFinishJob(job);
+	    cupsdContinueJob(job);
 	  }
 	}
 	break;

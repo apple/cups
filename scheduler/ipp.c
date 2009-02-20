@@ -1299,7 +1299,7 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   if (!compressions || !filetypes)
   {
-    cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
+    cupsdSetJobState(job, IPP_JOB_ABORTED, 1);
 
     if (con)
       send_ipp_status(con, IPP_INTERNAL_ERROR,
@@ -4109,7 +4109,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
+  cupsdSetJobState(job, IPP_JOB_CANCELED, purge);
   cupsdCheckJobs();
 
   if (purge)
@@ -10580,7 +10580,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
 			    attr->values[0].integer);
-                cupsdCancelJob(job, 0, (ipp_jstate_t)attr->values[0].integer);
+                cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer, 0);
 
                 check_jobs = 1;
 	      }
