@@ -48,7 +48,6 @@ typedef struct cupsd_job_s
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
   int			status_level;	/* Highest log level in a status message */
   int			cost;		/* Filtering cost */
-  char			*options;	/* Command-line options for filters */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */
   int			backend;	/* Backend process ID */
