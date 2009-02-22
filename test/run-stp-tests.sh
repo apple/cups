@@ -74,30 +74,35 @@ case "$testtype" in
 		nprinters1=0
 		nprinters2=0
 		pjobs=0
+		pprinters=0
 		;;
 	2)
 		echo "Running the medium tests (2)"
 		nprinters1=10
 		nprinters2=20
 		pjobs=20
+		pprinters=10
 		;;
 	3)
 		echo "Running the extreme tests (3)"
 		nprinters1=500
 		nprinters2=1000
 		pjobs=100
+		pprinters=50
 		;;
 	4)
 		echo "Running the torture tests (4)"
 		nprinters1=10000
 		nprinters2=20000
 		pjobs=200
+		pprinters=100
 		;;
 	*)
 		echo "Running the timid tests (1)"
 		nprinters1=0
 		nprinters2=0
 		pjobs=10
+		pprinters=0
 		;;
 esac
 
@@ -334,7 +339,8 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug2
+LogLevel debug
+LogTimeFormat usecs
 PreserveJobHistory Yes
 <Policy default>
 <Limit All>
@@ -568,7 +574,7 @@ for file in 5*.sh; do
 	echo "" >>$strfile
 	echo "\"$file\":" >>$strfile
 
-	sh $file $pjobs | tee -a $strfile
+	sh $file $pjobs $pprinters | tee -a $strfile
 	status=$?
 
 	if test $status != 0; then
@@ -743,9 +749,9 @@ fi
 
 # Debug2 log messages
 count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count = 0; then
-	echo "FAIL: $count debug2 messages, expected more than 0."
-	echo "<P>FAIL: $count debug2 messages, expected more than 0.</P>" >>$strfile
+if test $count != 0; then
+	echo "FAIL: $count debug2 messages, expected 0."
+	echo "<P>FAIL: $count debug2 messages, expected 0.</P>" >>$strfile
 	fail=`expr $fail + 1`
 else
 	echo "PASS: $count debug2 messages."

@@ -3959,21 +3959,28 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
       }
 
      /*
-      * See if the printer is currently printing a job...
+      * See if there are any pending jobs...
       */
 
-      if (printer->job)
-        jobid = ((cupsd_job_t *)printer->job)->id;
+      for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	   job;
+	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+	if (job->state_value <= IPP_JOB_PROCESSING &&
+	    !strcasecmp(job->dest, printer->name))
+	  break;
+
+      if (job)
+	jobid = job->id;
       else
       {
        /*
-        * No, see if there are any pending jobs...
+        * No, try stopped jobs...
 	*/
 
-        for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	  if (job->state_value <= IPP_JOB_PROCESSING &&
+	  if (job->state_value == IPP_JOB_STOPPED &&
 	      !strcasecmp(job->dest, printer->name))
 	    break;
 
@@ -3981,21 +3988,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	  jobid = job->id;
 	else
 	{
-	  for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	       job;
-	       job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	    if (job->state_value == IPP_JOB_STOPPED &&
-		!strcasecmp(job->dest, printer->name))
-	      break;
-
-          if (job)
-	    jobid = job->id;
-	  else
-	  {
-	    send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
-			    printer->name);
-	    return;
-	  }
+	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
+			  printer->name);
+	  return;
 	}
       }
     }
