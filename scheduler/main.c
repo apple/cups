@@ -1628,7 +1628,8 @@ static void
 process_children(void)
 {
   int			status;		/* Exit status of child */
-  int			pid;		/* Process ID of child */
+  int			pid,		/* Process ID of child */
+			job_id;		/* Job ID of child */
   cupsd_job_t		*job;		/* Current job */
   cupsd_printer_t	*printer;	/* Current printer */
   int			i;		/* Looping var */
@@ -1659,7 +1660,7 @@ process_children(void)
     * Collect the name of the process that finished...
     */
 
-    cupsdFinishProcess(pid, name, sizeof(name), &job);
+    cupsdFinishProcess(pid, name, sizeof(name), &job_id);
 
    /*
     * Delete certificates for CGI processes...
@@ -1672,7 +1673,7 @@ process_children(void)
     * Handle completed job filters...
     */
 
-    if (job)
+    if (job_id > 0 && (job = cupsdFindJob(job_id)) != NULL)
     {
       for (i = 0; job->filters[i]; i ++)
 	if (job->filters[i] == pid)
@@ -1718,10 +1719,11 @@ process_children(void)
 
 	    if (!job->printer_message)
 	    {
-	      if ((job->printer_message = ippFindAttribute(job->attrs,
-							   "job-printer-state-message",
-							   IPP_TAG_TEXT)) == NULL)
-		job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_TEXT,
+	      if ((job->printer_message =
+	               ippFindAttribute(job->attrs, "job-printer-state-message",
+					IPP_TAG_TEXT)) == NULL)
+		job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB,
+		                                    IPP_TAG_TEXT,
 						    "job-printer-state-message",
 						    NULL, "");
 	    }

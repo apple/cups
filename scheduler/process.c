@@ -44,9 +44,9 @@
 
 typedef struct
 {
-  int		pid;			/* Process ID */
-  cupsd_job_t	*job;			/* Job associated with process */
-  char		name[1];		/* Name of process */
+  int	pid,				/* Process ID */
+	job_id;				/* Job associated with process */
+  char	name[1];			/* Name of process */
 } cupsd_proc_t;
 
 
@@ -176,10 +176,10 @@ cupsdEndProcess(int pid,		/* I - Process ID */
  */
 
 const char *				/* O - Process name */
-cupsdFinishProcess(int         pid,	/* I - Process ID */
-                   char        *name,	/* I - Name buffer */
-		   int         namelen,	/* I - Size of name buffer */
-		   cupsd_job_t **job)	/* O - Job data or NULL */
+cupsdFinishProcess(int  pid,		/* I - Process ID */
+                   char *name,		/* I - Name buffer */
+		   int  namelen,	/* I - Size of name buffer */
+		   int  *job_id)	/* O - Job ID pointer or NULL */
 {
   cupsd_proc_t	key,			/* Search key */
 		*proc;			/* Matching process */
@@ -189,8 +189,8 @@ cupsdFinishProcess(int         pid,	/* I - Process ID */
 
   if ((proc = (cupsd_proc_t *)cupsArrayFind(process_array, &key)) != NULL)
   {
-    if (job)
-      *job = proc->job;
+    if (job_id)
+      *job_id = proc->job_id;
 
     strlcpy(name, proc->name, namelen);
     cupsArrayRemove(process_array, proc);
@@ -200,8 +200,8 @@ cupsdFinishProcess(int         pid,	/* I - Process ID */
   }
   else
   {
-    if (job)
-      *job = NULL;
+    if (job_id)
+      *job_id = 0;
 
     return ("unknown");
   }
@@ -224,7 +224,7 @@ cupsdStartProcess(
     int         sidefd,			/* I - Sidechannel file descriptor */
     int         root,			/* I - Run as root? */
     void        *profile,		/* I - Security profile to use */
-    cupsd_job_t *job,			/* I - Job associated with process */
+    int         job_id,			/* I - Job associated with process */
     int         *pid)			/* O - Process ID */
 {
   int		user;			/* Command UID */
@@ -481,8 +481,8 @@ cupsdStartProcess(
     {
       if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
       {
-        proc->pid = *pid;
-	proc->job = job;
+        proc->pid    = *pid;
+	proc->job_id = job_id;
 	strcpy(proc->name, command);
 
 	cupsArrayAdd(process_array, proc);

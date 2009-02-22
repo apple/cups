@@ -218,11 +218,11 @@ extern void	*cupsdCreateProfile(int job_id);
 extern void	cupsdDestroyProfile(void *profile);
 extern int	cupsdEndProcess(int pid, int force);
 extern const char *cupsdFinishProcess(int pid, char *name, int namelen,
-		                      cupsd_job_t **job);
+		                      int *job_id);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int sidefd,
-				  int root, void *profile, cupsd_job_t *job,
+				  int root, void *profile, int job_id,
 				  int *pid);
 
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,

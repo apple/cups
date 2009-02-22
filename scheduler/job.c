@@ -1044,7 +1044,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
 		            job->back_pipes[0], job->side_pipes[0], 0,
-			    job->profile, job, job->filters + i);
+			    job->profile, job->id, job->filters + i);
 
     cupsdClosePipe(filterfds[!slot]);
 
@@ -1099,7 +1099,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
 			      job->back_pipes[1], job->side_pipes[1],
-			      backroot, job->profile, job, &(job->backend));
+			      backroot, job->profile, job->id, &(job->backend));
 
       if (pid == 0)
       {
@@ -1195,6 +1195,9 @@ void
 cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
                cupsd_jobaction_t action)/* I - Action */
 {
+  if (job->printer)
+    finalize_job(job);
+
   if (action == CUPSD_JOB_PURGE)
   {
    /*
@@ -1232,28 +1235,13 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
   {
     free(job->compressions);
     free(job->filetypes);
+
+    job->num_files = 0;
   }
 
-  ippDelete(job->attrs);
+  unload_job(job);
 
   free(job);
-}
-
-
-/*
- * 'cupsdFinishJob()' - Finish a job.
- */
-
-void
-cupsdFinishJob(cupsd_job_t *job)	/* I - Job */
-{
-
-
-  cupsdLogJob(job, CUPSD_LOG_DEBUG, "File %d is complete.", job->current_file);
-  cupsdLogJob(job, CUPSD_LOG_DEBUG2,
-	      "cupsdFinishJob: job->status=%d, job->state_value=%d",
-	      job->status, job->state_value);
-
 }
 
 
@@ -3942,7 +3930,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 #endif /* __APPLE__ */
     else
     {
-      cupsdLogJob(job, loglevel, "%s", message);
+      if (loglevel != CUPSD_LOG_INFO)
+	cupsdLogJob(job, loglevel, "%s", message);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {
@@ -3955,7 +3944,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	if (loglevel <= job->status_level)
 	{
 	 /*
-	  * Some messages show in the printer-state-message attribute...
+	  * Some messages show in the job-printer-state-message attribute...
 	  */
 
 	  if (loglevel != CUPSD_LOG_NOTICE)
