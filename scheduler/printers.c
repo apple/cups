@@ -803,13 +803,13 @@ cupsdDeletePrinter(
     free(p->history);
   }
 
+  delete_printer_filters(p);
+
   for (i = 0; i < p->num_reasons; i ++)
     _cupsStrFree(p->reasons[i]);
 
   ippDelete(p->attrs);
   ippDelete(p->ppd_attrs);
-
-  delete_printer_filters(p);
 
   mimeDeleteType(MimeDatabase, p->filetype);
   mimeDeleteType(MimeDatabase, p->prefiltertype);
