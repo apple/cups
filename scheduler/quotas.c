@@ -178,16 +178,6 @@ cupsdUpdateQuota(
         attr = ippFindAttribute(job->attrs, "time-at-creation",
                                 IPP_TAG_INTEGER);
 
-    if (!attr)
-    {
-     /*
-      * This should never happen since cupsdLoadJob() checks for
-      * time-at-creation, but if it does just ignore this job...
-      */
-
-      continue;
-    }
-
     if (attr->values[0].integer < curtime)
     {
      /*
@@ -195,7 +185,7 @@ cupsdUpdateQuota(
       */
 
       if (JobAutoPurge)
-        cupsdCancelJob(job, 1, IPP_JOB_CANCELED);
+        cupsdDeleteJob(job, CUPSD_JOB_PURGE);
 
       continue;
     }

@@ -2854,10 +2854,25 @@ cupsdSetPrinterState(
 #endif /* __sgi */
   }
 
+ /*
+  * Set/clear the paused reason as needed...
+  */
+
   if (s == IPP_PRINTER_STOPPED)
     cupsdSetPrinterReasons(p, "+paused");
   else
     cupsdSetPrinterReasons(p, "-paused");
+
+ /*
+  * Clear the message for the queue when going to processing...
+  */
+
+  if (s == IPP_PRINTER_PROCESSING)
+    p->state_message[0] = '\0';
+
+ /*
+  * Update the printer history...
+  */
 
   cupsdAddPrinterHistory(p);
 
@@ -2873,8 +2888,8 @@ cupsdSetPrinterState(
   * to stopped (or visa-versa)...
   */
 
-  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED) &&
-      update)
+  if (update &&
+      (old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
   {
     if (p->type & CUPS_PRINTER_CLASS)
       cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
@@ -2892,9 +2907,6 @@ void
 cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
                  int             update)/* I - Update printers.conf? */
 {
-  cupsd_job_t	*job;			/* Active print job */
-
-
  /*
   * Set the printer state...
   */
@@ -2906,32 +2918,8 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
   */
 
   if (p->job)
-  {
-   /*
-    * Get pointer to job...
-    */
-
-    job = (cupsd_job_t *)p->job;
-
-   /*
-    * Stop it...
-    */
-
-    cupsdStopJob(job, 0);
-
-   /*
-    * Reset the state to pending...
-    */
-
-    job->state->values[0].integer = IPP_JOB_PENDING;
-    job->state_value              = IPP_JOB_PENDING;
-    job->dirty                    = 1;
-
-    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
-		  "Job stopped due to printer being paused");
-  }
+    cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
+                     "Job stopped due to printer being paused.");
 }
 
 
