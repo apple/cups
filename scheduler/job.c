@@ -76,7 +76,7 @@
 
 
 /*
- * Device Notes for Job Management
+ * Design Notes for Job Management
  * -------------------------------
  *
  * STATE CHANGES
@@ -90,7 +90,8 @@
  *     completed     Finalize
  *
  *     Finalize clears the printer <-> job association, deletes the status
- *     buffer, closes all of the pipes, etc.
+ *     buffer, closes all of the pipes, etc. and doesn't get run until all of
+ *     the print processes are finished.
  *
  * UNLOADING OF JOBS (cupsdUnloadCompletedJobs)
  *
@@ -419,11 +420,8 @@ cupsdCleanJobs(void)
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job && cupsArrayCount(Jobs) >= MaxJobs;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
-    if (job->state_value >= IPP_JOB_CANCELED)
-    {
-      cupsArrayRemove(Jobs, job);
+    if (job->state_value >= IPP_JOB_CANCELED && !job->printer)
       cupsdDeleteJob(job, CUPSD_JOB_PURGE);
-    }
 }
 
 
@@ -1241,6 +1239,10 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
 
   unload_job(job);
 
+  cupsArrayRemove(Jobs, job);
+  cupsArrayRemove(ActiveJobs, job);
+  cupsArrayRemove(PrintingJobs, job);
+
   free(job);
 }
 
@@ -1266,13 +1268,7 @@ cupsdFreeAllJobs(void)
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
-  {
-    cupsArrayRemove(Jobs, job);
-    cupsArrayRemove(ActiveJobs, job);
-    cupsArrayRemove(PrintingJobs, job);
-
     cupsdDeleteJob(job, CUPSD_JOB_DEFAULT);
-  }
 
   cupsdReleaseSignals();
 }
@@ -2230,7 +2226,8 @@ cupsdSetJobState(
         * Add the job to the "printing" list...
 	*/
 
-	cupsArrayAdd(PrintingJobs, job);
+        if (!cupsArrayFind(PrintingJobs, job))
+	  cupsArrayAdd(PrintingJobs, job);
 
        /*
 	* Set the processing time...
@@ -2266,11 +2263,10 @@ cupsdSetJobState(
         cupsdExpireSubscriptions(NULL, job);
 
        /*
-	* Remove the job from the active and printing lists...
+	* Remove the job from the active list...
 	*/
 
 	cupsArrayRemove(ActiveJobs, job);
-	cupsArrayRemove(PrintingJobs, job);
 
 #ifdef __APPLE__
        /*
@@ -2344,11 +2340,8 @@ cupsdSetJobState(
 	  job->dirty = 1;
 	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
-	else
-	{
-	  cupsArrayRemove(Jobs, job);
+	else if (!job->printer)
 	  cupsdDeleteJob(job, CUPSD_JOB_PURGE);
-	}
 	break;
   }
 
@@ -2680,6 +2673,8 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   cupsdSetPrinterState(job->printer, printer_state,
                        printer_state == IPP_PRINTER_STOPPED);
   update_job_attrs(job, 0);
+
+  cupsArrayRemove(PrintingJobs, job);
 
  /*
   * Clear the printer <-> job association...
@@ -3482,6 +3477,9 @@ static void
 start_job(cupsd_job_t     *job,		/* I - Job ID */
           cupsd_printer_t *printer)	/* I - Printer to print job */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "start_job(job=%p(%d), printer=%p(%s))",
+                  job, job->id, printer, printer->name);
+
  /*
   * Make sure we have some files around before we try to print...
   */
@@ -3930,8 +3928,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 #endif /* __APPLE__ */
     else
     {
-      if (loglevel != CUPSD_LOG_INFO)
-	cupsdLogJob(job, loglevel, "%s", message);
+      if (loglevel != CUPSD_LOG_INFO && loglevel > LogLevel)
+	cupsdLogJob(job, loglevel, "%d %s", loglevel, message);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {

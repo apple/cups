@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -471,24 +471,13 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     if (cupsArrayFind(cupsd_inactive_fds, fdptr))
       continue;
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "event->filter=%d, event->ident=%d",
-                    event->filter, (int)event->ident);
-
     retain_fd(fdptr);
 
     if (fdptr->read_cb && event->filter == EVFILT_READ)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	              fdptr->fd);
       (*(fdptr->read_cb))(fdptr->data);
-    }
 
     if (fdptr->write_cb && event->filter == EVFILT_WRITE)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	              fdptr->fd);
       (*(fdptr->write_cb))(fdptr->data);
-    }
 
     release_fd(fdptr);
   }
@@ -537,18 +526,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	retain_fd(fdptr);
 
 	if (fdptr->read_cb && (event->events & (EPOLLIN | EPOLLERR | EPOLLHUP)))
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	        	  fdptr->fd);
 	  (*(fdptr->read_cb))(fdptr->data);
-	}
 
 	if (fdptr->write_cb && (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)))
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	        	  fdptr->fd);
 	  (*(fdptr->write_cb))(fdptr->data);
-	}
 
 	release_fd(fdptr);
       }
@@ -649,18 +630,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       retain_fd(fdptr);
 
       if (fdptr->read_cb && (pfd->revents & (POLLIN | POLLERR | POLLHUP)))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	                fdptr->fd);
         (*(fdptr->read_cb))(fdptr->data);
-      }
 
       if (fdptr->write_cb && (pfd->revents & (POLLOUT | POLLERR | POLLHUP)))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
-      }
 
       release_fd(fdptr);
     }
@@ -719,18 +692,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       retain_fd(fdptr);
 
       if (fdptr->read_cb && FD_ISSET(fdptr->fd, &cupsd_current_input))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	                fdptr->fd);
         (*(fdptr->read_cb))(fdptr->data);
-      }
 
       if (fdptr->write_cb && FD_ISSET(fdptr->fd, &cupsd_current_output))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
-      }
 
       release_fd(fdptr);
     }

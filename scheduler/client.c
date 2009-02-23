@@ -797,12 +797,17 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   status = HTTP_CONTINUE;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdReadClient: %d, used=%d, file=%d state=%d",
-                  con->http.fd, con->http.used, con->file, con->http.state);
+		  "cupsdReadClient: %d con->http.used=%d, con->http.state=%d "
+		  "con->data_encoding=HTTP_ENCODE_%s, "
+		  "con->data_remaining=" CUPS_LLFMT ", con->file=%d",
+		  con->http.fd, con->http.used, con->http.state,
+		  con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
+		      "CHUNKED" : "LENGTH",
+		  CUPS_LLCAST con->http.data_remaining, con->file);
 
   if (con->http.error)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: http error seen...");
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdReadClient: HTTP error seen...");
     cupsdCloseClient(con);
     return;
   }
@@ -1955,14 +1960,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
   switch (con->http.state)
   {
     case HTTP_PUT_RECV :
-        cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	        	"cupsdReadClient: %d con->data_encoding=HTTP_ENCODE_%s, "
-			"con->data_remaining=" CUPS_LLFMT ", con->file=%d",
-			con->http.fd,
-			con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
-			    "CHUNKED" : "LENGTH",
-			CUPS_LLCAST con->http.data_remaining, con->file);
-
         do
 	{
           if ((bytes = httpRead2(HTTP(con), line, sizeof(line))) < 0)
@@ -2059,14 +2056,6 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
         break;
 
     case HTTP_POST_RECV :
-        cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	        	"cupsdReadClient: %d con->data_encoding=HTTP_ENCODE_"
-			"%s, con->data_remaining=" CUPS_LLFMT ", con->file=%d",
-			con->http.fd,
-			con->http.data_encoding == HTTP_ENCODE_CHUNKED ?
-			    "CHUNKED" : "LENGTH",
-			CUPS_LLCAST con->http.data_remaining, con->file);
-
         do
 	{
           if (con->request)

@@ -339,7 +339,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
-LogLevel debug
+LogLevel debug2
 LogTimeFormat usecs
 PreserveJobHistory Yes
 <Policy default>
@@ -755,9 +755,9 @@ fi
 
 # Debug2 log messages
 count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 0; then
-	echo "FAIL: $count debug2 messages, expected 0."
-	echo "<P>FAIL: $count debug2 messages, expected 0.</P>" >>$strfile
+if test $count = 0; then
+	echo "FAIL: $count debug2 messages, expected more than 0."
+	echo "<P>FAIL: $count debug2 messages, expected more than 0.</P>" >>$strfile
 	fail=`expr $fail + 1`
 else
 	echo "PASS: $count debug2 messages."
