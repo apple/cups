@@ -2448,6 +2448,30 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
     }
 
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-low-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-low-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-high-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-high-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
     if ((oldattr = ippFindAttribute(oldattrs, "marker-names",
                                     IPP_TAG_NAME)) != NULL)
     {
