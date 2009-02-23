@@ -4081,9 +4081,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (ppd->num_sizes == 0)
     {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-		      "The PPD file for printer %s contains no media "
-		      "options and is therefore invalid!", p->name);
+      if (!ppdFindAttr(ppd, "APScannerOnly", NULL))
+	cupsdLogMessage(CUPSD_LOG_CRIT,
+			"The PPD file for printer %s contains no media "
+			"options and is therefore invalid!", p->name);
+
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "media-supported", NULL, "unknown");
     }
     else
     {
@@ -4257,6 +4261,16 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	p->type |= CUPS_PRINTER_MEDIUM;
       else
 	p->type |= CUPS_PRINTER_SMALL;
+
+    if ((ppd_attr = ppdFindAttr(ppd, "APICADriver", NULL)) != NULL &&
+        ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+    {
+      if ((ppd_attr = ppdFindAttr(ppd, "APScannerOnly", NULL)) != NULL &&
+	  ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+        p->type |= CUPS_PRINTER_SCANNER;
+      else
+        p->type |= CUPS_PRINTER_MFP;
+    }
 
    /*
     * Add a filter from application/vnd.cups-raw to printer/name to
