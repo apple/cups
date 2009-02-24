@@ -2668,24 +2668,8 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
-  if (!p || !s)
-  {
-    cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "cupsdSetPrinterReasons called with p=%p and s=%p!", p, s);
-    return;
-  }
-
-  if (LogLevel == CUPSD_LOG_DEBUG2)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetPrinterReasons: num_reasons=%d",
-                    p->num_reasons);
-    for (i = 0; i < p->num_reasons; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetPrinterReasons: reasons[%d]=%p(\"%s\")", i,
-		      p->reasons[i], p->reasons[i]);
-  }
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
 
   if (s[0] == '-' || s[0] == '+')
   {
@@ -2812,17 +2796,6 @@ cupsdSetPrinterReasons(
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
       }
     }
-  }
-
-  if (LogLevel == CUPSD_LOG_DEBUG2)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdSetPrinterReasons: NEW num_reasons=%d",
-                    p->num_reasons);
-    for (i = 0; i < p->num_reasons; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetPrinterReasons: NEW reasons[%d]=%p(\"%s\")", i,
-		      p->reasons[i], p->reasons[i]);
   }
 }
 

@@ -85,6 +85,8 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 
   if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                    job_id);
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create security profile: %s",
                     strerror(errno));
     return (NULL);
@@ -130,7 +132,10 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = \"%s\"",
                   job_id, profile);
   return ((void *)strdup(profile));
+
 #else
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                  job_id);
 
   return (NULL);
 #endif /* HAVE_SANDBOX_H */
@@ -144,11 +149,12 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 void
 cupsdDestroyProfile(void *profile)	/* I - Profile */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
+		  profile ? (char *)profile : "(null)");
+
 #ifdef HAVE_SANDBOX_H
   if (profile)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
-                    (char *)profile);
     unlink((char *)profile);
     free(profile);
   }
@@ -164,6 +170,9 @@ int					/* O - 0 on success, -1 on failure */
 cupsdEndProcess(int pid,		/* I - Process ID */
                 int force)		/* I - Force child to die */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdEndProcess(pid=%d, force=%d)", pid,
+                  force);
+
   if (force)
     return (kill(pid, SIGKILL));
   else
@@ -195,16 +204,21 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
     strlcpy(name, proc->name, namelen);
     cupsArrayRemove(process_array, proc);
     free(proc);
-
-    return (name);
   }
   else
   {
     if (job_id)
       *job_id = 0;
 
-    return ("unknown");
+    strlcpy(name, "unknown", namelen);
   }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdFinishProcess(pid=%d, name=%p, namelen=%d, "
+		  "job_id=%p(%d)) = \"%s\"", pid, name, namelen, job_id,
+		  job_id ? *job_id : 0, name);
+
+  return (name);
 }
 
 
@@ -240,10 +254,6 @@ cupsdStartProcess(
 #endif /* __APPLE__ */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
-                  command, argv, envp, infd, outfd, errfd);
-
   if (RunUser)
     user = RunUser;
   else if (root)
@@ -253,17 +263,32 @@ cupsdStartProcess(
 
   if (stat(command, &commandinfo))
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
-    *pid = 0;
     return (0);
   }
   else if (commandinfo.st_mode & S_IWOTH)
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: insecure file permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid  = 0;
+
     errno = EPERM;
     return (0);
   }
@@ -271,10 +296,18 @@ cupsdStartProcess(
            (commandinfo.st_gid != Group || !(commandinfo.st_mode & S_IXGRP)) &&
            !(commandinfo.st_mode & S_IXOTH))
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: no execute permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid  = 0;
+
     errno = EPERM;
     return (0);
   }
@@ -491,6 +524,13 @@ cupsdStartProcess(
   }
 
   cupsdReleaseSignals();
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		  "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		  "profile=%p, job_id=%d, pid=%p) = %d",
+		  command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		  root, profile, job_id, pid, *pid);
 
   return (*pid);
 }

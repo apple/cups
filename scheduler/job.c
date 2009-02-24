@@ -286,11 +286,6 @@ cupsdCheckJobs(void)
     * Start held jobs if they are ready...
     */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdCheckJobs: Job %d: dest=%s, dtype=%x, "
-		    "state_value=%d, loaded=%s", job->id, job->dest, job->dtype,
-		    job->state_value, job->attrs ? "yes" : "no");
-
     if (job->state_value == IPP_JOB_HELD &&
         job->hold_until &&
 	job->hold_until < time(NULL))
@@ -485,9 +480,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 					/* RIP_MAX_CACHE env variable */
 
 
-  cupsdLogJob(job, CUPSD_LOG_DEBUG2,
-              "cupsdContinueJob: current_file=%d, num_files=%d",
-	      job->current_file, job->num_files);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdContinueJob(job=%p(%d)): current_file=%d, num_files=%d",
+	          job, job->id, job->current_file, job->num_files);
 
  /*
   * Figure out what filters are required to convert from
@@ -2063,7 +2058,7 @@ cupsdSetJobHoldUntil(cupsd_job_t *job,	/* I - Job */
       job->hold_until += 24 * 60 * 60;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetJobHoldUntil: hold_until = %d",
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetJobHoldUntil: hold_until=%d",
                   (int)job->hold_until);
 }
 
@@ -2129,11 +2124,9 @@ cupsdSetJobState(
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdSetJobState(job=%p(%d), newstate=%d, action=%d, "
-		  "message=\"%s\")", job, job->id, newstate, action,
-		  message ? message : "(null)");
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetJobState: current state=%d",
-                  job->state_value);
+                  "cupsdSetJobState(job=%p(%d), state=%d, newstate=%d, "
+		  "action=%d, message=\"%s\")", job, job->id, job->state_value,
+		  newstate, action, message ? message : "(null)");
 
 
  /*
