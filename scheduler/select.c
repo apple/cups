@@ -427,9 +427,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   struct timespec	ktimeout;	/* kevent() timeout */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect(timeout=%ld): %d fds",
-		  timeout, cupsArrayCount(cupsd_fds));
-
   cupsd_in_select = 1;
 
   if (timeout >= 0 && timeout < 86400)
@@ -467,9 +464,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   struct pollfd		*pfd;		/* Current pollfd structure */
   int			count;		/* Number of file descriptors */
 
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect(timeout=%ld): %d fds",
-		  timeout, cupsArrayCount(cupsd_fds));
 
 #  ifdef HAVE_EPOLL
   cupsd_in_select = 1;
@@ -607,9 +601,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   struct timeval	stimeout;	/* Timeout for select() */
   int			maxfd;		/* Maximum file descriptor */
 
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect(timeout=%ld): %d fds",
-		  timeout, cupsArrayCount(cupsd_fds));
 
  /*
   * Figure out the highest file descriptor number...

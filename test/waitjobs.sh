@@ -4,7 +4,7 @@
 #
 # Script to wait for jobs to complete.
 #
-#   Copyright 2008 by Apple Inc.
+#   Copyright 2008-2009 by Apple Inc.
 #
 #   These coded instructions, statements, and computer programs are the
 #   property of Apple Inc. and are protected by Federal copyright
@@ -17,7 +17,7 @@
 if test $# = 1; then
 	timeout=$1
 else
-	timeout=60
+	timeout=360
 fi
 
 echo "Waiting for jobs to complete..."

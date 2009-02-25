@@ -670,12 +670,6 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (!stop_scheduler)
   {
-#ifdef DEBUG
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "main: Top of loop, dead_children=%d, NeedReload=%d",
-                    dead_children, NeedReload);
-#endif /* DEBUG */
-
    /*
     * Check if there are dead children to handle...
     */
