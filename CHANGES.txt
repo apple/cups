@@ -11,7 +11,7 @@ CHANGES IN CUPS V1.4b3
 	- Added complete localizations for Japanese and Russian and partial
 	  localizations for Chinese, Danish, German, Finnish, French, Italian,
 	  Korean, Norwegian, Polish, Portuguese, and Swedish (STR #3096,
-	  STR #3098)
+	  STR #3098, STR #3109)
 	- Clicking on "Select Another Make/Manufacturer" in the web interface
 	  incorrectly added the printer (STR #3095)
 	- The scheduler no longer uses programs with insecure file
