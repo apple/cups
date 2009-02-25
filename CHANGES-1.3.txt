@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
 	  STR #3057)
+	- Fixed a localization problem for option choices (incorrectly) named
+	  "Custom" (STR #3106)
 	- The fallback OpenSSL random number seeding would not work (STR #3079)
 	- The scheduler might miss a child signal, causing high CPU usage.
 	- The scheduler did not enforce quotas after the job history was

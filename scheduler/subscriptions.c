@@ -3,7 +3,7 @@
  *
  *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1622,7 +1622,7 @@ cupsd_start_notifier(
   */
 
   if (cupsdStartProcess(command, argv, envp, fds[0], -1, NotifierPipes[1],
-			-1, -1, 0, DefaultProfile, &pid) < 0)
+			-1, -1, 0, DefaultProfile, 0, &pid) < 0)
   {
    /*
     * Error - can't fork!

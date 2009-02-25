@@ -57,7 +57,7 @@ cupsdStatBufDelete(cupsd_statbuf_t *sb)	/* I - Status buffer */
  */
 
 cupsd_statbuf_t	*			/* O - New status buffer */
-cupsdStatBufNew(int fd,			/* I - File descriptor of pipe */
+cupsdStatBufNew(int        fd,		/* I - File descriptor of pipe */
                 const char *prefix,	/* I - Printf-style prefix string */
 		...)			/* I - Additional args as needed */
 {

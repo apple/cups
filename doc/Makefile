@@ -185,7 +185,7 @@ install-languages:
 		if test -d $$lang; then \
 			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang; \
 			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
-			$(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang 2>/dev/null || true; \
+			test -f $$lang/cups.css && $(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang; \
 		fi; \
 	done
 

@@ -301,7 +301,7 @@ cupsSideChannelSNMPGet(
   */
 
   if (cupsSideChannelWrite(CUPS_SC_CMD_SNMP_GET, CUPS_SC_STATUS_NONE, oid,
-                           (int)strlen(oid), timeout))
+                           (int)strlen(oid) + 1, timeout))
     return (CUPS_SC_STATUS_TIMEOUT);
 
   real_datalen = sizeof(real_data);
@@ -401,7 +401,7 @@ cupsSideChannelSNMPWalk(
     */
 
     if (cupsSideChannelWrite(CUPS_SC_CMD_SNMP_GET_NEXT, CUPS_SC_STATUS_NONE,
-                             current_oid, (int)strlen(current_oid), timeout))
+                             current_oid, (int)strlen(current_oid) + 1, timeout))
       return (CUPS_SC_STATUS_TIMEOUT);
 
     real_datalen = sizeof(real_data);

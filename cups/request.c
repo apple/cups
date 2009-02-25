@@ -207,6 +207,13 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
                 (long)ippLength(request), (long)length));
 
  /*
+  * Clear any "Local" authentication data since it is probably stale...
+  */
+
+  if (http->authstring && !strncmp(http->authstring, "Local ", 6))
+    httpSetAuthString(http, NULL, NULL);
+
+ /*
   * Loop until we can send the request without authorization problems.
   */
 
@@ -590,13 +597,6 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
       return (HTTP_SERVICE_UNAVAILABLE);
     }
-
- /*
-  * Clear any "Local" authentication data since it is probably stale...
-  */
-
-  if (http->authstring && !strncmp(http->authstring, "Local ", 6))
-    httpSetAuthString(http, NULL, NULL);
 
  /*
   * Loop until we can send the request without authorization problems.

@@ -284,7 +284,7 @@ AC_SUBST(DBUS_NOTIFIER)
 AC_SUBST(DBUS_NOTIFIERLIBS)
 
 dnl Extra platform-specific libraries...
-CUPS_DEFAULT_PRINTADMIN_AUTH="@SYSTEM"
+CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
 FONTS="fonts"
 LEGACY_BACKENDS="parallel scsi"
@@ -334,11 +334,11 @@ case $uname in
 			fi
 
 			if test "x$default_operkey" != xdefault; then
-				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY($default_operkey) @admin @lpadmin"
+				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY($default_operkey) @admin @lpadmin"
 			elif grep -q system.print.operator /etc/authorization; then
-				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
+				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.operator) @admin @lpadmin"
 			else
-				CUPS_DEFAULT_PRINTADMIN_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
+				CUPS_DEFAULT_PRINTOPERATOR_AUTH="@AUTHKEY(system.print.admin) @admin @lpadmin"
 			fi])
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
@@ -347,8 +347,8 @@ case $uname in
                 ;;
 esac
 
-AC_SUBST(CUPS_DEFAULT_PRINTADMIN_AUTH)
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTADMIN_AUTH, "$CUPS_DEFAULT_PRINTADMIN_AUTH")
+AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(FONTS)
 AC_SUBST(LEGACY_BACKENDS)

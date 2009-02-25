@@ -4,7 +4,7 @@
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1133,7 +1133,13 @@ _cupsAdminGetServerSettings(
         else if (!strcasecmp(value, "all"))
 	  remote_any = 1;
       }
-      else if (line[0] != '<' && !in_location && !in_policy)
+      else if (line[0] != '<' && !in_location && !in_policy &&
+	       strcasecmp(line, "Allow") &&
+               strcasecmp(line, "AuthType") &&
+	       strcasecmp(line, "Deny") &&
+	       strcasecmp(line, "Order") &&
+	       strcasecmp(line, "Require") &&
+	       strcasecmp(line, "Satisfy"))
         cg->cupsd_num_settings = cupsAddOption(line, value,
 	                                       cg->cupsd_num_settings,
 					       &(cg->cupsd_settings));
@@ -1643,7 +1649,7 @@ _cupsAdminSetServerSettings(
 	                     "  <Limit Cancel-Job>\n"
 	                     "    Order deny,allow\n"
 			     "    Require user @OWNER "
-			     CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
+			     CUPS_DEFAULT_PRINTOPERATOR_AUTH "\n"
 			     "  </Limit>\n");
       }
 
@@ -1790,7 +1796,7 @@ _cupsAdminSetServerSettings(
 	                   "  <Limit Cancel-Job>\n"
 	                   "    Order deny,allow\n"
 	                   "    Require user @OWNER "
-			   CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
+			   CUPS_DEFAULT_PRINTOPERATOR_AUTH "\n"
 			   "  </Limit>\n");
 
       in_cancel_job = 0;
@@ -2015,7 +2021,7 @@ _cupsAdminSetServerSettings(
 	                 "  <Limit Cancel-Job>\n"
 	                 "    Order deny,allow\n"
 	                 "    Require user @OWNER "
-			 CUPS_DEFAULT_PRINTADMIN_AUTH "\n"
+			 CUPS_DEFAULT_PRINTOPERATOR_AUTH "\n"
 			 "  </Limit>\n");
 
     cupsFilePuts(temp, "  <Limit All>\n"

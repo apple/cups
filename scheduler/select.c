@@ -3,7 +3,7 @@
  *
  *   Select abstraction functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -269,7 +269,7 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
   */
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAddSelect: fd=%d, read_cb=%p, write_cb=%p, data=%p",
+                  "cupsdAddSelect(fd=%d, read_cb=%p, write_cb=%p, data=%p)",
 		  fd, read_cb, write_cb, data);
 
   if (fd < 0)
@@ -325,8 +325,7 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
 
       if (kevent(cupsd_kqueue_fd, &event, 1, NULL, 0, &timeout))
       {
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-			"cupsdAddSelect: kevent() returned %s",
+	cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 			strerror(errno));
 	return (0);
       }
@@ -341,8 +340,7 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
 
       if (kevent(cupsd_kqueue_fd, &event, 1, NULL, 0, &timeout))
       {
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-			"cupsdAddSelect: kevent() returned %s",
+	cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 			strerror(errno));
 	return (0);
       }
@@ -386,29 +384,17 @@ cupsdAddSelect(int             fd,	/* I - File descriptor */
   */
 
   if (read_cb)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdAddSelect: Adding fd %d to input set...", fd);
     FD_SET(fd, &cupsd_global_input);
-  }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdAddSelect: Removing fd %d from input set...", fd);
     FD_CLR(fd, &cupsd_global_input);
     FD_CLR(fd, &cupsd_current_input);
   }
 
   if (write_cb)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdAddSelect: Adding fd %d to output set...", fd);
     FD_SET(fd, &cupsd_global_output);
-  }
   else
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdAddSelect: Removing fd %d from output set...", fd);
     FD_CLR(fd, &cupsd_global_output);
     FD_CLR(fd, &cupsd_current_output);
   }
@@ -441,10 +427,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   struct timespec	ktimeout;	/* kevent() timeout */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdDoSelect: polling %d fds for %ld seconds...",
-		  cupsArrayCount(cupsd_fds), timeout);
-
   cupsd_in_select = 1;
 
   if (timeout >= 0 && timeout < 86400)
@@ -458,10 +440,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   else
     nfds = kevent(cupsd_kqueue_fd, NULL, 0, cupsd_kqueue_events, MaxFDs, NULL);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdDoSelect: kevent(%d, ..., %d, ...) returned %d...",
-                  cupsd_kqueue_fd, MaxFDs, nfds);
-
   cupsd_kqueue_changes = 0;
 
   for (i = nfds, event = cupsd_kqueue_events; i > 0; i --, event ++)
@@ -471,24 +449,13 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     if (cupsArrayFind(cupsd_inactive_fds, fdptr))
       continue;
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "event->filter=%d, event->ident=%d",
-                    event->filter, (int)event->ident);
-
     retain_fd(fdptr);
 
     if (fdptr->read_cb && event->filter == EVFILT_READ)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	              fdptr->fd);
       (*(fdptr->read_cb))(fdptr->data);
-    }
 
     if (fdptr->write_cb && event->filter == EVFILT_WRITE)
-    {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	              fdptr->fd);
       (*(fdptr->write_cb))(fdptr->data);
-    }
 
     release_fd(fdptr);
   }
@@ -497,10 +464,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   struct pollfd		*pfd;		/* Current pollfd structure */
   int			count;		/* Number of file descriptors */
 
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdDoSelect: polling %d fds for %ld seconds...",
-		  cupsArrayCount(cupsd_fds), timeout);
 
 #  ifdef HAVE_EPOLL
   cupsd_in_select = 1;
@@ -516,9 +479,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
                 	timeout * 1000);
     else
       nfds = epoll_wait(cupsd_epoll_fd, cupsd_epoll_events, MaxFDs, -1);
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: epoll() returned %d...",
-                    nfds);
 
     if (nfds < 0 && errno != EINTR)
     {
@@ -537,18 +497,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	retain_fd(fdptr);
 
 	if (fdptr->read_cb && (event->events & (EPOLLIN | EPOLLERR | EPOLLHUP)))
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	        	  fdptr->fd);
 	  (*(fdptr->read_cb))(fdptr->data);
-	}
 
 	if (fdptr->write_cb && (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)))
-	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	        	  fdptr->fd);
 	  (*(fdptr->write_cb))(fdptr->data);
-	}
 
 	release_fd(fdptr);
       }
@@ -567,8 +519,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     */
 
     cupsd_update_pollfds = 0;
-
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Updating pollfd array...");
 
    /*
     * (Re)allocate memory as needed...
@@ -616,17 +566,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     }
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdDoSelect: polling %d fds for %ld seconds...",
-		  count, timeout);
-
   if (timeout >= 0 && timeout < 86400)
     nfds = poll(cupsd_pollfds, count, timeout * 1000);
   else
     nfds = poll(cupsd_pollfds, count, -1);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: poll() returned %d...",
-                  nfds);
 
   if (nfds > 0)
   {
@@ -636,10 +579,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 
     for (pfd = cupsd_pollfds; count > 0; pfd ++, count --)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdDoSelect: pollfds[%d]={fd=%d, revents=%x}",
-		      (int)(pfd - cupsd_pollfds), pfd->fd, pfd->revents);
-
       if (!pfd->revents)
         continue;
 
@@ -649,18 +588,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       retain_fd(fdptr);
 
       if (fdptr->read_cb && (pfd->revents & (POLLIN | POLLERR | POLLHUP)))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	                fdptr->fd);
         (*(fdptr->read_cb))(fdptr->data);
-      }
 
       if (fdptr->write_cb && (pfd->revents & (POLLOUT | POLLERR | POLLHUP)))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
-      }
 
       release_fd(fdptr);
     }
@@ -687,10 +618,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   cupsd_current_input  = cupsd_global_input;
   cupsd_current_output = cupsd_global_output;
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdDoSelect: selecting %d fds for %ld seconds...",
-		  maxfd, timeout);
-
   if (timeout >= 0 && timeout < 86400)
   {
     stimeout.tv_sec  = timeout;
@@ -702,9 +629,6 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
   else
     nfds = select(maxfd, &cupsd_current_input, &cupsd_current_output, NULL,
                   NULL);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: select() returned %d...",
-                  nfds);
 
   if (nfds > 0)
   {
@@ -719,18 +643,10 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       retain_fd(fdptr);
 
       if (fdptr->read_cb && FD_ISSET(fdptr->fd, &cupsd_current_input))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Read on fd %d...",
-	                fdptr->fd);
         (*(fdptr->read_cb))(fdptr->data);
-      }
 
       if (fdptr->write_cb && FD_ISSET(fdptr->fd, &cupsd_current_output))
-      {
-        cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDoSelect: Write on fd %d...",
-	                fdptr->fd);
         (*(fdptr->write_cb))(fdptr->data);
-      }
 
       release_fd(fdptr);
     }
@@ -802,7 +718,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   * Range check input...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdRemoveSelect: fd=%d", fd);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdRemoveSelect(fd=%d)", fd);
 
   if (fd < 0)
     return;
@@ -832,8 +748,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
 
     if (kevent(cupsd_kqueue_fd, &event, 1, NULL, 0, &timeout))
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		      "cupsdRemoveSelect: kevent() returned %s",
+      cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 		      strerror(errno));
       return;
     }
@@ -845,8 +760,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
 
     if (kevent(cupsd_kqueue_fd, &event, 1, NULL, 0, &timeout))
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		      "cupsdRemoveSelect: kevent() returned %s",
+      cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 		      strerror(errno));
       return;
     }
@@ -861,9 +775,6 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   cupsd_update_pollfds = 1;
 
 #else /* select() */
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdRemoveSelect: Removing fd %d from input and output "
-		  "sets...", fd);
   FD_CLR(fd, &cupsd_global_input);
   FD_CLR(fd, &cupsd_global_output);
   FD_CLR(fd, &cupsd_current_input);
@@ -894,6 +805,8 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
 void
 cupsdStartSelect(void)
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStartSelect()");
+
   cupsd_fds = cupsArrayNew((cups_array_func_t)compare_fds, NULL);
 
 #if defined(HAVE_EPOLL) || defined(HAVE_KQUEUE)
@@ -929,6 +842,8 @@ cupsdStopSelect(void)
 {
   _cupsd_fd_t	*fdptr;			/* Current file descriptor */
 
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdStopSelect()");
 
   for (fdptr = (_cupsd_fd_t *)cupsArrayFirst(cupsd_fds);
        fdptr;

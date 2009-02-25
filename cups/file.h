@@ -91,6 +91,7 @@ extern ssize_t		cupsFilePutConf(cups_file_t *fp, const char *directive,
 			                const char *value) _CUPS_API_1_4;
 extern int		cupsFilePuts(cups_file_t *fp, const char *s) _CUPS_API_1_2;
 extern ssize_t		cupsFileRead(cups_file_t *fp, char *buf, size_t bytes) _CUPS_API_1_2;
+extern ssize_t		cupsFileReady(cups_file_t *fp) _CUPS_API_1_4;
 extern off_t		cupsFileRewind(cups_file_t *fp) _CUPS_API_1_2;
 extern off_t		cupsFileSeek(cups_file_t *fp, off_t pos) _CUPS_API_1_2;
 extern cups_file_t	*cupsFileStderr(void) _CUPS_API_1_2;

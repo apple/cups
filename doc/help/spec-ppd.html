@@ -12,7 +12,7 @@
 
   CUPS PPD extensions specification for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2009 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -1799,6 +1799,20 @@ information.</p>
 <pre class='command'>
 *% Define the printer utility application
 *APPrinterPrinterUtilityPath: "/Library/Printers/vendor/Tools/utility.app"
+</pre>
+
+<h3><span class='info'>Mac OS X 10.6</span><a name='APScannerOnly'>APScannerOnly</a></h3>
+
+<p class='summary'>*APScannerOnly: boolean</p>
+
+<p>This attribute specifies whether the device has scanning but no printing
+capabilities. The default is <tt>False</tt>.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*APICADriver: True
+*APScannerOnly: True
 </pre>
 
 <h3><span class='info'>Mac OS X 10.3</span><a name='APScanAppBundleID'>APScanAppBundleID</a></h3>

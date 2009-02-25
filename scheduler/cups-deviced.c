@@ -3,7 +3,7 @@
  *
  *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -313,11 +313,22 @@ main(int  argc,				/* I - Number of command-line args */
     {
       for (i = 0; i < num_backends; i ++)
         if (backend_fds[i].revents && backends[i].pipe)
-	  if (get_device(backends + i))
+	{
+	  cups_file_t *bpipe = backends[i].pipe;
+					/* Copy of pipe for backend... */
+
+	  do
 	  {
-	    backend_fds[i].fd     = 0;
-	    backend_fds[i].events = 0;
+	    if (get_device(backends + i))
+	    {
+	      backend_fds[i].fd     = 0;
+	      backend_fds[i].events = 0;
+	      break;
+	    }
 	  }
+	  while (bpipe->ptr &&
+	         memchr(bpipe->ptr, '\n', bpipe->end - bpipe->ptr));
+        }
     }
 
    /*

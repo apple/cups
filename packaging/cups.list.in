@@ -551,11 +551,14 @@ f 0644 root sys $DATADIR/templates/es templates/es/*.tmpl
 #d 0755 root sys $DATADIR/templates/it
 #f 0644 root sys $DATADIR/templates/it templates/it/*.tmpl
 
-#d 0755 root sys $DATADIR/templates/ja
-#f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
+d 0755 root sys $DATADIR/templates/ja
+f 0644 root sys $DATADIR/templates/ja templates/ja/*.tmpl
 
-#d 0755 root sys $DATADIR/templates/pl
-#f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
+d 0755 root sys $DATADIR/templates/pl
+f 0644 root sys $DATADIR/templates/pl templates/pl/*.tmpl
+
+d 0755 root sys $DATADIR/templates/ru
+f 0644 root sys $DATADIR/templates/ru templates/ru/*.tmpl
 
 #d 0755 root sys $DATADIR/templates/sv
 #f 0644 root sys $DATADIR/templates/sv templates/sv/*.tmpl
@@ -660,11 +663,14 @@ f 0644 root sys $DOCDIR/es doc/es/*.html
 #d 0755 root sys $DOCDIR/it
 #f 0644 root sys $DOCDIR/it doc/it/*.html
 
-#d 0755 root sys $DOCDIR/ja
-#f 0644 root sys $DOCDIR/ja doc/ja/*.html
+d 0755 root sys $DOCDIR/ja
+f 0644 root sys $DOCDIR/ja doc/ja/*.html
 
-#d 0755 root sys $DOCDIR/pl
-#f 0644 root sys $DOCDIR/pl doc/pl/*.html
+d 0755 root sys $DOCDIR/pl
+f 0644 root sys $DOCDIR/pl doc/pl/*.html
+
+d 0755 root sys $DOCDIR/ru
+f 0644 root sys $DOCDIR/ru doc/ru/*.html
 
 #d 0755 root sys $DOCDIR/sv
 #f 0644 root sys $DOCDIR/sv doc/sv/*.html

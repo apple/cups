@@ -803,13 +803,13 @@ cupsdDeletePrinter(
     free(p->history);
   }
 
+  delete_printer_filters(p);
+
   for (i = 0; i < p->num_reasons; i ++)
     _cupsStrFree(p->reasons[i]);
 
   ippDelete(p->attrs);
   ippDelete(p->ppd_attrs);
-
-  delete_printer_filters(p);
 
   mimeDeleteType(MimeDatabase, p->filetype);
   mimeDeleteType(MimeDatabase, p->prefiltertype);
@@ -1099,7 +1099,11 @@ cupsdLoadAllPrinters(void)
     }
     else if (!strcasecmp(line, "Reason"))
     {
-      if (value)
+      if (value &&
+          strcmp(value, "com.apple.print.recoverable-warning") &&
+          strcmp(value, "connecting-to-device") &&
+          strcmp(value, "cups-insecure-filter-error") &&
+          strcmp(value, "cups-missing-filter-error"))
       {
         for (i = 0 ; i < p->num_reasons; i ++)
 	  if (!strcmp(value, p->reasons[i]))
@@ -1590,7 +1594,9 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      if (strcmp(printer->reasons[i], "connecting-to-device") &&
+      if (strcmp(printer->reasons[i], "com.apple.print.recoverable-warning") &&
+          strcmp(printer->reasons[i], "connecting-to-device") &&
+          strcmp(printer->reasons[i], "cups-insecure-filter-error") &&
           strcmp(printer->reasons[i], "cups-missing-filter-error"))
         cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
@@ -2442,6 +2448,30 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
     }
 
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-low-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-low-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-high-levels",
+                                    IPP_TAG_INTEGER)) != NULL)
+    {
+      if ((attr = ippAddIntegers(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                                 "marker-high-levels", oldattr->num_values,
+				 NULL)) != NULL)
+      {
+	for (i = 0; i < oldattr->num_values; i ++)
+	  attr->values[i].integer = oldattr->values[i].integer;
+      }
+    }
+
     if ((oldattr = ippFindAttribute(oldattrs, "marker-names",
                                     IPP_TAG_NAME)) != NULL)
     {
@@ -2638,24 +2668,8 @@ cupsdSetPrinterReasons(
 		*rptr;			/* Pointer into reason */
 
 
-  if (!p || !s)
-  {
-    cupsdLogMessage(CUPSD_LOG_EMERG,
-                    "cupsdSetPrinterReasons called with p=%p and s=%p!", p, s);
-    return;
-  }
-
-  if (LogLevel == CUPSD_LOG_DEBUG2)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-		    "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdSetPrinterReasons: num_reasons=%d",
-                    p->num_reasons);
-    for (i = 0; i < p->num_reasons; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetPrinterReasons: reasons[%d]=%p(\"%s\")", i,
-		      p->reasons[i], p->reasons[i]);
-  }
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdSetPrinterReasons(p=%p(%s),s=\"%s\"", p, p->name, s);
 
   if (s[0] == '-' || s[0] == '+')
   {
@@ -2783,17 +2797,6 @@ cupsdSetPrinterReasons(
       }
     }
   }
-
-  if (LogLevel == CUPSD_LOG_DEBUG2)
-  {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "cupsdSetPrinterReasons: NEW num_reasons=%d",
-                    p->num_reasons);
-    for (i = 0; i < p->num_reasons; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdSetPrinterReasons: NEW reasons[%d]=%p(\"%s\")", i,
-		      p->reasons[i], p->reasons[i]);
-  }
 }
 
 
@@ -2848,10 +2851,25 @@ cupsdSetPrinterState(
 #endif /* __sgi */
   }
 
+ /*
+  * Set/clear the paused reason as needed...
+  */
+
   if (s == IPP_PRINTER_STOPPED)
     cupsdSetPrinterReasons(p, "+paused");
   else
     cupsdSetPrinterReasons(p, "-paused");
+
+ /*
+  * Clear the message for the queue when going to processing...
+  */
+
+  if (s == IPP_PRINTER_PROCESSING)
+    p->state_message[0] = '\0';
+
+ /*
+  * Update the printer history...
+  */
 
   cupsdAddPrinterHistory(p);
 
@@ -2867,8 +2885,8 @@ cupsdSetPrinterState(
   * to stopped (or visa-versa)...
   */
 
-  if ((old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED) &&
-      update)
+  if (update &&
+      (old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
   {
     if (p->type & CUPS_PRINTER_CLASS)
       cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
@@ -2886,9 +2904,6 @@ void
 cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
                  int             update)/* I - Update printers.conf? */
 {
-  cupsd_job_t	*job;			/* Active print job */
-
-
  /*
   * Set the printer state...
   */
@@ -2900,32 +2915,8 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
   */
 
   if (p->job)
-  {
-   /*
-    * Get pointer to job...
-    */
-
-    job = (cupsd_job_t *)p->job;
-
-   /*
-    * Stop it...
-    */
-
-    cupsdStopJob(job, 0);
-
-   /*
-    * Reset the state to pending...
-    */
-
-    job->state->values[0].integer = IPP_JOB_PENDING;
-    job->state_value              = IPP_JOB_PENDING;
-    job->dirty                    = 1;
-
-    cupsdMarkDirty(CUPSD_DIRTY_JOBS);
-
-    cupsdAddEvent(CUPSD_EVENT_JOB_STOPPED, p, job,
-		  "Job stopped due to printer being paused");
-  }
+    cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
+                     "Job stopped due to printer being paused.");
 }
 
 
@@ -3889,6 +3880,9 @@ delete_printer_filters(
 
       mimeDeleteFilter(MimeDatabase, filter);
     }
+
+  cupsdSetPrinterReasons(p, "-cups-insecure-filter-error"
+                            ",cups-missing-filter-error");
 }
 
 
@@ -4060,9 +4054,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (ppd->num_sizes == 0)
     {
-      cupsdLogMessage(CUPSD_LOG_CRIT,
-		      "The PPD file for printer %s contains no media "
-		      "options and is therefore invalid!", p->name);
+      if (!ppdFindAttr(ppd, "APScannerOnly", NULL))
+	cupsdLogMessage(CUPSD_LOG_CRIT,
+			"The PPD file for printer %s contains no media "
+			"options and is therefore invalid!", p->name);
+
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "media-supported", NULL, "unknown");
     }
     else
     {
@@ -4236,6 +4234,16 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	p->type |= CUPS_PRINTER_MEDIUM;
       else
 	p->type |= CUPS_PRINTER_SMALL;
+
+    if ((ppd_attr = ppdFindAttr(ppd, "APICADriver", NULL)) != NULL &&
+        ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+    {
+      if ((ppd_attr = ppdFindAttr(ppd, "APScannerOnly", NULL)) != NULL &&
+	  ppd_attr->value && !strcasecmp(ppd_attr->value, "true"))
+        p->type |= CUPS_PRINTER_SCANNER;
+      else
+        p->type |= CUPS_PRINTER_MFP;
+    }
 
    /*
     * Add a filter from application/vnd.cups-raw to printer/name to

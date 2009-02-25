@@ -206,10 +206,12 @@ cupsfilter.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 cupsfilter.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
 cupsfilter.o: ../cups/transcode.h ../cups/string.h ../config.h mime.h
 cupsfilter.o: ../cups/array.h ../cups/ipp.h ../cups/file.h
-cups-deviced.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cups-deviced.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-cups-deviced.o: ../cups/file.h ../cups/language.h ../cups/file.h
-cups-deviced.o: ../cups/string.h ../config.h ../cups/array.h ../cups/dir.h
+cups-deviced.o: util.h ../cups/file-private.h ../cups/http-private.h
+cups-deviced.o: ../config.h ../cups/http.h ../cups/versioning.h ../cups/md5.h
+cups-deviced.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/globals.h
+cups-deviced.o: ../cups/string.h ../cups/cups.h ../cups/i18n.h
+cups-deviced.o: ../cups/transcode.h ../cups/language.h ../cups/array.h
+cups-deviced.o: ../cups/debug.h ../cups/array.h ../cups/dir.h
 cups-lpd.o: ../cups/http-private.h ../config.h ../cups/http.h
 cups-lpd.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
 cups-lpd.o: ../cups/ipp.h ../cups/cups.h ../cups/ppd.h ../cups/array.h
@@ -235,12 +237,16 @@ testspeed.o: ../cups/language.h ../cups/debug.h
 testsub.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 testsub.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 testsub.o: ../cups/debug.h ../cups/string.h ../config.h
-util.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-util.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-util.o: ../cups/language.h ../cups/file.h ../cups/string.h ../config.h
-cups-driverd.o: util.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-cups-driverd.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-cups-driverd.o: ../cups/file.h ../cups/language.h ../cups/file.h
-cups-driverd.o: ../cups/string.h ../config.h ../cups/dir.h
-cups-driverd.o: ../cups/transcode.h ../cups/ppd-private.h ../cups/cups.h
-cups-driverd.o: ../ppdc/ppdc.h
+util.o: util.h ../cups/file-private.h ../cups/http-private.h ../config.h
+util.o: ../cups/http.h ../cups/versioning.h ../cups/md5.h
+util.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/globals.h
+util.o: ../cups/string.h ../cups/cups.h ../cups/i18n.h ../cups/transcode.h
+util.o: ../cups/language.h ../cups/array.h ../cups/debug.h
+cups-driverd.o: util.h ../cups/file-private.h ../cups/http-private.h
+cups-driverd.o: ../config.h ../cups/http.h ../cups/versioning.h ../cups/md5.h
+cups-driverd.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/globals.h
+cups-driverd.o: ../cups/string.h ../cups/cups.h ../cups/i18n.h
+cups-driverd.o: ../cups/transcode.h ../cups/language.h ../cups/array.h
+cups-driverd.o: ../cups/debug.h ../cups/dir.h ../cups/transcode.h
+cups-driverd.o: ../cups/ppd-private.h ../ppdc/ppdc.h ../cups/string.h
+cups-driverd.o: ../cups/file.h

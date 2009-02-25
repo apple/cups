@@ -3,7 +3,7 @@
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -217,11 +217,13 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 extern void	*cupsdCreateProfile(int job_id);
 extern void	cupsdDestroyProfile(void *profile);
 extern int	cupsdEndProcess(int pid, int force);
-extern const char *cupsdFinishProcess(int pid, char *name, int namelen);
+extern const char *cupsdFinishProcess(int pid, char *name, int namelen,
+		                      int *job_id);
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int sidefd,
-				  int root, void *profile, int *pid);
+				  int root, void *profile, int job_id,
+				  int *pid);
 
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,
 		               cupsd_selfunc_t write_cb, void *data);

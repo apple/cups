@@ -1216,22 +1216,13 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   if (need_restart_job && pclass->job)
   {
-    cupsd_job_t *job;
-
    /*
-    * Stop the current job and then restart it below...
+    * Reset the current job to a "pending" status...
     */
 
-    job = (cupsd_job_t *)pclass->job;
-
-    cupsdStopJob(job, 1);
-
-    job->state->values[0].integer = IPP_JOB_PENDING;
-    job->state_value              = IPP_JOB_PENDING;
+    cupsdSetJobState(pclass->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
+                     "Job restarted because the class was modified.");
   }
-
-  if (need_restart_job)
-    cupsdCheckJobs();
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
@@ -1299,7 +1290,8 @@ add_file(cupsd_client_t *con,		/* I - Connection to client */
 
   if (!compressions || !filetypes)
   {
-    cupsdCancelJob(job, 1, IPP_JOB_ABORTED);
+    cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
+                     "Job aborted because the scheduler ran out of memory.");
 
     if (con)
       send_ipp_status(con, IPP_INTERNAL_ERROR,
@@ -1738,7 +1730,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     * Hold job until specified time...
     */
 
-    cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
 
     job->state->values[0].integer = IPP_JOB_HELD;
     job->state_value              = IPP_JOB_HELD;
@@ -1896,7 +1888,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
       if ((kbytes = copy_banner(con, job, attr->values[0].string.text)) < 0)
       {
-        cupsdDeleteJob(job);
+        cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_PURGE,
+	                 "Aborting job because the start banner could not be "
+			 "copied.");
         return (NULL);
       }
 
@@ -2926,22 +2920,13 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (need_restart_job && printer->job)
   {
-    cupsd_job_t *job;
-
    /*
-    * Stop the current job and then restart it below...
+    * Restart the current job...
     */
 
-    job = (cupsd_job_t *)printer->job;
-
-    cupsdStopJob(job, 1);
-
-    job->state->values[0].integer = IPP_JOB_PENDING;
-    job->state_value              = IPP_JOB_PENDING;
+    cupsdSetJobState(printer->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
+                     "Job restarted because the printer was modified.");
   }
-
-  if (need_restart_job)
-    cupsdCheckJobs();
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
@@ -3974,21 +3959,28 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
       }
 
      /*
-      * See if the printer is currently printing a job...
+      * See if there are any pending jobs...
       */
 
-      if (printer->job)
-        jobid = ((cupsd_job_t *)printer->job)->id;
+      for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	   job;
+	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
+	if (job->state_value <= IPP_JOB_PROCESSING &&
+	    !strcasecmp(job->dest, printer->name))
+	  break;
+
+      if (job)
+	jobid = job->id;
       else
       {
        /*
-        * No, see if there are any pending jobs...
+        * No, try stopped jobs...
 	*/
 
-        for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+	for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
 	     job;
 	     job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	  if (job->state_value <= IPP_JOB_PROCESSING &&
+	  if (job->state_value == IPP_JOB_STOPPED &&
 	      !strcasecmp(job->dest, printer->name))
 	    break;
 
@@ -3996,21 +3988,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 	  jobid = job->id;
 	else
 	{
-	  for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	       job;
-	       job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-	    if (job->state_value == IPP_JOB_STOPPED &&
-		!strcasecmp(job->dest, printer->name))
-	      break;
-
-          if (job)
-	    jobid = job->id;
-	  else
-	  {
-	    send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
-			    printer->name);
-	    return;
-	  }
+	  send_ipp_status(con, IPP_NOT_POSSIBLE, _("No active jobs on %s!"),
+			  printer->name);
+	  return;
 	}
       }
     }
@@ -4109,7 +4089,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * Cancel the job and return...
   */
 
-  cupsdCancelJob(job, purge, IPP_JOB_CANCELED);
+  cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
+                   purge ? "Job purged by \"%s\"" : "Job canceled by \"%s\"",
+		   username);
   cupsdCheckJobs();
 
   if (purge)
@@ -5131,7 +5113,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
                   "copy_model: Running \"cups-driverd cat %s\"...", from);
 
   if (!cupsdStartProcess(buffer, argv, envp, -1, temppipe[1], CGIPipes[1],
-                         -1, -1, 0, DefaultProfile, &temppid))
+                         -1, -1, 0, DefaultProfile, 0, &temppid))
   {
     close(tempfd);
     unlink(tempfile);
@@ -6870,7 +6852,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
                   sizeof(scheme), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
-  if (!strcmp(resource, "/"))
+  if (!strcmp(resource, "/") || !strcmp(resource, "/jobs"))
   {
     dest    = NULL;
     dtype   = (cups_ptype_t)0;
@@ -7998,8 +7980,8 @@ static void
 hold_job(cupsd_client_t  *con,		/* I - Client connection */
          ipp_attribute_t *uri)		/* I - Job or Printer URI */
 {
-  ipp_attribute_t *attr,		/* Current job-hold-until */
-		*newattr;		/* New job-hold-until */
+  ipp_attribute_t *attr;		/* Current job-hold-until */
+  const char	*when;			/* New value */
   int		jobid;			/* Job ID */
   char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
@@ -8085,50 +8067,23 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
   * Hold the job and return...
   */
 
-  cupsdHoldJob(job);
-
-  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, cupsdFindDest(job->dest), job,
-                "Job held by user.");
-
-  if ((newattr = ippFindAttribute(con->request, "job-hold-until",
-                                  IPP_TAG_KEYWORD)) == NULL)
-    newattr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
-
-  if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
-                               IPP_TAG_KEYWORD)) == NULL)
-    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+  if ((attr = ippFindAttribute(con->request, "job-hold-until",
+			       IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
 
   if (attr)
   {
-   /*
-    * Free the old hold value and copy the new one over...
-    */
-
-    _cupsStrFree(attr->values[0].string.text);
-
-    if (newattr)
-    {
-      attr->value_tag = newattr->value_tag;
-      attr->values[0].string.text =
-          _cupsStrRetain(newattr->values[0].string.text);
-    }
-    else
-    {
-      attr->value_tag = IPP_TAG_KEYWORD;
-      attr->values[0].string.text = _cupsStrAlloc("indefinite");
-    }
-
-   /*
-    * Hold job until specified time...
-    */
-
-    cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+    when = attr->values[0].string.text;
 
     cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED, cupsdFindDest(job->dest), job,
-                  "Job job-hold-until value changed by user.");
+		  "Job job-hold-until value changed by user.");
   }
+  else
+    when = "indefinite";
 
-  cupsdLogJob(job, CUPSD_LOG_INFO, "Held by \"%s\".", username);
+  cupsdSetJobHoldUntil(job, when, 1);
+  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT, "Job held by \"%s\".",
+                   username);
 
   con->response->request.status.status_code = IPP_OK;
 }
@@ -10548,11 +10503,9 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
 			    attr->values[0].integer);
-
-		job->state->values[0].integer = attr->values[0].integer;
-		job->state_value = (ipp_jstate_t)attr->values[0].integer;
-
-                event |= CUPSD_EVENT_JOB_STATE;
+                cupsdSetJobState(job, attr->values[0].integer,
+		                 CUPSD_JOB_DEFAULT,
+				 "Job state changed by \"%s\"", username);
 		check_jobs = 1;
 	      }
 	      break;
@@ -10580,8 +10533,9 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 	      {
 		cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-state to %d",
 			    attr->values[0].integer);
-                cupsdCancelJob(job, 0, (ipp_jstate_t)attr->values[0].integer);
-
+                cupsdSetJobState(job, (ipp_jstate_t)attr->values[0].integer,
+		                 CUPSD_JOB_DEFAULT,
+				 "Job state changed by \"%s\"", username);
                 check_jobs = 1;
 	      }
 	      break;
@@ -10621,15 +10575,18 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       {
         cupsdLogJob(job, CUPSD_LOG_DEBUG, "Setting job-hold-until to %s",
 		    attr->values[0].string.text);
-        cupsdSetJobHoldUntil(job, attr->values[0].string.text);
+        cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
 
 	if (!strcmp(attr->values[0].string.text, "no-hold"))
+	{
 	  cupsdReleaseJob(job);
+          check_jobs = 1;
+	}
 	else
-	  cupsdHoldJob(job);
+	  cupsdSetJobState(job, IPP_JOB_HELD, CUPSD_JOB_DEFAULT,
+	                   "Job held by \"%s\".", username);
 
-        check_jobs = 1;
-        event      |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
+        event |= CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE;
       }
     }
     else if (attr->value_tag == IPP_TAG_DELETEATTR)

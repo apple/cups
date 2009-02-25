@@ -1748,7 +1748,7 @@ cupsdStartPolling(void)
     argv[1] = pollp->hostname;
 
     if (cupsdStartProcess(polld, argv, envp, -1, -1, statusfds[1], -1, -1,
-                          0, DefaultProfile, &(pollp->pid)) < 0)
+                          0, DefaultProfile, 0, &(pollp->pid)) < 0)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "cupsdStartPolling: Unable to fork polling daemon - %s",
@@ -5273,7 +5273,7 @@ update_lpd(int onoff)			/* - 1 = turn on, 0 = turn off */
     argv[4] = NULL;
 
     cupsdStartProcess("/bin/launchctl", argv, envp, -1, -1, -1, -1, -1, 1,
-                      NULL, &pid);
+                      NULL, 0, &pid);
   }
 #endif /* __APPLE__ */
   else

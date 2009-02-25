@@ -944,7 +944,6 @@ list_devices(void)
 
 #  ifdef B115200
       printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n", device, info);
-             device, i + 1);
 #  else
       printf("serial serial:%s?baud=38400 \"Unknown\" \"%s\"\n", device, info);
 #  endif /* B115200 */

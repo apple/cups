@@ -14,6 +14,18 @@
  */
 
 /*
+ * Constants...
+ */
+
+typedef enum cupsd_jobaction_e		/**** Actions for state changes ****/
+{
+  CUPSD_JOB_DEFAULT,			/* Use default action */
+  CUPSD_JOB_FORCE,			/* Force the change */
+  CUPSD_JOB_PURGE			/* Force the change and purge */
+} cupsd_jobaction_t;
+
+
+/*
  * Job request structure...
  */
 
@@ -23,10 +35,11 @@ typedef struct cupsd_job_s
 			priority,	/* Job priority */
 			dirty;		/* Do we need to write the "c" file? */
   ipp_jstate_t		state_value;	/* Cached job-state */
-  int			pending_timeout;/* Non-zero if the job was created and waiting on files */
+  int			pending_timeout;/* Non-zero if the job was created and
+					 * waiting on files */
   char			*username;	/* Printing user */
   char			*dest;		/* Destination printer or class */
-  cups_ptype_t		dtype;		/* Destination type (class/remote bits) */
+  cups_ptype_t		dtype;		/* Destination type */
   int			num_files;	/* Number of files in job */
   mime_type_t		**filetypes;	/* File types */
   int			*compressions;	/* Compression status of each file */
@@ -46,7 +59,8 @@ typedef struct cupsd_job_s
 			side_pipes[2],	/* Sidechannel pipes */
 			status_pipes[2];/* Status pipes */
   cupsd_statbuf_t	*status_buffer;	/* Status buffer for this job */
-  int			status_level;	/* Highest log level in a status message */
+  int			status_level;	/* Highest log level in a status
+					 * message */
   int			cost;		/* Filtering cost */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */
@@ -54,9 +68,12 @@ typedef struct cupsd_job_s
   int			status;		/* Status code from filters */
   cupsd_printer_t	*printer;	/* Printer this job is assigned to */
   int			tries;		/* Number of tries for this job */
-  char			*auth_username,	/* AUTH_USERNAME environment variable, if any */
-			*auth_domain,	/* AUTH_DOMAIN environment variable, if any */
-			*auth_password;	/* AUTH_PASSWORD environment variable, if any */
+  char			*auth_username,	/* AUTH_USERNAME environment variable,
+                                         * if any */
+			*auth_domain,	/* AUTH_DOMAIN environment variable,
+					 * if any */
+			*auth_password;	/* AUTH_PASSWORD environment variable,
+					 * if any */
   void			*profile;	/* Security profile */
   int			progress;	/* Printing progress */
 #ifdef HAVE_GSSAPI
@@ -103,19 +120,17 @@ VAR int			JobRetryLimit	VALUE(5),
  */
 
 extern cupsd_job_t	*cupsdAddJob(int priority, const char *dest);
-extern void		cupsdCancelJob(cupsd_job_t *job, int purge,
-			               ipp_jstate_t newstate);
 extern void		cupsdCancelJobs(const char *dest, const char *username,
 			                int purge);
 extern void		cupsdCheckJobs(void);
 extern void		cupsdCleanJobs(void);
-extern void		cupsdDeleteJob(cupsd_job_t *job);
+extern void		cupsdContinueJob(cupsd_job_t *job);
+extern void		cupsdDeleteJob(cupsd_job_t *job,
+			               cupsd_jobaction_t action);
 extern cupsd_job_t	*cupsdFindJob(int id);
-extern void		cupsdFinishJob(cupsd_job_t *job);
 extern void		cupsdFreeAllJobs(void);
 extern int		cupsdGetPrinterJobCount(const char *dest);
 extern int		cupsdGetUserJobCount(const char *username);
-extern void		cupsdHoldJob(cupsd_job_t *job);
 extern void		cupsdLoadAllJobs(void);
 extern int		cupsdLoadJob(cupsd_job_t *job);
 extern void		cupsdMoveJob(cupsd_job_t *job, cupsd_printer_t *p);
@@ -123,10 +138,18 @@ extern void		cupsdReleaseJob(cupsd_job_t *job);
 extern void		cupsdRestartJob(cupsd_job_t *job);
 extern void		cupsdSaveAllJobs(void);
 extern void		cupsdSaveJob(cupsd_job_t *job);
-extern void		cupsdSetJobHoldUntil(cupsd_job_t *job, const char *when);
+extern void		cupsdSetJobHoldUntil(cupsd_job_t *job,
+			                     const char *when, int update);
 extern void		cupsdSetJobPriority(cupsd_job_t *job, int priority);
-extern void		cupsdStopAllJobs(int force);
-extern void		cupsdStopJob(cupsd_job_t *job, int force);
+extern void		cupsdSetJobState(cupsd_job_t *job,
+			                 ipp_jstate_t newstate,
+					 cupsd_jobaction_t action,
+					 const char *message, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 4, 5)))
+#endif /* __GNUC__ */
+;
+extern void		cupsdStopAllJobs(cupsd_jobaction_t action);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
 

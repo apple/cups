@@ -1,13 +1,17 @@
-CHANGES.txt - 2009-02-17
+CHANGES.txt - 2009-02-25
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
-	- Added complete localizations for Japanese and Russian and partial
-	  localizations for Chinese, Danish, German, Finnish, French, Italian,
-	  Korean, Norwegian, Polish, Portuguese, and Swedish (STR #3096,
-	  STR #3098)
+	- The cups-deviced helper program could miss reporting some backend
+	  devices (STR #3108)
+	- The cupsSideChannelSNMP* functions did not work.
+	- The scheduler could consume 100% CPU when jobs were canceled.
+	- Added complete localizations for Japanese, Polish, and Russian and
+	  partial localizations for Chinese, Danish, German, Finnish, French,
+	  Italian, Korean, Norwegian, Portuguese, and Swedish (STR #3096,
+	  STR #3098, STR #3109, STR #3111)
 	- Clicking on "Select Another Make/Manufacturer" in the web interface
 	  incorrectly added the printer (STR #3095)
 	- The scheduler no longer uses programs with insecure file

@@ -29,9 +29,9 @@ dir.o: dir.h versioning.h string.h ../config.h debug.h
 emit.o: ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 encode.o: ipp-private.h string.h ../config.h debug.h
-file.o: http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
-file.o: ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
-file.o: i18n.h transcode.h debug.h
+file.o: file-private.h http-private.h ../config.h http.h versioning.h md5.h
+file.o: ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h
+file.o: language.h i18n.h transcode.h debug.h
 getdevices.o: globals.h string.h ../config.h http-private.h http.h
 getdevices.o: versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
 getdevices.o: file.h language.h i18n.h transcode.h debug.h
@@ -80,7 +80,7 @@ notify.o: md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h language.h
 notify.o: i18n.h transcode.h
 options.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.o: string.h ../config.h debug.h
-page.o: ppd.h array.h versioning.h file.h string.h ../config.h
+page.o: ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 ppd.o: ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.o: language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.o: ipp-private.h i18n.h transcode.h debug.h
@@ -115,6 +115,7 @@ testarray.o: debug.h
 testconflicts.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 testconflicts.o: language.h string.h ../config.h
 testcups.o: cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testcups.o: string.h ../config.h
 testfile.o: string.h ../config.h file.h versioning.h debug.h
 testhttp.o: http-private.h ../config.h http.h versioning.h md5.h
 testhttp.o: ipp-private.h ipp.h string.h
@@ -160,9 +161,9 @@ dir.32.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
 emit.32.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.32.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 encode.32.o: encode.c  ipp-private.h string.h ../config.h debug.h
-file.32.o: file.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
-file.32.o: file.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
-file.32.o: file.c  i18n.h transcode.h debug.h
+file.32.o: file.c  file-private.h http-private.h ../config.h http.h versioning.h md5.h
+file.32.o: file.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h
+file.32.o: file.c  language.h i18n.h transcode.h debug.h
 getdevices.32.o: getdevices.c  globals.h string.h ../config.h http-private.h http.h
 getdevices.32.o: getdevices.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
 getdevices.32.o: getdevices.c  file.h language.h i18n.h transcode.h debug.h
@@ -211,7 +212,7 @@ notify.32.o: notify.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 notify.32.o: notify.c  i18n.h transcode.h
 options.32.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.32.o: options.c  string.h ../config.h debug.h
-page.32.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
+page.32.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 ppd.32.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.32.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.32.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
@@ -246,6 +247,7 @@ testarray.32.o: testarray.c  debug.h
 testconflicts.32.o: testconflicts.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 testconflicts.32.o: testconflicts.c  language.h string.h ../config.h
 testcups.32.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testcups.32.o: testcups.c  string.h ../config.h
 testfile.32.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
 testhttp.32.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h
 testhttp.32.o: testhttp.c  ipp-private.h ipp.h string.h
@@ -291,9 +293,9 @@ dir.64.o: dir.c  dir.h versioning.h string.h ../config.h debug.h
 emit.64.o: emit.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 encode.64.o: encode.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 encode.64.o: encode.c  ipp-private.h string.h ../config.h debug.h
-file.64.o: file.c  http-private.h ../config.h http.h versioning.h md5.h ipp-private.h
-file.64.o: file.c  ipp.h globals.h string.h cups.h ppd.h array.h file.h language.h
-file.64.o: file.c  i18n.h transcode.h debug.h
+file.64.o: file.c  file-private.h http-private.h ../config.h http.h versioning.h md5.h
+file.64.o: file.c  ipp-private.h ipp.h globals.h string.h cups.h ppd.h array.h file.h
+file.64.o: file.c  language.h i18n.h transcode.h debug.h
 getdevices.64.o: getdevices.c  globals.h string.h ../config.h http-private.h http.h
 getdevices.64.o: getdevices.c  versioning.h md5.h ipp-private.h ipp.h cups.h ppd.h array.h
 getdevices.64.o: getdevices.c  file.h language.h i18n.h transcode.h debug.h
@@ -342,7 +344,7 @@ notify.64.o: notify.c  md5.h ipp-private.h ipp.h cups.h ppd.h array.h file.h lan
 notify.64.o: notify.c  i18n.h transcode.h
 options.64.o: options.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
 options.64.o: options.c  string.h ../config.h debug.h
-page.64.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h
+page.64.o: page.c  ppd.h array.h versioning.h file.h string.h ../config.h debug.h
 ppd.64.o: ppd.c  ppd-private.h cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 ppd.64.o: ppd.c  language.h globals.h string.h ../config.h http-private.h md5.h
 ppd.64.o: ppd.c  ipp-private.h i18n.h transcode.h debug.h
@@ -377,6 +379,7 @@ testarray.64.o: testarray.c  debug.h
 testconflicts.64.o: testconflicts.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h
 testconflicts.64.o: testconflicts.c  language.h string.h ../config.h
 testcups.64.o: testcups.c  cups.h ipp.h http.h versioning.h ppd.h array.h file.h language.h
+testcups.64.o: testcups.c  string.h ../config.h
 testfile.64.o: testfile.c  string.h ../config.h file.h versioning.h debug.h
 testhttp.64.o: testhttp.c  http-private.h ../config.h http.h versioning.h md5.h
 testhttp.64.o: testhttp.c  ipp-private.h ipp.h string.h

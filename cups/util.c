@@ -616,7 +616,7 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
     }
   }
   else
-    strcpy(uri, "ipp://localhost/jobs");
+    strcpy(uri, "ipp://localhost/");
 
   if (!http)
     if ((http = _cupsConnect()) == NULL)

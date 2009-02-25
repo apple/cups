@@ -3,7 +3,7 @@
  *
  *   CGI form variable and array functions.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -147,9 +147,6 @@ cgiGetArray(const char *name,		/* I - Name of array variable */
 
   if ((var = cgi_find_variable(name)) == NULL)
     return (NULL);
-
-  if (var->nvalues == 1)
-    return (var->values[0]);
 
   if (element < 0 || element >= var->nvalues)
     return (NULL);

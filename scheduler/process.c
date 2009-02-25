@@ -44,7 +44,8 @@
 
 typedef struct
 {
-  int	pid;				/* Process ID */
+  int	pid,				/* Process ID */
+	job_id;				/* Job associated with process */
   char	name[1];			/* Name of process */
 } cupsd_proc_t;
 
@@ -82,8 +83,22 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		temp[1024];		/* Quoted TempDir */
 
 
+  if (RunUser)
+  {
+   /*
+    * Only use sandbox profiles as root...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                    job_id);
+
+    return (NULL);
+  }
+
   if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
   {
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                    job_id);
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create security profile: %s",
                     strerror(errno));
     return (NULL);
@@ -129,7 +144,10 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = \"%s\"",
                   job_id, profile);
   return ((void *)strdup(profile));
+
 #else
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                  job_id);
 
   return (NULL);
 #endif /* HAVE_SANDBOX_H */
@@ -143,11 +161,12 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 void
 cupsdDestroyProfile(void *profile)	/* I - Profile */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
+		  profile ? (char *)profile : "(null)");
+
 #ifdef HAVE_SANDBOX_H
   if (profile)
   {
-    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDeleteProfile(profile=\"%s\")",
-                    (char *)profile);
     unlink((char *)profile);
     free(profile);
   }
@@ -163,6 +182,9 @@ int					/* O - 0 on success, -1 on failure */
 cupsdEndProcess(int pid,		/* I - Process ID */
                 int force)		/* I - Force child to die */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdEndProcess(pid=%d, force=%d)", pid,
+                  force);
+
   if (force)
     return (kill(pid, SIGKILL));
   else
@@ -177,7 +199,8 @@ cupsdEndProcess(int pid,		/* I - Process ID */
 const char *				/* O - Process name */
 cupsdFinishProcess(int  pid,		/* I - Process ID */
                    char *name,		/* I - Name buffer */
-		   int  namelen)	/* I - Size of name buffer */
+		   int  namelen,	/* I - Size of name buffer */
+		   int  *job_id)	/* O - Job ID pointer or NULL */
 {
   cupsd_proc_t	key,			/* Search key */
 		*proc;			/* Matching process */
@@ -187,14 +210,27 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
 
   if ((proc = (cupsd_proc_t *)cupsArrayFind(process_array, &key)) != NULL)
   {
+    if (job_id)
+      *job_id = proc->job_id;
+
     strlcpy(name, proc->name, namelen);
     cupsArrayRemove(process_array, proc);
     free(proc);
-
-    return (name);
   }
   else
-    return ("unknown");
+  {
+    if (job_id)
+      *job_id = 0;
+
+    strlcpy(name, "unknown", namelen);
+  }
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdFinishProcess(pid=%d, name=%p, namelen=%d, "
+		  "job_id=%p(%d)) = \"%s\"", pid, name, namelen, job_id,
+		  job_id ? *job_id : 0, name);
+
+  return (name);
 }
 
 
@@ -204,17 +240,18 @@ cupsdFinishProcess(int  pid,		/* I - Process ID */
 
 int					/* O - Process ID or 0 */
 cupsdStartProcess(
-    const char *command,		/* I - Full path to command */
-    char       *argv[],			/* I - Command-line arguments */
-    char       *envp[],			/* I - Environment */
-    int        infd,			/* I - Standard input file descriptor */
-    int        outfd,			/* I - Standard output file descriptor */
-    int        errfd,			/* I - Standard error file descriptor */
-    int        backfd,			/* I - Backchannel file descriptor */
-    int        sidefd,			/* I - Sidechannel file descriptor */
-    int        root,			/* I - Run as root? */
-    void       *profile,		/* I - Security profile to use */
-    int        *pid)			/* O - Process ID */
+    const char  *command,		/* I - Full path to command */
+    char        *argv[],		/* I - Command-line arguments */
+    char        *envp[],		/* I - Environment */
+    int         infd,			/* I - Standard input file descriptor */
+    int         outfd,			/* I - Standard output file descriptor */
+    int         errfd,			/* I - Standard error file descriptor */
+    int         backfd,			/* I - Backchannel file descriptor */
+    int         sidefd,			/* I - Sidechannel file descriptor */
+    int         root,			/* I - Run as root? */
+    void        *profile,		/* I - Security profile to use */
+    int         job_id,			/* I - Job associated with process */
+    int         *pid)			/* O - Process ID */
 {
   int		user;			/* Command UID */
   struct stat	commandinfo;		/* Command file information */
@@ -229,10 +266,6 @@ cupsdStartProcess(
 #endif /* __APPLE__ */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdStartProcess(\"%s\", %p, %p, %d, %d, %d)",
-                  command, argv, envp, infd, outfd, errfd);
-
   if (RunUser)
     user = RunUser;
   else if (root)
@@ -242,17 +275,32 @@ cupsdStartProcess(
 
   if (stat(command, &commandinfo))
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
-    *pid = 0;
     return (0);
   }
   else if (commandinfo.st_mode & S_IWOTH)
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: insecure file permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid  = 0;
+
     errno = EPERM;
     return (0);
   }
@@ -260,10 +308,18 @@ cupsdStartProcess(
            (commandinfo.st_gid != Group || !(commandinfo.st_mode & S_IXGRP)) &&
            !(commandinfo.st_mode & S_IXOTH))
   {
+    *pid = 0;
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		    root, profile, job_id, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: no execute permissions (0%o)",
 		    command, commandinfo.st_mode);
-    *pid  = 0;
+
     errno = EPERM;
     return (0);
   }
@@ -470,7 +526,8 @@ cupsdStartProcess(
     {
       if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
       {
-        proc->pid = *pid;
+        proc->pid    = *pid;
+	proc->job_id = job_id;
 	strcpy(proc->name, command);
 
 	cupsArrayAdd(process_array, proc);
@@ -479,6 +536,13 @@ cupsdStartProcess(
   }
 
   cupsdReleaseSignals();
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		  "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
+		  "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
+		  "profile=%p, job_id=%d, pid=%p) = %d",
+		  command, argv, envp, infd, outfd, errfd, backfd, sidefd,
+		  root, profile, job_id, pid, *pid);
 
   return (*pid);
 }

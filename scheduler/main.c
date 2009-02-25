@@ -670,12 +670,6 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (!stop_scheduler)
   {
-#ifdef DEBUG
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "main: Top of loop, dead_children=%d, NeedReload=%d",
-                    dead_children, NeedReload);
-#endif /* DEBUG */
-
    /*
     * Check if there are dead children to handle...
     */
@@ -1628,7 +1622,8 @@ static void
 process_children(void)
 {
   int		status;			/* Exit status of child */
-  int		pid;			/* Process ID of child */
+  int		pid,			/* Process ID of child */
+		job_id;			/* Job ID of child */
   cupsd_job_t	*job;			/* Current job */
   int		i;			/* Looping var */
   char		name[1024];		/* Process name */
@@ -1658,7 +1653,7 @@ process_children(void)
     * Collect the name of the process that finished...
     */
 
-    cupsdFinishProcess(pid, name, sizeof(name));
+    cupsdFinishProcess(pid, name, sizeof(name), &job_id);
 
    /*
     * Delete certificates for CGI processes...
@@ -1668,76 +1663,87 @@ process_children(void)
       cupsdDeleteCert(pid);
 
    /*
-    * Lookup the PID in the jobs list...
+    * Handle completed job filters...
     */
 
-    for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	 job;
-	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value >= IPP_JOB_HELD && (job->filters[0] || job->backend))
-      {
-	for (i = 0; job->filters[i]; i ++)
-          if (job->filters[i] == pid)
-	    break;
+    if (job_id > 0 && (job = cupsdFindJob(job_id)) != NULL)
+    {
+      for (i = 0; job->filters[i]; i ++)
+	if (job->filters[i] == pid)
+	  break;
 
-	if (job->filters[i] || job->backend == pid)
+      if (job->filters[i] || job->backend == pid)
+      {
+       /*
+	* OK, this process has gone away; what's left?
+	*/
+
+	if (job->filters[i])
+	  job->filters[i] = -pid;
+	else
+	  job->backend = -pid;
+
+	if (status && status != SIGTERM && status != SIGKILL &&
+	    job->status >= 0)
 	{
 	 /*
-          * OK, this process has gone away; what's left?
+	  * An error occurred; save the exit status so we know to stop
+	  * the printer or cancel the job when all of the filters finish...
+	  *
+	  * A negative status indicates that the backend failed and the
+	  * printer needs to be stopped.
 	  */
 
-          if (job->filters[i])
-	    job->filters[i] = -pid;
+	  if (job->filters[i])
+	    job->status = status;	/* Filter failed */
 	  else
-	    job->backend = -pid;
+	    job->status = -status;	/* Backend failed */
 
-          if (status && job->status >= 0)
+	  if (!(job->printer->type & CUPS_PRINTER_FAX) &&
+	      job->status_level >= CUPSD_LOG_ERROR)
+	  {
+	    job->status_level = CUPSD_LOG_ERROR;
+
+	    snprintf(job->printer->state_message,
+		     sizeof(job->printer->state_message), "%s failed", name);
+	    cupsdAddPrinterHistory(job->printer);
+
+	    if (!job->printer_message)
+	    {
+	      if ((job->printer_message =
+	               ippFindAttribute(job->attrs, "job-printer-state-message",
+					IPP_TAG_TEXT)) == NULL)
+		job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB,
+		                                    IPP_TAG_TEXT,
+						    "job-printer-state-message",
+						    NULL, "");
+	    }
+
+	    cupsdSetString(&(job->printer_message->values[0].string.text),
+			   job->printer->state_message);
+	  }
+	}
+
+       /*
+	* If this is not the last file in a job, see if all of the
+	* filters are done, and if so move to the next file.
+	*/
+
+	if (job->current_file < job->num_files)
+	{
+	  for (i = 0; job->filters[i] < 0; i ++);
+
+	  if (!job->filters[i])
 	  {
 	   /*
-	    * An error occurred; save the exit status so we know to stop
-	    * the printer or cancel the job when all of the filters finish...
-	    *
-	    * A negative status indicates that the backend failed and the
-	    * printer needs to be stopped.
+	    * Process the next file...
 	    */
 
-            if (job->filters[i])
- 	      job->status = status;	/* Filter failed */
-	    else
- 	      job->status = -status;	/* Backend failed */
-
-            if (job->printer && !(job->printer->type & CUPS_PRINTER_FAX) &&
-	        job->status_level > CUPSD_LOG_ERROR)
-	    {
-	      job->status_level = CUPSD_LOG_ERROR;
-
-              snprintf(job->printer->state_message,
-	               sizeof(job->printer->state_message), "%s failed", name);
-              cupsdAddPrinterHistory(job->printer);
-	    }
+	    cupsdContinueJob(job);
 	  }
-
-	 /*
-	  * If this is not the last file in a job, see if all of the
-	  * filters are done, and if so move to the next file.
-	  */
-
-          if (job->current_file < job->num_files)
-	  {
-	    for (i = 0; job->filters[i] < 0; i ++);
-
-	    if (!job->filters[i])
-	    {
-	     /*
-	      * Process the next file...
-	      */
-
-	      cupsdFinishJob(job);
-	    }
-	  }
-	  break;
 	}
       }
+    }
 
    /*
     * Show the exit status as needed, ignoring SIGTERM and SIGKILL errors
