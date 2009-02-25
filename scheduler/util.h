@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -20,13 +20,8 @@
  * Include necessary headers...
  */
 
-#  include <cups/cups.h>
-#  include <cups/file.h>
-#  include <cups/string.h>
-#  include <stdlib.h>
-#  include <errno.h>
+#  include <cups/file-private.h>
 #  include <signal.h>
-#  include <dirent.h>
 
 
 /*
