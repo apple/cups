@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
@@ -101,7 +101,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 <TR><TD>&nbsp;</TD></TR>
 <TR><TD CLASS="trailer">Wspólny uniksowy system drukowania, CUPS i logo CUPS
 są znakami handlowymi <A HREF="http://www.apple.com">Apple Inc.</A> CUPS
-copyright 2007-2008 Apple Inc. Wszystkie prawa zastrzeżone.</TD></TR>
+copyright 2007-2009 Apple Inc. Wszystkie prawa zastrzeżone.</TD></TR>
 </TABLE>
 </BODY>
 </HTML>
