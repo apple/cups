@@ -83,6 +83,18 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		temp[1024];		/* Quoted TempDir */
 
 
+  if (RunUser)
+  {
+   /*
+    * Only use sandbox profiles as root...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",
+                    job_id);
+
+    return (NULL);
+  }
+
   if ((fp = cupsTempFile2(profile, sizeof(profile))) == NULL)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdCreateProfile(job_id=%d) = NULL",

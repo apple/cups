@@ -1621,13 +1621,12 @@ parent_handler(int sig)			/* I - Signal */
 static void
 process_children(void)
 {
-  int			status;		/* Exit status of child */
-  int			pid,		/* Process ID of child */
-			job_id;		/* Job ID of child */
-  cupsd_job_t		*job;		/* Current job */
-  cupsd_printer_t	*printer;	/* Current printer */
-  int			i;		/* Looping var */
-  char			name[1024];	/* Process name */
+  int		status;			/* Exit status of child */
+  int		pid,			/* Process ID of child */
+		job_id;			/* Job ID of child */
+  cupsd_job_t	*job;			/* Current job */
+  int		i;			/* Looping var */
+  char		name[1024];		/* Process name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "process_children()");
@@ -1684,7 +1683,8 @@ process_children(void)
 	else
 	  job->backend = -pid;
 
-	if (status && job->status >= 0)
+	if (status && status != SIGTERM && status != SIGKILL &&
+	    job->status >= 0)
 	{
 	 /*
 	  * An error occurred; save the exit status so we know to stop
@@ -1699,17 +1699,14 @@ process_children(void)
 	  else
 	    job->status = -status;	/* Backend failed */
 
-          if ((printer = job->printer) == NULL)
-	    printer = cupsdFindDest(job->dest);
-
-	  if (printer && !(printer->type & CUPS_PRINTER_FAX) &&
+	  if (!(job->printer->type & CUPS_PRINTER_FAX) &&
 	      job->status_level >= CUPSD_LOG_ERROR)
 	  {
 	    job->status_level = CUPSD_LOG_ERROR;
 
-	    snprintf(printer->state_message,
-		     sizeof(printer->state_message), "%s failed", name);
-	    cupsdAddPrinterHistory(printer);
+	    snprintf(job->printer->state_message,
+		     sizeof(job->printer->state_message), "%s failed", name);
+	    cupsdAddPrinterHistory(job->printer);
 
 	    if (!job->printer_message)
 	    {
@@ -1723,7 +1720,7 @@ process_children(void)
 	    }
 
 	    cupsdSetString(&(job->printer_message->values[0].string.text),
-			   printer->state_message);
+			   job->printer->state_message);
 	  }
 	}
 
@@ -1745,7 +1742,6 @@ process_children(void)
 	    cupsdContinueJob(job);
 	  }
 	}
-	break;
       }
     }
 

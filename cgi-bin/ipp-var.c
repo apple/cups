@@ -1406,8 +1406,8 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
                  NULL, url);
   }
   else
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "job-uri", NULL,
-        	 "ipp://localhost/jobs");
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri", NULL,
+        	 "ipp://localhost/");
 
   if ((which_jobs = cgiGetVariable("which_jobs")) != NULL)
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD, "which-jobs",

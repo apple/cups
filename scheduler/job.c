@@ -3983,6 +3983,12 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     */
 
     finalize_job(job);
+
+   /*
+    * Check for new jobs...
+    */
+
+    cupsdCheckJobs();
   }
 }
 

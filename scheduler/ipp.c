@@ -6852,7 +6852,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
                   sizeof(scheme), username, sizeof(username), host,
 		  sizeof(host), &port, resource, sizeof(resource));
 
-  if (!strcmp(resource, "/"))
+  if (!strcmp(resource, "/") || !strcmp(resource, "/jobs"))
   {
     dest    = NULL;
     dtype   = (cups_ptype_t)0;
