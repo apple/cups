@@ -86,7 +86,8 @@ static int		compare_pids(mime_filter_t *a, mime_filter_t *b);
 static char		*escape_options(int num_options, cups_option_t *options);
 static int		exec_filter(const char *filter, char **argv,
 			            char **envp, int infd, int outfd);
-static int		exec_filters(cups_array_t *filters, const char *infile,
+static int		exec_filters(mime_type_t *srctype,
+			             cups_array_t *filters, const char *infile,
 		                     const char *outfile, const char *ppdfile,
 			             const char *printer, const char *user,
 				     const char *title, int num_options,
@@ -133,7 +134,8 @@ main(int  argc,				/* I - Number of command-line args */
   const char	*ppdfile;		/* PPD file */
   const char	*title,			/* Title string */
 		*user;			/* Username */
-  int		removeppd,		/* Remove PPD file */
+  int		all_filters,		/* Use all filters */
+		removeppd,		/* Remove PPD file */
 		removeinfile;		/* Remove input file */
   int		status;			/* Execution status */
 
@@ -159,6 +161,7 @@ main(int  argc,				/* I - Number of command-line args */
   ppdfile      = NULL;
   title        = NULL;
   user         = cupsUser();
+  all_filters  = 0;
   removeppd    = 0;
   removeinfile = 0;
 
@@ -211,6 +214,10 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  case 'D' : /* Delete input file after conversion */
 	      removeinfile = 1;
+	      break;
+
+          case 'e' : /* Use every filter from the PPD file */
+	      all_filters = 1;
 	      break;
 
           case 'f' : /* Specify input file... */
@@ -380,8 +387,16 @@ main(int  argc,				/* I - Number of command-line args */
     return (1);
   }
 
-  printer_type = add_printer_filters(command, mime, printer, ppdfile,
-                                     &prefilter_type);
+  if (all_filters)
+  {
+    printer_type = add_printer_filters(command, mime, printer, ppdfile,
+				       &prefilter_type);
+  }
+  else
+  {
+    printer_type   = mimeType(mime, "application", "vnd.cups-postscript");
+    prefilter_type = NULL;
+  }
 
  /*
   * Get the source and destination types...
@@ -429,6 +444,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     filters = cupsArrayNew(NULL, NULL);
     cupsArrayAdd(filters, &GZIPFilter);
+    GZIPFilter.src = src;
+    GZIPFilter.dst = dst;
   }
   else if ((filters = mimeFilter(mime, src, dst, &cost)) == NULL)
   {
@@ -456,7 +473,8 @@ main(int  argc,				/* I - Number of command-line args */
 	 filter;
 	 filter = (mime_filter_t *)cupsArrayNext(filters))
     {
-      if ((prefilter = mimeFilterLookup(mime, filter->src, prefilter_type)))
+      if ((prefilter = mimeFilterLookup(mime, filter->src,
+                                        prefilter_type)) != NULL)
 	cupsArrayAdd(prefilters, prefilter);
 
       cupsArrayAdd(prefilters, filter);
@@ -470,7 +488,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Do it!
   */
 
-  status = exec_filters(filters, infile, outfile, ppdfile, printer, user,
+  status = exec_filters(src, filters, infile, outfile, ppdfile, printer, user,
                         title, num_options, options);
 
  /*
@@ -610,6 +628,8 @@ add_printer_filters(
       if (ppdattr->value)
 	add_printer_filter(command, mime, *prefilter_type, ppdattr->value);
   }
+  else
+    *prefilter_type = NULL;
 
   return (printer_type);
 }
@@ -789,7 +809,8 @@ exec_filter(const char *filter,		/* I - Filter to execute */
  */
 
 static int				/* O - 0 on success, 1 on error */
-exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
+exec_filters(mime_type_t   *srctype,	/* I - Source type */
+             cups_array_t  *filters,	/* I - Array of filters to run */
              const char    *infile,	/* I - File to filter */
 	     const char    *outfile,	/* I - File to create */
 	     const char    *ppdfile,	/* I - PPD file, if any */
@@ -833,9 +854,8 @@ exec_filters(cups_array_t  *filters,	/* I - Array of filters to run */
 
   optstr = escape_options(num_options, options);
 
-  filter = cupsArrayFirst(filters);
   snprintf(content_type, sizeof(content_type), "CONTENT_TYPE=%s/%s",
-           filter->src->super, filter->src->type);
+           srctype->super, srctype->type);
   snprintf(cups_datadir, sizeof(cups_datadir), "CUPS_DATADIR=%s", DataDir);
   snprintf(cups_fontpath, sizeof(cups_fontpath), "CUPS_FONTPATH=%s", FontPath);
   snprintf(cups_serverbin, sizeof(cups_serverbin), "CUPS_SERVERBIN=%s",
@@ -1285,6 +1305,7 @@ usage(const char *command,		/* I - Command name */
 		    "Options:\n"
 		    "\n"
 		    "  -c cupsd.conf    Set cupsd.conf file to use\n"
+		    "  -e               Use every filter from the PPD file\n"
 		    "  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
 		    "  -n copies        Set number of copies\n"
 		    "  -o name=value    Set option(s)\n"
@@ -1296,6 +1317,7 @@ usage(const char *command,		/* I - Command name */
 		    "\n"
 		    "Options:\n"
 		    "\n"
+		    "  -e                   Use every filter from the PPD file\n"
 		    "  -f filename          Set file to be converted (otherwise stdin)\n"
 		    "  -o filename          Set file to be generated (otherwise stdout)\n"
 		    "  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
