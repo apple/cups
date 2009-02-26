@@ -2015,7 +2015,7 @@ cupsdSetPrinterAttr(
   * Don't allow empty values...
   */
 
-  if (!*value)
+  if (!*value && strcmp(name, "marker-message"))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Ignoring empty \"%s\" attribute", name);
     return;
