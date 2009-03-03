@@ -672,6 +672,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
   sprintf(portname, "%d", port);
 
+  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
+
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
     _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
