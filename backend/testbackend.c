@@ -246,7 +246,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         write(1, ps_query, strlen(ps_query));
 	write(2, "DEBUG: START\n", 13);
-        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 5.0)) > 0)
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 60.0)) > 0)
 	  write(2, buffer, bytes);
 	write(2, "\nDEBUG: END\n", 12);
       }
@@ -297,7 +297,7 @@ main(int  argc,				/* I - Number of command-line args */
     close(side_fds[1]);
 
     execv(backend, argv + first_arg);
-    fprintf(stderr, "textbackend: Unable to execute \"%s\": %s\n", backend,
+    fprintf(stderr, "testbackend: Unable to execute \"%s\": %s\n", backend,
             strerror(errno));
     return (errno);
   }
@@ -353,7 +353,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     length   = 0;
     scstatus = cupsSideChannelDoRequest(CUPS_SC_CMD_DRAIN_OUTPUT, buffer,
-                                        &length, 5.0);
+                                        &length, 60.0);
     printf("CUPS_SC_CMD_DRAIN_OUTPUT returned %s\n", statuses[scstatus]);
 
     length   = 1;
@@ -437,10 +437,12 @@ usage(void)
   puts("Options:");
   puts("  -d          Show log messages from backend.");
   puts("  -oid OID    Lookup the specified SNMP OID.");
+  puts("              (.1.3.6.1.2.1.43.10.2.1.4.1.1 is a good one for printers)");
   puts("  -ps         Send PostScript query code to backend.");
-  puts("  -s          Do SNMP tests.");
+  puts("  -s          Do side-channel + SNMP tests.");
   puts("  -t          Send spaces slowly to backend ('trickle').");
   puts("  -walk OID   Walk the specified SNMP OID.");
+  puts("              (.1.3.6.1.2.1.43 is a good one for printers)");
 
   exit(1);
 }

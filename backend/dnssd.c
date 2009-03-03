@@ -19,6 +19,8 @@
  *   browse_callback()       - Browse devices.
  *   browse_local_callback() - Browse local devices.
  *   compare_devices()       - Compare two devices.
+ *   exec_backend()          - Execute the backend that corresponds to the
+ *                             resolved service name.
  *   get_device()            - Create or update a device.
  *   query_callback()        - Process query data.
  *   unquote()               - Unquote a name string.
