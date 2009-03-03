@@ -368,6 +368,8 @@ main(int  argc,				/* I - Number of command-line args */
 	        warn |= WARN_FILTERS;
 	      else if (!strcmp(argv[i], "profiles"))
 	        warn |= WARN_PROFILES;
+	      else if (!strcmp(argv[i], "sizes"))
+	        warn |= WARN_SIZES;
 	      else if (!strcmp(argv[i], "translations"))
 	        warn |= WARN_TRANSLATIONS;
 	      else if (!strcmp(argv[i], "all"))
@@ -3258,7 +3260,7 @@ usage(void)
 		  "\n"
 		  "    -R root-directory    Set alternate root\n"
 		  "    -W {all,none,constraints,defaults,duplex,filters,"
-		  "translations}\n"
+		  "profiles,sizes,translations}\n"
 		  "                         Issue warnings instead of errors\n"
 		  "    -q                   Run silently\n"
 		  "    -r                   Use 'relaxed' open mode\n"
