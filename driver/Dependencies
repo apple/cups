@@ -11,11 +11,13 @@ commandtopclx.o: ../cups/string.h ../config.h ../data/pcl.h
 rastertoescpx.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoescpx.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoescpx.o: ../cups/file.h ../cups/language.h ../cups/raster.h
-rastertoescpx.o: ../cups/string.h ../config.h ../data/escp.h
+rastertoescpx.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h
+rastertoescpx.o: ../config.h ../data/escp.h
 rastertopclx.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertopclx.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertopclx.o: ../cups/file.h ../cups/language.h ../cups/raster.h
-rastertopclx.o: pcl-common.h ../cups/string.h ../config.h ../data/pcl.h
+rastertopclx.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h
+rastertopclx.o: ../config.h pcl-common.h ../data/pcl.h
 pcl-common.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pcl-common.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 pcl-common.o: ../cups/file.h ../cups/language.h ../cups/raster.h pcl-common.h
