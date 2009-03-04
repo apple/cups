@@ -5,14 +5,14 @@
 *% Test PPD file #2 for the Common UNIX Printing System (CUPS).
 *%
 *% This file is used to test the CUPS PPD API functions and cannot be
-*% used with any known printers.  Look at the PPD files in the "ppd"
-*% subdirectory as well as the CUPS web site for working PPD files.
+*% used with any known printers.  Look on the CUPS web site for working PPD
+*% files.
 *%
 *% If you are a PPD file developer, consider using the PPD compiler (ppdc)
 *% to create your PPD files - not only will it save you time, it produces
 *% consistently high-quality files.
 *%
-*% Copyright 2007-2008 by Apple Inc.
+*% Copyright 2007-2009 by Apple Inc.
 *% Copyright 2002-2006 by Easy Software Products.
 *% 
 *% These coded instructions, statements, and computer programs are the
@@ -40,25 +40,22 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer:	Type42
 
-*% These constraints are used to test ppdConflicts() and ppdResolveConflicts()
+*% These constraints are used to test ppdConflicts() and cupsResolveConflicts()
 *cupsUIConstraints envelope: "*PageSize Letter *InputSlot Envelope"
-*cupsUIConstraints envelope: "*PageRegion Letter *InputSlot Envelope"
-*cupsUIResolver envelope: "*InputSlot Manual"
+*cupsUIConstraints envelope: "*PageSize A4 *InputSlot Envelope"
+*cupsUIResolver envelope: "*InputSlot Manual *PageSize Env10"
 
 *cupsUIConstraints envphoto: "*PageSize Env10 *InputSlot Envelope *Quality Photo"
-*cupsUIConstraints envphoto: "*PageRegion Env10 *InputSlot Envelope *Quality Photo"
 *cupsUIResolver envphoto: "*Quality Normal"
 
 *% This constraint is used to test ppdInstallableConflict()
 *cupsUIConstraints: "*Duplex *InstalledDuplexer False"
 
-*% These constraints are used to test the loop detection code in ppdResolveConflicts()
+*% These constraints are used to test the loop detection code in cupsResolveConflicts()
 *cupsUIConstraints loop1: "*PageSize A4 *Quality Photo"
 *cupsUIResolver loop1: "*Quality Normal"
 *cupsUIConstraints loop2: "*PageSize A4 *Quality Normal"
-*cupsUIResolver loop2: "*PageSize Letter *Quality Draft"
-*cupsUIConstraints loop3: "*PageSize Letter *Quality Draft"
-*cupsUIResolver loop3: "*PageSize A4 *Quality Photo"
+*cupsUIResolver loop2: "*Quality Photo"
 
 *% For PageSize, we have put all of the translations in-line...
 *OpenUI *PageSize/Page Size: PickOne

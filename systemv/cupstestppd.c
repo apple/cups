@@ -2761,7 +2761,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
   prefix = warn ? "  WARN  " : "**FAIL**";
 
-  if (warn != 2 && (page_size = ppdFindOption(ppd, "PageSize")) == NULL)
+  if ((page_size = ppdFindOption(ppd, "PageSize")) == NULL && warn != 2)
   {
     if (!warn && !errors && !verbose)
       _cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2776,7 +2776,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       errors ++;
   }
 
-  if (warn != 2 && (page_region = ppdFindOption(ppd, "PageRegion")) == NULL)
+  if ((page_region = ppdFindOption(ppd, "PageRegion")) == NULL && warn != 2)
   {
     if (!warn && !errors && !verbose)
       _cupsLangPuts(stdout, _(" FAIL\n"));

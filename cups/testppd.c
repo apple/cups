@@ -601,8 +601,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppdMarkOption(ppd, "InputSlot", "Envelope");
     ppdMarkOption(ppd, "Quality", "Photo");
 
-    if ((conflicts = ppdConflicts(ppd)) == 2)
-      puts("PASS (2)");
+    if ((conflicts = ppdConflicts(ppd)) == 1)
+      puts("PASS (1)");
     else
     {
       printf("FAIL (%d)\n", conflicts);
@@ -649,6 +649,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fputs("cupsResolveConflicts(loop test): ", stdout);
     ppdMarkOption(ppd, "PageSize", "A4");
+    ppdMarkOption(ppd, "InputSlot", "Tray");
     ppdMarkOption(ppd, "Quality", "Photo");
     num_options = 0;
     options     = NULL;

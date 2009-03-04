@@ -5,14 +5,14 @@
 *% Test PPD file for the Common UNIX Printing System (CUPS).
 *%
 *% This file is used to test the CUPS PPD API functions and cannot be
-*% used with any known printers.  Look at the PPD files in the "ppd"
-*% subdirectory as well as the CUPS web site for working PPD files.
+*% used with any known printers.  Look on the CUPS web site for working PPD
+*% files.
 *%
 *% If you are a PPD file developer, consider using the PPD compiler (ppdc)
 *% to create your PPD files - not only will it save you time, it produces
 *% consistently high-quality files.
 *%
-*% Copyright 2007-2008 by Apple Inc.
+*% Copyright 2007-2009 by Apple Inc.
 *% Copyright 2002-2006 by Easy Software Products.
 *% 
 *% These coded instructions, statements, and computer programs are the
@@ -40,7 +40,7 @@
 *LandscapeOrientation: Plus90
 *TTRasterizer:	Type42
 
-*% These constraints are used to test ppdConflicts() and ppdResolveConflicts()
+*% These constraints are used to test ppdConflicts() and cupsResolveConflicts()
 *UIConstraints: *PageSize Letter *InputSlot Envelope
 *UIConstraints: *InputSlot Envelope *PageSize Letter
 *UIConstraints: *PageRegion Letter *InputSlot Envelope

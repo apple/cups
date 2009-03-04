@@ -380,8 +380,18 @@ have to guess how a particular constraint is best resolved.</p>
 <p>CUPS 1.4 and higher define two new attributes for constraints,
 <tt>cupsUIConstraints</tt> and <tt>cupsUIResolver</tt>. Each
 <tt>cupsUIConstraints</tt> attribute points to a <tt>cupsUIResolver</tt>
-attribute which corrects the conflict condition. The same
-<tt>cupsUIResolver</tt> can be used by multiple <tt>cupsUIConstraints</tt>.</p>
+attribute which specifies alternate options that resolve the conflict condition.
+The same <tt>cupsUIResolver</tt> can be used by multiple
+<tt>cupsUIConstraints</tt>.</p>
+
+<blockquote><b>Note:</b>
+
+    <p>When developing PPD files that contain constraints, it is very important
+    to use the <a href="man-cupstestppd.html">cupstestppd(1)</a> program to
+    verify that your constraints are accurate and cannot result in unresolvable
+    option selections.</p>
+
+</blockquote>
 
 <h3><span class='info'>CUPS 1.4</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
 
@@ -393,15 +403,23 @@ attribute which corrects the conflict condition. The same
 
 <p>Lists two or more options which conflict. The "resolver" string is a
 (possibly unique) keyword which specifies which options to change when the
-constraint exists. When no resolver is provided, a "revert to defaults"
-change is assumed - this type of constraint is typically only used for
-installable options.</p>
+constraint exists. When no resolver is provided, CUPS first tries the default
+choice followed by testing each option choice to resolve the conflict.</p>
 
 <p>Examples:</p>
 
 <pre class='command'>
 <em>*% Specify that 2-sided printing cannot happen on transparencies</em> 
 *cupsUIConstraints transparency: "*Duplex *MediaType Transparency"
+
+<em>*% Specify that envelope printing cannot happen from the paper trays</em> 
+*cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
+*cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
+*cupsUIConstraints envelope: "*PageSize EnvDL *InputSlot Tray2"
+*cupsUIConstraints envelope: "*PageSize EnvDL *InputSlot Tray2"
+
+<em>*% Specify an installable option constraint for the envelope feeder</em>
+*cupsUIConstraints: "*InputSlot EnvFeeder *InstalledEnvFeeder"
 
 <em>*% Specify that photo printing cannot happen on plain paper or transparencies at 1200dpi</em> 
 *cupsUIConstraints photo: "*OutputMode Photo *MediaType Plain *Resolution 1200dpi"
@@ -410,18 +428,29 @@ installable options.</p>
 
 <h3><span class='info'>CUPS 1.4</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
 
-<p class='summary'>*cupsUIResolution resolver: "*Keyword OptionKeyword ..."</p>
+<p class='summary'>*cupsUIResolution resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
-<p>Specifies one or more options to mark/select to resolve a constraint. The
+<p>Specifies two or more options to mark/select to resolve a constraint. The
 "resolver" string identifies a particular action to take for one or more
 <a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>. The same action
-can be used for multiple constraints.</p>
+can be used for multiple constraints. The option keyword pairs are treated as
+an ordered list of option selections to try - only the first N selections will
+be used, where N is the minimum number of selections required. Because
+<a href="api-ppd.html#cupsResolveConflicts"><code>cupsResolveConflicts()</code></a>
+will not change the most recent option selection passed to it, at least two
+options from the constraints must be listed to avoid situations where conflicts
+cannot be resolved.</p>
 
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Specify the option to change for the 2-sided transparency constraint</em> 
-*cupsUIResolver transparency: "*Duplex None"
+<em>*% Specify the options to change for the 2-sided transparency constraint</em> 
+*cupsUIResolver transparency: "*Duplex None *MediaType Plain"
+
+<em>*% Specify the options to change for the envelope printing constraints.  Notice
+*% that we try to change the InputSlot to either the envelope feeder or the
+*% manual feed first, then we change the page size...</em>
+*cupsUIResolver envelope: "*InputSlot EnvFeeder *InputSlot ManualFeed *PageSize Letter"
 
 <em>*% Specify the options to change for the photo printing constraints</em> 
 *cupsUIResolver photo: "*OutputMode Best *Resolution 600dpi"

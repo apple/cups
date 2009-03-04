@@ -516,7 +516,7 @@ testoptions:	testoptions.o libcups.a
 # testppd (dependency on static CUPS library is intentional)
 #
 
-testppd:	testppd.o libcups.a
+testppd:	testppd.o libcups.a test.ppd test2.ppd
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o libcups.a \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
