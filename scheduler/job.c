@@ -2741,8 +2741,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
   optptr  = options;
   *optptr = '\0';
 
-  snprintf(title, sizeof(title), "%s-%d", job->printer->name, job->id);
-  strcpy(copies, "1");
+  snprintf(title, title_size, "%s-%d", job->printer->name, job->id);
+  strlcpy(copies, "1", copies_size);
 
   for (attr = job->attrs->attrs; attr != NULL; attr = attr->next)
   {
@@ -2754,12 +2754,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
       */
 
       if (!banner_page)
-        sprintf(copies, "%d", attr->values[0].integer);
+        snprintf(copies, copies_size, "%d", attr->values[0].integer);
     }
     else if (!strcmp(attr->name, "job-name") &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
-      strlcpy(title, attr->values[0].string.text, sizeof(title));
+      strlcpy(title, attr->values[0].string.text, title_size);
     else if (attr->group_tag == IPP_TAG_JOB)
     {
      /*
