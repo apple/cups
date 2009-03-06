@@ -2482,8 +2482,35 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   */
 
   printer_state = IPP_PRINTER_IDLE;
-  job_state     = IPP_JOB_COMPLETED;
-  message       = "Job completed.";
+
+  switch (job_state = job->state_value)
+  {
+    case IPP_JOB_PENDING :
+        message = "Job paused.";
+	break;
+
+    case IPP_JOB_HELD :
+        message = "Job held.";
+	break;
+
+    case IPP_JOB_PROCESSING :
+    case IPP_JOB_COMPLETED :
+	job_state     = IPP_JOB_COMPLETED;
+	message       = "Job completed.";
+        break;
+
+    case IPP_JOB_STOPPED :
+        message = "Job stopped.";
+	break;
+
+    case IPP_JOB_CANCELED :
+        message = "Job canceled.";
+	break;
+
+    case IPP_JOB_ABORTED :
+        message = "Job aborted.";
+	break;
+  }
 
   if (job->status < 0)
   {
