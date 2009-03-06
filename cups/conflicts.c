@@ -1072,7 +1072,7 @@ ppd_test_constraints(
         key.option = constptr->option;
 
 	if ((marked = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key))
-	        != NULL &&
+	        == NULL ||
 	    (!strcasecmp(marked->choice, "None") ||
 	     !strcasecmp(marked->choice, "Off") ||
 	     !strcasecmp(marked->choice, "False")))
