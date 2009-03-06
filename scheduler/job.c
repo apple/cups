@@ -2493,6 +2493,7 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
         message = "Job held.";
 	break;
 
+    default :
     case IPP_JOB_PROCESSING :
     case IPP_JOB_COMPLETED :
 	job_state     = IPP_JOB_COMPLETED;
