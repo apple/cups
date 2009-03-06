@@ -2008,6 +2008,24 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
       }
 
      /*
+      * Resolvers must list at least two options...
+      */
+
+      if (num_options < 2)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	_cupsLangPrintf(stdout,
+			_("      %s  cupsUIResolver %s does not list at least "
+			  "two different options!\n"),
+			prefix, constattr->spec);
+
+	if (!warn)
+	  errors ++;
+      }
+
+     /*
       * Test the resolver...
       */
 
