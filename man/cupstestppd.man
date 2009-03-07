@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupstestppd 1 "Common UNIX Printing System" "3 May 2007" "Apple Inc."
+.TH cupstestppd 1 "Common UNIX Printing System" "2 March 2009" "Apple Inc."
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
@@ -62,6 +62,10 @@ Report all filter errors as warnings.
 -W profiles
 .br
 Report all profile errors as warnings.
+.TP 5
+-W sizes
+.br
+Report all media size errors as warnings.
 .TP 5
 -W translations
 .br

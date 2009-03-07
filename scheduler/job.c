@@ -22,7 +22,6 @@
  *   cupsdCleanJobs()           - Clean out old jobs.
  *   cupsdContinueJob()         - Continue printing with the next file in a job.
  *   cupsdDeleteJob()           - Free all memory used by a job.
- *   cupsdFinishJob()           - Finish a job.
  *   cupsdFreeAllJobs()         - Free all jobs from memory.
  *   cupsdFindJob()             - Find the specified job.
  *   cupsdGetPrinterJobCount()  - Get the number of pending, processing, or held
@@ -491,7 +490,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   FilterLevel -= job->cost;
 
-  filters   = NULL;
+  filters = NULL;
 
   if (job->printer->raw)
   {
@@ -827,7 +826,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
         * Just the language code (ll)...
 	*/
 
-        snprintf(lang, sizeof(lang), "LANG=%s.UTF8",
+        snprintf(lang, sizeof(lang), "LANG=%s.UTF-8",
 	         attr->values[0].string.text);
         break;
 
@@ -836,7 +835,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
         * Language and country code (ll-cc)...
 	*/
 
-        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c.UTF8",
+        snprintf(lang, sizeof(lang), "LANG=%c%c_%c%c.UTF-8",
 	         attr->values[0].string.text[0],
 		 attr->values[0].string.text[1],
 		 toupper(attr->values[0].string.text[3] & 255),
@@ -2481,9 +2480,40 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   * Process the exit status...
   */
 
-  printer_state = IPP_PRINTER_IDLE;
-  job_state     = IPP_JOB_COMPLETED;
-  message       = "Job completed.";
+  if (job->printer->state == IPP_PRINTER_PROCESSING)
+    printer_state = IPP_PRINTER_IDLE;
+  else
+    printer_state = job->printer->state;
+
+  switch (job_state = job->state_value)
+  {
+    case IPP_JOB_PENDING :
+        message = "Job paused.";
+	break;
+
+    case IPP_JOB_HELD :
+        message = "Job held.";
+	break;
+
+    default :
+    case IPP_JOB_PROCESSING :
+    case IPP_JOB_COMPLETED :
+	job_state     = IPP_JOB_COMPLETED;
+	message       = "Job completed.";
+        break;
+
+    case IPP_JOB_STOPPED :
+        message = "Job stopped.";
+	break;
+
+    case IPP_JOB_CANCELED :
+        message = "Job canceled.";
+	break;
+
+    case IPP_JOB_ABORTED :
+        message = "Job aborted.";
+	break;
+  }
 
   if (job->status < 0)
   {
@@ -2741,8 +2771,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
   optptr  = options;
   *optptr = '\0';
 
-  snprintf(title, sizeof(title), "%s-%d", job->printer->name, job->id);
-  strcpy(copies, "1");
+  snprintf(title, title_size, "%s-%d", job->printer->name, job->id);
+  strlcpy(copies, "1", copies_size);
 
   for (attr = job->attrs->attrs; attr != NULL; attr = attr->next)
   {
@@ -2754,12 +2784,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
       */
 
       if (!banner_page)
-        sprintf(copies, "%d", attr->values[0].integer);
+        snprintf(copies, copies_size, "%d", attr->values[0].integer);
     }
     else if (!strcmp(attr->name, "job-name") &&
 	     (attr->value_tag == IPP_TAG_NAME ||
 	      attr->value_tag == IPP_TAG_NAMELANG))
-      strlcpy(title, attr->values[0].string.text, sizeof(title));
+      strlcpy(title, attr->values[0].string.text, title_size);
     else if (attr->group_tag == IPP_TAG_JOB)
     {
      /*
@@ -3494,10 +3524,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
 
-  job->cost     = 0;
-  job->progress = 0;
-  job->printer  = printer;
-  printer->job  = job;
+  job->cost         = 0;
+  job->current_file = 0;
+  job->progress     = 0;
+  job->printer      = printer;
+  printer->job      = job;
 
  /*
   * Setup the last exit status and security profiles...

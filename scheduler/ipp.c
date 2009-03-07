@@ -360,7 +360,8 @@ cupsdProcessIPPRequest(
       */
 
       attr = con->request->attrs;
-      if (attr && !strcmp(attr->name, "attributes-charset") &&
+      if (attr && attr->name &&
+          !strcmp(attr->name, "attributes-charset") &&
 	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET)
 	charset = attr;
       else
@@ -369,7 +370,8 @@ cupsdProcessIPPRequest(
       if (attr)
         attr = attr->next;
 
-      if (attr && !strcmp(attr->name, "attributes-natural-language") &&
+      if (attr && attr->name &&
+          !strcmp(attr->name, "attributes-natural-language") &&
 	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
 	language = attr;
       else

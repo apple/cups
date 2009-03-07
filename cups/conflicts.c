@@ -181,16 +181,21 @@ cupsResolveConflicts(
     cups_option_t **options)		/* IO - Additional selected options */
 {
   int			i,		/* Looping var */
-			num_newopts,	/* Number of new options */
-			num_resopts;	/* Number of resolver options */
-  cups_option_t		*newopts,	/* New options */
-			*resopts;	/* Resolver options */
+			num_newopts;	/* Number of new options */
+  cups_option_t		*newopts;	/* New options */
   cups_array_t		*active,	/* Active constraints */
 			*pass,		/* Resolvers for this pass */
-			*resolvers;	/* Resolvers we have used */
+			*resolvers,	/* Resolvers we have used */
+			*test;		/* Test array for conflicts */
   _ppd_cups_uiconsts_t	*consts;	/* Current constraints */
   _ppd_cups_uiconst_t	*constptr;	/* Current constraint */
   ppd_attr_t		*resolver;	/* Current resolver */
+  const char		*resval;	/* Pointer into resolver value */
+  char			resoption[PPD_MAX_NAME],
+					/* Current resolver option */
+			reschoice[PPD_MAX_NAME],
+					/* Current resolver choice */
+			*resptr;	/* Pointer into option/choice */
   const char		*value;		/* Selected option value */
   int			changed;	/* Did we change anything? */
   ppd_choice_t		*marked;	/* Marked choice */
@@ -277,25 +282,74 @@ cupsResolveConflicts(
         cupsArrayAdd(pass, consts->resolver);
 	cupsArrayAdd(resolvers, consts->resolver);
 
-        if (option && choice)
+        for (resval = resolver->value; *resval && !changed;)
 	{
-	  resopts     = NULL;
-	  num_resopts = _ppdParseOptions(resolver->value, 0, &resopts);
+	  while (isspace(*resval & 255))
+	    resval ++;
 
-          if ((value = cupsGetOption(option, num_newopts, newopts)) != NULL &&
-	      !strcasecmp(value, choice))
+	  if (*resval != '*')
+	    break;
+
+	  for (resval ++, resptr = resoption;
+	       *resval && !isspace(*resval & 255);
+	       resval ++)
+            if (resptr < (resoption + sizeof(resoption) - 1))
+	      *resptr++ = *resval;
+
+          *resptr = '\0';
+
+	  while (isspace(*resval & 255))
+	    resval ++;
+
+	  for (resptr = reschoice;
+	       *resval && !isspace(*resval & 255);
+	       resval ++)
+            if (resptr < (reschoice + sizeof(reschoice) - 1))
+	      *resptr++ = *resval;
+
+          *resptr = '\0';
+
+          if (!resoption[0] || !reschoice[0])
+	    break;
+
+         /*
+	  * Is this the option we are changing?
+	  */
+
+	  if (option &&
+	      (!strcasecmp(resoption, option) ||
+	       (!strcasecmp(option, "PageSize") &&
+		!strcasecmp(resoption, "PageRegion")) ||
+	       (!strcasecmp(option, "PageRegion") &&
+	        !strcasecmp(resoption, "PageSize"))))
+	    continue;
+
+	 /*
+	  * Try this choice...
+	  */
+
+          if ((test = ppd_test_constraints(ppd, resoption, reschoice,
+					   num_newopts, newopts,
+					   _PPD_ALL_CONSTRAINTS)) == NULL)
 	  {
-	    DEBUG_printf(("cupsResolveConflicts: Resolver %s changes %s!\n",
-	                  consts->resolver, option));
-	    cupsFreeOptions(num_resopts, resopts);
-	    goto error;
-          }
+	   /*
+	    * That worked...
+	    */
 
-	  cupsFreeOptions(num_resopts, resopts);
-	}
+            changed = 1;
+	  }
+	  else
+            cupsArrayDelete(test);
 
-        num_newopts = _ppdParseOptions(resolver->value, num_newopts, &newopts);
-        changed     = 1;
+	 /*
+	  * Add the option/choice from the resolver regardless of whether it
+	  * worked; this makes sure that we can cascade several changes to
+	  * make things resolve...
+	  */
+
+	  num_newopts = cupsAddOption(resoption, reschoice, num_newopts,
+				      &newopts);
+        }
       }
       else
       {
@@ -306,7 +360,6 @@ cupsResolveConflicts(
 
         int		j;		/* Looping var */
 	ppd_choice_t	*cptr;		/* Current choice */
-        cups_array_t	*test;		/* Test array for conflicts */
         ppd_size_t	*size;		/* Current page size */
 
 
@@ -1019,7 +1072,7 @@ ppd_test_constraints(
         key.option = constptr->option;
 
 	if ((marked = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key))
-	        != NULL &&
+	        == NULL ||
 	    (!strcasecmp(marked->choice, "None") ||
 	     !strcasecmp(marked->choice, "Off") ||
 	     !strcasecmp(marked->choice, "False")))

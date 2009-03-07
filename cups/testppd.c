@@ -601,8 +601,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppdMarkOption(ppd, "InputSlot", "Envelope");
     ppdMarkOption(ppd, "Quality", "Photo");
 
-    if ((conflicts = ppdConflicts(ppd)) == 2)
-      puts("PASS (2)");
+    if ((conflicts = ppdConflicts(ppd)) == 1)
+      puts("PASS (1)");
     else
     {
       printf("FAIL (%d)\n", conflicts);
@@ -649,6 +649,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fputs("cupsResolveConflicts(loop test): ", stdout);
     ppdMarkOption(ppd, "PageSize", "A4");
+    ppdMarkOption(ppd, "InputSlot", "Tray");
     ppdMarkOption(ppd, "Quality", "Photo");
     num_options = 0;
     options     = NULL;
@@ -950,13 +951,23 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
       }
 
-      puts("Constraints:");
+      puts("\nConstraints:");
 
       for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
         printf("    *UIConstraints: *%s %s *%s %s\n", c->option1, c->choice1,
 	       c->option2, c->choice2);
+      if (ppd->num_consts == 0)
+        puts("    NO CONSTRAINTS");
 
-      puts("Attributes:");
+      puts("\nFilters:");
+
+      for (i = 0; i < ppd->num_filters; i ++)
+        printf("    %s\n", ppd->filters[i]);
+
+      if (ppd->num_filters == 0)
+        puts("    NO FILTERS");
+
+      puts("\nAttributes:");
 
       for (attr = (ppd_attr_t *)cupsArrayFirst(ppd->sorted_attrs);
            attr;

@@ -2015,7 +2015,7 @@ cupsdSetPrinterAttr(
   * Don't allow empty values...
   */
 
-  if (!*value)
+  if (!*value && strcmp(name, "marker-message"))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Ignoring empty \"%s\" attribute", name);
     return;
@@ -2736,10 +2736,6 @@ cupsdSetPrinterReasons(
 	  * Found a match, so remove it...
 	  */
 
-	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-	                  "cupsdSetPrinterReasons: Removing \"%s\" at index %d",
-			  reason, i);
-
 	  p->num_reasons --;
 	  _cupsStrFree(p->reasons[i]);
 
@@ -2778,10 +2774,6 @@ cupsdSetPrinterReasons(
 			  p->name, i + 1);
           return;
         }
-
-	cupsdLogMessage(CUPSD_LOG_DEBUG2,
-			"cupsdSetPrinterReasons: Adding \"%s\" at index %d",
-			reason, i);
 
         p->reasons[i] = _cupsStrAlloc(reason);
 	p->num_reasons ++;

@@ -1,9 +1,13 @@
-CHANGES.txt - 2009-02-25
+CHANGES.txt - 2009-03-04
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- The cupstestppd program did not validate the capitalization of
+	  filenames in the PPD file.
+	- The cupstestppd program did not validate the PageSize and PageRegion
+	  values.
 	- The cups-deviced helper program could miss reporting some backend
 	  devices (STR #3108)
 	- The cupsSideChannelSNMP* functions did not work.

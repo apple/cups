@@ -19,8 +19,8 @@ include ../Makedefs
 
 RBACKENDS =	ipp lpd $(DNSSD_BACKEND)
 UBACKENDS =	$(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
-TARGETS	=	test1284 testbackend testsupplies \
-		libbackend.a $(RBACKENDS) $(UBACKENDS)
+UNITTESTS =	test1284 testbackend testsupplies
+TARGETS =	libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o network.o runloop.o snmp-supplies.o
 OBJS	=	ipp.o lpd.o dnssd.o pap.o parallel.o scsi.o serial.o snmp.o \
 		socket.o test1284.o testbackend.o testsupplies.o usb.o
@@ -44,7 +44,7 @@ libs:
 # Make unit tests...
 #
 
-unittests:
+unittests:	$(UNITTESTS)
 
 
 #
@@ -52,7 +52,7 @@ unittests:
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(LIBOBJS) http mdns
+	$(RM) $(OBJS) $(TARGETS) $(UNITTESTS) $(LIBOBJS) http mdns
 
 
 #

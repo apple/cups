@@ -145,8 +145,9 @@ main(int  argc,				/* I - Number of command-line args */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
 #ifdef __APPLE__
-  int			run_as_child = 0;
+  int			run_as_child = 0,
 					/* Needed for Mac OS X fork/exec */
+			use_sysman = 1;	/* Use system management functions? */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
@@ -188,6 +189,11 @@ main(int  argc,				/* I - Number of command-line args */
         switch (*opt)
 	{
 #ifdef __APPLE__
+          case 'S' : /* Disable system management functions */
+              puts("Warning: -S (disable system management) for internal testing use only!");
+	      use_sysman = 0;
+	      break;
+
 	  case 'C' : /* Run as child with config file */
               run_as_child = 1;
 	      fg           = -1;
@@ -270,9 +276,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'p' : /* Stop immediately for profiling */
-              puts("Warning: -p option is for internal testing use only!");
+              puts("Warning: -p (startup profiling) is for internal testing use only!");
 	      stop_scheduler = 1;
 	      fg             = 1;
+	      break;
+
+          case 'P' : /* Disable security profiles */
+              puts("Warning: -P (disable security profiles) is for internal testing use only!");
+	      UseProfiles = 0;
 	      break;
 
           case 't' : /* Test the cupsd.conf file... */
@@ -630,7 +641,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Start power management framework...
   */
 
-  cupsdStartSystemMonitor();
+  if (use_sysman)
+    cupsdStartSystemMonitor();
 #endif /* __APPLE__ */
 
  /*
@@ -1149,7 +1161,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Stop monitoring system event monitoring...
   */
 
-  cupsdStopSystemMonitor();
+  if (use_sysman)
+    cupsdStopSystemMonitor();
 #endif /* __APPLE__ */
 
 #ifdef HAVE_GSSAPI
@@ -1742,6 +1755,7 @@ process_children(void)
 	    cupsdContinueJob(job);
 	  }
 	}
+	break;
       }
     }
 

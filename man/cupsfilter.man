@@ -11,14 +11,14 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "Common UNIX Printing System" "10 September 2008" "Apple Inc."
+.TH cupsfilter 8 "Common UNIX Printing System" "26 February 2009" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
 .B cupsfilter
 [ -c
 .I config-file
-] -j
+] [ -e ] -j
 .I job-id[,N]
 [ -m
 .I mime/type
@@ -41,6 +41,10 @@ through CUPS. By default, \fIcupsfilter\fR generates a PDF file.
 -c config-file
 .br
 Uses the named cupsd.conf configuration file.
+.TP 5
+-e
+.br
+Use every filter from the PPD file.
 .TP 5
 -j job-id[,N]
 .br
