@@ -491,7 +491,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   FilterLevel -= job->cost;
 
-  filters   = NULL;
+  filters = NULL;
 
   if (job->printer->raw)
   {
@@ -2481,7 +2481,10 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   * Process the exit status...
   */
 
-  printer_state = IPP_PRINTER_IDLE;
+  if (job->printer->state == IPP_PRINTER_PROCESSING)
+    printer_state = IPP_PRINTER_IDLE;
+  else
+    printer_state = job->printer->state;
 
   switch (job_state = job->state_value)
   {
@@ -3522,10 +3525,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
 
-  job->cost     = 0;
-  job->progress = 0;
-  job->printer  = printer;
-  printer->job  = job;
+  job->cost         = 0;
+  job->current_file = 0;
+  job->progress     = 0;
+  job->printer      = printer;
+  printer->job      = job;
 
  /*
   * Setup the last exit status and security profiles...
