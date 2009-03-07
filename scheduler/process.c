@@ -83,7 +83,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		temp[1024];		/* Quoted TempDir */
 
 
-  if (RunUser)
+  if (!UseProfiles || RunUser)
   {
    /*
     * Only use sandbox profiles as root...

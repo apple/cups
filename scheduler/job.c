@@ -22,7 +22,6 @@
  *   cupsdCleanJobs()           - Clean out old jobs.
  *   cupsdContinueJob()         - Continue printing with the next file in a job.
  *   cupsdDeleteJob()           - Free all memory used by a job.
- *   cupsdFinishJob()           - Finish a job.
  *   cupsdFreeAllJobs()         - Free all jobs from memory.
  *   cupsdFindJob()             - Find the specified job.
  *   cupsdGetPrinterJobCount()  - Get the number of pending, processing, or held

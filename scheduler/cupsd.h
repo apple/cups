@@ -152,8 +152,10 @@ typedef void (*cupsd_selfunc_t)(void *data);
  * Globals...
  */
 
-VAR int			TestConfigFile	VALUE(0);
+VAR int			TestConfigFile	VALUE(0),
 					/* Test the cupsd.conf file? */
+			UseProfiles	VALUE(1);
+					/* Use security profiles for child procs? */
 VAR int			MaxFDs		VALUE(0);
 					/* Maximum number of files */
 
