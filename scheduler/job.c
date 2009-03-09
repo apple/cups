@@ -4004,10 +4004,24 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     for (i = 0; job->filters[i] < 0; i ++);
 
     if (job->filters[i])
+    {
+     /*
+      * EOF but we haven't collected the exit status of all filters...
+      */
+
+      cupsdCheckProcess();
       return;
+    }
 
     if (job->current_file >= job->num_files && job->backend > 0)
+    {
+     /*
+      * EOF but we haven't collected the exit status of the backend...
+      */
+
+      cupsdCheckProcess();
       return;
+    }
 
    /*
     * Handle the end of job stuff...

@@ -147,7 +147,8 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef __APPLE__
   int			run_as_child = 0,
 					/* Needed for Mac OS X fork/exec */
-			use_sysman = 1;	/* Use system management functions? */
+			use_sysman = !getuid();
+					/* Use system management functions? */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
 #endif /* __APPLE__ */
@@ -1210,6 +1211,21 @@ main(int  argc,				/* I - Number of command-line args */
   cupsdStopSelect();
 
   return (!stop_scheduler);
+}
+
+
+/*
+ * 'cupsdCheckProcess()' - Tell the main loop to check for dead children.
+ */
+
+void
+cupsdCheckProcess(void)
+{
+ /*
+  * Flag that we have dead children...
+  */
+
+  dead_children = 1;
 }
 
 

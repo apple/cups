@@ -193,6 +193,7 @@ VAR PSQUpdateQuotaProcPtr PSQUpdateQuotaProc
  * Prototypes...
  */
 
+extern void	cupsdCheckProcess(void);
 extern void	cupsdClearString(char **s);
 extern void	cupsdHoldSignals(void);
 extern void	cupsdReleaseSignals(void);

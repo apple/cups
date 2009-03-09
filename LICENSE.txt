@@ -1,6 +1,6 @@
                 Common UNIX Printing System License Agreement
 
-                        Copyright 2007 by Apple Inc.
+		      Copyright 2007-2009 by Apple Inc.
 			     1 Infinite Loop
 			  Cupertino, CA 95014 USA
 
@@ -137,12 +137,11 @@ redistribute it freely, subject to the following restrictions:
 
 TRADEMARKS
 
-Apple Inc. has trademarked the Common UNIX Printing System, CUPS,
-and CUPS logo. You may use these names and logos in any direct port
-or binary distribution of CUPS. Please contact Apple Inc. for written
-permission to use them in derivative products. Our intention is to
-protect the value of these trademarks and ensure that any derivative
-product meets the same high-quality standards as the original.
+CUPS and the CUPS logo are trademarks of Apple Inc. You may use the name
+and logo in any direct port or binary distribution of CUPS. Please contact
+Apple Inc. for written permission to use them in derivative products. Our
+intention is to protect the value of these trademarks and ensure that any
+derivative product meets the same high-quality standards as the original.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
