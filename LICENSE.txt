@@ -1,4 +1,4 @@
-                Common UNIX Printing System License Agreement
+                          CUPS License Agreement
 
 		      Copyright 2007-2009 by Apple Inc.
 			     1 Infinite Loop
@@ -9,11 +9,10 @@
 
 INTRODUCTION
 
-The Common UNIX Printing System(tm), ("CUPS(tm)"), is provided
-under the GNU General Public License ("GPL") and GNU Library
-General Public License ("LGPL"), Version 2, with exceptions for
-Apple operating systems and the OpenSSL toolkit. A copy of the
-exceptions and licenses follow this introduction.
+CUPS(tm) is provided under the GNU General Public License ("GPL")
+and GNU Library General Public License ("LGPL"), Version 2, with
+exceptions for Apple operating systems and the OpenSSL toolkit. A
+copy of the exceptions and licenses follow this introduction.
 
 The GNU LGPL applies to the CUPS and CUPS Imaging libraries
 located in the "cups" and "filter" subdirectories of the CUPS
