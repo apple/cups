@@ -1,8 +1,7 @@
 #
 # "$Id: cups.list.in 7930 2008-09-10 22:25:54Z mike $"
 #
-#   ESP Package Manager (EPM) file list for the Common UNIX Printing
-#   System (CUPS).
+#   ESP Package Manager (EPM) file list for CUPS.
 #
 #   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -15,8 +14,8 @@
 #
 
 # Product information
-%product Common UNIX Printing System
-%copyright 2007-2008 by Apple Inc.
+%product CUPS
+%copyright 2007-2009 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -26,11 +25,8 @@
 %format !rpm
 %version @CUPS_VERSION@
 %format all
-%description The Common UNIX Printing System provides a portable printing
-%description layer for UNIX(r) operating systems.  It was developed by
-%description Easy Software Products to promote a standard printing solution
-%description for all UNIX vendors and users and is now owned by Apple Inc.
-%description CUPS provides the System V and Berkeley command-line interfaces. 
+%description CUPS is the standards-based, open source printing system developed by
+%description Apple Inc. for Mac OS® X and other UNIX®-like operating systems.
 
 %format rpm
 %provides lpd

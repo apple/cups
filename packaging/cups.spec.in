@@ -1,7 +1,7 @@
 #
 # "$Id: cups.spec.in 7718 2008-07-10 23:04:22Z mike $"
 #
-#   RPM "spec" file for the Common UNIX Printing System (CUPS).
+#   RPM "spec" file for CUPS.
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
@@ -32,7 +32,7 @@
 %{?_with_static: %define _static --enable-static}
 %{!?_with_static: %define _static --disable-static}
 
-Summary: Common UNIX Printing System
+Summary: CUPS
 Name: cups
 Version: @CUPS_VERSION@
 Release: 0
@@ -56,51 +56,43 @@ Obsoletes: cups-id, cups-it, cups-ja, cups-ko, cups-nl, cups-no, cups-pl
 Obsoletes: cups-pt, cups-ru, cups-sv, cups-zh
 
 %package devel
-Summary: Common UNIX Printing System - development environment
+Summary: CUPS - development environment
 Group: Development/Libraries
 Requires: %{name}-libs = %{epoch}:%{version}
 
 %package libs
-Summary: Common UNIX Printing System - shared libraries
+Summary: CUPS - shared libraries
 Group: System Environment/Libraries
 Provides: libcups1
 
 %package lpd
-Summary: Common UNIX Printing System - LPD support
+Summary: CUPS - LPD support
 Group: System Environment/Daemons
 Requires: %{name} = %{epoch}:%{version} xinetd
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %package php
-Summary: Common UNIX Printing System - PHP support
+Summary: CUPS - PHP support
 Group: Development/Languages
 Requires: %{name}-libs = %{epoch}:%{version}
 %endif
 
 %description
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. It was developed by Easy Software Products 
-to promote a standard printing solution for all UNIX vendors and users
-and is now owned by Apple Inc.  CUPS provides the System V and Berkeley
-command-line interfaces. 
+CUPS is the standards-based, open source printing system developed by
+Apple Inc. for Mac OS¨ X and other UNIX¨-like operating systems.
 
 %description devel
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This is the development package for creating
-additional printer drivers and other CUPS services.
+This package provides the CUPS headers and development environment.
 
 %description libs
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This package contains the CUPS shared libraries.
+This package provides the CUPS shared libraries.
 
 %description lpd
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This package provides LPD client support.
+This package provides LPD client support.
 
 %if %{?_with_php:1}%{!?_with_php:0}
 %description php
-The Common UNIX Printing System provides a portable printing layer for 
-UNIX® operating systems. This package provides PHP support.
+This package provides PHP support for CUPS.
 %endif
 
 %prep

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpc 8 "Common UNIX Printing System" "3 November 2008" "Apple Inc."
+.TH lpc 8 "CUPS" "3 November 2008" "Apple Inc."
 .SH NAME
 lpc \- line printer control program
 .SH SYNOPSIS

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH client.conf 5 "Common UNIX Printing System" "25 February 2006" "Apple Inc."
+.TH client.conf 5 "CUPS" "25 February 2006" "Apple Inc."
 .SH NAME
 client.conf \- client configuration file for cups
 .SH DESCRIPTION

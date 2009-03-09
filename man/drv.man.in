@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH drv 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH drv 1 "CUPS" "9 March 2009" "Apple Inc."
 .SH NAME
 drv \- cups driver interface for ppd compiler files
 .SH SYNOPSIS
@@ -21,7 +21,7 @@ drv \- cups driver interface for ppd compiler files
 .I drv:///filename.drv/pcfilename
 .SH DESCRIPTION
 \fIdrv\fR lists and compiles PPDC source files installed in the
-@CUPS_DATADIR@/drv and (on Mac OS X) /Library/Printers/PPDs.drv
+@CUPS_DATADIR@/drv and (on Mac OS X) /Library/Printers/PPDs/Contents/Resources
 directories on behalf of the scheduler, \fIcupsd(8)\fR.
 .PP
 The first form of the command lists all of the PPD files that can be produced

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH snmp.conf 5 "Common UNIX Printing System" "31 July 2006" "Apple Inc."
+.TH snmp.conf 5 "CUPS" "31 July 2006" "Apple Inc."
 .SH NAME
 snmp.conf \- snmp configuration file for cups
 .SH DESCRIPTION

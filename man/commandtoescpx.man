@@ -1,7 +1,7 @@
 .\"
 .\" "$Id: commandtoescpx.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
-.\"   rastertoescpx man page for the CUPS Driver Development Kit.
+.\"   commandtoescpx man page for the CUPS Driver Development Kit.
 .\"
 .\"   Copyright 2007-2009 by Apple Inc.
 .\"   Copyright 1997-2007 by Easy Software Products.
@@ -12,20 +12,20 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH rastertoescpx 1 "CUPS Driver Development Kit" "14 February 2007" "Apple Inc."
+.TH commandtoescpx 1 "CUPS" "9 March 2009" "Apple Inc."
 .SH NAME
-rastertoescpx \- enhanced esc/p raster driver for cups
+commandtoescpx \- enhanced esc/p command filter for cups
 .SH SYNOPSIS
-.B rastertoescpx
+.B commandtoescpx
 jobid user title copies options [
 .I filename.ras
 ]
 .SH DESCRIPTION
-\fIrastertoescpx\fR converts a CUPS raster stream to ESC/P or
+\fIcommandtoescpx\fR converts a CUPS command file to ESC/P or
 ESC/P2. It is used to support printing to a variety of EPSON and
 EPSON-compatible printers and plotters.
 .SH SEE ALSO
-cupsprofile(1), ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5), CUPS Driver Developer Kit Manual.
+ppdc(1), ppdhtml(1), ppdi(1), ppdmerge(1), ppdpo(1), ppdcfile(5), CUPS Driver Developer Kit Manual.
 .SH COPYRIGHT
 Copyright 2007-2009 by Apple Inc.
 .\"

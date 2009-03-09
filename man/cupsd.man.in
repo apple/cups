@@ -12,20 +12,19 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd 8 "Common UNIX Printing System" "27 August 2006" "Apple Inc."
+.TH cupsd 8 "CUPS" "9 March 2009" "Apple Inc."
 .SH NAME
-cupsd \- common unix printing system daemon
+cupsd \- cups scheduler
 .SH SYNOPSIS
 .B cupsd
 [ -c
 .I config-file
 ] [ -f ] [ -F ] [ -h ] [ -l ] [ -t ]
 .SH DESCRIPTION
-\fIcupsd\fR is the scheduler for the Common UNIX Printing System. It
-implements a printing system based upon the Internet Printing Protocol,
-version 1.1.  If no options are specified on the command-line then the
-default configuration file \fI@CUPS_SERVERROOT@/cupsd.conf\fR will be
-used.
+\fIcupsd\fR is the scheduler for CUPS. It implements a printing system based
+upon the Internet Printing Protocol, version 2.1.  If no options are specified
+on the command-line then the default configuration file
+\fI@CUPS_SERVERROOT@/cupsd.conf\fR will be used.
 .SH OPTIONS
 .TP 5
 -c config-file
@@ -56,7 +55,7 @@ This option is passed to \fIcupsd\fR when it is run from
 .br
 Test the configuration file for syntax errors.
 .SH COMPATIBILITY
-\fIcupsd\fR implements all of the required IPP/1.1 attributes and
+\fIcupsd\fR implements all of the required IPP/2.1 attributes and
 operations. It also implements several CUPS-specific administration
 operations.
 .SH SEE ALSO

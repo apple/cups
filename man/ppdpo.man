@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ppdpo 1 "Common UNIX Printing System" "10 October 2008" "Apple Inc."
+.TH ppdpo 1 "CUPS" "10 October 2008" "Apple Inc."
 .SH NAME
 ppdpo \- ppd message catalog generator
 .SH SYNOPSIS

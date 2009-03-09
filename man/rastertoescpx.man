@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH rastertoescpx 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH rastertoescpx 1 "CUPS" "20 May 2008" "Apple Inc."
 .SH NAME
 rastertoescpx \- enhanced esc/p raster driver for cups
 .SH SYNOPSIS

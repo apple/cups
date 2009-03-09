@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-config 1 "Common UNIX Printing System" "23 October 2008" "Apple Inc."
+.TH cups-config 1 "CUPS" "23 October 2008" "Apple Inc."
 .SH NAME
 cups-config \- get cups api, compiler, directory, and link information.
 .SH SYNOPSIS
