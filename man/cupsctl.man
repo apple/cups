@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsctl 8 "Common UNIX Printing System" "5 July 2007" "Apple Inc."
+.TH cupsctl 8 "CUPS" "5 July 2007" "Apple Inc."
 .SH NAME
 cupsctl \- configure cupsd.conf options
 .SH SYNOPSIS

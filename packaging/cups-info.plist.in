@@ -13,9 +13,9 @@
 	<key>CFBundleIdentifier</key>
 	<string>org.cups.cups</string>
         <key>CFBundleName</key>
-        <string>Common UNIX Printing System</string>
+        <string>CUPS</string>
         <key>CFBundleGetInfoString</key>
-        <string>Common UNIX Printing System, @CUPS_VERSION@</string>
+        <string>CUPS, @CUPS_VERSION@</string>
         <key>CFBundleShortVersionString</key>
         <string>@CUPS_RELEASE@</string>
 	<key>IFPkgFlagAllowBackRev</key>

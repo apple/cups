@@ -5,10 +5,9 @@
         <key>IFPkgDescriptionDeleteWarning</key>
         <string></string>
         <key>IFPkgDescriptionDescription</key>
-        <string>The Common UNIX Printing System provides a portable printing layer for UNIX(r) operating systems.
-</string>
+        <string>CUPS provides a portable printing layer for UNIX(r) operating systems.</string>
         <key>IFPkgDescriptionTitle</key>
-        <string>Common UNIX Printing System</string>
+        <string>CUPS</string>
         <key>IFPkgDescriptionVersion</key>
         <string>@CUPS_RELEASE@</string>
 </dict>

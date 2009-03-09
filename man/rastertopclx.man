@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH rastertopclx 1 "Common UNIX Printing System" "20 May 2008" "Apple Inc."
+.TH rastertopclx 1 "CUPS" "20 May 2008" "Apple Inc."
 .SH NAME
 rastertopclx \- enhanced pcl raster driver for cups
 .SH SYNOPSIS

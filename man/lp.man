@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lp 1 "Common UNIX Printing System" "17 November 2008" "Apple Inc."
+.TH lp 1 "CUPS" "17 November 2008" "Apple Inc."
 .SH NAME
 lp - print files
 .SH SYNOPSIS

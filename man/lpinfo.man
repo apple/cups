@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpinfo 8 "Common UNIX Printing System" "5 December 2008" "Apple Inc."
+.TH lpinfo 8 "CUPS" "5 December 2008" "Apple Inc."
 .SH NAME
 lpinfo \- show available devices or drivers
 .SH SYNOPSIS

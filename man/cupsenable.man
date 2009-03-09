@@ -13,7 +13,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsenable 8 "Common UNIX Printing System" "9 October 2008" "Apple Inc."
+.TH cupsenable 8 "CUPS" "9 October 2008" "Apple Inc."
 .SH NAME
 cupsdisable, cupsenable \- stop/start printers and classes
 .SH SYNOPSIS

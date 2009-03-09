@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpstat 1 "Common UNIX Printing System" "10 September 2008" "Apple Inc."
+.TH lpstat 1 "CUPS" "10 September 2008" "Apple Inc."
 .SH NAME
 lpstat \- print cups status information
 .SH SYNOPSIS

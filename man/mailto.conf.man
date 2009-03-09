@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH mailto.conf 5 "Common UNIX Printing System" "12 July 2006" "Apple Inc."
+.TH mailto.conf 5 "CUPS" "12 July 2006" "Apple Inc."
 .SH NAME
 mailto.conf \- configuration file for cups email notifier
 .SH DESCRIPTION

@@ -29,7 +29,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <TABLE CLASS="indent" SUMMARY="">
 <TR><TD STYLE="padding-right: 20px;">
 
-<H1>Common UNIX Printing System @CUPS_VERSION@</H1>
+<H1>CUPS @CUPS_VERSION@</H1>
 
 <P>CUPS は、Mac OS<SUP>&reg;</SUP> X およびその他の UNIX 系 OS のために、
 <A HREF="http://www.apple.com/">Apple Inc.</A>

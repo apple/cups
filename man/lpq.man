@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpq 1 "Common UNIX Printing System" "16 June 2008" "Apple Inc."
+.TH lpq 1 "CUPS" "16 June 2008" "Apple Inc."
 .SH NAME
 lpq \- show printer queue status
 .SH SYNOPSIS

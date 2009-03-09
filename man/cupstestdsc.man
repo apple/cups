@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupstestdsc 1 "Common UNIX Printing System" "20 March 2006" "Apple Inc."
+.TH cupstestdsc 1 "CUPS" "20 March 2006" "Apple Inc."
 .SH NAME
 cupstestdsc \- test conformance of postscript files
 .SH SYNOPSIS

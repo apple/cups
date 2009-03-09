@@ -29,7 +29,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 <TABLE CLASS="indent" SUMMARY="">
 <TR><TD STYLE="padding-right: 20px;">
 
-<H1>Common UNIX Printing System @CUPS_VERSION@</H1>
+<H1>CUPS @CUPS_VERSION@</H1>
 
 <P>CUPS is the standards-based, open source printing system developed by
 <A HREF="http://www.apple.com/">Apple Inc.</A> for Mac OS<SUP>&reg;</SUP> X and

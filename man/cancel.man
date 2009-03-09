@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cancel 1 "Common UNIX Printing System" "20 March 2006" "Apple Inc."
+.TH cancel 1 "CUPS" "20 March 2006" "Apple Inc."
 .SH NAME
 cancel - cancel jobs
 .SH SYNOPSIS

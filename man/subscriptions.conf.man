@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH subscriptions.conf 5 "Common UNIX Printing System" "30 April 2006" "Apple Inc."
+.TH subscriptions.conf 5 "CUPS" "30 April 2006" "Apple Inc."
 .SH NAME
 subscriptions.conf \- subscriptions file for cups
 .SH DESCRIPTION

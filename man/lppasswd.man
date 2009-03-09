@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lppasswd 1 "Common UNIX Printing System" "22 February 2008" "Apple Inc."
+.TH lppasswd 1 "CUPS" "22 February 2008" "Apple Inc."
 .SH NAME
 lppasswd \- add, change, or delete digest passwords.
 .SH SYNOPSIS

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-polld 8 "Common UNIX Printing System" "12 February 2006" "Apple Inc."
+.TH cups-polld 8 "CUPS" "12 February 2006" "Apple Inc."
 .SH NAME
 cups-polld \- cups printer polling daemon
 .SH SYNOPSIS

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "Common UNIX Printing System" "26 February 2009" "Apple Inc."
+.TH cupsfilter 8 "CUPS" "26 February 2009" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
