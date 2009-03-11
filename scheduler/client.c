@@ -2645,7 +2645,15 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 
   if (con->http.state != HTTP_GET_SEND &&
       con->http.state != HTTP_POST_SEND)
+  {
+   /*
+    * If we get called in the wrong state, then something went wrong with the
+    * connection and we need to shut it down...
+    */
+
+    cupsdCloseClient(con);
     return;
+  }
 
   if (con->pipe_pid)
   {
@@ -2806,7 +2814,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     }
   }
 
-  if (bytes <= 0)
+  if (bytes <= 0 ||
+      (con->http.state != HTTP_GET_SEND && con->http.state != HTTP_POST_SEND))
   {
     cupsdLogRequest(con, HTTP_OK);
 
