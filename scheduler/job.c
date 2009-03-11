@@ -1839,6 +1839,7 @@ cupsdSaveAllJobs(void)
     cupsFilePrintf(fp, "<Job %d>\n", job->id);
     cupsFilePrintf(fp, "State %d\n", job->state_value);
     cupsFilePrintf(fp, "Priority %d\n", job->priority);
+    cupsFilePrintf(fp, "HoldUntil %d\n", (int)job->hold_until);
     cupsFilePrintf(fp, "Username %s\n", job->username);
     cupsFilePrintf(fp, "Destination %s\n", job->dest);
     cupsFilePrintf(fp, "DestType %d\n", job->dtype);
@@ -3173,6 +3174,10 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
       else if (job->state_value > IPP_JOB_COMPLETED)
         job->state_value = IPP_JOB_COMPLETED;
     }
+    else if (!strcasecmp(line, "HoldUntil"))
+    {
+      job->hold_until = atoi(value);
+    }
     else if (!strcasecmp(line, "Priority"))
     {
       job->priority = atoi(value);
@@ -3953,7 +3958,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     else
     {
       if (loglevel != CUPSD_LOG_INFO && loglevel > LogLevel)
-	cupsdLogJob(job, loglevel, "%d %s", loglevel, message);
+	cupsdLogJob(job, loglevel, "%s", message);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {

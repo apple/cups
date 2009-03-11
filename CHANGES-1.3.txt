@@ -8,8 +8,7 @@ CHANGES IN CUPS V1.3.10
 	- The lpq command did not work when showing all destinations (STR #3117)
 	- The scheduler used a codeset name of UTF8 which is not supported on
 	  Solaris (STR #3113)
-	- cupsGetJobs() did not work with a NULL destination (STR #3107,
-	  STR #)
+	- cupsGetJobs() did not work with a NULL destination (STR #3107)
 	- Fixed a localization problem for option choices (incorrectly) named
 	  "Custom" (STR #3106)
 	- The fallback OpenSSL random number seeding would not work (STR #3079)
