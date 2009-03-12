@@ -413,7 +413,6 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     int		fd;			/* File descriptor */
-    cups_file_t	*fp;			/* Temporary file */
     char	buffer[8192];		/* Buffer for copying */
     int		bytes;			/* Number of bytes read */
     off_t	tbytes;			/* Total bytes copied */
@@ -425,28 +424,22 @@ main(int  argc,				/* I - Number of command-line args */
       return (CUPS_BACKEND_FAILED);
     }
 
-    if ((fp = cupsFileOpenFd(fd, compression ? "w9" : "w")) == NULL)
-    {
-      _cupsLangPrintError(_("ERROR: Unable to open temporary file"));
-      close(fd);
-      unlink(tmpfilename);
-      return (CUPS_BACKEND_FAILED);
-    }
+    _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
     tbytes = 0;
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-      if (cupsFileWrite(fp, buffer, bytes) < bytes)
+      if (write(fd, buffer, bytes) < bytes)
       {
         _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
-	cupsFileClose(fp);
+	close(fd);
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
       }
       else
         tbytes += bytes;
 
-    cupsFileClose(fp);
+    close(fd);
 
    /*
     * Don't try printing files less than 2 bytes...
