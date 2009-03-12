@@ -29,7 +29,8 @@
 (application/vnd.cups-command) which is used to send printer
 maintenance commands to a printer in a device-independent way.
 The current specification supports basic maintenance functions
-such as head cleaning and self-test pages.</p>
+such as head cleaning and self-test pages and query functions
+such as auto-configure, report supply levels, and report status.</p>
 
 <p>Printer drivers advertise support for the CUPS command file
 format by providing a filter for the
@@ -43,7 +44,7 @@ files by checking the <code>printer-type</code> attribute for the
 commands separated by spaces, for example:</p>
 
 <pre class='command'>
-*cupsCommand: "AutoConfigure Clean PrintSelfTestPage ReportLevels"
+*cupsCommand: "AutoConfigure Clean PrintSelfTestPage ReportLevels ReportStatus"
 </pre>
 
 <p>If no <code>cupsCommands</code> keyword is provided, the command filter
@@ -169,7 +170,24 @@ PrintSelfTestPage
 
 <p>The <code>ReportLevels</code> command queries the supply levels on a printer
 and reports "marker-colors", "marker-levels", "marker-names", and
-"marker-types" attributes using "ATTR:" messages sent to the scheduler.</p>
+"marker-types" attributes using "ATTR:" messages sent to the scheduler. This
+command should also report the current printer status using "STATE:" messages
+like the <a href='#ReportStatus'><code>ReportStatus</code></a> command.</p>
+
+<p>Example:</p>
+
+<pre class='command'>
+#CUPS-COMMAND
+ReportLevels
+</pre>
+
+
+<h3><a name='ReportStatus'>ReportStatus</a></h3>
+
+<p class='summary'>ReportStatus</p>
+
+<p>The <code>ReportStatus</code> command queries the printer for its current
+status and reports it using "STATE:" messages sent to the scheduler.</p>
 
 <p>Example:</p>
 
