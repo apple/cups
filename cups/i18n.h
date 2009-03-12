@@ -99,7 +99,7 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 extern int		_cupsLangPuts(FILE *fp, const char *message);
 extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
-extern cups_array_t	*_cupsMessageLoad(const char *filename);
+extern cups_array_t	*_cupsMessageLoad(const char *filename, int unquote);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);
 extern void		_cupsSetLocale(char *argv[]);
 

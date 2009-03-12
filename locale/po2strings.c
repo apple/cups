@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Use the CUPS .po loader to get the message strings...
   */
 
-  if ((po = _cupsMessageLoad(srcfile)) == NULL)
+  if ((po = _cupsMessageLoad(srcfile, 1)) == NULL)
   {
     perror(srcfile);
     return (1);

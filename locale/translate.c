@@ -7,7 +7,7 @@
  *   several different languages.  The translation isn't perfect, but it's
  *   a start (better than working from scratch.)
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -63,9 +63,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   if (access(argv[1], 0))
-    cat = _cupsMessageLoad("cups.pot");
+    cat = _cupsMessageLoad("cups.pot", 1);
   else
-    cat = _cupsMessageLoad(argv[1]);
+    cat = _cupsMessageLoad(argv[1], 1);
 
   if (!cat)
   {

@@ -791,7 +791,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   * Read the strings from the file...
   */
 
-  lang->strings = _cupsMessageLoad(filename);
+  lang->strings = _cupsMessageLoad(filename, 1);
 
  /*
   * Return...
@@ -883,7 +883,8 @@ _cupsMessageFree(cups_array_t *a)	/* I - Message array */
  */
 
 cups_array_t *				/* O - New message array */
-_cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
+_cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
+                 int        unquote)	/* I - Unescape \foo in strings */
 {
   cups_file_t		*fp;		/* Message file */
   cups_array_t		*a;		/* Message array */
@@ -967,7 +968,8 @@ _cupsMessageLoad(const char *filename)	/* I - Message catalog to load */
     * Unquote the text...
     */
 
-    cups_unquote(ptr, ptr);
+    if (unquote)
+      cups_unquote(ptr, ptr);
 
    /*
     * Create or add to a message...

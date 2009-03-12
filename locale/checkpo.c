@@ -83,7 +83,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Use the CUPS .po loader to get the message strings...
     */
 
-    if ((po = _cupsMessageLoad(argv[i])) == NULL)
+    if ((po = _cupsMessageLoad(argv[i], 0)) == NULL)
     {
       perror(argv[i]);
       return (1);
@@ -173,6 +173,32 @@ main(int  argc,				/* I - Number of command-line args */
 	free_formats(idfmts);
 	free_formats(strfmts);
       }
+
+     /*
+      * Only allow \\, \n, \r, \t, \", and \### character escapes...
+      */
+
+      for (strfmt = msg->str; *strfmt; strfmt ++)
+        if (*strfmt == '\\' &&
+	    strfmt[1] != '\\' && strfmt[1] != 'n' && strfmt[1] != 'r' &&
+	    strfmt[1] != 't' && strfmt[1] != '\"' && !isdigit(strfmt[1] & 255))
+	{
+	  if (pass)
+	  {
+	    pass = 0;
+	    puts("FAIL");
+	  }
+
+	  printf("    Bad escape \\%c in filter message \"%s\"\n"
+	         "      for \"%s\"\n\n", strfmt[1],
+		 abbreviate(msg->str, strbuf, sizeof(strbuf)),
+		 abbreviate(msg->id, idbuf, sizeof(idbuf)));
+          break;
+        }
+
+     /*
+      * Make sure filter message prefixes are preserved...
+      */
 
       if ((!strncmp(msg->id, "ALERT:", 6) && strncmp(msg->str, "ALERT:", 6)) ||
           (!strncmp(msg->id, "CRIT:", 5) && strncmp(msg->str, "CRIT:", 5)) ||

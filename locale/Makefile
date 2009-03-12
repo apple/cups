@@ -139,14 +139,15 @@ pot:
 
 #
 # checkpo - A simple utility to check PO files for correct translation
-#           strings.
+#           strings.  Dependency on static library is deliberate.
 #
 # checkpo filename.po [... filenameN.po]
 #
 
-checkpo:	checkpo.o ../cups/$(LIBCUPS)
+checkpo:	checkpo.o ../cups/libcups.a
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o checkpo checkpo.o $(LIBS)
+	$(CC) $(LDFLAGS) -o checkpo checkpo.o ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 checkall:	checkpo
 	for file in *.po; do \
@@ -161,9 +162,10 @@ checkall:	checkpo
 # po2strings filename.po filename.strings
 #
 
-po2strings:	po2strings.o ../cups/$(LIBCUPS)
+po2strings:	po2strings.o ../cups/libcups.a
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o po2strings po2strings.o $(LIBS)
+	$(CC) $(LDFLAGS) -o po2strings po2strings.o ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
@@ -185,9 +187,10 @@ strings2po:	strings2po.o
 # translate outfile language
 #
 
-translate:	translate.o ../cups/$(LIBCUPS)
+translate:	translate.o ../cups/libcups.a
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o translate translate.o $(LIBS)
+	$(CC) $(LDFLAGS) -o translate translate.o ../cups/libcups.a \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
