@@ -401,11 +401,11 @@ msgstr ""
 
 #, c-format
 msgid "      %s  Missing APDialogExtension file \"%s\"\n"
-msgstr ""
+msgstr "      %s  APDialogExtension ファイル \"%s\" が見つかりません\n"
 
 #, c-format
 msgid "      %s  Missing APPrinterIconPath file \"%s\"\n"
-msgstr ""
+msgstr "      %s  APPrinterIconPath ファイル \"%s\" が見つかりません\n"
 
 #, c-format
 msgid "      %s  Missing APPrinterLowInkTool file \"%s\"\n"
@@ -444,7 +444,7 @@ msgstr "      %s  cupsFilter ファイル \"%s\" が見つかりません!\n"
 
 #, c-format
 msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
-msgstr "      %s  cupsPreFilter ファイル \"%s\" が見つかりません!\n"
+msgstr "      %s  cupsICCProfile ファイル \"%s\" が見つかりません!\n"
 
 #, c-format
 msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
@@ -5610,12 +5610,6 @@ msgstr "タイトルなし"
 
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings の長さが不定"
-
-#~ msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
-#~ msgstr "       警告    APDialogExtension ファイル \"%s\" が見つかりません\n"
-
-#~ msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
-#~ msgstr "       警告    APPrinterIconPath ファイル \"%s\" が見つかりません\n"
 
 #~ msgid "%s: Unable to open %s - %s\n"
 #~ msgstr "%s: %s を開けません - %s\n"
