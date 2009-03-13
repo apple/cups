@@ -1716,7 +1716,7 @@ load_ppds(const char *d,		/* I - Actual directory */
     }
 
     for (i = 0; i < (int)(sizeof(languages) / sizeof(languages[0])); i ++)
-      if (!strcmp(languages[i].version, lang_version))
+      if (!strcasecmp(languages[i].version, lang_version))
         break;
 
     if (i < (int)(sizeof(languages) / sizeof(languages[0])))
