@@ -1,4 +1,4 @@
-                Common UNIX Printing System License Agreement
+                          CUPS License Agreement
 
 		      Copyright 2007-2009 by Apple Inc.
 			     1 Infinite Loop
@@ -9,11 +9,10 @@
 
 INTRODUCTION
 
-The Common UNIX Printing System(tm), ("CUPS(tm)"), is provided
-under the GNU General Public License ("GPL") and GNU Library
-General Public License ("LGPL"), Version 2, with exceptions for
-Apple operating systems and the OpenSSL toolkit. A copy of the
-exceptions and licenses follow this introduction.
+CUPS(tm) is provided under the GNU General Public License ("GPL")
+and GNU Library General Public License ("LGPL"), Version 2, with
+exceptions for Apple operating systems and the OpenSSL toolkit. A
+copy of the exceptions and licenses follow this introduction.
 
 The GNU LGPL applies to the CUPS and CUPS Imaging libraries
 located in the "cups" and "filter" subdirectories of the CUPS
@@ -137,11 +136,18 @@ redistribute it freely, subject to the following restrictions:
 
 TRADEMARKS
 
-CUPS and the CUPS logo are trademarks of Apple Inc. You may use the name
-and logo in any direct port or binary distribution of CUPS. Please contact
-Apple Inc. for written permission to use them in derivative products. Our
-intention is to protect the value of these trademarks and ensure that any
-derivative product meets the same high-quality standards as the original.
+CUPS and the CUPS logo (the "CUPS Marks") are trademarks of Apple
+Inc. Apple grants you a non-exclusive and non-transferable right
+to use the CUPS Marks in any direct port or binary distribution
+incorporating CUPS software and in any promotional material
+therefor.  You agree that your products will meet the highest
+levels of quality and integrity for similar goods, not be unlawful,
+and be developed, manufactured, and distributed in compliance with
+this license.  You will not interfere with Apple's rights in the
+CUPS Marks, and all use of the CUPS Marks shall inure to the
+benefit of Apple.  This license does not apply to use of the CUPS
+Marks in a derivative products, which requires prior written
+permission from Apple Inc.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991

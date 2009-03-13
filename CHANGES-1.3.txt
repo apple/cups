@@ -5,11 +5,14 @@ CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
 	  STR #3057)
+	- Now use a wrapper program instead of our fork of the Xpdf code to
+	  support printing of PDF files. The new wrapper supports using Xpdf,
+	  poppler, or Ghostscript to convert PDF files to PostScript (STR #3129)
+	- Long job names caused problems with some PJL printers (STR #3125)
 	- The lpq command did not work when showing all destinations (STR #3117)
 	- The scheduler used a codeset name of UTF8 which is not supported on
 	  Solaris (STR #3113)
-	- cupsGetJobs() did not work with a NULL destination (STR #3107,
-	  STR #)
+	- cupsGetJobs() did not work with a NULL destination (STR #3107)
 	- Fixed a localization problem for option choices (incorrectly) named
 	  "Custom" (STR #3106)
 	- The fallback OpenSSL random number seeding would not work (STR #3079)

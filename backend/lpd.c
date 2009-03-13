@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -386,7 +386,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	*/
 
         sanitize_title = !value[0] || !strcasecmp(value, "on") ||
-	 		!strcasecmp(value, "yes") || !strcasecmp(value, "true");
+	 		 !strcasecmp(value, "yes") || !strcasecmp(value, "true");
       }
       else if (!strcasecmp(name, "timeout"))
       {
@@ -433,6 +433,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
       return (CUPS_BACKEND_FAILED);
     }
+
+    _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
       if (write(fd, buffer, bytes) < bytes)

@@ -3,7 +3,7 @@ dnl "$Id: cups-pdf.m4 7449 2008-04-14 18:27:53Z mike $"
 dnl
 dnl   PDF filter configuration stuff for the Common UNIX Printing System (CUPS).
 dnl
-dnl   Copyright 2007-2008 by Apple Inc.
+dnl   Copyright 2007-2009 by Apple Inc.
 dnl   Copyright 2006 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

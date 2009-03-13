@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-01-30 09:28-0800\n"
+"POT-Creation-Date: 2009-03-13 15:08-0700\n"
 "PO-Revision-Date: 2008-12-17 17:32+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
@@ -284,14 +284,6 @@ msgstr ""
 "4.3.\n"
 "                REF: Páginas 58-59, sección 5.3.\n"
 
-#, c-format
-msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
-msgstr "        ADVERTENCIA    Falta el archivo APDialogExtension \"%s\"\n"
-
-#, c-format
-msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
-msgstr "        ADVERTENCIA    Falta el archivo APPrinterIconPath \"%s\"\n"
-
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
 "not CR LF!\n"
@@ -344,6 +336,10 @@ msgid "      %s  %s %s does not exist!\n"
 msgstr "      %s  %s %s no existe.\n"
 
 #, c-format
+msgid "      %s  %s file \"%s\" has the wrong capitalization!\n"
+msgstr ""
+
+#, c-format
 msgid ""
 "      %s  Bad %s choice %s!\n"
 "                REF: Page 122, section 5.17\n"
@@ -384,6 +380,14 @@ msgid "      %s  Bad language \"%s\"!\n"
 msgstr "      %s  Idioma incorrecto \"%s\".\n"
 
 #, c-format
+msgid "      %s  Bad spelling of %s - should be %s!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
+msgstr ""
+
+#, c-format
 msgid "      %s  Empty cupsUIConstraints %s!\n"
 msgstr "      %s  cupsUIConstraints %s vacío.\n"
 
@@ -395,6 +399,38 @@ msgstr "      %s  Falta cadena de traducción \"%s\" para opción %s.\n"
 msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
 "      %s  Falta cadena de traducción \"%s\" para opción %s, preferencia %s.\n"
+
+#, c-format
+msgid "      %s  Missing APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing APPrinterLowInkTool file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing APPrinterUtilityPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing APScanAppPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageRegion option!\n"
+"                REF: Page 100, section 5.14.\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      %s  Missing REQUIRED PageSize option!\n"
+"                REF: Page 99, section 5.14.\n"
+msgstr ""
 
 #, c-format
 msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"!\n"
@@ -436,11 +472,25 @@ msgstr "      %s  No hay traducción base \"%s\" incluida en el archivo.\n"
 
 #, c-format
 msgid ""
+"      %s  Non-standard size name \"%s\"!\n"
+"                REF: Page 187, section B.2.\n"
+msgstr ""
+
+#, c-format
+msgid ""
 "      %s  REQUIRED %s does not define choice None!\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
 "      %s  NECESARIA %s no define la opción None.\n"
 "                REF: Página 122, sección 5.17\n"
+
+#, c-format
+msgid "      %s  Size \"%s\" defined for %s but not for %s!\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)!\n"
+msgstr ""
 
 #, c-format
 msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
@@ -449,6 +499,11 @@ msgstr "      %s  valor hash de cupsICCProfile %s colisiona con %s!\n"
 #, c-format
 msgid "      %s  cupsUIResolver %s causes a loop!\n"
 msgstr "      %s  cupsUIResolver %s genera un bucle.\n"
+
+#, c-format
+msgid ""
+"      %s  cupsUIResolver %s does not list at least two different options!\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  %s choice names %s and %s differ only by case!\n"
@@ -1175,20 +1230,16 @@ msgid "%s: Unable to determine MIME type of \"%s\"!\n"
 msgstr "%s: No se ha podido determinar el tipo MIME de \"%s\".\n"
 
 #, c-format
-msgid "%s: Unable to open %s - %s\n"
-msgstr "%s: No se pudo abrir %s - %s\n"
-
-#, c-format
-msgid "%s: Unable to open %s - %s on line %d.\n"
-msgstr "%s: No se pudo abrir %s - %s en línea %d.\n"
-
-#, c-format
 msgid "%s: Unable to open %s: %s\n"
 msgstr "%s: No se pudo abrir %s: %s\n"
 
 #, c-format
 msgid "%s: Unable to open PPD file: %s on line %d\n"
 msgstr "%s: No se pudo abrir archivo PPD: %s en línea %d\n"
+
+#, c-format
+msgid "%s: Unable to open PPD file: %s on line %d.\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"!\n"
@@ -2109,6 +2160,10 @@ msgid "Bad printer-state value %d!"
 msgstr "Valor printer-state %d incorrecto."
 
 #, c-format
+msgid "Bad request ID %d!"
+msgstr ""
+
+#, c-format
 msgid "Bad request version number %d.%d!"
 msgstr "Petición incorrecta de número de versión %d.%d."
 
@@ -2335,6 +2390,10 @@ msgid "EPL2 Label Printer"
 msgstr "Impresora de etiquetas EPL2"
 
 #, c-format
+msgid "ERROR: %s job-id user title copies options [file]\n"
+msgstr ""
+
+#, c-format
 msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 msgstr "ERROR: Se ha detectado un comentario %%BoundingBox: incorrecto.\n"
 
@@ -2523,14 +2582,6 @@ msgid "ERROR: Unable to create temporary file"
 msgstr "ERROR: No se ha podido crear el archivo temporal"
 
 #, c-format
-msgid "ERROR: Unable to create temporary file - %s.\n"
-msgstr "ERROR: No se ha podido crear el archivo temporal - %s.\n"
-
-#, c-format
-msgid "ERROR: Unable to create temporary file: %s\n"
-msgstr "ERROR: No se ha podido crear el archivo temporal: %s\n"
-
-#, c-format
 msgid "ERROR: Unable to exec pictwpstops: %s\n"
 msgstr "ERROR: No se ha podido ejecutar pictwpstops: %s\n"
 
@@ -2588,6 +2639,9 @@ msgstr "ERROR: No se ha podido abrir \"%s\" - %s\n"
 msgid "ERROR: Unable to open %s: %s\n"
 msgstr "ERROR: No se ha podido abrir %s: %s\n"
 
+msgid "ERROR: Unable to open PPD file!\n"
+msgstr ""
+
 #, c-format
 msgid "ERROR: Unable to open banner file \"%s\" - %s\n"
 msgstr "ERROR: No se ha podido abrir el archivo de rótulo \"%s\" - %s\n"
@@ -2620,13 +2674,14 @@ msgid "ERROR: Unable to open print file %s: %s\n"
 msgstr "ERROR: No se ha podido abrir el archivo de impresión %s: %s\n"
 
 #, c-format
+msgid "ERROR: Unable to open raster file - %s\n"
+msgstr ""
+
+#, c-format
 msgid "ERROR: Unable to open temporary compressed print file: %s\n"
 msgstr ""
 "ERROR: No se ha podido abrir el archivo de impresión temporal comprimido: %"
 "s\n"
-
-msgid "ERROR: Unable to open temporary file"
-msgstr "ERROR: No se ha podido abrir el archivo temporal"
 
 #, c-format
 msgid "ERROR: Unable to print %d text columns!\n"
@@ -2959,8 +3014,15 @@ msgstr "INFO: Conectando a la impresora...\n"
 msgid "INFO: Control file sent successfully\n"
 msgstr "INFO: Archivo de control enviado correctamente\n"
 
+msgid "INFO: Copying print data...\n"
+msgstr ""
+
 msgid "INFO: Data file sent successfully\n"
 msgstr "INFO: Archivo de datos enviado correctamente\n"
+
+#, c-format
+msgid "INFO: Finished page %d...\n"
+msgstr ""
 
 #, c-format
 msgid "INFO: Formatting page %d...\n"
@@ -2991,7 +3053,8 @@ msgstr "INFO: Impresora ocupada; reintento en 5 segundos...\n"
 
 #, c-format
 msgid "INFO: Printer does not support IPP/%d.%d, trying IPP/1.0...\n"
-msgstr "INFO: La impresora no es compatible con IPP/%d.%d, probando IPP/1.0...\n"
+msgstr ""
+"INFO: La impresora no es compatible con IPP/%d.%d, probando IPP/1.0...\n"
 
 msgid "INFO: Printer is busy; will retry in 5 seconds...\n"
 msgstr "INFO: La impresora está ocupada; reintento en 5 segundos...\n"
@@ -3055,6 +3118,10 @@ msgstr "INFO: Archivo de impresión enviado, %lld bytes...\n"
 #, c-format
 msgid "INFO: Spooling LPR job, %.0f%% complete...\n"
 msgstr "INFO: Guardando trabajo LPR en cola, %.0f%% completado...\n"
+
+#, c-format
+msgid "INFO: Starting page %d...\n"
+msgstr ""
 
 msgid "INFO: Unable to contact printer, queuing on next printer in class...\n"
 msgstr ""
@@ -4335,6 +4402,7 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
+"  -e                   Use every filter from the PPD file\n"
 "  -f filename          Set file to be converted (otherwise stdin)\n"
 "  -o filename          Set file to be generated (otherwise stdout)\n"
 "  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
@@ -4347,25 +4415,6 @@ msgid ""
 "  -u                   Remove the PPD file when finished\n"
 "  -D                   Remove the input file when finished\n"
 msgstr ""
-"Uso: convert [ opciones ]\n"
-"\n"
-"Opciones:\n"
-"\n"
-"  -f nombrearchivo          Establece el archivo a convertir (de otro modo, "
-"stdin)\n"
-"  -o nombrearchivo          Establece el archivo a generar (de otro modo, "
-"stdout)\n"
-"  -i tipo/mime         Establece el tipo MIME de entrada (de otro modo, auto-"
-"tipado)\n"
-"  -j tipo/mime         Establece el tipo MIME de salida (de otro modo, "
-"application/pdf)\n"
-"  -P nombrearchivo.ppd      Establece el archivo PPD\n"
-"  -a 'nombre=valor ...'  Establece opcion(es)\n"
-"  -U nombreusuario          Establece el nombre de usuario del trabajo\n"
-"  -J título             Establece el título\n"
-"  -c copias            Establece el número de copias\n"
-"  -u                   Borra el archivo PPD después de terminar\n"
-"  -D                   Borra el archivo de entrada después de terminar\n"
 
 msgid ""
 "Usage: cupsaddsmb [options] printer1 ... printerN\n"
@@ -4447,23 +4496,13 @@ msgid ""
 "Options:\n"
 "\n"
 "  -c cupsd.conf    Set cupsd.conf file to use\n"
+"  -e               Use every filter from the PPD file\n"
 "  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
 "  -n copies        Set number of copies\n"
 "  -o name=value    Set option(s)\n"
 "  -p filename.ppd  Set PPD file\n"
 "  -t title         Set title\n"
 msgstr ""
-"Uso: cupsfilter -m tipo/mime [ opciones ] nombre_archivo\n"
-"\n"
-"Opciones:\n"
-"\n"
-"  -c cupsd.conf    Establecer el archivo cupsd.conf a usar\n"
-"  -j id-trabajo[,N]    Filtrar el archivo N del trabajo especificado (valor "
-"predeterminado 1)\n"
-"  -n copias        Establecer el número de copias\n"
-"  -o nombre=valor    Establecer las opciones\n"
-"  -p nombre_archivo.ppd  Especificar el archivo PPD\n"
-"  -t título         Establecer el título\n"
 
 msgid ""
 "Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
@@ -4493,26 +4532,14 @@ msgid ""
 "Options:\n"
 "\n"
 "    -R root-directory    Set alternate root\n"
-"    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
+"    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
+"translations}\n"
 "                         Issue warnings instead of errors\n"
 "    -q                   Run silently\n"
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
 msgstr ""
-"Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN.ppd"
-"[.gz]]\n"
-"       programa | cupstestppd [opciones] -\n"
-"\n"
-"Opciones:\n"
-"\n"
-"    -R directorio-raíz    Establecer el directorio raíz alternativo\n"
-"    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
-"                         Emitir avisos en vez de errores\n"
-"    -q                   Ejecutar en modo silencioso\n"
-"    -r                   Usar el modo de apertura 'relajado'\n"
-"    -v                   Ligeramente detallado\n"
-"    -vv                  Muy detallado\n"
 
 msgid "Usage: lpmove job/src dest\n"
 msgstr "Uso: lpmove trabajo/fuente destino\n"
@@ -4824,10 +4851,6 @@ msgid "cupsfilter: Only one filename can be specified!\n"
 msgstr "cupsfilter: Solo se puede especificar un nombre de archivo.\n"
 
 #, c-format
-msgid "cupsfilter: Unable to create temporary file: %s\n"
-msgstr "cupsfilter: No se ha podido crear el archivo temporal: %s\n"
-
-#, c-format
 msgid "cupsfilter: Unable to get job file - %s\n"
 msgstr "cupsfilter: No se ha podido obtener el archivo del trabajo - %s\n"
 
@@ -4938,14 +4961,6 @@ msgstr ""
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s\n"
 msgstr "lpadmin: No se ha podido conectar al servidor: %s\n"
-
-#, c-format
-msgid "lpadmin: Unable to create temporary file - %s\n"
-msgstr "lpadmin: No se ha podido crear el archivo temporal - %s\n"
-
-#, c-format
-msgid "lpadmin: Unable to create temporary file: %s\n"
-msgstr "lpadmin: No se ha podido crear el archivo temporal: %s\n"
 
 #, c-format
 msgid "lpadmin: Unable to open PPD file \"%s\" - %s\n"
@@ -5622,3 +5637,123 @@ msgstr "sin título"
 
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
+
+#~ msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
+#~ msgstr "        ADVERTENCIA    Falta el archivo APDialogExtension \"%s\"\n"
+
+#~ msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
+#~ msgstr "        ADVERTENCIA    Falta el archivo APPrinterIconPath \"%s\"\n"
+
+#~ msgid "%s: Unable to open %s - %s\n"
+#~ msgstr "%s: No se pudo abrir %s - %s\n"
+
+#~ msgid "%s: Unable to open %s - %s on line %d.\n"
+#~ msgstr "%s: No se pudo abrir %s - %s en línea %d.\n"
+
+#~ msgid "ERROR: Unable to create temporary file - %s.\n"
+#~ msgstr "ERROR: No se ha podido crear el archivo temporal - %s.\n"
+
+#~ msgid "ERROR: Unable to create temporary file: %s\n"
+#~ msgstr "ERROR: No se ha podido crear el archivo temporal: %s\n"
+
+#~ msgid "ERROR: Unable to open temporary file"
+#~ msgstr "ERROR: No se ha podido abrir el archivo temporal"
+
+#~ msgid ""
+#~ "Usage: convert [ options ]\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "  -f filename          Set file to be converted (otherwise stdin)\n"
+#~ "  -o filename          Set file to be generated (otherwise stdout)\n"
+#~ "  -i mime/type         Set input MIME type (otherwise auto-typed)\n"
+#~ "  -j mime/type         Set output MIME type (otherwise application/pdf)\n"
+#~ "  -P filename.ppd      Set PPD file\n"
+#~ "  -a 'name=value ...'  Set option(s)\n"
+#~ "  -U username          Set username for job\n"
+#~ "  -J title             Set title\n"
+#~ "  -c copies            Set number of copies\n"
+#~ "  -u                   Remove the PPD file when finished\n"
+#~ "  -D                   Remove the input file when finished\n"
+#~ msgstr ""
+#~ "Uso: convert [ opciones ]\n"
+#~ "\n"
+#~ "Opciones:\n"
+#~ "\n"
+#~ "  -f nombrearchivo          Establece el archivo a convertir (de otro "
+#~ "modo, stdin)\n"
+#~ "  -o nombrearchivo          Establece el archivo a generar (de otro modo, "
+#~ "stdout)\n"
+#~ "  -i tipo/mime         Establece el tipo MIME de entrada (de otro modo, "
+#~ "auto-tipado)\n"
+#~ "  -j tipo/mime         Establece el tipo MIME de salida (de otro modo, "
+#~ "application/pdf)\n"
+#~ "  -P nombrearchivo.ppd      Establece el archivo PPD\n"
+#~ "  -a 'nombre=valor ...'  Establece opcion(es)\n"
+#~ "  -U nombreusuario          Establece el nombre de usuario del trabajo\n"
+#~ "  -J título             Establece el título\n"
+#~ "  -c copias            Establece el número de copias\n"
+#~ "  -u                   Borra el archivo PPD después de terminar\n"
+#~ "  -D                   Borra el archivo de entrada después de terminar\n"
+
+#~ msgid ""
+#~ "Usage: cupsfilter -m mime/type [ options ] filename\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    Set cupsd.conf file to use\n"
+#~ "  -j job-id[,N]    Filter file N from the specified job (default is file "
+#~ "1)\n"
+#~ "  -n copies        Set number of copies\n"
+#~ "  -o name=value    Set option(s)\n"
+#~ "  -p filename.ppd  Set PPD file\n"
+#~ "  -t title         Set title\n"
+#~ msgstr ""
+#~ "Uso: cupsfilter -m tipo/mime [ opciones ] nombre_archivo\n"
+#~ "\n"
+#~ "Opciones:\n"
+#~ "\n"
+#~ "  -c cupsd.conf    Establecer el archivo cupsd.conf a usar\n"
+#~ "  -j id-trabajo[,N]    Filtrar el archivo N del trabajo especificado "
+#~ "(valor predeterminado 1)\n"
+#~ "  -n copias        Establecer el número de copias\n"
+#~ "  -o nombre=valor    Establecer las opciones\n"
+#~ "  -p nombre_archivo.ppd  Especificar el archivo PPD\n"
+#~ "  -t título         Establecer el título\n"
+
+#~ msgid ""
+#~ "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
+#~ "       program | cupstestppd [options] -\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "\n"
+#~ "    -R root-directory    Set alternate root\n"
+#~ "    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
+#~ "                         Issue warnings instead of errors\n"
+#~ "    -q                   Run silently\n"
+#~ "    -r                   Use 'relaxed' open mode\n"
+#~ "    -v                   Be slightly verbose\n"
+#~ "    -vv                  Be very verbose\n"
+#~ msgstr ""
+#~ "Uso: cupstestppd [opciones] nombre_archivo1.ppd[.gz] [... nombre_archivoN."
+#~ "ppd[.gz]]\n"
+#~ "       programa | cupstestppd [opciones] -\n"
+#~ "\n"
+#~ "Opciones:\n"
+#~ "\n"
+#~ "    -R directorio-raíz    Establecer el directorio raíz alternativo\n"
+#~ "    -W {all,none,constraints,defaults,duplex,filters,translations}\n"
+#~ "                         Emitir avisos en vez de errores\n"
+#~ "    -q                   Ejecutar en modo silencioso\n"
+#~ "    -r                   Usar el modo de apertura 'relajado'\n"
+#~ "    -v                   Ligeramente detallado\n"
+#~ "    -vv                  Muy detallado\n"
+
+#~ msgid "cupsfilter: Unable to create temporary file: %s\n"
+#~ msgstr "cupsfilter: No se ha podido crear el archivo temporal: %s\n"
+
+#~ msgid "lpadmin: Unable to create temporary file - %s\n"
+#~ msgstr "lpadmin: No se ha podido crear el archivo temporal - %s\n"
+
+#~ msgid "lpadmin: Unable to create temporary file: %s\n"
+#~ msgstr "lpadmin: No se ha podido crear el archivo temporal: %s\n"

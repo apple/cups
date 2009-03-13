@@ -2474,6 +2474,20 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
        attr;
        attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL))
   {
+    if (strcmp(attr->name, "cupsPreFilter"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "cupsPreFilter");
+
+      if (!warn)
+        errors ++;
+    }
+
     if (!attr->value ||
 	sscanf(attr->value, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type,
 	       &cost, program) != 4)
@@ -2532,6 +2546,20 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
        attr != NULL; 
        attr = ppdFindNextAttr(ppd, "APDialogExtension", NULL))
   {
+    if (strcmp(attr->name, "APDialogExtension"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "APDialogExtension");
+
+      if (!warn)
+        errors ++;
+    }
+
     if (!attr->value || access(attr->value, 0))
     {
       if (!warn && !errors && !verbose)
@@ -2556,6 +2584,20 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
   if ((attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL)
   {
+    if (strcmp(attr->name, "APPrinterIconPath"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "APPrinterIconPath");
+
+      if (!warn)
+        errors ++;
+    }
+
     if (!attr->value || access(attr->value, 0))
     {
       if (!warn && !errors && !verbose)
@@ -2580,6 +2622,20 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
   if ((attr = ppdFindAttr(ppd, "APPrinterLowInkTool", NULL)) != NULL)
   {
+    if (strcmp(attr->name, "APPrinterLowInkTool"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "APPrinterLowInkTool");
+
+      if (!warn)
+        errors ++;
+    }
+
     if (!attr->value || access(attr->value, 0))
     {
       if (!warn && !errors && !verbose)
@@ -2604,6 +2660,20 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
   if ((attr = ppdFindAttr(ppd, "APPrinterUtilityPath", NULL)) != NULL)
   {
+    if (strcmp(attr->name, "APPrinterUtilityPath"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "APPrinterUtilityPath");
+
+      if (!warn)
+        errors ++;
+    }
+
     if (!attr->value || access(attr->value, 0))
     {
       if (!warn && !errors && !verbose)
@@ -2620,6 +2690,58 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
     else
       errors = valid_path("APPrinterUtilityPath", attr->value, errors, verbose,
                           warn);
+  }
+
+ /*
+  * APScanAppBundleID and APScanAppPath
+  */
+
+  if ((attr = ppdFindAttr(ppd, "APScanAppPath", NULL)) != NULL)
+  {
+    if (strcmp(attr->name, "APScanAppPath"))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout,
+			_("      %s  Bad spelling of %s - should be %s!\n"),
+			prefix, attr->name, "APScanAppPath");
+
+      if (!warn)
+        errors ++;
+    }
+
+    if (!attr->value || access(attr->value, 0))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Missing "
+				  "APScanAppPath file \"%s\"\n"),
+			prefix, attr->value ? attr->value : "<NULL>");
+
+      if (!warn)
+	errors ++;
+    }
+    else
+      errors = valid_path("APScanAppPath", attr->value, errors, verbose,
+                          warn);
+
+    if (ppdFindAttr(ppd, "APScanAppBundleID", NULL))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Cannot provide both "
+				  "APScanAppPath and APScanAppBundleID!\n"),
+			prefix);
+
+      if (!warn)
+	errors ++;
+    }
   }
 #endif	/* __APPLE__ */
 

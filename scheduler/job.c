@@ -1839,6 +1839,7 @@ cupsdSaveAllJobs(void)
     cupsFilePrintf(fp, "<Job %d>\n", job->id);
     cupsFilePrintf(fp, "State %d\n", job->state_value);
     cupsFilePrintf(fp, "Priority %d\n", job->priority);
+    cupsFilePrintf(fp, "HoldUntil %d\n", (int)job->hold_until);
     cupsFilePrintf(fp, "Username %s\n", job->username);
     cupsFilePrintf(fp, "Destination %s\n", job->dest);
     cupsFilePrintf(fp, "DestType %d\n", job->dtype);
@@ -2566,8 +2567,11 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	    * another printer...
 	    */
 
-            job_state = IPP_JOB_PENDING;
-	    message   = "Retrying job on another printer.";
+            if (job_state == IPP_JOB_COMPLETED)
+	    {
+	      job_state = IPP_JOB_PENDING;
+	      message   = "Retrying job on another printer.";
+	    }
           }
 	  else if (!strcmp(job->printer->error_policy, "retry-current-job"))
 	  {
@@ -2576,48 +2580,55 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	    * and we'll retry on the same printer...
 	    */
 
-            job_state = IPP_JOB_PENDING;
-	    message   = "Retrying job on same printer.";
+            if (job_state == IPP_JOB_COMPLETED)
+	    {
+	      job_state = IPP_JOB_PENDING;
+	      message   = "Retrying job on same printer.";
+	    }
           }
 	  else if ((job->printer->type & CUPS_PRINTER_FAX) ||
         	   !strcmp(job->printer->error_policy, "retry-job"))
 	  {
-	   /*
-	    * The job was queued on a fax or the error policy is "retry-job" -
-	    * hold the job if the number of retries is less than the
-	    * JobRetryLimit, otherwise abort the job.
-	    */
-
-	    job->tries ++;
-
-	    if (job->tries >= JobRetryLimit)
+            if (job_state == IPP_JOB_COMPLETED)
 	    {
 	     /*
-	      * Too many tries...
+	      * The job was queued on a fax or the error policy is "retry-job" -
+	      * hold the job if the number of retries is less than the
+	      * JobRetryLimit, otherwise abort the job.
 	      */
 
-              snprintf(buffer, sizeof(buffer),
-	               "Job aborted after %d unsuccessful attempts.",
-		       JobRetryLimit);
-              job_state = IPP_JOB_ABORTED;
-	      message   = buffer;
-	    }
-	    else
-	    {
-	     /*
-	      * Try again in N seconds...
-	      */
+	      job->tries ++;
 
-	      set_hold_until(job, time(NULL) + JobRetryInterval);
+	      if (job->tries >= JobRetryLimit)
+	      {
+	       /*
+		* Too many tries...
+		*/
 
-              snprintf(buffer, sizeof(buffer),
-	               "Job held for %d seconds since it could not be sent.",
-		       JobRetryInterval);
-              job_state = IPP_JOB_HELD;
-	      message   = buffer;
-	    }
+		snprintf(buffer, sizeof(buffer),
+			 "Job aborted after %d unsuccessful attempts.",
+			 JobRetryLimit);
+		job_state = IPP_JOB_ABORTED;
+		message   = buffer;
+	      }
+	      else
+	      {
+	       /*
+		* Try again in N seconds...
+		*/
+
+		set_hold_until(job, time(NULL) + JobRetryInterval);
+
+		snprintf(buffer, sizeof(buffer),
+			 "Job held for %d seconds since it could not be sent.",
+			 JobRetryInterval);
+		job_state = IPP_JOB_HELD;
+		message   = buffer;
+	      }
+            }
 	  }
-	  else if (!strcmp(job->printer->error_policy, "abort-job"))
+	  else if (!strcmp(job->printer->error_policy, "abort-job") &&
+	           job_state == IPP_JOB_COMPLETED)
 	  {
 	    job_state = IPP_JOB_ABORTED;
 	    message   = "Job aborted due to backend errors; please consult "
@@ -2626,9 +2637,11 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	  else
           {
 	    printer_state = IPP_PRINTER_STOPPED;
-	    job_state     = IPP_JOB_PENDING;
 	    message       = "Printer stopped due to backend errors; please "
-	                    "consult the error_log file for details.";
+			    "consult the error_log file for details.";
+
+            if (job_state == IPP_JOB_COMPLETED)
+	      job_state = IPP_JOB_PENDING;
 	  }
           break;
 
@@ -2637,21 +2650,27 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	  * Abort the job...
 	  */
 
-	  job_state = IPP_JOB_ABORTED;
-	  message   = "Job aborted due to backend errors; please consult "
-		      "the error_log file for details.";
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	    job_state = IPP_JOB_ABORTED;
+	    message   = "Job aborted due to backend errors; please consult "
+			"the error_log file for details.";
+	  }
           break;
 
       case CUPS_BACKEND_HOLD :
-         /*
-	  * Hold the job...
-	  */
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	   /*
+	    * Hold the job...
+	    */
 
-	  cupsdSetJobHoldUntil(job, "indefinite", 1);
+	    cupsdSetJobHoldUntil(job, "indefinite", 1);
 
-	  job_state = IPP_JOB_HELD;
-	  message   = "Job held indefinitely due to backend errors; please "
-	              "consult the error_log file for details.";
+	    job_state = IPP_JOB_HELD;
+	    message   = "Job held indefinitely due to backend errors; please "
+			"consult the error_log file for details.";
+          }
           break;
 
       case CUPS_BACKEND_STOP :
@@ -2660,9 +2679,11 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	  */
 
 	  printer_state = IPP_PRINTER_STOPPED;
-	  job_state     = IPP_JOB_PENDING;
 	  message       = "Printer stopped due to backend errors; please "
 			  "consult the error_log file for details.";
+
+	  if (job_state == IPP_JOB_COMPLETED)
+	    job_state = IPP_JOB_PENDING;
           break;
 
       case CUPS_BACKEND_AUTH_REQUIRED :
@@ -2670,10 +2691,13 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	  * Hold the job for authentication...
 	  */
 
-	  cupsdSetJobHoldUntil(job, "auth-info-required", 1);
+	  if (job_state == IPP_JOB_COMPLETED)
+	  {
+	    cupsdSetJobHoldUntil(job, "auth-info-required", 1);
 
-	  job_state = IPP_JOB_HELD;
-	  message   = "Job held for authentication.";
+	    job_state = IPP_JOB_HELD;
+	    message   = "Job held for authentication.";
+          }
           break;
     }
   }
@@ -2683,9 +2707,12 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
     * Filter had errors; stop job...
     */
 
-    job_state = IPP_JOB_STOPPED;
-    message   = "Job stopped due to filter errors; please consult the "
-		"error_log file for details.";
+    if (job_state == IPP_JOB_COMPLETED)
+    {
+      job_state = IPP_JOB_STOPPED;
+      message   = "Job stopped due to filter errors; please consult the "
+		  "error_log file for details.";
+    }
   }
 
  /*
@@ -3172,6 +3199,10 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
         job->state_value = IPP_JOB_PENDING;
       else if (job->state_value > IPP_JOB_COMPLETED)
         job->state_value = IPP_JOB_COMPLETED;
+    }
+    else if (!strcasecmp(line, "HoldUntil"))
+    {
+      job->hold_until = atoi(value);
     }
     else if (!strcasecmp(line, "Priority"))
     {
@@ -3953,7 +3984,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     else
     {
       if (loglevel != CUPSD_LOG_INFO && loglevel > LogLevel)
-	cupsdLogJob(job, loglevel, "%d %s", loglevel, message);
+	cupsdLogJob(job, loglevel, "%s", message);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {
@@ -3961,7 +3992,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		sizeof(job->printer->state_message));
 	cupsdAddPrinterHistory(job->printer);
 
-	event |= CUPSD_EVENT_PRINTER_STATE;
+	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 
 	if (loglevel <= job->status_level)
 	{
@@ -3993,6 +4024,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		      "Class \"%s\" state changed." :
 		      "Printer \"%s\" state changed.",
 		  job->printer->name);
+
+  if (event & CUPSD_EVENT_JOB_PROGRESS)
+    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+                  "%s", job->printer->state_message);
 
   if (ptr == NULL && !job->status_buffer->bufused)
   {
