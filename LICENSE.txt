@@ -136,11 +136,18 @@ redistribute it freely, subject to the following restrictions:
 
 TRADEMARKS
 
-CUPS and the CUPS logo are trademarks of Apple Inc. You may use the name
-and logo in any direct port or binary distribution of CUPS. Please contact
-Apple Inc. for written permission to use them in derivative products. Our
-intention is to protect the value of these trademarks and ensure that any
-derivative product meets the same high-quality standards as the original.
+CUPS and the CUPS logo (the "CUPS Marks") are trademarks of Apple
+Inc. Apple grants you a non-exclusive and non-transferable right
+to use the CUPS Marks in any direct port or binary distribution
+incorporating CUPS software and in any promotional material
+therefor.  You agree that your products will meet the highest
+levels of quality and integrity for similar goods, not be unlawful,
+and be developed, manufactured, and distributed in compliance with
+this license.  You will not interfere with Apple's rights in the
+CUPS Marks, and all use of the CUPS Marks shall inure to the
+benefit of Apple.  This license does not apply to use of the CUPS
+Marks in a derivative products, which requires prior written
+permission from Apple Inc.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
