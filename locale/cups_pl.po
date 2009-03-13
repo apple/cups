@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-13 13:48-0700\n"
+"POT-Creation-Date: 2009-03-13 15:08-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -363,6 +363,10 @@ msgstr "      %s  Błędna wartość cupsUIConstraints %s: \"%s\"!\n"
 #, c-format
 msgid "      %s  Bad language \"%s\"!\n"
 msgstr "      %s  Błędny język \"%s\"!\n"
+
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s!\n"
+msgstr ""
 
 #, c-format
 msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
