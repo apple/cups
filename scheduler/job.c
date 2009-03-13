@@ -3992,7 +3992,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		sizeof(job->printer->state_message));
 	cupsdAddPrinterHistory(job->printer);
 
-	event |= CUPSD_EVENT_PRINTER_STATE;
+	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 
 	if (loglevel <= job->status_level)
 	{
@@ -4024,6 +4024,10 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 		      "Class \"%s\" state changed." :
 		      "Printer \"%s\" state changed.",
 		  job->printer->name);
+
+  if (event & CUPSD_EVENT_JOB_PROGRESS)
+    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+                  "%s", job->printer->state_message);
 
   if (ptr == NULL && !job->status_buffer->bufused)
   {
