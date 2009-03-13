@@ -2621,6 +2621,44 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       errors = valid_path("APPrinterUtilityPath", attr->value, errors, verbose,
                           warn);
   }
+
+ /*
+  * APScanAppBundleID and APScanAppPath
+  */
+
+  if ((attr = ppdFindAttr(ppd, "APScanAppPath", NULL)) != NULL)
+  {
+    if (!attr->value || access(attr->value, 0))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Missing "
+				  "APScanAppPath file \"%s\"\n"),
+			prefix, attr->value ? attr->value : "<NULL>");
+
+      if (!warn)
+	errors ++;
+    }
+    else
+      errors = valid_path("APScanAppPath", attr->value, errors, verbose,
+                          warn);
+
+    if (ppdFindAttr(ppd, "APScanAppBundleID", NULL))
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Cannot provide both "
+				  "APScanAppPath and APScanAppBundleID!\n"),
+			prefix);
+
+      if (!warn)
+	errors ++;
+    }
+  }
 #endif	/* __APPLE__ */
 
   return (errors);

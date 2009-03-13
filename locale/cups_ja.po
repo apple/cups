@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-12 16:02-0700\n"
+"POT-Creation-Date: 2009-03-13 13:48-0700\n"
 "PO-Revision-Date: 2009-02-20 16:43+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -387,6 +387,10 @@ msgid "      %s  Bad language \"%s\"!\n"
 msgstr "      %s  無効な言語 \"%s\"です!\n"
 
 #, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
+msgstr ""
+
+#, c-format
 msgid "      %s  Empty cupsUIConstraints %s!\n"
 msgstr "      %s 空の cupsUIConstraints %sです!\n"
 
@@ -413,6 +417,10 @@ msgstr ""
 
 #, c-format
 msgid "      %s  Missing APPrinterUtilityPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing APScanAppPath file \"%s\"\n"
 msgstr ""
 
 #, c-format

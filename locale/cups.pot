@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-12 16:02-0700\n"
+"POT-Creation-Date: 2009-03-13 13:48-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -297,7 +297,7 @@ msgstr ""
 msgid "        PASS    ShortNickName\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3294
+#: systemv/cupstestppd.c:3332
 #, c-format
 msgid ""
 "        WARN    \"%s %s\" conflicts with \"%s %s\"\n"
@@ -388,7 +388,7 @@ msgstr ""
 msgid "      %s  %s %s does not exist!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3449
+#: systemv/cupstestppd.c:3487
 #, c-format
 msgid "      %s  %s file \"%s\" has the wrong capitalization!\n"
 msgstr ""
@@ -400,13 +400,13 @@ msgid ""
 "                REF: Page 122, section 5.17\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3009
+#: systemv/cupstestppd.c:3047
 #, c-format
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3055 systemv/cupstestppd.c:3104
-#: systemv/cupstestppd.c:3143
+#: systemv/cupstestppd.c:3093 systemv/cupstestppd.c:3142
+#: systemv/cupstestppd.c:3181
 #, c-format
 msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
@@ -416,7 +416,7 @@ msgstr ""
 msgid "      %s  Bad cupsFilter value \"%s\"!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2672
+#: systemv/cupstestppd.c:2710
 #, c-format
 msgid "      %s  Bad cupsICCProfile %s!\n"
 msgstr ""
@@ -431,9 +431,14 @@ msgstr ""
 msgid "      %s  Bad cupsUIConstraints %s: \"%s\"!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2959
+#: systemv/cupstestppd.c:2997
 #, c-format
 msgid "      %s  Bad language \"%s\"!\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:2654
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
 msgstr ""
 
 #: systemv/cupstestppd.c:1878
@@ -441,12 +446,12 @@ msgstr ""
 msgid "      %s  Empty cupsUIConstraints %s!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2995
+#: systemv/cupstestppd.c:3033
 #, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3087 systemv/cupstestppd.c:3127
+#: systemv/cupstestppd.c:3125 systemv/cupstestppd.c:3165
 #, c-format
 msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
 msgstr ""
@@ -471,14 +476,19 @@ msgstr ""
 msgid "      %s  Missing APPrinterUtilityPath file \"%s\"\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2804
+#: systemv/cupstestppd.c:2637
+#, c-format
+msgid "      %s  Missing APScanAppPath file \"%s\"\n"
+msgstr ""
+
+#: systemv/cupstestppd.c:2842
 #, c-format
 msgid ""
 "      %s  Missing REQUIRED PageRegion option!\n"
 "                REF: Page 100, section 5.14.\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2789
+#: systemv/cupstestppd.c:2827
 #, c-format
 msgid ""
 "      %s  Missing REQUIRED PageSize option!\n"
@@ -500,7 +510,7 @@ msgstr ""
 msgid "      %s  Missing cupsFilter file \"%s\"\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2706
+#: systemv/cupstestppd.c:2744
 #, c-format
 msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
 msgstr ""
@@ -525,12 +535,12 @@ msgstr ""
 msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3181
+#: systemv/cupstestppd.c:3219
 #, c-format
 msgid "      %s  No base translation \"%s\" is included in file!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2867
+#: systemv/cupstestppd.c:2905
 #, c-format
 msgid ""
 "      %s  Non-standard size name \"%s\"!\n"
@@ -544,17 +554,17 @@ msgid ""
 "                REF: Page 122, section 5.17\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2884 systemv/cupstestppd.c:2898
+#: systemv/cupstestppd.c:2922 systemv/cupstestppd.c:2936
 #, c-format
 msgid "      %s  Size \"%s\" defined for %s but not for %s!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2842
+#: systemv/cupstestppd.c:2880
 #, c-format
 msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:2734
+#: systemv/cupstestppd.c:2772
 #, c-format
 msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
 msgstr ""
@@ -676,7 +686,7 @@ msgstr ""
 msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3321 systemv/cupstestppd.c:3343
+#: systemv/cupstestppd.c:3359 systemv/cupstestppd.c:3381
 #, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
 msgstr ""
@@ -957,17 +967,18 @@ msgstr ""
 #: systemv/cupstestppd.c:2455 systemv/cupstestppd.c:2482
 #: systemv/cupstestppd.c:2512 systemv/cupstestppd.c:2538
 #: systemv/cupstestppd.c:2562 systemv/cupstestppd.c:2586
-#: systemv/cupstestppd.c:2610 systemv/cupstestppd.c:2668
-#: systemv/cupstestppd.c:2703 systemv/cupstestppd.c:2730
-#: systemv/cupstestppd.c:2785 systemv/cupstestppd.c:2800
-#: systemv/cupstestppd.c:2838 systemv/cupstestppd.c:2880
-#: systemv/cupstestppd.c:2894 systemv/cupstestppd.c:2955
-#: systemv/cupstestppd.c:2991 systemv/cupstestppd.c:3005
-#: systemv/cupstestppd.c:3051 systemv/cupstestppd.c:3083
-#: systemv/cupstestppd.c:3100 systemv/cupstestppd.c:3123
-#: systemv/cupstestppd.c:3139 systemv/cupstestppd.c:3177
-#: systemv/cupstestppd.c:3317 systemv/cupstestppd.c:3339
-#: systemv/cupstestppd.c:3445
+#: systemv/cupstestppd.c:2610 systemv/cupstestppd.c:2634
+#: systemv/cupstestppd.c:2651 systemv/cupstestppd.c:2706
+#: systemv/cupstestppd.c:2741 systemv/cupstestppd.c:2768
+#: systemv/cupstestppd.c:2823 systemv/cupstestppd.c:2838
+#: systemv/cupstestppd.c:2876 systemv/cupstestppd.c:2918
+#: systemv/cupstestppd.c:2932 systemv/cupstestppd.c:2993
+#: systemv/cupstestppd.c:3029 systemv/cupstestppd.c:3043
+#: systemv/cupstestppd.c:3089 systemv/cupstestppd.c:3121
+#: systemv/cupstestppd.c:3138 systemv/cupstestppd.c:3161
+#: systemv/cupstestppd.c:3177 systemv/cupstestppd.c:3215
+#: systemv/cupstestppd.c:3355 systemv/cupstestppd.c:3377
+#: systemv/cupstestppd.c:3483
 msgid " FAIL\n"
 msgstr ""
 
@@ -5470,7 +5481,7 @@ msgid ""
 "    Note: this program only validates the DSC comments, not the PostScript itself.\n"
 msgstr ""
 
-#: systemv/cupstestppd.c:3361
+#: systemv/cupstestppd.c:3399
 msgid ""
 "Usage: cupstestppd [options] filename1.ppd[.gz] [... filenameN.ppd[.gz]]\n"
 "       program | cupstestppd [options] -\n"
