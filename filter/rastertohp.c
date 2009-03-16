@@ -4,7 +4,7 @@
  *   Hewlett-Packard Page Control Language filter for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -249,10 +249,9 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
     if (!ppd || ppd->model_number != 2)
     {
-      if (header->Duplex)
-	printf("\033&l%dS",			/* Set duplex mode */
-               header->Duplex + header->Tumble);
+      int mode = Duplex ? 1 + header->Tumble != 0 : 0;
 
+      printf("\033&l%dS", mode);		/* Set duplex mode */
       printf("\033&l0L");			/* Turn off perforation skip */
     }
   }
