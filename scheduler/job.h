@@ -43,9 +43,10 @@ typedef struct cupsd_job_s
   int			num_files;	/* Number of files in job */
   mime_type_t		**filetypes;	/* File types */
   int			*compressions;	/* Compression status of each file */
-  time_t		access_time;	/* Last access time */
   ipp_attribute_t	*sheets;	/* job-media-sheets-completed */
-  time_t		hold_until;	/* Hold expiration date/time */
+  time_t		access_time,	/* Last access time */
+			kill_time,	/* When to send SIGKILL */
+			hold_until;	/* Hold expiration date/time */
   ipp_attribute_t	*state;		/* Job state */
   ipp_attribute_t	*job_sheets;	/* Job sheets (NULL if none) */
   ipp_attribute_t	*printer_message,
@@ -109,7 +110,9 @@ VAR cups_array_t	*Jobs		VALUE(NULL),
 					/* List of jobs that are printing */
 VAR int			NextJobId	VALUE(1);
 					/* Next job ID to use */
-VAR int			JobRetryLimit	VALUE(5),
+VAR int			JobKillDelay	VALUE(DEFAULT_TIMEOUT),
+					/* Delay before killing jobs */
+			JobRetryLimit	VALUE(5),
 					/* Max number of tries */
 			JobRetryInterval VALUE(300);
 					/* Seconds between retries */
@@ -149,7 +152,8 @@ extern void		cupsdSetJobState(cupsd_job_t *job,
 __attribute__ ((__format__ (__printf__, 4, 5)))
 #endif /* __GNUC__ */
 ;
-extern void		cupsdStopAllJobs(cupsd_jobaction_t action);
+extern void		cupsdStopAllJobs(cupsd_jobaction_t action,
+			                 int kill_delay);
 extern int		cupsdTimeoutJob(cupsd_job_t *job);
 extern void		cupsdUnloadCompletedJobs(void);
 

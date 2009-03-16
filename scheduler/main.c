@@ -714,22 +714,12 @@ main(int  argc,				/* I - Number of command-line args */
       }
 
      /*
-      * Check for any active jobs...
-      */
-
-      for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	   job;
-	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-        if (job->state_value == IPP_JOB_PROCESSING)
-	  break;
-
-     /*
       * Restart if all clients are closed and all jobs finished, or
       * if the reload timeout has elapsed...
       */
 
       if ((cupsArrayCount(Clients) == 0 &&
-           (!job || NeedReload != RELOAD_ALL)) ||
+           (cupsArrayCount(PrintingJobs) == 0 || NeedReload != RELOAD_ALL)) ||
           (time(NULL) - ReloadTime) >= ReloadTimeout)
       {
        /*
@@ -890,7 +880,7 @@ main(int  argc,				/* I - Number of command-line args */
         cupsArrayCount(PrintingJobs) > 0)
     {
       SleepJobs = 0;
-      cupsdStopAllJobs(0);
+      cupsdStopAllJobs(CUPSD_JOB_DEFAULT, 10);
     }
 #endif /* __APPLE__ */
 

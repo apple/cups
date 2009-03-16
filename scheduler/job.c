@@ -271,23 +271,36 @@ cupsdCheckJobs(void)
   cupsd_printer_t	*printer,	/* Printer destination */
 			*pclass;	/* Printer class destination */
   ipp_attribute_t	*attr;		/* Job attribute */
+  time_t		curtime;	/* Current time */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "cupsdCheckJobs: %d active jobs, sleeping=%d, reload=%d",
                   cupsArrayCount(ActiveJobs), Sleeping, NeedReload);
 
+  curtime = time(NULL);
+
   for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
   {
+   /*
+    * Kill jobs if they are unresponsive...
+    */
+
+    if (job->kill_time && job->kill_time <= curtime)
+    {
+      stop_job(job, CUPSD_JOB_FORCE);
+      continue;
+    }
+
    /*
     * Start held jobs if they are ready...
     */
 
     if (job->state_value == IPP_JOB_HELD &&
         job->hold_until &&
-	job->hold_until < time(NULL))
+	job->hold_until < curtime)
     {
       if (job->pending_timeout)
       {
@@ -1256,7 +1269,7 @@ cupsdFreeAllJobs(void)
 
   cupsdHoldSignals();
 
-  cupsdStopAllJobs(1);
+  cupsdStopAllJobs(CUPSD_JOB_FORCE, 0);
   cupsdSaveAllJobs();
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
@@ -2352,7 +2365,8 @@ cupsdSetJobState(
 
 void
 cupsdStopAllJobs(
-    cupsd_jobaction_t action)		/* I - Action */
+    cupsd_jobaction_t action,		/* I - Action */
+    int               kill_delay)	/* I - Number of seconds before we kill */
 {
   cupsd_job_t	*job;			/* Current job */
 
@@ -2362,7 +2376,12 @@ cupsdStopAllJobs(
   for (job = (cupsd_job_t *)cupsArrayFirst(PrintingJobs);
        job;
        job = (cupsd_job_t *)cupsArrayNext(PrintingJobs))
+  {
+    if (kill_delay)
+      job->kill_time = time(NULL) + kill_delay;
+
     cupsdSetJobState(job, IPP_JOB_PENDING, action, NULL);
+  }
 }
 
 
@@ -3669,6 +3688,11 @@ stop_job(cupsd_job_t       *job,	/* I - Job */
 
   FilterLevel -= job->cost;
   job->cost   = 0;
+
+  if (action == CUPSD_JOB_DEFAULT && !job->kill_time)
+    job->kill_time = time(NULL) + JobKillDelay;
+  else if (action == CUPSD_JOB_FORCE)
+    job->kill_time = 0;
 
   for (i = 0; job->filters[i]; i ++)
     if (job->filters[i] > 0)
