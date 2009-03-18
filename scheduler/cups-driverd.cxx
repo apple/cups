@@ -1101,8 +1101,9 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (language)
       {
 	for (i = 0; i < PPD_MAX_LANG; i ++)
-	  if (!ppd->record.languages[i][0] ||
-	      !strcmp(ppd->record.languages[i], language))
+	  if (!ppd->record.languages[i][0])
+	    break;
+	  else if (!strcmp(ppd->record.languages[i], language))
 	  {
 	    ppd->matches ++;
 	    break;
@@ -1135,8 +1136,9 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (product)
       {
 	for (i = 0; i < PPD_MAX_PROD; i ++)
-	  if (!ppd->record.products[i][0] ||
-	      !strcasecmp(ppd->record.products[i], product))
+	  if (!ppd->record.products[i][0])
+	    break;
+	  else if (!strcasecmp(ppd->record.products[i], product))
 	  {
 	    ppd->matches += 3;
 	    break;
@@ -1146,8 +1148,9 @@ list_ppds(int        request_id,	/* I - Request ID */
       if (psversion)
       {
 	for (i = 0; i < PPD_MAX_VERS; i ++)
-	  if (!ppd->record.psversions[i][0] ||
-	      !strcasecmp(ppd->record.psversions[i], psversion))
+	  if (!ppd->record.psversions[i][0])
+	    break;
+	  else if (!strcasecmp(ppd->record.psversions[i], psversion))
 	  {
 	    ppd->matches ++;
 	    break;
