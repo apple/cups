@@ -707,8 +707,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	                                      choices[i]->option->keyword))
 	           != NULL)
       {
-        bufsize += 17 + strlen(choices[i]->option->keyword) + 6;
-					/* %%BeginFeature: *keyword True\n */
+        bufsize += 23 + strlen(choices[i]->option->keyword) + 6;
+					/* %%BeginFeature: *Customkeyword True\n */
 
         
         for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
