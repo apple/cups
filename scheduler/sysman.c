@@ -3,7 +3,7 @@
  *
  *   System management definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -792,7 +792,7 @@ sysUpdate(void)
 
      /*
       * If we have no printing jobs, allow the power change immediately.
-      * Otherwise set the SleepJobs time to 20 seconds in the future when
+      * Otherwise set the SleepJobs time to 15 seconds in the future when
       * we'll take more drastic measures...
       */
 
@@ -802,7 +802,7 @@ sysUpdate(void)
       else
       {
         LastSysEvent = sysevent;
-        SleepJobs    = time(NULL) + 20;
+        SleepJobs    = time(NULL) + 15;
       }
     }
 

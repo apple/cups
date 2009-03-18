@@ -9307,12 +9307,12 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 {
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
+  cupsd_job_t	*job;			/* Job information */
   char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
-  cupsd_job_t	*job;			/* Job information */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "restart_job(%p[%d], %s)", con,
@@ -9420,10 +9420,36 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
   }
 
  /*
-  * Restart the job and return...
+  * See if the job-hold-until attribute is specified...
   */
 
-  cupsdRestartJob(job);
+  if ((attr = ippFindAttribute(con->request, "job-hold-until",
+                               IPP_TAG_KEYWORD)) == NULL)
+    attr = ippFindAttribute(con->request, "job-hold-until", IPP_TAG_NAME);
+
+  if (attr && strcmp(attr->values[0].string.text, "no-hold"))
+  {
+   /*
+    * Return the job to a held state...
+    */
+
+    cupsdLogJob(job, CUPSD_LOG_DEBUG,
+		"Restarted by \"%s\" with job-hold-until=%s.",
+                username, attr->values[0].string.text);
+    cupsdSetJobHoldUntil(job, attr->values[0].string.text, 0);
+
+    cupsdAddEvent(CUPSD_EVENT_JOB_CONFIG_CHANGED | CUPSD_EVENT_JOB_STATE,
+                  NULL, job, "Job restarted by user with job-hold-until=%s",
+		  attr->values[0].string.text);
+  }
+  else
+  {
+   /*
+    * Restart the job...
+    */
+
+    cupsdRestartJob(job);
+  }
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Restarted by \"%s\".", username);
 

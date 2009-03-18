@@ -122,6 +122,7 @@ static const cupsd_var_t	variables[] =
   { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
+  { "JobKillDelay",		&JobKillDelay,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryLimit",		&JobRetryLimit,		CUPSD_VARTYPE_INTEGER },
   { "JobRetryInterval",		&JobRetryInterval,	CUPSD_VARTYPE_INTEGER },
   { "KeepAliveTimeout",		&KeepAliveTimeout,	CUPSD_VARTYPE_INTEGER },
@@ -559,6 +560,7 @@ cupsdReadConfiguration(void)
   SSLOptions               = CUPSD_SSL_NONE;
 #endif /* HAVE_SSL */
   DirtyCleanInterval       = DEFAULT_KEEPALIVE;
+  JobKillDelay             = DEFAULT_TIMEOUT;
   JobRetryLimit            = 5;
   JobRetryInterval         = 300;
   FileDevice               = FALSE;

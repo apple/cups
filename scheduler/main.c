@@ -714,22 +714,12 @@ main(int  argc,				/* I - Number of command-line args */
       }
 
      /*
-      * Check for any active jobs...
-      */
-
-      for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	   job;
-	   job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-        if (job->state_value == IPP_JOB_PROCESSING)
-	  break;
-
-     /*
       * Restart if all clients are closed and all jobs finished, or
       * if the reload timeout has elapsed...
       */
 
       if ((cupsArrayCount(Clients) == 0 &&
-           (!job || NeedReload != RELOAD_ALL)) ||
+           (cupsArrayCount(PrintingJobs) == 0 || NeedReload != RELOAD_ALL)) ||
           (time(NULL) - ReloadTime) >= ReloadTimeout)
       {
        /*
@@ -890,7 +880,7 @@ main(int  argc,				/* I - Number of command-line args */
         cupsArrayCount(PrintingJobs) > 0)
     {
       SleepJobs = 0;
-      cupsdStopAllJobs(0);
+      cupsdStopAllJobs(CUPSD_JOB_DEFAULT, 10);
     }
 #endif /* __APPLE__ */
 
@@ -1961,22 +1951,27 @@ select_timeout(int fds)			/* I - Number of descriptors returned */
   * Check for any active jobs...
   */
 
-  if (cupsArrayCount(ActiveJobs) > 0)
+  for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
+       job;
+       job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
   {
-    for (job = (cupsd_job_t *)cupsArrayFirst(ActiveJobs);
-	 job;
-	 job = (cupsd_job_t *)cupsArrayNext(ActiveJobs))
-      if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
-      {
-        timeout = job->hold_until;
-	why     = "release held jobs";
-      }
-      else if (job->state_value == IPP_JOB_PENDING && timeout > (now + 10))
-      {
-	timeout = now + 10;
-	why     = "start pending jobs";
-	break;
-      }
+    if (job->kill_time && job->kill_time < timeout)
+    {
+      timeout = job->kill_time;
+      why     = "kill unresponsive jobs";
+    }
+
+    if (job->state_value == IPP_JOB_HELD && job->hold_until < timeout)
+    {
+      timeout = job->hold_until;
+      why     = "release held jobs";
+    }
+    else if (job->state_value == IPP_JOB_PENDING && timeout > (now + 10))
+    {
+      timeout = now + 10;
+      why     = "start pending jobs";
+      break;
+    }
   }
 
 #ifdef HAVE_MALLINFO

@@ -1,9 +1,13 @@
-CHANGES.txt - 2009-03-04
+CHANGES.txt - 2009-03-18
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- CUPS-Get-PPDs did not work properly when filtering by language,
+	  product, or psversion (STR #3136)
+	- The scheduler now kills job filters when it takes more than 30 seconds
+	  (configurable) to cancel or hold the job.
 	- The cupstestppd program did not validate the capitalization of
 	  filenames in the PPD file.
 	- The cupstestppd program did not validate the PageSize and PageRegion

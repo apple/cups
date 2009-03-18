@@ -55,7 +55,8 @@ typedef struct
   char		*name,			/* Service name */
 		*domain,		/* Domain name */
 		*fullName,		/* Full name */
-		*make_and_model;	/* Make and model from TXT record */
+		*make_and_model,	/* Make and model from TXT record */
+		*device_id;		/* 1284 device ID from TXT record */
   cups_devtype_t type;			/* Device registration type */
   int		priority,		/* Priority associated with type */
 		cups_shared,		/* CUPS shared printer? */
@@ -307,7 +308,7 @@ main(int  argc,				/* I - Number of command-line args */
 			    best->cups_shared ? "/cups" : "/");
 
 	    cupsBackendReport("network", device_uri, best->make_and_model,
-	                      best->name, NULL, NULL);
+	                      best->name, best->device_id, NULL);
 	    best->sent = 1;
 	    best       = device;
 	  }
@@ -331,7 +332,7 @@ main(int  argc,				/* I - Number of command-line args */
 			best->cups_shared ? "/cups" : "/");
 
 	cupsBackendReport("network", device_uri, best->make_and_model,
-			  best->name, NULL, NULL);
+			  best->name, best->device_id, NULL);
 	best->sent = 1;
       }
     }
@@ -593,8 +594,8 @@ query_callback(
 {
   cups_array_t	*devices;		/* Device array */
   char		name[1024],		/* Service name */
-		*ptr;			/* Pointer into name */
-  cups_device_t	key,			/* Search key */
+		*ptr;			/* Pointer into string */
+  cups_device_t	dkey,			/* Search key */
 		*device;		/* Device */
 
 
@@ -617,123 +618,183 @@ query_callback(
   * Lookup the service in the devices array.
   */
 
-  devices  = (cups_array_t *)context;
-  key.name = name;
+  devices   = (cups_array_t *)context;
+  dkey.name = name;
 
   unquote(name, fullName, sizeof(name));
 
-  if ((key.domain = strstr(name, "._tcp.")) != NULL)
-    key.domain += 6;
+  if ((dkey.domain = strstr(name, "._tcp.")) != NULL)
+    dkey.domain += 6;
   else
-    key.domain = (char *)"local.";
+    dkey.domain = (char *)"local.";
 
   if ((ptr = strstr(name, "._")) != NULL)
     *ptr = '\0';
 
   if (strstr(fullName, "_ipp._tcp.") ||
       strstr(fullName, "_ipp-tls._tcp."))
-    key.type = CUPS_DEVICE_IPP;
+    dkey.type = CUPS_DEVICE_IPP;
   else if (strstr(fullName, "_fax-ipp._tcp."))
-    key.type = CUPS_DEVICE_FAX_IPP;
+    dkey.type = CUPS_DEVICE_FAX_IPP;
   else if (strstr(fullName, "_printer._tcp."))
-    key.type = CUPS_DEVICE_PRINTER;
+    dkey.type = CUPS_DEVICE_PRINTER;
   else if (strstr(fullName, "_pdl-datastream._tcp."))
-    key.type = CUPS_DEVICE_PDL_DATASTREAM;
+    dkey.type = CUPS_DEVICE_PDL_DATASTREAM;
   else
-    key.type = CUPS_DEVICE_RIOUSBPRINT;
+    dkey.type = CUPS_DEVICE_RIOUSBPRINT;
 
-  for (device = cupsArrayFind(devices, &key);
+  for (device = cupsArrayFind(devices, &dkey);
        device;
        device = cupsArrayNext(devices))
   {
-    if (strcasecmp(device->name, key.name) ||
-        strcasecmp(device->domain, key.domain))
+    if (strcasecmp(device->name, dkey.name) ||
+        strcasecmp(device->domain, dkey.domain))
     {
       device = NULL;
       break;
     }
-    else if (device->type == key.type)
+    else if (device->type == dkey.type)
     {
      /*
       * Found it, pull out the priority and make and model from the TXT
       * record and save it...
       */
 
-      const void *value;		/* Pointer to value */
-      uint8_t	valueLen;		/* Length of value (max 255) */
-      char	make_and_model[512],	/* Manufacturer and model */
-		model[256],		/* Model */
-		priority[256];		/* Priority */
+      const uint8_t	*data,		/* Pointer into data */
+			*datanext,	/* Next key/value pair */
+			*dataend;	/* End of entire TXT record */
+      uint8_t		datalen;	/* Length of current key/value pair */
+      char		key[256],	/* Key string */
+			value[256],	/* Value string */
+			make_and_model[512],
+				      	/* Manufacturer and model */
+			model[256],	/* Model */
+			device_id[2048];/* 1284 device ID */
 
 
-      value = TXTRecordGetValuePtr(rdlen, rdata, "priority", &valueLen);
+      device_id[0]      = '\0';
+      make_and_model[0] = '\0';
 
-      if (value && valueLen)
+      strcpy(model, "Unknown");
+
+      for (data = rdata, dataend = data + rdlen;
+           data < dataend;
+           data = datanext)
       {
-	memcpy(priority, value, valueLen);
-	priority[valueLen] = '\0';
-	device->priority = atoi(priority);
-      }
+       /*
+        * Read a key/value pair starting with an 8-bit length.  Since the
+	* length is 8 bits and the size of the key/value buffers is 256, we
+	* don't need to check for overflow...
+	*/
 
-      if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MFG",
-					&valueLen)) == NULL)
-	value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MANUFACTURER",
-	                             &valueLen);
+        datalen = *data++;
 
-      if (value && valueLen)
-      {
-	memcpy(make_and_model, value, valueLen);
-	make_and_model[valueLen] = '\0';
-      }
-      else
-	make_and_model[0] = '\0';
+        if (!datalen || (data + datalen) >= dataend)
+	  break;
 
-      if ((value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MDL",
-					&valueLen)) == NULL)
-	value = TXTRecordGetValuePtr(rdlen, rdata, "usb_MODEL", &valueLen);
+        datanext = data + datalen;
 
-      if (value && valueLen)
-      {
-	memcpy(model, value, valueLen);
-	model[valueLen] = '\0';
-      }
-      else if ((value = TXTRecordGetValuePtr(rdlen, rdata, "product",
-					     &valueLen)) != NULL && valueLen > 2)
-      {
-	if (((char *)value)[0] == '(')
+        for (ptr = key; data < datanext && *data != '='; data ++)
+	  *ptr++ = *data;
+	*ptr = '\0';
+
+	if (data < datanext && *data == '=')
 	{
-	 /*
-	  * Strip parenthesis...
-	  */
+	  data ++;
 
-	  memcpy(model, value + 1, valueLen - 2);
-	  model[valueLen - 2] = '\0';
+	  if (data < datanext)
+	    memcpy(value, data, datanext - data);
+	  value[datanext - data] = '\0';
 	}
 	else
-	{
-	  memcpy(model, value, valueLen);
-	  model[valueLen] = '\0';
-	}
+	  continue;
 
-	if (!strcasecmp(model, "GPL Ghostscript") ||
-	    !strcasecmp(model, "GNU Ghostscript") ||
-	    !strcasecmp(model, "ESP Ghostscript"))
+        if (!strncasecmp(key, "usb_", 4))
 	{
-	  if ((value = TXTRecordGetValuePtr(rdlen, rdata, "ty",
-					    &valueLen)) != NULL)
+	 /*
+	  * Add USB device ID information...
+	  */
+
+	  ptr = device_id + strlen(device_id);
+	  snprintf(ptr, sizeof(device_id) - (ptr - device_id), "%s:%s;",
+	           key + 4, value);
+        }
+
+        if (!strcasecmp(key, "usb_MFG") || !strcasecmp(key, "usb_MANU") ||
+	    !strcasecmp(key, "usb_MANUFACTURER"))
+	  strcpy(make_and_model, value);
+        else if (!strcasecmp(key, "usb_MDL") || !strcasecmp(key, "usb_MODEL"))
+	  strcpy(model, value);
+	else if (!strcasecmp(key, "product") && !strstr(value, "Ghostscript"))
+	{
+	  if (value[0] == '(')
 	  {
-	    memcpy(model, value, valueLen);
-	    model[valueLen] = '\0';
+	   /*
+	    * Strip parenthesis...
+	    */
 
-	    if ((ptr = strchr(model, ',')) != NULL)
+            if ((ptr = value + strlen(value) - 1) > value && *ptr == ')')
 	      *ptr = '\0';
+
+	    strcpy(model, value + 1);
 	  }
 	  else
-	    strcpy(model, "Unknown");
+	    strcpy(model, value);
+        }
+	else if (!strcasecmp(key, "ty"))
+	{
+          strcpy(model, value);
+
+	  if ((ptr = strchr(model, ',')) != NULL)
+	    *ptr = '\0';
+	}
+	else if (!strcasecmp(key, "priority"))
+	  device->priority = atoi(value);
+	else if ((device->type == CUPS_DEVICE_IPP ||
+	          device->type == CUPS_DEVICE_PRINTER) &&
+		 !strcasecmp(key, "printer-type"))
+	{
+	 /*
+	  * This is a CUPS printer!
+	  */
+
+	  device->cups_shared = 1;
+
+	  if (device->type == CUPS_DEVICE_PRINTER)
+	    device->sent = 1;
 	}
       }
+
+      if (device->device_id)
+        free(device->device_id);
+
+      if (!device_id[0] && strcmp(model, "Unknown"))
+      {
+        if (make_and_model[0])
+	  snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s;",
+	           make_and_model, model);
+        else if (!strncasecmp(model, "designjet ", 10))
+	  snprintf(device_id, sizeof(device_id), "MFG:HP;MDL:%s", model + 10);
+        else if (!strncasecmp(model, "stylus ", 7))
+	  snprintf(device_id, sizeof(device_id), "MFG:EPSON;MDL:%s", model + 7);
+        else if ((ptr = strchr(model, ' ')) != NULL)
+	{
+	 /*
+	  * Assume the first word is the make...
+	  */
+
+          memcpy(make_and_model, model, ptr - model);
+	  make_and_model[ptr - model] = '\0';
+
+	  snprintf(device_id, sizeof(device_id), "MFG:%s;MDL:%s",
+		   make_and_model, ptr + 1);
+        }
+      }
+
+      if (device_id[0])
+        device->device_id = strdup(device_id);
       else
-	strcpy(model, "Unknown");
+        device->device_id = NULL;
 
       if (device->make_and_model)
 	free(device->make_and_model);
@@ -742,25 +803,11 @@ query_callback(
       {
 	strlcat(make_and_model, " ", sizeof(make_and_model));
 	strlcat(make_and_model, model, sizeof(make_and_model));
+
 	device->make_and_model = strdup(make_and_model);
       }
       else
 	device->make_and_model = strdup(model);
-
-      if ((device->type == CUPS_DEVICE_IPP ||
-	   device->type == CUPS_DEVICE_PRINTER) &&
-	  TXTRecordGetValuePtr(rdlen, rdata, "printer-type", &valueLen))
-      {
-       /*
-	* This is a CUPS printer!
-	*/
-
-	device->cups_shared = 1;
-
-	if (device->type == CUPS_DEVICE_PRINTER)
-	  device->sent = 1;
-      }
-
       break;
     }
   }

@@ -1208,6 +1208,9 @@ printer.</P>
 	HREF="#JobRetryInterval"><CODE>JobRetryInterval</CODE></A>
 	directive controls the value of N</LI>
 
+	<LI><CODE>retry-this-job</CODE> - Retry the current job immediately
+	and indefinitely.</LI>
+
 	<LI><CODE>stop-printer</CODE> - Stop the printer and keep
 	the job for future printing; this is the default
 	value</LI>
@@ -1508,6 +1511,22 @@ number of seconds to wait before retrying a job. This is
 typically used for fax queues but can also be used with normal
 print queues whose error policy is <CODE>retry-job</CODE>. The
 default is 30 seconds.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="JobKillDelay">JobKillDelay</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+JobKillDelay 30
+JobKillDelay 120
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>JobKillDelay</CODE> directive specifies the number of seconds to
+wait before killing the filters and backend associated with a canceled or held
+job. The default is 30 seconds.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="JobRetryLimit">JobRetryLimit</A></H2>

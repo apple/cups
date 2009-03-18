@@ -5,6 +5,10 @@ CHANGES IN CUPS V1.3.10
 
 	- Documentation fixes (STR #2994, STR #2995, STR #3008, STR #3056,
 	  STR #3057)
+	- The scheduler did not support the job-hold-until attribute with the
+	  Restart-Job operation (STR #3130)
+	- The rastertohp driver did not set the 1-sided printing mode when
+	  needed (STR #3131)
 	- Now use a wrapper program instead of our fork of the Xpdf code to
 	  support printing of PDF files. The new wrapper supports using Xpdf,
 	  poppler, or Ghostscript to convert PDF files to PostScript (STR #3129)

@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "28 January 2009" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "16 March 2009" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -392,6 +392,11 @@ remote printers.
 Include filename
 .br
 Includes the named file.
+.TP 5
+JobKillDelay seconds
+.br
+Specifies the number of seconds to wait before killing the filters and backend
+associated with a canceled or held job.
 .TP 5
 JobRetryInterval seconds
 .br
