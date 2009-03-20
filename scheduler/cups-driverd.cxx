@@ -73,7 +73,8 @@ static const char * const ppd_types[] =	/* ppd-type values */
   "pdf",
   "raster",
   "fax",
-  "unknown"
+  "unknown",
+  "drv"
 };
 
 

@@ -3,7 +3,7 @@
  *
  *   Mini-daemon utility functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -391,6 +391,8 @@ cupsdSendIPPHeader(
  /*
   * Send IPP/1.1 response header: version number (2 bytes), status code
   * (2 bytes), and request ID (4 bytes)...
+  *
+  * TODO: Add version number (IPP/2.x and IPP/1.0) support.
   */
 
   putchar(1);
