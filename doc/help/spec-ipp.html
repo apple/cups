@@ -1799,10 +1799,10 @@ CUPS-Move-Job Response:
 
 <h3 class='title'><span class='info'>CUPS 1.2</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
 
-<p>The CUPS-Authenticate-Job operation (0x400E) authenticate a
-print job for printing. Typically this is used when printing to a
-remote server. The authentication information is passed in the
-HTTP request.</p>
+<p>The CUPS-Authenticate-Job operation (0x400E) authenticates a print job for
+printing, releasing the job if it is held. Typically this is used when printing
+to a remote server. The authentication information is passed in the HTTP
+request; the HTTP connection is normally encrypted for this type of request.</p>
 
 <h4>CUPS-Authenticate-Job Request</h4>
 
@@ -1835,6 +1835,12 @@ CUPS-Authenticate-Job request:
 	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
+
+	<dt>"job-hold-until" (keyword | name(MAX)):<span class='info'>CUPS 1.3</span>
+
+	<dd>The client OPTIONALLY supplies a new job-hold-until value for the
+	job. If specified and not the "no-hold" value, the job is held instead
+	of released for printing.
 
 </dl>
 
