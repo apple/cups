@@ -4007,9 +4007,6 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 #endif /* __APPLE__ */
     else
     {
-      if (loglevel != CUPSD_LOG_INFO && loglevel > LogLevel)
-	cupsdLogJob(job, loglevel, "%s", message);
-
       if (loglevel < CUPSD_LOG_DEBUG)
       {
 	strlcpy(job->printer->state_message, message,
