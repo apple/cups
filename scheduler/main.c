@@ -1718,8 +1718,8 @@ process_children(void)
 	  else
 	    job->status = -status;	/* Backend failed */
 
-	  if (!(job->printer->type & CUPS_PRINTER_FAX) &&
-	      job->status_level >= CUPSD_LOG_ERROR)
+	  if ((!(job->printer->type & CUPS_PRINTER_FAX) || job->filters[i]) &&
+	      job->status_level > CUPSD_LOG_ERROR)
 	  {
 	    job->status_level = CUPSD_LOG_ERROR;
 
@@ -1761,7 +1761,6 @@ process_children(void)
 	    cupsdContinueJob(job);
 	  }
 	}
-	break;
       }
     }
 
