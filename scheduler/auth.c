@@ -687,15 +687,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 #    endif /* PAM_TTY */
 #  endif /* HAVE_PAM_SET_ITEM */
 
-#  ifdef HAVE_PAM_SETCRED
-            pamerr = pam_setcred(pamh, PAM_ESTABLISH_CRED | PAM_SILENT);
-	    if (pamerr != PAM_SUCCESS)
-	      cupsdLogMessage(CUPSD_LOG_WARN,
-	                      "cupsdAuthorize: pam_setcred() "
-			      "returned %d (%s)!", pamerr,
-			      pam_strerror(pamh, pamerr));
-#  endif /* HAVE_PAM_SETCRED */
-
 	    pamerr = pam_authenticate(pamh, PAM_SILENT);
 	    if (pamerr != PAM_SUCCESS)
 	    {
@@ -706,6 +697,15 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 	      pam_end(pamh, 0);
 	      return;
 	    }
+
+#  ifdef HAVE_PAM_SETCRED
+            pamerr = pam_setcred(pamh, PAM_ESTABLISH_CRED | PAM_SILENT);
+	    if (pamerr != PAM_SUCCESS)
+	      cupsdLogMessage(CUPSD_LOG_WARN,
+	                      "cupsdAuthorize: pam_setcred() "
+			      "returned %d (%s)!", pamerr,
+			      pam_strerror(pamh, pamerr));
+#  endif /* HAVE_PAM_SETCRED */
 
 	    pamerr = pam_acct_mgmt(pamh, PAM_SILENT);
 	    if (pamerr != PAM_SUCCESS)
