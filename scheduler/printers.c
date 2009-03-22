@@ -2448,6 +2448,11 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       }
     }
 
+    if ((oldattr = ippFindAttribute(oldattrs, "marker-message",
+                                    IPP_TAG_TEXT)) != NULL)
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "marker-message",
+                   NULL, oldattr->values[0].string.text);
+
     if ((oldattr = ippFindAttribute(oldattrs, "marker-low-levels",
                                     IPP_TAG_INTEGER)) != NULL)
     {
