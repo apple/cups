@@ -32,7 +32,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-13 15:08-0700\n"
+"POT-Creation-Date: 2009-03-23 14:56-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1065,7 +1065,7 @@ msgstr ""
 msgid "%s accepting requests since %s\n"
 msgstr ""
 
-#: scheduler/ipp.c:10441
+#: scheduler/ipp.c:10467
 #, c-format
 msgid "%s cannot be changed."
 msgstr ""
@@ -2498,7 +2498,7 @@ msgstr ""
 msgid "Bad custom parameter"
 msgstr ""
 
-#: cups/http-support.c:1333
+#: cups/http-support.c:1336
 #, c-format
 msgid "Bad device URI \"%s\"!\n"
 msgstr ""
@@ -2513,7 +2513,7 @@ msgstr ""
 msgid "Bad device-uri scheme \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:9862 scheduler/ipp.c:11339
+#: scheduler/ipp.c:9888 scheduler/ipp.c:11365
 #, c-format
 msgid "Bad document-format \"%s\"!"
 msgstr ""
@@ -2527,7 +2527,7 @@ msgstr ""
 msgid "Bad font attribute: %s\n"
 msgstr ""
 
-#: scheduler/ipp.c:10457
+#: scheduler/ipp.c:10483
 msgid "Bad job-priority value!"
 msgstr ""
 
@@ -2540,14 +2540,14 @@ msgstr ""
 msgid "Bad job-sheets value type!"
 msgstr ""
 
-#: scheduler/ipp.c:10487
+#: scheduler/ipp.c:10513
 msgid "Bad job-state value!"
 msgstr ""
 
 #: scheduler/ipp.c:3661 scheduler/ipp.c:4017 scheduler/ipp.c:6624
 #: scheduler/ipp.c:6766 scheduler/ipp.c:8036 scheduler/ipp.c:8290
-#: scheduler/ipp.c:9133 scheduler/ipp.c:9358 scheduler/ipp.c:9775
-#: scheduler/ipp.c:10350
+#: scheduler/ipp.c:9133 scheduler/ipp.c:9358 scheduler/ipp.c:9801
+#: scheduler/ipp.c:10376
 #, c-format
 msgid "Bad job-uri attribute \"%s\"!"
 msgstr ""
@@ -2726,7 +2726,7 @@ msgstr ""
 msgid "Continuous"
 msgstr ""
 
-#: scheduler/ipp.c:8583 scheduler/ipp.c:8599 scheduler/ipp.c:9878
+#: scheduler/ipp.c:8583 scheduler/ipp.c:8599 scheduler/ipp.c:9904
 #, c-format
 msgid "Could not scan type \"%s\"!"
 msgstr ""
@@ -3030,7 +3030,7 @@ msgid "ERROR: No fonts in charset file %s\n"
 msgstr ""
 
 #: driver/rastertoescpx.c:1906 driver/rastertopclx.c:1931
-#: filter/rastertoepson.c:1128 filter/rastertohp.c:858
+#: filter/rastertoepson.c:1128 filter/rastertohp.c:857
 #: filter/rastertolabel.c:1283
 msgid "ERROR: No pages found!\n"
 msgstr ""
@@ -3220,7 +3220,7 @@ msgid "ERROR: Unable to open print file %s: %s\n"
 msgstr ""
 
 #: driver/rastertoescpx.c:1806 driver/rastertopclx.c:1831
-#: filter/rastertoepson.c:1000 filter/rastertohp.c:727
+#: filter/rastertoepson.c:1000 filter/rastertohp.c:726
 #: filter/rastertolabel.c:1148
 #, c-format
 msgid "ERROR: Unable to open raster file - %s\n"
@@ -3462,7 +3462,7 @@ msgstr ""
 msgid "Enter password:"
 msgstr ""
 
-#: scheduler/client.c:2326
+#: scheduler/client.c:2328
 msgid "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket."
 msgstr ""
 
@@ -3595,7 +3595,7 @@ msgstr ""
 
 #: scheduler/ipp.c:3639 scheduler/ipp.c:3942 scheduler/ipp.c:6601
 #: scheduler/ipp.c:6743 scheduler/ipp.c:8013 scheduler/ipp.c:9110
-#: scheduler/ipp.c:9335 scheduler/ipp.c:9752 scheduler/ipp.c:10327
+#: scheduler/ipp.c:9335 scheduler/ipp.c:9778 scheduler/ipp.c:10353
 msgid "Got a printer-uri attribute but no job-id!"
 msgstr ""
 
@@ -3661,7 +3661,7 @@ msgstr ""
 msgid "INFO: Loading image file...\n"
 msgstr ""
 
-#: cups/http-support.c:1400
+#: cups/http-support.c:1403
 msgid "INFO: Looking for printer...\n"
 msgstr ""
 
@@ -3716,7 +3716,7 @@ msgid "INFO: Printer not connected; will retry in 30 seconds...\n"
 msgstr ""
 
 #: driver/rastertoescpx.c:1873 driver/rastertopclx.c:1895
-#: filter/rastertoepson.c:1079 filter/rastertohp.c:804
+#: filter/rastertoepson.c:1079 filter/rastertohp.c:803
 #: filter/rastertolabel.c:1235
 #, c-format
 msgid "INFO: Printing page %d, %d%% complete...\n"
@@ -3728,7 +3728,7 @@ msgid "INFO: Printing page %d...\n"
 msgstr ""
 
 #: backend/socket.c:461 driver/rastertoescpx.c:1911 driver/rastertopclx.c:1936
-#: filter/rastertoepson.c:1133 filter/rastertohp.c:863
+#: filter/rastertoepson.c:1133 filter/rastertohp.c:862
 #: filter/rastertolabel.c:1288
 msgid "INFO: Ready to print.\n"
 msgstr ""
@@ -3916,6 +3916,10 @@ msgstr ""
 msgid "Interlock open."
 msgstr ""
 
+#: cups/http-support.c:1242
+msgid "Internal Server Error"
+msgstr ""
+
 #: cups/ppd.c:341
 msgid "Internal error"
 msgstr ""
@@ -3960,7 +3964,7 @@ msgstr ""
 #: scheduler/ipp.c:3680 scheduler/ipp.c:4045 scheduler/ipp.c:6642
 #: scheduler/ipp.c:6784 scheduler/ipp.c:7890 scheduler/ipp.c:8054
 #: scheduler/ipp.c:8263 scheduler/ipp.c:8308 scheduler/ipp.c:9151
-#: scheduler/ipp.c:9376 scheduler/ipp.c:9793 scheduler/ipp.c:10368
+#: scheduler/ipp.c:9376 scheduler/ipp.c:9819 scheduler/ipp.c:10394
 #, c-format
 msgid "Job #%d does not exist!"
 msgstr ""
@@ -3980,7 +3984,7 @@ msgstr ""
 msgid "Job #%d is already completed - can't cancel."
 msgstr ""
 
-#: scheduler/ipp.c:8350 scheduler/ipp.c:10383
+#: scheduler/ipp.c:8350 scheduler/ipp.c:10409
 #, c-format
 msgid "Job #%d is finished and cannot be altered!"
 msgstr ""
@@ -4034,7 +4038,7 @@ msgstr ""
 msgid "Job UUID: "
 msgstr ""
 
-#: scheduler/ipp.c:10465
+#: scheduler/ipp.c:10491
 msgid "Job is completed and cannot be changed."
 msgstr ""
 
@@ -4042,7 +4046,7 @@ msgstr ""
 msgid "Job operation failed:"
 msgstr ""
 
-#: scheduler/ipp.c:10501 scheduler/ipp.c:10520 scheduler/ipp.c:10531
+#: scheduler/ipp.c:10527 scheduler/ipp.c:10546 scheduler/ipp.c:10557
 msgid "Job state cannot be changed."
 msgstr ""
 
@@ -4341,7 +4345,7 @@ msgstr ""
 msgid "No error-status"
 msgstr ""
 
-#: scheduler/ipp.c:8549 scheduler/ipp.c:9844
+#: scheduler/ipp.c:8549 scheduler/ipp.c:9870
 msgid "No file!?!"
 msgstr ""
 
@@ -4964,9 +4968,9 @@ msgstr ""
 #: scheduler/ipp.c:6349 scheduler/ipp.c:6886 scheduler/ipp.c:7516
 #: scheduler/ipp.c:7572 scheduler/ipp.c:7880 scheduler/ipp.c:8121
 #: scheduler/ipp.c:8211 scheduler/ipp.c:8244 scheduler/ipp.c:8564
-#: scheduler/ipp.c:8955 scheduler/ipp.c:9035 scheduler/ipp.c:10236
-#: scheduler/ipp.c:10691 scheduler/ipp.c:11019 scheduler/ipp.c:11086
-#: scheduler/ipp.c:11369
+#: scheduler/ipp.c:8955 scheduler/ipp.c:9035 scheduler/ipp.c:10262
+#: scheduler/ipp.c:10717 scheduler/ipp.c:11045 scheduler/ipp.c:11112
+#: scheduler/ipp.c:11395
 msgid "The printer or class was not found."
 msgstr ""
 
@@ -5198,7 +5202,7 @@ msgstr ""
 msgid "Unable to find destination for job!"
 msgstr ""
 
-#: cups/http-support.c:1430
+#: cups/http-support.c:1433
 msgid "Unable to find printer!\n"
 msgstr ""
 
@@ -5311,7 +5315,7 @@ msgstr ""
 msgid "Units"
 msgstr ""
 
-#: cups/http-support.c:1243 cups/ppd.c:360
+#: cups/http-support.c:1246 cups/ppd.c:360
 msgid "Unknown"
 msgstr ""
 
@@ -5320,12 +5324,12 @@ msgstr ""
 msgid "Unknown printer error (%s)!"
 msgstr ""
 
-#: scheduler/ipp.c:10892
+#: scheduler/ipp.c:10918
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr ""
 
-#: scheduler/ipp.c:10876
+#: scheduler/ipp.c:10902
 #, c-format
 msgid "Unknown printer-op-policy \"%s\"."
 msgstr ""
@@ -5335,27 +5339,27 @@ msgstr ""
 msgid "Unsupported character set \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:8530 scheduler/ipp.c:9825
+#: scheduler/ipp.c:8530 scheduler/ipp.c:9851
 #, c-format
 msgid "Unsupported compression \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:11322
+#: scheduler/ipp.c:11348
 #, c-format
 msgid "Unsupported compression attribute %s!"
 msgstr ""
 
-#: scheduler/ipp.c:11350
+#: scheduler/ipp.c:11376
 #, c-format
 msgid "Unsupported format \"%s\"!"
 msgstr ""
 
-#: scheduler/ipp.c:1418 scheduler/ipp.c:9959
+#: scheduler/ipp.c:1418 scheduler/ipp.c:9985
 #, c-format
 msgid "Unsupported format '%s'!"
 msgstr ""
 
-#: scheduler/ipp.c:8664 scheduler/ipp.c:9942
+#: scheduler/ipp.c:8664 scheduler/ipp.c:9968
 #, c-format
 msgid "Unsupported format '%s/%s'!"
 msgstr ""
@@ -5390,7 +5394,7 @@ msgstr ""
 #: backend/parallel.c:127 backend/scsi.c:157 backend/serial.c:165
 #: backend/socket.c:132 backend/usb.c:183 filter/bannertops.c:118
 #: filter/hpgl-main.c:148 filter/imagetops.c:115 filter/imagetoraster.c:207
-#: filter/pstops.c:255 filter/rastertoepson.c:987 filter/rastertohp.c:714
+#: filter/pstops.c:255 filter/rastertoepson.c:987 filter/rastertohp.c:713
 #: filter/rastertolabel.c:1135 filter/textcommon.c:518
 #, c-format
 msgid "Usage: %s job-id user title copies options [file]\n"
@@ -5453,7 +5457,7 @@ msgid ""
 "    --[no-]user-cancel-any  Allow/prevent users to cancel any job\n"
 msgstr ""
 
-#: scheduler/main.c:2102
+#: scheduler/main.c:2096
 msgid ""
 "Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
 "\n"
@@ -5704,7 +5708,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: scheduler/client.c:2336
+#: scheduler/client.c:2338
 #, c-format
 msgid "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>."
 msgstr ""

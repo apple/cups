@@ -169,6 +169,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Install or list PPDs...
   */
 
+  abort();
+
   if (argc == 3 && !strcmp(argv[1], "cat"))
     return (cat_ppd(argv[2], 0));
   else if (argc == 2 && !strcmp(argv[1], "dump"))
