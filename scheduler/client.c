@@ -2819,7 +2819,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   if (bytes <= 0 ||
       (con->http.state != HTTP_GET_SEND && con->http.state != HTTP_POST_SEND))
   {
-    if (!con->sent_header)
+    if (!con->sent_header && !con->response)
       cupsdSendError(con, HTTP_SERVER_ERROR, CUPSD_AUTH_NONE);
     else
     {
