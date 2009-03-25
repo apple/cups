@@ -16,7 +16,6 @@
 //
 //   ppdcProfile::ppdcProfile()  - Create a color profile.
 //   ppdcProfile::~ppdcProfile() - Destroy a color profile.
-//   ppdcProfile::class_name()   - Return the name of the class.
 //
 
 //
@@ -58,17 +57,6 @@ ppdcProfile::~ppdcProfile()
 
   resolution->release();
   media_type->release();
-}
-
-
-//
-// 'ppdcProfile::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcProfile::class_name()
-{
-  return ("ppdcProfile");
 }
 
 

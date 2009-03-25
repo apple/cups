@@ -16,7 +16,6 @@
 //
 //   ppdcVariable::ppdcVariable()  - Create a variable.
 //   ppdcVariable::~ppdcVariable() - Destroy a variable.
-//   ppdcVariable::class_name()    - Return the name of the class.
 //   ppdcVariable::set_value()     - Set the value of a variable.
 //
 
@@ -52,17 +51,6 @@ ppdcVariable::~ppdcVariable()
 
   name->release();
   value->release();
-}
-
-
-//
-// 'ppdcVariable::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcVariable::class_name()
-{
-  return ("ppdcVariable");
 }
 
 

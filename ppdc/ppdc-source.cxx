@@ -17,7 +17,6 @@
 //   ppdcSource::ppdcSource()         - Load a driver source file.
 //   ppdcSource::~ppdcSource()        - Free a driver source file.
 //   ppdcSource::add_include()        - Add an include directory.
-//   ppdcSource::class_name()         - Return the name of the class.
 //   ppdcSource::find_driver()        - Find a driver.
 //   ppdcSource::find_include()       - Find an include file.
 //   ppdcSource::find_po()            - Find a message catalog for the given
@@ -147,17 +146,6 @@ ppdcSource::add_include(const char *d)	// I - Include directory
     includes = new ppdcArray();
 
   includes->add(new ppdcString(d));
-}
-
-
-//
-// 'ppdcSource::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcSource::class_name()
-{
-  return ("ppdcSource");
 }
 
 

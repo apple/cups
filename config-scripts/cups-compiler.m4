@@ -36,12 +36,14 @@ fi
 dnl Debug printfs can slow things down, so provide a separate option for that
 if test x$enable_debug_printfs = xyes; then
 	CFLAGS="$CFLAGS -DDEBUG"
+	CXXFLAGS="$CXXFLAGS -DDEBUG"
 fi
 
 dnl Debug guards use an extra 4 bytes for some structures like strings in the
 dnl string pool, so provide a separate option for that
 if test x$enable_debug_guards = xyes; then
 	CFLAGS="$CFLAGS -DDEBUG_GUARDS"
+	CXXFLAGS="$CXXFLAGS -DDEBUG_GUARDS"
 fi
 
 dnl Unit tests take up time during a compile...

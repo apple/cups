@@ -16,7 +16,6 @@
 //
 //   ppdcAttr::ppdcAttr()   - Create an attribute.
 //   ppdcAttr::~ppdcAttr()  - Destroy an attribute.
-//   ppdcAttr::class_name() - Return the name of the class.
 //
 
 //
@@ -59,17 +58,6 @@ ppdcAttr::~ppdcAttr()
   selector->release();
   text->release();
   value->release();
-}
-
-
-//
-// 'ppdcAttr::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcAttr::class_name()
-{
-  return ("ppdcAttr");
 }
 
 

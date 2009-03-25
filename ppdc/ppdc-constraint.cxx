@@ -16,7 +16,6 @@
 //
 //   ppdcConstraint::ppdcConstraint()  - Create a constraint.
 //   ppdcConstraint::~ppdcConstraint() - Destroy a constraint.
-//   ppdcConstraint::class_name()      - Return the name of the class.
 //
 
 //
@@ -57,17 +56,6 @@ ppdcConstraint::~ppdcConstraint()
   choice1->release();
   option2->release();
   choice2->release();
-}
-
-
-//
-// 'ppdcConstraint::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcConstraint::class_name()
-{
-  return ("ppdcConstraint");
 }
 
 

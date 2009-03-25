@@ -16,7 +16,6 @@
 //
 //   ppdcString::ppdcString()  - Create a shared string.
 //   ppdcString::~ppdcString() - Destroy a shared string.
-//   ppdcString::class_name()  - Return the name of the class.
 //
 
 //
@@ -55,17 +54,6 @@ ppdcString::~ppdcString()
 
   if (value)
     delete[] value;
-}
-
-
-//
-// 'ppdcString::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcString::class_name()
-{
-  return ("ppdcString");
 }
 
 

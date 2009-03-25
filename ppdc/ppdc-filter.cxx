@@ -16,7 +16,6 @@
 //
 //   ppdcFilter::ppdcFilter()  - Create a filter.
 //   ppdcFilter::~ppdcFilter() - Destroy a filter.
-//   ppdcFilter::class_name()  - Return the name of the class.
 //
 
 //
@@ -53,17 +52,6 @@ ppdcFilter::~ppdcFilter()
 
   mime_type->release();
   program->release();
-}
-
-
-//
-// 'ppdcFilter::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcFilter::class_name()
-{
-  return ("ppdcFilter");
 }
 
 

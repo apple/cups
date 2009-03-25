@@ -16,7 +16,6 @@
 //
 //   ppdcMessage::ppdcMessage()  - Create a shared message.
 //   ppdcMessage::~ppdcMessage() - Destroy a shared message.
-//   ppdcMessage::class_name()   - Return the name of the class.
 //
 
 //
@@ -51,17 +50,6 @@ ppdcMessage::~ppdcMessage()
 
   id->release();
   string->release();
-}
-
-
-//
-// 'ppdcMessage::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcMessage::class_name()
-{
-  return ("ppdcMessage");
 }
 
 

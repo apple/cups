@@ -16,7 +16,6 @@
 //
 //   ppdcFont::ppdcFont()   - Create a shared font.
 //   ppdcFont::~ppdcFont()  - Destroy a shared font.
-//   ppdcFont::class_name() - Return the name of the class.
 //
 
 //
@@ -59,17 +58,6 @@ ppdcFont::~ppdcFont()
   encoding->release();
   version->release();
   charset->release();
-}
-
-
-//
-// 'ppdcFont::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcFont::class_name()
-{
-  return ("ppdcFont");
 }
 
 

@@ -16,7 +16,6 @@
 //
 //   ppdcOption::ppdcOption()    - Copy a new option.
 //   ppdcOption::~ppdcOption()   - Destroy an option.
-//   ppdcOption::class_name()    - Return the name of the class.
 //   ppdcOption::find_choice()   - Find an option choice.
 //   ppdcOption::set_defchoice() - Set the default choice.
 //
@@ -87,17 +86,6 @@ ppdcOption::~ppdcOption()
   if (defchoice)
     defchoice->release();
   choices->release();
-}
-
-
-//
-// 'ppdcOption::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcOption::class_name()
-{
-  return ("ppdcOption");
 }
 
 

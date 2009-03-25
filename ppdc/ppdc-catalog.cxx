@@ -17,7 +17,6 @@
 //   ppdcCatalog::ppdcCatalog()   - Create a shared message catalog.
 //   ppdcCatalog::~ppdcCatalog()  - Destroy a shared message catalog.
 //   ppdcCatalog::add_message()   - Add a new message.
-//   ppdcCatalog::class_name()    - Return the name of the class.
 //   ppdcCatalog::find_message()  - Find a message in a catalog...
 //   ppdcCatalog::load_messages() - Load messages from a .po file.
 //   ppdcCatalog::save_messages() - Save the messages to a .po file.
@@ -156,17 +155,6 @@ ppdcCatalog::add_message(
   }
 
   messages->add(new ppdcMessage(id, string));
-}
-
-
-//
-// 'ppdcCatalog::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcCatalog::class_name()
-{
-  return ("ppdcCatalog");
 }
 
 

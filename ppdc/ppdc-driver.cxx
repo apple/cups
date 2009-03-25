@@ -16,7 +16,6 @@
 //
 //   ppdcDriver::ppdcDriver()           - Create a new printer driver.
 //   ppdcDriver::~ppdcDriver()          - Destroy a printer driver.
-//   ppdcDriver::class_name()           - Return the name of the class.
 //   ppdcDriver::find_attr()            - Find an attribute.
 //   ppdcDriver::find_group()           - Find a group.
 //   ppdcDriver::find_option()          - Find an option.
@@ -174,17 +173,6 @@ ppdcDriver::~ppdcDriver()
   groups->release();
   profiles->release();
   sizes->release();
-}
-
-
-//
-// 'ppdcDriver::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcDriver::class_name()
-{
-  return ("ppdcDriver");
 }
 
 

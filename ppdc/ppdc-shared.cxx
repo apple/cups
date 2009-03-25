@@ -16,7 +16,6 @@
 //
 //   ppdcShared::ppdcShared()  - Create shared data.
 //   ppdcShared::~ppdcShared() - Destroy shared data.
-//   ppdcShared::class_name()  - Return the name of the class.
 //   ppdcShared::release()     - Decrement the use count and delete as needed.
 //   ppdcShared::retain()      - Increment the use count for this data.
 //

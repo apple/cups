@@ -16,7 +16,6 @@
 //
 //   ppdcGroup::ppdcGroup()   - Copy a new group.
 //   ppdcGroup::~ppdcGroup()  - Destroy a group.
-//   ppdcGroup::class_name()  - Return the name of the class.
 //   ppdcGroup::find_option() - Find an option in a group.
 //
 
@@ -76,17 +75,6 @@ ppdcGroup::~ppdcGroup()
   name->release();
   text->release();
   options->release();
-}
-
-
-//
-// 'ppdcGroup::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcGroup::class_name()
-{
-  return ("ppdcGroup");
 }
 
 

@@ -16,7 +16,6 @@
 //
 //   ppdcChoice::ppdcChoice()  - Create a new option choice.
 //   ppdcChoice::~ppdcChoice() - Destroy an option choice.
-//   ppdcChoice::class_name()  - Return the name of the class.
 //
 
 //
@@ -54,17 +53,6 @@ ppdcChoice::~ppdcChoice()
   name->release();
   text->release();
   code->release();
-}
-
-
-//
-// 'ppdcChoice::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcChoice::class_name()
-{
-  return ("ppdcChoice");
 }
 
 

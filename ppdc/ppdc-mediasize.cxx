@@ -16,7 +16,6 @@
 //
 //   ppdcMediaSize::ppdcMediaSize()  - Create a new media size.
 //   ppdcMediaSize::~ppdcMediaSize() - Destroy a media size.
-//   ppdcMediaSize::class_name()     - Return the name of the class.
 //
 
 //
@@ -78,17 +77,6 @@ ppdcMediaSize::~ppdcMediaSize()
   text->release();
   size_code->release();
   region_code->release();
-}
-
-
-//
-// 'ppdcMediaSize::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcMediaSize::class_name()
-{
-  return ("ppdcMediaSize");
 }
 
 

@@ -17,7 +17,6 @@
 //   ppdcArray::ppdcArray()  - Create a new array.
 //   ppdcArray::~ppdcArray() - Destroy an array.
 //   ppdcArray::add()        - Add an element to an array.
-//   ppdcArray::class_name() - Return the name of the class.
 //   ppdcArray::first()      - Return the first element in the array.
 //   ppdcArray::next()       - Return the next element in the array.
 //   ppdcArray::remove()     - Remove an element from the array.
@@ -106,17 +105,6 @@ ppdcArray::add(ppdcShared *d)
   }
 
   data[count++] = d;
-}
-
-
-//
-// 'ppdcArray::class_name()' - Return the name of the class.
-//
-
-const char *
-ppdcArray::class_name()
-{
-  return ("ppdcArray");
 }
 
 
