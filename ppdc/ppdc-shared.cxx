@@ -3,7 +3,7 @@
 //
 //   Shared data class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -16,6 +16,7 @@
 //
 //   ppdcShared::ppdcShared()  - Create shared data.
 //   ppdcShared::~ppdcShared() - Destroy shared data.
+//   ppdcShared::class_name()  - Return the name of the class.
 //   ppdcShared::release()     - Decrement the use count and delete as needed.
 //   ppdcShared::retain()      - Increment the use count for this data.
 //
@@ -53,6 +54,10 @@ ppdcShared::~ppdcShared()
 void
 ppdcShared::release(void)
 {
+#ifdef DEBUG
+  fprintf(stderr, "DEBUG: %p release %s use=%d\n", this, class_name(), use);
+#endif // DEBUG
+
   use --;
   if (!use)
     delete this;
@@ -67,6 +72,10 @@ void
 ppdcShared::retain()
 {
   use ++;
+
+#ifdef DEBUG
+  fprintf(stderr, "DEBUG: %p retain %s use=%d\n", this, class_name(), use);
+#endif // DEBUG
 }
 
 

@@ -3,7 +3,7 @@
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -17,6 +17,7 @@
 //   ppdcCatalog::ppdcCatalog()   - Create a shared message catalog.
 //   ppdcCatalog::~ppdcCatalog()  - Destroy a shared message catalog.
 //   ppdcCatalog::add_message()   - Add a new message.
+//   ppdcCatalog::class_name()    - Return the name of the class.
 //   ppdcCatalog::find_message()  - Find a message in a catalog...
 //   ppdcCatalog::load_messages() - Load messages from a .po file.
 //   ppdcCatalog::save_messages() - Save the messages to a .po file.
@@ -69,6 +70,8 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 					// Global information
 
 
+  PPDC_NEW;
+
   locale   = new ppdcString(l);
   filename = new ppdcString(f);
   messages = new ppdcArray();
@@ -106,6 +109,8 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 ppdcCatalog::~ppdcCatalog()
 {
+  PPDC_DELETE;
+
   locale->release();
   filename->release();
   messages->release();
@@ -151,6 +156,17 @@ ppdcCatalog::add_message(
   }
 
   messages->add(new ppdcMessage(id, string));
+}
+
+
+//
+// 'ppdcCatalog::class_name()' - Return the name of the class.
+//
+
+const char *
+ppdcCatalog::class_name()
+{
+  return ("ppdcCatalog");
 }
 
 

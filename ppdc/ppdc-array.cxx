@@ -3,7 +3,7 @@
 //
 //   Array class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -17,6 +17,7 @@
 //   ppdcArray::ppdcArray()  - Create a new array.
 //   ppdcArray::~ppdcArray() - Destroy an array.
 //   ppdcArray::add()        - Add an element to an array.
+//   ppdcArray::class_name() - Return the name of the class.
 //   ppdcArray::first()      - Return the first element in the array.
 //   ppdcArray::next()       - Return the next element in the array.
 //   ppdcArray::remove()     - Remove an element from the array.
@@ -34,7 +35,10 @@
 //
 
 ppdcArray::ppdcArray(ppdcArray *a)
+  : ppdcShared()
 {
+  PPDC_NEW;
+
   if (a)
   {
     count = a->count;
@@ -70,6 +74,8 @@ ppdcArray::ppdcArray(ppdcArray *a)
 
 ppdcArray::~ppdcArray()
 {
+  PPDC_DELETE;
+
   for (int i = 0; i < count; i ++)
     data[i]->release();
 
@@ -99,8 +105,18 @@ ppdcArray::add(ppdcShared *d)
     data = temp;
   }
 
-  d->retain();
   data[count++] = d;
+}
+
+
+//
+// 'ppdcArray::class_name()' - Return the name of the class.
+//
+
+const char *
+ppdcArray::class_name()
+{
+  return ("ppdcArray");
 }
 
 

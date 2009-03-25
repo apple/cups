@@ -3,7 +3,7 @@
 //
 //   Group class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -14,9 +14,9 @@
 //
 // Contents:
 //
-//   ppdcGroup::ppdcGroup()   - Create a new group.
 //   ppdcGroup::ppdcGroup()   - Copy a new group.
 //   ppdcGroup::~ppdcGroup()  - Destroy a group.
+//   ppdcGroup::class_name()  - Return the name of the class.
 //   ppdcGroup::find_option() - Find an option in a group.
 //
 
@@ -34,6 +34,8 @@
 ppdcGroup::ppdcGroup(const char *n,	// I - Name of group
                      const char *t)	// I - Text of group
 {
+  PPDC_NEW;
+
   name    = new ppdcString(n);
   text    = new ppdcString(t);
   options = new ppdcArray();
@@ -48,6 +50,8 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
 {
   ppdcOption	*o;			// Current option
 
+
+  PPDC_NEW;
 
   g->name->retain();
   g->text->retain();
@@ -67,9 +71,22 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
 
 ppdcGroup::~ppdcGroup()
 {
+  PPDC_DELETE;
+
   name->release();
   text->release();
   options->release();
+}
+
+
+//
+// 'ppdcGroup::class_name()' - Return the name of the class.
+//
+
+const char *
+ppdcGroup::class_name()
+{
+  return ("ppdcGroup");
 }
 
 

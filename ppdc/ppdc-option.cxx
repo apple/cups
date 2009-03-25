@@ -3,7 +3,7 @@
 //
 //   Option class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -14,9 +14,9 @@
 //
 // Contents:
 //
-//   ppdcOption::ppdcOption()    - Create a new option.
 //   ppdcOption::ppdcOption()    - Copy a new option.
 //   ppdcOption::~ppdcOption()   - Destroy an option.
+//   ppdcOption::class_name()    - Return the name of the class.
 //   ppdcOption::find_choice()   - Find an option choice.
 //   ppdcOption::set_defchoice() - Set the default choice.
 //
@@ -37,9 +37,9 @@ ppdcOption::ppdcOption(ppdcOptType    ot,	// I - Option type
 		       const char     *t,	// I - Option text
 		       ppdcOptSection s,	// I - Section
                        float          o)	// I - Ordering number
+  : ppdcShared()
 {
-//  printf("ppdcOption(ot=%d, n=\"%s\", t=\"%s\"), this=%p\n",
-//         ot, n, t, this);
+  PPDC_NEW;
 
   type      = ot;
   name      = new ppdcString(n);
@@ -57,6 +57,8 @@ ppdcOption::ppdcOption(ppdcOptType    ot,	// I - Option type
 
 ppdcOption::ppdcOption(ppdcOption *o)		// I - Template option
 {
+  PPDC_NEW;
+
   o->name->retain();
   o->text->retain();
   if (o->defchoice)
@@ -78,11 +80,24 @@ ppdcOption::ppdcOption(ppdcOption *o)		// I - Template option
 
 ppdcOption::~ppdcOption()
 {
+  PPDC_DELETE;
+
   name->release();
   text->release();
   if (defchoice)
     defchoice->release();
   choices->release();
+}
+
+
+//
+// 'ppdcOption::class_name()' - Return the name of the class.
+//
+
+const char *
+ppdcOption::class_name()
+{
+  return ("ppdcOption");
 }
 
 
