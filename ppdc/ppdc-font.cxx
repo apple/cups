@@ -3,7 +3,7 @@
 //
 //   Shared font class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -14,8 +14,8 @@
 //
 // Contents:
 //
-//   ppdcFont::ppdcFont()  - Create a shared font.
-//   ppdcFont::~ppdcFont() - Destroy a shared font.
+//   ppdcFont::ppdcFont()   - Create a shared font.
+//   ppdcFont::~ppdcFont()  - Destroy a shared font.
 //
 
 //
@@ -36,6 +36,8 @@ ppdcFont::ppdcFont(const char     *n,		// I - Name of font
         	   ppdcFontStatus s)		// I - Font status
   : ppdcShared()
 {
+  PPDC_NEW;
+
   name     = new ppdcString(n);
   encoding = new ppdcString(e);
   version  = new ppdcString(v);
@@ -50,6 +52,8 @@ ppdcFont::ppdcFont(const char     *n,		// I - Name of font
 
 ppdcFont::~ppdcFont()
 {
+  PPDC_DELETE;
+
   name->release();
   encoding->release();
   version->release();

@@ -3,7 +3,7 @@
 //
 //   Option choice class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -34,6 +34,8 @@ ppdcChoice::ppdcChoice(const char *n,	// I - Name of choice
 		       const char *c)	// I - Code of choice
   : ppdcShared()
 {
+  PPDC_NEW;
+
   name = new ppdcString(n);
   text = new ppdcString(t);
   code = new ppdcString(c);
@@ -46,6 +48,8 @@ ppdcChoice::ppdcChoice(const char *n,	// I - Name of choice
 
 ppdcChoice::~ppdcChoice()
 {
+  PPDC_DELETE;
+
   name->release();
   text->release();
   code->release();

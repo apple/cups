@@ -3,7 +3,7 @@
 //
 //   Shared media size class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -41,6 +41,8 @@ ppdcMediaSize::ppdcMediaSize(const char *n,	// I - Name of media size
 			     const char *rc)	// I - PageRegion code, if any
   : ppdcShared()
 {
+  PPDC_NEW;
+
   name        = new ppdcString(n);
   text        = new ppdcString(t);
   width       = w;
@@ -69,6 +71,8 @@ ppdcMediaSize::ppdcMediaSize(const char *n,	// I - Name of media size
 
 ppdcMediaSize::~ppdcMediaSize()
 {
+  PPDC_DELETE;
+
   name->release();
   text->release();
   size_code->release();

@@ -28,6 +28,23 @@
 
 
 //
+// Macros...
+//
+
+#  ifdef DEBUG
+#    define PPDC_NAME(s)	const char *class_name() { return (s); }
+#    define PPDC_NEW		fprintf(stderr, "DEBUG: %p new %s\n", this, class_name())
+#    define PPDC_NEWVAL(s)	fprintf(stderr, "DEBUG: %p new %s(\"%s\")\n", this, class_name(), s)
+#    define PPDC_DELETE		fprintf(stderr, "DEBUG: %p delete %s\n", this, class_name())
+#  else
+#    define PPDC_NAME(s)
+#    define PPDC_NEW
+#    define PPDC_NEWVAL(s)
+#    define PPDC_DELETE
+#  endif // DEBUG
+
+
+//
 // Enumerations...
 //
 
@@ -96,6 +113,10 @@ class ppdcShared			//// Shared Data Value
   ppdcShared();
   virtual ~ppdcShared();
 
+#  ifdef DEBUG
+  virtual const char *class_name() = 0;
+#  endif // DEBUG
+
   void		retain();
   void		release();
 };
@@ -113,6 +134,8 @@ class ppdcArray				//// Shared Array
   ppdcArray(ppdcArray *a = 0);
   ~ppdcArray();
 
+  PPDC_NAME("ppdcArray")
+
   void		add(ppdcShared *d);
   ppdcShared	*first();
   ppdcShared	*next();
@@ -128,6 +151,8 @@ class ppdcString			//// Shared String
 
   ppdcString(const char *v);
   ~ppdcString();
+
+  PPDC_NAME("ppdcString")
 };
 
 class ppdcInteger			//// Shared integer
@@ -138,6 +163,8 @@ class ppdcInteger			//// Shared integer
   int		*value;			// Integer value
 
   ppdcInteger(int *v) { value = v; }
+
+  PPDC_NAME("ppdcInteger")
 };
 
 class ppdcMessage			//// Translation message
@@ -150,6 +177,8 @@ class ppdcMessage			//// Translation message
 
   ppdcMessage(const char *i, const char *s);
   ~ppdcMessage();
+
+  PPDC_NAME("ppdcMessage")
 };
 
 class ppdcCatalog			//// Translation catalog
@@ -163,6 +192,8 @@ class ppdcCatalog			//// Translation catalog
 
   ppdcCatalog(const char *l, const char *f = 0);
   ~ppdcCatalog();
+
+  PPDC_NAME("ppdcCatalog")
 
   void		add_message(const char *id, const char *string = NULL);
   const char	*find_message(const char *id);
@@ -184,6 +215,8 @@ class ppdcAttr				//// Attribute
   ppdcAttr(const char *n, const char *s, const char *t, const char *v,
            bool loc = false);
   ~ppdcAttr();
+
+  PPDC_NAME("ppdcAttr")
 };
 
 class ppdcFont				//// Shared Font
@@ -200,6 +233,8 @@ class ppdcFont				//// Shared Font
   ppdcFont(const char *n, const char *e, const char *v, const char *c,
            ppdcFontStatus s);
   ~ppdcFont();
+
+  PPDC_NAME("ppdcFont")
 };
 
 class ppdcChoice			//// Option Choice
@@ -213,6 +248,8 @@ class ppdcChoice			//// Option Choice
 
   ppdcChoice(const char *n, const char *t, const char *c);
   ~ppdcChoice();
+
+  PPDC_NAME("ppdcChoice")
 };
 
 class ppdcOption			//// Option
@@ -233,6 +270,8 @@ class ppdcOption			//// Option
   ppdcOption(ppdcOption *o);
   ~ppdcOption();
 
+  PPDC_NAME("ppdcOption")
+
   void		add_choice(ppdcChoice *c) { choices->add(c); }
   ppdcChoice	*find_choice(const char *n);
   void		set_defchoice(ppdcChoice *c);
@@ -251,6 +290,8 @@ class ppdcGroup			//// Group of Options
   ppdcGroup(ppdcGroup *g);
   ~ppdcGroup();
 
+  PPDC_NAME("ppdcGroup")
+
   void		add_option(ppdcOption *o) { options->add(o); }
   ppdcOption	*find_option(const char *n);
 };
@@ -268,6 +309,8 @@ class ppdcConstraint			//// Constraint
   ppdcConstraint(const char *o1, const char *c1, const char *o2,
 		 const char *c2);
   ~ppdcConstraint();
+
+  PPDC_NAME("ppdcConstraint")
 };
 
 class ppdcFilter			//// Filter Program
@@ -281,6 +324,8 @@ class ppdcFilter			//// Filter Program
 
   ppdcFilter(const char *t, const char *p, int c);
   ~ppdcFilter();
+
+  PPDC_NAME("ppdcFilter")
 };
 
 class ppdcMediaSize			//// Media Size
@@ -303,6 +348,8 @@ class ppdcMediaSize			//// Media Size
                 float lm, float bm, float rm, float tm,
 		const char *sc = 0, const char *rc = 0);
   ~ppdcMediaSize();
+
+  PPDC_NAME("ppdcMediaSize")
 };
 
 class ppdcProfile			//// Color Profile
@@ -318,6 +365,8 @@ class ppdcProfile			//// Color Profile
 
   ppdcProfile(const char *r, const char *m, float d, float g, const float *p);
   ~ppdcProfile();
+
+  PPDC_NAME("ppdcProfile")
 };
 
 class ppdcSource;
@@ -361,6 +410,8 @@ class ppdcDriver			//// Printer Driver Data
   ppdcDriver(ppdcDriver *d = 0);
   ~ppdcDriver();
 
+  PPDC_NAME("ppdcDriver")
+
   void		add_attr(ppdcAttr *a) { attrs->add(a); }
   void		add_constraint(ppdcConstraint *c) { constraints->add(c); }
   void		add_copyright(const char *c) {
@@ -401,6 +452,8 @@ class ppdcVariable			//// Variable Definition
   ppdcVariable(const char *n, const char *v);
   ~ppdcVariable();
 
+  PPDC_NAME("ppdcVariable")
+
   void		set_value(const char *v);
 };
 
@@ -440,6 +493,8 @@ class ppdcSource			//// Source File
 
   ppdcSource(const char *f = 0, cups_file_t *ffp = (cups_file_t *)0);
   ~ppdcSource();
+
+  PPDC_NAME("ppdcSource")
 
   static void	add_include(const char *d);
   ppdcDriver	*find_driver(const char *f);

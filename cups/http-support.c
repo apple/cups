@@ -1238,6 +1238,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
     case HTTP_SERVICE_UNAVAILABLE :
         s = _("Service Unavailable");
 	break;
+    case HTTP_SERVER_ERROR :
+        s = _("Internal Server Error");
+	break;
 
     default :
         s = _("Unknown");

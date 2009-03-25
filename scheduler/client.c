@@ -17,30 +17,32 @@
  *
  * Contents:
  *
- *   cupsdAcceptClient()     - Accept a new client.
- *   cupsdCloseAllClients()  - Close all remote clients immediately.
- *   cupsdCloseClient()      - Close a remote client.
- *   cupsdFlushHeader()      - Flush the header fields to the client.
- *   cupsdReadClient()       - Read data from a client.
- *   cupsdSendCommand()      - Send output from a command via HTTP.
- *   cupsdSendError()        - Send an error message via HTTP.
- *   cupsdSendHeader()       - Send an HTTP request.
- *   cupsdUpdateCGI()        - Read status messages from CGI scripts and programs.
- *   cupsdWriteClient()      - Write data to a client as needed.
- *   check_if_modified()     - Decode an "If-Modified-Since" line.
- *   compare_clients()       - Compare two client connections.
- *   data_ready()            - Check whether data is available from a client.
- *   encrypt_client()        - Enable encryption for the client...
- *   get_cdsa_certificate()  - Convert a keychain name into the CFArrayRef
- *			       required by SSLSetCertificate.
- *   get_file()              - Get a filename and state info.
- *   install_conf_file()     - Install a configuration file.
- *   is_cgi()                - Is the resource a CGI script/program?
- *   is_path_absolute()      - Is a path absolute and free of relative elements.
- *   make_certificate()      - Make a self-signed SSL/TLS certificate.
- *   pipe_command()          - Pipe the output of a command to the remote client.
- *   write_file()            - Send a file via HTTP.
- *   write_pipe()            - Flag that data is available on the CGI pipe.
+ *   cupsdAcceptClient()    - Accept a new client.
+ *   cupsdCloseAllClients() - Close all remote clients immediately.
+ *   cupsdCloseClient()     - Close a remote client.
+ *   cupsdFlushHeader()     - Flush the header fields to the client.
+ *   cupsdReadClient()      - Read data from a client.
+ *   cupsdSendCommand()     - Send output from a command via HTTP.
+ *   cupsdSendError()       - Send an error message via HTTP.
+ *   cupsdSendHeader()      - Send an HTTP request.
+ *   cupsdUpdateCGI()       - Read status messages from CGI scripts and
+ *                            programs.
+ *   cupsdWriteClient()     - Write data to a client as needed.
+ *   check_if_modified()    - Decode an "If-Modified-Since" line.
+ *   compare_clients()      - Compare two client connections.
+ *   data_ready()           - Check whether data is available from a client.
+ *   encrypt_client()       - Enable encryption for the client...
+ *   get_cdsa_certificate() - Get a SSL/TLS certificate from the System
+ *                            keychain.
+ *   get_file()             - Get a filename and state info.
+ *   install_conf_file()    - Install a configuration file.
+ *   is_cgi()               - Is the resource a CGI script/program?
+ *   is_path_absolute()     - Is a path absolute and free of relative elements
+ *                            (i.e. "..").
+ *   make_certificate()     - Make a self-signed SSL/TLS certificate.
+ *   pipe_command()         - Pipe the output of a command to the remote client.
+ *   write_file()           - Send a file via HTTP.
+ *   write_pipe()           - Flag that data is available on the CGI pipe.
  */
 
 /*
@@ -2817,16 +2819,21 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   if (bytes <= 0 ||
       (con->http.state != HTTP_GET_SEND && con->http.state != HTTP_POST_SEND))
   {
-    cupsdLogRequest(con, HTTP_OK);
-
-    httpFlushWrite(HTTP(con));
-
-    if (con->http.data_encoding == HTTP_ENCODE_CHUNKED && con->sent_header == 1)
+    if (!con->sent_header && !con->response)
+      cupsdSendError(con, HTTP_SERVER_ERROR, CUPSD_AUTH_NONE);
+    else
     {
-      if (httpWrite2(HTTP(con), "", 0) < 0)
+      cupsdLogRequest(con, HTTP_OK);
+
+      httpFlushWrite(HTTP(con));
+
+      if (con->http.data_encoding == HTTP_ENCODE_CHUNKED && con->sent_header == 1)
       {
-        cupsdCloseClient(con);
-	return;
+	if (httpWrite2(HTTP(con), "", 0) < 0)
+	{
+	  cupsdCloseClient(con);
+	  return;
+	}
       }
     }
 

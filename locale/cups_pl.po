@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-13 15:08-0700\n"
+"POT-Creation-Date: 2009-03-23 14:56-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -3182,6 +3182,9 @@ msgstr "Intellitech"
 
 msgid "Interlock open."
 msgstr "Rygiel jest otwarty."
+
+msgid "Internal Server Error"
+msgstr ""
 
 msgid "Internal error"
 msgstr "Błąd wewnętrzny"

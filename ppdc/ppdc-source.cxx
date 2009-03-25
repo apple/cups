@@ -19,6 +19,8 @@
 //   ppdcSource::add_include()        - Add an include directory.
 //   ppdcSource::find_driver()        - Find a driver.
 //   ppdcSource::find_include()       - Find an include file.
+//   ppdcSource::find_po()            - Find a message catalog for the given
+//                                      locale...
 //   ppdcSource::find_size()          - Find a media size.
 //   ppdcSource::find_variable()      - Find a variable.
 //   ppdcSource::get_attr()           - Get an attribute.
@@ -29,18 +31,19 @@
 //   ppdcSource::get_color_profile()  - Get a color profile definition.
 //   ppdcSource::get_color_space()    - Get an old-style colorspace value.
 //   ppdcSource::get_constraint()     - Get a constraint.
-//   ppdcSource::get_custom_size()    - Get a custom media size definition
-//                                      from a file.
+//   ppdcSource::get_custom_size()    - Get a custom media size definition from
+//                                      a file.
+//   ppdcSource::get_duplex()         - Get a duplex option.
 //   ppdcSource::get_filter()         - Get a filter.
 //   ppdcSource::get_float()          - Get a single floating-point number.
 //   ppdcSource::get_font()           - Get a font definition.
 //   ppdcSource::get_generic()        - Get a generic old-style option.
 //   ppdcSource::get_group()          - Get an option group.
 //   ppdcSource::get_installable()    - Get an installable option.
-//   ppdcSource::get_integer()        - Get an integer value from a string.
 //   ppdcSource::get_integer()        - Get an integer value from a file.
 //   ppdcSource::get_measurement()    - Get a measurement value.
 //   ppdcSource::get_option()         - Get an option definition.
+//   ppdcSource::get_po()             - Get a message catalog.
 //   ppdcSource::get_resolution()     - Get an old-style resolution option.
 //   ppdcSource::get_simple_profile() - Get a simple color profile definition.
 //   ppdcSource::get_size()           - Get a media size definition from a file.
@@ -93,7 +96,10 @@ const char	*ppdcSource::driver_types[] =
 
 ppdcSource::ppdcSource(const char  *f,	// I - File to read
                        cups_file_t *ffp)// I - File pointer to use
+  : ppdcShared()
 {
+  PPDC_NEW;
+
   filename      = new ppdcString(f);
   base_fonts    = new ppdcArray();
   drivers       = new ppdcArray();
@@ -115,6 +121,8 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
 
 ppdcSource::~ppdcSource()
 {
+  PPDC_DELETE;
+
   filename->release();
   base_fonts->release();
   drivers->release();

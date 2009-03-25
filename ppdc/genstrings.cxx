@@ -7,7 +7,7 @@
 //   the standard media and sample driver strings.  The results are picked up
 //   by GNU gettext and placed in the CUPS message catalog.
 //
-//   Copyright 2008 by Apple Inc.
+//   Copyright 2008-2009 by Apple Inc.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Apple Inc. and are protected by Federal copyright
@@ -90,6 +90,9 @@ main(void)
        message;
        message = (ppdcMessage *)catalog->messages->next())
     write_cstring(message->id->value);
+
+  src->release();
+  catalog->release();
 
   // Return with no errors.
   return (0);

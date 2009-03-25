@@ -3,7 +3,7 @@
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -69,6 +69,8 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 					// Global information
 
 
+  PPDC_NEW;
+
   locale   = new ppdcString(l);
   filename = new ppdcString(f);
   messages = new ppdcArray();
@@ -106,6 +108,8 @@ ppdcCatalog::ppdcCatalog(const char *l,	// I - Locale
 
 ppdcCatalog::~ppdcCatalog()
 {
+  PPDC_DELETE;
+
   locale->release();
   filename->release();
   messages->release();

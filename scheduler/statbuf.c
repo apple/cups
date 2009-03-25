@@ -289,7 +289,7 @@ cupsdStatBufUpdate(
   if (sb->prefix[0])
   {
     if (*loglevel > CUPSD_LOG_NONE &&
-	(*loglevel != CUPSD_LOG_INFO || LogLevel == CUPSD_LOG_DEBUG2))
+	(*loglevel != CUPSD_LOG_INFO || LogLevel >= CUPSD_LOG_DEBUG))
     {
      /*
       * General status message; send it to the error_log file...
@@ -300,7 +300,7 @@ cupsdStatBufUpdate(
       else
 	cupsdLogMessage(*loglevel, "%s %s", sb->prefix, message);
     }
-    else if (*loglevel < CUPSD_LOG_NONE && LogLevel == CUPSD_LOG_DEBUG2)
+    else if (*loglevel < CUPSD_LOG_NONE && LogLevel >= CUPSD_LOG_DEBUG)
       cupsdLogMessage(CUPSD_LOG_DEBUG2, "%s %s", sb->prefix, sb->buffer);
   }
 

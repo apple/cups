@@ -3,7 +3,7 @@
 //
 //   Color profile class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -34,7 +34,10 @@ ppdcProfile::ppdcProfile(const char  *r,	// I - Resolution name
 			 float       d,		// I - Density
 			 float       g,		// I - Gamma
 			 const float *p)	// I - 3x3 transform matrix
+  : ppdcShared()
 {
+  PPDC_NEW;
+
   resolution = new ppdcString(r);
   media_type = new ppdcString(m);
   density    = d;
@@ -50,6 +53,8 @@ ppdcProfile::ppdcProfile(const char  *r,	// I - Resolution name
 
 ppdcProfile::~ppdcProfile()
 {
+  PPDC_DELETE;
+
   resolution->release();
   media_type->release();
 }

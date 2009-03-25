@@ -1,9 +1,14 @@
-CHANGES.txt - 2009-03-18
+CHANGES.txt - 2009-03-23
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- If a CGI process died before sending its MIME headers, the request
+	  would hang on the client.
+	- The printer/class/job search feature on the web interface did not
+	  work (STR #3132)
+	- The scheduler did not write the printers out for classes.
 	- CUPS-Get-PPDs did not work properly when filtering by language,
 	  product, or psversion (STR #3136)
 	- The scheduler now kills job filters when it takes more than 30 seconds

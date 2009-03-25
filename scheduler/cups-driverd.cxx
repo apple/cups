@@ -3,9 +3,9 @@
  *
  *   PPD/driver support for the Common UNIX Printing System (CUPS).
  *
- *   This program handles listing and installing both static PPD files
- *   in CUPS_DATADIR/model and dynamically generated PPD files using
- *   the driver helper programs in CUPS_SERVERBIN/driver.
+ *   This program handles listing and installing static PPD files, PPD files
+ *   created from driver information files, and dynamically generated PPD files
+ *   using driver helper programs.
  *
  *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
@@ -73,7 +73,8 @@ static const char * const ppd_types[] =	/* ppd-type values */
   "pdf",
   "raster",
   "fax",
-  "unknown"
+  "unknown",
+  "drv"
 };
 
 

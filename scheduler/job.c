@@ -4007,8 +4007,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 #endif /* __APPLE__ */
     else
     {
-      if (loglevel != CUPSD_LOG_INFO && loglevel > LogLevel)
-	cupsdLogJob(job, loglevel, "%s", message);
+      cupsdLogJob(job, loglevel, "%s", message);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {
@@ -4018,7 +4017,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
 	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 
-	if (loglevel <= job->status_level)
+	if (loglevel < job->status_level)
 	{
 	 /*
 	  * Some messages show in the job-printer-state-message attribute...

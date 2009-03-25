@@ -536,6 +536,7 @@ cupsResolveConflicts(
 
   cupsFreeOptions(num_newopts, newopts);
 
+  cupsArrayDelete(active);
   cupsArrayDelete(pass);
   cupsArrayDelete(resolvers);
 

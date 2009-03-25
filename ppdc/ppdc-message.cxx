@@ -3,7 +3,7 @@
 //
 //   Shared message class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -33,6 +33,8 @@ ppdcMessage::ppdcMessage(const char *i,	// I - ID
                          const char *s)	// I - Text
   : ppdcShared()
 {
+  PPDC_NEW;
+
   id     = new ppdcString(i);
   string = new ppdcString(s);
 }
@@ -44,6 +46,8 @@ ppdcMessage::ppdcMessage(const char *i,	// I - ID
 
 ppdcMessage::~ppdcMessage()
 {
+  PPDC_DELETE;
+
   id->release();
   string->release();
 }

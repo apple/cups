@@ -14,18 +14,20 @@
 //
 // Contents:
 //
-//   ppdcDriver::ppdcDriver()       - Create a new printer driver.
-//   ppdcDriver::~ppdcDriver()      - Destroy a printer driver.
-//   ppdcDriver::find_attr()        - Find an attribute.
-//   ppdcDriver::find_group()       - Find a group.
-//   ppdcDriver::find_option()      - Find an option.
-//   ppdcDriver::set_default_size() - Set the default size name.
-//   ppdcDriver::set_file_name()    - Set the full filename.
-//   ppdcDriver::set_manufacturer() - Set the manufacturer name.
-//   ppdcDriver::set_model_name()   - Set the model name.
-//   ppdcDriver::set_pc_file_name() - Set the PC filename.
-//   ppdcDriver::set_version()      - Set the version string.
-//   ppdcDriver::write_ppd_file()   - Write a PPD file...
+//   ppdcDriver::ppdcDriver()           - Create a new printer driver.
+//   ppdcDriver::~ppdcDriver()          - Destroy a printer driver.
+//   ppdcDriver::find_attr()            - Find an attribute.
+//   ppdcDriver::find_group()           - Find a group.
+//   ppdcDriver::find_option()          - Find an option.
+//   ppdcDriver::set_custom_size_code() - Set the custom page size code.
+//   ppdcDriver::set_default_font()     - Set the default font name.
+//   ppdcDriver::set_default_size()     - Set the default size name.
+//   ppdcDriver::set_file_name()        - Set the full filename.
+//   ppdcDriver::set_manufacturer()     - Set the manufacturer name.
+//   ppdcDriver::set_model_name()       - Set the model name.
+//   ppdcDriver::set_pc_file_name()     - Set the PC filename.
+//   ppdcDriver::set_version()          - Set the version string.
+//   ppdcDriver::write_ppd_file()       - Write a PPD file...
 //
 
 //
@@ -41,9 +43,12 @@
 //
 
 ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
+  : ppdcShared()
 {
   ppdcGroup	*g;			// Current group
 
+
+  PPDC_NEW;
 
   if (d)
   {
@@ -140,6 +145,8 @@ ppdcDriver::ppdcDriver(ppdcDriver *d)	// I - Printer driver template
 
 ppdcDriver::~ppdcDriver()
 {
+  PPDC_DELETE;
+
   copyright->release();
 
   if (manufacturer)

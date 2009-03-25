@@ -3,7 +3,7 @@
 //
 //   Filter class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -32,7 +32,10 @@
 ppdcFilter::ppdcFilter(const char *t,	// I - MIME type
 		       const char *p,	// I - Filter program
 		       int        c)	// I - Relative cost
+  : ppdcShared()
 {
+  PPDC_NEW;
+
   mime_type = new ppdcString(t);
   program   = new ppdcString(p);
   cost      = c;
@@ -45,6 +48,8 @@ ppdcFilter::ppdcFilter(const char *t,	// I - MIME type
 
 ppdcFilter::~ppdcFilter()
 {
+  PPDC_DELETE;
+
   mime_type->release();
   program->release();
 }

@@ -792,6 +792,9 @@ cupsdSaveAllClasses(void)
              pclass->job_sheets[1]);
     cupsFilePutConf(fp, "JobSheets", value);
 
+    for (i = 0; i < pclass->num_printers; i ++)
+      cupsFilePrintf(fp, "Printer %s\n", pclass->printers[i]->name);
+
     cupsFilePrintf(fp, "QuotaPeriod %d\n", pclass->quota_period);
     cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
     cupsFilePrintf(fp, "KLimit %d\n", pclass->k_limit);

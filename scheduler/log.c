@@ -200,7 +200,11 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   * See if we want to log this message...
   */
 
-  if (TestConfigFile || level > LogLevel || !ErrorLog)
+  if (TestConfigFile || !ErrorLog)
+    return (1);
+
+  if (level > LogLevel ||
+      (level == CUPSD_LOG_INFO && LogLevel < CUPSD_LOG_DEBUG))
     return (1);
 
  /*

@@ -266,7 +266,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     }
 
     if (status == HTTP_FORBIDDEN || status == HTTP_ERROR ||
-        status == HTTP_SERVICE_UNAVAILABLE)
+	status >= HTTP_SERVER_ERROR)
     {
       _cupsSetHTTPError(status);
       break;
