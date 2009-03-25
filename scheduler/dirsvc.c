@@ -2547,10 +2547,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 			printer_len;	/* LPD TXT record length */
   char			resource[1024];	/* Resource path for printer */
   const char		*regtype;	/* Registration type */
-  const char		*domain;   	/* Registration domain */
-  cupsd_location_t	*location,	/* Printer location */
-			*policy;	/* Operation policy for Print-Job */
-  unsigned		address[4];	/* INADDR_ANY address */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "dnssdRegisterPrinter(%s) %s", p->name,
@@ -2595,26 +2591,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     cupsdSetString(&p->reg_name, name);
     cupsArrayAdd(DNSSDPrinters, p);
   }
-
- /*
-  * If 'Allow printing from the Internet' is enabled (i.e. from any address)
-  * let dnssd decide on the domain, otherwise restrict it to ".local".
-  */
-
-  if (p->type & CUPS_PRINTER_CLASS)
-    snprintf(resource, sizeof(resource), "/classes/%s", p->name);
-  else
-    snprintf(resource, sizeof(resource), "/printers/%s", p->name);
-
-  address[0] = address[1] = address[2] = address[3] = 0;
-  location   = cupsdFindBest(resource, HTTP_POST);
-  policy     = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
-
-  if ((location && !cupsdCheckAccess(address, "", 0, location)) ||
-      (policy && !cupsdCheckAccess(address, "", 0, policy)))
-    domain = "local.";
-  else
-    domain = NULL;
 
  /*
   * Register IPP and (optionally) LPD...
@@ -2666,9 +2642,8 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
                                              "_ipp._tcp,_cups";
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		    "Registering DNS-SD printer %s with name \"%s\", "
-		    "type \"%s\", and domain \"%s\"", p->name, name, regtype,
-		    domain ? domain : "(null)");
+		    "Registering DNS-SD printer %s with name \"%s\" and "
+		    "type \"%s\"", p->name, name, regtype);
 
    /*
     * Register the queue, dropping characters as needed until we succeed...
@@ -2680,7 +2655,7 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
     {
       p->ipp_ref = DNSSDRef;
       if ((se = DNSServiceRegister(&p->ipp_ref, kDNSServiceFlagsShareConnection,
-                                   0, name, regtype, domain, NULL,
+                                   0, name, regtype, NULL, NULL,
 				   htons(DNSSDPort), ipp_len, ipp_txt,
 				   dnssdRegisterCallback,
 				   p)) == kDNSServiceErr_BadParam)
@@ -2763,14 +2738,13 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
       */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		      "Registering DNS-SD printer %s with name \"%s\", "
-		      "type \"_printer._tcp\", and domain \"%s\"", p->name,
-		      name, domain ? domain : "(null)");
+		      "Registering DNS-SD printer %s with name \"%s\" and "
+		      "type \"_printer._tcp\"", p->name, name);
 
       p->printer_ref = DNSSDRef;
       if ((se = DNSServiceRegister(&p->printer_ref,
                                    kDNSServiceFlagsShareConnection,
-				   0, name, "_printer._tcp", domain, NULL,
+				   0, name, "_printer._tcp", NULL, NULL,
 				   htons(515), printer_len, printer_txt,
 				   dnssdRegisterCallback,
 				   p)) == kDNSServiceErr_NoError)
