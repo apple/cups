@@ -362,10 +362,18 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Grab the default destination...
   */
 
+  if ((defprinter = getenv("LPDEST")) == NULL)
+    if ((defprinter = getenv("PRINTER")) != NULL)
+      if (!strcmp(defprinter, "lp"))
+        defprinter = NULL;
+
 #ifdef __APPLE__
-  if ((defprinter = appleGetDefault(name, sizeof(name))) == NULL)
+  if (!defprinter)
+    defprinter = appleGetDefault(name, sizeof(name));
 #endif /* __APPLE__ */
-  defprinter = cupsGetDefault2(http);
+
+  if (!defprinter)
+    defprinter = cupsGetDefault2(http);
 
   if (defprinter)
   {
@@ -1541,6 +1549,9 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 		*instance;		/* Instance of destination */
   int		linenum;		/* Current line number */
   const char	*printer;		/* PRINTER or LPDEST */
+#ifdef __APPLE__
+  char		apple_default[1024];	/* Location-specific default */
+#endif /* __APPLE__ */
 
 
   DEBUG_printf(("cups_get_dests(filename=\"%s\", match_name=\"%s\", "
@@ -1561,8 +1572,13 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
   if ((printer = getenv("LPDEST")) == NULL)
     if ((printer = getenv("PRINTER")) != NULL)
-      if (strcmp(printer, "lp") == 0)
+      if (!strcmp(printer, "lp"))
         printer = NULL;
+
+#ifdef __APPLE__
+  if (!printer)
+    printer = appleGetDefault(apple_default, sizeof(apple_default));
+#endif /* __APPLE__ */
 
   DEBUG_printf(("cups_get_dests: printer=\"%s\"\n",
                 printer ? printer : "(null)"));
