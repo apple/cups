@@ -458,21 +458,15 @@ cupsGetDefault2(http_t *http)		/* I - Connection to server or @code CUPS_HTTP_DE
   ipp_t		*request,		/* IPP Request */
 		*response;		/* IPP Response */
   ipp_attribute_t *attr;		/* Current attribute */
-  const char	*var;			/* Environment variable */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
  /*
-  * First see if the LPDEST or PRINTER environment variables are
-  * set...  However, if PRINTER is set to "lp", ignore it to work
-  * around a "feature" in most Linux distributions - the default
-  * user login scripts set PRINTER to "lp"...
+  * See if we have a user default printer set...
   */
 
-  if ((var = getenv("LPDEST")) != NULL)
-    return (var);
-  else if ((var = getenv("PRINTER")) != NULL && strcmp(var, "lp") != 0)
-    return (var);
+  if (_cupsUserDefault(cg->def_printer, sizeof(cg->def_printer)))
+    return (cg->def_printer);
 
  /*
   * Connect to the server as needed...
