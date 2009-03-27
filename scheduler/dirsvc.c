@@ -2545,7 +2545,6 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 			*nameptr;	/* Pointer into name */
   int			ipp_len,	/* IPP TXT record length */
 			printer_len;	/* LPD TXT record length */
-  char			resource[1024];	/* Resource path for printer */
   const char		*regtype;	/* Registration type */
 
 
