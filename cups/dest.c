@@ -1260,6 +1260,7 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
       CFPreferencesSetAppValue(kLocationHistoryArrayKey, newlocations,
                                kPMPrintingPreferences);
       CFPreferencesAppSynchronize(kPMPrintingPreferences);
+      notify_post("com.apple.printerPrefsChange");
     }
 
     if (newlocations)
