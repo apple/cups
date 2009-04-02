@@ -1419,7 +1419,14 @@ _httpResolveURI(
       uri = NULL;
 
     if (logit)
+    {
+      if (uri)
+        fputs("DEBUG: Unable to resolve URI!\n", stderr);
+      else
+        fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
+
       fputs("STATE: -connecting-to-device\n", stderr);
+    }
 
 #else
    /*
