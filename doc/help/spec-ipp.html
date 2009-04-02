@@ -2678,6 +2678,27 @@ are supported.</p>
 name for the printer. If the printer is not being shared using this protocol,
 printer-dns-sd-name will have the noValue value.</p>
 
+<h4><a name="printer-state-reasons">printer-state-reasons (1setOf type2 keyword)</a></h4>
+
+<p>The printer-state-reasons attribute provides additional persistent state
+information for a printer. In addition to the keywords defined in RFC 2911,
+CUPS supports vendor-specific keywords with a domain prefix ("com.vendor.foo")
+and the following CUPS-specific keywords:</p>
+
+<ul>
+
+	<li><tt>cups-insecure-filter-warning</tt> - a filter or backend (or the
+	directory containing the filter or backend) has insecure file
+	permissions. CUPS will not execute programs with world write permissions
+	or setuid programs. When run as root (the default), CUPS also does not
+	execute programs that are not owned by root.
+	<span class='info'>CUPS 1.4</span></li>
+
+	<li><tt>cups-missing-filter-warning</tt> - a filter or backend is not
+	installed. <span class='info'>CUPS 1.4</span></li>
+
+</ul>
+
 <h4><a name="printer-type">printer-type (type2 enum)</a></h4>
 
 <p>The printer-type attribute specifies printer type and

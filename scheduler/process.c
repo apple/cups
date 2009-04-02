@@ -250,7 +250,7 @@ cupsdStartProcess(
     int         sidefd,			/* I - Sidechannel file descriptor */
     int         root,			/* I - Run as root? */
     void        *profile,		/* I - Security profile to use */
-    int         job_id,			/* I - Job associated with process */
+    cupsd_job_t *job,			/* I - Job associated with process */
     int         *pid)			/* O - Process ID */
 {
   int		user;			/* Command UID */
@@ -280,28 +280,36 @@ cupsdStartProcess(
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
 		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    "profile=%p, job=%p(%d), pid=%p) = %d",
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job_id, pid, *pid);
+		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
                     strerror(errno));
+
+    if (job && job->printer)
+      cupsdSetPrinterReasons(job->printer, "+cups-missing-filter-warning");
+
     return (0);
   }
-  else if (commandinfo.st_mode & S_IWOTH)
+  else if (commandinfo.st_mode & (S_ISUID | S_IWOTH))
   {
     *pid = 0;
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
 		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    "profile=%p, job=%p(%d), pid=%p) = %d",
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job_id, pid, *pid);
+		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: insecure file permissions (0%o)",
 		    command, commandinfo.st_mode);
 
+    if (job && job->printer)
+      cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning");
+
     errno = EPERM;
+
     return (0);
   }
   else if ((commandinfo.st_uid != user || !(commandinfo.st_mode & S_IXUSR)) &&
@@ -313,9 +321,9 @@ cupsdStartProcess(
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		    "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
 		    "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		    "profile=%p, job_id=%d, pid=%p) = %d",
+		    "profile=%p, job=%p(%d), pid=%p) = %d",
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		    root, profile, job_id, pid, *pid);
+		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to execute %s: no execute permissions (0%o)",
 		    command, commandinfo.st_mode);
@@ -527,7 +535,7 @@ cupsdStartProcess(
       if ((proc = calloc(1, sizeof(cupsd_proc_t) + strlen(command))) != NULL)
       {
         proc->pid    = *pid;
-	proc->job_id = job_id;
+	proc->job_id = job ? job->id : 0;
 	strcpy(proc->name, command);
 
 	cupsArrayAdd(process_array, proc);
@@ -540,9 +548,9 @@ cupsdStartProcess(
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
 		  "cupsdStartProcess(command=\"%s\", argv=%p, envp=%p, "
 		  "infd=%d, outfd=%d, errfd=%d, backfd=%d, sidefd=%d, root=%d, "
-		  "profile=%p, job_id=%d, pid=%p) = %d",
+		  "profile=%p, job=%p(%d), pid=%p) = %d",
 		  command, argv, envp, infd, outfd, errfd, backfd, sidefd,
-		  root, profile, job_id, pid, *pid);
+		  root, profile, job, job ? job->id : 0, pid, *pid);
 
   return (*pid);
 }

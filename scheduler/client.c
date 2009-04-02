@@ -3985,8 +3985,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL, 0,
-                           &pid))
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
+                           NULL, &pid))
     {
       unlink(seedfile);
       return (0);
@@ -4064,7 +4064,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         0, &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4298,7 +4298,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         0, &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4842,7 +4842,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   */
 
   if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
-			-1, -1, root, DefaultProfile, 0, &pid) < 0)
+			-1, -1, root, DefaultProfile, NULL, &pid) < 0)
   {
    /*
     * Error - can't fork!
