@@ -1452,8 +1452,9 @@ _httpResolveURI(
 	  DNSServiceRefDeallocate(domainref);
 
 	DNSServiceRefDeallocate(localref);
-	DNSServiceRefDeallocate(ref);
       }
+
+      DNSServiceRefDeallocate(ref);
     }
 
     if (logit)
