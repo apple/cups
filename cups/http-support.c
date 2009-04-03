@@ -1420,14 +1420,14 @@ _httpResolveURI(
         if (strcasecmp(domain, "local."))
 	{
 	 /*
-	  * Wait 1 second for a response to the local resolve; if nothing comes
+	  * Wait 2 seconds for a response to the local resolve; if nothing comes
 	  * in, do an additional domain resolution...
 	  */
 
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
-	  if (poll(&polldata, 1, 1000) != 1)
+	  if (poll(&polldata, 1, 2000) != 1)
 	  {
 	   /*
 	    * OK, send the domain name resolve...
