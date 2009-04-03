@@ -250,9 +250,6 @@ main(int  argc,				/* I - Number of command-line args */
       cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
-      static const char * const schemes[] =
-      		{ "lpd", "ipp", "ipp", "socket", "riousbprint" };
-					/* URI schemes for devices */
 
 
       for (device = (cups_device_t *)cupsArrayFirst(devices),
@@ -304,7 +301,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    unquote(uriName, best->fullName, sizeof(uriName));
 
 	    httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			    schemes[best->type], NULL, uriName, 0,
+			    "dnssd", NULL, uriName, 0,
 			    best->cups_shared ? "/cups" : "/");
 
 	    cupsBackendReport("network", device_uri, best->make_and_model,
@@ -328,7 +325,7 @@ main(int  argc,				/* I - Number of command-line args */
 	unquote(uriName, best->fullName, sizeof(uriName));
 
 	httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			schemes[best->type], NULL, uriName, 0,
+			"dnssd", NULL, uriName, 0,
 			best->cups_shared ? "/cups" : "/");
 
 	cupsBackendReport("network", device_uri, best->make_and_model,
@@ -438,12 +435,7 @@ static int				/* O - Result of comparison */
 compare_devices(cups_device_t *a,	/* I - First device */
                 cups_device_t *b)	/* I - Second device */
 {
-  int result = strcmp(a->name, b->name);
-
-  if (result)
-    return (result);
-  else
-    return (strcmp(a->domain, b->domain));
+  return (strcmp(a->name, b->name));
 }
 
 
@@ -524,8 +516,7 @@ get_device(cups_array_t *devices,	/* I - Device array */
   * See if this is a new device...
   */
 
-  key.name   = (char *)serviceName;
-  key.domain = (char *)replyDomain;
+  key.name = (char *)serviceName;
 
   if (!strcmp(regtype, "_ipp._tcp.") ||
       !strcmp(regtype, "_ipp-tls._tcp."))
@@ -542,11 +533,29 @@ get_device(cups_array_t *devices,	/* I - Device array */
   for (device = cupsArrayFind(devices, &key);
        device;
        device = cupsArrayNext(devices))
-    if (strcasecmp(device->name, key.name) ||
-        strcasecmp(device->domain, key.domain))
+    if (strcasecmp(device->name, key.name))
       break;
     else if (device->type == key.type)
+    {
+      if (!strcasecmp(device->domain, "local.") &&
+          strcasecmp(device->domain, replyDomain))
+      {
+       /*
+        * Update the .local listing to use the "global" domain name instead.
+	* The backend will try local lookups first, then the global domain name.
+	*/
+
+        free(device->domain);
+	device->domain = strdup(replyDomain);
+
+	DNSServiceConstructFullName(fullName, device->name, regtype,
+	                            replyDomain);
+	free(device->fullName);
+	device->fullName = strdup(fullName);
+      }
+
       return (device);
+    }
 
  /*
   * Yes, add the device...

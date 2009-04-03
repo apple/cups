@@ -1895,6 +1895,7 @@ cupsdUpdateDNSSDName(void)
   DNSServiceErrorType error;		/* Error from service creation */
   char		webif[1024];		/* Web interface share name */
 #ifdef HAVE_COREFOUNDATION_H
+  SCDynamicStoreRef sc;			/* Context for dynamic store */
   CFStringRef	nameRef;		/* Computer name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
   CFStringEncoding nameEncoding;	/* Computer name encoding */
@@ -1914,21 +1915,27 @@ cupsdUpdateDNSSDName(void)
   */
 
 #ifdef HAVE_COREFOUNDATION_H
-  cupsdClearString(&DNSSDName);
+  sc = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("cupsd"), NULL, NULL);
 
-  if ((nameRef = SCDynamicStoreCopyComputerName(NULL,
-						&nameEncoding)) != NULL)
+  if (sc)
   {
-    if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
-			   kCFStringEncodingUTF8))
-      cupsdSetString(&DNSSDName, nameBuffer);
+    if ((nameRef = SCDynamicStoreCopyComputerName(sc,
+						  &nameEncoding)) != NULL)
+    {
+      if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
+			     kCFStringEncodingUTF8))
+	cupsdSetString(&DNSSDName, nameBuffer);
 
-    CFRelease(nameRef);
+      CFRelease(nameRef);
+    }
+    else
+      cupsdSetString(&DNSSDName, ServerName);
+
+    CFRelease(sc);
   }
-
-#else
-  cupsdSetString(&DNSSDName, ServerName);
+  else
 #endif	/* HAVE_COREFOUNDATION_H */
+  cupsdSetString(&DNSSDName, ServerName);
 
  /*
   * Then (re)register the web interface if enabled...
