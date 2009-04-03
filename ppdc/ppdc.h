@@ -3,7 +3,7 @@
 //
 //   Definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -20,28 +20,15 @@
 // Include necessary headers...
 //
 
-#  include <cups/string.h>
-
 #  include <cups/file.h>
 #  include <stdlib.h>
-#  include <errno.h>
 
 
 //
 // Macros...
 //
 
-#  ifdef DEBUG
-#    define PPDC_NAME(s)	const char *class_name() { return (s); }
-#    define PPDC_NEW		fprintf(stderr, "DEBUG: %p new %s\n", this, class_name())
-#    define PPDC_NEWVAL(s)	fprintf(stderr, "DEBUG: %p new %s(\"%s\")\n", this, class_name(), s)
-#    define PPDC_DELETE		fprintf(stderr, "DEBUG: %p delete %s\n", this, class_name())
-#  else
-#    define PPDC_NAME(s)
-#    define PPDC_NEW
-#    define PPDC_NEWVAL(s)
-#    define PPDC_DELETE
-#  endif // DEBUG
+#  define PPDC_NAME(s)	const char *class_name() { return (s); }
 
 
 //
@@ -113,9 +100,7 @@ class ppdcShared			//// Shared Data Value
   ppdcShared();
   virtual ~ppdcShared();
 
-#  ifdef DEBUG
   virtual const char *class_name() = 0;
-#  endif // DEBUG
 
   void		retain();
   void		release();

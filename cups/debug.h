@@ -19,6 +19,15 @@
 #  define _CUPS_DEBUG_H_
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+
+/*
  * The debug macros are used if you compile with DEBUG defined.
  *
  * Usage:
@@ -50,6 +59,9 @@ __attribute__ ((__format__ (__printf__, 1, 2)))
 ;
 extern void	_cups_debug_puts(const char *s);
 
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_DEBUG_H_ */
 

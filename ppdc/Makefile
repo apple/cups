@@ -312,9 +312,9 @@ testcatalog:		testcatalog.o libcupsppdc.a ../cups/libcups.a
 # libcupsppdc.so.1, libcupsppdc.sl.1
 #
 
-libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS)
+libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LIBS)
+	$(DSOXX) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS) $(LINKCUPS)
 	$(RM) `basename $@ .1`
 	$(LN) $@ `basename $@ .1`
 
@@ -323,7 +323,7 @@ libcupsppdc.so.1 libcupsppdc.sl.1:	$(LIBOBJS)
 # libcupsppdc.1.dylib
 #
 
-libcupsppdc.1.dylib:	$(LIBOBJS)
+libcupsppdc.1.dylib:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Creating export list for $@...
 	nm $(LIBOBJS) | grep "T __" | awk '{print $$3}' | sort >t.exp
 	echo Linking $@...
@@ -332,7 +332,7 @@ libcupsppdc.1.dylib:	$(LIBOBJS)
 		-current_version 1.0.0 \
 		-compatibility_version 1.0.0 \
 		-exported_symbols_list t.exp \
-		$(LIBOBJS) $(LIBS)
+		$(LIBOBJS) $(LINKCUPS)
 	$(RM) libcupsppdc.dylib t.exp
 	$(LN) $@ libcupsppdc.dylib
 
@@ -341,9 +341,9 @@ libcupsppdc.1.dylib:	$(LIBOBJS)
 # libcupsppdc_s.a
 #
 
-libcupsppdc_s.a:	$(LIBOBJS)
+libcupsppdc_s.a:	$(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Creating $@...
-	$(DSOXX) $(DSOFLAGS) -o libcupsppdc_s.o $(LIBOBJS) $(LIBS)
+	$(DSOXX) $(DSOFLAGS) -o libcupsppdc_s.o $(LIBOBJS) $(LINKCUPS)
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ libcupsppdc_s.o
 
@@ -352,10 +352,10 @@ libcupsppdc_s.a:	$(LIBOBJS)
 # libcupsppdc.la
 #
 
-libcupsppdc.la:    $(LIBOBJS)
+libcupsppdc.la:    $(LIBOBJS) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) -rpath $(LIBDIR) \
-		-version-info 1:0 $(LIBS)
+		-version-info 1:0 $(LINKCUPS)
 
 
 #

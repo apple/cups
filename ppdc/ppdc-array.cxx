@@ -26,7 +26,7 @@
 // Include necessary headers...
 //
 
-#include "ppdc.h"
+#include "ppdc-private.h"
 
 
 //
