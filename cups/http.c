@@ -2265,7 +2265,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       httpFlushWrite(http);
     }
 
-    if ((length + http->wused) <= sizeof(http->wbuffer))
+    if ((length + http->wused) <= sizeof(http->wbuffer) &&
+        length < sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
