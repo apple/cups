@@ -783,7 +783,7 @@ cupsWriteRequestData(
   * Finally, check if we have any pending data from the server...
   */
 
-  if (httpCheck(http))
+  if (_httpWait(http, 0, 1))
     return (httpUpdate(http));
   else
     return (HTTP_CONTINUE);

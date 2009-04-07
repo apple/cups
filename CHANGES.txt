@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- cupsWriteRequestData() flushed the output buffer unnecessarily,
+	  causing reduced performance in some situations.
 	- If a CGI process died before sending its MIME headers, the request
 	  would hang on the client.
 	- The printer/class/job search feature on the web interface did not
