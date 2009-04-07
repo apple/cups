@@ -134,6 +134,7 @@ Version "1.4"
 {
   Manufacturer "Dymo"
   ModelName "Label Printer"
+  Attribute NickName "" "Dymo Label Printer"
   PCFileName "dymo.ppd"
   DriverType label
   ModelNumber $DYMO_3x0
@@ -179,6 +180,7 @@ Version "1.4"
   // Epson 24-Pin Series
   {
     ModelName "24-Pin Series"
+    Attribute NickName "" "Epson 24-Pin Series"
     PCFileName "epson24.ppd"
     ModelNumber $EPSON_24PIN
 
@@ -198,6 +200,7 @@ Version "1.4"
   // Epson 9-Pin Series
   {
     ModelName "9-Pin Series"
+    Attribute NickName "" "Epson 9-Pin Series"
     PCFileName "epson9.ppd"
     ModelNumber $EPSON_9PIN
     ColorDevice No
@@ -216,6 +219,7 @@ Version "1.4"
   // Epson Stylus Color Series
   {
     ModelName "Stylus Color Series"
+    Attribute NickName "" "Epson Stylus Color Series"
     PCFileName "stcolor.ppd"
     ModelNumber $EPSON_COLOR
     ColorDevice Yes
@@ -236,6 +240,7 @@ Version "1.4"
   // Epson New Stylus Color Series
   {
     ModelName "New Stylus Color Series"
+    Attribute NickName "" "Epson New Stylus Color Series"
     PCFileName "stcolor2.ppd"
     ModelNumber $EPSON_ICOLOR
     ColorDevice Yes
@@ -256,6 +261,7 @@ Version "1.4"
   // Epson Stylus Color Series
   {
     ModelName "Stylus Photo Series"
+    Attribute NickName "" "Epson Stylus Photo Series"
     PCFileName "stphoto.ppd"
     ModelNumber $EPSON_PHOTO
     ColorDevice Yes
@@ -276,6 +282,7 @@ Version "1.4"
   // Epson New Stylus Color Series
   {
     ModelName "New Stylus Photo Series"
+    Attribute NickName "" "Epson New Stylus Photo Series"
     PCFileName "stphoto2.ppd"
     ModelNumber $EPSON_IPHOTO
     ColorDevice Yes
@@ -303,6 +310,7 @@ Version "1.4"
     DriverType hp
 
     ModelName "PCL Laser Printer"
+    Attribute NickName "" "Generic PCL Laser Printer"
     PCFileName "generpcl.ppd"
     Throughput 8
     ModelNumber $HP_LASERJET
@@ -353,6 +361,7 @@ Version "1.4"
     DriverType ps
 
     ModelName "PostScript Printer"
+    Attribute NickName "" "Generic PostScript Printer"
     PCFileName "generic.ppd"
     Throughput 8
     ColorDevice No
@@ -394,6 +403,7 @@ Version "1.4"
   // HP DeskJet Series
   {
     ModelName "DeskJet Series"
+    Attribute NickName "" "HP DeskJet Series"
     PCFileName "deskjet.ppd"
     ModelNumber $HP_DESKJET
     ManualCopies Yes
@@ -447,6 +457,7 @@ Version "1.4"
   // HP LaserJet Series PCL 4/5
   {
     ModelName "LaserJet Series PCL 4/5"
+    Attribute NickName "" "HP LaserJet Series PCL 4/5"
     PCFileName "laserjet.ppd"
     Throughput 8
     ModelNumber $HP_LASERJET
@@ -498,7 +509,7 @@ Version "1.4"
 {
   Manufacturer "Intellitech"
   ModelName "IntelliBar Label Printer"
-  Attribute ShortNickName "" "Intellibar Label Printer"
+  Attribute ShortNickName "" "IntelliBar Label Printer"
   PCFileName "intelbar.ppd"
   DriverType label
   ModelNumber $INTELLITECH_PCL
@@ -624,6 +635,7 @@ Version "1.4"
   // Oki 24-Pin Series
   {
     ModelName "24-Pin Series"
+    Attribute NickName "" "Oki 24-Pin Series"
     PCFileName "okidat24.ppd"
     ModelNumber $EPSON_24PIN
 
@@ -637,6 +649,7 @@ Version "1.4"
   // Oki 9-Pin Series
   {
     ModelName "9-Pin Series"
+    Attribute NickName "" "Oki 9-Pin Series"
     PCFileName "okidata9.ppd"
     ModelNumber $EPSON_9PIN
     ColorDevice No
@@ -658,6 +671,7 @@ Version "1.4"
   // Zebra CPCL Label Printer
   {
     ModelName "CPCL Label Printer"
+    Attribute NickName "" "Zebra CPCL Label Printer"
     PCFileName "zebracpl.ppd"
     ModelNumber $ZEBRA_CPCL
 
@@ -787,6 +801,7 @@ Version "1.4"
   // Zebra EPL1 Label Printer
   {
     ModelName "EPL1 Label Printer"
+    Attribute NickName "" "Zebra EPL1 Label Printer"
     PCFileName "zebraep1.ppd"
     ModelNumber $ZEBRA_EPL_LINE
 
@@ -884,6 +899,7 @@ Version "1.4"
   // Zebra EPL2 Label Printer
   {
     ModelName "EPL2 Label Printer"
+    Attribute NickName "" "Zebra EPL2 Label Printer"
     PCFileName "zebraep2.ppd"
     ModelNumber $ZEBRA_EPL_PAGE
 
@@ -990,6 +1006,7 @@ Version "1.4"
   // Zebra ZPL Label Printer
   {
     ModelName "ZPL Label Printer"
+    Attribute NickName "" "Zebra ZPL Label Printer"
     PCFileName "zebra.ppd"
     ModelNumber $ZEBRA_ZPL
 
