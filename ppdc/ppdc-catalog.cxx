@@ -30,8 +30,7 @@
 // Include necessary headers...
 //
 
-#include "ppdc.h"
-#include <cups/globals.h>
+#include "ppdc-private.h"
 
 
 //

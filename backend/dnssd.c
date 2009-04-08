@@ -23,6 +23,7 @@
  *                             resolved service name.
  *   get_device()            - Create or update a device.
  *   query_callback()        - Process query data.
+ *   sigterm_handler()       - Handle termination signals...
  *   unquote()               - Unquote a name string.
  */
 
@@ -65,6 +66,14 @@ typedef struct
 
 
 /*
+ * Local globals...
+ */
+
+static int		job_canceled = 0;
+					/* Set to 1 on SIGTERM */
+
+
+/*
  * Local functions...
  */
 
@@ -97,6 +106,7 @@ static void		query_callback(DNSServiceRef sdRef,
 				       uint16_t rrclass, uint16_t rdlen,
 				       const void *rdata, uint32_t ttl,
 				       void *context);
+static void		sigterm_handler(int sig);
 static void		unquote(char *dst, const char *src, size_t dstsize);
 
 
@@ -126,13 +136,32 @@ main(int  argc,				/* I - Number of command-line args */
   cups_array_t	*devices;		/* Device array */
   cups_device_t	*device;		/* Current device */
   char		uriName[1024];		/* Unquoted fullName for URI */
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
 
+
+ /*
+  * Don't buffer stderr, and catch SIGTERM...
+  */
+
+  setbuf(stderr, NULL);
+
+#ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
+  sigset(SIGTERM, sigterm_handler);
+#elif defined(HAVE_SIGACTION)
+  memset(&action, 0, sizeof(action));
+
+  sigemptyset(&action.sa_mask);
+  action.sa_handler = SIG_IGN;
+  sigaction(SIGTERM, &action, sigterm_handler);
+#else
+  signal(SIGTERM, sigterm_handler);
+#endif /* HAVE_SIGSET */
 
  /*
   * Check command-line...
   */
-
-  setbuf(stderr, NULL);
 
   if (argc >= 6)
     exec_backend(argv);
@@ -221,7 +250,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop until we are killed...
   */
 
-  for (;;)
+  while (!job_canceled)
   {
     FD_ZERO(&input);
     FD_SET(fd, &input);
@@ -250,9 +279,6 @@ main(int  argc,				/* I - Number of command-line args */
       cups_device_t *best;		/* Best matching device */
       char	device_uri[1024];	/* Device URI */
       int	count;			/* Number of queries */
-      static const char * const schemes[] =
-      		{ "lpd", "ipp", "ipp", "socket", "riousbprint" };
-					/* URI schemes for devices */
 
 
       for (device = (cups_device_t *)cupsArrayFirst(devices),
@@ -304,7 +330,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    unquote(uriName, best->fullName, sizeof(uriName));
 
 	    httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			    schemes[best->type], NULL, uriName, 0,
+			    "dnssd", NULL, uriName, 0,
 			    best->cups_shared ? "/cups" : "/");
 
 	    cupsBackendReport("network", device_uri, best->make_and_model,
@@ -328,7 +354,7 @@ main(int  argc,				/* I - Number of command-line args */
 	unquote(uriName, best->fullName, sizeof(uriName));
 
 	httpAssembleURI(HTTP_URI_CODING_ALL, device_uri, sizeof(device_uri),
-			schemes[best->type], NULL, uriName, 0,
+			"dnssd", NULL, uriName, 0,
 			best->cups_shared ? "/cups" : "/");
 
 	cupsBackendReport("network", device_uri, best->make_and_model,
@@ -337,6 +363,8 @@ main(int  argc,				/* I - Number of command-line args */
       }
     }
   }
+
+  return (CUPS_BACKEND_OK);
 }
 
 
@@ -438,12 +466,7 @@ static int				/* O - Result of comparison */
 compare_devices(cups_device_t *a,	/* I - First device */
                 cups_device_t *b)	/* I - Second device */
 {
-  int result = strcmp(a->name, b->name);
-
-  if (result)
-    return (result);
-  else
-    return (strcmp(a->domain, b->domain));
+  return (strcmp(a->name, b->name));
 }
 
 
@@ -467,7 +490,12 @@ exec_backend(char **argv)		/* I - Command-line arguments */
   */
 
   if ((resolved_uri = cupsBackendDeviceURI(argv)) == NULL)
-    exit(CUPS_BACKEND_FAILED);
+  {
+    if (job_canceled)
+      exit(CUPS_BACKEND_OK);
+    else
+      exit(CUPS_BACKEND_FAILED);
+  }
 
  /*
   * Extract the scheme from the URI...
@@ -487,7 +515,7 @@ exec_backend(char **argv)		/* I - Command-line arguments */
   snprintf(filename, sizeof(filename), "%s/backend/%s", cups_serverbin, scheme);
 
  /*
-  * Overwrite the device URIs and run the new backend...
+  * Overwrite the device URI and run the new backend...
   */
 
   setenv("DEVICE_URI", resolved_uri, 1);
@@ -524,8 +552,7 @@ get_device(cups_array_t *devices,	/* I - Device array */
   * See if this is a new device...
   */
 
-  key.name   = (char *)serviceName;
-  key.domain = (char *)replyDomain;
+  key.name = (char *)serviceName;
 
   if (!strcmp(regtype, "_ipp._tcp.") ||
       !strcmp(regtype, "_ipp-tls._tcp."))
@@ -542,11 +569,29 @@ get_device(cups_array_t *devices,	/* I - Device array */
   for (device = cupsArrayFind(devices, &key);
        device;
        device = cupsArrayNext(devices))
-    if (strcasecmp(device->name, key.name) ||
-        strcasecmp(device->domain, key.domain))
+    if (strcasecmp(device->name, key.name))
       break;
     else if (device->type == key.type)
+    {
+      if (!strcasecmp(device->domain, "local.") &&
+          strcasecmp(device->domain, replyDomain))
+      {
+       /*
+        * Update the .local listing to use the "global" domain name instead.
+	* The backend will try local lookups first, then the global domain name.
+	*/
+
+        free(device->domain);
+	device->domain = strdup(replyDomain);
+
+	DNSServiceConstructFullName(fullName, device->name, regtype,
+	                            replyDomain);
+	free(device->fullName);
+	device->fullName = strdup(fullName);
+      }
+
       return (device);
+    }
 
  /*
   * Yes, add the device...
@@ -814,6 +859,17 @@ query_callback(
 
   if (!device)
     fprintf(stderr, "DEBUG: Ignoring TXT record for \"%s\"...\n", fullName);
+}
+
+
+/*
+ * 'sigterm_handler()' - Handle termination signals...
+ */
+
+static void
+sigterm_handler(int sig)		/* I - Signal number (unused) */
+{
+  job_canceled = 1;
 }
 
 

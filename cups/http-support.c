@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
+#  include <poll.h>
 #endif /* HAVE_DNSSD */
 
 
@@ -1347,10 +1348,18 @@ _httpResolveURI(
   if (strstr(hostname, "._tcp"))
   {
 #ifdef HAVE_DNSSD
-    DNSServiceRef	ref;		/* DNS-SD service reference */
+    DNSServiceRef	ref,		/* DNS-SD master service reference */
+			domainref,	/* DNS-SD service reference for domain */
+			localref;	/* DNS-SD service reference for .local */
+    int			domainsent = 0;	/* Send the domain resolve? */
     char		*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     _http_uribuf_t	uribuf;		/* URI buffer */
+    struct pollfd	polldata;	/* Polling data */
+
+
+    if (logit)
+      fprintf(stderr, "DEBUG: Resolving \"%s\"...\n", hostname);
 
    /*
     * Separate the hostname into service name, registration type, and domain...
@@ -1375,10 +1384,6 @@ _httpResolveURI(
       return (NULL);
     }
 
-    domain = regtype + strlen(regtype) - 1;
-    if (domain > regtype && *domain == '.')
-      *domain = '\0';
-
     for (domain = strchr(regtype, '.');
          domain;
 	 domain = strchr(domain + 1, '.'))
@@ -1398,28 +1403,69 @@ _httpResolveURI(
     if (logit)
     {
       fputs("STATE: +connecting-to-device\n", stderr);
-      fprintf(stderr, "DEBUG: Resolving %s, regtype=%s, domain=%s...\n",
-              hostname, regtype, domain);
+      fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"%s\", "
+                      "domain=\"local.\"...\n", hostname, regtype);
       _cupsLangPuts(stderr, _("INFO: Looking for printer...\n"));
     }
 
-    if (DNSServiceResolve(&ref, 0, 0, hostname, regtype, domain,
-			  resolve_callback,
-			  &uribuf) == kDNSServiceErr_NoError)
+    uri = NULL;
+
+    if (DNSServiceCreateConnection(&ref) == kDNSServiceErr_NoError)
     {
-      if (DNSServiceProcessResult(ref) != kDNSServiceErr_NoError &&
-          resolved_uri[0])
-        uri = NULL;
-      else
-        uri = resolved_uri;
+      localref = ref;
+      if (DNSServiceResolve(&localref, kDNSServiceFlagsShareConnection, 0,
+			    hostname, regtype, "local.", resolve_callback,
+			    &uribuf) == kDNSServiceErr_NoError)
+      {
+        if (strcasecmp(domain, "local."))
+	{
+	 /*
+	  * Wait 2 seconds for a response to the local resolve; if nothing comes
+	  * in, do an additional domain resolution...
+	  */
+
+	  polldata.fd     = DNSServiceRefSockFD(ref);
+	  polldata.events = POLLIN;
+
+	  if (poll(&polldata, 1, 2000) != 1)
+	  {
+	   /*
+	    * OK, send the domain name resolve...
+	    */
+
+	    if (logit)
+	      fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"%s\", "
+		              "domain=\"%s\"...\n", hostname, regtype, domain);
+
+	    domainref = ref;
+	    if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection, 0,
+				  hostname, regtype, domain, resolve_callback,
+				  &uribuf) == kDNSServiceErr_NoError)
+	      domainsent = 1;
+	  }
+        }
+
+	if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError)
+	  uri = resolved_uri;
+
+	if (domainsent)
+	  DNSServiceRefDeallocate(domainref);
+
+	DNSServiceRefDeallocate(localref);
+      }
 
       DNSServiceRefDeallocate(ref);
     }
-    else
-      uri = NULL;
 
     if (logit)
+    {
+      if (uri)
+        fputs("DEBUG: Unable to resolve URI!\n", stderr);
+      else
+        fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
+
       fputs("STATE: -connecting-to-device\n", stderr);
+    }
 
 #else
    /*

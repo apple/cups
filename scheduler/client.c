@@ -2819,7 +2819,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
   if (bytes <= 0 ||
       (con->http.state != HTTP_GET_SEND && con->http.state != HTTP_POST_SEND))
   {
-    if (!con->sent_header && !con->response)
+    if (!con->sent_header && con->pipe_pid)
       cupsdSendError(con, HTTP_SERVER_ERROR, CUPSD_AUTH_NONE);
     else
     {
@@ -3985,8 +3985,8 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL, 0,
-                           &pid))
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
+                           NULL, &pid))
     {
       unlink(seedfile);
       return (0);
@@ -4064,7 +4064,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         0, &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4298,7 +4298,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   infofd = open(infofile, O_RDONLY);
 
   if (!cupsdStartProcess(command, argv, envp, infofd, -1, -1, -1, -1, 1, NULL,
-                         0, &pid))
+                         NULL, &pid))
   {
     close(infofd);
     unlink(infofile);
@@ -4622,7 +4622,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     {
 #  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
       cupsdLogMessage(CUPSD_LOG_INFO,
-		      "Sorry, your version of Kerberos does not support "
+		      "[CGI] Sorry, your version of Kerberos does not support "
 		      "delegated credentials!");
 
 #  else
@@ -4655,7 +4655,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	  KerberosContext = NULL;
 
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unable to initialize Kerberos context");
+	                  "[CGI] Unable to initialize Kerberos context");
 	}
       }
 
@@ -4682,7 +4682,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 #    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "Unable to create new credentials cache (%d/%s)",
+			  "[CGI] Unable to create new credentials cache (%d/%s)",
 			  error, strerror(errno));
 	  ccache = NULL;
 	}
@@ -4690,8 +4690,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 					  &principal)) != 0)
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "Unable to parse kerberos username (%d/%s)", error,
-			  strerror(errno));
+			  "[CGI] Unable to parse kerberos username (%d/%s)",
+			  error, strerror(errno));
 	  krb5_cc_destroy(KerberosContext, ccache);
 	  ccache = NULL;
 	}
@@ -4699,7 +4699,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 					     principal)))
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "Unable to initialize credentials cache (%d/%s)",
+			  "[CGI] Unable to initialize credentials cache (%d/%s)",
 			  error, strerror(errno));
 	  krb5_cc_destroy(KerberosContext, ccache);
 	  krb5_free_principal(KerberosContext, principal);
@@ -4719,7 +4719,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 	  if (GSS_ERROR(major_status))
 	  {
 	    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-			       "Unable to import client credentials cache");
+			       "[CGI] Unable to import client credentials "
+			       "cache");
 	    krb5_cc_destroy(KerberosContext, ccache);
 	    ccache = NULL;
 	  }
@@ -4815,14 +4816,14 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   envp[envc] = NULL;
 
-  if (LogLevel == CUPSD_LOG_DEBUG2)
+  if (LogLevel >= CUPSD_LOG_DEBUG)
   {
     for (i = 0; i < argc; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "pipe_command: argv[%d] = \"%s\"", i, argv[i]);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "[CGI] argv[%d] = \"%s\"", i, argv[i]);
     for (i = 0; i < envc; i ++)
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "pipe_command: envp[%d] = \"%s\"", i, envp[i]);
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "[CGI] envp[%d] = \"%s\"", i, envp[i]);
   }
 
  /*
@@ -4831,7 +4832,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   if (cupsdOpenPipe(fds))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to create pipes for CGI %s - %s",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "[CGI] Unable to create pipe for %s - %s",
                     argv[0], strerror(errno));
     return (0);
   }
@@ -4841,13 +4842,13 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   */
 
   if (cupsdStartProcess(command, argv, envp, infile, fds[1], CGIPipes[1],
-			-1, -1, root, DefaultProfile, 0, &pid) < 0)
+			-1, -1, root, DefaultProfile, NULL, &pid) < 0)
   {
    /*
     * Error - can't fork!
     */
 
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to fork for CGI %s - %s", argv[0],
+    cupsdLogMessage(CUPSD_LOG_ERROR, "[CGI] Unable to start %s - %s", argv[0],
                     strerror(errno));
 
     cupsdClosePipe(fds);
@@ -4866,8 +4867,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
       cupsdAddCert(pid, con->username, NULL);
 #endif /* HAVE_GSSAPI */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] %s started - PID = %d",
-                    command, pid);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] Started %s (PID %d)", command, pid);
 
     *outfile = fds[0];
     close(fds[1]);

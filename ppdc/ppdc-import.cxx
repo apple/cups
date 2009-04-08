@@ -22,7 +22,7 @@
 // Include necessary headers...
 //
 
-#include "ppdc.h"
+#include "ppdc-private.h"
 #include <cups/ppd.h>
 #include <cups/i18n.h>
 

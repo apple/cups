@@ -22,11 +22,10 @@
 // Include necessary headers...
 //
 
-#include "ppdc.h"
+#include "ppdc-private.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <cups/i18n.h>
 
 
 //

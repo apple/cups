@@ -225,7 +225,7 @@ extern const char *cupsdFinishProcess(int pid, char *name, int namelen,
 extern int	cupsdStartProcess(const char *command, char *argv[],
 				  char *envp[], int infd, int outfd,
 				  int errfd, int backfd, int sidefd,
-				  int root, void *profile, int job_id,
+				  int root, void *profile, cupsd_job_t *job,
 				  int *pid);
 
 extern int	cupsdAddSelect(int fd, cupsd_selfunc_t read_cb,

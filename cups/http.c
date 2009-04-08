@@ -3,7 +3,7 @@
  *
  *   HTTP routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -21,13 +21,14 @@
  *
  *   _httpBIOMethods()    - Get the OpenSSL BIO methods for HTTP connections.
  *   httpBlocking()       - Set blocking/non-blocking behavior on a connection.
- *   httpCheck()          - Check to see if there is a pending response from
- *                          the server.
+ *   httpCheck()          - Check to see if there is a pending response from the
+ *                          server.
  *   httpClearCookie()    - Clear the cookie value(s).
  *   httpClearFields()    - Clear HTTP request fields.
  *   httpClose()          - Close an HTTP connection...
  *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
+ *   _httpCreate()        - Create an unconnected HTTP connection.
  *   httpDelete()         - Send a DELETE request to the server.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpError()          - Get the last error on a connection.
@@ -46,6 +47,7 @@
  *                          content-length or transfer-encoding fields.
  *   httpGetStatus()      - Get the status of the last HTTP request.
  *   httpGetSubField()    - Get a sub-field value.
+ *   httpGetSubField2()   - Get a sub-field value.
  *   httpGets()           - Get a line of text from a HTTP connection.
  *   httpHead()           - Send a HEAD request to the server.
  *   httpInitialize()     - Initialize the HTTP interface library and set the
@@ -58,14 +60,15 @@
  *   httpRead2()          - Read data from a HTTP connection.
  *   _httpReadCDSA()      - Read function for the CDSA library.
  *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
- *   httpReconnect()      - Reconnect to a HTTP server...
+ *   httpReconnect()      - Reconnect to a HTTP server.
  *   httpSetAuthString()  - Set the current authorization string.
  *   httpSetCookie()      - Set the cookie value(s)...
  *   httpSetExpect()      - Set the Expect: header in a request.
  *   httpSetField()       - Set the value of an HTTP header.
- *   httpSetLength()      - Set the content-length and transfer-encoding.
+ *   httpSetLength()      - Set the content-length and content-encoding.
  *   httpTrace()          - Send an TRACE request to the server.
  *   httpUpdate()         - Update the current HTTP state for incoming data.
+ *   _httpWait()          - Wait for data available on a connection (no flush).
  *   httpWait()           - Wait for data available on a connection.
  *   httpWrite()          - Write data to a HTTP connection.
  *   httpWrite2()         - Write data to a HTTP connection.
@@ -82,11 +85,11 @@
  *   http_read_ssl()      - Read from a SSL/TLS connection.
  *   http_send()          - Send a request with all fields and the trailing
  *                          blank line.
- *   http_setup_ssl()     - Set up SSL/TLS on a connection.
+ *   http_setup_ssl()     - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
  *   http_upgrade()       - Force upgrade to TLS encryption.
- *   http_wait()          - Wait for data available on a connection.
- *   http_write()         - Write data to a connection.
+ *   http_write()         - Write a buffer to a HTTP connection.
+ *   http_write_chunk()   - Write a chunked buffer.
  *   http_write_ssl()     - Write to a SSL/TLS connection.
  */
 
@@ -131,7 +134,6 @@ static void		http_debug_hex(const char *prefix, const char *buffer,
 static http_field_t	http_field(const char *name);
 static int		http_send(http_t *http, http_state_t request,
 			          const char *uri);
-static int		http_wait(http_t *http, int msec, int usessl);
 static int		http_write(http_t *http, const char *buffer,
 			           int length);
 static int		http_write_chunk(http_t *http, const char *buffer,
@@ -1012,7 +1014,7 @@ httpGets(char   *line,			/* I - Line to read into */
       * No newline; see if there is more data to be read...
       */
 
-      if (!http->blocking && !http_wait(http, 10000, 1))
+      if (!http->blocking && !_httpWait(http, 10000, 1))
       {
         DEBUG_puts("httpGets: Timed out!");
 #ifdef WIN32
@@ -1539,7 +1541,7 @@ _httpReadCDSA(
     * Make sure we have data before we read...
     */
 
-    if (!http_wait(http, 10000, 0))
+    if (!_httpWait(http, 10000, 0))
     {
       http->error = ETIMEDOUT;
       return (-1);
@@ -1600,7 +1602,7 @@ _httpReadGNUTLS(
     * Make sure we have data before we read...
     */
 
-    if (!http_wait(http, 10000, 0))
+    if (!_httpWait(http, 10000, 0))
     {
       http->error = ETIMEDOUT;
       return (-1);
@@ -2075,6 +2077,95 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 
 
 /*
+ * '_httpWait()' - Wait for data available on a connection (no flush).
+ */
+
+int					/* O - 1 if data is available, 0 otherwise */
+_httpWait(http_t *http,			/* I - Connection to server */
+          int    msec,			/* I - Milliseconds to wait */
+	  int    usessl)		/* I - Use SSL context? */
+{
+#ifdef HAVE_POLL
+  struct pollfd		pfd;		/* Polled file descriptor */
+#else
+  fd_set		input_set;	/* select() input set */
+  struct timeval	timeout;	/* Timeout */
+#endif /* HAVE_POLL */
+  int			nfds;		/* Result from select()/poll() */
+
+
+  DEBUG_printf(("_httpWait(http=%p, msec=%d, usessl=%d)\n", http, msec, usessl));
+
+  if (http->fd < 0)
+    return (0);
+
+ /*
+  * Check the SSL/TLS buffers for data first...
+  */
+
+#ifdef HAVE_SSL
+  if (http->tls && usessl)
+  {
+#  ifdef HAVE_LIBSSL
+    if (SSL_pending((SSL *)(http->tls)))
+      return (1);
+#  elif defined(HAVE_GNUTLS)
+    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
+      return (1);
+#  elif defined(HAVE_CDSASSL)
+    size_t bytes;			/* Bytes that are available */
+
+    if (!SSLGetBufferedReadSize(((http_tls_t *)(http->tls))->session, &bytes) &&
+        bytes > 0)
+      return (1);
+#  endif /* HAVE_LIBSSL */
+  }
+#endif /* HAVE_SSL */
+
+ /*
+  * Then try doing a select() or poll() to poll the socket...
+  */
+
+#ifdef HAVE_POLL
+  pfd.fd     = http->fd;
+  pfd.events = POLLIN;
+
+  while ((nfds = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+
+#else
+  do
+  {
+    FD_ZERO(&input_set);
+    FD_SET(http->fd, &input_set);
+
+    DEBUG_printf(("_httpWait: msec=%d, http->fd=%d\n", msec, http->fd));
+
+    if (msec >= 0)
+    {
+      timeout.tv_sec  = msec / 1000;
+      timeout.tv_usec = (msec % 1000) * 1000;
+
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, &timeout);
+    }
+    else
+      nfds = select(http->fd + 1, &input_set, NULL, NULL, NULL);
+
+    DEBUG_printf(("_httpWait: select() returned %d...\n", nfds));
+  }
+#  ifdef WIN32
+  while (nfds < 0 && WSAGetLastError() == WSAEINTR);
+#  else
+  while (nfds < 0 && errno == EINTR);
+#  endif /* WIN32 */
+#endif /* HAVE_POLL */
+
+  DEBUG_printf(("_httpWait: returning with nfds=%d...\n", nfds));
+
+  return (nfds > 0);
+}
+
+
+/*
  * 'httpWait()' - Wait for data available on a connection.
  *
  * @since CUPS 1.1.19/Mac OS X 10.3@
@@ -2108,7 +2199,7 @@ httpWait(http_t *http,			/* I - Connection to server */
   * If not, check the SSL/TLS buffers and do a select() on the connection...
   */
 
-  return (http_wait(http, msec, 1));
+  return (_httpWait(http, msec, 1));
 }
 
 
@@ -2174,7 +2265,8 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       httpFlushWrite(http);
     }
 
-    if ((length + http->wused) <= sizeof(http->wbuffer))
+    if ((length + http->wused) <= sizeof(http->wbuffer) &&
+        length < sizeof(http->wbuffer))
     {
      /*
       * Write to buffer...
@@ -2436,7 +2528,7 @@ http_bio_read(BIO  *h,			/* I - BIO data */
     * Make sure we have data before we read...
     */
 
-    if (!http_wait(http, 10000, 0))
+    if (!_httpWait(http, 10000, 0))
     {
 #ifdef WIN32
       http->error = WSAETIMEDOUT;
@@ -3035,95 +3127,6 @@ http_upgrade(http_t *http)		/* I - Connection to server */
     return (ret);
 }
 #endif /* HAVE_SSL */
-
-
-/*
- * 'http_wait()' - Wait for data available on a connection.
- */
-
-static int				/* O - 1 if data is available, 0 otherwise */
-http_wait(http_t *http,			/* I - Connection to server */
-          int    msec,			/* I - Milliseconds to wait */
-	  int    usessl)		/* I - Use SSL context? */
-{
-#ifdef HAVE_POLL
-  struct pollfd		pfd;		/* Polled file descriptor */
-#else
-  fd_set		input_set;	/* select() input set */
-  struct timeval	timeout;	/* Timeout */
-#endif /* HAVE_POLL */
-  int			nfds;		/* Result from select()/poll() */
-
-
-  DEBUG_printf(("http_wait(http=%p, msec=%d)\n", http, msec));
-
-  if (http->fd < 0)
-    return (0);
-
- /*
-  * Check the SSL/TLS buffers for data first...
-  */
-
-#ifdef HAVE_SSL
-  if (http->tls && usessl)
-  {
-#  ifdef HAVE_LIBSSL
-    if (SSL_pending((SSL *)(http->tls)))
-      return (1);
-#  elif defined(HAVE_GNUTLS)
-    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
-      return (1);
-#  elif defined(HAVE_CDSASSL)
-    size_t bytes;			/* Bytes that are available */
-
-    if (!SSLGetBufferedReadSize(((http_tls_t *)(http->tls))->session, &bytes) &&
-        bytes > 0)
-      return (1);
-#  endif /* HAVE_LIBSSL */
-  }
-#endif /* HAVE_SSL */
-
- /*
-  * Then try doing a select() or poll() to poll the socket...
-  */
-
-#ifdef HAVE_POLL
-  pfd.fd     = http->fd;
-  pfd.events = POLLIN;
-
-  while ((nfds = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
-
-#else
-  do
-  {
-    FD_ZERO(&input_set);
-    FD_SET(http->fd, &input_set);
-
-    DEBUG_printf(("http_wait: msec=%d, http->fd=%d\n", msec, http->fd));
-
-    if (msec >= 0)
-    {
-      timeout.tv_sec  = msec / 1000;
-      timeout.tv_usec = (msec % 1000) * 1000;
-
-      nfds = select(http->fd + 1, &input_set, NULL, NULL, &timeout);
-    }
-    else
-      nfds = select(http->fd + 1, &input_set, NULL, NULL, NULL);
-
-    DEBUG_printf(("http_wait: select() returned %d...\n", nfds));
-  }
-#  ifdef WIN32
-  while (nfds < 0 && WSAGetLastError() == WSAEINTR);
-#  else
-  while (nfds < 0 && errno == EINTR);
-#  endif /* WIN32 */
-#endif /* HAVE_POLL */
-
-  DEBUG_printf(("http_wait: returning with nfds=%d...\n", nfds));
-
-  return (nfds > 0);
-}
 
 
 /*

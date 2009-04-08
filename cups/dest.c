@@ -83,7 +83,6 @@
 #ifdef __APPLE__
 static CFArrayRef appleCopyLocations(void);
 static CFStringRef appleCopyNetwork(void);
-static char	*appleGetDefault(char *name, int namesize);
 static char	*appleGetPaperSize(char *name, int namesize);
 static CFStringRef appleGetPrinter(CFArrayRef locations, CFStringRef network,
 		                   CFIndex *locindex);
@@ -99,8 +98,8 @@ static int	cups_find_dest(const char *name, const char *instance,
 static char	*cups_get_default(const char *filename, char *namebuf,
 				  size_t namesize, const char **instance);
 static int	cups_get_dests(const char *filename, const char *match_name,
-		               const char *match_inst, int num_dests,
-		               cups_dest_t **dests);
+		               const char *match_inst, int user_default_set,
+			       int num_dests, cups_dest_t **dests);
 static int	cups_get_sdests(http_t *http, ipp_op_t op, const char *name,
 		                int num_dests, cups_dest_t **dests);
 static char	*cups_make_string(ipp_attribute_t *attr, char *buffer,
@@ -302,7 +301,8 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   char		filename[1024];		/* Local ~/.cups/lpoptions file */
   const char	*defprinter;		/* Default printer */
   char		name[1024],		/* Copy of printer name */
-		*instance;		/* Pointer to instance name */
+		*instance,		/* Pointer to instance name */
+		*user_default;		/* User default printer */
   int		num_reals;		/* Number of real queues */
   cups_dest_t	*reals;			/* Real queues */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -362,21 +362,19 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   * Grab the default destination...
   */
 
-#ifdef __APPLE__
-  if ((defprinter = appleGetDefault(name, sizeof(name))) == NULL)
-#endif /* __APPLE__ */
-  defprinter = cupsGetDefault2(http);
+  if ((user_default = _cupsUserDefault(name, sizeof(name))) != NULL)
+    defprinter = name;
+  else if ((defprinter = cupsGetDefault2(http)) != NULL)
+  {
+    strlcpy(name, defprinter, sizeof(name));
+    defprinter = name;
+  }
 
   if (defprinter)
   {
    /*
-    * Grab printer and instance name...
+    * Separate printer and instance name...
     */
-
-#ifdef __APPLE__
-    if (name != defprinter)
-#endif /* __APPLE__ */
-    strlcpy(name, defprinter, sizeof(name));
 
     if ((instance = strchr(name, '/')) != NULL)
       *instance++ = '\0';
@@ -389,21 +387,15 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
       dest->is_default = 1;
   }
   else
-  {
-   /*
-    * This initialization of "instance" is unnecessary, but avoids a
-    * compiler warning...
-    */
-
     instance = NULL;
-  }
 
  /*
   * Load the /etc/cups/lpoptions and ~/.cups/lpoptions files...
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  num_dests = cups_get_dests(filename, NULL, NULL, num_dests, dests);
+  num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL,
+                             num_dests, dests);
 
   if ((home = getenv("HOME")) != NULL)
   {
@@ -411,7 +403,8 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     if (access(filename, 0))
       snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
 
-    num_dests = cups_get_dests(filename, NULL, NULL, num_dests, dests);
+    num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL,
+                               num_dests, dests);
   }
 
  /*
@@ -497,6 +490,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   char		filename[1024],		/* Path to lpoptions */
 		defname[256];		/* Default printer name */
   const char	*home = getenv("HOME");	/* Home directory */
+  int		set_as_default = 0;	/* Set returned destination as default */
   ipp_op_t	op = IPP_GET_PRINTER_ATTRIBUTES;
 					/* IPP operation to get server ops */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
@@ -508,9 +502,8 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!name)
   {
-    if ((name = getenv("LPDEST")) == NULL)
-      if ((name = getenv("PRINTER")) != NULL && !strcmp(name, "lp"))
-        name = NULL;
+    set_as_default = 1;
+    name           = _cupsUserDefault(defname, sizeof(defname));
 
     if (!name && home)
     {
@@ -571,12 +564,15 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   if (instance)
     dest->instance = _cupsStrAlloc(instance);
 
+  if (set_as_default)
+    dest->is_default = 1;
+
  /*
   * Then add local options...
   */
 
   snprintf(filename, sizeof(filename), "%s/lpoptions", cg->cups_serverroot);
-  cups_get_dests(filename, name, instance, 1, &dest);
+  cups_get_dests(filename, name, instance, 1, 1, &dest);
 
   if (home)
   {
@@ -585,7 +581,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
     if (access(filename, 0))
       snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
 
-    cups_get_dests(filename, name, instance, 1, &dest);
+    cups_get_dests(filename, name, instance, 1, 1, &dest);
   }
 
  /*
@@ -762,7 +758,7 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
     * Merge in server defaults...
     */
 
-    num_temps = cups_get_dests(filename, NULL, NULL, num_temps, &temps);
+    num_temps = cups_get_dests(filename, NULL, NULL, 0, num_temps, &temps);
 
    /*
     * Point to user defaults...
@@ -938,6 +934,106 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 }
 
 
+/*
+ * '_cupsUserDefault()' - Get the user default printer from environment
+ *                        variables and location information.
+ */
+
+char *					/* O - Default printer or NULL */
+_cupsUserDefault(char   *name,		/* I - Name buffer */
+                 size_t namesize)	/* I - Size of name buffer */
+{
+  const char	*env;			/* LPDEST or PRINTER env variable */
+#ifdef __APPLE__
+  CFStringRef	network;		/* Network location */
+  CFArrayRef	locations;		/* Location array */
+  CFStringRef	locprinter;		/* Current printer */
+#endif /* __APPLE__ */
+
+
+  if ((env = getenv("LPDEST")) == NULL)
+    if ((env = getenv("PRINTER")) != NULL && !strcmp(env, "lp"))
+      env = NULL;
+
+  if (env)
+  {
+    strlcpy(name, env, namesize);
+    return (name);
+  }
+
+#ifdef __APPLE__
+ /*
+  * Use location-based defaults if "use last printer" is selected in the
+  * system preferences...
+  */
+
+  if (!appleUseLastPrinter())
+  {
+    DEBUG_puts("_cupsUserDefault: Not using last printer as default...");
+    name[0] = '\0';
+    return (NULL);
+  }
+
+ /*
+  * Get the current location...
+  */
+
+  if ((network = appleCopyNetwork()) == NULL)
+  {
+    DEBUG_puts("_cupsUserDefault: Unable to get current network...");
+    name[0] = '\0';
+    return (NULL);
+  }
+
+#  ifdef DEBUG
+  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
+  DEBUG_printf(("_cupsUserDefault: network=\"%s\"\n", name));
+#  endif /* DEBUG */
+
+ /*
+  * Lookup the network in the preferences...
+  */
+
+  if ((locations = appleCopyLocations()) == NULL)
+  {
+   /*
+    * Missing or bad location array, so no location-based default...
+    */
+
+    DEBUG_puts("_cupsUserDefault: Missing or bad location history array...");
+
+    CFRelease(network);
+
+    name[0] = '\0';
+    return (NULL);
+  }
+  
+  DEBUG_printf(("_cupsUserDefault: Got location, %d entries...\n",
+                (int)CFArrayGetCount(locations)));
+
+  if ((locprinter = appleGetPrinter(locations, network, NULL)) != NULL)
+    CFStringGetCString(locprinter, name, namesize, kCFStringEncodingUTF8);
+  else
+    name[0] = '\0';
+
+  CFRelease(network);
+  CFRelease(locations);
+
+  DEBUG_printf(("_cupsUserDefault: Returning \"%s\"...\n", name));
+
+  return (*name ? name : NULL);
+
+#else
+ /*
+  * No location-based defaults on this platform...
+  */
+
+  name[0] = '\0';
+  return (NULL);
+#endif /* __APPLE__ */
+}
+
+
 #ifdef __APPLE__
 /*
  * 'appleCopyLocations()' - Copy the location history array.
@@ -1002,79 +1098,6 @@ appleCopyNetwork(void)
   }
 
   return (network);
-}
-
-
-/*
- * 'appleGetDefault()' - Get the default printer for this location.
- */
-
-static char *				/* O - Name or NULL if no default */
-appleGetDefault(char *name,		/* I - Name buffer */
-                int  namesize)		/* I - Size of name buffer */
-{
-  CFStringRef		network;	/* Network location */
-  CFArrayRef		locations;	/* Location array */
-  CFStringRef		locprinter;	/* Current printer */
-
-
- /*
-  * Use location-based defaults if "use last printer" is selected in the
-  * system preferences...
-  */
-
-  if (!appleUseLastPrinter())
-  {
-    DEBUG_puts("appleGetDefault: Not using last printer as default...");
-    return (NULL);
-  }
-
- /*
-  * Get the current location...
-  */
-
-  if ((network = appleCopyNetwork()) == NULL)
-  {
-    DEBUG_puts("appleGetDefault: Unable to get current network...");
-    return (NULL);
-  }
-
-#ifdef DEBUG
-  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-  DEBUG_printf(("appleGetDefault: network=\"%s\"\n", name));
-#endif /* DEBUG */
-
- /*
-  * Lookup the network in the preferences...
-  */
-
-  if ((locations = appleCopyLocations()) == NULL)
-  {
-   /*
-    * Missing or bad location array, so no location-based default...
-    */
-
-    DEBUG_puts("appleGetDefault: Missing or bad location history array...");
-
-    CFRelease(network);
-
-    return (NULL);
-  }
-  
-  DEBUG_printf(("appleGetDefault: Got location, %d entries...\n",
-                (int)CFArrayGetCount(locations)));
-
-  if ((locprinter = appleGetPrinter(locations, network, NULL)) != NULL)
-    CFStringGetCString(locprinter, name, namesize, kCFStringEncodingUTF8);
-  else
-    name[0] = '\0';
-
-  CFRelease(network);
-  CFRelease(locations);
-
-  DEBUG_printf(("appleGetDefault: Returning \"%s\"...\n", name));
-
-  return (*name ? name : NULL);
 }
 
 
@@ -1237,6 +1260,7 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
       CFPreferencesSetAppValue(kLocationHistoryArrayKey, newlocations,
                                kPMPrintingPreferences);
       CFPreferencesAppSynchronize(kPMPrintingPreferences);
+      notify_post("com.apple.printerPrefsChange");
     }
 
     if (newlocations)
@@ -1526,11 +1550,13 @@ cups_get_default(const char *filename,	/* I - File to read */
  */
 
 static int				/* O - Number of destinations */
-cups_get_dests(const char  *filename,	/* I - File to read from */
-               const char  *match_name,	/* I - Destination name we want */
-	       const char  *match_inst,	/* I - Instance name we want */
-               int         num_dests,	/* I - Number of destinations */
-               cups_dest_t **dests)	/* IO - Destinations */
+cups_get_dests(
+    const char  *filename,		/* I - File to read from */
+    const char  *match_name,		/* I - Destination name we want */
+    const char  *match_inst,		/* I - Instance name we want */
+    int         user_default_set,	/* I - User default printer set? */
+    int         num_dests,		/* I - Number of destinations */
+    cups_dest_t **dests)		/* IO - Destinations */
 {
   int		i;			/* Looping var */
   cups_dest_t	*dest;			/* Current destination */
@@ -1540,13 +1566,12 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 		*name,			/* Name of destination/option */
 		*instance;		/* Instance of destination */
   int		linenum;		/* Current line number */
-  const char	*printer;		/* PRINTER or LPDEST */
 
 
   DEBUG_printf(("cups_get_dests(filename=\"%s\", match_name=\"%s\", "
-                "match_inst=\"%s\", num_dests=%d, dests=%p)\n", filename,
-		match_name ? match_name : "(null)",
-		match_inst ? match_inst : "(null)", num_dests, dests));
+                "match_inst=\"%s\", user_default_set=%d, num_dests=%d, "
+		"dests=%p)\n", filename, match_name, match_inst,
+		user_default_set, num_dests, dests));
 
  /*
   * Try to open the file...
@@ -1554,18 +1579,6 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
     return (num_dests);
-
- /*
-  * Check environment variables...
-  */
-
-  if ((printer = getenv("LPDEST")) == NULL)
-    if ((printer = getenv("PRINTER")) != NULL)
-      if (strcmp(printer, "lp") == 0)
-        printer = NULL;
-
-  DEBUG_printf(("cups_get_dests: printer=\"%s\"\n",
-                printer ? printer : "(null)"));
 
  /*
   * Read each printer; each line looks like:
@@ -1583,7 +1596,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     */
 
     DEBUG_printf(("cups_get_dests: linenum=%d line=\"%s\" lineptr=\"%s\"\n",
-                  linenum, line, lineptr ? lineptr : "(null)"));
+                  linenum, line, lineptr));
 
     if ((strcasecmp(line, "dest") && strcasecmp(line, "default")) || !lineptr)
     {
@@ -1682,7 +1695,7 @@ cups_get_dests(const char  *filename,	/* I - File to read from */
     * Set this as default if needed...
     */
 
-    if (!printer && !strcasecmp(line, "default"))
+    if (!user_default_set && !strcasecmp(line, "default"))
     {
       DEBUG_puts("cups_get_dests: Setting as default...");
 

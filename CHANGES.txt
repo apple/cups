@@ -1,9 +1,15 @@
-CHANGES.txt - 2009-03-23
+CHANGES.txt - 2009-04-03
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
 	- Documentation fixes (STR #3044, STR #3057)
+	- Added complete localizations for German, Japanese, Polish, and
+	  Russian and partial localizations for Chinese, Danish, Finnish,
+	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
+	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- cupsWriteRequestData() flushed the output buffer unnecessarily,
+	  causing reduced performance in some situations.
 	- If a CGI process died before sending its MIME headers, the request
 	  would hang on the client.
 	- The printer/class/job search feature on the web interface did not
@@ -21,10 +27,6 @@ CHANGES IN CUPS V1.4b3
 	  devices (STR #3108)
 	- The cupsSideChannelSNMP* functions did not work.
 	- The scheduler could consume 100% CPU when jobs were canceled.
-	- Added complete localizations for Japanese, Polish, and Russian and
-	  partial localizations for Chinese, Danish, German, Finnish, French,
-	  Italian, Korean, Norwegian, Portuguese, and Swedish (STR #3096,
-	  STR #3098, STR #3109, STR #3111)
 	- Clicking on "Select Another Make/Manufacturer" in the web interface
 	  incorrectly added the printer (STR #3095)
 	- The scheduler no longer uses programs with insecure file

@@ -1049,7 +1049,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
                             filterfds[slot][1], job->status_pipes[1],
 		            job->back_pipes[0], job->side_pipes[0], 0,
-			    job->profile, job->id, job->filters + i);
+			    job->profile, job, job->filters + i);
 
     cupsdClosePipe(filterfds[!slot]);
 
@@ -1104,7 +1104,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       pid = cupsdStartProcess(command, argv, envp, filterfds[!slot][0],
 			      filterfds[slot][1], job->status_pipes[1],
 			      job->back_pipes[1], job->side_pipes[1],
-			      backroot, job->profile, job->id, &(job->backend));
+			      backroot, job->profile, job, &(job->backend));
 
       if (pid == 0)
       {
@@ -1159,6 +1159,14 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);
+
+ /*
+  * If we get here than we are able to run the printer driver filters, so clear
+  * the missing and insecure warnings...
+  */
+
+  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			               "cups-insecure-filter-warning");
 
   return;
 
@@ -3607,6 +3615,9 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   job->status_buffer = cupsdStatBufNew(job->status_pipes[0], NULL);
   job->status_level  = CUPSD_LOG_INFO;
+
+  if (job->printer_message)
+    cupsdSetString(&(job->printer_message->values[0].string.text), "");
 
  /*
   * Create the backchannel pipes and make them non-blocking...

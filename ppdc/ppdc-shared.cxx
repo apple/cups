@@ -24,7 +24,7 @@
 // Include necessary headers...
 //
 
-#include "ppdc.h"
+#include "ppdc-private.h"
 
 
 //
@@ -53,9 +53,7 @@ ppdcShared::~ppdcShared()
 void
 ppdcShared::release(void)
 {
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: %p release %s use=%d\n", this, class_name(), use);
-#endif // DEBUG
+  DEBUG_printf(("%s: %p release use=%d", class_name(), this, use));
 
   use --;
   if (!use)
@@ -72,9 +70,7 @@ ppdcShared::retain()
 {
   use ++;
 
-#ifdef DEBUG
-  fprintf(stderr, "DEBUG: %p retain %s use=%d\n", this, class_name(), use);
-#endif // DEBUG
+  DEBUG_printf(("%s: %p retain use=%d", class_name(), this, use));
 }
 
 

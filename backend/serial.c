@@ -3,7 +3,7 @@
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1211,38 +1211,51 @@ list_devices(void)
       {
 	CFTypeRef	serialNameAsCFString;
 	CFTypeRef	bsdPathAsCFString;
+	CFTypeRef	hiddenVal;
 	char		serialName[128];
 	char		bsdPath[1024];
 	Boolean		result;
 
 
-	serialNameAsCFString =
-	    IORegistryEntryCreateCFProperty(serialService,
-	                                    CFSTR(kIOTTYDeviceKey),
-					    kCFAllocatorDefault, 0);
-	if (serialNameAsCFString)
+	/* Check if hidden... */
+	hiddenVal = IORegistryEntrySearchCFProperty(serialService, 
+						    kIOServicePlane,
+						    CFSTR("HiddenPort"),
+						    kCFAllocatorDefault,
+						    kIORegistryIterateRecursively | 
+						    kIORegistryIterateParents);
+	if (hiddenVal)
+	  CFRelease(hiddenVal);	/* This interface should not be used */
+	else
 	{
-	  result = CFStringGetCString(serialNameAsCFString, serialName,
-	                              sizeof(serialName),
-				      kCFStringEncodingASCII);
-	  CFRelease(serialNameAsCFString);
-
-	  if (result)
+	  serialNameAsCFString =
+	      IORegistryEntryCreateCFProperty(serialService,
+					      CFSTR(kIOTTYDeviceKey),
+					      kCFAllocatorDefault, 0);
+	  if (serialNameAsCFString)
 	  {
-	    bsdPathAsCFString =
-	        IORegistryEntryCreateCFProperty(serialService,
-		                                CFSTR(kIOCalloutDeviceKey),
-						kCFAllocatorDefault, 0);
-	    if (bsdPathAsCFString)
+	    result = CFStringGetCString(serialNameAsCFString, serialName,
+					sizeof(serialName),
+					kCFStringEncodingASCII);
+	    CFRelease(serialNameAsCFString);
+  
+	    if (result)
 	    {
-	      result = CFStringGetCString(bsdPathAsCFString, bsdPath,
-	                                  sizeof(bsdPath),
-					  kCFStringEncodingASCII);
-	      CFRelease(bsdPathAsCFString);
-
-	      if (result)
-		printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n",
-		       bsdPath, serialName);
+	      bsdPathAsCFString =
+		  IORegistryEntryCreateCFProperty(serialService,
+						  CFSTR(kIOCalloutDeviceKey),
+						  kCFAllocatorDefault, 0);
+	      if (bsdPathAsCFString)
+	      {
+		result = CFStringGetCString(bsdPathAsCFString, bsdPath,
+					    sizeof(bsdPath),
+					    kCFStringEncodingASCII);
+		CFRelease(bsdPathAsCFString);
+  
+		if (result)
+		  printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n",
+			 bsdPath, serialName);
+	      }
 	    }
 	  }
 	}

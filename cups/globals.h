@@ -145,6 +145,7 @@ extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
+extern char		*_cupsUserDefault(char *name, size_t namesize);
 
 
 /*

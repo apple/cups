@@ -306,6 +306,8 @@ _ippRead
 _ippReadFile
 _ippReadIO
 _ippSetPort
+_ippTagString
+_ippTagValue
 _ippTimeToDate
 _ippWrite
 _ippWriteFile

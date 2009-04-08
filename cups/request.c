@@ -753,6 +753,9 @@ cupsWriteRequestData(
     const char *buffer,			/* I - Bytes to write */
     size_t     length)			/* I - Number of bytes to write */
 {
+  int	wused;				/* Previous bytes in buffer */
+
+
  /*
   * Get the default connection as needed...
   */
@@ -776,6 +779,8 @@ cupsWriteRequestData(
   * Then write to the HTTP connection...
   */
 
+  wused = http->wused;
+
   if (httpWrite2(http, buffer, length) < 0)
     return (HTTP_ERROR);
 
@@ -783,10 +788,19 @@ cupsWriteRequestData(
   * Finally, check if we have any pending data from the server...
   */
 
-  if (httpCheck(http))
-    return (httpUpdate(http));
-  else
-    return (HTTP_CONTINUE);
+  if (length > HTTP_MAX_BUFFER ||
+      http->wused < wused ||
+      (wused > 0 && http->wused == length))
+  {
+   /*
+    * We've written something to the server, so check for response data...
+    */
+
+    if (_httpWait(http, 0, 1))
+      return (httpUpdate(http));
+  }
+
+  return (HTTP_CONTINUE);
 }
 
 

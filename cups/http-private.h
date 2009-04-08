@@ -268,6 +268,7 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int log);
+extern int		_httpWait(http_t *http, int msec, int usessl);
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*
