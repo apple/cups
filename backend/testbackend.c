@@ -164,8 +164,8 @@ main(int  argc,				/* I - Number of command-line args */
     if ((pid = fork()) == 0)
     {
      /*
-      * Trickle/query child comes here...  Rearrange file descriptors so that
-      * FD 
+      * Trickle/query child comes here.  Rearrange file descriptors so that
+      * FD 1, 3, and 4 point to the backend...
       */
 
       close(0);
@@ -208,6 +208,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         char	buffer[1024];		/* Buffer for response data */
 	ssize_t	bytes;			/* Number of bytes of response data */
+	double	timeout;		/* Timeout */
         static const char *ps_query =	/* PostScript query file */
 		"%!\n"
 		"save\n"
@@ -246,8 +247,13 @@ main(int  argc,				/* I - Number of command-line args */
 
         write(1, ps_query, strlen(ps_query));
 	write(2, "DEBUG: START\n", 13);
-        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 60.0)) > 0)
+	timeout = 60.0;
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer),
+	                                    timeout)) > 0)
+	{
 	  write(2, buffer, bytes);
+	  timeout = 5.0;
+	}
 	write(2, "\nDEBUG: END\n", 12);
       }
 
