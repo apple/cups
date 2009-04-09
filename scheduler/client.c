@@ -418,10 +418,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #ifdef AF_INET6
     if (temp.addr.sa_family == AF_INET6)
     {
-      if (HostNameLookups)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else if (httpAddrLocalhost(&temp))
+      if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
+      else if (HostNameLookups || RemoteAccessEnabled)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 
@@ -431,10 +431,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #endif /* AF_INET6 */
     if (temp.addr.sa_family == AF_INET)
     {
-      if (HostNameLookups)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else if (httpAddrLocalhost(&temp))
+      if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
+      else if (HostNameLookups || RemoteAccessEnabled)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 
@@ -3293,6 +3293,10 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
   ssl_options.Version = CSSM_APPLE_TP_SSL_OPTS_VERSION;
   ssl_options.ServerName = con->servername;
   ssl_options.ServerNameLen = strlen(con->servername);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		  con->servername);
 
   options.Data = (uint8 *)&ssl_options;
   options.Length = sizeof(ssl_options);
