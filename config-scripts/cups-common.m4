@@ -65,7 +65,7 @@ fi
 AC_SUBST(CUPS_HTMLVIEW)
 
 AC_MSG_CHECKING(for install-sh script)
-INSTALL="`pwd`/install-sh -c"
+INSTALL="`pwd`/install-sh"
 AC_SUBST(INSTALL)
 AC_MSG_RESULT(using $INSTALL)
 

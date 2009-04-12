@@ -72,15 +72,12 @@ install:	all install-data install-headers install-libs install-exec
 install-data:
 	for file in $(KEEP); do \
 		if test -r $(SERVERROOT)/$$file ; then \
-			$(INSTALL_CONFIG) $$file $(SERVERROOT)/$$file.N ; \
-			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file.N || true; \
+			$(INSTALL_CONFIG) -g $(CUPS_GROUP) $$file $(SERVERROOT)/$$file.N ; \
 		else \
-			$(INSTALL_CONFIG) $$file $(SERVERROOT) ; \
-			chgrp $(CUPS_GROUP) $(SERVERROOT)/$$file || true; \
+			$(INSTALL_CONFIG) -g $(CUPS_GROUP) $$file $(SERVERROOT) ; \
 		fi ; \
 	done
-	$(INSTALL_CONFIG) cupsd.conf $(SERVERROOT)/cupsd.conf.default
-	-chgrp $(CUPS_GROUP) $(SERVERROOT)/cupsd.conf.default
+	$(INSTALL_CONFIG) -g $(CUPS_GROUP) cupsd.conf $(SERVERROOT)/cupsd.conf.default
 	$(INSTALL_DIR) -m 755 $(DATADIR)/mime
 	for file in $(REPLACE); do \
 		if test -r $(DATADIR)/mime/$$file ; then \

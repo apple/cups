@@ -411,8 +411,17 @@ AC_DEFINE_UNQUOTED(CUPS_SERVERROOT, "$sysconfdir/cups")
 AC_SUBST(CUPS_SERVERROOT)
 
 # Transient run-time state
-CUPS_STATEDIR="$localstatedir/run/cups"
-AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$localstatedir/run/cups")
+case "$uname" in
+	Darwin*)
+		# Darwin (Mac OS X)
+		CUPS_STATEDIR="$CUPS_SERVERROOT"
+		;;
+	*)
+		# All others
+		CUPS_STATEDIR="$localstatedir/run/cups"
+		;;
+esac
+AC_DEFINE_UNQUOTED(CUPS_STATEDIR, "$CUPS_STATEDIR")
 AC_SUBST(CUPS_STATEDIR)
 
 dnl
