@@ -4,7 +4,7 @@
 #
 #   Test the lpstat command.
 #
-#   Copyright 2007 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -23,6 +23,18 @@ if test $? != 0; then
 	exit 1
 else
 	echo "    PASSED"
+fi
+echo ""
+
+echo "LPSTAT Test"
+echo ""
+echo "    lpstat -H"
+server="`../systemv/lpstat -H 2>&1`"
+if test $? != 0 -o "x$server" != xlocalhost:8631; then
+	echo "    FAILED ($server)"
+	exit 1
+else
+	echo "    PASSED ($server)"
 fi
 echo ""
 

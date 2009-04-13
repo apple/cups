@@ -4,7 +4,7 @@
  *   Internet Printing Protocol support functions for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -391,51 +391,13 @@ ippOpValue(const char *name)		/* I - Textual name */
 int					/* O - Port number */
 ippPort(void)
 {
-  const char	*ipp_port;		/* IPP_PORT environment variable */
-  struct servent *port;			/* Port number info */  
-  int		portnum;		/* Port number */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
   DEBUG_puts("ippPort()");
 
   if (!cg->ipp_port)
-  {
-   /*
-    * See if the server definition includes the port number...
-    */
-
-    DEBUG_puts("ippPort: Not initialized...");
-
-    cupsServer();
-
-#ifdef DEBUG
-    if (cg->ipp_port)
-      DEBUG_puts(("ippPort: Set via cupsServer()..."));
-#endif /* DEBUG */
-  }
-
-  if (!cg->ipp_port)
-  {
-    if ((ipp_port = getenv("IPP_PORT")) != NULL)
-    {
-      DEBUG_puts("ippPort: Set via IPP_PORT...");
-      portnum = atoi(ipp_port);
-    }
-    else if ((port = getservbyname("ipp", NULL)) == NULL)
-    {
-      DEBUG_puts("ippPort: Set via CUPS_DEFAULT_IPP_PORT...");
-      portnum = CUPS_DEFAULT_IPP_PORT;
-    }
-    else
-    {
-      DEBUG_puts("ippPort: Set via ipp service entry...");
-      portnum = ntohs(port->s_port);
-    }
-
-    if (portnum > 0)
-      cg->ipp_port = portnum;
-  }
+    _cupsSetDefaults();
 
   DEBUG_printf(("ippPort: Returning %d...\n", cg->ipp_port));
 
