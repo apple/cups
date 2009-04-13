@@ -76,7 +76,7 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read into */
     else
       status = select(4, &input, NULL, NULL, &tval);
   }
-  while (status < 0 && errno != EINTR);
+  while (status < 0 && errno != EINTR && errno != EAGAIN);
 
   if (status < 0)
     return (-1);			/* Timeout! */
@@ -138,9 +138,9 @@ cupsBackChannelWrite(
       else
 	status = select(4, NULL, &output, NULL, &tval);
     }
-    while (status < 0 && errno != EINTR);
+    while (status < 0 && errno != EINTR && errno != EAGAIN);
 
-    if (status < 0)
+    if (status <= 0)
       return (-1);			/* Timeout! */
 
    /*
@@ -159,7 +159,7 @@ cupsBackChannelWrite(
       * Write error - abort on fatal errors...
       */
 
-      if (errno != EINTR)
+      if (errno != EINTR && errno != EAGAIN)
         return (-1);
     }
     else
