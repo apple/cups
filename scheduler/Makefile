@@ -170,7 +170,7 @@ install-data:
 install-exec:
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	$(INSTALL_BIN) cupsd $(SBINDIR)
+	$(INSTALL_BIN) -m 500 cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	-if test "x`uname`" = xDarwin; then \
 		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \
