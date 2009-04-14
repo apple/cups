@@ -1231,7 +1231,7 @@ cupsdCheckAuth(
 	    * Allow Back-to-My-Mac addresses...
 	    */
 
-	    if ((netip6[0] & 0xff000000) == 0xfd000000)
+	    if ((ip[0] & 0xff000000) == 0xfd000000)
 	      return (1);
 #endif /* __APPLE__ */
 
