@@ -489,13 +489,10 @@ exec_backend(char **argv)		/* I - Command-line arguments */
   * Resolve the device URI...
   */
 
+  job_canceled = -1;
+
   if ((resolved_uri = cupsBackendDeviceURI(argv)) == NULL)
-  {
-    if (job_canceled)
-      exit(CUPS_BACKEND_OK);
-    else
-      exit(CUPS_BACKEND_FAILED);
-  }
+    exit(CUPS_BACKEND_FAILED);
 
  /*
   * Extract the scheme from the URI...
@@ -869,7 +866,10 @@ query_callback(
 static void
 sigterm_handler(int sig)		/* I - Signal number (unused) */
 {
-  job_canceled = 1;
+  if (job_canceled)
+    exit(CUPS_BACKEND_OK);
+  else
+    job_canceled = 1;
 }
 
 
