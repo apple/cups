@@ -426,7 +426,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
     pfd.events = POLLIN;
 
     while ((ready = poll(&pfd, 1, (int)(timeout * 1000.0))) < 0 &&
-           errno == EINTR);
+           (errno == EINTR || errno == EAGAIN));
 
 #else
     fd_set		input_set;	/* select() input set */
@@ -445,7 +445,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 #  ifdef WIN32
     while (ready < 0 && WSAGetLastError() == WSAEINTR);
 #  else
-    while (ready < 0 && errno == EINTR);
+    while (ready < 0 && (errno == EINTR || errno == EAGAIN));
 #  endif /* WIN32 */
 #endif /* HAVE_POLL */
 

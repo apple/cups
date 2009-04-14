@@ -1053,7 +1053,7 @@ httpGets(char   *line,			/* I - Line to read into */
 #else
         DEBUG_printf(("httpGets: recv() error %d!\n", errno));
 
-        if (errno == EINTR)
+        if (errno == EINTR || errno == EAGAIN)
 	  continue;
 	else if (errno != http->error)
 	{
@@ -1410,7 +1410,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
       http->error = WSAGetLastError();
       return (-1);
 #else
-      if (errno != EINTR)
+      if (errno != EINTR && errno != EAGAIN)
       {
         http->error = errno;
         return (-1);
@@ -1552,7 +1552,7 @@ _httpReadCDSA(
   {
     bytes = recv(http->fd, data, *dataLength, 0);
   }
-  while (bytes == -1 && errno == EINTR);
+  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
 
   if (bytes == *dataLength)
   {
@@ -2130,7 +2130,8 @@ _httpWait(http_t *http,			/* I - Connection to server */
   pfd.fd     = http->fd;
   pfd.events = POLLIN;
 
-  while ((nfds = poll(&pfd, 1, msec)) < 0 && errno == EINTR);
+  while ((nfds = poll(&pfd, 1, msec)) < 0 &&
+         (errno == EINTR || errno == EAGAIN));
 
 #else
   do
@@ -2155,7 +2156,7 @@ _httpWait(http_t *http,			/* I - Connection to server */
 #  ifdef WIN32
   while (nfds < 0 && WSAGetLastError() == WSAEINTR);
 #  else
-  while (nfds < 0 && errno == EINTR);
+  while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
 #  endif /* WIN32 */
 #endif /* HAVE_POLL */
 
@@ -2370,7 +2371,7 @@ _httpWriteCDSA(
   {
     bytes = write(http->fd, data, *dataLength);
   }
-  while (bytes == -1 && errno == EINTR);
+  while (bytes == -1 && (errno == EINTR || errno == EAGAIN));
 
   if (bytes == *dataLength)
   {
@@ -3162,7 +3163,7 @@ http_write(http_t     *http,		/* I - Connection to server */
 	continue;
       }
 #else
-      if (errno == EINTR)
+      if (errno == EINTR || errno == EAGAIN)
         continue;
       else if (errno != http->error && errno != ECONNRESET)
       {
