@@ -3578,6 +3578,8 @@ add_printer_filter(
 
     if (stat(filename, &fileinfo))
     {
+      memset(&fileinfo, 0, sizeof(fileinfo));
+
       snprintf(p->state_message, sizeof(p->state_message),
                "Filter \"%s\" for printer \"%s\" not available: %s",
 	       filename, p->name, strerror(errno));
@@ -3585,8 +3587,6 @@ add_printer_filter(
 
       cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
     }
-    else
-      memset(&fileinfo, 0, sizeof(fileinfo));
 
    /*
     * When running as root, do additional security checks...
