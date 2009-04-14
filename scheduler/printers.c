@@ -4170,8 +4170,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	  val->string.text = _cupsStrAlloc(output_bin->choices[i].choice);
       }
 
-      attr = ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-			  "output-bin-default", NULL, output_bin->defchoice);
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	           "output-bin-default", NULL, output_bin->defchoice);
     }
 
    /*
