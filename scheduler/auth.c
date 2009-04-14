@@ -1205,6 +1205,7 @@ cupsdCheckAuth(
   unsigned	netip6[4];		/* IPv6 network address */
 #endif /* AF_INET6 */
 
+
   while (num_masks > 0)
   {
     switch (masks->type)
@@ -1225,6 +1226,15 @@ cupsdCheckAuth(
 
           if (!strcmp(masks->mask.name.name, "*"))
 	  {
+#ifdef __APPLE__
+           /*
+	    * Allow Back-to-My-Mac addresses...
+	    */
+
+	    if ((netip6[0] & 0xff000000) == 0xfd000000)
+	      return (1);
+#endif /* __APPLE__ */
+
 	   /*
 	    * Check against all local interfaces...
 	    */
