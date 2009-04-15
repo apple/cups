@@ -1165,8 +1165,10 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * the missing and insecure warnings...
   */
 
-  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			               "cups-insecure-filter-warning");
+  if (cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			                   "cups-insecure-filter-warning"))
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
+                  "Printer drivers now functional.");
 
   return;
 

@@ -2663,12 +2663,13 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
  * 'cupsdSetPrinterReasons()' - Set/update the reasons strings.
  */
 
-void
+int					/* O - 1 if something changed, 0 otherwise */
 cupsdSetPrinterReasons(
     cupsd_printer_t  *p,		/* I - Printer */
     const char *s)			/* I - Reasons strings */
 {
-  int		i;			/* Looping var */
+  int		i,			/* Looping var */
+		changed = 0;		/* Did something change? */
   const char	*sptr;			/* Pointer into reasons */
   char		reason[255],		/* Reason string */
 		*rptr;			/* Pointer into reason */
@@ -2697,6 +2698,7 @@ cupsdSetPrinterReasons(
       _cupsStrFree(p->reasons[i]);
 
     p->num_reasons = 0;
+    changed        = 1;
 
     cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
@@ -2705,7 +2707,7 @@ cupsdSetPrinterReasons(
   }
 
   if (!strcmp(s, "none"))
-    return;
+    return (changed);
 
  /*
   * Loop through all of the reasons...
@@ -2743,6 +2745,7 @@ cupsdSetPrinterReasons(
 	  */
 
 	  p->num_reasons --;
+          changed = 1;
 	  _cupsStrFree(p->reasons[i]);
 
 	  if (i < p->num_reasons)
@@ -2778,11 +2781,12 @@ cupsdSetPrinterReasons(
 	  cupsdLogMessage(CUPSD_LOG_ALERT,
 	                  "Too many printer-state-reasons values for %s (%d)",
 			  p->name, i + 1);
-          return;
+          return (changed);
         }
 
         p->reasons[i] = _cupsStrAlloc(reason);
 	p->num_reasons ++;
+        changed = 1;
 
 	if (!strcmp(reason, "paused") && p->state != IPP_PRINTER_STOPPED)
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
@@ -2795,6 +2799,8 @@ cupsdSetPrinterReasons(
       }
     }
   }
+
+  return (changed);
 }
 
 
