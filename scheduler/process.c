@@ -287,7 +287,11 @@ cupsdStartProcess(
                     strerror(errno));
 
     if (job && job->printer)
-      cupsdSetPrinterReasons(job->printer, "+cups-missing-filter-warning");
+    {
+      if (cupsdSetPrinterReasons(job->printer, "+cups-missing-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
+		      "Printer driver %s is missing.", command);
+    }
 
     return (0);
   }
@@ -307,7 +311,12 @@ cupsdStartProcess(
 		    command, commandinfo.st_mode);
 
     if (job && job->printer)
-      cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning");
+    {
+      if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
+		      "Printer driver %s has insecure file permissions (0%o).",
+		      command, commandinfo.st_mode);
+    }
 
     errno = EPERM;
 
