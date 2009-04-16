@@ -1844,17 +1844,34 @@ httpSetField(http_t       *http,	/* I - Connection to server */
 
   strlcpy(http->fields[field], value, HTTP_MAX_VALUE);
 
- /*
-  * Special case for Authorization: as its contents can be
-  * longer than HTTP_MAX_VALUE
-  */
-
   if (field == HTTP_FIELD_AUTHORIZATION)
   {
+   /*
+    * Special case for Authorization: as its contents can be
+    * longer than HTTP_MAX_VALUE
+    */
+
     if (http->field_authorization)
       free(http->field_authorization);
 
     http->field_authorization = strdup(value);
+  }
+  else if (field == HTTP_FIELD_HOST)
+  {
+   /*
+    * Special-case for Host: as we don't want a trailing "." on the hostname.
+    */
+
+    char *ptr = http->fields[HTTP_FIELD_HOST];
+					/* Pointer into Host: field */
+
+    if (*ptr)
+    {
+      ptr += strlen(ptr) - 1;
+
+      if (*ptr == '.')
+        *ptr = '\0';
+    }
   }
 }
 

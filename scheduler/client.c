@@ -41,6 +41,7 @@
  *                            (i.e. "..").
  *   make_certificate()     - Make a self-signed SSL/TLS certificate.
  *   pipe_command()         - Pipe the output of a command to the remote client.
+ *   valid_host()           - Is the Host: field valid?
  *   write_file()           - Send a file via HTTP.
  *   write_pipe()           - Flag that data is available on the CGI pipe.
  */
@@ -110,6 +111,7 @@ static int		make_certificate(cupsd_client_t *con);
 #endif /* HAVE_SSL */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
+static int		valid_host(cupsd_client_t *con);
 static int		write_file(cupsd_client_t *con, http_status_t code,
 		        	   char *filename, char *type,
 				   struct stat *filestats);
@@ -1131,13 +1133,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	return;
       }
     }
-    else if (httpAddrLocalhost(con->http.hostaddr) &&
-             strcasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost") &&
-	     strncasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost:", 10) &&
-	     strcmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1") &&
-	     strncmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1:", 10) &&
-	     strcmp(con->http.fields[HTTP_FIELD_HOST], "[::1]") &&
-	     strncmp(con->http.fields[HTTP_FIELD_HOST], "[::1]:", 6))
+    else if (!valid_host(con))
     {
      /*
       * Access to localhost must use "localhost" or the corresponding IPv4
@@ -3298,6 +3294,10 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
                   "get_cdsa_certificate: Looking for certs for \"%s\"...",
 		  con->servername);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		  con->servername);
+
   options.Data = (uint8 *)&ssl_options;
   options.Length = sizeof(ssl_options);
 
@@ -3989,7 +3989,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL, 0,
                            NULL, &pid))
     {
       unlink(seedfile);
@@ -4878,6 +4878,165 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   }
 
   return (pid);
+}
+
+
+/*
+ * 'valid_host()' - Is the Host: field valid?
+ */
+
+static int				/* O - 1 if valid, 0 if not */
+valid_host(cupsd_client_t *con)		/* I - Client connection */
+{
+  cupsd_alias_t	*a;			/* Current alias */
+  cupsd_netif_t	*netif;			/* Current network interface */
+  const char	*host,			/* Host field */
+		*end;			/* End character */
+
+
+  host = con->http.fields[HTTP_FIELD_HOST];
+
+  if (httpAddrLocalhost(con->http.hostaddr))
+  {
+   /*
+    * Only allow "localhost" or the equivalent IPv4 or IPv6 numerical
+    * addresses when accessing CUPS via the loopback interface...
+    */
+
+    return (!strcasecmp(host, "localhost") ||
+            !strncasecmp(host, "localhost:", 10) ||
+	    !strcasecmp(host, "localhost.") ||
+            !strncasecmp(host, "localhost.:", 11) ||
+#ifdef __linux
+	    !strcasecmp(host, "localhost.localdomain") ||
+            !strncasecmp(host, "localhost.localdomain:", 22) ||
+#endif /* __linux */
+            !strcmp(host, "127.0.0.1") ||
+	    !strncmp(host, "127.0.0.1:", 10) ||
+	    !strcmp(host, "[::1]") ||
+	    !strncmp(host, "[::1]:", 6));
+  }
+
+#ifdef HAVE_DNSSD
+ /*
+  * Check if the hostname is something.local (Bonjour); if so, allow it.
+  */
+
+  if ((end = strrchr(host, '.')) != NULL &&
+      (!strcasecmp(end, ".local") || !strncasecmp(end, ".local:", 7) ||
+       !strcasecmp(end, ".local.") || !strncasecmp(end, ".local.:", 8)))
+    return (1);
+#endif /* HAVE_DNSSD */
+
+ /*
+  * Check if the hostname is an IP address...
+  */
+
+  if (isdigit(*host & 255) || *host == '[')
+  {
+   /*
+    * Possible IPv4/IPv6 address...
+    */
+
+    char	temp[1024],		/* Temporary string */
+		*ptr;			/* Pointer into temporary string */
+    http_addrlist_t *addrlist;		/* List of addresses */
+
+
+    strlcpy(temp, host, sizeof(temp));
+    if ((ptr = strrchr(temp, ':')) != NULL && !strchr(ptr, ']'))
+      *ptr = '\0';			/* Strip :port from host value */
+
+    if ((addrlist = httpAddrGetList(temp, AF_UNSPEC, NULL)) != NULL)
+    {
+     /*
+      * Good IPv4/IPv6 address...
+      */
+
+      httpAddrFreeList(addrlist);
+      return (1);
+    }
+  }
+
+ /*
+  * Check for (alias) name matches...
+  */
+
+  for (a = (cupsd_alias_t *)cupsArrayFirst(ServerAlias);
+       a;
+       a = (cupsd_alias_t *)cupsArrayNext(ServerAlias))
+  {
+   /*
+    * "ServerAlias *" allows all host values through...
+    */
+
+    if (!strcmp(a->name, "*"))
+      return (1);
+
+    if (!strncasecmp(host, a->name, a->namelen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + a->namelen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+
+#ifdef HAVE_DNSSD
+  for (a = (cupsd_alias_t *)cupsArrayFirst(DNSSDAlias);
+       a;
+       a = (cupsd_alias_t *)cupsArrayNext(DNSSDAlias))
+  {
+   /*
+    * "ServerAlias *" allows all host values through...
+    */
+
+    if (!strcmp(a->name, "*"))
+      return (1);
+
+    if (!strncasecmp(host, a->name, a->namelen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + a->namelen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+#endif /* HAVE_DNSSD */
+
+ /*
+  * Check for interface hostname matches...
+  */
+
+  for (netif = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+       netif;
+       netif = (cupsd_netif_t *)cupsArrayNext(NetIFList))
+  {
+    if (!strncasecmp(host, netif->hostname, netif->hostlen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + netif->hostlen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+
+  return (0);
 }
 
 

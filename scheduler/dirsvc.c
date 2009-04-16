@@ -38,6 +38,7 @@
  *   cupsdUpdateLDAPBrowse()    - Scan for new printers via LDAP...
  *   cupsdUpdateSLPBrowse()     - Get browsing information via SLP.
  *   dequote()                  - Remote quotes from a string.
+ *   dnssdAddAlias()            - Add a DNS-SD alias name.
  *   dnssdBuildTxtRecord()      - Build a TXT record from printer info.
  *   dnssdComparePrinters()     - Compare the registered names of two printers.
  *   dnssdDeregisterPrinter()   - Stop sending broadcast information for a
@@ -155,6 +156,10 @@ static void	update_smb(int onoff);
 
 
 #ifdef HAVE_DNSSD
+#  ifdef HAVE_COREFOUNDATION
+static void	dnssdAddAlias(const void *key, const void *value,
+		              void *context);
+#  endif /* HAVE_COREFOUNDATION */
 static char	*dnssdBuildTxtRecord(int *txt_len, cupsd_printer_t *p,
 		                     int for_lpd);
 static int	dnssdComparePrinters(cupsd_printer_t *a, cupsd_printer_t *b);
@@ -1896,6 +1901,7 @@ cupsdUpdateDNSSDName(void)
   char		webif[1024];		/* Web interface share name */
 #ifdef HAVE_COREFOUNDATION_H
   SCDynamicStoreRef sc;			/* Context for dynamic store */
+  CFDictionaryRef btmm;			/* Back-to-My-Mac domains */
   CFStringRef	nameRef;		/* Computer name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
   CFStringEncoding nameEncoding;	/* Computer name encoding */
@@ -1919,6 +1925,10 @@ cupsdUpdateDNSSDName(void)
 
   if (sc)
   {
+   /*
+    * Get the computer name from the dynamic store...
+    */
+
     if ((nameRef = SCDynamicStoreCopyComputerName(sc,
 						  &nameEncoding)) != NULL)
     {
@@ -1929,7 +1939,29 @@ cupsdUpdateDNSSDName(void)
       CFRelease(nameRef);
     }
     else
+    {
+     /*
+      * Use the ServerName instead...
+      */
+
       cupsdSetString(&DNSSDName, ServerName);
+    }
+
+   /*
+    * Get any Back-to-My-Mac domains and add them as aliases...
+    */
+
+    cupsdFreeAliases(DNSSDAlias);
+    DNSSDAlias = NULL;
+
+    btmm = SCDynamicStoreCopyValue(sc, CFSTR("Setup:/Network/BackToMyMac"));
+    if (btmm && CFGetTypeID(btmm) == CFDictionaryGetTypeID())
+      CFDictionaryApplyFunction(btmm, dnssdAddAlias, NULL);
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "No Back to My Mac aliases to add.");
+
+    if (btmm)
+      CFRelease(btmm);
 
     CFRelease(sc);
   }
@@ -2206,6 +2238,38 @@ dequote(char       *d,			/* I - Destination string */
 
 
 #ifdef HAVE_DNSSD
+#  ifdef HAVE_COREFOUNDATION
+/*
+ * 'dnssdAddAlias()' - Add a DNS-SD alias name.
+ */
+
+static void
+dnssdAddAlias(const void *key,		/* I - Key */
+              const void *value,	/* I - Value (domain) */
+	      void       *context)	/* I - Unused */
+{
+  char	valueStr[1024],			/* Domain string */
+	hostname[1024];			/* Complete hostname */
+
+
+  (void)context;
+
+  if (CFGetTypeID((CFStringRef)value) == CFStringGetTypeID() &&
+      CFStringGetCString((CFStringRef)value, valueStr, sizeof(valueStr),
+                         kCFStringEncodingUTF8))
+  {
+    snprintf(hostname, sizeof(hostname), "%s.%s", DNSSDName, valueStr);
+    if (!DNSSDAlias)
+      DNSSDAlias = cupsArrayNew(NULL, NULL);
+
+    cupsdAddAlias(DNSSDAlias, hostname);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Added Back to My Mac ServerAlias %s",
+		    hostname);
+  }
+}
+#  endif /* HAVE_COREFOUNDATION */
+
+
 /*
  * 'dnssdBuildTxtRecord()' - Build a TXT record from printer info.
  */

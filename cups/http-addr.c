@@ -154,7 +154,7 @@ httpAddrLocalhost(
 #endif /* AF_LOCAL */
 
   if (addr->addr.sa_family == AF_INET &&
-      ntohl(addr->ipv4.sin_addr.s_addr) == 0x7f000001)
+      (ntohl(addr->ipv4.sin_addr.s_addr) & 0xff000000) == 0x7f000000)
     return (1);
 
   return (0);
