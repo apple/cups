@@ -47,6 +47,7 @@
 enum
 {
   _PPD_NORMAL_CONSTRAINTS,
+  _PPD_OPTION_CONSTRAINTS,
   _PPD_INSTALLABLE_CONSTRAINTS,
   _PPD_ALL_CONSTRAINTS
 };
@@ -428,7 +429,7 @@ cupsResolveConflicts(
 	      (test = ppd_test_constraints(ppd, constptr->option->keyword,
 	                                   constptr->option->defchoice,
 					   num_newopts, newopts,
-					   _PPD_ALL_CONSTRAINTS)) == NULL)
+					   _PPD_OPTION_CONSTRAINTS)) == NULL)
 	  {
 	   /*
 	    * That worked...
@@ -459,7 +460,7 @@ cupsResolveConflicts(
 	          (test = ppd_test_constraints(ppd, constptr->option->keyword,
 	                                       cptr->choice, num_newopts,
 					       newopts,
-					       _PPD_ALL_CONSTRAINTS)) == NULL)
+					       _PPD_OPTION_CONSTRAINTS)) == NULL)
 	      {
 	       /*
 		* This choice works...
@@ -627,6 +628,9 @@ ppdInstallableConflict(
 {
   cups_array_t	*active;		/* Active conflicts */
 
+
+  DEBUG_printf(("ppdInstallableConflict(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+                ppd, option, choice));
 
  /* 
   * Range check input...
@@ -940,8 +944,9 @@ ppd_test_constraints(
   const char		*value;		/* Current value */
 
 
-  DEBUG_printf(("ppd_test_constraints(ppd=%p, num_options=%d, options=%p, "
-                "which=%d)\n", ppd, num_options, options, which));
+  DEBUG_printf(("ppd_test_constraints(ppd=%p, option=\"%s\", choice=\"%s\", "
+                "num_options=%d, options=%p, which=%d)\n", ppd, option, choice,
+		num_options, options, which));
 
   if (!ppd->cups_uiconstraints)
     ppd_load_constraints(ppd);
@@ -966,8 +971,27 @@ ppd_test_constraints(
 		  consts->constraints[1].choice ?
 		      consts->constraints[1].choice->choice : ""));
 
-    if (which != _PPD_ALL_CONSTRAINTS && which != consts->installable)
-      continue;
+    if (consts->installable && which < _PPD_INSTALLABLE_CONSTRAINTS)
+      continue;				/* Skip installable option constraint */
+
+    if (!consts->installable && which == _PPD_INSTALLABLE_CONSTRAINTS)
+      continue;				/* Skip non-installable option constraint */
+
+    if (which == _PPD_OPTION_CONSTRAINTS && option)
+    {
+     /*
+      * Skip constraints that do not involve the current option...
+      */
+
+      for (i = consts->num_constraints, constptr = consts->constraints;
+	   i > 0;
+	   i --, constptr ++)
+        if (!strcasecmp(constptr->option->keyword, option))
+	  break;
+
+      if (!i)
+        continue;
+    }
 
     DEBUG_puts("ppd_test_constraints: Testing...");
 
