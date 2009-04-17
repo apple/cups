@@ -2362,6 +2362,13 @@ cupsdSetJobState(
   }
 
  /*
+  * Finalize the job immediately if we forced things...
+  */
+
+  if (action == CUPSD_JOB_FORCE)
+    finalize_job(job);
+
+ /*
   * Update the server "busy" state...
   */
 
