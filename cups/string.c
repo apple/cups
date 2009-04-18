@@ -368,7 +368,7 @@ _cupsStrFree(const char *s)		/* I - String to free */
  */
 
 char *					/* O - Pointer to string */
-_cupsStrRetain(char *s)			/* I - String to retain */
+_cupsStrRetain(const char *s)		/* I - String to retain */
 {
   _cups_sp_item_t	*item;		/* Pointer to string pool item */
 
