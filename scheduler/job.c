@@ -2503,7 +2503,7 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   * Close pipes and status buffer...
   */
 
-  cupsdRemoveSelect(job->status_buffer->fd);
+  cupsdRemoveSelect(job->status_pipes[0]);
 
   cupsdClosePipe(job->print_pipes);
   cupsdClosePipe(job->back_pipes);
