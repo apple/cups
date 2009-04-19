@@ -399,9 +399,9 @@ cupsdFreeAliases(cups_array_t *aliases)	/* I - Array of aliases */
   cupsd_alias_t	*a;			/* Current alias */
 
 
-  for (a = (cupsd_alias_t *)cupsArrayFirst(ServerAlias);
+  for (a = (cupsd_alias_t *)cupsArrayFirst(aliases);
        a;
-       a = (cupsd_alias_t *)cupsArrayNext(ServerAlias))
+       a = (cupsd_alias_t *)cupsArrayNext(aliases))
     free(a);
 
   cupsArrayDelete(aliases);
