@@ -2464,19 +2464,28 @@ cupsdSendHeader(
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
-#ifdef HAVE_AUTHORIZATION_H
-    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE)
+    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
+        !strcasecmp(con->http.hostname, "localhost"))
     {
-      int 	 i;			/* Looping var */
+     /*
+      * Add a "trc" (try root certification) parameter for local non-Kerberos
+      * requests when the request requires system group membership - then the
+      * client knows the root certificate can/should be used.
+      *
+      * Also, for Mac OS X we also look for @AUTHKEY and add an "authkey"
+      * parameter as needed...
+      */
+
+      int 	i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
       size_t	auth_size;		/* Size of remaining buffer */
-
 
       auth_key  = auth_str + strlen(auth_str);
       auth_size = sizeof(auth_str) - (auth_key - auth_str);
 
       for (i = 0; i < con->best->num_names; i ++)
       {
+#ifdef HAVE_AUTHORIZATION_H
 	if (!strncasecmp(con->best->names[i], "@AUTHKEY(", 9))
 	{
 	  snprintf(auth_key, auth_size, ", authkey=\"%s\"",
@@ -2484,15 +2493,23 @@ cupsdSendHeader(
 	  /* end parenthesis is stripped in conf.c */
 	  break;
         }
-	else if (!strcasecmp(con->best->names[i], "@SYSTEM") &&
-	         SystemGroupAuthKey)
+	else
+#endif /* HAVE_AUTHORIZATION_H */
+	if (!strcasecmp(con->best->names[i], "@SYSTEM"))
 	{
-	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", SystemGroupAuthKey);
+#ifdef HAVE_AUTHORIZATION_H
+	  if (SystemGroupAuthKey)
+	    snprintf(auth_key, auth_size,
+	             ", authkey=\"%s\", trc=\"y\"",
+		     SystemGroupAuthKey);
+          else
+#else
+	  strlcpy(auth_key, ", trc=\"y\"", auth_size));
+#endif /* HAVE_AUTHORIZATION_H */
 	  break;
 	}
       }
     }
-#endif /* HAVE_AUTHORIZATION_H */
 
     if (auth_str[0])
     {

@@ -3,7 +3,7 @@
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -491,7 +491,8 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 #else
   int			pid;		/* Current process ID */
   FILE			*fp;		/* Certificate file */
-  char			filename[1024],	/* Certificate filename */
+  char			trc[16],	/* Try Root Certificate parameter */
+			filename[1024],	/* Certificate filename */
 			certificate[33];/* Certificate string */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 #  if defined(HAVE_AUTHORIZATION_H)
@@ -598,24 +599,33 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   snprintf(filename, sizeof(filename), "%s/certs/%d", cg->cups_statedir, pid);
   if ((fp = fopen(filename, "r")) == NULL && pid > 0)
   {
+   /*
+    * No certificate for this PID; see if we can get the root certificate...
+    */
+
     DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
                   filename, strerror(errno)));
 
 #ifdef HAVE_GSSAPI
-   /*
-    * If local certificate authentication isn't available for this PID,
-    * check if we need Kerberos authentication...
-    */
-
     if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
-      * Yes, don't try the root certificate...
+      * Kerberos required, don't try the root certificate...
       */
 
       return (1);
     }
 #endif /* HAVE_GSSAPI */
+
+    if (!httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "trc", trc,
+	                  sizeof(trc)))
+    {
+     /*
+      * Scheduler doesn't want us to use the root certificate...
+      */
+
+      return (1);
+    }
 
     snprintf(filename, sizeof(filename), "%s/certs/0", cg->cups_statedir);
     fp = fopen(filename, "r");
