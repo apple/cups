@@ -20,8 +20,8 @@
  * Contents:
  *
  *   cupsDoAuthentication() - Authenticate a request.
- *   DEBUG_gss_printf()     - Show debug error messages from GSSAPI...
- *   cups_get_gss_creds()   - Get CUPS service credentials for authentication.
+ *   cups_get_gssname()     - Get GSSAPI name for authentication.
+ *   cups_gss_printf()      - Show error messages from GSSAPI...
  *   cups_local_auth()      - Get the local authorization certificate if
  *                            available/applicable...
  */
@@ -62,13 +62,13 @@ extern const char *cssmErrorString(int error);
  */
 
 #ifdef HAVE_GSSAPI
+static gss_name_t cups_get_gssname(http_t *http, const char *service_name);
 #  ifdef DEBUG
-static void	DEBUG_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
-				 const char *message);
+static void	cups_gss_printf(OM_uint32 major_status, OM_uint32 minor_status,
+				const char *message);
 #  else
-#    define DEBUG_gss_printf(major, minor, message)
-#  endif /* DEBUG  */
-static gss_name_t cups_get_gss_creds(http_t *http, const char *service_name);
+#    define	cups_gss_printf(major, minor, message)
+#  endif /* DEBUG */
 #endif /* HAVE_GSSAPI */
 static int	cups_local_auth(http_t *http);
 
@@ -220,7 +220,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
       else
 	DEBUG_puts("cupsDoAuthentication: GSS service name set via environment");
 
-      http->gssname = cups_get_gss_creds(http, gss_service_name);
+      http->gssname = cups_get_gssname(http, gss_service_name);
     }
 
 #  ifdef USE_SPNEGO /* We don't implement SPNEGO just yet... */
@@ -277,8 +277,10 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 					 &http->gssctx,
 					 http->gssname, http->gssmech,
-					 GSS_C_DELEG_FLAG | GSS_C_MUTUAL_FLAG |
-					     GSS_C_INTEG_FLAG,
+#ifdef GSS_C_DELEG_POLICY_FLAG
+					 GSS_C_DELEG_POLICY_FLAG |
+#endif /* GSS_C_DELEG_POLICY_FLAG */
+					 GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
 					 GSS_C_INDEFINITE,
 					 GSS_C_NO_CHANNEL_BINDINGS,
 					 &input_token, &http->gssmech,
@@ -289,15 +291,13 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
 
     if (GSS_ERROR(major_status))
     {
-#  ifdef DEBUG
-      DEBUG_gss_printf(major_status, minor_status,
+      cups_gss_printf(major_status, minor_status,
 		       "Unable to initialize security context");
-#  endif /* DEBUG */
       return (-1);
     }
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
-      DEBUG_gss_printf(major_status, minor_status, "Continuation needed!");
+      cups_gss_printf(major_status, minor_status, "Continuation needed!");
 
     if (output_token.length > 0 && output_token.length <= 65536)
     {
@@ -376,15 +376,72 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
 
 
 #ifdef HAVE_GSSAPI
+/*
+ * 'cups_get_gssname()' - Get CUPS service credentials for authentication.
+ */
+
+static gss_name_t			/* O - Server name */
+cups_get_gssname(
+    http_t     *http,			/* I - Connection to server */
+    const char *service_name)		/* I - Service name */
+{
+  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
+					/* Service token */
+  OM_uint32	  major_status,		/* Major status code */
+		  minor_status;		/* Minor status code */
+  gss_name_t	  server_name;		/* Server name */
+  char		  buf[1024],		/* Name buffer */
+		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
+
+
+  DEBUG_printf(("cups_get_gssname(http=%p, service_name=\"%s\")", http,
+                service_name));
+
+
+ /*
+  * Get the hostname...
+  */
+
+  httpGetHostname(http, fqdn, sizeof(fqdn));
+
+  if (!strcmp(fqdn, "localhost"))
+    httpGetHostname(NULL, fqdn, sizeof(fqdn));
+
+ /*
+  * Get a server name we can use for authentication purposes...
+  */
+
+  snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
+
+  DEBUG_printf(("cups_get_gssname: Looking up %s...\n", buf));
+
+  token.value  = buf;
+  token.length = strlen(buf);
+  server_name  = GSS_C_NO_NAME;
+  major_status = gss_import_name(&minor_status, &token,
+	 			 GSS_C_NT_HOSTBASED_SERVICE,
+				 &server_name);
+
+  if (GSS_ERROR(major_status))
+  {
+    cups_gss_printf(major_status, minor_status,
+                    "cups_get_gssname: gss_import_name() failed");
+    return (NULL);
+  }
+
+  return (server_name);
+}
+
+
 #  ifdef DEBUG
 /*
- * 'DEBUG_gss_printf()' - Show debug error messages from GSSAPI...
+ * 'cups_gss_printf()' - Show debug error messages from GSSAPI...
  */
 
 static void
-DEBUG_gss_printf(OM_uint32 major_status,/* I - Major status code */
-                 OM_uint32 minor_status,/* I - Minor status code */
-		 const char *message)	/* I - Prefix for error message */
+cups_gss_printf(OM_uint32  major_status,/* I - Major status code */
+		OM_uint32  minor_status,/* I - Minor status code */
+		const char *message)	/* I - Prefix for error message */
 {
   OM_uint32	err_major_status,	/* Major status code for display */
 		err_minor_status;	/* Minor status code for display */
@@ -407,68 +464,13 @@ DEBUG_gss_printf(OM_uint32 major_status,/* I - Major status code */
     gss_display_status(&err_minor_status, minor_status, GSS_C_MECH_CODE,
 		       GSS_C_NULL_OID, &msg_ctx, &minor_status_string);
 
-  printf("%s: %s, %s\n", message, (char *)major_status_string.value,
-	 (char *)minor_status_string.value);
+  DEBUG_printf(("%s: %s, %s", message, (char *)major_status_string.value,
+	        (char *)minor_status_string.value));
 
   gss_release_buffer(&err_minor_status, &major_status_string);
   gss_release_buffer(&err_minor_status, &minor_status_string);
 }
 #  endif /* DEBUG */
-
-
-/*
- * 'cups_get_gss_creds()' - Get CUPS service credentials for authentication.
- */
-
-static gss_name_t			/* O - Server name */
-cups_get_gss_creds(
-    http_t     *http,			/* I - Connection to server */
-    const char *service_name)		/* I - Service name */
-{
-  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
-					/* Service token */
-  OM_uint32	  major_status,		/* Major status code */
-		  minor_status;		/* Minor status code */
-  gss_name_t	  server_name;		/* Server name */
-  char		  buf[1024],		/* Name buffer */
-		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
-
-
- /*
-  * Get the hostname...
-  */
-
-  httpGetHostname(http, fqdn, sizeof(fqdn));
-
-  if (!strcmp(fqdn, "localhost"))
-    httpGetHostname(NULL, fqdn, sizeof(fqdn));
-
- /*
-  * Get a server name we can use for authentication purposes...
-  */
-
-  snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
-
-  DEBUG_printf(("cups_get_gss_creds: Looking up %s...\n", buf));
-
-  token.value  = buf;
-  token.length = strlen(buf);
-  server_name  = GSS_C_NO_NAME;
-  major_status = gss_import_name(&minor_status, &token,
-	 			 GSS_C_NT_HOSTBASED_SERVICE,
-				 &server_name);
-
-  if (GSS_ERROR(major_status))
-  {
-#  ifdef DEBUG
-    DEBUG_gss_printf(major_status, minor_status, "gss_import_name() failed");
-#  endif /* DEBUG */
-
-    return (NULL);
-  }
-
-  return (server_name);
-}
 #endif /* HAVE_GSSAPI */
 
 

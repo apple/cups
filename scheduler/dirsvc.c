@@ -1968,7 +1968,7 @@ cupsdUpdateDNSSDName(void)
     if (btmm && CFGetTypeID(btmm) == CFDictionaryGetTypeID())
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG, "%d Back to My Mac aliases to add.",
-		      CFDictionaryGetCount(btmm));
+		      (int)CFDictionaryGetCount(btmm));
       CFDictionaryApplyFunction(btmm, dnssdAddAlias, NULL);
     }
     else if (btmm)

@@ -118,9 +118,6 @@ static const cupsd_var_t	variables[] =
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-#ifdef HAVE_GSSAPI
-  { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
-#endif /* HAVE_GSSAPI */
   { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
@@ -502,9 +499,6 @@ cupsdReadConfiguration(void)
   cupsdSetString(&RemoteRoot, "remroot");
   cupsdSetString(&ServerHeader, "CUPS/1.4");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
-#ifdef HAVE_GSSAPI
-  cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
-#endif /* HAVE_GSSAPI */
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
     PrintcapFormat = PRINTCAP_SOLARIS;
@@ -3126,19 +3120,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #endif /* HAVE_SSL */
-#ifdef HAVE_GSSAPI
-    else if (!strcasecmp(line, "Krb5Keytab") && value)
-    {
-      cupsdSetStringf(&Krb5Keytab, "KRB5_KTNAME=%s", value);
-      putenv(Krb5Keytab);
-
-#  ifdef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
-      gsskrb5_register_acceptor_identity(value);
-#  else
-      cupsdSetEnv("KRB5_KTNAME", value);
-#  endif /* HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY */
-    }
-#endif /* HAVE_GSSAPI */
     else if (!strcasecmp(line, "User") && value)
     {
      /*

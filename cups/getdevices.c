@@ -130,8 +130,8 @@ cupsGetDevices(
 
 	if ((auth_result = cupsDoAuthentication(http, "POST", "/")) == 0)
 	  httpReconnect(http);
-	else if (auth_result < 0)
-	  http->status = status = HTTP_FORBIDDEN;
+	else
+	  break;
       }
 
 #ifdef HAVE_SSL

@@ -397,7 +397,7 @@ _cupsStrRetain(const char *s)		/* I - String to retain */
 #endif /* HAVE_PTHREAD_H */
   }
 
-  return (s);
+  return ((char *)s);
 }
 
 

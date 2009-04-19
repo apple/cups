@@ -19,6 +19,7 @@ dnl
 AC_ARG_ENABLE(gssapi, [  --disable-gssapi        disable GSSAPI support])
 
 LIBGSSAPI=""
+AC_SUBST(LIBGSSAPI)
 
 if test x$enable_gssapi != xno; then
 	AC_PATH_PROG(KRB5CONFIG, krb5-config)
@@ -73,6 +74,7 @@ if test x$enable_gssapi != xno; then
 		AC_CHECK_FUNC(gsskrb5_register_acceptor_identity, 
 			      AC_DEFINE(HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY))
 		AC_CHECK_FUNC(krb5_cc_new_unique, AC_DEFINE(HAVE_KRB5_CC_NEW_UNIQUE))
+		AC_CHECK_FUNC(krb5_ipc_client_set_target_uid, AC_DEFINE(HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID))
 
 		AC_MSG_CHECKING(for GSS_C_NT_HOSTBASED_SERVICE)
 		if test $ac_cv_header_gssapi_gssapi_h = yes; then
@@ -115,7 +117,6 @@ else
 	CUPS_DEFAULT_GSSSERVICENAME=""
 fi
 
-AC_SUBST(LIBGSSAPI)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_GSSSERVICENAME, "$CUPS_DEFAULT_GSSSERVICENAME")
 
 dnl

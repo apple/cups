@@ -160,12 +160,6 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
 					/* Classification of system */
-#ifdef HAVE_GSSAPI
-VAR char		*GSSServiceName		VALUE(NULL);
-					/* GSS service name */
-VAR char		*Krb5Keytab		VALUE(NULL);
-					/* Kerberos Keytab */
-#endif /* HAVE_GSSAPI */
 VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
