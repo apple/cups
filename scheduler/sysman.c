@@ -400,7 +400,7 @@ sysEventThreadEntry(void)
 
   if (!BTMMKey)
     BTMMKey = SCDynamicStoreKeyCreate(kCFAllocatorDefault,
-                                      "Setup:/Network/BackToMyMac");
+                                      CFSTR("Setup:/Network/BackToMyMac"));
 
   if (!NetworkGlobalKeyIPv4)
     NetworkGlobalKeyIPv4 =
