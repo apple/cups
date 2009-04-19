@@ -1913,6 +1913,7 @@ cupsdUpdateDNSSDName(void)
   * enabled...
   */
 
+
   if (!DNSSDPort)
     return;
 
@@ -1929,21 +1930,30 @@ cupsdUpdateDNSSDName(void)
     * Get the computer name from the dynamic store...
     */
 
+    cupsdClearString(&DNSSDName);
+
     if ((nameRef = SCDynamicStoreCopyComputerName(sc,
 						  &nameEncoding)) != NULL)
     {
       if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
 			     kCFStringEncodingUTF8))
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "Dynamic store computer name is \"%s\".", nameBuffer);
 	cupsdSetString(&DNSSDName, nameBuffer);
+      }
 
       CFRelease(nameRef);
     }
-    else
+
+    if (!DNSSDName)
     {
      /*
       * Use the ServerName instead...
       */
 
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Using ServerName \"%s\" as computer name.", ServerName);
       cupsdSetString(&DNSSDName, ServerName);
     }
 
@@ -1956,7 +1966,14 @@ cupsdUpdateDNSSDName(void)
 
     btmm = SCDynamicStoreCopyValue(sc, CFSTR("Setup:/Network/BackToMyMac"));
     if (btmm && CFGetTypeID(btmm) == CFDictionaryGetTypeID())
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "%d Back to My Mac aliases to add.",
+		      CFDictionaryGetCount(btmm));
       CFDictionaryApplyFunction(btmm, dnssdAddAlias, NULL);
+    }
+    else if (btmm)
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Bad Back to My Mac data in dynamic store!");
     else
       cupsdLogMessage(CUPSD_LOG_DEBUG, "No Back to My Mac aliases to add.");
 
@@ -2266,6 +2283,9 @@ dnssdAddAlias(const void *key,		/* I - Key */
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Added Back to My Mac ServerAlias %s",
 		    hostname);
   }
+  else
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Bad Back to My Mac domain in dynamic store!");
 }
 #  endif /* HAVE_COREFOUNDATION */
 
