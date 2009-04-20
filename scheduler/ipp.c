@@ -7615,6 +7615,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   const char	*username;		/* Current user */
   char		*first_printer_name;	/* first-printer-name attribute */
   cups_array_t	*ra;			/* Requested attributes array */
+  int		local;			/* Local connection? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printers(%p[%d], %x)", con,
@@ -7672,6 +7673,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   else
     printer_mask = 0;
 
+  local = httpAddrLocalhost(&(con->http.hostaddr));
+
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     location = attr->values[0].string.text;
@@ -7704,6 +7707,9 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
        count < limit && printer;
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
+    if (!local && !printer->shared)
+      continue;
+
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(!location ||
