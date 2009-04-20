@@ -96,11 +96,11 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
   _cups_globals_t *cg;			/* Global data */
 
 
-  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")\n",
+  DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")",
                 http, method, resource));
-  DEBUG_printf(("cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"\n",
+  DEBUG_printf(("2cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"",
                 http->digest_tries, http->userpass));
-  DEBUG_printf(("cupsDoAuthentication: WWW-Authenticate=\"%s\"\n",
+  DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
                 httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
  /*
@@ -117,7 +117,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
   {
     if ((localauth = cups_local_auth(http)) == 0)
     {
-      DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n",
+      DEBUG_printf(("2cupsDoAuthentication: authstring=\"%s\"",
                     http->authstring));
   
       if (http->status == HTTP_UNAUTHORIZED)
@@ -199,7 +199,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
 
     if (gss_init_sec_context == NULL)
     {
-      DEBUG_puts("cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
+      DEBUG_puts("1cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
                  "is not present");
       return (-1);
     }
@@ -207,7 +207,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
 
     if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
     {
-      DEBUG_printf(("cupsDoAuthentication: too many Negotiate tries (%d)\n",
+      DEBUG_printf(("1cupsDoAuthentication: too many Negotiate tries (%d)",
                     http->digest_tries));
   
       return (-1);
@@ -218,7 +218,8 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
       if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
 	gss_service_name = CUPS_DEFAULT_GSSSERVICENAME;
       else
-	DEBUG_puts("cupsDoAuthentication: GSS service name set via environment");
+	DEBUG_puts("2cupsDoAuthentication: GSS service name set via "
+	           "environment variable");
 
       http->gssname = cups_get_gssname(http, gss_service_name);
     }
@@ -292,12 +293,14 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     if (GSS_ERROR(major_status))
     {
       cups_gss_printf(major_status, minor_status,
-		       "Unable to initialize security context");
+		      "cupsDoAuthentication: Unable to initialize security "
+		      "context");
       return (-1);
     }
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
-      cups_gss_printf(major_status, minor_status, "Continuation needed!");
+      cups_gss_printf(major_status, minor_status,
+		      "cupsDoAuthentication: Continuation needed!");
 
     if (output_token.length > 0 && output_token.length <= 65536)
     {
@@ -326,8 +329,8 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     }
     else
     {
-      DEBUG_printf(("cupsDoAuthentication: Kerberos credentials too large - "
-                    "%d bytes!\n", (int)output_token.length));
+      DEBUG_printf(("1cupsDoAuthentication: Kerberos credentials too large - "
+                    "%d bytes!", (int)output_token.length));
 
       gss_release_buffer(&minor_status, &output_token);
 
@@ -369,7 +372,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     httpSetAuthString(http, "Digest", digest);
   }
 
-  DEBUG_printf(("cupsDoAuthentication: authstring=\"%s\"\n", http->authstring));
+  DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\"", http->authstring));
 
   return (0);
 }
@@ -394,7 +397,7 @@ cups_get_gssname(
 		  fqdn[HTTP_MAX_URI];	/* Server name buffer */
 
 
-  DEBUG_printf(("cups_get_gssname(http=%p, service_name=\"%s\")", http,
+  DEBUG_printf(("7cups_get_gssname(http=%p, service_name=\"%s\")", http,
                 service_name));
 
 
@@ -413,7 +416,7 @@ cups_get_gssname(
 
   snprintf(buf, sizeof(buf), "%s@%s", service_name, fqdn);
 
-  DEBUG_printf(("cups_get_gssname: Looking up %s...\n", buf));
+  DEBUG_printf(("9cups_get_gssname: Looking up %s...", buf));
 
   token.value  = buf;
   token.length = strlen(buf);
@@ -464,7 +467,7 @@ cups_gss_printf(OM_uint32  major_status,/* I - Major status code */
     gss_display_status(&err_minor_status, minor_status, GSS_C_MECH_CODE,
 		       GSS_C_NULL_OID, &msg_ctx, &minor_status_string);
 
-  DEBUG_printf(("%s: %s, %s", message, (char *)major_status_string.value,
+  DEBUG_printf(("8%s: %s, %s", message, (char *)major_status_string.value,
 	        (char *)minor_status_string.value));
 
   gss_release_buffer(&err_minor_status, &major_status_string);
@@ -508,7 +511,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 #  endif /* HAVE_AUTHORIZATION_H */
 
 
-  DEBUG_printf(("cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"\n",
+  DEBUG_printf(("7cups_local_auth(http=%p) hostaddr=%s, hostname=\"%s\"",
                 http, httpAddrString(http->hostaddr, filename, sizeof(filename)), http->hostname));
 
  /*
@@ -518,7 +521,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   if (!httpAddrLocalhost(http->hostaddr) &&
       strcasecmp(http->hostname, "localhost") != 0)
   {
-    DEBUG_puts("cups_local_auth: Not a local connection!");
+    DEBUG_puts("8cups_local_auth: Not a local connection!");
     return (1);
   }
 
@@ -541,7 +544,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 				 kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
-      DEBUG_printf(("cups_local_auth: AuthorizationCreate() returned %d (%s)\n",
+      DEBUG_printf(("8cups_local_auth: AuthorizationCreate() returned %d (%s)",
 		    (int)status, cssmErrorString(status)));
       return (-1);
     }
@@ -576,14 +579,14 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
       httpSetAuthString(http, "AuthRef", buffer);
 
-      DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
 		    http->authstring));
       return (0);
     }
     else if (status == errAuthorizationCanceled)
       return (-1);
 
-    DEBUG_printf(("cups_local_auth: AuthorizationCopyRights() returned %d (%s)\n",
+    DEBUG_printf(("9cups_local_auth: AuthorizationCopyRights() returned %d (%s)",
 		  (int)status, cssmErrorString(status)));
 
   /*
@@ -605,7 +608,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     * No certificate for this PID; see if we can get the root certificate...
     */
 
-    DEBUG_printf(("cups_local_auth: Unable to open file %s: %s\n",
+    DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s",
                   filename, strerror(errno)));
 
 #ifdef HAVE_GSSAPI
@@ -648,7 +651,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     httpSetAuthString(http, "Local", certificate);
 
-    DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+    DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
 		  http->authstring));
 
     return (0);
@@ -677,7 +680,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     {
       httpSetAuthString(http, "PeerCred", username);
 
-      DEBUG_printf(("cups_local_auth: Returning authstring = \"%s\"\n",
+      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
 		    http->authstring));
 
       return (0);

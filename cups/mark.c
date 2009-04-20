@@ -465,17 +465,17 @@ ppdFindMarkedChoice(ppd_file_t *ppd,	/* I - PPD file */
 		*marked;		/* Marked choice */
 
 
-  DEBUG_printf(("ppdFindMarkedChoice(ppd=%p, option=\"%s\")", ppd, option));
+  DEBUG_printf(("2ppdFindMarkedChoice(ppd=%p, option=\"%s\")", ppd, option));
 
   if ((key.option = ppdFindOption(ppd, option)) == NULL)
   {
-    DEBUG_puts("ppdFindMarkedChoice: Option not found, returning NULL");
+    DEBUG_puts("3ppdFindMarkedChoice: Option not found, returning NULL");
     return (NULL);
   }
 
   marked = (ppd_choice_t *)cupsArrayFind(ppd->marked, &key);
 
-  DEBUG_printf(("ppdFindMarkedChoice: Returning %p(%s)...", marked,
+  DEBUG_printf(("3ppdFindMarkedChoice: Returning %p(%s)...", marked,
                 marked ? marked->choice : "NULL"));
 
   return (marked);
@@ -602,7 +602,7 @@ ppdMarkOption(ppd_file_t *ppd,		/* I - PPD file record */
               const char *option,	/* I - Keyword */
               const char *choice)	/* I - Option name */
 {
-  DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+  DEBUG_printf(("ppdMarkOption(ppd=%p, option=\"%s\", choice=\"%s\")",
         	ppd, option, choice));
 
  /*
@@ -756,12 +756,12 @@ debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
   ppd_choice_t	*c;			/* Current choice */
 
 
-  DEBUG_printf(("cupsMarkOptions: %s\n", title));
+  DEBUG_printf(("2cupsMarkOptions: %s", title));
 
   for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
        c;
        c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
-    DEBUG_printf(("cupsMarkOptions: %s=%s\n", c->option->keyword, c->choice));
+    DEBUG_printf(("2cupsMarkOptions: %s=%s", c->option->keyword, c->choice));
 }
 #endif /* DEBUG */
 
@@ -832,7 +832,7 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
   struct lconv	*loc;			/* Locale data */
 
 
-  DEBUG_printf(("ppd_mark_option(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+  DEBUG_printf(("7ppd_mark_option(ppd=%p, option=\"%s\", choice=\"%s\")",
         	ppd, option, choice));
 
  /*

@@ -109,7 +109,7 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
   float		*orders;		/* Collected order values */
 
 
-  DEBUG_printf(("ppdCollect2(ppd=%p, section=%d, min_order=%f, choices=%p)\n",
+  DEBUG_printf(("ppdCollect2(ppd=%p, section=%d, min_order=%f, choices=%p)",
                 ppd, section, min_order, choices));
 
   if (!ppd || !choices)
@@ -223,7 +223,7 @@ ppdCollect2(ppd_file_t    *ppd,		/* I - PPD file data */
 
   free(orders);
 
-  DEBUG_printf(("ppdCollect2: %d marked choices...\n", count));
+  DEBUG_printf(("2ppdCollect2: %d marked choices...", count));
 
  /*
   * Return the array and number of choices; if 0, free the array since
@@ -626,7 +626,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   struct lconv	*loc;			/* Locale data */
 
 
-  DEBUG_printf(("ppdEmitString(ppd=%p, section=%d, min_order=%f)\n",
+  DEBUG_printf(("ppdEmitString(ppd=%p, section=%d, min_order=%f)",
                 ppd, section, min_order));
 
  /*
@@ -697,7 +697,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
            !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
           !strcasecmp(choices[i]->choice, "Custom"))
       {
-        DEBUG_puts("ppdEmitString: Custom size set!");
+        DEBUG_puts("2ppdEmitString: Custom size set!");
 
         bufsize += 37;			/* %%BeginFeature: *CustomPageSize True\n */
         bufsize += 50;			/* Five 9-digit numbers + newline */
@@ -752,7 +752,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
   * Allocate memory...
   */
 
-  DEBUG_printf(("ppdEmitString: Allocating %d bytes for string...\n",
+  DEBUG_printf(("2ppdEmitString: Allocating %d bytes for string...",
                 (int)bufsize));
 
   if ((buffer = calloc(1, bufsize)) == NULL)
@@ -865,8 +865,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
       * Send DSC comments with option...
       */
 
-      DEBUG_printf(("Adding code for %s=%s...\n", choices[i]->option->keyword,
-                    choices[i]->choice));
+      DEBUG_printf(("2ppdEmitString: Adding code for %s=%s...",
+		    choices[i]->option->keyword, choices[i]->choice));
 
       if ((!strcasecmp(choices[i]->option->keyword, "PageSize") ||
            !strcasecmp(choices[i]->option->keyword, "PageRegion")) &&
@@ -1070,7 +1070,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 		      "} stopped cleartomark\n", bufend - bufptr + 1);
       bufptr += strlen(bufptr);
 
-      DEBUG_printf(("ppdEmitString: Offset in string is %d...\n",
+      DEBUG_printf(("2ppdEmitString: Offset in string is %d...",
                     (int)(bufptr - buffer)));
     }
     else

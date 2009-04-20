@@ -187,7 +187,7 @@ cupsEncodeOptions(ipp_t         *ipp,		/* I - Request to add to */
         	  int           num_options,	/* I - Number of options */
 		  cups_option_t *options)	/* I - Options */
 {
-  DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)\n", ipp, num_options, options));
+  DEBUG_printf(("cupsEncodeOptions(%p, %d, %p)", ipp, num_options, options));
 
  /*
   * Add the options in the proper groups & order...
@@ -232,7 +232,7 @@ cupsEncodeOptions2(
 
 
   DEBUG_printf(("cupsEncodeOptions2(ipp=%p, num_options=%d, options=%p, "
-                "group_tag=%x)\n", ipp, num_options, options, group_tag));
+                "group_tag=%x)", ipp, num_options, options, group_tag));
 
  /*
   * Range check input...
@@ -340,7 +340,7 @@ cupsEncodeOptions2(
     else
       count = 1;
 
-    DEBUG_printf(("cupsEncodeOptions2: option = \'%s\', count = %d\n",
+    DEBUG_printf(("2cupsEncodeOptions2: option=\"%s\", count=%d",
                   option->name, count));
 
    /*
@@ -353,7 +353,7 @@ cupsEncodeOptions2(
       * Ran out of memory!
       */
 
-      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for attributes!");
+      DEBUG_puts("1cupsEncodeOptions2: Ran out of memory for attributes!");
       return;
     }
 
@@ -382,7 +382,7 @@ cupsEncodeOptions2(
 	* Ran out of memory!
 	*/
 
-	DEBUG_puts("cupsEncodeOptions2: Ran out of memory for value copy!");
+	DEBUG_puts("1cupsEncodeOptions2: Ran out of memory for value copy!");
 	ippDeleteAttribute(ipp, attr);
 	return;
       }
@@ -459,8 +459,8 @@ cupsEncodeOptions2(
 
             attr->values[j].integer = strtol(val, &s, 10);
 
-            DEBUG_printf(("cupsEncodeOptions2: Added integer option value %d...\n",
-	                  attr->values[j].integer));
+            DEBUG_printf(("2cupsEncodeOptions2: Added integer option value "
+	                  "%d...", attr->values[j].integer));
             break;
 
 	case IPP_TAG_BOOLEAN :
@@ -474,7 +474,7 @@ cupsEncodeOptions2(
 
 	      attr->values[j].boolean = 1;
 
-              DEBUG_puts("cupsEncodeOptions2: Added boolean true value...");
+              DEBUG_puts("2cupsEncodeOptions2: Added boolean true value...");
 	    }
 	    else
 	    {
@@ -484,7 +484,7 @@ cupsEncodeOptions2(
 
 	      attr->values[j].boolean = 0;
 
-              DEBUG_puts("cupsEncodeOptions2: Added boolean false value...");
+              DEBUG_puts("2cupsEncodeOptions2: Added boolean false value...");
 	    }
             break;
 
@@ -511,8 +511,8 @@ cupsEncodeOptions2(
 	    else
 	      attr->values[j].range.upper = attr->values[j].range.lower;
 
-	    DEBUG_printf(("cupsEncodeOptions2: Added range option value %d-%d...\n",
-                	  attr->values[j].range.lower,
+	    DEBUG_printf(("2cupsEncodeOptions2: Added range option value "
+	                  "%d-%d...", attr->values[j].range.lower,
 			  attr->values[j].range.upper));
             break;
 
@@ -533,8 +533,8 @@ cupsEncodeOptions2(
             else
               attr->values[j].resolution.units = IPP_RES_PER_INCH;
 
-	    DEBUG_printf(("cupsEncodeOptions2: Added resolution option value %s...\n",
-                	  val));
+	    DEBUG_printf(("2cupsEncodeOptions2: Added resolution option value "
+	                  "%s...", val));
             break;
 
 	case IPP_TAG_STRING :
@@ -545,8 +545,8 @@ cupsEncodeOptions2(
             attr->values[j].unknown.length = (int)strlen(val);
 	    attr->values[j].unknown.data   = strdup(val);
 
-            DEBUG_printf(("cupsEncodeOptions2: Added octet-string value "
-	                  "\"%s\"...\n", (char *)attr->values[j].unknown.data));
+            DEBUG_printf(("2cupsEncodeOptions2: Added octet-string value "
+	                  "\"%s\"...", (char *)attr->values[j].unknown.data));
             break;
 
         case IPP_TAG_BEGIN_COLLECTION :
@@ -578,7 +578,7 @@ cupsEncodeOptions2(
 	      * Ran out of memory!
 	      */
 
-	      DEBUG_puts("cupsEncodeOptions2: Ran out of memory for string!");
+	      DEBUG_puts("1cupsEncodeOptions2: Ran out of memory for string!");
 
 	      if (copy)
 	        free(copy);
@@ -587,7 +587,7 @@ cupsEncodeOptions2(
 	      return;
 	    }
 
-	    DEBUG_printf(("cupsEncodeOptions2: Added string value \"%s\"...\n",
+	    DEBUG_printf(("2cupsEncodeOptions2: Added string value \"%s\"...",
 	                  val));
             break;
       }

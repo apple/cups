@@ -3,7 +3,7 @@
  *
  *   PPD file routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -577,7 +577,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
   mask = ppd_read(fp, &line, keyword, name, text, &string, 0, cg);
 
-  DEBUG_printf(("1ppdOpen2: mask=%x, keyword=\"%s\"...", mask, keyword));
+  DEBUG_printf(("2ppdOpen2: mask=%x, keyword=\"%s\"...", mask, keyword));
 
   if (mask == 0 ||
       strcmp(keyword, "PPD-Adobe") ||
@@ -596,7 +596,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     return (NULL);
   }
 
-  DEBUG_printf(("1ppdOpen2: keyword=%s, string=%p", keyword, string));
+  DEBUG_printf(("2ppdOpen2: keyword=%s, string=%p", keyword, string));
 
   _cupsStrFree(string);
 
@@ -641,7 +641,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
   while ((mask = ppd_read(fp, &line, keyword, name, text, &string, 1, cg)) != 0)
   {
-    DEBUG_printf(("1ppdOpen2: mask=%x, keyword=\"%s\", name=\"%s\", "
+    DEBUG_printf(("2ppdOpen2: mask=%x, keyword=\"%s\", name=\"%s\", "
                   "text=\"%s\", string=%d chars...", mask, keyword, name, text,
 		  string ? (int)strlen(string) : 0));
 
@@ -692,7 +692,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         ui_keyword = 1;
 
-        DEBUG_printf(("ppdOpen2: FOUND ADOBE UI KEYWORD %s WITHOUT OPENUI!",
+        DEBUG_printf(("2ppdOpen2: FOUND ADOBE UI KEYWORD %s WITHOUT OPENUI!",
 	              keyword));
 
         if (!group)
@@ -701,7 +701,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	                             encoding)) == NULL)
 	    goto error;
 
-          DEBUG_printf(("1ppdOpen2: Adding to group %s...", group->text));
+          DEBUG_printf(("2ppdOpen2: Adding to group %s...", group->text));
           option = ppd_get_option(group, keyword);
 	  group  = NULL;
 	}
@@ -736,7 +736,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	      !strcmp(ppd->attrs[j]->name + 7, keyword) &&
 	      ppd->attrs[j]->value)
 	  {
-	    DEBUG_printf(("1ppdOpen2: Setting Default%s to %s via attribute...",
+	    DEBUG_printf(("2ppdOpen2: Setting Default%s to %s via attribute...",
 	                  option->keyword, ppd->attrs[j]->value));
 	    strlcpy(option->defchoice, ppd->attrs[j]->value,
 	            sizeof(option->defchoice));
@@ -1034,7 +1034,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     {
       ppd_option_t	*custom_option;	/* Custom option */
 
-      DEBUG_puts("Processing Custom option...");
+      DEBUG_puts("2ppdOpen2: Processing Custom option...");
 
      /*
       * Get the option and custom option...
@@ -1061,7 +1061,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         if ((choice = ppdFindChoice(custom_option, "Custom")) == NULL)
 	  if ((choice = ppd_add_choice(custom_option, "Custom")) == NULL)
 	  {
-	    DEBUG_puts("Unable to add Custom choice!");
+	    DEBUG_puts("1ppdOpen2: Unable to add Custom choice!");
 
 	    cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1101,7 +1101,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	  if ((choice = ppdFindChoice(custom_option, "Custom")) == NULL)
 	    if ((choice = ppd_add_choice(custom_option, "Custom")) == NULL)
 	    {
-	      DEBUG_puts("Unable to add Custom choice!");
+	      DEBUG_puts("1ppdOpen2: Unable to add Custom choice!");
 
 	      cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1211,7 +1211,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Add an option record to the current sub-group, group, or file...
       */
 
-      DEBUG_printf(("1ppdOpen2: name=\"%s\" (%d)", name, (int)strlen(name)));
+      DEBUG_printf(("2ppdOpen2: name=\"%s\" (%d)", name, (int)strlen(name)));
 
       if (name[0] == '*')
         _cups_strcpy(name, name + 1); /* Eliminate leading asterisk */
@@ -1219,7 +1219,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       for (i = (int)strlen(name) - 1; i > 0 && isspace(name[i] & 255); i --)
         name[i] = '\0'; /* Eliminate trailing spaces */
 
-      DEBUG_printf(("1ppdOpen2: OpenUI of %s in group %s...", name,
+      DEBUG_printf(("2ppdOpen2: OpenUI of %s in group %s...", name,
                     group ? group->text : "(null)"));
 
       if (subgroup != NULL)
@@ -1230,7 +1230,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	                           encoding)) == NULL)
 	  goto error;
 
-        DEBUG_printf(("1ppdOpen2: Adding to group %s...", group->text));
+        DEBUG_printf(("2ppdOpen2: Adding to group %s...", group->text));
         option = ppd_get_option(group, name);
 	group  = NULL;
       }
@@ -1268,7 +1268,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    !strcmp(ppd->attrs[j]->name + 7, name) &&
 	    ppd->attrs[j]->value)
 	{
-	  DEBUG_printf(("1ppdOpen2: Setting Default%s to %s via attribute...",
+	  DEBUG_printf(("2ppdOpen2: Setting Default%s to %s via attribute...",
 	                option->keyword, ppd->attrs[j]->value));
 	  strlcpy(option->defchoice, ppd->attrs[j]->value,
 	          sizeof(option->defchoice));
@@ -1314,7 +1314,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         if ((choice = ppdFindChoice(option, "Custom")) == NULL)
 	  if ((choice = ppd_add_choice(option, "Custom")) == NULL)
 	  {
-	    DEBUG_puts("Unable to add Custom choice!");
+	    DEBUG_puts("1ppdOpen2: Unable to add Custom choice!");
 
 	    cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1387,7 +1387,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	    !strcmp(ppd->attrs[j]->name + 7, name) &&
 	    ppd->attrs[j]->value)
 	{
-	  DEBUG_printf(("1ppdOpen2: Setting Default%s to %s via attribute...",
+	  DEBUG_printf(("2ppdOpen2: Setting Default%s to %s via attribute...",
 	                option->keyword, ppd->attrs[j]->value));
 	  strlcpy(option->defchoice, ppd->attrs[j]->value,
 	          sizeof(option->defchoice));
@@ -1417,7 +1417,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       {
 	if ((choice = ppd_add_choice(option, "Custom")) == NULL)
 	{
-	  DEBUG_puts("Unable to add Custom choice!");
+	  DEBUG_puts("1ppdOpen2: Unable to add Custom choice!");
 
 	  cg->ppd_status = PPD_ALLOC_ERROR;
 
@@ -1590,11 +1590,11 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         * Set the default as part of the current option...
 	*/
 
-        DEBUG_printf(("1ppdOpen2: Setting %s to %s...", keyword, string));
+        DEBUG_printf(("2ppdOpen2: Setting %s to %s...", keyword, string));
 
         strlcpy(option->defchoice, string, sizeof(option->defchoice));
 
-        DEBUG_printf(("1ppdOpen2: %s is now %s...", keyword, option->defchoice));
+        DEBUG_printf(("2ppdOpen2: %s is now %s...", keyword, option->defchoice));
       }
       else
       {
@@ -1607,7 +1607,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
         if ((toption = ppdFindOption(ppd, keyword + 7)) != NULL)
 	{
-	  DEBUG_printf(("1ppdOpen2: Setting %s to %s...", keyword, string));
+	  DEBUG_printf(("2ppdOpen2: Setting %s to %s...", keyword, string));
 	  strlcpy(toption->defchoice, string, sizeof(toption->defchoice));
 	}
       }
@@ -1838,7 +1838,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 	         (PPD_KEYWORD | PPD_OPTION | PPD_STRING) &&
 	     !strcmp(keyword, option->keyword))
     {
-      DEBUG_printf(("1ppdOpen2: group=%p, subgroup=%p", group, subgroup));
+      DEBUG_printf(("2ppdOpen2: group=%p, subgroup=%p", group, subgroup));
 
       if (!strcmp(keyword, "PageSize"))
       {
@@ -2499,7 +2499,7 @@ ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
   ppd_group_t	*group;			/* Group */
 
 
-  DEBUG_printf(("1ppd_get_group(ppd=%p, name=\"%s\", text=\"%s\", cg=%p)",
+  DEBUG_printf(("7ppd_get_group(ppd=%p, name=\"%s\", text=\"%s\", cg=%p)",
                 ppd, name, text, cg));
 
   for (i = ppd->num_groups, group = ppd->groups; i > 0; i --, group ++)
@@ -2508,7 +2508,7 @@ ppd_get_group(ppd_file_t      *ppd,	/* I - PPD file */
 
   if (i == 0)
   {
-    DEBUG_printf(("1ppd_get_group: Adding group %s...", name));
+    DEBUG_printf(("8ppd_get_group: Adding group %s...", name));
 
     if (cg->ppd_conform == PPD_CONFORM_STRICT && strlen(text) >= sizeof(group->text))
     {
@@ -2557,7 +2557,7 @@ ppd_get_option(ppd_group_t *group,	/* I - Group */
   ppd_option_t	*option;		/* Option */
 
 
-  DEBUG_printf(("1ppd_get_option(group=%p(\"%s\"), name=\"%s\")",
+  DEBUG_printf(("7ppd_get_option(group=%p(\"%s\"), name=\"%s\")",
                 group, group->name, name));
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)

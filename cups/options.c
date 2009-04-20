@@ -94,7 +94,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     * No matching option name...
     */
 
-    DEBUG_printf(("1cupsAddOption: New option inserted at index %d...",
+    DEBUG_printf(("2cupsAddOption: New option inserted at index %d...",
                   insert));
 
     if (num_options == 0)
@@ -105,7 +105,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 
     if (temp == NULL)
     {
-      DEBUG_puts("cupsAddOption: Unable to expand option array, returning 0");
+      DEBUG_puts("1cupsAddOption: Unable to expand option array, returning 0");
       return (0);
     }
 
@@ -129,7 +129,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     * Match found; free the old value...
     */
 
-    DEBUG_printf(("1cupsAddOption: Option already exists at index %d...",
+    DEBUG_printf(("2cupsAddOption: Option already exists at index %d...",
                   insert));
 
     temp = *options + insert;
@@ -185,12 +185,12 @@ cupsGetOption(const char    *name,	/* I - Name of option */
 	match;				/* Matching index */
 
 
-  DEBUG_printf(("cupsGetOption(name=\"%s\", num_options=%d, options=%p)",
+  DEBUG_printf(("2cupsGetOption(name=\"%s\", num_options=%d, options=%p)",
                 name, num_options, options));
 
   if (!name || num_options <= 0 || !options)
   {
-    DEBUG_puts("1cupsGetOption: Returning NULL");
+    DEBUG_puts("3cupsGetOption: Returning NULL");
     return (NULL);
   }
 
@@ -198,11 +198,11 @@ cupsGetOption(const char    *name,	/* I - Name of option */
 
   if (!diff)
   {
-    DEBUG_printf(("1cupsGetOption: Returning \"%s\"", options[match].value));
+    DEBUG_printf(("3cupsGetOption: Returning \"%s\"", options[match].value));
     return (options[match].value);
   }
 
-  DEBUG_puts("1cupsGetOption: Returning NULL");
+  DEBUG_puts("3cupsGetOption: Returning NULL");
   return (NULL);
 }
 
@@ -256,7 +256,7 @@ cupsParseOptions(
 
   if ((copyarg = strdup(arg)) == NULL)
   {
-    DEBUG_puts("cupsParseOptions: Unable to copy arg string");
+    DEBUG_puts("1cupsParseOptions: Unable to copy arg string");
     DEBUG_printf(("1cupsParseOptions: Returning %d", num_options));
     return (num_options);
   }
@@ -531,7 +531,7 @@ cups_find_option(
   cups_option_t	key;			/* Search key */
 
 
-  DEBUG_printf(("9cups_find_option(name=\"%s\", num_options=%d, options=%p, "
+  DEBUG_printf(("7cups_find_option(name=\"%s\", num_options=%d, options=%p, "
 	        "prev=%d, rdiff=%p)", name, num_options, options, prev,
 		rdiff));
 

@@ -50,7 +50,7 @@ httpAddrConnect(
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)\n", addrlist, sock));
+  DEBUG_printf(("httpAddrConnect(addrlist=%p, sock=%p)", addrlist, sock));
 
   if (!sock)
   {
@@ -68,7 +68,7 @@ httpAddrConnect(
     * Create the socket...
     */
 
-    DEBUG_printf(("httpAddrConnect: Trying %s:%d...\n",
+    DEBUG_printf(("2httpAddrConnect: Trying %s:%d...",
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		  _httpAddrPort(&(addrlist->addr))));
 
@@ -134,13 +134,13 @@ httpAddrConnect(
     if (!connect(*sock, &(addrlist->addr.addr),
                  httpAddrLength(&(addrlist->addr))))
     {
-      DEBUG_printf(("httpAddrConnect: Connected to %s:%d...\n",
+      DEBUG_printf(("1httpAddrConnect: Connected to %s:%d...",
 		    httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		    _httpAddrPort(&(addrlist->addr))));
       break;
     }
 
-    DEBUG_printf(("httpAddrConnect: Unable to connect to %s:%d: %s\n",
+    DEBUG_printf(("1httpAddrConnect: Unable to connect to %s:%d: %s",
 		  httpAddrString(&(addrlist->addr), temp, sizeof(temp)),
 		  _httpAddrPort(&(addrlist->addr)), strerror(errno)));
 

@@ -2208,7 +2208,7 @@ do_samba_command(const char *command,	/* I - Command to run */
   if (logfile)
     _cupsLangPuts(logfile, "\n");
 
-  DEBUG_printf(("status=%d\n", status));
+  DEBUG_printf(("9do_samba_command: status=%d", status));
 
   if (WIFEXITED(status))
     return (WEXITSTATUS(status));

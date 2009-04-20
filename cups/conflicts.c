@@ -256,7 +256,7 @@ cupsResolveConflicts(
 	  * Resolver loop!
 	  */
 
-	  DEBUG_printf(("ppdResolveConflicts: Resolver loop with %s!\n",
+	  DEBUG_printf(("1ppdResolveConflicts: Resolver loop with %s!",
 	                consts->resolver));
           goto error;
 	}
@@ -264,14 +264,14 @@ cupsResolveConflicts(
         if ((resolver = ppdFindAttr(ppd, "cupsUIResolver",
 	                            consts->resolver)) == NULL)
         {
-	  DEBUG_printf(("ppdResolveConflicts: Resolver %s not found!\n",
+	  DEBUG_printf(("1ppdResolveConflicts: Resolver %s not found!",
 	                consts->resolver));
 	  goto error;
 	}
 
         if (!resolver->value)
 	{
-	  DEBUG_printf(("ppdResolveConflicts: Resolver %s has no value!\n",
+	  DEBUG_printf(("1ppdResolveConflicts: Resolver %s has no value!",
 	                consts->resolver));
 	  goto error;
 	}
@@ -481,7 +481,7 @@ cupsResolveConflicts(
 
       if (!changed)
       {
-	DEBUG_puts("ppdResolveConflicts: Unable to automatically resolve "
+	DEBUG_puts("1ppdResolveConflicts: Unable to automatically resolve "
 		   "constraint!");
 	goto error;
       }
@@ -520,10 +520,10 @@ cupsResolveConflicts(
 
   cupsArrayRestore(ppd->sorted_attrs);
 
-  DEBUG_printf(("cupsResolveConflicts: Returning %d options:", num_newopts));
+  DEBUG_printf(("1cupsResolveConflicts: Returning %d options:", num_newopts));
 #ifdef DEBUG
   for (i = 0; i < num_newopts; i ++)
-    DEBUG_printf(("cupsResolveConflicts: options[%d]: %s=%s", i,
+    DEBUG_printf(("1cupsResolveConflicts: options[%d]: %s=%s", i,
                   newopts[i].name, newopts[i].value));
 #endif /* DEBUG */
 
@@ -543,7 +543,7 @@ cupsResolveConflicts(
 
   cupsArrayRestore(ppd->sorted_attrs);
 
-  DEBUG_puts("cupsResolveConflicts: Unable to resolve conflicts!");
+  DEBUG_puts("1cupsResolveConflicts: Unable to resolve conflicts!");
 
   return (0);
 }
@@ -629,7 +629,7 @@ ppdInstallableConflict(
   cups_array_t	*active;		/* Active conflicts */
 
 
-  DEBUG_printf(("ppdInstallableConflict(ppd=%p, option=\"%s\", choice=\"%s\")\n",
+  DEBUG_printf(("2ppdInstallableConflict(ppd=%p, option=\"%s\", choice=\"%s\")",
                 ppd, option, choice));
 
  /* 
@@ -698,6 +698,8 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 		*ptr;			/* Pointer into option or choice */
 
 
+  DEBUG_printf(("7ppd_load_constraints(ppd=%p)", ppd));
+
  /*
   * Create an array to hold the constraint data...
   */
@@ -741,7 +743,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
     if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
     {
-      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+      DEBUG_puts("8ppd_load_constraints: Unable to allocate memory for "
 		 "UIConstraints!");
       return;
     }
@@ -749,7 +751,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
     if ((constptr = calloc(2, sizeof(_ppd_cups_uiconst_t))) == NULL)
     {
       free(consts);
-      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+      DEBUG_puts("8ppd_load_constraints: Unable to allocate memory for "
 		 "UIConstraints!");
       return;
     }
@@ -779,7 +781,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
     if (!constptr[0].option || (!constptr[0].choice && oldconst->choice1[0]))
     {
-      DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+      DEBUG_printf(("8ppd_load_constraints: Unknown option *%s %s!",
 		    oldconst->option1, oldconst->choice1));
       free(consts->constraints);
       free(consts);
@@ -804,7 +806,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
     if (!constptr[1].option || (!constptr[1].choice && oldconst->choice2[0]))
     {
-      DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+      DEBUG_printf(("8ppd_load_constraints: Unknown option *%s %s!",
 		    oldconst->option2, oldconst->choice2));
       free(consts->constraints);
       free(consts);
@@ -830,7 +832,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
   {
     if (!constattr->value)
     {
-      DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
+      DEBUG_puts("8ppd_load_constraints: Bad cupsUIConstraints value!");
       continue;
     }
 
@@ -840,13 +842,13 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
     if (i == 0)
     {
-      DEBUG_puts("ppd_load_constraints: Bad cupsUIConstraints value!");
+      DEBUG_puts("8ppd_load_constraints: Bad cupsUIConstraints value!");
       continue;
     }
 
     if ((consts = calloc(1, sizeof(_ppd_cups_uiconsts_t))) == NULL)
     {
-      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+      DEBUG_puts("8ppd_load_constraints: Unable to allocate memory for "
 		 "cupsUIConstraints!");
       return;
     }
@@ -854,7 +856,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
     if ((constptr = calloc(i, sizeof(_ppd_cups_uiconst_t))) == NULL)
     {
       free(consts);
-      DEBUG_puts("ppd_load_constraints: Unable to allocate memory for "
+      DEBUG_puts("8ppd_load_constraints: Unable to allocate memory for "
 		 "cupsUIConstraints!");
       return;
     }
@@ -905,7 +907,7 @@ ppd_load_constraints(ppd_file_t *ppd)	/* I - PPD file */
 
       if (!constptr->option || (!constptr->choice && choice[0]))
       {
-	DEBUG_printf(("ppd_load_constraints: Unknown option *%s %s!\n",
+	DEBUG_printf(("8ppd_load_constraints: Unknown option *%s %s!",
 		      option, choice));
 	break;
       }
@@ -944,14 +946,14 @@ ppd_test_constraints(
   const char		*value;		/* Current value */
 
 
-  DEBUG_printf(("ppd_test_constraints(ppd=%p, option=\"%s\", choice=\"%s\", "
-                "num_options=%d, options=%p, which=%d)\n", ppd, option, choice,
+  DEBUG_printf(("7ppd_test_constraints(ppd=%p, option=\"%s\", choice=\"%s\", "
+                "num_options=%d, options=%p, which=%d)", ppd, option, choice,
 		num_options, options, which));
 
   if (!ppd->cups_uiconstraints)
     ppd_load_constraints(ppd);
 
-  DEBUG_printf(("ppd_test_constraints: %d constraints!\n",
+  DEBUG_printf(("9ppd_test_constraints: %d constraints!",
 	        cupsArrayCount(ppd->cups_uiconstraints)));
 
   cupsArraySave(ppd->marked);
@@ -960,9 +962,9 @@ ppd_test_constraints(
        consts;
        consts = (_ppd_cups_uiconsts_t *)cupsArrayNext(ppd->cups_uiconstraints))
   {
-    DEBUG_printf(("ppd_test_constraints: installable=%d, resolver=\"%s\", "
+    DEBUG_printf(("9ppd_test_constraints: installable=%d, resolver=\"%s\", "
                   "num_constraints=%d option1=\"%s\", choice1=\"%s\", "
-		  "option2=\"%s\", choice2=\"%s\", ...\n",
+		  "option2=\"%s\", choice2=\"%s\", ...",
 		  consts->installable, consts->resolver, consts->num_constraints,
 		  consts->constraints[0].option->keyword,
 		  consts->constraints[0].choice ?
@@ -993,13 +995,13 @@ ppd_test_constraints(
         continue;
     }
 
-    DEBUG_puts("ppd_test_constraints: Testing...");
+    DEBUG_puts("9ppd_test_constraints: Testing...");
 
     for (i = consts->num_constraints, constptr = consts->constraints;
          i > 0;
 	 i --, constptr ++)
     {
-      DEBUG_printf(("ppd_test_constraints: %s=%s?\n", constptr->option->keyword,
+      DEBUG_printf(("9ppd_test_constraints: %s=%s?", constptr->option->keyword,
 		    constptr->choice ? constptr->choice->choice : ""));
 
       if (constptr->choice &&
@@ -1035,7 +1037,7 @@ ppd_test_constraints(
 
         if (!value || strcasecmp(value, constptr->choice->choice))
 	{
-	  DEBUG_puts("ppd_test_constraints: NO");
+	  DEBUG_puts("9ppd_test_constraints: NO");
 	  break;
 	}
       }
@@ -1050,7 +1052,7 @@ ppd_test_constraints(
 
 	  if (strcasecmp(value, constptr->choice->choice))
 	  {
-	    DEBUG_puts("ppd_test_constraints: NO");
+	    DEBUG_puts("9ppd_test_constraints: NO");
 	    break;
 	  }
 	}
@@ -1062,13 +1064,13 @@ ppd_test_constraints(
 
 	  if (strcasecmp(value, constptr->choice->choice))
 	  {
-	    DEBUG_puts("ppd_test_constraints: NO");
+	    DEBUG_puts("9ppd_test_constraints: NO");
 	    break;
 	  }
 	}
         else if (!constptr->choice->marked)
 	{
-	  DEBUG_puts("ppd_test_constraints: NO");
+	  DEBUG_puts("9ppd_test_constraints: NO");
 	  break;
 	}
       }
@@ -1078,7 +1080,7 @@ ppd_test_constraints(
 	if (!strcasecmp(choice, "None") || !strcasecmp(choice, "Off") ||
 	    !strcasecmp(choice, "False"))
 	{
-	  DEBUG_puts("ppd_test_constraints: NO");
+	  DEBUG_puts("9ppd_test_constraints: NO");
           break;
 	}
       }
@@ -1088,7 +1090,7 @@ ppd_test_constraints(
 	if (!strcasecmp(value, "None") || !strcasecmp(value, "Off") ||
 	    !strcasecmp(value, "False"))
 	{
-	  DEBUG_puts("ppd_test_constraints: NO");
+	  DEBUG_puts("9ppd_test_constraints: NO");
 	  break;
 	}
       }
@@ -1102,7 +1104,7 @@ ppd_test_constraints(
 	     !strcasecmp(marked->choice, "Off") ||
 	     !strcasecmp(marked->choice, "False")))
 	{
-	  DEBUG_puts("ppd_test_constraints: NO");
+	  DEBUG_puts("9ppd_test_constraints: NO");
 	  break;
 	}
       }
@@ -1114,13 +1116,13 @@ ppd_test_constraints(
         active = cupsArrayNew(NULL, NULL);
 
       cupsArrayAdd(active, consts);
-      DEBUG_puts("ppd_test_constraints: Added...");
+      DEBUG_puts("9ppd_test_constraints: Added...");
     }
   }
 
   cupsArrayRestore(ppd->marked);
 
-  DEBUG_printf(("ppd_test_constraints: Found %d active constraints!\n",
+  DEBUG_printf(("8ppd_test_constraints: Found %d active constraints!",
                 cupsArrayCount(active)));
 
   return (active);

@@ -54,7 +54,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 
   if (!ppd)
   {
-    DEBUG_puts("ppdPageSize: Bad PPD pointer, returning NULL...");
+    DEBUG_puts("1ppdPageSize: Bad PPD pointer, returning NULL...");
     return (NULL);
   }
 
@@ -72,7 +72,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 
       if (!i)
       {
-	DEBUG_puts("ppdPageSize: No custom sizes, returning NULL...");
+	DEBUG_puts("1ppdPageSize: No custom sizes, returning NULL...");
         return (NULL);
       }
 
@@ -144,7 +144,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Return the page size...
       */
 
-      DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+      DEBUG_printf(("1ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
                     size->name, size->width, size->length));
 
       return (size);
@@ -158,7 +158,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
 	if (!strcasecmp(name, size->name))
 	{
-	  DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+	  DEBUG_printf(("1ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
 			size->name, size->width, size->length));
 
           return (size);
@@ -174,14 +174,14 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
     for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
       if (size->marked)
       {
-	DEBUG_printf(("ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
+	DEBUG_printf(("1ppdPageSize: Returning %p (\"%s\", %gx%g)", size,
 		      size->name, size->width, size->length));
 
         return (size);
       }
   }
 
-  DEBUG_puts("ppdPageSize: Size not found, returning NULL");
+  DEBUG_puts("1ppdPageSize: Size not found, returning NULL");
 
   return (NULL);
 }

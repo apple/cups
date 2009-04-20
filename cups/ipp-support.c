@@ -399,7 +399,7 @@ ippPort(void)
   if (!cg->ipp_port)
     _cupsSetDefaults();
 
-  DEBUG_printf(("ippPort: Returning %d...\n", cg->ipp_port));
+  DEBUG_printf(("1ippPort: Returning %d...", cg->ipp_port));
 
   return (cg->ipp_port);
 }
@@ -412,7 +412,7 @@ ippPort(void)
 void
 ippSetPort(int p)			/* I - Port number to use */
 {
-  DEBUG_printf(("ippSetPort(p=%d)\n", p));
+  DEBUG_printf(("ippSetPort(p=%d)", p));
 
   _cupsGlobals()->ipp_port = p;
 }

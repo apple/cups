@@ -5,7 +5,7 @@
  *
  *   This set of APIs abstracts enumeration of directory entries.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -271,7 +271,7 @@ struct _cups_dir_s			/**** Directory data structure ****/
 void
 cupsDirClose(cups_dir_t *dp)		/* I - Directory pointer */
 {
-  DEBUG_printf(("cupsDirClose(dp=%p)\n", dp));
+  DEBUG_printf(("cupsDirClose(dp=%p)", dp));
 
  /*
   * Range check input...
@@ -301,7 +301,7 @@ cupsDirOpen(const char *directory)	/* I - Directory name */
   cups_dir_t	*dp;			/* Directory */
 
 
-  DEBUG_printf(("cupsDirOpen(directory=\"%s\")\n", directory));
+  DEBUG_printf(("cupsDirOpen(directory=\"%s\")", directory));
 
  /*
   * Range check input...
@@ -360,7 +360,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 #  endif /* HAVE_PTHREAD_H */
 
 
-  DEBUG_printf(("cupsDirRead(dp=%p)\n", dp));
+  DEBUG_printf(("2cupsDirRead(dp=%p)", dp));
 
  /*
   * Range check input...
@@ -382,17 +382,18 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 
     if (readdir_r(dp->dir, (struct dirent *)buffer, &entry))
     {
-      DEBUG_printf(("    readdir_r() failed - %s\n", strerror(errno)));
+      DEBUG_printf(("3cupsDirRead: readdir_r() failed - %s\n", strerror(errno)));
       return (NULL);
     }
 
     if (!entry)
     {
-      DEBUG_puts("    readdir_r() returned a NULL pointer!");
+      DEBUG_puts("3cupsDirRead: readdir_r() returned a NULL pointer!");
       return (NULL);
     }
 
-    DEBUG_printf(("    readdir_r() returned \"%s\"...\n", entry->d_name));
+    DEBUG_printf(("4cupsDirRead: readdir_r() returned \"%s\"...",
+                  entry->d_name));
 
 #  else
    /*
@@ -401,11 +402,11 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 
     if ((entry = readdir(dp->dir)) == NULL)
     {
-      DEBUG_puts("    readdir() returned a NULL pointer!");
+      DEBUG_puts("3cupsDirRead: readdir() returned a NULL pointer!");
       return (NULL);
     }
 
-    DEBUG_printf(("    readdir() returned \"%s\"...\n", entry->d_name));
+    DEBUG_printf(("4cupsDirRead: readdir() returned \"%s\"...", entry->d_name));
 
 #  endif /* HAVE_PTHREAD_H */
 
@@ -426,7 +427,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 
     if (stat(filename, &(dp->entry.fileinfo)))
     {
-      DEBUG_printf(("    stat() failed for \"%s\" - %s...\n", filename,
+      DEBUG_printf(("3cupsDirRead: stat() failed for \"%s\" - %s...", filename,
                     strerror(errno)));
       continue;
     }
@@ -449,7 +450,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
 void
 cupsDirRewind(cups_dir_t *dp)		/* I - Directory pointer */
 {
-  DEBUG_printf(("cupsDirRewind(dp=%p)\n", dp));
+  DEBUG_printf(("cupsDirRewind(dp=%p)", dp));
 
  /*
   * Range check input...

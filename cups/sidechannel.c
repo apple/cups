@@ -121,7 +121,7 @@ cupsSideChannelRead(
 
 
   DEBUG_printf(("cupsSideChannelRead(command=%p, status=%p, data=%p, "
-                "datalen=%p(%d), timeout=%.3f)\n", command, status, data,
+                "datalen=%p(%d), timeout=%.3f)", command, status, data,
 		datalen, datalen ? *datalen : -1, timeout));
 
  /*
@@ -155,7 +155,7 @@ cupsSideChannelRead(
   {
     if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, NULL) < 1)
     {
-      DEBUG_printf(("cupsSideChannelRead: Select error: %s\n", strerror(errno)));
+      DEBUG_printf(("1cupsSideChannelRead: Select error: %s", strerror(errno)));
       return (-1);
     }
   }
@@ -166,7 +166,7 @@ cupsSideChannelRead(
 
     if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, &stimeout) < 1)
     {
-      DEBUG_puts("cupsSideChannelRead: Select timeout");
+      DEBUG_puts("1cupsSideChannelRead: Select timeout");
       return (-1);
     }
   }
@@ -186,7 +186,7 @@ cupsSideChannelRead(
   while ((bytes = read(CUPS_SC_FD, buffer, sizeof(buffer))) < 0)
     if (errno != EINTR && errno != EAGAIN)
     {
-      DEBUG_printf(("cupsSideChannelRead: Read error: %s\n", strerror(errno)));
+      DEBUG_printf(("1cupsSideChannelRead: Read error: %s", strerror(errno)));
       return (-1);
     }
 
@@ -197,7 +197,7 @@ cupsSideChannelRead(
   if (buffer[0] < CUPS_SC_CMD_SOFT_RESET ||
       buffer[0] > CUPS_SC_CMD_SNMP_GET_NEXT)
   {
-    DEBUG_printf(("cupsSideChannelRead: Bad command %d!\n", buffer[0]));
+    DEBUG_printf(("1cupsSideChannelRead: Bad command %d!", buffer[0]));
     return (-1);
   }
 
@@ -240,7 +240,7 @@ cupsSideChannelRead(
     memcpy(data, buffer + 4, templen);
   }
 
-  DEBUG_printf(("cupsSideChannelRead: Returning status=%d\n", *status));
+  DEBUG_printf(("1cupsSideChannelRead: Returning status=%d", *status));
 
   return (0);
 }
@@ -284,7 +284,7 @@ cupsSideChannelSNMPGet(
 
 
   DEBUG_printf(("cupsSideChannelSNMPGet(oid=\"%s\", data=%p, datalen=%p(%d), "
-                "timeout=%.3f)\n", oid, data, datalen, datalen ? *datalen : -1,
+                "timeout=%.3f)", oid, data, datalen, datalen ? *datalen : -1,
 		timeout));
 
  /*
@@ -378,7 +378,7 @@ cupsSideChannelSNMPWalk(
 
 
   DEBUG_printf(("cupsSideChannelSNMPWalk(oid=\"%s\", timeout=%.3f, cb=%p, "
-                "context=%p)\n", oid, timeout, cb, context));
+                "context=%p)", oid, timeout, cb, context));
 
  /*
   * Range check input...

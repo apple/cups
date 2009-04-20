@@ -47,7 +47,7 @@ int			_cups_debug_fd = -1;
 
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
-static int		debug_init = 0;	/* Did we initialize debugging? */
+static int		debug_init = 1;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
 static int		debug_level = 0;/* Log level (0 to 9) */
 static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;

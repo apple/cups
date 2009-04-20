@@ -109,7 +109,7 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayAdd(cups_array_t *a,		/* I - Array */
              void         *e)		/* I - Element */
 {
-  DEBUG_printf(("1cupsArrayAdd(a=%p, e=%p)", a, e));
+  DEBUG_printf(("2cupsArrayAdd(a=%p, e=%p)", a, e));
 
  /*
   * Range check input...
@@ -117,7 +117,7 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
   if (!a || !e)
   {
-    DEBUG_puts("2cupsArrayAdd: returning 0");
+    DEBUG_puts("3cupsArrayAdd: returning 0");
     return (0);
   }
 
@@ -505,7 +505,7 @@ int					/* O - 0 on failure, 1 on success */
 cupsArrayInsert(cups_array_t *a,	/* I - Array */
 		void         *e)	/* I - Element */
 {
-  DEBUG_printf(("1cupsArrayInsert(a=%p, e=%p)", a, e));
+  DEBUG_printf(("2cupsArrayInsert(a=%p, e=%p)", a, e));
 
  /*
   * Range check input...
@@ -513,7 +513,7 @@ cupsArrayInsert(cups_array_t *a,	/* I - Array */
 
   if (!a || !e)
   {
-    DEBUG_puts("2cupsArrayInsert: returning 0");
+    DEBUG_puts("3cupsArrayInsert: returning 0");
     return (0);
   }
 
@@ -846,7 +846,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("9cups_array_add(a=%p, e=%p, insert=%d)", a, e, insert));
+  DEBUG_printf(("7cups_array_add(a=%p, e=%p, insert=%d)", a, e, insert));
 
  /*
   * Verify we have room for the new element...
@@ -1017,7 +1017,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("9cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)", a, e, prev,
+  DEBUG_printf(("7cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)", a, e, prev,
                 rdiff));
 
   if (a->compare)
@@ -1131,7 +1131,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
   * Return the closest element and the difference...
   */
 
-  DEBUG_printf(("9cups_array_find: Returning %d, diff=%d", current, diff));
+  DEBUG_printf(("8cups_array_find: Returning %d, diff=%d", current, diff));
 
   *rdiff = diff;
 
