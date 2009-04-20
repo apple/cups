@@ -3,7 +3,7 @@
  *
  *   Debugging macros for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -36,6 +36,9 @@ extern "C" {
  *   DEBUG_printf(("format string", arg, arg, ...));
  *
  * Note the extra parenthesis around the DEBUG_printf macro...
+ *
+ * If the first character is a digit, then it represents the "log level" of the
+ * message from 0 to 9.  The default level is 0.
  */
 
 #  ifdef DEBUG
