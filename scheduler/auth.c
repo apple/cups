@@ -17,6 +17,40 @@
  *
  * Contents:
  *
+ *   cupsdAddLocation()        - Add a location for authorization.
+ *   cupsdAddName()            - Add a name to a location...
+ *   cupsdAllowHost()          - Add a host name that is allowed to access the
+ *                               location.
+ *   cupsdAllowIP()            - Add an IP address or network that is allowed to
+ *                               access the location.
+ *   cupsdAuthorize()          - Validate any authorization credentials.
+ *   cupsdCheckAccess()        - Check whether the given address is allowed to
+ *                               access a location.
+ *   cupsdCheckAuth()          - Check authorization masks.
+ *   cupsdCheckGroup()         - Check for a user's group membership.
+ *   cupsdCopyKrb5Creds()      - Get a copy of the Kerberos credentials.
+ *   cupsdCopyLocation()       - Make a copy of a location...
+ *   cupsdDeleteAllLocations() - Free all memory used for location
+ *                               authorization.
+ *   cupsdDeleteLocation()     - Free all memory used by a location.
+ *   cupsdDenyHost()           - Add a host name that is not allowed to access
+ *                               the location.
+ *   cupsdDenyIP()             - Add an IP address or network that is not
+ *                               allowed to access the location.
+ *   cupsdFindBest()           - Find the location entry that best matches the
+ *                               resource.
+ *   cupsdFindLocation()       - Find the named location.
+ *   cupsdIsAuthorized()       - Check to see if the user is authorized...
+ *   add_allow()               - Add an allow mask to the location.
+ *   add_deny()                - Add a deny mask to the location.
+ *   check_authref()           - Check if an authorization services reference
+ *                               has the supplied right.
+ *   compare_locations()       - Compare two locations.
+ *   cups_crypt()              - Encrypt the password using the DES or MD5
+ *                               algorithms, as needed.
+ *   get_md5_password()        - Get an MD5 password.
+ *   pam_func()                - PAM conversation function.
+ *   to64()                    - Base64-encode an integer value...
  */
 
 /*
