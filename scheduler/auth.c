@@ -17,39 +17,6 @@
  *
  * Contents:
  *
- *   cupsdAddLocation()        - Add a location for authorization.
- *   cupsdAddName()            - Add a name to a location...
- *   cupsdAllowHost()          - Add a host name that is allowed to access the
- *                               location.
- *   cupsdAllowIP()            - Add an IP address or network that is allowed to
- *                               access the location.
- *   cupsdAuthorize()          - Validate any authorization credentials.
- *   cupsdCheckAccess()        - Check whether the given address is allowed to
- *                               access a location.
- *   cupsdCheckAuth()          - Check authorization masks.
- *   cupsdCheckGroup()         - Check for a user's group membership.
- *   cupsdCopyLocation()       - Make a copy of a location...
- *   cupsdDeleteAllLocations() - Free all memory used for location
- *                               authorization.
- *   cupsdDeleteLocation()     - Free all memory used by a location.
- *   cupsdDenyHost()           - Add a host name that is not allowed to access
- *                               the location.
- *   cupsdDenyIP()             - Add an IP address or network that is not
- *                               allowed to access the location.
- *   cupsdFindBest()           - Find the location entry that best matches the
- *                               resource.
- *   cupsdFindLocation()       - Find the named location.
- *   cupsdIsAuthorized()       - Check to see if the user is authorized...
- *   add_allow()               - Add an allow mask to the location.
- *   add_deny()                - Add a deny mask to the location.
- *   check_authref()           - Check if an authorization services reference
- *                               has the supplied right.
- *   compare_locations()       - Compare two locations.
- *   cups_crypt()              - Encrypt the password using the DES or MD5
- *                               algorithms, as needed.
- *   get_md5_password()        - Get an MD5 password.
- *   pam_func()                - PAM conversation function.
- *   to64()                    - Base64-encode an integer value...
  */
 
 /*
@@ -1575,7 +1542,7 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
 
     cupsd_ucred_t	peercred;	/* Peer credentials */
     socklen_t		peersize;	/* Size of peer credentials */
-
+    krb5_ccache		peerccache;	/* Peer Kerberos credentials */
 
     peersize = sizeof(peercred);
 
@@ -1583,25 +1550,47 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
                       strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
       return (NULL);
     }
 
     krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
+
+    if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to get credentials cache for UID %d (%d/%s)",
+		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+
+    error = krb5_cc_copy_creds(KerberosContext, peerccache, ccache);
+    krb5_cc_destroy(KerberosContext, peerccache);
+
+    if (error)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to copy credentials cache for UID %d (%d/%s)",
+		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+
+    krb5_ipc_client_clear_target();
   }
+  else
 #    endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
-
-  major_status = gss_krb5_copy_ccache(&minor_status, con->gss_creds, ccache);
-
-#    ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  krb5_ipc_client_clear_target();
-#    endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
-
-  if (GSS_ERROR(major_status))
   {
-    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-		       "Unable to copy client credentials cache");
-    krb5_cc_destroy(KerberosContext, ccache);
-    return (NULL);
+    major_status = gss_krb5_copy_ccache(&minor_status, con->gss_creds, ccache);
+
+    if (GSS_ERROR(major_status))
+    {
+      cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
+			 "Unable to copy client credentials cache");
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
   }
 
   return (ccache);
