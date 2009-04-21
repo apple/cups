@@ -7673,7 +7673,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   else
     printer_mask = 0;
 
-  local = httpAddrLocalhost(&(con->http.hostaddr));
+  local = httpAddrLocalhost(&(con->clientaddr));
 
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
