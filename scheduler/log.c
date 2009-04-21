@@ -525,7 +525,8 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
       return (1);
 
     if (con->request && con->response &&
-        con->response->request.status.status_code < IPP_REDIRECTION_OTHER_SITE)
+        (con->response->request.status.status_code < IPP_REDIRECTION_OTHER_SITE ||
+	 con->response->request.status.status_code == IPP_NOT_FOUND))
     {
      /*
       * Check successful requests...

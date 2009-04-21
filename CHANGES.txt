@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-04-19
+CHANGES.txt - 2009-04-21
 ------------------------
 
 CHANGES IN CUPS V1.4b3
@@ -13,6 +13,7 @@ CHANGES IN CUPS V1.4b3
 	  delegatable credentials.  Shared printing still requires delegation,
 	  however "delegation by policy" can be enabled in the KDC to make this
 	  all work.
+	- "AccessLogLevel actions" did not hide client-error-not-found errors.
 	- AP_FIRST_InputSlot did not work with number-up.
 	- cupsBackChannelRead() and cupsBackChannelWrite() could fail due to a
 	  lack of kernel buffers.
