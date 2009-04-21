@@ -63,6 +63,7 @@ typedef struct cupsd_job_s
   int			status_level;	/* Highest log level in a status
 					 * message */
   int			cost;		/* Filtering cost */
+  int			pending_cost;	/* Waiting for FilterLimit */
   int			filters[MAX_FILTERS + 1];
 					/* Filter process IDs, 0 terminated */
   int			backend;	/* Backend process ID */
