@@ -54,9 +54,9 @@ CHANGES IN CUPS V1.4b3
 	  status operations.
 	- ppdOpen*() incorrectly loaded PPDs with multiple JobPatchFile
 	  keywords.
-	- The network backends no longer report the SNMP "offline" status bit
-	  since some printers report this status when the printer is busy
-	  printing, warming up, etc.
+	- The network backends no longer report the SNMP "offline" or
+	  maintenance status bits since they are inconsistently implemented and
+	  often unreliable.
 	- The scheduler no longer logs child processes killed via SIGKILL as
 	  "crashed".
 	- The printer link shown on the "job moved" template was bad (STR #3085)
