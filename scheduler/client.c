@@ -3314,10 +3314,6 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
                   "get_cdsa_certificate: Looking for certs for \"%s\"...",
 		  con->servername);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
-		  con->servername);
-
   options.Data = (uint8 *)&ssl_options;
   options.Length = sizeof(ssl_options);
 
