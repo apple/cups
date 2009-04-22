@@ -47,9 +47,9 @@ int			_cups_debug_fd = -1;
 
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
-static int		debug_init = 1;	/* Did we initialize debugging? */
+static int		debug_init = 0;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
-static int		debug_level = 0;/* Log level (0 to 9) */
+static int		debug_level = 1;/* Log level (0 to 9) */
 static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
 #  endif /* HAVE_PTHREAD_H */
@@ -420,8 +420,6 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 
     if (!debug_init)
     {
-      debug_init = 1;
-
       if ((cups_debug_log = getenv("CUPS_DEBUG_LOG")) == NULL)
 	_cups_debug_fd = -1;
       else if (!strcmp(cups_debug_log, "-"))
@@ -448,6 +446,8 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 	  debug_filter = NULL;
 	}
       }
+
+      debug_init = 1;
     }
 
     pthread_mutex_unlock(&debug_mutex);
