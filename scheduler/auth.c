@@ -28,6 +28,7 @@
  *                               access a location.
  *   cupsdCheckAuth()          - Check authorization masks.
  *   cupsdCheckGroup()         - Check for a user's group membership.
+ *   cupsdCopyKrb5Creds()      - Get a copy of the Kerberos credentials.
  *   cupsdCopyLocation()       - Make a copy of a location...
  *   cupsdDeleteAllLocations() - Free all memory used for location
  *                               authorization.
@@ -47,7 +48,6 @@
  *   compare_locations()       - Compare two locations.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
- *   get_gss_creds()           - Obtain GSS credentials.
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
@@ -97,6 +97,11 @@ typedef struct xucred cupsd_ucred_t;
 typedef struct ucred cupsd_ucred_t;
 #  define CUPSD_UCRED_UID(c) (c).uid
 #endif /* HAVE_SYS_UCRED_H */
+#ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
+/* Not in public headers... */
+extern void	krb5_ipc_client_set_target_uid(uid_t);
+extern void	krb5_ipc_client_clear_target(void);
+#endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
 
 
 /*
@@ -113,10 +118,6 @@ static int		compare_locations(cupsd_location_t *a,
 #if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
-#ifdef HAVE_GSSAPI
-static gss_cred_id_t	get_gss_creds(const char *service_name,
-			              const char *con_server_name);
-#endif /* HAVE_GSSAPI */
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
@@ -960,7 +961,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
   else if (!strncmp(authorization, "Negotiate", 9)) 
   {
     int			len;		/* Length of authorization string */
-    gss_cred_id_t	server_creds;	/* Server credentials */
     gss_ctx_id_t	context;	/* Authorization context */
     OM_uint32		major_status,	/* Major status code */
 			minor_status;	/* Minor status code */
@@ -969,7 +969,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token for username */
     gss_name_t		client_name;	/* Client name */
-    unsigned int	ret_flags;	/* Credential flags */
 
 
 #  ifdef __APPLE__
@@ -1005,13 +1004,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     }
 
    /*
-    * Get the server credentials...
-    */
-
-    if ((server_creds = get_gss_creds(GSSServiceName, con->servername)) == NULL)
-      return;	
-
-   /*
     * Decode the authorization string to get the input token...
     */
 
@@ -1029,15 +1021,15 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     client_name  = GSS_C_NO_NAME;
     major_status = gss_accept_sec_context(&minor_status,
 					  &context,
-					  server_creds, 
+					  GSS_C_NO_CREDENTIAL, 
 					  &input_token,
 					  GSS_C_NO_CHANNEL_BINDINGS,
 					  &client_name,
 					  NULL,
 					  &con->gss_output_token,
-					  &ret_flags,
+					  &con->gss_flags,
 					  NULL,
-					  &con->gss_delegated_cred);
+					  &con->gss_creds);
 
     if (GSS_ERROR(major_status))
     {
@@ -1047,28 +1039,20 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       if (context != GSS_C_NO_CONTEXT)
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-
-      gss_release_cred(&minor_status, &server_creds);
       return;
     }
-
-   /*
-    * Release our credentials...
-    */
-
-    gss_release_cred(&minor_status, &server_creds);
 
    /*
     * Get the username associated with the client's credentials...
     */
 
-    if (!con->gss_delegated_cred)
+    if (!con->gss_creds)
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "cupsdAuthorize: No delegated credentials!");
+                      "cupsdAuthorize: No credentials!");
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
-                         "cupsdAuthorize: Credentials not complete");
+			 "cupsdAuthorize: Credentials not complete");
     else if (major_status == GSS_S_COMPLETE)
     {
       major_status = gss_display_name(&minor_status, client_name, 
@@ -1078,27 +1062,27 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
                            "cupsdAuthorize: Error getting username");
+	gss_release_cred(&minor_status, &con->gss_creds);
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 	return;
       }
 
-      gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Negotiate",
 		      username);
 
+      gss_release_name(&minor_status, &client_name);
       gss_release_buffer(&minor_status, &output_token);
-      gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-
-      con->gss_have_creds = 1;
 
       con->type = CUPSD_AUTH_NEGOTIATE;
     }
     else
-      gss_release_name(&minor_status, &client_name);
+      gss_release_cred(&minor_status, &con->gss_creds);
+
+    gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
   }
 #endif /* HAVE_GSSAPI */
   else
@@ -1205,6 +1189,7 @@ cupsdCheckAuth(
   unsigned	netip6[4];		/* IPv6 network address */
 #endif /* AF_INET6 */
 
+
   while (num_masks > 0)
   {
     switch (masks->type)
@@ -1225,6 +1210,15 @@ cupsdCheckAuth(
 
           if (!strcmp(masks->mask.name.name, "*"))
 	  {
+#ifdef __APPLE__
+           /*
+	    * Allow Back-to-My-Mac addresses...
+	    */
+
+	    if ((ip[0] & 0xff000000) == 0xfd000000)
+	      return (1);
+#endif /* __APPLE__ */
+
 	   /*
 	    * Check against all local interfaces...
 	    */
@@ -1472,6 +1466,170 @@ cupsdCheckGroup(
 
   return (0);
 }
+
+
+#ifdef HAVE_GSSAPI
+/*
+ * 'cupsdCopyKrb5Creds()' - Get a copy of the Kerberos credentials.
+ */
+
+krb5_ccache				/* O - Credentials or NULL */
+cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
+{
+#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
+  cupsdLogMessage(CUPSD_LOG_INFO,
+                  "Sorry, your version of Kerberos does not support delegated "
+		  "credentials!");
+  return (NULL);
+
+#  else
+  krb5_ccache		ccache = NULL;	/* Credentials */
+  krb5_error_code	error;		/* Kerberos error code */
+  OM_uint32		major_status,	/* Major status code */
+			minor_status;	/* Minor status code */
+  krb5_principal	principal;	/* Kerberos principal */
+
+
+#    ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (krb5_init_context == NULL)
+    return (NULL);
+#    endif /* __APPLE__ */
+
+  if (!KerberosInitialized)
+  {
+   /*
+    * Setup a Kerberos context for the scheduler to use...
+    */
+
+    KerberosInitialized = 1;
+
+    if (krb5_init_context(&KerberosContext))
+    {
+      KerberosContext = NULL;
+
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
+      return (NULL);
+    }
+  }
+
+ /*
+  * We MUST create a file-based cache because memory-based caches are
+  * only valid for the current process/address space.
+  *
+  * Due to various bugs/features in different versions of Kerberos, we
+  * need either the krb5_cc_new_unique() function or Heimdal's version
+  * of krb5_cc_gen_new() to create a new FILE: credential cache that
+  * can be passed to the backend.  These functions create a temporary
+  * file (typically in /tmp) containing the cached credentials, which
+  * are removed when we have successfully printed a job.
+  */
+
+#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
+  if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL, &ccache)) != 0)
+#    else /* HAVE_HEIMDAL */
+  if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops, &ccache)) != 0)
+#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to create new credentials cache (%d/%s)",
+                    error, strerror(errno));
+    return (NULL);
+  }
+
+  if ((error = krb5_parse_name(KerberosContext, con->username, &principal)) != 0)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to parse kerberos username (%d/%s)", error,
+                    strerror(errno));
+    krb5_cc_destroy(KerberosContext, ccache);
+    return (NULL);
+  }
+
+  if ((error = krb5_cc_initialize(KerberosContext, ccache, principal)))
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Unable to initialize credentials cache (%d/%s)", error,
+		    strerror(errno));
+    krb5_cc_destroy(KerberosContext, ccache);
+    krb5_free_principal(KerberosContext, principal);
+    return (NULL);
+  }
+
+  krb5_free_principal(KerberosContext, principal);
+
+ /*
+  * Copy the user's credentials to the new cache file...
+  */
+
+#    ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
+  if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
+      !(con->gss_flags & GSS_C_DELEG_FLAG))
+  {
+   /*
+    * Pull the credentials directly from the user...
+    */
+
+    cupsd_ucred_t	peercred;	/* Peer credentials */
+    socklen_t		peersize;	/* Size of peer credentials */
+    krb5_ccache		peerccache;	/* Peer Kerberos credentials */
+
+    peersize = sizeof(peercred);
+
+    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+                      strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+
+    krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
+
+    if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to get credentials cache for UID %d (%d/%s)",
+		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+
+    error = krb5_cc_copy_creds(KerberosContext, peerccache, ccache);
+    krb5_cc_close(KerberosContext, peerccache);
+    krb5_ipc_client_clear_target();
+
+    if (error)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to copy credentials cache for UID %d (%d/%s)",
+		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+  }
+  else
+#    endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
+  {
+    major_status = gss_krb5_copy_ccache(&minor_status, con->gss_creds, ccache);
+
+    if (GSS_ERROR(major_status))
+    {
+      cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
+			 "Unable to copy client credentials cache");
+      krb5_cc_destroy(KerberosContext, ccache);
+      return (NULL);
+    }
+  }
+
+  return (ccache);
+#  endif /* !HAVE_KRB5_CC_NEW_UNIQUE && !HAVE_HEIMDAL */
+}
+#endif /* HAVE_GSSAPI */
 
 
 /*
@@ -2506,81 +2664,6 @@ cups_crypt(const char *pw,		/* I - Password string */
   }
 }
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
-
-
-#ifdef HAVE_GSSAPI
-/*
- * 'get_gss_creds()' - Obtain GSS credentials.
- */
-
-static gss_cred_id_t			/* O - Server credentials */
-get_gss_creds(
-    const char *service_name, 		/* I - Service name */
-    const char *con_server_name)	/* I - Hostname of server */
-{
-  OM_uint32	major_status,		/* Major status code */
-		minor_status;		/* Minor status code */
-  gss_name_t	server_name;		/* Server name */
-  gss_cred_id_t	server_creds;		/* Server credentials */
-  gss_buffer_desc token = GSS_C_EMPTY_BUFFER;
-					/* Service name token */
-  char		buf[1024];		/* Service name buffer */
-
-
-  snprintf(buf, sizeof(buf), "%s@%s", service_name, con_server_name);
-
-  token.value  = buf;
-  token.length = strlen(buf);
-  server_name  = GSS_C_NO_NAME;
-  major_status = gss_import_name(&minor_status, &token,
-	 			 GSS_C_NT_HOSTBASED_SERVICE,
-				 &server_name);
-
-  memset(&token, 0, sizeof(token));
-
-  if (GSS_ERROR(major_status))
-  {
-    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status, 
-		       "gss_import_name() failed");
-    return (NULL);
-  }
-
-  major_status = gss_display_name(&minor_status, server_name, &token, NULL);
-
-  if (GSS_ERROR(major_status))
-  {
-    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
-                       "gss_display_name() failed"); 
-    return (NULL);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "get_gss_creds: Attempting to acquire credentials for %s...", 
-                  (char *)token.value);
-
-  server_creds = GSS_C_NO_CREDENTIAL;
-  major_status = gss_acquire_cred(&minor_status, server_name, GSS_C_INDEFINITE,
-			          GSS_C_NO_OID_SET, GSS_C_ACCEPT,
-				  &server_creds, NULL, NULL);
-  if (GSS_ERROR(major_status))
-  {
-    cupsdLogGSSMessage(CUPSD_LOG_WARN, major_status, minor_status,
-                       "gss_acquire_cred() failed"); 
-    gss_release_name(&minor_status, &server_name);
-    gss_release_buffer(&minor_status, &token);
-    return (NULL);
-  }
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "get_gss_creds: Credentials acquired successfully for %s.", 
-                  (char *)token.value);
-
-  gss_release_name(&minor_status, &server_name);
-  gss_release_buffer(&minor_status, &token);
-
-  return (server_creds);
-}
-#endif /* HAVE_GSSAPI */
 
 
 /*

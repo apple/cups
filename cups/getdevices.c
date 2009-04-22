@@ -3,7 +3,7 @@
  *
  *   cupsGetDevices implementation for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -66,6 +66,11 @@ cupsGetDevices(
   * Range check input...
   */
 
+  DEBUG_printf(("cupsGetDevices(http=%p, timeout=%d, include_schemes=\"%s\", "
+                "exclude_schemes=\"%s\", callback=%p, user_data=%p)", http,
+		timeout, include_schemes, exclude_schemes, callback,
+		user_data));
+
   if (!callback)
     return (IPP_INTERNAL_ERROR);
 
@@ -107,10 +112,10 @@ cupsGetDevices(
 
   do
   {
-    DEBUG_puts("cupsGetDevices: Sending request...");
+    DEBUG_puts("2cupsGetDevices: Sending request...");
     status = cupsSendRequest(http, request, "/", ippLength(request));
 
-    DEBUG_puts("cupsGetDevices: Waiting for response status...");
+    DEBUG_puts("2cupsGetDevices: Waiting for response status...");
     while (status == HTTP_CONTINUE)
       status = httpUpdate(http);
 
@@ -124,14 +129,12 @@ cupsGetDevices(
 	* See if we can do authentication...
 	*/
 
-	int auth_result;
+	DEBUG_puts("2cupsGetDevices: Need authorization...");
 
-	DEBUG_puts("cupsGetDevices: Need authorization...");
-
-	if ((auth_result = cupsDoAuthentication(http, "POST", "/")) == 0)
+	if (!cupsDoAuthentication(http, "POST", "/"))
 	  httpReconnect(http);
-	else if (auth_result < 0)
-	  http->status = status = HTTP_FORBIDDEN;
+	else
+	  break;
       }
 
 #ifdef HAVE_SSL
@@ -141,7 +144,7 @@ cupsGetDevices(
 	* Force a reconnect with encryption...
 	*/
 
-	DEBUG_puts("cupsGetDevices: Need encryption...");
+	DEBUG_puts("2cupsGetDevices: Need encryption...");
 
 	if (!httpReconnect(http))
 	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
@@ -151,7 +154,7 @@ cupsGetDevices(
   }
   while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
-  DEBUG_printf(("cupsGetDevices: status=%d\n", status));
+  DEBUG_printf(("2cupsGetDevices: status=%d", status));
 
   ippDelete(request);
 
@@ -177,14 +180,14 @@ cupsGetDevices(
   device_uri            = NULL;
   attr                  = NULL;
 
-  DEBUG_puts("cupsGetDevices: Reading response...");
+  DEBUG_puts("2cupsGetDevices: Reading response...");
 
   do
   {
     if ((state = ippRead(http, response)) == IPP_ERROR)
       break;
 
-    DEBUG_printf(("cupsGetDevices: state=%d, response->last=%p\n", state,
+    DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state,
                   response->last));
 
     if (!response->attrs)
@@ -197,8 +200,8 @@ cupsGetDevices(
       else
         attr = attr->next;
 
-      DEBUG_printf(("cupsGetDevices: attr->name=\"%s\", attr->value_tag=%d\n",
-                    attr->name ? attr->name : "(null)", attr->value_tag));
+      DEBUG_printf(("2cupsGetDevices: attr->name=\"%s\", attr->value_tag=%d",
+                    attr->name, attr->value_tag));
 
       if (!attr->name)
       {
@@ -237,7 +240,7 @@ cupsGetDevices(
   }
   while (state != IPP_DATA);
 
-  DEBUG_printf(("cupsGetDevices: state=%d, response->last=%p\n", state,
+  DEBUG_printf(("2cupsGetDevices: state=%d, response->last=%p", state,
 		response->last));
 
   if (device_class && device_id && device_info && device_make_and_model &&
@@ -258,7 +261,7 @@ cupsGetDevices(
   {
     attr = ippFindAttribute(response, "status-message", IPP_TAG_TEXT);
 
-    DEBUG_printf(("cupsGetDevices: status-code=%s, status-message=\"%s\"\n",
+    DEBUG_printf(("cupsGetDevices: status-code=%s, status-message=\"%s\"",
 		  ippErrorString(response->request.status.status_code),
 		  attr ? attr->values[0].string.text : ""));
 

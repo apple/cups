@@ -62,8 +62,7 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
-	$(INSTALL_DIR) -m 775 $(CACHEDIR)/rss
-	-chgrp $(CUPS_GROUP) $(CACHEDIR)/rss
+	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)/rss
 
 
 #

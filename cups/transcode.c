@@ -3,7 +3,7 @@
  *
  *   Transcoding support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -210,7 +210,7 @@ _cupsCharmapGet(
   void	*charmap;			/* Charset map pointer */
 
 
-  DEBUG_printf(("_cupsCharmapGet(encoding=%d)\n", encoding));
+  DEBUG_printf(("7_cupsCharmapGet(encoding=%d)", encoding));
 
  /*
   * Check for valid arguments...
@@ -218,7 +218,7 @@ _cupsCharmapGet(
 
   if (encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
   {
-    DEBUG_puts("    Bad encoding, returning NULL!");
+    DEBUG_puts("8_cupsCharmapGet: Bad encoding, returning NULL!");
     return (NULL);
   }
 
@@ -263,7 +263,7 @@ cupsCharsetToUTF8(
   * Check for valid arguments...
   */
 
-  DEBUG_printf(("cupsCharsetToUTF8(dest=%p, src=\"%s\", maxout=%d, encoding=%d)\n",
+  DEBUG_printf(("cupsCharsetToUTF8(dest=%p, src=\"%s\", maxout=%d, encoding=%d)",
 	        dest, src, maxout, encoding));
 
   if (dest)
@@ -271,7 +271,7 @@ cupsCharsetToUTF8(
 
   if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
   {
-    DEBUG_puts("    Bad arguments, returning -1");
+    DEBUG_puts("1cupsCharsetToUTF8: Bad arguments, returning -1");
     return (-1);
   }
 
@@ -473,15 +473,15 @@ cupsUTF8ToUTF32(
   * Check for valid arguments and clear output...
   */
 
-  DEBUG_printf(("cupsUTF8ToUTF32(dest=%p, src=\"%s\", maxout=%d)\n", dest,
-                src ? (const char *)src : "(null)", maxout));
+  DEBUG_printf(("2cupsUTF8ToUTF32(dest=%p, src=\"%s\", maxout=%d)", dest,
+                src, maxout));
 
   if (dest)
     *dest = 0;
 
   if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
   {
-    DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad arguments)");
+    DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad arguments)");
 
     return (-1);
   }
@@ -506,7 +506,7 @@ cupsUTF8ToUTF32(
 
       *dest++ = ch;
 
-      DEBUG_printf(("cupsUTF8ToUTF32: %02x => %08X\n", src[-1], ch));
+      DEBUG_printf(("4cupsUTF8ToUTF32: %02x => %08X", src[-1], ch));
       continue;
     }
     else if ((ch & 0xe0) == 0xc0)
@@ -518,7 +518,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -531,14 +531,14 @@ cupsUTF8ToUTF32(
 
       if (ch32 < 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
 
       *dest++ = ch32;
 
-      DEBUG_printf(("cupsUTF8ToUTF32: %02x %02x => %08X\n",
+      DEBUG_printf(("4cupsUTF8ToUTF32: %02x %02x => %08X",
                     src[-2], src[-1], (unsigned)ch32));
     }
     else if ((ch & 0xf0) == 0xe0)
@@ -550,7 +550,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -560,7 +560,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -573,14 +573,14 @@ cupsUTF8ToUTF32(
 
       if (ch32 < 0x800)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
 
       *dest++ = ch32;
 
-      DEBUG_printf(("cupsUTF8ToUTF32: %02x %02x %02x => %08X\n",
+      DEBUG_printf(("4cupsUTF8ToUTF32: %02x %02x %02x => %08X",
                     src[-3], src[-2], src[-1], (unsigned)ch32));
     }
     else if ((ch & 0xf8) == 0xf0)
@@ -592,7 +592,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -602,7 +602,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -612,7 +612,7 @@ cupsUTF8ToUTF32(
       next = *src++;
       if ((next & 0xc0) != 0x80)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
@@ -625,14 +625,14 @@ cupsUTF8ToUTF32(
 
       if (ch32 < 0x10000)
       {
-        DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+        DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
 	return (-1);
       }
 
       *dest++ = ch32;
 
-      DEBUG_printf(("cupsUTF8ToUTF32: %02x %02x %02x %02x => %08X\n",
+      DEBUG_printf(("4cupsUTF8ToUTF32: %02x %02x %02x %02x => %08X",
                     src[-4], src[-3], src[-2], src[-1], (unsigned)ch32));
     }
     else
@@ -641,7 +641,7 @@ cupsUTF8ToUTF32(
       * More than 4-octet (invalid UTF-8 sequence)...
       */
 
-      DEBUG_puts("cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
+      DEBUG_puts("3cupsUTF8ToUTF32: Returning -1 (bad UTF-8 sequence)");
 
       return (-1);
     }
@@ -656,7 +656,7 @@ cupsUTF8ToUTF32(
 
   *dest = 0;
 
-  DEBUG_printf(("cupsUTF8ToUTF32: Returning %d characters\n", maxout - 1 - i));
+  DEBUG_printf(("3cupsUTF8ToUTF32: Returning %d characters", maxout - 1 - i));
 
   return (maxout - 1 - i);
 }
@@ -694,7 +694,7 @@ cupsUTF32ToUTF8(
   * Check for valid arguments and clear output...
   */
 
-  DEBUG_printf(("cupsUTF32ToUTF8(dest=%p, src=%p, maxout=%d)\n", dest, src,
+  DEBUG_printf(("2cupsUTF32ToUTF8(dest=%p, src=%p, maxout=%d)", dest, src,
                 maxout));
 
   if (dest)
@@ -702,7 +702,7 @@ cupsUTF32ToUTF8(
 
   if (!dest || !src || maxout < 1)
   {
-    DEBUG_puts("cupsUTF32ToUTF8: Returning -1 (bad args)");
+    DEBUG_puts("3cupsUTF32ToUTF8: Returning -1 (bad args)");
 
     return (-1);
   }
@@ -714,7 +714,7 @@ cupsUTF32ToUTF8(
   start = dest;
   swap  = *src == 0xfffe0000;
 
-  DEBUG_printf(("cupsUTF32ToUTF8: swap=%d\n", swap));
+  DEBUG_printf(("4cupsUTF32ToUTF8: swap=%d", swap));
 
   if (*src == 0xfffe0000 || *src == 0xfeff)
     src ++;
@@ -741,7 +741,7 @@ cupsUTF32ToUTF8(
 
     if (ch > 0x10ffff)
     {
-      DEBUG_puts("cupsUTF32ToUTF8: Returning -1 (character out of range)");
+      DEBUG_puts("3cupsUTF32ToUTF8: Returning -1 (character out of range)");
 
       return (-1);
     }
@@ -759,7 +759,7 @@ cupsUTF32ToUTF8(
       *dest++ = (cups_utf8_t)ch;
       i --;
 
-      DEBUG_printf(("cupsUTF32ToUTF8: %08x => %02x\n", (unsigned)ch, dest[-1]));
+      DEBUG_printf(("4cupsUTF32ToUTF8: %08x => %02x", (unsigned)ch, dest[-1]));
     }
     else if (ch < 0x800)
     {
@@ -769,7 +769,7 @@ cupsUTF32ToUTF8(
 
       if (i < 2)
       {
-        DEBUG_puts("cupsUTF32ToUTF8: Returning -1 (too long 2)");
+        DEBUG_puts("3cupsUTF32ToUTF8: Returning -1 (too long 2)");
 
         return (-1);
       }
@@ -778,7 +778,7 @@ cupsUTF32ToUTF8(
       *dest++ = (cups_utf8_t)(0x80 | (ch & 0x3f));
       i -= 2;
 
-      DEBUG_printf(("cupsUTF32ToUTF8: %08x => %02x %02x\n", (unsigned)ch,
+      DEBUG_printf(("4cupsUTF32ToUTF8: %08x => %02x %02x", (unsigned)ch,
                     dest[-2], dest[-1]));
     }
     else if (ch < 0x10000)
@@ -789,7 +789,7 @@ cupsUTF32ToUTF8(
 
       if (i < 3)
       {
-        DEBUG_puts("cupsUTF32ToUTF8: Returning -1 (too long 3)");
+        DEBUG_puts("3cupsUTF32ToUTF8: Returning -1 (too long 3)");
 
         return (-1);
       }
@@ -799,7 +799,7 @@ cupsUTF32ToUTF8(
       *dest++ = (cups_utf8_t)(0x80 | (ch & 0x3f));
       i -= 3;
 
-      DEBUG_printf(("cupsUTF32ToUTF8: %08x => %02x %02x %02x\n", (unsigned)ch,
+      DEBUG_printf(("4cupsUTF32ToUTF8: %08x => %02x %02x %02x", (unsigned)ch,
                     dest[-3], dest[-2], dest[-1]));
     }
     else
@@ -809,7 +809,11 @@ cupsUTF32ToUTF8(
       */
 
       if (i < 4)
+      {
+        DEBUG_puts("3cupsUTF32ToUTF8: Returning -1 (too long 4)");
+
         return (-1);
+      }
 
       *dest++ = (cups_utf8_t)(0xf0 | ((ch >> 18) & 0x07));
       *dest++ = (cups_utf8_t)(0x80 | ((ch >> 12) & 0x3f));
@@ -817,14 +821,14 @@ cupsUTF32ToUTF8(
       *dest++ = (cups_utf8_t)(0x80 | (ch & 0x3f));
       i -= 4;
 
-      DEBUG_printf(("cupsUTF32ToUTF8: %08x => %02x %02x %02x %02x\n",
+      DEBUG_printf(("4cupsUTF32ToUTF8: %08x => %02x %02x %02x %02x",
                     (unsigned)ch, dest[-4], dest[-3], dest[-2], dest[-1]));
     }
   }
 
   *dest = '\0';
 
-  DEBUG_printf(("cupsUTF32ToUTF8: Returning %d\n", (int)(dest - start)));
+  DEBUG_printf(("3cupsUTF32ToUTF8: Returning %d", (int)(dest - start)));
 
   return ((int)(dest - start));
 }
@@ -1012,8 +1016,8 @@ conv_utf8_to_vbcs(
 		*workptr;		/* Pointer into string */
 
 
-  DEBUG_printf(("conv_utf8_to_vbcs(dest=%p, src=\"%s\", maxout=%d, "
-                "encoding=%d)\n", dest, src, maxout, encoding));
+  DEBUG_printf(("7conv_utf8_to_vbcs(dest=%p, src=\"%s\", maxout=%d, "
+                "encoding=%d)", dest, src, maxout, encoding));
 
  /*
   * Find legacy charset map in cache...
@@ -1021,7 +1025,7 @@ conv_utf8_to_vbcs(
 
   if ((vmap = (_cups_vmap_t *)get_charmap(encoding)) == NULL)
   {
-    DEBUG_puts("conv_utf8_to_vbcs: Returning -1 (no charmap)");
+    DEBUG_puts("8conv_utf8_to_vbcs: Returning -1 (no charmap)");
 
     return (-1);
   }
@@ -1032,7 +1036,7 @@ conv_utf8_to_vbcs(
 
   if (cupsUTF8ToUTF32(work, src, CUPS_MAX_USTRING) < 0)
   {
-    DEBUG_puts("conv_utf8_to_vbcs: Returning -1 (Unable to convert to UTF-32)");
+    DEBUG_puts("8conv_utf8_to_vbcs: Returning -1 (Unable to convert to UTF-32)");
 
     return (-1);
   }
@@ -1053,7 +1057,7 @@ conv_utf8_to_vbcs(
     {
       *dest++ = (cups_sbcs_t)unichar;
 
-      DEBUG_printf(("conv_utf8_to_vbcs: %08x => %02X\n", (unsigned)unichar,
+      DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X", (unsigned)unichar,
                     dest[-1]));
 
       continue;
@@ -1081,7 +1085,7 @@ conv_utf8_to_vbcs(
     {
       if (maxout < 5)
       {
-        DEBUG_puts("conv_utf8_to_vbcs: Returning -1 (out of space)");
+        DEBUG_puts("8conv_utf8_to_vbcs: Returning -1 (out of space)");
 
         return (-1);
       }
@@ -1093,14 +1097,14 @@ conv_utf8_to_vbcs(
 
       maxout -= 3;
 
-      DEBUG_printf(("conv_utf8_to_vbcs: %08x => %02X %02X %02X %02X\n",
+      DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X %02X %02X %02X",
                     (unsigned)unichar, dest[-4], dest[-3], dest[-2], dest[-1]));
     }
     else if (legchar > 0xffff)
     {
       if (maxout < 4)
       {
-        DEBUG_puts("conv_utf8_to_vbcs: Returning -1 (out of space)");
+        DEBUG_puts("8conv_utf8_to_vbcs: Returning -1 (out of space)");
 
         return (-1);
       }
@@ -1111,7 +1115,7 @@ conv_utf8_to_vbcs(
 
       maxout -= 2;
 
-      DEBUG_printf(("conv_utf8_to_vbcs: %08x => %02X %02X %02X\n",
+      DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X %02X %02X",
                     (unsigned)unichar, dest[-3], dest[-2], dest[-1]));
     }
     else if (legchar > 0xff)
@@ -1121,14 +1125,14 @@ conv_utf8_to_vbcs(
 
       maxout --;
 
-      DEBUG_printf(("conv_utf8_to_vbcs: %08x => %02X %02X\n",
+      DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X %02X",
                     (unsigned)unichar, dest[-2], dest[-1]));
     }
     else
     {
       *dest++ = legchar;
 
-      DEBUG_printf(("conv_utf8_to_vbcs: %08x => %02X\n",
+      DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X",
                     (unsigned)unichar, dest[-1]));
     }
   }
@@ -1137,7 +1141,7 @@ conv_utf8_to_vbcs(
 
   vmap->used --;
 
-  DEBUG_printf(("conv_utf8_to_vbcs: Returning %d characters\n",
+  DEBUG_printf(("8conv_utf8_to_vbcs: Returning %d characters",
                 (int)(dest - start)));
 
   return ((int)(dest - start));
@@ -1168,12 +1172,12 @@ conv_vbcs_to_utf8(
   * Find legacy charset map in cache...
   */
 
-  DEBUG_printf(("conv_vbcs_to_utf8(dest=%p, src=%p, maxout=%d, encoding=%d)\n",
+  DEBUG_printf(("7conv_vbcs_to_utf8(dest=%p, src=%p, maxout=%d, encoding=%d)",
                 dest, src, maxout, encoding));
 
   if ((vmap = (_cups_vmap_t *)get_charmap(encoding)) == NULL)
   {
-    DEBUG_puts("conv_vbcs_to_utf8: Returning -1 (NULL vmap)");
+    DEBUG_puts("8conv_vbcs_to_utf8: Returning -1 (NULL vmap)");
 
     return (-1);
   }
@@ -1196,7 +1200,7 @@ conv_vbcs_to_utf8(
     {
       *workptr++ = (cups_utf32_t)legchar;
 
-      DEBUG_printf(("conv_vbcs_to_utf8: %02X => %08X\n", src[-1],
+      DEBUG_printf(("9conv_vbcs_to_utf8: %02X => %08X", src[-1],
                     (unsigned)legchar));
       continue;
     }
@@ -1209,7 +1213,7 @@ conv_vbcs_to_utf8(
     {
       if (!*src)
       {
-        DEBUG_puts("conv_vbcs_to_utf8: Returning -1 (short string)");
+        DEBUG_puts("8conv_vbcs_to_utf8: Returning -1 (short string)");
 
 	return (-1);
       }
@@ -1229,7 +1233,7 @@ conv_vbcs_to_utf8(
       else
 	*workptr++ = (cups_utf32_t)*crow;
 
-      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X => %08X\n",
+      DEBUG_printf(("9conv_vbcs_to_utf8: %02X %02X => %08X",
                     src[-2], src[-1], (unsigned)workptr[-1]));
       continue;
     }
@@ -1242,7 +1246,7 @@ conv_vbcs_to_utf8(
     {
       if (!*src || !src[1])
       {
-        DEBUG_puts("conv_vbcs_to_utf8: Returning -1 (short string 2)");
+        DEBUG_puts("8conv_vbcs_to_utf8: Returning -1 (short string 2)");
 
 	return (-1);
       }
@@ -1254,7 +1258,7 @@ conv_vbcs_to_utf8(
     {
       if (!*src || !src[1] || !src[2])
       {
-        DEBUG_puts("conv_vbcs_to_utf8: Returning -1 (short string 3)");
+        DEBUG_puts("8conv_vbcs_to_utf8: Returning -1 (short string 3)");
 
 	return (-1);
       }
@@ -1265,7 +1269,7 @@ conv_vbcs_to_utf8(
     }
     else
     {
-      DEBUG_puts("conv_vbcs_to_utf8: Returning -1 (bad character)");
+      DEBUG_puts("8conv_vbcs_to_utf8: Returning -1 (bad character)");
 
       return (-1);
     }
@@ -1290,10 +1294,10 @@ conv_vbcs_to_utf8(
       *workptr++ = wide2uni->unichar;
 
     if (vmap->lead3char[(int)leadchar] == leadchar)
-      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X %02X => %08X\n",
+      DEBUG_printf(("9conv_vbcs_to_utf8: %02X %02X %02X => %08X",
 		    src[-3], src[-2], src[-1], (unsigned)workptr[-1]));
     else
-      DEBUG_printf(("conv_vbcs_to_utf8: %02X %02X %02X %02X => %08X\n",
+      DEBUG_printf(("9conv_vbcs_to_utf8: %02X %02X %02X %02X => %08X",
 		    src[-4], src[-3], src[-2], src[-1], (unsigned)workptr[-1]));
   }
 
@@ -1301,7 +1305,7 @@ conv_vbcs_to_utf8(
 
   vmap->used --;
 
-  DEBUG_printf(("conv_vbcs_to_utf8: Converting %d UTF-32 characters to UTF-8\n",
+  DEBUG_printf(("9conv_vbcs_to_utf8: Converting %d UTF-32 characters to UTF-8",
                 (int)(workptr - work)));
 
  /*
@@ -1373,7 +1377,7 @@ get_charmap(
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
-  DEBUG_printf(("get_charmap(encoding=%d)\n", encoding));
+  DEBUG_printf(("7get_charmap(encoding=%d)", encoding));
 
  /*
   * Get the data directory and charset map name...
@@ -1382,7 +1386,7 @@ get_charmap(
   snprintf(filename, sizeof(filename), "%s/charmaps/%s.txt",
 	   cg->cups_datadir, _cupsEncodingName(encoding));
 
-  DEBUG_printf(("get_charmap: filename=\"%s\"\n", filename));
+  DEBUG_printf(("9get_charmap: filename=\"%s\"", filename));
 
  /*
   * Read charset map input file into cache...
@@ -1452,7 +1456,7 @@ get_sbcs_charmap(
   * See if we already have this SBCS charset map loaded...
   */
 
-  DEBUG_printf(("get_sbcs_charmap(encoding=%d, filename=\"%s\")\n", encoding,
+  DEBUG_printf(("7get_sbcs_charmap(encoding=%d, filename=\"%s\")", encoding,
                 filename));
 
   for (cmap = cmap_cache; cmap; cmap = cmap->next)
@@ -1460,7 +1464,7 @@ get_sbcs_charmap(
     if (cmap->encoding == encoding)
     {
       cmap->used ++;
-      DEBUG_printf(("get_sbcs_charmap: Returning existing cmap=%p\n", cmap));
+      DEBUG_printf(("8get_sbcs_charmap: Returning existing cmap=%p", cmap));
 
       return ((void *)cmap);
     }
@@ -1472,7 +1476,7 @@ get_sbcs_charmap(
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
-    DEBUG_printf(("get_sbcs_charmap: Returning NULL (%s)\n", strerror(errno)));
+    DEBUG_printf(("8get_sbcs_charmap: Returning NULL (%s)", strerror(errno)));
 
     return (NULL);
   }
@@ -1484,7 +1488,7 @@ get_sbcs_charmap(
   if ((cmap = (_cups_cmap_t *)calloc(1, sizeof(_cups_cmap_t))) == NULL)
   {
     cupsFileClose(fp);
-    DEBUG_puts("get_sbcs_charmap: Returning NULL (Unable to allocate memory)");
+    DEBUG_puts("8get_sbcs_charmap: Returning NULL (Unable to allocate memory)");
 
     return (NULL);
   }
@@ -1556,7 +1560,7 @@ get_sbcs_charmap(
   cmap->next = cmap_cache;
   cmap_cache = cmap;
 
-  DEBUG_printf(("get_sbcs_charmap: Returning new cmap=%p\n", cmap));
+  DEBUG_printf(("8get_sbcs_charmap: Returning new cmap=%p", cmap));
 
   return (cmap);
 
@@ -1570,7 +1574,7 @@ get_sbcs_charmap(
 
   cupsFileClose(fp);
 
-  DEBUG_puts("get_sbcs_charmap: Returning NULL (Read/format error)");
+  DEBUG_puts("8get_sbcs_charmap: Returning NULL (Read/format error)");
 
   return (NULL);
 }
@@ -1600,7 +1604,7 @@ get_vbcs_charmap(
   int		legacy;			/* 32-bit legacy char */
 
 
-  DEBUG_printf(("get_vbcs_charmap(encoding=%d, filename=\"%s\")\n",
+  DEBUG_printf(("7get_vbcs_charmap(encoding=%d, filename=\"%s\")\n",
                 encoding, filename));
 
  /*
@@ -1612,7 +1616,7 @@ get_vbcs_charmap(
     if (vmap->encoding == encoding)
     {
       vmap->used ++;
-      DEBUG_printf(("get_vbcs_charmap: Returning existing vmap=%p\n", vmap));
+      DEBUG_printf(("8get_vbcs_charmap: Returning existing vmap=%p", vmap));
 
       return ((void *)vmap);
     }
@@ -1624,7 +1628,7 @@ get_vbcs_charmap(
 
   if ((fp = cupsFileOpen(filename, "r")) == NULL)
   {
-    DEBUG_printf(("get_vbcs_charmap: Returning NULL (%s)\n", strerror(errno)));
+    DEBUG_printf(("8get_vbcs_charmap: Returning NULL (%s)", strerror(errno)));
 
     return (NULL);
   }
@@ -1635,14 +1639,14 @@ get_vbcs_charmap(
 
   if ((mapcount = get_charmap_count(fp)) <= 0)
   {
-    DEBUG_puts("get_vbcs_charmap: Unable to get charmap count!");
+    DEBUG_puts("8get_vbcs_charmap: Unable to get charmap count!");
 
     cupsFileClose(fp);
 
     return (NULL);
   }
 
-  DEBUG_printf(("get_vbcs_charmap: mapcount=%d\n", mapcount));
+  DEBUG_printf(("8get_vbcs_charmap: mapcount=%d", mapcount));
 
  /*
   * Allocate memory for DBCS/VBCS charset map...
@@ -1650,7 +1654,7 @@ get_vbcs_charmap(
 
   if ((vmap = (_cups_vmap_t *)calloc(1, sizeof(_cups_vmap_t))) == NULL)
   {
-    DEBUG_puts("get_vbcs_charmap: Unable to allocate memory!");
+    DEBUG_puts("8get_vbcs_charmap: Unable to allocate memory!");
 
     cupsFileClose(fp);
 
@@ -1686,8 +1690,8 @@ get_vbcs_charmap(
 
     i ++;
 
-/*    DEBUG_printf(("    i=%d, legchar=0x%08lx, unichar=0x%04x\n", i,
-                  legchar, (unsigned)unichar)); */
+    DEBUG_printf(("9get_vbcs_charmap: i=%d, legchar=0x%08lx, unichar=0x%04x", i,
+                  legchar, (unsigned)unichar));
 
    /*
     * Save lead char of 2/3/4-byte legacy char...
@@ -1796,7 +1800,7 @@ get_vbcs_charmap(
   vmap->next = vmap_cache;
   vmap_cache = vmap;
 
-  DEBUG_printf(("get_vbcs_charmap: Returning new vmap=%p\n", vmap));
+  DEBUG_printf(("8get_vbcs_charmap: Returning new vmap=%p", vmap));
 
   return (vmap);
 
@@ -1810,7 +1814,7 @@ get_vbcs_charmap(
 
   cupsFileClose(fp);
 
-  DEBUG_puts("get_vbcs_charmap: Returning NULL (Read/format error)");
+  DEBUG_puts("8get_vbcs_charmap: Returning NULL (Read/format error)");
 
   return (NULL);
 }

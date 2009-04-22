@@ -160,7 +160,7 @@ extern void		cupsdSetDeviceURI(cupsd_printer_t *p, const char *uri);
 extern void		cupsdSetPrinterAttr(cupsd_printer_t *p,
 			                    const char *name, char *value);
 extern void		cupsdSetPrinterAttrs(cupsd_printer_t *p);
-extern void		cupsdSetPrinterReasons(cupsd_printer_t *p,
+extern int		cupsdSetPrinterReasons(cupsd_printer_t *p,
 			                       const char *s);
 extern void		cupsdSetPrinterState(cupsd_printer_t *p, ipp_pstate_t s,
 			                     int update);

@@ -969,7 +969,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 
   if (!appleUseLastPrinter())
   {
-    DEBUG_puts("_cupsUserDefault: Not using last printer as default...");
+    DEBUG_puts("1_cupsUserDefault: Not using last printer as default...");
     name[0] = '\0';
     return (NULL);
   }
@@ -980,14 +980,14 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 
   if ((network = appleCopyNetwork()) == NULL)
   {
-    DEBUG_puts("_cupsUserDefault: Unable to get current network...");
+    DEBUG_puts("1_cupsUserDefault: Unable to get current network...");
     name[0] = '\0';
     return (NULL);
   }
 
 #  ifdef DEBUG
   CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-  DEBUG_printf(("_cupsUserDefault: network=\"%s\"\n", name));
+  DEBUG_printf(("2_cupsUserDefault: network=\"%s\"", name));
 #  endif /* DEBUG */
 
  /*
@@ -1000,7 +1000,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
     * Missing or bad location array, so no location-based default...
     */
 
-    DEBUG_puts("_cupsUserDefault: Missing or bad location history array...");
+    DEBUG_puts("1_cupsUserDefault: Missing or bad location history array...");
 
     CFRelease(network);
 
@@ -1008,7 +1008,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
     return (NULL);
   }
   
-  DEBUG_printf(("_cupsUserDefault: Got location, %d entries...\n",
+  DEBUG_printf(("2_cupsUserDefault: Got location, %d entries...",
                 (int)CFArrayGetCount(locations)));
 
   if ((locprinter = appleGetPrinter(locations, network, NULL)) != NULL)
@@ -1019,7 +1019,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
   CFRelease(network);
   CFRelease(locations);
 
-  DEBUG_printf(("_cupsUserDefault: Returning \"%s\"...\n", name));
+  DEBUG_printf(("1_cupsUserDefault: Returning \"%s\"...", name));
 
   return (*name ? name : NULL);
 
@@ -1191,7 +1191,7 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
 
   if ((network = appleCopyNetwork()) == NULL)
   {
-    DEBUG_puts("appleSetDefault: Unable to get current network...");
+    DEBUG_puts("1appleSetDefault: Unable to get current network...");
     return;
   }
 
@@ -1568,9 +1568,9 @@ cups_get_dests(
   int		linenum;		/* Current line number */
 
 
-  DEBUG_printf(("cups_get_dests(filename=\"%s\", match_name=\"%s\", "
+  DEBUG_printf(("7cups_get_dests(filename=\"%s\", match_name=\"%s\", "
                 "match_inst=\"%s\", user_default_set=%d, num_dests=%d, "
-		"dests=%p)\n", filename, match_name, match_inst,
+		"dests=%p)", filename, match_name, match_inst,
 		user_default_set, num_dests, dests));
 
  /*
@@ -1595,12 +1595,12 @@ cups_get_dests(
     * See what type of line it is...
     */
 
-    DEBUG_printf(("cups_get_dests: linenum=%d line=\"%s\" lineptr=\"%s\"\n",
+    DEBUG_printf(("9cups_get_dests: linenum=%d line=\"%s\" lineptr=\"%s\"",
                   linenum, line, lineptr));
 
     if ((strcasecmp(line, "dest") && strcasecmp(line, "default")) || !lineptr)
     {
-      DEBUG_puts("cups_get_dests: Not a dest or default line...");
+      DEBUG_puts("9cups_get_dests: Not a dest or default line...");
       continue;
     }
 
@@ -1635,7 +1635,7 @@ cups_get_dests(
     if (*lineptr)
       *lineptr++ = '\0';
 
-    DEBUG_printf(("cups_get_dests: name=\"%s\", instance=\"%s\"\n", name,
+    DEBUG_printf(("9cups_get_dests: name=\"%s\", instance=\"%s\"", name,
                   instance));
 
    /*
@@ -1655,7 +1655,7 @@ cups_get_dests(
     }
     else if (cupsGetDest(name, NULL, num_dests, *dests) == NULL)
     {
-      DEBUG_puts("cups_get_dests: Not found!");
+      DEBUG_puts("9cups_get_dests: Not found!");
       continue;
     }
     else
@@ -1672,7 +1672,7 @@ cups_get_dests(
 	* Out of memory!
 	*/
 
-        DEBUG_puts("cups_get_dests: Out of memory!");
+        DEBUG_puts("9cups_get_dests: Out of memory!");
         break;
       }
     }
@@ -1697,7 +1697,7 @@ cups_get_dests(
 
     if (!user_default_set && !strcasecmp(line, "default"))
     {
-      DEBUG_puts("cups_get_dests: Setting as default...");
+      DEBUG_puts("9cups_get_dests: Setting as default...");
 
       for (i = 0; i < num_dests; i ++)
         (*dests)[i].is_default = 0;

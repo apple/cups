@@ -58,7 +58,8 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		first_arg,		/* First argument for backend */
-		do_query = 0,		/* Do PostScript query? */
+		do_ps = 0,		/* Do PostScript query+test? */
+		do_pcl = 0,		/* Do PCL query+test? */
 		do_side_tests = 0,	/* Test side-channel ops? */
 		do_trickle = 0,		/* Trickle data to backend */
 		do_walk = 0,		/* Do OID lookup (0) or walking (1) */
@@ -84,8 +85,10 @@ main(int  argc,				/* I - Number of command-line args */
        first_arg ++)
     if (!strcmp(argv[first_arg], "-d"))
       show_log = 1;
+    else if (!strcmp(argv[first_arg], "-pcl"))
+      do_pcl = 1;
     else if (!strcmp(argv[first_arg], "-ps"))
-      do_query = 1;
+      do_ps = 1;
     else if (!strcmp(argv[first_arg], "-s"))
       do_side_tests = 1;
     else if (!strcmp(argv[first_arg], "-t"))
@@ -157,15 +160,15 @@ main(int  argc,				/* I - Number of command-line args */
   * Execute the trickle process as needed...
   */
 
-  if (do_trickle || do_query)
+  if (do_trickle || do_pcl || do_ps)
   {
     pipe(data_fds);
 
     if ((pid = fork()) == 0)
     {
      /*
-      * Trickle/query child comes here...  Rearrange file descriptors so that
-      * FD 
+      * Trickle/query child comes here.  Rearrange file descriptors so that
+      * FD 1, 3, and 4 point to the backend...
       */
 
       close(0);
@@ -203,12 +206,25 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
        /*
-        * Do a simple PostScript query job to get the default page size.
+        * Do PS or PCL query + test pages.
 	*/
 
-        char	buffer[1024];		/* Buffer for response data */
-	ssize_t	bytes;			/* Number of bytes of response data */
-        static const char *ps_query =	/* PostScript query file */
+        char		buffer[1024];	/* Buffer for response data */
+	ssize_t		bytes;		/* Number of bytes of response data */
+	double		timeout;	/* Timeout */
+	const char	*data;		/* Data to send */
+        static const char *pcl_data =	/* PCL data */
+		"\033%-12345X@PJL\r\n"
+		"@PJL JOB NAME = \"Hello, World!\"\r\n"
+		"@PJL INFO USTATUS\r\n"
+		"@PJL ENTER LANGUAGE = PCL\r\n"
+		"\033E"
+		"Hello, World!\n"
+		"\014"
+		"\033%-12345X@PJL\r\n"
+		"@PJL EOJ NAME=\"Hello, World!\"\r\n"
+		"\033%-12345X";
+        static const char *ps_data =	/* PostScript data */
 		"%!\n"
 		"save\n"
 		"product = flush\n"
@@ -240,14 +256,27 @@ main(int  argc,				/* I - Number of command-line args */
 		"  {exch pop exit} {pop} ifelse\n"
 		"} bind forall\n"
 		"= flush pop pop\n"
+		"/Courier findfont 12 scalefont setfont\n"
+		"0 setgray 36 720 moveto (Hello, ) show product show (!) show\n"
+		"showpage\n"
 		"restore\n"
 		"\004";
 
 
-        write(1, ps_query, strlen(ps_query));
+	if (do_pcl)
+	  data = pcl_data;
+	else
+	  data = ps_data;
+
+        write(1, data, strlen(data));
 	write(2, "DEBUG: START\n", 13);
-        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 60.0)) > 0)
+	timeout = 60.0;
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer),
+	                                    timeout)) > 0)
+	{
 	  write(2, buffer, bytes);
+	  timeout = 5.0;
+	}
 	write(2, "\nDEBUG: END\n", 12);
       }
 
@@ -272,7 +301,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Child comes here...
     */
 
-    if (do_trickle || do_query)
+    if (do_trickle || do_ps)
     {
       close(0);
       dup(data_fds[0]);
@@ -311,7 +340,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Parent comes here, setup back and side channel file descriptors...
   */
 
-  if (do_trickle || do_query)
+  if (do_trickle || do_ps)
   {
     close(data_fds[0]);
     close(data_fds[1]);
@@ -438,7 +467,8 @@ usage(void)
   puts("  -d          Show log messages from backend.");
   puts("  -oid OID    Lookup the specified SNMP OID.");
   puts("              (.1.3.6.1.2.1.43.10.2.1.4.1.1 is a good one for printers)");
-  puts("  -ps         Send PostScript query code to backend.");
+  puts("  -pcl        Send PCL+PJL query and test page to backend.");
+  puts("  -ps         Send PostScript query and test page to backend.");
   puts("  -s          Do side-channel + SNMP tests.");
   puts("  -t          Send spaces slowly to backend ('trickle').");
   puts("  -walk OID   Walk the specified SNMP OID.");

@@ -237,6 +237,26 @@
 }
 {
 	# The name of the test...
+	NAME "Get Default Printer with no default set"
+
+	# The operation to use
+	OPERATION cups-get-default
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS client-error-not-found
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
 	NAME "Set Default Printer to Test1"
 
 	# The operation to use
@@ -255,6 +275,28 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
+}
+{
+	# The name of the test...
+	NAME "Get Default Printer"
+
+	# The operation to use
+	OPERATION cups-get-default
+	RESOURCE /
+
+	# The attributes to send
+	GROUP operation
+	ATTR charset attributes-charset utf-8
+	ATTR language attributes-natural-language en
+
+	# What statuses are OK?
+	STATUS successful-ok
+
+	# What attributes do we expect?
+	EXPECT attributes-charset
+	EXPECT attributes-natural-language
+	EXPECT printer-name
+	EXPECT printer-uri-supported
 }
 {
 	# The name of the test...

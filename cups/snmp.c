@@ -116,7 +116,7 @@ static void		snmp_set_error(cups_snmp_t *packet,
 void
 _cupsSNMPClose(int fd)			/* I - SNMP socket file descriptor */
 {
-  DEBUG_printf(("_cupsSNMPClose(fd=%d)\n", fd));
+  DEBUG_printf(("4_cupsSNMPClose(fd=%d)", fd));
 
 #ifdef WIN32
   closesocket(fd);
@@ -140,7 +140,7 @@ _cupsSNMPCopyOID(int       *dst,	/* I - Destination OID */
   int	i;				/* Looping var */
 
 
-  DEBUG_printf(("_cupsSNMPCopyOID(dst=%p, src=%p, dstsize=%d)\n", dst, src,
+  DEBUG_printf(("4_cupsSNMPCopyOID(dst=%p, src=%p, dstsize=%d)", dst, src,
                 dstsize));
 
   for (i = 0, dstsize --; src[i] >= 0 && i < dstsize; i ++)
@@ -169,7 +169,7 @@ _cupsSNMPDefaultCommunity(void)
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
-  DEBUG_puts("_cupsSNMPDefaultCommunity()");
+  DEBUG_puts("4_cupsSNMPDefaultCommunity()");
 
   if (!cg->snmp_community[0])
   {
@@ -190,7 +190,7 @@ _cupsSNMPDefaultCommunity(void)
     }
   }
 
-  DEBUG_printf(("_cupsSNMPDefaultCommunity: Returning \"%s\"\n",
+  DEBUG_printf(("5_cupsSNMPDefaultCommunity: Returning \"%s\"",
                 cg->snmp_community));
 
   return (cg->snmp_community);
@@ -214,11 +214,11 @@ _cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
   * Range check input...
   */
 
-  DEBUG_printf(("_cupsSNMPIsOID(packet=%p, oid=%p)\n", packet, oid));
+  DEBUG_printf(("4_cupsSNMPIsOID(packet=%p, oid=%p)", packet, oid));
 
   if (!packet || !oid)
   {
-    DEBUG_puts("_cupsSNMPIsOID: Returning 0");
+    DEBUG_puts("5_cupsSNMPIsOID: Returning 0");
 
     return (0);
   }
@@ -232,12 +232,12 @@ _cupsSNMPIsOID(cups_snmp_t *packet,	/* I - Response packet */
        i ++)
     if (oid[i] != packet->object_name[i])
     {
-      DEBUG_puts("_cupsSNMPIsOID: Returning 0");
+      DEBUG_puts("5_cupsSNMPIsOID: Returning 0");
 
       return (0);
     }
 
-  DEBUG_printf(("_cupsSNMPIsOID: Returning %d\n",
+  DEBUG_printf(("5_cupsSNMPIsOID: Returning %d",
                 i < CUPS_SNMP_MAX_OID && oid[i] == packet->object_name[i]));
 
   return (i < CUPS_SNMP_MAX_OID && oid[i] == packet->object_name[i]);
@@ -263,12 +263,12 @@ _cupsSNMPIsOIDPrefixed(
   * Range check input...
   */
 
-  DEBUG_printf(("_cupsSNMPIsOIDPrefixed(packet=%p, prefix=%p)\n", packet,
+  DEBUG_printf(("4_cupsSNMPIsOIDPrefixed(packet=%p, prefix=%p)", packet,
                 prefix));
 
   if (!packet || !prefix)
   {
-    DEBUG_puts("_cupsSNMPIsOIDPrefixed: Returning 0");
+    DEBUG_puts("5_cupsSNMPIsOIDPrefixed: Returning 0");
 
     return (0);
   }
@@ -282,12 +282,12 @@ _cupsSNMPIsOIDPrefixed(
        i ++)
     if (prefix[i] != packet->object_name[i])
     {
-      DEBUG_puts("_cupsSNMPIsOIDPrefixed: Returning 0");
+      DEBUG_puts("5_cupsSNMPIsOIDPrefixed: Returning 0");
 
       return (0);
     }
 
-  DEBUG_printf(("_cupsSNMPIsOIDPrefixed: Returning %d\n",
+  DEBUG_printf(("5_cupsSNMPIsOIDPrefixed: Returning %d",
                 i < CUPS_SNMP_MAX_OID));
 
   return (i < CUPS_SNMP_MAX_OID);
@@ -308,7 +308,7 @@ _cupsSNMPOIDToString(const int *src,	/* I - OID */
 	*dstend;			/* End of string buffer */
 
 
-  DEBUG_printf(("_cupsSNMPOIDToString(src=%p, dst=%p, dstsize=" CUPS_LLFMT ")\n",
+  DEBUG_printf(("4_cupsSNMPOIDToString(src=%p, dst=%p, dstsize=" CUPS_LLFMT ")",
                 src, dst, CUPS_LLCAST dstsize));
 
  /*
@@ -349,11 +349,11 @@ _cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_IN
   * Create the SNMP socket...
   */
 
-  DEBUG_printf(("_cupsSNMPOpen(family=%d)\n", family));
+  DEBUG_printf(("4_cupsSNMPOpen(family=%d)", family));
 
   if ((fd = socket(family, SOCK_DGRAM, 0)) < 0)
   {
-    DEBUG_printf(("_cupsSNMPOpen: Returning -1 (%s)\n", strerror(errno)));
+    DEBUG_printf(("5_cupsSNMPOpen: Returning -1 (%s)", strerror(errno)));
 
     return (-1);
   }
@@ -366,14 +366,14 @@ _cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_IN
 
   if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
   {
-    DEBUG_printf(("_cupsSNMPOpen: Returning -1 (%s)\n", strerror(errno)));
+    DEBUG_printf(("5_cupsSNMPOpen: Returning -1 (%s)", strerror(errno)));
 
     close(fd);
 
     return (-1);
   }
 
-  DEBUG_printf(("_cupsSNMPOpen: Returning %d\n", fd));
+  DEBUG_printf(("5_cupsSNMPOpen: Returning %d", fd));
 
   return (fd);
 }
@@ -402,12 +402,12 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Range check input...
   */
 
-  DEBUG_printf(("_cupsSNMPRead(fd=%d, packet=%p, timeout=%.1f)\n", fd, packet,
+  DEBUG_printf(("4_cupsSNMPRead(fd=%d, packet=%p, timeout=%.1f)", fd, packet,
                 timeout));
 
   if (fd < 0 || !packet)
   {
-    DEBUG_puts("_cupsSNMPRead: Returning NULL");
+    DEBUG_puts("5_cupsSNMPRead: Returning NULL");
 
     return (NULL);
   }
@@ -426,7 +426,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
     pfd.events = POLLIN;
 
     while ((ready = poll(&pfd, 1, (int)(timeout * 1000.0))) < 0 &&
-           errno == EINTR);
+           (errno == EINTR || errno == EAGAIN));
 
 #else
     fd_set		input_set;	/* select() input set */
@@ -445,7 +445,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 #  ifdef WIN32
     while (ready < 0 && WSAGetLastError() == WSAEINTR);
 #  else
-    while (ready < 0 && errno == EINTR);
+    while (ready < 0 && (errno == EINTR || errno == EAGAIN));
 #  endif /* WIN32 */
 #endif /* HAVE_POLL */
 
@@ -455,7 +455,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
 
     if (ready <= 0)
     {
-      DEBUG_puts("_cupsSNMPRead: Returning NULL (timeout)");
+      DEBUG_puts("5_cupsSNMPRead: Returning NULL (timeout)");
 
       return (NULL);
     }
@@ -470,7 +470,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   if ((bytes = recvfrom(fd, buffer, sizeof(buffer), 0, (void *)&address,
                         &addrlen)) < 0)
   {
-    DEBUG_printf(("_cupsSNMPRead: Returning NULL (%s)\n", strerror(errno)));
+    DEBUG_printf(("5_cupsSNMPRead: Returning NULL (%s)", strerror(errno)));
 
     return (NULL);
   }
@@ -489,7 +489,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
   * Return decoded data packet...
   */
 
-  DEBUG_puts("_cupsSNMPRead: Returning packet");
+  DEBUG_puts("5_cupsSNMPRead: Returning packet");
 
   return (packet);
 }
@@ -505,7 +505,7 @@ _cupsSNMPSetDebug(int level)		/* I - 1 to enable debug output, 0 otherwise */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
-  DEBUG_printf(("_cupsSNMPSetDebug(level=%d)\n", level));
+  DEBUG_printf(("4_cupsSNMPSetDebug(level=%d)", level));
 
   cg->snmp_debug = level;
 }
@@ -530,7 +530,7 @@ _cupsSNMPStringToOID(const char *src,	/* I - OID string */
 	*dstend;			/* End of OID array */
 
 
-  DEBUG_printf(("_cupsSNMPStringToOID(src=\"%s\", dst=%p, dstsize=%d)\n",
+  DEBUG_printf(("4_cupsSNMPStringToOID(src=\"%s\", dst=%p, dstsize=%d)",
                 src, dst, dstsize));
 
  /*
@@ -610,15 +610,14 @@ _cupsSNMPWalk(int            fd,	/* I - SNMP socket */
   * Range check input...
   */
 
-  DEBUG_printf(("_cupsSNMPWalk(fd=%d, address=%p, version=%d, "
-                "community=\"%s\", prefix=%p, timeout=%.1f, cb=%p, data=%p)\n",
-		fd, address, version, community ? community : "(null)",
-		prefix, timeout, cb, data));
+  DEBUG_printf(("4_cupsSNMPWalk(fd=%d, address=%p, version=%d, "
+                "community=\"%s\", prefix=%p, timeout=%.1f, cb=%p, data=%p)",
+		fd, address, version, community, prefix, timeout, cb, data));
 
   if (fd < 0 || !address || version != CUPS_SNMP_VERSION_1 || !community ||
       !prefix || !cb)
   {
-    DEBUG_puts("_cupsSNMPWalk: Returning -1");
+    DEBUG_puts("5_cupsSNMPWalk: Returning -1");
 
     return (-1);
   }
@@ -637,28 +636,28 @@ _cupsSNMPWalk(int            fd,	/* I - SNMP socket */
                        CUPS_ASN1_GET_NEXT_REQUEST, request_id,
 		       packet.object_name))
     {
-      DEBUG_puts("_cupsSNMPWalk: Returning -1");
+      DEBUG_puts("5_cupsSNMPWalk: Returning -1");
 
       return (-1);
     }
 
     if (!_cupsSNMPRead(fd, &packet, timeout))
     {
-      DEBUG_puts("_cupsSNMPWalk: Returning -1");
+      DEBUG_puts("5_cupsSNMPWalk: Returning -1");
 
       return (-1);
     }
 
     if (!_cupsSNMPIsOIDPrefixed(&packet, prefix))
     {
-      DEBUG_printf(("_cupsSNMPWalk: Returning %d\n", count));
+      DEBUG_printf(("5_cupsSNMPWalk: Returning %d", count));
 
       return (count);
     }
 
     if (packet.error || packet.error_status)
     {
-      DEBUG_printf(("_cupsSNMPWalk: Returning %d\n", count > 0 ? count : -1));
+      DEBUG_printf(("5_cupsSNMPWalk: Returning %d", count > 0 ? count : -1));
 
       return (count > 0 ? count : -1);
     }
@@ -698,16 +697,15 @@ _cupsSNMPWrite(
   * Range check input...
   */
 
-  DEBUG_printf(("_cupsSNMPWrite(fd=%d, address=%p, version=%d, "
-                "community=\"%s\", request_type=%d, request_id=%u, oid=%p)\n",
-		fd, address, version, community ? community : "(null)",
-		request_type, request_id, oid));
+  DEBUG_printf(("4_cupsSNMPWrite(fd=%d, address=%p, version=%d, "
+                "community=\"%s\", request_type=%d, request_id=%u, oid=%p)",
+		fd, address, version, community, request_type, request_id, oid));
 
   if (fd < 0 || !address || version != CUPS_SNMP_VERSION_1 || !community ||
       (request_type != CUPS_ASN1_GET_REQUEST &&
        request_type != CUPS_ASN1_GET_NEXT_REQUEST) || request_id < 1 || !oid)
   {
-    DEBUG_puts("_cupsSNMPWrite: Returning 0 (bad arguments)");
+    DEBUG_puts("5_cupsSNMPWrite: Returning 0 (bad arguments)");
 
     return (0);
   }
@@ -731,7 +729,7 @@ _cupsSNMPWrite(
 
   if (oid[i] >= 0)
   {
-    DEBUG_puts("_cupsSNMPWrite: Returning 0 (OID too big)");
+    DEBUG_puts("5_cupsSNMPWrite: Returning 0 (OID too big)");
 
     errno = E2BIG;
     return (0);
@@ -741,7 +739,7 @@ _cupsSNMPWrite(
 
   if (bytes < 0)
   {
-    DEBUG_puts("_cupsSNMPWrite: Returning 0 (request too big)");
+    DEBUG_puts("5_cupsSNMPWrite: Returning 0 (request too big)");
 
     errno = E2BIG;
     return (0);

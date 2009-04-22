@@ -4,7 +4,7 @@
  *   PPD model-specific attribute routines for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -44,8 +44,8 @@ ppdFindAttr(ppd_file_t *ppd,		/* I - PPD file data */
 		*attr;			/* Current attribute */
 
 
-  DEBUG_printf(("ppdFindAttr(ppd=%p, name=\"%s\", spec=\"%s\")\n", ppd,
-                name ? name : "(null)", spec ? spec : "(null)"));
+  DEBUG_printf(("2ppdFindAttr(ppd=%p, name=\"%s\", spec=\"%s\")", ppd, name,
+                spec));
 
  /*
   * Range check input...

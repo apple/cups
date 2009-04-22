@@ -4,7 +4,7 @@
  *   Network interface definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,6 +25,7 @@ typedef struct cupsd_netif_s		/**** Network interface data ****/
   http_addr_t		address,	/* Network address */
 			mask,		/* Network mask */
 			broadcast;	/* Broadcast address */
+  size_t		hostlen;	/* Length of hostname */
   char			name[32],	/* Network interface name */
 			hostname[1];	/* Hostname associated with interface */
 } cupsd_netif_t;

@@ -339,6 +339,7 @@ MaxLogSize 0
 AccessLog /tmp/cups-$user/log/access_log
 ErrorLog /tmp/cups-$user/log/error_log
 PageLog /tmp/cups-$user/log/page_log
+AccessLogLevel actions
 LogLevel debug2
 LogTimeFormat usecs
 PreserveJobHistory Yes
@@ -636,10 +637,30 @@ else
 	echo "<P>PASS: Printer 'Test2' correctly produced $count page(s).</P>" >>$strfile
 fi
 
-# Requested processed
+# Requests logged
 count=`wc -l /tmp/cups-$user/log/access_log | awk '{print $1}'`
-echo "PASS: $count requests processed."
-echo "<P>PASS: $count requests processed.</P>" >>$strfile
+expected=`expr 39 + 18 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+if test $count != $expected; then
+	echo "FAIL: $count requests logged, expected $expected."
+	echo "<P>FAIL: $count requests logged, expected $expected.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: $count requests logged."
+	echo "<P>PASS: $count requests logged.</P>" >>$strfile
+fi
+
+# Did CUPS-Get-Default get logged?
+if grep -q CUPS-Get-Default /tmp/cups-$user/log/access_log; then
+	echo "FAIL: CUPS-Get-Default logged with 'AccessLogLevel actions'"
+	echo "<P>FAIL: CUPS-Get-Default logged with 'AccessLogLevel actions'</P>" >>$strfile
+	echo "<PRE>" >>$strfile
+	grep CUPS-Get-Default /tmp/cups-$user/log/access_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	echo "</PRE>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: CUPS-Get-Default not logged."
+	echo "<P>PASS: CUPS-Get-Default not logged.</P>" >>$strfile
+fi
 
 # Emergency log messages
 count=`grep '^X ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`

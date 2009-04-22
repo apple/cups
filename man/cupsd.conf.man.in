@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "16 March 2009" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "19 April 2009" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -416,10 +416,6 @@ KeepAliveTimeout seconds
 .br
 Specifies the amount of time that connections are kept alive.
 .TP 5
-Krb5Keytab filename
-.br
-Overrides the Kerberos key tab location.
-.TP 5
 <Limit operations> ... </Limit>
 .br
 Specifies the IPP operations that are being limited inside a policy.
@@ -621,6 +617,11 @@ satisfied to allow access.
 ServerAdmin user@domain.com
 .br
 Specifies the email address of the server administrator.
+.TP 5
+ServerAlias hostname
+.br
+Specifies an alternate name that the server is known by. The special name "*"
+allows any name to be used.
 .TP 5
 ServerBin directory
 .br

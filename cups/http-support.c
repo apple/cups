@@ -727,7 +727,7 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
 		{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 };
 
 
-  DEBUG_printf(("httpGetDateTime(s=\"%s\")\n", s));
+  DEBUG_printf(("2httpGetDateTime(s=\"%s\")", s));
 
  /*
   * Extract the date and time from the formatted string...
@@ -736,8 +736,8 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
   if (sscanf(s, "%*s%d%15s%d%d:%d:%d", &day, mon, &year, &hour, &min, &sec) < 6)
     return (0);
 
-  DEBUG_printf(("    day=%d, mon=\"%s\", year=%d, hour=%d, min=%d, sec=%d\n",
-                day, mon, year, hour, min, sec));
+  DEBUG_printf(("4httpGetDateTime: day=%d, mon=\"%s\", year=%d, hour=%d, "
+                "min=%d, sec=%d", day, mon, year, hour, min, sec));
 
  /*
   * Convert the month name to a number from 0 to 11.
@@ -750,7 +750,7 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
   if (i >= 12)
     return (0);
 
-  DEBUG_printf(("    i=%d\n", i));
+  DEBUG_printf(("4httpGetDateTime: i=%d", i));
 
  /*
   * Now convert the date and time to a UNIX time value in seconds since
@@ -763,14 +763,14 @@ httpGetDateTime(const char *s)		/* I - Date/time string */
   else
     days = normal_days[i] + day - 1;
 
-  DEBUG_printf(("    days=%d\n", days));
+  DEBUG_printf(("4httpGetDateTime: days=%d", days));
 
   days += (year - 1970) * 365 +		/* 365 days per year (normally) */
           ((year - 1) / 4 - 492) -	/* + leap days */
 	  ((year - 1) / 100 - 19) +	/* - 100 year days */
           ((year - 1) / 400 - 4);	/* + 400 year days */
 
-  DEBUG_printf(("    days=%d\n", days));
+  DEBUG_printf(("4httpGetDateTime: days=%d\n", days));
 
   return (days * 86400 + hour * 3600 + min * 60 + sec);
 }
@@ -1313,8 +1313,8 @@ _httpResolveURI(
 #endif /* DEBUG */
 
 
-  DEBUG_printf(("_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
-                "resolved_size=" CUPS_LLFMT ")\n", uri, resolved_uri,
+  DEBUG_printf(("4_httpResolveURI(uri=\"%s\", resolved_uri=%p, "
+                "resolved_size=" CUPS_LLFMT ")", uri, resolved_uri,
 		CUPS_LLCAST resolved_size));
 
  /*
@@ -1336,8 +1336,8 @@ _httpResolveURI(
     if (logit)
       _cupsLangPrintf(stderr, _("Bad device URI \"%s\"!\n"), uri);
 
-    DEBUG_printf(("_httpResolveURI: httpSeparateURI returned %d!\n", status));
-    DEBUG_puts("_httpResolveURI: Returning NULL");
+    DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
+    DEBUG_puts("5_httpResolveURI: Returning NULL");
     return (NULL);
   }
 
@@ -1380,7 +1380,7 @@ _httpResolveURI(
 
     if (regtype <= hostname)
     {
-      DEBUG_puts("_httpResolveURI: Bad hostname, returning NULL");
+      DEBUG_puts("5_httpResolveURI: Bad hostname, returning NULL");
       return (NULL);
     }
 
@@ -1398,7 +1398,7 @@ _httpResolveURI(
 
     resolved_uri[0] = '\0';
 
-    DEBUG_printf(("_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
+    DEBUG_printf(("6_httpResolveURI: Resolving hostname=\"%s\", regtype=\"%s\", "
                   "domain=\"%s\"\n", hostname, regtype, domain));
     if (logit)
     {
@@ -1479,7 +1479,7 @@ _httpResolveURI(
       _cupsLangPuts(stderr, _("Unable to find printer!\n"));
   }
 
-  DEBUG_printf(("_httpResolveURI: Returning \"%s\"\n", uri));
+  DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));
 
   return (uri);
 }
@@ -1627,9 +1627,9 @@ resolve_callback(
   _http_uribuf_t	*uribuf;	/* URI buffer */
 
 
-  DEBUG_printf(("resolve_callback(sdRef=%p, flags=%x, interfaceIndex=%u, "
+  DEBUG_printf(("7resolve_callback(sdRef=%p, flags=%x, interfaceIndex=%u, "
 	        "errorCode=%d, fullName=\"%s\", hostTarget=\"%s\", port=%u, "
-	        "txtLen=%u, txtRecord=%p, context=%p)\n", sdRef, flags,
+	        "txtLen=%u, txtRecord=%p, context=%p)", sdRef, flags,
 	        interfaceIndex, errorCode, fullName, hostTarget, port, txtLen,
 	        txtRecord, context));
 
@@ -1673,7 +1673,7 @@ resolve_callback(
   httpAssembleURI(HTTP_URI_CODING_ALL, uribuf->buffer, uribuf->bufsize, scheme,
                   NULL, hostTarget, ntohs(port), rp);
 
-  DEBUG_printf(("resolve_callback: Resolved URI is \"%s\"...\n",
+  DEBUG_printf(("8resolve_callback: Resolved URI is \"%s\"...",
                 uribuf->buffer));
 }
 #endif /* HAVE_DNSSD */

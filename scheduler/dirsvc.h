@@ -4,7 +4,7 @@
  *   Directory services definitions for the Common UNIX Printing System
  *   (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -135,6 +135,8 @@ VAR cupsd_statbuf_t	*PollStatusBuffer VALUE(NULL);
 #ifdef HAVE_DNSSD
 VAR char		*DNSSDName	VALUE(NULL);
 					/* Computer/server name */
+VAR cups_array_t	*DNSSDAlias	VALUE(NULL);
+					/* List of dynamic ServerAlias's */
 VAR int			DNSSDPort	VALUE(0);
 					/* Port number to register */
 VAR cups_array_t	*DNSSDPrinters	VALUE(NULL);

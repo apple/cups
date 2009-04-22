@@ -4,7 +4,7 @@
 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
 	<TITLE>Strona domowa - CUPS @CUPS_VERSION@@CUPS_REVISION@</TITLE>
 	<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cups.css">
-	<LINK REL="SHORTCUT ICON" HREF="/favicon.png" TYPE="image/png">
+	<LINK REL="SHORTCUT ICON" HREF="/images/cups-icon.png" TYPE="image/png">
 </HEAD>
 <BODY>
 <TABLE CLASS="page" SUMMARY="{title}">

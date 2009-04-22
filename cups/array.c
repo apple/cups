@@ -3,7 +3,7 @@
  *
  *   Sorted array routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -109,7 +109,7 @@ int					/* O - 1 on success, 0 on failure */
 cupsArrayAdd(cups_array_t *a,		/* I - Array */
              void         *e)		/* I - Element */
 {
-  DEBUG_printf(("cupsArrayAdd(a=%p, e=%p)\n", a, e));
+  DEBUG_printf(("2cupsArrayAdd(a=%p, e=%p)", a, e));
 
  /*
   * Range check input...
@@ -117,7 +117,7 @@ cupsArrayAdd(cups_array_t *a,		/* I - Array */
 
   if (!a || !e)
   {
-    DEBUG_puts("cupsArrayAdd: returning 0");
+    DEBUG_puts("3cupsArrayAdd: returning 0");
     return (0);
   }
 
@@ -505,7 +505,7 @@ int					/* O - 0 on failure, 1 on success */
 cupsArrayInsert(cups_array_t *a,	/* I - Array */
 		void         *e)	/* I - Element */
 {
-  DEBUG_printf(("cupsArrayInsert(a=%p, e=%p)\n", a, e));
+  DEBUG_printf(("2cupsArrayInsert(a=%p, e=%p)", a, e));
 
  /*
   * Range check input...
@@ -513,7 +513,7 @@ cupsArrayInsert(cups_array_t *a,	/* I - Array */
 
   if (!a || !e)
   {
-    DEBUG_puts("cupsArrayInsert: returning 0");
+    DEBUG_puts("3cupsArrayInsert: returning 0");
     return (0);
   }
 
@@ -846,7 +846,7 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("cups_array_add(a=%p, e=%p, insert=%d)\n", a, e, insert));
+  DEBUG_printf(("7cups_array_add(a=%p, e=%p, insert=%d)", a, e, insert));
 
  /*
   * Verify we have room for the new element...
@@ -879,11 +879,11 @@ cups_array_add(cups_array_t *a,		/* I - Array */
       temp = realloc(a->elements, count * sizeof(void *));
     }
 
-    DEBUG_printf(("cups_array_add: count=%d\n", count));
+    DEBUG_printf(("9cups_array_add: count=%d", count));
 
     if (!temp)
     {
-      DEBUG_puts("cupsAddAdd: allocation failed, returning 0");
+      DEBUG_puts("9cups_array_add: allocation failed, returning 0");
       return (0);
     }
 
@@ -978,11 +978,11 @@ cups_array_add(cups_array_t *a,		/* I - Array */
       if (a->saved[i] >= current)
 	a->saved[i] ++;
 
-    DEBUG_printf(("cups_array_add: insert element at index %d...\n", current));
+    DEBUG_printf(("9cups_array_add: insert element at index %d...", current));
   }
 #ifdef DEBUG
   else
-    DEBUG_printf(("cups_array_add: append element at %d...\n", current));
+    DEBUG_printf(("9cups_array_add: append element at %d...", current));
 #endif /* DEBUG */
 
   a->elements[current] = e;
@@ -991,11 +991,11 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 
 #ifdef DEBUG
   for (current = 0; current < a->num_elements; current ++)
-    DEBUG_printf(("cups_array_add: a->elements[%d]=%p\n", current,
+    DEBUG_printf(("9cups_array_add: a->elements[%d]=%p", current,
                   a->elements[current]));
 #endif /* DEBUG */
 
-  DEBUG_puts("cups_array_add: returning 1");
+  DEBUG_puts("9cups_array_add: returning 1");
 
   return (1);
 }
@@ -1017,7 +1017,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
 	diff;				/* Comparison with current element */
 
 
-  DEBUG_printf(("cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)\n", a, e, prev,
+  DEBUG_printf(("7cups_array_find(a=%p, e=%p, prev=%d, rdiff=%p)", a, e, prev,
                 rdiff));
 
   if (a->compare)
@@ -1026,7 +1026,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
     * Do a binary search for the element...
     */
 
-    DEBUG_puts("cups_array_find: binary search");
+    DEBUG_puts("9cups_array_find: binary search");
 
     if (prev >= 0 && prev < a->num_elements)
     {
@@ -1042,7 +1042,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
         * Exact or edge match, return it!
 	*/
 
-        DEBUG_printf(("cups_array_find: Returning %d, diff=%d\n", prev, diff));
+        DEBUG_printf(("9cups_array_find: Returning %d, diff=%d", prev, diff));
 
 	*rdiff = diff;
 
@@ -1082,7 +1082,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
       current = (left + right) / 2;
       diff    = (*(a->compare))(e, a->elements[current], a->data);
 
-      DEBUG_printf(("cups_array_find: left=%d, right=%d, current=%d, diff=%d\n",
+      DEBUG_printf(("9cups_array_find: left=%d, right=%d, current=%d, diff=%d",
                     left, right, current, diff));
 
       if (diff == 0)
@@ -1115,7 +1115,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
     * Do a linear pointer search...
     */
 
-    DEBUG_puts("cups_array_find: linear search");
+    DEBUG_puts("9cups_array_find: linear search");
 
     diff = 1;
 
@@ -1131,7 +1131,7 @@ cups_array_find(cups_array_t *a,	/* I - Array */
   * Return the closest element and the difference...
   */
 
-  DEBUG_printf(("cups_array_find: Returning %d, diff=%d\n", current, diff));
+  DEBUG_printf(("8cups_array_find: Returning %d, diff=%d", current, diff));
 
   *rdiff = diff;
 

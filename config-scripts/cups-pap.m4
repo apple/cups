@@ -1,5 +1,5 @@
 dnl
-dnl "$Id: cups-pam.m4 5466 2006-04-26 19:52:27Z mike $"
+dnl "$Id$"
 dnl
 dnl   PAP (AppleTalk) stuff for the Common UNIX Printing System (CUPS).
 dnl
@@ -27,5 +27,5 @@ if test x$enable_pap = xyes -a $uname = Darwin; then
 fi
 
 dnl
-dnl End of "$Id: cups-pam.m4 5466 2006-04-26 19:52:27Z mike $".
+dnl End of "$Id$".
 dnl

@@ -119,8 +119,8 @@ _cupsStrAlloc(const char *s)		/* I - String */
     item->ref_count ++;
 
 #ifdef DEBUG_GUARDS
-    DEBUG_printf(("_cupsStrAlloc: Using string %p(%s) for \"%s\", guard=%08x, "
-                  "ref_count=%d\n", item, item->str, s, item->guard,
+    DEBUG_printf(("5_cupsStrAlloc: Using string %p(%s) for \"%s\", guard=%08x, "
+                  "ref_count=%d", item, item->str, s, item->guard,
 		  item->ref_count));
 
     if (item->guard != _CUPS_STR_GUARD)
@@ -154,8 +154,8 @@ _cupsStrAlloc(const char *s)		/* I - String */
 #ifdef DEBUG_GUARDS
   item->guard = _CUPS_STR_GUARD;
 
-  DEBUG_printf(("_cupsStrAlloc: Created string %p(%s) for \"%s\", guard=%08x, "
-		"ref_count=%d\n", item, item->str, s, item->guard,
+  DEBUG_printf(("5_cupsStrAlloc: Created string %p(%s) for \"%s\", guard=%08x, "
+		"ref_count=%d", item, item->str, s, item->guard,
 		item->ref_count));
 #endif /* DEBUG_GUARDS */
 
@@ -183,7 +183,7 @@ _cupsStrFlush(void)
   _cups_sp_item_t	*item;		/* Current item */
 
 
-  DEBUG_printf(("_cupsStrFlush: %d strings in array\n",
+  DEBUG_printf(("4_cupsStrFlush: %d strings in array",
                 cupsArrayCount(stringpool)));
 
 #ifdef HAVE_PTHREAD_H
@@ -326,8 +326,8 @@ _cupsStrFree(const char *s)		/* I - String to free */
 #ifdef DEBUG_GUARDS
   if (key->guard != _CUPS_STR_GUARD)
   {
-    DEBUG_printf(("_cupsStrFree: Freeing string %p(%s), guard=%08x, "
-                  "ref_count=%d\n", key, key->str, key->guard, key->ref_count));
+    DEBUG_printf(("5_cupsStrFree: Freeing string %p(%s), guard=%08x, "
+                  "ref_count=%d", key, key->str, key->guard, key->ref_count));
     abort();
   }
 #endif /* DEBUG_GUARDS */
@@ -368,7 +368,7 @@ _cupsStrFree(const char *s)		/* I - String to free */
  */
 
 char *					/* O - Pointer to string */
-_cupsStrRetain(char *s)			/* I - String to retain */
+_cupsStrRetain(const char *s)		/* I - String to retain */
 {
   _cups_sp_item_t	*item;		/* Pointer to string pool item */
 
@@ -380,8 +380,8 @@ _cupsStrRetain(char *s)			/* I - String to retain */
 #ifdef DEBUG_GUARDS
     if (item->guard != _CUPS_STR_GUARD)
     {
-      DEBUG_printf(("_cupsStrRetain: Retaining string %p(%s), guard=%08x, "
-                    "ref_count=%d\n", item, s, item->guard, item->ref_count));
+      DEBUG_printf(("5_cupsStrRetain: Retaining string %p(%s), guard=%08x, "
+                    "ref_count=%d", item, s, item->guard, item->ref_count));
       abort();
     }
 #endif /* DEBUG_GUARDS */
@@ -397,7 +397,7 @@ _cupsStrRetain(char *s)			/* I - String to retain */
 #endif /* HAVE_PTHREAD_H */
   }
 
-  return (s);
+  return ((char *)s);
 }
 
 

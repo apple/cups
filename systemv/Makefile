@@ -3,7 +3,7 @@
 #
 #   System V commands makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -49,7 +49,7 @@ unittests:
 
 clean:
 	$(RM) $(OBJS) $(TARGETS)
-	$(RM) accept cupsdisable cupsenable cupsreject reject
+	$(RM) accept cupsdisable cupsenable cupsreject disable enable reject
 
 
 #
@@ -79,27 +79,33 @@ install-data:
 #
 
 install-exec:
+	echo Installing System V admin printing commands in $(SBINDIR)
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	$(INSTALL_BIN) accept $(SBINDIR)
-	$(RM) $(SBINDIR)/reject
-	$(LN) accept $(SBINDIR)/reject
+	$(INSTALL_BIN) cupsaccept $(SBINDIR)
 	$(INSTALL_BIN) cupsaddsmb $(SBINDIR)
 	$(INSTALL_BIN) cupsctl $(SBINDIR)
 	$(INSTALL_BIN) lpadmin $(SBINDIR)
 	$(INSTALL_BIN) lpinfo $(SBINDIR)
 	$(INSTALL_BIN) lpmove $(SBINDIR)
+	$(RM) $(SBINDIR)/accept
+	$(LN) cupsaccept $(SBINDIR)/accept
+	$(RM) $(SBINDIR)/cupsdisable
+	$(LN) cupsaccept $(SBINDIR)/cupsdisable
+	$(RM) $(SBINDIR)/cupsenable
+	$(LN) cupsaccept $(SBINDIR)/cupsenable
+	$(RM) $(SBINDIR)/cupsreject
+	$(LN) cupsaccept $(SBINDIR)/cupsreject
+	$(RM) $(SBINDIR)/reject
+	$(LN) cupsaccept $(SBINDIR)/reject
+	echo Installing System V user printing commands in $(BINDIR)
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(INSTALL_BIN) cupstestdsc $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
-	$(RM) $(SBINDIR)/cupsaccept
-	$(LN) accept $(SBINDIR)/cupsaccept
-	$(RM) $(SBINDIR)/cupsdisable
-	$(LN) accept $(SBINDIR)/cupsdisable
-	$(RM) $(SBINDIR)/cupsenable
-	$(LN) accept $(SBINDIR)/cupsenable
-	$(RM) $(SBINDIR)/cupsreject
-	$(LN) accept $(SBINDIR)/cupsreject
+	$(RM) $(BINDIR)/disable
+	$(LN) cupsaccept $(BINDIR)/disable
+	$(RM) $(BINDIR)/enable
+	$(LN) cupsaccept $(BINDIR)/enable
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
@@ -134,12 +140,15 @@ uninstall:
 	$(RM) $(BINDIR)/cancel
 	$(RM) $(BINDIR)/cupstestdsc
 	$(RM) $(BINDIR)/cupstestppd
+	$(RM) $(BINDIR)/disable
+	$(RM) $(BINDIR)/enable
 	$(RM) $(BINDIR)/lp
 	$(RM) $(BINDIR)/lpoptions
 	$(RM) $(BINDIR)/lppasswd
 	$(RM) $(BINDIR)/lpstat
 	-$(RMDIR) $(BINDIR)
 	$(RM) $(SBINDIR)/accept
+	$(RM) $(SBINDIR)/cupsaccept
 	$(RM) $(SBINDIR)/cupsaddsmb
 	$(RM) $(SBINDIR)/cupsaccept
 	$(RM) $(SBINDIR)/cupsdisable
@@ -168,7 +177,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
-	for file in accept cupsenable cupsdisable cupsreject reject; do \
+	for file in accept cupsenable cupsdisable cupsreject disable enable reject; do \
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
 	done

@@ -3,7 +3,7 @@
  *
  *   Array test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -114,14 +114,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else
   {
-#ifdef DEBUG
-    putchar('\n');
-    for (text = (char *)cupsArrayFirst(array), i = 0;
-         text;
-	 text = (char *)cupsArrayNext(array), i ++)
-      printf("    #1  array[%d]=\"%s\"\n", i, text);
-#endif /* DEBUG */
-
     if (!cupsArrayAdd(array, strdup("Two Fish")))
     {
       puts("FAIL (\"Two Fish\")");
@@ -129,13 +121,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
     {
-#ifdef DEBUG
-      for (text = (char *)cupsArrayFirst(array), i = 0;
-           text;
-	   text = (char *)cupsArrayNext(array), i ++)
-	printf("    #2  array[%d]=\"%s\"\n", i, text);
-#endif /* DEBUG */
-
       if (!cupsArrayAdd(array, strdup("Red Fish")))
       {
 	puts("FAIL (\"Red Fish\")");
@@ -143,29 +128,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       }
       else
       {
-#ifdef DEBUG
-	for (text = (char *)cupsArrayFirst(array), i = 0;
-             text;
-	     text = (char *)cupsArrayNext(array), i ++)
-	  printf("    #3  array[%d]=\"%s\"\n", i, text);
-#endif /* DEBUG */
-
         if (!cupsArrayAdd(array, strdup("Blue Fish")))
 	{
 	  puts("FAIL (\"Blue Fish\")");
 	  status ++;
 	}
 	else
-	{
-#ifdef DEBUG
-	  for (text = (char *)cupsArrayFirst(array), i = 0;
-               text;
-	       text = (char *)cupsArrayNext(array), i ++)
-	    printf("    #4  array[%d]=\"%s\"\n", i, text);
-#endif /* DEBUG */
-
 	  puts("PASS");
-	}
       }
     }
   }
@@ -491,8 +460,6 @@ load_words(const char   *filename,	/* I - File to load */
   char		word[256];		/* Word from file */
 
 
-  DEBUG_printf(("    Loading \"%s\"...\n", filename));
-
   if ((fp = fopen(filename, "r")) == NULL)
   {
     perror(filename);
@@ -502,11 +469,7 @@ load_words(const char   *filename,	/* I - File to load */
   while (fscanf(fp, "%255s", word) == 1)
   {
     if (!cupsArrayFind(array, word))
-    {
-      DEBUG_printf(("    Adding \"%s\"...\n", word));
-
       cupsArrayAdd(array, strdup(word));
-    }
   }
 
   fclose(fp);

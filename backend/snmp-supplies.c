@@ -135,7 +135,7 @@ static const backend_state_t const printer_states[] =
 			  { CUPS_TC_doorOpen, "door-open-report" },
 			  { CUPS_TC_jammed, "media-jam-warning" },
 			  /* { CUPS_TC_offline, "offline-report" }, */ /* unreliable */
-			  { CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint, "service-needed-warning" },
+			  /* { CUPS_TC_serviceRequested | CUPS_TC_overduePreventMaint, "service-needed-warning" }, */ /* unreliable */
 			  { CUPS_TC_inputTrayMissing, "input-tray-missing-warning" },
 			  { CUPS_TC_outputTrayMissing, "output-tray-missing-warning" },
 			  { CUPS_TC_markerSupplyMissing, "marker-supply-missing-warning" },

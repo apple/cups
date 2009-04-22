@@ -220,7 +220,7 @@ cupsCreateJob(
 
 
   DEBUG_printf(("cupsCreateJob(http=%p, name=\"%s\", title=\"%s\", "
-                "num_options=%d, options=%p)\n",
+                "num_options=%d, options=%p)",
                 http, name, title, num_options, options));
 
  /*
@@ -910,7 +910,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   */
 
   DEBUG_printf(("cupsGetPPD3(http=%p, name=\"%s\", modtime=%p(%d), buffer=%p, "
-                "bufsize=%d)\n", http, name ? name : "(null)", modtime,
+                "bufsize=%d)", http, name, modtime,
 		modtime ? (int)*modtime : 0, buffer, (int)bufsize));
 
   if (!name)
@@ -1048,7 +1048,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
                             resource, sizeof(resource), 0))
     return (HTTP_NOT_FOUND);
 
-  DEBUG_printf(("cupsGetPPD3: Printer hostname=\"%s\", port=%d\n", hostname,
+  DEBUG_printf(("2cupsGetPPD3: Printer hostname=\"%s\", port=%d", hostname,
                 port));
 
  /*
@@ -1057,7 +1057,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
 
   httpGetHostname(NULL, localhost, sizeof(localhost));
 
-  DEBUG_printf(("cupsGetPPD3: Local hostname=\"%s\"\n", localhost));
+  DEBUG_printf(("2cupsGetPPD3: Local hostname=\"%s\"", localhost));
 
   if (!strcasecmp(localhost, hostname))
     strcpy(hostname, "localhost");
@@ -1069,7 +1069,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   httpGetHostname(http, http_hostname, sizeof(http_hostname));
   http_port = _httpAddrPort(http->hostaddr);
 
-  DEBUG_printf(("cupsGetPPD3: Connection hostname=\"%s\", port=%d\n",
+  DEBUG_printf(("2cupsGetPPD3: Connection hostname=\"%s\", port=%d",
                 http_hostname, http_port));
 
  /*
@@ -1081,7 +1081,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
   else if ((http2 = httpConnectEncrypt(hostname, port,
                                        cupsEncryption())) == NULL)
   {
-    DEBUG_puts("cupsGetPPD3: Unable to connect to server!");
+    DEBUG_puts("1cupsGetPPD3: Unable to connect to server!");
 
     return (HTTP_SERVICE_UNAVAILABLE);
   }
@@ -1131,22 +1131,7 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
     *modtime = httpGetDateTime(httpGetField(http2, HTTP_FIELD_DATE));
   else if (status != HTTP_NOT_MODIFIED)
   {
-    switch (status)
-    {
-      case HTTP_NOT_FOUND :
-          _cupsSetError(IPP_NOT_FOUND, httpStatus(status), 0);
-	  break;
-
-      case HTTP_UNAUTHORIZED :
-          _cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
-	  break;
-
-      default :
-	  DEBUG_printf(("cupsGetPPD3: HTTP error %d mapped to "
-	                "IPP_SERVICE_UNAVAILABLE!\n", status));
-	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, httpStatus(status), 0);
-	  break;
-    }
+    _cupsSetHTTPError(status);
 
     unlink(cg->ppd_filename);
   }
@@ -1157,6 +1142,8 @@ cupsGetPPD3(http_t     *http,		/* I  - HTTP connection or @code CUPS_HTTP_DEFAUL
  /*
   * Return the PPD file...
   */
+
+  DEBUG_printf(("1cupsGetPPD3: Returning status %d", status));
 
   return (status);
 }
@@ -1381,7 +1368,7 @@ cupsPrintFile(const char    *name,	/* I - Destination name */
 	      cups_option_t *options)	/* I - Options */
 {
   DEBUG_printf(("cupsPrintFile(name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)\n",
+                "title=\"%s\", num_options=%d, options=%p)",
                 name, filename, title, num_options, options));
 
   return (cupsPrintFiles2(CUPS_HTTP_DEFAULT, name, 1, &filename, title,
@@ -1406,7 +1393,7 @@ cupsPrintFile2(
     cups_option_t *options)		/* I - Options */
 {
   DEBUG_printf(("cupsPrintFile2(http=%p, name=\"%s\", filename=\"%s\", "
-                "title=\"%s\", num_options=%d, options=%p)\n",
+                "title=\"%s\", num_options=%d, options=%p)",
                 http, name, filename, title, num_options, options));
 
   return (cupsPrintFiles2(http, name, 1, &filename, title, num_options,
@@ -1429,9 +1416,8 @@ cupsPrintFiles(
     cups_option_t *options)		/* I - Options */
 {
   DEBUG_printf(("cupsPrintFiles(name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)\n",
+                "files=%p, title=\"%s\", num_options=%d, options=%p)",
                 name, num_files, files, title, num_options, options));
-
 
  /*
   * Print the file(s)...
@@ -1470,7 +1456,7 @@ cupsPrintFiles2(
 
 
   DEBUG_printf(("cupsPrintFiles2(http=%p, name=\"%s\", num_files=%d, "
-                "files=%p, title=\"%s\", num_options=%d, options=%p)\n",
+                "files=%p, title=\"%s\", num_options=%d, options=%p)",
                 http, name, num_files, files, title, num_options, options));
 
  /*
@@ -1711,10 +1697,9 @@ cups_get_printer_uri(
 		};
 
 
-  DEBUG_printf(("cups_get_printer_uri(http=%p, name=\"%s\", host=%p, "
-                "hostsize=%d, resource=%p, resourcesize=%d, depth=%d)\n",
-		http, name ? name : "(null)", host, hostsize,
-		resource, resourcesize, depth));
+  DEBUG_printf(("7cups_get_printer_uri(http=%p, name=\"%s\", host=%p, "
+                "hostsize=%d, resource=%p, resourcesize=%d, depth=%d)",
+		http, name, host, hostsize, resource, resourcesize, depth));
 
  /*
   * Setup the printer URI...
@@ -1731,7 +1716,7 @@ cups_get_printer_uri(
     return (0);
   }
 
-  DEBUG_printf(("cups_get_printer_uri: printer-uri=\"%s\"\n", uri));
+  DEBUG_printf(("9cups_get_printer_uri: printer-uri=\"%s\"", uri));
 
  /*
   * Get the hostname and port number we are connected to...
@@ -1812,7 +1797,7 @@ cups_get_printer_uri(
 	    else if ((http2 = httpConnectEncrypt(host, *port,
 						 cupsEncryption())) == NULL)
 	    {
-	      DEBUG_puts("Unable to connect to server!");
+	      DEBUG_puts("8cups_get_printer_uri: Unable to connect to server!");
 
 	      continue;
 	    }

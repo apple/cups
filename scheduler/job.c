@@ -332,6 +332,14 @@ cupsdCheckJobs(void)
     }
 
    /*
+    * Continue jobs that are waiting on the FilterLimit...
+    */
+
+    if (job->pending_cost > 0 &&
+	((FilterLevel + job->pending_cost) < FilterLimit || FilterLevel == 0))
+      cupsdContinueJob(job);
+
+   /*
     * Start pending jobs if the destination is available...
     */
 
@@ -441,7 +449,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 {
   int			i;		/* Looping var */
   int			slot;		/* Pipe slot */
-  cups_array_t		*filters,	/* Filters for job */
+  cups_array_t		*filters = NULL,/* Filters for job */
 			*prefilters;	/* Filters with prefilters */
   mime_filter_t		*filter,	/* Current filter */
 			*prefilter,	/* Prefilter */
@@ -450,13 +458,16 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*ptr,		/* Pointer into value */
 			*abort_message;	/* Abort message */
+  ipp_jstate_t		abort_state = IPP_JOB_ABORTED;
+					/* New job state on abort */
   struct stat		backinfo;	/* Backend file information */
   int			backroot;	/* Run backend as root? */
   int			pid;		/* Process ID of new filter process */
   int			banner_page;	/* 1 if banner page, 0 otherwise */
-  int			filterfds[2][2];/* Pipes used between filters */
+  int			filterfds[2][2] = { { -1, -1 }, { -1, -1 } };
+					/* Pipes used between filters */
   int			envc;		/* Number of environment variables */
-  char			**argv,		/* Filter command-line arguments */
+  char			**argv = NULL,	/* Filter command-line arguments */
 			filename[1024],	/* Job filename */
 			command[1024],	/* Full path to command */
 			jobid[255],	/* Job ID string */
@@ -503,7 +514,11 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   FilterLevel -= job->cost;
 
-  filters = NULL;
+  job->cost         = 0;
+  job->pending_cost = 0;
+
+  memset(job->filters, 0, sizeof(job->filters));
+
 
   if (job->printer->raw)
   {
@@ -513,8 +528,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     */
 
     cupsdLogJob(job, CUPSD_LOG_DEBUG, "Sending job to queue tagged as raw...");
-
-    filters = NULL;
   }
   else
   {
@@ -531,13 +544,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		  "Unable to convert file %d to printable format!",
 		  job->current_file);
 
-      job->current_file ++;
-
-      if (job->current_file == job->num_files)
-        cupsdSetJobState(job, IPP_JOB_ABORTED, CUPSD_JOB_DEFAULT,
-	                 "Aborting job because it cannot be printed.");
-
-      return;
+      abort_message = "Aborting job because it cannot be printed.";
+      goto abort_job;
     }
 
    /*
@@ -611,6 +619,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		"cupsdContinueJob: file=%d, cost=%d, level=%d, limit=%d",
 		job->current_file, job->cost, FilterLevel,
 		FilterLimit);
+
+    job->pending_cost = job->cost;
+    job->cost         = 0;
     return;
   }
 
@@ -638,12 +649,10 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
       cupsArrayDelete(filters);
 
-      cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		       "Stopping job because the scheduler ran out of "
-		       "memory.");
+      abort_state = IPP_JOB_STOPPED;
+      abort_message = "Stopping job because the scheduler ran out of memory.";
 
-      FilterLevel -= job->cost;
-      return;
+      goto abort_job;
     }
   }
 
@@ -672,14 +681,10 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       cupsdLogJob(job, CUPSD_LOG_DEBUG,
 		  "Unable to add port monitor - %s", strerror(errno));
 
-      cupsArrayDelete(filters);
+      abort_state   = IPP_JOB_STOPPED;
+      abort_message = "Stopping job because the scheduler ran out of memory.";
 
-      cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		       "Stopping job because the scheduler ran out of "
-		       "memory.");
-
-      FilterLevel -= job->cost;
-      return;
+      goto abort_job;
     }
   }
 
@@ -693,13 +698,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		"Too many filters (%d > %d), unable to print!",
 		cupsArrayCount(filters), MAX_FILTERS);
 
-    cupsArrayDelete(filters);
-    cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Stopping job because it needs too many filters to "
-		     "print.");
-
-    FilterLevel -= job->cost;
-    return;
+    abort_message = "Aborting job because it needs too many filters to print.";
+    goto abort_job;
   }
 
  /*
@@ -739,12 +739,10 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   if ((options = get_options(job, banner_page, copies, sizeof(copies), title,
                              sizeof(title))) == NULL)
   {
-    cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Stopping job because the scheduler ran out of memory.");
-    cupsArrayDelete(filters);
+    abort_state   = IPP_JOB_STOPPED;
+    abort_message = "Stopping job because the scheduler ran out of memory.";
 
-    FilterLevel -= job->cost;
-    return;
+    goto abort_job;
   }
 
  /*
@@ -774,12 +772,11 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Unable to allocate argument array - %s",
                     strerror(errno));
-    cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT,
-		     "Stopping job because the scheduler ran out of memory.");
-    cupsArrayDelete(filters);
 
-    FilterLevel -= job->cost;
-    return;
+    abort_state   = IPP_JOB_STOPPED;
+    abort_message = "Stopping job because the scheduler ran out of memory.";
+
+    goto abort_job;
   }
 
   sprintf(jobid, "%d", job->id);
@@ -965,13 +962,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
  /*
   * Now create processes for all of the filters...
   */
-
-  filterfds[0][0] = -1;
-  filterfds[0][1] = -1;
-  filterfds[1][0] = -1;
-  filterfds[1][1] = -1;
-
-  memset(job->filters, 0, sizeof(job->filters));
 
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
@@ -1165,8 +1155,10 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * the missing and insecure warnings...
   */
 
-  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			               "cups-insecure-filter-warning");
+  if (cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			                   "cups-insecure-filter-warning"))
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
+                  "Printer drivers now functional.");
 
   return;
 
@@ -1178,25 +1170,50 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   abort_job:
 
+  FilterLevel -= job->cost;
+  job->cost = 0;
+
   for (slot = 0; slot < 2; slot ++)
     cupsdClosePipe(filterfds[slot]);
 
+  cupsArrayDelete(filters);
+
+  if (argv)
+  {
+    if (job->printer->remote && job->num_files > 1)
+    {
+      for (i = 0; i < job->num_files; i ++)
+	free(argv[i + 6]);
+    }
+
+    free(argv);
+  }
+
+  cupsdClosePipe(job->print_pipes);
+  cupsdClosePipe(job->back_pipes);
+  cupsdClosePipe(job->side_pipes);
+
+  cupsdRemoveSelect(job->status_pipes[0]);
   cupsdClosePipe(job->status_pipes);
   cupsdStatBufDelete(job->status_buffer);
   job->status_buffer = NULL;
 
-  cupsArrayDelete(filters);
+ /*
+  * Update the printer and job state.
+  */
 
-  if (job->printer->remote && job->num_files > 1)
-  {
-    for (i = 0; i < job->num_files; i ++)
-      free(argv[i + 6]);
-  }
+  cupsdSetJobState(job, abort_state, CUPSD_JOB_DEFAULT, "%s", abort_message);
+  cupsdSetPrinterState(job->printer, IPP_PRINTER_IDLE, 0);
+  update_job_attrs(job, 0);
 
-  free(argv);
+  cupsArrayRemove(PrintingJobs, job);
 
-  cupsdSetJobState(job, IPP_JOB_STOPPED, CUPSD_JOB_DEFAULT, "%s",
-                   abort_message);
+ /*
+  * Clear the printer <-> job association...
+  */
+
+  job->printer->job = NULL;
+  job->printer      = NULL;
 }
 
 
@@ -2360,6 +2377,13 @@ cupsdSetJobState(
   }
 
  /*
+  * Finalize the job immediately if we forced things...
+  */
+
+  if (action == CUPSD_JOB_FORCE)
+    finalize_job(job);
+
+ /*
   * Update the server "busy" state...
   */
 
@@ -2494,13 +2518,12 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   * Close pipes and status buffer...
   */
 
-  cupsdRemoveSelect(job->status_buffer->fd);
-
   cupsdClosePipe(job->print_pipes);
   cupsdClosePipe(job->back_pipes);
   cupsdClosePipe(job->side_pipes);
-  cupsdClosePipe(job->status_pipes);
 
+  cupsdRemoveSelect(job->status_pipes[0]);
+  cupsdClosePipe(job->status_pipes);
   cupsdStatBufDelete(job->status_buffer);
   job->status_buffer = NULL;
 

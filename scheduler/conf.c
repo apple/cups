@@ -14,13 +14,15 @@
  *
  * Contents:
  *
+ *   cupsdAddAlias()          - Add a host alias.
  *   cupsdCheckPermissions()  - Fix the mode and ownership of a file or
  *                              directory.
+ *   cupsdFreeAliases()       - Free all of the alias entries.
  *   cupsdReadConfiguration() - Read the cupsd.conf file.
  *   get_address()            - Get an address + port number from a line.
  *   get_addr_and_mask()      - Get an IP address and netmask.
- *   parse_aaa()              - Parse authentication, authorization, and
- *                              access control lines.
+ *   parse_aaa()              - Parse authentication, authorization, and access
+ *                              control lines.
  *   parse_fatal_errors()     - Parse FatalErrors values in a string.
  *   parse_groups()           - Parse system group names in a string.
  *   parse_protocols()        - Parse browse protocols in a string.
@@ -116,9 +118,6 @@ static const cupsd_var_t	variables[] =
   { "FilterLimit",		&FilterLimit,		CUPSD_VARTYPE_INTEGER },
   { "FilterNice",		&FilterNice,		CUPSD_VARTYPE_INTEGER },
   { "FontPath",			&FontPath,		CUPSD_VARTYPE_STRING },
-#ifdef HAVE_GSSAPI
-  { "GSSServiceName",		&GSSServiceName,	CUPSD_VARTYPE_STRING },
-#endif /* HAVE_GSSAPI */
   { "HideImplicitMembers",	&HideImplicitMembers,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitClasses",		&ImplicitClasses,	CUPSD_VARTYPE_BOOLEAN },
   { "ImplicitAnyClasses",	&ImplicitAnyClasses,	CUPSD_VARTYPE_BOOLEAN },
@@ -198,6 +197,7 @@ static const unsigned	zeros[4] =
 /*
  * Local functions...
  */
+
 static http_addrlist_t	*get_address(const char *value, int defport);
 static int		get_addr_and_mask(const char *value, unsigned *ip,
 			                  unsigned *mask);
@@ -209,6 +209,30 @@ static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
 static int		read_location(cups_file_t *fp, char *name, int linenum);
 static int		read_policy(cups_file_t *fp, char *name, int linenum);
+
+
+/*
+ * 'cupsdAddAlias()' - Add a host alias.
+ */
+
+void
+cupsdAddAlias(cups_array_t *aliases,	/* I - Array of aliases */
+              const char   *name)	/* I - Name to add */
+{
+  cupsd_alias_t	*a;			/*  New alias */
+  size_t	namelen;		/* Length of name */
+
+
+  namelen = strlen(name);
+
+  if ((a = (cupsd_alias_t *)malloc(sizeof(cupsd_alias_t) + namelen)) == NULL)
+    return;
+
+  a->namelen = namelen;
+  strcpy(a->name, name);		/* OK since a->name is allocated */
+
+  cupsArrayAdd(aliases, a);
+}
 
 
 /*
@@ -363,6 +387,25 @@ cupsdCheckPermissions(
 
 
 /*
+ * 'cupsdFreeAliases()' - Free all of the alias entries.
+ */
+
+void
+cupsdFreeAliases(cups_array_t *aliases)	/* I - Array of aliases */
+{
+  cupsd_alias_t	*a;			/* Current alias */
+
+
+  for (a = (cupsd_alias_t *)cupsArrayFirst(aliases);
+       a;
+       a = (cupsd_alias_t *)cupsArrayNext(aliases))
+    free(a);
+
+  cupsArrayDelete(aliases);
+}
+
+
+/*
  * 'cupsdReadConfiguration()' - Read the cupsd.conf file.
  */
 
@@ -434,6 +477,9 @@ cupsdReadConfiguration(void)
   * String options...
   */
 
+  cupsdFreeAliases(ServerAlias);
+  ServerAlias = NULL;
+
   cupsdClearString(&ServerName);
   cupsdClearString(&ServerAdmin);
   cupsdSetString(&ServerBin, CUPS_SERVERBIN);
@@ -453,9 +499,6 @@ cupsdReadConfiguration(void)
   cupsdSetString(&RemoteRoot, "remroot");
   cupsdSetString(&ServerHeader, "CUPS/1.4");
   cupsdSetString(&StateDir, CUPS_STATEDIR);
-#ifdef HAVE_GSSAPI
-  cupsdSetString(&GSSServiceName, CUPS_DEFAULT_GSSSERVICENAME);
-#endif /* HAVE_GSSAPI */
 
   if (!strcmp(CUPS_DEFAULT_PRINTCAP, "/etc/printers.conf"))
     PrintcapFormat = PRINTCAP_SOLARIS;
@@ -673,9 +716,7 @@ cupsdReadConfiguration(void)
 
   if (!ServerName)
   {
-    if (HostNameLookups || RemoteAccessEnabled)
-      httpGetHostname(NULL, temp, sizeof(temp));
-    else if (gethostname(temp, sizeof(temp)))
+    if (gethostname(temp, sizeof(temp)))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get hostname: %s",
                       strerror(errno));
@@ -683,6 +724,50 @@ cupsdReadConfiguration(void)
     }
 
     cupsdSetString(&ServerName, temp);
+
+    if (!ServerAlias)
+      ServerAlias = cupsArrayNew(NULL, NULL);
+
+    cupsdAddAlias(ServerAlias, temp);
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", temp);
+
+    if (HostNameLookups || RemoteAccessEnabled)
+    {
+      struct hostent	*host;		/* Host entry to get FQDN */
+
+      if ((host = gethostbyname(temp)) != NULL)
+      {
+        if (strcasecmp(temp, host->h_name))
+        {
+	  cupsdSetString(&ServerName, host->h_name);
+	  cupsdAddAlias(ServerAlias, host->h_name);
+          cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s",
+	                  host->h_name);
+	}
+
+        if (host->h_aliases)
+	{
+          for (i = 0; host->h_aliases[i]; i ++)
+	    if (strcasecmp(temp, host->h_aliases[i]))
+	    {
+	      cupsdAddAlias(ServerAlias, host->h_aliases[i]);
+	      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s",
+	                      host->h_aliases[i]);
+	    }
+	}
+      }
+    }
+
+   /*
+    * Make sure we have the base hostname added as an alias, too!
+    */
+
+    if ((slash = strchr(temp, '.')) != NULL)
+    {
+      *slash = '\0';
+      cupsdAddAlias(ServerAlias, temp);
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", temp);
+    }
   }
 
   for (slash = ServerName; isdigit(*slash & 255) || *slash == '.'; slash ++);
@@ -3035,19 +3120,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       }
     }
 #endif /* HAVE_SSL */
-#ifdef HAVE_GSSAPI
-    else if (!strcasecmp(line, "Krb5Keytab") && value)
-    {
-      cupsdSetStringf(&Krb5Keytab, "KRB5_KTNAME=%s", value);
-      putenv(Krb5Keytab);
-
-#  ifdef HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY
-      gsskrb5_register_acceptor_identity(value);
-#  else
-      cupsdSetEnv("KRB5_KTNAME", value);
-#  endif /* HAVE_GSSKRB5_REGISTER_ACCEPTOR_IDENTITY */
-    }
-#endif /* HAVE_GSSAPI */
     else if (!strcasecmp(line, "User") && value)
     {
      /*
@@ -3271,6 +3343,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  if (!isspace(*value) || *value != ',')
 	    break;
       }
+    }
+    else if (!strcasecmp(line, "ServerAlias") && value)
+    {
+      if (!ServerAlias)
+        ServerAlias = cupsArrayNew(NULL, NULL);
+
+      cupsdAddAlias(ServerAlias, value);
     }
     else if (!strcasecmp(line, "SetEnv") && value)
     {

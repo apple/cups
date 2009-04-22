@@ -101,6 +101,7 @@ cupsdNetIFUpdate(void)
   struct ifaddrs	*addrs,		/* Interface address list */
 			*addr;		/* Current interface address */
   char			hostname[1024];	/* Hostname for address */
+  size_t		hostlen;	/* Length of hostname */
 
 
  /*
@@ -176,8 +177,8 @@ cupsdNetIFUpdate(void)
     * Create a new address element...
     */
 
-    if ((temp = calloc(1, sizeof(cupsd_netif_t) +
-                          strlen(hostname))) == NULL)
+    hostlen = strlen(hostname);
+    if ((temp = calloc(1, sizeof(cupsd_netif_t) + hostlen)) == NULL)
       break;
 
    /*
@@ -185,6 +186,7 @@ cupsdNetIFUpdate(void)
     */
 
     strlcpy(temp->name, addr->ifa_name, sizeof(temp->name));
+    temp->hostlen = hostlen;
     strcpy(temp->hostname, hostname);	/* Safe because hostname is allocated */
 
     if (addr->ifa_addr->sa_family == AF_INET)

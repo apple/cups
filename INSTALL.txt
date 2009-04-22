@@ -1,4 +1,4 @@
-INSTALL - CUPS v1.4b2 - 2008-12-15
+INSTALL - CUPS v1.4b3 - 2009-04-20
 ----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
@@ -179,9 +179,15 @@ GETTING DEBUG LOGGING FROM CUPS
 
     When configured with the "--enable-debug-printfs" option, CUPS compiles in
     additional debug logging support in the scheduler, CUPS API, and CUPS
-    Imaging API.  Set the CUPS_DEBUG_LOG environment variable to a filename to
-    append logging information at run-time.  Use the name "-" to send the
-    messages to stderr.
+    Imaging API.  The following environment variables are used to enable and
+    control debug logging:
+
+        CUPS_DEBUG_FILTER  Specifies a POSIX regular expression to control
+	                   which messages are logged.
+	CUPS_DEBUG_LEVEL   Specifies a number from 0 to 9 to control the
+	                   verbosity of the logging. The default level is 1.
+        CUPS_DEBUG_LOG     Specifies a log file to append to; use the name "-"
+	                   to send the messages to stderr.
 
 
 REPORTING PROBLEMS

@@ -3,7 +3,7 @@
  *
  *   Get/put file functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -66,7 +66,7 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)\n", http,
+  DEBUG_printf(("cupsGetFd(http=%p, resource=\"%s\", fd=%d)", http,
                 resource, fd));
 
   if (!resource || fd < 0)
@@ -179,6 +179,8 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Return the request status...
   */
 
+  DEBUG_printf(("1cupsGetFd: Returning %d...", status));
+
   return (status);
 }
 
@@ -274,7 +276,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
   * Range check input...
   */
 
-  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)\n", http,
+  DEBUG_printf(("cupsPutFd(http=%p, resource=\"%s\", fd=%d)", http,
                 resource, fd));
 
   if (!resource || fd < 0)
@@ -297,7 +299,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
 
   do
   {
-    DEBUG_printf(("cupsPutFd: starting attempt, authstring=\"%s\"...\n",
+    DEBUG_printf(("2cupsPutFd: starting attempt, authstring=\"%s\"...",
                   http->authstring));
 
     httpClearFields(http);
@@ -355,7 +357,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
 
     if (status == HTTP_ERROR && !retries)
     {
-      DEBUG_printf(("cupsPutFd: retry on status %d\n", status));
+      DEBUG_printf(("2cupsPutFd: retry on status %d", status));
 
       retries ++;
 
@@ -373,7 +375,7 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
       continue;
     }
 
-    DEBUG_printf(("cupsPutFd: status=%d\n", status));
+    DEBUG_printf(("2cupsPutFd: status=%d", status));
 
     if (status == HTTP_UNAUTHORIZED)
     {
@@ -431,6 +433,8 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
     _cupsSetHTTPError(status);
     httpFlush(http);
   }
+
+  DEBUG_printf(("1cupsPutFd: Returning %d...", status));
 
   return (status);
 }

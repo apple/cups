@@ -3,7 +3,7 @@
 #
 #   Berkeley commands makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -76,10 +76,12 @@ install-data:
 #
 
 install-exec:
+	echo Installing Berkeley user printing commands in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
 	$(INSTALL_BIN) lpq $(BINDIR)
 	$(INSTALL_BIN) lpr $(BINDIR)
 	$(INSTALL_BIN) lprm $(BINDIR)
+	echo Installing Berkeley admin printing commands in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
 	$(INSTALL_BIN) lpc $(SBINDIR)
 	if test "x$(SYMROOT)" != "x"; then \

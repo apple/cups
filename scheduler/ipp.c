@@ -7615,6 +7615,7 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   const char	*username;		/* Current user */
   char		*first_printer_name;	/* first-printer-name attribute */
   cups_array_t	*ra;			/* Requested attributes array */
+  int		local;			/* Local connection? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_printers(%p[%d], %x)", con,
@@ -7672,6 +7673,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
   else
     printer_mask = 0;
 
+  local = httpAddrLocalhost(&(con->clientaddr));
+
   if ((attr = ippFindAttribute(con->request, "printer-location",
                                IPP_TAG_TEXT)) != NULL)
     location = attr->values[0].string.text;
@@ -7704,6 +7707,9 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
        count < limit && printer;
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
   {
+    if (!local && !printer->shared)
+      continue;
+
     if ((!type || (printer->type & CUPS_PRINTER_CLASS) == type) &&
         (printer->type & printer_mask) == printer_type &&
 	(!location ||
@@ -9582,7 +9588,7 @@ save_auth_info(
   cupsFileClose(fp);
 
 #if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
-  if (con->gss_have_creds)
+  if (con->gss_creds)
     save_krb5_creds(con, job);
   else if (job->ccname)
     cupsdClearString(&(job->ccname));
@@ -9599,121 +9605,26 @@ static void
 save_krb5_creds(cupsd_client_t *con,	/* I - Client connection */
                 cupsd_job_t    *job)	/* I - Job */
 {
-#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Sorry, your version of Kerberos does not support delegated "
-		  "credentials!");
-  return;
-
-#  else
-  krb5_error_code	error;		/* Kerberos error code */
-  OM_uint32		major_status,	/* Major status code */
-			minor_status;	/* Minor status code */
-  krb5_principal	principal;	/* Kerberos principal */
-
-
-#   ifdef __APPLE__
  /*
-  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-  * to use it...
+  * Get the credentials...
   */
 
-  if (krb5_init_context == NULL)
-    return;
-#    endif /* __APPLE__ */
-
-  if (!KerberosInitialized)
-  {
-   /*
-    * Setup a Kerberos context for the scheduler to use...
-    */
-
-    KerberosInitialized = 1;
-
-    if (krb5_init_context(&KerberosContext))
-    {
-      KerberosContext = NULL;
-
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize Kerberos context");
-      return;
-    }
-  }
-
- /*
-  * We MUST create a file-based cache because memory-based caches are
-  * only valid for the current process/address space.
-  *
-  * Due to various bugs/features in different versions of Kerberos, we
-  * need either the krb5_cc_new_unique() function or Heimdal's version
-  * of krb5_cc_gen_new() to create a new FILE: credential cache that
-  * can be passed to the backend.  These functions create a temporary
-  * file (typically in /tmp) containing the cached credentials, which
-  * are removed when we have successfully printed a job.
-  */
-
-#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
-  if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
-                                  &(job->ccache))) != 0)
-#    else /* HAVE_HEIMDAL */
-  if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
-                               &(job->ccache))) != 0)
-#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to create new credentials cache (%d/%s)",
-                    error, strerror(errno));
-    job->ccache = NULL;
-    return;
-  }
-
-  if ((error = krb5_parse_name(KerberosContext, con->username, &principal)) != 0)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to parse kerberos username (%d/%s)",
-                    error, strerror(errno));
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    job->ccache = NULL;
-    return;
-  }
-
-  if ((error = krb5_cc_initialize(KerberosContext, job->ccache, principal)))
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to initialize credentials cache (%d/%s)", error,
-		    strerror(errno));
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    krb5_free_principal(KerberosContext, principal);
-    job->ccache = NULL;
-    return;
-  }
-
-  krb5_free_principal(KerberosContext, principal);
-
- /*
-  * Copy the user's credentials to the new cache file...
-  */
-
-  major_status = gss_krb5_copy_ccache(&minor_status, con->gss_delegated_cred,
-				      job->ccache);
-
-  if (GSS_ERROR(major_status))
-  {
-    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-                       "Unable to import client credentials cache");
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    job->ccache = NULL;
-    return;
-  }
+  job->ccache = cupsdCopyKrb5Creds(con);
 
  /*
   * Add the KRB5CCNAME environment variable to the job so that the
   * backend can use the credentials when printing.
   */
 
-  cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
-                  krb5_cc_get_name(KerberosContext, job->ccache));
+  if (job->ccache)
+  {
+    cupsdSetStringf(&(job->ccname), "KRB5CCNAME=FILE:%s",
+		    krb5_cc_get_name(KerberosContext, job->ccache));
 
-  cupsdLogJob(job, CUPSD_LOG_DEBUG2, "save_krb5_creds: %s", job->ccname);
-#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
+    cupsdLogJob(job, CUPSD_LOG_DEBUG2, "save_krb5_creds: %s", job->ccname);
+  }
+  else
+    cupsdClearString(&(job->ccname));
 }
 #endif /* HAVE_GSSAPI && HAVE_KRB5_H */
 

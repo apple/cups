@@ -3,7 +3,7 @@
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2003,7 +2003,10 @@ do_setup(pstops_doc_t *doc,		/* I - Document information */
   */
 
   if (doc->number_up > 1)
+  {
+    doc_puts(doc, "userdict/CUPSsetpagedevice/setpagedevice load put\n");
     doc_puts(doc, "userdict/setpagedevice{pop}bind put\n");
+  }
 
  /*
   * Changes to the transfer function must be made AFTER any
@@ -3436,6 +3439,15 @@ write_options(
   * Then send them out...
   */
 
+  if (doc->number_up > 1)
+  {
+   /*
+    * Temporarily restore setpagedevice so we can set the options...
+    */
+
+    doc_puts(doc, "userdict/setpagedevice/CUPSsetpagedevice load put\n");
+  }
+
   if (doc_setup)
   {
     doc_puts(doc, doc_setup);
@@ -3446,6 +3458,15 @@ write_options(
   {
     doc_puts(doc, any_setup);
     free(any_setup);
+  }
+
+  if (doc->number_up > 1)
+  {
+   /*
+    * Disable setpagedevice again...
+    */
+
+    doc_puts(doc, "userdict/setpagedevice{pop}bind put\n");
   }
 }
 

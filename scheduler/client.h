@@ -54,11 +54,10 @@ struct cupsd_client_s
   char			servername[256];/* Server name for connection */
   int			serverport;	/* Server port for connection */
 #ifdef HAVE_GSSAPI
-  int			gss_have_creds;	/* Have authenticated credentials */
+  gss_cred_id_t 	gss_creds;	/* Credentials from client header */
+  unsigned		gss_flags;	/* Credential flags */
   gss_buffer_desc 	gss_output_token;
 					/* Output token for Negotiate header */
-  gss_cred_id_t 	gss_delegated_cred;
-					/* Credentials from client header */
 #endif /* HAVE_GSSAPI */
 #ifdef HAVE_AUTHORIZATION_H
   AuthorizationRef	authref;	/* Authorization ref */

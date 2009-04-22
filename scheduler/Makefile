@@ -138,38 +138,29 @@ install-data:
 	echo Creating $(SERVERBIN)/driver...
 	$(INSTALL_DIR) -m 755 $(SERVERBIN)/driver
 	echo Creating $(SERVERROOT)...
-	$(INSTALL_DIR) -m 755 $(SERVERROOT)
-	-chgrp $(CUPS_GROUP) $(SERVERROOT)
+	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)
 	echo Creating $(SERVERROOT)/interfaces...
-	$(INSTALL_DIR) -m 755 $(SERVERROOT)/interfaces
-	-chgrp $(CUPS_GROUP) $(SERVERROOT)/interfaces
+	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)/interfaces
 	echo Creating $(SERVERROOT)/ppd...
-	$(INSTALL_DIR) -m 755 $(SERVERROOT)/ppd
-	-chgrp $(CUPS_GROUP) $(SERVERROOT)/ppd
-	-if test "x`uname`" != xDarwin; then \
+	$(INSTALL_DIR) -m 755 -g $(CUPS_GROUP) $(SERVERROOT)/ppd
+	if test "x`uname`" != xDarwin; then \
 		echo Creating $(SERVERROOT)/ssl...; \
-		$(INSTALL_DIR) -m 700 $(SERVERROOT)/ssl; \
-		chgrp $(CUPS_GROUP) $(SERVERROOT)/ssl || true; \
+		$(INSTALL_DIR) -m 700 -g $(CUPS_GROUP) $(SERVERROOT)/ssl; \
+	fi
+	if test "$(STATEDIR)" != "$(SERVERROOT)"; then \
 		echo Creating $(STATEDIR)...; \
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
-		echo Creating $(STATEDIR)/certs...; \
-		$(INSTALL_DIR) -m 511 $(STATEDIR)/certs; \
-		chgrp $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs || true; \
 	fi
+	echo Creating $(STATEDIR)/certs...
+	$(INSTALL_DIR) -m 511 -g $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
-	$(INSTALL_DIR) -m 710 $(REQUESTS)
-	-chgrp $(CUPS_GROUP) $(REQUESTS)
+	$(INSTALL_DIR) -m 710 -g $(CUPS_GROUP) $(REQUESTS)
 	echo Creating $(REQUESTS)/tmp...
-	$(INSTALL_DIR) -m 1770 $(REQUESTS)/tmp
-	-chgrp $(CUPS_GROUP) $(REQUESTS)/tmp
+	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
-	$(INSTALL_DIR) -m 775 $(CACHEDIR)
-	-chgrp $(CUPS_GROUP) $(CACHEDIR)
-#	echo Creating $(CACHEDIR)/ppd...
-#	$(INSTALL_DIR) -m 755 $(CACHEDIR)/ppd
-#	-chgrp $(CUPS_GROUP) $(CACHEDIR)/ppd
+	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
 
 
 #
@@ -179,7 +170,7 @@ install-data:
 install-exec:
 	echo Installing programs in $(SBINDIR)...
 	$(INSTALL_DIR) -m 755 $(SBINDIR)
-	$(INSTALL_BIN) cupsd $(SBINDIR)
+	$(INSTALL_BIN) -m 500 cupsd $(SBINDIR)
 	$(INSTALL_BIN) cupsfilter $(SBINDIR)
 	-if test "x`uname`" = xDarwin; then \
 		$(INSTALL_DIR) $(BUILDROOT)/System/Library/Printers/Libraries; \

@@ -3,7 +3,7 @@
  *
  *   Debugging functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -29,6 +29,7 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <regex.h>
 
 
 /*
@@ -44,8 +45,11 @@ int			_cups_debug_fd = -1;
  * Local globals...
  */
 
-static int		debug_init = 0;	/* Did we initialize debugging? */
+static regex_t		*debug_filter = NULL;
+					/* Filter expression for messages */
+static int		debug_init = 1;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
+static int		debug_level = 0;/* Log level (0 to 9) */
 static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
 #  endif /* HAVE_PTHREAD_H */
@@ -393,8 +397,13 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   struct timeval	curtime;	/* Current time */
   char			buffer[2048];	/* Output buffer */
   size_t		bytes;		/* Number of bytes in buffer */
-  const char		*cups_debug_log;/* CUPS_DEBUG_LOG environment variable */
-
+  int			level;		/* Log level in message */
+  const char		*cups_debug_filter,
+					/* CUPS_DEBUG_FILTER environment variable */
+			*cups_debug_level,
+					/* CUPS_DEBUG_LEVEL environment variable */
+			*cups_debug_log;/* CUPS_DEBUG_LOG environment variable */
+			
 
  /*
   * See if we need to do any logging...
@@ -422,6 +431,23 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 	snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
 	_cups_debug_fd = open(buffer, O_WRONLY | O_APPEND | O_CREAT, 0644);
       }
+
+      if ((cups_debug_level = getenv("CUPS_DEBUG_LEVEL")) != NULL)
+	debug_level = atoi(cups_debug_level);
+
+      if ((cups_debug_filter = getenv("CUPS_DEBUG_FILTER")) != NULL)
+      {
+        if ((debug_filter = (regex_t *)calloc(1, sizeof(regex_t))) == NULL)
+	  fputs("Unable to allocate memory for CUPS_DEBUG_FILTER - results not "
+	        "filtered!\n", stderr);
+	else if (regcomp(debug_filter, cups_debug_filter, REG_EXTENDED))
+	{
+	  fputs("Bad regular expression in CUPS_DEBUG_FILTER - results not "
+	        "filtered!\n", stderr);
+	  free(debug_filter);
+	  debug_filter = NULL;
+	}
+      }
     }
 
     pthread_mutex_unlock(&debug_mutex);
@@ -429,6 +455,30 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 
   if (_cups_debug_fd < 0)
     return;
+
+ /*
+  * Filter as needed...
+  */
+
+  if (isdigit(format[0]))
+    level = *format++ - '0';
+  else
+    level = 0;
+
+  if (level > debug_level)
+    return;
+
+  if (debug_filter)
+  {
+    int	result;				/* Filter result */
+
+    pthread_mutex_lock(&debug_mutex);
+    result = regexec(debug_filter, format, 0, NULL, 0);
+    pthread_mutex_unlock(&debug_mutex);
+
+    if (result)
+      return;
+  }
 
  /*
   * Format the message...
@@ -467,7 +517,14 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 void
 _cups_debug_puts(const char *s)		/* I - String to output */
 {
-  _cups_debug_printf("%s\n", s);
+  char	format[4];			/* C%s */
+
+  format[0] = *s++;
+  format[1] = '%';
+  format[2] = 's';
+  format[3] = '\0';
+
+  _cups_debug_printf(format, s);
 }
 
 

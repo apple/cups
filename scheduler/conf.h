@@ -82,6 +82,17 @@ typedef enum
 
 
 /*
+ * ServerAlias data...
+ */
+
+typedef struct
+{
+  size_t	namelen;		/* Length of alias name */
+  char		name[1];		/* Alias name */
+} cupsd_alias_t;
+
+
+/*
  * Globals...
  */
 
@@ -101,6 +112,8 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Directory for request files */
 			*DocumentRoot		VALUE(NULL);
 					/* Root directory for documents */
+VAR cups_array_t	*ServerAlias		VALUE(NULL);
+					/* Alias names for server */
 VAR int			RemoteAccessEnabled	VALUE(0),
 					/* Are we listening on non-local addresses? */
 			ServerNameIsIP		VALUE(0);
@@ -147,12 +160,6 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Remote root user */
 			*Classification		VALUE(NULL);
 					/* Classification of system */
-#ifdef HAVE_GSSAPI
-VAR char		*GSSServiceName		VALUE(NULL);
-					/* GSS service name */
-VAR char		*Krb5Keytab		VALUE(NULL);
-					/* Kerberos Keytab */
-#endif /* HAVE_GSSAPI */
 VAR uid_t		User			VALUE(1);
 					/* User ID for server */
 VAR gid_t		Group			VALUE(0);
@@ -265,10 +272,12 @@ VAR char		*SystemGroupAuthKey	VALUE(NULL);
  * Prototypes...
  */
 
+extern void	cupsdAddAlias(cups_array_t *aliases, const char *name);
 extern int	cupsdCheckPermissions(const char *filename,
 		                      const char *suffix, int mode,
 	 			      int user, int group, int is_dir,
 				      int create_dir);
+extern void	cupsdFreeAliases(cups_array_t *aliases);
 extern char	*cupsdGetDateTime(struct timeval *t, cupsd_time_t format);
 #ifdef HAVE_GSSAPI
 extern int	cupsdLogGSSMessage(int level, int major_status,

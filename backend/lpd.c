@@ -424,9 +424,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Copy stdin to a temporary file...
     */
 
-    char buffer[8192];	/* Buffer for copying */
-    int  bytes;		/* Number of bytes read */
+    http_addrlist_t	*addrlist;	/* Address list */
+    int			snmp_fd;	/* SNMP socket */
+    char		buffer[8192];	/* Buffer for copying */
+    int			bytes;		/* Number of bytes read */
 
+
+    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
+    {
+      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+		      hostname);
+      return (CUPS_BACKEND_STOP);
+    }
+
+    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
@@ -437,6 +448,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
+    {
       if (write(fd, buffer, bytes) < bytes)
       {
         _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
@@ -444,6 +456,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	unlink(tmpfilename);
 	return (CUPS_BACKEND_FAILED);
       }
+
+      if (snmp_fd >= 0)
+	backendCheckSideChannel(snmp_fd, &(addrlist->addr));
+    }
+
+    if (snmp_fd >= 0)
+      _cupsSNMPClose(snmp_fd);
+
+    httpAddrFreeList(addrlist);
   }
   else if (argc == 6)
   {

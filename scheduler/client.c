@@ -41,6 +41,7 @@
  *                            (i.e. "..").
  *   make_certificate()     - Make a self-signed SSL/TLS certificate.
  *   pipe_command()         - Pipe the output of a command to the remote client.
+ *   valid_host()           - Is the Host: field valid?
  *   write_file()           - Send a file via HTTP.
  *   write_pipe()           - Flag that data is available on the CGI pipe.
  */
@@ -110,6 +111,7 @@ static int		make_certificate(cupsd_client_t *con);
 #endif /* HAVE_SSL */
 static int		pipe_command(cupsd_client_t *con, int infile, int *outfile,
 			             char *command, char *options, int root);
+static int		valid_host(cupsd_client_t *con);
 static int		write_file(cupsd_client_t *con, http_status_t code,
 		        	   char *filename, char *type,
 				   struct stat *filestats);
@@ -418,10 +420,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #ifdef AF_INET6
     if (temp.addr.sa_family == AF_INET6)
     {
-      if (HostNameLookups)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else if (httpAddrLocalhost(&temp))
+      if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
+      else if (HostNameLookups || RemoteAccessEnabled)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 
@@ -431,10 +433,10 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
 #endif /* AF_INET6 */
     if (temp.addr.sa_family == AF_INET)
     {
-      if (HostNameLookups)
-        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
-      else if (httpAddrLocalhost(&temp))
+      if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
+      else if (HostNameLookups || RemoteAccessEnabled)
+        httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
 
@@ -890,7 +892,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 #ifdef HAVE_GSSAPI
-        con->gss_have_creds = 0;
+	{
+	  OM_uint32 minor_status;
+	  gss_release_cred(&minor_status, &con->gss_creds);
+	}
 #endif /* HAVE_GSSAPI */
 
        /*
@@ -1131,13 +1136,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	return;
       }
     }
-    else if (httpAddrLocalhost(con->http.hostaddr) &&
-             strcasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost") &&
-	     strncasecmp(con->http.fields[HTTP_FIELD_HOST], "localhost:", 10) &&
-	     strcmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1") &&
-	     strncmp(con->http.fields[HTTP_FIELD_HOST], "127.0.0.1:", 10) &&
-	     strcmp(con->http.fields[HTTP_FIELD_HOST], "[::1]") &&
-	     strncmp(con->http.fields[HTTP_FIELD_HOST], "[::1]:", 6))
+    else if (!valid_host(con))
     {
      /*
       * Access to localhost must use "localhost" or the corresponding IPv4
@@ -2468,19 +2467,28 @@ cupsdSendHeader(
       strlcpy(auth_str, "Negotiate", sizeof(auth_str));
 #endif /* HAVE_GSSAPI */
 
-#ifdef HAVE_AUTHORIZATION_H
-    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE)
+    if (con->best && auth_type != CUPSD_AUTH_NEGOTIATE &&
+        !strcasecmp(con->http.hostname, "localhost"))
     {
-      int 	 i;			/* Looping var */
+     /*
+      * Add a "trc" (try root certification) parameter for local non-Kerberos
+      * requests when the request requires system group membership - then the
+      * client knows the root certificate can/should be used.
+      *
+      * Also, for Mac OS X we also look for @AUTHKEY and add an "authkey"
+      * parameter as needed...
+      */
+
+      int 	i;			/* Looping var */
       char	*auth_key;		/* Auth key buffer */
       size_t	auth_size;		/* Size of remaining buffer */
-
 
       auth_key  = auth_str + strlen(auth_str);
       auth_size = sizeof(auth_str) - (auth_key - auth_str);
 
       for (i = 0; i < con->best->num_names; i ++)
       {
+#ifdef HAVE_AUTHORIZATION_H
 	if (!strncasecmp(con->best->names[i], "@AUTHKEY(", 9))
 	{
 	  snprintf(auth_key, auth_size, ", authkey=\"%s\"",
@@ -2488,15 +2496,23 @@ cupsdSendHeader(
 	  /* end parenthesis is stripped in conf.c */
 	  break;
         }
-	else if (!strcasecmp(con->best->names[i], "@SYSTEM") &&
-	         SystemGroupAuthKey)
+	else
+#endif /* HAVE_AUTHORIZATION_H */
+	if (!strcasecmp(con->best->names[i], "@SYSTEM"))
 	{
-	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", SystemGroupAuthKey);
+#ifdef HAVE_AUTHORIZATION_H
+	  if (SystemGroupAuthKey)
+	    snprintf(auth_key, auth_size,
+	             ", authkey=\"%s\", trc=\"y\"",
+		     SystemGroupAuthKey);
+          else
+#else
+	  strlcpy(auth_key, ", trc=\"y\"", auth_size));
+#endif /* HAVE_AUTHORIZATION_H */
 	  break;
 	}
       }
     }
-#endif /* HAVE_AUTHORIZATION_H */
 
     if (auth_str[0])
     {
@@ -3294,6 +3310,14 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
   ssl_options.ServerName = con->servername;
   ssl_options.ServerNameLen = strlen(con->servername);
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		  con->servername);
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		  con->servername);
+
   options.Data = (uint8 *)&ssl_options;
   options.Length = sizeof(ssl_options);
 
@@ -3985,7 +4009,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL, 0,
                            NULL, &pid))
     {
       unlink(seedfile);
@@ -4385,12 +4409,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 		server_name[1024],	/* SERVER_NAME environment variable */
 		server_port[1024];	/* SERVER_PORT environment variable */
   ipp_attribute_t *attr;		/* attributes-natural-language attribute */
-#ifdef HAVE_GSSAPI
-  krb5_ccache	ccache = NULL;		/* Kerberos credentials */
-#  if defined(HAVE_KRB5_CC_NEW_UNIQUE) || defined(HAVE_HEIMDAL)
-  char		krb5ccname[1024];	/* KRB5CCNAME environment variable */
-#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
-#endif /* HAVE_GSSAPI */
+  void		*ccache = NULL;		/* Kerberos credentials */
 
 
  /*
@@ -4618,133 +4637,8 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     */
 
 #ifdef HAVE_GSSAPI
-    if (con->gss_have_creds)
-    {
-#  if !defined(HAVE_KRB5_CC_NEW_UNIQUE) && !defined(HAVE_HEIMDAL)
-      cupsdLogMessage(CUPSD_LOG_INFO,
-		      "[CGI] Sorry, your version of Kerberos does not support "
-		      "delegated credentials!");
-
-#  else
-      krb5_error_code	error;		/* Kerberos error code */
-      OM_uint32		major_status,	/* Major status code */
-			minor_status;	/* Minor status code */
-      krb5_principal	principal;	/* Kerberos principal */
-
-
-#   ifdef __APPLE__
-     /*
-      * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-      * to use it...
-      */
-
-      if (krb5_init_context != NULL)
-      {
-#    endif /* __APPLE__ */
-
-      if (!KerberosInitialized)
-      {
-       /*
-	* Setup a Kerberos context for the scheduler to use...
-	*/
-
-        KerberosInitialized = 1;
-
-	if (krb5_init_context(&KerberosContext))
-	{
-	  KerberosContext = NULL;
-
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "[CGI] Unable to initialize Kerberos context");
-	}
-      }
-
-     /*
-      * We MUST create a file-based cache because memory-based caches are
-      * only valid for the current process/address space.
-      *
-      * Due to various bugs/features in different versions of Kerberos, we
-      * need either the krb5_cc_new_unique() function or Heimdal's version
-      * of krb5_cc_gen_new() to create a new FILE: credential cache that
-      * can be passed to the backend.  These functions create a temporary
-      * file (typically in /tmp) containing the cached credentials, which
-      * are removed when we have successfully printed a job.
-      */
-
-      if (KerberosContext)
-      {
-#    ifdef HAVE_KRB5_CC_NEW_UNIQUE
-	if ((error = krb5_cc_new_unique(KerberosContext, "FILE", NULL,
-					&ccache)) != 0)
-#    else /* HAVE_HEIMDAL */
-	if ((error = krb5_cc_gen_new(KerberosContext, &krb5_fcc_ops,
-				     &ccache)) != 0)
-#    endif /* HAVE_KRB5_CC_NEW_UNIQUE */
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "[CGI] Unable to create new credentials cache (%d/%s)",
-			  error, strerror(errno));
-	  ccache = NULL;
-	}
-	else if ((error = krb5_parse_name(KerberosContext, con->username,
-					  &principal)) != 0)
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "[CGI] Unable to parse kerberos username (%d/%s)",
-			  error, strerror(errno));
-	  krb5_cc_destroy(KerberosContext, ccache);
-	  ccache = NULL;
-	}
-	else if ((error = krb5_cc_initialize(KerberosContext, ccache,
-					     principal)))
-	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-			  "[CGI] Unable to initialize credentials cache (%d/%s)",
-			  error, strerror(errno));
-	  krb5_cc_destroy(KerberosContext, ccache);
-	  krb5_free_principal(KerberosContext, principal);
-	  ccache = NULL;
-	}
-	else
-	{
-	  krb5_free_principal(KerberosContext, principal);
-
-	 /*
-	  * Copy the user's credentials to the new cache file...
-	  */
-
-	  major_status = gss_krb5_copy_ccache(&minor_status,
-					      con->gss_delegated_cred, ccache);
-
-	  if (GSS_ERROR(major_status))
-	  {
-	    cupsdLogGSSMessage(CUPSD_LOG_ERROR, major_status, minor_status,
-			       "[CGI] Unable to import client credentials "
-			       "cache");
-	    krb5_cc_destroy(KerberosContext, ccache);
-	    ccache = NULL;
-	  }
-	  else
-	  {
-	   /*
-	    * Add the KRB5CCNAME environment variable to the job so that the
-	    * backend can use the credentials when printing.
-	    */
-
-	    snprintf(krb5ccname, sizeof(krb5ccname), "KRB5CCNAME=FILE:%s",
-		     krb5_cc_get_name(KerberosContext, ccache));
-	    envp[envc++] = krb5ccname;
-
-	    if (!RunUser)
-	      chown(krb5_cc_get_name(KerberosContext, ccache), User, Group);
-	  }
-       }
-     }
-#    ifdef __APPLE__
-     }
-#    endif /* __APPLE__ */
-#  endif /* HAVE_KRB5_CC_NEW_UNIQUE || HAVE_HEIMDAL */
-    }
+    if (con->gss_creds)
+      ccache = cupsdCopyKrb5Creds(con);
 #endif /* HAVE_GSSAPI */
   }
 
@@ -4861,11 +4755,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     */
 
     if (con->username[0])
-#ifdef HAVE_GSSAPI
       cupsdAddCert(pid, con->username, ccache);
-#else
-      cupsdAddCert(pid, con->username, NULL);
-#endif /* HAVE_GSSAPI */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "[CGI] Started %s (PID %d)", command, pid);
 
@@ -4874,6 +4764,165 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   }
 
   return (pid);
+}
+
+
+/*
+ * 'valid_host()' - Is the Host: field valid?
+ */
+
+static int				/* O - 1 if valid, 0 if not */
+valid_host(cupsd_client_t *con)		/* I - Client connection */
+{
+  cupsd_alias_t	*a;			/* Current alias */
+  cupsd_netif_t	*netif;			/* Current network interface */
+  const char	*host,			/* Host field */
+		*end;			/* End character */
+
+
+  host = con->http.fields[HTTP_FIELD_HOST];
+
+  if (httpAddrLocalhost(con->http.hostaddr))
+  {
+   /*
+    * Only allow "localhost" or the equivalent IPv4 or IPv6 numerical
+    * addresses when accessing CUPS via the loopback interface...
+    */
+
+    return (!strcasecmp(host, "localhost") ||
+            !strncasecmp(host, "localhost:", 10) ||
+	    !strcasecmp(host, "localhost.") ||
+            !strncasecmp(host, "localhost.:", 11) ||
+#ifdef __linux
+	    !strcasecmp(host, "localhost.localdomain") ||
+            !strncasecmp(host, "localhost.localdomain:", 22) ||
+#endif /* __linux */
+            !strcmp(host, "127.0.0.1") ||
+	    !strncmp(host, "127.0.0.1:", 10) ||
+	    !strcmp(host, "[::1]") ||
+	    !strncmp(host, "[::1]:", 6));
+  }
+
+#ifdef HAVE_DNSSD
+ /*
+  * Check if the hostname is something.local (Bonjour); if so, allow it.
+  */
+
+  if ((end = strrchr(host, '.')) != NULL &&
+      (!strcasecmp(end, ".local") || !strncasecmp(end, ".local:", 7) ||
+       !strcasecmp(end, ".local.") || !strncasecmp(end, ".local.:", 8)))
+    return (1);
+#endif /* HAVE_DNSSD */
+
+ /*
+  * Check if the hostname is an IP address...
+  */
+
+  if (isdigit(*host & 255) || *host == '[')
+  {
+   /*
+    * Possible IPv4/IPv6 address...
+    */
+
+    char	temp[1024],		/* Temporary string */
+		*ptr;			/* Pointer into temporary string */
+    http_addrlist_t *addrlist;		/* List of addresses */
+
+
+    strlcpy(temp, host, sizeof(temp));
+    if ((ptr = strrchr(temp, ':')) != NULL && !strchr(ptr, ']'))
+      *ptr = '\0';			/* Strip :port from host value */
+
+    if ((addrlist = httpAddrGetList(temp, AF_UNSPEC, NULL)) != NULL)
+    {
+     /*
+      * Good IPv4/IPv6 address...
+      */
+
+      httpAddrFreeList(addrlist);
+      return (1);
+    }
+  }
+
+ /*
+  * Check for (alias) name matches...
+  */
+
+  for (a = (cupsd_alias_t *)cupsArrayFirst(ServerAlias);
+       a;
+       a = (cupsd_alias_t *)cupsArrayNext(ServerAlias))
+  {
+   /*
+    * "ServerAlias *" allows all host values through...
+    */
+
+    if (!strcmp(a->name, "*"))
+      return (1);
+
+    if (!strncasecmp(host, a->name, a->namelen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + a->namelen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+
+#ifdef HAVE_DNSSD
+  for (a = (cupsd_alias_t *)cupsArrayFirst(DNSSDAlias);
+       a;
+       a = (cupsd_alias_t *)cupsArrayNext(DNSSDAlias))
+  {
+   /*
+    * "ServerAlias *" allows all host values through...
+    */
+
+    if (!strcmp(a->name, "*"))
+      return (1);
+
+    if (!strncasecmp(host, a->name, a->namelen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + a->namelen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+#endif /* HAVE_DNSSD */
+
+ /*
+  * Check for interface hostname matches...
+  */
+
+  for (netif = (cupsd_netif_t *)cupsArrayFirst(NetIFList);
+       netif;
+       netif = (cupsd_netif_t *)cupsArrayNext(NetIFList))
+  {
+    if (!strncasecmp(host, netif->hostname, netif->hostlen))
+    {
+     /*
+      * Prefix matches; check the character at the end - it must be ":", ".",
+      * ".:", or nul...
+      */
+
+      end = host + netif->hostlen;
+
+      if (!*end || *end == ':' || (*end == '.' && (!end[1] || end[1] == ':')))
+        return (1);
+    }
+  }
+
+  return (0);
 }
 
 

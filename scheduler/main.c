@@ -1718,16 +1718,21 @@ process_children(void)
 	  else
 	    job->status = -status;	/* Backend failed */
 
-	  if ((!(job->printer->type & CUPS_PRINTER_FAX) || job->filters[i]) &&
-	      job->status_level > CUPSD_LOG_ERROR)
+	  if (job->status_level > CUPSD_LOG_ERROR)
 	  {
 	    job->status_level = CUPSD_LOG_ERROR;
 
-	    snprintf(job->printer->state_message,
-		     sizeof(job->printer->state_message), "%s failed", name);
-	    cupsdAddPrinterHistory(job->printer);
+            if (job->printer)
+	    {
+	      snprintf(job->printer->state_message,
+		       sizeof(job->printer->state_message), "%s failed", name);
+	      cupsdAddPrinterHistory(job->printer);
+	    }
 
-	    if (!job->printer_message)
+	    if (!job->attrs)
+	      cupsdLoadJob(job);
+
+	    if (!job->printer_message && job->attrs)
 	    {
 	      if ((job->printer_message =
 	               ippFindAttribute(job->attrs, "job-printer-state-message",
@@ -1738,8 +1743,9 @@ process_children(void)
 						    NULL, "");
 	    }
 
-	    cupsdSetString(&(job->printer_message->values[0].string.text),
-			   job->printer->state_message);
+	    if (job->printer_message)
+	      cupsdSetString(&(job->printer_message->values[0].string.text),
+			     job->printer->state_message);
 	  }
 	}
 

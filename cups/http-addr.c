@@ -154,7 +154,7 @@ httpAddrLocalhost(
 #endif /* AF_LOCAL */
 
   if (addr->addr.sa_family == AF_INET &&
-      ntohl(addr->ipv4.sin_addr.s_addr) == 0x7f000001)
+      (ntohl(addr->ipv4.sin_addr.s_addr) & 0xff000000) == 0x7f000000)
     return (1);
 
   return (0);
@@ -184,8 +184,8 @@ httpAddrLookup(
 					/* Global data */
 
 
-  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)\n",
-                addr, name, namelen));
+  DEBUG_printf(("httpAddrLookup(addr=%p, name=%p, namelen=%d)", addr, name,
+		namelen));
 
  /*
   * Range check input...
@@ -289,6 +289,8 @@ httpAddrLookup(
   }
 #endif /* HAVE_GETNAMEINFO */
 
+  DEBUG_printf(("1httpAddrLookup: returning \"%s\"...", name));
+
   return (name);
 }
 
@@ -324,8 +326,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
                char              *s,	/* I - String buffer */
 	       int               slen)	/* I - Length of string */
 {
-  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)\n",
-                addr, s, slen));
+  DEBUG_printf(("httpAddrString(addr=%p, s=%p, slen=%d)", addr, s, slen));
 
  /*
   * Range check input...
@@ -452,7 +453,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
   else
     strlcpy(s, "UNKNOWN", slen);
 
-  DEBUG_printf(("httpAddrString: returning \"%s\"...\n", s));
+  DEBUG_printf(("1httpAddrString: returning \"%s\"...", s));
 
   return (s);
 }
@@ -474,7 +475,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
   					/* Pointer to library globals */
 
 
-  DEBUG_printf(("httpGetHostByName(name=\"%s\")\n", name));
+  DEBUG_printf(("httpGetHostByName(name=\"%s\")", name));
 
  /*
   * Avoid lookup delays and configuration problems when connecting
@@ -512,7 +513,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     cg->ip_ptrs[0]          = (char *)name;
     cg->ip_ptrs[1]          = NULL;
 
-    DEBUG_puts("httpGetHostByName: returning domain socket address...");
+    DEBUG_puts("1httpGetHostByName: returning domain socket address...");
 
     return (&cg->hostent);
   }
@@ -548,7 +549,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     cg->ip_ptrs[0]          = (char *)&(cg->ip_addr);
     cg->ip_ptrs[1]          = NULL;
 
-    DEBUG_puts("httpGetHostByName: returning IPv4 address...");
+    DEBUG_puts("1httpGetHostByName: returning IPv4 address...");
 
     return (&cg->hostent);
   }
@@ -559,7 +560,7 @@ httpGetHostByName(const char *name)	/* I - Hostname or IP address */
     * the name...
     */
 
-    DEBUG_puts("httpGetHostByName: returning domain lookup address(es)...");
+    DEBUG_puts("1httpGetHostByName: returning domain lookup address(es)...");
 
     return (gethostbyname(name));
   }

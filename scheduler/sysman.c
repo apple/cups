@@ -216,6 +216,7 @@ static CFRunLoopRef	SysEventRunloop = NULL;
 					/* The runloop. Access must be protected! */
 static CFStringRef	ComputerNameKey = NULL,
 					/* Computer name key */
+			BTMMKey = NULL,	/* Back to My Mac key */
 			NetworkGlobalKeyIPv4 = NULL,
 					/* Network global IPv4 key */
 			NetworkGlobalKeyIPv6 = NULL,
@@ -355,7 +356,7 @@ sysEventThreadEntry(void)
   SCDynamicStoreRef	store    = NULL;/* System Config dynamic store */
   CFRunLoopSourceRef	powerRLS = NULL,/* Power runloop source */
 			storeRLS = NULL;/* System Config runloop source */
-  CFStringRef		key[5],		/* System Config keys */
+  CFStringRef		key[6],		/* System Config keys */
 			pattern[2];	/* System Config patterns */
   CFArrayRef		keys = NULL,	/* System Config key array*/
 			patterns = NULL;/* System Config pattern array */
@@ -391,43 +392,47 @@ sysEventThreadEntry(void)
   bzero(&storeContext, sizeof(storeContext));
   storeContext.info = &threadData;
 
-  store = SCDynamicStoreCreate(NULL, CFSTR("cupsd"),
+  store = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("cupsd"),
                                sysEventConfigurationNotifier, &storeContext);
 
   if (!ComputerNameKey)
-    ComputerNameKey = SCDynamicStoreKeyCreateComputerName(NULL);
+    ComputerNameKey = SCDynamicStoreKeyCreateComputerName(kCFAllocatorDefault);
+
+  if (!BTMMKey)
+    BTMMKey = SCDynamicStoreKeyCreate(kCFAllocatorDefault,
+                                      CFSTR("Setup:/Network/BackToMyMac"));
 
   if (!NetworkGlobalKeyIPv4)
     NetworkGlobalKeyIPv4 =
-        SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL,
+        SCDynamicStoreKeyCreateNetworkGlobalEntity(kCFAllocatorDefault,
                                                    kSCDynamicStoreDomainState,
 						   kSCEntNetIPv4);
 
   if (!NetworkGlobalKeyIPv6)
     NetworkGlobalKeyIPv6 =
-        SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL,
+        SCDynamicStoreKeyCreateNetworkGlobalEntity(kCFAllocatorDefault,
                                                    kSCDynamicStoreDomainState,
 						   kSCEntNetIPv6);
 
   if (!NetworkGlobalKeyDNS)
     NetworkGlobalKeyDNS = 
-	SCDynamicStoreKeyCreateNetworkGlobalEntity(NULL, 
+	SCDynamicStoreKeyCreateNetworkGlobalEntity(kCFAllocatorDefault, 
 						   kSCDynamicStoreDomainState,
 						   kSCEntNetDNS);
 
   if (!HostNamesKey)
-    HostNamesKey = SCDynamicStoreKeyCreateHostNames(NULL);
+    HostNamesKey = SCDynamicStoreKeyCreateHostNames(kCFAllocatorDefault);
 
   if (!NetworkInterfaceKeyIPv4)
     NetworkInterfaceKeyIPv4 =
-        SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL,
+        SCDynamicStoreKeyCreateNetworkInterfaceEntity(kCFAllocatorDefault,
 	                                              kSCDynamicStoreDomainState,
 						      kSCCompAnyRegex,
 						      kSCEntNetIPv4);
 
   if (!NetworkInterfaceKeyIPv6)
     NetworkInterfaceKeyIPv6 =
-        SCDynamicStoreKeyCreateNetworkInterfaceEntity(NULL,
+        SCDynamicStoreKeyCreateNetworkInterfaceEntity(kCFAllocatorDefault,
 	                                              kSCDynamicStoreDomainState,
 						      kSCCompAnyRegex,
 						      kSCEntNetIPv6);
@@ -437,27 +442,28 @@ sysEventThreadEntry(void)
       NetworkInterfaceKeyIPv4 && NetworkInterfaceKeyIPv6)
   {
     key[0]     = ComputerNameKey;
-    key[1]     = NetworkGlobalKeyIPv4;
-    key[2]     = NetworkGlobalKeyIPv6;
-    key[3]     = NetworkGlobalKeyDNS;
-    key[4]     = HostNamesKey;
+    key[1]     = BTMMKey;
+    key[2]     = NetworkGlobalKeyIPv4;
+    key[3]     = NetworkGlobalKeyIPv6;
+    key[4]     = NetworkGlobalKeyDNS;
+    key[5]     = HostNamesKey;
 
     pattern[0] = NetworkInterfaceKeyIPv4;
     pattern[1] = NetworkInterfaceKeyIPv6;
 
-    keys     = CFArrayCreate(NULL, (const void **)key,
-                                    sizeof(key) / sizeof(key[0]),
-				    &kCFTypeArrayCallBacks);
+    keys     = CFArrayCreate(kCFAllocatorDefault, (const void **)key,
+			     sizeof(key) / sizeof(key[0]),
+			     &kCFTypeArrayCallBacks);
 
-    patterns = CFArrayCreate(NULL, (const void **)pattern,
+    patterns = CFArrayCreate(kCFAllocatorDefault, (const void **)pattern,
                              sizeof(pattern) / sizeof(pattern[0]),
 			     &kCFTypeArrayCallBacks);
 
     if (keys && patterns &&
         SCDynamicStoreSetNotificationKeys(store, keys, patterns))
     {
-      if ((storeRLS = SCDynamicStoreCreateRunLoopSource(NULL, store, 0))
-              != NULL)
+      if ((storeRLS = SCDynamicStoreCreateRunLoopSource(kCFAllocatorDefault,
+                                                        store, 0)) != NULL)
       {
 	CFRunLoopAddSource(CFRunLoopGetCurrent(), storeRLS,
 	                   kCFRunLoopDefaultMode);
@@ -491,7 +497,7 @@ sysEventThreadEntry(void)
   timerContext.info = &threadData;
 
   threadData.timerRef =
-      CFRunLoopTimerCreate(NULL,
+      CFRunLoopTimerCreate(kCFAllocatorDefault,
                            CFAbsoluteTimeGetCurrent() + (86400L * 365L * 10L), 
 			   86400L * 365L * 10L, 0, 0, sysEventTimerNotifier,
 			   &timerContext);
@@ -595,9 +601,9 @@ sysEventPowerNotifier(
 
     case kIOMessageSystemWillNotPowerOff:
     case kIOMessageSystemWillNotSleep:
-#ifdef kIOMessageSystemWillPowerOn
+#  ifdef kIOMessageSystemWillPowerOn
     case kIOMessageSystemWillPowerOn:
-#endif /* kIOMessageSystemWillPowerOn */
+#  endif /* kIOMessageSystemWillPowerOn */
     default:
 	sendit = 0;
 	break;
@@ -634,7 +640,7 @@ sysEventPowerNotifier(
 
 
 /*
- * 'sysEventConfigurationNotifier()' - Computer name changed notification
+ * 'sysEventConfigurationNotifier()' - Network configuration change notification
  *                                     callback.
  */
 
@@ -653,7 +659,8 @@ sysEventConfigurationNotifier(
 
   CFRange range = CFRangeMake(0, CFArrayGetCount(changedKeys));
 
-  if (CFArrayContainsValue(changedKeys, range, ComputerNameKey))
+  if (CFArrayContainsValue(changedKeys, range, ComputerNameKey) ||
+      CFArrayContainsValue(changedKeys, range, BTMMKey))
     threadData->sysevent.event |= SYSEVENT_NAMECHANGED;
   else
   {
@@ -845,7 +852,8 @@ sysUpdate(void)
     {
       if (!Sleeping)
       {
-        cupsdLogMessage(CUPSD_LOG_DEBUG, "Computer name changed");
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "Computer name or BTMM domains changed");
 
        /*
 	* De-register the individual printers...
@@ -857,7 +865,7 @@ sysUpdate(void)
 	  cupsdDeregisterPrinter(p, 1);
 
        /*
-        * Update the computer name...
+        * Update the computer name and BTMM domain list...
 	*/
 
 	cupsdUpdateDNSSDName();
@@ -876,7 +884,8 @@ sysUpdate(void)
       }
       else
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Computer name changed; ignored while sleeping");
+	                "Computer name or BTMM domains changed; ignored while "
+			"sleeping");
     }
   }
 }
