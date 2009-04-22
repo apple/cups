@@ -2631,7 +2631,7 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
 
   DEBUG_printf(("6%s: %d bytes:\n", prefix, bytes));
 
-  snprintf(line, sizeof(line), "%s: ", prefix);
+  snprintf(line, sizeof(line), "6%s: ", prefix);
   start = line + strlen(line);
 
   for (i = 0; i < bytes; i += 16)
