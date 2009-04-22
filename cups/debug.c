@@ -427,7 +427,11 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
       else
       {
 	snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
-	_cups_debug_fd = open(buffer, O_WRONLY | O_APPEND | O_CREAT, 0644);
+
+	if (buffer[0] == '+')
+	  _cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT, 0644);
+	else
+	  _cups_debug_fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT, 0644);
       }
 
       if ((cups_debug_level = getenv("CUPS_DEBUG_LEVEL")) != NULL)
