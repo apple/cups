@@ -430,11 +430,9 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * See if we can do authentication...
       */
 
-      int auth_result;
-
       DEBUG_puts("2cupsGetResponse: Need authorization...");
 
-      if ((auth_result = cupsDoAuthentication(http, "POST", resource)) == 0)
+      if (!cupsDoAuthentication(http, "POST", resource))
 	httpReconnect(http);
     }
 

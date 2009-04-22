@@ -129,11 +129,9 @@ cupsGetDevices(
 	* See if we can do authentication...
 	*/
 
-	int auth_result;
-
 	DEBUG_puts("2cupsGetDevices: Need authorization...");
 
-	if ((auth_result = cupsDoAuthentication(http, "POST", "/")) == 0)
+	if (!cupsDoAuthentication(http, "POST", "/"))
 	  httpReconnect(http);
 	else
 	  break;
