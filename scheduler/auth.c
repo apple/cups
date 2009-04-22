@@ -969,7 +969,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			output_token = GSS_C_EMPTY_BUFFER;
 					/* Output token for username */
     gss_name_t		client_name;	/* Client name */
-    unsigned int	ret_flags;	/* Credential flags */
 
 
 #  ifdef __APPLE__
@@ -1028,7 +1027,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					  &client_name,
 					  NULL,
 					  &con->gss_output_token,
-					  &ret_flags,
+					  &con->gss_flags,
 					  NULL,
 					  &con->gss_creds);
 
@@ -1053,7 +1052,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
-                         "cupsdAuthorize: Credentials not complete");
+			 "cupsdAuthorize: Credentials not complete");
     else if (major_status == GSS_S_COMPLETE)
     {
       major_status = gss_display_name(&minor_status, client_name, 
@@ -1063,27 +1062,27 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
                            "cupsdAuthorize: Error getting username");
+	gss_release_cred(&minor_status, &con->gss_creds);
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 	return;
       }
 
-      gss_release_name(&minor_status, &client_name);
       strlcpy(username, output_token.value, sizeof(username));
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "cupsdAuthorize: Authorized as %s using Negotiate",
 		      username);
 
+      gss_release_name(&minor_status, &client_name);
       gss_release_buffer(&minor_status, &output_token);
-      gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
-
-      con->gss_have_creds = 1;
 
       con->type = CUPSD_AUTH_NEGOTIATE;
     }
     else
-      gss_release_name(&minor_status, &client_name);
+      gss_release_cred(&minor_status, &con->gss_creds);
+
+    gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
   }
 #endif /* HAVE_GSSAPI */
   else
@@ -1568,7 +1567,8 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
   */
 
 #    ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  if (con->http.hostaddr->addr.sa_family == AF_LOCAL)
+  if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
+      !(con->gss_flags & GSS_C_DELEG_FLAG))
   {
    /*
     * Pull the credentials directly from the user...
@@ -1600,7 +1600,8 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
     }
 
     error = krb5_cc_copy_creds(KerberosContext, peerccache, ccache);
-    krb5_cc_destroy(KerberosContext, peerccache);
+    krb5_cc_close(KerberosContext, peerccache);
+    krb5_ipc_client_clear_target();
 
     if (error)
     {
@@ -1610,8 +1611,6 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
       krb5_cc_destroy(KerberosContext, ccache);
       return (NULL);
     }
-
-    krb5_ipc_client_clear_target();
   }
   else
 #    endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */

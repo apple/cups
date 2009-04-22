@@ -892,7 +892,10 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 #ifdef HAVE_GSSAPI
-        con->gss_have_creds = 0;
+	{
+	  OM_uint32 minor_status;
+	  gss_release_cred(&minor_status, &con->gss_creds);
+	}
 #endif /* HAVE_GSSAPI */
 
        /*
@@ -4634,7 +4637,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
     */
 
 #ifdef HAVE_GSSAPI
-    if (con->gss_have_creds)
+    if (con->gss_creds)
       ccache = cupsdCopyKrb5Creds(con);
 #endif /* HAVE_GSSAPI */
   }
