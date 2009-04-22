@@ -429,7 +429,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 		};
 
 
-  DEBUG_printf(("cupsLangGet(language=\"%s\")", language));
+  DEBUG_printf(("2cupsLangGet(language=\"%s\")", language));
 
 #ifdef __APPLE__
  /*
@@ -448,7 +448,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     if ((language = getenv("LANG")) == NULL)
       language = appleLangDefault();
 
-    DEBUG_printf(("2cupsLangGet: language=\"%s\"", language));
+    DEBUG_printf(("4cupsLangGet: language=\"%s\"", language));
   }
 
 #else
@@ -477,7 +477,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     ptr = setlocale(LC_ALL, NULL);
 #  endif /* LC_MESSAGES */
 
-    DEBUG_printf(("2cupsLangGet: current locale is \"%s\"", ptr));
+    DEBUG_printf(("4cupsLangGet: current locale is \"%s\"", ptr));
 
     if (!ptr || !strcmp(ptr, "C") || !strcmp(ptr, "POSIX"))
     {
@@ -525,7 +525,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       if (!strncmp(locale, "nb", 2))
         locale[1] = 'o';
 
-      DEBUG_printf(("2cupsLangGet: new language value is \"%s\"", language));
+      DEBUG_printf(("4cupsLangGet: new language value is \"%s\"", language));
     }
   }
 #endif /* __APPLE__ */
@@ -562,7 +562,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
     *ptr = '\0';
 
-    DEBUG_printf(("2cupsLangGet: charset set to \"%s\" via "
+    DEBUG_printf(("4cupsLangGet: charset set to \"%s\" via "
                   "nl_langinfo(CODESET)...", charset));
   }
 #endif /* CODESET */
@@ -642,7 +642,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     }
   }
 
-  DEBUG_printf(("2cupsLangGet: langname=\"%s\", country=\"%s\", charset=\"%s\"",
+  DEBUG_printf(("4cupsLangGet: langname=\"%s\", country=\"%s\", charset=\"%s\"",
                 langname, country, charset));
 
  /*
@@ -680,7 +680,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     }
   }
 
-  DEBUG_printf(("2cupsLangGet: encoding=%d(%s)", encoding,
+  DEBUG_printf(("4cupsLangGet: encoding=%d(%s)", encoding,
                 encoding == CUPS_AUTO_ENCODING ? "auto" :
 		    lang_encodings[encoding]));
 
@@ -711,7 +711,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
     pthread_mutex_unlock(&lang_mutex);
 #endif /* HAVE_PTHREAD_H */
 
-    DEBUG_printf(("1cupsLangGet: Using cached copy of \"%s\"...", real));
+    DEBUG_printf(("3cupsLangGet: Using cached copy of \"%s\"...", real));
 
     return (lang);
   }
@@ -731,7 +731,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
       * No generic localization, so use POSIX...
       */
 
-      DEBUG_printf(("2cupsLangGet: access(\"%s\", 0): %s", filename,
+      DEBUG_printf(("4cupsLangGet: access(\"%s\", 0): %s", filename,
                     strerror(errno)));
 
       snprintf(filename, sizeof(filename), "%s/C/cups_C.po", cg->localedir);

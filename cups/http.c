@@ -181,6 +181,25 @@ static const char * const http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
+#ifdef DEBUG
+static const char * const http_states[] =
+			{
+			  "HTTP_WAITING",
+			  "HTTP_OPTIONS",
+			  "HTTP_GET",
+			  "HTTP_GET_SEND",
+			  "HTTP_HEAD",
+			  "HTTP_POST",
+			  "HTTP_POST_RECV",
+			  "HTTP_POST_SEND",
+			  "HTTP_PUT",
+			  "HTTP_PUT_RECV",
+			  "HTTP_DELETE",
+			  "HTTP_TRACE",
+			  "HTTP_CLOSE",
+			  "HTTP_STATUS"
+			};
+#endif /* DEBUG */
 
 
 #if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
@@ -545,7 +564,8 @@ httpFlush(http_t *http)			/* I - Connection to server */
   int	blocking;			/* To block or not to block */
 
 
-  DEBUG_printf(("httpFlush(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("httpFlush(http=%p), state=%s", http,
+                http_states[http->state]));
 
  /*
   * Temporarily set non-blocking mode so we don't get stuck in httpRead()...
@@ -757,7 +777,8 @@ httpGetLength(http_t *http)		/* I - Connection to server */
 off_t					/* O - Content length */
 httpGetLength2(http_t *http)		/* I - Connection to server */
 {
-  DEBUG_printf(("2httpGetLength2(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
+                http_states[http->state]));
 
   if (!http)
     return (-1);
@@ -1936,7 +1957,8 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 		status;			/* Request status */
 
 
-  DEBUG_printf(("httpUpdate(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
+                http_states[http->state]));
 
  /*
   * Flush pending data, if any...
