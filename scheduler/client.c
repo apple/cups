@@ -2896,6 +2896,8 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       cupsdCloseClient(con);
       return;
     }
+    else
+      cupsArrayRemove(ActiveClients, con);
   }
 
   con->http.activity = time(NULL);
