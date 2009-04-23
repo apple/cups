@@ -2923,7 +2923,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
   * See if we have a job printing on this printer...
   */
 
-  if (p->job)
+  if (p->job && p->job->state_value == IPP_JOB_PROCESSING)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
                      "Job stopped due to printer being paused.");
 }
