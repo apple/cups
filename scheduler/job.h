@@ -29,7 +29,7 @@ typedef enum cupsd_jobaction_e		/**** Actions for state changes ****/
  * Job request structure...
  */
 
-typedef struct cupsd_job_s
+struct cupsd_job_s
 {
   int			id,		/* Job ID */
 			priority,	/* Job priority */
@@ -82,7 +82,7 @@ typedef struct cupsd_job_s
   krb5_ccache		ccache;		/* Kerberos credential cache */
   char			*ccname;	/* KRB5CCNAME environment variable */
 #endif /* HAVE_GSSAPI */
-} cupsd_job_t;
+};
 
 
 /*
