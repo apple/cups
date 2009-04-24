@@ -1999,7 +1999,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
     case HTTP_POST_RECV :
         do
 	{
-          if (con->request)
+          if (con->request && con->file < 0)
 	  {
 	   /*
 	    * Grab any request data from the connection...
@@ -2027,7 +2027,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      break;
             }
 	    else
+	    {
+	      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdReadClient: %d %d.%d %s %d",
+			      con->http.fd, con->request->request.op.version[0],
+			      con->request->request.op.version[1],
+			      ippOpString(con->request->request.op.operation_id),
+			      con->request->request.op.request_id);
 	      con->bytes += ippLength(con->request);
+	    }
 	  }
 
           if (con->file < 0 && con->http.state != HTTP_POST_SEND)
