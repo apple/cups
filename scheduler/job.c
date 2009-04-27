@@ -2549,8 +2549,8 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
     default :
     case IPP_JOB_PROCESSING :
     case IPP_JOB_COMPLETED :
-	job_state     = IPP_JOB_COMPLETED;
-	message       = "Job completed.";
+	job_state = IPP_JOB_COMPLETED;
+	message   = "Job completed.";
         break;
 
     case IPP_JOB_STOPPED :
@@ -2684,14 +2684,12 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	    message   = "Job aborted due to backend errors; please consult "
 	                "the error_log file for details.";
 	  }
-	  else
+	  else if (job->state_value == IPP_JOB_PROCESSING)
           {
+            job_state     = IPP_JOB_PENDING;
 	    printer_state = IPP_PRINTER_STOPPED;
 	    message       = "Printer stopped due to backend errors; please "
 			    "consult the error_log file for details.";
-
-            if (job_state == IPP_JOB_COMPLETED)
-	      job_state = IPP_JOB_PENDING;
 	  }
           break;
 
