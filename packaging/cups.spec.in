@@ -234,6 +234,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/templates/*
 %dir /usr/share/doc/cups
 /usr/share/doc/cups/*.*
+%dir /usr/share/doc/cups/de
+/usr/share/doc/cups/de/*
 %dir /usr/share/doc/cups/es
 /usr/share/doc/cups/es/*
 %dir /usr/share/doc/cups/ja
