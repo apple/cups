@@ -415,6 +415,9 @@ fi
 export LD_LIBRARY_PATH
 
 LD_PRELOAD="$root/cups/libcups.so.2:$root/filter/libcupsimage.so.2:$root/cgi-bin/libcupscgi.so.1:$root/scheduler/libcupsmime.so.1:$root/driver/libcupsdriver.so.1:$root/ppdc/libcupsppdc.so.1"
+if test `uname` = SunOS -a -r /usr/lib/libCrun.so.1; then
+	LD_PRELOAD="/usr/lib/libCrun.so.1:$LD_PRELOAD"
+fi
 export LD_PRELOAD
 
 if test "x$DYLD_LIBRARY_PATH" = x; then
