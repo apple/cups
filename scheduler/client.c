@@ -2569,7 +2569,7 @@ cupsdSendHeader(
 		     SystemGroupAuthKey);
           else
 #else
-	  strlcpy(auth_key, ", trc=\"y\"", auth_size));
+	  strlcpy(auth_key, ", trc=\"y\"", auth_size);
 #endif /* HAVE_AUTHORIZATION_H */
 	  break;
 	}
@@ -4086,7 +4086,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     envp[envc++] = home;
     envp[envc]   = NULL;
 
-    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL, 0,
+    if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
                            NULL, &pid))
     {
       unlink(seedfile);
