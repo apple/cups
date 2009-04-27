@@ -1017,10 +1017,11 @@ httpGets(char   *line,			/* I - Line to read into */
  /*
   * Read a line from the buffer...
   */
-    
-  lineptr = line;
-  lineend = line + length - 1;
-  eol     = 0;
+
+  http->error = 0;
+  lineptr     = line;
+  lineend     = line + length - 1;
+  eol         = 0;
 
   while (lineptr < lineend)
   {
@@ -1349,6 +1350,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     return (-1);
 
   http->activity = time(NULL);
+  http->error    = 0;
 
   if (length <= 0)
     return (0);
@@ -2626,7 +2628,7 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
 	*ptr;				/* Pointer into line */
 
 
-  if (_cups_debug_fd < 0)
+  if (_cups_debug_fd < 0 || _cups_debug_level < 6)
     return;
 
   DEBUG_printf(("6%s: %d bytes:\n", prefix, bytes));
@@ -3186,14 +3188,15 @@ http_upgrade(http_t *http)		/* I - Connection to server */
  
 static int				/* O - Number of bytes written */
 http_write(http_t     *http,		/* I - Connection to server */
-          const char *buffer,		/* I - Buffer for data */
-	  int        length)		/* I - Number of bytes to write */
+           const char *buffer,		/* I - Buffer for data */
+	   int        length)		/* I - Number of bytes to write */
 {
   int	tbytes,				/* Total bytes sent */
 	bytes;				/* Bytes sent */
 
 
-  tbytes = 0;
+  http->error = 0;
+  tbytes      = 0;
 
   while (length > 0)
   {
@@ -3251,6 +3254,7 @@ http_write_chunk(http_t     *http,	/* I - Connection to server */
 {
   char	header[255];			/* Chunk header */
   int	bytes;				/* Bytes written */
+
 
   DEBUG_printf(("7http_write_chunk(http=%p, buffer=%p, length=%d)",
                 http, buffer, length));

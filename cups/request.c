@@ -782,7 +782,7 @@ cupsWriteRequestData(
   * Finally, check if we have any pending data from the server...
   */
 
-  if (length > HTTP_MAX_BUFFER ||
+  if (length >= HTTP_MAX_BUFFER ||
       http->wused < wused ||
       (wused > 0 && http->wused == length))
   {

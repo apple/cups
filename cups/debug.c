@@ -38,6 +38,8 @@
 
 int			_cups_debug_fd = -1;
 					/* Debug log file descriptor */
+int			_cups_debug_level = 1;
+					/* Log level (0 to 9) */
 
 
 #ifdef DEBUG
@@ -49,7 +51,6 @@ static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
 static int		debug_init = 0;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
-static int		debug_level = 1;/* Log level (0 to 9) */
 static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
 #  endif /* HAVE_PTHREAD_H */
@@ -435,7 +436,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
       }
 
       if ((cups_debug_level = getenv("CUPS_DEBUG_LEVEL")) != NULL)
-	debug_level = atoi(cups_debug_level);
+	_cups_debug_level = atoi(cups_debug_level);
 
       if ((cups_debug_filter = getenv("CUPS_DEBUG_FILTER")) != NULL)
       {
@@ -469,7 +470,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   else
     level = 0;
 
-  if (level > debug_level)
+  if (level > _cups_debug_level)
     return;
 
   if (debug_filter)
