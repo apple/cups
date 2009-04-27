@@ -9455,6 +9455,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     cupsdRestartJob(job);
+    cupsdCheckJobs();
   }
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Restarted by \"%s\".", username);
