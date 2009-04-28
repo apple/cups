@@ -422,7 +422,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     {
       if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
-      else if (HostNameLookups || RemoteAccessEnabled)
+      else if (HostNameLookups || RemotePort)
         httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));
@@ -435,7 +435,7 @@ cupsdAcceptClient(cupsd_listener_t *lis)/* I - Listener socket */
     {
       if (httpAddrLocalhost(&temp))
         strlcpy(con->servername, "localhost", sizeof(con->servername));
-      else if (HostNameLookups || RemoteAccessEnabled)
+      else if (HostNameLookups || RemotePort)
         httpAddrLookup(&temp, con->servername, sizeof(con->servername));
       else
         httpAddrString(&temp, con->servername, sizeof(con->servername));

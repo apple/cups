@@ -55,7 +55,7 @@ cupsdAddClass(const char *name)		/* I - Name of class */
 
     c->type = CUPS_PRINTER_CLASS;
 
-    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort,
+    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, RemotePort,
                     name);
     cupsdSetString(&c->error_policy, "retry-job");
   }
