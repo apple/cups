@@ -371,13 +371,6 @@ cupsdCreateCommonData(void)
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
-  static const char * const errors[] =	/* printer-error-policy-supported values */
-		{
-		  "abort-job",
-		  "retry-current-job",
-		  "retry-job",
-		  "stop-printer"
-		};
   static const char * const notify_attrs[] =
 		{			/* notify-attributes-supported values */
 		  "printer-state-change-time",
@@ -621,11 +614,6 @@ cupsdCreateCommonData(void)
   /* pdf-override-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "pdl-override-supported", NULL, "not-attempted");
-
-  /* printer-error-policy-supported */
-  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
-                "printer-error-policy-supported",
-		sizeof(errors) / sizeof(errors[0]), NULL, errors);
 
   /* printer-op-policy-supported */
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
