@@ -1111,8 +1111,7 @@ static void
 ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 {
   ppd_choice_t	*manual_feed,		/* ManualFeed choice, if any */
-		*input_slot,		/* InputSlot choice, if any */
-		*page;			/* PageSize/PageRegion */
+		*input_slot;		/* InputSlot choice, if any */
   ppd_size_t	*size;			/* Current media size */
   ppd_attr_t	*rpr;			/* RequiresPageRegion value */
 
@@ -1138,13 +1137,16 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
   if (!rpr)
     rpr = ppdFindAttr(ppd, "RequiresPageRegion", "All");
 
-  if (!strcasecmp(size->name, "Custom") || (!manual_feed && !input_slot) ||
-      !((manual_feed && !strcasecmp(manual_feed->choice, "True")) ||
-        (input_slot && input_slot->code && input_slot->code[0])))
+  if (!strcasecmp(size->name, "Custom") ||
+      (!manual_feed && !input_slot) ||
+      (manual_feed && !strcasecmp(manual_feed->choice, "False")) ||
+      (input_slot && input_slot->code && !input_slot->code[0]) ||
+      (rpr && rpr->value && !strcasecmp(rpr->value, "False")))
   {
    /*
-    * Manual feed was not selected and/or the input slot selection does
-    * not contain any PostScript code.  Use the PageSize option...
+    * Use PageSize for custom sizes, when manual feed is not selected,
+    * when input slot is not selected or the selection has no code, or
+    * when the RequiredPageRegion value is False.
     */
 
     ppdMarkOption(ppd, "PageSize", size->name);
@@ -1152,33 +1154,10 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
   else
   {
    /*
-    * Manual feed was selected and/or the input slot selection contains
-    * PostScript code.  Use the PageRegion option...
+    * Otherwise use PageRegion...
     */
 
     ppdMarkOption(ppd, "PageRegion", size->name);
-
-   /*
-    * RequiresPageRegion does not apply to manual feed so we need to
-    * check that we are not doing manual feed before unmarking PageRegion.
-    */
-
-    if (!(manual_feed && !strcasecmp(manual_feed->choice, "True")) &&
-        ((rpr && rpr->value && !strcmp(rpr->value, "False")) ||
-         (!rpr && !ppd->num_filters)))
-    {
-     /*
-      * Either the PPD file specifies no PageRegion code or the PPD file
-      * not for a CUPS raster driver and thus defaults to no PageRegion
-      * code...  Unmark the PageRegion choice so that we don't output the
-      * code...
-      */
-
-      page = ppdFindMarkedChoice(ppd, "PageRegion");
-
-      if (page)
-        page->marked = 0;
-    }
   }
 }
 
