@@ -171,7 +171,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
-	for file in accept cupsenable cupsdisable cupsreject disable enable reject; do \
+	for file in accept cupsenable cupsdisable cupsreject reject; do \
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
 	done
