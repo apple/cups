@@ -1902,9 +1902,8 @@ cupsdUpdateDNSSDName(void)
 #ifdef HAVE_COREFOUNDATION_H
   SCDynamicStoreRef sc;			/* Context for dynamic store */
   CFDictionaryRef btmm;			/* Back-to-My-Mac domains */
-  CFStringRef	nameRef;		/* Computer name CFString */
+  CFStringRef	nameRef;		/* Host name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
-  CFStringEncoding nameEncoding;	/* Computer name encoding */
 #endif	/* HAVE_COREFOUNDATION_H */
 
 
@@ -1932,14 +1931,13 @@ cupsdUpdateDNSSDName(void)
 
     cupsdClearString(&DNSSDName);
 
-    if ((nameRef = SCDynamicStoreCopyComputerName(sc,
-						  &nameEncoding)) != NULL)
+    if ((nameRef = SCDynamicStoreCopyLocalHostName(sc)) != NULL)
     {
       if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
 			     kCFStringEncodingUTF8))
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
-	                "Dynamic store computer name is \"%s\".", nameBuffer);
+	                "Dynamic store host name is \"%s\".", nameBuffer);
 	cupsdSetString(&DNSSDName, nameBuffer);
       }
 
@@ -1953,7 +1951,7 @@ cupsdUpdateDNSSDName(void)
       */
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "Using ServerName \"%s\" as computer name.", ServerName);
+                      "Using ServerName \"%s\" as host name.", ServerName);
       cupsdSetString(&DNSSDName, ServerName);
     }
 
