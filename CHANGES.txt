@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- Moving jobs in the web interface now shows an error if you only have
+	  one printer or class added (STR #3094)
 	- Since classes have never truly supported the printer-error-policy
 	  stuff added in CUPS 1.2, update the code to reflect the current
 	  reality and support only the retry-current-job policy for now

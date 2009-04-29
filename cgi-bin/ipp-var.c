@@ -288,8 +288,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
   * See who is logged in...
   */
 
-  if ((user = getenv("REMOTE_USER")) == NULL)
-    user = "guest";
+  user = getenv("REMOTE_USER");
 
  /*
   * See if the user has already selected a new destination...
@@ -374,8 +373,14 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                  "requested-attributes", NULL, "printer-uri-supported");
 
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, user);
+    if (user)
+      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		   "requesting-user-name", NULL, user);
+
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
+                  CUPS_PRINTER_LOCAL);
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
+                  CUPS_PRINTER_SCANNER);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -415,7 +420,18 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
     else
       cgiStartHTML(cgiText(_("Move All Jobs")));
 
-    cgiCopyTemplateLang("job-move.tmpl");
+    if (cgiGetSize("JOB_PRINTER_NAME") > 0)
+      cgiCopyTemplateLang("job-move.tmpl");
+    else
+    {
+      if (job_id)
+	cgiSetVariable("MESSAGE", cgiText(_("Unable to move job")));
+      else
+	cgiSetVariable("MESSAGE", cgiText(_("Unable to move jobs")));
+
+      cgiSetVariable("ERROR", cgiText(_("No destinations added.")));
+      cgiCopyTemplateLang("error.tmpl");
+    }
   }
   else
   {
