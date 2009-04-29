@@ -250,7 +250,8 @@ cupsdDeregisterPrinter(
 		  removeit);
 
   if (!Browsing || !p->shared ||
-      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                  CUPS_PRINTER_SCANNER)))
     return;
 
  /*
@@ -680,7 +681,8 @@ cupsdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
                   p->name);
 
   if (!Browsing || !BrowseLocalProtocols ||
-      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+      (p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                  CUPS_PRINTER_SCANNER)))
     return;
 
 #ifdef HAVE_LIBSLP
@@ -888,7 +890,8 @@ cupsdSendBrowseList(void)
     for (count = 0, p = (cupsd_printer_t *)cupsArrayFirst(Printers);
          count < max_count && p != NULL;
 	 p = (cupsd_printer_t *)cupsArrayNext(Printers))
-      if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) &&
+      if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                       CUPS_PRINTER_SCANNER)) &&
           p->shared && p->browse_time < ut)
         count ++;
 
@@ -914,7 +917,8 @@ cupsdSendBrowseList(void)
 
       if (!p)
         break;
-      else if ((p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)) ||
+      else if ((p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                           CUPS_PRINTER_SCANNER)) ||
                !p->shared)
         continue;
       else if (p->browse_time < ut)
@@ -1669,7 +1673,8 @@ cupsdStartBrowsing(void)
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                     CUPS_PRINTER_SCANNER)))
       cupsdRegisterPrinter(p);
 }
 
@@ -1797,7 +1802,8 @@ cupsdStopBrowsing(void)
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
-    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT)))
+    if (!(p->type & (CUPS_PRINTER_REMOTE | CUPS_PRINTER_IMPLICIT |
+                     CUPS_PRINTER_SCANNER)))
       cupsdDeregisterPrinter(p, 1);
 
  /*
