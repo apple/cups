@@ -3,6 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- The ServerName, if specified, was not treated as a valid alias for the
+	  local system (STR #3167)
+	- "make epm" did not work (STR #3166)
 	- "lpstat -h server" showed non-shared printers (STR #3147)
 	- "make check" did not work on Linux (STR #3161)
 

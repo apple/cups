@@ -716,7 +716,14 @@ cupsdReadConfiguration(void)
   * See if the ServerName is an IP address...
   */
 
-  if (!ServerName)
+  if (ServerName)
+  {
+    if (!ServerAlias)
+      ServerAlias = cupsArrayNew(NULL, NULL);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", ServerName);
+  }
+  else
   {
     if (gethostname(temp, sizeof(temp)))
     {
