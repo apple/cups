@@ -83,10 +83,10 @@ static int	cups_local_auth(http_t *http);
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
-                     const char *method,/* I - Request method ("GET", "POST", "PUT") */
-		     const char *resource)
-					/* I - Resource path */
+cupsDoAuthentication(
+    http_t     *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
+    const char *method,			/* I - Request method ("GET", "POST", "PUT") */
+    const char *resource)		/* I - Resource path */
 {
   const char	*password;		/* Password string */
   char		prompt[1024],		/* Prompt for user */
@@ -102,6 +102,12 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
                 http->digest_tries, http->userpass));
   DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
                 httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
+
+  if (!http)
+    http = _cupsConnect();
+
+  if (!http || !method || !resource)
+    return (-1);
 
  /*
   * Clear the current authentication string...
@@ -154,7 +160,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
                                       "Digest", 5) != 0;
     http->userpass[0]   = '\0';
 
-    if ((password = cupsGetPassword(prompt)) == NULL)
+    if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
       return (-1);
 
     if (!password[0])

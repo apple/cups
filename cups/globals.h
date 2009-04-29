@@ -120,7 +120,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   char			user[65],	/* User name */
 			server[256],	/* Server address */
 			servername[256];/* Server hostname */
-  cups_password_cb_t	password_cb;	/* Password callback */
+  cups_password_cb2_t	password_cb;	/* Password callback */
+  void			*password_data;	/* Password user data */
 
   /* util.c */
   http_t		*http;		/* Current server connection */

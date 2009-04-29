@@ -112,7 +112,7 @@ _cupsGlobals(void)
     */
 
     globals->encryption  = (http_encryption_t)-1;
-    globals->password_cb = _cupsGetPassword;
+    globals->password_cb = (cups_password_cb2_t)_cupsGetPassword;
 
     cups_env_init(globals);
   }

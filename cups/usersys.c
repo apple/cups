@@ -23,6 +23,7 @@
  *                             server.
  *   cupsSetEncryption()     - Set the encryption preference.
  *   cupsSetPasswordCB()     - Set the password callback for CUPS.
+ *   cupsSetPasswordCB2()    - Set the advanced password callback for CUPS.
  *   cupsSetServer()         - Set the default server name.
  *   cupsSetUser()           - Set the default user name.
  *   cupsUser()              - Return the current user's name.
@@ -87,7 +88,36 @@ cupsEncryption(void)
 const char *				/* O - Password */
 cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
-  return ((*_cupsGlobals()->password_cb)(prompt));
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  return ((cg->password_cb)(prompt, NULL, NULL, NULL, cg->password_data));
+}
+
+
+/*
+ * 'cupsGetPassword2()' - Get a password from the user using the advanced
+ *                        callback.
+ *
+ * Uses the current password callback function. Returns @code NULL@ if the
+ * user does not provide a password.
+ *
+ * @since CUPS 1.4@
+ */
+
+const char *				/* O - Password */
+cupsGetPassword2(const char *prompt,	/* I - Prompt string */
+		 http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
+		 const char *method,	/* I - Request method ("GET", "POST", "PUT") */
+		 const char *resource)	/* I - Resource path */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  if (!http)
+    http = _cupsConnect();
+
+  return ((cg->password_cb)(prompt, http, method, resource, cg->password_data));
 }
 
 
@@ -140,10 +170,37 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
-  if (cb == (const char *(*)(const char *))0)
-    cg->password_cb = _cupsGetPassword;
+  if (cb == (cups_password_cb_t)0)
+    cg->password_cb = (cups_password_cb2_t)_cupsGetPassword;
+  else
+    cg->password_cb = (cups_password_cb2_t)cb;
+
+  cg->password_data = NULL;
+}
+
+
+/*
+ * 'cupsSetPasswordCB2()' - Set the advanced password callback for CUPS.
+ *
+ * Pass @code NULL@ to restore the default (console) password callback.
+ *
+ * @since CUPS 1.4@
+ */
+
+void
+cupsSetPasswordCB2(
+    cups_password_cb2_t cb,		/* I - Callback function */
+    void                *user_data)	/* I - User data pointer */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+  if (cb == (cups_password_cb2_t)0)
+    cg->password_cb = (cups_password_cb2_t)_cupsGetPassword;
   else
     cg->password_cb = cb;
+
+  cg->password_data = user_data;
 }
 
 

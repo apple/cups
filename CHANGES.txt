@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-04-21
+CHANGES.txt - 2009-04-28
 ------------------------
 
 CHANGES IN CUPS V1.4b3
@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- Revised the password callback support (STR #2953)
+	- ppdEmit*() did not choose between PageSize and PageRegion properly.
 	- Make some fairly substantial changes to the Kerberos support code so
 	  that CUPS can work in multi-realm environments and does not require
 	  delegatable credentials.  Shared printing still requires delegation,
