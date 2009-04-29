@@ -1117,10 +1117,26 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 
 
  /*
-  * This function determines if the user has selected a media source
-  * via the InputSlot or ManualFeed options; if so, it marks the
-  * PageRegion option corresponding to the current media size.
-  * Otherwise it marks the PageSize option.
+  * This function determines what page size code to use, if any, for the
+  * current media size, InputSlot, and ManualFeed selections.
+  *
+  * We use the PageSize code if any of the following are true:
+  *
+  * 1. A custom media size is selected.
+  * 2. ManualFeed and InputSlot are not selected (or do not exist).
+  * 3. ManualFeed is selected but is False and InputSlot is not selected or
+  *    the selection has no code - the latter check done to support "auto" or
+  *    "printer default" InputSlot options.
+  * 4. RequiresPageRegion does not exist and the PPD contains cupsFilter
+  *    keywords, indicating this is a CUPS-based driver.
+  *
+  * We use the PageRegion code only if:
+  *
+  * 5. RequiresPageRegion exists for the selected InputSlot (or "All" for any
+  *    InputSlot or ManualFeed selection) and is True.
+  *
+  * If none of the 5 conditions are true, no page size code is used and we
+  * unmark any existing PageSize or PageRegion choices.
   */
 
   if ((size = ppdPageSize(ppd, NULL)) == NULL)
@@ -1139,25 +1155,51 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 
   if (!strcasecmp(size->name, "Custom") ||
       (!manual_feed && !input_slot) ||
-      (manual_feed && !strcasecmp(manual_feed->choice, "False")) ||
-      (input_slot && input_slot->code && !input_slot->code[0]) ||
-      (rpr && rpr->value && !strcasecmp(rpr->value, "False")))
+      (manual_feed && !strcasecmp(manual_feed->choice, "False") &&
+       (!input_slot || (input_slot->code && !input_slot->code[0]))) ||
+      (!rpr && ppd->num_filters > 0))
   {
    /*
-    * Use PageSize for custom sizes, when manual feed is not selected,
-    * when input slot is not selected or the selection has no code, or
-    * when the RequiredPageRegion value is False.
+    * Use PageSize code...
     */
 
     ppdMarkOption(ppd, "PageSize", size->name);
   }
-  else
+  else if (rpr && rpr->value && !strcasecmp(rpr->value, "True"))
   {
    /*
-    * Otherwise use PageRegion...
+    * Use PageRegion code...
     */
 
     ppdMarkOption(ppd, "PageRegion", size->name);
+  }
+  else
+  {
+   /*
+    * Do not use PageSize or PageRegion code...
+    */
+
+    ppd_choice_t	*page;		/* PageSize/Region choice, if any */
+
+    if ((page = ppdFindMarkedChoice(ppd, "PageSize")) != NULL)
+    {
+     /*
+      * Unmark PageSize...
+      */
+
+      page->marked = 0;
+      cupsArrayRemove(ppd->marked, page);
+    }
+
+    if ((page = ppdFindMarkedChoice(ppd, "PageRegion")) != NULL)
+    {
+     /*
+      * Unmark PageRegion...
+      */
+
+      page->marked = 0;
+      cupsArrayRemove(ppd->marked, page);
+    }
   }
 }
 
