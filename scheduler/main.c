@@ -1718,7 +1718,8 @@ process_children(void)
 	  else
 	    job->status = -status;	/* Backend failed */
 
-	  if (job->status_level > CUPSD_LOG_ERROR)
+	  if (job->state_value == IPP_JOB_PROCESSING &&
+	      job->status_level > CUPSD_LOG_ERROR)
 	  {
 	    char	message[1024];	/* New printer-state-message */
 
