@@ -209,7 +209,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 
         DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p...\n", temp));
       }
-      else
+      else if (current->parent)
       {
         DEBUG_printf(("mimeAddTypeRule: Setting group %p op to AND...\n",
 	              current->parent));
