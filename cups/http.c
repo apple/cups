@@ -1889,18 +1889,38 @@ httpSetField(http_t       *http,	/* I - Connection to server */
   else if (field == HTTP_FIELD_HOST)
   {
    /*
-    * Special-case for Host: as we don't want a trailing "." on the hostname.
+    * Special-case for Host: as we don't want a trailing "." on the hostname and
+    * need to bracket IPv6 numeric addresses.
     */
 
-    char *ptr = http->fields[HTTP_FIELD_HOST];
+    if (strchr(value, ':'))
+    {
+     /*
+      * Bracket IPv6 numeric addresses...
+      *
+      * This is slightly inefficient (basically copying twice), but is an edge
+      * case and not worth optimizing...
+      */
+
+      snprintf(http->fields[HTTP_FIELD_HOST],
+               sizeof(http->fields[HTTP_FIELD_HOST]), "[%s]", value);
+    }
+    else
+    {
+     /*
+      * Check for a trailing dot on the hostname...
+      */
+
+      char *ptr = http->fields[HTTP_FIELD_HOST];
 					/* Pointer into Host: field */
 
-    if (*ptr)
-    {
-      ptr += strlen(ptr) - 1;
+      if (*ptr)
+      {
+	ptr += strlen(ptr) - 1;
 
-      if (*ptr == '.')
-        *ptr = '\0';
+	if (*ptr == '.')
+	  *ptr = '\0';
+      }
     }
   }
 }

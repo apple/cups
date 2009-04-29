@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- httpSetField wasn't bracketing IPv6 numeric addresses for the Host:
+	  field (STR #3164)
 	- The ServerName, if specified, was not treated as a valid alias for the
 	  local system (STR #3167)
 	- "make epm" did not work (STR #3166)
