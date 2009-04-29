@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- The scheduler and cupsfilter utility did not handle rules starting
+	  with a negation operator properly (STR #3160)
 	- The scheduler and cupsfilter utility would crash with certain MIME
 	  .types rules (STR #3159)
 	- httpSetField wasn't bracketing IPv6 numeric addresses for the Host:
