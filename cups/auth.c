@@ -132,7 +132,10 @@ cupsDoAuthentication(
       return (0);
     }
     else if (localauth == -1)
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);			/* Error or canceled */
+    }
   }
 
  /*
@@ -161,10 +164,16 @@ cupsDoAuthentication(
     http->userpass[0]   = '\0';
 
     if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);
+    }
 
     if (!password[0])
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);
+    }
 
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
@@ -207,6 +216,8 @@ cupsDoAuthentication(
     {
       DEBUG_puts("1cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
                  "is not present");
+      http->status = HTTP_AUTHORIZATION_CANCELED;
+
       return (-1);
     }
 #  endif /* __APPLE__ */
@@ -215,6 +226,7 @@ cupsDoAuthentication(
     {
       DEBUG_printf(("1cupsDoAuthentication: too many Negotiate tries (%d)",
                     http->digest_tries));
+      http->status = HTTP_AUTHORIZATION_CANCELED;
   
       return (-1);
     }
@@ -301,6 +313,8 @@ cupsDoAuthentication(
       cups_gss_printf(major_status, minor_status,
 		      "cupsDoAuthentication: Unable to initialize security "
 		      "context");
+      http->status = HTTP_AUTHORIZATION_CANCELED;
+
       return (-1);
     }
 
@@ -337,7 +351,7 @@ cupsDoAuthentication(
     {
       DEBUG_printf(("1cupsDoAuthentication: Kerberos credentials too large - "
                     "%d bytes!", (int)output_token.length));
-
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       gss_release_buffer(&minor_status, &output_token);
 
       return (-1);
