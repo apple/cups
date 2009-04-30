@@ -601,6 +601,37 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 #  endif /* HAVE_AUTHORIZATION_H */
 
+#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
+ /*
+  * See if we can authenticate using the peer credentials provided over a
+  * domain socket; if so, specify "PeerCred username" as the authentication
+  * information...
+  */
+
+  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
+  {
+   /*
+    * Verify that the current cupsUser() matches the current UID...
+    */
+
+    struct passwd	*pwd;		/* Password information */
+    const char		*username;	/* Current username */
+
+    username = cupsUser();
+
+    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
+    {
+      httpSetAuthString(http, "PeerCred", username);
+
+      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
+		    http->authstring));
+
+      return (0);
+    }
+  }
+#  endif /* SO_PEERCRED && AF_LOCAL */
+
  /*
   * Try opening a certificate file for this PID.  If that fails,
   * try the root certificate...
@@ -662,37 +693,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     return (0);
   }
-
-#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
- /*
-  * See if we can authenticate using the peer credentials provided over a
-  * domain socket; if so, specify "PeerCred username" as the authentication
-  * information...
-  */
-
-  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
-      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
-  {
-   /*
-    * Verify that the current cupsUser() matches the current UID...
-    */
-
-    struct passwd	*pwd;		/* Password information */
-    const char		*username;	/* Current username */
-
-    username = cupsUser();
-
-    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
-    {
-      httpSetAuthString(http, "PeerCred", username);
-
-      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
-		    http->authstring));
-
-      return (0);
-    }
-  }
-#  endif /* SO_PEERCRED && AF_LOCAL */
 
   return (1);
 #endif /* WIN32 || __EMX__ */
