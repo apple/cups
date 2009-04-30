@@ -434,6 +434,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       if (!cupsDoAuthentication(http, "POST", resource))
 	httpReconnect(http);
+      else
+        status = HTTP_AUTHORIZATION_CANCELED;
     }
 
 #ifdef HAVE_SSL
@@ -681,11 +683,15 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       case HTTP_UNAUTHORIZED :
           if (!cupsDoAuthentication(http, "POST", resource))
+	  {
 	    if (httpReconnect(http))
 	    {
 	      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
 	      return (HTTP_SERVICE_UNAVAILABLE);
 	    }
+	  }
+	  else
+	    status = HTTP_AUTHORIZATION_CANCELED;
 
           return (status);
 
@@ -863,6 +869,7 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
 
     case HTTP_UNAUTHORIZED :
+    case HTTP_AUTHORIZATION_CANCELED :
 	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
 	break;
 

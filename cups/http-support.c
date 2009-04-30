@@ -1210,6 +1210,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         s = _("Bad Request");
 	break;
     case HTTP_UNAUTHORIZED :
+    case HTTP_AUTHORIZATION_CANCELED :
         s = _("Unauthorized");
 	break;
     case HTTP_FORBIDDEN :

@@ -123,7 +123,10 @@ cupsGetFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
       */
 
       if (cupsDoAuthentication(http, "GET", resource))
+      {
+        status = HTTP_AUTHORIZATION_CANCELED;
         break;
+      }
 
       if (httpReconnect(http))
       {
@@ -390,7 +393,10 @@ cupsPutFd(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DEFA
       */
 
       if (cupsDoAuthentication(http, "PUT", resource))
+      {
+        status = HTTP_AUTHORIZATION_CANCELED;
         break;
+      }
 
       if (httpReconnect(http))
       {

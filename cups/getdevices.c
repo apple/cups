@@ -134,7 +134,10 @@ cupsGetDevices(
 	if (!cupsDoAuthentication(http, "POST", "/"))
 	  httpReconnect(http);
 	else
+	{
+	  status = HTTP_AUTHORIZATION_CANCELED;
 	  break;
+	}
       }
 
 #ifdef HAVE_SSL

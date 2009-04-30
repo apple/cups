@@ -248,7 +248,10 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_BAD_GATEWAY,			/* Bad gateway */
   HTTP_SERVICE_UNAVAILABLE,		/* Service is unavailable */
   HTTP_GATEWAY_TIMEOUT,			/* Gateway connection timed out */
-  HTTP_NOT_SUPPORTED			/* HTTP version not supported */
+  HTTP_NOT_SUPPORTED,			/* HTTP version not supported */
+
+  HTTP_AUTHORIZATION_CANCELED = 1000	/* User cancelled authorization */
+
 } http_status_t;
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS1.2@ ****/
