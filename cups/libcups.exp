@@ -154,6 +154,7 @@ _cupsGetJobs2
 _cupsGetNamedDest
 _cupsGetOption
 _cupsGetPassword
+_cupsGetPassword2
 _cupsGetPPD
 _cupsGetPPD2
 _cupsGetPPD3
@@ -188,6 +189,7 @@ _cupsSetDests
 _cupsSetDests2
 _cupsSetEncryption
 _cupsSetPasswordCB
+_cupsSetPasswordCB2
 _cupsSetServer
 _cupsSetUser
 _cupsSideChannelDoRequest
