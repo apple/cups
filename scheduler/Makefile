@@ -152,7 +152,7 @@ install-data:
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
 	fi
 	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 511 -u $(CUPS_USER) -g $(CUPS_PRIMARY_SYSTEM_GROUP) \
+	$(INSTALL_DIR) -m 511 -o $(CUPS_USER) -g $(CUPS_PRIMARY_SYSTEM_GROUP) \
 		$(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
