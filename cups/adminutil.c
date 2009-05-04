@@ -949,6 +949,8 @@ _cupsAdminGetServerSettings(
 	return (0);
       }
     }
+
+    http = cg->http;
   }
 
   if (!http || !num_settings || !settings)
