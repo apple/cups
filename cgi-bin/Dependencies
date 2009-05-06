@@ -42,6 +42,9 @@ jobs.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 jobs.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 jobs.o: ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h
 jobs.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+makedocset.o: cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
+makedocset.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
+makedocset.o: ../cups/file.h ../cups/language.h ../cups/array.h help-index.h
 printers.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 printers.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 printers.o: ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h

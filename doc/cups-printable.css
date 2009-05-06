@@ -19,6 +19,10 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.compact {
+  margin: 0;
+}
+
 P.example {
   font-style: italic;
   margin-left: 36pt;

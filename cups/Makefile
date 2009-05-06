@@ -548,34 +548,52 @@ apihelp:
 	mxmldoc --section "Programming" --title "Array API" \
 		--css ../doc/cups-printable.css \
 		--header api-array.header --intro api-array.shtml \
+		api-array.xml \
 		array.h array.c >../doc/help/api-array.html
+	mxmldoc --tokens help/api-array.html api-array.xml >../doc/help/api-array.tokens
+	$(RM) api-array.xml
 	mxmldoc --section "Programming" --title "CUPS API" \
 		--css ../doc/cups-printable.css \
 		--header api-cups.header --intro api-cups.shtml \
+		api-cups.xml \
 		cups.h adminutil.c dest.c language.c notify.c \
 		options.c tempfile.c usersys.c \
 		util.c >../doc/help/api-cups.html
+	mxmldoc --tokens help/api-cups.html api-cups.xml >../doc/help/api-cups.tokens
+	$(RM) api-cups.xml
 	mxmldoc --section "Programming" --title "File and Directory APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-filedir.header --intro api-filedir.shtml \
+		api-filedir.xml \
 		file.h file.c dir.h dir.c >../doc/help/api-filedir.html
+	mxmldoc --tokens api-filedir.xml >../doc/help/api-filedir.tokens
+	$(RM) api-filedir.xml
 	mxmldoc --section "Programming" --title "PPD API" \
 		--css ../doc/cups-printable.css \
 		--header api-ppd.header --intro api-ppd.shtml \
+		api-ppd.xml \
 		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c page.c \
 		ppd.c >../doc/help/api-ppd.html
+	mxmldoc --tokens help/api-ppd.html api-ppd.xml >../doc/help/api-ppd.tokens
+	$(RM) api-ppd.xml
 	mxmldoc --section "Programming" --title "HTTP and IPP APIs" \
 		--css ../doc/cups-printable.css \
 		--header api-httpipp.header --intro api-httpipp.shtml \
+		api-httpipp.xml \
 		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
 		http.c http-addr.c http-support.c ipp.c ipp-support.c \
 		md5passwd.c request.c >../doc/help/api-httpipp.html
+	mxmldoc --tokens help/api-httpipp.html api-httpipp.xml >../doc/help/api-httpipp.tokens
+	$(RM) api-httpipp.xml
 	mxmldoc --section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
 		--header api-filter.header --intro api-filter.shtml \
+		api-filter.xml \
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h \
 		>../doc/help/api-filter.html
+	mxmldoc --tokens help/api-filter.html api-filter.xml >../doc/help/api-filter.tokens
+	$(RM) api-filter.xml
 
 framedhelp:
 	echo Generating CUPS API help files...
@@ -618,42 +636,6 @@ framedhelp:
 		--section "Programming" \
 		--title "Filter and Backend Programming" \
 		--css ../doc/cups-printable.css \
-		--header api-filter.header --intro api-filter.shtml \
-		backchannel.c backend.h backend.c sidechannel.c sidechannel.h
-
-
-docsets:
-	echo Generating CUPS API documentation sets...
-	../tools/makedocset --docset org.cups.overview.docset \
-		--title "Introduction to CUPS Programming" \
-		--header api-overview.header --intro api-overview.shtml
-	../tools/makedocset --docset org.cups.array.docset \
-		--title "Array API" \
-		--header api-array.header --intro api-array.shtml \
-		array.h array.c
-	../tools/makedocset --docset org.cups.cups.docset \
-		--title "CUPS API" \
-		--header api-cups.header --intro api-cups.shtml \
-		cups.h adminutil.c dest.c language.c notify.c \
-		options.c tempfile.c usersys.c \
-		util.c
-	../tools/makedocset --docset org.cups.filedir.docset \
-		--title "File and Directory APIs" \
-		--header api-filedir.header --intro api-filedir.shtml \
-		file.h file.c dir.h dir.c
-	../tools/makedocset --docset org.cups.ppd.docset \
-		--title "PPD API" \
-		--header api-ppd.header --intro api-ppd.shtml \
-		ppd.h attr.c conflicts.c custom.c emit.c localize.c mark.c \
-		page.c ppd.c
-	../tools/makedocset --docset org.cups.httpipp.docset \
-		--title "HTTP and IPP APIs" \
-		--header api-httpipp.header --intro api-httpipp.shtml \
-		http.h ipp.h auth.c getdevices.c getputfile.c encode.c \
-		http.c http-addr.c http-support.c ipp.c ipp-support.c \
-		md5passwd.c request.c
-	../tools/makedocset --docset org.cups.filter.docset \
-		--title "Filter and Backend Programming" \
 		--header api-filter.header --intro api-filter.shtml \
 		backchannel.c backend.h backend.c sidechannel.c sidechannel.h
 

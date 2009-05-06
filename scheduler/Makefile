@@ -277,6 +277,8 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-mime.header --intro api-mime.shtml \
 		mime.h $(LIBOBJS:.o=.c) >../doc/help/api-mime.html
+	mxmldoc --tokens help/api-mime.html api-mime.xml >../doc/help/api-mime.tokens
+	$(RM) api-mime.xml
 
 framedhelp:
 	mxmldoc --framed api-mime \

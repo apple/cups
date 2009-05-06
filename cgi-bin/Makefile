@@ -28,6 +28,7 @@ OBJS	=	\
 		classes.o \
 		help.o \
 		jobs.o \
+		makedocset.o \
 		printers.o \
 		testcgi.o \
 		testhi.o \
@@ -80,7 +81,7 @@ unittests:	$(UNITTARGETS)
 #
 
 clean:
-	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS)
+	$(RM) $(OBJS) $(TARGETS) $(UNITTARGETS) makedocset
 	$(RM) libcupscgi.so libcupscgi.sl libcupscgi.dylib
 
 
@@ -194,6 +195,8 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-cgi.header --intro api-cgi.shtml \
 		cgi.h help-index.h $(LIBOBJS:.o=.c) >../doc/help/api-cgi.html
+	mxmldoc --tokens help/api-cgi.html api-cgi.xml >../doc/help/api-cgi.tokens
+	$(RM) api-cgi.xml
 
 framedhelp:
 	mxmldoc --framed api-cgi \
@@ -297,6 +300,17 @@ help.cgi:	help.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ jobs.o -lcupscgi $(LIBS)
+
+
+#
+# makedocset
+#
+
+makedocset:	makedocset.o ../Makedefs libcupscgi.a ../cups/libcups.a
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ makedocset.o libcupscgi.a \
+		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		$(LIBZ) $(LIBGSSAPI)
 
 
 #
