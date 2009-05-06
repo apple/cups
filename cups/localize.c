@@ -52,7 +52,7 @@
  * Local functions...
  */
 
-static void		ppd_ll_CC(char *ll_CC, int ll_CC_size);
+static cups_lang_t	*ppd_ll_CC(char *ll_CC, int ll_CC_size);
 
 
 /*
@@ -258,6 +258,7 @@ ppdLocalizeIPPReason(
     char       *buffer,			/* I - Value buffer */
     size_t     bufsize)			/* I - Size of value buffer */
 {
+  cups_lang_t	*lang;			/* Current language */
   ppd_attr_t	*locattr;		/* Localized attribute */
   char		ll_CC[6],		/* Language + country locale */
 		*bufptr,		/* Pointer into buffer */
@@ -282,7 +283,7 @@ ppdLocalizeIPPReason(
   * Get the default language...
   */
 
-  ppd_ll_CC(ll_CC, sizeof(ll_CC));
+  lang = ppd_ll_CC(ll_CC, sizeof(ll_CC));
 
  /*
   * Find the localized attribute...
@@ -293,7 +294,77 @@ ppdLocalizeIPPReason(
     locattr = ppdFindAttr(ppd, "cupsIPPReason", reason);
 
   if (!locattr)
+  {
+    if (lang && (!scheme || !strcmp(scheme, "text")))
+    {
+     /*
+      * Try to localize a standard printer-state-reason keyword...
+      */
+
+      const char *message = NULL;	/* Localized message */
+
+
+      if (!strncmp(reason, "media-needed", 12))
+        message = _("Media tray needs to be filled.");
+      else if (!strncmp(reason, "media-jam", 9))
+        message = _("Media jam!");
+      else if (!strncmp(reason, "moving-to-paused", 16) ||
+	       !strncmp(reason, "offline", 7) ||
+	       !strncmp(reason, "paused", 6) ||
+	       !strncmp(reason, "shutdown", 8))
+        message = _("Printer offline.");
+      else if (!strncmp(reason, "toner-low", 9))
+        message = _("Toner low.");
+      else if (!strncmp(reason, "toner-empty", 11))
+        message = _("Out of toner!");
+      else if (!strncmp(reason, "cover-open", 10))
+        message = _("Cover open.");
+      else if (!strncmp(reason, "interlock-open", 14))
+        message = _("Interlock open.");
+      else if (!strncmp(reason, "door-open", 9))
+        message = _("Door open.");
+      else if (!strncmp(reason, "input-tray-missing", 18))
+        message = _("Media tray missing!");
+      else if (!strncmp(reason, "media-low", 9))
+        message = _("Media tray almost empty.");
+      else if (!strncmp(reason, "media-empty", 11))
+        message = _("Media tray empty!");
+      else if (!strncmp(reason, "output-tray-missing", 19))
+        message = _("Output tray missing!");
+      else if (!strncmp(reason, "output-area-almost-full", 23))
+        message = _("Output bin almost full.");
+      else if (!strncmp(reason, "output-area-full", 16))
+        message = _("Output bin full!");
+      else if (!strncmp(reason, "marker-supply-low", 17))
+        message = _("Ink/toner almost empty.");
+      else if (!strncmp(reason, "marker-supply-empty", 19))
+        message = _("Ink/toner empty!");
+      else if (!strncmp(reason, "marker-waste-almost-full", 24))
+        message = _("Ink/toner waste bin almost full.");
+      else if (!strncmp(reason, "marker-waste-full", 17))
+        message = _("Ink/toner waste bin full!");
+      else if (!strncmp(reason, "fuser-over-temp", 15))
+        message = _("Fuser temperature high!");
+      else if (!strncmp(reason, "fuser-under-temp", 16))
+        message = _("Fuser temperature low!");
+      else if (!strncmp(reason, "opc-near-eol", 12))
+        message = _("OPC almost at end-of-life.");
+      else if (!strncmp(reason, "opc-life-over", 13))
+        message = _("OPC at end-of-life!");
+      else if (!strncmp(reason, "developer-low", 13))
+        message = _("Developer almost empty.");
+      else if (!strncmp(reason, "developer-empty", 15))
+        message = _("Developer empty!");
+
+      if (message)
+      {
+        strlcpy(buffer, _cupsLangString(lang, message), bufsize);
+	return (buffer);
+      }
+    }
+
     return (NULL);
+  }
 
  /*
   * Now find the value we need...
@@ -659,7 +730,7 @@ _ppdLocalizedAttr(ppd_file_t *ppd,	/* I - PPD file */
  * 'ppd_ll_CC()' - Get the current locale names.
  */
 
-static void
+static cups_lang_t *			/* O - Current language */
 ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
           int  ll_CC_size)		/* I - Size of country-specific name */
 {
@@ -673,7 +744,7 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
   if ((lang = cupsLangDefault()) == NULL)
   {
     strlcpy(ll_CC, "en_US", ll_CC_size);
-    return;
+    return (NULL);
   }
 
  /*
@@ -703,6 +774,7 @@ ppd_ll_CC(char *ll_CC,			/* O - Country-specific locale name */
 
   DEBUG_printf(("8ppd_ll_CC: lang->language=\"%s\", ll_CC=\"%s\"...",
                 lang->language, ll_CC));
+  return (lang);
 }
 
 
