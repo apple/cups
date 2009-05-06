@@ -1367,6 +1367,13 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     send_http_error(con, status, printer);
     return (NULL);
   }
+  else if (printer->num_auth_info_required == 1 &&
+           !strcmp(printer->auth_info_required[0], "negotiate") &&
+           !con->username[0])
+  {
+    send_http_error(con, HTTP_UNAUTHORIZED, printer);
+    return (NULL);
+  }
 #ifdef HAVE_SSL
   else if (auth_info && !con->http.tls &&
            !httpAddrLocalhost(con->http.hostaddr))
