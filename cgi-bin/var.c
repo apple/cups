@@ -806,6 +806,18 @@ cgi_initialize_post(void)
       else
         nbytes = 0;
     }
+    else if (nbytes == 0)
+    {
+     /*
+      * CUPS STR #3176: OpenBSD: Early end-of-file on POST data causes 100% CPU
+      *
+      * This should never happen, but does on OpenBSD.  If we see early end-of-
+      * file, treat this as an error and process no data.
+      */
+
+      free(data);
+      return (0);
+    }
 
   data[length] = '\0';
 
