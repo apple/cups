@@ -211,17 +211,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
         for (k = option->num_choices, choice = option->choices; k > 0; k --, choice ++)
         {
 	  if (!strcmp(choice->choice, "Custom"))
-	  {
-	    // Map Custom option to CustomFoo True/Bla: "code"
-	    char customname[255];	// Custom option keyword
-
-	    snprintf(customname, sizeof(customname), "Custom%s",
-		     option->keyword);
-
-	    driver->add_attr(new ppdcAttr(customname, "True", NULL,
-	                                  choice->code));
-            continue;
-	  }
+	    continue;
 
           cchoice = new ppdcChoice(choice->choice, choice->text, choice->code);
           coption->add_choice(cchoice);

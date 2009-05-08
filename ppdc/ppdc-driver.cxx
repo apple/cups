@@ -190,7 +190,7 @@ ppdcDriver::find_attr(const char *k,	// I - Keyword string
   for (a = (ppdcAttr *)attrs->first(); a; a = (ppdcAttr *)attrs->next())
     if (!strcmp(a->name->value, k) &&
         ((!s && (!a->selector->value || !a->selector->value[0])) ||
-	 (!s && !a->selector->value && !strcmp(a->selector->value, s))))
+	 (s && a->selector->value && !strcmp(a->selector->value, s))))
       return (a);
 
   return (NULL);
