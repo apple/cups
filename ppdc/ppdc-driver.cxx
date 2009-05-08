@@ -412,10 +412,11 @@ ppdcDriver::write_ppd_file(
 
   // Write the standard header stuff...
   cupsFilePrintf(fp, "*PPD-Adobe: \"4.3\"%s", lf);
-  cupsFilePrintf(fp, "*%% PPD file for %s with CUPS.%s", model_name->value, lf);
+  cupsFilePrintf(fp, "*%%%%%%%% PPD file for %s with CUPS.%s",
+                 model_name->value, lf);
   cupsFilePrintf(fp,
-                 "*%% Created by the CUPS PPD Compiler " CUPS_SVERSION ".%s",
-		 lf);
+                 "*%%%%%%%% Created by the CUPS PPD Compiler " CUPS_SVERSION
+		 ".%s", lf);
   for (s = (ppdcString *)copyright->first();
        s;
        s = (ppdcString *)copyright->next())
@@ -930,9 +931,6 @@ ppdcDriver::write_ppd_file(
     else
       cupsFilePrintf(fp, "*ParamCustomPageSize Orientation: 5 int 0 0%s", lf);
   }
-
-  if (type != PPDC_DRIVER_PS && !find_attr("RequiresPageRegion", NULL))
-    cupsFilePrintf(fp, "*RequiresPageRegion All: True%s", lf);
 
   // All other options...
   for (g = (ppdcGroup *)groups->first(); g; g = (ppdcGroup *)groups->next())
