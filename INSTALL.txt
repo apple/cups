@@ -186,8 +186,9 @@ GETTING DEBUG LOGGING FROM CUPS
 	                   which messages are logged.
 	CUPS_DEBUG_LEVEL   Specifies a number from 0 to 9 to control the
 	                   verbosity of the logging. The default level is 1.
-        CUPS_DEBUG_LOG     Specifies a log file to append to; use the name "-"
-	                   to send the messages to stderr.
+        CUPS_DEBUG_LOG     Specifies a log file to use.  Specify the name "-"
+	                   to send the messages to stderr.  Prefix a filename
+			   with "+" to append to an existing file.
 
 
 REPORTING PROBLEMS

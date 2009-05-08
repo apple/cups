@@ -279,10 +279,11 @@ static void soft_reset();
 static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 
 #if defined(__i386__) || defined(__x86_64__)
-static pid_t	child_pid;					/* Child PID */
+static pid_t	child_pid;		/* Child PID */
 static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
-static void sigterm_handler(int sig);				/* SIGTERM handler */
 #endif /* __i386__ || __x86_64__ */
+static int	job_canceled = 0;	/* Was the job canceled? */
+static void sigterm_handler(int sig);	/* SIGTERM handler */
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -448,9 +449,9 @@ print_device(const char *uri,		/* I - Device URI */
   fputs("STATE: -connecting-to-device\n", stderr);
 
   /*
-   * Now that we are "connected" to the port, ignore SIGTERM so that we
+   * Now that we are "connected" to the port, catch SIGTERM so that we
    * can finish out any page data the driver sends (e.g. to eject the
-   * current page...  Only ignore SIGTERM if we are printing data from
+   * current page...  Only catch SIGTERM if we are printing data from
    * stdin (otherwise you can't cancel raw jobs...)
    */
 
@@ -462,7 +463,7 @@ print_device(const char *uri,		/* I - Device URI */
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_IGN;
+    action.sa_handler = sigterm_handler;
     sigaction(SIGTERM, &action, NULL);
   }
 
@@ -582,13 +583,13 @@ print_device(const char *uri,		/* I - Device URI */
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
 	        "written, aborting!\n", stderr);
-          return (0);
+          return (CUPS_BACKEND_OK);
 	}
 	else if (errno != EAGAIN)
 	{
 	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
 	  perror("DEBUG: select");
-	  return (CUPS_BACKEND_STOP);
+	  return (CUPS_BACKEND_FAILED);
 	}
       }
 
@@ -621,7 +622,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  {
 	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
 	    perror("DEBUG: read");
-	    return CUPS_BACKEND_STOP;
+	    return (CUPS_BACKEND_FAILED);
 	  }
 
 	  g.print_bytes = 0;
@@ -667,7 +668,7 @@ print_device(const char *uri,		/* I - Device URI */
 	          (long)status);
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %ld\n",
 	          (long)err);
-	  status = CUPS_BACKEND_STOP;
+	  status = job_canceled ? CUPS_BACKEND_FAILED : CUPS_BACKEND_STOP;
 	  break;
 	}
 
@@ -1910,22 +1911,46 @@ static void run_legacy_backend(int argc,
 
   exit(exitstatus);
 }
+#endif /* __i386__ || __x86_64__ */
+
 
 /*
  * 'sigterm_handler()' - SIGTERM handler.
  */
 
-static void sigterm_handler(int sig)
+static void
+sigterm_handler(int sig)		/* I - Signal */
 {
-  /* If we started a child process pass the signal on to it...
-   */
+#if defined(__i386__) || defined(__x86_64__)
   if (child_pid)
+  {
+   /*
+    * If we started a child process pass the signal on to it...
+    */
+
+    int	status;
+
     kill(child_pid, sig);
+    while (waitpid(child_pid, &status, 0) < 0 && errno == EINTR);
 
-  exit(1);
-}
-
+    if (WIFEXITED(status))
+      exit(WEXITSTATUS(status));
+    else if (status == SIGTERM || status == SIGKILL)
+      exit(0);
+    else
+    {
+      fprintf(stderr, "DEBUG: Child crashed on signal %d!\n", status);
+      exit(CUPS_BACKEND_STOP);
+    }
+  }
 #endif /* __i386__ || __x86_64__ */
+
+ /*
+  * Otherwise just flag that the job has been canceled...
+  */
+
+  job_canceled = 1;
+}
 
 
 #ifdef PARSE_PS_ERRORS

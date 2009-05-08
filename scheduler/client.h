@@ -85,8 +85,10 @@ typedef struct
 
 VAR int			ListenBackLog	VALUE(SOMAXCONN),
 					/* Max backlog of pending connections */
-			LocalPort	VALUE(631);
+			LocalPort	VALUE(631),
 					/* Local port to use */
+			RemotePort	VALUE(0);
+					/* Remote port to use */
 VAR http_encryption_t	LocalEncryption	VALUE(HTTP_ENCRYPT_IF_REQUESTED);
 					/* Local port encryption to use */
 VAR cups_array_t	*Listeners	VALUE(NULL);

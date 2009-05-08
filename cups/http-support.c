@@ -1210,6 +1210,7 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
         s = _("Bad Request");
 	break;
     case HTTP_UNAUTHORIZED :
+    case HTTP_AUTHORIZATION_CANCELED :
         s = _("Unauthorized");
 	break;
     case HTTP_FORBIDDEN :
@@ -1460,9 +1461,9 @@ _httpResolveURI(
     if (logit)
     {
       if (uri)
-        fputs("DEBUG: Unable to resolve URI!\n", stderr);
-      else
         fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
+      else
+        fputs("DEBUG: Unable to resolve URI!\n", stderr);
 
       fputs("STATE: -connecting-to-device\n", stderr);
     }
@@ -1637,7 +1638,7 @@ resolve_callback(
   * Figure out the scheme from the full name...
   */
 
-  if (strstr(fullName, "._ipp"))
+  if (strstr(fullName, "._ipp") || strstr(fullName, "._fax-ipp"))
     scheme = "ipp";
   else if (strstr(fullName, "._printer."))
     scheme = "lpd";

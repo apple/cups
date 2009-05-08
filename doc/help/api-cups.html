@@ -27,6 +27,10 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.compact {
+  margin: 0;
+}
+
 P.example {
   font-style: italic;
   margin-left: 36pt;
@@ -409,6 +413,8 @@ div.contents ul.subcontents li {
 <li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
 server if it has changed.">cupsGetPPD3</a></li>
 <li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
+<li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
+callback.">cupsGetPassword2</a></li>
 <li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
 <li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
 <li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
@@ -437,6 +443,7 @@ specified server.">cupsPrintFiles2</a></li>
 <li><a href="#cupsSetDests2" title="Save the list of destinations for the specified server.">cupsSetDests2</a></li>
 <li><a href="#cupsSetEncryption" title="Set the encryption preference.">cupsSetEncryption</a></li>
 <li><a href="#cupsSetPasswordCB" title="Set the password callback for CUPS.">cupsSetPasswordCB</a></li>
+<li><a href="#cupsSetPasswordCB2" title="Set the advanced password callback for CUPS.">cupsSetPasswordCB2</a></li>
 <li><a href="#cupsSetServer" title="Set the default server name.">cupsSetServer</a></li>
 <li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
 <li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
@@ -450,6 +457,7 @@ specified server.">cupsPrintFiles2</a></li>
 	<li><a href="#cups_device_cb_t" title="Device callback ">cups_device_cb_t</a></li>
 	<li><a href="#cups_job_t" title="Job">cups_job_t</a></li>
 	<li><a href="#cups_option_t" title="Printer Options">cups_option_t</a></li>
+	<li><a href="#cups_password_cb2_t" title="New password callback ">cups_password_cb2_t</a></li>
 	<li><a href="#cups_password_cb_t" title="Password callback">cups_password_cb_t</a></li>
 	<li><a href="#cups_ptype_t" title="Printer type/capability bits">cups_ptype_t</a></li>
 </ul></li>
@@ -1562,6 +1570,34 @@ const char *cupsGetPassword (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Uses the current password callback function. Returns <code>NULL</code> if the
 user does not provide a password.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetPassword2">cupsGetPassword2</a></h3>
+<p class="description">Get a password from the user using the advanced
+callback.</p>
+<p class="code">
+const char *cupsGetPassword2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *prompt,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;http_t *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *method,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *resource<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>prompt</dt>
+<dd class="description">Prompt string</dd>
+<dt>http</dt>
+<dd class="description">Connection to server or <code>CUPS_HTTP_DEFAULT</code></dd>
+<dt>method</dt>
+<dd class="description">Request method (&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;)</dd>
+<dt>resource</dt>
+<dd class="description">Resource path</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Password</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Uses the current password callback function. Returns <code>NULL</code> if the
+user does not provide a password.
+
+</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsGetPrinters">cupsGetPrinters</a></h3>
 <p class="description">Get a list of printers from the default server.</p>
 <p class="code">
@@ -1990,6 +2026,24 @@ void cupsSetPasswordCB (<br>
 </dl>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback.</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
+<p class="description">Set the advanced password callback for CUPS.</p>
+<p class="code">
+void cupsSetPasswordCB2 (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_password_cb2_t">cups_password_cb2_t</a> cb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *user_data<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>cb</dt>
+<dd class="description">Callback function</dd>
+<dt>user_data</dt>
+<dd class="description">User data pointer</dd>
+</dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback.
+
+</p>
 <h3 class="function"><a name="cupsSetServer">cupsSetServer</a></h3>
 <p class="description">Set the default server name.</p>
 <p class="code">
@@ -2145,6 +2199,11 @@ typedef struct <a href="#cups_job_s">cups_job_s</a> cups_job_t;
 <p class="code">
 typedef struct <a href="#cups_option_s">cups_option_s</a> cups_option_t;
 </p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cups_password_cb2_t">cups_password_cb2_t</a></h3>
+<p class="description">New password callback </p>
+<p class="code">
+typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http, const char *method, const char *resource, void *user_data);
+</p>
 <h3 class="typedef"><a name="cups_password_cb_t">cups_password_cb_t</a></h3>
 <p class="description">Password callback</p>
 <p class="code">
@@ -2269,6 +2328,8 @@ typedef unsigned cups_ptype_t;
 <dd class="description">Local printer or class</dd>
 <dt>CUPS_PRINTER_MEDIUM </dt>
 <dd class="description">Can do Tabloid/B/C/A3/A2</dd>
+<dt>CUPS_PRINTER_MFP <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dd class="description">Printer with scanning capabilities </dd>
 <dt>CUPS_PRINTER_NOT_SHARED <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Printer is not shared </dd>
 <dt>CUPS_PRINTER_PUNCH </dt>
@@ -2277,6 +2338,8 @@ typedef unsigned cups_ptype_t;
 <dd class="description">Printer is rejecting jobs</dd>
 <dt>CUPS_PRINTER_REMOTE </dt>
 <dd class="description">Remote printer or class</dd>
+<dt>CUPS_PRINTER_SCANNER <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dd class="description">Scanner-only device </dd>
 <dt>CUPS_PRINTER_SMALL </dt>
 <dd class="description">Can do Letter/Legal/A4</dd>
 <dt>CUPS_PRINTER_SORT </dt>

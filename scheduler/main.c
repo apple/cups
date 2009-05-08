@@ -1718,14 +1718,20 @@ process_children(void)
 	  else
 	    job->status = -status;	/* Backend failed */
 
-	  if (job->status_level > CUPSD_LOG_ERROR)
+	  if (job->state_value == IPP_JOB_PROCESSING &&
+	      job->status_level > CUPSD_LOG_ERROR)
 	  {
+	    char	message[1024];	/* New printer-state-message */
+
+
 	    job->status_level = CUPSD_LOG_ERROR;
+
+	    snprintf(message, sizeof(message), "%s failed", name);
 
             if (job->printer)
 	    {
-	      snprintf(job->printer->state_message,
-		       sizeof(job->printer->state_message), "%s failed", name);
+	      strlcpy(job->printer->state_message, message,
+		       sizeof(job->printer->state_message));
 	      cupsdAddPrinterHistory(job->printer);
 	    }
 
@@ -1745,7 +1751,7 @@ process_children(void)
 
 	    if (job->printer_message)
 	      cupsdSetString(&(job->printer_message->values[0].string.text),
-			     job->printer->state_message);
+			     message);
 	  }
 	}
 

@@ -38,6 +38,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
   cups_file_t	*fp;			// File
   char		line[256],		// Comment line
 		*ptr;			// Pointer into line
+  int		cost;			// Cost for filter
   ppd_file_t	*ppd;			// PPD file data
   ppd_group_t	*group;			// PPD group
   ppd_option_t	*option;		// PPD option
@@ -47,6 +48,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
   ppd_const_t	*constraint2;		// Temp PPD UI constraint
   ppd_size_t	*size;			// PPD page size
   ppdcDriver	*driver;		// Driver
+  ppdcFilter	*filter;		// Current filter
   ppdcFont	*font;			// Font
   ppdcGroup	*cgroup;		// UI group
   ppdcOption	*coption;		// UI option
@@ -89,7 +91,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
     while (cupsFileGets(fp, line, sizeof(line)))
       if (strncmp(line, "*%", 2))
         break;
-      else
+      else if (strncmp(line, "*%%%% ", 6))
       {
         for (ptr = line + 2; isspace(*ptr); ptr ++);
 
@@ -111,15 +113,49 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
     else
       ptr = ppd->modelname;
 
-    driver->manufacturer  = new ppdcString(ppd->manufacturer);
-    driver->model_name    = new ppdcString(ptr);
-    driver->pc_file_name  = new ppdcString(ppd->pcfilename);
+    if (ppd->nickname)
+      driver->add_attr(new ppdcAttr("NickName", NULL, NULL, ppd->nickname));
+
+    if (ppd->shortnickname)
+      driver->add_attr(new ppdcAttr("ShortNickName", NULL, NULL,
+                                    ppd->shortnickname));
+
+    driver->manufacturer        = new ppdcString(ppd->manufacturer);
+    driver->model_name          = new ppdcString(ptr);
+    driver->pc_file_name        = new ppdcString(ppd->pcfilename);
     attr = ppdFindAttr(ppd, "FileVersion", NULL);
-    driver->version       = new ppdcString(attr ? attr->value : NULL);
-    driver->model_number  = ppd->model_number;
-    driver->manual_copies = ppd->manual_copies;
-    driver->color_device  = ppd->color_device;
-    driver->throughput    = ppd->throughput;
+    driver->version             = new ppdcString(attr ? attr->value : NULL);
+    driver->model_number        = ppd->model_number;
+    driver->manual_copies       = ppd->manual_copies;
+    driver->color_device        = ppd->color_device;
+    driver->throughput          = ppd->throughput;
+    driver->variable_paper_size = ppd->variable_sizes;
+    driver->max_width           = ppd->custom_max[0];
+    driver->max_length          = ppd->custom_max[1];
+    driver->min_width           = ppd->custom_min[0];
+    driver->min_length          = ppd->custom_min[1];
+    driver->left_margin         = ppd->custom_margins[0];
+    driver->bottom_margin       = ppd->custom_margins[1];
+    driver->right_margin        = ppd->custom_margins[2];
+    driver->top_margin          = ppd->custom_margins[3];
+
+    for (i = 0; i < ppd->num_filters; i ++)
+    {
+      strlcpy(line, ppd->filters[i], sizeof(line));
+
+      for (ptr = line; *ptr; ptr ++)
+        if (isspace(*ptr & 255))
+	  break;
+      *ptr++ = '\0';
+
+      cost = strtol(ptr, &ptr, 10);
+
+      while (isspace(*ptr & 255))
+        ptr ++;
+
+      filter = new ppdcFilter(line, ptr, cost);
+      driver->add_filter(filter);
+    }
 
     attr = ppdFindAttr(ppd, "DefaultFont", NULL);
     driver->default_font  = new ppdcString(attr ? attr->value : NULL);
@@ -166,7 +202,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
       {
         if (!strcmp(option->keyword, "PageSize") || !strcmp(option->keyword, "PageRegion"))
           continue;
-            
+
         coption = new ppdcOption((ppdcOptType)option->ui, option->keyword,
 	                         option->text, (ppdcOptSection)option->section,
 				 option->order);
@@ -174,6 +210,9 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 
         for (k = option->num_choices, choice = option->choices; k > 0; k --, choice ++)
         {
+	  if (!strcmp(choice->choice, "Custom"))
+	    continue;
+
           cchoice = new ppdcChoice(choice->choice, choice->text, choice->code);
           coption->add_choice(cchoice);
 
@@ -188,25 +227,21 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
          i > 0;
 	 i --, constraint ++)
     {
-      for (j = i - 1, constraint2 = constraint;
+      // Look for mirrored constraints...
+      for (j = i - 1, constraint2 = constraint + 1;
            j > 0;
 	   j --, constraint2 ++)
-	if (constraint != constraint2 &&
-	    !strcmp(constraint->option1, constraint2->option2) &&
-	    (constraint->choice1 == constraint2->choice2 ||
-	     (constraint->choice1 && constraint2->choice2 &&
-	      !strcmp(constraint->choice1, constraint2->choice2))) &&
+	if (!strcmp(constraint->option1, constraint2->option2) &&
+	    !strcmp(constraint->choice1, constraint2->choice2) &&
 	    !strcmp(constraint->option2, constraint2->option1) &&
-	    (constraint->choice2 == constraint2->choice1 ||
-	     (constraint->choice2 && constraint2->choice1 &&
-	      !strcmp(constraint->choice2, constraint2->choice1))))
+	    !strcmp(constraint->choice2, constraint2->choice1))
           break;
 
       if (j)
         continue;
 
-      cconstraint = new ppdcConstraint(constraint->option1, constraint->choice1,
-                                       constraint->option2, constraint->choice2);
+      cconstraint = new ppdcConstraint(constraint->option2, constraint->choice2,
+                                       constraint->option1, constraint->choice1);
       driver->add_constraint(cconstraint);
     }
 
@@ -240,6 +275,10 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 
 	driver->add_font(font);
       }
+      else if (!strcmp(attr->name, "CustomPageSize"))
+      {
+        driver->set_custom_size_code(attr->value);
+      }
       else if ((strncmp(attr->name, "Default", 7) ||
         	!strcmp(attr->name, "DefaultColorSpace")) &&
 	       strcmp(attr->name, "ColorDevice") &&
@@ -248,15 +287,35 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 	       strcmp(attr->name, "MaxMediaHeight") &&
 	       strcmp(attr->name, "MaxMediaWidth") &&
 	       strcmp(attr->name, "NickName") &&
+	       strcmp(attr->name, "ParamCustomPageSize") &&
 	       strcmp(attr->name, "ShortNickName") &&
 	       strcmp(attr->name, "Throughput") &&
 	       strcmp(attr->name, "PCFileName") &&
 	       strcmp(attr->name, "FileVersion") &&
 	       strcmp(attr->name, "FormatVersion") &&
+	       strcmp(attr->name, "HWMargins") &&
 	       strcmp(attr->name, "VariablePaperSize") &&
 	       strcmp(attr->name, "LanguageEncoding") &&
-	       strcmp(attr->name, "LanguageVersion"))
+	       strcmp(attr->name, "LanguageVersion") &&
+	       strcmp(attr->name, "cupsFilter") &&
+	       strcmp(attr->name, "cupsFlipDuplex") &&
+	       strcmp(attr->name, "cupsLanguages") &&
+	       strcmp(attr->name, "cupsManualCopies") &&
+	       strcmp(attr->name, "cupsModelNumber") &&
+	       strcmp(attr->name, "cupsVersion"))
       {
+        if ((ptr = strchr(attr->name, '.')) != NULL &&
+	    ((ptr - attr->name) == 2 || (ptr - attr->name) == 5))
+	{
+	  // Might be a localization attribute; test further...
+	  if (isalpha(attr->name[0] & 255) &&
+	      isalpha(attr->name[1] & 255) &&
+	      (attr->name[2] == '.' ||
+	       (attr->name[2] == '_' && isalpha(attr->name[3] & 255) &&
+	        isalpha(attr->name[4] & 255))))
+            continue;
+	}
+
         // Attribute...
         driver->add_attr(new ppdcAttr(attr->name, attr->spec, attr->text,
 	                              attr->value));

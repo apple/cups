@@ -155,7 +155,7 @@ cupsdNetIFUpdate(void)
     * Try looking up the hostname for the address as needed...
     */
 
-    if (HostNameLookups || RemoteAccessEnabled)
+    if (HostNameLookups || RemotePort)
       httpAddrLookup((http_addr_t *)(addr->ifa_addr), hostname,
                      sizeof(hostname));
     else

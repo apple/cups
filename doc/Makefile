@@ -3,7 +3,7 @@
 #
 #   Documentation makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -22,33 +22,37 @@ include ../Makedefs
 WEBPAGES	=	\
 			cups.css \
 			cups-printable.css \
-			favicon.png \
 			index.html \
 			robots.txt
 WEBIMAGES	=	\
 			images/color-wheel.png \
 			images/cups.png \
-			images/cups-block-diagram.gif \
-			images/cups-command-chain.png \
 			images/cups-icon.png \
-			images/cups-postscript-chain.png \
-			images/cups-raster-chain.png \
 			images/left.gif \
-			images/raster.png \
 			images/right.gif \
 			images/sel.gif \
-			images/smiley.jpg \
 			images/unsel.gif \
 			images/wait.gif
+HELPIMAGES	=	\
+			images/cups-block-diagram.gif \
+			images/cups-command-chain.png \
+			images/cups-postscript-chain.png \
+			images/cups-raster-chain.png \
+			images/raster.png \
+			images/smiley.jpg
 HELPFILES	=	\
 			help/accounting.html \
 			help/api-array.html \
+			help/api-cgi.html \
 			help/api-cups.html \
+			help/api-driver.html \
 			help/api-filedir.html \
 			help/api-filter.html \
 			help/api-httpipp.html \
+			help/api-mime.html \
 			help/api-overview.html \
 			help/api-ppd.html \
+			help/api-ppdc.html \
 			help/api-raster.html \
 			help/cgi.html \
 			help/glossary.html \
@@ -111,6 +115,7 @@ HELPFILES	=	\
 			help/spec-command.html \
 			help/spec-design.html \
 			help/spec-ipp.html \
+			help/spec-pdf.html \
 			help/spec-postscript.html \
 			help/spec-ppd.html \
 			help/spec-raster.html \
@@ -176,7 +181,7 @@ install-data: $(INSTALL_LANGUAGES)
 		$(INSTALL_MAN) $$file $(DOCDIR)/help; \
 	done
 	$(INSTALL_DIR) -m 755 $(DOCDIR)/images
-	for file in $(WEBIMAGES); do \
+	for file in $(WEBIMAGES) $(HELPIMAGES); do \
 		$(INSTALL_MAN) $$file $(DOCDIR)/images; \
 	done
 
@@ -235,6 +240,16 @@ uninstall-languages:
 		$(RM) $(DOCDIR)/$$lang/cups.css; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done
+
+
+#
+# Install the docset bits locally...
+#
+
+docset:
+	cp $(HELPFILES) ../org.cups.docset/Contents/Resources/Documentation/help
+	cp cups-printable.css ../org.cups.docset/Contents/Resources/Documentation
+	cp $(HELPIMAGES) ../org.cups.docset/Contents/Resources/Documentation/images
 
 
 #

@@ -423,6 +423,7 @@ cupsdReadConfiguration(void)
   struct group	*group;			/* Default group */
   char		*old_serverroot,	/* Old ServerRoot */
 		*old_requestroot;	/* Old RequestRoot */
+  int		old_remote_port;	/* Old RemotePort */
   const char	*tmpdir;		/* TMPDIR environment variable */
   struct stat	tmpinfo;		/* Temporary directory info */
   cupsd_policy_t *p;			/* Policy */
@@ -471,7 +472,8 @@ cupsdReadConfiguration(void)
 
   cupsdDeleteAllListeners();
 
-  RemoteAccessEnabled = 0;
+  old_remote_port = RemotePort;
+  RemotePort      = 0;
 
  /*
   * String options...
@@ -708,13 +710,20 @@ cupsdReadConfiguration(void)
   RunUser = getuid();
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Remote access is %s.",
-                  RemoteAccessEnabled ? "enabled" : "disabled");
+                  RemotePort ? "enabled" : "disabled");
 
  /*
   * See if the ServerName is an IP address...
   */
 
-  if (!ServerName)
+  if (ServerName)
+  {
+    if (!ServerAlias)
+      ServerAlias = cupsArrayNew(NULL, NULL);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", ServerName);
+  }
+  else
   {
     if (gethostname(temp, sizeof(temp)))
     {
@@ -731,7 +740,7 @@ cupsdReadConfiguration(void)
     cupsdAddAlias(ServerAlias, temp);
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Added auto ServerAlias %s", temp);
 
-    if (HostNameLookups || RemoteAccessEnabled)
+    if (HostNameLookups || RemotePort)
     {
       struct hostent	*host;		/* Host entry to get FQDN */
 
@@ -1269,6 +1278,7 @@ cupsdReadConfiguration(void)
   */
 
   if (NeedReload == RELOAD_ALL ||
+      old_remote_port != RemotePort ||
       !old_serverroot || !ServerRoot || strcmp(old_serverroot, ServerRoot) ||
       !old_requestroot || !RequestRoot || strcmp(old_requestroot, RequestRoot))
   {
@@ -2570,7 +2580,14 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
                         ntohs(lis->address.ipv4.sin_port));
 
         if (!httpAddrLocalhost(&(lis->address)))
-	  RemoteAccessEnabled = 1;
+	{
+#ifdef AF_INET6
+	  if (lis->address.addr.sa_family == AF_INET6)
+	    RemotePort = ntohs(lis->address.ipv6.sin6_port);
+	  else
+#endif /* AF_INET6 */
+	  RemotePort = ntohs(lis->address.ipv4.sin_port);
+	}
       }
 
      /*

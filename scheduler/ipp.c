@@ -1367,9 +1367,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     send_http_error(con, status, printer);
     return (NULL);
   }
-  else if (printer->num_auth_info_required > 0 &&
-           strcmp(printer->auth_info_required[0], "none") &&
-           !con->username[0] && !auth_info)
+  else if (printer->num_auth_info_required == 1 &&
+           !strcmp(printer->auth_info_required[0], "negotiate") &&
+           !con->username[0])
   {
     send_http_error(con, HTTP_UNAUTHORIZED, printer);
     return (NULL);
@@ -5496,6 +5496,25 @@ copy_printer_attrs(
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME,
         	 "printer-error-policy", NULL, printer->error_policy);
 
+  if (!ra || cupsArrayFind(ra, "printer-error-policy-supported"))
+  {
+    static const char * const errors[] =/* printer-error-policy-supported values */
+		  {
+		    "abort-job",
+		    "retry-current-job",
+		    "retry-job",
+		    "stop-printer"
+		  };
+
+    if (printer->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS))
+      ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
+                   "printer-error-policy-supported", NULL, "retry-current-job");
+    else
+      ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
+		    "printer-error-policy-supported",
+		    sizeof(errors) / sizeof(errors[0]), NULL, errors);
+  }
+
   if (!ra || cupsArrayFind(ra, "printer-is-accepting-jobs"))
     ippAddBoolean(con->response, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
                   printer->accepting);
@@ -9455,6 +9474,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     cupsdRestartJob(job);
+    cupsdCheckJobs();
   }
 
   cupsdLogJob(job, CUPSD_LOG_INFO, "Restarted by \"%s\".", username);
@@ -10820,10 +10840,11 @@ set_printer_defaults(
       if (attr->value_tag != IPP_TAG_NAME && attr->value_tag != IPP_TAG_KEYWORD)
         continue;
 
-      if (strcmp(attr->values[0].string.text, "abort-job") &&
-          strcmp(attr->values[0].string.text, "retry-current-job") &&
-          strcmp(attr->values[0].string.text, "retry-job") &&
-          strcmp(attr->values[0].string.text, "stop-printer"))
+      if (strcmp(attr->values[0].string.text, "retry-current-job") &&
+          ((printer->type & (CUPS_PRINTER_IMPLICIT | CUPS_PRINTER_CLASS)) ||
+	   (strcmp(attr->values[0].string.text, "abort-job") &&
+	    strcmp(attr->values[0].string.text, "retry-job") &&
+	    strcmp(attr->values[0].string.text, "stop-printer"))))
       {
 	send_ipp_status(con, IPP_NOT_POSSIBLE,
                 	_("Unknown printer-error-policy \"%s\"."),

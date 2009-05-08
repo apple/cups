@@ -152,7 +152,8 @@ install-data:
 		$(INSTALL_DIR) -m 755 $(STATEDIR); \
 	fi
 	echo Creating $(STATEDIR)/certs...
-	$(INSTALL_DIR) -m 511 -g $(CUPS_PRIMARY_SYSTEM_GROUP) $(STATEDIR)/certs
+	$(INSTALL_DIR) -m 511 -o $(CUPS_USER) -g $(CUPS_PRIMARY_SYSTEM_GROUP) \
+		$(STATEDIR)/certs
 	echo Creating $(LOGDIR)...
 	$(INSTALL_DIR) -m 755 $(LOGDIR)
 	echo Creating $(REQUESTS)...
@@ -276,6 +277,8 @@ apihelp:
 		--css ../doc/cups-printable.css \
 		--header api-mime.header --intro api-mime.shtml \
 		mime.h $(LIBOBJS:.o=.c) >../doc/help/api-mime.html
+	mxmldoc --tokens help/api-mime.html api-mime.xml >../doc/help/api-mime.tokens
+	$(RM) api-mime.xml
 
 framedhelp:
 	mxmldoc --framed api-mime \

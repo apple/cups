@@ -83,10 +83,10 @@ static int	cups_local_auth(http_t *http);
  */
 
 int					/* O - 0 on success, -1 on error */
-cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
-                     const char *method,/* I - Request method ("GET", "POST", "PUT") */
-		     const char *resource)
-					/* I - Resource path */
+cupsDoAuthentication(
+    http_t     *http,			/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
+    const char *method,			/* I - Request method ("GET", "POST", "PUT") */
+    const char *resource)		/* I - Resource path */
 {
   const char	*password;		/* Password string */
   char		prompt[1024],		/* Prompt for user */
@@ -102,6 +102,12 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
                 http->digest_tries, http->userpass));
   DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
                 httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
+
+  if (!http)
+    http = _cupsConnect();
+
+  if (!http || !method || !resource)
+    return (-1);
 
  /*
   * Clear the current authentication string...
@@ -126,7 +132,10 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
       return (0);
     }
     else if (localauth == -1)
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);			/* Error or canceled */
+    }
   }
 
  /*
@@ -154,11 +163,17 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
                                       "Digest", 5) != 0;
     http->userpass[0]   = '\0';
 
-    if ((password = cupsGetPassword(prompt)) == NULL)
+    if ((password = cupsGetPassword2(prompt, http, method, resource)) == NULL)
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);
+    }
 
     if (!password[0])
+    {
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       return (-1);
+    }
 
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
@@ -201,6 +216,8 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     {
       DEBUG_puts("1cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
                  "is not present");
+      http->status = HTTP_AUTHORIZATION_CANCELED;
+
       return (-1);
     }
 #  endif /* __APPLE__ */
@@ -209,6 +226,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     {
       DEBUG_printf(("1cupsDoAuthentication: too many Negotiate tries (%d)",
                     http->digest_tries));
+      http->status = HTTP_AUTHORIZATION_CANCELED;
   
       return (-1);
     }
@@ -295,6 +313,8 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
       cups_gss_printf(major_status, minor_status,
 		      "cupsDoAuthentication: Unable to initialize security "
 		      "context");
+      http->status = HTTP_AUTHORIZATION_CANCELED;
+
       return (-1);
     }
 
@@ -331,7 +351,7 @@ cupsDoAuthentication(http_t     *http,	/* I - Connection to server or @code CUPS
     {
       DEBUG_printf(("1cupsDoAuthentication: Kerberos credentials too large - "
                     "%d bytes!", (int)output_token.length));
-
+      http->status = HTTP_AUTHORIZATION_CANCELED;
       gss_release_buffer(&minor_status, &output_token);
 
       return (-1);
@@ -595,6 +615,37 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 #  endif /* HAVE_AUTHORIZATION_H */
 
+#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
+ /*
+  * See if we can authenticate using the peer credentials provided over a
+  * domain socket; if so, specify "PeerCred username" as the authentication
+  * information...
+  */
+
+  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
+  {
+   /*
+    * Verify that the current cupsUser() matches the current UID...
+    */
+
+    struct passwd	*pwd;		/* Password information */
+    const char		*username;	/* Current username */
+
+    username = cupsUser();
+
+    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
+    {
+      httpSetAuthString(http, "PeerCred", username);
+
+      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
+		    http->authstring));
+
+      return (0);
+    }
+  }
+#  endif /* SO_PEERCRED && AF_LOCAL */
+
  /*
   * Try opening a certificate file for this PID.  If that fails,
   * try the root certificate...
@@ -656,37 +707,6 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
     return (0);
   }
-
-#  if defined(SO_PEERCRED) && defined(AF_LOCAL)
- /*
-  * See if we can authenticate using the peer credentials provided over a
-  * domain socket; if so, specify "PeerCred username" as the authentication
-  * information...
-  */
-
-  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
-      !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
-  {
-   /*
-    * Verify that the current cupsUser() matches the current UID...
-    */
-
-    struct passwd	*pwd;		/* Password information */
-    const char		*username;	/* Current username */
-
-    username = cupsUser();
-
-    if ((pwd = getpwnam(username)) != NULL && pwd->pw_uid == getuid())
-    {
-      httpSetAuthString(http, "PeerCred", username);
-
-      DEBUG_printf(("8cups_local_auth: Returning authstring=\"%s\"",
-		    http->authstring));
-
-      return (0);
-    }
-  }
-#  endif /* SO_PEERCRED && AF_LOCAL */
 
   return (1);
 #endif /* WIN32 || __EMX__ */

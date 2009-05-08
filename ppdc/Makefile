@@ -58,6 +58,7 @@ LIBTARGETS =	\
 		libcupsppdc.a
 UNITTARGETS =	\
 		ppdc-static \
+		ppdi-static \
 		testcatalog
 EXECTARGETS =	\
 		ppdc \
@@ -101,8 +102,8 @@ clean:
 	$(RM) $(OBJS) core
 	$(RM) *.bak *.bck core.*
 	$(RM) $(TARGETS) $(UNITTARGETS)
-	$(RM) -r ppd
-	$(RM) sample.c test.drv
+	$(RM) -r ppd ppd2
+	$(RM) sample-import.drv sample.c test.drv
 	$(RM) libcupsppdc.so libcupsppdc.sl libcupsppdc.dylib
 
 
@@ -217,7 +218,10 @@ apihelp:
 		--title "PPD Compiler API" \
 		--css ../doc/cups-printable.css \
 		--header api-ppdc.header --intro api-ppdc.shtml \
+		api-ppdc.xml \
 		ppdc.h $(LIBOBJS:.o=.cxx) >../doc/help/api-ppdc.html
+	mxmldoc --tokens help/api-ppdc.html api-ppdc.xml >../doc/help/api-ppdc.tokens
+	$(RM) api-ppdc.xml
 
 framedhelp:
 	mxmldoc --framed api-ppdc \
@@ -277,6 +281,24 @@ ppdhtml:			ppdhtml.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 ppdi:			ppdi.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ ppdi.o -L. -lcupsppdc $(LIBS)
+
+
+ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/libcups.a
+	echo Linking $@...
+	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
+		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		$(COMMONLIBS) $(LIBZ)
+	echo Testing PPD importer...
+	$(RM) -r ppd ppd2 sample-import.drv
+	./ppdc-static -I ../data sample.drv
+	./ppdi-static -I ../data -o sample-import.drv ppd/*
+	./ppdc-static -I ../data -d ppd2 sample-import.drv
+	if diff -qr ppd ppd2; then \
+		echo PPD import OK; \
+	else \
+		echo PPD import FAILED; \
+		exit 1; \
+	fi
 
 
 #

@@ -3,6 +3,16 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- The web interface could hang on OpenBSD (STR #3176)
+	- The scheduler and cupsfilter utility did not handle rules starting
+	  with a negation operator properly (STR #3160)
+	- The scheduler and cupsfilter utility would crash with certain MIME
+	  .types rules (STR #3159)
+	- httpSetField wasn't bracketing IPv6 numeric addresses for the Host:
+	  field (STR #3164)
+	- The ServerName, if specified, was not treated as a valid alias for the
+	  local system (STR #3167)
+	- "make epm" did not work (STR #3166)
 	- "lpstat -h server" showed non-shared printers (STR #3147)
 	- "make check" did not work on Linux (STR #3161)
 

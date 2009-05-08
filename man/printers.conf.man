@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH printers.conf 5 "CUPS" "12 February 2006" "Apple Inc."
+.TH printers.conf 5 "CUPS" "29 April 2009" "Apple Inc."
 .SH NAME
 printers.conf \- printer configuration file for cups
 .SH DESCRIPTION
@@ -52,6 +52,8 @@ DeviceURI uri
 Specifies the device URI for a printer.
 .TP 5
 ErrorPolicy abort-job
+.TP 5
+ErrorPolicy retry-current-job
 .TP 5
 ErrorPolicy retry-job
 .TP 5

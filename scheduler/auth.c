@@ -495,7 +495,11 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     peersize = sizeof(peercred);
 
+#  ifdef __APPLE__
+    if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
+#  else
     if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+#  endif /* __APPLE__ */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
                       strerror(errno));

@@ -143,7 +143,9 @@ main(int  argc,				/* I - Number of command-line args */
 		  "copies-supported",
 		  "document-format-supported",
 		  "marker-colors",
+		  "marker-high-levels",
 		  "marker-levels",
+		  "marker-low-levels",
 		  "marker-message",
 		  "marker-names",
 		  "marker-types",
@@ -1629,11 +1631,8 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
-  const char		*message;	/* Message to show */
-  char			unknown[1024];	/* Unknown message string */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
-  cups_lang_t		*language;	/* Current localization */
   int			saw_caprw;	/* Saw com.apple.print.recoverable-warning state */
 
 
@@ -1648,96 +1647,24 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   saw_caprw = 0;
   state[0]  = '\0';
   prefix    = "STATE: ";
-  language  = cupsLangDefault();
 
   for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
     reason = reasons->values[i].string.text;
 
-    if (strcmp(reason, "paused"))
+    if (!strcmp(reason, "com.apple.print.recoverable-warning"))
+      saw_caprw = 1;
+    else if (strcmp(reason, "paused"))
     {
       strlcat(state, prefix, sizeof(state));
       strlcat(state, reason, sizeof(state));
 
       prefix  = ",";
     }
-
-    message = "";
-
-    if (!strncmp(reason, "media-needed", 12))
-      message = _("Media tray needs to be filled.");
-    else if (!strncmp(reason, "media-jam", 9))
-      message = _("Media jam!");
-    else if (!strncmp(reason, "moving-to-paused", 16) ||
-             !strncmp(reason, "offline", 7) ||
-             !strncmp(reason, "paused", 6) ||
-	     !strncmp(reason, "shutdown", 8))
-      message = _("Printer offline.");
-    else if (!strncmp(reason, "toner-low", 9))
-      message = _("Toner low.");
-    else if (!strncmp(reason, "toner-empty", 11))
-      message = _("Out of toner!");
-    else if (!strncmp(reason, "cover-open", 10))
-      message = _("Cover open.");
-    else if (!strncmp(reason, "interlock-open", 14))
-      message = _("Interlock open.");
-    else if (!strncmp(reason, "door-open", 9))
-      message = _("Door open.");
-    else if (!strncmp(reason, "input-tray-missing", 18))
-      message = _("Media tray missing!");
-    else if (!strncmp(reason, "media-low", 9))
-      message = _("Media tray almost empty.");
-    else if (!strncmp(reason, "media-empty", 11))
-      message = _("Media tray empty!");
-    else if (!strncmp(reason, "output-tray-missing", 19))
-      message = _("Output tray missing!");
-    else if (!strncmp(reason, "output-area-almost-full", 23))
-      message = _("Output bin almost full.");
-    else if (!strncmp(reason, "output-area-full", 16))
-      message = _("Output bin full!");
-    else if (!strncmp(reason, "marker-supply-low", 17))
-      message = _("Ink/toner almost empty.");
-    else if (!strncmp(reason, "marker-supply-empty", 19))
-      message = _("Ink/toner empty!");
-    else if (!strncmp(reason, "marker-waste-almost-full", 24))
-      message = _("Ink/toner waste bin almost full.");
-    else if (!strncmp(reason, "marker-waste-full", 17))
-      message = _("Ink/toner waste bin full!");
-    else if (!strncmp(reason, "fuser-over-temp", 15))
-      message = _("Fuser temperature high!");
-    else if (!strncmp(reason, "fuser-under-temp", 16))
-      message = _("Fuser temperature low!");
-    else if (!strncmp(reason, "opc-near-eol", 12))
-      message = _("OPC almost at end-of-life.");
-    else if (!strncmp(reason, "opc-life-over", 13))
-      message = _("OPC at end-of-life!");
-    else if (!strncmp(reason, "developer-low", 13))
-      message = _("Developer almost empty.");
-    else if (!strncmp(reason, "developer-empty", 15))
-      message = _("Developer empty!");
-    else if (!strcmp(reason, "com.apple.print.recoverable-warning"))
-      saw_caprw = 1;
-    else if (strstr(reason, "error") != NULL)
-    {
-      message = unknown;
-
-      snprintf(unknown, sizeof(unknown), _("Unknown printer error (%s)!"),
-               reason);
-    }
-
-    if (message[0])
-    {
-      count ++;
-      if (strstr(reasons->values[i].string.text, "error"))
-        fprintf(stderr, "ERROR: %s\n", _cupsLangString(language, message));
-      else if (strstr(reasons->values[i].string.text, "warning"))
-        fprintf(stderr, "WARNING: %s\n", _cupsLangString(language, message));
-      else
-        fprintf(stderr, "INFO: %s\n", _cupsLangString(language, message));
-    }
   }
 
-  fprintf(stderr, "%s\n", state);
+  if (state[0])
+    fprintf(stderr, "%s\n", state);
 
  /*
   * Relay com.apple.print.recoverable-message...
@@ -1755,7 +1682,13 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 
   if ((marker = ippFindAttribute(ipp, "marker-colors", IPP_TAG_NAME)) != NULL)
     report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-high-levels",
+                                 IPP_TAG_INTEGER)) != NULL)
+    report_attr(marker);
   if ((marker = ippFindAttribute(ipp, "marker-levels",
+                                 IPP_TAG_INTEGER)) != NULL)
+    report_attr(marker);
+  if ((marker = ippFindAttribute(ipp, "marker-low-levels",
                                  IPP_TAG_INTEGER)) != NULL)
     report_attr(marker);
   if ((marker = ippFindAttribute(ipp, "marker-message", IPP_TAG_TEXT)) != NULL)

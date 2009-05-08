@@ -27,6 +27,10 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.compact {
+  margin: 0;
+}
+
 P.example {
   font-style: italic;
   margin-left: 36pt;
@@ -444,7 +448,7 @@ conflicts.">ppdMarkOption</a></li>
 	<li><a href="#ppd_profile_t" title="sRGB Color Profiles">ppd_profile_t</a></li>
 	<li><a href="#ppd_section_t" title="Order dependency sections">ppd_section_t</a></li>
 	<li><a href="#ppd_size_t" title="Page Sizes">ppd_size_t</a></li>
-	<li><a href="#ppd_status_t" title="Types and structures...">ppd_status_t</a></li>
+	<li><a href="#ppd_status_t" title="Status Codes ">ppd_status_t</a></li>
 	<li><a href="#ppd_ui_t" title="UI Types">ppd_ui_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
@@ -465,11 +469,11 @@ conflicts.">ppdMarkOption</a></li>
 	<li><a href="#ppd_cpvalue_u" title="Custom Parameter Value ">ppd_cpvalue_u</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
-	<li><a href="#ppd_conform_e" title="">ppd_conform_e</a></li>
+	<li><a href="#ppd_conform_e" title="Conformance Levels ">ppd_conform_e</a></li>
 	<li><a href="#ppd_cptype_e" title="Custom Parameter Type ">ppd_cptype_e</a></li>
 	<li><a href="#ppd_cs_e" title="Colorspaces">ppd_cs_e</a></li>
 	<li><a href="#ppd_section_e" title="Order dependency sections">ppd_section_e</a></li>
-	<li><a href="#ppd_status_e" title="Types and structures...">ppd_status_e</a></li>
+	<li><a href="#ppd_status_e" title="Status Codes ">ppd_status_e</a></li>
 	<li><a href="#ppd_ui_e" title="UI Types">ppd_ui_e</a></li>
 </ul></li>
 <!--
@@ -1625,8 +1629,8 @@ typedef enum <a href="#ppd_section_e">ppd_section_e</a> ppd_section_t;
 <p class="code">
 typedef struct <a href="#ppd_size_s">ppd_size_s</a> ppd_size_t;
 </p>
-<h3 class="typedef"><a name="ppd_status_t">ppd_status_t</a></h3>
-<p class="description">Types and structures...</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_status_t">ppd_status_t</a></h3>
+<p class="description">Status Codes </p>
 <p class="code">
 typedef enum <a href="#ppd_status_e">ppd_status_e</a> ppd_status_t;
 </p>
@@ -2065,8 +2069,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">String value</dd>
 </dl>
 <h2 class="title"><a name="ENUMERATIONS">Constants</a></h2>
-<h3 class="enumeration"><a name="ppd_conform_e">ppd_conform_e</a></h3>
-<p class="description"></p>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_conform_e">ppd_conform_e</a></h3>
+<p class="description">Conformance Levels </p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>PPD_CONFORM_RELAXED </dt>
@@ -2129,8 +2133,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dt>PPD_ORDER_PROLOG </dt>
 <dd class="description">... must be in the Prolog section</dd>
 </dl>
-<h3 class="enumeration"><a name="ppd_status_e">ppd_status_e</a></h3>
-<p class="description">Types and structures...</p>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="ppd_status_e">ppd_status_e</a></h3>
+<p class="description">Status Codes </p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>PPD_ALLOC_ERROR </dt>

@@ -458,7 +458,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   ipp_attribute_t	*attr;		/* Current attribute */
   const char		*ptr,		/* Pointer into value */
 			*abort_message;	/* Abort message */
-  ipp_jstate_t		abort_state = IPP_JOB_ABORTED;
+  ipp_jstate_t		abort_state = IPP_JOB_STOPPED;
 					/* New job state on abort */
   struct stat		backinfo;	/* Backend file information */
   int			backroot;	/* Run backend as root? */
@@ -545,6 +545,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		  job->current_file);
 
       abort_message = "Aborting job because it cannot be printed.";
+      abort_state   = IPP_JOB_ABORTED;
+
       goto abort_job;
     }
 
@@ -649,7 +651,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
       cupsArrayDelete(filters);
 
-      abort_state = IPP_JOB_STOPPED;
       abort_message = "Stopping job because the scheduler ran out of memory.";
 
       goto abort_job;
@@ -681,7 +682,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       cupsdLogJob(job, CUPSD_LOG_DEBUG,
 		  "Unable to add port monitor - %s", strerror(errno));
 
-      abort_state   = IPP_JOB_STOPPED;
       abort_message = "Stopping job because the scheduler ran out of memory.";
 
       goto abort_job;
@@ -699,6 +699,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 		cupsArrayCount(filters), MAX_FILTERS);
 
     abort_message = "Aborting job because it needs too many filters to print.";
+    abort_state   = IPP_JOB_ABORTED;
+
     goto abort_job;
   }
 
@@ -739,7 +741,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   if ((options = get_options(job, banner_page, copies, sizeof(copies), title,
                              sizeof(title))) == NULL)
   {
-    abort_state   = IPP_JOB_STOPPED;
     abort_message = "Stopping job because the scheduler ran out of memory.";
 
     goto abort_job;
@@ -773,7 +774,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Unable to allocate argument array - %s",
                     strerror(errno));
 
-    abort_state   = IPP_JOB_STOPPED;
     abort_message = "Stopping job because the scheduler ran out of memory.";
 
     goto abort_job;
@@ -1048,7 +1048,7 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       cupsdLogJob(job, CUPSD_LOG_ERROR, "Unable to start filter \"%s\" - %s.",
 		  filter->filter, strerror(errno));
 
-      abort_message = "Stopped job because the scheduler could not execute a "
+      abort_message = "Stopping job because the scheduler could not execute a "
 		      "filter.";
 
       goto abort_job;
@@ -2549,8 +2549,8 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
     default :
     case IPP_JOB_PROCESSING :
     case IPP_JOB_COMPLETED :
-	job_state     = IPP_JOB_COMPLETED;
-	message       = "Job completed.";
+	job_state = IPP_JOB_COMPLETED;
+	message   = "Job completed.";
         break;
 
     case IPP_JOB_STOPPED :
@@ -2684,14 +2684,12 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
 	    message   = "Job aborted due to backend errors; please consult "
 	                "the error_log file for details.";
 	  }
-	  else
+	  else if (job->state_value == IPP_JOB_PROCESSING)
           {
+            job_state     = IPP_JOB_PENDING;
 	    printer_state = IPP_PRINTER_STOPPED;
 	    message       = "Printer stopped due to backend errors; please "
 			    "consult the error_log file for details.";
-
-            if (job_state == IPP_JOB_COMPLETED)
-	      job_state = IPP_JOB_PENDING;
 	  }
           break;
 

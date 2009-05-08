@@ -1148,7 +1148,7 @@ ippReadIO(void       *src,		/* I - Data source */
 	    return (IPP_ERROR);
 	  }
 
-	  DEBUG_printf(("1ippReadIO: ipp->current=%p, ipp->prev=%p",
+	  DEBUG_printf(("2ippReadIO: ipp->current=%p, ipp->prev=%p",
 	                ipp->current, ipp->prev));
 
 	 /*

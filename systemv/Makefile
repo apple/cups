@@ -49,7 +49,7 @@ unittests:
 
 clean:
 	$(RM) $(OBJS) $(TARGETS)
-	$(RM) accept cupsdisable cupsenable cupsreject disable enable reject
+	$(RM) accept cupsdisable cupsenable cupsreject reject
 
 
 #
@@ -102,10 +102,6 @@ install-exec:
 	$(INSTALL_BIN) cancel $(BINDIR)
 	$(INSTALL_BIN) cupstestdsc $(BINDIR)
 	$(INSTALL_BIN) cupstestppd $(BINDIR)
-	$(RM) $(BINDIR)/disable
-	$(LN) cupsaccept $(BINDIR)/disable
-	$(RM) $(BINDIR)/enable
-	$(LN) cupsaccept $(BINDIR)/enable
 	$(INSTALL_BIN) lp $(BINDIR)
 	$(INSTALL_BIN) lpoptions $(BINDIR)
 	$(INSTALL_BIN) lpstat $(BINDIR)
@@ -140,8 +136,6 @@ uninstall:
 	$(RM) $(BINDIR)/cancel
 	$(RM) $(BINDIR)/cupstestdsc
 	$(RM) $(BINDIR)/cupstestppd
-	$(RM) $(BINDIR)/disable
-	$(RM) $(BINDIR)/enable
 	$(RM) $(BINDIR)/lp
 	$(RM) $(BINDIR)/lpoptions
 	$(RM) $(BINDIR)/lppasswd
@@ -177,7 +171,7 @@ cancel:	cancel.o ../cups/$(LIBCUPS)
 cupsaccept:	cupsaccept.o ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsaccept cupsaccept.o $(LIBS)
-	for file in accept cupsenable cupsdisable cupsreject disable enable reject; do \
+	for file in accept cupsenable cupsdisable cupsreject reject; do \
 		$(RM) $$file; \
 		$(LN) cupsaccept $$file; \
 	done

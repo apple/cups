@@ -114,9 +114,7 @@ VAR char		*ConfigurationFile	VALUE(NULL),
 					/* Root directory for documents */
 VAR cups_array_t	*ServerAlias		VALUE(NULL);
 					/* Alias names for server */
-VAR int			RemoteAccessEnabled	VALUE(0),
-					/* Are we listening on non-local addresses? */
-			ServerNameIsIP		VALUE(0);
+VAR int			ServerNameIsIP		VALUE(0);
 					/* Is the ServerName an IP address? */
 VAR int			NumSystemGroups		VALUE(0);
 					/* Number of system group names */

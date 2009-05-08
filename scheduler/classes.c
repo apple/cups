@@ -55,9 +55,9 @@ cupsdAddClass(const char *name)		/* I - Name of class */
 
     c->type = CUPS_PRINTER_CLASS;
 
-    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, LocalPort,
+    cupsdSetStringf(&c->uri, "ipp://%s:%d/classes/%s", ServerName, RemotePort,
                     name);
-    cupsdSetString(&c->error_policy, "retry-job");
+    cupsdSetString(&c->error_policy, "retry-current-job");
   }
 
   return (c);
@@ -629,7 +629,12 @@ cupsdLoadAllClasses(void)
     else if (!strcasecmp(line, "ErrorPolicy"))
     {
       if (value)
-        cupsdSetString(&p->error_policy, value);
+      {
+        if (strcmp(value, "retry-current-job") && strcmp(value, "retry-job"))
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "ErrorPolicy %s ignored on line %d of classes.conf",
+			  value, linenum);
+      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of classes.conf.", linenum);

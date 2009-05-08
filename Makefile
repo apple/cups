@@ -3,7 +3,7 @@
 #
 #   Top-level Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -333,14 +333,50 @@ uninstall:
 # Run the test suite...
 #
 
-test:	all
+test:	all unittests
 	echo Running CUPS test suite...
 	cd test; ./run-stp-tests.sh
 
 
-check:	all
+check:	all unittests
 	echo Running CUPS test suite with defaults...
 	cd test; ./run-stp-tests.sh 1 0 n
+
+
+#
+# Create an Xcode docset...
+#
+
+apihelp:
+	for dir in cgi-bin cups filter driver ppdc scheduler; do\
+		echo Generating API help in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) apihelp) || exit 1;\
+	done
+
+framedhelp:
+	for dir in cgi-bin cups filter driver ppdc scheduler; do\
+		echo Generating framed API help in $$dir... ;\
+		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
+	done
+
+docset:	apihelp
+	echo Generating docset directory tree...
+	$(RM) -r org.cups.docset
+	mkdir -p org.cups.docset/Contents/Resources/Documentation/help
+	mkdir -p org.cups.docset/Contents/Resources/Documentation/images
+	cd doc; $(MAKE) $(MFLAGS) docset
+	cd cgi-bin; $(MAKE) $(MFLAGS) makedocset
+	cgi-bin/makedocset org.cups.docset \
+		`svnversion . | sed -e '1,$$s/[a-zA-Z]//g'` \
+		doc/help/api-*.tokens
+	$(RM) doc/help/api-*.tokens
+	echo Indexing docset...
+	/Developer/usr/bin/docsetutil index org.cups.docset
+	echo Generating docset archive and feed...
+	/Developer/usr/bin/docsetutil package --output org.cups.docset.xar \
+		--atom org.cups.docset.atom \
+		--download-url http://www.cups.org/org.cups.docset.xar \
+		org.cups.docset
 
 
 #

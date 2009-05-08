@@ -263,7 +263,7 @@ cupsCharsetToUTF8(
   * Check for valid arguments...
   */
 
-  DEBUG_printf(("cupsCharsetToUTF8(dest=%p, src=\"%s\", maxout=%d, encoding=%d)",
+  DEBUG_printf(("2cupsCharsetToUTF8(dest=%p, src=\"%s\", maxout=%d, encoding=%d)",
 	        dest, src, maxout, encoding));
 
   if (dest)
@@ -271,7 +271,7 @@ cupsCharsetToUTF8(
 
   if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
   {
-    DEBUG_puts("1cupsCharsetToUTF8: Bad arguments, returning -1");
+    DEBUG_puts("3cupsCharsetToUTF8: Bad arguments, returning -1");
     return (-1);
   }
 

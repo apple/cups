@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-04-21
+CHANGES.txt - 2009-05-08
 ------------------------
 
 CHANGES IN CUPS V1.4b3
@@ -8,6 +8,16 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+        - Fixed a number of ppdi issues and added a unit test to validate that
+	  ppdc + ppdi can generate and import the same data (STR #3152)
+	- Moving jobs in the web interface now shows an error if you only have
+	  one printer or class added (STR #3094)
+	- Since classes have never truly supported the printer-error-policy
+	  stuff added in CUPS 1.2, update the code to reflect the current
+	  reality and support only the retry-current-job policy for now
+	  (STR #3171)
+	- Revised the password callback support (STR #2953)
+	- ppdEmit*() did not choose between PageSize and PageRegion properly.
 	- Make some fairly substantial changes to the Kerberos support code so
 	  that CUPS can work in multi-realm environments and does not require
 	  delegatable credentials.  Shared printing still requires delegation,

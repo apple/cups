@@ -27,6 +27,10 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.compact {
+  margin: 0;
+}
+
 P.example {
   font-style: italic;
   margin-left: 36pt;
@@ -507,6 +511,10 @@ in seconds.">ippDateToTime</a></li>
 <li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
+	<li><a href="#http_addr_t" title="Socket address union, which
+makes using IPv6 and other
+address types easier and
+more portable. ">http_addr_t</a></li>
 	<li><a href="#http_addrlist_t" title="Socket address list, which is
 used to enumerate all of the
 addresses that are associated
@@ -515,30 +523,29 @@ with a hostname. ">http_addrlist_t</a></li>
 	<li><a href="#http_encoding_t" title="HTTP transfer encoding values">http_encoding_t</a></li>
 	<li><a href="#http_encryption_t" title="HTTP encryption values">http_encryption_t</a></li>
 	<li><a href="#http_field_t" title="HTTP field names">http_field_t</a></li>
-	<li><a href="#http_keepalive_t" title="Types and structures...">http_keepalive_t</a></li>
+	<li><a href="#http_keepalive_t" title="HTTP keep-alive values">http_keepalive_t</a></li>
+	<li><a href="#http_state_t" title="HTTP state values; states
+are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_status_t" title="HTTP status codes">http_status_t</a></li>
 	<li><a href="#http_t" title="HTTP connection type">http_t</a></li>
-	<li><a href="#http_uri_coding_t" title="HTTP version numbers">http_uri_coding_t</a></li>
-	<li><a href="#http_uri_status_t" title="URI en/decode flags">http_uri_status_t</a></li>
-	<li><a href="#http_version_t" title="Socket address union, which
-makes using IPv6 and other
-address types easier and
-more portable. ">http_version_t</a></li>
+	<li><a href="#http_uri_coding_t" title="URI en/decode flags">http_uri_coding_t</a></li>
+	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
+	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
 	<li><a href="#ipp_attribute_t" title="Attribute">ipp_attribute_t</a></li>
-	<li><a href="#ipp_finish_t" title="Orientation...">ipp_finish_t</a></li>
+	<li><a href="#ipp_finish_t" title="Finishings...">ipp_finish_t</a></li>
 	<li><a href="#ipp_iocb_t" title="IPP IO Callback Function ">ipp_iocb_t</a></li>
-	<li><a href="#ipp_jstate_t" title="Printer States....">ipp_jstate_t</a></li>
-	<li><a href="#ipp_op_t" title="Old names for the operations">ipp_op_t</a></li>
-	<li><a href="#ipp_orient_t" title="Qualities...">ipp_orient_t</a></li>
-	<li><a href="#ipp_pstate_t" title="IPP states...">ipp_pstate_t</a></li>
-	<li><a href="#ipp_quality_t" title="Job States....">ipp_quality_t</a></li>
+	<li><a href="#ipp_jstate_t" title="Job States....">ipp_jstate_t</a></li>
+	<li><a href="#ipp_op_t" title="IPP operations...">ipp_op_t</a></li>
+	<li><a href="#ipp_orient_t" title="Orientation...">ipp_orient_t</a></li>
+	<li><a href="#ipp_pstate_t" title="Printer States....">ipp_pstate_t</a></li>
+	<li><a href="#ipp_quality_t" title="Qualities...">ipp_quality_t</a></li>
 	<li><a href="#ipp_request_t" title="Request Header">ipp_request_t</a></li>
-	<li><a href="#ipp_res_t" title="Types and structures...">ipp_res_t</a></li>
-	<li><a href="#ipp_state_t" title="IPP operations...">ipp_state_t</a></li>
+	<li><a href="#ipp_res_t" title="Resolution units...">ipp_res_t</a></li>
+	<li><a href="#ipp_state_t" title="IPP states...">ipp_state_t</a></li>
 	<li><a href="#ipp_t" title="Attribute Value">ipp_t</a></li>
 	<li><a href="#ipp_uchar_t" title="IPP status codes...">ipp_uchar_t</a></li>
 	<li><a href="#ipp_tag_t" title="Format tags for attributes...">ipp_tag_t</a></li>
-	<li><a href="#ipp_value_t" title="New in CUPS 1.1.19">ipp_value_t</a></li>
+	<li><a href="#ipp_value_t" title="Attribute Value">ipp_value_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#http_addrlist_s" title="Socket address list, which is
@@ -550,27 +557,28 @@ with a hostname. ">http_addrlist_s</a></li>
 </ul></li>
 <li><a href="#UNIONS">Unions</a><ul class="code">
 	<li><a href="#ipp_request_u" title="Request Header">ipp_request_u</a></li>
-	<li><a href="#ipp_value_u" title="New in CUPS 1.1.19">ipp_value_u</a></li>
+	<li><a href="#ipp_value_u" title="Attribute Value">ipp_value_u</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#http_auth_e" title="HTTP authentication types">http_auth_e</a></li>
 	<li><a href="#http_encoding_e" title="HTTP transfer encoding values">http_encoding_e</a></li>
 	<li><a href="#http_encryption_e" title="HTTP encryption values">http_encryption_e</a></li>
 	<li><a href="#http_field_e" title="HTTP field names">http_field_e</a></li>
-	<li><a href="#http_keepalive_e" title="Types and structures...">http_keepalive_e</a></li>
-	<li><a href="#http_state_e" title="">http_state_e</a></li>
+	<li><a href="#http_keepalive_e" title="HTTP keep-alive values">http_keepalive_e</a></li>
+	<li><a href="#http_state_e" title="HTTP state values; states
+are server-oriented...">http_state_e</a></li>
 	<li><a href="#http_status_e" title="HTTP status codes">http_status_e</a></li>
-	<li><a href="#http_uri_coding_e" title="">http_uri_coding_e</a></li>
-	<li><a href="#http_uri_status_e" title="">http_uri_status_e</a></li>
-	<li><a href="#http_version_e" title="">http_version_e</a></li>
-	<li><a href="#ipp_finish_e" title="">ipp_finish_e</a></li>
-	<li><a href="#ipp_jstate_e" title="">ipp_jstate_e</a></li>
-	<li><a href="#ipp_op_e" title="">ipp_op_e</a></li>
-	<li><a href="#ipp_orient_e" title="">ipp_orient_e</a></li>
-	<li><a href="#ipp_pstate_e" title="">ipp_pstate_e</a></li>
-	<li><a href="#ipp_quality_e" title="">ipp_quality_e</a></li>
-	<li><a href="#ipp_res_e" title="Types and structures...">ipp_res_e</a></li>
-	<li><a href="#ipp_state_e" title="">ipp_state_e</a></li>
+	<li><a href="#http_uri_coding_e" title="URI en/decode flags">http_uri_coding_e</a></li>
+	<li><a href="#http_uri_status_e" title="URI separation status ">http_uri_status_e</a></li>
+	<li><a href="#http_version_e" title="HTTP version numbers">http_version_e</a></li>
+	<li><a href="#ipp_finish_e" title="Finishings...">ipp_finish_e</a></li>
+	<li><a href="#ipp_jstate_e" title="Job States....">ipp_jstate_e</a></li>
+	<li><a href="#ipp_op_e" title="IPP operations...">ipp_op_e</a></li>
+	<li><a href="#ipp_orient_e" title="Orientation...">ipp_orient_e</a></li>
+	<li><a href="#ipp_pstate_e" title="Printer States....">ipp_pstate_e</a></li>
+	<li><a href="#ipp_quality_e" title="Qualities...">ipp_quality_e</a></li>
+	<li><a href="#ipp_res_e" title="Resolution units...">ipp_res_e</a></li>
+	<li><a href="#ipp_state_e" title="IPP states...">ipp_state_e</a></li>
 	<li><a href="#ipp_status_e" title="IPP status codes...">ipp_status_e</a></li>
 	<li><a href="#ipp_tag_e" title="Format tags for attributes...">ipp_tag_e</a></li>
 </ul></li>
@@ -3233,6 +3241,14 @@ const <a href="#ipp_uchar_t">ipp_uchar_t</a> *ippTimeToDate (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Current state</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addr_t">http_addr_t</a></h3>
+<p class="description">Socket address union, which
+makes using IPv6 and other
+address types easier and
+more portable. </p>
+<p class="code">
+typedef union _http_addr_u / http_addr_t;
+</p>
 <h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_addrlist_t">http_addrlist_t</a></h3>
 <p class="description">Socket address list, which is
 used to enumerate all of the
@@ -3262,9 +3278,15 @@ typedef enum <a href="#http_encryption_e">http_encryption_e</a> http_encryption_
 typedef enum <a href="#http_field_e">http_field_e</a> http_field_t;
 </p>
 <h3 class="typedef"><a name="http_keepalive_t">http_keepalive_t</a></h3>
-<p class="description">Types and structures...</p>
+<p class="description">HTTP keep-alive values</p>
 <p class="code">
 typedef enum <a href="#http_keepalive_e">http_keepalive_e</a> http_keepalive_t;
+</p>
+<h3 class="typedef"><a name="http_state_t">http_state_t</a></h3>
+<p class="description">HTTP state values; states
+are server-oriented...</p>
+<p class="code">
+typedef enum <a href="#http_state_e">http_state_e</a> / http_state_t;
 </p>
 <h3 class="typedef"><a name="http_status_t">http_status_t</a></h3>
 <p class="description">HTTP status codes</p>
@@ -3277,20 +3299,17 @@ typedef enum <a href="#http_status_e">http_status_e</a> http_status_t;
 typedef struct _http_s http_t;
 </p>
 <h3 class="typedef"><a name="http_uri_coding_t">http_uri_coding_t</a></h3>
-<p class="description">HTTP version numbers</p>
+<p class="description">URI en/decode flags</p>
 <p class="code">
 typedef enum <a href="#http_uri_coding_e">http_uri_coding_e</a> http_uri_coding_t;
 </p>
-<h3 class="typedef"><a name="http_uri_status_t">http_uri_status_t</a></h3>
-<p class="description">URI en/decode flags</p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS1.2&nbsp;</span><a name="http_uri_status_t">http_uri_status_t</a></h3>
+<p class="description">URI separation status </p>
 <p class="code">
 typedef enum <a href="#http_uri_status_e">http_uri_status_e</a> http_uri_status_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="http_version_t">http_version_t</a></h3>
-<p class="description">Socket address union, which
-makes using IPv6 and other
-address types easier and
-more portable. </p>
+<h3 class="typedef"><a name="http_version_t">http_version_t</a></h3>
+<p class="description">HTTP version numbers</p>
 <p class="code">
 typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 </p>
@@ -3300,7 +3319,7 @@ typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 typedef struct <a href="#ipp_attribute_s">ipp_attribute_s</a> ipp_attribute_t;
 </p>
 <h3 class="typedef"><a name="ipp_finish_t">ipp_finish_t</a></h3>
-<p class="description">Orientation...</p>
+<p class="description">Finishings...</p>
 <p class="code">
 typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 </p>
@@ -3310,27 +3329,27 @@ typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 typedef ssize_t (*ipp_iocb_t)(void *, <a href="#ipp_uchar_t">ipp_uchar_t</a> *, size_t);
 </p>
 <h3 class="typedef"><a name="ipp_jstate_t">ipp_jstate_t</a></h3>
-<p class="description">Printer States....</p>
+<p class="description">Job States....</p>
 <p class="code">
 typedef enum <a href="#ipp_jstate_e">ipp_jstate_e</a> ipp_jstate_t;
 </p>
 <h3 class="typedef"><a name="ipp_op_t">ipp_op_t</a></h3>
-<p class="description">Old names for the operations</p>
+<p class="description">IPP operations...</p>
 <p class="code">
 typedef enum <a href="#ipp_op_e">ipp_op_e</a> ipp_op_t;
 </p>
 <h3 class="typedef"><a name="ipp_orient_t">ipp_orient_t</a></h3>
-<p class="description">Qualities...</p>
+<p class="description">Orientation...</p>
 <p class="code">
 typedef enum <a href="#ipp_orient_e">ipp_orient_e</a> ipp_orient_t;
 </p>
 <h3 class="typedef"><a name="ipp_pstate_t">ipp_pstate_t</a></h3>
-<p class="description">IPP states...</p>
+<p class="description">Printer States....</p>
 <p class="code">
 typedef enum <a href="#ipp_pstate_e">ipp_pstate_e</a> ipp_pstate_t;
 </p>
 <h3 class="typedef"><a name="ipp_quality_t">ipp_quality_t</a></h3>
-<p class="description">Job States....</p>
+<p class="description">Qualities...</p>
 <p class="code">
 typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 </p>
@@ -3340,12 +3359,12 @@ typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 typedef union <a href="#ipp_request_u">ipp_request_u</a> ipp_request_t;
 </p>
 <h3 class="typedef"><a name="ipp_res_t">ipp_res_t</a></h3>
-<p class="description">Types and structures...</p>
+<p class="description">Resolution units...</p>
 <p class="code">
 typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 </p>
 <h3 class="typedef"><a name="ipp_state_t">ipp_state_t</a></h3>
-<p class="description">IPP operations...</p>
+<p class="description">IPP states...</p>
 <p class="code">
 typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 </p>
@@ -3365,7 +3384,7 @@ typedef typedef unsigned char ipp_uchar_t;
 typedef enum <a href="#ipp_tag_e">ipp_tag_e</a> ipp_tag_t;
 </p>
 <h3 class="typedef"><a name="ipp_value_t">ipp_value_t</a></h3>
-<p class="description">New in CUPS 1.1.19</p>
+<p class="description">Attribute Value</p>
 <p class="code">
 typedef union <a href="#ipp_value_u">ipp_value_u</a> ipp_value_t;
 </p>
@@ -3445,7 +3464,7 @@ with a hostname. </p>
 <dl>
 </dl>
 <h3 class="union"><a name="ipp_value_u">ipp_value_u</a></h3>
-<p class="description">New in CUPS 1.1.19</p>
+<p class="description">Attribute Value</p>
 <p class="code">union ipp_value_u {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char boolean;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_t">ipp_t</a> *collection;<br>
@@ -3571,7 +3590,7 @@ with a hostname. </p>
 <dd class="description">WWW-Authenticate field</dd>
 </dl>
 <h3 class="enumeration"><a name="http_keepalive_e">http_keepalive_e</a></h3>
-<p class="description">Types and structures...</p>
+<p class="description">HTTP keep-alive values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>HTTP_KEEPALIVE_OFF </dt>
@@ -3580,7 +3599,8 @@ with a hostname. </p>
 <dd class="description">Use keep alive</dd>
 </dl>
 <h3 class="enumeration"><a name="http_state_e">http_state_e</a></h3>
-<p class="description"></p>
+<p class="description">HTTP state values; states
+are server-oriented...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>HTTP_CLOSE </dt>
@@ -3618,6 +3638,8 @@ with a hostname. </p>
 <dl>
 <dt>HTTP_ACCEPTED </dt>
 <dd class="description">DELETE command was successful</dd>
+<dt>HTTP_AUTHORIZATION_CANCELED </dt>
+<dd class="description">User cancelled authorization</dd>
 <dt>HTTP_BAD_GATEWAY </dt>
 <dd class="description">Bad gateway</dd>
 <dt>HTTP_BAD_REQUEST </dt>
@@ -3700,7 +3722,7 @@ with a hostname. </p>
 <dd class="description">Must use a proxy to access this URI</dd>
 </dl>
 <h3 class="enumeration"><a name="http_uri_coding_e">http_uri_coding_e</a></h3>
-<p class="description"></p>
+<p class="description">URI en/decode flags</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>HTTP_URI_CODING_ALL </dt>
@@ -3718,8 +3740,8 @@ with a hostname. </p>
 <dt>HTTP_URI_CODING_USERNAME </dt>
 <dd class="description">En/decode the username portion</dd>
 </dl>
-<h3 class="enumeration"><a name="http_uri_status_e">http_uri_status_e</a></h3>
-<p class="description"></p>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS1.2&nbsp;</span><a name="http_uri_status_e">http_uri_status_e</a></h3>
+<p class="description">URI separation status </p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>HTTP_URI_BAD_ARGUMENTS </dt>
@@ -3748,7 +3770,7 @@ with a hostname. </p>
 <dd class="description">Unknown scheme in URI (warning)</dd>
 </dl>
 <h3 class="enumeration"><a name="http_version_e">http_version_e</a></h3>
-<p class="description"></p>
+<p class="description">HTTP version numbers</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>HTTP_0_9 </dt>
@@ -3759,7 +3781,7 @@ with a hostname. </p>
 <dd class="description">HTTP/1.1</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_finish_e">ipp_finish_e</a></h3>
-<p class="description"></p>
+<p class="description">Finishings...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_FINISHINGS_BALE </dt>
@@ -3820,7 +3842,7 @@ with a hostname. </p>
 <dd class="description">Trim (any type)</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_jstate_e">ipp_jstate_e</a></h3>
-<p class="description"></p>
+<p class="description">Job States....</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_JOB_ABORTED </dt>
@@ -3839,7 +3861,7 @@ with a hostname. </p>
 <dd class="description">Job has been stopped</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_op_e">ipp_op_e</a></h3>
-<p class="description"></p>
+<p class="description">IPP operations...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_ACCEPT_JOBS </dt>
@@ -3926,7 +3948,7 @@ with a hostname. </p>
 <dd class="description">Validate job options</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_orient_e">ipp_orient_e</a></h3>
-<p class="description"></p>
+<p class="description">Orientation...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_LANDSCAPE </dt>
@@ -3939,7 +3961,7 @@ with a hostname. </p>
 <dd class="description">180 degrees</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_pstate_e">ipp_pstate_e</a></h3>
-<p class="description"></p>
+<p class="description">Printer States....</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_PRINTER_IDLE </dt>
@@ -3950,7 +3972,7 @@ with a hostname. </p>
 <dd class="description">Printer is stopped</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_quality_e">ipp_quality_e</a></h3>
-<p class="description"></p>
+<p class="description">Qualities...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_QUALITY_DRAFT </dt>
@@ -3961,7 +3983,7 @@ with a hostname. </p>
 <dd class="description">Normal quality</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_res_e">ipp_res_e</a></h3>
-<p class="description">Types and structures...</p>
+<p class="description">Resolution units...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_RES_PER_CM </dt>
@@ -3970,7 +3992,7 @@ with a hostname. </p>
 <dd class="description">Pixels per inch</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_state_e">ipp_state_e</a></h3>
-<p class="description"></p>
+<p class="description">IPP states...</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_ATTRIBUTE </dt>

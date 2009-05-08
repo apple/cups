@@ -98,6 +98,30 @@ static const char	*custom_code =
 			"%%EndFeature\n"
 			"} stopped cleartomark\n";
 
+static const char	*default2_code =
+			"[{\n"
+			"%%BeginFeature: *InstalledDuplexer False\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *InputSlot Tray\n"
+			"InputSlot=Tray\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *Quality Normal\n"
+			"Quality=Normal\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *IntOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *StringOption None\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n";
+
 
 /*
  * 'main()' - Main entry.
@@ -595,6 +619,23 @@ main(int  argc,				/* I - Number of command-line arguments */
       status ++;
       printf("FAIL (%d conflicts)\n", conflicts);
     }
+
+    fputs("ppdEmitString (defaults): ", stdout);
+    if ((s = ppdEmitString(ppd, PPD_ORDER_ANY, 0.0)) != NULL &&
+	!strcmp(s, default2_code))
+      puts("PASS");
+    else
+    {
+      status ++;
+      printf("FAIL (%d bytes instead of %d)\n", s ? (int)strlen(s) : 0,
+	     (int)strlen(default2_code));
+
+      if (s)
+	puts(s);
+    }
+
+    if (s)
+      free(s);
 
     fputs("ppdConflicts(): ", stdout);
     ppdMarkOption(ppd, "PageSize", "Env10");

@@ -3,7 +3,7 @@
 //
 //   Driver info file for CUPS-supplied PPDs.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 1993-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -521,11 +521,10 @@ Version "1.4"
   MinSize 36 36
   MaxSize 630 7128
 
-  UIConstraints "*inPrintMode Standard *inCutInterval "
-  UIConstraints "*inPrintMode Standard *inTearInterval "
-  UIConstraints "*inPrintMode Tear *inCutInterval "
-  UIConstraints "*inTearInterval *inPrintMode Cut"
-  UIConstraints "*inTearInterval *inPrintMode Standard"
+  UIConstraints "*inPrintMode Standard *inCutInterval"
+  UIConstraints "*inPrintMode Tear *inCutInterval"
+  UIConstraints "*inPrintMode Standard *inTearInterval"
+  UIConstraints "*inPrintMode Cut *inTearInterval"
 
   *MediaSize w288h432
 

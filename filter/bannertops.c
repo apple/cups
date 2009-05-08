@@ -589,7 +589,11 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
 
     printf("%%%%Page: %s %d\n", i == 1 ? "coverpage" : "coverback", i);
     puts("gsave");
-    printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+    if (i == 1)
+      printf("%.1f %.1f translate\n", PageLeft, PageBottom);
+    else
+      printf("%.1f %.1f translate\n", PageWidth - PageRight,
+             PageLength - PageRight);
     puts("0 setgray");
 
     y = info_top;

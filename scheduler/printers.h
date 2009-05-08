@@ -34,6 +34,8 @@ typedef struct
  * Printer/class information structure...
  */
 
+typedef struct cupsd_job_s cupsd_job_t;
+
 typedef struct cupsd_printer_s
 {
   char		*uri,			/* Printer URI */
@@ -67,7 +69,7 @@ typedef struct cupsd_printer_s
   mime_type_t	*filetype,		/* Pseudo-filetype for printer */
 		*prefiltertype;		/* Pseudo-filetype for pre-filters */
   cups_array_t	*filetypes;		/* Supported file types */
-  void		*job;			/* Current job in queue */
+  cupsd_job_t	*job;			/* Current job in queue */
   ipp_t		*attrs,			/* Attributes supported by this printer */
 		*ppd_attrs;		/* Attributes based on the PPD */
   int		num_printers,		/* Number of printers in class */

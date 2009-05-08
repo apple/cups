@@ -118,7 +118,8 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetString(&p->info, name);
   cupsdSetString(&p->hostname, ServerName);
 
-  cupsdSetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, LocalPort, name);
+  cupsdSetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, RemotePort,
+                  name);
   cupsdSetDeviceURI(p, "file:///dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;
@@ -370,13 +371,6 @@ cupsdCreateCommonData(void)
 		  "separate-documents-uncollated-copies",
 		  "separate-documents-collated-copies"
 		};
-  static const char * const errors[] =	/* printer-error-policy-supported values */
-		{
-		  "abort-job",
-		  "retry-current-job",
-		  "retry-job",
-		  "stop-printer"
-		};
   static const char * const notify_attrs[] =
 		{			/* notify-attributes-supported values */
 		  "printer-state-change-time",
@@ -620,11 +614,6 @@ cupsdCreateCommonData(void)
   /* pdf-override-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "pdl-override-supported", NULL, "not-attempted");
-
-  /* printer-error-policy-supported */
-  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
-                "printer-error-policy-supported",
-		sizeof(errors) / sizeof(errors[0]), NULL, errors);
 
   /* printer-op-policy-supported */
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
@@ -2923,7 +2912,7 @@ cupsdStopPrinter(cupsd_printer_t *p,	/* I - Printer to stop */
   * See if we have a job printing on this printer...
   */
 
-  if (p->job)
+  if (p->job && p->job->state_value == IPP_JOB_PROCESSING)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_DEFAULT,
                      "Job stopped due to printer being paused.");
 }

@@ -125,6 +125,12 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
 typedef const char *(*cups_password_cb_t)(const char *prompt);
 					/**** Password callback ****/
 
+typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
+					   const char *method,
+					   const char *resource,
+					   void *user_data);
+					/**** New password callback @since CUPS 1.4@ ****/
+
 typedef void (*cups_device_cb_t)(const char *device_class,
                                  const char *device_id, const char *device_info,
                                  const char *device_make_and_model,
@@ -294,6 +300,9 @@ extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
 				       void *user_data) _CUPS_API_1_4;
 extern cups_dest_t	*cupsGetNamedDest(http_t *http, const char *name,
 			                  const char *instance) _CUPS_API_1_4;
+extern const char	*cupsGetPassword2(const char *prompt, http_t *http,
+					  const char *method,
+					  const char *resource) _CUPS_API_1_4;
 extern http_status_t	cupsGetPPD3(http_t *http, const char *name,
 			            time_t *modtime, char *buffer,
 				    size_t bufsize) _CUPS_API_1_4;
@@ -309,6 +318,8 @@ extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
 extern http_status_t	cupsSendRequest(http_t *http, ipp_t *request,
 			                const char *resource,
 					size_t length) _CUPS_API_1_4;
+extern void		cupsSetPasswordCB2(cups_password_cb2_t cb,
+			                   void *user_data) _CUPS_API_1_4;
 extern http_status_t	cupsStartDocument(http_t *http, const char *name,
 			                  int job_id, const char *docname,
 					  const char *format,

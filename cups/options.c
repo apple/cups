@@ -3,7 +3,7 @@
  *
  *   Option routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -61,12 +61,12 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 		diff;			/* Result of search */
 
 
-  DEBUG_printf(("cupsAddOption(name=\"%s\", value=\"%s\", num_options=%d, "
+  DEBUG_printf(("2cupsAddOption(name=\"%s\", value=\"%s\", num_options=%d, "
                 "options=%p)", name, value, num_options, options));
  
   if (!name || !name[0] || !value || !options || num_options < 0)
   {
-    DEBUG_printf(("1cupsAddOption: Returning %d", num_options));
+    DEBUG_printf(("3cupsAddOption: Returning %d", num_options));
     return (num_options);
   }
 
@@ -94,7 +94,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     * No matching option name...
     */
 
-    DEBUG_printf(("2cupsAddOption: New option inserted at index %d...",
+    DEBUG_printf(("4cupsAddOption: New option inserted at index %d...",
                   insert));
 
     if (num_options == 0)
@@ -105,7 +105,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 
     if (temp == NULL)
     {
-      DEBUG_puts("1cupsAddOption: Unable to expand option array, returning 0");
+      DEBUG_puts("3cupsAddOption: Unable to expand option array, returning 0");
       return (0);
     }
 
@@ -113,7 +113,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 
     if (insert < num_options)
     {
-      DEBUG_printf(("2cupsAddOption: Shifting %d options...",
+      DEBUG_printf(("4cupsAddOption: Shifting %d options...",
                     (int)(num_options - insert)));
       memmove(temp + insert + 1, temp + insert,
 	      (num_options - insert) * sizeof(cups_option_t));
@@ -129,7 +129,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
     * Match found; free the old value...
     */
 
-    DEBUG_printf(("2cupsAddOption: Option already exists at index %d...",
+    DEBUG_printf(("4cupsAddOption: Option already exists at index %d...",
                   insert));
 
     temp = *options + insert;
@@ -138,7 +138,7 @@ cupsAddOption(const char    *name,	/* I  - Name of option */
 
   temp->value = _cupsStrAlloc(value);
 
-  DEBUG_printf(("1cupsAddOption: Returning %d", num_options));
+  DEBUG_printf(("3cupsAddOption: Returning %d", num_options));
 
   return (num_options);
 }
@@ -452,7 +452,7 @@ cupsRemoveOption(
   cups_option_t	*option;		/* Current option */
 
 
-  DEBUG_printf(("cupsRemoveOption(name=\"%s\", num_options=%d, options=%p)",
+  DEBUG_printf(("2cupsRemoveOption(name=\"%s\", num_options=%d, options=%p)",
                 name, num_options, options));
 
  /*
@@ -461,7 +461,7 @@ cupsRemoveOption(
 
   if (!name || num_options < 1 || !options)
   {
-    DEBUG_printf(("1cupsRemoveOption: Returning %d", num_options));
+    DEBUG_printf(("3cupsRemoveOption: Returning %d", num_options));
     return (num_options);
   }
 
@@ -479,7 +479,7 @@ cupsRemoveOption(
     * Remove this option from the array...
     */
 
-    DEBUG_puts("2cupsRemoveOption: Found option, removing it...");
+    DEBUG_puts("4cupsRemoveOption: Found option, removing it...");
 
     num_options --;
     i --;
@@ -495,7 +495,7 @@ cupsRemoveOption(
   * Return the new number of options...
   */
 
-  DEBUG_printf(("1cupsRemoveOption: Returning %d", num_options));
+  DEBUG_printf(("3cupsRemoveOption: Returning %d", num_options));
   return (num_options);
 }
 

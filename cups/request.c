@@ -264,6 +264,8 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       status   = http->status;
     }
 
+    DEBUG_printf(("2cupsDoIORequest: status=%d", status));
+
     if (status == HTTP_FORBIDDEN || status == HTTP_ERROR ||
 	status >= HTTP_SERVER_ERROR)
     {
@@ -434,6 +436,8 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       if (!cupsDoAuthentication(http, "POST", resource))
 	httpReconnect(http);
+      else
+        status = HTTP_AUTHORIZATION_CANCELED;
     }
 
 #ifdef HAVE_SSL
@@ -681,11 +685,15 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       case HTTP_UNAUTHORIZED :
           if (!cupsDoAuthentication(http, "POST", resource))
+	  {
 	    if (httpReconnect(http))
 	    {
 	      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
 	      return (HTTP_SERVICE_UNAVAILABLE);
 	    }
+	  }
+	  else
+	    status = HTTP_AUTHORIZATION_CANCELED;
 
           return (status);
 
@@ -782,7 +790,7 @@ cupsWriteRequestData(
   * Finally, check if we have any pending data from the server...
   */
 
-  if (length > HTTP_MAX_BUFFER ||
+  if (length >= HTTP_MAX_BUFFER ||
       http->wused < wused ||
       (wused > 0 && http->wused == length))
   {
@@ -863,6 +871,7 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
 
     case HTTP_UNAUTHORIZED :
+    case HTTP_AUTHORIZATION_CANCELED :
 	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
 	break;
 

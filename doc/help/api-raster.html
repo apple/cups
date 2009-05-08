@@ -27,6 +27,10 @@ PRE.command {
   margin-left: 36pt;
 }
 
+P.compact {
+  margin: 0;
+}
+
 P.example {
   font-style: italic;
   margin-left: 36pt;
@@ -391,17 +395,15 @@ page header structure.">cupsRasterWriteHeader2</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_adv_t" title="AdvanceMedia attribute values">cups_adv_t</a></li>
-	<li><a href="#cups_bool_t" title="Types...">cups_bool_t</a></li>
-	<li><a href="#cups_cspace_t" title="CutMedia attribute values">cups_cspace_t</a></li>
-	<li><a href="#cups_cut_t" title="LeadingEdge attribute values">cups_cut_t</a></li>
-	<li><a href="#cups_edge_t" title="Jog attribute values">cups_edge_t</a></li>
+	<li><a href="#cups_bool_t" title="Boolean type">cups_bool_t</a></li>
+	<li><a href="#cups_cspace_t" title="cupsColorSpace attribute values">cups_cspace_t</a></li>
+	<li><a href="#cups_cut_t" title="CutMedia attribute values">cups_cut_t</a></li>
+	<li><a href="#cups_edge_t" title="LeadingEdge attribute values">cups_edge_t</a></li>
 	<li><a href="#cups_interpret_cb_t" title="cupsRasterInterpretPPD callback function">cups_interpret_cb_t</a></li>
-	<li><a href="#cups_jog_t" title="cupsRasterOpen modes">cups_jog_t</a></li>
+	<li><a href="#cups_jog_t" title="Jog attribute values">cups_jog_t</a></li>
 	<li><a href="#cups_mode_t" title="cupsRasterOpen modes">cups_mode_t</a></li>
 	<li><a href="#cups_order_t" title="cupsColorOrder attribute values">cups_order_t</a></li>
-	<li><a href="#cups_orient_t" title="The page header structure contains the standard PostScript page device
-dictionary, along with some CUPS-specific parameters that are provided
-by the RIPs...">cups_orient_t</a></li>
+	<li><a href="#cups_orient_t" title="Orientation attribute values">cups_orient_t</a></li>
 	<li><a href="#cups_page_header2_t" title="Version 2 page header ">cups_page_header2_t</a></li>
 	<li><a href="#cups_page_header_t" title="Version 1 page header ">cups_page_header_t</a></li>
 	<li><a href="#cups_raster_t" title="Raster stream data">cups_raster_t</a></li>
@@ -412,14 +414,14 @@ by the RIPs...">cups_orient_t</a></li>
 </ul></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#cups_adv_e" title="AdvanceMedia attribute values">cups_adv_e</a></li>
-	<li><a href="#cups_bool_e" title="Types...">cups_bool_e</a></li>
-	<li><a href="#cups_cspace_e" title="">cups_cspace_e</a></li>
-	<li><a href="#cups_cut_e" title="">cups_cut_e</a></li>
-	<li><a href="#cups_edge_e" title="">cups_edge_e</a></li>
-	<li><a href="#cups_jog_e" title="">cups_jog_e</a></li>
-	<li><a href="#cups_mode_e" title="">cups_mode_e</a></li>
+	<li><a href="#cups_bool_e" title="Boolean type">cups_bool_e</a></li>
+	<li><a href="#cups_cspace_e" title="cupsColorSpace attribute values">cups_cspace_e</a></li>
+	<li><a href="#cups_cut_e" title="CutMedia attribute values">cups_cut_e</a></li>
+	<li><a href="#cups_edge_e" title="LeadingEdge attribute values">cups_edge_e</a></li>
+	<li><a href="#cups_jog_e" title="Jog attribute values">cups_jog_e</a></li>
+	<li><a href="#cups_mode_e" title="cupsRasterOpen modes">cups_mode_e</a></li>
 	<li><a href="#cups_order_e" title="cupsColorOrder attribute values">cups_order_e</a></li>
-	<li><a href="#cups_orient_e" title="">cups_orient_e</a></li>
+	<li><a href="#cups_orient_e" title="Orientation attribute values">cups_orient_e</a></li>
 </ul></li>
 <!--
   "$Id$"
@@ -809,22 +811,22 @@ the line buffer and as the number of bytes to write.</p>
 typedef enum <a href="#cups_adv_e">cups_adv_e</a> cups_adv_t;
 </p>
 <h3 class="typedef"><a name="cups_bool_t">cups_bool_t</a></h3>
-<p class="description">Types...</p>
+<p class="description">Boolean type</p>
 <p class="code">
 typedef enum <a href="#cups_bool_e">cups_bool_e</a> cups_bool_t;
 </p>
 <h3 class="typedef"><a name="cups_cspace_t">cups_cspace_t</a></h3>
-<p class="description">CutMedia attribute values</p>
+<p class="description">cupsColorSpace attribute values</p>
 <p class="code">
 typedef enum <a href="#cups_cspace_e">cups_cspace_e</a> cups_cspace_t;
 </p>
 <h3 class="typedef"><a name="cups_cut_t">cups_cut_t</a></h3>
-<p class="description">LeadingEdge attribute values</p>
+<p class="description">CutMedia attribute values</p>
 <p class="code">
 typedef enum <a href="#cups_cut_e">cups_cut_e</a> cups_cut_t;
 </p>
 <h3 class="typedef"><a name="cups_edge_t">cups_edge_t</a></h3>
-<p class="description">Jog attribute values</p>
+<p class="description">LeadingEdge attribute values</p>
 <p class="code">
 typedef enum <a href="#cups_edge_e">cups_edge_e</a> cups_edge_t;
 </p>
@@ -834,7 +836,7 @@ typedef enum <a href="#cups_edge_e">cups_edge_e</a> cups_edge_t;
 typedef int (*cups_interpret_cb_t)(<a href="#cups_page_header2_t">cups_page_header2_t</a> *header, int preferred_bits);
 </p>
 <h3 class="typedef"><a name="cups_jog_t">cups_jog_t</a></h3>
-<p class="description">cupsRasterOpen modes</p>
+<p class="description">Jog attribute values</p>
 <p class="code">
 typedef enum <a href="#cups_jog_e">cups_jog_e</a> cups_jog_t;
 </p>
@@ -849,9 +851,7 @@ typedef enum <a href="#cups_mode_e">cups_mode_e</a> cups_mode_t;
 typedef enum <a href="#cups_order_e">cups_order_e</a> cups_order_t;
 </p>
 <h3 class="typedef"><a name="cups_orient_t">cups_orient_t</a></h3>
-<p class="description">The page header structure contains the standard PostScript page device
-dictionary, along with some CUPS-specific parameters that are provided
-by the RIPs...</p>
+<p class="description">Orientation attribute values</p>
 <p class="code">
 typedef enum <a href="#cups_orient_e">cups_orient_e</a> cups_orient_t;
 </p>
@@ -1169,7 +1169,7 @@ factor not applied) </dd>
 <dd class="description">Advance the roll after this set</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_bool_e">cups_bool_e</a></h3>
-<p class="description">Types...</p>
+<p class="description">Boolean type</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_FALSE </dt>
@@ -1178,7 +1178,7 @@ factor not applied) </dd>
 <dd class="description">Logical true</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_cspace_e">cups_cspace_e</a></h3>
-<p class="description"></p>
+<p class="description">cupsColorSpace attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
@@ -1250,7 +1250,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Yellow, magenta, cyan, black</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_cut_e">cups_cut_e</a></h3>
-<p class="description"></p>
+<p class="description">CutMedia attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_CUT_FILE </dt>
@@ -1265,7 +1265,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Cut the roll after this set</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_edge_e">cups_edge_e</a></h3>
-<p class="description"></p>
+<p class="description">LeadingEdge attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_EDGE_BOTTOM </dt>
@@ -1278,7 +1278,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Leading edge is the top of the page</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_jog_e">cups_jog_e</a></h3>
-<p class="description"></p>
+<p class="description">Jog attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_JOG_FILE </dt>
@@ -1291,7 +1291,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">Move pages after this set</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_mode_e">cups_mode_e</a></h3>
-<p class="description"></p>
+<p class="description">cupsRasterOpen modes</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_RASTER_READ </dt>
@@ -1313,7 +1313,7 @@ light-cyan, light-magenta</dd>
 <dd class="description">CCC ... MMM ... YYY ... KKK ...</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_orient_e">cups_orient_e</a></h3>
-<p class="description"></p>
+<p class="description">Orientation attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_ORIENT_0 </dt>

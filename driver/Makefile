@@ -198,7 +198,10 @@ apihelp:
 		--title "Printer Driver API" \
 		--css ../doc/cups-printable.css \
 		--header api-driver.header --intro api-driver.shtml \
+		api-driver.xml \
 		driver.h $(LIBOBJS:.o=.c) >../doc/help/api-driver.html
+	mxmldoc --tokens help/api-driver.html >../doc/help/api-driver.tokens
+	$(RM) api-driver.xml
 
 framedhelp:
 	mxmldoc --framed api-driver \

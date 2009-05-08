@@ -181,6 +181,25 @@ static const char * const http_fields[] =
 			  "User-Agent",
 			  "WWW-Authenticate"
 			};
+#ifdef DEBUG
+static const char * const http_states[] =
+			{
+			  "HTTP_WAITING",
+			  "HTTP_OPTIONS",
+			  "HTTP_GET",
+			  "HTTP_GET_SEND",
+			  "HTTP_HEAD",
+			  "HTTP_POST",
+			  "HTTP_POST_RECV",
+			  "HTTP_POST_SEND",
+			  "HTTP_PUT",
+			  "HTTP_PUT_RECV",
+			  "HTTP_DELETE",
+			  "HTTP_TRACE",
+			  "HTTP_CLOSE",
+			  "HTTP_STATUS"
+			};
+#endif /* DEBUG */
 
 
 #if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
@@ -545,7 +564,8 @@ httpFlush(http_t *http)			/* I - Connection to server */
   int	blocking;			/* To block or not to block */
 
 
-  DEBUG_printf(("httpFlush(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("httpFlush(http=%p), state=%s", http,
+                http_states[http->state]));
 
  /*
   * Temporarily set non-blocking mode so we don't get stuck in httpRead()...
@@ -757,7 +777,8 @@ httpGetLength(http_t *http)		/* I - Connection to server */
 off_t					/* O - Content length */
 httpGetLength2(http_t *http)		/* I - Connection to server */
 {
-  DEBUG_printf(("2httpGetLength2(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("2httpGetLength2(http=%p), state=%s", http,
+                http_states[http->state]));
 
   if (!http)
     return (-1);
@@ -996,10 +1017,11 @@ httpGets(char   *line,			/* I - Line to read into */
  /*
   * Read a line from the buffer...
   */
-    
-  lineptr = line;
-  lineend = line + length - 1;
-  eol     = 0;
+
+  http->error = 0;
+  lineptr     = line;
+  lineend     = line + length - 1;
+  eol         = 0;
 
   while (lineptr < lineend)
   {
@@ -1328,6 +1350,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     return (-1);
 
   http->activity = time(NULL);
+  http->error    = 0;
 
   if (length <= 0)
     return (0);
@@ -1866,18 +1889,38 @@ httpSetField(http_t       *http,	/* I - Connection to server */
   else if (field == HTTP_FIELD_HOST)
   {
    /*
-    * Special-case for Host: as we don't want a trailing "." on the hostname.
+    * Special-case for Host: as we don't want a trailing "." on the hostname and
+    * need to bracket IPv6 numeric addresses.
     */
 
-    char *ptr = http->fields[HTTP_FIELD_HOST];
+    if (strchr(value, ':'))
+    {
+     /*
+      * Bracket IPv6 numeric addresses...
+      *
+      * This is slightly inefficient (basically copying twice), but is an edge
+      * case and not worth optimizing...
+      */
+
+      snprintf(http->fields[HTTP_FIELD_HOST],
+               sizeof(http->fields[HTTP_FIELD_HOST]), "[%s]", value);
+    }
+    else
+    {
+     /*
+      * Check for a trailing dot on the hostname...
+      */
+
+      char *ptr = http->fields[HTTP_FIELD_HOST];
 					/* Pointer into Host: field */
 
-    if (*ptr)
-    {
-      ptr += strlen(ptr) - 1;
+      if (*ptr)
+      {
+	ptr += strlen(ptr) - 1;
 
-      if (*ptr == '.')
-        *ptr = '\0';
+	if (*ptr == '.')
+	  *ptr = '\0';
+      }
     }
   }
 }
@@ -1936,7 +1979,8 @@ httpUpdate(http_t *http)		/* I - Connection to server */
 		status;			/* Request status */
 
 
-  DEBUG_printf(("httpUpdate(http=%p), state=%d", http, http->state));
+  DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
+                http_states[http->state]));
 
  /*
   * Flush pending data, if any...
@@ -2604,12 +2648,12 @@ http_debug_hex(const char *prefix,	/* I - Prefix for line */
 	*ptr;				/* Pointer into line */
 
 
-  if (_cups_debug_fd < 0)
+  if (_cups_debug_fd < 0 || _cups_debug_level < 6)
     return;
 
   DEBUG_printf(("6%s: %d bytes:\n", prefix, bytes));
 
-  snprintf(line, sizeof(line), "%s: ", prefix);
+  snprintf(line, sizeof(line), "6%s: ", prefix);
   start = line + strlen(line);
 
   for (i = 0; i < bytes; i += 16)
@@ -3164,14 +3208,15 @@ http_upgrade(http_t *http)		/* I - Connection to server */
  
 static int				/* O - Number of bytes written */
 http_write(http_t     *http,		/* I - Connection to server */
-          const char *buffer,		/* I - Buffer for data */
-	  int        length)		/* I - Number of bytes to write */
+           const char *buffer,		/* I - Buffer for data */
+	   int        length)		/* I - Number of bytes to write */
 {
   int	tbytes,				/* Total bytes sent */
 	bytes;				/* Bytes sent */
 
 
-  tbytes = 0;
+  http->error = 0;
+  tbytes      = 0;
 
   while (length > 0)
   {
@@ -3229,6 +3274,7 @@ http_write_chunk(http_t     *http,	/* I - Connection to server */
 {
   char	header[255];			/* Chunk header */
   int	bytes;				/* Bytes written */
+
 
   DEBUG_printf(("7http_write_chunk(http=%p, buffer=%p, length=%d)",
                 http, buffer, length));

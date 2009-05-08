@@ -61,6 +61,30 @@ static int	patmatch(const char *s, const char *pat);
 
 
 /*
+ * Local globals...
+ */
+
+#ifdef DEBUG
+static const char * const debug_ops[] =
+		{			/* Test names... */
+		  "NOP",		/* No operation */
+		  "AND",		/* Logical AND of all children */
+		  "OR",			/* Logical OR of all children */
+		  "MATCH",		/* Filename match */
+		  "ASCII",		/* ASCII characters in range */
+		  "PRINTABLE",		/* Printable characters (32-255) */
+		  "STRING",		/* String matches */
+		  "CHAR",		/* Character/byte matches */
+		  "SHORT",		/* Short/16-bit word matches */
+		  "INT",		/* Integer/32-bit word matches */
+		  "LOCALE",		/* Current locale matches string */
+		  "CONTAINS",		/* File contains a string */
+		  "ISTRING"		/* Case-insensitive string matches */
+		};
+#endif /* DEBUG */
+
+
+/*
  * 'mimeAddType()' - Add a MIME type to a database.
  */
 
@@ -157,7 +181,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
   logic  = MIME_MAGIC_NOP;
   invert = 0;
 
-  DEBUG_printf(("mimeAddTypeRule: %s/%s: %s\n", mt->super, mt->type, rule));
+  DEBUG_printf(("mimeAddTypeRule: %s/%s: %s", mt->super, mt->type, rule));
 
   while (*rule != '\0')
   {
@@ -207,11 +231,11 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
         current->prev   = NULL;
 	current->parent = temp;
 
-        DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p...\n", temp));
+        DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p...", temp));
       }
-      else
+      else if (current->parent)
       {
-        DEBUG_printf(("mimeAddTypeRule: Setting group %p op to AND...\n",
+        DEBUG_printf(("mimeAddTypeRule: Setting group %p op to AND...",
 	              current->parent));
         current->parent->op = MIME_MAGIC_AND;
       }
@@ -239,7 +263,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    return (-1);
 
           DEBUG_printf(("mimeAddTypeRule: Creating new AND group %p inside OR "
-	                "group\n", temp));
+	                "group", temp));
 
           while (current->prev != NULL)
 	  {
@@ -444,7 +468,7 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	*/
 
         DEBUG_printf(("mimeAddTypeRule: Making new OR group %p for "
-	              "parenthesis...\n", temp));
+	              "parenthesis...", temp));
 
         temp->op = MIME_MAGIC_OR;
 
@@ -452,13 +476,16 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	  return (-1);
 
 	temp->child->parent = temp;
+	temp->child->invert = temp->invert;
+	temp->invert        = 0;
 
 	temp  = temp->child;
         logic = MIME_MAGIC_OR;
       }
 
-      DEBUG_printf(("mimeAddTypeRule: adding %p: %s, op=%d, logic=%d, "
-                    "invert=%d\n", temp, name, op, logic, invert));
+      DEBUG_printf(("mimeAddTypeRule: adding %p: %s, op=MIME_MAGIC_%s(%d), "
+		    "logic=MIME_MAGIC_%s, invert=%d", temp, name, debug_ops[op],
+		    op, debug_ops[logic], invert));
 
      /*
       * Fill in data for the rule...
@@ -546,7 +573,7 @@ mimeFileType(mime_t     *mime,		/* I - MIME database */
 
 
   DEBUG_printf(("mimeFileType(mime=%p, pathname=\"%s\", filename=\"%s\", "
-                "compression=%p)\n", mime, pathname, filename, compression));
+                "compression=%p)", mime, pathname, filename, compression));
 
  /*
   * Range check input parameters...
@@ -671,27 +698,9 @@ checkrules(const char      *filename,	/* I - Filename */
 		intv;			/* Integer value */
   short		shortv;			/* Short value */
   unsigned char	*bufptr;		/* Pointer into buffer */
-#ifdef DEBUG
-  const char	* const debug_tests[] =	/* Test names... */
-		{
-		  "NOP",		/* No operation */
-		  "AND",		/* Logical AND of all children */
-		  "OR",			/* Logical OR of all children */
-		  "MATCH",		/* Filename match */
-		  "ASCII",		/* ASCII characters in range */
-		  "PRINTABLE",		/* Printable characters (32-255) */
-		  "STRING",		/* String matches */
-		  "CHAR",		/* Character/byte matches */
-		  "SHORT",		/* Short/16-bit word matches */
-		  "INT",		/* Integer/32-bit word matches */
-		  "LOCALE"		/* Current locale matches string */
-		  "CONTAINS"		/* File contains a string */
-		  "ISTRING"		/* Case-insensitive string matches */
-		};
-#endif /* DEBUG */
 
 
-  DEBUG_printf(("checkrules(filename=\"%s\", fb=%p, rules=%p)\n", filename,
+  DEBUG_printf(("checkrules(filename=\"%s\", fb=%p, rules=%p)", filename,
                 fb, rules));
 
   if (rules == NULL)
@@ -803,7 +812,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	  break;
 
       case MIME_MAGIC_STRING :
-          DEBUG_printf(("checkrules: string(%d, \"%s\")\n", rules->offset,
+          DEBUG_printf(("checkrules: string(%d, \"%s\")", rules->offset,
 	                rules->value.stringv));
 
          /*
@@ -823,7 +832,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	    fb->offset = rules->offset;
 
             DEBUG_printf(("checkrules: loaded %d byte fb->buffer at %d, starts "
-	                  "with \"%c%c%c%c\"...\n",
+	                  "with \"%c%c%c%c\"...",
 	                  fb->length, fb->offset, fb->buffer[0], fb->buffer[1],
 			  fb->buffer[2], fb->buffer[3]));
 	  }
@@ -838,7 +847,7 @@ checkrules(const char      *filename,	/* I - Filename */
 	  else
             result = (memcmp(fb->buffer + rules->offset - fb->offset,
 	                     rules->value.stringv, rules->length) == 0);
-          DEBUG_printf(("checkrules: result=%d\n", result));
+          DEBUG_printf(("checkrules: result=%d", result));
 	  break;
 
       case MIME_MAGIC_ISTRING :
@@ -1039,8 +1048,8 @@ checkrules(const char      *filename,	/* I - Filename */
     * the the rule set is false...
     */
 
-    DEBUG_printf(("checkrules: result of test %p (MIME_MAGIC_%s) is %d\n",
-                  rules, debug_tests[rules->op], result));
+    DEBUG_printf(("checkrules: result of test %p (MIME_MAGIC_%s) is %d",
+                  rules, debug_ops[rules->op], result));
 
     if ((result && logic == MIME_MAGIC_OR) ||
         (!result && logic == MIME_MAGIC_AND))
