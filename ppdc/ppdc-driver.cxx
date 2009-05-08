@@ -378,7 +378,8 @@ ppdcDriver::write_ppd_file(
     ppdcLineEnding le)			// I - Line endings to use
 {
   bool			delete_cat;	// Delete the catalog when we are done?
-  char			query[42];	// Query attribute
+  char			query[42],	// Query attribute
+			custom[42];	// Custom attribute
   ppdcString		*s;		// Copyright string
   ppdcGroup		*g;		// Current group
   ppdcOption		*o;		// Current option
@@ -560,6 +561,14 @@ ppdcDriver::write_ppd_file(
 	   !strcmp(a->name->value, "?PaperDimension")))
         continue;
 
+      if (!strncmp(a->name->value, "Custom", 6) &&
+          find_option(a->name->value + 6))
+	continue;
+
+      if (!strncmp(a->name->value, "ParamCustom", 11) &&
+          find_option(a->name->value + 11))
+	continue;
+
       if (!a->selector->value || !a->selector->value[0])
 	cupsFilePrintf(fp, "*%s", a->name->value);
       else if (!a->text->value || !a->text->value[0])
@@ -580,7 +589,7 @@ ppdcDriver::write_ppd_file(
       {
 	cupsFilePrintf(fp, ": \"%s\"%s", a->value->value, lf);
 
-	if (strchr(a->value->value, '\n'))
+	if (strchr(a->value->value, '\n') || strchr(a->value->value, '\r'))
           cupsFilePrintf(fp, "*End%s", lf);
       }
       else
@@ -1032,7 +1041,7 @@ ppdcDriver::write_ppd_file(
 
       if ((a = find_attr(query, NULL)) != NULL)
       {
-	cupsFilePrintf(fp, "*%s: \"%s\"\n", query, a->value->value);
+	cupsFilePrintf(fp, "*%s: \"%s\"%s", query, a->value->value, lf);
 
 	if (strchr(a->value->value, '\n') ||
             strchr(a->value->value, '\r'))
@@ -1040,6 +1049,32 @@ ppdcDriver::write_ppd_file(
       }
 
       cupsFilePrintf(fp, "*CloseUI: *%s%s", o->name->value, lf);
+
+      snprintf(custom, sizeof(custom), "Custom%s", o->name->value);
+      if ((a = find_attr(custom, "True")) != NULL)
+      {
+        // Output custom option information...
+        cupsFilePrintf(fp, "*%s True: \"%s\"%s", custom, a->value->value, lf);
+	if (strchr(a->value->value, '\n') || strchr(a->value->value, '\r'))
+	  cupsFilePrintf(fp, "*End%s", lf);
+
+        snprintf(custom, sizeof(custom), "ParamCustom%s", o->name->value);
+	for (a = (ppdcAttr *)attrs->first(); a; a = (ppdcAttr *)attrs->next())
+	{
+	  if (strcmp(a->name->value, custom))
+	    continue;
+
+	  if (!a->selector->value || !a->selector->value[0])
+	    cupsFilePrintf(fp, "*%s", a->name->value);
+	  else if (!a->text->value || !a->text->value[0])
+	    cupsFilePrintf(fp, "*%s %s", a->name->value, a->selector->value);
+	  else
+	    cupsFilePrintf(fp, "*%s %s/%s", a->name->value, a->selector->value,
+			   a->text->value);
+
+          cupsFilePrintf(fp, ": %s%s", a->value->value, lf);
+	}
+      }
     }
 
     if (strcasecmp(g->name->value, "General"))

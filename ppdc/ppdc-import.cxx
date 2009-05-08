@@ -113,6 +113,13 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
     else
       ptr = ppd->modelname;
 
+    if (ppd->nickname)
+      driver->add_attr(new ppdcAttr("NickName", NULL, NULL, ppd->nickname));
+
+    if (ppd->shortnickname)
+      driver->add_attr(new ppdcAttr("ShortNickName", NULL, NULL,
+                                    ppd->shortnickname));
+
     driver->manufacturer        = new ppdcString(ppd->manufacturer);
     driver->model_name          = new ppdcString(ptr);
     driver->pc_file_name        = new ppdcString(ppd->pcfilename);
@@ -195,7 +202,7 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
       {
         if (!strcmp(option->keyword, "PageSize") || !strcmp(option->keyword, "PageRegion"))
           continue;
-            
+
         coption = new ppdcOption((ppdcOptType)option->ui, option->keyword,
 	                         option->text, (ppdcOptSection)option->section,
 				 option->order);
@@ -203,6 +210,19 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
 
         for (k = option->num_choices, choice = option->choices; k > 0; k --, choice ++)
         {
+	  if (!strcmp(choice->choice, "Custom"))
+	  {
+	    // Map Custom option to CustomFoo True/Bla: "code"
+	    char customname[255];	// Custom option keyword
+
+	    snprintf(customname, sizeof(customname), "Custom%s",
+		     option->keyword);
+
+	    driver->add_attr(new ppdcAttr(customname, "True", NULL,
+	                                  choice->code));
+            continue;
+	  }
+
           cchoice = new ppdcChoice(choice->choice, choice->text, choice->code);
           coption->add_choice(cchoice);
 
@@ -217,25 +237,21 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
          i > 0;
 	 i --, constraint ++)
     {
-      for (j = i - 1, constraint2 = constraint;
+      // Look for mirrored constraints...
+      for (j = i - 1, constraint2 = constraint + 1;
            j > 0;
 	   j --, constraint2 ++)
-	if (constraint != constraint2 &&
-	    !strcmp(constraint->option1, constraint2->option2) &&
-	    (constraint->choice1 == constraint2->choice2 ||
-	     (constraint->choice1 && constraint2->choice2 &&
-	      !strcmp(constraint->choice1, constraint2->choice2))) &&
+	if (!strcmp(constraint->option1, constraint2->option2) &&
+	    !strcmp(constraint->choice1, constraint2->choice2) &&
 	    !strcmp(constraint->option2, constraint2->option1) &&
-	    (constraint->choice2 == constraint2->choice1 ||
-	     (constraint->choice2 && constraint2->choice1 &&
-	      !strcmp(constraint->choice2, constraint2->choice1))))
+	    !strcmp(constraint->choice2, constraint2->choice1))
           break;
 
       if (j)
         continue;
 
-      cconstraint = new ppdcConstraint(constraint->option1, constraint->choice1,
-                                       constraint->option2, constraint->choice2);
+      cconstraint = new ppdcConstraint(constraint->option2, constraint->choice2,
+                                       constraint->option1, constraint->choice1);
       driver->add_constraint(cconstraint);
     }
 

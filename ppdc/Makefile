@@ -290,9 +290,9 @@ ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/libcups.a
 		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
-	./ppdc-static -l en,fr -I ../data sample.drv
+	./ppdc-static -I ../data sample.drv
 	./ppdi-static -I ../data -o sample-import.drv ppd/*
-	./ppdc-static -l en,fr -I ../data -d ppd2 sample-import.drv
+	./ppdc-static -I ../data -d ppd2 sample-import.drv
 	if diff -qr ppd ppd2; then \
 		echo PPD import OK; \
 	else \
