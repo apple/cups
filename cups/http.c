@@ -1893,7 +1893,9 @@ httpSetField(http_t       *http,	/* I - Connection to server */
     * need to bracket IPv6 numeric addresses.
     */
 
-    if (strchr(value, ':'))
+    char *ptr = strchr(value, ':');
+
+    if (value[0] != '[' && ptr && strchr(ptr + 1, ':'))
     {
      /*
       * Bracket IPv6 numeric addresses...
