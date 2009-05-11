@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-05-08
+CHANGES.txt - 2009-05-11
 ------------------------
 
 CHANGES IN CUPS V1.4b3
@@ -8,6 +8,7 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- You can now modify a raw print queue (STR #3133)
         - Fixed a number of ppdi issues and added a unit test to validate that
 	  ppdc + ppdi can generate and import the same data (STR #3152)
 	- Moving jobs in the web interface now shows an error if you only have

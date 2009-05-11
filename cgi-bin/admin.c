@@ -1084,6 +1084,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 
       if (get_status != HTTP_OK)
       {
+        httpFlush(http);
+
         fprintf(stderr, "ERROR: Unable to get PPD file %s: %d - %s\n",
 	        uri, get_status, httpStatus(get_status));
       }
