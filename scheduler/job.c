@@ -45,6 +45,8 @@
  *   compare_active_jobs()      - Compare the job IDs and priorities of two
  *                                jobs.
  *   compare_jobs()             - Compare the job IDs of two jobs.
+ *   dump_job_history()         - Dump any debug messages for a job.
+ *   free_job_history()         - Free any log history.
  *   finalize_job()             - Cleanup after job filter processes and support
  *                                data.
  *   get_options()              - Get a string containing the job options.
@@ -165,7 +167,9 @@ static mime_filter_t	gziptoany_filter =
 
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
+static void	dump_job_history(cupsd_job_t *job);
 static void	finalize_job(cupsd_job_t *job);
+static void	free_job_history(cupsd_job_t *job);
 static char	*get_options(cupsd_job_t *job, int banner_page, char *copies,
 		             size_t copies_size, char *title,
 			     size_t title_size);
@@ -1206,6 +1210,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   cupsdSetPrinterState(job->printer, IPP_PRINTER_IDLE, 0);
   update_job_attrs(job, 0);
 
+  if (job->history)
+    free_job_history(job);
+
   cupsArrayRemove(PrintingJobs, job);
 
  /*
@@ -1268,6 +1275,9 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
 
     job->num_files = 0;
   }
+
+  if (job->history)
+    free_job_history(job);
 
   unload_job(job);
 
@@ -2478,6 +2488,140 @@ compare_jobs(void *first,		/* I - First job */
 
 
 /*
+ * 'dump_job_history()' - Dump any debug messages for a job.
+ */
+
+static void
+dump_job_history(cupsd_job_t *job)	/* I - Job */
+{
+  int			i,		/* Looping var */
+			oldsize;	/* Current MaxLogSize */
+  struct tm		*date;		/* Date/time value */
+  cupsd_joblog_t	*message;	/* Current message */
+  char			temp[2048],	/* Log message */
+			*ptr,		/* Pointer into log message */
+			start[256],	/* Start time */
+			end[256];	/* End time */
+  cupsd_printer_t	*printer;	/* Printer for job */
+
+
+ /*
+  * See if we have anything to dump...
+  */
+
+  if (!job->history)
+    return;
+
+ /*
+  * Disable log rotation temporarily...
+  */
+
+  oldsize    = MaxLogSize;
+  MaxLogSize = 0;
+
+ /*
+  * Copy the debug messages to the log...
+  */
+
+  message = (cupsd_joblog_t *)cupsArrayFirst(job->history);
+  date = localtime(&(message->time));
+  strftime(start, sizeof(start), "%X", date);
+
+  message = (cupsd_joblog_t *)cupsArrayLast(job->history);
+  date = localtime(&(message->time));
+  strftime(end, sizeof(end), "%X", date);
+
+  snprintf(temp, sizeof(temp),
+           "[Job %d] The following messages were recorded from %s to %s",
+           job->id, start, end);
+  cupsdWriteErrorLog(CUPSD_LOG_DEBUG, temp);
+
+  for (message = (cupsd_joblog_t *)cupsArrayFirst(job->history);
+       message;
+       message = (cupsd_joblog_t *)cupsArrayNext(job->history))
+    cupsdWriteErrorLog(CUPSD_LOG_DEBUG, message->message);
+
+  snprintf(temp, sizeof(temp), "[Job %d] End of messages", job->id);
+  cupsdWriteErrorLog(CUPSD_LOG_DEBUG, temp);
+
+ /*
+  * Log the printer state values...
+  */
+
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
+
+  if (printer)
+  {
+    snprintf(temp, sizeof(temp), "[Job %d] printer-state=%d(%s)", job->id,
+             printer->state,
+	     printer->state == IPP_PRINTER_IDLE ? "idle" :
+	         printer->state == IPP_PRINTER_PROCESSING ? "processing" :
+		 "stopped");
+    cupsdWriteErrorLog(CUPSD_LOG_DEBUG, temp);
+
+    snprintf(temp, sizeof(temp), "[Job %d] printer-state-message=\"%s\"",
+             job->id, printer->state_message);
+    cupsdWriteErrorLog(CUPSD_LOG_DEBUG, temp);
+
+    snprintf(temp, sizeof(temp), "[Job %d] printer-state-reasons=", job->id);
+    ptr = temp + strlen(temp);
+    if (printer->num_reasons == 0)
+      strlcpy(ptr, "none", sizeof(temp) - (ptr - temp));
+    else
+    {
+      for (i = 0;
+           i < printer->num_reasons && ptr < (temp + sizeof(temp) - 2);
+           i ++)
+      {
+        if (i)
+	  *ptr++ = ',';
+
+	strlcpy(ptr, printer->reasons[i], sizeof(temp) - (ptr - temp));
+	ptr += strlen(ptr);
+      }
+    }
+    cupsdWriteErrorLog(CUPSD_LOG_DEBUG, temp);
+  }
+
+ /*
+  * Restore log file rotation...
+  */
+
+  MaxLogSize = oldsize;
+
+ /*
+  * Free all messages...
+  */
+
+  free_job_history(job);
+}
+
+
+/*
+ * 'free_job_history()' - Free any log history.
+ */
+
+static void
+free_job_history(cupsd_job_t *job)	/* I - Job */
+{
+  char	*message;			/* Current message */
+
+
+  if (!job->history)
+    return;
+
+  for (message = (char *)cupsArrayFirst(job->history);
+       message;
+       message = (char *)cupsArrayNext(job->history))
+    free(message);
+
+  cupsArrayDelete(job->history);
+  job->history = NULL;
+}
+
+
+/*
  * 'finalize_job()' - Cleanup after job filter processes and support data.
  */
 
@@ -2771,6 +2915,14 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   cupsdSetPrinterState(job->printer, printer_state,
                        printer_state == IPP_PRINTER_STOPPED);
   update_job_attrs(job, 0);
+
+  if (job->history)
+  {
+    if (job->status)
+      dump_job_history(job);
+    else
+      free_job_history(job);
+  }
 
   cupsArrayRemove(PrintingJobs, job);
 
@@ -3767,7 +3919,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 {
   int		i;			/* Looping var */
   int		copies;			/* Number of copies printed */
-  char		message[1024],		/* Message text */
+  char		message[CUPSD_SB_BUFFER_SIZE],
+					/* Message text */
 		*ptr;			/* Pointer update... */
   int		loglevel,		/* Log level for message */
 		event = 0;		/* Events? */

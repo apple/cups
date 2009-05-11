@@ -203,8 +203,9 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
   if (TestConfigFile || !ErrorLog)
     return (1);
 
-  if (level > LogLevel ||
-      (level == CUPSD_LOG_INFO && LogLevel < CUPSD_LOG_DEBUG))
+  if ((level > LogLevel ||
+       (level == CUPSD_LOG_INFO && LogLevel < CUPSD_LOG_DEBUG)) &&
+      LogDebugHistory <= 0)
     return (1);
 
  /*
@@ -220,9 +221,55 @@ cupsdLogJob(cupsd_job_t *job,		/* I - Job */
     va_end(ap);
   }
   while (status == 0);
-
+  
   if (status > 0)
-    return (cupsdWriteErrorLog(level, log_line));
+  {
+    if ((level > LogLevel ||
+         (level == CUPSD_LOG_INFO && LogLevel < CUPSD_LOG_DEBUG)) &&
+	LogDebugHistory > 0)
+    {
+     /*
+      * Add message to the job history...
+      */
+
+      cupsd_joblog_t *temp;		/* Copy of log message */
+
+
+      if ((temp = malloc(sizeof(cupsd_joblog_t) + strlen(log_line))) != NULL)
+      {
+        temp->time = time(NULL);
+	strcpy(temp->message, log_line);
+      }
+
+      if (!job->history)
+	job->history = cupsArrayNew(NULL, NULL);
+
+      if (job->history && temp)
+      {
+	cupsArrayAdd(job->history, temp);
+
+	if (cupsArrayCount(job->history) > LogDebugHistory)
+	{
+	 /*
+	  * Remove excess messages...
+	  */
+
+	  temp = cupsArrayFirst(job->history);
+	  cupsArrayRemove(job->history, temp);
+	  free(temp);
+	}
+      }
+      else if (temp)
+	free(temp);
+
+      return (1);
+    }
+    else if (level <= LogLevel &&
+             (level != CUPSD_LOG_INFO || LogLevel >= CUPSD_LOG_DEBUG))
+      return (cupsdWriteErrorLog(level, log_line));
+    else
+      return (1);
+  }
   else
     return (cupsdWriteErrorLog(CUPSD_LOG_ERROR,
                                "Unable to allocate memory for log line!"));
