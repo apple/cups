@@ -307,6 +307,9 @@ case $uname in
 		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
 		AC_CHECK_FUNCS(mbr_uid_to_uuid)
 
+                dnl Check for the vproc_transaction_begin/end stuff...
+		AC_CHECK_FUNCS(vproc_transaction_begin)
+
 		dnl Need <dlfcn.h> header...
 		AC_CHECK_HEADER(dlfcn.h,AC_DEFINE(HAVE_DLFCN_H))
 

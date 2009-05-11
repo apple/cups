@@ -37,6 +37,9 @@
  */
 
 #include "cupsd.h"
+#ifdef HAVE_VPROC_TRANSACTION_BEGIN
+#  include <vproc.h>
+#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 
 
 /*
@@ -138,6 +141,9 @@ cupsdSetBusyState(void)
     "Active clients and printing jobs",
     "Active clients, printing jobs, and dirty files"
   };
+#ifdef HAVE_VPROC_TRANSACTION_BEGIN
+  static vproc_transaction_t vtran = 0;	/* Current busy transaction */
+#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 
 
   newbusy = (DirtyCleanTime ? 1 : 0) |
@@ -147,6 +153,16 @@ cupsdSetBusyState(void)
   if (newbusy != busy)
   {
     busy = newbusy;
+
+#ifdef HAVE_VPROC_TRANSACTION_BEGIN
+    if (busy && !vtran)
+      vtran = vproc_transaction_begin(NULL);
+    else if (!busy && vtran)
+    {
+      vproc_transaction_end(NULL, vtran);
+      vtran = 0;
+    }
+#endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetBusyState: %s", busy_text[busy]);
   }
