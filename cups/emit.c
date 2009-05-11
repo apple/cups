@@ -1156,7 +1156,8 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
   if (!strcasecmp(size->name, "Custom") ||
       (!manual_feed && !input_slot) ||
       (manual_feed && !strcasecmp(manual_feed->choice, "False") &&
-       (!input_slot || (input_slot->code && !input_slot->code[0]))))
+       (!input_slot || (input_slot->code && !input_slot->code[0]))) ||
+      (!rpr && ppd->num_filters > 0))
   {
    /*
     * Use PageSize code...
@@ -1164,8 +1165,7 @@ ppd_handle_media(ppd_file_t *ppd)	/* I - PPD file */
 
     ppdMarkOption(ppd, "PageSize", size->name);
   }
-  else if ((rpr && rpr->value && !strcasecmp(rpr->value, "True")) ||
-           (!rpr && ppd->num_filters > 0))
+  else if (rpr && rpr->value && !strcasecmp(rpr->value, "True"))
   {
    /*
     * Use PageRegion code...
