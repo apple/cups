@@ -2750,11 +2750,12 @@ cupsdSetPrinterReasons(
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
           if (strcmp(reason, "connecting-to-device"))
+	  {
 	    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
-	  if (PrintcapFormat == PRINTCAP_PLIST)
-	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-
+	    if (PrintcapFormat == PRINTCAP_PLIST)
+	      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+          }
 	  break;
 	}
     }
@@ -2786,10 +2787,12 @@ cupsdSetPrinterReasons(
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
 
 	if (strcmp(reason, "connecting-to-device"))
+	{
 	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
-	if (PrintcapFormat == PRINTCAP_PLIST)
-	  cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+	  if (PrintcapFormat == PRINTCAP_PLIST)
+	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+	}
       }
     }
   }
@@ -4171,7 +4174,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       }
 
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	           "output-bin-default", NULL, output_bin->defchoice);
+		   "output-bin-default", NULL, output_bin->defchoice);
     }
 
    /*
