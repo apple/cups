@@ -102,6 +102,8 @@
  */
 
 static char	*dequote(char *d, const char *s, int dlen);
+static char	*get_auth_info_required(cupsd_printer_t *p, char *buffer,
+		                        size_t bufsize);
 #ifdef __APPLE__
 static int	get_hostconfig(const char *name);
 #endif /* __APPLE__ */
@@ -2304,13 +2306,12 @@ dnssdBuildTxtRecord(
     cupsd_printer_t *p,			/* I - Printer information */
     int             for_lpd)		/* I - 1 = LPD, 0 = IPP */
 {
-  int		i, j;			/* Looping vars */
+  int		i;			/* Looping var */
   char		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
 		air_str[1024],		/* auth-info-required string buffer */
 		*keyvalue[32][2];	/* Table of key/value pairs */
-  ipp_attribute_t *air_attr;		/* auth-info-required attribute */
 
 
  /*
@@ -2420,26 +2421,8 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "pdl";
   keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";
 
-  if ((air_attr = ippFindAttribute(p->attrs, "auth-info-required",
-                                   IPP_TAG_KEYWORD)) != NULL &&
-      strcmp(air_attr->values[0].string.text, "none"))
+  if (get_auth_info_required(p, air_str, sizeof(air_str)))
   {
-    char	*air = air_str;		/* Pointer into string */
-
-
-    for (j = 0; j < air_attr->num_values; j ++)
-    {
-      if (air >= (air_str + sizeof(air_str) - 2))
-        break;
-
-      if (j)
-        *air++ = ',';
-
-      strlcpy(air, air_attr->values[j].string.text,
-              sizeof(air_str) - (air - air_str));
-      air += strlen(air);
-    }
-
     keyvalue[i  ][0] = "air";
     keyvalue[i++][1] = air_str;
   }
@@ -2925,6 +2908,85 @@ dnssdUpdate(void)
   }
 }
 #endif /* HAVE_DNSSD */
+
+
+/*
+ * 'get_auth_info_required()' - Get the auth-info-required value to advertise.
+ */
+
+static char *				/* O - String or NULL if none */
+get_auth_info_required(
+    cupsd_printer_t *p,			/* I - Printer */
+    char            *buffer,		/* I - Value buffer */
+    size_t          bufsize)		/* I - Size of value buffer */
+{
+  cupsd_location_t *auth;		/* Pointer to authentication element */
+  char		resource[1024];		/* Printer/class resource path */
+
+
+ /*
+  * If auth-info-required is set for this printer, return that...
+  */
+
+  if (p->num_auth_info_required > 0 && strcmp(p->auth_info_required[0], "none"))
+  {
+    int		i;			/* Looping var */
+    char	*bufptr;		/* Pointer into buffer */
+
+    for (i = 0, bufptr = buffer; i < p->num_auth_info_required; i ++)
+    {
+      if (bufptr >= (buffer + bufsize - 2))
+	break;
+
+      if (i)
+	*bufptr++ = ',';
+
+      strlcpy(bufptr, p->auth_info_required[i], bufsize - (bufptr - buffer));
+      bufptr += strlen(bufptr);
+    }
+
+    return (buffer);
+  }
+
+ /*
+  * Figure out the authentication data requirements to advertise...
+  */
+
+  if (p->type & CUPS_PRINTER_CLASS)
+    snprintf(resource, sizeof(resource), "/classes/%s", p->name);
+  else
+    snprintf(resource, sizeof(resource), "/printers/%s", p->name);
+
+  if ((auth = cupsdFindBest(resource, HTTP_POST)) == NULL ||
+      auth->type == CUPSD_AUTH_NONE)
+    auth = cupsdFindPolicyOp(p->op_policy_ptr, IPP_PRINT_JOB);
+
+  if (auth)
+  {
+    int	auth_type;			/* Authentication type */
+
+    if ((auth_type = auth->type) == CUPSD_AUTH_DEFAULT)
+      auth_type = DefaultAuthType;
+
+    switch (auth_type)
+    {
+      case CUPSD_AUTH_NONE :
+          return (NULL);
+
+      case CUPSD_AUTH_NEGOTIATE :
+	  strlcpy(buffer, "negotiate", bufsize);
+	  break;
+
+      default :
+	  strlcpy(buffer, "username,password", bufsize);
+	  break;
+    }
+
+    return (buffer);
+  }
+
+  return (NULL);
+}
 
 
 #ifdef __APPLE__
@@ -3687,8 +3749,9 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 			uri[1024],	/* Printer URI */
 			location[1024],	/* printer-location */
 			info[1024],	/* printer-info */
-			make_model[1024];
+			make_model[1024],
 					/* printer-make-and-model */
+			air[1024];	/* auth-info-required */
   cupsd_netif_t		*iface;		/* Network interface */
 
 
@@ -3726,6 +3789,11 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
   else
     strlcpy(make_model, "Local System V Printer", sizeof(make_model));
 
+  if (get_auth_info_required(p, packet, sizeof(packet)))
+    snprintf(air, sizeof(air), " auth-info-required=%s", packet);
+  else
+    air[0] = '\0';
+
  /*
   * Send a packet to each browse address...
   */
@@ -3762,9 +3830,9 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
         	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "");
+		   p->browse_attrs ? p->browse_attrs : "", air);
 
 	  bytes = strlen(packet);
 
@@ -3803,9 +3871,10 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+	  snprintf(packet, sizeof(packet),
+	           "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
         	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "");
+		   p->browse_attrs ? p->browse_attrs : "", air);
 
 	  bytes = strlen(packet);
 
@@ -3828,9 +3897,9 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s\n",
+      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
        	       type, p->state, p->uri, location, info, make_model,
-	       p->browse_attrs ? p->browse_attrs : "");
+	       p->browse_attrs ? p->browse_attrs : "", air);
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
