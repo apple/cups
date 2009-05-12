@@ -317,7 +317,8 @@ print_device(const char *uri,		/* I - Device URI */
 	     char	*argv[])	/* I - Command-line arguments */
 {
   char		  serial[1024];		/* Serial number buffer */
-  OSStatus	  status;		/* Function results */
+  OSStatus	  status,		/* Function results */
+		  prev_status = 0;	/* Previous results */
   pthread_t	  read_thread_id,	/* Read thread */
 		  sidechannel_thread_id;/* Side-channel thread */
   int		  have_sidechannel = 0;	/* Was the side-channel thread started? */
@@ -655,6 +656,19 @@ print_device(const char *uri,		/* I - Device URI */
 
 	if (status == kIOUSBTransactionTimeout)
 	  status = 0;
+
+	if (status == kIOReturnAborted && prev_status != kIOReturnAborted)
+	{
+	 /*
+	  * Ignore the first "aborted" status we get, since we might have
+	  * received a signal...
+	  */
+
+	  prev_status = status;
+	  status      = 0;
+	}
+	else
+	  prev_status = status;
 
 	if (status || bytes < 0)
 	{
