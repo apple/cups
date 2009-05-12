@@ -8,6 +8,8 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- The EPSON 24-pin series driver should now feed the correct amount
+	  (STR #2624)
 	- The scheduler now automatically logs the last N debug messages for
 	  failed print jobs.
 	- You can now modify a raw print queue (STR #3133)

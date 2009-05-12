@@ -4,7 +4,7 @@
  *   EPSON ESC/P and ESC/P2 filter for the Common UNIX Printing System
  *   (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -105,7 +105,7 @@ void	OutputRows(const cups_page_header2_t *header, int row);
 void
 Setup(void)
 {
-  const char	*device_uri;	/* The device for the printer... */
+  const char	*device_uri;		/* The device for the printer... */
 
 
  /*
@@ -124,11 +124,12 @@ Setup(void)
  */
 
 void
-StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
-          const cups_page_header2_t *header)	/* I - Page header */
+StartPage(
+    const ppd_file_t         *ppd,	/* I - PPD file */
+    const cups_page_header2_t *header)	/* I - Page header */
 {
-  int	n, t;					/* Numbers */
-  int	plane;					/* Looping var */
+  int	n, t;				/* Numbers */
+  int	plane;				/* Looping var */
 
 
  /*
@@ -144,8 +145,6 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
   * See which type of printer we are using...
   */
 
-  EjectPage = header->Margins[0] || header->Margins[1];
-    
   switch (Model)
   {
     case EPSON_9PIN :
@@ -165,8 +164,8 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
 
 	printf("\033l%c\033Q%c", 0,	/* Side margins */
                       (int)(10.0 * header->PageSize[0] / 72.0 + 0.5));
-	printf("\033C%c%c", 0,		/* Page length */
-                      (int)(header->PageSize[1] / 72.0 + 0.5));
+	printf("\033\062\033C%c",	/* Page length in 1/6th inches */
+		      (int)(header->PageSize[1] / 12.0 + 0.5));
 	printf("\033N%c", 0);		/* Bottom margin */
         printf("\033O");		/* No perforation skip */
 
@@ -321,7 +320,8 @@ StartPage(const ppd_file_t         *ppd,	/* I - PPD file */
  */
 
 void
-EndPage(const cups_page_header2_t *header)	/* I - Page header */
+EndPage(
+    const cups_page_header2_t *header)	/* I - Page header */
 {
   if (DotBytes && header)
   {
@@ -350,8 +350,7 @@ EndPage(const cups_page_header2_t *header)	/* I - Page header */
   * Eject the current page...
   */
 
-  if (EjectPage)
-    putchar(12);		/* Form feed */
+  putchar(12);				/* Form feed */
   fflush(stdout);
 
  /*
@@ -609,7 +608,8 @@ CompressData(const unsigned char *line,	/* I - Data to compress */
  */
 
 void
-OutputLine(const cups_page_header2_t *header)	/* I - Page header */
+OutputLine(
+    const cups_page_header2_t *header)	/* I - Page header */
 {
   if (header->cupsRowCount)
   {
@@ -777,14 +777,15 @@ OutputLine(const cups_page_header2_t *header)	/* I - Page header */
  */
 
 void
-OutputRows(const cups_page_header2_t *header,	/* I - Page image header */
-           int                      row)	/* I - Row number (0 or 1) */
+OutputRows(
+    const cups_page_header2_t *header,	/* I - Page image header */
+    int                      row)	/* I - Row number (0 or 1) */
 {
-  unsigned	i, n;				/* Looping vars */
-  int		dot_count,			/* Number of bytes to print */
-                dot_min;			/* Minimum number of bytes */
-  unsigned char *dot_ptr,			/* Pointer to print data */
-		*ptr;				/* Current data */
+  unsigned	i, n;			/* Looping vars */
+  int		dot_count,		/* Number of bytes to print */
+                dot_min;		/* Minimum number of bytes */
+  unsigned char *dot_ptr,		/* Pointer to print data */
+		*ptr;			/* Current data */
 
 
   dot_min = DotBytes * DotColumns;
