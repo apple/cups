@@ -1913,8 +1913,7 @@ httpSetField(http_t       *http,	/* I - Connection to server */
       * Check for a trailing dot on the hostname...
       */
 
-      char *ptr = http->fields[HTTP_FIELD_HOST];
-					/* Pointer into Host: field */
+      ptr = http->fields[HTTP_FIELD_HOST];
 
       if (*ptr)
       {
