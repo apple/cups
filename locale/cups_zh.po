@@ -2113,7 +2113,7 @@ msgid "Banners"
 msgstr "标题"
 
 msgid "Billing Information: "
-msgstr "帐单信息："
+msgstr "布告信息："
 
 msgid "Bond Paper"
 msgstr "证券纸"
@@ -3715,7 +3715,7 @@ msgid "Print and Tear"
 msgstr "打印和撕纸"
 
 msgid "Printed For: "
-msgstr "打印用于："
+msgstr "打印人："
 
 msgid "Printed From: "
 msgstr "打印自："
