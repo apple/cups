@@ -266,7 +266,7 @@ cupsSideChannelRead(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the SNMP query.
  *
- * @since CUPS 1.4@ 
+ * @since CUPS 1.4/Mac OS X 10.6@ 
  */
 
 cups_sc_status_t			/* O  - Query status */
@@ -358,7 +358,7 @@ cupsSideChannelSNMPGet(
  * support SNMP queries.  @code CUPS_SC_STATUS_NO_RESPONSE@ is returned when
  * the printer does not respond to the first SNMP query.
  *
- * @since CUPS 1.4@ 
+ * @since CUPS 1.4/Mac OS X 10.6@ 
  */
 
 cups_sc_status_t			/* O - Status of first query of @code CUPS_SC_STATUS_OK@ on success */

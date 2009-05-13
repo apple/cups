@@ -330,7 +330,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*marked;		/* Marked choices @since CUPS 1.3/Mac OS X 10.5@ @private@ */
 
   /**** New in CUPS 1.4 ****/
-  cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4@ @private@ */
+  cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
 } ppd_file_t;
 
 

@@ -117,8 +117,8 @@ enum cups_ptype_e			/**** Printer type/capability bit constants ****/
   CUPS_PRINTER_AUTHENTICATED = 0x400000,/* Printer requires authentication @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_PRINTER_COMMANDS = 0x800000,	/* Printer supports maintenance commands @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_PRINTER_DISCOVERED = 0x1000000,	/* Printer was automatically discovered and added @since CUPS 1.3/Mac OS X 10.5@ */
-  CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device @since CUPS 1.4@ */
-  CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities @since CUPS 1.4@ */
+  CUPS_PRINTER_SCANNER = 0x2000000,	/* Scanner-only device @since CUPS 1.4/Mac OS X 10.6@ */
+  CUPS_PRINTER_MFP = 0x4000000,		/* Printer with scanning capabilities @since CUPS 1.4/Mac OS X 10.6@ */
   CUPS_PRINTER_OPTIONS = 0x6fffc	/* ~(CLASS | REMOTE | IMPLICIT | DEFAULT | FAX | REJECTING | DELETE | NOT_SHARED | AUTHENTICATED | COMMANDS | DISCOVERED) @private@ */
 };
 
@@ -129,14 +129,14 @@ typedef const char *(*cups_password_cb2_t)(const char *prompt, http_t *http,
 					   const char *method,
 					   const char *resource,
 					   void *user_data);
-					/**** New password callback @since CUPS 1.4@ ****/
+					/**** New password callback @since CUPS 1.4/Mac OS X 10.6@ ****/
 
 typedef void (*cups_device_cb_t)(const char *device_class,
                                  const char *device_id, const char *device_info,
                                  const char *device_make_and_model,
                                  const char *device_uri,
 				 const char *device_location, void *user_data);
-					/**** Device callback @since CUPS 1.4@ ****/
+					/**** Device callback @since CUPS 1.4/Mac OS X 10.6@ ****/
 
 typedef struct cups_option_s		/**** Printer Options ****/
 {

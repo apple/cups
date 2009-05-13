@@ -316,17 +316,30 @@ uninstall:
 		fi \
 		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
 	fi
+	if test "x$(SMFMANIFESTDIR)" != x; then \
+		echo Uninstalling SMF manifest in $(SMFMANIFESTDIR)...;\
+		$(RM) $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+	fi
 	if test "x$(DBUSDIR)" != x; then \
 		echo Uninstalling cups.conf in $(DBUSDIR)...;\
 		$(RM) $(BUILDROOT)$(DBUSDIR)/cups.conf; \
 		$(RMDIR) $(BUILDROOT)$(DBUSDIR); \
 	fi
-	$(RM) $(BUILDROOT)/etc/xinetd.d/cups-lpd
-	$(RM) $(BUILDROOT)/usr/share/applications/cups.desktop
-	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/16x16/apps/cups.png
-	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/32x32/apps/cups.png
-	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/64x64/apps/cups.png
-	$(RM) $(BUILDROOT)/usr/share/icons/hicolor/128x128/apps/cups.png
+	if test "x$(XINETD)" != x; then \
+		echo Uninstalling xinetd configuration file for cups-lpd...; \
+		$(RM) $(BUILDROOT)$(XINETD)/cups-lpd; \
+	fi
+	if test "x$(MENUDIR)" != x; then \
+		echo Uninstalling desktop menu...; \
+		$(RM) $(BUILDROOT)$(MENUDIR)/cups.desktop; \
+	fi
+	if test "x$(ICONDIR)" != x; then \
+		echo Uninstalling desktop icons...; \
+		$(RM) $(BUILDROOT)$(ICONDIR)/hicolor/16x16/apps/cups.png; \
+		$(RM) $(BUILDROOT)$(ICONDIR)/hicolor/32x32/apps/cups.png; \
+		$(RM) $(BUILDROOT)$(ICONDIR)/hicolor/64x64/apps/cups.png; \
+		$(RM) $(BUILDROOT)$(ICONDIR)/hicolor/128x128/apps/cups.png; \
+	fi
 
 
 #
@@ -344,7 +357,7 @@ check:	all unittests
 
 
 #
-# Create an Xcode docset...
+# Create HTML documentation...
 #
 
 apihelp:
@@ -359,11 +372,17 @@ framedhelp:
 		(cd $$dir; $(MAKE) $(MFLAGS) framedhelp) || exit 1;\
 	done
 
+
+#
+# Create an Xcode docset...
+#
+
 docset:	apihelp
 	echo Generating docset directory tree...
 	$(RM) -r org.cups.docset
 	mkdir -p org.cups.docset/Contents/Resources/Documentation/help
 	mkdir -p org.cups.docset/Contents/Resources/Documentation/images
+	cd man; $(MAKE) $(MFLAGS) html
 	cd doc; $(MAKE) $(MFLAGS) docset
 	cd cgi-bin; $(MAKE) $(MFLAGS) makedocset
 	cgi-bin/makedocset org.cups.docset \

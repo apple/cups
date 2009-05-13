@@ -102,7 +102,7 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
  * Uses the current password callback function. Returns @code NULL@ if the
  * user does not provide a password.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 const char *				/* O - Password */
@@ -184,7 +184,7 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
  *
  * Pass @code NULL@ to restore the default (console) password callback.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 void

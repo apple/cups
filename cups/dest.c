@@ -478,7 +478,7 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
  * The returned destination must be freed using @link cupsFreeDests@ with a
  * "num_dests" value of 1.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 cups_dest_t *				/* O - Destination or @code NULL@ */

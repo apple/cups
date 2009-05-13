@@ -2,9 +2,11 @@
 <!-- SECTION: References -->
 <HEAD>
 	<TITLE>cupsd.conf</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
 </HEAD>
 <BODY>
 
+<H1 CLASS="title">cupsd.conf</H1>
 
 <P>The <VAR>/etc/cups/cupsd.conf</VAR> file contains
 configuration <I>directives</I> that control how the server

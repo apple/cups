@@ -40,7 +40,7 @@ PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
   margin-left: 36pt;
-  padding: 10px;
+  padding: 10pt;
 }
 
 PRE.command EM, PRE.example EM {
@@ -58,7 +58,7 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #cccccc;
+  background: #eeeeee;
   border: solid thin #999999;
   padding: 10pt;
 }
@@ -168,6 +168,9 @@ SPAN.info {
 H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
   float: right;
   font-size: 100%;
+}
+
+H1.title {
 }
 
 H2.title, H3.title {
@@ -334,6 +337,8 @@ div.contents ul.subcontents li {
 </head>
 <body>
 <div class='body'>
+<h1 class='title'>Developing PostScript Printer Drivers</h1>
+
 <p>This document describes how to develop printer drivers for PostScript printers. Topics include: <a href='#BASICS'>printer driver basics</a>, <a href='#CREATE'>creating new PPD files</a>, <a href='#IMPORT'>importing existing PPD files</a>, <a href='#FILTERS'>using custom filters</a>, <a href='#COLOR'>implementing color management</a>, <a href='#MACOSX'>adding Mac OS X features</a>, and <a href='#DEPLOY'>deploying your driver</a>.</p>
 
 <div class='summary'><table summary='General Information'>

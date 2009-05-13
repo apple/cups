@@ -196,7 +196,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
  * If the specified PPD file does not support custom page sizes, both
  * "minimum" and "maximum" are filled with zeroes.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 int					/* O - 1 if custom sizes are supported, 0 otherwise */

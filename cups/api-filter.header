@@ -4,7 +4,7 @@
   Filter and backend programming header for the Common UNIX Printing System
   (CUPS).
 
-  Copyright 2008 by Apple Inc.
+  Copyright 2008-2009 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -12,6 +12,8 @@
   which should have been included with this file.  If this file is
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
+
+<h1 class='title'>Filter and Backend Programming</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>

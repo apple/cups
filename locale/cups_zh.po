@@ -2113,10 +2113,10 @@ msgid "Banners"
 msgstr "标题"
 
 msgid "Billing Information: "
-msgstr "布告信息："
+msgstr "帐单信息："
 
 msgid "Bond Paper"
-msgstr "证券纸"
+msgstr "半透明纸"
 
 msgid "C0 Envelope"
 msgstr "C0 信封"

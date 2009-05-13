@@ -3,9 +3,11 @@
 <!-- SECTION: Specifications -->
 <HEAD>
 	<TITLE>CUPS Raster Format</TITLE>
-	<LINK REL="STYLESHEET" TYPE="test/css" HREF="../cups.css">
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
 </HEAD>
 <BODY>
+
+<H1 CLASS="title">CUPS Raster Format</H1>
 
 <P>CUPS raster files are device-dependent raster image files that
 contain a PostScript page device dictionary and device-dependent
@@ -15,7 +17,7 @@ RIPs to device-dependent filters that convert the raster data to
 a printable format.</P>
 
 <P>CUPS 1.0 and 1.1 used a version 1 raster format. CUPS 1.2
-introduces version 2 (compressed) and version 3 (uncompressed)
+introduced version 2 (compressed) and version 3 (uncompressed)
 formats that are a superset of the version 1 format. Applications
 using the CUPS Imaging API (the cupsRaster* functions) can read
 all formats without code changes.</P>
