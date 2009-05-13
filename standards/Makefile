@@ -21,7 +21,10 @@ include ../Makedefs
 #
 
 RFCS	=	\
+		rfc1155.txt \
+		rfc1157.txt \
 		rfc1179.txt \
+		rfc1213.txt \
 		rfc1321.txt \
 		rfc2222.txt \
 		rfc2246.txt \
@@ -30,10 +33,12 @@ RFCS	=	\
 		rfc2567.txt \
 		rfc2568.txt \
 		rfc2569.txt \
+		rfc2578.txt \
 		rfc2595.txt \
 		rfc2616.txt \
 		rfc2617.txt \
 		rfc2712.txt \
+		rfc2790.txt \
 		rfc2817.txt \
 		rfc2818.txt \
 		rfc2821.txt \
@@ -49,11 +54,15 @@ RFCS	=	\
 		rfc3391.txt \
 		rfc3510.txt \
 		rfc3712.txt \
+		rfc3805.txt \
+		rfc3875.txt \
 		rfc3986.txt \
 		rfc3995.txt \
 		rfc3996.txt \
 		rfc3997.txt \
-		rfc3998.txt
+		rfc3998.txt \
+		rfc4122.txt \
+		rfc4234.txt
 
 .SUFFIXES:	.html .txt
 .txt.html:	rfctohtml
@@ -146,7 +155,7 @@ uninstall:
 
 rfctohtml:	rfctohtml.o ../cups/libcups.a
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
-		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #
