@@ -1,9 +1,9 @@
-CHANGES.txt - 2009-05-11
+CHANGES.txt - 2009-05-13
 ------------------------
 
 CHANGES IN CUPS V1.4b3
 
-	- Documentation fixes (STR #3044, STR #3057)
+	- Documentation fixes (STR #3044, STR #3057, STR #3153)
 	- Added complete localizations for German, Japanese, Polish, and
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish

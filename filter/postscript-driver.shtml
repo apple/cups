@@ -248,14 +248,29 @@ information file.</P>
 
 <h2 class='title'><a name='COLOR'>Implementing Color Management</a></h2>
 
-<p>Talk about ICC color profiles and sRGB as two best options.</p>
+<p>CUPS uses ICC color profiles to provide more accurate color reproduction. The <a href='spec-ppd.html#cupsICCProfile'><tt>cupsICCProfile</tt></a> attribute defines the color profiles that are available for a given printer, for example:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "ColorModel.MediaType.Resolution/Description" /path/to/ICC/profile
+</pre>
+
+<p>where "ColorModel.MediaType.Resolution" defines a selector based on the corresponding option selections. A simple driver might only define profiles for the color models that are supported, for example a printer supporting Gray and RGB might use:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "Gray../Grayscale Profile" /path/to/ICC/gray-profile
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsICCProfile "RGB../Full Color Profile" /path/to/ICC/rgb-profile
+</pre>
+
+<p>The options used for profile selection can be customized using the <tt>cupsICCQualifier2</tt> and <tt>cupsICCQualifier3</tt> attributes.</p>
 
 
 <h2 class='title'><a name='MACOSX'>Adding Mac OS X Features</a></h2>
 
-<p>Talk about help books, icons, and PDEs.</p>
+<p>Mac OS X printer drivers can provide <a href='spec-ppd.html#MACOSX'>additional attributes</a> to specify additional option panes in the print dialog, an image of the printer, a help book, and option presets for the driver software:</p>
 
-
-<h2 class='title'><a name='DEPLOY'>Deploying Your Driver</a></h2>
-
-<p>Talk about install locations, etc.</p>
+<pre class='example'>
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APDialogExtension "" /Library/Printers/Vendor/filename.plugin
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APHelpBook "" /Library/Printers/Vendor/filename.bundle
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterIconPath "" /Library/Printers/Vendor/filename.icns
+<a href='ref-ppdcfile.html#Attribute'>Attribute</a> APPrinterPreset "name/text" "*option choice ..."
+</pre>
