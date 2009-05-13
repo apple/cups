@@ -325,6 +325,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/ppdcfile.5.gz
 /usr/share/man/man7/backend.7.gz
 /usr/share/man/man7/filter.7.gz
+/usr/share/man/man7/notifier.7.gz
 
 /usr/bin/cups-config
 /usr/bin/ppd*

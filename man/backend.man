@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH backend 7 "CUPS" "28 July 2008" "Apple Inc."
+.TH backend 7 "CUPS" "12 May 2009" "Apple Inc."
 
 .SH NAME
 backend \- cups backend transmission interfaces
@@ -36,13 +36,11 @@ standard input to a temporary file as required by the physical
 interface.
 
 .LP
-The command name (argv[0]) is set to the device URI of the
-destination printer. Starting with CUPS 1.1.22, any
-authentication information in argv[0] is removed, so
-backend developers are urged to use the DEVICE_URI environment
-variable whenever authentication information is required. The
-CUPS API includes a \fIcupsBackendDeviceURI\fR function for
-retrieving the correct device URI.
+The command name (argv[0]) is set to the device URI of the destination printer.
+Starting with CUPS 1.1.22, any authentication information in argv[0] is removed,
+so backend developers are urged to use the DEVICE_URI environment variable
+whenever authentication information is required. The CUPS API includes a
+\fIcupsBackendDeviceURI\fR function for retrieving the correct device URI.
 
 .LP
 Back-channel data from the device should be relayed to the job
@@ -174,7 +172,7 @@ this by canceling the job.
 All other exit code values are reserved.
 
 .SH SEE ALSO
-\fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR
+\fIcupsd(8)\fR, \fIcupsd.conf(5)\fR, \fIfilter(7)\fR,
 .br
 http://localhost:631/help
 

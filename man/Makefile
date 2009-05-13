@@ -51,6 +51,7 @@ MAN7	=	backend.$(MAN7EXT) \
 		commandtopclx.$(MAN7EXT) \
 		drv.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
+		notifier.$(MAN7EXT) \
 		rastertoescpx.$(MAN7EXT) \
 		rastertopclx.$(MAN7EXT)
 MAN8	=	cupsaccept.$(MAN8EXT) \
