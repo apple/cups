@@ -308,9 +308,7 @@ ppdLocalizeIPPReason(
         message = _("Media tray needs to be filled.");
       else if (!strncmp(reason, "media-jam", 9))
         message = _("Media jam!");
-      else if (!strncmp(reason, "moving-to-paused", 16) ||
-	       !strncmp(reason, "offline", 7) ||
-	       !strncmp(reason, "paused", 6) ||
+      else if (!strncmp(reason, "offline", 7) ||
 	       !strncmp(reason, "shutdown", 8))
         message = _("Printer offline.");
       else if (!strncmp(reason, "toner-low", 9))
