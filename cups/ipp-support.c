@@ -423,7 +423,7 @@ ippSetPort(int p)			/* I - Port number to use */
  *
  * The returned names are defined in RFC 2911 and 3382.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 const char *				/* O - Tag name */
@@ -443,7 +443,7 @@ ippTagString(ipp_tag_t tag)		/* I - Tag value */
  *
  * The tag names are defined in RFC 2911 and 3382.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ipp_tag_t				/* O - Tag value */

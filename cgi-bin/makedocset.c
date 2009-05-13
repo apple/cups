@@ -317,10 +317,10 @@ write_index(const char   *path,		/* I - File to write */
 		   "<head>\n"
 		   "<title>CUPS Documentation</title>\n"
 		   "<link rel='stylesheet' type='text/css' "
-		   "src='cups-printable.css'>\n"
+		   "href='cups-printable.css'>\n"
 		   "</head>\n"
 		   "<body>\n"
-		   "<h1>CUPS Documentation</h1>\n"
+		   "<h1 class='title'>CUPS Documentation</h1>\n"
 		   "<table width='100%' summary=''>\n"
 		   "<tr>\n");
 

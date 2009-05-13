@@ -1196,7 +1196,7 @@ cupsFilePutChar(cups_file_t *fp,	/* I - CUPS file */
  *
  * This function handles any comment escaping of the value.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ssize_t					/* O - Number of bytes written or -1 on error */

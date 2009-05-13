@@ -2,9 +2,11 @@
 <!-- SECTION: References -->
 <HEAD>
 	<TITLE>cupsd.conf</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
 </HEAD>
 <BODY>
 
+<H1 CLASS="title">cupsd.conf</H1>
 
 <P>The <VAR>/etc/cups/cupsd.conf</VAR> file contains
 configuration <I>directives</I> that control how the server
@@ -1964,6 +1966,24 @@ Directives inside <CODE>/printers</CODE> will override ones from
 </TABLE></DIV>
 
 
+<H2 CLASS="title"><A NAME="LogDebugHistory">LogDebugHistory</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+LogDebugHistory 0
+LogDebugHistory 200
+</PRE>
+
+<H3>Description</H3>
+
+<P>When <A HREF="#LogLevel"><CODE>LogLevel</CODE></A> is not set to
+<CODE>debug</CODE> or <CODE>debug2</CODE>, the <CODE>LogDebugHistory</CODE>
+directive specifies the number of debugging messages that are logged when an
+error occurs during printing. The default is 200 messages. A value of 0
+disables debugging history entirely and is not recommended.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.1.15</SPAN><A NAME="LogFilePerm">LogFilePerm</A></H2>
 
 <H3>Examples</H3>
@@ -2710,6 +2730,37 @@ address for the administrator on the system. By default the
 administrator email address is <CODE>root@server</CODE>, where
 <CODE>server</CODE> is the <A
 HREF="#ServerName"><CODE>ServerName</CODE></A>.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3.10</SPAN><A NAME="ServerAlias">ServerAlias</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+ServerAlias althost
+ServerAlias althost.foo.com
+ServerAlias althost.bar.com
+ServerAlias *
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>ServerAlias</CODE> directive specifies alternate names that the
+server is known by. By default it contains a list of all aliases associated
+with the <A HREF="#ServerName"><CODE>ServerName</CODE></A>. The special name
+"*" can be used to allow any hostname when accessing CUPS via an external
+network interfaces.</P>
+
+<BLOCKQUOTE><B>Note</B>
+
+<P>The <CODE>ServerAlias</CODE> directive is used for HTTP Host header
+validation when clients connect to the scheduler from external interfaces.
+Using the special name "*" can expose your system to known browser-based
+DNS rebinding attacks, even when accessing sites through a firewall. If the
+auto-discovery of alternate names does not work, we recommend listing each
+alternate name with a ServerAlias directive instead of using "*".</P>
+
+</BLOCKQUOTE>
 
 
 <H2 CLASS="title"><A NAME="ServerBin">ServerBin</A></H2>

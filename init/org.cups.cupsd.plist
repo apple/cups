@@ -4,6 +4,10 @@
 <dict>
 	<key>Label</key>
 	<string>org.cups.cupsd</string>
+	<key>EnableTransactions</key>
+	<true/>
+	<key>ExitTimeOut</key>
+	<integer>60</integer>
 	<key>KeepAlive</key>
 	<dict>
 		<key>PathState</key>

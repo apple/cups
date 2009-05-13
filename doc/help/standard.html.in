@@ -2,8 +2,11 @@
 <!-- SECTION: Getting Started -->
 <HEAD>
 	<TITLE>Standard Configuration</TITLE>
+	<LINK REL="STYLESHEET" TYPE="text/css" HREF="../cups-printable.css">
 </HEAD>
 <BODY>
+
+<H1 CLASS="title">Standard Configuration</H1>
 
 <P>This document describes the standard configuration for this CUPS
 server.</P>
@@ -14,7 +17,7 @@ server.</P>
      if you make any changes to the standard CUPS distribution that are
      not automatically updated by the configure script. -->
 <P>This file reflects the standard CUPS configuration as distributed
-by Easy Software Products, the creator of CUPS.</P>
+by Apple Inc, the developer of CUPS.</P>
 
 </BLOCKQUOTE>
 

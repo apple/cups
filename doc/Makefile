@@ -84,6 +84,7 @@ HELPFILES	=	\
 			help/man-lpstat.html \
 			help/man-mime.convs.html \
 			help/man-mime.types.html \
+			help/man-notifier.html \
 			help/man-ppdc.html \
 			help/man-ppdhtml.html \
 			help/man-ppdi.html \

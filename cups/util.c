@@ -112,7 +112,7 @@ cupsCancelJob(const char *name,		/* I - Name of printer or class */
  * Use the @link cupsLastError@ and @link cupsLastErrorString@ functions to get
  * the cause of any failure.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ipp_status_t				/* O - IPP status */
@@ -200,7 +200,7 @@ cupsCancelJob2(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP_
  * print, use the @link cupsPrintFile2@ or @link cupsPrintFiles2@ function
  * instead.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 int					/* O - Job ID or 0 on error */
@@ -280,7 +280,7 @@ cupsCreateJob(
  *
  * The document must have been started using @link cupsStartDocument@.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ipp_status_t				/* O - Status of document submission */
@@ -882,7 +882,7 @@ cupsGetPPD2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
  * For classes, @code cupsGetPPD3@ returns the PPD file for the first printer
  * in the class.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 http_status_t				/* O  - HTTP status */
@@ -1543,7 +1543,7 @@ cupsPrintFiles2(
  * @code CUPS_FORMAT_TEXT@ are provided for the "format" argument, although
  * any supported MIME type string can be supplied.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 http_status_t				/* O - HTTP status of request */

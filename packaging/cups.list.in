@@ -700,13 +700,7 @@ f 0644 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
 f 0644 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT
 f 0644 root sys $MANDIR/man5/printers.conf.$MAN5EXT man/printers.conf.$MAN5EXT
 
-f 0644 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
-f 0644 root sys $MANDIR/man7/commandtoescpx.$MAN7EXT man/commandtoescpx.$MAN7EXT
-f 0644 root sys $MANDIR/man7/commandtopclx.$MAN7EXT man/commandtopclx.$MAN7EXT
 f 0644 root sys $MANDIR/man7/drv.$MAN7EXT man/drv.$MAN7EXT
-f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
-f 0644 root sys $MANDIR/man7/rastertoescpx.$MAN7EXT man/rastertoescpx.$MAN7EXT
-f 0644 root sys $MANDIR/man7/rastertopclx.$MAN7EXT man/rastertopclx.$MAN7EXT
 
 l 0644 root sys $AMANDIR/man$MAN8DIR/accept.$MAN8EXT cupsaccept.$MAN8EXT
 f 0644 root sys $AMANDIR/man$MAN8DIR/cupsaccept.$MAN8EXT man/cupsaccept.$MAN8EXT
@@ -730,6 +724,9 @@ l 0644 root sys $AMANDIR/man$MAN8DIR/reject.$MAN8EXT cupsaccept.$MAN8EXT
 f 0644 root sys $MANDIR/man1/cups-config.$MAN1EXT man/cups-config.$MAN1EXT
 f 0644 root sys $MANDIR/man1/ man/ppd*.$MAN1EXT
 f 0644 root sys $MANDIR/man5/ppdcfile.$MAN5EXT man/ppdcfile.$MAN5EXT
+f 0644 root sys $MANDIR/man7/backend.$MAN7EXT man/backend.$MAN7EXT
+f 0644 root sys $MANDIR/man7/filter.$MAN7EXT man/filter.$MAN7EXT
+f 0644 root sys $MANDIR/man7/notifier.$MAN7EXT man/notifier.$MAN7EXT
 
 %subpackage lpd
 d 0755 root sys $AMANDIR/man$MAN8DIR -

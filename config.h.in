@@ -607,6 +607,13 @@
 
 
 /*
+ * Do we have vproc_transaction_begin/end?
+ */
+
+#undef HAVE_VPROC_TRANSACTION_BEGIN
+
+
+/*
  * Do we have libusb?
  */
 

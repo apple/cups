@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH filter 7 "CUPS" "18 September 2008" "Apple Inc."
+.TH filter 7 "CUPS" "13 May 2009" "Apple Inc."
 .SH NAME
 filter \- cups file conversion filter interface
 .SH SYNOPSIS
@@ -31,7 +31,24 @@ or from the standard input, copying the standard input to a temporary
 file as required by the file format. All output \fBmust\fR be sent to the
 standard output.
 .LP
-The command name (argv[0]) is set to the name of the destination printer.
+The command name (argv[0]) is set to the name of the destination printer but is
+also available in the PRINTER environment variable.
+
+.SH OPTIONS
+Options passed on the command-line typically do not include the default choices
+the printer's PPD file. In addition, some options may be specified in multiple
+ways - "landscape" is a synonym for "orientation-requested=4", "media" is a
+synonym for "PageSize", "PageRegion", "InputSlot", and "MediaType", and "sides"
+is a synonym for the various "Duplex" options. Non-raster filters \fBmust\fR
+support both explicit and implicit specification of PPD options - use the
+ppdMarkDefaults and cupsMarkOptions functions in the CUPS library to use the
+correct mapping, and ppdFindMarkedChoice to get the user-selected choice.
+.LP
+Raster filters should use option choices set through the raster page header, as
+those reflect the options in effect for a given page. Options specified on the
+command-line determine the default values for the entire job, which can be
+overridden on a per-page basis.
+
 .SH LOG MESSAGES
 Messages sent to stderr are generally logged to
 printer-state-message attribute and the current \fIErrorLog\fR.
@@ -229,7 +246,7 @@ scripts, it will only work with the System V interface script as the
 only filter.  Typically the interface script will be provided via the
 \fIlpadmin(8)\fR command using the \fI-i\fR option.
 .SH SEE ALSO
-\fIbackend(1)\fR, \fIcupsd(8)\fR,
+\fIbackend(7)\fR, \fIcupsd(8)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT

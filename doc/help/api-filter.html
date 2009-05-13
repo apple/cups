@@ -40,7 +40,7 @@ PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
   margin-left: 36pt;
-  padding: 10px;
+  padding: 10pt;
 }
 
 PRE.command EM, PRE.example EM {
@@ -58,7 +58,7 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #cccccc;
+  background: #eeeeee;
   border: solid thin #999999;
   padding: 10pt;
 }
@@ -168,6 +168,9 @@ SPAN.info {
 H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
   float: right;
   font-size: 100%;
+}
+
+H1.title {
 }
 
 H2.title, H3.title {
@@ -335,12 +338,12 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-filter.header 8087 2008-10-27 21:37:05Z mike $"
+  "$Id: api-filter.header 8627 2009-05-13 21:39:17Z mike $"
 
   Filter and backend programming header for the Common UNIX Printing System
   (CUPS).
 
-  Copyright 2008 by Apple Inc.
+  Copyright 2008-2009 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -348,6 +351,8 @@ div.contents ul.subcontents li {
   which should have been included with this file.  If this file is
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
+
+<h1 class='title'>Filter and Backend Programming</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>
@@ -377,6 +382,7 @@ div.contents ul.subcontents li {
 <ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
 <li><a href="#SECURITY">Security Considerations</a></li>
+<li><a href="#PERMISSIONS">File Permissions</a></li>
 <li><a href="#TEMPFILES">Temporary Files</a></li>
 <li><a href="#COPIES">Copy Generation</a></li>
 <li><a href="#EXITCODES">Exit Codes</a></li>
@@ -418,7 +424,7 @@ div.contents ul.subcontents li {
   Filter and backend programming introduction for the Common UNIX Printing
   System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2009 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -463,6 +469,12 @@ the remaining filters read from the standard input and write to the standard
 output. The backend is the last filter in the chain and writes to the
 device.</p>
 
+<p>Filters are always run as a non-privileged user, typically "lp", with no
+connection to the user's desktop. Backends are run either as a non-privileged
+user or as root if the file permissions do not allow user or group execution.
+The <a href="#PERMISSIONS">file permissions</a> section talks about this in
+more detail.</p>
+
 <h3><a name="SECURITY">Security Considerations</a></h3>
 
 <p>It is always important to use security programming practices. Filters and
@@ -475,7 +487,7 @@ specify an arbitrary file path to a separator page, template, or other file
 used by the filter since that can lead to an unauthorized disclosure of
 information. <em>Always</em> treat input as suspect and validate it!</p>
 
-<p>If you are developing a backend that runs as root, make sure to check for
+<p>If you are developing a backend that runs as root , make sure to check for
 potential buffer overflows, integer under/overflow conditions, and file
 accesses since these can lead to privilege escalations. When writing files,
 always validate the file path and <em>never</em> allow a user to determine
@@ -489,9 +501,22 @@ user may not be the same as the local user and/or there may not be a local home
 directory to write to.</p>
 
 <p>In addition, some operating systems provide additional security mechanisms
-that further limit file system access, even for backends running as root.  On
+that further limit file system access, even for backends running as root. On
 Mac OS X, for example, no backend may write to a user's home directory.</p>
 </blockquote>
+
+<h3><a name="PERMISSIONS">File Permissions</a></h3>
+
+<p>For security reasons, CUPS will only run filters and backends that are owned
+by root and do not have world write permissions. The recommended permissions for
+filters and backends are 0555 - read and execute but no write. Backends that
+must run as root should use permissions of 0500 - read and execute by root, no
+access for other users. Write permissions can be enabled for the root user
+only.</p>
+
+<p>To avoid a warning message, the directory containing your filter(s) must also
+be owned by root and have world write disabled - permissions of 0755 or 0555 are
+strongly encouraged.</p>
 
 <h3><a name="TEMPFILES">Temporary Files</a></h3>
 
@@ -1042,7 +1067,7 @@ variable or the device URI passed in argv[0], whichever is found
 first.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsBackendReport">cupsBackendReport</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsBackendReport">cupsBackendReport</a></h3>
 <p class="description">Write a device line from a backend.</p>
 <p class="code">
 void cupsBackendReport (<br>
@@ -1144,7 +1169,7 @@ pointed to by the &quot;data&quot; parameter.  cupsSideChannelDoRequest() will
 update the value to contain the number of data bytes in the buffer.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsSideChannelSNMPGet">cupsSideChannelSNMPGet</a></h3>
 <p class="description">Query a SNMP OID's value.</p>
 <p class="code">
 <a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPGet (<br>
@@ -1185,7 +1210,7 @@ support SNMP queries.  <code>CUPS_SC_STATUS_NO_RESPONSE</code> is returned when
 the printer does not respond to the SNMP query.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsSideChannelSNMPWalk">cupsSideChannelSNMPWalk</a></h3>
 <p class="description">Query multiple SNMP OID values.</p>
 <p class="code">
 <a href="#cups_sc_status_t">cups_sc_status_t</a> cupsSideChannelSNMPWalk (<br>
@@ -1331,9 +1356,9 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datal
 <dd class="description">Return the IEEE-1284 device ID</dd>
 <dt>CUPS_SC_CMD_GET_STATE </dt>
 <dd class="description">Return the device state</dd>
-<dt>CUPS_SC_CMD_SNMP_GET <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dt>CUPS_SC_CMD_SNMP_GET <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
 <dd class="description">Query an SNMP OID </dd>
-<dt>CUPS_SC_CMD_SNMP_GET_NEXT <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dt>CUPS_SC_CMD_SNMP_GET_NEXT <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
 <dd class="description">Query the next SNMP OID </dd>
 <dt>CUPS_SC_CMD_SOFT_RESET </dt>
 <dd class="description">Do a soft reset</dd>

@@ -4,7 +4,7 @@
  *   Internet Printing Protocol definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -248,7 +248,7 @@ typedef enum ipp_op_e			/**** IPP operations... ****/
   CUPS_MOVE_JOB,			/* Move a job to a different printer */
   CUPS_AUTHENTICATE_JOB,		/* Authenticate a job @since CUPS 1.2/Mac OS X 10.5@ */
   CUPS_GET_PPD,				/* Get a PPD file @since CUPS 1.3/Mac OS X 10.5@ */
-  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4@ */
+  CUPS_GET_DOCUMENT = 0x4027		/* Get a document file @since CUPS 1.4/Mac OS X 10.6@ */
 } ipp_op_t;
 
 /* Old names for the operations */

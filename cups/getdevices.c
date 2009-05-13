@@ -35,7 +35,7 @@
  * parameters provide comma-delimited lists of backends to include or omit from
  * the request respectively.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ipp_status_t				/* O - Request status - @code IPP_OK@ on success. */

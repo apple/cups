@@ -23,6 +23,7 @@
  *   cat_drv()         - Generate a PPD from a driver info file.
  *   cat_ppd()         - Copy a PPD file to stdout.
  *   copy_static()     - Copy a static PPD file to stdout.
+ *   compare_inodes()  - Compare two inodes.
  *   compare_matches() - Compare PPD match scores for sorting.
  *   compare_names()   - Compare PPD filenames for sorting.
  *   compare_ppds()    - Compare PPD file make and model names for sorting.
@@ -114,7 +115,8 @@ typedef struct				/**** In-memory record ****/
  * Globals...
  */
 
-cups_array_t	*PPDsByName = NULL,	/* PPD files sorted by filename and name */
+cups_array_t	*Inodes = NULL,		/* Inodes of directories we've visited */
+		*PPDsByName = NULL,	/* PPD files sorted by filename and name */
 		*PPDsByMakeModel = NULL;/* PPD files sorted by make and model */
 int		ChangedPPD;		/* Did we change the PPD database? */
 
@@ -133,6 +135,7 @@ static ppd_info_t	*add_ppd(const char *filename, const char *name,
 static int		cat_drv(const char *name, int request_id);
 static int		cat_ppd(const char *name, int request_id);
 static int		cat_static(const char *name, int request_id);
+static int		compare_inodes(struct stat *a, struct stat *b);
 static int		compare_matches(const ppd_info_t *p0,
 			                const ppd_info_t *p1);
 static int		compare_names(const ppd_info_t *p0,
@@ -661,6 +664,21 @@ cat_static(const char *name,		/* I - PPD name */
 
 
 /*
+ * 'compare_inodes()' - Compare two inodes.
+ */
+
+static int				/* O - Result of comparison */
+compare_inodes(struct stat *a,		/* I - First inode */
+               struct stat *b)		/* I - Second inode */
+{
+  if (a->st_dev != b->st_dev)
+    return (a->st_dev - b->st_dev);
+  else
+    return (a->st_ino - b->st_ino);
+}
+
+
+/*
  * 'compare_matches()' - Compare PPD match scores for sorting.
  */
 
@@ -838,6 +856,8 @@ list_ppds(int        request_id,	/* I - Request ID */
 
   if ((cups_datadir = getenv("CUPS_DATADIR")) == NULL)
     cups_datadir = CUPS_DATADIR;
+
+  Inodes = cupsArrayNew((cups_array_func_t)compare_inodes, NULL);
 
   snprintf(model, sizeof(model), "%s/model", cups_datadir);
   load_ppds(model, "", 1);
@@ -1323,6 +1343,8 @@ load_ppds(const char *d,		/* I - Actual directory */
           const char *p,		/* I - Virtual path in name */
 	  int        descend)		/* I - Descend into directories? */
 {
+  struct stat	dinfo,			/* Directory information */
+		*dinfoptr;		/* Pointer to match */
   int		i;			/* Looping var */
   cups_file_t	*fp;			/* Pointer to file */
   cups_dir_t	*dir;			/* Directory pointer */
@@ -1382,7 +1404,32 @@ load_ppds(const char *d,		/* I - Actual directory */
   };
 
 
-  fprintf(stderr, "DEBUG: [cups-driverd] Loading \"%s\"...\n", d);
+ /*
+  * See if we've loaded this directory before...
+  */
+
+  if (stat(d, &dinfo))
+  {
+    if (errno != ENOENT)
+      fprintf(stderr, "ERROR: [cups-driverd] Unable to stat \"%s\": %s\n", d,
+	      strerror(errno));
+
+    return (0);
+  }
+  else if (cupsArrayFind(Inodes, &dinfo))
+  {
+    fprintf(stderr, "ERROR: [cups-driverd] Skipping \"%s\": loop detected!\n",
+            d);
+    return (0);
+  }
+
+ /*
+  * Nope, add it to the Inodes array and continue...
+  */
+
+  dinfoptr = (struct stat *)malloc(sizeof(struct stat));
+  memcpy(dinfoptr, &dinfo, sizeof(struct stat));
+  cupsArrayAdd(Inodes, dinfoptr);
 
   if ((dir = cupsDirOpen(d)) == NULL)
   {
@@ -1393,6 +1440,8 @@ load_ppds(const char *d,		/* I - Actual directory */
 
     return (0);
   }
+
+  fprintf(stderr, "DEBUG: [cups-driverd] Loading \"%s\"...\n", d);
 
   while ((dent = cupsDirRead(dir)) != NULL)
   {

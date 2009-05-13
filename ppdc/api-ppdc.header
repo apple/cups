@@ -1,7 +1,7 @@
 <!--
   "$Id: api-array.header 8087 2008-10-27 21:37:05Z mike $"
 
-  Driver API header for CUPS.
+  PPD Compiler API header for CUPS.
 
   Copyright 2009 by Apple Inc.
 
@@ -12,19 +12,19 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h1 class='title'>Driver API</h1>
+<h1 class='title'>PPD Compiler API</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>
 <tr>
 	<th>Header</th>
-	<th>cups/driver.h</th>
+	<th>cups/ppdc.h</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 	<th>Library</th>
-	<td>-lcupsdriver</td>
+	<td>-lcupsppdc</td>
 </tr>
 <tr>
 	<th>See Also</th>

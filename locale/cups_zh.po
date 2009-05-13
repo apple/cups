@@ -2116,7 +2116,7 @@ msgid "Billing Information: "
 msgstr "帐单信息："
 
 msgid "Bond Paper"
-msgstr "证券纸"
+msgstr "半透明纸"
 
 msgid "C0 Envelope"
 msgstr "C0 信封"
@@ -3715,7 +3715,7 @@ msgid "Print and Tear"
 msgstr "打印和撕纸"
 
 msgid "Printed For: "
-msgstr "打印用于："
+msgstr "打印人："
 
 msgid "Printed From: "
 msgstr "打印自："

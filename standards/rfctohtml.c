@@ -48,6 +48,8 @@ main(int  argc,				/* I - Number of command-line args */
 		*outfile;		/* Output file */
   char		line[1024],		/* Line from file */
 		*lineptr,		/* Pointer into line */
+		title[2048],		/* Title string */
+		*titleptr,		/* Pointer into title */
 		name[1024],		/* Heading anchor name */
 		*nameptr;		/* Pointer into anchor name */
   int		rfc,			/* RFC # */
@@ -105,12 +107,8 @@ main(int  argc,				/* I - Number of command-line args */
 	       "<html>\n"
 	       "<!-- SECTION: Specifications -->\n"
 	       "<head>\n"
-	       "\t<style type='text/css'><!--\n"
-	       "\th1, h2, h3 { font-family: sans-serif; }\n"
-	       "\tp, pre { font-family: monospace; }\n"
-	       "\th2.title, h3.title, h3.title { border-bottom: solid "
-	       "2px #000000; }\n"
-	       "\t--></style>\n");
+	       "\t<link rel=\"stylesheet\" type=\"text/css\" "
+	       "href=\"../cups-printable.css\">\n");
 
  /*
   * Skip the initial header stuff (working group ID, RFC #, authors, and
@@ -152,7 +150,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   for (lineptr = line; isspace(*lineptr & 255); lineptr ++);
 
-  cupsFilePrintf(outfile, "<title>RFC %d: %s", rfc, lineptr);
+  snprintf(title, sizeof(title), "RFC %d: %s", rfc, lineptr);
+  titleptr = title + strlen(title);
 
   while (cupsFileGets(infile, line, sizeof(line)))
   {
@@ -163,13 +162,16 @@ main(int  argc,				/* I - Number of command-line args */
     else
     {
       for (lineptr = line; isspace(*lineptr & 255); lineptr ++);
-      cupsFilePrintf(outfile, " %s", lineptr);
+
+      snprintf(titleptr, sizeof(title) - (titleptr - title), " %s", lineptr);
+      titleptr += strlen(titleptr);
     }
   }
 
-  cupsFilePuts(outfile, "</title>\n"
-		        "</head>\n"
-		        "<body>\n");
+  cupsFilePrintf(outfile, "\t<title>%s</title>\n"
+			  "</head>\n"
+			  "<body>\n"
+			  "<h1 class='title'>%s</h1>\n", title, title);
 
  /*
   * Read the rest of the file...
@@ -198,7 +200,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (inheading)
       {
 	if (inheading < 0)
-	  cupsFilePuts(outfile, "</h1>\n");
+	  cupsFilePuts(outfile, "</h2>\n");
 	else
 	  cupsFilePrintf(outfile, "</a></h%d>\n", inheading);
 
@@ -212,7 +214,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (inheading)
       {
 	if (inheading < 0)
-	  cupsFilePuts(outfile, "</h1>\n");
+	  cupsFilePuts(outfile, "</h2>\n");
 	else
 	  cupsFilePrintf(outfile, "</a></h%d>\n", inheading);
 
@@ -449,7 +451,12 @@ put_line(cups_file_t *fp,		/* I - File */
   {
     "MAY",
     "MUST",
+    "NEED",
     "NOT",
+    "OPTIONAL",
+    "OPTIONALLY",
+    "RECOMMENDED",
+    "REQUIRED",
     "SHALL",
     "SHOULD"
   };
@@ -469,7 +476,8 @@ put_line(cups_file_t *fp,		/* I - File */
       for (i = 0; i < (int)(sizeof(keywords) / sizeof(sizeof(keywords[0]))); i ++)
       {
         len = strlen(keywords[i]);
-	if (!strncmp(s, keywords[i], len) && (isspace(s[len] & 255) || !*s))
+	if (!strncmp(s, keywords[i], len) &&
+	    (isspace(s[len] & 255) || ispunct(s[len] & 255) || !*s))
 	{
 	  cupsFilePrintf(fp, "<b>%s</b>", keywords[i]);
 	  s += len;

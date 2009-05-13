@@ -318,6 +318,8 @@ print_device(const char *uri,		/* I - Device URI */
 {
   char		  serial[1024];		/* Serial number buffer */
   OSStatus	  status;		/* Function results */
+  IOReturn	  iostatus,		/* Current IO status */
+		  prev_iostatus = 0;	/* Previous IO status */
   pthread_t	  read_thread_id,	/* Read thread */
 		  sidechannel_thread_id;/* Side-channel thread */
   int		  have_sidechannel = 0;	/* Was the side-channel thread started? */
@@ -646,28 +648,48 @@ print_device(const char *uri,		/* I - Device URI */
       {
 	bytes = g.print_bytes;
 
-	status = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
+	iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 
        /*
 	* Ignore timeout errors, but retain the number of bytes written to
 	* avoid sending duplicate data (<rdar://problem/6254911>)...
 	*/
 
-	if (status == kIOUSBTransactionTimeout)
-	  status = 0;
+	if (iostatus == kIOUSBTransactionTimeout)
+	  iostatus = 0;
 
-	if (status || bytes < 0)
+       /*
+        * Ignore stall errors, since we clear any stalls in the class driver...
+	*/
+
+	if (iostatus == kIOUSBPipeStalled)
+	  iostatus = 0;
+
+       /*
+	* Ignore the first "aborted" status we get, since we might have
+	* received a signal (<rdar://problem/6860126>)...
+	*/
+
+	if (iostatus == kIOReturnAborted && prev_iostatus != kIOReturnAborted)
+	{
+	  prev_iostatus = iostatus;
+	  iostatus      = 0;
+	}
+	else
+	  prev_iostatus = iostatus;
+
+	if (iostatus || bytes < 0)
 	{
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
 	  */
 
-	  OSStatus err = (*g.classdriver)->Abort(g.classdriver);
+	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data!\n"));
-	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %ld\n",
-	          (long)status);
-	  fprintf(stderr, "DEBUG: USB class driver Abort returned %ld\n",
-	          (long)err);
+	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
+	          iostatus);
+	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n",
+	          err);
 	  status = job_canceled ? CUPS_BACKEND_FAILED : CUPS_BACKEND_STOP;
 	  break;
 	}

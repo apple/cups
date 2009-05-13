@@ -335,7 +335,7 @@ cupsDoRequest(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_
  * cupsSendDocument() or cupsSendRequest(). For requests that return
  * additional data, use httpRead() after getting a successful response.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ipp_t *					/* O - Response or @code NULL@ on HTTP error */
@@ -483,7 +483,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  * This function is used after cupsGetResponse() to read the PPD or document
  * files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 ssize_t					/* O - Bytes read, 0 on EOF, -1 on error */
@@ -530,7 +530,7 @@ cupsReadResponseData(
  * Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
  * request is not freed.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 http_status_t				/* O - Initial HTTP status */
@@ -746,7 +746,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  * This function is used after @link cupsSendRequest@ to provide a PPD and
  * after @link cupsStartDocument@ to provide a document file.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 http_status_t				/* O - @code HTTP_CONTINUE@ if OK or HTTP status on error */

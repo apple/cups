@@ -280,9 +280,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/*.conf.5.gz
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man7
-/usr/share/man/man7/commandto*
 /usr/share/man/man7/drv*
-/usr/share/man/man7/rasterto*
 %dir /usr/share/man/man8
 /usr/share/man/man8/accept.8.gz
 /usr/share/man/man8/cupsaddsmb.8.gz
@@ -325,6 +323,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man5/ppdcfile.5.gz
 /usr/share/man/man7/backend.7.gz
 /usr/share/man/man7/filter.7.gz
+/usr/share/man/man7/notifier.7.gz
 
 /usr/bin/cups-config
 /usr/bin/ppd*

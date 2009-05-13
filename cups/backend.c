@@ -3,7 +3,7 @@
  *
  *   Backend functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -75,7 +75,7 @@ cupsBackendDeviceURI(char **argv)	/* I - Command-line arguments */
  * It handles quoting of special characters in the device-make-and-model,
  * device-info, device-id, and device-location strings.
  *
- * @since CUPS 1.4@
+ * @since CUPS 1.4/Mac OS X 10.6@
  */
 
 void

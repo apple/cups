@@ -40,7 +40,7 @@ PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
   margin-left: 36pt;
-  padding: 10px;
+  padding: 10pt;
 }
 
 PRE.command EM, PRE.example EM {
@@ -58,7 +58,7 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #cccccc;
+  background: #eeeeee;
   border: solid thin #999999;
   padding: 10pt;
 }
@@ -168,6 +168,9 @@ SPAN.info {
 H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
   float: right;
   font-size: 100%;
+}
+
+H1.title {
 }
 
 H2.title, H3.title {
@@ -334,8 +337,44 @@ div.contents ul.subcontents li {
 </head>
 <body>
 <div class='body'>
+<!--
+  "$Id: api-array.header 8087 2008-10-27 21:37:05Z mike $"
+
+  MIME API header for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h1 class='title'>MIME API</h1>
+
+<div class='summary'><table summary='General Information'>
+<thead>
+<tr>
+	<th>Header</th>
+	<th>cups/mime.h</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<th>Library</th>
+	<td>-lcupsmime</td>
+</tr>
+<tr>
+	<th>See Also</th>
+	<td>Programming: <a href='api-overview.html' target='_top'>Introduction to CUPS Programming</a></td>
+</tr>
+</tbody>
+</table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
+<ul class="subcontents">
+<li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#mimeAddFilter" title="Add a filter to the current MIME database.">mimeAddFilter</a></li>
 <li><a href="#mimeAddType" title="Add a MIME type to a database.">mimeAddType</a></li>
@@ -364,6 +403,23 @@ div.contents ul.subcontents li {
 	<li><a href="#mime_t" title="MIME Database">mime_t</a></li>
 	<li><a href="#mime_type_t" title="MIME Type Data">mime_type_t</a></li>
 </ul></li>
+<!--
+  "$Id: api-array.shtml 7616 2008-05-28 00:34:13Z mike $"
+
+  MIME API introduction for CUPS.
+
+  Copyright 2009 by Apple Inc.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
+<h2 class='title'><a name='OVERVIEW'>Overview</a></h2>
+
+<p>The MIME API provides file typing and conversion services for CUPS.</p>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
 <h3 class="function"><a name="mimeAddFilter">mimeAddFilter</a></h3>
 <p class="description">Add a filter to the current MIME database.</p>

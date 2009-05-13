@@ -442,6 +442,11 @@ Listens to the specified address and port or domain socket path.
 .br
 Specifies access control for the named location.
 .TP 5
+LogDebugHistory #-messages
+.br
+Specifies the number of debugging messages that are logged when an error
+occurs in a print job.
+.TP 5
 LogFilePerm mode
 .br
 Specifies the permissions for all log files that the scheduler writes.

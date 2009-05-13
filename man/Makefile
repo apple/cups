@@ -47,12 +47,9 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		printers.conf.$(MAN5EXT) \
 		subscriptions.conf.$(MAN5EXT)
 MAN7	=	backend.$(MAN7EXT) \
-		commandtoescpx.$(MAN7EXT) \
-		commandtopclx.$(MAN7EXT) \
 		drv.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
-		rastertoescpx.$(MAN7EXT) \
-		rastertopclx.$(MAN7EXT)
+		notifier.$(MAN7EXT)
 MAN8	=	cupsaccept.$(MAN8EXT) \
 		cupsaddsmb.$(MAN8EXT) \
 		cupsctl.$(MAN8EXT) \

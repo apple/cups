@@ -22,6 +22,8 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
+<H1 CLASS="title">CUPS PPD Extensions</H1>
+
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
 
 <p>This specification describes the attributes and extensions
@@ -297,9 +299,9 @@ equivalent.</p>
 <p class='summary'>*APCustomColorMatchingProfile: name</p>
 
 <p>This attribute defines a supported RGB color profile that can be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported. If not specified, RGB data will use the
-Generic RGB colorspace.</p>
+when doing custom color matching. Currently only <tt>sRGB</tt>,
+<tt>AdobeRGB</tt>, and <tt>GenericRGB</tt> are supported. If not specified, RGB
+data will use the GenericRGB colorspace.</p>
 
 <blockquote><b>Note:</b>
 
@@ -326,8 +328,8 @@ Add the named profile to the print settings using the key
 <p class='summary'>*APDefaultCustomColorMatchingProfile: name</p>
 
 <p>This attribute defines the default RGB color profile that will be used
-when doing custom color matching. Currently only <tt>sRGB</tt> and
-<tt>AdobeRGB</tt> are supported.</p>
+when doing custom color matching. Currently only <tt>sRGB</tt>,
+<tt>AdobeRGB</tt>, and <tt>GenericRGB</tt> are supported.</p>
 
 <p>Examples:</p>
 
@@ -343,7 +345,7 @@ when doing custom color matching. Currently only <tt>sRGB</tt> and
 
 <p>This attribute specifies that the driver provides its own custom color
 matching. When <tt>true</tt>, the default hand-off colorspace will be
-Generic Gray, Generic RGB, or Generic CMYK depending on the number of
+GenericGray, GenericRGB, or GenericCMYK depending on the number of
 components the driver requests. The <a
 href='#APDefaultCustomColorMatchingProfile'><tt>APDefaultCustomColorMatchingProfile</tt></a>
 attribute can be used to override the default 3-component (RGB) colorspace.</p>

@@ -3,7 +3,7 @@
 
   HTTP and IPP API header for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2009 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -12,6 +12,8 @@
   which should have been included with this file.  If this file is
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
+
+<h1 class='title'>HTTP and IPP APIs</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>

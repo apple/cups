@@ -132,6 +132,7 @@ static const cupsd_var_t	variables[] =
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
+  { "LogDebugHistory",		&LogDebugHistory,	CUPSD_VARTYPE_INTEGER },
   { "LogFilePerm",		&LogFilePerm,		CUPSD_VARTYPE_INTEGER },
   { "LPDConfigFile",		&LPDConfigFile,		CUPSD_VARTYPE_STRING },
   { "MaxActiveJobs",		&MaxActiveJobs,		CUPSD_VARTYPE_INTEGER },
@@ -619,6 +620,7 @@ cupsdReadConfiguration(void)
   KeepAlive                = TRUE;
   KeepAliveTimeout         = DEFAULT_KEEPALIVE;
   ListenBackLog            = SOMAXCONN;
+  LogDebugHistory          = 200;
   LogFilePerm              = CUPS_DEFAULT_LOG_FILE_PERM;
   LogLevel                 = CUPSD_LOG_WARN;
   LogTimeFormat            = CUPSD_TIME_STANDARD;

@@ -40,7 +40,7 @@ PRE.example {
   background: #eeeeee;
   border: dotted thin #999999;
   margin-left: 36pt;
-  padding: 10px;
+  padding: 10pt;
 }
 
 PRE.command EM, PRE.example EM {
@@ -58,7 +58,7 @@ P.formula {
 }
 
 BLOCKQUOTE {
-  background: #cccccc;
+  background: #eeeeee;
   border: solid thin #999999;
   padding: 10pt;
 }
@@ -168,6 +168,9 @@ SPAN.info {
 H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
   float: right;
   font-size: 100%;
+}
+
+H1.title {
 }
 
 H2.title, H3.title {
@@ -335,11 +338,11 @@ div.contents ul.subcontents li {
 <body>
 <div class='body'>
 <!--
-  "$Id: api-httpipp.header 8087 2008-10-27 21:37:05Z mike $"
+  "$Id: api-httpipp.header 8627 2009-05-13 21:39:17Z mike $"
 
   HTTP and IPP API header for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2009 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -348,6 +351,8 @@ div.contents ul.subcontents li {
   which should have been included with this file.  If this file is
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
+
+<h1 class='title'>HTTP and IPP APIs</h1>
 
 <div class='summary'><table summary='General Information'>
 <thead>
@@ -1063,7 +1068,7 @@ function multiple times for each group, or use cupsEncodeOptions()
 to add the standard groups.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetDevices">cupsGetDevices</a></h3>
 <p class="description">Get available printer devices.</p>
 <p class="code">
 ipp_status_t cupsGetDevices (<br>
@@ -1145,7 +1150,7 @@ the request respectively.
 <p class="discussion">This function returns <code>HTTP_OK</code> when the file is successfully retrieved.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetResponse">cupsGetResponse</a></h3>
 <p class="description">Get a response to an IPP request.</p>
 <p class="code">
 <a href="#ipp_t">ipp_t</a> *cupsGetResponse (<br>
@@ -1215,7 +1220,7 @@ successfully.
 successfully.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsReadResponseData">cupsReadResponseData</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsReadResponseData">cupsReadResponseData</a></h3>
 <p class="description">Read additional data after the IPP response.</p>
 <p class="code">
 ssize_t cupsReadResponseData (<br>
@@ -1239,7 +1244,7 @@ ssize_t cupsReadResponseData (<br>
 files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsSendRequest">cupsSendRequest</a></h3>
 <p class="description">Send an IPP request.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsSendRequest (<br>
@@ -1271,7 +1276,7 @@ Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
 request is not freed.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsWriteRequestData">cupsWriteRequestData</a></h3>
 <p class="description">Write additional data after an IPP request.</p>
 <p class="code">
 <a href="#http_status_t">http_status_t</a> cupsWriteRequestData (<br>
@@ -3136,7 +3141,7 @@ void ippSetPort (<br>
 <dt>p</dt>
 <dd class="description">Port number to use</dd>
 </dl>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagString">ippTagString</a></h3>
 <p class="description">Return the tag name corresponding to a tag value.</p>
 <p class="code">
 const char *ippTagString (<br>
@@ -3153,7 +3158,7 @@ const char *ippTagString (<br>
 <p class="discussion">The returned names are defined in RFC 2911 and 3382.
 
 </p>
-<h3 class="function"><span class="info">&nbsp;CUPS 1.4&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="ippTagValue">ippTagValue</a></h3>
 <p class="description">Return the tag value corresponding to a tag name.</p>
 <p class="code">
 <a href="#ipp_tag_t">ipp_tag_t</a> ippTagValue (<br>
@@ -3882,7 +3887,7 @@ are server-oriented...</p>
 <dd class="description">Get the default printer</dd>
 <dt>CUPS_GET_DEVICES </dt>
 <dd class="description">Get a list of supported devices</dd>
-<dt>CUPS_GET_DOCUMENT <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dt>CUPS_GET_DOCUMENT <span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span></dt>
 <dd class="description">Get a document file </dd>
 <dt>CUPS_GET_PPD <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Get a PPD file </dd>
