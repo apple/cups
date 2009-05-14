@@ -587,7 +587,7 @@ print_device(const char *uri,		/* I - Device URI */
 	        "written, aborting!\n", stderr);
           return (CUPS_BACKEND_OK);
 	}
-	else if (errno != EAGAIN)
+	else if (errno != EAGAIN && errno != EINTR)
 	{
 	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
 	  perror("DEBUG: select");
@@ -620,7 +620,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  * Read error - bail if we don't see EAGAIN or EINTR...
 	  */
 
-	  if (errno != EAGAIN || errno != EINTR)
+	  if (errno != EAGAIN && errno != EINTR)
 	  {
 	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
 	    perror("DEBUG: read");

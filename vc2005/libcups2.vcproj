@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="8.00"
 	Name="libcups2"
 	ProjectGUID="{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}"
-	RootNamespace="libcups2"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -64,15 +62,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="Debug\libcups2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="Debug\libcups2.pdb"
 				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="Debug\libcups2.lib"
 				TargetMachine="1"
 			/>
@@ -93,6 +89,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -143,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="libcups2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
@@ -152,8 +151,6 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="libcups2.lib"
 				TargetMachine="1"
 			/>
@@ -174,6 +171,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -253,15 +253,15 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\cups\backend.c"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\conflicts.c"
 				>
 			</File>
 			<File
 				RelativePath="..\cups\custom.c"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\debug.c"
 				>
 			</File>
 			<File

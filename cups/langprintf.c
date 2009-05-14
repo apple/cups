@@ -73,7 +73,7 @@ _cupsLangPrintError(const char *message)/* I - Message */
   * Format the message...
   */
 
-  snprintf(buffer, sizeof(buffer), "%s: %s",
+  snprintf(buffer, sizeof(buffer), "%s: %s\n",
 	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
 
  /*

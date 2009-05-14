@@ -86,7 +86,7 @@ cupsBackChannelRead(char   *buffer,	/* I - Buffer to read into */
   */
 
 #ifdef WIN32
-  return ((ssize_t)read(3, buffer, (unsigned)bytes));
+  return ((ssize_t)_read(3, buffer, (unsigned)bytes));
 #else
   return (read(3, buffer, bytes));
 #endif /* WIN32 */
@@ -148,7 +148,7 @@ cupsBackChannelWrite(
     */
 
 #ifdef WIN32
-    count = (ssize_t)write(3, buffer, (unsigned)(bytes - total));
+    count = (ssize_t)_write(3, buffer, (unsigned)(bytes - total));
 #else
     count = write(3, buffer, bytes - total);
 #endif /* WIN32 */

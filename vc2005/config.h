@@ -1,5 +1,5 @@
 /*
- * "$Id: config.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
@@ -15,6 +15,21 @@
 
 #ifndef _CUPS_CONFIG_H_
 #define _CUPS_CONFIG_H_
+
+/*
+ * Beginning with VC2005, Microsoft breaks ISO C and POSIX conformance
+ * by deprecating a number of functions in the name of security, even
+ * when many of the affected functions are otherwise completely secure.
+ * The _CRT_SECURE_NO_DEPRECATE definition ensures that we won't get
+ * warnings from their use...
+ *
+ * Then Microsoft decided that they should ignore this in VC2008 and use
+ * yet another define (_CRT_SECURE_NO_WARNINGS) instead.  Bastards.
+ */
+
+#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
+
 
 /*
  * Include necessary headers...
@@ -38,15 +53,11 @@
  * names to the corresponding non-standard Microsoft names.
  */
 
-#define access		_access
 #define close		_close
-#define fileno		_fileno
-#define lseek		_lseek
 #define open		_open
 #define read	        _read
 #define snprintf 	_snprintf
 #define strdup		_strdup
-#define unlink		_unlink
 #define vsnprintf 	_vsnprintf
 #define write		_write
 
@@ -371,7 +382,7 @@
  * Do we have DNS Service Discovery (aka Bonjour)?
  */
 
-/* #undef HAVE_DNSSD */
+#define HAVE_DNSSD 1
 
 
 /*
@@ -670,5 +681,5 @@
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
- * End of "$Id: config.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

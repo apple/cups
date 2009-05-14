@@ -36,7 +36,11 @@
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */
-#include <unistd.h>
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#endif /* WIN32 */
 #include <fcntl.h>
 
 

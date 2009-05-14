@@ -1432,7 +1432,13 @@ ippReadIO(void       *src,		/* I - Data source */
 	    case IPP_TAG_NOTSETTABLE :
 	    case IPP_TAG_DELETEATTR :
 	    case IPP_TAG_ADMINDEFINE :
-	        if (attr->value_tag == IPP_TAG_NOVALUE)
+	       /*
+	        * These value types are not supposed to have values, however
+		* some vendors (Brother) do not implement IPP correctly and so
+		* we need to map non-empty values to text...
+		*/
+
+	        if (attr->value_tag == tag)
 		{
 		  if (n == 0)
 		    break;

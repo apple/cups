@@ -1685,8 +1685,6 @@ httpReconnect(http_t *http)		/* I - Connection to server */
     close(http->fd);
 #endif /* WIN32 */
 
-    usleep(100000);
-
     http->fd = -1;
   }
 
@@ -2821,7 +2819,11 @@ http_send(http_t       *http,	/* I - Connection to server */
   */
 
   if (http->wused)
-    httpFlushWrite(http);
+  {
+    if (httpFlushWrite(http) < 0)
+      if (httpReconnect(http))
+        return (-1);
+  }
 
  /*
   * Send the request header...
@@ -2884,7 +2886,9 @@ http_send(http_t       *http,	/* I - Connection to server */
     return (-1);
   }
 
-  httpFlushWrite(http);
+  if (httpFlushWrite(http) < 0)
+    return (-1);
+
   httpGetLength2(http);
   httpClearFields(http);
 

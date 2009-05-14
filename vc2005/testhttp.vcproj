@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
-	Name="testfile"
-	ProjectGUID="{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}"
+	Version="8.00"
+	Name="testhttp"
+	ProjectGUID="{90B0058C-8393-411F-BD3B-E2C831D4E883}"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -62,13 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="Debug\testfile.exe"
+				OutputFile="Debug\testhttp.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/testfile.pdb"
+				ProgramDatabaseFile="$(OutDir)/testhttp.pdb"
 				SubSystem="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -88,6 +85,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -137,14 +137,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="testfile.exe"
+				OutputFile="testhttp.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -166,6 +164,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -179,7 +180,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\cups\testfile.c"
+				RelativePath="..\cups\testhttp.c"
 				>
 			</File>
 		</Filter>

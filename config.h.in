@@ -434,6 +434,7 @@
 
 #undef HAVE_USERSEC_H
 
+
 /*
  * Do we have pthread support?
  */
