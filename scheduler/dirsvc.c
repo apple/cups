@@ -1910,6 +1910,7 @@ cupsdUpdateDNSSDName(void)
 #ifdef HAVE_COREFOUNDATION_H
   SCDynamicStoreRef sc;			/* Context for dynamic store */
   CFDictionaryRef btmm;			/* Back-to-My-Mac domains */
+  CFStringEncoding nameEncoding;	/* Encoding of computer name */
   CFStringRef	nameRef;		/* Host name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
 #endif	/* HAVE_COREFOUNDATION_H */
@@ -1937,7 +1938,37 @@ cupsdUpdateDNSSDName(void)
     * Get the computer name from the dynamic store...
     */
 
-    cupsdClearString(&DNSSDName);
+    cupsdClearString(&DNSSDComputerName);
+
+    if ((nameRef = SCDynamicStoreCopyComputerName(sc, &nameEncoding)) != NULL)
+    {
+      if (CFStringGetCString(nameRef, nameBuffer, sizeof(nameBuffer),
+			     kCFStringEncodingUTF8))
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+	                "Dynamic store computer name is \"%s\".", nameBuffer);
+	cupsdSetString(&DNSSDComputerName, nameBuffer);
+      }
+
+      CFRelease(nameRef);
+    }
+
+    if (!DNSSDComputerName)
+    {
+     /*
+      * Use the ServerName instead...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "Using ServerName \"%s\" as computer name.", ServerName);
+      cupsdSetString(&DNSSDComputerName, ServerName);
+    }
+
+   /*
+    * Get the local hostname from the dynamic store...
+    */
+
+    cupsdClearString(&DNSSDHostName);
 
     if ((nameRef = SCDynamicStoreCopyLocalHostName(sc)) != NULL)
     {
@@ -1946,13 +1977,13 @@ cupsdUpdateDNSSDName(void)
       {
         cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                "Dynamic store host name is \"%s\".", nameBuffer);
-	cupsdSetString(&DNSSDName, nameBuffer);
+	cupsdSetString(&DNSSDHostName, nameBuffer);
       }
 
       CFRelease(nameRef);
     }
 
-    if (!DNSSDName)
+    if (!DNSSDHostName)
     {
      /*
       * Use the ServerName instead...
@@ -1960,7 +1991,7 @@ cupsdUpdateDNSSDName(void)
 
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "Using ServerName \"%s\" as host name.", ServerName);
-      cupsdSetString(&DNSSDName, ServerName);
+      cupsdSetString(&DNSSDHostName, ServerName);
     }
 
    /*
@@ -1990,7 +2021,10 @@ cupsdUpdateDNSSDName(void)
   }
   else
 #endif	/* HAVE_COREFOUNDATION_H */
-  cupsdSetString(&DNSSDName, ServerName);
+  {
+    cupsdSetString(&DNSSDComputerName, ServerName);
+    cupsdSetString(&DNSSDHostName, ServerName);
+  }
 
  /*
   * Then (re)register the web interface if enabled...
@@ -1998,8 +2032,8 @@ cupsdUpdateDNSSDName(void)
 
   if (BrowseWebIF)
   {
-    if (DNSSDName)
-      snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDName);
+    if (DNSSDComputerName)
+      snprintf(webif, sizeof(webif), "CUPS @ %s", DNSSDComputerName);
     else
       strlcpy(webif, "CUPS Web Interface", sizeof(webif));
 
@@ -2281,7 +2315,7 @@ dnssdAddAlias(const void *key,		/* I - Key */
       CFStringGetCString((CFStringRef)value, valueStr, sizeof(valueStr),
                          kCFStringEncodingUTF8))
   {
-    snprintf(hostname, sizeof(hostname), "%s.%s", DNSSDName, valueStr);
+    snprintf(hostname, sizeof(hostname), "%s.%s", DNSSDHostName, valueStr);
     if (!DNSSDAlias)
       DNSSDAlias = cupsArrayNew(NULL, NULL);
 
@@ -2646,13 +2680,13 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
   if (p->info && strlen(p->info) > 0)
   {
-    if (DNSSDName)
-      snprintf(name, sizeof(name), "%s @ %s", p->info, DNSSDName);
+    if (DNSSDComputerName)
+      snprintf(name, sizeof(name), "%s @ %s", p->info, DNSSDComputerName);
     else
       strlcpy(name, p->info, sizeof(name));
   }
-  else if (DNSSDName)
-    snprintf(name, sizeof(name), "%s @ %s", p->name, DNSSDName);
+  else if (DNSSDComputerName)
+    snprintf(name, sizeof(name), "%s @ %s", p->name, DNSSDComputerName);
   else
     strlcpy(name, p->name, sizeof(name));
 

@@ -133,8 +133,10 @@ VAR cupsd_statbuf_t	*PollStatusBuffer VALUE(NULL);
 					/* Status buffer for pollers */
 
 #ifdef HAVE_DNSSD
-VAR char		*DNSSDName	VALUE(NULL);
+VAR char		*DNSSDComputerName VALUE(NULL),
 					/* Computer/server name */
+			*DNSSDHostName	VALUE(NULL);
+					/* Hostname */
 VAR cups_array_t	*DNSSDAlias	VALUE(NULL);
 					/* List of dynamic ServerAlias's */
 VAR int			DNSSDPort	VALUE(0);
