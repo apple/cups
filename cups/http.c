@@ -1685,8 +1685,6 @@ httpReconnect(http_t *http)		/* I - Connection to server */
     close(http->fd);
 #endif /* WIN32 */
 
-    usleep(100000);
-
     http->fd = -1;
   }
 

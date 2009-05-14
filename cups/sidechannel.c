@@ -31,11 +31,15 @@
 #include "sidechannel.h"
 #include "string.h"
 #include "debug.h"
-#include <unistd.h>
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#endif /* WIN32 */
 #include <errno.h>
 #ifdef __hpux
 #  include <sys/time.h>
-#else
+#elif !defined(WIN32)
 #  include <sys/select.h>
 #endif /* __hpux */
 #ifndef WIN32

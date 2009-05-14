@@ -27,7 +27,9 @@ Global
 		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release|Win32.ActiveCfg = Release|Win32
 		{CE75FC5F-E0CF-45DC-AD27-84666D3FBA30}.Release|Win32.Build.0 = Release|Win32
 		{CB1F378C-ED31-4DAC-9379-599E853419CB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CB1F378C-ED31-4DAC-9379-599E853419CB}.Debug|Win32.Build.0 = Debug|Win32
 		{CB1F378C-ED31-4DAC-9379-599E853419CB}.Release|Win32.ActiveCfg = Release|Win32
+		{CB1F378C-ED31-4DAC-9379-599E853419CB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

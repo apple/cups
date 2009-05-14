@@ -364,7 +364,11 @@ _cupsSNMPOpen(int family)		/* I - Address family - @code AF_INET@ or @code AF_IN
 
   val = 1;
 
+#ifdef WIN32
+  if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, (char *)&val, sizeof(val)))
+#else
   if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &val, sizeof(val)))
+#endif /* WIN32 */
   {
     DEBUG_printf(("5_cupsSNMPOpen: Returning -1 (%s)", strerror(errno)));
 
@@ -438,7 +442,7 @@ _cupsSNMPRead(int         fd,		/* I - SNMP socket file descriptor */
       FD_SET(fd, &input_set);
 
       stimeout.tv_sec  = (int)timeout;
-      stimeout.tv_usec = (int)((timeout - stimeout.tv_usec) * 1000000);
+      stimeout.tv_usec = (int)((timeout - stimeout.tv_sec) * 1000000);
 
       ready = select(fd + 1, &input_set, NULL, NULL, &stimeout);
     }
@@ -799,11 +803,11 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
 
     fprintf(stderr, "%sHex Dump (%d bytes):\n", prefix, (int)len);
 
-    for (i = 0; i < len; i += 16)
+    for (i = 0; i < (int)len; i += 16)
     {
       fprintf(stderr, "%s%04x:", prefix, i);
 
-      for (j = 0; j < 16 && (i + j) < len; j ++)
+      for (j = 0; j < 16 && (i + j) < (int)len; j ++)
       {
         if (j && !(j & 3))
 	  fprintf(stderr, "  %02x", buffer[i + j]);
@@ -823,7 +827,7 @@ asn1_debug(const char    *prefix,	/* I - Prefix string */
 
       fputs("    ", stderr);
 
-      for (j = 0; j < 16 && (i + j) < len; j ++)
+      for (j = 0; j < 16 && (i + j) < (int)len; j ++)
         if (buffer[i + j] < ' ' || buffer[i + j] >= 0x7f)
 	  putc('.', stderr);
 	else
@@ -1187,7 +1191,7 @@ asn1_encode_snmp(unsigned char *buffer,	/* I - Buffer */
 	    1 + asn1_size_length(reqlen) + reqlen;
   total   = 1 + asn1_size_length(msglen) + msglen;
 
-  if (total > bufsize)
+  if (total > (int)bufsize)
   {
     packet->error = "Message too large for buffer";
     return (-1);

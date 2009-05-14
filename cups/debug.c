@@ -26,10 +26,16 @@
 
 #include "globals.h"
 #include "debug.h"
-#include <sys/time.h>
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <sys/time.h>
+#  include <unistd.h>
+#endif /* WIN32 */
 #include <fcntl.h>
-#include <unistd.h>
-#include <regex.h>
+#ifndef WIN32
+#  include <regex.h>
+#endif /* WIN32 */
 
 
 /*
@@ -47,8 +53,10 @@ int			_cups_debug_level = 1;
  * Local globals...
  */
 
+#  ifndef WIN32
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
+#  endif /* !WIN32 */
 static int		debug_init = 0;	/* Did we initialize debugging? */
 #  ifdef HAVE_PTHREAD_H
 static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;

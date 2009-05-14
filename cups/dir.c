@@ -73,7 +73,7 @@ _cups_dir_time(FILETIME ft)		/* I - File time */
   * between them...
   */
 
-  val = ft.dwLowDateTime + (ft.dwHighDateTime << 32);
+  val = ft.dwLowDateTime + ((ULONGLONG)ft.dwHighDateTime << 32);
   return ((time_t)(val / 10000000 - 11644732800));
 }
 

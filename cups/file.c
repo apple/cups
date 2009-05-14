@@ -755,7 +755,7 @@ cupsFileLock(cups_file_t *fp,		/* I - CUPS file */
   */
 
 #ifdef WIN32
-  return (locking(fp->fd, block ? _LK_LOCK : _LK_NBLCK, 0));
+  return (_locking(fp->fd, block ? _LK_LOCK : _LK_NBLCK, 0));
 #else
   return (lockf(fp->fd, block ? F_LOCK : F_TLOCK, 0));
 #endif /* WIN32 */
@@ -1078,7 +1078,7 @@ cupsFilePrintf(cups_file_t *fp,		/* I - CUPS file */
   bytes = vsnprintf(fp->printf_buffer, fp->printf_size, format, ap);
   va_end(ap);
 
-  if (bytes >= fp->printf_size)
+  if (bytes >= (ssize_t)fp->printf_size)
   {
    /*
     * Expand the printf buffer...
@@ -1762,7 +1762,7 @@ cupsFileUnlock(cups_file_t *fp)		/* I - CUPS file */
   */
 
 #ifdef WIN32
-  return (locking(fp->fd, _LK_UNLCK, 0));
+  return (_locking(fp->fd, _LK_UNLCK, 0));
 #else
   return (lockf(fp->fd, F_ULOCK, 0));
 #endif /* WIN32 */

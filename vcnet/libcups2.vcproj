@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="libcups2"
 	ProjectGUID="{CB4AA6F2-3E84-45BE-B505-95CD375E8BE3}"
+	RootNamespace="libcups2"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -42,14 +43,14 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\vcnet,.."
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -63,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ssleay32.lib libeay32.lib ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="Debug\libcups2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
@@ -124,11 +125,11 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				AdditionalIncludeDirectories="..\vcnet,.."
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBCUPS2_EXPORTS;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -142,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ssleay32.lib libeay32.lib ws2_32.lib"
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="libcups2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\vcnet\libcups2.def"
@@ -252,31 +253,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\cups\backchannel.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="WIN32"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						PreprocessorDefinitions="WIN32"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\cups\backend.c"
+				RelativePath="..\cups\conflicts.c"
 				>
 			</File>
 			<File
 				RelativePath="..\cups\custom.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\debug.c"
 				>
 			</File>
 			<File
@@ -378,6 +363,10 @@
 						PreprocessorDefinitions="WIN32"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\cups\getdevices.c"
+				>
 			</File>
 			<File
 				RelativePath="..\cups\getputfile.c"
@@ -708,7 +697,15 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\cups\pwgmedia.c"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\request.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\snmp.c"
 				>
 			</File>
 			<File

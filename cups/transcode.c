@@ -1130,7 +1130,7 @@ conv_utf8_to_vbcs(
     }
     else
     {
-      *dest++ = legchar;
+      *dest++ = (cups_sbcs_t)legchar;
 
       DEBUG_printf(("9conv_utf8_to_vbcs: %08x => %02X",
                     (unsigned)unichar, dest[-1]));
