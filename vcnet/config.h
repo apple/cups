@@ -3,7 +3,7 @@
  *
  *   Configuration file for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -17,6 +17,52 @@
 #define _CUPS_CONFIG_H_
 
 /*
+ * Beginning with VC2005, Microsoft breaks ISO C and POSIX conformance
+ * by deprecating a number of functions in the name of security, even
+ * when many of the affected functions are otherwise completely secure.
+ * The _CRT_SECURE_NO_DEPRECATE definition ensures that we won't get
+ * warnings from their use...
+ *
+ * Then Microsoft decided that they should ignore this in VC2008 and use
+ * yet another define (_CRT_SECURE_NO_WARNINGS) instead.  Bastards.
+ */
+
+#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
+
+
+/*
+ * Include necessary headers...
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+#include <io.h>
+
+
+/*
+ * Microsoft also renames the POSIX functions to _name, and introduces
+ * a broken compatibility layer using the original names.  As a result,
+ * random crashes can occur when, for example, strdup() allocates memory
+ * from a different heap than used by malloc() and free().
+ *
+ * To avoid moronic problems like this, we #define the POSIX function
+ * names to the corresponding non-standard Microsoft names.
+ */
+
+#define close		_close
+#define open		_open
+#define read	        _read
+#define snprintf 	_snprintf
+#define strdup		_strdup
+#define vsnprintf 	_vsnprintf
+#define write		_write
+
+
+/*
  * Compiler stuff...
  */
 
@@ -28,8 +74,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION		"CUPS v1.2svn"
-#define CUPS_MINIMAL		"CUPS/1.2svn"
+#define CUPS_SVERSION		"CUPS v1.4b3"
+#define CUPS_MINIMAL		"CUPS/1.4"
 
 
 /*
