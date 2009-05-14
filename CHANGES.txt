@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-05-13
+CHANGES.txt - 2009-05-14
 ------------------------
 
 CHANGES IN CUPS V1.4b3
@@ -8,6 +8,7 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- The scheduler could crash when deleting an attribute (STR #3197)
 	- The cups-driverd program did not detect symlink loops (STR #3185)
 	- The EPSON 24-pin series driver should now feed the correct amount
 	  (STR #2624)
