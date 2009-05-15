@@ -622,7 +622,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
   while (http == NULL);
 
-  if (job_cancelled)
+  if (job_cancelled || !http)
   {
     if (tmpfilename[0])
       unlink(tmpfilename);
