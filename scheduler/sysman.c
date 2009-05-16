@@ -109,6 +109,14 @@ cupsdCleanDirty(void)
 void
 cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
 {
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdMarkDirty(%c%c%c%c%c%c)",
+		  (what & CUPSD_DIRTY_PRINTERS) ? 'P' : '-',
+		  (what & CUPSD_DIRTY_CLASSES) ? 'C' : '-',
+		  (what & CUPSD_DIRTY_REMOTE) ? 'R' : '-',
+		  (what & CUPSD_DIRTY_PRINTCAP) ? 'p' : '-',
+		  (what & CUPSD_DIRTY_JOBS) ? 'J' : '-',
+		  (what & CUPSD_DIRTY_SUBSCRIPTIONS) ? 'S' : '-');
+
   if (what == CUPSD_DIRTY_PRINTCAP && !Printcap)
     return;
 

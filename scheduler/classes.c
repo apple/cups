@@ -285,6 +285,7 @@ cupsdFindClass(const char *name)	/* I - Name of class */
 void
 cupsdLoadAllClasses(void)
 {
+  int			i;		/* Looping var */
   cups_file_t		*fp;		/* classes.conf file */
   int			linenum;	/* Current line number */
   char			line[4096],	/* Line from file */
@@ -456,7 +457,17 @@ cupsdLoadAllClasses(void)
       else if (!strcasecmp(value, "stopped"))
       {
         p->state = IPP_PRINTER_STOPPED;
-	cupsdSetPrinterReasons(p, "+paused");
+
+        for (i = 0 ; i < p->num_reasons; i ++)
+	  if (!strcmp("paused", p->reasons[i]))
+	    break;
+
+        if (i >= p->num_reasons &&
+	    p->num_reasons < (int)(sizeof(p->reasons) / sizeof(p->reasons[0])))
+	{
+	  p->reasons[p->num_reasons] = _cupsStrAlloc("paused");
+	  p->num_reasons ++;
+	}
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,

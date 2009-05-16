@@ -1404,9 +1404,15 @@ cupsdReadConfiguration(void)
     cupsdLoadAllPrinters();
     cupsdLoadAllClasses();
     cupsdLoadRemoteCache();
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
     cupsdCreateCommonData();
+
+   /*
+    * Update the printcap file as needed...
+    */
+
+    if (Printcap && *Printcap && access(Printcap, 0))
+      cupsdWritePrintcap();
 
    /*
     * Load queued jobs...
