@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH mime.types 5 "CUPS" "17 June 2008" "Apple Inc."
+.TH mime.types 5 "CUPS" "16 May 2009" "Apple Inc."
 .SH NAME
 mime.types \- mime type description file for cups
 .SH DESCRIPTION
@@ -32,6 +32,10 @@ identify print and web files:
 
     super/type rule [ ... ruleN]
 .fi
+MIME type names are case-insensitive and are sorted in ascending alphanumeric
+order for the purposes of matching. See the "TYPE MATCHING AND PRIORITY"
+section for more information.
+.LP
 The rules may be grouped using parenthesis, joined using "+" for a
 logical AND and "," or whitespace for a logical OR, and negated using
 "!".
@@ -87,6 +91,18 @@ True if the range contains the string
 String constants can be specified inside quotes ("") for strings
 containing whitespace and angle brackets (<>) for hexadecimal
 strings.
+.SH TYPE MATCHING AND PRIORITY
+When CUPS needs to determine the MIME type of a given file, it checks every
+MIME type defined in the .types files. When two types have the same matching
+rules, the type chosen will depend on the type name and priority, with higher-
+priority types being used over lower-priority ones. If the types have the same
+priority, the type names are sorted alphanumerically in ascending order and the
+first type is chosen.
+.LP
+For example, if two types "text/bar" and "text/foo" are defined as matching the
+extension "doc", normally the type "text/bar" will be chosen since its name is
+alphanumerically smaller than "text/foo". However, if "text/foo" also defines a
+higher priority than "text/bar", "text/foo" will be chosen instead.
 .SH SEE ALSO
 \fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fIcupsd.conf(5)\fR,
 \fImime.convs(5)\fR, \fIprinters.conf(5)\fR,

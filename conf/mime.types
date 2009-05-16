@@ -7,7 +7,7 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.types" file that
 #   reflects your local configuration changes.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -50,10 +50,12 @@
 #
 #   MIME type names are case-insensitive.  Internally they are converted
 #   to lowercase.  Multiple occurrences of a type will cause the provided
-#   rules to be appended to the existing definition.  Type names are sorted
-#   in ascending order, so if two types use the same rules to resolve a type
-#   (e.g. doc extension for two types), the returned type will be the first
-#   type in the sorted list.
+#   rules to be appended to the existing definition.  If two types use the same
+#   rules to resolve a type and have the same priority, e.g. "doc" extension for
+#   "text/bar" and "text/foo", the returned type will be the first type as
+#   sorted in alphanumerically ascending order without regard to case.  Thus,
+#   the "text/bar" type will match the "doc" extension first unless the
+#   "text/foo" type has specified a higher priority.
 #
 #   The "printable" rule differs from the "ascii" rule in that it also
 #   accepts 8-bit characters in the range 128-255.
