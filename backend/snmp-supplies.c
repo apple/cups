@@ -17,7 +17,8 @@
  *
  *   backendSNMPSupplies()   - Get the current supplies for a device.
  *   backend_init_supplies() - Initialize the supplies list.
- *   backend_walk_cb()       - Interpret the supply value responses...
+ *   backend_walk_cb()       - Interpret the supply value responses.
+ *   utf16_to_utf8()         - Convert UTF-16 text to UTF-8.
  */
 
 /*
@@ -63,6 +64,7 @@ typedef struct				/**** Printer state table ****/
 static http_addr_t	current_addr;	/* Current address */
 static int		current_state = -1;
 					/* Current device state bits */
+static int		charset = -1;	/* Character set for supply names */
 static int		num_supplies = 0;
 					/* Number of supplies found */
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
@@ -77,6 +79,13 @@ static const int	hrPrinterStatus[] =
 static const int	hrPrinterDetectedErrorState[] =
 			{ CUPS_OID_hrPrinterDetectedErrorState, 1, -1 };
 					/* Current printer state bits OID */
+static const int	prtGeneralCurrentLocalization[] =
+			{ CUPS_OID_prtGeneralCurrentLocalization, 1, -1 };
+static const int	prtLocalizationCharacterSet[] =
+			{ CUPS_OID_prtLocalizationCharacterSet, 1, 1, -1 },
+			prtLocalizationCharacterSetOffset =
+			(sizeof(prtLocalizationCharacterSet) /
+			 sizeof(prtLocalizationCharacterSet[0]));
 static const int	prtMarkerColorantValue[] =
 			{ CUPS_OID_prtMarkerColorantValue, -1 },
 					/* Colorant OID */
@@ -150,6 +159,8 @@ static const backend_state_t const printer_states[] =
 
 static void	backend_init_supplies(int snmp_fd, http_addr_t *addr);
 static void	backend_walk_cb(cups_snmp_t *packet, void *data);
+static void	utf16_to_utf8(cups_utf8_t *dst, const unsigned char *src,
+			      size_t srcsize, size_t dstsize, int le);
 
 
 /*
@@ -348,6 +359,7 @@ backend_init_supplies(
   current_addr  = *addr;
   current_state = -1;
   num_supplies  = -1;
+  charset       = -1;
 
   memset(supplies, 0, sizeof(supplies));
 
@@ -384,6 +396,8 @@ backend_init_supplies(
     strlcpy(description, (char *)packet.object_value.string.bytes,
             sizeof(description));
 
+  fprintf(stderr, "DEBUG2: hrDeviceDesc=\"%s\"\n", description);
+
  /*
   * See if we have already queried this device...
   */
@@ -401,28 +415,31 @@ backend_init_supplies(
    /*
     * Yes, read the cache file:
     *
-    *     1 num_supplies
+    *     2 num_supplies charset
     *     device description
     *     supply structures...
     */
 
     if (cupsFileGets(cachefile, value, sizeof(value)))
     {
-      if (sscanf(value, "1 %d", &num_supplies) == 1 &&
+      if (sscanf(value, "2 %d%d", &num_supplies, &charset) == 2 &&
           num_supplies <= CUPS_MAX_SUPPLIES &&
           cupsFileGets(cachefile, value, sizeof(value)))
       {
-        if ((ptr = value + strlen(value) - 1) >= value && *ptr == '\n')
-	  *ptr = '\n';
-
         if (!strcmp(description, value))
 	  cupsFileRead(cachefile, (char *)supplies,
 	               num_supplies * sizeof(backend_supplies_t));
         else
+	{
 	  num_supplies = -1;
+	  charset      = -1;
+	}
       }
       else
+      {
         num_supplies = -1;
+	charset      = -1;
+      }
     }
 
     cupsFileClose(cachefile);
@@ -431,6 +448,55 @@ backend_init_supplies(
  /*
   * If the cache information isn't correct, scan for supplies...
   */
+
+  if (charset < 0)
+  {
+   /*
+    * Get the configured character set...
+    */
+
+    int	oid[CUPS_SNMP_MAX_OID];		/* OID for character set */
+
+
+    if (!_cupsSNMPWrite(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+			_cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			prtGeneralCurrentLocalization))
+      return;
+
+    if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
+	packet.object_type != CUPS_ASN1_INTEGER)
+    {
+      fprintf(stderr,
+              "ERROR: prtGeneralCurrentLocalization type is %x, expected %x!\n",
+	      packet.object_type, CUPS_ASN1_INTEGER);
+      return;
+    }
+
+    fprintf(stderr, "DEBUG2: prtGeneralCurrentLocalization=%d\n",
+            packet.object_value.integer);
+
+    _cupsSNMPCopyOID(oid, prtLocalizationCharacterSet, CUPS_SNMP_MAX_OID);
+    oid[prtLocalizationCharacterSetOffset - 3] = packet.object_value.integer;
+
+
+    if (!_cupsSNMPWrite(snmp_fd, &current_addr, CUPS_SNMP_VERSION_1,
+			_cupsSNMPDefaultCommunity(), CUPS_ASN1_GET_REQUEST, 1,
+			oid))
+      return;
+
+    if (!_cupsSNMPRead(snmp_fd, &packet, 0.5) ||
+	packet.object_type != CUPS_ASN1_INTEGER)
+    {
+      fprintf(stderr,
+              "ERROR: prtLocalizationCharacterSet type is %x, expected %x!\n",
+	      packet.object_type, CUPS_ASN1_INTEGER);
+      return;
+    }
+
+    fprintf(stderr, "DEBUG2: prtLocalizationCharacterSet=%d\n",
+	    packet.object_value.integer);
+    charset = packet.object_value.integer;
+  }
 
   if (num_supplies < 0)
   {
@@ -452,7 +518,7 @@ backend_init_supplies(
 
   if ((cachefile = cupsFileOpen(cachefilename, "w")) != NULL)
   {
-    cupsFilePrintf(cachefile, "1 %d\n", num_supplies);
+    cupsFilePrintf(cachefile, "2 %d %d\n", num_supplies, charset);
     cupsFilePrintf(cachefile, "%s\n", description);
 
     if (num_supplies > 0)
@@ -536,7 +602,7 @@ backend_init_supplies(
 
 
 /*
- * 'backend_walk_cb()' - Interpret the supply value responses...
+ * 'backend_walk_cb()' - Interpret the supply value responses.
  */
 
 static void
@@ -612,14 +678,64 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
         packet->object_type != CUPS_ASN1_OCTET_STRING)
       return;
 
-    fprintf(stderr, "DEBUG2: prtMarkerSuppliesDescription.1.%d = \"%s\"\n", i,
-            (char *)packet->object_value.string.bytes);
-
     if (i > num_supplies)
       num_supplies = i;
 
-    strlcpy(supplies[i - 1].name, (char *)packet->object_value.string.bytes,
-            sizeof(supplies[0].name));
+    switch (charset)
+    {
+      case CUPS_TC_csASCII :
+      case CUPS_TC_csUTF8 :
+      case CUPS_TC_csUnicodeASCII :
+	  strlcpy(supplies[i - 1].name,
+	          (char *)packet->object_value.string.bytes,
+		  sizeof(supplies[0].name));
+          break;
+
+      case CUPS_TC_csISOLatin1 :
+      case CUPS_TC_csUnicodeLatin1 :
+	  cupsCharsetToUTF8((cups_utf8_t *)supplies[i - 1].name,
+	                    (char *)packet->object_value.string.bytes,
+		            sizeof(supplies[0].name), CUPS_ISO8859_1);
+          break;
+
+      case CUPS_TC_csShiftJIS :
+	  cupsCharsetToUTF8((cups_utf8_t *)supplies[i - 1].name,
+	                    (char *)packet->object_value.string.bytes,
+		            sizeof(supplies[0].name), CUPS_JIS_X0213);
+          break;
+
+      case CUPS_TC_csUCS4 :
+      case CUPS_TC_csUTF32 :
+      case CUPS_TC_csUTF32BE :
+      case CUPS_TC_csUTF32LE :
+	  cupsUTF32ToUTF8((cups_utf8_t *)supplies[i - 1].name,
+	                  (cups_utf32_t *)packet->object_value.string.bytes,
+			  sizeof(supplies[0].name));
+          break;
+
+      case CUPS_TC_csUnicode :
+      case CUPS_TC_csUTF16BE :
+      case CUPS_TC_csUTF16LE :
+	  utf16_to_utf8((cups_utf8_t *)supplies[i - 1].name,
+	                packet->object_value.string.bytes,
+			packet->object_value.string.num_bytes,
+			sizeof(supplies[0].name), charset == CUPS_TC_csUTF16LE);
+          break;
+
+      default :
+	 /*
+	  * If we get here, the printer is using an unknown character set and
+	  * we just want to synthesize something for now...
+	  */
+
+          snprintf(supplies[i - 1].name, sizeof(supplies[i - 1].name),
+	           "??? %d", i);
+	  break;
+    }
+
+    fprintf(stderr, "DEBUG2: prtMarkerSuppliesDescription.1.%d = \"%s\"\n", i,
+            supplies[i - 1].name);
+
   }
   else if (_cupsSNMPIsOIDPrefixed(packet, prtMarkerSuppliesLevel))
   {
@@ -678,6 +794,67 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
 
     supplies[i - 1].type = packet->object_value.integer;
   }
+}
+
+
+/*
+ * 'utf16_to_utf8()' - Convert UTF-16 text to UTF-8.
+ */
+
+static void
+utf16_to_utf8(
+    cups_utf8_t         *dst,		/* I - Destination buffer */
+    const unsigned char *src,		/* I - Source string */
+    size_t		srcsize,	/* I - Size of source string */
+    size_t              dstsize,	/* I - Size of destination buffer */
+    int                 le)		/* I - Source is little-endian? */
+{
+  cups_utf32_t	ch,			/* Current character */
+		temp[CUPS_SNMP_MAX_STRING],
+					/* UTF-32 string */
+		*ptr;			/* Pointer into UTF-32 string */
+
+
+  for (ptr = temp; srcsize >= 2;)
+  {
+    if (le)
+      ch = src[0] | (src[1] << 8);
+    else
+      ch = (src[0] << 8) | src[1];
+
+    src += 2;
+    srcsize -= 2;
+
+    if (ch >= 0xd800 && ch <= 0xdbff && srcsize >= 2)
+    {
+     /*
+      * Multi-word UTF-16 char...
+      */
+
+      int lch;			/* Lower word */
+
+
+      if (le)
+	lch = src[0] | (src[1] << 8);
+      else
+	lch = (src[0] << 8) | src[1];
+
+      if (lch >= 0xdc00 && lch <= 0xdfff)
+      {
+	src += 2;
+	srcsize -= 2;
+
+	ch = (((ch & 0x3ff) << 10) | (lch & 0x3ff)) + 0x10000;
+      }
+    }
+
+    if (ptr < (temp + CUPS_SNMP_MAX_STRING - 1))
+      *ptr++ = ch;
+  }
+
+  *ptr = '\0';
+
+  cupsUTF32ToUTF8(dst, temp, dstsize);
 }
 
 

@@ -3,7 +3,7 @@
  *
  *   Backend support definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -78,6 +78,7 @@ extern "C" {
 #define CUPS_OID_prtGeneral			CUPS_OID_printmib,5
 #define CUPS_OID_prtGeneralTable		CUPS_OID_prtGeneral,1
 #define CUPS_OID_prtGeneralEntry		CUPS_OID_prtGeneralTable,1
+#define CUPS_OID_prtGeneralCurrentLocalization	CUPS_OID_prtGeneralEntry,2
 #define CUPS_OID_prtGeneralPrinterName		CUPS_OID_prtGeneralEntry,16
 #define CUPS_OID_prtGeneralSerialNumber		CUPS_OID_prtGeneralEntry,17
 
@@ -86,6 +87,11 @@ extern "C" {
 #define CUPS_OID_prtCoverEntry			CUPS_OID_prtCoverTable,1
 #define CUPS_OID_prtCoverDescription		CUPS_OID_prtCoverEntry,2
 #define CUPS_OID_prtCoverStatus			CUPS_OID_prtCoverEntry,3
+
+#define CUPS_OID_prtLocalization		CUPS_OID_printmib,7
+#define CUPS_OID_prtLocalizationTable		CUPS_OID_prtLocalization,1
+#define CUPS_OID_prtLocalizationEntry		CUPS_OID_prtLocalizationTable,1
+#define CUPS_OID_prtLocalizationCharacterSet	CUPS_OID_prtLocalizationEntry,4
 
 #define CUPS_OID_prtMarker			CUPS_OID_printmib,10
 #define CUPS_OID_prtMarkerTable			CUPS_OID_prtMarker,2
@@ -237,6 +243,22 @@ extern "C" {
 #define CUPS_TC_staples				32
 #define CUPS_TC_inserts				33
 #define CUPS_TC_covers				34
+
+/* These come from RFC 3808 to define character sets we support */
+/* Also see http://www.iana.org/assignments/character-sets */
+#define CUPS_TC_csASCII				3
+#define CUPS_TC_csISOLatin1			4
+#define CUPS_TC_csShiftJIS			17
+#define CUPS_TC_csUTF8				106
+#define CUPS_TC_csUnicode			1000 /* UCS2 BE */
+#define CUPS_TC_csUCS4				1001 /* UCS4 BE */
+#define CUPS_TC_csUnicodeASCII			1002
+#define CUPS_TC_csUnicodeLatin1			1003
+#define CUPS_TC_csUTF16BE			1013
+#define CUPS_TC_csUTF16LE			1014
+#define CUPS_TC_csUTF32				1017
+#define CUPS_TC_csUTF32BE			1018
+#define CUPS_TC_csUTF32LE			1019
 
 
 /*
