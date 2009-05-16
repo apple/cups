@@ -725,11 +725,31 @@ backend_walk_cb(cups_snmp_t *packet,	/* I - SNMP packet */
       default :
 	 /*
 	  * If we get here, the printer is using an unknown character set and
-	  * we just want to synthesize something for now...
+	  * we just want to copy characters that look like ASCII...
 	  */
 
-          snprintf(supplies[i - 1].name, sizeof(supplies[i - 1].name),
-	           "??? %d", i);
+          {
+	    char	*src, *dst;	/* Pointers into strings */
+
+
+           /*
+	    * Loop safe because both the object_value and supplies char arrays
+	    * are CUPS_SNMP_MAX_STRING elements long.
+	    */
+
+            for (src = (char *)packet->object_value.string.bytes,
+	             dst = supplies[i - 1].name;
+		 *src;
+		 src ++)
+	    {
+	      if ((*src & 0x80) || *src < ' ' || *src == 0x7f)
+	        *dst++ = '?';
+	      else
+	        *dst++ = *src;
+	    }
+
+	    *dst = '\0';
+	  }
 	  break;
     }
 
