@@ -467,7 +467,7 @@ backend_init_supplies(
 	packet.object_type != CUPS_ASN1_INTEGER)
     {
       fprintf(stderr,
-              "ERROR: prtGeneralCurrentLocalization type is %x, expected %x!\n",
+              "DEBUG: prtGeneralCurrentLocalization type is %x, expected %x!\n",
 	      packet.object_type, CUPS_ASN1_INTEGER);
       return;
     }
@@ -488,7 +488,7 @@ backend_init_supplies(
 	packet.object_type != CUPS_ASN1_INTEGER)
     {
       fprintf(stderr,
-              "ERROR: prtLocalizationCharacterSet type is %x, expected %x!\n",
+              "DEBUG: prtLocalizationCharacterSet type is %x, expected %x!\n",
 	      packet.object_type, CUPS_ASN1_INTEGER);
       return;
     }
