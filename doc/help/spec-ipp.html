@@ -12,7 +12,7 @@
 
   CUPS IPP specification for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2009 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -26,7 +26,7 @@
 
 <h2 class='title'><a name='INTRODUCTION'>Introduction</a></h2>
 
-<p>CUPS implements IPP/1.1 and the operations and attributes
+<p>CUPS implements IPP/2.1 and the operations and attributes
 defined in the "IPP: Job and Printer Set Operations", "IPP/1.1:
 Output-bin Attribute Extension", and "IPP/1.1: finishings
 'fold',' trim', and 'bale' attribute values extension"
@@ -1742,8 +1742,8 @@ CUPS-Get-PPDs Response:
 
 <h3 class='title'><span class='info'>CUPS 1.1</span><a name='CUPS_MOVE_JOB'>CUPS-Move-Job Operation</a></h3>
 
-<p>The CUPS-Move-Job operation (0x400D) moves an active print job
-to a different printer.</p>
+<p>The CUPS-Move-Job operation (0x400D) moves an active print job or all print
+jobs for a printer to a different printer.</p>
 
 <h4>CUPS-Move-Job Request</h4>
 
@@ -1760,12 +1760,14 @@ CUPS-Move-Job request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
+	<dt>"printer-uri" (uri)
+	<br><i>OR</i>
 	<dt>"printer-uri" (uri) and "job-id" (integer)
 	<br><i>OR</i>
 	<br>"job-uri":
 
-	<dd>The client MUST supply a URI for the specified printer and
-	a job ID number, or the job URI.
+	<dd>The client MUST supply a URI for the specified printer, the URI for
+	the specified printer and a job ID number, or the job URI.
 
 </dl>
 
