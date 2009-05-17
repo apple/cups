@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.4b3
 	  Russian and partial localizations for Chinese, Danish, Finnish,
 	  French, Italian, Korean, Norwegian, Portuguese, and Swedish
 	  (STR #3096, STR #3098, STR #3109, STR #3111, STR #3141)
+	- Updated the configure check for -fstack-protector (STR #3198)
 	- The network backends now correctly convert SNMP supply descriptions to
 	  UTF-8 encoding as needed.
 	- The scheduler could crash when deleting an attribute (STR #3197)
