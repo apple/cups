@@ -182,6 +182,7 @@ cupsResolveConflicts(
     cups_option_t **options)		/* IO - Additional selected options */
 {
   int			i,		/* Looping var */
+			tries,		/* Number of tries */
 			num_newopts;	/* Number of new options */
   cups_option_t		*newopts;	/* New options */
   cups_array_t		*active,	/* Active constraints */
@@ -230,10 +231,14 @@ cupsResolveConflicts(
 
   resolvers = NULL;
   pass      = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
+  tries     = 0;
 
-  while ((active = ppd_test_constraints(ppd, NULL, NULL, num_newopts, newopts,
+  while (tries < 100 &&
+         (active = ppd_test_constraints(ppd, NULL, NULL, num_newopts, newopts,
                                         _PPD_ALL_CONSTRAINTS)) != NULL)
   {
+    tries ++;
+
     if (!resolvers)
       resolvers = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
 
@@ -489,7 +494,11 @@ cupsResolveConflicts(
 
     cupsArrayClear(pass);
     cupsArrayDelete(active);
+    active = NULL;
   }
+
+  if (tries >= 100)
+    goto error;
 
  /*
   * Free the caller's option array...
