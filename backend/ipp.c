@@ -622,7 +622,7 @@ main(int  argc,				/* I - Number of command-line args */
   }
   while (http == NULL);
 
-  if (job_cancelled)
+  if (job_cancelled || !http)
   {
     if (tmpfilename[0])
       unlink(tmpfilename);
@@ -1056,8 +1056,26 @@ main(int  argc,				/* I - Number of command-line args */
 	httpReconnect(http);
       }
       else
+      {
+       /*
+	* Update auth-info-required as needed...
+	*/
+
         _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
 			cupsLastErrorString());
+
+	if (ipp_status == IPP_NOT_AUTHORIZED)
+	{
+	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
+		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
+
+	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
+		       "Negotiate", 9))
+	    fputs("ATTR: auth-info-required=negotiate\n", stderr);
+	  else
+	    fputs("ATTR: auth-info-required=username,password\n", stderr);
+	}
+      }
     }
     else if ((job_id_attr = ippFindAttribute(response, "job-id",
                                              IPP_TAG_INTEGER)) == NULL)
@@ -1276,19 +1294,6 @@ main(int  argc,				/* I - Number of command-line args */
       !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
-
- /*
-  * Update auth-info-required as needed...
-  */
-
-  if (ipp_status == IPP_NOT_AUTHORIZED)
-  {
-    if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
-                 "Negotiate", 9))
-      fputs("ATTR: auth-info-required=negotiate\n", stderr);
-    else
-      fputs("ATTR: auth-info-required=username,password\n", stderr);
-  }
 
  /*
   * Free memory...

@@ -389,41 +389,51 @@ cupsdStartProcess(
 
     if (infd != 0)
     {
-      close(0);
-      if (infd > 0)
-        dup(infd);
-      else
-        open("/dev/null", O_RDONLY);
+      if (infd < 0)
+        infd = open("/dev/null", O_RDONLY);
+
+      if (infd != 0)
+      {
+        dup2(infd, 0);
+	close(infd);
+      }
     }
+
     if (outfd != 1)
     {
-      close(1);
-      if (outfd > 0)
-	dup(outfd);
-      else
-        open("/dev/null", O_WRONLY);
+      if (outfd < 0)
+        outfd = open("/dev/null", O_WRONLY);
+
+      if (outfd != 1)
+      {
+        dup2(outfd, 1);
+	close(outfd);
+      }
     }
+
     if (errfd != 2)
     {
-      close(2);
-      if (errfd > 0)
-        dup(errfd);
-      else
-        open("/dev/null", O_WRONLY);
+      if (errfd < 0)
+        errfd = open("/dev/null", O_WRONLY);
+
+      if (errfd != 2)
+      {
+        dup2(errfd, 2);
+	close(errfd);
+      }
     }
-    if (backfd != 3)
+
+    if (backfd != 3 && backfd >= 0)
     {
-      close(3);
-      if (backfd > 0)
-	dup(backfd);
-      else
-        open("/dev/null", O_RDWR);
+      dup2(backfd, 3);
+      close(backfd);
       fcntl(3, F_SETFL, O_NDELAY);
     }
-    if (sidefd != 4 && sidefd > 0)
+
+    if (sidefd != 4 && sidefd >= 0)
     {
-      close(4);
-      dup(sidefd);
+      dup2(sidefd, 4);
+      close(sidefd);
       fcntl(4, F_SETFL, O_NDELAY);
     }
 

@@ -109,7 +109,7 @@ AC_ARG_WITH(gssservicename, [  --with-gssservicename   set default gss service n
 
 if test x$default_gssservicename != xno; then
 	if test "x$default_gssservicename" = "xdefault"; then
-		CUPS_DEFAULT_GSSSERVICENAME="ipp"
+		CUPS_DEFAULT_GSSSERVICENAME="host"
 	else
 		CUPS_DEFAULT_GSSSERVICENAME="$default_gssservicename"
 	fi

@@ -3,7 +3,9 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
-	- The web interface could hang on OpenBSD (STR #3176)
+	- The scheduler did not handle partial header lines properly from CGI
+	  programs (STR #3194)
+	- The web interface could hang on OpenBSD (STR #3176, STR #3196)
 	- The scheduler and cupsfilter utility did not handle rules starting
 	  with a negation operator properly (STR #3160)
 	- The scheduler and cupsfilter utility would crash with certain MIME

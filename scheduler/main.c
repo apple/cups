@@ -144,10 +144,10 @@ main(int  argc,				/* I - Number of command-line args */
   cups_file_t		*fp;		/* Fake lpsched lock file */
   struct stat		statbuf;	/* Needed for checking lpsched FIFO */
 #endif /* __sgi */
+  int			run_as_child = 0;
+					/* Needed for background fork/exec */
 #ifdef __APPLE__
-  int			run_as_child = 0,
-					/* Needed for Mac OS X fork/exec */
-			use_sysman = !getuid();
+  int			use_sysman = !getuid();
 					/* Use system management functions? */
 #else
   time_t		netif_time = 0;	/* Time since last network update */
@@ -189,16 +189,9 @@ main(int  argc,				/* I - Number of command-line args */
       for (opt = argv[i] + 1; *opt != '\0'; opt ++)
         switch (*opt)
 	{
-#ifdef __APPLE__
-          case 'S' : /* Disable system management functions */
-              puts("Warning: -S (disable system management) for internal testing use only!");
-	      use_sysman = 0;
-	      break;
-
 	  case 'C' : /* Run as child with config file */
               run_as_child = 1;
 	      fg           = -1;
-#endif /* __APPLE__ */
 
 	  case 'c' : /* Configuration file */
 	      i ++;
@@ -287,6 +280,13 @@ main(int  argc,				/* I - Number of command-line args */
 	      UseProfiles = 0;
 	      break;
 
+#ifdef __APPLE__
+          case 'S' : /* Disable system management functions */
+              puts("Warning: -S (disable system management) for internal testing use only!");
+	      use_sysman = 0;
+	      break;
+#endif /* __APPLE__ */
+
           case 't' : /* Test the cupsd.conf file... */
 	      TestConfigFile = 1;
 	      fg             = 1;
@@ -373,17 +373,27 @@ main(int  argc,				/* I - Number of command-line args */
       }
     }
 
-#ifdef __APPLE__
+#ifdef __OpenBSD__
    /*
-    * Since CoreFoundation has an overly-agressive check for whether a
-    * process has forked but not exec'd (whether CF has been called or
-    * not...), we now have to exec ourselves with the "-f" option to
-    * eliminate their bogus warning messages.
+    * Call _thread_sys_closefrom() so the child process doesn't reset the
+    * parent's file descriptors to be blocking.  This is a workaround for a
+    * limitation of userland libpthread on OpenBSD.
+    */
+   
+    _thread_sys_closefrom(0);
+#endif /* __OpenBSD__ */
+
+   /*
+    * Since CoreFoundation and DBUS both create fork-unsafe data on execution of
+    * a program, and since this kind of really unfriendly behavior seems to be
+    * more common these days in system libraries, we need to re-execute the
+    * background cupsd with the "-C" option to avoid problems.  Unfortunately,
+    * we also have to assume that argv[0] contains the name of the cupsd
+    * executable - there is no portable way to get the real pathname...
     */
 
     execlp(argv[0], argv[0], "-C", ConfigurationFile, (char *)0);
     exit(errno);
-#endif /* __APPLE__ */
   }
 
   if (fg < 1)
@@ -422,9 +432,23 @@ main(int  argc,				/* I - Number of command-line args */
     * Redirect stdin/out/err to /dev/null...
     */
 
-    open("/dev/null", O_RDONLY);
-    open("/dev/null", O_WRONLY);
-    open("/dev/null", O_WRONLY);
+    if ((i = open("/dev/null", O_RDONLY)) != 0)
+    {
+      dup2(i, 0);
+      close(i);
+    }
+
+    if ((i = open("/dev/null", O_WRONLY)) != 1)
+    {
+      dup2(i, 1);
+      close(i);
+    }
+
+    if ((i = open("/dev/null", O_WRONLY)) != 2)
+    {
+      dup2(i, 2);
+      close(i);
+    }
 #endif /* DEBUG */
   }
 
@@ -619,11 +643,7 @@ main(int  argc,				/* I - Number of command-line args */
   * we are up and running...
   */
 
-#ifdef __APPLE__
   if (!fg || run_as_child)
-#else
-  if (!fg)
-#endif /* __APPLE__ */
   {
    /*
     * Send a signal to the parent process, but only if the parent is

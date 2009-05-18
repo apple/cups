@@ -487,7 +487,7 @@ cups_gss_printf(OM_uint32  major_status,/* I - Major status code */
     gss_display_status(&err_minor_status, minor_status, GSS_C_MECH_CODE,
 		       GSS_C_NULL_OID, &msg_ctx, &minor_status_string);
 
-  DEBUG_printf(("8%s: %s, %s", message, (char *)major_status_string.value,
+  DEBUG_printf(("1%s: %s, %s", message, (char *)major_status_string.value,
 	        (char *)minor_status_string.value));
 
   gss_release_buffer(&err_minor_status, &major_status_string);
@@ -622,7 +622,12 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * information...
   */
 
-  if (http->hostaddr->addr.sa_family == AF_LOCAL &&
+#    ifdef HAVE_GSSAPI
+  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
+#    else
+  if (
+#    endif /* HAVE_GSSAPI */
+      http->hostaddr->addr.sa_family == AF_LOCAL &&
       !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
   {
    /*

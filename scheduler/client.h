@@ -45,7 +45,8 @@ struct cupsd_client_s
   int			pipe_pid;	/* Pipe process ID (or 0 if not a pipe) */
   int			sent_header,	/* Non-zero if sent HTTP header */
 			got_fields,	/* Non-zero if all fields seen */
-			field_col;	/* Column within line */
+			header_used;	/* Number of header bytes used */
+  char			header[2048];	/* Header from CGI program */
   cups_lang_t		*language;	/* Language to use */
 #ifdef HAVE_SSL
   int			auto_ssl;	/* Automatic test for SSL/TLS */

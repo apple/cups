@@ -2295,7 +2295,7 @@ cupsdSendCommand(
   con->sent_header = 0;
   con->file_ready  = 0;
   con->got_fields  = 0;
-  con->field_col   = 0;
+  con->header_used = 0;
 
   return (1);
 }
@@ -2578,7 +2578,8 @@ cupsdSendHeader(
 
     if (auth_str[0])
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendHeader: WWW-Authenticate: %s",
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdSendHeader: %d WWW-Authenticate: %s", con->http.fd,
                       auth_str);
 
       if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)
@@ -2710,9 +2711,10 @@ cupsdUpdateCGI(void)
 void
 cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 {
-  int		bytes;			/* Number of bytes written */
-  char		buf[16385];		/* Data buffer */
-  char		*bufptr;		/* Pointer into buffer */
+  int		bytes,			/* Number of bytes written */
+		field_col;		/* Current column */
+  char		*bufptr,		/* Pointer into buffer */
+		*bufend;		/* Pointer to end of buffer */
   ipp_state_t	ipp_state;		/* IPP state value */
 
 
@@ -2765,17 +2767,21 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
     bytes     = ipp_state != IPP_ERROR &&
                 (con->file >= 0 || ipp_state != IPP_DATA);
   }
-  else if ((bytes = read(con->file, buf, sizeof(buf) - 1)) > 0)
+  else if ((bytes = read(con->file, con->header,
+			 sizeof(con->header) - con->header_used)) > 0)
   {
+    con->header_used += bytes;
+
     if (con->pipe_pid && !con->got_fields)
     {
      /*
       * Inspect the data for Content-Type and other fields.
       */
 
-      buf[bytes] = '\0';
-
-      for (bufptr = buf; !con->got_fields && *bufptr; bufptr ++)
+      for (bufptr = con->header, bufend = con->header + con->header_used,
+               field_col = 0;
+           !con->got_fields && bufptr < bufend;
+	   bufptr ++)
       {
         if (*bufptr == '\n')
 	{
@@ -2783,11 +2789,11 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	  * Send line to client...
 	  */
 
-	  if (bufptr > buf && bufptr[-1] == '\r')
+	  if (bufptr > con->header && bufptr[-1] == '\r')
 	    bufptr[-1] = '\0';
 	  *bufptr++ = '\0';
 
-          cupsdLogMessage(CUPSD_LOG_DEBUG, "Script header: %s", buf);
+          cupsdLogMessage(CUPSD_LOG_DEBUG, "Script header: %s", con->header);
 
           if (!con->sent_header)
 	  {
@@ -2795,7 +2801,7 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	    * Handle redirection and CGI status codes...
 	    */
 
-            if (!strncasecmp(buf, "Location:", 9))
+            if (!strncasecmp(con->header, "Location:", 9))
 	    {
   	      cupsdSendHeader(con, HTTP_SEE_OTHER, NULL, CUPSD_AUTH_NONE);
 	      con->sent_header = 2;
@@ -2803,9 +2809,10 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	      if (httpPrintf(HTTP(con), "Content-Length: 0\r\n") < 0)
 		return;
 	    }
-	    else if (!strncasecmp(buf, "Status:", 7))
+	    else if (!strncasecmp(con->header, "Status:", 7))
 	    {
-  	      cupsdSendError(con, (http_status_t)atoi(buf + 7), CUPSD_AUTH_NONE);
+  	      cupsdSendError(con, (http_status_t)atoi(con->header + 7),
+	                     CUPSD_AUTH_NONE);
 	      con->sent_header = 2;
 	    }
 	    else
@@ -2821,27 +2828,25 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
             }
 	  }
 
-	  if (strncasecmp(buf, "Status:", 7))
-	    httpPrintf(HTTP(con), "%s\r\n", buf);
+	  if (strncasecmp(con->header, "Status:", 7))
+	    httpPrintf(HTTP(con), "%s\r\n", con->header);
 
          /*
 	  * Update buffer...
 	  */
 
-	  bytes -= (bufptr - buf);
+	  con->header_used -= bufptr - con->header;
 
-	  if (bytes > 0)
-	    memmove(buf, bufptr, bytes + 1);
-	  else
-	    buf[0] = '\0';
+	  if (con->header_used > 0)
+	    memmove(con->header, bufptr, con->header_used);
 
-	  bufptr = buf - 1;
+	  bufptr = con->header - 1;
 
          /*
 	  * See if the line was empty...
 	  */
 
-	  if (con->field_col == 0)
+	  if (field_col == 0)
 	  {
 	    con->got_fields = 1;
 
@@ -2855,33 +2860,22 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
 	      con->http.data_encoding = HTTP_ENCODE_CHUNKED;
           }
 	  else
-	    con->field_col = 0;
+	    field_col = 0;
 	}
 	else if (*bufptr != '\r')
-	  con->field_col ++;
+	  field_col ++;
       }
 
-      if (bytes > 0 && !con->got_fields)
-      {
-       /*
-        * Remaining text needs to go out...
-	*/
-
-        httpPrintf(HTTP(con), "%s", buf);
-
-        con->http.activity = time(NULL);
-        return;
-      }
-      else if (bytes == 0)
+      if (!con->got_fields)
       {
         con->http.activity = time(NULL);
         return;
       }
     }
 
-    if (bytes > 0)
+    if (con->header_used > 0)
     {
-      if (httpWrite2(HTTP(con), buf, bytes) < 0)
+      if (httpWrite2(HTTP(con), con->header, con->header_used) < 0)
       {
 	cupsdLogMessage(CUPSD_LOG_DEBUG,
 			"cupsdWriteClient: %d Closing for error %d (%s)",
@@ -2894,10 +2888,14 @@ cupsdWriteClient(cupsd_client_t *con)	/* I - Client connection */
       if (con->http.data_encoding == HTTP_ENCODE_CHUNKED)
         httpFlushWrite(HTTP(con));
 
-      con->bytes += bytes;
+      con->bytes += con->header_used;
 
       if (con->http.state == HTTP_WAITING)
 	bytes = 0;
+      else
+        bytes = con->header_used;
+
+      con->header_used = 0;
     }
   }
 

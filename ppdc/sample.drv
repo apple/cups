@@ -418,7 +418,6 @@ Version "1.4"
     UIConstraints "*PageSize Legal *InputSlot Envelope"
     UIConstraints "*PageSize Letter *InputSlot Envelope"
     UIConstraints "*PageSize Tabloid *InputSlot Envelope"
-    UIConstraints "*Resolution 600dpi *ColorModel CMYK"
 
     HWMargins 18 36 18 36
     *MediaSize Letter
@@ -441,7 +440,7 @@ Version "1.4"
 
     Resolution - 1 0 0 0 150dpi
     *Resolution - 1 0 0 0 300dpi
-    Resolution k 1 0 0 0 "600dpi/600 DPI Grayscale"
+    Resolution - 1 0 0 0 600dpi
 
     *InputSlot 1 Tray
     InputSlot 2 "Manual/Manual Feed" 

@@ -3781,7 +3781,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
   int		port;			/* Port portion of URI */
   ipp_attribute_t *attr;		/* Attribute in request */
   const char	*username;		/* Username */
-  int		purge;			/* Purge? */
+  cupsd_jobaction_t purge;		/* Purge? */
   cupsd_printer_t *printer;		/* Printer */
 
 
@@ -3827,9 +3827,9 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "purge-jobs",
                                IPP_TAG_BOOLEAN)) != NULL)
-    purge = attr->values[0].boolean;
+    purge = attr->values[0].boolean ? CUPSD_JOB_PURGE : CUPSD_JOB_DEFAULT;
   else
-    purge = 1;
+    purge = CUPSD_JOB_PURGE;
 
  /*
   * And if the destination is valid...
@@ -3871,7 +3871,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(NULL, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
-                    purge ? "purged" : "canceled", get_username(con));
+                    purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
+		    get_username(con));
   }
   else
   {
@@ -3893,7 +3894,8 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     cupsdCancelJobs(printer->name, username, purge);
 
     cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
-                    printer->name, purge ? "purged" : "canceled",
+                    printer->name,
+		    purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
 		    get_username(con));
   }
 
@@ -3919,7 +3921,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   cupsd_job_t	*job;			/* Job information */
   cups_ptype_t	dtype;			/* Destination type (printer/class) */
   cupsd_printer_t *printer;		/* Printer data */
-  int		purge;			/* Purge the job? */
+  cupsd_jobaction_t purge;		/* Purge the job? */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_job(%p[%d], %s)", con,
@@ -4028,9 +4030,9 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "purge-job",
                                IPP_TAG_BOOLEAN)) != NULL)
-    purge = attr->values[0].boolean;
+    purge = attr->values[0].boolean ? CUPSD_JOB_PURGE : CUPSD_JOB_DEFAULT;
   else
-    purge = 0;
+    purge = CUPSD_JOB_DEFAULT;
 
  /*
   * See if the job exists...
@@ -4061,7 +4063,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   * we can't cancel...
   */
 
-  if (job->state_value >= IPP_JOB_CANCELED && !purge)
+  if (job->state_value >= IPP_JOB_CANCELED && purge != CUPSD_JOB_PURGE)
   {
     switch (job->state_value)
     {
@@ -4092,11 +4094,12 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
-                   purge ? "Job purged by \"%s\"" : "Job canceled by \"%s\"",
+                   purge == CUPSD_JOB_PURGE ? "Job purged by \"%s\"" :
+		                              "Job canceled by \"%s\"",
 		   username);
   cupsdCheckJobs();
 
-  if (purge)
+  if (purge == CUPSD_JOB_PURGE)
     cupsdLogMessage(CUPSD_LOG_INFO, "[Job %d] Purged by \"%s\".", jobid,
 		    username);
   else
@@ -9607,7 +9610,11 @@ save_auth_info(
   cupsFileClose(fp);
 
 #if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
+#  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
+  if (con->http.hostaddr->addr.sa_family == AF_LOCAL || con->gss_creds)
+#  else
   if (con->gss_creds)
+#  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
     save_krb5_creds(con, job);
   else if (job->ccname)
     cupsdClearString(&(job->ccname));

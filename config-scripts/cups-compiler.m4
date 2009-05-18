@@ -140,7 +140,7 @@ if test -n "$GCC"; then
 	AC_MSG_CHECKING(if GCC supports -fstack-protector)
 	OLDCFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fstack-protector"
-	AC_TRY_COMPILE(,,
+	AC_TRY_LINK(,,
 		OPTIM="$OPTIM -fstack-protector"
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
