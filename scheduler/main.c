@@ -643,11 +643,7 @@ main(int  argc,				/* I - Number of command-line args */
   * we are up and running...
   */
 
-#ifdef __APPLE__
   if (!fg || run_as_child)
-#else
-  if (!fg)
-#endif /* __APPLE__ */
   {
    /*
     * Send a signal to the parent process, but only if the parent is
