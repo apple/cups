@@ -2578,7 +2578,8 @@ cupsdSendHeader(
 
     if (auth_str[0])
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSendHeader: WWW-Authenticate: %s",
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "cupsdSendHeader: %d WWW-Authenticate: %s", con->http.fd,
                       auth_str);
 
       if (httpPrintf(HTTP(con), "WWW-Authenticate: %s\r\n", auth_str) < 0)

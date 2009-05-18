@@ -1052,7 +1052,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     if (!con->gss_creds)
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "cupsdAuthorize: No credentials!");
+                      "cupsdAuthorize: No delegated credentials!");
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
@@ -1584,13 +1584,21 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
 
     peersize = sizeof(peercred);
 
+#      ifdef __APPLE__
+    if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
+#      else
     if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+#      endif /* __APPLE__ */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
                       strerror(errno));
       krb5_cc_destroy(KerberosContext, ccache);
       return (NULL);
     }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+                    "cupsdCopyKrb5Creds: Copying credentials for UID %d...",
+		    CUPSD_UCRED_UID(peercred));
 
     krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
 
