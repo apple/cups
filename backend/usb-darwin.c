@@ -1281,14 +1281,14 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 
   if (stat(bundlestr, &bundleinfo))
   {
-    fprintf(stderr, "Unable to load class driver \"%s\": %s", bundlestr,
-	    strerror(errno));
+    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": %s\n",
+	    bundlestr, strerror(errno));
     return (kr);
   }
   else if (bundleinfo.st_mode & S_IWOTH)
   {
-    fprintf(stderr, "Unable to load class driver \"%s\": insecure file "
-		    "permissions (0%o)", bundlestr, bundleinfo.st_mode);
+    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": insecure file "
+		    "permissions (0%o)\n", bundlestr, bundleinfo.st_mode);
     return (kr);
   }
 
