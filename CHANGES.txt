@@ -1,5 +1,12 @@
-CHANGES.txt - 2009-05-16
+CHANGES.txt - 2009-05-20
 ------------------------
+
+CHANGES IN CUPS V1.4??
+
+	- The Mac OS X USB backend did not handle aborted or stalled pipe
+	  conditions properly, which prevented drivers from ejecting partial
+	  pages when a job was canceled or held.
+
 
 CHANGES IN CUPS V1.4b3
 
