@@ -445,7 +445,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
 
   if (!language)
   {
-    if ((language = getenv("LANG")) == NULL)
+    if (!getenv("SOFTWARE") || (language = getenv("LANG")) == NULL)
       language = appleLangDefault();
 
     DEBUG_printf(("4cupsLangGet: language=\"%s\"", language));
@@ -1121,13 +1121,15 @@ appleLangDefault(void)
   					/* Pointer to library globals */
 
 
+  DEBUG_puts("2appleLangDefault()");
+
  /*
   * Only do the lookup and translation the first time.
   */
 
   if (!cg->language[0])
   {
-    if ((lang = getenv("LANG")))
+    if (getenv("SOFTWARE") != NULL && (lang = getenv("LANG")) != NULL)
     {
       strlcpy(cg->language, lang, sizeof(cg->language));
       return (cg->language);
