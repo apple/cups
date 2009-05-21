@@ -3,7 +3,7 @@
  *
  *   Web search program for www.cups.org.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -33,7 +33,8 @@
  * Local functions...
  */
 
-static void	list_nodes(const char *title, cups_array_t *nodes);
+static void	list_nodes(help_index_t *hi, const char *title,
+		           cups_array_t *nodes);
 
 
 /*
@@ -69,7 +70,7 @@ main(int  argc,				/* I - Number of command-line args */
   search = helpSearchIndex(hi, argv[2], NULL, NULL);
 
   if (search)
-    list_nodes(argv[1], search->sorted);
+    list_nodes(hi, argv[1], search->sorted);
 
  /*
   * Return with no errors...
@@ -84,10 +85,12 @@ main(int  argc,				/* I - Number of command-line args */
  */
 
 static void
-list_nodes(const char   *title,		/* I - Title string */
+list_nodes(help_index_t *hi,		/* I - Help index */
+           const char   *title,		/* I - Title string */
 	   cups_array_t *nodes)		/* I - Nodes */
 {
-  help_node_t	*node;			/* Current node */
+  help_node_t	*node,			/* Current node */
+		*file;			/* File node */
 
 
   printf("%d\n", cupsArrayCount(nodes));
@@ -96,10 +99,14 @@ list_nodes(const char   *title,		/* I - Title string */
        node = (help_node_t *)cupsArrayNext(nodes))
   {
     if (node->anchor)
-      printf("%d|%s#%s|%s\n", node->score, node->filename, node->anchor,
-             node->text);
+    {
+      file = helpFindNode(hi, node->filename, NULL);
+      printf("%d|%s#%s|%s|%s\n", node->score, node->filename, node->anchor,
+             node->text, file ? file->text : node->filename);
+    }
     else
-      printf("%d|%s|%s\n", node->score, node->filename, node->text);
+      printf("%d|%s|%s|%s\n", node->score, node->filename, node->text,
+             node->text);
   }
 }
 
