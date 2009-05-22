@@ -1,5 +1,23 @@
-CHANGES.txt - 2009-05-16
+CHANGES.txt - 2009-05-22
 ------------------------
+
+CHANGES IN CUPS V1.4rc1
+
+	- The PPD compiler now defines six variables: CUPS_VERSION,
+	  CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH,
+	  PLATFORM_NAME, and PLATFORM_ARCH (STR #3203)
+	- Fixed a whitespace skipping bug in cupsRasterInterpretPPD.
+	- The scheduler did not return HTTP 403 (Forbidden) for authenticated
+	  users that were not authorized to do IPP operations (STR #3193)
+	- The scheduler did not report more than 8 Product strings from a PPD
+	  file.  Some PPD files have as many as 24.
+	- ppdOpen*() could crash if a keyword had no value string (something
+	  that cupstestppd looks for...)
+	- cupsLangDefault() did not return the correct language on Mac OS X.
+	- The Mac OS X USB backend did not handle aborted or stalled pipe
+	  conditions properly, which prevented drivers from ejecting partial
+	  pages when a job was canceled or held.
+
 
 CHANGES IN CUPS V1.4b3
 

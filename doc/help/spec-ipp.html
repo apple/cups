@@ -365,7 +365,7 @@ Print-Job request:
 
 <dl>
 
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
@@ -472,7 +472,7 @@ Create-Job request:
 
 <dl>
 
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
@@ -577,7 +577,7 @@ Set-Job-Attributes request:
 	<dd>The client MUST supply a URI for the specified printer and
 	a job ID number, or the job URI.
 
-	<dt><span class="info">CUPS 1.4</span>"purge-job" (boolean):
+	<dt><span class="info">CUPS 1.4/Mac OS X 10.6</span>"purge-job" (boolean):
 
 	<dd>The client OPTIONALLY supplies this attribute. When true,
 	all job files (history and document) are purged. The default
@@ -632,7 +632,7 @@ Purge-Jobs request:
 	<dd>The client MUST supply a URI for the specified printer or
 	"ipp://.../printers" for all printers and classes.
 
-	<dt><span class="info">CUPS 1.2</span>"purge-jobs" (boolean):
+	<dt><span class="info">CUPS 1.2/Mac OS X 10.5</span>"purge-jobs" (boolean):
 
 	<dd>The client OPTIONALLY supplies this attribute to specify
 	whether the jobs are purged (true) or just canceled (false).
@@ -743,7 +743,7 @@ Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.2</span><a
+<h3 class='title'><span class='info'>CUPS 1.2/Mac OS X 10.5</span><a
 name='CREATE_PRINTER_SUBSCRIPTION'>Create-Printer-Subscription</a></h3>
 
 <p>The Create-Printer-Subscription operation (0x0016) creates a
@@ -915,7 +915,7 @@ CUPS-Get-Printers request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
-	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2</span>
+	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to
 	select the first printer that is returned.
@@ -949,7 +949,7 @@ CUPS-Get-Printers request:
 	responds as if this attribute had been supplied with a value of
 	'all'.
 
-	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2</span>
+	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a user name that is used to filter
 	the returned printers.
@@ -1016,7 +1016,7 @@ CUPS-Add-Modify-Printer request:
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3</span>
+	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
@@ -1179,7 +1179,7 @@ CUPS-Get-Classes request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
-	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2</span>
+	<dt>"first-printer-name" (name(127)):<span class='info'>CUPS 1.2/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies this attribute to
 	select the first printer that is returned.
@@ -1209,7 +1209,7 @@ CUPS-Get-Classes request:
 	interested. If the client omits this attribute, the server responds as
 	if this attribute had been supplied with a value of 'all'.
 
-	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2</span>
+	<dt>"requested-user-name" (name(127)) : <span class='info'>CUPS 1.2/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a user name that is used to filter
 	the returned printers.
@@ -1276,7 +1276,7 @@ CUPS-Add-Modify-Class request:
 
 <dl>
 
-	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3</span>
+	<dt>"auth-info-required" (1setOf type2 keyword):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication keywords that are required to communicate with the printer/remote queue.
 
@@ -1575,14 +1575,14 @@ CUPS-Get-Devices request:
 	<dd>The client OPTIONALLY supplies a device class keyword to select
 	which devices are returned.
 
-	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4/Mac OS X 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the
 	requestor does not want to discover. If the client omits this attribute,
 	the server responds with devices of all schemes specified by
 	the "include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4/Mac OS X 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the
 	requestor wants to discover. If the client omits this attribute,
@@ -1601,7 +1601,7 @@ CUPS-Get-Devices request:
 	the client omits this attribute, the server responds as if this
 	attribute had been supplied with a value of 'all'.
 
-	<dt>"timeout" (integer (1:MAX)) :<span class='info'>CUPS 1.4</span>
+	<dt>"timeout" (integer (1:MAX)) :<span class='info'>CUPS 1.4/Mac OS X 10.6</span>
 
 	<dd>The client OPTIONALLY supplies this attribute limiting the number of
 	devices that are returned.
@@ -1658,14 +1658,14 @@ CUPS-Get-PPDs request:
 	attributes as described in section 3.1.4.1 of the IPP Model and
 	Semantics document.
 
-	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+	<dt>"exclude-schemes" (1setOf name) :<span class='info'>CUPS 1.4/Mac OS X 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the
 	requestor does not want to list. If the client omits this attribute,
 	the server responds with PPDs of all schemes specified by the
 	"include-schemes" attribute.
 
-	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4</span>
+	<dt>"include-schemes" (1setOf name) :<span class='info'>CUPS 1.4/Mac OS X 10.6</span>
 
 	<dd>The client OPTIONALLY supplies a set of scheme names that the
 	requestor wants to list. If the client omits this attribute, the server
@@ -1680,27 +1680,27 @@ CUPS-Get-PPDs request:
 
 	<dd>The client OPTIONALLY supplies a printer manufacturer to select which PPDs are returned.
 
-	<dt>"ppd-make-and-model" (text(127)):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-make-and-model" (text(127)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a make and model to select which PPDs are returned.
 
-	<dt>"ppd-model-number" (integer):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-model-number" (integer):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a model number to select which PPDs are returned.
 
-	<dt>"ppd-natural-language" (naturalLanguage):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-natural-language" (naturalLanguage):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a language to select which PPDs are returned.
 
-	<dt>"ppd-product" (text(127)):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-product" (text(127)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript product string to select which PPDs are returned.
 
-	<dt>"ppd-psversion" (text(127)):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-psversion" (text(127)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a PostScript version string to select which PPDs are returned.
 
-	<dt>"ppd-type" (type1 keyword):<span class='info'>CUPS 1.3</span>
+	<dt>"ppd-type" (type1 keyword):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a driver type to select which PPDs are returned.
 
@@ -1802,7 +1802,7 @@ CUPS-Move-Job Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.2</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.2/Mac OS X 10.5</span><a name='CUPS_AUTHENTICATE_JOB'>CUPS-Authenticate-Job Operation</a></h3>
 
 <p>The CUPS-Authenticate-Job operation (0x400E) authenticates a print job for
 printing, releasing the job if it is held. Typically this is used when printing
@@ -1837,11 +1837,11 @@ CUPS-Authenticate-Job request:
 
 <dl>
 
-	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3</span>
+	<dt>"auth-info" (1setOf text(MAX)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies one or more authentication values as specified by the "auth-info-required" attribute.
 
-	<dt>"job-hold-until" (keyword | name(MAX)):<span class='info'>CUPS 1.3</span>
+	<dt>"job-hold-until" (keyword | name(MAX)):<span class='info'>CUPS 1.3/Mac OS X 10.5</span>
 
 	<dd>The client OPTIONALLY supplies a new job-hold-until value for the
 	job. If specified and not the "no-hold" value, the job is held instead
@@ -1880,7 +1880,7 @@ CUPS-Authenticate-Job Response:
 
 </dl>
 
-<h3 class='title'><span class='info'>CUPS 1.3</span><a name='CUPS_GET_PPD'>CUPS-Get-PPD Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='CUPS_GET_PPD'>CUPS-Get-PPD Operation</a></h3>
 
 <p>The CUPS-Get-PPD operation (0x400F) gets a PPD file from the
 server. The PPD file can be specified using a <tt>ppd-name</tt>
@@ -1950,7 +1950,7 @@ CUPS-Get-PPD Response:
 <p>If the status code is <tt>successful-ok</tt>, the PPD file follows
 the end of the IPP response.</p>
 
-<h3 class='title'><span class='info'>CUPS 1.4</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
+<h3 class='title'><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='CUPS_GET_DOCUMENT'>CUPS-Get-Document Operation</a></h3>
 
 <p>The CUPS-Get-Document operation (0x4027) gets a document file from a
 job on the server. The document file is specified using the
@@ -2067,7 +2067,7 @@ one of the following:
 
 </ul>
 
-<h4><a name="device-id">device-id (text(127))</a><span class="info">CUPS 1.2</span></h4>
+<h4><a name="device-id">device-id (text(127))</a><span class="info">CUPS 1.2/Mac OS X 10.5</span></h4>
 
 <p>The device-id attribute specifies the IEEE-1284 device ID
 string for the device.</p>
@@ -2077,7 +2077,7 @@ string for the device.</p>
 <p>The device-info attribute specifies a human-readable string describing
 the device, e.g. "Parallel Port #1".
 
-<h4><a name="device-location">device-location (text(127))</a><span class="info">CUPS 1.4</span></h4>
+<h4><a name="device-location">device-location (text(127))</a><span class="info">CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The device-location attribute specifies the physical location of the
 printer.
@@ -2137,7 +2137,7 @@ of the device-class attribute:
 
 <h3 class='title'><a name='JOB_TEMPLATE_ATTRIBUTES'>Job Template Attributes</a></h3>
 
-<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3</span></h4>
+<h4><a name="auth-info">auth-info (1setOf text(MAX))</a><span class="info">CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The auth-info attribute specifies the authentication information to use when printing to a remote device. The order and content of each text value is specifed by the <a href="#auth-info-required">auth-info-required</a> printer attribute.
 
@@ -2179,7 +2179,7 @@ supported. The default value is 10.
 <p>The document-count attribute specifies the number of documents that
 are present in the job.
 
-<h4><a name="fit-to-page">fit-to-page (boolean)</a><span class="info">CUPS 1.4</span></h4>
+<h4><a name="fit-to-page">fit-to-page (boolean)</a><span class="info">CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The fit-to-page attribute specifies whether to scale documents to fit on the
 selected media (fit-to-page=true) or use the physical size specified in the
@@ -2234,17 +2234,17 @@ Universal Coordinated Time (UTC) and <i>not</i> in the local time zone. If the
 specified time is less than the current time, the job is held until the
 next day.
 
-<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="job-media-progress">job-media-progress (integer(0:100))</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The job-media-progress attribute specifies the percentage of completion of
 the current page. It is only valid when the job-state attribute has the
 "processing" value (5).</p>
 
-<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="job-printer-state-message">job-printer-state-message (text(MAX))</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The job-printer-state-message attribute provides the last known value of the printer-state-message attribute for the printer that processed (or is processing) the job.</p>
 
-<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="job-printer-state-reasons">job-printer-state-reasons (1setOf type2 keyword)</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The job-printer-state-reasons attribute provides the last known value of the printer-state-reasons attribute for the printer that processed (or is processing) the job.</p>
 
@@ -2466,7 +2466,7 @@ name of the PPD file (the NickName attribute in the PPD file). If the
 make and model is not specified in the PPD file then the ModelName or
 ShortNickName attributes are used instead.
 
-<h4><a name="ppd-model-number">ppd-model-number (integer)</a><span class="info">CUPS 1.3</span></h4>
+<h4><a name="ppd-model-number">ppd-model-number (integer)</a><span class="info">CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The ppd-model-number attribute provides the <tt>cupsModelNumber</tt> value from the PPD file.
 
@@ -2484,11 +2484,11 @@ language is unknown or undefined then "en" (English) is assumed.
 
 <p>The ppd-product attribute specifies the Product attribute values in the PPD file.
 
-<h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">CUPS 1.3</span></h4>
+<h4><a name="ppd-psversion">ppd-psversion (1setOf text(127))</a><span class="info">CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The ppd-product attribute specifies the PSVersion attribute values in the PPD file.
 
-<h4><a name="ppd-type">ppd-type (type1 keyword)</a><span class="info">CUPS 1.3</span></h4>
+<h4><a name="ppd-type">ppd-type (type1 keyword)</a><span class="info">CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The ppd-type attribute specifies the type of driver described by the PPD file:</p>
 
@@ -2509,7 +2509,7 @@ language is unknown or undefined then "en" (English) is assumed.
 
 <h3 class='title'><a name='PRINTER_ATTRIBUTES'>Printer Attributes</a></h3>
 
-<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3</span></h4>
+<h4><a name="auth-info-required">auth-info-required (1setOf type2 keyword)</a><span class="info">CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The auth-info-required attribute specifies the authentication information that is required for printing a job. The following keywords are recognized:</p>
 
@@ -2549,50 +2549,50 @@ the system.
 <p>The job-sheets-supported attribute specifies the available banner files.
 There will always be at least one banner file available called "none".
 
-<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="marker-change-time">marker-change-time (integer)</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The marker-change-time attribute specifies the printer-up-time value when
 the last change to the marker-colors, marker-levels, marker-message,
 marker-names, or marker-types attributes was made.</p>
 
-<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="marker-colors">marker-colors (1setof name(MAX))</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The marker-colors attribute specifies the color(s) for each supply in the
 printer. It is only available when the driver provides supply levels. The
 color is either "none" or one or more hex-encoded sRGB colors of the form
 "#RRGGBB".</p>
 
-<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="marker-high-levels">marker-high-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The marker-high-levels attribute specifies the supply levels that indicate
 a near-full condition. A value of 100 should be used for supplies that are
 consumed/emptied, e.g. ink cartridges.</p>
 
-<h4><a name="marker-levels">marker-levels (1setof integer(-1:100))</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="marker-levels">marker-levels (1setof integer(-1:100))</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The marker-levels attribute specifies the current supply levels for the
 printer. It is only available when the driver provides supply levels. A
 value of -1 indicates the level is unknown, while values from 0 to 100
 indicate the corresponding percentage.</p>
 
-<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="marker-low-levels">marker-low-levels (1setof integer(0:100))</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The marker-low-levels attribute specifies the supply levels that indicate
 a near-empty condition. A value of 0 should be used for supplies that are
 filled, e.g. waste ink tanks.</p>
 
-<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="marker-message">marker-message (text(MAX))</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The marker-message attribute provides a human-readable status message
 for the current supply levels, e.g. "12 pages of ink remaining." It is only
 available when the driver provides supply levels.</p>
 
-<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="marker-names">marker-names (1setof name(MAX))</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The marker-names attribute specifies the name(s) for each supply in the
 printer. It is only available when the driver provides supply levels.</p>
 
-<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3</span></h4>
+<h4><a name="marker-types">marker-types (1setof type3 keyword)</a><span class='info'>CUPS 1.3/Mac OS X 10.5</span></h4>
 
 <p>The marker-types attribute specifies the type(s) of each supply in the
 printer. It is only available when the driver provides supply levels. The
@@ -2671,13 +2671,13 @@ to this printer. The default port monitor is "none".
 
 <p>The port-monitor-supported attribute specifies the available port monitors.
 
-<h4><a name="printer-commands">printer-commands (1setOf Type3 keyword)</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="printer-commands">printer-commands (1setOf Type3 keyword)</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The printer-commands attribute specifies the commands that are supported
 by the CUPS command file filter. The keyword "none" indicates that no commands
 are supported.</p>
 
-<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4</span></h4>
+<h4><a name="printer-dns-sd-name">printer-dns-sd-name (name(MAX) | noValue)</a><span class='info'>CUPS 1.4/Mac OS X 10.6</span></h4>
 
 <p>The printer-dns-sd-name attribute specifies the registered DNS-SD service
 name for the printer. If the printer is not being shared using this protocol,
@@ -2697,10 +2697,10 @@ and the following CUPS-specific keywords:</p>
 	permissions. CUPS will not execute programs with world write permissions
 	or setuid programs. When run as root (the default), CUPS also does not
 	execute programs that are not owned by root.
-	<span class='info'>CUPS 1.4</span></li>
+	<span class='info'>CUPS 1.4/Mac OS X 10.6</span></li>
 
 	<li><tt>cups-missing-filter-warning</tt> - a filter or backend is not
-	installed. <span class='info'>CUPS 1.4</span></li>
+	installed. <span class='info'>CUPS 1.4/Mac OS X 10.6</span></li>
 
 </ul>
 

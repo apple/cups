@@ -71,6 +71,9 @@
 #include "data/hp.h"
 #include "data/label.h"
 #include "data/pcl.h"
+#ifndef WIN32
+#  include <sys/utsname.h>
+#endif // !WIN32
 
 
 //
@@ -109,6 +112,25 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
   cond_state    = PPDC_COND_NORMAL;
   cond_current  = cond_stack;
   cond_stack[0] = PPDC_COND_NORMAL;
+
+  // Add standard #define variables...
+#define MAKE_STRING(x) #x
+
+  vars->add(new ppdcVariable("CUPS_VERSION", MAKE_STRING(CUPS_VERSION)));
+  vars->add(new ppdcVariable("CUPS_VERSION_MAJOR", MAKE_STRING(CUPS_VERSION_MAJOR)));
+  vars->add(new ppdcVariable("CUPS_VERSION_MINOR", MAKE_STRING(CUPS_VERSION_MINOR)));
+  vars->add(new ppdcVariable("CUPS_VERSION_PATCH", MAKE_STRING(CUPS_VERSION_PATCH)));
+
+#ifdef WIN32
+  vars->add(new ppdcVariable("PLATFORM_NAME", "Windows"));
+  vars->add(new ppdcVariable("PLATFORM_ARCH", "X86"));
+
+#else
+  struct utsname name;			// uname information
+
+  vars->add(new ppdcVariable("PLATFORM_NAME", name.sysname));
+  vars->add(new ppdcVariable("PLATFORM_ARCH", name.machine));
+#endif // WIN32
 
   if (f)
     read_file(f, ffp);

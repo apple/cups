@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.4b3 - 2009-04-20
-----------------------------------
+INSTALL - CUPS v1.4rc1 - 2009-05-22
+-----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can

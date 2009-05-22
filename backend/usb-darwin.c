@@ -656,27 +656,51 @@ print_device(const char *uri,		/* I - Device URI */
 	*/
 
 	if (iostatus == kIOUSBTransactionTimeout)
+	{
+	  fputs("DEBUG: Got USB transaction timeout during write!\n", stderr);
 	  iostatus = 0;
+	}
 
        /*
-        * Ignore stall errors, since we clear any stalls in the class driver...
+        * Ignore the first stall error we get since we try to clear any stalls
+	* in the class driver...
 	*/
 
-	if (iostatus == kIOUSBPipeStalled)
-	  iostatus = 0;
+	else if (iostatus == kIOUSBPipeStalled)
+	{
+	  fputs("DEBUG: Got USB pipe stalled during write!\n", stderr);
+
+          bytes = 0;
+
+	  if (prev_iostatus != kIOUSBPipeStalled)
+	  {
+	    prev_iostatus = iostatus;
+	    iostatus      = 0;
+	  }
+	}
 
        /*
 	* Ignore the first "aborted" status we get, since we might have
 	* received a signal (<rdar://problem/6860126>)...
 	*/
 
-	if (iostatus == kIOReturnAborted && prev_iostatus != kIOReturnAborted)
+	else if (iostatus == kIOReturnAborted)
 	{
-	  prev_iostatus = iostatus;
-	  iostatus      = 0;
-	}
+	  fputs("DEBUG: Got return aborted during write!\n", stderr);
+
+	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
+	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n", err);
+
+          bytes = 0;
+
+	  if (prev_iostatus != kIOReturnAborted)
+	  {
+	    prev_iostatus = iostatus;
+	    iostatus      = 0;
+	  }
+        }
 	else
-	  prev_iostatus = iostatus;
+          prev_iostatus = iostatus;
 
 	if (iostatus || bytes < 0)
 	{
@@ -684,21 +708,25 @@ print_device(const char *uri,		/* I - Device URI */
 	  * Write error - bail if we don't see an error we can retry...
 	  */
 
-	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data!\n"));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
 	          iostatus);
+
+	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n",
 	          err);
+
 	  status = job_canceled ? CUPS_BACKEND_FAILED : CUPS_BACKEND_STOP;
 	  break;
 	}
+	else if (bytes > 0)
+	{
+	  fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
 
-        fprintf(stderr, "DEBUG: Wrote %d bytes of print data...\n", (int)bytes);
-
-        g.print_bytes -= bytes;
-	print_ptr   += bytes;
-	total_bytes += bytes;
+	  g.print_bytes -= bytes;
+	  print_ptr   += bytes;
+	  total_bytes += bytes;
+	}
       }
 
       if (print_fd != 0 && status == noErr)
@@ -844,6 +872,8 @@ static void *read_thread(void *reference)
     readstatus = (*g.classdriver)->ReadPipe(g.classdriver, readbuffer, &rbytes);
     if (readstatus == kIOReturnSuccess && rbytes > 0)
     {
+      fprintf(stderr, "DEBUG: Read %d bytes of back-channel data...\n",
+              (int)rbytes);
       cupsBackChannelWrite((char*)readbuffer, rbytes, 1.0);
 
       /* cntrl-d is echoed by the printer.
@@ -858,6 +888,12 @@ static void *read_thread(void *reference)
       parse_pserror(readbuffer, rbytes);
 #endif
     }
+    else if (readstatus == kIOUSBTransactionTimeout)
+      fputs("DEBUG: Got USB transaction timeout during write!\n", stderr);
+    else if (readstatus == kIOUSBPipeStalled)
+      fputs("DEBUG: Got USB pipe stalled during read!\n", stderr);
+    else if (readstatus == kIOReturnAborted)
+      fputs("DEBUG: Got return aborted during read!\n", stderr);
 
    /*
     * Make sure this loop executes no more than once every 250 miliseconds...
@@ -904,41 +940,83 @@ sidechannel_thread(void *reference)
     switch (command)
     {
       case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
+	  fputs("DEBUG: CUPS_SC_CMD_SOFT_RESET received from driver...\n",
+		stderr);
+
           if ((*g.classdriver)->SoftReset != NULL)
 	  {
 	    soft_reset();
 	    cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, NULL, 0, 1.0);
+	    fputs("DEBUG: Returning status CUPS_STATUS_OK with no bytes...\n",
+	          stderr);
 	  }
 	  else
 	  {
 	    cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED,
 	                         NULL, 0, 1.0);
+	    fputs("DEBUG: Returning status CUPS_STATUS_NOT_IMPLEMENTED with "
+	          "no bytes...\n", stderr);
 	  }
 	  break;
 
       case CUPS_SC_CMD_DRAIN_OUTPUT:	/* Drain all pending output */
+	  fputs("DEBUG: CUPS_SC_CMD_DRAIN_OUTPUT received from driver...\n",
+		stderr);
+
 	  g.drain_output = 1;
 	  break;
 
       case CUPS_SC_CMD_GET_BIDI:		/* Is the connection bidirectional? */
+	  fputs("DEBUG: CUPS_SC_CMD_GET_BIDI received from driver...\n",
+		stderr);
+
 	  data[0] = g.bidi_flag;
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+
+	  fprintf(stderr,
+	          "DEBUG: Returned CUPS_SC_STATUS_OK with 1 byte (%02X)...\n",
+		  data[0]);
 	  break;
 
       case CUPS_SC_CMD_GET_DEVICE_ID:	/* Return IEEE-1284 device ID */
+	  fputs("DEBUG: CUPS_SC_CMD_GET_DEVICE_ID received from driver...\n",
+		stderr);
+
 	  datalen = sizeof(data);
 	  get_device_id(&status, data, &datalen);
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, datalen, 1.0);
+
+          if (datalen < sizeof(data))
+	    data[datalen] = '\0';
+	  else
+	    data[sizeof(data) - 1] = '\0';
+
+	  fprintf(stderr,
+	          "DEBUG: Returning CUPS_SC_STATUS_OK with %d bytes (%s)...\n",
+		  datalen, data);
 	  break;
 
       case CUPS_SC_CMD_GET_STATE:		/* Return device state */
+	  fputs("DEBUG: CUPS_SC_CMD_GET_STATE received from driver...\n",
+		stderr);
+
 	  data[0] = CUPS_SC_STATE_ONLINE;
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+
+	  fprintf(stderr,
+	          "DEBUG: Returned CUPS_SC_STATUS_OK with 1 byte (%02X)...\n",
+		  data[0]);
 	  break;
 
       default:
+	  fprintf(stderr, "DEBUG: Unknown side-channel command (%d) received "
+			  "from driver...\n", command);
+
 	  cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED,
 			       NULL, 0, 1.0);
+
+	  fputs("DEBUG: Returned CUPS_SC_STATUS_NOT_IMPLEMENTED with no bytes...\n",
+		stderr);
 	  break;
     }
   }
@@ -1281,14 +1359,14 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 
   if (stat(bundlestr, &bundleinfo))
   {
-    fprintf(stderr, "Unable to load class driver \"%s\": %s", bundlestr,
-	    strerror(errno));
+    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": %s\n",
+	    bundlestr, strerror(errno));
     return (kr);
   }
   else if (bundleinfo.st_mode & S_IWOTH)
   {
-    fprintf(stderr, "Unable to load class driver \"%s\": insecure file "
-		    "permissions (0%o)", bundlestr, bundleinfo.st_mode);
+    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": insecure file "
+		    "permissions (0%o)\n", bundlestr, bundleinfo.st_mode);
     return (kr);
   }
 

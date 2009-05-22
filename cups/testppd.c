@@ -166,6 +166,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
 
     putenv("LOCALEDIR=locale");
+    putenv("SOFTWARE=CUPS");
 
    /*
     * Do tests with test.ppd...

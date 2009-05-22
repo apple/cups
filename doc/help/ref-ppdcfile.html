@@ -98,6 +98,34 @@ which can be later referenced using <code>$name</code>. The name is
 case-insensitive and can be any sequence of letters, numbers,
 and the underscore. The value can be any valid expression.</p>
 
+<h3>Predefined Names</h3>
+
+<p>The following <code>#define</code> names are set by the PPD compiler:</p>
+
+<ul>
+
+	<li><code>CUPS_VERSION</code> - The full CUPS version string, e.g.
+	"1.4.0"</li>
+
+	<li><code>CUPS_VERSION_MAJOR</code> - The major version number, e.g.
+	"1"</li>
+
+	<li><code>CUPS_VERSION_MINOR</code> - The minor version number, e.g.
+	"4"</li>
+
+	<li><code>CUPS_VERSION_PATCH</code> - The patch version number, e.g.
+	"0"</li>
+
+	<li><code>PLATFORM_NAME</code> - The operating system name used by the
+	current system as reported by "uname" ("Windows" on Microsoft
+	Windows)</li>
+
+	<li><code>PLATFORM_ARCH</code> - The processor architecture used by the
+	current system as reported by "uname -m" ("X86" or "X64" on Microsoft
+	Windows)</li>
+
+</ul>
+
 <h3>See Also</h3>
 
 <p><a href='#_include'><code>#include</code></a></p>

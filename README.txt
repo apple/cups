@@ -1,18 +1,5 @@
-README - CUPS v1.4b3 - 2009-03-09
----------------------------------
-
-**********************************************************************
-**********************************************************************
-**********                                                  **********
-**********  THIS IS BETA-RELEASE SOFTWARE.  DO NOT USE ON   **********
-**********  PRODUCTION SYSTEMS!  REPORT PROBLEMS TO THE     **********
-**********  CUPS FORUMS OR BUG REPORTING PAGES:             **********
-**********                                                  **********
-**********    http://www.cups.org/newsgroups.php (FORUMS)   **********
-**********    http://www.cups.org/str.php        (BUGS)     **********
-**********                                                  **********
-**********************************************************************
-**********************************************************************
+README - CUPS v1.4rc1 - 2009-05-22
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -20,13 +7,13 @@ instead...
 
 INTRODUCTION
 
-    The Common UNIX Printing System ("CUPS") is a standards-based, open source
-    printing system developed by Apple Inc. for Mac OS® X and other UNIX®-like
-    operating systems.  CUPS uses the Internet Printing Protocol ("IPP") and
-    provides System V and Berkeley command-line interfaces, a web interface,
-    and a C API to manage printers and print jobs.  It supports printing to
-    both local (parallel, serial, USB) and networked printers, and printers can
-    be shared from one computer to another, even over the Internet!
+    CUPS is a standards-based, open source printing system developed by Apple
+    Inc. for Mac OS® X and other UNIX®-like operating systems.  CUPS uses the
+    Internet Printing Protocol ("IPP") and provides System V and Berkeley
+    command-line interfaces, a web interface, and a C API to manage printers and
+    print jobs.  It supports printing to both local (parallel, serial, USB) and
+    networked printers, and printers can be shared from one computer to another,
+    even over the Internet!
 
     Internally, CUPS uses PostScript Printer Description ("PPD") files to
     describe printer capabilities and features and a wide variety of generic

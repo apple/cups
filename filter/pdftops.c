@@ -65,13 +65,23 @@ main(int  argc,				/* I - Number of command-line args */
 		fit;			/* Fit output to default page size? */
   ppd_file_t	*ppd;			/* PPD file */
   ppd_size_t	*size;			/* Current page size */
-  int		pdfpid,			/* Process ID for pdftops */
-		pdfwaitpid,		/* Process ID from wait() */
-		pdfstatus,		/* Status from pdftops */
-		pdfargc;		/* Number of args for pdftops */
-  char		*pdfargv[100],		/* Arguments for pdftops/gs */
-		pdfwidth[255],		/* Paper width */
-		pdfheight[255];		/* Paper height */
+  int		pdf_pid,		/* Process ID for pdftops */
+		pdf_argc,		/* Number of args for pdftops */
+		pstops_pid,		/* Process ID of pstops filter */
+		pstops_pipe[2],		/* Pipe to pstops filter */
+		wait_children,		/* Number of child processes left */
+		wait_pid,		/* Process ID from wait() */
+		wait_status,		/* Status from child */
+		exit_status = 0;	/* Exit status */
+  char		*pdf_argv[100],		/* Arguments for pdftops/gs */
+		pdf_width[255],		/* Paper width */
+		pdf_height[255],	/* Paper height */
+		pstops_path[1024],	/* Path to pstops program */
+		*pstops_argv[7],	/* Arguments for pstops filter */
+		*pstops_options,	/* Options for pstops filter */
+		*pstops_start,		/* Start of pstops filter option */
+		*pstops_end;		/* End of pstops filter option */
+  const char	*cups_serverbin;	/* CUPS_SERVERBIN environment variable */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -158,21 +168,111 @@ main(int  argc,				/* I - Number of command-line args */
   cupsMarkOptions(ppd, num_options, options);
 
  /*
+  * Build the pstops command-line...
+  */
+
+  if ((cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+    cups_serverbin = CUPS_SERVERBIN;
+
+  snprintf(pstops_path, sizeof(pstops_path), "%s/filter/pstops",
+           cups_serverbin);
+
+  pstops_options = strdup(argv[5]);
+
+  if ((pstops_start = strstr(pstops_options, "fitplot")) != NULL &&
+      (!pstops_start[7] || isspace(pstops_start[7] & 255)))
+  {
+   /*
+    * Strip [no]fitplot option...
+    */
+
+    pstops_end = pstops_start + 7;
+
+    if ((pstops_start - pstops_options) >= 2 &&
+        !strncmp(pstops_start - 2, "no", 2))
+      pstops_start -= 2;
+
+    while (*pstops_end && isspace(*pstops_end & 255))
+      pstops_end ++;
+
+    _cups_strcpy(pstops_start, pstops_end);
+  }
+
+  if ((pstops_start = strstr(pstops_options, "fit-to-page")) != NULL &&
+      (!pstops_start[11] || isspace(pstops_start[11] & 255)))
+  {
+   /*
+    * Strip [no]fit-to-page option...
+    */
+
+    pstops_end = pstops_start + 11;
+
+    if ((pstops_start - pstops_options) >= 2 &&
+        !strncmp(pstops_start - 2, "no", 2))
+      pstops_start -= 2;
+
+    while (*pstops_end && isspace(*pstops_end & 255))
+      pstops_end ++;
+
+    _cups_strcpy(pstops_start, pstops_end);
+  }
+
+  if ((pstops_start = strstr(pstops_options, "landscape")) != NULL &&
+      (!pstops_start[9] || isspace(pstops_start[9] & 255)))
+  {
+   /*
+    * Strip [no]landscape option...
+    */
+
+    pstops_end = pstops_start + 9;
+
+    if ((pstops_start - pstops_options) >= 2 &&
+        !strncmp(pstops_start - 2, "no", 2))
+      pstops_start -= 2;
+
+    while (*pstops_end && isspace(*pstops_end & 255))
+      pstops_end ++;
+
+    _cups_strcpy(pstops_start, pstops_end);
+  }
+
+  if ((pstops_start = strstr(pstops_options, "orientation-requested=")) != NULL)
+  {
+   /*
+    * Strip [no]fitplot option...
+    */
+
+    pstops_end = pstops_start + 22;
+    while (*pstops_end && !isspace(*pstops_end & 255))
+      pstops_end ++;
+
+    _cups_strcpy(pstops_start, pstops_end);
+  }
+
+  pstops_argv[0] = argv[0];		/* Printer */
+  pstops_argv[1] = argv[1];		/* Job */
+  pstops_argv[2] = argv[2];		/* User */
+  pstops_argv[3] = argv[3];		/* Title */
+  pstops_argv[4] = argv[4];		/* Copies */
+  pstops_argv[5] = pstops_options;	/* Options */
+  pstops_argv[6] = NULL;
+
+ /*
   * Build the command-line for the pdftops or gs filter...
   */
 
 #ifdef HAVE_PDFTOPS
-  pdfargv[0] = (char *)"pdftops";
-  pdfargc    = 1;
+  pdf_argv[0] = (char *)"pdftops";
+  pdf_argc    = 1;
 #else
-  pdfargv[0] = (char *)"gs";
-  pdfargv[1] = (char *)"-q";
-  pdfargv[2] = (char *)"-dNOPAUSE";
-  pdfargv[3] = (char *)"-dBATCH";
-  pdfargv[4] = (char *)"-dSAFER";
-  pdfargv[5] = (char *)"-sDEVICE=pswrite";
-  pdfargv[6] = (char *)"-sOUTPUTFILE=%stdout";
-  pdfargc    = 7;
+  pdf_argv[0] = (char *)"gs";
+  pdf_argv[1] = (char *)"-q";
+  pdf_argv[2] = (char *)"-dNOPAUSE";
+  pdf_argv[3] = (char *)"-dBATCH";
+  pdf_argv[4] = (char *)"-dSAFER";
+  pdf_argv[5] = (char *)"-sDEVICE=pswrite";
+  pdf_argv[6] = (char *)"-sOUTPUTFILE=%stdout";
+  pdf_argc    = 7;
 #endif /* HAVE_PDFTOPS */
 
   if (ppd)
@@ -184,27 +284,27 @@ main(int  argc,				/* I - Number of command-line args */
     if (ppd->language_level == 1)
     {
 #ifdef HAVE_PDFTOPS
-      pdfargv[pdfargc++] = (char *)"-level1";
-      pdfargv[pdfargc++] = (char *)"-noembtt";
+      pdf_argv[pdf_argc++] = (char *)"-level1";
+      pdf_argv[pdf_argc++] = (char *)"-noembtt";
 #else
-      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=1";
+      pdf_argv[pdf_argc++] = (char *)"-dLanguageLevel=1";
 #endif /* HAVE_PDFTOPS */
     }
     else if (ppd->language_level == 2)
     {
 #ifdef HAVE_PDFTOPS
-      pdfargv[pdfargc++] = (char *)"-level2";
+      pdf_argv[pdf_argc++] = (char *)"-level2";
       if (!ppd->ttrasterizer)
-	pdfargv[pdfargc++] = (char *)"-noembtt";
+	pdf_argv[pdf_argc++] = (char *)"-noembtt";
 #else
-      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=2";
+      pdf_argv[pdf_argc++] = (char *)"-dLanguageLevel=2";
 #endif /* HAVE_PDFTOPS */
     }
     else
 #ifdef HAVE_PDFTOPS
-      pdfargv[pdfargc++] = (char *)"-level3";
+      pdf_argv[pdf_argc++] = (char *)"-level3";
 #else
-      pdfargv[pdfargc++] = (char *)"-dLanguageLevel=3";
+      pdf_argv[pdf_argc++] = (char *)"-dLanguageLevel=3";
 #endif /* HAVE_PDFTOPS */
 
     if ((val = cupsGetOption("fitplot", num_options, options)) == NULL)
@@ -254,72 +354,88 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_PDFTOPS
       if (orientation & 1)
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "%.0f", size->length);
-	snprintf(pdfheight, sizeof(pdfheight), "%.0f", size->width);
+	snprintf(pdf_width, sizeof(pdf_width), "%.0f", size->length);
+	snprintf(pdf_height, sizeof(pdf_height), "%.0f", size->width);
       }
       else
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "%.0f", size->width);
-	snprintf(pdfheight, sizeof(pdfheight), "%.0f", size->length);
+	snprintf(pdf_width, sizeof(pdf_width), "%.0f", size->width);
+	snprintf(pdf_height, sizeof(pdf_height), "%.0f", size->length);
       }
 
-      pdfargv[pdfargc++] = (char *)"-paperw";
-      pdfargv[pdfargc++] = pdfwidth;
-      pdfargv[pdfargc++] = (char *)"-paperh";
-      pdfargv[pdfargc++] = pdfheight;
-      pdfargv[pdfargc++] = (char *)"-expand";
+      pdf_argv[pdf_argc++] = (char *)"-paperw";
+      pdf_argv[pdf_argc++] = pdf_width;
+      pdf_argv[pdf_argc++] = (char *)"-paperh";
+      pdf_argv[pdf_argc++] = pdf_height;
+      pdf_argv[pdf_argc++] = (char *)"-expand";
 
 #else
       if (orientation & 1)
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "-dDEVICEWIDTHPOINTS=%.0f",
+	snprintf(pdf_width, sizeof(pdf_width), "-dDEVICEWIDTHPOINTS=%.0f",
 	         size->length);
-	snprintf(pdfheight, sizeof(pdfheight), "-dDEVICEHEIGHTPOINTS=%.0f",
+	snprintf(pdf_height, sizeof(pdf_height), "-dDEVICEHEIGHTPOINTS=%.0f",
 	         size->width);
       }
       else
       {
-	snprintf(pdfwidth, sizeof(pdfwidth), "-dDEVICEWIDTHPOINTS=%.0f",
+	snprintf(pdf_width, sizeof(pdf_width), "-dDEVICEWIDTHPOINTS=%.0f",
 	         size->width);
-	snprintf(pdfheight, sizeof(pdfheight), "-dDEVICEHEIGHTPOINTS=%.0f",
+	snprintf(pdf_height, sizeof(pdf_height), "-dDEVICEHEIGHTPOINTS=%.0f",
 	         size->length);
       }
 
-      pdfargv[pdfargc++] = pdfwidth;
-      pdfargv[pdfargc++] = pdfheight;
+      pdf_argv[pdf_argc++] = pdf_width;
+      pdf_argv[pdf_argc++] = pdf_height;
 #endif /* HAVE_PDFTOPS */
     }
   }
 
 #ifdef HAVE_PDFTOPS
-  pdfargv[pdfargc++] = filename;
-  pdfargv[pdfargc++] = (char *)"-";
+  pdf_argv[pdf_argc++] = filename;
+  pdf_argv[pdf_argc++] = (char *)"-";
 #else
-  pdfargv[pdfargc++] = (char *)"-c";
-  pdfargv[pdfargc++] = (char *)"save pop";
-  pdfargv[pdfargc++] = (char *)"-f";
-  pdfargv[pdfargc++] = filename;
+  pdf_argv[pdf_argc++] = (char *)"-c";
+  pdf_argv[pdf_argc++] = (char *)"save pop";
+  pdf_argv[pdf_argc++] = (char *)"-f";
+  pdf_argv[pdf_argc++] = filename;
 #endif /* HAVE_PDFTOPS */
 
-  pdfargv[pdfargc] = NULL;
+  pdf_argv[pdf_argc] = NULL;
 
-  if ((pdfpid = fork()) == 0)
+ /*
+  * Execute "pdftops/gs | pstops"...
+  */
+
+  if (pipe(pstops_pipe))
+  {
+    _cupsLangPrintError(_("ERROR: Unable to create pipe"));
+
+    exit_status = 1;
+    goto error;
+  }
+
+  if ((pdf_pid = fork()) == 0)
   {
    /*
     * Child comes here...
     */
 
+    dup2(pstops_pipe[1], 1);
+    close(pstops_pipe[0]);
+    close(pstops_pipe[1]);
+
 #ifdef HAVE_PDFTOPS
-    execv(CUPS_PDFTOPS, pdfargv);
+    execv(CUPS_PDFTOPS, pdf_argv);
     _cupsLangPrintError(_("ERROR: Unable to execute pdftops program"));
 #else
-    execv(CUPS_GHOSTSCRIPT, pdfargv);
+    execv(CUPS_GHOSTSCRIPT, pdf_argv);
     _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
 #endif /* HAVE_PDFTOPS */
 
     exit(1);
   }
-  else if (pdfpid < 0)
+  else if (pdf_pid < 0)
   {
    /*
     * Unable to fork!
@@ -331,45 +447,124 @@ main(int  argc,				/* I - Number of command-line args */
     _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
 #endif /* HAVE_PDFTOPS */
 
-    pdfstatus = 1;
+    exit_status = 1;
+    goto error;
   }
-  else
+
+  fprintf(stderr, "DEBUG: Started filter %s (PID %d)\n", pdf_argv[0], pdf_pid);
+
+  if ((pstops_pid = fork()) == 0)
   {
    /*
-    * Parent comes here...
+    * Child comes here...
     */
 
-    while ((pdfwaitpid = wait(&pdfstatus)) != pdfpid && errno == EINTR)
-    {
-     /*
-      * Wait until we get a valid process ID or the job is canceled...
-      */
+    dup2(pstops_pipe[0], 0);
+    close(pstops_pipe[0]);
+    close(pstops_pipe[1]);
 
+    execv(pstops_path, pstops_argv);
+    _cupsLangPrintError(_("ERROR: Unable to execute pstops program"));
+
+    exit(1);
+  }
+  else if (pstops_pid < 0)
+  {
+   /*
+    * Unable to fork!
+    */
+
+    _cupsLangPrintError(_("ERROR: Unable to execute pstops program"));
+
+    exit_status = 1;
+    goto error;
+  }
+
+  fprintf(stderr, "DEBUG: Started filter pstops (PID %d)\n", pstops_pid);
+
+  close(pstops_pipe[0]);
+  close(pstops_pipe[1]);
+
+ /*
+  * Wait for the child processes to exit...
+  */
+
+  wait_children = 2;
+
+  while (wait_children > 0)
+  {
+   /*
+    * Wait until we get a valid process ID or the job is canceled...
+    */
+
+    while ((wait_pid = wait(&wait_status)) < 0 && errno == EINTR)
+    {
       if (job_canceled)
       {
-        kill(pdfpid, SIGTERM);
+	kill(pdf_pid, SIGTERM);
+	kill(pstops_pid, SIGTERM);
+
 	job_canceled = 0;
       }
     }
 
-    if (pdfstatus)
-    {
-      if (WIFEXITED(pdfstatus))
-      {
-	pdfstatus = WEXITSTATUS(pdfstatus);
+    if (wait_pid < 0)
+      break;
 
-	_cupsLangPrintf(stderr,
-			_("ERROR: pdftops filter exited with status %d!\n"),
-			pdfstatus);
+    wait_children --;
+
+   /*
+    * Report child status...
+    */
+
+    if (wait_status)
+    {
+      if (WIFEXITED(wait_status))
+      {
+	exit_status = WEXITSTATUS(wait_status);
+
+        fprintf(stderr, "DEBUG: PID %d (%s) stopped with status %d!\n",
+	        wait_pid,		
+#ifdef HAVE_PDFTOPS
+                wait_pid == pdf_pid ? "pdftops" : "pstops",
+#else
+                wait_pid == pdf_pid ? "gs" : "pstops",
+#endif /* HAVE_PDFTOPS */
+		exit_status);
+      }
+      else if (WTERMSIG(wait_status) == SIGTERM)
+      {
+        fprintf(stderr,
+	        "DEBUG: PID %d (%s) was terminated normally with signal %d!\n",
+	        wait_pid,		
+#ifdef HAVE_PDFTOPS
+                wait_pid == pdf_pid ? "pdftops" : "pstops",
+#else
+                wait_pid == pdf_pid ? "gs" : "pstops",
+#endif /* HAVE_PDFTOPS */
+		exit_status);
       }
       else
       {
-	pdfstatus = WTERMSIG(pdfstatus);
+	exit_status = WTERMSIG(wait_status);
 
-	_cupsLangPrintf(stderr,
-			_("ERROR: pdftops filter crashed on signal %d!\n"),
-			pdfstatus);
+        fprintf(stderr, "DEBUG: PID %d (%s) crashed on signal %d!\n", wait_pid,		
+#ifdef HAVE_PDFTOPS
+                wait_pid == pdf_pid ? "pdftops" : "pstops",
+#else
+                wait_pid == pdf_pid ? "gs" : "pstops",
+#endif /* HAVE_PDFTOPS */
+		exit_status);
       }
+    }
+    else
+    {
+      fprintf(stderr, "DEBUG: PID %d (%s) exited with no errors.\n", wait_pid,		
+#ifdef HAVE_PDFTOPS
+	      wait_pid == pdf_pid ? "pdftops" : "pstops");
+#else
+	      wait_pid == pdf_pid ? "gs" : "pstops");
+#endif /* HAVE_PDFTOPS */
     }
   }
 
@@ -377,10 +572,12 @@ main(int  argc,				/* I - Number of command-line args */
   * Cleanup and exit...
   */
 
+  error:
+
   if (tempfile[0])
     unlink(tempfile);
 
-  return (pdfstatus);
+  return (exit_status);
 }
 
 

@@ -212,7 +212,7 @@ function is applied <i>after</i> the CMY transformation:</p>
 </pre>
 
 
-<h3><span class='info'>Mac OS X 10.3/CUPS 1.2</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
+<h3><span class='info'>Mac OS X 10.3/CUPS 1.2/Mac OS X 10.5</span><a name='cupsICCProfile'>cupsICCProfile</a></h3>
 
 <p class='summary'>*cupsICCProfile
 ColorModel.MediaType.Resolution/Description: "filename"</p>
@@ -395,7 +395,7 @@ The same <tt>cupsUIResolver</tt> can be used by multiple
 
 </blockquote>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsUIConstraints'>cupsUIConstraints</a></h3>
 
 <p class='summary'>*cupsUIConstraints resolver: "*Keyword1 *Keyword2 ..."<br>
 *cupsUIConstraints resolver: "*Keyword1 OptionKeyword1 *Keyword2 ..."<br>
@@ -428,7 +428,7 @@ choice followed by testing each option choice to resolve the conflict.</p>
 *cupsUIConstraints photo: "*OutputMode Photo *MediaType Transparency *Resolution 1200dpi"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
 
 <p class='summary'>*cupsUIResolution resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
@@ -1058,7 +1058,7 @@ PRE B {
 <p>The CUPS media attributes allow drivers to specify alternate custom page
 size limits based on up to two options.</p>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMediaQualifier2'>cupsMediaQualifier2</a></h3>
 
 <p class='summary'>*cupsMediaQualifier2: MainKeyword</p>
 
@@ -1077,7 +1077,7 @@ custom page size limits.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMediaQualifier3'>cupsMediaQualifier3</a></h3>
 
 <p class='summary'>*cupsMediaQualifier3: MainKeyword</p>
 
@@ -1096,7 +1096,7 @@ custom page size limits.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMinSize'>cupsMinSize</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMinSize'>cupsMinSize</a></h3>
 
 <p class='summary'>*cupsMinSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMinSize .Qualifier2.: "width length"<br>
@@ -1119,7 +1119,7 @@ are used to identify options to use for matching.</p>
 *cupsMinSize ..Photo: "300 300"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMaxSize'>cupsMaxSize</a></h3>
 
 <p class='summary'>*cupsMaxSize .Qualifier2.Qualifier3: "width length"<br>
 *cupsMaxSize .Qualifier2.: "width length"<br>
@@ -1145,7 +1145,7 @@ are used to identify options to use for matching.</p>
 
 <h2 class='title'><a name='ATTRIBUTES'>General Attributes</a></h2>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsBackSide'>cupsBackSide</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsBackSide'>cupsBackSide</a></h3>
 
 <p class='summary'>*cupsBackSide: keyword</p>
 
@@ -1241,7 +1241,7 @@ will be ignored.</p>
 <p>Also see the related <a href='#APDuplexRequiresFlippedMargin'><tt>APDuplexRequiresFlippedMargin</tt></a>
 attribute.</p>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsCommands'>cupsCommands</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsCommands'>cupsCommands</a></h3>
 
 <p class='summary'>*cupsCommands: "name name2 ... nameN"</p>
 
@@ -1257,7 +1257,7 @@ by whitespace.</p>
 </pre>
 
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsEvenDuplex'>cupsEvenDuplex</a></h3>
 
 <p class='summary'>*cupsEvenDuplex: boolean</p>
 
@@ -1341,7 +1341,7 @@ Ghostscript can use:</p>
 *cupsFlipDuplex: true
 </pre></blockquote>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsIPPFinishings'>cupsIPPFinishings</a></h3>
 
 <p class='summary'>*cupsIPPFinishings number/text: "*Option Choice ..."</p>
 
@@ -1357,7 +1357,7 @@ values to PPD options and choices.</p>
 *cupsIPPFinishings 21/staple-bottom-left: "*StapleLocation SingleLandscape"
 </pre>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsIPPReason'>cupsIPPReason</a></h3>
 
 <p class='summary'>*cupsIPPReason reason/Reason Text: "optional URIs"</p>
 
@@ -1401,7 +1401,7 @@ http://www.vendor.com/help"
 *End
 </pre>
 
-<h3><span class='info'>CUPS 1.2</span><a name='cupsLanguages'>cupsLanguages</a></h3>
+<h3><span class='info'>CUPS 1.2/Mac OS X 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
 
 <p class='summary'>*cupsLanguages: "locale list"</p>
 
@@ -1431,7 +1431,7 @@ hardware. The default value is <code>false</code>.</p>
 *cupsManualCopies: true
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMarkerName'>cupsMarkerName</a></h3>
 
 <p class='summary'>*cupsMarkerName/Name Text: ""</p>
 
@@ -1445,7 +1445,7 @@ generated by the driver to human readable text.</p>
 *cupsMarkerName cyanToner/Cyan Toner: ""
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsMarkerNotice'>cupsMarkerNotice</a></h3>
 
 <p class='summary'>*cupsMarkerNotice: "disclaimer text"</p>
 
@@ -1474,7 +1474,7 @@ the output for a specific model of printer.</p>
 *cupsModelNumber: 1234
 </pre>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsPJLCharset'>cupsPJLCharset</a></h3>
 
 <p class='summary'>*cupsPJLCharset: "ISO character set name"</p>
 
@@ -1489,7 +1489,7 @@ assumed.</p>
 *cupsPJLCharset: "UTF-8"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsPJLDisplay'>cupsPJLDisplay</a></h3>
 
 <p class='summary'>*cupsPJLDisplay: "what"</p>
 
@@ -1508,7 +1508,7 @@ to use "@PJL RDYMSG DISPLAY". The default is "job".</p>
 *cupsPJLDisplay: "none"
 </pre>
 
-<h3><span class='info'>CUPS 1.2</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
+<h3><span class='info'>CUPS 1.2/Mac OS X 10.5</span><a name='cupsPortMonitor'>cupsPortMonitor</a></h3>
 
 <p class='summary'>*cupsPortMonitor urischeme/Descriptive Text: "port monitor"</p>
 
@@ -1540,7 +1540,7 @@ to disable the port monitor for the given URI scheme.</p>
 *cupsPortMonitor usb/USB Status Monitor: "epson-usb"
 </pre>
 
-<h3><span class='info'>CUPS 1.3</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
+<h3><span class='info'>CUPS 1.3/Mac OS X 10.5</span><a name='cupsPreFilter'>cupsPreFilter</a></h3>
 
 <p class='summary'>*cupsPreFilter: "source/type cost program"</p>
 
@@ -1558,7 +1558,7 @@ before the filter that accepts the given MIME type.</p>
 *cupsPreFilter: "image/png 0 mypngprefilter"
 </pre>
 
-<h3><span class='info'>CUPS 1.4</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
+<h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
 
 <p class='summary'>*cupsSNMPSupplies: boolean</p>
 
@@ -1863,7 +1863,7 @@ the device.</p>
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
 
-<h3>Changes in CUPS 1.4</a></h3>
+<h3>Changes in CUPS 1.4</h3>
 
 <ul>
 
@@ -1898,7 +1898,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.3.1</a></h3>
+<h3>Changes in CUPS 1.3.1</h3>
 
 <ul>
 
@@ -1913,7 +1913,7 @@ the device.</p>
 </ul>
 
 
-<h3>Changes in CUPS 1.3</a></h3>
+<h3>Changes in CUPS 1.3</h3>
 
 <ul>
 
@@ -1932,7 +1932,7 @@ the device.</p>
 
 </ul>
 
-<h3>Changes in CUPS 1.2.8</a></h3>
+<h3>Changes in CUPS 1.2.8</h3>
 
 <ul>
 
@@ -1941,7 +1941,7 @@ the device.</p>
 
 </ul>
 
-<h3>Changes in CUPS 1.2</a></h3>
+<h3>Changes in CUPS 1.2</h3>
 
 <ul>
 
@@ -1966,7 +1966,7 @@ the device.</p>
 
 </ul>
 
-<h3>Changes in CUPS 1.1</a></h3>
+<h3>Changes in CUPS 1.1</h3>
 
 <ul>
 

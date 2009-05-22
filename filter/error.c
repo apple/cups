@@ -139,7 +139,7 @@ _cupsRasterClearError(void)
  *
  * If there are no recent errors, NULL is returned.
  *
- * @since CUPS 1.3@
+ * @since CUPS 1.3/Mac OS X 10.5@
  */
 
 const char *				/* O - Last error */

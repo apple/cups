@@ -62,7 +62,7 @@ extern "C" {
 #  define CUPS_VERSION		1.0400
 #  define CUPS_VERSION_MAJOR	1
 #  define CUPS_VERSION_MINOR	4
-#  define CUPS_VERSION_PATCH	-1
+#  define CUPS_VERSION_PATCH	0
 
 #  define CUPS_BC_FD		3	/* Back-channel file descriptor for select/poll */
 #  define CUPS_DATE_ANY		(time_t)-1
@@ -253,7 +253,7 @@ extern int		cupsPrintFiles2(http_t *http, const char *name,
 extern int		cupsSetDests2(http_t *http, int num_dests,
 			              cups_dest_t *dests) _CUPS_API_1_1_21;
 
-/**** New in CUPS 1.2 ****/
+/**** New in CUPS 1.2/Mac OS X 10.5 ****/
 extern ssize_t		cupsBackChannelRead(char *buffer, size_t bytes,
 			                    double timeout) _CUPS_API_1_2;
 extern ssize_t		cupsBackChannelWrite(const char *buffer, size_t bytes,
@@ -268,7 +268,7 @@ extern int		cupsRemoveOption(const char *name, int num_options,
 			                 cups_option_t **options) _CUPS_API_1_2;
 extern cups_file_t	*cupsTempFile2(char *filename, int len) _CUPS_API_1_2;
 
-/**** New in CUPS 1.3 ****/
+/**** New in CUPS 1.3/Mac OS X 10.5 ****/
 extern ipp_t		*cupsDoIORequest(http_t *http, ipp_t *request,
 			                 const char *resource, int infile,
 					 int outfile) _CUPS_API_1_3;
@@ -281,7 +281,7 @@ extern void		cupsSetDefaultDest(const char *name,
 					   int num_dests,
 					   cups_dest_t *dests) _CUPS_API_1_3;
 
-/**** New in CUPS 1.4 ****/
+/**** New in CUPS 1.4/Mac OS X 10.6 ****/
 extern ipp_status_t	cupsCancelJob2(http_t *http, const char *name,
 			               int job_id, int purge) _CUPS_API_1_4;
 extern int		cupsCreateJob(http_t *http, const char *name,

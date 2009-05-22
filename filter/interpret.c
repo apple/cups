@@ -985,6 +985,9 @@ scan_ps(_cups_ps_stack_t *st,		/* I  - Stack */
       */
 
       for (cur ++; *cur && *cur != '\n' && *cur != '\r'; cur ++);
+
+      if (!*cur)
+        cur --;
     }
     else if (!isspace(*cur & 255))
       break;

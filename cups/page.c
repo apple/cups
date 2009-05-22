@@ -18,9 +18,10 @@
  *
  * Contents:
  *
- *   ppdPageSize()   - Get the page size record for the given size.
- *   ppdPageWidth()  - Get the page width for the given size.
- *   ppdPageLength() - Get the page length for the given size.
+ *   ppdPageSize()       - Get the page size record for the given size.
+ *   ppdPageSizeLimits() - Return the custom page size limits.
+ *   ppdPageWidth()      - Get the page width for the given size.
+ *   ppdPageLength()     - Get the page length for the given size.
  */
 
 /*
