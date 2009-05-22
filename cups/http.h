@@ -387,7 +387,7 @@ extern void		httpSeparate2(const char *uri,
 				      char *host, int hostlen, int *port,
 				      char *resource, int resourcelen) _CUPS_DEPRECATED;
 
-/**** New in CUPS 1.2 ****/
+/**** New in CUPS 1.2/Mac OS X 10.5 ****/
 extern int		httpAddrAny(const http_addr_t *addr) _CUPS_API_1_2;
 extern http_addrlist_t	*httpAddrConnect(http_addrlist_t *addrlist, int *sock) _CUPS_API_1_2;
 extern int		httpAddrEqual(const http_addr_t *addr1,
@@ -435,7 +435,7 @@ extern void		httpSetLength(http_t *http, size_t length) _CUPS_API_1_2;
 extern ssize_t		httpWrite2(http_t *http, const char *buffer,
 			           size_t length) _CUPS_API_1_2;
 
-/**** New in CUPS 1.3 ****/
+/**** New in CUPS 1.3/Mac OS X 10.5 ****/
 extern char		*httpGetAuthString(http_t *http) _CUPS_API_1_3;
 extern void		httpSetAuthString(http_t *http, const char *scheme,
 			                  const char *data) _CUPS_API_1_3;

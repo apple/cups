@@ -213,7 +213,7 @@ typedef struct ppd_profile_s		/**** sRGB Color Profiles ****/
   float		matrix[3][3];		/* Transform matrix */
 } ppd_profile_t;
 
-/**** New in CUPS 1.2 ****/
+/**** New in CUPS 1.2/Mac OS X 10.5 ****/
 typedef enum ppd_cptype_e		/**** Custom Parameter Type @since CUPS 1.2/Mac OS X 10.5@ ****/
 {
   PPD_CUSTOM_CURVE,			/* Curve value for f(x) = x^value */
@@ -321,15 +321,15 @@ typedef struct ppd_file_s		/**** PPD File ****/
   int		cur_attr;		/* Current attribute @since CUPS 1.1.19/Mac OS X 10.3@ @private@ */
   ppd_attr_t	**attrs;		/* Attributes @since CUPS 1.1.19/Mac OS X 10.3@ @private@ */
 
-  /**** New in CUPS 1.2 ****/
+  /**** New in CUPS 1.2/Mac OS X 10.5 ****/
   cups_array_t	*sorted_attrs;		/* Attribute lookup array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
   cups_array_t	*options;		/* Option lookup array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
   cups_array_t	*coptions;		/* Custom options array @since CUPS 1.2/Mac OS X 10.5@ @private@ */
 
-  /**** New in CUPS 1.3 ****/
+  /**** New in CUPS 1.3/Mac OS X 10.5 ****/
   cups_array_t	*marked;		/* Marked choices @since CUPS 1.3/Mac OS X 10.5@ @private@ */
 
-  /**** New in CUPS 1.4 ****/
+  /**** New in CUPS 1.4/Mac OS X 10.6 ****/
   cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
 } ppd_file_t;
 

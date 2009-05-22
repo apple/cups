@@ -461,7 +461,7 @@ value. Otherwise printers and classes will disappear from client
 systems between updates.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLDAPBindDN">BrowseLDAPBindDN</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLDAPBindDN">BrowseLDAPBindDN</A></H2>
 
 <H3>Examples</H3>
 
@@ -476,7 +476,7 @@ domain name to use when listening for printer registrations. The
 default is undefined.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="BrowseLDAPCACertFile">BrowseLDAPCACertFile</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="BrowseLDAPCACertFile">BrowseLDAPCACertFile</A></H2>
 
 <H3>Examples</H3>
 
@@ -490,7 +490,7 @@ BrowseLDAPCACertFile /etc/cups/ssl/certs
 authority file to use for LDAP + SSL. The default is undefined.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLDAPDN">BrowseLDAPDN</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLDAPDN">BrowseLDAPDN</A></H2>
 
 <H3>Examples</H3>
 
@@ -505,7 +505,7 @@ domain name to use when registering local shared printers. The
 default is undefined.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLDAPPassword">BrowseLDAPPassword</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLDAPPassword">BrowseLDAPPassword</A></H2>
 
 <H3>Examples</H3>
 
@@ -520,7 +520,7 @@ access password to use when connecting to the LDAP server. The
 default is undefined.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLDAPServer">BrowseLDAPServer</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLDAPServer">BrowseLDAPServer</A></H2>
 
 <H3>Examples</H3>
 
@@ -551,7 +551,7 @@ additional IPP backend options to advertise with local shared
 printers. The default is to not include any options.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseLocalProtocols">BrowseLocalProtocols</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseLocalProtocols">BrowseLocalProtocols</A></H2>
 
 <H3>Examples</H3>
 
@@ -734,7 +734,7 @@ the options replace any options specified by the remote server.
 The default is to not include any options.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="BrowseRemoteProtocols">BrowseRemoteProtocols</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="BrowseRemoteProtocols">BrowseRemoteProtocols</A></H2>
 
 <H3>Examples</H3>
 
@@ -920,7 +920,7 @@ DataDir /usr/share/cups
 for data files.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultAuthType">DefaultAuthType</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultAuthType">DefaultAuthType</A></H2>
 
 <H3>Examples</H3>
 
@@ -957,7 +957,7 @@ character set for the language specified by the client or the
 <CODE>DefaultLanguage</CODE> directive.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultEncryption">DefaultEncryption</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultEncryption">DefaultEncryption</A></H2>
 
 <H3>Examples</H3>
 
@@ -995,7 +995,7 @@ language localization file exists for it. The default language
 is "en" for English.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="DefaultPaperSize">DefaultPaperSize</A></H2>
 
 <H3>Examples</H3>
 
@@ -1015,7 +1015,7 @@ of <CODE>None</CODE> tells the scheduler to not set the default paper
 size.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultPolicy">DefaultPolicy</A></H2>
 
 <H3>Examples</H3>
 
@@ -1031,7 +1031,7 @@ policy to use for IPP operation. The default is
 <CODE>default</CODE>.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
 
 <H3>Examples</H3>
 
@@ -1182,7 +1182,7 @@ default error log file is <VAR>@CUPS_LOGDIR@/error_log</VAR>.</P>
 information to the system log instead of a plain file.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.3/Mac OS X 10.5</SPAN><A NAME="ErrorPolicy">ErrorPolicy</A></H2>
 
 <H3>Examples</H3>
 
@@ -1221,7 +1221,7 @@ printer.</P>
 
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="FatalErrors">FatalErrors</A></H2>
 
 <H3>Examples</H3>
 
@@ -1483,7 +1483,7 @@ the file is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="JobRetryInterval">JobRetryInterval</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="JobRetryInterval">JobRetryInterval</A></H2>
 
 <H3>Examples</H3>
 
@@ -1501,7 +1501,7 @@ print queues whose error policy is <CODE>retry-job</CODE>. The
 default is 30 seconds.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="JobKillDelay">JobKillDelay</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="JobKillDelay">JobKillDelay</A></H2>
 
 <H3>Examples</H3>
 
@@ -1517,7 +1517,7 @@ wait before killing the filters and backend associated with a canceled or held
 job. The default is 30 seconds.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="JobRetryLimit">JobRetryLimit</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="JobRetryLimit">JobRetryLimit</A></H2>
 
 <H3>Examples</H3>
 
@@ -1601,7 +1601,7 @@ The request type names are case-sensitive for compatibility with
 Apache.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="LimitIPP">Limit (Policy)</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="LimitIPP">Limit (Policy)</A></H2>
 
 <H3>Examples</H3>
 
@@ -2252,7 +2252,7 @@ HREF="#LimitRequestBody"><CODE>LimitRequestBody</CODE></A>
 directive instead.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="MultipleOperationTimeout">MultipleOperationTimeout</A></H2>
 
 <H3>Examples</H3>
 
@@ -2371,7 +2371,7 @@ recognized:</P>
 <P>The default is "%p %j %u %T %P %C %{job-billing} %{job-originating-host-name} %{job-name} %{media} %{sides}".</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="PassEnv">PassEnv</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="PassEnv">PassEnv</A></H2>
 
 <H3>Examples</H3>
 
@@ -2390,7 +2390,7 @@ scheduler only passes the <CODE>DYLD_LIBRARY_PATH</CODE>,
 environment variables to child processes.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="Policy">Policy</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="Policy">Policy</A></H2>
 
 <H3>Examples</H3>
 
@@ -2920,7 +2920,7 @@ the text that is returned. The default is
 </TABLE></DIV>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="SetEnv">SetEnv</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="SetEnv">SetEnv</A></H2>
 
 <H3>Examples</H3>
 
@@ -3052,7 +3052,7 @@ to wait before an active HTTP or IPP request times out. The
 default timeout is 300 seconds.</P>
 
 
-<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2</SPAN><A NAME="UseNetworkDefault">UseNetworkDefault</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="UseNetworkDefault">UseNetworkDefault</A></H2>
 
 <H3>Examples</H3>
 
