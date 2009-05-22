@@ -34,7 +34,7 @@ WEBIMAGES	=	\
 			images/unsel.gif \
 			images/wait.gif
 HELPIMAGES	=	\
-			images/cups-block-diagram.gif \
+			images/cups-block-diagram.png \
 			images/cups-command-chain.png \
 			images/cups-postscript-chain.png \
 			images/cups-raster-chain.png \
