@@ -1,7 +1,7 @@
 CHANGES.txt - 2009-05-22
 ------------------------
 
-CHANGES IN CUPS V1.4??
+CHANGES IN CUPS V1.4rc1
 
 	- The PPD compiler now defines six variables: CUPS_VERSION,
 	  CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH,
