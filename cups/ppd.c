@@ -942,7 +942,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       * Get the parameter data...
       */
 
-      if (sscanf(string, "%d%32s%64s%64s", &corder, ctype, cminimum,
+      if (!string ||
+          sscanf(string, "%d%32s%64s%64s", &corder, ctype, cminimum,
                  cmaximum) != 4)
       {
         cg->ppd_status = PPD_BAD_CUSTOM_PARAM;
@@ -1615,6 +1616,12 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
     else if (!strcmp(keyword, "UIConstraints") ||
              !strcmp(keyword, "NonUIConstraints"))
     {
+      if (!string)
+      {
+	cg->ppd_status = PPD_BAD_UI_CONSTRAINTS;
+	goto error;
+      }
+
       if (ppd->num_consts == 0)
 	constraint = calloc(2, sizeof(ppd_const_t));
       else

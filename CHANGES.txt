@@ -1,8 +1,12 @@
-CHANGES.txt - 2009-05-21
+CHANGES.txt - 2009-05-22
 ------------------------
 
 CHANGES IN CUPS V1.4??
 
+	- The scheduler did not report more than 8 Product strings from a PPD
+	  file.  Some PPD files have as many as 24.
+	- ppdOpen*() could crash if a keyword had no value string (something
+	  that cupstestppd looks for...)
 	- cupsLangDefault() did not return the correct language on Mac OS X.
 	- The Mac OS X USB backend did not handle aborted or stalled pipe
 	  conditions properly, which prevented drivers from ejecting partial
