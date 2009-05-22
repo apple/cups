@@ -56,10 +56,10 @@
  * Constants...
  */
 
-#define PPD_SYNC	0x50504436	/* Sync word for ppds.dat (PPD6) */
+#define PPD_SYNC	0x50504437	/* Sync word for ppds.dat (PPD7) */
 #define PPD_MAX_LANG	32		/* Maximum languages */
-#define PPD_MAX_PROD	8		/* Maximum products */
-#define PPD_MAX_VERS	8		/* Maximum versions */
+#define PPD_MAX_PROD	32		/* Maximum products */
+#define PPD_MAX_VERS	32		/* Maximum versions */
 
 #define PPD_TYPE_POSTSCRIPT	0	/* PostScript PPD */
 #define PPD_TYPE_PDF		1	/* PDF PPD */
