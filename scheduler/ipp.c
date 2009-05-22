@@ -3730,7 +3730,8 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 
@@ -4054,7 +4055,8 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 
@@ -8088,7 +8090,8 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+		    cupsdFindDest(job->dest));
     return;
   }
 
@@ -8385,7 +8388,8 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
 
     if (!validate_user(job, con, job->username, username, sizeof(username)))
     {
-      send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+      send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                      cupsdFindDest(job->dest));
       return;
     }
 
@@ -9199,7 +9203,8 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 
@@ -9442,7 +9447,8 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 
@@ -9765,7 +9771,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 
@@ -10353,7 +10360,8 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!validate_user(job, con, job->username, username, sizeof(username)))
   {
-    send_http_error(con, HTTP_UNAUTHORIZED, cupsdFindDest(job->dest));
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
     return;
   }
 

@@ -3,6 +3,8 @@ CHANGES.txt - 2009-05-22
 
 CHANGES IN CUPS V1.4??
 
+	- The scheduler did not return HTTP 403 (Forbidden) for authenticated
+	  users that were not authorized to do IPP operations (STR #3193)
 	- The scheduler did not report more than 8 Product strings from a PPD
 	  file.  Some PPD files have as many as 24.
 	- ppdOpen*() could crash if a keyword had no value string (something
