@@ -3,6 +3,8 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- The pdftops filter did not print landscape PDF pages properly
+	  (STR #2881)
 	- The scheduler did not handle partial header lines properly from CGI
 	  programs (STR #3194)
 	- The web interface could hang on OpenBSD (STR #3176, STR #3196)

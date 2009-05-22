@@ -7,7 +7,7 @@
 #
 #   MIME converts file for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2009 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -38,7 +38,7 @@
 # PostScript filters
 #
 
-application/pdf			application/postscript		33	pdftops
+application/pdf			application/vnd.cups-postscript	66	pdftops
 application/postscript		application/vnd.cups-postscript	66	pstops
 application/vnd.hp-HPGL		application/postscript		66	hpgltops
 application/x-cshell		application/postscript		33	texttops
