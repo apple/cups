@@ -3,6 +3,9 @@ CHANGES.txt - 2009-05-22
 
 CHANGES IN CUPS V1.4??
 
+	- The PPD compiler now defines six variables: CUPS_VERSION,
+	  CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH,
+	  PLATFORM_NAME, and PLATFORM_ARCH (STR #3203)
 	- Fixed a whitespace skipping bug in cupsRasterInterpretPPD.
 	- The scheduler did not return HTTP 403 (Forbidden) for authenticated
 	  users that were not authorized to do IPP operations (STR #3193)
