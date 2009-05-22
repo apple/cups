@@ -3,6 +3,7 @@ CHANGES.txt - 2009-05-22
 
 CHANGES IN CUPS V1.4??
 
+	- Fixed a whitespace skipping bug in cupsRasterInterpretPPD.
 	- The scheduler did not return HTTP 403 (Forbidden) for authenticated
 	  users that were not authorized to do IPP operations (STR #3193)
 	- The scheduler did not report more than 8 Product strings from a PPD
