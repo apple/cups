@@ -895,6 +895,9 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	}
 
 #ifdef HAVE_GSSAPI
+        con->have_gss = 0;
+
+	if (con->gss_creds)
 	{
 	  OM_uint32 minor_status;
 	  gss_release_cred(&minor_status, &con->gss_creds);

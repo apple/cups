@@ -1046,6 +1046,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
+    con->have_gss = 1;
+
    /*
     * Get the username associated with the client's credentials...
     */
