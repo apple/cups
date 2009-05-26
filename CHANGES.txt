@@ -1,8 +1,10 @@
-CHANGES.txt - 2009-05-22
+CHANGES.txt - 2009-05-26
 ------------------------
 
 CHANGES IN CUPS V1.4rc1
 
+	- The scheduler crashed when getting the default paper size from
+	  libpaper (STR #3205, STR #3206)
 	- The PPD compiler now defines six variables: CUPS_VERSION,
 	  CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH,
 	  PLATFORM_NAME, and PLATFORM_ARCH (STR #3203)

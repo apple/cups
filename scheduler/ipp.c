@@ -109,10 +109,6 @@
 #include "cupsd.h"
 #include <cups/ppd-private.h>
 
-#ifdef HAVE_LIBPAPER
-#  include <paper.h>
-#endif /* HAVE_LIBPAPER */
-
 #ifdef __APPLE__
 #  include <ApplicationServices/ApplicationServices.h>
 #  include <CoreFoundation/CoreFoundation.h>

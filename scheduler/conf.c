@@ -41,6 +41,10 @@
 #include <sys/utsname.h>
 #include <syslog.h>
 
+#ifdef HAVE_LIBPAPER
+#  include <paper.h>
+#endif /* HAVE_LIBPAPER */
+
 
 /*
  * Possibly missing network definitions...
