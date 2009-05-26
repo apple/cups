@@ -2035,9 +2035,11 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 	}
 	else
 	{
-	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Undefined variable (%s) on line %d of "
-			    "%s.\n"), name, fp->line, fp->filename);
+	  if (!(cond_state & PPDC_COND_SKIP))
+	    _cupsLangPrintf(stderr,
+			    _("ppdc: Undefined variable (%s) on line %d of "
+			      "%s.\n"), name, fp->line, fp->filename);
+
 	  snprintf(bufptr, bufend - bufptr + 1, "$%s", name);
 	  bufptr += strlen(name) + 1;
 	}
@@ -2468,7 +2470,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       cond_current ++;
-      if (get_integer(fp))
+      if (get_integer(fp) > 0)
         *cond_current = PPDC_COND_SATISFIED;
       else
       {
@@ -2490,7 +2492,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
         get_integer(fp);
 	*cond_current |= PPDC_COND_SKIP;
       }
-      else if (get_integer(fp))
+      else if (get_integer(fp) > 0)
       {
         *cond_current |= PPDC_COND_SATISFIED;
 	*cond_current &= ~PPDC_COND_SKIP;
