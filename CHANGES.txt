@@ -3,6 +3,8 @@ CHANGES.txt - 2009-05-26
 
 CHANGES IN CUPS V1.4rc1
 
+	- Static libraries could not be installed by a non-root user on systems
+	  needing a ranlib program (STR #3209)
 	- The scheduler incorrectly always tried to copy Kerberos credentials
 	  for print jobs.
 	- Updated the Spanish localization (STR #3204)

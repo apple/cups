@@ -225,8 +225,9 @@ install-libs: $(INSTALLSTATIC)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) libcupsmime.a $(LIBDIR)
+	$(INSTALL_LIB) -m 755 libcupsmime.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsmime.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsmime.a
 
 
 #
