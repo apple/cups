@@ -16,9 +16,10 @@
  *
  * Contents:
  *
- *   main()    - Run the named backend.
- *   usage()   - Show usage information.
- *   walk_cb() - Show results of cupsSideChannelSNMPWalk...
+ *   main()            - Run the named backend.
+ *   sigterm_handler() - Flag when we get SIGTERM.
+ *   usage()           - Show usage information.
+ *   walk_cb()         - Show results of cupsSideChannelSNMPWalk...
  */
 
 /*
@@ -34,12 +35,21 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/wait.h>
+#include <signal.h>
+
+
+/*
+ * Local globals...
+ */
+
+static int	job_canceled = 0;
 
 
 /*
  * Local functions...
  */
 
+static void	sigterm_handler(int sig);
 static void	usage(void);
 static void	walk_cb(const char *oid, const char *data, int datalen,
 		        void *context);
@@ -58,6 +68,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		first_arg,		/* First argument for backend */
+		do_cancel = 0,		/* Simulate a cancel-job via SIGTERM */
 		do_ps = 0,		/* Do PostScript query+test? */
 		do_pcl = 0,		/* Do PCL query+test? */
 		do_side_tests = 0,	/* Test side-channel ops? */
@@ -69,9 +80,12 @@ main(int  argc,				/* I - Number of command-line args */
   char		scheme[255],		/* Scheme in URI == backend */
 		backend[1024];		/* Backend path */
   const char	*serverbin;		/* CUPS_SERVERBIN environment variable */
-  int		back_fds[2],		/* Back-channel pipe */
+  int		fd,			/* Temporary file descriptor */
+		back_fds[2],		/* Back-channel pipe */
 		side_fds[2],		/* Side-channel socket */
 		data_fds[2],		/* Data pipe */
+		back_pid = -1,		/* Backend process ID */
+		data_pid = -1,		/* Trickle process ID */
 		pid,			/* Process ID */
 		status;			/* Exit status */
 
@@ -85,6 +99,8 @@ main(int  argc,				/* I - Number of command-line args */
        first_arg ++)
     if (!strcmp(argv[first_arg], "-d"))
       show_log = 1;
+    else if (!strcmp(argv[first_arg], "-cancel"))
+      do_cancel = 1;
     else if (!strcmp(argv[first_arg], "-pcl"))
       do_pcl = 1;
     else if (!strcmp(argv[first_arg], "-ps"))
@@ -160,33 +176,44 @@ main(int  argc,				/* I - Number of command-line args */
   * Execute the trickle process as needed...
   */
 
-  if (do_trickle || do_pcl || do_ps)
+  if (do_trickle || do_pcl || do_ps || do_cancel)
   {
     pipe(data_fds);
 
-    if ((pid = fork()) == 0)
+    signal(SIGTERM, sigterm_handler);
+
+    if ((data_pid = fork()) == 0)
     {
      /*
       * Trickle/query child comes here.  Rearrange file descriptors so that
       * FD 1, 3, and 4 point to the backend...
       */
 
-      close(0);
-      open("/dev/null", O_RDONLY);
+      if ((fd = open("/dev/null", O_RDONLY)) != 0)
+      {
+        dup2(fd, 0);
+	close(fd);
+      }
 
-      close(1);
-      dup(data_fds[1]);
+      if (data_fds[1] != 1)
+      {
+        dup2(data_fds[1], 1);
+	close(data_fds[1]);
+      }
       close(data_fds[0]);
-      close(data_fds[1]);
 
-      close(3);
-      dup(back_fds[0]);
-      close(back_fds[0]);
+      if (back_fds[0] != 3)
+      {
+        dup2(back_fds[0], 3);
+        close(back_fds[0]);
+      }
       close(back_fds[1]);
 
-      close(4);
-      dup(side_fds[0]);
-      close(side_fds[0]);
+      if (side_fds[0] != 4)
+      {
+        dup2(side_fds[0], 4);
+        close(side_fds[0]);
+      }
       close(side_fds[1]);
 
       if (do_trickle)
@@ -202,6 +229,97 @@ main(int  argc,				/* I - Number of command-line args */
 	  write(1, " ", 1);
 	  sleep(1);
 	}
+      }
+      else if (do_cancel)
+      {
+       /*
+        * Write PS or PCL lines until we see SIGTERM...
+	*/
+
+        int	line = 0, page = 0;	/* Current line and page */
+	ssize_t	bytes;			/* Number of bytes of response data */
+	char	buffer[1024];		/* Output buffer */
+
+
+        if (do_pcl)
+	  write(1, "\033E", 2);
+	else
+	  write(1, "%!\n/Courier findfont 12 scalefont setfont 0 setgray\n", 52);
+
+        while (!job_canceled)
+	{
+	  if (line == 0)
+	  {
+	    page ++;
+
+	    if (do_pcl)
+	      snprintf(buffer, sizeof(buffer), "PCL Page %d\r\n\r\n", page);
+	    else
+	      snprintf(buffer, sizeof(buffer),
+	               "18 732 moveto (PS Page %d) show\n", page);
+
+	    write(1, buffer, strlen(buffer));
+	  }
+
+          line ++;
+
+	  if (do_pcl)
+	    snprintf(buffer, sizeof(buffer), "Line %d\r\n", line);
+	  else
+	    snprintf(buffer, sizeof(buffer), "18 %d moveto (Line %d) show\n",
+		     720 - line * 12, line);
+
+	  write(1, buffer, strlen(buffer));
+
+          if (line >= 55)
+	  {
+	   /*
+	    * Eject after 55 lines...
+	    */
+
+	    line = 0;
+	    if (do_pcl)
+	      write(1, "\014", 1);
+	    else
+	      write(1, "showpage\n", 9);
+	  }
+
+	 /*
+	  * Check for back-channel data...
+	  */
+
+	  if ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 0)) > 0)
+	    write(2, buffer, bytes);
+
+	 /*
+	  * Throttle output to ~100hz...
+	  */
+
+	  usleep(10000);
+	}
+
+       /*
+        * Eject current page with info...
+	*/
+
+        if (do_pcl)
+	  snprintf(buffer, sizeof(buffer),
+		   "Canceled on line %d of page %d\r\n\014\033E", line, page);
+	else
+	  snprintf(buffer, sizeof(buffer),
+	           "\n18 %d moveto (Canceled on line %d of page %d)\nshowpage\n",
+		   720 - line * 12, line, page);
+
+	write(1, buffer, strlen(buffer));
+
+       /*
+        * See if we get any back-channel data...
+	*/
+
+        while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer), 5.0)) > 0)
+	  write(2, buffer, bytes);
+
+	exit(0);
       }
       else
       {
@@ -282,7 +400,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       exit(0);
     }
-    else if (pid < 0)
+    else if (data_pid < 0)
     {
       perror("testbackend: Unable to fork");
       return (1);
@@ -295,34 +413,43 @@ main(int  argc,				/* I - Number of command-line args */
   * Execute the backend...
   */
 
-  if ((pid = fork()) == 0)
+  if ((back_pid = fork()) == 0)
   {
    /*
     * Child comes here...
     */
 
-    if (do_trickle || do_ps)
+    if (do_trickle || do_ps || do_pcl || do_cancel)
     {
-      close(0);
-      dup(data_fds[0]);
-      close(data_fds[0]);
+      if (data_fds[0] != 0)
+      {
+        dup2(data_fds[0], 0);
+        close(data_fds[0]);
+      }
       close(data_fds[1]);
     }
 
     if (!show_log)
     {
-      close(2);
-      open("/dev/null", O_WRONLY);
+      if ((fd = open("/dev/null", O_WRONLY)) != 2)
+      {
+        dup2(fd, 2);
+	close(fd);
+      }
     }
 
-    close(3);
-    dup(back_fds[1]);
-    close(back_fds[0]);
+    if (back_fds[1] != 3)
+    {
+      dup2(back_fds[1], 3);
+      close(back_fds[0]);
+    }
     close(back_fds[1]);
 
-    close(4);
-    dup(side_fds[1]);
-    close(side_fds[0]);
+    if (side_fds[1] != 4)
+    {
+      dup2(side_fds[1], 4);
+      close(side_fds[0]);
+    }
     close(side_fds[1]);
 
     execv(backend, argv + first_arg);
@@ -330,7 +457,7 @@ main(int  argc,				/* I - Number of command-line args */
             strerror(errno));
     return (errno);
   }
-  else if (pid < 0)
+  else if (back_pid < 0)
   {
     perror("testbackend: Unable to fork");
     return (1);
@@ -340,20 +467,24 @@ main(int  argc,				/* I - Number of command-line args */
   * Parent comes here, setup back and side channel file descriptors...
   */
 
-  if (do_trickle || do_ps)
+  if (do_trickle || do_ps || do_pcl || do_cancel)
   {
     close(data_fds[0]);
     close(data_fds[1]);
   }
 
-  close(3);
-  dup(back_fds[0]);
-  close(back_fds[0]);
+  if (back_fds[0] != 3)
+  {
+    dup2(back_fds[0], 3);
+    close(back_fds[0]);
+  }
   close(back_fds[1]);
 
-  close(4);
-  dup(side_fds[0]);
-  close(side_fds[0]);
+  if (side_fds[0] != 4)
+  {
+    dup2(side_fds[0], 4);
+    close(side_fds[0]);
+  }
   close(side_fds[1]);
 
  /*
@@ -435,14 +566,26 @@ main(int  argc,				/* I - Number of command-line args */
     printf("CUPS_SC_CMD_SOFT_RESET returned %s\n", statuses[scstatus]);
   }
 
-  while (wait(&status) != pid);
-
-  if (status)
+  if (do_cancel)
   {
-    if (WIFEXITED(status))
-      printf("%s exited with status %d!\n", backend, WEXITSTATUS(status));
-    else
-      printf("%s crashed with signal %d!\n", backend, WTERMSIG(status));
+    sleep(1);
+    kill(data_pid, SIGTERM);
+    kill(back_pid, SIGTERM);
+  }
+  
+  while ((pid = wait(&status)) > 0)
+  {
+    if (status)
+    {
+      if (WIFEXITED(status))
+	printf("%s exited with status %d!\n",
+	       pid == back_pid ? backend : "test",
+	       WEXITSTATUS(status));
+      else
+	printf("%s crashed with signal %d!\n",
+	       pid == back_pid ? backend : "test",
+	       WTERMSIG(status));
+    }
   }
 
  /*
@@ -454,16 +597,30 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
+ * 'sigterm_handler()' - Flag when we get SIGTERM.
+ */
+
+static void
+sigterm_handler(int sig)		/* I - Signal */
+{
+  (void)sig;
+
+  job_canceled = 1;
+}
+
+
+/*
  * 'usage()' - Show usage information.
  */
 
 static void
 usage(void)
 {
-  puts("Usage: testbackend [-d] [-ps] [-s [-oid OID] [-walk OID]] [-t] "
-       "device-uri job-id user title copies options [file]");
+  puts("Usage: testbackend [-cancel] [-d] [-ps | -pcl] [-s [-oid OID] "
+       "[-walk OID]] [-t] device-uri job-id user title copies options [file]");
   puts("");
   puts("Options:");
+  puts("  -cancel     Simulate a canceled print job after 2 seconds.");
   puts("  -d          Show log messages from backend.");
   puts("  -oid OID    Lookup the specified SNMP OID.");
   puts("              (.1.3.6.1.2.1.43.10.2.1.4.1.1 is a good one for printers)");
