@@ -47,9 +47,6 @@ ppdcGroup::ppdcGroup(const char *n,	// I - Name of group
 
 ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
 {
-  ppdcOption	*o;			// Current option
-
-
   PPDC_NEW;
 
   g->name->retain();
@@ -58,9 +55,7 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
   name = g->name;
   text = g->text;
 
-  options = new ppdcArray();
-  for (o = (ppdcOption *)g->options->first(); o; o = (ppdcOption *)g->options->next())
-    options->add(new ppdcOption(o));
+  options = new ppdcArray(g->options);
 }
 
 
