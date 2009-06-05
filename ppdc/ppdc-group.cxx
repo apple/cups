@@ -55,7 +55,11 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
   name = g->name;
   text = g->text;
 
-  options = new ppdcArray(g->options);
+  options = new ppdcArray();
+  for (ppdcOption *o = (ppdcOption *)g->options->first();
+       o;
+       o = (ppdcOption *)g->options->next())
+    options->add(new ppdcOption(o));
 }
 
 
