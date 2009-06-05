@@ -128,8 +128,16 @@ ppdcSource::ppdcSource(const char  *f,	// I - File to read
 #else
   struct utsname name;			// uname information
 
-  vars->add(new ppdcVariable("PLATFORM_NAME", name.sysname));
-  vars->add(new ppdcVariable("PLATFORM_ARCH", name.machine));
+  if (!uname(&name))
+  {
+    vars->add(new ppdcVariable("PLATFORM_NAME", name.sysname));
+    vars->add(new ppdcVariable("PLATFORM_ARCH", name.machine));
+  }
+  else
+  {
+    vars->add(new ppdcVariable("PLATFORM_NAME", "unknown"));
+    vars->add(new ppdcVariable("PLATFORM_ARCH", "unknown"));
+  }
 #endif // WIN32
 
   if (f)
