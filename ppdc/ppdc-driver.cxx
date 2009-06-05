@@ -19,6 +19,7 @@
 //   ppdcDriver::find_attr()            - Find an attribute.
 //   ppdcDriver::find_group()           - Find a group.
 //   ppdcDriver::find_option()          - Find an option.
+//   ppdcDriver::find_option_group()    - Find an option and its group.
 //   ppdcDriver::set_custom_size_code() - Set the custom page size code.
 //   ppdcDriver::set_default_font()     - Set the default font name.
 //   ppdcDriver::set_default_size()     - Set the default size name.
@@ -222,6 +223,19 @@ ppdcDriver::find_group(const char *n)	// I - Group name
 ppdcOption *				// O - Matching option or NULL
 ppdcDriver::find_option(const char *n)	// I - Option name
 {
+  return (find_option_group(n, (ppdcGroup **)0));
+}
+
+
+//
+// 'ppdcDriver::find_option_group()' - Find an option and its group.
+//
+
+ppdcOption *				// O - Matching option or NULL
+ppdcDriver::find_option_group(
+    const char *n,			// I - Option name
+    ppdcGroup  **mg)			// O - Matching group or NULL
+{
   ppdcGroup	*g;			// Current group
   ppdcOption	*o;			// Current option
 
@@ -229,7 +243,15 @@ ppdcDriver::find_option(const char *n)	// I - Option name
   for (g = (ppdcGroup *)groups->first(); g; g = (ppdcGroup *)groups->next())
     for (o = (ppdcOption *)g->options->first(); o; o = (ppdcOption *)g->options->next())
       if (!strcasecmp(n, o->name->value))
+      {
+        if (mg)
+	  *mg = g;
+
         return (o);
+      }
+
+  if (mg)
+    *mg = (ppdcGroup *)0;
 
   return (0);
 }

@@ -1564,6 +1564,7 @@ ppdcSource::get_option(ppdcFile   *fp,	// I - File to read
   ppdcOptSection section;		// Option section
   float		order;			// Option order
   ppdcOption	*o;			// Option
+  ppdcGroup	*mg;			// Matching group, if any
 
 
   // Read the Option parameters:
@@ -1634,7 +1635,7 @@ ppdcSource::get_option(ppdcFile   *fp,	// I - File to read
   order = get_float(fp);
 
   // See if the option already exists...
-  if ((o = d->find_option(name)) == NULL)
+  if ((o = d->find_option_group(name, &mg)) == NULL)
   {
     // Nope, add a new one...
     o = new ppdcOption(ot, name, text, section, order);
@@ -1643,6 +1644,13 @@ ppdcSource::get_option(ppdcFile   *fp,	// I - File to read
   {
     _cupsLangPrintf(stderr,
                     _("ppdc: Option %s redefined with a different type on line "
+		      "%d of %s!\n"), name, fp->line, fp->filename);
+    return (NULL);
+  }
+  else if (g != mg)
+  {
+    _cupsLangPrintf(stderr,
+                    _("ppdc: Option %s defined in two different groups on line "
 		      "%d of %s!\n"), name, fp->line, fp->filename);
     return (NULL);
   }
@@ -2408,6 +2416,7 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 {
   ppdcDriver	*d;			// Current driver
   ppdcGroup	*g,			// Current group
+		*mg,			// Matching group
 		*general,		// General options group
 		*install;		// Installable options group
   ppdcOption	*o;			// Current option
@@ -2852,12 +2861,21 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       // Add the choice to the cupsDarkness option...
-      if ((o = d->find_option("cupsDarkness")) == NULL)
+      if ((o = d->find_option_group("cupsDarkness", &mg)) == NULL)
       {
 	// Create the cupsDarkness option...
 	o = new ppdcOption(PPDC_PICKONE, "cupsDarkness", "Darkness", PPDC_SECTION_ANY, 10.0f);
 	g = general;
 	g->add_option(o);
+      }
+      else if (mg != general)
+      {
+	_cupsLangPrintf(stderr,
+			_("ppdc: Option %s defined in two different groups on "
+			  "line %d of %s!\n"), "cupsDarkness", fp->line,
+		        fp->filename);
+	c->release();
+	continue;
       }
 
       o->add_choice(c);
@@ -2929,12 +2947,21 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       // Add the choice to the cupsFinishing option...
-      if ((o = d->find_option("cupsFinishing")) == NULL)
+      if ((o = d->find_option_group("cupsFinishing", &mg)) == NULL)
       {
 	// Create the cupsFinishing option...
 	o = new ppdcOption(PPDC_PICKONE, "cupsFinishing", "Finishing", PPDC_SECTION_ANY, 10.0f);
 	g = general;
 	g->add_option(o);
+      }
+      else if (mg != general)
+      {
+	_cupsLangPrintf(stderr,
+			_("ppdc: Option %s defined in two different groups on "
+			  "line %d of %s!\n"), "cupsFinishing", fp->line,
+		        fp->filename);
+	c->release();
+	continue;
       }
 
       o->add_choice(c);
@@ -3011,13 +3038,23 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       // Add the choice to the InputSlot option...
-      if ((o = d->find_option("InputSlot")) == NULL)
+      
+      if ((o = d->find_option_group("InputSlot", &mg)) == NULL)
       {
 	// Create the InputSlot option...
 	o = new ppdcOption(PPDC_PICKONE, "InputSlot", "Media Source",
 	                   PPDC_SECTION_ANY, 10.0f);
 	g = general;
 	g->add_option(o);
+      }
+      else if (mg != general)
+      {
+	_cupsLangPrintf(stderr,
+			_("ppdc: Option %s defined in two different groups on "
+			  "line %d of %s!\n"), "InputSlot", fp->line,
+		        fp->filename);
+	c->release();
+	continue;
       }
 
       o->add_choice(c);
@@ -3135,13 +3172,22 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       // Add the choice to the MediaType option...
-      if ((o = d->find_option("MediaType")) == NULL)
+      if ((o = d->find_option_group("MediaType", &mg)) == NULL)
       {
 	// Create the MediaType option...
 	o = new ppdcOption(PPDC_PICKONE, "MediaType", "Media Type",
 	                   PPDC_SECTION_ANY, 10.0f);
 	g = general;
 	g->add_option(o);
+      }
+      else if (mg != general)
+      {
+	_cupsLangPrintf(stderr,
+			_("ppdc: Option %s defined in two different groups on "
+			  "line %d of %s!\n"), "MediaType", fp->line,
+		        fp->filename);
+	c->release();
+	continue;
       }
 
       o->add_choice(c);
@@ -3259,13 +3305,22 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       }
 
       // Add the choice to the Resolution option...
-      if ((o = d->find_option("Resolution")) == NULL)
+      if ((o = d->find_option_group("Resolution", &mg)) == NULL)
       {
 	// Create the Resolution option...
 	o = new ppdcOption(PPDC_PICKONE, "Resolution", NULL, PPDC_SECTION_ANY,
 	                   10.0f);
 	g = general;
 	g->add_option(o);
+      }
+      else if (mg != general)
+      {
+	_cupsLangPrintf(stderr,
+			_("ppdc: Option %s defined in two different groups on "
+			  "line %d of %s!\n"), "Resolution", fp->line,
+		        fp->filename);
+	c->release();
+	continue;
       }
 
       o->add_choice(c);

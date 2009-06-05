@@ -411,6 +411,7 @@ class ppdcDriver			//// Printer Driver Data
   ppdcAttr	*find_attr(const char *k, const char *s);
   ppdcGroup	*find_group(const char *n);
   ppdcOption	*find_option(const char *n);
+  ppdcOption	*find_option_group(const char *n, ppdcGroup **mg);
 
   void		set_custom_size_code(const char *c);
   void		set_default_font(ppdcFont *f);

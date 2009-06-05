@@ -50,7 +50,7 @@ ppdcString::ppdcString(const char *v)	// I - String
 
 ppdcString::~ppdcString()
 {
-  PPDC_DELETE;
+  PPDC_DELETEVAL(value);
 
   if (value)
     delete[] value;
