@@ -3,6 +3,8 @@ CHANGES.txt - 2009-06-05
 
 CHANGES IN CUPS V1.4rc1
 
+	- The IPP backend now reconnects after every request when talking to
+	  printers that claim IPP support but only use HTTP/1.0.
 	- The PPD compiler crashed when both "Resolution" and "Group foo Option
 	  Resolution" were specified in the .drv file.
 	- The PPD compiler's #if/#elif/#else/#endif did not work for undefined
