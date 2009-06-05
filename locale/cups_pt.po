@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -1775,9 +1775,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 mm/seg."
 
-msgid "600 DPI Grayscale"
-msgstr "Níveis de cinzento 600 DPI"
-
 msgid "600dpi"
 msgstr "600dpi"
 
@@ -2539,6 +2536,9 @@ msgstr "ERROR: Não é possível cancelar o trabalho %d: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: Não é possível copiar o ficheiro PDF"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: Não é possível criar o socket"
 
@@ -2560,6 +2560,9 @@ msgstr "ERROR: Não é possível executar o programa gs"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: Não é possível executar o programa pdftops"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2792,14 +2795,6 @@ msgstr ""
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: Detectado excesso doc_printf (%d bytes); a interromper!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: Filtro pdftops falhou ao sinal %d!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: Filtro pdftops saiu com o estado %d!\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4286,10 +4281,6 @@ msgid "Unknown"
 msgstr "Desconhecido"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "Erro de impressora desconhecido (%s)!"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "Printer-error-policy desconhecida \"%s\"."
 
@@ -5415,6 +5406,10 @@ msgstr ""
 "ppdc: Não foi fornecido qualquer catálogo de mensagem para o locale %s!\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc: Opção %s redefinida com um tipo diferente na linha %d de %s!\n"
 
@@ -5589,6 +5584,9 @@ msgstr "variable-bindings com comprimento indefinido"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: Não é possível abrir %s - %s na linha %d.\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "Níveis de cinzento 600 DPI"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Não é possível criar ficheiro o temporário - %s.\n"
 
@@ -5597,6 +5595,15 @@ msgstr "variable-bindings com comprimento indefinido"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: Não é possível abrir o ficheiro temporário"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: Filtro pdftops falhou ao sinal %d!\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: Filtro pdftops saiu com o estado %d!\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "Erro de impressora desconhecido (%s)!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"

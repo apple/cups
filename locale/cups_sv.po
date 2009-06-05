@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -1766,9 +1766,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 mm/sek."
 
-msgid "600 DPI Grayscale"
-msgstr "600 DPI gråskala"
-
 msgid "600dpi"
 msgstr "600 dpi"
 
@@ -2524,6 +2521,9 @@ msgstr "ERROR: Kunde inte avbryta utskriften %d: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: Kunde inte kopiera PDF-fil"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: Kunde inte skapa sockel"
 
@@ -2543,6 +2543,9 @@ msgstr "ERROR: Kunde inte exekvera gs-program"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: Kunde inte exekvera pdftops-program"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2770,14 +2773,6 @@ msgstr ""
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: doc_printf overflow (%d byte) upptäckt, stoppar!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: pdftops-filter kraschade på signal %d!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: pdftops-filter avslutades med status %d!\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4249,10 +4244,6 @@ msgid "Unknown"
 msgstr "Okänd"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "Okänt skrivarfel (%s)!"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "Okänd printer-error-policy \"%s\"."
 
@@ -5369,6 +5360,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc: Ingen meddelandekatalog angiven för språkversionen %s!\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc: Alternativ %s definieras om med en annan typ på rad %d av %s!\n"
 
@@ -5540,6 +5535,9 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: Kan inte öppna %s - %s på rad %d.\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600 DPI gråskala"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Kunde inte skapa temporär fil - %s.\n"
 
@@ -5548,6 +5546,15 @@ msgstr "variabelbindningar använder obegränsad längd"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: Kunde inte öppna temporär fil"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: pdftops-filter kraschade på signal %d!\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: pdftops-filter avslutades med status %d!\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "Okänt skrivarfel (%s)!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"

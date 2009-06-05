@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -1744,9 +1744,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 公釐∕秒"
 
-msgid "600 DPI Grayscale"
-msgstr "600 DPI 灰階"
-
 msgid "600dpi"
 msgstr "600dpi"
 
@@ -2497,6 +2494,9 @@ msgstr "ERROR: 無法取消作業 %d：%s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: 無法拷貝 PDF 檔案"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: 無法製作 socket"
 
@@ -2516,6 +2516,9 @@ msgstr "ERROR: 無法執行 gs 程式"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: 無法執行 pdftops 程式"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2741,14 +2744,6 @@ msgstr "ERROR: 不受支援的 page-border 值 %s，使用 page-border=none！\n
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: 偵測到 doc_printf 溢位（%d 位元組），正在中斷！\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: pdftops 濾鏡在遇到訊號 %d 時當機！\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: pdftops 濾鏡以狀態 %d 結束！\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4203,10 +4198,6 @@ msgid "Unknown"
 msgstr "未知"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "未知的印表機錯誤（%s）！"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "未知的 printer-error-policy“%s”。"
 
@@ -5299,6 +5290,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc：沒有針對環境變數 %s 提供的訊息目錄！\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc：在 %3$s 的第 %2$d:  行上，以不同的類型重複定義了選項 %1$s！\n"
 
@@ -5470,6 +5465,9 @@ msgstr "variable-bindings 使用的長度不確定"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s：無法打開 %s - %s 在第 %d 行。\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600 DPI 灰階"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: 無法製作暫存檔 - %s。\n"
 
@@ -5478,6 +5476,15 @@ msgstr "variable-bindings 使用的長度不確定"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: 無法打開暫存檔"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: pdftops 濾鏡在遇到訊號 %d 時當機！\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: pdftops 濾鏡以狀態 %d 結束！\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "未知的印表機錯誤（%s）！"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"

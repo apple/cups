@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -1770,9 +1770,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 мм/с"
 
-msgid "600 DPI Grayscale"
-msgstr "600dpi, оттенки серого"
-
 msgid "600dpi"
 msgstr "600dpi"
 
@@ -2530,6 +2527,9 @@ msgstr "ERROR: Не удается отменить задание %d: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: Не удается копировать файл PDF"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: Не удается создать сокет"
 
@@ -2549,6 +2549,9 @@ msgstr "ERROR: Не удается запустить программу gs"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: Не удается запустить программу pdftops"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2779,14 +2782,6 @@ msgstr ""
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: Обнаружено переполнение doc_printf (%d байт), отменяю!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: Сбой фильтра pdftops при сигнале %d!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: Фильтр pictwpstops закрыт со статусом %d!\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4255,10 +4250,6 @@ msgid "Unknown"
 msgstr "Неизвестный"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "Неизвестная ошибка принтера (%s)!"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "Неизвестная политика printer-error-policy «%s»."
 
@@ -5391,6 +5382,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc: Не указан каталог сообщений для региона %s!\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc: Для параметра %s определен другой тип в строке %d из %s!\n"
 
@@ -5566,6 +5561,9 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: Не удается открыть %s – %s в строке %d.\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600dpi, оттенки серого"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Не удается создать временный файл – %s.\n"
 
@@ -5574,6 +5572,15 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: Не удается открыть временный файл"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: Сбой фильтра pdftops при сигнале %d!\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: Фильтр pictwpstops закрыт со статусом %d!\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "Неизвестная ошибка принтера (%s)!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"
