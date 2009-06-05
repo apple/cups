@@ -2419,7 +2419,10 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
 
   // Initialize things as needed...
   if (inc && td)
+  {
     d = td;
+    d->retain();
+  }
   else
     d = new ppdcDriver(td);
 
@@ -3360,6 +3363,8 @@ ppdcSource::scan_file(ppdcFile   *fp,	// I - File to read
       drivers->add(d);
     }
   }
+  else if (inc && td)
+    td->release();
 }
 
 
