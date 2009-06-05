@@ -1802,8 +1802,7 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
     * file...
     */
 
-    close(1);
-    dup(fd);
+    dup2(fd, 1);
     close(fd);
 
     if (!getuid())

@@ -284,8 +284,7 @@ main(int  argc,				// I - Number of command-line arguments
 	if ((pid = fork()) == 0)
 	{
 	  // Child process comes here...
-	  close(0);
-	  dup(fds[0]);
+	  dup2(fds[0], 0);
 
 	  close(fds[0]);
 	  close(fds[1]);

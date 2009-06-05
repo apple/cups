@@ -282,7 +282,8 @@ cupsdPipeCommand(int        *pid,	/* O - Process ID or 0 on error */
                  char       **argv,	/* I - Arguments to pass to command */
 		 int        user)	/* I - User to run as or 0 for current */
 {
-  int	fds[2];				/* Pipe file descriptors */
+  int	fd,				/* Temporary file descriptor */
+	fds[2];				/* Pipe file descriptors */
 
 
  /*
@@ -344,11 +345,14 @@ cupsdPipeCommand(int        *pid,	/* O - Process ID or 0 on error */
     if (!getuid() && user)
       setuid(user);			/* Run as restricted user */
 
-    close(0);				/* </dev/null */
-    open("/dev/null", O_RDONLY);
+    if ((fd = open("/dev/null", O_RDONLY)) > 0)
+    {
+      dup2(fd, 0);			/* </dev/null */
+      close(fd);
+    }
 
-    close(1);				/* >pipe */
-    dup(fds[1]);
+    dup2(fds[1], 1);			/* >pipe */
+    close(fds[1]);
 
     cupsdExec(command, argv);
     exit(errno);
