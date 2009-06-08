@@ -1,8 +1,10 @@
-CHANGES.txt - 2009-06-05
+CHANGES.txt - 2009-06-08
 ------------------------
 
 CHANGES IN CUPS V1.4rc1
 
+	- The PPD compiler documentation was missing information on localization
+	  (STR #3212)
 	- The IPP backend now reconnects after every request when talking to
 	  printers that claim IPP support but only use HTTP/1.0.
 	- The PPD compiler crashed when both "Resolution" and "Group foo Option

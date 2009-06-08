@@ -356,11 +356,28 @@ main(int  argc,				// I - Number of command-line arguments
       * Write the PPD file...
       */
 
-      if (d->write_ppd_file(fp, catalog, locales, src, le))
+      ppdcArray *templocales = locales;
+
+      if (!templocales)
+      {
+	templocales = new ppdcArray();
+	for (ppdcCatalog *tempcatalog = (ppdcCatalog *)src->po_files->first();
+	     tempcatalog;
+	     tempcatalog = (ppdcCatalog *)src->po_files->next())
+	{
+	  tempcatalog->locale->retain();
+	  templocales->add(tempcatalog->locale);
+	}
+      }
+
+      if (d->write_ppd_file(fp, catalog, templocales, src, le))
       {
 	cupsFileClose(fp);
 	return (1);
       }
+
+      if (templocales != locales)
+        templocales->release();
 
       cupsFileClose(fp);
     }

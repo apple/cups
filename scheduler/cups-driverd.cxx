@@ -363,6 +363,7 @@ cat_drv(const char *name,		/* I - PPD name */
     {
       fprintf(stderr, "DEBUG2: [cups-driverd] Adding locale \"%s\"...\n",
               catalog->locale->value);
+      catalog->locale->retain();
       locales->add(catalog->locale);
     }
 
