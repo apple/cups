@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
-"PO-Revision-Date: 2009-03-16 19:35+0100\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"PO-Revision-Date: 2009-05-23 13:15+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -1805,9 +1805,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 mm/seg"
 
-msgid "600 DPI Grayscale"
-msgstr "600 PPP escala de grises"
-
 msgid "600dpi"
 msgstr "600ppp"
 
@@ -2576,6 +2573,9 @@ msgstr "ERROR: No se ha podido cancelar el trabajo %d: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: No se ha podido copiar el archivo PDF"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: No se ha podido crear socket"
 
@@ -2597,6 +2597,9 @@ msgstr "ERROR: No se ha podido ejecutar el programa gs"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: No se ha podido ejecutar el programa pdftops"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2836,14 +2839,6 @@ msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr ""
 "ERROR: Se ha detectado un desbordamiento de doc_printf (%d bytes); "
 "cancelando.\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: filtro pdftops se ha colgado con la señal %d.\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: filtro pdftops se ha cerrado con el estado %d.\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -3233,7 +3228,7 @@ msgid "Interlock open."
 msgstr "Dispositivo de seguridad abierto."
 
 msgid "Internal Server Error"
-msgstr ""
+msgstr "Error interno del servidor"
 
 msgid "Internal error"
 msgstr "Error interno"
@@ -4331,10 +4326,6 @@ msgstr "Unidades"
 
 msgid "Unknown"
 msgstr "Desconocido"
-
-#, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "Error de impresión desconocido (%s)."
 
 #, c-format
 msgid "Unknown printer-error-policy \"%s\"."
@@ -5530,6 +5521,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc: No se ha proporcionado catálogo de mensajes para el idioma %s.\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr ""
 "ppdc: La opción %s redefinida con un tipo diferente en la línea %d de %s.\n"
@@ -5694,3 +5689,15 @@ msgstr "sin título"
 
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
+
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600 PPP escala de grises"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: filtro pdftops se ha colgado con la señal %d.\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: filtro pdftops se ha cerrado con el estado %d.\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "Error de impresión desconocido (%s)."

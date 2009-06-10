@@ -237,8 +237,9 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) libcups.a $(LIBDIR)
+	$(INSTALL_LIB) -m 755 libcups.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcups.a
+	$(CHMOD) 555 $(LIBDIR)/libcups.a
 
 install32bit:
 	echo Installing libraries in $(LIB32DIR)...

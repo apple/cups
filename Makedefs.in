@@ -20,6 +20,7 @@
 AR		=	@AR@
 AWK		=	@AWK@
 CC		=	@LIBTOOL@ @CC@
+CHMOD		=	@CHMOD@
 CXX		=	@LIBTOOL@ @CXX@
 DSO		=	@DSO@
 DSOXX		=	@DSOXX@

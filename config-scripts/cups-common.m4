@@ -49,6 +49,7 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
+AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROG(HTMLDOC,htmldoc)
 AC_PATH_PROG(LD,ld)
 AC_PATH_PROG(LN,ln)
@@ -142,9 +143,6 @@ fi
 
 dnl Check for random number functions...
 AC_CHECK_FUNCS(random mrand48 lrand48)
-
-dnl Checks for mkstemp and mkstemps functions.
-AC_CHECK_FUNCS(mkstemp mkstemps)
 
 dnl Check for geteuid function.
 AC_CHECK_FUNCS(geteuid)

@@ -109,10 +109,6 @@
 #include "cupsd.h"
 #include <cups/ppd-private.h>
 
-#ifdef HAVE_LIBPAPER
-#  include <paper.h>
-#endif /* HAVE_LIBPAPER */
-
 #ifdef __APPLE__
 #  include <ApplicationServices/ApplicationServices.h>
 #  include <CoreFoundation/CoreFoundation.h>
@@ -9617,9 +9613,10 @@ save_auth_info(
 
 #if defined(HAVE_GSSAPI) && defined(HAVE_KRB5_H)
 #  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
-  if (con->http.hostaddr->addr.sa_family == AF_LOCAL || con->gss_creds)
+  if (con->have_gss &&
+      (con->http.hostaddr->addr.sa_family == AF_LOCAL || con->gss_creds))
 #  else
-  if (con->gss_creds)
+  if (con->have_gss && con->gss_creds)
 #  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
     save_krb5_creds(con, job);
   else if (job->ccname)

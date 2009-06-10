@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-12 15:10+0200\n"
 "Last-Translator: Teppo Turtiainen <teppot@iki.fi>\n"
 "Language-Team: Finnish\n"
@@ -1777,9 +1777,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60 mm/s"
 
-msgid "600 DPI Grayscale"
-msgstr "600 dpi harmaasävy"
-
 msgid "600dpi"
 msgstr "600 dpi"
 
@@ -2537,6 +2534,9 @@ msgstr "ERROR: Työtä %d ei voida peruuttaa: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: PDF-tiedostoa ei voida kopioida"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: Socketia ei voida luoda"
 
@@ -2556,6 +2556,9 @@ msgstr "ERROR: gs-ohjelmaa ei voida suorittaa"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: pdftops-ohjelmaa ei voida suorittaa"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2781,14 +2784,6 @@ msgstr "ERROR: Ei-tuettu page-border-arvo %s, käytetään page-border=none!\n"
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: Havaittiin doc_printf-ylivuoto (%d tavua), keskeytetään!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: pdftops-suodin kaatui signaaliin %d!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: pdftops-suodin lopetti signaaliin %d!\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4262,10 +4257,6 @@ msgid "Unknown"
 msgstr "Tuntematon"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "Tuntematon tulostinvirhe (%s)!"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "Tuntematon printer-error-policy ”%s”."
 
@@ -5388,6 +5379,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc: Ei viestikatalogia lokaalille %s!\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc: Valinta %s määritelty uudelleen eri tyypillä rivillä %d / %s!\n"
 
@@ -5560,6 +5555,9 @@ msgstr "variable-bindings käyttää määrittämätöntä pituutta"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: Kohdetta %s ei voida avata - %s linjalla %d.\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600 dpi harmaasävy"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Tilapäistiedostoa ei voida luoda - %s.\n"
 
@@ -5568,6 +5566,15 @@ msgstr "variable-bindings käyttää määrittämätöntä pituutta"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: Tilapäistiedostoa ei voida avata"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: pdftops-suodin kaatui signaaliin %d!\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: pdftops-suodin lopetti signaaliin %d!\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "Tuntematon tulostinvirhe (%s)!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"

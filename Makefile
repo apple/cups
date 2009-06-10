@@ -424,7 +424,7 @@ dist:	all
 		*BSD*) $(MAKE) $(MFLAGS) bsd;; \
 		Darwin*) $(MAKE) $(MFLAGS) osx;; \
 		IRIX*) $(MAKE) $(MFLAGS) tardist;; \
-		Linux*) $(MAKE) $(MFLAGS) rpm;; \
+		Linux*) test ! -x /usr/bin/rpm || $(MAKE) $(MFLAGS) rpm;; \
 		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac
 

@@ -145,13 +145,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Child goes here...
     */
 
-    close(0);
-    dup(cupslpd_stdin[0]);
+    dup2(cupslpd_stdin[0], 0);
     close(cupslpd_stdin[0]);
     close(cupslpd_stdin[1]);
 
-    close(1);
-    dup(cupslpd_stdout[1]);
+    dup2(cupslpd_stdout[1], 1);
     close(cupslpd_stdout[0]);
     close(cupslpd_stdout[1]);
 

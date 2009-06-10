@@ -2173,18 +2173,23 @@ do_samba_command(const char *command,	/* I - Command to run */
     * Child goes here, redirect stdin/out/err and execute the command...
     */
 
-    close(0);
-    open("/dev/null", O_RDONLY);
+    int fd = open("/dev/null", O_RDONLY);
 
-    close(1);
+    if (fd > 0)
+    {
+      dup2(fd, 0);
+      close(fd);
+    }
 
     if (logfile)
-      dup(fileno(logfile));
-    else
-      open("/dev/null", O_WRONLY);
+      dup2(fileno(logfile), 1);
+    else if ((fd = open("/dev/null", O_WRONLY)) > 1)
+    {
+      dup2(fd, 1);
+      close(fd);
+    }
 
-    close(2);
-    dup(1);
+    dup2(1, 2);
 
     execlp(command, command, address, "-N", "-A", authfile, "-c", subcmd,
            (char *)0);

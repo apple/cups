@@ -1,8 +1,23 @@
-CHANGES.txt - 2009-05-22
+CHANGES.txt - 2009-06-08
 ------------------------
 
 CHANGES IN CUPS V1.4rc1
 
+	- The PPD compiler documentation was missing information on localization
+	  (STR #3212)
+	- The IPP backend now reconnects after every request when talking to
+	  printers that claim IPP support but only use HTTP/1.0.
+	- The PPD compiler crashed when both "Resolution" and "Group foo Option
+	  Resolution" were specified in the .drv file.
+	- The PPD compiler's #if/#elif/#else/#endif did not work for undefined
+	  variables (STR #3210)
+	- Static libraries could not be installed by a non-root user on systems
+	  needing a ranlib program (STR #3209)
+	- The scheduler incorrectly always tried to copy Kerberos credentials
+	  for print jobs.
+	- Updated the Spanish localization (STR #3204)
+	- The scheduler crashed when getting the default paper size from
+	  libpaper (STR #3205, STR #3206)
 	- The PPD compiler now defines six variables: CUPS_VERSION,
 	  CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH,
 	  PLATFORM_NAME, and PLATFORM_ARCH (STR #3203)

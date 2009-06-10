@@ -241,8 +241,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Child process for pstoraster...  Assign new pipe input to pstoraster...
       */
 
-      close(0);
-      dup(mypipes[0]);
+      dup2(mypipes[0], 0);
       close(mypipes[0]);
       close(mypipes[1]);
 
@@ -265,8 +264,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Update stdout so it points at the new pstoraster...
     */
 
-    close(1);
-    dup(mypipes[1]);
+    dup2(mypipes[1], 1);
     close(mypipes[0]);
     close(mypipes[1]);
 

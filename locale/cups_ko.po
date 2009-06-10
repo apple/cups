@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-03-23 14:56-0700\n"
+"POT-Creation-Date: 2009-06-05 14:00-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -1762,9 +1762,6 @@ msgstr "60"
 msgid "60 mm/sec."
 msgstr "60mm/초"
 
-msgid "600 DPI Grayscale"
-msgstr "600 DPI 그레이 스케일"
-
 msgid "600dpi"
 msgstr "600dpi"
 
@@ -2517,6 +2514,9 @@ msgstr "ERROR: %d 작업을 취소할 수 없음: %s\n"
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: PDF 파일을 복사할 수 없음"
 
+msgid "ERROR: Unable to create pipe"
+msgstr ""
+
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: 소켓을 생성할 수 없음"
 
@@ -2536,6 +2536,9 @@ msgstr "ERROR: gs 프로그램을 실행할 수 없음"
 
 msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: pdftops 프로그램을 실행할 수 없음"
+
+msgid "ERROR: Unable to execute pstops program"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -2762,14 +2765,6 @@ msgstr "ERROR: page-border=none을 사용하는, 지원되지 않는 page-border
 #, c-format
 msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
 msgstr "ERROR: doc_printf 오버플로우(%d바이트)가 발견됨, 중단 중!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter crashed on signal %d!\n"
-msgstr "ERROR: pdftops 필터가 신호 %d에서 충돌함!\n"
-
-#, c-format
-msgid "ERROR: pdftops filter exited with status %d!\n"
-msgstr "ERROR: pdftops 필터가 상태 %d(으)로 종료됨!\n"
 
 #, c-format
 msgid "ERROR: pictwpstops exited on signal %d!\n"
@@ -4230,10 +4225,6 @@ msgid "Unknown"
 msgstr "알 수 없음"
 
 #, c-format
-msgid "Unknown printer error (%s)!"
-msgstr "알 수 없는 프린터 오류(%s)!"
-
-#, c-format
 msgid "Unknown printer-error-policy \"%s\"."
 msgstr "알 수 없는 printer-error-policy \"%s\" ."
 
@@ -5337,6 +5328,10 @@ msgid "ppdc: No message catalog provided for locale %s!\n"
 msgstr "ppdc: 로컬 %s에 대해 제공된 메시지 카탈로그 없음!\n"
 
 #, c-format
+msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgstr ""
+
+#, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr "ppdc: %3$s의 %2$d번째 줄에 %1$s 옵션이 다른 유형으로 재정의됨!\n"
 
@@ -5509,6 +5504,9 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: %s을(를) 열 수 없음 - %s, %d번째 줄\n"
 
+#~ msgid "600 DPI Grayscale"
+#~ msgstr "600 DPI 그레이 스케일"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: 임시 파일을 생성할 수 없음 - %s.\n"
 
@@ -5517,6 +5515,15 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: 임시 파일을 열 수 없음"
+
+#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
+#~ msgstr "ERROR: pdftops 필터가 신호 %d에서 충돌함!\n"
+
+#~ msgid "ERROR: pdftops filter exited with status %d!\n"
+#~ msgstr "ERROR: pdftops 필터가 상태 %d(으)로 종료됨!\n"
+
+#~ msgid "Unknown printer error (%s)!"
+#~ msgstr "알 수 없는 프린터 오류(%s)!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"

@@ -209,11 +209,11 @@ else
 	# Update permissions and strip as needed, then move to the final name.
 	# If the chmod, strip, rm, or mv commands fail, remove the installed
 	# file...
+	if [ x"$stripcmd" != x ]; then $doit $stripcmd $stripopt "$dsttmp" || echo "warning: Unable to strip $dst!"; fi
 	if [ x"$chowncmd" != x ]; then $doit $chowncmd "$dsttmp" || echo "warning: Unable to change owner of $dst!"; fi
 	if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd "$dsttmp" || echo "warning: Unable to change group of $dst!"; fi
 
 	trap "rm -f ${dsttmp}" 0 &&
-	if [ x"$stripcmd" != x ]; then $doit $stripcmd $stripopt "$dsttmp"; fi &&
 	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd "$dsttmp"; fi &&
 	$doit $rmcmd -f "$dstdir/$dstfile" &&
 	$doit $mvcmd "$dsttmp" "$dstdir/$dstfile"

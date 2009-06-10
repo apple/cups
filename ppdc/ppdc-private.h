@@ -32,6 +32,7 @@
 #  define PPDC_NEW		DEBUG_printf(("%s: %p new", class_name(), this))
 #  define PPDC_NEWVAL(s)	DEBUG_printf(("%s(\"%s\"): %p new", class_name(), s, this))
 #  define PPDC_DELETE		DEBUG_printf(("%s: %p delete", class_name(), this))
+#  define PPDC_DELETEVAL(s)	DEBUG_printf(("%s(\"%s\"): %p delete", class_name(), s, this))
 
 
 #endif // !_PPDC_PRIVATE_H_

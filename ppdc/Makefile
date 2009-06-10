@@ -182,8 +182,9 @@ install-libs: $(INSTALLSTATIC)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) libcupsppdc.a $(LIBDIR)
+	$(INSTALL_LIB) -m 755 libcupsppdc.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupsppdc.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsppdc.a
 
 
 #

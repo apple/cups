@@ -721,7 +721,8 @@ exec_filter(const char *filter,		/* I - Filter to execute */
 	    int        infd,		/* I - Stdin file descriptor */
 	    int        outfd)		/* I - Stdout file descriptor */
 {
-  int		pid;			/* Process ID */
+  int		pid,			/* Process ID */
+		fd;			/* Temporary file descriptor */
 #if defined(__APPLE__)
   char		processPath[1024],	/* CFProcessPath environment variable */
 		linkpath[1024];		/* Link path for symlinks... */
@@ -765,28 +766,40 @@ exec_filter(const char *filter,		/* I - Filter to execute */
 
     if (infd != 0)
     {
-      close(0);
+      if (infd < 0)
+        infd = open("/dev/null", O_RDONLY);
+
       if (infd > 0)
-        dup(infd);
-      else
-        open("/dev/null", O_RDONLY);
+      {
+        dup2(infd, 0);
+	close(infd);
+      }
     }
 
     if (outfd != 1)
     {
-      close(1);
-      if (outfd > 0)
-	dup(outfd);
-      else
-        open("/dev/null", O_WRONLY);
+      if (outfd < 0)
+        outfd = open("/dev/null", O_WRONLY);
+
+      if (outfd > 1)
+      {
+	dup2(outfd, 1);
+	close(outfd);
+      }
     }
 
-    close(3);
-    open("/dev/null", O_RDWR);
+    if ((fd = open("/dev/null", O_RDWR)) > 3)
+    {
+      dup2(fd, 3);
+      close(fd);
+    }
     fcntl(3, F_SETFL, O_NDELAY);
 
-    close(4);
-    open("/dev/null", O_RDWR);
+    if ((fd = open("/dev/null", O_RDWR)) > 4)
+    {
+      dup2(fd, 4);
+      close(fd);
+    }
     fcntl(4, F_SETFL, O_NDELAY);
 
    /*

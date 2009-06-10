@@ -33,7 +33,7 @@
 ppdcGroup::ppdcGroup(const char *n,	// I - Name of group
                      const char *t)	// I - Text of group
 {
-  PPDC_NEW;
+  PPDC_NEWVAL(n);
 
   name    = new ppdcString(n);
   text    = new ppdcString(t);
@@ -47,10 +47,7 @@ ppdcGroup::ppdcGroup(const char *n,	// I - Name of group
 
 ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
 {
-  ppdcOption	*o;			// Current option
-
-
-  PPDC_NEW;
+  PPDC_NEWVAL(g->name->value);
 
   g->name->retain();
   g->text->retain();
@@ -59,7 +56,9 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
   text = g->text;
 
   options = new ppdcArray();
-  for (o = (ppdcOption *)g->options->first(); o; o = (ppdcOption *)g->options->next())
+  for (ppdcOption *o = (ppdcOption *)g->options->first();
+       o;
+       o = (ppdcOption *)g->options->next())
     options->add(new ppdcOption(o));
 }
 
@@ -70,11 +69,14 @@ ppdcGroup::ppdcGroup(ppdcGroup *g)	// I - Group template
 
 ppdcGroup::~ppdcGroup()
 {
-  PPDC_DELETE;
+  PPDC_DELETEVAL(name ? name->value : NULL);
 
   name->release();
   text->release();
   options->release();
+
+  name = text = 0;
+  options = 0;
 }
 
 

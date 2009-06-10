@@ -702,6 +702,9 @@ main(int  argc,				/* I - Number of command-line args */
 
     fputs("DEBUG: Getting supported attributes...\n", stderr);
 
+    if (http->version < HTTP_1_1)
+      httpReconnect(http);
+
     if ((supported = cupsDoRequest(http, request, resource)) == NULL)
       ipp_status = cupsLastError();
     else
@@ -1021,6 +1024,9 @@ main(int  argc,				/* I - Number of command-line args */
     * Do the request...
     */
 
+    if (http->version < HTTP_1_1)
+      httpReconnect(http);
+
     if (num_files > 1)
       response = cupsDoRequest(http, request, resource);
     else
@@ -1130,6 +1136,9 @@ main(int  argc,				/* I - Number of command-line args */
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 	             "document-format", NULL, content_type);
 
+	if (http->version < HTTP_1_1)
+	  httpReconnect(http);
+
         ippDelete(cupsDoFileRequest(http, request, resource, files[i]));
 
 	if (cupsLastError() > IPP_OK_CONFLICT)
@@ -1198,7 +1207,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Do the request...
       */
 
-      if (!copies_sup)
+      if (!copies_sup || http->version < HTTP_1_1)
 	httpReconnect(http);
 
       response   = cupsDoRequest(http, request, resource);
@@ -1369,6 +1378,9 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
   * Do the request...
   */
 
+  if (http->version < HTTP_1_1)
+    httpReconnect(http);
+
   ippDelete(cupsDoRequest(http, request, resource));
 
   if (cupsLastError() > IPP_OK_CONFLICT)
@@ -1427,6 +1439,9 @@ check_printer_state(
  /*
   * Do the request...
   */
+
+  if (http->version < HTTP_1_1)
+    httpReconnect(http);
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
@@ -1802,8 +1817,7 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
     * file...
     */
 
-    close(1);
-    dup(fd);
+    dup2(fd, 1);
     close(fd);
 
     if (!getuid())

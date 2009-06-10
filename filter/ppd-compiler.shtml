@@ -808,3 +808,76 @@ lines:</p>
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsUIConstraints DuplexOff "*Duplex *OptionDuplexer False"
 <a href='ref-ppdcfile.html#Attribute'>Attribute</a> cupsUIResolver DuplexOff "*Duplex None"
 </pre>
+
+<h2 class='title'><a name='LOCALIZATION'>Localization</a></h2>
+
+<p>The PPD compiler provides localization of PPD files in different languages
+through <i>message catalog</i> files in the GNU gettext or Apple .strings
+formats. Each user text string and several key PPD attribute values such as
+<tt>LanguageVersion</tt> and <tt>LanguageEncoding</tt> are looked up in the
+corresponding message catalog and the translated text is substituted in the
+generated PPD files. One message catalog file can be used by multiple driver
+information files, and each file contains a single language translation.</p>
+
+<h3><a name='PPDPO'>The ppdpo Utility</a></h3>
+
+<p>While CUPS includes localizations of all standard media sizes and options in
+several languages, your driver information files may provide their own media
+sizes and options that need to be localized. CUPS provides a utility program to
+aid in the localization of drivers called <a
+href='man-ppdpo.html'><tt>ppdpo(1)</tt></a>. The <tt>ppdpo</tt> program creates
+or updates a message catalog file based upon one or more driver information
+files. New messages are added with the word "TRANSLATE" added to the front of
+the translation string to make locating new strings for translation easier. The
+program accepts the message catalog filename and one or more driver information
+files.</p>
+
+<p>For example, run the following command to create a new German message catalog
+called <var>de.po</var> for all of the driver information files in the current
+directory:</p>
+
+<pre class='command'>
+ppdpo -o de.po *.drv
+</pre>
+
+<p>If the file <var>de.po</var> already exists, <tt>ppdpo</tt> will update the
+contents of the file with any new messages that need to be translated. To create
+an Apple .strings file instead, specify the output filename with a .strings
+extension, for example:</p>
+
+<pre class='command'>
+ppdpo -o de.strings *.drv
+</pre>
+
+<h3><a name='PPDC_CATALOG'>Using Message Catalogs with the PPD Compiler</a></h3>
+
+<p>Once you have created a message catalog, use the <a
+href='ref-ppdcfile.html#_po'><tt>#po</tt></a> directive to declare it in each
+driver information file. For example, to declare the German message catalog for
+a driver use:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_po'>#po</a> de "de.po"  // German
+</pre>
+
+<p>In fact, you can use the <tt>#po</tt> directive as many times as needed:</p>
+
+<pre class='example'>
+<a href='ref-ppdcfile.html#_po'>#po</a> de "de.po"  // German
+<a href='ref-ppdcfile.html#_po'>#po</a> es "es.po"  // Spanish
+<a href='ref-ppdcfile.html#_po'>#po</a> fr "fr.po"  // French
+<a href='ref-ppdcfile.html#_po'>#po</a> it "it.po"  // Italian
+<a href='ref-ppdcfile.html#_po'>#po</a> ja "ja.po"  // Japanese
+</pre>
+
+<p>The filename ("de.po", etc.) can be relative to the location of the driver
+information file or an absolute path. Once defined, the PPD compiler will
+automatically generate a globalized PPD for every language declared in your
+driver information file. To generate a single-language PPD file, simply use the
+<tt>-l</tt> option to list the corresponding locale, for example:</p>
+
+<pre class='command'>
+ppdc -l de -d ppd/de mydrivers.drv
+</pre>
+
+<p>to generate German PPD files.</p>

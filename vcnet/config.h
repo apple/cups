@@ -375,26 +375,10 @@
 
 
 /*
- * Do we have Darwin's CoreFoundation and SystemConfiguration frameworks?
- */
-
-/* #undef HAVE_COREFOUNDATION */
-/* #undef HAVE_SYSTEMCONFIGURATION */
-
-
-/*
  * Do we have <sys/ioctl.h>?
  */
 
 /* #undef HAVE_SYS_IOCTL_H */
-
-
-/*
- * Do we have mkstemp() and/or mkstemps()?
- */
-
-/* #undef HAVE_MKSTEMP */
-/* #undef HAVE_MKSTEMPS */
 
 
 /*

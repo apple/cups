@@ -158,8 +158,9 @@ install-libs: $(INSTALLSTATIC)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) libcupscgi.a $(LIBDIR)
+	$(INSTALL_LIB) -m 755 libcupscgi.a $(LIBDIR)
 	$(RANLIB) $(LIBDIR)/libcupscgi.a
+	$(CHMOD) 555 $(LIBDIR)/libcupscgi.a
 
 
 #

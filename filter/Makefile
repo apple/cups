@@ -164,8 +164,9 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) libcupsimage.a $(LIBDIR);
-	$(RANLIB) $(LIBDIR)/libcupsimage.a;
+	$(INSTALL_LIB) -m 755 libcupsimage.a $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/libcupsimage.a
+	$(CHMOD) 555 $(LIBDIR)/libcupsimage.a
 
 install32bit:
 	$(INSTALL_DIR) -m 755 $(LIB32DIR)
