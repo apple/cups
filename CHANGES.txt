@@ -1,8 +1,9 @@
-CHANGES.txt - 2009-06-11
+CHANGES.txt - 2009-06-12
 ------------------------
 
 CHANGES IN CUPS V1.4.0
 
+	- The USB backend on Mac OS X did not cleanly cancel a job.
 	- The network backends now set the connecting-to-device printer-state-
 	  reasons value when looking up the address and copying the print data
 	  for consistency.
