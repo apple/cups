@@ -656,7 +656,8 @@ main(int  argc,				/* I - Number of command-line args */
   * might contain username:password information...
   */
 
-  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, hostname, port, resource);
+  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL, hostname,
+		  port, resource);
 
  /*
   * First validate the destination and see if the device supports multiple
