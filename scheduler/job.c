@@ -2642,9 +2642,7 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   */
 
   cupsdSetPrinterReasons(job->printer, "-connecting-to-device");
-#ifdef __APPLE__
   cupsdSetPrinterReasons(job->printer, "-com.apple.print.recoverable-warning");
-#endif /* __APPLE__ */
 
  /*
   * Similarly, clear the "offline-report" reason for non-USB devices since we
@@ -4163,7 +4161,6 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsFreeOptions(num_keywords, keywords);
     }
-#ifdef __APPLE__
     else if (!strncmp(message, "recoverable:", 12))
     {
       ptr = message + 12;
@@ -4192,7 +4189,6 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       cupsdAddPrinterHistory(job->printer);
       event |= CUPSD_EVENT_PRINTER_STATE;
     }
-#endif /* __APPLE__ */
     else
     {
       cupsdLogJob(job, loglevel, "%s", message);
