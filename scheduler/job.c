@@ -2637,11 +2637,14 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "finalize_job(job=%p(%d))", job, job->id);
 
  /*
-  * Clear the "connecting-to-device" reason, which is only valid when a
-  * printer is processing...
+  * Clear the "connecting-to-device" and "com.apple.print.recoverable-warning"
+  * reasons, which are only valid when a printer is processing...
   */
 
   cupsdSetPrinterReasons(job->printer, "-connecting-to-device");
+#ifdef __APPLE__
+  cupsdSetPrinterReasons(job->printer, "-com.apple.print.recoverable-warning");
+#endif /* __APPLE__ */
 
  /*
   * Similarly, clear the "offline-report" reason for non-USB devices since we
