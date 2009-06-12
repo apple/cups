@@ -1,5 +1,14 @@
-CHANGES.txt - 2009-06-08
+CHANGES.txt - 2009-06-11
 ------------------------
+
+CHANGES IN CUPS V1.4.0
+
+	- The network backends now set the connecting-to-device printer-state-
+	  reasons value when looking up the address and copying the print data
+	  for consistency.
+	- The scheduler now supports the com.apple.print.recoverable-warning
+	  reason on all platforms.
+
 
 CHANGES IN CUPS V1.4rc1
 
