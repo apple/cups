@@ -3637,9 +3637,6 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 		  "%s", con, con->http.fd, filestats, filename, len,
 		  status ? "(null)" : filename);
 
-  if (!status)
-    con->http.data_remaining = (int)filestats->st_size;
-
   if (status)
     return (NULL);
   else
