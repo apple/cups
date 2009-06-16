@@ -4018,9 +4018,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         cupsdStopPrinter(job->printer, 1);
 	return;
       }
-      else
+      else if (cupsdSetPrinterReasons(job->printer, message))
       {
-	cupsdSetPrinterReasons(job->printer, message);
 	cupsdAddPrinterHistory(job->printer);
 	event |= CUPSD_EVENT_PRINTER_STATE;
       }
@@ -4169,25 +4168,31 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       if (*ptr)
       {
-	cupsdSetPrinterReasons(job->printer,
-	                       "+com.apple.print.recoverable-warning");
-	cupsdSetString(&(job->printer->recoverable), ptr);
-	cupsdAddPrinterHistory(job->printer);
-	event |= CUPSD_EVENT_PRINTER_STATE;
+	if (cupsdSetPrinterReasons(job->printer,
+				   "+com.apple.print.recoverable-warning") ||
+	    !job->printer->recoverable ||
+	    strcmp(job->printer->recoverable, ptr))
+	{
+	  cupsdSetString(&(job->printer->recoverable), ptr);
+	  cupsdAddPrinterHistory(job->printer);
+	  event |= CUPSD_EVENT_PRINTER_STATE;
+	}
       }
     }
     else if (!strncmp(message, "recovered:", 10))
     {
-      cupsdSetPrinterReasons(job->printer,
-                             "-com.apple.print.recoverable-warning");
-
       ptr = message + 10;
       while (isspace(*ptr & 255))
         ptr ++;
 
-      cupsdSetString(&(job->printer->recoverable), ptr);
-      cupsdAddPrinterHistory(job->printer);
-      event |= CUPSD_EVENT_PRINTER_STATE;
+      if (cupsdSetPrinterReasons(job->printer,
+                                 "-com.apple.print.recoverable-warning") ||
+	  !job->printer->recoverable || strcmp(job->printer->recoverable, ptr))
+      {
+	cupsdSetString(&(job->printer->recoverable), ptr);
+	cupsdAddPrinterHistory(job->printer);
+	event |= CUPSD_EVENT_PRINTER_STATE;
+      }
     }
     else
     {
