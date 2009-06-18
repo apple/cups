@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
 "PO-Revision-Date: 2009-02-20 16:43+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -2475,13 +2475,6 @@ msgstr "ERROR: %%EndProlog が見つかりません!\n"
 msgid "ERROR: Missing %%EndSetup!\n"
 msgstr "ERROR: %%EndSetup が見つかりません!\n"
 
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-"ERROR: コマンドラインにデバイス URI が見つからず、環境変数 DEVICE_URI も見つ"
-"かりません!\n"
-
 #, c-format
 msgid "ERROR: Missing value on line %d of banner file!\n"
 msgstr "ERROR: バナーファイルの %d 行目に値が見つかりません!\n"
@@ -3473,6 +3466,9 @@ msgstr "PPD ファイルポインターが NULL です"
 
 msgid "Name OID uses indefinite length"
 msgstr "OID 名は限定的な長さを使用します"
+
+msgid "Nested classes are not allowed!"
+msgstr ""
 
 msgid "Never"
 msgstr "Never"
@@ -5623,6 +5619,13 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600 DPI グレースケール"
+
+#~ msgid ""
+#~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr ""
+#~ "ERROR: コマンドラインにデバイス URI が見つからず、環境変数 DEVICE_URI も見"
+#~ "つかりません!\n"
 
 #~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
 #~ msgstr "ERROR: pdftops フィルターはシグナル %d で異常終了しました!\n"

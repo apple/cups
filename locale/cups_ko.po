@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -2437,12 +2437,6 @@ msgstr "ERROR: %%EndProlog가 유실됨!\n"
 msgid "ERROR: Missing %%EndSetup!\n"
 msgstr "ERROR: %%EndSetup이 유실됨!\n"
 
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-"ERROR: 명령 라인의 장비 URI가 유실되었고 DEVICE_URI 환경 변수가 없음!\n"
-
 #, c-format
 msgid "ERROR: Missing value on line %d of banner file!\n"
 msgstr "ERROR: 배너 파일의 %d번째 줄 값이 유실됨!\n"
@@ -3423,6 +3417,9 @@ msgstr "NULL PPD 파일 포인터"
 
 msgid "Name OID uses indefinite length"
 msgstr "이름 OID 길이가 무제한입니다"
+
+msgid "Nested classes are not allowed!"
+msgstr ""
 
 msgid "Never"
 msgstr "안 함"
@@ -5506,6 +5503,12 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600 DPI 그레이 스케일"
+
+#~ msgid ""
+#~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr ""
+#~ "ERROR: 명령 라인의 장비 URI가 유실되었고 DEVICE_URI 환경 변수가 없음!\n"
 
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: 임시 파일을 생성할 수 없음 - %s.\n"
