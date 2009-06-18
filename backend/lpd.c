@@ -113,7 +113,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
   const char	*device_uri;		/* Device URI */
-  char		method[255],		/* Method in URI */
+  char		scheme[255],		/* Scheme in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
 		resource[1024],		/* Resource info (printer name) */
@@ -193,9 +193,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
     return (CUPS_BACKEND_FAILED);
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
-                  method, sizeof(method), username, sizeof(username),
-		  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
+                  username, sizeof(username), hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
   if (!port)
@@ -429,6 +428,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     char		buffer[8192];	/* Buffer for copying */
     int			bytes;		/* Number of bytes read */
 
+
+    fputs("STATE: +connecting-to-device\n", stderr);
+    fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
@@ -695,6 +697,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
   sprintf(portname, "%d", port);
 
+  fputs("STATE: +connecting-to-device\n", stderr);
   fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
@@ -721,9 +724,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * First try to reserve a port for this connection...
     */
 
-    fputs("STATE: +connecting-to-device\n", stderr);
-    fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n",
-	    hostname, port, printer);
+    fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n", hostname,
+            port, printer);
     _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,

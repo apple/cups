@@ -50,6 +50,7 @@
 #include "debug.h"
 #include "globals.h"
 #include <stdlib.h>
+#include <errno.h>
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #  include <poll.h>
@@ -1406,7 +1407,6 @@ _httpResolveURI(
       fputs("STATE: +connecting-to-device\n", stderr);
       fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"%s\", "
                       "domain=\"local.\"...\n", hostname, regtype);
-      _cupsLangPuts(stderr, _("INFO: Looking for printer...\n"));
     }
 
     uri = NULL;
@@ -1418,36 +1418,65 @@ _httpResolveURI(
 			    hostname, regtype, "local.", resolve_callback,
 			    &uribuf) == kDNSServiceErr_NoError)
       {
-        if (strcasecmp(domain, "local."))
+	int	fds;			/* Number of ready descriptors */
+	time_t	timeout,		/* Poll timeout */
+		start_time = time(NULL);/* Start time */
+
+	for (;;)
 	{
+	  if (logit)
+	    _cupsLangPuts(stderr, _("INFO: Looking for printer...\n"));
+
 	 /*
-	  * Wait 2 seconds for a response to the local resolve; if nothing comes
-	  * in, do an additional domain resolution...
+	  * For the first minute, wakeup every 2 seconds to emit a
+	  * "looking for printer" message...
 	  */
+
+	  timeout = (time(NULL) < (start_time + 60)) ? 2000 : -1;
 
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
-	  if (poll(&polldata, 1, 2000) != 1)
+	  fds = poll(&polldata, 1, timeout);
+
+	  if (fds < 0)
+	  {
+	    if (errno != EINTR && errno != EAGAIN)
+	    {
+	      DEBUG_printf(("5_httpResolveURI: poll error: %s", strerror(errno)));
+	      break;
+	    }
+	  }
+	  else if (fds == 0)
 	  {
 	   /*
-	    * OK, send the domain name resolve...
+	    * Wait 2 seconds for a response to the local resolve; if nothing
+	    * comes in, do an additional domain resolution...
 	    */
 
-	    if (logit)
-	      fprintf(stderr, "DEBUG: Resolving \"%s\", regtype=\"%s\", "
-		              "domain=\"%s\"...\n", hostname, regtype, domain);
-
-	    domainref = ref;
-	    if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection, 0,
-				  hostname, regtype, domain, resolve_callback,
-				  &uribuf) == kDNSServiceErr_NoError)
-	      domainsent = 1;
+	    if (domainsent == 0 && strcasecmp(domain, "local."))
+	    {
+	      if (logit)
+		fprintf(stderr,
+		        "DEBUG: Resolving \"%s\", regtype=\"%s\", "
+			"domain=\"%s\"...\n", hostname, regtype, domain);
+  
+	      domainref = ref;
+	      if (DNSServiceResolve(&domainref, kDNSServiceFlagsShareConnection, 0,
+				    hostname, regtype, domain, resolve_callback,
+				    &uribuf) == kDNSServiceErr_NoError)
+		domainsent = 1;
+	    }
 	  }
-        }
-
-	if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError)
-	  uri = resolved_uri;
+	  else
+	  {
+	    if (DNSServiceProcessResult(ref) == kDNSServiceErr_NoError)
+	    {
+	      uri = resolved_uri;
+	      break;
+	    }
+	  }
+	}
 
 	if (domainsent)
 	  DNSServiceRefDeallocate(domainref);

@@ -3,6 +3,12 @@ CHANGES-1.3.txt
 
 CHANGES IN CUPS V1.3.11
 
+	- The scheduler did not prevent nested classes (STR #3211)
+	- The scheduler did not reprint processing jobs that were moved to
+	  another destination (STR #3222)
+	- The scheduler did not reset the current job file when stopping a
+	  printer (STR #3226)
+	- The scheduler did not handle POSTs to custom CGIs properly (STR #3221)
 	- The pdftops filter did not print landscape PDF pages properly
 	  (STR #2881)
 	- The scheduler did not handle partial header lines properly from CGI

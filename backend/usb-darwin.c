@@ -105,6 +105,14 @@ extern char **environ;
 
 
 /*
+ * DEBUG_WRITES, if defined, causes the backend to write data to the printer in
+ * 512 byte increments, up to 8192 bytes, to make debugging with a USB bus
+ * analyzer easier.
+ */
+
+#define DEBUG_WRITES 0
+
+/*
  * WAIT_EOF_DELAY is number of seconds we'll wait for responses from
  * the printer after we've finished sending all the data
  */
@@ -232,6 +240,9 @@ typedef struct globals_s
 
   int			print_fd;	/* File descriptor to print */
   ssize_t		print_bytes;	/* Print bytes read */
+#if DEBUG_WRITES
+  ssize_t		debug_bytes;	/* Current bytes to read */
+#endif /* DEBUG_WRITES */
 
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
@@ -318,8 +329,7 @@ print_device(const char *uri,		/* I - Device URI */
 {
   char		  serial[1024];		/* Serial number buffer */
   OSStatus	  status;		/* Function results */
-  IOReturn	  iostatus,		/* Current IO status */
-		  prev_iostatus = 0;	/* Previous IO status */
+  IOReturn	  iostatus;		/* Current IO status */
   pthread_t	  read_thread_id,	/* Read thread */
 		  sidechannel_thread_id;/* Side-channel thread */
   int		  have_sidechannel = 0;	/* Was the side-channel thread started? */
@@ -612,7 +622,16 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (FD_ISSET(print_fd, &input_set))
       {
+#if DEBUG_WRITES
+	g.debug_bytes += 512;
+        if (g.debug_bytes > sizeof(print_buffer))
+	  g.debug_bytes = 512;
+
+	g.print_bytes = read(print_fd, print_buffer, g.debug_bytes);
+
+#else
 	g.print_bytes = read(print_fd, print_buffer, sizeof(print_buffer));
+#endif /* DEBUG_WRITES */
 
 	if (g.print_bytes < 0)
 	{
@@ -646,8 +665,7 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (g.print_bytes)
       {
-	bytes = g.print_bytes;
-
+	bytes    = g.print_bytes;
 	iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 
        /*
@@ -662,26 +680,20 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 
        /*
-        * Ignore the first stall error we get since we try to clear any stalls
-	* in the class driver...
+        * If we've stalled, retry the write...
 	*/
 
 	else if (iostatus == kIOUSBPipeStalled)
 	{
 	  fputs("DEBUG: Got USB pipe stalled during write!\n", stderr);
 
-          bytes = 0;
-
-	  if (prev_iostatus != kIOUSBPipeStalled)
-	  {
-	    prev_iostatus = iostatus;
-	    iostatus      = 0;
-	  }
+	  bytes    = g.print_bytes;
+	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
 	}
 
        /*
-	* Ignore the first "aborted" status we get, since we might have
-	* received a signal (<rdar://problem/6860126>)...
+	* Retry a write after an aborted write since we probably just got
+	* SIGTERM (<rdar://problem/6860126>)...
 	*/
 
 	else if (iostatus == kIOReturnAborted)
@@ -691,16 +703,13 @@ print_device(const char *uri,		/* I - Device URI */
 	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n", err);
 
-          bytes = 0;
+#if DEBUG_WRITES
+          sleep(5);
+#endif /* DEBUG_WRITES */
 
-	  if (prev_iostatus != kIOReturnAborted)
-	  {
-	    prev_iostatus = iostatus;
-	    iostatus      = 0;
-	  }
+	  bytes    = g.print_bytes;
+	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
         }
-	else
-          prev_iostatus = iostatus;
 
 	if (iostatus || bytes < 0)
 	{

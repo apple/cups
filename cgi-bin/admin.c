@@ -492,6 +492,12 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
     request = ippNewRequest(CUPS_GET_PRINTERS);
 
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type",
+		  CUPS_PRINTER_LOCAL);
+    ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_ENUM, "printer-type-mask",
+		  CUPS_PRINTER_CLASS | CUPS_PRINTER_REMOTE |
+		      CUPS_PRINTER_IMPLICIT);
+
    /*
     * Do the request and get back a response...
     */

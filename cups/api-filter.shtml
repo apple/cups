@@ -127,7 +127,7 @@ when running print filters and backends:</p>
 
 <dl class="code">
 
-	<dt>APPLE_LANGUAGES</dt>
+	<dt>APPLE_LANGUAGE</dt>
 	<dd>The Apple language identifier associated with the job
 	(Mac OS X only).</dd>
 
@@ -264,7 +264,16 @@ prefix strings:</p>
 	current queue. Typically this is used to indicate persistent media,
 	ink, toner, and configuration conditions or errors on a printer.
 	<a href='#TABLE2'>Table 2</a> lists the standard state keywords -
-	use vendor-prefixed ("com.acme.foo") keywords for custom states.</dd>
+	use vendor-prefixed ("com.acme.foo") keywords for custom states.
+
+	<blockquote><b>Note:</b>
+
+	<p>"STATE:" messages often provide visible alerts to the user. For example, on
+	Mac OS X setting a printer-state-reason value with an "-error" or "-warning"
+	suffix will cause the printer's dock item to bounce if the corresponding reason
+	is localized with a cupsIPPReason keyword in the printer's PPD file.</p>
+
+	</blockquote></dd>
 
 	<dt>WARNING: message</dt>
 	<dd>Sets the printer-state-message attribute and adds the specified
@@ -275,7 +284,6 @@ prefix strings:</p>
 
 <p>Messages without one of these prefixes are treated as if they began with
 the "DEBUG:" prefix string.</p>
-
 
 <div class='table'><table width='80%' summary='Table 1: Standard marker-types Values'>
 <caption>Table 1: <a name='TABLE1'>Standard marker-types Values</a></caption>

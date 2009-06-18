@@ -82,6 +82,7 @@ cupsdInitEnv(void)
   cupsdSetEnv("CUPS_SERVERROOT", ServerRoot);
   cupsdSetEnv("CUPS_STATEDIR", StateDir);
   cupsdSetEnv("DYLD_LIBRARY_PATH", NULL);
+  cupsdSetEnv("HOME", TempDir);
   cupsdSetEnv("LD_ASSUME_KERNEL", NULL);
   cupsdSetEnv("LD_LIBRARY_PATH", NULL);
   cupsdSetEnv("LD_PRELOAD", NULL);

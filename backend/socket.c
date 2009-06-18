@@ -3,7 +3,7 @@
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -62,7 +62,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
      char *argv[])			/* I - Command-line arguments */
 {
   const char	*device_uri;		/* Device URI */
-  char		method[255],		/* Method in URI */
+  char		scheme[255],		/* Scheme in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info (not used) */
 		resource[1024],		/* Resource info (not used) */
@@ -168,9 +168,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
     return (CUPS_BACKEND_FAILED);
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
-                  method, sizeof(method), username, sizeof(username),
-		  hostname, sizeof(hostname), &port,
+  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
+                  username, sizeof(username), hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
 
   if (port == 0)
@@ -261,6 +260,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   sprintf(portname, "%d", port);
 
+  fputs("STATE: +connecting-to-device\n", stderr);
   fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
@@ -270,11 +270,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     return (CUPS_BACKEND_STOP);
   }
 
-  fprintf(stderr, "DEBUG: Connecting to %s:%d\n",
-	  hostname, port);
+  fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
   _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
-
-  fputs("STATE: +connecting-to-device\n", stderr);
 
   for (delay = 5;;)
   {
@@ -345,9 +342,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (recoverable)
   {
    /*
-    * If we've shown a recoverable error make sure the printer proxies
-    * have a chance to see the recovered message. Not pretty but
-    * necessary for now...
+    * If we've shown a recoverable error make sure the printer proxies have a
+    * chance to see the recovered message. Not pretty but necessary for now...
     */
 
     fputs("INFO: recovered: \n", stderr);

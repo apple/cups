@@ -3637,9 +3637,6 @@ get_file(cupsd_client_t *con,		/* I  - Client connection */
 		  "%s", con, con->http.fd, filestats, filename, len,
 		  status ? "(null)" : filename);
 
-  if (!status)
-    con->http.data_remaining = (int)filestats->st_size;
-
   if (status)
     return (NULL);
   else
@@ -4013,7 +4010,6 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   char		command[1024],		/* Command */
 		*argv[12],		/* Command-line arguments */
 		*envp[MAX_ENV + 1],	/* Environment variables */
-		home[1024],		/* HOME environment variable */
 		infofile[1024],		/* Type-in information for cert */
 		seedfile[1024];		/* Random number seed file */
   int		envc,			/* Number of environment variables */
@@ -4054,8 +4050,6 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Seeding the random number generator...");
 
-    snprintf(home, sizeof(home), "HOME=%s", TempDir);
-
    /*
     * Write the seed file...
     */
@@ -4084,8 +4078,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
     argv[5] = NULL;
 
     envc = cupsdLoadEnv(envp, MAX_ENV);
-    envp[envc++] = home;
-    envp[envc]   = NULL;
+    envp[envc] = NULL;
 
     if (!cupsdStartProcess(command, argv, envp, -1, -1, -1, -1, -1, 1, NULL,
                            NULL, &pid))

@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
 "POT-Creation-Date: 2009-06-05 14:00-0700\n"
-"PO-Revision-Date: 2009-05-23 13:15+0100\n"
+"PO-Revision-Date: 2009-06-14 21:00+0100\n"
 "Last-Translator: Juan Pablo González Riopedre <riopedre13@yahoo.es>\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -2574,7 +2574,7 @@ msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: No se ha podido copiar el archivo PDF"
 
 msgid "ERROR: Unable to create pipe"
-msgstr ""
+msgstr "ERROR: No se ha podido crear el canal (pipe)"
 
 msgid "ERROR: Unable to create socket"
 msgstr "ERROR: No se ha podido crear socket"
@@ -2599,7 +2599,7 @@ msgid "ERROR: Unable to execute pdftops program"
 msgstr "ERROR: No se ha podido ejecutar el programa pdftops"
 
 msgid "ERROR: Unable to execute pstops program"
-msgstr ""
+msgstr "ERROR: No se ha podido ejecutar el programa pstops"
 
 #, c-format
 msgid "ERROR: Unable to fork pictwpstops: %s\n"
@@ -5523,11 +5523,12 @@ msgstr "ppdc: No se ha proporcionado catálogo de mensajes para el idioma %s.\n"
 #, c-format
 msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
 msgstr ""
+"ppdc: Opción %s definida en dos diferentes grupos en la línea %d de %s.\n"
 
 #, c-format
 msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
 msgstr ""
-"ppdc: La opción %s redefinida con un tipo diferente en la línea %d de %s.\n"
+"ppdc: Opción %s redefinida con un tipo diferente en la línea %d de %s.\n"
 
 #, c-format
 msgid "ppdc: Option constraint must *name on line %d of %s!\n"
@@ -5690,14 +5691,3 @@ msgstr "sin título"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings usa una longitud indefinida"
 
-#~ msgid "600 DPI Grayscale"
-#~ msgstr "600 PPP escala de grises"
-
-#~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
-#~ msgstr "ERROR: filtro pdftops se ha colgado con la señal %d.\n"
-
-#~ msgid "ERROR: pdftops filter exited with status %d!\n"
-#~ msgstr "ERROR: filtro pdftops se ha cerrado con el estado %d.\n"
-
-#~ msgid "Unknown printer error (%s)!"
-#~ msgstr "Error de impresión desconocido (%s)."

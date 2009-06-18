@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_options;		/* Number of printer options */
   cups_option_t	*options;		/* Printer options */
   const char	*device_uri;		/* Device URI */
-  char		method[255],		/* Method in URI */
+  char		scheme[255],		/* Scheme in URI */
 		hostname[1024],		/* Hostname */
 		username[255],		/* Username info */
 		resource[1024],		/* Resource info (printer name) */
@@ -236,21 +236,14 @@ main(int  argc,				/* I - Number of command-line args */
   if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
     return (CUPS_BACKEND_FAILED);
 
-  if (httpSeparateURI(HTTP_URI_CODING_ALL, device_uri,
-                      method, sizeof(method), username, sizeof(username),
-		      hostname, sizeof(hostname), &port,
-		      resource, sizeof(resource)) < HTTP_URI_OK)
-  {
-    _cupsLangPuts(stderr,
-                  _("ERROR: Missing device URI on command-line and no "
-		    "DEVICE_URI environment variable!\n"));
-    return (CUPS_BACKEND_STOP);
-  }
+  httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
+                  username, sizeof(username), hostname, sizeof(hostname), &port,
+		  resource, sizeof(resource));
 
   if (!port)
     port = IPP_PORT;			/* Default to port 631 */
 
-  if (!strcmp(method, "https"))
+  if (!strcmp(scheme, "https"))
     cupsSetEncryption(HTTP_ENCRYPT_ALWAYS);
   else
     cupsSetEncryption(HTTP_ENCRYPT_IF_REQUESTED);
@@ -421,6 +414,9 @@ main(int  argc,				/* I - Number of command-line args */
     off_t		tbytes;		/* Total bytes copied */
 
 
+    fputs("STATE: +connecting-to-device\n", stderr);
+    fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
+
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
       _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
@@ -544,8 +540,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   do
   {
-    fprintf(stderr, "DEBUG: Connecting to %s:%d\n",
-	    hostname, port);
+    fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
     _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
@@ -661,7 +656,8 @@ main(int  argc,				/* I - Number of command-line args */
   * might contain username:password information...
   */
 
-  snprintf(uri, sizeof(uri), "%s://%s:%d%s", method, hostname, port, resource);
+  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), scheme, NULL, hostname,
+		  port, resource);
 
  /*
   * First validate the destination and see if the device supports multiple
