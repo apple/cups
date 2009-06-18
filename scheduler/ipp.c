@@ -1190,6 +1190,12 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
                 	_("The printer or class was not found."));
 	return;
       }
+      else if (dtype & CUPS_PRINTER_CLASS)
+      {
+        send_ipp_status(con, IPP_BAD_REQUEST,
+			_("Nested classes are not allowed!"));
+        return;
+      }
 
      /*
       * Add it to the class...
