@@ -4,6 +4,7 @@ CHANGES.txt - 2009-06-18
 CHANGES IN CUPS V1.4.0
 
 	- Localization updates (STR #3223)
+	- Documentation updates (STR #3225)
 	- Fixed a HTML error in the add and modify printer web interface templates
 	  (STR #3229)
 	- The scheduler did not minimize the number of printer state events that
