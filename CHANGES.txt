@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-06-18
+CHANGES.txt - 2009-06-22
 ------------------------
 
 CHANGES IN CUPS V1.4.0
