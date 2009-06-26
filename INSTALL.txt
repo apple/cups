@@ -1,5 +1,5 @@
-INSTALL - CUPS v1.4rc1 - 2009-05-22
------------------------------------
+INSTALL - CUPS v1.4.0 - 2009-06-26
+----------------------------------
 
 This file describes how to compile and install CUPS from source code. For more
 information on CUPS see the file called "README.txt".  A complete change log can
@@ -43,7 +43,7 @@ COMPILING THE SUBVERSION REPOSITORY CODE
     configure script.  You'll need to run the GNU autoconf software (2.60 or
     higher) to create it:
 
-	autoconf -f
+	autoconf
 
 
 CONFIGURATION
