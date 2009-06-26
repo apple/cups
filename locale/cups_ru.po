@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -2446,13 +2446,6 @@ msgstr "ERROR: Отсутствует %%EndProlog!\n"
 msgid "ERROR: Missing %%EndSetup!\n"
 msgstr "ERROR: Отсутствует %%EndSetup!\n"
 
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-"ERROR: Отсутствует идентификатор URI устройства в командной строке и "
-"переменная окружения DEVICE_URI!\n"
-
 #, c-format
 msgid "ERROR: Missing value on line %d of banner file!\n"
 msgstr "ERROR: Отсутствует значение в строке %d в файле баннера!\n"
@@ -3443,6 +3436,9 @@ msgstr "Указатель PPD-файла установлен на NULL"
 
 msgid "Name OID uses indefinite length"
 msgstr "Для имени OID длина не установлена"
+
+msgid "Nested classes are not allowed!"
+msgstr ""
 
 msgid "Never"
 msgstr "Никогда"
@@ -5563,6 +5559,13 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600dpi, оттенки серого"
+
+#~ msgid ""
+#~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr ""
+#~ "ERROR: Отсутствует идентификатор URI устройства в командной строке и "
+#~ "переменная окружения DEVICE_URI!\n"
 
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Не удается создать временный файл – %s.\n"

@@ -1491,7 +1491,8 @@ const char *cupsGetPPD (<br>
 in the class.<br>
 <br>
 The returned filename is stored in a static buffer and is overwritten with
-each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.</p>
+each call to <code>cupsGetPPD</code> or <a href="#cupsGetPPD2"><code>cupsGetPPD2</code></a>.  The caller &quot;owns&quot; the
+file that is created and must <code>unlink</code> the returned filename.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.21/Mac OS X 10.4&nbsp;</span><a name="cupsGetPPD2">cupsGetPPD2</a></h3>
 <p class="description">Get the PPD file for a printer from the specified server.</p>
 <p class="code">
@@ -1513,7 +1514,8 @@ const char *cupsGetPPD2 (<br>
 in the class.<br>
 <br>
 The returned filename is stored in a static buffer and is overwritten with
-each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.
+each call to <a href="#cupsGetPPD"><code>cupsGetPPD</code></a> or <code>cupsGetPPD2</code>.  The caller &quot;owns&quot; the
+file that is created and must <code>unlink</code> the returned filename.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetPPD3">cupsGetPPD3</a></h3>
@@ -1549,7 +1551,8 @@ the server.<br>
 <br>
 The &quot;buffer&quot; parameter contains the local PPD filename.  If it contains
 the empty string, a new temporary file is created, otherwise the existing
-file will be overwritten as needed.<br>
+file will be overwritten as needed.  The caller &quot;owns&quot; the file that is
+created and must <code>unlink</code> the returned filename.<br>
 <br>
 On success, <code>HTTP_OK</code> is returned for a new PPD file and
 <code>HTTP_NOT_MODIFIED</code> if the existing PPD file is up-to-date.  Any other

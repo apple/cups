@@ -809,7 +809,8 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
  * in the class.
  *
  * The returned filename is stored in a static buffer and is overwritten with
- * each call to @code cupsGetPPD@ or @link cupsGetPPD2@.
+ * each call to @code cupsGetPPD@ or @link cupsGetPPD2@.  The caller "owns" the
+ * file that is created and must @code unlink@ the returned filename.
  */
 
 const char *				/* O - Filename for PPD file */
@@ -840,7 +841,8 @@ cupsGetPPD(const char *name)		/* I - Destination name */
  * in the class.
  *
  * The returned filename is stored in a static buffer and is overwritten with
- * each call to @link cupsGetPPD@ or @code cupsGetPPD2@.
+ * each call to @link cupsGetPPD@ or @code cupsGetPPD2@.  The caller "owns" the
+ * file that is created and must @code unlink@ the returned filename.
  *
  * @since CUPS 1.1.21/Mac OS X 10.4@
  */
@@ -873,7 +875,8 @@ cupsGetPPD2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_DE
  *
  * The "buffer" parameter contains the local PPD filename.  If it contains
  * the empty string, a new temporary file is created, otherwise the existing
- * file will be overwritten as needed.
+ * file will be overwritten as needed.  The caller "owns" the file that is
+ * created and must @code unlink@ the returned filename.
  *
  * On success, @code HTTP_OK@ is returned for a new PPD file and
  * @code HTTP_NOT_MODIFIED@ if the existing PPD file is up-to-date.  Any other

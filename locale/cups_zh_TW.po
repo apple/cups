@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -2419,11 +2419,6 @@ msgstr "ERROR: 遺失 %%EndProlog！\n"
 msgid "ERROR: Missing %%EndSetup!\n"
 msgstr "ERROR: 遺失 %%EndSetup！\n"
 
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr "ERROR: 指令行遺失設備 URI 且沒有 DEVICE_URI 環境變數！\n"
-
 #, c-format
 msgid "ERROR: Missing value on line %d of banner file!\n"
 msgstr "ERROR: 標語檔案的第 %d 行遺失值！\n"
@@ -3398,6 +3393,9 @@ msgstr "NULL PPD 檔案指標"
 
 msgid "Name OID uses indefinite length"
 msgstr "名稱 OID 使用的長度不確定"
+
+msgid "Nested classes are not allowed!"
+msgstr ""
 
 msgid "Never"
 msgstr "永不"
@@ -5467,6 +5465,11 @@ msgstr "variable-bindings 使用的長度不確定"
 
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600 DPI 灰階"
+
+#~ msgid ""
+#~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr "ERROR: 指令行遺失設備 URI 且沒有 DEVICE_URI 環境變數！\n"
 
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: 無法製作暫存檔 - %s。\n"

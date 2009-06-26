@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-05 14:00-0700\n"
+"POT-Creation-Date: 2009-06-18 15:43-0700\n"
 "PO-Revision-Date: 2009-02-12 15:10+0200\n"
 "Last-Translator: Teppo Turtiainen <teppot@iki.fi>\n"
 "Language-Team: Finnish\n"
@@ -2454,13 +2454,6 @@ msgstr "ERROR: %%EndProlog puuttuu!\n"
 msgid "ERROR: Missing %%EndSetup!\n"
 msgstr "ERROR: %%EndSetup puuttuu!\n"
 
-msgid ""
-"ERROR: Missing device URI on command-line and no DEVICE_URI environment "
-"variable!\n"
-msgstr ""
-"ERROR: Laitteen osoite puuttuu komentoriviltä eikä DEVICE_URI-"
-"ympäristömuuttujaa ole määritelty!\n"
-
 #, c-format
 msgid "ERROR: Missing value on line %d of banner file!\n"
 msgstr "ERROR: Arvo puuttuu otsikkotiedoston riviltä %d!\n"
@@ -3448,6 +3441,9 @@ msgstr "PPD-tiedoston osoitin NULL"
 
 msgid "Name OID uses indefinite length"
 msgstr "Nimi-OID käyttää määrittelemätöntä pituutta"
+
+msgid "Nested classes are not allowed!"
+msgstr ""
 
 msgid "Never"
 msgstr "Ei koskaan"
@@ -5557,6 +5553,13 @@ msgstr "variable-bindings käyttää määrittämätöntä pituutta"
 
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600 dpi harmaasävy"
+
+#~ msgid ""
+#~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr ""
+#~ "ERROR: Laitteen osoite puuttuu komentoriviltä eikä DEVICE_URI-"
+#~ "ympäristömuuttujaa ole määritelty!\n"
 
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: Tilapäistiedostoa ei voida luoda - %s.\n"
