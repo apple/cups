@@ -409,8 +409,6 @@ main(int  argc,				/* I - Number of command-line args */
 
     int			fd;		/* File descriptor */
     http_addrlist_t	*addrlist;	/* Address list */
-    char		buffer[8192];	/* Buffer for copying */
-    int			bytes;		/* Number of bytes read */
     off_t		tbytes;		/* Total bytes copied */
 
 
@@ -434,23 +432,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
-    tbytes = 0;
-
-    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-    {
-      if (write(fd, buffer, bytes) < bytes)
-      {
-        _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
-	close(fd);
-	unlink(tmpfilename);
-	return (CUPS_BACKEND_FAILED);
-      }
-      else
-        tbytes += bytes;
-
-      if (snmp_fd >= 0)
-	backendCheckSideChannel(snmp_fd, &(addrlist->addr));
-    }
+    tbytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0,
+                            backendNetworkSideCB);
 
     if (snmp_fd >= 0)
       _cupsSNMPClose(snmp_fd);

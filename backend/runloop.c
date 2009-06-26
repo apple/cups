@@ -196,6 +196,14 @@ backendRunLoop(
     signal(SIGTERM, SIG_IGN);
 #endif /* HAVE_SIGSET */
   }
+  else if (print_fd < 0)
+  {
+   /*
+    * Copy print data from stdin, but don't mess with the signal handlers...
+    */
+
+    print_fd = 0;
+  }
 
  /*
   * Figure out the maximum file descriptor value to use with select()...

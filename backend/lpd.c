@@ -425,8 +425,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     http_addrlist_t	*addrlist;	/* Address list */
     int			snmp_fd;	/* SNMP socket */
-    char		buffer[8192];	/* Buffer for copying */
-    int			bytes;		/* Number of bytes read */
 
 
     fputs("STATE: +connecting-to-device\n", stderr);
@@ -449,19 +447,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
-    while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
-    {
-      if (write(fd, buffer, bytes) < bytes)
-      {
-        _cupsLangPrintError(_("ERROR: Unable to write to temporary file"));
-	close(fd);
-	unlink(tmpfilename);
-	return (CUPS_BACKEND_FAILED);
-      }
-
-      if (snmp_fd >= 0)
-	backendCheckSideChannel(snmp_fd, &(addrlist->addr));
-    }
+    backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, backendNetworkSideCB);
 
     if (snmp_fd >= 0)
       _cupsSNMPClose(snmp_fd);
