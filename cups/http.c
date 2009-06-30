@@ -3004,6 +3004,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->error  = errno;
     http->status = HTTP_ERROR;
 
+    gnutls_deinit(conn->session);
+    gnutls_certificate_free_credentials(*credentials);
+    free(credentials);
+    free(conn);
+
     return (-1);
   }
 
