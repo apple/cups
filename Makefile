@@ -392,6 +392,7 @@ docset:	apihelp
 	echo Indexing docset...
 	/Developer/usr/bin/docsetutil index org.cups.docset
 	echo Generating docset archive and feed...
+	$(RM) org.cups.docset.atom
 	/Developer/usr/bin/docsetutil package --output org.cups.docset.xar \
 		--atom org.cups.docset.atom \
 		--download-url http://www.cups.org/org.cups.docset.xar \
