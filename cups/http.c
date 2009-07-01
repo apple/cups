@@ -3004,6 +3004,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     http->error  = errno;
     http->status = HTTP_ERROR;
 
+    gnutls_deinit(conn->session);
+    gnutls_certificate_free_credentials(*credentials);
+    free(credentials);
+    free(conn);
+
     return (-1);
   }
 
@@ -3139,6 +3144,13 @@ http_upgrade(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("7http_upgrade(%p)", http));
 
  /*
+  * Flush the connection to make sure any previous "Upgrade" message
+  * has been read.
+  */
+
+  httpFlush(http);
+
+ /*
   * Copy the HTTP data to a local variable so we can do the OPTIONS
   * request without interfering with the existing request data...
   */
@@ -3164,8 +3176,6 @@ http_upgrade(http_t *http)		/* I - Connection to server */
 
     while (httpUpdate(http) == HTTP_CONTINUE);
   }
-
-  httpFlush(http);
 
  /*
   * Restore the HTTP request data...

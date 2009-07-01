@@ -1,10 +1,11 @@
-CHANGES.txt - 2009-06-26
+CHANGES.txt - 2009-07-01
 ------------------------
 
 CHANGES IN CUPS V1.4.0
 
 	- Localization updates (STR #3223)
 	- Documentation updates (STR #3225, STR #3230)
+	- The web interface didn't show the default options (STR #3244)
 	- The IPP and LPD backends needed print data before they would do an
 	  SNMP query.
 	- Fixed a GNU TLS compatibility issue (STR #3231)

@@ -1165,7 +1165,7 @@ static Boolean list_device_cb(void *refcon,
 	snprintf(optionsstr, sizeof(optionsstr), "?location=%x", (unsigned)deviceLocation);
 
       httpAssembleURI(HTTP_URI_CODING_ALL, uristr, sizeof(uristr), "usb", NULL, makestr, 0, modelstr);
-      strncat(uristr, optionsstr, sizeof(uristr));
+      strlcat(uristr, optionsstr, sizeof(uristr));
 
       cupsBackendReport("direct", uristr, make_modelstr, make_modelstr, idstr,
                         NULL);

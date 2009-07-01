@@ -357,7 +357,7 @@ write_index(const char   *path,		/* I - File to write */
 
 static void
 write_info(const char *path,		/* I - File to write */
-           const char *revision)	/* I - Version number */
+           const char *revision)	/* I - Subversion revision number */
 {
   cups_file_t	*fp;			/* File */
 
@@ -379,14 +379,22 @@ write_info(const char *path,		/* I - File to write */
 		     "\t<key>CFBundleName</key>\n"
 		     "\t<string>CUPS Documentation</string>\n"
 		     "\t<key>CFBundleVersion</key>\n"
-		     "\t<string>1.4.%s</string>\n"
+		     "\t<string>%d.%d.%s</string>\n"
+		     "\t<key>CFBundleShortVersionString</key>\n"
+		     "\t<string>%d.%d.%d</string>\n"
 		     "\t<key>DocSetFeedName</key>\n"
 		     "\t<string>cups.org</string>\n"
 		     "\t<key>DocSetFeedURL</key>\n"
-		     "\t<string>http://www.cups.org/org.cups.docset.xar"
+		     "\t<string>http://www.cups.org/org.cups.docset.atom"
 		     "</string>\n"
+		     "\t<key>DocSetPublisherIdentifier</key>\n"
+		     "\t<string>org.cups</string>\n"
+		     "\t<key>DocSetPublisherName</key>\n"
+		     "\t<string>CUPS</string>\n"
 		     "</dict>\n"
-		     "</plist>\n", revision);
+		     "</plist>\n",
+		     CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, revision,
+		     CUPS_VERSION_MAJOR, CUPS_VERSION_MINOR, CUPS_VERSION_PATCH);
 
   cupsFileClose(fp);
 }
