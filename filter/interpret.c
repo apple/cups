@@ -204,6 +204,15 @@ cupsRasterInterpretPPD(
 
   strcpy(h->cupsPageSizeName, "Letter");
 
+#ifdef __APPLE__
+ /*
+  * cupsInteger0 is also used for the total page count on Mac OS X; set an
+  * uncommon default value so we can tell if the driver is using cupsInteger0.
+  */
+
+  h->cupsInteger[0] = 0x80000000;
+#endif /* __APPLE__ */
+
  /*
   * Apply patches and options to the page header...
   */

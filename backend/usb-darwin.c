@@ -2210,12 +2210,11 @@ static void get_device_id(cups_sc_status_t *status,
 			  char *data,
 			  int *datalen)
 {
-  UInt32 deviceLocation = 0;
-  UInt8	interfaceNum = 0;
   CFStringRef deviceIDString = NULL;
 
   /* GetDeviceID */
-  copy_devicestring(g.printer_obj, &deviceIDString, &deviceLocation, &interfaceNum);
+  copy_deviceid(g.classdriver, &deviceIDString);
+
   if (deviceIDString)
   {
     CFStringGetCString(deviceIDString, data, *datalen, kCFStringEncodingUTF8);
