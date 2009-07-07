@@ -135,8 +135,14 @@ to the access log file. The following levels are defined:</P>
 address, or network that is allowed access to the server. 
 <CODE>Allow</CODE> directives are cummulative, so multiple
 <CODE>Allow</CODE> directives can be used to allow access for
-multiple hosts or networks.  The <CODE>/mm</CODE> notation
-specifies a CIDR netmask, as shown in Table 1.</P>
+multiple hosts or networks.</P>
+
+<P>Host and domain name matching require that you enable the <A
+HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive.</P>
+
+<P>The <CODE>/mm</CODE> notation specifies a CIDR netmask, as shown in
+<A HREF="#TABLE1">Table 1</A>.</P>
 
 <DIV CLASS="table"><TABLE SUMMARY="CIDR Netmasks">
 <CAPTION>Table 1: <A NAME="TABLE1">CIDR Netmasks</A></CAPTION>
@@ -388,10 +394,10 @@ browse packets from all hosts.</P>
 HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
 directive.</P>
 
-<P>IP address matching supports exact matches, partial addresses
-that match networks using netmasks of 255.0.0.0, 255.255.0.0, and
-255.255.255.0, or network addresses using the specified netmask
-or bit count.</P>
+<P>IP address matching supports exact matches, partial addresses that match
+networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0, or network
+addresses using the specified netmask or bit count. The <CODE>/mm</CODE>
+notation specifies a CIDR netmask, a shown in <A HREF="TABLE1">Table 1</A>.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will allow browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will allow
@@ -426,10 +432,10 @@ browse packets from any hosts.</P>
 HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
 directive.</P>
 
-<P>IP address matching supports exact matches, partial addresses
-that match networks using netmasks of 255.0.0.0, 255.255.0.0, and
-255.255.255.0, or network addresses using the specified netmask
-or bit count.</P>
+<P>IP address matching supports exact matches, partial addresses that match
+networks using netmasks of 255.0.0.0, 255.255.0.0, and 255.255.255.0, or network
+addresses using the specified netmask or bit count. The <CODE>/mm</CODE>
+notation specifies a CIDR netmask, a shown in <A HREF="TABLE1">Table 1</A>.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will block browse data from all
 local interfaces. The <CODE>@IF(name)</CODE> name will block
@@ -1077,9 +1083,14 @@ printers are shared (published) by default. The default is
 address, or network that is denied access to the server.
 <CODE>Deny</CODE> directives are cummulative, so multiple
 <CODE>Deny</CODE> directives can be used to allow access for
-multiple hosts or networks. The <CODE>/mm</CODE> notation
-specifies a CIDR netmask, a shown in <A HREF="TABLE1">Table
-1</A>.</P>
+multiple hosts or networks.</P>
+
+<P>Host and domain name matching require that you enable the <A
+HREF="#HostNameLookups"><CODE>HostNameLookups</CODE></A>
+directive.</P>
+
+<P>The <CODE>/mm</CODE> notation specifies a CIDR netmask, a shown in
+<A HREF="TABLE1">Table 1</A>.</P>
 
 <P>The <CODE>@LOCAL</CODE> name will deny access from all local
 interfaces. The <CODE>@IF(name)</CODE> name will deny access from

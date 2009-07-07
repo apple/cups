@@ -3379,11 +3379,8 @@ load_job_cache(const char *filename)	/* I - job.cache filename */
     {
       cupsArrayAdd(Jobs, job);
 
-      if (job->state_value <= IPP_JOB_STOPPED)
-      {
-        cupsArrayAdd(ActiveJobs, job);
-	cupsdLoadJob(job);
-      }
+      if (job->state_value <= IPP_JOB_STOPPED && cupsdLoadJob(job))
+	cupsArrayAdd(ActiveJobs, job);
 
       job = NULL;
     }
@@ -3635,18 +3632,19 @@ load_request_root(void)
       * Load the job...
       */
 
-      cupsdLoadJob(job);
+      if (cupsdLoadJob(job))
+      {
+       /*
+        * Insert the job into the array, sorting by job priority and ID...
+        */
 
-     /*
-      * Insert the job into the array, sorting by job priority and ID...
-      */
+	cupsArrayAdd(Jobs, job);
 
-      cupsArrayAdd(Jobs, job);
-
-      if (job->state_value <= IPP_JOB_STOPPED)
-        cupsArrayAdd(ActiveJobs, job);
-      else
-        unload_job(job);
+	if (job->state_value <= IPP_JOB_STOPPED)
+	  cupsArrayAdd(ActiveJobs, job);
+	else
+	  unload_job(job);
+      }
     }
 
   cupsDirClose(dir);

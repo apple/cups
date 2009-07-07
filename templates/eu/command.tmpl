@@ -1,0 +1,12 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">{title} {printer_name} inprimagailuan</H2>
+
+<P>{job_state>5?:<IMG SRC="/images/wait.gif" WIDTH="16" HEIGHT="16"
+ALIGN="ABSMIDDLE" ALT="Lanpetuta egoeraren adierazlea"> }Inprimagailuaren lanaren komandoa
+{job_state=3?zain:{job_state=4?eutsita:
+{job_state=5?processing:{job_state=6?geldituta:
+{job_state=7?bertan behera utzita:{job_state=8?abortatuta:burututa}}}}}}{job_state=9?:{job_printer_state_message?,
+<EM>"{job_printer_state_message}"</EM>:}}</P>
+
+</DIV>

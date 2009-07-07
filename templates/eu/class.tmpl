@@ -1,0 +1,41 @@
+<DIV CLASS="indent">
+<H2 CLASS="title"><A HREF="{printer_uri_supported}">{printer_name}</A>
+({printer_state=3?Inaktiboa:{printer_state=4?Prozesatzen:Pausatuta}},
+{printer_is_accepting_jobs=0?Lanak ukatzen:Lanak onartzen},
+{default_name={printer_name}?, zerbitzariaren lehenetsiak:} partekatuta {server_is_sharing_printers=0?ez:{printer_is_shared=0?ez:}} daude)</H2>
+
+<FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
+<OPTION VALUE="">Mantenimendua</OPTION>
+<OPTION VALUE="print-test-page">Inprimatu probako orrialdea</OPTION>
+{printer_state=5?<OPTION VALUE="start-class">Jarraitu klasea</OPTION>:<OPTION VALUE="stop-class">Pausatu klasea</OPTION>}
+{printer_is_accepting_jobs=0?<OPTION VALUE="accept-jobs">Onartu lanak</OPTION>:<OPTION VALUE="reject-jobs">Ukatu lanak</OPTION>}
+<OPTION VALUE="move-jobs">Aldatu lan guztiak lekuz</OPTION>
+<OPTION VALUE="purge-jobs">Bertan behera utzi lan guztiak</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
+<SELECT NAME="OP" ONCHANGE="document.administration.submit();">
+<OPTION VALUE="">Administrazioa</OPTION>
+<OPTION VALUE="modify-class">Aldatu klasea</OPTION>
+<OPTION VALUE="delete-class">Ezabatu klasea</OPTION>
+<OPTION VALUE="set-class-options">Ezarri aukera lehenetsiak</OPTION>
+<OPTION VALUE="set-as-default">Ezarri zerbitzari lehenetsi gisa</OPTION>
+<OPTION VALUE="set-allowed-users">Ezarri baimendutako erabiltzaileak</OPTION>
+</SELECT>
+<INPUT TYPE="SUBMIT" VALUE="Go" STYLE="display: none;">
+</FORM>
+
+<TABLE SUMMARY="{printer_name}">
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Deskripzioa:</TH><TD>{printer_info}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Kokalekua:</TH><TD>{printer_location}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Kideak:</TH><TD>{?member_uris=?Bat ere ez:{member_uris}}</TD></TR>
+<TR><TH ALIGN="RIGHT" VALIGN="TOP">Aukera lehenetsiak:</TH><TD>job-sheets={job_sheets_default}
+papera={media_default?{media_default}:ezezaguna}
+{sides_default?sides={sides_default}:}</TD></TR>
+</TABLE>
+
+</DIV>
