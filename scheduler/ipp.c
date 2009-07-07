@@ -11168,7 +11168,7 @@ url_encode_string(const char *s,	/* I - String */
 
   while (*s && bufptr < bufend)
   {
-    if (*s == ' ' || *s == '%')
+    if (*s == ' ' || *s == '%' || *s == '+')
     {
       if (bufptr >= (bufend - 2))
 	break;
