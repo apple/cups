@@ -1,0 +1,32 @@
+<DIV CLASS="indent">
+
+<H2 CLASS="title">Aldatu {printer_name} klasea</H2>
+
+<FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
+
+<TABLE>
+<TR>
+<TH CLASS="label">Deskripzioa:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_INFO" VALUE="{?printer_info}" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kokalekua:</TH>
+<TD><INPUT TYPE="TEXT" NAME="PRINTER_LOCATION" VALUE="{?printer_location}" SIZE="40" MAXLENGTH="127"></TD>
+</TR>
+<TR>
+<TH CLASS="label">Kideak:</TH>
+<TD>
+<SELECT NAME="MEMBER_URIS" SIZE="10" MULTIPLE>
+{[member_uris]<OPTION VALUE="{member_uris}" {?member_selected}>{member_names}}
+</SELECT>
+</TD>
+</TR>
+<TR>
+<TD></TD>
+<TD><INPUT TYPE="SUBMIT" VALUE="Aldatu klasea"></TD>
+</TR>
+</TABLE>
+
+</FORM>
+</DIV>
