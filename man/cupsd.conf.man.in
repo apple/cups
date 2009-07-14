@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "19 April 2009" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "14 July 2009" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -306,6 +306,12 @@ Deny @IF(name)
 Deny @LOCAL
 .br
 Denies access to the named host or address.
+.TP 5
+DirtyCleanInterval seconds
+.br
+Specifies the delay for updating of configuration and state files. A value of 0
+causes the update to happen as soon as possible, typically within a few
+milliseconds.
 .TP 5
 DocumentRoot directory
 .br

@@ -3339,8 +3339,9 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
  * 'get_cdsa_certificate()' - Get a SSL/TLS certificate from the System keychain.
  */
 
-static CFArrayRef				/* O - Array of certificates */
-get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
+static CFArrayRef			/* O - Array of certificates */
+get_cdsa_certificate(
+    cupsd_client_t *con)		/* I - Client connection */
 {
   OSStatus		err;		/* Error info */
   SecKeychainRef	keychain;	/* Keychain reference */
@@ -3368,6 +3369,7 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
   CSSM_DATA		options;	/* Policy options */
   CSSM_APPLE_TP_SSL_OPTIONS
 			ssl_options;	/* SSL Option for hostname */
+  char			localname[1024];/* Local hostname */
 
 
   if (SecPolicySearchCreate(CSSM_CERT_X_509v3, &CSSMOID_APPLE_TP_SSL, 
@@ -3410,6 +3412,35 @@ get_cdsa_certificate(cupsd_client_t *con)	/* I - Client connection */
 
   err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
 					  keychain, FALSE, &search);
+  if (err && DNSSDHostName)
+  {
+   /*
+    * Search for the connection server name failed; try the DNS-SD .local
+    * hostname instead...
+    */
+
+    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
+
+    ssl_options.ServerName    = localname;
+    ssl_options.ServerNameLen = strlen(localname);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "get_cdsa_certificate: Looking for certs for \"%s\"...",
+		    localname);
+
+    if (SecPolicySetValue(policy, &options))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Cannot set policy value to use for searching");
+      CFRelease(keychain);
+      CFRelease(policy_search);
+      return (NULL);
+    }
+
+    err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					    keychain, FALSE, &search);
+  }
+
 #  else
  /*
   * Assume there is exactly one SecIdentity in the keychain...

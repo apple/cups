@@ -750,7 +750,7 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
     {
       cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 		      strerror(errno));
-      return;
+      goto cleanup;
     }
   }
 
@@ -762,10 +762,9 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
     {
       cupsdLogMessage(CUPSD_LOG_EMERG, "kevent() returned %s",
 		      strerror(errno));
-      return;
+      goto cleanup;
     }
   }
-
 
 #elif defined(HAVE_POLL)
  /*
@@ -780,6 +779,10 @@ cupsdRemoveSelect(int fd)		/* I - File descriptor */
   FD_CLR(fd, &cupsd_current_input);
   FD_CLR(fd, &cupsd_current_output);
 #endif /* HAVE_EPOLL */
+
+#ifdef HAVE_KQUEUE
+  cleanup:
+#endif /* HAVE_KQUEUE */
 
  /*
   * Remove the file descriptor from the active array and add to the

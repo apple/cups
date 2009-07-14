@@ -3032,7 +3032,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
-      if (!strncmp(attr->name, "time-", 5))
+      if (!strncmp(attr->name, "time-", 5) ||
+          !strcmp(attr->name, "job-hold-until"))
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) &&

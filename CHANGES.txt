@@ -1,10 +1,17 @@
-CHANGES.txt - 2009-07-07
+CHANGES.txt - 2009-07-14
 ------------------------
 
 CHANGES IN CUPS V1.4.0
 
 	- Localization updates (STR #3223, STR #3246, STR #3248, STR #3250)
-	- Documentation updates (STR #3225, STR #3230, STR #3242)
+	- Documentation updates (STR #3225, STR #3230, STR #3242, STR #3260)
+	- The USB backend returned different URIs for some printers than in
+	  CUPS 1.3 (STR #3259)
+	- The scheduler did not do local job-hold-until processing for remote
+	  queues (STR #3258)
+	- The scheduler did not try all possible SSL certificates on Mac OS X.
+	- The scheduler did not always remove a file descriptor when using the
+	  kqueue interface (STR #3256)
 	- The scheduler did not protect against bad job control files in all
 	  cases (STR #3253)
 	- The scheduler did not encode "+" in model names (STR #3254)
