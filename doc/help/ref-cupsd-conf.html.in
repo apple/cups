@@ -1104,7 +1104,7 @@ HREF="#Location"><CODE>Location</CODE></A> or <A
 HREF="#Limit"><CODE>Limit</CODE></A> section.</P>
 
 
-<H2 CLASS="title"><A NAME="DirtyCleanInterval">DirtyCleanInterval</A></H2>
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.4/Mac OS X 10.6</SPAN><A NAME="DirtyCleanInterval">DirtyCleanInterval</A></H2>
 
 <H3>Examples</H3>
 
@@ -1117,7 +1117,9 @@ DirtyCleanInterval 0
 
 <P>The <CODE>DirtyCleanInterval</CODE> directive specifies the number of
 seconds to wait before updating configuration and state files for printers,
-classes, subscriptions, and jobs. The default is 30 seconds.</P>
+classes, subscriptions, and jobs. The default is 30 seconds. A value of 0
+causes the update to occur as soon as possible, typically within a few
+milliseconds.</P>
 
 
 <H2 CLASS="title"><A NAME="DocumentRoot">DocumentRoot</A></H2>
