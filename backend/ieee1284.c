@@ -306,6 +306,14 @@ backendGetDeviceID(
       mfg = temp;
     }
 
+    if (!strncasecmp(mdl, mfg, strlen(mfg)))
+    {
+      mdl += strlen(mfg);
+
+      while (isspace(*mdl & 255))
+        mdl ++;
+    }
+
    /*
     * Generate the device URI from the manufacturer, make_model, and
     * serial number strings.
