@@ -13,7 +13,7 @@ dnl   which should have been included with this file.  If this file is
 dnl   file is missing or damaged, see the license at "http://www.cups.org/".
 dnl
 
-AC_ARG_WITH(pdftops, [  --with-pdftops          set pdftops filter (gs,pdftops,none), default=pdftops ])
+AC_ARG_WITH(pdftops, [  --with-pdftops          set pdftops filter (gs,/path/to/gs,pdftops,/path/to/pdftops,none), default=pdftops ])
 
 PDFTOPS=""
 CUPS_PDFTOPS=""
@@ -47,6 +47,12 @@ case "x$with_pdftops" in
 	fi
 	;;
 
+	x/*/gs) # Use /path/to/gs without any check:
+	CUPS_GHOSTSCRIPT="$with_pdftops"
+	AC_DEFINE(HAVE_GHOSTSCRIPT)
+	PDFTOPS="pdftops"
+	;;
+
 	xpdftops)
 	AC_PATH_PROG(CUPS_PDFTOPS, pdftops)
 	if test "x$CUPS_PDFTOPS" != x; then
@@ -56,6 +62,20 @@ case "x$with_pdftops" in
 		AC_MSG_ERROR(Unable to find pdftops program!)
 		exit 1
 	fi
+	;;
+
+	x/*/pdftops) # Use /path/to/pdftops without any check:
+	CUPS_PDFTOPS="$with_pdftops"
+	AC_DEFINE(HAVE_PDFTOPS)
+	PDFTOPS="pdftops"
+	;;
+
+	xnone) # Make no pdftops filter if with_pdftops=none:
+	;;
+
+	*) # Invalid with_pdftops value:
+	AC_MSG_ERROR(Invalid with_pdftops value!)
+	exit 1
 	;;
 esac
 
