@@ -593,7 +593,7 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
       printf("%.1f %.1f translate\n", PageLeft, PageBottom);
     else
       printf("%.1f %.1f translate\n", PageWidth - PageRight,
-             PageLength - PageRight);
+             PageLength - PageTop);
     puts("0 setgray");
 
     y = info_top;
