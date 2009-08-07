@@ -153,8 +153,8 @@ main(int  argc,				/* I - Number of command-line args */
   memset(&action, 0, sizeof(action));
 
   sigemptyset(&action.sa_mask);
-  action.sa_handler = SIG_IGN;
-  sigaction(SIGTERM, &action, sigterm_handler);
+  action.sa_handler = sigterm_handler;
+  sigaction(SIGTERM, &action, NULL);
 #else
   signal(SIGTERM, sigterm_handler);
 #endif /* HAVE_SIGSET */
