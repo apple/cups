@@ -418,12 +418,14 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
   * and then limit the length to the size of our buffer...
   */
 
-  if (length > (bufsize - 2))
+  if (length > bufsize)
     length = (((unsigned)buffer[1] & 255) << 8) +
 	     ((unsigned)buffer[0] & 255);
 
-  if (length > (bufsize - 2))
-    length = bufsize - 2;
+  if (length > bufsize)
+    length = bufsize;
+
+  length -= 2;
 
  /*
   * Copy the device ID text to the beginning of the buffer and

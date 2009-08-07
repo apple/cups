@@ -196,12 +196,19 @@ backendGetDeviceID(
       * and then limit the length to the size of our buffer...
       */
 
-      if (length > (device_id_size - 2))
+      if (length > device_id_size)
 	length = (((unsigned)device_id[1] & 255) << 8) +
 		 ((unsigned)device_id[0] & 255);
 
-      if (length > (device_id_size - 2))
-	length = device_id_size - 2;
+      if (length > device_id_size)
+	length = device_id_size;
+
+     /*
+      * The length field counts the number of bytes in the string
+      * including the length field itself (2 bytes).
+      */
+
+      length -= 2;
 
      /*
       * Copy the device ID text to the beginning of the buffer and
