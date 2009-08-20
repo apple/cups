@@ -29,7 +29,7 @@
 
 
 /*
- * Microsoft also renames the POSIX functions to _name, and introduces
+ * Microsoft renames the POSIX functions to _name, and introduces
  * a broken compatibility layer using the original names.  As a result,
  * random crashes can occur when, for example, strdup() allocates memory
  * from a different heap than used by malloc() and free().
@@ -63,8 +63,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.4b3"
-#define CUPS_MINIMAL "CUPS/1.4b3"
+#define CUPS_SVERSION "CUPS v1.4.0"
+#define CUPS_MINIMAL "CUPS/1.4.0"
 
 
 /*
