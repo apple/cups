@@ -50,6 +50,9 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <math.h>
+#ifdef WIN32
+#  define X_OK 0
+#endif /* WIN32 */
 
 
 /*
@@ -1541,7 +1544,7 @@ main(int  argc,				/* I - Number of command-line args */
 	for (j = 0, group = ppd->groups; j < ppd->num_groups; j ++, group ++)
 	  for (k = 0, option = group->options; k < group->num_options; k ++, option ++)
 	  {
-	    len = strlen(option->keyword);
+	    len = (int)strlen(option->keyword);
 
 	    for (m = 0, group2 = ppd->groups;
 		 m < ppd->num_groups;
@@ -1550,7 +1553,7 @@ main(int  argc,				/* I - Number of command-line args */
 	           n < group2->num_options;
 		   n ++, option2 ++)
 		if (option != option2 &&
-	            len < strlen(option2->keyword) &&
+	            len < (int)strlen(option2->keyword) &&
 	            !strncmp(option->keyword, option2->keyword, len))
 		{
 		  _cupsLangPrintf(stdout,
@@ -3070,7 +3073,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
          language;
 	 language = (char *)cupsArrayNext(languages))
     {
-      langlen = strlen(language);
+      langlen = (int)strlen(language);
       if (langlen != 2 && langlen != 5)
       {
 	if (!warn && !errors && !verbose)

@@ -29,10 +29,14 @@ _cupsStrStatistics
 _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
+_httpResolveURI
 _ippAddAttr
 _ippFindOption
 _ippFreeAttr
+_ppdFreeLanguages
 _ppdGetEncoding
+_ppdGetLanguages
+_ppdHashName
 cupsAddDest
 cupsAddOption
 cupsAdminCreateWindowsPPD
@@ -129,6 +133,7 @@ cupsPrintFiles2
 cupsPutFd
 cupsPutFile
 cupsRemoveOption
+cupsResolveConflicts
 cupsServer
 cupsSetDests
 cupsSetDests2

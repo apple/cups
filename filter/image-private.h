@@ -29,7 +29,11 @@
 #  include <cups/string.h>
 #  include <stdlib.h>
 #  include <string.h>
-#  include <unistd.h>
+#  ifdef WIN32
+#    include <io.h>
+#  else
+#    include <unistd.h>
+#  endif /* WIN32 */
 #  include <errno.h>
 #  include <math.h>
 
