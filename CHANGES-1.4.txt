@@ -8,6 +8,7 @@ CHANGES IN CUPS V1.4.1
 	- cupsGetNamedDest returned the default printer when the named
 	  destination did not exist (STR #3285)
 	- The JobKillDelay was not triggered for canceled jobs (STR #3292)
+	- The PPD compiler could get in an infinite loop (STR #3293)
 
 
 CHANGES IN CUPS V1.4.0
