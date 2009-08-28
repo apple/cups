@@ -12,6 +12,8 @@ CHANGES IN CUPS V1.4.1
 	- The configure check for dns-sd.h was broken (STR #3297)
 	- The "Query Printer for Default Options" page did not go away if the
 	  query job was held (STR #3302)
+	- Boolean options did not show up as selected in the web interface
+	  (STR #3303)
 
 
 CHANGES IN CUPS V1.4.0
