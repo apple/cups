@@ -10,6 +10,8 @@ CHANGES IN CUPS V1.4.1
 	- The JobKillDelay was not triggered for canceled jobs (STR #3292)
 	- The PPD compiler could get in an infinite loop (STR #3293)
 	- The configure check for dns-sd.h was broken (STR #3297)
+	- The "Query Printer for Default Options" page did not go away if the
+	  query job was held (STR #3302)
 
 
 CHANGES IN CUPS V1.4.0
