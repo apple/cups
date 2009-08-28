@@ -14,6 +14,8 @@ CHANGES IN CUPS V1.4.1
 	  query job was held (STR #3302)
 	- Boolean options did not show up as selected in the web interface
 	  (STR #3303)
+      	- The scheduler did not cache or report driver information files
+	  correctly, leading to a variety of issues (STR #3297, STR #3305)
 
 
 CHANGES IN CUPS V1.4.0
