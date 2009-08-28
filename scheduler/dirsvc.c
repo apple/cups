@@ -2369,7 +2369,7 @@ dnssdBuildTxtRecord(
 	     (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers", p->name);
 
   keyvalue[i  ][0] = "ty";
-  keyvalue[i++][1] = p->make_model;
+  keyvalue[i++][1] = p->make_model ? p->make_model : "Unknown";
 
   if (p->location && *p->location != '\0')
   {
