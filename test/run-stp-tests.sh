@@ -251,6 +251,7 @@ ln -s $root/notifier /tmp/cups-$user/bin
 ln -s $root/scheduler /tmp/cups-$user/bin/daemon
 ln -s $root/filter/bannertops /tmp/cups-$user/bin/filter
 ln -s $root/filter/commandtops /tmp/cups-$user/bin/filter
+ln -s $root/filter/gziptoany /tmp/cups-$user/bin/filter
 ln -s $root/filter/hpgltops /tmp/cups-$user/bin/filter
 ln -s $root/filter/pstops /tmp/cups-$user/bin/filter
 ln -s $root/filter/rastertoepson /tmp/cups-$user/bin/filter
@@ -532,7 +533,7 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=/tmp/cups-$user/cups-str-1.4-$date-$user.html
+strfile=/tmp/cups-$user/cups-str-1.5-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
