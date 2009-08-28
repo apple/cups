@@ -549,7 +549,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!cups_get_sdests(http, op, name, 0, &dest))
   {
-    if (op == CUPS_GET_DEFAULT)
+    if (op == CUPS_GET_DEFAULT || name)
       return (NULL);
 
    /*
@@ -557,7 +557,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
     * configuration file does not exist.  Find out the real default.
     */
 
-    if (!cups_get_sdests(http, CUPS_GET_DEFAULT, name, 0, &dest))
+    if (!cups_get_sdests(http, CUPS_GET_DEFAULT, NULL, 0, &dest))
       return (NULL);
   }
 

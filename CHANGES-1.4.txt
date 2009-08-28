@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.1
 
 	- DNS-SD registrations for raw queues had an empty "ty" key (STR #3299)
 	- The JPEG and BMP MIME type rules were broken (STR #3284)
+	- cupsGetNamedDest returned the default printer when the named
+	  destination did not exist (STR #3285)
 
 
 CHANGES IN CUPS V1.4.0
