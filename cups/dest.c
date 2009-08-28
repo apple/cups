@@ -549,7 +549,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!cups_get_sdests(http, op, name, 0, &dest))
   {
-    if (op == CUPS_GET_DEFAULT || name)
+    if (op == CUPS_GET_DEFAULT)
       return (NULL);
 
    /*
@@ -1800,7 +1800,7 @@ cups_get_sdests(http_t      *http,	/* I - Connection to server or CUPS_HTTP_DEFA
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                "requesting-user-name", NULL, cupsUser());
 
-  if (name)
+  if (name && op != CUPS_GET_DEFAULT)
   {
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
                      "localhost", ippPort(), "/printers/%s", name);
