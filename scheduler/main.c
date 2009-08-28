@@ -1793,6 +1793,18 @@ process_children(void)
 	    cupsdContinueJob(job);
 	  }
 	}
+	else if (job->state_value == IPP_JOB_CANCELED)
+	{
+	 /*
+	  * Remove the job from the active list if there are no processes still
+	  * running for it...
+	  */
+
+	  for (i = 0; job->filters[i] < 0; i++);
+
+	  if (!job->filters[i] && job->backend <= 0)
+	    cupsArrayRemove(ActiveJobs, job);
+	}
       }
     }
 

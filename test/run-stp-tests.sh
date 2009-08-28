@@ -807,7 +807,7 @@ echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-grep -v '^[dD]' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+grep -v '^d' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile
