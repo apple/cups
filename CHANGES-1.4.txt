@@ -21,6 +21,8 @@ CHANGES IN CUPS V1.4.1
 	- Modifying a class in the web interface did not work (STR #3312)
 	- BrowseLocalProtocols could be cleared when changing the sharing
 	  setting (STR #3287)
+	- The scheduler could return an empty supported document format
+	  (STR #3308)
 
 
 CHANGES IN CUPS V1.4.0

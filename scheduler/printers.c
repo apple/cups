@@ -3699,10 +3699,6 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
                       p->name, mimetype);
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "add_printer_formats: %s: %d supported types",
-		  p->name, cupsArrayCount(p->filetypes) + 1);
-
  /*
   * Add the file formats that can be filtered...
   */
@@ -3713,9 +3709,13 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
   else
     i = 0;
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "add_printer_formats: %s: %d supported types",
+                  p->name, cupsArrayCount(p->filetypes) + i);
+
   attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
                        "document-format-supported",
-		       cupsArrayCount(p->filetypes) + 1, NULL, NULL);
+                       cupsArrayCount(p->filetypes) + i, NULL, NULL);
 
   if (i)
     attr->values[0].string.text = _cupsStrAlloc("application/octet-stream");
