@@ -1247,6 +1247,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  * the job...
 	  */
 
+          fputs("DEBUG: No job-state available from printer - stopping queue.\n",
+	        stderr);
 	  ipp_status = IPP_INTERNAL_ERROR;
 	  break;
 	}
