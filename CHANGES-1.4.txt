@@ -16,6 +16,7 @@ CHANGES IN CUPS V1.4.1
 	  (STR #3303)
       	- The scheduler did not cache or report driver information files
 	  correctly, leading to a variety of issues (STR #3297, STR #3305)
+	- cupsDoIORequest() did not abort on permanent errors (STR #3311)
 
 
 CHANGES IN CUPS V1.4.0
