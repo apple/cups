@@ -27,6 +27,8 @@ CHANGES IN CUPS V1.4.1
 	  something other than "." for the decimal point (STR #3300)
 	- The IPP backend did not handle some non-comforming IPP printer
 	  implementations (STR #3262)
+	- The scheduler leaked three file descriptors to each job filter
+	  (STR #3263)
 
 
 CHANGES IN CUPS V1.4.0

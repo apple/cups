@@ -3863,6 +3863,11 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
   fcntl(job->side_pipes[1], F_SETFL,
 	fcntl(job->side_pipes[1], F_GETFL) | O_NONBLOCK);
 
+  fcntl(job->side_pipes[0], F_SETFD,
+	fcntl(job->side_pipes[0], F_GETFD) | FD_CLOEXEC);
+  fcntl(job->side_pipes[1], F_SETFD,
+	fcntl(job->side_pipes[1], F_GETFD) | FD_CLOEXEC);
+
  /*
   * Now start the first file in the job...
   */
