@@ -25,6 +25,8 @@ CHANGES IN CUPS V1.4.1
 	  (STR #3308)
 	- The PPD compiler generated invalid PPD files when the locale used
 	  something other than "." for the decimal point (STR #3300)
+	- The IPP backend did not handle some non-comforming IPP printer
+	  implementations (STR #3262)
 
 
 CHANGES IN CUPS V1.4.0
