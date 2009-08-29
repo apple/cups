@@ -247,7 +247,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     for (i = 0, j = 0; i < (int)(sizeof(base64_tests) / sizeof(base64_tests[0])); i ++)
     {
       httpEncode64_2(encode, sizeof(encode), base64_tests[i][0],
-                     strlen(base64_tests[i][0]));
+                     (int)strlen(base64_tests[i][0]));
       decodelen = (int)sizeof(decode);
       httpDecode64_2(decode, &decodelen, base64_tests[i][1]);
 

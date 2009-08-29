@@ -1558,8 +1558,11 @@ cupsdStartBrowsing(void)
       * Add the master connection to the select list...
       */
 
-      cupsdAddSelect(DNSServiceRefSockFD(DNSSDRef),
-		     (cupsd_selfunc_t)dnssdUpdate, NULL, NULL);
+      int fd = DNSServiceRefSockFD(DNSSDRef);
+
+      fcntl(fd, F_SETFD, fcntl(fd, F_GETFD) | FD_CLOEXEC);
+
+      cupsdAddSelect(fd, (cupsd_selfunc_t)dnssdUpdate, NULL, NULL);
 
      /*
       * Then get the port we use for registrations.  If we are not listening
@@ -2369,7 +2372,7 @@ dnssdBuildTxtRecord(
 	     (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers", p->name);
 
   keyvalue[i  ][0] = "ty";
-  keyvalue[i++][1] = p->make_model;
+  keyvalue[i++][1] = p->make_model ? p->make_model : "Unknown";
 
   if (p->location && *p->location != '\0')
   {

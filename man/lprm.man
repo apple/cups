@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lprm 1 "CUPS" "12 February 2006" "Apple Inc."
+.TH lprm 1 "CUPS" "28 August 2009" "Apple Inc."
 .SH NAME
 lprm \- cancel print jobs
 .SH SYNOPSIS
@@ -49,7 +49,7 @@ Specifies an alternate username.
 .TP 5
 -h server[:port]
 .br
-Specifies and alternate server.
+Specifies an alternate server.
 .SH COMPATIBILITY
 The CUPS version of \fIlprm\fR is compatible with the standard
 Berkeley \fIlprm\fR command.

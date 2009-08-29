@@ -1239,6 +1239,19 @@ main(int  argc,				/* I - Number of command-line args */
 	    break;
 	  }
 	}
+	else
+	{
+	 /*
+	  * If the printer does not return a job-state attribute, it does not
+	  * conform to the IPP specification - break out immediately and fail
+	  * the job...
+	  */
+
+          fputs("DEBUG: No job-state available from printer - stopping queue.\n",
+	        stderr);
+	  ipp_status = IPP_INTERNAL_ERROR;
+	  break;
+	}
       }
 
       ippDelete(response);
@@ -1317,6 +1330,8 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (ipp_status == IPP_NOT_AUTHORIZED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
+  else if (ipp_status == IPP_INTERNAL_ERROR)
+    return (CUPS_BACKEND_STOP);
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else

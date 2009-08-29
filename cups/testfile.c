@@ -64,8 +64,10 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		status;			/* Exit status */
   char		filename[1024];		/* Filename buffer */
   cups_file_t	*fp;			/* File pointer */
+#ifndef WIN32
   int		fds[2];			/* Open file descriptors */
   cups_file_t	*fdfile;		/* File opened with cupsFileOpenFd() */
+#endif /* !WIN32 */
   int		count;			/* Number of lines in file */
 
 
@@ -93,6 +95,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     status += random_tests();
 
+#ifndef WIN32
    /*
     * Test fdopen and close without reading...
     */
@@ -126,6 +129,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       puts("PASS");
     }
+#endif /* !WIN32 */
 
    /*
     * Count lines in euc-jp.txt, rewind, then count again.
@@ -756,7 +760,7 @@ read_write_tests(int compression)	/* I - Use compression? */
 
     fputs("cupsFileGetChar(partial line): ", stdout);
 
-    for (i = 0; i < strlen(partial_line); i ++)
+    for (i = 0; i < (int)strlen(partial_line); i ++)
       if ((byte = cupsFileGetChar(fp)) < 0)
         break;
       else if (byte != partial_line[i])

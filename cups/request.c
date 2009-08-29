@@ -266,7 +266,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
     DEBUG_printf(("2cupsDoIORequest: status=%d", status));
 
-    if (status == HTTP_FORBIDDEN || status >= HTTP_SERVER_ERROR)
+    if (status >= HTTP_BAD_REQUEST &&
+	status != HTTP_UNAUTHORIZED &&
+	status != HTTP_UPGRADE_REQUIRED)
     {
       httpFlush(http);
       _cupsSetHTTPError(status);

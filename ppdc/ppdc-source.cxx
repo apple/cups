@@ -1321,7 +1321,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
     while (*v && *v != ')')
     {
       // Skip leading whitespace...
-      while (*v && isspace(*v & 255));
+      while (*v && isspace(*v & 255))
         v ++;
 
       if (!*v || *v == ')')

@@ -650,7 +650,8 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
 	cgiSetIPPVars(response, NULL, NULL, NULL, 0);
 
       attr = ippFindAttribute(response, "job-state", IPP_TAG_ENUM);
-      if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED)
+      if (!attr || attr->values[0].integer >= IPP_JOB_STOPPED ||
+          attr->values[0].integer == IPP_JOB_HELD)
       {
 	ippDelete(response);
 	break;

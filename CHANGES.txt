@@ -1,5 +1,38 @@
-CHANGES.txt - 2009-08-07
+CHANGES.txt - 2009-08-28
 ------------------------
+
+CHANGES IN CUPS V1.4.1
+
+	- Documention fixes (STR #3296)
+	- DNS-SD registrations for raw queues had an empty "ty" key (STR #3299)
+	- The JPEG and BMP MIME type rules were broken (STR #3284)
+	- cupsGetNamedDest returned the default printer when the named
+	  destination did not exist (STR #3285)
+	- The JobKillDelay was not triggered for canceled jobs (STR #3292)
+	- The PPD compiler could get in an infinite loop (STR #3293)
+	- The configure check for dns-sd.h was broken (STR #3297)
+	- The "Query Printer for Default Options" page did not go away if the
+	  query job was held (STR #3302)
+	- Boolean options did not show up as selected in the web interface
+	  (STR #3303)
+      	- The scheduler did not cache or report driver information files
+	  correctly, leading to a variety of issues (STR #3283, STR #3297,
+	  STR #3305)
+	- cupsDoIORequest() did not abort on permanent errors (STR #3311)
+	- Modifying a class in the web interface did not work (STR #3312)
+	- BrowseLocalProtocols could be cleared when changing the sharing
+	  setting (STR #3287)
+	- The scheduler could return an empty supported document format
+	  (STR #3308)
+	- The PPD compiler generated invalid PPD files when the locale used
+	  something other than "." for the decimal point (STR #3300)
+	- The IPP backend did not handle some non-comforming IPP printer
+	  implementations (STR #3262)
+	- The scheduler leaked three file descriptors to each job filter
+	  (STR #3263)
+	- The scheduler now uses a default CUPS-Get-Devices timeout of 15
+	  seconds (STR #3307)
+
 
 CHANGES IN CUPS V1.4.0
 

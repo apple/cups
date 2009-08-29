@@ -32,7 +32,7 @@ else
 	fileurl="ftp://ftp.easysw.com/pub/cups/$version/cups-$fileversion-source.tar."
 	url="https://svn.easysw.com/public/cups/tags/release-$version"
 
-	svn copy https://svn.easysw.com/public/cups/trunk "$url" \
+	svn copy https://svn.easysw.com/public/cups/branches/branch-1.4 "$url" \
 		-m "Tag $version" || exit 1
 fi
 

@@ -43,7 +43,7 @@ if test x$enable_dnssd != xno; then
 				AC_MSG_CHECKING(for current version of dns_sd library)
 				SAVELIBS="$LIBS"
 				LIBS="$LIBS -ldns_sd"
-				AC_TRY_COMPILE([#include <dns_sd.h],
+				AC_TRY_COMPILE([#include <dns_sd.h>],
 					[int constant = kDNSServiceFlagsShareConnection;
 					unsigned char txtRecord[100];
 					uint8_t valueLen;

@@ -1553,7 +1553,7 @@ _cupsAdminSetServerSettings(
 	  const char *remotep = cupsGetOption("BrowseRemoteProtocols",
 					      num_settings, settings);
 
-          if (!localp)
+          if (!localp || !localp[0])
 	    localp = cupsGetOption("BrowseLocalProtocols", cupsd_num_settings,
 	                           cupsd_settings);
 
