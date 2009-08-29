@@ -554,6 +554,8 @@ ppdcDriver::write_ppd_file(
   else if (type != PPDC_DRIVER_PS)
     cupsFilePrintf(fp, "*TTRasterizer: Type42%s", lf);
 
+  struct lconv *loc = localeconv();
+
   if (attrs->count)
   {
     // Write driver-defined attributes...
@@ -679,16 +681,23 @@ ppdcDriver::write_ppd_file(
     for (p = (ppdcProfile *)profiles->first();
          p;
 	 p = (ppdcProfile *)profiles->next())
+    {
+      char density[255], gamma[255], profile[9][255];
+
+      _cupsStrFormatd(density, density + sizeof(density), p->density, loc);
+      _cupsStrFormatd(gamma, gamma + sizeof(gamma), p->gamma, loc);
+
+      for (int i = 0; i < 9; i ++)
+	_cupsStrFormatd(profile[i], profile[i] + sizeof(profile[0]),
+	                p->profile[i], loc);
+      
       cupsFilePrintf(fp,
-                     "*cupsColorProfile %s/%s: \"%.3f %.3f %.3f %.3f %.3f %.3f "
-		     "%.3f %.3f %.3f %.3f %.3f\"%s",
-		     p->resolution->value, p->media_type->value,
-		     p->density, p->gamma,
-		     p->profile[0], p->profile[1],
-		     p->profile[2], p->profile[3],
-		     p->profile[4], p->profile[5],
-		     p->profile[6], p->profile[7],
-		     p->profile[8], lf);
+                     "*cupsColorProfile %s/%s: \"%s %s %s %s %s %s %s %s %s %s "
+		     "%s\"%s", p->resolution->value, p->media_type->value,
+		     density, gamma, profile[0], profile[1], profile[2],
+		     profile[3], profile[4], profile[5], profile[6], profile[7],
+		     profile[8], lf);
+    }
   }
 
   if (locales)
@@ -871,13 +880,21 @@ ppdcDriver::write_ppd_file(
   cupsFilePrintf(fp, "*DefaultImageableArea: %s%s",
                  default_size ? default_size->value : "Letter", lf);
 
+  char left[255], right[255], bottom[255], top[255];
+
   for (m = (ppdcMediaSize *)sizes->first();
        m;
        m = (ppdcMediaSize *)sizes->next())
-    cupsFilePrintf(fp, "*ImageableArea %s/%s: \"%.2f %.2f %.2f %.2f\"%s",
+  {
+    _cupsStrFormatd(left, left + sizeof(left), m->left, loc);
+    _cupsStrFormatd(bottom, bottom + sizeof(bottom), m->bottom, loc);
+    _cupsStrFormatd(right, right + sizeof(right), m->width - m->right, loc);
+    _cupsStrFormatd(top, top + sizeof(top), m->length - m->top, loc);
+
+    cupsFilePrintf(fp, "*ImageableArea %s/%s: \"%s %s %s %s\"%s",
                    m->name->value, catalog->find_message(m->text->value),
-	           m->left, m->bottom, m->width - m->right, m->length - m->top,
-		   lf);
+		   left, bottom, right, top, lf);
+  }
 
   if ((a = find_attr("?ImageableArea", NULL)) != NULL)
   {
@@ -892,12 +909,19 @@ ppdcDriver::write_ppd_file(
   cupsFilePrintf(fp, "*DefaultPaperDimension: %s%s",
                  default_size ? default_size->value : "Letter", lf);
 
+  char width[255], length[255];
+
   for (m = (ppdcMediaSize *)sizes->first();
        m;
        m = (ppdcMediaSize *)sizes->next())
-    cupsFilePrintf(fp, "*PaperDimension %s/%s: \"%.2f %.2f\"%s",
+  {
+    _cupsStrFormatd(width, width + sizeof(width), m->width, loc);
+    _cupsStrFormatd(length, length + sizeof(length), m->length, loc);
+
+    cupsFilePrintf(fp, "*PaperDimension %s/%s: \"%s %s\"%s",
                    m->name->value, catalog->find_message(m->text->value),
-	           m->width, m->length, lf);
+		   width, length, lf);
+  }
 
   if ((a = find_attr("?PaperDimension", NULL)) != NULL)
   {
@@ -911,10 +935,18 @@ ppdcDriver::write_ppd_file(
   // Custom size support...
   if (variable_paper_size)
   {
-    cupsFilePrintf(fp, "*MaxMediaWidth: \"%.2f\"%s", max_width, lf);
-    cupsFilePrintf(fp, "*MaxMediaHeight: \"%.2f\"%s", max_length, lf);
-    cupsFilePrintf(fp, "*HWMargins: %.2f %.2f %.2f %.2f\n",
-	           left_margin, bottom_margin, right_margin, top_margin);
+    _cupsStrFormatd(width, width + sizeof(width), max_width, loc);
+    _cupsStrFormatd(length, length + sizeof(length), max_length, loc);
+
+    _cupsStrFormatd(left, left + sizeof(left), left_margin, loc);
+    _cupsStrFormatd(bottom, bottom + sizeof(bottom), bottom_margin, loc);
+    _cupsStrFormatd(right, right + sizeof(right), right_margin, loc);
+    _cupsStrFormatd(top, top + sizeof(top), top_margin, loc);
+
+    cupsFilePrintf(fp, "*MaxMediaWidth: \"%s\"%s", width, lf);
+    cupsFilePrintf(fp, "*MaxMediaHeight: \"%s\"%s", length, lf);
+    cupsFilePrintf(fp, "*HWMargins: %s %s %s %s%s", left, bottom, right, top,
+                   lf);
 
     if (custom_size_code && custom_size_code->value)
     {
@@ -934,15 +966,29 @@ ppdcDriver::write_ppd_file(
       cupsFilePrintf(fp, "*ParamCustomPageSize Width: %s%s", a->value->value,
 		     lf);
     else
-      cupsFilePrintf(fp, "*ParamCustomPageSize Width: 1 points %.2f %.2f%s",
-                     min_width, max_width, lf);
+    {
+      char width0[255];
+
+      _cupsStrFormatd(width0, width0 + sizeof(width0), min_width, loc);
+      _cupsStrFormatd(width, width + sizeof(width), max_width, loc);
+
+      cupsFilePrintf(fp, "*ParamCustomPageSize Width: 1 points %s %s%s",
+                     width0, width, lf);
+    }
 
     if ((a = find_attr("ParamCustomPageSize", "Height")) != NULL)
       cupsFilePrintf(fp, "*ParamCustomPageSize Height: %s%s", a->value->value,
 		     lf);
     else
-      cupsFilePrintf(fp, "*ParamCustomPageSize Height: 2 points %.2f %.2f%s",
-                     min_length, max_length, lf);
+    {
+      char length0[255];
+
+      _cupsStrFormatd(length0, length0 + sizeof(length0), min_length, loc);
+      _cupsStrFormatd(length, length + sizeof(length), max_length, loc);
+
+      cupsFilePrintf(fp, "*ParamCustomPageSize Height: 2 points %s %s%s",
+                     length0, length, lf);
+    }
 
     if ((a = find_attr("ParamCustomPageSize", "WidthOffset")) != NULL)
       cupsFilePrintf(fp, "*ParamCustomPageSize WidthOffset: %s%s",
@@ -1000,7 +1046,10 @@ ppdcDriver::write_ppd_file(
 	    break;
       }
 
-      cupsFilePrintf(fp, "*OrderDependency: %.1f ", o->order);
+      char order[255];
+      _cupsStrFormatd(order, order + sizeof(order), o->order, loc);
+
+      cupsFilePrintf(fp, "*OrderDependency: %s ", order);
       switch (o->section)
       {
         default :
