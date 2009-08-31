@@ -179,7 +179,12 @@ print_device(const char *uri,		/* I - Device URI */
       }
 
       if (pfds[1].revents & POLLIN)
-        tbytes += side_cb(printer, print_fd);
+      {
+        if ((bytes = side_cb(printer, print_fd)) < 0)
+	  pfds[1].events = 0;		/* Filter has gone away... */
+	else
+          tbytes += bytes;
+      }
     }
   }
 
@@ -747,7 +752,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
   {
     _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
-    return (0);
+    return (-1);
   }
 
   switch (command)
