@@ -328,7 +328,8 @@ cat_drv(const char *name,		/* I - PPD name */
   *pc_file_name++ = '\0';
 
 #ifdef __APPLE__
-  if (!strncmp(resource, "/Library/Printers/PPDs.drv/", 27))
+  if (!strncmp(resource, "/Library/Printers/PPDs/Contents/Resources/", 42) ||
+      !strncmp(resource, "/System/Library/Printers/PPDs/Contents/Resources/", 49))
     strlcpy(filename, resource, sizeof(filename));
   else
 #endif // __APPLE__
