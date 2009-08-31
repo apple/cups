@@ -1278,7 +1278,7 @@ int papCancelRequest(int sockfd, u_short tid)
  * 'sidechannel_request()' - Handle side-channel requests.
  */
 
-static void
+static int
 sidechannel_request()
 {
   cups_sc_command_t	command;	/* Request command */
@@ -1289,32 +1289,29 @@ sidechannel_request()
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    fputs(_("WARNING: Failed to read side-channel request!\n"), stderr);
-    return;
-  }
+    return (-1);
 
   switch (command)
   {
     case CUPS_SC_CMD_GET_BIDI:		/* Is the connection bidirectional? */
 	data[0] = 1;
-	cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+	return (cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0));
 	break;
 
     case CUPS_SC_CMD_GET_STATE:		/* Return device state */
 	data[0] = CUPS_SC_STATE_ONLINE;
-	cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0);
+	return (cupsSideChannelWrite(command, CUPS_SC_STATUS_OK, data, 1, 1.0));
 	break;
 
     case CUPS_SC_CMD_DRAIN_OUTPUT:	/* Drain all pending output */
     case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
     case CUPS_SC_CMD_GET_DEVICE_ID:	/* Return IEEE-1284 device ID */
     default:
-	cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED, 
-			     NULL, 0, 1.0);
+	return (cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED, 
+			             NULL, 0, 1.0));
 	break;
   }
-  return;
+  return (0);
 }
 
 

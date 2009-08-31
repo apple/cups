@@ -61,7 +61,7 @@ backendCheckSideChannel(
  * 'backendNetworkSideCB()' - Handle common network side-channel commands.
  */
 
-void
+int					/* O - -1 on error, 0 on success */
 backendNetworkSideCB(
     int         print_fd,		/* I - Print file or -1 */
     int         device_fd,		/* I - Device file or -1 */
@@ -79,10 +79,7 @@ backendNetworkSideCB(
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
-    return;
-  }
+    return (-1);
 
   switch (command)
   {
@@ -284,7 +281,7 @@ backendNetworkSideCB(
 	break;
   }
 
-  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+  return (cupsSideChannelWrite(command, status, data, datalen, 1.0));
 }
 
 

@@ -943,7 +943,7 @@ sidechannel_thread(void *reference)
     datalen = sizeof(data);
 
     if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-      continue;
+      break;
 
     switch (command)
     {

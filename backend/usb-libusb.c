@@ -750,10 +750,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
     return (-1);
-  }
 
   switch (command)
   {
