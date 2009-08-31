@@ -45,6 +45,8 @@
 
 static char	*password = NULL;	/* Password for device URI */
 static int	password_tries = 0;	/* Password tries */
+static const char *auth_info_required = "none";
+					/* New auth-info-required value */
 #ifdef __APPLE__
 static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
 #endif /* __APPLE__ */
@@ -1049,16 +1051,21 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
 			cupsLastErrorString());
 
-	if (ipp_status == IPP_NOT_AUTHORIZED)
+	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
 	{
 	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
 		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
 
+         /*
+	  * Normal authentication goes through the password callback, which sets
+	  * auth_info_required to "username,password".  Kerberos goes directly
+	  * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
+	  * here and set auth_info_required as needed...
+	  */
+
 	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
 		       "Negotiate", 9))
-	    fputs("ATTR: auth-info-required=negotiate\n", stderr);
-	  else
-	    fputs("ATTR: auth-info-required=username,password\n", stderr);
+	    auth_info_required = "negotiate";
 	}
       }
     }
@@ -1296,6 +1303,15 @@ main(int  argc,				/* I - Number of command-line args */
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 
+#ifdef HAVE_GSSAPI
+ /*
+  * See if we used Kerberos at all...
+  */
+
+  if (http->gssctx)
+    auth_info_required = "negotiate";
+#endif /* HAVE_GSSAPI */
+
  /*
   * Free memory...
   */
@@ -1328,7 +1344,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Return the queue status...
   */
 
-  if (ipp_status == IPP_NOT_AUTHORIZED)
+  fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
+
+  if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
@@ -1532,6 +1550,12 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
 {
   (void)prompt;
 
+ /*
+  * Remember that we need to authenticate...
+  */
+
+  auth_info_required = "username,password";
+
   if (password && *password && password_tries < 3)
   {
     password_tries ++;
@@ -1541,23 +1565,10 @@ password_cb(const char *prompt)		/* I - Prompt (not used) */
   else
   {
    /*
-    * If there is no password set in the device URI, return the
-    * "authentication required" exit code...
+    * Give up after 3 tries or if we don't have a password to begin with...
     */
 
-    if (tmpfilename[0])
-      unlink(tmpfilename);
-
-#ifdef __APPLE__
-    if (pstmpname[0])
-      unlink(pstmpname);
-#endif /* __APPLE__ */
-
-    fputs("ATTR: auth-info-required=username,password\n", stderr);
-
-    exit(CUPS_BACKEND_AUTH_REQUIRED);
-
-    return (NULL);			/* Eliminate compiler warning */
+    return (NULL);
   }
 }
 

@@ -1280,7 +1280,7 @@ asn1_get_integer(
   int	value;				/* Integer value */
 
 
-  for (value = 0;
+  for (value = (**buffer & 0x80) ? -1 : 0;
        length > 0 && *buffer < bufend;
        length --, (*buffer) ++)
     value = (value << 8) | **buffer;
