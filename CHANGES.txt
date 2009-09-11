@@ -1,5 +1,7 @@
-CHANGES.txt - 2009-08-28
+CHANGES.txt - 2009-09-11
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The PPD compiler now checks for overlapping filenames when writing
+	  PPD files.

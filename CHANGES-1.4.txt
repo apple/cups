@@ -7,7 +7,7 @@ CHANGES IN CUPS V1.4.1
 	- SNMP supply levels and states were wrong for some printers.
 	- The IPP backend did not update the auth-info-required value.
 	- The libusb-based USB backend would hang at the end of the job
-	  (STR #3315)
+	  (STR #3315, STR #3318)
 	- DNS-SD registrations for raw queues had an empty "ty" key (STR #3299)
 	- The JPEG and BMP MIME type rules were broken (STR #3284)
 	- cupsGetNamedDest returned the default printer when the named
