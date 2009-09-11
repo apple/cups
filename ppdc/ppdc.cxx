@@ -61,6 +61,7 @@ main(int  argc,				// I - Number of command-line arguments
 			verbose;	// Verbosity
   ppdcLineEnding	le;		// Line ending to use
   ppdcArray		*locales;	// List of locales
+  cups_array_t		*filenames;	// List of generated filenames
 
 
   _cupsSetLocale(argv);
@@ -75,6 +76,7 @@ main(int  argc,				// I - Number of command-line arguments
   src            = new ppdcSource();
   use_model_name = 0;
   verbose        = 0;
+  filenames      = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -338,6 +340,13 @@ main(int  argc,				// I - Number of command-line arguments
 	  snprintf(filename, sizeof(filename), "%s/%s.gz", outdir, pcfilename);
 	else
 	  snprintf(filename, sizeof(filename), "%s/%s", outdir, pcfilename);
+
+        if (cupsArrayFind(filenames, filename))
+	  _cupsLangPrintf(stderr,
+	                  _("ppdc: Warning - overlapping filename \"%s\".\n"),
+			  filename);
+	else
+	  cupsArrayAdd(filenames, strdup(filename));
 
 	fp = cupsFileOpen(filename, comp ? "w9" : "w");
 	if (!fp)
