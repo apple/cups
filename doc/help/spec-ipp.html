@@ -558,7 +558,7 @@ job as well.
 <h4>Cancel-Job Request</h4>
 
 <p>The following groups of attributes are supplied as part of the
-Set-Job-Attributes request:
+Cancel-Job request:
 
 <p>Group 1: Operation Attributes
 
@@ -631,6 +631,17 @@ Purge-Jobs request:
 
 	<dd>The client MUST supply a URI for the specified printer or
 	"ipp://.../printers" for all printers and classes.
+
+	<dt><span class="info">CUPS 1.2/Mac OS X 10.5</span>"requesting-user-name" (name(MAX)):
+
+	<dd>The client OPTIONALLY supplies this attribute to specify whose jobs
+	jobs are purged or canceled.
+
+	<dt><span class="info">CUPS 1.2/Mac OS X 10.5</span>"my-jobs" (boolean):
+
+	<dd>The client OPTIONALLY supplies this attribute to specify that only
+	the jobs owned by the requesting user are purged or canceled. The
+	default is false.
 
 	<dt><span class="info">CUPS 1.2/Mac OS X 10.5</span>"purge-jobs" (boolean):
 
