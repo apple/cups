@@ -8470,7 +8470,9 @@ ppd_parse_line(const char *line,	/* I - Line */
   * Read the option name...
   */
 
-  for (line += 8, olen --; isalnum(*line & 255); line ++)
+  for (line += 8, olen --;
+       *line > ' ' && *line < 0x7f && *line != ':' && *line != '/';
+       line ++)
     if (olen > 0)
     {
       *option++ = *line;
@@ -8498,7 +8500,9 @@ ppd_parse_line(const char *line,	/* I - Line */
   while (isspace(*line & 255))
     line ++;
 
-  for (clen --; isalnum(*line & 255); line ++)
+  for (clen --;
+       *line > ' ' && *line < 0x7f && *line != ':' && *line != '/';
+       line ++)
     if (clen > 0)
     {
       *choice++ = *line;
