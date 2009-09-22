@@ -379,6 +379,7 @@ cupsSideChannelSNMPWalk(
 			real_oidlen,	/* Length of returned OID string */
 			oidlen;		/* Length of first OID */
   const char		*current_oid;	/* Current OID */
+  char			last_oid[2048];	/* Last OID */
 
 
   DEBUG_printf(("cupsSideChannelSNMPWalk(oid=\"%s\", timeout=%.3f, cb=%p, "
@@ -397,6 +398,7 @@ cupsSideChannelSNMPWalk(
 
   current_oid = oid;
   oidlen      = (int)strlen(oid);
+  last_oid[0] = '\0';
 
   do
   {
@@ -422,7 +424,8 @@ cupsSideChannelSNMPWalk(
       * Parse the response of the form "oid\0value"...
       */
 
-      if (strncmp(real_data, oid, oidlen) || real_data[oidlen] != '.')
+      if (strncmp(real_data, oid, oidlen) || real_data[oidlen] != '.' ||
+          !strcmp(real_data, last_oid))
       {
        /*
         * Done with this set of OIDs...
@@ -448,6 +451,7 @@ cupsSideChannelSNMPWalk(
       */
 
       current_oid = real_data;
+      strlcpy(last_oid, current_oid, sizeof(last_oid));
     }
   }
   while (status == CUPS_SC_STATUS_OK);
