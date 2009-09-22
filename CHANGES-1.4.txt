@@ -3,6 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The USB backend did not compile on some platforms (STR #3332)
 	- cupsSideChannelSNMPWalk() could go into an infinite loop with broken
 	  SNMP implementations.
 

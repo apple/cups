@@ -560,7 +560,7 @@ open_device(const char *uri,		/* I - Device URI */
  * 'side_cb()' - Handle side-channel requests...
  */
 
-static void
+static int				/* O - 0 on success, -1 on error */
 side_cb(int         print_fd,		/* I - Print file */
         int         device_fd,		/* I - Device file */
         int         snmp_fd,		/* I - SNMP socket (unused) */
