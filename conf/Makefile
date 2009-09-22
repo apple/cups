@@ -90,7 +90,7 @@ install-data:
 	done
 	-if test x$(PAMDIR) != x; then \
 		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(PAMDIR); \
-		if test -r $(BUILDROOT)$(PAMDIR)/cups/$(PAMFILE) ; then \
+		if test -r $(BUILDROOT)$(PAMDIR)/cups ; then \
 			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups.N ; \
 		else \
 			$(INSTALL_DATA) $(PAMFILE) $(BUILDROOT)$(PAMDIR)/cups ; \
