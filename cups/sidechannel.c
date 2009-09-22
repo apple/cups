@@ -191,8 +191,22 @@ cupsSideChannelRead(
     if (errno != EINTR && errno != EAGAIN)
     {
       DEBUG_printf(("1cupsSideChannelRead: Read error: %s", strerror(errno)));
+      *command = CUPS_SC_CMD_NONE;
+      *status  = CUPS_SC_STATUS_IO_ERROR;
       return (-1);
     }
+
+ /*
+  * Watch for EOF or too few bytes...
+  */
+
+  if (bytes < 4)
+  {
+    DEBUG_printf(("1cupsSideChannelRead: Short read of %d bytes", bytes));
+    *command = CUPS_SC_CMD_NONE;
+    *status  = CUPS_SC_STATUS_BAD_MESSAGE;
+    return (-1);
+  }
 
  /*
   * Validate the command code in the message...
@@ -202,6 +216,8 @@ cupsSideChannelRead(
       buffer[0] > CUPS_SC_CMD_SNMP_GET_NEXT)
   {
     DEBUG_printf(("1cupsSideChannelRead: Bad command %d!", buffer[0]));
+    *command = CUPS_SC_CMD_NONE;
+    *status  = CUPS_SC_STATUS_BAD_MESSAGE;
     return (-1);
   }
 

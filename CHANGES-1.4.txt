@@ -3,6 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- cupsSideChannelRead() did not return an error for short reads.
 	- The installed PAM configuration file did not use the correct options
 	  with the pam_unix2 module (STR #3313)
 	- The scheduler did not preserve default options that contained special
