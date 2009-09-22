@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The scheduler did not remove old pre-filters when updating a printer
+	  driver (STR #3342)
 	- The HP/GL-2 filter did not check for early end-of-file (STR #3319)
 	- The USB backend did not compile on some platforms (STR #3332)
 	- cupsSideChannelSNMPWalk() could go into an infinite loop with broken
