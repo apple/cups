@@ -3834,7 +3834,7 @@ delete_printer_filters(
   for (filter = mimeFirstFilter(MimeDatabase);
        filter;
        filter = mimeNextFilter(MimeDatabase))
-    if (filter->dst == p->filetype)
+    if (filter->dst == p->filetype || filter->dst == p->prefiltertype)
     {
      /*
       * Delete the current filter...

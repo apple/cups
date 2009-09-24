@@ -84,7 +84,7 @@
  */
 
 static void	list_devices(void);
-static void	side_cb(int print_fd, int device_fd, int use_bc);
+static int	side_cb(int print_fd, int device_fd, int use_bc);
 
 
 /*
@@ -109,7 +109,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		sep;			/* Option separator */
   int		port;			/* Port number (not used) */
   int		copies;			/* Number of copies to print */
-  int		print_fd,		/* Print file */
+  int		side_eof = 0,		/* Saw EOF on side-channel? */
+		print_fd,		/* Print file */
 		device_fd;		/* Serial device */
   int		nfds;			/* Maximum file descriptor value + 1 */
   fd_set	input,			/* Input set for reading */
@@ -558,7 +559,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       if (!print_bytes)
 	FD_SET(print_fd, &input);
       FD_SET(device_fd, &input);
-      if (!print_bytes)
+      if (!print_bytes && !side_eof)
         FD_SET(CUPS_SC_FD, &input);
 
       FD_ZERO(&output);
@@ -579,7 +580,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* loop since it may have read from print_fd...
 	*/
 
-        side_cb(print_fd, device_fd, 1);
+        if (side_cb(print_fd, device_fd, 1))
+	  side_eof = 1;
 	continue;
       }
 
@@ -1278,7 +1280,7 @@ list_devices(void)
  * 'side_cb()' - Handle side-channel requests...
  */
 
-static void
+static int				/* O - 0 on success, -1 on error */
 side_cb(int print_fd,			/* I - Print file */
         int device_fd,			/* I - Device file */
 	int use_bc)			/* I - Using back-channel? */
@@ -1292,11 +1294,7 @@ side_cb(int print_fd,			/* I - Print file */
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr,
-                  _("WARNING: Failed to read side-channel request!\n"));
-    return;
-  }
+    return (-1);
 
   switch (command)
   {
@@ -1323,7 +1321,7 @@ side_cb(int print_fd,			/* I - Print file */
 	break;
   }
 
-  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+  return (cupsSideChannelWrite(command, status, data, datalen, 1.0));
 }
 
 

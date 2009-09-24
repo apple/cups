@@ -229,8 +229,11 @@ backendSNMPSupplies(
         packet.object_type != CUPS_ASN1_OCTET_STRING)
       return (-1);
 
-    new_state = (packet.object_value.string.bytes[0] << 8) |
-		packet.object_value.string.bytes[1];
+    if (packet.object_value.string.num_bytes == 2)
+      new_state = (packet.object_value.string.bytes[0] << 8) |
+		  packet.object_value.string.bytes[1];
+    else
+      new_state = 0;
 
     if (current_state < 0)
       change_state = 0xffff;

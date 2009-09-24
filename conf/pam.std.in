@@ -1,2 +1,2 @@
-auth	required	@PAMMOD@ nullok shadow
+auth	required	@PAMMODAUTH@
 account	required	@PAMMOD@

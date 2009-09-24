@@ -144,7 +144,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
   if (!strcasecmp(name, "LB"))
   {
     bufptr = buf;
-    while ((ch = getc(fp)) != StringTerminator)
+    while ((ch = getc(fp)) != StringTerminator && ch != EOF)
       if (bufptr < (buf + sizeof(buf) - 1))
         *bufptr++ = ch;
     *bufptr = '\0';

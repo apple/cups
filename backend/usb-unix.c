@@ -36,7 +36,7 @@
  */
 
 static int	open_device(const char *uri, int *use_bc);
-static void	side_cb(int print_fd, int device_fd, int snmp_fd,
+static int	side_cb(int print_fd, int device_fd, int snmp_fd,
 		        http_addr_t *addr, int use_bc);
 
 
@@ -560,7 +560,7 @@ open_device(const char *uri,		/* I - Device URI */
  * 'side_cb()' - Handle side-channel requests...
  */
 
-static void
+static int				/* O - 0 on success, -1 on error */
 side_cb(int         print_fd,		/* I - Print file */
         int         device_fd,		/* I - Device file */
         int         snmp_fd,		/* I - SNMP socket (unused) */
@@ -579,10 +579,7 @@ side_cb(int         print_fd,		/* I - Print file */
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
-    return;
-  }
+    return (-1);
 
   switch (command)
   {
@@ -625,7 +622,7 @@ side_cb(int         print_fd,		/* I - Print file */
 	break;
   }
 
-  cupsSideChannelWrite(command, status, data, datalen, 1.0);
+  return (cupsSideChannelWrite(command, status, data, datalen, 1.0));
 }
 
 

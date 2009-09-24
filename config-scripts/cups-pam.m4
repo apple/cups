@@ -22,9 +22,10 @@ if test $uname = AIX; then
 fi
 
 PAMDIR=""
-PAMFILE=""
+PAMFILE="pam.std"
 PAMLIBS=""
 PAMMOD="pam_unknown.so"
+PAMMODAUTH="pam_unknown.so"
 
 if test x$enable_pam != xno; then
 	SAVELIBS="$LIBS"
@@ -60,7 +61,7 @@ if test x$enable_pam != xno; then
 
 	case "$uname" in
 		Darwin*)
-			# Darwin, MacOS X
+			# Darwin/Mac OS X
 			if test "x$with_pam_module" != x; then
 				PAMFILE="pam.$with_pam_module"
 			elif test -f /usr/lib/pam/pam_opendirectory.so.2; then
@@ -70,26 +71,22 @@ if test x$enable_pam != xno; then
 			fi
 			;;
 
-		IRIX)
-			# SGI IRIX
-			PAMFILE="pam.irix"
-			;;
-
 		*)
 			# All others; this test might need to be updated
 			# as Linux distributors move things around...
 			if test "x$with_pam_module" != x; then
 				PAMMOD="pam_${with_pam_module}.so"
-			else
-				for mod in pam_unix2.so pam_unix.so pam_pwdb.so; do
-					if test -f /lib/security/$mod; then
-						PAMMOD="$mod"
-						break;
-					fi
-				done
+			elif test -f /lib/security/pam_unix2.so; then
+				PAMMOD="pam_unix2.so"
+			elif test -f /lib/security/pam_unix.so; then
+				PAMMOD="pam_unix.so"
 			fi
 
-			PAMFILE="pam.std"
+			if test "x$PAMMOD" = xpam_unix.so; then
+				PAMMODAUTH="$PAMMOD shadow nodelay"
+			else
+				PAMMODAUTH="$PAMMOD nodelay"
+			fi
 			;;
 	esac
 fi
@@ -98,6 +95,7 @@ AC_SUBST(PAMDIR)
 AC_SUBST(PAMFILE)
 AC_SUBST(PAMLIBS)
 AC_SUBST(PAMMOD)
+AC_SUBST(PAMMODAUTH)
 
 dnl
 dnl End of "$Id: cups-pam.m4 7960 2008-09-17 19:42:02Z mike $".

@@ -292,9 +292,8 @@ static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
 static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
-#endif /* __i386__ || __x86_64__ */
-static int	job_canceled = 0;	/* Was the job canceled? */
 static void sigterm_handler(int sig);	/* SIGTERM handler */
+#endif /* __i386__ || __x86_64__ */
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -461,9 +460,9 @@ print_device(const char *uri,		/* I - Device URI */
   fputs("STATE: -connecting-to-device\n", stderr);
 
   /*
-   * Now that we are "connected" to the port, catch SIGTERM so that we
+   * Now that we are "connected" to the port, ignore SIGTERM so that we
    * can finish out any page data the driver sends (e.g. to eject the
-   * current page...  Only catch SIGTERM if we are printing data from
+   * current page...  Only ignore SIGTERM if we are printing data from
    * stdin (otherwise you can't cancel raw jobs...)
    */
 
@@ -475,7 +474,7 @@ print_device(const char *uri,		/* I - Device URI */
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
-    action.sa_handler = sigterm_handler;
+    action.sa_handler = SIG_IGN;
     sigaction(SIGTERM, &action, NULL);
   }
 
@@ -725,7 +724,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n",
 	          err);
 
-	  status = job_canceled ? CUPS_BACKEND_FAILED : CUPS_BACKEND_STOP;
+	  status = CUPS_BACKEND_FAILED;
 	  break;
 	}
 	else if (bytes > 0)
@@ -944,7 +943,7 @@ sidechannel_thread(void *reference)
     datalen = sizeof(data);
 
     if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-      continue;
+      break;
 
     switch (command)
     {
@@ -2020,8 +2019,6 @@ static void run_legacy_backend(int argc,
 
   exit(exitstatus);
 }
-#endif /* __i386__ || __x86_64__ */
-
 
 /*
  * 'sigterm_handler()' - SIGTERM handler.
@@ -2030,7 +2027,8 @@ static void run_legacy_backend(int argc,
 static void
 sigterm_handler(int sig)		/* I - Signal */
 {
-#if defined(__i386__) || defined(__x86_64__)
+  /* If we started a child process pass the signal on to it...
+   */
   if (child_pid)
   {
    /*
@@ -2052,14 +2050,9 @@ sigterm_handler(int sig)		/* I - Signal */
       exit(CUPS_BACKEND_STOP);
     }
   }
-#endif /* __i386__ || __x86_64__ */
-
- /*
-  * Otherwise just flag that the job has been canceled...
-  */
-
-  job_canceled = 1;
 }
+
+#endif /* __i386__ || __x86_64__ */
 
 
 #ifdef PARSE_PS_ERRORS

@@ -158,7 +158,16 @@ print_device(const char *uri,		/* I - Device URI */
 
     while (poll(pfds, 2, -1) > 0)
     {
-      if (pfds[0].revents & POLLIN)
+     /*
+      * CUPS STR #3318: USB process hangs on end-of-file, making further
+      *                 printing impossible
+      *
+      * From a strict interpretation of POSIX poll(), POLLHUP should never be
+      * set without POLLIN, since POLLIN is the event you request.  That said,
+      * it appears that some versions of Linux break this.
+      */
+
+      if (pfds[0].revents & (POLLIN | POLLHUP))
       {
 	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
@@ -178,8 +187,13 @@ print_device(const char *uri,		/* I - Device URI */
 	  break;
       }
 
-      if (pfds[1].revents & POLLIN)
-        tbytes += side_cb(printer, print_fd);
+      if (pfds[1].revents & (POLLIN | POLLHUP))
+      {
+        if ((bytes = side_cb(printer, print_fd)) < 0)
+	  pfds[1].events = 0;		/* Filter has gone away... */
+	else
+          tbytes += bytes;
+      }
     }
   }
 
@@ -745,10 +759,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
   datalen = sizeof(data);
 
   if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-  {
-    _cupsLangPuts(stderr, _("WARNING: Failed to read side-channel request!\n"));
-    return (0);
-  }
+    return (-1);
 
   switch (command)
   {
