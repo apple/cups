@@ -12,12 +12,14 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupstestppd 1 "CUPS" "2 March 2009" "Apple Inc."
+.TH cupstestppd 1 "CUPS" "6 October 2009" "Apple Inc."
 .SH NAME
 cupstestppd \- test conformance of ppd files
 .SH SYNOPSIS
 .B cupstestppd
-[ -R
+[ -I
+.I category
+] [ -R
 .I rootdir
 ] [ -W
 .I category
@@ -41,6 +43,14 @@ on the command-line. The second form tests the PPD file provided
 on the standard input.
 .SH OPTIONS
 \fIcupstestppd\fR supports the following options:
+.TP 5
+-I filters
+.br
+Ignores all filter errors.
+.TP 5
+-I profiles
+.br
+Ignores all profile errors.
 .TP 5
 -R rootdir
 .br
