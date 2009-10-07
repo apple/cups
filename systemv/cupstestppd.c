@@ -101,6 +101,17 @@ enum
 
 
 /*
+ * File permissions...
+ */
+
+#define MODE_WRITE	0022		/* Group/other write */
+#define MODE_MASK	0555		/* Owner/group/other read+exec/search */
+#define MODE_DATAFILE	0444		/* Owner/group/other read */
+#define MODE_DIRECTORY	0555		/* Owner/group/other read+search */
+#define MODE_PROGRAM	0555		/* Owner/group/other read+exec */
+
+
+/*
  * Standard Adobe media keywords (must remain sorted)...
  */
 
@@ -304,6 +315,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		files;			/* Number of files */
   int		verbose;		/* Want verbose output? */
   int		warn;			/* Which errors to just warn about */
+  int		ignore;			/* Which errors to ignore */
   int		status;			/* Exit status */
   int		errors;			/* Number of conformance errors */
   int		ppdversion;		/* PPD spec version in PPD file */
@@ -341,6 +353,7 @@ main(int  argc,				/* I - Number of command-line args */
   status  = ERROR_NONE;
   root    = "";
   warn    = WARN_NONE;
+  ignore  = WARN_NONE;
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-' && argv[i][1])
@@ -348,6 +361,24 @@ main(int  argc,				/* I - Number of command-line args */
       for (opt = argv[i] + 1; *opt; opt ++)
         switch (*opt)
 	{
+	  case 'I' :			/* Ignore errors */
+	      i ++;
+
+	      if (i >= argc)
+	        usage();
+
+              if (!strcmp(argv[i], "none"))
+	        ignore = WARN_NONE;
+	      else if (!strcmp(argv[i], "filters"))
+	        ignore |= WARN_FILTERS;
+	      else if (!strcmp(argv[i], "profiles"))
+	        ignore |= WARN_PROFILES;
+	      else if (!strcmp(argv[i], "all"))
+	        ignore = WARN_FILTERS | WARN_PROFILES;
+	      else
+	        usage();
+	      break;
+
 	  case 'R' :			/* Alternate root directory */
 	      i ++;
 
@@ -357,7 +388,7 @@ main(int  argc,				/* I - Number of command-line args */
               root = argv[i];
 	      break;
 
-	  case 'W' :			/* Turn errors into warnings  */
+	  case 'W' :			/* Turn errors into warnings */
 	      i ++;
 
 	      if (i >= argc)
@@ -1256,10 +1287,10 @@ main(int  argc,				/* I - Number of command-line args */
       if (!(warn & WARN_CONSTRAINTS))
         errors = check_constraints(ppd, errors, verbose, 0);
 
-      if (!(warn & WARN_FILTERS))
+      if (!(warn & WARN_FILTERS) && !(ignore & WARN_FILTERS))
         errors = check_filters(ppd, root, errors, verbose, 0);
 
-      if (!(warn & WARN_PROFILES))
+      if (!(warn & WARN_PROFILES) && !(ignore & WARN_PROFILES))
         errors = check_profiles(ppd, root, errors, verbose, 0);
 
       if (!(warn & WARN_SIZES))
@@ -1387,17 +1418,17 @@ main(int  argc,				/* I - Number of command-line args */
       {
         check_basics(argv[i]);
 
-	if (warn & WARN_CONSTRAINTS)
-	  errors = check_constraints(ppd, errors, verbose, 1);
-
 	if (warn & WARN_DEFAULTS)
 	  errors = check_defaults(ppd, errors, verbose, 1);
 
-	if (warn & WARN_PROFILES)
-	  errors = check_profiles(ppd, root, errors, verbose, 1);
+	if (warn & WARN_CONSTRAINTS)
+	  errors = check_constraints(ppd, errors, verbose, 1);
 
-	if (warn & WARN_FILTERS)
+	if ((warn & WARN_FILTERS) && !(ignore & WARN_FILTERS))
 	  errors = check_filters(ppd, root, errors, verbose, 1);
+
+	if ((warn & WARN_PROFILES) && !(ignore & WARN_PROFILES))
+	  errors = check_profiles(ppd, root, errors, verbose, 1);
 
         if (warn & WARN_SIZES)
 	  errors = check_sizes(ppd, errors, verbose, 1);
@@ -2411,6 +2442,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 		pathprog[1024];		/* Complete path to program/filter */
   int		cost;			/* Cost of filter */
   const char	*prefix;		/* WARN/FAIL prefix */
+  struct stat	fileinfo;		/* File information */
 
 
   prefix = warn ? "  WARN  " : "**FAIL**";
@@ -2452,14 +2484,28 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 		   program);
       }
 
-      if (access(pathprog, X_OK))
+      if (stat(pathprog, &fileinfo))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout, _("      %s  Missing cupsFilter "
-				    "file \"%s\"\n"), prefix, program);
+				    "file \"%s\"\n"), prefix, pathprog);
+
+	if (!warn)
+	  errors ++;
+      }
+      else if (fileinfo.st_uid != 0 ||
+               (fileinfo.st_mode & MODE_WRITE) ||
+	       (fileinfo.st_mode & MODE_MASK) != MODE_PROGRAM)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout, _("      %s  Bad permissions on cupsFilter "
+				    "file \"%s\"\n"), prefix, pathprog);
 
 	if (!warn)
 	  errors ++;
@@ -2523,16 +2569,31 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 		   program);
       }
 
-      if (access(pathprog, X_OK))
+      if (stat(pathprog, &fileinfo))
       {
 	if (!warn && !errors && !verbose)
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout, _("      %s  Missing cupsPreFilter "
-				    "file \"%s\"\n"), prefix, program);
+				    "file \"%s\"\n"), prefix, pathprog);
 
         if (!warn)
+	  errors ++;
+      }
+      else if (fileinfo.st_uid != 0 ||
+               (fileinfo.st_mode & MODE_WRITE) ||
+	       (fileinfo.st_mode & MODE_MASK) != MODE_PROGRAM)
+      {
+	if (!warn && !errors && !verbose)
+	  _cupsLangPuts(stdout, _(" FAIL\n"));
+
+	if (verbose >= 0)
+	  _cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                            "cupsPreFilter file \"%s\"\n"), prefix,
+			  pathprog);
+
+	if (!warn)
 	  errors ++;
       }
       else
@@ -2562,8 +2623,11 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (!warn)
         errors ++;
     }
+    
+    snprintf(pathprog, sizeof(pathprog), "%s%s", root,
+             attr->value ? attr->value : "(null)");
 
-    if (!attr->value || access(attr->value, 0))
+    if (!attr->value || stat(pathprog, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2571,13 +2635,28 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing "
 				  "APDialogExtension file \"%s\"\n"),
-			prefix, attr->value ? attr->value : "<NULL>");
+			prefix, pathprog);
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DIRECTORY)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "APDialogExtension file \"%s\"\n"), prefix,
+			pathprog);
 
       if (!warn)
 	errors ++;
     }
     else
-      errors = valid_path("APDialogExtension", attr->value, errors, verbose,
+      errors = valid_path("APDialogExtension", pathprog, errors, verbose,
                           warn);
   }
 
@@ -2601,7 +2680,10 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
         errors ++;
     }
 
-    if (!attr->value || access(attr->value, 0))
+    snprintf(pathprog, sizeof(pathprog), "%s%s", root,
+             attr->value ? attr->value : "(null)");
+
+    if (!attr->value || stat(pathprog, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2609,13 +2691,28 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing "
 				  "APPrinterIconPath file \"%s\"\n"),
-			prefix, attr->value ? attr->value : "<NULL>");
+			prefix, pathprog);
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DATAFILE)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "APPrinterIconPath file \"%s\"\n"), prefix,
+			pathprog);
 
       if (!warn)
 	errors ++;
     }
     else
-      errors = valid_path("APPrinterIconPath", attr->value, errors, verbose,
+      errors = valid_path("APPrinterIconPath", pathprog, errors, verbose,
                           warn);
   }
 
@@ -2639,7 +2736,10 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
         errors ++;
     }
 
-    if (!attr->value || access(attr->value, 0))
+    snprintf(pathprog, sizeof(pathprog), "%s%s", root,
+             attr->value ? attr->value : "(null)");
+
+    if (!attr->value || stat(pathprog, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2647,13 +2747,28 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing "
 				  "APPrinterLowInkTool file \"%s\"\n"),
-			prefix, attr->value ? attr->value : "<NULL>");
+			prefix, pathprog);
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DIRECTORY)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "APPrinterLowInkTool file \"%s\"\n"), prefix,
+			pathprog);
 
       if (!warn)
 	errors ++;
     }
     else
-      errors = valid_path("APPrinterLowInkTool", attr->value, errors, verbose,
+      errors = valid_path("APPrinterLowInkTool", pathprog, errors, verbose,
                           warn);
   }
 
@@ -2677,7 +2792,10 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
         errors ++;
     }
 
-    if (!attr->value || access(attr->value, 0))
+    snprintf(pathprog, sizeof(pathprog), "%s%s", root,
+             attr->value ? attr->value : "(null)");
+
+    if (!attr->value || stat(pathprog, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2685,13 +2803,28 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing "
 				  "APPrinterUtilityPath file \"%s\"\n"),
-			prefix, attr->value ? attr->value : "<NULL>");
+			prefix, pathprog);
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DIRECTORY)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "APPrinterUtilityPath file \"%s\"\n"), prefix,
+			pathprog);
 
       if (!warn)
 	errors ++;
     }
     else
-      errors = valid_path("APPrinterUtilityPath", attr->value, errors, verbose,
+      errors = valid_path("APPrinterUtilityPath", pathprog, errors, verbose,
                           warn);
   }
 
@@ -2715,7 +2848,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
         errors ++;
     }
 
-    if (!attr->value || access(attr->value, 0))
+    if (!attr->value || stat(attr->value, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
@@ -2724,6 +2857,21 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 	_cupsLangPrintf(stdout, _("      %s  Missing "
 				  "APScanAppPath file \"%s\"\n"),
 			prefix, attr->value ? attr->value : "<NULL>");
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DIRECTORY)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "APScanAppPath file \"%s\"\n"), prefix,
+			attr->value);
 
       if (!warn)
 	errors ++;
@@ -2768,6 +2916,7 @@ check_profiles(ppd_file_t *ppd,		/* I - PPD file */
   const char	*ptr;			/* Pointer into string */
   const char	*prefix;		/* WARN/FAIL prefix */
   char		filename[1024];		/* Profile filename */
+  struct stat	fileinfo;		/* File information */
   int		num_profiles = 0;	/* Number of profiles */
   unsigned	hash,			/* Current hash value */
 		hashes[1000];		/* Hash values of profile names */
@@ -2822,14 +2971,29 @@ check_profiles(ppd_file_t *ppd,		/* I - PPD file */
 		 attr->value);
     }
 
-    if (access(filename, 0))
+    if (stat(filename, &fileinfo))
     {
       if (!warn && !errors && !verbose)
 	_cupsLangPuts(stdout, _(" FAIL\n"));
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing cupsICCProfile "
-				  "file \"%s\"!\n"), prefix, attr->value);
+				  "file \"%s\"!\n"), prefix, filename);
+
+      if (!warn)
+	errors ++;
+    }
+    else if (fileinfo.st_uid != 0 ||
+	     (fileinfo.st_mode & MODE_WRITE) ||
+	     (fileinfo.st_mode & MODE_MASK) != MODE_DATAFILE)
+    {
+      if (!warn && !errors && !verbose)
+	_cupsLangPuts(stdout, _(" FAIL\n"));
+
+      if (verbose >= 0)
+	_cupsLangPrintf(stdout, _("      %s  Bad permissions on "
+	                          "cupsICCProfile file \"%s\"\n"), prefix,
+			filename);
 
       if (!warn)
 	errors ++;
@@ -3489,6 +3653,8 @@ usage(void)
 		  "\n"
 		  "Options:\n"
 		  "\n"
+		  "    -I {filters,profiles}\n"
+		  "                         Ignore missing files\n"
 		  "    -R root-directory    Set alternate root\n"
 		  "    -W {all,none,constraints,defaults,duplex,filters,"
 		  "profiles,sizes,translations}\n"

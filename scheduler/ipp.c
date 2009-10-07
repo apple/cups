@@ -2324,8 +2324,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 		dstfile[1024];		/* Destination Script/PPD file */
   int		modify;			/* Non-zero if we are modifying */
   char		newname[IPP_MAX_NAME];	/* New printer name */
-  int		need_restart_job;	/* Need to restart job? */
-  int		set_device_uri,		/* Did we set the device URI? */
+  int		changed_driver,		/* Changed the PPD/interface script? */
+		need_restart_job,	/* Need to restart job? */
+		set_device_uri,		/* Did we set the device URI? */
 		set_port_monitor;	/* Did we set the port monitor? */
 
 
@@ -2469,6 +2470,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   * Look for attributes and copy them over as needed...
   */
 
+  changed_driver   = 0;
   need_restart_job = 0;
 
   if ((attr = ippFindAttribute(con->request, "printer-location",
@@ -2722,6 +2724,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   if (con->filename)
   {
     need_restart_job = 1;
+    changed_driver   = 1;
 
     strlcpy(srcfile, con->filename, sizeof(srcfile));
 
@@ -2792,18 +2795,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 	cupsdLogMessage(CUPSD_LOG_DEBUG,
 			"Copied PPD file successfully!");
 	chmod(dstfile, 0644);
-
-#ifdef __APPLE__
-       /*
-        * (Re)register color profiles...
-	*/
-
-        if (!RunUser)
-	{
-	  apple_unregister_profiles(printer);
-	  apple_register_profiles(printer);
-        }
-#endif /* __APPLE__ */
       }
       else
       {
@@ -2820,6 +2811,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                                     IPP_TAG_NAME)) != NULL)
   {
     need_restart_job = 1;
+    changed_driver   = 1;
 
     if (!strcmp(attr->values[0].string.text, "raw"))
     {
@@ -2857,19 +2849,33 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_DEBUG,
 		      "Copied PPD file successfully!");
       chmod(dstfile, 0644);
+    }
+  }
+
+  if (changed_driver)
+  {
+   /*
+    * If we changed the PPD/interface script, then remove the printer's cache
+    * file...
+    */
+
+    char cache_name[1024];		/* Cache filename for printer attrs */
+
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp", CacheDir,
+             printer->name);
+    unlink(cache_name);
 
 #ifdef __APPLE__
-     /*
-      * (Re)register color profiles...
-      */
+   /*
+    * (Re)register color profiles...
+    */
 
-      if (!RunUser)
-      {
-	apple_unregister_profiles(printer);
-	apple_register_profiles(printer);
-      }
-#endif /* __APPLE__ */
+    if (!RunUser)
+    {
+      apple_unregister_profiles(printer);
+      apple_register_profiles(printer);
     }
+#endif /* __APPLE__ */
   }
 
  /*

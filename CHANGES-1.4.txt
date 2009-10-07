@@ -3,6 +3,20 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The documentation for classes.conf and printers.conf did not provide
+	  the correct instructions for manual changes (STR #3351)
+	- The scheduler did not always rebuild printer cache files when the
+	  driver was changed (STR #3356)
+	- The documentation makefile failed to install localizations when using
+	  newer versions of Bash (STR #3360)
+	- The configure script did not use the --with-xinetd value for the
+	  default LPD configuration path (STR #3347)
+	- The configure script incorrectly required glib for DBUS support
+	  (STR #3346)
+	- The cupstestppd program incorrectly reported filters with bad
+	  permisssions as missing (STR #3363)
+	- The Russian web interface templates had errors (STR #3359)
+	- The cups.desktop file used the wrong locale names (STR #3358)
 	- cupsSideChannelRead() did not return an error for short reads.
 	- The installed PAM configuration file did not use the correct options
 	  with the pam_unix2 module (STR #3313)

@@ -20,7 +20,7 @@ fi
 rev=`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[a-zA-Z]*//g'`
 
 if test $# = 0; then
-	version="1.4svn-r$rev"
+	version="1.5svn-r$rev"
 else
 	version=$1
 fi
@@ -99,7 +99,7 @@ for file in packaging/cups-desc.plist packaging/cups-info.plist \
 	echo Updating $file...
 	sed -e '1,$s/@CUPS_VERSION@/'$version'/g' \
 		-e '1,$s/@CUPS_REVISION@//g' \
-		-e '1,$s/@CUPS_RELEASE@/1.4.'$rev'/g' \
+		-e '1,$s/@CUPS_RELEASE@/1.5.'$rev'/g' \
 		<$file.in >$file
 done
 

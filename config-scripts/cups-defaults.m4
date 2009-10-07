@@ -325,8 +325,8 @@ if test x$default_lpdconfigfile != xno; then
 				CUPS_DEFAULT_LPD_CONFIG_FILE="launchd:///System/Library/LaunchDaemons/org.cups.cups-lpd.plist"
 				;;
 			*)
-				if test -d /etc/xinetd.d; then
-					CUPS_DEFAULT_LPD_CONFIG_FILE="xinetd:///etc/xinetd.d/cups-lpd"
+				if test "x$XINETD" != x; then
+					CUPS_DEFAULT_LPD_CONFIG_FILE="xinetd://$XINETD/cups-lpd"
 				else
 					CUPS_DEFAULT_LPD_CONFIG_FILE=""
 				fi
