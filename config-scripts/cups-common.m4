@@ -266,11 +266,6 @@ if test "x$enable_dbus" != xno; then
 				dbus_message_iter_init_append,
 				AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
 				`$PKGCONFIG --libs dbus-1`)
-			if $PKGCONFIG --exists glib-2.0 && $PKGCONFIG --exists dbus-glib-1; then
-				DBUS_NOTIFIER="dbus"
-				DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs glib-2.0` `$PKGCONFIG --libs dbus-glib-1` `$PKGCONFIG --libs dbus-1`"
-				CFLAGS="$CFLAGS `$PKGCONFIG --cflags glib-2.0`"
-			fi
 		else
 			AC_MSG_RESULT(no)
 		fi
@@ -289,7 +284,6 @@ LEGACY_BACKENDS="parallel scsi"
 
 case $uname in
         Darwin*)
-#		FONTS=""
 		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
                 CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration -weak_framework ApplicationServices"

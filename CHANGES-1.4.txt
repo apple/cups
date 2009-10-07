@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The configure script incorrectly required glib for DBUS support
+	  (STR #3346)
 	- The cupstestppd program incorrectly reported filters with bad
 	  permisssions as missing (STR #3363)
 	- The Russian web interface templates had errors (STR #3359)
