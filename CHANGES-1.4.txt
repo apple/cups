@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The configure script did not use the --with-xinetd value for the
+	  default LPD configuration path (STR #3347)
 	- The configure script incorrectly required glib for DBUS support
 	  (STR #3346)
 	- The cupstestppd program incorrectly reported filters with bad
