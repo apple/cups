@@ -190,8 +190,8 @@ install-languages:
 	for lang in $(LANGUAGES); do \
 		if test -d $$lang; then \
 			$(INSTALL_DIR) -m 755 $(DOCDIR)/$$lang; \
-			$(INSTALL_MAN) $$lang/index.html $(DOCDIR)/$$lang; \
-			test -f $$lang/cups.css && $(INSTALL_MAN) $$lang/cups.css $(DOCDIR)/$$lang; \
+			$(INSTALL_DATA) $$lang/index.html $(DOCDIR)/$$lang; \
+			$(INSTALL_DATA) $$lang/cups.css $(DOCDIR)/$$lang >/dev/null 2>&1 || true; \
 		fi; \
 	done
 

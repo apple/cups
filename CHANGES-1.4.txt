@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The documentation makefile failed to install localizations when using
+	  newer versions of Bash (STR #3360)
 	- The configure script did not use the --with-xinetd value for the
 	  default LPD configuration path (STR #3347)
 	- The configure script incorrectly required glib for DBUS support
