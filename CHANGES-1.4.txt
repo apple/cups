@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- The documentation for classes.conf and printers.conf did not provide
+	  the correct instructions for manual changes (STR #3351)
 	- The scheduler did not always rebuild printer cache files when the
 	  driver was changed (STR #3356)
 	- The documentation makefile failed to install localizations when using
