@@ -62,16 +62,32 @@ fi
 AC_SUBST(INSTALL_LANGUAGES)
 AC_SUBST(UNINSTALL_LANGUAGES)
 
-AC_OUTPUT(Makedefs packaging/cups.list init/cups.sh init/cups-lpd cups-config
-	  conf/cupsd.conf conf/mime.convs conf/pam.std conf/snmp.conf
+AC_OUTPUT(Makedefs
+	  conf/cupsd.conf
+	  conf/mime.convs
+	  conf/pam.std
+	  conf/snmp.conf
+	  cups-config
 	  data/testprint
 	  desktop/cups.desktop
-	  doc/index.html doc/help/ref-cupsd-conf.html doc/help/standard.html
-	  init/org.cups.cups-lpd.plist init/cups.xml
-	  man/client.conf.man man/cups-deviced.man man/cups-driverd.man
-	  man/cups-lpd.man man/cupsaddsmb.man man/cupsd.man
-	  man/cupsd.conf.man man/drv.man man/lpoptions.man
-	  templates/header.tmpl
+	  doc/help/ref-cupsd-conf.html
+	  doc/help/standard.html
+	  doc/index.html
+	  man/client.conf.man
+	  man/cups-deviced.man
+	  man/cups-driverd.man
+	  man/cups-lpd.man
+	  man/cupsaddsmb.man
+	  man/cupsd.conf.man
+	  man/cupsd.man
+	  man/drv.man
+	  man/lpoptions.man
+	  scheduler/cups-lpd.xinetd
+	  scheduler/cups.sh
+	  scheduler/cups.xml
+	  scheduler/org.cups.cups-lpd.plist
+ 	  templates/header.tmpl
+          packaging/cups.list
 	  $LANGFILES)
 
 chmod +x cups-config

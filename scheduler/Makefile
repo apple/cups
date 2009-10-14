@@ -162,6 +162,43 @@ install-data:
 	$(INSTALL_DIR) -m 1770 -g $(CUPS_GROUP) $(REQUESTS)/tmp
 	echo Creating $(CACHEDIR)...
 	$(INSTALL_DIR) -m 775 -g $(CUPS_GROUP) $(CACHEDIR)
+	if test "x$(INITDIR)" != x; then \
+		echo Installing init scripts...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/init.d; \
+		$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		for level in $(RCLEVELS); do \
+			$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
+			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/S$(RCSTART)cups; \
+			if test `uname` = HP-UX; then \
+				level=`expr $$level - 1`; \
+				$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc$${level}.d; \
+			fi; \
+			$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc$${level}.d/K$(RCSTOP)cups; \
+		done; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(LN) ../init.d/cups $(BUILDROOT)$(INITDIR)/rc0.d/K$(RCSTOP)cups; \
+	fi
+	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
+		$(INSTALL_DIR) $(BUILDROOT)$(INITDDIR); \
+		if test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+			echo Installing LaunchDaemons configuration files...; \
+			$(INSTALL_DATA) org.cups.cupsd.plist $(BUILDROOT)$(DEFAULT_LAUNCHD_CONF); \
+			$(INSTALL_DATA) org.cups.cups-lpd.plist $(BUILDROOT)/System/Library/LaunchDaemons; \
+		else \
+			echo Installing RC script...; \
+			$(INSTALL_SCRIPT) cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
+		fi \
+	fi
+	if test "x$(SMFMANIFESTDIR)" != x; then \
+		echo Installing SMF manifest in $(SMFMANIFESTDIR)...;\
+		$(INSTALL_DIR) $(BUILDROOT)/$(SMFMANIFESTDIR); \
+		$(INSTALL_SCRIPT) cups.xml $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+	fi
+	if test "x$(XINETD)" != x; then \
+		echo Installing xinetd configuration file for cups-lpd...; \
+		$(INSTALL_DIR) -m 755 $(BUILDROOT)$(XINETD); \
+		$(INSTALL_DATA) cups-lpd.xinetd $(BUILDROOT)$(XINETD)/cups-lpd; \
+	fi
 
 
 #
@@ -266,6 +303,42 @@ uninstall:
 	-$(RMDIR) $(LIBDIR)
 	$(RM) $(INCLUDEDIR)/cups/mime.h
 	-$(RMDIR) $(INCLUDEDIR)/cups
+	echo Uninstalling startup script...
+	if test "x$(INITDIR)" != x; then \
+		$(RM) $(BUILDROOT)$(INITDIR)/init.d/cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/init.d; \
+		$(RM)  $(BUILDROOT)$(INITDIR)/rc0.d/K00cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc0.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc2.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc2.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc3.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc3.d; \
+		$(RM) $(BUILDROOT)$(INITDIR)/rc5.d/S99cups; \
+		$(RMDIR) $(BUILDROOT)$(INITDIR)/rc5.d; \
+	fi
+	if test "x$(INITDIR)" = x -a "x$(INITDDIR)" != x; then \
+		if test "$(INITDDIR)" = "/System/Library/StartupItems/PrintingServices"; then \
+			$(RM) $(BUILDROOT)$(INITDDIR)/PrintingServices; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/StartupParameters.plist; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj/Localizable.strings; \
+			$(RMDIR) $(BUILDROOT)$(INITDDIR)/Resources/English.lproj; \
+		elif test "$(INITDDIR)" = "/System/Library/LaunchDaemons"; then \
+			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cupsd.plist; \
+			$(RM) $(BUILDROOT)$(INITDDIR)/org.cups.cups-lpd.plist; \
+			$(RMDIR) $(BUILDROOT)/System/Library/StartupItems/PrintingServices; \
+		else \
+			$(INSTALL_SCRIPT) init/cups.sh $(BUILDROOT)$(INITDDIR)/cups; \
+		fi \
+		$(RMDIR) $(BUILDROOT)$(INITDDIR); \
+	fi
+	if test "x$(SMFMANIFESTDIR)" != x; then \
+		echo Uninstalling SMF manifest in $(SMFMANIFESTDIR)...;\
+		$(RM) $(BUILDROOT)$(SMFMANIFESTDIR)/cups.xml; \
+	fi
+	if test "x$(XINETD)" != x; then \
+		echo Uninstalling xinetd configuration file for cups-lpd...; \
+		$(RM) $(BUILDROOT)$(XINETD)/cups-lpd; \
+	fi
 
 
 #
