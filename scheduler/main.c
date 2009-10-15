@@ -165,7 +165,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (getuid() != geteuid())
   {
-    fputs("cupsd: Cannot run as a setuid program!\n", stderr);
+    fputs("cupsd: Cannot run as a setuid program\n", stderr);
     return (1);
   }
 #endif /* HAVE_GETEUID */
@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr, _("cupsd: Expected config filename "
-		                        "after \"-c\" option!\n"));
+		                        "after \"-c\" option\n"));
 	        usage(1);
 	      }
 
@@ -229,14 +229,14 @@ main(int  argc,				/* I - Number of command-line args */
                 if ((current = malloc(1024)) == NULL)
 		{
 		  _cupsLangPuts(stderr,
-		                _("cupsd: Unable to get current directory!\n"));
+		                _("cupsd: Unable to get current directory\n"));
                   return (1);
 		}
 
 		if (!getcwd(current, 1024))
 		{
 		  _cupsLangPuts(stderr,
-		                _("cupsd: Unable to get current directory!\n"));
+		                _("cupsd: Unable to get current directory\n"));
                   free(current);
 		  return (1);
 		}
@@ -294,13 +294,13 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  default : /* Unknown option */
               _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
-	                                "aborting!\n"), *opt);
+	                                "aborting\n"), *opt);
 	      usage(1);
 	      break;
 	}
     else
     {
-      _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting!\n"),
+      _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting\n"),
                       argv[i]);
       usage(1);
     }
@@ -362,13 +362,13 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (WIFEXITED(i))
       {
-        fprintf(stderr, "cupsd: Child exited with status %d!\n",
+        fprintf(stderr, "cupsd: Child exited with status %d\n",
 	        WEXITSTATUS(i));
 	return (2);
       }
       else
       {
-        fprintf(stderr, "cupsd: Child exited on signal %d!\n", WTERMSIG(i));
+        fprintf(stderr, "cupsd: Child exited on signal %d\n", WTERMSIG(i));
 	return (3);
       }
     }

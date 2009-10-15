@@ -70,7 +70,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = IPP_RESUME_PRINTER;
   else
   {
-    _cupsLangPrintf(stderr, _("%s: Don't know what to do!\n"),
+    _cupsLangPrintf(stderr, _("%s: Don't know what to do\n"),
                     command);
     return (1);
   }
@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	        	    command);
 #endif /* HAVE_SSL */
 	    break;
@@ -106,7 +106,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	command);
 	        return (1);
 	      }
@@ -129,7 +129,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected hostname after "
-				  "\'-h\' option!\n"),
+				  "\'-h\' option\n"),
 		        	command);
 	        return (1);
 	      }
@@ -148,7 +148,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected reason text after "
-				  "\'-r\' option!\n"),
+				  "\'-r\' option\n"),
 				command);
 		return (1);
 	      }
@@ -164,14 +164,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      op = IPP_RELEASE_HELD_NEW_JOBS;
 	    else
 	    {
-	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%s\'!\n"),
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%s\'\n"),
 			      command, argv[i]);
 	      return (1);
 	    }
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'\n"),
 	                    command, argv[i][1]);
 	    return (1);
       }

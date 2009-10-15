@@ -3,7 +3,7 @@
  *
  *   Image file to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -310,7 +310,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    fputs(_("ERROR: Unable to open image file for printing!\n"), stderr);
+    fputs(_("ERROR: Unable to open image file for printing\n"), stderr);
     ppdClose(ppd);
     return (1);
   }

@@ -3,7 +3,7 @@
  *
  *   HP-GL/2 input processing for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -136,7 +136,7 @@ ParseCommand(FILE    *fp,	/* I - File to read from */
     * file which we can't handle - abort!
     */
 
-    fputs(_("ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"),
+    fputs(_("ERROR: Invalid HP-GL/2 command seen, unable to print file\n"),
           stderr);
     return (-1);
   }

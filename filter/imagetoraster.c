@@ -3,7 +3,7 @@
  *
  *   Image file to raster filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -455,7 +455,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (cupsRasterInterpretPPD(&header, ppd, num_options, options, raster_cb))
   {
-    fputs(_("ERROR: Bad page setup!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Bad page setup\n"));
     fprintf(stderr, "DEBUG: %s\n", cupsRasterErrorString());
     return (1);
   }
@@ -586,7 +586,7 @@ main(int  argc,				/* I - Number of command-line arguments */
           (strcmp(profile->media_type, media_type) == 0 ||
            profile->media_type[0] == '-'))
       {
-        fputs("MATCH!\n", stderr);
+        fputs("MATCH\n", stderr);
 	break;
       }
       else
@@ -618,7 +618,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Open the input image to print...
   */
 
-  fputs(_("INFO: Loading image file...\n"), stderr);
+  _cupsLangPuts(stderr, _("INFO: Loading image file...\n"));
 
   if (header.cupsColorSpace == CUPS_CSPACE_CIEXYZ ||
       header.cupsColorSpace == CUPS_CSPACE_CIELab ||
@@ -632,7 +632,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    fputs(_("ERROR: Unable to open image file for printing!\n"), stderr);
+    _cupsLangPuts(stderr, _("ERROR: Unable to open image file for printing\n"));
     ppdClose(ppd);
     return (1);
   }
@@ -1194,8 +1194,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
 	      {
-		fputs(_("ERROR: Unable to write raster data to driver!\n"),
-		      stderr);
+		_cupsLangPuts(stderr,
+		              _("ERROR: Unable to write raster data to "
+			        "driver\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }
@@ -1290,8 +1291,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	                              header.cupsBytesPerLine)
 	    {
-              fputs(_("ERROR: Unable to write raster data to driver!\n"),
-	            stderr);
+              _cupsLangPuts(stderr,
+	                    _("ERROR: Unable to write raster data to driver\n"));
 	      cupsImageClose(img);
 	      exit(1);
 	    }
@@ -1330,8 +1331,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	              header.cupsBytesPerLine)
 	      {
-		fputs(_("ERROR: Unable to write raster data to driver!\n"),
-		      stderr);
+		_cupsLangPuts(stderr,
+		              _("ERROR: Unable to write raster data to "
+			        "driver\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }

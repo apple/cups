@@ -3,7 +3,7 @@
  *
  *   "lpinfo" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-		            _("%s: Sorry, no encryption support compiled in!\n"),
+		            _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -106,7 +106,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr,
-		              _("Error: need hostname after \'-h\' option!\n"));
+		              _("Error: need hostname after \'-h\' option\n"));
 		return (1);
               }
 
@@ -141,7 +141,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected 1284 device ID string "
-				"after --device-id!\n"));
+				"after --device-id\n"));
 		return (1);
 	      }
 	    }
@@ -159,7 +159,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected scheme list after "
-				"--exclude-schemes!\n"));
+				"--exclude-schemes\n"));
 		return (1);
 	      }
 	    }
@@ -177,7 +177,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected scheme list after "
-				"--include-schemes!\n"));
+				"--include-schemes\n"));
 		return (1);
 	      }
 	    }
@@ -194,7 +194,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected language after "
-				"--language!\n"));
+				"--language\n"));
 		return (1);
 	      }
 	    }
@@ -211,7 +211,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected make and model after "
-				"--make-and-model!\n"));
+				"--make-and-model\n"));
 		return (1);
 	      }
 	    }
@@ -228,7 +228,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 			      _("lpinfo: Expected product string after "
-				"--product!\n"));
+				"--product\n"));
 		return (1);
 	      }
 	    }
@@ -244,7 +244,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      else
 	      {
 		_cupsLangPuts(stderr,
-			      _("lpinfo: Expected timeout after --timeout!\n"));
+			      _("lpinfo: Expected timeout after --timeout\n"));
 		return (1);
 	      }
 	    }
@@ -254,20 +254,20 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 	    else
 	    {
-	      _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%s\'!\n"),
+	      _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%s\'\n"),
 			      argv[i]);
 	      return (1);
 	    }
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("lpinfo: Unknown option \'%c\'\n"),
 	                    argv[i][1]);
 	    return (1);
       }
     else
     {
-      _cupsLangPrintf(stderr, _("lpinfo: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpinfo: Unknown argument \'%s\'\n"),
                       argv[i]);
       return (1);
     }

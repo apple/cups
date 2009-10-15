@@ -432,7 +432,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 		      hostname);
       return (CUPS_BACKEND_STOP);
     }
@@ -602,7 +602,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   {
     _cupsLangPrintf(stderr,
 		    _("WARNING: Remote host did not respond with command "
-		      "status byte after %d seconds!\n"), timeout);
+		      "status byte after %d seconds\n"), timeout);
     status = errno;
   }
 
@@ -687,7 +687,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
                     hostname);
     return (CUPS_BACKEND_STOP);
   }
@@ -829,7 +829,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -1008,7 +1008,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	{
 	  _cupsLangPrintf(stderr,
 			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds!\n"), timeout);
+			    "status byte after %d seconds\n"), timeout);
 	  status = errno;
 	}
 
@@ -1100,7 +1100,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  {
 	    _cupsLangPrintf(stderr,
 			    _("WARNING: Remote host did not respond with data "
-			      "status byte after %d seconds!\n"), timeout);
+			      "status byte after %d seconds\n"), timeout);
 	    status = 0;
           }
 
@@ -1155,7 +1155,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	{
 	  _cupsLangPrintf(stderr,
 			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds!\n"), timeout);
+			    "status byte after %d seconds\n"), timeout);
 	  status = errno;
 	}
 

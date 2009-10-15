@@ -175,7 +175,7 @@ print_device(const char *uri,		/* I - Device URI */
 	                        bytes, 45000) < 0)
 	  {
 	    _cupsLangPrintf(stderr,
-			    _("ERROR: Unable to write %d bytes to printer!\n"),
+			    _("ERROR: Unable to write %d bytes to printer\n"),
 			    (int)bytes);
 	    tbytes = -1;
 	    break;
@@ -775,7 +775,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
 				  bytes, 5000) < 0)
 	    {
 	      _cupsLangPrintf(stderr,
-			      _("ERROR: Unable to write %d bytes to printer!\n"),
+			      _("ERROR: Unable to write %d bytes to printer\n"),
 			      (int)bytes);
 	      tbytes = -1;
 	      break;

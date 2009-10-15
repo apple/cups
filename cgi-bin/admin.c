@@ -637,7 +637,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
   if (!name)
   {
     cgiStartHTML(title);
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
@@ -1390,7 +1390,7 @@ do_cancel_subscription(http_t *http)/* I - HTTP connection */
 
   if (id <= 0)
   {
-    cgiSetVariable("ERROR", cgiText(_("Bad subscription ID!")));
+    cgiSetVariable("ERROR", cgiText(_("Bad subscription ID")));
     cgiStartHTML(_("Cancel RSS Subscription"));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -1954,7 +1954,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
                      cgiText(_("Unable to access cupsd.conf file:")));
       cgiSetVariable("ERROR",
                      cgiText(_("Unable to edit cupsd.conf files larger than "
-		               "1MB!")));
+		               "1MB")));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
 
@@ -2085,7 +2085,7 @@ do_delete_class(http_t *http)		/* I - HTTP connection */
   else
   {
     cgiStartHTML(cgiText(_("Delete Class")));
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
@@ -2170,7 +2170,7 @@ do_delete_printer(http_t *http)		/* I - HTTP connection */
   else
   {
     cgiStartHTML(cgiText(_("Delete Printer")));
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
     return;
@@ -2345,11 +2345,11 @@ do_export(http_t *http)			/* I - HTTP connection */
   else if (username && !*username)
     cgiSetVariable("ERROR",
                    cgiText(_("A Samba username is required to export "
-		             "printer drivers!")));
+		             "printer drivers")));
   else if (username && (!password || !*password))
     cgiSetVariable("ERROR",
                    cgiText(_("A Samba password is required to export "
-		             "printer drivers!")));
+		             "printer drivers")));
 
  /*
   * Show form...
@@ -2806,7 +2806,7 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
 
   if (!printer)
   {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiStartHTML(cgiText(_("Set Allowed Users")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -3060,7 +3060,7 @@ do_set_default(http_t *http)		/* I - HTTP connection */
 
   if (!printer)
   {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -3171,7 +3171,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 		     printer);
   else
   {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();
@@ -3849,7 +3849,7 @@ do_set_sharing(http_t *http)		/* I - HTTP connection */
 
   if (!printer || !shared)
   {
-    cgiSetVariable("ERROR", cgiText(_("Missing form variable!")));
+    cgiSetVariable("ERROR", cgiText(_("Missing form variable")));
     cgiStartHTML(cgiText(_("Set Publishing")));
     cgiCopyTemplateLang("error.tmpl");
     cgiEndHTML();

@@ -114,7 +114,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Unable to add a printer to the class:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -128,7 +128,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 		              _("lpadmin: Expected class name after \'-c\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -139,7 +139,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Class name can only contain printable "
-			      "characters!\n"));
+			      "characters\n"));
 	      return (1);
 	    }
 
@@ -172,7 +172,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected printer name after \'-d\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -183,7 +183,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Printer name can only contain "
-			      "printable characters!\n"));
+			      "printable characters\n"));
 	      return (1);
 	    }
 
@@ -210,7 +210,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPuts(stderr,
 	                      _("lpadmin: Expected hostname after \'-h\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
               }
 
@@ -238,7 +238,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Unable to set the interface script:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -255,7 +255,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected interface after \'-i\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -274,7 +274,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 		httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
               _cupsLangPrintf(stderr,
-	                      _("%s: Sorry, no encryption support compiled in!\n"),
+	                      _("%s: Sorry, no encryption support compiled in\n"),
 	                      argv[0]);
 #endif /* HAVE_SSL */
 	      break;
@@ -319,7 +319,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                    _("lpadmin: Unable to set the interface script or "
 			      "PPD file:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -336,7 +336,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected model after \'-m\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -356,7 +356,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected name=value after \'-o\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -389,7 +389,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected printer after \'-p\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -400,7 +400,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Printer name can only contain "
-			      "printable characters!\n"));
+			      "printable characters\n"));
 	      return (1);
 	    }
 	    break;
@@ -426,7 +426,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                    _("lpadmin: Unable to remove a printer from the "
 			      "class:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -440,7 +440,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected class after \'-r\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -451,7 +451,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Class name can only contain printable "
-			      "characters!\n"));
+			      "characters\n"));
 	      return (1);
 	    }
 
@@ -469,7 +469,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -489,7 +489,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected allow/deny:userlist after "
-			        "\'-u\' option!\n"));
+			        "\'-u\' option\n"));
 		return (1);
 	      }
 
@@ -505,7 +505,7 @@ main(int  argc,			/* I - Number of command-line arguments */
             else
 	    {
 	      _cupsLangPrintf(stderr,
-	                      _("lpadmin: Unknown allow/deny option \"%s\"!\n"),
+	                      _("lpadmin: Unknown allow/deny option \"%s\"\n"),
 	                      val);
 	      return (1);
 	    }
@@ -531,7 +531,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Unable to set the device URI:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -548,7 +548,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected device URI after \'-v\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -582,7 +582,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected printer or class after "
-			        "\'-x\' option!\n"));
+			        "\'-x\' option\n"));
 		return (1);
 	      }
 
@@ -593,7 +593,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Printer name can only contain "
-			      "printable characters!\n"));
+			      "printable characters\n"));
 	      return (1);
 	    }
 
@@ -624,7 +624,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                    _("lpadmin: Unable to set the printer "
 			      "description:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -641,7 +641,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected description after "
-			        "\'-D\' option!\n"));
+			        "\'-D\' option\n"));
 		return (1);
 	      }
 
@@ -657,12 +657,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Expected file type(s) after \'-I\' "
-			      "option!\n"));
+			      "option\n"));
 	      return (1);
 	    }
 
 	    _cupsLangPuts(stderr,
-	                  _("lpadmin: Warning - content type list ignored!\n"));
+	                  _("lpadmin: Warning - content type list ignored\n"));
 	    break;
 	    
         case 'L' : /* Set the printer-location attribute */
@@ -685,7 +685,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Unable to set the printer location:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -702,7 +702,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 		_cupsLangPuts(stderr,
 	                      _("lpadmin: Expected location after \'-L\' "
-			        "option!\n"));
+			        "option\n"));
 		return (1);
 	      }
 
@@ -731,7 +731,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      _cupsLangPuts(stderr,
 	                    _("lpadmin: Unable to set the PPD file:\n"
 			      "         You must specify a printer name "
-			      "first!\n"));
+			      "first\n"));
 	      return (1);
 	    }
 
@@ -747,7 +747,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-	                      _("lpadmin: Expected PPD after \'-P\' option!\n"));
+	                      _("lpadmin: Expected PPD after \'-P\' option\n"));
 		return (1);
 	      }
 
@@ -758,12 +758,12 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("lpadmin: Unknown option \'%c\'!\n"), argv[i][1]);
+	                    _("lpadmin: Unknown option \'%c\'\n"), argv[i][1]);
 	    return (1);
       }
     else
     {
-      _cupsLangPrintf(stderr, _("lpadmin: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpadmin: Unknown argument \'%s\'\n"),
                       argv[i]);
       return (1);
     }
@@ -791,7 +791,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     {
       _cupsLangPuts(stderr,
                     _("lpadmin: Unable to set the printer options:\n"
-		      "         You must specify a printer name first!\n"));
+		      "         You must specify a printer name first\n"));
       return (1);
     }
 
@@ -1125,7 +1125,7 @@ delete_printer_from_class(
 
   if ((members = ippFindAttribute(response, "member-names", IPP_TAG_NAME)) == NULL)
   {
-    _cupsLangPuts(stderr, _("lpadmin: No member names were seen!\n"));
+    _cupsLangPuts(stderr, _("lpadmin: No member names were seen\n"));
 
     ippDelete(response);
 

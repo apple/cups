@@ -3,7 +3,7 @@
 //
 //   PPD file merge utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2009 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -135,7 +135,7 @@ main(int  argc,				// I - Number of command-line arguments
       if ((locale = ppd_locale(ppd)) == NULL)
       {
         _cupsLangPrintf(stderr,
-	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"),
+	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s\n"),
 			ppd->lang_version, argv[i]);
         cupsFileClose(infile);
 	ppdClose(ppd);

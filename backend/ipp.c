@@ -343,7 +343,7 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ERROR: Unknown encryption option value \"%s\"!\n"),
+	                  _("ERROR: Unknown encryption option value \"%s\"\n"),
 	        	  value);
         }
       }
@@ -360,7 +360,7 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ERROR: Unknown version option value \"%s\"!\n"),
+	                  _("ERROR: Unknown version option value \"%s\"\n"),
 	        	  value);
 	}
       }
@@ -389,7 +389,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Unknown option \"%s\" with value \"%s\"!\n"),
+	                _("ERROR: Unknown option \"%s\" with value \"%s\"\n"),
 			name, value);
       }
     }
@@ -417,7 +417,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 		      hostname);
       return (CUPS_BACKEND_STOP);
     }
@@ -448,7 +448,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (tbytes <= 1)
     {
-      _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Empty print file\n"));
       unlink(tmpfilename);
       return (CUPS_BACKEND_FAILED);
     }
@@ -560,7 +560,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -576,7 +576,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (h_errno)
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 			hostname);
 	return (CUPS_BACKEND_STOP);
       }
@@ -691,7 +691,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -721,7 +721,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist!\n"));
+        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist\n"));
 
 	if (supported)
           ippDelete(supported);
@@ -731,7 +731,7 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Unable to get printer status (%s)!\n"),
+	                _("ERROR: Unable to get printer status (%s)\n"),
 			cupsLastErrorString());
         sleep(10);
       }
@@ -1026,7 +1026,7 @@ main(int  argc,				/* I - Number of command-line args */
 	* Update auth-info-required as needed...
 	*/
 
-        _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
+        _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)\n"),
 			cupsLastErrorString());
 
 	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
@@ -1197,7 +1197,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippDelete(response);
 
           _cupsLangPrintf(stderr,
-			  _("ERROR: Unable to get job %d attributes (%s)!\n"),
+			  _("ERROR: Unable to get job %d attributes (%s)\n"),
 			  job_id, cupsLastErrorString());
           break;
 	}
@@ -1723,7 +1723,7 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   if (!printer)
   {
     _cupsLangPuts(stderr,
-                  _("ERROR: PRINTER environment variable not defined!\n"));
+                  _("ERROR: PRINTER environment variable not defined\n"));
     return (-1);
   }
 
@@ -1842,10 +1842,10 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   if (status)
   {
     if (status >= 256)
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d\n"),
 		      status / 256);
     else
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d\n"),
 		      status);
 
     return (status);

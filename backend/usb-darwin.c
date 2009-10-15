@@ -373,12 +373,12 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!g.make || !g.model)
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
 
     if (!g.make)
-      fputs("DEBUG: USB make string is NULL!\n", stderr);
+      fputs("DEBUG: USB make string is NULL\n", stderr);
     if (!g.model)
-      fputs("DEBUG: USB model string is NULL!\n", stderr);
+      fputs("DEBUG: USB model string is NULL\n", stderr);
 
     return (CUPS_BACKEND_STOP);
   }
@@ -431,7 +431,7 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
       fprintf(stderr, "DEBUG: Could not load %s\n", print_buffer);
 
       if (driverBundlePath)
@@ -496,8 +496,8 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
-      fputs("DEBUG: Couldn't create side-channel thread!\n", stderr);
+      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+      fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
       return (CUPS_BACKEND_STOP);
     }
   }
@@ -514,8 +514,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error!\n"));
-    fputs("DEBUG: Couldn't create read thread!\n", stderr);
+    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+    fputs("DEBUG: Couldn't create read thread\n", stderr);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -593,12 +593,12 @@ print_device(const char *uri,		/* I - Device URI */
 	if (errno == EINTR && total_bytes == 0)
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
-	        "written, aborting!\n", stderr);
+	        "written, aborting\n", stderr);
           return (CUPS_BACKEND_OK);
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	  perror("DEBUG: select");
 	  return (CUPS_BACKEND_FAILED);
 	}
@@ -640,7 +640,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN && errno != EINTR)
 	  {
-	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data!\n"));
+	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	    perror("DEBUG: read");
 	    return (CUPS_BACKEND_FAILED);
 	  }
@@ -674,7 +674,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	if (iostatus == kIOUSBTransactionTimeout)
 	{
-	  fputs("DEBUG: Got USB transaction timeout during write!\n", stderr);
+	  fputs("DEBUG: Got USB transaction timeout during write\n", stderr);
 	  iostatus = 0;
 	}
 
@@ -684,7 +684,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	else if (iostatus == kIOUSBPipeStalled)
 	{
-	  fputs("DEBUG: Got USB pipe stalled during write!\n", stderr);
+	  fputs("DEBUG: Got USB pipe stalled during write\n", stderr);
 
 	  bytes    = g.print_bytes;
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
@@ -697,7 +697,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	else if (iostatus == kIOReturnAborted)
 	{
-	  fputs("DEBUG: Got return aborted during write!\n", stderr);
+	  fputs("DEBUG: Got return aborted during write\n", stderr);
 
 	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n", err);
@@ -716,7 +716,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  * Write error - bail if we don't see an error we can retry...
 	  */
 
-	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data\n"));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
 	          iostatus);
 
@@ -897,11 +897,11 @@ static void *read_thread(void *reference)
 #endif
     }
     else if (readstatus == kIOUSBTransactionTimeout)
-      fputs("DEBUG: Got USB transaction timeout during write!\n", stderr);
+      fputs("DEBUG: Got USB transaction timeout during write\n", stderr);
     else if (readstatus == kIOUSBPipeStalled)
-      fputs("DEBUG: Got USB pipe stalled during read!\n", stderr);
+      fputs("DEBUG: Got USB pipe stalled during read\n", stderr);
     else if (readstatus == kIOReturnAborted)
-      fputs("DEBUG: Got return aborted during read!\n", stderr);
+      fputs("DEBUG: Got return aborted during read\n", stderr);
 
    /*
     * Make sure this loop executes no more than once every 250 miliseconds...
@@ -1949,7 +1949,7 @@ static void run_legacy_backend(int argc,
 #  else
 	perror("DEBUG: Unable to set binary preference to ppc");
 #  endif /* __x86_64__ */
-	_cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
+	_cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
 	exit(CUPS_BACKEND_STOP);
       }
     }
@@ -1971,7 +1971,7 @@ static void run_legacy_backend(int argc,
     {
       fprintf(stderr, "DEBUG: Unable to exec %s: %s\n", usbpath,
               strerror(errno));
-      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver!\n"));
+      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
       exit(CUPS_BACKEND_STOP);
     }
 
@@ -1997,14 +1997,14 @@ static void run_legacy_backend(int argc,
     if (WIFSIGNALED(childstatus))
     {
       exitstatus = CUPS_BACKEND_STOP;
-      fprintf(stderr, "DEBUG: usb(legacy) backend %d crashed on signal %d!\n",
+      fprintf(stderr, "DEBUG: usb(legacy) backend %d crashed on signal %d\n",
               child_pid, WTERMSIG(childstatus));
     }
     else
     {
       if ((exitstatus = WEXITSTATUS(childstatus)) != 0)
 	fprintf(stderr,
-	        "DEBUG: usb(legacy) backend %d stopped with status %d!\n",
+	        "DEBUG: usb(legacy) backend %d stopped with status %d\n",
 		child_pid, exitstatus);
       else
 	fprintf(stderr, "DEBUG: usb(legacy) backend %d exited with no errors\n",
@@ -2046,7 +2046,7 @@ sigterm_handler(int sig)		/* I - Signal */
       exit(0);
     else
     {
-      fprintf(stderr, "DEBUG: Child crashed on signal %d!\n", status);
+      fprintf(stderr, "DEBUG: Child crashed on signal %d\n", status);
       exit(CUPS_BACKEND_STOP);
     }
   }

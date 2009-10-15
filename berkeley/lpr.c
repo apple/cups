@@ -3,7 +3,7 @@
  *
  *   "lpr" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -74,7 +74,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -89,7 +89,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -109,7 +109,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-H\' option!\n"),
+			          "\'-H\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -132,7 +132,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPrintf(stderr,
 		                _("%s: Error - expected value after \'-%c\' "
-				  "option!\n"), argv[0], ch);
+				  "option\n"), argv[0], ch);
 		return (1);
 	      }
 	    }
@@ -146,7 +146,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	case 'v' : /* Raster image */
 	    _cupsLangPrintf(stderr,
 	                    _("%s: Warning - \'%c\' format modifier not "
-			      "supported - output may not be correct!\n"),
+			      "supported - output may not be correct\n"),
 			    argv[0], ch);
 	    break;
 
@@ -160,7 +160,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: error - expected option=value after "
-			          "\'-o\' option!\n"),
+			          "\'-o\' option\n"),
 				argv[0]);
 		return (1);
 	      }
@@ -217,7 +217,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected destination after "
-			          "\'-P\' option!\n"),
+			          "\'-P\' option\n"),
 				argv[0]);
 		return (1);
 	      }
@@ -249,7 +249,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected copy count after "
-			          "\'-#\' option!\n"),
+			          "\'-#\' option\n"),
 				argv[0]);
 		return (1);
 	      }
@@ -273,7 +273,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 		_cupsLangPrintf(stderr,
 		                _("%s: Error - expected name after \'-%c\' "
-				  "option!\n"), argv[0], ch);
+				  "option\n"), argv[0], ch);
 		return (1);
 	      }
 
@@ -283,7 +283,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \'%c\'!\n"),
+	                    _("%s: Error - unknown option \'%c\'\n"),
 			    argv[0], argv[i][1]);
 	    return (1);
       }
@@ -354,7 +354,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (printer && !cupsGetNamedDest(NULL, printer, NULL))
       _cupsLangPrintf(stderr,
                       _("%s: Error - %s environment variable names "
-		        "non-existent destination \"%s\"!\n"),
+		        "non-existent destination \"%s\"\n"),
         	      argv[0], val, printer);
     else if (cupsLastError() == IPP_NOT_FOUND)
       _cupsLangPrintf(stderr,
@@ -362,7 +362,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		      argv[0]);
     else
       _cupsLangPrintf(stderr,
-                      _("%s: Error - scheduler not responding!\n"),
+                      _("%s: Error - scheduler not responding\n"),
 		      argv[0]);
 
     return (1);

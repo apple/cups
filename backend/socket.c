@@ -263,7 +263,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
                     hostname);
     return (CUPS_BACKEND_STOP);
   }
@@ -305,7 +305,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -474,7 +474,7 @@ wait_bc(int device_fd,			/* I - Socket */
 
     if ((bytes = read(device_fd, buffer, sizeof(buffer))) > 0)
     {
-      fprintf(stderr, "DEBUG: Received %d bytes of back-channel data!\n",
+      fprintf(stderr, "DEBUG: Received %d bytes of back-channel data\n",
 	      (int)bytes);
       cupsBackChannelWrite(buffer, bytes, 1.0);
     }

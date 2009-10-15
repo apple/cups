@@ -3,7 +3,7 @@
  *
  *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2001-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -88,7 +88,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
       _cupsLangPrintf(stderr,
-	              _("%s: Sorry, no encryption support compiled in!\n"),
+	              _("%s: Sorry, no encryption support compiled in\n"),
 	              argv[0]);
 #endif /* HAVE_SSL */
     }

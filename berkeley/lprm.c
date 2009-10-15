@@ -3,7 +3,7 @@
  *
  *   "lprm" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,7 +69,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -90,7 +90,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	                                 NULL)) == NULL)
 	    {
 	      _cupsLangPrintf(stderr,
-	                      _("%s: Error - unknown destination \"%s\"!\n"),
+	                      _("%s: Error - unknown destination \"%s\"\n"),
 			      argv[0], name);
               goto error;
 	    }
@@ -108,7 +108,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        goto error;
 	      }
@@ -128,7 +128,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-h\' option!\n"),
+			          "\'-h\' option\n"),
 				argv[0]);
 		goto error;
               }
@@ -145,7 +145,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \'%c\'!\n"),
+	                    _("%s: Error - unknown option \'%c\'\n"),
 			    argv[0], argv[i][1]);
             goto error;
       }
@@ -179,7 +179,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       else
       {
 	_cupsLangPrintf(stderr,
-			_("%s: Error - unknown destination \"%s\"!\n"),
+			_("%s: Error - unknown destination \"%s\"\n"),
 			argv[0], argv[i]);
 	goto error;
       }

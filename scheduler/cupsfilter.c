@@ -347,7 +347,7 @@ main(int  argc,				/* I - Number of command-line args */
     else
     {
       _cupsLangPuts(stderr,
-                    _("cupsfilter: Only one filename can be specified!\n"));
+                    _("cupsfilter: Only one filename can be specified\n"));
       usage(command, NULL);
     }
 
@@ -382,7 +382,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     _cupsLangPrintf(stderr,
                     _("%s: Unable to read MIME database from \"%s\" or "
-		      "\"%s\"!\n"),
+		      "\"%s\"\n"),
 		    command, mimedir, ServerRoot);
     return (1);
   }
@@ -408,7 +408,7 @@ main(int  argc,				/* I - Number of command-line args */
     if ((src = mimeType(mime, super, type)) == NULL)
     {
       _cupsLangPrintf(stderr,
-		      _("%s: Unknown source MIME type %s/%s!\n"),
+		      _("%s: Unknown source MIME type %s/%s\n"),
 		      command, super, type);
       return (1);
     }
@@ -416,7 +416,7 @@ main(int  argc,				/* I - Number of command-line args */
   else if ((src = mimeFileType(mime, infile, infile, &compression)) == NULL)
   {
     _cupsLangPrintf(stderr,
-                    _("%s: Unable to determine MIME type of \"%s\"!\n"),
+                    _("%s: Unable to determine MIME type of \"%s\"\n"),
 		    command, infile);
     return (1);
   }
@@ -427,7 +427,7 @@ main(int  argc,				/* I - Number of command-line args */
   else if ((dst = mimeType(mime, super, type)) == NULL)
   {
     _cupsLangPrintf(stderr,
-                    _("%s: Unknown destination MIME type %s/%s!\n"),
+                    _("%s: Unknown destination MIME type %s/%s\n"),
 		    command, super, type);
     return (1);
   }
@@ -450,7 +450,7 @@ main(int  argc,				/* I - Number of command-line args */
   else if ((filters = mimeFilter(mime, src, dst, &cost)) == NULL)
   {
     _cupsLangPrintf(stderr,
-                    _("%s: No filter to convert from %s/%s to %s/%s!\n"),
+                    _("%s: No filter to convert from %s/%s to %s/%s\n"),
 		    command, src->super, src->type, dst->super, dst->type);
     return (1);
   }
@@ -1031,10 +1031,10 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
       if (status)
       {
 	if (WIFEXITED(status))
-	  fprintf(stderr, "ERROR: %s (PID %d) stopped with status %d!\n",
+	  fprintf(stderr, "ERROR: %s (PID %d) stopped with status %d\n",
 		  filter->filter, pid, WEXITSTATUS(status));
 	else
-	  fprintf(stderr, "ERROR: %s (PID %d) crashed on signal %d!\n",
+	  fprintf(stderr, "ERROR: %s (PID %d) crashed on signal %d\n",
 		  filter->filter, pid, WTERMSIG(status));
 
         retval = 1;
@@ -1085,13 +1085,13 @@ get_job_file(const char *job)		/* I - Job ID */
 
   if (jobid < 1 || jobid > INT_MAX)
   {
-    _cupsLangPrintf(stderr, _("cupsfilter: Invalid job ID %d!\n"), (int)jobid);
+    _cupsLangPrintf(stderr, _("cupsfilter: Invalid job ID %d\n"), (int)jobid);
     exit(1);
   }
 
   if (docnum < 1 || docnum > INT_MAX)
   {
-    _cupsLangPrintf(stderr, _("cupsfilter: Invalid document number %d!\n"),
+    _cupsLangPrintf(stderr, _("cupsfilter: Invalid document number %d\n"),
                     (int)docnum);
     exit(1);
   }
@@ -1309,7 +1309,7 @@ usage(const char *command,		/* I - Command name */
       const char *opt)			/* I - Incorrect option, if any */
 {
   if (opt)
-    _cupsLangPrintf(stderr, _("%s: Unknown option '%c'!\n"), command, *opt);
+    _cupsLangPrintf(stderr, _("%s: Unknown option '%c'\n"), command, *opt);
 
   if (!strcmp(command, "cupsfilter"))
     _cupsLangPuts(stdout,
