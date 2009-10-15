@@ -3,7 +3,7 @@
  *
  *   "lpstat" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -106,7 +106,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -142,7 +142,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -163,7 +163,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - need \"completed\", "
 			          "\"not-completed\", or \"all\" after "
-				  "\'-W\' option!\n"),
+				  "\'-W\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -177,7 +177,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      _cupsLangPrintf(stderr,
 		              _("%s: Error - need \"completed\", "
 				"\"not-completed\", or \"all\" after "
-				"\'-W\' option!\n"),
+				"\'-W\' option\n"),
 			      argv[0]);
 	      return (1);
 	    }
@@ -236,7 +236,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPrintf(stderr,
 	                      _("%s: Error - expected destination after "
-			        "\'-b\' option!\n"),
+			        "\'-b\' option\n"),
 			      argv[0]);
 
 	      return (1);
@@ -296,7 +296,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 	                	_("%s: Error - expected hostname after "
-			          "\'-h\' option!\n"),
+			          "\'-h\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -456,7 +456,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \'%c\'!\n"),
+	                    _("%s: Error - unknown option \'%c\'\n"),
 			    argv[0], argv[i][1]);
 	    return (1);
       }
@@ -508,7 +508,7 @@ check_dest(const char  *command,	/* I  - Command name */
       if ((*dests = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer, pptr)) == NULL)
       {
         _cupsLangPrintf(stderr,
-	                _("%s: Invalid destination name in list \"%s\"!\n"),
+	                _("%s: Invalid destination name in list \"%s\"\n"),
 			command, name);
         exit(1);
       }
@@ -547,7 +547,7 @@ check_dest(const char  *command,	/* I  - Command name */
       else
       {
         _cupsLangPrintf(stderr,
-	                _("%s: Invalid destination name in list \"%s\"!\n"),
+	                _("%s: Invalid destination name in list \"%s\"\n"),
 			command, name);
         exit(1);
       }
@@ -562,7 +562,7 @@ check_dest(const char  *command,	/* I  - Command name */
     if (!cupsGetDest(printer, NULL, *num_dests, *dests))
     {
       _cupsLangPrintf(stderr,
-                      _("%s: Unknown destination \"%s\"!\n"), command, printer);
+                      _("%s: Unknown destination \"%s\"\n"), command, printer);
       exit(1);
     }
   }
@@ -1037,7 +1037,7 @@ show_default(cups_dest_t *dest)		/* I - Default destination */
     if (printer)
       _cupsLangPrintf(stdout,
                       _("lpstat: error - %s environment variable names "
-		        "non-existent destination \"%s\"!\n"),
+		        "non-existent destination \"%s\"\n"),
         	      val, printer);
     else
       _cupsLangPuts(stdout, _("no system default destination\n"));

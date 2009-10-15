@@ -3,7 +3,7 @@
  *
  *   Advanced EPSON ESC/P raster driver for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -917,7 +917,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
     if (!DotAvailList)
     {
-      fputs("ERROR: Unable to allocate band list!\n", stderr);
+      fputs("ERROR: Unable to allocate band list\n", stderr);
       exit(1);
     }
 
@@ -1788,7 +1788,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!ppd)
   {
-    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file\n"));
     return (1);
   }
 
@@ -1903,7 +1903,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
     return (1);
   }
   else

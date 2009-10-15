@@ -3,7 +3,7 @@
  *
  *   "lp" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -105,7 +105,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -120,7 +120,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -143,7 +143,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected destination after "
-			          "\'-d\' option!\n"),
+			          "\'-d\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -173,13 +173,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected form after \'-f\' "
-				  "option!\n"),
+				  "option\n"),
 				argv[0]);
 		return (1);
               }
 	    }
 
-	    _cupsLangPrintf(stderr, _("%s: Warning - form option ignored!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Warning - form option ignored\n"),
 	                    argv[0]);
 	    break;
 
@@ -194,7 +194,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected hostname after "
-				  "\'-h\' option!\n"),
+				  "\'-h\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -213,7 +213,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPrintf(stderr,
-		                _("%s: Expected job ID after \'-i\' option!\n"),
+		                _("%s: Expected job ID after \'-i\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -225,7 +225,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    {
 	      _cupsLangPrintf(stderr,
 		              _("%s: Error - cannot print files and alter "
-			        "jobs simultaneously!\n"),
+			        "jobs simultaneously\n"),
 			      argv[0]);
 	      return (1);
 	    }
@@ -237,7 +237,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
             if (job_id < 0)
 	    {
-	      _cupsLangPrintf(stderr, _("%s: Error - bad job ID!\n"), argv[0]);
+	      _cupsLangPrintf(stderr, _("%s: Error - bad job ID\n"), argv[0]);
 	      break;
 	    }
 	    break;
@@ -271,7 +271,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected copies after "
-				  "\'-n\' option!\n"),
+				  "\'-n\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -294,7 +294,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected option string after "
-				  "\'-o\' option!\n"),
+				  "\'-o\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -315,7 +315,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected priority after "
-				  "\'-%c\' option!\n"),
+				  "\'-%c\' option\n"),
 		        	argv[0], argv[i][1]);
 		return (1);
               }
@@ -362,7 +362,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected title after "
-				  "\'-t\' option!\n"),
+				  "\'-t\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -380,14 +380,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected mode list after "
-				  "\'-y\' option!\n"),
+				  "\'-y\' option\n"),
 				argv[0]);
 		return (1);
               }
 	    }
 
 	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - mode option ignored!\n"),
+		            _("%s: Warning - mode option ignored\n"),
 			    argv[0]);
 	    break;
 
@@ -402,7 +402,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected hold name after "
-				  "\'-H\' option!\n"),
+				  "\'-H\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -430,7 +430,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Need job ID (\'-i jobid\') before "
-			          "\'-H restart\'!\n"),
+			          "\'-H restart\'\n"),
 				argv[0]);
 		return (1);
 	      }
@@ -454,7 +454,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected page list after "
-				  "\'-P\' option!\n"),
+				  "\'-P\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -475,14 +475,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected character set after "
-				  "\'-S\' option!\n"),
+				  "\'-S\' option\n"),
 				argv[0]);
 		return (1);
               }
 	    }
 
 	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - character set option ignored!\n"),
+		            _("%s: Warning - character set option ignored\n"),
 			    argv[0]);
 	    break;
 
@@ -495,14 +495,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected content type after "
-			          "\'-T\' option!\n"),
+			          "\'-T\' option\n"),
 				argv[0]);
 		return (1);
               }
 	    }
 
 	    _cupsLangPrintf(stderr,
-		            _("%s: Warning - content type option ignored!\n"),
+		            _("%s: Warning - content type option ignored\n"),
 			    argv[0]);
 	    break;
 
@@ -511,7 +511,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'\n"),
 	                    argv[0], argv[i][1]);
 	    return (1);
       }
@@ -521,7 +521,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       {
         _cupsLangPrintf(stderr,
 			_("%s: Error - cannot print from stdin if files or a "
-		          "job ID are provided!\n"),
+		          "job ID are provided\n"),
 			 argv[0]);
 	return (1);
       }
@@ -601,7 +601,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (printer && !cupsGetNamedDest(NULL, printer, NULL))
       _cupsLangPrintf(stderr,
 		      _("%s: Error - %s environment variable names "
-		        "non-existent destination \"%s\"!\n"),
+		        "non-existent destination \"%s\"\n"),
         	      argv[0], val, printer);
     else if (cupsLastError() == IPP_NOT_FOUND)
       _cupsLangPrintf(stderr,
@@ -609,7 +609,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		      argv[0]);
     else
       _cupsLangPrintf(stderr,
-		      _("%s: Error - scheduler not responding!\n"),
+		      _("%s: Error - scheduler not responding\n"),
 		      argv[0]);
 
     return (1);

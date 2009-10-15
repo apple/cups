@@ -279,7 +279,7 @@ StartPage(
 
   if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
   {
-    fputs("ERROR: Unable to allocate memory!\n", stderr);
+    fputs("ERROR: Unable to allocate memory\n", stderr);
     exit(1);
   }
 
@@ -290,7 +290,7 @@ StartPage(
   {
     if ((CompBuffer = calloc(2, header->cupsWidth)) == NULL)
     {
-      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      fputs("ERROR: Unable to allocate memory\n", stderr);
       exit(1);
     }
   }
@@ -302,7 +302,7 @@ StartPage(
     if ((LineBuffers[0] = calloc(DotBytes,
                                  header->cupsWidth * (Shingling + 1))) == NULL)
     {
-      fputs("ERROR: Unable to allocate memory!\n", stderr);
+      fputs("ERROR: Unable to allocate memory\n", stderr);
       exit(1);
     }
 
@@ -1126,7 +1126,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
     return (1);
   }
   else

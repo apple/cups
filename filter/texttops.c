@@ -176,7 +176,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   if (SizeColumns <= 0 || SizeColumns > 32767 ||
       SizeLines <= 0 || SizeLines > 32767)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page\n"),
                     SizeColumns, SizeLines);
     exit(1);
   }
@@ -197,7 +197,7 @@ WriteProlog(const char *title,		/* I - Title of job */
 
   if (ColumnWidth <= 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to print %d text columns!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to print %d text columns\n"),
                     PageColumns);
     exit(1);
   }

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-06-18 15:43-0700\n"
+"POT-Creation-Date: 2009-10-15 11:12-0700\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -219,8 +219,8 @@ msgstr ""
 "                (제한=\"%s %s %s %s\")\n"
 
 #, c-format
-msgid "        WARN    %s has no corresponding options!\n"
-msgstr "        WARN    %s에 일치하는 옵션이 없습니다!\n"
+msgid "        WARN    %s has no corresponding options\n"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -230,22 +230,18 @@ msgstr ""
 "        WARN    %s이(가) %s와(과) 일반적인 접두어를 공유합니다\n"
 "                REF: 15페이지, 섹션 3.2.\n"
 
-msgid "        WARN    Default choices conflicting!\n"
-msgstr "        WARN    기본 선택사항 충돌!\n"
+msgid "        WARN    Default choices conflicting\n"
+msgstr ""
 
 #, c-format
 msgid ""
 "        WARN    Duplex option keyword %s may not work as expected and should "
-"be named Duplex!\n"
+"be named Duplex\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"        WARN    양면 옵션 키워드 %s이(가) 예상대로 동작하지 않을 수 있으며 이"
-"름을 양면으로 해야 합니다!\n"
-"                REF: 122페이지, 섹션 5.17\n"
 
-msgid ""
-"        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
-msgstr "        WARN    파일이 CR, LF 및 CR LF 줄 끝을 포함합니다!\n"
+msgid "        WARN    File contains a mix of CR, LF, and CR LF line endings\n"
+msgstr ""
 
 msgid ""
 "        WARN    LanguageEncoding required by PPD 4.3 spec.\n"
@@ -255,8 +251,8 @@ msgstr ""
 "                REF: 56-57페이지, 섹션 5.3.\n"
 
 #, c-format
-msgid "        WARN    Line %d only contains whitespace!\n"
-msgstr "        WARN    %d번째 줄에는 여백만 있습니다!\n"
+msgid "        WARN    Line %d only contains whitespace\n"
+msgstr ""
 
 msgid ""
 "        WARN    Manufacturer required by PPD 4.3 spec.\n"
@@ -267,18 +263,14 @@ msgstr ""
 
 msgid ""
 "        WARN    Non-Windows PPD files should use lines ending with only LF, "
-"not CR LF!\n"
+"not CR LF\n"
 msgstr ""
-"        WARN    비 Windows PPD 파일은 줄 끝을 CR LF가 아닌 LF만 있는 줄 끝을 "
-"사용해야 합니다!\n"
 
 #, c-format
 msgid ""
-"        WARN    Obsolete PPD version %.1f!\n"
+"        WARN    Obsolete PPD version %.1f\n"
 "                REF: Page 42, section 5.2.\n"
 msgstr ""
-"        WARN    이전 PPD 버전 %.1f!\n"
-"                REF: 42페이지, 섹션 5.2.\n"
 
 msgid ""
 "        WARN    PCFileName longer than 8.3 in violation of PPD spec.\n"
@@ -309,72 +301,99 @@ msgstr ""
 "                REF: 64-65페이지, 섹션 5.3.\n"
 
 #, c-format
-msgid "      %s  %s %s does not exist!\n"
-msgstr "      %s  %s %s이(가) 존재하지 않습니다!\n"
+msgid "      %s  %s %s does not exist\n"
+msgstr ""
 
 #, c-format
-msgid "      %s  %s file \"%s\" has the wrong capitalization!\n"
+msgid "      %s  %s file \"%s\" has the wrong capitalization\n"
 msgstr ""
 
 #, c-format
 msgid ""
-"      %s  Bad %s choice %s!\n"
+"      %s  Bad %s choice %s\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      %s  잘못된 %s - 선택사항 %s!\n"
-"                REF: 122페이지, 섹션 5.17\n"
 
 #, c-format
-msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
-msgstr "      %1$s  %3$s 옵션에 대한 잘못된 UTF-8 \"%2$s\" 번역 스트링!\n"
+msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
-msgstr ""
-"      %1$s  %3$s 옵션, %4$s 선택사항에 대한 잘못된 UTF-8 \"%2$s\" 번역 스트"
-"링!\n"
-
-#, c-format
-msgid "      %s  Bad cupsFilter value \"%s\"!\n"
-msgstr "      %s  잘못된 \"%s\" cupsFilter 값!\n"
-
-#, c-format
-msgid "      %s  Bad cupsICCProfile %s!\n"
-msgstr "      %s  잘못된 %s cupsICCProfile!\n"
-
-#, c-format
-msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
-msgstr "      %s  잘못된 \"%s\" cupsPreFilter 값!\n"
-
-#, c-format
-msgid "      %s  Bad cupsUIConstraints %s: \"%s\"!\n"
-msgstr "      %s  잘못된 cupsUIConstraints %s: \"%s\"!\n"
-
-#, c-format
-msgid "      %s  Bad language \"%s\"!\n"
-msgstr "      %s  잘못된 \"%s\" 언어!\n"
-
-#, c-format
-msgid "      %s  Bad spelling of %s - should be %s!\n"
+"      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s\n"
 msgstr ""
 
 #, c-format
-msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID!\n"
+msgid "      %s  Bad cupsFilter value \"%s\"\n"
 msgstr ""
 
 #, c-format
-msgid "      %s  Empty cupsUIConstraints %s!\n"
-msgstr "      %s  cupsUIConstraints %s이(가) 비어있음!\n"
-
-#, c-format
-msgid "      %s  Missing \"%s\" translation string for option %s!\n"
-msgstr "      %1$s  %3$s 옵션에 대한 \"%2$s\" 번역 스트링 유실됨!\n"
-
-#, c-format
-msgid "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+msgid "      %s  Bad cupsICCProfile %s\n"
 msgstr ""
-"      %1$s  %3$s 옵션, %4$s 선택사항에 대한 \"%2$s\" 번역 스트링 유실됨!\n"
+
+#, c-format
+msgid "      %s  Bad cupsPreFilter value \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad cupsUIConstraints %s: \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad language \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on APDialogExtension file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on APPrinterIconPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on APPrinterLowInkTool file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on APPrinterUtilityPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on APScanAppPath file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on cupsFilter file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on cupsICCProfile file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad permissions on cupsPreFilter file \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Bad spelling of %s - should be %s\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Cannot provide both APScanAppPath and APScanAppBundleID\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Empty cupsUIConstraints %s\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  Missing \"%s\" translation string for option %s, choice %s\n"
+msgstr ""
 
 #, c-format
 msgid "      %s  Missing APDialogExtension file \"%s\"\n"
@@ -398,105 +417,94 @@ msgstr ""
 
 #, c-format
 msgid ""
-"      %s  Missing REQUIRED PageRegion option!\n"
+"      %s  Missing REQUIRED PageRegion option\n"
 "                REF: Page 100, section 5.14.\n"
 msgstr ""
 
 #, c-format
 msgid ""
-"      %s  Missing REQUIRED PageSize option!\n"
+"      %s  Missing REQUIRED PageSize option\n"
 "                REF: Page 99, section 5.14.\n"
 msgstr ""
 
 #, c-format
-msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgid "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"\n"
 msgstr ""
-"      %1$s  \"*%4$s %5$s *%6$s %7$s\" UIConstraints에 있는 *%2$s %3$s 선택사"
-"항 유실됨!\n"
 
 #, c-format
-msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"!\n"
+msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"\n"
 msgstr ""
-"      %1$s  %4$s cupsUIConstraints에 있는 *%2$s %3$s 선택사항 유실됨: \"%5$s"
-"\"!\n"
 
 #, c-format
 msgid "      %s  Missing cupsFilter file \"%s\"\n"
 msgstr "      %s  \"%s\" cupsFilter 파일이 유실됨\n"
 
 #, c-format
-msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
-msgstr "      %s  \"%s\" cupsICCProfile 파일이 유실됨!\n"
+msgid "      %s  Missing cupsICCProfile file \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "      %s  Missing cupsPreFilter file \"%s\"\n"
 msgstr "      %s  \"%s\" cupsPreFilter 파일 유실됨\n"
 
 #, c-format
-msgid "      %s  Missing cupsUIResolver %s!\n"
-msgstr "      %s  %s cupsUIResolver 유실됨!\n"
-
-#, c-format
-msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"!\n"
+msgid "      %s  Missing cupsUIResolver %s\n"
 msgstr ""
-"      %1$s  \"*%3$s %4$s *%5$s %6$s\" UIConstraints에 있는 %2$s 옵션 유실"
-"됨!\n"
 
 #, c-format
-msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"!\n"
+msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"\n"
 msgstr ""
-"      %1$s  %3$s cupsUIConstraints에 있는 %2$s 옵션 유실됨: \"%4$s\"!\n"
 
 #, c-format
-msgid "      %s  No base translation \"%s\" is included in file!\n"
-msgstr "      %s  파일에 \"%s\" 기초 번역이 포함되어 있지 않습니다!\n"
+msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "      %s  No base translation \"%s\" is included in file\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"      %s  Non-standard size name \"%s\"!\n"
+"      %s  Non-standard size name \"%s\"\n"
 "                REF: Page 187, section B.2.\n"
 msgstr ""
 
 #, c-format
 msgid ""
-"      %s  REQUIRED %s does not define choice None!\n"
+"      %s  REQUIRED %s does not define choice None\n"
 "                REF: Page 122, section 5.17\n"
 msgstr ""
-"      %s  선택사항 없음을 정의하지 않은 %s이(가) 필요!\n"
-"                REF: 122페이지, 섹션 5.17\n"
 
 #, c-format
-msgid "      %s  Size \"%s\" defined for %s but not for %s!\n"
+msgid "      %s  Size \"%s\" defined for %s but not for %s\n"
 msgstr ""
 
 #, c-format
-msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)!\n"
+msgid "      %s  Size \"%s\" has unexpected dimensions (%gx%g)\n"
 msgstr ""
 
 #, c-format
-msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
-msgstr "      %s  불필요한 %s cupsICCProfile 값이 %s와(과) 충돌함!\n"
+msgid "      %s  cupsICCProfile %s hash value collides with %s\n"
+msgstr ""
 
 #, c-format
-msgid "      %s  cupsUIResolver %s causes a loop!\n"
-msgstr "      %s  %s cupsUIResolver가 루프를 유발함!\n"
+msgid "      %s  cupsUIResolver %s causes a loop\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"      %s  cupsUIResolver %s does not list at least two different options!\n"
+"      %s  cupsUIResolver %s does not list at least two different options\n"
 msgstr ""
 
 #, c-format
-msgid "      **FAIL**  %s choice names %s and %s differ only by case!\n"
-msgstr "      **FAIL**  %s 선택사항 이름 %s 및 %s이(가) 경우별로만 다름!\n"
+msgid "      **FAIL**  %s choice names %s and %s differ only by case\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"      **FAIL**  %s must be 1284DeviceID!\n"
+"      **FAIL**  %s must be 1284DeviceID\n"
 "                REF: Page 72, section 5.5\n"
 msgstr ""
-"      **FAIL**  %s은(는) 1284DeviceID이어야 합니다!\n"
-"                REF: 72페이지, 섹션 5.5\n"
 
 #, c-format
 msgid ""
@@ -508,19 +516,15 @@ msgstr ""
 
 #, c-format
 msgid ""
-"      **FAIL**  BAD DefaultImageableArea %s!\n"
+"      **FAIL**  BAD DefaultImageableArea %s\n"
 "                REF: Page 102, section 5.15.\n"
 msgstr ""
-"      **FAIL**  잘못된 DefaultImageableArea %s!\n"
-"                REF: 102페이지, 섹션 5.15.\n"
 
 #, c-format
 msgid ""
-"      **FAIL**  BAD DefaultPaperDimension %s!\n"
+"      **FAIL**  BAD DefaultPaperDimension %s\n"
 "                REF: Page 103, section 5.15.\n"
 msgstr ""
-"      **FAIL**  잘못된 DefaultPaperDimension %s!\n"
-"                REF: 103페이지, 섹션 5.15.\n"
 
 msgid ""
 "      **FAIL**  BAD JobPatchFile attribute in file\n"
@@ -575,11 +579,9 @@ msgstr ""
 
 #, c-format
 msgid ""
-"      **FAIL**  Bad %s choice %s!\n"
+"      **FAIL**  Bad %s choice %s\n"
 "                REF: Page 84, section 5.9\n"
 msgstr ""
-"      **FAIL**  잘못된 %s - 선택사항 %s!\n"
-"                REF: 84페이지, 섹션 5.9\n"
 
 #, c-format
 msgid ""
@@ -598,12 +600,12 @@ msgstr ""
 "                REF: 56페이지, 섹션 5.3.\n"
 
 #, c-format
-msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
-msgstr "      **FAIL**  잘못된 LanguageEncoding %s - ISOLatin1이어야 합니다!\n"
+msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1\n"
+msgstr ""
 
 #, c-format
-msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
-msgstr "      **FAIL**  잘못된 LanguageVersion %s - 영어여야 합니다!\n"
+msgid "      **FAIL**  Bad LanguageVersion %s - must be English\n"
+msgstr ""
 
 #, c-format
 msgid "      **FAIL**  Default option code cannot be interpreted: %s\n"
@@ -612,29 +614,26 @@ msgstr "      **FAIL**  기본 옵션 코드를 해석할 수 없습니다: %s\n
 #, c-format
 msgid ""
 "      **FAIL**  Default translation string for option %s choice %s contains "
-"8-bit characters!\n"
+"8-bit characters\n"
 msgstr ""
-"      **FAIL**  %s 옵션 %s 선택사항에 대한 기본 번역 스트링이 8비트 문자를 포"
-"함합니다!\n"
 
 #, c-format
 msgid ""
 "      **FAIL**  Default translation string for option %s contains 8-bit "
-"characters!\n"
+"characters\n"
 msgstr ""
-"      **FAIL**  %s 옵션에 대한 기본 번역 스트링이 8비트 문자를 포함합니다!\n"
 
 #, c-format
-msgid "      **FAIL**  Group names %s and %s differ only by case!\n"
-msgstr "      **FAIL**  %s 및 %s 그룹 이름이 경우별로만 다름!\n"
+msgid "      **FAIL**  Group names %s and %s differ only by case\n"
+msgstr ""
 
 #, c-format
-msgid "      **FAIL**  Multiple occurrences of %s choice name %s!\n"
-msgstr "      **FAIL**  다중  %s 항목이 %s 이름을 선택!\n"
+msgid "      **FAIL**  Multiple occurrences of %s choice name %s\n"
+msgstr ""
 
 #, c-format
-msgid "      **FAIL**  Option names %s and %s differ only by case!\n"
-msgstr "      **FAIL**  %s 및 %s 옵션 이름이 경우별로만 다름!\n"
+msgid "      **FAIL**  Option names %s and %s differ only by case\n"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -784,100 +783,82 @@ msgstr "    %d개의 오류 발견\n"
 
 #, c-format
 msgid ""
-"    Bad %%%%BoundingBox: on line %d!\n"
+"    Bad %%%%BoundingBox: on line %d\n"
 "        REF: Page 39, %%%%BoundingBox:\n"
 msgstr ""
-"    잘못된 %%%%BoundingBox: %d번째 줄!\n"
-"        REF: 39페이지, %%%%BoundingBox:\n"
 
 #, c-format
 msgid ""
-"    Bad %%%%Page: on line %d!\n"
+"    Bad %%%%Page: on line %d\n"
 "        REF: Page 53, %%%%Page:\n"
 msgstr ""
-"    잘못된 %%%%Page: %d번째 줄!\n"
-"        REF: 53페이지, %%%%Page:\n"
 
 #, c-format
 msgid ""
-"    Bad %%%%Pages: on line %d!\n"
+"    Bad %%%%Pages: on line %d\n"
 "        REF: Page 43, %%%%Pages:\n"
 msgstr ""
-"    잘못된 %%%%Pages: %d번째 줄!\n"
-"        REF: 43페이지, %%%%Pages:\n"
 
 #, c-format
 msgid ""
-"    Line %d is longer than 255 characters (%d)!\n"
+"    Line %d is longer than 255 characters (%d)\n"
 "        REF: Page 25, Line Length\n"
 msgstr ""
-"    %d번째 줄이 255자보다 깁니다(%d)!\n"
-"        REF: 25페이지, 줄 길이\n"
 
 msgid ""
-"    Missing %!PS-Adobe-3.0 on first line!\n"
+"    Missing %!PS-Adobe-3.0 on first line\n"
 "        REF: Page 17, 3.1 Conforming Documents\n"
 msgstr ""
-"    첫번째 줄에 있는 %!PS-Adobe-3.0이 유실됨!\n"
-"        REF: 17페이지, 3.1 도큐멘트 구성하기\n"
 
 #, c-format
 msgid ""
-"    Missing %%EndComments comment!\n"
+"    Missing %%EndComments comment\n"
 "        REF: Page 41, %%EndComments\n"
 msgstr ""
-"    %%EndComments 설명 유실됨!\n"
-"        REF: 41페이지, %%EndComments\n"
 
 #, c-format
 msgid ""
-"    Missing or bad %%BoundingBox: comment!\n"
+"    Missing or bad %%BoundingBox: comment\n"
 "        REF: Page 39, %%BoundingBox:\n"
 msgstr ""
-"    유실되었거나 잘못된 %%BoundingBox: 설명!\n"
-"        REF: 39페이지, %%BoundingBox:\n"
 
 #, c-format
 msgid ""
-"    Missing or bad %%Page: comments!\n"
+"    Missing or bad %%Page: comments\n"
 "        REF: Page 53, %%Page:\n"
 msgstr ""
-"    유실되었거나 잘못된 %%Page: 설명!\n"
-"        REF: 53페이지, %%Page:\n"
 
 #, c-format
 msgid ""
-"    Missing or bad %%Pages: comment!\n"
+"    Missing or bad %%Pages: comment\n"
 "        REF: Page 43, %%Pages:\n"
 msgstr ""
-"    유실되었거나 잘못된 %%Page: 설명!\n"
-"        REF: 43페이지, %%Pages:\n"
 
 msgid "    NO ERRORS FOUND\n"
 msgstr "    발견된 오류 없음\n"
 
 #, c-format
-msgid "    Saw %d lines that exceeded 255 characters!\n"
-msgstr "    255자를 초과하는 %d개의 줄 발견!\n"
+msgid "    Saw %d lines that exceeded 255 characters\n"
+msgstr ""
 
 #, c-format
-msgid "    Too many %%BeginDocument comments!\n"
-msgstr "    너무 많은 %%BeginDocument 설명!\n"
+msgid "    Too many %%BeginDocument comments\n"
+msgstr ""
 
 #, c-format
-msgid "    Too many %%EndDocument comments!\n"
-msgstr "    너무 많은 %%EndDocument 설명!\n"
+msgid "    Too many %%EndDocument comments\n"
+msgstr ""
 
-msgid "    Warning: file contains binary data!\n"
-msgstr "    경고: 파일에 바이너리 데이터가 포함되어 있습니다!\n"
-
-#, c-format
-msgid "    Warning: no %%EndComments comment in file!\n"
-msgstr "    경고: 파일에 %%EndComments 설명이 없습니다!\n"
+msgid "    Warning: file contains binary data\n"
+msgstr ""
 
 #, c-format
-msgid "    Warning: obsolete DSC version %.1f in file!\n"
-msgstr "    경고: 파일에 이전 DSC 버전 %.1f가 있습니다!\n"
+msgid "    Warning: no %%EndComments comment in file\n"
+msgstr ""
+
+#, c-format
+msgid "    Warning: obsolete DSC version %.1f in file\n"
+msgstr ""
 
 msgid " FAIL\n"
 msgstr " FAIL\n"
@@ -973,8 +954,8 @@ msgstr ""
 "\t%1$s\n"
 
 #, c-format
-msgid "%s not supported!"
-msgstr "%s이(가) 지원되지 않음!"
+msgid "%s not supported"
+msgstr ""
 
 #, c-format
 msgid "%s/%s accepting requests since %s\n"
@@ -997,119 +978,119 @@ msgid "%s: %s failed: %s\n"
 msgstr "%s: %s 실패: %s\n"
 
 #, c-format
-msgid "%s: Don't know what to do!\n"
-msgstr "%s: 해야할 일을 모르겠음!\n"
-
-#, c-format
-msgid ""
-"%s: Error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%1$s: 오류 - \"%3$s\" 대상에 존재하지 않는 %2$s 환경 변수 이름!\n"
-
-#, c-format
-msgid "%s: Error - bad job ID!\n"
-msgstr "%s: 오류 - 잘못된 작업 ID!\n"
-
-#, c-format
-msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
-msgstr "%s: 오류 - 파일을 프린트할 수 없고 작업을 동시에 대체할 수 없음!\n"
-
-#, c-format
-msgid ""
-"%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+msgid "%s: Don't know what to do\n"
 msgstr ""
-"%s: 오류 - 파일 또는 작업 ID가 제공되었다면 stdin에서 프린트할 수 없음!\n"
 
 #, c-format
-msgid "%s: Error - expected character set after '-S' option!\n"
-msgstr "%s: 오류 - '-S' 옵션 뒤에 문자 세트가 예상됨!\n"
+msgid ""
+"%s: Error - %s environment variable names non-existent destination \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected content type after '-T' option!\n"
-msgstr "%s: 오류 - '-T' 옵션 뒤에 콘텐츠 유형이 예상됨!\n"
+msgid "%s: Error - bad job ID\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected copies after '-n' option!\n"
-msgstr "%s: 오류 - '-n' 옵션 뒤에 복사 매수가 예상됨!\n"
+msgid "%s: Error - cannot print files and alter jobs simultaneously\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected copy count after '-#' option!\n"
-msgstr "%s: 오류 - '-#' 옵션 뒤에 복사본 수가 예상됨!\n"
+msgid "%s: Error - cannot print from stdin if files or a job ID are provided\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected destination after '-P' option!\n"
-msgstr "%s: 오류 - '-P' 옵션 뒤에 대상이 예상됨!\n"
+msgid "%s: Error - expected character set after '-S' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected destination after '-b' option!\n"
-msgstr "%s: 오류 - '-b' 옵션 뒤에 대상이 예상됨!\n"
+msgid "%s: Error - expected content type after '-T' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected destination after '-d' option!\n"
-msgstr "%s: 오류 - '-d' 옵션 뒤에 대상이 예상됨!\n"
+msgid "%s: Error - expected copies after '-n' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected form after '-f' option!\n"
-msgstr "%s: 오류 - '-f' 옵션 뒤에 구성이 예상됨!\n"
+msgid "%s: Error - expected copy count after '-#' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected hold name after '-H' option!\n"
-msgstr "%s: 오류 - '-H' 옵션 뒤에 유지 이름이 예상됨!\n"
+msgid "%s: Error - expected destination after '-P' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected hostname after '-H' option!\n"
-msgstr "%s: 오류 - '-H' 옵션 뒤에 호스트 이름이 예상됨!\n"
+msgid "%s: Error - expected destination after '-b' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected hostname after '-h' option!\n"
-msgstr "%s: 오류 - '-h' 옵션 뒤에 호스트 이름이 예상됨!\n"
+msgid "%s: Error - expected destination after '-d' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected mode list after '-y' option!\n"
-msgstr "%s: 오류 - '-y' 옵션 뒤에 모드 목록이 예상됨!\n"
+msgid "%s: Error - expected form after '-f' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected name after '-%c' option!\n"
-msgstr "%s: 오류 - '-%c' 옵션 뒤에 이름이 예상됨!\n"
+msgid "%s: Error - expected hold name after '-H' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected option string after '-o' option!\n"
-msgstr "%s: 오류 - '-o' 옵션 뒤에 옵션 스트링이 예상됨!\n"
+msgid "%s: Error - expected hostname after '-H' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected page list after '-P' option!\n"
-msgstr "%s: 오류 - '-P' 옵션 뒤에 페이지 목록이 예상됨!\n"
+msgid "%s: Error - expected hostname after '-h' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected priority after '-%c' option!\n"
-msgstr "%s: 오류 - '-%c' 옵션 뒤에 우선순위가 예상됨!\n"
+msgid "%s: Error - expected mode list after '-y' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected reason text after '-r' option!\n"
-msgstr "%s: 오류 - '-r' 옵션 뒤에 이유 텍스트가 예상됨!\n"
+msgid "%s: Error - expected name after '-%c' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected title after '-t' option!\n"
-msgstr "%s: 오류 - '-t' 옵션 뒤에 제목이 예상됨!\n"
+msgid "%s: Error - expected option string after '-o' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected username after '-U' option!\n"
-msgstr "%s: 오류 - '-U' 옵션 뒤에 사용자 이름이 예상됨!\n"
+msgid "%s: Error - expected page list after '-P' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected username after '-u' option!\n"
-msgstr "%s: 오류 - '-u' 옵션 뒤에 사용자 이름이 예상됨!\n"
+msgid "%s: Error - expected priority after '-%c' option\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - expected value after '-%c' option!\n"
-msgstr "%s: 오류 - '-%c' 옵션 뒤에 값이 예상됨!\n"
+msgid "%s: Error - expected reason text after '-r' option\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Error - expected title after '-t' option\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Error - expected username after '-U' option\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Error - expected username after '-U' option!n"
+msgstr ""
+
+#, c-format
+msgid "%s: Error - expected username after '-u' option\n"
+msgstr ""
+
+#, c-format
+msgid "%s: Error - expected value after '-%c' option\n"
+msgstr ""
 
 #, c-format
 msgid ""
 "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
-"option!\n"
+"option\n"
 msgstr ""
-"%s: 오류 - '-W' 옵션 뒤에 \"completed\", \"not-completed\" 또는 \"all\"이 필"
-"요!\n"
 
 #, c-format
 msgid "%s: Error - no default destination available.\n"
@@ -1120,8 +1101,8 @@ msgid "%s: Error - priority must be between 1 and 100.\n"
 msgstr "%s: 오류 - 우선순위는 1에서 100사이여야 합니다.\n"
 
 #, c-format
-msgid "%s: Error - scheduler not responding!\n"
-msgstr "%s: 오류 - 일정이 응답하지 않음!\n"
+msgid "%s: Error - scheduler not responding\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Error - too many files - \"%s\"\n"
@@ -1136,64 +1117,64 @@ msgid "%s: Error - unable to queue from stdin - %s\n"
 msgstr "%s: 오류 - stdin에서 대기할 수 없음 - %s\n"
 
 #, c-format
-msgid "%s: Error - unknown destination \"%s\"!\n"
-msgstr "%s: 오류 - 알 수 없는 대상 \"%s\"!\n"
+msgid "%s: Error - unknown destination \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - unknown destination \"%s/%s\"!\n"
-msgstr "%s: 오류 - 알 수 없는 대상 \"%s/%s\"!\n"
+msgid "%s: Error - unknown destination \"%s/%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - unknown option '%c'!\n"
-msgstr "%s: 오류 - 알 수 없는 옵션 '%c'!\n"
+msgid "%s: Error - unknown option '%c'\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Error - unknown option '%s'!\n"
-msgstr "%s: 오류 - 알 수 없는 옵션 '%s'!\n"
+msgid "%s: Error - unknown option '%s'\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Expected job ID after '-i' option!\n"
-msgstr "%s: '-i' 옵션 뒤에 작업 ID가 예상됨!\n"
+msgid "%s: Expected job ID after '-i' option\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Filter \"%s\" not available: %s\n"
 msgstr "%s: \"%s\" 필터를 사용할 수 없음: %s\n"
 
 #, c-format
-msgid "%s: Invalid destination name in list \"%s\"!\n"
-msgstr "%s: \"%s\" 목록에 유효하지 않은 대상 이름!\n"
+msgid "%s: Invalid destination name in list \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Invalid filter string \"%s\"\n"
 msgstr "%s: 유효하지 않은 필터 문자열 \"%s\"\n"
 
 #, c-format
-msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
-msgstr "%s: '-H restart' 앞에 작업 ID('-i jobid') 필요!\n"
+msgid "%s: Need job ID ('-i jobid') before '-H restart'\n"
+msgstr ""
 
 #, c-format
-msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
-msgstr "%s: %s/%s에서 %s/%s까지 변환할 필터가 없음!\n"
+msgid "%s: No filter to convert from %s/%s to %s/%s\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Operation failed: %s\n"
 msgstr "%s: 작동 실패: %s\n"
 
 #, c-format
-msgid "%s: Sorry, no encryption support compiled in!\n"
-msgstr "%s: 죄송합니다, 컴파일된 암호화 지원이 없습니다!\n"
+msgid "%s: Sorry, no encryption support compiled in\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to connect to server\n"
 msgstr "%s: 서버에 연결할 수 없음\n"
 
 #, c-format
-msgid "%s: Unable to contact server!\n"
-msgstr "%s: 서버에 연결할 수 없음!\n"
+msgid "%s: Unable to contact server\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Unable to determine MIME type of \"%s\"!\n"
-msgstr "%s: MIME 유형의 \"%s\"을(를) 결정할 수 없음!\n"
+msgid "%s: Unable to determine MIME type of \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "%s: Unable to open %s: %s\n"
@@ -1208,57 +1189,55 @@ msgid "%s: Unable to open PPD file: %s on line %d.\n"
 msgstr ""
 
 #, c-format
-msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"!\n"
-msgstr "%s: \"%s\" 또는 \"%s\"에서 MIME 데이터베이스를 읽을 수 없음!\n"
+msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Unknown destination \"%s\"!\n"
-msgstr "%s: 알 수 없는 대상 \"%s\"!\n"
+msgid "%s: Unknown destination \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Unknown destination MIME type %s/%s!\n"
-msgstr "%s: 알 수 없는 대상 MIME 유형 %s/%s!\n"
+msgid "%s: Unknown destination MIME type %s/%s\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Unknown option '%c'!\n"
-msgstr "%s: 알 수 없는 옵션 '%c'!\n"
+msgid "%s: Unknown option '%c'\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Unknown source MIME type %s/%s!\n"
-msgstr "%s: 알 수 없는 소스 MIME 유형 %s/%s!\n"
+msgid "%s: Unknown source MIME type %s/%s\n"
+msgstr ""
 
 #, c-format
 msgid ""
 "%s: Warning - '%c' format modifier not supported - output may not be "
-"correct!\n"
+"correct\n"
 msgstr ""
-"%s: 경고 - '%c' 포맷 조합 키가 지원되지 않음 - 출력이 올바르지 않을 수 있습니"
-"다!\n"
 
 #, c-format
-msgid "%s: Warning - character set option ignored!\n"
-msgstr "%s: 경고 - 문자 세트 옵션이 무시됨!\n"
+msgid "%s: Warning - character set option ignored\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Warning - content type option ignored!\n"
-msgstr "%s: 경고 - 콘텐츠 유형 옵션이 무시됨!\n"
+msgid "%s: Warning - content type option ignored\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Warning - form option ignored!\n"
-msgstr "%s: 경고 - 구성 옵션이 무시됨!\n"
+msgid "%s: Warning - form option ignored\n"
+msgstr ""
 
 #, c-format
-msgid "%s: Warning - mode option ignored!\n"
-msgstr "%s: 경고 - 모드 옵션이 무시됨!\n"
+msgid "%s: Warning - mode option ignored\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"%s: error - %s environment variable names non-existent destination \"%s\"!\n"
-msgstr "%1$s: 오류 - \"%3$s\" 대상에 존재하지 않는 %2$s 환경 변수 이름!\n"
+"%s: error - %s environment variable names non-existent destination \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "%s: error - expected option=value after '-o' option!\n"
-msgstr "%s: 오류 - '-o' 옵션 뒤에 option=value가 예상됨!\n"
+msgid "%s: error - expected option=value after '-o' option\n"
+msgstr ""
 
 #, c-format
 msgid "%s: error - no default destination available.\n"
@@ -1855,19 +1834,19 @@ msgstr "95"
 msgid "?Invalid help command unknown\n"
 msgstr "?유효하지 않은 도움말 명령을 알 수 없음\n"
 
-msgid "A Samba password is required to export printer drivers!"
-msgstr "프린터 드라이버를 보내려면 Samba 암호가 필요함!"
+msgid "A Samba password is required to export printer drivers"
+msgstr ""
 
-msgid "A Samba username is required to export printer drivers!"
-msgstr "프린터 드라이버를 보내려면 Samba 사용자 이름이 필요함!"
-
-#, c-format
-msgid "A class named \"%s\" already exists!"
-msgstr "\"%s\"(이)라는 이름의 클래스가 이미 존재합니다!"
+msgid "A Samba username is required to export printer drivers"
+msgstr ""
 
 #, c-format
-msgid "A printer named \"%s\" already exists!"
-msgstr "\"%s\"(이)라는 이름의 프린터가 이미 존재합니다!"
+msgid "A class named \"%s\" already exists"
+msgstr ""
+
+#, c-format
+msgid "A printer named \"%s\" already exists"
+msgstr ""
 
 msgid "A0"
 msgstr "A0"
@@ -1978,12 +1957,12 @@ msgid "Applicator"
 msgstr "적용자"
 
 #, c-format
-msgid "Attempt to set %s printer-state to bad value %d!"
-msgstr "%s 프린터 상태를 잘못된 %d 값으로 설정하려고 합니다!"
+msgid "Attempt to set %s printer-state to bad value %d"
+msgstr ""
 
 #, c-format
-msgid "Attribute groups are out of order (%x < %x)!"
-msgstr "속성 그룹이 올바르지 않습니다(%x < %x)!"
+msgid "Attribute groups are out of order (%x < %x)"
+msgstr ""
 
 msgid "B0"
 msgstr "B0"
@@ -2047,83 +2026,83 @@ msgid "Bad custom parameter"
 msgstr "잘못된 사용자 설정 매개변수"
 
 #, c-format
-msgid "Bad device URI \"%s\"!\n"
-msgstr "잘못된 장비 URI \"%s\"!\n"
+msgid "Bad device URI \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "Bad device-uri \"%s\"!"
-msgstr "잘못된 device-uri \"%s\"!"
+msgid "Bad device-uri \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Bad device-uri scheme \"%s\"!"
-msgstr "잘못된 device-uri 설계 \"%s\"!"
+msgid "Bad device-uri scheme \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Bad document-format \"%s\"!"
-msgstr "잘못된 document-format \"%s\"!"
+msgid "Bad document-format \"%s\""
+msgstr ""
 
-msgid "Bad filename buffer!"
-msgstr "잘못된 파일 이름 버퍼!"
+msgid "Bad filename buffer"
+msgstr ""
 
 #, c-format
 msgid "Bad font attribute: %s\n"
 msgstr "잘못된 서체 속성: %s\n"
 
-msgid "Bad job-priority value!"
-msgstr "잘못된 job-priority 값!"
+msgid "Bad job-priority value"
+msgstr ""
 
 #, c-format
-msgid "Bad job-sheets value \"%s\"!"
-msgstr "잘못된 job-sheets 값\"%s\"!"
+msgid "Bad job-sheets value \"%s\""
+msgstr ""
 
-msgid "Bad job-sheets value type!"
-msgstr "잘못된 job-sheets 값 유형!"
+msgid "Bad job-sheets value type"
+msgstr ""
 
-msgid "Bad job-state value!"
-msgstr "잘못된 job-state 값!"
-
-#, c-format
-msgid "Bad job-uri attribute \"%s\"!"
-msgstr "잘못된 job-uri 속성 \"%s\"!"
+msgid "Bad job-state value"
+msgstr ""
 
 #, c-format
-msgid "Bad notify-pull-method \"%s\"!"
-msgstr "잘못된 notify-pull-method \"%s\"!"
+msgid "Bad job-uri attribute \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Bad notify-recipient-uri URI \"%s\"!"
-msgstr "잘못된 notify-recipient-uri URI \"%s\"!"
+msgid "Bad notify-pull-method \"%s\""
+msgstr ""
+
+#, c-format
+msgid "Bad notify-recipient-uri URI \"%s\""
+msgstr ""
 
 #, c-format
 msgid "Bad number-up value %d."
 msgstr "잘못된 number-up 값 %d."
 
 #, c-format
-msgid "Bad option + choice on line %d!"
-msgstr "%d번째 줄에 있는 잘못된 옵션 + 선택사항!"
+msgid "Bad option + choice on line %d"
+msgstr ""
 
 #, c-format
 msgid "Bad page-ranges values %d-%d."
 msgstr "잘못된 page-ranges 값 %d-%d."
 
 #, c-format
-msgid "Bad port-monitor \"%s\"!"
-msgstr "잘못된 port-monitor \"%s\"!"
-
-#, c-format
-msgid "Bad printer-state value %d!"
-msgstr "잘못된 printer-state 값 %d!"
-
-#, c-format
-msgid "Bad request ID %d!"
+msgid "Bad port-monitor \"%s\""
 msgstr ""
 
 #, c-format
-msgid "Bad request version number %d.%d!"
-msgstr "잘못된 요청 버전 숫자 %d.%d!"
+msgid "Bad printer-state value %d"
+msgstr ""
 
-msgid "Bad subscription ID!"
-msgstr "잘못된 구독 ID!"
+#, c-format
+msgid "Bad request ID %d"
+msgstr ""
+
+#, c-format
+msgid "Bad request version number %d.%d"
+msgstr ""
+
+msgid "Bad subscription ID"
+msgstr ""
 
 msgid "Banners"
 msgstr "배너"
@@ -2183,8 +2162,8 @@ msgid "Change Settings"
 msgstr "설정값 변경"
 
 #, c-format
-msgid "Character set \"%s\" not supported!"
-msgstr "\"%s\" 문자 세트가 지원되지 않음!"
+msgid "Character set \"%s\" not supported"
+msgstr ""
 
 msgid "Chou3 Envelope"
 msgstr "Chou3 봉투"
@@ -2223,8 +2202,8 @@ msgid "Continuous"
 msgstr "계속"
 
 #, c-format
-msgid "Could not scan type \"%s\"!"
-msgstr "\"%s\" 유형을 검색할 수 없음!"
+msgid "Could not scan type \"%s\""
+msgstr ""
 
 msgid "Cover open."
 msgstr "덮개가 열려 있음."
@@ -2281,8 +2260,8 @@ msgstr "\"%s\" 대상이 작업을 허용하지 않습니다."
 msgid "Developer almost empty."
 msgstr "현상액이 거의 비었습니다."
 
-msgid "Developer empty!"
-msgstr "현상액이 비어 있음!"
+msgid "Developer empty"
+msgstr ""
 
 #, c-format
 msgid ""
@@ -2347,24 +2326,24 @@ msgid "ERROR: %s job-id user title copies options [file]\n"
 msgstr ""
 
 #, c-format
-msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
-msgstr "ERROR: 잘못된 %%BoundingBox: 설명이 보임!\n"
+msgid "ERROR: Bad %%BoundingBox: comment seen\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Bad %%IncludeFeature: comment!\n"
-msgstr "ERROR: 잘못된 %%IncludeFeature: 설명!\n"
+msgid "ERROR: Bad %%IncludeFeature: comment\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Bad %%Page: comment in file!\n"
-msgstr "ERROR: 잘못된 %%Page: 파일에 있는 설명!\n"
+msgid "ERROR: Bad %%Page: comment in file\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
-msgstr "ERROR: 잘못된 %%PageBoundingBox: 파일에 있는 설명!\n"
+msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"!\n"
-msgstr "ERROR: 잘못된 SCSI 장비 파일 \"%s\"!\n"
+msgid "ERROR: Bad SCSI device file \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Bad charset file %s\n"
@@ -2375,23 +2354,23 @@ msgid "ERROR: Bad charset type %s\n"
 msgstr "ERROR: 잘못된 문자 세트 유형 %s\n"
 
 #, c-format
-msgid "ERROR: Bad columns value %d!\n"
-msgstr "ERROR: 잘못된 열 값 %d!\n"
+msgid "ERROR: Bad columns value %d\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Bad cpi value %f!\n"
-msgstr "ERROR: 잘못된 cpi 값 %f!\n"
+msgid "ERROR: Bad cpi value %f\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Bad font description line: %s\n"
 msgstr "ERROR: 잘못된 서체 설명 줄: %s\n"
 
 #, c-format
-msgid "ERROR: Bad lpi value %f!\n"
-msgstr "ERROR: 잘못된 lpi 값 %f!\n"
+msgid "ERROR: Bad lpi value %f\n"
+msgstr ""
 
-msgid "ERROR: Bad page setup!\n"
-msgstr "ERROR: 잘못된 페이지 설정!\n"
+msgid "ERROR: Bad page setup\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Bad text direction %s\n"
@@ -2401,87 +2380,82 @@ msgstr "ERROR: 잘못된 텍스트 방향 %s\n"
 msgid "ERROR: Bad text width %s\n"
 msgstr "ERROR: 잘못된 텍스트 길이 %s\n"
 
-msgid "ERROR: Destination printer does not exist!\n"
-msgstr "ERROR: 대상 프린터가 없습니다!\n"
+msgid "ERROR: Destination printer does not exist\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
-msgstr "ERROR: %%BoundingBox 복제: 설명이 보임!\n"
+msgid "ERROR: Duplicate %%BoundingBox: comment seen\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Duplicate %%Pages: comment seen!\n"
-msgstr "ERROR: %%Pages 복제: 설명이 보임!\n"
+msgid "ERROR: Duplicate %%Pages: comment seen\n"
+msgstr ""
 
-msgid "ERROR: Empty print file!\n"
-msgstr "ERROR: 빈 프린트 파일!\n"
+msgid "ERROR: Empty print file\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Error %d sending PAPSendData request: %s\n"
 msgstr "ERROR: %d 오류가 다음 PAPSendData 요청을 보내는 중: %s\n"
 
 #, c-format
-msgid "ERROR: Expected quoted string on line %d of %s!\n"
-msgstr "ERROR: %2$s의 %1$d번째 줄에 인용 스트링이 예상됨!\n"
-
-msgid "ERROR: Fatal USB error!\n"
-msgstr "ERROR: 심각한 USB 오류!\n"
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
-msgstr "ERROR: 파일을 프린트할 수 없는, 유효하지 않은 HP-GL/2 명령이 보임!\n"
-
-#, c-format
-msgid "ERROR: Missing %%EndProlog!\n"
-msgstr "ERROR: %%EndProlog가 유실됨!\n"
-
-#, c-format
-msgid "ERROR: Missing %%EndSetup!\n"
-msgstr "ERROR: %%EndSetup이 유실됨!\n"
-
-#, c-format
-msgid "ERROR: Missing value on line %d of banner file!\n"
-msgstr "ERROR: 배너 파일의 %d번째 줄 값이 유실됨!\n"
-
-#, c-format
-msgid ""
-"ERROR: Need a msgid line before any translation strings on line %d of %s!\n"
+msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
-"ERROR: %2$s의 %1$d번째 줄에 있는 모든 번역 스트링 앞에 msgid 줄 필요!\n"
+
+msgid "ERROR: Fatal USB error\n"
+msgstr ""
+
+msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: No %%BoundingBox: comment in header!\n"
-msgstr "ERROR: %%BoundingBox가 없음: 머리말에 설명!\n"
+msgid "ERROR: Missing %%EndProlog\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: No %%Pages: comment in header!\n"
-msgstr "ERROR: %%Pages가 없음: 머리말에 설명!\n"
+msgid "ERROR: Missing %%EndSetup\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Missing value on line %d of banner file\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"ERROR: Need a msgid line before any translation strings on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: No %%BoundingBox: comment in header\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: No %%Pages: comment in header\n"
+msgstr ""
 
 msgid ""
-"ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
-"variable!\n"
-msgstr "ERROR: argv[0] 또는 DEVICE_URI 환경 변수에서 발견된 장비 URI가 없음!\n"
+"ERROR: No device URI found in argv[0] or in DEVICE_URI environment variable\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: No fonts in charset file %s\n"
 msgstr "ERROR: %s 문자 세트 파일에 서체 없음\n"
 
-msgid "ERROR: No pages found!\n"
-msgstr "ERROR: 페이지 없음!\n"
+msgid "ERROR: No pages found\n"
+msgstr ""
 
-msgid "ERROR: Out of paper!\n"
-msgstr "ERROR: 종이 없음!\n"
+msgid "ERROR: Out of paper\n"
+msgstr ""
 
-msgid "ERROR: PRINTER environment variable not defined!\n"
-msgstr "ERROR: PRINTER 환경 변수가 정의되지 않음!\n"
+msgid "ERROR: PRINTER environment variable not defined\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Print file was not accepted (%s)!\n"
-msgstr "ERROR: 프린트 파일이 허용되지 않음(%s)!\n"
+msgid "ERROR: Print file was not accepted (%s)\n"
+msgstr ""
 
 msgid "ERROR: Printer not responding\n"
 msgstr "ERROR: 프린터가 응답하지 않음\n"
-
-msgid "ERROR: Printer not responding!\n"
-msgstr "ERROR: 프린터가 응답하지 않음!\n"
 
 msgid "ERROR: Printer sent unexpected EOF\n"
 msgstr "ERROR: 프린터가 예기치 않은 EOF를 보냄\n"
@@ -2504,6 +2478,9 @@ msgstr "ERROR: 작업에 %d 파일을 추가할 수 없음: %s\n"
 #, c-format
 msgid "ERROR: Unable to cancel job %d: %s\n"
 msgstr "ERROR: %d 작업을 취소할 수 없음: %s\n"
+
+msgid "ERROR: Unable to connect to printer; will retry in 30 seconds...\n"
+msgstr ""
 
 msgid "ERROR: Unable to copy PDF file"
 msgstr "ERROR: PDF 파일을 복사할 수 없음"
@@ -2552,16 +2529,16 @@ msgid "ERROR: Unable to get default AppleTalk zone"
 msgstr "ERROR: 기본 AppleTalk 영역을 얻을 수 없음"
 
 #, c-format
-msgid "ERROR: Unable to get job %d attributes (%s)!\n"
-msgstr "ERROR: 작업 %d 속성을 얻을 수 없음(%s)!\n"
+msgid "ERROR: Unable to get job %d attributes (%s)\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Unable to get printer status (%s)!\n"
-msgstr "ERROR: 프린터 상태를 알 수 없음(%s)!\n"
+msgid "ERROR: Unable to get printer status (%s)\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Unable to locate printer '%s'!\n"
-msgstr "ERROR: '%s' 프린터를 찾을 수 없음!\n"
+msgid "ERROR: Unable to locate printer '%s'\n"
+msgstr ""
 
 msgid "ERROR: Unable to look for PAP response"
 msgstr "ERROR: PAP 응답을 찾을 수 없음"
@@ -2580,7 +2557,7 @@ msgstr "ERROR: \"%s\"을(를) 열 수 없음 - %s\n"
 msgid "ERROR: Unable to open %s: %s\n"
 msgstr "ERROR: %s을(를) 열 수 없음: %s\n"
 
-msgid "ERROR: Unable to open PPD file!\n"
+msgid "ERROR: Unable to open PPD file\n"
 msgstr ""
 
 #, c-format
@@ -2599,8 +2576,8 @@ msgstr "ERROR: \"%s\" 파일을 열 수 없음 - %s\n"
 msgid "ERROR: Unable to open file \"%s\": %s\n"
 msgstr "ERROR: \"%s\" 파일을 열 수 없음: %s\n"
 
-msgid "ERROR: Unable to open image file for printing!\n"
-msgstr "ERROR: 이미지 파일을 열어서 프린트할 수 없음!\n"
+msgid "ERROR: Unable to open image file for printing\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to open print file \"%s\": %s\n"
@@ -2623,18 +2600,18 @@ msgid "ERROR: Unable to open temporary compressed print file: %s\n"
 msgstr "ERROR: 임시로 압축한 프린트 파일을 열 수 없음: %s\n"
 
 #, c-format
-msgid "ERROR: Unable to print %d text columns!\n"
-msgstr "ERROR: %d개의 텍스트 열을 프린트할 수 없음!\n"
+msgid "ERROR: Unable to print %d text columns\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Unable to print %dx%d text page!\n"
-msgstr "ERROR: %dx%d 텍스트 페이지를 프린트할 수 없음!\n"
+msgid "ERROR: Unable to print %dx%d text page\n"
+msgstr ""
 
 msgid "ERROR: Unable to read print data"
 msgstr "ERROR: 프린트 데이터를 읽을 수 없음"
 
-msgid "ERROR: Unable to read print data!\n"
-msgstr "ERROR: 프린트 데이터를 읽을 수 없음!\n"
+msgid "ERROR: Unable to read print data\n"
+msgstr ""
 
 msgid "ERROR: Unable to reserve port"
 msgstr "ERROR: 포트를 예약할 수 없음"
@@ -2656,12 +2633,12 @@ msgstr "ERROR: PAP tickle 요청을 보낼 수 없음"
 msgid "ERROR: Unable to send initial PAP send data request"
 msgstr "ERROR: 초기 PAP 전송 데이터 요청을 보낼 수 없음"
 
+msgid "ERROR: Unable to send print data\n"
+msgstr ""
+
 #, c-format
 msgid "ERROR: Unable to send print data (%d)\n"
 msgstr "ERROR: 프린트 데이터를 보낼 수 없음(%d)\n"
-
-msgid "ERROR: Unable to send print data!\n"
-msgstr "ERROR: 프린트 데이터를 보낼 수 없음!\n"
 
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: 프린트 파일을 프린터로 보낼 수 없음"
@@ -2678,8 +2655,8 @@ msgid "ERROR: Unable to write %d bytes to \"%s\": %s\n"
 msgstr "ERROR: \"%2$s\"에 %1$d바이트를 쓸 수 없음: %3$s\n"
 
 #, c-format
-msgid "ERROR: Unable to write %d bytes to printer!\n"
-msgstr "ERROR: 프린터에 %d바이트를 쓸 수 없음!\n"
+msgid "ERROR: Unable to write %d bytes to printer\n"
+msgstr ""
 
 msgid "ERROR: Unable to write control file"
 msgstr "ERROR: 제어 파일을 쓸 수 없음"
@@ -2691,23 +2668,20 @@ msgstr "ERROR: 프린트 데이터를 쓸 수 없음"
 msgid "ERROR: Unable to write print data: %s\n"
 msgstr "ERROR: 프린트 데이터를 쓸 수 없음: %s\n"
 
-msgid "ERROR: Unable to write raster data to driver!\n"
-msgstr "ERROR: 드라이버에 래스터 데이터를 쓸 수 없음!\n"
-
-msgid "ERROR: Unable to write to temporary file"
-msgstr "ERROR: 임시 파일을 쓸 수 없음"
+msgid "ERROR: Unable to write raster data to driver\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unable to write uncompressed document data: %s\n"
 msgstr "ERROR: 압축되지 않은 도큐멘트 데이터를 쓸 수 없음: %s\n"
 
 #, c-format
-msgid "ERROR: Unexpected text on line %d of %s!\n"
-msgstr "ERROR: %2$s의 %1$d번째 줄에 예기치 않은 텍스트!\n"
+msgid "ERROR: Unexpected text on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Unknown encryption option value \"%s\"!\n"
-msgstr "ERROR: 알 수 없는 암호화 옵션 값 \"%s\"!\n"
+msgid "ERROR: Unknown encryption option value \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unknown file order \"%s\"\n"
@@ -2718,60 +2692,53 @@ msgid "ERROR: Unknown format character \"%c\"\n"
 msgstr "ERROR: 알 수 없는 포맷 문자 \"%c\"\n"
 
 #, c-format
-msgid "ERROR: Unknown message catalog format for \"%s\"!\n"
-msgstr "ERROR: \"%s\"에 대한 알 수 없는 메시지 카탈로그 포맷!\n"
+msgid "ERROR: Unknown message catalog format for \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
-msgstr "ERROR: \"%2$s\" 값이 있는 알 수 없는 \"%1$s\" 옵션!\n"
+msgid "ERROR: Unknown option \"%s\" with value \"%s\"\n"
+msgstr ""
 
 #, c-format
 msgid "ERROR: Unknown print mode \"%s\"\n"
 msgstr "ERROR: 알 수 없는 \"%s\" 프린트 모드\n"
 
 #, c-format
-msgid "ERROR: Unknown version option value \"%s\"!\n"
-msgstr "ERROR: 알 수 없는 \"%s\" 버전 옵션 값!\n"
-
-#, c-format
-msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
-msgstr "ERROR: brightness=100을 사용하는, 지원되지 않는 밝기 값 %s!\n"
-
-#, c-format
-msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
-msgstr "ERROR: gamma=1000을 사용하는, 지원되지 않는 감마 값 %s!\n"
-
-#, c-format
-msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
-msgstr "ERROR: number-up=1을 사용하는, 지원되지 않는 number-up 값 %d!\n"
-
-#, c-format
-msgid ""
-"ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb!\n"
+msgid "ERROR: Unknown version option value \"%s\"\n"
 msgstr ""
-"ERROR: number-up-layout=lrtb을 사용하는, 지원되지 않는 number-up-layout 값 %"
-"s!\n"
 
 #, c-format
-msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
-msgstr "ERROR: page-border=none을 사용하는, 지원되지 않는 page-border 값 %s!\n"
+msgid "ERROR: Unsupported brightness value %s, using brightness=100\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
-msgstr "ERROR: doc_printf 오버플로우(%d바이트)가 발견됨, 중단 중!\n"
+msgid "ERROR: Unsupported gamma value %s, using gamma=1000\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: pictwpstops exited on signal %d!\n"
-msgstr "ERROR: pictwpstops가 신호 %d에서 종료됨!\n"
+msgid "ERROR: Unsupported number-up value %d, using number-up=1\n"
+msgstr ""
 
 #, c-format
-msgid "ERROR: pictwpstops exited with status %d!\n"
-msgstr "ERROR: pictwpstops가 상태 %d(으)로 종료됨!\n"
-
 msgid ""
-"ERROR: recoverable: Unable to connect to printer; will retry in 30 "
-"seconds...\n"
-msgstr "ERROR: 복원 가능: 프린터에 연결할 수 없음; 30초 후에 다시 시도...\n"
+"ERROR: Unsupported number-up-layout value %s, using number-up-layout=lrtb\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: Unsupported page-border value %s, using page-border=none\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: pictwpstops exited on signal %d\n"
+msgstr ""
+
+#, c-format
+msgid "ERROR: pictwpstops exited with status %d\n"
+msgstr ""
 
 msgid "ERROR: select() failed"
 msgstr "ERROR: select() 실패"
@@ -2782,8 +2749,8 @@ msgstr "ERROR: 프린트 파일을 시작할 수 없음"
 msgid "Edit Configuration File"
 msgstr "구성 파일 편집"
 
-msgid "Empty PPD file!"
-msgstr "PPD 파일이 비어있음!"
+msgid "Empty PPD file"
+msgstr ""
 
 msgid "Ending Banner"
 msgstr "배너 종료 중"
@@ -2815,8 +2782,8 @@ msgstr "Epson"
 msgid "Error Policy"
 msgstr "오류 정책"
 
-msgid "Error: need hostname after '-h' option!\n"
-msgstr "오류: '-h' 옵션 뒤에 호스트 이름이 필요!\n"
+msgid "Error: need hostname after '-h' option\n"
+msgstr ""
 
 msgid "Every 10 Labels"
 msgstr "10개 레이블마다"
@@ -2877,11 +2844,11 @@ msgstr "2절지"
 msgid "Forbidden"
 msgstr "금지됨"
 
-msgid "Fuser temperature high!"
-msgstr "퓨저 온도가 높음!"
+msgid "Fuser temperature high"
+msgstr ""
 
-msgid "Fuser temperature low!"
-msgstr "퓨저 온도가 낮음!"
+msgid "Fuser temperature low"
+msgstr ""
 
 msgid "General"
 msgstr "일반"
@@ -2901,8 +2868,8 @@ msgstr "Get-Response-PDU 길이가 무제한입니다"
 msgid "Glossy Paper"
 msgstr "글로시 종이"
 
-msgid "Got a printer-uri attribute but no job-id!"
-msgstr "printer-uri 속성을 얻었지만, job-id가 없습니다!"
+msgid "Got a printer-uri attribute but no job-id"
+msgstr ""
 
 msgid "Grayscale"
 msgstr "그레이 스케일"
@@ -3118,14 +3085,14 @@ msgstr "올바르지 않은 여백 문자"
 msgid "Ink/toner almost empty."
 msgstr "잉크/토너가 거의 비었습니다."
 
-msgid "Ink/toner empty!"
-msgstr "잉크/토너가 비었음!"
+msgid "Ink/toner empty"
+msgstr ""
 
 msgid "Ink/toner waste bin almost full."
 msgstr "잉크/토너 폐기소가 거의 찼습니다."
 
-msgid "Ink/toner waste bin full!"
-msgstr "잉크/토너 폐기소가 찼음!"
+msgid "Ink/toner waste bin full"
+msgstr ""
 
 msgid "Installable Options"
 msgstr "설치 가능한 옵션"
@@ -3173,12 +3140,12 @@ msgid "JCL"
 msgstr "JCL"
 
 #, c-format
-msgid "Job #%d cannot be restarted - no files!"
-msgstr "#%d 작업을 다시 시작할 수 없음 - 파일 없음!"
+msgid "Job #%d cannot be restarted - no files"
+msgstr ""
 
 #, c-format
-msgid "Job #%d does not exist!"
-msgstr "#%d 작업이 없음!"
+msgid "Job #%d does not exist"
+msgstr ""
 
 #, c-format
 msgid "Job #%d is already aborted - can't cancel."
@@ -3193,28 +3160,28 @@ msgid "Job #%d is already completed - can't cancel."
 msgstr "#%d 작업이 이미 완료됨 - 취소할 수 없습니다."
 
 #, c-format
-msgid "Job #%d is finished and cannot be altered!"
-msgstr "#%d 작업이 종료되었고 대체할 수 없음!"
+msgid "Job #%d is finished and cannot be altered"
+msgstr ""
 
 #, c-format
-msgid "Job #%d is not complete!"
-msgstr "#%d 작업이 왼료되지 않음!"
+msgid "Job #%d is not complete"
+msgstr ""
 
 #, c-format
-msgid "Job #%d is not held for authentication!"
-msgstr "#%d 작업이 인증을 위해 유지되지 않음!"
+msgid "Job #%d is not held"
+msgstr ""
 
 #, c-format
-msgid "Job #%d is not held!"
-msgstr "#%d 작업이 유지되지 않음!"
+msgid "Job #%d is not held for authentication"
+msgstr ""
 
 #, c-format
-msgid "Job #%s does not exist!"
-msgstr "#%s 작업이 존재하지 않음!"
+msgid "Job #%s does not exist"
+msgstr ""
 
 #, c-format
-msgid "Job %d not found!"
-msgstr "%d 작업이 발견되지 않음!"
+msgid "Job %d not found"
+msgstr ""
 
 msgid "Job Completed"
 msgstr "작업이 완료됨"
@@ -3243,8 +3210,8 @@ msgstr "작업 실행에 실패함:"
 msgid "Job state cannot be changed."
 msgstr "작업 상태를 변경할 수 없습니다."
 
-msgid "Job subscriptions cannot be renewed!"
-msgstr "작업 구독을 갱신할 수 없음!"
+msgid "Job subscriptions cannot be renewed"
+msgstr ""
 
 msgid "Jobs"
 msgstr "작업"
@@ -3265,8 +3232,8 @@ msgid "Label Top"
 msgstr "레이블 상단"
 
 #, c-format
-msgid "Language \"%s\" not supported!"
-msgstr "\"%s\" 언어가 지원되지 않음!"
+msgid "Language \"%s\" not supported"
+msgstr ""
 
 msgid "Large Address"
 msgstr "주소 크게"
@@ -3319,17 +3286,17 @@ msgstr "미디어 추적"
 msgid "Media Type"
 msgstr "미디어 유형"
 
-msgid "Media jam!"
-msgstr "미디어가 걸림!"
+msgid "Media jam"
+msgstr ""
 
 msgid "Media tray almost empty."
 msgstr "미디어 트레이가 거의 비었습니다."
 
-msgid "Media tray empty!"
-msgstr "미디어 트레이가 비어 있음!"
+msgid "Media tray empty"
+msgstr ""
 
-msgid "Media tray missing!"
-msgstr "미디어 트레이가 유실됨!"
+msgid "Media tray missing"
+msgstr ""
 
 msgid "Media tray needs to be filled."
 msgstr "미디어 트레이를 채워야 합니다."
@@ -3346,28 +3313,28 @@ msgstr "PPD-Adobe-4.x 머리말이 유실됨"
 msgid "Missing asterisk in column 1"
 msgstr "1열에 있는 별표가 유실됨"
 
-msgid "Missing document-number attribute!"
-msgstr "document-number 속성이 유실됨!"
+msgid "Missing document-number attribute"
+msgstr ""
 
 #, c-format
-msgid "Missing double quote on line %d!"
-msgstr "%d번째 줄에 있는 큰 따옴표가 유실됨!"
+msgid "Missing double quote on line %d"
+msgstr ""
 
-msgid "Missing form variable!"
-msgstr "구성 변수가 유실됨!"
+msgid "Missing form variable"
+msgstr ""
 
-msgid "Missing notify-subscription-ids attribute!"
-msgstr "notify-subscription-ids 속성이 유실됨!"
+msgid "Missing notify-subscription-ids attribute"
+msgstr ""
 
-msgid "Missing requesting-user-name attribute!"
-msgstr "requesting-user-name 속성이 유실됨!"
+msgid "Missing requesting-user-name attribute"
+msgstr ""
 
-msgid "Missing required attributes!"
-msgstr "필요한 속성이 유실됨!"
+msgid "Missing required attributes"
+msgstr ""
 
 #, c-format
-msgid "Missing value on line %d!"
-msgstr "%d번째 줄에 있는 값이 유실됨!"
+msgid "Missing value on line %d"
+msgstr ""
 
 msgid "Missing value string"
 msgstr "값 스트링이 유실됨"
@@ -3418,7 +3385,7 @@ msgstr "NULL PPD 파일 포인터"
 msgid "Name OID uses indefinite length"
 msgstr "이름 OID 길이가 무제한입니다"
 
-msgid "Nested classes are not allowed!"
+msgid "Nested classes are not allowed"
 msgstr ""
 
 msgid "Never"
@@ -3436,27 +3403,27 @@ msgstr "아니요"
 msgid "No Content"
 msgstr "콘텐츠 없음"
 
-msgid "No PPD name!"
-msgstr "PPD 이름 없음!"
+msgid "No PPD name"
+msgstr ""
 
 msgid "No VarBind SEQUENCE"
 msgstr "VarBind SEQUENCE 없음"
 
-msgid "No Windows printer drivers are installed!"
-msgstr "설치된 Windows 프린터 드라이버가 없음!"
+msgid "No Windows printer drivers are installed"
+msgstr ""
 
 msgid "No active connection"
 msgstr "활성 연결이 없음"
 
 #, c-format
-msgid "No active jobs on %s!"
-msgstr "%s에 활성 작업이 없음!"
+msgid "No active jobs on %s"
+msgstr ""
 
-msgid "No attributes in request!"
-msgstr "요청에 속성이 없음!"
+msgid "No attributes in request"
+msgstr ""
 
-msgid "No authentication information provided!"
-msgstr "제공된 인증 정보가 없음!"
+msgid "No authentication information provided"
+msgstr ""
 
 msgid "No community name"
 msgstr "커뮤니티 이름 없음"
@@ -3473,32 +3440,32 @@ msgstr "error-index 없음"
 msgid "No error-status"
 msgstr "error-status 없음"
 
-msgid "No file!?!"
-msgstr "파일이 없음!?!"
+msgid "No file!?"
+msgstr ""
 
-msgid "No modification time!"
-msgstr "수정 시간 없음!"
+msgid "No modification time"
+msgstr ""
 
 msgid "No name OID"
 msgstr "이름 OID 없음"
 
-msgid "No printer name!"
-msgstr "프린터 이름 없음!"
+msgid "No printer name"
+msgstr ""
 
-msgid "No printer-uri found for class!"
-msgstr "클래스에 대한 printer-uri 없음!"
+msgid "No printer-uri found"
+msgstr ""
 
-msgid "No printer-uri found!"
-msgstr "printer-uri 없음!"
+msgid "No printer-uri found for class"
+msgstr ""
 
-msgid "No printer-uri in request!"
-msgstr "요청에 printer-uri 없음!"
+msgid "No printer-uri in request"
+msgstr ""
 
 msgid "No request-id"
 msgstr "request-id 없음"
 
-msgid "No subscription attributes in request!"
-msgstr "요청에 구독 속성이 없음!"
+msgid "No subscription attributes in request"
+msgstr ""
 
 msgid "No subscriptions found."
 msgstr "발견된 구독이 없습니다."
@@ -3545,8 +3512,8 @@ msgstr "승인"
 msgid "OPC almost at end-of-life."
 msgstr "OPC 수명이 거의 다 되었습니다."
 
-msgid "OPC at end-of-life!"
-msgstr "OPC 수명이 다 되었음!"
+msgid "OPC at end-of-life"
+msgstr ""
 
 msgid "Off (1-Sided)"
 msgstr "끔(한 쪽 방향)"
@@ -3576,8 +3543,8 @@ msgstr "설치된 옵션"
 msgid "Options: "
 msgstr "옵션: "
 
-msgid "Out of toner!"
-msgstr "토너가 없음!"
+msgid "Out of toner"
+msgstr ""
 
 msgid "Output Mode"
 msgstr "출력 모드"
@@ -3585,8 +3552,8 @@ msgstr "출력 모드"
 msgid "Output bin almost full."
 msgstr "출력소 거의 찼습니다."
 
-msgid "Output bin full!"
-msgstr "출력소가 찼습니다!"
+msgid "Output bin full"
+msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3604,8 +3571,8 @@ msgstr "%s/%s 프린터 출력을 %s로 보냄\n"
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "%1$s/%2$s 프린터 출력을 %4$s에 있는 %3$s 원격 프린터로 보냄\n"
 
-msgid "Output tray missing!"
-msgstr "출력 트레이가 유실됨!"
+msgid "Output tray missing"
+msgstr ""
 
 msgid "PASS\n"
 msgstr "PASS\n"
@@ -3936,8 +3903,8 @@ msgid ""
 msgstr "notify-lease-duration 속성을 작업 구독과 함께 사용할 수 없습니다."
 
 #, c-format
-msgid "The notify-user-data value is too large (%d > 63 octets)!"
-msgstr "notify-user-data 값이 너무 큼!(%d > 63행)!"
+msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
 
 msgid ""
 "The printer name may only contain up to 127 printable characters and may not "
@@ -3946,8 +3913,8 @@ msgstr ""
 "프린터 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래"
 "시(/) 또는 파운드 기호(#)를 포함하지 않습니다."
 
-msgid "The printer or class is not shared!"
-msgstr "프린터 또는 클래스를 공유할 수 없음!"
+msgid "The printer or class is not shared"
+msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "프린터 또는 클래스가 없습니다."
@@ -3956,8 +3923,8 @@ msgstr "프린터 또는 클래스가 없습니다."
 msgid "The printer-uri \"%s\" contains invalid characters."
 msgstr "\"%s\" printer-uri가 유효하지 않은 문자를 포함합니다."
 
-msgid "The printer-uri attribute is required!"
-msgstr "printer-uri 속성이 필요함!"
+msgid "The printer-uri attribute is required"
+msgstr ""
 
 msgid ""
 "The printer-uri must be of the form \"ipp://HOSTNAME/classes/CLASSNAME\"."
@@ -3990,12 +3957,12 @@ msgid "Too many active jobs."
 msgstr "활성 작업이 너무 많습니다."
 
 #, c-format
-msgid "Too many job-sheets values (%d > 2)!"
-msgstr "job-sheets 값이 너무 많습니다(%d > 2)!"
+msgid "Too many job-sheets values (%d > 2)"
+msgstr ""
 
 #, c-format
-msgid "Too many printer-state-reasons values (%d > %d)!"
-msgstr "printer-state-reasons 값이 너무 많습니다(%d > %d)!"
+msgid "Too many printer-state-reasons values (%d > %d)"
+msgstr ""
 
 msgid "Transparency"
 msgstr "투명도"
@@ -4056,14 +4023,14 @@ msgid "Unable to add class:"
 msgstr "클래스를 추가할 수 없음:"
 
 #, c-format
-msgid "Unable to add job for destination \"%s\"!"
-msgstr "\"%s\" 대상에 대한 작업을 추가할 수 없습니다!"
+msgid "Unable to add job for destination \"%s\""
+msgstr ""
 
 msgid "Unable to add printer:"
 msgstr "프린터를 추가할 수 없음:"
 
-msgid "Unable to allocate memory for file types!"
-msgstr "파일 유형에 대한 메모리를 할당할 수 없습니다!"
+msgid "Unable to allocate memory for file types"
+msgstr ""
 
 msgid "Unable to cancel RSS subscription:"
 msgstr "RSS 구독을 취소할 수 없음:"
@@ -4081,38 +4048,38 @@ msgid "Unable to connect to host."
 msgstr "호스트에 연결할 수 없음."
 
 #, c-format
-msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
-msgstr "64비트 CUPS 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+msgid "Unable to copy 64-bit CUPS printer driver files (%d)"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
-msgstr "64비트 Windows 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+msgid "Unable to copy 64-bit Windows printer driver files (%d)"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy CUPS printer driver files (%d)!"
-msgstr "CUPS 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+msgid "Unable to copy CUPS printer driver files (%d)"
+msgstr ""
+
+msgid "Unable to copy PPD file"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy PPD file - %s!"
-msgstr "PPD 파일을 복사할 수 없음 - %s!"
-
-msgid "Unable to copy PPD file!"
-msgstr "PPD 파일을 복사할 수 없습니다!"
+msgid "Unable to copy PPD file - %s"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy Windows 2000 printer driver files (%d)!"
-msgstr "Windows 2000 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+msgid "Unable to copy Windows 2000 printer driver files (%d)"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy Windows 9x printer driver files (%d)!"
-msgstr "Windows 9x 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+msgid "Unable to copy Windows 9x printer driver files (%d)"
+msgstr ""
 
 #, c-format
-msgid "Unable to copy interface script - %s!"
-msgstr "인터페이스 스크립트를 복사할 수 없음 - %s!"
+msgid "Unable to copy interface script - %s"
+msgstr ""
 
-msgid "Unable to create printer-uri!"
-msgstr "printer-uri를 생성할 수 없습니다!"
+msgid "Unable to create printer-uri"
+msgstr ""
 
 msgid "Unable to create temporary file:"
 msgstr "임시 파일을 생성할 수 없음:"
@@ -4126,14 +4093,14 @@ msgstr "프린터를 삭제할 수 없음:"
 msgid "Unable to do maintenance command:"
 msgstr "명령을 유지할 수 없음:"
 
-msgid "Unable to edit cupsd.conf files larger than 1MB!"
-msgstr "1MB보다 큰 cupsd.conf 파일은 편집할 수 없습니다!"
+msgid "Unable to edit cupsd.conf files larger than 1MB"
+msgstr ""
 
-msgid "Unable to find destination for job!"
-msgstr "작업에 대한 대상을 찾을 수 없습니다!"
+msgid "Unable to find destination for job"
+msgstr ""
 
-msgid "Unable to find printer!\n"
-msgstr "프린터를 찾을 수 없습니다!\n"
+msgid "Unable to find printer\n"
+msgstr ""
 
 msgid "Unable to get class list:"
 msgstr "클래스 목록을 얻을 수 없음:"
@@ -4154,12 +4121,12 @@ msgid "Unable to get printer status:"
 msgstr "프린터 상태를 알 수 없습니다:"
 
 #, c-format
-msgid "Unable to install Windows 2000 printer driver files (%d)!"
-msgstr "Windows 2000 프린터 드라이버 파일을 설치할 수 없습니다(%d)!"
+msgid "Unable to install Windows 2000 printer driver files (%d)"
+msgstr ""
 
 #, c-format
-msgid "Unable to install Windows 9x printer driver files (%d)!"
-msgstr "Windows 9x 프린터 드라이버 파일을 설치할 수 없습니다(%d)!"
+msgid "Unable to install Windows 9x printer driver files (%d)"
+msgstr ""
 
 msgid "Unable to modify class:"
 msgstr "클래스를 수정할 수 없음:"
@@ -4183,8 +4150,8 @@ msgid "Unable to open cupsd.conf file:"
 msgstr "cupsd.conf 파일을 열 수 없음:"
 
 #, c-format
-msgid "Unable to open document %d in job %d!"
-msgstr "도큐멘트 %d을(를) 작업 %d에서 열 수 없습니다!"
+msgid "Unable to open document %d in job %d"
+msgstr ""
 
 msgid "Unable to print test page:"
 msgstr "테스트 페이지를 프린트할 수 없음:"
@@ -4193,12 +4160,12 @@ msgstr "테스트 페이지를 프린트할 수 없음:"
 msgid "Unable to run \"%s\": %s\n"
 msgstr "\"%s\"을(를) 실행할 수 없음: %s\n"
 
-msgid "Unable to send command to printer driver!"
-msgstr "프린터 드라이버로 명령을 보낼 수 없습니다!"
+msgid "Unable to send command to printer driver"
+msgstr ""
 
 #, c-format
-msgid "Unable to set Windows printer driver (%d)!"
-msgstr "Windows 프린터 드라이버를 설정할 수 없습니다(%d)!"
+msgid "Unable to set Windows printer driver (%d)"
+msgstr ""
 
 msgid "Unable to set options:"
 msgstr "옵션을 설정할 수 없음:"
@@ -4209,8 +4176,8 @@ msgstr "서버 기본값을 설정할 수 없음:"
 msgid "Unable to upload cupsd.conf file:"
 msgstr "cupsd.conf 파일을 업로드할 수 없습니다:"
 
-msgid "Unable to use legacy USB class driver!\n"
-msgstr "레거시 USB 클래스 드라이버를 사용할 수 없음!\n"
+msgid "Unable to use legacy USB class driver\n"
+msgstr ""
 
 msgid "Unauthorized"
 msgstr "인증되지 않음"
@@ -4230,28 +4197,28 @@ msgid "Unknown printer-op-policy \"%s\"."
 msgstr "알 수 없는 printer-op-policy \"%s\"."
 
 #, c-format
-msgid "Unsupported character set \"%s\"!"
-msgstr "지원되지 않는 문자 세트 \"%s\"!"
+msgid "Unsupported character set \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Unsupported compression \"%s\"!"
-msgstr "지원되지 않는 압축 \"%s\"!"
+msgid "Unsupported compression \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Unsupported compression attribute %s!"
-msgstr "지원되지 않는 압축 속성 %s!"
+msgid "Unsupported compression attribute %s"
+msgstr ""
 
 #, c-format
-msgid "Unsupported format \"%s\"!"
-msgstr "지원되지 않는 포맷 \"%s\"!"
+msgid "Unsupported format \"%s\""
+msgstr ""
 
 #, c-format
-msgid "Unsupported format '%s'!"
-msgstr "지원되지 않는 포맷 '%s'!"
+msgid "Unsupported format '%s'"
+msgstr ""
 
 #, c-format
-msgid "Unsupported format '%s/%s'!"
-msgstr "지원되지 않는 포맷 '%s/%s'!"
+msgid "Unsupported format '%s/%s'"
+msgstr ""
 
 msgid "Unsupported value type"
 msgstr "지원되지 않는 값 유형"
@@ -4423,6 +4390,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
+"    -I {filters,profiles}\n"
+"                         Ignore missing files\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4559,12 +4528,13 @@ msgstr "WARNING: 발견된 첫번째 %d개 프린터만 추가 중"
 msgid "WARNING: Boolean expected for waiteof option \"%s\"\n"
 msgstr "WARNING: 불리언이 waiteof 옵션을 예상함 \"%s\"\n"
 
-msgid "WARNING: Failed to read side-channel request!\n"
-msgstr "WARNING: 읽기 side-channel 요청에 실패함!\n"
+#, c-format
+msgid "WARNING: Network host '%s' is busy; will retry in %d seconds...\n"
+msgstr ""
 
 #, c-format
-msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
-msgstr "WARNING: IncludeFeature를 통해 \"%s\" 옵션을 포함할 수 없음!\n"
+msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature\n"
+msgstr ""
 
 msgid "WARNING: Printer not responding\n"
 msgstr "WARNING: 프린터가 응답하지 않음\n"
@@ -4575,20 +4545,19 @@ msgstr "WARNING: 프린터가 예기치 않은 EOF를 보냄\n"
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with command status byte after %d "
-"seconds!\n"
-msgstr "WARNING: %d초 후에 원격 호스트가 명령 상태 바이트에 응답하지 않음!\n"
+"seconds\n"
+msgstr ""
 
 #, c-format
 msgid ""
 "WARNING: Remote host did not respond with control status byte after %d "
-"seconds!\n"
-msgstr "WARNING: %d초 후에 원격 호스트가 제어 상태 바이트에 응답하지 않음!\n"
+"seconds\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"WARNING: Remote host did not respond with data status byte after %d "
-"seconds!\n"
-msgstr "WARNING: %d초 후에 원격 호스트가 데이터 상태 바이트에 응답하지 않음!\n"
+"WARNING: Remote host did not respond with data status byte after %d seconds\n"
+msgstr ""
 
 #, c-format
 msgid "WARNING: SCSI command timed out (%d); retrying...\n"
@@ -4596,10 +4565,8 @@ msgstr "WARNING: SCSI 명령 시간 초과(%d); 재시도 중...\n"
 
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
-"Conventions and may not print correctly!\n"
+"Conventions and may not print correctly\n"
 msgstr ""
-"WARNING: 이 도큐멘트는 Adobe Document Structuring Conventions을 실행하지 않"
-"기 때문에 올바르게 프린트되지 않을 수 있음!\n"
 
 #, c-format
 msgid "WARNING: Unable to open \"%s:%s\": %s\n"
@@ -4617,30 +4584,23 @@ msgid "WARNING: Unknown PAP packet of type %d\n"
 msgstr "WARNING: %d 유형의 알 수 없는 PAP 패킷\n"
 
 #, c-format
-msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
-msgstr "WARNING: \"%2$s\" 옵션에 대한 알 수 없는 \"%1$s\" 선택사항!\n"
+msgid "WARNING: Unknown choice \"%s\" for option \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "WARNING: Unknown option \"%s\"!\n"
-msgstr "WARNING: 알 수 없는 \"%s\" 옵션!\n"
+msgid "WARNING: Unknown option \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "WARNING: Unsupported baud rate %s!\n"
-msgstr "WARNING: 지원되지 않는 보드율 %s!\n"
+msgid "WARNING: Unsupported baud rate %s\n"
+msgstr ""
 
 #, c-format
 msgid "WARNING: number expected for status option \"%s\"\n"
 msgstr "WARNING: \"%s\" 상태 옵션에 대한 예상되는 번호\n"
 
-#, c-format
-msgid ""
-"WARNING: recoverable: Network host '%s' is busy; will retry in %d "
-"seconds...\n"
+msgid "Warning, no Windows 2000 printer drivers are installed"
 msgstr ""
-"WARNING: 복원 가능: '%s' 네트워크 호스트가 사용 중; %d초 후에 다시 시도...\n"
-
-msgid "Warning, no Windows 2000 printer drivers are installed!"
-msgstr "경고, 설치된 Windows 2000 프린터 드라이버가 없음!"
 
 msgid "Yes"
 msgstr "예"
@@ -4689,40 +4649,40 @@ msgid "cupsctl: Unable to connect to server: %s\n"
 msgstr "cupsctl: 다음 서버에 연결할 수 없습니다: %s\n"
 
 #, c-format
-msgid "cupsctl: Unknown option \"%s\"!\n"
-msgstr "cupsctl: 알 수 없는 옵션 \"%s\"!\n"
+msgid "cupsctl: Unknown option \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "cupsctl: Unknown option \"-%c\"!\n"
-msgstr "cupsctl: 알 수 없는 옵션 \"-%c\"!\n"
+msgid "cupsctl: Unknown option \"-%c\"\n"
+msgstr ""
 
-msgid "cupsd: Expected config filename after \"-c\" option!\n"
-msgstr "cupsd: \"-c\" 옵션 뒤에 구성 파일 이름이 예상됨!\n"
+msgid "cupsd: Expected config filename after \"-c\" option\n"
+msgstr ""
 
-msgid "cupsd: Unable to get current directory!\n"
-msgstr "cupsd: 현재 디렉토리를 얻을 수 없음!\n"
-
-#, c-format
-msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
-msgstr "cupsd: 알 수 없는 \"%s\" 변수 - 중단 중!\n"
+msgid "cupsd: Unable to get current directory\n"
+msgstr ""
 
 #, c-format
-msgid "cupsd: Unknown option \"%c\" - aborting!\n"
-msgstr "cupsd: 알 수 없는 \"%c\" 옵션 - 중단 중!\n"
+msgid "cupsd: Unknown argument \"%s\" - aborting\n"
+msgstr ""
+
+#, c-format
+msgid "cupsd: Unknown option \"%c\" - aborting\n"
+msgstr ""
 
 msgid "cupsd: launchd(8) support not compiled in, running in normal mode.\n"
 msgstr "cupsd: launchd(8) 지원이 컴파일되지 않아서, 일반 모드로 실행합니다.\n"
 
 #, c-format
-msgid "cupsfilter: Invalid document number %d!\n"
-msgstr "cupsfilter: 유효하지 않은 도큐멘트 번호 %d!\n"
+msgid "cupsfilter: Invalid document number %d\n"
+msgstr ""
 
 #, c-format
-msgid "cupsfilter: Invalid job ID %d!\n"
-msgstr "cupsfilter: 유효하지 않은 작업 ID %d!\n"
+msgid "cupsfilter: Invalid job ID %d\n"
+msgstr ""
 
-msgid "cupsfilter: Only one filename can be specified!\n"
-msgstr "cupsfilter: 하나의 사용자 이름만 지정됨!\n"
+msgid "cupsfilter: Only one filename can be specified\n"
+msgstr ""
 
 #, c-format
 msgid "cupsfilter: Unable to get job file - %s\n"
@@ -4757,59 +4717,59 @@ msgstr "help\t\t명령에 대한 도움말 얻기\n"
 msgid "idle"
 msgstr "대기"
 
-msgid "job-printer-uri attribute missing!"
-msgstr "job-printer-uri 속성이 유실됨!"
+msgid "job-printer-uri attribute missing"
+msgstr ""
 
-msgid "lpadmin: Class name can only contain printable characters!\n"
-msgstr "lpadmin: 클래스 이름은 프린트 가능한 문자만 포함할 수 있음!\n"
+msgid "lpadmin: Class name can only contain printable characters\n"
+msgstr ""
 
-msgid "lpadmin: Expected PPD after '-P' option!\n"
-msgstr "lpadmin: '-P' 옵션 뒤에 PPD가 예상됨!\n"
+msgid "lpadmin: Expected PPD after '-P' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
-msgstr "lpadmin: '-u' 옵션 뒤에 allow/deny:userlist가 예상됨!\n"
+msgid "lpadmin: Expected allow/deny:userlist after '-u' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected class after '-r' option!\n"
-msgstr "lpadmin: '-r' 옵션 뒤에 클래스가 예상됨!\n"
+msgid "lpadmin: Expected class after '-r' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected class name after '-c' option!\n"
-msgstr "lpadmin: '-c' 옵션 뒤에 클래스 이름이 예상됨!\n"
+msgid "lpadmin: Expected class name after '-c' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected description after '-D' option!\n"
-msgstr "lpadmin: '-D' 옵션 뒤에 설명이 예상됨!\n"
+msgid "lpadmin: Expected description after '-D' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected device URI after '-v' option!\n"
-msgstr "lpadmin: '-v' 옵션 뒤에 장비 URI가 예상됨!\n"
+msgid "lpadmin: Expected device URI after '-v' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected file type(s) after '-I' option!\n"
-msgstr "lpadmin: '-I' 옵션 뒤에 파일 유형이 예상됨!\n"
+msgid "lpadmin: Expected file type(s) after '-I' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected hostname after '-h' option!\n"
-msgstr "lpadmin: '-h' 옵션 뒤에 호스트 이름이 예상됨!\n"
+msgid "lpadmin: Expected hostname after '-h' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected interface after '-i' option!\n"
-msgstr "lpadmin: '-i' 옵션 뒤에 인터페이스가 예상됨!\n"
+msgid "lpadmin: Expected interface after '-i' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected location after '-L' option!\n"
-msgstr "lpadmin: '-L' 옵션 뒤에 위치가 예상됨!\n"
+msgid "lpadmin: Expected location after '-L' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected model after '-m' option!\n"
-msgstr "lpadmin: '-m' 옵션 뒤에 모델이 예상됨!\n"
+msgid "lpadmin: Expected model after '-m' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected name=value after '-o' option!\n"
-msgstr "lpadmin: '-o' 옵션 뒤에 name=value가 예상됨!\n"
+msgid "lpadmin: Expected name=value after '-o' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected printer after '-p' option!\n"
-msgstr "lpadmin: '-p' 옵션 뒤에 프린터가 예상됨!\n"
+msgid "lpadmin: Expected printer after '-p' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected printer name after '-d' option!\n"
-msgstr "lpadmin: '-d' 옵션 뒤에 프린터 이름이 예상됨!\n"
+msgid "lpadmin: Expected printer name after '-d' option\n"
+msgstr ""
 
-msgid "lpadmin: Expected printer or class after '-x' option!\n"
-msgstr "lpadmin: '-x' 옵션 뒤에 프린터 또는 클래스가 예상됨!\n"
+msgid "lpadmin: Expected printer or class after '-x' option\n"
+msgstr ""
 
-msgid "lpadmin: No member names were seen!\n"
-msgstr "lpadmin: 회원 이름이 보이지 않음!\n"
+msgid "lpadmin: No member names were seen\n"
+msgstr ""
 
 #, c-format
 msgid "lpadmin: Printer %s is already a member of class %s.\n"
@@ -4819,15 +4779,13 @@ msgstr "lpadmin: %s 프린터에 이미 %s 클래스 회원이 있습니다.\n"
 msgid "lpadmin: Printer %s is not a member of class %s.\n"
 msgstr "lpadmin: %s 프린터에 %s 클래스 회원이 없습니다.\n"
 
-msgid "lpadmin: Printer name can only contain printable characters!\n"
-msgstr "lpadmin: 프린터 이름은 프린트 가능한 문자만 포함할 수 있음!\n"
+msgid "lpadmin: Printer name can only contain printable characters\n"
+msgstr ""
 
 msgid ""
 "lpadmin: Unable to add a printer to the class:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 클래스에 프린터를 추가할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 #, c-format
 msgid "lpadmin: Unable to connect to server: %s\n"
@@ -4843,125 +4801,109 @@ msgstr "lpadmin: \"%s\" 파일을 열 수 없음: %s\n"
 
 msgid ""
 "lpadmin: Unable to remove a printer from the class:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 클래스에서 프린터를 제거할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the PPD file:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: PPD 파일을 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the device URI:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 장비 URI를 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the interface script or PPD file:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 인터페이스 스크립트 또는 PPD 파일을 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the interface script:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 인터페이스 스크립트를 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer description:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 프린터 설명을 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer location:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 프린터 위치를 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 msgid ""
 "lpadmin: Unable to set the printer options:\n"
-"         You must specify a printer name first!\n"
+"         You must specify a printer name first\n"
 msgstr ""
-"lpadmin: 프린터 옵션을 설정할 수 없음:\n"
-"         먼저 프린터 이름을 지정해야 합니다!\n"
 
 #, c-format
-msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
-msgstr "lpadmin: 알 수 없는 allow/deny 옵션 \"%s\"!\n"
+msgid "lpadmin: Unknown allow/deny option \"%s\"\n"
+msgstr ""
 
 #, c-format
-msgid "lpadmin: Unknown argument '%s'!\n"
-msgstr "lpadmin: 알 수 없는 '%s' 변수!\n"
+msgid "lpadmin: Unknown argument '%s'\n"
+msgstr ""
 
 #, c-format
-msgid "lpadmin: Unknown option '%c'!\n"
-msgstr "lpadmin: 알 수 없는 '%c' 옵션!\n"
+msgid "lpadmin: Unknown option '%c'\n"
+msgstr ""
 
-msgid "lpadmin: Warning - content type list ignored!\n"
-msgstr "lpadmin: 경고 - 콘텐츠 유형 목록 무시됨!\n"
+msgid "lpadmin: Warning - content type list ignored\n"
+msgstr ""
 
 msgid "lpc> "
 msgstr "lpc> "
 
-msgid "lpinfo: Expected 1284 device ID string after --device-id!\n"
-msgstr "lpinfo: --device-id 뒤에 1284 장비 ID 스트링이 예상됨!\n"
+msgid "lpinfo: Expected 1284 device ID string after --device-id\n"
+msgstr ""
 
-msgid "lpinfo: Expected language after --language!\n"
-msgstr "lpinfo: --language 뒤에 언어가 예상됨!\n"
+msgid "lpinfo: Expected language after --language\n"
+msgstr ""
 
-msgid "lpinfo: Expected make and model after --make-and-model!\n"
-msgstr "lpinfo: --make-and-model 뒤에 제조사 및 모델이 예상됨!\n"
+msgid "lpinfo: Expected make and model after --make-and-model\n"
+msgstr ""
 
-msgid "lpinfo: Expected product string after --product!\n"
-msgstr "lpinfo: --product 뒤에 제품 스트링이 예상됨!\n"
+msgid "lpinfo: Expected product string after --product\n"
+msgstr ""
 
-msgid "lpinfo: Expected scheme list after --exclude-schemes!\n"
-msgstr "lpinfo: --exclude-schemes 뒤에 설계 목록이 예상됨!\n"
+msgid "lpinfo: Expected scheme list after --exclude-schemes\n"
+msgstr ""
 
-msgid "lpinfo: Expected scheme list after --include-schemes!\n"
-msgstr "lpinfo: --include-schemess 뒤에 설계 목록이 예상됨!\n"
+msgid "lpinfo: Expected scheme list after --include-schemes\n"
+msgstr ""
 
-msgid "lpinfo: Expected timeout after --timeout!\n"
-msgstr "lpinfo: --timeout 뒤에 제한 시간이 예상됨!\n"
-
-#, c-format
-msgid "lpinfo: Unknown argument '%s'!\n"
-msgstr "lpinfo: 알 수 없는 '%s' 변수!\n"
+msgid "lpinfo: Expected timeout after --timeout\n"
+msgstr ""
 
 #, c-format
-msgid "lpinfo: Unknown option '%c'!\n"
-msgstr "lpinfo: 알 수 없는 '%c' 옵션!\n"
+msgid "lpinfo: Unknown argument '%s'\n"
+msgstr ""
 
 #, c-format
-msgid "lpinfo: Unknown option '%s'!\n"
-msgstr "lpinfo: 알 수 없는 '%s' 옵션!\n"
+msgid "lpinfo: Unknown option '%c'\n"
+msgstr ""
+
+#, c-format
+msgid "lpinfo: Unknown option '%s'\n"
+msgstr ""
 
 #, c-format
 msgid "lpmove: Unable to connect to server: %s\n"
 msgstr "lpmove: 서버에 연결할 수 없음: %s\n"
 
 #, c-format
-msgid "lpmove: Unknown argument '%s'!\n"
-msgstr "lpmove: 알 수 없는 '%s' 변수!\n"
+msgid "lpmove: Unknown argument '%s'\n"
+msgstr ""
 
 #, c-format
-msgid "lpmove: Unknown option '%c'!\n"
-msgstr "lpmove: 알 수 없는 '%c' 옵션!\n"
+msgid "lpmove: Unknown option '%c'\n"
+msgstr ""
 
-msgid "lpoptions: No printers!?!\n"
-msgstr "lpoptions: 프린터가 없습니까!?!\n"
+msgid "lpoptions: No printers\n"
+msgstr ""
 
 #, c-format
 msgid "lpoptions: Unable to add printer or instance: %s\n"
@@ -4972,23 +4914,23 @@ msgid "lpoptions: Unable to get PPD file for %s: %s\n"
 msgstr "lpoptions: %s에 대한 PPD 파일을 얻을 수 없음: %s\n"
 
 #, c-format
-msgid "lpoptions: Unable to open PPD file for %s!\n"
-msgstr "lpoptions: %s에 대한 PPD 파일을 열 수 없음!\n"
+msgid "lpoptions: Unable to open PPD file for %s\n"
+msgstr ""
 
-msgid "lpoptions: Unknown printer or class!\n"
-msgstr "lpoptions: 알 수 없는 프린터 또는 클래스!\n"
+msgid "lpoptions: Unknown printer or class\n"
+msgstr ""
 
-msgid "lppasswd: Only root can add or delete passwords!\n"
-msgstr "lppasswd: root만 암호를 추가 또는 제거할 수 있음!\n"
+msgid "lppasswd: Only root can add or delete passwords\n"
+msgstr ""
 
-msgid "lppasswd: Password file busy!\n"
-msgstr "lppasswd: 암호 파일 사용 중!\n"
+msgid "lppasswd: Password file busy\n"
+msgstr ""
 
-msgid "lppasswd: Password file not updated!\n"
-msgstr "lppasswd: 암호 파일이 업데이트되지 않음!\n"
+msgid "lppasswd: Password file not updated\n"
+msgstr ""
 
-msgid "lppasswd: Sorry, password doesn't match!\n"
-msgstr "lppasswd: 죄송합니다, 암호가 일치하지 않습니다!\n"
+msgid "lppasswd: Sorry, password doesn't match\n"
+msgstr ""
 
 msgid ""
 "lppasswd: Sorry, password rejected.\n"
@@ -4999,8 +4941,8 @@ msgstr ""
 "암호는 최소한 6자 이상이어야 하고, 사용자 이름을 포함해서는 안되며, \n"
 "최소 하나 이상의 문자 및 숫자를 포함해야 합니다.\n"
 
-msgid "lppasswd: Sorry, passwords don't match!\n"
-msgstr "lppasswd: 죄송합니다, 암호가 일치하지 않습니다!\n"
+msgid "lppasswd: Sorry, passwords don't match\n"
+msgstr ""
 
 #, c-format
 msgid "lppasswd: Unable to copy password string: %s\n"
@@ -5029,8 +4971,8 @@ msgstr "lppasswd: \"%s\" 사용자 및 \"%s\" 그룹이 존재하지 않습니�
 #, c-format
 msgid ""
 "lpstat: error - %s environment variable names non-existent destination \"%s"
-"\"!\n"
-msgstr "lpstat: 오류 - %s 환경 변수 이름이 존재하지 않는 대상 \"%s\" 이름임!\n"
+"\"\n"
+msgstr ""
 
 #, c-format
 msgid "members of class %s:\n"
@@ -5042,20 +4984,20 @@ msgstr "엔트리 없음\n"
 msgid "no system default destination\n"
 msgstr "시스템 기본 대상 없음\n"
 
-msgid "notify-events not specified!"
-msgstr "notify-events가 지정되지 않음!"
+msgid "notify-events not specified"
+msgstr ""
 
 #, c-format
-msgid "notify-recipient-uri URI \"%s\" is already used!"
-msgstr "notify-recipient-uri \"%s\" URI가 이미 사용 중임!"
+msgid "notify-recipient-uri URI \"%s\" is already used"
+msgstr ""
 
 #, c-format
-msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
-msgstr "notify-recipient-uri \"%s\" URI가 알 수 없는 설계를 사용함!"
+msgid "notify-recipient-uri URI \"%s\" uses unknown scheme"
+msgstr ""
 
 #, c-format
-msgid "notify-subscription-id %d no good!"
-msgstr "%d notify-subscription-id가 좋지 않습니다!"
+msgid "notify-subscription-id %d no good"
+msgstr ""
 
 msgid "pending"
 msgstr "보류 중"
@@ -5073,40 +5015,40 @@ msgid "ppdc: Bad boolean value (%s) on line %d of %s.\n"
 msgstr "ppdc: 잘못된 불리언 값(%1$s)이 %3$s의 %2$d번째 줄에 있음.\n"
 
 #, c-format
-msgid "ppdc: Bad resolution name \"%s\" on line %d of %s!\n"
-msgstr "ppdc: 잘못된 \"%1$s\" 해상도 이름이 %3$s의 %2$d번째 줄에 있음!\n"
+msgid "ppdc: Bad resolution name \"%s\" on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Bad status keyword %s on line %d of %s!\n"
-msgstr "ppdc: 잘못된 %1$s 상태 키워드가 %3$s의 %2$d번째 줄에 있음!\n"
+msgid "ppdc: Bad status keyword %s on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Bad variable substitution ($%c) on line %d of %s.\n"
 msgstr "ppdc: 잘못된 변수 대체항목($%1$c)이 %3$s의 %2$d번째 줄에 있음.\n"
 
 #, c-format
-msgid "ppdc: Choice found on line %d of %s with no Option!\n"
-msgstr "ppdc: 선택사항이 %2$s의 %1$d번째 줄에서 옵션 없이 발견됨!\n"
+msgid "ppdc: Choice found on line %d of %s with no Option\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Duplicate #po for locale %s on line %d of %s!\n"
-msgstr "ppdc: 로컬 %1$s에 대한 중복된 #po가 %3$s의 %2$d번째 줄에 있음!\n"
+msgid "ppdc: Duplicate #po for locale %s on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected a filter definition on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 필터 정의가 예상됨!\n"
+msgid "ppdc: Expected a filter definition on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected a program name on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 프로그램 이름이 예상됨!\n"
+msgid "ppdc: Expected a program name on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Expected boolean value on line %d of %s.\n"
 msgstr "ppdc: %2$s의 %1$d번째 줄에 불리언 값이 예상됨.\n"
 
 #, c-format
-msgid "ppdc: Expected charset after Font on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 문자 세트가 예상됨!\n"
+msgid "ppdc: Expected charset after Font on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Expected choice code on line %d of %s.\n"
@@ -5117,188 +5059,180 @@ msgid "ppdc: Expected choice name/text on line %d of %s.\n"
 msgstr "ppdc: %2$s의 %1$d번째 줄에 선택사항 이름/텍스트가 예상됨.\n"
 
 #, c-format
-msgid "ppdc: Expected color order for ColorModel on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 색상 순서가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected colorspace for ColorModel on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 색상 공간이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected compression for ColorModel on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 압축이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s!\n"
+msgid "ppdc: Expected color order for ColorModel on line %d of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄에 UIConstraints에 대한 제한 스트링이 예상됨!\n"
+
+#, c-format
+msgid "ppdc: Expected colorspace for ColorModel on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected compression for ColorModel on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected constraints string for UIConstraints on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"ppdc: Expected driver type keyword following DriverType on line %d of %s!\n"
+"ppdc: Expected driver type keyword following DriverType on line %d of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄, DriverType 뒤에 드라이버 유형 키워드가 예상됨!\n"
 
 #, c-format
-msgid "ppdc: Expected duplex type after Duplex on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Duplex 뒤에 양면 유형이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected encoding after Font on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 인코딩이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected filename after #po %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄, #po %1$s 뒤에 파일 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected group name/text on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 그룹 이름/텍스트가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected include filename on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 포함 파일 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected integer on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 정수가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected locale after #po on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, #po 뒤에 로컬 위치가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after FileName on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, FileName 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after Font on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after Manufacturer on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Manufacturer 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after MediaSize on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, MediaSize 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after ModelName on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, ModelName 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name after PCFileName on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, PCFileName 뒤에 이름이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name/text after %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 이름/텍스트가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name/text after Installable on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Installable 뒤에 이름/텍스트 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name/text after Resolution on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Resolution 뒤에 이름/텍스트 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s!\n"
+msgid "ppdc: Expected duplex type after Duplex on line %d of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄, ColorModel에 대해 이름/텍스트 조합이 예상됨!\n"
 
 #, c-format
-msgid "ppdc: Expected option name/text on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 이름/텍스트가 예상됨!\n"
+msgid "ppdc: Expected encoding after Font on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected option section on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 섹션이 예상됨!\n"
+msgid "ppdc: Expected filename after #po %s on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected option type on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄의 옵션 유형이 예상됨!\n"
+msgid "ppdc: Expected group name/text on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected override field after Resolution on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Resolution 뒤에 오버라이드 필드가 예상됨!\n"
+msgid "ppdc: Expected include filename on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Expected real number on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 실제 번호가 예상됨!\n"
+msgid "ppdc: Expected integer on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected locale after #po on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after %s on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after FileName on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after Font on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after Manufacturer on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after MediaSize on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after ModelName on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name after PCFileName on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name/text after %s on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name/text after Installable on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name/text after Resolution on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected name/text combination for ColorModel on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected option name/text on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected option section on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected option type on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected override field after Resolution on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected real number on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %"
-"s!\n"
+"ppdc: Expected resolution/mediatype following ColorProfile on line %d of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄, ColorProfile 뒤에 해상도/미디어 유형이 예상됨!\n"
 
 #, c-format
 msgid ""
 "ppdc: Expected resolution/mediatype following SimpleColorProfile on line %d "
-"of %s!\n"
+"of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄, SimpleColorProfile 뒤에 해상도/미디어 유형이 예상"
-"됨!\n"
 
 #, c-format
-msgid "ppdc: Expected selector after %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 선택자가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected status after Font on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 상태가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected string after Copyright on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Copyright 뒤에 스트링이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected string after Version on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Version 뒤에 스트링이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected two option names on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 이름 2개가 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected value after %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 값이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Expected version after Font on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 버전이 예상됨!\n"
-
-#, c-format
-msgid "ppdc: Invalid #include/#po filename \"%s\"!\n"
-msgstr "ppdc: 유효하지 않은 #include/#po 파일 이름 \"%s\"!\n"
-
-#, c-format
-msgid "ppdc: Invalid cost for filter on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 비용!\n"
-
-#, c-format
-msgid "ppdc: Invalid empty MIME type for filter on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 빈 MIME 유형!\n"
-
-#, c-format
-msgid "ppdc: Invalid empty program name for filter on line %d of %s!\n"
+msgid "ppdc: Expected selector after %s on line %d of %s\n"
 msgstr ""
-"ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 빈 프로그램 이름!\n"
 
 #, c-format
-msgid "ppdc: Invalid option section \"%s\" on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 유효하지 않은 \"%1$s\" 옵션 섹션!\n"
+msgid "ppdc: Expected status after Font on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Invalid option type \"%s\" on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 유효하지 않은 \"%1$s\" 옵션 유형!\n"
+msgid "ppdc: Expected string after Copyright on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected string after Version on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected two option names on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected value after %s on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Expected version after Font on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid #include/#po filename \"%s\"\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid cost for filter on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid empty MIME type for filter on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid empty program name for filter on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid option section \"%s\" on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Invalid option type \"%s\" on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Loading driver information file \"%s\"...\n"
@@ -5313,32 +5247,32 @@ msgid "ppdc: Loading messages from \"%s\"...\n"
 msgstr "ppdc: \"%s\"에서 메시지 로드 중...\n"
 
 #, c-format
-msgid "ppdc: Missing #endif at end of \"%s\"!\n"
-msgstr "ppdc: \"%s\" 끝에서 #endif 유실됨!\n"
-
-#, c-format
-msgid "ppdc: Missing #if on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에서 #if 유실됨!\n"
-
-#, c-format
-msgid "ppdc: No message catalog provided for locale %s!\n"
-msgstr "ppdc: 로컬 %s에 대해 제공된 메시지 카탈로그 없음!\n"
-
-#, c-format
-msgid "ppdc: Option %s defined in two different groups on line %d of %s!\n"
+msgid "ppdc: Missing #endif at end of \"%s\"\n"
 msgstr ""
 
 #, c-format
-msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 %1$s 옵션이 다른 유형으로 재정의됨!\n"
+msgid "ppdc: Missing #if on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Option constraint must *name on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 있는 옵션 제한은 *name이어야 함!\n"
+msgid "ppdc: No message catalog provided for locale %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Too many nested #if's on line %d of %s!\n"
-msgstr "ppdc: %2$s의 %1$d번째 줄에 너무 많이 중첩된 #if가 있음!\n"
+msgid "ppdc: Option %s defined in two different groups on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Option %s redefined with a different type on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Option constraint must *name on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Too many nested #if's on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Unable to create PPD file \"%s\" - %s.\n"
@@ -5357,12 +5291,12 @@ msgid "ppdc: Unable to execute cupstestppd: %s\n"
 msgstr "ppdc: cupstestppd를 실행할 수 없음: %s\n"
 
 #, c-format
-msgid "ppdc: Unable to find #po file %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에서 #po 파일 %1$s을(를) 찾을 수 없음!\n"
+msgid "ppdc: Unable to find #po file %s on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Unable to find include file \"%s\" on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에서 포함 파일 \"%1$s\"을(를) 찾을 수 없음!\n"
+msgid "ppdc: Unable to find include file \"%s\" on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Unable to find localization for \"%s\" - %s\n"
@@ -5377,30 +5311,33 @@ msgid "ppdc: Undefined variable (%s) on line %d of %s.\n"
 msgstr "ppdc: %3$s의 %2$d번째 줄에 변수(%1$s)가 정의되지 않음.\n"
 
 #, c-format
-msgid "ppdc: Unknown driver type %s on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 %1$s 드라이브 유형!\n"
+msgid "ppdc: Unknown driver type %s on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 \"%1$s\" 양면 유형!\n"
+msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Unknown media size \"%s\" on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 \"%1$s\" 미디어 크기!\n"
+msgid "ppdc: Unknown media size \"%s\" on line %d of %s\n"
+msgstr ""
 
 #, c-format
-msgid "ppdc: Unknown token \"%s\" seen on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 보이는 알 수 없는 \"%1$s\" 토큰!\n"
+msgid "ppdc: Unknown token \"%s\" seen on line %d of %s\n"
+msgstr ""
 
 #, c-format
 msgid ""
-"ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s!\n"
+"ppdc: Unknown trailing characters in real number \"%s\" on line %d of %s\n"
 msgstr ""
-"ppdc: %3$s의 %2$d번째 줄에 있는 \"%1$s\" 실수에 알 수 없는 마지막 문자!\n"
 
 #, c-format
-msgid "ppdc: Unterminated string starting with %c on line %d of %s!\n"
-msgstr "ppdc: %3$s의 %2$d번째 줄에 %1$c(으)로 시작하는 끝나지 않는 스트링!\n"
+msgid "ppdc: Unterminated string starting with %c on line %d of %s\n"
+msgstr ""
+
+#, c-format
+msgid "ppdc: Warning - overlapping filename \"%s\".\n"
+msgstr ""
 
 #, c-format
 msgid "ppdc: Writing %s...\n"
@@ -5411,8 +5348,8 @@ msgid "ppdc: Writing PPD files to directory \"%s\"...\n"
 msgstr "ppdc: \"%s\" 디렉토리에 PPD 파일 쓰는 중...\n"
 
 #, c-format
-msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"
-msgstr "ppdmerge: %2$s에 잘못된 \"%1$s\" LanguageVersion!\n"
+msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s\n"
+msgstr ""
 
 #, c-format
 msgid "ppdmerge: Ignoring PPD file %s...\n"
@@ -5489,11 +5426,404 @@ msgstr "무제"
 msgid "variable-bindings uses indefinite length"
 msgstr "variable-bindings의 길이가 무제한입니다"
 
+#~ msgid "        WARN    %s has no corresponding options!\n"
+#~ msgstr "        WARN    %s에 일치하는 옵션이 없습니다!\n"
+
+#~ msgid "        WARN    Default choices conflicting!\n"
+#~ msgstr "        WARN    기본 선택사항 충돌!\n"
+
+#~ msgid ""
+#~ "        WARN    Duplex option keyword %s may not work as expected and "
+#~ "should be named Duplex!\n"
+#~ "                REF: Page 122, section 5.17\n"
+#~ msgstr ""
+#~ "        WARN    양면 옵션 키워드 %s이(가) 예상대로 동작하지 않을 수 있으"
+#~ "며 이름을 양면으로 해야 합니다!\n"
+#~ "                REF: 122페이지, 섹션 5.17\n"
+
+#~ msgid ""
+#~ "        WARN    File contains a mix of CR, LF, and CR LF line endings!\n"
+#~ msgstr "        WARN    파일이 CR, LF 및 CR LF 줄 끝을 포함합니다!\n"
+
+#~ msgid "        WARN    Line %d only contains whitespace!\n"
+#~ msgstr "        WARN    %d번째 줄에는 여백만 있습니다!\n"
+
 #~ msgid "        WARN    Missing APDialogExtension file \"%s\"\n"
 #~ msgstr "        WARN    \"%s\" APDialogExtension 파일 유실됨\n"
 
 #~ msgid "        WARN    Missing APPrinterIconPath file \"%s\"\n"
 #~ msgstr "        WARN    \"%s\" APPrinterIconPath 파일 유실됨\n"
+
+#~ msgid ""
+#~ "        WARN    Non-Windows PPD files should use lines ending with only "
+#~ "LF, not CR LF!\n"
+#~ msgstr ""
+#~ "        WARN    비 Windows PPD 파일은 줄 끝을 CR LF가 아닌 LF만 있는 줄 끝"
+#~ "을 사용해야 합니다!\n"
+
+#~ msgid ""
+#~ "        WARN    Obsolete PPD version %.1f!\n"
+#~ "                REF: Page 42, section 5.2.\n"
+#~ msgstr ""
+#~ "        WARN    이전 PPD 버전 %.1f!\n"
+#~ "                REF: 42페이지, 섹션 5.2.\n"
+
+#~ msgid "      %s  %s %s does not exist!\n"
+#~ msgstr "      %s  %s %s이(가) 존재하지 않습니다!\n"
+
+#~ msgid ""
+#~ "      %s  Bad %s choice %s!\n"
+#~ "                REF: Page 122, section 5.17\n"
+#~ msgstr ""
+#~ "      %s  잘못된 %s - 선택사항 %s!\n"
+#~ "                REF: 122페이지, 섹션 5.17\n"
+
+#~ msgid "      %s  Bad UTF-8 \"%s\" translation string for option %s!\n"
+#~ msgstr "      %1$s  %3$s 옵션에 대한 잘못된 UTF-8 \"%2$s\" 번역 스트링!\n"
+
+#~ msgid ""
+#~ "      %s  Bad UTF-8 \"%s\" translation string for option %s, choice %s!\n"
+#~ msgstr ""
+#~ "      %1$s  %3$s 옵션, %4$s 선택사항에 대한 잘못된 UTF-8 \"%2$s\" 번역 스"
+#~ "트링!\n"
+
+#~ msgid "      %s  Bad cupsFilter value \"%s\"!\n"
+#~ msgstr "      %s  잘못된 \"%s\" cupsFilter 값!\n"
+
+#~ msgid "      %s  Bad cupsICCProfile %s!\n"
+#~ msgstr "      %s  잘못된 %s cupsICCProfile!\n"
+
+#~ msgid "      %s  Bad cupsPreFilter value \"%s\"!\n"
+#~ msgstr "      %s  잘못된 \"%s\" cupsPreFilter 값!\n"
+
+#~ msgid "      %s  Bad cupsUIConstraints %s: \"%s\"!\n"
+#~ msgstr "      %s  잘못된 cupsUIConstraints %s: \"%s\"!\n"
+
+#~ msgid "      %s  Bad language \"%s\"!\n"
+#~ msgstr "      %s  잘못된 \"%s\" 언어!\n"
+
+#~ msgid "      %s  Empty cupsUIConstraints %s!\n"
+#~ msgstr "      %s  cupsUIConstraints %s이(가) 비어있음!\n"
+
+#~ msgid "      %s  Missing \"%s\" translation string for option %s!\n"
+#~ msgstr "      %1$s  %3$s 옵션에 대한 \"%2$s\" 번역 스트링 유실됨!\n"
+
+#~ msgid ""
+#~ "      %s  Missing \"%s\" translation string for option %s, choice %s!\n"
+#~ msgstr ""
+#~ "      %1$s  %3$s 옵션, %4$s 선택사항에 대한 \"%2$s\" 번역 스트링 유실됨!\n"
+
+#~ msgid ""
+#~ "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"!\n"
+#~ msgstr ""
+#~ "      %1$s  \"*%4$s %5$s *%6$s %7$s\" UIConstraints에 있는 *%2$s %3$s 선택"
+#~ "사항 유실됨!\n"
+
+#~ msgid "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"!\n"
+#~ msgstr ""
+#~ "      %1$s  %4$s cupsUIConstraints에 있는 *%2$s %3$s 선택사항 유실됨: \"%5"
+#~ "$s\"!\n"
+
+#~ msgid "      %s  Missing cupsICCProfile file \"%s\"!\n"
+#~ msgstr "      %s  \"%s\" cupsICCProfile 파일이 유실됨!\n"
+
+#~ msgid "      %s  Missing cupsUIResolver %s!\n"
+#~ msgstr "      %s  %s cupsUIResolver 유실됨!\n"
+
+#~ msgid "      %s  Missing option %s in UIConstraints \"*%s %s *%s %s\"!\n"
+#~ msgstr ""
+#~ "      %1$s  \"*%3$s %4$s *%5$s %6$s\" UIConstraints에 있는 %2$s 옵션 유실"
+#~ "됨!\n"
+
+#~ msgid "      %s  Missing option %s in cupsUIConstraints %s: \"%s\"!\n"
+#~ msgstr ""
+#~ "      %1$s  %3$s cupsUIConstraints에 있는 %2$s 옵션 유실됨: \"%4$s\"!\n"
+
+#~ msgid "      %s  No base translation \"%s\" is included in file!\n"
+#~ msgstr "      %s  파일에 \"%s\" 기초 번역이 포함되어 있지 않습니다!\n"
+
+#~ msgid ""
+#~ "      %s  REQUIRED %s does not define choice None!\n"
+#~ "                REF: Page 122, section 5.17\n"
+#~ msgstr ""
+#~ "      %s  선택사항 없음을 정의하지 않은 %s이(가) 필요!\n"
+#~ "                REF: 122페이지, 섹션 5.17\n"
+
+#~ msgid "      %s  cupsICCProfile %s hash value collides with %s!\n"
+#~ msgstr "      %s  불필요한 %s cupsICCProfile 값이 %s와(과) 충돌함!\n"
+
+#~ msgid "      %s  cupsUIResolver %s causes a loop!\n"
+#~ msgstr "      %s  %s cupsUIResolver가 루프를 유발함!\n"
+
+#~ msgid "      **FAIL**  %s choice names %s and %s differ only by case!\n"
+#~ msgstr "      **FAIL**  %s 선택사항 이름 %s 및 %s이(가) 경우별로만 다름!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  %s must be 1284DeviceID!\n"
+#~ "                REF: Page 72, section 5.5\n"
+#~ msgstr ""
+#~ "      **FAIL**  %s은(는) 1284DeviceID이어야 합니다!\n"
+#~ "                REF: 72페이지, 섹션 5.5\n"
+
+#~ msgid ""
+#~ "      **FAIL**  BAD DefaultImageableArea %s!\n"
+#~ "                REF: Page 102, section 5.15.\n"
+#~ msgstr ""
+#~ "      **FAIL**  잘못된 DefaultImageableArea %s!\n"
+#~ "                REF: 102페이지, 섹션 5.15.\n"
+
+#~ msgid ""
+#~ "      **FAIL**  BAD DefaultPaperDimension %s!\n"
+#~ "                REF: Page 103, section 5.15.\n"
+#~ msgstr ""
+#~ "      **FAIL**  잘못된 DefaultPaperDimension %s!\n"
+#~ "                REF: 103페이지, 섹션 5.15.\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Bad %s choice %s!\n"
+#~ "                REF: Page 84, section 5.9\n"
+#~ msgstr ""
+#~ "      **FAIL**  잘못된 %s - 선택사항 %s!\n"
+#~ "                REF: 84페이지, 섹션 5.9\n"
+
+#~ msgid "      **FAIL**  Bad LanguageEncoding %s - must be ISOLatin1!\n"
+#~ msgstr ""
+#~ "      **FAIL**  잘못된 LanguageEncoding %s - ISOLatin1이어야 합니다!\n"
+
+#~ msgid "      **FAIL**  Bad LanguageVersion %s - must be English!\n"
+#~ msgstr "      **FAIL**  잘못된 LanguageVersion %s - 영어여야 합니다!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Default translation string for option %s choice %s "
+#~ "contains 8-bit characters!\n"
+#~ msgstr ""
+#~ "      **FAIL**  %s 옵션 %s 선택사항에 대한 기본 번역 스트링이 8비트 문자"
+#~ "를 포함합니다!\n"
+
+#~ msgid ""
+#~ "      **FAIL**  Default translation string for option %s contains 8-bit "
+#~ "characters!\n"
+#~ msgstr ""
+#~ "      **FAIL**  %s 옵션에 대한 기본 번역 스트링이 8비트 문자를 포함합니"
+#~ "다!\n"
+
+#~ msgid "      **FAIL**  Group names %s and %s differ only by case!\n"
+#~ msgstr "      **FAIL**  %s 및 %s 그룹 이름이 경우별로만 다름!\n"
+
+#~ msgid "      **FAIL**  Multiple occurrences of %s choice name %s!\n"
+#~ msgstr "      **FAIL**  다중  %s 항목이 %s 이름을 선택!\n"
+
+#~ msgid "      **FAIL**  Option names %s and %s differ only by case!\n"
+#~ msgstr "      **FAIL**  %s 및 %s 옵션 이름이 경우별로만 다름!\n"
+
+#~ msgid ""
+#~ "    Bad %%%%BoundingBox: on line %d!\n"
+#~ "        REF: Page 39, %%%%BoundingBox:\n"
+#~ msgstr ""
+#~ "    잘못된 %%%%BoundingBox: %d번째 줄!\n"
+#~ "        REF: 39페이지, %%%%BoundingBox:\n"
+
+#~ msgid ""
+#~ "    Bad %%%%Page: on line %d!\n"
+#~ "        REF: Page 53, %%%%Page:\n"
+#~ msgstr ""
+#~ "    잘못된 %%%%Page: %d번째 줄!\n"
+#~ "        REF: 53페이지, %%%%Page:\n"
+
+#~ msgid ""
+#~ "    Bad %%%%Pages: on line %d!\n"
+#~ "        REF: Page 43, %%%%Pages:\n"
+#~ msgstr ""
+#~ "    잘못된 %%%%Pages: %d번째 줄!\n"
+#~ "        REF: 43페이지, %%%%Pages:\n"
+
+#~ msgid ""
+#~ "    Line %d is longer than 255 characters (%d)!\n"
+#~ "        REF: Page 25, Line Length\n"
+#~ msgstr ""
+#~ "    %d번째 줄이 255자보다 깁니다(%d)!\n"
+#~ "        REF: 25페이지, 줄 길이\n"
+
+#~ msgid ""
+#~ "    Missing %!PS-Adobe-3.0 on first line!\n"
+#~ "        REF: Page 17, 3.1 Conforming Documents\n"
+#~ msgstr ""
+#~ "    첫번째 줄에 있는 %!PS-Adobe-3.0이 유실됨!\n"
+#~ "        REF: 17페이지, 3.1 도큐멘트 구성하기\n"
+
+#~ msgid ""
+#~ "    Missing %%EndComments comment!\n"
+#~ "        REF: Page 41, %%EndComments\n"
+#~ msgstr ""
+#~ "    %%EndComments 설명 유실됨!\n"
+#~ "        REF: 41페이지, %%EndComments\n"
+
+#~ msgid ""
+#~ "    Missing or bad %%BoundingBox: comment!\n"
+#~ "        REF: Page 39, %%BoundingBox:\n"
+#~ msgstr ""
+#~ "    유실되었거나 잘못된 %%BoundingBox: 설명!\n"
+#~ "        REF: 39페이지, %%BoundingBox:\n"
+
+#~ msgid ""
+#~ "    Missing or bad %%Page: comments!\n"
+#~ "        REF: Page 53, %%Page:\n"
+#~ msgstr ""
+#~ "    유실되었거나 잘못된 %%Page: 설명!\n"
+#~ "        REF: 53페이지, %%Page:\n"
+
+#~ msgid ""
+#~ "    Missing or bad %%Pages: comment!\n"
+#~ "        REF: Page 43, %%Pages:\n"
+#~ msgstr ""
+#~ "    유실되었거나 잘못된 %%Page: 설명!\n"
+#~ "        REF: 43페이지, %%Pages:\n"
+
+#~ msgid "    Saw %d lines that exceeded 255 characters!\n"
+#~ msgstr "    255자를 초과하는 %d개의 줄 발견!\n"
+
+#~ msgid "    Too many %%BeginDocument comments!\n"
+#~ msgstr "    너무 많은 %%BeginDocument 설명!\n"
+
+#~ msgid "    Too many %%EndDocument comments!\n"
+#~ msgstr "    너무 많은 %%EndDocument 설명!\n"
+
+#~ msgid "    Warning: file contains binary data!\n"
+#~ msgstr "    경고: 파일에 바이너리 데이터가 포함되어 있습니다!\n"
+
+#~ msgid "    Warning: no %%EndComments comment in file!\n"
+#~ msgstr "    경고: 파일에 %%EndComments 설명이 없습니다!\n"
+
+#~ msgid "    Warning: obsolete DSC version %.1f in file!\n"
+#~ msgstr "    경고: 파일에 이전 DSC 버전 %.1f가 있습니다!\n"
+
+#~ msgid "%s not supported!"
+#~ msgstr "%s이(가) 지원되지 않음!"
+
+#~ msgid "%s: Don't know what to do!\n"
+#~ msgstr "%s: 해야할 일을 모르겠음!\n"
+
+#~ msgid ""
+#~ "%s: Error - %s environment variable names non-existent destination \"%s"
+#~ "\"!\n"
+#~ msgstr "%1$s: 오류 - \"%3$s\" 대상에 존재하지 않는 %2$s 환경 변수 이름!\n"
+
+#~ msgid "%s: Error - bad job ID!\n"
+#~ msgstr "%s: 오류 - 잘못된 작업 ID!\n"
+
+#~ msgid "%s: Error - cannot print files and alter jobs simultaneously!\n"
+#~ msgstr "%s: 오류 - 파일을 프린트할 수 없고 작업을 동시에 대체할 수 없음!\n"
+
+#~ msgid ""
+#~ "%s: Error - cannot print from stdin if files or a job ID are provided!\n"
+#~ msgstr ""
+#~ "%s: 오류 - 파일 또는 작업 ID가 제공되었다면 stdin에서 프린트할 수 없음!\n"
+
+#~ msgid "%s: Error - expected character set after '-S' option!\n"
+#~ msgstr "%s: 오류 - '-S' 옵션 뒤에 문자 세트가 예상됨!\n"
+
+#~ msgid "%s: Error - expected content type after '-T' option!\n"
+#~ msgstr "%s: 오류 - '-T' 옵션 뒤에 콘텐츠 유형이 예상됨!\n"
+
+#~ msgid "%s: Error - expected copies after '-n' option!\n"
+#~ msgstr "%s: 오류 - '-n' 옵션 뒤에 복사 매수가 예상됨!\n"
+
+#~ msgid "%s: Error - expected copy count after '-#' option!\n"
+#~ msgstr "%s: 오류 - '-#' 옵션 뒤에 복사본 수가 예상됨!\n"
+
+#~ msgid "%s: Error - expected destination after '-P' option!\n"
+#~ msgstr "%s: 오류 - '-P' 옵션 뒤에 대상이 예상됨!\n"
+
+#~ msgid "%s: Error - expected destination after '-b' option!\n"
+#~ msgstr "%s: 오류 - '-b' 옵션 뒤에 대상이 예상됨!\n"
+
+#~ msgid "%s: Error - expected destination after '-d' option!\n"
+#~ msgstr "%s: 오류 - '-d' 옵션 뒤에 대상이 예상됨!\n"
+
+#~ msgid "%s: Error - expected form after '-f' option!\n"
+#~ msgstr "%s: 오류 - '-f' 옵션 뒤에 구성이 예상됨!\n"
+
+#~ msgid "%s: Error - expected hold name after '-H' option!\n"
+#~ msgstr "%s: 오류 - '-H' 옵션 뒤에 유지 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected hostname after '-H' option!\n"
+#~ msgstr "%s: 오류 - '-H' 옵션 뒤에 호스트 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected hostname after '-h' option!\n"
+#~ msgstr "%s: 오류 - '-h' 옵션 뒤에 호스트 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected mode list after '-y' option!\n"
+#~ msgstr "%s: 오류 - '-y' 옵션 뒤에 모드 목록이 예상됨!\n"
+
+#~ msgid "%s: Error - expected name after '-%c' option!\n"
+#~ msgstr "%s: 오류 - '-%c' 옵션 뒤에 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected option string after '-o' option!\n"
+#~ msgstr "%s: 오류 - '-o' 옵션 뒤에 옵션 스트링이 예상됨!\n"
+
+#~ msgid "%s: Error - expected page list after '-P' option!\n"
+#~ msgstr "%s: 오류 - '-P' 옵션 뒤에 페이지 목록이 예상됨!\n"
+
+#~ msgid "%s: Error - expected priority after '-%c' option!\n"
+#~ msgstr "%s: 오류 - '-%c' 옵션 뒤에 우선순위가 예상됨!\n"
+
+#~ msgid "%s: Error - expected reason text after '-r' option!\n"
+#~ msgstr "%s: 오류 - '-r' 옵션 뒤에 이유 텍스트가 예상됨!\n"
+
+#~ msgid "%s: Error - expected title after '-t' option!\n"
+#~ msgstr "%s: 오류 - '-t' 옵션 뒤에 제목이 예상됨!\n"
+
+#~ msgid "%s: Error - expected username after '-U' option!\n"
+#~ msgstr "%s: 오류 - '-U' 옵션 뒤에 사용자 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected username after '-u' option!\n"
+#~ msgstr "%s: 오류 - '-u' 옵션 뒤에 사용자 이름이 예상됨!\n"
+
+#~ msgid "%s: Error - expected value after '-%c' option!\n"
+#~ msgstr "%s: 오류 - '-%c' 옵션 뒤에 값이 예상됨!\n"
+
+#~ msgid ""
+#~ "%s: Error - need \"completed\", \"not-completed\", or \"all\" after '-W' "
+#~ "option!\n"
+#~ msgstr ""
+#~ "%s: 오류 - '-W' 옵션 뒤에 \"completed\", \"not-completed\" 또는 \"all\"이 "
+#~ "필요!\n"
+
+#~ msgid "%s: Error - scheduler not responding!\n"
+#~ msgstr "%s: 오류 - 일정이 응답하지 않음!\n"
+
+#~ msgid "%s: Error - unknown destination \"%s\"!\n"
+#~ msgstr "%s: 오류 - 알 수 없는 대상 \"%s\"!\n"
+
+#~ msgid "%s: Error - unknown destination \"%s/%s\"!\n"
+#~ msgstr "%s: 오류 - 알 수 없는 대상 \"%s/%s\"!\n"
+
+#~ msgid "%s: Error - unknown option '%c'!\n"
+#~ msgstr "%s: 오류 - 알 수 없는 옵션 '%c'!\n"
+
+#~ msgid "%s: Error - unknown option '%s'!\n"
+#~ msgstr "%s: 오류 - 알 수 없는 옵션 '%s'!\n"
+
+#~ msgid "%s: Expected job ID after '-i' option!\n"
+#~ msgstr "%s: '-i' 옵션 뒤에 작업 ID가 예상됨!\n"
+
+#~ msgid "%s: Invalid destination name in list \"%s\"!\n"
+#~ msgstr "%s: \"%s\" 목록에 유효하지 않은 대상 이름!\n"
+
+#~ msgid "%s: Need job ID ('-i jobid') before '-H restart'!\n"
+#~ msgstr "%s: '-H restart' 앞에 작업 ID('-i jobid') 필요!\n"
+
+#~ msgid "%s: No filter to convert from %s/%s to %s/%s!\n"
+#~ msgstr "%s: %s/%s에서 %s/%s까지 변환할 필터가 없음!\n"
+
+#~ msgid "%s: Sorry, no encryption support compiled in!\n"
+#~ msgstr "%s: 죄송합니다, 컴파일된 암호화 지원이 없습니다!\n"
+
+#~ msgid "%s: Unable to contact server!\n"
+#~ msgstr "%s: 서버에 연결할 수 없음!\n"
+
+#~ msgid "%s: Unable to determine MIME type of \"%s\"!\n"
+#~ msgstr "%s: MIME 유형의 \"%s\"을(를) 결정할 수 없음!\n"
 
 #~ msgid "%s: Unable to open %s - %s\n"
 #~ msgstr "%s: %s을(를) 열 수 없음 - %s\n"
@@ -5501,8 +5831,183 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "%s: Unable to open %s - %s on line %d.\n"
 #~ msgstr "%s: %s을(를) 열 수 없음 - %s, %d번째 줄\n"
 
+#~ msgid "%s: Unable to read MIME database from \"%s\" or \"%s\"!\n"
+#~ msgstr "%s: \"%s\" 또는 \"%s\"에서 MIME 데이터베이스를 읽을 수 없음!\n"
+
+#~ msgid "%s: Unknown destination \"%s\"!\n"
+#~ msgstr "%s: 알 수 없는 대상 \"%s\"!\n"
+
+#~ msgid "%s: Unknown destination MIME type %s/%s!\n"
+#~ msgstr "%s: 알 수 없는 대상 MIME 유형 %s/%s!\n"
+
+#~ msgid "%s: Unknown option '%c'!\n"
+#~ msgstr "%s: 알 수 없는 옵션 '%c'!\n"
+
+#~ msgid "%s: Unknown source MIME type %s/%s!\n"
+#~ msgstr "%s: 알 수 없는 소스 MIME 유형 %s/%s!\n"
+
+#~ msgid ""
+#~ "%s: Warning - '%c' format modifier not supported - output may not be "
+#~ "correct!\n"
+#~ msgstr ""
+#~ "%s: 경고 - '%c' 포맷 조합 키가 지원되지 않음 - 출력이 올바르지 않을 수 있"
+#~ "습니다!\n"
+
+#~ msgid "%s: Warning - character set option ignored!\n"
+#~ msgstr "%s: 경고 - 문자 세트 옵션이 무시됨!\n"
+
+#~ msgid "%s: Warning - content type option ignored!\n"
+#~ msgstr "%s: 경고 - 콘텐츠 유형 옵션이 무시됨!\n"
+
+#~ msgid "%s: Warning - form option ignored!\n"
+#~ msgstr "%s: 경고 - 구성 옵션이 무시됨!\n"
+
+#~ msgid "%s: Warning - mode option ignored!\n"
+#~ msgstr "%s: 경고 - 모드 옵션이 무시됨!\n"
+
+#~ msgid ""
+#~ "%s: error - %s environment variable names non-existent destination \"%s"
+#~ "\"!\n"
+#~ msgstr "%1$s: 오류 - \"%3$s\" 대상에 존재하지 않는 %2$s 환경 변수 이름!\n"
+
+#~ msgid "%s: error - expected option=value after '-o' option!\n"
+#~ msgstr "%s: 오류 - '-o' 옵션 뒤에 option=value가 예상됨!\n"
+
 #~ msgid "600 DPI Grayscale"
 #~ msgstr "600 DPI 그레이 스케일"
+
+#~ msgid "A Samba password is required to export printer drivers!"
+#~ msgstr "프린터 드라이버를 보내려면 Samba 암호가 필요함!"
+
+#~ msgid "A Samba username is required to export printer drivers!"
+#~ msgstr "프린터 드라이버를 보내려면 Samba 사용자 이름이 필요함!"
+
+#~ msgid "A class named \"%s\" already exists!"
+#~ msgstr "\"%s\"(이)라는 이름의 클래스가 이미 존재합니다!"
+
+#~ msgid "A printer named \"%s\" already exists!"
+#~ msgstr "\"%s\"(이)라는 이름의 프린터가 이미 존재합니다!"
+
+#~ msgid "Attempt to set %s printer-state to bad value %d!"
+#~ msgstr "%s 프린터 상태를 잘못된 %d 값으로 설정하려고 합니다!"
+
+#~ msgid "Attribute groups are out of order (%x < %x)!"
+#~ msgstr "속성 그룹이 올바르지 않습니다(%x < %x)!"
+
+#~ msgid "Bad device URI \"%s\"!\n"
+#~ msgstr "잘못된 장비 URI \"%s\"!\n"
+
+#~ msgid "Bad device-uri \"%s\"!"
+#~ msgstr "잘못된 device-uri \"%s\"!"
+
+#~ msgid "Bad device-uri scheme \"%s\"!"
+#~ msgstr "잘못된 device-uri 설계 \"%s\"!"
+
+#~ msgid "Bad document-format \"%s\"!"
+#~ msgstr "잘못된 document-format \"%s\"!"
+
+#~ msgid "Bad filename buffer!"
+#~ msgstr "잘못된 파일 이름 버퍼!"
+
+#~ msgid "Bad job-priority value!"
+#~ msgstr "잘못된 job-priority 값!"
+
+#~ msgid "Bad job-sheets value \"%s\"!"
+#~ msgstr "잘못된 job-sheets 값\"%s\"!"
+
+#~ msgid "Bad job-sheets value type!"
+#~ msgstr "잘못된 job-sheets 값 유형!"
+
+#~ msgid "Bad job-state value!"
+#~ msgstr "잘못된 job-state 값!"
+
+#~ msgid "Bad job-uri attribute \"%s\"!"
+#~ msgstr "잘못된 job-uri 속성 \"%s\"!"
+
+#~ msgid "Bad notify-pull-method \"%s\"!"
+#~ msgstr "잘못된 notify-pull-method \"%s\"!"
+
+#~ msgid "Bad notify-recipient-uri URI \"%s\"!"
+#~ msgstr "잘못된 notify-recipient-uri URI \"%s\"!"
+
+#~ msgid "Bad option + choice on line %d!"
+#~ msgstr "%d번째 줄에 있는 잘못된 옵션 + 선택사항!"
+
+#~ msgid "Bad port-monitor \"%s\"!"
+#~ msgstr "잘못된 port-monitor \"%s\"!"
+
+#~ msgid "Bad printer-state value %d!"
+#~ msgstr "잘못된 printer-state 값 %d!"
+
+#~ msgid "Bad request version number %d.%d!"
+#~ msgstr "잘못된 요청 버전 숫자 %d.%d!"
+
+#~ msgid "Bad subscription ID!"
+#~ msgstr "잘못된 구독 ID!"
+
+#~ msgid "Character set \"%s\" not supported!"
+#~ msgstr "\"%s\" 문자 세트가 지원되지 않음!"
+
+#~ msgid "Could not scan type \"%s\"!"
+#~ msgstr "\"%s\" 유형을 검색할 수 없음!"
+
+#~ msgid "Developer empty!"
+#~ msgstr "현상액이 비어 있음!"
+
+#~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
+#~ msgstr "ERROR: 잘못된 %%BoundingBox: 설명이 보임!\n"
+
+#~ msgid "ERROR: Bad %%IncludeFeature: comment!\n"
+#~ msgstr "ERROR: 잘못된 %%IncludeFeature: 설명!\n"
+
+#~ msgid "ERROR: Bad %%Page: comment in file!\n"
+#~ msgstr "ERROR: 잘못된 %%Page: 파일에 있는 설명!\n"
+
+#~ msgid "ERROR: Bad %%PageBoundingBox: comment in file!\n"
+#~ msgstr "ERROR: 잘못된 %%PageBoundingBox: 파일에 있는 설명!\n"
+
+#~ msgid "ERROR: Bad SCSI device file \"%s\"!\n"
+#~ msgstr "ERROR: 잘못된 SCSI 장비 파일 \"%s\"!\n"
+
+#~ msgid "ERROR: Bad columns value %d!\n"
+#~ msgstr "ERROR: 잘못된 열 값 %d!\n"
+
+#~ msgid "ERROR: Bad cpi value %f!\n"
+#~ msgstr "ERROR: 잘못된 cpi 값 %f!\n"
+
+#~ msgid "ERROR: Bad lpi value %f!\n"
+#~ msgstr "ERROR: 잘못된 lpi 값 %f!\n"
+
+#~ msgid "ERROR: Bad page setup!\n"
+#~ msgstr "ERROR: 잘못된 페이지 설정!\n"
+
+#~ msgid "ERROR: Destination printer does not exist!\n"
+#~ msgstr "ERROR: 대상 프린터가 없습니다!\n"
+
+#~ msgid "ERROR: Duplicate %%BoundingBox: comment seen!\n"
+#~ msgstr "ERROR: %%BoundingBox 복제: 설명이 보임!\n"
+
+#~ msgid "ERROR: Duplicate %%Pages: comment seen!\n"
+#~ msgstr "ERROR: %%Pages 복제: 설명이 보임!\n"
+
+#~ msgid "ERROR: Empty print file!\n"
+#~ msgstr "ERROR: 빈 프린트 파일!\n"
+
+#~ msgid "ERROR: Expected quoted string on line %d of %s!\n"
+#~ msgstr "ERROR: %2$s의 %1$d번째 줄에 인용 스트링이 예상됨!\n"
+
+#~ msgid "ERROR: Fatal USB error!\n"
+#~ msgstr "ERROR: 심각한 USB 오류!\n"
+
+#~ msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file!\n"
+#~ msgstr ""
+#~ "ERROR: 파일을 프린트할 수 없는, 유효하지 않은 HP-GL/2 명령이 보임!\n"
+
+#~ msgid "ERROR: Missing %%EndProlog!\n"
+#~ msgstr "ERROR: %%EndProlog가 유실됨!\n"
+
+#~ msgid "ERROR: Missing %%EndSetup!\n"
+#~ msgstr "ERROR: %%EndSetup이 유실됨!\n"
 
 #~ msgid ""
 #~ "ERROR: Missing device URI on command-line and no DEVICE_URI environment "
@@ -5510,14 +6015,121 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgstr ""
 #~ "ERROR: 명령 라인의 장비 URI가 유실되었고 DEVICE_URI 환경 변수가 없음!\n"
 
+#~ msgid "ERROR: Missing value on line %d of banner file!\n"
+#~ msgstr "ERROR: 배너 파일의 %d번째 줄 값이 유실됨!\n"
+
+#~ msgid ""
+#~ "ERROR: Need a msgid line before any translation strings on line %d of %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "ERROR: %2$s의 %1$d번째 줄에 있는 모든 번역 스트링 앞에 msgid 줄 필요!\n"
+
+#~ msgid "ERROR: No %%BoundingBox: comment in header!\n"
+#~ msgstr "ERROR: %%BoundingBox가 없음: 머리말에 설명!\n"
+
+#~ msgid "ERROR: No %%Pages: comment in header!\n"
+#~ msgstr "ERROR: %%Pages가 없음: 머리말에 설명!\n"
+
+#~ msgid ""
+#~ "ERROR: No device URI found in argv[0] or in DEVICE_URI environment "
+#~ "variable!\n"
+#~ msgstr ""
+#~ "ERROR: argv[0] 또는 DEVICE_URI 환경 변수에서 발견된 장비 URI가 없음!\n"
+
+#~ msgid "ERROR: No pages found!\n"
+#~ msgstr "ERROR: 페이지 없음!\n"
+
+#~ msgid "ERROR: Out of paper!\n"
+#~ msgstr "ERROR: 종이 없음!\n"
+
+#~ msgid "ERROR: PRINTER environment variable not defined!\n"
+#~ msgstr "ERROR: PRINTER 환경 변수가 정의되지 않음!\n"
+
+#~ msgid "ERROR: Print file was not accepted (%s)!\n"
+#~ msgstr "ERROR: 프린트 파일이 허용되지 않음(%s)!\n"
+
+#~ msgid "ERROR: Printer not responding!\n"
+#~ msgstr "ERROR: 프린터가 응답하지 않음!\n"
+
 #~ msgid "ERROR: Unable to create temporary file - %s.\n"
 #~ msgstr "ERROR: 임시 파일을 생성할 수 없음 - %s.\n"
 
 #~ msgid "ERROR: Unable to create temporary file: %s\n"
 #~ msgstr "ERROR: 임시 파일을 생성할 수 없음: %s\n"
 
+#~ msgid "ERROR: Unable to get job %d attributes (%s)!\n"
+#~ msgstr "ERROR: 작업 %d 속성을 얻을 수 없음(%s)!\n"
+
+#~ msgid "ERROR: Unable to get printer status (%s)!\n"
+#~ msgstr "ERROR: 프린터 상태를 알 수 없음(%s)!\n"
+
+#~ msgid "ERROR: Unable to locate printer '%s'!\n"
+#~ msgstr "ERROR: '%s' 프린터를 찾을 수 없음!\n"
+
+#~ msgid "ERROR: Unable to open image file for printing!\n"
+#~ msgstr "ERROR: 이미지 파일을 열어서 프린트할 수 없음!\n"
+
 #~ msgid "ERROR: Unable to open temporary file"
 #~ msgstr "ERROR: 임시 파일을 열 수 없음"
+
+#~ msgid "ERROR: Unable to print %d text columns!\n"
+#~ msgstr "ERROR: %d개의 텍스트 열을 프린트할 수 없음!\n"
+
+#~ msgid "ERROR: Unable to print %dx%d text page!\n"
+#~ msgstr "ERROR: %dx%d 텍스트 페이지를 프린트할 수 없음!\n"
+
+#~ msgid "ERROR: Unable to read print data!\n"
+#~ msgstr "ERROR: 프린트 데이터를 읽을 수 없음!\n"
+
+#~ msgid "ERROR: Unable to send print data!\n"
+#~ msgstr "ERROR: 프린트 데이터를 보낼 수 없음!\n"
+
+#~ msgid "ERROR: Unable to write %d bytes to printer!\n"
+#~ msgstr "ERROR: 프린터에 %d바이트를 쓸 수 없음!\n"
+
+#~ msgid "ERROR: Unable to write raster data to driver!\n"
+#~ msgstr "ERROR: 드라이버에 래스터 데이터를 쓸 수 없음!\n"
+
+#~ msgid "ERROR: Unable to write to temporary file"
+#~ msgstr "ERROR: 임시 파일을 쓸 수 없음"
+
+#~ msgid "ERROR: Unexpected text on line %d of %s!\n"
+#~ msgstr "ERROR: %2$s의 %1$d번째 줄에 예기치 않은 텍스트!\n"
+
+#~ msgid "ERROR: Unknown encryption option value \"%s\"!\n"
+#~ msgstr "ERROR: 알 수 없는 암호화 옵션 값 \"%s\"!\n"
+
+#~ msgid "ERROR: Unknown message catalog format for \"%s\"!\n"
+#~ msgstr "ERROR: \"%s\"에 대한 알 수 없는 메시지 카탈로그 포맷!\n"
+
+#~ msgid "ERROR: Unknown option \"%s\" with value \"%s\"!\n"
+#~ msgstr "ERROR: \"%2$s\" 값이 있는 알 수 없는 \"%1$s\" 옵션!\n"
+
+#~ msgid "ERROR: Unknown version option value \"%s\"!\n"
+#~ msgstr "ERROR: 알 수 없는 \"%s\" 버전 옵션 값!\n"
+
+#~ msgid "ERROR: Unsupported brightness value %s, using brightness=100!\n"
+#~ msgstr "ERROR: brightness=100을 사용하는, 지원되지 않는 밝기 값 %s!\n"
+
+#~ msgid "ERROR: Unsupported gamma value %s, using gamma=1000!\n"
+#~ msgstr "ERROR: gamma=1000을 사용하는, 지원되지 않는 감마 값 %s!\n"
+
+#~ msgid "ERROR: Unsupported number-up value %d, using number-up=1!\n"
+#~ msgstr "ERROR: number-up=1을 사용하는, 지원되지 않는 number-up 값 %d!\n"
+
+#~ msgid ""
+#~ "ERROR: Unsupported number-up-layout value %s, using number-up-"
+#~ "layout=lrtb!\n"
+#~ msgstr ""
+#~ "ERROR: number-up-layout=lrtb을 사용하는, 지원되지 않는 number-up-layout "
+#~ "값 %s!\n"
+
+#~ msgid "ERROR: Unsupported page-border value %s, using page-border=none!\n"
+#~ msgstr ""
+#~ "ERROR: page-border=none을 사용하는, 지원되지 않는 page-border 값 %s!\n"
+
+#~ msgid "ERROR: doc_printf overflow (%d bytes) detected, aborting!\n"
+#~ msgstr "ERROR: doc_printf 오버플로우(%d바이트)가 발견됨, 중단 중!\n"
 
 #~ msgid "ERROR: pdftops filter crashed on signal %d!\n"
 #~ msgstr "ERROR: pdftops 필터가 신호 %d에서 충돌함!\n"
@@ -5525,8 +6137,241 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "ERROR: pdftops filter exited with status %d!\n"
 #~ msgstr "ERROR: pdftops 필터가 상태 %d(으)로 종료됨!\n"
 
+#~ msgid "ERROR: pictwpstops exited on signal %d!\n"
+#~ msgstr "ERROR: pictwpstops가 신호 %d에서 종료됨!\n"
+
+#~ msgid "ERROR: pictwpstops exited with status %d!\n"
+#~ msgstr "ERROR: pictwpstops가 상태 %d(으)로 종료됨!\n"
+
+#~ msgid ""
+#~ "ERROR: recoverable: Unable to connect to printer; will retry in 30 "
+#~ "seconds...\n"
+#~ msgstr "ERROR: 복원 가능: 프린터에 연결할 수 없음; 30초 후에 다시 시도...\n"
+
+#~ msgid "Empty PPD file!"
+#~ msgstr "PPD 파일이 비어있음!"
+
+#~ msgid "Error: need hostname after '-h' option!\n"
+#~ msgstr "오류: '-h' 옵션 뒤에 호스트 이름이 필요!\n"
+
+#~ msgid "Fuser temperature high!"
+#~ msgstr "퓨저 온도가 높음!"
+
+#~ msgid "Fuser temperature low!"
+#~ msgstr "퓨저 온도가 낮음!"
+
+#~ msgid "Got a printer-uri attribute but no job-id!"
+#~ msgstr "printer-uri 속성을 얻었지만, job-id가 없습니다!"
+
+#~ msgid "Ink/toner empty!"
+#~ msgstr "잉크/토너가 비었음!"
+
+#~ msgid "Ink/toner waste bin full!"
+#~ msgstr "잉크/토너 폐기소가 찼음!"
+
+#~ msgid "Job #%d cannot be restarted - no files!"
+#~ msgstr "#%d 작업을 다시 시작할 수 없음 - 파일 없음!"
+
+#~ msgid "Job #%d does not exist!"
+#~ msgstr "#%d 작업이 없음!"
+
+#~ msgid "Job #%d is finished and cannot be altered!"
+#~ msgstr "#%d 작업이 종료되었고 대체할 수 없음!"
+
+#~ msgid "Job #%d is not complete!"
+#~ msgstr "#%d 작업이 왼료되지 않음!"
+
+#~ msgid "Job #%d is not held for authentication!"
+#~ msgstr "#%d 작업이 인증을 위해 유지되지 않음!"
+
+#~ msgid "Job #%d is not held!"
+#~ msgstr "#%d 작업이 유지되지 않음!"
+
+#~ msgid "Job #%s does not exist!"
+#~ msgstr "#%s 작업이 존재하지 않음!"
+
+#~ msgid "Job %d not found!"
+#~ msgstr "%d 작업이 발견되지 않음!"
+
+#~ msgid "Job subscriptions cannot be renewed!"
+#~ msgstr "작업 구독을 갱신할 수 없음!"
+
+#~ msgid "Language \"%s\" not supported!"
+#~ msgstr "\"%s\" 언어가 지원되지 않음!"
+
+#~ msgid "Media jam!"
+#~ msgstr "미디어가 걸림!"
+
+#~ msgid "Media tray empty!"
+#~ msgstr "미디어 트레이가 비어 있음!"
+
+#~ msgid "Media tray missing!"
+#~ msgstr "미디어 트레이가 유실됨!"
+
+#~ msgid "Missing document-number attribute!"
+#~ msgstr "document-number 속성이 유실됨!"
+
+#~ msgid "Missing double quote on line %d!"
+#~ msgstr "%d번째 줄에 있는 큰 따옴표가 유실됨!"
+
+#~ msgid "Missing form variable!"
+#~ msgstr "구성 변수가 유실됨!"
+
+#~ msgid "Missing notify-subscription-ids attribute!"
+#~ msgstr "notify-subscription-ids 속성이 유실됨!"
+
+#~ msgid "Missing requesting-user-name attribute!"
+#~ msgstr "requesting-user-name 속성이 유실됨!"
+
+#~ msgid "Missing required attributes!"
+#~ msgstr "필요한 속성이 유실됨!"
+
+#~ msgid "Missing value on line %d!"
+#~ msgstr "%d번째 줄에 있는 값이 유실됨!"
+
+#~ msgid "No PPD name!"
+#~ msgstr "PPD 이름 없음!"
+
+#~ msgid "No Windows printer drivers are installed!"
+#~ msgstr "설치된 Windows 프린터 드라이버가 없음!"
+
+#~ msgid "No active jobs on %s!"
+#~ msgstr "%s에 활성 작업이 없음!"
+
+#~ msgid "No attributes in request!"
+#~ msgstr "요청에 속성이 없음!"
+
+#~ msgid "No authentication information provided!"
+#~ msgstr "제공된 인증 정보가 없음!"
+
+#~ msgid "No file!?!"
+#~ msgstr "파일이 없음!?!"
+
+#~ msgid "No modification time!"
+#~ msgstr "수정 시간 없음!"
+
+#~ msgid "No printer name!"
+#~ msgstr "프린터 이름 없음!"
+
+#~ msgid "No printer-uri found for class!"
+#~ msgstr "클래스에 대한 printer-uri 없음!"
+
+#~ msgid "No printer-uri found!"
+#~ msgstr "printer-uri 없음!"
+
+#~ msgid "No printer-uri in request!"
+#~ msgstr "요청에 printer-uri 없음!"
+
+#~ msgid "No subscription attributes in request!"
+#~ msgstr "요청에 구독 속성이 없음!"
+
+#~ msgid "OPC at end-of-life!"
+#~ msgstr "OPC 수명이 다 되었음!"
+
+#~ msgid "Out of toner!"
+#~ msgstr "토너가 없음!"
+
+#~ msgid "Output bin full!"
+#~ msgstr "출력소가 찼습니다!"
+
+#~ msgid "Output tray missing!"
+#~ msgstr "출력 트레이가 유실됨!"
+
+#~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
+#~ msgstr "notify-user-data 값이 너무 큼!(%d > 63행)!"
+
+#~ msgid "The printer or class is not shared!"
+#~ msgstr "프린터 또는 클래스를 공유할 수 없음!"
+
+#~ msgid "The printer-uri attribute is required!"
+#~ msgstr "printer-uri 속성이 필요함!"
+
+#~ msgid "Too many job-sheets values (%d > 2)!"
+#~ msgstr "job-sheets 값이 너무 많습니다(%d > 2)!"
+
+#~ msgid "Too many printer-state-reasons values (%d > %d)!"
+#~ msgstr "printer-state-reasons 값이 너무 많습니다(%d > %d)!"
+
+#~ msgid "Unable to add job for destination \"%s\"!"
+#~ msgstr "\"%s\" 대상에 대한 작업을 추가할 수 없습니다!"
+
+#~ msgid "Unable to allocate memory for file types!"
+#~ msgstr "파일 유형에 대한 메모리를 할당할 수 없습니다!"
+
+#~ msgid "Unable to copy 64-bit CUPS printer driver files (%d)!"
+#~ msgstr "64비트 CUPS 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+
+#~ msgid "Unable to copy 64-bit Windows printer driver files (%d)!"
+#~ msgstr "64비트 Windows 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+
+#~ msgid "Unable to copy CUPS printer driver files (%d)!"
+#~ msgstr "CUPS 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+
+#~ msgid "Unable to copy PPD file - %s!"
+#~ msgstr "PPD 파일을 복사할 수 없음 - %s!"
+
+#~ msgid "Unable to copy PPD file!"
+#~ msgstr "PPD 파일을 복사할 수 없습니다!"
+
+#~ msgid "Unable to copy Windows 2000 printer driver files (%d)!"
+#~ msgstr "Windows 2000 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+
+#~ msgid "Unable to copy Windows 9x printer driver files (%d)!"
+#~ msgstr "Windows 9x 프린터 드라이버 파일을 복사할 수 없습니다(%d)!"
+
+#~ msgid "Unable to copy interface script - %s!"
+#~ msgstr "인터페이스 스크립트를 복사할 수 없음 - %s!"
+
+#~ msgid "Unable to create printer-uri!"
+#~ msgstr "printer-uri를 생성할 수 없습니다!"
+
+#~ msgid "Unable to edit cupsd.conf files larger than 1MB!"
+#~ msgstr "1MB보다 큰 cupsd.conf 파일은 편집할 수 없습니다!"
+
+#~ msgid "Unable to find destination for job!"
+#~ msgstr "작업에 대한 대상을 찾을 수 없습니다!"
+
+#~ msgid "Unable to find printer!\n"
+#~ msgstr "프린터를 찾을 수 없습니다!\n"
+
+#~ msgid "Unable to install Windows 2000 printer driver files (%d)!"
+#~ msgstr "Windows 2000 프린터 드라이버 파일을 설치할 수 없습니다(%d)!"
+
+#~ msgid "Unable to install Windows 9x printer driver files (%d)!"
+#~ msgstr "Windows 9x 프린터 드라이버 파일을 설치할 수 없습니다(%d)!"
+
+#~ msgid "Unable to open document %d in job %d!"
+#~ msgstr "도큐멘트 %d을(를) 작업 %d에서 열 수 없습니다!"
+
+#~ msgid "Unable to send command to printer driver!"
+#~ msgstr "프린터 드라이버로 명령을 보낼 수 없습니다!"
+
+#~ msgid "Unable to set Windows printer driver (%d)!"
+#~ msgstr "Windows 프린터 드라이버를 설정할 수 없습니다(%d)!"
+
+#~ msgid "Unable to use legacy USB class driver!\n"
+#~ msgstr "레거시 USB 클래스 드라이버를 사용할 수 없음!\n"
+
 #~ msgid "Unknown printer error (%s)!"
 #~ msgstr "알 수 없는 프린터 오류(%s)!"
+
+#~ msgid "Unsupported character set \"%s\"!"
+#~ msgstr "지원되지 않는 문자 세트 \"%s\"!"
+
+#~ msgid "Unsupported compression \"%s\"!"
+#~ msgstr "지원되지 않는 압축 \"%s\"!"
+
+#~ msgid "Unsupported compression attribute %s!"
+#~ msgstr "지원되지 않는 압축 속성 %s!"
+
+#~ msgid "Unsupported format \"%s\"!"
+#~ msgstr "지원되지 않는 포맷 \"%s\"!"
+
+#~ msgid "Unsupported format '%s'!"
+#~ msgstr "지원되지 않는 포맷 '%s'!"
+
+#~ msgid "Unsupported format '%s/%s'!"
+#~ msgstr "지원되지 않는 포맷 '%s/%s'!"
 
 #~ msgid ""
 #~ "Usage: convert [ options ]\n"
@@ -5613,11 +6458,515 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ "    -v                   약간 자세하게\n"
 #~ "    -vv                  매우 자세하게\n"
 
+#~ msgid "WARNING: Failed to read side-channel request!\n"
+#~ msgstr "WARNING: 읽기 side-channel 요청에 실패함!\n"
+
+#~ msgid "WARNING: Option \"%s\" cannot be included via IncludeFeature!\n"
+#~ msgstr "WARNING: IncludeFeature를 통해 \"%s\" 옵션을 포함할 수 없음!\n"
+
+#~ msgid ""
+#~ "WARNING: Remote host did not respond with command status byte after %d "
+#~ "seconds!\n"
+#~ msgstr ""
+#~ "WARNING: %d초 후에 원격 호스트가 명령 상태 바이트에 응답하지 않음!\n"
+
+#~ msgid ""
+#~ "WARNING: Remote host did not respond with control status byte after %d "
+#~ "seconds!\n"
+#~ msgstr ""
+#~ "WARNING: %d초 후에 원격 호스트가 제어 상태 바이트에 응답하지 않음!\n"
+
+#~ msgid ""
+#~ "WARNING: Remote host did not respond with data status byte after %d "
+#~ "seconds!\n"
+#~ msgstr ""
+#~ "WARNING: %d초 후에 원격 호스트가 데이터 상태 바이트에 응답하지 않음!\n"
+
+#~ msgid ""
+#~ "WARNING: This document does not conform to the Adobe Document Structuring "
+#~ "Conventions and may not print correctly!\n"
+#~ msgstr ""
+#~ "WARNING: 이 도큐멘트는 Adobe Document Structuring Conventions을 실행하지 "
+#~ "않기 때문에 올바르게 프린트되지 않을 수 있음!\n"
+
+#~ msgid "WARNING: Unknown choice \"%s\" for option \"%s\"!\n"
+#~ msgstr "WARNING: \"%2$s\" 옵션에 대한 알 수 없는 \"%1$s\" 선택사항!\n"
+
+#~ msgid "WARNING: Unknown option \"%s\"!\n"
+#~ msgstr "WARNING: 알 수 없는 \"%s\" 옵션!\n"
+
+#~ msgid "WARNING: Unsupported baud rate %s!\n"
+#~ msgstr "WARNING: 지원되지 않는 보드율 %s!\n"
+
+#~ msgid ""
+#~ "WARNING: recoverable: Network host '%s' is busy; will retry in %d "
+#~ "seconds...\n"
+#~ msgstr ""
+#~ "WARNING: 복원 가능: '%s' 네트워크 호스트가 사용 중; %d초 후에 다시 시"
+#~ "도...\n"
+
+#~ msgid "Warning, no Windows 2000 printer drivers are installed!"
+#~ msgstr "경고, 설치된 Windows 2000 프린터 드라이버가 없음!"
+
+#~ msgid "cupsctl: Unknown option \"%s\"!\n"
+#~ msgstr "cupsctl: 알 수 없는 옵션 \"%s\"!\n"
+
+#~ msgid "cupsctl: Unknown option \"-%c\"!\n"
+#~ msgstr "cupsctl: 알 수 없는 옵션 \"-%c\"!\n"
+
+#~ msgid "cupsd: Expected config filename after \"-c\" option!\n"
+#~ msgstr "cupsd: \"-c\" 옵션 뒤에 구성 파일 이름이 예상됨!\n"
+
+#~ msgid "cupsd: Unable to get current directory!\n"
+#~ msgstr "cupsd: 현재 디렉토리를 얻을 수 없음!\n"
+
+#~ msgid "cupsd: Unknown argument \"%s\" - aborting!\n"
+#~ msgstr "cupsd: 알 수 없는 \"%s\" 변수 - 중단 중!\n"
+
+#~ msgid "cupsd: Unknown option \"%c\" - aborting!\n"
+#~ msgstr "cupsd: 알 수 없는 \"%c\" 옵션 - 중단 중!\n"
+
+#~ msgid "cupsfilter: Invalid document number %d!\n"
+#~ msgstr "cupsfilter: 유효하지 않은 도큐멘트 번호 %d!\n"
+
+#~ msgid "cupsfilter: Invalid job ID %d!\n"
+#~ msgstr "cupsfilter: 유효하지 않은 작업 ID %d!\n"
+
+#~ msgid "cupsfilter: Only one filename can be specified!\n"
+#~ msgstr "cupsfilter: 하나의 사용자 이름만 지정됨!\n"
+
 #~ msgid "cupsfilter: Unable to create temporary file: %s\n"
 #~ msgstr "cupsfilter: 다음 임시 파일을 생성할 수 없습니다: %s\n"
+
+#~ msgid "job-printer-uri attribute missing!"
+#~ msgstr "job-printer-uri 속성이 유실됨!"
+
+#~ msgid "lpadmin: Class name can only contain printable characters!\n"
+#~ msgstr "lpadmin: 클래스 이름은 프린트 가능한 문자만 포함할 수 있음!\n"
+
+#~ msgid "lpadmin: Expected PPD after '-P' option!\n"
+#~ msgstr "lpadmin: '-P' 옵션 뒤에 PPD가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected allow/deny:userlist after '-u' option!\n"
+#~ msgstr "lpadmin: '-u' 옵션 뒤에 allow/deny:userlist가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected class after '-r' option!\n"
+#~ msgstr "lpadmin: '-r' 옵션 뒤에 클래스가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected class name after '-c' option!\n"
+#~ msgstr "lpadmin: '-c' 옵션 뒤에 클래스 이름이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected description after '-D' option!\n"
+#~ msgstr "lpadmin: '-D' 옵션 뒤에 설명이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected device URI after '-v' option!\n"
+#~ msgstr "lpadmin: '-v' 옵션 뒤에 장비 URI가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected file type(s) after '-I' option!\n"
+#~ msgstr "lpadmin: '-I' 옵션 뒤에 파일 유형이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected hostname after '-h' option!\n"
+#~ msgstr "lpadmin: '-h' 옵션 뒤에 호스트 이름이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected interface after '-i' option!\n"
+#~ msgstr "lpadmin: '-i' 옵션 뒤에 인터페이스가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected location after '-L' option!\n"
+#~ msgstr "lpadmin: '-L' 옵션 뒤에 위치가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected model after '-m' option!\n"
+#~ msgstr "lpadmin: '-m' 옵션 뒤에 모델이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected name=value after '-o' option!\n"
+#~ msgstr "lpadmin: '-o' 옵션 뒤에 name=value가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected printer after '-p' option!\n"
+#~ msgstr "lpadmin: '-p' 옵션 뒤에 프린터가 예상됨!\n"
+
+#~ msgid "lpadmin: Expected printer name after '-d' option!\n"
+#~ msgstr "lpadmin: '-d' 옵션 뒤에 프린터 이름이 예상됨!\n"
+
+#~ msgid "lpadmin: Expected printer or class after '-x' option!\n"
+#~ msgstr "lpadmin: '-x' 옵션 뒤에 프린터 또는 클래스가 예상됨!\n"
+
+#~ msgid "lpadmin: No member names were seen!\n"
+#~ msgstr "lpadmin: 회원 이름이 보이지 않음!\n"
+
+#~ msgid "lpadmin: Printer name can only contain printable characters!\n"
+#~ msgstr "lpadmin: 프린터 이름은 프린트 가능한 문자만 포함할 수 있음!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to add a printer to the class:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 클래스에 프린터를 추가할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
 
 #~ msgid "lpadmin: Unable to create temporary file - %s\n"
 #~ msgstr "lpadmin: 임시 파일을 생성할 수 없음 - %s\n"
 
 #~ msgid "lpadmin: Unable to create temporary file: %s\n"
 #~ msgstr "lpadmin: 임시 파일을 생성할 수 없음: %s\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to remove a printer from the class:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 클래스에서 프린터를 제거할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the PPD file:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: PPD 파일을 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the device URI:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 장비 URI를 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the interface script or PPD file:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 인터페이스 스크립트 또는 PPD 파일을 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the interface script:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 인터페이스 스크립트를 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the printer description:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 프린터 설명을 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the printer location:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 프린터 위치를 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid ""
+#~ "lpadmin: Unable to set the printer options:\n"
+#~ "         You must specify a printer name first!\n"
+#~ msgstr ""
+#~ "lpadmin: 프린터 옵션을 설정할 수 없음:\n"
+#~ "         먼저 프린터 이름을 지정해야 합니다!\n"
+
+#~ msgid "lpadmin: Unknown allow/deny option \"%s\"!\n"
+#~ msgstr "lpadmin: 알 수 없는 allow/deny 옵션 \"%s\"!\n"
+
+#~ msgid "lpadmin: Unknown argument '%s'!\n"
+#~ msgstr "lpadmin: 알 수 없는 '%s' 변수!\n"
+
+#~ msgid "lpadmin: Unknown option '%c'!\n"
+#~ msgstr "lpadmin: 알 수 없는 '%c' 옵션!\n"
+
+#~ msgid "lpadmin: Warning - content type list ignored!\n"
+#~ msgstr "lpadmin: 경고 - 콘텐츠 유형 목록 무시됨!\n"
+
+#~ msgid "lpinfo: Expected 1284 device ID string after --device-id!\n"
+#~ msgstr "lpinfo: --device-id 뒤에 1284 장비 ID 스트링이 예상됨!\n"
+
+#~ msgid "lpinfo: Expected language after --language!\n"
+#~ msgstr "lpinfo: --language 뒤에 언어가 예상됨!\n"
+
+#~ msgid "lpinfo: Expected make and model after --make-and-model!\n"
+#~ msgstr "lpinfo: --make-and-model 뒤에 제조사 및 모델이 예상됨!\n"
+
+#~ msgid "lpinfo: Expected product string after --product!\n"
+#~ msgstr "lpinfo: --product 뒤에 제품 스트링이 예상됨!\n"
+
+#~ msgid "lpinfo: Expected scheme list after --exclude-schemes!\n"
+#~ msgstr "lpinfo: --exclude-schemes 뒤에 설계 목록이 예상됨!\n"
+
+#~ msgid "lpinfo: Expected scheme list after --include-schemes!\n"
+#~ msgstr "lpinfo: --include-schemess 뒤에 설계 목록이 예상됨!\n"
+
+#~ msgid "lpinfo: Expected timeout after --timeout!\n"
+#~ msgstr "lpinfo: --timeout 뒤에 제한 시간이 예상됨!\n"
+
+#~ msgid "lpinfo: Unknown argument '%s'!\n"
+#~ msgstr "lpinfo: 알 수 없는 '%s' 변수!\n"
+
+#~ msgid "lpinfo: Unknown option '%c'!\n"
+#~ msgstr "lpinfo: 알 수 없는 '%c' 옵션!\n"
+
+#~ msgid "lpinfo: Unknown option '%s'!\n"
+#~ msgstr "lpinfo: 알 수 없는 '%s' 옵션!\n"
+
+#~ msgid "lpmove: Unknown argument '%s'!\n"
+#~ msgstr "lpmove: 알 수 없는 '%s' 변수!\n"
+
+#~ msgid "lpmove: Unknown option '%c'!\n"
+#~ msgstr "lpmove: 알 수 없는 '%c' 옵션!\n"
+
+#~ msgid "lpoptions: No printers!?!\n"
+#~ msgstr "lpoptions: 프린터가 없습니까!?!\n"
+
+#~ msgid "lpoptions: Unable to open PPD file for %s!\n"
+#~ msgstr "lpoptions: %s에 대한 PPD 파일을 열 수 없음!\n"
+
+#~ msgid "lpoptions: Unknown printer or class!\n"
+#~ msgstr "lpoptions: 알 수 없는 프린터 또는 클래스!\n"
+
+#~ msgid "lppasswd: Only root can add or delete passwords!\n"
+#~ msgstr "lppasswd: root만 암호를 추가 또는 제거할 수 있음!\n"
+
+#~ msgid "lppasswd: Password file busy!\n"
+#~ msgstr "lppasswd: 암호 파일 사용 중!\n"
+
+#~ msgid "lppasswd: Password file not updated!\n"
+#~ msgstr "lppasswd: 암호 파일이 업데이트되지 않음!\n"
+
+#~ msgid "lppasswd: Sorry, password doesn't match!\n"
+#~ msgstr "lppasswd: 죄송합니다, 암호가 일치하지 않습니다!\n"
+
+#~ msgid "lppasswd: Sorry, passwords don't match!\n"
+#~ msgstr "lppasswd: 죄송합니다, 암호가 일치하지 않습니다!\n"
+
+#~ msgid ""
+#~ "lpstat: error - %s environment variable names non-existent destination \"%"
+#~ "s\"!\n"
+#~ msgstr ""
+#~ "lpstat: 오류 - %s 환경 변수 이름이 존재하지 않는 대상 \"%s\" 이름임!\n"
+
+#~ msgid "notify-events not specified!"
+#~ msgstr "notify-events가 지정되지 않음!"
+
+#~ msgid "notify-recipient-uri URI \"%s\" is already used!"
+#~ msgstr "notify-recipient-uri \"%s\" URI가 이미 사용 중임!"
+
+#~ msgid "notify-recipient-uri URI \"%s\" uses unknown scheme!"
+#~ msgstr "notify-recipient-uri \"%s\" URI가 알 수 없는 설계를 사용함!"
+
+#~ msgid "notify-subscription-id %d no good!"
+#~ msgstr "%d notify-subscription-id가 좋지 않습니다!"
+
+#~ msgid "ppdc: Bad resolution name \"%s\" on line %d of %s!\n"
+#~ msgstr "ppdc: 잘못된 \"%1$s\" 해상도 이름이 %3$s의 %2$d번째 줄에 있음!\n"
+
+#~ msgid "ppdc: Bad status keyword %s on line %d of %s!\n"
+#~ msgstr "ppdc: 잘못된 %1$s 상태 키워드가 %3$s의 %2$d번째 줄에 있음!\n"
+
+#~ msgid "ppdc: Choice found on line %d of %s with no Option!\n"
+#~ msgstr "ppdc: 선택사항이 %2$s의 %1$d번째 줄에서 옵션 없이 발견됨!\n"
+
+#~ msgid "ppdc: Duplicate #po for locale %s on line %d of %s!\n"
+#~ msgstr "ppdc: 로컬 %1$s에 대한 중복된 #po가 %3$s의 %2$d번째 줄에 있음!\n"
+
+#~ msgid "ppdc: Expected a filter definition on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 필터 정의가 예상됨!\n"
+
+#~ msgid "ppdc: Expected a program name on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 프로그램 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected charset after Font on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 문자 세트가 예상됨!\n"
+
+#~ msgid "ppdc: Expected color order for ColorModel on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 색상 순서가 예상됨!\n"
+
+#~ msgid "ppdc: Expected colorspace for ColorModel on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 색상 공간이 예상됨!\n"
+
+#~ msgid "ppdc: Expected compression for ColorModel on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 ColorModel에 대한 압축이 예상됨!\n"
+
+#~ msgid ""
+#~ "ppdc: Expected constraints string for UIConstraints on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄에 UIConstraints에 대한 제한 스트링이 예상됨!\n"
+
+#~ msgid ""
+#~ "ppdc: Expected driver type keyword following DriverType on line %d of %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄, DriverType 뒤에 드라이버 유형 키워드가 예상됨!\n"
+
+#~ msgid "ppdc: Expected duplex type after Duplex on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Duplex 뒤에 양면 유형이 예상됨!\n"
+
+#~ msgid "ppdc: Expected encoding after Font on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 인코딩이 예상됨!\n"
+
+#~ msgid "ppdc: Expected filename after #po %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄, #po %1$s 뒤에 파일 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected group name/text on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 그룹 이름/텍스트가 예상됨!\n"
+
+#~ msgid "ppdc: Expected include filename on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 포함 파일 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected integer on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 정수가 예상됨!\n"
+
+#~ msgid "ppdc: Expected locale after #po on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, #po 뒤에 로컬 위치가 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after FileName on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, FileName 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after Font on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after Manufacturer on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Manufacturer 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after MediaSize on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, MediaSize 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after ModelName on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, ModelName 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name after PCFileName on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, PCFileName 뒤에 이름이 예상됨!\n"
+
+#~ msgid "ppdc: Expected name/text after %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 이름/텍스트가 예상됨!\n"
+
+#~ msgid "ppdc: Expected name/text after Installable on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Installable 뒤에 이름/텍스트 예상됨!\n"
+
+#~ msgid "ppdc: Expected name/text after Resolution on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Resolution 뒤에 이름/텍스트 예상됨!\n"
+
+#~ msgid ""
+#~ "ppdc: Expected name/text combination for ColorModel on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄, ColorModel에 대해 이름/텍스트 조합이 예상됨!\n"
+
+#~ msgid "ppdc: Expected option name/text on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 이름/텍스트가 예상됨!\n"
+
+#~ msgid "ppdc: Expected option section on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 섹션이 예상됨!\n"
+
+#~ msgid "ppdc: Expected option type on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄의 옵션 유형이 예상됨!\n"
+
+#~ msgid "ppdc: Expected override field after Resolution on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄, Resolution 뒤에 오버라이드 필드가 예상됨!\n"
+
+#~ msgid "ppdc: Expected real number on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 실제 번호가 예상됨!\n"
+
+#~ msgid ""
+#~ "ppdc: Expected resolution/mediatype following ColorProfile on line %d of %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄, ColorProfile 뒤에 해상도/미디어 유형이 예상됨!\n"
+
+#~ msgid ""
+#~ "ppdc: Expected resolution/mediatype following SimpleColorProfile on line %"
+#~ "d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄, SimpleColorProfile 뒤에 해상도/미디어 유형이 예"
+#~ "상됨!\n"
+
+#~ msgid "ppdc: Expected selector after %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 선택자가 예상됨!\n"
+
+#~ msgid "ppdc: Expected status after Font on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 상태가 예상됨!\n"
+
+#~ msgid "ppdc: Expected string after Copyright on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Copyright 뒤에 스트링이 예상됨!\n"
+
+#~ msgid "ppdc: Expected string after Version on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Version 뒤에 스트링이 예상됨!\n"
+
+#~ msgid "ppdc: Expected two option names on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 옵션 이름 2개가 예상됨!\n"
+
+#~ msgid "ppdc: Expected value after %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄, %1$s 뒤에 값이 예상됨!\n"
+
+#~ msgid "ppdc: Expected version after Font on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄, Font 뒤에 버전이 예상됨!\n"
+
+#~ msgid "ppdc: Invalid #include/#po filename \"%s\"!\n"
+#~ msgstr "ppdc: 유효하지 않은 #include/#po 파일 이름 \"%s\"!\n"
+
+#~ msgid "ppdc: Invalid cost for filter on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 비용!\n"
+
+#~ msgid "ppdc: Invalid empty MIME type for filter on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 빈 MIME 유형!\n"
+
+#~ msgid "ppdc: Invalid empty program name for filter on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %2$s의 %1$d번째 줄의 필터에 대해 유효하지 않은 빈 프로그램 이름!\n"
+
+#~ msgid "ppdc: Invalid option section \"%s\" on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 유효하지 않은 \"%1$s\" 옵션 섹션!\n"
+
+#~ msgid "ppdc: Invalid option type \"%s\" on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 유효하지 않은 \"%1$s\" 옵션 유형!\n"
+
+#~ msgid "ppdc: Missing #endif at end of \"%s\"!\n"
+#~ msgstr "ppdc: \"%s\" 끝에서 #endif 유실됨!\n"
+
+#~ msgid "ppdc: Missing #if on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에서 #if 유실됨!\n"
+
+#~ msgid "ppdc: No message catalog provided for locale %s!\n"
+#~ msgstr "ppdc: 로컬 %s에 대해 제공된 메시지 카탈로그 없음!\n"
+
+#~ msgid "ppdc: Option %s redefined with a different type on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 %1$s 옵션이 다른 유형으로 재정의됨!\n"
+
+#~ msgid "ppdc: Option constraint must *name on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 있는 옵션 제한은 *name이어야 함!\n"
+
+#~ msgid "ppdc: Too many nested #if's on line %d of %s!\n"
+#~ msgstr "ppdc: %2$s의 %1$d번째 줄에 너무 많이 중첩된 #if가 있음!\n"
+
+#~ msgid "ppdc: Unable to find #po file %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에서 #po 파일 %1$s을(를) 찾을 수 없음!\n"
+
+#~ msgid "ppdc: Unable to find include file \"%s\" on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %3$s의 %2$d번째 줄에서 포함 파일 \"%1$s\"을(를) 찾을 수 없음!\n"
+
+#~ msgid "ppdc: Unknown driver type %s on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 %1$s 드라이브 유형!\n"
+
+#~ msgid "ppdc: Unknown duplex type \"%s\" on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 \"%1$s\" 양면 유형!\n"
+
+#~ msgid "ppdc: Unknown media size \"%s\" on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 알 수 없는 \"%1$s\" 미디어 크기!\n"
+
+#~ msgid "ppdc: Unknown token \"%s\" seen on line %d of %s!\n"
+#~ msgstr "ppdc: %3$s의 %2$d번째 줄에 보이는 알 수 없는 \"%1$s\" 토큰!\n"
+
+#~ msgid ""
+#~ "ppdc: Unknown trailing characters in real number \"%s\" on line %d of %"
+#~ "s!\n"
+#~ msgstr ""
+#~ "ppdc: %3$s의 %2$d번째 줄에 있는 \"%1$s\" 실수에 알 수 없는 마지막 문자!\n"
+
+#~ msgid "ppdc: Unterminated string starting with %c on line %d of %s!\n"
+#~ msgstr ""
+#~ "ppdc: %3$s의 %2$d번째 줄에 %1$c(으)로 시작하는 끝나지 않는 스트링!\n"
+
+#~ msgid "ppdmerge: Bad LanguageVersion \"%s\" in %s!\n"
+#~ msgstr "ppdmerge: %2$s에 잘못된 \"%1$s\" LanguageVersion!\n"

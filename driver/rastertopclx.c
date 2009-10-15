@@ -4,7 +4,7 @@
  *   Advanced HP Page Control Language and Raster Transfer Language
  *   filter for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1813,7 +1813,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!ppd)
   {
-    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file\n"));
     return (1);
   }
 
@@ -1928,7 +1928,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
     return (1);
   }
   else

@@ -3,7 +3,7 @@
  *
  *   Common run loop APIs for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -254,7 +254,7 @@ backendRunLoop(
 	else if (errno == EINTR && total_bytes == 0)
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
-	        "written, aborting!\n", stderr);
+	        "written, aborting\n", stderr);
           return (0);
 	}
 
@@ -288,7 +288,7 @@ backendRunLoop(
       if ((bc_bytes = read(device_fd, bc_buffer, sizeof(bc_buffer))) > 0)
       {
 	fprintf(stderr,
-	        "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data!\n",
+	        "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data\n",
 	        CUPS_LLCAST bc_bytes);
         cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
       }
@@ -354,7 +354,7 @@ backendRunLoop(
 	  if (paperout != 1)
 	  {
 	    fputs("STATE: +media-empty-warning\n", stderr);
-	    _cupsLangPuts(stderr, _("ERROR: Out of paper!\n"));
+	    _cupsLangPuts(stderr, _("ERROR: Out of paper\n"));
 	    paperout = 1;
 	  }
         }

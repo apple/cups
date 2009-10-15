@@ -626,7 +626,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	  _cupsLangPrintf(stdout,
-			  _("      **FAIL**  BAD DefaultImageableArea %s!\n"
+			  _("      **FAIL**  BAD DefaultImageableArea %s\n"
 			    "                REF: Page 102, section 5.15.\n"),
 			  attr->value);
 	}
@@ -662,7 +662,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	  _cupsLangPrintf(stdout,
-			  _("      **FAIL**  BAD DefaultPaperDimension %s!\n"
+			  _("      **FAIL**  BAD DefaultPaperDimension %s\n"
 			    "                REF: Page 103, section 5.15.\n"),
 			  attr->value);
 	}
@@ -1255,7 +1255,7 @@ main(int  argc,				/* I - Number of command-line args */
 		_cupsLangPuts(stdout, _(" FAIL\n"));
 
 	      _cupsLangPrintf(stdout,
-	                      _("      **FAIL**  Bad %s choice %s!\n"
+	                      _("      **FAIL**  Bad %s choice %s\n"
 			        "                REF: Page 84, section 5.9\n"),
 	                      option->keyword, choice->choice);
             }
@@ -1274,7 +1274,7 @@ main(int  argc,				/* I - Number of command-line args */
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	  _cupsLangPrintf(stdout,
-	                  _("      **FAIL**  %s must be 1284DeviceID!\n"
+	                  _("      **FAIL**  %s must be 1284DeviceID\n"
 			    "                REF: Page 72, section 5.5\n"),
 			  attr->name);
         }
@@ -1320,7 +1320,7 @@ main(int  argc,				/* I - Number of command-line args */
             if (verbose >= 0)
 	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad LanguageEncoding %s - "
-			        "must be ISOLatin1!\n"),
+			        "must be ISOLatin1\n"),
 	                      attr->value ? attr->value : "(null)");
 
             errors ++;
@@ -1334,7 +1334,7 @@ main(int  argc,				/* I - Number of command-line args */
             if (verbose >= 0)
 	      _cupsLangPrintf(stdout,
 	                      _("      **FAIL**  Bad LanguageVersion %s - "
-			        "must be English!\n"),
+			        "must be English\n"),
 	                      ppd->lang_version ? ppd->lang_version : "(null)");
 
             errors ++;
@@ -1367,7 +1367,7 @@ main(int  argc,				/* I - Number of command-line args */
 		_cupsLangPrintf(stdout,
 				_("      **FAIL**  Default translation "
 				  "string for option %s contains 8-bit "
-				  "characters!\n"),
+				  "characters\n"),
 				option->keyword);
 
 	      errors ++;
@@ -1394,7 +1394,7 @@ main(int  argc,				/* I - Number of command-line args */
 		  _cupsLangPrintf(stdout,
 				  _("      **FAIL**  Default translation "
 				    "string for option %s choice %s contains "
-				    "8-bit characters!\n"),
+				    "8-bit characters\n"),
 				  option->keyword,
 				  option->choices[j].choice);
 
@@ -1452,7 +1452,7 @@ main(int  argc,				/* I - Number of command-line args */
 	if (option)
 	  _cupsLangPrintf(stdout,
 			  _("        WARN    Duplex option keyword %s may not "
-			    "work as expected and should be named Duplex!\n"
+			    "work as expected and should be named Duplex\n"
 			    "                REF: Page 122, section 5.17\n"),
 			  option->keyword);
 
@@ -1481,7 +1481,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      !ppdFindOption(ppd, attr->name + 7))
             _cupsLangPrintf(stdout,
 	                    _("        WARN    %s has no corresponding "
-			      "options!\n"),
+			      "options\n"),
 	                    attr->name);
 	}
 
@@ -1489,7 +1489,7 @@ main(int  argc,				/* I - Number of command-line args */
 	if (ppdConflicts(ppd))
 	{
 	  _cupsLangPuts(stdout,
-	                _("        WARN    Default choices conflicting!\n"));
+	                _("        WARN    Default choices conflicting\n"));
 
           show_conflicts(ppd);
         }
@@ -1497,7 +1497,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (ppdversion < 43)
 	{
           _cupsLangPrintf(stdout,
-	                  _("        WARN    Obsolete PPD version %.1f!\n"
+	                  _("        WARN    Obsolete PPD version %.1f\n"
 			    "                REF: Page 42, section 5.2.\n"),
 	        	  0.1f * ppdversion);
 	}
@@ -1832,7 +1832,7 @@ check_basics(const char *filename)	/* I - PPD file to check */
       
       if (col > 0 && whitespace)
 	_cupsLangPrintf(stdout,
-		        _("        WARN    Line %d only contains whitespace!\n"),
+		        _("        WARN    Line %d only contains whitespace\n"),
 			linenum);
 
       linenum ++;
@@ -1851,12 +1851,12 @@ check_basics(const char *filename)	/* I - PPD file to check */
   if (mixed)
     _cupsLangPuts(stdout,
 		  _("        WARN    File contains a mix of CR, LF, and "
-		    "CR LF line endings!\n"));
+		    "CR LF line endings\n"));
 
   if (eol == EOL_CRLF)
     _cupsLangPuts(stdout,
 		  _("        WARN    Non-Windows PPD files should use lines "
-		    "ending with only LF, not CR LF!\n"));
+		    "ending with only LF, not CR LF\n"));
 
   cupsFileClose(fp);
 }
@@ -1909,7 +1909,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	_cupsLangPrintf(stdout,
-			_("      %s  Empty cupsUIConstraints %s!\n"),
+			_("      %s  Empty cupsUIConstraints %s\n"),
 			prefix, constattr->spec);
 
 	if (!warn)
@@ -1928,7 +1928,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad cupsUIConstraints %s: \"%s\"!\n"),
+			_("      %s  Bad cupsUIConstraints %s: \"%s\"\n"),
 			prefix, constattr->spec, constattr->value);
 
 	if (!warn)
@@ -1946,7 +1946,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	_cupsLangPrintf(stdout,
-			_("      %s  Missing cupsUIResolver %s!\n"),
+			_("      %s  Missing cupsUIResolver %s\n"),
 			prefix, constattr->spec);
 
 	if (!warn)
@@ -1999,7 +1999,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	  _cupsLangPrintf(stdout,
 			  _("      %s  Missing option %s in "
-			    "cupsUIConstraints %s: \"%s\"!\n"),
+			    "cupsUIConstraints %s: \"%s\"\n"),
 			  prefix, option, constattr->spec, constattr->value);
 	  
 	  if (!warn)
@@ -2015,7 +2015,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	  _cupsLangPrintf(stdout,
 			  _("      %s  Missing choice *%s %s in "
-			    "cupsUIConstraints %s: \"%s\"!\n"),
+			    "cupsUIConstraints %s: \"%s\"\n"),
 			  prefix, option, choice, constattr->spec,
 			  constattr->value);
 
@@ -2052,7 +2052,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  cupsUIResolver %s does not list at least "
-			  "two different options!\n"),
+			  "two different options\n"),
 			prefix, constattr->spec);
 
 	if (!warn)
@@ -2069,7 +2069,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 	  _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	_cupsLangPrintf(stdout,
-			_("      %s  cupsUIResolver %s causes a loop!\n"),
+			_("      %s  cupsUIResolver %s causes a loop\n"),
 			prefix, constattr->spec);
 
 	if (!warn)
@@ -2106,7 +2106,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing option %s in "
-			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"\n"),
 			prefix, c->option1,
 			c->option1, c->choice1, c->option2, c->choice2);
 
@@ -2120,7 +2120,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing choice *%s %s in "
-			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"\n"),
 			prefix, c->option1, c->choice1,
 			c->option1, c->choice1, c->option2, c->choice2);
 
@@ -2147,7 +2147,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing option %s in "
-			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"\n"),
 			prefix, c->option2,
 			c->option1, c->choice1, c->option2, c->choice2);
 
@@ -2161,7 +2161,7 @@ check_constraints(ppd_file_t *ppd,	/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  Missing choice *%s %s in "
-			  "UIConstraints \"*%s %s *%s %s\"!\n"),
+			  "UIConstraints \"*%s %s *%s %s\"\n"),
 			prefix, c->option2, c->choice2,
 			c->option1, c->choice1, c->option2, c->choice2);
 
@@ -2208,7 +2208,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
 			  _("      **FAIL**  Group names %s and %s differ only "
-			    "by case!\n"),
+			    "by case\n"),
 			  groupa->name, groupb->name);
 
 	errors ++;
@@ -2230,7 +2230,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
 			  _("      **FAIL**  Option names %s and %s differ only "
-			    "by case!\n"),
+			    "by case\n"),
 			  optiona->keyword, optionb->keyword);
 
 	errors ++;
@@ -2253,7 +2253,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
 			    _("      **FAIL**  Multiple occurrences of %s "
-			      "choice name %s!\n"),
+			      "choice name %s\n"),
 			    optiona->keyword, choicea->choice);
 
 	  errors ++;
@@ -2270,7 +2270,7 @@ check_case(ppd_file_t *ppd,		/* I - PPD file */
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
 			    _("      **FAIL**  %s choice names %s and %s "
-			      "differ only by case!\n"),
+			      "differ only by case\n"),
 			    optiona->keyword, choicea->choice, choiceb->choice);
 
 	  errors ++;
@@ -2338,7 +2338,7 @@ check_defaults(ppd_file_t *ppd,		/* I - PPD file */
 
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
-			    _("      %s  %s %s does not exist!\n"),
+			    _("      %s  %s %s does not exist\n"),
 			    prefix, attr->name, attr->value);
 
           if (!warn)
@@ -2385,7 +2385,7 @@ check_duplex(ppd_file_t *ppd,		/* I - PPD file */
 
 	_cupsLangPrintf(stdout,
 			_("      %s  REQUIRED %s does not define "
-			  "choice None!\n"
+			  "choice None\n"
 			  "                REF: Page 122, section 5.17\n"),
 			prefix, option->keyword);
       }
@@ -2408,7 +2408,7 @@ check_duplex(ppd_file_t *ppd,		/* I - PPD file */
 	    _cupsLangPuts(stdout, _(" FAIL\n"));
 
 	  _cupsLangPrintf(stdout,
-			  _("      %s  Bad %s choice %s!\n"
+			  _("      %s  Bad %s choice %s\n"
 			    "                REF: Page 122, section 5.17\n"),
 			  prefix, option->keyword, choice->choice);
 	}
@@ -2461,7 +2461,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad cupsFilter value \"%s\"!\n"),
+			_("      %s  Bad cupsFilter value \"%s\"\n"),
 			prefix, ppd->filters[i]);
 
       if (!warn)
@@ -2530,7 +2530,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "cupsPreFilter");
 
       if (!warn)
@@ -2546,7 +2546,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad cupsPreFilter value \"%s\"!\n"),
+			_("      %s  Bad cupsPreFilter value \"%s\"\n"),
 			prefix, attr->value ? attr->value : "");
 
       if (!warn)
@@ -2617,7 +2617,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "APDialogExtension");
 
       if (!warn)
@@ -2673,7 +2673,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "APPrinterIconPath");
 
       if (!warn)
@@ -2729,7 +2729,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "APPrinterLowInkTool");
 
       if (!warn)
@@ -2785,7 +2785,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "APPrinterUtilityPath");
 
       if (!warn)
@@ -2841,7 +2841,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad spelling of %s - should be %s!\n"),
+			_("      %s  Bad spelling of %s - should be %s\n"),
 			prefix, attr->name, "APScanAppPath");
 
       if (!warn)
@@ -2887,7 +2887,7 @@ check_filters(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Cannot provide both "
-				  "APScanAppPath and APScanAppBundleID!\n"),
+				  "APScanAppPath and APScanAppBundleID\n"),
 			prefix);
 
       if (!warn)
@@ -2943,7 +2943,7 @@ check_profiles(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
-			_("      %s  Bad cupsICCProfile %s!\n"),
+			_("      %s  Bad cupsICCProfile %s\n"),
 			prefix, attr->spec);
 
       if (!warn)
@@ -2978,7 +2978,7 @@ check_profiles(ppd_file_t *ppd,		/* I - PPD file */
 
       if (verbose >= 0)
 	_cupsLangPrintf(stdout, _("      %s  Missing cupsICCProfile "
-				  "file \"%s\"!\n"), prefix, filename);
+				  "file \"%s\"\n"), prefix, filename);
 
       if (!warn)
 	errors ++;
@@ -3021,7 +3021,7 @@ check_profiles(ppd_file_t *ppd,		/* I - PPD file */
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
 			  _("      %s  cupsICCProfile %s hash value "
-			    "collides with %s!\n"), prefix, attr->spec,
+			    "collides with %s\n"), prefix, attr->spec,
 			  specs[i]);
 
 	if (!warn)
@@ -3075,7 +3075,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
     if (verbose >= 0)
       _cupsLangPrintf(stdout,
-		      _("      %s  Missing REQUIRED PageSize option!\n"
+		      _("      %s  Missing REQUIRED PageSize option\n"
 		        "                REF: Page 99, section 5.14.\n"),
 		      prefix);
 
@@ -3090,7 +3090,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
     if (verbose >= 0)
       _cupsLangPrintf(stdout,
-		      _("      %s  Missing REQUIRED PageRegion option!\n"
+		      _("      %s  Missing REQUIRED PageRegion option\n"
 		        "                REF: Page 100, section 5.14.\n"),
 		      prefix);
 
@@ -3129,7 +3129,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
 			  _("      %s  Size \"%s\" has unexpected dimensions "
-			    "(%gx%g)!\n"),
+			    "(%gx%g)\n"),
 			  prefix, size->name, size->width, size->length);
 
 	if (!warn)
@@ -3153,7 +3153,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 		   (int (*)(const void *, const void *))strcmp))
       {
 	_cupsLangPrintf(stdout,
-			_("      %s  Non-standard size name \"%s\"!\n"
+			_("      %s  Non-standard size name \"%s\"\n"
 			  "                REF: Page 187, section B.2.\n"),
 			prefix, size->name);
       }
@@ -3171,7 +3171,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  Size \"%s\" defined for %s but not for "
-			  "%s!\n"),
+			  "%s\n"),
 			prefix, size->name, "PageRegion", "PageSize");
 
       if (!warn)
@@ -3185,7 +3185,7 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  Size \"%s\" defined for %s but not for "
-			  "%s!\n"),
+			  "%s\n"),
 			prefix, size->name, "PageSize", "PageRegion");
 
       if (!warn)
@@ -3245,7 +3245,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 
 	if (verbose >= 0)
 	  _cupsLangPrintf(stdout,
-			  _("      %s  Bad language \"%s\"!\n"),
+			  _("      %s  Bad language \"%s\"\n"),
 			  prefix, language);
 
 	if (!warn)
@@ -3282,7 +3282,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
 			    _("      %s  Missing \"%s\" translation "
-			      "string for option %s!\n"),
+			      "string for option %s\n"),
 			    prefix, language, option->keyword);
 
           if (!warn)
@@ -3296,7 +3296,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
 			    _("      %s  Bad UTF-8 \"%s\" translation "
-			      "string for option %s!\n"),
+			      "string for option %s\n"),
 			    prefix, language, option->keyword);
 
 	  if (!warn)
@@ -3343,7 +3343,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 		_cupsLangPrintf(stdout,
 				_("      %s  Bad UTF-8 \"%s\" "
 				  "translation string for option %s, "
-				  "choice %s!\n"),
+				  "choice %s\n"),
 				prefix, language,
 				ckeyword + 1 + strlen(language),
 				"True");
@@ -3375,7 +3375,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 		    _cupsLangPrintf(stdout,
 				    _("      %s  Missing \"%s\" "
 				      "translation string for option %s, "
-				      "choice %s!\n"),
+				      "choice %s\n"),
 				    prefix, language,
 				    ckeyword + 1 + strlen(language),
 				    cparam->name);
@@ -3392,7 +3392,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 		    _cupsLangPrintf(stdout,
 				    _("      %s  Bad UTF-8 \"%s\" "
 				      "translation string for option %s, "
-				      "choice %s!\n"),
+				      "choice %s\n"),
 				    prefix, language,
 				    ckeyword + 1 + strlen(language),
 				    cparam->name);
@@ -3415,7 +3415,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	      _cupsLangPrintf(stdout,
 			      _("      %s  Missing \"%s\" "
 				"translation string for option %s, "
-				"choice %s!\n"),
+				"choice %s\n"),
 			      prefix, language, option->keyword,
 			      option->choices[j].choice);
 
@@ -3431,7 +3431,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	      _cupsLangPrintf(stdout,
 			      _("      %s  Bad UTF-8 \"%s\" "
 				"translation string for option %s, "
-				"choice %s!\n"),
+				"choice %s\n"),
 			      prefix, language, option->keyword,
 			      option->choices[j].choice);
 
@@ -3468,7 +3468,7 @@ check_translations(ppd_file_t *ppd,	/* I - PPD file */
 	  if (verbose >= 0)
 	    _cupsLangPrintf(stdout,
 			    _("      %s  No base translation \"%s\" "
-			      "is included in file!\n"), prefix, ll);
+			      "is included in file\n"), prefix, ll);
 
 	  if (!warn)
 	    errors ++;
@@ -3738,7 +3738,7 @@ valid_path(const char *keyword,		/* I - Keyword using path */
       if (verbose >= 0)
 	_cupsLangPrintf(stdout,
 			_("      %s  %s file \"%s\" has the wrong "
-			  "capitalization!\n"), prefix, keyword, path);
+			  "capitalization\n"), prefix, keyword, path);
 
       if (!warn)
 	errors ++;

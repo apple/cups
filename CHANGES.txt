@@ -1,7 +1,10 @@
-CHANGES.txt - 2009-09-11
+CHANGES.txt - 2009-10-15
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Dropped support for the recoverable: and recovered: message prefixes.
+	- The scheduler now requires that filters and backends have group write
+	  permissions disabled.
 	- The PPD compiler now checks for overlapping filenames when writing
 	  PPD files.

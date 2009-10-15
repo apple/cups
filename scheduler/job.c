@@ -2652,12 +2652,11 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "finalize_job(job=%p(%d))", job, job->id);
 
  /*
-  * Clear the "connecting-to-device" and "com.apple.print.recoverable-warning"
-  * reasons, which are only valid when a printer is processing...
+  * Clear the "connecting-to-device" reason, which is only valid when a printer
+  * is processing...
   */
 
   cupsdSetPrinterReasons(job->printer, "-connecting-to-device");
-  cupsdSetPrinterReasons(job->printer, "-com.apple.print.recoverable-warning");
 
  /*
   * Similarly, clear the "offline-report" reason for non-USB devices since we
@@ -4179,47 +4178,32 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsFreeOptions(num_keywords, keywords);
     }
-    else if (!strncmp(message, "recoverable:", 12))
-    {
-      ptr = message + 12;
-      while (isspace(*ptr & 255))
-        ptr ++;
-
-      if (*ptr)
-      {
-	if (cupsdSetPrinterReasons(job->printer,
-				   "+com.apple.print.recoverable-warning") ||
-	    !job->printer->recoverable ||
-	    strcmp(job->printer->recoverable, ptr))
-	{
-	  cupsdSetString(&(job->printer->recoverable), ptr);
-	  cupsdAddPrinterHistory(job->printer);
-	  event |= CUPSD_EVENT_PRINTER_STATE;
-	}
-      }
-    }
-    else if (!strncmp(message, "recovered:", 10))
-    {
-      ptr = message + 10;
-      while (isspace(*ptr & 255))
-        ptr ++;
-
-      if (cupsdSetPrinterReasons(job->printer,
-                                 "-com.apple.print.recoverable-warning") ||
-	  !job->printer->recoverable || strcmp(job->printer->recoverable, ptr))
-      {
-	cupsdSetString(&(job->printer->recoverable), ptr);
-	cupsdAddPrinterHistory(job->printer);
-	event |= CUPSD_EVENT_PRINTER_STATE;
-      }
-    }
     else
     {
-      cupsdLogJob(job, loglevel, "%s", message);
+     /*
+      * Strip legacy message prefix...
+      */
+
+      if (!strncmp(message, "recoverable:", 12))
+      {
+        ptr = message + 12;
+	while (isspace(*ptr & 255))
+          ptr ++;
+      }
+      else if (!strncmp(message, "recovered:", 10))
+      {
+        ptr = message + 10;
+	while (isspace(*ptr & 255))
+          ptr ++;
+      }
+      else
+        ptr = message;
+
+      cupsdLogJob(job, loglevel, "%s", ptr);
 
       if (loglevel < CUPSD_LOG_DEBUG)
       {
-	strlcpy(job->printer->state_message, message,
+	strlcpy(job->printer->state_message, ptr,
 		sizeof(job->printer->state_message));
 	cupsdAddPrinterHistory(job->printer);
 

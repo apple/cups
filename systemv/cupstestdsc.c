@@ -3,7 +3,7 @@
  *
  *   DSC test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -177,7 +177,7 @@ check_file(const char *filename)	/* I - File to read from */
 
 	status ++;
 	_cupsLangPrintf(stdout,
-                	_("    Line %d is longer than 255 characters (%d)!\n"
+                	_("    Line %d is longer than 255 characters (%d)\n"
 		          "        REF: Page 25, Line Length\n"),
 			linenum, (int)bytes);
       }
@@ -193,7 +193,7 @@ check_file(const char *filename)	/* I - File to read from */
           _cupsLangPuts(stdout, _("FAIL\n"));
 
 	_cupsLangPuts(stdout,
-	              _("    Missing %!PS-Adobe-3.0 on first line!\n"
+	              _("    Missing %!PS-Adobe-3.0 on first line\n"
 		        "        REF: Page 17, 3.1 Conforming Documents\n"));
 	cupsFileClose(fp);
 	return (1);
@@ -219,7 +219,7 @@ check_file(const char *filename)	/* I - File to read from */
 
 	  status ++;
 	  _cupsLangPrintf(stdout,
-	                  _("    Bad %%%%Pages: on line %d!\n"
+	                  _("    Bad %%%%Pages: on line %d\n"
 		            "        REF: Page 43, %%%%Pages:\n"),
 			  linenum);
 	}
@@ -235,7 +235,7 @@ check_file(const char *filename)	/* I - File to read from */
             _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d!\n"
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d\n"
 		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
 			  linenum);
 	}
@@ -259,7 +259,7 @@ check_file(const char *filename)	/* I - File to read from */
             _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%Pages: on line %d!\n"
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Pages: on line %d\n"
 		        	    "        REF: Page 43, %%%%Pages:\n"),
 			  linenum);
 	}
@@ -277,7 +277,7 @@ check_file(const char *filename)	/* I - File to read from */
             _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d!\n"
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d\n"
 		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
 			  linenum);
 	}
@@ -306,7 +306,7 @@ check_file(const char *filename)	/* I - File to read from */
             _cupsLangPuts(stdout, _("FAIL\n"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%Page: on line %d!\n"
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Page: on line %d\n"
 		        	    "        REF: Page 53, %%%%Page:\n"),
 		          linenum);
 	}
@@ -343,7 +343,7 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%BoundingBox: comment!\n"
+    _cupsLangPuts(stdout, _("    Missing or bad %%BoundingBox: comment\n"
 		            "        REF: Page 39, %%BoundingBox:\n"));
   }
 
@@ -353,7 +353,7 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%Pages: comment!\n"
+    _cupsLangPuts(stdout, _("    Missing or bad %%Pages: comment\n"
 		            "        REF: Page 43, %%Pages:\n"));
   }
 
@@ -363,7 +363,7 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing %%EndComments comment!\n"
+    _cupsLangPuts(stdout, _("    Missing %%EndComments comment\n"
 		            "        REF: Page 41, %%EndComments\n"));
   }
 
@@ -373,7 +373,7 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%Page: comments!\n"
+    _cupsLangPuts(stdout, _("    Missing or bad %%Page: comments\n"
 		            "        REF: Page 53, %%Page:\n"));
   }
 
@@ -383,7 +383,7 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Too many %%EndDocument comments!\n"));
+    _cupsLangPuts(stdout, _("    Too many %%EndDocument comments\n"));
   }
   else if (level > 0)
   {
@@ -391,27 +391,27 @@ check_file(const char *filename)	/* I - File to read from */
       _cupsLangPuts(stdout, _("FAIL\n"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Too many %%BeginDocument comments!\n"));
+    _cupsLangPuts(stdout, _("    Too many %%BeginDocument comments\n"));
   }
 
   if (saw_long_line > 1)
     _cupsLangPrintf(stderr,
-                    _("    Saw %d lines that exceeded 255 characters!\n"),
+                    _("    Saw %d lines that exceeded 255 characters\n"),
                     saw_long_line);
 
   if (!status)
     _cupsLangPuts(stdout, _("PASS\n"));
 
   if (binary)
-    _cupsLangPuts(stdout, _("    Warning: file contains binary data!\n"));
+    _cupsLangPuts(stdout, _("    Warning: file contains binary data\n"));
 
   if (version < 3.0f)
     _cupsLangPrintf(stdout,
-                    _("    Warning: obsolete DSC version %.1f in file!\n"),
+                    _("    Warning: obsolete DSC version %.1f in file\n"),
 		    version);
 
   if (saw_end_comments < 0)
-    _cupsLangPuts(stdout, _("    Warning: no %%EndComments comment in file!\n"));
+    _cupsLangPuts(stdout, _("    Warning: no %%EndComments comment in file\n"));
 
   cupsFileClose(fp);
 

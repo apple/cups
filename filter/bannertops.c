@@ -3,7 +3,7 @@
  *
  *   Banner to PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2009 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -219,7 +219,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
     if (!*ptr)
     {
       _cupsLangPrintf(stderr,
-                      _("ERROR: Missing value on line %d of banner file!\n"),
+                      _("ERROR: Missing value on line %d of banner file\n"),
 		      linenum);
       continue;
     }
@@ -231,7 +231,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
     if (!strcasecmp(line, "Footer"))
     {
       if (banner->footer)
-        fprintf(stderr, "DEBUG: Extra \"Footer\" on line %d of banner file!\n",
+        fprintf(stderr, "DEBUG: Extra \"Footer\" on line %d of banner file\n",
 		linenum);
       else
         banner->footer = strdup(ptr);
@@ -239,7 +239,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
     else if (!strcasecmp(line, "Header"))
     {
       if (banner->header)
-        fprintf(stderr, "DEBUG: Extra \"Header\" on line %d of banner file!\n",
+        fprintf(stderr, "DEBUG: Extra \"Header\" on line %d of banner file\n",
 		linenum);
       else
         banner->header = strdup(ptr);
@@ -334,12 +334,12 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
         {
 	  fprintf(stderr,
 	          "DEBUG: Unknown \"Show\" value \"%s\" on line %d of banner "
-		  "file!\n", value, linenum);
+		  "file\n", value, linenum);
 	}
       }
     }
     else
-      fprintf(stderr, "DEBUG: Unknown key \"%s\" on line %d of banner file!\n",
+      fprintf(stderr, "DEBUG: Unknown key \"%s\" on line %d of banner file\n",
               line, linenum);
   }
 
@@ -548,7 +548,7 @@ write_banner(banner_file_t *banner,	/* I - Banner file */
                                                           CUPS_IMAGE_WHITE,
 				 CUPS_IMAGE_WHITE, 100, 0, NULL)) == NULL)
       {
-        fprintf(stderr, "DEBUG: Unable to open image file \"%s\"!\n",
+        fprintf(stderr, "DEBUG: Unable to open image file \"%s\"\n",
 	        imagefile);
         continue;
       }

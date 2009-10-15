@@ -3,7 +3,7 @@
  *
  *   "cancel" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -82,7 +82,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -97,7 +97,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option\n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -128,7 +128,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-h\' option!\n"),
+			          "\'-h\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -150,7 +150,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected username after "
-			          "\'-u\' option!\n"),
+			          "\'-u\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -161,7 +161,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \'%c\'!\n"),
+	                    _("%s: Error - unknown option \'%c\'\n"),
 			    argv[0], argv[i][1]);
 	    return (1);
       }
@@ -219,7 +219,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	*/
 
         _cupsLangPrintf(stderr,
-	                _("%s: Error - unknown destination \"%s\"!\n"),
+	                _("%s: Error - unknown destination \"%s\"\n"),
 			argv[0], argv[i]);
 	return (1);
       }
@@ -242,7 +242,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                               cupsEncryption())) == NULL)
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("%s: Unable to contact server!\n"),
+	                  _("%s: Unable to contact server\n"),
 			  argv[0]);
 	  return (1);
 	}
@@ -323,7 +323,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                             cupsEncryption())) == NULL)
       {
-	_cupsLangPrintf(stderr, _("%s: Unable to contact server!\n"),
+	_cupsLangPrintf(stderr, _("%s: Unable to contact server\n"),
 	                argv[0]);
 	return (1);
       }

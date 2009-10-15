@@ -378,7 +378,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      break;
 #  endif /* B230400 */
           default :
-	      _cupsLangPrintf(stderr, _("WARNING: Unsupported baud rate %s!\n"),
+	      _cupsLangPrintf(stderr, _("WARNING: Unsupported baud rate %s\n"),
 			      value);
 	      break;
 	}
@@ -594,7 +594,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	if ((bc_bytes = read(device_fd, bc_buffer, sizeof(bc_buffer))) > 0)
 	{
 	  fprintf(stderr,
-	          "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data!\n",
+	          "DEBUG: Received " CUPS_LLFMT " bytes of back-channel data\n",
 	          CUPS_LLCAST bc_bytes);
           cupsBackChannelWrite(bc_buffer, bc_bytes, 1.0);
 	}

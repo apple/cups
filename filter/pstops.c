@@ -300,7 +300,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Empty print file\n"));
     return (1);
   }
 
@@ -645,7 +645,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 
 
       if (saw_pages)
-        _cupsLangPuts(stderr, _("ERROR: Duplicate %%Pages: comment seen!\n"));
+        _cupsLangPuts(stderr, _("ERROR: Duplicate %%Pages: comment seen\n"));
 
       saw_pages = 1;
 
@@ -693,7 +693,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       if (saw_bounding_box)
         _cupsLangPuts(stderr,
-	              _("ERROR: Duplicate %%BoundingBox: comment seen!\n"));
+	              _("ERROR: Duplicate %%BoundingBox: comment seen\n"));
       else if (strstr(line + 14, "(atend)"))
       {
        /*
@@ -704,7 +704,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 	              doc->bounding_box + 1, doc->bounding_box + 2,
 		      doc->bounding_box + 3) != 4)
       {
-	_cupsLangPuts(stderr, _("ERROR: Bad %%BoundingBox: comment seen!\n"));
+	_cupsLangPuts(stderr, _("ERROR: Bad %%BoundingBox: comment seen\n"));
 
 	doc->bounding_box[0] = (int)PageLeft;
 	doc->bounding_box[1] = (int)PageBottom;
@@ -756,10 +756,10 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
   }
 
   if (!saw_bounding_box)
-    _cupsLangPuts(stderr, _("ERROR: No %%BoundingBox: comment in header!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No %%BoundingBox: comment in header\n"));
 
   if (!saw_pages)
-    _cupsLangPuts(stderr, _("ERROR: No %%Pages: comment in header!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No %%Pages: comment in header\n"));
 
   if (!saw_for)
     WriteTextComment("For", doc->user);
@@ -1095,7 +1095,7 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   _cupsLangPuts(stderr,
                 _("WARNING: This document does not conform to the Adobe "
 		  "Document Structuring Conventions and may not print "
-		  "correctly!\n"));
+		  "correctly\n"));
 
  /*
   * Then write a standard DSC comment section...
@@ -1283,13 +1283,13 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (!parse_text(line + 7, &ptr, label, sizeof(label)))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file\n"));
     label[0] = '\0';
     number   = doc->page;
   }
   else if (strtol(ptr, &ptr, 10) == LONG_MAX || !isspace(*ptr & 255))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file\n"));
     number = doc->page;
   }
 
@@ -1360,7 +1360,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 		 bounding_box + 3) != 4)
       {
         _cupsLangPuts(stderr,
-	              _("ERROR: Bad %%PageBoundingBox: comment in file!\n"));
+	              _("ERROR: Bad %%PageBoundingBox: comment in file\n"));
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
       }
@@ -1768,7 +1768,7 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%EndProlog", 11))
       linelen = cupsFileGetLine(fp, line, linesize);
     else
-      _cupsLangPuts(stderr, _("ERROR: Missing %%EndProlog!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Missing %%EndProlog\n"));
   }
 
   doc_puts(doc, "%%EndProlog\n");
@@ -1839,7 +1839,7 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
     if (!strncmp(line, "%%EndSetup", 10))
       linelen = cupsFileGetLine(fp, line, linesize);
     else
-      _cupsLangPuts(stderr, _("ERROR: Missing %%EndSetup!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Missing %%EndSetup\n"));
   }
 
   if (num_options > 0)
@@ -2088,7 +2088,7 @@ doc_printf(pstops_doc_t *doc,		/* I - Document information */
   {
     _cupsLangPrintf(stderr,
 		    _("ERROR: doc_printf overflow (%d bytes) detected, "
-		      "aborting!\n"), (int)bytes);
+		      "aborting\n"), (int)bytes);
     exit(1);
   }
 
@@ -2217,7 +2217,7 @@ include_feature(
 
   if (sscanf(line + 17, "%254s%254s", name, value) != 2)
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%IncludeFeature: comment!\n"));
+    _cupsLangPuts(stderr, _("ERROR: Bad %%IncludeFeature: comment\n"));
     return (num_options);
   }
 
@@ -2227,7 +2227,7 @@ include_feature(
 
   if ((option = ppdFindOption(ppd, name + 1)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("WARNING: Unknown option \"%s\"!\n"), name + 1);
+    _cupsLangPrintf(stderr, _("WARNING: Unknown option \"%s\"\n"), name + 1);
     return (num_options);
   }
 
@@ -2235,14 +2235,14 @@ include_feature(
       option->section == PPD_ORDER_JCL)
   {
     _cupsLangPrintf(stderr, _("WARNING: Option \"%s\" cannot be included via "
-                              "IncludeFeature!\n"), name + 1);
+                              "IncludeFeature\n"), name + 1);
     return (num_options);
   }
 
   if (!ppdFindChoice(option, value))
   {
     _cupsLangPrintf(stderr,
-                    _("WARNING: Unknown choice \"%s\" for option \"%s\"!\n"),
+                    _("WARNING: Unknown choice \"%s\" for option \"%s\"\n"),
                     value, name + 1);
     return (num_options);
   }
@@ -2416,7 +2416,7 @@ set_pstops_options(
     if (intval < 10 || intval > 1000)
     {
       _cupsLangPrintf(stderr, _("ERROR: Unsupported brightness value %s, using "
-                                "brightness=100!\n"), val);
+                                "brightness=100\n"), val);
       doc->brightness = 1.0f;
     }
     else
@@ -2485,7 +2485,7 @@ set_pstops_options(
     if (intval < 1 || intval > 10000)
     {
       _cupsLangPrintf(stderr, _("ERROR: Unsupported gamma value %s, using "
-                                "gamma=1000!\n"), val);
+                                "gamma=1000\n"), val);
       doc->gamma = 1.0f;
     }
     else
@@ -2539,7 +2539,7 @@ set_pstops_options(
       default :
           _cupsLangPrintf(stderr,
 			  _("ERROR: Unsupported number-up value %d, using "
-			    "number-up=1!\n"), intval);
+			    "number-up=1\n"), intval);
           doc->number_up = 1;
 	  break;
     }
@@ -2572,7 +2572,7 @@ set_pstops_options(
     else
     {
       _cupsLangPrintf(stderr, _("ERROR: Unsupported number-up-layout value %s, "
-                                "using number-up-layout=lrtb!\n"), val);
+                                "using number-up-layout=lrtb\n"), val);
       doc->number_up_layout = PSTOPS_LAYOUT_LRTB;
     }
   }
@@ -2622,7 +2622,7 @@ set_pstops_options(
     else
     {
       _cupsLangPrintf(stderr, _("ERROR: Unsupported page-border value %s, "
-                                "using page-border=none!\n"), val);
+                                "using page-border=none\n"), val);
       doc->page_border = PSTOPS_BORDERNONE;
     }
   }

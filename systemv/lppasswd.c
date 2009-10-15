@@ -3,7 +3,7 @@
  *
  *   MD5 password program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -182,7 +182,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (getuid() && getuid() != geteuid() && (op != CHANGE || username))
   {
     _cupsLangPuts(stderr,
-                  _("lppasswd: Only root can add or delete passwords!\n"));
+                  _("lppasswd: Only root can add or delete passwords\n"));
     return (1);
   }
 
@@ -237,7 +237,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (strcmp(passwd, newpass) != 0)
     {
       _cupsLangPuts(stderr,
-                    _("lppasswd: Sorry, passwords don't match!\n"));
+                    _("lppasswd: Sorry, passwords don't match\n"));
       return (1);
     }
 
@@ -311,7 +311,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((fd = open(passwdnew, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
     if (errno == EEXIST)
-      _cupsLangPuts(stderr, _("lppasswd: Password file busy!\n"));
+      _cupsLangPuts(stderr, _("lppasswd: Password file busy\n"));
     else
       _cupsLangPrintf(stderr,
                       _("lppasswd: Unable to open password file: %s\n"),
@@ -411,7 +411,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
       _cupsLangPuts(stderr,
-                    _("lppasswd: Sorry, password doesn't match!\n"));
+                    _("lppasswd: Sorry, password doesn't match\n"));
       error = 1;
     }
     else
@@ -444,7 +444,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (error)
   {
-    _cupsLangPuts(stderr, _("lppasswd: Password file not updated!\n"));
+    _cupsLangPuts(stderr, _("lppasswd: Password file not updated\n"));
     
     unlink(passwdnew);
 

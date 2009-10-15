@@ -3,7 +3,7 @@
  *
  *   Linux SCSI printer support for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 2003-2005 by Easy Software Products, all rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or
@@ -111,7 +111,7 @@ print_device(const char *resource,	/* I - SCSI device */
 
   if (strncmp(resource, "/dev/sg", 7) != 0)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Bad SCSI device file \"%s\"!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Bad SCSI device file \"%s\"\n"),
                     resource);
     return (CUPS_BACKEND_STOP);
   }

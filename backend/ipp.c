@@ -117,7 +117,6 @@ main(int  argc,				/* I - Number of command-line args */
 		*response,		/* IPP response */
 		*supported;		/* get-printer-attributes response */
   time_t	start_time;		/* Time of first connect */
-  int		recoverable;		/* Recoverable error shown? */
   int		contimeout;		/* Connection timeout */
   int		delay;			/* Delay for retries... */
   int		compression,		/* Do compression of the job data? */
@@ -141,7 +140,6 @@ main(int  argc,				/* I - Number of command-line args */
   int		version;		/* IPP version */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
-                  "com.apple.print.recoverable-message",
 		  "copies-supported",
 		  "document-format-supported",
 		  "marker-colors",
@@ -345,7 +343,7 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ERROR: Unknown encryption option value \"%s\"!\n"),
+	                  _("ERROR: Unknown encryption option value \"%s\"\n"),
 	        	  value);
         }
       }
@@ -362,7 +360,7 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ERROR: Unknown version option value \"%s\"!\n"),
+	                  _("ERROR: Unknown version option value \"%s\"\n"),
 	        	  value);
 	}
       }
@@ -391,7 +389,7 @@ main(int  argc,				/* I - Number of command-line args */
 	*/
 
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Unknown option \"%s\" with value \"%s\"!\n"),
+	                _("ERROR: Unknown option \"%s\" with value \"%s\"\n"),
 			name, value);
       }
     }
@@ -419,7 +417,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 		      hostname);
       return (CUPS_BACKEND_STOP);
     }
@@ -450,7 +448,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (tbytes <= 1)
     {
-      _cupsLangPuts(stderr, _("ERROR: Empty print file!\n"));
+      _cupsLangPuts(stderr, _("ERROR: Empty print file\n"));
       unlink(tmpfilename);
       return (CUPS_BACKEND_FAILED);
     }
@@ -517,9 +515,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Try connecting to the remote server...
   */
 
-  delay       = 5;
-  recoverable = 0;
-  start_time  = time(NULL);
+  delay      = 5;
+  start_time = time(NULL);
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -563,14 +560,12 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
+			_("WARNING: Network host \'%s\' is busy; "
 			  "will retry in %d seconds...\n"),
 			hostname, delay);
 
@@ -581,18 +576,16 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (h_errno)
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 			hostname);
 	return (CUPS_BACKEND_STOP);
       }
       else
       {
-        recoverable = 1;
-
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
 	_cupsLangPuts(stderr,
-	              _("ERROR: recoverable: Unable to connect to printer; will "
-			"retry in 30 seconds...\n"));
+	              _("ERROR: Unable to connect to printer; will retry in 30 "
+		        "seconds...\n"));
 	sleep(30);
       }
 
@@ -698,16 +691,13 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"),
-			hostname, delay);
+			_("WARNING: Network host \'%s\' is busy; will retry in "
+			  "%d seconds...\n"), hostname, delay);
 
         report_printer_state(supported, 0);
 
@@ -731,7 +721,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist!\n"));
+        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist\n"));
 
 	if (supported)
           ippDelete(supported);
@@ -741,7 +731,7 @@ main(int  argc,				/* I - Number of command-line args */
       else
       {
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Unable to get printer status (%s)!\n"),
+	                _("ERROR: Unable to get printer status (%s)\n"),
 			cupsLastErrorString());
         sleep(10);
       }
@@ -822,18 +812,6 @@ main(int  argc,				/* I - Number of command-line args */
 
       return (CUPS_BACKEND_FAILED);
     }
-  }
-
-  if (recoverable)
-  {
-   /*
-    * If we've shown a recoverable error make sure the printer proxies
-    * have a chance to see the recovered message. Not pretty but
-    * necessary for now...
-    */
-
-    fputs("INFO: recovered: \n", stderr);
-    sleep(5);
   }
 
  /*
@@ -1048,7 +1026,7 @@ main(int  argc,				/* I - Number of command-line args */
 	* Update auth-info-required as needed...
 	*/
 
-        _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)!\n"),
+        _cupsLangPrintf(stderr, _("ERROR: Print file was not accepted (%s)\n"),
 			cupsLastErrorString());
 
 	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
@@ -1219,7 +1197,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippDelete(response);
 
           _cupsLangPrintf(stderr,
-			  _("ERROR: Unable to get job %d attributes (%s)!\n"),
+			  _("ERROR: Unable to get job %d attributes (%s)\n"),
 			  job_id, cupsLastErrorString());
           break;
 	}
@@ -1418,7 +1396,6 @@ check_printer_state(
 	*response;			/* IPP response */
   static const char * const attrs[] =	/* Attributes we want */
   {
-    "com.apple.print.recoverable-message",
     "marker-colors",
     "marker-levels",
     "marker-message",
@@ -1651,14 +1628,12 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*caprm,		/* com.apple.print.recoverable-message */
-			*psm,		/* printer-state-message */
+  ipp_attribute_t	*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
-  int			saw_caprw;	/* Saw com.apple.print.recoverable-warning state */
 
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
@@ -1669,17 +1644,15 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  saw_caprw = 0;
-  state[0]  = '\0';
-  prefix    = "STATE: ";
+  state[0] = '\0';
+  prefix   = "STATE: ";
 
   for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
     reason = reasons->values[i].string.text;
 
-    if (!strcmp(reason, "com.apple.print.recoverable-warning"))
-      saw_caprw = 1;
-    else if (strcmp(reason, "paused"))
+    if (strcmp(reason, "paused") &&
+	strcmp(reason, "com.apple.print.recoverable-warning"))
     {
       strlcat(state, prefix, sizeof(state));
       strlcat(state, reason, sizeof(state));
@@ -1690,16 +1663,6 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 
   if (state[0])
     fprintf(stderr, "%s\n", state);
-
- /*
-  * Relay com.apple.print.recoverable-message...
-  */
-
-  if ((caprm = ippFindAttribute(ipp, "com.apple.print.recoverable-message",
-                                IPP_TAG_TEXT)) != NULL)
-    fprintf(stderr, "WARNING: %s: %s\n",
-            saw_caprw ? "recoverable" : "recovered",
-	    caprm->values[0].string.text);
 
  /*
   * Relay the current marker-* attribute values...
@@ -1760,7 +1723,7 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   if (!printer)
   {
     _cupsLangPuts(stderr,
-                  _("ERROR: PRINTER environment variable not defined!\n"));
+                  _("ERROR: PRINTER environment variable not defined\n"));
     return (-1);
   }
 
@@ -1879,10 +1842,10 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
   if (status)
   {
     if (status >= 256)
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d\n"),
 		      status / 256);
     else
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d\n"),
 		      status);
 
     return (status);

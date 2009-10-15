@@ -358,7 +358,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
 	*/
 
         cgiStartHTML(cgiText(_("Move Job")));
-	cgiShowIPPError(_("Unable to find destination for job!"));
+	cgiShowIPPError(_("Unable to find destination for job"));
 	cgiEndHTML();
 	return;
       }
@@ -591,7 +591,7 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
   if ((job_id = cupsCreateJob(http, dest, title,
 			      1, &hold_option)) < 1)
   {
-    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver!")));
+    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver")));
     cgiSetVariable("ERROR", cupsLastErrorString());
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");
@@ -611,7 +611,7 @@ cgiPrintCommand(http_t     *http,	/* I - Connection to server */
 
   if (cupsLastError() >= IPP_REDIRECTION_OTHER_SITE)
   {
-    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver!")));
+    cgiSetVariable("MESSAGE", cgiText(_("Unable to send command to printer driver")));
     cgiSetVariable("ERROR", cupsLastErrorString());
     cgiStartHTML(title);
     cgiCopyTemplateLang("error.tmpl");

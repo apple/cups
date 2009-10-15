@@ -1336,7 +1336,7 @@ _httpResolveURI(
 #endif /* DEBUG */
   {
     if (logit)
-      _cupsLangPrintf(stderr, _("Bad device URI \"%s\"!\n"), uri);
+      _cupsLangPrintf(stderr, _("Bad device URI \"%s\"\n"), uri);
 
     DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
     DEBUG_puts("5_httpResolveURI: Returning NULL");
@@ -1492,7 +1492,7 @@ _httpResolveURI(
       if (uri)
         fprintf(stderr, "DEBUG: Resolved as \"%s\"...\n", uri);
       else
-        fputs("DEBUG: Unable to resolve URI!\n", stderr);
+        fputs("DEBUG: Unable to resolve URI\n", stderr);
 
       fputs("STATE: -connecting-to-device\n", stderr);
     }
@@ -1506,7 +1506,7 @@ _httpResolveURI(
 #endif /* HAVE_DNSSD */
 
     if (logit && !uri)
-      _cupsLangPuts(stderr, _("Unable to find printer!\n"));
+      _cupsLangPuts(stderr, _("Unable to find printer\n"));
   }
 
   DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));

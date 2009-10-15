@@ -100,7 +100,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -115,7 +115,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!\n"),
+				  "\'-U\' option!n"),
 		        	argv[0]);
 	        return (1);
 	      }
@@ -154,11 +154,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    {
 	      if (instance)
 		_cupsLangPrintf(stderr,
-		                _("%s: Error - unknown destination \"%s/%s\"!\n"),
+		                _("%s: Error - unknown destination \"%s/%s\"\n"),
 		        	argv[0], dest, instance);
               else
 		_cupsLangPrintf(stderr,
-		                _("%s: Unknown destination \"%s\"!\n"),
+		                _("%s: Unknown destination \"%s\"\n"),
 				argv[0], dest);
 
 	      return (1);
@@ -186,7 +186,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-h\' option!\n"),
+			          "\'-h\' option\n"),
 				argv[0]);
 		return (1);
               }
@@ -243,7 +243,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
 	_cupsLangPrintf(stderr,
 	                _("%s: error - %s environment variable names "
-			  "non-existent destination \"%s\"!\n"),
+			  "non-existent destination \"%s\"\n"),
         	        argv[0], val, dest);
       else
 	_cupsLangPrintf(stderr,

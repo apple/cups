@@ -262,7 +262,7 @@ cupsAdminCreateWindowsPPD(
       if ((ptr = strchr(line, ':')) == NULL)
       {
         snprintf(line, sizeof(line),
-	         _cupsLangString(language, _("Missing value on line %d!")),
+	         _cupsLangString(language, _("Missing value on line %d")),
 		 linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
@@ -281,7 +281,7 @@ cupsAdminCreateWindowsPPD(
       {
         snprintf(line, sizeof(line),
 	         _cupsLangString(language,
-		                 _("Missing double quote on line %d!")),
+		                 _("Missing double quote on line %d")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
@@ -300,7 +300,7 @@ cupsAdminCreateWindowsPPD(
       {
         snprintf(line, sizeof(line),
 	         _cupsLangString(language,
-		                 _("Bad option + choice on line %d!")),
+		                 _("Bad option + choice on line %d")),
 	         linenum);
         _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, line, 0);
 
@@ -345,7 +345,7 @@ cupsAdminCreateWindowsPPD(
 
   if (linenum == 0)
   {
-    _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, _("Empty PPD file!"), 1);
+    _cupsSetError(IPP_DOCUMENT_FORMAT_ERROR, _("Empty PPD file"), 1);
 
     cupsFileClose(dstfp);
     unlink(buffer);
@@ -496,7 +496,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
 	                       _("Unable to copy Windows 2000 printer "
-	                         "driver files (%d)!")), status);
+	                         "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -531,7 +531,7 @@ cupsAdminExportSamba(
 	snprintf(message, sizeof(message),
         	 _cupsLangString(language,
 	                         _("Unable to copy CUPS printer driver "
-				   "files (%d)!")), status);
+				   "files (%d)")), status);
 
 	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -574,7 +574,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
                 	       _("Unable to install Windows 2000 printer "
-		        	 "driver files (%d)!")), status);
+		        	 "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -619,7 +619,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
                 	       _("Unable to copy Windows 9x printer "
-		        	 "driver files (%d)!")), status);
+		        	 "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -648,7 +648,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
                 	       _("Unable to install Windows 9x printer "
-		        	 "driver files (%d)!")), status);
+		        	 "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -700,7 +700,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
 	                       _("Unable to copy 64-bit Windows printer "
-	                         "driver files (%d)!")), status);
+	                         "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -735,7 +735,7 @@ cupsAdminExportSamba(
 	snprintf(message, sizeof(message),
         	 _cupsLangString(language,
 	                         _("Unable to copy 64-bit CUPS printer driver "
-				   "files (%d)!")), status);
+				   "files (%d)")), status);
 
 	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -778,7 +778,7 @@ cupsAdminExportSamba(
       snprintf(message, sizeof(message),
                _cupsLangString(language,
                 	       _("Unable to install Windows 2000 printer "
-		        	 "driver files (%d)!")), status);
+		        	 "driver files (%d)")), status);
 
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
@@ -796,13 +796,13 @@ cupsAdminExportSamba(
     if (!have_drivers)
       strlcpy(message,
               _cupsLangString(language,
-                	      _("No Windows printer drivers are installed!")),
+                	      _("No Windows printer drivers are installed")),
               sizeof(message));
     else
       strlcpy(message,
               _cupsLangString(language,
                 	      _("Warning, no Windows 2000 printer drivers "
-				"are installed!")),
+				"are installed")),
               sizeof(message));
 
     _cupsSetError(IPP_NOT_FOUND, message, 0);
@@ -829,7 +829,7 @@ cupsAdminExportSamba(
   {
     snprintf(message, sizeof(message),
              _cupsLangString(language,
-        		     _("Unable to set Windows printer driver (%d)!")),
+        		     _("Unable to set Windows printer driver (%d)")),
         		     status);
 
     _cupsSetError(IPP_INTERNAL_ERROR, message, 0);

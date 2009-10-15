@@ -432,7 +432,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
 		      hostname);
       return (CUPS_BACKEND_STOP);
     }
@@ -602,7 +602,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
   {
     _cupsLangPrintf(stderr,
 		    _("WARNING: Remote host did not respond with command "
-		      "status byte after %d seconds!\n"), timeout);
+		      "status byte after %d seconds\n"), timeout);
     status = errno;
   }
 
@@ -652,7 +652,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 			have_supplies;	/* Printer supports supply levels? */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
-  int			recoverable;	/* Recoverable error shown? */
   size_t		nbytes;		/* Number of bytes written */
   off_t			tbytes;		/* Total bytes written */
   char			buffer[32768];	/* Output buffer */
@@ -688,7 +687,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'!\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
                     hostname);
     return (CUPS_BACKEND_STOP);
   }
@@ -697,8 +696,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   * Remember when we started trying to connect to the printer...
   */
 
-  recoverable = 0;
-  start_time  = time(NULL);
+  start_time = time(NULL);
 
  /*
   * Loop forever trying to print the file...
@@ -831,15 +829,13 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding!\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"), hostname, delay);
+			_("WARNING: Network host \'%s\' is busy; will retry in "
+			  "%d seconds...\n"), hostname, delay);
 
 	sleep(delay);
 
@@ -856,26 +852,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
       else
       {
-        recoverable = 1;
-
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
 	_cupsLangPuts(stderr,
-	              _("ERROR: recoverable: Unable to connect to printer; "
-		        "will retry in 30 seconds...\n"));
+	              _("ERROR: Unable to connect to printer; will retry in 30 "
+		        "seconds...\n"));
 	sleep(30);
       }
-    }
-
-    if (recoverable)
-    {
-     /*
-      * If we've shown a recoverable error make sure the printer proxies
-      * have a chance to see the recovered message. Not pretty but
-      * necessary for now...
-      */
-
-      fputs("INFO: recovered: \n", stderr);
-      sleep(5);
     }
 
     fputs("STATE: -connecting-to-device\n", stderr);
@@ -1026,7 +1008,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	{
 	  _cupsLangPrintf(stderr,
 			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds!\n"), timeout);
+			    "status byte after %d seconds\n"), timeout);
 	  status = errno;
 	}
 
@@ -1118,7 +1100,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  {
 	    _cupsLangPrintf(stderr,
 			    _("WARNING: Remote host did not respond with data "
-			      "status byte after %d seconds!\n"), timeout);
+			      "status byte after %d seconds\n"), timeout);
 	    status = 0;
           }
 
@@ -1173,7 +1155,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	{
 	  _cupsLangPrintf(stderr,
 			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds!\n"), timeout);
+			    "status byte after %d seconds\n"), timeout);
 	  status = errno;
 	}
 

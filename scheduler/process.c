@@ -295,7 +295,7 @@ cupsdStartProcess(
 
     return (0);
   }
-  else if ((commandinfo.st_mode & (S_ISUID | S_IWOTH)) ||
+  else if ((commandinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) ||
            (!RunUser && commandinfo.st_uid))
   {
     *pid = 0;

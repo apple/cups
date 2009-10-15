@@ -3567,11 +3567,12 @@ add_printer_filter(
     if (!RunUser)
     {
      /*
-      * Only use filters that are owned by root and do not have world write
-      * permissions.
+      * Only use filters that are owned by root and do not have group or world
+      * write permissions.
       */
 
-      if (fileinfo.st_uid || (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
+      if (fileinfo.st_uid ||
+          (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
       {
 	if (fileinfo.st_uid)
 	  snprintf(p->state_message, sizeof(p->state_message),
@@ -3598,7 +3599,7 @@ add_printer_filter(
 
 	if (!stat(filename, &fileinfo) &&
 	    (fileinfo.st_uid ||
-	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
+	     (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0))
 	{
 	  if (fileinfo.st_uid)
 	    snprintf(p->state_message, sizeof(p->state_message),

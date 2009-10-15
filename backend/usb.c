@@ -3,7 +3,7 @@
  *
  *   USB port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     _cupsLangPuts(stderr,
                   _("ERROR: No device URI found in argv[0] or in DEVICE_URI "
-	            "environment variable!\n"));
+	            "environment variable\n"));
     return (1);
   }
 

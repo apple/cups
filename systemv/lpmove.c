@@ -3,7 +3,7 @@
  *
  *   "lpmove" command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -76,7 +76,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in!\n"),
+	                    _("%s: Sorry, no encryption support compiled in\n"),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -91,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr,
-		              _("Error: need hostname after \'-h\' option!\n"));
+		              _("Error: need hostname after \'-h\' option\n"));
 		return (1);
               }
 
@@ -100,7 +100,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \'%c\'!\n"),
+	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \'%c\'\n"),
 	                    argv[i][1]);
 	    return (1);
       }
@@ -122,7 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       dest = argv[i];
     else
     {
-      _cupsLangPrintf(stderr, _("lpmove: Unknown argument \'%s\'!\n"),
+      _cupsLangPrintf(stderr, _("lpmove: Unknown argument \'%s\'\n"),
                       argv[i]);
       return (1);
     }

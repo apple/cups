@@ -3,7 +3,7 @@
  *
  *   Common text filter routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -610,7 +610,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (PageColumns < 1)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Bad columns value %d!\n"), PageColumns);
+      _cupsLangPrintf(stderr, _("ERROR: Bad columns value %d\n"), PageColumns);
       return (1);
     }
   }
@@ -621,7 +621,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (CharsPerInch <= 0.0)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Bad cpi value %f!\n"), CharsPerInch);
+      _cupsLangPrintf(stderr, _("ERROR: Bad cpi value %f\n"), CharsPerInch);
       return (1);
     }
   }
@@ -632,7 +632,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (LinesPerInch <= 0.0)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Bad lpi value %f!\n"), LinesPerInch);
+      _cupsLangPrintf(stderr, _("ERROR: Bad lpi value %f\n"), LinesPerInch);
       return (1);
     }
   }

@@ -369,7 +369,7 @@ StartPage(ppd_file_t         *ppd,	/* I - PPD file */
 
   if ((Planes[0] = malloc(header->cupsBytesPerLine)) == NULL)
   {
-    fputs("ERROR: Unable to allocate memory!\n", stderr);
+    fputs("ERROR: Unable to allocate memory\n", stderr);
     exit(1);
   }
 
@@ -854,7 +854,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found!\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
     return (1);
   }
   else

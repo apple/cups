@@ -3,7 +3,7 @@
  *
  *   Printer option program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -101,7 +101,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 		                    dests)) == NULL)
 	    {
 	      _cupsLangPuts(stderr,
-	                    _("lpoptions: Unknown printer or class!\n"));
+	                    _("lpoptions: Unknown printer or class\n"));
 	      return (1);
 	    }
 
@@ -151,7 +151,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 
             if (dest == NULL)
-	      _cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+	      _cupsLangPuts(stderr, _("lpoptions: No printers\n"));
 	    else
 	      list_options(dest);
 
@@ -169,7 +169,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (dest == NULL)
               {
-		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+		_cupsLangPuts(stderr, _("lpoptions: No printers\n"));
                 return (1);
               }
 
@@ -245,7 +245,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (dest == NULL)
               {
-		_cupsLangPuts(stderr, _("lpoptions: No printers!?!\n"));
+		_cupsLangPuts(stderr, _("lpoptions: No printers\n"));
                 return (1);
               }
 
@@ -513,7 +513,7 @@ list_options(cups_dest_t *dest)		/* I - Destination to list */
   {
     unlink(filename);
     _cupsLangPrintf(stderr,
-                    _("lpoptions: Unable to open PPD file for %s!\n"),
+                    _("lpoptions: Unable to open PPD file for %s\n"),
 		    dest->name);
     return;
   }
