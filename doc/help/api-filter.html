@@ -489,7 +489,7 @@ specify an arbitrary file path to a separator page, template, or other file
 used by the filter since that can lead to an unauthorized disclosure of
 information. <em>Always</em> treat input as suspect and validate it!</p>
 
-<p>If you are developing a backend that runs as root , make sure to check for
+<p>If you are developing a backend that runs as root, make sure to check for
 potential buffer overflows, integer under/overflow conditions, and file
 accesses since these can lead to privilege escalations. When writing files,
 always validate the file path and <em>never</em> allow a user to determine
@@ -510,15 +510,15 @@ Mac OS X, for example, no backend may write to a user's home directory.</p>
 <h3><a name="PERMISSIONS">File Permissions</a></h3>
 
 <p>For security reasons, CUPS will only run filters and backends that are owned
-by root and do not have world write permissions. The recommended permissions for
-filters and backends are 0555 - read and execute but no write. Backends that
-must run as root should use permissions of 0500 - read and execute by root, no
-access for other users. Write permissions can be enabled for the root user
-only.</p>
+by root and do not have world or group write permissions. The recommended
+permissions for filters and backends are 0555 - read and execute but no write.
+Backends that must run as root should use permissions of 0500 - read and execute
+by root, no access for other users. Write permissions can be enabled for the
+root user only.</p>
 
 <p>To avoid a warning message, the directory containing your filter(s) must also
-be owned by root and have world write disabled - permissions of 0755 or 0555 are
-strongly encouraged.</p>
+be owned by root and have world and group write disabled - permissions of 0755
+or 0555 are strongly encouraged.</p>
 
 <h3><a name="TEMPFILES">Temporary Files</a></h3>
 
