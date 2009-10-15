@@ -75,7 +75,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   time_t	start_time,		/* Time of first connect */
 		current_time,		/* Current time */
 		wait_time;		/* Time to wait before shutting down socket */
-  int		recoverable;		/* Recoverable error shown? */
   int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
@@ -255,8 +254,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Then try to connect to the remote host...
   */
 
-  recoverable = 0;
-  start_time  = time(NULL);
+  start_time = time(NULL);
 
   sprintf(portname, "%d", port);
 
@@ -311,12 +309,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"),
-			hostname, delay);
+			_("WARNING: Network host \'%s\' is busy; will retry in "
+			  "%d seconds...\n"), hostname, delay);
 
 	sleep(delay);
 
@@ -325,29 +320,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       }
       else
       {
-        recoverable = 1;
-
         _cupsLangPrintf(stderr, "DEBUG: Connection error: %s\n",
 	                strerror(errno));
 	_cupsLangPuts(stderr,
-	              _("ERROR: recoverable: Unable to connect to printer; "
-		        "will retry in 30 seconds...\n"));
+	              _("ERROR: Unable to connect to printer; will retry in 30 "
+		        "seconds...\n"));
 	sleep(30);
       }
     }
     else
       break;
-  }
-
-  if (recoverable)
-  {
-   /*
-    * If we've shown a recoverable error make sure the printer proxies have a
-    * chance to see the recovered message. Not pretty but necessary for now...
-    */
-
-    fputs("INFO: recovered: \n", stderr);
-    sleep(5);
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);

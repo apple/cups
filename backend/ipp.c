@@ -117,7 +117,6 @@ main(int  argc,				/* I - Number of command-line args */
 		*response,		/* IPP response */
 		*supported;		/* get-printer-attributes response */
   time_t	start_time;		/* Time of first connect */
-  int		recoverable;		/* Recoverable error shown? */
   int		contimeout;		/* Connection timeout */
   int		delay;			/* Delay for retries... */
   int		compression,		/* Do compression of the job data? */
@@ -141,7 +140,6 @@ main(int  argc,				/* I - Number of command-line args */
   int		version;		/* IPP version */
   static const char * const pattrs[] =
 		{			/* Printer attributes we want */
-                  "com.apple.print.recoverable-message",
 		  "copies-supported",
 		  "document-format-supported",
 		  "marker-colors",
@@ -517,9 +515,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Try connecting to the remote server...
   */
 
-  delay       = 5;
-  recoverable = 0;
-  start_time  = time(NULL);
+  delay      = 5;
+  start_time = time(NULL);
 
   fputs("STATE: +connecting-to-device\n", stderr);
 
@@ -567,10 +564,8 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
+			_("WARNING: Network host \'%s\' is busy; "
 			  "will retry in %d seconds...\n"),
 			hostname, delay);
 
@@ -587,12 +582,10 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else
       {
-        recoverable = 1;
-
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
 	_cupsLangPuts(stderr,
-	              _("ERROR: recoverable: Unable to connect to printer; will "
-			"retry in 30 seconds...\n"));
+	              _("ERROR: Unable to connect to printer; will retry in 30 "
+		        "seconds...\n"));
 	sleep(30);
       }
 
@@ -702,12 +695,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-        recoverable = 1;
-
 	_cupsLangPrintf(stderr,
-			_("WARNING: recoverable: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"),
-			hostname, delay);
+			_("WARNING: Network host \'%s\' is busy; will retry in "
+			  "%d seconds...\n"), hostname, delay);
 
         report_printer_state(supported, 0);
 
@@ -822,18 +812,6 @@ main(int  argc,				/* I - Number of command-line args */
 
       return (CUPS_BACKEND_FAILED);
     }
-  }
-
-  if (recoverable)
-  {
-   /*
-    * If we've shown a recoverable error make sure the printer proxies
-    * have a chance to see the recovered message. Not pretty but
-    * necessary for now...
-    */
-
-    fputs("INFO: recovered: \n", stderr);
-    sleep(5);
   }
 
  /*
@@ -1418,7 +1396,6 @@ check_printer_state(
 	*response;			/* IPP response */
   static const char * const attrs[] =	/* Attributes we want */
   {
-    "com.apple.print.recoverable-message",
     "marker-colors",
     "marker-levels",
     "marker-message",
@@ -1651,14 +1628,12 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*caprm,		/* com.apple.print.recoverable-message */
-			*psm,		/* printer-state-message */
+  ipp_attribute_t	*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
   const char		*prefix;	/* Prefix for STATE: line */
   char			state[1024];	/* State string */
-  int			saw_caprw;	/* Saw com.apple.print.recoverable-warning state */
 
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
@@ -1669,17 +1644,15 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  saw_caprw = 0;
-  state[0]  = '\0';
-  prefix    = "STATE: ";
+  state[0] = '\0';
+  prefix   = "STATE: ";
 
   for (i = 0, count = 0; i < reasons->num_values; i ++)
   {
     reason = reasons->values[i].string.text;
 
-    if (!strcmp(reason, "com.apple.print.recoverable-warning"))
-      saw_caprw = 1;
-    else if (strcmp(reason, "paused"))
+    if (strcmp(reason, "paused") &&
+	strcmp(reason, "com.apple.print.recoverable-warning"))
     {
       strlcat(state, prefix, sizeof(state));
       strlcat(state, reason, sizeof(state));
@@ -1690,16 +1663,6 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 
   if (state[0])
     fprintf(stderr, "%s\n", state);
-
- /*
-  * Relay com.apple.print.recoverable-message...
-  */
-
-  if ((caprm = ippFindAttribute(ipp, "com.apple.print.recoverable-message",
-                                IPP_TAG_TEXT)) != NULL)
-    fprintf(stderr, "WARNING: %s: %s\n",
-            saw_caprw ? "recoverable" : "recovered",
-	    caprm->values[0].string.text);
 
  /*
   * Relay the current marker-* attribute values...
