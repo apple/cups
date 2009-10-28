@@ -380,10 +380,10 @@ least 100 files.</p>
 inclusion in a driver. The name with optional user text defines
 the name for the media size and is used with the <a
 href='#MediaSize'><code>MediaSize</code></a> directive to associate
-the media size with the driver. The name may only contain
-letters, numbers, and the underscore and may not exceed 40
-characters in length. The user text, if supplied, may not exceed
-80 characters in length.</p>
+the media size with the driver. The name may contain up to 40 ASCII
+characters within the range of decimal 33 to decimal 126 inclusive,
+except for the characters comma (44), slash (47) and colon (58).
+The user text, if supplied, may not exceed 80 bytes in length.</p>
 
 <p>The width and length define the dimensions of the media. Each
 number is optionally followed by one of the following unit
@@ -459,17 +459,15 @@ Attribute fooProfile "Photo/Photographic Profile" "photopro.icc"
 <h3>Description</h3>
 
 <p>The <code>Attribute</code> directive creates a PPD attribute. The
-name is any combination of letters, numbers, and the underscore
-and can be up to 40 characters in length.</p>
+name may contain up to 40 ASCII characters within the range of decimal
+33 to decimal 126 inclusive, except for the characters comma (44),
+slash (47) and colon (58).</p>
 
-<p>The selector can be the empty string (<code>""</code>), a keyword
-consisting of up to 40 letters, numbers, and the underscore, or
-a string composed of a keyword and user text of up to 80
-characters.</p>
+<p>The selector can be the empty string (<code>""</code>) or text of up
+to 80 bytes.</p>
 
-<p>The value is any string or number; the string may contain
-multiple lines, however no one line may exceed 255
-characters.</p>
+<p>The value is any string or number; the string may contain multiple
+lines, however no one line may exceed 255 bytes.</p>
 
 <h3>See Also</h3>
 
@@ -495,14 +493,15 @@ Choice "False/No" "&lt;&lt;/cupsCompression 0&gt;&gt;setpagedevice"
 <h3>Description</h3>
 
 <p>The <code>Choice</code> directive adds a single choice to the
-current option. The name is any combination of letters, numbers,
-and the underscore and can be up to 40 characters in length.</p>
+current option. The name may contain up to 40 ASCII characters within
+the range of decimal 33 to decimal 126 inclusive, except for the
+characters comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
+<p>If provided, the text can be any string up to 80 bytes
 in length. If no text is provided, the name is used.</p>
 
 <p>The code is any string and may contain multiple lines,
-however no one line may exceed 255 characters.</p>
+however no one line may exceed 255 bytes.</p>
 
 <h3>See Also</h3>
 
@@ -568,11 +567,12 @@ ColorModel CMYK cmyk chunky 0
 
 <p>The <code>ColorModel</code> directive is a convenience directive
 which creates a ColorModel option and choice for the current
-printer driver. The name is any combination of letters, numbers,
-and the underscore and can be up to 40 characters in length.</p>
+printer driver. The name may contain up to 40 ASCII characters within
+the range of decimal 33 to decimal 126 inclusive, except for the
+characters comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <p>The colorspace argument is one of the standard colorspace
 keywords defined later in this appendix in the section titled,
@@ -698,7 +698,7 @@ MA 02111 USA"
 <p>The <code>Copyright</code> directive adds text comments to the
 top of a PPD file, typically for use in copyright notices. The
 text argument can contain multiple lines of text, but no line
-may exceed 255 characters.</p>
+may exceed 255 bytes.</p>
 
 
 <h2 class="title"><a name='CustomMedia'>CustomMedia</a></h2>
@@ -730,11 +730,12 @@ CustomMedia "A4/A4 - 210x297mm" 210mm 297mm 12 12 12 12
 <h3>Description</h3>
 
 <p>The <code>CustomMedia</code> directive adds a custom media size to
-the driver. The name is any combination of letters, numbers,
-and the underscore and can be up to 40 characters in length.</p>
+the driver. The name may contain up to 40 ASCII characters within the
+range of decimal 33 to decimal 126 inclusive, except for the characters
+comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <p>The width and length arguments specify the dimensions of the
 media as defined for the <a href="#_media"><code>#media</code></a>
@@ -747,7 +748,7 @@ printable margins of the media.</p>
 PostScript commands to run for the <code>PageSize</code> and
 <code>PageRegion</code> options, respectively. The commands can
 contain multiple lines, however no line may be more than 255
-characters in length.</p>
+bytes in length.</p>
 
 <h3>See Also</h3>
 
@@ -823,11 +824,12 @@ therefore the darkness of the print.</p>
 the Dymo driver from 0 (lowest) to 3 (highest), with 2
 representing the normal setting.</p>
 
-<p>The name is any combination of letters, numbers, and the
-underscore and can be up to 40 characters in length.</p>
+<p>The name may contain up to 40 ASCII characters within the range of
+decimal 33 to decimal 126 inclusive, except for the characters comma
+(44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <h3>See Also</h3>
 
@@ -1044,14 +1046,15 @@ Finishing "Glossy/Photo Overcoat"
 <h3>Description</h3>
 
 <p>The <code>Finishing</code> directive adds a choice to the
-<code>cupsFinishing</code> option. The name is any combination of
-letters, numbers, and the underscore and can be up to 40
-characters in length. The name is stored in the
-<code>OutputType</code> attribute in the PostScript page device
-dictionary.</p>
+<code>cupsFinishing</code> option. The name may contain up to 40 ASCII
+characters within the range of decimal 33 to decimal 126 inclusive,
+except for the characters comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
+
+<p>The name is stored in the <code>OutputType</code> attribute in the
+PostScript page device dictionary.</p>
 
 <h3>See Also</h3>
 
@@ -1091,8 +1094,7 @@ Font Unicode-Foo Expert "(2.0)" Adobe-Identity ROM
 <h3>Description</h3>
 
 <p>The <code>Font</code> directive defines a "device font" for the
-current printer driver. The name is the PostScript font
-name.</p>
+current printer driver. The name is the PostScript font name.</p>
 
 <p>The encoding is the default encoding of the font, usually
 <code>Standard</code>, <code>Expert</code>, or <code>Special</code>, as
@@ -1139,14 +1141,16 @@ Group "Special/Vendor Options"
 <h3>Description</h3>
 
 <p>The <code>Group</code> directive specifies the group for new
-<code>Option</code> directives. The name is any combination of
-letters, numbers, and the underscore and can be up to 40
-characters in length. The names <code>General</code> and
-<code>InstallableOptions</code> are predefined for the standard
-Adobe UI keywords and for installable options, respectively.</p>
+<code>Option</code> directives. The name may contain up to 40 ASCII
+characters within the range of decimal 33 to decimal 126 inclusive,
+except for the characters comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 40 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 40 bytes in length.
+If no text is provided, the name is used.</p>
+
+<p>The names <code>General</code> and <code>InstallableOptions</code>
+are predefined for the standard Adobe UI keywords and for installable
+options, respectively.</p>
 
 <center><table width='80%' border='1' bgcolor='#cccccc' cellpadding='5' cellspacing='0'>
 <tr>
@@ -1154,8 +1158,8 @@ in length. If no text is provided, the name is used.</p>
 
 	<p>Because of certain API binary compatibility issues,
 	CUPS limits the length of PPD group translation strings
-	(text) to 40 characters, while the PPD specification
-	allows for up to 80 characters.</p>
+	(text) to 40 bytes, while the PPD specification
+	allows for up to 80 bytes.</p>
 
 	</td>
 </tr>
@@ -1229,11 +1233,12 @@ from 0 to 2<sup>32</sup>-1 specifying the value that is placed
 in the <code>MediaPosition</code> attribute in the PostScript page
 device dictionary.</p>
 
-<p>The name is any combination of letters, numbers, and the
-underscore and can be up to 40 characters in length.</p>
+<p>The name may contain up to 40 ASCII characters within the range of
+decimal 33 to decimal 126 inclusive, except for the characters comma
+(44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <h3>See Also</h3>
 
@@ -1271,11 +1276,12 @@ Installable "Option1/Duplexer Installed"
 
 <p>The <code>Installable</code> directive adds a new boolean option
 to the <code>InstallableOptions</code> group with a default value of
-<code>False</code>. The name is any combination of letters, numbers,
-and the underscore and can be up to 40 characters in length.</p>
+<code>False</code>. The name may contain up to 40 ASCII characters
+within the range of decimal 33 to decimal 126 inclusive, except for
+the characters comma (44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 
 <h2 class="title"><a name='LocAttribute'>LocAttribute</a></h2>
@@ -1295,17 +1301,15 @@ LocAttribute fooProfile "Photo/Photographic Profile" "photopro.icc"
 <h3>Description</h3>
 
 <p>The <code>LocAttribute</code> directive creates a localized PPD
-attribute. The name is any combination of letters, numbers, and the
-underscore and can be up to 40 characters in length.</p>
+attribute. The name may contain up to 40 ASCII characters within the
+range of decimal 33 to decimal 126 inclusive, except for the characters
+comma (44), slash (47) and colon (58).</p>
 
-<p>The selector can be the empty string (<code>""</code>), a keyword
-consisting of up to 40 letters, numbers, and the underscore, or
-a string composed of a keyword and user text of up to 80
-characters.</p>
+<p>The selector can be the empty string (<code>""</code>) or text of up
+to 80 bytes.</p>
 
-<p>The value is any string or number; the string may contain
-multiple lines, however no one line may exceed 255
-characters.</p>
+<p>The value is any string or number; the string may contain multiple
+lines, however no one line may exceed 255 bytes.</p>
 
 <h3>See Also</h3>
 
@@ -1458,13 +1462,15 @@ from 0 to 2<sup>32</sup>-1 specifying the value that is placed
 in the <code>cupsMediaType</code> attribute in the PostScript page
 device dictionary.</p>
 
-<p>The name is any combination of letters, numbers, and the
-underscore and can be up to 40 characters in length. The name is
-placed in the <code>MediaType</code> attribute in the PostScript
-page device dictionary.</p>
+<p>The name may contain up to 40 ASCII characters within the range of
+decimal 33 to decimal 126 inclusive, except for the characters comma
+(44), slash (47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
+
+<p>The name is placed in the <code>MediaType</code> attribute in the
+PostScript page device dictionary.</p>
 
 <h3>See Also</h3>
 
@@ -1532,7 +1538,7 @@ name is any string of letters, numbers, spaces, and the
 characters ".", "/", "-", and "+" and should not begin with the
 manufacturer name since the PPD compiler will add this
 automatically for you. The maximum length of the name string is
-31 characters to conform to the Adobe limits on the length of
+31 bytes to conform to the Adobe limits on the length of
 <code>ShortNickName</code>.</p>
 
 <h3>See Also</h3>
@@ -1598,11 +1604,12 @@ Option "fooFinish/Finishing Option" PickOne DocumentSetup 10
 
 <p>The <code>Option</code> directive creates a new option in the
 current group, by default the <code>General</code> group. The name
-is any combination of letters, numbers, and the underscore and
-can be up to 40 characters in length.</p>
+may contain up to 40 ASCII characters within the range of decimal 33
+to decimal 126 inclusive, except for the characters comma (44), slash
+(47) and colon (58).</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <p>The type argument is one of the following keywords:</p>
 
@@ -1749,8 +1756,8 @@ for asymmetric resolutions. The <code>HHH</code> and <code>VVV</code> in
 the examples represent the horizontal and vertical resolutions
 which must be positive integer values.</p>
 
-<p>If provided, the text can be any string up to 80 characters
-in length. If no text is provided, the name is used.</p>
+<p>If provided, the text can be any string up to 80 bytes in length.
+If no text is provided, the name is used.</p>
 
 <h3>See Also</h3>
 
