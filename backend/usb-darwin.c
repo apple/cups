@@ -697,7 +697,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	else if (iostatus == kIOReturnAborted)
 	{
-	  fputs("DEBUG: Got return aborted during write\n", stderr);
+	  fputs("DEBUG: Got USB return aborted during write\n", stderr);
 
 	  IOReturn err = (*g.classdriver)->Abort(g.classdriver);
 	  fprintf(stderr, "DEBUG: USB class driver Abort returned %x\n", err);
@@ -897,11 +897,11 @@ static void *read_thread(void *reference)
 #endif
     }
     else if (readstatus == kIOUSBTransactionTimeout)
-      fputs("DEBUG: Got USB transaction timeout during write\n", stderr);
+      fputs("DEBUG: Got USB transaction timeout during read\n", stderr);
     else if (readstatus == kIOUSBPipeStalled)
       fputs("DEBUG: Got USB pipe stalled during read\n", stderr);
     else if (readstatus == kIOReturnAborted)
-      fputs("DEBUG: Got return aborted during read\n", stderr);
+      fputs("DEBUG: Got USB return aborted during read\n", stderr);
 
    /*
     * Make sure this loop executes no more than once every 250 miliseconds...
