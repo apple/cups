@@ -3,7 +3,7 @@
  *
  *   Online help CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -63,6 +63,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiSetVariable("SECTION", "help");
+  cgiSetVariable("REFRESH_PAGE", "");
 
  /*
   * Load the help index...
@@ -102,7 +103,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   for (i = 0; i < argc; i ++)
-    fprintf(stderr, "argv[%d]=\"%s\"\n", i, argv[i]);
+    fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);
 
   if ((helpfile = getenv("PATH_INFO")) != NULL)
   {
@@ -181,6 +182,12 @@ main(int  argc,				/* I - Number of command-line arguments */
   query = cgiGetVariable("QUERY");
   topic = cgiGetVariable("TOPIC");
   si    = helpSearchIndex(hi, query, topic, helpfile);
+
+  cgiClearVariables();
+  if (query)
+    cgiSetVariable("QUERY", query);
+  if (topic)
+    cgiSetVariable("TOPIC", topic);
 
   fprintf(stderr, "DEBUG: query=\"%s\", topic=\"%s\"\n",
           query ? query : "(null)", topic ? topic : "(null)");

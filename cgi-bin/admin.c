@@ -122,6 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiSetVariable("SECTION", "admin");
+  cgiSetVariable("REFRESH_PAGE", "");
 
  /*
   * See if we have form data...
@@ -191,7 +192,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (op && !strcmp(op, "redirect"))
   {
-    const char *url;			/* Redirection URL... */
+    const char	*url;			/* Redirection URL... */
     char	prefix[1024];		/* URL prefix */
 
 
@@ -205,7 +206,50 @@ main(int  argc,				/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: redirecting with prefix %s!\n", prefix);
 
     if ((url = cgiGetVariable("URL")) != NULL)
-      printf("Location: %s%s\n\n", prefix, url);
+    {
+      char	encoded[1024],		/* Encoded URL string */
+      		*ptr;			/* Pointer into encoded string */
+
+
+      ptr = encoded;
+      if (*url != '/')
+        *ptr++ = '/';
+
+      for (; *url && ptr < (encoded + sizeof(encoded) - 4); url ++)
+      {
+        if (strchr("%@&+ <>#=", *url) || *url < ' ' || *url & 128)
+	{
+	 /*
+	  * Percent-encode this character; safe because we have at least 4
+	  * bytes left in the array...
+	  */
+
+	  sprintf(ptr, "%%%02X", *url & 255);
+	  ptr += 3;
+	}
+	else
+	  *ptr++ = *url;
+      }
+
+      *ptr = '\0';
+
+      if (*url)
+      {
+       /*
+        * URL was too long, just redirect to the admin page...
+	*/
+
+	printf("Location: %s/admin\n\n", prefix);
+      }
+      else
+      {
+       /*
+        * URL is OK, redirect there...
+	*/
+
+        printf("Location: %s%s\n\n", prefix, encoded);
+      }
+    }
     else
       printf("Location: %s/admin\n\n", prefix);
   }
@@ -345,6 +389,31 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
     * and classes and (re)show the add page...
     */
 
+    if (cgiGetVariable("EVENT_JOB_CREATED"))
+      cgiSetVariable("EVENT_JOB_CREATED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_COMPLETED"))
+      cgiSetVariable("EVENT_JOB_COMPLETED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_STOPPED"))
+      cgiSetVariable("EVENT_JOB_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_CONFIG_CHANGED"))
+      cgiSetVariable("EVENT_JOB_CONFIG_CHANGED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
+      cgiSetVariable("EVENT_PRINTER_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_ADDED"))
+      cgiSetVariable("EVENT_PRINTER_ADDED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_MODIFIED"))
+      cgiSetVariable("EVENT_PRINTER_MODIFIED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_DELETED"))
+      cgiSetVariable("EVENT_PRINTER_DELETED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_STARTED"))
+      cgiSetVariable("EVENT_SERVER_STARTED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_STOPPED"))
+      cgiSetVariable("EVENT_SERVER_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_RESTARTED"))
+      cgiSetVariable("EVENT_SERVER_RESTARTED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_AUDIT"))
+      cgiSetVariable("EVENT_SERVER_AUDIT", "CHECKED");
+
     request  = ippNewRequest(CUPS_GET_PRINTERS);
     response = cupsDoRequest(http, request, "/");
 
@@ -467,6 +536,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
   ipp_attribute_t *attr;		/* member-uris attribute */
   char		uri[HTTP_MAX_URI];	/* Device or printer URI */
   const char	*name,			/* Pointer to class name */
+		*op,			/* Operation name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
   static const char * const pattrs[] =	/* Requested printer attributes */
@@ -478,6 +548,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
 
   title = cgiText(modify ? _("Modify Class") : _("Add Class"));
+  op    = cgiGetVariable("OP");
   name  = cgiGetVariable("PRINTER_NAME");
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
@@ -501,6 +572,12 @@ do_am_class(http_t *http,		/* I - HTTP connection */
    /*
     * Do the request and get back a response...
     */
+
+    cgiClearVariables();
+    if (op)
+      cgiSetVariable("OP", op);
+    if (name)
+      cgiSetVariable("PRINTER_NAME", name);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -2621,7 +2698,9 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((val = cupsGetOption("DefaultAuthType", num_settings,
                            settings)) != NULL && !strcasecmp(val, "Negotiate"))
     cgiSetVariable("KERBEROS", "CHECKED");
+  else
 #endif /* HAVE_GSSAPI */
+  cgiSetVariable("KERBEROS", "");
 
 #ifdef HAVE_DNSSD
   cgiSetVariable("HAVE_DNSSD", "1");

@@ -15,6 +15,7 @@
  * Contents:
  *
  *   cgiCheckVariables()        - Check for the presence of "required" variables.
+ *   cgiClearVariables()        - Clear all form variables.
  *   cgiGetArray()              - Get an element from a form array...
  *   cgiGetFile()               - Get the file (if any) that was submitted in the form.
  *   cgiGetSize()               - Get the size of a form array value.
@@ -135,6 +136,31 @@ cgiCheckVariables(const char *names)	/* I - Variables to look for */
 
 
 /*
+ * 'cgiClearVariables()' - Clear all form variables.
+ */
+
+void
+cgiClearVariables(void)
+{
+  int		i, j;			/* Looping vars */
+  _cgi_var_t	*v;			/* Current variable */
+
+
+  for (v = form_vars, i = form_count; i > 0; v ++, i --)
+  {
+    _cupsStrFree(v->name);
+    for (j = 0; j < v->nvalues; j ++)
+      if (v->values[j])
+        _cupsStrFree(v->values[j]);
+  }
+
+  form_count = 0;
+
+  cgi_unlink_file();
+}
+
+
+/*
  * 'cgiGetArray()' - Get an element from a form array...
  */
 
@@ -151,7 +177,7 @@ cgiGetArray(const char *name,		/* I - Name of array variable */
   if (element < 0 || element >= var->nvalues)
     return (NULL);
 
-  return (var->values[element]);
+  return (_cupsStrRetain(var->values[element]));
 }
 
 
@@ -206,7 +232,7 @@ cgiGetVariable(const char *name)	/* I - Name of variable */
 		  var->values[var->nvalues - 1]));
 #endif /* DEBUG */
 
-  return ((var == NULL) ? NULL : var->values[var->nvalues - 1]);
+  return ((var == NULL) ? NULL : _cupsStrRetain(var->values[var->nvalues - 1]));
 }
 
 
@@ -337,9 +363,9 @@ cgiSetArray(const char *name,		/* I - Name of variable */
       var->nvalues = element + 1;
     }
     else if (var->values[element])
-      free((char *)var->values[element]);
+      _cupsStrFree((char *)var->values[element]);
 
-    var->values[element] = strdup(value);
+    var->values[element] = _cupsStrAlloc(value);
   }
 }
 
@@ -384,7 +410,7 @@ cgiSetSize(const char *name,		/* I - Name of variable */
   {
     for (i = size; i < var->nvalues; i ++)
       if (var->values[i])
-        free((void *)(var->values[i]));
+        _cupsStrFree((void *)(var->values[i]));
   }
 
   var->nvalues = size;
@@ -417,9 +443,9 @@ cgiSetVariable(const char *name,	/* I - Name of variable */
   {
     for (i = 0; i < var->nvalues; i ++)
       if (var->values[i])
-        free((char *)var->values[i]);
+        _cupsStrFree((char *)var->values[i]);
 
-    var->values[0] = strdup(value);
+    var->values[0] = _cupsStrAlloc(value);
     var->nvalues   = 1;
   }
 }
@@ -465,10 +491,10 @@ cgi_add_variable(const char *name,	/* I - Variable name */
   if ((var->values = calloc(element + 1, sizeof(char *))) == NULL)
     return;
 
-  var->name            = strdup(name);
+  var->name            = _cupsStrAlloc(name);
   var->nvalues         = element + 1;
   var->avalues         = element + 1;
-  var->values[element] = strdup(value);
+  var->values[element] = _cupsStrAlloc(value);
 
   form_count ++;
 }

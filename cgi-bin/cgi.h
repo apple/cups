@@ -54,6 +54,7 @@ typedef struct cgi_file_s		/**** Uploaded file data ****/
 extern void		cgiAbort(const char *title, const char *stylesheet,
 			         const char *format, ...);
 extern int		cgiCheckVariables(const char *names);
+extern void		cgiClearVariables(void);
 extern void		*cgiCompileSearch(const char *query);
 extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
 extern void		cgiCopyTemplateLang(const char *tmpl);

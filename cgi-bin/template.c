@@ -675,6 +675,8 @@ cgi_puts(const char *s,			/* I - String to output */
       fputs("&gt;", out);
     else if (*s == '\"')
       fputs("&quot;", out);
+    else if (*s == '\'')
+      fputs("&#39;", out);
     else if (*s == '&')
       fputs("&amp;", out);
     else
@@ -695,7 +697,7 @@ cgi_puturi(const char *s,		/* I - String to output */
 {
   while (*s)
   {
-    if (strchr("%&+ <>#=", *s) || *s & 128)
+    if (strchr("%@&+ <>#=", *s) || *s < ' ' || *s & 128)
       fprintf(out, "%%%02X", *s & 255);
     else
       putc(*s, out);

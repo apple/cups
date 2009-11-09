@@ -3,6 +3,9 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.2
 
+	- SECURITY: The CUPS web interface was vulnerable to several XSS and
+	  HTTP header/body attacks via attribute injection (STR #3367,
+	  STR #3401)
 	- Fixed localization errors (STR #3359, STR #3372, STR #3380, STR #3387)
 	- The documentation for classes.conf and printers.conf did not provide
 	  the correct instructions for manual changes (STR #3351)
