@@ -26,7 +26,6 @@
  *   httpClearCookie()    - Clear the cookie value(s).
  *   httpClearFields()    - Clear HTTP request fields.
  *   httpClose()          - Close an HTTP connection...
- *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   _httpCreate()        - Create an unconnected HTTP connection.
  *   httpDelete()         - Send a DELETE request to the server.
@@ -721,7 +720,7 @@ httpGetField(http_t       *http,	/* I - Connection to server */
 {
   if (!http || field <= HTTP_FIELD_UNKNOWN || field >= HTTP_FIELD_MAX)
     return (NULL);
-  else if (field == HTTP_FIELD_AUTHORIZATION && 
+  else if (field == HTTP_FIELD_AUTHORIZATION &&
 	   http->field_authorization)
   {
    /*
@@ -1137,7 +1136,7 @@ httpGets(char   *line,			/* I - Line to read into */
       http->activity = time(NULL);
 
       *lineptr = '\0';
-      
+
       DEBUG_printf(("3httpGets: Returning \"%s\"", line));
 
       return (line);
@@ -2283,7 +2282,7 @@ httpWait(http_t *http,			/* I - Connection to server */
  *
  * @deprecated@
  */
- 
+
 int					/* O - Number of bytes written */
 httpWrite(http_t     *http,		/* I - Connection to server */
           const char *buffer,		/* I - Buffer for data */
@@ -2298,7 +2297,7 @@ httpWrite(http_t     *http,		/* I - Connection to server */
  *
  * @since CUPS 1.2/Mac OS X 10.5@
  */
- 
+
 ssize_t					/* O - Number of bytes written */
 httpWrite2(http_t     *http,		/* I - Connection to server */
            const char *buffer,		/* I - Buffer for data */
@@ -2456,7 +2455,7 @@ _httpWriteCDSA(
   else
   {
     *dataLength = 0;
-  
+
     if (errno == EAGAIN)
       result = errSSLWouldBlock;
     else
@@ -2517,7 +2516,7 @@ http_bio_ctrl(BIO  *h,			/* I - BIO data */
 	}
 	else
 	  return (0);
-        
+
     case BIO_CTRL_DUP :
     case BIO_CTRL_FLUSH :
         return (1);
@@ -2719,7 +2718,36 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
   return (SSL_read((SSL *)(http->tls), buf, len));
 
 #  elif defined(HAVE_GNUTLS)
-  return (gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len));
+  ssize_t	result;			/* Return value */
+
+
+  result = gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len);
+
+  if (result < 0 && !errno)
+  {
+   /*
+    * Convert GNU TLS error to errno value...
+    */
+
+    switch (result)
+    {
+      case GNUTLS_E_INTERRUPTED :
+	  errno = EINTR;
+	  break;
+
+      case GNUTLS_E_AGAIN :
+          errno = EAGAIN;
+          break;
+
+      default :
+          errno = EPIPE;
+          break;
+    }
+
+    result = -1;
+  }
+
+  return ((int)result);
 
 #  elif defined(HAVE_CDSASSL)
   int		result;			/* Return value */
@@ -2857,7 +2885,7 @@ http_send(http_t       *http,	/* I - Connection to server */
       DEBUG_printf(("9http_send: %s: %s", http_fields[i],
                     httpGetField(http, i)));
 
-      if (httpPrintf(http, "%s: %s\r\n", http_fields[i], 
+      if (httpPrintf(http, "%s: %s\r\n", http_fields[i],
 		     httpGetField(http, i)) < 1)
       {
 	http->status = HTTP_ERROR;
@@ -2896,15 +2924,15 @@ http_send(http_t       *http,	/* I - Connection to server */
   * The Kerberos and AuthRef authentication strings can only be used once...
   */
 
-  if (http->field_authorization && http->authstring && 
-      (!strncmp(http->authstring, "Negotiate", 9) || 
+  if (http->field_authorization && http->authstring &&
+      (!strncmp(http->authstring, "Negotiate", 9) ||
        !strncmp(http->authstring, "AuthRef", 7)))
   {
     http->_authstring[0] = '\0';
 
     if (http->authstring != http->_authstring)
       free(http->authstring);
-  
+
     http->authstring = http->_authstring;
   }
 
@@ -3220,7 +3248,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
 /*
  * 'http_write()' - Write a buffer to a HTTP connection.
  */
- 
+
 static int				/* O - Number of bytes written */
 http_write(http_t     *http,		/* I - Connection to server */
            const char *buffer,		/* I - Buffer for data */
@@ -3335,7 +3363,36 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
   return (SSL_write((SSL *)(http->tls), buf, len));
 
 #  elif defined(HAVE_GNUTLS)
-  return (gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len));
+  ssize_t	result;			/* Return value */
+
+  result = gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len);
+
+  if (result < 0 && !errno)
+  {
+   /*
+    * Convert GNU TLS error to errno value...
+    */
+
+    switch (result)
+    {
+      case GNUTLS_E_INTERRUPTED :
+	  errno = EINTR;
+	  break;
+
+      case GNUTLS_E_AGAIN :
+          errno = EAGAIN;
+          break;
+
+      default :
+          errno = EPIPE;
+          break;
+    }
+
+    result = -1;
+  }
+
+  return ((int)result);
+
 #  elif defined(HAVE_CDSASSL)
   int		result;			/* Return value */
   OSStatus	error;			/* Error info */
@@ -3358,11 +3415,11 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 	else
 	{
 	  result = -1;
-	  errno = EINTR;
+	  errno  = EINTR;
 	}
 	break;
     default :
-	errno = EPIPE;
+	errno  = EPIPE;
 	result = -1;
 	break;
   }

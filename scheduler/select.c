@@ -241,11 +241,11 @@ static fd_set		cupsd_global_input,
 
 static int		compare_fds(_cupsd_fd_t *a, _cupsd_fd_t *b);
 static _cupsd_fd_t	*find_fd(int fd);
-#define			release_fd(f) { \
+#define		release_fd(f) { \
 			  (f)->use --; \
 			  if (!(f)->use) free((f));\
 			}
-#define			retain_fd(f) (f)->use++
+#define		retain_fd(f) (f)->use++
 
 
 /*
