@@ -185,7 +185,9 @@ cupsdEndProcess(int pid,		/* I - Process ID */
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdEndProcess(pid=%d, force=%d)", pid,
                   force);
 
-  if (force)
+  if (!pid)
+    return (0);
+  else if (force)
     return (kill(pid, SIGKILL));
   else
     return (kill(pid, SIGTERM));
@@ -295,8 +297,9 @@ cupsdStartProcess(
 
     return (0);
   }
-  else if ((commandinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) ||
-           (!RunUser && commandinfo.st_uid))
+  else if (!RunUser &&
+           ((commandinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) ||
+            commandinfo.st_uid))
   {
     *pid = 0;
 
