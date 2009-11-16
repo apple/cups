@@ -1657,7 +1657,30 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
           cupsdLogMessage(CUPSD_LOG_ERROR,
 	                  "[Job %d] Ran out of memory for job file types!",
 			  job->id);
-	  return (1);
+
+	  ippDelete(job->attrs);
+	  job->attrs = NULL;
+
+	  if (compressions)
+	    free(compressions);
+
+	  if (filetypes)
+	    free(filetypes);
+
+	  if (job->compressions)
+	  {
+	    free(job->compressions);
+	    job->compressions = NULL;
+	  }
+
+	  if (job->filetypes)
+	  {
+	    free(job->filetypes);
+	    job->filetypes = NULL;
+	  }
+
+	  job->num_files = 0;
+	  return (0);
 	}
 
         job->compressions = compressions;
@@ -1725,6 +1748,21 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 
   ippDelete(job->attrs);
   job->attrs = NULL;
+
+  if (job->compressions)
+  {
+    free(job->compressions);
+    job->compressions = NULL;
+  }
+
+  if (job->filetypes)
+  {
+    free(job->filetypes);
+    job->filetypes = NULL;
+  }
+
+  job->num_files = 0;
+
   unlink(jobfile);
 
   return (0);
@@ -4331,7 +4369,7 @@ update_job_attrs(cupsd_job_t *job,	/* I - Job to update */
   else if (job->printer->state_message[0] && do_message)
     cupsdSetString(&(job->printer_message->values[0].string.text),
 		   job->printer->state_message);
-  
+
  /*
   * ... and the printer-state-reasons value...
   */
