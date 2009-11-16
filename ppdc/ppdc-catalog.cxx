@@ -168,6 +168,9 @@ ppdcCatalog::find_message(
   ppdcMessage	*m;			// Current message
 
 
+  if (!*id)
+    return (id);
+
   for (m = (ppdcMessage *)messages->first();
        m;
        m = (ppdcMessage *)messages->next())

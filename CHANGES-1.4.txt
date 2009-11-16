@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- The PPD compiler incorrectly inserted translations of empty strings
+	  (STR #3411)
 	- The scheduler did not reset the SIGPIPE handler of child processes
 	  (STR #3399)
 	- cupsGetNamedDest() incorrectly returned the default printer if the
