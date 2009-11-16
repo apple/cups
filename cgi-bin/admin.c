@@ -1121,6 +1121,11 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         if ((attr = ippFindAttribute(oldinfo, "printer-location",
 	                             IPP_TAG_TEXT)) != NULL)
           cgiSetVariable("PRINTER_LOCATION", attr->values[0].string.text);
+
+	if ((attr = ippFindAttribute(oldinfo, "printer-is-shared",
+				     IPP_TAG_BOOLEAN)) != NULL)
+	  cgiSetVariable("PRINTER_IS_SHARED",
+			 attr->values[0].boolean ? "1" : "0");
       }
 
       cgiCopyTemplateLang("modify-printer.tmpl");

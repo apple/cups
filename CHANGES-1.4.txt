@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- The web interface did not preserve the "printer is shared" state when
+	  modifying a printer (STR #3390)
 	- The PPD compiler incorrectly inserted translations of empty strings
 	  (STR #3411)
 	- The scheduler did not reset the SIGPIPE handler of child processes
