@@ -49,14 +49,6 @@
 
 
 /*
- * Local globals...
- */
-
-static int	current_device;		/* Current device for add/modify */
-static time_t	last_device_time;	/* Last update time for device list */
-
-
-/*
  * Local functions...
  */
 
@@ -65,7 +57,7 @@ static void	choose_device_cb(const char *device_class,
                                  const char *device_make_and_model,
                                  const char *device_uri,
                                  const char *device_location,
-				 const char *title);
+				 int *current_device);
 static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
@@ -290,37 +282,20 @@ choose_device_cb(
     const char *device_make_and_model,	/* I - Make and model */
     const char *device_uri,		/* I - Device URI */
     const char *device_location,	/* I - Location */
-    const char *title)			/* I - Page title */
+    int        *current_device)		/* I - Current device index */
 {
  /*
   * Add the device to the array...
   */
 
-  cgiSetArray("device_class", current_device, device_class);
-  cgiSetArray("device_id", current_device, device_id);
-  cgiSetArray("device_info", current_device, device_info);
-  cgiSetArray("device_make_and_model", current_device, device_make_and_model);
-  cgiSetArray("device_uri", current_device, device_uri);
-  cgiSetArray("device_location", current_device, device_location);
+  cgiSetArray("device_class", *current_device, device_class);
+  cgiSetArray("device_id", *current_device, device_id);
+  cgiSetArray("device_info", *current_device, device_info);
+  cgiSetArray("device_make_and_model", *current_device, device_make_and_model);
+  cgiSetArray("device_uri", *current_device, device_uri);
+  cgiSetArray("device_location", *current_device, device_location);
 
-  current_device ++;
-
-  if (time(NULL) > last_device_time && cgiSupportsMultipart())
-  {
-   /*
-    * Update the page...
-    */
-
-    if (!last_device_time)
-      cgiStartMultipart();
-
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("choose-device.tmpl");
-    cgiEndHTML();
-    fflush(stdout);
-
-    time(&last_device_time);
-  }
+  (*current_device) ++;
 }
 
 
@@ -841,6 +816,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
+  int		current_device;		/* Index of current device */
   static int	baudrates[] =		/* Baud rates */
 		{
 		  1200,
@@ -1001,31 +977,42 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     }
 
    /*
-    * Scan for devices for up to 30 seconds, updating the page as we find
-    * them...
+    * For modern browsers, start a multi-part page so we can show that something
+    * is happening.  Non-modern browsers just get everything at the end...
+    */
+
+    if (cgiSupportsMultipart())
+    {
+      cgiStartMultipart();
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("choose-device.tmpl");
+      cgiEndHTML();
+      fflush(stdout);
+    }
+
+   /*
+    * Scan for devices for up to 30 seconds...
     */
 
     fputs("DEBUG: Getting list of devices...\n", stderr);
 
-    last_device_time = 0;
-    current_device   = 0;
+    current_device = 0;
     if (cupsGetDevices(http, 30, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
                        (cups_device_cb_t)choose_device_cb,
-		       (void *)title) == IPP_OK)
+		       &current_device) == IPP_OK)
     {
       fputs("DEBUG: Got device list!\n", stderr);
 
-      if (!cgiSupportsMultipart())
-      {
-       /*
-        * Non-modern browsers that don't support multi-part documents get
-	* everything at the end...
-	*/
+      if (cgiSupportsMultipart())
+        cgiStartMultipart();
 
-	cgiStartHTML(title);
-	cgiCopyTemplateLang("choose-device.tmpl");
-	cgiEndHTML();
-      }
+      cgiSetVariable("CUPS_GET_DEVICES_DONE", "1");
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("choose-device.tmpl");
+      cgiEndHTML();
+
+      if (cgiSupportsMultipart())
+        cgiEndMultipart();
     }
     else
     {
@@ -1046,16 +1033,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         return;
       }
     }
-
-   /*
-    * Show the final selection page...
-    */
-
-    cgiSetVariable("CUPS_GET_DEVICES_DONE", "1");
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("choose-device.tmpl");
-    cgiEndHTML();
-    cgiEndMultipart();
   }
   else if (strchr(var, '/') == NULL)
   {
