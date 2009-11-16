@@ -1238,7 +1238,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       * Got the list of PPDs, see if the user has selected a make...
       */
 
-      if (cgiSetIPPVars(response, NULL, NULL, NULL, 0) == 0)
+      if (cgiSetIPPVars(response, NULL, NULL, NULL, 0) == 0 && !modify)
       {
        /*
         * No PPD files with this make, try again with all makes...
@@ -1274,8 +1274,11 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	*/
 
         cgiStartHTML(title);
-	cgiSetVariable("CURRENT_MAKE_AND_MODEL",
-	               cgiGetArray("PPD_MAKE_AND_MODEL", 0));
+	if (!cgiGetVariable("PPD_MAKE"))
+	  cgiSetVariable("PPD_MAKE", cgiGetVariable("CURRENT_MAKE"));
+	if (!modify)
+	  cgiSetVariable("CURRENT_MAKE_AND_MODEL",
+	                 cgiGetArray("PPD_MAKE_AND_MODEL", 0));
 	cgiCopyTemplateLang("choose-model.tmpl");
         cgiEndHTML();
       }
@@ -1567,7 +1570,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
-    const char		*val;		/* Setting value */ 
+    const char		*val;		/* Setting value */
 #endif /* HAVE_GSSAPI */
 
 
@@ -1639,7 +1642,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 	  strcat(local_protocols, "slp");
       }
 #endif /* HAVE_SLP */
-      
+
       if (cgiGetVariable("BROWSE_REMOTE_CUPS"))
 	strcpy(remote_protocols, "cups");
       else
@@ -1892,7 +1895,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
-      
+
       perror(tempfile);
       return;
     }
@@ -1904,7 +1907,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
-      
+
       perror(tempfile);
       close(tempfd);
       unlink(tempfile);
@@ -3319,7 +3322,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
           ((ppdattr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
            ppdattr->value && strstr(ppdattr->value, "AutoConfigure")))
         cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
-      else 
+      else
       {
         for (i = 0; i < ppd->num_filters; i ++)
 	  if (!strncmp(ppd->filters[i], "application/vnd.cups-postscript", 31))
@@ -3423,7 +3426,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  cgiSetVariable("GROUP", group->text);
 
 	cgiCopyTemplateLang("option-header.tmpl");
-	
+
 	for (j = group->num_options, option = group->options;
 	     j > 0;
 	     j --, option ++)
@@ -4067,7 +4070,7 @@ get_option_value(
 
     snprintf(buffer, bufsize, "Custom.%gx%g%s", width, length, uval);
   }
-  else if (cupsArrayCount(coption->params) == 1) 
+  else if (cupsArrayCount(coption->params) == 1)
   {
     cparam = ppdFirstCustomParam(coption);
     snprintf(keyword, sizeof(keyword), "%s.%s", coption->keyword, cparam->name);

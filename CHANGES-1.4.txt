@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- Modifying a printer from the web interface sometimes caused the wrong
+	  driver to be selected (STR #3418)
 	- The scheduler did not handle out-of-memory conditions properly when
 	  loading a job (STR #3407)
 	- When adding printers from the web interface, the dynamic updates of
