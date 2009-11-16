@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- The scheduler did not reset the SIGPIPE handler of child processes
+	  (STR #3399)
 	- cupsGetNamedDest() incorrectly returned the default printer if the
 	  named printer did not exist (STR #3397)
 	- Fixed a GNU TLS error handling bug (STR #3381)
