@@ -3,6 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- Some C API headers were missing C++ wrapper logic.
 	- Added an Indonesian translation (STR #3352)
 	- The PPD compiler did not localize single-language PPD options properly
 	  (STR #3386)

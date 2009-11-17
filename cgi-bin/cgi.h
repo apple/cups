@@ -34,6 +34,14 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+/*
  * Types...
  */
 
@@ -98,6 +106,10 @@ extern void		cgiStartHTML(const char *title);
 extern void		cgiStartMultipart(void);
 extern int		cgiSupportsMultipart(void);
 extern const char	*cgiText(const char *message);
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_CGI_H_ */
 

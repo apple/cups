@@ -24,6 +24,14 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+/*
  * Data structures...
  */
 
@@ -67,6 +75,10 @@ extern help_index_t	*helpSearchIndex(help_index_t *hi, const char *query,
 			                 const char *section,
 					 const char *filename);
 
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_HELP_INDEX_H_ */
 
