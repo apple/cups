@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- The web interface did not allow users to successfully add serial
+	  printers (STR #3391)
 	- cupsTempFd() did not work in some situations (STR #3382)
 	- Some C API headers were missing C++ wrapper logic.
 	- Added an Indonesian translation (STR #3352)
