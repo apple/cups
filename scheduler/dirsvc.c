@@ -50,6 +50,7 @@
  *                                printer or update the broadcast contents.
  *   dnssdStop()                - Stop all DNS-SD registrations.
  *   dnssdUpdate()              - Handle DNS-SD queries.
+ *   get_auth_info_required()   - Get the auth-info-required value to advertise.
  *   get_hostconfig()           - Get an /etc/hostconfig service setting.
  *   is_local_queue()           - Determine whether the URI points at a local
  *                                queue.
@@ -63,6 +64,7 @@
  *   send_ldap_ou()             - Send LDAP ou registrations.
  *   send_ldap_browse()         - Send LDAP printer registrations.
  *   ldap_dereg_printer()       - Delete printer from directory
+ *   ldap_dereg_ou()            - Remove the organizational unit.
  *   send_slp_browse()          - Register the specified printer with SLP.
  *   slp_attr_callback()        - SLP attribute callback
  *   slp_dereg_printer()        - SLPDereg() the specified printer
@@ -996,93 +998,91 @@ cupsdSendBrowseList(void)
  * 'ldap_rebind_proc()' - Callback function for LDAP rebind
  */
 
-static int
-ldap_rebind_proc (LDAP *RebindLDAPHandle,
-                  LDAP_CONST char *refsp,
-                  ber_tag_t request,
-                  ber_int_t msgid,
-                  void *params)
+static int				/* O - Result code */
+ldap_rebind_proc(
+    LDAP            *RebindLDAPHandle,	/* I - LDAP handle */
+    LDAP_CONST char *refsp,		/* I - ??? */
+    ber_tag_t       request,		/* I - ??? */
+    ber_int_t       msgid,		/* I - ??? */
+    void            *params)		/* I - ??? */
 {
-  int               rc;
+  int		rc;			/* Result code */
+#    if LDAP_API_VERSION > 3000
+  struct berval	bval;			/* Bind value */
+#    endif /* LDAP_API_VERSION > 3000 */
 
  /*
   * Bind to new LDAP server...
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "ldap_rebind_proc: Rebind to %s", refsp);
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_rebind_proc: Rebind to %s", refsp);
 
 #    if LDAP_API_VERSION > 3000
-  struct berval bval;
   bval.bv_val = BrowseLDAPPassword;
   bval.bv_len = (BrowseLDAPPassword == NULL) ? 0 : strlen(BrowseLDAPPassword);
 
-  rc = ldap_sasl_bind_s(RebindLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE, &bval, NULL, NULL, NULL);
+  rc = ldap_sasl_bind_s(RebindLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE,
+                        &bval, NULL, NULL, NULL);
 #    else
-  rc = ldap_bind_s(RebindLDAPHandle, BrowseLDAPBindDN,
-                   BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
+  rc = ldap_bind_s(RebindLDAPHandle, BrowseLDAPBindDN, BrowseLDAPPassword,
+                   LDAP_AUTH_SIMPLE);
 #    endif /* LDAP_API_VERSION > 3000 */
 
   return (rc);
 }
 
-#  else /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
 
+#  else /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
 /*
  * 'ldap_rebind_proc()' - Callback function for LDAP rebind
  */
 
-static int
-ldap_rebind_proc (LDAP *RebindLDAPHandle,
-                  char **dnp,
-                  char **passwdp,
-                  int *authmethodp,
-                  int freeit,
-                  void *arg)
+static int				/* O - Result code */
+ldap_rebind_proc(
+    LDAP *RebindLDAPHandle,		/* I - LDAP handle */
+    char **dnp,				/* I - ??? */
+    char **passwdp,			/* I - ??? */
+    int  *authmethodp,			/* I - ??? */
+    int  freeit,			/* I - ??? */
+    void *arg)				/* I - ??? */
 {
-  switch ( freeit ) {
+  switch (freeit)
+  {
+    case 1:
+       /*
+        * Free current values...
+        */
 
-  case 1:
+        cupsdLogMessage(CUPSD_LOG_DEBUG2, "ldap_rebind_proc: Free values...");
 
-     /*
-      * Free current values...
-      */
+        if (dnp && *dnp)
+          free(*dnp);
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                     "ldap_rebind_proc: Free values...");
+        if (passwdp && *passwdp)
+          free(*passwdp);
+        break;
 
-      if ( dnp && *dnp ) {
-        free( *dnp );
-      }
-      if ( passwdp && *passwdp ) {
-        free( *passwdp );
-      }
-      break;
+    case 0:
+       /*
+        * Return credentials for LDAP referal...
+        */
 
-  case 0:
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                        "ldap_rebind_proc: Return necessary values...");
 
-     /*
-      * Return credentials for LDAP referal...
-      */
+        *dnp         = strdup(BrowseLDAPBindDN);
+        *passwdp     = strdup(BrowseLDAPPassword);
+        *authmethodp = LDAP_AUTH_SIMPLE;
+        break;
 
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                     "ldap_rebind_proc: Return necessary values...");
+    default:
+       /*
+        * Should never happen...
+        */
 
-      *dnp = strdup(BrowseLDAPBindDN);
-      *passwdp = strdup(BrowseLDAPPassword);
-      *authmethodp = LDAP_AUTH_SIMPLE;
-      break;
-
-  default:
-
-     /*
-      * Should never happen...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "LDAP rebind has been called with wrong freeit value!");
-      break;
-
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "LDAP rebind has been called with wrong freeit value!");
+        break;
   }
 
   return (LDAP_SUCCESS);
@@ -1096,25 +1096,22 @@ ldap_rebind_proc (LDAP *RebindLDAPHandle,
  * 'ldap_connect()' - Start new LDAP connection
  */
 
-static LDAP *
+static LDAP *				/* O - LDAP handle */
 ldap_connect(void)
 {
- /* 
-  * Open LDAP handle...
-  */
-
-  int		rc;				/* LDAP API status */
-  int		version = 3;			/* LDAP version */
-  struct berval	bv = {0, ""};			/* SASL bind value */
-  LDAP		*TempBrowseLDAPHandle=NULL;	/* Temporary LDAP Handle */
+  int		rc;			/* LDAP API status */
+  int		version = 3;		/* LDAP version */
+  struct berval	bv = {0, ""};		/* SASL bind value */
+  LDAP		*TempBrowseLDAPHandle=NULL;
+					/* Temporary LDAP Handle */
 #  if defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP)
-  int		ldap_ssl = 0;			/* LDAP SSL indicator */
-  int		ssl_err = 0;			/* LDAP SSL error value */
+  int		ldap_ssl = 0;		/* LDAP SSL indicator */
+  int		ssl_err = 0;		/* LDAP SSL error value */
 #  endif /* defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP) */
+
 
 #  ifdef HAVE_OPENLDAP
 #    ifdef HAVE_LDAP_SSL
-
  /*
   * Set the certificate file to use for encrypted LDAP sessions...
   */
@@ -1122,7 +1119,7 @@ ldap_connect(void)
   if (BrowseLDAPCACertFile)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-	            "cupsdStartBrowsing: Setting CA certificate file \"%s\"",
+	            "ldap_connect: Setting CA certificate file \"%s\"",
                     BrowseLDAPCACertFile);
 
     if ((rc = ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE,
@@ -1131,8 +1128,8 @@ ldap_connect(void)
                       "Unable to set CA certificate file for LDAP "
                       "connections: %d - %s", rc, ldap_err2string(rc));
   }
-
 #    endif /* HAVE_LDAP_SSL */
+
  /*
   * Initialize OPENLDAP connection...
   * LDAP stuff currently only supports ldapi EXTERNAL SASL binds...
@@ -1153,26 +1150,27 @@ ldap_connect(void)
   * Split LDAP URI into its components...
   */
 
-  if (! BrowseLDAPServer)
+  if (!BrowseLDAPServer)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "BrowseLDAPServer not configured! Disable LDAP browsing!");
-    BrowseLocalProtocols &= ~BROWSE_LDAP;
+    cupsdLogMessage(CUPSD_LOG_ERROR, "BrowseLDAPServer not configured!");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Disabling LDAP browsing!");
+    BrowseLocalProtocols  &= ~BROWSE_LDAP;
     BrowseRemoteProtocols &= ~BROWSE_LDAP;
     return (NULL);
   }
 
-  sscanf(BrowseLDAPServer, "%10[^:]://%254[^:/]:%d", ldap_protocol, ldap_host, &ldap_port);
+  sscanf(BrowseLDAPServer, "%10[^:]://%254[^:/]:%d", ldap_protocol, ldap_host,
+         &ldap_port);
 
-  if (strcmp(ldap_protocol, "ldap") == 0) {
+  if (!strcmp(ldap_protocol, "ldap"))
     ldap_ssl = 0;
-  } else if (strcmp(ldap_protocol, "ldaps") == 0) {
+  else if (!strcmp(ldap_protocol, "ldaps"))
     ldap_ssl = 1;
-  } else {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "unrecognised ldap protocol (%s)!", ldap_protocol);
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Disable LDAP browsing!");
+  else
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unrecognized LDAP protocol (%s)!",
+                    ldap_protocol);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Disabling LDAP browsing!");
     BrowseLocalProtocols &= ~BROWSE_LDAP;
     BrowseRemoteProtocols &= ~BROWSE_LDAP;
     return (NULL);
@@ -1186,15 +1184,14 @@ ldap_connect(void)
       ldap_port = LDAP_PORT;
   }
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "LDAP Connection Details: PROT:%s HOST:%s PORT:%d",
+  cupsdLogMessage(CUPSD_LOG_DEBUG, "ldap_connect: PROT:%s HOST:%s PORT:%d",
                   ldap_protocol, ldap_host, ldap_port);
 
  /*
   * Initialize LDAP connection...
   */
 
-  if (! ldap_ssl)
+  if (!ldap_ssl)
   {
     if ((TempBrowseLDAPHandle = ldap_init(ldap_host, ldap_port)) == NULL)
       rc = LDAP_OPERATIONS_ERROR;
@@ -1205,19 +1202,23 @@ ldap_connect(void)
   }
   else
   {
-
    /*
     * Initialize SSL LDAP connection...
     */
+
     if (BrowseLDAPCACertFile)
     {
       rc = ldapssl_client_init(BrowseLDAPCACertFile, (void *)NULL);
-      if (rc != LDAP_SUCCESS) {
+      if (rc != LDAP_SUCCESS)
+      {
         cupsdLogMessage(CUPSD_LOG_ERROR,
                         "Failed to initialize LDAP SSL client!");
         rc = LDAP_OPERATIONS_ERROR;
-      } else {
-        if ((TempBrowseLDAPHandle = ldapssl_init(ldap_host, ldap_port, 1)) == NULL)
+      }
+      else
+      {
+        if ((TempBrowseLDAPHandle = ldapssl_init(ldap_host, ldap_port,
+                                                 1)) == NULL)
           rc = LDAP_OPERATIONS_ERROR;
         else
           rc = LDAP_SUCCESS;
@@ -1237,7 +1238,7 @@ ldap_connect(void)
     */
 
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "LDAP client libraries does not support TLS");
+                    "LDAP client libraries do not support SSL");
     rc = LDAP_OPERATIONS_ERROR;
 
 #    endif /* HAVE_LDAP_SSL */
@@ -1250,105 +1251,104 @@ ldap_connect(void)
 
   if (rc != LDAP_SUCCESS)
   {
-    if ((rc == LDAP_SERVER_DOWN) || (rc == LDAP_CONNECT_ERROR))
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to initialize LDAP! Temporary disable LDAP browsing...");
-    }
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to initialize LDAP!");
+
+    if (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Temporarily disabling LDAP browsing...");
     else
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to initialize LDAP! Disable LDAP browsing!");
-      BrowseLocalProtocols &= ~BROWSE_LDAP;
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Disabling LDAP browsing!");
+
+      BrowseLocalProtocols  &= ~BROWSE_LDAP;
       BrowseRemoteProtocols &= ~BROWSE_LDAP;
     }
 
     ldap_disconnect(TempBrowseLDAPHandle);
-    TempBrowseLDAPHandle = NULL;
+
+    return (NULL);
   }
 
  /*
   * Upgrade LDAP version...
   */
 
-  else if (ldap_set_option(TempBrowseLDAPHandle, LDAP_OPT_PROTOCOL_VERSION,
+  if (ldap_set_option(TempBrowseLDAPHandle, LDAP_OPT_PROTOCOL_VERSION,
                            (const void *)&version) != LDAP_SUCCESS)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR,
-                   "Unable to set LDAP protocol version %d! Disable LDAP browsing!",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to set LDAP protocol version %d!",
                    version);
-    BrowseLocalProtocols &= ~BROWSE_LDAP;
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Disabling LDAP browsing!");
+
+    BrowseLocalProtocols  &= ~BROWSE_LDAP;
     BrowseRemoteProtocols &= ~BROWSE_LDAP;
     ldap_disconnect(TempBrowseLDAPHandle);
-    TempBrowseLDAPHandle = NULL;
-  }
-  else
-  {
 
-   /*
-    * Register LDAP rebind procedure...
-    */
+    return (NULL);
+  }
+
+ /*
+  * Register LDAP rebind procedure...
+  */
 
 #  ifdef HAVE_LDAP_REBIND_PROC
 #    if defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000)
 
-    rc = ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc, (void *)NULL);
-    if ( rc != LDAP_SUCCESS )
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Setting LDAP rebind function failed with status %d: %s",
-                      rc, ldap_err2string(rc));
+  rc = ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc,
+                            (void *)NULL);
+  if (rc != LDAP_SUCCESS)
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "Setting LDAP rebind function failed with status %d: %s",
+                    rc, ldap_err2string(rc));
 
 #    else
 
-    ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc, (void *)NULL);
+  ldap_set_rebind_proc(TempBrowseLDAPHandle, &ldap_rebind_proc, (void *)NULL);
 
 #    endif /* defined(LDAP_API_FEATURE_X_OPENLDAP) && (LDAP_API_VERSION > 2000) */
 #  endif /* HAVE_LDAP_REBIND_PROC */
 
-   /*
-    * Start LDAP bind...
-    */
+ /*
+  * Start LDAP bind...
+  */
 
 #  if LDAP_API_VERSION > 3000
-    struct berval bval;
-    bval.bv_val = BrowseLDAPPassword;
-    bval.bv_len = (BrowseLDAPPassword == NULL) ? 0 : strlen(BrowseLDAPPassword);
+  struct berval bval;
+  bval.bv_val = BrowseLDAPPassword;
+  bval.bv_len = (BrowseLDAPPassword == NULL) ? 0 : strlen(BrowseLDAPPassword);
 
-    if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost"))
-      rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, NULL, "EXTERNAL", &bv, NULL,
-                            NULL, NULL);
-    else
-      rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE, &bval, NULL, NULL, NULL);
+  if (!BrowseLDAPServer || !strcasecmp(BrowseLDAPServer, "localhost"))
+    rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, NULL, "EXTERNAL", &bv, NULL,
+                          NULL, NULL);
+  else
+    rc = ldap_sasl_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN, LDAP_SASL_SIMPLE, &bval, NULL, NULL, NULL);
+
 #  else
-      rc = ldap_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN,
-                       BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
+    rc = ldap_bind_s(TempBrowseLDAPHandle, BrowseLDAPBindDN,
+                     BrowseLDAPPassword, LDAP_AUTH_SIMPLE);
 #  endif /* LDAP_API_VERSION > 3000 */
 
-    if (rc != LDAP_SUCCESS)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                     "LDAP bind failed with error %d: %s",
-                      rc, ldap_err2string(rc));
-#  if defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP)
-      if (ldap_ssl && ((rc == LDAP_SERVER_DOWN) || (rc == LDAP_CONNECT_ERROR)))
-      {
-        ssl_err = PORT_GetError();
-        if (ssl_err != 0)
-          cupsdLogMessage(CUPSD_LOG_ERROR,
-                          "LDAP SSL error %d: %s",
-                          ssl_err, ldapssl_err2string(ssl_err));
-      }
-#  endif /* defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP) */
-      ldap_disconnect(TempBrowseLDAPHandle);
-      TempBrowseLDAPHandle = NULL;
-    }
-    else
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                     "LDAP connection established");
-    }
+  if (rc != LDAP_SUCCESS)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "LDAP bind failed with error %d: %s",
+                    rc, ldap_err2string(rc));
 
+#  if defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP)
+    if (ldap_ssl && (rc == LDAP_SERVER_DOWN || rc == LDAP_CONNECT_ERROR))
+    {
+      ssl_err = PORT_GetError();
+      if (ssl_err != 0)
+        cupsdLogMessage(CUPSD_LOG_ERROR, "LDAP SSL error %d: %s", ssl_err,
+                        ldapssl_err2string(ssl_err));
+    }
+#  endif /* defined(HAVE_LDAP_SSL) && defined (HAVE_MOZILLA_LDAP) */
+
+    ldap_disconnect(TempBrowseLDAPHandle);
+
+    return (NULL);
   }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "LDAP connection established");
+
   return (TempBrowseLDAPHandle);
 }
 
@@ -1360,24 +1360,23 @@ ldap_connect(void)
 static void
 ldap_reconnect(void)
 {
-  LDAP		*TempBrowseLDAPHandle = NULL;	/* Temp Handle to LDAP server */
+  LDAP	*TempBrowseLDAPHandle = NULL;	/* Temp Handle to LDAP server */
 
-  cupsdLogMessage(CUPSD_LOG_INFO,
-                  "Try LDAP reconnect...");
 
  /*
   * Get a new LDAP Handle and replace the global Handle
   * if the new connection was successful
   */
 
+  cupsdLogMessage(CUPSD_LOG_INFO, "Try LDAP reconnect...");
+
   TempBrowseLDAPHandle = ldap_connect();
 
   if (TempBrowseLDAPHandle != NULL)
   {
     if (BrowseLDAPHandle != NULL)
-    {
       ldap_disconnect(BrowseLDAPHandle);
-    }
+
     BrowseLDAPHandle = TempBrowseLDAPHandle;
   }
 }
@@ -1388,9 +1387,10 @@ ldap_reconnect(void)
  */
 
 static void
-ldap_disconnect(LDAP *ld)	/* I - LDAP handle */
+ldap_disconnect(LDAP *ld)		/* I - LDAP handle */
 {
-  int	rc;	/* return code */
+  int	rc;				/* Return code */
+
 
  /*
   * Close LDAP handle...
@@ -1401,6 +1401,7 @@ ldap_disconnect(LDAP *ld)	/* I - LDAP handle */
 #  else
   rc = ldap_unbind_s(ld);
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
+
   if (rc != LDAP_SUCCESS)
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unbind from LDAP server failed with status %d: %s",
@@ -3971,7 +3972,7 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
  * 'ldap_search_rec()' - LDAP Search with reconnect
  */
 
-static int
+static int				/* O - Return code */
 ldap_search_rec(LDAP        *ld,	/* I - LDAP handler */
                 char        *base,	/* I - Base dn */
                 int         scope,	/* I - LDAP search scope */
@@ -4040,11 +4041,9 @@ ldap_freeres(LDAPMessage *entry)	/* I - LDAP handler */
 
   rc = ldap_msgfree(entry);
   if (rc == -1)
-    cupsdLogMessage(CUPSD_LOG_WARN,
-                    "Can't free LDAPMessage!");
+    cupsdLogMessage(CUPSD_LOG_WARN, "Can't free LDAPMessage!");
   else if (rc == 0)
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "Freeing LDAPMessage was unnecessary");
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "Freeing LDAPMessage was unnecessary");
 }
 
 
@@ -4052,7 +4051,7 @@ ldap_freeres(LDAPMessage *entry)	/* I - LDAP handler */
  * 'ldap_getval_char()' - Get first LDAP value and convert to string
  */
 
-static int
+static int				/* O - Return code */
 ldap_getval_firststring(
     LDAP          *ld,			/* I - LDAP handler */
     LDAPMessage   *entry,		/* I - LDAP message or search result */
@@ -4082,7 +4081,6 @@ ldap_getval_firststring(
   }
   else
   {
-
    /*
     * Check size and copy value into our string...
     */
@@ -4104,7 +4102,7 @@ ldap_getval_firststring(
     ldap_value_free_len(bval);
   }
 #  else
-  char			**value;	/* LDAP value */
+  char	**value;			/* LDAP value */
 
  /*
   * Get value from LDAPMessage...
@@ -4114,8 +4112,7 @@ ldap_getval_firststring(
   {
     rc = -1;
     dn = ldap_get_dn(ld, entry);
-    cupsdLogMessage(CUPSD_LOG_WARN,
-                    "Failed to get LDAP value %s for %s!",
+    cupsdLogMessage(CUPSD_LOG_WARN, "Failed to get LDAP value %s for %s!",
                     attr, dn);
     ldap_memfree(dn);
   }
@@ -4168,11 +4165,10 @@ send_ldap_ou(char *ou,			/* I - Servername/ou to register */
   * Reconnect if LDAP Handle is invalid...
   */
 
-  if (! BrowseLDAPHandle)
+  if (!BrowseLDAPHandle)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "send_ldap_ou: LDAP Handle is invalid. Try "
-		    "reconnecting...");
+                    "send_ldap_ou: LDAP Handle is invalid. Try reconnecting...");
     ldap_reconnect();
     return;
   }
@@ -4630,6 +4626,10 @@ ldap_dereg_printer(cupsd_printer_t *p)	/* I - Printer to deregister */
 }
 
 
+/*
+ * 'ldap_dereg_ou()' - Remove the organizational unit.
+ */
+
 static void
 ldap_dereg_ou(char *ou,			/* I - Organizational unit (servername) */
               char *basedn)		/* I - Dase dn */
@@ -4688,7 +4688,6 @@ ldap_dereg_ou(char *ou,			/* I - Organizational unit (servername) */
                         "LDAP delete for %s failed with status %d: %s",
                         ou, rc, ldap_err2string(rc));
     }
-
   }
 }
 #endif /* HAVE_LDAP */
