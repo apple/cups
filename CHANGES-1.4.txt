@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.3
 
+	- SECURITY: The scheduler could try responding on a closed client
+	  connection, leading to a crash (STR #3200)
 	- The web interface did not allow users to successfully add serial
 	  printers (STR #3391)
 	- cupsTempFd() did not work in some situations (STR #3382)
