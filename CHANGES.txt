@@ -1,8 +1,10 @@
-CHANGES.txt - 2009-10-15
+CHANGES.txt - 2009-11-19
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The cupstestppd tool now warns about non-unique filenames and
+	  provides a way to ignore all filename warnings.
 	- Dropped support for the recoverable: and recovered: message prefixes.
 	- The scheduler now requires that filters and backends have group write
 	  permissions disabled.
