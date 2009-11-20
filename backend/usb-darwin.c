@@ -498,6 +498,7 @@ print_device(const char *uri,		/* I - Device URI */
     {
       _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
       fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
+      registry_close();
       return (CUPS_BACKEND_STOP);
     }
   }
@@ -516,6 +517,7 @@ print_device(const char *uri,		/* I - Device URI */
   {
     _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
     fputs("DEBUG: Couldn't create read thread\n", stderr);
+    registry_close();
     return (CUPS_BACKEND_STOP);
   }
 
@@ -594,13 +596,15 @@ print_device(const char *uri,		/* I - Device URI */
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
 	        "written, aborting\n", stderr);
+          registry_close();
           return (CUPS_BACKEND_OK);
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
 	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	  perror("DEBUG: select");
-	  return (CUPS_BACKEND_FAILED);
+	  registry_close();
+          return (CUPS_BACKEND_FAILED);
 	}
       }
 
@@ -642,6 +646,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  {
 	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	    perror("DEBUG: read");
+	    registry_close();
 	    return (CUPS_BACKEND_FAILED);
 	  }
 
