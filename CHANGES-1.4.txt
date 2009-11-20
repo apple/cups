@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3422)
+	- cupstestppd didn't catch problems with JobPatchFile definitions
+	  (STR #3421)
 	- The socket backend could crash if a SNMP string had a negative length.
 	- Fixed some termination issues with the USB backend on Mac OS X.
 	- The side-channel APIs did not handle interrupts properly.
