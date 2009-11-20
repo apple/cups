@@ -1911,6 +1911,7 @@ static void run_legacy_backend(int argc,
     * Setup a SIGTERM handler then block it before forking...
     */
 
+    int			err;		/* posix_spawn result */
     struct sigaction	action;		/* POSIX signal action */
     sigset_t		newmask,	/* New signal mask */
 			oldmask;	/* Old signal mask */
@@ -1977,10 +1978,11 @@ static void run_legacy_backend(int argc,
 
     my_argv[i] = NULL;
 
-    if (posix_spawn(&child_pid, usbpath, NULL, &attrs, my_argv, environ))
+    if ((err = posix_spawn(&child_pid, usbpath, NULL, &attrs, my_argv,
+                           environ)) != 0)
     {
       fprintf(stderr, "DEBUG: Unable to exec %s: %s\n", usbpath,
-              strerror(errno));
+              strerror(err));
       _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
       exit(CUPS_BACKEND_STOP);
     }
