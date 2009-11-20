@@ -375,7 +375,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addr->addr), 1,
+    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addr->addr), 1, 0, 
                             backendNetworkSideCB);
 
     if (print_fd != 0 && tbytes >= 0)

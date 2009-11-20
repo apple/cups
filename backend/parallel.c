@@ -284,7 +284,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, side_cb);
+    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, 1, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintf(stderr,

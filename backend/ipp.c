@@ -432,7 +432,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
 
-    tbytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0,
+    tbytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
                             backendNetworkSideCB);
 
     if (snmp_fd >= 0)

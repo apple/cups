@@ -187,10 +187,10 @@ print_device(const char *uri,		/* I - Device URI */
     * select() or poll(), so we can't support the sidechannel either...
     */
 
-    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, NULL);
+    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, 1, NULL);
 
 #else
-    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, side_cb);
+    tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, 1, side_cb);
 #endif /* __sun */
 
     if (print_fd != 0 && tbytes >= 0)
