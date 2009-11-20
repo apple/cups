@@ -116,6 +116,7 @@ cupsSideChannelRead(
   char		buffer[16388];		/* Message buffer */
   int		bytes;			/* Bytes read */
   int		templen;		/* Data length from message */
+  int		nfds;			/* Number of file descriptors */
 #ifdef HAVE_POLL
   struct pollfd	pfd;			/* Poll structure for poll() */
 #else /* select() */
@@ -143,38 +144,30 @@ cupsSideChannelRead(
   pfd.fd     = CUPS_SC_FD;
   pfd.events = POLLIN;
 
-  if (timeout < 0.0)
-  {
-    if (poll(&pfd, 1, -1) < 1)
-      return (-1);
-  }
-  else if (poll(&pfd, 1, (long)(timeout * 1000)) < 1)
-    return (-1);
+  while ((nfds = poll(&pfd, 1, 
+		      timeout < 0.0 ? -1 : (long)(timeout * 1000))) < 0 &&
+	 (errno == EINTR || errno == EAGAIN))
+    ;
 
 #else /* select() */
   FD_ZERO(&input_set);
   FD_SET(CUPS_SC_FD, &input_set);
 
-  if (timeout < 0.0)
-  {
-    if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, NULL) < 1)
-    {
-      DEBUG_printf(("1cupsSideChannelRead: Select error: %s", strerror(errno)));
-      return (-1);
-    }
-  }
-  else
-  {
-    stimeout.tv_sec  = (int)timeout;
-    stimeout.tv_usec = (int)(timeout * 1000000) % 1000000;
+  stimeout.tv_sec  = (int)timeout;
+  stimeout.tv_usec = (int)(timeout * 1000000) % 1000000;
 
-    if (select(CUPS_SC_FD + 1, &input_set, NULL, NULL, &stimeout) < 1)
-    {
-      DEBUG_puts("1cupsSideChannelRead: Select timeout");
-      return (-1);
-    }
-  }
+  while ((nfds = select(CUPS_SC_FD + 1, &input_set, NULL, NULL, 
+			timeout < 0.0 ? NULL : &stimeout)) < 0 &&
+	 (errno == EINTR || errno == EAGAIN))
+    ;
+
 #endif /* HAVE_POLL */
+
+  if  (nfds < 1)
+  {
+    *status = nfds==0 ? CUPS_SC_STATUS_TIMEOUT : CUPS_SC_STATUS_IO_ERROR;
+    return (-1);
+  }
 
  /*
   * Read a side-channel message for the format:

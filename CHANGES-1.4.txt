@@ -5,6 +5,7 @@ CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
+	- The side-channel APIs did not handle interrupts properly.
 	- The network backends incorrectly cleared the media-empty-warning
 	  state.
 	- The web interface did not allow users to successfully add serial
