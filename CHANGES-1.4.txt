@@ -5,6 +5,7 @@ CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
+	- Localization updates (STR #3352, STR #3422)
 	- The socket backend could crash if a SNMP string had a negative length.
 	- Fixed some termination issues with the USB backend on Mac OS X.
 	- The side-channel APIs did not handle interrupts properly.
@@ -14,7 +15,6 @@ CHANGES IN CUPS V1.4.3
 	  printers (STR #3391)
 	- cupsTempFd() did not work in some situations (STR #3382)
 	- Some C API headers were missing C++ wrapper logic.
-	- Added an Indonesian translation (STR #3352)
 	- The PPD compiler did not localize single-language PPD options properly
 	  (STR #3386)
 	- Modifying a printer from the web interface sometimes caused the wrong

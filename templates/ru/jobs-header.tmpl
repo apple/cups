@@ -1,5 +1,6 @@
 <DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Показать активные задания"></FORM>}
-{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="Завершено"><INPUT TYPE="SUBMIT" VALUE="Показать завершенные задания"></FORM>}
-{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="все"><INPUT TYPE="SUBMIT" VALUE="Показать все задания"></FORM>}</DIV>
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Показать завершенные задания"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Показать все задания"></FORM>}</DIV>
 
-<P ALIGN="CENTER">{total=0?Нет заданий:Задание {#job_id} из {total} {?which_jobs=?активных:{which_jobs=всех?:завершенных}}.</P>
+<P ALIGN="CENTER">{total=0?Нет заданий:Задание {#job_id} из {total} {?which_jobs=?активных:{which_jobs=all?:завершенных}}.</P>
+
