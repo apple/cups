@@ -46,6 +46,7 @@ application/x-csource		application/postscript		33	texttops
 application/x-perl		application/postscript		33	texttops
 application/x-shell		application/postscript		33	texttops
 text/plain			application/postscript		33	texttops
+text/css			application/postscript		33	texttops
 text/html			application/postscript		33	texttops
 image/gif			application/vnd.cups-postscript	66	imagetops
 image/png			application/vnd.cups-postscript	66	imagetops
