@@ -433,11 +433,11 @@ cupsdCleanJobs(void)
   cupsd_job_t	*job;			/* Current job */
 
 
-  if (MaxJobs <= 0)
+  if (MaxJobs <= 0 && JobHistory)
     return;
 
   for (job = (cupsd_job_t *)cupsArrayFirst(Jobs);
-       job && cupsArrayCount(Jobs) >= MaxJobs;
+       job && (cupsArrayCount(Jobs) >= MaxJobs || !JobHistory);
        job = (cupsd_job_t *)cupsArrayNext(Jobs))
     if (job->state_value >= IPP_JOB_CANCELED && !job->printer)
       cupsdDeleteJob(job, CUPSD_JOB_PURGE);
@@ -2434,8 +2434,6 @@ cupsdSetJobState(
 	  job->dirty = 1;
 	  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 	}
-	else if (!job->printer)
-	  cupsdDeleteJob(job, CUPSD_JOB_PURGE);
 	break;
   }
 
