@@ -1511,12 +1511,36 @@ cupsPrintFiles2(
       return (0);
     }
 
-    status = cupsStartDocument(http, name, job_id, docname, format,
-                               i == (num_files - 1));
+    do
+    {
+      cupsFileRewind(fp);
 
-    while (status == HTTP_CONTINUE &&
-           (bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
-      status = cupsWriteRequestData(http, buffer, bytes);
+      status = cupsStartDocument(http, name, job_id, docname, format,
+			         i == (num_files - 1));
+
+      while (status == HTTP_CONTINUE &&
+	     (bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
+        status = cupsWriteRequestData(http, buffer, bytes);
+
+      if (status == HTTP_UNAUTHORIZED)
+      {
+        char	resource[1024];		/* Printer resource */
+
+        snprintf(resource, sizeof(resource), "/printers/%s", name);
+
+        if (!cupsDoAuthentication(http, "POST", resource))
+        {
+	  if (httpReconnect(http))
+	  {
+	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    return (0);
+	  }
+        }
+	else
+	  status = HTTP_AUTHORIZATION_CANCELED;
+      }
+    }
+    while (status == HTTP_UNAUTHORIZED);
 
     cupsFileClose(fp);
 
