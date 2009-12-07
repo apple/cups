@@ -277,7 +277,6 @@ ln -s $root/templates /tmp/cups-$user/share
 
 if test $ssltype != 0; then
 	mkdir $root/ssl
-	cp server.* $root/ssl
 fi
 
 #

@@ -333,7 +333,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
                    NULL, job_uri);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                    "requested-attributes", NULL, "job-printer-uri");
-      
+
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
         if ((attr = ippFindAttribute(response, "job-printer-uri",
@@ -926,7 +926,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
 		 ishttps ? "https" : "http",
 		 userpass, hostname, port, resource);
       else
-	snprintf(url, urlsize, "%s://%s:%d%s", 
+	snprintf(url, urlsize, "%s://%s:%d%s",
 		 ishttps ? "https" : "http",
 		 hostname, port, resource);
     }
@@ -1518,7 +1518,11 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     */
 
     if (dest)
+    {
       snprintf(val, sizeof(val), "/%s/%s", section, dest);
+      cgiSetVariable("PRINTER_NAME", dest);
+      cgiSetVariable("PRINTER_URI_SUPPORTED", val);
+    }
     else
       strlcpy(val, "/jobs/", sizeof(val));
 

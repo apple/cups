@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3422)
+	- The web interface did not show completed jobs for a printer
+	  (STR #3436)
 	- Authenticated printing did not always work when printing directly to
 	  a remote server (STR #3435)
 	- The USB backend did not work on Solaris (STR #3423)
