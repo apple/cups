@@ -3297,11 +3297,16 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     for (option = ppdFirstOption(ppd);
          option;
 	 option = ppdNextOption(ppd))
+    {
       if ((var = cgiGetVariable(option->keyword)) != NULL)
       {
 	have_options = 1;
 	ppdMarkOption(ppd, option->keyword, var);
+	fprintf(stderr, "DEBUG: Set %s to %s...\n", option->keyword, var);
       }
+      else
+        fprintf(stderr, "DEBUG: Didn't find %s...\n", option->keyword);
+    }
   }
 
   if (!have_options || ppdConflicts(ppd))

@@ -119,7 +119,7 @@ cgiCopyTemplateLang(const char *tmpl)	/* I - Base filename */
       *locptr = '\0';			/* Strip charset */
   }
 
-  fprintf(stderr, "DEBUG: lang=\"%s\", locale=\"%s\"...\n",
+  fprintf(stderr, "DEBUG2: lang=\"%s\", locale=\"%s\"...\n",
           lang ? lang : "(null)", locale);
 
  /*

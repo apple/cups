@@ -27,7 +27,7 @@ P.example {
   font-style: italic;
   margin-left: 36pt;
 }
-  
+
 PRE.example {
   background: white;
   border: dotted thin #999999;
@@ -236,6 +236,10 @@ H2 SPAN.info, H3 SPAN.info, H4 SPAN.info {
 .conflict {
   background: red;
   color: white;
+}
+
+TH.conflict {
+  text-align: right;
 }
 
 H1.title {
