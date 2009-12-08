@@ -6,6 +6,7 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- The snmp backend did not work with some printers (STR #3413)
 	- The web interface did not show the conflicting values when setting
 	  options (STR #3440)
 	- Setting options in the web interface did not always work (STR #3439)
