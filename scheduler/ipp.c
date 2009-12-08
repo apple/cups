@@ -1706,8 +1706,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                               "job-media-sheets-completed", 0);
   ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
                printer->uri);
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-               title);
 
   if ((attr = ippFindAttribute(job->attrs, "job-k-octets",
                                IPP_TAG_INTEGER)) != NULL)
@@ -3199,7 +3197,7 @@ apple_register_profiles(
       num_profiles ++;
     }
 
-  
+
  /*
   * If we have profiles, add them...
   */
@@ -3245,7 +3243,7 @@ apple_register_profiles(
 	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
 	q2_attr = ppdFindAttr(ppd, q_keyword, NULL);
       }
-      else 
+      else
 	q2_attr = ppdFindAttr(ppd, "DefaultMediaType", NULL);
 
       if (q2_attr && q2_attr->value && q2_attr->value[0])
@@ -3259,7 +3257,7 @@ apple_register_profiles(
 	snprintf(q_keyword, sizeof(q_keyword), "Default%s", attr->value);
 	q3_attr = ppdFindAttr(ppd, q_keyword, NULL);
       }
-      else 
+      else
 	q3_attr = ppdFindAttr(ppd, "DefaultResolution", NULL);
 
       if (q3_attr && q3_attr->value && q3_attr->value[0])
@@ -3428,7 +3426,7 @@ apple_register_profiles(
     attr = ppdFindAttr(ppd, "DefaultColorSpace", NULL);
 
     num_profiles = (attr && ppd->colorspace == PPD_CS_GRAY) ? 1 : 2;
-      
+
     if ((profiles = calloc(num_profiles, sizeof(CMDeviceProfileArray))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -4426,7 +4424,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     if (q->page_count == -4) /* special case: unlimited user */
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request approved for printer %s (%s): " 
+                      "User \"%s\" request approved for printer %s (%s): "
 		      "unlimited quota.",
 		      username, p->name, p->info);
       q->page_count = 0; /* allow user to print */
