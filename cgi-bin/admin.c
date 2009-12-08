@@ -3413,6 +3413,16 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	    {
 	      cgiSetArray("ckeyword", k, option->keyword);
 	      cgiSetArray("ckeytext", k, option->text);
+
+	      for (m = 0; m < option->num_choices; m ++)
+	      {
+	        if (option->choices[m].marked)
+	        {
+	          cgiSetArray("cchoice", k, option->choices[m].text);
+	          break;
+	        }
+              }
+
 	      k ++;
 	    }
 
