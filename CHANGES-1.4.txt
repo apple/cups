@@ -6,6 +6,8 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3422)
+	- The scheduler did not use the Get-Job-Attributes policy for a printer
+	  (STR #3431)
 	- The scheduler added two job-name attributes to each job object
 	  (STR #3428)
 	- CSS files would not print (STR #3442)

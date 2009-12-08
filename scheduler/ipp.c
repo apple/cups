@@ -6744,6 +6744,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   ipp_attribute_t *attr;		/* Current attribute */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
+  cupsd_printer_t *printer;		/* Current printer */
   char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
@@ -6818,7 +6819,19 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  if ((printer = job->printer) == NULL)
+    printer = cupsdFindDest(job->dest);
+
+  if (printer)
+  {
+    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
+                                   NULL)) != HTTP_OK)
+    {
+      send_http_error(con, status, printer);
+      return;
+    }
+  }
+  else if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status, NULL);
     return;
