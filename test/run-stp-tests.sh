@@ -275,10 +275,6 @@ ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
 ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
-if test $ssltype != 0; then
-	mkdir $root/ssl
-fi
-
 #
 # Mac OS X filters and configuration files...
 #

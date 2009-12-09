@@ -168,7 +168,7 @@ static mime_filter_t	gziptoany_filter =
 static int	compare_active_jobs(void *first, void *second, void *data);
 static int	compare_jobs(void *first, void *second, void *data);
 static void	dump_job_history(cupsd_job_t *job);
-static void	finalize_job(cupsd_job_t *job);
+static void	finalize_job(cupsd_job_t *job, int set_job_state);
 static void	free_job_history(cupsd_job_t *job);
 static char	*get_options(cupsd_job_t *job, int banner_page, char *copies,
 		             size_t copies_size, char *title,
@@ -1233,7 +1233,7 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
                cupsd_jobaction_t action)/* I - Action */
 {
   if (job->printer)
-    finalize_job(job);
+    finalize_job(job, 1);
 
   if (action == CUPSD_JOB_PURGE)
   {
@@ -2234,7 +2234,7 @@ cupsdSetJobState(
   */
 
   if (oldstate == IPP_JOB_PROCESSING)
-    stop_job(job, action != CUPSD_JOB_DEFAULT);
+    stop_job(job, action);
 
  /*
   * Set the new job state...
@@ -2441,8 +2441,8 @@ cupsdSetJobState(
   * Finalize the job immediately if we forced things...
   */
 
-  if (action == CUPSD_JOB_FORCE)
-    finalize_job(job);
+  if (action >= CUPSD_JOB_FORCE)
+    finalize_job(job, 0);
 
  /*
   * Update the server "busy" state...
@@ -2677,7 +2677,8 @@ free_job_history(cupsd_job_t *job)	/* I - Job */
  */
 
 static void
-finalize_job(cupsd_job_t *job)		/* I - Job */
+finalize_job(cupsd_job_t *job,		/* I - Job */
+             int         set_job_state)	/* I - 1 = set the job state */
 {
   ipp_pstate_t		printer_state;	/* New printer state value */
   ipp_jstate_t		job_state;	/* New job state value */
@@ -2962,7 +2963,9 @@ finalize_job(cupsd_job_t *job)		/* I - Job */
   * Update the printer and job state.
   */
 
-  cupsdSetJobState(job, job_state, CUPSD_JOB_DEFAULT, "%s", message);
+  if (job_state != job->state_value)
+    cupsdSetJobState(job, job_state, CUPSD_JOB_DEFAULT, "%s", message);
+
   cupsdSetPrinterState(job->printer, printer_state,
                        printer_state == IPP_PRINTER_STOPPED);
   update_job_attrs(job, 0);
@@ -3930,15 +3933,34 @@ stop_job(cupsd_job_t       *job,	/* I - Job */
 
   if (action == CUPSD_JOB_DEFAULT && !job->kill_time)
     job->kill_time = time(NULL) + JobKillDelay;
-  else if (action == CUPSD_JOB_FORCE)
+  else if (action >= CUPSD_JOB_FORCE)
     job->kill_time = 0;
 
   for (i = 0; job->filters[i]; i ++)
     if (job->filters[i] > 0)
-      cupsdEndProcess(job->filters[i], action == CUPSD_JOB_FORCE);
+    {
+      cupsdEndProcess(job->filters[i], action >= CUPSD_JOB_FORCE);
+
+      if (action >= CUPSD_JOB_FORCE)
+        job->filters[i] = -job->filters[i];
+    }
 
   if (job->backend > 0)
-    cupsdEndProcess(job->backend, action == CUPSD_JOB_FORCE);
+  {
+    cupsdEndProcess(job->backend, action >= CUPSD_JOB_FORCE);
+
+    if (action >= CUPSD_JOB_FORCE)
+      job->backend = -job->backend;
+  }
+
+  if (action >= CUPSD_JOB_FORCE)
+  {
+   /*
+    * Clear job status...
+    */
+
+    job->status = 0;
+  }
 }
 
 
@@ -4313,7 +4335,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
     * Handle the end of job stuff...
     */
 
-    finalize_job(job);
+    finalize_job(job, 1);
 
    /*
     * Check for new jobs...
