@@ -571,7 +571,7 @@ d 0755 root sys $SERVERROOT -
 d 0755 root $CUPS_GROUP $SERVERROOT/interfaces -
 d 0755 root $CUPS_GROUP $SERVERROOT/ppd -
 d 0700 root $CUPS_GROUP $SERVERROOT/ssl -
-c $CUPS_PERM root $CUPS_GROUP $SERVERROOT conf/*.conf
+c $CUPS_PERM root $CUPS_GROUP $SERVERROOT/ conf/*.conf
 f $CUPS_PERM root $CUPS_GROUP $SERVERROOT/cupsd.conf.default conf/cupsd.conf
 
 %if PAMDIR
@@ -742,7 +742,7 @@ f 0444 root sys $AMANDIR/man$MAN8DIR/cups-lpd.$MAN8EXT man/cups-lpd.$MAN8EXT
 
 # Startup scripts
 %system darwin
-f 0444 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist init/org.cups.cupsd.plist
+f 0444 root sys /System/Library/LaunchDaemons/org.cups.cupsd.plist scheduler/org.cups.cupsd.plist
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cupsd.plist || exit 0
 killall cupsd || exit 0
@@ -755,7 +755,7 @@ EOF
 launchctl load -D system /System/Library/LaunchDaemons/org.cups.cupsd.plist
 EOF
 %subpackage lpd
-f 0444 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist init/org.cups.cups-lpd.plist
+f 0444 root sys /System/Library/LaunchDaemons/org.cups.cups-lpd.plist scheduler/org.cups.cups-lpd.plist
 %preremove <<EOF
 launchctl unload /System/Library/LaunchDaemons/org.cups.cups-lpd.plist || exit 0
 EOF
@@ -769,10 +769,10 @@ EOF
 %subpackage
 
 %system !darwin
-i 0755 root sys cups init/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(@RCLEVELS@)
+i 0755 root sys cups scheduler/cups.sh start(@RCSTART@) stop(@RCSTOP) runlevels(@RCLEVELS@)
 %subpackage lpd
 %if XINETD
-f 0444 root sys $XINETD/cups-lpd init/cups-lpd
+f 0444 root sys $XINETD/cups-lpd scheduler/cups-lpd.xinetd
 %endif
 %subpackage
 

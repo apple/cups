@@ -1,4 +1,5 @@
 _cgiCheckVariables
+_cgiClearVariables
 _cgiCompileSearch
 _cgiCopyTemplateFile
 _cgiCopyTemplateLang

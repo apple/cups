@@ -27,6 +27,14 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+/*
  * Constants...
  */
 
@@ -56,6 +64,10 @@ extern void		cupsBackendReport(const char *device_scheme,
 			                  const char *device_location)
 					  _CUPS_API_1_4;
 			                  
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_BACKEND_H_ */
 

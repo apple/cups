@@ -23,8 +23,6 @@
 	</array>
 	<key>ServiceIPC</key>
 	<true/>
-	<key>SHAuthorizationRight</key>
-	<string>system.preferences</string>
 	<key>Sockets</key>
 	<dict>
 		<key>Listeners</key>

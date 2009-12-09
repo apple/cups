@@ -379,7 +379,7 @@ main(int  argc,				/* I - Number of command-line args */
     * parent's file descriptors to be blocking.  This is a workaround for a
     * limitation of userland libpthread on OpenBSD.
     */
-   
+
     _thread_sys_closefrom(0);
 #endif /* __OpenBSD__ */
 
@@ -807,8 +807,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (timeout == 86400 && Launchd && LaunchdTimeout && !NumPolled &&
         !cupsArrayCount(ActiveJobs) &&
-	(!Browsing || 
-	 (!BrowseRemoteProtocols && 
+	(!Browsing ||
+	 (!BrowseRemoteProtocols &&
 	  (!NumBrowsers || !BrowseLocalProtocols ||
 	   cupsArrayCount(Printers) == 0))))
     {
@@ -1036,6 +1036,7 @@ main(int  argc,				/* I - Number of command-line args */
     if ((current_time - senddoc_time) >= 10)
     {
       cupsdCheckJobs();
+      cupsdCleanJobs();
       senddoc_time = current_time;
     }
 
@@ -1194,8 +1195,8 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_GSSAPI */
 
 #if defined(__APPLE__) && defined(HAVE_DLFCN_H)
- /* 
-  * Unload Print Service quota enforcement library (X Server only) 
+ /*
+  * Unload Print Service quota enforcement library (X Server only)
   */
 
   PSQUpdateQuotaProc = NULL;
@@ -1552,13 +1553,13 @@ launchd_checkin(void)
 
 	if (lis)
 	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, 
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 		  "launchd_checkin: Matched existing listener %s with fd %d...",
 		  httpAddrString(&(lis->address), s, sizeof(s)), fd);
 	}
 	else
 	{
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, 
+	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 		  "launchd_checkin: Adding new listener %s with fd %d...",
 		  httpAddrString(&addr, s, sizeof(s)), fd);
 
@@ -1612,12 +1613,12 @@ launchd_checkout(void)
 
  /*
   * Create or remove the launchd KeepAlive file based on whether
-  * there are active jobs, polling, browsing for remote printers or 
+  * there are active jobs, polling, browsing for remote printers or
   * shared printers to advertise...
   */
 
-  if ((cupsArrayCount(ActiveJobs) || NumPolled || 
-       (Browsing && 
+  if ((cupsArrayCount(ActiveJobs) || NumPolled ||
+       (Browsing &&
 	(BrowseRemoteProtocols ||
         (BrowseLocalProtocols && NumBrowsers && cupsArrayCount(Printers))))))
   {

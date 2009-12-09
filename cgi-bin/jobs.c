@@ -57,6 +57,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiSetVariable("SECTION", "jobs");
+  cgiSetVariable("REFRESH_PAGE", "");
 
  /*
   * Connect to the HTTP server...

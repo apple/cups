@@ -16,7 +16,7 @@ SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
 <TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Startseite&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Verwaltung&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Klassen&nbsp;&nbsp;</A></TD>
-<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;On-Line&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Auftr&auml;ge&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Drucker&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
@@ -31,7 +31,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 
 <H1>Common UNIX Printing System @CUPS_VERSION@</H1>
 
-<P>CUPS ist das auf Standards basierte, Open-Source Drucker System, welches von 
+<P>CUPS ist das auf Standards basierte, Open-Source Drucker System, welches von
 <A HREF="http://www.apple.com/">Apple Inc.</A> f&uuml;r Mac OS<SUP>&reg;</SUP> X und
 andere UNIX<SUP>&reg;</SUP>-&auml;hnliche Betriebssysteme entwickelt wird.</P>
 

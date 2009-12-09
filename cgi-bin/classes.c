@@ -72,6 +72,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiSetVariable("SECTION", "classes");
+  cgiSetVariable("REFRESH_PAGE", "");
 
  /*
   * See if we are displaying a printer or all classes...

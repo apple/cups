@@ -999,7 +999,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 		       DEVICE_PRODUCT, LexmarkProductOID2);
 	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
 	               packet.community, CUPS_ASN1_GET_REQUEST,
-		       DEVICE_URI, LexmarkDeviceIdOID);
+		       DEVICE_ID, LexmarkDeviceIdOID);
 	_cupsSNMPWrite(fd, &(packet.address), CUPS_SNMP_VERSION_1,
 	               packet.community, CUPS_ASN1_GET_REQUEST,
 		       DEVICE_PRODUCT, XeroxProductOID);
@@ -1054,7 +1054,9 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 	break;
 
     case DEVICE_ID :
-	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING)
+	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
+	    (!device->id ||
+	     strlen(device->id) < packet.object_value.string.num_bytes))
 	{
 	 /*
 	  * Update an existing cache entry...
@@ -1107,7 +1109,7 @@ read_snmp_response(int fd)		/* I - SNMP socket file descriptor */
 
     case DEVICE_URI :
 	if (device && packet.object_type == CUPS_ASN1_OCTET_STRING &&
-	    !device->uri)
+	    !device->uri && packet.object_value.string.num_bytes > 0)
 	{
 	 /*
 	  * Update an existing cache entry...

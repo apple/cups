@@ -498,6 +498,7 @@ print_device(const char *uri,		/* I - Device URI */
     {
       _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
       fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
+      registry_close();
       return (CUPS_BACKEND_STOP);
     }
   }
@@ -516,6 +517,7 @@ print_device(const char *uri,		/* I - Device URI */
   {
     _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
     fputs("DEBUG: Couldn't create read thread\n", stderr);
+    registry_close();
     return (CUPS_BACKEND_STOP);
   }
 
@@ -594,13 +596,15 @@ print_device(const char *uri,		/* I - Device URI */
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
 	        "written, aborting\n", stderr);
+          registry_close();
           return (CUPS_BACKEND_OK);
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
 	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	  perror("DEBUG: select");
-	  return (CUPS_BACKEND_FAILED);
+	  registry_close();
+          return (CUPS_BACKEND_FAILED);
 	}
       }
 
@@ -642,6 +646,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  {
 	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
 	    perror("DEBUG: read");
+	    registry_close();
 	    return (CUPS_BACKEND_FAILED);
 	  }
 
@@ -943,7 +948,12 @@ sidechannel_thread(void *reference)
     datalen = sizeof(data);
 
     if (cupsSideChannelRead(&command, &status, data, &datalen, 1.0))
-      break;
+    {
+      if (status == CUPS_SC_STATUS_TIMEOUT)
+	continue;
+      else
+	break;
+    }
 
     switch (command)
     {
@@ -1901,6 +1911,7 @@ static void run_legacy_backend(int argc,
     * Setup a SIGTERM handler then block it before forking...
     */
 
+    int			err;		/* posix_spawn result */
     struct sigaction	action;		/* POSIX signal action */
     sigset_t		newmask,	/* New signal mask */
 			oldmask;	/* Old signal mask */
@@ -1967,10 +1978,11 @@ static void run_legacy_backend(int argc,
 
     my_argv[i] = NULL;
 
-    if (posix_spawn(&child_pid, usbpath, NULL, &attrs, my_argv, environ))
+    if ((err = posix_spawn(&child_pid, usbpath, NULL, &attrs, my_argv,
+                           environ)) != 0)
     {
       fprintf(stderr, "DEBUG: Unable to exec %s: %s\n", usbpath,
-              strerror(errno));
+              strerror(err));
       _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
       exit(CUPS_BACKEND_STOP);
     }

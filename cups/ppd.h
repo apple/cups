@@ -115,7 +115,10 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19/Mac OS X 10.3@ 
   PPD_ILLEGAL_OPTION_KEYWORD,		/* Illegal option keyword string */
   PPD_ILLEGAL_TRANSLATION,		/* Illegal translation string */
   PPD_ILLEGAL_WHITESPACE,		/* Illegal whitespace character */
-  PPD_BAD_CUSTOM_PARAM			/* Bad custom parameter */
+  PPD_BAD_CUSTOM_PARAM,			/* Bad custom parameter */
+  PPD_MISSING_OPTION_KEYWORD,		/* Missing option keyword */
+  PPD_BAD_VALUE,			/* Bad value string */
+  PPD_MAX_STATUS			/* @private@ */
 } ppd_status_t;
 
 enum ppd_conform_e			/**** Conformance Levels @since CUPS 1.1.19/Mac OS X 10.3@ ****/

@@ -241,11 +241,11 @@ static fd_set		cupsd_global_input,
 
 static int		compare_fds(_cupsd_fd_t *a, _cupsd_fd_t *b);
 static _cupsd_fd_t	*find_fd(int fd);
-#define			release_fd(f) { \
+#define		release_fd(f) { \
 			  (f)->use --; \
 			  if (!(f)->use) free((f));\
 			}
-#define			retain_fd(f) (f)->use++
+#define		retain_fd(f) (f)->use++
 
 
 /*
@@ -454,7 +454,7 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     if (fdptr->read_cb && event->filter == EVFILT_READ)
       (*(fdptr->read_cb))(fdptr->data);
 
-    if (fdptr->write_cb && event->filter == EVFILT_WRITE)
+    if (fdptr->use > 1 && fdptr->write_cb && event->filter == EVFILT_WRITE)
       (*(fdptr->write_cb))(fdptr->data);
 
     release_fd(fdptr);
@@ -499,7 +499,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	if (fdptr->read_cb && (event->events & (EPOLLIN | EPOLLERR | EPOLLHUP)))
 	  (*(fdptr->read_cb))(fdptr->data);
 
-	if (fdptr->write_cb && (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)))
+	if (fdptr->use > 1 && fdptr->write_cb &&
+	    (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)))
 	  (*(fdptr->write_cb))(fdptr->data);
 
 	release_fd(fdptr);
@@ -590,7 +591,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       if (fdptr->read_cb && (pfd->revents & (POLLIN | POLLERR | POLLHUP)))
         (*(fdptr->read_cb))(fdptr->data);
 
-      if (fdptr->write_cb && (pfd->revents & (POLLOUT | POLLERR | POLLHUP)))
+      if (fdptr->use > 1 && fdptr->write_cb &&
+          (pfd->revents & (POLLOUT | POLLERR | POLLHUP)))
         (*(fdptr->write_cb))(fdptr->data);
 
       release_fd(fdptr);
@@ -645,7 +647,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
       if (fdptr->read_cb && FD_ISSET(fdptr->fd, &cupsd_current_input))
         (*(fdptr->read_cb))(fdptr->data);
 
-      if (fdptr->write_cb && FD_ISSET(fdptr->fd, &cupsd_current_output))
+      if (fdptr->use > 1 && fdptr->write_cb &&
+          FD_ISSET(fdptr->fd, &cupsd_current_output))
         (*(fdptr->write_cb))(fdptr->data);
 
       release_fd(fdptr);

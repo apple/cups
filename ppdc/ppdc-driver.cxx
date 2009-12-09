@@ -690,7 +690,7 @@ ppdcDriver::write_ppd_file(
       for (int i = 0; i < 9; i ++)
 	_cupsStrFormatd(profile[i], profile[i] + sizeof(profile[0]),
 	                p->profile[i], loc);
-      
+
       cupsFilePrintf(fp,
                      "*cupsColorProfile %s/%s: \"%s %s %s %s %s %s %s %s %s %s "
 		     "%s\"%s", p->resolution->value, p->media_type->value,
@@ -1026,7 +1026,7 @@ ppdcDriver::write_ppd_file(
       if (!o->choices->count)
         continue;
 
-      if (!o->text->value || !strcmp(o->name->value, o->text->value))
+      if (!o->text->value)
 	cupsFilePrintf(fp, "*OpenUI *%s/%s: ", o->name->value,
 	               catalog->find_message(o->name->value));
       else
@@ -1093,9 +1093,9 @@ ppdcDriver::write_ppd_file(
 	   c = (ppdcChoice *)o->choices->next())
       {
         // Write this choice...
-	if (!c->text->value || !strcmp(c->name->value, c->text->value))
-          cupsFilePrintf(fp, "*%s %s: \"%s\"%s", o->name->value,
-	                 catalog->find_message(c->name->value),
+	if (!c->text->value)
+          cupsFilePrintf(fp, "*%s %s/%s: \"%s\"%s", o->name->value,
+                         c->name->value, catalog->find_message(c->name->value),
 	        	 c->code->value, lf);
         else
           cupsFilePrintf(fp, "*%s %s/%s: \"%s\"%s", o->name->value,
@@ -1138,10 +1138,11 @@ ppdcDriver::write_ppd_file(
 	  if (!a->selector->value || !a->selector->value[0])
 	    cupsFilePrintf(fp, "*%s", a->name->value);
 	  else if (!a->text->value || !a->text->value[0])
-	    cupsFilePrintf(fp, "*%s %s", a->name->value, a->selector->value);
+	    cupsFilePrintf(fp, "*%s %s/%s", a->name->value, a->selector->value,
+	                   catalog->find_message(a->selector->value));
 	  else
 	    cupsFilePrintf(fp, "*%s %s/%s", a->name->value, a->selector->value,
-			   a->text->value);
+			   catalog->find_message(a->text->value));
 
           cupsFilePrintf(fp, ": %s%s", a->value->value, lf);
 	}
@@ -1278,12 +1279,8 @@ ppdcDriver::write_ppd_file(
       // Finally the localizable attributes...
       for (a = (ppdcAttr *)attrs->first(); a; a = (ppdcAttr *)attrs->next())
       {
-        if ((!a->text || !a->text->value || !a->text->value[0]) &&
-	    strncmp(a->name->value, "Custom", 6) &&
-	    strncmp(a->name->value, "ParamCustom", 11))
-	  continue;
-
         if (!a->localizable &&
+	    (!a->text || !a->text->value || !a->text->value[0]) &&
 	    strcmp(a->name->value, "APCustomColorMatchingName") &&
 	    strcmp(a->name->value, "APPrinterPreset") &&
 	    strcmp(a->name->value, "cupsICCProfile") &&
@@ -1291,7 +1288,7 @@ ppdcDriver::write_ppd_file(
 	    strcmp(a->name->value, "cupsMarkerName") &&
 	    strncmp(a->name->value, "Custom", 6) &&
 	    strncmp(a->name->value, "ParamCustom", 11))
-          continue;
+	  continue;
 
         cupsFilePrintf(fp, "*%s.%s %s/%s: \"%s\"%s", locale->value,
 	               a->name->value, a->selector->value,

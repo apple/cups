@@ -3,7 +3,7 @@
  *
  *   IEEE-1284 support functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,26 +26,6 @@
  */
 
 #include "backend-private.h"
-
-#ifdef __linux
-#  include <sys/ioctl.h>
-#  include <linux/lp.h>
-#  define IOCNR_GET_DEVICE_ID		1
-#  define LPIOC_GET_DEVICE_ID(len)	_IOC(_IOC_READ, 'P', IOCNR_GET_DEVICE_ID, len)
-#  include <linux/parport.h>
-#  include <linux/ppdev.h>
-#  include <unistd.h>
-#  include <fcntl.h>
-#endif /* __linux */
-
-#ifdef __sun
-#  ifdef __sparc
-#    include <sys/ecppio.h>
-#  else
-#    include <sys/ioccom.h>
-#    include <sys/ecppsys.h>
-#  endif /* __sparc */
-#endif /* __sun */
 
 
 /*

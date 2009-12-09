@@ -49,14 +49,6 @@
 
 
 /*
- * Local globals...
- */
-
-static int	current_device;		/* Current device for add/modify */
-static time_t	last_device_time;	/* Last update time for device list */
-
-
-/*
  * Local functions...
  */
 
@@ -65,7 +57,7 @@ static void	choose_device_cb(const char *device_class,
                                  const char *device_make_and_model,
                                  const char *device_uri,
                                  const char *device_location,
-				 const char *title);
+				 int *current_device);
 static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
@@ -122,6 +114,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   cgiSetVariable("SECTION", "admin");
+  cgiSetVariable("REFRESH_PAGE", "");
 
  /*
   * See if we have form data...
@@ -191,7 +184,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (op && !strcmp(op, "redirect"))
   {
-    const char *url;			/* Redirection URL... */
+    const char	*url;			/* Redirection URL... */
     char	prefix[1024];		/* URL prefix */
 
 
@@ -205,7 +198,50 @@ main(int  argc,				/* I - Number of command-line arguments */
     fprintf(stderr, "DEBUG: redirecting with prefix %s!\n", prefix);
 
     if ((url = cgiGetVariable("URL")) != NULL)
-      printf("Location: %s%s\n\n", prefix, url);
+    {
+      char	encoded[1024],		/* Encoded URL string */
+      		*ptr;			/* Pointer into encoded string */
+
+
+      ptr = encoded;
+      if (*url != '/')
+        *ptr++ = '/';
+
+      for (; *url && ptr < (encoded + sizeof(encoded) - 4); url ++)
+      {
+        if (strchr("%@&+ <>#=", *url) || *url < ' ' || *url & 128)
+	{
+	 /*
+	  * Percent-encode this character; safe because we have at least 4
+	  * bytes left in the array...
+	  */
+
+	  sprintf(ptr, "%%%02X", *url & 255);
+	  ptr += 3;
+	}
+	else
+	  *ptr++ = *url;
+      }
+
+      *ptr = '\0';
+
+      if (*url)
+      {
+       /*
+        * URL was too long, just redirect to the admin page...
+	*/
+
+	printf("Location: %s/admin\n\n", prefix);
+      }
+      else
+      {
+       /*
+        * URL is OK, redirect there...
+	*/
+
+        printf("Location: %s%s\n\n", prefix, encoded);
+      }
+    }
     else
       printf("Location: %s/admin\n\n", prefix);
   }
@@ -246,37 +282,20 @@ choose_device_cb(
     const char *device_make_and_model,	/* I - Make and model */
     const char *device_uri,		/* I - Device URI */
     const char *device_location,	/* I - Location */
-    const char *title)			/* I - Page title */
+    int        *current_device)		/* I - Current device index */
 {
  /*
   * Add the device to the array...
   */
 
-  cgiSetArray("device_class", current_device, device_class);
-  cgiSetArray("device_id", current_device, device_id);
-  cgiSetArray("device_info", current_device, device_info);
-  cgiSetArray("device_make_and_model", current_device, device_make_and_model);
-  cgiSetArray("device_uri", current_device, device_uri);
-  cgiSetArray("device_location", current_device, device_location);
+  cgiSetArray("device_class", *current_device, device_class);
+  cgiSetArray("device_id", *current_device, device_id);
+  cgiSetArray("device_info", *current_device, device_info);
+  cgiSetArray("device_make_and_model", *current_device, device_make_and_model);
+  cgiSetArray("device_uri", *current_device, device_uri);
+  cgiSetArray("device_location", *current_device, device_location);
 
-  current_device ++;
-
-  if (time(NULL) > last_device_time && cgiSupportsMultipart())
-  {
-   /*
-    * Update the page...
-    */
-
-    if (!last_device_time)
-      cgiStartMultipart();
-
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("choose-device.tmpl");
-    cgiEndHTML();
-    fflush(stdout);
-
-    time(&last_device_time);
-  }
+  (*current_device) ++;
 }
 
 
@@ -344,6 +363,31 @@ do_add_rss_subscription(http_t *http)	/* I - HTTP connection */
     * Don't have everything we need, so get the available printers
     * and classes and (re)show the add page...
     */
+
+    if (cgiGetVariable("EVENT_JOB_CREATED"))
+      cgiSetVariable("EVENT_JOB_CREATED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_COMPLETED"))
+      cgiSetVariable("EVENT_JOB_COMPLETED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_STOPPED"))
+      cgiSetVariable("EVENT_JOB_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_JOB_CONFIG_CHANGED"))
+      cgiSetVariable("EVENT_JOB_CONFIG_CHANGED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_STOPPED"))
+      cgiSetVariable("EVENT_PRINTER_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_ADDED"))
+      cgiSetVariable("EVENT_PRINTER_ADDED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_MODIFIED"))
+      cgiSetVariable("EVENT_PRINTER_MODIFIED", "CHECKED");
+    if (cgiGetVariable("EVENT_PRINTER_DELETED"))
+      cgiSetVariable("EVENT_PRINTER_DELETED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_STARTED"))
+      cgiSetVariable("EVENT_SERVER_STARTED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_STOPPED"))
+      cgiSetVariable("EVENT_SERVER_STOPPED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_RESTARTED"))
+      cgiSetVariable("EVENT_SERVER_RESTARTED", "CHECKED");
+    if (cgiGetVariable("EVENT_SERVER_AUDIT"))
+      cgiSetVariable("EVENT_SERVER_AUDIT", "CHECKED");
 
     request  = ippNewRequest(CUPS_GET_PRINTERS);
     response = cupsDoRequest(http, request, "/");
@@ -467,6 +511,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
   ipp_attribute_t *attr;		/* member-uris attribute */
   char		uri[HTTP_MAX_URI];	/* Device or printer URI */
   const char	*name,			/* Pointer to class name */
+		*op,			/* Operation name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
   static const char * const pattrs[] =	/* Requested printer attributes */
@@ -478,6 +523,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
 
 
   title = cgiText(modify ? _("Modify Class") : _("Add Class"));
+  op    = cgiGetVariable("OP");
   name  = cgiGetVariable("PRINTER_NAME");
 
   if (cgiGetVariable("PRINTER_LOCATION") == NULL)
@@ -501,6 +547,12 @@ do_am_class(http_t *http,		/* I - HTTP connection */
    /*
     * Do the request and get back a response...
     */
+
+    cgiClearVariables();
+    if (op)
+      cgiSetVariable("OP", op);
+    if (name)
+      cgiSetVariable("PRINTER_NAME", name);
 
     if ((response = cupsDoRequest(http, request, "/")) != NULL)
     {
@@ -764,6 +816,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
+  int		current_device;		/* Index of current device */
   static int	baudrates[] =		/* Baud rates */
 		{
 		  1200,
@@ -924,31 +977,42 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     }
 
    /*
-    * Scan for devices for up to 30 seconds, updating the page as we find
-    * them...
+    * For modern browsers, start a multi-part page so we can show that something
+    * is happening.  Non-modern browsers just get everything at the end...
+    */
+
+    if (cgiSupportsMultipart())
+    {
+      cgiStartMultipart();
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("choose-device.tmpl");
+      cgiEndHTML();
+      fflush(stdout);
+    }
+
+   /*
+    * Scan for devices for up to 30 seconds...
     */
 
     fputs("DEBUG: Getting list of devices...\n", stderr);
 
-    last_device_time = 0;
-    current_device   = 0;
+    current_device = 0;
     if (cupsGetDevices(http, 30, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
                        (cups_device_cb_t)choose_device_cb,
-		       (void *)title) == IPP_OK)
+		       &current_device) == IPP_OK)
     {
       fputs("DEBUG: Got device list!\n", stderr);
 
-      if (!cgiSupportsMultipart())
-      {
-       /*
-        * Non-modern browsers that don't support multi-part documents get
-	* everything at the end...
-	*/
+      if (cgiSupportsMultipart())
+        cgiStartMultipart();
 
-	cgiStartHTML(title);
-	cgiCopyTemplateLang("choose-device.tmpl");
-	cgiEndHTML();
-      }
+      cgiSetVariable("CUPS_GET_DEVICES_DONE", "1");
+      cgiStartHTML(title);
+      cgiCopyTemplateLang("choose-device.tmpl");
+      cgiEndHTML();
+
+      if (cgiSupportsMultipart())
+        cgiEndMultipart();
     }
     else
     {
@@ -969,16 +1033,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         return;
       }
     }
-
-   /*
-    * Show the final selection page...
-    */
-
-    cgiSetVariable("CUPS_GET_DEVICES_DONE", "1");
-    cgiStartHTML(title);
-    cgiCopyTemplateLang("choose-device.tmpl");
-    cgiEndHTML();
-    cgiEndMultipart();
   }
   else if (strchr(var, '/') == NULL)
   {
@@ -1044,6 +1098,11 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
         if ((attr = ippFindAttribute(oldinfo, "printer-location",
 	                             IPP_TAG_TEXT)) != NULL)
           cgiSetVariable("PRINTER_LOCATION", attr->values[0].string.text);
+
+	if ((attr = ippFindAttribute(oldinfo, "printer-is-shared",
+				     IPP_TAG_BOOLEAN)) != NULL)
+	  cgiSetVariable("PRINTER_IS_SHARED",
+			 attr->values[0].boolean ? "1" : "0");
       }
 
       cgiCopyTemplateLang("modify-printer.tmpl");
@@ -1179,7 +1238,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       * Got the list of PPDs, see if the user has selected a make...
       */
 
-      if (cgiSetIPPVars(response, NULL, NULL, NULL, 0) == 0)
+      if (cgiSetIPPVars(response, NULL, NULL, NULL, 0) == 0 && !modify)
       {
        /*
         * No PPD files with this make, try again with all makes...
@@ -1215,8 +1274,11 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	*/
 
         cgiStartHTML(title);
-	cgiSetVariable("CURRENT_MAKE_AND_MODEL",
-	               cgiGetArray("PPD_MAKE_AND_MODEL", 0));
+	if (!cgiGetVariable("PPD_MAKE"))
+	  cgiSetVariable("PPD_MAKE", cgiGetVariable("CURRENT_MAKE"));
+	if (!modify)
+	  cgiSetVariable("CURRENT_MAKE_AND_MODEL",
+	                 cgiGetArray("PPD_MAKE_AND_MODEL", 0));
 	cgiCopyTemplateLang("choose-model.tmpl");
         cgiEndHTML();
       }
@@ -1508,7 +1570,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 #ifdef HAVE_GSSAPI
     char		default_auth_type[255];
 					/* DefaultAuthType value */
-    const char		*val;		/* Setting value */ 
+    const char		*val;		/* Setting value */
 #endif /* HAVE_GSSAPI */
 
 
@@ -1580,7 +1642,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
 	  strcat(local_protocols, "slp");
       }
 #endif /* HAVE_SLP */
-      
+
       if (cgiGetVariable("BROWSE_REMOTE_CUPS"))
 	strcpy(remote_protocols, "cups");
       else
@@ -1833,7 +1895,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
-      
+
       perror(tempfile);
       return;
     }
@@ -1845,7 +1907,7 @@ do_config_server(http_t *http)		/* I - HTTP connection */
       cgiSetVariable("ERROR", strerror(errno));
       cgiCopyTemplateLang("error.tmpl");
       cgiEndHTML();
-      
+
       perror(tempfile);
       close(tempfd);
       unlink(tempfile);
@@ -2621,7 +2683,9 @@ do_menu(http_t *http)			/* I - HTTP connection */
   if ((val = cupsGetOption("DefaultAuthType", num_settings,
                            settings)) != NULL && !strcasecmp(val, "Negotiate"))
     cgiSetVariable("KERBEROS", "CHECKED");
+  else
 #endif /* HAVE_GSSAPI */
+  cgiSetVariable("KERBEROS", "");
 
 #ifdef HAVE_DNSSD
   cgiSetVariable("HAVE_DNSSD", "1");
@@ -3233,11 +3297,16 @@ do_set_options(http_t *http,		/* I - HTTP connection */
     for (option = ppdFirstOption(ppd);
          option;
 	 option = ppdNextOption(ppd))
+    {
       if ((var = cgiGetVariable(option->keyword)) != NULL)
       {
 	have_options = 1;
 	ppdMarkOption(ppd, option->keyword, var);
+	fprintf(stderr, "DEBUG: Set %s to %s...\n", option->keyword, var);
       }
+      else
+        fprintf(stderr, "DEBUG: Didn't find %s...\n", option->keyword);
+    }
   }
 
   if (!have_options || ppdConflicts(ppd))
@@ -3258,7 +3327,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
           ((ppdattr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
            ppdattr->value && strstr(ppdattr->value, "AutoConfigure")))
         cgiSetVariable("HAVE_AUTOCONFIGURE", "YES");
-      else 
+      else
       {
         for (i = 0; i < ppd->num_filters; i ++)
 	  if (!strncmp(ppd->filters[i], "application/vnd.cups-postscript", 31))
@@ -3344,6 +3413,16 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	    {
 	      cgiSetArray("ckeyword", k, option->keyword);
 	      cgiSetArray("ckeytext", k, option->text);
+
+	      for (m = 0; m < option->num_choices; m ++)
+	      {
+	        if (option->choices[m].marked)
+	        {
+	          cgiSetArray("cchoice", k, option->choices[m].text);
+	          break;
+	        }
+              }
+
 	      k ++;
 	    }
 
@@ -3362,7 +3441,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  cgiSetVariable("GROUP", group->text);
 
 	cgiCopyTemplateLang("option-header.tmpl");
-	
+
 	for (j = group->num_options, option = group->options;
 	     j > 0;
 	     j --, option ++)
@@ -4006,7 +4085,7 @@ get_option_value(
 
     snprintf(buffer, bufsize, "Custom.%gx%g%s", width, length, uval);
   }
-  else if (cupsArrayCount(coption->params) == 1) 
+  else if (cupsArrayCount(coption->params) == 1)
   {
     cparam = ppdFirstCustomParam(coption);
     snprintf(keyword, sizeof(keyword), "%s.%s", coption->keyword, cparam->name);

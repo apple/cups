@@ -1,8 +1,64 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.3
+
+	- SECURITY: The scheduler could try responding on a closed client
+	  connection, leading to a crash (STR #3200)
+	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- The scheduler would crash when an active printer was deleted.
+	- The snmp backend did not work with some printers (STR #3413)
+	- The web interface did not show the conflicting values when setting
+	  options (STR #3440)
+	- Setting options in the web interface did not always work (STR #3439)
+	- The scheduler did not use the Get-Job-Attributes policy for a printer
+	  (STR #3431)
+	- The scheduler added two job-name attributes to each job object
+	  (STR #3428)
+	- CSS files would not print (STR #3442)
+	- The scheduler did not clean out completed jobs when PreserveJobHistory
+	  was turned off (STR #3425)
+	- The web interface did not show completed jobs for a printer
+	  (STR #3436)
+	- Authenticated printing did not always work when printing directly to
+	  a remote server (STR #3435)
+	- The USB backend did not work on Solaris (STR #3423)
+	- cupstestppd didn't catch problems with JobPatchFile definitions
+	  (STR #3421)
+	- The socket backend could crash if a SNMP string had a negative length.
+	- Fixed some termination issues with the USB backend on Mac OS X.
+	- The side-channel APIs did not handle interrupts properly.
+	- The network backends incorrectly cleared the media-empty-warning
+	  state.
+	- The web interface did not allow users to successfully add serial
+	  printers (STR #3391)
+	- cupsTempFd() did not work in some situations (STR #3382)
+	- Some C API headers were missing C++ wrapper logic.
+	- The PPD compiler did not localize single-language PPD options properly
+	  (STR #3386)
+	- Modifying a printer from the web interface sometimes caused the wrong
+	  driver to be selected (STR #3418)
+	- The scheduler did not handle out-of-memory conditions properly when
+	  loading a job (STR #3407)
+	- When adding printers from the web interface, the dynamic updates of
+	  the device list made it hard to pick a device (STR #3406)
+	- Fixed a typo in the web interface admin page template (STR 3403)
+	- The web interface did not preserve the "printer is shared" state when
+	  modifying a printer (STR #3390)
+	- The PPD compiler incorrectly inserted translations of empty strings
+	  (STR #3411)
+	- The scheduler did not reset the SIGPIPE handler of child processes
+	  (STR #3399)
+	- cupsGetNamedDest() incorrectly returned the default printer if the
+	  named printer did not exist (STR #3397)
+	- Fixed a GNU TLS error handling bug (STR #3381)
+
+
 CHANGES IN CUPS V1.4.2
 
+	- SECURITY: The CUPS web interface was vulnerable to several XSS and
+	  HTTP header/body attacks via attribute injection (STR #3367,
+	  STR #3401)
 	- Fixed localization errors (STR #3359, STR #3372, STR #3380, STR #3387)
 	- The documentation for classes.conf and printers.conf did not provide
 	  the correct instructions for manual changes (STR #3351)

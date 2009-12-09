@@ -842,6 +842,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
 
   if (!strcasecmp(option, "AP_D_InputSlot"))
   {
+    cupsArraySave(ppd->options);
+
     if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
     {
       key.option = o;
@@ -851,13 +853,21 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
         cupsArrayRemove(ppd->marked, oldc);
       }
     }
+
+    cupsArrayRestore(ppd->options);
   }
 
  /*
   * Check for custom options...
   */
 
-  if ((o = ppdFindOption(ppd, option)) == NULL)
+  cupsArraySave(ppd->options);
+
+  o = ppdFindOption(ppd, option);
+
+  cupsArrayRestore(ppd->options);
+
+  if (!o)
     return;
 
   loc = localeconv();
@@ -912,15 +922,15 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
               if (units)
 	      {
         	if (!strcasecmp(units, "cm"))
-	          cparam->current.custom_points *= 72.0f / 2.54f;	      
+	          cparam->current.custom_points *= 72.0f / 2.54f;
         	else if (!strcasecmp(units, "mm"))
-	          cparam->current.custom_points *= 72.0f / 25.4f;	      
+	          cparam->current.custom_points *= 72.0f / 25.4f;
         	else if (!strcasecmp(units, "m"))
-	          cparam->current.custom_points *= 72.0f / 0.0254f;	      
+	          cparam->current.custom_points *= 72.0f / 0.0254f;
         	else if (!strcasecmp(units, "in"))
-	          cparam->current.custom_points *= 72.0f;	      
+	          cparam->current.custom_points *= 72.0f;
         	else if (!strcasecmp(units, "ft"))
-	          cparam->current.custom_points *= 12.0f * 72.0f;	      
+	          cparam->current.custom_points *= 12.0f * 72.0f;
               }
 	      break;
 
@@ -1060,6 +1070,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
       * appropriate...
       */
 
+      cupsArraySave(ppd->options);
+
       if (!strcasecmp(option, "PageSize"))
       {
 	if ((o = ppdFindOption(ppd, "PageRegion")) != NULL)
@@ -1084,12 +1096,16 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
           }
         }
       }
+
+      cupsArrayRestore(ppd->options);
     }
     else if (!strcasecmp(option, "InputSlot"))
     {
      /*
       * Unmark ManualFeed option...
       */
+
+      cupsArraySave(ppd->options);
 
       if ((o = ppdFindOption(ppd, "ManualFeed")) != NULL)
       {
@@ -1100,6 +1116,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
           cupsArrayRemove(ppd->marked, oldc);
         }
       }
+
+      cupsArrayRestore(ppd->options);
     }
     else if (!strcasecmp(option, "ManualFeed") &&
 	     !strcasecmp(choice, "True"))
@@ -1107,6 +1125,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
      /*
       * Unmark InputSlot option...
       */
+
+      cupsArraySave(ppd->options);
 
       if ((o = ppdFindOption(ppd, "InputSlot")) != NULL)
       {
@@ -1117,6 +1137,8 @@ ppd_mark_option(ppd_file_t *ppd,	/* I - PPD file */
           cupsArrayRemove(ppd->marked, oldc);
         }
       }
+
+      cupsArrayRestore(ppd->options);
     }
   }
 
@@ -1197,7 +1219,7 @@ ppd_mark_size(ppd_file_t *ppd,		/* I - PPD file */
       return;
   }
   else
-    return;    
+    return;
 
  /*
   * Search the PPD file for a matching size...

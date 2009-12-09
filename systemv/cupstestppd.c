@@ -69,7 +69,8 @@ enum
   WARN_TRANSLATIONS = 16,
   WARN_DUPLEX = 32,
   WARN_SIZES = 64,
-  WARN_ALL = 127
+  WARN_FILENAME = 128,
+  WARN_ALL = 255
 };
 
 
@@ -369,6 +370,8 @@ main(int  argc,				/* I - Number of command-line args */
 
               if (!strcmp(argv[i], "none"))
 	        ignore = WARN_NONE;
+	      else if (!strcmp(argv[i], "filename"))
+	        ignore |= WARN_FILENAME;
 	      else if (!strcmp(argv[i], "filters"))
 	        ignore |= WARN_FILTERS;
 	      else if (!strcmp(argv[i], "profiles"))
@@ -999,7 +1002,7 @@ main(int  argc,				/* I - Number of command-line args */
 	if (verbose > 0)
           _cupsLangPuts(stdout, _("        PASS    PCFileName\n"));
       }
-      else
+      else if (!(ignore & WARN_FILENAME))
       {
 	if (verbose >= 0)
 	{
@@ -1523,12 +1526,23 @@ main(int  argc,				/* I - Number of command-line args */
 	* a warning and not a hard error...
 	*/
 
-	if (ppd->pcfilename && strlen(ppd->pcfilename) > 12)
-	{
-	  _cupsLangPuts(stdout,
-	                _("        WARN    PCFileName longer than 8.3 in "
-			  "violation of PPD spec.\n"
-			  "                REF: Pages 61-62, section 5.3.\n"));
+        if (!(ignore & WARN_FILENAME) && ppd->pcfilename)
+        {
+	  if (strlen(ppd->pcfilename) > 12)
+	  {
+	    _cupsLangPuts(stdout,
+			  _("        WARN    PCFileName longer than 8.3 in "
+			    "violation of PPD spec.\n"
+			    "                REF: Pages 61-62, section "
+			    "5.3.\n"));
+	  }
+
+	  if (!strcasecmp(ppd->pcfilename, "unused.ppd"))
+	    _cupsLangPuts(stdout,
+	                  _("        WARN    PCFileName should contain a "
+	                    "unique filename.\n"
+			    "                REF: Pages 61-62, section "
+			    "5.3.\n"));
         }
 
         if (!ppd->shortnickname && ppdversion < 43)
@@ -3653,8 +3667,8 @@ usage(void)
 		  "\n"
 		  "Options:\n"
 		  "\n"
-		  "    -I {filters,profiles}\n"
-		  "                         Ignore missing files\n"
+		  "    -I {filename,filters,none,profiles}\n"
+		  "                         Ignore specific warnings\n"
 		  "    -R root-directory    Set alternate root\n"
 		  "    -W {all,none,constraints,defaults,duplex,filters,"
 		  "profiles,sizes,translations}\n"

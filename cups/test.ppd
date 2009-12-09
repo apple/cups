@@ -39,7 +39,7 @@
 *Throughput:	"1"
 *LandscapeOrientation: Plus90
 *TTRasterizer:	Type42
-*cupsFilter: "application/vnd.cups-raster - 0"
+*cupsFilter: "application/vnd.cups-raster 0 -"
 *RequiresPageRegion All: True
 
 *% These constraints are used to test ppdConflicts() and cupsResolveConflicts()

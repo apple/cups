@@ -583,8 +583,12 @@ ppdConflicts(ppd_file_t *ppd)		/* I - PPD to check */
   * Clear all conflicts...
   */
 
+  cupsArraySave(ppd->options);
+
   for (o = ppdFirstOption(ppd); o; o = ppdNextOption(ppd))
     o->conflicted = 0;
+
+  cupsArrayRestore(ppd->options);
 
  /*
   * Test for conflicts...
@@ -641,7 +645,7 @@ ppdInstallableConflict(
   DEBUG_printf(("2ppdInstallableConflict(ppd=%p, option=\"%s\", choice=\"%s\")",
                 ppd, option, choice));
 
- /* 
+ /*
   * Range check input...
   */
 

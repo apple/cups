@@ -147,6 +147,7 @@ backendRunLoop(
     int         snmp_fd,		/* I - SNMP socket or -1 if none */
     http_addr_t *addr,			/* I - Address of device */
     int         use_bc,			/* I - Use back-channel? */
+    int         update_state,		/* I - Update printer-state-reasons? */
     int         (*side_cb)(int, int, int, http_addr_t *, int))
 					/* I - Side-channel callback */
 {
@@ -245,7 +246,7 @@ backendRunLoop(
 	* Pause printing to clear any pending errors...
 	*/
 
-	if (errno == ENXIO && offline != 1)
+	if (errno == ENXIO && offline != 1 && update_state)
 	{
 	  fputs("STATE: +offline-report\n", stderr);
 	  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
@@ -351,7 +352,7 @@ backendRunLoop(
 
         if (errno == ENOSPC)
 	{
-	  if (paperout != 1)
+	  if (paperout != 1 && update_state)
 	  {
 	    fputs("STATE: +media-empty-warning\n", stderr);
 	    _cupsLangPuts(stderr, _("ERROR: Out of paper\n"));
@@ -360,7 +361,7 @@ backendRunLoop(
         }
 	else if (errno == ENXIO)
 	{
-	  if (offline != 1)
+	  if (offline != 1 && update_state)
 	  {
 	    fputs("STATE: +offline-report\n", stderr);
 	    _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
@@ -376,13 +377,13 @@ backendRunLoop(
       }
       else
       {
-        if (paperout)
+        if (paperout && update_state)
 	{
 	  fputs("STATE: -media-empty-warning\n", stderr);
 	  paperout = 0;
 	}
 
-	if (offline)
+	if (offline && update_state)
 	{
 	  fputs("STATE: -offline-report\n", stderr);
 	  _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));

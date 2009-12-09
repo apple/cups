@@ -275,11 +275,6 @@ ln -s $root/data/*.h /tmp/cups-$user/share/ppdc
 ln -s $root/data/*.defs /tmp/cups-$user/share/ppdc
 ln -s $root/templates /tmp/cups-$user/share
 
-if test $ssltype != 0; then
-	mkdir $root/ssl
-	cp server.* $root/ssl
-fi
-
 #
 # Mac OS X filters and configuration files...
 #
@@ -437,6 +432,7 @@ fi
 
 export SHLIB_PATH
 
+CUPS_DISABLE_APPLE_DEFAULT=yes; export CUPS_DISABLE_APPLE_DEFAULT
 CUPS_SERVER=localhost:8631; export CUPS_SERVER
 CUPS_SERVERROOT=/tmp/cups-$user; export CUPS_SERVERROOT
 CUPS_STATEDIR=/tmp/cups-$user; export CUPS_STATEDIR

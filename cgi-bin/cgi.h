@@ -34,6 +34,14 @@
 
 
 /*
+ * C++ magic...
+ */
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* __cplusplus */
+
+/*
  * Types...
  */
 
@@ -54,6 +62,7 @@ typedef struct cgi_file_s		/**** Uploaded file data ****/
 extern void		cgiAbort(const char *title, const char *stylesheet,
 			         const char *format, ...);
 extern int		cgiCheckVariables(const char *names);
+extern void		cgiClearVariables(void);
 extern void		*cgiCompileSearch(const char *query);
 extern void		cgiCopyTemplateFile(FILE *out, const char *tmpl);
 extern void		cgiCopyTemplateLang(const char *tmpl);
@@ -97,6 +106,10 @@ extern void		cgiStartHTML(const char *title);
 extern void		cgiStartMultipart(void);
 extern int		cgiSupportsMultipart(void);
 extern const char	*cgiText(const char *message);
+
+#  ifdef __cplusplus
+}
+#  endif /* __cplusplus */
 
 #endif /* !_CUPS_CGI_H_ */
 

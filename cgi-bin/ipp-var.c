@@ -333,7 +333,7 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
                    NULL, job_uri);
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
                    "requested-attributes", NULL, "job-printer-uri");
-      
+
       if ((response = cupsDoRequest(http, request, "/")) != NULL)
       {
         if ((attr = ippFindAttribute(response, "job-printer-uri",
@@ -926,7 +926,7 @@ cgiRewriteURL(const char *uri,		/* I - Current URI */
 		 ishttps ? "https" : "http",
 		 userpass, hostname, port, resource);
       else
-	snprintf(url, urlsize, "%s://%s:%d%s", 
+	snprintf(url, urlsize, "%s://%s:%d%s",
 		 ishttps ? "https" : "http",
 		 hostname, port, resource);
     }
@@ -1398,7 +1398,9 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
   int			ascending,	/* Order of jobs (0 = descending) */
 			first,		/* First job to show */
 			count;		/* Number of jobs */
-  const char		*var;		/* Form variable */
+  const char		*var,		/* Form variable */
+			*query,		/* Query string */
+			*section;	/* Section in web interface */
   void			*search;	/* Search data */
   char			url[1024],	/* Printer URI */
 			val[1024];	/* Form variable */
@@ -1442,11 +1444,14 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     * Get a list of matching job objects.
     */
 
-    if ((var = cgiGetVariable("QUERY")) != NULL &&
+    if ((query = cgiGetVariable("QUERY")) != NULL &&
         !cgiGetVariable("CLEAR"))
-      search = cgiCompileSearch(var);
+      search = cgiCompileSearch(query);
     else
+    {
+      query  = NULL;
       search = NULL;
+    }
 
     jobs  = cgiGetIPPObjects(response, search);
     count = cupsArrayCount(jobs);
@@ -1471,16 +1476,27 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     if (first < 0)
       first = 0;
 
-    sprintf(val, "%d", count);
-    cgiSetVariable("TOTAL", val);
-
     if ((var = cgiGetVariable("ORDER")) != NULL)
       ascending = !strcasecmp(var, "asc");
     else
-    {
       ascending = !which_jobs || !strcasecmp(which_jobs, "not-completed");
-      cgiSetVariable("ORDER", ascending ? "asc" : "dec");
-    }
+
+    section = cgiGetVariable("SECTION");
+
+    cgiClearVariables();
+
+    if (query)
+      cgiSetVariable("QUERY", query);
+
+    cgiSetVariable("ORDER", ascending ? "asc" : "dec");
+
+    cgiSetVariable("SECTION", section);
+
+    sprintf(val, "%d", count);
+    cgiSetVariable("TOTAL", val);
+
+    if (which_jobs)
+      cgiSetVariable("WHICH_JOBS", which_jobs);
 
     if (ascending)
     {
@@ -1502,7 +1518,11 @@ cgiShowJobs(http_t     *http,		/* I - Connection to server */
     */
 
     if (dest)
-      snprintf(val, sizeof(val), "/%s/%s",  cgiGetVariable("SECTION"), dest);
+    {
+      snprintf(val, sizeof(val), "/%s/%s", section, dest);
+      cgiSetVariable("PRINTER_NAME", dest);
+      cgiSetVariable("PRINTER_URI_SUPPORTED", val);
+    }
     else
       strlcpy(val, "/jobs/", sizeof(val));
 

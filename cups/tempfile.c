@@ -118,8 +118,8 @@ cupsTempFd(char *filename,		/* I - Pointer to buffer */
     * Format a string using the hex time values...
     */
 
-    snprintf(filename, len - 1, "%s/%08lx%05lx", tmpdir,
-             (unsigned long)curtime.tv_sec, (unsigned long)curtime.tv_usec);
+    snprintf(filename, len - 1, "%s/%05x%08lx", tmpdir, (unsigned)getpid(),
+             (unsigned long)(curtime.tv_sec + curtime.tv_usec + tries));
 #endif /* WIN32 */
 
    /*
