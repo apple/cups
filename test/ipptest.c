@@ -33,12 +33,17 @@
 
 #include <cups/cups.h>
 #include <cups/language.h>
+#include <cups/http-private.h>
+#ifndef O_BINARY
+#  define O_BINARY 0
+#endif /* !O_BINARY */
 
 
 /*
  * Globals...
  */
 
+int		Chunking = 0;		/* Use chunked requests */
 int		Verbosity = 0;		/* Show all attributes? */
 
 
@@ -46,13 +51,12 @@ int		Verbosity = 0;		/* Show all attributes? */
  * Local functions...
  */
 
-int		do_tests(const char *, const char *);
-ipp_op_t	ippOpValue(const char *);
-ipp_status_t	ippErrorValue(const char *);
-char		*get_token(FILE *, char *, int, int *linenum);
-void		print_attr(ipp_attribute_t *);
-void		print_col(ipp_t *col);
-void		usage(const char *option);
+static int	do_tests(const char *uri, const char *testfile);
+static char	*get_token(FILE *fp, char *buf, int buflen,
+		           int *linenum);
+static void	print_attr(ipp_attribute_t *attr);
+static void	print_col(ipp_t *col);
+static void	usage(void);
 
 
 /*
@@ -60,13 +64,14 @@ void		usage(const char *option);
  */
 
 int					/* O - Exit status */
-main(int  argc,				/* I - Number of command-line arguments */
+main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		i;			/* Looping var */
   int		status;			/* Status of tests... */
-  const char	*uri;			/* URI to use */
-  const char	*testfile;		/* Test file to use */
+  char		*opt;			/* Current option */
+  const char	*uri,			/* URI to use */
+		*testfile;		/* Test file to use */
   int		interval;		/* Test interval */
 
 
@@ -85,28 +90,48 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if (argv[i][0] == '-')
     {
-      if (!strcmp(argv[i], "-v"))
-        Verbosity ++;
-      else if (!strcmp(argv[i], "-d"))
+      for (opt = argv[i] + 1; *opt; opt ++)
       {
-        i ++;
+        switch (*opt)
+        {
+          case 'c' : /* Enable HTTP chunking */
+              Chunking = 1;
+              break;
 
-	if (i >= argc)
-	  usage(NULL);
-	else
-	  putenv(argv[i]);
-      }
-      else if (!strcmp(argv[i], "-i"))
-      {
-        i++;
+          case 'd' : /* Define a variable */
+	      i ++;
 
-	if (i >= argc)
-	  usage(NULL);
-	else
-	  interval = atoi(argv[i]);
+	      if (i >= argc)
+	      {
+		fputs("ipptest: Missing name=value for \"-d\"!\n", stderr);
+		usage();
+              }
+	      else
+		putenv(argv[i]);
+	      break;
+
+          case 'i' : /* Test every N seconds */
+	      i++;
+
+	      if (i >= argc)
+	      {
+		fputs("ipptest: Missing seconds for \"-i\"!\n", stderr);
+		usage();
+              }
+	      else
+		interval = atoi(argv[i]);
+	      break;
+
+          case 'v' : /* Be verbose */
+	      Verbosity ++;
+	      break;
+
+	  default :
+	      fprintf(stderr, "ipptest: Unknown option \"-%c\"!\n", *opt);
+	      usage();
+	      break;
+	}
       }
-      else
-        usage(argv[i]);
     }
     else if (!strncmp(argv[i], "ipp://", 6) ||
              !strncmp(argv[i], "http://", 7) ||
@@ -117,7 +142,11 @@ main(int  argc,				/* I - Number of command-line arguments */
       */
 
       if (!testfile && uri)
-        usage(NULL);
+      {
+        fputs("ipptest: May only specify a single URI before a test!\n",
+              stderr);
+        usage();
+      }
 
       uri      = argv[i];
       testfile = NULL;
@@ -136,7 +165,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
 
   if (!uri || !testfile)
-    usage(NULL);
+    usage();
 
  /*
   * Loop if the interval is set...
@@ -163,7 +192,7 @@ main(int  argc,				/* I - Number of command-line arguments */
  * 'do_tests()' - Do tests as specified in the test file.
  */
 
-int					/* 1 = success, 0 = failure */
+static int				/* 1 = success, 0 = failure */
 do_tests(const char *uri,		/* I - URI to connect on */
          const char *testfile)		/* I - Test file to use */
 {
@@ -569,7 +598,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     if (Verbosity)
     {
-      printf("%s:\n", ippOpString(op));
+      printf("    %s:\n", ippOpString(op));
 
       for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
 	print_attr(attrptr);
@@ -578,7 +607,36 @@ do_tests(const char *uri,		/* I - URI to connect on */
     printf("    %-60.60s [", name);
     fflush(stdout);
 
-    if (filename[0])
+    if (Chunking)
+    {
+      http_status_t status = cupsSendRequest(http, request, resource, 0);
+
+      if (status == HTTP_CONTINUE && filename[0])
+      {
+        int	fd;			/* File to send */
+        char	buffer[8192];		/* Copy buffer */
+        ssize_t	bytes;			/* Bytes read/written */
+
+
+        if ((fd = open(filename, O_RDONLY | O_BINARY)) >= 0)
+        {
+          while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+            if ((status = cupsWriteRequestData(http, buffer,
+                                               bytes)) != HTTP_CONTINUE)
+              break;
+        }
+        else
+          status = HTTP_ERROR;
+      }
+
+      ippDelete(request);
+
+      if (status == HTTP_CONTINUE)
+	response = cupsGetResponse(http, resource);
+      else
+	response = NULL;
+    }
+    else if (filename[0])
       response = cupsDoFileRequest(http, request, resource, filename);
     else
       response = cupsDoIORequest(http, request, resource, -1,
@@ -597,6 +655,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
     }
     else
     {
+      if (http->version != HTTP_1_1)
+        pass = 0;
+
       if ((attrptr = ippFindAttribute(response, "job-id",
                                       IPP_TAG_INTEGER)) != NULL)
         job_id = attrptr->values[0].integer;
@@ -652,6 +713,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	printf("        RECEIVED: %lu bytes in response\n",
 	       (unsigned long)ippLength(response));
 
+        if (http->version != HTTP_1_1)
+          printf("        BAD HTTP VERSION (%d.%d)\n", http->version / 100,
+                 http->version % 100);
+
 	for (i = 0; i < num_statuses; i ++)
           if (response->request.status.status_code == statuses[i])
 	    break;
@@ -691,7 +756,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
  * 'get_token()' - Get a token from a file.
  */
 
-char *					/* O  - Token from file or NULL on EOF */
+static char *				/* O  - Token from file or NULL on EOF */
 get_token(FILE *fp,			/* I  - File to read from */
           char *buf,			/* I  - Buffer to read into */
 	  int  buflen,			/* I  - Length of buffer */
@@ -783,7 +848,7 @@ get_token(FILE *fp,			/* I  - File to read from */
  * 'print_attr()' - Print an attribute on the screen.
  */
 
-void
+static void
 print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 {
   int		i;			/* Looping var */
@@ -861,7 +926,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 	  print_col(attr->values[i].collection);
 	}
 	break;
-        
+
     default :
 	break; /* anti-compiler-warning-code */
   }
@@ -874,7 +939,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
  * 'print_col()' - Print a collection attribute on the screen.
  */
 
-void
+static void
 print_col(ipp_t *col)			/* I - Collection attribute to print */
 {
   int			i;		/* Looping var */
@@ -947,7 +1012,7 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
 	    putchar(' ');
 	  }
 	  break;
-	  
+
       default :
 	  break; /* anti-compiler-warning-code */
     }
@@ -961,17 +1026,18 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
  * 'usage()' - Show program usage.
  */
 
-void
-usage(const char *option)		/* I - Option string or NULL */
+static void
+usage(void)
 {
-  if (option)
-    fprintf(stderr, "ipptest: Unknown option \"%s\"!\n", option);
-
   fputs("Usage: ipptest [options] URL testfile [ ... testfileN ]\n", stderr);
   fputs("Options:\n", stderr);
   fputs("\n", stderr);
-  fputs("-i N    Repeat the last test file once every N seconds.\n", stderr);
-  fputs("-v      Show all attributes in response, even on success.\n", stderr);
+  fputs("-c             Send requests using chunking.\n", stderr);
+  fputs("-d name=value  Define variable.\n", stderr);
+  fputs("-i seconds     Repeat the last test file with the given interval.\n",
+        stderr);
+  fputs("-v             Show all attributes in response, even on success.\n",
+        stderr);
 
   exit(1);
 }
