@@ -14,11 +14,13 @@
  *
  * Contents:
  *
- *   main()       - Parse options and do tests.
- *   do_tests()   - Do tests as specified in the test file.
- *   get_token()  - Get a token from a file.
- *   print_attr() - Print an attribute on the screen.
- *   usage()      - Show program usage.
+ *   main()           - Parse options and do tests.
+ *   do_tests()       - Do tests as specified in the test file.
+ *   expect_matches() - Return true if the tag matches the specification.
+ *   get_token()      - Get a token from a file.
+ *   print_attr()     - Print an attribute on the screen.
+ *   print_col()      - Print a collection attribute on the screen.
+ *   usage()          - Show program usage.
  */
 
 /*
@@ -40,6 +42,19 @@
 
 
 /*
+ * Types...
+ */
+
+typedef struct _cups_expect_s		/**** Expected attribute info ****/
+{
+  char	*name,				/* Attribute name */
+	*of_type,			/* Type name */
+	*same_count_as,			/* Parallel attribute name */
+	*if_defined;			/* Only required if variable defined */
+} _cups_expect_t;
+
+
+/*
  * Globals...
  */
 
@@ -52,6 +67,7 @@ int		Verbosity = 0;		/* Show all attributes? */
  */
 
 static int	do_tests(const char *uri, const char *testfile);
+static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
 static void	print_attr(ipp_attribute_t *attr);
@@ -187,7 +203,7 @@ main(int  argc,				/* I - Number of command-line args */
   return (status);
 }
 
-
+        
 /*
  * 'do_tests()' - Do tests as specified in the test file.
  */
@@ -215,12 +231,15 @@ do_tests(const char *uri,		/* I - URI to connect on */
   ipp_op_t	op;			/* Operation */
   ipp_tag_t	group;			/* Current group */
   ipp_tag_t	value;			/* Current value type */
-  ipp_attribute_t *attrptr;		/* Attribute pointer */
+  ipp_attribute_t *attrptr,		/* Attribute pointer */
+		*found;			/* Found attribute */
   char		attr[128];		/* Attribute name */
   int		num_statuses;		/* Number of valid status codes */
   ipp_status_t	statuses[100];		/* Valid status codes */
   int		num_expects;		/* Number of expected attributes */
-  char		*expects[100];		/* Expected attributes */
+  _cups_expect_t expects[100],		/* Expected attributes */
+		*expect,		/* Current expected attribute */
+		*last_expect;		/* Last EXPECT (for predicates) */
   int		num_displayed;		/* Number of displayed attributes */
   char		*displayed[100];	/* Displayed attributes */
   char		name[1024];		/* Name of test */
@@ -294,6 +313,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
     num_statuses  = 0;
     num_expects   = 0;
     num_displayed = 0;
+    last_expect   = NULL;
     filename[0]   = '\0';
 
     strcpy(name, testfile);
@@ -306,6 +326,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
+      if (strcasecmp(token, "EXPECT") &&
+          strcasecmp(token, "IF-DEFINED") &&
+          strcasecmp(token, "OF-TYPE") &&
+          strcasecmp(token, "SAME-COUNT-AS"))
+        last_expect = NULL;
+
       if (!strcmp(token, "}"))
         break;
       else if (!strcasecmp(token, "NAME"))
@@ -448,7 +474,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    }
 	    else if (!strncasecmp(tempptr + 1, "user", 4))
 	    {
+#ifdef CUPS_LITE
+              strlcpy(tokenptr, "embedded", sizeof(token) - (tokenptr - token));
+#else
 	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
+#endif /* CUPS_LITE */
 	      tempptr += 5;
 	    }
 	    else if (!strncasecmp(tempptr + 1, "ENV[", 4))
@@ -555,16 +585,77 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	statuses[num_statuses] = ippErrorValue(token);
 	num_statuses ++;
       }
-      else if (!strcasecmp(token, "EXPECT") &&
-               num_expects < (int)(sizeof(expects) / sizeof(expects[0])))
+      else if (!strcasecmp(token, "EXPECT"))
       {
        /*
         * Expected attributes...
 	*/
 
+        if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
+        {
+	  fprintf(stderr, "ipptest: Too many EXPECT's on line %d\n", linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+        }
+
 	get_token(fp, token, sizeof(token), &linenum);
-	expects[num_expects] = strdup(token);
+
+        last_expect = expects + num_expects;
 	num_expects ++;
+
+	last_expect->name          = strdup(token);
+        last_expect->of_type       = NULL;
+        last_expect->same_count_as = NULL;
+        last_expect->if_defined    = NULL;
+      }
+      else if (!strcasecmp(token, "OF-TYPE"))
+      {
+	get_token(fp, token, sizeof(token), &linenum);
+
+	if (last_expect)
+	  last_expect->of_type = strdup(token);
+	else
+	{
+	  fprintf(stderr,
+		  "ipptest: OF-TYPE without a preceding EXPECT on line %d\n",
+		  linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+	}
+      }
+      else if (!strcasecmp(token, "SAME-COUNT-AS"))
+      {
+	get_token(fp, token, sizeof(token), &linenum);
+
+	if (last_expect)
+	  last_expect->same_count_as = strdup(token);
+	else
+	{
+	  fprintf(stderr,
+		  "ipptest: SAME-COUNT-AS without a preceding EXPECT on line "
+		  "%d\n", linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+	}
+      }
+      else if (!strcasecmp(token, "IF-DEFINED"))
+      {
+	get_token(fp, token, sizeof(token), &linenum);
+
+	if (last_expect)
+	  last_expect->if_defined = strdup(token);
+	else
+	{
+	  fprintf(stderr,
+		  "ipptest: IF-DEFINED without a preceding EXPECT on line %d\n",
+		  linenum);
+	  httpClose(http);
+	  ippDelete(request);
+	  return (0);
+	}
       }
       else if (!strcasecmp(token, "DISPLAY") &&
                num_displayed < (int)(sizeof(displayed) / sizeof(displayed[0])))
@@ -579,8 +670,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else
       {
-	printf("Unexpected token %s seen on line %d - aborting test!\n", token,
-	       linenum);
+	fprintf(stderr,
+	        "ipptest: Unexpected token %s seen on line %d - aborting "
+	        "test!\n", token, linenum);
 	httpClose(http);
 	ippDelete(request);
 	return (0);
@@ -674,12 +766,31 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	pass = 0;
       else
       {
-        for (i = 0; i < num_expects; i ++)
-	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
-	  {
-	    pass = 0;
-	    break;
-	  }
+        for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+        {
+          if (expect->if_defined && !getenv(expect->if_defined))
+            continue;
+
+          found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+
+          if (!found || !expect_matches(expect, found->value_tag))
+          {
+      	    pass = 0;
+      	    break;          
+          }
+
+          if (expect->same_count_as)
+          {
+            attrptr = ippFindAttribute(response, expect->same_count_as,
+                                       IPP_TAG_ZERO);
+
+            if (!attrptr || attrptr->num_values != found->num_values)
+            {
+              pass = 0;
+              break;
+            }
+          }
+        }
       }
 
       if (pass)
@@ -690,21 +801,31 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
         if (Verbosity)
 	{
-	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
+	  for (attrptr = response->attrs;
+	       attrptr != NULL;
+	       attrptr = attrptr->next)
+	  {
 	    print_attr(attrptr);
+          }
         }
         else if (num_displayed > 0)
 	{
-	  for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
+	  for (attrptr = response->attrs;
+	       attrptr != NULL;
+	       attrptr = attrptr->next)
+	  {
 	    if (attrptr->name)
 	    {
 	      for (i = 0; i < num_displayed; i ++)
+	      {
 		if (!strcmp(displayed[i], attrptr->name))
 		{
 		  print_attr(attrptr);
 		  break;
 		}
+	      }
 	    }
+	  }
         }
       }
       else
@@ -727,9 +848,35 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	printf("        status-code = %04x (%s)\n",
 	       cupsLastError(), ippErrorString(cupsLastError()));
 
-        for (i = 0; i < num_expects; i ++)
-	  if (ippFindAttribute(response, expects[i], IPP_TAG_ZERO) == NULL)
-	    printf("        EXPECTED: %s\n", expects[i]);
+        for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+        {
+          if (expect->if_defined && !getenv(expect->if_defined))
+            continue;
+
+          found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+
+          if (!found)
+      	    printf("        EXPECTED: %s\n", expect->name);
+          else if (!expect_matches(expect, found->value_tag))
+            printf("        EXPECTED: %s of type %s but got %s\n", 
+                   expect->name, expect->of_type,
+                   ippTagString(found->value_tag));
+          else if (expect->same_count_as)
+          {
+            attrptr = ippFindAttribute(response, expect->same_count_as,
+                                       IPP_TAG_ZERO);
+
+            if (!attrptr)
+	      printf("        EXPECTED: %s (%d values) same count as %s "
+	             "(not returned)\n", 
+		     expect->name, found->num_values, expect->same_count_as);
+            else if (attrptr->num_values != found->num_values)
+	      printf("        EXPECTED: %s (%d values) same count as %s "
+	             "(%d values)\n", 
+		     expect->name, found->num_values, expect->same_count_as,
+		     attrptr->num_values);
+          }
+        }
 
 	for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
 	  print_attr(attrptr);
@@ -738,9 +885,16 @@ do_tests(const char *uri,		/* I - URI to connect on */
       ippDelete(response);
     }
 
-    for (i = 0; i < num_expects; i ++)
-      free(expects[i]);
-
+    for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+    {
+      free(expect->name);
+      if (expect->of_type)
+        free(expect->of_type);
+      if (expect->same_count_as)
+        free(expect->same_count_as);
+      if (expect->if_defined)
+        free(expect->if_defined);
+    }
     if (!pass)
       break;
   }
@@ -749,6 +903,66 @@ do_tests(const char *uri,		/* I - URI to connect on */
   httpClose(http);
 
   return (pass);
+}
+
+
+/*
+ * 'expect_matches()' - Return true if the tag matches the specification.
+ */
+ 
+static int				/* O - 1 if matches, 0 otherwise */
+expect_matches(
+    _cups_expect_t *expect,		/* I - Expected attribute */
+    ipp_tag_t      value_tag)		/* I - Value tag for attribute */
+{
+  int	match;				/* Match? */
+  char	*of_type,			/* Type name to match */
+	*next;				/* Next name to match */
+
+
+ /*
+  * If we don't expect a particular type, return immediately...
+  */
+
+  if (!expect->of_type)
+    return (1);
+
+ /*
+  * Parse the "of_type" value since the string can contain multiple attribute
+  * types separated by "|"...
+  */
+
+  for (of_type = expect->of_type, match = 0; !match && of_type; of_type = next)
+  {
+   /*
+    * Find the next separator, and set it (temporarily) to nul if present.
+    */
+
+    if ((next = strchr(of_type, '|')) != NULL)
+      *next = '\0';
+  
+   /*
+    * Support some meta-types to make it easier to write the test file.
+    */
+
+    if (!strcmp(of_type, "text"))
+      match = value_tag == IPP_TAG_TEXTLANG || value_tag == IPP_TAG_TEXT;            
+    else if (!strcmp(of_type, "name"))
+      match = value_tag == IPP_TAG_NAMELANG || value_tag == IPP_TAG_NAME;    
+    else if (!strcmp(of_type, "collection"))
+      match = value_tag == IPP_TAG_BEGIN_COLLECTION;   
+    else
+      match = value_tag == ippTagValue(of_type);
+
+   /*
+    * Restore the separator if we have one...
+    */
+
+    if (next)
+      *next++ = '|';
+  }
+
+  return (match);
 }
 
 
