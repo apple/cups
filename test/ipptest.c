@@ -474,11 +474,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    }
 	    else if (!strncasecmp(tempptr + 1, "user", 4))
 	    {
-#ifdef CUPS_LITE
-              strlcpy(tokenptr, "embedded", sizeof(token) - (tokenptr - token));
-#else
 	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
-#endif /* CUPS_LITE */
 	      tempptr += 5;
 	    }
 	    else if (!strncasecmp(tempptr + 1, "ENV[", 4))
