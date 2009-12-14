@@ -649,7 +649,10 @@ cupsdDeleteAllPrinters(void)
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+    p->op_policy_ptr = DefaultPolicyPtr;
     cupsdDeletePrinter(p, 0);
+  }
 }
 
 
@@ -3756,7 +3759,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	 filter;
 	 filter = (mime_filter_t *)cupsArrayNext(MimeDatabase->filters))
     {
-      if (filter->dst == p->filetype && filter->filter && 
+      if (filter->dst == p->filetype && filter->filter &&
 	  strstr(filter->filter, "PrintJobMgr"))
 	break;
     }
