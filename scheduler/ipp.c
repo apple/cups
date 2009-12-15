@@ -5430,14 +5430,6 @@ copy_printer_attrs(
 
   curtime = time(NULL);
 
-#ifdef __APPLE__
-  if ((!ra || cupsArrayFind(ra, "com.apple.print.recoverable-message")) &&
-      printer->recoverable)
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "com.apple.print.recoverable-message", NULL,
-		 printer->recoverable);
-#endif /* __APPLE__ */
-
   if (!ra || cupsArrayFind(ra, "marker-change-time"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "marker-change-time", printer->marker_time);

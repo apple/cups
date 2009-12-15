@@ -94,7 +94,6 @@ typedef struct cupsd_printer_s
   time_t	marker_time;		/* Last time marker attributes were updated */
   cups_array_t	*filters,		/* Filters for queue */
 		*pre_filters;		/* Pre-filters for queue */
-  char		*recoverable;		/* com.apple.print.recoverable-message */
 
 #ifdef HAVE_DNSSD
   char		*reg_name,		/* Name used for service registration */
