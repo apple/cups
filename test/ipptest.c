@@ -47,6 +47,7 @@
 
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
+  int	not_expect;			/* Don't expect attribute? */
   char	*name,				/* Attribute name */
 	*of_type,			/* Type name */
 	*same_count_as,			/* Parallel attribute name */
@@ -600,7 +601,17 @@ do_tests(const char *uri,		/* I - URI to connect on */
         last_expect = expects + num_expects;
 	num_expects ++;
 
-	last_expect->name          = strdup(token);
+        if (token[0] == '!')
+        {
+          last_expect->not_expect = 1;
+          last_expect->name       = strdup(token + 1);
+        }
+        else
+        {
+          last_expect->not_expect = 0;
+	  last_expect->name       = strdup(token);
+	}
+
         last_expect->of_type       = NULL;
         last_expect->same_count_as = NULL;
         last_expect->if_defined    = NULL;
@@ -769,13 +780,14 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-          if (!found || !expect_matches(expect, found->value_tag))
+          if ((found == NULL) != expect->not_expect ||
+              (found && !expect_matches(expect, found->value_tag)))
           {
       	    pass = 0;
       	    break;          
           }
 
-          if (expect->same_count_as)
+          if (found && expect->same_count_as)
           {
             attrptr = ippFindAttribute(response, expect->same_count_as,
                                        IPP_TAG_ZERO);
@@ -851,27 +863,35 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-          if (!found)
-      	    printf("        EXPECTED: %s\n", expect->name);
-          else if (!expect_matches(expect, found->value_tag))
-            printf("        EXPECTED: %s of type %s but got %s\n", 
-                   expect->name, expect->of_type,
-                   ippTagString(found->value_tag));
-          else if (expect->same_count_as)
+          if ((found == NULL) != expect->not_expect)
           {
-            attrptr = ippFindAttribute(response, expect->same_count_as,
-                                       IPP_TAG_ZERO);
-
-            if (!attrptr)
-	      printf("        EXPECTED: %s (%d values) same count as %s "
-	             "(not returned)\n", 
-		     expect->name, found->num_values, expect->same_count_as);
-            else if (attrptr->num_values != found->num_values)
-	      printf("        EXPECTED: %s (%d values) same count as %s "
-	             "(%d values)\n", 
-		     expect->name, found->num_values, expect->same_count_as,
-		     attrptr->num_values);
-          }
+            if (expect->not_expect)
+	      printf("        NOT EXPECTED: %s\n", expect->name);
+	    else
+	      printf("        EXPECTED: %s\n", expect->name);
+	  }
+          else if (found)
+          {
+            if (!expect_matches(expect, found->value_tag))
+              printf("        EXPECTED: %s of type %s but got %s\n", 
+                     expect->name, expect->of_type,
+                     ippTagString(found->value_tag));
+	    else if (expect->same_count_as)
+	    {
+	      attrptr = ippFindAttribute(response, expect->same_count_as,
+					 IPP_TAG_ZERO);
+  
+	      if (!attrptr)
+		printf("        EXPECTED: %s (%d values) same count as %s "
+		       "(not returned)\n", 
+		       expect->name, found->num_values, expect->same_count_as);
+	      else if (attrptr->num_values != found->num_values)
+		printf("        EXPECTED: %s (%d values) same count as %s "
+		       "(%d values)\n", 
+		       expect->name, found->num_values, expect->same_count_as,
+		       attrptr->num_values);
+	    }
+	  }
         }
 
 	for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)

@@ -2441,7 +2441,7 @@ cupsdSetJobState(
   * Finalize the job immediately if we forced things...
   */
 
-  if (action >= CUPSD_JOB_FORCE)
+  if (action >= CUPSD_JOB_FORCE && job->printer)
     finalize_job(job, 0);
 
  /*

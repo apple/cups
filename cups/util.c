@@ -570,17 +570,17 @@ cupsGetJobs2(http_t     *http,		/* I - Connection to server or @code CUPS_HTTP_D
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
   static const char * const attrs[] =	/* Requested attributes */
 		{
+		  "document-format",
 		  "job-id",
-		  "job-priority",
 		  "job-k-octets",
+		  "job-name",
+		  "job-originating-user-name",
+		  "job-printer-uri",
+		  "job-priority",
 		  "job-state",
 		  "time-at-completed",
 		  "time-at-creation",
-		  "time-at-processing",
-		  "job-printer-uri",
-		  "document-format",
-		  "job-name",
-		  "job-originating-user-name"
+		  "time-at-processing"
 		};
 
 
