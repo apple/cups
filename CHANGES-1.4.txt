@@ -6,6 +6,7 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- Documentation update (STR #3451)
 	- IPP conformance: Get-Jobs has a default value for requested-attributes
 	  (STR #3383)
 	- cupsPrintFiles() did not report all errors (STR #3449)
