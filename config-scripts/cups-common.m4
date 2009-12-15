@@ -262,6 +262,8 @@ if test "x$enable_dbus" != xno; then
 			AC_DEFINE(HAVE_DBUS)
 			CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
 			CUPSDLIBS="$CUPSDLIBS `$PKGCONFIG --libs dbus-1`"
+			DBUS_NOTIFIER="dbus"
+			DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs dbus-1`"
 			AC_CHECK_LIB(dbus-1,
 				dbus_message_iter_init_append,
 				AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
