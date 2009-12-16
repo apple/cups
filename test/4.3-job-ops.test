@@ -296,6 +296,7 @@
 	# What attributes do we expect?
 	EXPECT attributes-charset
 	EXPECT attributes-natural-language
+	EXPECT !job-printer-uri
 }
 {
 	# The name of the test...
@@ -310,6 +311,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/
+	ATTR keyword requested-attributes all
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -320,6 +322,7 @@
 	EXPECT job-uri
 	EXPECT job-id
 	EXPECT job-state
+	EXPECT job-printer-uri
 }
 
 #

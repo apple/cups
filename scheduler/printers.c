@@ -205,11 +205,6 @@ cupsdAddPrinterHistory(
   ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-shared", p->shared);
   ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
                NULL, p->state_message);
-#ifdef __APPLE__
-  if (p->recoverable)
-    ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "com.apple.print.recoverable-message", NULL, p->recoverable);
-#endif /* __APPLE__ */
   if (p->num_reasons == 0)
     ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                  "printer-state-reasons", NULL, "none");
@@ -649,7 +644,10 @@ cupsdDeleteAllPrinters(void)
   for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
        p;
        p = (cupsd_printer_t *)cupsArrayNext(Printers))
+  {
+    p->op_policy_ptr = DefaultPolicyPtr;
     cupsdDeletePrinter(p, 0);
+  }
 }
 
 
@@ -840,10 +838,6 @@ cupsdDeletePrinter(
 
   if (p->browse_attrs)
     free(p->browse_attrs);
-
-#ifdef __APPLE__
-  cupsdClearString(&p->recoverable);
-#endif /* __APPLE__ */
 
   cupsFreeOptions(p->num_options, p->options);
 
@@ -1094,7 +1088,6 @@ cupsdLoadAllPrinters(void)
     else if (!strcasecmp(line, "Reason"))
     {
       if (value &&
-          strcmp(value, "com.apple.print.recoverable-warning") &&
           strcmp(value, "connecting-to-device") &&
           strcmp(value, "cups-insecure-filter-warning") &&
           strcmp(value, "cups-missing-filter-warning"))
@@ -1599,8 +1592,7 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "StateTime %d\n", (int)printer->state_time);
 
     for (i = 0; i < printer->num_reasons; i ++)
-      if (strcmp(printer->reasons[i], "com.apple.print.recoverable-warning") &&
-          strcmp(printer->reasons[i], "connecting-to-device") &&
+      if (strcmp(printer->reasons[i], "connecting-to-device") &&
           strcmp(printer->reasons[i], "cups-insecure-filter-warning") &&
           strcmp(printer->reasons[i], "cups-missing-filter-warning"))
         cupsFilePutConf(fp, "Reason", printer->reasons[i]);
@@ -3756,7 +3748,7 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	 filter;
 	 filter = (mime_filter_t *)cupsArrayNext(MimeDatabase->filters))
     {
-      if (filter->dst == p->filetype && filter->filter && 
+      if (filter->dst == p->filetype && filter->filter &&
 	  strstr(filter->filter, "PrintJobMgr"))
 	break;
     }

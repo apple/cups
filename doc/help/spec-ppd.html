@@ -161,9 +161,8 @@ based on well-known colorspaces such as sRGB and Adobe RGB.</p>
 
 <blockquote><b>Note:</b>
 
-<p>At this time, none of the CUPS raster
-filters support ICC profiles. This will be addressed as time
-and resources permit.</p>
+<p>At this time, none of the CUPS raster filters support ICC profiles. This
+will be addressed as time and resources permit.</p>
 
 </blockquote>
 
@@ -174,7 +173,7 @@ gamma m00 m01 m02 m10 m11 m12 m20 m21 m22"</p>
 
 <p>This string attribute specifies an sRGB-based color profile
 consisting of gamma and density controls and a 3x3 CMY color
-transform matrix.</p>
+transform matrix. <em>This attribute is not supported on Mac OS X.</em></p>
 
 <p>The <i>Resolution</i> and <i>MediaType</i> values may be "-"
 to act as a wildcard. Otherwise they must match one of the
@@ -276,6 +275,15 @@ profiles should be used when generating 1-, 3-, and 4-component raster
 data as requested by the driver. The <tt>APCustomColorMatchingProfile</tt>
 and <tt>APDefaultColorMatchingProfile</tt> attributes specify alternate
 color profiles (sRGB or AdobeRGB) to use for 3-color (RGB) raster data.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Prior to Mac OS X 10.6, the default RGB color space was Apple's "GenericRGB".
+The new default in Mac OS X 10.6 and later is "sRGB". For more information, see
+<a href="http://support.apple.com/kb/HT3712">"Mac OS X v10.6: About gamma
+2.2"</a> on Apple's support site.</p>
+
+</blockquote>
 
 <h4><span class='info'>Mac OS X 10.5</span><a name='APCustomColorMatchingName'>APCustomColorMatchingName</a></h4>
 

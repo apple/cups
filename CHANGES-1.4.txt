@@ -6,6 +6,12 @@ CHANGES IN CUPS V1.4.3
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- Documentation update (STR #3451)
+	- IPP conformance: Get-Jobs has a default value for requested-attributes
+	  (STR #3383)
+	- cupsPrintFiles() did not report all errors (STR #3449)
+	- cupsAddDest() could read freed memory (STR #3448)
+	- The DBUS notifier did not build (STR #3447)
 	- The scheduler would crash when an active printer was deleted.
 	- The snmp backend did not work with some printers (STR #3413)
 	- The web interface did not show the conflicting values when setting

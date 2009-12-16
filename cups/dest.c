@@ -144,6 +144,12 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
 
     dest = cups_add_dest(name, instance, &num_dests, dests);
 
+   /*
+    * Find the base dest again now the array has been realloc'd.
+    */
+
+    parent = cupsGetDest(name, NULL, num_dests, *dests);
+
     if (instance && parent && parent->num_options > 0)
     {
      /*

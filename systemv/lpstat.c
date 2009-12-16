@@ -1287,10 +1287,10 @@ show_jobs(const char *dests,		/* I - Destinations */
 		  "job-id",
 		  "job-k-octets",
 		  "job-name",
-		  "time-at-creation",
-		  "job-printer-uri",
 		  "job-originating-user-name",
-		  "job-state-reasons"
+		  "job-printer-uri",
+		  "job-state-reasons",
+		  "time-at-creation"
 		};
 
 

@@ -123,7 +123,8 @@ to the access log file. The following levels are defined:</P>
   Allow from nnn.nnn.nnn.nnn
   Allow from nnn.nnn.nnn.nnn/mm
   Allow from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
-  Allow from xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
+  Allow from [xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx]
+  Allow from [xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx]/mmm
   Allow from @LOCAL
   Allow from @IF(name)
 &lt;/Location&gt;
@@ -1071,7 +1072,8 @@ printers are shared (published) by default. The default is
   Deny from nnn.nnn.nnn.nnn
   Deny from nnn.nnn.nnn.nnn/mm
   Deny from nnn.nnn.nnn.nnn/mmm.mmm.mmm.mmm
-  Deny from xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
+  Deny from [xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx]
+  Deny from [xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx]/mmm
   Deny from @LOCAL
   Deny from @IF(name)
 &lt;/Location&gt;

@@ -5430,14 +5430,6 @@ copy_printer_attrs(
 
   curtime = time(NULL);
 
-#ifdef __APPLE__
-  if ((!ra || cupsArrayFind(ra, "com.apple.print.recoverable-message")) &&
-      printer->recoverable)
-    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
-                 "com.apple.print.recoverable-message", NULL,
-		 printer->recoverable);
-#endif /* __APPLE__ */
-
   if (!ra || cupsArrayFind(ra, "marker-change-time"))
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "marker-change-time", printer->marker_time);
@@ -7007,7 +6999,18 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   else
     username[0] = '\0';
 
-  ra = create_requested_array(con->request);
+  if ((ra = create_requested_array(con->request)) == NULL &&
+      !ippFindAttribute(con->request, "requested-attributes", IPP_TAG_KEYWORD))
+  {
+   /*
+    * IPP conformance - Get-Jobs has a default requested-attributes value of
+    * "job-id" and "job-uri".
+    */
+
+    ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+    cupsArrayAdd(ra, "job-id");
+    cupsArrayAdd(ra, "job-uri");
+  }
 
  /*
   * OK, build a list of jobs for this printer...

@@ -134,7 +134,7 @@ main(int  argc,				/* I - Number of command-line args */
 			senddoc_time,	/* Send-Document time */
 			expire_time,	/* Subscription expire time */
 			report_time,	/* Malloc/client/job report time */
-			event_time;	/* Last time an event notification was done */
+			event_time;	/* Last event notification time */
   long			timeout;	/* Timeout for cupsdDoSelect() */
   struct rlimit		limit;		/* Runtime limit */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
@@ -270,19 +270,22 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'p' : /* Stop immediately for profiling */
-              puts("Warning: -p (startup profiling) is for internal testing use only!");
+              fputs("cupsd: -p (startup profiling) is for internal testing "
+                    "use only!\n", stderr);
 	      stop_scheduler = 1;
 	      fg             = 1;
 	      break;
 
           case 'P' : /* Disable security profiles */
-              puts("Warning: -P (disable security profiles) is for internal testing use only!");
+              fputs("cupsd: -P (disable security profiles) is for internal "
+                    "testing use only!\n", stderr);
 	      UseProfiles = 0;
 	      break;
 
 #ifdef __APPLE__
           case 'S' : /* Disable system management functions */
-              puts("Warning: -S (disable system management) for internal testing use only!");
+              fputs("cupsd: -S (disable system management) for internal "
+                    "testing use only!\n", stderr);
 	      use_sysman = 0;
 	      break;
 #endif /* __APPLE__ */
@@ -763,7 +766,8 @@ main(int  argc,				/* I - Number of command-line args */
 	if (Launchd)
 	{
 	 /*
-	  * If we were started by launchd get the listen sockets file descriptors...
+	  * If we were started by launchd, get the listen socket file
+	  * descriptors...
 	  */
 
 	  launchd_checkin();
@@ -1566,8 +1570,8 @@ launchd_checkin(void)
 	  if ((lis = calloc(1, sizeof(cupsd_listener_t))) == NULL)
 	  {
 	    cupsdLogMessage(CUPSD_LOG_ERROR,
-			    "launchd_checkin: Unable to allocate listener - %s.",
-			    strerror(errno));
+			    "launchd_checkin: Unable to allocate listener - "
+			    "%s.", strerror(errno));
 	    exit(EXIT_FAILURE);
 	  }
 
@@ -1623,7 +1627,8 @@ launchd_checkout(void)
         (BrowseLocalProtocols && NumBrowsers && cupsArrayCount(Printers))))))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "Creating launchd keepalive file \"" CUPS_KEEPALIVE "\"...");
+                    "Creating launchd keepalive file \"" CUPS_KEEPALIVE
+                    "\"...");
 
     if ((fd = open(CUPS_KEEPALIVE, O_RDONLY | O_CREAT | O_EXCL, S_IRUSR)) >= 0)
       close(fd);
@@ -1631,7 +1636,8 @@ launchd_checkout(void)
   else
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
-                    "Removing launchd keepalive file \"" CUPS_KEEPALIVE "\"...");
+                    "Removing launchd keepalive file \"" CUPS_KEEPALIVE
+                    "\"...");
 
     unlink(CUPS_KEEPALIVE);
   }
@@ -1767,7 +1773,7 @@ process_children(void)
 		job->printer_message = ippAddString(job->attrs, IPP_TAG_JOB,
 		                                    IPP_TAG_TEXT,
 						    "job-printer-state-message",
-						    NULL, "");
+						    NULL, NULL);
 	    }
 
 	    if (job->printer_message)
@@ -1781,7 +1787,7 @@ process_children(void)
 	* filters are done, and if so move to the next file.
 	*/
 
-	if (job->current_file < job->num_files)
+	if (job->current_file < job->num_files && job->printer)
 	{
 	  for (i = 0; job->filters[i] < 0; i ++);
 
@@ -1794,7 +1800,7 @@ process_children(void)
 	    cupsdContinueJob(job);
 	  }
 	}
-	else if (job->state_value == IPP_JOB_CANCELED)
+	else if (job->state_value >= IPP_JOB_CANCELED)
 	{
 	 /*
 	  * Remove the job from the active list if there are no processes still
