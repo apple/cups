@@ -142,7 +142,7 @@ else
 fi
 
 dnl Check for random number functions...
-AC_CHECK_FUNCS(random mrand48 lrand48)
+AC_CHECK_FUNCS(random lrand48 arc4random)
 
 dnl Check for geteuid function.
 AC_CHECK_FUNCS(geteuid)

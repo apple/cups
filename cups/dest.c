@@ -138,8 +138,7 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
 
   if (!cupsGetDest(name, instance, num_dests, *dests))
   {
-    if (instance &&
-        (parent = cupsGetDest(name, NULL, num_dests, *dests)) == NULL)
+    if (instance && !cupsGetDest(name, NULL, num_dests, *dests))
       return (num_dests);
 
     dest = cups_add_dest(name, instance, &num_dests, dests);

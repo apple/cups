@@ -772,6 +772,7 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
     if (section == PPD_ORDER_JCL)
     {
       if (!strcasecmp(choices[i]->choice, "Custom") &&
+	  choices[i]->code &&
           (coption = ppdFindCustomOption(ppd, choices[i]->option->keyword))
 	      != NULL)
       {

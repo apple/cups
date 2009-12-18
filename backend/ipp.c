@@ -1794,8 +1794,11 @@ run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
       * Change to an unpriviledged user...
       */
 
-      setgid(fileinfo.st_gid);
-      setuid(fileinfo.st_uid);
+      if (setgid(fileinfo.st_gid))
+        return (errno);
+
+      if (setuid(fileinfo.st_uid))
+        return (errno);
     }
 
     execlp("pictwpstops", printer, argv[1], argv[2], argv[3], argv[4], argv[5],

@@ -139,13 +139,13 @@ depend:
 
 #
 # Run the clang.llvm.org static code analysis tool on the C sources.
+# (at least checker-231 is required for scan-build to work this way)
 #
 
 .PHONY: clang
 clang:
 	$(RM) -r clang
-	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) \
-		CC=ccc-analyzer CXX=ccc-analyzer clean all
+	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) clean all
 
 
 #

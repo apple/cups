@@ -277,8 +277,8 @@ ppdPageSizeLimits(ppd_file_t *ppd,	/* I - PPD file record */
       attr = ppdFindAttr(ppd, "cupsMinSize", spec);
     }
 
-    if (!attr ||
-        (attr->value && sscanf(attr->value, "%f%f", &width, &length) != 2))
+    if ((attr && attr->value &&
+         sscanf(attr->value, "%f%f", &width, &length) != 2) || !attr)
     {
       width  = ppd->custom_min[0];
       length = ppd->custom_min[1];

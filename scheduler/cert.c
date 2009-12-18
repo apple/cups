@@ -71,7 +71,7 @@ cupsdAddCert(int        pid,		/* I - Process ID */
   strlcpy(cert->username, username, sizeof(cert->username));
 
   for (i = 0; i < 32; i ++)
-    cert->certificate[i] = hex[random() & 15];
+    cert->certificate[i] = hex[CUPS_RAND() & 15];
 
  /*
   * Save the certificate to a file readable only by the User and Group
@@ -425,7 +425,7 @@ cupsdInitCerts(void)
     cupsFileClose(fp);
   }
 
-  srandom(seed);
+  CUPS_SRAND(seed);
 
  /*
   * Create a root certificate and return...

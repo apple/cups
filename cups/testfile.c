@@ -375,9 +375,9 @@ random_tests(void)
     fputs("cupsFileSeek(), cupsFileRead(): ", stdout);
 
     for (num_records = (pass + 1) * 256, count = (pass + 1) * 256,
-             record = rand() % num_records;
+             record = CUPS_RAND() % num_records;
          count > 0;
-	 count --, record = (record + (rand() & 31) - 16 + num_records) %
+	 count --, record = (record + (CUPS_RAND() & 31) - 16 + num_records) %
 	                    num_records)
     {
      /*
@@ -471,14 +471,10 @@ read_write_tests(int compression)	/* I - Use compression? */
   * Initialize the write buffer with random data...
   */
 
-#ifdef WIN32
-  srand((unsigned)time(NULL));
-#else
-  srand(time(NULL));
-#endif /* WIN32 */
+  CUPS_SRAND(time(NULL));
 
   for (i = 0; i < (int)sizeof(writebuf); i ++)
-    writebuf[i] = rand();
+    writebuf[i] = CUPS_RAND();
 
  /*
   * cupsFileOpen(write)

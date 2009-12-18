@@ -24,21 +24,7 @@
  */
 
 #include "driver.h"
-
-
-/*
- * Random number function to use, in order of preference...
- */
-
-#ifdef HAVE_RANDOM
-#  define RANDOM_FUNCTION	random
-#elif defined(HAVE_MRAND48)
-#  define RANDOM_FUNCTION	mrand48
-#elif defined(HAVE_LRAND48)
-#  define RANDOM_FUNCTION	lrand48
-#else
-#  define RANDOM_FUNCTION	rand
-#endif /* HAVE_RANDOM */
+#include <config.h>
 
 
 /*
@@ -169,8 +155,8 @@ cupsDitherLine(cups_dither_t    *d,	/* I - Dither data */
 
       if (errrange > 1)
       {
-        errbase0 = errbase + (RANDOM_FUNCTION() % errrange);
-        errbase1 = errbase + (RANDOM_FUNCTION() % errrange);
+        errbase0 = errbase + (CUPS_RAND() % errrange);
+        errbase1 = errbase + (CUPS_RAND() % errrange);
       }
       else
         errbase0 = errbase1 = errbase;
@@ -263,8 +249,8 @@ cupsDitherLine(cups_dither_t    *d,	/* I - Dither data */
 
       if (errrange > 1)
       {
-        errbase0 = errbase + (RANDOM_FUNCTION() % errrange);
-        errbase1 = errbase + (RANDOM_FUNCTION() % errrange);
+        errbase0 = errbase + (CUPS_RAND() % errrange);
+        errbase1 = errbase + (CUPS_RAND() % errrange);
       }
       else
         errbase0 = errbase1 = errbase;
