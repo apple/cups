@@ -5,8 +5,16 @@ CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
-	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- Localization updates (STR #3352, STR #3409, STR #3422, STR #3452,
+	  STR #3473)
 	- Documentation update (STR #3451)
+	- The IPP backend now sets the printer-state-message to "Ready to
+	  print." at the end of a successful job (STR #3460)
+	- The PPD compiler did not correctly add the manufacturer to the output
+	  filename when using the "-m" option (STR #3469)
+	- The IPP backend did not handle authentication properly for the Get-
+	  Printer-Attributes operation (STR 3458)
+	- Getting SNMP values larger than 127 bytes did not work.
 	- IPP conformance: Get-Jobs has a default value for requested-attributes
 	  (STR #3383)
 	- cupsPrintFiles() did not report all errors (STR #3449)

@@ -3,7 +3,7 @@
  *
  *   SNMP functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -89,14 +89,14 @@ static char		*asn1_get_string(unsigned char **buffer,
 			                 unsigned char *bufend,
 			                 int length, char *string,
 			                 int strsize);
-static int		asn1_get_length(unsigned char **buffer,
+static unsigned		asn1_get_length(unsigned char **buffer,
 			                unsigned char *bufend);
 static int		asn1_get_type(unsigned char **buffer,
 			              unsigned char *bufend);
 static void		asn1_set_integer(unsigned char **buffer,
 			                 int integer);
 static void		asn1_set_length(unsigned char **buffer,
-			                int length);
+			                unsigned length);
 static void		asn1_set_oid(unsigned char **buffer,
 			             const int *oid);
 static void		asn1_set_packed(unsigned char **buffer,
@@ -1286,6 +1286,12 @@ asn1_get_integer(
   int	value;				/* Integer value */
 
 
+  if (length > sizeof(int))
+  {
+    (*buffer) += length;
+    return (0);
+  }
+
   for (value = (**buffer & 0x80) ? -1 : 0;
        length > 0 && *buffer < bufend;
        length --, (*buffer) ++)
@@ -1299,18 +1305,32 @@ asn1_get_integer(
  * 'asn1_get_length()' - Get a value length.
  */
 
-static int				/* O  - Length */
+static unsigned				/* O  - Length */
 asn1_get_length(unsigned char **buffer,	/* IO - Pointer in buffer */
 		unsigned char *bufend)	/* I  - End of buffer */
 {
-  int	length;				/* Length */
+  unsigned	length;			/* Length */
 
 
   length = **buffer;
   (*buffer) ++;
 
   if (length & 128)
-    length = asn1_get_integer(buffer, bufend, length & 127);
+  {
+    int	count;				/* Number of bytes for length */
+
+
+    if ((count = length & 127) > sizeof(unsigned))
+    {
+      (*buffer) += count;
+      return (0);
+    }
+
+    for (length = 0;
+	 count > 0 && *buffer < bufend;
+	 count --, (*buffer) ++)
+      length = (length << 8) | **buffer;
+  }
 
   return (length);
 }
@@ -1529,7 +1549,7 @@ asn1_set_integer(unsigned char **buffer,/* IO - Pointer in buffer */
 
 static void
 asn1_set_length(unsigned char **buffer,	/* IO - Pointer in buffer */
-		int           length)	/* I  - Length value */
+		unsigned      length)	/* I  - Length value */
 {
   if (length > 255)
   {

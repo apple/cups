@@ -253,7 +253,7 @@ cupsdCancelJobs(const char *dest,	/* I - Destination to cancel */
       if (purge)
 	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_PURGE,
 	                 "Job purged by user.");
-      else
+      else if (job->state_value < IPP_JOB_CANCELED)
 	cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
 			 "Job canceled by user.");
     }

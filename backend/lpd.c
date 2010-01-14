@@ -796,7 +796,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
       error = errno;
       close(fd);
-      fd = -1;
 
       if (addr->next)
         continue;

@@ -948,7 +948,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
 	  if (isalnum(*uriptr & 255) || *uriptr == '_' || *uriptr == '-' ||
 	      *uriptr == '.')
 	    *tptr++ = *uriptr;
-	  else if ((*uriptr == ' ' || *uriptr == '/') && tptr[-1] != '_')
+	  else if ((*uriptr == ' ' || *uriptr == '/') && tptr > template &&
+	           tptr[-1] != '_')
 	    *tptr++ = '_';
 	  else if (*uriptr == '?' || *uriptr == '(')
 	    break;

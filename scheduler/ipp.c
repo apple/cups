@@ -1547,12 +1547,9 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
                   priority);
   }
 
-  if ((attr = ippFindAttribute(con->request, "job-name",
-                               IPP_TAG_NAME)) != NULL)
-    title = attr->values[0].string.text;
-  else
+  if (!ippFindAttribute(con->request, "job-name", IPP_TAG_NAME))
     ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "job-name", NULL,
-                 title = "Untitled");
+                 "Untitled");
 
   if ((job = cupsdAddJob(priority, printer->name)) == NULL)
   {
@@ -9631,7 +9628,7 @@ save_auth_info(
   * Write a random number of newlines to the end of the file...
   */
 
-  for (i = (rand() % 1024); i >= 0; i --)
+  for (i = (CUPS_RAND() % 1024); i >= 0; i --)
     cupsFilePutChar(fp, '\n');
 
  /*
