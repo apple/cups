@@ -1340,7 +1340,10 @@ main(int  argc,				/* I - Number of command-line args */
   else if (ipp_status > IPP_OK_CONFLICT)
     return (CUPS_BACKEND_FAILED);
   else
+  {
+    _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
     return (CUPS_BACKEND_OK);
+  }
 }
 
 
