@@ -728,6 +728,15 @@ main(int  argc,				/* I - Number of command-line args */
 
 	return (CUPS_BACKEND_STOP);
       }
+      else if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+      {
+	if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
+		     "Negotiate", 9))
+	  auth_info_required = "negotiate";
+
+	fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
+	return (CUPS_BACKEND_AUTH_REQUIRED);
+      }
       else
       {
 	_cupsLangPrintf(stderr,
