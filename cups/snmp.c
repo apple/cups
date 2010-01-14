@@ -1286,6 +1286,12 @@ asn1_get_integer(
   int	value;				/* Integer value */
 
 
+  if (length > sizeof(int))
+  {
+    (*buffer) += length;
+    return (0);
+  }
+
   for (value = (**buffer & 0x80) ? -1 : 0;
        length > 0 && *buffer < bufend;
        length --, (*buffer) ++)
@@ -1314,7 +1320,13 @@ asn1_get_length(unsigned char **buffer,	/* IO - Pointer in buffer */
     int	count;				/* Number of bytes for length */
 
 
-    for (count = length & 127, length = 0;
+    if ((count = length & 127) > sizeof(unsigned))
+    {
+      (*buffer) += count;
+      return (0);
+    }
+
+    for (length = 0;
 	 count > 0 && *buffer < bufend;
 	 count --, (*buffer) ++)
       length = (length << 8) | **buffer;
