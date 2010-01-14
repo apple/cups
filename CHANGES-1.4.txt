@@ -5,7 +5,7 @@ CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
-	- Localization updates (STR #3352, STR #3409, STR #3422)
+	- Localization updates (STR #3352, STR #3409, STR #3422, STR #3452)
 	- Documentation update (STR #3451)
 	- The PPD compiler did not correctly add the manufacturer to the output
 	  filename when using the "-m" option (STR #3469)
