@@ -136,7 +136,7 @@
  * 
  *     4. kqueue() - O(n)
  *         b. cupsdStartSelect() creates kqueue file descriptor
- *            using kqyeue() function and allocates a global event
+ *            using kqueue() function and allocates a global event
  *            buffer.
  *         c. cupsdAdd/RemoveSelect() uses EV_SET and kevent() to
  *            register the changes. The event user data field is a
@@ -144,7 +144,7 @@
  *         d. cupsdDoSelect() uses kevent() to poll for events and
  *            loops through the events, using the user data field to
  *            find the callback record.
- *         e. cupsdStopSelect() closes the kqyeye() file descriptor
+ *         e. cupsdStopSelect() closes the kqueue() file descriptor
  *            and frees all of the memory used by the event buffer.
  * 
  *     5. /dev/poll - O(n log n) - NOT YET IMPLEMENTED
