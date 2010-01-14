@@ -3,7 +3,7 @@
 //
 //   Source class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2010 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -3514,7 +3514,8 @@ ppdcSource::write_file(const char *f)	// I - File to write
   for (d = (ppdcDriver *)drivers->first(); d; d = (ppdcDriver *)drivers->next())
   {
     // Start the driver...
-    cupsFilePrintf(fp, "\n// %s %s\n", d->manufacturer->value, d->model_name->value);
+    cupsFilePrintf(fp, "\n// %s %s\n", d->manufacturer->value,
+                   d->model_name->value);
     cupsFilePuts(fp, "{\n");
 
     // Write the copyright stings...

@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.4.3
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422)
 	- Documentation update (STR #3451)
+	- The PPD compiler did not correctly add the manufacturer to the output
+	  filename when using the "-m" option (STR #3469)
 	- The IPP backend did not handle authentication properly for the Get-
 	  Printer-Attributes operation (STR 3458)
 	- Getting SNMP values larger than 127 bytes did not work.
