@@ -3,7 +3,7 @@
  *
  *   Administration CGI for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -49,6 +49,13 @@
 
 
 /*
+ * Local globals...
+ */
+
+static int	current_device = 0;	/* Current device shown */
+
+
+/*
  * Local functions...
  */
 
@@ -57,7 +64,7 @@ static void	choose_device_cb(const char *device_class,
                                  const char *device_make_and_model,
                                  const char *device_uri,
                                  const char *device_location,
-				 int *current_device);
+				 const char *title);
 static void	do_add_rss_subscription(http_t *http);
 static void	do_am_class(http_t *http, int modify);
 static void	do_am_printer(http_t *http, int modify);
@@ -282,20 +289,35 @@ choose_device_cb(
     const char *device_make_and_model,	/* I - Make and model */
     const char *device_uri,		/* I - Device URI */
     const char *device_location,	/* I - Location */
-    int        *current_device)		/* I - Current device index */
+    const char *title)			/* I - Page title */
 {
+ /*
+  * For modern browsers, start a multi-part page so we can show that something
+  * is happening.  Non-modern browsers just get everything at the end...
+  */
+
+  if (current_device == 0 && cgiSupportsMultipart())
+  {
+    cgiStartMultipart();
+    cgiStartHTML(title);
+    cgiCopyTemplateLang("choose-device.tmpl");
+    cgiEndHTML();
+    fflush(stdout);
+  }
+
+
  /*
   * Add the device to the array...
   */
 
-  cgiSetArray("device_class", *current_device, device_class);
-  cgiSetArray("device_id", *current_device, device_id);
-  cgiSetArray("device_info", *current_device, device_info);
-  cgiSetArray("device_make_and_model", *current_device, device_make_and_model);
-  cgiSetArray("device_uri", *current_device, device_uri);
-  cgiSetArray("device_location", *current_device, device_location);
+  cgiSetArray("device_class", current_device, device_class);
+  cgiSetArray("device_id", current_device, device_id);
+  cgiSetArray("device_info", current_device, device_info);
+  cgiSetArray("device_make_and_model", current_device, device_make_and_model);
+  cgiSetArray("device_uri", current_device, device_uri);
+  cgiSetArray("device_location", current_device, device_location);
 
-  (*current_device) ++;
+  current_device ++;
 }
 
 
@@ -816,7 +838,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
   const char	*name,			/* Pointer to class name */
 		*ptr;			/* Pointer to CGI variable */
   const char	*title;			/* Title of page */
-  int		current_device;		/* Index of current device */
   static int	baudrates[] =		/* Baud rates */
 		{
 		  1200,
@@ -978,20 +999,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     }
 
    /*
-    * For modern browsers, start a multi-part page so we can show that something
-    * is happening.  Non-modern browsers just get everything at the end...
-    */
-
-    if (cgiSupportsMultipart())
-    {
-      cgiStartMultipart();
-      cgiStartHTML(title);
-      cgiCopyTemplateLang("choose-device.tmpl");
-      cgiEndHTML();
-      fflush(stdout);
-    }
-
-   /*
     * Scan for devices for up to 30 seconds...
     */
 
@@ -1000,7 +1007,7 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     current_device = 0;
     if (cupsGetDevices(http, 30, CUPS_INCLUDE_ALL, CUPS_EXCLUDE_NONE,
                        (cups_device_cb_t)choose_device_cb,
-		       &current_device) == IPP_OK)
+		       (void *)title) == IPP_OK)
     {
       fputs("DEBUG: Got device list!\n", stderr);
 
