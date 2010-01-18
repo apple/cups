@@ -1,4 +1,4 @@
-CHANGES.txt - 2009-11-19
+CHANGES.txt - 2010-01-18
 ------------------------
 
 CHANGES IN CUPS V1.5b1
@@ -10,3 +10,4 @@ CHANGES IN CUPS V1.5b1
 	  permissions disabled.
 	- The PPD compiler now checks for overlapping filenames when writing
 	  PPD files.
+	- The HP-GL/2 filter is no longer included with CUPS (STR #3322)

@@ -3,7 +3,7 @@
 #
 #   Datafile makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -71,7 +71,6 @@ CHARSETS =	\
 		utf-8
 
 DATAFILES =	\
-		HPGLprolog \
 		psglyphs \
 		testprint
 

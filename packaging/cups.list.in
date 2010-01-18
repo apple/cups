@@ -3,7 +3,7 @@
 #
 #   ESP Package Manager (EPM) file list for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2009 by Apple Inc.
+%copyright 2007-2010 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -296,7 +296,6 @@ f 0555 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
 f 0555 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
 f 0555 root sys $SERVERBIN/filter/commandtops filter/commandtops
 f 0555 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
-f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
 %if IMGFILTERS
 f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
@@ -503,7 +502,6 @@ d 0755 root sys $DATADIR/charsets -
 f 0444 root sys $DATADIR/charsets/utf-8 data/utf-8
 
 d 0755 root sys $DATADIR/data -
-f 0444 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint data/testprint
 
