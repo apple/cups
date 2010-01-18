@@ -1332,7 +1332,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 		*auth_info;		/* auth-info attribute */
   const char	*val;			/* Default option value */
   int		priority;		/* Job priority */
-  char		*title;			/* Job name/title */
   cupsd_job_t	*job;			/* Current job */
   char		job_uri[HTTP_MAX_URI];	/* Job URI */
   int		kbytes;			/* Size of print file */

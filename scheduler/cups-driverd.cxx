@@ -1991,7 +1991,8 @@ load_drv(const char  *filename,		/* I - Actual filename */
 	  type = PPD_TYPE_PDF;
     }
 
-    for (product = (ppdcAttr *)d->attrs->first(), products_found = 0;
+    for (product = (ppdcAttr *)d->attrs->first(), products_found = 0,
+             ppd = NULL;
          product;
 	 product = (ppdcAttr *)d->attrs->next())
       if (!strcmp(product->name->value, "Product"))
