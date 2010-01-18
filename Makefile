@@ -142,10 +142,12 @@ depend:
 # (at least checker-231 is required for scan-build to work this way)
 #
 
-.PHONY: clang
+.PHONY: clang clang-changes
 clang:
 	$(RM) -r clang
 	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) clean all
+clang-changes:
+	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) all
 
 
 #
