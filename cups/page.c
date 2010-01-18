@@ -3,7 +3,7 @@
  *
  *   Page size functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -250,6 +250,9 @@ ppdPageSizeLimits(ppd_file_t *ppd,	/* I - PPD file record */
   * Figure out the current minimum width and length...
   */
 
+  width  = ppd->custom_min[0];
+  length = ppd->custom_min[1];
+
   if (qualifier2)
   {
    /*
@@ -284,11 +287,6 @@ ppdPageSizeLimits(ppd_file_t *ppd,	/* I - PPD file record */
       length = ppd->custom_min[1];
     }
   }
-  else
-  {
-    width  = ppd->custom_min[0];
-    length = ppd->custom_min[1];
-  }
 
   minimum->width  = width;
   minimum->length = length;
@@ -300,6 +298,9 @@ ppdPageSizeLimits(ppd_file_t *ppd,	/* I - PPD file record */
  /*
   * Figure out the current maximum width and length...
   */
+
+  width  = ppd->custom_max[0];
+  length = ppd->custom_max[1];
 
   if (qualifier2)
   {
@@ -334,11 +335,6 @@ ppdPageSizeLimits(ppd_file_t *ppd,	/* I - PPD file record */
       width  = ppd->custom_max[0];
       length = ppd->custom_max[1];
     }
-  }
-  else
-  {
-    width  = ppd->custom_max[0];
-    length = ppd->custom_max[1];
   }
 
   maximum->width  = width;

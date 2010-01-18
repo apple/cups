@@ -3,7 +3,7 @@
  *
  *   CGI template function.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -437,7 +437,14 @@ cgi_copy(FILE *out,			/* I - Output file */
         * Test for existance...
 	*/
 
-        result     = cgiGetArray(name, element) != NULL && outptr[0];
+        if (name[0] == '?')
+	  result = cgiGetArray(name + 1, element) != NULL;
+	else if (name[0] == '#')
+	  result = cgiGetVariable(name + 1) != NULL;
+        else
+          result = cgiGetArray(name, element) != NULL;
+
+	result     = result && outptr[0];
 	compare[0] = '\0';
       }
       else
