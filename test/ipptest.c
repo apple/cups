@@ -3,7 +3,7 @@
  *
  *   IPP test command for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,13 +14,21 @@
  *
  * Contents:
  *
- *   main()           - Parse options and do tests.
- *   do_tests()       - Do tests as specified in the test file.
- *   expect_matches() - Return true if the tag matches the specification.
- *   get_token()      - Get a token from a file.
- *   print_attr()     - Print an attribute on the screen.
- *   print_col()      - Print a collection attribute on the screen.
- *   usage()          - Show program usage.
+ *   main()              - Parse options and do tests.
+ *   do_tests()          - Do tests as specified in the test file.
+ *   expect_matches()    - Return true if the tag matches the specification.
+ *   get_token()         - Get a token from a file.
+ *   iso_date()          - Return an ISO 8601 date/time string for the given IPP
+ *                         dateTime value.
+ *   print_attr()        - Print an attribute on the screen.
+ *   print_col()         - Print a collection attribute on the screen.
+ *   print_fatal_error() - Print a fatal error message.
+ *   print_test_error()  - Print a test error message.
+ *   print_xml_header()  - Print a standard XML plist header.
+ *   print_xml_string()  - Print an XML string with escaping.
+ *   print_xml_trailer() - Print the XML trailer with success/fail value.
+ *   usage()             - Show program usage.
+ *   with_value()        - Test a WITH-VALUE predicate.
  */
 
 /*
@@ -32,10 +40,12 @@
 #include <cups/string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <regex.h>
 
 #include <cups/cups.h>
-#include <cups/language.h>
+#include <cups/i18n.h>
 #include <cups/http-private.h>
+#include <cups/string.h>
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
@@ -51,7 +61,10 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
   char	*name,				/* Attribute name */
 	*of_type,			/* Type name */
 	*same_count_as,			/* Parallel attribute name */
-	*if_defined;			/* Only required if variable defined */
+	*if_defined,			/* Only required if variable defined */
+	*if_undefined,			/* Only required if variable is not defined */
+	*with_value;			/* Attribute must include this value */
+  int	with_regex;			/* WITH-VALUE is a regular expression */
 } _cups_expect_t;
 
 
@@ -59,8 +72,10 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
  * Globals...
  */
 
-int		Chunking = 0;		/* Use chunked requests */
+int		Chunking = 1;		/* Use chunked requests */
 int		Verbosity = 0;		/* Show all attributes? */
+int		XML = 0,		/* Produce XML output? */
+		XMLHeader = 0;		/* 1 if header is written */
 
 
 /*
@@ -71,9 +86,24 @@ static int	do_tests(const char *uri, const char *testfile);
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
 static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
+static char	*iso_date(ipp_uchar_t *date);
 static void	print_attr(ipp_attribute_t *attr);
 static void	print_col(ipp_t *col);
+static void	print_fatal_error(const char *s, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 1, 2)))
+#endif /* __GNUC__ */
+;
+static void	print_test_error(const char *s, ...)
+#ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 1, 2)))
+#endif /* __GNUC__ */
+;
+static void	print_xml_header(void);
+static void	print_xml_string(const char *element, const char *s);
+static void	print_xml_trailer(int success, const char *message);
 static void	usage(void);
+static int      with_value(char *value, int regex, ipp_attribute_t *attr);
 
 
 /*
@@ -91,6 +121,8 @@ main(int  argc,				/* I - Number of command-line args */
 		*testfile;		/* Test file to use */
   int		interval;		/* Test interval */
 
+
+  _cupsSetLocale(argv);
 
  /*
   * We need at least:
@@ -120,7 +152,8 @@ main(int  argc,				/* I - Number of command-line args */
 
 	      if (i >= argc)
 	      {
-		fputs("ipptest: Missing name=value for \"-d\"!\n", stderr);
+		_cupsLangPuts(stderr,
+		              _("ipptest: Missing name=value for \"-d\".\n"));
 		usage();
               }
 	      else
@@ -132,19 +165,43 @@ main(int  argc,				/* I - Number of command-line args */
 
 	      if (i >= argc)
 	      {
-		fputs("ipptest: Missing seconds for \"-i\"!\n", stderr);
+		_cupsLangPuts(stderr,
+		              _("ipptest: Missing seconds for \"-i\".\n"));
 		usage();
               }
 	      else
 		interval = atoi(argv[i]);
+
+              if (XML && interval)
+	      {
+	        _cupsLangPuts(stderr, _("ipptest: \"-i\" is incompatible with "
+			                "\"-x\".\n"));
+		usage();
+	      }
 	      break;
+
+          case 'l' : /* Disable HTTP chunking */
+              Chunking = 0;
+              break;
 
           case 'v' : /* Be verbose */
 	      Verbosity ++;
 	      break;
 
+          case 'X' : /* Produce XML output */
+	      XML = 1;
+
+              if (interval)
+	      {
+	        _cupsLangPuts(stderr, _("ipptest: \"-i\" is incompatible with "
+				        "\"-x\".\n"));
+		usage();
+	      }
+	      break;
+
 	  default :
-	      fprintf(stderr, "ipptest: Unknown option \"-%c\"!\n", *opt);
+	      _cupsLangPrintf(stderr, _("ipptest: Unknown option \"-%c\".\n"),
+	                      *opt);
 	      usage();
 	      break;
 	}
@@ -160,8 +217,8 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (!testfile && uri)
       {
-        fputs("ipptest: May only specify a single URI before a test!\n",
-              stderr);
+        _cupsLangPuts(stderr, _("ipptest: May only specify a single URI before "
+	                        "a test!\n"));
         usage();
       }
 
@@ -188,7 +245,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Loop if the interval is set...
   */
 
-  if (interval)
+  if (XML)
+    print_xml_trailer(status == 0, NULL);
+  else if (interval)
   {
     for (;;)
     {
@@ -216,19 +275,19 @@ do_tests(const char *uri,		/* I - URI to connect on */
   int		i;			/* Looping var */
   int		linenum;		/* Current line number */
   int		version;		/* IPP version number to use */
-  http_t	*http;			/* HTTP connection to server */
+  http_t	*http = NULL;		/* HTTP connection to server */
   char		scheme[HTTP_MAX_URI],	/* URI scheme */
 		userpass[HTTP_MAX_URI],	/* username:password */
 		server[HTTP_MAX_URI],	/* Server */
 		resource[HTTP_MAX_URI];	/* Resource path */
   int		port;			/* Port number */
-  FILE		*fp;			/* Test file */
+  FILE		*fp = NULL;		/* Test file */
   char		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
 		temp[1024],		/* Temporary string */
 		*tempptr;		/* Pointer into temp string */
-  ipp_t		*request;		/* IPP request */
-  ipp_t		*response;		/* IPP response */
+  ipp_t		*request = NULL;	/* IPP request */
+  ipp_t		*response = NULL;	/* IPP response */
   ipp_op_t	op;			/* Operation */
   ipp_tag_t	group;			/* Current group */
   ipp_tag_t	value;			/* Current value type */
@@ -237,11 +296,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
   char		attr[128];		/* Attribute name */
   int		num_statuses;		/* Number of valid status codes */
   ipp_status_t	statuses[100];		/* Valid status codes */
-  int		num_expects;		/* Number of expected attributes */
-  _cups_expect_t expects[100],		/* Expected attributes */
+  int		num_expects = 0;	/* Number of expected attributes */
+  _cups_expect_t expects[200],		/* Expected attributes */
 		*expect,		/* Current expected attribute */
 		*last_expect;		/* Last EXPECT (for predicates) */
-  int		num_displayed;		/* Number of displayed attributes */
+  int		num_displayed = 0;	/* Number of displayed attributes */
   char		*displayed[100];	/* Displayed attributes */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
@@ -256,8 +315,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
   if ((fp = fopen(testfile, "r")) == NULL)
   {
-    printf("Unable to open test file %s - %s\n", testfile, strerror(errno));
-    return (0);
+    print_fatal_error("Unable to open test file %s - %s", testfile,
+                      strerror(errno));
+    goto test_error;
   }
 
  /*
@@ -269,17 +329,20 @@ do_tests(const char *uri,		/* I - URI to connect on */
 		  sizeof(resource));
   if ((http = httpConnect(server, port)) == NULL)
   {
-    printf("Unable to connect to %s on port %d - %s\n", server, port,
-           strerror(errno));
-    fclose(fp);
-    return (0);
+    print_fatal_error("Unable to connect to %s on port %d - %s", server, port,
+                      strerror(errno));
+    goto test_error;
   }
 
  /*
   * Loop on tests...
   */
 
-  printf("\"%s\":\n", testfile);
+  if (XML)
+    print_xml_header();
+  else
+    printf("\"%s\":\n", testfile);
+
   pass            = 1;
   job_id          = 0;
   subscription_id = 0;
@@ -294,10 +357,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
     if (strcmp(token, "{"))
     {
-      printf("Unexpected token %s seen on line %d - aborting test!\n", token,
-             linenum);
-      httpClose(http);
-      return (0);
+      print_fatal_error("Unexpected token %s seen on line %d.", token, linenum);
+      goto test_error;
     }
 
    /*
@@ -329,8 +390,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
     {
       if (strcasecmp(token, "EXPECT") &&
           strcasecmp(token, "IF-DEFINED") &&
+          strcasecmp(token, "IF-UNDEFINED") &&
           strcasecmp(token, "OF-TYPE") &&
-          strcasecmp(token, "SAME-COUNT-AS"))
+          strcasecmp(token, "SAME-COUNT-AS") &&
+          strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
       if (!strcmp(token, "}"))
@@ -358,11 +421,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  version = major * 10 + minor;
 	else
 	{
-	  printf("Bad version %s seen on line %d - aborting test!\n", token,
-		 linenum);
-	  httpClose(http);
-	  ippDelete(request);
-	  return (0);
+	  print_fatal_error("Bad version %s seen on line %d.", token, linenum);
+	  goto test_error;
 	}
       }
       else if (!strcasecmp(token, "RESOURCE"))
@@ -423,6 +483,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
         for (tempptr = temp, tokenptr = token;
 	     *tempptr && tokenptr < (token + sizeof(token) - 1);)
+	{
 	  if (*tempptr == '$')
 	  {
 	   /*
@@ -510,6 +571,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	    *tokenptr++ = *tempptr++;
 	    *tokenptr   = '\0';
 	  }
+	}
 
         switch (value)
 	{
@@ -526,12 +588,14 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      puts("    ERROR: resolution tag not yet supported!");
-	      break;
+	      print_fatal_error("resolution tag not yet supported on line %d",
+	                        linenum);
+	      goto test_error;
 
 	  case IPP_TAG_RANGE :
-	      puts("    ERROR: range tag not yet supported!");
-	      break;
+	      print_fatal_error("range tag not yet supported on line %d",
+	                        linenum);
+	      goto test_error;
 
 	  default :
 	      if (!strchr(token, ','))
@@ -571,12 +635,17 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
 	get_token(fp, filename, sizeof(filename), &linenum);
       }
-      else if (!strcasecmp(token, "STATUS") &&
-               num_statuses < (int)(sizeof(statuses) / sizeof(statuses[0])))
+      else if (!strcasecmp(token, "STATUS"))
       {
        /*
         * Status...
 	*/
+
+        if (num_statuses >= (int)(sizeof(statuses) / sizeof(statuses[0])))
+	{
+	  print_fatal_error("Too many STATUS's on line %d.", linenum);
+	  goto test_error;
+	}
 
 	get_token(fp, token, sizeof(token), &linenum);
 	statuses[num_statuses] = ippErrorValue(token);
@@ -590,10 +659,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
         if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
         {
-	  fprintf(stderr, "ipptest: Too many EXPECT's on line %d\n", linenum);
-	  httpClose(http);
-	  ippDelete(request);
-	  return (0);
+	  print_fatal_error("Too many EXPECT's on line %d.", linenum);
+	  goto test_error;
         }
 
 	get_token(fp, token, sizeof(token), &linenum);
@@ -615,6 +682,8 @@ do_tests(const char *uri,		/* I - URI to connect on */
         last_expect->of_type       = NULL;
         last_expect->same_count_as = NULL;
         last_expect->if_defined    = NULL;
+        last_expect->if_undefined  = NULL;
+        last_expect->with_value    = NULL;
       }
       else if (!strcasecmp(token, "OF-TYPE"))
       {
@@ -624,12 +693,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  last_expect->of_type = strdup(token);
 	else
 	{
-	  fprintf(stderr,
-		  "ipptest: OF-TYPE without a preceding EXPECT on line %d\n",
-		  linenum);
-	  httpClose(http);
-	  ippDelete(request);
-	  return (0);
+	  print_fatal_error("OF-TYPE without a preceding EXPECT on line %d.",
+	                    linenum);
+	  goto test_error;
 	}
       }
       else if (!strcasecmp(token, "SAME-COUNT-AS"))
@@ -640,12 +706,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  last_expect->same_count_as = strdup(token);
 	else
 	{
-	  fprintf(stderr,
-		  "ipptest: SAME-COUNT-AS without a preceding EXPECT on line "
-		  "%d\n", linenum);
-	  httpClose(http);
-	  ippDelete(request);
-	  return (0);
+	  print_fatal_error("SAME-COUNT-AS without a preceding EXPECT on line "
+	                    "%d.", linenum);
+	  goto test_error;
 	}
       }
       else if (!strcasecmp(token, "IF-DEFINED"))
@@ -656,20 +719,69 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  last_expect->if_defined = strdup(token);
 	else
 	{
-	  fprintf(stderr,
-		  "ipptest: IF-DEFINED without a preceding EXPECT on line %d\n",
-		  linenum);
-	  httpClose(http);
-	  ippDelete(request);
-	  return (0);
+	  print_fatal_error("IF-DEFINED without a preceding EXPECT on line %d.",
+		            linenum);
+	  goto test_error;
 	}
       }
-      else if (!strcasecmp(token, "DISPLAY") &&
-               num_displayed < (int)(sizeof(displayed) / sizeof(displayed[0])))
+      else if (!strcasecmp(token, "IF-UNDEFINED"))
+      {
+	get_token(fp, token, sizeof(token), &linenum);
+
+	if (last_expect)
+	  last_expect->if_undefined = strdup(token);
+	else
+	{
+	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT on line "
+	                    "%d.", linenum);
+	  goto test_error;
+	}
+      }
+      else if (!strcasecmp(token, "WITH-VALUE"))
+      {
+      	get_token(fp, token, sizeof(token), &linenum);
+        if (last_expect)
+	{
+	  tokenptr = token + strlen(token) - 1;
+	  if (token[0] == '/' && tokenptr > token && *tokenptr == '/')
+	  {
+	   /*
+	    * WITH-VALUE is a POSIX extended regular expression.
+	    */
+
+	    last_expect->with_value = calloc(1, tokenptr - token);
+	    last_expect->with_regex = 1;
+
+	    if (last_expect->with_value)
+	      memcpy(last_expect->with_value, token + 1, tokenptr - token - 1);
+	  }
+	  else
+	  {
+	   /*
+	    * WITH-VALUE is a literal value...
+	    */
+
+	    last_expect->with_value = strdup(token);
+	  }
+	}
+	else
+	{
+	  print_fatal_error("WITH-VALUE without a preceding EXPECT on line %d.",
+		            linenum);
+	  goto test_error;
+	}
+      }
+      else if (!strcasecmp(token, "DISPLAY"))
       {
        /*
         * Display attributes...
 	*/
+
+        if (num_displayed >= (int)(sizeof(displayed) / sizeof(displayed[0])))
+	{
+	  print_fatal_error("Too many DISPLAY's on line %d", linenum);
+	  goto test_error;
+	}
 
 	get_token(fp, token, sizeof(token), &linenum);
 	displayed[num_displayed] = strdup(token);
@@ -677,12 +789,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else
       {
-	fprintf(stderr,
-	        "ipptest: Unexpected token %s seen on line %d - aborting "
-	        "test!\n", token, linenum);
-	httpClose(http);
-	ippDelete(request);
-	return (0);
+	print_fatal_error("Unexpected token %s seen on line %d.", token,
+	                  linenum);
+	goto test_error;
       }
     }
 
@@ -695,16 +804,32 @@ do_tests(const char *uri,		/* I - URI to connect on */
     request->request.op.operation_id = op;
     request->request.op.request_id   = 1;
 
-    if (Verbosity)
+    if (XML)
     {
-      printf("    %s:\n", ippOpString(op));
-
+      puts("<dict>");
+      puts("<key>Name</key>");
+      print_xml_string("string", name);
+      puts("<key>Operation</key>");
+      print_xml_string("string", ippOpString(op));
+      puts("<key>RequestAttributes</key>");
+      puts("<dict>");
       for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
 	print_attr(attrptr);
+      puts("</dict>");
     }
+    else
+    {
+      if (Verbosity)
+      {
+        printf("    %s:\n", ippOpString(op));
 
-    printf("    %-60.60s [", name);
-    fflush(stdout);
+        for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
+          print_attr(attrptr);
+      }
+
+      printf("    %-60.60s [", name);
+      fflush(stdout);
+    }
 
     if (Chunking)
     {
@@ -741,17 +866,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
       response = cupsDoIORequest(http, request, resource, -1,
                                  Verbosity ? 1 : -1);
 
-    if (response == NULL)
-    {
-      time_t curtime;
+    request = NULL;
 
-      curtime = time(NULL);
-
-      puts("FAIL]");
-      printf("        ERROR %04x (%s) @ %s\n", cupsLastError(),
-	     cupsLastErrorString(), ctime(&curtime));
+    if (!response)
       pass = 0;
-    }
     else
     {
       if (http->version != HTTP_1_1)
@@ -778,6 +896,9 @@ do_tests(const char *uri,		/* I - URI to connect on */
           if (expect->if_defined && !getenv(expect->if_defined))
             continue;
 
+          if (expect->if_undefined && getenv(expect->if_undefined))
+            continue;
+            
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
           if ((found == NULL) != expect->not_expect ||
@@ -787,6 +908,13 @@ do_tests(const char *uri,		/* I - URI to connect on */
       	    break;          
           }
 
+          if (found &&
+	      !with_value(expect->with_value, expect->with_regex, found))
+          {
+            pass = 0;
+            break;
+          }
+          
           if (found && expect->same_count_as)
           {
             attrptr = ippFindAttribute(response, expect->same_count_as,
@@ -800,106 +928,135 @@ do_tests(const char *uri,		/* I - URI to connect on */
           }
         }
       }
-
-      if (pass)
-      {
-	puts("PASS]");
-	printf("        RECEIVED: %lu bytes in response\n",
-	       (unsigned long)ippLength(response));
-
-        if (Verbosity)
-	{
-	  for (attrptr = response->attrs;
-	       attrptr != NULL;
-	       attrptr = attrptr->next)
-	  {
-	    print_attr(attrptr);
-          }
-        }
-        else if (num_displayed > 0)
-	{
-	  for (attrptr = response->attrs;
-	       attrptr != NULL;
-	       attrptr = attrptr->next)
-	  {
-	    if (attrptr->name)
-	    {
-	      for (i = 0; i < num_displayed; i ++)
-	      {
-		if (!strcmp(displayed[i], attrptr->name))
-		{
-		  print_attr(attrptr);
-		  break;
-		}
-	      }
-	    }
-	  }
-        }
-      }
-      else
-      {
-	puts("FAIL]");
-	printf("        RECEIVED: %lu bytes in response\n",
-	       (unsigned long)ippLength(response));
-
-        if (http->version != HTTP_1_1)
-          printf("        BAD HTTP VERSION (%d.%d)\n", http->version / 100,
-                 http->version % 100);
-
-	for (i = 0; i < num_statuses; i ++)
-          if (response->request.status.status_code == statuses[i])
-	    break;
-
-	if (i == num_statuses && num_statuses > 0)
-	  puts("        BAD STATUS");
-
-	printf("        status-code = %04x (%s)\n",
-	       cupsLastError(), ippErrorString(cupsLastError()));
-
-        for (i = num_expects, expect = expects; i > 0; i --, expect ++)
-        {
-          if (expect->if_defined && !getenv(expect->if_defined))
-            continue;
-
-          found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
-
-          if ((found == NULL) != expect->not_expect)
-          {
-            if (expect->not_expect)
-	      printf("        NOT EXPECTED: %s\n", expect->name);
-	    else
-	      printf("        EXPECTED: %s\n", expect->name);
-	  }
-          else if (found)
-          {
-            if (!expect_matches(expect, found->value_tag))
-              printf("        EXPECTED: %s of type %s but got %s\n", 
-                     expect->name, expect->of_type,
-                     ippTagString(found->value_tag));
-	    else if (expect->same_count_as)
-	    {
-	      attrptr = ippFindAttribute(response, expect->same_count_as,
-					 IPP_TAG_ZERO);
-  
-	      if (!attrptr)
-		printf("        EXPECTED: %s (%d values) same count as %s "
-		       "(not returned)\n", 
-		       expect->name, found->num_values, expect->same_count_as);
-	      else if (attrptr->num_values != found->num_values)
-		printf("        EXPECTED: %s (%d values) same count as %s "
-		       "(%d values)\n", 
-		       expect->name, found->num_values, expect->same_count_as,
-		       attrptr->num_values);
-	    }
-	  }
-        }
-
-	for (attrptr = response->attrs; attrptr != NULL; attrptr = attrptr->next)
-	  print_attr(attrptr);
-      }
-
-      ippDelete(response);
     }
+
+    if (XML)
+    {
+      puts("<key>Successful</key>");
+      puts(pass ? "<true />" : "<false />");
+      puts("<key>StatusCode</key>");
+      print_xml_string("string", ippErrorString(cupsLastError()));
+      puts("<key>ResponseAttributes</key>");
+      puts("<dict>");
+      for (attrptr = response ? response->attrs : NULL;
+	   attrptr;
+	   attrptr = attrptr->next)
+	print_attr(attrptr);
+      puts("</dict>");
+    }
+    else
+    {
+      puts(pass ? "PASS]" : "FAIL]");
+      printf("        RECEIVED: %lu bytes in response\n",
+	     (unsigned long)ippLength(response));
+      printf("        status-code = %x (%s)\n", cupsLastError(),
+	     ippErrorString(cupsLastError()));
+
+      if ((Verbosity || !pass) && response)
+      {
+	for (attrptr = response->attrs;
+	     attrptr != NULL;
+	     attrptr = attrptr->next)
+	{
+	  print_attr(attrptr);
+	}
+      }
+    }
+
+    if (pass && !XML && !Verbosity && num_displayed > 0)
+    {
+      for (attrptr = response->attrs;
+	   attrptr != NULL;
+	   attrptr = attrptr->next)
+	if (attrptr->name)
+	  for (i = 0; i < num_displayed; i ++)
+	    if (!strcmp(displayed[i], attrptr->name))
+	    {
+	      print_attr(attrptr);
+	      break;
+	    }
+    }
+    else if (!pass)
+    {
+      if (XML)
+      {
+	puts("<key>Errors</key>");
+	puts("<array>");
+      }
+
+      if (http->version != HTTP_1_1)
+	print_test_error("Bad HTTP version (%d.%d)", http->version / 100,
+			 http->version % 100);
+
+      if (!response)
+	print_test_error("IPP request failed with status %04x (%s)",
+			 cupsLastError(), cupsLastErrorString());
+
+      for (i = 0; i < num_statuses; i ++)
+	if (response->request.status.status_code == statuses[i])
+	  break;
+
+      if (i == num_statuses && num_statuses > 0)
+	print_test_error("Bad status-code");
+
+      for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+      {
+	if (expect->if_defined && !getenv(expect->if_defined))
+	  continue;
+
+	if (expect->if_undefined && getenv(expect->if_undefined))
+	  continue;
+    
+	found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+
+	if ((found == NULL) != expect->not_expect)
+	{
+	  if (expect->not_expect)
+	    print_test_error("NOT EXPECTED: %s", expect->name);
+	  else
+	    print_test_error("EXPECTED: %s", expect->name);
+	}
+	else if (found)
+	{
+	  if (!expect_matches(expect, found->value_tag))
+	    print_test_error("EXPECTED: %s OF-TYPE %s (got %s)", 
+			     expect->name, expect->of_type,
+			     ippTagString(found->value_tag));
+	  else if (!with_value(expect->with_value, expect->with_regex, found))
+	  {
+	    if (expect->with_regex)
+	      print_test_error("EXPECTED: %s WITH-VALUE /%s/",
+			       expect->name, expect->with_value);         
+	    else
+	      print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
+			       expect->name, expect->with_value);         
+	  }
+	  else if (expect->same_count_as)
+	  {
+	    attrptr = ippFindAttribute(response, expect->same_count_as,
+				       IPP_TAG_ZERO);
+
+	    if (!attrptr)
+	      print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+			       "(not returned)", expect->name,
+			       found->num_values, expect->same_count_as);
+	    else if (attrptr->num_values != found->num_values)
+	      print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+			       "(%d values)", expect->name, found->num_values,
+			       expect->same_count_as, attrptr->num_values);
+	  }
+	}
+      }
+
+      if (XML)
+	puts("</array>");
+    }
+
+    if (XML)
+      puts("</dict>");
+
+    ippDelete(response);
+    response = NULL;
 
     for (i = num_expects, expect = expects; i > 0; i --, expect ++)
     {
@@ -910,7 +1067,17 @@ do_tests(const char *uri,		/* I - URI to connect on */
         free(expect->same_count_as);
       if (expect->if_defined)
         free(expect->if_defined);
+      if (expect->if_undefined)
+        free(expect->if_undefined);  
+      if (expect->with_value)
+        free(expect->with_value);
     }
+    num_expects = 0;
+
+    for (i = 0; i < num_displayed; i ++)
+      free(displayed[i]);
+    num_displayed = 0;
+
     if (!pass)
       break;
   }
@@ -919,6 +1086,39 @@ do_tests(const char *uri,		/* I - URI to connect on */
   httpClose(http);
 
   return (pass);
+
+ /*
+  * If we get here there was a fatal test error...
+  */
+
+  test_error:
+
+  if (fp)
+    fclose(fp);
+
+  httpClose(http);
+  ippDelete(request);
+  ippDelete(response);
+
+  for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+  {
+    free(expect->name);
+    if (expect->of_type)
+      free(expect->of_type);
+    if (expect->same_count_as)
+      free(expect->same_count_as);
+    if (expect->if_defined)
+      free(expect->if_defined);
+    if (expect->if_undefined)
+      free(expect->if_undefined);  
+    if (expect->with_value)
+      free(expect->with_value);
+  }
+
+  for (i = 0; i < num_displayed; i ++)
+    free(displayed[i]);
+
+  return (0);
 }
 
 
@@ -1016,23 +1216,44 @@ get_token(FILE *fp,			/* I  - File to read from */
 
     if (ch == EOF)
       return (NULL);
-    else if (ch == '\'' || ch == '\"')
+    else if (ch == '\'' || ch == '\"' || ch == '/')
     {
      /*
-      * Quoted text...
+      * Quoted text or regular expression...
       */
 
       quote  = ch;
       bufptr = buf;
       bufend = buf + buflen - 1;
 
+      if (quote == '/')
+        *bufptr++ = ch;
+
       while ((ch = getc(fp)) != EOF)
-	if (ch == quote)
+      {
+        if (ch == '\\')
+	{
+	 /*
+	  * Escape next character...
+	  */
+
+	  if (bufptr < bufend)
+	    *bufptr++ = ch;
+
+	  if ((ch = getc(fp)) != EOF && bufptr < bufend)
+	    *bufptr++ = ch;
+	}
+	else if (ch == quote)
           break;
 	else if (bufptr < bufend)
           *bufptr++ = ch;
+      }
+
+      if (quote == '/' && ch == quote && bufptr < bufend)
+        *bufptr++ = quote;
 
       *bufptr = '\0';
+
       return (buf);
     }
     else if (ch == '#')
@@ -1066,11 +1287,39 @@ get_token(FILE *fp,			/* I  - File to read from */
 
       if (ch == '#')
         ungetc(ch, fp);
-
+      else if (ch == '\n')
+        (*linenum) ++;
+        
       *bufptr = '\0';
+
       return (buf);
     }
   }
+}
+
+
+/*
+ * 'iso_date()' - Return an ISO 8601 date/time string for the given IPP dateTime
+ *                value.
+ */
+
+static char *				/* O - ISO 8601 date/time string */
+iso_date(ipp_uchar_t *date)		/* I - IPP (RFC 1903) date/time value */
+{
+  unsigned	year = (date[0] << 8) + date[1];
+					/* Year */
+  static char	buffer[255];		/* String buffer */
+
+
+  if (date[9] == 0 && date[10] == 0)
+    snprintf(buffer, sizeof(buffer), "%04u-%02u-%02uT%02u:%02u:%02uZ",
+	     year, date[2], date[3], date[4], date[5], date[6]);
+  else
+    snprintf(buffer, sizeof(buffer), "%04u-%02u-%02uT%02u:%02u:%02u%c%02u%02u",
+	     year, date[2], date[3], date[4], date[5], date[6],
+	     date[8], date[9], date[10]);
+
+  return (buffer);
 }
 
 
@@ -1081,52 +1330,91 @@ get_token(FILE *fp,			/* I  - File to read from */
 static void
 print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 {
-  int		i;			/* Looping var */
+  int			i;		/* Looping var */
+  ipp_attribute_t	*colattr;	/* Collection attribute */
 
 
-  if (attr->name == NULL)
+  if (XML)
   {
-    puts("        -- separator --");
-    return;
-  }
+    if (!attr->name)
+    {
+      printf("<key>%s</key>\n<true />\n", ippTagString(attr->group_tag));
+      return;
+    }
 
-  printf("        %s (%s%s) = ", attr->name,
-         attr->num_values > 1 ? "1setOf " : "",
-	 ippTagString(attr->value_tag));
+    print_xml_string("key", attr->name);
+    if (attr->num_values > 1)
+      puts("<array>");
+  }
+  else
+  {
+    if (!attr->name)
+    {
+      puts("        -- separator --");
+      return;
+    }
+
+    printf("        %s (%s%s) = ", attr->name,
+	   attr->num_values > 1 ? "1setOf " : "",
+	   ippTagString(attr->value_tag));
+  }
 
   switch (attr->value_tag)
   {
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
 	for (i = 0; i < attr->num_values; i ++)
-	  printf("%d ", attr->values[i].integer);
+	  if (XML)
+	    printf("<integer>%d</integer>\n", attr->values[i].integer);
+	  else
+	    printf("%d ", attr->values[i].integer);
 	break;
 
     case IPP_TAG_BOOLEAN :
 	for (i = 0; i < attr->num_values; i ++)
-	  if (attr->values[i].boolean)
-	    printf("true ");
+	  if (XML)
+	    puts(attr->values[i].boolean ? "<true />" : "<false />");
+	  else if (attr->values[i].boolean)
+	    fputs("true ", stdout);
 	  else
-	    printf("false ");
-	break;
-
-    case IPP_TAG_NOVALUE :
-	printf("novalue");
+	    fputs("false ", stdout);
 	break;
 
     case IPP_TAG_RANGE :
 	for (i = 0; i < attr->num_values; i ++)
-	  printf("%d-%d ", attr->values[i].range.lower,
-		 attr->values[i].range.upper);
+	  if (XML)
+	    printf("<dict><key>lower</key><integer>%d</integer>"
+	           "<key>upper</key><integer>%d</integer></dict>\n",
+		   attr->values[i].range.lower, attr->values[i].range.upper);
+	  else
+	    printf("%d-%d ", attr->values[i].range.lower,
+		   attr->values[i].range.upper);
 	break;
 
     case IPP_TAG_RESOLUTION :
 	for (i = 0; i < attr->num_values; i ++)
-	  printf("%dx%d%s ", attr->values[i].resolution.xres,
-		 attr->values[i].resolution.yres,
-		 attr->values[i].resolution.units == IPP_RES_PER_INCH ?
-		     "dpi" : "dpc");
+	  if (XML)
+	    printf("<dict><key>xres</key><integer>%d</integer>"
+	           "<key>yres</key><integer>%d</integer>"
+		   "<key>units</key><string>%s</string></dict>\n",
+	           attr->values[i].resolution.xres,
+		   attr->values[i].resolution.yres,
+		   attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+		       "dpi" : "dpc");
+	  else
+	    printf("%dx%d%s ", attr->values[i].resolution.xres,
+		   attr->values[i].resolution.yres,
+		   attr->values[i].resolution.units == IPP_RES_PER_INCH ?
+		       "dpi" : "dpc");
 	break;
+
+    case IPP_TAG_DATE :
+	for (i = 0; i < attr->num_values; i ++)
+	  if (XML)
+            printf("<date>%s</date>\n", iso_date(attr->values[i].date));
+          else
+	    printf("%s ", iso_date(attr->values[i].date));
+        break;
 
     case IPP_TAG_STRING :
     case IPP_TAG_TEXT :
@@ -1137,31 +1425,66 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
     case IPP_TAG_MIMETYPE :
     case IPP_TAG_LANGUAGE :
 	for (i = 0; i < attr->num_values; i ++)
-	  printf("\"%s\" ", attr->values[i].string.text);
+	  if (XML)
+	    print_xml_string("string", attr->values[i].string.text);
+	  else
+	    printf("\"%s\" ", attr->values[i].string.text);
 	break;
 
     case IPP_TAG_TEXTLANG :
     case IPP_TAG_NAMELANG :
 	for (i = 0; i < attr->num_values; i ++)
-	  printf("\"%s\",%s ", attr->values[i].string.text,
-		 attr->values[i].string.charset);
+	  if (XML)
+	  {
+	    fputs("<dict><key>language</key><string>", stdout);
+	    print_xml_string(NULL, attr->values[i].string.charset);
+	    fputs("</string><key>string</key><string>", stdout);
+	    print_xml_string(NULL, attr->values[i].string.text);
+	    puts("</string></dict>");
+	  }
+	  else
+	    printf("\"%s\",%s ", attr->values[i].string.text,
+		   attr->values[i].string.charset);
 	break;
 
     case IPP_TAG_BEGIN_COLLECTION :
 	for (i = 0; i < attr->num_values; i ++)
 	{
-	  if (i)
-	    putchar(' ');
+	  if (XML)
+	  {
+	    puts("<dict>");
+	    for (colattr = attr->values[i].collection->attrs;
+	         colattr;
+		 colattr = colattr->next)
+	      print_attr(colattr);
+	    puts("</dict>");
+	  }
+	  else
+	  {
+	    if (i)
+	      putchar(' ');
 
-	  print_col(attr->values[i].collection);
+	    print_col(attr->values[i].collection);
+          }
 	}
 	break;
 
     default :
-	break; /* anti-compiler-warning-code */
+	if (XML)
+	  printf("<string>&lt;&lt;%s&gt;&gt;</string>\n",
+	         ippTagString(attr->value_tag));
+	else
+	  fputs(ippTagString(attr->value_tag), stdout);
+	break;
   }
 
-  putchar('\n');
+  if (XML)
+  {
+    if (attr->num_values > 1)
+      puts("</array>");
+  }
+  else
+    putchar('\n');
 }
 
 
@@ -1253,23 +1576,321 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
 
 
 /*
+ * 'print_fatal_error()' - Print a fatal error message.
+ */
+
+static void
+print_fatal_error(const char *s,	/* I - Printf-style format string */
+                  ...)			/* I - Additional arguments as needed */
+{
+  char		buffer[10240];		/* Format buffer */
+  va_list	ap;			/* Pointer to arguments */
+
+
+ /*
+  * Format the error message...
+  */
+
+  va_start(ap, s);
+  vsnprintf(buffer, sizeof(buffer), s, ap);
+  va_end(ap);
+
+ /*
+  * Then output it...
+  */
+
+  if (XML)
+  {
+    print_xml_header();
+    print_xml_trailer(0, buffer);
+  }
+  else
+    _cupsLangPrintf(stderr, "ipptest: %s\n", buffer);
+}
+
+
+/*
+ * 'print_test_error()' - Print a test error message.
+ */
+
+static void
+print_test_error(const char *s,		/* I - Printf-style format string */
+                 ...)			/* I - Additional arguments as needed */
+{
+  char		buffer[10240];		/* Format buffer */
+  va_list	ap;			/* Pointer to arguments */
+
+
+ /*
+  * Format the error message...
+  */
+
+  va_start(ap, s);
+  vsnprintf(buffer, sizeof(buffer), s, ap);
+  va_end(ap);
+
+ /*
+  * Then output it...
+  */
+
+  if (XML)
+    print_xml_string("string", buffer);
+  else
+    printf("        %s\n", buffer);
+}
+
+
+/*
+ * 'print_xml_header()' - Print a standard XML plist header.
+ */
+
+static void
+print_xml_header(void)
+{
+  if (!XMLHeader)
+  {
+    puts("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    puts("<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" "
+         "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
+    puts("<plist version=\"1.0\">");
+    puts("<dict>");
+    puts("<key>Chunking</key>");
+    puts(Chunking ? "<true />" : "<false />");
+    puts("<key>Tests</key>");
+    puts("<array>");
+
+    XMLHeader = 1;
+  }
+}
+
+
+/*
+ * 'print_xml_string()' - Print an XML string with escaping.
+ */
+
+static void
+print_xml_string(const char *element,	/* I - Element name or NULL */
+		 const char *s)		/* I - String to print */
+{
+  if (element)
+    printf("<%s>", element);
+
+  while (*s)
+  {
+    if (*s == '&')
+      fputs("&amp;", stdout);
+    else if (*s == '<')
+      fputs("&lt;", stdout);
+    else if (*s == '>')
+      fputs("&gt;", stdout);
+    else
+      putchar(*s);
+
+    s ++;
+  }
+
+  if (element)
+    printf("</%s>\n", element);
+}
+
+
+/*
+ * 'print_xml_trailer()' - Print the XML trailer with success/fail value.
+ */
+
+static void
+print_xml_trailer(int        success,	/* I - 1 on success, 0 on failure */
+                  const char *message)	/* I - Error message or NULL */
+{
+  if (XMLHeader)
+  {
+    puts("</array>");
+    puts("<key>Successful</key>");
+    puts(success ? "<true />" : "<false />");
+    if (message)
+    {
+      puts("<key>ErrorMessage</key>");
+      print_xml_string("string", message);
+    }
+    puts("</dict>");
+    puts("</plist>");
+
+    XMLHeader = 0;
+  }
+}
+
+
+/*
  * 'usage()' - Show program usage.
  */
 
 static void
 usage(void)
 {
-  fputs("Usage: ipptest [options] URL testfile [ ... testfileN ]\n", stderr);
-  fputs("Options:\n", stderr);
-  fputs("\n", stderr);
-  fputs("-c             Send requests using chunking.\n", stderr);
-  fputs("-d name=value  Define variable.\n", stderr);
-  fputs("-i seconds     Repeat the last test file with the given interval.\n",
-        stderr);
-  fputs("-v             Show all attributes in response, even on success.\n",
-        stderr);
+  _cupsLangPuts(stderr,
+                _("Usage: ipptest [options] URI filename.test [ ... "
+		  "filenameN.test ]\n"
+		  "\n"
+		  "Options:\n"
+		  "\n"
+		  "-c             Send requests using chunking (default)\n"
+		  "-d name=value  Define variable.\n"
+		  "-i seconds     Repeat the last test file with the given "
+		  "interval.\n"
+		  "-l             Send requests using content length\n"
+		  "-v             Show all attributes sent and received.\n"
+		  "-X             Produce XML instead of plain text.\n"));
 
   exit(1);
+}
+
+
+/*
+ * 'with_value()' - Test a WITH-VALUE predicate.
+ */
+
+static int				/* O - 1 on match, 0 on non-match */
+with_value(char            *value,	/* I - Value string */
+           int             regex,	/* I - Value is a regular expression */
+           ipp_attribute_t *attr)	/* I - Attribute to compare */
+{
+  int	i;				/* Looping var */
+  char	*valptr;			/* Pointer into value */
+
+
+ /*
+  * NULL matches everything.
+  */
+
+  if (!value)
+    return (1);
+
+ /*
+  * Compare the value string to the attribute value.
+  */
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_INTEGER :
+    case IPP_TAG_ENUM :
+        if (regex)
+	{
+	 /*
+	  * TODO: Report an error.
+	  */
+
+	  return (0);
+	}
+
+        for (i = 0; i < attr->num_values; i ++)
+        {
+          valptr = value;
+
+	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+		 *valptr == '-')
+	  {
+	    if (attr->values[i].integer == strtol(valptr, &valptr, 0))
+	      return (1);
+	  }
+        }
+	break;
+
+    case IPP_TAG_BOOLEAN :
+        if (regex)
+	{
+	 /*
+	  * TODO: Report an error.
+	  */
+
+	  return (0);
+	}
+
+	for (i = 0; i < attr->num_values; i ++)
+	{
+          if (!strcmp(value, "true") == attr->values[i].boolean)
+	    return (1);
+	}
+	break;
+
+    case IPP_TAG_NOVALUE :
+        if (regex)
+	{
+	 /*
+	  * TODO: Report an error.
+	  */
+
+	  return (0);
+	}
+
+        return (!strcmp(value, "no-value"));
+
+    case IPP_TAG_STRING :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_NAME :
+    case IPP_TAG_KEYWORD :
+    case IPP_TAG_CHARSET :
+    case IPP_TAG_URI :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_LANGUAGE :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_NAMELANG :
+        if (regex)
+	{
+	 /*
+	  * Value is an extended, case-sensitive POSIX regular expression...
+	  */
+
+	  regex_t	re;		/* Regular expression */
+
+          if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
+	  {
+	   /*
+	    * Bad regular expression!
+	    *
+	    * TODO: Report an error here.
+	    */
+
+	    return (0);
+	  }
+
+         /*
+	  * See if ALL of the values match the given regular expression.
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	      break;
+	  }
+
+	  regfree(&re);
+
+          return (i == attr->num_values);
+	}
+	else
+	{
+	 /*
+	  * Value is a literal string, see if at least one value matches the
+	  * literal string...
+	  */
+
+	  for (i = 0; i < attr->num_values; i ++)
+	  {
+	    if (!strcmp(value, attr->values[i].string.text))
+	      return (1);
+	  }
+	}
+	break;
+
+    default :
+       /*
+	* TODO: Report an error.
+	*/
+
+	return (0);
+  }
+
+  return (0);
 }
 
 
