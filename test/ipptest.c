@@ -1488,7 +1488,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	    break;
 
         if (*tempptr)
-	  *tempptr++ = '\0';
+	  *tempptr = '\0';
 
 	if (!strcmp(temp, "uri"))
 	  value = vars->uri;
@@ -1684,7 +1684,7 @@ get_token(FILE *fp,			/* I  - File to read from */
 
     if (ch == EOF)
       return (NULL);
-    else if (ch == '\'' || ch == '\"' || ch == '/')
+    else if (ch == '\'' || ch == '\"')
     {
      /*
       * Quoted text or regular expression...
@@ -1693,9 +1693,6 @@ get_token(FILE *fp,			/* I  - File to read from */
       quote  = ch;
       bufptr = buf;
       bufend = buf + buflen - 1;
-
-      if (quote == '/')
-        *bufptr++ = ch;
 
       while ((ch = getc(fp)) != EOF)
       {
@@ -1716,9 +1713,6 @@ get_token(FILE *fp,			/* I  - File to read from */
 	else if (bufptr < bufend)
           *bufptr++ = ch;
       }
-
-      if (quote == '/' && ch == quote && bufptr < bufend)
-        *bufptr++ = quote;
 
       *bufptr = '\0';
 

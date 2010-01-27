@@ -182,7 +182,7 @@ WITH-VALUE "literal string"
 Requires at least one value of the EXPECT attribute to match the literal string.
 Comparisons are case-sensitive.
 .TP 5
-WITH-VALUE /regular expression/
+WITH-VALUE "/regular expression/"
 Requires that all values of the EXPECT attribute match the regular expression,
 which must conform to the POSIX regular expression syntax.
 Comparisons are case-sensitive.
