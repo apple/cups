@@ -3,7 +3,7 @@
 #
 #   API library Makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the

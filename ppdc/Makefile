@@ -3,7 +3,7 @@
 #
 #   Makefile for the CUPS PPD Compiler.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 2002-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -143,7 +143,7 @@ install-exec:
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(EXECTARGETS) $(LIBTARGETS); do \
+		for file in $(EXECTARGETS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi

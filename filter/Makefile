@@ -127,7 +127,7 @@ install-exec:
 	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(FILTERS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -156,6 +156,10 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSIMAGE) $(SYMROOT); \
 	fi
 
 installstatic:

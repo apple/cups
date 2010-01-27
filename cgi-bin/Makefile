@@ -3,7 +3,7 @@
 #
 #   CGI makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -118,7 +118,7 @@ install-exec:
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(CGIS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
