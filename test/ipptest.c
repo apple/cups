@@ -15,9 +15,13 @@
  * Contents:
  *
  *   main()              - Parse options and do tests.
+ *   compare_vars()      - Compare two variables.
  *   do_tests()          - Do tests as specified in the test file.
+ *   expand_variables()  - Expand variables in a string.
  *   expect_matches()    - Return true if the tag matches the specification.
+ *   get_filename()      - Get a filename based on the current test file.
  *   get_token()         - Get a token from a file.
+ *   get_variable()      - Get the value of a variable.
  *   iso_date()          - Return an ISO 8601 date/time string for the given IPP
  *                         dateTime value.
  *   print_attr()        - Print an attribute on the screen.
@@ -27,6 +31,7 @@
  *   print_xml_header()  - Print a standard XML plist header.
  *   print_xml_string()  - Print an XML string with escaping.
  *   print_xml_trailer() - Print the XML trailer with success/fail value.
+ *   set_variable()      - Set a variable value.
  *   usage()             - Show program usage.
  *   with_value()        - Test a WITH-VALUE predicate.
  */
@@ -37,15 +42,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cups/string.h>
 #include <errno.h>
 #include <ctype.h>
 #include <regex.h>
 
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/http-private.h>
-#include <cups/string.h>
+#include <cups/globals.h>
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
@@ -67,14 +68,34 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
   int	with_regex;			/* WITH-VALUE is a regular expression */
 } _cups_expect_t;
 
+typedef struct _cups_var_s		/**** Variable ****/
+{
+  char	*name,				/* Name of variable */
+	*value;				/* Value of variable */
+} _cups_var_t;
+
+typedef struct _cups_vars_s		/**** Set of variables ****/
+{
+  const char	*uri;			/* URI for printer */
+  char		scheme[256],		/* Scheme from URI */
+		userpass[256],		/* Username/password from URI */
+		hostname[256],		/* Hostname from URI */
+		resource[512];		/* Resource path from URI */
+  int 		port,			/* Port number from URI */
+		job_id,			/* Current job-id value */
+		subscription_id;	/* Current notify-subscription-id value */
+  cups_array_t	*vars;			/* Array of variables */
+} _cups_vars_t;
+
 
 /*
  * Globals...
  */
 
-int		Chunking = 1;		/* Use chunked requests */
-int		Verbosity = 0;		/* Show all attributes? */
-int		XML = 0,		/* Produce XML output? */
+int		Chunking = 1,		/* Use chunked requests */
+		Verbosity = 0,		/* Show all attributes? */
+		Version = 11,		/* Default IPP version */
+		XML = 0,		/* Produce XML output? */
 		XMLHeader = 0;		/* 1 if header is written */
 
 
@@ -82,10 +103,16 @@ int		XML = 0,		/* Produce XML output? */
  * Local functions...
  */
 
-static int	do_tests(const char *uri, const char *testfile);
+static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
+static int	do_tests(_cups_vars_t *vars, const char *testfile);
+static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
+		                 size_t dstsize);
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
+static char	*get_filename(const char *testfile, char *dst, const char *src,
+		              size_t dstsize);
 static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
+static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
 static void	print_attr(ipp_attribute_t *attr);
 static void	print_col(ipp_t *col);
@@ -102,6 +129,8 @@ __attribute__ ((__format__ (__printf__, 1, 2)))
 static void	print_xml_header(void);
 static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
+static void	set_variable(_cups_vars_t *vars, const char *name,
+		             const char *value);
 static void	usage(void);
 static int      with_value(char *value, int regex, ipp_attribute_t *attr);
 
@@ -114,23 +143,47 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
-  int		i;			/* Looping var */
-  int		status;			/* Status of tests... */
-  char		*opt;			/* Current option */
-  const char	*uri,			/* URI to use */
-		*testfile;		/* Test file to use */
-  int		interval;		/* Test interval */
+  int			i;		/* Looping var */
+  int			status;		/* Status of tests... */
+  char			*opt,		/* Current option */
+			name[1024],	/* Name/value buffer */
+			*value;		/* Pointer to value */
+  const char		*testfile;	/* Test file to use */
+  int			interval;	/* Test interval */
+  _cups_vars_t		vars;		/* Variables */
+  http_uri_status_t	uri_status;	/* URI separation status */
+  static const char * const uri_status_strings[] =
+  {
+    "URI too large",
+    "Bad arguments to function",
+    "Bad resource in URI",
+    "Bad port number in URI",
+    "Bad hostname/address in URI",
+    "Bad username in URI",
+    "Bad scheme in URI",
+    "Bad/empty URI",
+    "OK",
+    "Missing scheme in URI",
+    "Unknown scheme in URI",
+    "Missing resource in URI"
+  };
 
+
+ /*
+  * Initialize the locale and variables...
+  */
 
   _cupsSetLocale(argv);
+
+  memset(&vars, 0, sizeof(vars));
+  vars.vars = cupsArrayNew((cups_array_func_t)compare_vars, NULL);
 
  /*
   * We need at least:
   *
-  *     testipp URL testfile
+  *     ipptest URI testfile
   */
 
-  uri      = NULL;
   testfile = NULL;
   status   = 0;
   interval = 0;
@@ -143,6 +196,56 @@ main(int  argc,				/* I - Number of command-line args */
       {
         switch (*opt)
         {
+	  case 'E' : /* Encrypt */
+#ifdef HAVE_SSL
+	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+#else
+	      _cupsLangPrintf(stderr,
+			      _("%s: Sorry, no encryption support compiled in\n"),
+			      argv[0]);
+#endif /* HAVE_SSL */
+	      break;
+
+	  case 'V' : /* Set IPP version */
+	      i ++;
+
+	      if (i >= argc)
+	      {
+		_cupsLangPuts(stderr,
+		              _("ipptest: Missing version for \"-V\".\n"));
+		usage();
+              }
+
+	      if (!strcmp(argv[i], "1.0"))
+	        Version = 10;
+	      else if (!strcmp(argv[i], "1.1"))
+	        Version = 11;
+	      else if (!strcmp(argv[i], "2.0"))
+	        Version = 20;
+	      else if (!strcmp(argv[i], "2.1"))
+	        Version = 21;
+	      else if (!strcmp(argv[i], "2.2"))
+	        Version = 22;
+	      else
+	      {
+		_cupsLangPrintf(stderr,
+		                _("ipptest: Bad version %s for \"-V\".\n"),
+				argv[i]);
+		usage();
+	      }
+	      break;
+
+          case 'X' : /* Produce XML output */
+	      XML = 1;
+
+              if (interval)
+	      {
+	        _cupsLangPuts(stderr, _("ipptest: \"-i\" is incompatible with "
+				        "\"-x\".\n"));
+		usage();
+	      }
+	      break;
+
           case 'c' : /* Enable HTTP chunking */
               Chunking = 1;
               break;
@@ -156,8 +259,14 @@ main(int  argc,				/* I - Number of command-line args */
 		              _("ipptest: Missing name=value for \"-d\".\n"));
 		usage();
               }
+
+              strlcpy(name, argv[i], sizeof(name));
+	      if ((value = strchr(name, '=')) != NULL)
+	        *value++ = '\0';
 	      else
-		putenv(argv[i]);
+	        value = name + strlen(name);
+
+	      set_variable(&vars, name, value);
 	      break;
 
           case 'i' : /* Test every N seconds */
@@ -188,17 +297,6 @@ main(int  argc,				/* I - Number of command-line args */
 	      Verbosity ++;
 	      break;
 
-          case 'X' : /* Produce XML output */
-	      XML = 1;
-
-              if (interval)
-	      {
-	        _cupsLangPuts(stderr, _("ipptest: \"-i\" is incompatible with "
-				        "\"-x\".\n"));
-		usage();
-	      }
-	      break;
-
 	  default :
 	      _cupsLangPrintf(stderr, _("ipptest: Unknown option \"-%c\".\n"),
 	                      *opt);
@@ -215,15 +313,34 @@ main(int  argc,				/* I - Number of command-line args */
       * Set URI...
       */
 
-      if (!testfile && uri)
+      if (vars.uri)
       {
-        _cupsLangPuts(stderr, _("ipptest: May only specify a single URI before "
-	                        "a test!\n"));
+        _cupsLangPuts(stderr, _("ipptest: May only specify a single URI.\n"));
         usage();
       }
 
-      uri      = argv[i];
-      testfile = NULL;
+      vars.uri   = argv[i];
+      uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, vars.uri,
+                                   vars.scheme, sizeof(vars.scheme),
+                                   vars.userpass, sizeof(vars.userpass),
+				   vars.hostname, sizeof(vars.hostname),
+				   &(vars.port),
+				   vars.resource, sizeof(vars.resource));
+
+      if (uri_status != HTTP_URI_OK)
+      {
+        _cupsLangPrintf(stderr, _("ipptest: Bad URI - %s.\n"),
+	                uri_status_strings[uri_status - HTTP_URI_OVERFLOW]);
+        return (1);
+      }
+
+      if (strcmp(vars.scheme, "http") && strcmp(vars.scheme, "https") &&
+          strcmp(vars.scheme, "ipp"))
+      {
+        _cupsLangPuts(stderr, _("ipptest: Only http, https, and ipp URIs are "
+	                        "supported."));
+	return (1);
+      }
     }
     else
     {
@@ -231,14 +348,20 @@ main(int  argc,				/* I - Number of command-line args */
       * Run test...
       */
 
+      if (!vars.uri)
+      {
+        _cupsLangPuts(stderr, _("ipptest: URI required before test file."));
+	usage();
+      }
+
       testfile = argv[i];
 
-      if (!do_tests(uri, testfile))
-        status ++;
+      if (!do_tests(&vars, testfile))
+        status = 1;
     }
   }
 
-  if (!uri || !testfile)
+  if (!vars.uri || !testfile)
     usage();
 
  /*
@@ -246,13 +369,13 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (XML)
-    print_xml_trailer(status == 0, NULL);
+    print_xml_trailer(!status, NULL);
   else if (interval)
   {
     for (;;)
     {
       sleep(interval);
-      do_tests(uri, testfile);
+      do_tests(&vars, testfile);
     }
   }
 
@@ -263,37 +386,49 @@ main(int  argc,				/* I - Number of command-line args */
   return (status);
 }
 
-        
+
+/*
+ * 'compare_vars()' - Compare two variables.
+ */
+
+static int				/* O - Result of comparison */
+compare_vars(_cups_var_t *a,		/* I - First variable */
+             _cups_var_t *b)		/* I - Second variable */
+{
+  return (strcasecmp(a->name, b->name));
+}
+
+
 /*
  * 'do_tests()' - Do tests as specified in the test file.
  */
 
 static int				/* 1 = success, 0 = failure */
-do_tests(const char *uri,		/* I - URI to connect on */
-         const char *testfile)		/* I - Test file to use */
+do_tests(_cups_vars_t *vars,		/* I - Variables */
+         const char   *testfile)	/* I - Test file to use */
 {
-  int		i;			/* Looping var */
-  int		linenum;		/* Current line number */
-  int		version;		/* IPP version number to use */
+  int		i,			/* Looping var */
+		linenum,		/* Current line number */
+		pass,			/* Did we pass the test? */
+		request_id;		/* Current request ID */
   http_t	*http = NULL;		/* HTTP connection to server */
-  char		scheme[HTTP_MAX_URI],	/* URI scheme */
-		userpass[HTTP_MAX_URI],	/* username:password */
-		server[HTTP_MAX_URI],	/* Server */
-		resource[HTTP_MAX_URI];	/* Resource path */
-  int		port;			/* Port number */
   FILE		*fp = NULL;		/* Test file */
-  char		token[1024],		/* Token from file */
+  char		resource[512],		/* Resource for request */
+		token[1024],		/* Token from file */
 		*tokenptr,		/* Pointer into token */
-		temp[1024],		/* Temporary string */
-		*tempptr;		/* Pointer into temp string */
+		temp[1024];		/* Temporary string */
   ipp_t		*request = NULL;	/* IPP request */
   ipp_t		*response = NULL;	/* IPP response */
+  char		attr[128];		/* Attribute name */
   ipp_op_t	op;			/* Operation */
   ipp_tag_t	group;			/* Current group */
   ipp_tag_t	value;			/* Current value type */
   ipp_attribute_t *attrptr,		/* Attribute pointer */
 		*found;			/* Found attribute */
-  char		attr[128];		/* Attribute name */
+  char		name[1024];		/* Name of test */
+  char		filename[1024];		/* Filename */
+  int		chunking,		/* To chunk or not to chunk */
+		version;		/* IPP version number to use */
   int		num_statuses;		/* Number of valid status codes */
   ipp_status_t	statuses[100];		/* Valid status codes */
   int		num_expects = 0;	/* Number of expected attributes */
@@ -302,11 +437,6 @@ do_tests(const char *uri,		/* I - URI to connect on */
 		*last_expect;		/* Last EXPECT (for predicates) */
   int		num_displayed = 0;	/* Number of displayed attributes */
   char		*displayed[100];	/* Displayed attributes */
-  char		name[1024];		/* Name of test */
-  char		filename[1024];		/* Filename */
-  int		pass;			/* Did we pass the test? */
-  int		job_id;			/* Job ID from last operation */
-  int		subscription_id;	/* Subscription ID from last operation */
 
 
  /*
@@ -324,13 +454,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
   * Connect to the server...
   */
 
-  httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass,
-                  sizeof(userpass), server, sizeof(server), &port, resource,
-		  sizeof(resource));
-  if ((http = httpConnect(server, port)) == NULL)
+  if ((http = httpConnectEncrypt(vars->hostname, vars->port,
+                                 cupsEncryption())) == NULL)
   {
-    print_fatal_error("Unable to connect to %s on port %d - %s", server, port,
-                      strerror(errno));
+    print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
+                      vars->port, strerror(errno));
     goto test_error;
   }
 
@@ -343,11 +471,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
   else
     printf("\"%s\":\n", testfile);
 
-  pass            = 1;
-  job_id          = 0;
-  subscription_id = 0;
-  version         = 11;
-  linenum         = 1;
+  CUPS_SRAND(time(NULL));
+
+  pass       = 1;
+  linenum    = 1;
+  request_id = (CUPS_RAND() % 1000) * 137 + 1;
 
   while (get_token(fp, token, sizeof(token), &linenum) != NULL)
   {
@@ -355,7 +483,109 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Expect an open brace...
     */
 
-    if (strcmp(token, "{"))
+    if (!strcmp(token, "DEFINE"))
+    {
+     /*
+      * DEFINE name value
+      */
+
+      if (get_token(fp, attr, sizeof(attr), &linenum) &&
+          get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        expand_variables(vars, token, temp, sizeof(token));
+	set_variable(vars, attr, token);
+      }
+      else
+      {
+        print_fatal_error("Missing DEFINE name and/or value on line %d.",
+	                  linenum);
+        goto test_error;
+      }
+
+      continue;
+    }
+    else if (!strcmp(token, "INCLUDE"))
+    {
+     /*
+      * INCLUDE "filename"
+      * INCLUDE <filename>
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+       /*
+        * Map the filename to and then run the tests...
+	*/
+
+        if (!do_tests(vars, get_filename(testfile, filename, temp,
+	                                 sizeof(filename))))
+	  goto test_error;
+      }
+      else
+      {
+        print_fatal_error("Missing INCLUDE filename on line %d.", linenum);
+        goto test_error;
+      }
+
+      continue;
+    }
+    else if (!strcmp(token, "TRANSFER"))
+    {
+     /*
+      * TRANSFER chunked
+      * TRANSFER length
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        if (!strcmp(temp, "chunked"))
+	  Chunking = 1;
+	else if (!strcmp(temp, "length"))
+	  Chunking = 0;
+	else
+	{
+	  print_fatal_error("Bad TRANSER value \"%s\" on line %d.", temp,
+	                    linenum);
+	  goto test_error;
+	}
+      }
+      else
+      {
+        print_fatal_error("Missing TRANSER value on line %d.", linenum);
+        goto test_error;
+      }
+
+      continue;
+    }
+    else if (!strcmp(token, "VERSION"))
+    {
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        if (!strcmp(temp, "1.0"))
+	  Version = 10;
+	else if (!strcmp(temp, "1.1"))
+	  Version = 11;
+	else if (!strcmp(temp, "2.0"))
+	  Version = 20;
+	else if (!strcmp(temp, "2.1"))
+	  Version = 21;
+	else if (!strcmp(temp, "2.2"))
+	  Version = 22;
+	else
+	{
+	  print_fatal_error("Bad VERSION \"%s\" on line %d.", temp, linenum);
+	  goto test_error;
+	}
+      }
+      else
+      {
+        print_fatal_error("Missing VERSION number on line %d.", linenum);
+        goto test_error;
+      }
+
+      continue;
+    }
+    else if (strcmp(token, "{"))
     {
       print_fatal_error("Unexpected token %s seen on line %d.", token, linenum);
       goto test_error;
@@ -365,9 +595,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
     * Initialize things...
     */
 
-    httpSeparateURI(HTTP_URI_CODING_ALL, uri, scheme, sizeof(scheme), userpass,
-                    sizeof(userpass), server, sizeof(server), &port, resource,
-		    sizeof(resource));
+    strlcpy(resource, vars->resource, sizeof(resource));
 
     request       = ippNew();
     op            = (ipp_op_t)0;
@@ -377,8 +605,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
     num_displayed = 0;
     last_expect   = NULL;
     filename[0]   = '\0';
+    version       = Version;
+    chunking      = Chunking;
 
-    strcpy(name, testfile);
+    strlcpy(name, testfile, sizeof(name));
     if (strrchr(name, '.') != NULL)
       *strrchr(name, '.') = '\0';
 
@@ -398,6 +628,25 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
       if (!strcmp(token, "}"))
         break;
+      else if (!strcmp(token, "DEFINE"))
+      {
+       /*
+	* DEFINE name value
+	*/
+
+	if (get_token(fp, attr, sizeof(attr), &linenum) &&
+	    get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  expand_variables(vars, token, temp, sizeof(token));
+	  set_variable(vars, attr, token);
+	}
+	else
+	{
+	  print_fatal_error("Missing DEFINE name and/or value on line %d.",
+			    linenum);
+	  goto test_error;
+	}
+      }
       else if (!strcasecmp(token, "NAME"))
       {
        /*
@@ -406,22 +655,55 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
 	get_token(fp, name, sizeof(name), &linenum);
       }
-      else if (!strcasecmp(token, "VERSION"))
+      else if (!strcmp(token, "TRANSFER"))
       {
        /*
-        * IPP version number for test...
+	* TRANSFER chunked
+	* TRANSFER length
 	*/
 
-        int major, minor;		/* Major/minor IPP version */
-
-
-	get_token(fp, temp, sizeof(temp), &linenum);
-	if (sscanf(temp, "%d.%d", &major, &minor) == 2 &&
-	    major >= 0 && minor >= 0 && minor < 10)
-	  version = major * 10 + minor;
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  if (!strcmp(temp, "chunked"))
+	    chunking = 1;
+	  else if (!strcmp(temp, "length"))
+	    chunking = 0;
+	  else
+	  {
+	    print_fatal_error("Bad TRANSER value \"%s\" on line %d.", temp,
+			      linenum);
+	    goto test_error;
+	  }
+	}
 	else
 	{
-	  print_fatal_error("Bad version %s seen on line %d.", token, linenum);
+	  print_fatal_error("Missing TRANSER value on line %d.", linenum);
+	  goto test_error;
+	}
+      }
+      else if (!strcasecmp(token, "VERSION"))
+      {
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  if (!strcmp(temp, "1.0"))
+	    version = 10;
+	  else if (!strcmp(temp, "1.1"))
+	    version = 11;
+	  else if (!strcmp(temp, "2.0"))
+	    version = 20;
+	  else if (!strcmp(temp, "2.1"))
+	    version = 21;
+	  else if (!strcmp(temp, "2.2"))
+	    version = 22;
+	  else
+	  {
+	    print_fatal_error("Bad VERSION \"%s\" on line %d.", temp, linenum);
+	    goto test_error;
+	  }
+	}
+	else
+	{
+	  print_fatal_error("Missing VERSION number on line %d.", linenum);
 	  goto test_error;
 	}
       }
@@ -431,7 +713,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * Resource name...
 	*/
 
-	get_token(fp, resource, sizeof(resource), &linenum);
+	if (!get_token(fp, resource, sizeof(resource), &linenum))
+	{
+	  print_fatal_error("Missing RESOURCE path on line %d.", linenum);
+	  goto test_error;
+	}
       }
       else if (!strcasecmp(token, "OPERATION"))
       {
@@ -439,8 +725,18 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * Operation...
 	*/
 
-	get_token(fp, token, sizeof(token), &linenum);
-	op = ippOpValue(token);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing OPERATION code on line %d.", linenum);
+	  goto test_error;
+	}
+
+	if ((op = ippOpValue(token)) < 0)
+	{
+	  print_fatal_error("Bad OPERATION code \"%s\" on line %d.", token,
+	                    linenum);
+	  goto test_error;
+	}
       }
       else if (!strcasecmp(token, "GROUP"))
       {
@@ -448,8 +744,17 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * Attribute group...
 	*/
 
-	get_token(fp, token, sizeof(token), &linenum);
-	value = ippTagValue(token);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing GROUP tag on line %d.", linenum);
+	  goto test_error;
+	}
+
+	if ((value = ippTagValue(token)) < 0)
+	{
+	  print_fatal_error("Bad GROUP tag \"%s\" on line %d.", token, linenum);
+	  goto test_error;
+	}
 
 	if (value == group)
 	  ippAddSeparator(request);
@@ -464,8 +769,19 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
         int delay;
 
-	get_token(fp, token, sizeof(token), &linenum);
-	if ((delay = atoi(token)) > 0)
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing DELAY value on line %d.", linenum);
+	  goto test_error;
+	}
+
+	if ((delay = atoi(token)) <= 0)
+	{
+	  print_fatal_error("Bad DELAY value \"%s\" on line %d.", token,
+	                    linenum);
+	  goto test_error;
+	}
+	else
 	  sleep(delay);
       }
       else if (!strcasecmp(token, "ATTR"))
@@ -474,104 +790,32 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * Attribute...
 	*/
 
-	get_token(fp, token, sizeof(token), &linenum);
-	value = ippTagValue(token);
-	get_token(fp, attr, sizeof(attr), &linenum);
-	get_token(fp, temp, sizeof(temp), &linenum);
-
-        token[sizeof(token) - 1] = '\0';
-
-        for (tempptr = temp, tokenptr = token;
-	     *tempptr && tokenptr < (token + sizeof(token) - 1);)
+	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  if (*tempptr == '$')
-	  {
-	   /*
-	    * Substitute a string/number...
-	    */
-
-            if (!strncasecmp(tempptr + 1, "uri", 3))
-	    {
-	      strlcpy(tokenptr, uri, sizeof(token) - (tokenptr - token));
-	      tempptr += 4;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "scheme", 6) ||
-	             !strncasecmp(tempptr + 1, "method", 6))
-	    {
-	      strlcpy(tokenptr, scheme, sizeof(token) - (tokenptr - token));
-	      tempptr += 7;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "username", 8))
-	    {
-	      strlcpy(tokenptr, userpass, sizeof(token) - (tokenptr - token));
-	      tempptr += 9;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "hostname", 8))
-	    {
-	      strlcpy(tokenptr, server, sizeof(token) - (tokenptr - token));
-	      tempptr += 9;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "port", 4))
-	    {
-	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
-	               "%d", port);
-	      tempptr += 5;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "resource", 8))
-	    {
-	      strlcpy(tokenptr, resource, sizeof(token) - (tokenptr - token));
-	      tempptr += 9;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "job-id", 6))
-	    {
-	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
-	               "%d", job_id);
-	      tempptr += 7;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "notify-subscription-id", 22))
-	    {
-	      snprintf(tokenptr, sizeof(token) - (tokenptr - token),
-	               "%d", subscription_id);
-	      tempptr += 23;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "user", 4))
-	    {
-	      strlcpy(tokenptr, cupsUser(), sizeof(token) - (tokenptr - token));
-	      tempptr += 5;
-	    }
-	    else if (!strncasecmp(tempptr + 1, "ENV[", 4))
-	    {
-	      char *end;		/* End of $ENV[name] */
-
-
-	      if ((end = strchr(tempptr + 5, ']')) != NULL)
-	      {
-	        *end++ = '\0';
-		strlcpy(tokenptr,
-		        getenv(tempptr + 5) ? getenv(tempptr + 5) : tempptr + 5,
-		        sizeof(token) - (tokenptr - token));
-		tempptr = end;
-	      }
-	      else
-	      {
-		*tokenptr++ = *tempptr++;
-		*tokenptr   = '\0';
-	      }
-	    }
-            else
-	    {
-	      *tokenptr++ = *tempptr++;
-	      *tokenptr   = '\0';
-	    }
-
-            tokenptr += strlen(tokenptr);
-	  }
-	  else
-	  {
-	    *tokenptr++ = *tempptr++;
-	    *tokenptr   = '\0';
-	  }
+	  print_fatal_error("Missing ATTR value tag on line %d.", linenum);
+	  goto test_error;
 	}
+
+	if ((value = ippTagValue(token)) < 0)
+	{
+	  print_fatal_error("Bad ATTR value tag \"%s\" on line %d.", token,
+	                    linenum);
+	  goto test_error;
+	}
+
+	if (!get_token(fp, attr, sizeof(attr), &linenum))
+	{
+	  print_fatal_error("Missing ATTR name on line %d.", linenum);
+	  goto test_error;
+	}
+
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  print_fatal_error("Missing ATTR value on line %d.", linenum);
+	  goto test_error;
+	}
+
+        expand_variables(vars, token, temp, sizeof(token));
 
         switch (value)
 	{
@@ -633,7 +877,13 @@ do_tests(const char *uri,		/* I - URI to connect on */
         * File...
 	*/
 
-	get_token(fp, filename, sizeof(filename), &linenum);
+	if (!get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  print_fatal_error("Missing FILE filename on line %d.", linenum);
+	  goto test_error;
+	}
+
+	get_filename(testfile, filename, temp, sizeof(filename));
       }
       else if (!strcasecmp(token, "STATUS"))
       {
@@ -647,8 +897,19 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  goto test_error;
 	}
 
-	get_token(fp, token, sizeof(token), &linenum);
-	statuses[num_statuses] = ippErrorValue(token);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing STATUS code on line %d.", linenum);
+	  goto test_error;
+	}
+
+	if ((statuses[num_statuses] = ippErrorValue(token)) < 0)
+	{
+	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
+	                    linenum);
+	  goto test_error;
+	}
+
 	num_statuses ++;
       }
       else if (!strcasecmp(token, "EXPECT"))
@@ -663,7 +924,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  goto test_error;
         }
 
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing EXPECT name on line %d.", linenum);
+	  goto test_error;
+	}
 
         last_expect = expects + num_expects;
 	num_expects ++;
@@ -687,7 +952,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else if (!strcasecmp(token, "OF-TYPE"))
       {
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing OF-TYPE value tag(s) on line %d.",
+	                    linenum);
+	  goto test_error;
+	}
 
 	if (last_expect)
 	  last_expect->of_type = strdup(token);
@@ -700,7 +970,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else if (!strcasecmp(token, "SAME-COUNT-AS"))
       {
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing SAME-COUNT-AS name on line %d.", linenum);
+	  goto test_error;
+	}
 
 	if (last_expect)
 	  last_expect->same_count_as = strdup(token);
@@ -713,7 +987,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else if (!strcasecmp(token, "IF-DEFINED"))
       {
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing IF-DEFINED name on line %d.", linenum);
+	  goto test_error;
+	}
 
 	if (last_expect)
 	  last_expect->if_defined = strdup(token);
@@ -726,7 +1004,11 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else if (!strcasecmp(token, "IF-UNDEFINED"))
       {
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing IF-UNDEFINED name on line %d.", linenum);
+	  goto test_error;
+	}
 
 	if (last_expect)
 	  last_expect->if_undefined = strdup(token);
@@ -739,7 +1021,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
       }
       else if (!strcasecmp(token, "WITH-VALUE"))
       {
-      	get_token(fp, token, sizeof(token), &linenum);
+      	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing WITH-VALUE value on line %d.", linenum);
+	  goto test_error;
+	}
+
         if (last_expect)
 	{
 	  tokenptr = token + strlen(token) - 1;
@@ -783,7 +1070,12 @@ do_tests(const char *uri,		/* I - URI to connect on */
 	  goto test_error;
 	}
 
-	get_token(fp, token, sizeof(token), &linenum);
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing DISPLAY name on line %d.", linenum);
+	  goto test_error;
+	}
+
 	displayed[num_displayed] = strdup(token);
 	num_displayed ++;
       }
@@ -802,7 +1094,7 @@ do_tests(const char *uri,		/* I - URI to connect on */
     request->request.op.version[0]   = version / 10;
     request->request.op.version[1]   = version % 10;
     request->request.op.operation_id = op;
-    request->request.op.request_id   = 1;
+    request->request.op.request_id   = ++ request_id;
 
     if (XML)
     {
@@ -875,13 +1167,18 @@ do_tests(const char *uri,		/* I - URI to connect on */
       if (http->version != HTTP_1_1)
         pass = 0;
 
+      if (response->request.status.version[0] != (version / 10) ||
+	  response->request.status.version[1] != (version % 10) ||
+	  response->request.status.request_id != request_id)
+        pass = 0;
+
       if ((attrptr = ippFindAttribute(response, "job-id",
                                       IPP_TAG_INTEGER)) != NULL)
-        job_id = attrptr->values[0].integer;
+        vars->job_id = attrptr->values[0].integer;
 
       if ((attrptr = ippFindAttribute(response, "notify-subscription-id",
                                       IPP_TAG_INTEGER)) != NULL)
-        subscription_id = attrptr->values[0].integer;
+        vars->subscription_id = attrptr->values[0].integer;
 
       for (i = 0; i < num_statuses; i ++)
         if (response->request.status.status_code == statuses[i])
@@ -893,10 +1190,10 @@ do_tests(const char *uri,		/* I - URI to connect on */
       {
         for (i = num_expects, expect = expects; i > 0; i --, expect ++)
         {
-          if (expect->if_defined && !getenv(expect->if_defined))
+          if (expect->if_defined && !get_variable(vars, expect->if_defined))
             continue;
 
-          if (expect->if_undefined && getenv(expect->if_undefined))
+          if (expect->if_undefined && get_variable(vars, expect->if_undefined))
             continue;
             
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -991,59 +1288,72 @@ do_tests(const char *uri,		/* I - URI to connect on */
       if (!response)
 	print_test_error("IPP request failed with status %04x (%s)",
 			 cupsLastError(), cupsLastErrorString());
-
-      for (i = 0; i < num_statuses; i ++)
-	if (response->request.status.status_code == statuses[i])
-	  break;
-
-      if (i == num_statuses && num_statuses > 0)
-	print_test_error("Bad status-code");
-
-      for (i = num_expects, expect = expects; i > 0; i --, expect ++)
+      else
       {
-	if (expect->if_defined && !getenv(expect->if_defined))
-	  continue;
+	if (response->request.status.version[0] != (version / 10) ||
+	    response->request.status.version[1] != (version % 10))
+          print_test_error("Bad version %d.%d in response (expected %d.%d)",
+	                   response->request.status.version[0],
+			   response->request.status.version[1],
+			   version / 10, version % 10);
 
-	if (expect->if_undefined && getenv(expect->if_undefined))
-	  continue;
-    
-	found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+	if (response->request.status.request_id != request_id)
+	  print_test_error("Bad request ID %d in response (expected %d)",
+			   response->request.status.request_id, request_id);
 
-	if ((found == NULL) != expect->not_expect)
+	for (i = 0; i < num_statuses; i ++)
+	  if (response->request.status.status_code == statuses[i])
+	    break;
+
+	if (i == num_statuses && num_statuses > 0)
+	  print_test_error("Bad status-code");
+
+	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
-	  if (expect->not_expect)
-	    print_test_error("NOT EXPECTED: %s", expect->name);
-	  else
-	    print_test_error("EXPECTED: %s", expect->name);
-	}
-	else if (found)
-	{
-	  if (!expect_matches(expect, found->value_tag))
-	    print_test_error("EXPECTED: %s OF-TYPE %s (got %s)", 
-			     expect->name, expect->of_type,
-			     ippTagString(found->value_tag));
-	  else if (!with_value(expect->with_value, expect->with_regex, found))
+	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
+	    continue;
+
+	  if (expect->if_undefined && get_variable(vars, expect->if_undefined))
+	    continue;
+      
+	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
+
+	  if ((found == NULL) != expect->not_expect)
 	  {
-	    if (expect->with_regex)
-	      print_test_error("EXPECTED: %s WITH-VALUE /%s/",
-			       expect->name, expect->with_value);         
+	    if (expect->not_expect)
+	      print_test_error("NOT EXPECTED: %s", expect->name);
 	    else
-	      print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
-			       expect->name, expect->with_value);         
+	      print_test_error("EXPECTED: %s", expect->name);
 	  }
-	  else if (expect->same_count_as)
+	  else if (found)
 	  {
-	    attrptr = ippFindAttribute(response, expect->same_count_as,
-				       IPP_TAG_ZERO);
+	    if (!expect_matches(expect, found->value_tag))
+	      print_test_error("EXPECTED: %s OF-TYPE %s (got %s)", 
+			       expect->name, expect->of_type,
+			       ippTagString(found->value_tag));
+	    else if (!with_value(expect->with_value, expect->with_regex, found))
+	    {
+	      if (expect->with_regex)
+		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
+				 expect->name, expect->with_value);         
+	      else
+		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
+				 expect->name, expect->with_value);         
+	    }
+	    else if (expect->same_count_as)
+	    {
+	      attrptr = ippFindAttribute(response, expect->same_count_as,
+					 IPP_TAG_ZERO);
 
-	    if (!attrptr)
-	      print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			       "(not returned)", expect->name,
-			       found->num_values, expect->same_count_as);
-	    else if (attrptr->num_values != found->num_values)
-	      print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
-			       "(%d values)", expect->name, found->num_values,
-			       expect->same_count_as, attrptr->num_values);
+	      if (!attrptr)
+		print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				 "(not returned)", expect->name,
+				 found->num_values, expect->same_count_as);
+	      else if (attrptr->num_values != found->num_values)
+		print_test_error("EXPECTED: %s (%d values) SAME-COUNT-AS %s "
+				 "(%d values)", expect->name, found->num_values,
+				 expect->same_count_as, attrptr->num_values);
+	    }
 	  }
 	}
       }
@@ -1123,6 +1433,111 @@ do_tests(const char *uri,		/* I - URI to connect on */
 
 
 /*
+ * 'expand_variables()' - Expand variables in a string.
+ */
+
+static void
+expand_variables(_cups_vars_t *vars,	/* I - Variables */
+                 char         *dst,	/* I - Destination string buffer */
+		 const char   *src,	/* I - Source string */
+		 size_t       dstsize)	/* I - Size of destination buffer */
+{
+  char		*dstptr,		/* Pointer into destination */
+		*dstend,		/* End of destination */
+		temp[256],		/* Temporary string */
+		*tempptr;		/* Pointer into temporary string */
+  const char	*value;			/* Value to substitute */
+
+
+  dstptr = dst;
+  dstend = dst + dstsize - 1;
+
+  while (*src && dstptr < dstend)
+  {
+    if (*src == '$')
+    {
+     /*
+      * Substitute a string/number...
+      */
+
+      if (!strncmp(src, "$$", 2))
+      {
+        value = "$";
+	src   += 2;
+      }
+      else if (!strncmp(src, "$ENV[", 5))
+      {
+	strlcpy(temp, src + 5, sizeof(temp));
+
+	for (tempptr = temp; *tempptr; tempptr ++)
+	  if (*tempptr == ']')
+	    break;
+
+        if (*tempptr)
+	  *tempptr++ = '\0';
+
+	value = getenv(temp);
+        src   += tempptr - temp + 5;
+      }
+      else
+      {
+	strlcpy(temp, src + 1, sizeof(temp));
+
+	for (tempptr = temp; *tempptr; tempptr ++)
+	  if (!isalnum(*tempptr & 255) && *tempptr != '-' && *tempptr != '_')
+	    break;
+
+        if (*tempptr)
+	  *tempptr++ = '\0';
+
+	if (!strcmp(temp, "uri"))
+	  value = vars->uri;
+	else if (!strcmp(temp, "scheme") || !strcmp(temp, "method"))
+	  value = vars->scheme;
+	else if (!strcmp(temp, "username"))
+	  value = vars->userpass;
+	else if (!strcmp(temp, "hostname"))
+	  value = vars->hostname;
+	else if (!strcmp(temp, "port"))
+	{
+	  snprintf(temp, sizeof(temp), "%d", vars->port);
+	  value = temp;
+	}
+	else if (!strcmp(temp, "resource"))
+	  value = vars->resource;
+	else if (!strcmp(temp, "job-id"))
+	{
+	  snprintf(temp, sizeof(temp), "%d", vars->job_id);
+	  value = temp;
+	}
+	else if (!strcmp(temp, "notify-subscription-id"))
+	{
+	  snprintf(temp, sizeof(temp), "%d", vars->subscription_id);
+	  value = temp;
+	}
+	else if (!strcmp(temp, "user"))
+	  value = cupsUser();
+	else
+	  value = get_variable(vars, temp);
+
+        src += tempptr - temp + 1;
+      }
+
+      if (value)
+      {
+        strlcpy(dstptr, value, dstend - dstptr + 1);
+	dstptr += strlen(dstptr);
+      }
+    }
+    else
+      *dstptr++ = *src++;
+  }
+
+  *dstptr = '\0';
+}
+
+
+/*
  * 'expect_matches()' - Return true if the tag matches the specification.
  */
  
@@ -1179,6 +1594,59 @@ expect_matches(
   }
 
   return (match);
+}
+
+
+/*
+ * 'get_filename()' - Get a filename based on the current test file.
+ */
+
+static char *				/* O - Filename */
+get_filename(const char *testfile,	/* I - Current test file */
+             char       *dst,		/* I - Destination filename */
+	     const char *src,		/* I - Source filename */
+             size_t     dstsize)	/* I - Size of destination buffer */
+{
+  char			*dstptr;	/* Pointer into destination */
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Global data */
+
+
+  if (*src == '<' && src[strlen(src) - 1] == '>')
+  {
+   /*
+    * Map <filename> to CUPS_DATADIR/ipptest/filename...
+    */
+
+    snprintf(dst, dstsize, "%s/ipptest/%s", cg->cups_datadir, src + 1);
+    dstptr = dst + strlen(dst) - 1;
+    if (*dstptr == '>')
+      *dstptr = '\0';
+  }
+  else if (*src == '/' || !strchr(testfile, '/'))
+  {
+   /*
+    * Use the path as-is...
+    */
+
+    strlcpy(dst, src, dstsize);
+  }
+  else
+  {
+   /*
+    * Make path relative to testfile...
+    */
+
+    strlcpy(dst, testfile, dstsize);
+    if ((dstptr = strrchr(dst, '/')) != NULL)
+      dstptr ++;
+    else
+      dstptr = dst; /* Should never happen */
+
+    strlcpy(dstptr, src, dstsize - (dstptr - dst));
+  }
+
+  return (dst);
 }
 
 
@@ -1295,6 +1763,25 @@ get_token(FILE *fp,			/* I  - File to read from */
       return (buf);
     }
   }
+}
+
+
+/*
+ * 'get_variable()' - Get the value of a variable.
+ */
+
+static char *				/* O - Value or NULL */
+get_variable(_cups_vars_t *vars,	/* I - Variables */
+             const char   *name)	/* I - Variable name */
+{
+  _cups_var_t	key,			/* Search key */
+		*match;			/* Matching variable, if any */
+
+
+  key.name = (char *)name;
+  match    = cupsArrayFind(vars->vars, &key);
+
+  return (match ? match->value : NULL);
 }
 
 
@@ -1721,6 +2208,31 @@ print_xml_trailer(int        success,	/* I - 1 on success, 0 on failure */
 
 
 /*
+ * 'set_variable()' - Set a variable value.
+ */
+
+static void
+set_variable(_cups_vars_t *vars,	/* I - Variables */
+             const char   *name,	/* I - Variable name */
+             const char   *value)	/* I - Value string */
+{
+  _cups_var_t	*var;			/* New variable */
+
+
+  if ((var = malloc(sizeof(_cups_var_t))) == NULL)
+  {
+    print_fatal_error("Unable to allocate memory for variable \"%s\".", name);
+    exit(1);
+  }
+
+  var->name  = strdup(name);
+  var->value = strdup(value);
+
+  cupsArrayAdd(vars->vars, var);
+}
+
+
+/*
  * 'usage()' - Show program usage.
  */
 
@@ -1733,13 +2245,14 @@ usage(void)
 		  "\n"
 		  "Options:\n"
 		  "\n"
+		  "-E             Test with encryption.\n"
+		  "-X             Produce XML instead of plain text.\n"
 		  "-c             Send requests using chunking (default)\n"
 		  "-d name=value  Define variable.\n"
 		  "-i seconds     Repeat the last test file with the given "
 		  "interval.\n"
 		  "-l             Send requests using content length\n"
-		  "-v             Show all attributes sent and received.\n"
-		  "-X             Produce XML instead of plain text.\n"));
+		  "-v             Show all attributes sent and received.\n"));
 
   exit(1);
 }

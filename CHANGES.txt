@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-01-18
+CHANGES.txt - 2010-01-26
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The ipptest tool is now a first-class user program and has several
+	  improvements along with new documentation (STR #3484)
 	- The cupstestppd tool now warns about non-unique filenames and
 	  provides a way to ignore all filename warnings.
 	- Dropped support for the recoverable: and recovered: message prefixes.
