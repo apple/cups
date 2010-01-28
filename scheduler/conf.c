@@ -108,7 +108,6 @@ static const cupsd_var_t	variables[] =
   { "ClassifyOverride",		&ClassifyOverride,	CUPSD_VARTYPE_BOOLEAN },
   { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_INTEGER },
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
-  { "DefaultCharset",		&DefaultCharset,	CUPSD_VARTYPE_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
   { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "DefaultPaperSize",		&DefaultPaperSize,	CUPSD_VARTYPE_STRING },
@@ -540,8 +539,6 @@ cupsdReadConfiguration(void)
   else
     cupsdSetString(&DefaultLanguage, language->language);
 
-  cupsdSetString(&DefaultCharset, _cupsEncodingName(language->encoding));
-
   cupsdClearString(&DefaultPaperSize);
 
   cupsdSetString(&RIPCache, "8m");
@@ -910,7 +907,7 @@ cupsdReadConfiguration(void)
   * Set the default locale using the language and charset...
   */
 
-  cupsdSetStringf(&DefaultLocale, "%s.%s", DefaultLanguage, DefaultCharset);
+  cupsdSetStringf(&DefaultLocale, "%s.UTF-8", DefaultLanguage);
 
  /*
   * Update all relative filenames to include the full path from ServerRoot...

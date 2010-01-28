@@ -3,7 +3,7 @@
  *
  *   Printer routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -430,7 +430,7 @@ cupsdCreateCommonData(void)
 
   /* charset-configured */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET | IPP_TAG_COPY,
-               "charset-configured", NULL, DefaultCharset);
+               "charset-configured", NULL, "utf-8");
 
   /* charset-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_CHARSET | IPP_TAG_COPY,
@@ -450,8 +450,8 @@ cupsdCreateCommonData(void)
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_TEXT | IPP_TAG_COPY,
                "cups-version", NULL, CUPS_SVERSION + 6);
 
-  /* generated-natural-language-supported */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_COPY,
+  /* generated-natural-language-supported (no IPP_TAG_COPY) */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "generated-natural-language-supported", NULL, DefaultLanguage);
 
   /* ipp-versions-supported */
@@ -534,8 +534,8 @@ cupsdCreateCommonData(void)
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "multiple-operation-time-out", MultipleOperationTimeout);
 
-  /* natural-language-configured */
-  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_COPY,
+  /* natural-language-configured (no IPP_TAG_COPY) */
+  ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE,
                "natural-language-configured", NULL, DefaultLanguage);
 
   /* notify-attributes-supported */

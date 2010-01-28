@@ -425,7 +425,8 @@ ippAddString(ipp_t      *ipp,		/* I - IPP message */
     value = "en";
 
  /*
-  * Convert language values to lowercase and change _ to - as needed...
+  * Convert language and charset values to lowercase and change _ to - as
+  * needed...
   */
 
   if ((type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET) && value)
@@ -473,6 +474,8 @@ ippAddStrings(
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* New attribute */
   ipp_value_t		*value;		/* Current value */
+  char			buffer[1024],	/* Language/charset value buffer */
+			*bufptr;	/* Pointer into buffer */
 
 
   DEBUG_printf(("ippAddStrings(ipp=%p, group=%02x(%s), type=%02x(%s), "
@@ -506,16 +509,36 @@ ippAddStrings(
 
     if (values != NULL)
     {
-     /*
-      * Force language to be English for the POSIX locale...
-      */
+      if ((int)type & IPP_TAG_COPY)
+        value->string.text = (char *)values[i];
+      else if (type == IPP_TAG_LANGUAGE && !strcasecmp(values[i], "C"))
+      {
+       /*
+	* Force language to be English for the POSIX locale...
+	*/
 
-      if (type == IPP_TAG_LANGUAGE && !strcasecmp(values[i], "C"))
 	value->string.text = ((int)type & IPP_TAG_COPY) ? "en" :
                                       _cupsStrAlloc("en");
+      }
+      else if (type == IPP_TAG_LANGUAGE || type == IPP_TAG_CHARSET)
+      {
+       /*
+	* Convert language values to lowercase and change _ to - as needed...
+	*/
+
+	strlcpy(buffer, values[i], sizeof(buffer));
+
+	for (bufptr = buffer; *bufptr; bufptr ++)
+	  if (*bufptr == '_')
+	    *bufptr = '-';
+	  else
+	    *bufptr = tolower(*bufptr & 255);
+
+	value->string.text = _cupsStrAlloc(buffer);
+      }
       else
-	value->string.text = ((int)type & IPP_TAG_COPY) ? (char *)values[i] :
-                                      _cupsStrAlloc(values[i]);
+	value->string.text = _cupsStrAlloc(values[i]);
+
     }
   }
 

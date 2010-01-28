@@ -390,7 +390,7 @@ cupsdProcessIPPRequest(
 		     charset->values[0].string.text);
       else
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	     "attributes-charset", NULL, DefaultCharset);
+        	     "attributes-charset", NULL, "utf-8");
 
       if (language)
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
@@ -10185,7 +10185,7 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
   if (ippFindAttribute(con->response, "attributes-charset",
                        IPP_TAG_ZERO) == NULL)
     ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                 "attributes-charset", NULL, DefaultCharset);
+                 "attributes-charset", NULL, "utf-8");
 
   if (ippFindAttribute(con->response, "attributes-natural-language",
                        IPP_TAG_ZERO) == NULL)

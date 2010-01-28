@@ -136,8 +136,6 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Data file directory */
 			*DefaultLanguage	VALUE(NULL),
 					/* Default language encoding */
-			*DefaultCharset		VALUE(NULL),
-					/* Default charset */
 			*DefaultLocale		VALUE(NULL),
 					/* Default locale */
 			*DefaultPaperSize	VALUE(NULL),

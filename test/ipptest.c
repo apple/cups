@@ -33,6 +33,7 @@
  *   print_xml_trailer() - Print the XML trailer with success/fail value.
  *   set_variable()      - Set a variable value.
  *   usage()             - Show program usage.
+ *   validate_attr()     - Determine whether an attribute is valid.
  *   with_value()        - Test a WITH-VALUE predicate.
  */
 
@@ -58,29 +59,30 @@
 
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
-  int	not_expect;			/* Don't expect attribute? */
-  char	*name,				/* Attribute name */
-	*of_type,			/* Type name */
-	*same_count_as,			/* Parallel attribute name */
-	*if_defined,			/* Only required if variable defined */
-	*if_undefined,			/* Only required if variable is not defined */
-	*with_value;			/* Attribute must include this value */
-  int	with_regex;			/* WITH-VALUE is a regular expression */
+  int		not_expect;		/* Don't expect attribute? */
+  char		*name,			/* Attribute name */
+		*of_type,		/* Type name */
+		*same_count_as,		/* Parallel attribute name */
+		*if_defined,		/* Only required if variable defined */
+		*if_undefined,		/* Only required if variable is not defined */
+		*with_value;		/* Attribute must include this value */
+  int		with_regex,		/* WITH-VALUE is a regular expression */
+		count;			/* Expected count if > 0 */
 } _cups_expect_t;
 
 typedef struct _cups_var_s		/**** Variable ****/
 {
-  char	*name,				/* Name of variable */
-	*value;				/* Value of variable */
+  char		*name,			/* Name of variable */
+		*value;			/* Value of variable */
 } _cups_var_t;
 
 typedef struct _cups_vars_s		/**** Set of variables ****/
 {
   const char	*uri;			/* URI for printer */
-  char		scheme[256],		/* Scheme from URI */
+  char		scheme[64],		/* Scheme from URI */
 		userpass[256],		/* Username/password from URI */
 		hostname[256],		/* Hostname from URI */
-		resource[512];		/* Resource path from URI */
+		resource[1024];		/* Resource path from URI */
   int 		port,			/* Port number from URI */
 		job_id,			/* Current job-id value */
 		subscription_id;	/* Current notify-subscription-id value */
@@ -97,6 +99,21 @@ int		Chunking = 1,		/* Use chunked requests */
 		Version = 11,		/* Default IPP version */
 		XML = 0,		/* Produce XML output? */
 		XMLHeader = 0;		/* 1 if header is written */
+const char * const URIStatusStrings[] =
+{					/* URI status strings */
+  "URI too large",
+  "Bad arguments to function",
+  "Bad resource in URI",
+  "Bad port number in URI",
+  "Bad hostname/address in URI",
+  "Bad username in URI",
+  "Bad scheme in URI",
+  "Bad/empty URI",
+  "OK",
+  "Missing scheme in URI",
+  "Unknown scheme in URI",
+  "Missing resource in URI"
+};
 
 
 /*
@@ -132,6 +149,7 @@ static void	print_xml_trailer(int success, const char *message);
 static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
 static void	usage(void);
+static int	validate_attr(ipp_attribute_t *attr, int print);
 static int      with_value(char *value, int regex, ipp_attribute_t *attr);
 
 
@@ -152,21 +170,6 @@ main(int  argc,				/* I - Number of command-line args */
   int			interval;	/* Test interval */
   _cups_vars_t		vars;		/* Variables */
   http_uri_status_t	uri_status;	/* URI separation status */
-  static const char * const uri_status_strings[] =
-  {
-    "URI too large",
-    "Bad arguments to function",
-    "Bad resource in URI",
-    "Bad port number in URI",
-    "Bad hostname/address in URI",
-    "Bad username in URI",
-    "Bad scheme in URI",
-    "Bad/empty URI",
-    "OK",
-    "Missing scheme in URI",
-    "Unknown scheme in URI",
-    "Missing resource in URI"
-  };
 
 
  /*
@@ -330,7 +333,7 @@ main(int  argc,				/* I - Number of command-line args */
       if (uri_status != HTTP_URI_OK)
       {
         _cupsLangPrintf(stderr, _("ipptest: Bad URI - %s.\n"),
-	                uri_status_strings[uri_status - HTTP_URI_OVERFLOW]);
+	                URIStatusStrings[uri_status - HTTP_URI_OVERFLOW]);
         return (1);
       }
 
@@ -618,7 +621,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
-      if (strcasecmp(token, "EXPECT") &&
+      if (strcasecmp(token, "COUNT") &&
+          strcasecmp(token, "EXPECT") &&
           strcasecmp(token, "IF-DEFINED") &&
           strcasecmp(token, "IF-UNDEFINED") &&
           strcasecmp(token, "OF-TYPE") &&
@@ -933,22 +937,38 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         last_expect = expects + num_expects;
 	num_expects ++;
 
+	memset(last_expect, 0, sizeof(_cups_expect_t));
+
         if (token[0] == '!')
         {
           last_expect->not_expect = 1;
           last_expect->name       = strdup(token + 1);
         }
         else
-        {
-          last_expect->not_expect = 0;
-	  last_expect->name       = strdup(token);
+	  last_expect->name = strdup(token);
+      }
+      else if (!strcasecmp(token, "COUNT"))
+      {
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing COUNT number on line %d.", linenum);
+	  goto test_error;
 	}
 
-        last_expect->of_type       = NULL;
-        last_expect->same_count_as = NULL;
-        last_expect->if_defined    = NULL;
-        last_expect->if_undefined  = NULL;
-        last_expect->with_value    = NULL;
+        if ((i = atoi(token)) <= 0)
+	{
+	  print_fatal_error("Bad COUNT \"%s\" on line %d.", token, linenum);
+	  goto test_error;
+	}
+
+	if (last_expect)
+	  last_expect->count = i;
+	else
+	{
+	  print_fatal_error("COUNT without a preceding EXPECT on line %d.",
+	                    linenum);
+	  goto test_error;
+	}
       }
       else if (!strcasecmp(token, "OF-TYPE"))
       {
@@ -1180,6 +1200,23 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
                                       IPP_TAG_INTEGER)) != NULL)
         vars->subscription_id = attrptr->values[0].integer;
 
+      for (attrptr = response->attrs, group = attrptr->group_tag;
+           attrptr;
+	   attrptr = attrptr->next)
+      {
+        if (attrptr->group_tag < group && attrptr->group_tag != IPP_TAG_ZERO)
+	{
+	  pass = 0;
+	  break;
+	}
+
+        if (!validate_attr(attrptr, 0))
+	{
+	  pass = 0;
+	  break;
+	}
+      }
+
       for (i = 0; i < num_statuses; i ++)
         if (response->request.status.status_code == statuses[i])
 	  break;
@@ -1211,7 +1248,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
             pass = 0;
             break;
           }
-          
+
+          if (found && expect->count > 0 && found->num_values != expect->count)
+	  {
+            pass = 0;
+            break;
+	  }
+
           if (found && expect->same_count_as)
           {
             attrptr = ippFindAttribute(response, expect->same_count_as,
@@ -1244,13 +1287,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else
     {
       puts(pass ? "PASS]" : "FAIL]");
-      printf("        RECEIVED: %lu bytes in response\n",
-	     (unsigned long)ippLength(response));
-      printf("        status-code = %x (%s)\n", cupsLastError(),
-	     ippErrorString(cupsLastError()));
 
-      if ((Verbosity || !pass) && response)
+      if (Verbosity && response)
       {
+	printf("        RECEIVED: %lu bytes in response\n",
+	       (unsigned long)ippLength(response));
+	printf("        status-code = %x (%s)\n", cupsLastError(),
+	       ippErrorString(cupsLastError()));
+
 	for (attrptr = response->attrs;
 	     attrptr != NULL;
 	     attrptr = attrptr->next)
@@ -1301,6 +1345,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  print_test_error("Bad request ID %d in response (expected %d)",
 			   response->request.status.request_id, request_id);
 
+	for (attrptr = response->attrs, group = attrptr->group_tag;
+	     attrptr;
+	     attrptr = attrptr->next)
+	{
+	  if (attrptr->group_tag < group && attrptr->group_tag != IPP_TAG_ZERO)
+	    print_test_error("Attribute groups out of order (%s < %s)",
+	                     ippTagString(attrptr->group_tag),
+			     ippTagString(group));
+
+	  validate_attr(attrptr, 1);
+	}
+
 	for (i = 0; i < num_statuses; i ++)
 	  if (response->request.status.status_code == statuses[i])
 	    break;
@@ -1339,6 +1395,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      else
 		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
 				 expect->name, expect->with_value);         
+	    }
+	    else if (expect->count > 0 && found->num_values != expect->count)
+	    {
+	      print_test_error("EXPECTED: %s COUNT %d (got %d)", expect->name,
+			       expect->count, found->num_values);
 	    }
 	    else if (expect->same_count_as)
 	    {
@@ -2253,6 +2314,726 @@ usage(void)
 
 
 /*
+ * 'validate_attr()' - Determine whether an attribute is valid.
+ */
+
+static int				/* O - 1 if valid, 0 otherwise */
+validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
+              int             print)	/* I - 1 = report issues to stdout */
+{
+  int		i;			/* Looping var */
+  char		scheme[64],		/* Scheme from URI */
+		userpass[256],		/* Username/password from URI */
+		hostname[256],		/* Hostname from URI */
+		resource[1024];		/* Resource from URI */
+  int		port,			/* Port number from URI */
+		uri_status,		/* URI separation status */
+		valid = 1;		/* Is the attribute valid? */
+  const char	*ptr;			/* Pointer into string */
+  ipp_attribute_t *colattr;		/* Collection attribute */
+  regex_t	re;			/* Regular expression */
+  ipp_uchar_t	*date;			/* Current date value */
+
+
+ /*
+  * Skip separators.
+  */
+
+  if (!attr->name)
+    return (1);
+
+ /*
+  * Validate the attribute name.
+  */
+
+  for (ptr = attr->name; *ptr; ptr ++)
+    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' && *ptr != '_')
+      break;
+
+  if (*ptr || ptr == attr->name)
+  {
+    valid = 0;
+
+    if (print)
+      print_test_error("\"%s\": Bad attribute name - invalid character (RFC "
+		       "2911 section 4.1.3).", attr->name);
+  }
+
+  if ((ptr - attr->name) > 255)
+  {
+    valid = 0;
+
+    if (print)
+      print_test_error("\"%s\": Bad attribute name - bad length (RFC 2911 "
+		       "section 4.1.3).", attr->name);
+  }
+
+  switch (attr->value_tag)
+  {
+    case IPP_TAG_INTEGER :
+        break;
+
+    case IPP_TAG_BOOLEAN :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].boolean != 0 &&
+	      attr->values[i].boolean != 1)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad boolen value %d (RFC 2911 section "
+	                       "4.1.10).", attr->name, attr->values[i].boolean);
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_ENUM :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].integer < 1)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad enum value %d - out of range "
+	                       "(RFC 2911 section 4.1.4).", attr->name,
+			       attr->values[i].integer);
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_STRING :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].unknown.length > 1023)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad octetString value - bad length %d "
+	                       "(RFC 2911 section 4.1.10).", attr->name,
+			       attr->values[i].unknown.length);
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_DATE :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  date = attr->values[i].date;
+
+          if (date[2] < 1 || date[2] > 12)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime month %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[2]);
+            else
+	      break;
+	  }
+
+          if (date[3] < 1 || date[3] > 31)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime day %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[3]);
+            else
+	      break;
+	  }
+
+          if (date[4] > 23)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime hours %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[4]);
+            else
+	      break;
+	  }
+
+          if (date[5] > 59)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime minutes %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[5]);
+            else
+	      break;
+	  }
+
+          if (date[6] > 60)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime seconds %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[6]);
+            else
+	      break;
+	  }
+
+          if (date[7] > 9)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime deciseconds %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[7]);
+            else
+	      break;
+	  }
+
+          if (date[8] != '-' && date[8] != '+')
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime UTC sign '%c' (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[8]);
+            else
+	      break;
+	  }
+
+          if (date[9] > 11)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime UTC hours %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[9]);
+            else
+	      break;
+	  }
+
+          if (date[10] > 59)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad dateTime UTC minutes %u (RFC 2911 "
+	                       "section 4.1.13).", attr->name, date[10]);
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_RESOLUTION :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].resolution.xres <= 0)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad resolution value %dx%d%s - cross "
+	                       "feed resolution must be positive (RFC 2911 "
+			       "section 4.1.13).", attr->name,
+			       attr->values[i].resolution.xres,
+			       attr->values[i].resolution.yres,
+			       attr->values[i].resolution.units ==
+			           IPP_RES_PER_INCH ? "dpi" :
+			           attr->values[i].resolution.units ==
+			               IPP_RES_PER_CM ? "dpc" : "unknown");
+            else
+	      break;
+	  }
+
+	  if (attr->values[i].resolution.yres <= 0)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad resolution value %dx%d%s - feed "
+	                       "resolution must be positive (RFC 2911 section "
+			       "4.1.13).", attr->name,
+			       attr->values[i].resolution.xres,
+			       attr->values[i].resolution.yres,
+			       attr->values[i].resolution.units ==
+			           IPP_RES_PER_INCH ? "dpi" :
+			           attr->values[i].resolution.units ==
+			               IPP_RES_PER_CM ? "dpc" : "unknown");
+            else
+	      break;
+	  }
+
+	  if (attr->values[i].resolution.units != IPP_RES_PER_INCH &&
+	      attr->values[i].resolution.units != IPP_RES_PER_CM)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad resolution value %dx%d%s - bad "
+	                       "units value (RFC 2911 section 4.1.13).",
+			       attr->name, attr->values[i].resolution.xres,
+			       attr->values[i].resolution.yres,
+			       attr->values[i].resolution.units ==
+			           IPP_RES_PER_INCH ? "dpi" :
+			           attr->values[i].resolution.units ==
+			               IPP_RES_PER_CM ? "dpc" : "unknown");
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_RANGE :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (attr->values[i].range.lower > attr->values[i].range.upper)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad rangeOfInteger value %d-%d - lower "
+	                       "greater than upper (RFC 2911 section 4.1.13).",
+			       attr->name, attr->values[i].range.lower,
+			       attr->values[i].range.upper);
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_BEGIN_COLLECTION :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (colattr = attr->values[i].collection->attrs;
+	       colattr;
+	       colattr = colattr->next)
+	  {
+	    if (!validate_attr(colattr, 0))
+	    {
+	      valid = 0;
+	      break;
+	    }
+	  }
+
+	  if (colattr && print)
+	  {
+            print_test_error("\"%s\": Bad collection value.", attr->name);
+
+	    while (colattr)
+	    {
+	      validate_attr(colattr, print);
+	      colattr = colattr->next;
+	    }
+	  }
+	}
+        break;
+
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	  {
+	    if ((*ptr & 0xe0) == 0xc0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf0) == 0xe0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf8) == 0xf0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if (*ptr & 0x80)
+	      break;
+	  }
+
+	  if (*ptr)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad text value \"%s\" - bad UTF-8 "
+			       "sequence (RFC 2911 section 4.1.1).", attr->name,
+			       attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > 1023)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad text value \"%s\" - bad length %d "
+			       "(RFC 2911 section 4.1.1).", attr->name,
+			       attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_NAME :
+    case IPP_TAG_NAMELANG :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	  {
+	    if ((*ptr & 0xe0) == 0xc0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf0) == 0xe0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if ((*ptr & 0xf8) == 0xf0)
+	    {
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	      ptr ++;
+	      if ((*ptr & 0xc0) != 0x80)
+	        break;
+	    }
+	    else if (*ptr & 0x80)
+	      break;
+	  }
+
+	  if (*ptr)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad name value \"%s\" - bad UTF-8 "
+			       "sequence (RFC 2911 section 4.1.2).", attr->name,
+			       attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > 1023)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad name value \"%s\" - bad length %d "
+			       "(RFC 2911 section 4.1.2).", attr->name,
+			       attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_KEYWORD :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	    if (!isalnum(*ptr & 255) && *ptr != '-' && *ptr != '.' &&
+	        *ptr != '_')
+	      break;
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad keyword value \"%s\" - invalid "
+			       "character (RFC 2911 section 4.1.3).",
+			       attr->name, attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > 255)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad keyword value \"%s\" - bad "
+			       "length %d (RFC 2911 section 4.1.3).",
+			       attr->name, attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_URI :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  uri_status = httpSeparateURI(HTTP_URI_CODING_ALL,
+	                               attr->values[i].string.text,
+				       scheme, sizeof(scheme),
+				       userpass, sizeof(userpass),
+				       hostname, sizeof(hostname),
+				       &port, resource, sizeof(resource));
+
+	  if (uri_status < HTTP_URI_OK)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad URI value \"%s\" - %s "
+	                       "(RFC 2911 section 4.1.5).", attr->name,
+	                       attr->values[i].string.text,
+			       URIStatusStrings[uri_status -
+			                        HTTP_URI_OVERFLOW]);
+            else
+	      break;
+	  }
+
+	  if (strlen(attr->values[i].string.text) > 1023)
+	  {
+	    valid = 0;
+
+	    if (print)
+	      print_test_error("\"%s\": Bad URI value \"%s\" - bad length %d "
+	                       "(RFC 2911 section 4.1.5).", attr->name,
+	                       attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_URISCHEME :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  ptr = attr->values[i].string.text;
+	  if (islower(*ptr & 255))
+	  {
+	    for (ptr ++; *ptr; ptr ++)
+	      if (!islower(*ptr & 255) && !isdigit(*ptr & 255) &&
+	          *ptr != '+' && *ptr != '-' && *ptr != '.')
+                break;
+	  }
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad uriScheme value \"%s\" - bad "
+	                       "characters (RFC 2911 section 4.1.6).",
+			       attr->name, attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > 63)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad uriScheme value \"%s\" - bad "
+	                       "length %d (RFC 2911 section 4.1.6).",
+			       attr->name, attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_CHARSET :
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  for (ptr = attr->values[i].string.text; *ptr; ptr ++)
+	    if (!isprint(*ptr & 255) || isupper(*ptr & 255) ||
+	        isspace(*ptr & 255))
+	      break;
+
+	  if (*ptr || ptr == attr->values[i].string.text)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad charset value \"%s\" - bad "
+	                       "characters (RFC 2911 section 4.1.7).",
+			       attr->name, attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if ((ptr - attr->values[i].string.text) > 40)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad charset value \"%s\" - bad "
+	                       "length %d (RFC 2911 section 4.1.7).",
+			       attr->name, attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    case IPP_TAG_LANGUAGE :
+       /*
+        * The following regular expression is derived from the ABNF for
+	* language tags in RFC 4646.  All I can say is that this is the
+	* easiest way to check the values...
+	*/
+
+        if ((i = regcomp(&re,
+			 "^("
+			 "(([a-z]{2,3}(-[a-z][a-z][a-z]){0,3})|[a-z]{4,8})"
+								/* language */
+			 "(-[a-z][a-z][a-z][a-z]){0,1}"		/* script */
+			 "(-([a-z][a-z]|[0-9][0-9][0-9])){0,1}"	/* region */
+			 "(-([a-z]{5,8}|[0-9][0-9][0-9]))*"	/* variant */
+			 "(-[a-wy-z](-[a-z0-9]{2,8})+)*"	/* extension */
+			 "(-x(-[a-z0-9]{1,8})+)*"		/* privateuse */
+			 "|"
+			 "x(-[a-z0-9]{1,8})+"			/* privateuse */
+			 "|"
+			 "[a-z]{1,3}(-[a-z][0-9]{2,8}){1,2}"	/* grandfathered */
+			 ")$",
+			 REG_NOSUB | REG_EXTENDED)) != 0)
+        {
+          char	temp[256];		/* Temporary error string */
+
+          regerror(i, &re, temp, sizeof(temp));
+	  print_fatal_error("Unable to compile naturalLanguage regular "
+	                    "expression: %s.", temp);
+        }
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad naturalLanguage value \"%s\" - bad "
+	                       "characters (RFC 2911 section 4.1.8).",
+			       attr->name, attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if (strlen(attr->values[i].string.text) > 63)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad naturalLanguage value \"%s\" - bad "
+	                       "length %d (RFC 2911 section 4.1.8).",
+			       attr->name, attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+
+	regfree(&re);
+        break;
+
+    case IPP_TAG_MIMETYPE :
+       /*
+        * The following regular expression is derived from the ABNF for
+	* language tags in RFC 2045 and 4288.  All I can say is that this is
+	* the easiest way to check the values...
+	*/
+
+        if ((i = regcomp(&re,
+			 "^"
+			 "[-a-zA-Z0-9!#$&.+^_]{1,127}"		/* type-name */
+			 "/"
+			 "[-a-zA-Z0-9!#$&.+^_]{1,127}"		/* subtype-name */
+			 "(;[-a-zA-Z0-9!#$&.+^_]{1,127}="	/* parameter= */
+			 "([-a-zA-Z0-9!#$&.+^_]{1,127}|\"[^\"]*\"))*"
+			 					/* value */
+			 "$",
+			 REG_NOSUB | REG_EXTENDED)) != 0)
+        {
+          char	temp[256];		/* Temporary error string */
+
+          regerror(i, &re, temp, sizeof(temp));
+	  print_fatal_error("Unable to compile mimeMediaType regular "
+	                    "expression: %s.", temp);
+        }
+
+        for (i = 0; i < attr->num_values; i ++)
+	{
+	  if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad mimeMediaType value \"%s\" - bad "
+	                       "characters (RFC 2911 section 4.1.9).",
+			       attr->name, attr->values[i].string.text);
+            else
+	      break;
+	  }
+
+	  if (strlen(attr->values[i].string.text) > 255)
+	  {
+	    valid = 0;
+
+            if (print)
+	      print_test_error("\"%s\": Bad mimeMediaType value \"%s\" - bad "
+	                       "length %d (RFC 2911 section 4.1.9).",
+			       attr->name, attr->values[i].string.text,
+			       (int)strlen(attr->values[i].string.text));
+            else
+	      break;
+	  }
+	}
+        break;
+
+    default :
+        break;
+  }
+
+  return (valid);
+}
+
+
+/*
  * 'with_value()' - Test a WITH-VALUE predicate.
  */
 
@@ -2351,12 +3132,12 @@ with_value(char            *value,	/* I - Value string */
 
           if ((i = regcomp(&re, value, REG_EXTENDED | REG_NOSUB)) != 0)
 	  {
-	   /*
-	    * Bad regular expression!
-	    *
-	    * TODO: Report an error here.
-	    */
+	    char temp[256];		/* Temporary string */
 
+            regerror(i, &re, temp, sizeof(temp));
+
+	    print_fatal_error("Unable to compile WITH-VALUE regular expression "
+	                      "\"%s\" - %s", value, temp);
 	    return (0);
 	  }
 

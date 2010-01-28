@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "26 February 2010" "Apple Inc."
+.TH ipp.test 5 "CUPS" "28 February 2010" "Apple Inc."
 .SH NAME
 ipp.test \- ipptest test file format
 .SH DESCRIPTION
@@ -163,6 +163,9 @@ VERSION 2.2
 Specifies the IPP version number to use for this test.
 .SH EXPECT PREDICATES
 The following predicates are understood following the EXPECT test directive:
+.TP 5
+COUNT number
+Requires the EXPECT attribute to have the specified number of values.
 .TP 5
 IF-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is defined.

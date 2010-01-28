@@ -945,25 +945,6 @@ of authentication to use for IPP operations that require a
 username. The default is <CODE>Basic</CODE>.</P>
 
 
-<H2 CLASS="title"><A NAME="DefaultCharset">DefaultCharset</A></H2>
-
-<H3>Examples</H3>
-
-<PRE CLASS="command">
-DefaultCharset utf-8
-DefaultCharset iso-8859-1
-DefaultCharset windows-1251
-</PRE>
-
-<H3>Description</H3>
-
-<P>The <CODE>DefaultCharset</CODE> directive sets the default
-character set to use for client connections. The default
-character set is <CODE>utf-8</CODE> but is overridden by the
-character set for the language specified by the client or the
-<CODE>DefaultLanguage</CODE> directive.</P>
-
-
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultEncryption">DefaultEncryption</A></H2>
 
 <H3>Examples</H3>
