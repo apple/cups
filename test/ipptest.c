@@ -59,7 +59,8 @@
 
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
-  int		not_expect;		/* Don't expect attribute? */
+  int		optional,		/* Optional attribute? */
+		not_expect;		/* Don't expect attribute? */
   char		*name,			/* Attribute name */
 		*of_type,		/* Type name */
 		*same_count_as,		/* Parallel attribute name */
@@ -68,6 +69,7 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*with_value;		/* Attribute must include this value */
   int		with_regex,		/* WITH-VALUE is a regular expression */
 		count;			/* Expected count if > 0 */
+  ipp_tag_t	in_group;		/* IN-GROUP value */
 } _cups_expect_t;
 
 typedef struct _cups_var_s		/**** Variable ****/
@@ -78,14 +80,13 @@ typedef struct _cups_var_s		/**** Variable ****/
 
 typedef struct _cups_vars_s		/**** Set of variables ****/
 {
-  const char	*uri;			/* URI for printer */
+  const char	*uri,			/* URI for printer */
+		*filename;		/* Filename */
   char		scheme[64],		/* Scheme from URI */
 		userpass[256],		/* Username/password from URI */
 		hostname[256],		/* Hostname from URI */
 		resource[1024];		/* Resource path from URI */
-  int 		port,			/* Port number from URI */
-		job_id,			/* Current job-id value */
-		subscription_id;	/* Current notify-subscription-id value */
+  int 		port;			/* Port number from URI */
   cups_array_t	*vars;			/* Array of variables */
 } _cups_vars_t;
 
@@ -99,8 +100,8 @@ int		Chunking = 1,		/* Use chunked requests */
 		Version = 11,		/* Default IPP version */
 		XML = 0,		/* Produce XML output? */
 		XMLHeader = 0;		/* 1 if header is written */
-const char * const URIStatusStrings[] =
-{					/* URI status strings */
+const char * const URIStatusStrings[] =	/* URI status strings */
+{
   "URI too large",
   "Bad arguments to function",
   "Bad resource in URI",
@@ -270,6 +271,19 @@ main(int  argc,				/* I - Number of command-line args */
 	        value = name + strlen(name);
 
 	      set_variable(&vars, name, value);
+	      break;
+
+          case 'f' : /* Set the default test filename */
+	      i ++;
+
+	      if (i >= argc)
+	      {
+		_cupsLangPuts(stderr,
+		              _("ipptest: Missing filename for \"-f\".\n"));
+		usage();
+              }
+
+	      vars.filename = argv[i];
 	      break;
 
           case 'i' : /* Test every N seconds */
@@ -547,14 +561,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  Chunking = 0;
 	else
 	{
-	  print_fatal_error("Bad TRANSER value \"%s\" on line %d.", temp,
+	  print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
 	                    linenum);
 	  goto test_error;
 	}
       }
       else
       {
-        print_fatal_error("Missing TRANSER value on line %d.", linenum);
+        print_fatal_error("Missing TRANSFER value on line %d.", linenum);
         goto test_error;
       }
 
@@ -600,6 +614,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
     strlcpy(resource, vars->resource, sizeof(resource));
 
+    request_id ++;
     request       = ippNew();
     op            = (ipp_op_t)0;
     group         = IPP_TAG_ZERO;
@@ -625,6 +640,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           strcasecmp(token, "EXPECT") &&
           strcasecmp(token, "IF-DEFINED") &&
           strcasecmp(token, "IF-UNDEFINED") &&
+          strcasecmp(token, "IN-GROUP") &&
           strcasecmp(token, "OF-TYPE") &&
           strcasecmp(token, "SAME-COUNT-AS") &&
           strcasecmp(token, "WITH-VALUE"))
@@ -659,6 +675,32 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	get_token(fp, name, sizeof(name), &linenum);
       }
+      else if (!strcmp(token, "REQUEST-ID"))
+      {
+       /*
+	* REQUEST-ID #
+	* REQUEST-ID random
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  if (isdigit(temp[0] & 255))
+	    request_id = atoi(temp);
+	  else if (!strcasecmp(temp, "random"))
+	    request_id = (CUPS_RAND() % 1000) * 137 + 1;
+	  else
+	  {
+	    print_fatal_error("Bad REQUEST-ID value \"%s\" on line %d.", temp,
+			      linenum);
+	    goto test_error;
+	  }
+	}
+	else
+	{
+	  print_fatal_error("Missing REQUEST-ID value on line %d.", linenum);
+	  goto test_error;
+	}
+      }
       else if (!strcmp(token, "TRANSFER"))
       {
        /*
@@ -674,14 +716,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    chunking = 0;
 	  else
 	  {
-	    print_fatal_error("Bad TRANSER value \"%s\" on line %d.", temp,
+	    print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
 			      linenum);
 	    goto test_error;
 	  }
 	}
 	else
 	{
-	  print_fatal_error("Missing TRANSER value on line %d.", linenum);
+	  print_fatal_error("Missing TRANSFER value on line %d.", linenum);
 	  goto test_error;
 	}
       }
@@ -689,7 +731,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
 	if (get_token(fp, temp, sizeof(temp), &linenum))
 	{
-	  if (!strcmp(temp, "1.0"))
+	  if (!strcmp(temp, "0.0"))
+	    version = 0;
+	  else if (!strcmp(temp, "1.0"))
 	    version = 10;
 	  else if (!strcmp(temp, "1.1"))
 	    version = 11;
@@ -836,14 +880,56 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
-	      print_fatal_error("resolution tag not yet supported on line %d",
-	                        linenum);
-	      goto test_error;
+	      {
+	        int	xres,		/* X resolution */
+			yres;		/* Y resolution */
+		char	units[6];	/* Units */
+
+                if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
+		    (strcasecmp(units, "dpi") && strcasecmp(units, "dpc") &&
+		     strcasecmp(units, "other")))
+		{
+		  print_fatal_error("Bad resolution value \"%s\" on line %d.",
+		                    token, linenum);
+		  goto test_error;
+		}
+
+		if (!strcasecmp(units, "dpi"))
+		  ippAddResolution(request, group, attr, xres, yres,
+				   IPP_RES_PER_INCH);
+		else if (!strcasecmp(units, "dpc"))
+		  ippAddResolution(request, group, attr, xres, yres,
+				   IPP_RES_PER_CM);
+		else
+		  ippAddResolution(request, group, attr, xres, yres,
+				   (ipp_res_t)0);
+	      }
+	      break;
 
 	  case IPP_TAG_RANGE :
-	      print_fatal_error("range tag not yet supported on line %d",
-	                        linenum);
-	      goto test_error;
+	      {
+	        int	lowers[4],	/* Lower value */
+			uppers[4],	/* Upper values */
+			num_vals;	/* Number of values */
+
+
+		num_vals = sscanf(token, "%d-%d,%d-%d,%d-%d,%d-%d",
+		                  lowers + 0, uppers + 0,
+				  lowers + 1, uppers + 1,
+				  lowers + 2, uppers + 2,
+				  lowers + 3, uppers + 3);
+
+                if ((num_vals & 1) || num_vals == 0)
+		{
+		  print_fatal_error("Bad rangeOfInteger value \"%s\" on line "
+		                    "%d.", token, linenum);
+		  goto test_error;
+		}
+
+		ippAddRanges(request, group, attr, num_vals / 2, lowers,
+		             uppers);
+	      }
+	      break;
 
 	  default :
 	      if (!strchr(token, ','))
@@ -944,6 +1030,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           last_expect->not_expect = 1;
           last_expect->name       = strdup(token + 1);
         }
+        else if (token[0] == '?')
+        {
+          last_expect->optional = 1;
+          last_expect->name     = strdup(token + 1);
+        }
         else
 	  last_expect->name = strdup(token);
       }
@@ -984,6 +1075,29 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  print_fatal_error("OF-TYPE without a preceding EXPECT on line %d.",
+	                    linenum);
+	  goto test_error;
+	}
+      }
+      else if (!strcasecmp(token, "IN-GROUP"))
+      {
+        ipp_tag_t	in_group;	/* IN-GROUP value */
+
+
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing IN-GROUP group tag on line %d.", linenum);
+	  goto test_error;
+	}
+
+        if ((in_group = ippTagValue(token)) == (ipp_tag_t)-1)
+	{
+	}
+	else if (last_expect)
+	  last_expect->in_group = in_group;
+	else
+	{
+	  print_fatal_error("IN-GROUP without a preceding EXPECT on line %d.",
 	                    linenum);
 	  goto test_error;
 	}
@@ -1114,7 +1228,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     request->request.op.version[0]   = version / 10;
     request->request.op.version[1]   = version % 10;
     request->request.op.operation_id = op;
-    request->request.op.request_id   = ++ request_id;
+    request->request.op.request_id   = request_id;
 
     if (XML)
     {
@@ -1194,11 +1308,58 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
       if ((attrptr = ippFindAttribute(response, "job-id",
                                       IPP_TAG_INTEGER)) != NULL)
-        vars->job_id = attrptr->values[0].integer;
+      {
+        snprintf(temp, sizeof(temp), "%d", attrptr->values[0].integer);
+	set_variable(vars, "job-id", temp);
+      }
+
+      if ((attrptr = ippFindAttribute(response, "job-uri",
+                                      IPP_TAG_URI)) != NULL)
+	set_variable(vars, "job-uri", attrptr->values[0].string.text);
 
       if ((attrptr = ippFindAttribute(response, "notify-subscription-id",
                                       IPP_TAG_INTEGER)) != NULL)
-        vars->subscription_id = attrptr->values[0].integer;
+      {
+        snprintf(temp, sizeof(temp), "%d", attrptr->values[0].integer);
+	set_variable(vars, "notify-subscription-id", temp);
+      }
+
+      attrptr = response->attrs;
+      if (!attrptr || !attrptr->name ||
+	  attrptr->value_tag != IPP_TAG_CHARSET ||
+	  attrptr->group_tag != IPP_TAG_OPERATION ||
+	  attrptr->num_values != 1 ||
+          strcmp(attrptr->name, "attributes-charset"))
+        pass = 0;
+
+      if (attrptr)
+      {
+        attrptr = attrptr->next;
+	if (!attrptr || !attrptr->name ||
+	    attrptr->value_tag != IPP_TAG_LANGUAGE ||
+	    attrptr->group_tag != IPP_TAG_OPERATION ||
+	    attrptr->num_values != 1 ||
+	    strcmp(attrptr->name, "attributes-natural-language"))
+	  pass = 0;
+      }
+
+      if ((attrptr = ippFindAttribute(response, "status-message",
+                                      IPP_TAG_ZERO)) != NULL &&
+          (attrptr->value_tag != IPP_TAG_TEXT ||
+	   attrptr->group_tag != IPP_TAG_OPERATION ||
+	   attrptr->num_values != 1 ||
+	   (attrptr->value_tag == IPP_TAG_TEXT &&
+	    strlen(attrptr->values[0].string.text) > 255)))
+	pass = 0;
+
+      if ((attrptr = ippFindAttribute(response, "detailed-status-message",
+                                      IPP_TAG_ZERO)) != NULL &&
+          (attrptr->value_tag != IPP_TAG_TEXT ||
+	   attrptr->group_tag != IPP_TAG_OPERATION ||
+	   attrptr->num_values != 1 ||
+	   (attrptr->value_tag == IPP_TAG_TEXT &&
+	    strlen(attrptr->values[0].string.text) > 1023)))
+	pass = 0;
 
       for (attrptr = response->attrs, group = attrptr->group_tag;
            attrptr;
@@ -1232,11 +1393,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
           if (expect->if_undefined && get_variable(vars, expect->if_undefined))
             continue;
-            
+
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-          if ((found == NULL) != expect->not_expect ||
-              (found && !expect_matches(expect, found->value_tag)))
+          if ((found && expect->not_expect) ||
+	      (!found && !(expect->not_expect || expect->optional)) ||
+	      (found && !expect_matches(expect, found->value_tag)) ||
+	      (found && expect->in_group &&
+	       found->group_tag != expect->in_group))
           {
       	    pass = 0;
       	    break;          
@@ -1336,14 +1500,103 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
 	if (response->request.status.version[0] != (version / 10) ||
 	    response->request.status.version[1] != (version % 10))
-          print_test_error("Bad version %d.%d in response (expected %d.%d)",
+          print_test_error("Bad version %d.%d in response - expected %d.%d "
+	                   "(RFC 2911 section 3.1.8).",
 	                   response->request.status.version[0],
 			   response->request.status.version[1],
 			   version / 10, version % 10);
 
 	if (response->request.status.request_id != request_id)
-	  print_test_error("Bad request ID %d in response (expected %d)",
+	  print_test_error("Bad request ID %d in response - expected %d "
+			   "(RFC 2911 section 3.1.1)",
 			   response->request.status.request_id, request_id);
+
+	attrptr = response->attrs;
+	if (!attrptr)
+	  print_test_error("Missing first attribute \"attributes-charset "
+	                   "(charset)\" in group operation-attributes-tag "
+			   "(RFC 2911 section 3.1.4).");
+	else
+	{
+	  if (!attrptr->name ||
+	      attrptr->value_tag != IPP_TAG_CHARSET ||
+	      attrptr->group_tag != IPP_TAG_OPERATION ||
+	      attrptr->num_values != 1 ||
+	      strcmp(attrptr->name, "attributes-charset"))
+	    print_test_error("Bad first attribute \"%s (%s%s)\" in group %s, "
+			     "expected \"attributes-charset (charset)\" in "
+			     "group operation-attributes-tag (RFC 2911 section "
+			     "3.1.4).",
+			     attrptr->name ? attrptr->name : "(null)",
+			     attrptr->num_values > 1 ? "1setOf " : "",
+			     ippTagString(attrptr->value_tag),
+			     ippTagString(attrptr->group_tag));
+
+	  attrptr = attrptr->next;
+	  if (!attrptr)
+	    print_test_error("Missing second attribute \"attributes-natural-"
+			     "language (naturalLanguage)\" in group "
+			     "operation-attributes-tag (RFC 2911 section "
+			     "3.1.4).");
+	  else if (!attrptr->name ||
+	           attrptr->value_tag != IPP_TAG_LANGUAGE ||
+	           attrptr->group_tag != IPP_TAG_OPERATION ||
+	           attrptr->num_values != 1 ||
+	           strcmp(attrptr->name, "attributes-natural-language"))
+	    print_test_error("Bad first attribute \"%s (%s%s)\" in group %s, "
+			     "expected \"attributes-natural-language "
+			     "(naturalLanguage)\" in group "
+			     "operation-attributes-tag (RFC 2911 section "
+			     "3.1.4).",
+			     attrptr->name ? attrptr->name : "(null)",
+			     attrptr->num_values > 1 ? "1setOf " : "",
+			     ippTagString(attrptr->value_tag),
+			     ippTagString(attrptr->group_tag));
+        }
+
+	if ((attrptr = ippFindAttribute(response, "status-message",
+					 IPP_TAG_ZERO)) != NULL)
+	{
+	  if (attrptr->value_tag != IPP_TAG_TEXT)
+	    print_test_error("status-message (text(255)) has wrong value tag "
+	                     "%s (RFC 2911 section 3.1.6.2).",
+			     ippTagString(attrptr->value_tag));
+	  if (attrptr->group_tag != IPP_TAG_OPERATION)
+	    print_test_error("status-message (text(255)) has wrong group tag "
+	                     "%s (RFC 2911 section 3.1.6.2).",
+			     ippTagString(attrptr->group_tag));
+	  if (attrptr->num_values != 1)
+	    print_test_error("status-message (text(255)) has %d values "
+	                     "(RFC 2911 section 3.1.6.2).",
+			     attrptr->num_values);
+	  if (attrptr->value_tag == IPP_TAG_TEXT &&
+	      strlen(attrptr->values[0].string.text) > 255)
+	    print_test_error("status-message (text(255)) has bad length %d"
+	                     " (RFC 2911 section 3.1.6.2).",
+	                     (int)strlen(attrptr->values[0].string.text));
+        }
+
+	if ((attrptr = ippFindAttribute(response, "detailed-status-message",
+					 IPP_TAG_ZERO)) != NULL)
+	{
+	  if (attrptr->value_tag != IPP_TAG_TEXT)
+	    print_test_error("detailed-status-message (text(MAX)) has wrong "
+	                     "value tag %s (RFC 2911 section 3.1.6.3).",
+			     ippTagString(attrptr->value_tag));
+	  if (attrptr->group_tag != IPP_TAG_OPERATION)
+	    print_test_error("detailed-status-message (text(MAX)) has wrong "
+	                     "group tag %s (RFC 2911 section 3.1.6.3).",
+			     ippTagString(attrptr->group_tag));
+	  if (attrptr->num_values != 1)
+	    print_test_error("detailed-status-message (text(MAX)) has %d values"
+			     " (RFC 2911 section 3.1.6.3).",
+			     attrptr->num_values);
+	  if (attrptr->value_tag == IPP_TAG_TEXT &&
+	      strlen(attrptr->values[0].string.text) > 1023)
+	    print_test_error("detailed-status-message (text(MAX)) has bad "
+			     "length %d (RFC 2911 section 3.1.6.3).",
+	                     (int)strlen(attrptr->values[0].string.text));
+        }
 
 	for (attrptr = response->attrs, group = attrptr->group_tag;
 	     attrptr;
@@ -1374,20 +1627,23 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       
 	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
-	  if ((found == NULL) != expect->not_expect)
-	  {
-	    if (expect->not_expect)
-	      print_test_error("NOT EXPECTED: %s", expect->name);
-	    else
-	      print_test_error("EXPECTED: %s", expect->name);
-	  }
+	  if (found && expect->not_expect)
+            print_test_error("NOT EXPECTED: %s", expect->name);
+	  else if (!found && !(expect->not_expect || expect->optional))
+	    print_test_error("EXPECTED: %s", expect->name);
 	  else if (found)
 	  {
 	    if (!expect_matches(expect, found->value_tag))
 	      print_test_error("EXPECTED: %s OF-TYPE %s (got %s)", 
 			       expect->name, expect->of_type,
 			       ippTagString(found->value_tag));
-	    else if (!with_value(expect->with_value, expect->with_regex, found))
+
+	    if (expect->in_group && found->group_tag != expect->in_group)
+	      print_test_error("EXPECTED: %s IN-GROUP %s (got %s).",
+	                       expect->name, ippTagString(expect->in_group),
+			       ippTagString(found->group_tag));
+
+	    if (!with_value(expect->with_value, expect->with_regex, found))
 	    {
 	      if (expect->with_regex)
 		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
@@ -1396,12 +1652,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
 				 expect->name, expect->with_value);         
 	    }
-	    else if (expect->count > 0 && found->num_values != expect->count)
+
+	    if (expect->count > 0 && found->num_values != expect->count)
 	    {
 	      print_test_error("EXPECTED: %s COUNT %d (got %d)", expect->name,
 			       expect->count, found->num_values);
 	    }
-	    else if (expect->same_count_as)
+
+	    if (expect->same_count_as)
 	    {
 	      attrptr = ippFindAttribute(response, expect->same_count_as,
 					 IPP_TAG_ZERO);
@@ -1553,6 +1811,8 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 
 	if (!strcmp(temp, "uri"))
 	  value = vars->uri;
+	else if (!strcmp(temp, "filename"))
+	  value = vars->filename;
 	else if (!strcmp(temp, "scheme") || !strcmp(temp, "method"))
 	  value = vars->scheme;
 	else if (!strcmp(temp, "username"))
@@ -1566,16 +1826,6 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	}
 	else if (!strcmp(temp, "resource"))
 	  value = vars->resource;
-	else if (!strcmp(temp, "job-id"))
-	{
-	  snprintf(temp, sizeof(temp), "%d", vars->job_id);
-	  value = temp;
-	}
-	else if (!strcmp(temp, "notify-subscription-id"))
-	{
-	  snprintf(temp, sizeof(temp), "%d", vars->subscription_id);
-	  value = temp;
-	}
 	else if (!strcmp(temp, "user"))
 	  value = cupsUser();
 	else
@@ -2271,19 +2521,28 @@ set_variable(_cups_vars_t *vars,	/* I - Variables */
              const char   *name,	/* I - Variable name */
              const char   *value)	/* I - Value string */
 {
-  _cups_var_t	*var;			/* New variable */
+  _cups_var_t	key,			/* Search key */
+		*var;			/* New variable */
 
 
-  if ((var = malloc(sizeof(_cups_var_t))) == NULL)
+  key.name = (char *)name;
+  if ((var = cupsArrayFind(vars->vars, &key)) != NULL)
+  {
+    free(var->value);
+    var->value = strdup(value);
+  }
+  else if ((var = malloc(sizeof(_cups_var_t))) == NULL)
   {
     print_fatal_error("Unable to allocate memory for variable \"%s\".", name);
     exit(1);
   }
+  else
+  {
+    var->name  = strdup(name);
+    var->value = strdup(value);
 
-  var->name  = strdup(name);
-  var->value = strdup(value);
-
-  cupsArrayAdd(vars->vars, var);
+    cupsArrayAdd(vars->vars, var);
+  }
 }
 
 
@@ -2301,12 +2560,14 @@ usage(void)
 		  "Options:\n"
 		  "\n"
 		  "-E             Test with encryption.\n"
+		  "-V version     Set default IPP version.\n"
 		  "-X             Produce XML instead of plain text.\n"
 		  "-c             Send requests using chunking (default)\n"
 		  "-d name=value  Define variable.\n"
+		  "-f filename    Set default test file.\n"
 		  "-i seconds     Repeat the last test file with the given "
 		  "interval.\n"
-		  "-l             Send requests using content length\n"
+		  "-l             Send requests using content-length\n"
 		  "-v             Show all attributes sent and received.\n"));
 
   exit(1);
@@ -3061,38 +3322,45 @@ with_value(char            *value,	/* I - Value string */
   {
     case IPP_TAG_INTEGER :
     case IPP_TAG_ENUM :
-        if (regex)
-	{
-	 /*
-	  * TODO: Report an error.
-	  */
-
-	  return (0);
-	}
-
         for (i = 0; i < attr->num_values; i ++)
         {
+	  char	op;			/* Comparison operator */
+	  int	intvalue;		/* Integer value */
+
+
           valptr = value;
+	  if (*valptr == '<' || *valptr == '>' || *valptr == '=')
+	    op = *valptr++;
+	  else
+	    op = '=';
 
 	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
-		 *valptr == '-')
+		 *valptr == '-' || *valptr == ',')
 	  {
-	    if (attr->values[i].integer == strtol(valptr, &valptr, 0))
-	      return (1);
+	    if (*valptr == ',')
+	      valptr ++;
+
+	    intvalue = strtol(valptr, &valptr, 0);
+	    switch (op)
+	    {
+	      case '=' :
+	          if (attr->values[i].integer == intvalue)
+		    return (1);
+		  break;
+	      case '<' :
+	          if (attr->values[i].integer < intvalue)
+		    return (1);
+		  break;
+	      case '>' :
+	          if (attr->values[i].integer > intvalue)
+		    return (1);
+		  break;
+	    }
 	  }
         }
 	break;
 
     case IPP_TAG_BOOLEAN :
-        if (regex)
-	{
-	 /*
-	  * TODO: Report an error.
-	  */
-
-	  return (0);
-	}
-
 	for (i = 0; i < attr->num_values; i ++)
 	{
           if (!strcmp(value, "true") == attr->values[i].boolean)
@@ -3101,27 +3369,18 @@ with_value(char            *value,	/* I - Value string */
 	break;
 
     case IPP_TAG_NOVALUE :
-        if (regex)
-	{
-	 /*
-	  * TODO: Report an error.
-	  */
-
-	  return (0);
-	}
-
         return (!strcmp(value, "no-value"));
 
-    case IPP_TAG_STRING :
-    case IPP_TAG_TEXT :
-    case IPP_TAG_NAME :
-    case IPP_TAG_KEYWORD :
     case IPP_TAG_CHARSET :
-    case IPP_TAG_URI :
-    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_KEYWORD :
     case IPP_TAG_LANGUAGE :
-    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_MIMETYPE :
+    case IPP_TAG_NAME :
     case IPP_TAG_NAMELANG :
+    case IPP_TAG_TEXT :
+    case IPP_TAG_TEXTLANG :
+    case IPP_TAG_URI :
+    case IPP_TAG_URISCHEME :
         if (regex)
 	{
 	 /*
@@ -3171,11 +3430,7 @@ with_value(char            *value,	/* I - Value string */
 	break;
 
     default :
-       /*
-	* TODO: Report an error.
-	*/
-
-	return (0);
+        break;
   }
 
   return (0);

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "28 February 2010" "Apple Inc."
+.TH ipp.test 5 "CUPS" "29 February 2010" "Apple Inc."
 .SH NAME
 ipp.test \- ipptest test file format
 .SH DESCRIPTION
@@ -119,8 +119,10 @@ test report.
 .TP 5
 EXPECT attribute-name [ predicate(s) ]
 .TP 5
-EXPECT !attribute-name [ predicate(s) ]
-Specifies that the response must/must not include the named attribute.
+EXPECT ?attribute-name predicate(s)
+.TP 5
+EXPECT !attribute-name
+Specifies that the response must/may/must not include the named attribute.
 Additional requirements can be added as predicates - see the "EXPECT PREDICATES"
 section for more information on predicates.
 .TP 5
@@ -136,6 +138,12 @@ Specifies the human-readable name of the test.
 .TP 5
 OPERATION operation-code
 Specifies the operation to be performed.
+.TP 5
+REQUEST-ID number
+.TP 5
+REQUEST-ID random
+Specifies the request-id value to use in the request, either an integer or the
+word "random" to use a randomly generated value (the default).
 .TP 5
 RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
@@ -173,6 +181,9 @@ Makes the EXPECT conditions apply only if the specified variable is defined.
 IF-UNDEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is not
 defined.
+.TP 5
+IN-GROUP tag
+Requires the EXPECT attribute to be in the specified group tag.
 .TP 5
 OF-TYPE tag[,tag,...]
 Requires the EXPECT attribute to use the specified value tag(s).
@@ -306,7 +317,17 @@ specifications. Here is a complete list:
 .fi
 .SH TAGS
 Value and group tags correspond to the names from RFC 2911 and other IPP
-extension specifications. Here is a complete list:
+extension specifications. Here are the group tags:
+.nf
+    event-notification-attributes-tag
+    job-attributes-tag
+    operation-attributes-tag
+    printer-attributes-tag
+    subscription-attributes-tag
+    unsupported-attributes-tag
+.fi
+.LP
+Here are the value tags:
 .nf
     admin-define
     begCollection
@@ -315,14 +336,9 @@ extension specifications. Here is a complete list:
     dateTime
     default
     delete-attribute
-    end-of-attributes-tag
-    endCollection
     enum
-    event-notification-attributes-tag
     integer
-    job-attributes-tag
     keyword
-    memberAttrName
     mimeMediaType
     nameWithLanguage
     nameWithoutLanguage
@@ -330,18 +346,14 @@ extension specifications. Here is a complete list:
     no-value
     not-settable
     octetString
-    printer-attributes-tag
     rangeOfInteger
     resolution
-    subscription-attributes-tag
     textWithLanguage
     textWithoutLanguage
     unknown
     unsupported
-    unsupported-attributes-tag
     uri
     uriScheme
-    operation-attributes-tag
 .fi
 .SH VARIABLES
 The \fIipptest\fR program maintains a list of variables that can be used in any
@@ -356,12 +368,19 @@ $ENV[name]
 Inserts the value of the named environment variable, or an empty string if the
 environment variable is not defined.
 .TP 5
+$filename
+Inserts the filename provided to \fIipptest\fR with the "-f" option.
+.TP 5
 $hostname
 Inserts the hostname from the URI provided to \fIipptest\fR.
 .TP 5
 $job-id
 Inserts the last job-id value returned in a test response or 0 if no job-id has
 been seen.
+.TP 5
+$job-uri
+Inserts the last job-uri value returned in a test response or an empty string if
+no job-uri has been seen.
 .TP 5
 $scheme
 Inserts the scheme from the URI provided to \fIipptest\fR.

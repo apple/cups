@@ -21,7 +21,6 @@ include ../Makedefs
 #
 
 TESTFILES	=	\
-			ipp-1.0.test \
 			ipp-1.1.test \
 			ipp-2.0.test \
 			ipp-2.1.test \

@@ -1,0 +1,160 @@
+#
+# "$Id$"
+#
+#   IPP/1.1 test suite.
+#
+#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptest -f filename printer-uri ipp-1.1.test
+#
+
+# Test that a request-id value of 0 is not accepted.
+#
+# Required by: RFC 2911 section 3.1.1
+{
+	NAME "3.1.1: Bad request-id value 0"
+	REQUEST-ID 0
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+
+
+# Test that the first two attributes must be attributes-charset and
+# attributes-natural-language.
+#
+# Required by: RFC 2911 section 3.1.4
+{
+	NAME "3.1.4: No Operation Attributes"
+	REQUEST-ID random
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "3.1.4: attributes-charset"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "3.1.4: attributes-natural-language"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "3.1.4: attributes-natural-language + attributes-charset"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR charset attributes-charset utf-8
+	ATTR uri printer-uri $uri
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+{
+	NAME "3.1.4: attributes-charset + attributes-natural-language"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS successful-ok
+	EXPECT printer-uri-supported OF-TYPE uri
+}
+
+
+# Test that bad IPP versions are not supported.
+#
+# Required by: RFC 2911 section 3.1.8
+{
+	# The name of the test...
+	NAME "3.1.8: Unsupported IPP version 0.0"
+	VERSION 0.0
+	OPERATION Get-Printer-Attributes
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+
+	STATUS server-error-version-not-supported
+	EXPECT !printer-uri-supported
+}
+
+
+# Test that printer operations require the printer-uri operation attribute.
+#
+# Required by: RFC 2911 section 3.2
+{
+	NAME "3.2: No printer-uri operation attribute"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+
+	STATUS client-error-bad-request
+	EXPECT !printer-uri-supported
+}
+
+
+# Test Print-Job operation
+#
+# Required by: RFC 2911 section 3.2.1
+{
+	NAME "3.2.1: Print-Job Operation"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format application/octet-stream
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+
+#
+# End of "$Id$".
+#

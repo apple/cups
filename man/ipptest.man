@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptest 1 "CUPS" "26 January 2010" "Apple Inc."
+.TH ipptest 1 "CUPS" "28 January 2010" "Apple Inc."
 .SH NAME
 ipptest - perform internet printing protocol tests
 .SH SYNOPSIS
@@ -20,6 +20,8 @@ ipptest - perform internet printing protocol tests
 .I version
 ] [ -X ] [ -c ] [ -d
 .I name=value
+] [ -f
+.I filename
 ] [ -i
 .I seconds
 ] [ -l ] [ -v ] 
@@ -42,7 +44,8 @@ The following options are recognized by \fIipptest\fR:
 Forces encryption when connecting to the server.
 .TP 5
 -V version
-Specifies the IPP version to use: 1.0, 1.1, 2.0, 2.1, or 2.2.
+Specifies the default IPP version to use: 1.0, 1.1, 2.0, 2.1, or 2.2. If not
+specified, version 1.1 is used.
 .TP 5
 -X
 Specifies that XML (Apple plist) output is desired instead of the plain text
@@ -55,6 +58,9 @@ IPP.
 .TP 5
 -d name=value
 Defines the named variable.
+.TP 5
+-f filename
+Defines the default request filename for tests.
 .TP 5
 -i seconds
 Specifies that the (last) test should be repeated at the specified interval.
