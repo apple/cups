@@ -3329,16 +3329,21 @@ with_value(char            *value,	/* I - Value string */
 
 
           valptr = value;
-	  if (*valptr == '<' || *valptr == '>' || *valptr == '=')
-	    op = *valptr++;
-	  else
-	    op = '=';
 
 	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
-		 *valptr == '-' || *valptr == ',')
+		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
+		 *valptr == '=' || *valptr == '>')
 	  {
-	    if (*valptr == ',')
+	    op = '=';
+	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    {
+	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
+		op = *valptr;
 	      valptr ++;
+	    }
+
+            if (!*valptr)
+	      break;
 
 	    intvalue = strtol(valptr, &valptr, 0);
 	    switch (op)
