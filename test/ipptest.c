@@ -48,9 +48,13 @@
 #include <regex.h>
 
 #include <cups/globals.h>
+#include <fcntl.h>
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
+#ifdef WIN32
+#  define sleep(x) Sleep(x * 1000)
+#endif /* WIN32 */
 
 
 /*
@@ -392,6 +396,7 @@ main(int  argc,				/* I - Number of command-line args */
     for (;;)
     {
       sleep(interval);
+
       do_tests(&vars, testfile);
     }
   }
