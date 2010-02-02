@@ -10,6 +10,7 @@ _cgiFormEncode
 _cgiFreeSearch
 _cgiGetArray
 _cgiGetAttributes
+_cgiGetCookie
 _cgiGetFile
 _cgiGetIPPObjects
 _cgiGetSize
@@ -24,6 +25,7 @@ _cgiRewriteURL
 _cgiSetArray
 _cgiSetIPPObjectVars
 _cgiSetIPPVars
+_cgiSetCookie
 _cgiSetServerVersion
 _cgiSetSize
 _cgiSetVariable

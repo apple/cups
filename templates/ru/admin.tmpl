@@ -4,16 +4,16 @@
 <H2 CLASS="title">Принтеры</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Добавить принтер"></FORM>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Найти новый принтер"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="Добавить принтер"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="Найти новый принтер"></FORM>
 <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Управление принтерами"></FORM>
-{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Экспортировать принтер в Samba"></FORM>:}
+{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="Экспортировать принтер в Samba"></FORM>:}
 </P>
 
 <H2 CLASS="title">Группы</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Добавить группу"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="Добавить группу"></FORM>
 <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Управление группами"></FORM>
 </P>
 
@@ -28,7 +28,7 @@
 <H2 CLASS="title">Сервер</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Редактировать конфигурационный файл"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="Редактировать конфигурационный файл"></FORM>
 <FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Показать журнал заданий"></FORM>
 <FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Показать журнал ошибок"></FORM>
 <FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Показать журнал страниц"></FORM>
@@ -38,6 +38,7 @@
 <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 
 {ADVANCEDSETTINGS?<P><B>Параметры сервера\:</B></P>
 
@@ -95,7 +96,7 @@
 <H2 CLASS="title">Подписка по RSS</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Добавить подписку по RSS"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="Добавить подписку по RSS"></FORM>
 </P>
 
 </DIV>
@@ -104,6 +105,6 @@
 <THEAD><TR><TH>Название</TH><TH>События</TH><TH>Очередь</TH></TR></THEAD>
 <TBODY>{[notify_subscription_id]
 <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Отменить подписку по RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Все очереди}</TD></TR>}
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Отменить подписку по RSS"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:Все очереди}</TD></TR>}
 </TBODY>
 </TABLE>:}

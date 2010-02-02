@@ -3,6 +3,7 @@
 <H2 CLASS="title">{op=modify-printer?Modify {printer_name}:Add Printer}</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
 

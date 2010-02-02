@@ -3,6 +3,7 @@
 <H2 CLASS="title">Set Default Options for {printer_name}</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="Query Printer for Default Options">:}

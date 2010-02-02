@@ -10,6 +10,7 @@ function select_printers() {
 --></SCRIPT>
 
 <FORM METHOD="POST" ACTION="/admin/" NAME="export_samba">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba">
 
 <H2 CLASS="title">Exportar impresoras a Samba</H2>

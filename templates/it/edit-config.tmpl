@@ -10,7 +10,7 @@ function reset_config()
 <H2 CLASS="title">Modifica file di configurazione</H2>
 
 <FORM NAME="cups" METHOD="POST" ACTION="/admin/">
-
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server">
 
 <TEXTAREA NAME="CUPSDCONF" COLS="80" ROWS="25">{CUPSDCONF}</TEXTAREA>
