@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   API library Makefile for the Common UNIX Printing System (CUPS).
+#   API library Makefile for CUPS.
 #
 #   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
@@ -326,17 +326,21 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER) libcups.exp
+libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
+	echo Creating export list for $@...
+	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
+		grep -v -e '^(_cupsConnect|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
+		sort >t.exp
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.8.0 \
 		-compatibility_version 2.0.0 \
-		-exported_symbols_list libcups.exp \
+		-exported_symbols_list t.exp \
 		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
-	$(RM) libcups.dylib
+	$(RM) libcups.dylib t.exp
 	$(LN) $@ libcups.dylib
 
 
