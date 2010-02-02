@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   MD5 password program for the Common UNIX Printing System (CUPS).
+ *   MD5 password program for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,9 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <cups/string.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
+#include <cups/globals.h>
 #include <cups/md5.h>
 
 #ifndef WIN32
@@ -79,7 +77,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 		groupline[17],		/* Group from line */
 		md5line[33],		/* MD5-sum from line */
 		md5new[33];		/* New MD5 sum */
-  const char	*root;			/* CUPS server root directory */
   char		passwdmd5[1024],	/* passwd.md5 file */
 		passwdold[1024],	/* passwd.old file */
 		passwdnew[1024];	/* passwd.tmp file */
@@ -88,6 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   int		flag;			/* Password check flags... */
   int		fd;			/* Password file descriptor */
   int		error;			/* Write error */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Signal action */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET*/
@@ -113,18 +111,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
  /*
   * Find the server directory...
-  *
-  * We use the CUPS_SERVERROOT environment variable when we are running
-  * as root or when lppasswd is not setuid...
   */
 
-  if ((root = getenv("CUPS_SERVERROOT")) == NULL ||
-      (getuid() != geteuid() && getuid()))
-    root = CUPS_SERVERROOT;
-
-  snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", root);
-  snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", root);
-  snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", root);
+  snprintf(passwdmd5, sizeof(passwdmd5), "%s/passwd.md5", cg->cups_serverroot);
+  snprintf(passwdold, sizeof(passwdold), "%s/passwd.old", cg->cups_serverroot);
+  snprintf(passwdnew, sizeof(passwdnew), "%s/passwd.new", cg->cups_serverroot);
 
  /*
   * Find the default system group...
