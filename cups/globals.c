@@ -38,6 +38,51 @@
 static void
 cups_env_init(_cups_globals_t *g)	/* I - Global data */
 {
+#ifdef WIN32
+  HKEY		key;			/* Registry key */
+  DWORD		size;			/* Size of string */
+  static char	installdir[1024],	/* Install directory */
+		confdir[1024],		/* Server root directory */
+		localedir[1024];	/* Locale directory */
+
+
+ /*
+  * Open the registry...
+  */
+
+  strcpy(installdir, "C:/Program Files/cups.org");
+
+  if (!RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\cups.org", 0, KEY_READ,
+                    &key))
+  {
+   /*
+    * Grab the installation directory...
+    */
+
+    size = sizeof(installdir);
+    RegQueryValueEx(key, "installdir", NULL, NULL, installdir, &size);
+    RegCloseKey(key);
+  }
+
+  snprintf(confdir, sizeof(confdir), "%s/conf", installdir);
+  snprintf(localedir, sizeof(localedir), "%s/locale", installdir);
+
+  if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+    g->cups_datadir = installdir;
+
+  if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+    g->cups_serverbin = installdir;
+
+  if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+    g->cups_serverroot = confdir;
+
+  if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
+    g->cups_statedir = confdir;
+
+  if ((g->localedir = getenv("LOCALEDIR")) == NULL)
+    g->localedir = localedir;
+
+#else
   if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
     g->cups_datadir = CUPS_DATADIR;
 
@@ -52,6 +97,7 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
 
   if ((g->localedir = getenv("LOCALEDIR")) == NULL)
     g->localedir = CUPS_LOCALEDIR;
+#endif /* WIN32 */
 }
 
 
