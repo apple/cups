@@ -48,13 +48,9 @@
 #include <regex.h>
 
 #include <cups/globals.h>
-#include <fcntl.h>
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */
-#ifdef WIN32
-#  define sleep(x) Sleep(x * 1000)
-#endif /* WIN32 */
 
 
 /*
@@ -91,6 +87,7 @@ typedef struct _cups_vars_s		/**** Set of variables ****/
 		hostname[256],		/* Hostname from URI */
 		resource[1024];		/* Resource path from URI */
   int 		port;			/* Port number from URI */
+  http_encryption_t encryption;		/* Encryption for connection? */
   cups_array_t	*vars;			/* Array of variables */
 } _cups_vars_t;
 
@@ -206,7 +203,7 @@ main(int  argc,				/* I - Number of command-line args */
         {
 	  case 'E' : /* Encrypt */
 #ifdef HAVE_SSL
-	      cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
+	      vars.encryption = HTTP_ENCRYPT_REQUIRED;
 #else
 	      _cupsLangPrintf(stderr,
 			      _("%s: Sorry, no encryption support compiled in\n"),
@@ -396,7 +393,6 @@ main(int  argc,				/* I - Number of command-line args */
     for (;;)
     {
       sleep(interval);
-
       do_tests(&vars, testfile);
     }
   }
@@ -477,7 +473,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   */
 
   if ((http = httpConnectEncrypt(vars->hostname, vars->port,
-                                 cupsEncryption())) == NULL)
+                                 vars->encryption)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, strerror(errno));
@@ -978,7 +974,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
-	get_filename(testfile, filename, temp, sizeof(filename));
+        expand_variables(vars, token, temp, sizeof(token));	
+	get_filename(testfile, filename, token, sizeof(filename));
       }
       else if (!strcasecmp(token, "STATUS"))
       {
@@ -1258,7 +1255,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           print_attr(attrptr);
       }
 
-      printf("    %-60.60s [", name);
+      printf("    %-69.69s [", name);
       fflush(stdout);
     }
 
@@ -1272,7 +1269,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         char	buffer[8192];		/* Copy buffer */
         ssize_t	bytes;			/* Bytes read/written */
 
-
         if ((fd = open(filename, O_RDONLY | O_BINARY)) >= 0)
         {
           while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
@@ -1281,7 +1277,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
               break;
         }
         else
+	{
+	  snprintf(buffer, sizeof(buffer), "%s: %s", filename, strerror(errno));
+	  _cupsSetError(IPP_INTERNAL_ERROR, buffer, 0);
+
           status = HTTP_ERROR;
+	}
       }
 
       ippDelete(request);
@@ -1499,8 +1500,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			 http->version % 100);
 
       if (!response)
-	print_test_error("IPP request failed with status %04x (%s)",
-			 cupsLastError(), cupsLastErrorString());
+	print_test_error("IPP request failed with status %s (%s)",
+			 ippErrorString(cupsLastError()),
+			 cupsLastErrorString());
       else
       {
 	if (response->request.status.version[0] != (version / 10) ||
@@ -1620,7 +1622,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    break;
 
 	if (i == num_statuses && num_statuses > 0)
-	  print_test_error("Bad status-code");
+	{
+	  print_test_error("Bad status-code (%s)",
+	                   ippErrorString(cupsLastError()));
+	  print_test_error("status-message=\"%s\"", cupsLastErrorString());
+        }
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
@@ -1864,7 +1870,8 @@ expect_matches(
 {
   int	match;				/* Match? */
   char	*of_type,			/* Type name to match */
-	*next;				/* Next name to match */
+	*next,				/* Next name to match */
+	sep;				/* Separator character */
 
 
  /*
@@ -1876,7 +1883,7 @@ expect_matches(
 
  /*
   * Parse the "of_type" value since the string can contain multiple attribute
-  * types separated by "|"...
+  * types separated by "," or "|"...
   */
 
   for (of_type = expect->of_type, match = 0; !match && of_type; of_type = next)
@@ -1885,7 +1892,9 @@ expect_matches(
     * Find the next separator, and set it (temporarily) to nul if present.
     */
 
-    if ((next = strchr(of_type, '|')) != NULL)
+    for (next = of_type; *next && *next != '|' && *next != ','; next ++);
+
+    if ((sep = *next) != '\0')
       *next = '\0';
   
    /*
@@ -1905,8 +1914,8 @@ expect_matches(
     * Restore the separator if we have one...
     */
 
-    if (next)
-      *next++ = '|';
+    if (sep)
+      *next++ = sep;
   }
 
   return (match);
@@ -3316,7 +3325,7 @@ with_value(char            *value,	/* I - Value string */
   * NULL matches everything.
   */
 
-  if (!value)
+  if (!value || !*value)
     return (1);
 
  /*
@@ -3329,11 +3338,14 @@ with_value(char            *value,	/* I - Value string */
     case IPP_TAG_ENUM :
         for (i = 0; i < attr->num_values; i ++)
         {
-	  char	op;			/* Comparison operator */
+	  char	op,			/* Comparison operator */
+	  	*nextptr;		/* Next pointer */
 	  int	intvalue;		/* Integer value */
 
 
           valptr = value;
+	  if (!strncmp(valptr, "no-value,", 9))
+	    valptr += 9;
 
 	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
 		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
@@ -3350,7 +3362,11 @@ with_value(char            *value,	/* I - Value string */
             if (!*valptr)
 	      break;
 
-	    intvalue = strtol(valptr, &valptr, 0);
+	    intvalue = strtol(valptr, &nextptr, 0);
+	    if (nextptr == valptr)
+	      break;
+	    valptr = nextptr;
+
 	    switch (op)
 	    {
 	      case '=' :
@@ -3379,7 +3395,7 @@ with_value(char            *value,	/* I - Value string */
 	break;
 
     case IPP_TAG_NOVALUE :
-        return (!strcmp(value, "no-value"));
+        return (!strcmp(value, "no-value") || !strncmp(value, "no-value,", 9));
 
     case IPP_TAG_CHARSET :
     case IPP_TAG_KEYWORD :

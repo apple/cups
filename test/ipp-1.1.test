@@ -188,7 +188,7 @@
 	EXPECT ?number-up-default OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT ?number-up-supported OF-TYPE integer|rangeOfInteger IN-GROUP printer-attributes-tag WITH-VALUE >0
 	EXPECT ?number-up-supported WITH-VALUE 1
-	EXPECT ?orientation-requested-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
+	EXPECT ?orientation-requested-default OF-TYPE enum,no-value IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
 	EXPECT ?orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6
 	EXPECT ?pages-ranges-supported OF-TYPE boolean IN-GROUP printer-attributes-tag
 	EXPECT ?print-quality-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5
@@ -228,8 +228,8 @@
 	# Not requiring 0x0004 Validate-Job since it is deprecated
 	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
 	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
-	EXPECT operations-supported WITH-VALUE 0x000A # Get-Jobs
-	EXPECT operations-supported WITH-VALUE 0x000B # Get-Printer-Attributes
+	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
+	EXPECT operations-supported WITH-VALUE 0x000b # Get-Printer-Attributes
 	EXPECT pdl-override-supported OF-TYPE keyword IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-is-accepting-jobs OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-name OF-TYPE name IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{1,127}$$/"
@@ -241,6 +241,81 @@
 	EXPECT uri-authentication-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT uri-security-supported OF-TYPE keyword IN-GROUP printer-attributes-tag SAME-COUNT-AS uri-authentication-supported
 }
+
+
+# Test Get-Printer-Attributes operation with requested-attributes
+#
+# Required by: RFC 2911 section 3.2.5
+{
+	NAME "3.2.5: Get-Printer-Attributes Operation (requested-attributes)"
+	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR mimeMediaType document-format application/octet-stream
+	ATTR keyword requested-attributes printer-uri-supported
+
+	STATUS successful-ok
+
+	EXPECT printer-uri-supported OF-TYPE uri IN-GROUP printer-attributes-tag
+	EXPECT !printer-name
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (default)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT !job-name
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (requested-attributes)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword requested-attributes all
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-hold-until OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-priority OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0,<101
+	EXPECT ?job-sheets OF-TYPE keyword|name IN-GROUP job-attributes-tag
+	EXPECT ?media OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag WITH-VALUE "/^(single-document|separate-documents-uncollated-copies|separate-documents-collated-copies|single-document-new-sheet)$$/"
+	EXPECT ?number-up OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
+	EXPECT ?pages-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
+	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+}
+
 
 #
 # End of "$Id$".
