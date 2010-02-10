@@ -279,7 +279,45 @@
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT !job-printer-uri
+	EXPECT !job-more-info
 	EXPECT !job-name
+	EXPECT !job-originating-user-name
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+	EXPECT !job-detailed-status-messages
+	EXPECT !number-of-documents
+	EXPECT !output-device-assigned
+	EXPECT !time-at-creation
+	EXPECT !time-at-processing
+	EXPECT !time-at-completed
+	EXPECT !job-printer-up-time
+	EXPECT !date-time-at-creation
+	EXPECT !date-time-at-processing
+	EXPECT !date-time-at-completed
+	EXPECT !number-of-intervening-jobs
+	EXPECT !job-message-from-operator
+	EXPECT !job-k-octets
+	EXPECT !job-impressions
+	EXPECT !job-media-sheets
+	EXPECT !job-k-octets-processed
+	EXPECT !job-impressions-completed
+	EXPECT !job-media-sheets-completed
+
+	EXPECT !copies
+	EXPECT !finishings
+	EXPECT !job-hold-until
+	EXPECT !job-priority
+	EXPECT !job-sheets
+	EXPECT !media
+	EXPECT !multiple-document-handling
+	EXPECT !number-up
+	EXPECT !orientation-requested
+	EXPECT !pages-ranges
+	EXPECT !print-quality
+	EXPECT !printer-resolution
+	EXPECT !sides
 }
 
 
@@ -300,7 +338,389 @@
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
 	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT time-at-processing OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT time-at-completed OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT job-printer-up-time OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-creation OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-processing OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-completed OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-message-from-operator OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-k-octets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-impressions OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-media-sheets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-k-octets-processed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-media-sheets-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+
+	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
+	EXPECT ?job-hold-until OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-priority OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0,<101
+	EXPECT ?job-sheets OF-TYPE keyword|name IN-GROUP job-attributes-tag
+	EXPECT ?media OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?multiple-document-handling OF-TYPE keyword IN-GROUP job-attributes-tag WITH-VALUE "/^(single-document|separate-documents-uncollated-copies|separate-documents-collated-copies|single-document-new-sheet)$$/"
+	EXPECT ?number-up OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT ?orientation-requested OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
+	EXPECT ?pages-ranges OF-TYPE rangeOfInteger IN-GROUP job-attributes-tag
+	EXPECT ?print-quality OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE 3,4,5
+	EXPECT ?printer-resolution OF-TYPE resolution IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?sides OF-TYPE keyword IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE "/^(one-sided|two-sided-long-edge|two-sided-short-edge)$$/"
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (my-jobs)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR boolean my-jobs true
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT !job-printer-uri
+	EXPECT !job-more-info
+	EXPECT !job-name
+	EXPECT !job-originating-user-name
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+	EXPECT !job-detailed-status-messages
+	EXPECT !number-of-documents
+	EXPECT !output-device-assigned
+	EXPECT !time-at-creation
+	EXPECT !time-at-processing
+	EXPECT !time-at-completed
+	EXPECT !job-printer-up-time
+	EXPECT !date-time-at-creation
+	EXPECT !date-time-at-processing
+	EXPECT !date-time-at-completed
+	EXPECT !number-of-intervening-jobs
+	EXPECT !job-message-from-operator
+	EXPECT !job-k-octets
+	EXPECT !job-impressions
+	EXPECT !job-media-sheets
+	EXPECT !job-k-octets-processed
+	EXPECT !job-impressions-completed
+	EXPECT !job-media-sheets-completed
+
+	EXPECT !copies
+	EXPECT !finishings
+	EXPECT !job-hold-until
+	EXPECT !job-priority
+	EXPECT !job-sheets
+	EXPECT !media
+	EXPECT !multiple-document-handling
+	EXPECT !number-up
+	EXPECT !orientation-requested
+	EXPECT !pages-ranges
+	EXPECT !print-quality
+	EXPECT !printer-resolution
+	EXPECT !sides
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (my-jobs different user)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name not-$user
+	ATTR boolean my-jobs true
+
+	STATUS successful-ok
+	EXPECT !job-id
+	EXPECT !job-uri
+	EXPECT !job-printer-uri
+	EXPECT !job-more-info
+	EXPECT !job-name
+	EXPECT !job-originating-user-name
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+	EXPECT !job-detailed-status-messages
+	EXPECT !number-of-documents
+	EXPECT !output-device-assigned
+	EXPECT !time-at-creation
+	EXPECT !time-at-processing
+	EXPECT !time-at-completed
+	EXPECT !job-printer-up-time
+	EXPECT !date-time-at-creation
+	EXPECT !date-time-at-processing
+	EXPECT !date-time-at-completed
+	EXPECT !number-of-intervening-jobs
+	EXPECT !job-message-from-operator
+	EXPECT !job-k-octets
+	EXPECT !job-impressions
+	EXPECT !job-media-sheets
+	EXPECT !job-k-octets-processed
+	EXPECT !job-impressions-completed
+	EXPECT !job-media-sheets-completed
+
+	EXPECT !copies
+	EXPECT !finishings
+	EXPECT !job-hold-until
+	EXPECT !job-priority
+	EXPECT !job-sheets
+	EXPECT !media
+	EXPECT !multiple-document-handling
+	EXPECT !number-up
+	EXPECT !orientation-requested
+	EXPECT !pages-ranges
+	EXPECT !print-quality
+	EXPECT !printer-resolution
+	EXPECT !sides
+}
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (which-jobs=not-completed)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword which-jobs not-completed
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT !job-printer-uri
+	EXPECT !job-more-info
+	EXPECT !job-name
+	EXPECT !job-originating-user-name
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+	EXPECT !job-detailed-status-messages
+	EXPECT !number-of-documents
+	EXPECT !output-device-assigned
+	EXPECT !time-at-creation
+	EXPECT !time-at-processing
+	EXPECT !time-at-completed
+	EXPECT !job-printer-up-time
+	EXPECT !date-time-at-creation
+	EXPECT !date-time-at-processing
+	EXPECT !date-time-at-completed
+	EXPECT !number-of-intervening-jobs
+	EXPECT !job-message-from-operator
+	EXPECT !job-k-octets
+	EXPECT !job-impressions
+	EXPECT !job-media-sheets
+	EXPECT !job-k-octets-processed
+	EXPECT !job-impressions-completed
+	EXPECT !job-media-sheets-completed
+
+	EXPECT !copies
+	EXPECT !finishings
+	EXPECT !job-hold-until
+	EXPECT !job-priority
+	EXPECT !job-sheets
+	EXPECT !media
+	EXPECT !multiple-document-handling
+	EXPECT !number-up
+	EXPECT !orientation-requested
+	EXPECT !pages-ranges
+	EXPECT !print-quality
+	EXPECT !printer-resolution
+	EXPECT !sides
+}
+
+
+
+# Test Get-Jobs operation
+#
+# Required by: RFC 2911 section 3.2.6
+{
+	NAME "3.2.6: Get-Jobs Operation (which-jobs=completed)"
+	OPERATION Get-Jobs
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR keyword which-jobs completed
+	DELAY 10
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT !job-printer-uri
+	EXPECT !job-more-info
+	EXPECT !job-name
+	EXPECT !job-originating-user-name
+	EXPECT !job-state
+	EXPECT !job-state-reasons
+	EXPECT !job-state-message
+	EXPECT !job-detailed-status-messages
+	EXPECT !number-of-documents
+	EXPECT !output-device-assigned
+	EXPECT !time-at-creation
+	EXPECT !time-at-processing
+	EXPECT !time-at-completed
+	EXPECT !job-printer-up-time
+	EXPECT !date-time-at-creation
+	EXPECT !date-time-at-processing
+	EXPECT !date-time-at-completed
+	EXPECT !number-of-intervening-jobs
+	EXPECT !job-message-from-operator
+	EXPECT !job-k-octets
+	EXPECT !job-impressions
+	EXPECT !job-media-sheets
+	EXPECT !job-k-octets-processed
+	EXPECT !job-impressions-completed
+	EXPECT !job-media-sheets-completed
+
+	EXPECT !copies
+	EXPECT !finishings
+	EXPECT !job-hold-until
+	EXPECT !job-priority
+	EXPECT !job-sheets
+	EXPECT !media
+	EXPECT !multiple-document-handling
+	EXPECT !number-up
+	EXPECT !orientation-requested
+	EXPECT !pages-ranges
+	EXPECT !print-quality
+	EXPECT !printer-resolution
+	EXPECT !sides
+}
+
+
+# Test Cancel-Job operation
+#
+# Required by: RFC 2911 section 3.3.3
+{
+	NAME "3.3.3: Cancel-Job Operation (completed job)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS client-error-not-possible
+}
+
+
+# Test Print-Job operation
+#
+# Required by: RFC 2911 section 3.2.1
+{
+	NAME "3.2.1: Print-Job Operation"
+	OPERATION Print-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR name requesting-user-name $user
+	ATTR name job-name $filename
+	ATTR boolean ipp-attribute-fidelity false
+	ATTR name document-name $filename
+	ATTR keyword compression none
+	ATTR mimeMediaType document-format application/octet-stream
+	FILE $filename
+
+	STATUS successful-ok
+	STATUS client-error-document-format-not-supported
+	EXPECT job-uri OF-TYPE uri COUNT 1 IN-GROUP job-attributes-tag
+	EXPECT job-id OF-TYPE integer COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE >0
+	EXPECT job-state OF-TYPE enum COUNT 1 IN-GROUP job-attributes-tag
+	       WITH-VALUE 3,4,5,6,7,8,9
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer
+	       IN-GROUP job-attributes-tag WITH-VALUE >-1
+}
+
+
+# Test Cancel-Job operation
+#
+# Required by: RFC 2911 section 3.3.3
+{
+	NAME "3.3.3: Cancel-Job Operation (pending/processing job)"
+	OPERATION Cancel-Job
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+}
+
+
+# Test Get-Job-Attributes operation
+#
+# Required by: RFC 2911 section 3.3.4
+{
+	NAME "3.3.4: Get-Job-Attributes Operation"
+	OPERATION Get-Job-Attributes
+	GROUP operation-attributes-tag
+	ATTR charset attributes-charset utf-8
+	ATTR naturalLanguage attributes-natural-language en
+	ATTR uri printer-uri $uri
+	ATTR integer job-id $job-id
+	ATTR name requesting-user-name $user
+
+	STATUS successful-ok
+	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
+	EXPECT job-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-printer-uri OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-more-info OF-TYPE uri IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-originating-user-name OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT job-state OF-TYPE enum IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >2,<10
+	EXPECT job-state-reasons OF-TYPE keyword IN-GROUP job-attributes-tag
+	EXPECT ?job-state-message OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-detailed-status-messages OF-TYPE text IN-GROUP job-attributes-tag
+	EXPECT ?number-of-documents OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?output-device-assigned OF-TYPE name IN-GROUP job-attributes-tag COUNT 1
+	EXPECT time-at-creation OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT time-at-processing OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT time-at-completed OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE no-value,>-1
+	EXPECT job-printer-up-time OF-TYPE no-value,integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-creation OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-processing OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?date-time-at-completed OF-TYPE no-value,dateTime IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?number-of-intervening-jobs OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-message-from-operator OF-TYPE text IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-k-octets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-impressions OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-media-sheets OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-k-octets-processed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-impressions-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+	EXPECT ?job-media-sheets-completed OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1
+
 	EXPECT ?copies OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0
 	EXPECT ?finishings OF-TYPE enum IN-GROUP job-attributes-tag
 	EXPECT ?job-hold-until OF-TYPE keyword|name IN-GROUP job-attributes-tag COUNT 1
