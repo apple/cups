@@ -26,6 +26,7 @@
  */
 
 #include "backend-private.h"
+#include <cups/globals.h>
 
 
 /*
@@ -264,7 +265,7 @@ backendGetDeviceID(
     * Get the make, model, and serial numbers...
     */
 
-    num_values = _ppdGet1284Values(device_id, &values);
+    num_values = _cupsGet1284Values(device_id, &values);
 
     if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
       if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
@@ -354,7 +355,7 @@ backendGetMakeModel(
   * Look for the description field...
   */
 
-  num_values = _ppdGet1284Values(device_id, &values);
+  num_values = _cupsGet1284Values(device_id, &values);
 
   if ((mdl = cupsGetOption("MODEL", num_values, values)) == NULL)
     mdl = cupsGetOption("MDL", num_values, values);

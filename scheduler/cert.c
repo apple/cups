@@ -1,8 +1,7 @@
 /*
  * "$Id$"
  *
- *   Authentication certificate routines for the Common UNIX
- *   Printing System (CUPS).
+ *   Authentication certificate routines for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
@@ -427,7 +426,7 @@ cupsdInitCerts(void)
 
     cupsFileClose(fp);
   }
-#endif /* !HVE_ARC4RANDOM */
+#endif /* !HAVE_ARC4RANDOM */
 
  /*
   * Create a root certificate and return...

@@ -25,6 +25,7 @@ var.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 var.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 var.o: ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h
 var.o: ../cups/i18n.h ../cups/transcode.h ../cups/string.h ../config.h
+var.o: ../cups/http.h ../cups/md5.h
 admin.o: cgi-private.h cgi.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 admin.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 admin.o: ../cups/language.h ../cups/array.h help-index.h ../cups/debug.h

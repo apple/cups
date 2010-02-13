@@ -28,10 +28,6 @@ parallel.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
 parallel.o: ../cups/file.h ../cups/language.h ../cups/debug.h ../cups/i18n.h
 parallel.o: ../cups/transcode.h ../cups/snmp-private.h ../cups/string.h
 parallel.o: ../config.h
-scsi.o: ../cups/backend.h ../cups/versioning.h ../cups/cups.h ../cups/ipp.h
-scsi.o: ../cups/http.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-scsi.o: ../cups/language.h ../cups/i18n.h ../cups/transcode.h
-scsi.o: ../cups/string.h ../config.h
 serial.o: backend-private.h ../cups/backend.h ../cups/versioning.h
 serial.o: ../cups/sidechannel.h ../cups/ppd-private.h ../cups/cups.h
 serial.o: ../cups/ipp.h ../cups/http.h ../cups/ppd.h ../cups/array.h
@@ -57,7 +53,9 @@ test1284.o: ../cups/backend.h ../cups/versioning.h ../cups/sidechannel.h
 test1284.o: ../cups/ppd-private.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 test1284.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 test1284.o: ../cups/debug.h ../cups/i18n.h ../cups/transcode.h
-test1284.o: ../cups/snmp-private.h
+test1284.o: ../cups/snmp-private.h ../cups/globals.h ../cups/string.h
+test1284.o: ../cups/http-private.h ../cups/md5.h ../cups/ipp-private.h
+test1284.o: ../cups/i18n.h
 testbackend.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 testbackend.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 testbackend.o: ../cups/array.h ../cups/file.h ../cups/language.h

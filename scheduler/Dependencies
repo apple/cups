@@ -248,5 +248,4 @@ cups-driverd.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/globals.h
 cups-driverd.o: ../cups/string.h ../cups/cups.h ../cups/i18n.h
 cups-driverd.o: ../cups/transcode.h ../cups/language.h ../cups/array.h
 cups-driverd.o: ../cups/debug.h ../cups/dir.h ../cups/transcode.h
-cups-driverd.o: ../cups/ppd-private.h ../ppdc/ppdc.h ../cups/string.h
-cups-driverd.o: ../cups/file.h
+cups-driverd.o: ../cups/ppd-private.h ../ppdc/ppdc.h ../cups/file.h

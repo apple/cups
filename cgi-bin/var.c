@@ -1224,10 +1224,11 @@ cgi_set_sid(void)
 
   CUPS_SRAND(time(NULL));
   snprintf(buffer, sizeof(buffer), "%s:%s:%s:%02X%02X%02X%02X%02X%02X%02X%02X",
-           remote_addr, server_name, server_port, CUPS_RAND() & 255,
-	   CUPS_RAND() & 255, CUPS_RAND() & 255, CUPS_RAND() & 255,
-	   CUPS_RAND() & 255, CUPS_RAND() & 255, CUPS_RAND() & 255,
-	   CUPS_RAND() & 255);
+           remote_addr, server_name, server_port,
+	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
+	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
+	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255,
+	   (unsigned)CUPS_RAND() & 255, (unsigned)CUPS_RAND() & 255);
   _cupsMD5Init(&md5);
   _cupsMD5Append(&md5, (unsigned char *)buffer, (int)strlen(buffer));
   _cupsMD5Finish(&md5, sum);

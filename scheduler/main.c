@@ -1450,7 +1450,7 @@ static void
 launchd_checkin(void)
 {
   size_t		i,		/* Looping var */
-			count;		/* Numebr of listeners */
+			count;		/* Number of listeners */
   int			portnum;	/* Port number */
   launch_data_t		ld_msg,		/* Launch data message */
 			ld_resp,	/* Launch data response */

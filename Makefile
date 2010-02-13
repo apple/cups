@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   Top-level Makefile for the Common UNIX Printing System (CUPS).
+#   Top-level Makefile for CUPS.
 #
 #   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -284,7 +284,7 @@ docset:	apihelp
 
 
 #
-# Make software distributions using EPM (http://www.easysw.com/epm/)...
+# Make software distributions using EPM (http://www.epmhome.org/)...
 #
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)

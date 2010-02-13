@@ -237,11 +237,11 @@ framedhelp:
 # genstrings - generate GNU gettext strings.
 #
 
-genstrings:		genstrings.o libcupsppdc.a ../cups/libcups.a \
+genstrings:		genstrings.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC) \
 			sample.drv ../data/media.defs
 	echo Linking $@...
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o genstrings genstrings.o \
-		libcupsppdc.a ../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) \
+		libcupsppdc.a ../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Generating localization strings...
 	./genstrings >sample.c
@@ -256,10 +256,10 @@ ppdc:			ppdc.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	$(CXX) $(LDFLAGS) -o $@ ppdc.o -L. -lcupsppdc $(LIBS)
 
 
-ppdc-static:		ppdc.o libcupsppdc.a  ../cups/libcups.a foo.drv foo-fr.po
+ppdc-static:		ppdc.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC) foo.drv foo-fr.po
 	echo Linking $@...
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdc-static ppdc.o libcupsppdc.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD compiler...
 	./ppdc-static -l en,fr -I ../data foo.drv
@@ -284,10 +284,10 @@ ppdi:			ppdi.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 	$(CXX) $(LDFLAGS) -o $@ ppdi.o -L. -lcupsppdc $(LIBS)
 
 
-ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/libcups.a
+ppdi-static:		ppdc-static ppdi.o libcupsppdc.a  ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CXX) $(ARCHFLAGS) $(LDFLAGS) -o ppdi-static ppdi.o libcupsppdc.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	echo Testing PPD importer...
 	$(RM) -r ppd ppd2 sample-import.drv
@@ -324,10 +324,10 @@ ppdpo:			ppdpo.o $(LIBCUPSPPDC) ../cups/$(LIBCUPS)
 # testcatalog, test ppdcCatalog class.
 #
 
-testcatalog:		testcatalog.o libcupsppdc.a ../cups/libcups.a
+testcatalog:		testcatalog.o libcupsppdc.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CXX) $(LDFLAGS) -o $@ testcatalog.o libcupsppdc.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 
 

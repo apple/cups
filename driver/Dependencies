@@ -44,7 +44,7 @@ cmyk.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 cmyk.o: ../cups/language.h ../cups/raster.h ../cups/string.h ../config.h
 dither.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 dither.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-dither.o: ../cups/language.h ../cups/raster.h
+dither.o: ../cups/language.h ../cups/raster.h ../config.h
 lut.o: driver.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 lut.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 lut.o: ../cups/language.h ../cups/raster.h

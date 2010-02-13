@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   IPP test makefile for the Common UNIX Printing System (CUPS).
+#   IPP test makefile for CUPS.
 #
 #   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
@@ -134,9 +134,9 @@ ipptest:	ipptest.o ../cups/$(LIBCUPS)
 # ipptest-static
 #
 
-ipptest-static:	ipptest.o ../cups/libcups.a
+ipptest-static:	ipptest.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ipptest.o  ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o $@ ipptest.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

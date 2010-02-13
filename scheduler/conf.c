@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -131,7 +131,6 @@ static const cupsd_var_t	variables[] =
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
   { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
-  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
@@ -689,7 +688,6 @@ cupsdReadConfiguration(void)
 
 #ifdef HAVE_LAUNCHD
   LaunchdTimeout = DEFAULT_TIMEOUT + 10;
-  cupsdSetString(&LaunchdConf, CUPS_DEFAULT_LAUNCHD_CONF);
 #endif /* HAVE_LAUNCHD */
 
 #ifdef __APPLE__
