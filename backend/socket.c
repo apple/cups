@@ -72,9 +72,11 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		sep;			/* Option separator */
   int		print_fd;		/* Print file */
   int		copies;			/* Number of copies to print */
-  time_t	start_time,		/* Time of first connect */
-		current_time,		/* Current time */
+  time_t	start_time;		/* Time of first connect */
+#ifdef __APPLE__
+  time_t	current_time,		/* Current time */
 		wait_time;		/* Time to wait before shutting down socket */
+#endif /* __APPLE__ */
   int		contimeout;		/* Connection timeout */
   int		waiteof;		/* Wait for end-of-file? */
   int		port;			/* Port number */
