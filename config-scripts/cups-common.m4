@@ -281,7 +281,7 @@ AC_SUBST(DBUS_NOTIFIERLIBS)
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
-LEGACY_BACKENDS="parallel scsi"
+LEGACY_BACKENDS="parallel"
 
 case $uname in
         Darwin*)
