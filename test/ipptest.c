@@ -57,6 +57,13 @@
  * Types...
  */
 
+typedef enum				/**** How to send request data ****/
+{
+  _CUPS_TRANSFER_AUTO,			/* Chunk for files, length for static */
+  _CUPS_TRANSFER_CHUNKED,		/* Chunk always */
+  _CUPS_TRANSFER_LENGTH			/* Length always */
+} _cups_transfer_t;
+
 typedef struct _cups_expect_s		/**** Expected attribute info ****/
 {
   int		optional,		/* Optional attribute? */
@@ -96,8 +103,9 @@ typedef struct _cups_vars_s		/**** Set of variables ****/
  * Globals...
  */
 
-int		Chunking = 1,		/* Use chunked requests */
-		Verbosity = 0,		/* Show all attributes? */
+_cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
+					/* How to transfer requests */
+int		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XML = 0,		/* Produce XML output? */
 		XMLHeader = 0;		/* 1 if header is written */
@@ -252,7 +260,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'c' : /* Enable HTTP chunking */
-              Chunking = 1;
+              Transfer = _CUPS_TRANSFER_CHUNKED;
               break;
 
           case 'd' : /* Define a variable */
@@ -308,7 +316,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
           case 'l' : /* Disable HTTP chunking */
-              Chunking = 0;
+              Transfer = _CUPS_TRANSFER_LENGTH;
               break;
 
           case 'v' : /* Be verbose */
@@ -445,8 +453,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		*found;			/* Found attribute */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
-  int		chunking,		/* To chunk or not to chunk */
-		version;		/* IPP version number to use */
+  _cups_transfer_t transfer;		/* To chunk or not to chunk */
+  int		version;		/* IPP version number to use */
   int		num_statuses;		/* Number of valid status codes */
   ipp_status_t	statuses[100];		/* Valid status codes */
   int		num_expects = 0;	/* Number of expected attributes */
@@ -550,16 +558,19 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else if (!strcmp(token, "TRANSFER"))
     {
      /*
+      * TRANSFER auto
       * TRANSFER chunked
       * TRANSFER length
       */
 
       if (get_token(fp, temp, sizeof(temp), &linenum))
       {
-        if (!strcmp(temp, "chunked"))
-	  Chunking = 1;
+        if (!strcmp(temp, "auto"))
+	  Transfer = _CUPS_TRANSFER_AUTO;
+	else if (!strcmp(temp, "chunked"))
+	  Transfer = _CUPS_TRANSFER_CHUNKED;
 	else if (!strcmp(temp, "length"))
-	  Chunking = 0;
+	  Transfer = _CUPS_TRANSFER_LENGTH;
 	else
 	{
 	  print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
@@ -625,7 +636,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     last_expect   = NULL;
     filename[0]   = '\0';
     version       = Version;
-    chunking      = Chunking;
+    transfer      = Transfer;
 
     strlcpy(name, testfile, sizeof(name));
     if (strrchr(name, '.') != NULL)
@@ -705,16 +716,19 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       else if (!strcmp(token, "TRANSFER"))
       {
        /*
+	* TRANSFER auto
 	* TRANSFER chunked
 	* TRANSFER length
 	*/
 
 	if (get_token(fp, temp, sizeof(temp), &linenum))
 	{
+	  if (!strcmp(temp, "auto"))
+	    transfer = _CUPS_TRANSFER_AUTO;
 	  if (!strcmp(temp, "chunked"))
-	    chunking = 1;
+	    transfer = _CUPS_TRANSFER_CHUNKED;
 	  else if (!strcmp(temp, "length"))
-	    chunking = 0;
+	    transfer = _CUPS_TRANSFER_LENGTH;
 	  else
 	  {
 	    print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
@@ -1259,8 +1273,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       fflush(stdout);
     }
 
-    if (Chunking)
+    if (transfer == _CUPS_TRANSFER_CHUNKED ||
+        (transfer == _CUPS_TRANSFER_AUTO && filename[0]))
     {
+     /*
+      * Send request using chunking...
+      */
+
       http_status_t status = cupsSendRequest(http, request, resource, 0);
 
       if (status == HTTP_CONTINUE && filename[0])
@@ -1295,8 +1314,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else if (filename[0])
       response = cupsDoFileRequest(http, request, resource, filename);
     else
-      response = cupsDoIORequest(http, request, resource, -1,
-                                 Verbosity ? 1 : -1);
+      response = cupsDoRequest(http, request, resource);
 
     request = NULL;
 
@@ -2460,8 +2478,10 @@ print_xml_header(void)
          "\"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">");
     puts("<plist version=\"1.0\">");
     puts("<dict>");
-    puts("<key>Chunking</key>");
-    puts(Chunking ? "<true />" : "<false />");
+    puts("<key>Transfer</key>");
+    printf("<string>%s</string>\n",
+           Transfer == _CUPS_TRANSFER_AUTO ? "auto" :
+	       Transfer == _CUPS_TRANSFER_CHUNKED ? "chunked" : "length");
     puts("<key>Tests</key>");
     puts("<array>");
 

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "29 February 2010" "Apple Inc."
+.TH ipp.test 5 "CUPS" "15 February 2010" "Apple Inc."
 .SH NAME
 ipp.test \- ipptest test file format
 .SH DESCRIPTION
@@ -20,6 +20,7 @@ one or more IPP operation tests. Comments start with the "#" character and
 continue to the end of the line. Each test is enclosed by curley braces, for
 example:
 .nf
+
     # This is a comment
     {
       # The name of the test
@@ -80,6 +81,11 @@ INCLUDE <filename>
 Includes another test file. The first form includes a file relative to the
 current test file, while the second form includes a file from the \fIipptest\fR
 include directory.
+.TP 5
+TRANSFER auto
+Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
+requests with attached files and "Content-Length:" for requests without attached
+files.
 .TP 5
 TRANSFER chunked
 Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding:
@@ -151,6 +157,10 @@ The default is the resource from the URI provided to the \fIipptest\fR program.
 .TP 5
 STATUS status-code
 Specifies an expected response status-code value.
+.TP 5
+TRANSFER auto
+Specifies that this test will use "Transfer-Encoding: chunked" if it has an
+attached file or "Content-Length:" otherwise.
 .TP 5
 TRANSFER chunked
 Specifies that this test will use the HTTP/1.1 "Transfer-Encoding: chunked"

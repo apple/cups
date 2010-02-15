@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptest 1 "CUPS" "28 January 2010" "Apple Inc."
+.TH ipptest 1 "CUPS" "15 February 2010" "Apple Inc."
 .SH NAME
 ipptest - perform internet printing protocol tests
 .SH SYNOPSIS
@@ -53,8 +53,9 @@ report. This option is incompatible with the \fI-i\fR (interval) option.
 .TP 5
 -c
 Specifies that requests should be sent using the HTTP/1.1 "Transfer-Encoding:
-chunked" header (default), which is required for conformance by all versions of
-IPP.
+chunked" header, which is required for conformance by all versions of IPP. The
+default is to use "Transfer-Encoding: chunked" for requests with attached files
+and "Content-Length:" for requests without attached files.
 .TP 5
 -d name=value
 Defines the named variable.
@@ -68,7 +69,9 @@ This option is incompatible with the \fI-X\fR (XML output) option.
 .TP 5
 -l
 Specifies that requests should be sent using the HTTP/1.0 "Content-Length:"
-header, which is required for conformance by all versions of IPP.
+header, which is required for conformance by all versions of IPP. The
+default is to use "Transfer-Encoding: chunked" for requests with attached files
+and "Content-Length:" for requests without attached files.
 .TP 5
 -v
 Specifies that all request and response attributes should be output. This is the
