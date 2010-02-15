@@ -273,7 +273,6 @@ l 0700 root sys $SERVERBIN/backend/mdns dnssd
 %endif
 %system !darwin
 f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
-f 0555 root sys $SERVERBIN/backend/scsi backend/scsi
 %system all
 f 0555 root sys $SERVERBIN/backend/serial backend/serial
 f 0555 root sys $SERVERBIN/backend/snmp backend/snmp

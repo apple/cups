@@ -2211,6 +2211,9 @@ add_job_subscriptions(
       ippAddSeparator(con->response);
       ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
 		    "notify-subscription-id", sub->id);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added subscription %d for job %d",
+                      sub->id, job->id);
     }
 
     if (attr)
