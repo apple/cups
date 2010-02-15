@@ -2192,6 +2192,15 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		return;
 	      }
 	    }
+	    else if (filestats.st_size == 0)
+	    {
+	     /*
+	      * Don't allow empty file...
+	      */
+
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
+	    }
 
 	    if (con->command)
 	    {
