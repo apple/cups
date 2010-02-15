@@ -2771,6 +2771,12 @@ cupsdSetPrinterState(
     int             update)		/* I - Update printers.conf? */
 {
   ipp_pstate_t	old_state;		/* Old printer state */
+  static const char * const printer_states[] =
+  {					/* State strings */
+    "idle",
+    "processing",
+    "stopped"
+  };
 
 
  /*
@@ -2794,9 +2800,9 @@ cupsdSetPrinterState(
   {
     cupsdAddEvent(s == IPP_PRINTER_STOPPED ? CUPSD_EVENT_PRINTER_STOPPED :
                       CUPSD_EVENT_PRINTER_STATE, p, NULL,
-		  "%s \"%s\" state changed.",
+		  "%s \"%s\" state changed to %s.",
 		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
-		  p->name);
+		  p->name, printer_states[p->state]);
 
    /*
     * Let the browse code know this needs to be updated...

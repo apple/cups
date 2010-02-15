@@ -4291,16 +4291,16 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       break;
   }
 
-  if (event & CUPSD_EVENT_PRINTER_STATE)
+  if (event & CUPSD_EVENT_JOB_PROGRESS)
+    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
+                  "%s", job->printer->state_message);
+  else if (event & CUPSD_EVENT_PRINTER_STATE)
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		  (job->printer->type & CUPS_PRINTER_CLASS) ?
 		      "Class \"%s\" state changed." :
 		      "Printer \"%s\" state changed.",
 		  job->printer->name);
 
-  if (event & CUPSD_EVENT_JOB_PROGRESS)
-    cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
-                  "%s", job->printer->state_message);
 
   if (ptr == NULL && !job->status_buffer->bufused)
   {
