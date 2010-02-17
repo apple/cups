@@ -6454,7 +6454,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" deleted by \"%s\".",
                     printer->name, get_username(con));
 
-    cupsdDeletePrinter(printer, 0);
+    if (cupsdDeletePrinter(printer, 0))
+      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
+
     cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
   }
 

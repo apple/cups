@@ -3,7 +3,7 @@
  *
  *   Printer class routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -117,7 +117,7 @@ cupsdAddPrinterToClass(
  * 'cupsdDeletePrinterFromClass()' - Delete a printer from a class.
  */
 
-void
+int					/* O - 1 if class changed, 0 otherwise */
 cupsdDeletePrinterFromClass(
     cupsd_printer_t *c,			/* I - Class to delete from */
     cupsd_printer_t *p)			/* I - Printer to delete */
@@ -149,13 +149,15 @@ cupsdDeletePrinterFromClass(
               (c->num_printers - i) * sizeof(cupsd_printer_t *));
   }
   else
-    return;
+    return (0);
 
  /*
   * Update the IPP attributes (have to do this for member-names)...
   */
 
   cupsdSetPrinterAttrs(c);
+
+  return (1);
 }
 
 
@@ -163,10 +165,11 @@ cupsdDeletePrinterFromClass(
  * 'cupsdDeletePrinterFromClasses()' - Delete a printer from all classes.
  */
 
-void
+int					/* O - 1 if class changed, 0 otherwise */
 cupsdDeletePrinterFromClasses(
     cupsd_printer_t *p)			/* I - Printer to delete */
 {
+  int			changed = 0;	/* Any class changed? */
   cupsd_printer_t	*c;		/* Pointer to current class */
 
 
@@ -179,7 +182,7 @@ cupsdDeletePrinterFromClasses(
        c;
        c = (cupsd_printer_t *)cupsArrayNext(Printers))
     if (c->type & (CUPS_PRINTER_CLASS | CUPS_PRINTER_IMPLICIT))
-      cupsdDeletePrinterFromClass(c, p);
+      changed |= cupsdDeletePrinterFromClass(c, p);
 
  /*
   * Then clean out any empty implicit classes...
@@ -193,7 +196,10 @@ cupsdDeletePrinterFromClasses(
       cupsdLogMessage(CUPSD_LOG_DEBUG, "Deleting implicit class \"%s\"...",
                       c->name);
       cupsdDeletePrinter(c, 0);
+      changed = 1;
     }
+
+  return (changed);
 }
 
 

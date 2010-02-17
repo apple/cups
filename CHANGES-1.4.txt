@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.4
 
+	- The scheduler did not update the classes.conf file when deleting a
+	  printer belonging to a class (STR #3505)
 	- The lppasswd command did not use localized password prompts
 	  (STR #3492)
 	- The socket backend no longer waits for back-channel data on platforms

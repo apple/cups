@@ -3,7 +3,7 @@
  *
  *   Printer class definitions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -21,9 +21,9 @@
 extern cupsd_printer_t	*cupsdAddClass(const char *name);
 extern void		cupsdAddPrinterToClass(cupsd_printer_t *c,
 			                       cupsd_printer_t *p);
-extern void		cupsdDeletePrinterFromClass(cupsd_printer_t *c,
+extern int		cupsdDeletePrinterFromClass(cupsd_printer_t *c,
 			                            cupsd_printer_t *p);
-extern void		cupsdDeletePrinterFromClasses(cupsd_printer_t *p);
+extern int		cupsdDeletePrinterFromClasses(cupsd_printer_t *p);
 extern cupsd_printer_t	*cupsdFindAvailablePrinter(const char *name);
 extern cupsd_printer_t	*cupsdFindClass(const char *name);
 extern void		cupsdLoadAllClasses(void);

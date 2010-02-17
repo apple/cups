@@ -655,12 +655,13 @@ cupsdDeleteAllPrinters(void)
  * 'cupsdDeletePrinter()' - Delete a printer from the system.
  */
 
-void
+int					/* O - 1 if classes affected, 0 otherwise */
 cupsdDeletePrinter(
     cupsd_printer_t *p,			/* I - Printer to delete */
     int             update)		/* I - Update printers.conf? */
 {
-  int	i;				/* Looping var */
+  int	i,				/* Looping var */
+	changed = 0;			/* Class changed? */
 #ifdef __sgi
   char	filename[1024];			/* Interface script filename */
 #endif /* __sgi */
@@ -771,7 +772,7 @@ cupsdDeletePrinter(
 
   if (!(p->type & CUPS_PRINTER_IMPLICIT))
   {
-    cupsdDeletePrinterFromClasses(p);
+    changed = cupsdDeletePrinterFromClasses(p);
 
    /*
     * Deregister from any browse protocols...
@@ -848,6 +849,8 @@ cupsdDeletePrinter(
   */
 
   cupsArrayRestore(Printers);
+
+  return (changed);
 }
 
 
