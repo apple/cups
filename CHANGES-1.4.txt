@@ -20,7 +20,7 @@ CHANGES IN CUPS V1.4.3
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422, STR #3452,
 	  STR #3473, STR #3502)
-	- Documentation update (STR #3451)
+	- Documentation updates (STR #3451, STR #3504)
 	- The IPP backend now sets the printer-state-message to "Ready to
 	  print." at the end of a successful job (STR #3460)
 	- The PPD compiler did not correctly add the manufacturer to the output
