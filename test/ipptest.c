@@ -19,6 +19,7 @@
  *   do_tests()          - Do tests as specified in the test file.
  *   expand_variables()  - Expand variables in a string.
  *   expect_matches()    - Return true if the tag matches the specification.
+ *   get_collection()    - Get a collection value from the current test file.
  *   get_filename()      - Get a filename based on the current test file.
  *   get_token()         - Get a token from a file.
  *   get_variable()      - Get the value of a variable.
@@ -79,6 +80,13 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
   ipp_tag_t	in_group;		/* IN-GROUP value */
 } _cups_expect_t;
 
+typedef struct _cups_status_s		/**** Status info ****/
+{
+  ipp_status_t	status;			/* Expected status code */
+  char		*if_defined,		/* Only if variable is defined */
+		*if_undefined;		/* Only if variable is not defined */
+} _cups_status_t;
+
 typedef struct _cups_var_s		/**** Variable ****/
 {
   char		*name,			/* Name of variable */
@@ -133,8 +141,13 @@ const char * const URIStatusStrings[] =	/* URI status strings */
 static int	compare_vars(_cups_var_t *a, _cups_var_t *b);
 static int	do_tests(_cups_vars_t *vars, const char *testfile);
 static void	expand_variables(_cups_vars_t *vars, char *dst, const char *src,
-		                 size_t dstsize);
+		                 size_t dstsize)
+#ifdef __GNUC__
+__attribute((nonnull(1,2,3)))
+#endif /* __GNUC__ */
+;
 static int      expect_matches(_cups_expect_t *expect, ipp_tag_t value_tag);
+static ipp_t	*get_collection(_cups_vars_t *vars, FILE *fp, int *linenum);
 static char	*get_filename(const char *testfile, char *dst, const char *src,
 		              size_t dstsize);
 static char	*get_token(FILE *fp, char *buf, int buflen,
@@ -450,13 +463,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   ipp_tag_t	group;			/* Current group */
   ipp_tag_t	value;			/* Current value type */
   ipp_attribute_t *attrptr,		/* Attribute pointer */
-		*found;			/* Found attribute */
+		*found,			/* Found attribute */
+		*lastcol = NULL;	/* Last collection attribute */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
   _cups_transfer_t transfer;		/* To chunk or not to chunk */
   int		version;		/* IPP version number to use */
-  int		num_statuses;		/* Number of valid status codes */
-  ipp_status_t	statuses[100];		/* Valid status codes */
+  int		num_statuses = 0;	/* Number of valid status codes */
+  _cups_status_t statuses[100],		/* Valid status codes */
+		*last_status;		/* Last STATUS (for predicates) */
   int		num_expects = 0;	/* Number of expected attributes */
   _cups_expect_t expects[200],		/* Expected attributes */
 		*expect,		/* Current expected attribute */
@@ -630,10 +645,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     request       = ippNew();
     op            = (ipp_op_t)0;
     group         = IPP_TAG_ZERO;
-    num_statuses  = 0;
-    num_expects   = 0;
-    num_displayed = 0;
     last_expect   = NULL;
+    last_status   = NULL;
     filename[0]   = '\0';
     version       = Version;
     transfer      = Transfer;
@@ -649,7 +662,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
       if (strcasecmp(token, "COUNT") &&
-          strcasecmp(token, "EXPECT") &&
           strcasecmp(token, "IF-DEFINED") &&
           strcasecmp(token, "IF-UNDEFINED") &&
           strcasecmp(token, "IN-GROUP") &&
@@ -658,8 +670,58 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           strcasecmp(token, "WITH-VALUE"))
         last_expect = NULL;
 
+      if (strcasecmp(token, "IF-DEFINED") &&
+          strcasecmp(token, "IF-UNDEFINED"))
+        last_status = NULL;
+
       if (!strcmp(token, "}"))
         break;
+      else if (!strcmp(token, "{") && lastcol)
+      {
+       /*
+	* Another collection value
+	*/
+
+	ipp_t	*col = get_collection(vars, fp, &linenum);
+					/* Collection value */
+
+	if (col)
+	{
+	  ipp_attribute_t *tempcol;	/* Pointer to new buffer */
+
+
+	 /*
+	  * Reallocate memory...
+	  */
+
+	  if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
+				          (lastcol->num_values + 1) *
+				          sizeof(ipp_value_t))) == NULL)
+	  {
+	    print_fatal_error("Unable to allocate memory on line %d.", linenum);
+	    goto test_error;
+	  }
+
+	  if (tempcol != lastcol)
+	  {
+	   /*
+	    * Reset pointers in the list...
+	    */
+
+	    if (request->prev)
+	      request->prev->next = tempcol;
+	    else
+	      request->attrs = tempcol;
+
+	    lastcol = request->current = request->last = tempcol;
+	  }
+
+	  lastcol->values[lastcol->num_values].collection = col;
+	  lastcol->num_values ++;
+	}
+	else
+	  goto test_error;
+      }
       else if (!strcmp(token, "DEFINE"))
       {
        /*
@@ -725,7 +787,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  if (!strcmp(temp, "auto"))
 	    transfer = _CUPS_TRANSFER_AUTO;
-	  if (!strcmp(temp, "chunked"))
+	  else if (!strcmp(temp, "chunked"))
 	    transfer = _CUPS_TRANSFER_CHUNKED;
 	  else if (!strcmp(temp, "length"))
 	    transfer = _CUPS_TRANSFER_LENGTH;
@@ -946,6 +1008,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      }
 	      break;
 
+          case IPP_TAG_BEGIN_COLLECTION :
+	      if (!strcmp(token, "{"))
+	      {
+	        ipp_t	*col = get_collection(vars, fp, &linenum);
+					/* Collection value */
+
+                if (col)
+		  lastcol = ippAddCollection(request, group, attr, col);
+		else
+		  goto test_error;
+              }
+	      else
+	      {
+		print_fatal_error("Bad ATTR collection value on line %d.",
+				  linenum);
+		goto test_error;
+	      }
+	      break;
+
 	  default :
 	      if (!strchr(token, ','))
 	        ippAddString(request, group, value, attr, NULL, token);
@@ -1009,14 +1090,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
-	if ((statuses[num_statuses] = ippErrorValue(token)) < 0)
+	if ((statuses[num_statuses].status = ippErrorValue(token)) < 0)
 	{
 	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
 	                    linenum);
 	  goto test_error;
 	}
 
+        last_status = statuses + num_statuses;
 	num_statuses ++;
+
+	last_status->if_defined   = NULL;
+	last_status->if_undefined = NULL;
       }
       else if (!strcasecmp(token, "EXPECT"))
       {
@@ -1145,10 +1230,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (last_expect)
 	  last_expect->if_defined = strdup(token);
+	else if (last_status)
+	  last_status->if_defined = strdup(token);
 	else
 	{
-	  print_fatal_error("IF-DEFINED without a preceding EXPECT on line %d.",
-		            linenum);
+	  print_fatal_error("IF-DEFINED without a preceding EXPECT or STATUS "
+	                    "on line %d.", linenum);
 	  goto test_error;
 	}
       }
@@ -1162,10 +1249,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (last_expect)
 	  last_expect->if_undefined = strdup(token);
+	else if (last_status)
+	  last_status->if_undefined = strdup(token);
 	else
 	{
-	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT on line "
-	                    "%d.", linenum);
+	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT or STATUS "
+			    "on line %d.", linenum);
 	  goto test_error;
 	}
       }
@@ -1403,8 +1492,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
 
       for (i = 0; i < num_statuses; i ++)
-        if (response->request.status.status_code == statuses[i])
+      {
+        if (statuses[i].if_defined &&
+	    !get_variable(vars, statuses[i].if_defined))
+	  continue;
+
+        if (statuses[i].if_undefined &&
+	    get_variable(vars, statuses[i].if_undefined))
+	  continue;
+
+        if (response->request.status.status_code == statuses[i].status)
 	  break;
+      }
 
       if (i == num_statuses && num_statuses > 0)
 	pass = 0;
@@ -1636,8 +1735,18 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
 
 	for (i = 0; i < num_statuses; i ++)
-	  if (response->request.status.status_code == statuses[i])
+	{
+	  if (statuses[i].if_defined &&
+	      !get_variable(vars, statuses[i].if_defined))
+	    continue;
+
+	  if (statuses[i].if_undefined &&
+	      get_variable(vars, statuses[i].if_undefined))
+	    continue;
+
+	  if (response->request.status.status_code == statuses[i].status)
 	    break;
+        }
 
 	if (i == num_statuses && num_statuses > 0)
 	{
@@ -1716,6 +1825,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     ippDelete(response);
     response = NULL;
 
+    for (i = 0; i < num_statuses; i ++)
+    {
+      if (statuses[i].if_defined)
+        free(statuses[i].if_defined);
+      if (statuses[i].if_undefined)
+        free(statuses[i].if_undefined);
+    }
+    num_statuses = 0;
+
     for (i = num_expects, expect = expects; i > 0; i --, expect ++)
     {
       free(expect->name);
@@ -1757,6 +1875,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   httpClose(http);
   ippDelete(request);
   ippDelete(response);
+
+  for (i = 0; i < num_statuses; i ++)
+  {
+    if (statuses[i].if_defined)
+      free(statuses[i].if_defined);
+    if (statuses[i].if_undefined)
+      free(statuses[i].if_undefined);
+  }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
   {
@@ -1827,7 +1953,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	value = getenv(temp);
         src   += tempptr - temp + 5;
       }
-      else
+      else if (vars)
       {
 	strlcpy(temp, src + 1, sizeof(temp));
 
@@ -1861,6 +1987,11 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 	  value = get_variable(vars, temp);
 
         src += tempptr - temp + 1;
+      }
+      else
+      {
+        value = "$";
+	src ++;
       }
 
       if (value)
@@ -1937,6 +2068,238 @@ expect_matches(
   }
 
   return (match);
+}
+
+
+/*
+ * 'get_collection()' - Get a collection value from the current test file.
+ */
+
+static ipp_t *				/* O  - Collection value */
+get_collection(_cups_vars_t *vars,	/* I  - Variables */
+               FILE         *fp,	/* I  - File to read from */
+	       int          *linenum)	/* IO - Line number */
+{
+  char		token[1024],		/* Token from file */
+		temp[1024],		/* Temporary string */
+		attr[128];		/* Attribute name */
+  ipp_tag_t	value;			/* Current value type */
+  ipp_t		*col = ippNew();	/* Collection value */
+  ipp_attribute_t *lastcol = NULL;	/* Last collection attribute */
+
+
+  while (get_token(fp, token, sizeof(token), linenum) != NULL)
+  {
+    if (!strcmp(token, "}"))
+      break;
+    else if (!strcmp(token, "{") && lastcol)
+    {
+     /*
+      * Another collection value
+      */
+
+      ipp_t	*subcol = get_collection(vars, fp, linenum);
+					/* Collection value */
+
+      if (subcol)
+      {
+	ipp_attribute_t	*tempcol;	/* Pointer to new buffer */
+
+
+       /*
+	* Reallocate memory...
+	*/
+
+	if ((tempcol = realloc(lastcol, sizeof(ipp_attribute_t) +
+				        (lastcol->num_values + 1) *
+					sizeof(ipp_value_t))) == NULL)
+	{
+	  print_fatal_error("Unable to allocate memory on line %d.", *linenum);
+	  goto col_error;
+	}
+
+	if (tempcol != lastcol)
+	{
+	 /*
+	  * Reset pointers in the list...
+	  */
+
+	  if (col->prev)
+	    col->prev->next = tempcol;
+	  else
+	    col->attrs = tempcol;
+
+	  lastcol = col->current = col->last = tempcol;
+	}
+
+	lastcol->values[lastcol->num_values].collection = subcol;
+	lastcol->num_values ++;
+      }
+      else
+	goto col_error;
+    }
+    else if (!strcasecmp(token, "MEMBER"))
+    {
+     /*
+      * Attribute...
+      */
+
+      lastcol = NULL;
+
+      if (!get_token(fp, token, sizeof(token), linenum))
+      {
+	print_fatal_error("Missing MEMBER value tag on line %d.", *linenum);
+	goto col_error;
+      }
+
+      if ((value = ippTagValue(token)) < 0)
+      {
+	print_fatal_error("Bad MEMBER value tag \"%s\" on line %d.", token,
+			  *linenum);
+	goto col_error;
+      }
+
+      if (!get_token(fp, attr, sizeof(attr), linenum))
+      {
+	print_fatal_error("Missing MEMBER name on line %d.", *linenum);
+	goto col_error;
+      }
+
+      if (!get_token(fp, temp, sizeof(temp), linenum))
+      {
+	print_fatal_error("Missing MEMBER value on line %d.", *linenum);
+	goto col_error;
+      }
+
+      expand_variables(vars, token, temp, sizeof(token));
+
+      switch (value)
+      {
+	case IPP_TAG_BOOLEAN :
+	    if (!strcasecmp(token, "true"))
+	      ippAddBoolean(col, IPP_TAG_ZERO, attr, 1);
+	    else
+	      ippAddBoolean(col, IPP_TAG_ZERO, attr, atoi(token));
+	    break;
+
+	case IPP_TAG_INTEGER :
+	case IPP_TAG_ENUM :
+	    ippAddInteger(col, IPP_TAG_ZERO, value, attr, atoi(token));
+	    break;
+
+	case IPP_TAG_RESOLUTION :
+	    {
+	      int	xres,		/* X resolution */
+			yres;		/* Y resolution */
+	      char	units[6];	/* Units */
+
+	      if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
+		  (strcasecmp(units, "dpi") && strcasecmp(units, "dpc") &&
+		   strcasecmp(units, "other")))
+	      {
+		print_fatal_error("Bad resolution value \"%s\" on line %d.",
+				  token, *linenum);
+		goto col_error;
+	      }
+
+	      if (!strcasecmp(units, "dpi"))
+		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
+		                 IPP_RES_PER_INCH);
+	      else if (!strcasecmp(units, "dpc"))
+		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
+		                 IPP_RES_PER_CM);
+	      else
+		ippAddResolution(col, IPP_TAG_ZERO, attr, xres, yres,
+		                 (ipp_res_t)0);
+	    }
+	    break;
+
+	case IPP_TAG_RANGE :
+	    {
+	      int	lowers[4],	/* Lower value */
+			uppers[4],	/* Upper values */
+			num_vals;	/* Number of values */
+
+
+	      num_vals = sscanf(token, "%d-%d,%d-%d,%d-%d,%d-%d",
+				lowers + 0, uppers + 0,
+				lowers + 1, uppers + 1,
+				lowers + 2, uppers + 2,
+				lowers + 3, uppers + 3);
+
+	      if ((num_vals & 1) || num_vals == 0)
+	      {
+		print_fatal_error("Bad rangeOfInteger value \"%s\" on line %d.",
+		                  token, *linenum);
+		goto col_error;
+	      }
+
+	      ippAddRanges(col, IPP_TAG_ZERO, attr, num_vals / 2, lowers,
+			   uppers);
+	    }
+	    break;
+
+	case IPP_TAG_BEGIN_COLLECTION :
+	    if (!strcmp(token, "{"))
+	    {
+	      ipp_t	*subcol = get_collection(vars, fp, linenum);
+				      /* Collection value */
+
+	      if (subcol)
+		lastcol = ippAddCollection(col, IPP_TAG_ZERO, attr, subcol);
+	      else
+		goto col_error;
+	    }
+	    else
+	    {
+	      print_fatal_error("Bad collection value on line %d.", *linenum);
+	      goto col_error;
+	    }
+	    break;
+
+	default :
+	    if (!strchr(token, ','))
+	      ippAddString(col, IPP_TAG_ZERO, value, attr, NULL, token);
+	    else
+	    {
+	     /*
+	      * Multiple string values...
+	      */
+
+	      int	num_values;	/* Number of values */
+	      char	*values[100],	/* Values */
+			*ptr;		/* Pointer to next value */
+
+
+	      values[0]  = token;
+	      num_values = 1;
+
+	      for (ptr = strchr(token, ','); ptr; ptr = strchr(ptr, ','))
+	      {
+		*ptr++ = '\0';
+		values[num_values] = ptr;
+		num_values ++;
+	      }
+
+	      ippAddStrings(col, IPP_TAG_ZERO, value, attr, num_values,
+			    NULL, (const char **)values);
+	    }
+	    break;
+      }
+    }
+  }
+
+  return (col);
+
+ /*
+  * If we get here there was a parse error; free memory and return.
+  */
+
+  col_error:
+
+  ippDelete(col);
+
+  return (NULL);
 }
 
 

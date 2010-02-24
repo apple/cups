@@ -11,9 +11,10 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "15 February 2010" "Apple Inc."
+.TH ipp.test 5 "CUPS" "23 February 2010" "Apple Inc."
 .SH NAME
 ipp.test \- ipptest test file format
+
 .SH DESCRIPTION
 The \fIipptest(1)\fR program accepts free-form plain text files that describe
 one or more IPP operation tests. Comments start with the "#" character and
@@ -65,6 +66,7 @@ example:
       EXPECT job-originating-user-name OF-TYPE name WITH-VALUE "$user"
     }
 .fi
+
 .SH TOP-LEVEL DIRECTIVES
 The following directives can be used outside of a test:
 .TP 5
@@ -109,12 +111,18 @@ VERSION 2.1
 .TP 5
 VERSION 2.2
 Specifies the default IPP version number to use for the tests that follow.
+
 .SH TEST DIRECTIVES
 The following directives are understood in a test:
 .TP 5
 ATTR tag attribute-name value(s)
 Adds an attribute to the test request. Values are separated by the comma (",")
 character - escape commas using the "\" character.
+.TP 5
+ATTR collection attribute-name { MEMBER tag member-name value(s) ... } [ ... { ... } ]
+Adds a collection attribute to the test request. Member attributes follow the
+same syntax as regular attributes and can themselves be nested collections.
+Multiple collection values can be supplied as needed.
 .TP 5
 DELAY seconds
 Specifies a delay before this test will be run.
@@ -155,8 +163,10 @@ RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
 The default is the resource from the URI provided to the \fIipptest\fR program.
 .TP 5
-STATUS status-code
-Specifies an expected response status-code value.
+STATUS status-code [ predicate ]
+Specifies an expected response status-code value. Additional requirements can be
+added as predicates - see the "STATUS PREDICATES" section for more information
+on predicates.
 .TP 5
 TRANSFER auto
 Specifies that this test will use "Transfer-Encoding: chunked" if it has an
@@ -179,6 +189,7 @@ VERSION 2.1
 .TP 5
 VERSION 2.2
 Specifies the IPP version number to use for this test.
+
 .SH EXPECT PREDICATES
 The following predicates are understood following the EXPECT test directive:
 .TP 5
@@ -210,6 +221,16 @@ WITH-VALUE "/regular expression/"
 Requires that all values of the EXPECT attribute match the regular expression,
 which must conform to the POSIX regular expression syntax.
 Comparisons are case-sensitive.
+
+.SH STATUS PREDICATES
+The following predicates are understood following the STATUS test directive:
+.TP 5
+IF-DEFINED variable-name
+Makes the STATUS apply only if the specified variable is defined.
+.TP 5
+IF-UNDEFINED variable-name
+Makes the STATUS apply only if the specified variable is not defined.
+
 .SH OPERATION CODES
 Operation codes correspond to the names from RFC 2911 and other IPP extension
 specifications. Here is a complete list:
@@ -275,6 +296,7 @@ specifications. Here is a complete list:
     Suspend-Current-Job
     Validate-Job
 .fi
+
 .SH STATUS CODES
 Status codes correspond to the names from RFC 2911 and other IPP extension
 specifications. Here is a complete list:
@@ -325,6 +347,7 @@ specifications. Here is a complete list:
     successful-ok-ignored-subscriptions
     successful-ok-too-many-events
 .fi
+
 .SH TAGS
 Value and group tags correspond to the names from RFC 2911 and other IPP
 extension specifications. Here are the group tags:
@@ -340,9 +363,9 @@ extension specifications. Here are the group tags:
 Here are the value tags:
 .nf
     admin-define
-    begCollection
     boolean
     charset
+    collection
     dateTime
     default
     delete-attribute
@@ -365,6 +388,7 @@ Here are the value tags:
     uri
     uriScheme
 .fi
+
 .SH VARIABLES
 The \fIipptest\fR program maintains a list of variables that can be used in any
 literal string or attribute value by specifying "$variable-name". Aside from
@@ -413,10 +437,12 @@ Inserts the current user's login name.
 .TP 5
 $username
 Inserts the username from the URI provided to \fIipptest\fR, if any.
+
 .SH SEE ALSO
 \fIipptest(1)\fR,
 .br
 http://localhost:631/help
+
 .SH COPYRIGHT
 Copyright 2007-2010 by Apple Inc.
 .\"
