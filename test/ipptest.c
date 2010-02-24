@@ -928,6 +928,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
+	printf("%d: value=%s\n", linenum, ippTagString(value));
+
 	if (!get_token(fp, attr, sizeof(attr), &linenum))
 	{
 	  print_fatal_error("Missing ATTR name on line %d.", linenum);
@@ -2686,10 +2688,10 @@ print_col(ipp_t *col)			/* I - Collection attribute to print */
   ipp_attribute_t	*attr;		/* Current attribute in collection */
 
 
-  putchar('{');
+  fputs("{ ", stdout);
   for (attr = col->attrs; attr; attr = attr->next)
   {
-    printf("%s(%s%s)=", attr->name, attr->num_values > 1 ? "1setOf " : "",
+    printf("%s (%s%s) = ", attr->name, attr->num_values > 1 ? "1setOf " : "",
 	   ippTagString(attr->value_tag));
 
     switch (attr->value_tag)
