@@ -44,12 +44,13 @@ lpoptions.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
 lpoptions.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 lpoptions.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
 lpoptions.o: ../cups/transcode.h
-lppasswd.o: ../cups/string.h ../config.h ../cups/cups.h ../cups/ipp.h
-lppasswd.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-lppasswd.o: ../cups/file.h ../cups/language.h ../cups/i18n.h
-lppasswd.o: ../cups/transcode.h ../cups/md5.h
-lpstat.o: ../cups/http-private.h ../config.h ../cups/http.h
-lpstat.o: ../cups/versioning.h ../cups/md5.h ../cups/ipp-private.h
-lpstat.o: ../cups/ipp.h ../cups/string.h ../cups/cups.h ../cups/ppd.h
-lpstat.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/i18n.h
-lpstat.o: ../cups/transcode.h ../cups/debug.h
+lppasswd.o: ../cups/globals.h ../cups/string.h ../config.h
+lppasswd.o: ../cups/http-private.h ../cups/http.h ../cups/versioning.h
+lppasswd.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+lppasswd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+lppasswd.o: ../cups/i18n.h ../cups/transcode.h ../cups/md5.h
+lpstat.o: ../cups/globals.h ../cups/string.h ../config.h
+lpstat.o: ../cups/http-private.h ../cups/http.h ../cups/versioning.h
+lpstat.o: ../cups/md5.h ../cups/ipp-private.h ../cups/ipp.h ../cups/cups.h
+lpstat.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
+lpstat.o: ../cups/i18n.h ../cups/transcode.h ../cups/debug.h

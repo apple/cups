@@ -1,9 +1,9 @@
 /*
  * "$Id: lpstat.c 7921 2008-09-10 15:42:24Z mike $"
  *
- *   "lpstat" command for the Common UNIX Printing System (CUPS).
+ *   "lpstat" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,10 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <cups/http-private.h>
-#include <cups/string.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
+#include <cups/globals.h>
 #include <cups/debug.h>
 
 
@@ -1518,7 +1515,7 @@ show_printers(const char  *printers,	/* I - Destinations */
   char		printer_uri[HTTP_MAX_URI],
 					/* Printer URI */
 		printer_state_time[255];/* Printer state time */
-  const char	*root;			/* Server root directory... */
+  _cups_globals_t *cg = _cupsGlobals();	/* Global data */
   static const char *pattrs[] =		/* Attributes we need for printers... */
 		{
 		  "printer-name",
@@ -1542,9 +1539,6 @@ show_printers(const char  *printers,	/* I - Destinations */
 
   DEBUG_printf(("show_printers(printers=\"%s\", num_dests=%d, dests=%p, "
                 "long_status=%d)\n", printers, num_dests, dests, long_status));
-
-  if ((root = getenv("CUPS_SERVERROOT")) == NULL)
-    root = CUPS_SERVERROOT;
 
   if (printers != NULL && !strcmp(printers, "all"))
     printers = NULL;
@@ -1820,10 +1814,11 @@ show_printers(const char  *printers,	/* I - Destinations */
 	    if (make_model && strstr(make_model, "System V Printer"))
 	      _cupsLangPrintf(stdout,
 	                      _("\tInterface: %s/interfaces/%s\n"),
-			      root, printer);
+			      cg->cups_serverroot, printer);
 	    else if (make_model && !strstr(make_model, "Raw Printer"))
 	      _cupsLangPrintf(stdout,
-	                      _("\tInterface: %s/ppd/%s.ppd\n"), root, printer);
+	                      _("\tInterface: %s/ppd/%s.ppd\n"),
+			      cg->cups_serverroot, printer);
           }
 	  _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	  _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));
@@ -1933,10 +1928,11 @@ show_printers(const char  *printers,	/* I - Destinations */
 		if (make_model && strstr(make_model, "System V Printer"))
 		  _cupsLangPrintf(stdout,
 	                	  _("\tInterface: %s/interfaces/%s\n"),
-				  root, printer);
+				  cg->cups_serverroot, printer);
 		else if (make_model && !strstr(make_model, "Raw Printer"))
 		  _cupsLangPrintf(stdout,
-	                	  _("\tInterface: %s/ppd/%s.ppd\n"), root, printer);
+	                	  _("\tInterface: %s/ppd/%s.ppd\n"),
+				  cg->cups_serverroot, printer);
               }
 	      _cupsLangPuts(stdout, _("\tOn fault: no alert\n"));
 	      _cupsLangPuts(stdout, _("\tAfter fault: continue\n"));

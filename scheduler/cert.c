@@ -1,10 +1,9 @@
 /*
  * "$Id: cert.c 7673 2008-06-18 22:31:26Z mike $"
  *
- *   Authentication certificate routines for the Common UNIX
- *   Printing System (CUPS).
+ *   Authentication certificate routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -390,9 +389,8 @@ cupsdFindCert(const char *certificate)	/* I - Certificate */
 void
 cupsdInitCerts(void)
 {
+#ifndef HAVE_ARC4RANDOM
   cups_file_t	*fp;			/* /dev/random file */
-  unsigned	seed;			/* Seed for random number generator */
-  struct timeval tod;			/* Time of day */
 
 
  /*
@@ -402,16 +400,20 @@ cupsdInitCerts(void)
 
   if ((fp = cupsFileOpen("/dev/urandom", "rb")) == NULL)
   {
+    struct timeval tod;			/* Time of day */
+
    /*
     * Get the time in usecs and use it as the initial seed...
     */
 
     gettimeofday(&tod, NULL);
 
-    seed = (unsigned)(tod.tv_sec + tod.tv_usec);
+    CUPS_SRAND((unsigned)(tod.tv_sec + tod.tv_usec));
   }
   else
   {
+    unsigned	seed;			/* Seed for random number generator */
+
    /*
     * Read 4 random characters from the random device and use
     * them as the seed...
@@ -420,12 +422,11 @@ cupsdInitCerts(void)
     seed = cupsFileGetChar(fp);
     seed = (seed << 8) | cupsFileGetChar(fp);
     seed = (seed << 8) | cupsFileGetChar(fp);
-    seed = (seed << 8) | cupsFileGetChar(fp);
+    CUPS_SRAND((seed << 8) | cupsFileGetChar(fp));
 
     cupsFileClose(fp);
   }
-
-  CUPS_SRAND(seed);
+#endif /* !HAVE_ARC4RANDOM */
 
  /*
   * Create a root certificate and return...

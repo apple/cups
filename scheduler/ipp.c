@@ -3,7 +3,7 @@
  *
  *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -390,7 +390,7 @@ cupsdProcessIPPRequest(
 		     charset->values[0].string.text);
       else
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-        	     "attributes-charset", NULL, DefaultCharset);
+        	     "attributes-charset", NULL, "utf-8");
 
       if (language)
 	ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
@@ -904,6 +904,9 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdAddPrinterHistory(printer);
 
+  cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+                "Now accepting jobs.");
+
   if (dtype & CUPS_PRINTER_CLASS)
   {
     cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
@@ -1102,7 +1105,8 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     cupsdSetString(&pclass->info, attr->values[0].string.text);
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL)
+                               IPP_TAG_BOOLEAN)) != NULL &&
+      attr->values[0].boolean != pclass->accepting)
   {
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-accepting-jobs to %d (was %d.)",
@@ -1110,6 +1114,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
     pclass->accepting = attr->values[0].boolean;
     cupsdAddPrinterHistory(pclass);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL, "%s accepting jobs.",
+		  pclass->accepting ? "Now" : "No longer");
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-shared",
@@ -1154,6 +1161,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
     strlcpy(pclass->state_message, attr->values[0].string.text,
             sizeof(pclass->state_message));
     cupsdAddPrinterHistory(pclass);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL, "%s",
+                  pclass->state_message);
   }
   if ((attr = ippFindAttribute(con->request, "member-uris",
                                IPP_TAG_URI)) != NULL)
@@ -1232,9 +1242,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   if (modify)
   {
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, pclass, NULL,
-                  "Class \"%s\" modified by \"%s\".", pclass->name,
-        	  get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED | CUPSD_EVENT_PRINTER_CONFIG,
+		  pclass, NULL, "Class \"%s\" modified by \"%s\".",
+		  pclass->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Class \"%s\" modified by \"%s\".",
                     pclass->name, get_username(con));
@@ -1243,9 +1253,9 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   {
     cupsdAddPrinterHistory(pclass);
 
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, pclass, NULL,
-                  "New class \"%s\" added by \"%s\".", pclass->name,
-        	  get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED | CUPSD_EVENT_PRINTER_CONFIG,
+		  pclass, NULL, "New class \"%s\" added by \"%s\".",
+		  pclass->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "New class \"%s\" added by \"%s\".",
                     pclass->name, get_username(con));
@@ -1332,7 +1342,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 		*auth_info;		/* auth-info attribute */
   const char	*val;			/* Default option value */
   int		priority;		/* Job priority */
-  char		*title;			/* Job name/title */
   cupsd_job_t	*job;			/* Current job */
   char		job_uri[HTTP_MAX_URI];	/* Job URI */
   int		kbytes;			/* Size of print file */
@@ -2202,6 +2211,9 @@ add_job_subscriptions(
       ippAddSeparator(con->response);
       ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
 		    "notify-subscription-id", sub->id);
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Added subscription %d for job %d",
+                      sub->id, job->id);
     }
 
     if (attr)
@@ -2604,7 +2616,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-accepting-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL)
+                               IPP_TAG_BOOLEAN)) != NULL &&
+      attr->values[0].boolean != printer->accepting)
   {
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Setting %s printer-is-accepting-jobs to %d (was %d.)",
@@ -2612,6 +2625,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     printer->accepting = attr->values[0].boolean;
     cupsdAddPrinterHistory(printer);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+                  "%s accepting jobs.",
+		  printer->accepting ? "Now" : "No longer");
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-is-shared",
@@ -2656,6 +2673,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
     cupsdAddPrinterHistory(printer);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL, "%s",
+                  printer->state_message);
   }
 
   if ((attr = ippFindAttribute(con->request, "printer-state-reasons",
@@ -2697,6 +2717,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     if (PrintcapFormat == PRINTCAP_PLIST)
       cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+                  "Printer \"%s\" state changed.", printer->name);
   }
 
   set_printer_defaults(con, printer);
@@ -2936,9 +2959,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (modify)
   {
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED, printer, NULL,
-                  "Printer \"%s\" modified by \"%s\".", printer->name,
-        	  get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED | CUPSD_EVENT_PRINTER_CONFIG,
+                  printer, NULL, "Printer \"%s\" modified by \"%s\".",
+		  printer->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" modified by \"%s\".",
                     printer->name, get_username(con));
@@ -2947,9 +2970,9 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsdAddPrinterHistory(printer);
 
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED, printer, NULL,
-                  "New printer \"%s\" added by \"%s\".", printer->name,
-        	  get_username(con));
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED | CUPSD_EVENT_PRINTER_CONFIG,
+                  printer, NULL, "New printer \"%s\" added by \"%s\".",
+		  printer->name, get_username(con));
 
     cupsdLogMessage(CUPSD_LOG_INFO, "New printer \"%s\" added by \"%s\".",
                     printer->name, get_username(con));
@@ -6431,7 +6454,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
     cupsdLogMessage(CUPSD_LOG_INFO, "Printer \"%s\" deleted by \"%s\".",
                     printer->name, get_username(con));
 
-    cupsdDeletePrinter(printer, 0);
+    if (cupsdDeletePrinter(printer, 0))
+      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
+
     cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
   }
 
@@ -9034,6 +9059,9 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdAddPrinterHistory(printer);
 
+  cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
+                "No longer accepting jobs.");
+
   if (dtype & CUPS_PRINTER_CLASS)
   {
     cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
@@ -10186,7 +10214,7 @@ send_ipp_status(cupsd_client_t *con,	/* I - Client connection */
   if (ippFindAttribute(con->response, "attributes-charset",
                        IPP_TAG_ZERO) == NULL)
     ippAddString(con->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                 "attributes-charset", NULL, DefaultCharset);
+                 "attributes-charset", NULL, "utf-8");
 
   if (ippFindAttribute(con->response, "attributes-natural-language",
                        IPP_TAG_ZERO) == NULL)

@@ -1,8 +1,7 @@
 /*
  * "$Id: conf.h 7935 2008-09-11 01:54:11Z mike $"
  *
- *   Configuration file definitions for the Common UNIX Printing System (CUPS)
- *   scheduler.
+ *   Configuration file definitions for CUPS.
  *
  *   Copyright 2007-2009 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -136,8 +135,6 @@ VAR char		*AccessLog		VALUE(NULL),
 					/* Data file directory */
 			*DefaultLanguage	VALUE(NULL),
 					/* Default language encoding */
-			*DefaultCharset		VALUE(NULL),
-					/* Default charset */
 			*DefaultLocale		VALUE(NULL),
 					/* Default locale */
 			*DefaultPaperSize	VALUE(NULL),
@@ -253,8 +250,6 @@ VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
 #ifdef HAVE_LAUNCHD
 VAR int			LaunchdTimeout		VALUE(DEFAULT_KEEPALIVE);
 					/* Time after which an idle cupsd will exit */
-VAR char		*LaunchdConf		VALUE(NULL);
-					/* launchd(8) configuration file */
 #endif /* HAVE_LAUNCHD */
 
 #ifdef __APPLE__

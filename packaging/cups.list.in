@@ -3,7 +3,7 @@
 #
 #   ESP Package Manager (EPM) file list for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 
 # Product information
 %product CUPS
-%copyright 2007-2009 by Apple Inc.
+%copyright 2007-2010 by Apple Inc.
 %vendor Apple Inc.
 #%license LICENSE.txt
 %readme LICENSE.txt
@@ -273,7 +273,6 @@ l 0700 root sys $SERVERBIN/backend/mdns dnssd
 %endif
 %system !darwin
 f 0555 root sys $SERVERBIN/backend/parallel backend/parallel
-f 0555 root sys $SERVERBIN/backend/scsi backend/scsi
 %system all
 f 0555 root sys $SERVERBIN/backend/serial backend/serial
 f 0555 root sys $SERVERBIN/backend/snmp backend/snmp
@@ -296,7 +295,6 @@ f 0555 root sys $SERVERBIN/filter/commandtoespcx driver/commandtoescpx
 f 0555 root sys $SERVERBIN/filter/commandtopclx driver/commandtopclx
 f 0555 root sys $SERVERBIN/filter/commandtops filter/commandtops
 f 0555 root sys $SERVERBIN/filter/gziptoany filter/gziptoany
-f 0555 root sys $SERVERBIN/filter/hpgltops filter/hpgltops
 %if IMGFILTERS
 f 0555 root sys $SERVERBIN/filter/imagetops filter/imagetops
 f 0555 root sys $SERVERBIN/filter/imagetoraster filter/imagetoraster
@@ -351,6 +349,7 @@ d 0755 root sys $BINDIR -
 f 0555 root sys $BINDIR/cancel systemv/cancel
 f 0555 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
 f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
+f 0555 root sys $BINDIR/ipptest test/ipptest
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
 f 0555 root sys $BINDIR/lppasswd systemv/lppasswd
@@ -465,26 +464,27 @@ d 0755 root $CUPS_GROUP $STATEDIR -
 d 0511 root $CUPS_PRIMARY_SYSTEM_GROUP $STATEDIR/certs -
 
 # Data files
-#f 0444 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
-#f 0444 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
+f 0444 root sys $LOCALEDIR/da/cups_da.po locale/cups_da.po
+f 0444 root sys $LOCALEDIR/de/cups_de.po locale/cups_de.po
 f 0444 root sys $LOCALEDIR/es/cups_es.po locale/cups_es.po
 #f 0444 root sys $LOCALEDIR/et/cups_et.po locale/cups_et.po
 f 0444 root sys $LOCALEDIR/eu/cups_eu.po locale/cups_eu.po
-#f 0444 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
-#f 0444 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
+f 0444 root sys $LOCALEDIR/fi/cups_fi.po locale/cups_fi.po
+f 0444 root sys $LOCALEDIR/fr/cups_fr.po locale/cups_fr.po
 #f 0444 root sys $LOCALEDIR/he/cups_he.po locale/cups_he.po
-#f 0444 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
-#f 0444 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
-#f 0444 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
-#f 0444 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
-#f 0444 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
-#f 0444 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
-#f 0444 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
-#f 0444 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
-#f 0444 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
-#f 0444 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
-#f 0444 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
-#f 0444 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
+f 0444 root sys $LOCALEDIR/id/cups_id.po locale/cups_id.po
+f 0444 root sys $LOCALEDIR/it/cups_it.po locale/cups_it.po
+f 0444 root sys $LOCALEDIR/ja/cups_ja.po locale/cups_ja.po
+f 0444 root sys $LOCALEDIR/ko/cups_ko.po locale/cups_ko.po
+f 0444 root sys $LOCALEDIR/nl/cups_nl.po locale/cups_nl.po
+f 0444 root sys $LOCALEDIR/no/cups_no.po locale/cups_no.po
+f 0444 root sys $LOCALEDIR/pl/cups_pl.po locale/cups_pl.po
+f 0444 root sys $LOCALEDIR/pt/cups_pt.po locale/cups_pt.po
+f 0444 root sys $LOCALEDIR/pt_BR/cups_pt_BR.po locale/cups_pt_BR.po
+f 0444 root sys $LOCALEDIR/ru/cups_ru.po locale/cups_ru.po
+f 0444 root sys $LOCALEDIR/sv/cups_sv.po locale/cups_sv.po
+f 0444 root sys $LOCALEDIR/zh/cups_zh.po locale/cups_zh.po
+f 0444 root sys $LOCALEDIR/zh_TW/cups_zh_TW.po locale/cups_zh_TW.po
 
 d 0755 root sys $DATADIR -
 
@@ -503,7 +503,6 @@ d 0755 root sys $DATADIR/charsets -
 f 0444 root sys $DATADIR/charsets/utf-8 data/utf-8
 
 d 0755 root sys $DATADIR/data -
-f 0444 root sys $DATADIR/data/HPGLprolog data/HPGLprolog
 f 0444 root sys $DATADIR/data/psglyphs data/psglyphs
 f 0444 root sys $DATADIR/data/testprint data/testprint
 
@@ -515,6 +514,10 @@ f 0444 root sys $DATADIR/examples examples/*.drv
 
 d 0755 root sys $DATADIR/fonts -
 f 0444 root sys $DATADIR/fonts fonts/Monospace*
+
+d 0755 root sys $DATADIR/ipptest -
+f 0444 root sys $DATADIR/ipptest test/ipp-*.test
+f 0444 root sys $DATADIR/ipptest test/testfile.*
 
 d 0755 root sys $DATADIR/mime -
 f 0444 root sys $DATADIR/mime/mime.convs conf/mime.convs
@@ -530,8 +533,8 @@ d 0755 root sys $DATADIR/templates -
 f 0444 root sys $DATADIR/templates templates/*.tmpl
 
 ## Template files
-#d 0755 root sys $DATADIR/templates/de
-#f 0444 root sys $DATADIR/templates/de templates/de/*.tmpl
+d 0755 root sys $DATADIR/templates/de
+f 0444 root sys $DATADIR/templates/de templates/de/*.tmpl
 
 d 0755 root sys $DATADIR/templates/es
 f 0444 root sys $DATADIR/templates/es templates/es/*.tmpl
@@ -548,8 +551,11 @@ f 0444 root sys $DATADIR/templates/eu templates/eu/*.tmpl
 #d 0755 root sys $DATADIR/templates/he
 #f 0444 root sys $DATADIR/templates/he templates/he/*.tmpl
 
-#d 0755 root sys $DATADIR/templates/it
-#f 0444 root sys $DATADIR/templates/it templates/it/*.tmpl
+d 0755 root sys $DATADIR/templates/id
+f 0444 root sys $DATADIR/templates/id templates/id/*.tmpl
+
+d 0755 root sys $DATADIR/templates/it
+f 0444 root sys $DATADIR/templates/it templates/it/*.tmpl
 
 d 0755 root sys $DATADIR/templates/ja
 f 0444 root sys $DATADIR/templates/ja templates/ja/*.tmpl
@@ -644,8 +650,8 @@ f 0444 root sys $DOCDIR/images doc/images/*.png
 f 0444 root sys $DOCDIR/robots.txt doc/robots.txt
 
 # Localized documentation files
-#d 0755 root sys $DOCDIR/de
-#f 0444 root sys $DOCDIR/de doc/de/*.html
+d 0755 root sys $DOCDIR/de
+f 0444 root sys $DOCDIR/de doc/de/*.html
 
 d 0755 root sys $DOCDIR/es
 f 0444 root sys $DOCDIR/es doc/es/*.html
@@ -663,8 +669,11 @@ f 0444 root sys $DOCDIR/eu doc/eu/*.html
 #f 0444 root sys $DOCDIR/he doc/he/*.html
 #f 0444 root sys $DOCDIR/he/cups.css doc/he/cups.css
 
-#d 0755 root sys $DOCDIR/it
-#f 0444 root sys $DOCDIR/it doc/it/*.html
+d 0755 root sys $DOCDIR/id
+f 0444 root sys $DOCDIR/id doc/id/*.html
+
+d 0755 root sys $DOCDIR/it
+f 0444 root sys $DOCDIR/it doc/it/*.html
 
 d 0755 root sys $DOCDIR/ja
 f 0444 root sys $DOCDIR/ja doc/ja/*.html
@@ -692,6 +701,7 @@ d 0755 root sys $MANDIR/man7 -
 f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ipptest.$MAN1EXT man/ipptest.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
@@ -702,6 +712,7 @@ f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
 
 f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.$MAN5EXT
+f 0444 root sys $MANDIR/man5/ipp.test.$MAN5EXT man/ipp.test.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mailto.conf.$MAN5EXT man/mailto.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT

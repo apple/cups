@@ -103,13 +103,11 @@ diff -urN olddirectory directory >filename.patch
 in their entirety, however that may delay the adoption of your
 changes.</P>
 
-<BLOCKQUOTE>Patches and files must conform to the standards
-outlined in the "<A HREF="#CODING">Coding Guidelines</A>" and "<A
-HREF="#MAKEFILES">Makefile Guidelines</A>" sections in this
-document. In addition, since Apple Inc. provides CUPS
-under multiple licenses, we require that you assign the copyright
-for your changes and files to us for inclusion in
-CUPS.</BLOCKQUOTE>
+<BLOCKQUOTE>Patches and files must conform to the standards outlined in the
+"<A HREF="#CODING">Coding Guidelines</A>" and "<A HREF="#MAKEFILES">Makefile
+Guidelines</A>" sections in this document. In addition, since Apple Inc.
+provides CUPS under multiple licenses, we require that you assign the copyright
+for your changes and files to us for inclusion in CUPS.</BLOCKQUOTE>
 
 
 <H2 CLASS="title"><A NAME="PRACTICES">Software Development Practices</A></H2>
@@ -151,51 +149,45 @@ MAJOR.MINOR.PATCH
 2.0.0
 </PRE>
 
-<P>The first production release in a MAJOR.MINOR series
-(MAJOR.MINOR.0) is called a feature release. Feature releases are
-the only releases that may contain new features. Subsequent
-production releases in a MAJOR.MINOR series may only contain bug
-fixes.</P>
+<P>The first production release in a MAJOR.MINOR series (MAJOR.MINOR.0) is
+called a feature release. Feature releases are the only releases that may
+contain new features. Subsequent production releases in a MAJOR.MINOR series may
+only contain bug fixes.</P>
 
-<BLOCKQUOTE>We did not hold to this limitation in the CUPS 1.1
-series for a variety of reasons. Starting with CUPS 1.2, the "no
-new features in a patch release" policy will be strictly
-enforced. This should yield more frequent minor releases with
-fewer new features (and interactions!) to
-validate/test.</BLOCKQUOTE>
+<BLOCKQUOTE>We did not hold to this limitation in the CUPS 1.1 series for a
+variety of reasons. Starting with CUPS 1.2, the "no new features in a patch
+release" policy has been strictly enforced. The policy has also resulted in
+fewer new features (and interactions!) to validate/test in the subsequence
+feature releases.</BLOCKQUOTE>
 
-<P>Beta-test releases are identified by appending the letter B
-to the major and minor version numbers followed by the beta
-release number:</P>
+<P>Beta-test releases are identified by appending the letter B to the major and
+minor version numbers followed by the beta release number:</P>
 
 <PRE CLASS="command">
 MAJOR.MINORbNUMBER
 1.2b1
 </PRE>
 
-<P>Release candidates are identified by appending the letters RC
-to the major and minor version numbers followed by the release
-candidate number:</P>
+<P>Release candidates are identified by appending the letters RC to the major
+and minor version numbers followed by the release candidate number:</P>
 
 <PRE CLASS="command">
 MAJOR.MINORrcNUMBER
 1.2rc1
 </PRE>
 
-<P>Developer snapshots are identified by appending the letters
-SVN-R to the major and minor version numbers followed by the
-revision number:</P>
+<P>Developer snapshots are identified by appending the letters SVN-R to the
+major and minor version numbers followed by the revision number:</P>
 
 <PRE CLASS="command">
 MAJOR.MINORsvn-rREV
 1.2svn-r1234
 </PRE>
 
-<P>Beta-test releases, release candidates, and developer
-snapshots are only created for new minor releases. Once a
-production release has been made (MAJOR.MINOR.0), subsequent
-patch releases are issues without preliminary beta or release
-testing.</P>
+<P>Beta-test releases, release candidates, and developer snapshots are only
+created for new minor releases. Once a production release has been made
+(MAJOR.MINOR.0), subsequent patch releases are issues without preliminary beta
+or release testing.</P>
 
 <H3>Version Control (Subversion)</H3>
 
@@ -212,16 +204,9 @@ applicable STRs. The following format <em>must</em> be used for
 commit log messages:</P>
 
 <PRE CLASS="command">
-Summary of the change ("fix PostScript printing bug") along
-with corresponding STRs ("STR #1, STR #6")
+Summary of the change on one line followed by bug number (STR #NNNN)
 
-foo.cxx:
-    - function(): Detailed list of changes
-    - function2(): Detailed list of changes
-    - Summary of design changes ("added new foo struct")
-
-bar.h:
-    - More detailed changes
+Detailed list of changes.
 </PRE>
 
 <P>Primary development occurs on the <var>trunk</var> branch,
@@ -625,7 +610,7 @@ the Subversion "&#36;Id$" tag:</P>
  *
  *   Description of file contents.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -703,12 +688,14 @@ special text in the function description comment:</P>
 
 <UL>
 
-	<LI><CODE>@since CUPS <I>version</I>@</CODE> - Marks the
-	function as new in the specified version of CUPS.</LI>
-
 	<LI><CODE>@deprecated@</CODE> - Marks the function as
 	deprecated (not recommended for new development and
 	scheduled for removal)</LI>
+
+	<LI><CODE>@since CUPS <I>version</I>@</CODE> - Marks the
+	function as new in the specified version of CUPS.</LI>
+
+	<LI><CODE>@private@</CODE> - Marks the function as private.</LI>
 
 </UL>
 

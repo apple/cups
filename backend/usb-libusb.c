@@ -31,6 +31,7 @@
 
 #include <usb.h>
 #include <poll.h>
+#include <cups/globals.h>
 
 
 /*
@@ -514,7 +515,7 @@ make_device_uri(
   * Get the make, model, and serial numbers...
   */
 
-  num_values = _ppdGet1284Values(device_id, &values);
+  num_values = _cupsGet1284Values(device_id, &values);
 
   if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
     if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)

@@ -1,37 +1,5 @@
 # DO NOT DELETE
 
-hpgl-attr.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-attr.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-attr.o: ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-attr.o: ../cups/string.h ../config.h
-hpgl-config.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-config.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-config.o: ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-config.o: ../cups/language.h ../cups/string.h ../config.h
-hpgl-main.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-main.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-main.o: ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-main.o: ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-prolog.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-prolog.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-prolog.o: ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-prolog.o: ../cups/language.h ../cups/string.h ../config.h
-hpgl-char.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-char.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-char.o: ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-char.o: ../cups/string.h ../config.h
-hpgl-input.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-input.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-input.o: ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-input.o: ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-polygon.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-polygon.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-polygon.o: ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-polygon.o: ../cups/language.h ../cups/string.h ../config.h
-hpgl-vector.o: hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-vector.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-vector.o: ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-vector.o: ../cups/language.h ../cups/string.h ../config.h
 image-bmp.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
 image-bmp.o: ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 image-bmp.o: ../cups/array.h ../cups/file.h ../cups/language.h
@@ -99,17 +67,6 @@ raster.o: image-private.h image.h ../cups/raster.h ../cups/cups.h
 raster.o: ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 raster.o: ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.o: ../cups/string.h ../config.h
-form-main.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-main.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-main.o: ../cups/file.h ../cups/language.h ../cups/language.h
-form-main.o: ../cups/string.h ../config.h
-form-ps.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-ps.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-form-ps.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
-form-tree.o: form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-tree.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-tree.o: ../cups/file.h ../cups/language.h ../cups/language.h
-form-tree.o: ../cups/string.h ../config.h
 bannertops.o: pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 bannertops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 bannertops.o: ../cups/file.h ../cups/language.h ../cups/language.h
@@ -120,8 +77,7 @@ commandtops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 commandtops.o: ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
 commandtops.o: ../cups/sidechannel.h
 gziptoany.o: ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
-gziptoany.o: ../cups/i18n.h ../cups/transcode.h ../cups/language.h
-gziptoany.o: ../cups/array.h
+gziptoany.o: ../cups/i18n.h ../cups/transcode.h
 imagetops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 imagetops.o: ../cups/file.h ../cups/language.h ../cups/language.h
@@ -147,9 +103,9 @@ pstops.o: common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.o: ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.o: ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
-rasterbench.o: ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-rasterbench.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-rasterbench.o: ../cups/file.h ../cups/language.h
+rasterbench.o: ../config.h ../cups/raster.h ../cups/cups.h ../cups/ipp.h
+rasterbench.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+rasterbench.o: ../cups/array.h ../cups/file.h ../cups/language.h
 rastertoepson.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.o: ../cups/file.h ../cups/language.h ../cups/ppd.h
@@ -182,38 +138,6 @@ texttops.o: ../cups/language.h ../cups/language.h ../cups/string.h
 texttops.o: ../config.h ../cups/i18n.h ../cups/transcode.h
 # DO NOT DELETE
 
-hpgl-attr.32.o: hpgl-attr.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-attr.32.o: hpgl-attr.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-attr.32.o: hpgl-attr.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-attr.32.o: hpgl-attr.c  ../cups/string.h ../config.h
-hpgl-config.32.o: hpgl-config.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-config.32.o: hpgl-config.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-config.32.o: hpgl-config.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-config.32.o: hpgl-config.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-main.32.o: hpgl-main.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-main.32.o: hpgl-main.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-main.32.o: hpgl-main.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-main.32.o: hpgl-main.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-prolog.32.o: hpgl-prolog.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-prolog.32.o: hpgl-prolog.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-prolog.32.o: hpgl-prolog.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-prolog.32.o: hpgl-prolog.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-char.32.o: hpgl-char.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-char.32.o: hpgl-char.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-char.32.o: hpgl-char.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-char.32.o: hpgl-char.c  ../cups/string.h ../config.h
-hpgl-input.32.o: hpgl-input.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-input.32.o: hpgl-input.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-input.32.o: hpgl-input.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-input.32.o: hpgl-input.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-polygon.32.o: hpgl-polygon.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-polygon.32.o: hpgl-polygon.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-polygon.32.o: hpgl-polygon.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-polygon.32.o: hpgl-polygon.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-vector.32.o: hpgl-vector.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-vector.32.o: hpgl-vector.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-vector.32.o: hpgl-vector.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-vector.32.o: hpgl-vector.c  ../cups/language.h ../cups/string.h ../config.h
 image-bmp.32.o: image-bmp.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
 image-bmp.32.o: image-bmp.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 image-bmp.32.o: image-bmp.c  ../cups/array.h ../cups/file.h ../cups/language.h
@@ -281,17 +205,6 @@ raster.32.o: raster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
 raster.32.o: raster.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 raster.32.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.32.o: raster.c  ../cups/string.h ../config.h
-form-main.32.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-main.32.o: form-main.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-main.32.o: form-main.c  ../cups/file.h ../cups/language.h ../cups/language.h
-form-main.32.o: form-main.c  ../cups/string.h ../config.h
-form-ps.32.o: form-ps.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-ps.32.o: form-ps.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-form-ps.32.o: form-ps.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
-form-tree.32.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-tree.32.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-tree.32.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
-form-tree.32.o: form-tree.c  ../cups/string.h ../config.h
 bannertops.32.o: bannertops.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 bannertops.32.o: bannertops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 bannertops.32.o: bannertops.c  ../cups/file.h ../cups/language.h ../cups/language.h
@@ -302,8 +215,7 @@ commandtops.32.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/arra
 commandtops.32.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
 commandtops.32.o: commandtops.c  ../cups/sidechannel.h
 gziptoany.32.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
-gziptoany.32.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h ../cups/language.h
-gziptoany.32.o: gziptoany.c  ../cups/array.h
+gziptoany.32.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h
 imagetops.32.o: imagetops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetops.32.o: imagetops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 imagetops.32.o: imagetops.c  ../cups/file.h ../cups/language.h ../cups/language.h
@@ -329,9 +241,9 @@ pstops.32.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.32.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.32.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.32.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
-rasterbench.32.o: rasterbench.c  ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-rasterbench.32.o: rasterbench.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-rasterbench.32.o: rasterbench.c  ../cups/file.h ../cups/language.h
+rasterbench.32.o: rasterbench.c  ../config.h ../cups/raster.h ../cups/cups.h ../cups/ipp.h
+rasterbench.32.o: rasterbench.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+rasterbench.32.o: rasterbench.c  ../cups/array.h ../cups/file.h ../cups/language.h
 rastertoepson.32.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.32.o: rastertoepson.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.32.o: rastertoepson.c  ../cups/file.h ../cups/language.h ../cups/ppd.h
@@ -364,38 +276,6 @@ texttops.32.o: texttops.c  ../cups/language.h ../cups/language.h ../cups/string.
 texttops.32.o: texttops.c  ../config.h ../cups/i18n.h ../cups/transcode.h
 # DO NOT DELETE
 
-hpgl-attr.64.o: hpgl-attr.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-attr.64.o: hpgl-attr.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-attr.64.o: hpgl-attr.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-attr.64.o: hpgl-attr.c  ../cups/string.h ../config.h
-hpgl-config.64.o: hpgl-config.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-config.64.o: hpgl-config.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-config.64.o: hpgl-config.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-config.64.o: hpgl-config.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-main.64.o: hpgl-main.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-main.64.o: hpgl-main.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-main.64.o: hpgl-main.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-main.64.o: hpgl-main.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-prolog.64.o: hpgl-prolog.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-prolog.64.o: hpgl-prolog.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-prolog.64.o: hpgl-prolog.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-prolog.64.o: hpgl-prolog.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-char.64.o: hpgl-char.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-char.64.o: hpgl-char.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-char.64.o: hpgl-char.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-char.64.o: hpgl-char.c  ../cups/string.h ../config.h
-hpgl-input.64.o: hpgl-input.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-hpgl-input.64.o: hpgl-input.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-hpgl-input.64.o: hpgl-input.c  ../cups/file.h ../cups/language.h ../cups/language.h
-hpgl-input.64.o: hpgl-input.c  ../cups/string.h ../config.h ../cups/i18n.h ../cups/transcode.h
-hpgl-polygon.64.o: hpgl-polygon.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-polygon.64.o: hpgl-polygon.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-polygon.64.o: hpgl-polygon.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-polygon.64.o: hpgl-polygon.c  ../cups/language.h ../cups/string.h ../config.h
-hpgl-vector.64.o: hpgl-vector.c  hpgltops.h common.h ../cups/cups.h ../cups/ipp.h
-hpgl-vector.64.o: hpgl-vector.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-hpgl-vector.64.o: hpgl-vector.c  ../cups/array.h ../cups/file.h ../cups/language.h
-hpgl-vector.64.o: hpgl-vector.c  ../cups/language.h ../cups/string.h ../config.h
 image-bmp.64.o: image-bmp.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
 image-bmp.64.o: image-bmp.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 image-bmp.64.o: image-bmp.c  ../cups/array.h ../cups/file.h ../cups/language.h
@@ -463,17 +343,6 @@ raster.64.o: raster.c  image-private.h image.h ../cups/raster.h ../cups/cups.h
 raster.64.o: raster.c  ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 raster.64.o: raster.c  ../cups/array.h ../cups/file.h ../cups/language.h ../cups/debug.h
 raster.64.o: raster.c  ../cups/string.h ../config.h
-form-main.64.o: form-main.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-main.64.o: form-main.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-main.64.o: form-main.c  ../cups/file.h ../cups/language.h ../cups/language.h
-form-main.64.o: form-main.c  ../cups/string.h ../config.h
-form-ps.64.o: form-ps.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-ps.64.o: form-ps.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-form-ps.64.o: form-ps.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
-form-tree.64.o: form-tree.c  form.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-form-tree.64.o: form-tree.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-form-tree.64.o: form-tree.c  ../cups/file.h ../cups/language.h ../cups/language.h
-form-tree.64.o: form-tree.c  ../cups/string.h ../config.h
 bannertops.64.o: bannertops.c  pstext.h common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 bannertops.64.o: bannertops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 bannertops.64.o: bannertops.c  ../cups/file.h ../cups/language.h ../cups/language.h
@@ -484,8 +353,7 @@ commandtops.64.o: commandtops.c  ../cups/versioning.h ../cups/ppd.h ../cups/arra
 commandtops.64.o: commandtops.c  ../cups/file.h ../cups/language.h ../cups/string.h ../config.h
 commandtops.64.o: commandtops.c  ../cups/sidechannel.h
 gziptoany.64.o: gziptoany.c  ../cups/file.h ../cups/versioning.h ../cups/string.h ../config.h
-gziptoany.64.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h ../cups/language.h
-gziptoany.64.o: gziptoany.c  ../cups/array.h
+gziptoany.64.o: gziptoany.c  ../cups/i18n.h ../cups/transcode.h
 imagetops.64.o: imagetops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 imagetops.64.o: imagetops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 imagetops.64.o: imagetops.c  ../cups/file.h ../cups/language.h ../cups/language.h
@@ -511,9 +379,9 @@ pstops.64.o: pstops.c  common.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
 pstops.64.o: pstops.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
 pstops.64.o: pstops.c  ../cups/language.h ../cups/language.h ../cups/string.h ../config.h
 pstops.64.o: pstops.c  ../cups/file.h ../cups/array.h ../cups/i18n.h ../cups/transcode.h
-rasterbench.64.o: rasterbench.c  ../cups/raster.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-rasterbench.64.o: rasterbench.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
-rasterbench.64.o: rasterbench.c  ../cups/file.h ../cups/language.h
+rasterbench.64.o: rasterbench.c  ../config.h ../cups/raster.h ../cups/cups.h ../cups/ipp.h
+rasterbench.64.o: rasterbench.c  ../cups/http.h ../cups/versioning.h ../cups/ppd.h
+rasterbench.64.o: rasterbench.c  ../cups/array.h ../cups/file.h ../cups/language.h
 rastertoepson.64.o: rastertoepson.c  ../cups/cups.h ../cups/ipp.h ../cups/http.h
 rastertoepson.64.o: rastertoepson.c  ../cups/versioning.h ../cups/ppd.h ../cups/array.h
 rastertoepson.64.o: rastertoepson.c  ../cups/file.h ../cups/language.h ../cups/ppd.h

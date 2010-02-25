@@ -1,13 +1,26 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.4
+
+	- The scheduler did not update the classes.conf file when deleting a
+	  printer belonging to a class (STR #3505)
+	- The lppasswd command did not use localized password prompts
+	  (STR #3492)
+	- The socket backend no longer waits for back-channel data on platforms
+	  other than Mac OS X (STR #3495)
+	- The scheduler didn't send events when a printer started accepting or
+	  rejecting jobs (STR #3480)
+	- The web interface now includes additional CSRF protection (STR #3498)
+
+
 CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
 	- Localization updates (STR #3352, STR #3409, STR #3422, STR #3452,
-	  STR #3473)
-	- Documentation update (STR #3451)
+	  STR #3473, STR #3502)
+	- Documentation updates (STR #3451, STR #3504)
 	- The IPP backend now sets the printer-state-message to "Ready to
 	  print." at the end of a successful job (STR #3460)
 	- The PPD compiler did not correctly add the manufacturer to the output

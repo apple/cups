@@ -3,7 +3,7 @@
  *
  *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -1131,8 +1131,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	  *ptr = '\0';
       }
       else
-        snprintf(locale, sizeof(locale), "%s.%s",
-	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE], DefaultCharset);
+        snprintf(locale, sizeof(locale), "%s.UTF-8",
+	         con->http.fields[HTTP_FIELD_ACCEPT_LANGUAGE]);
 
       con->language = cupsLangGet(locale);
     }
@@ -2191,6 +2191,15 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		cupsdCloseClient(con);
 		return;
 	      }
+	    }
+	    else if (filestats.st_size == 0)
+	    {
+	     /*
+	      * Don't allow empty file...
+	      */
+
+	      unlink(con->filename);
+	      cupsdClearString(&con->filename);
 	    }
 
 	    if (con->command)

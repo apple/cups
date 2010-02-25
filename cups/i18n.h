@@ -82,19 +82,19 @@ typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
  * Prototypes...
  */
 
-#ifdef __APPLE__
+#  ifdef __APPLE__
 extern const char	*_cupsAppleLanguage(const char *locale, char *language,
 			                    size_t langsize);
-#endif /* __APPLE__ */
+#  endif /* __APPLE__ */
 extern void		_cupsCharmapFlush(void);
 extern void		_cupsCharmapFree(const cups_encoding_t encoding);
 extern void		*_cupsCharmapGet(const cups_encoding_t encoding);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
 extern void		_cupsLangPrintError(const char *message);
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)
-#    ifdef __GNUC__
+#  ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
-#    endif /* __GNUC__ */
+#  endif /* __GNUC__ */
 ;
 extern int		_cupsLangPuts(FILE *fp, const char *message);
 extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);

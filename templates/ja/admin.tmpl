@@ -4,16 +4,16 @@
 <H2 CLASS="title">プリンター</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="プリンターの追加"></FORM>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="新しいプリンターの検索"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-printer"><INPUT TYPE="SUBMIT" VALUE="プリンターの追加"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="find-new-printers"><INPUT TYPE="SUBMIT" VALUE="新しいプリンターの検索"></FORM>
 <FORM ACTION="/printers/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="プリンターの管理"></FORM>
-{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="プリンターを Samba にエクスポート"></FORM>:}
+{have_samba?<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="export-samba"><INPUT TYPE="SUBMIT" VALUE="プリンターを Samba にエクスポート"></FORM>:}
 </P>
 
 <H2 CLASS="title">クラス</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="クラスの追加"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-class"><INPUT TYPE="SUBMIT" VALUE="クラスの追加"></FORM>
 <FORM ACTION="/classes/" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="クラスの管理"></FORM>
 </P>
 
@@ -28,7 +28,7 @@
 <H2 CLASS="title">サーバー</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="設定ファイルの編集"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="config-server"><INPUT TYPE="SUBMIT" VALUE="設定ファイルの編集"></FORM>
 <FORM ACTION="/admin/log/access_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="アクセスログの表示"></FORM>
 <FORM ACTION="/admin/log/error_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="エラーログの表示"></FORM>
 <FORM ACTION="/admin/log/page_log" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="ページログの表示"></FORM>
@@ -38,6 +38,7 @@
 <BLOCKQUOTE>{SETTINGS_ERROR}</BLOCKQUOTE>:
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 
 {ADVANCEDSETTINGS?<P><B>サーバー設定\:</B></P>
 
@@ -95,7 +96,7 @@
 <H2 CLASS="title">RSS 購読</H2>
 
 <P>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="RSS 購読の追加"></FORM>
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="add-rss-subscription"><INPUT TYPE="SUBMIT" VALUE="RSS 購読の追加"></FORM>
 </P>
 
 </DIV>
@@ -104,6 +105,6 @@
 <THEAD><TR><TH>名前</TH><TH>イベント</TH><TH>キュー名</TH></TR></THEAD>
 <TBODY>{[notify_subscription_id]
 <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="RSS 購読のキャンセル"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:すべてのキュー}</TD></TR>}
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="RSS 購読のキャンセル"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:すべてのキュー}</TD></TR>}
 </TBODY>
 </TABLE>:}

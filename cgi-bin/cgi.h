@@ -1,9 +1,9 @@
 /*
  * "$Id: cgi.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   CGI support library definitions.
+ *   CGI support library definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,11 +69,12 @@ extern void		cgiCopyTemplateLang(const char *tmpl);
 extern int		cgiDoSearch(void *search, const char *text);
 extern void		cgiEndHTML(void);
 extern void		cgiEndMultipart(void);
-extern char		*cgiFormEncode(char *dst, const char *src, size_t dstsize);
+extern char		*cgiFormEncode(char *dst, const char *src,
+			               size_t dstsize);
 extern void		cgiFreeSearch(void *search);
 extern const char	*cgiGetArray(const char *name, int element);
 extern void		cgiGetAttributes(ipp_t *request, const char *tmpl);
-extern char		*cgiGetCookie(const char *name, char *buf, int buflen);
+extern const char	*cgiGetCookie(const char *name);
 extern const cgi_file_t	*cgiGetFile(void);
 extern cups_array_t	*cgiGetIPPObjects(ipp_t *response, void *search);
 extern int		cgiGetSize(const char *name);

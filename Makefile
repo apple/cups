@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7961 2008-09-17 19:52:46Z mike $"
 #
-#   Top-level Makefile for the Common UNIX Printing System (CUPS).
+#   Top-level Makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -142,10 +142,12 @@ depend:
 # (at least checker-231 is required for scan-build to work this way)
 #
 
-.PHONY: clang
+.PHONY: clang clang-changes
 clang:
 	$(RM) -r clang
 	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) clean all
+clang-changes:
+	scan-build -V -k -o `pwd`/clang $(MAKE) $(MFLAGS) all
 
 
 #
@@ -282,7 +284,7 @@ docset:	apihelp
 
 
 #
-# Make software distributions using EPM (http://www.easysw.com/epm/)...
+# Make software distributions using EPM (http://www.epmhome.org/)...
 #
 
 EPMFLAGS	=	-v --output-dir dist $(EPMARCH)

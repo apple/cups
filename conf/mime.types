@@ -7,7 +7,7 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.types" file that
 #   reflects your local configuration changes.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -79,14 +79,6 @@ application/postscript		ai eps ps string(0,%!) string(0,<04>%!) \
 				 contains(0,4096,"LANGUAGE = POSTSCRIPT") \
 				 (contains(0,4096,<0a>%!) + \
 				  !contains(0,4096,"ENTER LANGUAGE")))
-application/vnd.hp-HPGL		hpgl \
-				string(0,<1B>E<1B>%0B) \
-				string(0,<1B>%-1B) string(0,<201B>)\
-				string(0,BP;) string(0,IN;) string(0,DF;) \
-				string(0,BPINPS;) \
-				(contains(0,128,<1B>%-12345X) + \
-				 (contains(0,4096,"LANGUAGE=HPGL") \
-				  contains(0,4096,"LANGUAGE = HPGL")))
 
 ########################################################################
 #

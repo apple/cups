@@ -63,8 +63,8 @@
  * Version of software...
  */
 
-#define CUPS_SVERSION "CUPS v1.4.0"
-#define CUPS_MINIMAL "CUPS/1.4.0"
+#define CUPS_SVERSION "CUPS v1.5svn"
+#define CUPS_MINIMAL "CUPS/1.5svn"
 
 
 /*
@@ -205,6 +205,13 @@
  */
 
 /* #undef HAVE_CRYPT_H */
+
+
+/*
+ * Do we have <scsi/sg.h>?
+ */
+
+/* #undef HAVE_SCSI_SG_H */
 
 
 /*
@@ -574,7 +581,7 @@
  * Default GSS service name...
  */
 
-#define CUPS_DEFAULT_GSSSERVICENAME "ipp"
+#define CUPS_DEFAULT_GSSSERVICENAME "host"
 
 
 /*
@@ -625,9 +632,23 @@
  * Which random number generator function to use...
  */
 
+/* #undef HAVE_ARC4RANDOM */
 /* #undef HAVE_RANDOM */
-/* #undef HAVE_MRAND48 */
 /* #undef HAVE_LRAND48 */
+
+#ifdef HAVE_ARC4RANDOM
+#  define CUPS_RAND() arc4random()
+#  define CUPS_SRAND(v) arc4random_stir()
+#elif defined(HAVE_RANDOM)
+#  define CUPS_RAND() random()
+#  define CUPS_SRAND(v) srandom(v)
+#elif defined(HAVE_LRAND48)
+#  define CUPS_RAND() lrand48()
+#  define CUPS_SRAND(v) srand48(v)
+#else
+#  define CUPS_RAND() rand()
+#  define CUPS_SRAND(v) srand(v)
+#endif /* HAVE_ARC4RANDOM */
 
 
 /*

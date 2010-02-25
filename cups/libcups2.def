@@ -1,5 +1,5 @@
 LIBRARY libcups2
-VERSION 2.7
+VERSION 2.8
 EXPORTS
 _cupsAdminGetServerSettings
 _cupsAdminSetServerSettings
@@ -67,6 +67,7 @@ cupsDirRead
 cupsDirRewind
 cupsDoAuthentication
 cupsDoFileRequest
+cupsDoIORequest
 cupsDoRequest
 cupsEncodeOptions
 cupsEncodeOptions2
@@ -115,6 +116,7 @@ cupsGetPPD
 cupsGetPPD2
 cupsGetPassword
 cupsGetPrinters
+cupsGetResponse
 cupsLangDefault
 cupsLangEncoding
 cupsLangFlush
@@ -134,6 +136,7 @@ cupsPutFd
 cupsPutFile
 cupsRemoveOption
 cupsResolveConflicts
+cupsSendRequest
 cupsServer
 cupsSetDests
 cupsSetDests2
@@ -148,6 +151,7 @@ cupsUTF32ToUTF8
 cupsUTF8ToCharset
 cupsUTF8ToUTF32
 cupsUser
+cupsWriteRequestData
 httpAddrAny
 httpAddrConnect
 httpAddrEqual
@@ -248,6 +252,8 @@ ippRead
 ippReadFile
 ippReadIO
 ippSetPort
+ippTagString
+ippTagValue
 ippTimeToDate
 ippWrite
 ippWriteFile

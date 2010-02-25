@@ -559,8 +559,9 @@ httpError(http_t *http)			/* I - Connection to server */
 void
 httpFlush(http_t *http)			/* I - Connection to server */
 {
-  char	buffer[8192];			/* Junk buffer */
-  int	blocking;			/* To block or not to block */
+  char		buffer[8192];		/* Junk buffer */
+  int		blocking;		/* To block or not to block */
+  http_state_t	oldstate;		/* Old state */
 
 
   DEBUG_printf(("httpFlush(http=%p), state=%s", http,
@@ -577,6 +578,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
   * Read any data we can...
   */
 
+  oldstate = http->state;
   while (httpRead2(http, buffer, sizeof(buffer)) > 0);
 
  /*
@@ -586,7 +588,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
   http->blocking = blocking;
 
-  if (http->state != HTTP_WAITING && http->fd >= 0)
+  if (http->state == oldstate && http->fd >= 0)
   {
    /*
     * Didn't get the data back, so close the current connection.
@@ -625,7 +627,11 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("httpFlushWrite(http=%p)", http));
 
   if (!http || !http->wused)
+  {
+    DEBUG_puts(http ? "1httpFlushWrite: Write buffer is empty." :
+                      "1httpFlushWrite: No connection.");
     return (0);
+  }
 
   if (http->data_encoding == HTTP_ENCODE_CHUNKED)
     bytes = http_write_chunk(http, http->wbuffer, http->wused);
@@ -633,6 +639,8 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
     bytes = http_write(http, http->wbuffer, http->wused);
 
   http->wused = 0;
+
+  DEBUG_printf(("1httpFlushWrite: Returning %d.", bytes));
 
   return (bytes);
 }
@@ -2167,7 +2175,10 @@ _httpWait(http_t *http,			/* I - Connection to server */
   DEBUG_printf(("4_httpWait(http=%p, msec=%d, usessl=%d)", http, msec, usessl));
 
   if (http->fd < 0)
+  {
+    DEBUG_printf(("5_httpWait: Returning 0 since fd=%d", http->fd));
     return (0);
+  }
 
  /*
   * Check the SSL/TLS buffers for data first...
@@ -2178,16 +2189,27 @@ _httpWait(http_t *http,			/* I - Connection to server */
   {
 #  ifdef HAVE_LIBSSL
     if (SSL_pending((SSL *)(http->tls)))
+    {
+      DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
       return (1);
+    }
+
 #  elif defined(HAVE_GNUTLS)
     if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
+    {
+      DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
       return (1);
+    }
+
 #  elif defined(HAVE_CDSASSL)
     size_t bytes;			/* Bytes that are available */
 
     if (!SSLGetBufferedReadSize(((http_tls_t *)(http->tls))->session, &bytes) &&
         bytes > 0)
+    {
+      DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
       return (1);
+    }
 #  endif /* HAVE_LIBSSL */
   }
 #endif /* HAVE_SSL */
@@ -2230,7 +2252,8 @@ _httpWait(http_t *http,			/* I - Connection to server */
 #  endif /* WIN32 */
 #endif /* HAVE_POLL */
 
-  DEBUG_printf(("5_httpWait: returning with nfds=%d...", nfds));
+  DEBUG_printf(("5_httpWait: returning with nfds=%d, errno=%d...", nfds,
+                errno));
 
   return (nfds > 0);
 }
@@ -3258,6 +3281,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 	bytes;				/* Bytes sent */
 
 
+  DEBUG_printf(("2http_write(http=%p, buffer=%p, length=%d)", http, buffer,
+                length));
   http->error = 0;
   tbytes      = 0;
 
@@ -3288,7 +3313,8 @@ http_write(http_t     *http,		/* I - Connection to server */
       }
 #endif /* WIN32 */
 
-      DEBUG_puts("8http_write: error writing data...");
+      DEBUG_printf(("3http_write: error writing data (%s).",
+                    strerror(http->error)));
 
       return (-1);
     }
@@ -3301,6 +3327,8 @@ http_write(http_t     *http,		/* I - Connection to server */
 #ifdef DEBUG
   http_debug_hex("http_write", buffer - tbytes, tbytes);
 #endif /* DEBUG */
+
+  DEBUG_printf(("3http_write: Returning %d.", tbytes));
 
   return (tbytes);
 }
@@ -3359,12 +3387,15 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 	       const char *buf,		/* I - Buffer holding data */
 	       int        len)		/* I - Length of buffer */
 {
-#  if defined(HAVE_LIBSSL)
-  return (SSL_write((SSL *)(http->tls), buf, len));
-
-#  elif defined(HAVE_GNUTLS)
   ssize_t	result;			/* Return value */
 
+
+  DEBUG_printf(("2http_write_ssl(http=%p, buf=%p, len=%d)", http, buf, len));
+
+#  if defined(HAVE_LIBSSL)
+  result = SSL_write((SSL *)(http->tls), buf, len);
+
+#  elif defined(HAVE_GNUTLS)
   result = gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len);
 
   if (result < 0 && !errno)
@@ -3391,10 +3422,7 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
     result = -1;
   }
 
-  return ((int)result);
-
 #  elif defined(HAVE_CDSASSL)
-  int		result;			/* Return value */
   OSStatus	error;			/* Error info */
   size_t	processed;		/* Number of bytes processed */
 
@@ -3423,9 +3451,11 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 	result = -1;
 	break;
   }
-
-  return (result);
 #  endif /* HAVE_LIBSSL */
+
+  DEBUG_printf(("3http_write_ssl: Returning %d.", (int)result));
+
+  return ((int)result);
 }
 #endif /* HAVE_SSL */
 

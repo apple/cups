@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-launchd.m4 6649 2007-07-11 21:46:42Z mike $"
 dnl
-dnl   launchd stuff for the Common UNIX Printing System (CUPS).
+dnl   launchd stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2010 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -35,7 +35,6 @@ if test x$enable_launchd != xno; then
 	esac
 fi
 
-AC_DEFINE_UNQUOTED(CUPS_DEFAULT_LAUNCHD_CONF, "$DEFAULT_LAUNCHD_CONF")
 AC_SUBST(DEFAULT_LAUNCHD_CONF)
 AC_SUBST(LAUNCHDLIBS)
 

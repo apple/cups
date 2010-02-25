@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
-#   API library Makefile for the Common UNIX Printing System (CUPS).
+#   API library Makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -113,10 +113,10 @@ HEADERS	=	\
 #
 
 LIBTARGETS =	\
+		$(LIBCUPSSTATIC) \
 		$(LIBCUPS) \
 		$(LIB32CUPS) \
-		$(LIB64CUPS) \
-		libcups.a
+		$(LIB64CUPS)
 
 UNITTARGETS =	\
 		testadmin \
@@ -140,7 +140,7 @@ TARGETS	=	\
 # Make all targets...
 #
 
-all:	$(TARGETS)
+all:		$(TARGETS)
 
 
 #
@@ -237,9 +237,9 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 
 installstatic:
 	$(INSTALL_DIR) -m 755 $(LIBDIR)
-	$(INSTALL_LIB) -m 755 libcups.a $(LIBDIR)
-	$(RANLIB) $(LIBDIR)/libcups.a
-	$(CHMOD) 555 $(LIBDIR)/libcups.a
+	$(INSTALL_LIB) -m 755 $(LIBCUPSSTATIC) $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/$(LIBCUPSSTATIC)
+	$(CHMOD) 555 $(LIBDIR)/$(LIBCUPSSTATIC)
 
 install32bit:
 	echo Installing libraries in $(LIB32DIR)...
@@ -326,17 +326,21 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 # libcups.2.dylib
 #
 
-libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER) libcups.exp
+libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
+	echo Creating export list for $@...
+	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
+		grep -v -e '^(_cupsConnect|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
+		sort >t.exp
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
 		-current_version 2.8.0 \
 		-compatibility_version 2.0.0 \
-		-exported_symbols_list libcups.exp \
+		-exported_symbols_list t.exp \
 		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
-	$(RM) libcups.dylib
+	$(RM) libcups.dylib t.exp
 	$(LN) $@ libcups.dylib
 
 
@@ -376,36 +380,12 @@ libcups.a:	$(LIBOBJS)
 
 
 #
-# CUPS language bindings for various scripting languages...
-#
-# NOTE: Not currently used or functional - see the scripting/php directory
-#       for the hand-written bindings...
-#
-
-phpcups.so:	$(LIBCUPS) php_cups_wrap.o
-	echo Linking $@...
-	if test `uname` = Darwin; then \
-		DSOFLAGS="-bundle -flat_namespace -undefined suppress"; \
-	else \
-		DSOFLAGS="$(DSOFLAGS)"; \
-	fi; \
-	$(DSO) $$DSOFLAGS -o $@ php_cups_wrap.o $(LIBS) `php-config --ldflags --libs`
-
-php_cups_wrap.o:	php_cups_wrap.c
-	echo Compiling $<...
-	$(CC) $(CFLAGS) `php-config --includes` -c $<
-php_cups_wrap.c:	cups.h
-	echo Creating $< using SWIG...
-	swig -php -o $@ -module cups cups.h
-
-
-#
 # testadmin (dependency on static CUPS library is intentional)
 #
 
-testadmin:	testadmin.o libcups.a
+testadmin:	testadmin.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testadmin.o libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testadmin.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -413,9 +393,9 @@ testadmin:	testadmin.o libcups.a
 # testarray (dependency on static CUPS library is intentional)
 #
 
-testarray:	testarray.o libcups.a
+testarray:	testarray.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testarray.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testarray.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running array API tests...
 	./testarray
@@ -425,9 +405,9 @@ testarray:	testarray.o libcups.a
 # testconflicts (dependency on static CUPS library is intentional)
 #
 
-testconflicts:	testconflicts.o libcups.a
+testconflicts:	testconflicts.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testconflicts.o libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testconflicts.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -435,9 +415,9 @@ testconflicts:	testconflicts.o libcups.a
 # testcups (dependency on static CUPS library is intentional)
 #
 
-testcups:	testcups.o libcups.a
+testcups:	testcups.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testcups.o libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testcups.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -445,9 +425,9 @@ testcups:	testcups.o libcups.a
 # testfile (dependency on static CUPS library is intentional)
 #
 
-testfile:	testfile.o libcups.a
+testfile:	testfile.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testfile.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testfile.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running file API tests...
 	./testfile
@@ -457,9 +437,9 @@ testfile:	testfile.o libcups.a
 # testhttp (dependency on static CUPS library is intentional)
 #
 
-testhttp:	testhttp.o libcups.a
+testhttp:	testhttp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhttp.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhttp.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running HTTP API tests...
 	./testhttp
@@ -469,9 +449,9 @@ testhttp:	testhttp.o libcups.a
 # testipp (dependency on static CUPS library is intentional)
 #
 
-testipp:	testipp.o libcups.a
+testipp:	testipp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testipp.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testipp.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running IPP API tests...
 	./testipp
@@ -481,9 +461,9 @@ testipp:	testipp.o libcups.a
 # testi18n (dependency on static CUPS library is intentional)
 #
 
-testi18n:	testi18n.o libcups.a
+testi18n:	testi18n.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testi18n.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running internationalization API tests...
 	./testi18n
@@ -493,9 +473,9 @@ testi18n:	testi18n.o libcups.a
 # testlang (dependency on static CUPS library is intentional)
 #
 
-testlang:	testlang.o libcups.a
+testlang:	testlang.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testlang.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testlang.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running language API tests...
 	./testlang
@@ -505,9 +485,9 @@ testlang:	testlang.o libcups.a
 # testoptions (dependency on static CUPS library is intentional)
 #
 
-testoptions:	testoptions.o libcups.a
+testoptions:	testoptions.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testoptions.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testoptions.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running option API tests...
 	./testoptions
@@ -517,9 +497,9 @@ testoptions:	testoptions.o libcups.a
 # testppd (dependency on static CUPS library is intentional)
 #
 
-testppd:	testppd.o libcups.a test.ppd test2.ppd
+testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 	echo Linking $@...
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o libcups.a \
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testppd.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running PPD API tests...
 	./testppd
@@ -529,9 +509,9 @@ testppd:	testppd.o libcups.a test.ppd test2.ppd
 # testsnmp (dependency on static CUPS library is intentional)
 #
 
-testsnmp:	testsnmp.o libcups.a
+testsnmp:	testsnmp.o $(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testsnmp.o libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testsnmp.o $(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

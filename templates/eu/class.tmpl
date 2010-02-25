@@ -5,6 +5,7 @@
 {default_name={printer_name}?, zerbitzariaren lehenetsiak:} partekatuta {server_is_sharing_printers=0?ez:{printer_is_shared=0?ez:}} daude)</H2>
 
 <FORM METHOD="POST" ACTION="{printer_uri_supported}" NAME="maintenance">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <SELECT NAME="OP" ONCHANGE="document.maintenance.submit();">
 <OPTION VALUE="">Mantenimendua</OPTION>
 <OPTION VALUE="print-test-page">Inprimatu probako orrialdea</OPTION>
@@ -17,6 +18,7 @@
 </FORM>
 
 <FORM METHOD="POST" ACTION="{admin_uri}" NAME="administration">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">
 <SELECT NAME="OP" ONCHANGE="document.administration.submit();">
 <OPTION VALUE="">Administrazioa</OPTION>

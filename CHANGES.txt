@@ -1,8 +1,10 @@
-CHANGES.txt - 2009-11-19
+CHANGES.txt - 2010-02-12
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The ipptest tool is now a first-class user program and has several
+	  improvements along with new documentation (STR #3484)
 	- The cupstestppd tool now warns about non-unique filenames and
 	  provides a way to ignore all filename warnings.
 	- Dropped support for the recoverable: and recovered: message prefixes.
@@ -10,3 +12,5 @@ CHANGES IN CUPS V1.5b1
 	  permissions disabled.
 	- The PPD compiler now checks for overlapping filenames when writing
 	  PPD files.
+	- The HP-GL/2 filter is no longer included with CUPS (STR #3322)
+	- The SCSI backend is no longer included with CUPS (STR #3500)

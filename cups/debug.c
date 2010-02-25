@@ -68,7 +68,7 @@ static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
  * 'debug_vsnprintf()' - Format a string into a fixed size buffer.
  */
 
-int					/* O - Number of bytes formatted */
+static int				/* O - Number of bytes formatted */
 debug_vsnprintf(char       *buffer,	/* O - Output buffer */
                 size_t     bufsize,	/* O - Size of output buffer */
 	        const char *format,	/* I - printf-style format string */

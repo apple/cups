@@ -281,15 +281,14 @@ AC_SUBST(DBUS_NOTIFIERLIBS)
 dnl Extra platform-specific libraries...
 CUPS_DEFAULT_PRINTOPERATOR_AUTH="@SYSTEM"
 CUPS_SYSTEM_AUTHKEY=""
-FONTS="fonts"
-LEGACY_BACKENDS="parallel scsi"
+LEGACY_BACKENDS="parallel"
 
 case $uname in
         Darwin*)
 		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
-                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -framework SystemConfiguration -weak_framework ApplicationServices"
-                LIBS="-framework SystemConfiguration -framework CoreFoundation $LIBS"
+                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -weak_framework ApplicationServices"
+                LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
 
 		dnl Check for framework headers...
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
@@ -347,7 +346,6 @@ esac
 AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
-AC_SUBST(FONTS)
 AC_SUBST(LEGACY_BACKENDS)
 
 dnl

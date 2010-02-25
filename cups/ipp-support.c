@@ -217,7 +217,7 @@ static char	* const ipp_std_ops[] =
 		  "dateTime",		/* 0x31 */
 		  "resolution",		/* 0x32 */
 		  "rangeOfInteger",	/* 0x33 */
-		  "begCollection",	/* 0x34 */
+		  "collection",		/* 0x34 */
 		  "textWithLanguage",	/* 0x35 */
 		  "nameWithLanguage",	/* 0x36 */
 		  "endCollection",	/* 0x37 */

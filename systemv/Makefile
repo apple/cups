@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7929 2008-09-10 22:23:59Z mike $"
 #
-#   System V commands makefile for the Common UNIX Printing System (CUPS).
+#   System V commands makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -212,10 +212,10 @@ cupstestppd:	cupstestppd.o ../cups/$(LIBCUPS) ../filter/$(LIBCUPSIMAGE)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ cupstestppd.o $(LINKCUPSIMAGE) $(IMGLIBS) $(LIBS)
 
-cupstestppd-static:	cupstestppd.o ../cups/libcups.a ../filter/libcupsimage.a
+cupstestppd-static:	cupstestppd.o ../cups/$(LIBCUPSSTATIC) ../filter/libcupsimage.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ cupstestppd.o ../filter/libcupsimage.a \
-		../cups/libcups.a $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
+		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(LIBGSSAPI) $(LIBS) $(LIBZ)
 
 
 #

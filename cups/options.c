@@ -1,9 +1,9 @@
 /*
  * "$Id: options.c 8181 2008-12-10 17:29:57Z mike $"
  *
- *   Option routines for the Common UNIX Printing System (CUPS).
+ *   Option routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,11 +16,14 @@
  *
  * Contents:
  *
- *   cupsAddOption()    - Add an option to an option array.
- *   cupsFreeOptions()  - Free all memory used by options.
- *   cupsGetOption()    - Get an option value.
- *   cupsParseOptions() - Parse options from a command-line argument.
- *   cupsRemoveOption() - Remove an option from an option array.
+ *   cupsAddOption()        - Add an option to an option array.
+ *   cupsFreeOptions()      - Free all memory used by options.
+ *   cupsGetOption()        - Get an option value.
+ *   cupsParseOptions()     - Parse options from a command-line argument.
+ *   cupsRemoveOption()     - Remove an option from an option array.
+ *   _cupsGet1284Values()   - Get 1284 device ID keys and values.
+ *   cups_compare_options() - Compare two options.
+ *   cups_find_option()     - Find an option using a binary search.
  */
 
 /*
@@ -497,6 +500,89 @@ cupsRemoveOption(
 
   DEBUG_printf(("3cupsRemoveOption: Returning %d", num_options));
   return (num_options);
+}
+
+
+/*
+ * '_cupsGet1284Values()' - Get 1284 device ID keys and values.
+ *
+ * The returned dictionary is a CUPS option array that can be queried with
+ * cupsGetOption and freed with cupsFreeOptions.
+ */
+
+int					/* O - Number of key/value pairs */
+_cupsGet1284Values(
+    const char *device_id,		/* I - IEEE-1284 device ID string */
+    cups_option_t **values)		/* O - Array of key/value pairs */
+{
+  int		num_values;		/* Number of values */
+  char		key[256],		/* Key string */
+		value[256],		/* Value string */
+		*ptr;			/* Pointer into key/value */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (values)
+    *values = NULL;
+
+  if (!device_id || !values)
+    return (0);
+
+ /*
+  * Parse the 1284 device ID value into keys and values.  The format is
+  * repeating sequences of:
+  *
+  *   [whitespace]key:value[whitespace];
+  */
+
+  num_values = 0;
+  while (*device_id)
+  {
+    while (isspace(*device_id & 255))
+      device_id ++;
+
+    if (!*device_id)
+      break;
+
+    for (ptr = key; *device_id && *device_id != ':'; device_id ++)
+      if (ptr < (key + sizeof(key) - 1))
+        *ptr++ = *device_id;
+
+    if (!*device_id)
+      break;
+
+    while (ptr > key && isspace(ptr[-1] & 255))
+      ptr --;
+
+    *ptr = '\0';
+    device_id ++;
+
+    while (isspace(*device_id & 255))
+      device_id ++;
+
+    if (!*device_id)
+      break;
+
+    for (ptr = value; *device_id && *device_id != ';'; device_id ++)
+      if (ptr < (value + sizeof(value) - 1))
+        *ptr++ = *device_id;
+
+    if (!*device_id)
+      break;
+
+    while (ptr > value && isspace(ptr[-1] & 255))
+      ptr --;
+
+    *ptr = '\0';
+    device_id ++;
+
+    num_values = cupsAddOption(key, value, num_values, values);
+  }
+
+  return (num_values);
 }
 
 

@@ -3,6 +3,7 @@
 <H2 CLASS="title">{op=modify-printer?Aldatu {printer_name}:Gehitu inprimagailua}</H2>
 
 <FORM METHOD="POST" ACTION="/admin" ENCTYPE="multipart/form-data">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {printer_name?<INPUT TYPE="HIDDEN" NAME="printer_name" VALUE="{printer_name}">:}
 <INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">

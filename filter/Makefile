@@ -3,7 +3,7 @@
 #
 #   Filter makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -22,7 +22,6 @@ FILTERS	=	\
 		$(BANNERTOPS) \
 		commandtops \
 		gziptoany \
-		hpgltops \
 		$(TEXTTOPS) \
 		pstops \
 		$(IMGFILTERS) \
@@ -43,16 +42,13 @@ TARGETS	=	\
 		$(LIBTARGETS) \
 		$(FILTERS)
 
-HPGLOBJS =	hpgl-attr.o hpgl-config.o hpgl-main.o hpgl-prolog.o \
-		hpgl-char.o hpgl-input.o hpgl-polygon.o hpgl-vector.o
 IMAGEOBJS =	image-bmp.o image-colorspace.o image-gif.o image-jpeg.o \
 		image-photocd.o image-pix.o image-png.o image-pnm.o \
 		image-sgi.o image-sgilib.o image-sun.o image-tiff.o \
 		image-zoom.o image.o error.o interpret.o raster.o
 IMAGE32OBJS =	$(IMAGEOBJS:.o=.32.o)
 IMAGE64OBJS =	$(IMAGEOBJS:.o=.64.o)
-FORMOBJS =	form-attr.o form-main.o form-ps.o form-text.o form-tree.o
-OBJS	=	$(HPGLOBJS) $(IMAGEOBJS) $(FORMOBJS) \
+OBJS	=	$(IMAGEOBJS) \
 		bannertops.o commandtops.o gziptoany.o imagetops.o \
 		imagetoraster.o common.o pdftops.o pstext.o pstops.o \
 		rasterbench.o rastertoepson.o rastertohp.o rastertolabel.o \
@@ -131,7 +127,7 @@ install-exec:
 	$(LN) rastertolabel $(SERVERBIN)/filter/rastertodymo
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(FILTERS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -160,6 +156,10 @@ install-libs: $(INSTALLSTATIC) $(INSTALL32) $(INSTALL64)
 	-if test $(LIBCUPSIMAGE) = "libcupsimage.2.dylib"; then \
 		$(RM) $(LIBDIR)/libcupsimage.dylib; \
 		$(LN) $(LIBCUPSIMAGE) $(LIBDIR)/libcupsimage.dylib; \
+	fi
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp $(LIBCUPSIMAGE) $(SYMROOT); \
 	fi
 
 installstatic:
@@ -293,30 +293,12 @@ commandtops:	commandtops.o ../cups/$(LIBCUPS)
 
 
 #
-# formtops
-#
-
-formtops:	$(FORMOBJS) common.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ $(FORMOBJS) common.o $(LIBS) -lm
-
-
-#
 # gziptoany
 #
 
 gziptoany:	gziptoany.o ../Makedefs ../cups/$(LIBCUPS)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o $@ gziptoany.o $(LIBZ) $(LIBS)
-
-
-#
-# hpgltops
-#
-
-hpgltops:	$(HPGLOBJS) common.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ $(HPGLOBJS) common.o $(LIBS) -lm
 
 
 #

@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
-#   CGI makefile for the Common UNIX Printing System (CUPS).
+#   CGI makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -118,7 +118,7 @@ install-exec:
 	done
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(CGIS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -307,10 +307,10 @@ jobs.cgi:	jobs.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # makedocset
 #
 
-makedocset:	makedocset.o ../Makedefs libcupscgi.a ../cups/libcups.a
+makedocset:	makedocset.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ makedocset.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 
 
@@ -327,10 +327,10 @@ printers.cgi:	printers.o ../Makedefs ../cups/$(LIBCUPS) $(LIBCUPSCGI)
 # testcgi
 #
 
-testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
+testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcgi.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	echo Testing CGI API...
 	./testcgi
@@ -340,10 +340,10 @@ testcgi:	testcgi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 # testhi
 #
 
-testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/libcups.a
+testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testhi.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 	echo Testing help index API...
 	./testhi
@@ -353,9 +353,9 @@ testhi:	testhi.o ../Makedefs libcupscgi.a ../cups/libcups.a
 # testtemplate
 #
 
-testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/libcups.a
+testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o $@ testtemplate.o libcupscgi.a ../cups/$(LIBCUPSSTATIC) \
 		$(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
@@ -363,10 +363,10 @@ testtemplate:	testtemplate.o ../Makedefs libcupscgi.a ../cups/libcups.a
 # websearch
 #
 
-websearch:	websearch.o ../Makedefs libcupscgi.a ../cups/libcups.a
+websearch:	websearch.o ../Makedefs libcupscgi.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ websearch.o libcupscgi.a \
-		../cups/libcups.a $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(SSLLIBS) $(DNSSDLIBS) \
 		$(LIBZ) $(LIBGSSAPI)
 
 

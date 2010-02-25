@@ -140,7 +140,7 @@ extern void		cupsdAddPrinterUser(cupsd_printer_t *p,
 			                    const char *username);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
-extern void		cupsdDeletePrinter(cupsd_printer_t *p, int update);
+extern int		cupsdDeletePrinter(cupsd_printer_t *p, int update);
 extern cupsd_printer_t	*cupsdFindDest(const char *name);
 extern cupsd_printer_t	*cupsdFindPrinter(const char *name);
 extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p,

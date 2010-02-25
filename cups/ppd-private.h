@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Private PPD definitions for the Common UNIX Printing System (CUPS).
+ *   Private PPD definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -68,8 +68,6 @@ typedef struct _ppd_cups_uiconsts_s	/**** cupsUIConstraints ****/
  */
 
 extern void		_ppdFreeLanguages(cups_array_t *languages);
-extern int		_ppdGet1284Values(const char *device_id,
-			                  cups_option_t **values);
 extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);
 extern unsigned		_ppdHashName(const char *name);

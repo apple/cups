@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-ssl.m4 7241 2008-01-22 22:34:52Z mike $"
 dnl
-dnl   OpenSSL/GNUTLS stuff for the Common UNIX Printing System (CUPS).
+dnl   OpenSSL/GNUTLS stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2010 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -26,13 +26,14 @@ AC_ARG_WITH(openssl-includes, [  --with-openssl-includes set directory for OpenS
 
 SSLFLAGS=""
 SSLLIBS=""
+have_ssl=0
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
-    if test "x${SSLLIBS}" = "x" -a "x${enable_cdsassl}" != "xno"; then
+    if test $have_ssl = 0 -a "x${enable_cdsassl}" != "xno"; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h, [
-		SSLLIBS="-framework CoreFoundation -framework Security"
+	    	have_ssl=1
 		AC_DEFINE(HAVE_SSL)
 		AC_DEFINE(HAVE_CDSASSL)
 
@@ -58,9 +59,10 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl Then look for GNU TLS...
-    if test "x${SSLLIBS}" = "x" -a "x${enable_gnutls}" != "xno" -a "x$PKGCONFIG" != x; then
+    if test $have_ssl = 0 -a "x${enable_gnutls}" != "xno" -a "x$PKGCONFIG" != x; then
     	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
 	if $PKGCONFIG --exists gnutls; then
+	    have_ssl=1
 	    SSLLIBS=`$PKGCONFIG --libs gnutls`
 	    SSLFLAGS=`$PKGCONFIG --cflags gnutls`
 	    AC_DEFINE(HAVE_SSL)
@@ -69,7 +71,7 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl Check for the OpenSSL library last...
-    if test "x${SSLLIBS}" = "x" -a "x${enable_openssl}" != "xno"; then
+    if test $have_ssl = 0 -a "x${enable_openssl}" != "xno"; then
 	AC_CHECK_HEADER(openssl/ssl.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
@@ -87,7 +89,8 @@ if test x$enable_ssl != xno; then
 	        "-lcrypto -lRSAglue -lrsaref"
 	    do
 		AC_CHECK_LIB(ssl,SSL_new,
-		    [SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
+		    [have_ssl=1
+		     SSLFLAGS="-DOPENSSL_DISABLE_OLD_DES_SUPPORT"
 		     SSLLIBS="-lssl $libcrypto"
 		     AC_DEFINE(HAVE_SSL)
 		     AC_DEFINE(HAVE_LIBSSL)],,
@@ -102,7 +105,7 @@ if test x$enable_ssl != xno; then
     fi
 fi
 
-if test "x$SSLLIBS" != x; then
+if test $have_ssl = 1; then
     AC_MSG_RESULT([    Using SSLLIBS="$SSLLIBS"])
     AC_MSG_RESULT([    Using SSLFLAGS="$SSLFLAGS"])
 fi

@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-sharedlibs.m4 7630 2008-06-09 22:31:44Z mike $"
 dnl
-dnl   Shared library support for the Common UNIX Printing System (CUPS).
+dnl   Shared library support for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2010 by Apple Inc.
 dnl   Copyright 1997-2005 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -18,10 +18,14 @@ DSOFLAGS="${DSOFLAGS:=}"
 
 AC_ARG_ENABLE(shared, [  --disable-shared        do not create shared libraries])
 
+cupsbase="cups"
+LIBCUPSBASE="lib$cupsbase"
+LIBCUPSSTATIC="lib$cupsbase.a"
+
 if test x$enable_shared != xno; then
 	case "$uname" in
 		SunOS*)
-			LIBCUPS="libcups.so.2"
+			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -32,7 +36,7 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -Wl,-h\`basename \$@\` -G \$(OPTIM)"
 			;;
 		UNIX_S*)
-			LIBCUPS="libcups.so.2"
+			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -45,7 +49,7 @@ if test x$enable_shared != xno; then
 		HP-UX*)
 			case "$uarch" in
 				ia64)
-					LIBCUPS="libcups.so.2"
+					LIBCUPS="lib$cupsbase.so.2"
 					LIBCUPSCGI="libcupscgi.so.1"
 					LIBCUPSDRIVER="libcupsdriver.so.1"
 					LIBCUPSIMAGE="libcupsimage.so.2"
@@ -56,7 +60,7 @@ if test x$enable_shared != xno; then
 					DSOFLAGS="$DSOFLAGS -Wl,-b,-z,+h,\`basename \$@\`"
 					;;
 				*)
-					LIBCUPS="libcups.sl.2"
+					LIBCUPS="lib$cupsbase.sl.2"
 					LIBCUPSCGI="libcupscgi.sl.1"
 					LIBCUPSDRIVER="libcupsdriver.sl.1"
 					LIBCUPSIMAGE="libcupsimage.sl.2"
@@ -69,7 +73,7 @@ if test x$enable_shared != xno; then
 			esac
 			;;
 		IRIX)
-			LIBCUPS="libcups.so.2"
+			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -80,7 +84,7 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -set_version,sgi2.6,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		OSF1* | Linux | GNU | *BSD*)
-			LIBCUPS="libcups.so.2"
+			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -91,7 +95,7 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -Wl,-soname,\`basename \$@\` -shared \$(OPTIM)"
 			;;
 		Darwin*)
-			LIBCUPS="libcups.2.dylib"
+			LIBCUPS="lib$cupsbase.2.dylib"
 			LIBCUPSCGI="libcupscgi.1.dylib"
 			LIBCUPSDRIVER="libcupsdriver.1.dylib"
 			LIBCUPSIMAGE="libcupsimage.2.dylib"
@@ -102,7 +106,8 @@ if test x$enable_shared != xno; then
 			DSOFLAGS="$DSOFLAGS -dynamiclib -single_module -lc"
 			;;
 		AIX*)
-			LIBCUPS="libcups_s.a"
+			LIBCUPS="lib${cupsbase}_s.a"
+			LIBCUPSBASE="${cupsbase}_s"
 			LIBCUPSCGI="libcupscgi_s.a"
 			LIBCUPSDRIVER="libcupsdriver_s.a"
 			LIBCUPSIMAGE="libcupsimage_s.a"
@@ -115,7 +120,7 @@ if test x$enable_shared != xno; then
 		*)
 			echo "Warning: shared libraries may not be supported.  Trying -shared"
 			echo "         option with compiler."
-			LIBCUPS="libcups.so.2"
+			LIBCUPS="lib$cupsbase.so.2"
 			LIBCUPSCGI="libcupscgi.so.1"
 			LIBCUPSDRIVER="libcupsdriver.so.1"
 			LIBCUPSIMAGE="libcupsimage.so.2"
@@ -128,7 +133,7 @@ if test x$enable_shared != xno; then
 	esac
 else
 	PICFLAG=0
-	LIBCUPS="libcups.a"
+	LIBCUPS="lib$cupsbase.a"
 	LIBCUPSCGI="libcupscgi.a"
 	LIBCUPSDRIVER="libcupsdriver.a"
 	LIBCUPSIMAGE="libcupsimage.a"
@@ -149,21 +154,23 @@ AC_SUBST(DSOFLAGS)
 AC_SUBST(DSO32FLAGS)
 AC_SUBST(DSO64FLAGS)
 AC_SUBST(LIBCUPS)
+AC_SUBST(LIBCUPSBASE)
 AC_SUBST(LIBCUPSCGI)
 AC_SUBST(LIBCUPSDRIVER)
 AC_SUBST(LIBCUPSIMAGE)
 AC_SUBST(LIBCUPSMIME)
 AC_SUBST(LIBCUPSPPDC)
+AC_SUBST(LIBCUPSSTATIC)
 
 if test x$enable_shared = xno; then
-	LINKCUPS="../cups/libcups.a"
+	LINKCUPS="../cups/lib$cupsbase.a"
 	LINKCUPSIMAGE="../filter/libcupsimage.a"
 else
 	if test $uname = AIX; then
-		LINKCUPS="-lcups_s"
+		LINKCUPS="-l${cupsbase}_s"
 		LINKCUPSIMAGE="-lcupsimage_s"
 	else
-		LINKCUPS="-lcups"
+		LINKCUPS="-l${cupsbase}"
 		LINKCUPSIMAGE="-lcupsimage"
 	fi
 fi

@@ -141,6 +141,8 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
  */
 
 extern http_t		*_cupsConnect(void);
+extern int		_cupsGet1284Values(const char *device_id,
+			                   cups_option_t **values);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsSetDefaults(void);

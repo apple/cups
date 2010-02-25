@@ -3,6 +3,7 @@
 <H2 CLASS="title">Modyfikowanie {printer_name}</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 <INPUT TYPE="HIDDEN" NAME="BAUDRATE" VALUE="{?baudrate}">
 <INPUT TYPE="HIDDEN" NAME="BITS" VALUE="{?bits}">

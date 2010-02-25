@@ -3,7 +3,7 @@
 .\"
 .\"   cupsd.conf man page for the Common UNIX Printing System (CUPS).
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2010 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "14 July 2009" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "28 January 2010" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -251,10 +251,6 @@ DefaultAuthType Digest
 DefaultAuthType Negotiate
 .br
 Specifies the default type of authentication to use.
-.TP 5
-DefaultCharset charset
-.br
-Specifies the default character set to use for text.
 .TP 5
 DefaultEncryption Never
 .TP 5

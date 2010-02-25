@@ -3,6 +3,7 @@
 <H2 CLASS="title">Standardeinstellungen f&uuml;r {printer_name} festlegen</H2>
 
 <FORM METHOD="POST" ACTION="/admin">
+<INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}">
 <INPUT TYPE="HIDDEN" NAME="PRINTER_NAME" VALUE="{printer_name}">
 <INPUT TYPE="HIDDEN" NAME="OP" VALUE="{op}">
 {HAVE_AUTOCONFIGURE?<INPUT TYPE="SUBMIT" NAME="AUTOCONFIGURE" VALUE="Drucker nach Standardeinstellungen fragen">:}

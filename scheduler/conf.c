@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -108,7 +108,6 @@ static const cupsd_var_t	variables[] =
   { "ClassifyOverride",		&ClassifyOverride,	CUPSD_VARTYPE_BOOLEAN },
   { "ConfigFilePerm",		&ConfigFilePerm,	CUPSD_VARTYPE_INTEGER },
   { "DataDir",			&DataDir,		CUPSD_VARTYPE_STRING },
-  { "DefaultCharset",		&DefaultCharset,	CUPSD_VARTYPE_STRING },
   { "DefaultLanguage",		&DefaultLanguage,	CUPSD_VARTYPE_STRING },
   { "DefaultLeaseDuration",	&DefaultLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "DefaultPaperSize",		&DefaultPaperSize,	CUPSD_VARTYPE_STRING },
@@ -132,7 +131,6 @@ static const cupsd_var_t	variables[] =
   { "KeepAlive",		&KeepAlive,		CUPSD_VARTYPE_BOOLEAN },
 #ifdef HAVE_LAUNCHD
   { "LaunchdTimeout",		&LaunchdTimeout,	CUPSD_VARTYPE_INTEGER },
-  { "LaunchdConf",		&LaunchdConf,		CUPSD_VARTYPE_STRING },
 #endif /* HAVE_LAUNCHD */
   { "LimitRequestBody",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "ListenBackLog",		&ListenBackLog,		CUPSD_VARTYPE_INTEGER },
@@ -540,8 +538,6 @@ cupsdReadConfiguration(void)
   else
     cupsdSetString(&DefaultLanguage, language->language);
 
-  cupsdSetString(&DefaultCharset, _cupsEncodingName(language->encoding));
-
   cupsdClearString(&DefaultPaperSize);
 
   cupsdSetString(&RIPCache, "8m");
@@ -692,7 +688,6 @@ cupsdReadConfiguration(void)
 
 #ifdef HAVE_LAUNCHD
   LaunchdTimeout = DEFAULT_TIMEOUT + 10;
-  cupsdSetString(&LaunchdConf, CUPS_DEFAULT_LAUNCHD_CONF);
 #endif /* HAVE_LAUNCHD */
 
 #ifdef __APPLE__
@@ -910,7 +905,7 @@ cupsdReadConfiguration(void)
   * Set the default locale using the language and charset...
   */
 
-  cupsdSetStringf(&DefaultLocale, "%s.%s", DefaultLanguage, DefaultCharset);
+  cupsdSetStringf(&DefaultLocale, "%s.UTF-8", DefaultLanguage);
 
  /*
   * Update all relative filenames to include the full path from ServerRoot...

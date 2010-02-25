@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7924 2008-09-10 17:36:13Z mike $"
 #
-#   Backend makefile for the Common UNIX Printing System (CUPS).
+#   Backend makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -17,12 +17,16 @@
 
 include ../Makedefs
 
+#
+# Object files...
+#
+
 RBACKENDS =	ipp lpd $(DNSSD_BACKEND)
 UBACKENDS =	$(PAP) $(LEGACY_BACKENDS) serial snmp socket usb
 UNITTESTS =	test1284 testbackend testsupplies
 TARGETS =	libbackend.a $(RBACKENDS) $(UBACKENDS)
 LIBOBJS	=	ieee1284.o network.o runloop.o snmp-supplies.o
-OBJS	=	ipp.o lpd.o dnssd.o pap.o parallel.o scsi.o serial.o snmp.o \
+OBJS	=	ipp.o lpd.o dnssd.o pap.o parallel.o serial.o snmp.o \
 		socket.o test1284.o testbackend.o testsupplies.o usb.o
 
 
@@ -134,9 +138,9 @@ uninstall:
 # test1284
 #
 
-test1284:	test1284.o ../cups/libcups.a
+test1284:	test1284.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o test1284 test1284.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -144,9 +148,9 @@ test1284:	test1284.o ../cups/libcups.a
 # testbackend
 #
 
-testbackend:	testbackend.o ../cups/libcups.a
+testbackend:	testbackend.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o testbackend testbackend.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -154,10 +158,10 @@ testbackend:	testbackend.o ../cups/libcups.a
 # testsupplies
 #
 
-testsupplies:	testsupplies.o libbackend.a ../cups/libcups.a
+testsupplies:	testsupplies.o libbackend.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsupplies testsupplies.o libbackend.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 
 
@@ -219,17 +223,6 @@ pap:	pap.o ../cups/$(LIBCUPS)
 parallel:	parallel.o ../cups/$(LIBCUPS) libbackend.a
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o parallel parallel.o libbackend.a $(LIBS)
-
-
-#
-# scsi
-#
-
-scsi:	scsi.o ../cups/$(LIBCUPS)
-	echo Linking $@...
-	$(CC) $(LDFLAGS) -o scsi scsi.o $(LIBS)
-
-scsi.o:	scsi.c scsi-irix.c scsi-linux.c
 
 
 #

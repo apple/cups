@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7875 2008-08-27 22:53:31Z mike $"
 #
-#   Scheduler Makefile for the Common UNIX Printing System (CUPS).
+#   Scheduler Makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -73,14 +73,17 @@ UNITTARGETS =	\
 		testspeed \
 		testsub
 
-TARGETS	=	\
-		$(LIBTARGETS) \
+DAEMONS =	\
 		cupsd \
 		cupsfilter \
 		cups-deviced \
 		cups-driverd \
 		cups-lpd \
-		cups-polld \
+		cups-polld
+
+TARGETS	=	\
+		$(LIBTARGETS) \
+		$(DAEMONS)
 
 
 #
@@ -223,7 +226,7 @@ install-exec:
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(TARGETS); do \
+		for file in $(DAEMONS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -374,11 +377,11 @@ cupsd:	$(CUPSDOBJS) $(LIBCUPSMIME) ../cups/$(LIBCUPS)
 		$(LIBPAPER) $(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBS) \
 		$(LIBGSSAPI) $(LIBWRAP)
 
-cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/libcups.a
+cupsd-static:	$(CUPSDOBJS) libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o cupsd-static $(CUPSDOBJS) libcupsmime.a \
 		$(LIBZ) $(SSLLIBS) $(LIBSLP) $(LIBLDAP) $(PAMLIBS) \
-		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(LIBPAPER) \
 		$(LIBMALLOC) $(CUPSDLIBS) $(DNSSDLIBS) $(LIBGSSAPI) \
 		$(LIBWRAP)
 
@@ -503,9 +506,9 @@ testdirsvc:	testdirsvc.o
 # Make the test program, "testlpd".
 #
 
-testlpd:	testlpd.o ../cups/libcups.a cups-lpd
+testlpd:	testlpd.o ../cups/$(LIBCUPSSTATIC) cups-lpd
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o testlpd testlpd.o ../cups/$(LIBCUPSSTATIC) \
 		$(COMMONLIBS) $(LIBZ) $(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 
 
@@ -513,10 +516,10 @@ testlpd:	testlpd.o ../cups/libcups.a cups-lpd
 # testmime
 #
 
-testmime:	testmime.o libcupsmime.a ../cups/libcups.a
+testmime:	testmime.o libcupsmime.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testmime.o libcupsmime.a \
-		../cups/libcups.a $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(COMMONLIBS) $(LIBZ) $(SSLLIBS) \
 		$(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running MIME tests...
 	./testmime
@@ -526,9 +529,9 @@ testmime:	testmime.o libcupsmime.a ../cups/libcups.a
 # Make the test program, "testspeed".
 #
 
-testspeed:	testspeed.o ../cups/libcups.a
+testspeed:	testspeed.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o testspeed testspeed.o ../cups/$(LIBCUPSSTATIC) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 
@@ -536,9 +539,9 @@ testspeed:	testspeed.o ../cups/libcups.a
 # Make the test program, "testsub".
 #
 
-testsub:	testsub.o ../cups/libcups.a
+testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/$(LIBCUPSSTATIC) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
 
 

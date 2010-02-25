@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
-#   IPP test makefile for the Common UNIX Printing System (CUPS).
+#   IPP test makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -17,10 +17,24 @@ include ../Makedefs
 
 
 #
+# Sample test files.
+#
+
+TESTFILES	=	\
+			ipp-1.1.test \
+			ipp-2.0.test \
+			ipp-2.1.test \
+			testfile.jpg \
+			testfile.pdf \
+			testfile.ps \
+			testfile.txt
+
+
+#
 # Make all targets...
 #
 
-all:	ipptest
+all:	ipptest ipptest-static
 
 
 #
@@ -42,7 +56,7 @@ unittests:
 #
 
 clean:
-	$(RM) ipptest ipptest.o
+	$(RM) ipptest ipptest.o ipptest-static
 
 
 #
@@ -65,6 +79,11 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
+	echo Installing sample ipptest files in $(DATADIR)/ipptest...
+	$(INSTALL_DIR) -m 755 $(DATADIR)/ipptest
+	for file in $(TESTFILES); do \
+		$(INSTALL_DATA) $$file $(DATADIR)/ipptest; \
+	done
 
 
 #
@@ -72,6 +91,13 @@ install-data:
 #
 
 install-exec:
+	echo Installing ipptest in $(BINDIR)...
+	$(INSTALL_DIR) -m 755 $(BINDIR)
+	$(INSTALL_BIN) ipptest $(BINDIR)
+	if test "x$(SYMROOT)" != "x"; then \
+		$(INSTALL_DIR) $(SYMROOT); \
+		cp ipptest $(SYMROOT); \
+	fi
 
 
 #
@@ -99,9 +125,18 @@ uninstall:
 # ipptest
 #
 
-ipptest:	ipptest.o ../cups/libcups.a
+ipptest:	ipptest.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o ipptest ipptest.o  ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o $@ ipptest.o $(LIBS)
+
+
+#
+# ipptest-static
+#
+
+ipptest-static:	ipptest.o ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ipptest.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

@@ -250,7 +250,8 @@ cupsdStartListening(void)
 	unlink(lis->address.un.sun_path);
 
        /*
-	* Save the curent umask and set it to 0...
+	* Save the current umask and set it to 0 so that all users can access
+	* the domain socket...
 	*/
 
 	mask = umask(0);

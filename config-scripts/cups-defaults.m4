@@ -447,6 +447,15 @@ fi
 AC_SUBST(BANNERTOPS)
 AC_SUBST(TEXTTOPS)
 
+dnl Fonts
+if test "x$BANNERTOPS" = x -a "x$TEXTTOPS" = x; then
+	FONTS=""
+else
+	FONTS="fonts"
+fi
+
+AC_SUBST(FONTS)
+
 dnl
 dnl End of "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $".
 dnl

@@ -5,6 +5,7 @@ _cupsCharmapFlush
 _cupsCharmapFree
 _cupsCharmapGet
 _cupsEncodingName
+_cupsGet1284Values
 _cupsGetPassword
 _cupsGlobals
 _cupsLangPrintf
@@ -53,7 +54,6 @@ _httpResolveURI
 _ippAddAttr
 _ippFreeAttr
 _ppdFreeLanguages
-_ppdGet1284Values
 _ppdGetEncoding
 _ppdGetLanguages
 _ppdHashName

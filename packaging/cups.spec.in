@@ -5,7 +5,7 @@
 #
 #   Original version by Jason McMullan <jmcc@ontv.com>.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1999-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -185,6 +185,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cancel
 /usr/bin/cupstestdsc
 /usr/bin/cupstestppd
+/usr/bin/ipptest
 /usr/bin/lp*
 %dir /usr/lib/cups
 %dir /usr/lib/cups/backend
@@ -225,6 +226,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/cups/drv/*
 %dir /usr/share/cups/fonts
 /usr/share/cups/fonts/*
+%dir /usr/share/cups/ipptest
+/usr/share/cups/ipptest/*
 %dir /usr/share/cups/mime
 /usr/share/cups/mime/*
 %dir /usr/share/cups/model
@@ -240,6 +243,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/es/*
 %dir /usr/share/doc/cups/eu
 /usr/share/doc/cups/eu/*
+%dir /usr/share/doc/cups/id
+/usr/share/doc/cups/id/*
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/*
 %dir /usr/share/doc/cups/pl
@@ -271,6 +276,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/cancel.1.gz
 /usr/share/man/man1/cupstestdsc.1.gz
 /usr/share/man/man1/cupstestppd.1.gz
+/usr/share/man/man1/ipptest.1.gz
 /usr/share/man/man1/lp.1.gz
 /usr/share/man/man1/lpoptions.1.gz
 /usr/share/man/man1/lppasswd.1.gz
@@ -280,6 +286,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/man/man1/lpstat.1.gz
 %dir /usr/share/man/man5
 /usr/share/man/man5/*.conf.5.gz
+/usr/share/man/man5/ipp.test.5.gz
 /usr/share/man/man5/mime.*.5.gz
 %dir /usr/share/man/man7
 /usr/share/man/man7/drv*

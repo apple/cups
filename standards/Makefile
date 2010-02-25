@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7871 2008-08-27 21:12:43Z mike $"
 #
-#   Standards makefile for the Common UNIX Printing System (CUPS).
+#   Standards makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 2006 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -153,8 +153,8 @@ uninstall:
 # rfctohtml - make html versions of RFCs...
 #
 
-rfctohtml:	rfctohtml.o ../cups/libcups.a
-	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ rfctohtml.o ../cups/libcups.a \
+rfctohtml:	rfctohtml.o ../cups/$(LIBCUPSSTATIC)
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ rfctohtml.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
