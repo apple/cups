@@ -3,6 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.4
 
+	- The Dymo driver did not support copies (STR #3457)
 	- The scheduler did not update the classes.conf file when deleting a
 	  printer belonging to a class (STR #3505)
 	- The lppasswd command did not use localized password prompts
