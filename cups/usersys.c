@@ -444,17 +444,11 @@ _cupsSetDefaults(void)
        !cg->ipp_port) && (home = getenv("HOME")) != NULL)
   {
    /*
-    * Look for ~/.cups/client.conf or ~/.cupsrc...
+    * Look for ~/.cups/client.conf...
     */
 
     snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
-    if ((fp = cupsFileOpen(filename, "r")) == NULL)
-    {
-      snprintf(filename, sizeof(filename), "%s/.cupsrc", home);
-      fp = cupsFileOpen(filename, "r");
-    }
-
-    if (fp)
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
       cups_read_client_conf(fp, cg, cups_encryption, cups_server);
       cupsFileClose(fp);
