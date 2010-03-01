@@ -1730,7 +1730,7 @@ process_children(void)
 	  job->backend = -pid;
 
 	if (status && status != SIGTERM && status != SIGKILL &&
-	    job->status >= 0)
+	    status != SIGPIPE && job->status >= 0)
 	{
 	 /*
 	  * An error occurred; save the exit status so we know to stop
@@ -1824,6 +1824,12 @@ process_children(void)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "PID %d (%s) was terminated normally with signal %d.",
+                      pid, name, status);
+    }
+    else if (status == SIGPIPE)
+    {
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+                      "PID %d (%s) did not catch or ignore signal %d.",
                       pid, name, status);
     }
     else if (status)
