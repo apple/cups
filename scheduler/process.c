@@ -3,7 +3,7 @@
  *
  *   Process management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -114,23 +114,50 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"
-                 "  (regex #\"^%s/\"))\n", request);
+                 "  (regex"
+		 " #\"^%s$\""		/* RequestRoot */
+		 " #\"^%s/\""		/* RequestRoot/... */
+		 " #\"^/Users$\""
+		 " #\"^/Users/\""
+		 "))\n",
+		 request, request);
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
-                 "  (regex #\"^%s\" #\"^/private/etc\" #\"^/usr/local/etc\" "
-		 "#\"^/Library\" #\"^/System\" #\"^/Users\"))\n", root);
+                 "  (regex"
+		 " #\"^%s$\""		/* ServerRoot */
+		 " #\"^%s/\""		/* ServerRoot/... */
+		 " #\"^/private/etc$\""
+		 " #\"^/private/etc/\""
+		 " #\"^/usr/local/etc$\""
+		 " #\"^/usr/local/etc/\""
+		 " #\"^/Library$\""
+		 " #\"^/Library/\""
+		 " #\"^/System$\""
+		 " #\"^/System/\""
+		 "))\n",
+		 root, root);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
-                 "  (regex #\"^%s$\" #\"^%s/\" #\"^%s$\" #\"^%s/\""
+                 "  (regex"
+		 " #\"^%s$\""		/* TempDir */
+		 " #\"^%s/\""		/* TempDir/... */
+		 " #\"^%s$\""		/* CacheDir */
+		 " #\"^%s/\""		/* CacheDir/... */
+		 " #\"^%s/Library$\""	/* RequestRoot/Library */
+		 " #\"^%s/Library/\""	/* RequestRoot/Library/... */
 		 " #\"^/Library/Application Support/\""
 		 " #\"^/Library/Caches/\""
 		 " #\"^/Library/Preferences/\""
-		 " #\"^/Library/Printers/\""
+		 " #\"^/Library/Printers/.*/\""
+		 " #\"^/Users/Shared/\""
 		 "))\n",
-		 temp, temp, cache, cache);
+		 temp, temp, cache, cache, request, request);
   cupsFilePuts(fp,
 	       "(deny file-write*\n"
-	       "  (regex #\"^/Library/Printers/PPDs/\""
+	       "  (regex"
+	       " #\"^/Library/Printers/PPDs$\""
+	       " #\"^/Library/Printers/PPDs/\""
+	       " #\"^/Library/Printers/PPD Plugins$\""
 	       " #\"^/Library/Printers/PPD Plugins/\""
 	       "))\n");
   if (job_id)
