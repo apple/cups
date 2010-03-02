@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-02-28
+CHANGES.txt - 2010-03-02
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler now allows writing to /Users/Shared from print filters
+	  on Mac OS X.
 	- CUPS no longer supports the old ~/.cupsrc or ~/.lpoptions files from
 	  CUPS 1.1.x.  The ~/.cups/client.conf and ~/.cups/lpoptions files that
 	  were introduced in CUPS 1.2 must now be used.
