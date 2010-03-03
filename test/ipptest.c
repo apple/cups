@@ -2049,7 +2049,7 @@ expect_matches(
   * types separated by "," or "|"...
   */
 
-  for (of_type = expect->of_type, match = 0; !match && of_type; of_type = next)
+  for (of_type = expect->of_type, match = 0; !match && *of_type; of_type = next)
   {
    /*
     * Find the next separator, and set it (temporarily) to nul if present.
