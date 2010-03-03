@@ -3,7 +3,7 @@
  *
  *   Scheduler main loop for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -69,10 +69,6 @@
 #  include <notify.h>
 #endif /* HAVE_NOTIFY_H */
 
-#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
-#  include <dlfcn.h>
-#endif /* __APPLE__ && HAVE_DLFCN_H */
-
 
 /*
  * Local functions...
@@ -105,12 +101,6 @@ static int		dead_children = 0;
 					/* Dead children? */
 static int		stop_scheduler = 0;
 					/* Should the scheduler stop? */
-
-#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
-static const char *PSQLibPath = "/usr/lib/libPrintServiceQuota.dylib";
-static const char *PSQLibFuncName = "PSQUpdateQuota";
-static void *PSQLibRef;			/* libPrintServiceQuota.dylib */
-#endif /* HAVE_DLFCN_H */
 
 
 /*
@@ -556,17 +546,6 @@ main(int  argc,				/* I - Number of command-line args */
     launchd_checkout();
   }
 #endif /* HAVE_LAUNCHD */
-
-#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
- /*
-  * Load Print Service quota enforcement library (X Server only)
-  */
-
-  PSQLibRef = dlopen(PSQLibPath, RTLD_LAZY);
-
-  if (PSQLibRef)
-    PSQUpdateQuotaProc = dlsym(PSQLibRef, PSQLibFuncName);
-#endif /* __APPLE__ && HAVE_DLFCN_H */
 
  /*
   * Startup the server...
@@ -1197,19 +1176,6 @@ main(int  argc,				/* I - Number of command-line args */
   if (KerberosContext)
     krb5_free_context(KerberosContext);
 #endif /* HAVE_GSSAPI */
-
-#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
- /*
-  * Unload Print Service quota enforcement library (X Server only)
-  */
-
-  PSQUpdateQuotaProc = NULL;
-  if (PSQLibRef)
-  {
-    dlclose(PSQLibRef);
-    PSQLibRef = NULL;
-  }
-#endif /* __APPLE__ && HAVE_DLFCN_H */
 
 #ifdef __sgi
  /*

@@ -3,7 +3,7 @@
  *
  *   Configuration file definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -251,11 +251,6 @@ VAR int			SSLOptions		VALUE(CUPSD_SSL_NONE);
 VAR int			LaunchdTimeout		VALUE(DEFAULT_KEEPALIVE);
 					/* Time after which an idle cupsd will exit */
 #endif /* HAVE_LAUNCHD */
-
-#ifdef __APPLE__
-VAR int			AppleQuotas		VALUE(TRUE);
-					/* Use Apple PrintService Quotas instead of CUPS quotas */
-#endif  /* __APPLE__ */
 
 #ifdef HAVE_AUTHORIZATION_H
 VAR char		*SystemGroupAuthKey	VALUE(NULL);

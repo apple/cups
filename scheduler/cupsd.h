@@ -3,7 +3,7 @@
  *
  *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -177,16 +177,6 @@ VAR krb5_context	KerberosContext VALUE(NULL);
 VAR int			Launchd		VALUE(0);
 					/* Running from launchd */
 #endif /* HAVE_LAUNCH_H */
-
-#if defined(__APPLE__) && defined(HAVE_DLFCN_H)
-typedef int (*PSQUpdateQuotaProcPtr)(const char *printer, const char *info, 
-                                     const char *user, int nPages, int options);
-VAR PSQUpdateQuotaProcPtr PSQUpdateQuotaProc
-					VALUE(0);
-					/* Apple PrintService quota function */
-#endif /* __APPLE__ && HAVE_DLFCN_H */
-
-
 
 
 /*

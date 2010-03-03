@@ -3,7 +3,7 @@
  *
  *   Job management routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -4055,28 +4055,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
         job->sheets->values[0].integer += copies;
 
 	if (job->printer->page_limit)
-	{
-	  cupsd_quota_t *q = cupsdUpdateQuota(job->printer, job->username,
-					      copies, 0);
-
-#ifdef __APPLE__
-	  if (AppleQuotas && q->page_count == -3)
-	  {
-	   /*
-	    * Quota limit exceeded, cancel job in progress immediately...
-	    */
-
-	    cupsdSetJobState(job, IPP_JOB_CANCELED, CUPSD_JOB_DEFAULT,
-	                     "Canceled job because pages exceed user %s "
-			     "quota limit on printer %s (%s).",
-			     job->username, job->printer->name,
-			     job->printer->info);
-	    return;
-	  }
-#else
-          (void)q;
-#endif /* __APPLE__ */
-	}
+	  cupsdUpdateQuota(job->printer, job->username, copies, 0);
       }
 
       cupsdLogPage(job, message);

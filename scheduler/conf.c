@@ -82,9 +82,6 @@ typedef struct
 static const cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
-#ifdef __APPLE__
-  { "AppleQuotas",		&AppleQuotas,		CUPSD_VARTYPE_BOOLEAN },
-#endif  /* __APPLE__ */
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
@@ -689,10 +686,6 @@ cupsdReadConfiguration(void)
 #ifdef HAVE_LAUNCHD
   LaunchdTimeout = DEFAULT_TIMEOUT + 10;
 #endif /* HAVE_LAUNCHD */
-
-#ifdef __APPLE__
-  AppleQuotas = TRUE;
-#endif  /* __APPLE__ */
 
  /*
   * Read the configuration file...
