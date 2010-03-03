@@ -713,6 +713,9 @@ cupsdReadConfiguration(void)
   cupsdLogMessage(CUPSD_LOG_INFO, "Remote access is %s.",
                   RemotePort ? "enabled" : "disabled");
 
+  if (!RemotePort)
+    BrowseLocalProtocols = 0;		/* Disable sharing - no remote access */
+
  /*
   * See if the ServerName is an IP address...
   */

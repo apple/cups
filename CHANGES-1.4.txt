@@ -3,6 +3,13 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.4
 
+	- Documentation updates (STR #3453)
+	- cupsDo*Request did not flush error text, leading to multiple issues
+	  (STR #3325, STR #3519)
+	- cupsDoAuthentication did not cancel password authentication after 3
+	  failures (STR #3518)
+	- Fixed several LDAP browsing bugs (STR #3392)
+	- The Dymo driver did not support copies (STR #3457)
 	- The scheduler did not update the classes.conf file when deleting a
 	  printer belonging to a class (STR #3505)
 	- The lppasswd command did not use localized password prompts

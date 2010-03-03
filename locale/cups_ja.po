@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-02-20 16:43+0900\n"
 "Last-Translator: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
 "Language-Team: OPFC TRANSCUPS <opfc-transcups@sourceforge.jp>\n"
@@ -307,6 +307,11 @@ msgid ""
 msgstr ""
 "        警告    8.3 文字より長い PCFileName は PPD 仕様違反です。\n"
 "                参照: 61-62 ページ、セクション 5.3。\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2134,6 +2139,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "バナー"
 
@@ -2235,9 +2243,6 @@ msgstr "連続"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "カバーが開いています。"
-
 msgid "Created"
 msgstr "ジョブ作成"
 
@@ -2287,12 +2292,6 @@ msgstr "DeskJet Series"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "宛先 \"%s\" はジョブを受け付けていません。"
 
-msgid "Developer almost empty."
-msgstr "現像剤が無くなりかけています。"
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2318,9 +2317,6 @@ msgstr "無効"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "ドキュメント %d がジョブ %d に見つかりません。"
-
-msgid "Door open."
-msgstr "ドアが開いています。"
 
 msgid "Double Postcard"
 msgstr "往復はがき"
@@ -2369,10 +2365,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2433,9 +2425,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2667,10 +2656,6 @@ msgstr "ERROR: PAP の初期データ送信要求を送信できません"
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: プリントデータを送信できません (%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: プリントファイルをプリンターへ送信できません"
 
@@ -2786,6 +2771,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "終了バナー"
 
+msgid "English"
+msgstr "Japanese"
+
 msgid "Enter old password:"
 msgstr "古いパスワードを入力:"
 
@@ -2874,12 +2862,6 @@ msgstr "フォリオ"
 
 msgid "Forbidden"
 msgstr "Forbidden"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "一般"
@@ -3100,6 +3082,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "不正な制御文字"
 
@@ -3115,18 +3100,6 @@ msgstr "不正な翻訳文字列"
 msgid "Illegal whitespace character"
 msgstr "不正な空白文字"
 
-msgid "Ink/toner almost empty."
-msgstr "インクまたはトナーがほとんどありません。"
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "廃インクまたは廃トナー容器がほとんど一杯です。"
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "インストール可能オプション"
 
@@ -3138,9 +3111,6 @@ msgstr "IntelliBar ラベルプリンター"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "インターロックが開いています。"
 
 msgid "Internal Server Error"
 msgstr "サーバー内部エラー"
@@ -3319,21 +3289,6 @@ msgstr "用紙の経路"
 msgid "Media Type"
 msgstr "用紙種類"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "用紙トレイが空になりかけています。"
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "用紙トレイに補充が必要です。"
-
 msgid "Medium"
 msgstr "紙質"
 
@@ -3357,6 +3312,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3542,12 +3500,6 @@ msgstr "注意"
 msgid "OK"
 msgstr "OK"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPC はもうすぐ交換が必要になります。"
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "Off (片面)"
 
@@ -3576,17 +3528,8 @@ msgstr "インストールされたオプション"
 msgid "Options: "
 msgstr "オプション:"
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "出力モード"
-
-msgid "Output bin almost full."
-msgstr "排紙トレイがほとんど一杯です。"
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3604,9 +3547,6 @@ msgstr "プリンター %s/%s の出力は %s に送られます\n"
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr ""
 "プリンター %s/%s の出力は、リモートプリンター %s (%s 上) に送られます\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "合格\n"
@@ -3763,9 +3703,6 @@ msgstr "プリンターの休止"
 msgid "Printer Settings"
 msgstr "プリンター設定"
 
-msgid "Printer offline."
-msgstr "プリンターはオフラインです。"
-
 msgid "Printer:"
 msgstr "プリンター:"
 
@@ -3819,9 +3756,6 @@ msgstr "戻る"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "コマンドを実行中: %s %s -N -A %s -c '%s'\n"
-
-msgid "SCSI Printer"
-msgstr "SCSI プリンター"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "SEQUENCE は不定長を使用しています"
@@ -3932,6 +3866,18 @@ msgstr ""
 "クラス名は 127 文字以内の表示可能文字から成り、空白、スラッシュ (/)、ポンド記"
 "号 (#) を含んではなりません。"
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -3940,6 +3886,48 @@ msgstr ""
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3954,6 +3942,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "プリンターまたはクラスが見つかりませんでした。"
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -3984,14 +3987,14 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr "サブスクリプションが多すぎます。"
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "熱転写メディア"
 
 msgid "Title: "
 msgstr "タイトル: "
-
-msgid "Toner low."
-msgstr "トナーが少なくなっています。"
 
 msgid "Too many active jobs."
 msgstr "アクティブなジョブが多すぎます。"
@@ -4466,8 +4469,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4476,6 +4479,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4636,10 +4655,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr "WARNING: SCSI コマンドはタイムアウトしました (%d)。再試行中...\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4796,6 +4811,42 @@ msgstr "help\t\tコマンドのヘルプを取得\n"
 
 msgid "idle"
 msgstr "待機中"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -6080,8 +6131,17 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "タイプ \"%s\" を検査できませんでした!"
 
+#~ msgid "Cover open."
+#~ msgstr "カバーが開いています。"
+
+#~ msgid "Developer almost empty."
+#~ msgstr "現像剤が無くなりかけています。"
+
 #~ msgid "Developer empty!"
 #~ msgstr "現像剤が無くなりました!"
+
+#~ msgid "Door open."
+#~ msgstr "ドアが開いています。"
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: 不正な %%BoundingBox: コメントがあります!\n"
@@ -6205,6 +6265,9 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: プリントデータを読み込めません!\n"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: プリントデータを送信できません (%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: プリントデータを送信できません!\n"
 
@@ -6288,11 +6351,20 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "printer-uri 属性を取得しましたが、job-id を取得できませんでした!"
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "インクまたはトナーがほとんどありません。"
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "インクまたはトナーがありません!"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "廃インクまたは廃トナー容器がほとんど一杯です。"
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "廃インクまたは廃トナー容器が一杯です!"
+
+#~ msgid "Interlock open."
+#~ msgstr "インターロックが開いています。"
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "ジョブ番号 %d を再開できません - ファイルが見つかりません!"
@@ -6327,11 +6399,17 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "Media jam!"
 #~ msgstr "紙詰まりです!"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "用紙トレイが空になりかけています。"
+
 #~ msgid "Media tray empty!"
 #~ msgstr "用紙トレイが空になりました!"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "用紙トレイが見つかりません!"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "用紙トレイに補充が必要です。"
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "document-number 属性がありません!"
@@ -6390,17 +6468,29 @@ msgstr "variable-bindings の長さが不定"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "リクエストにサブスクリプション属性がありません!"
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPC はもうすぐ交換が必要になります。"
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPC は交換時期です!"
 
 #~ msgid "Out of toner!"
 #~ msgstr "トナー切れです!"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "排紙トレイがほとんど一杯です。"
+
 #~ msgid "Output bin full!"
 #~ msgstr "排紙トレイが一杯です!"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "排紙トレイが見つかりません!"
+
+#~ msgid "Printer offline."
+#~ msgstr "プリンターはオフラインです。"
+
+#~ msgid "SCSI Printer"
+#~ msgstr "SCSI プリンター"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "notify-user-data 値が大きすぎます (%d > 63 オクテット)!"
@@ -6410,6 +6500,9 @@ msgstr "variable-bindings の長さが不定"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "printer-uri 属性は必須です!"
+
+#~ msgid "Toner low."
+#~ msgstr "トナーが少なくなっています。"
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "job-sheets 値が多すぎます (%d > 2)!"
@@ -6560,6 +6653,9 @@ msgstr "variable-bindings の長さが不定"
 #~ msgstr ""
 #~ "WARNING: リモートホストは %d 秒経ってもデータ・ステータス・バイトを返しま"
 #~ "せんでした!\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr "WARNING: SCSI コマンドはタイムアウトしました (%d)。再試行中...\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "

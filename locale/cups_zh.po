@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -278,6 +278,11 @@ msgid ""
 msgstr ""
 "        WARN    PCFileName 长于 8.3，不符合 PPD 规范。\n"
 "                REF: 页 61-62，节 5.3。\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2103,6 +2108,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "标题"
 
@@ -2204,9 +2212,6 @@ msgstr "连续"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "机盖打开。"
-
 msgid "Created"
 msgstr "创建"
 
@@ -2256,12 +2261,6 @@ msgstr "DeskJet 系列"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "目的位置“%s”没有接受作业。"
 
-msgid "Developer almost empty."
-msgstr "显影剂差不多快要空了。"
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2287,9 +2286,6 @@ msgstr "停用"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "找不到文稿 %d（在作业 %d 中）。"
-
-msgid "Door open."
-msgstr "打印机门打开。"
 
 msgid "Double Postcard"
 msgstr "双面明信片"
@@ -2338,10 +2334,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2402,9 +2394,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2635,10 +2624,6 @@ msgstr "ERROR: 无法发送初始 PAP 发送数据请求"
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: 无法发送打印数据 (%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: 无法将打印文件发送到打印机"
 
@@ -2754,6 +2739,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "结束标题"
 
+msgid "English"
+msgstr "Chinese"
+
 msgid "Enter old password:"
 msgstr "输入旧密码："
 
@@ -2840,12 +2828,6 @@ msgstr "对开本"
 
 msgid "Forbidden"
 msgstr "禁止"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "通用"
@@ -3062,6 +3044,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "非法控制字符"
 
@@ -3077,18 +3062,6 @@ msgstr "非法转换字符串"
 msgid "Illegal whitespace character"
 msgstr "非法空白字符"
 
-msgid "Ink/toner almost empty."
-msgstr "墨水/碳粉差不多快要空了。"
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "墨水/碳粉废物箱差不多快要满了。"
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "可安装的选项"
 
@@ -3100,9 +3073,6 @@ msgstr "IntelliBar 标签打印机"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "互锁打开。"
 
 msgid "Internal Server Error"
 msgstr ""
@@ -3281,21 +3251,6 @@ msgstr "介质跟踪"
 msgid "Media Type"
 msgstr "介质类型"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "介质盒差不多快要空了。"
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "介质盒需要装纸。"
-
 msgid "Medium"
 msgstr "中等"
 
@@ -3319,6 +3274,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3504,12 +3462,6 @@ msgstr "注释"
 msgid "OK"
 msgstr "好"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPC 的使用寿命差不多快要到了。"
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "关闭（单面）"
 
@@ -3538,17 +3490,8 @@ msgstr "选项已安装"
 msgid "Options: "
 msgstr "Options: "
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "输出模式"
-
-msgid "Output bin almost full."
-msgstr "出纸箱差不多快要满了。"
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3565,9 +3508,6 @@ msgstr "打印机 %s 的输出已发送到 %s/%s\n"
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "打印机 %s/%s 的输出已发送到远程打印机 %s（在 %s 上）\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "通过\n"
@@ -3724,9 +3664,6 @@ msgstr "打印机已暂停"
 msgid "Printer Settings"
 msgstr "打印机设置"
 
-msgid "Printer offline."
-msgstr "打印机已脱机。"
-
 msgid "Printer:"
 msgstr "打印机："
 
@@ -3780,9 +3717,6 @@ msgstr "倒回"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "运行命令：%s %s -N -A %s -c &apos;%s&apos;\n"
-
-msgid "SCSI Printer"
-msgstr "SCSI 打印机"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "SEQUENCE 使用不定长度"
@@ -3893,12 +3827,66 @@ msgstr ""
 "类名称可能最多包含 127 个可打印的字符，且不能包含空格、斜线 (/) 或磅符号 "
 "(#)。"
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr "notify-lease-duration 属性不能配合作业订阅使用。"
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3913,6 +3901,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "打印机或类找不到。"
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -3937,14 +3940,14 @@ msgstr "订阅名称可能不包含空格、斜线 (/)、问号 (?) 或磅符号
 msgid "There are too many subscriptions."
 msgstr "有太多订阅。"
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "热转印介质"
 
 msgid "Title: "
 msgstr "标题："
-
-msgid "Toner low."
-msgstr "碳粉不足。"
 
 msgid "Too many active jobs."
 msgstr "太多活跃的作业。"
@@ -4383,8 +4386,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4393,6 +4396,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4552,10 +4571,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr "WARNING: SCSI 命令超时 (%d)；正在重试…\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4708,6 +4723,42 @@ msgstr "帮助\t\t获得命令帮助\n"
 
 msgid "idle"
 msgstr "闲置"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -5924,8 +5975,17 @@ msgstr "variable-bindings 使用不定长度"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "未能扫描类型“%s”！"
 
+#~ msgid "Cover open."
+#~ msgstr "机盖打开。"
+
+#~ msgid "Developer almost empty."
+#~ msgstr "显影剂差不多快要空了。"
+
 #~ msgid "Developer empty!"
 #~ msgstr "显影剂已空！"
+
+#~ msgid "Door open."
+#~ msgstr "打印机门打开。"
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: 错误的 %%BoundingBox：发现批注！\n"
@@ -6050,6 +6110,9 @@ msgstr "variable-bindings 使用不定长度"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: 无法读取打印数据！\n"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: 无法发送打印数据 (%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: 无法发送打印数据！\n"
 
@@ -6130,11 +6193,20 @@ msgstr "variable-bindings 使用不定长度"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "获得 printer-uri 属性而不是 job-id！"
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "墨水/碳粉差不多快要空了。"
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "墨水/碳粉已空！"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "墨水/碳粉废物箱差不多快要满了。"
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "墨水/碳粉废物箱已满！"
+
+#~ msgid "Interlock open."
+#~ msgstr "互锁打开。"
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "作业 #%d 不能重新开始 - 无文件！"
@@ -6169,11 +6241,17 @@ msgstr "variable-bindings 使用不定长度"
 #~ msgid "Media jam!"
 #~ msgstr "卡纸！"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "介质盒差不多快要空了。"
+
 #~ msgid "Media tray empty!"
 #~ msgstr "介质盒已空！"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "缺少介质盒！"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "介质盒需要装纸。"
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "缺少 document-number 属性！"
@@ -6232,17 +6310,29 @@ msgstr "variable-bindings 使用不定长度"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "请求中没有订阅属性！"
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPC 的使用寿命差不多快要到了。"
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPC 的使用寿命已到！"
 
 #~ msgid "Out of toner!"
 #~ msgstr "碳粉不足！"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "出纸箱差不多快要满了。"
+
 #~ msgid "Output bin full!"
 #~ msgstr "出纸箱已满！"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "缺少输出盒！"
+
+#~ msgid "Printer offline."
+#~ msgstr "打印机已脱机。"
+
+#~ msgid "SCSI Printer"
+#~ msgstr "SCSI 打印机"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "notify-user-data 值太大（%d &gt; 63 个八位字节）！"
@@ -6252,6 +6342,9 @@ msgstr "variable-bindings 使用不定长度"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "需要 printer-uri 属性。"
+
+#~ msgid "Toner low."
+#~ msgstr "碳粉不足。"
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "太多 job-sheets 值 (%d > 2)！"
@@ -6445,6 +6538,9 @@ msgstr "variable-bindings 使用不定长度"
 #~ "WARNING: Remote host did not respond with data status byte after %d "
 #~ "seconds!\n"
 #~ msgstr "WARNING: %d 秒钟后，远程主机没有响应数据状态字节！\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr "WARNING: SCSI 命令超时 (%d)；正在重试…\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "

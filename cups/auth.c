@@ -3,7 +3,7 @@
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -98,16 +98,17 @@ cupsDoAuthentication(
 
   DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")",
                 http, method, resource));
-  DEBUG_printf(("2cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"",
-                http->digest_tries, http->userpass));
-  DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
-                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
   if (!http)
     http = _cupsConnect();
 
   if (!http || !method || !resource)
     return (-1);
+
+  DEBUG_printf(("2cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"",
+                http->digest_tries, http->userpass));
+  DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
+                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
  /*
   * Clear the current authentication string...
@@ -181,6 +182,15 @@ cupsDoAuthentication(
   else if (http->status == HTTP_UNAUTHORIZED)
     http->digest_tries ++;
 
+  if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+  {
+    DEBUG_printf(("1cupsDoAuthentication: Too many authentication tries (%d)",
+		  http->digest_tries));
+
+    http->status = HTTP_AUTHORIZATION_CANCELED;
+    return (-1);
+  }
+
  /*
   * Got a password; encode it for the server...
   */
@@ -221,15 +231,6 @@ cupsDoAuthentication(
       return (-1);
     }
 #  endif /* __APPLE__ */
-
-    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
-    {
-      DEBUG_printf(("1cupsDoAuthentication: too many Negotiate tries (%d)",
-                    http->digest_tries));
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-  
-      return (-1);
-    }
 
     if (http->gssname == GSS_C_NO_NAME)
     {

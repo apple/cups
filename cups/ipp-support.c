@@ -462,8 +462,12 @@ ippTagValue(const char *name)		/* I - Tag name */
     return (IPP_TAG_JOB);
   else if (!strcasecmp(name, "printer"))
     return (IPP_TAG_PRINTER);
+  else if (!strcasecmp(name, "unsupported"))
+    return (IPP_TAG_UNSUPPORTED_GROUP);
   else if (!strcasecmp(name, "subscription"))
     return (IPP_TAG_SUBSCRIPTION);
+  else if (!strcasecmp(name, "event"))
+    return (IPP_TAG_EVENT_NOTIFICATION);
   else if (!strcasecmp(name, "language"))
     return (IPP_TAG_LANGUAGE);
   else if (!strcasecmp(name, "mimetype"))
@@ -472,6 +476,8 @@ ippTagValue(const char *name)		/* I - Tag name */
     return (IPP_TAG_NAME);
   else if (!strcasecmp(name, "text"))
     return (IPP_TAG_TEXT);
+  else if (!strcasecmp(name, "begCollection"))
+    return (IPP_TAG_BEGIN_COLLECTION);
   else
     return (IPP_TAG_ZERO);
 }

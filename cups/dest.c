@@ -4,7 +4,7 @@
  *   User-defined destination (and option) support for the Common UNIX
  *   Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -404,8 +404,6 @@ cupsGetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   if ((home = getenv("HOME")) != NULL)
   {
     snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-    if (access(filename, 0))
-      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
 
     num_dests = cups_get_dests(filename, NULL, NULL, user_default != NULL,
                                num_dests, dests);
@@ -517,13 +515,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
       snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
 
-      if ((name = cups_get_default(filename, defname, sizeof(defname),
-				   &instance)) == NULL)
-      {
-	snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
-	name = cups_get_default(filename, defname, sizeof(defname),
-				&instance);
-      }
+      name = cups_get_default(filename, defname, sizeof(defname), &instance);
     }
 
     if (!name)
@@ -581,9 +573,6 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
   if (home)
   {
     snprintf(filename, sizeof(filename), "%s/.cups/lpoptions", home);
-
-    if (access(filename, 0))
-      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
 
     cups_get_dests(filename, name, instance, 1, 1, &dest);
   }
@@ -770,13 +759,6 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
 
     if ((home = getenv("HOME")) != NULL)
     {
-     /*
-      * Remove the old ~/.lpoptions file...
-      */
-
-      snprintf(filename, sizeof(filename), "%s/.lpoptions", home);
-      unlink(filename);
-
      /*
       * Create ~/.cups subdirectory...
       */

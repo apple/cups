@@ -921,14 +921,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
-	if ((value = ippTagValue(token)) < 0)
+	if ((value = ippTagValue(token)) == IPP_TAG_ZERO)
 	{
 	  print_fatal_error("Bad ATTR value tag \"%s\" on line %d.", token,
 	                    linenum);
 	  goto test_error;
 	}
-
-	printf("%d: value=%s\n", linenum, ippTagString(value));
 
 	if (!get_token(fp, attr, sizeof(attr), &linenum))
 	{
@@ -1030,6 +1028,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      break;
 
 	  default :
+	      print_fatal_error("Unsupported ATTR value tag %s on line %d.",
+				ippTagString(value), linenum);
+	      goto test_error;
+
+	  case IPP_TAG_TEXTLANG :
+	  case IPP_TAG_NAMELANG :
+	  case IPP_TAG_TEXT :
+	  case IPP_TAG_NAME :
+	  case IPP_TAG_KEYWORD :
+	  case IPP_TAG_URI :
+	  case IPP_TAG_URISCHEME :
+	  case IPP_TAG_CHARSET :
+	  case IPP_TAG_LANGUAGE :
+	  case IPP_TAG_MIMETYPE :
 	      if (!strchr(token, ','))
 	        ippAddString(request, group, value, attr, NULL, token);
 	      else
@@ -2037,7 +2049,7 @@ expect_matches(
   * types separated by "," or "|"...
   */
 
-  for (of_type = expect->of_type, match = 0; !match && of_type; of_type = next)
+  for (of_type = expect->of_type, match = 0; !match && *of_type; of_type = next)
   {
    /*
     * Find the next separator, and set it (temporarily) to nul if present.

@@ -3,7 +3,7 @@
  *
  *   Directory services routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -120,7 +120,7 @@ static void	process_implicit_classes(void);
 static void	send_cups_browse(cupsd_printer_t *p);
 #ifdef HAVE_LDAP
 static LDAP	*ldap_connect(void);
-static void	ldap_reconnect(void);
+static LDAP	*ldap_reconnect(void);
 static void	ldap_disconnect(LDAP *ld);
 static int	ldap_search_rec(LDAP *ld, char *base, int scope,
                                 char *filter, char *attrs[],
@@ -1357,7 +1357,7 @@ ldap_connect(void)
  * 'ldap_reconnect()' - Reconnect to LDAP Server
  */
 
-static void
+static LDAP *				/* O - New LDAP handle */
 ldap_reconnect(void)
 {
   LDAP	*TempBrowseLDAPHandle = NULL;	/* Temp Handle to LDAP server */
@@ -1365,7 +1365,7 @@ ldap_reconnect(void)
 
  /*
   * Get a new LDAP Handle and replace the global Handle
-  * if the new connection was successful
+  * if the new connection was successful.
   */
 
   cupsdLogMessage(CUPSD_LOG_INFO, "Try LDAP reconnect...");
@@ -1379,6 +1379,8 @@ ldap_reconnect(void)
 
     BrowseLDAPHandle = TempBrowseLDAPHandle;
   }
+
+  return (BrowseLDAPHandle);
 }
 
 
@@ -3982,6 +3984,7 @@ ldap_search_rec(LDAP        *ld,	/* I - LDAP handler */
                 LDAPMessage **res)	/* I - LDAP handler */
 {
   int	rc;				/* Return code */
+  LDAP  *ldr;				/* LDAP handler after reconnect */
 
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
@@ -4004,13 +4007,13 @@ ldap_search_rec(LDAP        *ld,	/* I - LDAP handler */
                     "We try the LDAP search once again after reconnecting to "
 		    "the server");
     ldap_freeres(*res);
-    ldap_reconnect();
+    ldr = ldap_reconnect();
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
-    rc = ldap_search_ext_s(ld, base, scope, filter, attrs, attrsonly, NULL,
+    rc = ldap_search_ext_s(ldr, base, scope, filter, attrs, attrsonly, NULL,
                            NULL, NULL, LDAP_NO_LIMIT, res);
 #  else
-    rc = ldap_search_s(ld, base, scope, filter, attrs, attrsonly, res);
+    rc = ldap_search_s(ldr, base, scope, filter, attrs, attrsonly, res);
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
   }
 
@@ -4086,7 +4089,7 @@ ldap_getval_firststring(
     */
 
     size = maxsize;
-    if (size < bval[0]->bv_len)
+    if (size < (bval[0]->bv_len + 1))
     {
       rc = -1;
       dn = ldap_get_dn(ld, entry);
@@ -4096,7 +4099,7 @@ ldap_getval_firststring(
       ldap_memfree(dn);
     }
     else
-      size = bval[0]->bv_len;
+      size = bval[0]->bv_len + 1;
 
     strlcpy(retval, bval[0]->bv_val, size);
     ldap_value_free_len(bval);
@@ -4142,6 +4145,7 @@ send_ldap_ou(char *ou,			/* I - Servername/ou to register */
   LDAPMessage   *res,                   /* Search result token */
 		*e;			/* Current entry from search */
   int           rc;                     /* LDAP status */
+  int           rcmod;                  /* LDAP status for modifications */
   char          dn[1024],               /* DN of the organizational unit we are adding */
                 *desc[2],               /* Change records */
                 *ou_value[2];
@@ -4252,16 +4256,16 @@ send_ldap_ou(char *ou,			/* I - Servername/ou to register */
       pmods[i] = NULL;
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
-      if ((rc = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
-                                  NULL)) != LDAP_SUCCESS)
+      if ((rcmod = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                     NULL)) != LDAP_SUCCESS)
 #  else
-      if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      if ((rcmod = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
                         "LDAP modify for %s failed with status %d: %s",
-                        ou, rc, ldap_err2string(rc));
-        if ( LDAP_SERVER_DOWN == rc )
+                        ou, rcmod, ldap_err2string(rcmod));
+        if (rcmod == LDAP_SERVER_DOWN)
           ldap_reconnect();
       }
     }
@@ -4284,21 +4288,22 @@ send_ldap_ou(char *ou,			/* I - Servername/ou to register */
     pmods[i] = NULL;
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
-    if ((rc = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
-                             NULL)) != LDAP_SUCCESS)
+    if ((rcmod = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                NULL)) != LDAP_SUCCESS)
 #  else
-    if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+    if ((rcmod = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "LDAP add for %s failed with status %d: %s",
-                      ou, rc, ldap_err2string(rc));
-      if ( LDAP_SERVER_DOWN == rc )
+                      ou, rcmod, ldap_err2string(rcmod));
+      if (rcmod == LDAP_SERVER_DOWN)
         ldap_reconnect();
     }
   }
 
-  ldap_freeres(res);
+  if (rc == LDAP_SUCCESS)
+    ldap_freeres(res);
 }
 
 
@@ -4323,6 +4328,7 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
 		typestring[255],	/* String to hold printer-type */
 		dn[1024];		/* DN of the printer we are adding */
   int		rc;			/* LDAP status */
+  int		rcmod;			/* LDAP status for modifications */
   char		old_uri[HTTP_MAX_URI],	/* Printer URI */
 		old_location[1024],	/* Printer location */
 		old_info[1024],		/* Printer information */
@@ -4506,16 +4512,16 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
       pmods[i] = NULL;
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
-      if ((rc = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
-                                  NULL)) != LDAP_SUCCESS)
+      if ((rcmod = ldap_modify_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                     NULL)) != LDAP_SUCCESS)
 #  else
-      if ((rc = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+      if ((rcmod = ldap_modify_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
       {
         cupsdLogMessage(CUPSD_LOG_ERROR,
                         "LDAP modify for %s failed with status %d: %s",
-                        p->name, rc, ldap_err2string(rc));
-        if (rc == LDAP_SERVER_DOWN)
+                        p->name, rcmod, ldap_err2string(rcmod));
+        if (rcmod == LDAP_SERVER_DOWN)
           ldap_reconnect();
       }
     }
@@ -4540,21 +4546,22 @@ send_ldap_browse(cupsd_printer_t *p)	/* I - Printer to register */
     pmods[i] = NULL;
 
 #  if defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000
-    if ((rc = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
-                             NULL)) != LDAP_SUCCESS)
+    if ((rcmod = ldap_add_ext_s(BrowseLDAPHandle, dn, pmods, NULL,
+                                NULL)) != LDAP_SUCCESS)
 #  else
-    if ((rc = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
+    if ((rcmod = ldap_add_s(BrowseLDAPHandle, dn, pmods)) != LDAP_SUCCESS)
 #  endif /* defined(HAVE_OPENLDAP) && LDAP_API_VERSION > 3000 */
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "LDAP add for %s failed with status %d: %s",
-                      p->name, rc, ldap_err2string(rc));
-      if (rc == LDAP_SERVER_DOWN)
+                      p->name, rcmod, ldap_err2string(rcmod));
+      if (rcmod == LDAP_SERVER_DOWN)
         ldap_reconnect();
     }
   }
 
-  ldap_freeres(res);
+  if (rc == LDAP_SUCCESS)
+    ldap_freeres(res);
 }
 
 

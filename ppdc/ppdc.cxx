@@ -59,6 +59,7 @@ main(int  argc,				// I - Number of command-line arguments
 			filename[1024];	// PPD filename
   int			comp,		// Compress
 			do_test,	// Test PPD files
+			single_language,// Generate single-language files
 			use_model_name,	// Use ModelName for filename
 			verbose;	// Verbosity
   ppdcLineEnding	le;		// Line ending to use
@@ -69,16 +70,17 @@ main(int  argc,				// I - Number of command-line arguments
   _cupsSetLocale(argv);
 
   // Scan the command-line...
-  catalog        = NULL;
-  comp           = 0;
-  do_test        = 0;
-  le             = PPDC_LFONLY;
-  locales        = NULL;
-  outdir         = "ppd";
-  src            = new ppdcSource();
-  use_model_name = 0;
-  verbose        = 0;
-  filenames      = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
+  catalog         = NULL;
+  comp            = 0;
+  do_test         = 0;
+  le              = PPDC_LFONLY;
+  locales         = NULL;
+  outdir          = "ppd";
+  single_language = 0;
+  src             = new ppdcSource();
+  use_model_name  = 0;
+  verbose         = 0;
+  filenames       = cupsArrayNew((cups_array_func_t)strcasecmp, NULL);
 
   for (i = 1; i < argc; i ++)
     if (argv[i][0] == '-')
@@ -178,6 +180,8 @@ main(int  argc,				// I - Number of command-line arguments
 	      }
 	      else
 	      {
+	        single_language = 1;
+
         	if (verbose > 1)
 	          _cupsLangPrintf(stdout,
 		                  _("ppdc: Loading messages for locale "
@@ -383,7 +387,7 @@ main(int  argc,				// I - Number of command-line arguments
 
       ppdcArray *templocales = locales;
 
-      if (!templocales)
+      if (!templocales && !single_language)
       {
 	templocales = new ppdcArray();
 	for (ppdcCatalog *tempcatalog = (ppdcCatalog *)src->po_files->first();

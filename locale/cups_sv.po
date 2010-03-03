@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -278,6 +278,11 @@ msgid ""
 msgstr ""
 "        VARN    PCFileName längre än 8.3 i strid med PPD-spec.\n"
 "                REF: Sidorna 61-62, sektion 5.3.\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2104,6 +2109,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "Banners"
 
@@ -2205,9 +2213,6 @@ msgstr "Kontinuerlig"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "Lock öppet."
-
 msgid "Created"
 msgstr "Skapad"
 
@@ -2257,12 +2262,6 @@ msgstr "DeskJet-serier"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "Mål \"%s\" tar inte emot utskrifter."
 
-msgid "Developer almost empty."
-msgstr "Tonern nästan slut."
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2288,9 +2287,6 @@ msgstr "Avaktiverad"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "Dokument %d hittades inte i utskrift %d."
-
-msgid "Door open."
-msgstr "Lucka öppen."
 
 msgid "Double Postcard"
 msgstr "Dubbelt vykort"
@@ -2339,10 +2335,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2403,9 +2395,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2636,10 +2625,6 @@ msgstr "ERROR: Kunde inte skicka första PAP-send-data-förfrågan"
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: Kunde inte skicka utskriftsdata (%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: Kunde inte skicka utskriftsfil till skrivare"
 
@@ -2755,6 +2740,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "Slutbanner"
 
+msgid "English"
+msgstr "Swedish"
+
 msgid "Enter old password:"
 msgstr "Ange gammalt lösenord:"
 
@@ -2843,12 +2831,6 @@ msgstr "Folio"
 
 msgid "Forbidden"
 msgstr "Förbjudet"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "Allmänt"
@@ -3066,6 +3048,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "Otillåtet styrtecken"
 
@@ -3081,18 +3066,6 @@ msgstr "Otillåten översättningssträng"
 msgid "Illegal whitespace character"
 msgstr "Otillåtet blanktecken"
 
-msgid "Ink/toner almost empty."
-msgstr "Bläck/toner är nästan slut."
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "Avfallsbehållaren för bläck/toner nästan full."
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "Installerbara alternativ"
 
@@ -3104,9 +3077,6 @@ msgstr "Eikettskrivare från IntelliBar"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "Spärrmekanism öppen."
 
 msgid "Internal Server Error"
 msgstr ""
@@ -3285,21 +3255,6 @@ msgstr "Mediespårning"
 msgid "Media Type"
 msgstr "Medietyp"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "Mediefack nästan tomt."
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "Mediefacket måste fyllas på."
-
 msgid "Medium"
 msgstr "Medium"
 
@@ -3323,6 +3278,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3508,12 +3466,6 @@ msgstr "Anm"
 msgid "OK"
 msgstr "OK"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPC nästan vid slutpunkten."
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "Av (1-sidig)"
 
@@ -3542,17 +3494,8 @@ msgstr "Alternativ installerade"
 msgid "Options: "
 msgstr "Alternativ: "
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "Utmatningsläge"
-
-msgid "Output bin almost full."
-msgstr "Utmatningsfack nästan fullt."
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3569,9 +3512,6 @@ msgstr "Utmatning för skrivaren %s/%s skickas till %s\n"
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "Utmatning för skrivaren %s/%s skickas till fjärrskrivaren %s på %s\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "OK\n"
@@ -3728,9 +3668,6 @@ msgstr "Utskrift pausad"
 msgid "Printer Settings"
 msgstr "Skrivarinställningar"
 
-msgid "Printer offline."
-msgstr "Skrivare frånkopplad."
-
 msgid "Printer:"
 msgstr "Skrivare:"
 
@@ -3787,9 +3724,6 @@ msgstr "Bakåt"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "Kör kommando: %s %s -N -A %s -c ”%s”\n"
-
-msgid "SCSI Printer"
-msgstr "Skrivare SCSI"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "SEQUENCE använder obegränsad längd"
@@ -3900,6 +3834,18 @@ msgstr ""
 "Klassnamnet får endast innehålla upp till 127 skrivbara tecken och får inte "
 "innehålla blanksteg, snedstreck (/) eller fyrkantstecknet (#)."
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -3908,6 +3854,48 @@ msgstr ""
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3922,6 +3910,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "Skrivaren eller klassen hittades inte."
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -3951,14 +3954,14 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr "Det finns för många prenumerationer."
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "Termiska överföringsmedia"
 
 msgid "Title: "
 msgstr "Titel: "
-
-msgid "Toner low."
-msgstr "Toner låg."
 
 msgid "Too many active jobs."
 msgstr "För många aktiva utskrifter."
@@ -4400,8 +4403,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4410,6 +4413,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4571,10 +4590,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr "WARNING: SCSI-kommando nådde en maxtidsgräns (%d), försöker igen...\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4732,6 +4747,42 @@ msgstr "help\t\tfå hjälp om kommandon\n"
 
 msgid "idle"
 msgstr "overksam"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -5972,8 +6023,17 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "Kunde inte skanna typen \"%s\"!"
 
+#~ msgid "Cover open."
+#~ msgstr "Lock öppet."
+
+#~ msgid "Developer almost empty."
+#~ msgstr "Tonern nästan slut."
+
 #~ msgid "Developer empty!"
 #~ msgstr "Tonern är slut!"
+
+#~ msgid "Door open."
+#~ msgstr "Lucka öppen."
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: Felaktig %%BoundingBox: kommentar sedd!\n"
@@ -6104,6 +6164,9 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: Kunde inte läsa utskriftsdata!"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: Kunde inte skicka utskriftsdata (%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: Kunde inte skicka utskriftsdata!"
 
@@ -6189,11 +6252,20 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "Attribut för printer-uri finns, men inget utskrifts-ID!"
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "Bläck/toner är nästan slut."
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "Bläck/toner är slut!"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "Avfallsbehållaren för bläck/toner nästan full."
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "Avfallsbehållaren för bläck/toner är full!"
+
+#~ msgid "Interlock open."
+#~ msgstr "Spärrmekanism öppen."
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "Utskrift #%d kan inte startas om - inga filer!"
@@ -6228,11 +6300,17 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "Media jam!"
 #~ msgstr "Medietrassel!"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "Mediefack nästan tomt."
+
 #~ msgid "Media tray empty!"
 #~ msgstr "Mediefack tomt!"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "Mediefack saknas!"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "Mediefacket måste fyllas på."
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "Saknar attribut för dokumentnummer!"
@@ -6291,17 +6369,29 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "Inga prenumerationsattribut i begäran!"
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPC nästan vid slutpunkten."
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPC vid slutpunkten!"
 
 #~ msgid "Out of toner!"
 #~ msgstr "Slut på toner!"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "Utmatningsfack nästan fullt."
+
 #~ msgid "Output bin full!"
 #~ msgstr "Utmatningsfack fullt!"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "Utmatningsfack saknas!"
+
+#~ msgid "Printer offline."
+#~ msgstr "Skrivare frånkopplad."
+
+#~ msgid "SCSI Printer"
+#~ msgstr "Skrivare SCSI"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "Värdet för notify-user-data är för stort (%d &gt; 63 oktetter)!"
@@ -6311,6 +6401,9 @@ msgstr "variabelbindningar använder obegränsad längd"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "Attributet printer-uri krävs!"
+
+#~ msgid "Toner low."
+#~ msgstr "Toner låg."
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "För många värden för utskriftsark (%d > 2)!"
@@ -6514,6 +6607,10 @@ msgstr "variabelbindningar använder obegränsad längd"
 #~ "seconds!\n"
 #~ msgstr ""
 #~ "WARNING: Fjärrvärden svarade inte med datastatusbyte efter %d sekunder!\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr ""
+#~ "WARNING: SCSI-kommando nådde en maxtidsgräns (%d), försöker igen...\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "

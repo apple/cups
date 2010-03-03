@@ -1,10 +1,9 @@
 /*
  * "$Id: usersys.c 8498 2009-04-13 17:03:15Z mike $"
  *
- *   User, system, and password routines for the Common UNIX Printing
- *   System (CUPS).
+ *   User, system, and password routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -17,14 +16,16 @@
  *
  * Contents:
  *
- *   cupsEncryption()        - Get the default encryption settings.
+ *   cupsEncryption()        - Get the current encryption settings.
  *   cupsGetPassword()       - Get a password from the user.
- *   cupsServer()            - Return the hostname/address of the default
+ *   cupsGetPassword2()      - Get a password from the user using the advanced
+ *                             password callback.
+ *   cupsServer()            - Return the hostname/address of the current
  *                             server.
  *   cupsSetEncryption()     - Set the encryption preference.
  *   cupsSetPasswordCB()     - Set the password callback for CUPS.
  *   cupsSetPasswordCB2()    - Set the advanced password callback for CUPS.
- *   cupsSetServer()         - Set the default server name.
+ *   cupsSetServer()         - Set the default server name and port.
  *   cupsSetUser()           - Set the default user name.
  *   cupsUser()              - Return the current user's name.
  *   _cupsGetPassword()      - Get a password from the user.
@@ -42,6 +43,8 @@
 #include <sys/stat.h>
 #ifdef WIN32
 #  include <windows.h>
+#else
+#  include <pwd.h>
 #endif /* WIN32 */
 #include "debug.h"
 
@@ -57,12 +60,17 @@ static void	cups_read_client_conf(cups_file_t *fp,
 
 
 /*
- * 'cupsEncryption()' - Get the default encryption settings.
+ * 'cupsEncryption()' - Get the current encryption settings.
  *
  * The default encryption setting comes from the CUPS_ENCRYPTION
  * environment variable, then the ~/.cups/client.conf file, and finally the
  * /etc/cups/client.conf file. If not set, the default is
  * @code HTTP_ENCRYPT_IF_REQUESTED@.
+ *
+ * Note: The current encryption setting is tracked separately for each thread
+ * in a program. Multi-threaded programs that override the setting via the
+ * @link cupsSetEncryption@ function need to do so in each thread for the same
+ * setting to be used.
  */
 
 http_encryption_t			/* O - Encryption settings */
@@ -83,6 +91,11 @@ cupsEncryption(void)
  *
  * Uses the current password callback function. Returns @code NULL@ if the
  * user does not provide a password.
+ *
+ * Note: The current password callback function is tracked separately for each
+ * thread in a program. Multi-threaded programs that override the setting via
+ * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
+ * do so in each thread for the same function to be used.
  */
 
 const char *				/* O - Password */
@@ -97,10 +110,15 @@ cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
 /*
  * 'cupsGetPassword2()' - Get a password from the user using the advanced
- *                        callback.
+ *                        password callback.
  *
  * Uses the current password callback function. Returns @code NULL@ if the
  * user does not provide a password.
+ *
+ * Note: The current password callback function is tracked separately for each
+ * thread in a program. Multi-threaded programs that override the setting via
+ * the @link cupsSetPasswordCB@ or @link cupsSetPasswordCB2@ functions need to
+ * do so in each thread for the same function to be used.
  *
  * @since CUPS 1.4/Mac OS X 10.6@
  */
@@ -122,10 +140,20 @@ cupsGetPassword2(const char *prompt,	/* I - Prompt string */
 
 
 /*
- * 'cupsServer()' - Return the hostname/address of the default server.
+ * 'cupsServer()' - Return the hostname/address of the current server.
  *
- * The returned value can be a fully-qualified hostname, a numeric
- * IPv4 or IPv6 address, or a domain socket pathname.
+ * The default server comes from the CUPS_SERVER environment variable, then the
+ * ~/.cups/client.conf file, and finally the /etc/cups/client.conf file. If not
+ * set, the default is the local system - either "localhost" or a domain socket
+ * path.
+ *
+ * The returned value can be a fully-qualified hostname, a numeric IPv4 or IPv6
+ * address, or a domain socket pathname.
+ *
+ * Note: The current server is tracked separately for each thread in a program.
+ * Multi-threaded programs that override the server via the
+ * @link cupsSetServer@ function need to do so in each thread for the same
+ * server to be used.
  */
 
 const char *				/* O - Server name */
@@ -143,6 +171,15 @@ cupsServer(void)
 
 /*
  * 'cupsSetEncryption()' - Set the encryption preference.
+ *
+ * The default encryption setting comes from the CUPS_ENCRYPTION
+ * environment variable, then the ~/.cups/client.conf file, and finally the
+ * /etc/cups/client.conf file. If not set, the default is
+ * @code HTTP_ENCRYPT_IF_REQUESTED@.
+ *
+ * Note: The current encryption setting is tracked separately for each thread
+ * in a program. Multi-threaded programs that override the setting need to do
+ * so in each thread for the same setting to be used.
  */
 
 void
@@ -161,7 +198,14 @@ cupsSetEncryption(http_encryption_t e)	/* I - New encryption preference */
 /*
  * 'cupsSetPasswordCB()' - Set the password callback for CUPS.
  *
- * Pass @code NULL@ to restore the default (console) password callback.
+ * Pass @code NULL@ to restore the default (console) password callback, which
+ * reads the password from the console. Programs should call either this
+ * function or @link cupsSetPasswordCB2@, as only one callback can be registered
+ * by a program per thread.
+ *
+ * Note: The current password callback is tracked separately for each thread
+ * in a program. Multi-threaded programs that override the callback need to do
+ * so in each thread for the same callback to be used.
  */
 
 void
@@ -182,7 +226,14 @@ cupsSetPasswordCB(cups_password_cb_t cb)/* I - Callback function */
 /*
  * 'cupsSetPasswordCB2()' - Set the advanced password callback for CUPS.
  *
- * Pass @code NULL@ to restore the default (console) password callback.
+ * Pass @code NULL@ to restore the default (console) password callback, which
+ * reads the password from the console. Programs should call either this
+ * function or @link cupsSetPasswordCB2@, as only one callback can be registered
+ * by a program per thread.
+ *
+ * Note: The current password callback is tracked separately for each thread
+ * in a program. Multi-threaded programs that override the callback need to do
+ * so in each thread for the same callback to be used.
  *
  * @since CUPS 1.4/Mac OS X 10.6@
  */
@@ -205,11 +256,17 @@ cupsSetPasswordCB2(
 
 
 /*
- * 'cupsSetServer()' - Set the default server name.
+ * 'cupsSetServer()' - Set the default server name and port.
  *
  * The "server" string can be a fully-qualified hostname, a numeric
- * IPv4 or IPv6 address, or a domain socket pathname. Pass @code NULL@ to
- * restore the default server name.
+ * IPv4 or IPv6 address, or a domain socket pathname. Hostnames and numeric IP
+ * addresses can be optionally followed by a colon and port number to override
+ * the default port 631, e.g. "hostname:8631". Pass @code NULL@ to restore the
+ * default server name and port.
+ *
+ * Note: The current server is tracked separately for each thread in a program.
+ * Multi-threaded programs that override the server need to do so in each
+ * thread for the same server to be used.
  */
 
 void
@@ -254,6 +311,10 @@ cupsSetServer(const char *server)	/* I - Server name */
  * 'cupsSetUser()' - Set the default user name.
  *
  * Pass @code NULL@ to restore the default user name.
+ *
+ * Note: The current user name is tracked separately for each thread in a
+ * program. Multi-threaded programs that override the user name need to do so
+ * in each thread for the same user name to be used.
  */
 
 void
@@ -269,13 +330,13 @@ cupsSetUser(const char *user)		/* I - User name */
 }
 
 
-#if defined(WIN32)
-/*
- * WIN32 username and password stuff.
- */
-
 /*
  * 'cupsUser()' - Return the current user's name.
+ *
+ * Note: The current user name is tracked separately for each thread in a
+ * program. Multi-threaded programs that override the user name with the
+ * @link cupsSetUser@ function need to do so in each thread for the same user
+ * name to be used.
  */
 
 const char *				/* O - User name */
@@ -286,16 +347,38 @@ cupsUser(void)
 
   if (!cg->user[0])
   {
-    DWORD	size;		/* Size of string */
+#ifdef WIN32
+   /*
+    * Get the current user name from the OS...
+    */
 
+    DWORD	size;			/* Size of string */
 
     size = sizeof(cg->user);
     if (!GetUserName(cg->user, &size))
+#else
+   /*
+    * Get the user name corresponding to the current UID...
+    */
+
+    struct passwd	*pwd;		/* User/password entry */
+
+    setpwent();
+    if ((pwd = getpwuid(getuid())) != NULL)
     {
      /*
-      * Use the default username...
+      * Found a match!
       */
 
+      strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
+    }
+    else
+#endif /* WIN32 */
+    {
+     /*
+      * Use the default "unknown" user name...
+      */
+      
       strcpy(cg->user, "unknown");
     }
   }
@@ -311,72 +394,21 @@ cupsUser(void)
 const char *				/* O - Password */
 _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 {
+#ifdef WIN32
+ /*
+  * Currently no console password support is provided on Windows.
+  */
+
   return (NULL);
-}
+
 #else
-/*
- * UNIX username and password stuff...
- */
+ /*
+  * Use the standard getpass function to get a password from the console.
+  */
 
-#  include <pwd.h>
-
-/*
- * 'cupsUser()' - Return the current user's name.
- */
-
-const char *				/* O - User name */
-cupsUser(void)
-{
-  struct passwd	*pwd;			/* User/password entry */
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-
-
-  if (!cg->user[0])
-  {
-   /*
-    * Rewind the password file...
-    */
-
-    setpwent();
-
-   /*
-    * Lookup the password entry for the current user.
-    */
-
-    if ((pwd = getpwuid(getuid())) == NULL)
-      strcpy(cg->user, "unknown");	/* Unknown user! */
-    else
-    {
-     /*
-      * Copy the username...
-      */
-
-      setpwent();
-
-      strlcpy(cg->user, pwd->pw_name, sizeof(cg->user));
-    }
-
-   /*
-    * Rewind the password file again...
-    */
-
-    setpwent();
-  }
-
-  return (cg->user);
-}
-
-
-/*
- * '_cupsGetPassword()' - Get a password from the user.
- */
-
-const char *				/* O - Password */
-_cupsGetPassword(const char *prompt)	/* I - Prompt string */
-{
   return (getpass(prompt));
-}
 #endif /* WIN32 */
+}
 
 
 /*
@@ -412,17 +444,11 @@ _cupsSetDefaults(void)
        !cg->ipp_port) && (home = getenv("HOME")) != NULL)
   {
    /*
-    * Look for ~/.cups/client.conf or ~/.cupsrc...
+    * Look for ~/.cups/client.conf...
     */
 
     snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
-    if ((fp = cupsFileOpen(filename, "r")) == NULL)
-    {
-      snprintf(filename, sizeof(filename), "%s/.cupsrc", home);
-      fp = cupsFileOpen(filename, "r");
-    }
-
-    if (fp)
+    if ((fp = cupsFileOpen(filename, "r")) != NULL)
     {
       cups_read_client_conf(fp, cg, cups_encryption, cups_server);
       cupsFileClose(fp);

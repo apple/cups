@@ -33,7 +33,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cups_1.4rc1_eu\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-07-03 19:34+0200\n"
 "Last-Translator: Iñaki Larrañaga Murgoitio <dooteo@euskalgnu.org>\n"
 "Language-Team: Basque <itzulpena@euskalgnu.org>\n"
@@ -312,6 +312,11 @@ msgstr ""
 "        ABISUA    PCFileName 8.3 baino luzeagoa da, eta PPD zehaztapenaren "
 "bortxaketa da.\n"
 "                Erref: 61-62 orrialdeak, 5.3 atala.\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2142,6 +2147,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "Titularrak"
 
@@ -2243,9 +2251,6 @@ msgstr "Jarraia"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "Estalkia irekita."
-
 msgid "Created"
 msgstr "Sortuta"
 
@@ -2295,12 +2300,6 @@ msgstr "DeskJet serieak"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "\"%s\" helburuak ez du lanik onartzen."
 
-msgid "Developer almost empty."
-msgstr "Errebelatzailea ia hutsik."
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2326,9 +2325,6 @@ msgstr "Desgaituta"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "Ez da %d dokumentua aurkitu %d lanean."
-
-msgid "Door open."
-msgstr "Atea irekita."
 
 msgid "Double Postcard"
 msgstr "Postal bikoitza"
@@ -2378,10 +2374,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2442,9 +2434,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2680,10 +2669,6 @@ msgstr "ERROR: ezin da PAPren hasierako datuak bidaltzeko eskaera bidali"
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: ezin da inprimatzeko daturik bidali (%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: ezin da inprimatzeko fitxategia inprimagailura bidali"
 
@@ -2799,6 +2784,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "Titularraren amaiera"
 
+msgid "English"
+msgstr "Basque"
+
 msgid "Enter old password:"
 msgstr "Sartu pasahitz zaharra:"
 
@@ -2888,12 +2876,6 @@ msgstr "Folioa"
 
 msgid "Forbidden"
 msgstr "Debekatua"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "Orokorra"
@@ -3117,6 +3099,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "Kontrol-karaktere ilegala"
 
@@ -3132,18 +3117,6 @@ msgstr "Itzulpenaren katea ilegala"
 msgid "Illegal whitespace character"
 msgstr "Zuriunea karakterea ilegala"
 
-msgid "Ink/toner almost empty."
-msgstr "Tinta/Tonerra ia hutsik."
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "Tinta/Tonerraren zakarrontzia ia beteta."
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "Aukera instalagarriak"
 
@@ -3155,9 +3128,6 @@ msgstr "IntelliBar etiketen inprimagailua"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "Segurtasun-blokeoa irekita."
 
 msgid "Internal Server Error"
 msgstr "Zerbitzariaren barneko errorea"
@@ -3337,21 +3307,6 @@ msgstr "Paperaren jarraipena"
 msgid "Media Type"
 msgstr "Paper mota"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "Paperen erretilua is hutsik."
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "Paperen erretilua bete egin behar da."
-
 msgid "Medium"
 msgstr "Euskarria"
 
@@ -3375,6 +3330,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3560,12 +3518,6 @@ msgstr "Oharra"
 msgid "OK"
 msgstr "Ados"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPCa ia agortuta."
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "Desaktibatuta (1 aldea)"
 
@@ -3594,17 +3546,8 @@ msgstr "Instalatutako aukerak"
 msgid "Options: "
 msgstr "Aukerak: "
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "Irteeraren modua"
-
-msgid "Output bin almost full."
-msgstr "Irteerako ontzia ia beteta."
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3624,9 +3567,6 @@ msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr ""
 "%s/%s inprimagailuarentzako irteera urruneko %s inprimagailura bidalita %s(e)"
 "n\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "BALIOZKOA\n"
@@ -3783,9 +3723,6 @@ msgstr "Inprimagailua pausatuta"
 msgid "Printer Settings"
 msgstr "Inprimagailuaren ezarpenak"
 
-msgid "Printer offline."
-msgstr "Inprimagailua lineaz kanpo."
-
 msgid "Printer:"
 msgstr "Inprimagailua:"
 
@@ -3840,9 +3777,6 @@ msgstr "Birboninatu"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "Komandoa exekutaten: %s %s -N -A %s -c '%s'\n"
-
-msgid "SCSI Printer"
-msgstr "SCSI inprimagailua"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "SEQUENCEk definitu gabeko luzera darabil"
@@ -3953,12 +3887,66 @@ msgstr ""
 "Klasearen izenak inprimagarriak diren 127 karaktere sooilik eduki ditzake, "
 "eta ezin du zuriune, barrak (/) edo traolaren (#) ikurrik eduki."
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr "notify-lease-duration atributua ezin da erabili lanen harpidetzekin."
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3973,6 +3961,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "Inprimagailua edo klasea ez da aurkitu."
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -4002,14 +4005,14 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr "Harpidetza gehiegi daude."
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "Transferentzia termikoaren euskarria"
 
 msgid "Title: "
 msgstr "Titulua: "
-
-msgid "Toner low."
-msgstr "Tonerra baxua."
 
 msgid "Too many active jobs."
 msgstr "Lan aktibo gehiegi."
@@ -4487,8 +4490,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4497,6 +4500,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4662,12 +4681,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr ""
-"WARNING: SCSI komandoak denboraren muga gainditu du (%d). Berriro "
-"saiatzen...\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4824,6 +4837,42 @@ msgstr "help\t\tkomandoei buruzko laguntza eskaintzen du\n"
 
 msgid "idle"
 msgstr "inaktibo"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -6123,8 +6172,17 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "Ezin izan da \"%s\" mota eskaneatu."
 
+#~ msgid "Cover open."
+#~ msgstr "Estalkia irekita."
+
+#~ msgid "Developer almost empty."
+#~ msgstr "Errebelatzailea ia hutsik."
+
 #~ msgid "Developer empty!"
 #~ msgstr "Errebelatzailea hutsik!"
+
+#~ msgid "Door open."
+#~ msgstr "Atea irekita."
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: %%BoundingBox: iruzkin okerra ikusi da\n"
@@ -6251,6 +6309,9 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: ezin da inprimatzeko daturik irakurri\n"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: ezin da inprimatzeko daturik bidali (%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: ezin da inprimatzeko daturik bidali\n"
 
@@ -6334,11 +6395,20 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "printer-uri atributua lortu da, baina ez job-id."
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "Tinta/Tonerra ia hutsik."
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "Tinta/Tonerra hutsik!"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "Tinta/Tonerraren zakarrontzia ia beteta."
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "Tinta/Tonerraren zakarrontzia beteta!"
+
+#~ msgid "Interlock open."
+#~ msgstr "Segurtasun-blokeoa irekita."
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "%d. lana ezin da berrabiatu. Ez dago fitxategirik."
@@ -6373,11 +6443,17 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgid "Media jam!"
 #~ msgstr "Paper gatazka!"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "Paperen erretilua is hutsik."
+
 #~ msgid "Media tray empty!"
 #~ msgstr "Paperen erretilua hutsik!"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "Paperen erretilua falta da!"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "Paperen erretilua bete egin behar da."
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "document-number atributua falta da."
@@ -6436,17 +6512,29 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "Ez dago harpidetzako atributurik eskaeran."
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPCa ia agortuta."
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPCa agortuta."
 
 #~ msgid "Out of toner!"
 #~ msgstr "Tonerra agortuta!"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "Irteerako ontzia ia beteta."
+
 #~ msgid "Output bin full!"
 #~ msgstr "Irteerako ontzia beteta!"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "Irteerako erretilua falta da."
+
+#~ msgid "Printer offline."
+#~ msgstr "Inprimagailua lineaz kanpo."
+
+#~ msgid "SCSI Printer"
+#~ msgstr "SCSI inprimagailua"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "notify-user-data balioa handiegia da (%d > 63 zortzikote)!"
@@ -6456,6 +6544,9 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "printer-uri atributua behar da."
+
+#~ msgid "Toner low."
+#~ msgstr "Tonerra baxua."
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "job-sheets balio gehiegi (%d > 2)."
@@ -6612,6 +6703,11 @@ msgstr "'variable-bindings'-ek definitu gabeko luzera darabil"
 #~ msgstr ""
 #~ "WARNING: urruneko ostalariak ez du erantzun datuen egoeraren bytearekin %"
 #~ "d segundo ondoren\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr ""
+#~ "WARNING: SCSI komandoak denboraren muga gainditu du (%d). Berriro "
+#~ "saiatzen...\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "

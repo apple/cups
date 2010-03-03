@@ -3,7 +3,7 @@
  *
  *   CUPS filtering program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -835,7 +835,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 {
   int		i;			/* Looping var */
   const char	*argv[8],		/* Command-line arguments */
-		*envp[12],		/* Environment variables */
+		*envp[15],		/* Environment variables */
 		*temp;			/* Temporary string */
   char		*optstr,		/* Filter options */
 		content_type[1024],	/* CONTENT_TYPE */
@@ -846,6 +846,9 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 		lang[1024],		/* LANG */
 		path[1024],		/* PATH */
 		ppd[1024],		/* PPD */
+		printer_info[255],	/* PRINTER_INFO env variable */
+		printer_location[255],	/* PRINTER_LOCATION env variable */
+		printer_name[255],	/* PRINTER env variable */
 		rip_cache[1024],	/* RIP_CACHE */
 		userenv[1024],		/* USER */
 		program[1024];		/* Program to run */
@@ -859,6 +862,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   cups_array_t	*pids;			/* Executed filters array */
   mime_filter_t	key;			/* Search key for filters */
   cups_lang_t	*language;		/* Current language */
+  cups_dest_t	*dest;			/* Destination information */
 
 
  /*
@@ -900,6 +904,34 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   snprintf(rip_cache, sizeof(rip_cache), "RIP_CACHE=%s", RIPCache);
   snprintf(userenv, sizeof(userenv), "USER=%s", user);
 
+  if (printer &&
+      (dest = cupsGetNamedDest(CUPS_HTTP_DEFAULT, printer, NULL)) != NULL)
+  {
+    if ((temp = cupsGetOption("printer-info", dest->num_options,
+                              dest->options)) != NULL)
+      snprintf(printer_info, sizeof(printer_info), "PRINTER_INFO=%s", temp);
+    else
+      snprintf(printer_info, sizeof(printer_info), "PRINTER_INFO=%s", printer);
+
+    if ((temp = cupsGetOption("printer-location", dest->num_options,
+                              dest->options)) != NULL)
+      snprintf(printer_location, sizeof(printer_location),
+               "PRINTER_LOCATION=%s", temp);
+    else
+      strlcpy(printer_location, "PRINTER_LOCATION=Unknown",
+              sizeof(printer_location));
+  }
+  else
+  {
+    snprintf(printer_info, sizeof(printer_info), "PRINTER_INFO=%s",
+             printer ? printer : "Unknown");
+    strlcpy(printer_location, "PRINTER_LOCATION=Unknown",
+            sizeof(printer_location));
+  }
+
+  snprintf(printer_name, sizeof(printer_name), "PRINTER=%s",
+	   printer ? printer : "Unknown");
+
   argv[0] = (char *)printer;
   argv[1] = "1";
   argv[2] = user;
@@ -921,9 +953,12 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   envp[6]  = lang;
   envp[7]  = path;
   envp[8]  = ppd;
-  envp[9]  = rip_cache;
-  envp[10] = userenv;
-  envp[11] = NULL;
+  envp[9]  = printer_info;
+  envp[10] = printer_location;
+  envp[11] = printer_name;
+  envp[12] = rip_cache;
+  envp[13] = userenv;
+  envp[14] = NULL;
 
   for (i = 0; argv[i]; i ++)
     fprintf(stderr, "DEBUG: argv[%d]=\"%s\"\n", i, argv[i]);

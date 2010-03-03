@@ -3889,9 +3889,14 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   char		custom_in[256],		/* Custom size name in inches */
 		custom_mm[256];		/* Custom size name in millimeters */
   ppd_size_t	*size;			/* Current size */
-  ppd_option_t	*output_bin,		/* OutputBin options */
-		*duplex;		/* Duplex options */
+  ppd_option_t	*duplex,		/* Duplex option */
+		*output_bin,		/* OutputBin option */
+		*resolution;		/* (Set|JCL|)Resolution option */
+  ppd_choice_t	*choice;		/* Current PPD choice */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
+  int		xdpi,			/* Horizontal resolution */
+		ydpi;			/* Vertical resolution */
+  const char	*resptr;		/* Pointer into resolution keyword */
   _cups_pwg_media_t *pwgmedia;		/* Matching PWG size name */
   ipp_attribute_t *attr;		/* Attribute data */
   ipp_t		*media_col_default,	/* media-col-default collection value */
@@ -4146,6 +4151,102 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "output-bin-default", NULL, output_bin->defchoice);
+    }
+
+   /*
+    * Printer resolutions...
+    */
+
+    if ((resolution = ppdFindOption(ppd, "Resolution")) == NULL)
+      if ((resolution = ppdFindOption(ppd, "JCLResolution")) == NULL)
+        if ((resolution = ppdFindOption(ppd, "SetResolution")) == NULL)
+	  resolution = ppdFindOption(ppd, "CNRes_PGP");
+
+    if (resolution)
+    {
+     /*
+      * Report all supported resolutions...
+      */
+
+      attr = ippAddResolutions(p->ppd_attrs, IPP_TAG_PRINTER,
+                               "printer-resolution-supported",
+                               resolution->num_choices, IPP_RES_PER_INCH,
+			       NULL, NULL);
+
+      for (i = 0, choice = resolution->choices;
+           i < resolution->num_choices;
+	   i ++, choice ++)
+      {
+        xdpi = (int)strtol(choice->choice, (char **)&resptr, 10);
+	if (resptr > choice->choice && xdpi > 0)
+	{
+	  if (*resptr == 'x')
+	    ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
+	  else
+	    ydpi = xdpi;
+        }
+
+	if (xdpi <= 0 || ydpi <= 0)
+	{
+	  cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "Bad resolution \"%s\" for printer %s.",
+			  choice->choice, p->name);
+	  xdpi = ydpi = 72;
+	}
+
+        attr->values[i].resolution.xres  = xdpi;
+        attr->values[i].resolution.yres  = xdpi;
+        attr->values[i].resolution.units = IPP_RES_PER_INCH;
+
+        if (choice->marked)
+	  ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
+	                   "printer-resolution-default", IPP_RES_PER_INCH,
+			   xdpi, ydpi);
+      }
+    }
+    else if ((ppd_attr = ppdFindAttr(ppd, "DefaultResolution", NULL)) != NULL &&
+             ppd_attr->value)
+    {
+     /*
+      * Just the DefaultResolution to report...
+      */
+
+      xdpi = (int)strtol(ppd_attr->value, (char **)&resptr, 10);
+      if (resptr > ppd_attr->value && xdpi > 0)
+      {
+	if (*resptr == 'x')
+	  ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
+	else
+	  ydpi = xdpi;
+      }
+
+      if (xdpi <= 0 || ydpi <= 0)
+      {
+	cupsdLogMessage(CUPSD_LOG_WARN,
+			"Bad default resolution \"%s\" for printer %s.",
+			ppd_attr->value, p->name);
+	xdpi = ydpi = 72;
+      }
+
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
+		       "printer-resolution-default", IPP_RES_PER_INCH,
+		       xdpi, ydpi);
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
+		       "printer-resolution-supported", IPP_RES_PER_INCH,
+		       xdpi, ydpi);
+    }
+    else
+    {
+     /*
+      * No resolutions in PPD - make one up...
+      */
+
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
+		       "printer-resolution-default", IPP_RES_PER_INCH,
+		       72, 72);
+      ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
+		       "printer-resolution-supported", IPP_RES_PER_INCH,
+		       72, 72);
     }
 
    /*
