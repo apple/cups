@@ -4185,7 +4185,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	  else
 	    ydpi = xdpi;
         }
-	else
+
+	if (xdpi <= 0 || ydpi <= 0)
 	{
 	  cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Bad resolution \"%s\" for printer %s.",
@@ -4218,7 +4219,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	else
 	  ydpi = xdpi;
       }
-      else
+
+      if (xdpi <= 0 || ydpi <= 0)
       {
 	cupsdLogMessage(CUPSD_LOG_WARN,
 			"Bad default resolution \"%s\" for printer %s.",
