@@ -181,6 +181,15 @@ cupsDoAuthentication(
   else if (http->status == HTTP_UNAUTHORIZED)
     http->digest_tries ++;
 
+  if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
+  {
+    DEBUG_printf(("1cupsDoAuthentication: Too many authentication tries (%d)",
+		  http->digest_tries));
+
+    http->status = HTTP_AUTHORIZATION_CANCELED;
+    return (-1);
+  }
+
  /*
   * Got a password; encode it for the server...
   */
@@ -221,15 +230,6 @@ cupsDoAuthentication(
       return (-1);
     }
 #  endif /* __APPLE__ */
-
-    if (http->status == HTTP_UNAUTHORIZED && http->digest_tries >= 3)
-    {
-      DEBUG_printf(("1cupsDoAuthentication: too many Negotiate tries (%d)",
-                    http->digest_tries));
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-  
-      return (-1);
-    }
 
     if (http->gssname == GSS_C_NO_NAME)
     {
