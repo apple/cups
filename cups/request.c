@@ -3,7 +3,7 @@
  *
  *   IPP utilities for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -263,14 +263,15 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       response = cupsGetResponse(http, resource);
       status   = http->status;
     }
+    else
+      httpFlush(http);
 
     DEBUG_printf(("2cupsDoIORequest: status=%d", status));
 
-    if (status >= HTTP_BAD_REQUEST &&
-	status != HTTP_UNAUTHORIZED &&
-	status != HTTP_UPGRADE_REQUIRED)
+    if (status == HTTP_ERROR ||
+        (status >= HTTP_BAD_REQUEST && status != HTTP_UNAUTHORIZED &&
+	 status != HTTP_UPGRADE_REQUIRED))
     {
-      httpFlush(http);
       _cupsSetHTTPError(status);
       break;
     }
