@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -278,6 +278,11 @@ msgid ""
 msgstr ""
 "        WARN    PCFileName длиннее чем 8.3 нарушает спецификацию PPD.\n"
 "                REF: Стр. 61-62, раздел 5.3.\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2102,6 +2107,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "Баннеры"
 
@@ -2203,9 +2211,6 @@ msgstr "Непрерывно"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "Крышка открыта."
-
 msgid "Created"
 msgstr "Создано"
 
@@ -2255,12 +2260,6 @@ msgstr "Серия DeskJet"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "Назначение «%s» не принимает задания."
 
-msgid "Developer almost empty."
-msgstr "Проявитель почти закончился."
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2286,9 +2285,6 @@ msgstr "Отключено"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "Документ %d в задании %d не найден."
-
-msgid "Door open."
-msgstr "Дверца открыта."
 
 msgid "Double Postcard"
 msgstr "Двойная открытка"
@@ -2337,10 +2333,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2401,9 +2393,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2635,10 +2624,6 @@ msgstr "ERROR: Не удается отправить исходный запр�
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: Не удается отправить данные печати (%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: Не удается отправить файл печати на принтер"
 
@@ -2754,6 +2739,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "Конечный баннер"
 
+msgid "English"
+msgstr "Russian"
+
 msgid "Enter old password:"
 msgstr "Введите старый пароль:"
 
@@ -2842,12 +2830,6 @@ msgstr "Фолио"
 
 msgid "Forbidden"
 msgstr "Запрещено"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "Основные"
@@ -3067,6 +3049,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "Недействительный контрольный символ"
 
@@ -3082,18 +3067,6 @@ msgstr "Недействительный перевод"
 msgid "Illegal whitespace character"
 msgstr "Недействительный символ пробела"
 
-msgid "Ink/toner almost empty."
-msgstr "Чернила/тонер заканчиваются."
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "Корзина чернил/тонера почти полный."
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "Параметры, разрешенные к установке"
 
@@ -3105,9 +3078,6 @@ msgstr "Принтер для печати этикеток IntelliBar"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "Открыт замок."
 
 msgid "Internal Server Error"
 msgstr ""
@@ -3286,21 +3256,6 @@ msgstr "Контроль подачи бумаги"
 msgid "Media Type"
 msgstr "Тип бумаги"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "Лоток с бумагой почти пуст."
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "Необходимо вставить бумагу в лоток."
-
 msgid "Medium"
 msgstr "Средний"
 
@@ -3324,6 +3279,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3509,12 +3467,6 @@ msgstr "Примечание"
 msgid "OK"
 msgstr "ОК"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPC почти в end-of-life."
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "Выкл. (односторонняя печать)"
 
@@ -3543,17 +3495,8 @@ msgstr "Параметры установлены"
 msgid "Options: "
 msgstr "Параметры: "
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "Режим вывода"
-
-msgid "Output bin almost full."
-msgstr "Выходной лоток почти заполнен."
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3570,9 +3513,6 @@ msgstr "Вывод для принтера %s/%s отправлен на %s\n"
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "Вывод для принтера %s/%s отправлен на удаленный принтер %s на %s\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "PASS\n"
@@ -3729,9 +3669,6 @@ msgstr "Принтер приостановлен"
 msgid "Printer Settings"
 msgstr "Параметры принтера"
 
-msgid "Printer offline."
-msgstr "Принтер в режиме не подключен к сети."
-
 msgid "Printer:"
 msgstr "Принтер:"
 
@@ -3787,9 +3724,6 @@ msgstr "Вернуться в начало"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "Запущенная команда: %s %s -N -A %s -c «%s»\n"
-
-msgid "SCSI Printer"
-msgstr "Принтер SCSI"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "Для SEQUENCE длина не установлена"
@@ -3900,6 +3834,18 @@ msgstr ""
 "Имя класса может содержать максимально 127 печатных символов и не может "
 "содержать пробелы, дроби (/) или знак «решетки» (#)."
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr ""
@@ -3908,6 +3854,48 @@ msgstr ""
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3922,6 +3910,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "Принтер или класс не найден."
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -3948,14 +3951,14 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr "Слишком много подписок."
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "Носитель для печати методом термопереноса"
 
 msgid "Title: "
 msgstr "Заголовок: "
-
-msgid "Toner low."
-msgstr "Тонер заканчивается."
 
 msgid "Too many active jobs."
 msgstr "Слишком много активных заданий."
@@ -4398,8 +4401,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4408,6 +4411,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4572,10 +4591,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr "WARNING: Время команды SCSI истекло (%d). Повтор попытки…\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4730,6 +4745,42 @@ msgstr "справка\t\tполучить справку о командах\n"
 
 msgid "idle"
 msgstr "свободен"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -5979,8 +6030,17 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "Не удалось сканировать тип «%s»!"
 
+#~ msgid "Cover open."
+#~ msgstr "Крышка открыта."
+
+#~ msgid "Developer almost empty."
+#~ msgstr "Проявитель почти закончился."
+
 #~ msgid "Developer empty!"
 #~ msgstr "Проявитель закончился!"
+
+#~ msgid "Door open."
+#~ msgstr "Дверца открыта."
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: Неверный %%BoundingBox: комментарий просмотрен!\n"
@@ -6111,6 +6171,9 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: Не удается считать данные печати!\n"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: Не удается отправить данные печати (%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: Не удается отправить данные печати!\n"
 
@@ -6200,11 +6263,20 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "Получен атрибут printer-uri, но не job-id!"
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "Чернила/тонер заканчиваются."
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "Чернила/тонер закончились!"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "Корзина чернил/тонера почти полный."
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "Корзина чернил/тонера полная!"
+
+#~ msgid "Interlock open."
+#~ msgstr "Открыт замок."
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "Задание #%d не может быть перезапущено – нет файлов!"
@@ -6239,11 +6311,17 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "Media jam!"
 #~ msgstr "Затор бумаги!"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "Лоток с бумагой почти пуст."
+
 #~ msgid "Media tray empty!"
 #~ msgstr "Лоток с бумагой пуст!"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "Лоток с бумагой отсутствует!"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "Необходимо вставить бумагу в лоток."
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "Отсутствует атрибут document-number!"
@@ -6302,17 +6380,29 @@ msgstr "Для variable-bindings длина не установлена"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "Нет атрибутов подписки в запросе!"
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPC почти в end-of-life."
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPC в end-of-life!"
 
 #~ msgid "Out of toner!"
 #~ msgstr "Недостаточно тонера!"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "Выходной лоток почти заполнен."
+
 #~ msgid "Output bin full!"
 #~ msgstr "Выходной лоток заполнен!"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "Выходной лоток отсутствует!"
+
+#~ msgid "Printer offline."
+#~ msgstr "Принтер в режиме не подключен к сети."
+
+#~ msgid "SCSI Printer"
+#~ msgstr "Принтер SCSI"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "Значение notify-user-data слишком длинное (%d > 63 октетов)!"
@@ -6322,6 +6412,9 @@ msgstr "Для variable-bindings длина не установлена"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "Требуется атрибут printer-uri!"
+
+#~ msgid "Toner low."
+#~ msgstr "Тонер заканчивается."
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "Слишком много значений job-sheets (%d > 2)!"
@@ -6527,6 +6620,9 @@ msgstr "Для variable-bindings длина не установлена"
 #~ "seconds!\n"
 #~ msgstr ""
 #~ "WARNING: Удаленный хост не ответил байтом data-статуса после %d секунд!\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr "WARNING: Время команды SCSI истекло (%d). Повтор попытки…\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "

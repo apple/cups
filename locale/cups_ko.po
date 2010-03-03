@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.4\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2009-10-15 11:12-0700\n"
+"POT-Creation-Date: 2010-03-03 10:36-0800\n"
 "PO-Revision-Date: 2009-02-16 12:00-0800\n"
 "Last-Translator: Apple Inc.\n"
 "Language-Team: Apple Inc.\n"
@@ -278,6 +278,11 @@ msgid ""
 msgstr ""
 "        WARN    PPD 사양에 위반되는 8.3 이상의 PCFileName.\n"
 "                REF: 61-62페이지, 섹션 5.3.\n"
+
+msgid ""
+"        WARN    PCFileName should contain a unique filename.\n"
+"                REF: Pages 61-62, section 5.3.\n"
+msgstr ""
 
 msgid ""
 "        WARN    Protocols contains PJL but JCL attributes are not set.\n"
@@ -2104,6 +2109,9 @@ msgstr ""
 msgid "Bad subscription ID"
 msgstr ""
 
+msgid "Bad value string"
+msgstr ""
+
 msgid "Banners"
 msgstr "배너"
 
@@ -2205,9 +2213,6 @@ msgstr "계속"
 msgid "Could not scan type \"%s\""
 msgstr ""
 
-msgid "Cover open."
-msgstr "덮개가 열려 있음."
-
 msgid "Created"
 msgstr "생성됨"
 
@@ -2257,12 +2262,6 @@ msgstr "DeskJet 시리즈"
 msgid "Destination \"%s\" is not accepting jobs."
 msgstr "\"%s\" 대상이 작업을 허용하지 않습니다."
 
-msgid "Developer almost empty."
-msgstr "현상액이 거의 비었습니다."
-
-msgid "Developer empty"
-msgstr ""
-
 #, c-format
 msgid ""
 "Device: uri = %s\n"
@@ -2288,9 +2287,6 @@ msgstr "비활성화됨"
 #, c-format
 msgid "Document %d not found in job %d."
 msgstr "도큐멘트 %d을 작업 %d에서 찾을 수 없습니다."
-
-msgid "Door open."
-msgstr "문이 열려 있음."
 
 msgid "Double Postcard"
 msgstr "이중 엽서"
@@ -2339,10 +2335,6 @@ msgstr ""
 
 #, c-format
 msgid "ERROR: Bad %%PageBoundingBox: comment in file\n"
-msgstr ""
-
-#, c-format
-msgid "ERROR: Bad SCSI device file \"%s\"\n"
 msgstr ""
 
 #, c-format
@@ -2403,9 +2395,6 @@ msgid "ERROR: Expected quoted string on line %d of %s\n"
 msgstr ""
 
 msgid "ERROR: Fatal USB error\n"
-msgstr ""
-
-msgid "ERROR: Invalid HP-GL/2 command seen, unable to print file\n"
 msgstr ""
 
 #, c-format
@@ -2636,10 +2625,6 @@ msgstr "ERROR: 초기 PAP 전송 데이터 요청을 보낼 수 없음"
 msgid "ERROR: Unable to send print data\n"
 msgstr ""
 
-#, c-format
-msgid "ERROR: Unable to send print data (%d)\n"
-msgstr "ERROR: 프린트 데이터를 보낼 수 없음(%d)\n"
-
 msgid "ERROR: Unable to send print file to printer"
 msgstr "ERROR: 프린트 파일을 프린터로 보낼 수 없음"
 
@@ -2755,6 +2740,9 @@ msgstr ""
 msgid "Ending Banner"
 msgstr "배너 종료 중"
 
+msgid "English"
+msgstr "Korean"
+
 msgid "Enter old password:"
 msgstr "이전 암호 입력:"
 
@@ -2843,12 +2831,6 @@ msgstr "2절지"
 
 msgid "Forbidden"
 msgstr "금지됨"
-
-msgid "Fuser temperature high"
-msgstr ""
-
-msgid "Fuser temperature low"
-msgstr ""
 
 msgid "General"
 msgstr "일반"
@@ -3067,6 +3049,9 @@ msgstr "ISO B8"
 msgid "ISO B9"
 msgstr "ISO B9"
 
+msgid "ISOLatin1"
+msgstr "UTF-8"
+
 msgid "Illegal control character"
 msgstr "올바르지 않은 제어 문자"
 
@@ -3082,18 +3067,6 @@ msgstr "올바르지 않은 번역 스트링"
 msgid "Illegal whitespace character"
 msgstr "올바르지 않은 여백 문자"
 
-msgid "Ink/toner almost empty."
-msgstr "잉크/토너가 거의 비었습니다."
-
-msgid "Ink/toner empty"
-msgstr ""
-
-msgid "Ink/toner waste bin almost full."
-msgstr "잉크/토너 폐기소가 거의 찼습니다."
-
-msgid "Ink/toner waste bin full"
-msgstr ""
-
 msgid "Installable Options"
 msgstr "설치 가능한 옵션"
 
@@ -3105,9 +3078,6 @@ msgstr "IntelliBar 레이블 프린터"
 
 msgid "Intellitech"
 msgstr "Intellitech"
-
-msgid "Interlock open."
-msgstr "연동 장치가 열려 있음."
 
 msgid "Internal Server Error"
 msgstr ""
@@ -3286,21 +3256,6 @@ msgstr "미디어 추적"
 msgid "Media Type"
 msgstr "미디어 유형"
 
-msgid "Media jam"
-msgstr ""
-
-msgid "Media tray almost empty."
-msgstr "미디어 트레이가 거의 비었습니다."
-
-msgid "Media tray empty"
-msgstr ""
-
-msgid "Media tray missing"
-msgstr ""
-
-msgid "Media tray needs to be filled."
-msgstr "미디어 트레이를 채워야 합니다."
-
 msgid "Medium"
 msgstr "중간"
 
@@ -3324,6 +3279,9 @@ msgid "Missing form variable"
 msgstr ""
 
 msgid "Missing notify-subscription-ids attribute"
+msgstr ""
+
+msgid "Missing option keyword"
 msgstr ""
 
 msgid "Missing requesting-user-name attribute"
@@ -3509,12 +3467,6 @@ msgstr "참고"
 msgid "OK"
 msgstr "승인"
 
-msgid "OPC almost at end-of-life."
-msgstr "OPC 수명이 거의 다 되었습니다."
-
-msgid "OPC at end-of-life"
-msgstr ""
-
 msgid "Off (1-Sided)"
 msgstr "끔(한 쪽 방향)"
 
@@ -3543,17 +3495,8 @@ msgstr "설치된 옵션"
 msgid "Options: "
 msgstr "옵션: "
 
-msgid "Out of toner"
-msgstr ""
-
 msgid "Output Mode"
 msgstr "출력 모드"
-
-msgid "Output bin almost full."
-msgstr "출력소 거의 찼습니다."
-
-msgid "Output bin full"
-msgstr ""
 
 #, c-format
 msgid "Output for printer %s is sent to %s\n"
@@ -3570,9 +3513,6 @@ msgstr "%s/%s 프린터 출력을 %s로 보냄\n"
 #, c-format
 msgid "Output for printer %s/%s is sent to remote printer %s on %s\n"
 msgstr "%1$s/%2$s 프린터 출력을 %4$s에 있는 %3$s 원격 프린터로 보냄\n"
-
-msgid "Output tray missing"
-msgstr ""
 
 msgid "PASS\n"
 msgstr "PASS\n"
@@ -3729,9 +3669,6 @@ msgstr "중단된 프린터"
 msgid "Printer Settings"
 msgstr "프린터 설정"
 
-msgid "Printer offline."
-msgstr "프린터가 오프라인입니다."
-
 msgid "Printer:"
 msgstr "프린터:"
 
@@ -3785,9 +3722,6 @@ msgstr "뒤로가기"
 #, c-format
 msgid "Running command: %s %s -N -A %s -c '%s'\n"
 msgstr "실행 중인 명령: %s %s -N -A %s -c '%s'\n"
-
-msgid "SCSI Printer"
-msgstr "SCSI 프린터"
 
 msgid "SEQUENCE uses indefinite length"
 msgstr "SEQUENCE 길이가 무제한입니다"
@@ -3898,12 +3832,66 @@ msgstr ""
 "클래스 이름은 최대 127자의 프린트 가능한 문자만을 포함할 수 있고 빈 칸, 슬래"
 "시(/) 또는 파운드 기호(#)를 포함하지 않습니다."
 
+msgid "The developer unit needs to be replaced."
+msgstr ""
+
+msgid "The developer unit will need to be replaced soon."
+msgstr ""
+
+msgid "The fuser's temperature is high."
+msgstr ""
+
+msgid "The fuser's temperature is low."
+msgstr ""
+
 msgid ""
 "The notify-lease-duration attribute cannot be used with job subscriptions."
 msgstr "notify-lease-duration 속성을 작업 구독과 함께 사용할 수 없습니다."
 
 #, c-format
 msgid "The notify-user-data value is too large (%d > 63 octets)"
+msgstr ""
+
+msgid "The optical photoconductor needs to be replaced."
+msgstr ""
+
+msgid "The optical photoconductor will need to be replaced soon."
+msgstr ""
+
+msgid "The output bin is almost full."
+msgstr ""
+
+msgid "The output bin is full."
+msgstr ""
+
+msgid "The output bin is missing."
+msgstr ""
+
+msgid "The paper tray is almost empty."
+msgstr ""
+
+msgid "The paper tray is empty."
+msgstr ""
+
+msgid "The paper tray is missing."
+msgstr ""
+
+msgid "The paper tray needs to be filled."
+msgstr ""
+
+msgid "The printer is almost out of ink."
+msgstr ""
+
+msgid "The printer is low on toner."
+msgstr ""
+
+msgid "The printer is offline."
+msgstr ""
+
+msgid "The printer is out of ink."
+msgstr ""
+
+msgid "The printer is out of toner."
 msgstr ""
 
 msgid ""
@@ -3918,6 +3906,21 @@ msgstr ""
 
 msgid "The printer or class was not found."
 msgstr "프린터 또는 클래스가 없습니다."
+
+msgid "The printer's cover is open."
+msgstr ""
+
+msgid "The printer's door is open."
+msgstr ""
+
+msgid "The printer's interlock is open."
+msgstr ""
+
+msgid "The printer's waste bin is almost full."
+msgstr ""
+
+msgid "The printer's waste bin is full."
+msgstr ""
 
 #, c-format
 msgid "The printer-uri \"%s\" contains invalid characters."
@@ -3944,14 +3947,14 @@ msgstr ""
 msgid "There are too many subscriptions."
 msgstr "구독이 너무 많습니다."
 
+msgid "There is a paper jam."
+msgstr ""
+
 msgid "Thermal Transfer Media"
 msgstr "열 전송 미디어"
 
 msgid "Title: "
 msgstr "제목: "
-
-msgid "Toner low."
-msgstr "토너가 부족합니다."
 
 msgid "Too many active jobs."
 msgstr "활성 작업이 너무 많습니다."
@@ -4390,8 +4393,8 @@ msgid ""
 "\n"
 "Options:\n"
 "\n"
-"    -I {filters,profiles}\n"
-"                         Ignore missing files\n"
+"    -I {filename,filters,none,profiles}\n"
+"                         Ignore specific warnings\n"
 "    -R root-directory    Set alternate root\n"
 "    -W {all,none,constraints,defaults,duplex,filters,profiles,sizes,"
 "translations}\n"
@@ -4400,6 +4403,22 @@ msgid ""
 "    -r                   Use 'relaxed' open mode\n"
 "    -v                   Be slightly verbose\n"
 "    -vv                  Be very verbose\n"
+msgstr ""
+
+msgid ""
+"Usage: ipptest [options] URI filename.test [ ... filenameN.test ]\n"
+"\n"
+"Options:\n"
+"\n"
+"-E             Test with encryption.\n"
+"-V version     Set default IPP version.\n"
+"-X             Produce XML instead of plain text.\n"
+"-c             Send requests using chunking (default)\n"
+"-d name=value  Define variable.\n"
+"-f filename    Set default test file.\n"
+"-i seconds     Repeat the last test file with the given interval.\n"
+"-l             Send requests using content-length\n"
+"-v             Show all attributes sent and received.\n"
 msgstr ""
 
 msgid "Usage: lpmove job/src dest\n"
@@ -4559,10 +4578,6 @@ msgid ""
 "WARNING: Remote host did not respond with data status byte after %d seconds\n"
 msgstr ""
 
-#, c-format
-msgid "WARNING: SCSI command timed out (%d); retrying...\n"
-msgstr "WARNING: SCSI 명령 시간 초과(%d); 재시도 중...\n"
-
 msgid ""
 "WARNING: This document does not conform to the Adobe Document Structuring "
 "Conventions and may not print correctly\n"
@@ -4716,6 +4731,42 @@ msgstr "help\t\t명령에 대한 도움말 얻기\n"
 
 msgid "idle"
 msgstr "대기"
+
+msgid "ipptest: \"-i\" is incompatible with \"-x\".\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad URI - %s.\n"
+msgstr ""
+
+#, c-format
+msgid "ipptest: Bad version %s for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: May only specify a single URI.\n"
+msgstr ""
+
+msgid "ipptest: Missing filename for \"-f\".\n"
+msgstr ""
+
+msgid "ipptest: Missing name=value for \"-d\".\n"
+msgstr ""
+
+msgid "ipptest: Missing seconds for \"-i\".\n"
+msgstr ""
+
+msgid "ipptest: Missing version for \"-V\".\n"
+msgstr ""
+
+msgid "ipptest: Only http, https, and ipp URIs are supported."
+msgstr ""
+
+msgid "ipptest: URI required before test file."
+msgstr ""
+
+#, c-format
+msgid "ipptest: Unknown option \"-%c\".\n"
+msgstr ""
 
 msgid "job-printer-uri attribute missing"
 msgstr ""
@@ -5951,8 +6002,17 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "Could not scan type \"%s\"!"
 #~ msgstr "\"%s\" 유형을 검색할 수 없음!"
 
+#~ msgid "Cover open."
+#~ msgstr "덮개가 열려 있음."
+
+#~ msgid "Developer almost empty."
+#~ msgstr "현상액이 거의 비었습니다."
+
 #~ msgid "Developer empty!"
 #~ msgstr "현상액이 비어 있음!"
+
+#~ msgid "Door open."
+#~ msgstr "문이 열려 있음."
 
 #~ msgid "ERROR: Bad %%BoundingBox: comment seen!\n"
 #~ msgstr "ERROR: 잘못된 %%BoundingBox: 설명이 보임!\n"
@@ -6081,6 +6141,9 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "ERROR: Unable to read print data!\n"
 #~ msgstr "ERROR: 프린트 데이터를 읽을 수 없음!\n"
 
+#~ msgid "ERROR: Unable to send print data (%d)\n"
+#~ msgstr "ERROR: 프린트 데이터를 보낼 수 없음(%d)\n"
+
 #~ msgid "ERROR: Unable to send print data!\n"
 #~ msgstr "ERROR: 프린트 데이터를 보낼 수 없음!\n"
 
@@ -6163,11 +6226,20 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "Got a printer-uri attribute but no job-id!"
 #~ msgstr "printer-uri 속성을 얻었지만, job-id가 없습니다!"
 
+#~ msgid "Ink/toner almost empty."
+#~ msgstr "잉크/토너가 거의 비었습니다."
+
 #~ msgid "Ink/toner empty!"
 #~ msgstr "잉크/토너가 비었음!"
 
+#~ msgid "Ink/toner waste bin almost full."
+#~ msgstr "잉크/토너 폐기소가 거의 찼습니다."
+
 #~ msgid "Ink/toner waste bin full!"
 #~ msgstr "잉크/토너 폐기소가 찼음!"
+
+#~ msgid "Interlock open."
+#~ msgstr "연동 장치가 열려 있음."
 
 #~ msgid "Job #%d cannot be restarted - no files!"
 #~ msgstr "#%d 작업을 다시 시작할 수 없음 - 파일 없음!"
@@ -6202,11 +6274,17 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "Media jam!"
 #~ msgstr "미디어가 걸림!"
 
+#~ msgid "Media tray almost empty."
+#~ msgstr "미디어 트레이가 거의 비었습니다."
+
 #~ msgid "Media tray empty!"
 #~ msgstr "미디어 트레이가 비어 있음!"
 
 #~ msgid "Media tray missing!"
 #~ msgstr "미디어 트레이가 유실됨!"
+
+#~ msgid "Media tray needs to be filled."
+#~ msgstr "미디어 트레이를 채워야 합니다."
 
 #~ msgid "Missing document-number attribute!"
 #~ msgstr "document-number 속성이 유실됨!"
@@ -6265,17 +6343,29 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ msgid "No subscription attributes in request!"
 #~ msgstr "요청에 구독 속성이 없음!"
 
+#~ msgid "OPC almost at end-of-life."
+#~ msgstr "OPC 수명이 거의 다 되었습니다."
+
 #~ msgid "OPC at end-of-life!"
 #~ msgstr "OPC 수명이 다 되었음!"
 
 #~ msgid "Out of toner!"
 #~ msgstr "토너가 없음!"
 
+#~ msgid "Output bin almost full."
+#~ msgstr "출력소 거의 찼습니다."
+
 #~ msgid "Output bin full!"
 #~ msgstr "출력소가 찼습니다!"
 
 #~ msgid "Output tray missing!"
 #~ msgstr "출력 트레이가 유실됨!"
+
+#~ msgid "Printer offline."
+#~ msgstr "프린터가 오프라인입니다."
+
+#~ msgid "SCSI Printer"
+#~ msgstr "SCSI 프린터"
 
 #~ msgid "The notify-user-data value is too large (%d > 63 octets)!"
 #~ msgstr "notify-user-data 값이 너무 큼!(%d > 63행)!"
@@ -6285,6 +6375,9 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 
 #~ msgid "The printer-uri attribute is required!"
 #~ msgstr "printer-uri 속성이 필요함!"
+
+#~ msgid "Toner low."
+#~ msgstr "토너가 부족합니다."
 
 #~ msgid "Too many job-sheets values (%d > 2)!"
 #~ msgstr "job-sheets 값이 너무 많습니다(%d > 2)!"
@@ -6481,6 +6574,9 @@ msgstr "variable-bindings의 길이가 무제한입니다"
 #~ "seconds!\n"
 #~ msgstr ""
 #~ "WARNING: %d초 후에 원격 호스트가 데이터 상태 바이트에 응답하지 않음!\n"
+
+#~ msgid "WARNING: SCSI command timed out (%d); retrying...\n"
+#~ msgstr "WARNING: SCSI 명령 시간 초과(%d); 재시도 중...\n"
 
 #~ msgid ""
 #~ "WARNING: This document does not conform to the Adobe Document Structuring "
