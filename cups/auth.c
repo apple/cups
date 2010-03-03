@@ -3,7 +3,7 @@
  *
  *   Authentication functions for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -98,16 +98,17 @@ cupsDoAuthentication(
 
   DEBUG_printf(("cupsDoAuthentication(http=%p, method=\"%s\", resource=\"%s\")",
                 http, method, resource));
-  DEBUG_printf(("2cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"",
-                http->digest_tries, http->userpass));
-  DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
-                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
   if (!http)
     http = _cupsConnect();
 
   if (!http || !method || !resource)
     return (-1);
+
+  DEBUG_printf(("2cupsDoAuthentication: digest_tries=%d, userpass=\"%s\"",
+                http->digest_tries, http->userpass));
+  DEBUG_printf(("2cupsDoAuthentication: WWW-Authenticate=\"%s\"",
+                httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE)));
 
  /*
   * Clear the current authentication string...
