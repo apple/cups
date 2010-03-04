@@ -679,6 +679,9 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Process the current HTTP status...
     */
 
+    if (status >= HTTP_BAD_REQUEST)
+      httpFlush(http);
+
     switch (status)
     {
       case HTTP_ERROR :
@@ -802,7 +805,14 @@ cupsWriteRequestData(
     */
 
     if (_httpWait(http, 0, 1))
-      return (httpUpdate(http));
+    {
+      http_status_t	status;		/* Status from httpUpdate */
+
+      if ((status = httpUpdate(http)) >= HTTP_BAD_REQUEST)
+        httpFlush(http);
+
+      return (status);
+    }
   }
 
   return (HTTP_CONTINUE);
