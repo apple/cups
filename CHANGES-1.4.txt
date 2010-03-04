@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453)
+	- The lpq and lpr commands would sometimes choose different default
+	  printers (STR #3503)
 	- cupsDo*Request did not flush error text, leading to multiple issues
 	  (STR #3325, STR #3519)
 	- cupsDoAuthentication did not cancel password authentication after 3
