@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -110,168 +110,6 @@ enum
 #define MODE_DATAFILE	0444		/* Owner/group/other read */
 #define MODE_DIRECTORY	0555		/* Owner/group/other read+search */
 #define MODE_PROGRAM	0555		/* Owner/group/other read+exec */
-
-
-/*
- * Standard Adobe media keywords (must remain sorted)...
- */
-
-static const char adobe_size_names[][PPD_MAX_NAME] =
-{
-  "10x11",
-  "10x13",
-  "10x14",
-  "12x11",
-  "15x11",
-  "7x9",
-  "8x10",
-  "9x11",
-  "9x12",
-  "A0",
-  "A1",
-  "A10",
-  "A2",
-  "A3",
-  "A3Extra",
-  "A3Rotated",
-  "A4",
-  "A4Extra",
-  "A4Plus",
-  "A4Rotated",
-  "A4Small",
-  "A5",
-  "A5Extra",
-  "A5Rotated",
-  "A6",
-  "A6Rotated",
-  "A7",
-  "A8",
-  "A9",
-  "ARCHA",
-  "ARCHB",
-  "ARCHC",
-  "ARCHD",
-  "ARCHE",
-  "AnsiA",
-  "AnsiB",
-  "AnsiC",
-  "AnsiD",
-  "AnsiE",
-  "B0",
-  "B1",
-  "B1",
-  "B10",
-  "B2",
-  "B3",
-  "B4",
-  "B4Rotated",
-  "B5",
-  "B5Rotated",
-  "B6",
-  "B6Rotated",
-  "B7",
-  "B8",
-  "B9",
-  "C4",
-  "C5",
-  "C6",
-  "DL",
-  "DoublePostcard",
-  "DoublePostcardRotated",
-  "Env10",
-  "Env11",
-  "Env12",
-  "Env14",
-  "Env9",
-  "EnvC0",
-  "EnvC1",
-  "EnvC2",
-  "EnvC3",
-  "EnvC4",
-  "EnvC5",
-  "EnvC6",
-  "EnvC65",
-  "EnvC7",
-  "EnvChou3",
-  "EnvChou3Rotated",
-  "EnvChou4",
-  "EnvChou4Rotated",
-  "EnvDL",
-  "EnvISOB4",
-  "EnvISOB5",
-  "EnvISOB6",
-  "EnvInvite",
-  "EnvItalian",
-  "EnvKaku2",
-  "EnvKaku2Rotated",
-  "EnvKaku3",
-  "EnvKaku3Rotated",
-  "EnvMonarch",
-  "EnvPRC1",
-  "EnvPRC10",
-  "EnvPRC10Rotated",
-  "EnvPRC1Rotated",
-  "EnvPRC2",
-  "EnvPRC2Rotated",
-  "EnvPRC3",
-  "EnvPRC3Rotated",
-  "EnvPRC4",
-  "EnvPRC4Rotated",
-  "EnvPRC5",
-  "EnvPRC5Rotated",
-  "EnvPRC6",
-  "EnvPRC6Rotated",
-  "EnvPRC7",
-  "EnvPRC7Rotated",
-  "EnvPRC8",
-  "EnvPRC8Rotated",
-  "EnvPRC9",
-  "EnvPRC9Rotated",
-  "EnvPersonal",
-  "EnvYou4",
-  "EnvYou4Rotated",
-  "Executive",
-  "FanFoldGerman",
-  "FanFoldGermanLegal",
-  "FanFoldUS",
-  "Folio",
-  "ISOB0",
-  "ISOB1",
-  "ISOB10",
-  "ISOB2",
-  "ISOB3",
-  "ISOB4",
-  "ISOB5",
-  "ISOB5Extra",
-  "ISOB6",
-  "ISOB7",
-  "ISOB8",
-  "ISOB9",
-  "Ledger",
-  "Legal",
-  "LegalExtra",
-  "Letter",
-  "LetterExtra",
-  "LetterPlus",
-  "LetterRotated",
-  "LetterSmall",
-  "Monarch",
-  "Note",
-  "PRC16K",
-  "PRC16KRotated",
-  "PRC32K",
-  "PRC32KBig",
-  "PRC32KBigRotated",
-  "PRC32KRotated",
-  "Postcard",
-  "PostcardRotated",
-  "Quarto",
-  "Statement",
-  "SuperA",
-  "SuperB",
-  "Tabloid",
-  "TabloidExtra"
-};
 
 
 /*
@@ -3148,28 +2986,6 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
 
 	if (!warn)
 	  errors ++;
-      }
-    }
-    else if (warn && verbose >= 0)
-    {
-     /*
-      * Lookup the size name in the standard size table...
-      */
-
-      strlcpy(name, size->name, sizeof(name));
-      if ((nameptr = strchr(name, '.')) != NULL)
-        *nameptr = '\0';
-
-      if (!bsearch(name, adobe_size_names,
-                   sizeof(adobe_size_names) /
-		       sizeof(adobe_size_names[0]),
-		   sizeof(adobe_size_names[0]),
-		   (int (*)(const void *, const void *))strcmp))
-      {
-	_cupsLangPrintf(stdout,
-			_("      %s  Non-standard size name \"%s\"\n"
-			  "                REF: Page 187, section B.2.\n"),
-			prefix, size->name);
       }
     }
 
