@@ -690,18 +690,15 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
           return (status);
 
       case HTTP_UNAUTHORIZED :
-          if (!cupsDoAuthentication(http, "POST", resource))
-	  {
-	    if (httpReconnect(http))
-	    {
-	      _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
-	      return (HTTP_SERVICE_UNAVAILABLE);
-	    }
-	  }
-	  else
-	    status = HTTP_AUTHORIZATION_CANCELED;
+          if (cupsDoAuthentication(http, "POST", resource))
+	    return (HTTP_AUTHORIZATION_CANCELED);
 
-          return (status);
+	  if (httpReconnect(http))
+	  {
+	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    return (HTTP_SERVICE_UNAVAILABLE);
+	  }
+	  break;
 
 #ifdef HAVE_SSL
       case HTTP_UPGRADE_REQUIRED :
@@ -716,9 +713,12 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	    return (HTTP_SERVICE_UNAVAILABLE);
 	  }
 
-	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
-
-          return (status);
+	  if (httpEncryption(http, HTTP_ENCRYPT_REQUIRED))
+	  {
+	    _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+	    return (HTTP_SERVICE_UNAVAILABLE);
+	  }
+	  break;
 #endif /* HAVE_SSL */
 
       case HTTP_EXPECTATION_FAILED :
