@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453)
+	- The scheduler no longer looks up network interface hostnames by
+	  default on Mac OS X (STR #3523)
 	- ippWriteIO did not write collection (member) attributes properly in
 	  all cases (STR #3521)
 	- The "cupsctl --remote-any" and corresponding web interface check box
