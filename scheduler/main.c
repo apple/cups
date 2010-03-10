@@ -21,6 +21,7 @@
  *   cupsdReleaseSignals()     - Release signals for delivery.
  *   cupsdSetString()          - Set a string value.
  *   cupsdSetStringf()         - Set a formatted string value.
+ *   cupsd_clean_files()       - Clean out old files.
  *   launchd_checkin()         - Check-in with launchd and collect the
  *                               listening fds.
  *   launchd_checkout()        - Check-out with launchd.
@@ -45,11 +46,12 @@
 #include <syslog.h>
 #include <grp.h>
 #include <cups/dir.h>
+#include <fnmatch.h>
 
 #ifdef HAVE_LAUNCH_H
 #  include <launch.h>
 #  include <libgen.h>
-#  define CUPS_KEEPALIVE	CUPS_CACHEDIR "/org.cups.cupsd"
+#  define CUPS_KEEPALIVE CUPS_CACHEDIR "/org.cups.cupsd"
 					/* Name of the launchd KeepAlive file */
 #  ifndef LAUNCH_JOBKEY_KEEPALIVE
 #    define LAUNCH_JOBKEY_KEEPALIVE "KeepAlive"
@@ -74,6 +76,8 @@
  * Local functions...
  */
 
+static void		cupsd_clean_files(const char *path,
+			                  const char *pattern);
 #ifdef HAVE_LAUNCHD
 static void		launchd_checkin(void);
 static void		launchd_checkout(void);
@@ -498,42 +502,14 @@ main(int  argc,				/* I - Number of command-line args */
     return (0);
   }
 
+ /*
+  * Clean out old temp files and printer cache data.
+  */
+
   if (!strncmp(TempDir, RequestRoot, strlen(RequestRoot)))
-  {
-   /*
-    * Clean out the temporary directory...
-    */
+    cupsd_clean_files(TempDir, NULL);
 
-    cups_dir_t		*dir;		/* Temporary directory */
-    cups_dentry_t	*dent;		/* Directory entry */
-    char		tempfile[1024];	/* Temporary filename */
-
-
-    if ((dir = cupsDirOpen(TempDir)) != NULL)
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Cleaning out old temporary files in \"%s\"...", TempDir);
-
-      while ((dent = cupsDirRead(dir)) != NULL)
-      {
-        snprintf(tempfile, sizeof(tempfile), "%s/%s", TempDir, dent->filename);
-
-	if (unlink(tempfile))
-	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unable to remove temporary file \"%s\" - %s",
-	                  tempfile, strerror(errno));
-        else
-	  cupsdLogMessage(CUPSD_LOG_DEBUG, "Removed temporary file \"%s\"...",
-	                  tempfile);
-      }
-
-      cupsDirClose(dir);
-    }
-    else
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to open temporary directory \"%s\" - %s",
-                      TempDir, strerror(errno));
-  }
+  cupsd_clean_files(CacheDir, "*.ipp");
 
 #if HAVE_LAUNCHD
   if (Launchd)
@@ -1404,6 +1380,60 @@ cupsdSetStringf(char       **s,		/* O - New string */
 
   if (olds)
     _cupsStrFree(olds);
+}
+
+
+/*
+ * 'cupsd_clean_files()' - Clean out old files.
+ */
+ 
+static void
+cupsd_clean_files(const char *path,	/* I - Directory to clean */
+                  const char *pattern)	/* I - Filename pattern or NULL */
+{
+  cups_dir_t	*dir;			/* Directory */
+  cups_dentry_t	*dent;			/* Directory entry */
+  char		filename[1024];		/* Filename */
+  int		status;			/* Status from unlink/rmdir */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG,
+                  "cupsd_clean_files(path=\"%s\", pattern=\"%s\")", path,
+		  pattern ? pattern : "(null)");
+
+  if ((dir = cupsDirOpen(path)) == NULL)
+  {
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to open directory \"%s\" - %s",
+		    path, strerror(errno));
+    return;
+  }
+
+  cupsdLogMessage(CUPSD_LOG_INFO, "Cleaning out old files in \"%s\"...", path);
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+  {
+    if (pattern && fnmatch(pattern, dent->filename, 0))
+      continue;
+
+    snprintf(filename, sizeof(filename), "%s/%s", path, dent->filename);
+
+    if (S_ISDIR(dent->fileinfo.st_mode))
+    {
+      cupsd_clean_files(filename, pattern);
+
+      status = rmdir(filename);
+    }
+    else
+      status = unlink(filename);
+
+    if (status)
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to remove \"%s\" - %s", filename,
+		      strerror(errno));
+    else
+      cupsdLogMessage(CUPSD_LOG_DEBUG, "Removed \"%s\"...", filename);
+  }
+
+  cupsDirClose(dir);
 }
 
 

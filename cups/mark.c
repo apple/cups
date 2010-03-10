@@ -3,7 +3,7 @@
  *
  *   Option marking routines for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -399,6 +399,60 @@ cupsMarkOptions(
 	*/
 
         ppd_mark_choices(ppd, attr->value);
+      }
+    }
+    else if (!strcasecmp(optptr->name, "print-quality"))
+    {
+      ppd_option_t	*output_mode = ppdFindOption(ppd, "OutputMode");
+					/* OutputMode option */
+
+      if (!strcmp(optptr->value, "3"))
+      {
+       /*
+        * Draft quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Draft"))
+	  ppd_mark_option(ppd, "OutputMode", "Draft");
+	else if (ppdFindChoice(output_mode, "Fast"))
+	  ppd_mark_option(ppd, "OutputMode", "Fast");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "DraftGray_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+      }
+      else if (!strcmp(optptr->value, "4"))
+      {
+       /*
+        * Normal quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Normal"))
+	  ppd_mark_option(ppd, "OutputMode", "Normal");
+	else if (ppdFindChoice(output_mode, "Good"))
+	  ppd_mark_option(ppd, "OutputMode", "Good");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Color_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+        else if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Gray_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+      }
+      else if (!strcmp(optptr->value, "5"))
+      {
+       /*
+        * High/best/photo quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Best"))
+	  ppd_mark_option(ppd, "OutputMode", "Best");
+	else if (ppdFindChoice(output_mode, "High"))
+	  ppd_mark_option(ppd, "OutputMode", "High");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Photo_on_Photo_Paper")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
       }
     }
     else if (!strcasecmp(optptr->name, "APPrinterPreset"))

@@ -3489,10 +3489,6 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "number-up-default", 1);
 
-  if (!cupsGetOption("orientation-requested", p->num_options, p->options))
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
-                 "orientation-requested-default", NULL, NULL);
-
   if (!cupsGetOption("notify-lease-duration", p->num_options, p->options))
     ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
         	  "notify-lease-duration-default", DefaultLeaseDuration);
@@ -3500,6 +3496,14 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
   if (!cupsGetOption("notify-events", p->num_options, p->options))
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
         	 "notify-events-default", NULL, "job-completed");
+
+  if (!cupsGetOption("orientation-requested", p->num_options, p->options))
+    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NOVALUE,
+                 "orientation-requested-default", NULL, NULL);
+
+  if (!cupsGetOption("print-quality", p->num_options, p->options))
+    ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                  "print-quality-default", IPP_QUALITY_NORMAL);
 }
 
 
@@ -3738,19 +3742,9 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
     mime_filter_t	*filter;	/* MIME filter looping var */
 
 
-    pdl[0] = '\0';
-
-    if (mimeType(MimeDatabase, "application", "pdf"))
-      strlcat(pdl, "application/pdf,", sizeof(pdl));
-
-    if (mimeType(MimeDatabase, "application", "postscript"))
-      strlcat(pdl, "application/postscript,", sizeof(pdl));
-
-    if (mimeType(MimeDatabase, "application", "vnd.cups-raster"))
-      strlcat(pdl, "application/vnd.cups-raster,", sizeof(pdl));
-
    /*
-    * Determine if this is a Tioga PrintJobMgr based queue...
+    * We only support raw printing if this is not a Tioga PrintJobMgr based
+    * queue and if application/octet-stream is a known type...
     */
 
     for (filter = (mime_filter_t *)cupsArrayFirst(MimeDatabase->filters);
@@ -3762,16 +3756,34 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	break;
     }
 
-   /*
-    * We only support raw printing if this is not a Tioga PrintJobMgr based
-    * queue and if application/octet-stream is a known conversion...
-    */
+    pdl[0] = '\0';
 
     if (!filter && mimeType(MimeDatabase, "application", "octet-stream"))
       strlcat(pdl, "application/octet-stream,", sizeof(pdl));
 
-    if (mimeType(MimeDatabase, "image", "png"))
-      strlcat(pdl, "image/png,", sizeof(pdl));
+   /*
+    * Then list a bunch of formats that are supported by the printer...
+    */
+
+    for (type = (mime_type_t *)cupsArrayFirst(p->filetypes);
+	 type;
+	 type = (mime_type_t *)cupsArrayNext(p->filetypes))
+    {
+      if (!strcasecmp(type->super, "application"))
+      {
+        if (!strcasecmp(type->type, "pdf"))
+	  strlcat(pdl, "application/pdf,", sizeof(pdl));
+        else if (!strcasecmp(type->type, "postscript"))
+	  strlcat(pdl, "application/postscript,", sizeof(pdl));
+      }
+      else if (!strcasecmp(type->super, "image"))
+      {
+        if (!strcasecmp(type->type, "jpeg"))
+	  strlcat(pdl, "image/jpeg,", sizeof(pdl));
+	else if (!strcasecmp(type->type, "png"))
+	  strlcat(pdl, "image/png,", sizeof(pdl));
+      }
+    }
 
     if (pdl[0])
       pdl[strlen(pdl) - 1] = '\0';	/* Remove trailing comma */
@@ -3891,6 +3903,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ppd_size_t	*size;			/* Current size */
   ppd_option_t	*duplex,		/* Duplex option */
 		*output_bin,		/* OutputBin option */
+		*output_mode,		/* OutputMode option */
 		*resolution;		/* (Set|JCL|)Resolution option */
   ppd_choice_t	*choice;		/* Current PPD choice */
   ppd_attr_t	*ppd_attr;		/* PPD attribute */
@@ -3902,8 +3915,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ipp_t		*media_col_default,	/* media-col-default collection value */
 		*media_size;		/* media-size collection value */
   ipp_value_t	*val;			/* Attribute value */
-  int		num_finishings;		/* Number of finishings */
-  int		finishings[5];		/* finishings-supported values */
+  int		num_finishings,		/* Number of finishings */
+		finishings[5];		/* finishings-supported values */
+  int		num_qualities,		/* Number of print-quality values */
+		qualities[3];		/* print-quality values */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one-sided",
@@ -3922,7 +3937,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
@@ -3990,8 +4005,51 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     ippAddBoolean(p->ppd_attrs, IPP_TAG_PRINTER, "color-supported",
 		  ppd->color_device);
     if (ppd->throughput)
+    {
       ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		    "pages-per-minute", ppd->throughput);
+      if (ppd->color_device)
+	ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+		      "pages-per-minute-color", ppd->throughput);
+    }
+
+    num_qualities = 0;
+
+    if ((output_mode = ppdFindOption(ppd, "OutputMode")) != NULL)
+    {
+      if (ppdFindChoice(output_mode, "draft") ||
+          ppdFindChoice(output_mode, "fast"))
+        qualities[num_qualities ++] = IPP_QUALITY_DRAFT;
+      if (ppdFindChoice(output_mode, "normal") ||
+          ppdFindChoice(output_mode, "good"))
+        qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
+      if (ppdFindChoice(output_mode, "best") ||
+          ppdFindChoice(output_mode, "high"))
+        qualities[num_qualities ++] = IPP_QUALITY_HIGH;
+    }
+    else if ((ppd_attr = ppdFindAttr(ppd, "APPrinterPreset", NULL)) != NULL)
+    {
+      do
+      {
+        if (strstr(ppd_attr->spec, "draft") ||
+	    strstr(ppd_attr->spec, "Draft"))
+	{
+	  qualities[num_qualities ++] = IPP_QUALITY_DRAFT;
+	  break;
+	}
+      }
+      while ((ppd_attr = ppdFindNextAttr(ppd, "APPrinterPreset",
+                                         NULL)) != NULL);
+
+      qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
+      qualities[num_qualities ++] = IPP_QUALITY_HIGH;
+    }
+
+    if (num_qualities == 0)
+      qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
+
+    ippAddIntegers(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                   "print-quality-supported", num_qualities, qualities);
 
     if (ppd->nickname)
     {
@@ -4195,7 +4253,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	}
 
         attr->values[i].resolution.xres  = xdpi;
-        attr->values[i].resolution.yres  = xdpi;
+        attr->values[i].resolution.yres  = ydpi;
         attr->values[i].resolution.units = IPP_RES_PER_INCH;
 
         if (choice->marked)
