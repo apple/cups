@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: cupsfilter.man 7936 2008-09-11 03:12:59Z mike $"
 .\"
-.\"   cupsfilter man page for the Common UNIX Printing System (CUPS).
+.\"   cupsfilter man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2010 by Apple Inc.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
 .\"   property of Apple Inc. and are protected by Federal copyright
@@ -11,13 +11,15 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsfilter 8 "CUPS" "26 February 2009" "Apple Inc."
+.TH cupsfilter 8 "CUPS" "4 March 2010" "Apple Inc."
 .SH NAME
 cupsfilter \- convert a file to another format using cups filters
 .SH SYNOPSIS
 .B cupsfilter
 [ -c
 .I config-file
+] [ -d 
+.I printer
 ] [ -e ] -j
 .I job-id[,N]
 [ -m
@@ -41,6 +43,9 @@ through CUPS. By default, \fIcupsfilter\fR generates a PDF file.
 -c config-file
 .br
 Uses the named cupsd.conf configuration file.
+.TP 5
+-d printer
+Uses information from the named printer.
 .TP 5
 -e
 .br
@@ -80,7 +85,7 @@ This will be addressed in a future CUPS release.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2010 by Apple Inc.
 .\"
 .\" End of "$Id: cupsfilter.man 7936 2008-09-11 03:12:59Z mike $".
 .\"

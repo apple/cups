@@ -1,9 +1,9 @@
 /*
  * "$Id: mark.c 8210 2009-01-09 02:30:26Z mike $"
  *
- *   Option marking routines for the Common UNIX Printing System (CUPS).
+ *   Option marking routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,7 +29,7 @@
  *   ppdFirstOption()      - Return the first option in the PPD file.
  *   ppdNextOption()       - Return the next option in the PPD file.
  *   _ppdParseOptions()    - Parse options from a PPD file.
- *   debug_marked()        - Output the marked array to stdout...
+ *   ppd_debug_marked()    - Output the marked array to stdout...
  *   ppd_defaults()        - Set the defaults for this group and all sub-groups.
  *   ppd_mark_choices()    - Mark one or more option choices from a string.
  *   ppd_mark_option()     - Quickly mark an option without checking for
@@ -53,9 +53,9 @@
  */
 
 #ifdef DEBUG
-static void	debug_marked(ppd_file_t *ppd, const char *title);
+static void	ppd_debug_marked(ppd_file_t *ppd, const char *title);
 #else
-#  define	debug_marked(ppd,title)
+#  define	ppd_debug_marked(ppd,title)
 #endif /* DEBUG */
 static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
 static void	ppd_mark_choices(ppd_file_t *ppd, const char *s);
@@ -122,7 +122,7 @@ cupsMarkOptions(
   if (!ppd || num_options <= 0 || !options)
     return (0);
 
-  debug_marked(ppd, "Before...");
+  ppd_debug_marked(ppd, "Before...");
 
  /*
   * Do special handling for media, media-col, and PageSize...
@@ -146,10 +146,8 @@ cupsMarkOptions(
 
     num_media_cols = cupsParseOptions(media_col, 0, &media_cols);
 
-    if ((val = cupsGetOption("media-key", num_media_cols, media_cols)) != NULL)
-      media = val;
-    else if ((val = cupsGetOption("media-size", num_media_cols,
-                                  media_cols)) != NULL)
+    if ((val = cupsGetOption("media-size", num_media_cols,
+			     media_cols)) != NULL)
     {
      /*
       * Lookup by dimensions...
@@ -164,15 +162,15 @@ cupsMarkOptions(
       num_media_sizes = cupsParseOptions(val, 0, &media_sizes);
       loc             = localeconv();
 
-      if ((val = cupsGetOption("x-dimension", num_media_sizes,
+      if ((val = cupsGetOption("media-x-dimension", num_media_sizes,
                                media_sizes)) != NULL)
-        width = _cupsStrScand(val, NULL, loc) * 2540.0 / 72.0;
+        width = _cupsStrScand(val, NULL, loc) * 72.0 / 2540.0;
       else
         width = 0.0;
 
-      if ((val = cupsGetOption("y-dimension", num_media_sizes,
+      if ((val = cupsGetOption("media-y-dimension", num_media_sizes,
                                media_sizes)) != NULL)
-        length = _cupsStrScand(val, NULL, loc) * 2540.0 / 72.0;
+        length = _cupsStrScand(val, NULL, loc) * 72.0 / 2540.0;
       else
         length = 0.0;
 
@@ -219,6 +217,9 @@ cupsMarkOptions(
 
       if (cupsGetOption("InputSlot", num_options, options) == NULL)
 	ppd_mark_option(ppd, "InputSlot", s);
+
+      if (cupsGetOption("MediaColor", num_options, options) == NULL)
+	ppd_mark_option(ppd, "MediaColor", s);
 
       if (cupsGetOption("MediaType", num_options, options) == NULL)
 	ppd_mark_option(ppd, "MediaType", s);
@@ -401,6 +402,60 @@ cupsMarkOptions(
         ppd_mark_choices(ppd, attr->value);
       }
     }
+    else if (!strcasecmp(optptr->name, "print-quality"))
+    {
+      ppd_option_t	*output_mode = ppdFindOption(ppd, "OutputMode");
+					/* OutputMode option */
+
+      if (!strcmp(optptr->value, "3"))
+      {
+       /*
+        * Draft quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Draft"))
+	  ppd_mark_option(ppd, "OutputMode", "Draft");
+	else if (ppdFindChoice(output_mode, "Fast"))
+	  ppd_mark_option(ppd, "OutputMode", "Fast");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "DraftGray_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+      }
+      else if (!strcmp(optptr->value, "4"))
+      {
+       /*
+        * Normal quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Normal"))
+	  ppd_mark_option(ppd, "OutputMode", "Normal");
+	else if (ppdFindChoice(output_mode, "Good"))
+	  ppd_mark_option(ppd, "OutputMode", "Good");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Color_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+        else if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Gray_with_Paper_Auto-Detect")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+      }
+      else if (!strcmp(optptr->value, "5"))
+      {
+       /*
+        * High/best/photo quality...
+	*/
+
+	if (ppdFindChoice(output_mode, "Best"))
+	  ppd_mark_option(ppd, "OutputMode", "Best");
+	else if (ppdFindChoice(output_mode, "High"))
+	  ppd_mark_option(ppd, "OutputMode", "High");
+
+        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
+	                        "Photo_on_Photo_Paper")) != NULL)
+          ppd_mark_choices(ppd, attr->value);
+      }
+    }
     else if (!strcasecmp(optptr->name, "APPrinterPreset"))
     {
      /*
@@ -421,7 +476,7 @@ cupsMarkOptions(
     else
       ppd_mark_option(ppd, optptr->name, optptr->value);
 
-  debug_marked(ppd, "After...");
+  ppd_debug_marked(ppd, "After...");
 
   return (ppdConflicts(ppd) > 0);
 }
@@ -746,11 +801,11 @@ _ppdParseOptions(
 
 #ifdef DEBUG
 /*
- * 'debug_marked()' - Output the marked array to stdout...
+ * 'ppd_debug_marked()' - Output the marked array to stdout...
  */
 
 static void
-debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
+ppd_debug_marked(ppd_file_t *ppd,		/* I - PPD file data */
              const char *title)		/* I - Title for list */
 {
   ppd_choice_t	*c;			/* Current choice */

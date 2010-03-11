@@ -3,7 +3,7 @@
  *
  *   cupsGetDevices implementation for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -107,55 +107,15 @@ cupsGetDevices(
   }
 
  /*
-  * Send the request and do any necessary authentication...
+  * Send the request...
   */
 
-  do
-  {
-    DEBUG_puts("2cupsGetDevices: Sending request...");
-    status = cupsSendRequest(http, request, "/", ippLength(request));
+  DEBUG_puts("2cupsGetDevices: Sending request...");
+  status = cupsSendRequest(http, request, "/", ippLength(request));
 
-    DEBUG_puts("2cupsGetDevices: Waiting for response status...");
-    while (status == HTTP_CONTINUE)
-      status = httpUpdate(http);
-
-    if (status != HTTP_OK)
-    {
-      httpFlush(http);
-
-      if (status == HTTP_UNAUTHORIZED)
-      {
-       /*
-	* See if we can do authentication...
-	*/
-
-	DEBUG_puts("2cupsGetDevices: Need authorization...");
-
-	if (!cupsDoAuthentication(http, "POST", "/"))
-	  httpReconnect(http);
-	else
-	{
-	  status = HTTP_AUTHORIZATION_CANCELED;
-	  break;
-	}
-      }
-
-#ifdef HAVE_SSL
-      else if (status == HTTP_UPGRADE_REQUIRED)
-      {
-       /*
-	* Force a reconnect with encryption...
-	*/
-
-	DEBUG_puts("2cupsGetDevices: Need encryption...");
-
-	if (!httpReconnect(http))
-	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
-      }
-#endif /* HAVE_SSL */
-    }
-  }
-  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
+  DEBUG_puts("2cupsGetDevices: Waiting for response status...");
+  while (status == HTTP_CONTINUE)
+    status = httpUpdate(http);
 
   DEBUG_printf(("2cupsGetDevices: status=%d", status));
 
@@ -258,7 +218,7 @@ cupsGetDevices(
   httpBlocking(http, blocking);
   httpFlush(http);
 
-  if (status == IPP_ERROR)
+  if (status == HTTP_ERROR)
     _cupsSetError(IPP_ERROR, NULL, 0);
   else
   {

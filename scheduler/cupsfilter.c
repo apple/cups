@@ -212,6 +212,14 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(command, opt);
 	      break;
 
+          case 'd' : /* Specify the real printer name */
+	      i ++;
+	      if (i < argc)
+	        printer = argv[i];
+	      else
+	        usage(command, opt);
+	      break;
+
 	  case 'D' : /* Delete input file after conversion */
 	      removeinfile = 1;
 	      break;
@@ -1353,6 +1361,7 @@ usage(const char *command,		/* I - Command name */
 		    "Options:\n"
 		    "\n"
 		    "  -c cupsd.conf    Set cupsd.conf file to use\n"
+		    "  -d printer       Use the named printer\n"
 		    "  -e               Use every filter from the PPD file\n"
 		    "  -j job-id[,N]    Filter file N from the specified job (default is file 1)\n"
 		    "  -n copies        Set number of copies\n"
@@ -1365,6 +1374,7 @@ usage(const char *command,		/* I - Command name */
 		    "\n"
 		    "Options:\n"
 		    "\n"
+		    "  -d printer           Use the named printer\n"
 		    "  -e                   Use every filter from the PPD file\n"
 		    "  -f filename          Set file to be converted (otherwise stdin)\n"
 		    "  -o filename          Set file to be generated (otherwise stdout)\n"

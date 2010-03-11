@@ -4,7 +4,7 @@
  *   Administration utility API definitions for the Common UNIX Printing
  *   System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -863,25 +863,6 @@ cupsAdminGetServerSettings(
     int           *num_settings,	/* O - Number of settings */
     cups_option_t **settings)		/* O - Settings */
 {
-  return (_cupsAdminGetServerSettings(http, num_settings, settings));
-}
-
-
-/*
- * '_cupsAdminGetServerSettings()' - Get settings from the server.
- *
- * The returned settings should be freed with cupsFreeOptions() when
- * you are done with them.
- *
- * @since CUPS 1.2@
- */
-
-int					/* O - 1 on success, 0 on failure */
-_cupsAdminGetServerSettings(
-    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
-    int           *num_settings,	/* O - Number of settings */
-    cups_option_t **settings)		/* O - Settings */
-{
   int		i;			/* Looping var */
   cups_file_t	*cupsd;			/* cupsd.conf file */
   char		cupsdconf[1024];	/* cupsd.conf filename */
@@ -1214,22 +1195,6 @@ cupsAdminSetServerSettings(
     int           num_settings,		/* I - Number of settings */
     cups_option_t *settings)		/* I - Settings */
 {
-  return (_cupsAdminSetServerSettings(http, num_settings, settings));
-}
-
-
-/*
- * '_cupsAdminSetServerSettings()' - Set settings on the server.
- *
- * @since CUPS 1.2@
- */
-
-int					/* O - 1 on success, 0 on failure */
-_cupsAdminSetServerSettings(
-    http_t        *http,		/* I - Connection to server or @code CUPS_HTTP_DEFAULT@ */
-    int           num_settings,		/* I - Number of settings */
-    cups_option_t *settings)		/* I - Settings */
-{
   int		i;			/* Looping var */
   http_status_t status;			/* GET/PUT status */
   const char	*server_port_env;	/* SERVER_PORT env var */
@@ -1309,8 +1274,8 @@ _cupsAdminSetServerSettings(
   * Get current settings...
   */
 
-  if (!_cupsAdminGetServerSettings(http, &cupsd_num_settings,
-                                   &cupsd_settings))
+  if (!cupsAdminGetServerSettings(http, &cupsd_num_settings,
+				  &cupsd_settings))
     return (0);
 
   if ((val = cupsGetOption(CUPS_SERVER_DEBUG_LOGGING, cupsd_num_settings,
@@ -1330,6 +1295,9 @@ _cupsAdminSetServerSettings(
     remote_any = atoi(val);
   else
     remote_any = 0;
+
+  DEBUG_printf(("1cupsAdminSetServerSettings: old remote_any=%d",
+                remote_any));
 
   if ((val = cupsGetOption(CUPS_SERVER_REMOTE_PRINTERS, cupsd_num_settings,
                            cupsd_settings)) != NULL)
@@ -1495,13 +1463,13 @@ _cupsAdminSetServerSettings(
   while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
   {
     if ((!strcasecmp(line, "Port") || !strcasecmp(line, "Listen")) &&
-        (share_printers >= 0 || remote_admin >= 0))
+        (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
     {
       if (!wrote_port_listen)
       {
         wrote_port_listen = 1;
 
-	if (share_printers > 0 || remote_admin > 0)
+	if (remote_admin > 0 || remote_any > 0 || share_printers > 0)
 	{
 	  cupsFilePuts(temp, "# Allow remote access\n");
 	  cupsFilePrintf(temp, "Port %d\n", server_port);
@@ -1709,7 +1677,8 @@ _cupsAdminSetServerSettings(
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
       }
-      else if (in_root_location && (remote_admin >= 0 || share_printers >= 0))
+      else if (in_root_location &&
+               (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
       {
 	wrote_root_location = 1;
 
@@ -1720,12 +1689,14 @@ _cupsAdminSetServerSettings(
           cupsFilePuts(temp, "  # Allow remote administration...\n");
 	else if (share_printers > 0)
           cupsFilePuts(temp, "  # Allow shared printing...\n");
+	else if (remote_any > 0)
+          cupsFilePuts(temp, "  # Allow remote access...\n");
 	else
           cupsFilePuts(temp, "  # Restrict access to the server...\n");
 
         cupsFilePuts(temp, "  Order allow,deny\n");
 
-	if (remote_admin > 0 || share_printers > 0)
+	if (remote_admin > 0 || remote_any > 0 || share_printers > 0)
 	  cupsFilePrintf(temp, "  Allow %s\n",
 	                 remote_any > 0 ? "all" : "@LOCAL");
       }
@@ -1910,9 +1881,10 @@ _cupsAdminSetServerSettings(
     }
   }
 
-  if (!wrote_port_listen && (share_printers >= 0 || remote_admin >= 0))
+  if (!wrote_port_listen &&
+      (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
   {
-    if (share_printers > 0 || remote_admin > 0)
+    if (remote_admin > 0 || remote_any > 0 || share_printers > 0)
     {
       cupsFilePuts(temp, "# Allow remote access\n");
       cupsFilePrintf(temp, "Port %d\n", ippPort());
@@ -1930,7 +1902,8 @@ _cupsAdminSetServerSettings(
 #endif /* CUPS_DEFAULT_DOMAINSOCKET */
   }
 
-  if (!wrote_root_location && (remote_admin >= 0 || share_printers >= 0))
+  if (!wrote_root_location &&
+      (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
   {
     if (remote_admin > 0 && share_printers > 0)
       cupsFilePuts(temp,
@@ -1939,13 +1912,15 @@ _cupsAdminSetServerSettings(
       cupsFilePuts(temp, "# Allow remote administration...\n");
     else if (share_printers > 0)
       cupsFilePuts(temp, "# Allow shared printing...\n");
+    else if (remote_any > 0)
+      cupsFilePuts(temp, "# Allow remote access...\n");
     else
       cupsFilePuts(temp, "# Restrict access to the server...\n");
 
     cupsFilePuts(temp, "<Location />\n"
                        "  Order allow,deny\n");
 
-    if (remote_admin > 0 || share_printers > 0)
+    if (remote_admin > 0 || remote_any > 0 || share_printers > 0)
       cupsFilePrintf(temp, "  Allow %s\n", remote_any > 0 ? "all" : "@LOCAL");
 
     cupsFilePuts(temp, "</Location>\n");

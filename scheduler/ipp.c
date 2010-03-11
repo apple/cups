@@ -2879,7 +2879,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -4434,66 +4434,6 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Check quotas...
   */
 
-#ifdef __APPLE__
-  if (AppleQuotas && (q = cupsdFindQuota(p, username)) != NULL)
-  {
-   /*
-    * TODO: Define these special page count values as constants!
-    */
-
-    if (q->page_count == -4) /* special case: unlimited user */
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request approved for printer %s (%s): "
-		      "unlimited quota.",
-		      username, p->name, p->info);
-      q->page_count = 0; /* allow user to print */
-      return (1);
-    }
-    else if (q->page_count == -3) /* quota exceeded */
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request denied for printer %s (%s): "
-		      "quota limit exceeded.",
-		      username, p->name, p->info);
-      q->page_count = 2; /* force quota exceeded failure */
-      return (-1);
-    }
-    else if (q->page_count == -2) /* quota disabled for user */
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request denied for printer %s (%s): "
-		      "printing disabled for user.",
-		      username, p->name, p->info);
-      q->page_count = 2; /* force quota exceeded failure */
-      return (-1);
-    }
-    else if (q->page_count == -1) /* quota access error */
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request denied for printer %s (%s): "
-		      "unable to determine quota limit.",
-		      username, p->name, p->info);
-      q->page_count = 2; /* force quota exceeded failure */
-      return (-1);
-    }
-    else if (q->page_count < 0) /* user not found or other error */
-    {
-      cupsdLogMessage(CUPSD_LOG_INFO,
-                      "User \"%s\" request denied for printer %s (%s): "
-		      "user disabled / missing quota.",
-		      username, p->name, p->info);
-      q->page_count = 2; /* force quota exceeded failure */
-      return (-1);
-    }
-    else /* page within user limits */
-    {
-      q->page_count = 0; /* allow user to print */
-      return (1);
-    }
-  }
-  else
-#endif /* __APPLE__ */
   if (p->k_limit || p->page_limit)
   {
     if ((q = cupsdUpdateQuota(p, username, 0, 0)) == NULL)
@@ -6430,7 +6370,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.ipp2", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__

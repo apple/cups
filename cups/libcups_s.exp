@@ -1,6 +1,4 @@
 _cups_debug_fd
-_cupsAdminGetServerSettings
-_cupsAdminSetServerSettings
 _cupsCharmapFlush
 _cupsCharmapFree
 _cupsCharmapGet

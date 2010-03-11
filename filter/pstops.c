@@ -3,7 +3,7 @@
  *
  *   PostScript filter for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -121,14 +121,22 @@ typedef struct				/**** Document information ****/
 		*title;			/* Job name */
   int		copies;			/* Number of copies */
   const char	*ap_input_slot,		/* AP_FIRSTPAGE_InputSlot value */
-		*ap_manual_feed;	/* AP_FIRSTPAGE_ManualFeed value */
+		*ap_manual_feed,	/* AP_FIRSTPAGE_ManualFeed value */
+		*ap_media_color,	/* AP_FIRSTPAGE_MediaColor value */
+		*ap_media_type,		/* AP_FIRSTPAGE_MediaType value */
+		*ap_page_region,	/* AP_FIRSTPAGE_PageRegion value */
+		*ap_page_size;		/* AP_FIRSTPAGE_PageSize value */
   float		brightness;		/* brightness value */
   int		collate,		/* Collate copies? */
 		emit_jcl,		/* Emit JCL commands? */
 		fitplot;		/* Fit pages to media */
   float		gamma;			/* gamma value */
   const char	*input_slot,		/* InputSlot value */
-		*manual_feed;		/* ManualFeed value */
+		*manual_feed,		/* ManualFeed value */
+		*media_color,		/* MediaColor value */
+		*media_type,		/* MediaType value */
+		*page_region,		/* PageRegion value */
+		*page_size;		/* PageSize value */
   int		mirror,			/* doc->mirror/mirror pages */
 		number_up,		/* Number of pages on each sheet */
 		number_up_layout,	/* doc->number_up_layout of N-up pages */
@@ -1322,6 +1330,18 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 					        doc->ap_manual_feed,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("MediaColor", doc->ap_media_color,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("MediaType", doc->ap_media_type,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("PageRegion", doc->ap_page_region,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("PageSize", doc->ap_page_size,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
     }
     else if (doc->page == (Duplex + 2))
     {
@@ -1335,6 +1355,18 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
       pageinfo->num_options = cupsAddOption("ManualFeed",
                                             doc->input_slot ? "False" :
 					        doc->manual_feed,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("MediaColor", doc->media_color,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("MediaType", doc->media_type,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("PageRegion", doc->page_region,
+                                            pageinfo->num_options,
+					    &(pageinfo->options));
+      pageinfo->num_options = cupsAddOption("PageSize", doc->page_size,
                                             pageinfo->num_options,
 					    &(pageinfo->options));
     }
@@ -2388,18 +2420,35 @@ set_pstops_options(
   doc->new_bounding_box[3] = INT_MIN;
 
  /*
-  * AP_FIRSTPAGE_InputSlot
+  * AP_FIRSTPAGE_* and the corresponding non-first-page options.
   */
 
-  doc->ap_input_slot = cupsGetOption("AP_FIRSTPAGE_InputSlot", num_options,
-                                     options);
-
- /*
-  * AP_FIRSTPAGE_ManualFeed
-  */
-
+  doc->ap_input_slot  = cupsGetOption("AP_FIRSTPAGE_InputSlot", num_options,
+                                      options);
   doc->ap_manual_feed = cupsGetOption("AP_FIRSTPAGE_ManualFeed", num_options,
                                       options);
+  doc->ap_media_color = cupsGetOption("AP_FIRSTPAGE_MediaColor", num_options,
+                                      options);
+  doc->ap_media_type  = cupsGetOption("AP_FIRSTPAGE_MediaType", num_options,
+                                      options);
+  doc->ap_page_region = cupsGetOption("AP_FIRSTPAGE_PageRegion", num_options,
+                                      options);
+  doc->ap_page_size   = cupsGetOption("AP_FIRSTPAGE_PageSize", num_options,
+                                      options);
+
+  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
+    doc->input_slot = choice->choice;
+  if ((choice = ppdFindMarkedChoice(ppd, "ManualFeed")) != NULL)
+    doc->manual_feed = choice->choice;
+  if ((choice = ppdFindMarkedChoice(ppd, "MediaColor")) != NULL)
+    doc->media_color = choice->choice;
+  if ((choice = ppdFindMarkedChoice(ppd, "MediaType")) != NULL)
+    doc->media_type = choice->choice;
+  if ((choice = ppdFindMarkedChoice(ppd, "PageRegion")) != NULL)
+    doc->page_region = choice->choice;
+  if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL)
+    doc->page_size = choice->choice;
+
 
  /*
   * brightness
@@ -2495,18 +2544,8 @@ set_pstops_options(
     doc->gamma = 1.0f;
 
  /*
-  * InputSlot
+  * mirror/MirrorPrint
   */
-
-  if ((choice = ppdFindMarkedChoice(ppd, "InputSlot")) != NULL)
-    doc->input_slot = choice->choice;
-
- /*
-  * ManualFeed
-  */
-
-  if ((choice = ppdFindMarkedChoice(ppd, "ManualFeed")) != NULL)
-    doc->manual_feed = choice->choice;
 
   if ((choice = ppdFindMarkedChoice(ppd, "MirrorPrint")) != NULL)
   {

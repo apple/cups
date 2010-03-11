@@ -545,7 +545,7 @@ cupsGetNamedDest(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
   if (!cups_get_sdests(http, op, name, 0, &dest))
   {
-    if (op == CUPS_GET_DEFAULT || name)
+    if (op == CUPS_GET_DEFAULT || (name && !set_as_default))
       return (NULL);
 
    /*

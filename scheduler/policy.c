@@ -213,10 +213,24 @@ cupsdDeleteAllPolicies(void)
 {
   cupsd_policy_t	*p;		/* Current policy */
   cupsd_location_t	*po;		/* Current policy op */
+  cupsd_printer_t	*printer;	/* Current printer */
 
 
   if (!Policies)
     return;
+
+ /*
+  * First clear the policy pointers for all printers...
+  */
+
+  for (printer = (cupsd_printer_t *)cupsArrayFirst(Printers);
+       printer;
+       printer = (cupsd_printer_t *)cupsArrayNext(Printers))
+    printer->op_policy_ptr = NULL;
+
+ /*
+  * Then free all of the policies...
+  */
 
   for (p = (cupsd_policy_t *)cupsArrayFirst(Policies);
        p;

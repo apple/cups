@@ -155,7 +155,11 @@ cupsdNetIFUpdate(void)
     * Try looking up the hostname for the address as needed...
     */
 
+#ifdef __APPLE__
+    if (HostNameLookups)
+#else
     if (HostNameLookups || RemotePort)
+#endif /* __APPLE__ */
       httpAddrLookup((http_addr_t *)(addr->ifa_addr), hostname,
                      sizeof(hostname));
     else

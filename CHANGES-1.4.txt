@@ -4,6 +4,19 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453)
+	- The PostScript filter did not support all media selection options for
+	  the first page (STR #3525)
+	- The scheduler did not always remove job control files (STR #3425)
+	- The scheduler could crash on restart if classes were defined
+	  (STR #3524)
+	- The scheduler no longer looks up network interface hostnames by
+	  default on Mac OS X (STR #3523)
+	- ippWriteIO did not write collection (member) attributes properly in
+	  all cases (STR #3521)
+	- The "cupsctl --remote-any" and corresponding web interface check box
+	  (allow printing from the Internet) did not work reliably (STR #3520)
+	- The lpq and lpr commands would sometimes choose different default
+	  printers (STR #3503)
 	- cupsDo*Request did not flush error text, leading to multiple issues
 	  (STR #3325, STR #3519)
 	- cupsDoAuthentication did not cancel password authentication after 3

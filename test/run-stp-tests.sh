@@ -612,6 +612,18 @@ echo "Test Summary"
 echo ""
 echo "<H2>Summary</H2>" >>$strfile
 
+# Job control files
+count=`ls -1 /tmp/cups-$user/spool | wc -l`
+count=`expr $count - 1`
+if test $count != 0; then
+	echo "FAIL: $count job control files were not purged."
+	echo "<P>FAIL: $count job control files were not purged.</P>" >>$strfile
+	fail=`expr $fail + 1`
+else
+	echo "PASS: All job control files purged."
+	echo "<P>PASS: All job control files purged.</P>" >>$strfile
+fi
+
 # Pages printed on Test1 (within 1 page for timing-dependent cancel issues)
 count=`grep '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=`expr $pjobs \* 2 + 34`

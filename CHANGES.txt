@@ -1,8 +1,12 @@
-CHANGES.txt - 2010-03-02
+CHANGES.txt - 2010-03-09
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler and CUPS API now support the print-quality job template
+	  attribute.
+	- The scheduler no longer supports the old Mac OS X Server quota
+	  plugin.
 	- The scheduler now allows writing to /Users/Shared from print filters
 	  on Mac OS X.
 	- CUPS no longer supports the old ~/.cupsrc or ~/.lpoptions files from
