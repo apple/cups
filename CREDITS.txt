@@ -1,4 +1,4 @@
-CREDITS.txt - 2009-07-07
+CREDITS.txt - 2010-03-13
 ------------------------
 
 Few projects are completed by one person, and CUPS is no exception.  We'd
@@ -40,7 +40,7 @@ like to thank the following individuals for their contributions:
     Opher Shachar                  - Hebrew localization.
     Stuart Stevens                 - HP JetDirect IPP information.
     Andrea Suatoni                 - IRIX desktop integration and testing.
-    Teppo Turlianen                - Finnish localization.
+    Teppo Turliainen               - Finnish localization.
     Tim Waugh                      - Lots of patches, testing, and Linux
                                      integration.
     Yugami                         - LDAP browsing support.
