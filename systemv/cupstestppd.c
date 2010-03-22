@@ -2911,8 +2911,6 @@ check_sizes(ppd_file_t *ppd,		/* I - PPD file */
   ppd_size_t	*size;			/* Current size */
   int		width,			/* Custom width */
 		length;			/* Custom length */
-  char		name[PPD_MAX_NAME],	/* Size name without dot suffix */
-		*nameptr;		/* Pointer into name */
   const char	*prefix;		/* WARN/FAIL prefix */
   ppd_option_t	*page_size,		/* PageSize option */
 		*page_region;		/* PageRegion option */
