@@ -56,7 +56,9 @@ LIBOBJS	=	\
 		options.o \
 		page.o \
 		ppd.o \
-		pwgmedia.o \
+		pwg-file.o \
+		pwg-media.o \
+		pwg-ppd.o \
 		request.o \
 		sidechannel.o \
 		snmp.o \
@@ -83,6 +85,7 @@ OBJS	=	\
 		testoptions.o \
 		testlang.o \
 		testppd.o \
+		testpwg.o \
 		testsnmp.o \
 		php_cups_wrap.o
 
@@ -130,6 +133,7 @@ UNITTARGETS =	\
 		testlang \
 		testoptions \
 		testppd \
+		testpwg \
 		testsnmp
 
 TARGETS	=	\
@@ -503,6 +507,18 @@ testppd:	testppd.o $(LIBCUPSSTATIC) test.ppd test2.ppd
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 	echo Running PPD API tests...
 	./testppd
+
+
+#
+# testpwg (dependency on static CUPS library is intentional)
+#
+
+testpwg:	testpwg.o $(LIBCUPSSTATIC) test.ppd
+	echo Linking $@...
+	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testpwg.o $(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
+	echo Running PWG API tests...
+	./testpwg test.ppd
 
 
 #

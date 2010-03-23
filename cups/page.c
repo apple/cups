@@ -44,7 +44,7 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
 {
   int		i;			/* Looping var */
   ppd_size_t	*size;			/* Current page size */
-  float		w, l;			/* Width and length of page */
+  double	w, l;			/* Width and length of page */
   char		*nameptr;		/* Pointer into name */
   struct lconv	*loc;			/* Locale data */
   ppd_coption_t	*coption;		/* Custom option for page size */
@@ -81,52 +81,54 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       * Variable size; size name can be one of the following:
       *
       *    Custom.WIDTHxLENGTHin    - Size in inches
+      *    Custom.WIDTHxLENGTHft    - Size in feet
       *    Custom.WIDTHxLENGTHcm    - Size in centimeters
       *    Custom.WIDTHxLENGTHmm    - Size in millimeters
+      *    Custom.WIDTHxLENGTHm     - Size in meters
       *    Custom.WIDTHxLENGTH[pt]  - Size in points
       */
 
       loc = localeconv();
-      w   = (float)_cupsStrScand(name + 7, &nameptr, loc);
+      w   = _cupsStrScand(name + 7, &nameptr, loc);
       if (!nameptr || *nameptr != 'x')
         return (NULL);
 
-      l = (float)_cupsStrScand(nameptr + 1, &nameptr, loc);
+      l = _cupsStrScand(nameptr + 1, &nameptr, loc);
       if (!nameptr)
         return (NULL);
 
       if (!strcasecmp(nameptr, "in"))
       {
-        w *= 72.0f;
-	l *= 72.0f;
+        w *= 72.0;
+	l *= 72.0;
       }
       else if (!strcasecmp(nameptr, "ft"))
       {
-        w *= 12.0f * 72.0f;
-	l *= 12.0f * 72.0f;
+        w *= 12.0 * 72.0;
+	l *= 12.0 * 72.0;
       }
       else if (!strcasecmp(nameptr, "mm"))
       {
-        w *= 72.0f / 25.4f;
-        l *= 72.0f / 25.4f;
+        w *= 72.0 / 25.4;
+        l *= 72.0 / 25.4;
       }
       else if (!strcasecmp(nameptr, "cm"))
       {
-        w *= 72.0f / 2.54f;
-        l *= 72.0f / 2.54f;
+        w *= 72.0 / 2.54;
+        l *= 72.0 / 2.54;
       }
       else if (!strcasecmp(nameptr, "m"))
       {
-        w *= 72.0f / 0.0254f;
-        l *= 72.0f / 0.0254f;
+        w *= 72.0 / 0.0254;
+        l *= 72.0 / 0.0254;
       }
 
-      size->width  = w;
-      size->length = l;
+      size->width  = (float)w;
+      size->length = (float)l;
       size->left   = ppd->custom_margins[0];
       size->bottom = ppd->custom_margins[1];
-      size->right  = w - ppd->custom_margins[2];
-      size->top    = l - ppd->custom_margins[3];
+      size->right  = (float)(w - ppd->custom_margins[2]);
+      size->top    = (float)(l - ppd->custom_margins[3]);
 
      /*
       * Update the custom option records for the page size, too...

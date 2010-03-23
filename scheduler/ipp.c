@@ -1347,6 +1347,11 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   int		kbytes;			/* Size of print file */
   int		i;			/* Looping var */
   int		lowerpagerange;		/* Page range bound */
+  const char	*ppd;			/* PPD keyword for media selection */
+  int		exact;			/* Did we have an exact match? */
+  ipp_attribute_t *media_col,		/* media-col attribute */
+		*media_margin;		/* media-*-margin attribute */
+  ipp_t		*unsup_col;		/* media-col in unsupported response */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "add_job(%p[%d], %p(%s), %p(%s/%s))",
@@ -1509,6 +1514,62 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
       }
 
       lowerpagerange = attr->values[i].range.upper + 1;
+    }
+  }
+
+ /*
+  * Do media selection as needed...
+  */
+
+  if (!ippFindAttribute(con->request, "InputSlot", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetInputSlot(printer->pwg, con->request, NULL)) != NULL)
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "InputSlot", NULL,
+                 ppd);
+
+  if (!ippFindAttribute(con->request, "MediaType", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetMediaType(printer->pwg, con->request, NULL)) != NULL)
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "MediaType", NULL,
+                 ppd);
+
+  if (!ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetPageSize(printer->pwg, con->request, NULL, &exact)) != NULL)
+  {
+    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "PageSize", NULL,
+                 ppd);
+
+    if (!exact &&
+        (media_col = ippFindAttribute(con->request, "media-col",
+	                              IPP_TAG_BEGIN_COLLECTION)) != NULL)
+    {
+      send_ipp_status(con, IPP_OK_SUBST, _("Unsupported margins."));
+
+      unsup_col = ippNew();
+      ippAddCollection(con->response, IPP_TAG_UNSUPPORTED_GROUP, "media-col",
+                       unsup_col);
+
+      if ((media_margin = ippFindAttribute(media_col->values[0].collection,
+                                           "media-bottom-margin",
+					   IPP_TAG_INTEGER)) != NULL)
+        ippAddInteger(unsup_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	              "media-bottom-margin", media_margin->values[0].integer);
+
+      if ((media_margin = ippFindAttribute(media_col->values[0].collection,
+                                           "media-left-margin",
+					   IPP_TAG_INTEGER)) != NULL)
+        ippAddInteger(unsup_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	              "media-left-margin", media_margin->values[0].integer);
+
+      if ((media_margin = ippFindAttribute(media_col->values[0].collection,
+                                           "media-right-margin",
+					   IPP_TAG_INTEGER)) != NULL)
+        ippAddInteger(unsup_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	              "media-right-margin", media_margin->values[0].integer);
+
+      if ((media_margin = ippFindAttribute(media_col->values[0].collection,
+                                           "media-top-margin",
+					   IPP_TAG_INTEGER)) != NULL)
+        ippAddInteger(unsup_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	              "media-top-margin", media_margin->values[0].integer);
     }
   }
 
@@ -2880,6 +2941,10 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     char cache_name[1024];		/* Cache filename for printer attrs */
 
     snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir,
+             printer->name);
+    unlink(cache_name);
+
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -4617,8 +4682,9 @@ copy_attribute(
         for (i = 0; i < attr->num_values; i ++)
 	{
 	  toattr->values[i].collection = ippNew();
+	  toattr->values[i].collection->request.status.version[0] = 2;
 	  copy_attrs(toattr->values[i].collection, attr->values[i].collection,
-	             NULL, IPP_TAG_ZERO, 0);
+	             NULL, IPP_TAG_ZERO, quickcopy);
 	}
         break;
 
@@ -4683,11 +4749,14 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
     {
      /*
       * Don't send collection attributes by default to IPP/1.x clients
-      * since many do not support collections...
+      * since many do not support collections.  Also don't send
+      * media-col-database unless specifically requested by the client.
       */
 
       if (fromattr->value_tag == IPP_TAG_BEGIN_COLLECTION &&
-          !ra && to->request.status.version[0] == 1)
+          !ra &&
+	  (to->request.status.version[0] == 1 ||
+	   !strcmp(fromattr->name, "media-col-database")))
 	continue;
 
       copy_attribute(to, fromattr, quickcopy);
@@ -5052,6 +5121,7 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
   int		i;			/* Looping var */
   char		option[PPD_MAX_NAME],	/* Option name */
 		choice[PPD_MAX_NAME];	/* Choice name */
+  ppd_size_t	*size;			/* Default size */
   int		num_defaults;		/* Number of default options */
   cups_option_t	*defaults;		/* Default options */
   char		cups_protocol[PPD_MAX_LINE];
@@ -5224,19 +5294,19 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 
     cupsFileClose(dst);
   }
-  else if (ppdPageSize(ppd, DefaultPaperSize))
+  else if ((size = ppdPageSize(ppd, DefaultPaperSize)) != NULL)
   {
    /*
     * Add the default media sizes...
     */
 
-    num_defaults = cupsAddOption("PageSize", DefaultPaperSize,
+    num_defaults = cupsAddOption("PageSize", size->name,
                                  num_defaults, &defaults);
-    num_defaults = cupsAddOption("PageRegion", DefaultPaperSize,
+    num_defaults = cupsAddOption("PageRegion", size->name,
                                  num_defaults, &defaults);
-    num_defaults = cupsAddOption("PaperDimension", DefaultPaperSize,
+    num_defaults = cupsAddOption("PaperDimension", size->name,
                                  num_defaults, &defaults);
-    num_defaults = cupsAddOption("ImageableArea", DefaultPaperSize,
+    num_defaults = cupsAddOption("ImageableArea", size->name,
                                  num_defaults, &defaults);
   }
 
@@ -6371,6 +6441,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/%s.ipp2", CacheDir, printer->name);
+  unlink(filename);
+
+  snprintf(filename, sizeof(filename), "%s/%s.pwg", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__

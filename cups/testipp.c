@@ -3,7 +3,7 @@
  *
  *   IPP test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cups/file.h>
 #include <cups/string.h>
 #include <errno.h>
 #include "ipp-private.h"
@@ -82,6 +83,32 @@ ipp_uchar_t	collection[] =			/* Collection buffer */
 		  0x00, 0x00,			/* No value */
 		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
 		    0x00, 0x00,			/* No name */
+		    0x00, 0x0a,			/* Value length + value */
+		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
+		    IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
+		    0x00, 0x00,			/* Name length + name */
+		    0x00, 0x00,			/* No value */
+		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x0b,		/* Value length + value */
+		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      IPP_TAG_INTEGER,		/* integer tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x04,		/* Value length + value */
+		      0x00, 0x00, 0x54, 0x56,
+		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x0b,		/* Value length + value */
+		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      IPP_TAG_INTEGER,		/* integer tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x04,		/* Value length + value */
+		      0x00, 0x00, 0x6d, 0x24,
+		    IPP_TAG_END_COLLECTION,	/* endCollection tag */
+		    0x00, 0x00,			/* No name */
+		    0x00, 0x00,			/* No value */
+		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
+		    0x00, 0x00,			/* No name */
 		    0x00, 0x0b,			/* Value length + value */
 		    'm', 'e', 'd', 'i', 'a', '-', 'c', 'o', 'l', 'o', 'r',
 		    IPP_TAG_KEYWORD,		/* keyword tag */
@@ -104,6 +131,32 @@ ipp_uchar_t	collection[] =			/* Collection buffer */
 		  IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
 		  0x00, 0x00,			/* No name */
 		  0x00, 0x00,			/* No value */
+		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
+		    0x00, 0x00,			/* No name */
+		    0x00, 0x0a,			/* Value length + value */
+		    'm', 'e', 'd', 'i', 'a', '-', 's', 'i', 'z', 'e',
+		    IPP_TAG_BEGIN_COLLECTION,	/* begCollection tag */
+		    0x00, 0x00,			/* Name length + name */
+		    0x00, 0x00,			/* No value */
+		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x0b,		/* Value length + value */
+		      'x', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      IPP_TAG_INTEGER,		/* integer tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x04,		/* Value length + value */
+		      0x00, 0x00, 0x52, 0x08,
+		      IPP_TAG_MEMBERNAME,	/* memberAttrName tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x0b,		/* Value length + value */
+		      'y', '-', 'd', 'i', 'm', 'e', 'n', 's', 'i', 'o', 'n',
+		      IPP_TAG_INTEGER,		/* integer tag */
+		      0x00, 0x00,		/* No name */
+		      0x00, 0x04,		/* Value length + value */
+		      0x00, 0x00, 0x74, 0x04,
+		    IPP_TAG_END_COLLECTION,	/* endCollection tag */
+		    0x00, 0x00,			/* No name */
+		    0x00, 0x00,			/* No value */
 		    IPP_TAG_MEMBERNAME,		/* memberAttrName tag */
 		    0x00, 0x00,			/* No name */
 		    0x00, 0x0b,			/* Value length + value */
@@ -147,11 +200,15 @@ int				/* O - Exit status */
 main(int  argc,			/* I - Number of command-line arguments */
      char *argv[])		/* I - Command-line arguments */
 {
-  ipp_t		*cols[2];	/* Collections */
+  ipp_t		*cols[2],	/* Collections */
+		*size;		/* media-size collection */
   ipp_t		*request;	/* Request */
+  ipp_attribute_t *media_col,	/* media-col attribute */
+		*media_size,	/* media-size attribute */
+		*attr;		/* Other attribute */
   ipp_state_t	state;		/* State */
   int		length;		/* Length of data */
-  int		fd;		/* File descriptor */
+  cups_file_t	*fp;		/* File pointer */
   int		i;		/* Looping var */
   int		status;		/* Status of tests (0 = success, 1 = fail) */
 
@@ -180,14 +237,27 @@ main(int  argc,			/* I - Number of command-line arguments */
         	 "printer-uri", NULL, "ipp://localhost/printers/foo");
 
     cols[0] = ippNew();
-    ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL, "blue");
-    ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL, "plain");
+    size    = ippNew();
+    ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "x-dimension", 21590);
+    ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "y-dimension", 27940);
+    ippAddCollection(cols[0], IPP_TAG_JOB, "media-size", size);
+    ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL,
+                 "blue");
+    ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL,
+                 "plain");
 
     cols[1] = ippNew();
-    ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL, "plaid");
-    ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL, "glossy");
+    size    = ippNew();
+    ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "x-dimension", 21000);
+    ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "y-dimension", 29700);
+    ippAddCollection(cols[1], IPP_TAG_JOB, "media-size", size);
+    ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL,
+                 "plaid");
+    ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL,
+		 "glossy");
 
-    ippAddCollections(request, IPP_TAG_JOB, "media-col", 2, (const ipp_t **)cols);
+    ippAddCollections(request, IPP_TAG_JOB, "media-col", 2,
+                      (const ipp_t **)cols);
 
     length = ippLength(request);
     if (length != sizeof(collection))
@@ -225,7 +295,11 @@ main(int  argc,			/* I - Number of command-line arguments */
     }
     else if (memcmp(wbuffer, collection, wused))
     {
-      puts("FAIL - output does not match baseline!");
+      for (i = 0; i < wused; i ++)
+        if (wbuffer[i] != collection[i])
+	  break;
+
+      printf("FAIL - output does not match baseline at 0x%04x!\n", i);
       hex_dump("Bytes Written", wbuffer, wused);
       hex_dump("Baseline", collection, sizeof(collection));
       status = 1;
@@ -271,13 +345,148 @@ main(int  argc,			/* I - Number of command-line arguments */
     else
       puts("PASS");
 
+    fputs("ippFindAttribute(media-col): ", stdout);
+    if ((media_col = ippFindAttribute(request, "media-col",
+                                      IPP_TAG_BEGIN_COLLECTION)) == NULL)
+    {
+      if ((media_col = ippFindAttribute(request, "media-col",
+                                        IPP_TAG_ZERO)) == NULL)
+        puts("FAIL (not found)");
+      else
+        printf("FAIL (wrong type - %s)\n", ippTagString(media_col->value_tag));
+
+      status = 1;
+    }
+    else if (media_col->num_values != 2)
+    {
+      printf("FAIL (wrong count - %d)\n", media_col->num_values);
+      status = 1;
+    }
+    else
+      puts("PASS");
+
+    fputs("ippFindAttribute(media-size 1): ", stdout);
+    if ((media_size = ippFindAttribute(media_col->values[0].collection,
+                                       "media-size",
+                                       IPP_TAG_BEGIN_COLLECTION)) == NULL)
+    {
+      if ((media_size = ippFindAttribute(media_col->values[0].collection,
+                                         "media-col",
+                                         IPP_TAG_ZERO)) == NULL)
+        puts("FAIL (not found)");
+      else
+        printf("FAIL (wrong type - %s)\n", ippTagString(media_size->value_tag));
+
+      status = 1;
+    }
+    else
+    {
+      if ((attr = ippFindAttribute(media_size->values[0].collection,
+                                   "x-dimension", IPP_TAG_INTEGER)) == NULL)
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "x-dimension", IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (missing x-dimension)");
+	else
+	  printf("FAIL (wrong type for x-dimension - %s)\n",
+	         ippTagString(attr->value_tag));
+
+	status = 1;
+      }
+      else if (attr->values[0].integer != 21590)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n",
+	       attr->values[0].integer);
+	status = 1;
+      }
+      else if ((attr = ippFindAttribute(media_size->values[0].collection,
+                                        "y-dimension",
+					IPP_TAG_INTEGER)) == NULL)
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "y-dimension", IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (missing y-dimension)");
+	else
+	  printf("FAIL (wrong type for y-dimension - %s)\n",
+	         ippTagString(attr->value_tag));
+
+	status = 1;
+      }
+      else if (attr->values[0].integer != 27940)
+      {
+        printf("FAIL (wrong value for y-dimension - %d)\n",
+	       attr->values[0].integer);
+	status = 1;
+      }
+      else
+	puts("PASS");
+    }
+
+    fputs("ippFindAttribute(media-size 2): ", stdout);
+    if ((media_size = ippFindAttribute(media_col->values[1].collection,
+                                       "media-size",
+                                       IPP_TAG_BEGIN_COLLECTION)) == NULL)
+    {
+      if ((media_size = ippFindAttribute(media_col->values[1].collection,
+                                         "media-col",
+                                         IPP_TAG_ZERO)) == NULL)
+        puts("FAIL (not found)");
+      else
+        printf("FAIL (wrong type - %s)\n", ippTagString(media_size->value_tag));
+
+      status = 1;
+    }
+    else
+    {
+      if ((attr = ippFindAttribute(media_size->values[0].collection,
+                                   "x-dimension",
+				   IPP_TAG_INTEGER)) == NULL)
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "x-dimension", IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (missing x-dimension)");
+	else
+	  printf("FAIL (wrong type for x-dimension - %s)\n",
+	         ippTagString(attr->value_tag));
+
+	status = 1;
+      }
+      else if (attr->values[0].integer != 21000)
+      {
+        printf("FAIL (wrong value for x-dimension - %d)\n",
+	       attr->values[0].integer);
+	status = 1;
+      }
+      else if ((attr = ippFindAttribute(media_size->values[0].collection,
+                                        "y-dimension",
+				        IPP_TAG_INTEGER)) == NULL)
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "y-dimension", IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (missing y-dimension)");
+	else
+	  printf("FAIL (wrong type for y-dimension - %s)\n",
+	         ippTagString(attr->value_tag));
+
+	status = 1;
+      }
+      else if (attr->values[0].integer != 29700)
+      {
+        printf("FAIL (wrong value for y-dimension - %d)\n",
+	       attr->values[0].integer);
+	status = 1;
+      }
+      else
+	puts("PASS");
+    }
+
     ippDelete(request);
 
    /*
     * Test _ippFindOption() private API...
     */
 
-    fputs("_ippFindOption(\"printer-type\"): ", stdout);
+    fputs("_ippFindOption(printer-type): ", stdout);
     if (_ippFindOption("printer-type"))
       puts("PASS");
     else
@@ -305,7 +514,7 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     for (i = 1; i < argc; i ++)
     {
-      if ((fd = open(argv[i], O_RDONLY)) < 0)
+      if ((fp = cupsFileOpen(argv[i], "r")) == NULL)
       {
 	printf("Unable to open \"%s\" - %s\n", argv[i], strerror(errno));
 	status = 1;
@@ -313,7 +522,8 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
       request = ippNew();
-      while ((state = ippReadFile(fd, request)) == IPP_ATTRIBUTE);
+      while ((state = ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
+                                request)) == IPP_ATTRIBUTE);
 
       if (state != IPP_DATA)
       {
@@ -327,7 +537,7 @@ main(int  argc,			/* I - Number of command-line arguments */
       }
 
       ippDelete(request);
-      close(fd);
+      cupsFileClose(fp);
     }
   }
 

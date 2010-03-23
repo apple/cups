@@ -16,6 +16,8 @@
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #endif /* HAVE_DNSSD */
+#include <cups/pwg-private.h>
+
 
 /*
  * Quota data...
@@ -94,6 +96,7 @@ typedef struct cupsd_printer_s
   time_t	marker_time;		/* Last time marker attributes were updated */
   cups_array_t	*filters,		/* Filters for queue */
 		*pre_filters;		/* Pre-filters for queue */
+  _pwg_t	*pwg;			/* PWG<->PPD mapping data */
 
 #ifdef HAVE_DNSSD
   char		*reg_name,		/* Name used for service registration */
