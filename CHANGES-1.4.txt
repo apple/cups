@@ -4,6 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453)
+	- Fixed support for media-col and page size variants (STR #3394)
 	- The PostScript filter did not support all media selection options for
 	  the first page (STR #3525)
 	- The scheduler did not always remove job control files (STR #3425)

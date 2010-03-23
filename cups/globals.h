@@ -26,6 +26,7 @@
 #  include "http-private.h"
 #  include "cups.h"
 #  include "i18n.h"
+#  include "pwg-private.h"
 
 #  ifdef HAVE_PTHREAD_H
 #    include <pthread.h>
@@ -103,9 +104,12 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   int			ppd_line;	/* Current line number */
   ppd_conform_t		ppd_conform;	/* Level of conformance required */
 
-  /* pwgmedia.c */
-  cups_array_t		*pwg_size_lut,	/* Lookup table for PWG names */
-			*leg_size_lut;	/* Lookup table for legacy names */
+  /* pwg-media.c */
+  cups_array_t		*leg_size_lut,	/* Lookup table for legacy names */
+			*ppd_size_lut,	/* Lookup table for PPD names */
+			*pwg_size_lut;	/* Lookup table for PWG names */
+  _pwg_media_t		pwg_media;	/* PWG media data for custom size */
+  char			pwg_name[65];	/* PWG media name for custom size */
 
   /* snmp.c */
   char			snmp_community[255];

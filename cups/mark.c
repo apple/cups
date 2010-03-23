@@ -34,8 +34,6 @@
  *   ppd_mark_choices()    - Mark one or more option choices from a string.
  *   ppd_mark_option()     - Quickly mark an option without checking for
  *                           conflicts.
- *   ppd_mark_size()       - Quickly mark a page size without checking for
- *                           conflicts.
  */
 
 /*
@@ -45,7 +43,7 @@
 #include "cups.h"
 #include "string.h"
 #include "debug.h"
-#include "pwgmedia.h"
+#include "pwg-private.h"
 
 
 /*
@@ -61,7 +59,6 @@ static void	ppd_defaults(ppd_file_t *ppd, ppd_group_t *g);
 static void	ppd_mark_choices(ppd_file_t *ppd, const char *s);
 static void	ppd_mark_option(ppd_file_t *ppd, const char *option,
 		                const char *choice);
-static void	ppd_mark_size(ppd_file_t *ppd, const char *size);
 
 
 /*
@@ -83,8 +80,8 @@ cupsMarkOptions(
 		s[255];			/* Temporary string */
   const char	*val,			/* Pointer into value */
 		*media,			/* media option */
-		*media_col,		/* media-col option */
-		*page_size;		/* PageSize option */
+		*page_size,		/* PageSize option */
+		*ppd_keyword;		/* PPD keyword */
   cups_option_t	*optptr;		/* Current option */
   ppd_option_t	*option;		/* PPD option */
   ppd_attr_t	*attr;			/* PPD attribute */
@@ -125,66 +122,21 @@ cupsMarkOptions(
   ppd_debug_marked(ppd, "Before...");
 
  /*
-  * Do special handling for media, media-col, and PageSize...
+  * Do special handling for media and PageSize...
   */
 
   media     = cupsGetOption("media", num_options, options);
-  media_col = cupsGetOption("media-col", num_options, options);
   page_size = cupsGetOption("PageSize", num_options, options);
-
-  if (media_col && (!page_size || !page_size[0]))
-  {
-   /*
-    * Pull out the corresponding media size from the media-col value...
-    */
-
-    int			num_media_cols,	/* Number of media-col values */
-    			num_media_sizes;/* Number of media-size values */
-    cups_option_t	*media_cols,	/* media-col values */
-			*media_sizes;	/* media-size values */
-
-
-    num_media_cols = cupsParseOptions(media_col, 0, &media_cols);
-
-    if ((val = cupsGetOption("media-size", num_media_cols,
-			     media_cols)) != NULL)
-    {
-     /*
-      * Lookup by dimensions...
-      */
-
-      double		width,		/* Width in points */
-			length;		/* Length in points */
-      struct lconv	*loc;		/* Locale data */
-      _cups_pwg_media_t	*pwgmedia;	/* PWG media name */
-
-
-      num_media_sizes = cupsParseOptions(val, 0, &media_sizes);
-      loc             = localeconv();
-
-      if ((val = cupsGetOption("media-x-dimension", num_media_sizes,
-                               media_sizes)) != NULL)
-        width = _cupsStrScand(val, NULL, loc) * 72.0 / 2540.0;
-      else
-        width = 0.0;
-
-      if ((val = cupsGetOption("media-y-dimension", num_media_sizes,
-                               media_sizes)) != NULL)
-        length = _cupsStrScand(val, NULL, loc) * 72.0 / 2540.0;
-      else
-        length = 0.0;
-
-      if ((pwgmedia = _cupsPWGMediaBySize(width, length)) != NULL)
-        media = pwgmedia->pwg;
-
-      cupsFreeOptions(num_media_sizes, media_sizes);
-    }
-
-    cupsFreeOptions(num_media_cols, media_cols);
-  }
 
   if (media)
   {
+   /*
+    * Load PWG mapping data as needed...
+    */
+
+    if (!ppd->pwg)
+      ppd->pwg = _pwgCreateWithPPD(ppd);
+
    /*
     * Loop through the option string, separating it at commas and
     * marking each individual option as long as the corresponding
@@ -212,27 +164,18 @@ cupsMarkOptions(
       * Mark it...
       */
 
-      if (!page_size || !page_size[0])
-	ppd_mark_size(ppd, s);
+      if ((!page_size || !page_size[0]) &&
+	  (ppd_keyword = _pwgGetPageSize((_pwg_t *)ppd->pwg, NULL, s,
+	                                 NULL)) != NULL)
+	ppd_mark_option(ppd, "PageSize", ppd_keyword);
 
-      if (cupsGetOption("InputSlot", num_options, options) == NULL)
-	ppd_mark_option(ppd, "InputSlot", s);
+      if (!cupsGetOption("InputSlot", num_options, options) &&
+	  (ppd_keyword = _pwgGetInputSlot((_pwg_t *)ppd->pwg, NULL, s)) != NULL)
+	ppd_mark_option(ppd, "InputSlot", ppd_keyword);
 
-      if (cupsGetOption("MediaColor", num_options, options) == NULL)
-	ppd_mark_option(ppd, "MediaColor", s);
-
-      if (cupsGetOption("MediaType", num_options, options) == NULL)
-	ppd_mark_option(ppd, "MediaType", s);
-
-      if (cupsGetOption("EFMediaType", num_options, options) == NULL)
-	ppd_mark_option(ppd, "EFMediaType", s);		/* EFI */
-
-      if (cupsGetOption("EFMediaQualityMode", num_options, options) == NULL)
-	ppd_mark_option(ppd, "EFMediaQualityMode", s);	/* EFI */
-
-      if (!strcasecmp(s, "manual") &&
-	  !cupsGetOption("ManualFeed", num_options, options))
-	ppd_mark_option(ppd, "ManualFeed", "True");
+      if (!cupsGetOption("MediaType", num_options, options) &&
+	  (ppd_keyword = _pwgGetMediaType((_pwg_t *)ppd->pwg, NULL, s)) != NULL)
+	ppd_mark_option(ppd, "MediaType", ppd_keyword);
     }
   }
 
@@ -241,8 +184,7 @@ cupsMarkOptions(
   */
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
-    if (!strcasecmp(optptr->name, "media") ||
-        !strcasecmp(optptr->name, "media-col"))
+    if (!strcasecmp(optptr->name, "media"))
       continue;
     else if (!strcasecmp(optptr->name, "sides"))
     {

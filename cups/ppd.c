@@ -1,9 +1,9 @@
 /*
  * "$Id: ppd.c 7906 2008-09-03 20:19:43Z mike $"
  *
- *   PPD file routines for the Common UNIX Printing System (CUPS).
+ *   PPD file routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -60,6 +60,7 @@
  */
 
 #include "ppd-private.h"
+#include "pwg-private.h"
 #include "globals.h"
 #include "debug.h"
 #include <stdlib.h>
@@ -312,6 +313,13 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
 
     cupsArrayDelete(ppd->cups_uiconstraints);
   }
+
+ /*
+  * Free any PWG mapping data...
+  */
+
+  if (ppd->pwg)
+    _pwgDestroy((_pwg_t *)ppd->pwg);
 
  /*
   * Free the whole record...

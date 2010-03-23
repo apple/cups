@@ -17,6 +17,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
+	ATTR keyword requested-attributes printer-defaults,printer-description,media-col-database
 
 	# What statuses are OK?
 	STATUS successful-ok

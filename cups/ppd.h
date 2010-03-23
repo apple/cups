@@ -1,10 +1,9 @@
 /*
  * "$Id: ppd.h 7791 2008-07-24 00:55:30Z mike $"
  *
- *   PostScript Printer Description definitions for the Common UNIX Printing
- *   System (CUPS).
+ *   PostScript Printer Description definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -334,6 +333,9 @@ typedef struct ppd_file_s		/**** PPD File ****/
 
   /**** New in CUPS 1.4/Mac OS X 10.6 ****/
   cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
+
+  /**** New in CUPS 1.5 ****/
+  void		*pwg;			/* PWG to/from PPD mappings */
 } ppd_file_t;
 
 

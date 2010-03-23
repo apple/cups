@@ -53,7 +53,7 @@
 
 #include "debug.h"
 #include "globals.h"
-#include "pwgmedia.h"
+#include "pwg-private.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <sys/stat.h>
@@ -1095,8 +1095,8 @@ static char *				/* O - Default paper size */
 appleGetPaperSize(char *name,		/* I - Paper size name buffer */
                   int  namesize)	/* I - Size of buffer */
 {
-  CFStringRef		defaultPaperID;	/* Default paper ID */
-  _cups_pwg_media_t	*pwgmedia;	/* PWG media size */
+  CFStringRef	defaultPaperID;		/* Default paper ID */
+  _pwg_media_t	*pwgmedia;		/* PWG media size */
 
 
   defaultPaperID = CFPreferencesCopyAppValue(kDefaultPaperIDKey,
@@ -1106,7 +1106,7 @@ appleGetPaperSize(char *name,		/* I - Paper size name buffer */
       !CFStringGetCString(defaultPaperID, name, namesize,
 			  kCFStringEncodingUTF8))
     name[0] = '\0';
-  else if ((pwgmedia = _cupsPWGMediaByLegacy(name)) != NULL)
+  else if ((pwgmedia = _pwgMediaForLegacy(name)) != NULL)
     strlcpy(name, pwgmedia->pwg, namesize);
 
   if (defaultPaperID)

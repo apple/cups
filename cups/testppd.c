@@ -3,7 +3,7 @@
  *
  *   PPD test program for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,13 +23,12 @@
  * Include necessary headers...
  */
 
+#include <cups/cups.h>
+#include <cups/string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <cups/string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "cups.h"
-#include "pwgmedia.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -58,6 +57,11 @@ static const char	*default_code =
 			"%%EndFeature\n"
 			"} stopped cleartomark\n"
 			"[{\n"
+			"%%BeginFeature: *MediaType Plain\n"
+			"MediaType=Plain\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
 			"%%BeginFeature: *IntOption None\n"
 			"%%EndFeature\n"
 			"} stopped cleartomark\n"
@@ -74,6 +78,11 @@ static const char	*custom_code =
 			"[{\n"
 			"%%BeginFeature: *InputSlot Tray\n"
 			"InputSlot=Tray\n"
+			"%%EndFeature\n"
+			"} stopped cleartomark\n"
+			"[{\n"
+			"%%BeginFeature: *MediaType Plain\n"
+			"MediaType=Plain\n"
 			"%%EndFeature\n"
 			"} stopped cleartomark\n"
 			"[{\n"
@@ -145,7 +154,6 @@ main(int  argc,				/* I - Number of command-line arguments */
 		maxsize,		/* Maximum size */
 		*size;			/* Current size */
   ppd_attr_t	*attr;			/* Current attribute */
-  _cups_pwg_media_t *pwgmedia;		/* PWG media size */
 
 
   status = 0;
@@ -432,20 +440,6 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (!size || strcmp(size->name, "Letter"))
     {
       printf("FAIL (%s)\n", size ? size->name : "unknown");
-      status ++;
-    }
-    else
-      puts("PASS");
-
-    fputs("_cupsPWGMediaBySize(842, 1191): ", stdout);
-    if ((pwgmedia = _cupsPWGMediaBySize(842, 1191)) == NULL)
-    {
-      puts("FAIL (not found)");
-      status ++;
-    }
-    else if (strcmp(pwgmedia->pwg, "iso_a3_297x420mm"))
-    {
-      printf("FAIL (%s)\n", pwgmedia->pwg);
       status ++;
     }
     else

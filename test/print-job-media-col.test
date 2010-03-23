@@ -22,8 +22,8 @@
 	ATTR collection media-col {
 		MEMBER collection media-size {
 			# 4x6
-			MEMBER integer media-x-dimension 10160
-			MEMBER integer media-y-dimension 15240
+			MEMBER integer x-dimension 10160
+			MEMBER integer y-dimension 15240
 		}
 	}
 

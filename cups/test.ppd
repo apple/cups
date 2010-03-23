@@ -2,7 +2,7 @@
 *%
 *% "$Id: test.ppd 7819 2008-08-01 00:27:24Z mike $"
 *%
-*% Test PPD file for the Common UNIX Printing System (CUPS).
+*% Test PPD file for CUPS.
 *%
 *% This file is used to test the CUPS PPD API functions and cannot be
 *% used with any known printers.  Look on the CUPS web site for working PPD
@@ -12,7 +12,7 @@
 *% to create your PPD files - not only will it save you time, it produces
 *% consistently high-quality files.
 *%
-*% Copyright 2007-2009 by Apple Inc.
+*% Copyright 2007-2010 by Apple Inc.
 *% Copyright 2002-2006 by Easy Software Products.
 *% 
 *% These coded instructions, statements, and computer programs are the
@@ -65,6 +65,9 @@
 *PageSize Letter/US Letter:	"PageSize=Letter"
 *fr.PageSize Letter/French US Letter: ""
 *fr_CA.PageSize Letter/French Canadian US Letter: ""
+*PageSize Letter.Fullbleed/US Letter Borderless: "PageSize=Letter.Fullbleed"
+*fr.PageSize Letter.Fullbleed/French US Letter Borderless: ""
+*fr_CA.PageSize Letter.Fullbleed/French Canadian US Letter Borderless: ""
 *PageSize A4/A4:		"PageSize=A4"
 *fr.PageSize A4/French A4: ""
 *fr_CA.PageSize A4/French Canadian A4: ""
@@ -78,27 +81,32 @@
 *OrderDependency: 10 AnySetup *PageRegion
 *DefaultPageRegion: Letter
 *PageRegion Letter/US Letter:	"PageRegion=Letter"
+*PageRegion Letter.Fullbleed/US Letter Borderless: "PageRegion=Letter.Fullbleed"
 *PageRegion A4/A4:		"PageRegion=A4"
 *PageRegion Env10/#10 Envelope:	"PageRegion=Env10"
 *CloseUI: *PageRegion
 
 *fr.Translation PageRegion/French Page Region: ""
 *fr.PageRegion Letter/French US Letter: ""
+*fr.PageRegion Letter.Fullbleed/French US Letter Borderless: ""
 *fr.PageRegion A4/French A4: ""
 *fr.PageRegion Env10/French #10 Envelope: ""
 
 *fr_CA.Translation PageRegion/French Canadian Page Region: ""
 *fr_CA.PageRegion Letter/French Canadian US Letter: ""
+*fr_CA.PageRegion Letter.Fullbleed/French Canadian US Letter Borderless: ""
 *fr_CA.PageRegion A4/French Canadian A4: ""
 *fr_CA.PageRegion Env10/French Canadian #10 Envelope: ""
 
 *DefaultImageableArea: Letter 
 *ImageableArea Letter:	"18 36 594 756"
+*ImageableArea Letter.Fullbleed:	"0 0 612 792"
 *ImageableArea A4:	"18 36 577 806"
 *ImageableArea Env10:	"18 36 279 648"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter:	"612 792"
+*PaperDimension Letter.Fullbleed:	"612 792"
 *PaperDimension A4:	"595 842"
 *PaperDimension Env10:	"297 684"
 
@@ -119,6 +127,15 @@
 *InputSlot Manual/Manual Feed: "InputSlot=Manual"
 *InputSlot Envelope/Envelope Feed: "InputSlot=Envelope"
 *CloseUI: *InputSlot
+
+*OpenUI *MediaType/Media Type: PickOne
+*OrderDependency: 25 AnySetup *MediaType
+*DefaultMediaType: Plain
+*MediaType Plain/Plain Paper: "MediaType=Plain"
+*MediaType Matte/Matte Photo: "MediaType=Matte"
+*MediaType Glossy/Glossy Photo: "MediaType=Glossy"
+*MediaType Transparency/Transparency Film: "MediaType=Transparency"
+*CloseUI: *MediaType
 
 *OpenUI *Duplex/2-Sided Printing: PickOne
 *OrderDependency: 10 DocumentSetup *Duplex
