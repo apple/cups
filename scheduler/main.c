@@ -1447,7 +1447,9 @@ launchd_checkin(void)
 {
   size_t		i,		/* Looping var */
 			count;		/* Number of listeners */
+#  ifdef HAVE_SSL
   int			portnum;	/* Port number */
+#  endif /* HAVE_SSL */
   launch_data_t		ld_msg,		/* Launch data message */
 			ld_resp,	/* Launch data response */
 			ld_array,	/* Launch data array */
