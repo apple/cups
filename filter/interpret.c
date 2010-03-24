@@ -1,9 +1,9 @@
 /*
  * "$Id: interpret.c 7852 2008-08-21 04:19:45Z mike $"
  *
- *   PPD command interpreter for the Common UNIX Printing System (CUPS).
+ *   PPD command interpreter for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -40,9 +40,7 @@
  * Include necessary headers...
  */
 
-#include <cups/string.h>
 #include "image-private.h"
-#include <stdlib.h>
 
 
 /*

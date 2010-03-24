@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   Sample SNMP configuration file for CUPS.  See "man cups-smnp.conf" for a
+#   Sample SNMP configuration file for CUPS.  See "man cups-snmp.conf" for a
 #   complete description of this file.
 #
 

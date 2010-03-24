@@ -1,9 +1,9 @@
 /*
  * "$Id: encode.c 7696 2008-06-26 00:54:42Z mike $"
  *
- *   Option encoding routines for the Common UNIX Printing System (CUPS).
+ *   Option encoding routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -27,12 +27,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "ipp-private.h"
-#include <stdlib.h>
-#include <ctype.h>
-#include "string.h"
-#include "debug.h"
+#include "cups-private.h"
 
 
 /*

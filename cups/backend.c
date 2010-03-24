@@ -1,9 +1,9 @@
 /*
  * "$Id: backend.c 7810 2008-07-29 01:11:15Z mike $"
  *
- *   Backend functions for the Common UNIX Printing System (CUPS).
+ *   Backend functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,9 +25,8 @@
  * Include necessary headers...
  */
 
-#include <stdlib.h>
+#include "cups-private.h"
 #include "backend.h"
-#include "globals.h"
 
 
 /*

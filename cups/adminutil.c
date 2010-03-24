@@ -1,8 +1,7 @@
 /*
  * "$Id: adminutil.c 7850 2008-08-20 00:07:25Z mike $"
  *
- *   Administration utility API definitions for the Common UNIX Printing
- *   System (CUPS).
+ *   Administration utility API definitions for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
@@ -33,10 +32,8 @@
  * Include necessary headers...
  */
 
+#include "cups-private.h"
 #include "adminutil.h"
-#include "globals.h"
-#include "debug.h"
-#include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #ifdef WIN32

@@ -1,7 +1,7 @@
 /*
  * "$Id: auth.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Authentication functions for the Common UNIX Printing System (CUPS).
+ *   Authentication functions for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
@@ -30,11 +30,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
+#include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)

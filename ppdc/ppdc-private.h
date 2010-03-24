@@ -3,7 +3,7 @@
 //
 //   Private definitions for the CUPS PPD Compiler.
 //
-//   Copyright 2009 by Apple Inc.
+//   Copyright 2009-2010 by Apple Inc.
 //
 //   These coded instructions, statements, and computer programs are the
 //   property of Apple Inc. and are protected by Federal copyright
@@ -20,9 +20,7 @@
 //
 
 #  include "ppdc.h"
-#  include <cups/debug.h>
-#  include <cups/globals.h>
-#  include <errno.h>
+#  include <cups/cups-private.h>
 
 
 //

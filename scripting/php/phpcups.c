@@ -29,7 +29,7 @@
  * Include necessary headers...
  */
 
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"

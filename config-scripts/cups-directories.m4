@@ -118,6 +118,17 @@ if test "$libdir" = "\${exec_prefix}/lib"; then
 	esac
 fi
 
+dnl Setup private include directory...
+AC_ARG_WITH(privateinclude, [  --with-privateinclude   set path for private include files, default=none],privatedir="$withval",privatedir="")
+if test "x$privateinclude" != x -a "x$privateinclude" != xnone; then
+	PRIVATEINCLUDE="$privateinclude/cups"
+else
+	privateinclude=""
+	PRIVATEINCLUDE=""
+fi
+AC_SUBST(privateinclude)
+AC_SUBST(PRIVATEINCLUDE)
+
 dnl Setup init.d locations...
 AC_ARG_WITH(rcdir, [  --with-rcdir            set path for rc scripts],rcdir="$withval",rcdir="")
 AC_ARG_WITH(rclevels, [  --with-rclevels         set run levels for rc scripts],rclevels="$withval",rclevels="2 3 5")

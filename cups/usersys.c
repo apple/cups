@@ -37,8 +37,7 @@
  * Include necessary headers...
  */
 
-#include "http-private.h"
-#include "globals.h"
+#include "cups-private.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #ifdef WIN32
@@ -46,7 +45,6 @@
 #else
 #  include <pwd.h>
 #endif /* WIN32 */
-#include "debug.h"
 
 
 /*

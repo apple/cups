@@ -1,7 +1,7 @@
 /*
  * "$Id: localize.c 7679 2008-06-19 23:37:45Z mike $"
  *
- *   PPD localization routines for the Common UNIX Printing System (CUPS).
+ *   PPD localization routines for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -43,9 +43,8 @@
  * Include necessary headers.
  */
 
-#include "globals.h"
+#include "cups-private.h"
 #include "ppd-private.h"
-#include "debug.h"
 
 
 /*

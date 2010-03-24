@@ -1,9 +1,9 @@
 /*
  * "$Id: lp.c 7170 2008-01-04 02:21:30Z mike $"
  *
- *   "lp" command for the Common UNIX Printing System (CUPS).
+ *   "lp" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,12 +23,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/string.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
+#include <cups/cups-private.h>
 
 
 /*

@@ -1,9 +1,9 @@
 /*
  * "$Id: testmime.c 7670 2008-06-17 22:42:08Z mike $"
  *
- *   MIME test program for the Common UNIX Printing System (CUPS).
+ *   MIME test program for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,11 +23,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cups/string.h>
-#include "mime.h"
+#include <cups/string-private.h>
 #include <cups/dir.h>
+#include "mime.h"
 
 
 /*

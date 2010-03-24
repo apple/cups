@@ -1,9 +1,9 @@
 /*
  * "$Id: string.c 7460 2008-04-16 02:19:54Z mike $"
  *
- *   String functions for the Common UNIX Printing System (CUPS).
+ *   String functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -36,12 +36,12 @@
  * Include necessary headers...
  */
 
+#include "string-private.h"
+#include "debug-private.h"
+#include "array.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <limits.h>
-#include "array.h"
-#include "debug.h"
-#include "string.h"
 #ifdef HAVE_PTHREAD_H
 #  include <pthread.h>
 #endif /* HAVE_PTHREAD_H */

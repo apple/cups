@@ -1,7 +1,15 @@
 /*
  * "$Id: po2strings.c 6921 2007-09-06 13:38:37Z mike $"
  *
- * Convert GNU gettext .po files to Apple .strings file (UTF-16 BE text file).
+ *   Convert GNU gettext .po files to Apple .strings file (UTF-16 BE text file).
+ *
+ *   Copyright 2007-2010 by Apple Inc.
+ *
+ *   These coded instructions, statements, and computer programs are the
+ *   property of Apple Inc. and are protected by Federal copyright
+ *   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+ *   which should have been included with this file.  If this file is
+ *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
  * Usage:
  *
@@ -17,10 +25,7 @@
  *   write_string() - Write a string to the .strings file.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
+#include <cups/cups-private.h>
 
 
 /*

@@ -48,9 +48,8 @@
 
 /*#define DEBUG*/
 #include "cgi-private.h"
-#include <errno.h>
 #include <cups/http.h>
-#include <cups/md5.h>
+#include <cups/md5-private.h>
 
 
 /*

@@ -1,9 +1,9 @@
 /*
- * "$Id: debug.h 7701 2008-06-27 22:37:23Z mike $"
+ * "$Id$"
  *
- *   Debugging macros for the Common UNIX Printing System (CUPS).
+ *   Private debugging macros for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,8 +15,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_DEBUG_H_
-#  define _CUPS_DEBUG_H_
+#ifndef _CUPS_DEBUG_PRIVATE_H_
+#  define _CUPS_DEBUG_PRIVATE_H_
 
 /*
  * C++ magic...
@@ -82,8 +82,8 @@ extern void	_cups_debug_puts(const char *s);
 }
 #  endif /* __cplusplus */
 
-#endif /* !_CUPS_DEBUG_H_ */
+#endif /* !_CUPS_DEBUG_PRIVATE_H_ */
 
 /*
- * End of "$Id: debug.h 7701 2008-06-27 22:37:23Z mike $".
+ * End of "$Id$".
  */

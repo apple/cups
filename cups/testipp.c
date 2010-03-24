@@ -1,7 +1,7 @@
 /*
  * "$Id: testipp.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   IPP test program for the Common UNIX Printing System (CUPS).
+ *   IPP test program for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
@@ -23,11 +23,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <cups/file.h>
-#include <cups/string.h>
-#include <errno.h>
+#include "string-private.h"
 #include "ipp-private.h"
 #ifdef WIN32
 #  include <io.h>

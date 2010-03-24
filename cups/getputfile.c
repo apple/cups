@@ -1,9 +1,9 @@
 /*
  * "$Id: getputfile.c 7359 2008-02-29 19:01:35Z mike $"
  *
- *   Get/put file functions for the Common UNIX Printing System (CUPS).
+ *   Get/put file functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,13 +26,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "cups.h"
-#include "language.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
+#include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)

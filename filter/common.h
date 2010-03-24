@@ -1,9 +1,9 @@
 /*
  * "$Id: common.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Common filter definitions for the Common UNIX Printing System (CUPS).
+ *   Common filter definitions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -19,16 +19,10 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <ctype.h>
-#include <time.h>
-
+#include <cups/string-private.h>
 #include <cups/cups.h>
 #include <cups/language.h>
-#include <cups/string.h>
+#include <time.h>
 
 
 /*

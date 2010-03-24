@@ -1,9 +1,9 @@
 /*
  * "$Id: rastertolabel.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Label printer filter for the Common UNIX Printing System (CUPS).
+ *   Label printer filter for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2001-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,14 +31,12 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
+#include <cups/string-private.h>
+#include <cups/language-private.h>
 #include <cups/raster.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <errno.h>
 
 
 /*

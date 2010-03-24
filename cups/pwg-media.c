@@ -32,10 +32,7 @@
  * Include necessary headers...
  */
 
-#include "pwg-private.h"
-#include "globals.h"
-#include "string.h"
-#include "debug.h"
+#include "cups-private.h"
 #include <math.h>
 
 

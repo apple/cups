@@ -22,17 +22,12 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <ctype.h>
+#include <cups/cups-private.h>
+#include <cups/md5-private.h>
 #include <fcntl.h>
 #include <grp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#include <cups/globals.h>
-#include <cups/md5.h>
 
 #ifndef WIN32
 #  include <unistd.h>

@@ -1,9 +1,9 @@
 /*
  * "$Id: mime.c 7694 2008-06-26 00:23:20Z mike $"
  *
- *   MIME database file routines for the Common UNIX Printing System (CUPS).
+ *   MIME database file routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -38,13 +38,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-#include <cups/debug.h>
+#include <cups/string-private.h>
+#include <cups/debug-private.h>
 #include <cups/dir.h>
-#include <cups/string.h>
 #include "mime.h"
 
 

@@ -1,9 +1,9 @@
 /*
  * "$Id: cgi-private.h 7940 2008-09-16 00:45:16Z mike $"
  *
- *   Private CGI definitions for the Common UNIX Printing System (CUPS).
+ *   Private CGI definitions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -18,9 +18,9 @@
  */
 
 #include "cgi.h"
-#include <cups/debug.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
+#include <cups/debug-private.h>
+#include <cups/language-private.h>
+#include <cups/string-private.h>
 
 
 /*

@@ -1,9 +1,9 @@
 /*
  * "$Id: lpq.c 7460 2008-04-16 02:19:54Z mike $"
  *
- *   "lpq" command for the Common UNIX Printing System (CUPS).
+ *   "lpq" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,12 +28,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cups/string.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/debug.h>
+#include <cups/cups-private.h>
 
 
 /*

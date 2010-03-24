@@ -1,7 +1,7 @@
 /*
  * "$Id: page.c 7791 2008-07-24 00:55:30Z mike $"
  *
- *   Page size functions for the Common UNIX Printing System (CUPS).
+ *   Page size functions for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -28,10 +28,9 @@
  * Include necessary headers...
  */
 
+#include "string-private.h"
+#include "debug-private.h"
 #include "ppd.h"
-#include "string.h"
-#include <ctype.h>
-#include "debug.h"
 
 
 /*

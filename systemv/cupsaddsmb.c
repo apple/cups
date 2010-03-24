@@ -1,9 +1,9 @@
 /*
  * "$Id: cupsaddsmb.c 7033 2007-10-19 02:11:28Z mike $"
  *
- *   "cupsaddsmb" command for the Common UNIX Printing System (CUPS).
+ *   "cupsaddsmb" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2001-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,13 +23,8 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cups/string.h>
+#include <cups/cups-private.h>
 #include <cups/adminutil.h>
-#include <cups/i18n.h>
-#include <cups/debug.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>

@@ -3,7 +3,7 @@
  *
  *   Man page to HTML conversion program.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2004-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,8 +23,7 @@
  * Include necessary headers.
  */
 
-#include <cups/string.h>
-#include <stdlib.h>
+#include <cups/string-private.h>
 #include <unistd.h>
 
 

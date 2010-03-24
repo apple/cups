@@ -3,7 +3,9 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.4
 
-	- Documentation updates (STR #3453)
+	- Documentation updates (STR #3453, STR #3527, STR #3528, STR #3529)
+	- The cupsfilter command did not set the RIP_MAX_CACHE environment
+	  variable (STR #3531)
 	- Fixed support for media-col and page size variants (STR #3394)
 	- The PostScript filter did not support all media selection options for
 	  the first page (STR #3525)

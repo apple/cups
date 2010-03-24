@@ -1,10 +1,9 @@
 /*
  * "$Id: image-private.h 7473 2008-04-21 17:51:58Z mike $"
  *
- *   Private image library definitions for the Common UNIX Printing
- *   System (CUPS).
+ *   Private image library definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,8 +24,8 @@
 
 #  include "image.h"
 #  include <cups/cups.h>
-#  include <cups/debug.h>
-#  include <cups/string.h>
+#  include <cups/debug-private.h>
+#  include <cups/string-private.h>
 #  include <stdlib.h>
 #  include <string.h>
 #  ifdef WIN32

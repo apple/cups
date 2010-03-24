@@ -119,7 +119,7 @@ distclean:	clean
 	$(RM) packaging/cups-desc.plist packaging/cups-info.plist
 	$(RM) templates/header.tmpl
 	$(RM) desktop/cups.desktop
-	$(RM) scheduler/cups.sh scheduler/cups-lpd
+	$(RM) scheduler/cups.sh scheduler/cups-lpd.xinetd
 	$(RM) scheduler/org.cups.cups-lpd.plist scheduler/cups.xml
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
@@ -188,6 +188,11 @@ install-headers:
 		echo Installing header files in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) install-headers) || exit 1;\
 	done
+	if test "x$(privateinclude)" != x; then \
+		echo Installing config.h into $(PRIVATEINCLUDE)...; \
+		$(INSTALLDIR) -m 755 $(PRIVATEINCLUDE); \
+		$(INSTALL_DATA) config.h $(PRIVATEINCLUDE); \
+	fi
 
 
 #

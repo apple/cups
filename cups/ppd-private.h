@@ -31,7 +31,7 @@
  * Include necessary headers...
  */
 
-#  include "cups.h"
+#  include <cups/cups.h>
 
 
 /*

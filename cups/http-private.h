@@ -1,9 +1,9 @@
 /*
  * "$Id: http-private.h 7850 2008-08-20 00:07:25Z mike $"
  *
- *   Private HTTP definitions for the Common UNIX Printing System (CUPS).
+ *   Private HTTP definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -22,8 +22,8 @@
  * Include necessary headers...
  */
 
+#  include "config.h"
 #  include <stdlib.h>
-#  include <config.h>
 
 #  ifdef __sun
 #    include <sys/select.h>
@@ -74,8 +74,8 @@
 typedef int socklen_t;
 #  endif /* __sgi || (__APPLE__ && !_SOCKLEN_T) */
 
-#  include "http.h"
-#  include "md5.h"
+#  include <cups/http.h>
+#  include "md5-private.h"
 #  include "ipp-private.h"
 
 #  if defined HAVE_LIBSSL

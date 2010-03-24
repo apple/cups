@@ -1,9 +1,9 @@
 /*
  * "$Id: lprm.c 7261 2008-01-28 23:09:31Z mike $"
  *
- *   "lprm" command for the Common UNIX Printing System (CUPS).
+ *   "lprm" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -21,12 +21,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
+#include <cups/cups-private.h>
 
 
 /*

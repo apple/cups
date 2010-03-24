@@ -1,9 +1,9 @@
 /*
  * "$Id: mailto.c 7460 2008-04-16 02:19:54Z mike $"
  *
- *   "mailto" notifier for the Common UNIX Printing System (CUPS).
+ *   "mailto" notifier for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,9 +26,8 @@
  */
 
 #include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
-#include <errno.h>
+#include <cups/language-private.h>
+#include <cups/string-private.h>
 #include <sys/wait.h>
 #include <signal.h>
 

@@ -1,7 +1,7 @@
 /*
 * "$Id: usb-darwin.c 7953 2008-09-17 01:43:19Z mike $"
 *
-* Copyright 2005-2009 Apple Inc. All rights reserved.
+* Copyright 2005-2010 Apple Inc. All rights reserved.
 *
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
@@ -89,9 +89,9 @@
 #include <mach/mach.h>
 #include <mach/mach_error.h>
 #include <mach/mach_time.h>
-#include <cups/debug.h>
+#include <cups/debug-private.h>
 #include <cups/sidechannel.h>
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 #include "backend-private.h"
 
 #include <CoreFoundation/CoreFoundation.h>

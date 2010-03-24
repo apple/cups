@@ -1,9 +1,9 @@
 /*
- * "$Id: globals.h 7910 2008-09-06 00:25:17Z mike $"
+ * "$Id$"
  *
- *   Global variable definitions for the Common UNIX Printing System (CUPS).
+ *   Private definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,19 +15,20 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_GLOBALS_H_
-#  define _CUPS_GLOBALS_H_
+#ifndef _CUPS_CUPS_PRIVATE_H_
+#  define _CUPS_CUPS_PRIVATE_H_
 
 /*
  * Include necessary headers...
  */
 
-#  include "string.h"
+#  include <cups/cups.h>
+#  include "string-private.h"
+#  include "debug-private.h"
 #  include "http-private.h"
-#  include "cups.h"
-#  include "i18n.h"
+#  include "ipp-private.h"
+#  include "language-private.h"
 #  include "pwg-private.h"
-
 #  ifdef HAVE_PTHREAD_H
 #    include <pthread.h>
 #  endif /* HAVE_PTHREAD_H */
@@ -43,8 +44,7 @@ extern "C" {
 
 
 /*
- * To make libcups thread safe, define thread safe globals (aka thread-
- * specific data) for the static variables used in the library.
+ * Types...
  */
 
 typedef struct _cups_globals_s		/**** CUPS global state data ****/
@@ -163,8 +163,8 @@ extern char		*_cupsUserDefault(char *name, size_t namesize);
 #  ifdef __cplusplus
 }
 #  endif /* __cplusplus */
-#endif /* !_CUPS_GLOBALS_H_ */
+#endif /* !_CUPS_CUPS_PRIVATE_H_ */
 
 /*
- * End of "$Id: globals.h 7910 2008-09-06 00:25:17Z mike $".
+ * End of "$Id$".
  */

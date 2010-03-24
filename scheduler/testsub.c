@@ -1,9 +1,9 @@
 /*
  * "$Id: testsub.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Scheduler notification tester for the Common UNIX Printing System (CUPS).
+ *   Scheduler notification tester for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,8 +25,8 @@
  */
 
 #include <cups/cups.h>
-#include <cups/debug.h>
-#include <cups/string.h>
+#include <cups/debug-private.h>
+#include <cups/string-private.h>
 #include <signal.h>
 
 

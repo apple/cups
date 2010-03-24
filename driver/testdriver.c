@@ -1,14 +1,13 @@
 /*
  * "$Id: testdriver.c 7306 2008-02-15 00:52:38Z mike $"
  *
- *   Sample/test driver interface program for the Common UNIX Printing
- *   System (CUPS).
+ *   Sample/test driver interface program for CUPS.
  *
  *   This program handles listing and installing both static PPD files
  *   in CUPS_DATADIR/model and dynamically generated PPD files using
  *   the driver helper programs in CUPS_SERVERBIN/driver.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,8 +27,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include <cups/cups.h>
 
 

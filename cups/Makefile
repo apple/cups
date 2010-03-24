@@ -110,6 +110,18 @@ HEADERS	=	\
 		transcode.h \
 		versioning.h
 
+HEADERSPRIV =	\
+		cups-private.h \
+		debug-private.h \
+		file-private.h \
+		http-private.h \
+		ipp-private.h \
+		language-private.h \
+		md5-private.h \
+		ppd-private.h \
+		pwg-private.h \
+		snmp-private.h \
+		string-private.h
 
 #
 # Targets in this directory...
@@ -216,6 +228,13 @@ install-headers:
 	for file in $(HEADERS); do \
 		$(INSTALL_DATA) $$file $(INCLUDEDIR)/cups; \
 	done
+	if test "x$(privateinclude)" != x; then \
+		echo Installing private header files into $(PRIVATEINCLUDE)...; \
+		$(INSTALLDIR) -m 755 $(PRIVATEINCLUDE); \
+		for file in $(HEADERSPRIV); do \
+			$(INSTALL_DATA) $$file $(PRIVATEINCLUDE); \
+		done; \
+	fi
 
 
 #

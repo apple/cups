@@ -1,7 +1,7 @@
 /*
  * "$Id: cupsd.h 7928 2008-09-10 22:14:22Z mike $"
  *
- *   Main header file for the Common UNIX Printing System (CUPS) scheduler.
+ *   Main header file for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -18,11 +18,9 @@
  * Include necessary headers.
  */
 
-#include <cups/http-private.h>
-#include <cups/string.h>
-#include <stdlib.h>
+#include <cups/cups-private.h>
+
 #include <limits.h>
-#include <errno.h>
 #include <time.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -38,13 +36,7 @@
 #  include <unistd.h>
 #endif /* WIN32 */
 
-#include <cups/array.h>
-#include <cups/cups.h>
 #include "mime.h"
-#include <cups/http.h>
-#include <cups/ipp.h>
-#include <cups/i18n.h>
-#include <cups/debug.h>
 
 #if defined(HAVE_CDSASSL)
 #  include <CoreFoundation/CoreFoundation.h>

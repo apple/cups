@@ -1,9 +1,9 @@
 /*
  * "$Id: lpadmin.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   "lpadmin" command for the Common UNIX Printing System (CUPS).
+ *   "lpadmin" command for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,14 +34,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
-#include <cups/string.h>
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/debug.h>
+#include <cups/cups-private.h>
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */

@@ -1,9 +1,9 @@
 /*
- * "$Id: string.h 6649 2007-07-11 21:46:42Z mike $"
+ * "$Id$"
  *
- *   String definitions for the Common UNIX Printing System (CUPS).
+ *   Private string definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,8 +15,8 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_STRING_H_
-#  define _CUPS_STRING_H_
+#ifndef _CUPS_STRING_PRIVATE_H_
+#  define _CUPS_STRING_PRIVATE_H_
 
 /*
  * Include necessary headers...
@@ -26,9 +26,10 @@
 #  include <stdlib.h>
 #  include <stdarg.h>
 #  include <ctype.h>
+#  include <errno.h>
 #  include <locale.h>
 
-#  include <config.h>
+#  include "config.h"
 
 #  ifdef HAVE_STRING_H
 #    include <string.h>
@@ -155,5 +156,5 @@ extern double	_cupsStrScand(const char *buf, char **bufptr,
 #endif /* !_CUPS_STRING_H_ */
 
 /*
- * End of "$Id: string.h 6649 2007-07-11 21:46:42Z mike $".
+ * End of "$Id$".
  */

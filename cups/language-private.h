@@ -1,9 +1,9 @@
 /*
- * "$Id: i18n.h 7363 2008-03-03 22:19:24Z mike $"
+ * "$Id$"
  *
- *   (Private) localization support for the Common UNIX Printing System (CUPS).
+ *   Private localization support for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -15,15 +15,15 @@
  *   This file is subject to the Apple OS-Developed Software exception.
  */
 
-#ifndef _CUPS_I18N_H_
-#  define _CUPS_I18N_H_
+#ifndef _CUPS_LANGUAGE_PRIVATE_H_
+#  define _CUPS_LANGUAGE_PRIVATE_H_
 
 /*
  * Include necessary headers...
  */
 
 #  include <stdio.h>
-#  include "transcode.h"
+#  include <cups/transcode.h>
 
 #  ifdef __cplusplus
 extern "C" {
@@ -108,8 +108,8 @@ extern void		_cupsSetLocale(char *argv[]);
 }
 #  endif /* __cplusplus */
 
-#endif /* !_CUPS_I18N_H_ */
+#endif /* !_CUPS_LANGUAGE_PRIVATE_H_ */
 
 /*
- * End of "$Id: i18n.h 7363 2008-03-03 22:19:24Z mike $".
+ * End of "$Id$".
  */

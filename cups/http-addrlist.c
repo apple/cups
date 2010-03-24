@@ -1,9 +1,9 @@
 /*
  * "$Id: http-addrlist.c 7910 2008-09-06 00:25:17Z mike $"
  *
- *   HTTP address list routines for the Common UNIX Printing System (CUPS).
+ *   HTTP address list routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,11 +23,7 @@
  * Include necessary headers...
  */
 
-#include "http-private.h"
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <errno.h>
+#include "cups-private.h"
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>
 #endif /* HAVE_RESOLV_H */

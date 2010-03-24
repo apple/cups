@@ -1,9 +1,9 @@
 /*
  * "$Id: testspeed.c 7727 2008-07-14 18:02:21Z mike $"
  *
- *   Scheduler speed test for the Common UNIX Printing System (CUPS).
+ *   Scheduler speed test for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,14 +24,13 @@
  * Include necessary headers...
  */
 
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include <cups/cups.h>
 #include <cups/language.h>
-#include <cups/debug.h>
+#include <cups/debug-private.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <errno.h>
 
 
 /*

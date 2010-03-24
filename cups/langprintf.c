@@ -1,10 +1,9 @@
 /*
  * "$Id: langprintf.c 7802 2008-07-28 18:50:45Z mike $"
  *
- *   Localized printf/puts functions for the Common UNIX Printing
- *   System (CUPS).
+ *   Localized printf/puts functions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2002-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,9 +27,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include "globals.h"
-#include <errno.h>
+#include "cups-private.h"
 
 
 /*

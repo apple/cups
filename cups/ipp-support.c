@@ -1,10 +1,9 @@
 /*
  * "$Id: ipp-support.c 7847 2008-08-19 04:22:14Z mike $"
  *
- *   Internet Printing Protocol support functions for the Common UNIX
- *   Printing System (CUPS).
+ *   Internet Printing Protocol support functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,9 +30,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
+#include "cups-private.h"
 
 
 /*

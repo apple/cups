@@ -1,7 +1,7 @@
 /*
  * "$Id: ipptest.c 9000 2010-02-24 06:29:38Z mike $"
  *
- *   IPP test command for the Common UNIX Printing System (CUPS).
+ *   IPP test command for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
@@ -42,13 +42,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <ctype.h>
+#include <cups/cups-private.h>
 #include <regex.h>
 
-#include <cups/globals.h>
 #ifndef O_BINARY
 #  define O_BINARY 0
 #endif /* !O_BINARY */

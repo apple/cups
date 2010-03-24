@@ -1,9 +1,9 @@
 /*
  * "$Id: ipp-private.h 7259 2008-01-28 22:26:04Z mike $"
  *
- *   Private IPP definitions for the Common UNIX Printing System (CUPS).
+ *   Private IPP definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -22,7 +22,7 @@
  * Include necessary headers...
  */
 
-#  include "ipp.h"
+#  include <cups/ipp.h>
 
 
 /*

@@ -1,8 +1,7 @@
 /*
  * "$Id: dest.c 7946 2008-09-16 23:27:54Z mike $"
  *
- *   User-defined destination (and option) support for the Common UNIX
- *   Printing System (CUPS).
+ *   User-defined destination (and option) support for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
@@ -51,11 +50,7 @@
  * Include necessary headers...
  */
 
-#include "debug.h"
-#include "globals.h"
-#include "pwg-private.h"
-#include <stdlib.h>
-#include <ctype.h>
+#include "cups-private.h"
 #include <sys/stat.h>
 
 #ifdef HAVE_NOTIFY_H

@@ -1,14 +1,14 @@
 /*
  * "$Id: file.c 7672 2008-06-18 22:03:02Z mike $"
  *
- *   File functions for the Common UNIX Printing System (CUPS).
+ *   File functions for CUPS.
  *
  *   Since stdio files max out at 256 files on many systems, we have to
  *   write similar functions without this limit.  At the same time, using
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

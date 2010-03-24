@@ -3,7 +3,7 @@
  *
  *   PostScript command filter for CUPS.
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -28,7 +28,7 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include <cups/sidechannel.h>
 
 

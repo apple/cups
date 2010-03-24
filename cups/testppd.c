@@ -1,7 +1,7 @@
 /*
  * "$Id: testppd.c 7897 2008-09-02 19:33:19Z mike $"
  *
- *   PPD test program for the Common UNIX Printing System (CUPS).
+ *   PPD test program for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
@@ -23,12 +23,9 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/string.h>
-#include <stdio.h>
+#include "cups-private.h"
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <errno.h>
 #ifdef WIN32
 #  include <io.h>
 #else

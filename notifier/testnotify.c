@@ -1,9 +1,9 @@
 /*
  * "$Id: testnotify.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Test notifier for the Common UNIX Printing System (CUPS).
+ *   Test notifier for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,7 +24,7 @@
 
 #include <cups/cups.h>
 #include <cups/language.h>
-#include <cups/string.h>
+#include <cups/string-private.h>
 
 
 /*

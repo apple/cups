@@ -1,11 +1,11 @@
 /*
  * "$Id: dir.c 7279 2008-01-31 01:50:44Z mike $"
  *
- *   Public directory routines for the Common UNIX Printing System (CUPS).
+ *   Directory routines for CUPS.
  *
  *   This set of APIs abstracts enumeration of directory entries.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,11 +31,9 @@
  * Include necessary headers...
  */
 
+#include "string-private.h"
+#include "debug-private.h"
 #include "dir.h"
-#include "string.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <errno.h>
 
 
 /*

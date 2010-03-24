@@ -1,9 +1,9 @@
 /*
  * "$Id: backend-private.h 7810 2008-07-29 01:11:15Z mike $"
  *
- *   Backend support definitions for the Common UNIX Printing System (CUPS).
+ *   Backend support definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,12 +26,10 @@
 #  include <cups/backend.h>
 #  include <cups/sidechannel.h>
 #  include <cups/ppd-private.h>
-#  include <cups/debug.h>
-#  include <cups/i18n.h>
+#  include <cups/debug-private.h>
+#  include <cups/language-private.h>
 #  include <cups/snmp-private.h>
-#  include <stdlib.h>
-#  include <errno.h>
-#  include <cups/string.h>
+#  include <cups/string-private.h>
 #  include <signal.h>
 
 #  ifdef __linux

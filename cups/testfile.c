@@ -1,9 +1,9 @@
 /*
  * "$Id: testfile.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   File test program for the Common UNIX Printing System (CUPS).
+ *   File test program for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,13 +26,11 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h>
-#include "string.h"
+#include "string-private.h"
+#include "debug-private.h"
 #include "file.h"
-#include "debug.h"
+#include <stdlib.h>
+#include <time.h>
 #ifdef HAVE_LIBZ
 #  include <zlib.h>
 #endif /* HAVE_LIBZ */

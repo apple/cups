@@ -1,9 +1,9 @@
 /*
  * "$Id: testraster.c 7376 2008-03-19 21:07:45Z mike $"
  *
- *   Raster test program routines for the Common UNIX Printing System (CUPS).
+ *   Raster test program routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,8 +28,6 @@
  */
 
 #include "image-private.h"
-#include <stdlib.h>
-#include <cups/string.h>
 
 
 /*

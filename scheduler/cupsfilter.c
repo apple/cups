@@ -1,7 +1,7 @@
 /*
  * "$Id: cupsfilter.c 7952 2008-09-17 00:56:20Z mike $"
  *
- *   CUPS filtering program for the Common UNIX Printing System (CUPS).
+ *   CUPS filtering program for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
@@ -30,12 +30,8 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
-#include <errno.h>
+#include <cups/cups-private.h>
 #include "mime.h"
-#include <stdlib.h>
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -66,7 +62,7 @@ static char		*ServerBin = NULL;
 static char		*ServerRoot = NULL;
 					/* CUPS_SERVERROOT environment variable */
 static char		*RIPCache = NULL;
-					/* RIP_CACHE environment variable */
+					/* RIP_MAX_CACHE environment variable */
 static char		TempFile[1024] = "";
 					/* Temporary file */
 
@@ -857,7 +853,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 		printer_info[255],	/* PRINTER_INFO env variable */
 		printer_location[255],	/* PRINTER_LOCATION env variable */
 		printer_name[255],	/* PRINTER env variable */
-		rip_cache[1024],	/* RIP_CACHE */
+		rip_max_cache[1024],	/* RIP_MAX_CACHE */
 		userenv[1024],		/* USER */
 		program[1024];		/* Program to run */
   mime_filter_t	*filter,		/* Current filter */
@@ -909,7 +905,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 #else
     snprintf(ppd, sizeof(ppd), "PPD=%s/model/laserjet.ppd", DataDir);
 #endif /* __APPLE__ */
-  snprintf(rip_cache, sizeof(rip_cache), "RIP_CACHE=%s", RIPCache);
+  snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
   snprintf(userenv, sizeof(userenv), "USER=%s", user);
 
   if (printer &&
@@ -964,7 +960,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   envp[9]  = printer_info;
   envp[10] = printer_location;
   envp[11] = printer_name;
-  envp[12] = rip_cache;
+  envp[12] = rip_max_cache;
   envp[13] = userenv;
   envp[14] = NULL;
 

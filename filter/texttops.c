@@ -1,9 +1,9 @@
 /*
  * "$Id: texttops.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Text to PostScript filter for the Common UNIX Printing System (CUPS).
+ *   Text to PostScript filter for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,7 +29,7 @@
  */
 
 #include "textcommon.h"
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 
 
 /*

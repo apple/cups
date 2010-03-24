@@ -1,9 +1,9 @@
 /*
  * "$Id: type.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   MIME typing routines for the Common UNIX Printing System (CUPS).
+ *   MIME typing routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -27,14 +27,10 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cups/string-private.h>
+#include <cups/debug-private.h>
 #include <locale.h>
-
-#include <cups/string.h>
 #include "mime.h"
-#include <cups/debug.h>
 
 
 /*

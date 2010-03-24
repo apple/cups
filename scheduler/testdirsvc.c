@@ -1,9 +1,9 @@
 /*
  * "$Id: testdirsvc.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Browsing test program for the Common UNIX Printing System (CUPS).
+ *   Browsing test program for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,9 +23,7 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cups/string-private.h>
 
 
 /*

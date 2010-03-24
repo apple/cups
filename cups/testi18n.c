@@ -1,9 +1,9 @@
 /*
  * "$Id: testi18n.c 7560 2008-05-13 06:34:04Z mike $"
  *
- *   Internationalization test for Common UNIX Printing System (CUPS).
+ *   Internationalization test for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,14 +24,11 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
+#include "string-private.h"
+#include "language-private.h"
 #include <stdlib.h>
-#include <errno.h>
 #include <time.h>
 #include <unistd.h>
-
-#include "i18n.h"
-#include "string.h"
 
 
 /*

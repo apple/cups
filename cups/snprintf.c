@@ -1,9 +1,9 @@
 /*
  * "$Id: snprintf.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   snprintf functions for the Common UNIX Printing System (CUPS).
+ *   snprintf functions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,9 +24,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <ctype.h>
-#include "string.h"
+#include "string-private.h"
 
 
 #ifndef HAVE_VSNPRINTF

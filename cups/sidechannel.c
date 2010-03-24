@@ -1,9 +1,9 @@
 /*
  * "$Id: sidechannel.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Side-channel API code for the Common UNIX Printing System (CUPS).
+ *   Side-channel API code for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,14 +29,13 @@
  */
 
 #include "sidechannel.h"
-#include "string.h"
-#include "debug.h"
+#include "string-private.h"
+#include "debug-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else
 #  include <unistd.h>
 #endif /* WIN32 */
-#include <errno.h>
 #ifdef __hpux
 #  include <sys/time.h>
 #elif !defined(WIN32)

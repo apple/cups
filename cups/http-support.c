@@ -1,9 +1,9 @@
 /*
  * "$Id: http-support.c 7952 2008-09-17 00:56:20Z mike $"
  *
- *   HTTP support routines for the Common UNIX Printing System (CUPS) scheduler.
+ *   HTTP support routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -47,10 +47,7 @@
  * Include necessary headers...
  */
 
-#include "debug.h"
-#include "globals.h"
-#include <stdlib.h>
-#include <errno.h>
+#include "cups-private.h"
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
 #  include <poll.h>

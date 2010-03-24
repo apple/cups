@@ -1,9 +1,9 @@
 /*
  * "$Id: cups-lpd.c 7899 2008-09-03 12:57:17Z mike $"
  *
- *   Line Printer Daemon interface for the Common UNIX Printing System (CUPS).
+ *   Line Printer Daemon interface for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -28,17 +28,10 @@
  * Include necessary headers...
  */
 
-#include <cups/http-private.h>
-#include <cups/cups.h>
-#include <cups/string.h>
-#include <cups/language.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cups/cups-private.h>
 #include <syslog.h>
-#include <ctype.h>
 #include <unistd.h>
 #include <fcntl.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

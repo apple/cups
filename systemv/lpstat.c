@@ -31,11 +31,7 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/globals.h>
-#include <cups/debug.h>
+#include <cups/cups-private.h>
 
 
 /*

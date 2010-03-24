@@ -1,9 +1,9 @@
 /*
  * "$Id: globals.c 7870 2008-08-27 18:14:10Z mike $"
  *
- *   Global variable access routines for the Common UNIX Printing System (CUPS).
+ *   Global variable access routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,9 +26,7 @@
  * Include necessary headers...
  */
 
-#include "http-private.h"
-#include "globals.h"
-#include <stdlib.h>
+#include "cups-private.h"
 
 
 /*

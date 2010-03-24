@@ -1,9 +1,9 @@
 /*
  * "$Id: notify.c 7337 2008-02-22 04:44:04Z mike $"
  *
- *   Notification routines for the Common UNIX Printing System (CUPS).
+ *   Notification routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2005-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,7 +25,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
+#include "cups-private.h"
 
 
 /*

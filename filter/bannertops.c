@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Banner to PostScript filter for the Common UNIX Printing System (CUPS).
+ *   Banner to PostScript filter for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -29,7 +29,7 @@
 
 #include "pstext.h"
 #include "image.h"
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 
 
 /*

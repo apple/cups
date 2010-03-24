@@ -1,9 +1,9 @@
 /*
  * "$Id: testlpd.c 6789 2007-08-13 19:52:43Z mike $"
  *
- *   cups-lpd test program for the Common UNIX Printing System (CUPS).
+ *   cups-lpd test program for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,11 +29,9 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
-#include <stdlib.h>
+#include <cups/string-private.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <errno.h>
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>

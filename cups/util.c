@@ -1,7 +1,7 @@
 /*
  * "$Id: util.c 7850 2008-08-20 00:07:25Z mike $"
  *
- *   Printing utilities for the Common UNIX Printing System (CUPS).
+ *   Printing utilities for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
@@ -58,10 +58,8 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
+#include "cups-private.h"
 #include <stdlib.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)

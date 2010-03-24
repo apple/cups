@@ -1,9 +1,9 @@
 /*
  * "$Id: gziptoany.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   GZIP/raw pre-filter for the Common UNIX Printing System (CUPS).
+ *   GZIP/raw pre-filter for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,11 +23,7 @@
  * Include necessary headers...
  */
 
-#include <cups/file.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cups/cups-private.h>
 
 
 /*

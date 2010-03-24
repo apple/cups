@@ -4,7 +4,7 @@
  *   Advanced HP Page Control Language and Raster Transfer Language
  *   filter for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products
  *
  *   These coded instructions, statements, and computer programs are the
@@ -30,11 +30,10 @@
  */
 
 #include "driver.h"
-#include <cups/i18n.h>
-#include <cups/string.h>
+#include <cups/language-private.h>
+#include <cups/string-private.h>
 #include "pcl-common.h"
 #include <signal.h>
-#include <errno.h>
 
 
 /*

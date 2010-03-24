@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   PWG media API definitions for CUPS.
+ *   Private PWG media API definitions for CUPS.
  *
  *   Copyright 2009-2010 by Apple Inc.
  *

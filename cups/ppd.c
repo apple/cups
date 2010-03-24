@@ -59,11 +59,8 @@
  * Include necessary headers.
  */
 
+#include "cups-private.h"
 #include "ppd-private.h"
-#include "pwg-private.h"
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
 
 
 /*

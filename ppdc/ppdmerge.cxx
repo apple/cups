@@ -3,7 +3,7 @@
 //
 //   PPD file merge utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2010 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -23,12 +23,9 @@
 // Include necessary headers...
 //
 
+#include <cups/cups-private.h>
 #include <cups/ppd-private.h>
-#include <cups/cups.h>
 #include <cups/array.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
-#include <errno.h>
 
 
 //

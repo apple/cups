@@ -1,10 +1,9 @@
 /*
  * "$Id$"
  *
- *   Common PostScript text definitions for the Common UNIX Printing System
- *   (CUPS).
+ *   Common PostScript text definitions for CUPS.
  *
- *   Copyright 2008 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright

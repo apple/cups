@@ -1,9 +1,9 @@
 /*
  * "$Id: backchannel.c 7616 2008-05-28 00:34:13Z mike $"
  *
- *   Backchannel functions for the Common UNIX Printing System (CUPS).
+ *   Backchannel functions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

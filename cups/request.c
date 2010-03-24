@@ -1,7 +1,7 @@
 /*
  * "$Id: request.c 7946 2008-09-16 23:27:54Z mike $"
  *
- *   IPP utilities for the Common UNIX Printing System (CUPS).
+ *   IPP utilities for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
@@ -31,10 +31,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <errno.h>
+#include "cups-private.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)

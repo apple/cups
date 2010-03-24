@@ -23,10 +23,8 @@
  * Include necessary headers...
  */
 
+#include "cups-private.h"
 #include "ppd-private.h"
-#include "debug.h"
-#include "string.h"
-#include <stdlib.h>
 
 
 /*

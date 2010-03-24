@@ -1,9 +1,9 @@
 /*
  * "$Id: testhttp.c 7742 2008-07-15 20:23:09Z mike $"
  *
- *   HTTP test program for the Common UNIX Printing System (CUPS).
+ *   HTTP test program for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,10 +23,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "string-private.h"
 #include "http-private.h"
-#include "string.h"
+#include <stdlib.h>
 
 
 /*

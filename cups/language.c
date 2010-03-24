@@ -1,9 +1,9 @@
 /*
  * "$Id: language.c 7558 2008-05-12 23:46:44Z mike $"
  *
- *   I18N/language support for the Common UNIX Printing System (CUPS).
+ *   I18N/language support for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -40,10 +40,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <errno.h>
+#include "cups-private.h"
 #ifdef HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif /* HAVE_LANGINFO_H */

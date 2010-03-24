@@ -1,9 +1,9 @@
 /*
  * "$Id: emit.c 7863 2008-08-26 03:39:59Z mike $"
  *
- *   PPD code emission routines for the Common UNIX Printing System (CUPS).
+ *   PPD code emission routines for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -38,12 +38,7 @@
  * Include necessary headers...
  */
 
-#include "ppd.h"
-#include <stdlib.h>
-#include "string.h"
-#include <errno.h>
-#include "debug.h"
-
+#include "cups-private.h"
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
 #else

@@ -1,10 +1,9 @@
 /*
  * "$Id: rastertohp.c 7834 2008-08-04 21:02:09Z mike $"
  *
- *   Hewlett-Packard Page Control Language filter for the Common UNIX
- *   Printing System (CUPS).
+ *   Hewlett-Packard Page Control Language filter for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -32,14 +31,12 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
+#include <cups/string-private.h>
+#include <cups/language-private.h>
 #include <cups/raster.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <errno.h>
 
 
 /*
