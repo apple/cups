@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Debugging functions for the Common UNIX Printing System (CUPS).
+ *   Debugging functions for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -24,8 +24,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
+#include "cups-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else

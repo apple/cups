@@ -3,7 +3,7 @@
  *
  *   CMYK color separation code for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,7 +34,7 @@
  */
 
 #include "driver.h"
-#include <cups/string.h>
+#include <cups/string-private.h>
 
 
 /*

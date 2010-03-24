@@ -1,10 +1,9 @@
 /*
  * "$Id$"
  *
- *   IEEE-1284 support functions test program for the Common UNIX Printing
- *   System (CUPS).
+ *   IEEE-1284 support functions test program for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,9 +23,7 @@
  * Include necessary headers.
  */
 
-#include <cups/string.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cups/string-private.h>
 #ifdef WIN32
 #  include <io.h>
 #else

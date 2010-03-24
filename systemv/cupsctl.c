@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   CUPS control program for the Common UNIX Printing System (CUPS).
+ *   Scheduler control program for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,10 +24,8 @@
  * Include necessary headers...
  */
 
+#include <cups/cups-private.h>
 #include <cups/adminutil.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
-#include <errno.h>
 
 
 /*

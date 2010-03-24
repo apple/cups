@@ -40,10 +40,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "string.h"
-#include "debug.h"
-#include "pwg-private.h"
+#include "cups-private.h"
 
 
 /*

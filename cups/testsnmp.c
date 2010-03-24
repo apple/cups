@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   SNMP test program for the Common UNIX Printing System (CUPS).
+ *   SNMP test program for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -25,11 +25,9 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include "string.h"
+#include "cups-private.h"
 #include "snmp-private.h"
+#include <stdlib.h>
 
 
 /*

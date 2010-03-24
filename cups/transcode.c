@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Transcoding support for the Common UNIX Printing System (CUPS).
+ *   Transcoding support for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -40,11 +40,9 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
+#include "cups-private.h"
 #include <limits.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <time.h>
 
 

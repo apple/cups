@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   SNMP functions for the Common UNIX Printing System (CUPS).
+ *   SNMP functions for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
@@ -58,10 +58,8 @@
  * Include necessary headers.
  */
 
-#include "globals.h"
-#include "debug.h"
+#include "cups-private.h"
 #include "snmp-private.h"
-#include <errno.h>
 #ifdef HAVE_POLL
 #  include <sys/poll.h>
 #endif /* HAVE_POLL */

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   cupsGetDevices implementation for the Common UNIX Printing System (CUPS).
+ *   cupsGetDevices implementation for CUPS.
  *
  *   Copyright 2008-2010 by Apple Inc.
  *
@@ -22,8 +22,7 @@
  * Include necessary headers...
  */
 
-#include "globals.h"
-#include "debug.h"
+#include "cups-private.h"
 
 
 /*

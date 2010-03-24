@@ -188,6 +188,11 @@ install-headers:
 		echo Installing header files in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) install-headers) || exit 1;\
 	done
+	if test "x$(privateinclude)" != x; then \
+		echo Installing config.h into $(PRIVATEINCLUDE)...; \
+		$(INSTALLDIR) -m 755 $(PRIVATEINCLUDE); \
+		$(INSTALL_DATA) config.h $(PRIVATEINCLUDE); \
+	fi
 
 
 #

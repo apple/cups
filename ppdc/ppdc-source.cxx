@@ -61,7 +61,6 @@
 //
 
 #include "ppdc-private.h"
-#include <cups/globals.h>
 #include <limits.h>
 #include <math.h>
 #include <unistd.h>

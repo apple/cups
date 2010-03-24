@@ -60,11 +60,7 @@
  * Include necessary headers...
  */
 
-#include "http-private.h"
-#include "globals.h"
-#include "debug.h"
-#include <stdlib.h>
-#include <errno.h>
+#include "cups-private.h"
 #ifdef WIN32
 #  include <io.h>
 #endif /* WIN32 */

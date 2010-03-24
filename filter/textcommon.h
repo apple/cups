@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Common text filter definitions for the Common UNIX Printing System (CUPS).
+ *   Common text filter definitions for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

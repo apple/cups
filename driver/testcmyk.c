@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Test the CMYK color separation code for ESP Print Pro.
+ *   Test the CMYK color separation code for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products, All Rights Reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,7 +23,7 @@
  * Include necessary headers.
  */
 
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include "driver.h"
 #include <sys/stat.h>
 

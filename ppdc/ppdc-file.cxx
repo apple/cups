@@ -3,7 +3,7 @@
 //
 //   File class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2010 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -25,7 +25,6 @@
 //
 
 #include "ppdc-private.h"
-#include <cups/i18n.h>
 
 
 //

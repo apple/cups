@@ -31,10 +31,8 @@
  */
 
 #include "cups.h"
-#include <stdlib.h>
-#include <ctype.h>
-#include "string.h"
-#include "debug.h"
+#include "string-private.h"
+#include "debug-private.h"
 
 
 /*

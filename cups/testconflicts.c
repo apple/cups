@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   PPD constraint test program for the Common UNIX Printing System (CUPS).
+ *   PPD constraint test program for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -23,7 +23,7 @@
  */
 
 #include "cups.h"
-#include "string.h"
+#include "string-private.h"
 
 
 /*

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   CUPS filtering program for the Common UNIX Printing System (CUPS).
+ *   CUPS filtering program for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
@@ -30,12 +30,8 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/i18n.h>
-#include <cups/string.h>
-#include <errno.h>
+#include <cups/cups-private.h>
 #include "mime.h"
-#include <stdlib.h>
 #include <limits.h>
 #include <unistd.h>
 #include <fcntl.h>

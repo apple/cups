@@ -45,11 +45,6 @@
  */
 
 #include "image-private.h"
-#include <cups/debug.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <cups/string.h>
-
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
 #else

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   PostScript filter for the Common UNIX Printing System (CUPS).
+ *   PostScript filter for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
@@ -57,7 +57,7 @@
 #include <math.h>
 #include <cups/file.h>
 #include <cups/array.h>
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 #include <signal.h>
 
 

@@ -1,14 +1,14 @@
 /*
  * "$Id$"
  *
- *   Private file definitions for the Common UNIX Printing System (CUPS).
+ *   Private file definitions for CUPS.
  *
  *   Since stdio files max out at 256 files on many systems, we have to
  *   write similar functions without this limit.  At the same time, using
  *   our own file functions allows us to provide transparent support of
  *   gzip'd print files, PPD files, etc.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,14 +25,11 @@
  * Include necessary headers...
  */
 
+#  include "cups-private.h"
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <stdarg.h>
-#  include <errno.h>
 #  include <fcntl.h>
-#  include "http-private.h"
-#  include "globals.h"
-#  include "debug.h"
 
 #  ifdef HAVE_LIBZ
 #    include <zlib.h>
