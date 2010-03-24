@@ -240,10 +240,13 @@ sysman.o: ../cups/pwg-private.h mime.h ../cups/array.h ../cups/file.h
 sysman.o: sysman.h statbuf.h cert.h auth.h client.h policy.h printers.h
 sysman.o: ../cups/pwg-private.h classes.h job.h conf.h banners.h dirsvc.h
 sysman.o: network.h subscriptions.h
-filter.o: mime.h ../cups/array.h ../cups/ipp.h ../cups/file.h
+filter.o: ../cups/string-private.h ../config.h ../cups/debug-private.h mime.h
+filter.o: ../cups/array.h ../cups/ipp.h ../cups/file.h
+mime.o: ../cups/string-private.h ../config.h ../cups/debug-private.h
 mime.o: ../cups/dir.h ../cups/versioning.h mime.h ../cups/array.h
 mime.o: ../cups/ipp.h ../cups/file.h
-type.o: mime.h ../cups/array.h ../cups/ipp.h ../cups/file.h
+type.o: ../cups/string-private.h ../config.h ../cups/debug-private.h mime.h
+type.o: ../cups/array.h ../cups/ipp.h ../cups/file.h
 cupsfilter.o: ../cups/cups-private.h ../cups/cups.h ../cups/ipp.h
 cupsfilter.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 cupsfilter.o: ../cups/array.h ../cups/file.h ../cups/language.h
@@ -281,8 +284,9 @@ testdirsvc.o: ../config.h
 testlpd.o: ../cups/cups.h ../cups/ipp.h ../cups/http.h ../cups/versioning.h
 testlpd.o: ../cups/ppd.h ../cups/array.h ../cups/file.h ../cups/language.h
 testlpd.o: ../cups/string-private.h ../config.h
-testmime.o: mime.h ../cups/array.h ../cups/ipp.h ../cups/file.h ../cups/dir.h
-testmime.o: ../cups/versioning.h
+testmime.o: ../cups/string-private.h ../config.h ../cups/dir.h
+testmime.o: ../cups/versioning.h mime.h ../cups/array.h ../cups/ipp.h
+testmime.o: ../cups/file.h
 testspeed.o: ../cups/string-private.h ../config.h ../cups/cups.h
 testspeed.o: ../cups/ipp.h ../cups/http.h ../cups/versioning.h ../cups/ppd.h
 testspeed.o: ../cups/array.h ../cups/file.h ../cups/language.h
