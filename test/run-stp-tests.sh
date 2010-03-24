@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# "$Id: run-stp-tests.sh 7954 2008-09-17 05:23:09Z mike $"
+# "$Id: run-stp-tests.sh 9034 2010-03-09 07:03:06Z mike $"
 #
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
@@ -529,7 +529,7 @@ done
 #
 
 date=`date "+%Y-%m-%d"`
-strfile=/tmp/cups-$user/cups-str-1.4-$date-$user.html
+strfile=/tmp/cups-$user/cups-str-1.5-$date-$user.html
 
 rm -f $strfile
 cat str-header.html >$strfile
@@ -815,7 +815,7 @@ echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-grep -v '^[dD]' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+grep -v '^d' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile
@@ -852,5 +852,5 @@ if test $fail != 0; then
 fi
 
 #
-# End of "$Id: run-stp-tests.sh 7954 2008-09-17 05:23:09Z mike $"
+# End of "$Id: run-stp-tests.sh 9034 2010-03-09 07:03:06Z mike $"
 #
