@@ -119,7 +119,7 @@ if test "$libdir" = "\${exec_prefix}/lib"; then
 fi
 
 dnl Setup private include directory...
-AC_ARG_WITH(privateinclude, [  --with-privateinclude   set path for private include files, default=none],privatedir="$withval",privatedir="")
+AC_ARG_WITH(privateinclude, [  --with-privateinclude   set path for private include files, default=none],privateinclude="$withval",privateinclude="")
 if test "x$privateinclude" != x -a "x$privateinclude" != xnone; then
 	PRIVATEINCLUDE="$privateinclude/cups"
 else
