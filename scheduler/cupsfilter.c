@@ -62,7 +62,7 @@ static char		*ServerBin = NULL;
 static char		*ServerRoot = NULL;
 					/* CUPS_SERVERROOT environment variable */
 static char		*RIPCache = NULL;
-					/* RIP_CACHE environment variable */
+					/* RIP_MAX_CACHE environment variable */
 static char		TempFile[1024] = "";
 					/* Temporary file */
 
@@ -853,7 +853,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 		printer_info[255],	/* PRINTER_INFO env variable */
 		printer_location[255],	/* PRINTER_LOCATION env variable */
 		printer_name[255],	/* PRINTER env variable */
-		rip_cache[1024],	/* RIP_CACHE */
+		rip_max_cache[1024],	/* RIP_MAX_CACHE */
 		userenv[1024],		/* USER */
 		program[1024];		/* Program to run */
   mime_filter_t	*filter,		/* Current filter */
@@ -905,7 +905,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
 #else
     snprintf(ppd, sizeof(ppd), "PPD=%s/model/laserjet.ppd", DataDir);
 #endif /* __APPLE__ */
-  snprintf(rip_cache, sizeof(rip_cache), "RIP_CACHE=%s", RIPCache);
+  snprintf(rip_max_cache, sizeof(rip_max_cache), "RIP_MAX_CACHE=%s", RIPCache);
   snprintf(userenv, sizeof(userenv), "USER=%s", user);
 
   if (printer &&
@@ -960,7 +960,7 @@ exec_filters(mime_type_t   *srctype,	/* I - Source type */
   envp[9]  = printer_info;
   envp[10] = printer_location;
   envp[11] = printer_name;
-  envp[12] = rip_cache;
+  envp[12] = rip_max_cache;
   envp[13] = userenv;
   envp[14] = NULL;
 
