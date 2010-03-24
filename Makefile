@@ -119,7 +119,7 @@ distclean:	clean
 	$(RM) packaging/cups-desc.plist packaging/cups-info.plist
 	$(RM) templates/header.tmpl
 	$(RM) desktop/cups.desktop
-	$(RM) scheduler/cups.sh scheduler/cups-lpd
+	$(RM) scheduler/cups.sh scheduler/cups-lpd.xinetd
 	$(RM) scheduler/org.cups.cups-lpd.plist scheduler/cups.xml
 	-$(RM) doc/*/index.html
 	-$(RM) templates/*/header.tmpl
