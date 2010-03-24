@@ -232,7 +232,7 @@ install-headers:
 		echo Installing private header files into $(PRIVATEINCLUDE)...; \
 		$(INSTALLDIR) -m 755 $(PRIVATEINCLUDE); \
 		for file in $(HEADERSPRIV); do \
-			$(INSTALL_DATA) $$file $(PRIVATEINCLUDE); \
+			$(INSTALL_DATA) $$file $(PRIVATEINCLUDE)/$$file; \
 		done; \
 	fi
 
