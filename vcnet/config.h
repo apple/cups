@@ -1,9 +1,9 @@
 /*
  * "$Id: config.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Configuration file for the Common UNIX Printing System (CUPS).
+ *   Configuration file for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -49,6 +49,14 @@
 #define unlink		_unlink
 #define vsnprintf 	_vsnprintf
 #define write		_write
+
+
+/*
+ * Map the POSIX sleep() and usleep() functions to the Win32 Sleep() function...
+ */
+
+#define sleep(X)	Sleep(1000 * (X))
+#define usleep(X)	Sleep((X)/1000)
 
 
 /*

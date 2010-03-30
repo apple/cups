@@ -4249,7 +4249,8 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
       cupsdLogJob(job, loglevel, "%s", ptr);
 
-      if (loglevel < CUPSD_LOG_DEBUG)
+      if (loglevel < CUPSD_LOG_DEBUG &&
+          strcmp(job->printer->state_message, ptr))
       {
 	strlcpy(job->printer->state_message, ptr,
 		sizeof(job->printer->state_message));
@@ -4284,7 +4285,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
   if (event & CUPSD_EVENT_JOB_PROGRESS)
     cupsdAddEvent(CUPSD_EVENT_JOB_PROGRESS, job->printer, job,
                   "%s", job->printer->state_message);
-  else if (event & CUPSD_EVENT_PRINTER_STATE)
+  if (event & CUPSD_EVENT_PRINTER_STATE)
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		  (job->printer->type & CUPS_PRINTER_CLASS) ?
 		      "Class \"%s\" state changed." :

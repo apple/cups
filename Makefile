@@ -190,8 +190,8 @@ install-headers:
 	done
 	if test "x$(privateinclude)" != x; then \
 		echo Installing config.h into $(PRIVATEINCLUDE)...; \
-		$(INSTALLDIR) -m 755 $(PRIVATEINCLUDE); \
-		$(INSTALL_DATA) config.h $(PRIVATEINCLUDE); \
+		$(INSTALL_DIR) -m 755 $(PRIVATEINCLUDE); \
+		$(INSTALL_DATA) config.h $(PRIVATEINCLUDE)/config.h; \
 	fi
 
 

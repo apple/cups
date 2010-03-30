@@ -111,6 +111,12 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   _pwg_media_t		pwg_media;	/* PWG media data for custom size */
   char			pwg_name[65];	/* PWG media name for custom size */
 
+  /* request.c */
+  http_t		*http;		/* Current server connection */
+  ipp_status_t		last_error;	/* Last IPP error */
+  char			*last_status_message;
+					/* Last IPP status-message */
+
   /* snmp.c */
   char			snmp_community[255];
 					/* Default SNMP community name */
@@ -128,11 +134,6 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
   void			*password_data;	/* Password user data */
 
   /* util.c */
-  http_t		*http;		/* Current server connection */
-  ipp_status_t		last_error;	/* Last IPP error */
-  char			*last_status_message;
-					/* Last IPP status-message */
-
   char			def_printer[256];
 					/* Default printer */
   char			ppd_filename[HTTP_MAX_URI];

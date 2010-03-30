@@ -41,6 +41,8 @@ CHANGES IN CUPS V1.4.3
 
 	- SECURITY: The scheduler could try responding on a closed client
 	  connection, leading to a crash (STR #3200)
+	- SECURITY: The lppasswd program allowed the localization files to be
+	  overridden when running in setuid mode (STR #3482)
 	- Localization updates (STR #3352, STR #3409, STR #3422, STR #3452,
 	  STR #3473, STR #3502)
 	- Documentation updates (STR #3451, STR #3504)

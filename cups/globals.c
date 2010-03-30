@@ -81,20 +81,44 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
     g->localedir = localedir;
 
 #else
-  if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
-    g->cups_datadir = CUPS_DATADIR;
+#  ifdef HAVE_GETEUID
+  if ((geteuid() != getuid() && getuid()) || getegid() != getgid())
+#  else
+  if (!getuid())
+#  endif /* HAVE_GETEUID */
+  {
+   /*
+    * When running setuid/setgid, don't allow environment variables to override
+    * the directories...
+    */
 
-  if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
-    g->cups_serverbin = CUPS_SERVERBIN;
-
-  if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+    g->cups_datadir    = CUPS_DATADIR;
+    g->cups_serverbin  = CUPS_SERVERBIN;
     g->cups_serverroot = CUPS_SERVERROOT;
+    g->cups_statedir   = CUPS_STATEDIR;
+    g->localedir       = CUPS_LOCALEDIR;
+  }
+  else
+  {
+   /*
+    * Allow directories to be overridden by environment variables.
+    */
 
-  if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
-    g->cups_statedir = CUPS_STATEDIR;
+    if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+      g->cups_datadir = CUPS_DATADIR;
 
-  if ((g->localedir = getenv("LOCALEDIR")) == NULL)
-    g->localedir = CUPS_LOCALEDIR;
+    if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+      g->cups_serverbin = CUPS_SERVERBIN;
+
+    if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+      g->cups_serverroot = CUPS_SERVERROOT;
+
+    if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
+      g->cups_statedir = CUPS_STATEDIR;
+
+    if ((g->localedir = getenv("LOCALEDIR")) == NULL)
+      g->localedir = CUPS_LOCALEDIR;
+  }
 #endif /* WIN32 */
 }
 
@@ -132,7 +156,7 @@ _cupsGlobals(void)
   _cups_globals_t *globals;		/* Pointer to global data */
 
 
- /* 
+ /*
   * Initialize the global data exactly once...
   */
 

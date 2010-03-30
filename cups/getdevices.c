@@ -106,15 +106,55 @@ cupsGetDevices(
   }
 
  /*
-  * Send the request...
+  * Send the request and do any necessary authentication...
   */
 
-  DEBUG_puts("2cupsGetDevices: Sending request...");
-  status = cupsSendRequest(http, request, "/", ippLength(request));
+  do
+  {
+    DEBUG_puts("2cupsGetDevices: Sending request...");
+    status = cupsSendRequest(http, request, "/", ippLength(request));
 
-  DEBUG_puts("2cupsGetDevices: Waiting for response status...");
-  while (status == HTTP_CONTINUE)
-    status = httpUpdate(http);
+    DEBUG_puts("2cupsGetDevices: Waiting for response status...");
+    while (status == HTTP_CONTINUE)
+      status = httpUpdate(http);
+
+    if (status != HTTP_OK)
+    {
+      httpFlush(http);
+
+      if (status == HTTP_UNAUTHORIZED)
+      {
+       /*
+	* See if we can do authentication...
+	*/
+
+	DEBUG_puts("2cupsGetDevices: Need authorization...");
+
+	if (!cupsDoAuthentication(http, "POST", "/"))
+	  httpReconnect(http);
+	else
+	{
+	  status = HTTP_AUTHORIZATION_CANCELED;
+	  break;
+	}
+      }
+
+#ifdef HAVE_SSL
+      else if (status == HTTP_UPGRADE_REQUIRED)
+      {
+       /*
+	* Force a reconnect with encryption...
+	*/
+
+	DEBUG_puts("2cupsGetDevices: Need encryption...");
+
+	if (!httpReconnect(http))
+	  httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
+      }
+#endif /* HAVE_SSL */
+    }
+  }
+  while (status == HTTP_UNAUTHORIZED || status == HTTP_UPGRADE_REQUIRED);
 
   DEBUG_printf(("2cupsGetDevices: status=%d", status));
 
