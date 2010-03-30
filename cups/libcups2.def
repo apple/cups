@@ -1,8 +1,6 @@
 LIBRARY libcups2
 VERSION 2.8
 EXPORTS
-_cupsAdminGetServerSettings
-_cupsAdminSetServerSettings
 _cupsCharmapFlush
 _cupsCharmapFree
 _cupsCharmapGet
@@ -37,6 +35,25 @@ _ppdFreeLanguages
 _ppdGetEncoding
 _ppdGetLanguages
 _ppdHashName
+_pwgCreateWithFile
+_pwgDestroy
+_pwgWriteFile
+_pwgGenerateSize
+_pwgInitSize
+_pwgMediaForLegacy
+_pwgMediaForPPD
+_pwgMediaForPWG
+_pwgMediaForSize
+_pwgCreateWithPPD
+_pwgGetInputSlot
+_pwgGetMediaType
+_pwgGetPageSize
+_pwgGetSize
+_pwgGetSource
+_pwgGetType
+_pwgInputSlotForSource
+_pwgMediaTypeForType
+_pwgPageSizeForMedia
 cupsAddDest
 cupsAddOption
 cupsAdminCreateWindowsPPD

@@ -43,6 +43,7 @@
  */
 
 #include <cups/cups-private.h>
+#include <cups/file-private.h>
 #include <regex.h>
 
 #ifndef O_BINARY
