@@ -41,13 +41,6 @@
 #  include <inttypes.h>
 #endif /* HAVE_INTTYPES_H */
 
-#ifdef HAVE_COREFOUNDATION_H
-#  include <CoreFoundation/CoreFoundation.h>
-#endif /* HAVE_COREFOUNDATION_H */
-#ifdef HAVE_CFPRIV_H
-#  include <CoreFoundation/CFPriv.h>
-#endif /* HAVE_CFPRIV_H */
-
 
 /*
  * LPD "mini-daemon" for CUPS.  This program must be used in conjunction
@@ -363,7 +356,7 @@ create_job(http_t        *http,		/* I - HTTP connection */
                  NULL, title);
 
   if (docname[0])
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name", 
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "document-name",
                  NULL, docname);
 
   cupsEncodeOptions(request, num_options, options);
@@ -654,100 +647,6 @@ get_printer(http_t        *http,	/* I - HTTP connection */
 
     ippDelete(response);
   }
-
- /*
-  * Override shared value for LPD using system-specific APIs...
-  */
-
-#ifdef HAVE_CFPRIV_H /* MacOS X */
-  if (shared && *shared)
-  {
-    CFURLRef		prefsurl;	/* URL for preferences file */
-    CFDataRef		xmldata;	/* XML data from preferences file */
-    CFPropertyListRef	plist;		/* Property list from XML data */
-    CFStringRef		queueid;	/* CFString of destination name */
-    CFArrayRef		lprqarray;	/* Array of shared "LPR" printers */
-    CFBooleanRef	serverflag;	/* State of the print service */
-    static const char printerprefsfile[] =
-        "/Library/Preferences/com.apple.printservice.plist";
-					/* Preferences file */
-
-
-   /*
-    * See if we are running on MacOS X Server...
-    */
-
-    CFDictionaryRef versdict = _CFCopyServerVersionDictionary();
-
-    if (versdict)
-    {
-     /*
-      * Yes, use the LPR sharing preference...
-      */
-
-      CFRelease(versdict);
-
-      *shared = 0;
-
-      prefsurl = CFURLCreateFromFileSystemRepresentation(
-                     kCFAllocatorDefault, 
-		     (const UInt8 *)printerprefsfile, 
-		     (CFIndex)strlen(printerprefsfile), 
-		     false);
-      if (prefsurl)
-      {
-        if (CFURLCreateDataAndPropertiesFromResource(kCFAllocatorDefault,
-	                                             prefsurl, &xmldata, NULL,
-						     NULL, NULL))
-	{
-	  plist = CFPropertyListCreateFromXMLData(kCFAllocatorDefault, xmldata, 
-						  kCFPropertyListImmutable,
-						  NULL);
-	  if (plist)
-	  {
-	    serverflag = (CFBooleanRef)CFDictionaryGetValue(
-	                                   (CFDictionaryRef)plist,
-					   CFSTR("serviceState"));
-
-            if (serverflag && CFBooleanGetValue(serverflag))
-	    {
-	      lprqarray = (CFArrayRef)CFDictionaryGetValue(
-	                                  (CFDictionaryRef)plist,
-					  CFSTR("lprSharedQueues"));
-
-	      if (lprqarray)
-	      {
-	        queueid = CFStringCreateWithCString(CFAllocatorGetDefault(), 
-						    dest,
-						    kCFStringEncodingUTF8);
-
-                if (queueid)
-		{
-	          *shared = CFArrayContainsValue(lprqarray,
-						 CFRangeMake(0,
-						     CFArrayGetCount(lprqarray)),
-						 queueid);
-
-                  CFRelease(queueid);
-		}
-	      }
-	    }
-
-	    CFRelease(plist);
-	  }
-
-	  CFRelease(xmldata);
-	}
-
-	CFRelease(prefsurl);
-      }
-
-      if (!shared)
-	syslog(LOG_ERR, "Warning - Print Service sharing disabled for LPD "
-	                "on queue: %s", name);
-    }
-  }
-#endif /* HAVE_CFPRIV_H */
 
  /*
   * Next look for the printer in the lpoptions file...
