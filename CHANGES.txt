@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-03-09
+CHANGES.txt - 2010-04-01
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The main CUPS header (<cups/cups.h>) no longer includes the PPD header
+	  (<cups/ppd.h>).
 	- The scheduler and CUPS API now support the print-quality job template
 	  attribute.
 	- The scheduler no longer supports the old Mac OS X Server quota
