@@ -1,23 +1,26 @@
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-checkpo.o: ../cups/cups-private.h ../cups/cups.h ../cups/ipp.h ../cups/http.h
-checkpo.o: ../cups/versioning.h ../cups/ppd.h ../cups/array.h ../cups/file.h
-checkpo.o: ../cups/language.h ../cups/string-private.h ../config.h
-checkpo.o: ../cups/debug-private.h ../cups/http-private.h ../cups/http.h
-checkpo.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
-checkpo.o: ../cups/language-private.h ../cups/transcode.h
-checkpo.o: ../cups/pwg-private.h
-po2strings.o: ../cups/cups-private.h ../cups/cups.h ../cups/ipp.h
-po2strings.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-po2strings.o: ../cups/array.h ../cups/file.h ../cups/language.h
-po2strings.o: ../cups/string-private.h ../config.h ../cups/debug-private.h
+checkpo.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+checkpo.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+checkpo.o: ../cups/language.h ../cups/array.h ../cups/string-private.h
+checkpo.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
+checkpo.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+checkpo.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+checkpo.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+checkpo.o: ../cups/transcode.h
+po2strings.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+po2strings.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+po2strings.o: ../cups/language.h ../cups/array.h ../cups/string-private.h
+po2strings.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
+po2strings.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
 po2strings.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
 po2strings.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-po2strings.o: ../cups/transcode.h ../cups/pwg-private.h
-translate.o: ../cups/cups-private.h ../cups/cups.h ../cups/ipp.h
-translate.o: ../cups/http.h ../cups/versioning.h ../cups/ppd.h
-translate.o: ../cups/array.h ../cups/file.h ../cups/language.h
-translate.o: ../cups/string-private.h ../config.h ../cups/debug-private.h
+po2strings.o: ../cups/transcode.h
+translate.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+translate.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+translate.o: ../cups/language.h ../cups/array.h ../cups/string-private.h
+translate.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
+translate.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
 translate.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
 translate.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
-translate.o: ../cups/transcode.h ../cups/pwg-private.h
+translate.o: ../cups/transcode.h
