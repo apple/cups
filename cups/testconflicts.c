@@ -23,6 +23,7 @@
  */
 
 #include "cups.h"
+#include "ppd.h"
 #include "string-private.h"
 
 

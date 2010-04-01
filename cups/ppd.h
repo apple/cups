@@ -32,6 +32,7 @@
  */
 
 #  include <stdio.h>
+#  include "cups.h"
 #  include "array.h"
 #  include "file.h"
 
@@ -343,6 +344,8 @@ typedef struct ppd_file_s		/**** PPD File ****/
  * Prototypes...
  */
 
+extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
+			                cups_option_t *options);
 extern void		ppdClose(ppd_file_t *ppd);
 extern int		ppdCollect(ppd_file_t *ppd, ppd_section_t section,
 			           ppd_choice_t  ***choices);
@@ -399,19 +402,29 @@ extern ppd_option_t	*ppdNextOption(ppd_file_t *ppd) _CUPS_API_1_2;
 extern int		ppdLocalize(ppd_file_t *ppd) _CUPS_API_1_2;
 extern ppd_file_t	*ppdOpen2(cups_file_t *fp) _CUPS_API_1_2;
 
-/**** New in CUPS 1.3 ****/
+/**** New in CUPS 1.3/Mac OS X 10.5 ****/
 extern const char	*ppdLocalizeIPPReason(ppd_file_t *ppd,
 			                      const char *reason,
 					      const char *scheme,
 					      char *buffer,
 					      size_t bufsize) _CUPS_API_1_3;
 
-/**** New in CUPS 1.4 ****/
+/**** New in CUPS 1.4/Mac OS X 10.6 ****/
+extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
+					 const char *choice,
+					 cups_option_t **options)
+					     _CUPS_API_1_4;
+extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
+			                     const char *choice,
+					     int *num_options,
+					     cups_option_t **options)
+					     _CUPS_API_1_4;
 extern int		ppdInstallableConflict(ppd_file_t *ppd,
 			                       const char *option,
-					       const char *choice);
+					       const char *choice)
+					           _CUPS_API_1_4;
 extern ppd_attr_t	*ppdLocalizeAttr(ppd_file_t *ppd, const char *keyword,
-			                 const char *spec);
+			                 const char *spec) _CUPS_API_1_4;
 extern const char	*ppdLocalizeMarkerName(ppd_file_t *ppd,
 			                       const char *name) _CUPS_API_1_4;
 extern int		ppdPageSizeLimits(ppd_file_t *ppd,

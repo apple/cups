@@ -25,6 +25,7 @@
 #  include <cups/cups.h>
 #  include "string-private.h"
 #  include "debug-private.h"
+#  include "ppd-private.h"
 #  include "http-private.h"
 #  include "ipp-private.h"
 #  include "language-private.h"

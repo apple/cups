@@ -27,6 +27,7 @@
 
 #include <cups/string-private.h>
 #include <cups/cups.h>
+#include <cups/ppd.h>
 
 
 /*

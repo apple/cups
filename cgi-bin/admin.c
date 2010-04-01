@@ -40,7 +40,7 @@
 
 #include "cgi-private.h"
 #include <cups/adminutil.h>
-#include <cups/file.h>
+#include <cups/ppd.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>

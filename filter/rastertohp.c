@@ -31,6 +31,7 @@
  */
 
 #include <cups/cups.h>
+#include <cups/ppd.h>
 #include <cups/string-private.h>
 #include <cups/language-private.h>
 #include <cups/raster.h>

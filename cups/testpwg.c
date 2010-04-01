@@ -23,7 +23,7 @@
  * Include necessary headers...
  */
 
-#include "pwg-private.h"
+#include "ppd-private.h"
 
 
 /*

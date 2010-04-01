@@ -31,7 +31,8 @@
  * Include necessary headers...
  */
 
-#  include <cups/cups.h>
+#  include <cups/ppd.h>
+#  include "pwg-private.h"
 
 
 /*
@@ -78,6 +79,23 @@ extern char		*_ppdNormalizeMakeAndModel(const char *make_and_model,
 						   size_t bufsize);
 extern int		_ppdParseOptions(const char *s, int num_options,
 			                 cups_option_t **options);
+extern _pwg_t		*_pwgCreateWithPPD(ppd_file_t *ppd);
+extern const char	*_pwgGetInputSlot(_pwg_t *pwg, ipp_t *job,
+			                  const char *keyword);
+extern const char	*_pwgGetMediaType(_pwg_t *pwg, ipp_t *job,
+			                  const char *keyword);
+extern const char	*_pwgGetPageSize(_pwg_t *pwg, ipp_t *job,
+			                 const char *keyword, int *exact);
+extern _pwg_size_t	*_pwgGetSize(_pwg_t *pwg, const char *page_size);
+extern const char	*_pwgGetSource(_pwg_t *pwg, const char *input_slot);
+extern const char	*_pwgGetType(_pwg_t *pwg, const char *media_type);
+extern const char	*_pwgInputSlotForSource(const char *media_source,
+			                        char *name, size_t namesize);
+extern _pwg_media_t	*_pwgMediaForPPD(const char *ppd);
+extern const char	*_pwgMediaTypeForType(const char *media_source,
+			                      char *name, size_t namesize);
+extern const char	*_pwgPageSizeForMedia(_pwg_media_t *media,
+			                      char *name, size_t namesize);
 
 
 /*

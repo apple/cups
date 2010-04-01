@@ -48,6 +48,10 @@ extern "C" {
  * Types and structures...
  */
 
+#  ifndef _CUPS_PPD_H_
+typedef struct ppd_file_s ppd_file_t;
+#  endif /* _CUPS_PPD_H_ */
+
 typedef struct _pwg_media_s		/**** Common media size data ****/
 {
   const char	*pwg,			/* PWG 5101.1 "self describing" name */
@@ -84,8 +88,7 @@ typedef struct _pwg_s			/**** PWG-PPD conversion data ****/
 		custom_min_length;	/* Minimum custom length in 2540ths */
   char		*custom_max_keyword,	/* Maximum custom size PWG keyword */
 		*custom_min_keyword,	/* Minimum custom size PWG keyword */
-		custom_ppd_size[PPD_MAX_NAME];
-					/* Custom PPD size name */
+		custom_ppd_size[41];	/* Custom PPD size name */
   _pwg_size_t	custom_size;		/* Custom size record */
   int		num_sources;		/* Number of media sources */
   _pwg_map_t	*sources;		/* Media sources */
@@ -99,33 +102,16 @@ typedef struct _pwg_s			/**** PWG-PPD conversion data ****/
  */
 
 extern _pwg_t		*_pwgCreateWithFile(const char *filename);
-extern _pwg_t		*_pwgCreateWithPPD(ppd_file_t *ppd);
 extern void		_pwgDestroy(_pwg_t *pwg);
 extern void		_pwgGenerateSize(char *keyword, size_t keysize,
 				         const char *prefix,
 					 const char *ppdname,
 					 int width, int length);
-extern const char	*_pwgGetInputSlot(_pwg_t *pwg, ipp_t *job,
-			                  const char *keyword);
-extern const char	*_pwgGetMediaType(_pwg_t *pwg, ipp_t *job,
-			                  const char *keyword);
-extern const char	*_pwgGetPageSize(_pwg_t *pwg, ipp_t *job,
-			                 const char *keyword, int *exact);
-extern _pwg_size_t	*_pwgGetSize(_pwg_t *pwg, const char *page_size);
-extern const char	*_pwgGetSource(_pwg_t *pwg, const char *input_slot);
-extern const char	*_pwgGetType(_pwg_t *pwg, const char *media_type);
 extern int		_pwgInitSize(_pwg_size_t *size, ipp_t *job,
 				     int *margins_set);
-extern const char	*_pwgInputSlotForSource(const char *media_source,
-			                        char *name, size_t namesize);
 extern _pwg_media_t	*_pwgMediaForLegacy(const char *legacy);
-extern _pwg_media_t	*_pwgMediaForPPD(const char *ppd);
 extern _pwg_media_t	*_pwgMediaForPWG(const char *pwg);
 extern _pwg_media_t	*_pwgMediaForSize(int width, int length);
-extern const char	*_pwgMediaTypeForType(const char *media_source,
-			                      char *name, size_t namesize);
-extern const char	*_pwgPageSizeForMedia(_pwg_media_t *media,
-			                      char *name, size_t namesize);
 extern int		_pwgWriteFile(_pwg_t *pwg, const char *filename);
 
 
