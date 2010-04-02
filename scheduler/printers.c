@@ -4166,19 +4166,23 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       if (pwgsize)
       {
+        ipp_t	*col;			/* Collection value */
+
 	input_slot = ppdFindMarkedChoice(ppd, "InputSlot");
 	media_type = ppdFindMarkedChoice(ppd, "MediaType");
+	col        = new_media_col(pwgsize,
+			           input_slot ?
+				       _pwgGetSource(p->pwg,
+				                     input_slot->choice) :
+				       NULL,
+				   media_type ?
+				       _pwgGetType(p->pwg,
+				                   media_type->choice) :
+				   NULL);
 
 	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
-			 new_media_col(pwgsize,
-			               input_slot ?
-				           _pwgGetSource(p->pwg,
-				                         input_slot->choice) :
-					   NULL,
-				       media_type ?
-				           _pwgGetType(p->pwg,
-				                       media_type->choice) :
-					   NULL));
+	                 col);
+        ippDelete(col);
       }
 
      /*
@@ -4975,8 +4979,9 @@ new_media_col(_pwg_size_t *size,	/* I - media-size/margin values */
 		"x-dimension", size->width);
   ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		"y-dimension", size->length);
-
   ippAddCollection(media_col, IPP_TAG_PRINTER, "media-size", media_size);
+  ippDelete(media_size);
+
   ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		"media-bottom-margin", size->bottom);
   ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,

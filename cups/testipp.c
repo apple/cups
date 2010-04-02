@@ -239,6 +239,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "x-dimension", 21590);
     ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "y-dimension", 27940);
     ippAddCollection(cols[0], IPP_TAG_JOB, "media-size", size);
+    ippDelete(size);
     ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL,
                  "blue");
     ippAddString(cols[0], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL,
@@ -249,6 +250,7 @@ main(int  argc,			/* I - Number of command-line arguments */
     ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "x-dimension", 21000);
     ippAddInteger(size, IPP_TAG_ZERO, IPP_TAG_INTEGER, "y-dimension", 29700);
     ippAddCollection(cols[1], IPP_TAG_JOB, "media-size", size);
+    ippDelete(size);
     ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-color", NULL,
                  "plaid");
     ippAddString(cols[1], IPP_TAG_JOB, IPP_TAG_KEYWORD, "media-type", NULL,
@@ -256,6 +258,8 @@ main(int  argc,			/* I - Number of command-line arguments */
 
     ippAddCollections(request, IPP_TAG_JOB, "media-col", 2,
                       (const ipp_t **)cols);
+    ippDelete(cols[0]);
+    ippDelete(cols[1]);
 
     length = ippLength(request);
     if (length != sizeof(collection))

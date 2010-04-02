@@ -1012,7 +1012,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 					/* Collection value */
 
                 if (col)
+                {
 		  lastcol = ippAddCollection(request, group, attr, col);
+		  ippDelete(col);
+		}
 		else
 		  goto test_error;
               }
@@ -2257,7 +2260,10 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 				      /* Collection value */
 
 	      if (subcol)
+	      {
 		lastcol = ippAddCollection(col, IPP_TAG_ZERO, attr, subcol);
+		ippDelete(subcol);
+	      }
 	      else
 		goto col_error;
 	    }

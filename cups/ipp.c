@@ -181,6 +181,8 @@ ippAddCollection(ipp_t      *ipp,	/* I - IPP message */
   attr->value_tag            = IPP_TAG_BEGIN_COLLECTION;
   attr->values[0].collection = value;
 
+  value->use ++;
+
   return (attr);
 }
 
@@ -219,10 +221,15 @@ ippAddCollections(
   attr->value_tag = IPP_TAG_BEGIN_COLLECTION;
 
   if (values != NULL)
+  {
     for (i = 0, value = attr->values;
 	 i < num_values;
 	 i ++, value ++)
+    {
       value->collection = (ipp_t *)values[i];
+      value->collection->use ++;
+    }
+  }
 
   return (attr);
 }
@@ -794,6 +801,10 @@ ippDelete(ipp_t *ipp)			/* I - IPP message */
   if (!ipp)
     return;
 
+  ipp->use --;
+  if (ipp->use > 0)
+    return;
+
   for (attr = ipp->attrs; attr != NULL; attr = next)
   {
     next = attr->next;
@@ -968,6 +979,7 @@ ippNew(void)
 
     temp->request.any.version[0] = 1;
     temp->request.any.version[1] = 1;
+    temp->use                    = 1;
   }
 
   DEBUG_printf(("1ippNew: Returning %p", temp));
@@ -3009,7 +3021,7 @@ ipp_read_http(http_t      *http,	/* I - Client connection */
   int		tbytes,			/* Total bytes read */
 		bytes;			/* Bytes read this pass */
   char		len[32];		/* Length string */
-  
+
 
   DEBUG_printf(("7ipp_read_http(http=%p, buffer=%p, length=%d)",
                 http, buffer, (int)length));

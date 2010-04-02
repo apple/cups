@@ -1544,9 +1544,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
       send_ipp_status(con, IPP_OK_SUBST, _("Unsupported margins."));
 
       unsup_col = ippNew();
-      ippAddCollection(con->response, IPP_TAG_UNSUPPORTED_GROUP, "media-col",
-                       unsup_col);
-
       if ((media_margin = ippFindAttribute(media_col->values[0].collection,
                                            "media-bottom-margin",
 					   IPP_TAG_INTEGER)) != NULL)
@@ -1570,6 +1567,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 					   IPP_TAG_INTEGER)) != NULL)
         ippAddInteger(unsup_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
 	              "media-top-margin", media_margin->values[0].integer);
+
+      ippAddCollection(con->response, IPP_TAG_UNSUPPORTED_GROUP, "media-col",
+                       unsup_col);
+      ippDelete(unsup_col);
     }
   }
 
@@ -4681,10 +4682,8 @@ copy_attribute(
 
         for (i = 0; i < attr->num_values; i ++)
 	{
-	  toattr->values[i].collection = ippNew();
-	  toattr->values[i].collection->request.status.version[0] = 2;
-	  copy_attrs(toattr->values[i].collection, attr->values[i].collection,
-	             NULL, IPP_TAG_ZERO, quickcopy);
+	  toattr->values[i].collection = attr->values[i].collection;
+	  attr->values[i].collection->use ++;
 	}
         break;
 
