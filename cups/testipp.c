@@ -16,7 +16,11 @@
  *
  * Contents:
  *
- *   main() - Main entry.
+ *   main()             - Main entry.
+ *   hex_dump()         - Produce a hex dump of a buffer.
+ *   print_attributes() - Print the attributes in a request...
+ *   read_cb()          - Read data from a buffer.
+ *   write_cb()         - Write data into a buffer.
  */
 
 /*
@@ -278,7 +282,8 @@ main(int  argc,			/* I - Number of command-line arguments */
     printf("Write Sample to Memory: ");
 
     wused = 0;
-    while ((state = ippWriteIO(wbuffer, write_cb, 1, NULL, request)) != IPP_DATA)
+    while ((state = ippWriteIO(wbuffer, write_cb, 1, NULL,
+                               request)) != IPP_DATA)
       if (state == IPP_ERROR)
 	break;
 
@@ -367,119 +372,124 @@ main(int  argc,			/* I - Number of command-line arguments */
     else
       puts("PASS");
 
-    fputs("ippFindAttribute(media-size 1): ", stdout);
-    if ((media_size = ippFindAttribute(media_col->values[0].collection,
-                                       "media-size",
-                                       IPP_TAG_BEGIN_COLLECTION)) == NULL)
+    if (media_col)
     {
+      fputs("ippFindAttribute(media-size 1): ", stdout);
       if ((media_size = ippFindAttribute(media_col->values[0].collection,
-                                         "media-col",
-                                         IPP_TAG_ZERO)) == NULL)
-        puts("FAIL (not found)");
-      else
-        printf("FAIL (wrong type - %s)\n", ippTagString(media_size->value_tag));
-
-      status = 1;
-    }
-    else
-    {
-      if ((attr = ippFindAttribute(media_size->values[0].collection,
-                                   "x-dimension", IPP_TAG_INTEGER)) == NULL)
+					 "media-size",
+					 IPP_TAG_BEGIN_COLLECTION)) == NULL)
       {
-	if ((attr = ippFindAttribute(media_size->values[0].collection,
-				     "x-dimension", IPP_TAG_ZERO)) == NULL)
-	  puts("FAIL (missing x-dimension)");
+	if ((media_size = ippFindAttribute(media_col->values[0].collection,
+					   "media-col",
+					   IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (not found)");
 	else
-	  printf("FAIL (wrong type for x-dimension - %s)\n",
-	         ippTagString(attr->value_tag));
+	  printf("FAIL (wrong type - %s)\n",
+	         ippTagString(media_size->value_tag));
 
-	status = 1;
-      }
-      else if (attr->values[0].integer != 21590)
-      {
-        printf("FAIL (wrong value for x-dimension - %d)\n",
-	       attr->values[0].integer);
-	status = 1;
-      }
-      else if ((attr = ippFindAttribute(media_size->values[0].collection,
-                                        "y-dimension",
-					IPP_TAG_INTEGER)) == NULL)
-      {
-	if ((attr = ippFindAttribute(media_size->values[0].collection,
-				     "y-dimension", IPP_TAG_ZERO)) == NULL)
-	  puts("FAIL (missing y-dimension)");
-	else
-	  printf("FAIL (wrong type for y-dimension - %s)\n",
-	         ippTagString(attr->value_tag));
-
-	status = 1;
-      }
-      else if (attr->values[0].integer != 27940)
-      {
-        printf("FAIL (wrong value for y-dimension - %d)\n",
-	       attr->values[0].integer);
 	status = 1;
       }
       else
-	puts("PASS");
-    }
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "x-dimension", IPP_TAG_INTEGER)) == NULL)
+	{
+	  if ((attr = ippFindAttribute(media_size->values[0].collection,
+				       "x-dimension", IPP_TAG_ZERO)) == NULL)
+	    puts("FAIL (missing x-dimension)");
+	  else
+	    printf("FAIL (wrong type for x-dimension - %s)\n",
+		   ippTagString(attr->value_tag));
 
-    fputs("ippFindAttribute(media-size 2): ", stdout);
-    if ((media_size = ippFindAttribute(media_col->values[1].collection,
-                                       "media-size",
-                                       IPP_TAG_BEGIN_COLLECTION)) == NULL)
-    {
+	  status = 1;
+	}
+	else if (attr->values[0].integer != 21590)
+	{
+	  printf("FAIL (wrong value for x-dimension - %d)\n",
+		 attr->values[0].integer);
+	  status = 1;
+	}
+	else if ((attr = ippFindAttribute(media_size->values[0].collection,
+					  "y-dimension",
+					  IPP_TAG_INTEGER)) == NULL)
+	{
+	  if ((attr = ippFindAttribute(media_size->values[0].collection,
+				       "y-dimension", IPP_TAG_ZERO)) == NULL)
+	    puts("FAIL (missing y-dimension)");
+	  else
+	    printf("FAIL (wrong type for y-dimension - %s)\n",
+		   ippTagString(attr->value_tag));
+
+	  status = 1;
+	}
+	else if (attr->values[0].integer != 27940)
+	{
+	  printf("FAIL (wrong value for y-dimension - %d)\n",
+		 attr->values[0].integer);
+	  status = 1;
+	}
+	else
+	  puts("PASS");
+      }
+
+      fputs("ippFindAttribute(media-size 2): ", stdout);
       if ((media_size = ippFindAttribute(media_col->values[1].collection,
-                                         "media-col",
-                                         IPP_TAG_ZERO)) == NULL)
-        puts("FAIL (not found)");
-      else
-        printf("FAIL (wrong type - %s)\n", ippTagString(media_size->value_tag));
-
-      status = 1;
-    }
-    else
-    {
-      if ((attr = ippFindAttribute(media_size->values[0].collection,
-                                   "x-dimension",
-				   IPP_TAG_INTEGER)) == NULL)
+					 "media-size",
+					 IPP_TAG_BEGIN_COLLECTION)) == NULL)
       {
-	if ((attr = ippFindAttribute(media_size->values[0].collection,
-				     "x-dimension", IPP_TAG_ZERO)) == NULL)
-	  puts("FAIL (missing x-dimension)");
+	if ((media_size = ippFindAttribute(media_col->values[1].collection,
+					   "media-col",
+					   IPP_TAG_ZERO)) == NULL)
+	  puts("FAIL (not found)");
 	else
-	  printf("FAIL (wrong type for x-dimension - %s)\n",
-	         ippTagString(attr->value_tag));
+	  printf("FAIL (wrong type - %s)\n",
+	         ippTagString(media_size->value_tag));
 
-	status = 1;
-      }
-      else if (attr->values[0].integer != 21000)
-      {
-        printf("FAIL (wrong value for x-dimension - %d)\n",
-	       attr->values[0].integer);
-	status = 1;
-      }
-      else if ((attr = ippFindAttribute(media_size->values[0].collection,
-                                        "y-dimension",
-				        IPP_TAG_INTEGER)) == NULL)
-      {
-	if ((attr = ippFindAttribute(media_size->values[0].collection,
-				     "y-dimension", IPP_TAG_ZERO)) == NULL)
-	  puts("FAIL (missing y-dimension)");
-	else
-	  printf("FAIL (wrong type for y-dimension - %s)\n",
-	         ippTagString(attr->value_tag));
-
-	status = 1;
-      }
-      else if (attr->values[0].integer != 29700)
-      {
-        printf("FAIL (wrong value for y-dimension - %d)\n",
-	       attr->values[0].integer);
 	status = 1;
       }
       else
-	puts("PASS");
+      {
+	if ((attr = ippFindAttribute(media_size->values[0].collection,
+				     "x-dimension",
+				     IPP_TAG_INTEGER)) == NULL)
+	{
+	  if ((attr = ippFindAttribute(media_size->values[0].collection,
+				       "x-dimension", IPP_TAG_ZERO)) == NULL)
+	    puts("FAIL (missing x-dimension)");
+	  else
+	    printf("FAIL (wrong type for x-dimension - %s)\n",
+		   ippTagString(attr->value_tag));
+
+	  status = 1;
+	}
+	else if (attr->values[0].integer != 21000)
+	{
+	  printf("FAIL (wrong value for x-dimension - %d)\n",
+		 attr->values[0].integer);
+	  status = 1;
+	}
+	else if ((attr = ippFindAttribute(media_size->values[0].collection,
+					  "y-dimension",
+					  IPP_TAG_INTEGER)) == NULL)
+	{
+	  if ((attr = ippFindAttribute(media_size->values[0].collection,
+				       "y-dimension", IPP_TAG_ZERO)) == NULL)
+	    puts("FAIL (missing y-dimension)");
+	  else
+	    printf("FAIL (wrong type for y-dimension - %s)\n",
+		   ippTagString(attr->value_tag));
+
+	  status = 1;
+	}
+	else if (attr->values[0].integer != 29700)
+	{
+	  printf("FAIL (wrong value for y-dimension - %d)\n",
+		 attr->values[0].integer);
+	  status = 1;
+	}
+	else
+	  puts("PASS");
+      }
     }
 
     ippDelete(request);

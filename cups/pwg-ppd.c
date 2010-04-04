@@ -71,7 +71,6 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 		ppd_name[PPD_MAX_NAME];	/* Normalized PPD name */
   const char	*pwg_name;		/* Standard PWG media name */
   _pwg_media_t	*pwg_media;		/* PWG media data */
-  struct lconv	*loc;			/* Locale conversion data */
 
 
   DEBUG_printf(("_pwgCreateWithPPD(ppd=%p)", ppd));
@@ -109,8 +108,6 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
                   ppd->num_sizes));
     goto create_error;
   }
-
-  loc = localeconv();
 
   for (i = ppd->num_sizes, pwg_size = pwg->sizes, ppd_size = ppd->sizes;
        i > 0;
@@ -284,7 +281,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
                              sizeof(_pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
-                    "for MediaType.", input_slot->num_choices));
+                    "for MediaType.", media_type->num_choices));
       goto create_error;
     }
 
@@ -496,7 +493,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
     if (!_pwgInitSize(&jobsize, job, &margins_set))
       return (NULL);
-  }    
+  }
   else
   {
    /*
