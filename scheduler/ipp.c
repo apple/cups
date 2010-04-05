@@ -7421,9 +7421,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 	  (!job->printer || (job->printer->type & dmask) != dtype))
 	continue;
 
-      if ((job_comparison < 0 && job->state->values[0].integer > job_state) ||
-          (job_comparison == 0 && job->state->values[0].integer != job_state) ||
-          (job_comparison > 0 && job->state->values[0].integer < job_state))
+      if ((job_comparison < 0 && job->state_value > job_state) ||
+          (job_comparison == 0 && job->state_value != job_state) ||
+          (job_comparison > 0 && job->state_value < job_state))
 	continue;
 
       if (job->id < first_job_id)
