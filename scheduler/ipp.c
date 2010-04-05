@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   IPP routines for the Common UNIX Printing System (CUPS) scheduler.
+ *   IPP routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -38,12 +38,13 @@
  *                                 printer.
  *   apply_printer_defaults()    - Apply printer default options to a job.
  *   authenticate_job()          - Set job authentication info.
- *   cancel_all_jobs()           - Cancel all print jobs.
+ *   cancel_all_jobs()           - Cancel all or selected print jobs.
  *   cancel_job()                - Cancel a print job.
  *   cancel_subscription()       - Cancel a subscription.
- *   check_quotas()              - Check quotas for a printer and user.
  *   check_rss_recipient()       - Check that we do not have a duplicate RSS
  *                                 feed URI.
+ *   check_quotas()              - Check quotas for a printer and user.
+ *   close_job()                 - Close a multi-file job.
  *   copy_attribute()            - Copy a single attribute.
  *   copy_attrs()                - Copy attributes from one request to another.
  *   copy_banner()               - Copy a banner file to the requests directory
@@ -69,16 +70,20 @@
  *   get_ppds()                  - Get the list of PPD files on the local
  *                                 system.
  *   get_printer_attrs()         - Get printer attributes.
+ *   get_printer_supported()     - Get printer supported values.
  *   get_printers()              - Get a list of printers or classes.
  *   get_subscription_attrs()    - Get subscription attributes.
  *   get_subscriptions()         - Get subscriptions.
  *   get_username()              - Get the username associated with a request.
  *   hold_job()                  - Hold a print job.
+ *   hold_new_jobs()             - Hold pending/new jobs on a printer or class.
  *   move_job()                  - Move a job to a new destination.
  *   ppd_parse_line()            - Parse a PPD default line.
  *   print_job()                 - Print a file to a printer or class.
  *   read_job_ticket()           - Read a job ticket embedded in a print file.
  *   reject_jobs()               - Reject print jobs to a printer.
+ *   release_held_new_jobs()     - Release pending/new jobs on a printer or
+ *                                 class.
  *   release_job()               - Release a held print job.
  *   renew_subscription()        - Renew an existing subscription...
  *   restart_job()               - Restart an old print job.
