@@ -46,7 +46,7 @@ DefaultAuthType Basic
 # Set the default printer/job policies...
 <Policy default>
   # Job-related operations must be done by the owner or an administrator...
-  <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job CUPS-Get-Document>
+  <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job Cancel-My-Jobs Close-Job CUPS-Move-Job CUPS-Get-Document>
     Require user @OWNER @SYSTEM
     Order deny,allow
   </Limit>
@@ -66,7 +66,7 @@ DefaultAuthType Basic
   </Limit>
 
   # Only the owner or an administrator can cancel or authenticate a job...
-  <Limit Cancel-Job CUPS-Authenticate-Job>
+  <Limit Cancel-Job Cancel-Jobs CUPS-Authenticate-Job>
     Require user @OWNER @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow
   </Limit>
@@ -84,7 +84,7 @@ DefaultAuthType Basic
     Order deny,allow
   </Limit>
 
-  <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job CUPS-Move-Job CUPS-Get-Document>
+  <Limit Send-Document Send-URI Hold-Job Release-Job Restart-Job Purge-Jobs Set-Job-Attributes Create-Job-Subscription Renew-Subscription Cancel-Subscription Get-Notifications Reprocess-Job Cancel-Current-Job Suspend-Current-Job Resume-Job Cancel-My-Jobs Close-Job CUPS-Move-Job CUPS-Get-Document>
     AuthType Default
     Require user @OWNER @SYSTEM
     Order deny,allow
@@ -105,7 +105,7 @@ DefaultAuthType Basic
   </Limit>
 
   # Only the owner or an administrator can cancel or authenticate a job...
-  <Limit Cancel-Job CUPS-Authenticate-Job>
+  <Limit Cancel-Job Cancel-Jobs CUPS-Authenticate-Job>
     AuthType Default
     Require user @OWNER @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow

@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "23 February 2010" "Apple Inc."
+.TH ipp.test 5 "CUPS" "4 April 2010" "Apple Inc."
 .SH NAME
 ipp.test \- ipptest test file format
 
@@ -29,7 +29,7 @@ example:
 
       # The request to send
       OPERATION Print-Job
-      GROUP operation
+      GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
       ATTR uri printer-uri $uri
@@ -49,7 +49,7 @@ example:
 
       # The request to send
       OPERATION Get-Job-Attributes
-      GROUP operation
+      GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
       ATTR uri printer-uri $uri
@@ -232,8 +232,8 @@ IF-UNDEFINED variable-name
 Makes the STATUS apply only if the specified variable is not defined.
 
 .SH OPERATION CODES
-Operation codes correspond to the names from RFC 2911 and other IPP extension
-specifications. Here is a complete list:
+Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from
+RFC 2911 and other IPP extension specifications. Here is a complete list:
 .nf
     Activate-Printer
     CUPS-Accept-Jobs
@@ -254,7 +254,10 @@ specifications. Here is a complete list:
     CUPS-Set-Default
     Cancel-Current-Job
     Cancel-Job
+    Cancel-Jobs
+    Cancel-My-Jobs
     Cancel-Subscription
+    Close-Job
     Create-Job
     Create-Job-Subscription
     Create-Printer-Subscription
@@ -283,6 +286,7 @@ specifications. Here is a complete list:
     Reprocess-Job
     Restart-Job
     Restart-Printer
+    Resubmit-Job
     Resume-Job
     Resume-Printer
     Schedule-Job-After

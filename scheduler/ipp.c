@@ -160,6 +160,7 @@ static int	check_rss_recipient(const char *recipient);
 static int	check_quotas(cupsd_client_t *con, cupsd_printer_t *p);
 static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
 		                        int quickcopy);
+static void	close_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
 		           ipp_tag_t group, int quickcopy);
 static int	copy_banner(cupsd_client_t *con, cupsd_job_t *job,
@@ -580,6 +581,8 @@ cupsdProcessIPPRequest(
 	      break;
 
 	  case IPP_PURGE_JOBS :
+	  case IPP_CANCEL_JOBS :
+	  case IPP_CANCEL_MY_JOBS :
               cancel_all_jobs(con, uri);
               break;
 
@@ -597,6 +600,10 @@ cupsdProcessIPPRequest(
 
 	  case IPP_RELEASE_HELD_NEW_JOBS :
               release_held_new_jobs(con, uri);
+              break;
+
+	  case IPP_CLOSE_JOB :
+              close_job(con, uri);
               break;
 
 	  case CUPS_GET_DEFAULT :
@@ -3857,13 +3864,14 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
 
 /*
- * 'cancel_all_jobs()' - Cancel all print jobs.
+ * 'cancel_all_jobs()' - Cancel all or selected print jobs.
  */
 
 static void
 cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 	        ipp_attribute_t *uri)	/* I - Job or Printer URI */
 {
+  int		i;			/* Looping var */
   http_status_t	status;			/* Policy status */
   cups_ptype_t	dtype;			/* Destination type */
   char		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
@@ -3872,13 +3880,73 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
   ipp_attribute_t *attr;		/* Attribute in request */
-  const char	*username;		/* Username */
-  cupsd_jobaction_t purge;		/* Purge? */
+  const char	*username = NULL;	/* Username */
+  cupsd_jobaction_t purge = CUPSD_JOB_DEFAULT;
+					/* Purge? */
   cupsd_printer_t *printer;		/* Printer */
+  ipp_attribute_t *job_ids;		/* job-ids attribute */
+  cupsd_job_t	*job;			/* Job */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cancel_all_jobs(%p[%d], %s)", con,
                   con->http.fd, uri->values[0].string.text);
+
+ /*
+  * Get the jobs to cancel/purge...
+  */
+
+  switch (con->request->request.op.operation_id)
+  {
+    case IPP_PURGE_JOBS :
+       /*
+	* Get the username (if any) for the jobs we want to cancel (only if
+	* "my-jobs" is specified...
+	*/
+
+        if ((attr = ippFindAttribute(con->request, "my-jobs",
+                                     IPP_TAG_BOOLEAN)) != NULL &&
+            attr->values[0].boolean)
+	{
+	  if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+				       IPP_TAG_NAME)) != NULL)
+	    username = attr->values[0].string.text;
+	  else
+	  {
+	    send_ipp_status(con, IPP_BAD_REQUEST,
+			    _("Missing requesting-user-name attribute"));
+	    return;
+	  }
+	}
+
+       /*
+	* Look for the "purge-jobs" attribute...
+	*/
+
+	if ((attr = ippFindAttribute(con->request, "purge-jobs",
+				     IPP_TAG_BOOLEAN)) != NULL)
+	  purge = attr->values[0].boolean ? CUPSD_JOB_PURGE : CUPSD_JOB_DEFAULT;
+	else
+	  purge = CUPSD_JOB_PURGE;
+	break;
+
+    case IPP_CANCEL_MY_JOBS :
+        if (con->username[0])
+          username = con->username;
+        else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+					  IPP_TAG_NAME)) != NULL)
+          username = attr->values[0].string.text;
+        else
+        {
+	  send_ipp_status(con, IPP_BAD_REQUEST,
+			  _("Missing requesting-user-name attribute"));
+	  return;
+        }
+
+    default :
+        break;
+  }
+
+  job_ids = ippFindAttribute(con->request, "job-ids", IPP_TAG_INTEGER);
 
  /*
   * See if we have a printer URI...
@@ -3890,38 +3958,6 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
                     _("The printer-uri attribute is required"));
     return;
   }
-
- /*
-  * Get the username (if any) for the jobs we want to cancel (only if
-  * "my-jobs" is specified...
-  */
-
-  if ((attr = ippFindAttribute(con->request, "my-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL &&
-      attr->values[0].boolean)
-  {
-    if ((attr = ippFindAttribute(con->request, "requesting-user-name",
-                                 IPP_TAG_NAME)) != NULL)
-      username = attr->values[0].string.text;
-    else
-    {
-      send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Missing requesting-user-name attribute"));
-      return;
-    }
-  }
-  else
-    username = NULL;
-
- /*
-  * Look for the "purge-jobs" attribute...
-  */
-
-  if ((attr = ippFindAttribute(con->request, "purge-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL)
-    purge = attr->values[0].boolean ? CUPSD_JOB_PURGE : CUPSD_JOB_DEFAULT;
-  else
-    purge = CUPSD_JOB_PURGE;
 
  /*
   * And if the destination is valid...
@@ -3956,15 +3992,46 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       return;
     }
 
-   /*
-    * Cancel all jobs on all printers...
-    */
+    if (job_ids)
+    {
+      for (i = 0; i < job_ids->num_values; i ++)
+      {
+	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
+	  break;
+      }
 
-    cupsdCancelJobs(NULL, username, purge);
+      if (i < job_ids->num_values)
+      {
+	send_ipp_status(con, IPP_NOT_FOUND, _("job-id %d not found."),
+			job_ids->values[i].integer);
+	return;
+      }
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
-                    purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
-		    get_username(con));
+      for (i = 0; i < job_ids->num_values; i ++)
+      {
+	job = cupsdFindJob(job_ids->values[i].integer);
+
+	cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
+	                 purge == CUPSD_JOB_PURGE ? "Job purged by user." :
+	                                            "Job canceled by user.");
+      }
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Selected jobs were %s by \"%s\".",
+		      purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
+		      get_username(con));
+    }
+    else
+    {
+     /*
+      * Cancel all jobs on all printers...
+      */
+
+      cupsdCancelJobs(NULL, username, purge);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "All jobs were %s by \"%s\".",
+		      purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
+		      get_username(con));
+    }
   }
   else
   {
@@ -3979,16 +4046,48 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
       return;
     }
 
-   /*
-    * Cancel all of the jobs on the named printer...
-    */
+    if (job_ids)
+    {
+      for (i = 0; i < job_ids->num_values; i ++)
+      {
+	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL ||
+	    strcasecmp(job->dest, printer->name))
+	  break;
+      }
 
-    cupsdCancelJobs(printer->name, username, purge);
+      if (i < job_ids->num_values)
+      {
+	send_ipp_status(con, IPP_NOT_FOUND, _("job-id %d not found."),
+			job_ids->values[i].integer);
+	return;
+      }
 
-    cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
-                    printer->name,
-		    purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
-		    get_username(con));
+      for (i = 0; i < job_ids->num_values; i ++)
+      {
+	job = cupsdFindJob(job_ids->values[i].integer);
+
+	cupsdSetJobState(job, IPP_JOB_CANCELED, purge,
+	                 purge == CUPSD_JOB_PURGE ? "Job purged by user." :
+	                                            "Job canceled by user.");
+      }
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "Selected jobs were %s by \"%s\".",
+		      purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
+		      get_username(con));
+    }
+    else
+    {
+     /*
+      * Cancel all of the jobs on the named printer...
+      */
+
+      cupsdCancelJobs(printer->name, username, purge);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "All jobs on \"%s\" were %s by \"%s\".",
+		      printer->name,
+		      purge == CUPSD_JOB_PURGE ? "purged" : "canceled",
+		      get_username(con));
+    }
   }
 
   con->response->request.status.status_code = IPP_OK;
@@ -4524,6 +4623,130 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   return (1);
+}
+
+
+/*
+ * 'close_job()' - Close a multi-file job.
+ */
+
+static void
+close_job(cupsd_client_t  *con,		/* I - Client connection */
+          ipp_attribute_t *uri)		/* I - Printer URI */
+{
+  cupsd_job_t		*job;		/* Job */
+  cupsd_printer_t	*printer;	/* Printer */
+  ipp_attribute_t	*attr;		/* Attribute */
+  char			job_uri[HTTP_MAX_URI],
+					/* Job URI */
+			username[256];	/* User name */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "close_job(%p[%d], %s)", con,
+                  con->http.fd, uri->values[0].string.text);
+
+ /*
+  * See if we have a job URI or a printer URI...
+  */
+
+  if (strcmp(uri->name, "printer-uri"))
+  {
+   /*
+    * job-uri is not supported by Close-Job!
+    */
+
+    send_ipp_status(con, IPP_BAD_REQUEST,
+		    _("Close-Job doesn't support the job-uri attribute."));
+    return;
+  }
+
+ /*
+  * Got a printer URI; see if we also have a job-id attribute...
+  */
+
+  if ((attr = ippFindAttribute(con->request, "job-id",
+			       IPP_TAG_INTEGER)) == NULL)
+  {
+    send_ipp_status(con, IPP_BAD_REQUEST,
+		    _("Got a printer-uri attribute but no job-id"));
+    return;
+  }
+
+  if ((job = cupsdFindJob(attr->values[0].integer)) == NULL)
+  {
+   /*
+    * Nope - return a "not found" error...
+    */
+
+    send_ipp_status(con, IPP_NOT_FOUND, _("Job #%d does not exist"),
+                    attr->values[0].integer);
+    return;
+  }
+
+  printer = cupsdFindDest(job->dest);
+
+ /*
+  * See if the job is owned by the requesting user...
+  */
+
+  if (!validate_user(job, con, job->username, username, sizeof(username)))
+  {
+    send_http_error(con, con->username[0] ? HTTP_FORBIDDEN : HTTP_UNAUTHORIZED,
+                    cupsdFindDest(job->dest));
+    return;
+  }
+
+ /*
+  * Add any ending sheet...
+  */
+
+  if (cupsdTimeoutJob(job))
+    return;
+
+  if (job->state_value == IPP_JOB_STOPPED)
+  {
+    job->state->values[0].integer = IPP_JOB_PENDING;
+    job->state_value              = IPP_JOB_PENDING;
+  }
+  else if (job->state_value == IPP_JOB_HELD)
+  {
+    if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
+				 IPP_TAG_KEYWORD)) == NULL)
+      attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
+
+    if (!attr || !strcmp(attr->values[0].string.text, "no-hold"))
+    {
+      job->state->values[0].integer = IPP_JOB_PENDING;
+      job->state_value              = IPP_JOB_PENDING;
+    }
+  }
+
+  job->dirty = 1;
+  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
+
+ /*
+  * Fill in the response info...
+  */
+
+  snprintf(job_uri, sizeof(job_uri), "http://%s:%d/jobs/%d", ServerName,
+	   LocalPort, job->id);
+  ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL,
+               job_uri);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+
+  ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_ENUM, "job-state",
+                job->state_value);
+
+  add_job_state_reasons(con, job);
+
+  con->response->request.status.status_code = IPP_OK;
+
+ /*
+  * Start the job if necessary...
+  */
+
+  cupsdCheckJobs();
 }
 
 
@@ -6899,6 +7122,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   int		first_job_id;		/* First job ID */
   int		limit;			/* Maximum number of jobs to return */
   int		count;			/* Number of jobs that match */
+  ipp_attribute_t *job_ids;		/* job-ids attribute */
   cupsd_job_t	*job;			/* Current job pointer */
   cupsd_printer_t *printer;		/* Printer */
   cups_array_t	*list;			/* Which job list... */
@@ -6979,13 +7203,21 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
     return;
   }
 
+  job_ids = ippFindAttribute(con->request, "job-ids", IPP_TAG_INTEGER);
+
  /*
   * See if the "which-jobs" attribute have been specified...
   */
 
   if ((attr = ippFindAttribute(con->request, "which-jobs",
-                               IPP_TAG_KEYWORD)) != NULL &&
-      !strcmp(attr->values[0].string.text, "completed"))
+                               IPP_TAG_KEYWORD)) != NULL && job_ids)
+  {
+    send_ipp_status(con, IPP_CONFLICT,
+                    _("The %s attribute cannot be provided with job-ids."),
+                    "which-jobs");
+    return;
+  }
+  else if (attr && !strcmp(attr->values[0].string.text, "completed"))
   {
     completed = 1;
     list      = Jobs;
@@ -7012,13 +7244,33 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
   if ((attr = ippFindAttribute(con->request, "limit",
                                IPP_TAG_INTEGER)) != NULL)
+  {
+    if (job_ids)
+    {
+      send_ipp_status(con, IPP_CONFLICT,
+		      _("The %s attribute cannot be provided with job-ids."),
+		      "limit");
+      return;
+    }
+
     limit = attr->values[0].integer;
+  }
   else
     limit = 0;
 
   if ((attr = ippFindAttribute(con->request, "first-job-id",
                                IPP_TAG_INTEGER)) != NULL)
+  {
+    if (job_ids)
+    {
+      send_ipp_status(con, IPP_CONFLICT,
+		      _("The %s attribute cannot be provided with job-ids."),
+		      "first-job-id");
+      return;
+    }
+
     first_job_id = attr->values[0].integer;
+  }
   else
     first_job_id = 1;
 
@@ -7027,8 +7279,14 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "my-jobs",
-                               IPP_TAG_BOOLEAN)) != NULL &&
-      attr->values[0].boolean)
+                               IPP_TAG_BOOLEAN)) != NULL && job_ids)
+  {
+    send_ipp_status(con, IPP_CONFLICT,
+                    _("The %s attribute cannot be provided with job-ids."),
+                    "my-jobs");
+    return;
+  }
+  else if (attr && attr->values[0].boolean)
     strlcpy(username, get_username(con), sizeof(username));
   else
     username[0] = '\0';
@@ -7050,58 +7308,100 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   * OK, build a list of jobs for this printer...
   */
 
-  for (count = 0, job = (cupsd_job_t *)cupsArrayFirst(list);
-       (limit <= 0 || count < limit) && job;
-       job = (cupsd_job_t *)cupsArrayNext(list))
+  if (job_ids)
   {
-   /*
-    * Filter out jobs that don't match...
-    */
+    int	i;				/* Looping var */
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                    "get_jobs: job->id=%d, dest=\"%s\", username=\"%s\", "
-		    "state_value=%d, attrs=%p", job->id, job->dest,
-		    job->username, job->state_value, job->attrs);
-
-    if (!job->dest || !job->username)
-      cupsdLoadJob(job);
-
-    if (!job->dest || !job->username)
-      continue;
-
-    if ((dest && strcmp(job->dest, dest)) &&
-        (!job->printer || !dest || strcmp(job->printer->name, dest)))
-      continue;
-    if ((job->dtype & dmask) != dtype &&
-        (!job->printer || (job->printer->type & dmask) != dtype))
-      continue;
-    if (completed && job->state_value <= IPP_JOB_STOPPED)
-      continue;
-
-    if (job->id < first_job_id)
-      continue;
-
-    cupsdLoadJob(job);
-
-    if (!job->attrs)
+    for (i = 0; i < job_ids->num_values; i ++)
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d",
-                      job->id);
-      continue;
+      if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
+        break;
     }
 
-    if (username[0] && strcasecmp(username, job->username))
-      continue;
+    if (i < job_ids->num_values)
+    {
+      send_ipp_status(con, IPP_NOT_FOUND, _("job-id %d not found."),
+                      job_ids->values[i].integer);
+      return;
+    }
 
-    if (count > 0)
-      ippAddSeparator(con->response);
+    for (i = 0; i < job_ids->num_values; i ++)
+    {
+      job = cupsdFindJob(job_ids->values[i].integer);
 
-    count ++;
+      cupsdLoadJob(job);
 
-    copy_job_attrs(con, job, ra);
+      if (!job->attrs)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d",
+			job->id);
+	continue;
+      }
+
+      if (username[0] && strcasecmp(username, job->username))
+	continue;
+
+      if (i > 0)
+	ippAddSeparator(con->response);
+
+      copy_job_attrs(con, job, ra);
+    }
   }
+  else
+  {
+    for (count = 0, job = (cupsd_job_t *)cupsArrayFirst(list);
+	 (limit <= 0 || count < limit) && job;
+	 job = (cupsd_job_t *)cupsArrayNext(list))
+    {
+     /*
+      * Filter out jobs that don't match...
+      */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count=%d", count);
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		      "get_jobs: job->id=%d, dest=\"%s\", username=\"%s\", "
+		      "state_value=%d, attrs=%p", job->id, job->dest,
+		      job->username, job->state_value, job->attrs);
+
+      if (!job->dest || !job->username)
+	cupsdLoadJob(job);
+
+      if (!job->dest || !job->username)
+	continue;
+
+      if ((dest && strcmp(job->dest, dest)) &&
+	  (!job->printer || !dest || strcmp(job->printer->name, dest)))
+	continue;
+      if ((job->dtype & dmask) != dtype &&
+	  (!job->printer || (job->printer->type & dmask) != dtype))
+	continue;
+      if (completed && job->state_value <= IPP_JOB_STOPPED)
+	continue;
+
+      if (job->id < first_job_id)
+	continue;
+
+      cupsdLoadJob(job);
+
+      if (!job->attrs)
+      {
+	cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: No attributes for job %d",
+			job->id);
+	continue;
+      }
+
+      if (username[0] && strcasecmp(username, job->username))
+	continue;
+
+      if (count > 0)
+	ippAddSeparator(con->response);
+
+      count ++;
+
+      copy_job_attrs(con, job, ra);
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count=%d", count);
+  }
 
   cupsArrayDelete(ra);
 

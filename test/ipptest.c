@@ -853,7 +853,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
-	if ((op = ippOpValue(token)) < 0)
+	if ((op = ippOpValue(token)) < 0 && (op = strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad OPERATION code \"%s\" on line %d.", token,
 	                    linenum);
@@ -1083,7 +1083,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
 
-        expand_variables(vars, token, temp, sizeof(token));	
+        expand_variables(vars, token, temp, sizeof(token));
 	get_filename(testfile, filename, token, sizeof(filename));
       }
       else if (!strcasecmp(token, "STATUS"))
@@ -1540,7 +1540,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	       found->group_tag != expect->in_group))
           {
       	    pass = 0;
-      	    break;          
+      	    break;
           }
 
           if (found &&
@@ -1776,7 +1776,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  if (expect->if_undefined && get_variable(vars, expect->if_undefined))
 	    continue;
-      
+
 	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
 
 	  if (found && expect->not_expect)
@@ -1786,7 +1786,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  else if (found)
 	  {
 	    if (!expect_matches(expect, found->value_tag))
-	      print_test_error("EXPECTED: %s OF-TYPE %s (got %s)", 
+	      print_test_error("EXPECTED: %s OF-TYPE %s (got %s)",
 			       expect->name, expect->of_type,
 			       ippTagString(found->value_tag));
 
@@ -1799,10 +1799,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    {
 	      if (expect->with_regex)
 		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
-				 expect->name, expect->with_value);         
+				 expect->name, expect->with_value);
 	      else
 		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
-				 expect->name, expect->with_value);         
+				 expect->name, expect->with_value);
 	    }
 
 	    if (expect->count > 0 && found->num_values != expect->count)
@@ -1858,7 +1858,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (expect->if_defined)
         free(expect->if_defined);
       if (expect->if_undefined)
-        free(expect->if_undefined);  
+        free(expect->if_undefined);
       if (expect->with_value)
         free(expect->with_value);
     }
@@ -1908,7 +1908,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     if (expect->if_defined)
       free(expect->if_defined);
     if (expect->if_undefined)
-      free(expect->if_undefined);  
+      free(expect->if_undefined);
     if (expect->with_value)
       free(expect->with_value);
   }
@@ -2025,7 +2025,7 @@ expand_variables(_cups_vars_t *vars,	/* I - Variables */
 /*
  * 'expect_matches()' - Return true if the tag matches the specification.
  */
- 
+
 static int				/* O - 1 if matches, 0 otherwise */
 expect_matches(
     _cups_expect_t *expect,		/* I - Expected attribute */
@@ -2059,17 +2059,17 @@ expect_matches(
 
     if ((sep = *next) != '\0')
       *next = '\0';
-  
+
    /*
     * Support some meta-types to make it easier to write the test file.
     */
 
     if (!strcmp(of_type, "text"))
-      match = value_tag == IPP_TAG_TEXTLANG || value_tag == IPP_TAG_TEXT;            
+      match = value_tag == IPP_TAG_TEXTLANG || value_tag == IPP_TAG_TEXT;
     else if (!strcmp(of_type, "name"))
-      match = value_tag == IPP_TAG_NAMELANG || value_tag == IPP_TAG_NAME;    
+      match = value_tag == IPP_TAG_NAMELANG || value_tag == IPP_TAG_NAME;
     else if (!strcmp(of_type, "collection"))
-      match = value_tag == IPP_TAG_BEGIN_COLLECTION;   
+      match = value_tag == IPP_TAG_BEGIN_COLLECTION;
     else
       match = value_tag == ippTagValue(of_type);
 
@@ -2474,7 +2474,7 @@ get_token(FILE *fp,			/* I  - File to read from */
         ungetc(ch, fp);
       else if (ch == '\n')
         (*linenum) ++;
-        
+
       *bufptr = '\0';
 
       return (buf);

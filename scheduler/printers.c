@@ -326,6 +326,9 @@ cupsdCreateCommonData(void)
 		  IPP_DISABLE_PRINTER,
 		  IPP_HOLD_NEW_JOBS,
 		  IPP_RELEASE_HELD_NEW_JOBS,
+		  IPP_CANCEL_JOBS,
+		  IPP_CANCEL_MY_JOBS,
+		  IPP_CLOSE_JOB,
 		  CUPS_GET_DEFAULT,
 		  CUPS_GET_PRINTERS,
 		  CUPS_ADD_PRINTER,
@@ -496,6 +499,9 @@ cupsdCreateCommonData(void)
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
 		NULL, holds);
+
+  /* job-ids-supported */
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "job-ids-supported", 1);
 
   /* job-priority-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,

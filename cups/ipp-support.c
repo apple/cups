@@ -92,26 +92,43 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 static char	* const ipp_std_ops[] =
 		{
 		  /* 0x0000 - 0x000f */
-		  "", "", "Print-Job", "Print-URI",
-		  "Validate-Job", "Create-Job", "Send-Document",
-		  "Send-URI", "Cancel-Job", "Get-Job-Attributes",
-		  "Get-Jobs", "Get-Printer-Attributes",
-		  "Hold-Job", "Release-Job", "Restart-Job", "",
+		  "unknown-00",
+		  "unknown-01",
+		  "Print-Job",
+		  "Print-URI",
+		  "Validate-Job",
+		  "Create-Job",
+		  "Send-Document",
+		  "Send-URI",
+		  "Cancel-Job",
+		  "Get-Job-Attributes",
+		  "Get-Jobs",
+		  "Get-Printer-Attributes",
+		  "Hold-Job",
+		  "Release-Job",
+		  "Restart-Job",
+		  "unknown-0f",
 
 		  /* 0x0010 - 0x001f */
-		  "Pause-Printer", "Resume-Printer",
-		  "Purge-Jobs", "Set-Printer-Attributes",
+		  "Pause-Printer",
+		  "Resume-Printer",
+		  "Purge-Jobs",
+		  "Set-Printer-Attributes",
 		  "Set-Job-Attributes",
 		  "Get-Printer-Supported-Values",
 		  "Create-Printer-Subscription",
 		  "Create-Job-Subscription",
 		  "Get-Subscription-Attributes",
-		  "Get-Subscriptions", "Renew-Subscription",
-		  "Cancel-Subscription", "Get-Notifications",
-		  "Send-Notifications", "", "",
+		  "Get-Subscriptions",
+		  "Renew-Subscription",
+		  "Cancel-Subscription",
+		  "Get-Notifications",
+		  "Send-Notifications",
+		  "unknown-1e",
+		  "unknown-1f",
 
 		  /* 0x0020 - 0x002f */
-		  "",
+		  "unknown-20",
 		  "Get-Printer-Support-Files",
 		  "Enable-Printer",
 		  "Disable-Printer",
@@ -128,9 +145,19 @@ static char	* const ipp_std_ops[] =
 		  "Suspend-Current-Job",
 		  "Resume-Job",
 
-		  /* 0x0030 - 0x0031 */
+		  /* 0x0030 - 0x003b */
 		  "Promote-Job",
-		  "Schedule-Job-After"
+		  "Schedule-Job-After",
+		  "unknown-32",
+		  "Cancel-Document",
+		  "Get-Document-Attributes",
+		  "Get-Documents",
+		  "Delete-Document",
+		  "Set-Document-Attributes",
+		  "Cancel-Jobs",
+		  "Cancel-My-Jobs",
+		  "Resubmit-Job",
+		  "Close-Job"
 		},
 		* const ipp_cups_ops[] =
 		{
@@ -325,7 +352,7 @@ ippOpString(ipp_op_t op)		/* I - Operation ID */
   * See if the operation ID is a known value...
   */
 
-  if (op >= IPP_PRINT_JOB && op <= IPP_SCHEDULE_JOB_AFTER)
+  if (op >= IPP_PRINT_JOB && op <= IPP_CLOSE_JOB)
     return (ipp_std_ops[op]);
   else if (op == IPP_PRIVATE)
     return ("windows-ext");

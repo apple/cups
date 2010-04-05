@@ -1172,7 +1172,8 @@ cupsdReadConfiguration(void)
 		      "Set-Job-Attributes Create-Job-Subscription "
 		      "Renew-Subscription Cancel-Subscription "
 		      "Get-Notifications Reprocess-Job Cancel-Current-Job "
-		      "Suspend-Current-Job Resume-Job CUPS-Move-Job "
+		      "Suspend-Current-Job Resume-Job Cancel-Jobs "
+		      "Cancel-My-Jobs Close-Job CUPS-Move-Job "
 		      "CUPS-Authenticate-Job CUPS-Get-Document>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
 
@@ -1199,6 +1200,9 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOBS);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_MY_JOBS);
+      cupsdAddPolicyOp(p, po, IPP_CLOSE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_AUTHENTICATE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_GET_DOCUMENT);
@@ -3678,9 +3682,67 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                linenum);
 
      /*
-      * Verify that we have an explicit policy for CUPS-Get-Document
-      * (ensures that upgrades do not introduce new security issues...)
+      * Verify that we have an explicit policy for Cancel-Jobs, Cancel-My-Jobs,
+      * Close-Job, and CUPS-Get-Document (ensures that upgrades do not
+      * introduce new security issues...)
       */
+
+      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
+      {
+        if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOB)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
+	{
+	 /*
+	  * Add a new limit for Cancel-Jobs using the Cancel-Job limit as a
+	  * template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for Cancel-Jobs defined in policy %s "
+			  "- using Cancel-Job's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
+	}
+      }
+
+      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
+      {
+        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
+	{
+	 /*
+	  * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
+	  * a template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for Cancel-My-Jobs defined in policy %s "
+			  "- using Send-Document's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
+	}
+      }
+
+      if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
+      {
+        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
+	{
+	 /*
+	  * Add a new limit for Close-Job using the Send-Document limit as a
+	  * template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for Close-Job defined in policy %s "
+			  "- using Send-Document's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
+	}
+      }
 
       if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
           op->op == IPP_ANY_OPERATION)
