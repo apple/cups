@@ -362,10 +362,10 @@ cupsdCreateCommonData(void)
   static const char * const media_col_supported[] =
 		{			/* media-col-supported values */
 		  "media-bottom-margin",
-		  "media-color",
 		  "media-left-margin",
 		  "media-right-margin",
 		  "media-size",
+		  "media-source",
 		  "media-top-margin",
 		  "media-type"
 		};
@@ -446,6 +446,18 @@ cupsdCreateCommonData(void)
 		  "printer-info",
 		  "printer-location"
 	        };
+  static const char * const which_jobs[] =
+  {					/* which-jobs-supported values */
+    "completed",
+    "not-completed",
+    "aborted",
+    "all",
+    "canceled",
+    "pending",
+    "pending-held",
+    "processing",
+    "processing-stopped"
+  };
 
 
   if (CommonData)
@@ -667,6 +679,11 @@ cupsdCreateCommonData(void)
   /* server-is-sharing-printers */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "server-is-sharing-printers",
                 BrowseLocalProtocols != 0 && Browsing);
+
+  /* which-jobs-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "which-jobs-supported",
+                sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 }
 
 

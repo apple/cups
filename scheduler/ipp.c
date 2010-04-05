@@ -7123,7 +7123,8 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
-  int		completed;		/* Completed jobs? */
+  int		job_comparison;		/* Job comparison */
+  ipp_jstate_t	job_state;		/* job-state value */
   int		first_job_id;		/* First job ID */
   int		limit;			/* Maximum number of jobs to return */
   int		count;			/* Number of jobs that match */
@@ -7222,25 +7223,68 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
                     "which-jobs");
     return;
   }
-  else if (attr && !strcmp(attr->values[0].string.text, "completed"))
+  else if (!attr || !strcmp(attr->values[0].string.text, "not-completed"))
   {
-    completed = 1;
-    list      = Jobs;
+    job_comparison = -1;
+    job_state      = IPP_JOB_STOPPED;
+    list           = Jobs;
   }
-  else if (attr && !strcmp(attr->values[0].string.text, "all"))
+  else if (!strcmp(attr->values[0].string.text, "completed"))
   {
-    completed = 0;
-    list      = Jobs;
+    job_comparison = 1;
+    job_state      = IPP_JOB_CANCELED;
+    list           = Jobs;
   }
-  else if (attr && !strcmp(attr->values[0].string.text, "processing"))
+  else if (!strcmp(attr->values[0].string.text, "aborted"))
   {
-    completed = 0;
-    list      = PrintingJobs;
+    job_comparison = 0;
+    job_state      = IPP_JOB_ABORTED;
+    list           = Jobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "all"))
+  {
+    job_comparison = 1;
+    job_state      = IPP_JOB_PENDING;
+    list           = Jobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "canceled"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_CANCELED;
+    list           = Jobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "pending"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_PENDING;
+    list           = ActiveJobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "pending-held"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_HELD;
+    list           = ActiveJobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "processing"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_PROCESSING;
+    list           = PrintingJobs;
+  }
+  else if (!strcmp(attr->values[0].string.text, "processing-stopped"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_STOPPED;
+    list           = ActiveJobs;
   }
   else
   {
-    completed = 0;
-    list      = ActiveJobs;
+    send_ipp_status(con, IPP_ATTRIBUTES,
+                    _("The which-jobs value \"%s\" is not supported."),
+		    attr->values[0].string.text);
+    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+                 "which-jobs", NULL, attr->values[0].string.text);
+    return;
   }
 
  /*
@@ -7343,9 +7387,6 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 	continue;
       }
 
-      if (username[0] && strcasecmp(username, job->username))
-	continue;
-
       if (i > 0)
 	ippAddSeparator(con->response);
 
@@ -7379,7 +7420,10 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
       if ((job->dtype & dmask) != dtype &&
 	  (!job->printer || (job->printer->type & dmask) != dtype))
 	continue;
-      if (completed && job->state_value <= IPP_JOB_STOPPED)
+
+      if ((job_comparison < 0 && job->state->values[0].integer > job_state) ||
+          (job_comparison == 0 && job->state->values[0].integer != job_state) ||
+          (job_comparison > 0 && job->state->values[0].integer < job_state))
 	continue;
 
       if (job->id < first_job_id)
