@@ -4478,14 +4478,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
            i < resolution->num_choices;
 	   i ++, choice ++)
       {
-        xdpi = (int)strtol(choice->choice, (char **)&resptr, 10);
-	if (resptr > choice->choice && xdpi > 0)
-	{
-	  if (*resptr == 'x')
-	    ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
-	  else
-	    ydpi = xdpi;
-        }
+        xdpi = ydpi = (int)strtol(choice->choice, (char **)&resptr, 10);
+	if (resptr > choice->choice && xdpi > 0 && *resptr == 'x')
+	  ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
 
 	if (xdpi <= 0 || ydpi <= 0)
 	{
