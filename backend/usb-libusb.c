@@ -31,7 +31,7 @@
 
 #include <usb.h>
 #include <poll.h>
-#include <cups/globals.h>
+#include <cups/cups-private.h>
 
 
 /*
