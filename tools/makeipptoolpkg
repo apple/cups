@@ -43,7 +43,7 @@ fi
 echo Creating package directory...
 pkgdir="ipptool-$fileversion"
 
-test -d $pkgdir && rm -r $pkgdir || exit 1
+test -d $pkgdir && rm -r $pkgdir
 mkdir $pkgdir || exit 1
 
 echo Copying package files
@@ -57,8 +57,9 @@ cp test/testfile.* $pkgdir
 if test `uname` = Darwin; then
 	echo Creating disk image...
 	pkgfile="$pkgdir.dmg"
-	test -f $pkgfile && rm $pkgfile || exit 1
-	hdiutil create -srcfolder $pkgdir $pkgfile || exit 1
+	test -f $pkgfile && rm $pkgfile
+	hdiutil create -srcfolder $pkgdir $pkgfile
+	#sudo chown `whoami` $pkgfile
 else
 	echo Creating archive...
 	pkgfile="$pkgdir.tar.gz"
@@ -72,7 +73,7 @@ elif test -x /sbin/md5; then
 fi
 
 echo Removing temporary files...
-#rm -r $pkgdir
+rm -r $pkgdir
 
 echo "Done!"
 
