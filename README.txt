@@ -1,5 +1,5 @@
-README - CUPS v1.4.0 - 2009-06-26
----------------------------------
+README - CUPS v1.5svn - 2010-04-07
+----------------------------------
 
 Looking for compile instructions?  Read the file "INSTALL.txt"
 instead...
@@ -150,7 +150,7 @@ PRINTING FILES
 
 LEGAL STUFF
 
-    CUPS is Copyright 2007-2009 by Apple Inc.  CUPS and the CUPS logo are
+    CUPS is Copyright 2007-2010 by Apple Inc.  CUPS and the CUPS logo are
     trademarks of Apple Inc.
 
     The MD5 Digest code is Copyright 1999 Aladdin Enterprises.

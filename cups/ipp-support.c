@@ -272,7 +272,7 @@ static const char * const job_states[] =
   "pending",
   "pending-held",
   "processing",
-  "processing-stopped"
+  "processing-stopped",
   "canceled",
   "aborted",
   "completed"
