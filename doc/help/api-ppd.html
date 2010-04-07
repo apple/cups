@@ -1805,6 +1805,7 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 &nbsp;&nbsp;&nbsp;&nbsp;char *product;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_profile_t">ppd_profile_t</a> *profiles;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *protocols;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *pwg;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *shortnickname;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_size_t">ppd_size_t</a> *sizes;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int throughput;<br>
@@ -1887,6 +1888,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">sRGB color profiles </dd>
 <dt>protocols <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">Protocols (BCP, TBCP) string </dd>
+<dt>pwg </dt>
+<dd class="description">PWG to/from PPD mappings</dd>
 <dt>shortnickname </dt>
 <dd class="description">Short version of nickname</dd>
 <dt>sizes </dt>
@@ -2154,6 +2157,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Bad OrderDependency</dd>
 <dt>PPD_BAD_UI_CONSTRAINTS </dt>
 <dd class="description">Bad UIConstraints</dd>
+<dt>PPD_BAD_VALUE </dt>
+<dd class="description">Bad value string</dd>
 <dt>PPD_FILE_OPEN_ERROR </dt>
 <dd class="description">Unable to open PPD file</dd>
 <dt>PPD_ILLEGAL_CHARACTER </dt>
@@ -2172,6 +2177,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Line longer than 255 chars</dd>
 <dt>PPD_MISSING_ASTERISK </dt>
 <dd class="description">Missing asterisk in column 0</dd>
+<dt>PPD_MISSING_OPTION_KEYWORD </dt>
+<dd class="description">Missing option keyword</dd>
 <dt>PPD_MISSING_PPDADOBE4 </dt>
 <dd class="description">Missing PPD-Adobe-4.x header</dd>
 <dt>PPD_MISSING_VALUE </dt>
