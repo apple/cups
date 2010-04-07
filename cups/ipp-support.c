@@ -16,6 +16,7 @@
  *
  * Contents:
  *
+ *   _ippAttrString() - Convert the attribute's value to a string.
  *   ippErrorString() - Return a name for the given status code.
  *   ippErrorValue()  - Return a status code for the given name.
  *   ippOpString()    - Return a name for the given operation id.
@@ -24,6 +25,7 @@
  *   ippSetPort()     - Set the default port number.
  *   ippTagString()   - Return the tag name corresponding to a tag value.
  *   ippTagValue()    - Return the tag value corresponding to a tag name.
+ *   ipp_col_string() - Convert a collection to a string.
  */
 
 /*
@@ -265,6 +267,244 @@ static char	* const ipp_std_ops[] =
 		  "mimeMediaType",	/* 0x49 */
 		  "memberAttrName"	/* 0x4a */
 		};
+static const char * const job_states[] =
+{					/* job-state enums */
+  "pending",
+  "pending-held",
+  "processing",
+  "processing-stopped"
+  "canceled",
+  "aborted",
+  "completed"
+};
+static const char * const printer_states[] =
+{					/* printer-state enums */
+  "idle",
+  "processing",
+  "stopped",
+};
+
+
+/*
+ * Local functions...
+ */
+
+static size_t	ipp_col_string(ipp_t *col, char *buffer, size_t bufsize);
+
+
+/*
+ * '_ippAttrString()' - Convert the attribute's value to a string.
+ *
+ * Returns the number of bytes that would be written, not including the
+ * trailing nul. The buffer pointer can be NULL to get the required length,
+ * just like (v)snprintf.
+ */
+
+size_t					/* O - Number of bytes less nul */
+_ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
+               char            *buffer,	/* I - String buffer or NULL */
+               size_t          bufsize)	/* I - Size of string buffer */
+{
+  int		i;			/* Looping var */
+  char		*bufptr,		/* Pointer into buffer */
+		*bufend,		/* End of buffer */
+		temp[256];		/* Temporary string */
+  const char	*ptr;			/* Pointer into string */
+  ipp_value_t	*val;			/* Current value */
+
+
+  if (!attr || !attr->name)
+  {
+    if (buffer)
+      *buffer = '\0';
+
+    return (0);
+  }
+
+  bufptr = buffer;
+  if (buffer)
+    bufend = buffer + bufsize - 1;
+  else
+    bufend = NULL;
+
+  for (i = attr->num_values, val = attr->values; i > 0; i --, val ++)
+  {
+    if (val > attr->values)
+    {
+      if (bufptr < bufend)
+        *bufptr++ = ',';
+      else
+        bufptr ++;
+    }
+
+    switch (attr->value_tag)
+    {
+      case IPP_TAG_ENUM :
+          if (!strcmp(attr->name, "printer-state") &&
+              val->integer >= IPP_PRINTER_IDLE &&
+              val->integer <= IPP_PRINTER_STOPPED)
+          {
+            ptr = printer_states[val->integer - IPP_PRINTER_IDLE];
+
+            if (bufptr < bufend)
+              strlcpy(bufptr, ptr, bufend - bufptr + 1);
+
+            bufptr += strlen(ptr);
+            break;
+          }
+          else if (!strcmp(attr->name, "job-state") &&
+		   val->integer >= IPP_JOB_PENDING &&
+		   val->integer <= IPP_JOB_COMPLETED)
+          {
+            ptr = job_states[val->integer - IPP_JOB_PENDING];
+
+            if (bufptr < bufend)
+              strlcpy(bufptr, ptr, bufend - bufptr + 1);
+
+            bufptr += strlen(ptr);
+            break;
+          }
+
+      case IPP_TAG_INTEGER :
+          if (bufptr < bufend)
+            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d", val->integer);
+          else
+            bufptr += snprintf(temp, sizeof(temp), "%d", val->integer);
+          break;
+
+      case IPP_TAG_BOOLEAN :
+          if (bufptr < bufend)
+            strlcpy(bufptr, val->boolean ? "true" : "false",
+                    bufend - bufptr + 1);
+
+          bufptr += val->boolean ? 4 : 5;
+          break;
+
+      case IPP_TAG_RANGE :
+          if (bufptr < bufend)
+            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d-%d",
+                               val->range.lower, val->range.upper);
+          else
+            bufptr += snprintf(temp, sizeof(temp), "%d-%d", val->range.lower,
+                               val->range.upper);
+          break;
+
+      case IPP_TAG_RESOLUTION :
+          if (bufptr < bufend)
+            bufptr += snprintf(bufptr, bufend - bufptr + 1, "%dx%d%s",
+                               val->resolution.xres, val->resolution.yres,
+                               val->resolution.units == IPP_RES_PER_INCH ?
+                                   "dpi" : "dpc");
+          else
+            bufptr += snprintf(temp, sizeof(temp), "%dx%d%s",
+                               val->resolution.xres, val->resolution.yres,
+                               val->resolution.units == IPP_RES_PER_INCH ?
+                                   "dpi" : "dpc");
+          break;
+
+      case IPP_TAG_DATE :
+          {
+            unsigned year;		/* Year */
+
+            year = (val->date[0] << 8) + val->date[1];
+
+	    if (val->date[9] == 0 && val->date[10] == 0)
+	      snprintf(temp, sizeof(temp), "%04u-%02u-%02uT%02u:%02u:%02uZ",
+		       year, val->date[2], val->date[3], val->date[4],
+		       val->date[5], val->date[6]);
+	    else
+	      snprintf(temp, sizeof(temp),
+	               "%04u-%02u-%02uT%02u:%02u:%02u%c%02u%02u",
+		       year, val->date[2], val->date[3], val->date[4],
+		       val->date[5], val->date[6], val->date[8], val->date[9],
+		       val->date[10]);
+
+            if (bufptr < bufend)
+              strlcpy(bufptr, temp, bufend - bufptr + 1);
+
+            bufptr += strlen(temp);
+          }
+          break;
+
+      case IPP_TAG_TEXT :
+      case IPP_TAG_NAME :
+      case IPP_TAG_KEYWORD :
+      case IPP_TAG_CHARSET :
+      case IPP_TAG_URI :
+      case IPP_TAG_MIMETYPE :
+      case IPP_TAG_LANGUAGE :
+      case IPP_TAG_TEXTLANG :
+      case IPP_TAG_NAMELANG :
+          for (ptr = val->string.text; *ptr; ptr ++)
+          {
+            if (*ptr == '\\' || *ptr == '\"')
+            {
+              if (bufptr < bufend)
+                *bufptr = '\\';
+              bufptr ++;
+            }
+
+            if (bufptr < bufend)
+              *bufptr = *ptr;
+            bufptr ++;
+          }
+          break;
+
+      case IPP_TAG_BEGIN_COLLECTION :
+          if (bufptr < bufend)
+            bufptr += ipp_col_string(val->collection, bufptr,
+                                     bufend - bufptr + 1);
+          else
+            bufptr += ipp_col_string(val->collection, NULL, 0);
+          break;
+
+      case IPP_TAG_STRING :
+          for (ptr = val->string.text; *ptr; ptr ++)
+          {
+            if (*ptr == '\\' || isspace(*ptr & 255))
+            {
+              if (bufptr < bufend)
+                *bufptr = '\\';
+              bufptr ++;
+
+              if (bufptr < bufend)
+                *bufptr = *ptr;
+              bufptr ++;
+            }
+            else if (!isprint(*ptr & 255))
+            {
+              if (bufptr < bufend)
+                bufptr += snprintf(bufptr, bufend - bufptr + 1, "\\%03o",
+                                   *ptr & 255);
+              else
+                bufptr += snprintf(temp, sizeof(temp), "\\%03o",
+                                   *ptr & 255);
+            }
+            else
+            {
+              if (bufptr < bufend)
+                *bufptr = *ptr;
+              bufptr ++;
+            }
+          }
+          break;
+
+      default :
+          ptr = ippTagString(attr->value_tag);
+          if (bufptr < bufend)
+            strlcpy(bufptr, ptr, bufend - bufptr + 1);
+          bufptr += strlen(ptr);
+          break;
+    }
+  }
+
+  if (bufptr < bufend)
+    *bufptr = '\0';
+  else if (bufend)
+    *bufend = '\0';
+
+  return (bufptr - buffer);
+}
 
 
 /*
@@ -504,6 +744,52 @@ ippTagValue(const char *name)		/* I - Tag name */
     return (IPP_TAG_BEGIN_COLLECTION);
   else
     return (IPP_TAG_ZERO);
+}
+
+
+/*
+ * 'ipp_col_string()' - Convert a collection to a string.
+ */
+
+static size_t				/* O - Number of bytes */
+ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
+               char   *buffer,		/* I - Buffer or NULL */
+               size_t bufsize)		/* I - Size of buffer */
+{
+  char			*bufptr,	/* Position in buffer */
+			*bufend,	/* End of buffer */
+			temp[256];	/* Temporary string */
+  ipp_attribute_t	*attr;		/* Current member attribute */
+
+
+  bufptr = buffer;
+  bufend = buffer + bufsize - 1;
+
+  if (bufptr < bufend)
+    *bufptr = '{';
+  bufptr ++;
+
+  for (attr = col->attrs; attr; attr = attr->next)
+  {
+    if (!attr->name)
+      continue;
+
+    if (bufptr < bufend)
+      bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
+    else
+      bufptr += snprintf(temp, sizeof(temp), "%s=", attr->name);
+
+    if (bufptr < bufend)
+      bufptr += _ippAttrString(attr, bufptr, bufend - bufptr + 1);
+    else
+      bufptr += _ippAttrString(attr, temp, sizeof(temp));
+  }
+
+  if (bufptr < bufend)
+    *bufptr = '}';
+  bufptr ++;
+
+  return (bufptr - buffer);
 }
 
 

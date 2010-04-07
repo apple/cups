@@ -71,6 +71,8 @@ HELPFILES	=	\
 			help/man-cupstestppd.html \
 			help/man-drv.html \
 			help/man-filter.html \
+			help/man-ipptool.html \
+			help/man-ipptoolfile.html \
 			help/man-lp.html \
 			help/man-lpadmin.html \
 			help/man-lpc.html \

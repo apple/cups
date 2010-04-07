@@ -21,6 +21,9 @@ include ../Makedefs
 #
 
 TESTFILES	=	\
+			create-printer-subscription.test \
+			get-completed-jobs.test \
+			get-jobs.test \
 			ipp-1.1.test \
 			ipp-2.0.test \
 			ipp-2.1.test \
@@ -34,7 +37,7 @@ TESTFILES	=	\
 # Make all targets...
 #
 
-all:	ipptest ipptest-static
+all:	ipptool ipptool-static
 
 
 #
@@ -56,7 +59,7 @@ unittests:
 #
 
 clean:
-	$(RM) ipptest ipptest.o ipptest-static
+	$(RM) ipptool ipptool.o ipptool-static
 
 
 #
@@ -64,7 +67,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies ipptest.c >/dev/null 2>&1
+	makedepend -Y -I.. -fDependencies ipptool.c >/dev/null 2>&1
 
 
 #
@@ -79,10 +82,10 @@ install:	all install-data install-headers install-libs install-exec
 #
 
 install-data:
-	echo Installing sample ipptest files in $(DATADIR)/ipptest...
-	$(INSTALL_DIR) -m 755 $(DATADIR)/ipptest
+	echo Installing sample ipptool files in $(DATADIR)/ipptool...
+	$(INSTALL_DIR) -m 755 $(DATADIR)/ipptool
 	for file in $(TESTFILES); do \
-		$(INSTALL_DATA) $$file $(DATADIR)/ipptest; \
+		$(INSTALL_DATA) $$file $(DATADIR)/ipptool; \
 	done
 
 
@@ -91,12 +94,12 @@ install-data:
 #
 
 install-exec:
-	echo Installing ipptest in $(BINDIR)...
+	echo Installing ipptool in $(BINDIR)...
 	$(INSTALL_DIR) -m 755 $(BINDIR)
-	$(INSTALL_BIN) ipptest $(BINDIR)
+	$(INSTALL_BIN) ipptool $(BINDIR)
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		cp ipptest $(SYMROOT); \
+		cp ipptool $(SYMROOT); \
 	fi
 
 
@@ -122,21 +125,21 @@ uninstall:
 
 
 #
-# ipptest
+# ipptool
 #
 
-ipptest:	ipptest.o ../cups/$(LIBCUPS)
+ipptool:	ipptool.o ../cups/$(LIBCUPS)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ipptest.o $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ ipptool.o $(LIBS)
 
 
 #
-# ipptest-static
+# ipptool-static
 #
 
-ipptest-static:	ipptest.o ../cups/$(LIBCUPSSTATIC)
+ipptool-static:	ipptool.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
-	$(CC) $(LDFLAGS) -o $@ ipptest.o  ../cups/$(LIBCUPSSTATIC) \
+	$(CC) $(LDFLAGS) -o $@ ipptool.o  ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

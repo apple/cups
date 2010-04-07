@@ -1,36 +1,49 @@
 #
-# "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
+# "$Id$"
 #
-#   Verify that the CUPS subscription operations work.
+#   Create a printer subscription.
 #
+#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2001-2006 by Easy Software Products. All rights reserved.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+# Usage:
+#
+#   ./ipptool -d recipient=uri printer-uri create-printer-subscription.test
+#
+
+
 {
 	# The name of the test...
-	NAME "Add Printer Subscription w/Lease"
+	NAME "Create a printer subscription"
 
 	# The operation to use
 	OPERATION Create-Printer-Subscription
-	RESOURCE /
 
 	# The attributes to send
-	GROUP operation
+	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 
-        GROUP subscription
-	ATTR uri notify-recipient testnotify://nowait
+        GROUP subscription-attributes-tag
+	ATTR uri notify-recipient $recipient
 	ATTR keyword notify-events printer-state-changed
 
 	# What statuses are OK?
 	STATUS successful-ok
 
 	# What attributes do we expect?
-	EXPECT attributes-charset
-	EXPECT attributes-natural-language
-	EXPECT notify-subscription-id
+	EXPECT notify-subscription-id OF-TYPE integer WITH-VALUE >0
 	DISPLAY notify-subscription-id
 }
 
+
 #
-# End of "$Id: 4.4-subscription-ops.test 4840 2005-11-14 21:53:30Z mike $"
+# End of "$Id$"
 #
