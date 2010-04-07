@@ -48,21 +48,22 @@ mkdir $pkgdir || exit 1
 
 echo Copying package files
 cp IPPTOOL.txt LICENSE.txt $pkgdir
+cp doc/help/man-ipptool*.html $pkgdir
 cp test/create-printer-subscription.test $pkgdir
 cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
-cp test/ipp-*.test $pkgdir
+cp test/ipp-[12].*.test $pkgdir
 cp test/ipptool-static $pkgdir/ipptool
 cp test/testfile.* $pkgdir
 
 if test `uname` = Darwin; then
 	echo Creating disk image...
-	pkgfile="$pkgdir.dmg"
+	pkgfile="$pkgdir-macosx-universal.dmg"
 	test -f $pkgfile && rm $pkgfile
 	hdiutil create -srcfolder $pkgdir $pkgfile
 	#sudo chown `whoami` $pkgfile
 else
 	echo Creating archive...
-	pkgfile="$pkgdir.tar.gz"
+	pkgfile="$pkgdir-`uname`-`uname -m`.tar.gz"
 	tar czf $pkgfile $pkgdir || exit 1
 fi
 
