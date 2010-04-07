@@ -24,7 +24,9 @@
  * Include necessary headers...
  */
 
-#  include <cups/cups.h>
+#  include "cups.h"
+#  include "ppd.h"
+
 
 #  ifdef __cplusplus
 extern "C" {

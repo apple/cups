@@ -1,9 +1,9 @@
 /*
  * "$Id: cups.h 8781 2009-08-28 17:34:54Z mike $"
  *
- *   API definitions for the Common UNIX Printing System (CUPS).
+ *   API definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -29,8 +29,8 @@
 typedef off_t ssize_t;			/* @private@ */
 #  endif /* WIN32 && !__CUPS_SSIZE_T_DEFINED */
 
+#  include "file.h"
 #  include "ipp.h"
-#  include "ppd.h"
 #  include "language.h"
 
 
@@ -212,8 +212,6 @@ extern void		cupsEncodeOptions(ipp_t *ipp, int num_options,
 extern void		cupsFreeOptions(int num_options, cups_option_t *options);
 extern const char	*cupsGetOption(const char *name, int num_options,
 			               cups_option_t *options);
-extern int		cupsMarkOptions(ppd_file_t *ppd, int num_options,
-			                cups_option_t *options);
 extern int		cupsParseOptions(const char *arg, int num_options,
 			                 cups_option_t **options);
 
@@ -289,10 +287,6 @@ extern int		cupsCreateJob(http_t *http, const char *name,
 				      cups_option_t *options) _CUPS_API_1_4;
 extern ipp_status_t	cupsFinishDocument(http_t *http,
 			                   const char *name) _CUPS_API_1_4;
-extern int		cupsGetConflicts(ppd_file_t *ppd, const char *option,
-					 const char *choice,
-					 cups_option_t **options)
-					     _CUPS_API_1_4;
 extern ipp_status_t	cupsGetDevices(http_t *http, int timeout,
 			               const char *include_schemes,
 			               const char *exclude_schemes,
@@ -310,11 +304,6 @@ extern ipp_t		*cupsGetResponse(http_t *http,
 			                 const char *resource) _CUPS_API_1_4;
 extern ssize_t		cupsReadResponseData(http_t *http, char *buffer,
 			                     size_t length) _CUPS_API_1_4;
-extern int		cupsResolveConflicts(ppd_file_t *ppd, const char *option,
-			                     const char *choice,
-					     int *num_options,
-					     cups_option_t **options)
-					     _CUPS_API_1_4;
 extern http_status_t	cupsSendRequest(http_t *http, ipp_t *request,
 			                const char *resource,
 					size_t length) _CUPS_API_1_4;

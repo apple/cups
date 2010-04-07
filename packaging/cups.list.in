@@ -349,7 +349,7 @@ d 0755 root sys $BINDIR -
 f 0555 root sys $BINDIR/cancel systemv/cancel
 f 0555 root sys $BINDIR/cupstestdsc systemv/cupstestdsc
 f 0555 root sys $BINDIR/cupstestppd systemv/cupstestppd
-f 0555 root sys $BINDIR/ipptest test/ipptest
+f 0555 root sys $BINDIR/ipptool test/ipptool
 f 0555 root sys $BINDIR/lp systemv/lp
 f 0555 root sys $BINDIR/lpoptions systemv/lpoptions
 f 0555 root sys $BINDIR/lppasswd systemv/lppasswd
@@ -515,9 +515,12 @@ f 0444 root sys $DATADIR/examples examples/*.drv
 d 0755 root sys $DATADIR/fonts -
 f 0444 root sys $DATADIR/fonts fonts/Monospace*
 
-d 0755 root sys $DATADIR/ipptest -
-f 0444 root sys $DATADIR/ipptest test/ipp-*.test
-f 0444 root sys $DATADIR/ipptest test/testfile.*
+d 0755 root sys $DATADIR/ipptool -
+f 0444 root sys $DATADIR/ipptool/create-printer-subscription.test test/create-printer-subscription.test
+f 0444 root sys $DATADIR/ipptool/get-completed-jobs.test test/get-completed-jobs.test
+f 0444 root sys $DATADIR/ipptool/get-jobs.test test/get-jobs.test
+f 0444 root sys $DATADIR/ipptool test/ipp-*.test
+f 0444 root sys $DATADIR/ipptool test/testfile.*
 
 d 0755 root sys $DATADIR/mime -
 f 0444 root sys $DATADIR/mime/mime.convs conf/mime.convs
@@ -701,7 +704,7 @@ d 0755 root sys $MANDIR/man7 -
 f 0444 root sys $MANDIR/man1/cancel.$MAN1EXT man/cancel.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestdsc.$MAN1EXT man/cupstestdsc.$MAN1EXT
 f 0444 root sys $MANDIR/man1/cupstestppd.$MAN1EXT man/cupstestppd.$MAN1EXT
-f 0444 root sys $MANDIR/man1/ipptest.$MAN1EXT man/ipptest.$MAN1EXT
+f 0444 root sys $MANDIR/man1/ipptool.$MAN1EXT man/ipptool.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpoptions.$MAN1EXT man/lpoptions.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lppasswd.$MAN1EXT man/lppasswd.$MAN1EXT
 f 0444 root sys $MANDIR/man1/lpq.$MAN1EXT man/lpq.$MAN1EXT
@@ -712,7 +715,7 @@ f 0444 root sys $MANDIR/man1/lp.$MAN1EXT man/lp.$MAN1EXT
 
 f 0444 root sys $MANDIR/man5/classes.conf.$MAN5EXT man/classes.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/cupsd.conf.$MAN5EXT man/cupsd.conf.$MAN5EXT
-f 0444 root sys $MANDIR/man5/ipp.test.$MAN5EXT man/ipp.test.$MAN5EXT
+f 0444 root sys $MANDIR/man5/ipptoolfile.$MAN5EXT man/ipptoolfile.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mailto.conf.$MAN5EXT man/mailto.conf.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.convs.$MAN5EXT man/mime.convs.$MAN5EXT
 f 0444 root sys $MANDIR/man5/mime.types.$MAN5EXT man/mime.types.$MAN5EXT

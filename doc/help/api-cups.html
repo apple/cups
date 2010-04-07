@@ -398,7 +398,7 @@ div.contents ul.subcontents li {
 <li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
 <li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
 <li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
-<li><a href="#cupsEncryption" title="Get the default encryption settings.">cupsEncryption</a></li>
+<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
 <li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
 <li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
 <li><a href="#cupsFreeJobs" title="Free memory used by job data.">cupsFreeJobs</a></li>
@@ -419,7 +419,7 @@ div.contents ul.subcontents li {
 server if it has changed.">cupsGetPPD3</a></li>
 <li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
 <li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
-callback.">cupsGetPassword2</a></li>
+password callback.">cupsGetPassword2</a></li>
 <li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
 <li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
 <li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
@@ -442,14 +442,14 @@ default server.">cupsPrintFiles</a></li>
 specified server.">cupsPrintFiles2</a></li>
 <li><a href="#cupsRemoveDest" title="Remove a destination from the destination list.">cupsRemoveDest</a></li>
 <li><a href="#cupsRemoveOption" title="Remove an option from an option array.">cupsRemoveOption</a></li>
-<li><a href="#cupsServer" title="Return the hostname/address of the default server.">cupsServer</a></li>
+<li><a href="#cupsServer" title="Return the hostname/address of the current server.">cupsServer</a></li>
 <li><a href="#cupsSetDefaultDest" title="Set the default destination.">cupsSetDefaultDest</a></li>
 <li><a href="#cupsSetDests" title="Save the list of destinations for the default server.">cupsSetDests</a></li>
 <li><a href="#cupsSetDests2" title="Save the list of destinations for the specified server.">cupsSetDests2</a></li>
 <li><a href="#cupsSetEncryption" title="Set the encryption preference.">cupsSetEncryption</a></li>
 <li><a href="#cupsSetPasswordCB" title="Set the password callback for CUPS.">cupsSetPasswordCB</a></li>
 <li><a href="#cupsSetPasswordCB2" title="Set the advanced password callback for CUPS.">cupsSetPasswordCB2</a></li>
-<li><a href="#cupsSetServer" title="Set the default server name.">cupsSetServer</a></li>
+<li><a href="#cupsSetServer" title="Set the default server name and port.">cupsSetServer</a></li>
 <li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
 <li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
 <li><a href="#cupsTempFd" title="Creates a temporary file.">cupsTempFd</a></li>
@@ -479,7 +479,7 @@ specified server.">cupsPrintFiles2</a></li>
 
   CUPS API introduction for the Common UNIX Printing System (CUPS).
 
-  Copyright 2007-2008 by Apple Inc.
+  Copyright 2007-2010 by Apple Inc.
   Copyright 1997-2006 by Easy Software Products, all rights reserved.
 
   These coded instructions, statements, and computer programs are the
@@ -558,12 +558,13 @@ instance will return the default instance for that destination.</p>
 </tr>
 <tr>
 	<td>"printer-is-accepting-jobs"</td>
-	<td>"1" if the destination is accepting new jobs, "0" if not.</td>
+	<td>"true" if the destination is accepting new jobs, "false" if
+	not.</td>
 </tr>
 <tr>
 	<td>"printer-is-shared"</td>
-	<td>"1" if the destination is being shared with other computers, "0" if
-	not.</td>
+	<td>"true" if the destination is being shared with other computers,
+	"false" if not.</td>
 </tr>
 <tr>
 	<td>"printer-location"</td>
@@ -1157,7 +1158,7 @@ instead.
 
 </p>
 <h3 class="function"><a name="cupsEncryption">cupsEncryption</a></h3>
-<p class="description">Get the default encryption settings.</p>
+<p class="description">Get the current encryption settings.</p>
 <p class="code">
 http_encryption_t cupsEncryption (void);</p>
 <h4 class="returnvalue">Return Value</h4>
@@ -1166,7 +1167,12 @@ http_encryption_t cupsEncryption (void);</p>
 <p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
 environment variable, then the ~/.cups/client.conf file, and finally the
 /etc/cups/client.conf file. If not set, the default is
-<code>HTTP_ENCRYPT_IF_REQUESTED</code>.</p>
+<code>HTTP_ENCRYPT_IF_REQUESTED</code>.<br>
+<br>
+Note: The current encryption setting is tracked separately for each thread
+in a program. Multi-threaded programs that override the setting via the
+<a href="#cupsSetEncryption"><code>cupsSetEncryption</code></a> function need to do so in each thread for the same
+setting to be used.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsFinishDocument">cupsFinishDocument</a></h3>
 <p class="description">Finish sending a document.</p>
 <p class="code">
@@ -1577,10 +1583,15 @@ const char *cupsGetPassword (<br>
 <p class="description">Password</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Uses the current password callback function. Returns <code>NULL</code> if the
-user does not provide a password.</p>
+user does not provide a password.<br>
+<br>
+Note: The current password callback function is tracked separately for each
+thread in a program. Multi-threaded programs that override the setting via
+the <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a> or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a> functions need to
+do so in each thread for the same function to be used.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsGetPassword2">cupsGetPassword2</a></h3>
 <p class="description">Get a password from the user using the advanced
-callback.</p>
+password callback.</p>
 <p class="code">
 const char *cupsGetPassword2 (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *prompt,<br>
@@ -1603,7 +1614,12 @@ const char *cupsGetPassword2 (<br>
 <p class="description">Password</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Uses the current password callback function. Returns <code>NULL</code> if the
-user does not provide a password.
+user does not provide a password.<br>
+<br>
+Note: The current password callback function is tracked separately for each
+thread in a program. Multi-threaded programs that override the setting via
+the <a href="#cupsSetPasswordCB"><code>cupsSetPasswordCB</code></a> or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a> functions need to
+do so in each thread for the same function to be used.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsGetPrinters">cupsGetPrinters</a></h3>
@@ -1941,14 +1957,24 @@ int cupsRemoveOption (<br>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New number of options</p>
 <h3 class="function"><a name="cupsServer">cupsServer</a></h3>
-<p class="description">Return the hostname/address of the default server.</p>
+<p class="description">Return the hostname/address of the current server.</p>
 <p class="code">
 const char *cupsServer (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Server name</p>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">The returned value can be a fully-qualified hostname, a numeric
-IPv4 or IPv6 address, or a domain socket pathname.</p>
+<p class="discussion">The default server comes from the CUPS_SERVER environment variable, then the
+~/.cups/client.conf file, and finally the /etc/cups/client.conf file. If not
+set, the default is the local system - either &quot;localhost&quot; or a domain socket
+path.<br>
+<br>
+The returned value can be a fully-qualified hostname, a numeric IPv4 or IPv6
+address, or a domain socket pathname.<br>
+<br>
+Note: The current server is tracked separately for each thread in a program.
+Multi-threaded programs that override the server via the
+<a href="#cupsSetServer"><code>cupsSetServer</code></a> function need to do so in each thread for the same
+server to be used.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span><a name="cupsSetDefaultDest">cupsSetDefaultDest</a></h3>
 <p class="description">Set the default destination.</p>
 <p class="code">
@@ -2021,6 +2047,15 @@ void cupsSetEncryption (<br>
 <dt>e</dt>
 <dd class="description">New encryption preference</dd>
 </dl>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">The default encryption setting comes from the CUPS_ENCRYPTION
+environment variable, then the ~/.cups/client.conf file, and finally the
+/etc/cups/client.conf file. If not set, the default is
+<code>HTTP_ENCRYPT_IF_REQUESTED</code>.<br>
+<br>
+Note: The current encryption setting is tracked separately for each thread
+in a program. Multi-threaded programs that override the setting need to do
+so in each thread for the same setting to be used.</p>
 <h3 class="function"><a name="cupsSetPasswordCB">cupsSetPasswordCB</a></h3>
 <p class="description">Set the password callback for CUPS.</p>
 <p class="code">
@@ -2033,7 +2068,14 @@ void cupsSetPasswordCB (<br>
 <dd class="description">Callback function</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback.</p>
+<p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback, which
+reads the password from the console. Programs should call either this
+function or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a>, as only one callback can be registered
+by a program per thread.<br>
+<br>
+Note: The current password callback is tracked separately for each thread
+in a program. Multi-threaded programs that override the callback need to do
+so in each thread for the same callback to be used.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsSetPasswordCB2">cupsSetPasswordCB2</a></h3>
 <p class="description">Set the advanced password callback for CUPS.</p>
 <p class="code">
@@ -2049,11 +2091,18 @@ void cupsSetPasswordCB2 (<br>
 <dd class="description">User data pointer</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback.
+<p class="discussion">Pass <code>NULL</code> to restore the default (console) password callback, which
+reads the password from the console. Programs should call either this
+function or <a href="#cupsSetPasswordCB2"><code>cupsSetPasswordCB2</code></a>, as only one callback can be registered
+by a program per thread.<br>
+<br>
+Note: The current password callback is tracked separately for each thread
+in a program. Multi-threaded programs that override the callback need to do
+so in each thread for the same callback to be used.
 
 </p>
 <h3 class="function"><a name="cupsSetServer">cupsSetServer</a></h3>
-<p class="description">Set the default server name.</p>
+<p class="description">Set the default server name and port.</p>
 <p class="code">
 void cupsSetServer (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *server<br>
@@ -2065,8 +2114,14 @@ void cupsSetServer (<br>
 </dl>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">The &quot;server&quot; string can be a fully-qualified hostname, a numeric
-IPv4 or IPv6 address, or a domain socket pathname. Pass <code>NULL</code> to
-restore the default server name.</p>
+IPv4 or IPv6 address, or a domain socket pathname. Hostnames and numeric IP
+addresses can be optionally followed by a colon and port number to override
+the default port 631, e.g. &quot;hostname:8631&quot;. Pass <code>NULL</code> to restore the
+default server name and port.<br>
+<br>
+Note: The current server is tracked separately for each thread in a program.
+Multi-threaded programs that override the server need to do so in each
+thread for the same server to be used.</p>
 <h3 class="function"><a name="cupsSetUser">cupsSetUser</a></h3>
 <p class="description">Set the default user name.</p>
 <p class="code">
@@ -2079,7 +2134,11 @@ void cupsSetUser (<br>
 <dd class="description">User name</dd>
 </dl>
 <h4 class="discussion">Discussion</h4>
-<p class="discussion">Pass <code>NULL</code> to restore the default user name.</p>
+<p class="discussion">Pass <code>NULL</code> to restore the default user name.<br>
+<br>
+Note: The current user name is tracked separately for each thread in a
+program. Multi-threaded programs that override the user name need to do so
+in each thread for the same user name to be used.</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.4/Mac OS X 10.6&nbsp;</span><a name="cupsStartDocument">cupsStartDocument</a></h3>
 <p class="description">Add a document to a job created with cupsCreateJob().</p>
 <p class="code">
@@ -2186,6 +2245,11 @@ The temporary file is opened for writing.
 const char *cupsUser (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">User name</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Note: The current user name is tracked separately for each thread in a
+program. Multi-threaded programs that override the user name with the
+<a href="#cupsSetUser"><code>cupsSetUser</code></a> function need to do so in each thread for the same user
+name to be used.</p>
 <h2 class="title"><a name="TYPES">Data Types</a></h2>
 <h3 class="typedef"><a name="cups_dest_t">cups_dest_t</a></h3>
 <p class="description">Destination</p>

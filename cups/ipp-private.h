@@ -66,9 +66,11 @@ typedef struct				/**** Attribute mapping data ****/
  * Prototypes for private functions...
  */
 
-extern ipp_attribute_t	*_ippAddAttr(ipp_t *, int);
+extern ipp_attribute_t	*_ippAddAttr(ipp_t *ipp, int num_values);
+extern size_t		_ippAttrString(ipp_attribute_t *attr, char *buffer,
+			               size_t bufsize);
 extern _ipp_option_t	*_ippFindOption(const char *name);
-extern void		_ippFreeAttr(ipp_attribute_t *);
+extern void		_ippFreeAttr(ipp_attribute_t *attr);
 
 
 /*

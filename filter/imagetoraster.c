@@ -1,9 +1,9 @@
 /*
  * "$Id: imagetoraster.c 7306 2008-02-15 00:52:38Z mike $"
  *
- *   Image file to raster filter for the Common UNIX Printing System (CUPS).
+ *   Image file to raster filter for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -39,7 +39,7 @@
 #include "image-private.h"
 #include <unistd.h>
 #include <math.h>
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 
 
 /*
@@ -658,7 +658,7 @@ main(int  argc,				/* I - Number of command-line arguments */
    /*
     * Scale the image as neccesary to match the desired pixels-per-inch.
     */
-    
+
     if (Orientation & 1)
     {
       xprint = (PageTop - PageBottom) / 72.0;

@@ -26,6 +26,7 @@
 
 #include "string-private.h"
 #include "cups.h"
+#include "ppd.h"
 #include <stdlib.h>
 
 
@@ -90,7 +91,7 @@ main(int  argc,				/* I - Number of command-line arguments */
              cupsLastErrorString());
       return (1);
     }
-              
+
     interval = atoi(argv[3]);
 
     if (cupsStartDocument(CUPS_HTTP_DEFAULT, argv[1], job_id, argv[2],

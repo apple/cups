@@ -584,7 +584,7 @@ httpFlush(http_t *http)			/* I - Connection to server */
 
   http->blocking = blocking;
 
-  if (http->state == oldstate && http->fd >= 0)
+  if (http->state == oldstate && http->state != HTTP_WAITING && http->fd >= 0)
   {
    /*
     * Didn't get the data back, so close the current connection.

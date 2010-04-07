@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -552,7 +552,7 @@ for file in 4*.test; do
 	echo "Performing $file..."
 	echo "" >>$strfile
 
-	./ipptest ipp://localhost:$port/printers $file | tee -a $strfile
+	./ipptool -t ipp://localhost:$port/printers $file | tee -a $strfile
 	status=$?
 
 	if test $status != 0; then

@@ -3,7 +3,7 @@
  *
  *   RFC file to HTML conversion program.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -23,7 +23,7 @@
  * Include necessary headers.
  */
 
-#include <cups/string.h>
+#include <cups/string-private.h>
 #include <stdlib.h>
 #include <cups/file.h>
 

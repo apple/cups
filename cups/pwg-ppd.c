@@ -71,7 +71,6 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 		ppd_name[PPD_MAX_NAME];	/* Normalized PPD name */
   const char	*pwg_name;		/* Standard PWG media name */
   _pwg_media_t	*pwg_media;		/* PWG media data */
-  struct lconv	*loc;			/* Locale conversion data */
 
 
   DEBUG_printf(("_pwgCreateWithPPD(ppd=%p)", ppd));
@@ -109,8 +108,6 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
                   ppd->num_sizes));
     goto create_error;
   }
-
-  loc = localeconv();
 
   for (i = ppd->num_sizes, pwg_size = pwg->sizes, ppd_size = ppd->sizes;
        i > 0;
@@ -233,29 +230,23 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
           !strcasecmp(choice->choice, "Default"))
         pwg_name = "auto";
       else if (!strcasecmp(choice->choice, "Cassette"))
-        pwg_name = "main-tray";
+        pwg_name = "main";
       else if (!strncasecmp(choice->choice, "Multipurpose", 12) ||
                !strcasecmp(choice->choice, "MP") ||
                !strcasecmp(choice->choice, "MPTray"))
-        pwg_name = "alternate-tray";
+        pwg_name = "alternate";
       else if (!strcasecmp(choice->choice, "LargeCapacity"))
-        pwg_name = "large-capacity-tray";
+        pwg_name = "large-capacity";
       else if (!strncasecmp(choice->choice, "Lower", 5))
-        pwg_name = "bottom-tray";
+        pwg_name = "bottom";
       else if (!strncasecmp(choice->choice, "Middle", 6))
-        pwg_name = "middle-tray";
+        pwg_name = "middle";
       else if (!strncasecmp(choice->choice, "Upper", 5))
-        pwg_name = "top-tray";
-      else if (!strcasecmp(choice->choice, "Rear"))
-        pwg_name = "rear-feed";
+        pwg_name = "top";
       else if (!strncasecmp(choice->choice, "Side", 4))
-        pwg_name = "side-feed";
-      else if (!strcasecmp(choice->choice, "Envelope"))
-        pwg_name = "envelope-feed";
-      else if (!strcasecmp(choice->choice, "Manual"))
-        pwg_name = "manual-feed";
+        pwg_name = "side";
       else if (!strcasecmp(choice->choice, "Roll") ||
-               !strcasecmp(choice->choice, "Roll"))
+               !strcasecmp(choice->choice, "Roll1"))
         pwg_name = "main-roll";
       else if (!strcasecmp(choice->choice, "Roll2"))
         pwg_name = "alternate-roll";
@@ -284,7 +275,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
                              sizeof(_pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
-                    "for MediaType.", input_slot->num_choices));
+                    "for MediaType.", media_type->num_choices));
       goto create_error;
     }
 
@@ -496,7 +487,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
     if (!_pwgInitSize(&jobsize, job, &margins_set))
       return (NULL);
-  }    
+  }
   else
   {
    /*
@@ -753,23 +744,23 @@ _pwgInputSlotForSource(
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {
-  if (strcasecmp(media_source, "main-tray"))
+  if (strcasecmp(media_source, "main"))
     strlcpy(name, "Cassette", namesize);
-  else if (strcasecmp(media_source, "alternate-tray"))
+  else if (strcasecmp(media_source, "alternate"))
     strlcpy(name, "Multipurpose", namesize);
-  else if (strcasecmp(media_source, "large-capacity-tray"))
+  else if (strcasecmp(media_source, "large-capacity"))
     strlcpy(name, "LargeCapacity", namesize);
-  else if (strcasecmp(media_source, "bottom-tray"))
+  else if (strcasecmp(media_source, "bottom"))
     strlcpy(name, "Lower", namesize);
-  else if (strcasecmp(media_source, "middle-tray"))
+  else if (strcasecmp(media_source, "middle"))
     strlcpy(name, "Middle", namesize);
-  else if (strcasecmp(media_source, "top-tray"))
+  else if (strcasecmp(media_source, "top"))
     strlcpy(name, "Upper", namesize);
-  else if (strcasecmp(media_source, "rear-feed"))
+  else if (strcasecmp(media_source, "rear"))
     strlcpy(name, "Rear", namesize);
-  else if (strcasecmp(media_source, "side-feed"))
+  else if (strcasecmp(media_source, "side"))
     strlcpy(name, "Side", namesize);
-  else if (strcasecmp(media_source, "envelope-feed"))
+  else if (strcasecmp(media_source, "envelope"))
     strlcpy(name, "Envelope", namesize);
   else if (strcasecmp(media_source, "main-roll"))
     strlcpy(name, "Roll", namesize);

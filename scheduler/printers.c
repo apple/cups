@@ -326,6 +326,9 @@ cupsdCreateCommonData(void)
 		  IPP_DISABLE_PRINTER,
 		  IPP_HOLD_NEW_JOBS,
 		  IPP_RELEASE_HELD_NEW_JOBS,
+		  IPP_CANCEL_JOBS,
+		  IPP_CANCEL_MY_JOBS,
+		  IPP_CLOSE_JOB,
 		  CUPS_GET_DEFAULT,
 		  CUPS_GET_PRINTERS,
 		  CUPS_ADD_PRINTER,
@@ -359,10 +362,10 @@ cupsdCreateCommonData(void)
   static const char * const media_col_supported[] =
 		{			/* media-col-supported values */
 		  "media-bottom-margin",
-		  "media-color",
 		  "media-left-margin",
 		  "media-right-margin",
 		  "media-size",
+		  "media-source",
 		  "media-top-margin",
 		  "media-type"
 		};
@@ -443,6 +446,18 @@ cupsdCreateCommonData(void)
 		  "printer-info",
 		  "printer-location"
 	        };
+  static const char * const which_jobs[] =
+  {					/* which-jobs-supported values */
+    "completed",
+    "not-completed",
+    "aborted",
+    "all",
+    "canceled",
+    "pending",
+    "pending-held",
+    "processing",
+    "processing-stopped"
+  };
 
 
   if (CommonData)
@@ -496,6 +511,9 @@ cupsdCreateCommonData(void)
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "job-hold-until-supported", sizeof(holds) / sizeof(holds[0]),
 		NULL, holds);
+
+  /* job-ids-supported */
+  ippAddBoolean(CommonData, IPP_TAG_PRINTER, "job-ids-supported", 1);
 
   /* job-priority-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -661,6 +679,11 @@ cupsdCreateCommonData(void)
   /* server-is-sharing-printers */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "server-is-sharing-printers",
                 BrowseLocalProtocols != 0 && Browsing);
+
+  /* which-jobs-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "which-jobs-supported",
+                sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 }
 
 
@@ -4166,19 +4189,23 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       if (pwgsize)
       {
+        ipp_t	*col;			/* Collection value */
+
 	input_slot = ppdFindMarkedChoice(ppd, "InputSlot");
 	media_type = ppdFindMarkedChoice(ppd, "MediaType");
+	col        = new_media_col(pwgsize,
+			           input_slot ?
+				       _pwgGetSource(p->pwg,
+				                     input_slot->choice) :
+				       NULL,
+				   media_type ?
+				       _pwgGetType(p->pwg,
+				                   media_type->choice) :
+				   NULL);
 
 	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
-			 new_media_col(pwgsize,
-			               input_slot ?
-				           _pwgGetSource(p->pwg,
-				                         input_slot->choice) :
-					   NULL,
-				       media_type ?
-				           _pwgGetType(p->pwg,
-				                       media_type->choice) :
-					   NULL));
+	                 col);
+        ippDelete(col);
       }
 
      /*
@@ -4468,14 +4495,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
            i < resolution->num_choices;
 	   i ++, choice ++)
       {
-        xdpi = (int)strtol(choice->choice, (char **)&resptr, 10);
-	if (resptr > choice->choice && xdpi > 0)
-	{
-	  if (*resptr == 'x')
-	    ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
-	  else
-	    ydpi = xdpi;
-        }
+        xdpi = ydpi = (int)strtol(choice->choice, (char **)&resptr, 10);
+	if (resptr > choice->choice && xdpi > 0 && *resptr == 'x')
+	  ydpi = (int)strtol(resptr + 1, (char **)&resptr, 10);
 
 	if (xdpi <= 0 || ydpi <= 0)
 	{
@@ -4975,8 +4997,9 @@ new_media_col(_pwg_size_t *size,	/* I - media-size/margin values */
 		"x-dimension", size->width);
   ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		"y-dimension", size->length);
-
   ippAddCollection(media_col, IPP_TAG_PRINTER, "media-size", media_size);
+  ippDelete(media_size);
+
   ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		"media-bottom-margin", size->bottom);
   ippAddInteger(media_col, IPP_TAG_PRINTER, IPP_TAG_INTEGER,

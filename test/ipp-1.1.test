@@ -14,7 +14,7 @@
 #
 # Usage:
 #
-#   ./ipptest -f filename printer-uri ipp-1.1.test
+#   ./ipptool -f filename -t printer-uri ipp-1.1.test
 #
 
 # Test that a request-id value of 0 is not accepted.

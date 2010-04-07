@@ -377,6 +377,7 @@ div.contents ul.subcontents li {
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 <li><a href="#cgiCheckVariables" title="Check for the presence of &quot;required&quot; variables.">cgiCheckVariables</a></li>
+<li><a href="#cgiClearVariables" title="Clear all form variables.">cgiClearVariables</a></li>
 <li><a href="#cgiCompileSearch" title="Compile a search string.">cgiCompileSearch</a></li>
 <li><a href="#cgiCopyTemplateFile" title="Copy a template file and replace all the
 '{variable}' strings with the variable value.">cgiCopyTemplateFile</a></li>
@@ -386,26 +387,28 @@ div.contents ul.subcontents li {
 <li><a href="#cgiEndMultipart" title="End the delivery of a multipart web page.">cgiEndMultipart</a></li>
 <li><a href="#cgiFormEncode" title="Encode a string as a form variable.">cgiFormEncode</a></li>
 <li><a href="#cgiFreeSearch" title="Free a compiled search context.">cgiFreeSearch</a></li>
-<li><a href="#cgiGetArray" title="Get an element from a form array...">cgiGetArray</a></li>
+<li><a href="#cgiGetArray" title="Get an element from a form array.">cgiGetArray</a></li>
 <li><a href="#cgiGetAttributes" title="Get the list of attributes that are needed
 by the template file.">cgiGetAttributes</a></li>
+<li><a href="#cgiGetCookie" title="Get a cookie value.">cgiGetCookie</a></li>
 <li><a href="#cgiGetFile" title="Get the file (if any) that was submitted in the form.">cgiGetFile</a></li>
 <li><a href="#cgiGetIPPObjects" title="Get the objects in an IPP response.">cgiGetIPPObjects</a></li>
 <li><a href="#cgiGetSize" title="Get the size of a form array value.">cgiGetSize</a></li>
 <li><a href="#cgiGetTemplateDir" title="Get the templates directory...">cgiGetTemplateDir</a></li>
-<li><a href="#cgiGetVariable" title="Get a CGI variable from the database...">cgiGetVariable</a></li>
-<li><a href="#cgiInitialize" title="Initialize the CGI variable &quot;database&quot;...">cgiInitialize</a></li>
+<li><a href="#cgiGetVariable" title="Get a CGI variable from the database.">cgiGetVariable</a></li>
+<li><a href="#cgiInitialize" title="Initialize the CGI variable &quot;database&quot;.">cgiInitialize</a></li>
 <li><a href="#cgiIsPOST" title="Determine whether this page was POSTed.">cgiIsPOST</a></li>
 <li><a href="#cgiMoveJobs" title="Move one or more jobs.">cgiMoveJobs</a></li>
 <li><a href="#cgiPrintCommand" title="Print a CUPS command job.">cgiPrintCommand</a></li>
 <li><a href="#cgiPrintTestPage" title="Print a test page.">cgiPrintTestPage</a></li>
 <li><a href="#cgiRewriteURL" title="Rewrite a printer URI into a web browser URL...">cgiRewriteURL</a></li>
 <li><a href="#cgiSetArray" title="Set array element N to the specified string.">cgiSetArray</a></li>
+<li><a href="#cgiSetCookie" title="Set a cookie value.">cgiSetCookie</a></li>
 <li><a href="#cgiSetIPPObjectVars" title="Set CGI variables from an IPP object.">cgiSetIPPObjectVars</a></li>
 <li><a href="#cgiSetIPPVars" title="Set CGI variables from an IPP response.">cgiSetIPPVars</a></li>
 <li><a href="#cgiSetServerVersion" title="Set the server name and CUPS version...">cgiSetServerVersion</a></li>
 <li><a href="#cgiSetSize" title="Set the array size.">cgiSetSize</a></li>
-<li><a href="#cgiSetVariable" title="Set a CGI variable in the database...">cgiSetVariable</a></li>
+<li><a href="#cgiSetVariable" title="Set a CGI variable in the database.">cgiSetVariable</a></li>
 <li><a href="#cgiShowIPPError" title="Show the last IPP error message.">cgiShowIPPError</a></li>
 <li><a href="#cgiShowJobs" title="Show print jobs.">cgiShowJobs</a></li>
 <li><a href="#cgiStartHTML" title="Start a HTML page.">cgiStartHTML</a></li>
@@ -463,6 +466,10 @@ int cgiCheckVariables (<br>
 <p class="description">1 if all variables present, 0 otherwise</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Names may be separated by spaces and/or commas.</p>
+<h3 class="function"><a name="cgiClearVariables">cgiClearVariables</a></h3>
+<p class="description">Clear all form variables.</p>
+<p class="code">
+void cgiClearVariables (void);</p>
 <h3 class="function"><a name="cgiCompileSearch">cgiCompileSearch</a></h3>
 <p class="description">Compile a search string.</p>
 <p class="code">
@@ -557,7 +564,7 @@ void cgiFreeSearch (<br>
 <dd class="description">Search context</dd>
 </dl>
 <h3 class="function"><a name="cgiGetArray">cgiGetArray</a></h3>
-<p class="description">Get an element from a form array...</p>
+<p class="description">Get an element from a form array.</p>
 <p class="code">
 const char *cgiGetArray (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
@@ -587,6 +594,19 @@ void cgiGetAttributes (<br>
 <dt>tmpl</dt>
 <dd class="description">Base filename</dd>
 </dl>
+<h3 class="function"><a name="cgiGetCookie">cgiGetCookie</a></h3>
+<p class="description">Get a cookie value.</p>
+<p class="code">
+const char *cgiGetCookie (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name of cookie</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Value or NULL</p>
 <h3 class="function"><a name="cgiGetFile">cgiGetFile</a></h3>
 <p class="description">Get the file (if any) that was submitted in the form.</p>
 <p class="code">
@@ -629,7 +649,7 @@ char *cgiGetTemplateDir (void);</p>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Template directory</p>
 <h3 class="function"><a name="cgiGetVariable">cgiGetVariable</a></h3>
-<p class="description">Get a CGI variable from the database...</p>
+<p class="description">Get a CGI variable from the database.</p>
 <p class="code">
 const char *cgiGetVariable (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name<br>
@@ -643,9 +663,9 @@ const char *cgiGetVariable (<br>
 <p class="description">Value of variable</p>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Returns NULL if the variable doesn't exist.  If the variable is an
-array of values, returns the last element...</p>
+array of values, returns the last element.</p>
 <h3 class="function"><a name="cgiInitialize">cgiInitialize</a></h3>
-<p class="description">Initialize the CGI variable &quot;database&quot;...</p>
+<p class="description">Initialize the CGI variable &quot;database&quot;.</p>
 <p class="code">
 int cgiInitialize (void);</p>
 <h4 class="returnvalue">Return Value</h4>
@@ -751,6 +771,32 @@ void cgiSetArray (<br>
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">If the variable array is smaller than (element + 1), the intervening
 elements are set to NULL.</p>
+<h3 class="function"><a name="cgiSetCookie">cgiSetCookie</a></h3>
+<p class="description">Set a cookie value.</p>
+<p class="code">
+void cgiSetCookie (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *value,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *path,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const char *domain,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;time_t expires,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int secure<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Name</dd>
+<dt>value</dt>
+<dd class="description">Value</dd>
+<dt>path</dt>
+<dd class="description">Path (typically &quot;/&quot;)</dd>
+<dt>domain</dt>
+<dd class="description">Domain name</dd>
+<dt>expires</dt>
+<dd class="description">Expiration date (0 for session)</dd>
+<dt>secure</dt>
+<dd class="description">Require SSL</dd>
+</dl>
 <h3 class="function"><a name="cgiSetIPPObjectVars">cgiSetIPPObjectVars</a></h3>
 <p class="description">Set CGI variables from an IPP object.</p>
 <p class="code">
@@ -814,7 +860,7 @@ void cgiSetSize (<br>
 <dd class="description">Number of elements (0 to N)</dd>
 </dl>
 <h3 class="function"><a name="cgiSetVariable">cgiSetVariable</a></h3>
-<p class="description">Set a CGI variable in the database...</p>
+<p class="description">Set a CGI variable in the database.</p>
 <p class="code">
 void cgiSetVariable (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;const char *name,<br>

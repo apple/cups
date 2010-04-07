@@ -537,19 +537,19 @@ are server-oriented...">http_state_t</a></li>
 	<li><a href="#http_uri_status_t" title="URI separation status ">http_uri_status_t</a></li>
 	<li><a href="#http_version_t" title="HTTP version numbers">http_version_t</a></li>
 	<li><a href="#ipp_attribute_t" title="Attribute">ipp_attribute_t</a></li>
-	<li><a href="#ipp_finish_t" title="Finishings...">ipp_finish_t</a></li>
+	<li><a href="#ipp_finish_t" title="Finishings">ipp_finish_t</a></li>
 	<li><a href="#ipp_iocb_t" title="IPP IO Callback Function ">ipp_iocb_t</a></li>
-	<li><a href="#ipp_jstate_t" title="Job States....">ipp_jstate_t</a></li>
-	<li><a href="#ipp_op_t" title="IPP operations...">ipp_op_t</a></li>
-	<li><a href="#ipp_orient_t" title="Orientation...">ipp_orient_t</a></li>
-	<li><a href="#ipp_pstate_t" title="Printer States....">ipp_pstate_t</a></li>
-	<li><a href="#ipp_quality_t" title="Qualities...">ipp_quality_t</a></li>
+	<li><a href="#ipp_jstate_t" title="Job states">ipp_jstate_t</a></li>
+	<li><a href="#ipp_op_t" title="IPP operations">ipp_op_t</a></li>
+	<li><a href="#ipp_orient_t" title="Orientation values">ipp_orient_t</a></li>
+	<li><a href="#ipp_pstate_t" title="Printer states">ipp_pstate_t</a></li>
+	<li><a href="#ipp_quality_t" title="Qualities">ipp_quality_t</a></li>
 	<li><a href="#ipp_request_t" title="Request Header">ipp_request_t</a></li>
-	<li><a href="#ipp_res_t" title="Resolution units...">ipp_res_t</a></li>
-	<li><a href="#ipp_state_t" title="IPP states...">ipp_state_t</a></li>
+	<li><a href="#ipp_res_t" title="Resolution units">ipp_res_t</a></li>
+	<li><a href="#ipp_state_t" title="IPP states">ipp_state_t</a></li>
 	<li><a href="#ipp_t" title="Attribute Value">ipp_t</a></li>
-	<li><a href="#ipp_uchar_t" title="IPP status codes...">ipp_uchar_t</a></li>
-	<li><a href="#ipp_tag_t" title="Format tags for attributes...">ipp_tag_t</a></li>
+	<li><a href="#ipp_uchar_t" title="IPP status codes">ipp_uchar_t</a></li>
+	<li><a href="#ipp_tag_t" title="Format tags for attributes">ipp_tag_t</a></li>
 	<li><a href="#ipp_value_t" title="Attribute Value">ipp_value_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
@@ -576,16 +576,16 @@ are server-oriented...">http_state_e</a></li>
 	<li><a href="#http_uri_coding_e" title="URI en/decode flags">http_uri_coding_e</a></li>
 	<li><a href="#http_uri_status_e" title="URI separation status ">http_uri_status_e</a></li>
 	<li><a href="#http_version_e" title="HTTP version numbers">http_version_e</a></li>
-	<li><a href="#ipp_finish_e" title="Finishings...">ipp_finish_e</a></li>
-	<li><a href="#ipp_jstate_e" title="Job States....">ipp_jstate_e</a></li>
-	<li><a href="#ipp_op_e" title="IPP operations...">ipp_op_e</a></li>
-	<li><a href="#ipp_orient_e" title="Orientation...">ipp_orient_e</a></li>
-	<li><a href="#ipp_pstate_e" title="Printer States....">ipp_pstate_e</a></li>
-	<li><a href="#ipp_quality_e" title="Qualities...">ipp_quality_e</a></li>
-	<li><a href="#ipp_res_e" title="Resolution units...">ipp_res_e</a></li>
-	<li><a href="#ipp_state_e" title="IPP states...">ipp_state_e</a></li>
-	<li><a href="#ipp_status_e" title="IPP status codes...">ipp_status_e</a></li>
-	<li><a href="#ipp_tag_e" title="Format tags for attributes...">ipp_tag_e</a></li>
+	<li><a href="#ipp_finish_e" title="Finishings">ipp_finish_e</a></li>
+	<li><a href="#ipp_jstate_e" title="Job states">ipp_jstate_e</a></li>
+	<li><a href="#ipp_op_e" title="IPP operations">ipp_op_e</a></li>
+	<li><a href="#ipp_orient_e" title="Orientation values">ipp_orient_e</a></li>
+	<li><a href="#ipp_pstate_e" title="Printer states">ipp_pstate_e</a></li>
+	<li><a href="#ipp_quality_e" title="Qualities">ipp_quality_e</a></li>
+	<li><a href="#ipp_res_e" title="Resolution units">ipp_res_e</a></li>
+	<li><a href="#ipp_state_e" title="IPP states">ipp_state_e</a></li>
+	<li><a href="#ipp_status_e" title="IPP status codes">ipp_status_e</a></li>
+	<li><a href="#ipp_tag_e" title="Format tags for attributes">ipp_tag_e</a></li>
 </ul></li>
 <!--
   "$Id$"
@@ -3324,7 +3324,7 @@ typedef enum <a href="#http_version_e">http_version_e</a> http_version_t;
 typedef struct <a href="#ipp_attribute_s">ipp_attribute_s</a> ipp_attribute_t;
 </p>
 <h3 class="typedef"><a name="ipp_finish_t">ipp_finish_t</a></h3>
-<p class="description">Finishings...</p>
+<p class="description">Finishings</p>
 <p class="code">
 typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 </p>
@@ -3334,27 +3334,27 @@ typedef enum <a href="#ipp_finish_e">ipp_finish_e</a> ipp_finish_t;
 typedef ssize_t (*ipp_iocb_t)(void *, <a href="#ipp_uchar_t">ipp_uchar_t</a> *, size_t);
 </p>
 <h3 class="typedef"><a name="ipp_jstate_t">ipp_jstate_t</a></h3>
-<p class="description">Job States....</p>
+<p class="description">Job states</p>
 <p class="code">
 typedef enum <a href="#ipp_jstate_e">ipp_jstate_e</a> ipp_jstate_t;
 </p>
 <h3 class="typedef"><a name="ipp_op_t">ipp_op_t</a></h3>
-<p class="description">IPP operations...</p>
+<p class="description">IPP operations</p>
 <p class="code">
 typedef enum <a href="#ipp_op_e">ipp_op_e</a> ipp_op_t;
 </p>
 <h3 class="typedef"><a name="ipp_orient_t">ipp_orient_t</a></h3>
-<p class="description">Orientation...</p>
+<p class="description">Orientation values</p>
 <p class="code">
 typedef enum <a href="#ipp_orient_e">ipp_orient_e</a> ipp_orient_t;
 </p>
 <h3 class="typedef"><a name="ipp_pstate_t">ipp_pstate_t</a></h3>
-<p class="description">Printer States....</p>
+<p class="description">Printer states</p>
 <p class="code">
 typedef enum <a href="#ipp_pstate_e">ipp_pstate_e</a> ipp_pstate_t;
 </p>
 <h3 class="typedef"><a name="ipp_quality_t">ipp_quality_t</a></h3>
-<p class="description">Qualities...</p>
+<p class="description">Qualities</p>
 <p class="code">
 typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 </p>
@@ -3364,12 +3364,12 @@ typedef enum <a href="#ipp_quality_e">ipp_quality_e</a> ipp_quality_t;
 typedef union <a href="#ipp_request_u">ipp_request_u</a> ipp_request_t;
 </p>
 <h3 class="typedef"><a name="ipp_res_t">ipp_res_t</a></h3>
-<p class="description">Resolution units...</p>
+<p class="description">Resolution units</p>
 <p class="code">
 typedef enum <a href="#ipp_res_e">ipp_res_e</a> ipp_res_t;
 </p>
 <h3 class="typedef"><a name="ipp_state_t">ipp_state_t</a></h3>
-<p class="description">IPP states...</p>
+<p class="description">IPP states</p>
 <p class="code">
 typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 </p>
@@ -3379,12 +3379,12 @@ typedef enum <a href="#ipp_state_e">ipp_state_e</a> ipp_state_t;
 typedef struct <a href="#ipp_s">ipp_s</a> ipp_t;
 </p>
 <h3 class="typedef"><a name="ipp_uchar_t">ipp_uchar_t</a></h3>
-<p class="description">IPP status codes...</p>
+<p class="description">IPP status codes</p>
 <p class="code">
 typedef typedef unsigned char ipp_uchar_t;
 </p>
 <h3 class="typedef"><a name="ipp_tag_t">ipp_tag_t</a></h3>
-<p class="description">Format tags for attributes...</p>
+<p class="description">Format tags for attributes</p>
 <p class="code">
 typedef enum <a href="#ipp_tag_e">ipp_tag_e</a> ipp_tag_t;
 </p>
@@ -3442,6 +3442,7 @@ with a hostname. </p>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_attribute_t">ipp_attribute_t</a> *prev;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_request_t">ipp_request_t</a> request;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ipp_state_t">ipp_state_t</a> state;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int use;<br>
 };</p>
 <h4 class="members">Members</h4>
 <dl>
@@ -3459,6 +3460,8 @@ with a hostname. </p>
 <dd class="description">Request header</dd>
 <dt>state </dt>
 <dd class="description">State of request</dd>
+<dt>use </dt>
+<dd class="description">Use count</dd>
 </dl>
 <h2 class="title"><a name="UNIONS">Unions</a></h2>
 <h3 class="union"><a name="ipp_request_u">ipp_request_u</a></h3>
@@ -3786,7 +3789,7 @@ are server-oriented...</p>
 <dd class="description">HTTP/1.1</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_finish_e">ipp_finish_e</a></h3>
-<p class="description">Finishings...</p>
+<p class="description">Finishings</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_FINISHINGS_BALE </dt>
@@ -3847,7 +3850,7 @@ are server-oriented...</p>
 <dd class="description">Trim (any type)</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_jstate_e">ipp_jstate_e</a></h3>
-<p class="description">Job States....</p>
+<p class="description">Job states</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_JOB_ABORTED </dt>
@@ -3866,7 +3869,7 @@ are server-oriented...</p>
 <dd class="description">Job has been stopped</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_op_e">ipp_op_e</a></h3>
-<p class="description">IPP operations...</p>
+<p class="description">IPP operations</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_ACCEPT_JOBS </dt>
@@ -3903,8 +3906,14 @@ are server-oriented...</p>
 <dd class="description">Set the default printer</dd>
 <dt>IPP_CANCEL_JOB </dt>
 <dd class="description">Cancel a job</dd>
+<dt>IPP_CANCEL_JOBS </dt>
+<dd class="description">Cancel-Jobs</dd>
+<dt>IPP_CANCEL_MY_JOBS </dt>
+<dd class="description">Cancel-My-Jobs</dd>
 <dt>IPP_CANCEL_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Cancel a subscription </dd>
+<dt>IPP_CLOSE_JOB </dt>
+<dd class="description">Close-Job</dd>
 <dt>IPP_CREATE_JOB </dt>
 <dd class="description">Create an empty print job</dd>
 <dt>IPP_CREATE_JOB_SUBSCRIPTION <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
@@ -3943,6 +3952,8 @@ are server-oriented...</p>
 <dd class="description">Renew a printer subscription </dd>
 <dt>IPP_RESTART_JOB </dt>
 <dd class="description">Reprint a job</dd>
+<dt>IPP_RESUBMIT_JOB </dt>
+<dd class="description">Resubmit-Job</dd>
 <dt>IPP_RESUME_PRINTER </dt>
 <dd class="description">Start a printer</dd>
 <dt>IPP_SEND_DOCUMENT </dt>
@@ -3953,7 +3964,7 @@ are server-oriented...</p>
 <dd class="description">Validate job options</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_orient_e">ipp_orient_e</a></h3>
-<p class="description">Orientation...</p>
+<p class="description">Orientation values</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_LANDSCAPE </dt>
@@ -3966,7 +3977,7 @@ are server-oriented...</p>
 <dd class="description">180 degrees</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_pstate_e">ipp_pstate_e</a></h3>
-<p class="description">Printer States....</p>
+<p class="description">Printer states</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_PRINTER_IDLE </dt>
@@ -3977,7 +3988,7 @@ are server-oriented...</p>
 <dd class="description">Printer is stopped</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_quality_e">ipp_quality_e</a></h3>
-<p class="description">Qualities...</p>
+<p class="description">Qualities</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_QUALITY_DRAFT </dt>
@@ -3988,7 +3999,7 @@ are server-oriented...</p>
 <dd class="description">Normal quality</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_res_e">ipp_res_e</a></h3>
-<p class="description">Resolution units...</p>
+<p class="description">Resolution units</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_RES_PER_CM </dt>
@@ -3997,7 +4008,7 @@ are server-oriented...</p>
 <dd class="description">Pixels per inch</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_state_e">ipp_state_e</a></h3>
-<p class="description">IPP states...</p>
+<p class="description">IPP states</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_ATTRIBUTE </dt>
@@ -4012,7 +4023,7 @@ are server-oriented...</p>
 <dd class="description">Nothing is happening/request completed</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_status_e">ipp_status_e</a></h3>
-<p class="description">IPP status codes...</p>
+<p class="description">IPP status codes</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>CUPS_SEE_OTHER </dt>
@@ -4105,7 +4116,7 @@ are server-oriented...</p>
 <dd class="description">server-error-version-not-supported</dd>
 </dl>
 <h3 class="enumeration"><a name="ipp_tag_e">ipp_tag_e</a></h3>
-<p class="description">Format tags for attributes...</p>
+<p class="description">Format tags for attributes</p>
 <h4 class="constants">Constants</h4>
 <dl>
 <dt>IPP_TAG_ADMINDEFINE </dt>

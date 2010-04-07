@@ -1,7 +1,7 @@
 #
 # "$Id$"
 #
-#   Get list of not-completed jobs.
+#   Get list of completed jobs.
 #
 #   Copyright 2007-2010 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products. All rights reserved.
@@ -20,7 +20,7 @@
 
 {
 	# The name of the test...
-	NAME "Get pending jobs"
+	NAME "Get completed jobs"
 
 	# The operation to use
 	OPERATION Get-Jobs
@@ -30,6 +30,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
+	ATTR keyword which-jobs completed
 	ATTR keyword requested-attributes
 	     job-id,job-name,document-format,job-media-sheets-completed,job-originating-user-name
 

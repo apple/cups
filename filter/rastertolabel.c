@@ -31,6 +31,7 @@
  */
 
 #include <cups/cups.h>
+#include <cups/ppd.h>
 #include <cups/string-private.h>
 #include <cups/language-private.h>
 #include <cups/raster.h>
@@ -1057,8 +1058,8 @@ ZPLCompress(char repeat_char,		/* I - Character to repeat */
   {
    /*
     * Print as many z's as possible - they are the largest denomination
-    * representing 400 characters (zC stands for 400 adjacent C's)	
-    */	
+    * representing 400 characters (zC stands for 400 adjacent C's)
+    */
 
     while (repeat_count >= 400)
     {

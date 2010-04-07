@@ -1,10 +1,9 @@
 /*
  * "$Id$"
  *
- *   PDF to PostScript filter front-end for the Common UNIX Printing
- *   System (CUPS).
+ *   PDF to PostScript filter front-end for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -24,8 +23,8 @@
  */
 
 #include <cups/cups.h>
-#include <cups/string.h>
-#include <cups/i18n.h>
+#include <cups/string-private.h>
+#include <cups/language-private.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <errno.h>
@@ -524,7 +523,7 @@ main(int  argc,				/* I - Number of command-line args */
 	exit_status = WEXITSTATUS(wait_status);
 
         fprintf(stderr, "DEBUG: PID %d (%s) stopped with status %d!\n",
-	        wait_pid,		
+	        wait_pid,
 #ifdef HAVE_PDFTOPS
                 wait_pid == pdf_pid ? "pdftops" : "pstops",
 #else
@@ -536,7 +535,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         fprintf(stderr,
 	        "DEBUG: PID %d (%s) was terminated normally with signal %d!\n",
-	        wait_pid,		
+	        wait_pid,
 #ifdef HAVE_PDFTOPS
                 wait_pid == pdf_pid ? "pdftops" : "pstops",
 #else
@@ -548,7 +547,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
 	exit_status = WTERMSIG(wait_status);
 
-        fprintf(stderr, "DEBUG: PID %d (%s) crashed on signal %d!\n", wait_pid,		
+        fprintf(stderr, "DEBUG: PID %d (%s) crashed on signal %d!\n", wait_pid,
 #ifdef HAVE_PDFTOPS
                 wait_pid == pdf_pid ? "pdftops" : "pstops",
 #else
@@ -559,7 +558,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
-      fprintf(stderr, "DEBUG: PID %d (%s) exited with no errors.\n", wait_pid,		
+      fprintf(stderr, "DEBUG: PID %d (%s) exited with no errors.\n", wait_pid,
 #ifdef HAVE_PDFTOPS
 	      wait_pid == pdf_pid ? "pdftops" : "pstops");
 #else

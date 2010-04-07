@@ -1,7 +1,7 @@
 .\"
 .\" "$Id$"
 .\"
-.\"   ipp.test man page for CUPS.
+.\"   ipptoolfile man page for CUPS.
 .\"
 .\"   Copyright 2010 by Apple Inc.
 .\"
@@ -11,15 +11,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipp.test 5 "CUPS" "23 February 2010" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "6 April 2010" "Apple Inc."
 .SH NAME
-ipp.test \- ipptest test file format
+ipptoolfile \- ipptool file format
 
 .SH DESCRIPTION
-The \fIipptest(1)\fR program accepts free-form plain text files that describe
-one or more IPP operation tests. Comments start with the "#" character and
-continue to the end of the line. Each test is enclosed by curley braces, for
-example:
+The \fIipptool(1)\fR program accepts free-form plain text files that describe one or more IPP requests. Comments start with the "#" character and continue to the end of the line. Each request is enclosed by curley braces, for example:
 .nf
 
     # This is a comment
@@ -29,7 +26,7 @@ example:
 
       # The request to send
       OPERATION Print-Job
-      GROUP operation
+      GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
       ATTR uri printer-uri $uri
@@ -49,7 +46,7 @@ example:
 
       # The request to send
       OPERATION Get-Job-Attributes
-      GROUP operation
+      GROUP operation-attributes-tag
       ATTR charset attributes-charset utf-8
       ATTR language attributes-natural-language en
       ATTR uri printer-uri $uri
@@ -75,13 +72,13 @@ Defines a test.
 .TP 5
 DEFINE variable-name value
 Defines the named variable to the given value. This is equivalent to specifying
-"-d variable-name=value" on the \fIipptest\fR command-line.
+"-d variable-name=value" on the \fIipptool\fR command-line.
 .TP 5
 INCLUDE "filename"
 .TP 5
 INCLUDE <filename>
 Includes another test file. The first form includes a file relative to the
-current test file, while the second form includes a file from the \fIipptest\fR
+current test file, while the second form includes a file from the \fIipptool\fR
 include directory.
 .TP 5
 TRANSFER auto
@@ -92,12 +89,12 @@ files.
 TRANSFER chunked
 Specifies that tests will, by default, use the HTTP/1.1 "Transfer-Encoding:
 chunked" header. This is the default and is equivalent to specifying "-c" on the
-\fIipptest\fR command-line. Support for chunked requests is required for
+\fIipptool\fR command-line. Support for chunked requests is required for
 conformance with all versions of IPP.
 .TP 5
 TRANSFER length
 Specifies that tests will, by default, use the HTTP/1.0 "Content-Length:"
-header. This is equivalent to specifying "-l" on the \fIipptest\fR command-line.
+header. This is equivalent to specifying "-l" on the \fIipptool\fR command-line.
 Support for content length requests is required for conformance with all
 versions of IPP.
 .TP 5
@@ -161,7 +158,7 @@ word "random" to use a randomly generated value (the default).
 .TP 5
 RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
-The default is the resource from the URI provided to the \fIipptest\fR program.
+The default is the resource from the URI provided to the \fIipptool\fR program.
 .TP 5
 STATUS status-code [ predicate ]
 Specifies an expected response status-code value. Additional requirements can be
@@ -232,8 +229,8 @@ IF-UNDEFINED variable-name
 Makes the STATUS apply only if the specified variable is not defined.
 
 .SH OPERATION CODES
-Operation codes correspond to the names from RFC 2911 and other IPP extension
-specifications. Here is a complete list:
+Operation codes correspond to the hexadecimal numbers (0xHHHH) and names from
+RFC 2911 and other IPP extension specifications. Here is a complete list:
 .nf
     Activate-Printer
     CUPS-Accept-Jobs
@@ -254,7 +251,10 @@ specifications. Here is a complete list:
     CUPS-Set-Default
     Cancel-Current-Job
     Cancel-Job
+    Cancel-Jobs
+    Cancel-My-Jobs
     Cancel-Subscription
+    Close-Job
     Create-Job
     Create-Job-Subscription
     Create-Printer-Subscription
@@ -283,6 +283,7 @@ specifications. Here is a complete list:
     Reprocess-Job
     Restart-Job
     Restart-Printer
+    Resubmit-Job
     Resume-Job
     Resume-Printer
     Schedule-Job-After
@@ -390,7 +391,7 @@ Here are the value tags:
 .fi
 
 .SH VARIABLES
-The \fIipptest\fR program maintains a list of variables that can be used in any
+The \fIipptool\fR program maintains a list of variables that can be used in any
 literal string or attribute value by specifying "$variable-name". Aside from
 variables defined using the "-d" option or "DEFINE" directive, the following
 pre-defined variables are available:
@@ -403,10 +404,10 @@ Inserts the value of the named environment variable, or an empty string if the
 environment variable is not defined.
 .TP 5
 $filename
-Inserts the filename provided to \fIipptest\fR with the "-f" option.
+Inserts the filename provided to \fIipptool\fR with the "-f" option.
 .TP 5
 $hostname
-Inserts the hostname from the URI provided to \fIipptest\fR.
+Inserts the hostname from the URI provided to \fIipptool\fR.
 .TP 5
 $job-id
 Inserts the last job-id value returned in a test response or 0 if no job-id has
@@ -417,29 +418,29 @@ Inserts the last job-uri value returned in a test response or an empty string if
 no job-uri has been seen.
 .TP 5
 $scheme
-Inserts the scheme from the URI provided to \fIipptest\fR.
+Inserts the scheme from the URI provided to \fIipptool\fR.
 .TP 5
 $notify-subscription-id
 Inserts the last notify-subscription-id value returnd in a test response or 0 if
 no notify-subscription-id has been seen.
 .TP 5
 $port
-Inserts the port number from the URI provided to \fIipptest\fR.
+Inserts the port number from the URI provided to \fIipptool\fR.
 .TP 5
 $resource
-Inserts the resource path from the URI provided to \fIipptest\fR.
+Inserts the resource path from the URI provided to \fIipptool\fR.
 .TP 5
 $uri
-Inserts the URI provided to \fIipptest\fR.
+Inserts the URI provided to \fIipptool\fR.
 .TP 5
 $user
 Inserts the current user's login name.
 .TP 5
 $username
-Inserts the username from the URI provided to \fIipptest\fR, if any.
+Inserts the username from the URI provided to \fIipptool\fR, if any.
 
 .SH SEE ALSO
-\fIipptest(1)\fR,
+\fIipptool(1)\fR,
 .br
 http://localhost:631/help
 

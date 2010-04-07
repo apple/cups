@@ -1,7 +1,7 @@
 #
 # "$Id: Makefile 7930 2008-09-10 22:25:54Z mike $"
 #
-#   Man page makefile for the Common UNIX Printing System (CUPS).
+#   Man page makefile for CUPS.
 #
 #   Copyright 2007-2010 by Apple Inc.
 #   Copyright 1993-2006 by Easy Software Products.
@@ -24,7 +24,7 @@ MAN1	=	cancel.$(MAN1EXT) \
 		cups-config.$(MAN1EXT) \
 		cupstestdsc.$(MAN1EXT) \
 		cupstestppd.$(MAN1EXT) \
-		ipptest.$(MAN1EXT) \
+		ipptool.$(MAN1EXT) \
 		lp.$(MAN1EXT) \
 		lpoptions.$(MAN1EXT) \
 		lppasswd.$(MAN1EXT) \
@@ -41,7 +41,7 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		client.conf.$(MAN5EXT) \
 		cups-snmp.conf.$(MAN5EXT) \
 		cupsd.conf.$(MAN5EXT) \
-		ipp.test.$(MAN5EXT) \
+		ipptoolfile.$(MAN5EXT) \
 		mailto.conf.$(MAN5EXT) \
 		mime.convs.$(MAN5EXT) \
 		mime.types.$(MAN5EXT) \

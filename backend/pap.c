@@ -1,15 +1,15 @@
 /*
 * "$Id: pap.c 7720 2008-07-11 22:46:21Z mike $"
 *
-* Copyright 2004-2008 Apple Inc. All rights reserved.
-* 
+* Copyright 2004-2010 Apple Inc. All rights reserved.
+*
 * IMPORTANT:  This Apple software is supplied to you by Apple Computer,
 * Inc. ("Apple") in consideration of your agreement to the following
 * terms, and your use, installation, modification or redistribution of
 * this Apple software constitutes acceptance of these terms.  If you do
 * not agree with these terms, please do not use, install, modify or
 * redistribute this Apple software.
-* 
+*
 * In consideration of your agreement to abide by the following terms, and
 * subject to these terms, Apple grants you a personal, non-exclusive
 * license, under Apple’s copyrights in this original Apple software (the
@@ -17,7 +17,7 @@
 * Software, with or without modifications, in source and/or binary forms;
 * provided that if you redistribute the Apple Software in its entirety and
 * without modifications, you must retain this notice and the following
-* text and disclaimers in all such redistributions of the Apple Software. 
+* text and disclaimers in all such redistributions of the Apple Software.
 * Neither the name, trademarks, service marks or logos of Apple Computer,
 * Inc. may be used to endorse or promote products derived from the Apple
 * Software without specific prior written permission from Apple.  Except
@@ -25,13 +25,13 @@
 * or implied, are granted by Apple herein, including but not limited to
 * any patent rights that may be infringed by your derivative works or by
 * other works in which the Apple Software may be incorporated.
-* 
+*
 * The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
 * MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
 * THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
 * FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
 * OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
-* 
+*
 * IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
 * OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -42,8 +42,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* This program implements the Printer Access Protocol (PAP) on top of AppleTalk 
-* Transaction Protocol (ATP). If it were to use the blocking pap functions of 
+* This program implements the Printer Access Protocol (PAP) on top of AppleTalk
+* Transaction Protocol (ATP). If it were to use the blocking pap functions of
 * the AppleTalk library it would need seperate threads for reading, writing
 * and status.
 *
@@ -98,7 +98,7 @@
 #include <cups/cups.h>
 #include <cups/backend.h>
 #include <cups/sidechannel.h>
-#include <cups/i18n.h>
+#include <cups/language-private.h>
 
 #include <netat/appletalk.h>
 #include <netat/atp.h>
@@ -117,20 +117,20 @@ enum { RUNNING, NOTLOADED, LOADED, OTHERERROR };
 
 extern int atp_abort(int fd, at_inet_t *dest, u_short tid);
 extern int atp_close(int fd);
-extern int atp_getreq(int fd, at_inet_t *src, char *buf, int *len, int *userdata, 
+extern int atp_getreq(int fd, at_inet_t *src, char *buf, int *len, int *userdata,
 		      int *xo, u_short *tid, u_char *bitmap, int nowait);
 extern int atp_getresp(int fd, u_short *tid, at_resp_t *resp);
 extern int atp_look(int fd);
 extern int atp_open(at_socket *sock);
-extern int atp_sendreq(int fd, at_inet_t *dest, char *buf, int len, 
-		       int userdata, int xo, int xo_relt, u_short *tid, 
+extern int atp_sendreq(int fd, at_inet_t *dest, char *buf, int len,
+		       int userdata, int xo, int xo_relt, u_short *tid,
 		       at_resp_t *resp, at_retry_t *retry, int nowait);
-extern int atp_sendrsp(int fd, at_inet_t *dest, int xo, u_short tid, 
+extern int atp_sendrsp(int fd, at_inet_t *dest, int xo, u_short tid,
 		       at_resp_t *resp);
 extern int checkATStack();
-extern int nbp_lookup(at_entity_t *entity, at_nbptuple_t *buf, int max, 
+extern int nbp_lookup(at_entity_t *entity, at_nbptuple_t *buf, int max,
 		      at_retry_t *retry);
-extern int nbp_make_entity(at_entity_t *entity, char *obj, char *type, 
+extern int nbp_make_entity(at_entity_t *entity, char *obj, char *type,
 			   char *zone);
 extern int zip_getmyzone(char *ifName,	at_nvestr_t *zone);
 #endif /* HAVE_APPLETALK_AT_PROTO_H */
@@ -168,16 +168,16 @@ int       gDebug	= 0;		/* Option: emit debugging info    */
 
 /* Local functions */
 static int listDevices(void);
-static int printFile(char* name, char* type, char* zone, int fdin, int fdout, 
+static int printFile(char* name, char* type, char* zone, int fdin, int fdout,
 		     int fderr, int copies, int argc);
-static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, 
+static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
 		   at_inet_t* pap_to, u_char* flowQuantum);
 static int papClose();
-static int papWrite(int sockfd, at_inet_t* dest, u_short tid, u_char connID, 
+static int papWrite(int sockfd, at_inet_t* dest, u_short tid, u_char connID,
 		    u_char flowQuantum, char* data, int len, int eof);
-static int papCloseResp(int sockfd, at_inet_t* dest, int xo, u_short tid, 
+static int papCloseResp(int sockfd, at_inet_t* dest, int xo, u_short tid,
 			u_char connID);
-static int papSendRequest(int sockfd, at_inet_t* dest, u_char connID, 
+static int papSendRequest(int sockfd, at_inet_t* dest, u_char connID,
 			  int function, u_char bitmap, int xo, int seqno);
 static int papCancelRequest(int sockfd, u_short tid);
 static void sidechannel_request();
@@ -331,7 +331,7 @@ static int listDevices(void)
   /* Not required but sort them so they look nice */
   qsort(buf, numberFound, sizeof(at_nbptuple_t), nbptuple_compare);
 
-  for (i = 0; i < numberFound; i++) 
+  for (i = 0; i < numberFound; i++)
   {
     memcpy(name, buf[i].enu_entity.object.str, MIN(buf[i].enu_entity.object.len, sizeof(name)-1));
     name[MIN(buf[i].enu_entity.object.len, sizeof(name)-1)] = '\0';
@@ -418,7 +418,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   u_char	flowQuantum = 1;
   time_t	now,
 		start_time,
-		elasped_time, 
+		elasped_time,
 		sleep_time,
 		connect_timeout = -1,
 		nextStatusTime = 0;
@@ -539,7 +539,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   * Now that we are connected to the printer ignore SIGTERM so that we
   * can finish out any page data the driver sends (e.g. to eject the
   * current page...  if we are printing data from a file then catch the
-  * signal so we can send a PAP Close packet (otherwise you can't cancel 
+  * signal so we can send a PAP Close packet (otherwise you can't cancel
   * raw jobs...)
   */
 
@@ -688,14 +688,14 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         _cupsLangPrintError(_("ERROR: Unable to look for PAP response"));
         break;
       }
-  
+
       if (rc > 0)
       {
         /* It's an ATP response */
         resp.resp[0].iov_base = sockBuffer;
         resp.resp[0].iov_len = sizeof(sockBuffer) - 1;
         resp.bitmap = 0x01;
-  
+
         if ((err = atp_getresp(gSockfd, &tid, &resp)) < 0)
         {
           _cupsLangPrintError(_("ERROR: Unable to get PAP response"));
@@ -725,7 +725,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           statusUpdate(&iov_base[5], iov_base[4]);
         }
         break;
-      
+
       case AT_PAP_TYPE_SEND_DATA:            /* Send-Data packet */
         sendDataAddr.socket  = src.socket;
         gSendDataID     = tid;
@@ -753,7 +753,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           }
         }
         break;
-    
+
       case AT_PAP_TYPE_DATA:              /* Data packet */
         for (len=0, i=0; i < ATP_TRESP_MAX; i++)
         {
@@ -769,12 +769,12 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           char *logLevel;
           char logstr[512];
           int  logstrlen;
-          
+
 	  cupsBackChannelWrite(sockBuffer, len, 1.0);
-          
+
           sockBuffer[len] = '\0';     /* We always reserve room for the nul so we can use strstr() below*/
           pLineBegin = sockBuffer;
-                                        
+
           /* If there are PostScript status comments in the buffer log them.
            *
            *  This logic shouldn't be in the backend but until we get backchannel
@@ -786,16 +786,16 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           {
             pCommentEnd += 3;            /* Skip past "]%%" */
             *pCommentEnd = '\0';         /* There's always room for the nul */
-            
+
             /* Strip the CRs & LFs before writing it to stderr */
             for (pChar = pLineBegin; pChar < pCommentEnd; pChar++)
               if (*pChar == '\r' || *pChar == '\n')
                 *pChar = ' ';
-                                                
+
             if (strncasecmp(pLineBegin, "%%[ Error:", 10) == 0)
             {
               /* logLevel should be "ERROR" here but this causes PrintCenter
-              *  to pause the queue which in turn clears this error, which 
+              *  to pause the queue which in turn clears this error, which
               *  restarts the job. So the job ends up in an infinite loop with
               *  the queue being held/un-held. Just make it DEBUG for now until
               *  we fix notifications later.
@@ -807,7 +807,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
               logLevel = "DEBUG";
             else
               logLevel = "INFO";
-            
+
             if ((logstrlen = snprintf(logstr, sizeof(logstr), "%s: %s\n", logLevel, pLineBegin)) >= sizeof(logstr))
             {
               /* If the string was trucnated make sure it has a linefeed before the nul */
@@ -840,10 +840,10 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
           goto Exit;
         }
         break;
-      
+
       case AT_PAP_TYPE_TICKLE:            /* Tickle packet */
         break;
-    
+
       case AT_PAP_TYPE_CLOSE_CONN:          /* Close-Connection packet */
         /* We shouldn't normally see this. */
         papCloseResp(gSockfd, &gSessionAddr, xo, tid, gConnID);
@@ -859,7 +859,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         }
         goto Exit;
         break;
-    
+
       case AT_PAP_TYPE_OPEN_CONN:            /* Open-Connection packet */
       case AT_PAP_TYPE_OPEN_CONN_REPLY:        /* Open-Connection-Reply packet */
       case AT_PAP_TYPE_SEND_STATUS:          /* Send-Status packet */
@@ -867,13 +867,13 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         _cupsLangPrintf(stderr, _("WARNING: Unexpected PAP packet of type %d\n"),
 	                TYPE_OF(userdata));
         break;
-      
+
       default:
         _cupsLangPrintf(stderr, _("WARNING: Unknown PAP packet of type %d\n"),
 	                TYPE_OF(userdata));
         break;
       }
-    
+
       if (CONNID_OF(userdata) == gConnID)
       {
         /* Reset tickle timer */
@@ -906,7 +906,7 @@ Exit:
  *
  * @result    A non-zero return value for errors
  */
-static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd, 
+static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
 		   at_inet_t* sessionAddr, u_char* flowQuantum)
 {
   int		result,
@@ -914,7 +914,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
 		userdata;
   time_t	tm,
 		waitTime;
-  char		data[10], 
+  char		data[10],
 		rdata[ATP_DATA_SIZE];
   u_char	*puserdata;
   at_socket	socketfd;
@@ -930,7 +930,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
   if ((*fd = atp_open(&socketfd)) < 0)
     return -1;
 
- /* 
+ /*
   * Build the open connection request packet.
   */
 
@@ -960,7 +960,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
 
     fprintf(stderr, "DEBUG: -> %s\n", packet_name(AT_PAP_TYPE_OPEN_CONN));
 
-    if (atp_sendreq(*fd, &tuple->enu_addr, data, 4, userdata, 1, 0, 
+    if (atp_sendreq(*fd, &tuple->enu_addr, data, 4, userdata, 1, 0,
 		    0, &resp, &retry, 0) < 0)
     {
       statusUpdate("Destination unreachable", 23);
@@ -971,7 +971,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
     puserdata = (u_char *)&resp.userdata[0];
     open_result = OSReadBigInt16(&rdata[2], 0);
 
-    fprintf(stderr, "DEBUG: <- %s, status %d\n", packet_name(puserdata[1]), 
+    fprintf(stderr, "DEBUG: <- %s, status %d\n", packet_name(puserdata[1]),
 	    open_result);
 
    /*
@@ -1019,7 +1019,7 @@ static int papOpen(at_nbptuple_t* tuple, u_char* connID, int* fd,
 
 /*!
  * @function  papClose
- * @abstract  End a PAP session by canceling outstanding send-data & tickle 
+ * @abstract  End a PAP session by canceling outstanding send-data & tickle
  *            transactions and sending a PAP close request.
  *
  * @result  A non-zero return value for errors
@@ -1040,7 +1040,7 @@ static int papClose()
     gSockfd = 0;
 
     alarm(0);
-  
+
     /* Cancel the pending send-data and tickle trnsactions
     */
     if (gSendDataID)
@@ -1049,7 +1049,7 @@ static int papClose()
       gSendDataID = 0;
       papCancelRequest(fd, tmpID);
     }
-  
+
     if (gTickleID)
     {
       tmpID = gTickleID;
@@ -1059,29 +1059,29 @@ static int papClose()
 
     /* This is a workaround for bug #2735145. The problem is papWrite()
     *  returns before the ATP TRel arrives for it. If we send the pap close packet
-    *  before this release then the printer can drop the last data packets. 
-    *  The effect on an Epson printer is the last page doesn't print, on HP it 
+    *  before this release then the printer can drop the last data packets.
+    *  The effect on an Epson printer is the last page doesn't print, on HP it
     *  doesn't close the pap session.
     */
     if (gWaitEOF == false)
       sleep(2);
 
     fprintf(stderr, "DEBUG: -> %s\n", packet_name(AT_PAP_TYPE_CLOSE_CONN));
-  
+
     puserdata[0] = gConnID;
     puserdata[1] = AT_PAP_TYPE_CLOSE_CONN;
     puserdata[2] = 0;
     puserdata[3] = 0;
-  
+
     retry.interval = 2;
     retry.retries = 5;
-  
+
     resp.bitmap = 0x01;
     resp.resp[0].iov_base = rdata;
     resp.resp[0].iov_len = sizeof(rdata);
-  
+
     atp_sendreq(fd, &gSessionAddr, 0, 0, userdata, 1, 0, 0, &resp, &retry, 0);
-  
+
     close(fd);
   }
   return noErr;
@@ -1307,7 +1307,7 @@ sidechannel_request()
     case CUPS_SC_CMD_SOFT_RESET:	/* Do a soft reset */
     case CUPS_SC_CMD_GET_DEVICE_ID:	/* Return IEEE-1284 device ID */
     default:
-	return (cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED, 
+	return (cupsSideChannelWrite(command, CUPS_SC_STATUS_NOT_IMPLEMENTED,
 			             NULL, 0, 1.0));
 	break;
   }
@@ -1336,8 +1336,8 @@ void statusUpdate(char* status, u_char statusLen)
     last_statusLen = statusLen;
     memcpy(status_str, status, statusLen);
     status_str[(int)statusLen] = '\0';
-    
-    /* 
+
+    /*
      * Make sure the status string is in the form of a PostScript comment.
      */
 
@@ -1382,7 +1382,7 @@ static int parseUri(const char* argv0, char* name, char* type, char* zone)
   method[0] = username[0] = hostname[0] = resource[0] = '\0';
   port = 0;
 
-  httpSeparateURI(HTTP_URI_CODING_NONE, argv0, method, sizeof(method), 
+  httpSeparateURI(HTTP_URI_CODING_NONE, argv0, method, sizeof(method),
 		  username, sizeof(username),
 		  hostname, sizeof(hostname), &port,
 		  resource, sizeof(resource));
@@ -1526,7 +1526,7 @@ static int addPercentEscapes(const char* src, char* dst, int dstMax)
   {
     c = *src++;
 
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || 
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
         (c >= '0' && c <= '9') || (c == '.' || c == '-'  || c == '*' || c == '_'))
     {
       if (dst >= dstEnd)
@@ -1594,7 +1594,7 @@ static int removePercentEscapes(const char* src, char* dst, int dstMax)
 int nbptuple_compare(const void *p1, const void *p2)
 {
   int result;
-  int len = MIN(((at_nbptuple_t*)p1)->enu_entity.object.len, 
+  int len = MIN(((at_nbptuple_t*)p1)->enu_entity.object.len,
           ((at_nbptuple_t*)p2)->enu_entity.object.len);
 
   if ((result = memcmp(((at_nbptuple_t*)p1)->enu_entity.object.str, ((at_nbptuple_t*)p2)->enu_entity.object.str, len)) == 0)
@@ -1619,7 +1619,7 @@ int nbptuple_compare(const void *p1, const void *p2)
 static int okayToUseAppleTalk()
 {
   int atStatus = checkATStack();
-  
+
   /* I think the test should be:
    *    return atStatus == RUNNING || atStatus == LOADED;
    * but when I disable AppleTalk from the network control panel and

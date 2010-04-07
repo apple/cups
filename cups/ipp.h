@@ -231,6 +231,15 @@ typedef enum ipp_op_e			/**** IPP operations ****/
   IPP_RESUME_JOB,			/* Resume the current job @private@ */
   IPP_PROMOTE_JOB,			/* Promote a job to print sooner @private@ */
   IPP_SCHEDULE_JOB_AFTER,		/* Schedule a job to print after another @private@ */
+  IPP_CANCEL_DOCUMENT = 0x0033,		/* Cancel-Document @private@ */
+  IPP_GET_DOCUMENT_ATTRIBUTES,		/* Get-Document-Attributes @private@ */
+  IPP_GET_DOCUMENTS,			/* Get-Documents @private@ */
+  IPP_DELETE_DOCUMENT,			/* Delete-Document @private@ */
+  IPP_SET_DOCUMENT_ATTRIBUTES,		/* Set-Document-Attributes @private@ */
+  IPP_CANCEL_JOBS,			/* Cancel-Jobs */
+  IPP_CANCEL_MY_JOBS,			/* Cancel-My-Jobs */
+  IPP_RESUBMIT_JOB,			/* Resubmit-Job */
+  IPP_CLOSE_JOB,			/* Close-Job */
   IPP_PRIVATE = 0x4000,			/* Reserved @private@ */
   CUPS_GET_DEFAULT,			/* Get the default printer */
   CUPS_GET_PRINTERS,			/* Get a list of printers and/or classes */
@@ -404,6 +413,9 @@ struct ipp_s				/**** IPP Request/Response/Notification ****/
 
 /**** New in CUPS 1.2 ****/
   ipp_attribute_t *prev;		/* Previous attribute (for read) @since CUPS 1.2/Mac OS X 10.5@ */
+
+/**** New in CUPS 1.5 ****/
+  int		use;			/* Use count */
 };
 
 
