@@ -245,6 +245,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/cups/eu/*
 %dir /usr/share/doc/cups/id
 /usr/share/doc/cups/id/*
+%dir /usr/share/doc/cups/it
+/usr/share/doc/cups/it/*
 %dir /usr/share/doc/cups/ja
 /usr/share/doc/cups/ja/*
 %dir /usr/share/doc/cups/pl
