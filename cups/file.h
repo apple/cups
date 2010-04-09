@@ -27,6 +27,7 @@
  */
 
 #  include "versioning.h"
+#  include <stddef.h>
 #  include <sys/types.h>
 #  if defined(WIN32) && !defined(__CUPS_SSIZE_T_DEFINED)
 #    define __CUPS_SSIZE_T_DEFINED

@@ -1,10 +1,9 @@
 /*
  * "$Id: network.c 7861 2008-08-26 03:15:14Z mike $"
  *
- *   Network interface functions for the Common UNIX Printing System
- *   (CUPS) scheduler.
+ *   Network interface functions for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

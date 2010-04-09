@@ -14,7 +14,7 @@
 #
 # Usage:
 #
-#   ./ipptool printer-uri get-jobs.test
+#   ./ipptool printer-uri get-completed-jobs.test
 #
 
 
@@ -32,17 +32,17 @@
 	ATTR uri printer-uri $uri
 	ATTR keyword which-jobs completed
 	ATTR keyword requested-attributes
-	     job-id,job-name,document-format,job-media-sheets-completed,job-originating-user-name
+	     job-id,job-state,job-name,job-originating-user-name,job-media-sheets-completed
 
 	# What statuses are OK?
 	STATUS successful-ok
 
 	# What attributes to display
 	DISPLAY job-id
+	DISPLAY job-state
 	DISPLAY job-name
-	DISPLAY document-format
-	DISPLAY job-media-sheets-completed
 	DISPLAY job-originating-user-name
+	DISPLAY job-media-sheets-completed
 }
 
 

@@ -29,6 +29,7 @@ _cups_strlcat
 _cups_strlcpy
 _httpResolveURI
 _ippAddAttr
+_ippAttrString
 _ippFindOption
 _ippFreeAttr
 _ppdFreeLanguages

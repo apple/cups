@@ -186,18 +186,34 @@ backendGetDeviceID(
 
      /*
       * The length field counts the number of bytes in the string
-      * including the length field itself (2 bytes).
+      * including the length field itself (2 bytes).  The minimum
+      * length for a valid/usable device ID is 14 bytes:
+      *
+      *     <LENGTH> MFG: <MFG> ;MDL: <MDL> ;
+      *        2  +   4  +  1  +  5 +  1 +  1
       */
 
-      length -= 2;
+      if (length < 14)
+      {
+       /*
+	* Can't use this device ID, so don't try to copy it...
+	*/
 
-     /*
-      * Copy the device ID text to the beginning of the buffer and
-      * nul-terminate.
-      */
+	device_id[0] = '\0';
+	got_id       = 0;
+      }
+      else
+      {
+       /*
+	* Copy the device ID text to the beginning of the buffer and
+	* nul-terminate.
+	*/
 
-      memmove(device_id, device_id + 2, length);
-      device_id[length] = '\0';
+	length -= 2;
+
+	memmove(device_id, device_id + 2, length);
+	device_id[length] = '\0';
+      }
     }
 #    ifdef DEBUG
     else
@@ -294,6 +310,9 @@ backendGetDeviceID(
       mfg = temp;
     }
 
+    if (!mdl)
+      mdl = "";
+
     if (!strncasecmp(mdl, mfg, strlen(mfg)))
     {
       mdl += strlen(mfg);
@@ -385,7 +404,11 @@ backendGetMakeModel(
 
       char	temp[1024];		/* Temporary make and model */
 
-      snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
+      if (mfg)
+	snprintf(temp, sizeof(temp), "%s %s", mfg, mdl);
+      else
+	snprintf(temp, sizeof(temp), "%s", mdl);
+
       _ppdNormalizeMakeAndModel(temp, make_model, make_model_size);
     }
   }

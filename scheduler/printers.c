@@ -4524,7 +4524,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * Just the DefaultResolution to report...
       */
 
-      xdpi = (int)strtol(ppd_attr->value, (char **)&resptr, 10);
+      xdpi = ydpi = (int)strtol(ppd_attr->value, (char **)&resptr, 10);
       if (resptr > ppd_attr->value && xdpi > 0)
       {
 	if (*resptr == 'x')
