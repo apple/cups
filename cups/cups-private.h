@@ -30,9 +30,7 @@
 #  include "ipp-private.h"
 #  include "language-private.h"
 #  include "pwg-private.h"
-#  ifdef HAVE_PTHREAD_H
-#    include <pthread.h>
-#  endif /* HAVE_PTHREAD_H */
+#  include "thread-private.h"
 
 
 /*
@@ -150,7 +148,9 @@ extern http_t		*_cupsConnect(void);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
 extern const char	*_cupsGetPassword(const char *prompt);
+extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
+extern void		_cupsGlobalUnlock(void);
 extern void		_cupsSetDefaults(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);

@@ -24,7 +24,6 @@
  */
 
 #include "cups-private.h"
-#include <stdlib.h>
 #include <sys/stat.h>
 #ifdef WIN32
 #  include <io.h>
@@ -697,7 +696,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     }
     else
       puts("FAIL (No conflicts!)");
-    
+
     fputs("ppdInstallableConflict(): ", stdout);
     if (ppdInstallableConflict(ppd, "Duplex", "DuplexNoTumble") &&
         !ppdInstallableConflict(ppd, "Duplex", "None"))

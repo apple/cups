@@ -27,8 +27,7 @@
  * Include necessary headers...
  */
 
-#include <stdlib.h>
-#include <cups/file.h>
+#include "file.h"
 #include "string-private.h"
 #include "ipp-private.h"
 #ifdef WIN32

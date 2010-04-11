@@ -432,7 +432,6 @@
 
 #undef HAVE_LAUNCH_H
 #undef HAVE_LAUNCHD
-#define CUPS_DEFAULT_LAUNCHD_CONF ""
 
 
 /*
@@ -480,6 +479,20 @@
 #undef HAVE_COREFOUNDATION_H
 #undef HAVE_CFPRIV_H
 #undef HAVE_CFBUNDLEPRIV_H
+
+
+/*
+ * Do we have ApplicationServices public headers?
+ */
+
+#undef HAVE_APPLICATIONSERVICES_H
+
+
+/*
+ * Do we have the SCDynamicStoreCopyComputerName function?
+ */
+
+#undef HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME
 
 
 /*

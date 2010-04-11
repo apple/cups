@@ -26,9 +26,11 @@
  *   httpClearCookie()    - Clear the cookie value(s).
  *   httpClearFields()    - Clear HTTP request fields.
  *   httpClose()          - Close an HTTP connection...
+ *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   _httpCreate()        - Create an unconnected HTTP connection.
  *   httpDelete()         - Send a DELETE request to the server.
+ *   _httpDisconnect()    - Disconnect a HTTP connection.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpError()          - Get the last error on a connection.
  *   httpFlush()          - Flush data from a HTTP connection.
@@ -52,6 +54,7 @@
  *   httpInitialize()     - Initialize the HTTP interface library and set the
  *                          default HTTP proxy (if any).
  *   httpOptions()        - Send an OPTIONS request to the server.
+ *   _httpPeek()          - Peek at data from a HTTP connection.
  *   httpPost()           - Send a POST request to the server.
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
  *   httpPut()            - Send a PUT request to the server.
@@ -320,24 +323,27 @@ httpClose(http_t *http)			/* I - Connection to server */
 
   DEBUG_printf(("httpClose(http=%p)", http));
 
+ /*
+  * Range check input...
+  */
+
   if (!http)
     return;
+
+ /*
+  * Close any open connection...
+  */
+
+  _httpDisconnect(http);
+
+ /*
+  * Free memory used...
+  */
 
   httpAddrFreeList(http->addrlist);
 
   if (http->cookie)
     free(http->cookie);
-
-#ifdef HAVE_SSL
-  if (http->tls)
-    http_shutdown_ssl(http);
-#endif /* HAVE_SSL */
-
-#ifdef WIN32
-  closesocket(http->fd);
-#else
-  close(http->fd);
-#endif /* WIN32 */
 
 #ifdef HAVE_GSSAPI
   if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -499,6 +505,28 @@ httpDelete(http_t     *http,		/* I - Connection to server */
            const char *uri)		/* I - URI to delete */
 {
   return (http_send(http, HTTP_DELETE, uri));
+}
+
+
+/*
+ * '_httpDisconnect()' - Disconnect a HTTP connection.
+ */
+
+void
+_httpDisconnect(http_t *http)		/* I - Connection to server */
+{
+#ifdef HAVE_SSL
+  if (http->tls)
+    http_shutdown_ssl(http);
+#endif /* HAVE_SSL */
+
+#ifdef WIN32
+  closesocket(http->fd);
+#else
+  close(http->fd);
+#endif /* WIN32 */
+
+  http->fd = -1;
 }
 
 
@@ -1244,6 +1272,176 @@ httpOptions(http_t     *http,		/* I - Connection to server */
             const char *uri)		/* I - URI for options */
 {
   return (http_send(http, HTTP_OPTIONS, uri));
+}
+
+
+/*
+ * '_httpPeek()' - Peek at data from a HTTP connection.
+ *
+ * This function copies available data from the given HTTP connection, reading
+ * a buffer as needed.  The data is still available for reading using
+ * @link httpRead@ or @link httpRead2@.
+ *
+ * For non-blocking connections the usual timeouts apply.
+ */
+
+ssize_t					/* O - Number of bytes copied */
+_httpPeek(http_t *http,			/* I - Connection to server */
+          char   *buffer,		/* I - Buffer for data */
+	  size_t length)		/* I - Maximum number of bytes */
+{
+  ssize_t	bytes;			/* Bytes read */
+  char		len[32];		/* Length string */
+
+
+  DEBUG_printf(("_httpPeek(http=%p, buffer=%p, length=" CUPS_LLFMT ")",
+                http, buffer, CUPS_LLCAST length));
+
+  if (http == NULL || buffer == NULL)
+    return (-1);
+
+  http->activity = time(NULL);
+  http->error    = 0;
+
+  if (length <= 0)
+    return (0);
+
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+      http->data_remaining <= 0)
+  {
+    DEBUG_puts("2_httpPeek: Getting chunk length...");
+
+    if (httpGets(len, sizeof(len), http) == NULL)
+    {
+      DEBUG_puts("1_httpPeek: Could not get length!");
+      return (0);
+    }
+
+    http->data_remaining = strtoll(len, NULL, 16);
+    if (http->data_remaining < 0)
+    {
+      DEBUG_puts("1_httpPeek: Negative chunk length!");
+      return (0);
+    }
+  }
+
+  DEBUG_printf(("2_httpPeek: data_remaining=" CUPS_LLFMT,
+                CUPS_LLCAST http->data_remaining));
+
+  if (http->data_remaining <= 0)
+  {
+   /*
+    * A zero-length chunk ends a transfer; unless we are reading POST
+    * data, go idle...
+    */
+
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+      httpGets(len, sizeof(len), http);
+
+    if (http->state == HTTP_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_WAITING;
+
+   /*
+    * Prevent future reads for this request...
+    */
+
+    http->data_encoding = HTTP_ENCODE_LENGTH;
+
+    return (0);
+  }
+  else if (length > (size_t)http->data_remaining)
+    length = (size_t)http->data_remaining;
+
+  if (http->used == 0)
+  {
+   /*
+    * Buffer small reads for better performance...
+    */
+
+    if (!http->blocking && !httpWait(http, 10000))
+      return (0);
+
+    if (http->data_remaining > sizeof(http->buffer))
+      bytes = sizeof(http->buffer);
+    else
+      bytes = http->data_remaining;
+
+#ifdef HAVE_SSL
+    if (http->tls)
+      bytes = http_read_ssl(http, http->buffer, bytes);
+    else
+#endif /* HAVE_SSL */
+    {
+      DEBUG_printf(("2_httpPeek: reading %d bytes from socket into buffer...",
+                    (int)bytes));
+
+      bytes = recv(http->fd, http->buffer, bytes, 0);
+
+      DEBUG_printf(("2_httpPeek: read %d bytes from socket into buffer...",
+                    (int)bytes));
+    }
+
+    if (bytes > 0)
+      http->used = bytes;
+    else if (bytes < 0)
+    {
+#ifdef WIN32
+      http->error = WSAGetLastError();
+      return (-1);
+#else
+      if (errno != EINTR && errno != EAGAIN)
+      {
+        http->error = errno;
+        return (-1);
+      }
+#endif /* WIN32 */
+    }
+    else
+    {
+      http->error = EPIPE;
+      return (0);
+    }
+  }
+
+  if (http->used > 0)
+  {
+    if (length > (size_t)http->used)
+      length = (size_t)http->used;
+
+    bytes = (ssize_t)length;
+
+    DEBUG_printf(("2_httpPeek: grabbing %d bytes from input buffer...",
+                  (int)bytes));
+
+    memcpy(buffer, http->buffer, length);
+  }
+  else
+    bytes = 0;
+
+  if (bytes < 0)
+  {
+#ifdef WIN32
+    http->error = WSAGetLastError();
+#else
+    if (errno == EINTR || errno == EAGAIN)
+      bytes = 0;
+    else
+      http->error = errno;
+#endif /* WIN32 */
+  }
+  else if (bytes == 0)
+  {
+    http->error = EPIPE;
+    return (0);
+  }
+
+#ifdef DEBUG
+  http_debug_hex("_httpPeek", buffer, (int)bytes);
+#endif /* DEBUG */
+
+  return (bytes);
 }
 
 

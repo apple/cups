@@ -16,7 +16,7 @@ SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
 <TD CLASS="sel"><A HREF="/">&nbsp;&nbsp;Startseite&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/admin">&nbsp;&nbsp;Verwaltung&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/classes/">&nbsp;&nbsp;Klassen&nbsp;&nbsp;</A></TD>
-<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
+<TD CLASS="unsel"><A HREF="/help/">&nbsp;&nbsp;Online-&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/jobs/">&nbsp;&nbsp;Auftr&auml;ge&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel"><A HREF="/printers/">&nbsp;&nbsp;Drucker&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT
@@ -31,7 +31,7 @@ AUTOSAVE="org.cups.help" RESULTS="20"></FORM></TD>
 
 <H1>Common UNIX Printing System @CUPS_VERSION@</H1>
 
-<P>CUPS ist das auf Standards basierte, Open-Source Drucker System, welches von
+<P>CUPS ist das auf Standards basierte, Opensource-Drucksystem, welches von
 <A HREF="http://www.apple.com/">Apple Inc.</A> f&uuml;r Mac OS<SUP>&reg;</SUP> X und
 andere UNIX<SUP>&reg;</SUP>-&auml;hnliche Betriebssysteme entwickelt wird.</P>
 
@@ -46,13 +46,13 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <H2>CUPS f&uuml;r Benutzer</H2>
 
-<P><A HREF="help/overview.html">CUPS &Uuml;bersicht</A></P>
+<P><A HREF="help/overview.html">CUPS.&Uuml;bersicht</A></P>
 
 <P><A HREF="help/options.html">Kommandozeilendruck und Einstellungen</A></P>
 
 <P><A HREF="help/whatsnew.html">Neues in CUPS 1.4</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Benutzer Forum</A></P>
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.general">Benutzerforum</A></P>
 
 </TD><TD VALIGN="top" STYLE="border-right: dotted thin #cccccc; padding-left: 20px; padding-right: 20px;">
 
@@ -66,7 +66,7 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <P><A HREF="help/security.html">Sicherheit des Servers</A></P>
 
-<P><A HREF="help/kerberos.html">Benutzen der Kerberos Authentifizierung</A></P>
+<P><A HREF="help/kerberos.html">Verwenden der Kerberos Authentifizierung</A></P>
 
 <P><A HREF="help/network.html">Benutzen von Netzwerkdruckern</A></P>
 
@@ -78,21 +78,21 @@ HEIGHT="128" ALT="CUPS"></A></TD>
 
 <H2>CUPS f&uuml;r Entwickler</H2>
 
-<P><A HREF="help/api-overview.html">Einf&uuml;hrung in die CUPS Programmierung</A></P>
+<P><A HREF="help/api-overview.html">Einf&uuml;hrung in die CUPS-Programmierung</A></P>
 
-<P><A HREF="help/api-cups.html">CUPS API</A></P>
+<P><A HREF="help/api-cups.html">CUPS-API</A></P>
 
-<P><A HREF="help/api-filter.html">Filter und Backend Programmierung</A></P>
+<P><A HREF="help/api-filter.html">Filter- und Backend-Programmierung</A></P>
 
-<P><A HREF="help/api-httpipp.html">HTTP und IPP APIs</A></P>
+<P><A HREF="help/api-httpipp.html">HTTP- und IPP-APIs</A></P>
 
-<P><A HREF="help/api-ppd.html">PPD API</A></P>
+<P><A HREF="help/api-ppd.html">PPD-API</A></P>
 
-<P><A HREF="help/api-raster.html">Raster API</A></P>
+<P><A HREF="help/api-raster.html">Raster-API</A></P>
 
 <P><A HREF="help/ref-ppdcfile.html">PPD Compiler Driver Information File Reference</A></P>
 
-<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Entwickler Forum</A></P>
+<P><A HREF="http://www.cups.org/newsgroups.php?gcups.development">Entwicklerforum</A></P>
 
 </TD></TR>
 </TABLE>

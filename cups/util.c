@@ -18,7 +18,7 @@
  *
  *   cupsCancelJob()        - Cancel a print job on the default server.
  *   cupsCancelJob2()       - Cancel or purge a print job.
- *   cupsCreateJob()        - Create an empty job.
+ *   cupsCreateJob()        - Create an empty job for streaming.
  *   cupsFinishDocument()   - Finish sending a document.
  *   cupsFreeJobs()         - Free memory used by job data.
  *   cupsGetClasses()       - Get a list of printer classes from the default
@@ -37,8 +37,6 @@
  *                            server if it has changed.
  *   cupsGetPrinters()      - Get a list of printers from the default server.
  *   cupsGetServerPPD()     - Get an available PPD file from the server.
- *   cupsLastError()        - Return the last IPP status code.
- *   cupsLastErrorString()  - Return the last IPP status-message.
  *   cupsPrintFile()        - Print a file to a printer or class on the default
  *                            server.
  *   cupsPrintFile2()       - Print a file to a printer or class on the
@@ -49,7 +47,6 @@
  *                            the specified server.
  *   cupsStartDocument()    - Add a document to a job created with
  *                            cupsCreateJob().
- *   _cupsConnect()         - Get the default server connection...
  *   cups_get_printer_uri() - Get the printer-uri-supported attribute for the
  *                            first printer in a class.
  */
@@ -59,7 +56,6 @@
  */
 
 #include "cups-private.h"
-#include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #if defined(WIN32) || defined(__EMX__)
@@ -1334,30 +1330,6 @@ cupsGetServerPPD(http_t     *http,	/* I - Connection to server or @code CUPS_HTT
 
 
 /*
- * 'cupsLastError()' - Return the last IPP status code.
- */
-
-ipp_status_t				/* O - IPP status code from last request */
-cupsLastError(void)
-{
-  return (_cupsGlobals()->last_error);
-}
-
-
-/*
- * 'cupsLastErrorString()' - Return the last IPP status-message.
- *
- * @since CUPS 1.2/Mac OS X 10.5@
- */
-
-const char *				/* O - status-message text from last request */
-cupsLastErrorString(void)
-{
-  return (_cupsGlobals()->last_status_message);
-}
-
-
-/*
  * 'cupsPrintFile()' - Print a file to a printer or class on the default server.
  */
 
@@ -1619,67 +1591,6 @@ cupsStartDocument(
   ippDelete(request);
 
   return (status);
-}
-
-
-/*
- * '_cupsConnect()' - Get the default server connection...
- */
-
-http_t *				/* O - HTTP connection */
-_cupsConnect(void)
-{
-  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-
-
- /*
-  * See if we are connected to the same server...
-  */
-
-  if (cg->http)
-  {
-   /*
-    * Compare the connection hostname, port, and encryption settings to
-    * the cached defaults; these were initialized the first time we
-    * connected...
-    */
-
-    if (strcmp(cg->http->hostname, cg->server) ||
-        cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
-        (cg->http->encryption != cg->encryption &&
-	 cg->http->encryption == HTTP_ENCRYPT_NEVER))
-    {
-     /*
-      * Need to close the current connection because something has changed...
-      */
-
-      httpClose(cg->http);
-      cg->http = NULL;
-    }
-  }
-
- /*
-  * (Re)connect as needed...
-  */
-
-  if (!cg->http)
-  {
-    if ((cg->http = httpConnectEncrypt(cupsServer(), ippPort(),
-                                       cupsEncryption())) == NULL)
-    {
-      if (errno)
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
-      else
-        _cupsSetError(IPP_SERVICE_UNAVAILABLE,
-	              _("Unable to connect to host."), 1);
-    }
-  }
-
- /*
-  * Return the cached connection...
-  */
-
-  return (cg->http);
 }
 
 

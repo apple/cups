@@ -60,6 +60,19 @@
 
 
 /*
+ * Map various parameters to Posix style system calls
+ */
+
+#  define F_OK		00
+#  define W_OK		02
+#  define R_OK		04
+#  define O_RDONLY	_O_RDONLY
+#  define O_WRONLY	_O_WRONLY
+#  define O_CREATE	_O_CREAT
+#  define O_TRUNC	_O_TRUNC
+
+
+/*
  * Compiler stuff...
  */
 
@@ -79,10 +92,10 @@
  * Default user and groups...
  */
 
-#define CUPS_DEFAULT_USER	"lp"
-#define CUPS_DEFAULT_GROUP	"sys"
-#define CUPS_DEFAULT_SYSTEM_GROUPS "admin"
-#define CUPS_DEFAULT_PRINTOPERATOR_AUTH "@admin @lpadmin"
+#define CUPS_DEFAULT_USER	""
+#define CUPS_DEFAULT_GROUP	""
+#define CUPS_DEFAULT_SYSTEM_GROUPS ""
+#define CUPS_DEFAULT_PRINTOPERATOR_AUTH ""
 
 
 /*
@@ -261,9 +274,9 @@
  * Do we have the strXXX() functions?
  */
 
-#define HAVE_STRDUP
-#define HAVE_STRCASECMP
-#define HAVE_STRNCASECMP
+#define HAVE_STRDUP 1
+#define HAVE_STRCASECMP 1
+#define HAVE_STRNCASECMP 1
 /* #undef HAVE_STRLCAT */
 /* #undef HAVE_STRLCPY */
 
@@ -386,7 +399,7 @@
  * Do we have DNS Service Discovery (aka Bonjour)?
  */
 
-/* #undef HAVE_DNSSD */
+#define HAVE_DNSSD 1
 
 
 /*
@@ -486,7 +499,6 @@
 
 /* #undef HAVE_LAUNCH_H */
 /* #undef HAVE_LAUNCHD */
-#define CUPS_DEFAULT_LAUNCHD_CONF ""
 
 
 /*
@@ -534,6 +546,20 @@
 /* #undef HAVE_COREFOUNDATION_H */
 /* #undef HAVE_CFPRIV_H */
 /* #undef HAVE_CFBUNDLEPRIV_H */
+
+
+/*
+ * Do we have ApplicationServices public headers?
+ */
+
+/* #undef HAVE_APPLICATIONSERVICES_H */
+
+
+/*
+ * Do we have the SCDynamicStoreCopyComputerName function?
+ */
+
+/* #undef HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
 
 
 /*

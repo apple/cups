@@ -25,6 +25,7 @@
  */
 
 #include "cups-private.h"
+#include "thread-private.h"
 #ifdef WIN32
 #  include <io.h>
 #else
@@ -57,10 +58,8 @@ static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
 #  endif /* !WIN32 */
 static int		debug_init = 0;	/* Did we initialize debugging? */
-#  ifdef HAVE_PTHREAD_H
-static pthread_mutex_t	debug_mutex = PTHREAD_MUTEX_INITIALIZER;
+static _cups_mutex_t	debug_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
-#  endif /* HAVE_PTHREAD_H */
 
 
 /*
@@ -244,11 +243,11 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
 	    if ((width + 2) > sizeof(temp))
 	      break;
 
-#ifdef HAVE_LONG_LONG
+#  ifdef HAVE_LONG_LONG
             if (size == 'L')
 	      sprintf(temp, tformat, va_arg(ap, long long));
 	    else
-#endif /* HAVE_LONG_LONG */
+#  endif /* HAVE_LONG_LONG */
             if (size == 'l')
 	      sprintf(temp, tformat, va_arg(ap, long));
 	    else
@@ -411,7 +410,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
 			*cups_debug_level,
 					/* CUPS_DEBUG_LEVEL environment variable */
 			*cups_debug_log;/* CUPS_DEBUG_LOG environment variable */
-			
+
 
  /*
   * See if we need to do any logging...
@@ -424,7 +423,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
     * thread already did it...
     */
 
-    pthread_mutex_lock(&debug_mutex);
+    _cupsMutexLock(&debug_mutex);
 
     if (!debug_init)
     {
@@ -462,7 +461,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
       debug_init = 1;
     }
 
-    pthread_mutex_unlock(&debug_mutex);
+    _cupsMutexUnlock(&debug_mutex);
   }
 
   if (_cups_debug_fd < 0)
@@ -484,9 +483,9 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   {
     int	result;				/* Filter result */
 
-    pthread_mutex_lock(&debug_mutex);
+    _cupsMutexLock(&debug_mutex);
     result = regexec(debug_filter, format, 0, NULL, 0);
-    pthread_mutex_unlock(&debug_mutex);
+    _cupsMutexUnlock(&debug_mutex);
 
     if (result)
       return;
@@ -538,12 +537,6 @@ _cups_debug_puts(const char *s)		/* I - String to output */
 
   _cups_debug_printf(format, s);
 }
-
-
-#elif defined(__APPLE__)
-/* Mac OS X needs these stubbed since we reference them in the libcups.exp file */
-void	_cups_debug_printf(const char *format, ...) {}
-void	_cups_debug_puts(const char *s) {}
 #endif /* DEBUG */
 
 

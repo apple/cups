@@ -466,10 +466,10 @@ rastertohp:	rastertohp.o ../cups/$(LIBCUPS) $(LIBCUPSIMAGE)
 # testraster
 #
 
-testraster:	testraster.o ../cups/libcups.a libcupsimage.a
+testraster:	testraster.o ../cups/$(LIBCUPSSTATIC) libcupsimage.a
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testraster.o libcupsimage.a \
-		../cups/libcups.a $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(IMGLIBS) $(DSOLIBS) $(COMMONLIBS) \
 		$(SSLLIBS) $(DNSSDLIBS) $(LIBGSSAPI)
 	echo Running raster API tests...
 	./testraster

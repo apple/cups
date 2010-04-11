@@ -29,8 +29,6 @@
 #include "debug-private.h"
 #include "array.h"
 #include "dir.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 
 /*

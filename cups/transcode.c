@@ -42,7 +42,6 @@
 
 #include "cups-private.h"
 #include <limits.h>
-#include <stdlib.h>
 #include <time.h>
 
 
@@ -50,10 +49,8 @@
  * Local globals...
  */
 
-#ifdef HAVE_PTHREAD_H
-static pthread_mutex_t	map_mutex = PTHREAD_MUTEX_INITIALIZER;
+static _cups_mutex_t	map_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control access to maps */
-#endif /* HAVE_PTHREAD_H */
 static _cups_cmap_t	*cmap_cache = NULL;
 					/* SBCS Charmap Cache */
 static _cups_vmap_t	*vmap_cache = NULL;
@@ -104,9 +101,7 @@ _cupsCharmapFlush(void)
 		*vnext;			/* Next Legacy VBCS Charset Map */
 
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_lock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexLock(&map_mutex);
 
  /*
   * Loop through SBCS charset map cache, free all memory...
@@ -134,9 +129,7 @@ _cupsCharmapFlush(void)
 
   vmap_cache = NULL;
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_unlock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexUnlock(&map_mutex);
 }
 
 
@@ -158,9 +151,7 @@ _cupsCharmapFree(
   * See if we already have this SBCS charset map loaded...
   */
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_lock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexLock(&map_mutex);
 
   for (cmap = cmap_cache; cmap; cmap = cmap->next)
   {
@@ -186,9 +177,7 @@ _cupsCharmapFree(
     }
   }
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_unlock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexUnlock(&map_mutex);
 }
 
 
@@ -224,15 +213,11 @@ _cupsCharmapGet(
   * Lookup or get the charset map pointer and return...
   */
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_lock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexLock(&map_mutex);
 
   charmap = get_charmap(encoding);
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_unlock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexUnlock(&map_mutex);
 
   return (charmap);
 }
@@ -320,18 +305,14 @@ cupsCharsetToUTF8(
   * Convert input legacy charset to UTF-8...
   */
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_lock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexLock(&map_mutex);
 
   if (encoding < CUPS_ENCODING_SBCS_END)
     bytes = conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
   else
     bytes = conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_unlock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexUnlock(&map_mutex);
 
   return (bytes);
 }
@@ -422,18 +403,14 @@ cupsUTF8ToCharset(
   * Convert input UTF-8 to legacy charset...
   */
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_lock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexLock(&map_mutex);
 
   if (encoding < CUPS_ENCODING_SBCS_END)
     bytes = conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding);
   else
     bytes = conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding);
 
-#ifdef HAVE_PTHREAD_H
-  pthread_mutex_unlock(&map_mutex);
-#endif /* HAVE_PTHREAD_H */
+  _cupsMutexUnlock(&map_mutex);
 
   return (bytes);
 }

@@ -144,9 +144,9 @@ pot:
 # checkpo filename.po [... filenameN.po]
 #
 
-checkpo:	checkpo.o ../cups/libcups.a
+checkpo:	checkpo.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o checkpo checkpo.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o checkpo checkpo.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 checkall:	checkpo
@@ -162,9 +162,9 @@ checkall:	checkpo
 # po2strings filename.po filename.strings
 #
 
-po2strings:	po2strings.o ../cups/libcups.a
+po2strings:	po2strings.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o po2strings po2strings.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o po2strings po2strings.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
@@ -187,9 +187,9 @@ strings2po:	strings2po.o
 # translate outfile language
 #
 
-translate:	translate.o ../cups/libcups.a
+translate:	translate.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $<...
-	$(CC) $(LDFLAGS) -o translate translate.o ../cups/libcups.a \
+	$(CC) $(LDFLAGS) -o translate translate.o ../cups/$(LIBCUPSSTATIC) \
 		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

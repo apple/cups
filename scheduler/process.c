@@ -31,7 +31,7 @@
 #include <grp.h>
 #ifdef __APPLE__
 #  include <libgen.h>
-#endif /* __APPLE__ */ 
+#endif /* __APPLE__ */
 #ifdef HAVE_SANDBOX_H
 #  define __APPLE_API_PRIVATE
 #  include <sandbox.h>
@@ -376,7 +376,7 @@ cupsdStartProcess(
   if (envp)
   {
    /*
-    * Add special voodoo magic for MacOS X - this allows MacOS X 
+    * Add special voodoo magic for Mac OS X - this allows Mac OS X
     * programs to access their bundle resources properly...
     */
 

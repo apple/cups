@@ -265,11 +265,15 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
 extern int		_httpAddrPort(http_addr_t *addr);
 extern http_t		*_httpCreate(const char *host, int port,
 			             http_encryption_t encryption);
+extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
+extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int log);
 extern int		_httpWait(http_t *http, int msec, int usessl);
+
+
 #endif /* !_CUPS_HTTP_PRIVATE_H_ */
 
 /*

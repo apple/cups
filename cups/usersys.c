@@ -340,6 +340,7 @@ cupsSetUser(const char *user)		/* I - User name */
 const char *				/* O - User name */
 cupsUser(void)
 {
+  const char	*user;			/* USER environment variable */
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
 
 
@@ -372,11 +373,19 @@ cupsUser(void)
     }
     else
 #endif /* WIN32 */
+    if ((user = getenv("USER")) != NULL)
+    {
+     /*
+      * Use the username from the "USER" environment variable...
+      */
+      strlcpy(cg->user, user, sizeof(cg->user));
+    }
+    else
     {
      /*
       * Use the default "unknown" user name...
       */
-      
+
       strcpy(cg->user, "unknown");
     }
   }
@@ -501,7 +510,7 @@ _cupsSetDefaults(void)
   if (!cg->ipp_port)
   {
     const char		*ipp_port;	/* IPP_PORT environment variable */
-    struct servent	*service;	/* Port number info */  
+    struct servent	*service;	/* Port number info */
 
 
     if ((ipp_port = getenv("IPP_PORT")) != NULL)
