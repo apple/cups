@@ -842,6 +842,9 @@ cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
   * See if we need to add the ending sheet...
   */
 
+  if (!cupsdLoadJob(job))
+    return (-1);
+
   printer = cupsdFindDest(job->dest);
   attr    = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
