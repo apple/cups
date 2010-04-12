@@ -45,7 +45,9 @@ _httpAddrPort
 _httpBIOMethods
 _httpCreate
 _httpEncodeURI
+_httpPeek
 _httpResolveURI
+_httpWait
 _ippAddAttr
 _ippFreeAttr
 _ppdFreeLanguages

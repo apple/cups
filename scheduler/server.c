@@ -1,9 +1,9 @@
 /*
  * "$Id: server.c 7927 2008-09-10 22:05:29Z mike $"
  *
- *   Server start/stop routines for the Common UNIX Printing System (CUPS).
+ *   Server start/stop routines for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -44,41 +44,6 @@ static int	started = 0;
 void
 cupsdStartServer(void)
 {
-#ifdef HAVE_LIBSSL
-  int			i;		/* Looping var */
-  struct timeval	curtime;	/* Current time in microseconds */
-  unsigned char		data[1024];	/* Seed data */
-#endif /* HAVE_LIBSSL */
-
-
-#ifdef HAVE_LIBSSL
- /*
-  * Initialize the encryption libraries...
-  */
-
-  SSL_library_init();
-  SSL_load_error_strings();
-
- /*
-  * Using the current time is a dubious random seed, but on some systems
-  * it is the best we can do (on others, this seed isn't even used...)
-  */
-
-  gettimeofday(&curtime, NULL);
-  srand(curtime.tv_sec + curtime.tv_usec);
-
-  for (i = 0; i < sizeof(data); i ++)
-    data[i] = rand(); /* Yes, this is a poor source of random data... */
-
-  RAND_seed(&data, sizeof(data));
-#elif defined(HAVE_GNUTLS)
- /*
-  * Initialize the encryption libraries...
-  */
-
-  gnutls_global_init();
-#endif /* HAVE_LIBSSL */
-
  /*
   * Create the default security profile...
   */

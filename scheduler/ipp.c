@@ -842,6 +842,9 @@ cupsdTimeoutJob(cupsd_job_t *job)	/* I - Job to timeout */
   * See if we need to add the ending sheet...
   */
 
+  if (!cupsdLoadJob(job))
+    return (-1);
+
   printer = cupsdFindDest(job->dest);
   attr    = ippFindAttribute(job->attrs, "job-sheets", IPP_TAG_NAME);
 
@@ -10223,6 +10226,17 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
 
   if (!con->filename)
   {
+   /*
+    * Check for an empty request with "last-document" set to true, which is
+    * used to close an "open" job by RFC 2911, section 3.3.2.
+    */
+
+    if (job->num_files > 0 &&
+        (attr = ippFindAttribute(con->request, "last-document",
+	                         IPP_TAG_BOOLEAN)) != NULL &&
+        attr->values[0].boolean)
+      goto last_document;
+
     send_ipp_status(con, IPP_BAD_REQUEST, _("No file!?"));
     return;
   }
@@ -10378,6 +10392,8 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
  /*
   * Start the job if this is the last document...
   */
+
+  last_document:
 
   if ((attr = ippFindAttribute(con->request, "last-document",
                                IPP_TAG_BOOLEAN)) != NULL &&

@@ -269,10 +269,10 @@ test:
 # testcmyk, test cmyk separation functions.
 #
 
-testcmyk:		test testcmyk.o libcupsdriver.a ../cups/libcups.a
+testcmyk:		test testcmyk.o libcupsdriver.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testcmyk.o libcupsdriver.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	echo Running CMYK API tests...
 	./testcmyk > test/testcmyk.log
@@ -282,10 +282,10 @@ testcmyk:		test testcmyk.o libcupsdriver.a ../cups/libcups.a
 # testdither, test dithering functions.
 #
 
-testdither:		test testdither.o libcupsdriver.a ../cups/libcups.a
+testdither:		test testdither.o libcupsdriver.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testdither.o libcupsdriver.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	echo Running dither API tests...
 	./testdither > test/0-255.pgm 2>test/0-255.log
@@ -302,10 +302,10 @@ testdither:		test testdither.o libcupsdriver.a ../cups/libcups.a
 # testrgb, test RGB separation functions.
 #
 
-testrgb:		test testrgb.o libcupsdriver.a ../cups/libcups.a
+testrgb:		test testrgb.o libcupsdriver.a ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(LDFLAGS) -o $@ testrgb.o libcupsdriver.a \
-		../cups/libcups.a $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
+		../cups/$(LIBCUPSSTATIC) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	echo Running RGB API tests...
 	./testrgb > test/testrgb.log 2>&1 || echo "RGB tests failed!"

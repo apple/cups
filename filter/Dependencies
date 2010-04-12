@@ -87,19 +87,25 @@ gziptoany.o: ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
 gziptoany.o: ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
 gziptoany.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
 gziptoany.o: ../cups/language-private.h ../cups/transcode.h
+gziptoany.o: ../cups/thread-private.h
 imagetops.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetops.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 imagetops.o: ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
 imagetops.o: image.h ../cups/raster.h ../cups/ppd.h
+imagetops.o: ../cups/language-private.h ../cups/transcode.h
 imagetoraster.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetoraster.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h
 imagetoraster.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 imagetoraster.o: ../cups/language.h ../cups/array.h image-private.h image.h
 imagetoraster.o: ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.o: ../cups/language-private.h ../cups/transcode.h
 common.o: common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.o: ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.o: ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
-pdftops.o: ../cups/cups.h
+pdftops.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+pdftops.o: ../cups/language.h ../cups/array.h ../cups/string-private.h
+pdftops.o: ../config.h ../cups/language-private.h ../cups/transcode.h
 pstext.o: pstext.h common.h ../cups/string-private.h ../config.h
 pstext.o: ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
 pstext.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
@@ -235,19 +241,25 @@ gziptoany.32.o: gziptoany.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../
 gziptoany.32.o: gziptoany.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
 gziptoany.32.o: gziptoany.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
 gziptoany.32.o: gziptoany.c  ../cups/language-private.h ../cups/transcode.h
+gziptoany.32.o: gziptoany.c  ../cups/thread-private.h
 imagetops.32.o: imagetops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetops.32.o: imagetops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 imagetops.32.o: imagetops.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
 imagetops.32.o: imagetops.c  image.h ../cups/raster.h ../cups/ppd.h
+imagetops.32.o: imagetops.c  ../cups/language-private.h ../cups/transcode.h
 imagetoraster.32.o: imagetoraster.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetoraster.32.o: imagetoraster.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
 imagetoraster.32.o: imagetoraster.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 imagetoraster.32.o: imagetoraster.c  ../cups/language.h ../cups/array.h image-private.h image.h
 imagetoraster.32.o: imagetoraster.c  ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.32.o: imagetoraster.c  ../cups/language-private.h ../cups/transcode.h
 common.32.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.32.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.32.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
-pdftops.32.o: pdftops.c  ../cups/cups.h
+pdftops.32.o: pdftops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.32.o: pdftops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+pdftops.32.o: pdftops.c  ../cups/language.h ../cups/array.h ../cups/string-private.h
+pdftops.32.o: pdftops.c  ../config.h ../cups/language-private.h ../cups/transcode.h
 pstext.32.o: pstext.c  pstext.h common.h ../cups/string-private.h ../config.h
 pstext.32.o: pstext.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
 pstext.32.o: pstext.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
@@ -383,19 +395,25 @@ gziptoany.64.o: gziptoany.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../
 gziptoany.64.o: gziptoany.c  ../cups/pwg-private.h ../cups/http-private.h ../cups/http.h
 gziptoany.64.o: gziptoany.c  ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
 gziptoany.64.o: gziptoany.c  ../cups/language-private.h ../cups/transcode.h
+gziptoany.64.o: gziptoany.c  ../cups/thread-private.h
 imagetops.64.o: imagetops.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetops.64.o: imagetops.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 imagetops.64.o: imagetops.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
 imagetops.64.o: imagetops.c  image.h ../cups/raster.h ../cups/ppd.h
+imagetops.64.o: imagetops.c  ../cups/language-private.h ../cups/transcode.h
 imagetoraster.64.o: imagetoraster.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 imagetoraster.64.o: imagetoraster.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h
 imagetoraster.64.o: imagetoraster.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 imagetoraster.64.o: imagetoraster.c  ../cups/language.h ../cups/array.h image-private.h image.h
 imagetoraster.64.o: imagetoraster.c  ../cups/raster.h ../cups/ppd.h ../cups/debug-private.h
+imagetoraster.64.o: imagetoraster.c  ../cups/language-private.h ../cups/transcode.h
 common.64.o: common.c  common.h ../cups/string-private.h ../config.h ../cups/cups.h
 common.64.o: common.c  ../cups/ppd.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
 common.64.o: common.c  ../cups/ipp.h ../cups/http.h ../cups/language.h ../cups/array.h
-pdftops.64.o: pdftops.c  ../cups/cups.h
+pdftops.64.o: pdftops.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
+pdftops.64.o: pdftops.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+pdftops.64.o: pdftops.c  ../cups/language.h ../cups/array.h ../cups/string-private.h
+pdftops.64.o: pdftops.c  ../config.h ../cups/language-private.h ../cups/transcode.h
 pstext.64.o: pstext.c  pstext.h common.h ../cups/string-private.h ../config.h
 pstext.64.o: pstext.c  ../cups/cups.h ../cups/ppd.h ../cups/cups.h ../cups/file.h
 pstext.64.o: pstext.c  ../cups/versioning.h ../cups/ipp.h ../cups/http.h

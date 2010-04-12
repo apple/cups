@@ -20,9 +20,12 @@
  *   cupsDoIORequest()      - Do an IPP request with file descriptors.
  *   cupsDoRequest()        - Do an IPP request.
  *   cupsGetResponse()      - Get a response to an IPP request.
+ *   cupsLastError()        - Return the last IPP status code.
+ *   cupsLastErrorString()  - Return the last IPP status-message.
  *   cupsReadResponseData() - Read additional data after the IPP response.
  *   cupsSendRequest()      - Send an IPP request.
  *   cupsWriteRequestData() - Write additional data after an IPP request.
+ *   _cupsConnect()         - Get the default server connection...
  *   _cupsSetError()        - Set the last IPP status code and status-message.
  *   _cupsSetHTTPError()    - Set the last error using the HTTP status.
  */
@@ -299,7 +302,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
  /*
   * Delete the original request and return the response...
   */
-  
+
   ippDelete(request);
 
   return (response);
@@ -478,6 +481,30 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
 
 /*
+ * 'cupsLastError()' - Return the last IPP status code.
+ */
+
+ipp_status_t				/* O - IPP status code from last request */
+cupsLastError(void)
+{
+  return (_cupsGlobals()->last_error);
+}
+
+
+/*
+ * 'cupsLastErrorString()' - Return the last IPP status-message.
+ *
+ * @since CUPS 1.2/Mac OS X 10.5@
+ */
+
+const char *				/* O - status-message text from last request */
+cupsLastErrorString(void)
+{
+  return (_cupsGlobals()->last_status_message);
+}
+
+
+/*
  * 'cupsReadResponseData()' - Read additional data after the IPP response.
  *
  * This function is used after cupsGetResponse() to read the PPD or document
@@ -524,7 +551,7 @@ cupsReadResponseData(
  *
  * Use httpWrite() to write any additional data (document, PPD file, etc.)
  * for the request, cupsGetResponse() to get the IPP response, and httpRead()
- * to read any additional data following the response. Only one request can be 
+ * to read any additional data following the response. Only one request can be
  * sent/queued at a time.
  *
  * Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
@@ -813,6 +840,67 @@ cupsWriteRequestData(
   }
 
   return (HTTP_CONTINUE);
+}
+
+
+/*
+ * '_cupsConnect()' - Get the default server connection...
+ */
+
+http_t *				/* O - HTTP connection */
+_cupsConnect(void)
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+
+
+ /*
+  * See if we are connected to the same server...
+  */
+
+  if (cg->http)
+  {
+   /*
+    * Compare the connection hostname, port, and encryption settings to
+    * the cached defaults; these were initialized the first time we
+    * connected...
+    */
+
+    if (strcmp(cg->http->hostname, cg->server) ||
+        cg->ipp_port != _httpAddrPort(cg->http->hostaddr) ||
+        (cg->http->encryption != cg->encryption &&
+	 cg->http->encryption == HTTP_ENCRYPT_NEVER))
+    {
+     /*
+      * Need to close the current connection because something has changed...
+      */
+
+      httpClose(cg->http);
+      cg->http = NULL;
+    }
+  }
+
+ /*
+  * (Re)connect as needed...
+  */
+
+  if (!cg->http)
+  {
+    if ((cg->http = httpConnectEncrypt(cupsServer(), ippPort(),
+                                       cupsEncryption())) == NULL)
+    {
+      if (errno)
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
+      else
+        _cupsSetError(IPP_SERVICE_UNAVAILABLE,
+	              _("Unable to connect to host."), 1);
+    }
+  }
+
+ /*
+  * Return the cached connection...
+  */
+
+  return (cg->http);
 }
 
 

@@ -24,7 +24,8 @@ dnssd.o: ../cups/debug-private.h ../cups/language-private.h
 dnssd.o: ../cups/transcode.h ../cups/snmp-private.h ../cups/http.h
 dnssd.o: ../cups/string-private.h ../config.h ../cups/array.h
 pap.o: ../config.h ../cups/cups.h ../cups/backend.h ../cups/versioning.h
-pap.o: ../cups/sidechannel.h
+pap.o: ../cups/sidechannel.h ../cups/language-private.h ../cups/transcode.h
+pap.o: ../cups/language.h ../cups/array.h
 parallel.o: backend-private.h ../cups/backend.h ../cups/versioning.h
 parallel.o: ../cups/sidechannel.h ../cups/ppd-private.h ../cups/ppd.h
 parallel.o: ../cups/cups.h ../cups/file.h ../cups/ipp.h ../cups/language.h
@@ -67,6 +68,7 @@ test1284.o: ../cups/string-private.h ../cups/debug-private.h
 test1284.o: ../cups/ppd-private.h ../cups/http-private.h
 test1284.o: ../cups/md5-private.h ../cups/ipp-private.h ../cups/ipp.h
 test1284.o: ../cups/http.h ../cups/language-private.h
+test1284.o: ../cups/thread-private.h
 testbackend.o: ../cups/string-private.h ../config.h ../cups/cups.h
 testbackend.o: ../cups/sidechannel.h ../cups/versioning.h
 testsupplies.o: backend-private.h ../cups/backend.h ../cups/versioning.h

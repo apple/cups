@@ -15,13 +15,10 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
-	ATTR mimetype document-format application/postscript
 	ATTR keyword job-hold-until indefinite
+	ATTR name job-name $filename
 
-	GROUP job
-	ATTR integer copies 1
-
-	FILE ../data/testprint.ps
+	FILE $filename
 
 	# What statuses are OK?
 	STATUS ok

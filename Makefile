@@ -27,10 +27,7 @@ include Makedefs
 # Directories to make...
 #
 
-DIRS	=	cups filter backend berkeley cgi-bin driver locale man monitor \
-		notifier ppdc scheduler systemv test \
-		$(PHPDIR) \
-		conf data desktop doc examples $(FONTS) templates
+DIRS	=	cups test $(BUILDDIRS) $(PHPDIR) $(FONTS)
 
 
 #

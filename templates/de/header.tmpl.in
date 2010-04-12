@@ -17,7 +17,7 @@ SRC="/images/left.gif" WIDTH="64" HEIGHT="36" BORDER="0" ALT=""></A></TD>
 <TD CLASS="unsel"><A HREF="/">&nbsp;&nbsp;Startseite&nbsp;&nbsp;</A></TD>
 <TD CLASS="{SECTION=admin?:un}sel"><A HREF="/admin">&nbsp;&nbsp;Verwaltung&nbsp;&nbsp;</A></TD>
 <TD CLASS="{SECTION=classes?:un}sel"><A HREF="/classes/">&nbsp;&nbsp;Klassen&nbsp;&nbsp;</A></TD>
-<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;Online&nbsp;Hilfe&nbsp;&nbsp;</A></TD>
+<TD CLASS="{SECTION=help?:un}sel"><A HREF="/help/">&nbsp;&nbsp;Online-Hilfe&nbsp;&nbsp;</A></TD>
 <TD CLASS="{SECTION=jobs?:un}sel"><A HREF="/jobs/">&nbsp;&nbsp;Auftr&auml;ge&nbsp;&nbsp;</A></TD>
 <TD CLASS="{SECTION=printers?:un}sel"><A HREF="/printers/">&nbsp;&nbsp;Drucker&nbsp;&nbsp;</A></TD>
 <TD CLASS="unsel" WIDTH="100%"><FORM ACTION="/help/" METHOD="GET"><INPUT

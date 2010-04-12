@@ -124,6 +124,7 @@ ARCHFLAGS	=	@ARCHFLAGS@
 ARFLAGS		=	@ARFLAGS@
 BACKLIBS	=	@BACKLIBS@
 BANNERTOPS	=	@BANNERTOPS@
+BUILDDIRS	=	@BUILDDIRS@
 CFLAGS		=	@CPPFLAGS@ @CFLAGS@
 COMMONLIBS	=	@LIBS@
 CUPSDLIBS	=	@CUPSDLIBS@
@@ -266,7 +267,7 @@ DBUSDIR		=	@DBUSDIR@
 
 .c.o:
 	echo Compiling $<...
-	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c $<
+	$(CC) $(ARCHFLAGS) $(OPTIM) $(ALL_CFLAGS) -c -o $@ $<
 
 .c.32.o:
 	echo Compiling 32-bit $<...
@@ -278,7 +279,7 @@ DBUSDIR		=	@DBUSDIR@
 
 .cxx.o:
 	echo Compiling $<...
-	$(CXX) $(ARCHFLAGS) $(OPTIM) $(ALL_CXXFLAGS) -c $<
+	$(CXX) $(ARCHFLAGS) $(OPTIM) $(ALL_CXXFLAGS) -c -o $@ $<
 
 .man.1 .man.1m .man.3 .man.5 .man.7 .man.8:
 	echo Linking $<...

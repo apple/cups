@@ -25,7 +25,6 @@
 
 #include "string-private.h"
 #include "http-private.h"
-#include <stdlib.h>
 
 
 /*

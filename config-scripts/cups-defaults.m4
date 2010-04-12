@@ -1,10 +1,9 @@
 dnl
 dnl "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $"
 dnl
-dnl   Default cupsd configuration settings for the Common UNIX Printing System
-dnl   (CUPS).
+dnl   Default cupsd configuration settings for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2010 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the

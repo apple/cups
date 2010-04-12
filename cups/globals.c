@@ -16,10 +16,13 @@
  *
  * Contents:
  *
- *   _cupsGlobals()	  - Return a pointer to thread local storage.
- *   cups_env_init()      - Initialize environment variables.
- *   globals_init()       - Initialize globals once.
- *   globals_destructor() - Free memory allocated by _cupsGlobals().
+ *   _cupsGlobalLock()    - Lock the global mutex.
+ *   _cupsGlobals()       - Return a pointer to thread local storage
+ *   _cupsGlobalUnlock()  - Unlock the global mutex.
+ *   DllMain()            - Main entry for library.
+ *   cups_globals_alloc() - Allocate and initialize global data.
+ *   cups_globals_free()  - Free global data.
+ *   cups_globals_init()  - Initialize environment variables.
  */
 
 /*
@@ -30,20 +33,183 @@
 
 
 /*
- * 'cups_env_init()' - Initialize environment variables.
+ * Local globals...
  */
 
-static void
-cups_env_init(_cups_globals_t *g)	/* I - Global data */
+
+static _cups_threadkey_t cups_globals_key = _CUPS_THREADKEY_INITIALIZER;
+					/* Thread local storage key */
+#ifdef HAVE_PTHREAD_H
+static pthread_once_t	cups_globals_key_once = PTHREAD_ONCE_INIT;
+					/* One-time initialization object */
+#endif /* HAVE_PTHREAD_H */
+static _cups_mutex_t	cups_global_mutex = _CUPS_MUTEX_INITIALIZER;
+					/* Global critical section */
+
+
+/*
+ * Local functions...
+ */
+
+static _cups_globals_t	*cups_globals_alloc(void);
+static void		cups_globals_free(_cups_globals_t *g);
+#ifdef HAVE_PTHREAD_H
+static void		cups_globals_init(void);
+#endif /* HAVE_PTHREAD_H */
+
+
+/*
+ * '_cupsGlobalLock()' - Lock the global mutex.
+ */
+
+void
+_cupsGlobalLock(void)
 {
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_lock(&cups_global_mutex);
+#elif defined(WIN32)
+  EnterCriticalSection(&cups_global_mutex->m_criticalSection);
+#endif /* HAVE_PTHREAD_H */
+}
+
+
+/*
+ * '_cupsGlobals()' - Return a pointer to thread local storage
+ */
+
+_cups_globals_t *			/* O - Pointer to global data */
+_cupsGlobals(void)
+{
+  _cups_globals_t *cg;			/* Pointer to global data */
+
+
+#ifdef HAVE_PTHREAD_H
+ /*
+  * Initialize the global data exactly once...
+  */
+
+  pthread_once(&cups_globals_key_once, cups_globals_init);
+#endif /* HAVE_PTHREAD_H */
+
+ /*
+  * See if we have allocated the data yet...
+  */
+
+  if ((cg = (_cups_globals_t *)_cupsThreadGetData(cups_globals_key)) == NULL)
+  {
+   /*
+    * No, allocate memory as set the pointer for the key...
+    */
+
+    if ((cg = cups_globals_alloc()) != NULL)
+      _cupsThreadSetData(cups_globals_key, cg);
+  }
+
+ /*
+  * Return the pointer to the data...
+  */
+
+  return (cg);
+}
+
+
+/*
+ * '_cupsGlobalUnlock()' - Unlock the global mutex.
+ */
+
+void
+_cupsGlobalUnlock(void)
+{
+#ifdef HAVE_PTHREAD_H
+  pthread_mutex_unlock(&cups_global_mutex);
+#elif defined(WIN32)
+  LeaveCriticalSection(&cups_global_mutex->m_criticalSection);
+#endif /* HAVE_PTHREAD_H */
+}
+
+
+#ifdef WIN32
+/*
+ * 'DllMain()' - Main entry for library.
+ */
+
+BOOL WINAPI				/* O - Success/failure */
+DllMain(HINSTANCE hinst,		/* I - DLL module handle */
+        DWORD     reason,		/* I - Reason */
+        LPVOID    reserved)		/* I - Unused */
+{
+  _cups_globals_t *cg;			/* Global data */
+
+
+  (void)hinst;
+  (void)reserved;
+
+  switch (reason)
+  {
+    case DLL_PROCESS_ATTACH :		/* Called on library initialization */
+        InitializeCriticalSection(&cups_global_lock);
+
+        if ((cups_globals_key = TlsAlloc()) == TLS_OUT_OF_INDEXES)
+          return (FALSE);
+        break;
+
+    case DLL_THREAD_DETACH :		/* Called when a thread terminates */
+        if ((cg = (_cups_globals_t *)TlsGetValue(cups_globals_key)) != NULL)
+          cups_globals_free(cg);
+        break;
+
+    case DLL_PROCESS_DETACH :		/* Called when library is unloaded */
+        if ((cg = (_cups_globals_t *)TlsGetValue(cups_globals_key)) != NULL)
+          cups_globals_free(cg);
+
+        TlsFree(cups_globals_key);
+        DeleteCriticalSection(&cups_global_lock);
+        break;
+
+    default:
+        break;
+  }
+
+  return (TRUE);
+}
+#endif /* WIN32 */
+
+
+/*
+ * 'cups_globals_alloc()' - Allocate and initialize global data.
+ */
+
+static _cups_globals_t *		/* O - Pointer to global data */
+cups_globals_alloc(void)
+{
+  _cups_globals_t *cg = malloc(sizeof(_cups_globals_t));
+					/* Pointer to global data */
 #ifdef WIN32
   HKEY		key;			/* Registry key */
   DWORD		size;			/* Size of string */
   static char	installdir[1024],	/* Install directory */
 		confdir[1024],		/* Server root directory */
 		localedir[1024];	/* Locale directory */
+#endif /* WIN32 */
 
 
+  if (!cg)
+    return (NULL);
+
+ /*
+  * Clear the global storage and set the default encryption and password
+  * callback values...
+  */
+
+  memset(cg, 0, sizeof(_cups_globals_t));
+  cg->encryption  = (http_encryption_t)-1;
+  cg->password_cb = (cups_password_cb2_t)_cupsGetPassword;
+
+ /*
+  * Then set directories as appropriate...
+  */
+
+#ifdef WIN32
  /*
   * Open the registry...
   */
@@ -65,20 +231,20 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
   snprintf(confdir, sizeof(confdir), "%s/conf", installdir);
   snprintf(localedir, sizeof(localedir), "%s/locale", installdir);
 
-  if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
-    g->cups_datadir = installdir;
+  if ((cg->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+    cg->cups_datadir = installdir;
 
-  if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
-    g->cups_serverbin = installdir;
+  if ((cg->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+    cg->cups_serverbin = installdir;
 
-  if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
-    g->cups_serverroot = confdir;
+  if ((cg->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+    cg->cups_serverroot = confdir;
 
-  if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
-    g->cups_statedir = confdir;
+  if ((cg->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
+    cg->cups_statedir = confdir;
 
-  if ((g->localedir = getenv("LOCALEDIR")) == NULL)
-    g->localedir = localedir;
+  if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
+    cg->localedir = localedir;
 
 #else
 #  ifdef HAVE_GETEUID
@@ -92,11 +258,11 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
     * the directories...
     */
 
-    g->cups_datadir    = CUPS_DATADIR;
-    g->cups_serverbin  = CUPS_SERVERBIN;
-    g->cups_serverroot = CUPS_SERVERROOT;
-    g->cups_statedir   = CUPS_STATEDIR;
-    g->localedir       = CUPS_LOCALEDIR;
+    cg->cups_datadir    = CUPS_DATADIR;
+    cg->cups_serverbin  = CUPS_SERVERBIN;
+    cg->cups_serverroot = CUPS_SERVERROOT;
+    cg->cups_statedir   = CUPS_STATEDIR;
+    cg->localedir       = CUPS_LOCALEDIR;
   }
   else
   {
@@ -104,130 +270,40 @@ cups_env_init(_cups_globals_t *g)	/* I - Global data */
     * Allow directories to be overridden by environment variables.
     */
 
-    if ((g->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
-      g->cups_datadir = CUPS_DATADIR;
+    if ((cg->cups_datadir = getenv("CUPS_DATADIR")) == NULL)
+      cg->cups_datadir = CUPS_DATADIR;
 
-    if ((g->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
-      g->cups_serverbin = CUPS_SERVERBIN;
+    if ((cg->cups_serverbin = getenv("CUPS_SERVERBIN")) == NULL)
+      cg->cups_serverbin = CUPS_SERVERBIN;
 
-    if ((g->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
-      g->cups_serverroot = CUPS_SERVERROOT;
+    if ((cg->cups_serverroot = getenv("CUPS_SERVERROOT")) == NULL)
+      cg->cups_serverroot = CUPS_SERVERROOT;
 
-    if ((g->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
-      g->cups_statedir = CUPS_STATEDIR;
+    if ((cg->cups_statedir = getenv("CUPS_STATEDIR")) == NULL)
+      cg->cups_statedir = CUPS_STATEDIR;
 
-    if ((g->localedir = getenv("LOCALEDIR")) == NULL)
-      g->localedir = CUPS_LOCALEDIR;
+    if ((cg->localedir = getenv("LOCALEDIR")) == NULL)
+      cg->localedir = CUPS_LOCALEDIR;
   }
 #endif /* WIN32 */
-}
 
-
-#ifdef HAVE_PTHREAD_H
-/*
- * Implement per-thread globals...
- */
-
-/*
- * Local globals...
- */
-
-static pthread_key_t	globals_key = -1;
-					/* Thread local storage key */
-static pthread_once_t	globals_key_once = PTHREAD_ONCE_INIT;
-					/* One-time initialization object */
-
-
-/*
- * Local functions...
- */
-
-static void	globals_init();
-static void	globals_destructor(void *value);
-
-
-/*
- * '_cupsGlobals()' - Return a pointer to thread local storage
- */
-
-_cups_globals_t *			/* O - Pointer to global data */
-_cupsGlobals(void)
-{
-  _cups_globals_t *globals;		/* Pointer to global data */
-
-
- /*
-  * Initialize the global data exactly once...
-  */
-
-  pthread_once(&globals_key_once, globals_init);
-
- /*
-  * See if we have allocated the data yet...
-  */
-
-  if ((globals = (_cups_globals_t *)pthread_getspecific(globals_key)) == NULL)
-  {
-   /*
-    * No, allocate memory as set the pointer for the key...
-    */
-
-    globals = calloc(1, sizeof(_cups_globals_t));
-    pthread_setspecific(globals_key, globals);
-
-   /*
-    * Initialize variables that have non-zero values
-    */
-
-    globals->encryption  = (http_encryption_t)-1;
-    globals->password_cb = (cups_password_cb2_t)_cupsGetPassword;
-
-    cups_env_init(globals);
-  }
-
- /*
-  * Return the pointer to the data...
-  */
-
-  return (globals);
+  return (cg);
 }
 
 
 /*
- * 'globals_init()' - Initialize globals once.
+ * 'cups_globals_free()' - Free global data.
  */
 
 static void
-globals_init()
+cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 {
-  pthread_key_create(&globals_key, globals_destructor);
-}
-
-
-/*
- * 'globals_destructor()' - Free memory allocated by _cupsGlobals().
- */
-
-static void
-globals_destructor(void *value)		/* I - Data to free */
-{
-  int			i;		/* Looping var */
   _ipp_buffer_t		*buffer,	/* Current IPP read/write buffer */
 			*next;		/* Next buffer */
-  _cups_globals_t	*cg;		/* Global data */
 
-
-  cg = (_cups_globals_t *)value;
-
-  httpClose(cg->http);
-
-  for (i = 0; i < 3; i ++)
-    cupsFileClose(cg->stdio_files[i]);
 
   if (cg->last_status_message)
     _cupsStrFree(cg->last_status_message);
-
-  cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
 
   for (buffer = cg->ipp_buffers; buffer; buffer = next)
   {
@@ -238,47 +314,31 @@ globals_destructor(void *value)		/* I - Data to free */
   cupsArrayDelete(cg->pwg_size_lut);
   cupsArrayDelete(cg->leg_size_lut);
 
-  free(value);
+  httpClose(cg->http);
+
+  cupsFileClose(cg->stdio_files[0]);
+  cupsFileClose(cg->stdio_files[1]);
+  cupsFileClose(cg->stdio_files[2]);
+
+  cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
+
+  free(cg);
 }
 
 
-#else
+#ifdef HAVE_PTHREAD_H
 /*
- * Implement static globals...
+ * 'cups_globals_init()' - Initialize environment variables.
  */
 
-/*
- * '_cupsGlobals()' - Return a pointer to thread local storage.
- */
-
-_cups_globals_t *			/* O - Pointer to global data */
-_cupsGlobals(void)
+static void
+cups_globals_init(void)
 {
-  static _cups_globals_t globals;	/* Global data */
-  static int		initialized = 0;/* Global data initialized? */
-
-
  /*
-  * Initialize global data as needed...
+  * Register the global data for this thread...
   */
 
-  if (!initialized)
-  {
-    initialized = 1;
-
-   /*
-    * Initialize global variables...
-    */
-
-    memset(&globals, 0, sizeof(globals));
-
-    globals.encryption  = (http_encryption_t)-1;
-    globals.password_cb = (cups_password_cb2_t)_cupsGetPassword;
-
-    cups_env_init(&globals);
-  }
-
-  return (&globals);
+  pthread_key_create(&cups_globals_key, (void (*)(void *))cups_globals_free);
 }
 #endif /* HAVE_PTHREAD_H */
 

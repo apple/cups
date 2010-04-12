@@ -50,7 +50,13 @@
 #include "cups-private.h"
 #ifdef HAVE_DNSSD
 #  include <dns_sd.h>
-#  include <poll.h>
+#  ifdef WIN32
+#    include <io.h>
+#  elif defined(HAVE_POLL)
+#    include <poll.h>
+#  else
+#    include <sys/select.h>
+#  endif /* WIN32 */
 #endif /* HAVE_DNSSD */
 
 
@@ -107,7 +113,7 @@ static char		*http_copy_encode(char *dst, const char *src,
 			                  char *dstend, const char *reserved,
 					  const char *term, int encode);
 #ifdef HAVE_DNSSD
-static void		resolve_callback(DNSServiceRef sdRef,
+static void DNSSD_API	resolve_callback(DNSServiceRef sdRef,
 					 DNSServiceFlags flags,
 					 uint32_t interfaceIndex,
 					 DNSServiceErrorType errorCode,
@@ -1354,8 +1360,12 @@ _httpResolveURI(
     char		*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     _http_uribuf_t	uribuf;		/* URI buffer */
+#ifdef HAVE_POLL
     struct pollfd	polldata;	/* Polling data */
-
+#else /* select() */
+    fd_set		input_set;	/* Input set for select() */
+    struct timeval	stimeout;	/* Timeout value for select() */
+#endif /* HAVE_POLL */
 
     if (logit)
       fprintf(stderr, "DEBUG: Resolving \"%s\"...\n", hostname);
@@ -1431,10 +1441,22 @@ _httpResolveURI(
 
 	  timeout = (time(NULL) < (start_time + 60)) ? 2000 : -1;
 
+#ifdef HAVE_POLL
 	  polldata.fd     = DNSServiceRefSockFD(ref);
 	  polldata.events = POLLIN;
 
 	  fds = poll(&polldata, 1, timeout);
+
+#else /* select() */
+	  FD_ZERO(&input_set);
+	  FD_SET(DNSServiceRefSockFD(ref), &input_set);
+
+	  stimeout.tv_sec  = ((int)timeout) / 1000;
+	  stimeout.tv_usec = ((int)(timeout) * 1000) % 1000000;
+
+	  fds = select(DNSServiceRefSockFD(ref)+1, &input_set, NULL, NULL, 
+		       timeout < 0.0 ? NULL : &stimeout); 
+#endif /* HAVE_POLL */
 
 	  if (fds < 0)
 	  {
@@ -1634,7 +1656,7 @@ http_copy_encode(char       *dst,	/* O - Destination buffer */
  * 'resolve_callback()' - Build a device URI for the given service name.
  */
 
-static void
+static void DNSSD_API
 resolve_callback(
     DNSServiceRef       sdRef,		/* I - Service reference */
     DNSServiceFlags     flags,		/* I - Results flags */

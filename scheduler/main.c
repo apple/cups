@@ -1,7 +1,7 @@
 /*
  * "$Id: main.c 7925 2008-09-10 17:47:26Z mike $"
  *
- *   Scheduler main loop for the Common UNIX Printing System (CUPS).
+ *   Main loop for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -526,6 +526,8 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Startup the server...
   */
+
+  httpInitialize();
 
   cupsdStartServer();
 

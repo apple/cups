@@ -27,7 +27,6 @@
 
 #include "cups-private.h"
 #include "snmp-private.h"
-#include <stdlib.h>
 
 
 /*

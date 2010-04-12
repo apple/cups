@@ -1,9 +1,9 @@
 dnl
 dnl "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $"
 dnl
-dnl   Common configuration stuff for the Common UNIX Printing System (CUPS).
+dnl   Common configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2009 by Apple Inc.
+dnl   Copyright 2007-2010 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -22,9 +22,9 @@ AC_CONFIG_HEADER(config.h)
 dnl Version number information...
 CUPS_VERSION="1.5svn"
 CUPS_REVISION=""
-#if test -z "$CUPS_REVISION" -a -d .svn; then
-#	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
-#fi
+if test -z "$CUPS_REVISION" -a -d .svn; then
+	CUPS_REVISION="-r`svnversion . | awk -F: '{print $NF}' | sed -e '1,$s/[[a-zA-Z]]*//g'`"
+fi
 CUPS_BUILD="cups-$CUPS_VERSION"
 
 AC_ARG_WITH(cups_build, [  --with-cups-build       set "cups-config --build" string ],
@@ -291,9 +291,13 @@ case $uname in
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
 
 		dnl Check for framework headers...
+		AC_CHECK_HEADER(ApplicationServices/ApplicationServices.h,AC_DEFINE(HAVE_APPLICATIONSERVICES_H))
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
 		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
 		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
+
+		dnl Check for dynamic store function...
+		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName)
 
 		dnl Check for the new membership functions in MacOSX 10.4...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
@@ -347,6 +351,30 @@ AC_SUBST(CUPS_DEFAULT_PRINTOPERATOR_AUTH)
 AC_DEFINE_UNQUOTED(CUPS_DEFAULT_PRINTOPERATOR_AUTH, "$CUPS_DEFAULT_PRINTOPERATOR_AUTH")
 AC_SUBST(CUPS_SYSTEM_AUTHKEY)
 AC_SUBST(LEGACY_BACKENDS)
+
+dnl Check for build components
+COMPONENTS="all"
+
+AC_ARG_WITH(components, [  --with-components       set components to build:
+			    - "all" (default) builds everything
+			    - "core" builds libcups and ipptool],
+	COMPONENTS="$withval")
+
+case "$COMPONENTS" in
+	all)
+		BUILDDIRS="filter backend berkeley cgi-bin driver monitor notifier ppdc scheduler systemv conf data locale man doc examples templates"
+		;;
+
+	core)
+		BUILDDIRS="data locale"
+		;;
+
+	*)
+		AC_MSG_ERROR([Bad build component "$COMPONENT" specified!])
+		;;
+esac
+
+AC_SUBST(BUILDDIRS)
 
 dnl
 dnl End of "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $".

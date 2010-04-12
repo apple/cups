@@ -25,10 +25,12 @@
  *                          server.
  *   httpClearCookie()    - Clear the cookie value(s).
  *   httpClearFields()    - Clear HTTP request fields.
- *   httpClose()          - Close an HTTP connection...
+ *   httpClose()          - Close an HTTP connection.
+ *   httpConnect()        - Connect to a HTTP server.
  *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
  *   _httpCreate()        - Create an unconnected HTTP connection.
  *   httpDelete()         - Send a DELETE request to the server.
+ *   _httpDisconnect()    - Disconnect a HTTP connection.
  *   httpEncryption()     - Set the required encryption on the link.
  *   httpError()          - Get the last error on a connection.
  *   httpFlush()          - Flush data from a HTTP connection.
@@ -52,6 +54,7 @@
  *   httpInitialize()     - Initialize the HTTP interface library and set the
  *                          default HTTP proxy (if any).
  *   httpOptions()        - Send an OPTIONS request to the server.
+ *   _httpPeek()          - Peek at data from a HTTP connection.
  *   httpPost()           - Send a POST request to the server.
  *   httpPrintf()         - Print a formatted string to a HTTP connection.
  *   httpPut()            - Send a PUT request to the server.
@@ -61,7 +64,7 @@
  *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
  *   httpReconnect()      - Reconnect to a HTTP server.
  *   httpSetAuthString()  - Set the current authorization string.
- *   httpSetCookie()      - Set the cookie value(s)...
+ *   httpSetCookie()      - Set the cookie value(s).
  *   httpSetExpect()      - Set the Expect: header in a request.
  *   httpSetField()       - Set the value of an HTTP header.
  *   httpSetLength()      - Set the content-length and content-encoding.
@@ -82,10 +85,12 @@
  *   http_debug_hex()     - Do a hex dump of a buffer.
  *   http_field()         - Return the field index for a field name.
  *   http_read_ssl()      - Read from a SSL/TLS connection.
+ *   http_locking_cb()    - Lock/unlock a thread's mutex.
  *   http_send()          - Send a request with all fields and the trailing
  *                          blank line.
  *   http_setup_ssl()     - Set up SSL/TLS support on a connection.
  *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
+ *   http_threadid_cb()   - Return the current thread ID.
  *   http_upgrade()       - Force upgrade to TLS encryption.
  *   http_write()         - Write a buffer to a HTTP connection.
  *   http_write_chunk()   - Write a chunked buffer.
@@ -139,6 +144,19 @@ static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
 static int		http_write_ssl(http_t *http, const char *buf, int len);
+
+#  ifdef HAVE_GNUTLS
+#    ifdef HAVE_PTHREAD_H
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
+#    endif /* HAVE_PTHREAD_H */
+
+#  elif defined(HAVE_LIBSSL)
+static _cups_mutex_t	*http_locks;	/* OpenSSL lock mutexes */
+
+static void		http_locking_cb(int mode, int type, const char *file,
+					int line);
+static unsigned long	http_threadid_cb(void);
+#  endif /* HAVE_GNUTLS */
 #endif /* HAVE_SSL */
 
 
@@ -307,7 +325,7 @@ httpClearFields(http_t *http)		/* I - Connection to server */
 
 
 /*
- * 'httpClose()' - Close an HTTP connection...
+ * 'httpClose()' - Close an HTTP connection.
  */
 
 void
@@ -320,24 +338,27 @@ httpClose(http_t *http)			/* I - Connection to server */
 
   DEBUG_printf(("httpClose(http=%p)", http));
 
+ /*
+  * Range check input...
+  */
+
   if (!http)
     return;
+
+ /*
+  * Close any open connection...
+  */
+
+  _httpDisconnect(http);
+
+ /*
+  * Free memory used...
+  */
 
   httpAddrFreeList(http->addrlist);
 
   if (http->cookie)
     free(http->cookie);
-
-#ifdef HAVE_SSL
-  if (http->tls)
-    http_shutdown_ssl(http);
-#endif /* HAVE_SSL */
-
-#ifdef WIN32
-  closesocket(http->fd);
-#else
-  close(http->fd);
-#endif /* WIN32 */
 
 #ifdef HAVE_GSSAPI
   if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -499,6 +520,28 @@ httpDelete(http_t     *http,		/* I - Connection to server */
            const char *uri)		/* I - URI to delete */
 {
   return (http_send(http, HTTP_DELETE, uri));
+}
+
+
+/*
+ * '_httpDisconnect()' - Disconnect a HTTP connection.
+ */
+
+void
+_httpDisconnect(http_t *http)		/* I - Connection to server */
+{
+#ifdef HAVE_SSL
+  if (http->tls)
+    http_shutdown_ssl(http);
+#endif /* HAVE_SSL */
+
+#ifdef WIN32
+  closesocket(http->fd);
+#else
+  close(http->fd);
+#endif /* WIN32 */
+
+  http->fd = -1;
 }
 
 
@@ -1174,21 +1217,26 @@ httpHead(http_t     *http,		/* I - Connection to server */
 void
 httpInitialize(void)
 {
-#ifdef HAVE_LIBSSL
-#  ifndef WIN32
-  struct timeval	curtime;	/* Current time in microseconds */
-#  endif /* !WIN32 */
-  int			i;		/* Looping var */
-  unsigned char		data[1024];	/* Seed data */
-#endif /* HAVE_LIBSSL */
-
+  static int	initialized = 0;	/* Have we been called before? */
 #ifdef WIN32
   WSADATA	winsockdata;		/* WinSock data */
-  static int	initialized = 0;	/* Has WinSock been initialized? */
+#endif /* WIN32 */
+#ifdef HAVE_LIBSSL
+  int		i;			/* Looping var */
+  unsigned char	data[1024];		/* Seed data */
+#endif /* HAVE_LIBSSL */
 
 
-  if (!initialized)
-    WSAStartup(MAKEWORD(1,1), &winsockdata);
+  _cupsGlobalLock();
+  if (initialized)
+  {
+    _cupsGlobalUnlock();
+    return;
+  }
+
+#ifdef WIN32
+  WSAStartup(MAKEWORD(1,1), &winsockdata);
+
 #elif !defined(SO_NOSIGPIPE)
  /*
   * Ignore SIGPIPE signals...
@@ -1196,6 +1244,7 @@ httpInitialize(void)
 
 #  ifdef HAVE_SIGSET
   sigset(SIGPIPE, SIG_IGN);
+
 #  elif defined(HAVE_SIGACTION)
   struct sigaction	action;		/* POSIX sigaction data */
 
@@ -1203,35 +1252,63 @@ httpInitialize(void)
   memset(&action, 0, sizeof(action));
   action.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &action, NULL);
+
 #  else
   signal(SIGPIPE, SIG_IGN);
 #  endif /* !SO_NOSIGPIPE */
 #endif /* WIN32 */
 
 #ifdef HAVE_GNUTLS
-  gnutls_global_init();
-#endif /* HAVE_GNUTLS */
+ /*
+  * Make sure we handle threading properly...
+  */
 
-#ifdef HAVE_LIBSSL
+#  ifdef HAVE_PTHREAD_H
+  gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+#  endif /* HAVE_PTHREAD_H */
+
+ /*
+  * Initialize GNU TLS...
+  */
+
+  gnutls_global_init();
+
+#elif defined(HAVE_LIBSSL)
+ /*
+  * Initialize OpenSSL...
+  */
+
   SSL_load_error_strings();
   SSL_library_init();
+
+ /*
+  * Set the threading callbacks...
+  */
+
+  http_locks = calloc(CRYPTO_num_locks(), sizeof(_cups_mutex_t));
+#  ifdef HAVE_PTHREAD_H
+  for (i = 0; i < CRYPTO_num_locks(); i ++)
+    pthread_mutex_init(http_locks + i, NULL);
+#  endif /* HAVE_PTHREAD_H */
+
+  CRYPTO_set_id_callback(http_threadid_cb);
+  CRYPTO_set_locking_callback(http_locking_cb);
 
  /*
   * Using the current time is a dubious random seed, but on some systems
   * it is the best we can do (on others, this seed isn't even used...)
   */
 
-#  ifdef WIN32
-#  else
-  gettimeofday(&curtime, NULL);
-  srand(curtime.tv_sec + curtime.tv_usec);
-#  endif /* WIN32 */
+  CUPS_SRAND(time(NULL));
 
   for (i = 0; i < sizeof(data); i ++)
-    data[i] = rand();
+    data[i] = CUPS_RAND();
 
   RAND_seed(data, sizeof(data));
-#endif /* HAVE_LIBSSL */
+#endif /* HAVE_GNUTLS */
+
+  initialized = 1;
+  _cupsGlobalUnlock();
 }
 
 
@@ -1244,6 +1321,176 @@ httpOptions(http_t     *http,		/* I - Connection to server */
             const char *uri)		/* I - URI for options */
 {
   return (http_send(http, HTTP_OPTIONS, uri));
+}
+
+
+/*
+ * '_httpPeek()' - Peek at data from a HTTP connection.
+ *
+ * This function copies available data from the given HTTP connection, reading
+ * a buffer as needed.  The data is still available for reading using
+ * @link httpRead@ or @link httpRead2@.
+ *
+ * For non-blocking connections the usual timeouts apply.
+ */
+
+ssize_t					/* O - Number of bytes copied */
+_httpPeek(http_t *http,			/* I - Connection to server */
+          char   *buffer,		/* I - Buffer for data */
+	  size_t length)		/* I - Maximum number of bytes */
+{
+  ssize_t	bytes;			/* Bytes read */
+  char		len[32];		/* Length string */
+
+
+  DEBUG_printf(("_httpPeek(http=%p, buffer=%p, length=" CUPS_LLFMT ")",
+                http, buffer, CUPS_LLCAST length));
+
+  if (http == NULL || buffer == NULL)
+    return (-1);
+
+  http->activity = time(NULL);
+  http->error    = 0;
+
+  if (length <= 0)
+    return (0);
+
+  if (http->data_encoding == HTTP_ENCODE_CHUNKED &&
+      http->data_remaining <= 0)
+  {
+    DEBUG_puts("2_httpPeek: Getting chunk length...");
+
+    if (httpGets(len, sizeof(len), http) == NULL)
+    {
+      DEBUG_puts("1_httpPeek: Could not get length!");
+      return (0);
+    }
+
+    http->data_remaining = strtoll(len, NULL, 16);
+    if (http->data_remaining < 0)
+    {
+      DEBUG_puts("1_httpPeek: Negative chunk length!");
+      return (0);
+    }
+  }
+
+  DEBUG_printf(("2_httpPeek: data_remaining=" CUPS_LLFMT,
+                CUPS_LLCAST http->data_remaining));
+
+  if (http->data_remaining <= 0)
+  {
+   /*
+    * A zero-length chunk ends a transfer; unless we are reading POST
+    * data, go idle...
+    */
+
+    if (http->data_encoding == HTTP_ENCODE_CHUNKED)
+      httpGets(len, sizeof(len), http);
+
+    if (http->state == HTTP_POST_RECV)
+      http->state ++;
+    else
+      http->state = HTTP_WAITING;
+
+   /*
+    * Prevent future reads for this request...
+    */
+
+    http->data_encoding = HTTP_ENCODE_LENGTH;
+
+    return (0);
+  }
+  else if (length > (size_t)http->data_remaining)
+    length = (size_t)http->data_remaining;
+
+  if (http->used == 0)
+  {
+   /*
+    * Buffer small reads for better performance...
+    */
+
+    if (!http->blocking && !httpWait(http, 10000))
+      return (0);
+
+    if (http->data_remaining > sizeof(http->buffer))
+      bytes = sizeof(http->buffer);
+    else
+      bytes = http->data_remaining;
+
+#ifdef HAVE_SSL
+    if (http->tls)
+      bytes = http_read_ssl(http, http->buffer, bytes);
+    else
+#endif /* HAVE_SSL */
+    {
+      DEBUG_printf(("2_httpPeek: reading %d bytes from socket into buffer...",
+                    (int)bytes));
+
+      bytes = recv(http->fd, http->buffer, bytes, 0);
+
+      DEBUG_printf(("2_httpPeek: read %d bytes from socket into buffer...",
+                    (int)bytes));
+    }
+
+    if (bytes > 0)
+      http->used = bytes;
+    else if (bytes < 0)
+    {
+#ifdef WIN32
+      http->error = WSAGetLastError();
+      return (-1);
+#else
+      if (errno != EINTR && errno != EAGAIN)
+      {
+        http->error = errno;
+        return (-1);
+      }
+#endif /* WIN32 */
+    }
+    else
+    {
+      http->error = EPIPE;
+      return (0);
+    }
+  }
+
+  if (http->used > 0)
+  {
+    if (length > (size_t)http->used)
+      length = (size_t)http->used;
+
+    bytes = (ssize_t)length;
+
+    DEBUG_printf(("2_httpPeek: grabbing %d bytes from input buffer...",
+                  (int)bytes));
+
+    memcpy(buffer, http->buffer, length);
+  }
+  else
+    bytes = 0;
+
+  if (bytes < 0)
+  {
+#ifdef WIN32
+    http->error = WSAGetLastError();
+#else
+    if (errno == EINTR || errno == EAGAIN)
+      bytes = 0;
+    else
+      http->error = errno;
+#endif /* WIN32 */
+  }
+  else if (bytes == 0)
+  {
+    http->error = EPIPE;
+    return (0);
+  }
+
+#ifdef DEBUG
+  http_debug_hex("_httpPeek", buffer, (int)bytes);
+#endif /* DEBUG */
+
+  return (bytes);
 }
 
 
@@ -1819,7 +2066,7 @@ httpSetAuthString(http_t     *http,	/* I - Connection to server */
 
 
 /*
- * 'httpSetCookie()' - Set the cookie value(s)...
+ * 'httpSetCookie()' - Set the cookie value(s).
  *
  * @since CUPS 1.1.19/Mac OS X 10.3@
  */
@@ -2805,6 +3052,25 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 #endif /* HAVE_SSL */
 
 
+#ifdef HAVE_LIBSSL
+/*
+ * 'http_locking_cb()' - Lock/unlock a thread's mutex.
+ */
+
+static void
+http_locking_cb(int        mode,	/* I - Lock mode */
+		int        type,	/* I - Lock type */
+		const char *file,	/* I - Source file */
+		int        line)	/* I - Line number */
+{
+  if (mode & CRYPTO_LOCK)
+    _cupsMutexLock(http_locks + type);
+  else
+    _cupsMutexUnlock(http_locks + type);
+}
+#endif /* HAVE_LIBSSL */
+
+
 /*
  * 'http_send()' - Send a request with all fields and the trailing blank line.
  */
@@ -3174,6 +3440,23 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
   http->tls = NULL;
 }
 #endif /* HAVE_SSL */
+
+
+#ifdef HAVE_LIBSSL
+/*
+ * 'http_threadid_cb()' - Return the current thread ID.
+ */
+
+static unsigned long			/* O - Thread ID */
+http_threadid_cb(void)
+{
+#  ifdef HAVE_PTHREAD_H
+  return ((unsigned long)pthread_self());
+#  else
+  return (0);
+#  endif /* HAVE_PTHREAD_H */
+}
+#endif /* HAVE_LIBSSL */
 
 
 #ifdef HAVE_SSL

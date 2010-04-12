@@ -65,6 +65,7 @@ LIBOBJS	=	\
 		snprintf.o \
 		string.o \
 		tempfile.o \
+		thread.o \
 		transcode.o \
 		usersys.o \
 		util.o
@@ -121,7 +122,9 @@ HEADERSPRIV =	\
 		ppd-private.h \
 		pwg-private.h \
 		snmp-private.h \
-		string-private.h
+		string-private.h \
+		thread-private.h
+
 
 #
 # Targets in this directory...
@@ -283,7 +286,7 @@ install64bit:
 
 uninstall: $(UNINSTALL32) $(UNINSTALL64)
 	$(RM) $(LIBDIR)/libcups.2.dylib
-	$(RM) $(LIBDIR)/libcups.a
+	$(RM) $(LIBDIR)/$(LIBCUPSSTATIC)
 	$(RM) $(LIBDIR)/libcups.dylib
 	$(RM) $(LIBDIR)/libcups_s.a
 	$(RM) $(LIBDIR)/libcups.sl
