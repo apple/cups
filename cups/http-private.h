@@ -99,6 +99,7 @@ extern BIO_METHOD *_httpBIOMethods(void);
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
 #    include <gnutls/gnutls.h>
+#    include <gcrypt.h>
 
 typedef struct
 {
