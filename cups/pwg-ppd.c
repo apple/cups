@@ -15,6 +15,28 @@
  *
  * Contents:
  *
+ *   _pwgCreateWithPPD()      - Create PWG mapping data from a PPD file.
+ *   _pwgGetBin()             - Get the PWG output-bin keyword associated with a
+ *                              PPD OutputBin.
+ *   _pwgGetInputSlot()       - Get the PPD InputSlot associated with the job
+ *                              attributes or a keyword string.
+ *   _pwgGetMediaType()       - Get the PPD MediaType associated with the job
+ *                              attributes or a keyword string.
+ *   _pwgGetOutputBin()       - Get the PPD OutputBin associated with the
+ *                              keyword string.
+ *   _pwgGetPageSize()        - Get the PPD PageSize associated with the job
+ *                              attributes or a keyword string.
+ *   _pwgGetSize()            - Get the PWG size associated with a PPD PageSize.
+ *   _pwgGetSource()          - Get the PWG media-source associated with a PPD
+ *                              InputSlot.
+ *   _pwgGetType()            - Get the PWG media-type associated with a PPD
+ *                              MediaType.
+ *   _pwgInputSlotForSource() - Get the InputSlot name for the given PWG source.
+ *   _pwgMediaTypeForType()   - Get the MediaType name for the given PWG type.
+ *   _pwgPageSizeForMedia()   - Get the PageSize name for the given media.
+ *   pwg_ppdize_name()        - Convert an IPP keyword to a PPD keyword.
+ *   pwg_unppdize_name()      - Convert a PPD keyword to a lowercase IPP
+ *                              keyword.
  */
 
 /*
