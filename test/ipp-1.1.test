@@ -99,6 +99,7 @@
 	NAME "3.1.8: Unsupported IPP version 0.0"
 	VERSION 0.0
 	OPERATION Get-Printer-Attributes
+	GROUP operation-attributes-tag
 	ATTR charset attributes-charset utf-8
 	ATTR naturalLanguage attributes-natural-language en
 	ATTR uri printer-uri $uri
