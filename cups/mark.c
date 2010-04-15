@@ -286,8 +286,10 @@ cupsMarkOptions(
     }
     else if (!strcasecmp(optptr->name, "output-bin"))
     {
-      if (!cupsGetOption("OutputBin", num_options, options))
-        ppd_mark_option(ppd, "OutputBin", optptr->value);
+      if (!cupsGetOption("OutputBin", num_options, options) &&
+	  (ppd_keyword = _pwgGetOutputBin((_pwg_t *)ppd->pwg,
+	                                  optptr->value)) != NULL)
+	ppd_mark_option(ppd, "OutputBin", ppd_keyword);
     }
     else if (!strcasecmp(optptr->name, "multiple-document-handling"))
     {
