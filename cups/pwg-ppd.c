@@ -339,7 +339,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
   {
-    if ((pwg->types = calloc(output_bin->num_choices,
+    if ((pwg->bins = calloc(output_bin->num_choices,
                              sizeof(_pwg_map_t))) == NULL)
     {
       DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
@@ -350,7 +350,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     pwg->num_bins = output_bin->num_choices;
 
     for (i = output_bin->num_choices, choice = output_bin->choices,
-             map = pwg->types;
+             map = pwg->bins;
 	 i > 0;
 	 i --, choice ++, map ++)
     {
