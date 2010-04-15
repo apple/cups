@@ -4205,7 +4205,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 				   media_type ?
 				       _pwgGetType(p->pwg,
 				                   media_type->choice) :
-				   NULL);
+				       NULL);
 
 	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
 	                 col);

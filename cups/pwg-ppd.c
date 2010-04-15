@@ -717,6 +717,13 @@ _pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_size_t	*size;			/* Current size */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !page_size)
+    return (NULL);
+
   if (!strncasecmp(page_size, "Custom.", 7))
   {
    /*
@@ -804,6 +811,13 @@ _pwgGetSource(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_map_t	*source;		/* Current source */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !input_slot)
+    return (NULL);
+
   for (i = pwg->num_sources, source = pwg->sources; i > 0; i --, source ++)
     if (!strcasecmp(input_slot, source->ppd))
       return (source->pwg);
@@ -824,6 +838,13 @@ _pwgGetType(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_map_t	*type;			/* Current type */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !media_type)
+    return (NULL);
+
   for (i = pwg->num_types, type = pwg->types; i > 0; i --, type ++)
     if (!strcasecmp(media_type, type->ppd))
       return (type->pwg);
@@ -842,6 +863,13 @@ _pwgInputSlotForSource(
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!media_source || !name || namesize < PPD_MAX_NAME)
+    return (NULL);
+
   if (strcasecmp(media_source, "main"))
     strlcpy(name, "Cassette", namesize);
   else if (strcasecmp(media_source, "alternate"))
@@ -881,6 +909,13 @@ _pwgMediaTypeForType(
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!media_type || !name || namesize < PPD_MAX_NAME)
+    return (NULL);
+
   if (strcasecmp(media_type, "auto"))
     strlcpy(name, "Auto", namesize);
   else if (strcasecmp(media_type, "cardstock"))
