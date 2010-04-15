@@ -15,24 +15,6 @@
  *
  * Contents:
  *
- *   _pwgCreateWithPPD()      - Create PWG mapping data from a PPD file.
- *   _pwgGetInputSlot()       - Get the PPD InputSlot associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetMediaType()       - Get the PPD MediaType associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetPageSize()        - Get the PPD PageSize associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetSize()            - Get the PWG size associated with a PPD PageSize.
- *   _pwgGetSource()          - Get the PWG media-source associated with a PPD
- *                              InputSlot.
- *   _pwgGetType()            - Get the PWG media-type associated with a PPD
- *                              MediaType.
- *   _pwgInputSlotForSource() - Get the InputSlot name for the given PWG source.
- *   _pwgMediaTypeForType()   - Get the MediaType name for the given PWG type.
- *   _pwgPageSizeForMedia()   - Get the PageSize name for the given media.
- *   pwg_ppdize_name()        - Convert an IPP keyword to a PPD keyword.
- *   pwg_unppdize_name()      - Convert a PPD keyword to a lowercase IPP
- *                              keyword.
  */
 
 /*
@@ -61,7 +43,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   int		i, j;			/* Looping vars */
   _pwg_t	*pwg;			/* PWG mapping data */
   ppd_option_t	*input_slot,		/* InputSlot option */
-		*media_type;		/* MediaType option */
+		*media_type,		/* MediaType option */
+		*output_bin;		/* OutputBin option */
   ppd_choice_t	*choice;		/* Current InputSlot/MediaType */
   _pwg_map_t	*map;			/* Current source/type map */
   ppd_size_t	*ppd_size;		/* Current PPD size */
@@ -327,6 +310,35 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
   }
 
+
+ /*
+  * Copy and convert OutputBin data...
+  */
+
+  if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
+  {
+    if ((pwg->types = calloc(output_bin->num_choices,
+                             sizeof(_pwg_map_t))) == NULL)
+    {
+      DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
+                    "for OutputBin.", output_bin->num_choices));
+      goto create_error;
+    }
+
+    pwg->num_bins = output_bin->num_choices;
+
+    for (i = output_bin->num_choices, choice = output_bin->choices,
+             map = pwg->types;
+	 i > 0;
+	 i --, choice ++, map ++)
+    {
+      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(choice->choice);
+    }
+  }
+
   return (pwg);
 
  /*
@@ -337,6 +349,38 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   _cupsSetError(IPP_INTERNAL_ERROR, _("Out of memory."), 1);
   _pwgDestroy(pwg);
+
+  return (NULL);
+}
+
+
+/*
+ * '_pwgGetBin()' - Get the PWG output-bin keyword associated with a PPD
+ *                  OutputBin.
+ */
+
+const char *				/* O - output-bin or NULL */
+_pwgGetBin(_pwg_t     *pwg,		/* I - PWG mapping data */
+	   const char *output_bin)	/* I - PPD OutputBin string */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !output_bin)
+    return (NULL);
+
+ /*
+  * Look up the OutputBin string...
+  */
+
+
+  for (i = 0; i < pwg->num_bins; i ++)
+    if (!strcasecmp(output_bin, pwg->bins[i].ppd))
+      return (pwg->bins[i].pwg);
 
   return (NULL);
 }
@@ -437,6 +481,38 @@ _pwgGetMediaType(_pwg_t     *pwg,	/* I - PWG mapping data */
       if (!strcasecmp(keyword, pwg->types[i].pwg))
         return (pwg->types[i].ppd);
   }
+
+  return (NULL);
+}
+
+
+/*
+ * '_pwgGetOutputBin()' - Get the PPD OutputBin associated with the keyword
+ *                        string.
+ */
+
+const char *				/* O - PPD OutputBin or NULL */
+_pwgGetOutputBin(_pwg_t     *pwg,	/* I - PWG mapping data */
+		 const char *output_bin)/* I - Keyword string */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !output_bin)
+    return (NULL);
+
+ /*
+  * Look up the OutputBin string...
+  */
+
+
+  for (i = 0; i < pwg->num_bins; i ++)
+    if (!strcasecmp(output_bin, pwg->bins[i].pwg))
+      return (pwg->bins[i].ppd);
 
   return (NULL);
 }

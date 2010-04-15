@@ -80,6 +80,8 @@ typedef struct _pwg_size_s		/**** Size element - PPD to/from PWG */
 
 typedef struct _pwg_s			/**** PWG-PPD conversion data ****/
 {
+  int		num_bins;		/* Number of output bins */
+  _pwg_map_t	*bins;			/* Output bins */
   int		num_sizes;		/* Number of media sizes */
   _pwg_size_t	*sizes;			/* Media sizes */
   int		custom_max_width,	/* Maximum custom width in 2540ths */

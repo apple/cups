@@ -82,8 +82,8 @@ INCLUDE "ipp-2.0.test"
 	EXPECT operations-supported WITH-VALUE 0x0022 # Enable-Printer
 	EXPECT operations-supported WITH-VALUE 0x0023 # Disable-Printer
 
-	?EXPECT printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
-	?EXPECT printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
+	EXPECT ?printer-alert OF-TYPE octetString IN-GROUP printer-attributes-tag
+	EXPECT ?printer-alert-description OF-TYPE text IN-GROUP printer-attributes-tag SAME-COUNT-AS printer-alert
 	EXPECT printer-settable-attributes-supported OF-TYPE keyword IN-GROUP printer-attributes-tag
 	EXPECT printer-state-change-time OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT printer-state-reasons OF-TYPE keyword IN-GROUP printer-attributes-tag

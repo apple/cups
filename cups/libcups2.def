@@ -46,8 +46,10 @@ _pwgMediaForPPD
 _pwgMediaForPWG
 _pwgMediaForSize
 _pwgCreateWithPPD
+_pwgGetBin
 _pwgGetInputSlot
 _pwgGetMediaType
+_pwgGetOutputBin
 _pwgGetPageSize
 _pwgGetSize
 _pwgGetSource

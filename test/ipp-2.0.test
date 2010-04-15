@@ -45,7 +45,7 @@ INCLUDE "ipp-1.1.test"
 	EXPECT finishings-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3
 	EXPECT media-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT media-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag
-	EXPECT orientation-requested-default OF-TYPE enum IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE 3,4,5,6
+	EXPECT orientation-requested-default OF-TYPE enum,no-value IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE no-value,3,4,5,6
 	EXPECT orientation-requested-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 3,4,5,6
 	EXPECT output-bin-default OF-TYPE keyword|name IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT output-bin-supported OF-TYPE keyword|name IN-GROUP printer-attributes-tag

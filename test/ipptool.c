@@ -544,7 +544,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   int		i,			/* Looping var */
 		linenum,		/* Current line number */
 		pass,			/* Did we pass the test? */
-		request_id;		/* Current request ID */
+		request_id,		/* Current request ID */
+		show_header = 1;	/* Show the test header? */
   http_t	*http = NULL;		/* HTTP connection to server */
   FILE		*fp = NULL;		/* Test file */
   char		resource[512],		/* Resource for request */
@@ -603,11 +604,6 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Loop on tests...
   */
 
-  if (Output == _CUPS_OUTPUT_PLIST)
-    print_xml_header();
-  else if (Output == _CUPS_OUTPUT_TEST)
-    printf("\"%s\":\n", testfile);
-
   CUPS_SRAND(time(NULL));
 
   pass       = 1;
@@ -664,6 +660,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         goto test_error;
       }
 
+      show_header = 1;
       continue;
     }
     else if (!strcmp(token, "TRANSFER"))
@@ -734,6 +731,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
    /*
     * Initialize things...
     */
+
+    if (show_header)
+    {
+      if (Output == _CUPS_OUTPUT_PLIST)
+	print_xml_header();
+      else if (Output == _CUPS_OUTPUT_TEST)
+	printf("\"%s\":\n", testfile);
+
+      show_header = 0;
+    }
 
     strlcpy(resource, vars->resource, sizeof(resource));
 
