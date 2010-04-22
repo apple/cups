@@ -17,13 +17,6 @@ include Makedefs
 
 
 #
-# Don't run top-level build targets in parallel...
-#
-
-.NOTPARALLEL:
-
-
-#
 # Directories to make...
 #
 
@@ -314,6 +307,13 @@ dist:	all
 		Linux*) test ! -x /usr/bin/rpm || $(MAKE) $(MFLAGS) rpm;; \
 		SunOS*) $(MAKE) $(MFLAGS) pkg;; \
 	esac
+
+
+#
+# Don't run top-level build targets in parallel...
+#
+
+.NOTPARALLEL:
 
 
 #
