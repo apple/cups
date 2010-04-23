@@ -39,7 +39,7 @@ Release: 0
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
+Source: http://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
