@@ -87,8 +87,7 @@ OBJS	=	\
 		testlang.o \
 		testppd.o \
 		testpwg.o \
-		testsnmp.o \
-		php_cups_wrap.o
+		testsnmp.o
 
 
 #
