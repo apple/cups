@@ -1003,6 +1003,10 @@ main(int  argc,				/* I - Number of command-line args */
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
 		       NULL, keyword);
 
+	if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+       	       NULL, keyword);
+       	               
 	_pwgDestroy(pwg);
       }
 
