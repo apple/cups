@@ -4457,7 +4457,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Output bin...
     */
 
-    if (p->pwg->num_bins > 0)
+    if (p->pwg && p->pwg->num_bins > 0)
     {
       attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 			   "output-bin-supported", p->pwg->num_bins,
