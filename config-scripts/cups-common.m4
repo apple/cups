@@ -225,9 +225,9 @@ AC_SUBST(ARFLAGS)
 
 dnl Prep libraries specifically for cupsd and backends...
 BACKLIBS=""
-CUPSDLIBS=""
+SERVERLIBS=""
 AC_SUBST(BACKLIBS)
-AC_SUBST(CUPSDLIBS)
+AC_SUBST(SERVERLIBS)
 
 dnl See if we have POSIX ACL support...
 SAVELIBS="$LIBS"
@@ -235,7 +235,7 @@ LIBS=""
 AC_ARG_ENABLE(acl, [  --enable-acl            build with POSIX ACL support])
 if test "x$enable_acl" != xno; then
 	AC_SEARCH_LIBS(acl_init, acl, AC_DEFINE(HAVE_ACL_INIT))
-	CUPSDLIBS="$CUPSDLIBS $LIBS"
+	SERVERLIBS="$SERVERLIBS $LIBS"
 fi
 LIBS="$SAVELIBS"
 
@@ -261,7 +261,7 @@ if test "x$enable_dbus" != xno; then
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(HAVE_DBUS)
 			CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-			CUPSDLIBS="$CUPSDLIBS `$PKGCONFIG --libs dbus-1`"
+			SERVERLIBS="$SERVERLIBS `$PKGCONFIG --libs dbus-1`"
 			DBUS_NOTIFIER="dbus"
 			DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs dbus-1`"
 			AC_CHECK_LIB(dbus-1,
@@ -287,7 +287,7 @@ case $uname in
         Darwin*)
 		LEGACY_BACKENDS=""
                 BACKLIBS="$BACKLIBS -framework IOKit"
-                CUPSDLIBS="$CUPSDLIBS -sectorder __TEXT __text cupsd.order -e start -framework IOKit -weak_framework ApplicationServices"
+                SERVERLIBS="$SERVERLIBS -framework IOKit -weak_framework ApplicationServices"
                 LIBS="-framework SystemConfiguration -framework CoreFoundation -framework Security $LIBS"
 
 		dnl Check for framework headers...

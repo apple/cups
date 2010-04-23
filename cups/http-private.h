@@ -130,6 +130,9 @@ extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 		              size_t *dataLength);
 extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
 		               size_t *dataLength);
+
+#  elif defined(HAVE_SSPISSL)
+#    include "sspi-private.h"
 #  endif /* HAVE_LIBSSL */
 
 

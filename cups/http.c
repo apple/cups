@@ -103,11 +103,13 @@
 
 #include "cups-private.h"
 #include <fcntl.h>
-#ifndef WIN32
+#ifdef WIN32
+#  include <tchar.h>
+#else
 #  include <signal.h>
 #  include <sys/time.h>
 #  include <sys/resource.h>
-#endif /* !WIN32 */
+#endif /* WIN32 */
 #ifdef HAVE_POLL
 #  include <sys/poll.h>
 #endif /* HAVE_POLL */
@@ -1116,13 +1118,16 @@ httpGets(char   *line,			/* I - Line to read into */
 	*/
 
 #ifdef WIN32
-        if (WSAGetLastError() != http->error)
+        DEBUG_printf(("3httpGets: recv() error %d!", WSAGetLastError()));
+
+        if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+	  continue;
+	else if (WSAGetLastError() != http->error)
 	{
 	  http->error = WSAGetLastError();
 	  continue;
 	}
 
-        DEBUG_printf(("3httpGets: recv() error %d!", WSAGetLastError()));
 #else
         DEBUG_printf(("3httpGets: recv() error %d!", errno));
 
@@ -1437,8 +1442,11 @@ _httpPeek(http_t *http,			/* I - Connection to server */
     else if (bytes < 0)
     {
 #ifdef WIN32
-      http->error = WSAGetLastError();
-      return (-1);
+      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
+      {
+        http->error = WSAGetLastError();
+        return (-1);
+      }
 #else
       if (errno != EINTR && errno != EAGAIN)
       {
@@ -1472,7 +1480,10 @@ _httpPeek(http_t *http,			/* I - Connection to server */
   if (bytes < 0)
   {
 #ifdef WIN32
-    http->error = WSAGetLastError();
+    if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+      bytes = 0;
+    else
+      http->error = WSAGetLastError();
 #else
     if (errno == EINTR || errno == EAGAIN)
       bytes = 0;
@@ -1687,8 +1698,11 @@ httpRead2(http_t *http,			/* I - Connection to server */
     else if (bytes < 0)
     {
 #ifdef WIN32
-      http->error = WSAGetLastError();
-      return (-1);
+      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
+      {
+        http->error = WSAGetLastError();
+        return (-1);
+      }
 #else
       if (errno != EINTR && errno != EAGAIN)
       {
@@ -1738,7 +1752,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
                   CUPS_LLCAST length));
 
 #ifdef WIN32
-    bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0);
+    while ((bytes = (ssize_t) recv(http->fd, buffer, (int)length, 0)) < 0)
+      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
+        break;
 #else
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
       if (errno != EINTR && errno != EAGAIN)
@@ -1761,7 +1777,10 @@ httpRead2(http_t *http,			/* I - Connection to server */
   else if (bytes < 0)
   {
 #ifdef WIN32
-    http->error = WSAGetLastError();
+    if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+      bytes = 0;
+    else
+      http->error = WSAGetLastError();
 #else
     if (errno == EINTR || errno == EAGAIN)
       bytes = 0;
@@ -2489,7 +2508,8 @@ _httpWait(http_t *http,			/* I - Connection to server */
     DEBUG_printf(("6_httpWait: select() returned %d...", nfds));
   }
 #  ifdef WIN32
-  while (nfds < 0 && WSAGetLastError() == WSAEINTR);
+  while (nfds < 0 && (WSAGetLastError() == WSAEINTR ||
+                      WSAGetLastError() == WSAEWOULDBLOCK));
 #  else
   while (nfds < 0 && (errno == EINTR || errno == EAGAIN));
 #  endif /* WIN32 */
@@ -3047,6 +3067,8 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
   }
 
   return (result);
+#  elif defined(HAVE_SSPISSL)
+  return _sspiRead((_sspi_struct_t*) http->tls, buf, len);
 #  endif /* HAVE_LIBSSL */
 }
 #endif /* HAVE_SSL */
@@ -3244,6 +3266,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   http_tls_t	*conn;			/* CDSA connection information */
+#  elif defined(HAVE_SSPISSL)
+  TCHAR		username[256];		/* Username returned from GetUserName() */
+  TCHAR		commonName[256];	/* Common name for certificate */
+  DWORD		dwSize;			/* 32 bit size */
+  _sspi_struct_t *conn;			/* SSPI connection information */
 #  endif /* HAVE_LIBSSL */
 
 
@@ -3377,6 +3404,32 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
     return (-1);
   }
+#  elif defined(HAVE_SSPISSL)
+  conn = _sspiAlloc();
+
+  if (!conn)
+    return (-1);
+
+  conn->sock = http->fd;
+  dwSize     = sizeof(username) / sizeof(TCHAR);
+  GetUserName(username, &dwSize);
+  _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
+               sizeof(commonName) / sizeof(TCHAR), TEXT("CN=%s"), username);
+
+  if (!_sspiGetCredentials(conn, L"ClientContainer", commonName, FALSE))
+  {
+    _sspiFree(conn);
+    return (-1);
+  }
+
+  _sspiSetAllowsAnyRoot(conn, TRUE);
+  _sspiSetAllowsExpiredCerts(conn, TRUE);
+
+  if (!_sspiConnect(conn, http->hostname))
+  {
+    _sspiFree(conn);
+    return (-1);
+  }
 #  endif /* HAVE_CDSASSL */
 
   http->tls = conn;
@@ -3435,6 +3488,11 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
     CFRelease(conn->certsArray);
 
   free(conn);
+#  elif defined(HAVE_SSPISSL)
+  _sspi_struct_t  *conn;		/* SSPI connection information */
+
+  conn = (_sspi_struct_t*)(http->tls);
+  _sspiFree(conn);
 #  endif /* HAVE_LIBSSL */
 
   http->tls = NULL;
@@ -3577,7 +3635,9 @@ http_write(http_t     *http,		/* I - Connection to server */
     if (bytes < 0)
     {
 #ifdef WIN32
-      if (WSAGetLastError() != http->error)
+      if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+        continue;
+      else if (WSAGetLastError() != http->error && WSAGetLastError() != WSAECONNRESET)
       {
         http->error = WSAGetLastError();
 	continue;
@@ -3730,6 +3790,8 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 	result = -1;
 	break;
   }
+#  elif defined(HAVE_SSPISSL)
+  return _sspiWrite((_sspi_struct_t*) http->tls, (void*) buf, len);
 #  endif /* HAVE_LIBSSL */
 
   DEBUG_printf(("3http_write_ssl: Returning %d.", (int)result));

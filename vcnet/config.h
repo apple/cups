@@ -348,7 +348,8 @@
 /* #undef HAVE_CDSASSL */
 /* #undef HAVE_GNUTLS */
 /* #undef HAVE_LIBSSL */
-/* #undef HAVE_SSL */
+#define HAVE_SSPISSL
+#define HAVE_SSL
 
 
 /*

@@ -345,7 +345,6 @@ libcupsimage.2.dylib:	$(IMAGEOBJS) $(LIBCUPSIMAGEORDER)
 		-install_name $(libdir)/$@ \
 		-current_version 2.3.0 \
 		-compatibility_version 2.0.0 \
-		-sectorder __TEXT __text $(LIBCUPSIMAGEORDER) \
 		$(IMAGEOBJS) $(DSOLIBS) -L../cups $(LINKCUPS) -lm
 	$(RM) libcupsimage.dylib
 	$(LN) $@ libcupsimage.dylib

@@ -6,6 +6,7 @@ _cupsEncodingName
 _cupsGet1284Values
 _cupsGetPassword
 _cupsGlobals
+_cupsLangPrintError
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString

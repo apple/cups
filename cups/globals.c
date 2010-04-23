@@ -68,7 +68,7 @@ _cupsGlobalLock(void)
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_lock(&cups_global_mutex);
 #elif defined(WIN32)
-  EnterCriticalSection(&cups_global_mutex->m_criticalSection);
+  EnterCriticalSection(&cups_global_mutex.m_criticalSection);
 #endif /* HAVE_PTHREAD_H */
 }
 
@@ -123,7 +123,7 @@ _cupsGlobalUnlock(void)
 #ifdef HAVE_PTHREAD_H
   pthread_mutex_unlock(&cups_global_mutex);
 #elif defined(WIN32)
-  LeaveCriticalSection(&cups_global_mutex->m_criticalSection);
+  LeaveCriticalSection(&cups_global_mutex.m_criticalSection);
 #endif /* HAVE_PTHREAD_H */
 }
 
@@ -147,7 +147,7 @@ DllMain(HINSTANCE hinst,		/* I - DLL module handle */
   switch (reason)
   {
     case DLL_PROCESS_ATTACH :		/* Called on library initialization */
-        InitializeCriticalSection(&cups_global_lock);
+        InitializeCriticalSection(&cups_global_mutex.m_criticalSection);
 
         if ((cups_globals_key = TlsAlloc()) == TLS_OUT_OF_INDEXES)
           return (FALSE);
@@ -163,7 +163,7 @@ DllMain(HINSTANCE hinst,		/* I - DLL module handle */
           cups_globals_free(cg);
 
         TlsFree(cups_globals_key);
-        DeleteCriticalSection(&cups_global_lock);
+        DeleteCriticalSection(&cups_global_mutex.m_criticalSection);
         break;
 
     default:

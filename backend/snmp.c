@@ -141,13 +141,6 @@ typedef struct snmp_cache_s		/**** SNMP scan cache ****/
 
 
 /*
- * Private CUPS API to set the last error...
- */
-
-extern void		_cupsSetError(ipp_status_t status, const char *message);
-
-
-/*
  * Local functions...
  */
 

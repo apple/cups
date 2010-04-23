@@ -1062,27 +1062,34 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  case IPP_TAG_RESOLUTION :
 	      {
 	        int	xres,		/* X resolution */
-			yres;		/* Y resolution */
-		char	units[6];	/* Units */
+	        yres;		/* Y resolution */
+	        char *ptr;	/* Pointer into value */
 
-                if (sscanf(token, "%dx%d%5s", &xres, &yres, units) != 3 ||
-		    (strcasecmp(units, "dpi") && strcasecmp(units, "dpc") &&
-		     strcasecmp(units, "other")))
-		{
-		  print_fatal_error("Bad resolution value \"%s\" on line %d.",
+	        xres = yres = strtol(token, (char **)&ptr, 10);
+	        if (ptr > token && xres > 0)
+	        {
+	          if (*ptr == 'x')
+	          yres = strtol(ptr + 1, (char **)&ptr, 10);
+	        }
+
+	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
+	        (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
+	        strcasecmp(ptr, "other")))
+	        {
+	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
 		                    token, linenum);
-		  goto test_error;
-		}
+	          goto test_error;
+	        }
 
-		if (!strcasecmp(units, "dpi"))
-		  ippAddResolution(request, group, attr, xres, yres,
-				   IPP_RES_PER_INCH);
-		else if (!strcasecmp(units, "dpc"))
-		  ippAddResolution(request, group, attr, xres, yres,
-				   IPP_RES_PER_CM);
-		else
-		  ippAddResolution(request, group, attr, xres, yres,
-				   (ipp_res_t)0);
+	        if (!strcasecmp(ptr, "dpi"))
+	          ippAddResolution(request, group, attr, IPP_RES_PER_INCH,
+	                           xres, yres);
+	        else if (!strcasecmp(ptr, "dpc"))
+	          ippAddResolution(request, group, attr, IPP_RES_PER_CM,
+	                           xres, yres);
+	        else
+	          ippAddResolution(request, group, attr, (ipp_res_t)0,
+	                           xres, yres);
 	      }
 	      break;
 
@@ -2328,7 +2335,7 @@ get_collection(_cups_vars_t *vars,	/* I  - Variables */
 	goto col_error;
       }
 
-      if ((value = ippTagValue(token)) < 0)
+      if ((value = ippTagValue(token)) == IPP_TAG_ZERO)
       {
 	print_fatal_error("Bad MEMBER value tag \"%s\" on line %d.", token,
 			  *linenum);

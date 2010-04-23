@@ -100,21 +100,6 @@ AC_SUBST(PIEFLAGS)
 RELROFLAGS=""
 AC_SUBST(RELROFLAGS)
 
-LIBCUPSORDER="libcups.order"
-AC_ARG_WITH(libcupsorder, [  --with-libcupsorder     set libcups secorder file, default=libcups.order],
-	if test -f "$withval"; then
-		LIBCUPSORDER="$withval"
-	fi)
-AC_SUBST(LIBCUPSORDER)
-
-LIBCUPSIMAGEORDER="libcupsimage.order"
-AC_ARG_WITH(libcupsimageorder, [  --with-libcupsimagesorder
-                          set libcupsimage secorder file, default=libcupsimage.order],
-	if test -f "$withval"; then
-		LIBCUPSIMAGEORDER="$withval"
-	fi)
-AC_SUBST(LIBCUPSIMAGEORDER)
-
 PHPOPTIONS=""
 AC_SUBST(PHPOPTIONS)
 

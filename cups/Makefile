@@ -363,7 +363,6 @@ libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 		-current_version 2.8.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
-		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib t.exp
