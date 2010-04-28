@@ -441,6 +441,20 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       puts("PASS");
 
+    fputs("cupsMarkOptions(media=A4): ", stdout);
+    num_options = cupsAddOption("media", "A4", 0, &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    size = ppdPageSize(ppd, NULL);
+    if (!size || strcmp(size->name, "A4"))
+    {
+      printf("FAIL (%s)\n", size ? size->name : "unknown");
+      status ++;
+    }
+    else
+      puts("PASS");
+
    /*
     * Test localization...
     */
