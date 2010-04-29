@@ -1017,16 +1017,6 @@ main(int  argc,				/* I - Number of command-line args */
     cupsFreeOptions(num_options, options);
 
    /*
-    * If copies aren't supported, then we are likely dealing with an HP
-    * JetDirect.  The HP IPP implementation seems to close the connection
-    * after every request - that is, it does *not* implement HTTP Keep-
-    * Alive, which is REQUIRED by HTTP/1.1...
-    */
-
-    if (!copies_sup)
-      httpReconnect(http);
-
-   /*
     * Do the request...
     */
 
@@ -1043,8 +1033,10 @@ main(int  argc,				/* I - Number of command-line args */
 	else
 	  fd = 0;
 
-        while ((bytes = read(0, buffer, sizeof(buffer))) > 0)
+        while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
 	{
+	  fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
+
 	  if ((http_status = cupsWriteRequestData(http, buffer, bytes))
 	          != HTTP_CONTINUE)
             break;
