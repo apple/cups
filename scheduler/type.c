@@ -518,15 +518,18 @@ mimeAddTypeRule(mime_type_t *mt,	/* I - Type to add to */
 	    if (length[1] == 1)
 	      temp->value.charv = value[1][0];
 	    else
-	      temp->value.charv = (char)strtol(value[1], NULL, 0);
+	      temp->value.charv = (unsigned char)strtol(value[1], NULL, 0);
+
+	    DEBUG_printf(("1mimeAddTypeRule: CHAR(%d,0x%02x)", temp->offset,
+	                  temp->value.charv));
 	    break;
 	case MIME_MAGIC_SHORT :
 	    temp->offset       = strtol(value[0], NULL, 0);
-	    temp->value.shortv = (short)strtol(value[1], NULL, 0);
+	    temp->value.shortv = (unsigned short)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_INT :
 	    temp->offset     = strtol(value[0], NULL, 0);
-	    temp->value.intv = (int)strtol(value[1], NULL, 0);
+	    temp->value.intv = (unsigned)strtol(value[1], NULL, 0);
 	    break;
 	case MIME_MAGIC_LOCALE :
 	    if (length[0] > (sizeof(temp->value.localev) - 1))
