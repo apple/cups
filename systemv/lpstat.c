@@ -1416,7 +1416,7 @@ show_jobs(const char *dests,		/* I - Destinations */
 
       rank ++;
 
-      if (match_list(dests, dest) || match_list(users, username))
+      if (match_list(dests, dest) && match_list(users, username))
       {
         jobdate = localtime(&jobtime);
         snprintf(temp, sizeof(temp), "%s-%d", dest, jobid);
