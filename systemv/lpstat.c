@@ -574,11 +574,11 @@ match_list(const char *list,		/* I - List of names */
 
 
  /*
-  * An empty list never matches...
+  * An empty list always matches...
   */
 
   if (!list || !*list)
-    return (0);
+    return (1);
 
   while (*list)
   {
