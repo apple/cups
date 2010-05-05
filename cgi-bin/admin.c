@@ -771,7 +771,7 @@ do_am_class(http_t *http,		/* I - HTTP connection */
     attr = ippAddStrings(request, IPP_TAG_PRINTER, IPP_TAG_URI, "member-uris",
                          num_printers, NULL, NULL);
     for (i = 0; i < num_printers; i ++)
-      attr->values[i].string.text = strdup(cgiGetArray("MEMBER_URIS", i));
+      attr->values[i].string.text = _cupsStrAlloc(cgiGetArray("MEMBER_URIS", i));
   }
 
  /*
@@ -2481,7 +2481,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
          attr;
 	 attr = ippFindNextAttribute(response, "device-uri", IPP_TAG_URI))
     {
-      cupsArrayAdd(printer_devices, strdup(attr->values[0].string.text));
+      cupsArrayAdd(printer_devices, _cupsStrAlloc(attr->values[0].string.text));
     }
 
    /*
@@ -2618,7 +2618,7 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
       for (printer_device = (char *)cupsArrayFirst(printer_devices);
            printer_device;
 	   printer_device = (char *)cupsArrayNext(printer_devices))
-        free(printer_device);
+        _cupsStrFree(printer_device);
 
       cupsArrayDelete(printer_devices);
     }
@@ -3059,7 +3059,7 @@ do_set_allowed_users(http_t *http)	/* I - HTTP connection */
         * Add the name...
 	*/
 
-        attr->values[i].string.text = strdup(ptr);
+        attr->values[i].string.text = _cupsStrAlloc(ptr);
 
        /*
         * Advance to the next name...
