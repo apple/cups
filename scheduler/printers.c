@@ -309,6 +309,7 @@ cupsdCreateCommonData(void)
 		  IPP_GET_PRINTER_ATTRIBUTES,
 		  IPP_HOLD_JOB,
 		  IPP_RELEASE_JOB,
+		  IPP_RESTART_JOB,
 		  IPP_PAUSE_PRINTER,
 		  IPP_RESUME_PRINTER,
 		  IPP_PURGE_JOBS,
@@ -408,6 +409,7 @@ cupsdCreateCommonData(void)
 		{			/* job-creation-attributes-supported */
 		  "copies",
 		  "finishings",
+		  "ipp-attribute-fidelity",
 		  "job-hold-until",
 		  "job-name",
 		  "job-priority",
@@ -500,6 +502,10 @@ cupsdCreateCommonData(void)
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "ipp-versions-supported", sizeof(versions) / sizeof(versions[0]),
 		NULL, versions);
+
+  /* ippget-event-life */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "ippget-event-life", 15);
 
   /* job-creation-attributes-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
@@ -3487,12 +3493,10 @@ add_printer_defaults(cupsd_printer_t *p)/* I - Printer */
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-hold-until-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-priority-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("job-sheets-default"));
-    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("media-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("media-col-default"));
     cupsArrayAdd(CommonDefaults, _cupsStrAlloc("number-up-default"));
     cupsArrayAdd(CommonDefaults,
                  _cupsStrAlloc("orientation-requested-default"));
-    cupsArrayAdd(CommonDefaults, _cupsStrAlloc("sides-default"));
   }
 
  /*
@@ -4201,7 +4205,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 				   media_type ?
 				       _pwgGetType(p->pwg,
 				                   media_type->choice) :
-				   NULL);
+				       NULL);
 
 	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
 	                 col);
@@ -4453,22 +4457,51 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Output bin...
     */
 
-    if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
+    if (p->pwg && p->pwg->num_bins > 0)
     {
       attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-			   "output-bin-supported", output_bin->num_choices,
+			   "output-bin-supported", p->pwg->num_bins,
 			   NULL, NULL);
 
       if (attr != NULL)
       {
 	for (i = 0, val = attr->values;
-	     i < output_bin->num_choices;
+	     i < p->pwg->num_bins;
 	     i ++, val ++)
-	  val->string.text = _cupsStrAlloc(output_bin->choices[i].choice);
+	  val->string.text = _cupsStrAlloc(p->pwg->bins[i].pwg);
       }
 
+      if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
+      {
+	for (i = 0; i < p->pwg->num_bins; i ++)
+	  if (!strcmp(p->pwg->bins[i].ppd, output_bin->defchoice))
+	    break;
+
+        if (i >= p->pwg->num_bins)
+	  i = 0;
+
+	ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		     "output-bin-default", NULL, p->pwg->bins[i].pwg);
+      }
+      else
+        ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+	             "output-bin-default", NULL, p->pwg->bins[0].pwg);
+    }
+    else if ((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
+                                     NULL)) != NULL &&
+	     !strcasecmp(ppd_attr->value, "Reverse"))
+    {
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		   "output-bin-default", NULL, output_bin->defchoice);
+		   "output-bin-supported", NULL, "face-up");
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "output-bin-default", NULL, "face-up");
+    }
+    else
+    {
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "output-bin-supported", NULL, "face-down");
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "output-bin-default", NULL, "face-down");
     }
 
    /*
@@ -4589,6 +4622,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       else
 	ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		     "sides-default", NULL, "one-sided");
+    }
+    else
+    {
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "sides-supported", NULL, "one-sided");
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "sides-default", NULL, "one-sided");
     }
 
     if (ppdFindOption(ppd, "Collate") != NULL)

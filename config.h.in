@@ -496,7 +496,7 @@
 
 
 /*
- * Do we have MacOSX 10.4's mbr_XXX functions()?
+ * Do we have MacOSX 10.4's mbr_XXX functions?
  */
 
 #undef HAVE_MEMBERSHIP_H
@@ -505,7 +505,7 @@
 
 
 /*
- * Do we have Darwin's notify_post() header and function?
+ * Do we have Darwin's notify_post header and function?
  */
 
 #undef HAVE_NOTIFY_H
@@ -637,6 +637,13 @@
  */
 
 #undef HAVE_TCPD_H
+
+
+/*
+ * Do we have <iconv.h>?
+ */
+
+#undef HAVE_ICONV_H
 
 
 #endif /* !_CUPS_CONFIG_H_ */

@@ -23,13 +23,10 @@
  * Include necessary headers.
  */
 
+#  include <cups/cups-private.h>
+#  include <cups/snmp-private.h>
 #  include <cups/backend.h>
 #  include <cups/sidechannel.h>
-#  include <cups/ppd-private.h>
-#  include <cups/debug-private.h>
-#  include <cups/language-private.h>
-#  include <cups/snmp-private.h>
-#  include <cups/string-private.h>
 #  include <signal.h>
 
 #  ifdef __linux

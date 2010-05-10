@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-04-04
+CHANGES.txt - 2010-05-10
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- CUPS now uses iconv to implement all of its character encoding
+	  support (STR #3097)
 	- The scheduler now implements the Cancel-Jobs, Cancel-My-Jobs, and
 	  Close-Job operations along with the job-ids operation attribute from
 	  PWG 5100.11.

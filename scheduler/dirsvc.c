@@ -2347,7 +2347,8 @@ dnssdBuildTxtRecord(
     int             for_lpd)		/* I - 1 = LPD, 0 = IPP */
 {
   int		i;			/* Looping var */
-  char		type_str[32],		/* Type to string buffer */
+  char		adminurl_str[256],	/* URL for th admin page */
+		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
 		air_str[1024],		/* auth-info-required string buffer */
@@ -2377,11 +2378,15 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "ty";
   keyvalue[i++][1] = p->make_model ? p->make_model : "Unknown";
 
-  if (p->location && *p->location != '\0')
-  {
-    keyvalue[i  ][0] = "note";
-    keyvalue[i++][1] = p->location;
-  }
+  httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str),
+                   "http", NULL, DNSSDHostName, DNSSDPort, "/%s/%s",
+		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
+		   p->name);
+  keyvalue[i  ][0] = "adminurl";
+  keyvalue[i++][1] = adminurl_str;
+
+  keyvalue[i  ][0] = "note";
+  keyvalue[i++][1] = p->location ? p->location : "";
 
   keyvalue[i  ][0] = "priority";
   keyvalue[i++][1] = for_lpd ? "100" : "0";
@@ -2404,59 +2409,35 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "Binary";
   keyvalue[i++][1] = "T";
 
-  if ((p->type & CUPS_PRINTER_FAX))
-  {
-    keyvalue[i  ][0] = "Fax";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Fax";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_FAX) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_COLOR))
-  {
-    keyvalue[i  ][0] = "Color";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Color";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_COLOR) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_DUPLEX))
-  {
-    keyvalue[i  ][0] = "Duplex";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Duplex";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_DUPLEX) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_STAPLE))
-  {
-    keyvalue[i  ][0] = "Staple";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Staple";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_STAPLE) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_COPIES))
-  {
-    keyvalue[i  ][0] = "Copies";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Copies";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_COPIES) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_COLLATE))
-  {
-    keyvalue[i  ][0] = "Collate";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Collate";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_COLLATE) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_PUNCH))
-  {
-    keyvalue[i  ][0] = "Punch";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Punch";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_PUNCH) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_BIND))
-  {
-    keyvalue[i  ][0] = "Bind";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Bind";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_BIND) ? "T" : "F";
 
-  if ((p->type & CUPS_PRINTER_SORT))
-  {
-    keyvalue[i  ][0] = "Sort";
-    keyvalue[i++][1] = "T";
-  }
+  keyvalue[i  ][0] = "Sort";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_SORT) ? "T" : "F";
+
+  keyvalue[i  ][0] = "Scan";
+  keyvalue[i++][1] = (p->type & CUPS_PRINTER_MFP) ? "T" : "F";
 
   keyvalue[i  ][0] = "pdl";
   keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";

@@ -1,11 +1,8 @@
 _cups_debug_fd
-_cupsCharmapFlush
-_cupsCharmapFree
-_cupsCharmapGet
-_cupsEncodingName
 _cupsGet1284Values
 _cupsGetPassword
 _cupsGlobals
+_cupsLangPrintError
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString
@@ -67,8 +64,10 @@ _pwgMediaForPPD
 _pwgMediaForPWG
 _pwgMediaForSize
 _pwgCreateWithPPD
+_pwgGetBin
 _pwgGetInputSlot
 _pwgGetMediaType
+_pwgGetOutputBin
 _pwgGetPageSize
 _pwgGetSize
 _pwgGetSource

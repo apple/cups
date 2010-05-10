@@ -42,6 +42,7 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
   _pwg_size_t	*size;			/* Current size */
   _pwg_map_t	*map;			/* Current map */
   int		linenum,		/* Current line number */
+		num_bins,		/* Number of bins in file */
 		num_sizes,		/* Number of sizes in file */
 		num_sources,		/* Number of sources in file */
 		num_types;		/* Number of types in file */
@@ -90,6 +91,7 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
   */
 
   linenum     = 0;
+  num_bins    = 0;
   num_sizes   = 0;
   num_sources = 0;
   num_types   = 0;
@@ -104,6 +106,54 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
       DEBUG_printf(("_pwgCreateWithFile: Missing value on line %d.", linenum));
       _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
       goto create_error;
+    }
+    else if (!strcasecmp(line, "NumBins"))
+    {
+      if (num_bins > 0)
+      {
+        DEBUG_puts("_pwgCreateWithFile: NumBins listed multiple times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
+	goto create_error;
+      }
+
+      if ((num_bins = atoi(value)) <= 0 || num_bins > 65536)
+      {
+        DEBUG_printf(("_pwgCreateWithFile: Bad NumBins value %d on line %d.",
+	              num_sizes, linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
+	goto create_error;
+      }
+
+      if ((pwg->bins = calloc(num_bins, sizeof(_pwg_map_t))) == NULL)
+      {
+        DEBUG_printf(("_pwgCreateWithFile: Unable to allocate %d bins.",
+	              num_sizes));
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	goto create_error;
+      }
+    }
+    else if (!strcasecmp(line, "Bin"))
+    {
+      if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
+      {
+        DEBUG_printf(("_pwgCreateWithFile: Bad Bin on line %d.", linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
+	goto create_error;
+      }
+
+      if (pwg->num_bins >= num_bins)
+      {
+        DEBUG_printf(("_pwgCreateWithFile: Too many Bin's on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
+	goto create_error;
+      }
+
+      map      = pwg->bins + pwg->num_bins;
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(ppd_keyword);
+
+      pwg->num_bins ++;
     }
     else if (!strcasecmp(line, "NumSizes"))
     {
@@ -354,6 +404,17 @@ _pwgDestroy(_pwg_t *pwg)		/* I - PWG mapping data */
   * Free memory as needed...
   */
 
+  if (pwg->bins)
+  {
+    for (i = pwg->num_bins, map = pwg->bins; i > 0; i --, map ++)
+    {
+      _cupsStrFree(map->pwg);
+      _cupsStrFree(map->ppd);
+    }
+
+    free(pwg->bins);
+  }
+
   if (pwg->sizes)
   {
     for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
@@ -436,6 +497,17 @@ _pwgWriteFile(_pwg_t     *pwg,		/* I - PWG mapping data */
   */
 
   cupsFilePuts(fp, "#CUPS-PWGPPD\n");
+
+ /*
+  * Output bins...
+  */
+
+  if (pwg->num_bins > 0)
+  {
+    cupsFilePrintf(fp, "NumBins %d\n", pwg->num_bins);
+    for (i = pwg->num_bins, map = pwg->bins; i > 0; i --, map ++)
+      cupsFilePrintf(fp, "Bin %s %s\n", map->pwg, map->ppd);
+  }
 
  /*
   * Media sizes...

@@ -17,13 +17,6 @@ include Makedefs
 
 
 #
-# Don't run top-level build targets in parallel...
-#
-
-.NOTPARALLEL:
-
-
-#
 # Directories to make...
 #
 

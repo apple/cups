@@ -16,10 +16,14 @@
  * Contents:
  *
  *   _pwgCreateWithPPD()      - Create PWG mapping data from a PPD file.
+ *   _pwgGetBin()             - Get the PWG output-bin keyword associated with a
+ *                              PPD OutputBin.
  *   _pwgGetInputSlot()       - Get the PPD InputSlot associated with the job
  *                              attributes or a keyword string.
  *   _pwgGetMediaType()       - Get the PPD MediaType associated with the job
  *                              attributes or a keyword string.
+ *   _pwgGetOutputBin()       - Get the PPD OutputBin associated with the
+ *                              keyword string.
  *   _pwgGetPageSize()        - Get the PPD PageSize associated with the job
  *                              attributes or a keyword string.
  *   _pwgGetSize()            - Get the PWG size associated with a PPD PageSize.
@@ -61,7 +65,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   int		i, j;			/* Looping vars */
   _pwg_t	*pwg;			/* PWG mapping data */
   ppd_option_t	*input_slot,		/* InputSlot option */
-		*media_type;		/* MediaType option */
+		*media_type,		/* MediaType option */
+		*output_bin;		/* OutputBin option */
   ppd_choice_t	*choice;		/* Current InputSlot/MediaType */
   _pwg_map_t	*map;			/* Current source/type map */
   ppd_size_t	*ppd_size;		/* Current PPD size */
@@ -327,6 +332,35 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
   }
 
+
+ /*
+  * Copy and convert OutputBin data...
+  */
+
+  if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
+  {
+    if ((pwg->bins = calloc(output_bin->num_choices,
+                             sizeof(_pwg_map_t))) == NULL)
+    {
+      DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
+                    "for OutputBin.", output_bin->num_choices));
+      goto create_error;
+    }
+
+    pwg->num_bins = output_bin->num_choices;
+
+    for (i = output_bin->num_choices, choice = output_bin->choices,
+             map = pwg->bins;
+	 i > 0;
+	 i --, choice ++, map ++)
+    {
+      pwg_unppdize_name(choice->choice, pwg_keyword, sizeof(pwg_keyword));
+
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(choice->choice);
+    }
+  }
+
   return (pwg);
 
  /*
@@ -337,6 +371,38 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   _cupsSetError(IPP_INTERNAL_ERROR, _("Out of memory."), 1);
   _pwgDestroy(pwg);
+
+  return (NULL);
+}
+
+
+/*
+ * '_pwgGetBin()' - Get the PWG output-bin keyword associated with a PPD
+ *                  OutputBin.
+ */
+
+const char *				/* O - output-bin or NULL */
+_pwgGetBin(_pwg_t     *pwg,		/* I - PWG mapping data */
+	   const char *output_bin)	/* I - PPD OutputBin string */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !output_bin)
+    return (NULL);
+
+ /*
+  * Look up the OutputBin string...
+  */
+
+
+  for (i = 0; i < pwg->num_bins; i ++)
+    if (!strcasecmp(output_bin, pwg->bins[i].ppd))
+      return (pwg->bins[i].pwg);
 
   return (NULL);
 }
@@ -437,6 +503,38 @@ _pwgGetMediaType(_pwg_t     *pwg,	/* I - PWG mapping data */
       if (!strcasecmp(keyword, pwg->types[i].pwg))
         return (pwg->types[i].ppd);
   }
+
+  return (NULL);
+}
+
+
+/*
+ * '_pwgGetOutputBin()' - Get the PPD OutputBin associated with the keyword
+ *                        string.
+ */
+
+const char *				/* O - PPD OutputBin or NULL */
+_pwgGetOutputBin(_pwg_t     *pwg,	/* I - PWG mapping data */
+		 const char *output_bin)/* I - Keyword string */
+{
+  int	i;				/* Looping var */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !output_bin)
+    return (NULL);
+
+ /*
+  * Look up the OutputBin string...
+  */
+
+
+  for (i = 0; i < pwg->num_bins; i ++)
+    if (!strcasecmp(output_bin, pwg->bins[i].pwg))
+      return (pwg->bins[i].ppd);
 
   return (NULL);
 }
@@ -619,6 +717,13 @@ _pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_size_t	*size;			/* Current size */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !page_size)
+    return (NULL);
+
   if (!strncasecmp(page_size, "Custom.", 7))
   {
    /*
@@ -706,6 +811,13 @@ _pwgGetSource(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_map_t	*source;		/* Current source */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !input_slot)
+    return (NULL);
+
   for (i = pwg->num_sources, source = pwg->sources; i > 0; i --, source ++)
     if (!strcasecmp(input_slot, source->ppd))
       return (source->pwg);
@@ -726,6 +838,13 @@ _pwgGetType(_pwg_t     *pwg,		/* I - PWG mapping data */
   _pwg_map_t	*type;			/* Current type */
 
 
+ /*
+  * Range check input...
+  */
+
+  if (!pwg || !media_type)
+    return (NULL);
+
   for (i = pwg->num_types, type = pwg->types; i > 0; i --, type ++)
     if (!strcasecmp(media_type, type->ppd))
       return (type->pwg);
@@ -744,6 +863,13 @@ _pwgInputSlotForSource(
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!media_source || !name || namesize < PPD_MAX_NAME)
+    return (NULL);
+
   if (strcasecmp(media_source, "main"))
     strlcpy(name, "Cassette", namesize);
   else if (strcasecmp(media_source, "alternate"))
@@ -783,6 +909,13 @@ _pwgMediaTypeForType(
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {
+ /*
+  * Range check input...
+  */
+
+  if (!media_type || !name || namesize < PPD_MAX_NAME)
+    return (NULL);
+
   if (strcasecmp(media_type, "auto"))
     strlcpy(name, "Auto", namesize);
   else if (strcasecmp(media_type, "cardstock"))

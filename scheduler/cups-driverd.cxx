@@ -1480,6 +1480,15 @@ load_ppds(const char *d,		/* I - Actual directory */
 
       continue;
     }
+    else if ((ptr = filename + strlen(filename) - 6) > filename &&
+             !strcmp(ptr, ".plist"))
+    {
+     /*
+      * Skip plist files in the PPDs directory...
+      */
+
+      continue;
+    }
 
    /*
     * See if this file has been scanned before...

@@ -1,9 +1,16 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.5
+
+
+
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453, STR #3527, STR #3528, STR #3529)
+	- Fixed some IPP conformance issues with the scheduler's
+	  ippget-event-life, operations-supported, output-bin, and sides
+	  attributes (STR #3554)
 	- The GNU TLS and OpenSSL interfaces have been made thread-safe
 	  (STR #3461)
 	- Fixed an IPP conformance issue with the scheduler's Send-Document

@@ -39,7 +39,7 @@ Release: 0
 Epoch: 1
 License: GPL
 Group: System Environment/Daemons
-Source: ftp://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.gz
+Source: http://ftp.easysw.com/pub/cups/%{version}/cups-%{version}-source.tar.bz2
 Url: http://www.cups.org
 Packager: Anonymous <anonymous@foo.com>
 Vendor: Apple Inc.
@@ -216,8 +216,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /usr/share/cups
 %dir /usr/share/cups/banners
 /usr/share/cups/banners/*
-%dir /usr/share/cups/charmaps
-/usr/share/cups/charmaps/*
 %dir /usr/share/cups/charsets
 /usr/share/cups/charsets/*
 %dir /usr/share/cups/data

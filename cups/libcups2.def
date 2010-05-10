@@ -1,10 +1,6 @@
 LIBRARY libcups2
 VERSION 2.8
 EXPORTS
-_cupsCharmapFlush
-_cupsCharmapFree
-_cupsCharmapGet
-_cupsEncodingName
 _cupsGetPassword
 _cupsGlobals
 _cupsLangPrintf
@@ -46,8 +42,10 @@ _pwgMediaForPPD
 _pwgMediaForPWG
 _pwgMediaForSize
 _pwgCreateWithPPD
+_pwgGetBin
 _pwgGetInputSlot
 _pwgGetMediaType
+_pwgGetOutputBin
 _pwgGetPageSize
 _pwgGetSize
 _pwgGetSource

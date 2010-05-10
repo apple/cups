@@ -77,9 +77,9 @@ typedef struct _mime_magic_s		/**** MIME Magic Data ****/
     char	matchv[64];		/* Match value */
     char	localev[64];		/* Locale value */
     char	stringv[64];		/* String value */
-    char	charv;			/* Byte value */
-    short	shortv;			/* Short value */
-    int		intv;			/* Integer value */
+    unsigned char charv;		/* Byte value */
+    unsigned short shortv;		/* Short value */
+    unsigned	intv;			/* Integer value */
   }		value;
 } mime_magic_t;
 

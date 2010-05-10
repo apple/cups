@@ -87,8 +87,7 @@ OBJS	=	\
 		testlang.o \
 		testppd.o \
 		testpwg.o \
-		testsnmp.o \
-		php_cups_wrap.o
+		testsnmp.o
 
 
 #
@@ -355,15 +354,14 @@ libcups.so.2 libcups.sl.2:	$(LIBOBJS)
 libcups.2.dylib:	$(LIBOBJS) $(LIBCUPSORDER)
 	echo Creating export list for $@...
 	nm $(LIBOBJS) 2>/dev/null | grep "T _" | awk '{print $$3}' | \
-		grep -v -e '^(_cupsConnect|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
+		grep -v -e '^(_cupsConnect|_cupsCharset|_cupsEncodingName|_cupsSetDefaults|_cupsSetHTTPError|_cupsUserDefault|_httpWait)$$' | \
 		sort >t.exp
 	echo Linking $@...
 	$(DSO) $(ARCHFLAGS) $(DSOFLAGS) -o $@ \
 		-install_name $(libdir)/$@ \
-		-current_version 2.8.0 \
+		-current_version 2.9.0 \
 		-compatibility_version 2.0.0 \
 		-exported_symbols_list t.exp \
-		-sectorder __TEXT __text $(LIBCUPSORDER) \
 		$(LIBOBJS) $(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) \
 		$(COMMONLIBS) $(LIBZ)
 	$(RM) libcups.dylib t.exp
@@ -390,7 +388,7 @@ libcups_s.a:	$(LIBOBJS) libcups_s.exp
 libcups.la:    $(LIBOBJS)
 	echo Linking $@...
 	$(CC) $(ARCHFLAGS) $(DSOFLAGS) -o $@ $(LIBOBJS:.o=.lo) \
-		-rpath $(LIBDIR) -version-info 2:8 $(LIBGSSAPI) $(SSLLIBS) \
+		-rpath $(LIBDIR) -version-info 2:9 $(LIBGSSAPI) $(SSLLIBS) \
 		$(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 

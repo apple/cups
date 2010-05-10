@@ -161,10 +161,14 @@ cupsMarkOptions(
       * Mark it...
       */
 
-      if ((!page_size || !page_size[0]) &&
-	  (ppd_keyword = _pwgGetPageSize((_pwg_t *)ppd->pwg, NULL, s,
-	                                 NULL)) != NULL)
-	ppd_mark_option(ppd, "PageSize", ppd_keyword);
+      if (!page_size || !page_size[0])
+      {
+        if (!strncasecmp(s, "Custom.", 7) || ppdPageSize(ppd, s))
+          ppd_mark_option(ppd, "PageSize", s);
+        else if ((ppd_keyword = _pwgGetPageSize((_pwg_t *)ppd->pwg, NULL, s,
+	                                        NULL)) != NULL)
+	  ppd_mark_option(ppd, "PageSize", ppd_keyword);
+      }
 
       if (!cupsGetOption("InputSlot", num_options, options) &&
 	  (ppd_keyword = _pwgGetInputSlot((_pwg_t *)ppd->pwg, NULL, s)) != NULL)
@@ -286,8 +290,10 @@ cupsMarkOptions(
     }
     else if (!strcasecmp(optptr->name, "output-bin"))
     {
-      if (!cupsGetOption("OutputBin", num_options, options))
-        ppd_mark_option(ppd, "OutputBin", optptr->value);
+      if (!cupsGetOption("OutputBin", num_options, options) &&
+	  (ppd_keyword = _pwgGetOutputBin((_pwg_t *)ppd->pwg,
+	                                  optptr->value)) != NULL)
+	ppd_mark_option(ppd, "OutputBin", ppd_keyword);
     }
     else if (!strcasecmp(optptr->name, "multiple-document-handling"))
     {

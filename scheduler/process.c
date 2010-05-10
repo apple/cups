@@ -1,7 +1,7 @@
 /*
  * "$Id: process.c 7256 2008-01-25 00:48:54Z mike $"
  *
- *   Process management routines for the Common UNIX Printing System (CUPS).
+ *   Process management routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -110,7 +110,8 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
   cupsd_requote(temp, TempDir, sizeof(temp));
 
   cupsFilePuts(fp, "(version 1)\n");
-  cupsFilePuts(fp, "(debug deny)\n");
+  if (LogLevel >= CUPSD_LOG_DEBUG)
+    cupsFilePuts(fp, "(debug deny)\n");
   cupsFilePuts(fp, "(allow default)\n");
   cupsFilePrintf(fp,
                  "(deny file-write* file-read-data file-read-metadata\n"

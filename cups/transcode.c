@@ -17,23 +17,10 @@
  * Contents:
  *
  *   _cupsCharmapFlush() - Flush all character set maps out of cache.
- *   _cupsCharmapFree()  - Free a character set map.
- *   _cupsCharmapGet()   - Get a character set map.
  *   cupsCharsetToUTF8() - Convert legacy character set to UTF-8.
  *   cupsUTF8ToCharset() - Convert UTF-8 to legacy character set.
  *   cupsUTF8ToUTF32()   - Convert UTF-8 to UTF-32.
  *   cupsUTF32ToUTF8()   - Convert UTF-32 to UTF-8.
- *   compare_wide()      - Compare key for wide (VBCS) match.
- *   conv_sbcs_to_utf8() - Convert legacy SBCS to UTF-8.
- *   conv_utf8_to_sbcs() - Convert UTF-8 to legacy SBCS.
- *   conv_utf8_to_vbcs() - Convert UTF-8 to legacy DBCS/VBCS.
- *   conv_vbcs_to_utf8() - Convert legacy DBCS/VBCS to UTF-8.
- *   free_sbcs_charmap() - Free memory used by a single byte character set.
- *   free_vbcs_charmap() - Free memory used by a variable byte character set.
- *   get_charmap()       - Lookup or get a character set map (private).
- *   get_charmap_count() - Count lines in a charmap file.
- *   get_sbcs_charmap()  - Get SBCS Charmap.
- *   get_vbcs_charmap()  - Get DBCS/VBCS Charmap.
  */
 
 /*
@@ -43,49 +30,25 @@
 #include "cups-private.h"
 #include <limits.h>
 #include <time.h>
+#ifdef HAVE_ICONV_H
+#  include <iconv.h>
+#endif /* HAVE_ICONV_H */
 
 
 /*
  * Local globals...
  */
 
+#ifdef HAVE_ICONV_H
 static _cups_mutex_t	map_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control access to maps */
-static _cups_cmap_t	*cmap_cache = NULL;
-					/* SBCS Charmap Cache */
-static _cups_vmap_t	*vmap_cache = NULL;
-					/* VBCS Charmap Cache */
-
-
-/*
- * Local functions...
- */
-
-static int		compare_wide(const void *k1, const void *k2);
-static int		conv_sbcs_to_utf8(cups_utf8_t *dest,
-					  const cups_sbcs_t *src,
-					  int maxout,
-					  const cups_encoding_t encoding);
-static int		conv_utf8_to_sbcs(cups_sbcs_t *dest,
-					  const cups_utf8_t *src,
-					  int maxout,
-					  const cups_encoding_t encoding);
-static int		conv_utf8_to_vbcs(cups_sbcs_t *dest,
-					  const cups_utf8_t *src,
-					  int maxout,
-					  const cups_encoding_t encoding);
-static int		conv_vbcs_to_utf8(cups_utf8_t *dest,
-					  const cups_sbcs_t *src,
-					  int maxout,
-					  const cups_encoding_t encoding);
-static void		free_sbcs_charmap(_cups_cmap_t *sbcs);
-static void		free_vbcs_charmap(_cups_vmap_t *vbcs);
-static void		*get_charmap(const cups_encoding_t encoding);
-static int		get_charmap_count(cups_file_t *fp);
-static _cups_cmap_t	*get_sbcs_charmap(const cups_encoding_t encoding,
-				          const char *filename);
-static _cups_vmap_t	*get_vbcs_charmap(const cups_encoding_t encoding,
-				          const char *filename);
+static iconv_t		map_from_utf8 = (iconv_t)-1;
+					/* Convert from UTF-8 to charset */
+static iconv_t		map_to_utf8 = (iconv_t)-1;
+					/* Convert from charset to UTF-8 */
+static cups_encoding_t	map_encoding = CUPS_AUTO_ENCODING;
+					/* Which charset is cached */
+#endif /* HAVE_ICONV_H */
 
 
 /*
@@ -95,151 +58,39 @@ static _cups_vmap_t	*get_vbcs_charmap(const cups_encoding_t encoding,
 void
 _cupsCharmapFlush(void)
 {
-  _cups_cmap_t	*cmap,			/* Legacy SBCS / Unicode Charset Map */
-		*cnext;			/* Next Legacy SBCS Charset Map */
-  _cups_vmap_t	*vmap,			/* Legacy VBCS / Unicode Charset Map */
-		*vnext;			/* Next Legacy VBCS Charset Map */
-
-
-  _cupsMutexLock(&map_mutex);
-
- /*
-  * Loop through SBCS charset map cache, free all memory...
-  */
-
-  for (cmap = cmap_cache; cmap; cmap = cnext)
+#ifdef HAVE_ICONV_H
+  if (map_from_utf8 != (iconv_t)-1)
   {
-    cnext = cmap->next;
-
-    free_sbcs_charmap(cmap);
+    iconv_close(map_from_utf8);
+    map_from_utf8 = (iconv_t)-1;
   }
 
-  cmap_cache = NULL;
-
- /*
-  * Loop through DBCS/VBCS charset map cache, free all memory...
-  */
-
-  for (vmap = vmap_cache; vmap; vmap = vnext)
+  if (map_to_utf8 != (iconv_t)-1)
   {
-    vnext = vmap->next;
-
-    free_vbcs_charmap(vmap);
+    iconv_close(map_to_utf8);
+    map_to_utf8 = (iconv_t)-1;
   }
 
-  vmap_cache = NULL;
-
-  _cupsMutexUnlock(&map_mutex);
-}
-
-
-/*
- * '_cupsCharmapFree()' - Free a character set map.
- *
- * This does not actually free; use '_cupsCharmapFlush()' for that.
- */
-
-void
-_cupsCharmapFree(
-    const cups_encoding_t encoding)	/* I - Encoding */
-{
-  _cups_cmap_t	*cmap;			/* Legacy SBCS / Unicode Charset Map */
-  _cups_vmap_t	*vmap;			/* Legacy VBCS / Unicode Charset Map */
-
-
- /*
-  * See if we already have this SBCS charset map loaded...
-  */
-
-  _cupsMutexLock(&map_mutex);
-
-  for (cmap = cmap_cache; cmap; cmap = cmap->next)
-  {
-    if (cmap->encoding == encoding)
-    {
-      if (cmap->used > 0)
-	cmap->used --;
-      break;
-    }
-  }
-
- /*
-  * See if we already have this DBCS/VBCS charset map loaded...
-  */
-
-  for (vmap = vmap_cache; vmap; vmap = vmap->next)
-  {
-    if (vmap->encoding == encoding)
-    {
-      if (vmap->used > 0)
-	vmap->used --;
-      break;
-    }
-  }
-
-  _cupsMutexUnlock(&map_mutex);
-}
-
-
-/*
- * '_cupsCharmapGet()' - Get a character set map.
- *
- * This code handles single-byte (SBCS), double-byte (DBCS), and
- * variable-byte (VBCS) character sets _without_ charset escapes...
- * This code does not handle multiple-byte character sets (MBCS)
- * (such as ISO-2022-JP) with charset switching via escapes...
- */
-
-void *					/* O - Charset map pointer */
-_cupsCharmapGet(
-    const cups_encoding_t encoding)	/* I - Encoding */
-{
-  void	*charmap;			/* Charset map pointer */
-
-
-  DEBUG_printf(("7_cupsCharmapGet(encoding=%d)", encoding));
-
- /*
-  * Check for valid arguments...
-  */
-
-  if (encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
-  {
-    DEBUG_puts("8_cupsCharmapGet: Bad encoding, returning NULL!");
-    return (NULL);
-  }
-
- /*
-  * Lookup or get the charset map pointer and return...
-  */
-
-  _cupsMutexLock(&map_mutex);
-
-  charmap = get_charmap(encoding);
-
-  _cupsMutexUnlock(&map_mutex);
-
-  return (charmap);
+  map_encoding = CUPS_AUTO_ENCODING;
+#endif /* HAVE_ICONV_H */
 }
 
 
 /*
  * 'cupsCharsetToUTF8()' - Convert legacy character set to UTF-8.
- *
- * This code handles single-byte (SBCS), double-byte (DBCS), and
- * variable-byte (VBCS) character sets _without_ charset escapes...
- * This code does not handle multiple-byte character sets (MBCS)
- * (such as ISO-2022-JP) with charset switching via escapes...
  */
 
 int					/* O - Count or -1 on error */
 cupsCharsetToUTF8(
-    cups_utf8_t *dest,			/* O - Target string */
-    const char *src,			/* I - Source string */
-    const int maxout,			/* I - Max output */
+    cups_utf8_t           *dest,	/* O - Target string */
+    const char            *src,		/* I - Source string */
+    const int             maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
-  int	bytes;				/* Number of bytes converted */
+  cups_utf8_t	*destptr;		/* Pointer into UTF-8 buffer */
+  int		bytes;			/* Number of bytes converted */
+  size_t	srclen,			/* Length of source string */
+		outBytesLeft;		/* Bytes remaining in output buffer */
 
 
  /*
@@ -249,11 +100,11 @@ cupsCharsetToUTF8(
   DEBUG_printf(("2cupsCharsetToUTF8(dest=%p, src=\"%s\", maxout=%d, encoding=%d)",
 	        dest, src, maxout, encoding));
 
-  if (dest)
-    *dest = '\0';
-
-  if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
+  if (!dest || !src || maxout < 1)
   {
+    if (dest)
+      *dest = '\0';
+
     DEBUG_puts("3cupsCharsetToUTF8: Bad arguments, returning -1");
     return (-1);
   }
@@ -262,8 +113,8 @@ cupsCharsetToUTF8(
   * Handle identity conversions...
   */
 
-  if (encoding == CUPS_UTF8 ||
-      encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
+  if (encoding == CUPS_UTF8 || encoding <= CUPS_US_ASCII ||
+      encoding >= CUPS_ENCODING_VBCS_END)
   {
     strlcpy((char *)dest, src, maxout);
     return ((int)strlen((char *)dest));
@@ -273,14 +124,14 @@ cupsCharsetToUTF8(
   * Handle ISO-8859-1 to UTF-8 directly...
   */
 
+  destptr = dest;
+
   if (encoding == CUPS_ISO8859_1)
   {
     int		ch;			/* Character from string */
-    cups_utf8_t	*destptr,		/* Pointer into UTF-8 buffer */
-		*destend;		/* End of UTF-8 buffer */
+    cups_utf8_t	*destend;		/* End of UTF-8 buffer */
 
 
-    destptr = dest;
     destend = dest + maxout - 2;
 
     while (*src && destptr < destend)
@@ -305,26 +156,46 @@ cupsCharsetToUTF8(
   * Convert input legacy charset to UTF-8...
   */
 
+#ifdef HAVE_ICONV_H
   _cupsMutexLock(&map_mutex);
 
-  if (encoding < CUPS_ENCODING_SBCS_END)
-    bytes = conv_sbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
-  else
-    bytes = conv_vbcs_to_utf8(dest, (cups_sbcs_t *)src, maxout, encoding);
+  if (map_encoding != encoding)
+  {
+    _cupsCharmapFlush();
+
+    map_from_utf8 = iconv_open(_cupsEncodingName(encoding), "UTF-8");
+    map_to_utf8   = iconv_open("UTF-8", _cupsEncodingName(encoding));
+    map_encoding     = encoding;
+  }
+
+  if (map_to_utf8 != (iconv_t)-1)
+  {
+    srclen       = strlen(src);
+    outBytesLeft = maxout - 1;
+    bytes        = (int)iconv(map_to_utf8, (char **)&src, &srclen,
+			      (char **)&destptr, &outBytesLeft);
+    *destptr     = '\0';
+
+    _cupsMutexUnlock(&map_mutex);
+
+    return ((int)(destptr - dest));
+  }
 
   _cupsMutexUnlock(&map_mutex);
+#endif /* HAVE_ICONV_H */
 
-  return (bytes);
+ /*
+  * No iconv() support, so error out...
+  */
+
+  *destptr = '\0';
+
+  return (-1);
 }
 
 
 /*
  * 'cupsUTF8ToCharset()' - Convert UTF-8 to legacy character set.
- *
- * This code handles single-byte (SBCS), double-byte (DBCS), and
- * variable-byte (VBCS) character sets _without_ charset escapes...
- * This code does not handle multiple-byte character sets (MBCS)
- * (such as ISO-2022-JP) with charset switching via escapes...
  */
 
 int					/* O - Count or -1 on error */
@@ -334,14 +205,17 @@ cupsUTF8ToCharset(
     const int		  maxout,	/* I - Max output */
     const cups_encoding_t encoding)	/* I - Encoding */
 {
-  int	bytes;				/* Number of bytes converted */
+  char		*destptr;		/* Pointer into destination */
+  int		bytes;			/* Number of bytes converted */
+  size_t	srclen,			/* Length of source string */
+		outBytesLeft;		/* Bytes remaining in output buffer */
 
 
  /*
   * Check for valid arguments...
   */
 
-  if (!dest || !src || maxout < 1 || maxout > CUPS_MAX_USTRING)
+  if (!dest || !src || maxout < 1)
   {
     if (dest)
       *dest = '\0';
@@ -353,8 +227,8 @@ cupsUTF8ToCharset(
   * Handle identity conversions...
   */
 
-  if (encoding == CUPS_UTF8 ||
-      encoding < 0 || encoding >= CUPS_ENCODING_VBCS_END)
+  if (encoding == CUPS_UTF8 || encoding <= CUPS_US_ASCII ||
+      encoding >= CUPS_ENCODING_VBCS_END)
   {
     strlcpy(dest, (char *)src, maxout);
     return ((int)strlen(dest));
@@ -364,14 +238,14 @@ cupsUTF8ToCharset(
   * Handle UTF-8 to ISO-8859-1 directly...
   */
 
+  destptr = dest;
+
   if (encoding == CUPS_ISO8859_1)
   {
     int		ch;			/* Character from string */
-    char	*destptr,		/* Pointer into ISO-8859-1 buffer */
-		*destend;		/* End of ISO-8859-1 buffer */
+    char	*destend;		/* End of ISO-8859-1 buffer */
 
 
-    destptr = dest;
     destend = dest + maxout - 1;
 
     while (*src && destptr < destend)
@@ -399,20 +273,45 @@ cupsUTF8ToCharset(
     return ((int)(destptr - dest));
   }
 
+#ifdef HAVE_ICONV_H
  /*
   * Convert input UTF-8 to legacy charset...
   */
 
   _cupsMutexLock(&map_mutex);
 
-  if (encoding < CUPS_ENCODING_SBCS_END)
-    bytes = conv_utf8_to_sbcs((cups_sbcs_t *)dest, src, maxout, encoding);
-  else
-    bytes = conv_utf8_to_vbcs((cups_sbcs_t *)dest, src, maxout, encoding);
+  if (map_encoding != encoding)
+  {
+    _cupsCharmapFlush();
+
+    map_from_utf8 = iconv_open(_cupsEncodingName(encoding), "UTF-8");
+    map_to_utf8   = iconv_open("UTF-8", _cupsEncodingName(encoding));
+    map_encoding  = encoding;
+  }
+
+  if (map_from_utf8 != (iconv_t)-1)
+  {
+    srclen       = strlen((char *)src);
+    outBytesLeft = maxout - 1;
+    bytes        = (int)iconv(map_from_utf8, (char **)&src, &srclen,
+			      &destptr, &outBytesLeft);
+    *destptr     = '\0';
+
+    _cupsMutexUnlock(&map_mutex);
+
+    return ((int)(destptr - dest));
+  }
 
   _cupsMutexUnlock(&map_mutex);
+#endif /* HAVE_ICONV_H */
 
-  return (bytes);
+ /*
+  * No iconv() support, so error out...
+  */
+
+  *destptr = '\0';
+
+  return (-1);
 }
 
 

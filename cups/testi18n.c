@@ -199,16 +199,6 @@ main(int  argc,				/* I - Argument Count */
   }
 
  /*
-  * Make sure we have a symbolic link from the data directory to a
-  * "charmaps" directory, and then point the library at it...
-  */
-
-  if (access("charmaps", 0))
-    symlink("../data", "charmaps");
-
-  putenv("CUPS_DATADIR=.");
-
- /*
   * Start with some conversion tests from a UTF-8 test file.
   */
 
@@ -268,62 +258,6 @@ main(int  argc,				/* I - Argument Count */
     puts("PASS");
 
   fclose(fp);
-
- /*
-  * Test charmap load for ISO-8859-1...
-  */
-
-  fputs("_cupsCharmapGet(CUPS_ISO8859_1): ", stdout);
-
-  if (!_cupsCharmapGet(CUPS_ISO8859_1))
-  {
-    errors ++;
-    puts("FAIL");
-  }
-  else
-    puts("PASS");
-
- /*
-  * Test charmap load for Windows-932 (Shift-JIS)...
-  */
-
-  fputs("_cupsCharmapGet(CUPS_WINDOWS_932): ", stdout);
-
-  if (!_cupsCharmapGet(CUPS_WINDOWS_932))
-  {
-    errors ++;
-    puts("FAIL");
-  }
-  else
-    puts("PASS");
-
- /*
-  * Test VBCS charmap load for EUC-JP...
-  */
-
-  fputs("_cupsCharmapGet(CUPS_EUC_JP): ", stdout);
-
-  if (!_cupsCharmapGet(CUPS_EUC_JP))
-  {
-    errors ++;
-    puts("FAIL");
-  }
-  else
-    puts("PASS");
-
- /*
-  * Test VBCS charmap load for EUC-TW...
-  */
-
-  fputs("_cupsCharmapGet(CUPS_EUC_TW): ", stdout);
-
-  if (!_cupsCharmapGet(CUPS_EUC_TW))
-  {
-    errors ++;
-    puts("FAIL");
-  }
-  else
-    puts("PASS");
 
  /*
   * Test UTF-8 to legacy charset (ISO 8859-1)...

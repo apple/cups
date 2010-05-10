@@ -1,7 +1,7 @@
 /*
  * "$Id: ipp.c 7948 2008-09-17 00:04:12Z mike $"
  *
- *   IPP backend for the Common UNIX Printing System (CUPS).
+ *   IPP backend for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -24,8 +24,6 @@
  *                            cupsDoFileRequest().
  *   report_attr()          - Report an IPP attribute value.
  *   report_printer_state() - Report the printer state.
- *   run_pictwps_filter()   - Convert PICT files to PostScript when printing
- *                            remotely.
  *   sigterm_handler()      - Handle 'terminate' signals that stop the backend.
  */
 
@@ -33,7 +31,6 @@
  * Include necessary headers.
  */
 
-#include <cups/http-private.h>
 #include "backend-private.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -47,11 +44,7 @@ static char	*password = NULL;	/* Password for device URI */
 static int	password_tries = 0;	/* Password tries */
 static const char *auth_info_required = "none";
 					/* New auth-info-required value */
-#ifdef __APPLE__
-static char	pstmpname[1024] = "";	/* Temporary PostScript file name */
-#endif /* __APPLE__ */
-static char	tmpfilename[1024] = "";	/* Temporary spool file name */
-static int	job_cancelled = 0;	/* Job cancelled? */
+static int	job_canceled = 0;	/* Job cancelled? */
 
 
 /*
@@ -69,10 +62,6 @@ static void	compress_files(int num_files, char **files);
 static const char *password_cb(const char *);
 static void	report_attr(ipp_attribute_t *attr);
 static int	report_printer_state(ipp_t *ipp, int job_id);
-
-#ifdef __APPLE__
-static int	run_pictwps_filter(char **argv, const char *filename);
-#endif /* __APPLE__ */
 static void	sigterm_handler(int sig);
 
 
@@ -107,10 +96,10 @@ main(int  argc,				/* I - Number of command-line args */
 		page_count,		/* Page count via SNMP */
 		have_supplies;		/* Printer supports supply levels? */
   int		num_files;		/* Number of files to print */
-  char		**files,		/* Files to print */
-		*filename;		/* Pointer to single filename */
+  char		**files;		/* Files to print */
   int		port;			/* Port number (not used) */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
+  http_status_t	http_status;		/* Status of HTTP request */
   ipp_status_t	ipp_status;		/* Status of IPP request */
   http_t	*http;			/* HTTP connection */
   ipp_t		*request,		/* IPP request */
@@ -127,13 +116,18 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
   ipp_attribute_t *job_state;		/* job-state */
   ipp_attribute_t *copies_sup;		/* copies-supported */
+  ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
+  ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
   const char	*content_type,		/* CONTENT_TYPE environment variable */
 		*final_content_type;	/* FINAL_CONTENT_TYPE environment var */
+  int		fd;			/* File descriptor */
+  off_t		bytes;			/* Bytes copied */
+  char		buffer[16384];		/* Copy buffer */
 #if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
@@ -149,6 +143,7 @@ main(int  argc,				/* I - Number of command-line args */
 		  "marker-message",
 		  "marker-names",
 		  "marker-types",
+		  "media-col-supported",
 		  "printer-is-accepting-jobs",
 		  "printer-state",
 		  "printer-state-message",
@@ -253,7 +248,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   compression = 0;
-  version     = 11;
+  version     = 20;
   waitjob     = 1;
   waitprinter = 1;
   contimeout  = 7 * 24 * 60 * 60;
@@ -403,64 +398,14 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc == 6)
   {
-   /*
-    * Copy stdin to a temporary file...
-    */
+    num_files    = 0;
+    send_options = !strcasecmp(final_content_type, "application/pdf") ||
+                   !strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
+                   !strcasecmp(final_content_type, "image/jpeg") ||
+                   !strcasecmp(final_content_type, "image/png") ||
+                   !strcasecmp(final_content_type, "image/urf");
 
-    int			fd;		/* File descriptor */
-    http_addrlist_t	*addrlist;	/* Address list */
-    off_t		tbytes;		/* Total bytes copied */
-
-
-    fputs("STATE: +connecting-to-device\n", stderr);
-    fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
-    {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
-		      hostname);
-      return (CUPS_BACKEND_STOP);
-    }
-
-    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
-
-    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
-    {
-      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
-      return (CUPS_BACKEND_FAILED);
-    }
-
-    _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
-
-    tbytes = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
-                            backendNetworkSideCB);
-
-    if (snmp_fd >= 0)
-      _cupsSNMPClose(snmp_fd);
-
-    httpAddrFreeList(addrlist);
-
-    close(fd);
-
-   /*
-    * Don't try printing files less than 2 bytes...
-    */
-
-    if (tbytes <= 1)
-    {
-      _cupsLangPuts(stderr, _("ERROR: Empty print file\n"));
-      unlink(tmpfilename);
-      return (CUPS_BACKEND_FAILED);
-    }
-
-   /*
-    * Point to the single file from stdin...
-    */
-
-    filename     = tmpfilename;
-    num_files    = 1;
-    files        = &filename;
-    send_options = 0;
+    fputs("DEBUG: Sending stdin for job...\n", stderr);
   }
   else
   {
@@ -476,9 +421,9 @@ main(int  argc,				/* I - Number of command-line args */
     if (compression)
       compress_files(num_files, files);
 #endif /* HAVE_LIBZ */
-  }
 
-  fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
+    fprintf(stderr, "DEBUG: %d files to send in job...\n", num_files);
+  }
 
  /*
   * Set the authentication info, if any...
@@ -527,7 +472,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
-      if (job_cancelled)
+      if (job_canceled)
 	break;
 
       if (getenv("CLASS") != NULL)
@@ -542,9 +487,6 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPuts(stderr,
 	              _("INFO: Unable to contact printer, queuing on next "
 			"printer in class...\n"));
-
-        if (tmpfilename[0])
-	  unlink(tmpfilename);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -589,19 +531,14 @@ main(int  argc,				/* I - Number of command-line args */
 	sleep(30);
       }
 
-      if (job_cancelled)
+      if (job_canceled)
 	break;
     }
   }
   while (http == NULL);
 
-  if (job_cancelled || !http)
-  {
-    if (tmpfilename[0])
-      unlink(tmpfilename);
-
+  if (job_canceled || !http)
     return (CUPS_BACKEND_FAILED);
-  }
 
   fputs("STATE: -connecting-to-device\n", stderr);
   _cupsLangPuts(stderr, _("INFO: Connected to printer...\n"));
@@ -639,13 +576,14 @@ main(int  argc,				/* I - Number of command-line args */
 
  /*
   * First validate the destination and see if the device supports multiple
-  * copies.  We have to do this because some IPP servers (e.g. HP JetDirect)
-  * don't support the copies attribute...
+  * copies...
   */
 
-  copies_sup = NULL;
-  format_sup = NULL;
-  supported  = NULL;
+  copies_sup    = NULL;
+  cups_version  = NULL;
+  format_sup    = NULL;
+  media_col_sup = NULL;
+  supported     = NULL;
 
   do
   {
@@ -677,7 +615,12 @@ main(int  argc,				/* I - Number of command-line args */
     fputs("DEBUG: Getting supported attributes...\n", stderr);
 
     if (http->version < HTTP_1_1)
-      httpReconnect(http);
+    {
+      _cupsLangPuts(stderr,
+                    _("ERROR: Unable to print - printer does not conform to "
+		      "the IPP standard.\n"));
+      exit(CUPS_BACKEND_STOP);
+    }
 
     if ((supported = cupsDoRequest(http, request, resource)) == NULL)
       ipp_status = cupsLastError();
@@ -710,13 +653,24 @@ main(int  argc,				/* I - Number of command-line args */
 	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version > 10)
       {
        /*
-	* Switch to IPP/1.0...
+	* Switch to IPP/1.1 or IPP/1.0...
 	*/
 
-	_cupsLangPrintf(stderr,
-	                _("INFO: Printer does not support IPP/%d.%d, trying "
-		          "IPP/1.0...\n"), version / 10, version % 10);
-	version = 10;
+        if (version >= 20)
+	{
+	  _cupsLangPrintf(stderr,
+			  _("INFO: Printer does not support IPP/%d.%d, trying "
+			    "IPP/%s...\n"), version / 10, version % 10, "1.1");
+	  version = 11;
+	}
+	else
+	{
+	  _cupsLangPrintf(stderr,
+			  _("INFO: Printer does not support IPP/%d.%d, trying "
+			    "IPP/%s...\n"), version / 10, version % 10, "1.0");
+	  version = 10;
+        }
+
 	httpReconnect(http);
       }
       else if (ipp_status == IPP_NOT_FOUND)
@@ -750,28 +704,47 @@ main(int  argc,				/* I - Number of command-line args */
 
       continue;
     }
-    else if ((copies_sup = ippFindAttribute(supported, "copies-supported",
-	                                    IPP_TAG_RANGE)) != NULL)
+
+   /*
+    * Check for supported attributes...
+    */
+
+    if ((copies_sup = ippFindAttribute(supported, "copies-supported",
+	                               IPP_TAG_RANGE)) != NULL)
     {
      /*
       * Has the "copies-supported" attribute - does it have an upper
       * bound > 1?
       */
 
+      fprintf(stderr, "DEBUG: copies-supported=%d-%d\n",
+	      copies_sup->values[0].range.lower,
+	      copies_sup->values[0].range.upper);
+
       if (copies_sup->values[0].range.upper <= 1)
 	copies_sup = NULL; /* No */
     }
 
-    format_sup = ippFindAttribute(supported, "document-format-supported",
-	                          IPP_TAG_MIMETYPE);
+    cups_version = ippFindAttribute(supported, "cups-version", IPP_TAG_TEXT);
 
-    if (format_sup)
+    if ((format_sup = ippFindAttribute(supported, "document-format-supported",
+	                               IPP_TAG_MIMETYPE)) != NULL)
     {
       fprintf(stderr, "DEBUG: document-format-supported (%d values)\n",
 	      format_sup->num_values);
       for (i = 0; i < format_sup->num_values; i ++)
 	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
 	        format_sup->values[i].string.text);
+    }
+
+    if ((media_col_sup = ippFindAttribute(supported, "media-col-supported",
+	                                  IPP_TAG_KEYWORD)) != NULL)
+    {
+      fprintf(stderr, "DEBUG: media-col-supported (%d values)\n",
+	      media_col_sup->num_values);
+      for (i = 0; i < media_col_sup->num_values; i ++)
+	fprintf(stderr, "DEBUG: [%d] = \"%s\"\n", i,
+	        media_col_sup->values[i].string.text);
     }
 
     report_printer_state(supported, 0);
@@ -809,9 +782,6 @@ main(int  argc,				/* I - Number of command-line args */
 
       ippDelete(supported);
       httpClose(http);
-
-      if (tmpfilename[0])
-	unlink(tmpfilename);
 
      /*
       * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -857,7 +827,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Build the IPP request...
     */
 
-    if (job_cancelled)
+    if (job_canceled)
       break;
 
     if (num_files > 1)
@@ -868,28 +838,28 @@ main(int  argc,				/* I - Number of command-line args */
     request->request.op.version[0] = version / 10;
     request->request.op.version[1] = version % 10;
 
+    fprintf(stderr, "DEBUG: %s IPP/%d.%d\n",
+            ippOpString(request->request.op.operation_id),
+	    request->request.op.version[0],
+	    request->request.op.version[1]);
+
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
         	 NULL, uri);
-
-    fprintf(stderr, "DEBUG: printer-uri = \"%s\"\n", uri);
+    fprintf(stderr, "DEBUG: printer-uri=\"%s\"\n", uri);
 
     if (argv[2][0])
+    {
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
                    "requesting-user-name", NULL, argv[2]);
+      fprintf(stderr, "DEBUG: requesting-user-name=\"%s\"\n", argv[2]);
+    }
 
-    fprintf(stderr, "DEBUG: requesting-user-name = \"%s\"\n", argv[2]);
-
-   /*
-    * Only add a "job-name" attribute if the remote server supports
-    * copy generation - some IPP implementations like HP's don't seem
-    * to like UTF-8 job names (STR #1837)...
-    */
-
-    if (argv[3][0] && copies_sup)
+    if (argv[3][0])
+    {
       ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
         	   argv[3]);
-
-    fprintf(stderr, "DEBUG: job-name = \"%s\"\n", argv[3]);
+      fprintf(stderr, "DEBUG: job-name=\"%s\"\n", argv[3]);
+    }
 
 #ifdef HAVE_LIBZ
     if (compression)
@@ -904,50 +874,6 @@ main(int  argc,				/* I - Number of command-line args */
     options     = NULL;
     num_options = cupsParseOptions(argv[5], 0, &options);
 
-#ifdef __APPLE__
-    if (!strcasecmp(final_content_type, "application/pictwps") &&
-        num_files == 1)
-    {
-      if (format_sup != NULL)
-      {
-	for (i = 0; i < format_sup->num_values; i ++)
-	  if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
-	    break;
-      }
-
-      if (format_sup == NULL || i >= format_sup->num_values)
-      {
-       /*
-	* Remote doesn't support "application/pictwps" (i.e. it's not MacOS X)
-	* so convert the document to PostScript...
-	*/
-
-	if (run_pictwps_filter(argv, files[0]))
-	{
-	  if (pstmpname[0])
-	    unlink(pstmpname);
-
-	  if (tmpfilename[0])
-	    unlink(tmpfilename);
-
-	  return (CUPS_BACKEND_FAILED);
-        }
-
-        files[0] = pstmpname;
-
-       /*
-	* Change the MIME type to application/postscript and change the
-	* number of copies to 1...
-	*/
-
-	final_content_type = "application/postscript";
-	copies             = 1;
-	copies_remaining   = 1;
-        send_options       = 0;
-      }
-    }
-#endif /* __APPLE__ */
-
     if (format_sup != NULL)
     {
       for (i = 0; i < format_sup->num_values; i ++)
@@ -959,46 +885,178 @@ main(int  argc,				/* I - Number of command-line args */
 	             "document-format", NULL, final_content_type);
     }
 
-    if (copies_sup && version > 10 && send_options)
+    if (send_options)
     {
-     /*
-      * Only send options if the destination printer supports the copies
-      * attribute and IPP/1.1.  This is a hack for the HP and Lexmark
-      * implementations of IPP, which do not accept extension attributes
-      * and incorrectly report a client-error-bad-request error instead of
-      * the successful-ok-unsupported-attributes status.  In short, at least
-      * some HP and Lexmark implementations of IPP are non-compliant.
-      */
+      if (cups_version || !media_col_sup)
+      {
+       /*
+        * When talking to another CUPS server, send all options...
+	*/
 
-      cupsEncodeOptions(request, num_options, options);
+        cupsEncodeOptions(request, num_options, options);
+      }
+      else
+      {
+       /*
+        * Otherwise send standard IPP attributes...
+	*/
 
-      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies",
-                    copies);
+	char		cachefile[1024];/* Printer PWG cache file */
+	const char	*cups_cachedir;	/* Location of cache file */
+        _pwg_t		*pwg;		/* PWG mapping data */
+	const char	*keyword;	/* PWG keyword */
+	_pwg_size_t	*size;		/* PWG media size */
+
+
+        if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
+	  cups_cachedir = CUPS_CACHEDIR;
+
+	snprintf(cachefile, sizeof(cachefile), "%s/%s.pwg", cups_cachedir,
+	         getenv("PRINTER"));
+
+	if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
+	  keyword = cupsGetOption("media", num_options, options);
+
+        pwg  = _pwgCreateWithFile(cachefile);
+	size = _pwgGetSize(pwg, keyword);
+
+	if (media_col_sup && size)
+	{
+	  ipp_t		*media_col,	/* media-col value */
+	  		*media_size;	/* media-size value */
+	  const char	*media_source,	/* media-source value */
+			*media_type;	/* media-type value */
+
+	  media_size = ippNew();
+	  ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                "x-dimension", size->width);
+	  ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                "y-dimension", size->length);
+
+	  media_col = ippNew();
+	  ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
+
+	  media_source = _pwgGetSource(pwg, cupsGetOption("InputSlot",
+	                                                  num_options,
+							  options));
+	  media_type   = _pwgGetType(pwg, cupsGetOption("MediaType",
+	                                                num_options, options));
+
+	  for (i = 0; i < media_col_sup->num_values; i ++)
+	  {
+	    if (!strcmp(media_col_sup->values[i].string.text,
+	                "media-left-margin"))
+	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                    "media-left-margin", size->left);
+	    else if (!strcmp(media_col_sup->values[i].string.text,
+	                     "media-bottom-margin"))
+	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                    "media-bottom-margin", size->left);
+	    else if (!strcmp(media_col_sup->values[i].string.text,
+	                     "media-right-margin"))
+	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                    "media-right-margin", size->left);
+	    else if (!strcmp(media_col_sup->values[i].string.text,
+	                     "media-top-margin"))
+	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+	                    "media-top-margin", size->left);
+	    else if (!strcmp(media_col_sup->values[i].string.text,
+	                     "media-source") && media_source)
+	      ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
+			   "media-source", NULL, media_source);
+	    else if (!strcmp(media_col_sup->values[i].string.text,
+	                     "media-type") && media_type)
+	      ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
+			   "media-type", NULL, media_type);
+          }
+
+          ippAddCollection(request, IPP_TAG_JOB, "media-col", media_col);
+	}
+	else if (size)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media",
+	               NULL, size->map.pwg);
+        else if (keyword)
+        {
+	  _pwg_media_t	*found;		/* PWG media */
+
+
+          if ((found = _pwgMediaForPPD(keyword)) == NULL)
+	    keyword = found->pwg;
+	  else if ((found = _pwgMediaForLegacy(keyword)) == NULL)
+	    keyword = found->pwg;
+
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media",
+	               NULL, keyword);
+        }
+
+        if ((keyword = cupsGetOption("output-bin", num_options,
+	                             options)) == NULL)
+	  keyword = _pwgGetBin(pwg, cupsGetOption("OutputBin", num_options,
+	                                          options));
+
+	if (keyword)
+          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
+	               NULL, keyword);
+
+	if ((keyword = cupsGetOption("output-mode", num_options,
+				     options)) != NULL)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+		       NULL, keyword);
+
+	if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+       	       NULL, keyword);
+       	               
+	_pwgDestroy(pwg);
+      }
+
+      if (copies_sup && copies > 1)
+        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
     }
 
     cupsFreeOptions(num_options, options);
 
    /*
-    * If copies aren't supported, then we are likely dealing with an HP
-    * JetDirect.  The HP IPP implementation seems to close the connection
-    * after every request - that is, it does *not* implement HTTP Keep-
-    * Alive, which is REQUIRED by HTTP/1.1...
-    */
-
-    if (!copies_sup)
-      httpReconnect(http);
-
-   /*
     * Do the request...
     */
-
-    if (http->version < HTTP_1_1)
-      httpReconnect(http);
 
     if (num_files > 1)
       response = cupsDoRequest(http, request, resource);
     else
-      response = cupsDoFileRequest(http, request, resource, files[0]);
+    {
+      fputs("DEBUG: Sending file using chunking...\n", stderr);
+      http_status = cupsSendRequest(http, request, resource, 0);
+      if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
+      {
+        if (num_files == 1)
+	  fd = open(files[0], O_RDONLY);
+	else
+	  fd = 0;
+
+        while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	{
+	  fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
+
+	  if ((http_status = cupsWriteRequestData(http, buffer, bytes))
+	          != HTTP_CONTINUE)
+            break;
+          else
+	  {
+	   /*
+	    * Check for side-channel requests...
+	    */
+
+	    backendCheckSideChannel(snmp_fd, http->hostaddr);
+	  }
+	}
+
+        if (num_files == 1)
+	  close(fd);
+      }
+
+      response = cupsGetResponse(http, resource);
+      ippDelete(request);
+    }
 
     ipp_status = cupsLastError();
 
@@ -1006,7 +1064,7 @@ main(int  argc,				/* I - Number of command-line args */
     {
       job_id = 0;
 
-      if (job_cancelled)
+      if (job_canceled)
         break;
 
       if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
@@ -1015,19 +1073,6 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPuts(stderr,
 	              _("INFO: Printer busy; will retry in 10 seconds...\n"));
 	sleep(10);
-      }
-      else if ((ipp_status == IPP_BAD_REQUEST ||
-	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version > 10)
-      {
-       /*
-	* Switch to IPP/1.0...
-	*/
-
-	_cupsLangPrintf(stderr,
-	                _("INFO: Printer does not support IPP/%d.%d, trying "
-		          "IPP/1.0...\n"), version / 10, version % 10);
-	version = 10;
-	httpReconnect(http);
       }
       else
       {
@@ -1072,7 +1117,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     ippDelete(response);
 
-    if (job_cancelled)
+    if (job_canceled)
       break;
 
     if (job_id && num_files > 1)
@@ -1109,10 +1154,31 @@ main(int  argc,				/* I - Number of command-line args */
         ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
 	             "document-format", NULL, content_type);
 
-	if (http->version < HTTP_1_1)
-	  httpReconnect(http);
+	fprintf(stderr, "DEBUG: Sending file %d using chunking...\n", i + 1);
+	http_status = cupsSendRequest(http, request, resource, 0);
+	if (http_status == HTTP_CONTINUE && request->state == IPP_DATA &&
+	    (fd = open(files[i], O_RDONLY)) >= 0)
+	{
+	  while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	  {
+	    if ((http_status = cupsWriteRequestData(http, buffer, bytes))
+		    != HTTP_CONTINUE)
+	      break;
+	    else
+	    {
+	     /*
+	      * Check for side-channel requests...
+	      */
 
-        ippDelete(cupsDoFileRequest(http, request, resource, files[i]));
+	      backendCheckSideChannel(snmp_fd, http->hostaddr);
+	    }
+	  }
+
+	  close(fd);
+	}
+
+	ippDelete(cupsGetResponse(http, resource));
+	ippDelete(request);
 
 	if (cupsLastError() > IPP_OK_CONFLICT)
 	{
@@ -1146,7 +1212,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPuts(stderr, _("INFO: Waiting for job to complete...\n"));
 
-    for (delay = 1; !job_cancelled;)
+    for (delay = 1; !job_canceled;)
     {
      /*
       * Check for side-channel requests...
@@ -1179,9 +1245,6 @@ main(int  argc,				/* I - Number of command-line args */
      /*
       * Do the request...
       */
-
-      if (!copies_sup || http->version < HTTP_1_1)
-	httpReconnect(http);
 
       response   = cupsDoRequest(http, request, resource);
       ipp_status = cupsLastError();
@@ -1272,7 +1335,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Cancel the job as needed...
   */
 
-  if (job_cancelled && job_id)
+  if (job_canceled && job_id)
     cancel_job(http, uri, job_id, resource, argv[2], version);
 
  /*
@@ -1311,9 +1374,6 @@ main(int  argc,				/* I - Number of command-line args */
   * Remove the temporary file(s) if necessary...
   */
 
-  if (tmpfilename[0])
-    unlink(tmpfilename);
-
 #ifdef HAVE_LIBZ
   if (compression)
   {
@@ -1321,11 +1381,6 @@ main(int  argc,				/* I - Number of command-line args */
       unlink(files[i]);
   }
 #endif /* HAVE_LIBZ */
-
-#ifdef __APPLE__
-  if (pstmpname[0])
-    unlink(pstmpname);
-#endif /* __APPLE__ */
 
  /*
   * Return the queue status...
@@ -1379,9 +1434,6 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
  /*
   * Do the request...
   */
-
-  if (http->version < HTTP_1_1)
-    httpReconnect(http);
 
   ippDelete(cupsDoRequest(http, request, resource));
 
@@ -1440,9 +1492,6 @@ check_printer_state(
  /*
   * Do the request...
   */
-
-  if (http->version < HTTP_1_1)
-    httpReconnect(http);
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
@@ -1702,179 +1751,6 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 }
 
 
-#ifdef __APPLE__
-/*
- * 'run_pictwps_filter()' - Convert PICT files to PostScript when printing
- *                          remotely.
- *
- * This step is required because the PICT format is not documented and
- * subject to change, so developing a filter for other OS's is infeasible.
- * Also, fonts required by the PICT file need to be embedded on the
- * client side (which has the fonts), so we run the filter to get a
- * PostScript file for printing...
- */
-
-static int				/* O - Exit status of filter */
-run_pictwps_filter(char       **argv,	/* I - Command-line arguments */
-                   const char *filename)/* I - Filename */
-{
-  struct stat	fileinfo;		/* Print file information */
-  const char	*ppdfile;		/* PPD file for destination printer */
-  int		pid;			/* Child process ID */
-  int		fd;			/* Temporary file descriptor */
-  int		status;			/* Exit status of filter */
-  const char	*printer;		/* PRINTER env var */
-  static char	ppdenv[1024];		/* PPD environment variable */
-
-
- /*
-  * First get the PPD file for the printer...
-  */
-
-  printer = getenv("PRINTER");
-  if (!printer)
-  {
-    _cupsLangPuts(stderr,
-                  _("ERROR: PRINTER environment variable not defined\n"));
-    return (-1);
-  }
-
-  if ((ppdfile = cupsGetPPD(printer)) == NULL)
-  {
-    _cupsLangPrintf(stderr,
-		    _("ERROR: Unable to get PPD file for printer \"%s\" - "
-		      "%s.\n"), printer, cupsLastErrorString());
-  }
-  else
-  {
-    snprintf(ppdenv, sizeof(ppdenv), "PPD=%s", ppdfile);
-    putenv(ppdenv);
-  }
-
- /*
-  * Then create a temporary file for printing...
-  */
-
-  if ((fd = cupsTempFd(pstmpname, sizeof(pstmpname))) < 0)
-  {
-    _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
-    if (ppdfile)
-      unlink(ppdfile);
-    return (-1);
-  }
-
- /*
-  * Get the owner of the spool file - it is owned by the user we want to run
-  * as...
-  */
-
-  if (argv[6])
-    stat(argv[6], &fileinfo);
-  else
-  {
-   /*
-    * Use the OSX defaults, as an up-stream filter created the PICT
-    * file...
-    */
-
-    fileinfo.st_uid = 1;
-    fileinfo.st_gid = 80;
-  }
-
-  if (ppdfile)
-    chown(ppdfile, fileinfo.st_uid, fileinfo.st_gid);
-
-  fchown(fd, fileinfo.st_uid, fileinfo.st_gid);
-
- /*
-  * Finally, run the filter to convert the file...
-  */
-
-  if ((pid = fork()) == 0)
-  {
-   /*
-    * Child process for pictwpstops...  Redirect output of pictwpstops to a
-    * file...
-    */
-
-    dup2(fd, 1);
-    close(fd);
-
-    if (!getuid())
-    {
-     /*
-      * Change to an unpriviledged user...
-      */
-
-      if (setgid(fileinfo.st_gid))
-        return (errno);
-
-      if (setuid(fileinfo.st_uid))
-        return (errno);
-    }
-
-    execlp("pictwpstops", printer, argv[1], argv[2], argv[3], argv[4], argv[5],
-           filename, NULL);
-    _cupsLangPrintf(stderr, _("ERROR: Unable to exec pictwpstops: %s\n"),
-		    strerror(errno));
-    return (errno);
-  }
-
-  close(fd);
-
-  if (pid < 0)
-  {
-   /*
-    * Error!
-    */
-
-    _cupsLangPrintf(stderr, _("ERROR: Unable to fork pictwpstops: %s\n"),
-		    strerror(errno));
-    if (ppdfile)
-      unlink(ppdfile);
-    return (-1);
-  }
-
- /*
-  * Now wait for the filter to complete...
-  */
-
-  if (wait(&status) < 0)
-  {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to wait for pictwpstops: %s\n"),
-		    strerror(errno));
-    close(fd);
-    if (ppdfile)
-      unlink(ppdfile);
-    return (-1);
-  }
-
-  if (ppdfile)
-    unlink(ppdfile);
-
-  close(fd);
-
-  if (status)
-  {
-    if (status >= 256)
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited with status %d\n"),
-		      status / 256);
-    else
-      _cupsLangPrintf(stderr, _("ERROR: pictwpstops exited on signal %d\n"),
-		      status);
-
-    return (status);
-  }
-
- /*
-  * Return with no errors..
-  */
-
-  return (0);
-}
-#endif /* __APPLE__ */
-
-
 /*
  * 'sigterm_handler()' - Handle 'terminate' signals that stop the backend.
  */
@@ -1884,28 +1760,15 @@ sigterm_handler(int sig)		/* I - Signal */
 {
   (void)sig;	/* remove compiler warnings... */
 
-  if (!job_cancelled)
+  if (!job_canceled)
   {
    /*
     * Flag that the job should be cancelled...
     */
 
-    job_cancelled = 1;
+    job_canceled = 1;
     return;
   }
-
- /*
-  * The scheduler already tried to cancel us once, now just terminate
-  * after removing our temp files!
-  */
-
-  if (tmpfilename[0])
-    unlink(tmpfilename);
-
-#ifdef __APPLE__
-  if (pstmpname[0])
-    unlink(pstmpname);
-#endif /* __APPLE__ */
 
   exit(1);
 }
