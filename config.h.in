@@ -639,6 +639,13 @@
 #undef HAVE_TCPD_H
 
 
+/*
+ * Do we have <iconv.h>?
+ */
+
+#undef HAVE_ICONV_H
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

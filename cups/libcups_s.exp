@@ -1,8 +1,4 @@
 _cups_debug_fd
-_cupsCharmapFlush
-_cupsCharmapFree
-_cupsCharmapGet
-_cupsEncodingName
 _cupsGet1284Values
 _cupsGetPassword
 _cupsGlobals

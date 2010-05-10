@@ -1,10 +1,6 @@
 LIBRARY libcups2
 VERSION 2.8
 EXPORTS
-_cupsCharmapFlush
-_cupsCharmapFree
-_cupsCharmapGet
-_cupsEncodingName
 _cupsGetPassword
 _cupsGlobals
 _cupsLangPrintf

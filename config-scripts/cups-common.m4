@@ -133,6 +133,15 @@ AC_CHECK_HEADER(sys/param.h,AC_DEFINE(HAVE_SYS_PARAM_H))
 AC_CHECK_HEADER(sys/ucred.h,AC_DEFINE(HAVE_SYS_UCRED_H))
 AC_CHECK_HEADER(scsi/sg.h,AC_DEFINE(HAVE_SCSI_SG_H))
 
+dnl Checks for iconv.h and iconv_open
+AC_CHECK_HEADER(iconv.h,
+	SAVELIBS="$LIBS"
+	LIBS=""
+	AC_SEARCH_LIBS(iconv_open,iconv,
+		AC_DEFINE(HAVE_ICONV_H)
+		SAVELIBS="$SAVELIBS $LIBS")
+	LIBS="$SAVELIBS")
+
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup strcasecmp strncasecmp strlcat strlcpy)
 if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then
