@@ -130,12 +130,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 #endif /* !WIN32 */
 
    /*
-    * Count lines in euc-jp.txt, rewind, then count again.
+    * Count lines in psglyphs, rewind, then count again.
     */
 
-    fputs("\ncupsFileOpen(\"../data/euc-jp.txt\", \"r\"): ", stdout);
+    fputs("\ncupsFileOpen(\"../data/psglyphs\", \"r\"): ", stdout);
 
-    if ((fp = cupsFileOpen("../data/euc-jp.txt", "r")) == NULL)
+    if ((fp = cupsFileOpen("../data/psglyphs", "r")) == NULL)
     {
       puts("FAIL");
       status ++;
@@ -145,9 +145,9 @@ main(int  argc,				/* I - Number of command-line arguments */
       puts("PASS");
       fputs("cupsFileGets: ", stdout);
 
-      if ((count = count_lines(fp)) != 15184)
+      if ((count = count_lines(fp)) != 1051)
       {
-        printf("FAIL (got %d lines, expected 15184)\n", count);
+        printf("FAIL (got %d lines, expected 1051)\n", count);
 	status ++;
       }
       else
@@ -165,9 +165,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	  puts("PASS");
 	  fputs("cupsFileGets: ", stdout);
 
-	  if ((count = count_lines(fp)) != 15184)
+	  if ((count = count_lines(fp)) != 1051)
 	  {
-	    printf("FAIL (got %d lines, expected 15184)\n", count);
+	    printf("FAIL (got %d lines, expected 1051)\n", count);
 	    status ++;
 	  }
 	  else
