@@ -9022,7 +9022,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
                type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Could not scan type \"%s\""),
+                      _("Bad document-format \"%s\""),
 		      format->values[0].string.text);
       return;
     }
@@ -9038,7 +9038,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Could not scan type \"%s\""),
+                      _("Bad document-format \"%s\""),
 		      default_format);
       return;
     }
@@ -9103,7 +9103,9 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
   else if (!filetype)
   {
     send_ipp_status(con, IPP_DOCUMENT_FORMAT,
-                    _("Unsupported format \'%s/%s\'"), super, type);
+                    _("Unsupported document-format \"%s\""),
+		    format ? format->values[0].string.text :
+			     "application/octet-stream");
     cupsdLogMessage(CUPSD_LOG_INFO,
                     "Hint: Do you have the raw file printing rules enabled?");
 
@@ -11696,7 +11698,8 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
 	     ipp_attribute_t *uri)	/* I - Printer URI */
 {
   http_status_t		status;		/* Policy status */
-  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*auth_info;	/* auth-info attribute */
   ipp_attribute_t	*format;	/* Document-format attribute */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   char			super[MIME_MAX_SUPER],
@@ -11715,15 +11718,21 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   */
 
   if ((attr = ippFindAttribute(con->request, "compression",
-                               IPP_TAG_KEYWORD)) != NULL &&
-      !strcmp(attr->values[0].string.text, "none"))
+                               IPP_TAG_KEYWORD)) != NULL)
   {
-    send_ipp_status(con, IPP_ATTRIBUTES,
-                    _("Unsupported compression attribute %s"),
-                    attr->values[0].string.text);
-    ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
-	         "compression", NULL, attr->values[0].string.text);
-    return;
+    if (strcmp(attr->values[0].string.text, "none")
+#ifdef HAVE_LIBZ
+        && strcmp(attr->values[0].string.text, "gzip")
+#endif /* HAVE_LIBZ */
+      )
+    {
+      send_ipp_status(con, IPP_ATTRIBUTES,
+                      _("Unsupported compression \"%s\""),
+        	      attr->values[0].string.text);
+      ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+	           "compression", NULL, attr->values[0].string.text);
+      return;
+    }
   }
 
  /*
@@ -11747,7 +11756,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Hint: Do you have the raw file printing rules enabled?");
       send_ipp_status(con, IPP_DOCUMENT_FORMAT,
-                      _("Unsupported format \"%s\""),
+                      _("Unsupported document-format \"%s\""),
 		      format->values[0].string.text);
       ippAddString(con->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_MIMETYPE,
                    "document-format", NULL, format->values[0].string.text);
@@ -11774,11 +11783,32 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
+  auth_info = ippFindAttribute(con->request, "auth-info", IPP_TAG_TEXT);
+
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status, printer);
-    return;
+    return (NULL);
   }
+  else if (printer->num_auth_info_required == 1 &&
+           !strcmp(printer->auth_info_required[0], "negotiate") &&
+           !con->username[0])
+  {
+    send_http_error(con, HTTP_UNAUTHORIZED, printer);
+    return (NULL);
+  }
+#ifdef HAVE_SSL
+  else if (auth_info && !con->http.tls &&
+           !httpAddrLocalhost(con->http.hostaddr))
+  {
+   /*
+    * Require encryption of auth-info over non-local connections...
+    */
+
+    send_http_error(con, HTTP_UPGRADE_REQUIRED, printer);
+    return (NULL);
+  }
+#endif /* HAVE_SSL */
 
  /*
   * Everything was ok, so return OK status...
