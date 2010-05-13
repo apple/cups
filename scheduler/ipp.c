@@ -11788,14 +11788,14 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
   if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status, printer);
-    return (NULL);
+    return;
   }
   else if (printer->num_auth_info_required == 1 &&
            !strcmp(printer->auth_info_required[0], "negotiate") &&
            !con->username[0])
   {
     send_http_error(con, HTTP_UNAUTHORIZED, printer);
-    return (NULL);
+    return;
   }
 #ifdef HAVE_SSL
   else if (auth_info && !con->http.tls &&
@@ -11806,7 +11806,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     */
 
     send_http_error(con, HTTP_UPGRADE_REQUIRED, printer);
-    return (NULL);
+    return;
   }
 #endif /* HAVE_SSL */
 
