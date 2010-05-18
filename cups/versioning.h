@@ -49,6 +49,7 @@
 #    define _CUPS_API_1_2 AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #    define _CUPS_API_1_3 AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
 #    define _CUPS_API_1_4 AVAILABLE_MAC_OS_X_VERSION_10_6_AND_LATER
+#    define _CUPS_API_1_5
 #  else
 #    define _CUPS_API_1_1_19
 #    define _CUPS_API_1_1_20
@@ -56,6 +57,7 @@
 #    define _CUPS_API_1_2
 #    define _CUPS_API_1_3
 #    define _CUPS_API_1_4
+#    define _CUPS_API_1_5
 #  endif /* __APPLE__ && !_CUPS_SOURCE */
 
 /*

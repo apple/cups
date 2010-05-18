@@ -414,8 +414,8 @@ struct ipp_s				/**** IPP Request/Response/Notification ****/
 /**** New in CUPS 1.2 ****/
   ipp_attribute_t *prev;		/* Previous attribute (for read) @since CUPS 1.2/Mac OS X 10.5@ */
 
-/**** New in CUPS 1.5 ****/
-  int		use;			/* Use count */
+/**** New in CUPS 1.4.4 ****/
+  int		use;			/* Use count @since CUPS 1.4.4/Mac OS X 10.6.?@ */
 };
 
 
