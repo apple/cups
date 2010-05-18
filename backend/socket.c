@@ -307,7 +307,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -324,9 +324,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       {
         _cupsLangPrintf(stderr, "DEBUG: Connection error: %s\n",
 	                strerror(errno));
-	_cupsLangPuts(stderr,
-	              _("ERROR: Unable to connect to printer; will retry in 30 "
-		        "seconds...\n"));
+	_cupsLangPuts(stderr, _("ERROR: The printer is not responding; will retry in 30 "
+						  "seconds...\n"));
 	sleep(30);
       }
     }

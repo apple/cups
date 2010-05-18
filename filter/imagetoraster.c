@@ -455,7 +455,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (cupsRasterInterpretPPD(&header, ppd, num_options, options, raster_cb))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad page setup\n"));
+    _cupsLangPuts(stderr, _("ERROR: The page setup information was not valid.\n"));
     fprintf(stderr, "DEBUG: %s\n", cupsRasterErrorString());
     return (1);
   }
@@ -632,7 +632,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    _cupsLangPuts(stderr, _("ERROR: Unable to open image file for printing\n"));
+    _cupsLangPuts(stderr, _("ERROR: The image file to print could not be opened.\n"));
     ppdClose(ppd);
     return (1);
   }
@@ -1195,8 +1195,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ERROR: Unable to write raster data to "
-			        "driver\n"));
+		              _("ERROR: The raster data could not be written "
+			        "to the driver.\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }
@@ -1291,8 +1291,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	                              header.cupsBytesPerLine)
 	    {
-              _cupsLangPuts(stderr,
-	                    _("ERROR: Unable to write raster data to driver\n"));
+	      _cupsLangPuts(stderr,
+	                    _("ERROR: The raster data could not be written to "
+			      "the driver.\n"));
 	      cupsImageClose(img);
 	      exit(1);
 	    }
@@ -1332,8 +1333,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ERROR: Unable to write raster data to "
-			        "driver\n"));
+		              _("ERROR: The raster data could not be written "
+			        "to the driver.\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }

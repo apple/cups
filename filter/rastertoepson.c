@@ -1030,8 +1030,21 @@ main(int  argc,				/* I - Number of command-line arguments */
   */
 
   ppd = ppdOpenFile(getenv("PPD"));
-  if (ppd)
-    Model = ppd->model_number;
+  if (!ppd)
+  {
+    ppd_status_t	status;		/* PPD error */
+    int			linenum;	/* Line number */
+
+    _cupsLangPrintf(stderr, _("ERROR: The PPD file could not be opened.\n"));
+
+    status = ppdLastError(&linenum);
+
+    fprintf(stderr, "DEBUG: %s on line %d.\n", ppdErrorString(status), linenum);
+
+    return (1);
+  }
+
+  Model = ppd->model_number;
 
   Setup();
 
@@ -1123,7 +1136,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages were found.\n"));
     return (1);
   }
   else

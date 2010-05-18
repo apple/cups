@@ -373,7 +373,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!g.make || !g.model)
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+    fprintf(stderr, "DEBUG: Fatal USB error.\n");
+    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
 
     if (!g.make)
       fputs("DEBUG: USB make string is NULL\n", stderr);
@@ -431,7 +432,7 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
       fprintf(stderr, "DEBUG: Could not load %s\n", print_buffer);
 
       if (driverBundlePath)
@@ -496,7 +497,8 @@ print_device(const char *uri,		/* I - Device URI */
 
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+      fprintf(stderr, "DEBUG: Fatal USB error.\n");
+      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
       fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
       registry_close();
       return (CUPS_BACKEND_STOP);
@@ -515,7 +517,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+    fprintf(stderr, "DEBUG: Fatal USB error.\n");
+    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
     fputs("DEBUG: Couldn't create read thread\n", stderr);
     registry_close();
     return (CUPS_BACKEND_STOP);
@@ -601,7 +604,7 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
 	  perror("DEBUG: select");
 	  registry_close();
           return (CUPS_BACKEND_FAILED);
@@ -644,7 +647,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN && errno != EINTR)
 	  {
-	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
+	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
 	    perror("DEBUG: read");
 	    registry_close();
 	    return (CUPS_BACKEND_FAILED);
@@ -720,8 +723,7 @@ print_device(const char *uri,		/* I - Device URI */
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
 	  */
-
-	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data to printer.\n"));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
 	          iostatus);
 

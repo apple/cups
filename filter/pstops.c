@@ -308,7 +308,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if ((len = cupsFileGetLine(fp, line, sizeof(line))) == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: Empty print file\n"));
+    fputs("DEBUG: The print file is empty.\n", stderr);
     return (1);
   }
 
@@ -651,9 +651,8 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     {
       int	pages;			/* Number of pages */
 
-
-      if (saw_pages)
-        _cupsLangPuts(stderr, _("ERROR: Duplicate %%Pages: comment seen\n"));
+      if (saw_pages) 
+	fputs("DEBUG: A duplicate %%Pages: comment was seen.\n", stderr);
 
       saw_pages = 1;
 
@@ -699,9 +698,8 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
     }
     else if (!strncmp(line, "%%BoundingBox:", 14))
     {
-      if (saw_bounding_box)
-        _cupsLangPuts(stderr,
-	              _("ERROR: Duplicate %%BoundingBox: comment seen\n"));
+      if (saw_bounding_box) 
+	fputs("DEBUG: A duplicate %%BoundingBox: comment was seen.\n", stderr);
       else if (strstr(line + 14, "(atend)"))
       {
        /*
@@ -712,7 +710,7 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
 	              doc->bounding_box + 1, doc->bounding_box + 2,
 		      doc->bounding_box + 3) != 4)
       {
-	_cupsLangPuts(stderr, _("ERROR: Bad %%BoundingBox: comment seen\n"));
+	fputs("DEBUG: A bad %%BoundingBox: comment was seen.\n", stderr);
 
 	doc->bounding_box[0] = (int)PageLeft;
 	doc->bounding_box[1] = (int)PageBottom;
@@ -763,11 +761,12 @@ copy_comments(cups_file_t  *fp,		/* I - File to read from */
       break;
   }
 
-  if (!saw_bounding_box)
-    _cupsLangPuts(stderr, _("ERROR: No %%BoundingBox: comment in header\n"));
+  if (!saw_bounding_box) 
+    fputs("DEBUG: There wasn't a %%BoundingBox: comment in the header.\n",
+          stderr);
 
-  if (!saw_pages)
-    _cupsLangPuts(stderr, _("ERROR: No %%Pages: comment in header\n"));
+  if (!saw_pages) 
+    fputs("DEBUG: There wasn't a %%Pages: comment in the header.\n", stderr);
 
   if (!saw_for)
     WriteTextComment("For", doc->user);
@@ -1100,10 +1099,8 @@ copy_non_dsc(cups_file_t  *fp,		/* I - File to read from */
   * that may not print correctly...
   */
 
-  _cupsLangPuts(stderr,
-                _("WARNING: This document does not conform to the Adobe "
-		  "Document Structuring Conventions and may not print "
-		  "correctly\n"));
+  fputs("DEBUG: This document does not conform to the Adobe Document "
+        "Structuring Conventions and may not print correctly.\n", stderr);
 
  /*
   * Then write a standard DSC comment section...
@@ -1291,13 +1288,13 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
 
   if (!parse_text(line + 7, &ptr, label, sizeof(label)))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file\n"));
+    fputs("DEBUG: There was a bad %%Page: comment in the file.\n", stderr);
     label[0] = '\0';
     number   = doc->page;
   }
   else if (strtol(ptr, &ptr, 10) == LONG_MAX || !isspace(*ptr & 255))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%Page: comment in file\n"));
+    fputs("DEBUG: There was a bad %%Page: comment in the file.\n", stderr);
     number = doc->page;
   }
 
@@ -1391,8 +1388,7 @@ copy_page(cups_file_t  *fp,		/* I - File to read from */
                  bounding_box + 1, bounding_box + 2,
 		 bounding_box + 3) != 4)
       {
-        _cupsLangPuts(stderr,
-	              _("ERROR: Bad %%PageBoundingBox: comment in file\n"));
+	fputs("DEBUG: There was a bad %%PageBoundingBox: comment in the file.\n", stderr);
         memcpy(bounding_box, doc->bounding_box,
 	       sizeof(bounding_box));
       }
@@ -1799,8 +1795,8 @@ copy_prolog(cups_file_t  *fp,		/* I - File to read from */
 
     if (!strncmp(line, "%%EndProlog", 11))
       linelen = cupsFileGetLine(fp, line, linesize);
-    else
-      _cupsLangPuts(stderr, _("ERROR: Missing %%EndProlog\n"));
+    else 
+      fputs("DEBUG: The %%EndProlog comment is missing.\n", stderr);
   }
 
   doc_puts(doc, "%%EndProlog\n");
@@ -1870,8 +1866,8 @@ copy_setup(cups_file_t  *fp,		/* I - File to read from */
 
     if (!strncmp(line, "%%EndSetup", 10))
       linelen = cupsFileGetLine(fp, line, linesize);
-    else
-      _cupsLangPuts(stderr, _("ERROR: Missing %%EndSetup\n"));
+    else 
+      fputs("DEBUG: The %%EndSetup comment is missing.\n", stderr);
   }
 
   if (num_options > 0)
@@ -2249,7 +2245,7 @@ include_feature(
 
   if (sscanf(line + 17, "%254s%254s", name, value) != 2)
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad %%IncludeFeature: comment\n"));
+    fputs("DEBUG: The %%IncludeFeature: comment is not valid.\n", stderr);
     return (num_options);
   }
 
@@ -2755,7 +2751,7 @@ set_pstops_options(
     if ((doc->temp = cupsTempFile2(doc->tempfile,
                                    sizeof(doc->tempfile))) == NULL)
     {
-      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
+      perror("DEBUG: Unable to create temporary file");
       exit(1);
     }
   }

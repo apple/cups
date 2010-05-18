@@ -502,7 +502,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -526,7 +526,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
 	_cupsLangPuts(stderr,
-	              _("ERROR: Unable to connect to printer; will retry in 30 "
+	              _("INFO: The printer is not responding; will retry in 30 "
 		        "seconds...\n"));
 	sleep(30);
       }
@@ -616,8 +616,11 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (http->version < HTTP_1_1)
     {
+      fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
+              http->version / 100, http->version % 100);
+
       _cupsLangPuts(stderr,
-                    _("ERROR: Unable to print - printer does not conform to "
+                    _("ERROR: Unable to print: the printer does not conform to "
 		      "the IPP standard.\n"));
       exit(CUPS_BACKEND_STOP);
     }
@@ -634,7 +637,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -675,7 +678,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist\n"));
+        _cupsLangPuts(stderr, _("ERROR: The printer URI is incorrect or no longer exists.\n"));
 
 	if (supported)
           ippDelete(supported);

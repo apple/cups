@@ -1812,7 +1812,15 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (!ppd)
   {
-    _cupsLangPuts(stderr, _("ERROR: Unable to open PPD file\n"));
+    ppd_status_t	status;		/* PPD error */
+    int			linenum;	/* Line number */
+
+    _cupsLangPrintf(stderr, _("ERROR: The PPD file could not be opened.\n"));
+
+    status = ppdLastError(&linenum);
+
+    fprintf(stderr, "DEBUG: %s on line %d.\n", ppdErrorString(status), linenum);
+
     return (1);
   }
 
@@ -1927,7 +1935,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages found\n"));
+    _cupsLangPuts(stderr, _("ERROR: No pages were found.\n"));
     return (1);
   }
   else

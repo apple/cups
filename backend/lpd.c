@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -34,6 +34,7 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 #ifdef WIN32
 #  include <winsock.h>
@@ -441,7 +442,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
-      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
+      perror("DEBUG: Unable to create temporary file");
       return (CUPS_BACKEND_FAILED);
     }
 
@@ -587,7 +588,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   if (lpd_write(fd, buf, bytes) < bytes)
   {
-    _cupsLangPrintError(_("ERROR: Unable to send LPD command"));
+    perror("DEBUG: Unable to send LPD command");
     return (-1);
   }
 
@@ -754,7 +755,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	if ((fd = socket(addr->addr.addr.sa_family, SOCK_STREAM, 0)) < 0)
 	{
-          _cupsLangPrintError(_("ERROR: Unable to create socket"));
+	  perror("DEBUG: Unable to create socket");
 	  sleep(1);
 
           continue;
@@ -771,7 +772,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	if ((fd = rresvport_af(&lport, addr->addr.addr.sa_family)) < 0)
 	{
-	  _cupsLangPrintError(_("ERROR: Unable to reserve port"));
+	  perror("DEBUG: Unable to reserve port");
 	  sleep(1);
 
 	  continue;
@@ -829,7 +830,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -853,9 +854,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       else
       {
         fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
-	_cupsLangPuts(stderr,
-	              _("ERROR: Unable to connect to printer; will retry in 30 "
-		        "seconds...\n"));
+	_cupsLangPuts(stderr, _("INFO: The printer is not responding; will retry in 30 "
+						  "seconds...\n"));
 	sleep(30);
       }
     }
@@ -905,7 +905,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	httpAddrFreeList(addrlist);
 	close(fd);
 
-	_cupsLangPrintError(_("ERROR: unable to stat print file"));
+	perror("DEBUG: unable to stat print file");
 	return (CUPS_BACKEND_FAILED);
       }
 
@@ -998,7 +998,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
 	status = errno;
-	_cupsLangPrintError(_("ERROR: Unable to write control file"));
+	perror("DEBUG: Unable to write control file");
+
       }
       else
       {
@@ -1068,7 +1069,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	  if (lpd_write(fd, buffer, nbytes) < nbytes)
 	  {
-            _cupsLangPrintError(_("ERROR: Unable to send print file to printer"));
+	    perror("DEBUG: Unable to send print file to printer");
             break;
 	  }
 	  else
@@ -1082,7 +1083,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  status = errno;
 	else if (lpd_write(fd, "", 1) < 1)
 	{
-          _cupsLangPrintError(_("ERROR: Unable to send trailing nul to printer"));
+	  perror("DEBUG: Unable to send trailing nul to printer");
 	  status = errno;
 	}
 	else
@@ -1145,7 +1146,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
 	status = errno;
-	_cupsLangPrintError(_("ERROR: Unable to write control file"));
+	perror("DEBUG: Unable to write control file");
       }
       else
       {

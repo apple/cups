@@ -299,7 +299,7 @@ static int listDevices(void)
 
   if (zip_getmyzone(ZIP_DEF_INTERFACE, &at_zone))
   {
-    _cupsLangPrintError(_("ERROR: Unable to get default AppleTalk zone"));
+    perror("DEBUG: Unable to get default AppleTalk zone.");
     return -2;
   }
 
@@ -319,7 +319,7 @@ static int listDevices(void)
 
   if ((numberFound = nbp_lookup(&entity, buf, MAX_PRINTERS, &retry)) < 0)
   {
-    _cupsLangPrintError(_("ERROR: Unable to lookup AppleTalk printers"));
+    perror("DEBUG: Unable to lookup AppleTalk printers.");
     return numberFound;
   }
 
@@ -448,7 +448,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   /* try to find our printer */
   if ((err = nbp_make_entity(&entity, name, type, zone)) != noErr)
   {
-    _cupsLangPrintError(_("ERROR: Unable to make AppleTalk address"));
+    perror("DEBUG: Unable to make AppleTalk address.");
     goto Exit;
   }
 
@@ -568,7 +568,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   /* Start the tickle packets and set a timeout alarm  */
   if ((err = papSendRequest(gSockfd, &gSessionAddr, gConnID, AT_PAP_TYPE_TICKLE, 0, false, false)) < 0)
   {
-    _cupsLangPrintError(_("ERROR: Unable to send PAP tickle request"));
+    perror("DEBUG: Unable to send PAP tickle request.");
     goto Exit;
   }
   signal(SIGALRM, signalHandler);
@@ -577,7 +577,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
   /* Prime the pump with an initial send-data packet */
   if ((err = papSendRequest(gSockfd, &gSessionAddr, gConnID, AT_PAP_TYPE_SEND_DATA, 0xFF, true, true)) < 0)
   {
-    _cupsLangPrintError(_("ERROR: Unable to send initial PAP send data request"));
+    perror("DEBUG: Unable to send initial PAP send data request.");
     goto Exit;
   }
 
@@ -626,7 +626,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     /* Wait here for something interesting to happen */
     if ((err = select(maxfdp1, &readSet, 0, 0, timeoutPtr)) < 0)
     {
-      _cupsLangPrintError(_("ERROR: select() failed"));
+      perror("DEBUG: select() failed.");
       break;
     }
 
@@ -634,7 +634,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     {
       /* Time to send a status request */
       if ((err = papSendRequest(gSockfd, &tuple.enu_addr, 0, AT_PAP_TYPE_SEND_STATUS, 0x01, false, false)) < 0)
-        _cupsLangPrintError(_("WARNING: Unable to send PAP status request"));
+	_cupsLangPrintError(_("WARNING: Unable to send PAP status request"));
 
       if (gStatusInterval)
         nextStatusTime = time(NULL) + gStatusInterval;
@@ -685,7 +685,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
     {
       if ((rc = atp_look(gSockfd)) < 0)
       {
-        _cupsLangPrintError(_("ERROR: Unable to look for PAP response"));
+	perror("DEBUG: Unable to look for PAP response.");
         break;
       }
 
@@ -698,7 +698,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
 
         if ((err = atp_getresp(gSockfd, &tid, &resp)) < 0)
         {
-          _cupsLangPrintError(_("ERROR: Unable to get PAP response"));
+	  perror("DEBUG: Unable to get PAP response.");
           break;
         }
         userdata = resp.userdata[0];
@@ -709,7 +709,7 @@ static int printFile(char* name, char* type, char* zone, int fdin, int fdout, in
         reqlen = sizeof(atpReqBuf);
         if ((err = atp_getreq(gSockfd, &src, atpReqBuf, &reqlen, &userdata, &xo, &tid, &bitmap, 0)) < 0)
         {
-          _cupsLangPrintError(_("ERROR: Unable to get PAP request"));
+	  perror("DEBUG: Unable to get PAP response.");
           break;
         }
       }

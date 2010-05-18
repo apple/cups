@@ -3,7 +3,7 @@
  *
  *   Serial port backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -26,6 +26,7 @@
  */
 
 #include "backend-private.h"
+#include <stdio.h>
 
 #ifdef __hpux
 #  include <sys/modem.h>
@@ -614,7 +615,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	  if (errno != EAGAIN || errno != EINTR)
 	  {
-	    _cupsLangPrintError(_("ERROR: Unable to read print data"));
+	    perror("DEBUG: Unable to read print data");
 
             tcsetattr(device_fd, TCSADRAIN, &origopts);
 
@@ -690,7 +691,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 	  if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	  {
-	    _cupsLangPrintError(_("ERROR: Unable to write print data"));
+	    perror("DEBUG: Unable to write print data");
 
             tcsetattr(device_fd, TCSADRAIN, &origopts);
 
