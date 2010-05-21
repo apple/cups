@@ -803,7 +803,7 @@ if grep -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
 	echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
 else
 	echo "FAIL: page_log formatted incorrectly."
-	echo "<P>FAIL: page_log formatted incorrectly.</P>" >>$strfile
+	echo "<P>FAIL: page_log formatted incorrectly - no page size information.</P>" >>$strfile
 	fail=`expr $fail + 1`
 fi
 
