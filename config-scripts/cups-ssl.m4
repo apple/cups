@@ -84,6 +84,10 @@ if test x$enable_ssl != xno; then
 	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
 	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
 	    fi
+
+	    if test "x$have_pthread" = xyes; then
+		    AC_MSG_ERROR([The current version of GNU TLS cannot be made thread-safe.])
+	    fi
 	fi
     fi
 

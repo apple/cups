@@ -11,7 +11,8 @@ CHANGES IN CUPS V1.4.4
 	- Fixed some IPP conformance issues with the scheduler's
 	  ippget-event-life, operations-supported, output-bin, and sides
 	  attributes (STR #3554)
-	- The GNU TLS and OpenSSL interfaces have been made thread-safe
+	- The OpenSSL interfaces have been made thread-safe and the GNU TLS
+	  interface is explicitly forbidden when threading is enabled
 	  (STR #3461)
 	- Fixed an IPP conformance issue with the scheduler's Send-Document
 	  implementation (STR #3514)
