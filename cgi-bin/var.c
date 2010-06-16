@@ -1111,6 +1111,9 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
 	    * Read the hex code...
 	    */
 
+            if (!isxdigit(data[1] & 255) || !isxdigit(data[2] & 255))
+	      return (0);
+
             if (s < (value + sizeof(value) - 1))
 	    {
               data ++;
