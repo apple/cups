@@ -68,7 +68,7 @@ if test x$enable_ssl != xno; then
 	    SSLFLAGS=`$PKGCONFIG --cflags gnutls`
 	    AC_DEFINE(HAVE_SSL)
 	    AC_DEFINE(HAVE_GNUTLS)
-	elif "x$LIBGNUTLSCONFIG" != x; then
+	elif test "x$LIBGNUTLSCONFIG" != x; then
 	    have_ssl=1
 	    SSLLIBS=`$LIBGNUTLSCONFIG --libs`
 	    SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
@@ -80,7 +80,7 @@ if test x$enable_ssl != xno; then
             if $PKGCONFIG --exists gcrypt; then
 	        SSLLIBS="$SSLLIBS `$PKGCONFIG --libs gcrypt`"
 	        SSLFLAGS="$SSLFLAGS `$PKGCONFIG --cflags gcrypt`"
-	    elif "x$LIBGCRYPTCONFIG" != x; then
+	    elif test "x$LIBGCRYPTCONFIG" != x; then
 	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
 	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
 	    fi

@@ -343,6 +343,13 @@
 
 
 /*
+ * Does the "stat" structure contain the "st_gen" member?
+ */
+
+#undef HAVE_ST_GEN
+
+
+/*
  * Does the "tm" structure contain the "tm_gmtoff" member?
  */
 

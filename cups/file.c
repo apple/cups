@@ -2294,7 +2294,9 @@ cups_open(const char *filename,		/* I - Filename */
   if (S_ISLNK(linkinfo.st_mode) ||
       fileinfo.st_dev != linkinfo.st_dev ||
       fileinfo.st_ino != linkinfo.st_ino ||
+#ifdef HAVE_ST_GEN
       fileinfo.st_gen != linkinfo.st_gen ||
+#endif /* HAVE_ST_GEN */
       fileinfo.st_nlink != linkinfo.st_nlink ||
       fileinfo.st_mode != linkinfo.st_mode)
   {
