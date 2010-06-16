@@ -250,7 +250,7 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_GATEWAY_TIMEOUT,			/* Gateway connection timed out */
   HTTP_NOT_SUPPORTED,			/* HTTP version not supported */
 
-  HTTP_AUTHORIZATION_CANCELED = 1000	/* User cancelled authorization */
+  HTTP_AUTHORIZATION_CANCELED = 1000	/* User canceled authorization */
 
 } http_status_t;
 

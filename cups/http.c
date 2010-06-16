@@ -1240,7 +1240,7 @@ httpInitialize(void)
   }
 
 #ifdef WIN32
-  WSAStartup(MAKEWORD(1,1), &winsockdata);
+  WSAStartup(MAKEWORD(2,2), &winsockdata);
 
 #elif !defined(SO_NOSIGPIPE)
  /*

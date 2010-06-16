@@ -60,6 +60,7 @@
 
 #include "file-private.h"
 #include <sys/stat.h>
+#include <sys/types.h>
 
 
 /*
@@ -848,7 +849,11 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 	}
 
 	if (fd >= 0)
+#ifdef WIN32
+	  _chsize(fd, 0);
+#else
 	  ftruncate(fd, 0);
+#endif /* WIN32 */
         break;
 
     case 's' : /* Read/write socket */
@@ -2264,7 +2269,11 @@ cups_open(const char *filename,		/* I - Filename */
     return (-1);
   }
 
+#ifdef WIN32
+  if (fileinfo.st_mode & _S_IFDIR)
+#else
   if (S_ISDIR(fileinfo.st_mode))
+#endif /* WIN32 */
   {
     close(fd);
     errno = EISDIR;

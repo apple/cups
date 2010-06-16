@@ -320,7 +320,9 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
   cupsFileClose(cg->stdio_files[1]);
   cupsFileClose(cg->stdio_files[2]);
 
+#  ifndef CUPS_LITE
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
+#  endif /* !CUPS_LITE */
 
   free(cg);
 }
