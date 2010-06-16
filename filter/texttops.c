@@ -176,13 +176,25 @@ WriteProlog(const char *title,		/* I - Title of job */
   if (SizeColumns <= 0 || SizeColumns > 32767 ||
       SizeLines <= 0 || SizeLines > 32767)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page\n"),
+    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page.\n"),
                     SizeColumns, SizeLines);
     exit(1);
   }
 
-  Page    = calloc(sizeof(lchar_t *), SizeLines);
-  Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines);
+  if ((Page = calloc(sizeof(lchar_t *), SizeLines)) == NULL)
+  {
+    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page.\n"),
+                    SizeColumns, SizeLines);
+    exit(1);
+  }
+
+  if ((Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines)) == NULL)
+  {
+    _cupsLangPrintf(stderr, _("ERROR: Unable to print %dx%d text page.\n"),
+                    SizeColumns, SizeLines);
+    exit(1);
+  }
+
   for (i = 1; i < SizeLines; i ++)
     Page[i] = Page[0] + i * SizeColumns;
 
