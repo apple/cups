@@ -1353,6 +1353,9 @@ _httpResolveURI(
   if (strstr(hostname, "._tcp"))
   {
 #ifdef HAVE_DNSSD
+#  ifdef WIN32
+#    pragma comment(lib, "dnssd.lib")
+#  endif /* WIN32 */
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref,	/* DNS-SD service reference for domain */
 			localref;	/* DNS-SD service reference for .local */
