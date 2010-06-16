@@ -13,6 +13,8 @@ CHANGES IN CUPS V1.4.4
 	  (STR #3516)
 	- Security: The web admin interface could disclose the contents of
 	  memory (STR #3577)
+	- Security: CUPS could overwrite files as root in directories owned or
+	  writable by non-root users (STR #3510)
 	- Fixed some IPP conformance issues with the scheduler's
 	  ippget-event-life, operations-supported, output-bin, and sides
 	  attributes (STR #3554)
