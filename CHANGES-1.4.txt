@@ -8,6 +8,7 @@ CHANGES IN CUPS V1.4.5
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453, STR #3527, STR #3528, STR #3529)
+	- Security: The fix for CVE-2009-3553 was incomplete (STR #3490)
 	- Fixed some IPP conformance issues with the scheduler's
 	  ippget-event-life, operations-supported, output-bin, and sides
 	  attributes (STR #3554)

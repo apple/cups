@@ -454,7 +454,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
     if (fdptr->read_cb && event->filter == EVFILT_READ)
       (*(fdptr->read_cb))(fdptr->data);
 
-    if (fdptr->use > 1 && fdptr->write_cb && event->filter == EVFILT_WRITE)
+    if (fdptr->use > 1 && fdptr->write_cb && event->filter == EVFILT_WRITE &&
+        !cupsArrayFind(cupsd_inactive_fds, fdptr))
       (*(fdptr->write_cb))(fdptr->data);
 
     release_fd(fdptr);
@@ -500,7 +501,8 @@ cupsdDoSelect(long timeout)		/* I - Timeout in seconds */
 	  (*(fdptr->read_cb))(fdptr->data);
 
 	if (fdptr->use > 1 && fdptr->write_cb &&
-	    (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)))
+            (event->events & (EPOLLOUT | EPOLLERR | EPOLLHUP)) &&
+            !cupsArrayFind(cupsd_inactive_fds, fdptr))
 	  (*(fdptr->write_cb))(fdptr->data);
 
 	release_fd(fdptr);
