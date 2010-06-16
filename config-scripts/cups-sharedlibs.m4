@@ -165,16 +165,31 @@ AC_SUBST(LIBCUPSSTATIC)
 if test x$enable_shared = xno; then
 	LINKCUPS="../cups/lib$cupsbase.a"
 	LINKCUPSIMAGE="../filter/libcupsimage.a"
+
+	EXTLINKCUPS="-lcups"
+	EXTLINKCUPSDRIVER="-lcupsdriver"
+	EXTLINKCUPSIMAGE="-lcupsimage"
 else
 	if test $uname = AIX; then
 		LINKCUPS="-l${cupsbase}_s"
 		LINKCUPSIMAGE="-lcupsimage_s"
+
+		EXTLINKCUPS="-lcups_s"
+		EXTLINKCUPSDRIVER="-lcupsdriver_s"
+		EXTLINKCUPSIMAGE="-lcupsimage_s"
 	else
 		LINKCUPS="-l${cupsbase}"
 		LINKCUPSIMAGE="-lcupsimage"
+
+		EXTLINKCUPS="-lcups"
+		EXTLINKCUPSDRIVER="-lcupsdriver"
+		EXTLINKCUPSIMAGE="-lcupsimage"
 	fi
 fi
 
+AC_SUBST(EXTLINKCUPS)
+AC_SUBST(EXTLINKCUPSDRIVER)
+AC_SUBST(EXTLINKCUPSIMAGE)
 AC_SUBST(LINKCUPS)
 AC_SUBST(LINKCUPSIMAGE)
 

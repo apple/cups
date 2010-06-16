@@ -15,6 +15,8 @@ CHANGES IN CUPS V1.4.4
 	  memory (STR #3577)
 	- Security: CUPS could overwrite files as root in directories owned or
 	  writable by non-root users (STR #3510)
+	- The cups-config utility did not return the correct linker options on
+	  AIX (STR #3587)
 	- Fixed some IPP conformance issues with the scheduler's
 	  ippget-event-life, operations-supported, output-bin, and sides
 	  attributes (STR #3554)

@@ -4,7 +4,7 @@
 # 
 #   CUPS configuration utility.
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2010 by Apple Inc.
 #   Copyright 2001-2006 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -15,7 +15,7 @@
 #
 
 VERSION="@CUPS_VERSION@"
-APIVERSION="1.4"
+APIVERSION="1.5"
 BUILD="@CUPS_BUILD@"
 
 prefix=@prefix@
@@ -113,12 +113,12 @@ while test $# -gt 0; do
 	    ;;
 	--libs)
 	    if test $static = no; then
-	        libs="-lcups $LIBS";
+	        libs="@EXTLINKCUPS@ $LIBS";
  	        if test $image = yes; then
- 	            libs="-lcupsimage $libs"
+ 	            libs="@EXTLINKCUPSIMAGE@ $libs"
 		fi
  	        if test $driver = yes; then
- 	            libs="-lcupsdriver $libs"
+ 	            libs="@EXTLINKCUPSDRIVER@ $libs"
 		fi
 	    else
 	        libs="$libdir/libcups.a $LIBS";
