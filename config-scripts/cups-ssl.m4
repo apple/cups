@@ -77,16 +77,15 @@ if test x$enable_ssl != xno; then
 	fi
 
 	if test $have_ssl = 1; then
-            if $PKGCONFIG --exists gcrypt; then
+	    if test "x$have_pthread" = xyes; then
+		AC_MSG_WARN([The current version of GNU TLS cannot be made thread-safe.])
+		have_ssl=0
+            elif $PKGCONFIG --exists gcrypt; then
 	        SSLLIBS="$SSLLIBS `$PKGCONFIG --libs gcrypt`"
 	        SSLFLAGS="$SSLFLAGS `$PKGCONFIG --cflags gcrypt`"
 	    elif test "x$LIBGCRYPTCONFIG" != x; then
 	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
 	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
-	    fi
-
-	    if test "x$have_pthread" = xyes; then
-		    AC_MSG_ERROR([The current version of GNU TLS cannot be made thread-safe.])
 	    fi
 	fi
     fi
