@@ -1536,22 +1536,10 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   * Do media selection as needed...
   */
 
-  if (!ippFindAttribute(con->request, "InputSlot", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetInputSlot(printer->pwg, con->request, NULL)) != NULL)
-    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "InputSlot", NULL,
-                 ppd);
-
-  if (!ippFindAttribute(con->request, "MediaType", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetMediaType(printer->pwg, con->request, NULL)) != NULL)
-    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "MediaType", NULL,
-                 ppd);
-
-  if (!ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
+  if (!ippFindAttribute(con->request, "PageRegion", IPP_TAG_ZERO) &&
+      !ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
       (ppd = _pwgGetPageSize(printer->pwg, con->request, NULL, &exact)) != NULL)
   {
-    ippAddString(con->request, IPP_TAG_JOB, IPP_TAG_NAME, "PageSize", NULL,
-                 ppd);
-
     if (!exact &&
         (media_col = ippFindAttribute(con->request, "media-col",
 	                              IPP_TAG_BEGIN_COLLECTION)) != NULL)

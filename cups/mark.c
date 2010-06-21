@@ -72,7 +72,7 @@ cupsMarkOptions(
     int           num_options,		/* I - Number of options */
     cups_option_t *options)		/* I - Options */
 {
-  int		i, j, k;		/* Looping vars */
+  int		i, j;			/* Looping vars */
   char		*ptr,			/* Pointer into string */
 		s[255];			/* Temporary string */
   const char	*val,			/* Pointer into value */
@@ -80,33 +80,7 @@ cupsMarkOptions(
 		*page_size,		/* PageSize option */
 		*ppd_keyword;		/* PPD keyword */
   cups_option_t	*optptr;		/* Current option */
-  ppd_option_t	*option;		/* PPD option */
   ppd_attr_t	*attr;			/* PPD attribute */
-  static const char * const duplex_options[] =
-		{			/* Duplex option names */
-		  "Duplex",		/* Adobe */
-		  "EFDuplex",		/* EFI */
-		  "EFDuplexing",	/* EFI */
-		  "KD03Duplex",		/* Kodak */
-		  "JCLDuplex"		/* Samsung */
-		};
-  static const char * const duplex_one[] =
-		{			/* one-sided names */
-		  "None",
-		  "False"
-		};
-  static const char * const duplex_two_long[] =
-		{			/* two-sided-long-edge names */
-		  "DuplexNoTumble",	/* Adobe */
-		  "LongEdge",		/* EFI */
-		  "Top"			/* EFI */
-		};
-  static const char * const duplex_two_short[] =
-		{			/* two-sided-long-edge names */
-		  "DuplexTumble",	/* Adobe */
-		  "ShortEdge",		/* EFI */
-		  "Bottom"		/* EFI */
-		};
 
 
  /*
@@ -185,98 +159,11 @@ cupsMarkOptions(
   */
 
   for (i = num_options, optptr = options; i > 0; i --, optptr ++)
-    if (!strcasecmp(optptr->name, "media"))
+    if (!strcasecmp(optptr->name, "media") ||
+        !strcasecmp(optptr->name, "output-bin") ||
+	!strcasecmp(optptr->name, "output-mode") ||
+	!strcasecmp(optptr->name, "sides"))
       continue;
-    else if (!strcasecmp(optptr->name, "sides"))
-    {
-      for (j = 0;
-           j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
-	   j ++)
-        if (cupsGetOption(duplex_options[j], num_options, options))
-	  break;
-
-      if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
-      {
-       /*
-        * Don't override the PPD option with the IPP attribute...
-	*/
-
-        continue;
-      }
-
-      if (!strcasecmp(optptr->value, "one-sided"))
-      {
-       /*
-        * Mark the appropriate duplex option for one-sided output...
-	*/
-
-        for (j = 0;
-	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
-	     j ++)
-	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
-	    break;
-
-	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
-	{
-          for (k = 0;
-	       k < (int)(sizeof(duplex_one) / sizeof(duplex_one[0]));
-	       k ++)
-            if (ppdFindChoice(option, duplex_one[k]))
-	    {
-	      ppd_mark_option(ppd, duplex_options[j], duplex_one[k]);
-	      break;
-            }
-        }
-      }
-      else if (!strcasecmp(optptr->value, "two-sided-long-edge"))
-      {
-       /*
-        * Mark the appropriate duplex option for two-sided-long-edge output...
-	*/
-
-        for (j = 0;
-	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
-	     j ++)
-	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
-	    break;
-
-	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
-	{
-          for (k = 0;
-	       k < (int)(sizeof(duplex_two_long) / sizeof(duplex_two_long[0]));
-	       k ++)
-            if (ppdFindChoice(option, duplex_two_long[k]))
-	    {
-	      ppd_mark_option(ppd, duplex_options[j], duplex_two_long[k]);
-	      break;
-            }
-        }
-      }
-      else if (!strcasecmp(optptr->value, "two-sided-short-edge"))
-      {
-       /*
-        * Mark the appropriate duplex option for two-sided-short-edge output...
-	*/
-
-        for (j = 0;
-	     j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0]));
-	     j ++)
-	  if ((option = ppdFindOption(ppd, duplex_options[j])) != NULL)
-	    break;
-
-	if (j < (int)(sizeof(duplex_options) / sizeof(duplex_options[0])))
-	{
-          for (k = 0;
-	       k < (int)(sizeof(duplex_two_short) / sizeof(duplex_two_short[0]));
-	       k ++)
-            if (ppdFindChoice(option, duplex_two_short[k]))
-	    {
-	      ppd_mark_option(ppd, duplex_options[j], duplex_two_short[k]);
-	      break;
-            }
-        }
-      }
-    }
     else if (!strcasecmp(optptr->name, "resolution") ||
              !strcasecmp(optptr->name, "printer-resolution"))
     {
@@ -287,13 +174,6 @@ cupsMarkOptions(
       	/* HP */
       ppd_mark_option(ppd, "CNRes_PGP", optptr->value);
       	/* Canon */
-    }
-    else if (!strcasecmp(optptr->name, "output-bin"))
-    {
-      if (!cupsGetOption("OutputBin", num_options, options) &&
-	  (ppd_keyword = _pwgGetOutputBin((_pwg_t *)ppd->pwg,
-	                                  optptr->value)) != NULL)
-	ppd_mark_option(ppd, "OutputBin", ppd_keyword);
     }
     else if (!strcasecmp(optptr->name, "multiple-document-handling"))
     {
@@ -668,6 +548,7 @@ ppdNextOption(ppd_file_t *ppd)		/* I - PPD file */
  * This function looks for strings of the form:
  *
  *     *option choice ... *optionN choiceN
+ *     property value ... propertyN valueN
  *
  * It stops when it finds a string that doesn't match this format.
  */
@@ -676,10 +557,11 @@ int					/* O  - Number of options */
 _ppdParseOptions(
     const char    *s,			/* I  - String to parse */
     int           num_options,		/* I  - Number of options */
-    cups_option_t **options)		/* IO - Options */
+    cups_option_t **options,		/* IO - Options */
+    _ppd_parse_t  which)		/* I  - What to parse */
 {
-  char	option[PPD_MAX_NAME],		/* Current option */
-	choice[PPD_MAX_NAME],		/* Current choice */
+  char	option[PPD_MAX_NAME + 1],	/* Current option/property */
+	choice[PPD_MAX_NAME],		/* Current choice/value */
 	*ptr;				/* Pointer into option or choice */
 
 
@@ -687,8 +569,8 @@ _ppdParseOptions(
     return (num_options);
 
  /*
-  * Read all of the "*Option Choice" pairs from the string, marking PPD
-  * options as we go...
+  * Read all of the "*Option Choice" and "property value" pairs from the
+  * string, add them to an options array as we go...
   */
 
   while (*s)
@@ -700,19 +582,15 @@ _ppdParseOptions(
     while (isspace(*s & 255))
       s ++;
 
-    if (*s != '*')
-      break;
-
    /*
-    * Get the option name...
+    * Get the option/property name...
     */
 
-    s ++;
     ptr = option;
     while (*s && !isspace(*s & 255) && ptr < (option + sizeof(option) - 1))
       *ptr++ = *s++;
 
-    if (ptr == s)
+    if (ptr == s || !isspace(*s & 255))
       break;
 
     *ptr = '\0';
@@ -731,13 +609,19 @@ _ppdParseOptions(
     while (*s && !isspace(*s & 255) && ptr < (choice + sizeof(choice) - 1))
       *ptr++ = *s++;
 
+    if (!isspace(*s & 255) && *s)
+      break;
+
     *ptr = '\0';
 
    /*
     * Add it to the options array...
     */
 
-    num_options = cupsAddOption(option, choice, num_options, options);
+    if (option[0] == '*' && which != _PPD_PARSE_PROPERTIES)
+      num_options = cupsAddOption(option + 1, choice, num_options, options);
+    else if (option[0] != '*' && which != _PPD_PARSE_OPTIONS)
+      num_options = cupsAddOption(option, choice, num_options, options);
   }
 
   return (num_options);
@@ -806,7 +690,7 @@ ppd_mark_choices(ppd_file_t *ppd,	/* I - PPD file */
     return;
 
   options     = NULL;
-  num_options = _ppdParseOptions(s, 0, &options);
+  num_options = _ppdParseOptions(s, 0, &options, 0);
 
   for (i = num_options, option = options; i > 0; i --, option ++)
     ppd_mark_option(ppd, option->name, option->value);

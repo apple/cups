@@ -46,11 +46,14 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
 		num_sizes,		/* Number of sizes in file */
 		num_sources,		/* Number of sources in file */
 		num_types;		/* Number of types in file */
-  char		line[512],		/* Current line */
+  char		line[2048],		/* Current line */
 		*value,			/* Pointer to value in line */
+		*valueptr,		/* Pointer into value */
 		pwg_keyword[128],	/* PWG keyword */
 		ppd_keyword[PPD_MAX_NAME];
 					/* PPD keyword */
+  _pwg_output_mode_t output_mode;	/* Output mode for preset */
+  _pwg_print_quality_t print_quality;	/* Print quality for preset */
 
 
   DEBUG_printf(("_pwgCreateWithFile(filename=\"%s\")", filename));
@@ -331,6 +334,38 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
 
       pwg->num_types ++;
     }
+    else if (!strcasecmp(line, "Preset"))
+    {
+     /*
+      * Preset output-mode print-quality name=value ...
+      */
+
+      output_mode   = (_pwg_output_mode_t)strtol(value, &valueptr, 10);
+      print_quality = (_pwg_print_quality_t)strtol(valueptr, &valueptr, 10);
+
+      if (output_mode < _PWG_OUTPUT_MODE_MONOCHROME ||
+          output_mode >= _PWG_OUTPUT_MODE_MAX ||
+	  print_quality < _PWG_PRINT_QUALITY_DRAFT ||
+	  print_quality >= _PWG_PRINT_QUALITY_MAX ||
+	  valueptr == value || !*valueptr)
+      {
+        DEBUG_printf(("_pwgCreateWithFile: Bad Preset on line %d.", linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PWG mapping file."), 1);
+	goto create_error;
+      }
+
+      pwg->num_presets[output_mode][print_quality] =
+          cupsParseOptions(valueptr, 0,
+	                   pwg->presets[output_mode] + print_quality);
+    }
+    else if (!strcasecmp(line, "SidesOption"))
+      pwg->sides_option = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides1Sided"))
+      pwg->sides_1sided = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides2SidedLong"))
+      pwg->sides_2sided_long = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides2SidedShort"))
+      pwg->sides_2sided_short = _cupsStrAlloc(value);
     else
     {
       DEBUG_printf(("_pwgCreateWithFile: Unknown %s on line %d.", line,
@@ -466,10 +501,11 @@ int					/* O - 1 on success, 0 on failure */
 _pwgWriteFile(_pwg_t     *pwg,		/* I - PWG mapping data */
               const char *filename)	/* I - File to write */
 {
-  int		i;			/* Looping var */
+  int		i, j, k;		/* Looping vars */
   cups_file_t	*fp;			/* Output file */
   _pwg_size_t	*size;			/* Current size */
   _pwg_map_t	*map;			/* Current map */
+  cups_option_t	*option;		/* Current option */
 
 
  /*
@@ -546,6 +582,38 @@ _pwgWriteFile(_pwg_t     *pwg,		/* I - PWG mapping data */
     for (i = pwg->num_types, map = pwg->types; i > 0; i --, map ++)
       cupsFilePrintf(fp, "Type %s %s\n", map->pwg, map->ppd);
   }
+
+ /*
+  * Presets...
+  */
+
+  for (i = _PWG_OUTPUT_MODE_MONOCHROME; i < _PWG_OUTPUT_MODE_MAX; i ++)
+    for (j = _PWG_PRINT_QUALITY_DRAFT; i < _PWG_PRINT_QUALITY_MAX; i ++)
+      if (pwg->num_presets[i][j])
+      {
+	cupsFilePrintf(fp, "Preset %d %d", i, j);
+	for (k = pwg->num_presets[i][j], option = pwg->presets[i][j];
+	     k > 0;
+	     k --, option ++)
+	  cupsFilePrintf(fp, " %s=%s", option->name, option->value);
+	cupsFilePutChar(fp, '\n');
+      }
+
+ /*
+  * Duplex/sides...
+  */
+
+  if (pwg->sides_option)
+    cupsFilePrintf(fp, "SidesOption %s\n", pwg->sides_option);
+
+  if (pwg->sides_1sided)
+    cupsFilePrintf(fp, "Sides1Sided %s\n", pwg->sides_1sided);
+
+  if (pwg->sides_2sided_long)
+    cupsFilePrintf(fp, "Sides2SidedLong %s\n", pwg->sides_2sided_long);
+
+  if (pwg->sides_2sided_short)
+    cupsFilePrintf(fp, "Sides2SidedShort %s\n", pwg->sides_2sided_short);
 
  /*
   * Close and return...
