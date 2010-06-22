@@ -2683,8 +2683,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
 
 int					/* O - 1 if something changed, 0 otherwise */
 cupsdSetPrinterReasons(
-    cupsd_printer_t  *p,		/* I - Printer */
-    const char *s)			/* I - Reasons strings */
+    cupsd_printer_t *p,			/* I - Printer */
+    const char      *s)			/* I - Reasons strings */
 {
   int		i,			/* Looping var */
 		changed = 0;		/* Did something change? */

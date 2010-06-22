@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- The scheduler now clears the printer-state-reasons when the driver is
+	  changed (STR #3570)
 	- The web interface did not allow a user to change the driver
 	  (STR #3537, STR #3601)
 	- The scheduler was not setting the PATH_INFO environment variable when

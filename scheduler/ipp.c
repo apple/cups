@@ -2939,7 +2939,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
    /*
     * If we changed the PPD/interface script, then remove the printer's cache
-    * file...
+    * file and clear the printer-state-reasons...
     */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
@@ -2951,6 +2951,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg", CacheDir,
              printer->name);
     unlink(cache_name);
+
+    cupsdSetPrinterReasons(printer, "none");
 
 #ifdef __APPLE__
    /*
