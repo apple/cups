@@ -4550,7 +4550,12 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   argv[0] = command;
 
   if (options)
-    strlcpy(argbuf, options, sizeof(argbuf));
+  {
+    commptr = options;
+    if (*commptr == ' ')
+      commptr ++;
+    strlcpy(argbuf, commptr, sizeof(argbuf));
+  }
   else
     argbuf[0] = '\0';
 

@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.5
 
+	- The scheduler was not setting the PATH_INFO environment variable when
+	  needed (STR #3600)
 	- The scheduler incorrectly set the CUPSD_AUTH_TYPE environment
 	  variable instead of AUTH_TYPE (STR #3599)
 	- Fixed a buffer overrun in the PPD compiler (STR #3594)
