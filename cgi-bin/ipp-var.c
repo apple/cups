@@ -285,10 +285,14 @@ cgiMoveJobs(http_t     *http,		/* I - Connection to server */
 
 
  /*
-  * See who is logged in...
+  * Make sure we have a username...
   */
 
-  user = getenv("REMOTE_USER");
+  if ((user = getenv("REMOTE_USER")) == NULL)
+  {
+    puts("Status: 401\n");
+    exit(0);
+  }
 
  /*
   * See if the user has already selected a new destination...
