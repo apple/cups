@@ -3,8 +3,9 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.5
 
+	- Documentation fixes (STR #3542)
 	- The web interface did not allow a user to change the driver
-	  (STR #3601)
+	  (STR #3537, STR #3601)
 	- The scheduler was not setting the PATH_INFO environment variable when
 	  needed (STR #3600)
 	- The scheduler incorrectly set the CUPSD_AUTH_TYPE environment
