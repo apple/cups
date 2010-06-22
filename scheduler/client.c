@@ -4504,7 +4504,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
   char		argbuf[10240],		/* Argument buffer */
 		*argv[100],		/* Argument strings */
 		*envp[MAX_ENV + 20];	/* Environment variables */
-  char		auth_type[256],		/* CUPSD_AUTH_TYPE environment variable */
+  char		auth_type[256],		/* AUTH_TYPE environment variable */
 		content_length[1024],	/* CONTENT_LENGTH environment variable */
 		content_type[1024],	/* CONTENT_TYPE environment variable */
 		http_cookie[32768],	/* HTTP_COOKIE environment variable */
@@ -4649,7 +4649,7 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   if (con->username[0])
   {
-    snprintf(auth_type, sizeof(auth_type), "CUPSD_AUTH_TYPE=%s",
+    snprintf(auth_type, sizeof(auth_type), "AUTH_TYPE=%s",
              httpGetField(HTTP(con), HTTP_FIELD_AUTHORIZATION));
 
     if ((uriptr = strchr(auth_type + 10, ' ')) != NULL)
