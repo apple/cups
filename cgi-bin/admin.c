@@ -951,8 +951,6 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       if (!cgiGetVariable("CURRENT_MAKE"))
         cgiSetVariable("CURRENT_MAKE", make);
 
-      cgiSetVariable("PPD_MAKE", make);
-
       if (!cgiGetVariable("CURRENT_MAKE_AND_MODEL"))
         cgiSetVariable("CURRENT_MAKE_AND_MODEL", uriptr);
 
@@ -1218,8 +1216,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
                  NULL, "ipp://localhost/printers/");
 
-    if ((var = cgiGetVariable("CURRENT_MAKE")) == NULL)
-      var = cgiGetVariable("PPD_MAKE");
+    if ((var = cgiGetVariable("PPD_MAKE")) == NULL)
+      var = cgiGetVariable("CURRENT_MAKE");
     if (var && !cgiGetVariable("SELECT_MAKE"))
     {
       const char *make_model;		/* Make and model */
