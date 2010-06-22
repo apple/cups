@@ -2045,8 +2045,8 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 	var = find_variable(name);
 	if (var)
 	{
-	  strncpy(bufptr, var->value->value, bufend - bufptr);
-	  bufptr += strlen(var->value->value);
+	  strlcpy(bufptr, var->value->value, bufend - bufptr + 1);
+	  bufptr += strlen(bufptr);
 	}
 	else
 	{
@@ -2056,7 +2056,7 @@ ppdcSource::get_token(ppdcFile *fp,	// I - File to read
 			      "%s.\n"), name, fp->line, fp->filename);
 
 	  snprintf(bufptr, bufend - bufptr + 1, "$%s", name);
-	  bufptr += strlen(name) + 1;
+	  bufptr += strlen(bufptr);
 	}
       }
     }
