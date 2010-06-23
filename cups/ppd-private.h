@@ -134,10 +134,6 @@ extern int		_ppdParseOptions(const char *s, int num_options,
 extern _pwg_t		*_pwgCreateWithFile(const char *filename);
 extern _pwg_t		*_pwgCreateWithPPD(ppd_file_t *ppd);
 extern void		_pwgDestroy(_pwg_t *pwg);
-extern void		_pwgGenerateSize(char *keyword, size_t keysize,
-				         const char *prefix,
-					 const char *ppdname,
-					 int width, int length);
 extern const char	*_pwgGetBin(_pwg_t *pwg, const char *output_bin);
 extern const char	*_pwgGetInputSlot(_pwg_t *pwg, ipp_t *job,
 			                  const char *keyword);

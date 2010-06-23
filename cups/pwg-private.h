@@ -79,6 +79,10 @@ typedef struct _pwg_size_s		/**** Size element - PPD to/from PWG */
  * Functions...
  */
 
+extern void		_pwgGenerateSize(char *keyword, size_t keysize,
+				         const char *prefix,
+					 const char *name,
+					 int width, int length);
 extern int		_pwgInitSize(_pwg_size_t *size, ipp_t *job,
 				     int *margins_set);
 extern _pwg_media_t	*_pwgMediaForLegacy(const char *legacy);

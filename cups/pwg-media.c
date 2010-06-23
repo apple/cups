@@ -15,6 +15,7 @@
  *
  * Contents:
  *
+ *   _pwgGenerateSize()   - Generate a PWG size keyword.
  *   _pwgInitSize()       - Initialize a PWG size using IPP job template
  *                          attributes.
  *   _pwgMediaForLegacy() - Find a PWG media size by ISO/IPP legacy name.
@@ -234,6 +235,79 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_MM("om_folio-sp_215x315mm", NULL, NULL, 215, 315),
   _PWG_MEDIA_MM("om_invite_220x220mm", NULL, "EnvInvite", 220, 220)
 };
+
+
+/*
+ * '_pwgGenerateSize()' - Generate a PWG size keyword.
+ */
+
+void
+_pwgGenerateSize(char       *keyword,	/* I - Keyword buffer */
+                 size_t     keysize,	/* I - Size of keyword buffer */
+		 const char *prefix,	/* I - Prefix for PWG size or NULL */
+		 const char *name,	/* I - Size name or NULL */
+		 int        width,	/* I - Width of page in 2540ths */
+		 int        length)	/* I - Length of page in 2540ths */
+{
+  struct lconv	*loc;			/* Locale conversion data */
+  double	uwidth,			/* Width in inches or millimeters */
+		ulength;		/* Height in inches or millimeters */
+  const char	*units;			/* Units to report */
+  char		usize[12 + 1 + 12 + 3],	/* Unit size: NNNNNNNNNNNNxNNNNNNNNNNNNuu */
+		*uptr;			/* Pointer into unit size */
+
+
+  loc = localeconv();
+
+  if ((width % 635) == 0 && (length % 635) == 0)
+  {
+   /*
+    * Use inches since the size is a multiple of 1/4 inch.
+    */
+
+    uwidth  = width / 2540.0;
+    ulength = length / 2540.0;
+    units   = "in";
+
+    if (!prefix)
+      prefix = "oe";
+  }
+  else
+  {
+   /*
+    * Use millimeters since the size is not a multiple of 1/4 inch.
+    */
+
+    uwidth  = width * 0.01;
+    ulength = length * 0.01;
+    units   = "mm";
+
+    if (!prefix)
+      prefix = "om";
+  }
+
+  uptr = usize;
+  _cupsStrFormatd(uptr, uptr + 12, uwidth, loc);
+  uptr += strlen(uptr);
+  *uptr++ = 'x';
+  _cupsStrFormatd(uptr, uptr + 12, ulength, loc);
+  uptr += strlen(uptr);
+
+ /*
+  * Safe because usize can hold up to 12 + 1 + 12 + 4 bytes.
+  */
+
+  strcpy(uptr, units);
+
+  if (!name)
+    name = usize;
+
+ /*
+  * Format the name...
+  */
+
+  snprintf(keyword, keysize, "%s_%s_%s", prefix, name, usize);
+}
 
 
 /*
