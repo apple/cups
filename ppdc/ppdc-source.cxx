@@ -1363,17 +1363,17 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	while (isspace(*newv & 255))
 	  newv ++;
 
-        if (strncmp(newv, "==", 2))
+        if (!strncmp(newv, "==", 2))
 	{
 	  compop = PPDC_EQ;
 	  newv += 2;
 	}
-        else if (strncmp(newv, "!=", 2))
+        else if (!strncmp(newv, "!=", 2))
         {
 	  compop = PPDC_NE;
 	  newv += 2;
 	}
-        else if (strncmp(newv, "<=", 2))
+        else if (!strncmp(newv, "<=", 2))
         {
 	  compop = PPDC_LE;
 	  newv += 2;
@@ -1383,7 +1383,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
 	  compop = PPDC_LT;
 	  newv ++;
 	}
-        else if (strncmp(newv, ">=", 2))
+        else if (!strncmp(newv, ">=", 2))
         {
 	  compop = PPDC_GE;
 	  newv += 2;
@@ -1404,7 +1404,7 @@ ppdcSource::get_integer(const char *v)	// I - Value string
           if (*newv == ')' || !*newv)
 	    return (-1);
 
-	  if (isdigit(*v & 255) || *v == '-' || *v == '+')
+	  if (isdigit(*newv & 255) || *newv == '-' || *newv == '+')
 	  {
 	    // Get the second number...
 	    temp2 = strtol(newv, &newv, 0);

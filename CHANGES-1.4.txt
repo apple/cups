@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- Relational operators were broken in #if/#elif/#else/#endif expressions
+	  for the PPD compiler.
 	- Moving a job via the web interface failed without asking for
 	  authentication (STR #3559)
 	- The scheduler now clears the printer-state-reasons when the driver is
