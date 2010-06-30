@@ -825,6 +825,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         return (CUPS_BACKEND_FAILED);
       }
 
+      fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(error));
+
       if (error == ECONNREFUSED || error == EHOSTDOWN ||
           error == EHOSTUNREACH)
       {
@@ -834,9 +836,29 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintf(stderr,
-			_("WARNING: Network host \'%s\' is busy; will retry in "
-			  "%d seconds...\n"), hostname, delay);
+	switch (error)
+	{
+	  case EHOSTDOWN :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' may not exist "
+			        "or is unavailable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case EHOSTUNREACH :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is "
+			        "unreachable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case ECONNREFUSED :
+	  default :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is busy.\n"),
+			      hostname);
+	      break;
+        }
 
 	sleep(delay);
 
@@ -853,9 +875,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
       else
       {
-        fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
-	_cupsLangPuts(stderr, _("INFO: The printer is not responding; will retry in 30 "
-						  "seconds...\n"));
+	_cupsLangPrintf(stderr, _("ERROR: Network printer \'%s\' is not "
+	                          "responding.\n"), hostname);
 	sleep(30);
       }
     }

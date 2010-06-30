@@ -472,6 +472,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
+      int error = errno;		/* Connection error */
+
       if (job_canceled)
 	break;
 
@@ -497,6 +499,8 @@ main(int  argc,				/* I - Number of command-line args */
         return (CUPS_BACKEND_FAILED);
       }
 
+      fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
+
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
           errno == EHOSTUNREACH)
       {
@@ -506,10 +510,29 @@ main(int  argc,				/* I - Number of command-line args */
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintf(stderr,
-			_("WARNING: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"),
-			hostname, delay);
+	switch (error)
+	{
+	  case EHOSTDOWN :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' may not exist "
+			        "or is unavailable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case EHOSTUNREACH :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is "
+			        "unreachable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case ECONNREFUSED :
+	  default :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is busy.\n"),
+			      hostname);
+	      break;
+        }
 
 	sleep(delay);
 
@@ -518,16 +541,15 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (h_errno)
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unable to locate network printer \'%s\'.\n"),
 			hostname);
 	return (CUPS_BACKEND_STOP);
       }
       else
       {
-        fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
-	_cupsLangPuts(stderr,
-	              _("INFO: The printer is not responding; will retry in 30 "
-		        "seconds...\n"));
+	_cupsLangPrintf(stderr, _("ERROR: Network printer \'%s\' is not "
+	                          "responding.\n"), hostname);
 	sleep(30);
       }
 
