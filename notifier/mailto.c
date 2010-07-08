@@ -368,8 +368,10 @@ email_message(const char *to,		/* I - Recipient of message */
     fputs("DEBUG: QUIT\n", stderr);
 
     if (!cupsFileGets(fp, response, sizeof(response)) || atoi(response) >= 500)
-      goto smtp_error;
-    fprintf(stderr, "DEBUG: <<< %s\n", response);
+      fprintf(stderr, "ERROR: Got \"%s\" trying to QUIT connection.\n",
+              response);
+    else
+      fprintf(stderr, "DEBUG: <<< %s\n", response);
 
     cupsFileClose(fp);
 
