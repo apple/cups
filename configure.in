@@ -31,9 +31,9 @@ sinclude(config-scripts/cups-poll.m4)
 sinclude(config-scripts/cups-slp.m4)
 sinclude(config-scripts/cups-gssapi.m4)
 sinclude(config-scripts/cups-ldap.m4)
+sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-ssl.m4)
 sinclude(config-scripts/cups-pam.m4)
-sinclude(config-scripts/cups-threads.m4)
 sinclude(config-scripts/cups-largefile.m4)
 sinclude(config-scripts/cups-dnssd.m4)
 sinclude(config-scripts/cups-launchd.m4)
@@ -80,7 +80,6 @@ AC_OUTPUT(Makedefs
 	  man/cupsaddsmb.man
 	  man/cupsd.conf.man
 	  man/cupsd.man
-	  man/drv.man
 	  man/lpoptions.man
 	  scheduler/cups-lpd.xinetd
 	  scheduler/cups.sh

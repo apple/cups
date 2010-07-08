@@ -38,6 +38,8 @@ if test x$enable_ssl != xno; then
 		AC_DEFINE(HAVE_CDSASSL)
 
 		dnl Check for the various security headers...
+		AC_CHECK_HEADER(Security/SecItemPriv.h,
+		    AC_DEFINE(HAVE_SECITEMPRIV_H))
 		AC_CHECK_HEADER(Security/SecPolicy.h,
 		    AC_DEFINE(HAVE_SECPOLICY_H))
 		AC_CHECK_HEADER(Security/SecPolicyPriv.h,
@@ -54,6 +56,15 @@ if test x$enable_ssl != xno; then
 		    AC_MSG_RESULT(yes)
 		else
 		    AC_MSG_RESULT(no)
+		fi
+
+		dnl Check for SecPolicyCreateSSL...
+		AC_MSG_CHECKING(for SecPolicyCreateSSL)
+		if test $uversion -ge 100; then
+		    AC_DEFINE(HAVE_SECPOLICYCREATESSL)
+		    AC_MSG_RESULT(yes)
+		else
+		    AC_MSG_RESULT(no)
 		fi])
 	fi
     fi
@@ -63,24 +74,32 @@ if test x$enable_ssl != xno; then
     	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
     	AC_PATH_PROG(LIBGCRYPTCONFIG,libgcrypt-config)
 	if $PKGCONFIG --exists gnutls; then
-	    have_ssl=1
-	    SSLLIBS=`$PKGCONFIG --libs gnutls`
-	    SSLFLAGS=`$PKGCONFIG --cflags gnutls`
-	    AC_DEFINE(HAVE_SSL)
-	    AC_DEFINE(HAVE_GNUTLS)
-	elif "x$LIBGNUTLSCONFIG" != x; then
-	    have_ssl=1
-	    SSLLIBS=`$LIBGNUTLSCONFIG --libs`
-	    SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
-	    AC_DEFINE(HAVE_SSL)
-	    AC_DEFINE(HAVE_GNUTLS)
+	    if test "x$have_pthread" = xyes; then
+		AC_MSG_WARN([The current version of GNU TLS cannot be made thread-safe.])
+	    else
+	        have_ssl=1
+	        SSLLIBS=`$PKGCONFIG --libs gnutls`
+	        SSLFLAGS=`$PKGCONFIG --cflags gnutls`
+	        AC_DEFINE(HAVE_SSL)
+	        AC_DEFINE(HAVE_GNUTLS)
+	    fi
+	elif test "x$LIBGNUTLSCONFIG" != x; then
+	    if test "x$have_pthread" = xyes; then
+		AC_MSG_WARN([The current version of GNU TLS cannot be made thread-safe.])
+	    else
+	        have_ssl=1
+	        SSLLIBS=`$LIBGNUTLSCONFIG --libs`
+	        SSLFLAGS=`$LIBGNUTLSCONFIG --cflags`
+	        AC_DEFINE(HAVE_SSL)
+	        AC_DEFINE(HAVE_GNUTLS)
+	    fi
 	fi
 
 	if test $have_ssl = 1; then
             if $PKGCONFIG --exists gcrypt; then
 	        SSLLIBS="$SSLLIBS `$PKGCONFIG --libs gcrypt`"
 	        SSLFLAGS="$SSLFLAGS `$PKGCONFIG --cflags gcrypt`"
-	    elif "x$LIBGCRYPTCONFIG" != x; then
+	    elif test "x$LIBGCRYPTCONFIG" != x; then
 	        SSLLIBS="$SSLLIBS `$LIBGCRYPTCONFIG --libs`"
 	        SSLFLAGS="$SSLFLAGS `$LIBGCRYPTCONFIG --cflags`"
 	    fi

@@ -962,6 +962,67 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     con->type = CUPSD_AUTH_DIGEST;
   }
 #ifdef HAVE_GSSAPI
+#  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
+  else if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
+           !strncmp(authorization, "Negotiate", 9)) 
+  {
+   /*
+    * Pull the credentials directly from the user...
+    */
+
+    krb5_error_code	error;		/* Kerberos error code */
+    cupsd_ucred_t	peercred;	/* Peer credentials */
+    socklen_t		peersize;	/* Size of peer credentials */
+    krb5_ccache		peerccache;	/* Peer Kerberos credentials */
+    const char		*peername;	/* Peer username */
+
+    peersize = sizeof(peercred);
+
+#    ifdef __APPLE__
+    if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
+#    else
+    if (getsockopt(con->http.fd, SOL_SOCKET, SO_PEERCRED, &peercred, &peersize))
+#    endif /* __APPLE__ */
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+		      strerror(errno));
+      return;
+    }
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "cupsdAuthorize: Copying credentials for UID %d...",
+		    CUPSD_UCRED_UID(peercred));
+
+    krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
+
+    if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to get credentials cache for UID %d (%d/%s)",
+		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      return;
+    }
+
+    if ((peername = krb5_cc_get_name(KerberosContext, peerccache)) != NULL)
+    {
+      strlcpy(username, peername, sizeof(username));
+
+      con->have_gss = 1;
+      con->type     = CUPSD_AUTH_NEGOTIATE;
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as %s using Negotiate",
+		      username);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to get Kerberos name for UID %d",
+		      (int)CUPSD_UCRED_UID(peercred));
+
+    krb5_cc_close(KerberosContext, peerccache);
+    krb5_ipc_client_clear_target();
+  }
+#  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
   else if (!strncmp(authorization, "Negotiate", 9)) 
   {
     int			len;		/* Length of authorization string */
@@ -1003,7 +1064,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (!*authorization)
     {
       cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "cupsdAuthorize: No authentication data specified.");
+		      "cupsdAuthorize: No authentication data specified.");
       return;
     }
 
@@ -1014,7 +1075,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     len                = strlen(authorization);
     input_token.value  = malloc(len);
     input_token.value  = httpDecode64_2(input_token.value, &len,
-		                        authorization);
+					authorization);
     input_token.length = len;
 
    /*
@@ -1038,7 +1099,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     if (GSS_ERROR(major_status))
     {
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
-                         "cupsdAuthorize: Error accepting GSSAPI security "
+			 "cupsdAuthorize: Error accepting GSSAPI security "
 			 "context");
 
       if (context != GSS_C_NO_CONTEXT)
@@ -1054,7 +1115,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
     if (!con->gss_creds)
       cupsdLogMessage(CUPSD_LOG_DEBUG,
-                      "cupsdAuthorize: No delegated credentials!");
+		      "cupsdAuthorize: No delegated credentials!");
 
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
@@ -1067,7 +1128,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       if (GSS_ERROR(major_status))
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
-                           "cupsdAuthorize: Error getting username");
+			   "cupsdAuthorize: Error getting username");
 	gss_release_cred(&minor_status, &con->gss_creds);
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);

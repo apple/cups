@@ -69,7 +69,6 @@ HELPFILES	=	\
 			help/man-cupsenable.html \
 			help/man-cupstestdsc.html \
 			help/man-cupstestppd.html \
-			help/man-drv.html \
 			help/man-filter.html \
 			help/man-ipptool.html \
 			help/man-ipptoolfile.html \

@@ -1167,6 +1167,19 @@ cupsdReadConfiguration(void)
 
       cupsdLogMessage(CUPSD_LOG_INFO, "<Policy default>");
       cupsdLogMessage(CUPSD_LOG_INFO,
+                      "<Limit Create-Job Print-Job Print-URI Validate-Job>");
+      cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
+
+      po = cupsdAddPolicyOp(p, NULL, IPP_CREATE_JOB);
+      po->order_type = CUPSD_AUTH_ALLOW;
+
+      cupsdAddPolicyOp(p, po, IPP_PRINT_JOB);
+      cupsdAddPolicyOp(p, po, IPP_PRINT_URI);
+      cupsdAddPolicyOp(p, po, IPP_VALIDATE_JOB);
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "</Limit>");
+
+      cupsdLogMessage(CUPSD_LOG_INFO,
                       "<Limit Send-Document Send-URI Cancel-Job Hold-Job "
                       "Release-Job Restart-Job Purge-Jobs "
 		      "Set-Job-Attributes Create-Job-Subscription "
@@ -3682,10 +3695,29 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                linenum);
 
      /*
-      * Verify that we have an explicit policy for Cancel-Jobs, Cancel-My-Jobs,
-      * Close-Job, and CUPS-Get-Document (ensures that upgrades do not
-      * introduce new security issues...)
+      * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
+      * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
+      * upgrades do not introduce new security issues...
       */
+
+      if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
+          op->op == IPP_ANY_OPERATION)
+      {
+        if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
+            op->op != IPP_ANY_OPERATION)
+	{
+	 /*
+	  * Add a new limit for Validate-Job using the Print-Job limit as a
+	  * template...
+	  */
+
+          cupsdLogMessage(CUPSD_LOG_WARN,
+	                  "No limit for Validate-Job defined in policy %s "
+			  "- using Print-Job's policy", pol->name);
+
+          cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
+	}
+      }
 
       if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
           op->op == IPP_ANY_OPERATION)

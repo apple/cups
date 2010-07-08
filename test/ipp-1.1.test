@@ -567,7 +567,7 @@
 	ATTR uri printer-uri $uri
 	ATTR name requesting-user-name $user
 	ATTR keyword which-jobs completed
-	DELAY 10
+	DELAY 20
 
 	STATUS successful-ok
 	EXPECT job-id OF-TYPE integer IN-GROUP job-attributes-tag COUNT 1 WITH-VALUE >0

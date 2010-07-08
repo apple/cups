@@ -28,7 +28,7 @@ if test $# = 0; then
 	svn up
 	rev=`svnversion . | sed -e '1,$s/[a-zA-Z]//g'`
 	fileversion="1.5svn-r$rev"
-	version=snapshot
+	version=snapshots
 else
 	fileversion=$1
 	version=$1

@@ -62,20 +62,29 @@ static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
 _pwg_t *				/* O - PWG mapping data */
 _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 {
-  int		i, j;			/* Looping vars */
-  _pwg_t	*pwg;			/* PWG mapping data */
-  ppd_option_t	*input_slot,		/* InputSlot option */
-		*media_type,		/* MediaType option */
-		*output_bin;		/* OutputBin option */
-  ppd_choice_t	*choice;		/* Current InputSlot/MediaType */
-  _pwg_map_t	*map;			/* Current source/type map */
-  ppd_size_t	*ppd_size;		/* Current PPD size */
-  _pwg_size_t	*pwg_size;		/* Current PWG size */
-  char		pwg_keyword[3 + PPD_MAX_NAME + 1 + 12 + 1 + 12 + 3],
+  int			i, j;		/* Looping vars */
+  _pwg_t		*pwg;		/* PWG mapping data */
+  ppd_option_t		*input_slot,	/* InputSlot option */
+			*media_type,	/* MediaType option */
+			*output_bin,	/* OutputBin option */
+			*color_model,	/* ColorModel option */
+			*duplex;	/* Duplex option */
+  ppd_choice_t		*choice;	/* Current InputSlot/MediaType */
+  _pwg_map_t		*map;		/* Current source/type map */
+  ppd_attr_t		*ppd_attr;	/* Current PPD preset attribute */
+  int			num_options;	/* Number of preset options and props */
+  cups_option_t		*options;	/* Preset options and properties */
+  ppd_size_t		*ppd_size;	/* Current PPD size */
+  _pwg_size_t		*pwg_size;	/* Current PWG size */
+  char			pwg_keyword[3 + PPD_MAX_NAME + 1 + 12 + 1 + 12 + 3],
 					/* PWG keyword string */
-		ppd_name[PPD_MAX_NAME];	/* Normalized PPD name */
-  const char	*pwg_name;		/* Standard PWG media name */
-  _pwg_media_t	*pwg_media;		/* PWG media data */
+			ppd_name[PPD_MAX_NAME];
+					/* Normalized PPD name */
+  const char		*pwg_name;	/* Standard PWG media name */
+  _pwg_media_t		*pwg_media;	/* PWG media data */
+  _pwg_output_mode_t	pwg_output_mode;/* output-mode index */
+  _pwg_print_quality_t	pwg_print_quality;
+					/* print-quality index */
 
 
   DEBUG_printf(("_pwgCreateWithPPD(ppd=%p)", ppd));
@@ -358,6 +367,171 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
       map->pwg = _cupsStrAlloc(pwg_keyword);
       map->ppd = _cupsStrAlloc(choice->choice);
+    }
+  }
+
+  if ((ppd_attr = ppdFindAttr(ppd, "APPrinterPreset", NULL)) != NULL)
+  {
+   /*
+    * Copy and convert APPrinterPreset (output-mode + print-quality) data...
+    */
+
+    const char	*quality,		/* com.apple.print.preset.quality value */
+		*output_mode,		/* com.apple.print.preset.output-mode value */
+		*color_model_val;	/* ColorModel choice */
+
+
+    do
+    {
+      num_options = _ppdParseOptions(ppd_attr->value, 0, &options,
+                                     _PPD_PARSE_ALL);
+
+      if ((quality = cupsGetOption("com.apple.print.preset.quality",
+                                   num_options, options)) != NULL)
+      {
+       /*
+        * Get the print-quality for this preset...
+	*/
+
+	if (!strcmp(quality, "low"))
+	  pwg_print_quality = _PWG_PRINT_QUALITY_DRAFT;
+	else if (!strcmp(quality, "high"))
+	  pwg_print_quality = _PWG_PRINT_QUALITY_HIGH;
+	else
+	  pwg_print_quality = _PWG_PRINT_QUALITY_NORMAL;
+
+       /*
+        * Get the output mode for this preset...
+	*/
+
+        output_mode     = cupsGetOption("com.apple.print.preset.output-mode",
+	                                num_options, options);
+        color_model_val = cupsGetOption("ColorModel", num_options, options);
+
+        if (output_mode)
+	{
+	  if (!strcmp(output_mode, "monochrome"))
+	    pwg_output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+	  else
+	    pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+	}
+	else if (color_model_val)
+	{
+	  if (!strcasecmp(color_model_val, "Gray"))
+	    pwg_output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+	  else
+	    pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+	}
+	else
+	  pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+
+       /*
+        * Save the options for this combination as needed...
+	*/
+
+        if (!pwg->num_presets[pwg_output_mode][pwg_print_quality])
+	  pwg->num_presets[pwg_output_mode][pwg_print_quality] =
+	      _ppdParseOptions(ppd_attr->value, 0,
+	                       pwg->presets[pwg_output_mode] +
+			           pwg_print_quality, _PPD_PARSE_OPTIONS);
+      }
+
+      cupsFreeOptions(num_options, options);
+    }
+    while ((ppd_attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL)) != NULL);
+  }
+
+  if (!pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_DRAFT] &&
+      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_NORMAL] &&
+      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_HIGH] &&
+      (color_model = ppdFindOption(ppd, "ColorModel")) != NULL &&
+      ppdFindChoice(color_model, "Gray"))
+  {
+   /*
+    * Copy and convert ColorModel (output-mode) data...
+    */
+
+    cups_option_t	*coption,	/* Color option */
+			*moption;	/* Monochrome option */
+
+    for (pwg_print_quality = _PWG_PRINT_QUALITY_DRAFT;
+         pwg_print_quality < _PWG_PRINT_QUALITY_MAX;
+	 pwg_print_quality ++)
+    {
+      if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_print_quality])
+      {
+       /*
+        * Copy the color options...
+	*/
+
+        num_options = pwg->num_presets[_PWG_OUTPUT_MODE_COLOR]
+	                              [pwg_print_quality];
+	options     = calloc(sizeof(cups_option_t), num_options);
+
+	if (options)
+	{
+	  for (i = num_options, moption = options,
+	           coption = pwg->presets[_PWG_OUTPUT_MODE_COLOR]
+		                         [pwg_print_quality];
+	       i > 0;
+	       i --, moption ++, coption ++)
+	  {
+	    moption->name  = _cupsStrRetain(coption->name);
+	    moption->value = _cupsStrRetain(coption->value);
+	  }
+
+	  pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	      num_options;
+	  pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	      options;
+	}
+      }
+      else if (pwg_print_quality != _PWG_PRINT_QUALITY_NORMAL)
+        continue;
+
+     /*
+      * Add ColorModel=Gray to the preset...
+      */
+
+      pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+          cupsAddOption("ColorModel", "Gray",
+	                pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME]
+			                [pwg_print_quality],
+			pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME] +
+			    pwg_print_quality);
+    }
+  }
+
+ /*
+  * Copy and convert Duplex (sides) data...
+  */
+
+  if ((duplex = ppdFindOption(ppd, "Duplex")) == NULL)
+    if ((duplex = ppdFindOption(ppd, "JCLDuplex")) == NULL)
+      if ((duplex = ppdFindOption(ppd, "EFDuplex")) == NULL)
+        if ((duplex = ppdFindOption(ppd, "EFDuplexing")) == NULL)
+	  duplex = ppdFindOption(ppd, "KD03Duplex");
+
+  if (duplex)
+  {
+    pwg->sides_option = _cupsStrAlloc(duplex->keyword);
+
+    for (i = duplex->num_choices, choice = duplex->choices;
+         i > 0;
+	 i --, choice ++)
+    {
+      if ((!strcasecmp(choice->choice, "None") ||
+	   !strcasecmp(choice->choice, "False")) && !pwg->sides_1sided)
+        pwg->sides_1sided = _cupsStrAlloc(choice->choice);
+      else if ((!strcasecmp(choice->choice, "DuplexNoTumble") ||
+	        !strcasecmp(choice->choice, "LongEdge") ||
+	        !strcasecmp(choice->choice, "Top")) && !pwg->sides_2sided_long)
+        pwg->sides_2sided_long = _cupsStrAlloc(choice->choice);
+      else if ((!strcasecmp(choice->choice, "DuplexTumble") ||
+	        !strcasecmp(choice->choice, "ShortEdge") ||
+	        !strcasecmp(choice->choice, "Bottom")) &&
+	       !pwg->sides_2sided_short)
+        pwg->sides_2sided_short = _cupsStrAlloc(choice->choice);
     }
   }
 

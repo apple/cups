@@ -336,7 +336,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
 
   /**** New in CUPS 1.5 ****/
-  void		*pwg;			/* PWG to/from PPD mappings */
+  void		*pwg;			/* PWG to/from PPD mappings @since CUPS 1.5@ @private@ */
 } ppd_file_t;
 
 

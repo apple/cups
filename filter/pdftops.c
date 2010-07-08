@@ -133,7 +133,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fd = cupsTempFd(tempfile, sizeof(tempfile))) < 0)
     {
-      _cupsLangPrintError(_("ERROR: Unable to copy PDF file"));
+      perror("DEBUG: Unable to copy PDF file");
       return (1);
     }
 
@@ -409,7 +409,7 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (pipe(pstops_pipe))
   {
-    _cupsLangPrintError(_("ERROR: Unable to create pipe"));
+    perror("DEBUG: Unable to create pipe");
 
     exit_status = 1;
     goto error;
@@ -427,10 +427,10 @@ main(int  argc,				/* I - Number of command-line args */
 
 #ifdef HAVE_PDFTOPS
     execv(CUPS_PDFTOPS, pdf_argv);
-    _cupsLangPrintError(_("ERROR: Unable to execute pdftops program"));
+    perror("DEBUG: Unable to execute pdftops program");
 #else
     execv(CUPS_GHOSTSCRIPT, pdf_argv);
-    _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
+    perror("DEBUG: Unable to execute gs program");
 #endif /* HAVE_PDFTOPS */
 
     exit(1);
@@ -442,9 +442,9 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
 #ifdef HAVE_PDFTOPS
-    _cupsLangPrintError(_("ERROR: Unable to execute pdftops program"));
+    perror("DEBUG: Unable to execute pdftops program");
 #else
-    _cupsLangPrintError(_("ERROR: Unable to execute gs program"));
+    perror("DEBUG: Unable to execute gs program");
 #endif /* HAVE_PDFTOPS */
 
     exit_status = 1;
@@ -464,7 +464,7 @@ main(int  argc,				/* I - Number of command-line args */
     close(pstops_pipe[1]);
 
     execv(pstops_path, pstops_argv);
-    _cupsLangPrintError(_("ERROR: Unable to execute pstops program"));
+    perror("DEBUG: Unable to execute pstops program");
 
     exit(1);
   }
@@ -474,7 +474,7 @@ main(int  argc,				/* I - Number of command-line args */
     * Unable to fork!
     */
 
-    _cupsLangPrintError(_("ERROR: Unable to execute pstops program"));
+    perror("DEBUG: Unable to execute pstops program");
 
     exit_status = 1;
     goto error;

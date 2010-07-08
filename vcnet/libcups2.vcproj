@@ -1302,6 +1302,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\cups\sspi.c"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\string.c"
 				>
 				<FileConfiguration
@@ -1372,6 +1376,10 @@
 						PreprocessorDefinitions="WIN32"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\cups\thread.c"
+				>
 			</File>
 			<File
 				RelativePath="..\cups\transcode.c"
@@ -1572,7 +1580,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\cups\sspi-private.h"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\thread-private.h"
 				>
 			</File>
 			<File

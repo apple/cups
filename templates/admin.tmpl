@@ -105,6 +105,6 @@
 <THEAD><TR><TH>Name</TH><TH>Events</TH><TH>Queue Name</TH></TR></THEAD>
 <TBODY>{[notify_subscription_id]
 <TR><TD><A HREF="{notify_recipient_uri}">{notify_recipient_name}</A><BR>
-<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
+<FORM ACTION="/admin/" METHOD="POST"><INPUT TYPE="HIDDEN" NAME="org.cups.sid" VALUE="{$org.cups.sid}"><INPUT TYPE="HIDDEN" NAME="OP" VALUE="cancel-subscription"><INPUT TYPE="HIDDEN" NAME="notify_subscription_id" VALUE="{notify_subscription_id}"><INPUT TYPE="SUBMIT" VALUE="Cancel RSS Subscription"></FORM>&nbsp;</TD><TD>{notify_events}</TD><TD NOWRAP>&nbsp;{notify_printer_name?{notify_printer_name}:All Queues}</TD></TR>}
 </TBODY>
 </TABLE>:}

@@ -289,6 +289,7 @@
  */
 
 #undef HAVE_AUTHORIZATION_H
+#undef HAVE_SECITEMPRIV_H
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
 #undef HAVE_SECBASEPRIV_H
@@ -300,6 +301,13 @@
  */
 
 #undef HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
+
+
+/*
+ * Do we have the SecPolicyCreateSSL function?
+ */
+
+#undef HAVE_SECPOLICYCREATESSL
 
 
 /*
@@ -340,6 +348,13 @@
  */
 
 #undef HAVE_SYS_IOCTL_H
+
+
+/*
+ * Does the "stat" structure contain the "st_gen" member?
+ */
+
+#undef HAVE_ST_GEN
 
 
 /*

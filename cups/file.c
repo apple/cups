@@ -59,6 +59,8 @@
  */
 
 #include "file-private.h"
+#include <sys/stat.h>
+#include <sys/types.h>
 
 
 /*
@@ -69,6 +71,7 @@
 static ssize_t	cups_compress(cups_file_t *fp, const char *buf, size_t bytes);
 #endif /* HAVE_LIBZ */
 static ssize_t	cups_fill(cups_file_t *fp);
+static int	cups_open(const char *filename, int mode);
 static ssize_t	cups_read(cups_file_t *fp, char *buf, size_t bytes);
 static ssize_t	cups_write(cups_file_t *fp, const char *buf, size_t bytes);
 
@@ -827,7 +830,8 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
   switch (*mode)
   {
     case 'a' : /* Append file */
-        fd = open(filename, O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE | O_BINARY, 0666);
+        fd = cups_open(filename,
+		       O_RDWR | O_CREAT | O_APPEND | O_LARGEFILE | O_BINARY);
         break;
 
     case 'r' : /* Read file */
@@ -835,7 +839,21 @@ cupsFileOpen(const char *filename,	/* I - Name of file */
 	break;
 
     case 'w' : /* Write file */
-        fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT | O_LARGEFILE | O_BINARY, 0666);
+        fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY);
+	if (fd < 0 && errno == ENOENT)
+	{
+	  fd = cups_open(filename,
+	                 O_WRONLY | O_CREAT | O_EXCL | O_LARGEFILE | O_BINARY);
+	  if (fd < 0 && errno == EEXIST)
+	    fd = cups_open(filename, O_WRONLY | O_LARGEFILE | O_BINARY);
+	}
+
+	if (fd >= 0)
+#ifdef WIN32
+	  _chsize(fd, 0);
+#else
+	  ftruncate(fd, 0);
+#endif /* WIN32 */
         break;
 
     case 's' : /* Read/write socket */
@@ -2205,6 +2223,94 @@ cups_fill(cups_file_t *fp)		/* I - CUPS file */
   fp->end = fp->buf + bytes;
 
   return (bytes);
+}
+
+
+/*
+ * 'cups_open()' - Safely open a file for writing.
+ *
+ * We don't allow appending to directories or files that are hard-linked or
+ * symlinked.
+ */
+
+static int				/* O - File descriptor or -1 otherwise */
+cups_open(const char *filename,		/* I - Filename */
+	  int        mode)		/* I - Open mode */
+{
+  int		fd;			/* File descriptor */
+  struct stat	fileinfo;		/* File information */
+#ifndef WIN32
+  struct stat	linkinfo;		/* Link information */
+#endif /* !WIN32 */
+
+
+ /*
+  * Open the file...
+  */
+
+  if ((fd = open(filename, mode, 0666)) < 0)
+    return (-1);
+
+ /*
+  * Then verify that the file descriptor doesn't point to a directory or hard-
+  * linked file.
+  */
+
+  if (fstat(fd, &fileinfo))
+  {
+    close(fd);
+    return (-1);
+  }
+
+  if (fileinfo.st_nlink != 1)
+  {
+    close(fd);
+    errno = EPERM;
+    return (-1);
+  }
+
+#ifdef WIN32
+  if (fileinfo.st_mode & _S_IFDIR)
+#else
+  if (S_ISDIR(fileinfo.st_mode))
+#endif /* WIN32 */
+  {
+    close(fd);
+    errno = EISDIR;
+    return (-1);
+  }
+
+#ifndef WIN32
+ /*
+  * Then use lstat to determine whether the filename is a symlink...
+  */
+
+  if (lstat(filename, &linkinfo))
+  {
+    close(fd);
+    return (-1);
+  }
+
+  if (S_ISLNK(linkinfo.st_mode) ||
+      fileinfo.st_dev != linkinfo.st_dev ||
+      fileinfo.st_ino != linkinfo.st_ino ||
+#ifdef HAVE_ST_GEN
+      fileinfo.st_gen != linkinfo.st_gen ||
+#endif /* HAVE_ST_GEN */
+      fileinfo.st_nlink != linkinfo.st_nlink ||
+      fileinfo.st_mode != linkinfo.st_mode)
+  {
+   /*
+    * Yes, don't allow!
+    */
+
+    close(fd);
+    errno = EPERM;
+    return (-1);
+  }
+#endif /* !WIN32 */
+
+  return (fd);
 }
 
 

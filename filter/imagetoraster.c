@@ -455,7 +455,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (cupsRasterInterpretPPD(&header, ppd, num_options, options, raster_cb))
   {
-    _cupsLangPuts(stderr, _("ERROR: Bad page setup\n"));
+    _cupsLangPuts(stderr, _("ERROR: The page setup information was not valid.\n"));
     fprintf(stderr, "DEBUG: %s\n", cupsRasterErrorString());
     return (1);
   }
@@ -481,6 +481,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   switch (header.cupsColorSpace)
   {
     case CUPS_CSPACE_W :
+    case CUPS_CSPACE_SW :
         if (header.cupsBitsPerColor >= 8)
 	{
           primary   = CUPS_IMAGE_WHITE;
@@ -493,10 +494,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
 	break;
 
-    default :
     case CUPS_CSPACE_RGB :
     case CUPS_CSPACE_RGBA :
     case CUPS_CSPACE_RGBW :
+    case CUPS_CSPACE_SRGB :
+    case CUPS_CSPACE_ADOBERGB :
         if (header.cupsBitsPerColor >= 8)
 	{
           primary   = CUPS_IMAGE_RGB;
@@ -540,6 +542,42 @@ main(int  argc,				/* I - Number of command-line arguments */
         primary   = CUPS_IMAGE_CMY;
 	secondary = CUPS_IMAGE_CMY;
 	break;
+
+    case CUPS_CSPACE_CIEXYZ :
+    case CUPS_CSPACE_CIELab :
+    case CUPS_CSPACE_ICC1 :
+    case CUPS_CSPACE_ICC2 :
+    case CUPS_CSPACE_ICC3 :
+    case CUPS_CSPACE_ICC4 :
+    case CUPS_CSPACE_ICC5 :
+    case CUPS_CSPACE_ICC6 :
+    case CUPS_CSPACE_ICC7 :
+    case CUPS_CSPACE_ICC8 :
+    case CUPS_CSPACE_ICC9 :
+    case CUPS_CSPACE_ICCA :
+    case CUPS_CSPACE_ICCB :
+    case CUPS_CSPACE_ICCC :
+    case CUPS_CSPACE_ICCD :
+    case CUPS_CSPACE_ICCE :
+    case CUPS_CSPACE_ICCF :
+    case CUPS_CSPACE_DEVICE1 :
+    case CUPS_CSPACE_DEVICE2 :
+    case CUPS_CSPACE_DEVICE3 :
+    case CUPS_CSPACE_DEVICE4 :
+    case CUPS_CSPACE_DEVICE5 :
+    case CUPS_CSPACE_DEVICE6 :
+    case CUPS_CSPACE_DEVICE7 :
+    case CUPS_CSPACE_DEVICE8 :
+    case CUPS_CSPACE_DEVICE9 :
+    case CUPS_CSPACE_DEVICEA :
+    case CUPS_CSPACE_DEVICEB :
+    case CUPS_CSPACE_DEVICEC :
+    case CUPS_CSPACE_DEVICED :
+    case CUPS_CSPACE_DEVICEE :
+    case CUPS_CSPACE_DEVICEF :
+        fprintf(stderr, "ERROR: Colorspace %d not supported.\n",
+	        header.cupsColorSpace);
+	exit(1);
 	break;
   }
 
@@ -632,7 +670,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    _cupsLangPuts(stderr, _("ERROR: Unable to open image file for printing\n"));
+    _cupsLangPuts(stderr, _("ERROR: The image file to print could not be opened.\n"));
     ppdClose(ppd);
     return (1);
   }
@@ -1195,8 +1233,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ERROR: Unable to write raster data to "
-			        "driver\n"));
+		              _("ERROR: The raster data could not be written "
+			        "to the driver.\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }
@@ -1291,8 +1329,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (cupsRasterWritePixels(ras, row, header.cupsBytesPerLine) <
 	                              header.cupsBytesPerLine)
 	    {
-              _cupsLangPuts(stderr,
-	                    _("ERROR: Unable to write raster data to driver\n"));
+	      _cupsLangPuts(stderr,
+	                    _("ERROR: The raster data could not be written to "
+			      "the driver.\n"));
 	      cupsImageClose(img);
 	      exit(1);
 	    }
@@ -1332,8 +1371,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	              header.cupsBytesPerLine)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ERROR: Unable to write raster data to "
-			        "driver\n"));
+		              _("ERROR: The raster data could not be written "
+			        "to the driver.\n"));
 		cupsImageClose(img);
 		exit(1);
 	      }

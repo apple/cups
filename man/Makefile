@@ -49,7 +49,6 @@ MAN5	=	classes.conf.$(MAN5EXT) \
 		printers.conf.$(MAN5EXT) \
 		subscriptions.conf.$(MAN5EXT)
 MAN7	=	backend.$(MAN7EXT) \
-		drv.$(MAN7EXT) \
 		filter.$(MAN7EXT) \
 		notifier.$(MAN7EXT)
 MAN8	=	cupsaccept.$(MAN8EXT) \

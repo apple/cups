@@ -1211,7 +1211,8 @@ appleSetDefault(const char *name)	/* I - Default printer/class name */
         CFArrayRemoveValueAtIndex(newlocations, locindex);
     }
     else
-      newlocations = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+      newlocations = CFArrayCreateMutable(kCFAllocatorDefault, 0,
+					  &kCFTypeArrayCallBacks);
 
     newlocation = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					    &kCFTypeDictionaryKeyCallBacks,

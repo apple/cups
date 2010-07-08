@@ -3,15 +3,46 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.5
 
+	- Documentation fixes (STR #3542)
+	- Fixed the Solaris SMF configuration file for cups-lpd (STR #3611)
+	- The scheduler did not set the notify-subscribed-event attribute when
+	  delivering printer-added or printer-modified events (STR #3608)
+	- The mailto notifier could get into an infinite loop (STR #3609)
+	- Date/time information was not shown in banner pages.
+	- Relational operators were broken in #if/#elif/#else/#endif expressions
+	  for the PPD compiler.
+	- Moving a job via the web interface failed without asking for
+	  authentication (STR #3559)
+	- The scheduler now clears the printer-state-reasons when the driver is
+	  changed (STR #3570)
+	- The web interface did not allow a user to change the driver
+	  (STR #3537, STR #3601)
+	- The scheduler was not setting the PATH_INFO environment variable when
+	  needed (STR #3600)
+	- The scheduler incorrectly set the CUPSD_AUTH_TYPE environment
+	  variable instead of AUTH_TYPE (STR #3599)
+	- Fixed a buffer overrun in the PPD compiler (STR #3594)
+	- Fixed some additional IPP job template attribute mapping issues in the
+	  scheduler.
 
 
 CHANGES IN CUPS V1.4.4
 
 	- Documentation updates (STR #3453, STR #3527, STR #3528, STR #3529)
+	- Security: The fix for CVE-2009-3553 was incomplete (STR #3490)
+	- Security: The texttops filter did not check the results of allocations
+	  (STR #3516)
+	- Security: The web admin interface could disclose the contents of
+	  memory (STR #3577)
+	- Security: CUPS could overwrite files as root in directories owned or
+	  writable by non-root users (STR #3510)
+	- The cups-config utility did not return the correct linker options on
+	  AIX (STR #3587)
 	- Fixed some IPP conformance issues with the scheduler's
 	  ippget-event-life, operations-supported, output-bin, and sides
 	  attributes (STR #3554)
-	- The GNU TLS and OpenSSL interfaces have been made thread-safe
+	- The OpenSSL interfaces have been made thread-safe and the GNU TLS
+	  interface is explicitly forbidden when threading is enabled
 	  (STR #3461)
 	- Fixed an IPP conformance issue with the scheduler's Send-Document
 	  implementation (STR #3514)

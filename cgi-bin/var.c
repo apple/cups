@@ -1111,6 +1111,9 @@ cgi_initialize_string(const char *data)	/* I - Form data string */
 	    * Read the hex code...
 	    */
 
+            if (!isxdigit(data[1] & 255) || !isxdigit(data[2] & 255))
+	      return (0);
+
             if (s < (value + sizeof(value) - 1))
 	    {
               data ++;
@@ -1232,7 +1235,7 @@ cgi_set_sid(void)
   _cupsMD5Append(&md5, (unsigned char *)buffer, (int)strlen(buffer));
   _cupsMD5Finish(&md5, sum);
   
-  cgiSetCookie(CUPS_SID, httpMD5String(sum, sid), "/", server_name, 0, 0);
+  cgiSetCookie(CUPS_SID, httpMD5String(sum, sid), "/", NULL, 0, 0);
 
   return (cupsGetOption(CUPS_SID, num_cookies, cookies));
 }

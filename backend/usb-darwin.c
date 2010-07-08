@@ -112,12 +112,6 @@ extern char **environ;
 
 #define DEBUG_WRITES 0
 
-/*
- * WAIT_EOF_DELAY is number of seconds we'll wait for responses from
- * the printer after we've finished sending all the data
- */
-#define WAIT_EOF_DELAY			7
-#define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			5000L
 
 #define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
@@ -247,11 +241,6 @@ typedef struct globals_s
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
   int			bidi_flag;	/* 0=unidirectional, 1=bidirectional */
-
-  pthread_mutex_t	sidechannel_thread_mutex;
-  pthread_cond_t	sidechannel_thread_cond;
-  int			sidechannel_thread_stop;
-  int			sidechannel_thread_done;
 } globals_t;
 
 
@@ -344,7 +333,6 @@ print_device(const char *uri,		/* I - Device URI */
   UInt32	  bytes;		/* Bytes written */
   struct timeval  *timeout,		/* Timeout pointer */
 		  stimeout;		/* Timeout for select() */
-  struct timespec cond_timeout;		/* pthread condition timeout */
 
 
  /*
@@ -373,7 +361,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!g.make || !g.model)
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+    fprintf(stderr, "DEBUG: Fatal USB error.\n");
+    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
 
     if (!g.make)
       fputs("DEBUG: USB make string is NULL\n", stderr);
@@ -431,7 +420,7 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
       fprintf(stderr, "DEBUG: Could not load %s\n", print_buffer);
 
       if (driverBundlePath)
@@ -488,15 +477,10 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (have_sidechannel)
   {
-    g.sidechannel_thread_stop = 0;
-    g.sidechannel_thread_done = 0;
-
-    pthread_cond_init(&g.sidechannel_thread_cond, NULL);
-    pthread_mutex_init(&g.sidechannel_thread_mutex, NULL);
-
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
-      _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+      fprintf(stderr, "DEBUG: Fatal USB error.\n");
+      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
       fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
       registry_close();
       return (CUPS_BACKEND_STOP);
@@ -515,7 +499,8 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
-    _cupsLangPuts(stderr, _("ERROR: Fatal USB error\n"));
+    fprintf(stderr, "DEBUG: Fatal USB error.\n");
+    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
     fputs("DEBUG: Couldn't create read thread\n", stderr);
     registry_close();
     return (CUPS_BACKEND_STOP);
@@ -601,7 +586,7 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
 	  perror("DEBUG: select");
 	  registry_close();
           return (CUPS_BACKEND_FAILED);
@@ -644,7 +629,7 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN && errno != EINTR)
 	  {
-	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data\n"));
+	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
 	    perror("DEBUG: read");
 	    registry_close();
 	    return (CUPS_BACKEND_FAILED);
@@ -720,8 +705,7 @@ print_device(const char *uri,		/* I - Device URI */
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
 	  */
-
-	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data\n"));
+	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data to printer.\n"));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
 	          iostatus);
 
@@ -749,86 +733,6 @@ print_device(const char *uri,		/* I - Device URI */
   }
 
   fprintf(stderr, "DEBUG: Sent %lld bytes...\n", (off_t)total_bytes);
-
- /*
-  * Wait for the side channel thread to exit...
-  */
-
-  if (have_sidechannel)
-  {
-    close(CUPS_SC_FD);
-    pthread_mutex_lock(&g.readwrite_lock_mutex);
-    g.readwrite_lock = 0;
-    pthread_cond_signal(&g.readwrite_lock_cond);
-    pthread_mutex_unlock(&g.readwrite_lock_mutex);
-
-    g.sidechannel_thread_stop = 1;
-    pthread_mutex_lock(&g.sidechannel_thread_mutex);
-    if (!g.sidechannel_thread_done)
-    {
-     /*
-      * Wait for the side-channel thread to exit...
-      */
-
-      cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
-      cond_timeout.tv_nsec = 0;
-      if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
-			         &g.sidechannel_thread_mutex,
-				 &cond_timeout) != 0)
-      {
-       /*
-	* Force the side-channel thread to exit...
-	*/
-
-	pthread_kill(sidechannel_thread_id, SIGTERM);
-      }
-    }
-    pthread_mutex_unlock(&g.sidechannel_thread_mutex);
-
-    pthread_join(sidechannel_thread_id, NULL);
-
-    pthread_cond_destroy(&g.sidechannel_thread_cond);
-    pthread_mutex_destroy(&g.sidechannel_thread_mutex);
-  }
-
-  pthread_cond_destroy(&g.readwrite_lock_cond);
-  pthread_mutex_destroy(&g.readwrite_lock_mutex);
-
- /*
-  * Signal the read thread to stop...
-  */
-
-  g.read_thread_stop = 1;
-
- /*
-  * Give the read thread WAIT_EOF_DELAY seconds to complete all the data. If
-  * we are not signaled in that time then force the thread to exit.
-  */
-
-  pthread_mutex_lock(&g.read_thread_mutex);
-
-  if (!g.read_thread_done)
-  {
-    cond_timeout.tv_sec = time(NULL) + WAIT_EOF_DELAY;
-    cond_timeout.tv_nsec = 0;
-
-    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
-                               &cond_timeout) != 0)
-    {
-     /*
-      * Force the read thread to exit...
-      */
-
-      g.wait_eof = 0;
-      pthread_kill(read_thread_id, SIGTERM);
-    }
-  }
-  pthread_mutex_unlock(&g.read_thread_mutex);
-
-  pthread_join(read_thread_id, NULL);	/* wait for the read thread to return */
-
-  pthread_cond_destroy(&g.read_thread_cond);
-  pthread_mutex_destroy(&g.read_thread_mutex);
 
  /*
   * Close the connection and input file and general clean up...
@@ -1038,12 +942,7 @@ sidechannel_thread(void *reference)
 	  break;
     }
   }
-  while (!g.sidechannel_thread_stop);
-
-  pthread_mutex_lock(&g.sidechannel_thread_mutex);
-  g.sidechannel_thread_done = 1;
-  pthread_cond_signal(&g.sidechannel_thread_cond);
-  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+  while (1);
 
   return NULL;
 }

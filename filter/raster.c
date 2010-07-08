@@ -1,9 +1,9 @@
 /*
  * "$Id: raster.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   Raster file routines for the Common UNIX Printing System (CUPS).
+ *   Raster file routines for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -915,6 +915,7 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_WHITE :
       case CUPS_CSPACE_GOLD :
       case CUPS_CSPACE_SILVER :
+      case CUPS_CSPACE_SW :
           r->header.cupsNumColors = 1;
 	  break;
 
@@ -923,6 +924,8 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
       case CUPS_CSPACE_YMC :
       case CUPS_CSPACE_CIEXYZ :
       case CUPS_CSPACE_CIELab :
+      case CUPS_CSPACE_SRGB :
+      case CUPS_CSPACE_ADOBERGB :
       case CUPS_CSPACE_ICC1 :
       case CUPS_CSPACE_ICC2 :
       case CUPS_CSPACE_ICC3 :
@@ -956,6 +959,25 @@ cups_raster_update(cups_raster_t *r)	/* I - Raster stream */
             r->header.cupsNumColors = 6;
 	  else
             r->header.cupsNumColors = 4;
+	  break;
+
+      case CUPS_CSPACE_DEVICE1 :
+      case CUPS_CSPACE_DEVICE2 :
+      case CUPS_CSPACE_DEVICE3 :
+      case CUPS_CSPACE_DEVICE4 :
+      case CUPS_CSPACE_DEVICE5 :
+      case CUPS_CSPACE_DEVICE6 :
+      case CUPS_CSPACE_DEVICE7 :
+      case CUPS_CSPACE_DEVICE8 :
+      case CUPS_CSPACE_DEVICE9 :
+      case CUPS_CSPACE_DEVICEA :
+      case CUPS_CSPACE_DEVICEB :
+      case CUPS_CSPACE_DEVICEC :
+      case CUPS_CSPACE_DEVICED :
+      case CUPS_CSPACE_DEVICEE :
+      case CUPS_CSPACE_DEVICEF :
+          r->header.cupsNumColors = r->header.cupsColorSpace -
+	                            CUPS_CSPACE_DEVICE1 + 1;
 	  break;
     }
   }

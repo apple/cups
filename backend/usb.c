@@ -197,8 +197,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		      resource, sizeof(resource)) < HTTP_URI_OK)
   {
     _cupsLangPuts(stderr,
-                  _("ERROR: No device URI found in argv[0] or in DEVICE_URI "
-	            "environment variable\n"));
+		  _("ERROR: No device URI found in argv[0] or in DEVICE_URI "
+                    "environment variable\n"));
     return (1);
   }
 

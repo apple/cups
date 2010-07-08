@@ -355,7 +355,7 @@ backendRunLoop(
 	  if (paperout != 1 && update_state)
 	  {
 	    fputs("STATE: +media-empty-warning\n", stderr);
-	    _cupsLangPuts(stderr, _("ERROR: Out of paper\n"));
+	    _cupsLangPuts(stderr, _("DEBUG: Out of paper\n"));
 	    paperout = 1;
 	  }
         }

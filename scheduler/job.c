@@ -173,7 +173,7 @@ static void	free_job_history(cupsd_job_t *job);
 static char	*get_options(cupsd_job_t *job, int banner_page, char *copies,
 		             size_t copies_size, char *title,
 			     size_t title_size);
-static int	ipp_length(ipp_t *ipp);
+static size_t	ipp_length(ipp_t *ipp);
 static void	load_job_cache(const char *filename);
 static void	load_next_job_id(const char *filename);
 static void	load_request_root(void);
@@ -3020,39 +3020,159 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	    size_t      title_size)	/* I - Size of title buffer */
 {
   int			i;		/* Looping var */
+  size_t		newlength;	/* New option buffer length */
   char			*optptr,	/* Pointer to options */
 			*valptr;	/* Pointer in value string */
   ipp_attribute_t	*attr;		/* Current attribute */
+  _pwg_t		*pwg;		/* PWG->PPD mapping data */
+  int			num_pwgppds;	/* Number of PWG->PPD options */
+  cups_option_t		*pwgppds,	/* PWG->PPD options */
+			*pwgppd,	/* Current PWG->PPD option */
+			*preset;	/* Current preset option */
+  int			output_mode,	/* Output mode (if any) */
+			print_quality;	/* Print quality (if any) */
+  const char		*ppd;		/* PPD option choice */
+  int			exact;		/* Did we get an exact match? */
   static char		*options = NULL;/* Full list of options */
-  static int		optlength = 0;	/* Length of option buffer */
+  static size_t		optlength = 0;	/* Length of option buffer */
 
 
  /*
-  * Building the options string is harder than it needs to be, but
-  * for the moment we need to pass strings for command-line args and
-  * not IPP attribute pointers... :)
+  * Building the options string is harder than it needs to be, but for the
+  * moment we need to pass strings for command-line args and not IPP attribute
+  * pointers... :)
   *
-  * First allocate/reallocate the option buffer as needed...
+  * First build an options array for any PWG->PPD mapped option/choice pairs.
   */
 
-  i = ipp_length(job->attrs);
+  pwg         = job->printer->pwg;
+  num_pwgppds = 0;
+  pwgppds     = NULL;
 
-  if (i > optlength || !options)
+  if (pwg)
+  {
+    if ((attr = ippFindAttribute(job->attrs, "output-mode",
+				 IPP_TAG_KEYWORD)) != NULL &&
+	!strcmp(attr->values[0].string.text, "monochrome"))
+      output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+    else
+      output_mode = _PWG_OUTPUT_MODE_COLOR;
+
+    if ((attr = ippFindAttribute(job->attrs, "print-quality",
+				 IPP_TAG_INTEGER)) != NULL &&
+	attr->values[0].integer >= IPP_QUALITY_DRAFT &&
+	attr->values[0].integer <= IPP_QUALITY_HIGH)
+      print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
+    else
+      print_quality = IPP_QUALITY_NORMAL;
+
+    if (pwg->num_presets[output_mode][print_quality] == 0)
+    {
+     /*
+      * Try to find a preset that works so that we maximize the chances of us
+      * getting a good print using IPP attributes.
+      */
+
+      if (pwg->num_presets[output_mode][_PWG_PRINT_QUALITY_NORMAL] > 0)
+        print_quality = _PWG_PRINT_QUALITY_NORMAL;
+      else if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][print_quality] > 0)
+        output_mode = _PWG_OUTPUT_MODE_COLOR;
+      else
+      {
+        print_quality = _PWG_PRINT_QUALITY_NORMAL;
+        output_mode   = _PWG_OUTPUT_MODE_COLOR;
+      }
+    }
+
+    if (pwg->num_presets[output_mode][print_quality] > 0)
+    {
+     /*
+      * Copy the preset options as long as the corresponding names are not
+      * already defined in the IPP request...
+      */
+
+      for (i = pwg->num_presets[output_mode][print_quality],
+	       preset = pwg->presets[output_mode][print_quality];
+	   i > 0;
+	   i --, preset ++)
+      {
+        if (!ippFindAttribute(job->attrs, preset->name, IPP_TAG_ZERO))
+	  num_pwgppds = cupsAddOption(preset->name, preset->value, num_pwgppds,
+	                              &pwgppds);
+      }
+    }
+
+    if (pwg->sides_option &&
+        !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
+	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)
+    {
+     /*
+      * Add a duplex option...
+      */
+
+      if (!strcmp(attr->values[0].string.text, "one-sided"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_1sided,
+				    num_pwgppds, &pwgppds);
+      else if (!strcmp(attr->values[0].string.text, "two-sided-long-edge"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_long,
+				    num_pwgppds, &pwgppds);
+      else if (!strcmp(attr->values[0].string.text, "two-sided-short-edge"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_short,
+				    num_pwgppds, &pwgppds);
+    }
+  }
+
+  if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetInputSlot(job->printer->pwg, job->attrs, NULL)) != NULL)
+    num_pwgppds = cupsAddOption("InputSlot", ppd, num_pwgppds, &pwgppds);
+
+  if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetMediaType(job->printer->pwg, job->attrs, NULL)) != NULL)
+    num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);
+
+  if (!ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
+      !ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO) &&
+      (ppd = _pwgGetPageSize(job->printer->pwg, job->attrs, NULL,
+			     &exact)) != NULL)
+    num_pwgppds = cupsAddOption("PageSize", ppd, num_pwgppds, &pwgppds);
+
+  if (!ippFindAttribute(job->attrs, "OutputBin", IPP_TAG_ZERO) &&
+      (attr = ippFindAttribute(job->attrs, "output-bin",
+                               IPP_TAG_ZERO)) != NULL &&
+      (attr->value_tag == IPP_TAG_KEYWORD || attr->value_tag == IPP_TAG_NAME) &&
+      (ppd = _pwgGetOutputBin(pwg, attr->values[0].string.text)) != NULL) 
+    num_pwgppds = cupsAddOption("OutputBin", ppd, num_pwgppds, &pwgppds);
+
+ /*
+  * Figure out how much room we need...
+  */
+
+  newlength = ipp_length(job->attrs);
+
+  for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
+    newlength += 1 + strlen(pwgppd->name) + 1 + strlen(pwgppd->value);
+
+ /*
+  * Then allocate/reallocate the option buffer as needed...
+  */
+
+  if (newlength > optlength || !options)
   {
     if (!options)
-      optptr = malloc(i);
+      optptr = malloc(newlength);
     else
-      optptr = realloc(options, i);
+      optptr = realloc(options, newlength);
 
     if (!optptr)
     {
       cupsdLogJob(job, CUPSD_LOG_CRIT,
-		  "Unable to allocate %d bytes for option buffer!", i);
+		  "Unable to allocate " CUPS_LLFMT " bytes for option buffer!",
+		  CUPS_LLCAST newlength);
       return (NULL);
     }
 
     options   = optptr;
-    optlength = i;
+    optlength = newlength;
   }
 
  /*
@@ -3088,7 +3208,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
       * Filter out other unwanted attributes...
       */
 
-      if (attr->value_tag == IPP_TAG_MIMETYPE ||
+      if (attr->value_tag == IPP_TAG_NOVALUE ||
+          attr->value_tag == IPP_TAG_MIMETYPE ||
 	  attr->value_tag == IPP_TAG_NAMELANG ||
 	  attr->value_tag == IPP_TAG_TEXTLANG ||
 	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid")) ||
@@ -3096,8 +3217,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
-      if (!strncmp(attr->name, "time-", 5) ||
-          !strcmp(attr->name, "job-hold-until"))
+      if (!strcmp(attr->name, "job-hold-until"))
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) &&
@@ -3155,11 +3275,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	      if (!attr->values[i].boolean)
 		strlcat(optptr, "no", optlength - (optptr - options));
 
-	  case IPP_TAG_NOVALUE :
-	      strlcat(optptr, attr->name,
-	              optlength - (optptr - options));
-	      break;
-
 	  case IPP_TAG_RANGE :
 	      if (attr->values[i].range.lower == attr->values[i].range.upper)
 		snprintf(optptr, optlength - (optptr - options) - 1,
@@ -3204,6 +3319,25 @@ get_options(cupsd_job_t *job,		/* I - Job */
     }
   }
 
+ /*
+  * Finally loop through the PWG->PPD mapped options and add them...
+  */
+
+  for (i = num_pwgppds, pwgppd = pwgppds; i > 0; i --, pwgppd ++)
+  {
+    *optptr++ = ' ';
+    strcpy(optptr, pwgppd->name);
+    optptr += strlen(optptr);
+    *optptr++ = '=';
+    strcpy(optptr, pwgppd->value);
+    optptr += strlen(optptr);
+  }
+
+  cupsFreeOptions(num_pwgppds, pwgppds);
+
+ /*
+  * Return the options string...
+  */
 
   return (options);
 }
@@ -3214,10 +3348,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
  *		    the textual IPP attributes.
  */
 
-static int				/* O - Size of attribute buffer */
+static size_t				/* O - Size of attribute buffer */
 ipp_length(ipp_t *ipp)			/* I - IPP request */
 {
-  int			bytes; 		/* Number of bytes */
+  size_t		bytes; 		/* Number of bytes */
   int			i;		/* Looping var */
   ipp_attribute_t	*attr;		/* Current attribute */
 
@@ -3234,14 +3368,12 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
     * Skip attributes that won't be sent to filters...
     */
 
-    if (attr->value_tag == IPP_TAG_MIMETYPE ||
+    if (attr->value_tag == IPP_TAG_NOVALUE ||
+	attr->value_tag == IPP_TAG_MIMETYPE ||
 	attr->value_tag == IPP_TAG_NAMELANG ||
 	attr->value_tag == IPP_TAG_TEXTLANG ||
 	attr->value_tag == IPP_TAG_URI ||
 	attr->value_tag == IPP_TAG_URISCHEME)
-      continue;
-
-    if (strncmp(attr->name, "time-", 5) == 0)
       continue;
 
    /*

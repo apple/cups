@@ -10,9 +10,9 @@
 <!--
   "$Id: spec-ppd.html 7937 2008-09-11 16:16:41Z mike $"
 
-  CUPS PPD extensions specification for the Common UNIX Printing System (CUPS).
+  CUPS PPD extensions specification for CUPS.
 
-  Copyright 2007-2009 by Apple Inc.
+  Copyright 2007-2010 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
 
   These coded instructions, statements, and computer programs are the
@@ -1566,6 +1566,31 @@ before the filter that accepts the given MIME type.</p>
 *cupsPreFilter: "image/png 0 mypngprefilter"
 </pre>
 
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsPrintQuality'>cupsPrintQuality</a></h3>
+
+<p class='summary'>*cupsPrintQuality keyword/text: "code"</p>
+
+<p>This UI keyword defines standard print qualities that directly map from the IPP "print-quality" job template attribute. Standard keyword values are "Draft", "Normal", and "High" which are mapped from the IPP "print-quality" values 3, 4, and 5 respectively. Each <code>cupsPrintQuality</code> option typically sets output mode and resolution parameters in the page device dictionary, eliminating the need for separate (and sometimes confusing) output mode and resolution options.</p>
+
+<blockquote><b>Note:</b>
+
+<p>Unlike all of the other keywords defined in this document, <code>cupsPrintQuality</code> is a UI keyword that MUST be enclosed inside the PPD <code>OpenUI</code> and <code>CloseUI</code> keywords.</p>
+
+</blockquote>
+
+<p>Examples:</p>
+
+<pre class='command'>
+*OpenUI *cupsPrintQuality/Print Quality: PickOne
+*OrderDependency: 10 AnySetup *cupsPrintQuality
+*DefaultcupsPrintQuality: Normal
+*cupsPrintQuality Draft/Draft: "code"
+*cupsPrintQuality Normal/Normal: "code"
+*cupsPrintQuality High/Photo: "code"
+*CloseUI: *cupsPrintQuality
+</pre>
+
 <h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>
 
 <p class='summary'>*cupsSNMPSupplies: boolean</p>
@@ -1775,39 +1800,51 @@ Technical Note TN2144</a> for more information.</p>
 in the print dialog of applications (such as iPhoto) that set the job
 style hint to <tt>NSPrintPhotoJobStyleHint</tt>. Each preset maps to one or
 more pairs of PPD options and choices as well as providing key/value data for
-the application. The following preset names are currently defined:</p>
+the application. The following standard preset names are currently defined:</p>
 
 <ul>
 
-	<li><code>Photo_with_Paper_Auto-Detect</code>; Photo printing
-        with paper auto-detect</li>
+	<li><code>General_with_Paper_Auto-Detect</code>; Normal quality general printing with auto-detected media.</li>
 
-	<li><code>Photo_with_Paper_Auto-Detect_-_Fine</code>; Photo printing
-        with paper auto-detect - fine</li>
+	<li><code>General_with_Paper_Auto-Detect_-_Draft</code>; Draft quality general printing with auto-detected media.</li>
 
-	<li><code>Photo_on_Plain_Paper</code>; Photo printing on plain paper</li>
+	<li><code>General_on_Plain_Paper</code>; Normal quality general printing on plain paper.</li>
 
-	<li><code>Photo_on_Plain_Paper_-_Fine</code>; Photo printing on plain
-        paper - fine</li>
+	<li><code>General_on_Plain_Paper_-_Draft</code>; Draft quality general printing on plain paper.</li>
 
-	<li><code>Photo_on_Photo_Paper</code>; Photo printing on photo paper</li>
+	<li><code>Photo_with_Paper_Auto-Detect</code>; Normal quality photo printing with auto-detected media.</li>
 
-	<li><code>Photo_on_Photo_Paper_-_Fine</code>; Photo printing on photo
-        paper - fine</li>
+	<li><code>Photo_with_Paper_Auto-Detect_-_Fine</code>; High quality photo printing with auto-detected media.</li>
 
-	<li><code>Photo_on_Matte_Paper</code>; Photo printing on matte paper</li>
+	<li><code>Photo_on_Plain_Paper</code>; Normal quality photo printing on plain paper.</li>
 
-	<li><code>Photo_on_Matte_Paper_-_Fine</code>; Photo printing on matte
-        paper - fine</li>
+	<li><code>Photo_on_Plain_Paper_-_Fine</code>; High quality photo printing on plain paper.</li>
+
+	<li><code>Photo_on_Photo_Paper</code>; Normal quality photo printing on glossy photo paper.</li>
+
+	<li><code>Photo_on_Photo_Paper_-_Fine</code>; High quality photo printing on glossy photo paper.</li>
+
+	<li><code>Photo_on_Matte_Paper</code>; Normal quality photo printing on matte paper.</li>
+
+	<li><code>Photo_on_Matte_Paper_-_Fine</code>; High quality photo printing on matte paper.</li>
 
 </ul>
 
 <p>The value string consists of pairs of keywords, either an option name and
 choice (*MainKeyword OptionKeyword) or a preset identifier and value
-(com.apple.print.preset.foo value). Preset identifiers and their supported
-values are documented in "<a
-href='http://developer.apple.com/documentation/Printing/Conceptual/PresetDraft/presets_intro/chapter_1_section_2.html'
->Creating Printing Presets for iPhoto: Printing Presets File Format</a>".</p>
+(com.apple.print.preset.foo value). The following preset identifiers are currently used:</p>
+
+<ul>
+
+	<li><code>com.apple.print.preset.graphicsType</code>; specifies the type of printing used for this printing - "General" for general purpose printing and "Photo" for photo printing.</li>
+
+	<li><code>com.apple.print.preset.media-front-coating</code>; specifies the media type selected by this preset - "none" (plain paper), "glossy", "high-gloss", "semi-gloss", "satin", "matte", and "autodetect".</li>
+
+	<li><code>com.apple.print.preset.output-mode</code>; specifies the output mode for this preset - "color" (default for color printers) or "monochrome" (grayscale, default for B&amp;W printers).</li>
+
+	<li><code>com.apple.print.preset.quality</code>; specifies the overall print quality selected by this preset - "low" (draft), "mid" (normal), or "high".</li>
+
+</ul>
 
 <p>Presets, like options, can also be localized in multiple languages.</p>
 
@@ -1870,6 +1907,17 @@ the device.</p>
 
 
 <h2 class='title'><a name='HISTORY'>Change History</a></h2>
+
+<h3>Changes in CUPS 1.4.5</h3>
+
+<ul>
+
+	<li>Added <a href='#cupsPrintQuality'><tt>cupsPrintQuality</tt></a> UI keyword.</li>
+
+	<li>Added new properties and values for the <a href='#APPrinterPreset'><tt>APPrinterPreset</tt></a> keyword.</li>
+
+</ul>
+
 
 <h3>Changes in CUPS 1.4</h3>
 

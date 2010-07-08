@@ -1,8 +1,11 @@
-CHANGES.txt - 2010-05-10
+CHANGES.txt - 2010-06-16
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added several new color spaces to the CUPS raster format (STR #3419)
+	- The Validate-Job operation now uses the same policy as Print-Job by
+	  default. 
 	- CUPS now uses iconv to implement all of its character encoding
 	  support (STR #3097)
 	- The scheduler now implements the Cancel-Jobs, Cancel-My-Jobs, and

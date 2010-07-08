@@ -770,8 +770,7 @@ main(int  argc,				/* I - Number of command-line args */
         !cupsArrayCount(ActiveJobs) &&
 	(!Browsing ||
 	 (!BrowseRemoteProtocols &&
-	  (!NumBrowsers || !BrowseLocalProtocols ||
-	   cupsArrayCount(Printers) == 0))))
+	  (!BrowseLocalProtocols || !cupsArrayCount(Printers)))))
     {
       timeout		= LaunchdTimeout;
       launchd_idle_exit = 1;
@@ -1621,10 +1620,10 @@ launchd_checkout(void)
   * shared printers to advertise...
   */
 
-  if ((cupsArrayCount(ActiveJobs) || NumPolled ||
-       (Browsing &&
-	(BrowseRemoteProtocols ||
-        (BrowseLocalProtocols && NumBrowsers && cupsArrayCount(Printers))))))
+  if (cupsArrayCount(ActiveJobs) || NumPolled ||
+      (Browsing &&
+       (BrowseRemoteProtocols || 
+        (BrowseLocalProtocols && cupsArrayCount(Printers)))))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
                     "Creating launchd keepalive file \"" CUPS_KEEPALIVE

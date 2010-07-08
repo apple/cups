@@ -472,6 +472,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
+      int error = errno;		/* Connection error */
+
       if (job_canceled)
 	break;
 
@@ -497,19 +499,40 @@ main(int  argc,				/* I - Number of command-line args */
         return (CUPS_BACKEND_FAILED);
       }
 
+      fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
+
       if (errno == ECONNREFUSED || errno == EHOSTDOWN ||
           errno == EHOSTUNREACH)
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
-	_cupsLangPrintf(stderr,
-			_("WARNING: Network host \'%s\' is busy; "
-			  "will retry in %d seconds...\n"),
-			hostname, delay);
+	switch (error)
+	{
+	  case EHOSTDOWN :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' may not exist "
+			        "or is unavailable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case EHOSTUNREACH :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is "
+			        "unreachable at this time.\n"), 
+			      hostname);
+	      break;
+
+	  case ECONNREFUSED :
+	  default :
+	      _cupsLangPrintf(stderr,
+			      _("WARNING: Network printer \'%s\' is busy.\n"),
+			      hostname);
+	      break;
+        }
 
 	sleep(delay);
 
@@ -518,16 +541,15 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (h_errno)
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
+	_cupsLangPrintf(stderr,
+	                _("ERROR: Unable to locate network printer \'%s\'.\n"),
 			hostname);
 	return (CUPS_BACKEND_STOP);
       }
       else
       {
-        fprintf(stderr, "DEBUG: Connection error: %s\n", strerror(errno));
-	_cupsLangPuts(stderr,
-	              _("ERROR: Unable to connect to printer; will retry in 30 "
-		        "seconds...\n"));
+	_cupsLangPrintf(stderr, _("ERROR: Network printer \'%s\' is not "
+	                          "responding.\n"), hostname);
 	sleep(30);
       }
 
@@ -616,8 +638,11 @@ main(int  argc,				/* I - Number of command-line args */
 
     if (http->version < HTTP_1_1)
     {
+      fprintf(stderr, "DEBUG: Printer responded with HTTP version %d.%d.\n",
+              http->version / 100, http->version % 100);
+
       _cupsLangPuts(stderr,
-                    _("ERROR: Unable to print - printer does not conform to "
+                    _("ERROR: Unable to print: the printer does not conform to "
 		      "the IPP standard.\n"));
       exit(CUPS_BACKEND_STOP);
     }
@@ -634,7 +659,7 @@ main(int  argc,				/* I - Number of command-line args */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Printer not responding\n"));
+	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -675,7 +700,7 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        _cupsLangPuts(stderr, _("ERROR: Destination printer does not exist\n"));
+        _cupsLangPuts(stderr, _("ERROR: The printer URI is incorrect or no longer exists.\n"));
 
 	if (supported)
           ippDelete(supported);
