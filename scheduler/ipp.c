@@ -1257,7 +1257,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
 
   if (modify)
   {
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED | CUPSD_EVENT_PRINTER_CONFIG,
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED,
 		  pclass, NULL, "Class \"%s\" modified by \"%s\".",
 		  pclass->name, get_username(con));
 
@@ -1268,7 +1268,7 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   {
     cupsdAddPrinterHistory(pclass);
 
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED | CUPSD_EVENT_PRINTER_CONFIG,
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
 		  pclass, NULL, "New class \"%s\" added by \"%s\".",
 		  pclass->name, get_username(con));
 
@@ -3030,7 +3030,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
   if (modify)
   {
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED | CUPSD_EVENT_PRINTER_CONFIG,
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_MODIFIED,
                   printer, NULL, "Printer \"%s\" modified by \"%s\".",
 		  printer->name, get_username(con));
 
@@ -3041,7 +3041,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
     cupsdAddPrinterHistory(printer);
 
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED | CUPSD_EVENT_PRINTER_CONFIG,
+    cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
                   printer, NULL, "New printer \"%s\" added by \"%s\".",
 		  printer->name, get_username(con));
 
