@@ -116,6 +116,10 @@
     type='service'
     version='1'>
 
+    <restarter>
+	<service_fmri value='svc:/network/inetd:default' />
+    </restarter>
+
     <dependency
         name='filesystem_minimal'
         grouping='require_all'
@@ -155,10 +159,6 @@
         timeout_seconds='60' />
 
     <instance name='default' enabled='false' >
-        <restarter>
-            <service_fmri value='svc:/network/inetd:default' />
-        </restarter>
-
         <dependency
             name='cupsd'
             grouping='require_all'
