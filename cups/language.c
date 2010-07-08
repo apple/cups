@@ -262,9 +262,17 @@ _cupsEncodingName(
 {
   if (encoding < 0 ||
       encoding >= (sizeof(lang_encodings) / sizeof(const char *)))
+  {
+    DEBUG_printf(("1_cupsEncodingName(encoding=%d) = out of range (\"%s\")",
+                  encoding, lang_encodings[0]));
     return (lang_encodings[0]);
+  }
   else
+  {
+    DEBUG_printf(("1_cupsEncodingName(encoding=%d) = \"%s\"",
+                  encoding, lang_encodings[encoding]));
     return (lang_encodings[encoding]);
+  }
 }
 
 

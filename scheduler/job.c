@@ -3208,7 +3208,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
       * Filter out other unwanted attributes...
       */
 
-      if (attr->value_tag == IPP_TAG_MIMETYPE ||
+      if (attr->value_tag == IPP_TAG_NOVALUE ||
+          attr->value_tag == IPP_TAG_MIMETYPE ||
 	  attr->value_tag == IPP_TAG_NAMELANG ||
 	  attr->value_tag == IPP_TAG_TEXTLANG ||
 	  (attr->value_tag == IPP_TAG_URI && strcmp(attr->name, "job-uuid")) ||
@@ -3216,8 +3217,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	  attr->value_tag == IPP_TAG_BEGIN_COLLECTION) /* Not yet supported */
 	continue;
 
-      if (!strncmp(attr->name, "time-", 5) ||
-          !strcmp(attr->name, "job-hold-until"))
+      if (!strcmp(attr->name, "job-hold-until"))
 	continue;
 
       if (!strncmp(attr->name, "job-", 4) &&
@@ -3274,11 +3274,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	  case IPP_TAG_BOOLEAN :
 	      if (!attr->values[i].boolean)
 		strlcat(optptr, "no", optlength - (optptr - options));
-
-	  case IPP_TAG_NOVALUE :
-	      strlcat(optptr, attr->name,
-	              optlength - (optptr - options));
-	      break;
 
 	  case IPP_TAG_RANGE :
 	      if (attr->values[i].range.lower == attr->values[i].range.upper)
@@ -3373,14 +3368,12 @@ ipp_length(ipp_t *ipp)			/* I - IPP request */
     * Skip attributes that won't be sent to filters...
     */
 
-    if (attr->value_tag == IPP_TAG_MIMETYPE ||
+    if (attr->value_tag == IPP_TAG_NOVALUE ||
+	attr->value_tag == IPP_TAG_MIMETYPE ||
 	attr->value_tag == IPP_TAG_NAMELANG ||
 	attr->value_tag == IPP_TAG_TEXTLANG ||
 	attr->value_tag == IPP_TAG_URI ||
 	attr->value_tag == IPP_TAG_URISCHEME)
-      continue;
-
-    if (strncmp(attr->name, "time-", 5) == 0)
       continue;
 
    /*
