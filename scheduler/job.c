@@ -3275,6 +3275,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	      if (!attr->values[i].boolean)
 		strlcat(optptr, "no", optlength - (optptr - options));
 
+	      strlcat(optptr, attr->name,
+	              optlength - (optptr - options));
+	      break;
+
 	  case IPP_TAG_RANGE :
 	      if (attr->values[i].range.lower == attr->values[i].range.upper)
 		snprintf(optptr, optlength - (optptr - options) - 1,
