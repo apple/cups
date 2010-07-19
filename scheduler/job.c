@@ -3122,9 +3122,13 @@ get_options(cupsd_job_t *job,		/* I - Job */
     }
   }
 
-  if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetInputSlot(job->printer->pwg, job->attrs, NULL)) != NULL)
-    num_pwgppds = cupsAddOption("InputSlot", ppd, num_pwgppds, &pwgppds);
+  if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO))
+  {
+    if ((ppd = _pwgGetInputSlot(job->printer->pwg, job->attrs, NULL)) != NULL)
+      num_pwgppds = cupsAddOption("InputSlot", ppd, num_pwgppds, &pwgppds);
+    else if (!ippFindAttribute(job->attrs, "AP_D_InputSlot", IPP_TAG_ZERO))
+      num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds, &pwgppds);
+  }
 
   if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
       (ppd = _pwgGetMediaType(job->printer->pwg, job->attrs, NULL)) != NULL)
