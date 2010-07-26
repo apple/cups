@@ -3125,7 +3125,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
   if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
       !ippFindAttribute(job->attrs, "HPPaperSource", IPP_TAG_ZERO))
   {
-    if ((ppd = _pwgGetInputSlot(job->printer->pwg, job->attrs, NULL)) != NULL)
+    if ((ppd = _pwgGetInputSlot(pwg, job->attrs, NULL)) != NULL)
       num_pwgppds = cupsAddOption(pwg->source_option, ppd, num_pwgppds,
                                   &pwgppds);
     else if (!ippFindAttribute(job->attrs, "AP_D_InputSlot", IPP_TAG_ZERO))
@@ -3133,13 +3133,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
   }
 
   if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetMediaType(job->printer->pwg, job->attrs, NULL)) != NULL)
+      (ppd = _pwgGetMediaType(pwg, job->attrs, NULL)) != NULL)
     num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);
 
   if (!ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
       !ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetPageSize(job->printer->pwg, job->attrs, NULL,
-			     &exact)) != NULL)
+      (ppd = _pwgGetPageSize(pwg, job->attrs, NULL, &exact)) != NULL)
     num_pwgppds = cupsAddOption("PageSize", ppd, num_pwgppds, &pwgppds);
 
   if (!ippFindAttribute(job->attrs, "OutputBin", IPP_TAG_ZERO) &&
