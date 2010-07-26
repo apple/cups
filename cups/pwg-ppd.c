@@ -223,8 +223,13 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Copy and convert InputSlot data...
   */
 
-  if ((input_slot = ppdFindOption(ppd, "InputSlot")) != NULL)
+  if ((input_slot = ppdFindOption(ppd, "InputSlot")) == NULL)
+    input_slot = ppdFindOption(ppd, "HPPaperSource");
+
+  if (input_slot)
   {
+    pwg->source_option = _cupsStrAlloc(input_slot->keyword);
+
     if ((pwg->sources = calloc(input_slot->num_choices,
                                sizeof(_pwg_map_t))) == NULL)
     {
@@ -245,6 +250,10 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
         pwg_name = "auto";
       else if (!strcasecmp(choice->choice, "Cassette"))
         pwg_name = "main";
+      else if (!strcasecmp(choice->choice, "PhotoTray"))
+        pwg_name = "photo";
+      else if (!strcasecmp(choice->choice, "CDTray"))
+        pwg_name = "disc";
       else if (!strncasecmp(choice->choice, "Multipurpose", 12) ||
                !strcasecmp(choice->choice, "MP") ||
                !strcasecmp(choice->choice, "MPTray"))
@@ -647,13 +656,30 @@ _pwgGetInputSlot(_pwg_t     *pwg,	/* I - PWG mapping data */
 
     ipp_attribute_t	*media_col,	/* media-col attribute */
 			*media_source;	/* media-source attribute */
+    _pwg_size_t		size;		/* Dimensional size */
+    int			margins_set;	/* Were the margins set? */
 
     media_col = ippFindAttribute(job, "media-col", IPP_TAG_BEGIN_COLLECTION);
     if (media_col &&
         (media_source = ippFindAttribute(media_col->values[0].collection,
                                          "media-source",
 	                                 IPP_TAG_KEYWORD)) != NULL)
+    {
+     /*
+      * Use the media-source value from media-col...
+      */
+
       keyword = media_source->values[0].string.text;
+    }
+    else if (_pwgInitSize(&size, job, &margins_set))
+    {
+     /*
+      * For media <= 5x7, look for a photo tray...
+      */
+
+      if (size.width <= (5 * 2540) && size.length <= (7 * 2540))
+        keyword = "photo";
+    }
   }
 
   if (keyword)

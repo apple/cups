@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Printer routines for the Common UNIX Printing System (CUPS).
+ *   Printer routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -4487,10 +4487,17 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 	             "output-bin-default", NULL, p->pwg->bins[0].pwg);
     }
-    else if ((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
+    else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
-	     !strcasecmp(ppd_attr->value, "Reverse"))
+	      !strcasecmp(ppd_attr->value, "Reverse")) ||
+	     (!ppd_attr && ppd->manufacturer &&	/* EPSON "compatibility heuristic" */
+	      !strcasecmp(ppd->manufacturer, "epson")))
     {
+     /*
+      * Report that this printer has a single output bin that leaves pages face
+      * up.
+      */
+
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "output-bin-supported", NULL, "face-up");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,

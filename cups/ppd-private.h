@@ -100,6 +100,7 @@ typedef struct _pwg_s			/**** PWG-PPD conversion data ****/
 		*custom_min_keyword,	/* Minimum custom size PWG keyword */
 		custom_ppd_size[41];	/* Custom PPD size name */
   _pwg_size_t	custom_size;		/* Custom size record */
+  char		*source_option;		/* PPD option for media source */
   int		num_sources;		/* Number of media sources */
   _pwg_map_t	*sources;		/* Media sources */
   int		num_types;		/* Number of media types */

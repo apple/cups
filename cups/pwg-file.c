@@ -238,6 +238,10 @@ _pwgCreateWithFile(const char *filename)/* I - File to read */
 		       pwg->custom_min_width, pwg->custom_min_length);
       pwg->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
     }
+    else if (!strcasecmp(line, "SourceOption"))
+    {
+      pwg->source_option = _cupsStrAlloc(value);
+    }
     else if (!strcasecmp(line, "NumSources"))
     {
       if (num_sources > 0)
@@ -461,6 +465,9 @@ _pwgDestroy(_pwg_t *pwg)		/* I - PWG mapping data */
     free(pwg->sizes);
   }
 
+  if (pwg->source_option)
+    _cupsStrFree(pwg->source_option);
+
   if (pwg->sources)
   {
     for (i = pwg->num_sources, map = pwg->sources; i > 0; i --, map ++)
@@ -564,6 +571,9 @@ _pwgWriteFile(_pwg_t     *pwg,		/* I - PWG mapping data */
  /*
   * Media sources...
   */
+
+  if (pwg->source_option)
+    cupsFilePrintf(fp, "SourceOption %s\n", pwg->source_option);
 
   if (pwg->num_sources > 0)
   {
