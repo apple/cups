@@ -4002,11 +4002,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
-  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg", CacheDir, p->name);
+  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg2", CacheDir, p->name);
   if (stat(pwg_name, &pwg_info))
     pwg_info.st_mtime = 0;
 
