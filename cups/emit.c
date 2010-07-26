@@ -795,8 +795,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	      */
 
               pnum = *cptr++ - '0';
-	      while (isalnum(*cptr & 255))
-	        pnum = pnum * 10 + *cptr - '0';
+	      while (isdigit(*cptr & 255))
+	        pnum = pnum * 10 + *cptr++ - '0';
 
               for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 	           cparam;

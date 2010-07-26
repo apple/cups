@@ -4,6 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- PJL value substitution of more than 9 values was broken (STR #3621)
 	- Custom options with missing string values caused ppdEmit* to segfault
 	  (STR #3620)
 	- Fixed an issue with the Italian version of the web interface
