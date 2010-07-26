@@ -1,5 +1,5 @@
 <DIV CLASS="indent">{?which_jobs=?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="SUBMIT" VALUE="Mostra stampe attive"></FORM>}
-{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completate"><INPUT TYPE="SUBMIT" VALUE="Mostra stampe completate"></FORM>}
-{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="tutte"><INPUT TYPE="SUBMIT" VALUE="Mostra tutte le stampe"></FORM>}</DIV>
+{?which_jobs=completed?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="completed"><INPUT TYPE="SUBMIT" VALUE="Mostra stampe completate"></FORM>}
+{?which_jobs=all?:<FORM ACTION="{?printer_name=?/jobs:{printer_uri_supported}}" METHOD="GET"><INPUT TYPE="HIDDEN" NAME="which_jobs" VALUE="all"><INPUT TYPE="SUBMIT" VALUE="Mostra tutte le stampe"></FORM>}</DIV>
 
 <P ALIGN="CENTER">{total=0?Nessuna stampa:Mostrat{total=1?a:e} {#job_id} di {total} stamp{total=1?a:e} {?which_jobs=?attiva:{which_jobs=all?:completata}} }.</P>
