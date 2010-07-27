@@ -4,6 +4,11 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- PJL value substitution of more than 9 values was broken (STR #3621)
+	- Custom options with missing string values caused ppdEmit* to segfault
+	  (STR #3620)
+	- Fixed an issue with the Italian version of the web interface
+	  (STR #3624)
 	- Fixed the Solaris SMF configuration file for cups-lpd (STR #3611)
 	- The scheduler did not set the notify-subscribed-event attribute when
 	  delivering printer-added or printer-modified events (STR #3608)

@@ -223,8 +223,13 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Copy and convert InputSlot data...
   */
 
-  if ((input_slot = ppdFindOption(ppd, "InputSlot")) != NULL)
+  if ((input_slot = ppdFindOption(ppd, "InputSlot")) == NULL)
+    input_slot = ppdFindOption(ppd, "HPPaperSource");
+
+  if (input_slot)
   {
+    pwg->source_option = _cupsStrAlloc(input_slot->keyword);
+
     if ((pwg->sources = calloc(input_slot->num_choices,
                                sizeof(_pwg_map_t))) == NULL)
     {
@@ -245,6 +250,10 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
         pwg_name = "auto";
       else if (!strcasecmp(choice->choice, "Cassette"))
         pwg_name = "main";
+      else if (!strcasecmp(choice->choice, "PhotoTray"))
+        pwg_name = "photo";
+      else if (!strcasecmp(choice->choice, "CDTray"))
+        pwg_name = "disc";
       else if (!strncasecmp(choice->choice, "Multipurpose", 12) ||
                !strcasecmp(choice->choice, "MP") ||
                !strcasecmp(choice->choice, "MPTray"))
@@ -443,62 +452,102 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (!pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_DRAFT] &&
       !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_NORMAL] &&
-      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_HIGH] &&
-      (color_model = ppdFindOption(ppd, "ColorModel")) != NULL &&
-      ppdFindChoice(color_model, "Gray"))
+      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_HIGH])
   {
    /*
-    * Copy and convert ColorModel (output-mode) data...
+    * Try adding some common color options to create grayscale presets.  These
+    * are listed in order of popularity...
     */
 
-    cups_option_t	*coption,	/* Color option */
-			*moption;	/* Monochrome option */
+    const char	*color_option = NULL,	/* Color control option */
+		*gray_choice = NULL;	/* Choice to select grayscale */
 
-    for (pwg_print_quality = _PWG_PRINT_QUALITY_DRAFT;
-         pwg_print_quality < _PWG_PRINT_QUALITY_MAX;
-	 pwg_print_quality ++)
+    if ((color_model = ppdFindOption(ppd, "ColorModel")) != NULL &&
+        ppdFindChoice(color_model, "Gray"))
     {
-      if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_print_quality])
-      {
-       /*
-        * Copy the color options...
-	*/
+      color_option = "ColorModel";
+      gray_choice  = "Gray";
+    }
+    else if ((color_model = ppdFindOption(ppd, "HPColorMode")) != NULL &&
+             ppdFindChoice(color_model, "grayscale"))
+    {
+      color_option = "HPColorMode";
+      gray_choice  = "grayscale";
+    }
+    else if ((color_model = ppdFindOption(ppd, "BRMonoColor")) != NULL &&
+             ppdFindChoice(color_model, "Mono"))
+    {
+      color_option = "BRMonoColor";
+      gray_choice  = "Mono";
+    }
+    else if ((color_model = ppdFindOption(ppd, "CNIJSGrayScale")) != NULL &&
+             ppdFindChoice(color_model, "1"))
+    {
+      color_option = "CNIJSGrayScale";
+      gray_choice  = "1";
+    }
+    else if ((color_model = ppdFindOption(ppd, "HPColorAsGray")) != NULL &&
+             ppdFindChoice(color_model, "True"))
+    {
+      color_option = "HPColorAsGray";
+      gray_choice  = "True";
+    }
 
-        num_options = pwg->num_presets[_PWG_OUTPUT_MODE_COLOR]
-	                              [pwg_print_quality];
-	options     = calloc(sizeof(cups_option_t), num_options);
-
-	if (options)
-	{
-	  for (i = num_options, moption = options,
-	           coption = pwg->presets[_PWG_OUTPUT_MODE_COLOR]
-		                         [pwg_print_quality];
-	       i > 0;
-	       i --, moption ++, coption ++)
-	  {
-	    moption->name  = _cupsStrRetain(coption->name);
-	    moption->value = _cupsStrRetain(coption->value);
-	  }
-
-	  pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
-	      num_options;
-	  pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
-	      options;
-	}
-      }
-      else if (pwg_print_quality != _PWG_PRINT_QUALITY_NORMAL)
-        continue;
-
+    if (color_option && gray_choice)
+    {
      /*
-      * Add ColorModel=Gray to the preset...
+      * Copy and convert ColorModel (output-mode) data...
       */
 
-      pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
-          cupsAddOption("ColorModel", "Gray",
-	                pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME]
-			                [pwg_print_quality],
-			pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME] +
-			    pwg_print_quality);
+      cups_option_t	*coption,	/* Color option */
+			  *moption;	/* Monochrome option */
+
+      for (pwg_print_quality = _PWG_PRINT_QUALITY_DRAFT;
+	   pwg_print_quality < _PWG_PRINT_QUALITY_MAX;
+	   pwg_print_quality ++)
+      {
+	if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_print_quality])
+	{
+	 /*
+	  * Copy the color options...
+	  */
+
+	  num_options = pwg->num_presets[_PWG_OUTPUT_MODE_COLOR]
+					[pwg_print_quality];
+	  options     = calloc(sizeof(cups_option_t), num_options);
+
+	  if (options)
+	  {
+	    for (i = num_options, moption = options,
+		     coption = pwg->presets[_PWG_OUTPUT_MODE_COLOR]
+					   [pwg_print_quality];
+		 i > 0;
+		 i --, moption ++, coption ++)
+	    {
+	      moption->name  = _cupsStrRetain(coption->name);
+	      moption->value = _cupsStrRetain(coption->value);
+	    }
+
+	    pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+		num_options;
+	    pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+		options;
+	  }
+	}
+	else if (pwg_print_quality != _PWG_PRINT_QUALITY_NORMAL)
+	  continue;
+
+       /*
+	* Add the grayscale option to the preset...
+	*/
+
+	pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	    cupsAddOption(color_option, gray_choice,
+			  pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME]
+					  [pwg_print_quality],
+			  pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME] +
+			      pwg_print_quality);
+      }
     }
   }
 
@@ -607,13 +656,30 @@ _pwgGetInputSlot(_pwg_t     *pwg,	/* I - PWG mapping data */
 
     ipp_attribute_t	*media_col,	/* media-col attribute */
 			*media_source;	/* media-source attribute */
+    _pwg_size_t		size;		/* Dimensional size */
+    int			margins_set;	/* Were the margins set? */
 
     media_col = ippFindAttribute(job, "media-col", IPP_TAG_BEGIN_COLLECTION);
     if (media_col &&
         (media_source = ippFindAttribute(media_col->values[0].collection,
                                          "media-source",
 	                                 IPP_TAG_KEYWORD)) != NULL)
+    {
+     /*
+      * Use the media-source value from media-col...
+      */
+
       keyword = media_source->values[0].string.text;
+    }
+    else if (_pwgInitSize(&size, job, &margins_set))
+    {
+     /*
+      * For media <= 5x7, look for a photo tray...
+      */
+
+      if (size.width <= (5 * 2540) && size.length <= (7 * 2540))
+        keyword = "photo";
+    }
   }
 
   if (keyword)

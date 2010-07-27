@@ -1362,7 +1362,6 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   int		kbytes;			/* Size of print file */
   int		i;			/* Looping var */
   int		lowerpagerange;		/* Page range bound */
-  const char	*ppd;			/* PPD keyword for media selection */
   int		exact;			/* Did we have an exact match? */
   ipp_attribute_t *media_col,		/* media-col attribute */
 		*media_margin;		/* media-*-margin attribute */
@@ -1538,7 +1537,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!ippFindAttribute(con->request, "PageRegion", IPP_TAG_ZERO) &&
       !ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
-      (ppd = _pwgGetPageSize(printer->pwg, con->request, NULL, &exact)) != NULL)
+      _pwgGetPageSize(printer->pwg, con->request, NULL, &exact))
   {
     if (!exact &&
         (media_col = ippFindAttribute(con->request, "media-col",
@@ -2944,11 +2943,11 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir,
              printer->name);
     unlink(cache_name);
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg2", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -3994,7 +3993,7 @@ cancel_all_jobs(cupsd_client_t  *con,	/* I - Client connection */
     {
       for (i = 0; i < job_ids->num_values; i ++)
       {
-	if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
+	if (!cupsdFindJob(job_ids->values[i].integer))
 	  break;
       }
 
@@ -4633,7 +4632,6 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
           ipp_attribute_t *uri)		/* I - Printer URI */
 {
   cupsd_job_t		*job;		/* Job */
-  cupsd_printer_t	*printer;	/* Printer */
   ipp_attribute_t	*attr;		/* Attribute */
   char			job_uri[HTTP_MAX_URI],
 					/* Job URI */
@@ -4680,8 +4678,6 @@ close_job(cupsd_client_t  *con,		/* I - Client connection */
                     attr->values[0].integer);
     return;
   }
-
-  printer = cupsdFindDest(job->dest);
 
  /*
   * See if the job is owned by the requesting user...
@@ -6660,10 +6656,10 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp2", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.ipp3", CacheDir, printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.pwg", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.pwg2", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__
@@ -7356,7 +7352,7 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
     for (i = 0; i < job_ids->num_values; i ++)
     {
-      if ((job = cupsdFindJob(job_ids->values[i].integer)) == NULL)
+      if (!cupsdFindJob(job_ids->values[i].integer))
         break;
     }
 

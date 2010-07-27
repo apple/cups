@@ -678,7 +678,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	    case PPD_CUSTOM_PASSCODE :
 	    case PPD_CUSTOM_PASSWORD :
 	    case PPD_CUSTOM_STRING :
-	        bufsize += strlen(cparam->current.custom_string);
+	        if (cparam->current.custom_string)
+		  bufsize += strlen(cparam->current.custom_string);
 	        break;
           }
 	}
@@ -723,7 +724,9 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	    case PPD_CUSTOM_PASSCODE :
 	    case PPD_CUSTOM_PASSWORD :
 	    case PPD_CUSTOM_STRING :
-	        bufsize += 3 + 4 * strlen(cparam->current.custom_string);
+		bufsize += 3;
+	        if (cparam->current.custom_string)
+		  bufsize += 4 * strlen(cparam->current.custom_string);
 	        break;
           }
 	}
@@ -792,8 +795,8 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	      */
 
               pnum = *cptr++ - '0';
-	      while (isalnum(*cptr & 255))
-	        pnum = pnum * 10 + *cptr - '0';
+	      while (isdigit(*cptr & 255))
+	        pnum = pnum * 10 + *cptr++ - '0';
 
               for (cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 	           cparam;
@@ -823,9 +826,12 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 		  case PPD_CUSTOM_PASSCODE :
 		  case PPD_CUSTOM_PASSWORD :
 		  case PPD_CUSTOM_STRING :
-		      strlcpy(bufptr, cparam->current.custom_string,
-		              bufend - bufptr);
-		      bufptr += strlen(bufptr);
+		      if (cparam->current.custom_string)
+		      {
+			strlcpy(bufptr, cparam->current.custom_string,
+				bufend - bufptr);
+			bufptr += strlen(bufptr);
+		      }
 		      break;
 		}
 	      }
@@ -1028,14 +1034,19 @@ ppdEmitString(ppd_file_t    *ppd,	/* I - PPD file record */
 	    case PPD_CUSTOM_STRING :
 	        *bufptr++ = '(';
 
-		for (s = cparam->current.custom_string; *s; s ++)
-		  if (*s < ' ' || *s == '(' || *s == ')' || *s >= 127)
+		if (cparam->current.custom_string)
+		{
+		  for (s = cparam->current.custom_string; *s; s ++)
 		  {
-		    snprintf(bufptr, bufend - bufptr + 1, "\\%03o", *s & 255);
-		    bufptr += strlen(bufptr);
+		    if (*s < ' ' || *s == '(' || *s == ')' || *s >= 127)
+		    {
+		      snprintf(bufptr, bufend - bufptr + 1, "\\%03o", *s & 255);
+		      bufptr += strlen(bufptr);
+		    }
+		    else
+		      *bufptr++ = *s;
 		  }
-		  else
-		    *bufptr++ = *s;
+		}
 
 	        *bufptr++ = ')';
 		*bufptr++ = '\n';

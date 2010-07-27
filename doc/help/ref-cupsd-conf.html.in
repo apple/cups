@@ -2931,23 +2931,23 @@ SetEnv MY_ENV_VAR foo
 variable that should be passed to child processes.</P>
 
 
-<H2 CLASS="title"><A NAME="SSLOptions">SSLOptions</A></H2>
+<H2 CLASS="title"><A NAME="SSLListen">SSLListen</A></H2>
 
 <H3>Examples</H3>
 
 <PRE CLASS="command">
-SSLOptions 127.0.0.1:443
-SSLOptions 192.0.2.1:443
+SSLListen 127.0.0.1:443
+SSLListen 192.0.2.1:443
 </PRE>
 
 <H3>Description</H3>
 
-<P>The <CODE>SSLOptions</CODE> directive specifies a network
+<P>The <CODE>SSLListen</CODE> directive specifies a network
 address and port to listen for secure connections. Multiple
-<CODE>SSLOptions</CODE> directives can be provided to listen on
+<CODE>SSLListen</CODE> directives can be provided to listen on
 multiple addresses.</P>
 
-<P>The <CODE>SSLOptions</CODE> directive is similar to the <A
+<P>The <CODE>SSLListen</CODE> directive is similar to the <A
 HREF="#SSLPort"><CODE>SSLPort</CODE></A> directive but allows you
 to restrict access to specific interfaces or networks.</P>
 

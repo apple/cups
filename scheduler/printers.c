@@ -1,7 +1,7 @@
 /*
  * "$Id: printers.c 7968 2008-09-19 23:03:01Z mike $"
  *
- *   Printer routines for the Common UNIX Printing System (CUPS).
+ *   Printer routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -4002,11 +4002,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp2", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
-  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg", CacheDir, p->name);
+  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg2", CacheDir, p->name);
   if (stat(pwg_name, &pwg_info))
     pwg_info.st_mtime = 0;
 
@@ -4487,10 +4487,17 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 	             "output-bin-default", NULL, p->pwg->bins[0].pwg);
     }
-    else if ((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
+    else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
-	     !strcasecmp(ppd_attr->value, "Reverse"))
+	      !strcasecmp(ppd_attr->value, "Reverse")) ||
+	     (!ppd_attr && ppd->manufacturer &&	/* EPSON "compatibility heuristic" */
+	      !strcasecmp(ppd->manufacturer, "epson")))
     {
+     /*
+      * Report that this printer has a single output bin that leaves pages face
+      * up.
+      */
+
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "output-bin-supported", NULL, "face-up");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
