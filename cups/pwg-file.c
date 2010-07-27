@@ -598,7 +598,7 @@ _pwgWriteFile(_pwg_t     *pwg,		/* I - PWG mapping data */
   */
 
   for (i = _PWG_OUTPUT_MODE_MONOCHROME; i < _PWG_OUTPUT_MODE_MAX; i ++)
-    for (j = _PWG_PRINT_QUALITY_DRAFT; i < _PWG_PRINT_QUALITY_MAX; i ++)
+    for (j = _PWG_PRINT_QUALITY_DRAFT; j < _PWG_PRINT_QUALITY_MAX; j ++)
       if (pwg->num_presets[i][j])
       {
 	cupsFilePrintf(fp, "Preset %d %d", i, j);
