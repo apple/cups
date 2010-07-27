@@ -1062,8 +1062,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  fprintf(stderr, "DEBUG: Read %d bytes...\n", (int)bytes);
 
-	  if ((http_status = cupsWriteRequestData(http, buffer, bytes))
-	          != HTTP_CONTINUE)
+	  if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
             break;
           else
 	  {
@@ -1186,8 +1185,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
 	  {
-	    if ((http_status = cupsWriteRequestData(http, buffer, bytes))
-		    != HTTP_CONTINUE)
+	    if (cupsWriteRequestData(http, buffer, bytes) != HTTP_CONTINUE)
 	      break;
 	    else
 	    {

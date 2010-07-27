@@ -88,7 +88,6 @@ cupsCharsetToUTF8(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
   cups_utf8_t	*destptr;		/* Pointer into UTF-8 buffer */
-  int		bytes;			/* Number of bytes converted */
   size_t	srclen,			/* Length of source string */
 		outBytesLeft;		/* Bytes remaining in output buffer */
 
@@ -172,9 +171,10 @@ cupsCharsetToUTF8(
   {
     srclen       = strlen(src);
     outBytesLeft = maxout - 1;
-    bytes        = (int)iconv(map_to_utf8, (char **)&src, &srclen,
-			      (char **)&destptr, &outBytesLeft);
-    *destptr     = '\0';
+
+    iconv(map_to_utf8, (char **)&src, &srclen, (char **)&destptr,
+	  &outBytesLeft);
+    *destptr = '\0';
 
     _cupsMutexUnlock(&map_mutex);
 
@@ -206,7 +206,6 @@ cupsUTF8ToCharset(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
   char		*destptr;		/* Pointer into destination */
-  int		bytes;			/* Number of bytes converted */
   size_t	srclen,			/* Length of source string */
 		outBytesLeft;		/* Bytes remaining in output buffer */
 
@@ -293,9 +292,9 @@ cupsUTF8ToCharset(
   {
     srclen       = strlen((char *)src);
     outBytesLeft = maxout - 1;
-    bytes        = (int)iconv(map_from_utf8, (char **)&src, &srclen,
-			      &destptr, &outBytesLeft);
-    *destptr     = '\0';
+
+    iconv(map_from_utf8, (char **)&src, &srclen, &destptr, &outBytesLeft);
+    *destptr = '\0';
 
     _cupsMutexUnlock(&map_mutex);
 
