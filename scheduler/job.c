@@ -3064,7 +3064,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	attr->values[0].integer <= IPP_QUALITY_HIGH)
       print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
     else
-      print_quality = IPP_QUALITY_NORMAL;
+      print_quality = _PWG_PRINT_QUALITY_NORMAL;
 
     if (pwg->num_presets[output_mode][print_quality] == 0)
     {
