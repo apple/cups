@@ -9843,8 +9843,6 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
     return;
   }
 
-  printer = cupsdFindDest(job->dest);
-
  /*
   * See if the job is owned by the requesting user...
   */
