@@ -997,6 +997,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 	}
       }
 
+      puts("\nSizes:");
+      for (i = ppd->num_sizes, size = ppd->sizes; i > 0; i --, size ++)
+        printf("    %s = %gx%g, [%g %g %g %g]\n", size->name, size->width,
+	       size->length, size->left, size->bottom, size->right, size->top);
+
       puts("\nConstraints:");
 
       for (i = ppd->num_consts, c = ppd->consts; i > 0; i --, c ++)
