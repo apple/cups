@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "6 April 2010" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "2 August 2010" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -73,6 +73,12 @@ Defines a test.
 DEFINE variable-name value
 Defines the named variable to the given value. This is equivalent to specifying
 "-d variable-name=value" on the \fIipptool\fR command-line.
+.TP 5
+IGNORE-ERRORS yes
+.TP 5
+IGNORE-ERRORS no
+Specifies whether, by default, \fIipptool\fR will ignore errors and continue with
+subsequent tests.
 .TP 5
 INCLUDE "filename"
 .TP 5
@@ -144,6 +150,12 @@ when sending a test print file.
 GROUP tag
 Specifies the group tag for subsequent attributes in the request.
 .TP 5
+IGNORE-ERRORS yes
+.TP 5
+IGNORE-ERRORS no
+Specifies whether \fIipptool\fR will ignore errors and continue with subsequent
+tests.
+.TP 5
 NAME "literal string"
 Specifies the human-readable name of the test.
 .TP 5
@@ -159,6 +171,12 @@ word "random" to use a randomly generated value (the default).
 RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
 The default is the resource from the URI provided to the \fIipptool\fR program.
+.TP 5
+SKIP-PREVIOUS-ERROR yes
+.TP 5
+SKIP-PREVIOUS-ERROR no
+Specifies whether \fIipptool\fR will skip the current test if the previous test
+resulted in an error/failure.
 .TP 5
 STATUS status-code [ predicate ]
 Specifies an expected response status-code value. Additional requirements can be

@@ -123,7 +123,8 @@ _cups_transfer_t Transfer = _CUPS_TRANSFER_AUTO;
 					/* How to transfer requests */
 _cups_output_t	Output = _CUPS_OUTPUT_LIST;
 					/* Output mode */
-int		Verbosity = 0,		/* Show all attributes? */
+int		IgnoreErrors = 0,	/* Ignore errors? */
+		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0;		/* 1 if header is written */
 const char * const URIStatusStrings[] =	/* URI status strings */
@@ -254,6 +255,10 @@ main(int  argc,				/* I - Number of command-line args */
 			      _("%s: Sorry, no encryption support compiled in\n"),
 			      argv[0]);
 #endif /* HAVE_SSL */
+	      break;
+
+          case 'I' : /* Ignore errors */
+	      IgnoreErrors = 1;
 	      break;
 
           case 'L' : /* Disable HTTP chunking */
@@ -544,8 +549,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   int		i,			/* Looping var */
 		linenum,		/* Current line number */
 		pass,			/* Did we pass the test? */
+		prev_pass = 1,		/* Did we pass the previous test? */
 		request_id,		/* Current request ID */
-		show_header = 1;	/* Show the test header? */
+		show_header = 1,	/* Show the test header? */
+		ignore_errors,		/* Ignore test failures? */
+		skip_previous = 0;	/* Skip on previous test failure? */
   http_t	*http = NULL;		/* HTTP connection to server */
   FILE		*fp = NULL;		/* Test file */
   char		resource[512],		/* Resource for request */
@@ -637,6 +645,26 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
       continue;
     }
+    else if (!strcmp(token, "IGNORE-ERRORS"))
+    {
+     /*
+      * IGNORE-ERRORS yes
+      * IGNORE-ERRORS no
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum) &&
+          (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+      {
+        IgnoreErrors = !strcasecmp(temp, "yes");
+      }
+      else
+      {
+        print_fatal_error("Missing IGNORE-ERRORS value on line %d.", linenum);
+        goto test_error;
+      }
+
+      continue;
+    }
     else if (!strcmp(token, "INCLUDE"))
     {
      /*
@@ -652,7 +680,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         if (!do_tests(vars, get_filename(testfile, filename, temp,
 	                                 sizeof(filename))))
-	  goto test_error;
+	{
+	  pass = 0;
+
+	  if (!IgnoreErrors)
+	    goto test_error;
+	}
       }
       else
       {
@@ -748,6 +781,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     request       = ippNew();
     op            = (ipp_op_t)0;
     group         = IPP_TAG_ZERO;
+    ignore_errors = IgnoreErrors;
     last_expect   = NULL;
     last_status   = NULL;
     filename[0]   = '\0';
@@ -844,6 +878,26 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_error;
 	}
       }
+      else if (!strcmp(token, "IGNORE-ERRORS"))
+      {
+       /*
+	* IGNORE-ERRORS yes
+	* IGNORE-ERRORS no
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum) &&
+	    (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+	{
+	  ignore_errors = !strcasecmp(temp, "yes");
+	}
+	else
+	{
+	  print_fatal_error("Missing IGNORE-ERRORS value on line %d.", linenum);
+	  goto test_error;
+	}
+
+	continue;
+      }
       else if (!strcasecmp(token, "NAME"))
       {
        /*
@@ -877,6 +931,26 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  print_fatal_error("Missing REQUEST-ID value on line %d.", linenum);
 	  goto test_error;
 	}
+      }
+      else if (!strcmp(token, "SKIP-PREVIOUS-ERROR"))
+      {
+       /*
+	* SKIP-PREVIOUS-ERROR yes
+	* SKIP-PREVIOUS-ERROR no
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum) &&
+	    (!strcasecmp(temp, "yes") || !strcasecmp(temp, "no")))
+	{
+	  skip_previous = !strcasecmp(temp, "yes");
+	}
+	else
+	{
+	  print_fatal_error("Missing SKIP-PREVIOUS-ERROR value on line %d.", linenum);
+	  goto test_error;
+	}
+
+	continue;
       }
       else if (!strcmp(token, "TRANSFER"))
       {
@@ -1062,8 +1136,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  case IPP_TAG_RESOLUTION :
 	      {
 	        int	xres,		/* X resolution */
-	        yres;		/* Y resolution */
-	        char *ptr;	/* Pointer into value */
+			yres;		/* Y resolution */
+	        char	*ptr;		/* Pointer into value */
 
 	        xres = yres = strtol(token, (char **)&ptr, 10);
 	        if (ptr > token && xres > 0)
@@ -1489,6 +1563,27 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       fflush(stdout);
     }
 
+    if (skip_previous && !prev_pass)
+    {
+      ippDelete(request);
+      request = NULL;
+
+      if (Output == _CUPS_OUTPUT_PLIST)
+      {
+	puts("<key>Successful</key>");
+	puts("<true />");
+	puts("<key>StatusCode</key>");
+	print_xml_string("string", "skipped");
+	puts("<key>ResponseAttributes</key>");
+	puts("<dict>");
+	puts("</dict>");
+      }
+      else if (Output == _CUPS_OUTPUT_TEST)
+	puts("SKIPPED]");
+
+      goto skip_error;
+    }
+
     if (transfer == _CUPS_TRANSFER_CHUNKED ||
         (transfer == _CUPS_TRANSFER_AUTO && filename[0]))
     {
@@ -1532,19 +1627,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else
       response = cupsDoRequest(http, request, resource);
 
-    request = NULL;
+    request   = NULL;
+    prev_pass = 1;
 
     if (!response)
-      pass = 0;
+      prev_pass = pass = 0;
     else
     {
       if (http->version != HTTP_1_1)
-        pass = 0;
+        prev_pass = pass = 0;
 
       if (response->request.status.version[0] != (version / 10) ||
 	  response->request.status.version[1] != (version % 10) ||
 	  response->request.status.request_id != request_id)
-        pass = 0;
+        prev_pass = pass = 0;
 
       if ((attrptr = ippFindAttribute(response, "job-id",
                                       IPP_TAG_INTEGER)) != NULL)
@@ -1570,7 +1666,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  attrptr->group_tag != IPP_TAG_OPERATION ||
 	  attrptr->num_values != 1 ||
           strcmp(attrptr->name, "attributes-charset"))
-        pass = 0;
+        prev_pass = pass = 0;
 
       if (attrptr)
       {
@@ -1580,7 +1676,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    attrptr->group_tag != IPP_TAG_OPERATION ||
 	    attrptr->num_values != 1 ||
 	    strcmp(attrptr->name, "attributes-natural-language"))
-	  pass = 0;
+	  prev_pass = pass = 0;
       }
 
       if ((attrptr = ippFindAttribute(response, "status-message",
@@ -1590,7 +1686,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	   attrptr->num_values != 1 ||
 	   (attrptr->value_tag == IPP_TAG_TEXT &&
 	    strlen(attrptr->values[0].string.text) > 255)))
-	pass = 0;
+	prev_pass = pass = 0;
 
       if ((attrptr = ippFindAttribute(response, "detailed-status-message",
                                       IPP_TAG_ZERO)) != NULL &&
@@ -1599,7 +1695,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	   attrptr->num_values != 1 ||
 	   (attrptr->value_tag == IPP_TAG_TEXT &&
 	    strlen(attrptr->values[0].string.text) > 1023)))
-	pass = 0;
+	prev_pass = pass = 0;
 
       for (attrptr = response->attrs, group = attrptr->group_tag;
            attrptr;
@@ -1607,13 +1703,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
         if (attrptr->group_tag < group && attrptr->group_tag != IPP_TAG_ZERO)
 	{
-	  pass = 0;
+	  prev_pass = pass = 0;
 	  break;
 	}
 
         if (!validate_attr(attrptr, 0))
 	{
-	  pass = 0;
+	  prev_pass = pass = 0;
 	  break;
 	}
       }
@@ -1633,7 +1729,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
 
       if (i == num_statuses && num_statuses > 0)
-	pass = 0;
+	prev_pass = pass = 0;
       else
       {
         for (i = num_expects, expect = expects; i > 0; i --, expect ++)
@@ -1652,20 +1748,20 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      (found && expect->in_group &&
 	       found->group_tag != expect->in_group))
           {
-      	    pass = 0;
+      	    prev_pass = pass = 0;
       	    break;
           }
 
           if (found &&
 	      !with_value(expect->with_value, expect->with_regex, found))
           {
-            pass = 0;
+            prev_pass = pass = 0;
             break;
           }
 
           if (found && expect->count > 0 && found->num_values != expect->count)
 	  {
-            pass = 0;
+            prev_pass = pass = 0;
             break;
 	  }
 
@@ -1676,7 +1772,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             if (!attrptr || attrptr->num_values != found->num_values)
             {
-              pass = 0;
+              prev_pass = pass = 0;
               break;
             }
           }
@@ -1687,7 +1783,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     if (Output == _CUPS_OUTPUT_PLIST)
     {
       puts("<key>Successful</key>");
-      puts(pass ? "<true />" : "<false />");
+      puts(prev_pass ? "<true />" : "<false />");
       puts("<key>StatusCode</key>");
       print_xml_string("string", ippErrorString(cupsLastError()));
       puts("<key>ResponseAttributes</key>");
@@ -1700,7 +1796,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     }
     else if (Output == _CUPS_OUTPUT_TEST)
     {
-      puts(pass ? "PASS]" : "FAIL]");
+      puts(prev_pass ? "PASS]" : "FAIL]");
 
       if (Verbosity && response)
       {
@@ -1717,11 +1813,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
       }
     }
-    else if (!pass)
+    else if (!prev_pass)
       fprintf(stderr, "%s\n", cupsLastErrorString());
 
-    if (pass && Output != _CUPS_OUTPUT_PLIST && Output != _CUPS_OUTPUT_QUIET &&
-        !Verbosity && num_displayed > 0)
+    if (prev_pass && Output != _CUPS_OUTPUT_PLIST && 
+        Output != _CUPS_OUTPUT_QUIET && !Verbosity && num_displayed > 0)
     {
       if (Output >= _CUPS_OUTPUT_LIST)
       {
@@ -1787,7 +1883,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	}
       }
     }
-    else if (!pass)
+    else if (!prev_pass)
     {
       if (Output == _CUPS_OUTPUT_PLIST)
       {
@@ -2005,6 +2101,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     if (Output == _CUPS_OUTPUT_PLIST)
       puts("</dict>");
 
+    skip_error:
+
     ippDelete(response);
     response = NULL;
 
@@ -2037,7 +2135,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(displayed[i]);
     num_displayed = 0;
 
-    if (!pass)
+    if (!ignore_errors && !prev_pass)
       break;
   }
 
@@ -3317,6 +3415,7 @@ usage(void)
 		  "\n"
 		  "-C             Send requests using chunking (default)\n"
 		  "-E             Test with TLS encryption.\n"
+		  "-I             Ignore errors\n"
 		  "-L             Send requests using content-length\n"
 		  "-S             Test with SSL encryption.\n"
 		  "-V version     Set default IPP version.\n"

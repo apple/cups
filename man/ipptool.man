@@ -11,12 +11,12 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "6 April 2010" "Apple Inc."
+.TH ipptool 1 "CUPS" "2 August 2010" "Apple Inc."
 .SH NAME
 ipptool - perform internet printing protocol requests
 .SH SYNOPSIS
 .B ipptool
-[ -C ] [ -E ] [ -L ] [ -S ] [ -V
+[ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -V
 .I version
 ] [ -X ] [ -c ] [ -d
 .I name=value
@@ -42,6 +42,9 @@ Specifies that requests should be sent using the HTTP/1.1 "Transfer-Encoding: ch
 .TP 5
 -E
 Forces TLS encryption when connecting to the server using the HTTP "Upgrade" header.
+.TP 5
+-I
+Specifies that \fIipptool\fR will continue past errors.
 .TP 5
 -L
 Specifies that requests should be sent using the HTTP/1.0 "Content-Length:" header, which is required for conformance by all versions of IPP. The default is to use "Transfer-Encoding: chunked" for requests with attached files and "Content-Length:" for requests without attached files.
