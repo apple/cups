@@ -1418,7 +1418,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 
-	if ((statuses[num_statuses].status = ippErrorValue(token)) < 0)
+	if ((statuses[num_statuses].status = ippErrorValue(token)) < 0 &&
+	    (statuses[num_statuses].status = strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
 	                    linenum);

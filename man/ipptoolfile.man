@@ -341,8 +341,8 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
 .fi
 
 .SH STATUS CODES
-Status codes correspond to the names from RFC 2911 and other IPP extension
-specifications. Here is a complete list:
+Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
+2911 and other IPP extension specifications. Here is a complete list:
 .nf
     client-error-attributes-not-settable
     client-error-attributes-or-values-not-supported
