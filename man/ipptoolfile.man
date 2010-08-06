@@ -87,9 +87,9 @@ Includes another test file. The first form includes a file relative to the
 current test file, while the second form includes a file from the \fIipptool\fR
 include directory.
 .TP 5
-SKIP-IF-DEFINED variable
+SKIP-IF-DEFINED variable-name
 .TP 5
-SKIP-IF-NOT-DEFINED variable
+SKIP-IF-NOT-DEFINED variable-name
 Specifies that the remainder of the test file should be skipped when the
 variable is or is not defined.
 .TP 5
@@ -178,9 +178,9 @@ RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
 The default is the resource from the URI provided to the \fIipptool\fR program.
 .TP 5
-SKIP-IF-DEFINED variable
+SKIP-IF-DEFINED variable-name
 .TP 5
-SKIP-IF-NOT-DEFINED variable
+SKIP-IF-NOT-DEFINED variable-name
 Specifies that the current test should be skipped when the variable is or is not
 defined.
 .TP 5
@@ -223,15 +223,15 @@ The following predicates are understood following the EXPECT test directive:
 COUNT number
 Requires the EXPECT attribute to have the specified number of values.
 .TP 5
-DEFINE-MATCH variable
+DEFINE-MATCH variable-name
 Defines the variable to "1" when the EXPECT condition matches. A side-effect of
 this predicate is that this EXPECT will never fail a test.
 .TP 5
-DEFINE-NO-MATCH variable
+DEFINE-NO-MATCH variable-name
 Defines the variable to "1" when the EXPECT condition does not match. A side-
 effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
-DEFINE-VALUE variable
+DEFINE-VALUE variable-name
 Defines the variable to the value of the attribute when the EXPECT condition
 matches.
 .TP 5
