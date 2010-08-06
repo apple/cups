@@ -1956,29 +1956,32 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      (found && expect->in_group &&
 	       found->group_tag != expect->in_group))
           {
-      	    prev_pass = pass = 0;
-
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
+	    else
+	      prev_pass = pass = 0;
+
       	    continue;
           }
 
           if (found &&
 	      !with_value(expect->with_value, expect->with_regex, found))
           {
-            prev_pass = pass = 0;
-
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
+	    else
+	      prev_pass = pass = 0;
+
             continue;
           }
 
           if (found && expect->count > 0 && found->num_values != expect->count)
 	  {
-            prev_pass = pass = 0;
-
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
+	    else
+	      prev_pass = pass = 0;
+
             continue;
 	  }
 
@@ -1989,10 +1992,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
             if (!attrptr || attrptr->num_values != found->num_values)
             {
-              prev_pass = pass = 0;
-
 	      if (expect->define_no_match)
 		set_variable(vars, expect->define_no_match, "1");
+	      else
+		prev_pass = pass = 0;
+
               continue;
             }
           }
@@ -2265,6 +2269,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
+	  if (expect->define_no_match)
+	    continue;
+
 	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
 	    continue;
 
@@ -2357,6 +2364,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         free(expect->if_undefined);
       if (expect->with_value)
         free(expect->with_value);
+      if (expect->define_match)
+        free(expect->define_match);
+      if (expect->define_no_match)
+        free(expect->define_no_match);
+      if (expect->define_value)
+        free(expect->define_value);
     }
     num_expects = 0;
 
@@ -2398,6 +2411,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(expect->if_undefined);
     if (expect->with_value)
       free(expect->with_value);
+    if (expect->define_match)
+      free(expect->define_match);
+    if (expect->define_no_match)
+      free(expect->define_no_match);
+    if (expect->define_value)
+      free(expect->define_value);
   }
 
   for (i = 0; i < num_displayed; i ++)
