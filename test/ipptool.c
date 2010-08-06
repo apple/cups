@@ -82,7 +82,10 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*same_count_as,		/* Parallel attribute name */
 		*if_defined,		/* Only required if variable defined */
 		*if_undefined,		/* Only required if variable is not defined */
-		*with_value;		/* Attribute must include this value */
+		*with_value,		/* Attribute must include this value */
+		*define_match,		/* Variable to define on match */
+		*define_no_match,	/* Variable to define on no-match */
+		*define_value;		/* Variable to define with value */
   int		with_regex,		/* WITH-VALUE is a regular expression */
 		count;			/* Expected count if > 0 */
   ipp_tag_t	in_group;		/* IN-GROUP value */
@@ -572,7 +575,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   char		name[1024];		/* Name of test */
   char		filename[1024];		/* Filename */
   _cups_transfer_t transfer;		/* To chunk or not to chunk */
-  int		version;		/* IPP version number to use */
+  int		version,		/* IPP version number to use */
+		skip_test;		/* Skip this test? */
   int		num_statuses = 0;	/* Number of valid status codes */
   _cups_status_t statuses[100],		/* Valid status codes */
 		*last_status;		/* Last STATUS (for predicates) */
@@ -593,7 +597,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   {
     print_fatal_error("Unable to open test file %s - %s", testfile,
                       strerror(errno));
-    goto test_error;
+    pass = 0;
+    goto test_exit;
   }
 
  /*
@@ -605,7 +610,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, strerror(errno));
-    goto test_error;
+    pass = 0;
+    goto test_exit;
   }
 
  /*
@@ -640,7 +646,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
         print_fatal_error("Missing DEFINE name and/or value on line %d.",
 	                  linenum);
-        goto test_error;
+	pass = 0;
+	goto test_exit;
       }
 
       continue;
@@ -660,7 +667,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       else
       {
         print_fatal_error("Missing IGNORE-ERRORS value on line %d.", linenum);
-        goto test_error;
+	pass = 0;
+	goto test_exit;
       }
 
       continue;
@@ -684,17 +692,55 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  pass = 0;
 
 	  if (!IgnoreErrors)
-	    goto test_error;
+	    goto test_exit;
 	}
       }
       else
       {
         print_fatal_error("Missing INCLUDE filename on line %d.", linenum);
-        goto test_error;
+	pass = 0;
+	goto test_exit;
       }
 
       show_header = 1;
       continue;
+    }
+    else if (!strcmp(token, "SKIP-IF-DEFINED"))
+    {
+     /*
+      * SKIP-IF-DEFINED variable
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        if (get_variable(vars, temp))
+	  goto test_exit;
+      }
+      else
+      {
+        print_fatal_error("Missing SKIP-IF-DEFINED value on line %d.", linenum);
+	pass = 0;
+	goto test_exit;
+      }
+    }
+    else if (!strcmp(token, "SKIP-IF-NOT-DEFINED"))
+    {
+     /*
+      * SKIP-IF-NOT-DEFINED variable
+      */
+
+      if (get_token(fp, temp, sizeof(temp), &linenum))
+      {
+        if (!get_variable(vars, temp))
+	  goto test_exit;
+      }
+      else
+      {
+        print_fatal_error("Missing SKIP-IF-NOT-DEFINED value on line %d.",
+	                  linenum);
+	pass = 0;
+	goto test_exit;
+      }
     }
     else if (!strcmp(token, "TRANSFER"))
     {
@@ -716,13 +762,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else
       {
         print_fatal_error("Missing TRANSFER value on line %d.", linenum);
-        goto test_error;
+	pass = 0;
+	goto test_exit;
       }
 
       continue;
@@ -744,13 +792,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  print_fatal_error("Bad VERSION \"%s\" on line %d.", temp, linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else
       {
         print_fatal_error("Missing VERSION number on line %d.", linenum);
-        goto test_error;
+	pass = 0;
+	goto test_exit;
       }
 
       continue;
@@ -758,7 +808,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     else if (strcmp(token, "{"))
     {
       print_fatal_error("Unexpected token %s seen on line %d.", token, linenum);
-      goto test_error;
+      pass = 0;
+      goto test_exit;
     }
 
    /*
@@ -785,6 +836,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     last_expect   = NULL;
     last_status   = NULL;
     filename[0]   = '\0';
+    skip_test     = 0;
     version       = Version;
     transfer      = Transfer;
 
@@ -799,6 +851,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     while (get_token(fp, token, sizeof(token), &linenum) != NULL)
     {
       if (strcasecmp(token, "COUNT") &&
+          strcasecmp(token, "DEFINE-MATCH") &&
+          strcasecmp(token, "DEFINE-NO-MATCH") &&
+          strcasecmp(token, "DEFINE-VALUE") &&
           strcasecmp(token, "IF-DEFINED") &&
           strcasecmp(token, "IF-UNDEFINED") &&
           strcasecmp(token, "IN-GROUP") &&
@@ -836,7 +891,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 				          sizeof(ipp_value_t))) == NULL)
 	  {
 	    print_fatal_error("Unable to allocate memory on line %d.", linenum);
-	    goto test_error;
+	    pass = 0;
+	    goto test_exit;
 	  }
 
 	  if (tempcol != lastcol)
@@ -857,7 +913,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  lastcol->num_values ++;
 	}
 	else
-	  goto test_error;
+	{
+	  pass = 0;
+	  goto test_exit;
+	}
       }
       else if (!strcmp(token, "DEFINE"))
       {
@@ -875,7 +934,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("Missing DEFINE name and/or value on line %d.",
 			    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcmp(token, "IGNORE-ERRORS"))
@@ -893,7 +953,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  print_fatal_error("Missing IGNORE-ERRORS value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	continue;
@@ -923,13 +984,53 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    print_fatal_error("Bad REQUEST-ID value \"%s\" on line %d.", temp,
 			      linenum);
-	    goto test_error;
+	    pass = 0;
+	    goto test_exit;
 	  }
 	}
 	else
 	{
 	  print_fatal_error("Missing REQUEST-ID value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcmp(token, "SKIP-IF-DEFINED"))
+      {
+       /*
+	* SKIP-IF-DEFINED variable
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  if (get_variable(vars, temp))
+	    skip_test = 1;
+	}
+	else
+	{
+	  print_fatal_error("Missing SKIP-IF-DEFINED value on line %d.",
+	                    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcmp(token, "SKIP-IF-NOT-DEFINED"))
+      {
+       /*
+	* SKIP-IF-NOT-DEFINED variable
+	*/
+
+	if (get_token(fp, temp, sizeof(temp), &linenum))
+	{
+	  if (!get_variable(vars, temp))
+	    skip_test = 1;
+	}
+	else
+	{
+	  print_fatal_error("Missing SKIP-IF-NOT-DEFINED value on line %d.",
+			    linenum);
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcmp(token, "SKIP-PREVIOUS-ERROR"))
@@ -947,7 +1048,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  print_fatal_error("Missing SKIP-PREVIOUS-ERROR value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	continue;
@@ -972,13 +1074,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    print_fatal_error("Bad TRANSFER value \"%s\" on line %d.", temp,
 			      linenum);
-	    goto test_error;
+	    pass = 0;
+	    goto test_exit;
 	  }
 	}
 	else
 	{
 	  print_fatal_error("Missing TRANSFER value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "VERSION"))
@@ -1000,13 +1104,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  else
 	  {
 	    print_fatal_error("Bad VERSION \"%s\" on line %d.", temp, linenum);
-	    goto test_error;
+	    pass = 0;
+	    goto test_exit;
 	  }
 	}
 	else
 	{
 	  print_fatal_error("Missing VERSION number on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "RESOURCE"))
@@ -1018,7 +1124,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, resource, sizeof(resource), &linenum))
 	{
 	  print_fatal_error("Missing RESOURCE path on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "OPERATION"))
@@ -1030,14 +1137,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing OPERATION code on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if ((op = ippOpValue(token)) < 0 && (op = strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad OPERATION code \"%s\" on line %d.", token,
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "GROUP"))
@@ -1049,13 +1158,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing GROUP tag on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if ((value = ippTagValue(token)) < 0)
 	{
 	  print_fatal_error("Bad GROUP tag \"%s\" on line %d.", token, linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (value == group)
@@ -1074,14 +1185,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing DELAY value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if ((delay = atoi(token)) <= 0)
 	{
 	  print_fatal_error("Bad DELAY value \"%s\" on line %d.", token,
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 	else
 	  sleep(delay);
@@ -1095,26 +1208,30 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing ATTR value tag on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if ((value = ippTagValue(token)) == IPP_TAG_ZERO)
 	{
 	  print_fatal_error("Bad ATTR value tag \"%s\" on line %d.", token,
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (!get_token(fp, attr, sizeof(attr), &linenum))
 	{
 	  print_fatal_error("Missing ATTR name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing ATTR value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         expand_variables(vars, token, temp, sizeof(token));
@@ -1152,7 +1269,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        {
 	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
 		                    token, linenum);
-	          goto test_error;
+		  pass = 0;
+		  goto test_exit;
 	        }
 
 	        if (!strcasecmp(ptr, "dpi"))
@@ -1184,7 +1302,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		{
 		  print_fatal_error("Bad rangeOfInteger value \"%s\" on line "
 		                    "%d.", token, linenum);
-		  goto test_error;
+		  pass = 0;
+		  goto test_exit;
 		}
 
 		ippAddRanges(request, group, attr, num_vals / 2, lowers,
@@ -1204,20 +1323,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 		  ippDelete(col);
 		}
 		else
-		  goto test_error;
+		{
+		  pass = 0;
+		  goto test_exit;
+	        }
               }
 	      else
 	      {
 		print_fatal_error("Bad ATTR collection value on line %d.",
 				  linenum);
-		goto test_error;
+		pass = 0;
+		goto test_exit;
 	      }
 	      break;
 
 	  default :
 	      print_fatal_error("Unsupported ATTR value tag %s on line %d.",
 				ippTagString(value), linenum);
-	      goto test_error;
+	      pass = 0;
+	      goto test_exit;
 
 	  case IPP_TAG_TEXTLANG :
 	  case IPP_TAG_NAMELANG :
@@ -1267,7 +1391,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing FILE filename on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         expand_variables(vars, token, temp, sizeof(token));
@@ -1282,20 +1407,23 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         if (num_statuses >= (int)(sizeof(statuses) / sizeof(statuses[0])))
 	{
 	  print_fatal_error("Too many STATUS's on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing STATUS code on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if ((statuses[num_statuses].status = ippErrorValue(token)) < 0)
 	{
 	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         last_status = statuses + num_statuses;
@@ -1313,13 +1441,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         if (num_expects >= (int)(sizeof(expects) / sizeof(expects[0])))
         {
 	  print_fatal_error("Too many EXPECT's on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
         }
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing EXPECT name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         last_expect = expects + num_expects;
@@ -1345,13 +1475,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing COUNT number on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         if ((i = atoi(token)) <= 0)
 	{
 	  print_fatal_error("Bad COUNT \"%s\" on line %d.", token, linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (last_expect)
@@ -1360,7 +1492,68 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("COUNT without a preceding EXPECT on line %d.",
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcasecmp(token, "DEFINE-MATCH"))
+      {
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing DEFINE-MATCH variable on line %d.",
+	                    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+	if (last_expect)
+	  last_expect->define_match = strdup(token);
+	else
+	{
+	  print_fatal_error("DEFINE-MATCH without a preceding EXPECT on line "
+	                    "%d.", linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcasecmp(token, "DEFINE-NO-MATCH"))
+      {
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing DEFINE-NO-MATCH variable on line %d.",
+	                    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+	if (last_expect)
+	  last_expect->define_no_match = strdup(token);
+	else
+	{
+	  print_fatal_error("DEFINE-NO-MATCH without a preceding EXPECT on "
+	                    "line %d.", linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+      }
+      else if (!strcasecmp(token, "DEFINE-VALUE"))
+      {
+	if (!get_token(fp, token, sizeof(token), &linenum))
+	{
+	  print_fatal_error("Missing DEFINE-VALUE variable on line %d.",
+	                    linenum);
+	  pass = 0;
+	  goto test_exit;
+	}
+
+	if (last_expect)
+	  last_expect->define_value = strdup(token);
+	else
+	{
+	  print_fatal_error("DEFINE-VALUE without a preceding EXPECT on line "
+			    "%d.", linenum);
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "OF-TYPE"))
@@ -1369,7 +1562,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("Missing OF-TYPE value tag(s) on line %d.",
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (last_expect)
@@ -1378,7 +1572,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("OF-TYPE without a preceding EXPECT on line %d.",
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "IN-GROUP"))
@@ -1389,7 +1584,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing IN-GROUP group tag on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         if ((in_group = ippTagValue(token)) == (ipp_tag_t)-1)
@@ -1401,7 +1597,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("IN-GROUP without a preceding EXPECT on line %d.",
 	                    linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "SAME-COUNT-AS"))
@@ -1409,7 +1606,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing SAME-COUNT-AS name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (last_expect)
@@ -1418,7 +1616,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("SAME-COUNT-AS without a preceding EXPECT on line "
 	                    "%d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "IF-DEFINED"))
@@ -1426,7 +1625,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing IF-DEFINED name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (last_expect)
@@ -1437,7 +1637,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("IF-DEFINED without a preceding EXPECT or STATUS "
 	                    "on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "IF-UNDEFINED"))
@@ -1445,7 +1646,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing IF-UNDEFINED name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (last_expect)
@@ -1456,7 +1658,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT or STATUS "
 			    "on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "WITH-VALUE"))
@@ -1464,7 +1667,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing WITH-VALUE value on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
         if (last_expect)
@@ -1495,7 +1699,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	{
 	  print_fatal_error("WITH-VALUE without a preceding EXPECT on line %d.",
 		            linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
       }
       else if (!strcasecmp(token, "DISPLAY"))
@@ -1507,13 +1712,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         if (num_displayed >= (int)(sizeof(displayed) / sizeof(displayed[0])))
 	{
 	  print_fatal_error("Too many DISPLAY's on line %d", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
 	  print_fatal_error("Missing DISPLAY name on line %d.", linenum);
-	  goto test_error;
+	  pass = 0;
+	  goto test_exit;
 	}
 
 	displayed[num_displayed] = strdup(token);
@@ -1523,7 +1730,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       {
 	print_fatal_error("Unexpected token %s seen on line %d.", token,
 	                  linenum);
-	goto test_error;
+	pass = 0;
+	goto test_exit;
       }
     }
 
@@ -1563,7 +1771,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       fflush(stdout);
     }
 
-    if (skip_previous && !prev_pass)
+    if ((skip_previous && !prev_pass) || skip_test)
     {
       ippDelete(request);
       request = NULL;
@@ -1749,20 +1957,29 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	       found->group_tag != expect->in_group))
           {
       	    prev_pass = pass = 0;
-      	    break;
+
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+      	    continue;
           }
 
           if (found &&
 	      !with_value(expect->with_value, expect->with_regex, found))
           {
             prev_pass = pass = 0;
-            break;
+
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+            continue;
           }
 
           if (found && expect->count > 0 && found->num_values != expect->count)
 	  {
             prev_pass = pass = 0;
-            break;
+
+	    if (expect->define_no_match)
+	      set_variable(vars, expect->define_no_match, "1");
+            continue;
 	  }
 
           if (found && expect->same_count_as)
@@ -1773,9 +1990,21 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
             if (!attrptr || attrptr->num_values != found->num_values)
             {
               prev_pass = pass = 0;
-              break;
+
+	      if (expect->define_no_match)
+		set_variable(vars, expect->define_no_match, "1");
+              continue;
             }
           }
+
+	  if (found && expect->define_match)
+	    set_variable(vars, expect->define_match, "1");
+
+	  if (found && expect->define_value)
+	  {
+	    _ippAttrString(found, token, sizeof(token));
+	    set_variable(vars, expect->define_value, token);
+	  }
         }
       }
     }
@@ -2139,16 +2368,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       break;
   }
 
-  fclose(fp);
-  httpClose(http);
-
-  return (pass);
-
- /*
-  * If we get here there was a fatal test error...
-  */
-
-  test_error:
+  test_exit:
 
   if (fp)
     fclose(fp);
@@ -2183,7 +2403,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   for (i = 0; i < num_displayed; i ++)
     free(displayed[i]);
 
-  return (0);
+  return (pass);
 }
 
 
