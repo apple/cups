@@ -1958,7 +1958,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
-	    else
+	    else if (!expect->define_match)
 	      prev_pass = pass = 0;
 
       	    continue;
@@ -1969,7 +1969,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
-	    else
+	    else if (!expect->define_match)
 	      prev_pass = pass = 0;
 
             continue;
@@ -1979,7 +1979,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
-	    else
+	    else if (!expect->define_match)
 	      prev_pass = pass = 0;
 
             continue;
@@ -1994,7 +1994,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
             {
 	      if (expect->define_no_match)
 		set_variable(vars, expect->define_no_match, "1");
-	      else
+	      else if (!expect->define_match)
 		prev_pass = pass = 0;
 
               continue;
@@ -2269,7 +2269,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
 	{
-	  if (expect->define_no_match)
+	  if (expect->define_match || expect->define_no_match)
 	    continue;
 
 	  if (expect->if_defined && !get_variable(vars, expect->if_defined))

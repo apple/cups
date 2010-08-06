@@ -224,10 +224,12 @@ COUNT number
 Requires the EXPECT attribute to have the specified number of values.
 .TP 5
 DEFINE-MATCH variable
-Defines the variable to "1" when the EXPECT condition matches.
+Defines the variable to "1" when the EXPECT condition matches. A side-effect of
+this predicate is that this EXPECT will never fail a test.
 .TP 5
 DEFINE-NO-MATCH variable
-Defines the variable to "1" when the EXPECT condition does not match.
+Defines the variable to "1" when the EXPECT condition does not match. A side-
+effect of this predicate is that this EXPECT will never fail a test.
 .TP 5
 DEFINE-VALUE variable
 Defines the variable to the value of the attribute when the EXPECT condition
