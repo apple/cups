@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptoolfile 5 "CUPS" "6 April 2010" "Apple Inc."
+.TH ipptoolfile 5 "CUPS" "6 August 2010" "Apple Inc."
 .SH NAME
 ipptoolfile \- ipptool file format
 
@@ -74,12 +74,24 @@ DEFINE variable-name value
 Defines the named variable to the given value. This is equivalent to specifying
 "-d variable-name=value" on the \fIipptool\fR command-line.
 .TP 5
+IGNORE-ERRORS yes
+.TP 5
+IGNORE-ERRORS no
+Specifies whether, by default, \fIipptool\fR will ignore errors and continue with
+subsequent tests.
+.TP 5
 INCLUDE "filename"
 .TP 5
 INCLUDE <filename>
 Includes another test file. The first form includes a file relative to the
 current test file, while the second form includes a file from the \fIipptool\fR
 include directory.
+.TP 5
+SKIP-IF-DEFINED variable-name
+.TP 5
+SKIP-IF-NOT-DEFINED variable-name
+Specifies that the remainder of the test file should be skipped when the
+variable is or is not defined.
 .TP 5
 TRANSFER auto
 Specifies that tests will, by default, use "Transfer-Encoding: chunked" for
@@ -144,6 +156,12 @@ when sending a test print file.
 GROUP tag
 Specifies the group tag for subsequent attributes in the request.
 .TP 5
+IGNORE-ERRORS yes
+.TP 5
+IGNORE-ERRORS no
+Specifies whether \fIipptool\fR will ignore errors and continue with subsequent
+tests.
+.TP 5
 NAME "literal string"
 Specifies the human-readable name of the test.
 .TP 5
@@ -159,6 +177,18 @@ word "random" to use a randomly generated value (the default).
 RESOURCE path
 Specifies an alternate resource path that is used for the HTTP POST request.
 The default is the resource from the URI provided to the \fIipptool\fR program.
+.TP 5
+SKIP-IF-DEFINED variable-name
+.TP 5
+SKIP-IF-NOT-DEFINED variable-name
+Specifies that the current test should be skipped when the variable is or is not
+defined.
+.TP 5
+SKIP-PREVIOUS-ERROR yes
+.TP 5
+SKIP-PREVIOUS-ERROR no
+Specifies whether \fIipptool\fR will skip the current test if the previous test
+resulted in an error/failure.
 .TP 5
 STATUS status-code [ predicate ]
 Specifies an expected response status-code value. Additional requirements can be
@@ -192,6 +222,18 @@ The following predicates are understood following the EXPECT test directive:
 .TP 5
 COUNT number
 Requires the EXPECT attribute to have the specified number of values.
+.TP 5
+DEFINE-MATCH variable-name
+Defines the variable to "1" when the EXPECT condition matches. A side-effect of
+this predicate is that this EXPECT will never fail a test.
+.TP 5
+DEFINE-NO-MATCH variable-name
+Defines the variable to "1" when the EXPECT condition does not match. A side-
+effect of this predicate is that this EXPECT will never fail a test.
+.TP 5
+DEFINE-VALUE variable-name
+Defines the variable to the value of the attribute when the EXPECT condition
+matches.
 .TP 5
 IF-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is defined.
@@ -299,8 +341,8 @@ RFC 2911 and other IPP extension specifications. Here is a complete list:
 .fi
 
 .SH STATUS CODES
-Status codes correspond to the names from RFC 2911 and other IPP extension
-specifications. Here is a complete list:
+Status codes correspond to the hexadecimal numbers (0xHHHH) and names from RFC
+2911 and other IPP extension specifications. Here is a complete list:
 .nf
     client-error-attributes-not-settable
     client-error-attributes-or-values-not-supported

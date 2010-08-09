@@ -3064,7 +3064,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	attr->values[0].integer <= IPP_QUALITY_HIGH)
       print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
     else
-      print_quality = IPP_QUALITY_NORMAL;
+      print_quality = _PWG_PRINT_QUALITY_NORMAL;
 
     if (pwg->num_presets[output_mode][print_quality] == 0)
     {
@@ -3139,7 +3139,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
     if (!ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO) &&
 	(ppd = _pwgGetPageSize(pwg, job->attrs, NULL, &exact)) != NULL)
+    {
       num_pwgppds = cupsAddOption("PageSize", ppd, num_pwgppds, &pwgppds);
+
+      if (!ippFindAttribute(job->attrs, "media", IPP_TAG_ZERO))
+        num_pwgppds = cupsAddOption("media", ppd, num_pwgppds, &pwgppds);
+    }
 
     if (!ippFindAttribute(job->attrs, "OutputBin", IPP_TAG_ZERO) &&
 	(attr = ippFindAttribute(job->attrs, "output-bin",

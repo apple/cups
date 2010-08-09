@@ -281,7 +281,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Grab line break...
 	*/
 
-        if (list == 1)
+	if (list == 1)
 	{
 	  fputs("</dt>\n<dd>", outfile);
 	  list = 2;
@@ -402,7 +402,7 @@ main(int  argc,				/* I - Number of command-line args */
         * Process the text as if it was in-line...
 	*/
 
-        post = "\n<br />\n<br />";
+        post = "\n<br>\n<br>";
         goto process_text;
       }
       else if (!strncmp(line, ".\\}", 3))
@@ -635,6 +635,12 @@ process_text:
       {
         fputs(post, outfile);
 	post = NULL;
+      }
+
+      if (list == 1)
+      {
+	fputs("</dt>\n<dd>", outfile);
+	list = 2;
       }
     }
   }
