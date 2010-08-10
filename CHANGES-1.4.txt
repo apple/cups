@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- The CUPS library no longer uses certain problematic ctype macros that
+	  change based on the locale's character set.
 	- PJL value substitution of more than 9 values was broken (STR #3621)
 	- Custom options with missing string values caused ppdEmit* to segfault
 	  (STR #3620)
