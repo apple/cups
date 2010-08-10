@@ -1080,6 +1080,16 @@ main(int  argc,				/* I - Number of command-line args */
 				     options)) != NULL)
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
 		       NULL, keyword);
+	else if ((keyword = cupsGetOption("ColorModel", num_options,
+		                                options)) != NULL)
+	{
+	  if (!strcasecmp(keyword, "Gray"))
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			         NULL, "monochrome");
+		else if (!strcasecmp(keyword, "Color"))
+		  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			           NULL, "color");
+	}
 
 	if ((keyword = cupsGetOption("print-quality", num_options,
 				     options)) != NULL)
