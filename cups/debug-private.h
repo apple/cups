@@ -57,9 +57,19 @@ extern "C" {
  */
 
 #  ifdef DEBUG
+#    ifdef WIN32
+#      ifdef LIBCUPS2_EXPORTS
+#        define DLLExport __declspec(dllexport)
+#      else
+#	  define DLLExport
+#      endif /* LIBCUPS2_EXPORTS */
+#    else
+#      define DLLExport
+#    endif /* WIN32 */
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
 #  else
+#    define DLLExport
 #    define DEBUG_puts(x)
 #    define DEBUG_printf(x)
 #  endif /* DEBUG */
@@ -71,12 +81,12 @@ extern "C" {
 
 extern int	_cups_debug_fd;
 extern int	_cups_debug_level;
-extern void	_cups_debug_printf(const char *format, ...)
+extern void	DLLExport _cups_debug_printf(const char *format, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 1, 2)))
 #endif /* __GNUC__ */
 ;
-extern void	_cups_debug_puts(const char *s);
+extern void	DLLExport _cups_debug_puts(const char *s);
 
 #  ifdef __cplusplus
 }

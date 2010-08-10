@@ -30,9 +30,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "string-private.h"
-#include "debug-private.h"
+#include "cups-private.h"
 
 
 /*

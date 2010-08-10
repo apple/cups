@@ -131,6 +131,17 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 			servername[256];/* Server hostname */
   cups_password_cb2_t	password_cb;	/* Password callback */
   void			*password_data;	/* Password user data */
+  http_tls_credentials_t tls_credentials;
+					/* Default client credentials */
+  cups_client_cert_cb_t	client_cert_cb;	/* Client certificate callback */
+  void			*client_cert_data;
+					/* Client certificate user data */
+  cups_server_cert_cb_t	server_cert_cb;	/* Server certificate callback */
+  void			*server_cert_data;
+					/* Server certificate user data */
+  int			any_root,	/* Allow any root */
+			expired_certs,	/* Allow expired certs */
+			expired_root;	/* Allow expired root */
 
   /* util.c */
   char			def_printer[256];

@@ -3131,7 +3131,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds,
 	                            &pwgppds);
     }
-
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
 	(ppd = _pwgGetMediaType(pwg, job->attrs, NULL)) != NULL)
       num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);

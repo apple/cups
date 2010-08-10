@@ -86,6 +86,7 @@ extern void		_pwgGenerateSize(char *keyword, size_t keysize,
 extern int		_pwgInitSize(_pwg_size_t *size, ipp_t *job,
 				     int *margins_set);
 extern _pwg_media_t	*_pwgMediaForLegacy(const char *legacy);
+extern _pwg_media_t	*_pwgMediaForPPD(const char *ppd);
 extern _pwg_media_t	*_pwgMediaForPWG(const char *pwg);
 extern _pwg_media_t	*_pwgMediaForSize(int width, int length);
 

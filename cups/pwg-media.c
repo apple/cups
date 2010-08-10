@@ -417,12 +417,15 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
   else
   {
     if ((media = ippFindAttribute(job, "media", IPP_TAG_NAME)) == NULL)
-      media = ippFindAttribute(job, "media", IPP_TAG_KEYWORD);
+      if ((media = ippFindAttribute(job, "media", IPP_TAG_KEYWORD)) == NULL)
+        if ((media = ippFindAttribute(job, "PageSize", IPP_TAG_NAME)) == NULL)
+	  media = ippFindAttribute(job, "PageRegion", IPP_TAG_NAME);
 
     if (media)
     {
       if ((pwg = _pwgMediaForPWG(media->values[0].string.text)) == NULL)
-	pwg = _pwgMediaForLegacy(media->values[0].string.text);
+	if ((pwg = _pwgMediaForLegacy(media->values[0].string.text)) == NULL)
+	  pwg = _pwgMediaForPPD(media->values[0].string.text);
 
       if (pwg)
       {

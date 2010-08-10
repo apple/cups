@@ -27,15 +27,25 @@
 #include "cups-private.h"
 #include "thread-private.h"
 #ifdef WIN32
+#  include <sys/timeb.h>
+#  include <time.h>
 #  include <io.h>
+static int				/* O  - 0 on success, -1 on failure */
+gettimeofday(struct timeval	*tv,	/* I  - Timeval struct */
+             void		*tz)	/* I  - Timezone */
+{   
+  struct _timeb timebuffer;		/* Time buffer struct */
+  _ftime(&timebuffer);
+  tv->tv_sec = timebuffer.time;
+  tv->tv_usec = timebuffer.millitm * 1000;  
+  return 0;
+}
 #else
 #  include <sys/time.h>
 #  include <unistd.h>
 #endif /* WIN32 */
 #include <fcntl.h>
-#ifndef WIN32
-#  include <regex.h>
-#endif /* WIN32 */
+#include <regex.h>
 
 
 /*
@@ -53,10 +63,8 @@ int			_cups_debug_level = 1;
  * Local globals...
  */
 
-#  ifndef WIN32
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
-#  endif /* !WIN32 */
 static int		debug_init = 0;	/* Did we initialize debugging? */
 static _cups_mutex_t	debug_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
@@ -396,7 +404,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
  * '_cups_debug_printf()' - Write a formatted line to the log.
  */
 
-void
+void DLLExport
 _cups_debug_printf(const char *format,	/* I - Printf-style format string */
                    ...)			/* I - Additional arguments as needed */
 {
@@ -525,7 +533,7 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
  * '_cups_debug_puts()' - Write a single line to the log.
  */
 
-void
+void DLLExport
 _cups_debug_puts(const char *s)		/* I - String to output */
 {
   char	format[4];			/* C%s */

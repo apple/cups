@@ -5664,6 +5664,8 @@ copy_printer_attrs(
 {
   char			printer_uri[HTTP_MAX_URI];
 					/* Printer URI */
+  char			printer_icons[HTTP_MAX_URI];
+					/* Printer icons */
   time_t		curtime;	/* Current time */
   int			i;		/* Looping var */
   ipp_attribute_t	*history;	/* History collection */
@@ -5761,6 +5763,16 @@ copy_printer_attrs(
       ippAddStrings(con->response, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
 		    "printer-error-policy-supported",
 		    sizeof(errors) / sizeof(errors[0]), NULL, errors);
+  }
+
+  if (!ra || cupsArrayFind(ra, "printer-icons"))
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, printer_icons, sizeof(printer_icons),
+                     "http", NULL, con->servername, con->serverport,
+		     "/icons/%s.png", printer->name);
+    ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-icons",
+                 NULL, printer_icons);
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "printer-icons=\"%s\"", printer_icons);
   }
 
   if (!ra || cupsArrayFind(ra, "printer-is-accepting-jobs"))
@@ -6657,6 +6669,9 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/%s.ipp3", CacheDir, printer->name);
+  unlink(filename);
+
+  snprintf(filename, sizeof(filename), "%s/%s.png", CacheDir, printer->name);
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/%s.pwg2", CacheDir, printer->name);

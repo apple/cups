@@ -142,6 +142,13 @@ AC_CHECK_HEADER(iconv.h,
 		SAVELIBS="$SAVELIBS $LIBS")
 	LIBS="$SAVELIBS")
 
+dnl Checks for statfs and its many headers...
+AC_CHECK_HEADER(sys/mount.h,AC_DEFINE(HAVE_SYS_MOUNT_H))
+AC_CHECK_HEADER(sys/statfs.h,AC_DEFINE(HAVE_SYS_STATFS_H))
+AC_CHECK_HEADER(sys/statvfs.h,AC_DEFINE(HAVE_SYS_STATVFS_H))
+AC_CHECK_HEADER(sys/vfs.h,AC_DEFINE(HAVE_SYS_VFS_H))
+AC_CHECK_FUNCS(statfs statvfs)
+
 dnl Checks for string functions.
 AC_CHECK_FUNCS(strdup strcasecmp strncasecmp strlcat strlcpy)
 if test "$uname" = "HP-UX" -a "$uversion" = "1020"; then

@@ -148,7 +148,6 @@ extern const char	*_pwgGetSource(_pwg_t *pwg, const char *input_slot);
 extern const char	*_pwgGetType(_pwg_t *pwg, const char *media_type);
 extern const char	*_pwgInputSlotForSource(const char *media_source,
 			                        char *name, size_t namesize);
-extern _pwg_media_t	*_pwgMediaForPPD(const char *ppd);
 extern const char	*_pwgMediaTypeForType(const char *media_type,
 			                      char *name, size_t namesize);
 extern const char	*_pwgPageSizeForMedia(_pwg_media_t *media,

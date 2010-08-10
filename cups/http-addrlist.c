@@ -102,6 +102,16 @@ httpAddrConnect(
     setsockopt(*sock, SOL_SOCKET, SO_NOSIGPIPE, &val, sizeof(val));
 #endif /* SO_NOSIGPIPE */
 
+#ifdef __APPLE__
+   /*
+    * Use a 30-second read timeout when connecting to limit the amount of time
+    * we block...
+    */
+
+    val = 30;
+    setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &val, sizeof(val));
+#endif /* __APPLE__ */
+
    /*
     * Using TCP_NODELAY improves responsiveness, especially on systems
     * with a slow loopback interface...
@@ -153,6 +163,9 @@ httpAddrConnect(
     *sock    = -1;
     addrlist = addrlist->next;
   }
+
+  if (!addrlist)
+    _cupsSetError(HTTP_SERVICE_UNAVAILABLE, _("Unable to connect to server"), 1);
 
   return (addrlist);
 }

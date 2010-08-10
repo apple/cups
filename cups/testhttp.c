@@ -93,6 +93,8 @@ static uri_test_t	uri_tests[] =	/* URI test data */
 			    "http", "", "server", "/admin?DEVICE_URI=usb://HP/Photosmart%25202600%2520series?serial=MY53OK70V10400", 80, 0 },
 			  { HTTP_URI_OK, "lpd://Acme%20Laser%20(01%3A23%3A45).local._tcp._printer/",
 			    "lpd", "", "Acme Laser (01:23:45).local._tcp._printer", "/", 515, 0 },
+			  { HTTP_URI_OK, "ipp://HP%20Officejet%204500%20G510n-z%20%40%20Will's%20MacBook%20Pro%2015%22._ipp._tcp.local./",
+			    "ipp", "", "HP Officejet 4500 G510n-z @ Will's MacBook Pro 15\"._ipp._tcp.local.", "/", 631, 0 },
 
 			  /* Missing scheme */
 			  { HTTP_URI_MISSING_SCHEME, "/path/to/file/index.html",

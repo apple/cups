@@ -14,7 +14,7 @@
 #
 # Usage:
 #
-#   ./ipptool -V 2.0 -f filename -t printer-uri ipp-2.0.test
+#   ./ipptool -V 2.0 {-d PRINTER_IS_COLOR=1} -f filename -t printer-uri ipp-2.0.test
 #
 
 # Do all of the IPP/1.1 tests as an IPP/2.0 client
@@ -59,7 +59,7 @@ INCLUDE "ipp-1.1.test"
 	# Printer description attributes
 	EXPECT color-supported OF-TYPE boolean IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT pages-per-minute OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
-	EXPECT pages-per-minute-color OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1
+	EXPECT pages-per-minute-color OF-TYPE integer IN-GROUP printer-attributes-tag COUNT 1 IF-DEFINED PRINTER_IS_COLOR
 	EXPECT printer-info OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT printer-location OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
 	EXPECT printer-make-and-model OF-TYPE text IN-GROUP printer-attributes-tag COUNT 1 WITH-VALUE "/^.{0,127}$$/"
