@@ -920,7 +920,9 @@ httpSeparateURI(
 
     for (ptr = scheme, end = scheme + schemelen - 1;
          *uri && *uri != ':' && ptr < end;)
-      if (isalnum(*uri & 255) || *uri == '-' || *uri == '+' || *uri == '.')
+      if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                 "abcdefghijklmnopqrstuvwxyz"
+		 "0123456789-+.", *uri) != NULL)
         *ptr++ = *uri++;
       else
         break;

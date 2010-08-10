@@ -387,7 +387,7 @@ ppdLocalizeIPPReason(
 
 	valptr += 5;
 
-        while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
+        while (*valptr && !_cups_isspace(*valptr) && bufptr < bufend)
 	{
 	  if (*valptr == '%' && isxdigit(valptr[1] & 255) &&
 	      isxdigit(valptr[2] & 255))
@@ -425,7 +425,7 @@ ppdLocalizeIPPReason(
         * Skip this URI...
 	*/
 
-        while (*valptr && !isspace(*valptr & 255))
+        while (*valptr && !_cups_isspace(*valptr))
           valptr++;
       }
 
@@ -433,7 +433,7 @@ ppdLocalizeIPPReason(
       * Skip whitespace...
       */
 
-      while (isspace(*valptr & 255))
+      while (_cups_isspace(*valptr))
 	valptr ++;
     }
 
@@ -461,7 +461,7 @@ ppdLocalizeIPPReason(
         * Copy URI...
 	*/
 
-        while (*valptr && !isspace(*valptr & 255) && bufptr < bufend)
+        while (*valptr && !_cups_isspace(*valptr) && bufptr < bufend)
 	  *bufptr++ = *valptr++;
 
 	*bufptr = '\0';
@@ -474,7 +474,7 @@ ppdLocalizeIPPReason(
         * Skip this URI...
 	*/
 
-	while (*valptr && !isspace(*valptr & 255))
+	while (*valptr && !_cups_isspace(*valptr))
 	  valptr++;
       }
 
@@ -482,7 +482,7 @@ ppdLocalizeIPPReason(
       * Skip whitespace...
       */
 
-      while (isspace(*valptr & 255))
+      while (_cups_isspace(*valptr))
 	valptr ++;
     }
 
@@ -596,7 +596,7 @@ _ppdGetLanguages(ppd_file_t *ppd)	/* I - PPD file */
     * Skip leading whitespace...
     */
 
-    while (isspace(*ptr & 255))
+    while (_cups_isspace(*ptr))
       ptr ++;
 
     if (!*ptr)
@@ -606,7 +606,7 @@ _ppdGetLanguages(ppd_file_t *ppd)	/* I - PPD file */
     * Find the end of this language name...
     */
 
-    for (start = ptr; *ptr && !isspace(*ptr & 255); ptr ++);
+    for (start = ptr; *ptr && !_cups_isspace(*ptr); ptr ++);
 
     if (*ptr)
       *ptr++ = '\0';

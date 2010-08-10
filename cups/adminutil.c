@@ -240,7 +240,7 @@ cupsAdminCreateWindowsPPD(
     }
     else if (jcloption && !strncmp(line, "*OrderDependency:", 17))
     {
-      for (ptr = line + 17; *ptr && isspace(*ptr & 255); ptr ++);
+      for (ptr = line + 17; _cups_isspace(*ptr); ptr ++);
 
       ptr = strchr(ptr, ' ');
 
@@ -1066,7 +1066,7 @@ cupsAdminGetServerSettings(
 
 	while (*value)
 	{
-	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+	  for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
 
 	  if (*valptr)
 	    *valptr++ = '\0';
@@ -1077,7 +1077,7 @@ cupsAdminGetServerSettings(
 	    break;
 	  }
 
-          for (value = valptr; isspace(*value & 255); value ++);
+          for (value = valptr; _cups_isspace(*value); value ++);
 	}
       }
       else if (!strcasecmp(line, "</Limit>"))
@@ -1729,7 +1729,7 @@ cupsAdminSetServerSettings(
 
 	while (*value)
 	{
-	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+	  for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
 
 	  if (*valptr)
 	    *valptr++ = '\0';
@@ -1745,7 +1745,7 @@ cupsAdminSetServerSettings(
 	  else
 	    cupsFilePrintf(temp, " %s", value);
 
-          for (value = valptr; isspace(*value & 255); value ++);
+          for (value = valptr; _cups_isspace(*value); value ++);
 	}
 
 	cupsFilePuts(temp, ">\n");

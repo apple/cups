@@ -166,7 +166,7 @@ _ppdNormalizeMakeAndModel(
   * Skip leading whitespace...
   */
 
-  while (isspace(*make_and_model & 255))
+  while (_cups_isspace(*make_and_model))
     make_and_model ++;
 
  /*
@@ -321,7 +321,7 @@ _ppdNormalizeMakeAndModel(
   */
 
   for (bufptr = buffer + strlen(buffer) - 1;
-       bufptr >= buffer && isspace(*bufptr & 255);
+       bufptr >= buffer && _cups_isspace(*bufptr);
        bufptr --);
 
   bufptr[1] = '\0';

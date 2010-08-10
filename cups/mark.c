@@ -579,7 +579,7 @@ _ppdParseOptions(
     * Skip leading whitespace...
     */
 
-    while (isspace(*s & 255))
+    while (_cups_isspace(*s))
       s ++;
 
    /*
@@ -587,10 +587,10 @@ _ppdParseOptions(
     */
 
     ptr = option;
-    while (*s && !isspace(*s & 255) && ptr < (option + sizeof(option) - 1))
+    while (*s && !_cups_isspace(*s) && ptr < (option + sizeof(option) - 1))
       *ptr++ = *s++;
 
-    if (ptr == s || !isspace(*s & 255))
+    if (ptr == s || !_cups_isspace(*s))
       break;
 
     *ptr = '\0';
@@ -599,17 +599,17 @@ _ppdParseOptions(
     * Get the choice...
     */
 
-    while (isspace(*s & 255))
+    while (_cups_isspace(*s))
       s ++;
 
     if (!*s)
       break;
 
     ptr = choice;
-    while (*s && !isspace(*s & 255) && ptr < (choice + sizeof(choice) - 1))
+    while (*s && !_cups_isspace(*s) && ptr < (choice + sizeof(choice) - 1))
       *ptr++ = *s++;
 
-    if (!isspace(*s & 255) && *s)
+    if (*s && !_cups_isspace(*s))
       break;
 
     *ptr = '\0';

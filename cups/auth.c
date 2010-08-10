@@ -247,7 +247,7 @@ cupsDoAuthentication(
     authorization = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 
     authorization += 9;
-    while (*authorization && isspace(*authorization & 255))
+    while (*authorization && _cups_isspace(*authorization))
       authorization ++;
 
     if (*authorization)

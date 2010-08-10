@@ -470,7 +470,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
       case IPP_TAG_STRING :
           for (ptr = val->string.text; *ptr; ptr ++)
           {
-            if (*ptr == '\\' || isspace(*ptr & 255))
+            if (*ptr == '\\' || _cups_isspace(*ptr))
             {
               if (buffer && bufptr < bufend)
                 *bufptr = '\\';

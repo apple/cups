@@ -1263,7 +1263,7 @@ pwg_ppdize_name(const char *ipp,	/* I - IPP keyword */
 
   for (ptr = name + 1, end = name + namesize - 1; *ipp && ptr < end;)
   {
-    if (*ipp == '-' && isalpha(ipp[1] & 255))
+    if (*ipp == '-' && _cups_isalpha(ipp[1]))
     {
       ipp ++;
       *ptr++ = toupper(*ipp++ & 255);
@@ -1291,13 +1291,13 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
   for (ptr = name, end = name + namesize - 1; *ppd && ptr < end; ppd ++)
   {
-    if (isalnum(*ppd & 255) || *ppd == '-' || *ppd == '.')
+    if (_cups_isalnum(*ppd) || *ppd == '-' || *ppd == '.')
       *ptr++ = tolower(*ppd & 255);
     else if (*ppd == '_')
       *ptr++ = '-';
 
-    if (!isupper(*ppd & 255) && isalnum(*ppd & 255) &&
-	isupper(ppd[1] & 255) && ptr < end)
+    if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
+	_cups_isupper(ppd[1]) && ptr < end)
       *ptr++ = '-';
   }
 

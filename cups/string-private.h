@@ -64,6 +64,23 @@ extern "C" {
 
 
 /*
+ * Replacements for the ctype macros that are not affected by locale, since we
+ * really only care about testing for ASCII characters when parsing files, etc.
+ */
+
+#  define _cups_isalnum(ch)	(strchr("0123456789"\
+				        "abcdefghijklmnopqrstuvwxyz"\
+				        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
+					(ch)) != NULL && (ch))
+#  define _cups_isalpha(ch)	(strchr("abcdefghijklmnopqrstuvwxyz"\
+				        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
+					(ch)) != NULL && (ch))
+#  define _cups_isspace(ch)	(strchr("\f\n\r\t\v ", (ch)) != NULL && (ch))
+#  define _cups_isupper(ch)	(strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
+					(ch)) != NULL && (ch))
+
+
+/*
  * String pool structures...
  */
 
