@@ -1666,7 +1666,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
       else if (!strcasecmp(token, "WITH-VALUE"))
       {
-      	if (!get_token(fp, token, sizeof(token), &linenum))
+      	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing WITH-VALUE value on line %d.", linenum);
 	  pass = 0;
@@ -1675,7 +1675,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         if (last_expect)
 	{
+	 /*
+	  * Expand any variables in the value and then save it.
+	  */
+
+	  expand_variables(vars, token, temp, sizeof(token));
+
 	  tokenptr = token + strlen(token) - 1;
+
 	  if (token[0] == '/' && tokenptr > token && *tokenptr == '/')
 	  {
 	   /*
@@ -4476,6 +4483,12 @@ with_value(char            *value,	/* I - Value string */
 	    }
 	  }
         }
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%d", attr->name, attr->values[i].integer);
+	}
 	break;
 
     case IPP_TAG_BOOLEAN :
@@ -4483,6 +4496,13 @@ with_value(char            *value,	/* I - Value string */
 	{
           if (!strcmp(value, "true") == attr->values[i].boolean)
 	    return (1);
+	}
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%s", attr->name,
+			     attr->values[i].boolean ? "true" : "false");
 	}
 	break;
 
@@ -4527,7 +4547,7 @@ with_value(char            *value,	/* I - Value string */
 	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
 	    {
 	      if (report)
-	        print_test_error("GOT: %s[%d]=\"%s\"", attr->name, i,
+	        print_test_error("GOT: %s=\"%s\"", attr->name,
 		                 attr->values[i].string.text);
 	      else
 	        break;
@@ -4549,6 +4569,13 @@ with_value(char            *value,	/* I - Value string */
 	  {
 	    if (!strcmp(value, attr->values[i].string.text))
 	      return (1);
+	  }
+
+	  if (report)
+	  {
+	    for (i = 0; i < attr->num_values; i ++)
+	      print_test_error("GOT: %s=\"%s\"", attr->name,
+			       attr->values[i].string.text);
 	  }
 	}
 	break;
