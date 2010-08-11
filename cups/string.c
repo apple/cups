@@ -36,6 +36,7 @@
  * Include necessary headers...
  */
 
+#define _CUPS_STRING_C_
 #include "string-private.h"
 #include "debug-private.h"
 #include "thread-private.h"

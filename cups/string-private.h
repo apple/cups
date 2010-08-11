@@ -64,23 +64,6 @@ extern "C" {
 
 
 /*
- * Replacements for the ctype macros that are not affected by locale, since we
- * really only care about testing for ASCII characters when parsing files, etc.
- */
-
-#  define _cups_isalnum(ch)	(strchr("0123456789"\
-				        "abcdefghijklmnopqrstuvwxyz"\
-				        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
-					(ch)) != NULL && (ch))
-#  define _cups_isalpha(ch)	(strchr("abcdefghijklmnopqrstuvwxyz"\
-				        "ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
-					(ch)) != NULL && (ch))
-#  define _cups_isspace(ch)	(strchr("\f\n\r\t\v ", (ch)) != NULL && (ch))
-#  define _cups_isupper(ch)	(strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ",\
-					(ch)) != NULL && (ch))
-
-
-/*
  * String pool structures...
  */
 
@@ -94,6 +77,62 @@ typedef struct _cups_sp_item_s		/**** String Pool Item ****/
   unsigned int	ref_count;		/* Reference count */
   char		str[1];			/* String */
 } _cups_sp_item_t;
+
+
+/*
+ * Replacements for the ctype macros that are not affected by locale, since we
+ * really only care about testing for ASCII characters when parsing files, etc.
+ * These are used only within libcups since the rest of CUPS doesn't call
+ * setlocale() for LC_CTYPE and doesn't have to worry about third-party
+ * libraries doing so (and if they do that is a bug: NetSNMP, I'm looking at
+ * you!)
+ *
+ * The _CUPS_INLINE definition controls whether we get an inline function body,
+ * and external function body, or an external definition.
+ */
+
+#  if defined(__GNUC__) || __STDC_VERSION__ >= 199901L
+#    define _CUPS_INLINE static inline
+#  elif defined(_MSC_VER)
+#    define _CUPS_INLINE static __inline
+#  elif defined(_CUPS_STRING_C_)
+#    define _CUPS_INLINE
+#  endif /* __GNUC__ || __STDC_VERSION__ */
+
+#  ifdef _CUPS_INLINE
+_CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
+_cups_isalnum(int ch)			/* I - Character to test */
+{
+  return ((ch >= '0' && ch <= '9') ||
+          (ch >= 'A' && ch <= 'Z') ||
+          (ch >= 'a' && ch <= 'z'));
+}
+
+_CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
+_cups_isalpha(int ch)			/* I - Character to test */
+{
+  return ((ch >= 'A' && ch <= 'Z') ||
+          (ch >= 'a' && ch <= 'z'));
+}
+
+_CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
+_cups_isspace(int ch)			/* I - Character to test */
+{
+  return (ch == ' ' || ch == '\f' || ch == '\n' || ch == '\r' || ch == '\t' ||
+          ch == '\v');
+}
+
+_CUPS_INLINE int			/* O - 1 on match, 0 otherwise */
+_cups_isupper(int ch)			/* I - Character to test */
+{
+  return (ch >= 'A' && ch <= 'Z');
+}
+#  else
+extern int _cups_isalnum(int ch);
+extern int _cups_isalpha(int ch);
+extern int _cups_isspace(int ch);
+extern int _cups_isupper(int ch);
+#  endif /* _CUPS_INLINE */
 
 
 /*
