@@ -81,7 +81,7 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*of_type,		/* Type name */
 		*same_count_as,		/* Parallel attribute name */
 		*if_defined,		/* Only required if variable defined */
-		*if_undefined,		/* Only required if variable is not defined */
+		*if_not_defined,	/* Only required if variable is not defined */
 		*with_value,		/* Attribute must include this value */
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
@@ -95,7 +95,7 @@ typedef struct _cups_status_s		/**** Status info ****/
 {
   ipp_status_t	status;			/* Expected status code */
   char		*if_defined,		/* Only if variable is defined */
-		*if_undefined;		/* Only if variable is not defined */
+		*if_not_defined;		/* Only if variable is not defined */
 } _cups_status_t;
 
 typedef struct _cups_var_s		/**** Variable ****/
@@ -190,7 +190,8 @@ static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
 static void	usage(void);
 static int	validate_attr(ipp_attribute_t *attr, int print);
-static int      with_value(char *value, int regex, ipp_attribute_t *attr);
+static int      with_value(char *value, int regex, ipp_attribute_t *attr,
+		           int report);
 
 
 /*
@@ -855,7 +856,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           strcasecmp(token, "DEFINE-NO-MATCH") &&
           strcasecmp(token, "DEFINE-VALUE") &&
           strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-UNDEFINED") &&
+          strcasecmp(token, "IF-NOT-DEFINED") &&
           strcasecmp(token, "IN-GROUP") &&
           strcasecmp(token, "OF-TYPE") &&
           strcasecmp(token, "SAME-COUNT-AS") &&
@@ -863,7 +864,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         last_expect = NULL;
 
       if (strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-UNDEFINED"))
+          strcasecmp(token, "IF-NOT-DEFINED"))
         last_status = NULL;
 
       if (!strcmp(token, "}"))
@@ -1431,7 +1432,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	num_statuses ++;
 
 	last_status->if_defined   = NULL;
-	last_status->if_undefined = NULL;
+	last_status->if_not_defined = NULL;
       }
       else if (!strcasecmp(token, "EXPECT"))
       {
@@ -1642,22 +1643,22 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "IF-UNDEFINED"))
+      else if (!strcasecmp(token, "IF-NOT-DEFINED"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error("Missing IF-UNDEFINED name on line %d.", linenum);
+	  print_fatal_error("Missing IF-NOT-DEFINED name on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
 
 	if (last_expect)
-	  last_expect->if_undefined = strdup(token);
+	  last_expect->if_not_defined = strdup(token);
 	else if (last_status)
-	  last_status->if_undefined = strdup(token);
+	  last_status->if_not_defined = strdup(token);
 	else
 	{
-	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT or STATUS "
+	  print_fatal_error("IF-NOT-DEFINED without a preceding EXPECT or STATUS "
 			    "on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1929,8 +1930,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    !get_variable(vars, statuses[i].if_defined))
 	  continue;
 
-        if (statuses[i].if_undefined &&
-	    get_variable(vars, statuses[i].if_undefined))
+        if (statuses[i].if_not_defined &&
+	    get_variable(vars, statuses[i].if_not_defined))
 	  continue;
 
         if (response->request.status.status_code == statuses[i].status)
@@ -1946,7 +1947,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           if (expect->if_defined && !get_variable(vars, expect->if_defined))
             continue;
 
-          if (expect->if_undefined && get_variable(vars, expect->if_undefined))
+          if (expect->if_not_defined &&
+	      get_variable(vars, expect->if_not_defined))
             continue;
 
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -1966,7 +1968,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           }
 
           if (found &&
-	      !with_value(expect->with_value, expect->with_regex, found))
+	      !with_value(expect->with_value, expect->with_regex, found, 0))
           {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
@@ -2253,8 +2255,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      !get_variable(vars, statuses[i].if_defined))
 	    continue;
 
-	  if (statuses[i].if_undefined &&
-	      get_variable(vars, statuses[i].if_undefined))
+	  if (statuses[i].if_not_defined &&
+	      get_variable(vars, statuses[i].if_not_defined))
 	    continue;
 
 	  if (response->request.status.status_code == statuses[i].status)
@@ -2276,7 +2278,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
 	    continue;
 
-	  if (expect->if_undefined && get_variable(vars, expect->if_undefined))
+	  if (expect->if_not_defined &&
+	      get_variable(vars, expect->if_not_defined))
 	    continue;
 
 	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -2297,7 +2300,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	                       expect->name, ippTagString(expect->in_group),
 			       ippTagString(found->group_tag));
 
-	    if (!with_value(expect->with_value, expect->with_regex, found))
+	    if (!with_value(expect->with_value, expect->with_regex, found, 0))
 	    {
 	      if (expect->with_regex)
 		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
@@ -2305,6 +2308,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      else
 		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
 				 expect->name, expect->with_value);
+
+	      with_value(expect->with_value, expect->with_regex, found, 1);
 	    }
 
 	    if (expect->count > 0 && found->num_values != expect->count)
@@ -2347,8 +2352,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     {
       if (statuses[i].if_defined)
         free(statuses[i].if_defined);
-      if (statuses[i].if_undefined)
-        free(statuses[i].if_undefined);
+      if (statuses[i].if_not_defined)
+        free(statuses[i].if_not_defined);
     }
     num_statuses = 0;
 
@@ -2361,8 +2366,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         free(expect->same_count_as);
       if (expect->if_defined)
         free(expect->if_defined);
-      if (expect->if_undefined)
-        free(expect->if_undefined);
+      if (expect->if_not_defined)
+        free(expect->if_not_defined);
       if (expect->with_value)
         free(expect->with_value);
       if (expect->define_match)
@@ -2395,8 +2400,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   {
     if (statuses[i].if_defined)
       free(statuses[i].if_defined);
-    if (statuses[i].if_undefined)
-      free(statuses[i].if_undefined);
+    if (statuses[i].if_not_defined)
+      free(statuses[i].if_not_defined);
   }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
@@ -2408,8 +2413,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(expect->same_count_as);
     if (expect->if_defined)
       free(expect->if_defined);
-    if (expect->if_undefined)
-      free(expect->if_undefined);
+    if (expect->if_not_defined)
+      free(expect->if_not_defined);
     if (expect->with_value)
       free(expect->with_value);
     if (expect->define_match)
@@ -4401,7 +4406,8 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 static int				/* O - 1 on match, 0 on non-match */
 with_value(char            *value,	/* I - Value string */
            int             regex,	/* I - Value is a regular expression */
-           ipp_attribute_t *attr)	/* I - Attribute to compare */
+           ipp_attribute_t *attr,	/* I - Attribute to compare */
+	   int             report)	/* I - 1 = report failures */
 {
   int	i;				/* Looping var */
   char	*valptr;			/* Pointer into value */
@@ -4519,7 +4525,13 @@ with_value(char            *value,	/* I - Value string */
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
 	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
-	      break;
+	    {
+	      if (report)
+	        print_test_error("GOT: %s[%d]=\"%s\"", attr->name, i,
+		                 attr->values[i].string.text);
+	      else
+	        break;
+	    }
 	  }
 
 	  regfree(&re);
