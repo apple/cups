@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Job management routines for the Common UNIX Printing System (CUPS).
+ *   Job management routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -3131,6 +3131,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds,
 	                            &pwgppds);
     }
+
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
 	(ppd = _pwgGetMediaType(pwg, job->attrs, NULL)) != NULL)
       num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);
