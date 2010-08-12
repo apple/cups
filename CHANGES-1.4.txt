@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- The lpadmin command did not support setting of the location or
+	  description of a class (STR #3613)
 	- The cupsaddsmb command did not give up after too many failed attempts
 	  (STR #3615)
 	- The CUPS library no longer uses certain problematic ctype macros that
