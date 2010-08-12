@@ -219,6 +219,7 @@ export_dest(http_t     *http,		/* I - Connection to server */
   int		status;			/* Status of export */
   char		ppdfile[1024],		/* PPD file for printer drivers */
 		prompt[1024];		/* Password prompt */
+  int		tries;			/* Number of tries */
 
 
  /*
@@ -238,7 +239,7 @@ export_dest(http_t     *http,		/* I - Connection to server */
   * Try to export it...
   */
 
-  for (status = 0; !status;)
+  for (status = 0, tries = 0; !status && tries < 3; tries ++)
   {
    /*
     * Get the password, as needed...
