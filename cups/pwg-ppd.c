@@ -1291,9 +1291,9 @@ pwg_unppdize_name(const char *ppd,	/* I - PPD keyword */
 
   for (ptr = name, end = name + namesize - 1; *ppd && ptr < end; ppd ++)
   {
-    if (_cups_isalnum(*ppd) || *ppd == '-' || *ppd == '.')
+    if (_cups_isalnum(*ppd) || *ppd == '-')
       *ptr++ = tolower(*ppd & 255);
-    else if (*ppd == '_')
+    else if (*ppd == '_' || *ppd == '.')
       *ptr++ = '-';
 
     if (!_cups_isupper(*ppd) && _cups_isalnum(*ppd) &&
