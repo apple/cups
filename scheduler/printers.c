@@ -1623,7 +1623,7 @@ cupsdSaveAllPrinters(void)
   */
 
   fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), 0600);
+  fchmod(cupsFileNumber(fp), ConfigFilePerm & 0600);
 
  /*
   * Write a small header to the file...
