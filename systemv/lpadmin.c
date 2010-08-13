@@ -30,9 +30,6 @@
  */
 
 #include <cups/cups-private.h>
-#ifdef HAVE_LIBZ
-#  include <zlib.h>
-#endif /* HAVE_LIBZ */
 
 
 /*
