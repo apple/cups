@@ -4,6 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
+	- Localization fixes (STR #3636)
 	- The lpadmin command did not support setting of custom option values
 	  (STR #3631)
 	- The lpadmin command did not support setting of the location or
