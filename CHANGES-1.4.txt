@@ -5,8 +5,10 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
 	- Localization fixes (STR #3635, STR #3636)
-	- The USB backend did not check whether the printer has a serial number
-	  (STR #3590)
+	- Increased the write timeout for the libusb-based USB backend to 5
+	  minutes (STR #3595)
+	- The libusb-base USB backend did not check whether the printer has a
+	  serial number (STR #3590)
 	- The lpadmin command did not support setting of custom option values
 	  (STR #3631)
 	- The lpadmin command did not support setting of the location or

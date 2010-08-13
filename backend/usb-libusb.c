@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Libusb interface code for the Common UNIX Printing System (CUPS).
+ *   Libusb interface code for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -173,7 +173,7 @@ print_device(const char *uri,		/* I - Device URI */
 	if ((bytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
 	  if (usb_bulk_write(printer->handle, printer->write_endp, buffer,
-	                        bytes, 45000) < 0)
+	                        bytes, 3600000) < 0)
 	  {
 	    _cupsLangPrintf(stderr,
 			    _("ERROR: Unable to write %d bytes to printer\n"),
