@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
 	- Localization fixes (STR #3635, STR #3636)
+	- Setting the PRINTER or LPDEST environment variables to "name/instance"
+	  did not work (STR #3485)
 	- The scheduler did not handle the JobRetryLimit setting properly
 	  (STR #3466)
 	- The lpstat command always showed a remote job ID of 0 for shared
