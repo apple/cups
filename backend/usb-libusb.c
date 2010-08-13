@@ -519,7 +519,8 @@ make_device_uri(
 
   if ((sern = cupsGetOption("SERIALNUMBER", num_values, values)) == NULL)
     if ((sern = cupsGetOption("SERN", num_values, values)) == NULL)
-      if ((sern = cupsGetOption("SN", num_values, values)) == NULL)
+      if ((sern = cupsGetOption("SN", num_values, values)) == NULL &&
+          printer->device->descriptor.iSerialNumber)
       {
        /*
         * Try getting the serial number from the device itself...
