@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
 	- Localization fixes (STR #3635, STR #3636)
+	- The lpstat command always showed a remote job ID of 0 for shared
+	  printers (STR #3627)
 	- Increased the write timeout for the libusb-based USB backend to 5
 	  minutes (STR #3595)
 	- The libusb-base USB backend did not check whether the printer has a

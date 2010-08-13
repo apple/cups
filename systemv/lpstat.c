@@ -1529,7 +1529,8 @@ show_printers(const char  *printers,	/* I - Destinations */
 		};
   static const char *jattrs[] =		/* Attributes we need for jobs... */
 		{
-		  "job-id"
+		  "job-id",
+		  "job-state"
 		};
 
 
