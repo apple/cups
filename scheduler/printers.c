@@ -138,7 +138,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
 
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 		   ServerName, RemotePort, "/printers/%s", name);
-  cupsdSetStringf(&p->uri, uri);
+  cupsdSetString(&p->uri, uri);
   cupsdSetDeviceURI(p, "file:///dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;

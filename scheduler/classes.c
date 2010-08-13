@@ -58,7 +58,7 @@ cupsdAddClass(const char *name)		/* I - Name of class */
 
     httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 		     ServerName, RemotePort, "/classes/%s", name);
-    cupsdSetStringf(&c->uri, uri);
+    cupsdSetString(&c->uri, uri);
 
     cupsdSetString(&c->error_policy, "retry-current-job");
   }
