@@ -2856,7 +2856,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	      job->tries ++;
 
-	      if (job->tries >= JobRetryLimit)
+	      if (job->tries > JobRetryLimit && JobRetryLimit > 0)
 	      {
 	       /*
 		* Too many tries...
