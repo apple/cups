@@ -1129,8 +1129,8 @@ set_printer_options(
 		tempfile[1024];		/* Temporary filename */
   cups_file_t	*in,			/* PPD file */
 		*out;			/* Temporary file */
-  int		outfd;			/* Temporary file descriptor */
-  const char	*protocol;		/* Old protocol option */
+  const char	*protocol,		/* Old protocol option */
+		*customval;		/* Custom option value */
 
 
   DEBUG_printf(("set_printer_options(http=%p, printer=\"%s\", num_options=%d, "
@@ -1290,8 +1290,19 @@ set_printer_options(
 
         if (choice && strcmp(choice->choice, keyptr))
 	{
-	  cupsFilePrintf(out, "*Default%s: %s\n", keyword, choice->choice);
-	  ppdchanged = 1;
+	  if (strcmp(choice->choice, "Custom"))
+	  {
+	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, choice->choice);
+	    ppdchanged = 1;
+	  }
+	  else if ((customval = cupsGetOption(keyword, num_options,
+	                                      options)) != NULL)
+	  {
+	    cupsFilePrintf(out, "*Default%s: %s\n", keyword, customval);
+	    ppdchanged = 1;
+	  }
+	  else
+	    cupsFilePrintf(out, "%s\n", line);
 	}
 	else
 	  cupsFilePrintf(out, "%s\n", line);
