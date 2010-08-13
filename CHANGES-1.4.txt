@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
 	- Localization fixes (STR #3635, STR #3636)
+	- The socket backend could go into an infinite loop with certain
+	  printers (STR #3622)
 	- Setting the PRINTER or LPDEST environment variables to "name/instance"
 	  did not work (STR #3485)
 	- The scheduler did not handle the JobRetryLimit setting properly
