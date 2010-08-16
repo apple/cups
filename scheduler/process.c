@@ -137,6 +137,13 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		 " #\"^/System/\""
 		 "))\n",
 		 root, root);
+  /* Specifically allow applications to stat RequestRoot */
+  cupsFilePrintf(fp,
+                 "(allow file-read-metadata\n"
+                 "  (regex"
+		 " #\"^%s$\""		/* RequestRoot */
+		 "))\n",
+		 request);
   cupsFilePrintf(fp,
                  "(allow file-write* file-read-data file-read-metadata\n"
                  "  (regex"
