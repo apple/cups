@@ -25,11 +25,12 @@
  *   get_variable()      - Get the value of a variable.
  *   iso_date()          - Return an ISO 8601 date/time string for the given IPP
  *                         dateTime value.
+ *   password_cb()       - Password callback for authenticated tests.
  *   print_attr()        - Print an attribute on the screen.
  *   print_col()         - Print a collection attribute on the screen.
  *   print_csv()         - Print a line of CSV text.
  *   print_fatal_error() - Print a fatal error message.
- *   print_line()        - Print a line of formatted text.
+ *   print_line()        - Print a line of formatted or CSV text.
  *   print_test_error()  - Print a test error message.
  *   print_xml_header()  - Print a standard XML plist header.
  *   print_xml_string()  - Print an XML string with escaping.
@@ -130,6 +131,7 @@ int		IgnoreErrors = 0,	/* Ignore errors? */
 		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0;		/* 1 if header is written */
+char		*Password = NULL;	/* Password from URI */
 const char * const URIStatusStrings[] =	/* URI status strings */
 {
   "URI too large",
@@ -167,6 +169,7 @@ static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
+static const char *password_cb(const char *prompt);
 static void	print_attr(ipp_attribute_t *attr);
 static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
@@ -429,9 +432,12 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
     }
-    else if (!strncmp(argv[i], "ipp://", 6) ||
-             !strncmp(argv[i], "http://", 7) ||
-             !strncmp(argv[i], "https://", 8))
+    else if (!strncmp(argv[i], "ipp://", 6) || !strncmp(argv[i], "http://", 7)
+#ifdef HAVE_SSL
+	     || !strncmp(argv[i], "ipps://", 7)
+	     || !strncmp(argv[i], "https://", 8)
+#endif /* HAVE_SSL */
+	     )
     {
      /*
       * Set URI...
@@ -442,6 +448,11 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPuts(stderr, _("ipptool: May only specify a single URI.\n"));
         usage();
       }
+
+#ifdef HAVE_SSL
+      if (!strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8))
+        vars.encryption = HTTP_ENCRYPT_ALWAYS;
+#endif /* HAVE_SSL */
 
       vars.uri   = argv[i];
       uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, vars.uri,
@@ -458,12 +469,13 @@ main(int  argc,				/* I - Number of command-line args */
         return (1);
       }
 
-      if (strcmp(vars.scheme, "http") && strcmp(vars.scheme, "https") &&
-          strcmp(vars.scheme, "ipp"))
+      if (vars.userpass[0])
       {
-        _cupsLangPuts(stderr, _("ipptool: Only http, https, and ipp URIs are "
-	                        "supported."));
-	return (1);
+        if ((Password = strchr(vars.userpass, ':')) != NULL)
+	  *Password++ = '\0';
+
+        cupsSetUser(vars.userpass);
+	cupsSetPasswordCB(password_cb);
       }
     }
     else
@@ -3043,6 +3055,19 @@ iso_date(ipp_uchar_t *date)		/* I - IPP (RFC 1903) date/time value */
 	     date[8], date[9], date[10]);
 
   return (buffer);
+}
+
+
+/*
+ * 'password_cb()' - Password callback for authenticated tests.
+ */
+
+static const char *			/* O - Password */
+password_cb(const char *prompt)		/* I - Prompt (unused) */
+{
+  (void)prompt;
+
+  return (Password);
 }
 
 

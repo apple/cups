@@ -3305,7 +3305,10 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
     }
 
     if (con->http.tls_credentials)
+    {
       CFRelease(con->http.tls_credentials);
+      con->http.tls_credentials = NULL;
+    }
 
     return (0);
   }
@@ -3443,7 +3446,7 @@ get_cdsa_certificate(
 
 #  elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY)
  /*
-  * Use a policy to search for valid certificates who's common name matches the
+  * Use a policy to search for valid certificates whose common name matches the
   * servername...
   */
 

@@ -3528,6 +3528,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   if ((credentials = http->tls_credentials) == NULL)
     credentials = cg->tls_credentials;
 
+#    if HAVE_SECPOLICYCREATESSL
  /*
   * Otherwise root around in the user's keychain to see if one can be found...
   */
@@ -3535,7 +3536,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
   if (!credentials)
   {
     CFDictionaryRef	query;		/* Query dictionary */
-    CFTypeRef		matches;	/* Matching credentials */
+    CFTypeRef		matches = NULL;	/* Matching credentials */
     CFArrayRef		dn_array = NULL;/* Distinguished names array */
     CFTypeRef		keys[]   = { kSecClass,
 				     kSecMatchLimit,
@@ -3550,8 +3551,12 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
     * Get the names associated with the server.
     */
 
-    if (SSLCopyDistinguishedNames(http->tls, &dn_array) != noErr)
-      return (-1);
+    if ((error = SSLCopyDistinguishedNames(http->tls, &dn_array)) != noErr)
+    {
+      DEBUG_printf(("4http_set_credentials: SSLCopyDistinguishedNames, error=%d",
+                    (int)error));
+      return (error);
+    }
 
    /*
     * Create a query which will return all identities that can sign and match
@@ -3564,17 +3569,28 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 			       sizeof(keys) / sizeof(keys[0]),
 			       &kCFTypeDictionaryKeyCallBacks,
 			       &kCFTypeDictionaryValueCallBacks);
-    error = SecItemCopyMatching(query, &matches);
+    if (query)
+    {
+      error = SecItemCopyMatching(query, &matches);
+      DEBUG_printf(("4http_set_credentials: SecItemCopyMatching, error=%d",
+		    (int)error));
+      CFRelease(query);
+    }
 
-    CFRelease(query);
-    CFRelease(matches);
+    if (matches)
+      CFRelease(matches);
 
     if (dn_array)
       CFRelease(dn_array);
   }
+#    endif /* HAVE_SECPOLICYCREATESSL */
 
   if (credentials)
+  {
     error = SSLSetCertificate(http->tls, credentials);
+    DEBUG_printf(("4http_set_credentials: SSLSetCertificate, error=%d",
+		  (int)error));
+  }
 
   return (error);
 
@@ -3603,7 +3619,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
-  char		*message = NULL;	/* Error message */
+  const char	*message = NULL;	/* Error message */
   cups_array_t	*credentials;		/* Credentials array */
   char		*hostname;		/* Hostname */
   cups_array_t	*names;			/* CUPS distinguished names */
@@ -3623,7 +3639,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("7http_setup_ssl(http=%p)", http));
 
  /*
-  * Allways allow self-signed certificates for the local loopback address...
+  * Always allow self-signed certificates for the local loopback address...
   */
 
   if ((any_root = cg->any_root) == 0 && httpAddrLocalhost(http->hostaddr))
@@ -3708,29 +3724,57 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 
   error = SSLSetConnection(http->tls, http);
+  DEBUG_printf(("4http_setup_ssl: SSLSetConnection, error=%d", (int)error));
 
   if (!error)
+  {
     error = SSLSetIOFuncs(http->tls, _httpReadCDSA, _httpWriteCDSA);
+    DEBUG_printf(("4http_setup_ssl: SSLSetIOFuncs, error=%d", (int)error));
+  }
 
   if (!error)
+  {
     error = SSLSetProtocolVersionEnabled(http->tls, kSSLProtocol2, false);
+    DEBUG_printf(("4http_setup_ssl: SSLSetProtocolVersionEnabled, error=%d",
+                  (int)error));
+  }
 
   if (!error)
+  {
     error = SSLSetAllowsAnyRoot(http->tls, any_root);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot, error=%d",
+                  (int)error));
+  }
 
   if (!error)
+  {
     error = SSLSetAllowsExpiredCerts(http->tls, cg->expired_certs);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredCerts, error=%d",
+                  (int)error));
+  }
 
   if (!error)
+  {
     error = SSLSetAllowsExpiredRoots(http->tls, cg->expired_root);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredRoots, error=%d",
+                  (int)error));
+  }
 
   if (!error)
   {
     if (cg->client_cert_cb)
+    {
       error = SSLSetSessionOption(http->tls,
 				  kSSLSessionOptionBreakOnCertRequested, true);
+      DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnCertRequested, "
+                    "error=%d", (int)error));
+    }
     else
+    {
       error = http_set_credentials(http);
+      DEBUG_printf(("4http_setup_ssl: http_set_credentials, error=%d",
+                    (int)error));
+    }
   }
 
  /*
@@ -3741,16 +3785,25 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   if (!error && cg->server_cert_cb != NULL)
   {
     error = SSLSetEnableCertVerify(http->tls, false);
+    DEBUG_printf(("4http_setup_ssl: SSLSetEnableCertVerify, error=%d",
+                  (int)error));
 
     if (!error)
+    {
       error = SSLSetSessionOption(http->tls,
 				  kSSLSessionOptionBreakOnServerAuth, true);
+      DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnServerAuth, "
+                    "error=%d", (int)error));
+    }
   }
 
   if (!error)
   {
     hostname = httpAddrLocalhost(http->hostaddr) ? "localhost" : http->hostname;
     error    = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
+
+    DEBUG_printf(("4http_setup_ssl: SSLSetPeerDomainName, error=%d",
+                  (int)error));
   }
 
   if (!error)
@@ -3880,7 +3933,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
     */
 
     if (!message)
+#ifdef HAVE_CSSMERRORSTRING
+      message = cssmErrorString(error);
+#else
       message = _("Unable to establish a secure connection to host.");
+#endif /* HAVE_CSSMERRORSTRING */
 
     _cupsSetError(HTTP_PKI_ERROR, message, 1);
 
@@ -3964,7 +4021,8 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
   _sspiFree(http->tls_credentials);
 #  endif /* HAVE_LIBSSL */
 
-  http->tls = NULL;
+  http->tls             = NULL;
+  http->tls_credentials = NULL;
 }
 #endif /* HAVE_SSL */
 
