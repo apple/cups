@@ -1211,7 +1211,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 	else
+	{
+	  if (Output == _CUPS_OUTPUT_TEST)
+	    printf("    [%d second delay]\n", delay);
+
 	  sleep(delay);
+	}
       }
       else if (!strcasecmp(token, "ATTR"))
       {
