@@ -442,6 +442,10 @@
 #
 # Required by: RFC 2911 section 3.2.6
 {
+	# Skip this test when doing authenticated printing since we'll always
+	# use the authenticated username over the requesting-user-name value.
+	SKIP-IF-DEFINED uriuser
+
 	NAME "3.2.6: Get-Jobs Operation (my-jobs different user)"
 	OPERATION Get-Jobs
 	GROUP operation-attributes-tag

@@ -96,7 +96,7 @@ typedef struct _cups_status_s		/**** Status info ****/
 {
   ipp_status_t	status;			/* Expected status code */
   char		*if_defined,		/* Only if variable is defined */
-		*if_not_defined;		/* Only if variable is not defined */
+		*if_not_defined;	/* Only if variable is not defined */
 } _cups_status_t;
 
 typedef struct _cups_var_s		/**** Variable ****/
@@ -476,6 +476,7 @@ main(int  argc,				/* I - Number of command-line args */
 
         cupsSetUser(vars.userpass);
 	cupsSetPasswordCB(password_cb);
+	set_variable(&vars, "uriuser", vars.userpass);
       }
     }
     else
