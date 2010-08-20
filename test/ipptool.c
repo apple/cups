@@ -1803,13 +1803,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("<key>Successful</key>");
 	puts("<true />");
 	puts("<key>StatusCode</key>");
-	print_xml_string("string", "skipped");
+	print_xml_string("string", "skip");
 	puts("<key>ResponseAttributes</key>");
 	puts("<dict>");
 	puts("</dict>");
       }
       else if (Output == _CUPS_OUTPUT_TEST)
-	puts("SKIPPED]");
+	puts("SKIP]");
 
       goto skip_error;
     }
