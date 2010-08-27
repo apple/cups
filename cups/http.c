@@ -3591,6 +3591,8 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
     DEBUG_printf(("4http_set_credentials: SSLSetCertificate, error=%d",
 		  (int)error));
   }
+  else
+    DEBUG_puts("4http_set_credentials: No credentials to set.");
 
   return (error);
 
@@ -3642,8 +3644,10 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   * Always allow self-signed certificates for the local loopback address...
   */
 
-  if ((any_root = cg->any_root) == 0 && httpAddrLocalhost(http->hostaddr))
+  if (httpAddrLocalhost(http->hostaddr))
     any_root = 1;
+  else
+    any_root = cg->any_root;
 
 #  ifdef HAVE_LIBSSL
   context = SSL_CTX_new(SSLv23_client_method());
