@@ -3746,22 +3746,22 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   if (!error)
   {
     error = SSLSetAllowsAnyRoot(http->tls, any_root);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot, error=%d",
-                  (int)error));
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot(%d), error=%d",
+                  any_root, (int)error));
   }
 
   if (!error)
   {
     error = SSLSetAllowsExpiredCerts(http->tls, cg->expired_certs);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredCerts, error=%d",
-                  (int)error));
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredCerts(%d), error=%d",
+                  cg->expired_certs, (int)error));
   }
 
   if (!error)
   {
     error = SSLSetAllowsExpiredRoots(http->tls, cg->expired_root);
-    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredRoots, error=%d",
-                  (int)error));
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredRoots(%d), error=%d",
+                  cg->expired_root, (int)error));
   }
 
   if (!error)
