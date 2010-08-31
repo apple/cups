@@ -461,7 +461,10 @@ ppdMarkDefaults(ppd_file_t *ppd)	/* I - PPD file record */
   for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
        c;
        c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
+  {
     cupsArrayRemove(ppd->marked, c);
+    c->marked = 0;
+  }
 
  /*
   * Then repopulate it with the defaults...
