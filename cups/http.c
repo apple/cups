@@ -3892,9 +3892,13 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    break;
 
 	case errSSLUnknownRootCert :
+	    message = _("Unable to establish a secure connection to host "
+	                "(untrusted certificate).");
+	    break;
+
 	case errSSLNoRootCert :
 	    message = _("Unable to establish a secure connection to host "
-	                "(unknown root certificate).");
+	                "(self-signed certificate).");
 	    break;
 
 	case errSSLCertExpired :
@@ -3915,6 +3919,11 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	case errSSLXCertChainInvalid :
 	    message = _("Unable to establish a secure connection to host "
 	                "(certificate chain invalid).");
+	    break;
+
+	case errSSLConnectionRefused :
+	    message = _("Unable to establish a secure connection to host "
+	                "(peer dropped connection before responding).");
 	    break;
 
  	default :
@@ -3943,7 +3952,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
       message = _("Unable to establish a secure connection to host.");
 #endif /* HAVE_CSSMERRORSTRING */
 
-    _cupsSetError(HTTP_PKI_ERROR, message, 1);
+    _cupsSetError(IPP_PKI_ERROR, message, 1);
 
     return (-1);
   }

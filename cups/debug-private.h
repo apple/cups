@@ -54,6 +54,10 @@ extern "C" {
  * 7 = static functions
  * 8 = return values for static functions
  * 9 = progress for static functions
+ *
+ * The DEBUG_set macro allows an application to programmatically enable (or
+ * disable) debug logging.  The arguments correspond to the CUPS_DEBUG_LOG,
+ * CUPS_DEBUG_LEVEL, and CUPS_DEBUG_FILTER environment variables.
  */
 
 #  ifdef DEBUG
@@ -61,7 +65,7 @@ extern "C" {
 #      ifdef LIBCUPS2_EXPORTS
 #        define DLLExport __declspec(dllexport)
 #      else
-#	  define DLLExport
+#        define DLLExport
 #      endif /* LIBCUPS2_EXPORTS */
 #    else
 #      define DLLExport
@@ -87,6 +91,8 @@ __attribute__ ((__format__ (__printf__, 1, 2)))
 #endif /* __GNUC__ */
 ;
 extern void	DLLExport _cups_debug_puts(const char *s);
+extern void	DLLExport _cups_debug_set(const char *log, const char *level,
+		                          const char *filter, int force);
 
 #  ifdef __cplusplus
 }
