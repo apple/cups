@@ -4548,8 +4548,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
 	      !strcasecmp(ppd_attr->value, "Reverse")) ||
-	     (!ppd_attr && ppd->manufacturer &&	/* EPSON "compatibility heuristic" */
-	      !strcasecmp(ppd->manufacturer, "epson")))
+	     (!ppd_attr && ppd->manufacturer &&	/* "Compatibility heuristic" */
+	      (!strcasecmp(ppd->manufacturer, "epson") ||
+	       !strcasecmp(ppd->manufacturer, "lexmark"))))
     {
      /*
       * Report that this printer has a single output bin that leaves pages face
