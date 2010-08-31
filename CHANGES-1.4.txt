@@ -5,6 +5,9 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542, STR #3650)
 	- Localization fixes (STR #3635, STR #3636, STR #3647)
+	- cupsAdminSetServerSettings duplicated Listen and Order lines
+	  (STR #3645)
+	- Added DeviceN colorspace support to the CUPS Raster format (STR #3419)
 	- ppdMarkDefaults() did not clear the marked field of the previous
 	  choices (STR #3642)
 	- The serial backend would not allow a raw job to be canceled
