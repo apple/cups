@@ -505,7 +505,7 @@ _cups_debug_puts(const char *s)		/* I - String to output */
  */
 
 void DLLExport
-_cups_debug_set(const char *log,	/* I - Log file or NULL */
+_cups_debug_set(const char *logfile,	/* I - Log file or NULL */
                 const char *level,	/* I - Log level or NULL */
 		const char *filter,	/* I - Filter string or NULL */
 		int        force)	/* I - Force initialization */
@@ -536,15 +536,15 @@ _cups_debug_set(const char *log,	/* I - Log file or NULL */
     * Open logs, set log levels, etc.
     */
 
-    if (!log)
+    if (!logfile)
       _cups_debug_fd = -1;
-    else if (!strcmp(log, "-"))
+    else if (!strcmp(logfile, "-"))
       _cups_debug_fd = 2;
     else
     {
       char	buffer[1024];		/* Filename buffer */
 
-      snprintf(buffer, sizeof(buffer), log, getpid());
+      snprintf(buffer, sizeof(buffer), logfile, getpid());
 
       if (buffer[0] == '+')
 	_cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT, 0644);

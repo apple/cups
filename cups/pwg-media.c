@@ -434,6 +434,49 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
       }
       else
       {
+       /*
+        * See if the name is of the form:
+	*
+	*   WIDTHxLENGTH    - Size in inches
+	*   WIDTHxLENGTHcm  - Size in centimeters
+	*   WIDTHxLENGTHmm  - Size in millimeters
+	*/
+
+	double		w, l;		/* Width and length of page */
+	char		*ptr;		/* Pointer into name */
+        struct lconv	*loc;		/* Locale data */
+
+	loc = localeconv();
+	w   = _cupsStrScand(media->values[0].string.text, &ptr, loc);
+
+	if (ptr && *ptr == 'x')
+	{
+	  l = _cupsStrScand(ptr + 1, &ptr, loc);
+
+	  if (ptr &&
+	      (!*ptr || !strcasecmp(ptr, "mm") || !strcasecmp(ptr, "cm")))
+	  {
+	    if (!strcasecmp(ptr, "mm"))
+	    {
+	      size->width  = (int)(w * 100);
+	      size->length = (int)(l * 100);
+	      return (1);
+	    }
+	    else if (!strcasecmp(ptr, "cm"))
+	    {
+	      size->width  = (int)(w * 1000);
+	      size->length = (int)(l * 1000);
+	      return (1);
+	    }
+	    else
+	    {
+	      size->width  = (int)(w * 2540);
+	      size->length = (int)(l * 2540);
+	      return (1);
+	    }
+	  }
+	}
+
         _cupsSetError(IPP_INTERNAL_ERROR, _("Unsupported media value."), 1);
 	return (0);
       }

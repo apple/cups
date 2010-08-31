@@ -72,10 +72,12 @@ extern "C" {
 #    endif /* WIN32 */
 #    define DEBUG_puts(x) _cups_debug_puts(x)
 #    define DEBUG_printf(x) _cups_debug_printf x
+#    define DEBUG_set(logfile,level,filter) _cups_debug_set(logfile,level,filter,1)
 #  else
 #    define DLLExport
 #    define DEBUG_puts(x)
 #    define DEBUG_printf(x)
+#    define DEBUG_set(logfile,level,filter)
 #  endif /* DEBUG */
 
 
@@ -91,8 +93,9 @@ __attribute__ ((__format__ (__printf__, 1, 2)))
 #endif /* __GNUC__ */
 ;
 extern void	DLLExport _cups_debug_puts(const char *s);
-extern void	DLLExport _cups_debug_set(const char *log, const char *level,
-		                          const char *filter, int force);
+extern void	DLLExport _cups_debug_set(const char *logfile,
+					  const char *level, const char *filter,
+					  int force);
 
 #  ifdef __cplusplus
 }
