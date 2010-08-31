@@ -3049,8 +3049,14 @@ get_options(cupsd_job_t *job,		/* I - Job */
   num_pwgppds = 0;
   pwgppds     = NULL;
 
-  if (pwg)
+  if (pwg &&
+      !ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
+      !ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO))
   {
+   /*
+    * Map output-mode and print-quality to a preset...
+    */
+
     if ((attr = ippFindAttribute(job->attrs, "output-mode",
 				 IPP_TAG_KEYWORD)) != NULL &&
 	!strcmp(attr->values[0].string.text, "monochrome"))
@@ -3101,7 +3107,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	                              &pwgppds);
       }
     }
+  }
 
+  if (pwg)
+  {
     if (pwg->sides_option &&
         !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
 	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)
