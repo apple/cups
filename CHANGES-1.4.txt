@@ -3,8 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.5
 
-	- Documentation fixes (STR #3542)
-	- Localization fixes (STR #3635, STR #3636)
+	- Documentation fixes (STR #3542, STR #3650)
+	- Localization fixes (STR #3635, STR #3636, STR #3647)
 	- The serial backend would not allow a raw job to be canceled
 	  (STR #3649)
 	- The socket backend could go into an infinite loop with certain
