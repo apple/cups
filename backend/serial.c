@@ -503,7 +503,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * stdin (otherwise you can't cancel raw jobs...)
   */
 
-  if (print_fd != 0)
+  if (!print_fd)
   {
 #ifdef HAVE_SIGSET /* Use System V signals over POSIX to avoid bugs */
     sigset(SIGTERM, SIG_IGN);

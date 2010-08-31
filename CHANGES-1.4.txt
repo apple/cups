@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542)
 	- Localization fixes (STR #3635, STR #3636)
+	- The serial backend would not allow a raw job to be canceled
+	  (STR #3649)
 	- The socket backend could go into an infinite loop with certain
 	  printers (STR #3622)
 	- Setting the PRINTER or LPDEST environment variables to "name/instance"
