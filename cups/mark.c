@@ -563,7 +563,7 @@ _ppdParseOptions(
     cups_option_t **options,		/* IO - Options */
     _ppd_parse_t  which)		/* I  - What to parse */
 {
-  char	option[PPD_MAX_NAME + 1],	/* Current option/property */
+  char	option[PPD_MAX_NAME * 2 + 1],	/* Current option/property */
 	choice[PPD_MAX_NAME],		/* Current choice/value */
 	*ptr;				/* Pointer into option or choice */
 

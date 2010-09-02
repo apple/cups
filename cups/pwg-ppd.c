@@ -387,7 +387,9 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
     const char	*quality,		/* com.apple.print.preset.quality value */
 		*output_mode,		/* com.apple.print.preset.output-mode value */
-		*color_model_val;	/* ColorModel choice */
+		*color_model_val,	/* ColorModel choice */
+		*graphics_type,		/* com.apple.print.preset.graphicsType value */
+		*paper_coating;		/* com.apple.print.preset.media-front-coating value */
 
 
     do
@@ -408,6 +410,31 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	  pwg_print_quality = _PWG_PRINT_QUALITY_HIGH;
 	else
 	  pwg_print_quality = _PWG_PRINT_QUALITY_NORMAL;
+
+       /*
+	* Ignore graphicsType "Photo" presets that are not high quality.
+	*/
+
+	graphics_type = cupsGetOption("com.apple.print.preset.graphicsType",
+				      num_options, options);
+
+	if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && graphics_type &&
+	    !strcmp(graphics_type, "Photo"))
+	  continue;
+
+       /*
+	* Ignore presets for normal and draft quality where the coating
+	* isn't "none" or "autodetect".
+	*/
+
+	paper_coating = cupsGetOption(
+	                    "com.apple.print.preset.media-front-coating",
+			    num_options, options);
+
+        if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && paper_coating &&
+	    strcmp(paper_coating, "none") &&
+	    strcmp(paper_coating, "autodetect"))		
+	  continue;
 
        /*
         * Get the output mode for this preset...
