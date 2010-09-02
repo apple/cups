@@ -3439,6 +3439,20 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	   i > 0;
 	   i --, group ++)
       {
+	for (j = group->num_options, option = group->options;
+	     j > 0;
+	     j --, option ++)
+	{
+	  if (!strcmp(option->keyword, "PageRegion"))
+	    continue;
+
+	  if (option->num_choices > 1)
+	    break;
+	}
+
+        if (j == 0)
+	  continue;
+
         cgiSetVariable("GROUP_ID", group->name);
 
 	if (!strcmp(group->name, "InstallableOptions"))
@@ -3452,7 +3466,7 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	     j > 0;
 	     j --, option ++)
 	{
-	  if (!strcmp(option->keyword, "PageRegion"))
+	  if (!strcmp(option->keyword, "PageRegion") || option->num_choices < 2)
 	    continue;
 
 	  cgiSetVariable("KEYWORD", option->keyword);
@@ -3484,7 +3498,6 @@ do_set_options(http_t *http,		/* I - HTTP connection */
 	  if ((coption = ppdFindCustomOption(ppd, option->keyword)))
 	  {
             const char *units = NULL;	/* Units value, if any */
-
 
 	    cgiSetVariable("ISCUSTOM", "1");
 
