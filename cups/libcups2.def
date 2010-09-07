@@ -188,6 +188,7 @@ httpClearFields
 httpClose
 httpConnect
 httpConnectEncrypt
+httpCopyCredentials
 httpDecode64
 httpDecode64_2
 httpDelete
@@ -197,7 +198,7 @@ httpEncryption
 httpError
 httpFlush
 httpFlushWrite
-httpFreeCredential
+httpFreeCredentials
 httpGet
 httpGetBlocking
 httpGetCookie
