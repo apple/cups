@@ -993,6 +993,24 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 		    "cupsdAuthorize: Copying credentials for UID %d...",
 		    CUPSD_UCRED_UID(peercred));
 
+    if (!KerberosInitialized)
+    {
+     /*
+      * Setup a Kerberos context for the scheduler to use...
+      */
+
+      KerberosInitialized = 1;
+
+      if (krb5_init_context(&KerberosContext))
+      {
+	KerberosContext = NULL;
+
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Unable to initialize Kerberos context");
+	return;
+      }
+    }
+
     krb5_ipc_client_set_target_uid(CUPSD_UCRED_UID(peercred));
 
     if ((error = krb5_cc_default(KerberosContext, &peerccache)) != 0)
