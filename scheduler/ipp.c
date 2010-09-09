@@ -2943,7 +2943,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp4", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -6668,7 +6668,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp3", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.ipp4", CacheDir, printer->name);
   unlink(filename);
 
   snprintf(filename, sizeof(filename), "%s/%s.png", CacheDir, printer->name);

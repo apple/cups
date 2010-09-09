@@ -4060,7 +4060,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp4", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
@@ -4689,6 +4689,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
    /*
     * Duplexing, etc...
     */
+
+    ppdMarkDefaults(ppd);
 
     if ((duplex = ppdFindOption(ppd, "Duplex")) == NULL)
       if ((duplex = ppdFindOption(ppd, "EFDuplex")) == NULL)
