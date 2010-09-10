@@ -4064,7 +4064,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
-  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg2", CacheDir, p->name);
+  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg3", CacheDir, p->name);
   if (stat(pwg_name, &pwg_info))
     pwg_info.st_mtime = 0;
 

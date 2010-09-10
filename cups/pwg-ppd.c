@@ -48,6 +48,13 @@
 
 
 /*
+ * Macro to test for two almost-equal PWG measurements.
+ */
+
+#define _PWG_EQUIVALENT(x, y)	(abs((x)-(y)) < 2)
+
+
+/*
  * Local functions...
  */
 
@@ -62,7 +69,7 @@ static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
 _pwg_t *				/* O - PWG mapping data */
 _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 {
-  int			i, j;		/* Looping vars */
+  int			i, j, k;	/* Looping vars */
   _pwg_t		*pwg;		/* PWG mapping data */
   ppd_option_t		*input_slot,	/* InputSlot option */
 			*media_type,	/* MediaType option */
@@ -85,6 +92,19 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   _pwg_output_mode_t	pwg_output_mode;/* output-mode index */
   _pwg_print_quality_t	pwg_print_quality;
 					/* print-quality index */
+  int			similar;	/* Are the old and new size similar? */
+  _pwg_size_t           *old_size;	/* Current old size */
+  int			old_imageable,	/* Old imageable length in 2540ths */
+			old_borderless;	/* Old borderless state */
+  int			new_width,	/* New width in 2540ths */
+			new_length,	/* New length in 2540ths */
+			new_left,	/* New left margin in 2540ths */
+			new_bottom,	/* New bottom margin in 2540ths */
+			new_right,	/* New right margin in 2540ths */
+			new_top,	/* New top margin in 2540ths */
+			new_imageable,	/* New imageable length in 2540ths */
+			new_borderless;	/* New borderless state */
+  _pwg_size_t           *new_size;	/* New size to add, if any */
 
 
   DEBUG_printf(("_pwgCreateWithPPD(ppd=%p)", ppd));
@@ -133,7 +153,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
     if (!strcasecmp(ppd_size->name, "Custom"))
       continue;
-
+	
    /*
     * Convert the PPD size name to the corresponding PWG keyword name.
     */
@@ -162,6 +182,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
     else
     {
+
      /*
       * Not a standard name; convert it to a PWG vendor name of the form:
       *
@@ -177,20 +198,71 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
 
    /*
-    * Save this size...
+    * If we have a similar paper with non-zero margins then we only
+    * want to keep it if it has a larger imageable area length.
     */
 
-    pwg_size->map.ppd = _cupsStrAlloc(ppd_size->name);
-    pwg_size->map.pwg = _cupsStrAlloc(pwg_name);
-    pwg_size->width   = _PWG_FROMPTS(ppd_size->width);
-    pwg_size->length  = _PWG_FROMPTS(ppd_size->length);
-    pwg_size->left    = _PWG_FROMPTS(ppd_size->left);
-    pwg_size->bottom  = _PWG_FROMPTS(ppd_size->bottom);
-    pwg_size->right   = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
-    pwg_size->top     = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
+    new_width      = _PWG_FROMPTS(ppd_size->width);
+    new_length     = _PWG_FROMPTS(ppd_size->length);
+    new_left       = _PWG_FROMPTS(ppd_size->left);
+    new_bottom     = _PWG_FROMPTS(ppd_size->bottom);
+    new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
+    new_top        = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
+    new_imageable  = new_length - new_top - new_bottom;
+    new_borderless = new_bottom == 0 && new_top == 0 &&
+                     new_left == 0 && new_right == 0;
 
-    pwg->num_sizes ++;
-    pwg_size ++;
+    for (k = pwg->num_sizes, similar = 0, old_size = pwg->sizes, new_size = NULL;
+         k > 0 && !similar;
+         k --, old_size ++)
+    {
+      old_imageable  = old_size->length - old_size->top - old_size->bottom;
+      old_borderless = old_size->left == 0 && old_size->bottom == 0 &&
+	               old_size->right == 0 && old_size->top == 0;
+
+      similar = old_borderless == new_borderless &&
+                _PWG_EQUIVALENT(old_size->width, new_width) &&
+	        _PWG_EQUIVALENT(old_size->length, new_length);
+
+      if (similar && new_imageable > old_imageable)
+      {
+       /*
+	* The new paper has a larger imageable area so it will replace
+	* the older paper.
+	*/
+
+	new_size = old_size;
+	_cupsStrFree(old_size->map.ppd);
+	_cupsStrFree(old_size->map.pwg);
+      }
+    }
+
+    if (!similar)
+    {
+     /*
+      * The paper was unique enough to deserve its own entry so add it to the
+      * end.
+      */
+
+      new_size = pwg_size ++;
+      pwg->num_sizes ++;
+    } 
+
+    if (new_size)
+    {
+     /*
+      * Save this size...
+      */
+
+      new_size->map.ppd = _cupsStrAlloc(ppd_size->name);
+      new_size->map.pwg = _cupsStrAlloc(pwg_name);
+      new_size->width   = new_width;
+      new_size->length  = new_length;
+      new_size->left    = new_left;
+      new_size->bottom  = new_bottom;
+      new_size->right   = new_right;
+      new_size->top     = new_top;
+    }
   }
 
   if (ppd->variable_sizes)

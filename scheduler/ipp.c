@@ -2947,7 +2947,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
              printer->name);
     unlink(cache_name);
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg2", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg3", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -6674,7 +6674,7 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
   snprintf(filename, sizeof(filename), "%s/%s.png", CacheDir, printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.pwg2", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.pwg3", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__
