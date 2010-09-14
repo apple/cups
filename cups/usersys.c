@@ -493,10 +493,17 @@ _cupsGetPassword(const char *prompt)	/* I - Prompt string */
 
 #else
  /*
-  * Use the standard getpass function to get a password from the console.
+  * Use the standard getpass function to get a password from the console.  An
+  * empty password is treated as canceling the authentication request.
   */
 
-  return (getpass(prompt));
+  const char	*password = getpass(prompt);
+					/* Password string */
+
+  if (!password || !password[0])
+    return (NULL);
+  else
+    return (password);
 #endif /* WIN32 */
 }
 

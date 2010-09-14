@@ -438,7 +438,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       DEBUG_puts("2cupsGetResponse: Need authorization...");
 
       if (!cupsDoAuthentication(http, "POST", resource))
-	httpReconnect(http);
+        httpReconnect(http);
       else
         status = HTTP_AUTHORIZATION_CANCELED;
     }

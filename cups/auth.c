@@ -166,12 +166,6 @@ cupsDoAuthentication(
       return (-1);
     }
 
-    if (!password[0])
-    {
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-      return (-1);
-    }
-
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
   }
