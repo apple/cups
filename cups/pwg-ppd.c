@@ -1322,7 +1322,7 @@ _pwgPageSizeForMedia(
   else if (!media->pwg || !strncmp(media->pwg, "custom_", 7) ||
            (sizeptr = strchr(media->pwg, '_')) == NULL ||
 	   (dimptr = strchr(sizeptr + 1, '_')) == NULL ||
-	   (dimptr - sizeptr) > namesize)
+	   (size_t)(dimptr - sizeptr) > namesize)
   {
    /*
     * Use a name of the form "wNNNhNNN"...

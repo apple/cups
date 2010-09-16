@@ -136,10 +136,10 @@ ppdPageSize(ppd_file_t *ppd,		/* I - PPD file record */
       if ((coption = ppdFindCustomOption(ppd, "PageSize")) != NULL)
       {
         if ((cparam = ppdFindCustomParam(coption, "Width")) != NULL)
-	  cparam->current.custom_points = w;
+	  cparam->current.custom_points = (float)w;
 
         if ((cparam = ppdFindCustomParam(coption, "Height")) != NULL)
-	  cparam->current.custom_points = l;
+	  cparam->current.custom_points = (float)l;
       }
 
      /*

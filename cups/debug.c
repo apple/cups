@@ -31,13 +31,14 @@
 #  include <sys/timeb.h>
 #  include <time.h>
 #  include <io.h>
+#  define getpid (int)GetCurrentProcessId
 static int				/* O  - 0 on success, -1 on failure */
 gettimeofday(struct timeval	*tv,	/* I  - Timeval struct */
              void		*tz)	/* I  - Timezone */
 {   
   struct _timeb timebuffer;		/* Time buffer struct */
   _ftime(&timebuffer);
-  tv->tv_sec = timebuffer.time;
+  tv->tv_sec  = (long)timebuffer.time;
   tv->tv_usec = timebuffer.millitm * 1000;  
   return 0;
 }
