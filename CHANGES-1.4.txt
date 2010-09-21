@@ -3,13 +3,14 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.6
 
-	- Improved the mapping of non-standard PPD and PWG names (STR #3671)
 
 
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542, STR #3650)
 	- Localization fixes (STR #3635, STR #3636, STR #3647, STR #3666)
+	- Fixed a PPD loader bug that could cause a crash in cupsd (STR #3680)
+	- Improved the mapping of non-standard PPD and PWG names (STR #3671)
 	- The scheduler did not initialize Kerberos in all cases (STR #3662)
 	- cupsAdminSetServerSettings duplicated Listen and Order lines
 	  (STR #3645)

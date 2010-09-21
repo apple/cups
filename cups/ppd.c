@@ -663,6 +663,8 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
 
       goto error;
     }
+    else if (!string)
+      continue;
 
    /*
     * Certain main keywords (as defined by the PPD spec) may be used
