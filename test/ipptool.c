@@ -1872,9 +1872,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (http->version != HTTP_1_1)
         prev_pass = pass = 0;
 
-      if (response->request.status.version[0] != (version / 10) ||
-	  response->request.status.version[1] != (version % 10) ||
-	  response->request.status.request_id != request_id)
+      if (response->request.status.request_id != request_id)
+        prev_pass = pass = 0;
+
+      if (version &&
+          (response->request.status.version[0] != (version / 10) ||
+	   response->request.status.version[1] != (version % 10)))
         prev_pass = pass = 0;
 
       if ((attrptr = ippFindAttribute(response, "job-id",
@@ -2162,8 +2165,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			 cupsLastErrorString());
       else
       {
-	if (response->request.status.version[0] != (version / 10) ||
-	    response->request.status.version[1] != (version % 10))
+	if (version &&
+	    (response->request.status.version[0] != (version / 10) ||
+	     response->request.status.version[1] != (version % 10)))
           print_test_error("Bad version %d.%d in response - expected %d.%d "
 	                   "(RFC 2911 section 3.1.8).",
 	                   response->request.status.version[0],
