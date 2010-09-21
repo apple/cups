@@ -153,8 +153,10 @@ VAR int			MaxFDs		VALUE(0);
 
 VAR time_t		ReloadTime	VALUE(0);
 					/* Time of reload request... */
-VAR int			NeedReload	VALUE(RELOAD_ALL);
+VAR int			NeedReload	VALUE(RELOAD_ALL),
 					/* Need to load configuration? */
+			DoingShutdown	VALUE(0);
+					/* Shutting down the scheduler? */
 VAR void		*DefaultProfile	VALUE(0);
 					/* Default security profile */
 

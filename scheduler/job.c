@@ -348,7 +348,7 @@ cupsdCheckJobs(void)
     */
 
     if (job->state_value == IPP_JOB_PENDING && !NeedReload && !Sleeping &&
-        !job->printer)
+        !DoingShutdown && !job->printer)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;
