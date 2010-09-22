@@ -289,6 +289,7 @@
  */
 
 #undef HAVE_AUTHORIZATION_H
+#undef HAVE_SECCERTIFICATE_H
 #undef HAVE_SECITEMPRIV_H
 #undef HAVE_SECPOLICY_H
 #undef HAVE_SECPOLICYPRIV_H
@@ -302,12 +303,25 @@
 
 #undef HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
 
+/*
+ * Do we have the SecPolicyCreateSSL function?
+ */
+
+#undef HAVE_SECPOLICYCREATESSL
+
 
 /*
  * Do we have the SecPolicyCreateSSL function?
  */
 
 #undef HAVE_SECPOLICYCREATESSL
+
+
+/*
+ * Do we have the cssmErrorString function?
+ */
+
+#undef HAVE_CSSMERRORSTRING
 
 
 /*
@@ -659,6 +673,18 @@
  */
 
 #undef HAVE_ICONV_H
+
+
+/*
+ * Do we have statfs or statvfs and one of the corresponding headers?
+ */
+
+#undef HAVE_STATFS
+#undef HAVE_STATVFS
+#undef HAVE_SYS_MOUNT_H
+#undef HAVE_SYS_STATFS_H
+#undef HAVE_SYS_STATVFS_H
+#undef HAVE_SYS_VFS_H
 
 
 #endif /* !_CUPS_CONFIG_H_ */

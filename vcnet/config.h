@@ -24,8 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <ctype.h>
 #include <io.h>
+#include <direct.h>
 
 
 /*
@@ -42,8 +42,10 @@
 #define close		_close
 #define fileno		_fileno
 #define lseek		_lseek
+#define mkdir(d,p)	_mkdir(d)
 #define open		_open
 #define read	        _read
+#define rmdir		_rmdir
 #define snprintf 	_snprintf
 #define strdup		_strdup
 #define unlink		_unlink

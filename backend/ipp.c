@@ -18,8 +18,9 @@
  *
  *   main()                 - Send a file to the printer or server.
  *   cancel_job()           - Cancel a print job.
- *   check_printer_state()  - Check the printer state...
+ *   check_printer_state()  - Check the printer state.
  *   compress_files()       - Compress print files...
+ *   monitor_printer()      - Monitor the printer state...
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
  *   report_attr()          - Report an IPP attribute value.
@@ -36,33 +37,82 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+
+/*
+ * Types...
+ */
+
+typedef struct _cups_monitor_s		/**** Monitoring data ****/
+{
+  const char		*uri,		/* Printer URI */
+			*hostname,	/* Hostname */
+			*user,		/* Username */
+			*resource;	/* Resource path */
+  int			port,		/* Port number */
+			version,	/* IPP version */
+			job_id;		/* Job ID for submitted job */
+  http_encryption_t	encryption;	/* Use encryption? */
+  ipp_jstate_t		job_state;	/* Current job state */
+  ipp_pstate_t		printer_state;	/* Current printer state */
+} _cups_monitor_t;
+
+
 /*
  * Globals...
  */
 
-static char	*password = NULL;	/* Password for device URI */
-static int	password_tries = 0;	/* Password tries */
 static const char *auth_info_required = "none";
 					/* New auth-info-required value */
+static const char * const jattrs[] =	/* Job attributes we want */
+{
+  "job-media-sheets-completed",
+  "job-state",
+  "job-state-reasons"
+};
 static int	job_canceled = 0;	/* Job cancelled? */
+static char	*password = NULL;	/* Password for device URI */
+static int	password_tries = 0;	/* Password tries */
+static const char * const pattrs[] =	/* Printer attributes we want */
+{
+  "copies-supported",
+  "cups-version",
+  "document-format-supported",
+  "marker-colors",
+  "marker-high-levels",
+  "marker-levels",
+  "marker-low-levels",
+  "marker-message",
+  "marker-names",
+  "marker-types",
+  "media-col-supported",
+  "printer-alert",
+  "printer-alert-description",
+  "printer-is-accepting-jobs",
+  "printer-state",
+  "printer-state-message",
+  "printer-state-reasons",
+};
 
 
 /*
  * Local functions...
  */
 
-static void	cancel_job(http_t *http, const char *uri, int id,
-		           const char *resource, const char *user, int version);
-static void	check_printer_state(http_t *http, const char *uri,
-		                    const char *resource, const char *user,
-				    int version, int job_id);
+static void		cancel_job(http_t *http, const char *uri, int id,
+			           const char *resource, const char *user,
+				   int version);
+static ipp_pstate_t	check_printer_state(http_t *http, const char *uri,
+		                            const char *resource,
+					    const char *user, int version,
+					    int job_id);
 #ifdef HAVE_LIBZ
-static void	compress_files(int num_files, char **files);
+static void		compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
-static const char *password_cb(const char *);
-static void	report_attr(ipp_attribute_t *attr);
-static int	report_printer_state(ipp_t *ipp, int job_id);
-static void	sigterm_handler(int sig);
+static void		*monitor_printer(_cups_monitor_t *monitor);
+static const char	*password_cb(const char *);
+static void		report_attr(ipp_attribute_t *attr);
+static int		report_printer_state(ipp_t *ipp, int job_id);
+static void		sigterm_handler(int sig);
 
 
 /*
@@ -111,6 +161,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		compression,		/* Do compression of the job data? */
 		waitjob,		/* Wait for job complete? */
 		waitprinter;		/* Wait for printer ready? */
+  _cups_monitor_t monitor;		/* Monitoring data */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
   int		job_id;			/* job-id value */
   ipp_attribute_t *job_sheets;		/* job-media-sheets-completed */
@@ -132,28 +183,6 @@ main(int  argc,				/* I - Number of command-line args */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
-  static const char * const pattrs[] =
-		{			/* Printer attributes we want */
-		  "copies-supported",
-		  "document-format-supported",
-		  "marker-colors",
-		  "marker-high-levels",
-		  "marker-levels",
-		  "marker-low-levels",
-		  "marker-message",
-		  "marker-names",
-		  "marker-types",
-		  "media-col-supported",
-		  "printer-is-accepting-jobs",
-		  "printer-state",
-		  "printer-state-message",
-		  "printer-state-reasons",
-		};
-  static const char * const jattrs[] =
-		{			/* Job attributes we want */
-		  "job-media-sheets-completed",
-		  "job-state"
-		};
 
 
  /*
@@ -402,8 +431,7 @@ main(int  argc,				/* I - Number of command-line args */
     send_options = !strcasecmp(final_content_type, "application/pdf") ||
                    !strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
                    !strcasecmp(final_content_type, "image/jpeg") ||
-                   !strcasecmp(final_content_type, "image/png") ||
-                   !strcasecmp(final_content_type, "image/urf");
+                   !strcasecmp(final_content_type, "image/png");
 
     fputs("DEBUG: Sending stdin for job...\n", stderr);
   }
@@ -472,6 +500,11 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
     {
+#if 0 /* These need to go in here someplace when we see HTTP_PKI_ERROR or IPP_PKI_ERROR */
+      fputs("STATE: +cups-certificate-error\n", stderr);
+      fputs("STATE: -cups-certificate-error\n", stderr);
+#endif /* 0 */
+
       int error = errno;		/* Connection error */
 
       if (job_canceled)
@@ -647,13 +680,14 @@ main(int  argc,				/* I - Number of command-line args */
       exit(CUPS_BACKEND_STOP);
     }
 
-    if ((supported = cupsDoRequest(http, request, resource)) == NULL)
-      ipp_status = cupsLastError();
-    else
-      ipp_status = supported->request.status.status_code;
+    supported  = cupsDoRequest(http, request, resource);
+    ipp_status = cupsLastError();
 
     if (ipp_status > IPP_OK_CONFLICT)
     {
+      fprintf(stderr, "DEBUG: Get-Printer-Attributes returned %s.\n",
+              ippErrorString(ipp_status));
+
       if (ipp_status == IPP_PRINTER_BUSY ||
 	  ipp_status == IPP_SERVICE_UNAVAILABLE)
       {
@@ -700,7 +734,9 @@ main(int  argc,				/* I - Number of command-line args */
       }
       else if (ipp_status == IPP_NOT_FOUND)
       {
-        _cupsLangPuts(stderr, _("ERROR: The printer URI is incorrect or no longer exists.\n"));
+        _cupsLangPuts(stderr,
+	              _("ERROR: The printer URI is incorrect or no longer "
+		        "exists.\n"));
 
 	if (supported)
           ippDelete(supported);
@@ -833,6 +869,23 @@ main(int  argc,				/* I - Number of command-line args */
   }
   else
     copies_remaining = copies;
+
+ /*
+  * Start monitoring the printer in the background...
+  */
+
+  monitor.uri           = uri;
+  monitor.hostname      = hostname;
+  monitor.user          = argv[2];
+  monitor.resource      = resource;
+  monitor.port          = port;
+  monitor.version       = version;
+  monitor.job_id        = 0;
+  monitor.encryption    = cupsEncryption();
+  monitor.job_state     = IPP_JOB_PENDING;
+  monitor.printer_state = IPP_PRINTER_IDLE;
+
+  _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
 
  /*
   * Then issue the print-job request...
@@ -1005,9 +1058,9 @@ main(int  argc,				/* I - Number of command-line args */
 	  _pwg_media_t	*found;		/* PWG media */
 
 
-          if ((found = _pwgMediaForPPD(keyword)) == NULL)
+          if ((found = _pwgMediaForPPD(keyword)) != NULL)
 	    keyword = found->pwg;
-	  else if ((found = _pwgMediaForLegacy(keyword)) == NULL)
+	  else if ((found = _pwgMediaForLegacy(keyword)) != NULL)
 	    keyword = found->pwg;
 
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media",
@@ -1027,11 +1080,52 @@ main(int  argc,				/* I - Number of command-line args */
 				     options)) != NULL)
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
 		       NULL, keyword);
+	else if ((keyword = cupsGetOption("ColorModel", num_options,
+		                                options)) != NULL)
+	{
+	  if (!strcasecmp(keyword, "Gray"))
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			         NULL, "monochrome");
+		else if (!strcasecmp(keyword, "Color"))
+		  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			           NULL, "color");
+	}
+
+	if ((keyword = cupsGetOption("print-quality", num_options,
+				     options)) != NULL)
+	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+		        atoi(keyword));
+        else if ((keyword = cupsGetOption("cupsPrintQuality", num_options,
+	                                  options)) != NULL)
+        {
+	  if (!strcasecmp(keyword, "draft"))
+	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+	                  IPP_QUALITY_DRAFT);
+	  else if (!strcasecmp(keyword, "normal"))
+	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+	                  IPP_QUALITY_NORMAL);
+	  else if (!strcasecmp(keyword, "high"))
+	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+	                  IPP_QUALITY_HIGH);
+	}
 
 	if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-       	       NULL, keyword);
-       	               
+		       NULL, keyword);
+	else if ((keyword = cupsGetOption("Duplex", num_options,
+	                                  options)) != NULL)
+	{
+	  if (!strcasecmp(keyword, "None"))
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+			 NULL, "one-sided");
+	  else if (!strcasecmp(keyword, "DuplexNoTumble"))
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+			 NULL, "two-sided-long-edge");
+	  if (!strcasecmp(keyword, "DuplexTumble"))
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+			 NULL, "two-sided-short-edge");
+        }
+
 	_pwgDestroy(pwg);
       }
 
@@ -1134,7 +1228,7 @@ main(int  argc,				/* I - Number of command-line args */
     }
     else
     {
-      job_id = job_id_attr->values[0].integer;
+      monitor.job_id = job_id = job_id_attr->values[0].integer;
       _cupsLangPrintf(stderr, _("NOTICE: Print file accepted - job ID %d.\n"),
                       job_id);
     }
@@ -1336,11 +1430,13 @@ main(int  argc,				/* I - Number of command-line args */
 
       ippDelete(response);
 
+#if 0
      /*
       * Check the printer state and report it if necessary...
       */
 
       check_printer_state(http, uri, resource, argv[2], version, job_id);
+#endif /* 0 */
 
      /*
       * Wait 1-10 seconds before polling again...
@@ -1467,34 +1563,27 @@ cancel_job(http_t     *http,		/* I - HTTP connection */
 
 
 /*
- * 'check_printer_state()' - Check the printer state...
+ * 'check_printer_state()' - Check the printer state.
  */
 
-static void
+static ipp_pstate_t			/* O - Current printer-state */
 check_printer_state(
     http_t      *http,			/* I - HTTP connection */
     const char  *uri,			/* I - Printer URI */
     const char  *resource,		/* I - Resource path */
     const char  *user,			/* I - Username, if any */
     int         version,		/* I - IPP version */
-    int         job_id)			/* I - Current job ID */
+    int         job_id)
 {
-  ipp_t	*request,			/* IPP request */
-	*response;			/* IPP response */
-  static const char * const attrs[] =	/* Attributes we want */
-  {
-    "marker-colors",
-    "marker-levels",
-    "marker-message",
-    "marker-names",
-    "marker-types",
-    "printer-state-message",
-    "printer-state-reasons"
-  };
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Attribute in response */
+  ipp_pstate_t	printer_state = IPP_PRINTER_STOPPED;
+					/* Current printer-state */
 
 
  /*
-  * Check on the printer state...
+  * Send a Get-Printer-Attributes request and log the results...
   */
 
   request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
@@ -1502,25 +1591,32 @@ check_printer_state(
   request->request.op.version[1] = version % 10;
 
   ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-               NULL, uri);
+	       NULL, uri);
 
   if (user && user[0])
     ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                 "requesting-user-name", NULL, user);
+		 "requesting-user-name", NULL, user);
 
   ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                "requested-attributes",
-		(int)(sizeof(attrs) / sizeof(attrs[0])), NULL, attrs);
-
- /*
-  * Do the request...
-  */
+		"requested-attributes",
+		(int)(sizeof(pattrs) / sizeof(pattrs[0])), NULL, pattrs);
 
   if ((response = cupsDoRequest(http, request, resource)) != NULL)
   {
     report_printer_state(response, job_id);
+
+    if ((attr = ippFindAttribute(response, "printer-state",
+				 IPP_TAG_ENUM)) != NULL)
+      printer_state = (ipp_pstate_t)attr->values[0].integer;
+
     ippDelete(response);
   }
+
+ /*
+  * Return the printer-state value...
+  */
+
+  return (printer_state);
 }
 
 
@@ -1600,6 +1696,122 @@ compress_files(int  num_files,		/* I - Number of files */
   }
 }
 #endif /* HAVE_LIBZ */
+
+
+/*
+ * 'monitor_printer()' - Monitor the printer state...
+ */
+
+static void *				/* O - Thread exit code */
+monitor_printer(
+    _cups_monitor_t *monitor)		/* I - Monitoring data */
+{
+  http_t	*http;			/* Connection to printer */
+  ipp_t		*request,		/* IPP request */
+		*response;		/* IPP response */
+  ipp_attribute_t *attr;		/* Attribute in response */
+  int		delay,			/* Current delay */
+		prev_delay,		/* Previous delay */
+		temp_delay;		/* Temporary delay value */
+
+
+ /*
+  * Make a copy of the printer connection...
+  */
+
+  http = _httpCreate(monitor->hostname, monitor->port, monitor->encryption);
+  cupsSetPasswordCB(password_cb);
+
+ /*
+  * Loop until the job is canceled, aborted, or completed.
+  */
+
+  delay      = 1;
+  prev_delay = 0;
+
+  while (monitor->job_state < IPP_JOB_CANCELED && !job_canceled)
+  {
+   /*
+    * Reconnect to the printer...
+    */
+
+    if (!httpReconnect(http))
+    {
+     /*
+      * Connected, so check on the printer state...
+      */
+
+      monitor->printer_state = check_printer_state(http, monitor->uri,
+                                                   monitor->resource,
+						   monitor->user,
+						   monitor->version,
+						   monitor->job_id);
+
+      if (monitor->job_id > 0)
+      {
+       /*
+        * Check the status of the job itself...
+	*/
+
+	request = ippNewRequest(IPP_GET_JOB_ATTRIBUTES);
+	request->request.op.version[0] = monitor->version / 10;
+	request->request.op.version[1] = monitor->version % 10;
+
+	ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+		     NULL, monitor->uri);
+	ippAddInteger(request, IPP_TAG_OPERATION, IPP_TAG_INTEGER, "job-id",
+	              monitor->job_id);
+
+	if (monitor->user && monitor->user[0])
+	  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		       "requesting-user-name", NULL, monitor->user);
+
+	ippAddStrings(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		      "requested-attributes",
+		      (int)(sizeof(jattrs) / sizeof(jattrs[0])), NULL, jattrs);
+
+       /*
+	* Do the request...
+	*/
+
+	response = cupsDoRequest(http, request, monitor->resource);
+
+	if ((attr = ippFindAttribute(response, "job-state",
+				     IPP_TAG_ENUM)) != NULL)
+	  monitor->job_state = (ipp_jstate_t)attr->values[0].integer;
+	else
+	  monitor->job_state = IPP_JOB_COMPLETED;
+
+	ippDelete(response);
+      }
+
+     /*
+      * Disconnect from the printer - we'll reconnect on the next poll...
+      */
+
+      _httpDisconnect(http);
+    }
+
+   /*
+    * Sleep for N seconds, and then update the next sleep time using a
+    * Fibonacci series (1 1 2 3 5 8)...
+    */
+
+    sleep(delay);
+
+    temp_delay = delay;
+    delay      = (delay + prev_delay) % 12;
+    prev_delay = delay < temp_delay ? 0 : temp_delay;
+  }
+
+ /*
+  * Cleanup and return...
+  */
+
+  httpClose(http);
+
+  return (NULL);
+}
 
 
 /*
@@ -1712,41 +1924,93 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
 {
   int			i;		/* Looping var */
   int			count;		/* Count of reasons shown... */
-  ipp_attribute_t	*psm,		/* printer-state-message */
+  ipp_attribute_t	*pa,		/* printer-alert */
+			*pam,		/* printer-alert-message */
+			*psm,		/* printer-state-message */
 			*reasons,	/* printer-state-reasons */
 			*marker;	/* marker-* attributes */
   const char		*reason;	/* Current reason */
   const char		*prefix;	/* Prefix for STATE: line */
-  char			state[1024];	/* State string */
+  char			value[1024],	/* State/message string */
+			*valptr;	/* Pointer into string */
 
+
+ /*
+  * Report alerts and messages...
+  */
+
+  if ((pa = ippFindAttribute(ipp, "printer-alert", IPP_TAG_TEXT)) != NULL)
+    report_attr(pa);
+
+  if ((pam = ippFindAttribute(ipp, "printer-alert-message",
+                              IPP_TAG_TEXT)) != NULL)
+    report_attr(pam);
 
   if ((psm = ippFindAttribute(ipp, "printer-state-message",
                               IPP_TAG_TEXT)) != NULL)
-    fprintf(stderr, "INFO: %s\n", psm->values[0].string.text);
+  {
+    char	*ptr;			/* Pointer into message */
+
+
+    strlcpy(value, "INFO: ", sizeof(value));
+    for (ptr = psm->values[0].string.text, valptr = value + 6;
+         *ptr && valptr < (value + sizeof(value) - 6);
+	 ptr ++)
+    {
+      if (*ptr < ' ' && *ptr > 0 && *ptr != '\t')
+      {
+       /*
+        * Substitute "<XX>" for the control character; sprintf is safe because
+	* we always leave 6 chars free at the end...
+	*/
+
+        sprintf(valptr, "<%02X>", *ptr);
+	valptr += 4;
+      }
+      else
+        *valptr++ = *ptr;
+    }
+
+    *valptr++ = '\n';
+    *valptr++ = '\0';
+
+    fputs(value, stderr);
+  }
+
+ /*
+  * Now report printer-state-reasons, filtering out some of the reasons we never
+  * want to set...
+  */
 
   if ((reasons = ippFindAttribute(ipp, "printer-state-reasons",
                                   IPP_TAG_KEYWORD)) == NULL)
     return (0);
 
-  state[0] = '\0';
+  value[0] = '\0';
   prefix   = "STATE: ";
 
-  for (i = 0, count = 0; i < reasons->num_values; i ++)
+  for (i = 0, count = 0, valptr = value; i < reasons->num_values; i ++)
   {
     reason = reasons->values[i].string.text;
 
     if (strcmp(reason, "paused") &&
 	strcmp(reason, "com.apple.print.recoverable-warning"))
     {
-      strlcat(state, prefix, sizeof(state));
-      strlcat(state, reason, sizeof(state));
+      strlcpy(valptr, prefix, sizeof(value) - (valptr - value) - 1);
+      valptr += strlen(valptr);
+      strlcpy(valptr, reason, sizeof(value) - (valptr - value) - 1);
+      valptr += strlen(valptr);
 
       prefix  = ",";
     }
   }
 
-  if (state[0])
-    fprintf(stderr, "%s\n", state);
+  if (value[0])
+  {
+    *valptr++ = '\n';
+    *valptr++ = '\0';
+    fputs(value, stderr);
+  }
 
  /*
   * Relay the current marker-* attribute values...

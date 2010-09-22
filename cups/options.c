@@ -30,9 +30,7 @@
  * Include necessary headers...
  */
 
-#include "cups.h"
-#include "string-private.h"
-#include "debug-private.h"
+#include "cups-private.h"
 
 
 /*
@@ -283,7 +281,7 @@ cupsParseOptions(
   * Skip leading spaces...
   */
 
-  while (isspace(*ptr & 255))
+  while (_cups_isspace(*ptr))
     ptr ++;
 
  /*
@@ -297,7 +295,7 @@ cupsParseOptions(
     */
 
     name = ptr;
-    while (!isspace(*ptr & 255) && *ptr != '=' && *ptr)
+    while (!strchr("\f\n\r\t\v =", *ptr) && *ptr)
       ptr ++;
 
    /*
@@ -311,7 +309,7 @@ cupsParseOptions(
     * Skip trailing spaces...
     */
 
-    while (isspace(*ptr & 255))
+    while (_cups_isspace(*ptr))
       *ptr++ = '\0';
 
     if ((sep = *ptr) == '=')
@@ -340,7 +338,7 @@ cupsParseOptions(
 
     value = ptr;
 
-    while (*ptr && !isspace(*ptr & 255))
+    while (*ptr && !_cups_isspace(*ptr))
     {
       if (*ptr == ',')
         ptr ++;
@@ -395,7 +393,7 @@ cupsParseOptions(
 	* Normal space-delimited string...
 	*/
 
-	while (!isspace(*ptr & 255) && *ptr)
+	while (*ptr && !_cups_isspace(*ptr))
 	{
 	  if (*ptr == '\\' && ptr[1])
 	    _cups_strcpy(ptr, ptr + 1);
@@ -414,7 +412,7 @@ cupsParseOptions(
     * Skip trailing whitespace...
     */
 
-    while (isspace(*ptr & 255))
+    while (_cups_isspace(*ptr))
       ptr ++;
 
    /*
@@ -539,7 +537,7 @@ _cupsGet1284Values(
   num_values = 0;
   while (*device_id)
   {
-    while (isspace(*device_id & 255))
+    while (_cups_isspace(*device_id))
       device_id ++;
 
     if (!*device_id)
@@ -552,13 +550,13 @@ _cupsGet1284Values(
     if (!*device_id)
       break;
 
-    while (ptr > key && isspace(ptr[-1] & 255))
+    while (ptr > key && _cups_isspace(ptr[-1]))
       ptr --;
 
     *ptr = '\0';
     device_id ++;
 
-    while (isspace(*device_id & 255))
+    while (_cups_isspace(*device_id))
       device_id ++;
 
     if (!*device_id)
@@ -571,7 +569,7 @@ _cupsGet1284Values(
     if (!*device_id)
       break;
 
-    while (ptr > value && isspace(ptr[-1] & 255))
+    while (ptr > value && _cups_isspace(ptr[-1]))
       ptr --;
 
     *ptr = '\0';

@@ -38,6 +38,8 @@ if test x$enable_ssl != xno; then
 		AC_DEFINE(HAVE_CDSASSL)
 
 		dnl Check for the various security headers...
+		AC_CHECK_HEADER(Security/SecCertificate.h,
+		    AC_DEFINE(HAVE_SECCERTIFICATE_H))
 		AC_CHECK_HEADER(Security/SecItemPriv.h,
 		    AC_DEFINE(HAVE_SECITEMPRIV_H))
 		AC_CHECK_HEADER(Security/SecPolicy.h,
@@ -60,12 +62,14 @@ if test x$enable_ssl != xno; then
 
 		dnl Check for SecPolicyCreateSSL...
 		AC_MSG_CHECKING(for SecPolicyCreateSSL)
-		if test $uversion -ge 100; then
+		if test $uversion -ge 110; then
 		    AC_DEFINE(HAVE_SECPOLICYCREATESSL)
 		    AC_MSG_RESULT(yes)
 		else
 		    AC_MSG_RESULT(no)
 		fi])
+
+		AC_DEFINE(HAVE_CSSMERRORSTRING)
 	fi
     fi
 

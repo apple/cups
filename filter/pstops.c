@@ -2389,6 +2389,7 @@ set_pstops_options(
   ppd_attr_t	*attr;			/* PPD attribute */
   ppd_option_t	*option;		/* PPD option */
   ppd_choice_t	*choice;		/* PPD choice */
+  const char	*content_type;		/* Original content type */
 
 
  /*
@@ -2414,6 +2415,18 @@ set_pstops_options(
   doc->new_bounding_box[1] = INT_MAX;
   doc->new_bounding_box[2] = INT_MIN;
   doc->new_bounding_box[3] = INT_MIN;
+
+ /*
+  * See what the source content type is.  When printing PostScript content we
+  * want to do scaling and orientation, but otherwise we don't want to change
+  * anything...
+  */
+
+  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+    content_type = "application/postscript";
+
+  if (!strcasecmp(content_type, "application/postscript"))
+    Orientation = 0;
 
  /*
   * AP_FIRSTPAGE_* and the corresponding non-first-page options.
@@ -2444,7 +2457,6 @@ set_pstops_options(
     doc->page_region = choice->choice;
   if ((choice = ppdFindMarkedChoice(ppd, "PageSize")) != NULL)
     doc->page_size = choice->choice;
-
 
  /*
   * brightness
@@ -2505,15 +2517,24 @@ set_pstops_options(
     doc->emit_jcl = 1;
 
  /*
-  * fitplot/fit-to-page
+  * fitplot/fit-to-page/ipp-attribute-fidelity
+  *
+  * (Only for original PostScript content)
   */
 
-  if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
-      !strcasecmp(val, "true"))
-    doc->fitplot = 1;
-  else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
-           !strcasecmp(val, "true"))
-    doc->fitplot = 1;
+  if (!strcasecmp(content_type, "application/postscript"))
+  {
+    if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
+	!strcasecmp(val, "true"))
+      doc->fitplot = 1;
+    else if ((val = cupsGetOption("fit-to-page", num_options, options)) != NULL &&
+	     !strcasecmp(val, "true"))
+      doc->fitplot = 1;
+    else if ((val = cupsGetOption("ipp-attribute-fidelity", num_options,
+                                  options)) != NULL &&
+	     !strcasecmp(val, "true"))
+      doc->fitplot = 1;
+  }
 
  /*
   * gamma

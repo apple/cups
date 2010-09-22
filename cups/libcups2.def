@@ -1,5 +1,5 @@
 LIBRARY libcups2
-VERSION 2.8
+VERSION 2.9
 EXPORTS
 _cupsGetPassword
 _cupsGlobals
@@ -154,6 +154,7 @@ cupsRemoveOption
 cupsResolveConflicts
 cupsSendRequest
 cupsServer
+cupsSetCredentials
 cupsSetDests
 cupsSetDests2
 cupsSetEncryption
@@ -168,6 +169,7 @@ cupsUTF8ToCharset
 cupsUTF8ToUTF32
 cupsUser
 cupsWriteRequestData
+httpAddCredential
 httpAddrAny
 httpAddrConnect
 httpAddrEqual
@@ -186,6 +188,7 @@ httpClearFields
 httpClose
 httpConnect
 httpConnectEncrypt
+httpCopyCredentials
 httpDecode64
 httpDecode64_2
 httpDelete
@@ -195,6 +198,7 @@ httpEncryption
 httpError
 httpFlush
 httpFlushWrite
+httpFreeCredentials
 httpGet
 httpGetBlocking
 httpGetCookie
@@ -227,6 +231,7 @@ httpSeparate
 httpSeparate2
 httpSeparateURI
 httpSetCookie
+httpSetCredentials
 httpSetExpect
 httpSetField
 httpSetLength

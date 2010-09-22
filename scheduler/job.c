@@ -1,7 +1,7 @@
 /*
  * "$Id: job.c 7902 2008-09-03 14:20:17Z mike $"
  *
- *   Job management routines for the Common UNIX Printing System (CUPS).
+ *   Job management routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -348,7 +348,7 @@ cupsdCheckJobs(void)
     */
 
     if (job->state_value == IPP_JOB_PENDING && !NeedReload && !Sleeping &&
-        !job->printer)
+        !DoingShutdown && !job->printer)
     {
       printer = cupsdFindDest(job->dest);
       pclass  = NULL;
@@ -2856,7 +2856,7 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
 	      job->tries ++;
 
-	      if (job->tries >= JobRetryLimit)
+	      if (job->tries > JobRetryLimit && JobRetryLimit > 0)
 	      {
 	       /*
 		* Too many tries...
@@ -3049,8 +3049,17 @@ get_options(cupsd_job_t *job,		/* I - Job */
   num_pwgppds = 0;
   pwgppds     = NULL;
 
-  if (pwg)
+  if (pwg &&
+      !ippFindAttribute(job->attrs,
+                        "com.apple.print.DocumentTicket.PMSpoolFormat",
+			IPP_TAG_ZERO) &&
+      (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
+       ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
+   /*
+    * Map output-mode and print-quality to a preset...
+    */
+
     if ((attr = ippFindAttribute(job->attrs, "output-mode",
 				 IPP_TAG_KEYWORD)) != NULL &&
 	!strcmp(attr->values[0].string.text, "monochrome"))
@@ -3101,7 +3110,10 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	                              &pwgppds);
       }
     }
+  }
 
+  if (pwg)
+  {
     if (pwg->sides_option &&
         !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
 	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)

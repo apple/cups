@@ -94,6 +94,101 @@ main(int  argc,				/* I - Number of command-line args */
     puts("PASS");
   }
 
+  fputs("_pwgMediaForPWG(\"iso_a4_210x297mm\"): ", stdout);
+  if ((pwgmedia = _pwgMediaForPWG("iso_a4_210x297mm")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (strcmp(pwgmedia->pwg, "iso_a4_210x297mm"))
+  {
+    printf("FAIL (%s)\n", pwgmedia->pwg);
+    status ++;
+  }
+  else if (pwgmedia->width != 21000 || pwgmedia->length != 29700)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    puts("PASS");
+
+  fputs("_pwgMediaForLegacy(\"na-letter\"): ", stdout);
+  if ((pwgmedia = _pwgMediaForLegacy("na-letter")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (strcmp(pwgmedia->pwg, "na_letter_8.5x11in"))
+  {
+    printf("FAIL (%s)\n", pwgmedia->pwg);
+    status ++;
+  }
+  else if (pwgmedia->width != 21590 || pwgmedia->length != 27940)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    puts("PASS");
+
+  fputs("_pwgMediaForPPD(\"4x6\"): ", stdout);
+  if ((pwgmedia = _pwgMediaForPPD("4x6")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (strcmp(pwgmedia->pwg, "na_index-4x6_4x6in"))
+  {
+    printf("FAIL (%s)\n", pwgmedia->pwg);
+    status ++;
+  }
+  else if (pwgmedia->width != 10160 || pwgmedia->length != 15240)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    puts("PASS");
+
+  fputs("_pwgMediaForPPD(\"10x15cm\"): ", stdout);
+  if ((pwgmedia = _pwgMediaForPPD("10x15cm")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (strcmp(pwgmedia->pwg, "om_100x150mm_100x150mm"))
+  {
+    printf("FAIL (%s)\n", pwgmedia->pwg);
+    status ++;
+  }
+  else if (pwgmedia->width != 10000 || pwgmedia->length != 15000)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    puts("PASS");
+
+  fputs("_pwgMediaForPPD(\"Custom.10x15cm\"): ", stdout);
+  if ((pwgmedia = _pwgMediaForPPD("Custom.10x15cm")) == NULL)
+  {
+    puts("FAIL (not found)");
+    status ++;
+  }
+  else if (strcmp(pwgmedia->pwg, "custom_10x15cm_100x150mm"))
+  {
+    printf("FAIL (%s)\n", pwgmedia->pwg);
+    status ++;
+  }
+  else if (pwgmedia->width != 10000 || pwgmedia->length != 15000)
+  {
+    printf("FAIL (%dx%d)\n", pwgmedia->width, pwgmedia->length);
+    status ++;
+  }
+  else
+    puts("PASS");
+
   fputs("_pwgMediaForSize(29700, 42000): ", stdout);
   if ((pwgmedia = _pwgMediaForSize(29700, 42000)) == NULL)
   {

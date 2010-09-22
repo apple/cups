@@ -112,6 +112,12 @@ extern char **environ;
 
 #define DEBUG_WRITES 0
 
+/*
+ * WAIT_EOF_DELAY is number of seconds we'll wait for responses from
+ * the printer after we've finished sending all the data
+ */
+#define WAIT_EOF_DELAY			7
+#define WAIT_SIDE_DELAY			3
 #define DEFAULT_TIMEOUT			5000L
 
 #define	USB_INTERFACE_KIND		CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID190)
@@ -241,6 +247,11 @@ typedef struct globals_s
   Boolean		wait_eof;
   int			drain_output;	/* Drain all pending output */
   int			bidi_flag;	/* 0=unidirectional, 1=bidirectional */
+
+  pthread_mutex_t	sidechannel_thread_mutex;
+  pthread_cond_t	sidechannel_thread_cond;
+  int			sidechannel_thread_stop;
+  int			sidechannel_thread_done;
 } globals_t;
 
 
@@ -333,6 +344,7 @@ print_device(const char *uri,		/* I - Device URI */
   UInt32	  bytes;		/* Bytes written */
   struct timeval  *timeout,		/* Timeout pointer */
 		  stimeout;		/* Timeout for select() */
+  struct timespec cond_timeout;		/* pthread condition timeout */
 
 
  /*
@@ -477,6 +489,12 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (have_sidechannel)
   {
+    g.sidechannel_thread_stop = 0;
+    g.sidechannel_thread_done = 0;
+
+    pthread_cond_init(&g.sidechannel_thread_cond, NULL);
+    pthread_mutex_init(&g.sidechannel_thread_mutex, NULL);
+
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
       fprintf(stderr, "DEBUG: Fatal USB error.\n");
@@ -734,6 +752,101 @@ print_device(const char *uri,		/* I - Device URI */
 
   fprintf(stderr, "DEBUG: Sent %lld bytes...\n", (off_t)total_bytes);
 
+  if (!print_fd)
+  {
+   /*
+    * Re-enable the SIGTERM handler so pthread_kill() will work...
+    */
+  
+    struct sigaction	action;		/* POSIX signal action */
+
+    memset(&action, 0, sizeof(action));
+
+    sigemptyset(&action.sa_mask);
+    action.sa_handler = SIG_DFL;
+    sigaction(SIGTERM, &action, NULL);
+  }
+
+ /*
+  * Wait for the side channel thread to exit...
+  */
+
+  if (have_sidechannel)
+  {
+    close(CUPS_SC_FD);
+    pthread_mutex_lock(&g.readwrite_lock_mutex);
+    g.readwrite_lock = 0;
+    pthread_cond_signal(&g.readwrite_lock_cond);
+    pthread_mutex_unlock(&g.readwrite_lock_mutex);
+
+    g.sidechannel_thread_stop = 1;
+    pthread_mutex_lock(&g.sidechannel_thread_mutex);
+    if (!g.sidechannel_thread_done)
+    {
+     /*
+      * Wait for the side-channel thread to exit...
+      */
+
+      cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
+      cond_timeout.tv_nsec = 0;
+      if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
+			         &g.sidechannel_thread_mutex,
+				 &cond_timeout) != 0)
+      {
+       /*
+	* Force the side-channel thread to exit...
+	*/
+
+	pthread_kill(sidechannel_thread_id, SIGTERM);
+      }
+    }
+    pthread_mutex_unlock(&g.sidechannel_thread_mutex);
+
+    pthread_join(sidechannel_thread_id, NULL);
+
+    pthread_cond_destroy(&g.sidechannel_thread_cond);
+    pthread_mutex_destroy(&g.sidechannel_thread_mutex);
+  }
+
+  pthread_cond_destroy(&g.readwrite_lock_cond);
+  pthread_mutex_destroy(&g.readwrite_lock_mutex);
+
+ /*
+  * Signal the read thread to stop...
+  */
+
+  g.read_thread_stop = 1;
+
+ /*
+  * Give the read thread WAIT_EOF_DELAY seconds to complete all the data. If
+  * we are not signaled in that time then force the thread to exit.
+  */
+
+  pthread_mutex_lock(&g.read_thread_mutex);
+
+  if (!g.read_thread_done)
+  {
+    cond_timeout.tv_sec = time(NULL) + WAIT_EOF_DELAY;
+    cond_timeout.tv_nsec = 0;
+
+    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+                               &cond_timeout) != 0)
+    {
+     /*
+      * Force the read thread to exit...
+      */
+
+      g.wait_eof = 0;
+      pthread_kill(read_thread_id, SIGTERM);
+    }
+  }
+  pthread_mutex_unlock(&g.read_thread_mutex);
+
+  pthread_join(read_thread_id, NULL);	/* wait for the read thread to return */
+
+  pthread_cond_destroy(&g.read_thread_cond);
+  pthread_mutex_destroy(&g.read_thread_mutex);
+
  /*
   * Close the connection and input file and general clean up...
   */
@@ -942,7 +1055,12 @@ sidechannel_thread(void *reference)
 	  break;
     }
   }
-  while (1);
+  while (!g.sidechannel_thread_stop);
+
+  pthread_mutex_lock(&g.sidechannel_thread_mutex);
+  g.sidechannel_thread_done = 1;
+  pthread_cond_signal(&g.sidechannel_thread_cond);
+  pthread_mutex_unlock(&g.sidechannel_thread_mutex);
 
   return NULL;
 }
@@ -1278,7 +1396,10 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
   {
     fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": %s\n",
 	    bundlestr, strerror(errno));
-    return (kr);
+    if (errno == ENOENT)
+      return (load_classdriver(NULL, intf, printerDriver));
+    else
+      return (kr);
   }
   else if (bundleinfo.st_mode & S_IWOTH)
   {

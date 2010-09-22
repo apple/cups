@@ -65,6 +65,21 @@
 
 #include "cupsd.h"
 #include <cups/dir.h>
+#ifdef HAVE_APPLICATIONSERVICES_H
+#  include <ApplicationServices/ApplicationServices.h>
+#endif /* HAVE_APPLICATIONSERVICES_H */
+#ifdef HAVE_SYS_MOUNT_H
+#  include <sys/mount.h>
+#endif /* HAVE_SYS_MOUNT_H */
+#ifdef HAVE_SYS_STATFS_H
+#  include <sys/statfs.h>
+#endif /* HAVE_SYS_STATFS_H */
+#ifdef HAVE_SYS_STATVFS_H
+#  include <sys/statvfs.h>
+#endif /* HAVE_SYS_STATVFS_H */
+#ifdef HAVE_SYS_VFS_H
+#  include <sys/vfs.h>
+#endif /* HAVE_SYS_VFS_H */
 
 
 /*
@@ -97,6 +112,7 @@ cupsd_printer_t *			/* O - New printer */
 cupsdAddPrinter(const char *name)	/* I - Name of printer */
 {
   cupsd_printer_t	*p;		/* New printer */
+  char			uri[1024];	/* Printer URI */
 
 
  /*
@@ -120,8 +136,9 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   cupsdSetString(&p->info, name);
   cupsdSetString(&p->hostname, ServerName);
 
-  cupsdSetStringf(&p->uri, "ipp://%s:%d/printers/%s", ServerName, RemotePort,
-                  name);
+  httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+		   ServerName, RemotePort, "/printers/%s", name);
+  cupsdSetString(&p->uri, uri);
   cupsdSetDeviceURI(p, "file:///dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;
@@ -270,6 +287,14 @@ cupsdCreateCommonData(void)
   char			filename[1024],	/* Filename */
 			*notifier;	/* Current notifier */
   cupsd_policy_t	*p;		/* Current policy */
+  int			k_supported;	/* Maximum file size supported */
+#ifdef HAVE_STATFS
+  struct statfs		spoolinfo;	/* FS info for spool directory */
+  double		spoolsize;	/* FS size */
+#elif defined(HAVE_STATVFS)
+  struct statvfs	spoolinfo;	/* FS info for spool directory */
+  double		spoolsize;	/* FS size */
+#endif /* HAVE_STATFS */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const int orients[4] =/* orientation-requested-supported values */
@@ -419,6 +444,7 @@ cupsdCreateCommonData(void)
 		  "multiple-document-handling",
 		  "number-up",
 		  "output-bin",
+		  "output-mode",
 		  "orientation-requested",
 		  "page-ranges",
 		  "print-quality",
@@ -437,6 +463,7 @@ cupsdCreateCommonData(void)
 		  "multiple-document-handling",
 		  "number-up",
 		  "output-bin",
+		  "output-mode",
 		  "orientation-requested",
 		  "page-ranges",
 		  "print-quality",
@@ -449,23 +476,51 @@ cupsdCreateCommonData(void)
 		  "printer-location"
 	        };
   static const char * const which_jobs[] =
-  {					/* which-jobs-supported values */
-    "completed",
-    "not-completed",
-    "aborted",
-    "all",
-    "canceled",
-    "pending",
-    "pending-held",
-    "processing",
-    "processing-stopped"
-  };
+		{			/* which-jobs-supported values */
+		  "completed",
+		  "not-completed",
+		  "aborted",
+		  "all",
+		  "canceled",
+		  "pending",
+		  "pending-held",
+		  "processing",
+		  "processing-stopped"
+		};
 
 
   if (CommonData)
     ippDelete(CommonData);
 
   CommonData = ippNew();
+
+ /*
+  * Get the maximum spool size based on the size of the filesystem used for
+  * the RequestRoot directory.  If the host OS doesn't support the statfs call
+  * or the filesystem is larger than 2TiB, always report INT_MAX.
+  */
+
+#ifdef HAVE_STATFS
+  if (statfs(RequestRoot, &spoolinfo))
+    k_supported = INT_MAX;
+  else if ((spoolsize = (double)spoolinfo.f_bsize * spoolinfo.f_blocks / 1024) >
+               INT_MAX)
+    k_supported = INT_MAX;
+  else
+    k_supported = (int)spoolsize;
+
+#elif defined(HAVE_STATVFS)
+  if (statvfs(RequestRoot, &spoolinfo))
+    k_supported = INT_MAX;
+  else if ((spoolsize = (double)spoolinfo.f_frsize * spoolinfo.f_blocks / 1024) >
+               INT_MAX)
+    k_supported = INT_MAX;
+  else
+    k_supported = (int)spoolsize;
+
+#else
+  k_supported = INT_MAX;
+#endif /* HAVE_STATFS */
 
  /*
   * This list of attributes is sorted to improve performance when the
@@ -520,6 +575,10 @@ cupsdCreateCommonData(void)
 
   /* job-ids-supported */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "job-ids-supported", 1);
+
+  /* job-k-octets-supported */
+  ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                "job-k-octets-supported", k_supported);
 
   /* job-priority-supported */
   ippAddInteger(CommonData, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
@@ -663,9 +722,9 @@ cupsdCreateCommonData(void)
   /* page-ranges-supported */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
 
-  /* pdf-override-supported */
+  /* pdl-override-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
-               "pdl-override-supported", NULL, "not-attempted");
+               "pdl-override-supported", NULL, "attempted");
 
   /* printer-op-policy-supported */
   attr = ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
@@ -1564,7 +1623,7 @@ cupsdSaveAllPrinters(void)
   */
 
   fchown(cupsFileNumber(fp), getuid(), Group);
-  fchmod(cupsFileNumber(fp), 0600);
+  fchmod(cupsFileNumber(fp), ConfigFilePerm & 0600);
 
  /*
   * Write a small header to the file...
@@ -3633,12 +3692,11 @@ add_printer_filter(
     if (!RunUser)
     {
      /*
-      * Only use filters that are owned by root and do not have group or world
-      * write permissions.
+      * Only use filters that are owned by root and do not have world write
+      * permissions.
       */
 
-      if (fileinfo.st_uid ||
-          (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
+      if (fileinfo.st_uid || (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
       {
 	if (fileinfo.st_uid)
 	  snprintf(p->state_message, sizeof(p->state_message),
@@ -3665,7 +3723,7 @@ add_printer_filter(
 
 	if (!stat(filename, &fileinfo) &&
 	    (fileinfo.st_uid ||
-	     (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0))
+	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
 	{
 	  if (fileinfo.st_uid)
 	    snprintf(p->state_message, sizeof(p->state_message),
@@ -4002,11 +4060,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp3", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp4", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
 
-  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg2", CacheDir, p->name);
+  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg3", CacheDir, p->name);
   if (stat(pwg_name, &pwg_info))
     pwg_info.st_mtime = 0;
 
@@ -4490,8 +4548,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
 	      !strcasecmp(ppd_attr->value, "Reverse")) ||
-	     (!ppd_attr && ppd->manufacturer &&	/* EPSON "compatibility heuristic" */
-	      !strcasecmp(ppd->manufacturer, "epson")))
+	     (!ppd_attr && ppd->manufacturer &&	/* "Compatibility heuristic" */
+	      (!strcasecmp(ppd->manufacturer, "epson") ||
+	       !strcasecmp(ppd->manufacturer, "lexmark"))))
     {
      /*
       * Report that this printer has a single output bin that leaves pages face
@@ -4509,6 +4568,31 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		   "output-bin-supported", NULL, "face-down");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
 		   "output-bin-default", NULL, "face-down");
+    }
+
+   /*
+    * output-mode...
+    */
+
+    if (ppd->color_device)
+    {
+      static const char * const output_modes[] =
+      {
+        "monochrome",
+	"color"
+      };
+
+      ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                    "output-mode-supported", 2, NULL, output_modes);
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "output-mode-default", NULL, "color");
+    }
+    else
+    {
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "output-mode-supported", NULL, "monochrome");
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "output-mode-default", NULL, "monochrome");
     }
 
    /*
@@ -4544,7 +4628,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	  cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Bad resolution \"%s\" for printer %s.",
 			  choice->choice, p->name);
-	  xdpi = ydpi = 72;
+	  xdpi = ydpi = 300;
 	}
 
         attr->values[i].resolution.xres  = xdpi;
@@ -4578,7 +4662,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	cupsdLogMessage(CUPSD_LOG_WARN,
 			"Bad default resolution \"%s\" for printer %s.",
 			ppd_attr->value, p->name);
-	xdpi = ydpi = 72;
+	xdpi = ydpi = 300;
       }
 
       ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
@@ -4596,15 +4680,17 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
       ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
 		       "printer-resolution-default", IPP_RES_PER_INCH,
-		       72, 72);
+		       300, 300);
       ippAddResolution(p->ppd_attrs, IPP_TAG_PRINTER,
 		       "printer-resolution-supported", IPP_RES_PER_INCH,
-		       72, 72);
+		       300, 300);
     }
 
    /*
     * Duplexing, etc...
     */
+
+    ppdMarkDefaults(ppd);
 
     if ((duplex = ppdFindOption(ppd, "Duplex")) == NULL)
       if ((duplex = ppdFindOption(ppd, "EFDuplex")) == NULL)
@@ -4866,6 +4952,129 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (ppdFindAttr(ppd, "APRemoteQueueID", NULL))
       p->type |= CUPS_PRINTER_REMOTE;
+
+#ifdef HAVE_APPLICATIONSERVICES_H
+   /*
+    * Convert the file referenced in APPrinterIconPath to a 128x128 PNG
+    * and save it as cacheDir/printername.png
+    */
+
+    if ((ppd_attr = ppdFindAttr(ppd, "APPrinterIconPath", NULL)) != NULL &&
+        ppd_attr->value)
+    {
+      CGImageRef	imageRef = NULL;/* Current icon image */
+      CGImageRef	biggestIconRef = NULL;
+					/* Biggest icon image */
+      CGImageRef	closestTo128IconRef = NULL;
+					/* Icon image closest to and >= 128 */
+      CGImageSourceRef	sourceRef;	/* The file's image source */
+      char		outPath[HTTP_MAX_URI];
+					/* The path to the PNG file */
+      CFURLRef		outUrl;		/* The URL made from the outPath */
+      CFURLRef		icnsFileUrl;	/* The URL of the original ICNS icon file */
+      CGImageDestinationRef destRef;	/* The image destination to write */
+      size_t		bytesPerRow;	/* The bytes per row used for resizing */
+      CGContextRef	context;	/* The CG context used for resizing */
+
+      snprintf(outPath, sizeof(outPath), "%s/%s.png", CacheDir, p->name);
+      outUrl      = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
+                                                            (UInt8 *)outPath,
+						            strlen(outPath),
+						            FALSE);
+      icnsFileUrl = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
+							    (UInt8 *)ppd_attr->value,
+							    strlen(ppd_attr->value),
+							    FALSE);
+      if (outUrl && icnsFileUrl)
+      {
+        sourceRef = CGImageSourceCreateWithURL(icnsFileUrl, NULL);
+        if (sourceRef)
+        {
+          for (i = 0; i < CGImageSourceGetCount(sourceRef); i ++)
+          {
+            imageRef = CGImageSourceCreateImageAtIndex(sourceRef, i, NULL);
+            if (imageRef &&
+                CGImageGetWidth(imageRef) == CGImageGetHeight(imageRef))
+            {
+             /*
+              * Loop through remembering the icon closest to 128 but >= 128
+              * and then remember the largest icon.
+              */
+
+              if (CGImageGetWidth(imageRef) >= 128 &&
+		  (!closestTo128IconRef ||
+		   CGImageGetWidth(imageRef) <
+		       CGImageGetWidth(closestTo128IconRef)))
+              {
+                CGImageRelease(closestTo128IconRef);
+                CGImageRetain(imageRef);
+                closestTo128IconRef = imageRef;
+              }
+
+              if (!biggestIconRef ||
+		  CGImageGetWidth(imageRef) > CGImageGetWidth(biggestIconRef))
+              {
+                CGImageRelease(biggestIconRef);
+                CGImageRetain(imageRef);
+                biggestIconRef = imageRef;
+              }
+
+              CGImageRelease(imageRef);
+            }
+          }
+
+          if (biggestIconRef)
+          {
+           /*
+            * If biggestIconRef is NULL, we found no icons. Otherwise we first
+            * want the closest to 128, but if none are larger than 128, we want
+            * the largest icon available.
+            */
+
+            imageRef = closestTo128IconRef ? closestTo128IconRef :
+                                             biggestIconRef;
+            CGImageRetain(imageRef);
+            CGImageRelease(biggestIconRef);
+            CGImageRelease(closestTo128IconRef);
+            destRef = CGImageDestinationCreateWithURL(outUrl, kUTTypePNG, 1,
+                                                      NULL);
+            if (destRef)
+            {
+              if (CGImageGetWidth(imageRef) != 128)
+              {
+                bytesPerRow = CGImageGetBytesPerRow(imageRef) /
+                              CGImageGetWidth(imageRef) * 128;
+                context     = CGBitmapContextCreate(NULL, 128, 128,
+						    CGImageGetBitsPerComponent(imageRef),
+						    bytesPerRow,
+						    CGImageGetColorSpace(imageRef),
+						    kCGImageAlphaPremultipliedFirst);
+                if (context)
+                {
+                  CGContextDrawImage(context, CGRectMake(0, 0, 128, 128),
+				     imageRef);
+                  CGImageRelease(imageRef);
+                  imageRef = CGBitmapContextCreateImage(context);
+                  CGContextRelease(context);
+                }
+              }
+
+              CGImageDestinationAddImage(destRef, imageRef, NULL);
+              CGImageDestinationFinalize(destRef);
+              CFRelease(destRef);
+            }
+
+            CGImageRelease(imageRef);
+          }
+
+          CFRelease(sourceRef);
+          CFRelease(icnsFileUrl);
+        }
+
+        CFRelease(outUrl);
+      }
+    }
+#endif /* HAVE_APPLICATIONSERVICES_H */
 
    /*
     * Close the PPD and set the type...

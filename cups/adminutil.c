@@ -240,7 +240,7 @@ cupsAdminCreateWindowsPPD(
     }
     else if (jcloption && !strncmp(line, "*OrderDependency:", 17))
     {
-      for (ptr = line + 17; *ptr && isspace(*ptr & 255); ptr ++);
+      for (ptr = line + 17; _cups_isspace(*ptr); ptr ++);
 
       ptr = strchr(ptr, ' ');
 
@@ -1066,7 +1066,7 @@ cupsAdminGetServerSettings(
 
 	while (*value)
 	{
-	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+	  for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
 
 	  if (*valptr)
 	    *valptr++ = '\0';
@@ -1077,7 +1077,7 @@ cupsAdminGetServerSettings(
 	    break;
 	  }
 
-          for (value = valptr; isspace(*value & 255); value ++);
+          for (value = valptr; _cups_isspace(*value); value ++);
 	}
       }
       else if (!strcasecmp(line, "</Limit>"))
@@ -1460,7 +1460,7 @@ cupsAdminSetServerSettings(
   while (cupsFileGetConf(cupsd, line, sizeof(line), &value, &linenum))
   {
     if ((!strcasecmp(line, "Port") || !strcasecmp(line, "Listen")) &&
-        (remote_admin >= 0 || remote_any > 0 || share_printers >= 0))
+        (remote_admin >= 0 || remote_any >= 0 || share_printers >= 0))
     {
       if (!wrote_port_listen)
       {
@@ -1704,83 +1704,86 @@ cupsAdminSetServerSettings(
 
       cupsFilePuts(temp, "</Location>\n");
     }
-    else if (!strcasecmp(line, "<Limit") && in_default_policy)
+    else if (!strcasecmp(line, "<Limit"))
     {
-     /*
-      * See if the policy limit is for the Cancel-Job operation...
-      */
-
-      char	*valptr;		/* Pointer into value */
-
-
-      indent += 2;
-
-      if (!strcasecmp(value, "cancel-job") && user_cancel_any >= 0)
+      if (in_default_policy)
       {
        /*
-	* Don't write anything for this limit section...
+	* See if the policy limit is for the Cancel-Job operation...
 	*/
-
-	in_cancel_job = 2;
+  
+	char	*valptr;		/* Pointer into value */
+  
+  
+	if (!strcasecmp(value, "cancel-job") && user_cancel_any >= 0)
+	{
+	 /*
+	  * Don't write anything for this limit section...
+	  */
+  
+	  in_cancel_job = 2;
+	}
+	else
+	{
+	  cupsFilePrintf(temp, "%*s%s", indent, "", line);
+  
+	  while (*value)
+	  {
+	    for (valptr = value; *valptr && !_cups_isspace(*valptr); valptr ++);
+  
+	    if (*valptr)
+	      *valptr++ = '\0';
+  
+	    if (!strcasecmp(value, "cancel-job") && user_cancel_any >= 0)
+	    {
+	     /*
+	      * Write everything except for this definition...
+	      */
+  
+	      in_cancel_job = 1;
+	    }
+	    else
+	      cupsFilePrintf(temp, " %s", value);
+  
+	    for (value = valptr; _cups_isspace(*value); value ++);
+	  }
+  
+	  cupsFilePuts(temp, ">\n");
+	}
       }
       else
-      {
-	cupsFilePrintf(temp, "  %s", line);
+        cupsFilePrintf(temp, "%*s%s %s>\n", indent, "", line, value);
 
-	while (*value)
-	{
-	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
-
-	  if (*valptr)
-	    *valptr++ = '\0';
-
-          if (!strcasecmp(value, "cancel-job") && user_cancel_any >= 0)
-	  {
-	   /*
-	    * Write everything except for this definition...
-	    */
-
-	    in_cancel_job = 1;
-	  }
-	  else
-	    cupsFilePrintf(temp, " %s", value);
-
-          for (value = valptr; isspace(*value & 255); value ++);
-	}
-
-	cupsFilePuts(temp, ">\n");
-      }
+      indent += 2;
     }
     else if (!strcasecmp(line, "</Limit>") && in_cancel_job)
     {
       indent -= 2;
 
       if (in_cancel_job == 1)
-        cupsFilePuts(temp, "  </Limit>\n");
+	cupsFilePuts(temp, "  </Limit>\n");
 
       wrote_policy = 1;
 
       if (!user_cancel_any)
 	cupsFilePuts(temp, "  # Only the owner or an administrator can cancel "
-	                   "a job...\n"
-	                   "  <Limit Cancel-Job>\n"
-	                   "    Order deny,allow\n"
-	                   "    Require user @OWNER "
+			   "a job...\n"
+			   "  <Limit Cancel-Job>\n"
+			   "    Order deny,allow\n"
+			   "    Require user @OWNER "
 			   CUPS_DEFAULT_PRINTOPERATOR_AUTH "\n"
 			   "  </Limit>\n");
 
       in_cancel_job = 0;
     }
     else if ((((in_admin_location || in_conf_location || in_root_location) &&
-               remote_admin >= 0) ||
+               (remote_admin >= 0 || remote_any >= 0)) ||
               (in_root_location && share_printers >= 0)) &&
              (!strcasecmp(line, "Allow") || !strcasecmp(line, "Deny") ||
 	      !strcasecmp(line, "Order")))
       continue;
     else if (in_cancel_job == 2)
       continue;
-    else if (!strcasecmp(line, "<Limit")  && value)
-      cupsFilePrintf(temp, "  %s %s>\n", line, value);
     else if (line[0] == '<')
     {
       if (value)

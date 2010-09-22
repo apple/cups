@@ -479,7 +479,8 @@ ppdEmitJCL(ppd_file_t *ppd,		/* I - PPD file record */
       */
 
       for (title += 7; *title && isdigit(*title & 255); title ++);
-      for (; *title && isspace(*title & 255); title ++);
+      while (_cups_isspace(*title))
+        title ++;
 
       if ((ptr = strstr(title, " - ")) != NULL)
       {

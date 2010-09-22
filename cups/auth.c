@@ -166,12 +166,6 @@ cupsDoAuthentication(
       return (-1);
     }
 
-    if (!password[0])
-    {
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-      return (-1);
-    }
-
     snprintf(http->userpass, sizeof(http->userpass), "%s:%s", cupsUser(),
              password);
   }
@@ -247,7 +241,7 @@ cupsDoAuthentication(
     authorization = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
 
     authorization += 9;
-    while (*authorization && isspace(*authorization & 255))
+    while (*authorization && _cups_isspace(*authorization))
       authorization ++;
 
     if (*authorization)

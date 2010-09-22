@@ -25,11 +25,12 @@
  *   get_variable()      - Get the value of a variable.
  *   iso_date()          - Return an ISO 8601 date/time string for the given IPP
  *                         dateTime value.
+ *   password_cb()       - Password callback for authenticated tests.
  *   print_attr()        - Print an attribute on the screen.
  *   print_col()         - Print a collection attribute on the screen.
  *   print_csv()         - Print a line of CSV text.
  *   print_fatal_error() - Print a fatal error message.
- *   print_line()        - Print a line of formatted text.
+ *   print_line()        - Print a line of formatted or CSV text.
  *   print_test_error()  - Print a test error message.
  *   print_xml_header()  - Print a standard XML plist header.
  *   print_xml_string()  - Print an XML string with escaping.
@@ -81,7 +82,7 @@ typedef struct _cups_expect_s		/**** Expected attribute info ****/
 		*of_type,		/* Type name */
 		*same_count_as,		/* Parallel attribute name */
 		*if_defined,		/* Only required if variable defined */
-		*if_undefined,		/* Only required if variable is not defined */
+		*if_not_defined,	/* Only required if variable is not defined */
 		*with_value,		/* Attribute must include this value */
 		*define_match,		/* Variable to define on match */
 		*define_no_match,	/* Variable to define on no-match */
@@ -95,7 +96,7 @@ typedef struct _cups_status_s		/**** Status info ****/
 {
   ipp_status_t	status;			/* Expected status code */
   char		*if_defined,		/* Only if variable is defined */
-		*if_undefined;		/* Only if variable is not defined */
+		*if_not_defined;	/* Only if variable is not defined */
 } _cups_status_t;
 
 typedef struct _cups_var_s		/**** Variable ****/
@@ -130,6 +131,7 @@ int		IgnoreErrors = 0,	/* Ignore errors? */
 		Verbosity = 0,		/* Show all attributes? */
 		Version = 11,		/* Default IPP version */
 		XMLHeader = 0;		/* 1 if header is written */
+char		*Password = NULL;	/* Password from URI */
 const char * const URIStatusStrings[] =	/* URI status strings */
 {
   "URI too large",
@@ -167,6 +169,7 @@ static char	*get_token(FILE *fp, char *buf, int buflen,
 		           int *linenum);
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
+static const char *password_cb(const char *prompt);
 static void	print_attr(ipp_attribute_t *attr);
 static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
@@ -190,7 +193,8 @@ static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
 static void	usage(void);
 static int	validate_attr(ipp_attribute_t *attr, int print);
-static int      with_value(char *value, int regex, ipp_attribute_t *attr);
+static int      with_value(char *value, int regex, ipp_attribute_t *attr,
+		           int report);
 
 
 /*
@@ -428,9 +432,12 @@ main(int  argc,				/* I - Number of command-line args */
 	}
       }
     }
-    else if (!strncmp(argv[i], "ipp://", 6) ||
-             !strncmp(argv[i], "http://", 7) ||
-             !strncmp(argv[i], "https://", 8))
+    else if (!strncmp(argv[i], "ipp://", 6) || !strncmp(argv[i], "http://", 7)
+#ifdef HAVE_SSL
+	     || !strncmp(argv[i], "ipps://", 7)
+	     || !strncmp(argv[i], "https://", 8)
+#endif /* HAVE_SSL */
+	     )
     {
      /*
       * Set URI...
@@ -441,6 +448,11 @@ main(int  argc,				/* I - Number of command-line args */
         _cupsLangPuts(stderr, _("ipptool: May only specify a single URI.\n"));
         usage();
       }
+
+#ifdef HAVE_SSL
+      if (!strncmp(argv[i], "ipps://", 7) || !strncmp(argv[i], "https://", 8))
+        vars.encryption = HTTP_ENCRYPT_ALWAYS;
+#endif /* HAVE_SSL */
 
       vars.uri   = argv[i];
       uri_status = httpSeparateURI(HTTP_URI_CODING_ALL, vars.uri,
@@ -457,12 +469,14 @@ main(int  argc,				/* I - Number of command-line args */
         return (1);
       }
 
-      if (strcmp(vars.scheme, "http") && strcmp(vars.scheme, "https") &&
-          strcmp(vars.scheme, "ipp"))
+      if (vars.userpass[0])
       {
-        _cupsLangPuts(stderr, _("ipptool: Only http, https, and ipp URIs are "
-	                        "supported."));
-	return (1);
+        if ((Password = strchr(vars.userpass, ':')) != NULL)
+	  *Password++ = '\0';
+
+        cupsSetUser(vars.userpass);
+	cupsSetPasswordCB(password_cb);
+	set_variable(&vars, "uriuser", vars.userpass);
       }
     }
     else
@@ -855,7 +869,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           strcasecmp(token, "DEFINE-NO-MATCH") &&
           strcasecmp(token, "DEFINE-VALUE") &&
           strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-UNDEFINED") &&
+          strcasecmp(token, "IF-NOT-DEFINED") &&
           strcasecmp(token, "IN-GROUP") &&
           strcasecmp(token, "OF-TYPE") &&
           strcasecmp(token, "SAME-COUNT-AS") &&
@@ -863,7 +877,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         last_expect = NULL;
 
       if (strcasecmp(token, "IF-DEFINED") &&
-          strcasecmp(token, "IF-UNDEFINED"))
+          strcasecmp(token, "IF-NOT-DEFINED"))
         last_status = NULL;
 
       if (!strcmp(token, "}"))
@@ -1197,7 +1211,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 	else
+	{
+	  if (Output == _CUPS_OUTPUT_TEST)
+	    printf("    [%d second delay]\n", delay);
+
 	  sleep(delay);
+	}
       }
       else if (!strcasecmp(token, "ATTR"))
       {
@@ -1431,7 +1450,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	num_statuses ++;
 
 	last_status->if_defined   = NULL;
-	last_status->if_undefined = NULL;
+	last_status->if_not_defined = NULL;
       }
       else if (!strcasecmp(token, "EXPECT"))
       {
@@ -1642,22 +1661,22 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
       }
-      else if (!strcasecmp(token, "IF-UNDEFINED"))
+      else if (!strcasecmp(token, "IF-NOT-DEFINED"))
       {
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
-	  print_fatal_error("Missing IF-UNDEFINED name on line %d.", linenum);
+	  print_fatal_error("Missing IF-NOT-DEFINED name on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
 	}
 
 	if (last_expect)
-	  last_expect->if_undefined = strdup(token);
+	  last_expect->if_not_defined = strdup(token);
 	else if (last_status)
-	  last_status->if_undefined = strdup(token);
+	  last_status->if_not_defined = strdup(token);
 	else
 	{
-	  print_fatal_error("IF-UNDEFINED without a preceding EXPECT or STATUS "
+	  print_fatal_error("IF-NOT-DEFINED without a preceding EXPECT or STATUS "
 			    "on line %d.", linenum);
 	  pass = 0;
 	  goto test_exit;
@@ -1665,7 +1684,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       }
       else if (!strcasecmp(token, "WITH-VALUE"))
       {
-      	if (!get_token(fp, token, sizeof(token), &linenum))
+      	if (!get_token(fp, temp, sizeof(temp), &linenum))
 	{
 	  print_fatal_error("Missing WITH-VALUE value on line %d.", linenum);
 	  pass = 0;
@@ -1674,7 +1693,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
         if (last_expect)
 	{
+	 /*
+	  * Expand any variables in the value and then save it.
+	  */
+
+	  expand_variables(vars, token, temp, sizeof(token));
+
 	  tokenptr = token + strlen(token) - 1;
+
 	  if (token[0] == '/' && tokenptr > token && *tokenptr == '/')
 	  {
 	   /*
@@ -1782,13 +1808,13 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	puts("<key>Successful</key>");
 	puts("<true />");
 	puts("<key>StatusCode</key>");
-	print_xml_string("string", "skipped");
+	print_xml_string("string", "skip");
 	puts("<key>ResponseAttributes</key>");
 	puts("<dict>");
 	puts("</dict>");
       }
       else if (Output == _CUPS_OUTPUT_TEST)
-	puts("SKIPPED]");
+	puts("SKIP]");
 
       goto skip_error;
     }
@@ -1846,9 +1872,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       if (http->version != HTTP_1_1)
         prev_pass = pass = 0;
 
-      if (response->request.status.version[0] != (version / 10) ||
-	  response->request.status.version[1] != (version % 10) ||
-	  response->request.status.request_id != request_id)
+      if (response->request.status.request_id != request_id)
+        prev_pass = pass = 0;
+
+      if (version &&
+          (response->request.status.version[0] != (version / 10) ||
+	   response->request.status.version[1] != (version % 10)))
         prev_pass = pass = 0;
 
       if ((attrptr = ippFindAttribute(response, "job-id",
@@ -1929,8 +1958,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    !get_variable(vars, statuses[i].if_defined))
 	  continue;
 
-        if (statuses[i].if_undefined &&
-	    get_variable(vars, statuses[i].if_undefined))
+        if (statuses[i].if_not_defined &&
+	    get_variable(vars, statuses[i].if_not_defined))
 	  continue;
 
         if (response->request.status.status_code == statuses[i].status)
@@ -1946,7 +1975,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           if (expect->if_defined && !get_variable(vars, expect->if_defined))
             continue;
 
-          if (expect->if_undefined && get_variable(vars, expect->if_undefined))
+          if (expect->if_not_defined &&
+	      get_variable(vars, expect->if_not_defined))
             continue;
 
           found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -1966,7 +1996,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
           }
 
           if (found &&
-	      !with_value(expect->with_value, expect->with_regex, found))
+	      !with_value(expect->with_value, expect->with_regex, found, 0))
           {
 	    if (expect->define_no_match)
 	      set_variable(vars, expect->define_no_match, "1");
@@ -2135,8 +2165,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 			 cupsLastErrorString());
       else
       {
-	if (response->request.status.version[0] != (version / 10) ||
-	    response->request.status.version[1] != (version % 10))
+	if (version &&
+	    (response->request.status.version[0] != (version / 10) ||
+	     response->request.status.version[1] != (version % 10)))
           print_test_error("Bad version %d.%d in response - expected %d.%d "
 	                   "(RFC 2911 section 3.1.8).",
 	                   response->request.status.version[0],
@@ -2253,8 +2284,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      !get_variable(vars, statuses[i].if_defined))
 	    continue;
 
-	  if (statuses[i].if_undefined &&
-	      get_variable(vars, statuses[i].if_undefined))
+	  if (statuses[i].if_not_defined &&
+	      get_variable(vars, statuses[i].if_not_defined))
 	    continue;
 
 	  if (response->request.status.status_code == statuses[i].status)
@@ -2276,7 +2307,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  if (expect->if_defined && !get_variable(vars, expect->if_defined))
 	    continue;
 
-	  if (expect->if_undefined && get_variable(vars, expect->if_undefined))
+	  if (expect->if_not_defined &&
+	      get_variable(vars, expect->if_not_defined))
 	    continue;
 
 	  found = ippFindAttribute(response, expect->name, IPP_TAG_ZERO);
@@ -2297,7 +2329,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	                       expect->name, ippTagString(expect->in_group),
 			       ippTagString(found->group_tag));
 
-	    if (!with_value(expect->with_value, expect->with_regex, found))
+	    if (!with_value(expect->with_value, expect->with_regex, found, 0))
 	    {
 	      if (expect->with_regex)
 		print_test_error("EXPECTED: %s WITH-VALUE /%s/",
@@ -2305,6 +2337,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	      else
 		print_test_error("EXPECTED: %s WITH-VALUE \"%s\"",
 				 expect->name, expect->with_value);
+
+	      with_value(expect->with_value, expect->with_regex, found, 1);
 	    }
 
 	    if (expect->count > 0 && found->num_values != expect->count)
@@ -2347,8 +2381,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     {
       if (statuses[i].if_defined)
         free(statuses[i].if_defined);
-      if (statuses[i].if_undefined)
-        free(statuses[i].if_undefined);
+      if (statuses[i].if_not_defined)
+        free(statuses[i].if_not_defined);
     }
     num_statuses = 0;
 
@@ -2361,8 +2395,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         free(expect->same_count_as);
       if (expect->if_defined)
         free(expect->if_defined);
-      if (expect->if_undefined)
-        free(expect->if_undefined);
+      if (expect->if_not_defined)
+        free(expect->if_not_defined);
       if (expect->with_value)
         free(expect->with_value);
       if (expect->define_match)
@@ -2395,8 +2429,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   {
     if (statuses[i].if_defined)
       free(statuses[i].if_defined);
-    if (statuses[i].if_undefined)
-      free(statuses[i].if_undefined);
+    if (statuses[i].if_not_defined)
+      free(statuses[i].if_not_defined);
   }
 
   for (i = num_expects, expect = expects; i > 0; i --, expect ++)
@@ -2408,8 +2442,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       free(expect->same_count_as);
     if (expect->if_defined)
       free(expect->if_defined);
-    if (expect->if_undefined)
-      free(expect->if_undefined);
+    if (expect->if_not_defined)
+      free(expect->if_not_defined);
     if (expect->with_value)
       free(expect->with_value);
     if (expect->define_match)
@@ -3031,6 +3065,19 @@ iso_date(ipp_uchar_t *date)		/* I - IPP (RFC 1903) date/time value */
 	     date[8], date[9], date[10]);
 
   return (buffer);
+}
+
+
+/*
+ * 'password_cb()' - Password callback for authenticated tests.
+ */
+
+static const char *			/* O - Password */
+password_cb(const char *prompt)		/* I - Prompt (unused) */
+{
+  (void)prompt;
+
+  return (Password);
 }
 
 
@@ -4401,7 +4448,8 @@ validate_attr(ipp_attribute_t *attr,	/* I - Attribute to validate */
 static int				/* O - 1 on match, 0 on non-match */
 with_value(char            *value,	/* I - Value string */
            int             regex,	/* I - Value is a regular expression */
-           ipp_attribute_t *attr)	/* I - Attribute to compare */
+           ipp_attribute_t *attr,	/* I - Attribute to compare */
+	   int             report)	/* I - 1 = report failures */
 {
   int	i;				/* Looping var */
   char	*valptr;			/* Pointer into value */
@@ -4470,6 +4518,12 @@ with_value(char            *value,	/* I - Value string */
 	    }
 	  }
         }
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%d", attr->name, attr->values[i].integer);
+	}
 	break;
 
     case IPP_TAG_BOOLEAN :
@@ -4477,6 +4531,13 @@ with_value(char            *value,	/* I - Value string */
 	{
           if (!strcmp(value, "true") == attr->values[i].boolean)
 	    return (1);
+	}
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%s", attr->name,
+			     attr->values[i].boolean ? "true" : "false");
 	}
 	break;
 
@@ -4519,7 +4580,13 @@ with_value(char            *value,	/* I - Value string */
 	  for (i = 0; i < attr->num_values; i ++)
 	  {
 	    if (regexec(&re, attr->values[i].string.text, 0, NULL, 0))
-	      break;
+	    {
+	      if (report)
+	        print_test_error("GOT: %s=\"%s\"", attr->name,
+		                 attr->values[i].string.text);
+	      else
+	        break;
+	    }
 	  }
 
 	  regfree(&re);
@@ -4537,6 +4604,13 @@ with_value(char            *value,	/* I - Value string */
 	  {
 	    if (!strcmp(value, attr->values[i].string.text))
 	      return (1);
+	  }
+
+	  if (report)
+	  {
+	    for (i = 0; i < attr->num_values; i ++)
+	      print_test_error("GOT: %s=\"%s\"", attr->name,
+			       attr->values[i].string.text);
 	  }
 	}
 	break;

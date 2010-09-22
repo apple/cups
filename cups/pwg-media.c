@@ -60,26 +60,26 @@ static int	pwg_compare_ppd(_pwg_media_t *a, _pwg_media_t *b);
 static _pwg_media_t const cups_pwg_media[] =
 {					/* Media size lookup table */
   /* North American Standard Sheet Media Sizes */
-  _PWG_MEDIA_IN("na_index-3x5_3x5in", NULL, NULL, 3, 5),
+  _PWG_MEDIA_IN("na_index-3x5_3x5in", NULL, "3x5", 3, 5),
   _PWG_MEDIA_IN("na_personal_3.625x6.5in", NULL, "EnvPersonal", 3.625, 6.5),
   _PWG_MEDIA_IN("na_monarch_3.875x7.5in", "monarch-envelope", "EnvMonarch", 3.875, 7.5),
   _PWG_MEDIA_IN("na_number-9_3.875x8.875in", "na-number-9-envelope", "Env9", 3.875, 8.875),
-  _PWG_MEDIA_IN("na_index-4x6_4x6in", NULL, NULL, 4, 6),
+  _PWG_MEDIA_IN("na_index-4x6_4x6in", NULL, "4x6", 4, 6),
   _PWG_MEDIA_IN("na_number-10_4.125x9.5in", "na-number-10-envelope", "Env10", 4.125, 9.5),
   _PWG_MEDIA_IN("na_a2_4.375x5.75in", NULL, NULL, 4.375, 5.75),
   _PWG_MEDIA_IN("na_number-11_4.5x10.375in", NULL, "Env11", 4.5, 10.375),
   _PWG_MEDIA_IN("na_number-12_4.75x11in", NULL, "Env12", 4.75, 11),
-  _PWG_MEDIA_IN("na_5x7_5x7in", NULL, NULL, 5, 7),
-  _PWG_MEDIA_IN("na_index-5x8_5x8in", NULL, NULL, 5, 8),
+  _PWG_MEDIA_IN("na_5x7_5x7in", NULL, "5x7", 5, 7),
+  _PWG_MEDIA_IN("na_index-5x8_5x8in", NULL, "5x8", 5, 8),
   _PWG_MEDIA_IN("na_number-14_5x11.5in", NULL, "Env14", 5, 11.5),
   _PWG_MEDIA_IN("na_invoice_5.5x8.5in", "invoice", "Statement", 5.5, 8.5),
   _PWG_MEDIA_IN("na_index-4x6-ext_6x8in", NULL, NULL, 6, 8),
-  _PWG_MEDIA_IN("na_6x9_6x9in", "na-6x9-envelope", NULL, 6, 9),
-  _PWG_MEDIA_IN("na_c5_6.5x9.5in", NULL, NULL, 6.5, 9.5),
+  _PWG_MEDIA_IN("na_6x9_6x9in", "na-6x9-envelope", "6x9", 6, 9),
+  _PWG_MEDIA_IN("na_c5_6.5x9.5in", NULL, "6.5x9.5", 6.5, 9.5),
   _PWG_MEDIA_IN("na_7x9_7x9in", "na-7x9-envelope", "7x9", 7, 9),
   _PWG_MEDIA_IN("na_executive_7.25x10.5in", "executive", "Executive", 7.25, 10.5),
   _PWG_MEDIA_IN("na_govt-letter_8x10in", "na-8x10", "8x10", 8, 10),
-  _PWG_MEDIA_IN("na_govt-legal_8x13in", NULL, NULL, 8, 13),
+  _PWG_MEDIA_IN("na_govt-legal_8x13in", NULL, "8x13", 8, 13),
   _PWG_MEDIA_IN("na_quarto_8.5x10.83in", "quarto", "Quarto", 8.5, 10.83),
   _PWG_MEDIA_IN("na_letter_8.5x11in", "na-letter", "Letter", 8.5, 11),
   _PWG_MEDIA_IN("na_fanfold-eur_8.5x12in", NULL, "FanFoldGerman", 8.5, 12),
@@ -94,15 +94,15 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_10x11_10x11in", NULL, "10x11", 10, 11),
   _PWG_MEDIA_IN("na_10x13_10x13in", "na-10x13-envelope", "10x13", 10, 13),
   _PWG_MEDIA_IN("na_10x14_10x14in", "na-10x14-envelope", "10x14", 10, 14),
-  _PWG_MEDIA_IN("na_10x15_10x15in", "na-10x15-envelope", NULL, 10, 15),
-  _PWG_MEDIA_IN("na_11x12_11x12in", NULL, NULL, 11, 12),
-  _PWG_MEDIA_IN("na_edp_11x14in", NULL, NULL, 11, 14),
+  _PWG_MEDIA_IN("na_10x15_10x15in", "na-10x15-envelope", "10x15", 10, 15),
+  _PWG_MEDIA_IN("na_11x12_11x12in", NULL, "11x12", 11, 12),
+  _PWG_MEDIA_IN("na_edp_11x14in", NULL, "11x14", 11, 14),
   _PWG_MEDIA_IN("na_fanfold-us_11x14.875in", NULL, NULL, 11, 14.875),
-  _PWG_MEDIA_IN("na_11x15_11x15in", NULL, NULL, 11, 15),
+  _PWG_MEDIA_IN("na_11x15_11x15in", NULL, "11x15", 11, 15),
   _PWG_MEDIA_IN("na_ledger_11x17in", "tabloid", "Tabloid", 11, 17),
   _PWG_MEDIA_IN("na_eur-edp_12x14in", NULL, NULL, 12, 14),
   _PWG_MEDIA_IN("na_arch-b_12x18in", "arch-b", "ARCHB", 12, 18),
-  _PWG_MEDIA_IN("na_12x19_12x19in", NULL, NULL, 12, 19),
+  _PWG_MEDIA_IN("na_12x19_12x19in", NULL, "12x19", 12, 19),
   _PWG_MEDIA_IN("na_b-plus_12x19.17in", NULL, "SuperB", 12, 19.17),
   _PWG_MEDIA_IN("na_super-b_13x19in", "super-b", NULL, 13, 19),
   _PWG_MEDIA_IN("na_c_17x22in", "c", "AnsiC", 17, 22),
@@ -113,7 +113,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_wide-format_30x42in", NULL, NULL, 30, 42),
   _PWG_MEDIA_IN("na_e_34x44in", "e", "AnsiE", 34, 44),
   _PWG_MEDIA_IN("na_arch-e_36x48in", "arch-e", "ARCHE", 36, 48),
-  _PWG_MEDIA_IN("na_f_44x68in", NULL, NULL, 44, 68),
+  _PWG_MEDIA_IN("na_f_44x68in", NULL, "AnsiF", 44, 68),
 
   /* Chinese Standard Sheet Media Inch Sizes */
   _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, NULL, 7.75, 10.75),
@@ -353,8 +353,8 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
     */
 
     if ((media_size = ippFindAttribute(media_col->values[0].collection,
-                                            "media-size",
-					    IPP_TAG_BEGIN_COLLECTION)) != NULL)
+				       "media-size",
+				       IPP_TAG_BEGIN_COLLECTION)) != NULL)
     {
      /*
       * Got media-size, look for x-dimension and y-dimension member
@@ -417,12 +417,42 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
   else
   {
     if ((media = ippFindAttribute(job, "media", IPP_TAG_NAME)) == NULL)
-      media = ippFindAttribute(job, "media", IPP_TAG_KEYWORD);
+      if ((media = ippFindAttribute(job, "media", IPP_TAG_KEYWORD)) == NULL)
+        if ((media = ippFindAttribute(job, "PageSize", IPP_TAG_NAME)) == NULL)
+	  media = ippFindAttribute(job, "PageRegion", IPP_TAG_NAME);
 
     if (media)
     {
-      if ((pwg = _pwgMediaForPWG(media->values[0].string.text)) == NULL)
-	pwg = _pwgMediaForLegacy(media->values[0].string.text);
+      const char *name = media->values[0].string.text;
+					/* Name string */
+
+      if ((pwg = _pwgMediaForPWG(name)) == NULL)
+      {
+       /*
+        * Not a PWG name, try a legacy name...
+	*/
+
+	if ((pwg = _pwgMediaForLegacy(name)) == NULL)
+	{
+	 /*
+	  * Not a legacy name, try a PPD name...
+	  */
+
+	  const char	*suffix;	/* Suffix on media string */
+
+	  pwg = _pwgMediaForPPD(name);
+	  if (pwg && 
+	      (suffix = name + strlen(name) - 10 /* .FullBleed */) > name &&
+	      !strcasecmp(suffix, ".FullBleed"))
+	  {
+	   /*
+	    * Indicate that margins are set with the default values of 0.
+	    */
+
+	    *margins_set = 1;
+	  }
+	}
+      }
 
       if (pwg)
       {
@@ -501,7 +531,8 @@ _pwgMediaForLegacy(
 _pwg_media_t *				/* O - Matching size or NULL */
 _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
 {
-  _pwg_media_t	key;			/* Search key */
+  _pwg_media_t	key,			/* Search key */
+		*size;			/* Matching size */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
@@ -518,8 +549,7 @@ _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
 
   if (!cg->ppd_size_lut)
   {
-    int			i;		/* Looping var */
-    _pwg_media_t	*size;		/* Current size */
+    int	i;				/* Looping var */
 
     cg->ppd_size_lut = cupsArrayNew((cups_array_func_t)pwg_compare_ppd, NULL);
 
@@ -536,7 +566,96 @@ _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
   */
 
   key.ppd = ppd;
-  return ((_pwg_media_t *)cupsArrayFind(cg->ppd_size_lut, &key));
+  if ((size = (_pwg_media_t *)cupsArrayFind(cg->ppd_size_lut, &key)) == NULL)
+  {
+   /*
+    * See if the name is of the form:
+    *
+    *   [Custom.]WIDTHxLENGTH[.FullBleed]    - Size in points/inches [borderless]
+    *   [Custom.]WIDTHxLENGTHcm[.FullBleed]  - Size in centimeters [borderless]
+    *   [Custom.]WIDTHxLENGTHft[.FullBleed]  - Size in feet [borderless]
+    *   [Custom.]WIDTHxLENGTHin[.FullBleed]  - Size in inches [borderless]
+    *   [Custom.]WIDTHxLENGTHm[.FullBleed]   - Size in meters [borderless]
+    *   [Custom.]WIDTHxLENGTHmm[.FullBleed]  - Size in millimeters [borderless]
+    *   [Custom.]WIDTHxLENGTHpt[.FullBleed]  - Size in points [borderless]
+    */
+
+    double		w, l,		/* Width and length of page */
+			factor;		/* Unit scaling factor */
+    char		*ptr;		/* Pointer into name */
+    struct lconv	*loc;		/* Locale data */
+    int			custom;		/* Custom page size? */
+
+    if (!strncasecmp(ppd, "Custom.", 7))
+    {
+      custom = 1;
+      factor = 2540.0 / 72.0;
+      ptr    = (char *)ppd + 7;
+    }
+    else
+    {
+      custom = 0;
+      factor = 2540.0;
+      ptr    = (char *)ppd;
+    }
+
+    loc = localeconv();
+    w   = _cupsStrScand(ptr, &ptr, loc);
+
+    if (ptr && ptr > ppd && *ptr == 'x')
+    {
+      l = _cupsStrScand(ptr + 1, &ptr, loc);
+
+      if (ptr &&
+	  (!*ptr ||
+	   !strcasecmp(ptr, "FullBleed") ||
+	   !strcasecmp(ptr, ".FullBleed") ||
+	   !strcasecmp(ptr, "cm") ||
+	   !strcasecmp(ptr, "cm.FullBleed") ||
+	   !strcasecmp(ptr, "ft") ||
+	   !strcasecmp(ptr, "ft.FullBleed") ||
+	   !strcasecmp(ptr, "in") ||
+	   !strcasecmp(ptr, "in.FullBleed") ||
+	   !strcasecmp(ptr, "m") ||
+	   !strcasecmp(ptr, "m.FullBleed") ||
+	   !strcasecmp(ptr, "mm") ||
+	   !strcasecmp(ptr, "mm.FullBleed") ||
+	   !strcasecmp(ptr, "pt") ||
+	   !strcasecmp(ptr, "pt.FullBleed")))
+      {
+	size = &(cg->pwg_media);
+
+	if (!strncasecmp(ptr, "cm", 2))
+	  factor = 1000.0;
+	else if (!strncasecmp(ptr, "ft", 2))
+	  factor = 2540.0 * 12.0;
+	else if (!strncasecmp(ptr, "in", 2))
+	  factor = 2540.0;
+	else if (!strncasecmp(ptr, "mm", 2))
+	  factor = 100.0;
+	else if (*ptr == 'm' || *ptr == 'M')
+	  factor = 100000.0;
+	else if (!strncasecmp(ptr, "pt", 2))
+	  factor = 2540.0 / 72.0;
+
+       /*
+	* Not a standard size; convert it to a PWG custom name of the form:
+	*
+	*     [oe|om]_WIDTHxHEIGHTuu_WIDTHxHEIGHTuu
+	*/
+
+	size->width  = (int)(w * factor);
+	size->length = (int)(l * factor);
+	size->pwg    = cg->pwg_name;
+
+	_pwgGenerateSize(cg->pwg_name, sizeof(cg->pwg_name),
+	                 custom ? "custom" : NULL, custom ? ppd + 7 : NULL,
+	                 size->width, size->length);
+      }
+    }
+  }
+
+  return (size);
 }
 
 
@@ -547,7 +666,9 @@ _pwgMediaForPPD(const char *ppd)	/* I - PPD size name */
 _pwg_media_t *				/* O - Matching size or NULL */
 _pwgMediaForPWG(const char *pwg)	/* I - PWG size name */
 {
-  _pwg_media_t	key;			/* Search key */
+  char		*ptr;			/* Pointer into name */
+  _pwg_media_t	key,			/* Search key */
+		*size;			/* Matching size */
   _cups_globals_t *cg = _cupsGlobals();	/* Global data */
 
 
@@ -564,8 +685,7 @@ _pwgMediaForPWG(const char *pwg)	/* I - PWG size name */
 
   if (!cg->pwg_size_lut)
   {
-    int			i;		/* Looping var */
-    _pwg_media_t	*size;		/* Current size */
+    int	i;				/* Looping var */
 
     cg->pwg_size_lut = cupsArrayNew((cups_array_func_t)pwg_compare_pwg, NULL);
 
@@ -581,7 +701,50 @@ _pwgMediaForPWG(const char *pwg)	/* I - PWG size name */
   */
 
   key.pwg = pwg;
-  return ((_pwg_media_t *)cupsArrayFind(cg->pwg_size_lut, &key));
+  if ((size = (_pwg_media_t *)cupsArrayFind(cg->pwg_size_lut, &key)) == NULL &&
+      (ptr = (char *)strchr(pwg, '_')) != NULL &&
+      (ptr = (char *)strchr(ptr + 1, '_')) != NULL)
+  {
+   /*
+    * Try decoding the self-describing name of the form:
+    *
+    * class_name_WWWxHHHin
+    * class_name_WWWxHHHmm
+    */
+
+    double		w, l;		/* Width and length of page */
+    struct lconv	*loc;		/* Locale data */
+
+    ptr ++;
+    loc = localeconv();
+    w   = _cupsStrScand(ptr, &ptr, loc);
+
+    if (ptr && *ptr == 'x')
+    {
+      l = _cupsStrScand(ptr + 1, &ptr, loc);
+
+      if (ptr && (!strcmp(ptr, "in") || !strcmp(ptr, "mm")))
+      {
+	size = &(cg->pwg_media);
+
+	if (!strcmp(ptr, "mm"))
+	{
+	  size->width  = (int)(w * 100);
+	  size->length = (int)(l * 100);
+	}
+	else
+	{
+	  size->width  = (int)(w * 2540);
+	  size->length = (int)(l * 2540);
+	}
+
+        strlcpy(cg->pwg_name, pwg, sizeof(cg->pwg_name));
+	size->pwg = cg->pwg_name;
+      }
+    }
+  }
+
+  return (size);
 }
 
 

@@ -169,6 +169,15 @@ typedef struct cups_job_s		/**** Job ****/
   time_t	processing_time;	/* Time the job was processed */
 } cups_job_t;
 
+typedef int (*cups_client_cert_cb_t)(http_t *http, void *tls,
+				     cups_array_t *distinguished_names, 
+				     void *user_data);
+					/**** Client credentials callback @since CUPS 1.5@ ****/
+
+typedef int (*cups_server_cert_cb_t)(http_t *http, void *tls,
+				     cups_array_t *certs, void *user_data);
+					/**** Server credentials callback @since CUPS 1.5@ ****/
+
 
 /*
  * Functions...
@@ -316,6 +325,14 @@ extern http_status_t	cupsStartDocument(http_t *http, const char *name,
 					  int last_document) _CUPS_API_1_4;
 extern http_status_t	cupsWriteRequestData(http_t *http, const char *buffer,
 			                     size_t length) _CUPS_API_1_4;
+
+/**** New in CUPS 1.5 ****/
+extern void		cupsSetClientCertCB(cups_client_cert_cb_t cb,
+					    void *user_data) _CUPS_API_1_5;
+extern int		cupsSetCredentials(cups_array_t *certs) _CUPS_API_1_5;
+extern void		cupsSetServerCertCB(cups_server_cert_cb_t cb,
+					    void *user_data) _CUPS_API_1_5;
+
 
 #  ifdef __cplusplus
 }

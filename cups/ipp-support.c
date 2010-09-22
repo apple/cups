@@ -90,6 +90,12 @@ static const char * const ipp_status_oks[] =	/* "OK" status codes */
 		  "server-error-job-canceled",
 		  "server-error-multiple-document-jobs-not-supported",
 		  "server-error-printer-is-deactivated"
+		},
+		* const ipp_status_1000s[] =		/* CUPS internal */
+		{
+		  "cups-authorization-canceled",
+		  "cups-pki-error",
+		  "cups-upgrade-required"
 		};
 static char	* const ipp_std_ops[] =
 		{
@@ -331,7 +337,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
   {
     if (val > attr->values)
     {
-      if (bufptr < bufend)
+      if (buffer && bufptr < bufend)
         *bufptr++ = ',';
       else
         bufptr ++;
@@ -346,7 +352,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
           {
             ptr = printer_states[val->integer - IPP_PRINTER_IDLE];
 
-            if (bufptr < bufend)
+            if (buffer && bufptr < bufend)
               strlcpy(bufptr, ptr, bufend - bufptr + 1);
 
             bufptr += strlen(ptr);
@@ -358,7 +364,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
           {
             ptr = job_states[val->integer - IPP_JOB_PENDING];
 
-            if (bufptr < bufend)
+            if (buffer && bufptr < bufend)
               strlcpy(bufptr, ptr, bufend - bufptr + 1);
 
             bufptr += strlen(ptr);
@@ -366,14 +372,14 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
           }
 
       case IPP_TAG_INTEGER :
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d", val->integer);
           else
             bufptr += snprintf(temp, sizeof(temp), "%d", val->integer);
           break;
 
       case IPP_TAG_BOOLEAN :
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             strlcpy(bufptr, val->boolean ? "true" : "false",
                     bufend - bufptr + 1);
 
@@ -381,7 +387,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
           break;
 
       case IPP_TAG_RANGE :
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             bufptr += snprintf(bufptr, bufend - bufptr + 1, "%d-%d",
                                val->range.lower, val->range.upper);
           else
@@ -390,7 +396,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
           break;
 
       case IPP_TAG_RESOLUTION :
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             bufptr += snprintf(bufptr, bufend - bufptr + 1, "%dx%d%s",
                                val->resolution.xres, val->resolution.yres,
                                val->resolution.units == IPP_RES_PER_INCH ?
@@ -419,7 +425,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
 		       val->date[5], val->date[6], val->date[8], val->date[9],
 		       val->date[10]);
 
-            if (bufptr < bufend)
+            if (buffer && bufptr < bufend)
               strlcpy(bufptr, temp, bufend - bufptr + 1);
 
             bufptr += strlen(temp);
@@ -435,23 +441,26 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
       case IPP_TAG_LANGUAGE :
       case IPP_TAG_TEXTLANG :
       case IPP_TAG_NAMELANG :
+	  if (!val->string.text)
+	    break;
+
           for (ptr = val->string.text; *ptr; ptr ++)
           {
             if (*ptr == '\\' || *ptr == '\"')
             {
-              if (bufptr < bufend)
+              if (buffer && bufptr < bufend)
                 *bufptr = '\\';
               bufptr ++;
             }
 
-            if (bufptr < bufend)
+            if (buffer && bufptr < bufend)
               *bufptr = *ptr;
             bufptr ++;
           }
           break;
 
       case IPP_TAG_BEGIN_COLLECTION :
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             bufptr += ipp_col_string(val->collection, bufptr,
                                      bufend - bufptr + 1);
           else
@@ -461,19 +470,19 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
       case IPP_TAG_STRING :
           for (ptr = val->string.text; *ptr; ptr ++)
           {
-            if (*ptr == '\\' || isspace(*ptr & 255))
+            if (*ptr == '\\' || _cups_isspace(*ptr))
             {
-              if (bufptr < bufend)
+              if (buffer && bufptr < bufend)
                 *bufptr = '\\';
               bufptr ++;
 
-              if (bufptr < bufend)
+              if (buffer && bufptr < bufend)
                 *bufptr = *ptr;
               bufptr ++;
             }
             else if (!isprint(*ptr & 255))
             {
-              if (bufptr < bufend)
+              if (buffer && bufptr < bufend)
                 bufptr += snprintf(bufptr, bufend - bufptr + 1, "\\%03o",
                                    *ptr & 255);
               else
@@ -482,7 +491,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
             }
             else
             {
-              if (bufptr < bufend)
+              if (buffer && bufptr < bufend)
                 *bufptr = *ptr;
               bufptr ++;
             }
@@ -491,14 +500,14 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
 
       default :
           ptr = ippTagString(attr->value_tag);
-          if (bufptr < bufend)
+          if (buffer && bufptr < bufend)
             strlcpy(bufptr, ptr, bufend - bufptr + 1);
           bufptr += strlen(ptr);
           break;
     }
   }
 
-  if (bufptr < bufend)
+  if (buffer && bufptr < bufend)
     *bufptr = '\0';
   else if (bufend)
     *bufend = '\0';
@@ -531,6 +540,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
     return (ipp_status_400s[error - IPP_BAD_REQUEST]);
   else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
     return (ipp_status_500s[error - IPP_INTERNAL_ERROR]);
+  else if (error >= IPP_AUTHORIZATION_CANCELED && error <= IPP_UPGRADE_REQUIRED)
+    return (ipp_status_1000s[error - IPP_AUTHORIZATION_CANCELED]);
 
  /*
   * No, build an "unknown-xxxx" error string...
@@ -571,6 +582,10 @@ ippErrorValue(const char *name)		/* I - Name */
   for (i = 0; i < (sizeof(ipp_status_500s) / sizeof(ipp_status_500s[0])); i ++)
     if (!strcasecmp(name, ipp_status_500s[i]))
       return ((ipp_status_t)(i + 0x500));
+
+  for (i = 0; i < (sizeof(ipp_status_1000s) / sizeof(ipp_status_1000s[0])); i ++)
+    if (!strcasecmp(name, ipp_status_1000s[i]))
+      return ((ipp_status_t)(i + 0x1000));
 
   return ((ipp_status_t)-1);
 }

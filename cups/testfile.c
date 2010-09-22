@@ -469,7 +469,7 @@ read_write_tests(int compression)	/* I - Use compression? */
   * Initialize the write buffer with random data...
   */
 
-  CUPS_SRAND(time(NULL));
+  CUPS_SRAND((unsigned)time(NULL));
 
   for (i = 0; i < (int)sizeof(writebuf); i ++)
     writebuf[i] = CUPS_RAND();

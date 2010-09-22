@@ -2347,8 +2347,8 @@ dnssdBuildTxtRecord(
     int             for_lpd)		/* I - 1 = LPD, 0 = IPP */
 {
   int		i;			/* Looping var */
-  char		adminurl_str[256],	/* URL for th admin page */
-		type_str[32],		/* Type to string buffer */
+  char		adminurl_str[256],	/* URL for the admin page */
+  		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
 		air_str[1024],		/* auth-info-required string buffer */

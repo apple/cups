@@ -651,7 +651,7 @@ fi
 
 # Requests logged
 count=`wc -l /tmp/cups-$user/log/access_log | awk '{print $1}'`
-expected=`expr 39 + 18 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
+expected=`expr 37 + 18 + $pjobs \* 8 + $pprinters \* $pjobs \* 4`
 if test $count != $expected; then
 	echo "FAIL: $count requests logged, expected $expected."
 	echo "<P>FAIL: $count requests logged, expected $expected.</P>" >>$strfile

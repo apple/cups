@@ -1,9 +1,45 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.6
+
+
+
 CHANGES IN CUPS V1.4.5
 
-	- Documentation fixes (STR #3542)
+	- Documentation fixes (STR #3542, STR #3650)
+	- Localization fixes (STR #3635, STR #3636, STR #3647, STR #3666)
+	- The scheduler would restart jobs while shutting down (STR #3679)
+	- Fixed a PPD loader bug that could cause a crash in cupsd (STR #3680)
+	- Improved the mapping of non-standard PPD and PWG names (STR #3671)
+	- The scheduler did not initialize Kerberos in all cases (STR #3662)
+	- cupsAdminSetServerSettings duplicated Listen and Order lines
+	  (STR #3645)
+	- Added DeviceN colorspace support to the CUPS Raster format (STR #3419)
+	- ppdMarkDefaults() did not clear the marked field of the previous
+	  choices (STR #3642)
+	- The serial backend would not allow a raw job to be canceled
+	  (STR #3649)
+	- The socket backend could go into an infinite loop with certain
+	  printers (STR #3622)
+	- Setting the PRINTER or LPDEST environment variables to "name/instance"
+	  did not work (STR #3485)
+	- The scheduler did not handle the JobRetryLimit setting properly
+	  (STR #3466)
+	- The lpstat command always showed a remote job ID of 0 for shared
+	  printers (STR #3627)
+	- Increased the write timeout for the libusb-based USB backend to 5
+	  minutes (STR #3595)
+	- The libusb-base USB backend did not check whether the printer has a
+	  serial number (STR #3590)
+	- The lpadmin command did not support setting of custom option values
+	  (STR #3631)
+	- The lpadmin command did not support setting of the location or
+	  description of a class (STR #3613)
+	- The cupsaddsmb command did not give up after too many failed attempts
+	  (STR #3615)
+	- The CUPS library no longer uses certain problematic ctype macros that
+	  change based on the locale's character set.
 	- PJL value substitution of more than 9 values was broken (STR #3621)
 	- Custom options with missing string values caused ppdEmit* to segfault
 	  (STR #3620)

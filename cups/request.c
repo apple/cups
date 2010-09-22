@@ -438,7 +438,7 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       DEBUG_puts("2cupsGetResponse: Need authorization...");
 
       if (!cupsDoAuthentication(http, "POST", resource))
-	httpReconnect(http);
+        httpReconnect(http);
       else
         status = HTTP_AUTHORIZATION_CANCELED;
     }
@@ -969,8 +969,11 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
 
     case HTTP_UNAUTHORIZED :
-    case HTTP_AUTHORIZATION_CANCELED :
 	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
+	break;
+
+    case HTTP_AUTHORIZATION_CANCELED :
+	_cupsSetError(IPP_AUTHORIZATION_CANCELED, httpStatus(status), 0);
 	break;
 
     case HTTP_FORBIDDEN :
@@ -992,6 +995,14 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
     case HTTP_NOT_SUPPORTED :
 	_cupsSetError(IPP_VERSION_NOT_SUPPORTED, httpStatus(status), 0);
 	break;
+
+    case HTTP_UPGRADE_REQUIRED :
+	_cupsSetError(IPP_UPGRADE_REQUIRED, httpStatus(status), 0);
+        break;
+
+    case HTTP_PKI_ERROR :
+	_cupsSetError(IPP_PKI_ERROR, httpStatus(status), 0);
+        break;
 
     default :
 	DEBUG_printf(("4_cupsSetHTTPError: HTTP error %d mapped to "

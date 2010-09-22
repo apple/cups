@@ -238,7 +238,7 @@ matches.
 IF-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is defined.
 .TP 5
-IF-UNDEFINED variable-name
+IF-NOT-DEFINED variable-name
 Makes the EXPECT conditions apply only if the specified variable is not
 defined.
 .TP 5
@@ -267,7 +267,7 @@ The following predicates are understood following the STATUS test directive:
 IF-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is defined.
 .TP 5
-IF-UNDEFINED variable-name
+IF-NOT-DEFINED variable-name
 Makes the STATUS apply only if the specified variable is not defined.
 
 .SH OPERATION CODES

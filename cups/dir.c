@@ -200,7 +200,7 @@ cupsDirRead(cups_dir_t *dp)		/* I - Directory pointer */
   dp->entry.fileinfo.st_atime = _cups_dir_time(entry.ftLastAccessTime);
   dp->entry.fileinfo.st_ctime = _cups_dir_time(entry.ftCreationTime);
   dp->entry.fileinfo.st_mtime = _cups_dir_time(entry.ftLastWriteTime);
-  dp->entry.fileinfo.st_size  = entry.nFileSizeLow + (entry.nFileSizeHigh << 32);
+  dp->entry.fileinfo.st_size  = entry.nFileSizeLow + ((unsigned long long)entry.nFileSizeHigh << 32);
 
  /*
   * Return the entry...

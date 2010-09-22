@@ -202,8 +202,11 @@ cups_globals_alloc(void)
   */
 
   memset(cg, 0, sizeof(_cups_globals_t));
-  cg->encryption  = (http_encryption_t)-1;
-  cg->password_cb = (cups_password_cb2_t)_cupsGetPassword;
+  cg->encryption    = (http_encryption_t)-1;
+  cg->password_cb   = (cups_password_cb2_t)_cupsGetPassword;
+  cg->any_root      = 1;
+  cg->expired_certs = 1;
+  cg->expired_root  = 1;
 
  /*
   * Then set directories as appropriate...
@@ -316,13 +319,13 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
 
   httpClose(cg->http);
 
+  _httpFreeCredentials(cg->tls_credentials);
+
   cupsFileClose(cg->stdio_files[0]);
   cupsFileClose(cg->stdio_files[1]);
   cupsFileClose(cg->stdio_files[2]);
 
-#  ifndef CUPS_LITE
   cupsFreeOptions(cg->cupsd_num_settings, cg->cupsd_settings);
-#  endif /* !CUPS_LITE */
 
   free(cg);
 }

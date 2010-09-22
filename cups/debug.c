@@ -18,6 +18,7 @@
  *   debug_vsnprintf()    - Format a string into a fixed size buffer.
  *   _cups_debug_printf() - Write a formatted line to the log.
  *   _cups_debug_puts()   - Write a single line to the log.
+ *   _cups_debug_set()    - Enable or disable debug logging.
  */
 
 /*
@@ -27,15 +28,26 @@
 #include "cups-private.h"
 #include "thread-private.h"
 #ifdef WIN32
+#  include <sys/timeb.h>
+#  include <time.h>
 #  include <io.h>
+#  define getpid (int)GetCurrentProcessId
+static int				/* O  - 0 on success, -1 on failure */
+gettimeofday(struct timeval	*tv,	/* I  - Timeval struct */
+             void		*tz)	/* I  - Timezone */
+{   
+  struct _timeb timebuffer;		/* Time buffer struct */
+  _ftime(&timebuffer);
+  tv->tv_sec  = (long)timebuffer.time;
+  tv->tv_usec = timebuffer.millitm * 1000;  
+  return 0;
+}
 #else
 #  include <sys/time.h>
 #  include <unistd.h>
 #endif /* WIN32 */
 #include <fcntl.h>
-#ifndef WIN32
-#  include <regex.h>
-#endif /* WIN32 */
+#include <regex.h>
 
 
 /*
@@ -53,10 +65,8 @@ int			_cups_debug_level = 1;
  * Local globals...
  */
 
-#  ifndef WIN32
 static regex_t		*debug_filter = NULL;
 					/* Filter expression for messages */
-#  endif /* !WIN32 */
 static int		debug_init = 0;	/* Did we initialize debugging? */
 static _cups_mutex_t	debug_mutex = _CUPS_MUTEX_INITIALIZER;
 					/* Mutex to control initialization */
@@ -396,7 +406,7 @@ debug_vsnprintf(char       *buffer,	/* O - Output buffer */
  * '_cups_debug_printf()' - Write a formatted line to the log.
  */
 
-void
+void DLLExport
 _cups_debug_printf(const char *format,	/* I - Printf-style format string */
                    ...)			/* I - Additional arguments as needed */
 {
@@ -405,11 +415,6 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   char			buffer[2048];	/* Output buffer */
   size_t		bytes;		/* Number of bytes in buffer */
   int			level;		/* Log level in message */
-  const char		*cups_debug_filter,
-					/* CUPS_DEBUG_FILTER environment variable */
-			*cups_debug_level,
-					/* CUPS_DEBUG_LEVEL environment variable */
-			*cups_debug_log;/* CUPS_DEBUG_LOG environment variable */
 
 
  /*
@@ -417,52 +422,8 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
   */
 
   if (!debug_init)
-  {
-   /*
-    * Get a lock on the debug initializer, then re-check in case another
-    * thread already did it...
-    */
-
-    _cupsMutexLock(&debug_mutex);
-
-    if (!debug_init)
-    {
-      if ((cups_debug_log = getenv("CUPS_DEBUG_LOG")) == NULL)
-	_cups_debug_fd = -1;
-      else if (!strcmp(cups_debug_log, "-"))
-	_cups_debug_fd = 2;
-      else
-      {
-	snprintf(buffer, sizeof(buffer), cups_debug_log, getpid());
-
-	if (buffer[0] == '+')
-	  _cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT, 0644);
-	else
-	  _cups_debug_fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-      }
-
-      if ((cups_debug_level = getenv("CUPS_DEBUG_LEVEL")) != NULL)
-	_cups_debug_level = atoi(cups_debug_level);
-
-      if ((cups_debug_filter = getenv("CUPS_DEBUG_FILTER")) != NULL)
-      {
-        if ((debug_filter = (regex_t *)calloc(1, sizeof(regex_t))) == NULL)
-	  fputs("Unable to allocate memory for CUPS_DEBUG_FILTER - results not "
-	        "filtered!\n", stderr);
-	else if (regcomp(debug_filter, cups_debug_filter, REG_EXTENDED))
-	{
-	  fputs("Bad regular expression in CUPS_DEBUG_FILTER - results not "
-	        "filtered!\n", stderr);
-	  free(debug_filter);
-	  debug_filter = NULL;
-	}
-      }
-
-      debug_init = 1;
-    }
-
-    _cupsMutexUnlock(&debug_mutex);
-  }
+    _cups_debug_set(getenv("CUPS_DEBUG_LOG"), getenv("CUPS_DEBUG_LEVEL"),
+                    getenv("CUPS_DEBUG_FILTER"), 0);
 
   if (_cups_debug_fd < 0)
     return;
@@ -525,10 +486,11 @@ _cups_debug_printf(const char *format,	/* I - Printf-style format string */
  * '_cups_debug_puts()' - Write a single line to the log.
  */
 
-void
+void DLLExport
 _cups_debug_puts(const char *s)		/* I - String to output */
 {
   char	format[4];			/* C%s */
+
 
   format[0] = *s++;
   format[1] = '%';
@@ -536,6 +498,82 @@ _cups_debug_puts(const char *s)		/* I - String to output */
   format[3] = '\0';
 
   _cups_debug_printf(format, s);
+}
+
+
+/*
+ * '_cups_debug_set()' - Enable or disable debug logging.
+ */
+
+void DLLExport
+_cups_debug_set(const char *logfile,	/* I - Log file or NULL */
+                const char *level,	/* I - Log level or NULL */
+		const char *filter,	/* I - Filter string or NULL */
+		int        force)	/* I - Force initialization */
+{
+  _cupsMutexLock(&debug_mutex);
+
+  if (!debug_init || force)
+  {
+   /*
+    * Restore debug settings to defaults...
+    */
+
+    if (_cups_debug_fd != -1)
+    {
+      close(_cups_debug_fd);
+      _cups_debug_fd = -1;
+    }
+
+    if (debug_filter)
+    {
+      regfree((regex_t *)debug_filter);
+      debug_filter = NULL;
+    }
+
+    _cups_debug_level = 1;
+
+   /*
+    * Open logs, set log levels, etc.
+    */
+
+    if (!logfile)
+      _cups_debug_fd = -1;
+    else if (!strcmp(logfile, "-"))
+      _cups_debug_fd = 2;
+    else
+    {
+      char	buffer[1024];		/* Filename buffer */
+
+      snprintf(buffer, sizeof(buffer), logfile, getpid());
+
+      if (buffer[0] == '+')
+	_cups_debug_fd = open(buffer + 1, O_WRONLY | O_APPEND | O_CREAT, 0644);
+      else
+	_cups_debug_fd = open(buffer, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+    }
+
+    if (level)
+      _cups_debug_level = atoi(level);
+
+    if (filter)
+    {
+      if ((debug_filter = (regex_t *)calloc(1, sizeof(regex_t))) == NULL)
+	fputs("Unable to allocate memory for CUPS_DEBUG_FILTER - results not "
+	      "filtered!\n", stderr);
+      else if (regcomp(debug_filter, filter, REG_EXTENDED))
+      {
+	fputs("Bad regular expression in CUPS_DEBUG_FILTER - results not "
+	      "filtered!\n", stderr);
+	free(debug_filter);
+	debug_filter = NULL;
+      }
+    }
+
+    debug_init = 1;
+  }
+
+  _cupsMutexUnlock(&debug_mutex);
 }
 #endif /* DEBUG */
 

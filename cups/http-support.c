@@ -297,7 +297,7 @@ httpAssembleURI(
       * Otherwise, just copy the host string...
       */
 
-      ptr = http_copy_encode(ptr, host, end, ":/?#[]@\\", NULL,
+      ptr = http_copy_encode(ptr, host, end, ":/?#[]@\\\"", NULL,
                              encoding & HTTP_URI_CODING_HOSTNAME);
 
       if (!ptr)
@@ -920,7 +920,9 @@ httpSeparateURI(
 
     for (ptr = scheme, end = scheme + schemelen - 1;
          *uri && *uri != ':' && ptr < end;)
-      if (isalnum(*uri & 255) || *uri == '-' || *uri == '+' || *uri == '.')
+      if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                 "abcdefghijklmnopqrstuvwxyz"
+		 "0123456789-+.", *uri) != NULL)
         *ptr++ = *uri++;
       else
         break;
@@ -944,7 +946,7 @@ httpSeparateURI(
     *port = 80;
   else if (!strcmp(scheme, "https"))
     *port = 443;
-  else if (!strcmp(scheme, "ipp"))
+  else if (!strcmp(scheme, "ipp") || !strcmp(scheme, "ipps"))
     *port = 631;
   else if (!strcasecmp(scheme, "lpd"))
     *port = 515;
@@ -1246,6 +1248,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
 	break;
     case HTTP_SERVER_ERROR :
         s = _("Internal Server Error");
+	break;
+    case HTTP_PKI_ERROR :
+        s = _("SSL/TLS Negotiation Error");
 	break;
 
     default :

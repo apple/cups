@@ -19,82 +19,97 @@
  *
  * Contents:
  *
- *   _httpBIOMethods()    - Get the OpenSSL BIO methods for HTTP connections.
- *   httpBlocking()       - Set blocking/non-blocking behavior on a connection.
- *   httpCheck()          - Check to see if there is a pending response from the
- *                          server.
- *   httpClearCookie()    - Clear the cookie value(s).
- *   httpClearFields()    - Clear HTTP request fields.
- *   httpClose()          - Close an HTTP connection.
- *   httpConnect()        - Connect to a HTTP server.
- *   httpConnectEncrypt() - Connect to a HTTP server using encryption.
- *   _httpCreate()        - Create an unconnected HTTP connection.
- *   httpDelete()         - Send a DELETE request to the server.
- *   _httpDisconnect()    - Disconnect a HTTP connection.
- *   httpEncryption()     - Set the required encryption on the link.
- *   httpError()          - Get the last error on a connection.
- *   httpFlush()          - Flush data from a HTTP connection.
- *   httpFlushWrite()     - Flush data in write buffer.
- *   httpGet()            - Send a GET request to the server.
- *   httpGetAuthString()  - Get the current authorization string.
- *   httpGetBlocking()    - Get the blocking/non-block state of a connection.
- *   httpGetCookie()      - Get any cookie data from the response.
- *   httpGetFd()          - Get the file descriptor associated with a
- *                          connection.
- *   httpGetField()       - Get a field value from a request/response.
- *   httpGetLength()      - Get the amount of data remaining from the
- *                          content-length or transfer-encoding fields.
- *   httpGetLength2()     - Get the amount of data remaining from the
- *                          content-length or transfer-encoding fields.
- *   httpGetStatus()      - Get the status of the last HTTP request.
- *   httpGetSubField()    - Get a sub-field value.
- *   httpGetSubField2()   - Get a sub-field value.
- *   httpGets()           - Get a line of text from a HTTP connection.
- *   httpHead()           - Send a HEAD request to the server.
- *   httpInitialize()     - Initialize the HTTP interface library and set the
- *                          default HTTP proxy (if any).
- *   httpOptions()        - Send an OPTIONS request to the server.
- *   _httpPeek()          - Peek at data from a HTTP connection.
- *   httpPost()           - Send a POST request to the server.
- *   httpPrintf()         - Print a formatted string to a HTTP connection.
- *   httpPut()            - Send a PUT request to the server.
- *   httpRead()           - Read data from a HTTP connection.
- *   httpRead2()          - Read data from a HTTP connection.
- *   _httpReadCDSA()      - Read function for the CDSA library.
- *   _httpReadGNUTLS()    - Read function for the GNU TLS library.
- *   httpReconnect()      - Reconnect to a HTTP server.
- *   httpSetAuthString()  - Set the current authorization string.
- *   httpSetCookie()      - Set the cookie value(s).
- *   httpSetExpect()      - Set the Expect: header in a request.
- *   httpSetField()       - Set the value of an HTTP header.
- *   httpSetLength()      - Set the content-length and content-encoding.
- *   httpTrace()          - Send an TRACE request to the server.
- *   httpUpdate()         - Update the current HTTP state for incoming data.
- *   _httpWait()          - Wait for data available on a connection (no flush).
- *   httpWait()           - Wait for data available on a connection.
- *   httpWrite()          - Write data to a HTTP connection.
- *   httpWrite2()         - Write data to a HTTP connection.
- *   _httpWriteCDSA()     - Write function for the CDSA library.
- *   _httpWriteGNUTLS()   - Write function for the GNU TLS library.
- *   http_bio_ctrl()      - Control the HTTP connection.
- *   http_bio_free()      - Free OpenSSL data.
- *   http_bio_new()       - Initialize an OpenSSL BIO structure.
- *   http_bio_puts()      - Send a string for OpenSSL.
- *   http_bio_read()      - Read data for OpenSSL.
- *   http_bio_write()     - Write data for OpenSSL.
- *   http_debug_hex()     - Do a hex dump of a buffer.
- *   http_field()         - Return the field index for a field name.
- *   http_read_ssl()      - Read from a SSL/TLS connection.
- *   http_locking_cb()    - Lock/unlock a thread's mutex.
- *   http_send()          - Send a request with all fields and the trailing
- *                          blank line.
- *   http_setup_ssl()     - Set up SSL/TLS support on a connection.
- *   http_shutdown_ssl()  - Shut down SSL/TLS on a connection.
- *   http_threadid_cb()   - Return the current thread ID.
- *   http_upgrade()       - Force upgrade to TLS encryption.
- *   http_write()         - Write a buffer to a HTTP connection.
- *   http_write_chunk()   - Write a chunked buffer.
- *   http_write_ssl()     - Write to a SSL/TLS connection.
+ *   httpAddCredential()       - Allocates and adds a single credential to an
+ *                               array.
+ *   _httpBIOMethods()         - Get the OpenSSL BIO methods for HTTP
+ *                               connections.
+ *   httpBlocking()            - Set blocking/non-blocking behavior on a
+ *                               connection.
+ *   httpCheck()               - Check to see if there is a pending response
+ *                               from the server.
+ *   httpClearCookie()         - Clear the cookie value(s).
+ *   httpClearFields()         - Clear HTTP request fields.
+ *   httpClose()               - Close an HTTP connection.
+ *   httpConnect()             - Connect to a HTTP server.
+ *   httpConnectEncrypt()      - Connect to a HTTP server using encryption.
+ *   httpCopyCredentials()     - Copy the credentials associated with an
+ *                               encrypted connection.
+ *   _httpConvertCredentials() - Convert credentials to the internal format.
+ *   _httpCreate()             - Create an unconnected HTTP connection.
+ *   httpDelete()              - Send a DELETE request to the server.
+ *   _httpDisconnect()         - Disconnect a HTTP connection.
+ *   httpEncryption()          - Set the required encryption on the link.
+ *   httpError()               - Get the last error on a connection.
+ *   httpFlush()               - Flush data from a HTTP connection.
+ *   httpFlushWrite()          - Flush data in write buffer.
+ *   _httpFreeCredentials()    - Free internal credentials.
+ *   httpFreeCredentials()     - Free an array of credentials.
+ *   httpGet()                 - Send a GET request to the server.
+ *   httpGetAuthString()       - Get the current authorization string.
+ *   httpGetBlocking()         - Get the blocking/non-block state of a
+ *                               connection.
+ *   httpGetCookie()           - Get any cookie data from the response.
+ *   httpGetFd()               - Get the file descriptor associated with a
+ *                               connection.
+ *   httpGetField()            - Get a field value from a request/response.
+ *   httpGetLength()           - Get the amount of data remaining from the
+ *                               content-length or transfer-encoding fields.
+ *   httpGetLength2()          - Get the amount of data remaining from the
+ *                               content-length or transfer-encoding fields.
+ *   httpGetStatus()           - Get the status of the last HTTP request.
+ *   httpGetSubField()         - Get a sub-field value.
+ *   httpGetSubField2()        - Get a sub-field value.
+ *   httpGets()                - Get a line of text from a HTTP connection.
+ *   httpHead()                - Send a HEAD request to the server.
+ *   httpInitialize()          - Initialize the HTTP interface library and set
+ *                               the default HTTP proxy (if any).
+ *   httpOptions()             - Send an OPTIONS request to the server.
+ *   _httpPeek()               - Peek at data from a HTTP connection.
+ *   httpPost()                - Send a POST request to the server.
+ *   httpPrintf()              - Print a formatted string to a HTTP connection.
+ *   httpPut()                 - Send a PUT request to the server.
+ *   httpRead()                - Read data from a HTTP connection.
+ *   httpRead2()               - Read data from a HTTP connection.
+ *   _httpReadCDSA()           - Read function for the CDSA library.
+ *   _httpReadGNUTLS()         - Read function for the GNU TLS library.
+ *   httpReconnect()           - Reconnect to a HTTP server.
+ *   httpSetAuthString()       - Set the current authorization string.
+ *   httpSetCredentials()      - Set the credentials associated with an
+ *                               encrypted connection.
+ *   httpSetCookie()           - Set the cookie value(s).
+ *   httpSetExpect()           - Set the Expect: header in a request.
+ *   httpSetField()            - Set the value of an HTTP header.
+ *   httpSetLength()           - Set the content-length and content-encoding.
+ *   httpTrace()               - Send an TRACE request to the server.
+ *   httpUpdate()              - Update the current HTTP state for incoming
+ *                               data.
+ *   _httpWait()               - Wait for data available on a connection (no
+ *                               flush).
+ *   httpWait()                - Wait for data available on a connection.
+ *   httpWrite()               - Write data to a HTTP connection.
+ *   httpWrite2()              - Write data to a HTTP connection.
+ *   _httpWriteCDSA()          - Write function for the CDSA library.
+ *   _httpWriteGNUTLS()        - Write function for the GNU TLS library.
+ *   http_bio_ctrl()           - Control the HTTP connection.
+ *   http_bio_free()           - Free OpenSSL data.
+ *   http_bio_new()            - Initialize an OpenSSL BIO structure.
+ *   http_bio_puts()           - Send a string for OpenSSL.
+ *   http_bio_read()           - Read data for OpenSSL.
+ *   http_bio_write()          - Write data for OpenSSL.
+ *   http_debug_hex()          - Do a hex dump of a buffer.
+ *   http_field()              - Return the field index for a field name.
+ *   http_read_ssl()           - Read from a SSL/TLS connection.
+ *   http_locking_cb()         - Lock/unlock a thread's mutex.
+ *   http_send()               - Send a request with all fields and the trailing
+ *                               blank line.
+ *   http_set_credentials()    - Set the SSL/TLS credentials.
+ *   http_setup_ssl()          - Set up SSL/TLS support on a connection.
+ *   http_shutdown_ssl()       - Shut down SSL/TLS on a connection.
+ *   http_threadid_cb()        - Return the current thread ID.
+ *   http_upgrade()            - Force upgrade to TLS encryption.
+ *   http_write()              - Write a buffer to a HTTP connection.
+ *   http_write_chunk()        - Write a chunked buffer.
+ *   http_write_ssl()          - Write to a SSL/TLS connection.
  */
 
 /*
@@ -142,6 +157,7 @@ static int		http_write_chunk(http_t *http, const char *buffer,
 			                 int length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
+static int		http_set_credentials(http_t *http);
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
@@ -242,8 +258,45 @@ static BIO_METHOD	http_bio_methods =
 			  http_bio_free,
 			  NULL,
 			};
+#endif /* HAVE_SSL && HAVE_LIBSSL */
 
 
+/*
+ * 'httpAddCredential()' - Allocates and adds a single credential to an array.
+ *
+ * Use @code cupsArrayNew(NULL, NULL)@ to create a credentials array.
+ *
+ * @since CUPS 1.5@
+ */
+
+int					/* O - 0 on success, -1 on error */
+httpAddCredential(
+    cups_array_t *credentials,		/* I - Credentials array */
+    const void   *data,			/* I - PEM-encoded X.509 data */
+    size_t       datalen)		/* I - Length of data */
+{
+  http_credential_t	*credential;	/* Credential data */
+
+
+  if ((credential = malloc(sizeof(http_credential_t))) != NULL)
+  {
+    credential->datalen = datalen;
+
+    if ((credential->data = malloc(datalen)) != NULL)
+    {
+      memcpy(credential->data, data, datalen);
+      cupsArrayAdd(credentials, credential);
+      return (0);
+    }
+
+    free(credential);
+  }
+
+  return (-1);
+}
+
+
+#if defined(HAVE_SSL) && defined(HAVE_LIBSSL)
 /*
  * '_httpBIOMethods()' - Get the OpenSSL BIO methods for HTTP connections.
  */
@@ -439,6 +492,129 @@ httpConnectEncrypt(
   free(http);
 
   return (NULL);
+}
+
+
+/*
+ * 'httpCopyCredentials()' - Copy the credentials associated with an encrypted
+ *			     connection.
+ *
+ * @since CUPS 1.5@
+ */
+
+int					/* O - Status of call (0 = success) */
+httpCopyCredentials(
+    http_t	 *http,			/* I - Connection to server */
+    cups_array_t **credentials)		/* O - Array of credentials */
+{
+#  ifdef HAVE_LIBSSL
+#  elif defined(HAVE_GNUTLS)
+#  elif defined(HAVE_CDSASSL)
+  OSStatus		error;		/* Error code */
+  CFIndex		count;		/* Number of credentials */
+  CFArrayRef		peerCerts;	/* Peer certificates */
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFDataRef		data;		/* Certificate data */
+  int			i;		/* Looping var */
+#  elif defined(HAVE_SSPISSL)
+#  endif /* HAVE_LIBSSL */
+
+
+  if (credentials)
+    *credentials = NULL;
+
+  if (!http || !http->tls || !credentials)
+    return (-1);
+
+#  ifdef HAVE_LIBSSL
+  return (-1);
+
+#  elif defined(HAVE_GNUTLS)
+  return (-1);
+
+#  elif defined(HAVE_CDSASSL)
+  if (!(error = SSLCopyPeerCertificates(http->tls, &peerCerts)) && peerCerts)
+  {
+    if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
+    {
+      for (i = 0, count = CFArrayGetCount(peerCerts); i < count; i++)
+      {
+	secCert = (SecCertificateRef)CFArrayGetValueAtIndex(peerCerts, i);
+	if ((data = SecCertificateCopyData(secCert)))
+	{
+	  httpAddCredential(*credentials, CFDataGetBytePtr(data),
+	                    CFDataGetLength(data));
+	  CFRelease(data);
+	}
+      }
+    }
+
+    CFRelease(peerCerts);
+  }
+
+  return (error);
+
+#  elif defined(HAVE_SSPISSL)
+  return (-1);
+#  endif /* HAVE_LIBSSL */
+}
+
+
+/*
+ * '_httpConvertCredentials()' - Convert credentials to the internal format.
+ */
+
+http_tls_credentials_t			/* O - Internal credentials */
+_httpConvertCredentials(
+    cups_array_t *credentials)		/* I - Array of credentials */
+{
+  if (!credentials)
+    return (NULL);
+
+#  ifdef HAVE_LIBSSL
+  return (NULL);
+
+#  elif defined(HAVE_GNUTLS)
+  return (NULL);
+
+#  elif defined(HAVE_CDSASSL)
+  CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
+  SecCertificateRef	secCert;	/* Certificate reference */
+  CFDataRef		data;		/* Credential data reference */
+  http_credential_t	*credential;	/* Credential data */
+
+
+  if ((peerCerts = CFArrayCreateMutable(kCFAllocatorDefault,
+				        cupsArrayCount(credentials),
+				        &kCFTypeArrayCallBacks)) == NULL)
+    return (NULL);
+
+  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
+       credential;
+       credential = (http_credential_t *)cupsArrayNext(credentials))
+  {
+    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data, 
+			     credential->datalen)))
+    {
+      if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
+              != NULL)
+      {
+	CFArrayAppendValue(peerCerts, secCert);
+	CFRelease(secCert);
+      }
+
+      CFRelease(data);
+    }
+  }
+
+  return (peerCerts);
+
+#  elif defined(HAVE_SSPISSL)
+  return (NULL);
+
+#  else
+  return (NULL);
+#  endif /* HAVE_LIBSSL */
 }
 
 
@@ -684,6 +860,57 @@ httpFlushWrite(http_t *http)		/* I - Connection to server */
   DEBUG_printf(("1httpFlushWrite: Returning %d.", bytes));
 
   return (bytes);
+}
+
+
+/*
+ * '_httpFreeCredentials()' - Free internal credentials.
+ */
+
+void
+_httpFreeCredentials(
+    http_tls_credentials_t credentials)	/* I - Internal credentials */
+{
+  if (!credentials)
+    return;
+
+#ifdef HAVE_LIBSSL
+  (void)credentials;
+
+#elif defined(HAVE_GNUTLS)
+  (void)credentials;
+
+#elif defined(HAVE_CDSASSL)
+  CFRelease(credentials);
+
+#elif defined(HAVE_SSPISSL)
+  (void)credentials;
+
+#endif /* HAVE_LIBSSL */
+}
+
+
+/*
+ * 'httpFreeCredentials()' - Free an array of credentials.
+ */
+
+void
+httpFreeCredentials(
+    cups_array_t *credentials)		/* I - Array of credentials */
+{
+  http_credential_t	*credential;	/* Credential */
+
+
+  for (credential = (http_credential_t *)cupsArrayFirst(credentials);
+       credential;
+       credential = (http_credential_t *)cupsArrayNext(credentials))
+  {
+    cupsArrayRemove(credentials, credential);
+    free((void *)credential->data);
+    free(credential);
+  }
+
+  cupsArrayDelete(credentials);
 }
 
 
@@ -941,7 +1168,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
     * Skip leading whitespace...
     */
 
-    while (isspace(*fptr & 255))
+    while (_cups_isspace(*fptr))
       fptr ++;
 
     if (*fptr == ',')
@@ -955,7 +1182,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
     */
 
     for (ptr = temp;
-         *fptr && *fptr != '=' && !isspace(*fptr & 255) &&
+         *fptr && *fptr != '=' && !_cups_isspace(*fptr) &&
 	     ptr < (temp + sizeof(temp) - 1);
          *ptr++ = *fptr++);
 
@@ -967,7 +1194,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
     * Skip trailing chars up to the '='...
     */
 
-    while (isspace(*fptr & 255))
+    while (_cups_isspace(*fptr))
       fptr ++;
 
     if (!*fptr)
@@ -982,7 +1209,7 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
 
     fptr ++;
 
-    while (isspace(*fptr & 255))
+    while (_cups_isspace(*fptr))
       fptr ++;
 
     if (*fptr == '\"')
@@ -1010,12 +1237,12 @@ httpGetSubField2(http_t       *http,	/* I - Connection to server */
       */
 
       for (ptr = value;
-           *fptr && !isspace(*fptr & 255) && *fptr != ',' && ptr < end;
+           *fptr && !_cups_isspace(*fptr) && *fptr != ',' && ptr < end;
 	   *ptr++ = *fptr++);
 
       *ptr = '\0';
 
-      while (*fptr && !isspace(*fptr & 255) && *fptr != ',')
+      while (*fptr && !_cups_isspace(*fptr) && *fptr != ',')
         fptr ++;
     }
 
@@ -2085,6 +2312,28 @@ httpSetAuthString(http_t     *http,	/* I - Connection to server */
 
 
 /*
+ * 'httpSetCredentials()' - Set the credentials associated with an encrypted
+ *			    connection.
+ *
+ * @since CUPS 1.5@
+ */
+
+int						/* O - Status of call (0 = success) */
+httpSetCredentials(http_t	*http,		/* I - Connection to server */
+		   cups_array_t *credentials)	/* I - Array of credentials */
+{
+  if (!http || cupsArrayCount(credentials) < 1)
+    return (-1);
+
+  _httpFreeCredentials(http->tls_credentials);
+
+  http->tls_credentials = _httpConvertCredentials(credentials);
+
+  return (http->tls_credentials ? 0 : -1);
+}
+
+
+/*
  * 'httpSetCookie()' - Set the cookie value(s).
  *
  * @since CUPS 1.1.19/Mac OS X 10.3@
@@ -2351,7 +2600,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
       */
 
       *value++ = '\0';
-      while (isspace(*value & 255))
+      while (_cups_isspace(*value))
         value ++;
 
      /*
@@ -2450,14 +2699,14 @@ _httpWait(http_t *http,			/* I - Connection to server */
   if (http->tls && usessl)
   {
 #  ifdef HAVE_LIBSSL
-    if (SSL_pending((SSL *)(http->tls)))
+    if (SSL_pending(http->tls))
     {
       DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
       return (1);
     }
 
 #  elif defined(HAVE_GNUTLS)
-    if (gnutls_record_check_pending(((http_tls_t *)(http->tls))->session))
+    if (gnutls_record_check_pending(http->tls))
     {
       DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
       return (1);
@@ -2466,7 +2715,7 @@ _httpWait(http_t *http,			/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
     size_t bytes;			/* Bytes that are available */
 
-    if (!SSLGetBufferedReadSize(((http_tls_t *)(http->tls))->session, &bytes) &&
+    if (!SSLGetBufferedReadSize(http->tls, &bytes) &&
         bytes > 0)
     {
       DEBUG_puts("5_httpWait: Return 1 since there is pending SSL data.");
@@ -3007,7 +3256,7 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
   ssize_t	result;			/* Return value */
 
 
-  result = gnutls_record_recv(((http_tls_t *)(http->tls))->session, buf, len);
+  result = gnutls_record_recv(http->tls, buf, len);
 
   if (result < 0 && !errno)
   {
@@ -3041,7 +3290,7 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
   size_t	processed;		/* Number of bytes processed */
 
 
-  error = SSLRead(((http_tls_t *)http->tls)->session, buf, len, &processed);
+  error = SSLRead(http->tls, buf, len, &processed);
 
   switch (error)
   {
@@ -3249,32 +3498,156 @@ http_send(http_t       *http,	/* I - Connection to server */
 
 #ifdef HAVE_SSL
 /*
+ * 'http_set_credentials()' - Set the SSL/TLS credentials.
+ */
+
+static int				/* O - Status of connection */
+http_set_credentials(http_t *http)	/* I - Connection to server */
+{
+  _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
+#  ifdef HAVE_CDSASSL
+  OSStatus		error = 0;	/* Error code */
+  http_tls_credentials_t credentials = NULL;
+					/* TLS credentials */
+#  endif /* HAVE_CDSASSL */
+
+
+  DEBUG_printf(("7http_set_credentials(%p)", http));
+
+#  ifdef HAVE_LIBSSL
+  return (-1);
+
+#  elif defined(HAVE_GNUTLS)
+  return (-1);
+
+#  elif defined(HAVE_CDSASSL)
+ /*
+  * Prefer connection specific credentials...
+  */
+
+  if ((credentials = http->tls_credentials) == NULL)
+    credentials = cg->tls_credentials;
+
+#    if HAVE_SECPOLICYCREATESSL
+ /*
+  * Otherwise root around in the user's keychain to see if one can be found...
+  */
+
+  if (!credentials)
+  {
+    CFDictionaryRef	query;		/* Query dictionary */
+    CFTypeRef		matches = NULL;	/* Matching credentials */
+    CFArrayRef		dn_array = NULL;/* Distinguished names array */
+    CFTypeRef		keys[]   = { kSecClass,
+				     kSecMatchLimit,
+				     kSecReturnRef };
+					/* Keys for dictionary */
+    CFTypeRef		values[] = { kSecClassCertificate,
+				     kSecMatchLimitOne,
+				     kCFBooleanTrue };
+					/* Values for dictionary */
+
+   /*
+    * Get the names associated with the server.
+    */
+
+    if ((error = SSLCopyDistinguishedNames(http->tls, &dn_array)) != noErr)
+    {
+      DEBUG_printf(("4http_set_credentials: SSLCopyDistinguishedNames, error=%d",
+                    (int)error));
+      return (error);
+    }
+
+   /*
+    * Create a query which will return all identities that can sign and match
+    * the passed in policy.
+    */
+
+    query = CFDictionaryCreate(NULL,
+			       (const void**)(&keys[0]),
+			       (const void**)(&values[0]),
+			       sizeof(keys) / sizeof(keys[0]),
+			       &kCFTypeDictionaryKeyCallBacks,
+			       &kCFTypeDictionaryValueCallBacks);
+    if (query)
+    {
+      error = SecItemCopyMatching(query, &matches);
+      DEBUG_printf(("4http_set_credentials: SecItemCopyMatching, error=%d",
+		    (int)error));
+      CFRelease(query);
+    }
+
+    if (matches)
+      CFRelease(matches);
+
+    if (dn_array)
+      CFRelease(dn_array);
+  }
+#    endif /* HAVE_SECPOLICYCREATESSL */
+
+  if (credentials)
+  {
+    error = SSLSetCertificate(http->tls, credentials);
+    DEBUG_printf(("4http_set_credentials: SSLSetCertificate, error=%d",
+		  (int)error));
+  }
+  else
+    DEBUG_puts("4http_set_credentials: No credentials to set.");
+
+  return (error);
+
+#  elif defined(HAVE_SSPISSL)
+  return (-1);
+#  endif /* HAVE_LIBSSL */
+}
+
+
+/*
  * 'http_setup_ssl()' - Set up SSL/TLS support on a connection.
  */
 
 static int				/* O - Status of connection */
 http_setup_ssl(http_t *http)		/* I - Connection to server */
 {
+  _cups_globals_t	*cg = _cupsGlobals();
+					/* Pointer to library globals */
+  int			any_root;	/* Allow any root */
+
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
-  SSL		*conn;			/* Connection for encryption */
   BIO		*bio;			/* BIO data */
 #  elif defined(HAVE_GNUTLS)
-  http_tls_t	*conn;			/* TLS session object */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
-  http_tls_t	*conn;			/* CDSA connection information */
+  const char	*message = NULL;	/* Error message */
+  cups_array_t	*credentials;		/* Credentials array */
+  char		*hostname;		/* Hostname */
+  cups_array_t	*names;			/* CUPS distinguished names */
+  CFArrayRef	dn_array;		/* CF distinguished names array */
+  CFIndex	count;			/* Number of credentials */
+  CFDataRef	data;			/* Certificate data */
+  int		i;			/* Looping var */
+  http_credential_t
+		*credential;		/* Credential data */
 #  elif defined(HAVE_SSPISSL)
   TCHAR		username[256];		/* Username returned from GetUserName() */
   TCHAR		commonName[256];	/* Common name for certificate */
   DWORD		dwSize;			/* 32 bit size */
-  _sspi_struct_t *conn;			/* SSPI connection information */
 #  endif /* HAVE_LIBSSL */
 
 
   DEBUG_printf(("7http_setup_ssl(http=%p)", http));
+
+ /*
+  * Always allow self-signed certificates for the local loopback address...
+  */
+
+  if (httpAddrLocalhost(http->hostaddr))
+    any_root = 1;
+  else
+    any_root = cg->any_root;
 
 #  ifdef HAVE_LIBSSL
   context = SSL_CTX_new(SSLv23_client_method());
@@ -3284,10 +3657,10 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   bio = BIO_new(_httpBIOMethods());
   BIO_ctrl(bio, BIO_C_SET_FILE_PTR, 0, (char *)http);
 
-  conn = SSL_new(context);
-  SSL_set_bio(conn, bio, bio);
+  http->tls = SSL_new(context);
+  SSL_set_bio(http->tls_credentials, bio, bio);
 
-  if (SSL_connect(conn) != 1)
+  if (SSL_connect(http->tls) != 1)
   {
 #    ifdef DEBUG
     unsigned long	error;	/* Error code */
@@ -3297,7 +3670,8 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #    endif /* DEBUG */
 
     SSL_CTX_free(context);
-    SSL_free(conn);
+    SSL_free(http->tls);
+    http->tls = NULL;
 
 #    ifdef WIN32
     http->error  = WSAGetLastError();
@@ -3310,20 +3684,10 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   }
 
 #  elif defined(HAVE_GNUTLS)
-  if ((conn = (http_tls_t *)malloc(sizeof(http_tls_t))) == NULL)
-  {
-    http->error  = errno;
-    http->status = HTTP_ERROR;
-
-    return (-1);
-  }
-
   credentials = (gnutls_certificate_client_credentials *)
                     malloc(sizeof(gnutls_certificate_client_credentials));
   if (credentials == NULL)
   {
-    free(conn);
-
     http->error = errno;
     http->status = HTTP_ERROR;
 
@@ -3332,107 +3696,298 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
   gnutls_certificate_allocate_credentials(credentials);
 
-  gnutls_init(&(conn->session), GNUTLS_CLIENT);
-  gnutls_set_default_priority(conn->session);
-  gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE, *credentials);
-  gnutls_transport_set_ptr(conn->session, (gnutls_transport_ptr)http);
-  gnutls_transport_set_pull_function(conn->session, _httpReadGNUTLS);
-  gnutls_transport_set_push_function(conn->session, _httpWriteGNUTLS);
+  gnutls_init(&http->tls, GNUTLS_CLIENT);
+  gnutls_set_default_priority(http->tls);
+  gnutls_credentials_set(http->tls, GNUTLS_CRD_CERTIFICATE, *credentials);
+  gnutls_transport_set_ptr(http->tls, (gnutls_transport_ptr)http);
+  gnutls_transport_set_pull_function(http->tls, _httpReadGNUTLS);
+  gnutls_transport_set_push_function(http->tls, _httpWriteGNUTLS);
 
-  if ((gnutls_handshake(conn->session)) != GNUTLS_E_SUCCESS)
+  if ((gnutls_handshake(http->tls)) != GNUTLS_E_SUCCESS)
   {
     http->error  = errno;
     http->status = HTTP_ERROR;
 
-    gnutls_deinit(conn->session);
+    gnutls_deinit(http->tls);
     gnutls_certificate_free_credentials(*credentials);
     free(credentials);
-    free(conn);
+    http->tls = NULL;
 
     return (-1);
   }
 
-  conn->credentials = credentials;
+  http->tls_credentials = credentials;
 
 #  elif defined(HAVE_CDSASSL)
-  conn = (http_tls_t *)calloc(1, sizeof(http_tls_t));
-
-  if (conn == NULL)
-    return (-1);
-
-  if ((error = SSLNewContext(false, &conn->session)))
+  if ((error = SSLNewContext(false, &http->tls)))
   {
     http->error  = error;
     http->status = HTTP_ERROR;
 
-    free(conn);
     return (-1);
   }
 
- /*
-  * Use a union to resolve warnings about int/pointer size mismatches...
-  */
-
-  error = SSLSetConnection(conn->session, http);
-
-  if (!error)
-    error = SSLSetIOFuncs(conn->session, _httpReadCDSA, _httpWriteCDSA);
-
-  if (!error)
-    error = SSLSetAllowsExpiredCerts(conn->session, true);
-
-  if (!error)
-    error = SSLSetAllowsAnyRoot(conn->session, true);
-
-  if (!error)
-    error = SSLSetProtocolVersionEnabled(conn->session, kSSLProtocol2, false);
+  error = SSLSetConnection(http->tls, http);
+  DEBUG_printf(("4http_setup_ssl: SSLSetConnection, error=%d", (int)error));
 
   if (!error)
   {
-    while ((error = SSLHandshake(conn->session)) == errSSLWouldBlock)
-      usleep(1000);
+    error = SSLSetIOFuncs(http->tls, _httpReadCDSA, _httpWriteCDSA);
+    DEBUG_printf(("4http_setup_ssl: SSLSetIOFuncs, error=%d", (int)error));
+  }
+
+  if (!error)
+  {
+    error = SSLSetProtocolVersionEnabled(http->tls, kSSLProtocol2, false);
+    DEBUG_printf(("4http_setup_ssl: SSLSetProtocolVersionEnabled, error=%d",
+                  (int)error));
+  }
+
+  if (!error)
+  {
+    error = SSLSetAllowsAnyRoot(http->tls, any_root);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsAnyRoot(%d), error=%d",
+                  any_root, (int)error));
+  }
+
+  if (!error)
+  {
+    error = SSLSetAllowsExpiredCerts(http->tls, cg->expired_certs);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredCerts(%d), error=%d",
+                  cg->expired_certs, (int)error));
+  }
+
+  if (!error)
+  {
+    error = SSLSetAllowsExpiredRoots(http->tls, cg->expired_root);
+    DEBUG_printf(("4http_setup_ssl: SSLSetAllowsExpiredRoots(%d), error=%d",
+                  cg->expired_root, (int)error));
+  }
+
+  if (!error)
+  {
+    if (cg->client_cert_cb)
+    {
+      error = SSLSetSessionOption(http->tls,
+				  kSSLSessionOptionBreakOnCertRequested, true);
+      DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnCertRequested, "
+                    "error=%d", (int)error));
+    }
+    else
+    {
+      error = http_set_credentials(http);
+      DEBUG_printf(("4http_setup_ssl: http_set_credentials, error=%d",
+                    (int)error));
+    }
+  }
+
+ /*
+  * If there's a server certificate callback installed let it evaluate the
+  * certificate(s) during the handshake...
+  */
+
+  if (!error && cg->server_cert_cb != NULL)
+  {
+    error = SSLSetEnableCertVerify(http->tls, false);
+    DEBUG_printf(("4http_setup_ssl: SSLSetEnableCertVerify, error=%d",
+                  (int)error));
+
+    if (!error)
+    {
+      error = SSLSetSessionOption(http->tls,
+				  kSSLSessionOptionBreakOnServerAuth, true);
+      DEBUG_printf(("4http_setup_ssl: kSSLSessionOptionBreakOnServerAuth, "
+                    "error=%d", (int)error));
+    }
+  }
+
+  if (!error)
+  {
+    hostname = httpAddrLocalhost(http->hostaddr) ? "localhost" : http->hostname;
+    error    = SSLSetPeerDomainName(http->tls, hostname, strlen(hostname));
+
+    DEBUG_printf(("4http_setup_ssl: SSLSetPeerDomainName, error=%d",
+                  (int)error));
+  }
+
+  if (!error)
+  {
+    int done = 0;			/* Are we done yet? */
+
+    while (!error && !done)
+    {
+      error = SSLHandshake(http->tls);
+
+      DEBUG_printf(("4_httpWait: SSLHandshake returned %d.", (int)error));
+
+      switch (error)
+      {
+	case noErr :
+	    done = 1;
+	    break;
+
+	case errSSLWouldBlock :
+	    usleep(1000);
+	    break;
+
+	case errSSLServerAuthCompleted :
+	    error = 0;
+	    if (cg->server_cert_cb)
+	    {
+	      error = httpCopyCredentials(http, &credentials);
+	      if (!error)
+	      {
+		error = (cg->server_cert_cb)(http, http->tls, credentials,
+					     cg->server_cert_data);
+		httpFreeCredentials(credentials);
+	      }
+
+	      DEBUG_printf(("4_httpWait: Server certificate callback returned "
+			    "%d.", (int)error));
+	    }
+	    break;
+
+	case errSSLClientCertRequested :
+	    error = 0;
+
+	    if (cg->client_cert_cb)
+	    {
+	      names = NULL;
+	      if (!(error = SSLCopyDistinguishedNames(http->tls, &dn_array)) && 
+		  dn_array)
+	      {
+		if ((names = cupsArrayNew(NULL, NULL)) != NULL)
+		{
+		  for (i = 0, count = CFArrayGetCount(dn_array); i < count; i++)
+		  {
+		    data = (CFDataRef)CFArrayGetValueAtIndex(dn_array, i);
+
+		    if ((credential = malloc(sizeof(*credential))))
+		    {
+		      credential->datalen = CFDataGetLength(data);
+		      if ((credential->data = malloc(credential->datalen)))
+		      {
+			memcpy((void *)credential->data, CFDataGetBytePtr(data), 
+			       credential->datalen);
+			cupsArrayAdd(names, credential);
+		      }
+		    }
+		  }
+		}
+
+		CFRelease(dn_array);
+	      }
+
+	      if (!error)
+	      {
+		error = (cg->client_cert_cb)(http, http->tls, names, 
+					     cg->client_cert_data);
+
+		DEBUG_printf(("4_httpWait: Client certificate callback "
+		              "returned %d.", (int)error));
+	      }
+
+	      httpFreeCredentials(names);
+	    }
+	    break;
+
+	case errSSLUnknownRootCert :
+	    message = _("Unable to establish a secure connection to host "
+	                "(untrusted certificate).");
+	    break;
+
+	case errSSLNoRootCert :
+	    message = _("Unable to establish a secure connection to host "
+	                "(self-signed certificate).");
+	    break;
+
+	case errSSLCertExpired :
+	    message = _("Unable to establish a secure connection to host "
+	                "(expired certificate).");
+	    break;
+
+	case errSSLCertNotYetValid :
+	    message = _("Unable to establish a secure connection to host "
+	                "(certificate not yet valid).");
+	    break;
+
+	case errSSLHostNameMismatch :
+	    message = _("Unable to establish a secure connection to host "
+	                "(host name mismatch).");
+	    break;
+
+	case errSSLXCertChainInvalid :
+	    message = _("Unable to establish a secure connection to host "
+	                "(certificate chain invalid).");
+	    break;
+
+	case errSSLConnectionRefused :
+	    message = _("Unable to establish a secure connection to host "
+	                "(peer dropped connection before responding).");
+	    break;
+
+ 	default :
+	    break;
+      }
+    }
   }
 
   if (error)
   {
     http->error  = error;
     http->status = HTTP_ERROR;
+    errno        = ECONNREFUSED;
 
-    SSLDisposeContext(conn->session);
+    SSLDisposeContext(http->tls);
+    http->tls = NULL;
 
-    free(conn);
+   /*
+    * If an error string wasn't set by the callbacks use a generic one...
+    */
+
+    if (!message)
+#ifdef HAVE_CSSMERRORSTRING
+      message = cssmErrorString(error);
+#else
+      message = _("Unable to establish a secure connection to host.");
+#endif /* HAVE_CSSMERRORSTRING */
+
+    _cupsSetError(IPP_PKI_ERROR, message, 1);
 
     return (-1);
   }
-#  elif defined(HAVE_SSPISSL)
-  conn = _sspiAlloc();
 
-  if (!conn)
+#  elif defined(HAVE_SSPISSL)
+  http->tls = _sspiAlloc();
+
+  if (!http->tls)
     return (-1);
 
-  conn->sock = http->fd;
-  dwSize     = sizeof(username) / sizeof(TCHAR);
+  http->tls->sock = http->fd;
+  dwSize          = sizeof(username) / sizeof(TCHAR);
   GetUserName(username, &dwSize);
   _sntprintf_s(commonName, sizeof(commonName) / sizeof(TCHAR),
                sizeof(commonName) / sizeof(TCHAR), TEXT("CN=%s"), username);
 
-  if (!_sspiGetCredentials(conn, L"ClientContainer", commonName, FALSE))
+  if (!_sspiGetCredentials(http->tls_credentials, L"ClientContainer",
+                           commonName, FALSE))
   {
-    _sspiFree(conn);
+    _sspiFree(http->tls_credentials);
+    http->tls_credentials = NULL;
     return (-1);
   }
 
-  _sspiSetAllowsAnyRoot(conn, TRUE);
-  _sspiSetAllowsExpiredCerts(conn, TRUE);
+  _sspiSetAllowsAnyRoot(http->tls_credentials, TRUE);
+  _sspiSetAllowsExpiredCerts(http->tls_credentials, TRUE);
 
-  if (!_sspiConnect(conn, http->hostname))
+  if (!_sspiConnect(http->tls_credentials, http->hostname))
   {
-    _sspiFree(conn);
+    _sspiFree(http->tls_credentials);
+    http->tls_credentials = NULL;
     return (-1);
   }
 #  endif /* HAVE_CDSASSL */
 
-  http->tls = conn;
   return (0);
 }
 #endif /* HAVE_SSL */
@@ -3448,54 +4003,39 @@ http_shutdown_ssl(http_t *http)		/* I - Connection to server */
 {
 #  ifdef HAVE_LIBSSL
   SSL_CTX	*context;		/* Context for encryption */
-  SSL		*conn;			/* Connection for encryption */
 
+  context = SSL_get_SSL_CTX(http->tls_credentials);
 
-  conn    = (SSL *)(http->tls);
-  context = SSL_get_SSL_CTX(conn);
-
-  SSL_shutdown(conn);
+  SSL_shutdown(http->tls_credentials);
   SSL_CTX_free(context);
-  SSL_free(conn);
+  SSL_free(http->tls_credentials);
 
 #  elif defined(HAVE_GNUTLS)
-  http_tls_t      *conn;		/* Encryption session */
   gnutls_certificate_client_credentials *credentials;
 					/* TLS credentials */
 
+  credentials = (gnutls_certificate_client_credentials *)(http->tls_credentials);
 
-  conn = (http_tls_t *)(http->tls);
-  credentials = (gnutls_certificate_client_credentials *)(conn->credentials);
-
-  gnutls_bye(conn->session, GNUTLS_SHUT_RDWR);
-  gnutls_deinit(conn->session);
+  gnutls_bye(http->tls, GNUTLS_SHUT_RDWR);
+  gnutls_deinit(http->tls);
   gnutls_certificate_free_credentials(*credentials);
   free(credentials);
-  free(conn);
 
 #  elif defined(HAVE_CDSASSL)
-  http_tls_t      *conn;		/* CDSA connection information */
-
-
-  conn = (http_tls_t *)(http->tls);
-
-  while (SSLClose(conn->session) == errSSLWouldBlock)
+  while (SSLClose(http->tls) == errSSLWouldBlock)
     usleep(1000);
 
-  SSLDisposeContext(conn->session);
+  SSLDisposeContext(http->tls);
 
-  if (conn->certsArray)
-    CFRelease(conn->certsArray);
+  if (http->tls_credentials)
+    CFRelease(http->tls_credentials);
 
-  free(conn);
 #  elif defined(HAVE_SSPISSL)
-  _sspi_struct_t  *conn;		/* SSPI connection information */
-
-  conn = (_sspi_struct_t*)(http->tls);
-  _sspiFree(conn);
+  _sspiFree(http->tls_credentials);
 #  endif /* HAVE_LIBSSL */
 
-  http->tls = NULL;
+  http->tls             = NULL;
+  http->tls_credentials = NULL;
 }
 #endif /* HAVE_SSL */
 
@@ -3554,7 +4094,7 @@ http_upgrade(http_t *http)		/* I - Connection to server */
 
   httpClearFields(http);
   httpSetField(http, HTTP_FIELD_CONNECTION, "upgrade");
-  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.0, SSL/2.0, SSL/3.0");
+  httpSetField(http, HTTP_FIELD_UPGRADE, "TLS/1.2, TLS/1.1, TLS/1.0, SSL/3.0");
 
   if ((ret = httpOptions(http, "*")) == 0)
   {
@@ -3735,7 +4275,7 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
   result = SSL_write((SSL *)(http->tls), buf, len);
 
 #  elif defined(HAVE_GNUTLS)
-  result = gnutls_record_send(((http_tls_t *)(http->tls))->session, buf, len);
+  result = gnutls_record_send(http->tls, buf, len);
 
   if (result < 0 && !errno)
   {
@@ -3766,7 +4306,7 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
   size_t	processed;		/* Number of bytes processed */
 
 
-  error = SSLWrite(((http_tls_t *)http->tls)->session, buf, len, &processed);
+  error = SSLWrite(http->tls, buf, len, &processed);
 
   switch (error)
   {

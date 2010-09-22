@@ -28,6 +28,7 @@ WEBIMAGES	=	\
 			images/color-wheel.png \
 			images/cups.png \
 			images/cups-icon.png \
+			images/generic.png \
 			images/left.gif \
 			images/right.gif \
 			images/sel.gif \

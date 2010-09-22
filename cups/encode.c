@@ -120,6 +120,7 @@ static const _ipp_option_t ipp_options[] =
   { 0, "penwidth",		IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "penwidth-default",	IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "port-monitor",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
+  { 0, "ppd-name",		IPP_TAG_NAME,		IPP_TAG_PRINTER },
   { 0, "ppi",			IPP_TAG_INTEGER,	IPP_TAG_JOB },
   { 0, "ppi-default",		IPP_TAG_INTEGER,	IPP_TAG_PRINTER },
   { 0, "prettyprint",		IPP_TAG_BOOLEAN,	IPP_TAG_JOB },

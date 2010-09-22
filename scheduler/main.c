@@ -706,6 +706,8 @@ main(int  argc,				/* I - Number of command-line args */
 	* Shutdown the server...
 	*/
 
+        DoingShutdown = 1;
+
 	cupsdStopServer();
 
        /*
@@ -735,6 +737,8 @@ main(int  argc,				/* I - Number of command-line args */
        /*
         * Startup the server...
         */
+
+        DoingShutdown = 0;
 
         cupsdStartServer();
 
@@ -1110,6 +1114,8 @@ main(int  argc,				/* I - Number of command-line args */
  /*
   * Close all network clients...
   */
+
+  DoingShutdown = 1;
 
   cupsdStopServer();
 

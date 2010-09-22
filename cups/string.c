@@ -36,6 +36,7 @@
  * Include necessary headers...
  */
 
+#define _CUPS_STRING_C_
 #include "string-private.h"
 #include "debug-private.h"
 #include "thread-private.h"
@@ -401,7 +402,7 @@ _cupsStrScand(const char   *buf,	/* I - Pointer to number */
   * Skip leading whitespace...
   */
 
-  while (isspace(*buf & 255))
+  while (_cups_isspace(*buf))
     buf ++;
 
  /*

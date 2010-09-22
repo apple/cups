@@ -90,7 +90,8 @@ typedef int socklen_t;
 #    include <openssl/rand.h>
 #    include <openssl/ssl.h>
 
-typedef SSL http_tls_t;
+typedef SSL  *http_tls_t;
+typedef void *http_tls_credentials_t;
 
 extern BIO_METHOD *_httpBIOMethods(void);
 
@@ -99,13 +100,11 @@ extern BIO_METHOD *_httpBIOMethods(void);
  * The GNU TLS library is more of a "bare metal" SSL/TLS library...
  */
 #    include <gnutls/gnutls.h>
+#    include <gnutls/x509.h>
 #    include <gcrypt.h>
 
-typedef struct
-{
-  gnutls_session	session;	/* GNU TLS session object */
-  void			*credentials;	/* GNU TLS credentials object */
-} http_tls_t;
+typedef gnutls_session http_tls_t;
+typedef void *http_tls_credentials_t;
 
 extern ssize_t	_httpReadGNUTLS(gnutls_transport_ptr ptr, void *data,
 		                size_t length);
@@ -118,13 +117,43 @@ extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
  * for its IO and protocol management...
  */
 
+#    include <CoreFoundation/CoreFoundation.h>
+#    include <Security/Security.h>
 #    include <Security/SecureTransport.h>
+#    include <Security/SecItem.h>
+#    ifdef HAVE_SECBASEPRIV_H
+#      include <Security/SecBasePriv.h>
+#    elif defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */
+extern const char *cssmErrorString(int error);
+#    endif /* HAVE_SECBASEPRIV_H */
+#    ifdef HAVE_SECCERTIFICATE_H
+#      include <Security/SecCertificate.h>
+#      include <Security/SecIdentity.h>
+#    endif /* HAVE_SECCERTIFICATE_H */
+#    ifdef HAVE_SECITEMPRIV_H
+#      include <Security/SecItemPriv.h>
+#    else /* Declare constants from that header... */
+extern const CFTypeRef kSecClassCertificate;
+extern const CFTypeRef kSecClassIdentity;
+#    endif /* HAVE_SECITEMPRIV_H */
+#    ifdef HAVE_SECIDENTITYSEARCHPRIV_H
+#      include <Security/SecIdentitySearchPriv.h>
+#    elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
+extern OSStatus SecIdentitySearchCreateWithPolicy(SecPolicyRef policy,
+				CFStringRef idString, CSSM_KEYUSE keyUsage,
+				CFTypeRef keychainOrArray,
+				Boolean returnOnlyValidIdentities,
+				SecIdentitySearchRef* searchRef);
+#    endif /* HAVE_SECIDENTITYSEARCHPRIV_H */
+#    ifdef HAVE_SECPOLICYPRIV_H
+#      include <Security/SecPolicyPriv.h>
+#    elif defined(HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY) /* Declare prototype for function in that header... */
+extern OSStatus SecPolicySetValue(SecPolicyRef policyRef,
+                                  const CSSM_DATA *value);
+#    endif /* HAVE_SECPOLICYPRIV_H */
 
-typedef struct				/**** CDSA connection information ****/
-{
-  SSLContextRef		session;	/* CDSA session object */
-  CFArrayRef		certsArray;	/* Certificates array */
-} http_tls_t;
+typedef SSLContextRef	http_tls_t;
+typedef CFArrayRef	http_tls_credentials_t;
 
 extern OSStatus	_httpReadCDSA(SSLConnectionRef connection, void *data,
 		              size_t *dataLength);
@@ -133,6 +162,10 @@ extern OSStatus	_httpWriteCDSA(SSLConnectionRef connection, const void *data,
 
 #  elif defined(HAVE_SSPISSL)
 #    include "sspi-private.h"
+typedef _sspi_struct_t * http_tls_t;
+typedef void *http_tls_credentials_t;
+#  else
+typedef void *http_tls_t;
 #  endif /* HAVE_LIBSSL */
 
 
@@ -162,7 +195,7 @@ struct _http_s				/**** HTTP connection structure. ****/
   char			nonce[HTTP_MAX_VALUE];
 					/* Nonce value */
   int			nonce_count;	/* Nonce count */
-  void			*tls;		/* TLS state information */
+  http_tls_t		tls;		/* TLS state information */
   http_encryption_t	encryption;	/* Encryption requirements */
   /**** New in CUPS 1.1.19 ****/
   fd_set		*input_set;	/* select() set for httpWait() @deprecated@ */
@@ -193,6 +226,9 @@ struct _http_s				/**** HTTP connection structure. ****/
 #  ifdef HAVE_AUTHORIZATION_H
   AuthorizationRef	auth_ref;	/* Authorization ref */
 #  endif /* HAVE_AUTHORIZATION_H */
+  /**** New in CUPS 1.5 ****/
+  http_tls_credentials_t tls_credentials;
+					/* TLS credentials */
 };
 
 
@@ -267,11 +303,14 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  */
 
 extern int		_httpAddrPort(http_addr_t *addr);
+extern http_tls_credentials_t
+			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,
 			             http_encryption_t encryption);
 extern void		_httpDisconnect(http_t *http);
 extern char		*_httpEncodeURI(char *dst, const char *src,
 			                size_t dstsize);
+extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
 extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int log);

@@ -461,7 +461,10 @@ ppdMarkDefaults(ppd_file_t *ppd)	/* I - PPD file record */
   for (c = (ppd_choice_t *)cupsArrayFirst(ppd->marked);
        c;
        c = (ppd_choice_t *)cupsArrayNext(ppd->marked))
+  {
     cupsArrayRemove(ppd->marked, c);
+    c->marked = 0;
+  }
 
  /*
   * Then repopulate it with the defaults...
@@ -560,7 +563,7 @@ _ppdParseOptions(
     cups_option_t **options,		/* IO - Options */
     _ppd_parse_t  which)		/* I  - What to parse */
 {
-  char	option[PPD_MAX_NAME + 1],	/* Current option/property */
+  char	option[PPD_MAX_NAME * 2 + 1],	/* Current option/property */
 	choice[PPD_MAX_NAME],		/* Current choice/value */
 	*ptr;				/* Pointer into option or choice */
 
@@ -579,7 +582,7 @@ _ppdParseOptions(
     * Skip leading whitespace...
     */
 
-    while (isspace(*s & 255))
+    while (_cups_isspace(*s))
       s ++;
 
    /*
@@ -587,10 +590,10 @@ _ppdParseOptions(
     */
 
     ptr = option;
-    while (*s && !isspace(*s & 255) && ptr < (option + sizeof(option) - 1))
+    while (*s && !_cups_isspace(*s) && ptr < (option + sizeof(option) - 1))
       *ptr++ = *s++;
 
-    if (ptr == s || !isspace(*s & 255))
+    if (ptr == s || !_cups_isspace(*s))
       break;
 
     *ptr = '\0';
@@ -599,17 +602,17 @@ _ppdParseOptions(
     * Get the choice...
     */
 
-    while (isspace(*s & 255))
+    while (_cups_isspace(*s))
       s ++;
 
     if (!*s)
       break;
 
     ptr = choice;
-    while (*s && !isspace(*s & 255) && ptr < (choice + sizeof(choice) - 1))
+    while (*s && !_cups_isspace(*s) && ptr < (choice + sizeof(choice) - 1))
       *ptr++ = *s++;
 
-    if (!isspace(*s & 255) && *s)
+    if (*s && !_cups_isspace(*s))
       break;
 
     *ptr = '\0';
