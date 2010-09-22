@@ -3050,8 +3050,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
   pwgppds     = NULL;
 
   if (pwg &&
-      !ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
-      !ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO))
+      (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
+       ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
    /*
     * Map output-mode and print-quality to a preset...

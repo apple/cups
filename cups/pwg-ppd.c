@@ -903,6 +903,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 		dtop,			/* Difference in top margins */
 		dmin,			/* Minimum difference */
 		dclosest;		/* Closest difference */
+  const char	*ppd_name;		/* PPD media name */
 
 
  /*
@@ -914,6 +915,36 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
   if (exact)
     *exact = 0;
+
+  ppd_name = keyword;
+
+  if (job)
+  {
+   /*
+    * Try getting the PPD media name from the job attributes...
+    */
+
+    ipp_attribute_t	*attr;		/* Job attribute */
+
+    if ((attr = ippFindAttribute(job, "PageSize", IPP_TAG_ZERO)) == NULL)
+      if ((attr = ippFindAttribute(job, "PageRegion", IPP_TAG_ZERO)) == NULL)
+        attr = ippFindAttribute(job, "media", IPP_TAG_ZERO);
+
+    if (attr && (attr->value_tag == IPP_TAG_NAME ||
+                 attr->value_tag == IPP_TAG_KEYWORD))
+      ppd_name = attr->values[0].string.text;
+  }
+
+  if (ppd_name)
+  {
+   /*
+    * Try looking up the named PPD size first...
+    */
+
+    for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+      if (!strcasecmp(ppd_name, size->map.ppd))
+        return (ppd_name);
+  }
 
   if (job && !keyword)
   {
@@ -936,7 +967,8 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
     if ((media = _pwgMediaForPWG(keyword)) == NULL)
       if ((media = _pwgMediaForLegacy(keyword)) == NULL)
-        return (NULL);
+        if ((media = _pwgMediaForPPD(keyword)) == NULL)
+	  return (NULL);
 
     jobsize.width  = media->width;
     jobsize.length = media->length;
