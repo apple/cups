@@ -3050,6 +3050,9 @@ get_options(cupsd_job_t *job,		/* I - Job */
   pwgppds     = NULL;
 
   if (pwg &&
+      !ippFindAttribute(job->attrs,
+                        "com.apple.print.DocumentTicket.PMSpoolFormat",
+			IPP_TAG_ZERO) &&
       (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
        ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
