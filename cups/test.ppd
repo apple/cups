@@ -65,6 +65,9 @@
 *PageSize Letter/US Letter:	"PageSize=Letter"
 *fr.PageSize Letter/French US Letter: ""
 *fr_CA.PageSize Letter/French Canadian US Letter: ""
+*PageSize Letter.Banner/US Letter Banner: "PageSize=Letter.Banner"
+*fr.PageSize Letter.Banner/French US Letter Banner: ""
+*fr_CA.PageSize Letter.Banner/French Canadian US Letter Banner: ""
 *PageSize Letter.Fullbleed/US Letter Borderless: "PageSize=Letter.Fullbleed"
 *fr.PageSize Letter.Fullbleed/French US Letter Borderless: ""
 *fr_CA.PageSize Letter.Fullbleed/French Canadian US Letter Borderless: ""
@@ -81,6 +84,7 @@
 *OrderDependency: 10 AnySetup *PageRegion
 *DefaultPageRegion: Letter
 *PageRegion Letter/US Letter:	"PageRegion=Letter"
+*PageRegion Letter.Banner/US Letter Banner: "PageRegion=Letter.Fullbleed"
 *PageRegion Letter.Fullbleed/US Letter Borderless: "PageRegion=Letter.Fullbleed"
 *PageRegion A4/A4:		"PageRegion=A4"
 *PageRegion Env10/#10 Envelope:	"PageRegion=Env10"
@@ -88,24 +92,28 @@
 
 *fr.Translation PageRegion/French Page Region: ""
 *fr.PageRegion Letter/French US Letter: ""
+*fr.PageRegion Letter.Banner/French US Letter Banner: ""
 *fr.PageRegion Letter.Fullbleed/French US Letter Borderless: ""
 *fr.PageRegion A4/French A4: ""
 *fr.PageRegion Env10/French #10 Envelope: ""
 
 *fr_CA.Translation PageRegion/French Canadian Page Region: ""
 *fr_CA.PageRegion Letter/French Canadian US Letter: ""
+*fr_CA.PageRegion Letter.Banner/French Canadian US Letter Banner: ""
 *fr_CA.PageRegion Letter.Fullbleed/French Canadian US Letter Borderless: ""
 *fr_CA.PageRegion A4/French Canadian A4: ""
 *fr_CA.PageRegion Env10/French Canadian #10 Envelope: ""
 
 *DefaultImageableArea: Letter 
 *ImageableArea Letter:	"18 36 594 756"
+*ImageableArea Letter.Banner:	"18 0 594 792"
 *ImageableArea Letter.Fullbleed:	"0 0 612 792"
 *ImageableArea A4:	"18 36 577 806"
 *ImageableArea Env10:	"18 36 279 648"
 
 *DefaultPaperDimension: Letter
 *PaperDimension Letter:	"612 792"
+*PaperDimension Letter.Banner:	"612 792"
 *PaperDimension Letter.Fullbleed:	"612 792"
 *PaperDimension A4:	"595 842"
 *PaperDimension Env10:	"297 684"
