@@ -107,31 +107,30 @@ main(int  argc,				/* I - Number of command-line args */
 	close(fd);
 
         if ((media = ippFindAttribute(job, "media", IPP_TAG_ZERO)) != NULL &&
-	    (media->value_tag == IPP_TAG_NAME ||
-	     media->value_tag == IPP_TAG_KEYWORD))
-	{
-	  printf("_pwgGetPageSize(media=%s): ", media->values[0].string.text);
-	  fflush(stdout);
+	    media->value_tag != IPP_TAG_NAME &&
+	    media->value_tag != IPP_TAG_KEYWORD)
+	  media = NULL;
 
-	  if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
-	  {
-	    puts("FAIL (Not Found)");
-	    status = 1;
-	  }
-	  else if (strcasecmp(pagesize, media->values[0].string.text))
-	  {
-	    printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize,
-	           media->values[0].string.text);
-	    status = 1;
-	  }
-	  else
-	    printf("PASS (%s)\n", pagesize);
-	}
+	if (media)
+	  printf("_pwgGetPageSize(media=%s): ", media->values[0].string.text);
 	else
+	  fputs("_pwgGetPageSize(media-col): ", stdout);
+
+        fflush(stdout);
+
+	if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
 	{
-	  printf("%s: No media attribute found!\n", argv[2]);
+	  puts("FAIL (Not Found)");
 	  status = 1;
 	}
+	else if (media && strcasecmp(pagesize, media->values[0].string.text))
+	{
+	  printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize,
+		 media->values[0].string.text);
+	  status = 1;
+	}
+	else
+	  printf("PASS (%s)\n", pagesize);
 
 	ippDelete(job);
       }

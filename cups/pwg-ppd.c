@@ -932,8 +932,13 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
       if ((attr = ippFindAttribute(job, "PageRegion", IPP_TAG_ZERO)) == NULL)
         attr = ippFindAttribute(job, "media", IPP_TAG_ZERO);
 
-    DEBUG_printf(("1_pwgGetPageSize: Found attribute %s (%s)", attr->name,
-                  ippTagString(attr->value_tag)));
+#ifdef DEBUG
+    if (attr)
+      DEBUG_printf(("1_pwgGetPageSize: Found attribute %s (%s)", attr->name,
+		    ippTagString(attr->value_tag)));
+    else
+      DEBUG_puts("1_pwgGetPageSize: Did not find media attribute.");
+#endif /* DEBUG */
 
     if (attr && (attr->value_tag == IPP_TAG_NAME ||
                  attr->value_tag == IPP_TAG_KEYWORD))
