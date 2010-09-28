@@ -43,33 +43,32 @@
 *
 * Contents:
 *
-*  list_devices()	- List all USB devices.
-*  print_device()	- Print a file to a USB device.
-*  sidechannel_thread() - Thread to handle side-channel requests.
-*  read_thread()	- Thread to read the backchannel data on.
-*  list_device_cb()	- list_device iterator callback.
-*  find_device_cb()	- print_device iterator callback.
-*  status_timer_cb()	- Status timer callback.
-*  iterate_printers()	- Iterate over all the printers.
-*  device_added()	- Device added notifier.
-*  copy_deviceinfo()	- Copy strings from the 1284 device ID.
-*  release_deviceinfo()	- Release deviceinfo strings.
-*  load_classdriver()	- Load a classdriver.
-*  unload_classdriver()	- Unload a classdriver.
-*  load_printerdriver()	- Load vendor's classdriver.
-*  registry_open()	- Open a connection to the printer.
-*  registry_close()	- Close the connection to the printer.
-*  copy_deviceid()	- Copy the 1284 device id string.
-*  copy_devicestring()	- Copy the 1284 device id string.
-*  copy_value_for_key()	- Copy value string associated with a key.
-*  cfstr_create_trim()	- Create CFString and trim whitespace characters.
-*  parse_options()	- Parse uri options.
-*  setup_cfLanguage()	- Create AppleLanguages array from LANG environment var.
-*  run_legacy_backend()	- Re-exec backend as ppc or i386.
-*  sigterm_handler()	- SIGTERM handler.
-*  next_line()		- Find the next line in a buffer.
-*  parse_pserror()	- Scan the backchannel data for postscript errors.
-*  get_device_id()	- Return IEEE-1284 device ID.
+ *   list_devices()       - List all USB devices.
+ *   print_device()       - Print a file to a USB device.
+ *   read_thread()        - Thread to read the backchannel data on.
+ *   sidechannel_thread() - Handle side-channel requests.
+ *   iterate_printers()   - Iterate over all the printers.
+ *   device_added()       - Device added notifier.
+ *   list_device_cb()     - list_device iterator callback.
+ *   find_device_cb()     - print_device iterator callback.
+ *   status_timer_cb()    - Status timer callback.
+ *   copy_deviceinfo()    - Copy strings from the 1284 device ID.
+ *   release_deviceinfo() - Release deviceinfo strings.
+ *   load_classdriver()   - Load a classdriver.
+ *   unload_classdriver() - Unload a classdriver.
+ *   load_printerdriver() - Load vendor's classdriver.
+ *   registry_open()      - Open a connection to the printer.
+ *   registry_close()     - Close the connection to the printer.
+ *   copy_deviceid()      - Copy the 1284 device id string.
+ *   copy_devicestring()  - Copy the 1284 device id string.
+ *   copy_value_for_key() - Copy value string associated with a key.
+ *   cfstr_create_trim()  - Create CFString and trim whitespace characters.
+ *   parse_options()      - Parse URI options.
+ *   sigterm_handler()    - SIGTERM handler.
+ *   next_line()          - Find the next line in a buffer.
+ *   parse_pserror()      - Scan the backchannel data for postscript errors.
+ *   soft_reset()         - Send a soft reset to the device.
+ *   get_device_id()      - Return IEEE-1284 device ID.
 */
 
 /*
@@ -292,8 +291,8 @@ static void status_timer_cb(CFRunLoopTimerRef timer, void *info);
 #if defined(__i386__) || defined(__x86_64__)
 static pid_t	child_pid;		/* Child PID */
 static void run_legacy_backend(int argc, char *argv[], int fd);	/* Starts child backend process running as a ppc executable */
-static void sigterm_handler(int sig);	/* SIGTERM handler */
 #endif /* __i386__ || __x86_64__ */
+static void sigterm_handler(int sig);	/* SIGTERM handler */
 
 #ifdef PARSE_PS_ERRORS
 static const char *next_line (const char *buffer);
@@ -763,7 +762,8 @@ print_device(const char *uri,		/* I - Device URI */
     memset(&action, 0, sizeof(action));
 
     sigemptyset(&action.sa_mask);
-    action.sa_handler = SIG_DFL;
+    sigaddset(&action.sa_mask, SIGTERM);
+    action.sa_handler = sigterm_handler;
     sigaction(SIGTERM, &action, NULL);
   }
 
@@ -797,6 +797,7 @@ print_device(const char *uri,		/* I - Device URI */
 	* Force the side-channel thread to exit...
 	*/
 
+        fputs("DEBUG: Force the side-channel thread to exit...\n", stderr);
 	pthread_kill(sidechannel_thread_id, SIGTERM);
       }
     }
@@ -837,6 +838,7 @@ print_device(const char *uri,		/* I - Device URI */
       */
 
       g.wait_eof = 0;
+      fputs("DEBUG: Force the read thread to exit...\n", stderr);
       pthread_kill(read_thread_id, SIGTERM);
     }
   }
@@ -2051,6 +2053,8 @@ static void run_legacy_backend(int argc,
 
   exit(exitstatus);
 }
+#endif /* __i386__ || __x86_64__ */
+
 
 /*
  * 'sigterm_handler()' - SIGTERM handler.
@@ -2059,8 +2063,11 @@ static void run_legacy_backend(int argc,
 static void
 sigterm_handler(int sig)		/* I - Signal */
 {
-  /* If we started a child process pass the signal on to it...
-   */
+#if defined(__i386__) || defined(__x86_64__)
+ /*
+  * If we started a child process pass the signal on to it...
+  */
+
   if (child_pid)
   {
    /*
@@ -2082,9 +2089,8 @@ sigterm_handler(int sig)		/* I - Signal */
       exit(CUPS_BACKEND_STOP);
     }
   }
-}
-
 #endif /* __i386__ || __x86_64__ */
+}
 
 
 #ifdef PARSE_PS_ERRORS
