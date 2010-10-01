@@ -1364,7 +1364,8 @@ _httpResolveURI(
     DNSServiceRef	ref,		/* DNS-SD master service reference */
 			domainref,	/* DNS-SD service reference for domain */
 			localref;	/* DNS-SD service reference for .local */
-    int			domainsent = 0;	/* Send the domain resolve? */
+    int			domainsent = 0,	/* Send the domain resolve? */
+			offline = 0;	/* offline-report state set? */
     char		*regtype,	/* Pointer to type in hostname */
 			*domain;	/* Pointer to domain in hostname */
     _http_uribuf_t	uribuf;		/* URI buffer */
@@ -1494,6 +1495,17 @@ _httpResolveURI(
 				    &uribuf) == kDNSServiceErr_NoError)
 		domainsent = 1;
 	    }
+
+	   /*
+	    * If it hasn't resolved within 5 seconds set the offline-report
+	    * printer-state-reason...
+	    */
+
+	    if (logit && offline == 0 && time(NULL) > (start_time + 5))
+	    {
+	      fputs("STATE: +offline-report\n", stderr);
+	      offline = 1;
+	    }
 	  }
 	  else
 	  {
@@ -1521,7 +1533,7 @@ _httpResolveURI(
       else
         fputs("DEBUG: Unable to resolve URI\n", stderr);
 
-      fputs("STATE: -connecting-to-device\n", stderr);
+      fputs("STATE: -connecting-to-device,offline-report\n", stderr);
     }
 
 #else

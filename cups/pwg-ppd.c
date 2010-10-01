@@ -182,7 +182,6 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
     else
     {
-
      /*
       * Not a standard name; convert it to a PWG vendor name of the form:
       *
@@ -209,8 +208,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
     new_top        = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
     new_imageable  = new_length - new_top - new_bottom;
-    new_borderless = new_bottom == 0 && new_top == 0 &&
-                     new_left == 0 && new_right == 0;
+    new_borderless = (new_bottom == 0 && new_top == 0) ||
+                     (new_left == 0 && new_right == 0);
 
     for (k = pwg->num_sizes, similar = 0, old_size = pwg->sizes, new_size = NULL;
          k > 0 && !similar;
@@ -906,6 +905,9 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
   const char	*ppd_name;		/* PPD media name */
 
 
+  DEBUG_printf(("_pwgGetPageSize(pwg=%p, job=%p, keyword=\"%s\", exact=%p)",
+	        pwg, job, keyword, exact));
+
  /*
   * Range check input...
   */
@@ -930,10 +932,20 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
       if ((attr = ippFindAttribute(job, "PageRegion", IPP_TAG_ZERO)) == NULL)
         attr = ippFindAttribute(job, "media", IPP_TAG_ZERO);
 
+#ifdef DEBUG
+    if (attr)
+      DEBUG_printf(("1_pwgGetPageSize: Found attribute %s (%s)", attr->name,
+		    ippTagString(attr->value_tag)));
+    else
+      DEBUG_puts("1_pwgGetPageSize: Did not find media attribute.");
+#endif /* DEBUG */
+
     if (attr && (attr->value_tag == IPP_TAG_NAME ||
                  attr->value_tag == IPP_TAG_KEYWORD))
       ppd_name = attr->values[0].string.text;
   }
+
+  DEBUG_printf(("1_pwgGetPageSize: ppd_name=\"%s\"", ppd_name));
 
   if (ppd_name)
   {
@@ -942,8 +954,20 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
     */
 
     for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+    {
+      DEBUG_printf(("2_pwgGetPageSize: size[%d]=[\"%s\" \"%s\"]",
+                    (int)(size - pwg->sizes), size->map.pwg, size->map.ppd));
+
       if (!strcasecmp(ppd_name, size->map.ppd))
+      {
+	if (exact)
+	  *exact = 1;
+
+        DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", ppd_name));
+
         return (ppd_name);
+      }
+    }
   }
 
   if (job && !keyword)
@@ -1029,11 +1053,18 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
     if (exact)
       *exact = 1;
 
+    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", size->map.ppd));
+
     return (size->map.ppd);
   }
 
   if (closest)
+  {
+    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\" (closest)",
+                  closest->map.ppd));
+
     return (closest->map.ppd);
+  }
 
  /*
   * If we get here we need to check for custom page size support...
@@ -1065,12 +1096,17 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
     else if (exact)
       *exact = 1;
 
+    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\" (custom)",
+                  pwg->custom_ppd_size));
+
     return (pwg->custom_ppd_size);
   }
 
  /*
   * No custom page size support or the size is out of range - return NULL.
   */
+
+  DEBUG_puts("1_pwgGetPageSize: Returning NULL");
 
   return (NULL);
 }

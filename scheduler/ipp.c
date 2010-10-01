@@ -4391,7 +4391,8 @@ check_rss_recipient(
  * 'check_quotas()' - Check quotas for a printer and user.
  */
 
-static int				/* O - 1 if OK, 0 if not */
+static int				/* O - 1 if OK, 0 if forbidden,
+					       -1 if limit reached */
 check_quotas(cupsd_client_t  *con,	/* I - Client connection */
              cupsd_printer_t *p)	/* I - Printer or class */
 {
@@ -4441,7 +4442,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     {
       cupsdLogMessage(CUPSD_LOG_INFO, "Too many jobs for printer \"%s\"...",
                       p->name);
-      return (0);
+      return (-1);
     }
   }
 
@@ -4455,7 +4456,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     {
       cupsdLogMessage(CUPSD_LOG_INFO, "Too many jobs for user \"%s\"...",
                       username);
-      return (0);
+      return (-1);
     }
   }
 

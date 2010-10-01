@@ -15,8 +15,9 @@
  *
  * Contents:
  *
- *   main()     - Main entry.
- *   test_pwg() - Test the PWG mapping functions.
+ *   main()          - Main entry.
+ *   test_pagesize() - Test the PWG mapping functions.
+ *   test_pwg()      - Test the PWG mapping functions.
  */
 
 /*
@@ -24,13 +25,16 @@
  */
 
 #include "ppd-private.h"
+#include "file-private.h"
 
 
 /*
  * Local functions...
  */
 
-static int	test_pwg(_pwg_t *pwg);
+static int	test_pwg(_pwg_t *pwg, ppd_file_t *ppd);
+static int	test_pagesize(_pwg_t *pwg, ppd_file_t *ppd,
+		              const char *ppdsize);
 
 
 /*
@@ -50,13 +54,13 @@ main(int  argc,				/* I - Number of command-line args */
 
   status = 0;
 
-  if (argc != 2)
+  if (argc < 2 || argc > 3)
   {
-    puts("Usage: ./testpwg filename.ppd");
+    puts("Usage: ./testpwg filename.ppd [jobfile]");
     return (1);
   }
-  else
-    ppdfile = argv[1];
+
+  ppdfile = argv[1];
 
   printf("ppdOpenFile(%s): ", ppdfile);
   if ((ppd = ppdOpenFile(ppdfile)) == NULL)
@@ -83,7 +87,59 @@ main(int  argc,				/* I - Number of command-line args */
   else
   {
     puts("PASS");
-    status += test_pwg(pwg);
+    status += test_pwg(pwg, ppd);
+
+    if (argc == 3)
+    {
+     /*
+      * Test PageSize mapping code.
+      */
+
+      int		fd;		/* Job file descriptor */
+      const char	*pagesize;	/* PageSize value */
+      ipp_t		*job;		/* Job attributes */
+      ipp_attribute_t	*media;		/* Media attribute */
+
+      if ((fd = open(argv[2], O_RDONLY)) >= 0)
+      {
+	job = ippNew();
+	ippReadFile(fd, job);
+	close(fd);
+
+        if ((media = ippFindAttribute(job, "media", IPP_TAG_ZERO)) != NULL &&
+	    media->value_tag != IPP_TAG_NAME &&
+	    media->value_tag != IPP_TAG_KEYWORD)
+	  media = NULL;
+
+	if (media)
+	  printf("_pwgGetPageSize(media=%s): ", media->values[0].string.text);
+	else
+	  fputs("_pwgGetPageSize(media-col): ", stdout);
+
+        fflush(stdout);
+
+	if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
+	{
+	  puts("FAIL (Not Found)");
+	  status = 1;
+	}
+	else if (media && strcasecmp(pagesize, media->values[0].string.text))
+	{
+	  printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize,
+		 media->values[0].string.text);
+	  status = 1;
+	}
+	else
+	  printf("PASS (%s)\n", pagesize);
+
+	ippDelete(job);
+      }
+      else
+      {
+        perror(argv[2]);
+	status = 1;
+      }
+    }
 
    /*
     * _pwgDestroy should never fail...
@@ -208,11 +264,70 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
+ * 'test_pagesize()' - Test the PWG mapping functions.
+ */
+
+static int				/* O - 1 on failure, 0 on success */
+test_pagesize(_pwg_t     *pwg,		/* I - PWG mapping data */
+              ppd_file_t *ppd,		/* I - PPD file */
+	      const char *ppdsize)	/* I - PPD page size */
+{
+  int		status = 0;		/* Return status */
+  ipp_t		*job;			/* Job attributes */
+  const char	*pagesize;		/* PageSize value */
+
+
+  if (ppdPageSize(ppd, ppdsize))
+  {
+    printf("_pwgGetPageSize(keyword=%s): ", ppdsize);
+    fflush(stdout);
+
+    if ((pagesize = _pwgGetPageSize(pwg, NULL, ppdsize, NULL)) == NULL)
+    {
+      puts("FAIL (Not Found)");
+      status = 1;
+    }
+    else if (strcasecmp(pagesize, ppdsize))
+    {
+      printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize, ppdsize);
+      status = 1;
+    }
+    else
+      puts("PASS");
+
+    job = ippNew();
+    ippAddString(job, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media", NULL, ppdsize);
+
+    printf("_pwgGetPageSize(media=%s): ", ppdsize);
+    fflush(stdout);
+
+    if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
+    {
+      puts("FAIL (Not Found)");
+      status = 1;
+    }
+    else if (strcasecmp(pagesize, ppdsize))
+    {
+      printf("FAIL (Got \"%s\", Expected \"%s\")\n", pagesize, ppdsize);
+      status = 1;
+    }
+    else
+      puts("PASS");
+
+    ippDelete(job);
+  }
+
+  return (status);
+}
+
+
+/*
  * 'test_pwg()' - Test the PWG mapping functions.
  */
 
 static int				/* O - 1 on failure, 0 on success */
-test_pwg(_pwg_t *pwg)			/* I - PWG mapping data */
+test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
+         ppd_file_t *ppd)		/* I - PPD file */
 {
   int		i,			/* Looping var */
 		status = 0;		/* Return status */
@@ -358,7 +473,18 @@ test_pwg(_pwg_t *pwg)			/* I - PWG mapping data */
 
     if (!status)
       puts("PASS");
+
+    _pwgDestroy(pwg2);
   }
+
+ /*
+  * Test PageSize mapping code...
+  */
+
+  status += test_pagesize(pwg, ppd, "Letter");
+  status += test_pagesize(pwg, ppd, "na-letter");
+  status += test_pagesize(pwg, ppd, "A4");
+  status += test_pagesize(pwg, ppd, "iso-a4");
 
   return (status);
 }

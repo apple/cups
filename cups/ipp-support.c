@@ -540,8 +540,8 @@ ippErrorString(ipp_status_t error)	/* I - Error status */
     return (ipp_status_400s[error - IPP_BAD_REQUEST]);
   else if (error >= IPP_INTERNAL_ERROR && error <= IPP_PRINTER_IS_DEACTIVATED)
     return (ipp_status_500s[error - IPP_INTERNAL_ERROR]);
-  else if (error >= IPP_AUTHORIZATION_CANCELED && error <= IPP_UPGRADE_REQUIRED)
-    return (ipp_status_1000s[error - IPP_AUTHORIZATION_CANCELED]);
+  else if (error >= IPP_AUTHENTICATION_CANCELED && error <= IPP_UPGRADE_REQUIRED)
+    return (ipp_status_1000s[error - IPP_AUTHENTICATION_CANCELED]);
 
  /*
   * No, build an "unknown-xxxx" error string...
