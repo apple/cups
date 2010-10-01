@@ -312,7 +312,7 @@ typedef enum ipp_status_e		/**** IPP status codes ****/
   IPP_MULTIPLE_JOBS_NOT_SUPPORTED,	/* server-error-multiple-document-jobs-not-supported */
   IPP_PRINTER_IS_DEACTIVATED,		/* server-error-printer-is-deactivated */
 
-  IPP_AUTHORIZATION_CANCELED = 0x1000,	/* Authorization canceled by user @since CUPS 1.4@ */
+  IPP_AUTHENTICATION_CANCELED = 0x1000,	/* Authentication canceled by user @since CUPS 1.5@ */
   IPP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5@ */
   IPP_UPGRADE_REQUIRED			/* TLS upgrade required */
 } ipp_status_t;

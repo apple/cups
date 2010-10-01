@@ -969,11 +969,11 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	break;
 
     case HTTP_UNAUTHORIZED :
-	_cupsSetError(IPP_NOT_AUTHORIZED, httpStatus(status), 0);
+	_cupsSetError(IPP_NOT_AUTHENTICATED, httpStatus(status), 0);
 	break;
 
     case HTTP_AUTHORIZATION_CANCELED :
-	_cupsSetError(IPP_AUTHORIZATION_CANCELED, httpStatus(status), 0);
+	_cupsSetError(IPP_AUTHENTICATION_CANCELED, httpStatus(status), 0);
 	break;
 
     case HTTP_FORBIDDEN :

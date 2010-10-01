@@ -9,6 +9,9 @@ CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542, STR #3650)
 	- Localization fixes (STR #3635, STR #3636, STR #3647, STR #3666)
+	- The CUPS API incorrectly mapped the HTTP_UNAUTHORIZED status to the
+	  IPP_NOT_AUTHORIZED status code, when IPP_NOT_AUTHENTICATED would be
+	  the correct mapping (STR #3684)
 	- The scheduler would restart jobs while shutting down (STR #3679)
 	- Fixed a PPD loader bug that could cause a crash in cupsd (STR #3680)
 	- Improved the mapping of non-standard PPD and PWG names (STR #3671)
