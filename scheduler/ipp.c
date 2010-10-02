@@ -11401,6 +11401,7 @@ static void
 start_printer(cupsd_client_t  *con,	/* I - Client connection */
               ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  int			i;		/* Temporary variable */
   http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer data */
@@ -11450,6 +11451,21 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
                     printer->name, get_username(con));
 
   cupsdCheckJobs();
+
+ /*
+  * Check quotas...
+  */
+
+  if ((i = check_quotas(con, printer)) < 0)
+  {
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
+    return (NULL);
+  }
+  else if (i == 0)
+  {
+    send_ipp_status(con, IPP_NOT_AUTHORIZED, _("Not allowed to print."));
+    return (NULL);
+  }
 
  /*
   * Everything was ok, so return OK status...
