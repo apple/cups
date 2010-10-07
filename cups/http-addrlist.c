@@ -40,9 +40,12 @@ httpAddrConnect(
     http_addrlist_t *addrlist,		/* I - List of potential addresses */
     int             *sock)		/* O - Socket */
 {
-  int	val;				/* Socket option value */
+  int			val;		/* Socket option value */
+#ifdef __APPLE__
+  struct timeval	timeout;	/* Socket timeout value */
+#endif /* __APPLE__ */
 #ifdef DEBUG
-  char	temp[256];			/* Temporary address string */
+  char			temp[256];	/* Temporary address string */
 #endif /* DEBUG */
 
 
@@ -108,8 +111,9 @@ httpAddrConnect(
     * we block...
     */
 
-    val = 30;
-    setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &val, sizeof(val));
+    timeout.tv_sec  = 30;
+    timeout.tv_usec = 0;
+    setsockopt(*sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 #endif /* __APPLE__ */
 
    /*
