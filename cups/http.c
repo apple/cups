@@ -1353,11 +1353,10 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 	else if (WSAGetLastError() == WSAEWOULDBLOCK)
 	{
-	  if (!http->timeout_cb ||
-	      !(*http->timeout_cb)(http, http->timeout_data))
-	    break;
-	  else
+	  if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	    continue;
+
+	  http->error = WSAGetLastError();
 	}
 	else if (WSAGetLastError() != http->error)
 	{
@@ -1372,11 +1371,12 @@ httpGets(char   *line,			/* I - Line to read into */
 	  continue;
 	else if (errno == EWOULDBLOCK || errno == EAGAIN)
 	{
-	  if ((!http->timeout_cb && errno != EAGAIN) ||
-	      !(*http->timeout_cb)(http, http->timeout_data))
-	    break;
-	  else
+	  if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
 	    continue;
+	  else if (!http->timeout_cb && errno == EAGAIN)
+	    continue;
+
+	  http->error = errno;
 	}
 	else if (errno != http->error)
 	{
@@ -1959,8 +1959,12 @@ httpRead2(http_t *http,			/* I - Connection to server */
 #else
       if (errno == EWOULDBLOCK || errno == EAGAIN)
       {
-        if ((!http->timeout_cb && errno != EAGAIN) ||
-	    !(*http->timeout_cb)(http, http->timeout_data))
+        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+	else if (!http->timeout_cb && errno != EAGAIN)
 	{
 	  http->error = errno;
 	  return (-1);
@@ -2029,8 +2033,9 @@ httpRead2(http_t *http,			/* I - Connection to server */
     {
       if (errno == EWOULDBLOCK || errno == EAGAIN)
       {
-        if ((!http->timeout_cb && errno != EAGAIN) ||
-	    !(*http->timeout_cb)(http, http->timeout_data))
+        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	  break;
+        else if (!http->timeout_cb && errno != EAGAIN)
 	  break;
       }
       else if (errno != EINTR)
@@ -2059,7 +2064,7 @@ httpRead2(http_t *http,			/* I - Connection to server */
     else
       http->error = WSAGetLastError();
 #else
-    if (errno == EINTR || errno == EAGAIN)
+    if (errno == EINTR || (errno == EAGAIN && !http->timeout_cb))
       bytes = 0;
     else
       http->error = errno;
@@ -4270,10 +4275,10 @@ http_write(http_t     *http,		/* I - Connection to server */
         continue;
       else if (WSAGetLastError() == WSAEWOULDBLOCK)
       {
-        if (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-	else
+        if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
           continue;
+
+        http->error = WSAGetLastError();
       }
       else if (WSAGetLastError() != http->error &&
                WSAGetLastError() != WSAECONNRESET)
@@ -4281,19 +4286,18 @@ http_write(http_t     *http,		/* I - Connection to server */
         http->error = WSAGetLastError();
 	continue;
       }
-#else
-      fprintf(stderr, "http_write: Got %d (%s) on write of %d bytes.\n",
-              errno, strerror(errno), length);
 
+#else
       if (errno == EINTR)
         continue;
       else if (errno == EWOULDBLOCK || errno == EAGAIN)
       {
-        if ((!http->timeout_cb && errno != EAGAIN) ||
-	    !(*http->timeout_cb)(http, http->timeout_data))
-	  break;
-	else
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
           continue;
+        else if (!http->timeout_cb && errno == EAGAIN)
+	  continue;
+
+        http->error = errno;
       }
       else if (errno != http->error && errno != ECONNRESET)
       {
