@@ -11459,12 +11459,12 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
   if ((i = check_quotas(con, printer)) < 0)
   {
     send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
-    return (NULL);
+    return;
   }
   else if (i == 0)
   {
     send_ipp_status(con, IPP_NOT_AUTHORIZED, _("Not allowed to print."));
-    return (NULL);
+    return;
   }
 
  /*
