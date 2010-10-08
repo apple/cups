@@ -1014,6 +1014,10 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 	_cupsSetError(IPP_PKI_ERROR, httpStatus(status), 0);
         break;
 
+    case HTTP_ERROR :
+	_cupsSetError(IPP_INTERNAL_ERROR, httpStatus(status), 0);
+        break;
+
     default :
 	DEBUG_printf(("4_cupsSetHTTPError: HTTP error %d mapped to "
 	              "IPP_SERVICE_UNAVAILABLE!", status));
