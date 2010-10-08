@@ -2545,7 +2545,7 @@ _httpSetTimeout(
     http_t             *http,		/* I - Connection to server */
     double             timeout,		/* I - Number of seconds for timeout,
                                                must be greater than 0 */
-    _http_timeout_cb_t cb,		/* I - Callback function of NULL */
+    _http_timeout_cb_t cb,		/* I - Callback function or NULL */
     void               *user_data)	/* I - User data pointer */
 {
   if (!http || timeout <= 0.0)
