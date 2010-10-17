@@ -3068,7 +3068,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
       output_mode = _PWG_OUTPUT_MODE_COLOR;
 
     if ((attr = ippFindAttribute(job->attrs, "print-quality",
-				 IPP_TAG_INTEGER)) != NULL &&
+				 IPP_TAG_ENUM)) != NULL &&
 	attr->values[0].integer >= IPP_QUALITY_DRAFT &&
 	attr->values[0].integer <= IPP_QUALITY_HIGH)
       print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;
