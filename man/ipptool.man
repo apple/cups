@@ -11,7 +11,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "2 August 2010" "Apple Inc."
+.TH ipptool 1 "CUPS" "17 October 2010" "Apple Inc."
 .SH NAME
 ipptool - perform internet printing protocol requests
 .SH SYNOPSIS
@@ -68,7 +68,7 @@ Defines the named variable.
 Defines the default request filename for tests.
 .TP 5
 -i seconds
-Specifies that the (last) file should be repeated at the specified interval. This option is incompatible with the \fI-x\fR (XML plist output) option.
+Specifies that the (last) file should be repeated at the specified interval. This option is incompatible with the \fI-X\fR (XML plist output) option.
 .TP 5
 -l
 Specifies that plain text output is desired.
