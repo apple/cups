@@ -24,6 +24,7 @@ _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
 _httpResolveURI
+_httpSetTimeout
 _ippAddAttr
 _ippAttrString
 _ippFindOption
