@@ -3513,7 +3513,19 @@ get_cdsa_certificate(
       goto cleanup;
     }
 
+    CFRelease(search);
+    search = NULL;
+    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					       keychain, FALSE, &search)))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Cannot create identity search reference: %s (%d)",
+		      cssmErrorString(err), (int)err);
+      goto cleanup;
+    }
+
     err = SecIdentitySearchCopyNext(search, &identity);
+
   }
 
   if (err)
@@ -4477,11 +4489,21 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 		*argv[4],		/* Command-line arguments */
 		*envp[MAX_ENV + 1],	/* Environment variables */
 		keychain[1024],		/* Keychain argument */
-		infofile[1024];		/* Type-in information for cert */
+		infofile[1024],		/* Type-in information for cert */
+		localname[1024],	/* Local hostname */
+		*servername;		/* Name of server in cert */
   cups_file_t	*fp;			/* Seed/info file */
   int		infofd;			/* Info file descriptor */
 
 
+  if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
+  {
+    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
+    servername = localname;
+  }
+  else
+    servername = con->servername;
+	
  /*
   * Run the "certtool" command to generate a self-signed certificate...
   */
@@ -4509,7 +4531,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   }
 
   cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n",
-        	 con->servername, con->servername, ServerAdmin);
+        	 servername, servername, ServerAdmin);
   cupsFileClose(fp);
 
   cupsdLogMessage(CUPSD_LOG_INFO,
