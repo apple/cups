@@ -216,7 +216,7 @@ main(int  argc,				/* I - Number of command-line args */
 			filename[1024],	/* Real filename */
 			testname[1024];	/* Real test filename */
   const char		*testfile;	/* Test file to use */
-  int			interval,	/* Test interval */
+  int			interval,	/* Test interval in microseconds */
 			repeat;		/* Repeat count */
   _cups_vars_t		vars;		/* Variables */
   http_uri_status_t	uri_status;	/* URI separation status */
@@ -394,7 +394,16 @@ main(int  argc,				/* I - Number of command-line args */
 		usage();
               }
 	      else
-		interval = atoi(argv[i]);
+	      {
+		interval = (int)(_cupsStrScand(argv[i], NULL, localeconv()) *
+		                 1000000.0);
+		if (interval <= 0)
+		{
+		  _cupsLangPuts(stderr,
+				_("ipptool: Invalid seconds for \"-i\".\n"));
+		  usage();
+		}
+              }
 
               if (Output == _CUPS_OUTPUT_PLIST && interval)
 	      {
@@ -533,20 +542,20 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (Output == _CUPS_OUTPUT_PLIST)
     print_xml_trailer(!status, NULL);
-  else if (interval && repeat > 0)
+  else if (interval > 0 && repeat > 0)
   {
     while (repeat > 1)
     {
-      sleep(interval);
+      usleep(interval);
       do_tests(&vars, testfile);
       repeat --;
     }
   }
-  else if (interval)
+  else if (interval > 0)
   {
     for (;;)
     {
-      sleep(interval);
+      usleep(interval);
       do_tests(&vars, testfile);
     }
   }
@@ -1213,7 +1222,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         * Delay before operation...
 	*/
 
-        int delay;
+        double delay;
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1222,7 +1231,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 
-	if ((delay = atoi(token)) <= 0)
+	if ((delay = _cupsStrScand(token, NULL, localeconv())) <= 0.0)
 	{
 	  print_fatal_error("Bad DELAY value \"%s\" on line %d.", token,
 	                    linenum);
@@ -1232,9 +1241,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  if (Output == _CUPS_OUTPUT_TEST)
-	    printf("    [%d second delay]\n", delay);
+	    printf("    [%g second delay]\n", delay);
 
-	  sleep(delay);
+	  usleep((int)(1000000.0 * delay));
 	}
       }
       else if (!strcasecmp(token, "ATTR"))
