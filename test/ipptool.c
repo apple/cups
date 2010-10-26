@@ -4570,6 +4570,65 @@ with_value(char            *value,	/* I - Value string */
 	}
 	break;
 
+    case IPP_TAG_RANGE :
+        for (i = 0; i < attr->num_values; i ++)
+        {
+	  char	op,			/* Comparison operator */
+	  	*nextptr;		/* Next pointer */
+	  int	intvalue;		/* Integer value */
+
+
+          valptr = value;
+	  if (!strncmp(valptr, "no-value,", 9))
+	    valptr += 9;
+
+	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
+		 *valptr == '=' || *valptr == '>')
+	  {
+	    op = '=';
+	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    {
+	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
+		op = *valptr;
+	      valptr ++;
+	    }
+
+            if (!*valptr)
+	      break;
+
+	    intvalue = strtol(valptr, &nextptr, 0);
+	    if (nextptr == valptr)
+	      break;
+	    valptr = nextptr;
+
+	    switch (op)
+	    {
+	      case '=' :
+	          if (attr->values[i].range.upper == intvalue)
+		    return (1);
+		  break;
+	      case '<' :
+	          if (attr->values[i].range.upper < intvalue)
+		    return (1);
+		  break;
+	      case '>' :
+	          if (attr->values[i].range.upper > intvalue)
+		    return (1);
+		  break;
+	    }
+	  }
+        }
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%d-%d", attr->name,
+	                     attr->values[i].range.lower,
+	                     attr->values[i].range.upper);
+	}
+	break;
+
     case IPP_TAG_BOOLEAN :
 	for (i = 0; i < attr->num_values; i ++)
 	{
