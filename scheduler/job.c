@@ -294,6 +294,9 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!", 
+		      job->id);
+
       stop_job(job, CUPSD_JOB_FORCE);
       continue;
     }
@@ -2720,6 +2723,12 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
   cupsdDestroyProfile(job->profile);
   job->profile = NULL;
+
+ /*
+  * Clear the unresponsive job watchdog timer...
+  */
+
+  job->kill_time = 0;
 
  /*
   * Close pipes and status buffer...
