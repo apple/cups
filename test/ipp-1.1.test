@@ -226,7 +226,7 @@
 	EXPECT ipp-versions-supported OF-TYPE keyword IN-GROUP printer-attributes-tag WITH-VALUE 1.1
 	EXPECT natural-language-configured OF-TYPE naturalLanguage IN-GROUP printer-attributes-tag COUNT 1
 	EXPECT operations-supported OF-TYPE enum IN-GROUP printer-attributes-tag WITH-VALUE 0x0002 # Print-Job
-	# Not requiring 0x0004 Validate-Job since it is deprecated
+	EXPECT operations-supported WITH-VALUE 0x0004 # Validate-Job
 	EXPECT operations-supported WITH-VALUE 0x0008 # Cancel-Job
 	EXPECT operations-supported WITH-VALUE 0x0009 # Get-Job-Attributes
 	EXPECT operations-supported WITH-VALUE 0x000a # Get-Jobs
