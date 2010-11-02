@@ -16,29 +16,6 @@
  *
  * Contents:
  *
- *   cupsArrayAdd()       - Add an element to the array.
- *   cupsArrayClear()     - Clear the array.
- *   cupsArrayCount()     - Get the number of elements in the array.
- *   cupsArrayCurrent()   - Return the current element in the array.
- *   cupsArrayDelete()    - Free all memory used by the array.
- *   cupsArrayDup()       - Duplicate the array.
- *   cupsArrayFind()      - Find an element in the array.
- *   cupsArrayFirst()     - Get the first element in the array.
- *   cupsArrayGetIndex()  - Get the index of the current element.
- *   cupsArrayGetInsert() - Get the index of the last inserted element.
- *   cupsArrayIndex()     - Get the N-th element in the array.
- *   cupsArrayInsert()    - Insert an element in the array.
- *   cupsArrayLast()      - Get the last element in the array.
- *   cupsArrayNew()       - Create a new array.
- *   cupsArrayNext()      - Get the next element in the array.
- *   cupsArrayPrev()      - Get the previous element in the array.
- *   cupsArrayRemove()    - Remove an element from the array.
- *   cupsArrayRestore()   - Reset the current element to the last cupsArraySave.
- *   cupsArraySave()      - Mark the current element for a later
- *                          cupsArrayRestore.
- *   cupsArrayUserData()  - Return the user data for an array.
- *   cups_array_add()     - Insert or append an element to the array...
- *   cups_array_find()    - Find an element in the array...
  */
 
 /*
@@ -84,6 +61,8 @@ struct _cups_array_s			/**** CUPS array structure ****/
   cups_ahash_func_t	hashfunc;	/* Hash function */
   int			hashsize,	/* Size of hash */
 			*hash;		/* Hash array */
+  cups_acopy_func_t	copyfunc;	/* Copy function */
+  cups_afree_func_t	freefunc;	/* Free function */
 };
 
 
@@ -236,8 +215,21 @@ cupsArrayDelete(cups_array_t *a)	/* I - Array */
     return;
 
  /*
-  * Free the array of element pointers - the caller is responsible
-  * for freeing the elements themselves...
+  * Free the elements if we have a free function (otherwise the caller is
+  * responsible for doing the dirty work...)
+  */
+
+  if (a->freefunc)
+  {
+    int		i;			/* Looping var */
+    void	**e;			/* Current element */
+
+    for (i = a->num_elements, e = a->elements; i > 0; i --, e ++)
+      (a->freefunc)(*e, a->data);
+  }
+
+ /*
+  * Free the array of element pointers...
   */
 
   if (a->alloc_elements)
@@ -303,7 +295,26 @@ cupsArrayDup(cups_array_t *a)		/* I - Array */
     * Copy the element pointers...
     */
 
-    memcpy(da->elements, a->elements, a->num_elements * sizeof(void *));
+    if (a->copyfunc)
+    {
+     /*
+      * Use the copy function to make a copy of each element...
+      */
+
+      int	i;			/* Looping var */
+
+      for (i = 0; i < a->num_elements; i ++)
+	da->elements[i] = (a->copyfunc)(a->elements[i], a->data);
+    }
+    else
+    {
+     /*
+      * Just copy raw pointers...
+      */
+
+      memcpy(da->elements, a->elements, a->num_elements * sizeof(void *));
+    }
+
     da->num_elements   = a->num_elements;
     da->alloc_elements = a->num_elements;
   }
@@ -566,7 +577,7 @@ cups_array_t *				/* O - Array */
 cupsArrayNew(cups_array_func_t f,	/* I - Comparison function or @code NULL@ for an unsorted array */
              void              *d)	/* I - User data pointer or @code NULL@ */
 {
-  return (cupsArrayNew2(f, d, 0, 0));
+  return (cupsArrayNew3(f, d, 0, 0, 0, 0));
 }
 
 
@@ -589,6 +600,38 @@ cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
               void               *d,	/* I - User data or @code NULL@ */
               cups_ahash_func_t  h,	/* I - Hash function or @code NULL@ for unhashed lookups */
 	      int                hsize)	/* I - Hash size (>= 0) */
+{
+  return (cupsArrayNew3(f, d, h, hsize, 0, 0));
+}
+
+
+/*
+ * 'cupsArrayNew3()' - Create a new array with hash and/or free function.
+ *
+ * The comparison function ("f") is used to create a sorted array. The function
+ * receives pointers to two elements and the user data pointer ("d") - the user
+ * data pointer argument can safely be omitted when not required so functions
+ * like @code strcmp@ can be used for sorted string arrays.
+ *
+ * The hash function ("h") is used to implement cached lookups with the
+ * specified hash size ("hsize").
+ *
+ * The copy function ("cf") is used to automatically copy/retain elements when
+ * added or the array is copied.
+ *
+ * The free function ("cf") is used to automatically free/release elements when
+ * removed or the array is deleted.
+ *
+ * @since CUPS 1.5@
+ */
+
+cups_array_t *				/* O - Array */
+cupsArrayNew3(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ for an unsorted array */
+              void               *d,	/* I - User data or @code NULL@ */
+              cups_ahash_func_t  h,	/* I - Hash function or @code NULL@ for unhashed lookups */
+	      int                hsize,	/* I - Hash size (>= 0) */
+	      cups_acopy_func_t  cf,	/* I - Copy function */
+	      cups_afree_func_t  ff)	/* I - Free function */
 {
   cups_array_t	*a;			/* Array  */
 
@@ -622,6 +665,9 @@ cupsArrayNew2(cups_array_func_t  f,	/* I - Comparison function or @code NULL@ fo
 
     memset(a->hash, -1, hsize * sizeof(int));
   }
+
+  a->copyfunc = cf;
+  a->freefunc = ff;
 
   return (a);
 }
@@ -737,6 +783,9 @@ cupsArrayRemove(cups_array_t *a,	/* I - Array */
   */
 
   a->num_elements --;
+
+  if (a->freefunc)
+    (a->freefunc)(a->elements[current], a->data);
 
   if (current < a->num_elements)
     memmove(a->elements + current, a->elements + current + 1,
@@ -985,7 +1034,11 @@ cups_array_add(cups_array_t *a,		/* I - Array */
     DEBUG_printf(("9cups_array_add: append element at %d...", current));
 #endif /* DEBUG */
 
-  a->elements[current] = e;
+  if (a->copyfunc)
+    a->elements[current] = (a->copyfunc)(e, a->data);
+  else
+    a->elements[current] = e;
+
   a->num_elements ++;
   a->insert = current;
 

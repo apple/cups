@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-06-16
+CHANGES.txt - 2010-11-02
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added new cupsArrayNew3 API which offers memory management of array
+	  elements.
 	- Added several new color spaces to the CUPS raster format (STR #3419)
 	- The Validate-Job operation now uses the same policy as Print-Job by
 	  default. 
