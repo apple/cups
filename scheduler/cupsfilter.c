@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   CUPS filtering program for CUPS.
+ *   Filtering program for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.

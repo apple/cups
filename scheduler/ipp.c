@@ -7577,7 +7577,7 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
     * If we don't have any new events, nothing to do here...
     */
 
-    if (min_seq > (sub->first_event_id + sub->num_events))
+    if (min_seq > (sub->first_event_id + cupsArrayCount(sub->events)))
       continue;
 
    /*
@@ -7589,11 +7589,12 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
     else
       j = min_seq - sub->first_event_id;
 
-    for (; j < sub->num_events; j ++)
+    for (; j < cupsArrayCount(sub->events); j ++)
     {
       ippAddSeparator(con->response);
 
-      copy_attrs(con->response, sub->events[j]->attrs, NULL,
+      copy_attrs(con->response,
+                 ((cupsd_event_t *)cupsArrayIndex(sub->events, j))->attrs, NULL,
         	 IPP_TAG_EVENT_NOTIFICATION, 0);
     }
   }

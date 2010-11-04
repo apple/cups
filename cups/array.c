@@ -155,6 +155,19 @@ cupsArrayClear(cups_array_t *a)		/* I - Array */
     return;
 
  /*
+  * Free the existing elements as needed..
+  */
+
+  if (a->freefunc)
+  {
+    int		i;			/* Looping var */
+    void	**e;			/* Current element */
+
+    for (i = a->num_elements, e = a->elements; i > 0; i --, e ++)
+      (a->freefunc)(*e, a->data);
+  }
+
+ /*
   * Set the number of elements to 0; we don't actually free the memory
   * here - that is done in cupsArrayDelete()...
   */

@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
+ *   Printer definitions for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.

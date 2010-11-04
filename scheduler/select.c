@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Select abstraction functions for the Common UNIX Printing System (CUPS).
+ *   Select abstraction functions for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products.
