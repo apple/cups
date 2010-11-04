@@ -4396,8 +4396,8 @@ static int				/* O - 1 if OK, 0 if forbidden,
 check_quotas(cupsd_client_t  *con,	/* I - Client connection */
              cupsd_printer_t *p)	/* I - Printer or class */
 {
-  int		i;			/* Looping var */
-  char		username[33];		/* Username */
+  char		username[33],		/* Username */
+		*name;			/* Current user name */
   cupsd_quota_t	*q;			/* Quota data */
 #ifdef HAVE_MBR_UID_TO_UUID
  /*
@@ -4464,10 +4464,10 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Check against users...
   */
 
-  if (p->num_users == 0 && p->k_limit == 0 && p->page_limit == 0)
+  if (cupsArrayCount(p->users) == 0 && p->k_limit == 0 && p->page_limit == 0)
     return (1);
 
-  if (p->num_users)
+  if (cupsArrayCount(p->users))
   {
 #ifdef HAVE_MBR_UID_TO_UUID
    /*
@@ -4498,21 +4498,22 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     endpwent();
 #endif /* HAVE_MBR_UID_TO_UUID */
 
-    for (i = 0; i < p->num_users; i ++)
-      if (p->users[i][0] == '@')
+    for (name = (char *)cupsArrayFirst(p->users);
+         name;
+	 name = (char *)cupsArrayNext(p->users))
+      if (name[0] == '@')
       {
        /*
         * Check group membership...
 	*/
 
 #ifdef HAVE_MBR_UID_TO_UUID
-        if (p->users[i][1] == '#')
+        if (name[1] == '#')
 	{
-	  if (uuid_parse((char *)p->users[i] + 2, grp_uuid))
+	  if (uuid_parse(name + 2, grp_uuid))
 	    uuid_clear(grp_uuid);
 	}
-	else if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
-	                                           grp_uuid)) != 0)
+	else if ((mbr_err = mbr_group_name_to_uuid(name + 1, grp_uuid)) != 0)
 	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4521,10 +4522,10 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "check_quotas: UUID lookup failed for ACL entry "
-			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+			  "\"%s\" (err=%d)", name, mbr_err);
 	  cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Access control entry \"%s\" not a valid group name; "
-			  "entry ignored", p->users[i]);
+			  "entry ignored", name);
 	}
 
 	if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
@@ -4536,7 +4537,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 			  "check_quotas: group \"%s\" membership check "
-			  "failed (err=%d)", p->users[i] + 1, mbr_err);
+			  "failed (err=%d)", name + 1, mbr_err);
 	  is_member = 0;
 	}
 
@@ -4548,20 +4549,19 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	  break;
 
 #else
-        if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+        if (cupsdCheckGroup(username, pw, name + 1))
 	  break;
 #endif /* HAVE_MBR_UID_TO_UUID */
       }
 #ifdef HAVE_MBR_UID_TO_UUID
       else
       {
-        if (p->users[i][0] == '#')
+        if (name[0] == '#')
 	{
-	  if (uuid_parse((char *)p->users[i] + 1, usr2_uuid))
+	  if (uuid_parse(name + 1, usr2_uuid))
 	    uuid_clear(usr2_uuid);
         }
-        else if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
-					          usr2_uuid)) != 0)
+        else if ((mbr_err = mbr_user_name_to_uuid(name, usr2_uuid)) != 0)
     	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4570,21 +4570,21 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
           cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "check_quotas: UUID lookup failed for ACL entry "
-			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+			  "\"%s\" (err=%d)", name, mbr_err);
           cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Access control entry \"%s\" not a valid user name; "
-			  "entry ignored", p->users[i]);
+			  "entry ignored", name);
 	}
 
 	if (!uuid_compare(usr_uuid, usr2_uuid))
 	  break;
       }
 #else
-      else if (!strcasecmp(username, p->users[i]))
+      else if (!strcasecmp(username, name))
 	break;
 #endif /* HAVE_MBR_UID_TO_UUID */
 
-    if ((i < p->num_users) == p->deny_users)
+    if ((name != NULL) == p->deny_users)
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Denying user \"%s\" access to printer \"%s\"...",
@@ -11650,13 +11650,13 @@ static int				/* O - 0 if not allowed, 1 if allowed */
 user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
              const char      *username)	/* I - Username */
 {
-  int		i;			/* Looping var */
   struct passwd	*pw;			/* User password data */
   char		baseuser[256],		/* Base username */
-		*baseptr;		/* Pointer to "@" in base username */
+		*baseptr,		/* Pointer to "@" in base username */
+		*name;			/* Current user name */
 
 
-  if (p->num_users == 0)
+  if (cupsArrayCount(p->users) == 0)
     return (1);
 
   if (!strcmp(username, "root"))
@@ -11679,31 +11679,33 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
   pw = getpwnam(username);
   endpwent();
 
-  for (i = 0; i < p->num_users; i ++)
+  for (name = (char *)cupsArrayFirst(p->users);
+       name;
+       name = (char *)cupsArrayNext(p->users))
   {
-    if (p->users[i][0] == '@')
+    if (name[0] == '@')
     {
      /*
       * Check group membership...
       */
 
-      if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+      if (cupsdCheckGroup(username, pw, name + 1))
         break;
     }
-    else if (p->users[i][0] == '#')
+    else if (name[0] == '#')
     {
      /*
       * Check UUID...
       */
 
-      if (cupsdCheckGroup(username, pw, p->users[i]))
+      if (cupsdCheckGroup(username, pw, name))
         break;
     }
-    else if (!strcasecmp(username, p->users[i]))
+    else if (!strcasecmp(username, name))
       break;
   }
 
-  return ((i < p->num_users) != p->deny_users);
+  return ((name != NULL) != p->deny_users);
 }
 
 

@@ -4,7 +4,7 @@
  *   Policy definitions for the Common UNIX Printing System (CUPS)
  *   scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -22,7 +22,11 @@
 typedef struct
 {
   char			*name;		/* Policy name */
-  cups_array_t		*ops;		/* Operations */
+  cups_array_t		*job_access,	/* Private users/groups for jobs */
+			*job_attrs,	/* Private attributes for jobs */
+			*sub_access,	/* Private users/groups for subscriptions */
+			*sub_attrs,	/* Private attributes for subscriptions */
+			*ops;		/* Operations */
 } cupsd_policy_t;
 
 

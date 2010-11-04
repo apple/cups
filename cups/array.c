@@ -16,6 +16,32 @@
  *
  * Contents:
  *
+ *   cupsArrayAdd()       - Add an element to the array.
+ *   cupsArrayClear()     - Clear the array.
+ *   cupsArrayCount()     - Get the number of elements in the array.
+ *   cupsArrayCurrent()   - Return the current element in the array.
+ *   cupsArrayDelete()    - Free all memory used by the array.
+ *   cupsArrayDup()       - Duplicate the array.
+ *   cupsArrayFind()      - Find an element in the array.
+ *   cupsArrayFirst()     - Get the first element in the array.
+ *   cupsArrayGetIndex()  - Get the index of the current element.
+ *   cupsArrayGetInsert() - Get the index of the last inserted element.
+ *   cupsArrayIndex()     - Get the N-th element in the array.
+ *   cupsArrayInsert()    - Insert an element in the array.
+ *   cupsArrayLast()      - Get the last element in the array.
+ *   cupsArrayNew()       - Create a new array.
+ *   cupsArrayNew2()      - Create a new array with hash.
+ *   cupsArrayNew3()      - Create a new array with hash and/or free function.
+ *   cupsArrayNext()      - Get the next element in the array.
+ *   cupsArrayPrev()      - Get the previous element in the array.
+ *   cupsArrayRemove()    - Remove an element from the array.
+ *   cupsArrayRestore()   - Reset the current element to the last @link
+ *                          cupsArraySave@.
+ *   cupsArraySave()      - Mark the current element for a later @link
+ *                          cupsArrayRestore@.
+ *   cupsArrayUserData()  - Return the user data for an array.
+ *   cups_array_add()     - Insert or append an element to the array...
+ *   cups_array_find()    - Find an element in the array...
  */
 
 /*
@@ -1035,7 +1061,13 @@ cups_array_add(cups_array_t *a,		/* I - Array */
 #endif /* DEBUG */
 
   if (a->copyfunc)
-    a->elements[current] = (a->copyfunc)(e, a->data);
+  {
+    if ((a->elements[current] = (a->copyfunc)(e, a->data)) == NULL)
+    {
+      DEBUG_puts("8cups_array_add: Copy function returned NULL, returning 0");
+      return (0);
+    }
+  }
   else
     a->elements[current] = e;
 

@@ -62,7 +62,7 @@ typedef struct
 
 typedef struct
 {
-  cupsd_authmask_t	from;		/* Source address/name mask */
+  cups_array_t		*from;		/* Source address/name mask(s) */
   http_addr_t		to;		/* Destination address */
 } cupsd_dirsvc_relay_t;
 

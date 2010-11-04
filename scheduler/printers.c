@@ -250,25 +250,16 @@ cupsdAddPrinterUser(
     cupsd_printer_t *p,			/* I - Printer */
     const char      *username)		/* I - User */
 {
-  const char	**temp;			/* Temporary array pointer */
-
-
   if (!p || !username)
     return;
 
-  if (p->num_users == 0)
-    temp = malloc(sizeof(char **));
-  else
-    temp = realloc(p->users, sizeof(char **) * (p->num_users + 1));
+  if (!p->users)
+    p->users = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
+                             (cups_ahash_func_t)NULL, 0,
+			     (cups_acopy_func_t)_cupsStrAlloc,
+			     (cups_afree_func_t)_cupsStrFree);
 
-  if (!temp)
-    return;
-
-  p->users = temp;
-  temp     += p->num_users;
-
-  if ((*temp = strdup(username)) != NULL)
-    p->num_users ++;
+  cupsArrayAdd(p->users, (char *)username);
 }
 
 
@@ -1015,19 +1006,11 @@ void
 cupsdFreePrinterUsers(
     cupsd_printer_t *p)			/* I - Printer */
 {
-  int	i;				/* Looping var */
-
-
-  if (!p || !p->num_users)
+  if (!p)
     return;
 
-  for (i = 0; i < p->num_users; i ++)
-    free((void *)p->users[i]);
-
-  free(p->users);
-
-  p->num_users = 0;
-  p->users     = NULL;
+  cupsArrayDelete(p->users);
+  p->users = NULL;
 }
 
 
@@ -1583,7 +1566,8 @@ cupsdSaveAllPrinters(void)
   char			temp[1024],	/* Temporary string */
 			backup[1024],	/* printers.conf.O file */
 			value[2048],	/* Value string */
-			*ptr;		/* Pointer into value */
+			*ptr,		/* Pointer into value */
+			*name;		/* Current user/group name */
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
@@ -1756,9 +1740,10 @@ cupsdSaveAllPrinters(void)
     cupsFilePrintf(fp, "PageLimit %d\n", printer->page_limit);
     cupsFilePrintf(fp, "KLimit %d\n", printer->k_limit);
 
-    for (i = 0; i < printer->num_users; i ++)
-      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser",
-                      printer->users[i]);
+    for (name = (char *)cupsArrayFirst(printer->users);
+         name;
+	 name = (char *)cupsArrayNext(printer->users))
+      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser", name);
 
     if (printer->op_policy)
       cupsFilePutConf(fp, "OpPolicy", printer->op_policy);
@@ -2263,7 +2248,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ipp_t		*oldattrs;		/* Old printer attributes */
   ipp_attribute_t *attr;		/* Attribute data */
   cups_option_t	*option;		/* Current printer option */
-  char		*filter;		/* Current filter */
+  char		*name,			/* Current user/group name */
+		*filter;		/* Current filter */
   static const char * const air_none[] =
 		{			/* No authentication */
 		  "none"
@@ -2366,16 +2352,21 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info ? p->info : "");
 
-  if (p->num_users)
+  if (cupsArrayCount(p->users) > 0)
   {
     if (p->deny_users)
-      ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                    "requesting-user-name-denied", p->num_users, NULL,
-		    p->users);
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                           "requesting-user-name-denied",
+			   cupsArrayCount(p->users), NULL, NULL);
     else
-      ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
-                    "requesting-user-name-allowed", p->num_users, NULL,
-		    p->users);
+      attr = ippAddStrings(p->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME,
+                           "requesting-user-name-allowed",
+			   cupsArrayCount(p->users), NULL, NULL);
+
+    for (i = 0, name = (char *)cupsArrayFirst(p->users);
+         name;
+	 i ++, name = (char *)cupsArrayNext(p->users))
+      attr->values[i].string.text = _cupsStrRetain(name);
   }
 
   ippAddInteger(p->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,

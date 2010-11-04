@@ -462,8 +462,7 @@ cupsdReadConfiguration(void)
   if (NumRelays > 0)
   {
     for (i = 0; i < NumRelays; i ++)
-      if (Relays[i].from.type == CUPSD_AUTH_NAME)
-	free(Relays[i].from.mask.name.name);
+      cupsArrayDelete(Relays[i].from);
 
     free(Relays);
 
@@ -1888,9 +1887,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	*/
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, zeros, zeros);
+	  cupsdAddIPMask(&(loc->allow), zeros, zeros);
 	else
-	  cupsdDenyIP(loc, zeros, zeros);
+	  cupsdAddIPMask(&(loc->deny), zeros, zeros);
       }
       else if (!strcasecmp(value, "none"))
       {
@@ -1899,9 +1898,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	*/
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, ones, zeros);
+	  cupsdAddIPMask(&(loc->allow), ones, zeros);
 	else
-	  cupsdDenyIP(loc, ones, zeros);
+	  cupsdAddIPMask(&(loc->deny), ones, zeros);
       }
 #ifdef AF_INET6
       else if (value[0] == '*' || value[0] == '.' ||
@@ -1918,9 +1917,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	  value ++;
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowHost(loc, value);
+	  cupsdAddNameMask(&(loc->allow), value);
 	else
-	  cupsdDenyHost(loc, value);
+	  cupsdAddNameMask(&(loc->deny), value);
       }
       else
       {
@@ -1936,9 +1935,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	}
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, ip, mask);
+	  cupsdAddIPMask(&(loc->allow), ip, mask);
 	else
-	  cupsdDenyIP(loc, ip, mask);
+	  cupsdAddIPMask(&(loc->deny), ip, mask);
       }
 
      /*
@@ -2407,8 +2406,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 					/* Line from file */
 			temp[HTTP_MAX_BUFFER],
 					/* Temporary buffer for value */
-			temp2[HTTP_MAX_BUFFER],
-					/* Temporary buffer 2 for value */
 			*ptr,		/* Pointer into line/temp */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
@@ -2704,7 +2701,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       if ((location = cupsdFindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
-        location = cupsdAddLocation("CUPS_INTERNAL_BROWSE_ACL");
+        if ((location = cupsdNewLocation("CUPS_INTERNAL_BROWSE_ACL")) != NULL)
+	  cupsdAddLocation(location);
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2752,35 +2750,43 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       if ((location = cupsdFindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
-        location = cupsdAddLocation("CUPS_INTERNAL_BROWSE_ACL");
+        if ((location = cupsdNewLocation("CUPS_INTERNAL_BROWSE_ACL")) != NULL)
+	  cupsdAddLocation(location);
+
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unable to initialize browse access control list!");
       else
       {
+	if (!strncasecmp(value, "from", 4))
+	{
+	 /*
+	  * Skip leading "from"...
+	  */
+
+	  value += 4;
+	}
+
 	while (*value)
 	{
-	  if (!strncasecmp(value, "from", 4))
-	  {
-	   /*
-	    * Strip leading "from"...
-	    */
+	 /*
+	  * Skip leading whitespace...
+	  */
 
-	    value += 4;
+	  while (isspace(*value & 255))
+	    value ++;
 
-	    while (isspace(*value & 255))
-	      value ++;
-
-	    if (!*value)
-	      break;
-	  }
+	  if (!*value)
+	    break;
 
 	 /*
 	  * Find the end of the value...
 	  */
 
-	  for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+	  for (valueptr = value;
+	       *valueptr && !isspace(*valueptr & 255);
+	       valueptr ++);
 
 	  while (isspace(*valueptr & 255))
 	    *valueptr++ = '\0';
@@ -2808,9 +2814,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    */
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, zeros, zeros);
+	      cupsdAddIPMask(&(location->allow), zeros, zeros);
 	    else
-	      cupsdDenyIP(location, zeros, zeros);
+	      cupsdAddIPMask(&(location->deny), zeros, zeros);
 	  }
 	  else if (!strcasecmp(value, "none"))
 	  {
@@ -2819,28 +2825,26 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    */
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, ones, zeros);
+	      cupsdAddIPMask(&(location->allow), ones, zeros);
 	    else
-	      cupsdDenyIP(location, ones, zeros);
+	      cupsdAddIPMask(&(location->deny), ones, zeros);
 	  }
 #ifdef AF_INET6
 	  else if (value[0] == '*' || value[0] == '.' ||
 		   (!isdigit(value[0] & 255) && value[0] != '['))
 #else
-	  else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+	  else if (value[0] == '*' || value[0] == '.' ||
+	           !isdigit(value[0] & 255))
 #endif /* AF_INET6 */
 	  {
 	   /*
 	    * Host or domain name...
 	    */
 
-	    if (value[0] == '*')
-	      value ++;
-
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowHost(location, value);
+	      cupsdAddNameMask(&(location->allow), value);
 	    else
-	      cupsdDenyHost(location, value);
+	      cupsdAddNameMask(&(location->deny), value);
 	  }
 	  else
 	  {
@@ -2856,9 +2860,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    }
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, ip, mask);
+	      cupsdAddIPMask(&(location->allow), ip, mask);
 	    else
-	      cupsdDenyIP(location, ip, mask);
+	      cupsdAddIPMask(&(location->deny), ip, mask);
 	  }
 
 	 /*
@@ -2896,14 +2900,29 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (!strncasecmp(value, "from ", 5))
       {
        /*
-        * Strip leading "from"...
+	* Skip leading "from"...
 	*/
 
 	value += 5;
 
+       /*
+        * Skip leading whitespace...
+	*/
+
 	while (isspace(*value))
 	  value ++;
       }
+
+     /*
+      * Find the end of the from value...
+      */
+
+      for (valueptr = value;
+	   *valueptr && !isspace(*valueptr & 255);
+	   valueptr ++);
+
+      while (isspace(*valueptr & 255))
+	*valueptr++ = '\0';
 
      /*
       * Figure out what form the from address takes:
@@ -2930,24 +2949,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Host or domain name...
 	*/
 
-	if (value[0] == '*')
-	  value ++;
-
-        strlcpy(temp, value, sizeof(temp));
-	if ((ptr = strchr(temp, ' ')) != NULL)
-	  *ptr = '\0';
-
-        relay->from.type = CUPSD_AUTH_NAME;
-
-	if ((relay->from.mask.name.name = strdup(temp)) == NULL)
+        if (!cupsdAddNameMask(&(relay->from), value))
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 			  "Unable to allocate BrowseRelay name at line %d - %s.",
 			  linenum, strerror(errno));
 	  continue;
 	}
-
-	relay->from.mask.name.length = strlen(temp);
       }
       else
       {
@@ -2962,41 +2970,32 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  break;
 	}
 
-        relay->from.type = CUPSD_AUTH_IP;
-	memcpy(relay->from.mask.ip.address, ip,
-	       sizeof(relay->from.mask.ip.address));
-	memcpy(relay->from.mask.ip.netmask, mask,
-	       sizeof(relay->from.mask.ip.netmask));
-      }
-
-     /*
-      * Skip value and trailing whitespace...
-      */
-
-      for (; *value; value ++)
-	if (isspace(*value))
-	  break;
-
-      while (isspace(*value))
-        value ++;
-
-      if (!strncasecmp(value, "to ", 3))
-      {
-       /*
-        * Strip leading "to"...
-	*/
-
-	value += 3;
-
-	while (isspace(*value))
-	  value ++;
+        if (!cupsdAddIPMask(&(relay->from), ip, mask))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to allocate BrowseRelay IP at line %d - %s.",
+			  linenum, strerror(errno));
+	  continue;
+	}
       }
 
      /*
       * Get "to" address and port...
       */
 
-      if ((addrlist = get_address(value, BrowsePort)) != NULL)
+      if (!strncasecmp(valueptr, "to ", 3))
+      {
+       /*
+        * Strip leading "to"...
+	*/
+
+	valueptr += 3;
+
+	while (isspace(*valueptr))
+	  valueptr ++;
+      }
+
+      if ((addrlist = get_address(valueptr, BrowsePort)) != NULL)
       {
        /*
         * Only IPv4 addresses are supported...
@@ -3012,37 +3011,29 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	  httpAddrString(&(relay->to), temp, sizeof(temp));
 
-	  if (relay->from.type == CUPSD_AUTH_IP)
-	    snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
-		     relay->from.mask.ip.address[0] >> 24,
-		     (relay->from.mask.ip.address[0] >> 16) & 255,
-		     (relay->from.mask.ip.address[0] >> 8) & 255,
-		     relay->from.mask.ip.address[0] & 255,
-		     relay->from.mask.ip.netmask[0] >> 24,
-		     (relay->from.mask.ip.netmask[0] >> 16) & 255,
-		     (relay->from.mask.ip.netmask[0] >> 8) & 255,
-		     relay->from.mask.ip.netmask[0] & 255);
-	  else
-	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
-
 	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-			  temp2, temp, ntohs(relay->to.ipv4.sin_port));
+			  value, temp, ntohs(relay->to.ipv4.sin_port));
 
 	  NumRelays ++;
 	}
 	else
+	{
+	  cupsArrayDelete(relay->from);
+	  relay->from = NULL;
+
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad relay address %s at line %d.",
-	                  value, linenum);
+	                  valueptr, linenum);
+	}
 
 	httpAddrFreeList(addrlist);
       }
       else
       {
-        if (relay->from.type == CUPSD_AUTH_NAME)
-	  free(relay->from.mask.name.name);
+	cupsArrayDelete(relay->from);
+	relay->from = NULL;
 
         cupsdLogMessage(CUPSD_LOG_ERROR, "Bad relay address %s at line %d.",
-	                value, linenum);
+	                valueptr, linenum);
       }
     }
     else if (!strcasecmp(line, "BrowsePoll") && value)
@@ -3563,8 +3554,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 			*valptr;	/* Pointer into value */
 
 
-  if ((parent = cupsdAddLocation(location)) == NULL)
+  if ((parent = cupsdNewLocation(location)) == NULL)
     return (0);
+
+  cupsdAddLocation(parent);
 
   parent->limit = CUPSD_AUTH_LIMIT_ALL;
   loc           = parent;
@@ -3589,8 +3582,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	  continue;
       }
 
-      if ((loc = cupsdCopyLocation(&parent)) == NULL)
+      if ((loc = cupsdCopyLocation(parent)) == NULL)
         return (0);
+
+      cupsdAddLocation(loc);
 
       loc->limit = 0;
       while (*value)

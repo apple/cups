@@ -3,7 +3,7 @@
  *
  *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -83,7 +83,7 @@ typedef struct cupsd_printer_s
   cups_array_t	*quotas;		/* Quota records */
   int		deny_users,		/* 1 = deny, 0 = allow */
 		num_users;		/* Number of allowed/denied users */
-  const char	**users;		/* Allowed/denied users */
+  cups_array_t	*users;			/* Allowed/denied users */
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */

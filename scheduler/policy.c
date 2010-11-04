@@ -36,6 +36,7 @@
 
 static int	compare_ops(cupsd_location_t *a, cupsd_location_t *b);
 static int	compare_policies(cupsd_policy_t *a, cupsd_policy_t *b);
+static void	free_policy(cupsd_policy_t *p);
 static int	hash_op(cupsd_location_t *op);
 
 
@@ -53,7 +54,10 @@ cupsdAddPolicy(const char *policy)	/* I - Name of policy */
     return (NULL);
 
   if (!Policies)
-    Policies = cupsArrayNew((cups_array_func_t)compare_policies, NULL);
+    Policies = cupsArrayNew3((cups_array_func_t)compare_policies, NULL,
+			     (cups_ahash_func_t)NULL, 0,
+			     (cups_acopy_func_t)NULL,
+			     (cups_afree_func_t)free_policy);
 
   if (!Policies)
     return (NULL);
@@ -77,9 +81,7 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
                  cupsd_location_t *po,	/* I - Policy operation to copy */
                  ipp_op_t         op)	/* I - IPP operation code */
 {
-  int			i;		/* Looping var */
   cupsd_location_t	*temp;		/* New policy operation */
-  char			name[1024];	/* Interface name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
@@ -89,72 +91,20 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
     return (NULL);
 
   if (!p->ops)
-    p->ops = cupsArrayNew2((cups_array_func_t)compare_ops, NULL,
-                           (cups_ahash_func_t)hash_op, 128);
+    p->ops = cupsArrayNew3((cups_array_func_t)compare_ops, NULL,
+                           (cups_ahash_func_t)hash_op, 128,
+			   (cups_acopy_func_t)NULL,
+			   (cups_afree_func_t)cupsdFreeLocation);
 
   if (!p->ops)
     return (NULL);
 
-  if ((temp = calloc(1, sizeof(cupsd_location_t))) != NULL)
+  if ((temp = cupsdCopyLocation(po)) != NULL)
   {
     temp->op    = op;
     temp->limit = CUPSD_AUTH_LIMIT_IPP;
 
     cupsArrayAdd(p->ops, temp);
-
-    if (po)
-    {
-     /*
-      * Copy the specified policy to the new one...
-      */
-
-      temp->order_type = po->order_type;
-      temp->type       = po->type;
-      temp->level      = po->level;
-      temp->satisfy    = po->satisfy;
-      temp->encryption = po->encryption;
-
-      for (i = 0; i < po->num_names; i ++)
-        cupsdAddName(temp, po->names[i]);
-
-      for (i = 0; i < po->num_allow; i ++)
-        switch (po->allow[i].type)
-	{
-	  case CUPSD_AUTH_IP :
-	      cupsdAllowIP(temp, po->allow[i].mask.ip.address,
-	                   po->allow[i].mask.ip.netmask);
-	      break;
-
-          case CUPSD_AUTH_INTERFACE :
-	      snprintf(name, sizeof(name), "@IF(%s)",
-	               po->allow[i].mask.name.name);
-              cupsdAllowHost(temp, name);
-	      break;
-
-          default :
-              cupsdAllowHost(temp, po->allow[i].mask.name.name);
-	      break;
-        }
-
-      for (i = 0; i < po->num_deny; i ++)
-        switch (po->deny[i].type)
-	{
-	  case CUPSD_AUTH_IP :
-	      cupsdDenyIP(temp, po->deny[i].mask.ip.address,
-	                  po->deny[i].mask.ip.netmask);
-	      break;
-
-          case CUPSD_AUTH_INTERFACE :
-	      snprintf(name, sizeof(name), "@IF(%s)",
-	               po->deny[i].mask.name.name);
-              cupsdDenyHost(temp, name);
-	      break;
-
-          default :
-              cupsdDenyHost(temp, po->deny[i].mask.name.name);
-	      break;
-        }
-    }
   }
 
   return (temp);
@@ -211,8 +161,6 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 void
 cupsdDeleteAllPolicies(void)
 {
-  cupsd_policy_t	*p;		/* Current policy */
-  cupsd_location_t	*po;		/* Current policy op */
   cupsd_printer_t	*printer;	/* Current printer */
 
 
@@ -228,23 +176,11 @@ cupsdDeleteAllPolicies(void)
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
     printer->op_policy_ptr = NULL;
 
+  DefaultPolicyPtr = NULL;
+
  /*
   * Then free all of the policies...
   */
-
-  for (p = (cupsd_policy_t *)cupsArrayFirst(Policies);
-       p;
-       p = (cupsd_policy_t *)cupsArrayNext(Policies))
-  {
-    for (po = (cupsd_location_t *)cupsArrayFirst(p->ops);
-         po;
-	 po = (cupsd_location_t *)cupsArrayNext(p->ops))
-      cupsdDeleteLocation(po);
-
-    cupsArrayDelete(p->ops);
-    cupsdClearString(&p->name);
-    free(p);
-  }
 
   cupsArrayDelete(Policies);
 
@@ -347,6 +283,19 @@ compare_policies(cupsd_policy_t *a,	/* I - First policy */
                  cupsd_policy_t *b)	/* I - Second policy */
 {
   return (strcasecmp(a->name, b->name));
+}
+
+
+/*
+ * 'free_policy()' - Free the memory used by a policy.
+ */
+
+static void
+free_policy(cupsd_policy_t *p)		/* I - Policy to free */
+{
+  cupsArrayDelete(p->ops);
+  cupsdClearString(&p->name);
+  free(p);
 }
 
 

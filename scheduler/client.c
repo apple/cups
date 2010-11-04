@@ -2545,26 +2545,27 @@ cupsdSendHeader(
       * parameter as needed...
       */
 
-      int 	i;			/* Looping var */
-      char	*auth_key;		/* Auth key buffer */
+      char	*name,			/* Current user name */
+		*auth_key;		/* Auth key buffer */
       size_t	auth_size;		/* Size of remaining buffer */
 
       auth_key  = auth_str + strlen(auth_str);
       auth_size = sizeof(auth_str) - (auth_key - auth_str);
 
-      for (i = 0; i < con->best->num_names; i ++)
+      for (name = (char *)cupsArrayFirst(con->best->names);
+           name;
+	   name = (char *)cupsArrayNext(con->best->names))
       {
 #ifdef HAVE_AUTHORIZATION_H
-	if (!strncasecmp(con->best->names[i], "@AUTHKEY(", 9))
+	if (!strncasecmp(name, "@AUTHKEY(", 9))
 	{
-	  snprintf(auth_key, auth_size, ", authkey=\"%s\"",
-	           con->best->names[i] + 9);
+	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", name + 9);
 	  /* end parenthesis is stripped in conf.c */
 	  break;
         }
 	else
 #endif /* HAVE_AUTHORIZATION_H */
-	if (!strcasecmp(con->best->names[i], "@SYSTEM"))
+	if (!strcasecmp(name, "@SYSTEM"))
 	{
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
