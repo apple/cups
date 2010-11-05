@@ -1185,11 +1185,17 @@ main(int  argc,				/* I - Number of command-line args */
  * 'cupsdAddString()' - Copy and add a string to an array.
  */
 
-void
-cupsdAddString(cups_array_t *a,		/* I - String array */
-               const char   *s)		/* I - String to copy and add */
+int					/* O  - 1 on success, 0 on failure */
+cupsdAddString(cups_array_t **a,	/* IO - String array */
+               const char   *s)		/* I  - String to copy and add */
 {
-  cupsArrayAdd(a, _cupsStrAlloc(s));
+  if (!*a)
+    *a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
+		       (cups_ahash_func_t)NULL, 0,
+		       (cups_acopy_func_t)_cupsStrAlloc,
+		       (cups_afree_func_t)_cupsStrFree);
+
+  return (cupsArrayAdd(*a, (char *)s));
 }
 
 
@@ -1253,15 +1259,13 @@ cupsdClosePipe(int *fds)		/* I - Pipe file descriptors (2) */
  */
 
 void
-cupsdFreeStrings(cups_array_t *a)	/* I - String array */
+cupsdFreeStrings(cups_array_t **a)	/* IO - String array */
 {
-  char	*s;				/* Current string */
-
-
-  for (s = (char *)cupsArrayFirst(a); s; s = (char *)cupsArrayNext(a))
-    _cupsStrFree(s);
-
-  cupsArrayDelete(a);
+  if (*a)
+  {
+    cupsArrayDelete(*a);
+    *a = NULL;
+  }
 }
 
 

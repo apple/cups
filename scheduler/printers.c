@@ -16,13 +16,11 @@
  *
  *   cupsdAddPrinter()          - Add a printer to the system.
  *   cupsdAddPrinterHistory()   - Add the current printer state to the history.
- *   cupsdAddPrinterUser()      - Add a user to the ACL.
  *   cupsdCreateCommonData()    - Create the common printer data.
  *   cupsdDeleteAllPrinters()   - Delete all printers from the system.
  *   cupsdDeletePrinter()       - Delete a printer from the system.
  *   cupsdFindDest()            - Find a destination in the list.
  *   cupsdFindPrinter()         - Find a printer in the list.
- *   cupsdFreePrinterUsers()    - Free allow/deny users.
  *   cupsdLoadAllPrinters()     - Load printers from the printers.conf file.
  *   cupsdRenamePrinter()       - Rename a printer.
  *   cupsdSaveAllPrinters()     - Save all printer definitions to the
@@ -238,28 +236,6 @@ cupsdAddPrinterHistory(
 
   p->history[p->num_history] = history;
   p->num_history ++;
-}
-
-
-/*
- * 'cupsdAddPrinterUser()' - Add a user to the ACL.
- */
-
-void
-cupsdAddPrinterUser(
-    cupsd_printer_t *p,			/* I - Printer */
-    const char      *username)		/* I - User */
-{
-  if (!p || !username)
-    return;
-
-  if (!p->users)
-    p->users = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
-                             (cups_ahash_func_t)NULL, 0,
-			     (cups_acopy_func_t)_cupsStrAlloc,
-			     (cups_afree_func_t)_cupsStrFree);
-
-  cupsArrayAdd(p->users, (char *)username);
 }
 
 
@@ -922,7 +898,7 @@ cupsdDeletePrinter(
   delete_string_array(&(p->filters));
   delete_string_array(&(p->pre_filters));
 
-  cupsdFreePrinterUsers(p);
+  cupsdFreeStrings(&(p->users));
   cupsdFreeQuotas(p);
 
   cupsdClearString(&p->uri);
@@ -995,22 +971,6 @@ cupsdFindPrinter(const char *name)	/* I - Name of printer to find */
     return (NULL);
   else
     return (p);
-}
-
-
-/*
- * 'cupsdFreePrinterUsers()' - Free allow/deny users.
- */
-
-void
-cupsdFreePrinterUsers(
-    cupsd_printer_t *p)			/* I - Printer */
-{
-  if (!p)
-    return;
-
-  cupsArrayDelete(p->users);
-  p->users = NULL;
 }
 
 
@@ -1382,7 +1342,7 @@ cupsdLoadAllPrinters(void)
       if (value)
       {
         p->deny_users = 0;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -1393,7 +1353,7 @@ cupsdLoadAllPrinters(void)
       if (value)
       {
         p->deny_users = 1;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,

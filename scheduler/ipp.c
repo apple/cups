@@ -11199,7 +11199,7 @@ set_printer_defaults(
     }
     else if (!strcmp(attr->name, "requesting-user-name-allowed"))
     {
-      cupsdFreePrinterUsers(printer);
+      cupsdFreeStrings(&(printer->users));
 
       printer->deny_users = 0;
 
@@ -11208,12 +11208,12 @@ set_printer_defaults(
 	   strcmp(attr->values[0].string.text, "all")))
       {
 	for (i = 0; i < attr->num_values; i ++)
-	  cupsdAddPrinterUser(printer, attr->values[i].string.text);
+	  cupsdAddString(&(printer->users), attr->values[i].string.text);
       }
     }
     else if (!strcmp(attr->name, "requesting-user-name-denied"))
     {
-      cupsdFreePrinterUsers(printer);
+      cupsdFreeStrings(&(printer->users));
 
       printer->deny_users = 1;
 
@@ -11222,7 +11222,7 @@ set_printer_defaults(
 	   strcmp(attr->values[0].string.text, "none")))
       {
 	for (i = 0; i < attr->num_values; i ++)
-	  cupsdAddPrinterUser(printer, attr->values[i].string.text);
+	  cupsdAddString(&(printer->users), attr->values[i].string.text);
       }
     }
     else if (!strcmp(attr->name, "job-quota-period"))

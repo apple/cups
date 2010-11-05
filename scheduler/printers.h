@@ -139,8 +139,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
-extern void		cupsdAddPrinterUser(cupsd_printer_t *p,
-			                    const char *username);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern int		cupsdDeletePrinter(cupsd_printer_t *p, int update);
@@ -148,7 +146,6 @@ extern cupsd_printer_t	*cupsdFindDest(const char *name);
 extern cupsd_printer_t	*cupsdFindPrinter(const char *name);
 extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p,
 			                const char *username);
-extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
 extern void		cupsdRenamePrinter(cupsd_printer_t *p,
