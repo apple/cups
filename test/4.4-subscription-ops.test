@@ -16,6 +16,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
 
         GROUP subscription
 	ATTR uri notify-recipient-uri testnotify://
@@ -48,6 +49,7 @@
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
 	ATTR integer notify-subscription-id $notify-subscription-id
+	ATTR name requesting-user-name $user
 
 	# What statuses are OK?
 	STATUS client-error-not-found
@@ -69,6 +71,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
 
         GROUP subscription
 	ATTR uri notify-recipient-uri testnotify://
@@ -102,6 +105,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
 
 	# What statuses are OK?
 	STATUS successful-ok
@@ -129,6 +133,7 @@
 	ATTR charset attributes-charset utf-8
 	ATTR language attributes-natural-language en
 	ATTR uri printer-uri $scheme://$hostname:$port/printers/Test1
+	ATTR name requesting-user-name $user
 
         GROUP subscription
 	ATTR uri notify-recipient-uri testnotify://

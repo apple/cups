@@ -38,7 +38,7 @@ typedef struct
 
 typedef struct cupsd_job_s cupsd_job_t;
 
-typedef struct cupsd_printer_s
+struct cupsd_printer_s
 {
   char		*uri,			/* Printer URI */
 		*hostname,		/* Host printer resides on */
@@ -81,8 +81,7 @@ typedef struct cupsd_printer_s
 		page_limit,		/* Maximum number of pages */
 		k_limit;		/* Maximum number of kilobytes */
   cups_array_t	*quotas;		/* Quota records */
-  int		deny_users,		/* 1 = deny, 0 = allow */
-		num_users;		/* Number of allowed/denied users */
+  int		deny_users;		/* 1 = deny, 0 = allow */
   cups_array_t	*users;			/* Allowed/denied users */
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
@@ -109,7 +108,7 @@ typedef struct cupsd_printer_s
   DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp,_cups */
 		printer_ref;		/* Reference for _printer._tcp */
 #endif /* HAVE_DNSSD */
-} cupsd_printer_t;
+};
 
 
 /*

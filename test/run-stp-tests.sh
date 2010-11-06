@@ -736,10 +736,10 @@ fi
 
 # Warning log messages
 count=`grep '^W ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
-if test $count != 0; then
-	echo "FAIL: $count warning messages, expected 0."
+if test $count != 9; then
+	echo "FAIL: $count warning messages, expected 9."
 	grep '^W ' /tmp/cups-$user/log/error_log
-	echo "<P>FAIL: $count warning messages, expected 0.</P>" >>$strfile
+	echo "<P>FAIL: $count warning messages, expected 9.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
 	grep '^W ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile

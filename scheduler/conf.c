@@ -29,6 +29,7 @@
  *   read_configuration()     - Read a configuration file.
  *   read_location()          - Read a <Location path> definition.
  *   read_policy()            - Read a <Policy name> definition.
+ *   set_policy_defaults()    - Set default policy values as needed.
  */
 
 /*
@@ -209,6 +210,7 @@ static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
 static int		read_location(cups_file_t *fp, char *name, int linenum);
 static int		read_policy(cups_file_t *fp, char *name, int linenum);
+static void		set_policy_defaults(cupsd_policy_t *pol);
 
 
 /*
@@ -1165,6 +1167,27 @@ cupsdReadConfiguration(void)
       DefaultPolicyPtr = p = cupsdAddPolicy("default");
 
       cupsdLogMessage(CUPSD_LOG_INFO, "<Policy default>");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "JobPrivateAccess default");
+      cupsdAddString(&(p->job_access), "@OWNER");
+      cupsdAddString(&(p->job_access), "@SYSTEM");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "JobPrivateValues default");
+      cupsdAddString(&(p->job_attrs), "job-name");
+      cupsdAddString(&(p->job_attrs), "job-originating-host-name");
+      cupsdAddString(&(p->job_attrs), "job-originating-user-name");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateAccess default");
+      cupsdAddString(&(p->sub_access), "@OWNER");
+      cupsdAddString(&(p->sub_access), "@SYSTEM");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateValues default");
+      cupsdAddString(&(p->job_attrs), "notify-events");
+      cupsdAddString(&(p->job_attrs), "notify-pull-method");
+      cupsdAddString(&(p->job_attrs), "notify-recipient-uri");
+      cupsdAddString(&(p->job_attrs), "notify-subscriber-user-name");
+      cupsdAddString(&(p->job_attrs), "notify-user-data");
+
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "<Limit Create-Job Print-Job Print-URI Validate-Job>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1184,7 +1207,7 @@ cupsdReadConfiguration(void)
 		      "Set-Job-Attributes Create-Job-Subscription "
 		      "Renew-Subscription Cancel-Subscription "
 		      "Get-Notifications Reprocess-Job Cancel-Current-Job "
-		      "Suspend-Current-Job Resume-Job Cancel-Jobs "
+		      "Suspend-Current-Job Resume-Job "
 		      "Cancel-My-Jobs Close-Job CUPS-Move-Job "
 		      "CUPS-Authenticate-Job CUPS-Get-Document>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1212,7 +1235,6 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
-      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOBS);
       cupsdAddPolicyOp(p, po, IPP_CANCEL_MY_JOBS);
       cupsdAddPolicyOp(p, po, IPP_CLOSE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
@@ -1228,7 +1250,7 @@ cupsdReadConfiguration(void)
 		      "Hold-New-Jobs Release-Held-New-Jobs "
 		      "Deactivate-Printer Activate-Printer Restart-Printer "
 		      "Shutdown-Printer Startup-Printer Promote-Job "
-		      "Schedule-Job-After CUPS-Add-Printer "
+		      "Schedule-Job-After Cancel-Jobs CUPS-Add-Printer "
 		      "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
 		      "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1256,6 +1278,7 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_STARTUP_PRINTER);
       cupsdAddPolicyOp(p, po, IPP_PROMOTE_JOB);
       cupsdAddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOBS);
       cupsdAddPolicyOp(p, po, CUPS_ADD_PRINTER);
       cupsdAddPolicyOp(p, po, CUPS_DELETE_PRINTER);
       cupsdAddPolicyOp(p, po, CUPS_ADD_CLASS);
@@ -3689,106 +3712,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                "Missing </Limit> before </Policy> on line %d!",
 	                linenum);
 
-     /*
-      * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
-      * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
-      * upgrades do not introduce new security issues...
-      */
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Validate-Job using the Print-Job limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Validate-Job defined in policy %s "
-			  "- using Print-Job's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOB)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Cancel-Jobs using the Cancel-Job limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Cancel-Jobs defined in policy %s "
-			  "- using Cancel-Job's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
-	  * a template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Cancel-My-Jobs defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Close-Job using the Send-Document limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Close-Job defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for CUPS-Get-Document using the Send-Document
-	  * limit as a template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for CUPS-Get-Document defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
-	}
-      }
+      set_policy_defaults(pol);
 
       return (linenum);
     }
@@ -3869,6 +3793,109 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = NULL;
     }
+    else if (!strcasecmp(line, "JobPrivateAccess") ||
+	     !strcasecmp(line, "JobPrivateValues") ||
+	     !strcasecmp(line, "SubscriptionPrivateAccess") ||
+	     !strcasecmp(line, "SubscriptionPrivateValues"))
+    {
+      if (op)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "%s directive must appear outside <Limit>...</Limit> "
+			"on line %d.", line, linenum);
+	if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
+      }
+      else
+      {
+       /*
+        * Pull out whitespace-delimited values...
+	*/
+
+	while (*value)
+	{
+	 /*
+	  * Find the end of the current value...
+	  */
+
+	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	  if (*valptr)
+	    *valptr++ = '\0';
+
+         /*
+	  * Save it appropriately...
+	  */
+
+	  if (!strcasecmp(line, "JobPrivateAccess"))
+	  {
+	   /*
+	    * JobPrivateAccess {all|default|user/group list|@@ACL}
+	    */
+
+            if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->job_access), "@OWNER");
+	      cupsdAddString(&(pol->job_access), "@SYSTEM");
+	    }
+	    else
+	      cupsdAddString(&(pol->job_access), value);
+	  }
+	  else if (!strcasecmp(line, "JobPrivateValues"))
+	  {
+	   /*
+	    * JobPrivateValues {all|none|default|attribute list}
+	    */
+
+	    if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->job_attrs), "job-name");
+	      cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
+	      cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+	    }
+	    else
+	      cupsdAddString(&(pol->job_attrs), value);
+	  }
+	  else if (!strcasecmp(line, "SubscriptionPrivateAccess"))
+	  {
+	   /*
+	    * SubscriptionPrivateAccess {all|default|user/group list|@@ACL}
+	    */
+
+            if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->sub_access), "@OWNER");
+	      cupsdAddString(&(pol->sub_access), "@SYSTEM");
+	    }
+	    else
+	      cupsdAddString(&(pol->sub_access), value);
+	  }
+	  else /* if (!strcasecmp(line, "SubscriptionPrivateValues")) */
+	  {
+	   /*
+	    * SubscriptionPrivateValues {all|none|default|attribute list}
+	    */
+
+	    if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->sub_attrs), "notify-events");
+	      cupsdAddString(&(pol->sub_attrs), "notify-pull-method");
+	      cupsdAddString(&(pol->sub_attrs), "notify-recipient-uri");
+	      cupsdAddString(&(pol->sub_attrs), "notify-subscriber-user-name");
+	      cupsdAddString(&(pol->sub_attrs), "notify-user-data");
+	    }
+	    else
+	      cupsdAddString(&(pol->sub_attrs), value);
+	  }
+
+	 /*
+	  * Find the next string on the line...
+	  */
+
+	  for (value = valptr; isspace(*value & 255); value ++);
+	}
+      }
+    }
     else if (!op)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3898,6 +3925,184 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
                   linenum, policy);
 
   return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
+}
+
+
+/*
+ * 'set_policy_defaults()' - Set default policy values as needed.
+ */
+
+static void
+set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
+{
+  cupsd_location_t	*op;		/* Policy operation */
+
+
+ /*
+  * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
+  * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
+  * upgrades do not introduce new security issues...
+  */
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Validate-Job using the Print-Job limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Validate-Job defined in policy %s "
+		      "- using Print-Job's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Validate-Job defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_PAUSE_PRINTER)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Cancel-Jobs using the Pause-Printer limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-Jobs defined in policy %s "
+		      "- using Pause-Printer's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-Jobs defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
+      * a template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-My-Jobs defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-My-Jobs defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Close-Job using the Send-Document limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Close-Job defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Close-Job defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for CUPS-Get-Document using the Send-Document
+      * limit as a template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for CUPS-Get-Document defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for CUPS-Get-Document defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+ /*
+  * Verify we have JobPrivateAccess, JobPrivateValues,
+  * SubscriptionPrivateAccess, and SubscriptionPrivateValues in the policy.
+  */
+
+  if (!pol->job_access)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No JobPrivateAccess defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->job_access), "@OWNER");
+    cupsdAddString(&(pol->job_access), "@SYSTEM");
+  }
+
+  if (!pol->job_attrs)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No JobPrivateValues defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->job_attrs), "job-name");
+    cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
+    cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+  }
+
+  if (!pol->sub_access)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No SubscriptionPrivateAccess defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->sub_access), "@OWNER");
+    cupsdAddString(&(pol->sub_access), "@SYSTEM");
+  }
+
+  if (!pol->sub_attrs)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No SubscriptionPrivateValues defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->sub_attrs), "notify-events");
+    cupsdAddString(&(pol->sub_attrs), "notify-pull-method");
+    cupsdAddString(&(pol->sub_attrs), "notify-recipient-uri");
+    cupsdAddString(&(pol->sub_attrs), "notify-subscriber-user-name");
+    cupsdAddString(&(pol->sub_attrs), "notify-user-data");
+  }
 }
 
 

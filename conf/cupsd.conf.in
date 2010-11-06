@@ -45,6 +45,12 @@ DefaultAuthType Basic
 
 # Set the default printer/job policies...
 <Policy default>
+  # Job/subscription privacy...
+  JobPrivateAccess default
+  JobPrivateValues default
+  SubscriptionPrivateAccess default
+  SubscriptionPrivateAccess default
+
   # Job-related operations must be done by the owner or an administrator...
   <Limit Create-Job Print-Job Print-URI Validate-Job>
     Order deny,allow
@@ -63,14 +69,14 @@ DefaultAuthType Basic
   </Limit>
 
   # All printer operations require a printer operator to authenticate...
-  <Limit Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Accept-Jobs CUPS-Reject-Jobs>
+  <Limit Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After Cancel-Jobs CUPS-Accept-Jobs CUPS-Reject-Jobs>
     AuthType Default
     Require user @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow
   </Limit>
 
   # Only the owner or an administrator can cancel or authenticate a job...
-  <Limit Cancel-Job Cancel-Jobs CUPS-Authenticate-Job>
+  <Limit Cancel-Job CUPS-Authenticate-Job>
     Require user @OWNER @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow
   </Limit>
@@ -82,6 +88,12 @@ DefaultAuthType Basic
 
 # Set the authenticated printer/job policies...
 <Policy authenticated>
+  # Job/subscription privacy...
+  JobPrivateAccess default
+  JobPrivateValues default
+  SubscriptionPrivateAccess default
+  SubscriptionPrivateAccess default
+
   # Job-related operations must be done by the owner or an administrator...
   <Limit Create-Job Print-Job Print-URI Validate-Job>
     AuthType Default
@@ -102,14 +114,14 @@ DefaultAuthType Basic
   </Limit>
 
   # All printer operations require a printer operator to authenticate...
-  <Limit Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After CUPS-Accept-Jobs CUPS-Reject-Jobs>
+  <Limit Pause-Printer Resume-Printer Enable-Printer Disable-Printer Pause-Printer-After-Current-Job Hold-New-Jobs Release-Held-New-Jobs Deactivate-Printer Activate-Printer Restart-Printer Shutdown-Printer Startup-Printer Promote-Job Schedule-Job-After Cancel-Jobs CUPS-Accept-Jobs CUPS-Reject-Jobs>
     AuthType Default
     Require user @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow
   </Limit>
 
   # Only the owner or an administrator can cancel or authenticate a job...
-  <Limit Cancel-Job Cancel-Jobs CUPS-Authenticate-Job>
+  <Limit Cancel-Job CUPS-Authenticate-Job>
     AuthType Default
     Require user @OWNER @CUPS_DEFAULT_PRINTOPERATOR_AUTH@
     Order deny,allow
