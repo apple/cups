@@ -1,7 +1,7 @@
 /*
  * "$Id: dirsvc.c 7933 2008-09-11 00:44:58Z mike $"
  *
- *   Directory services routines for the Common UNIX Printing System (CUPS).
+ *   Directory services routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -634,7 +634,7 @@ cupsdLoadRemoteCache(void)
       if (value)
       {
         p->deny_users = 0;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -645,7 +645,7 @@ cupsdLoadRemoteCache(void)
       if (value)
       {
         p->deny_users = 1;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -728,7 +728,8 @@ cupsdSaveRemoteCache(void)
   int			i;		/* Looping var */
   cups_file_t		*fp;		/* printers.conf file */
   char			temp[1024],	/* Temporary string */
-			value[2048];	/* Value string */
+			value[2048],	/* Value string */
+			*name;		/* Current user name */
   cupsd_printer_t	*printer;	/* Current printer class */
   time_t		curtime;	/* Current time */
   struct tm		*curdate;	/* Current date */
@@ -829,9 +830,10 @@ cupsdSaveRemoteCache(void)
              printer->job_sheets[1]);
     cupsFilePutConf(fp, "JobSheets", value);
 
-    for (i = 0; i < printer->num_users; i ++)
-      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser",
-                      printer->users[i]);
+    for (name = (char *)cupsArrayFirst(printer->users);
+	 name;
+	 name = (char *)cupsArrayNext(printer->users))
+      cupsFilePutConf(fp, printer->deny_users ? "DenyUser" : "AllowUser", name);
 
     for (i = printer->num_options, option = printer->options;
          i > 0;
@@ -5194,24 +5196,20 @@ update_cups_browse(void)
 	case CUPSD_AUTH_ALLOW : /* Order Deny,Allow */
             auth = CUPSD_AUTH_ALLOW;
 
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
+            if (cupsdCheckAuth(address, srcname, len, BrowseACL->deny))
 	      auth = CUPSD_AUTH_DENY;
 
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
+            if (cupsdCheckAuth(address, srcname, len, BrowseACL->allow))
 	      auth = CUPSD_AUTH_ALLOW;
 	    break;
 
 	case CUPSD_AUTH_DENY : /* Order Allow,Deny */
             auth = CUPSD_AUTH_DENY;
 
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_allow, BrowseACL->allow))
+            if (cupsdCheckAuth(address, srcname, len, BrowseACL->allow))
 	      auth = CUPSD_AUTH_ALLOW;
 
-            if (cupsdCheckAuth(address, srcname, len,
-	        	  BrowseACL->num_deny, BrowseACL->deny))
+            if (cupsdCheckAuth(address, srcname, len, BrowseACL->deny))
 	      auth = CUPSD_AUTH_DENY;
 	    break;
       }
@@ -5323,7 +5321,7 @@ update_cups_browse(void)
   */
 
   for (i = 0; i < NumRelays; i ++)
-    if (cupsdCheckAuth(address, srcname, len, 1, &(Relays[i].from)))
+    if (cupsdCheckAuth(address, srcname, len, Relays[i].from))
       if (sendto(BrowseSocket, packet, bytes, 0,
                  (struct sockaddr *)&(Relays[i].to),
 		 httpAddrLength(&(Relays[i].to))) <= 0)

@@ -1,9 +1,9 @@
 /*
  * "$Id: policy.c 7673 2008-06-18 22:31:26Z mike $"
  *
- *   Policy routines for the Common UNIX Printing System (CUPS).
+ *   Policy routines for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,13 +14,19 @@
  *
  * Contents:
  *
- *   cupsdAddPolicy()         - Add a policy to the system.
+ *   AddPolicy()              - Add a policy to the system.
  *   cupsdAddPolicyOp()       - Add an operation to a policy.
- *   cupsdCheckPolicy()       - Check the IPP operation and username against
- *                              a policy.
+ *   cupsdCheckPolicy()       - Check the IPP operation and username against a
+ *                              policy.
  *   cupsdDeleteAllPolicies() - Delete all policies in memory.
  *   cupsdFindPolicy()        - Find a named policy.
  *   cupsdFindPolicyOp()      - Find a policy operation.
+ *   cupsdGetPrivateAttrs()   - Get the private attributes for the current
+ *                              request.
+ *   compare_ops()            - Compare two operations.
+ *   compare_policies()       - Compare two policies.
+ *   free_policy()            - Free the memory used by a policy.
+ *   hash_op()                - Generate a lookup hash for the operation.
  */
 
 /*
@@ -28,6 +34,7 @@
  */
 
 #include "cupsd.h"
+#include <pwd.h>
 
 
 /*
@@ -36,6 +43,7 @@
 
 static int	compare_ops(cupsd_location_t *a, cupsd_location_t *b);
 static int	compare_policies(cupsd_policy_t *a, cupsd_policy_t *b);
+static void	free_policy(cupsd_policy_t *p);
 static int	hash_op(cupsd_location_t *op);
 
 
@@ -53,7 +61,10 @@ cupsdAddPolicy(const char *policy)	/* I - Name of policy */
     return (NULL);
 
   if (!Policies)
-    Policies = cupsArrayNew((cups_array_func_t)compare_policies, NULL);
+    Policies = cupsArrayNew3((cups_array_func_t)compare_policies, NULL,
+			     (cups_ahash_func_t)NULL, 0,
+			     (cups_acopy_func_t)NULL,
+			     (cups_afree_func_t)free_policy);
 
   if (!Policies)
     return (NULL);
@@ -77,9 +88,7 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
                  cupsd_location_t *po,	/* I - Policy operation to copy */
                  ipp_op_t         op)	/* I - IPP operation code */
 {
-  int			i;		/* Looping var */
   cupsd_location_t	*temp;		/* New policy operation */
-  char			name[1024];	/* Interface name */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddPolicyOp(p=%p, po=%p, op=%x(%s))",
@@ -89,72 +98,20 @@ cupsdAddPolicyOp(cupsd_policy_t   *p,	/* I - Policy */
     return (NULL);
 
   if (!p->ops)
-    p->ops = cupsArrayNew2((cups_array_func_t)compare_ops, NULL,
-                           (cups_ahash_func_t)hash_op, 128);
+    p->ops = cupsArrayNew3((cups_array_func_t)compare_ops, NULL,
+                           (cups_ahash_func_t)hash_op, 128,
+			   (cups_acopy_func_t)NULL,
+			   (cups_afree_func_t)cupsdFreeLocation);
 
   if (!p->ops)
     return (NULL);
 
-  if ((temp = calloc(1, sizeof(cupsd_location_t))) != NULL)
+  if ((temp = cupsdCopyLocation(po)) != NULL)
   {
     temp->op    = op;
     temp->limit = CUPSD_AUTH_LIMIT_IPP;
 
     cupsArrayAdd(p->ops, temp);
-
-    if (po)
-    {
-     /*
-      * Copy the specified policy to the new one...
-      */
-
-      temp->order_type = po->order_type;
-      temp->type       = po->type;
-      temp->level      = po->level;
-      temp->satisfy    = po->satisfy;
-      temp->encryption = po->encryption;
-
-      for (i = 0; i < po->num_names; i ++)
-        cupsdAddName(temp, po->names[i]);
-
-      for (i = 0; i < po->num_allow; i ++)
-        switch (po->allow[i].type)
-	{
-	  case CUPSD_AUTH_IP :
-	      cupsdAllowIP(temp, po->allow[i].mask.ip.address,
-	                   po->allow[i].mask.ip.netmask);
-	      break;
-
-          case CUPSD_AUTH_INTERFACE :
-	      snprintf(name, sizeof(name), "@IF(%s)",
-	               po->allow[i].mask.name.name);
-              cupsdAllowHost(temp, name);
-	      break;
-
-          default :
-              cupsdAllowHost(temp, po->allow[i].mask.name.name);
-	      break;
-        }
-
-      for (i = 0; i < po->num_deny; i ++)
-        switch (po->deny[i].type)
-	{
-	  case CUPSD_AUTH_IP :
-	      cupsdDenyIP(temp, po->deny[i].mask.ip.address,
-	                  po->deny[i].mask.ip.netmask);
-	      break;
-
-          case CUPSD_AUTH_INTERFACE :
-	      snprintf(name, sizeof(name), "@IF(%s)",
-	               po->deny[i].mask.name.name);
-              cupsdDenyHost(temp, name);
-	      break;
-
-          default :
-              cupsdDenyHost(temp, po->deny[i].mask.name.name);
-	      break;
-        }
-    }
   }
 
   return (temp);
@@ -211,8 +168,6 @@ cupsdCheckPolicy(cupsd_policy_t *p,	/* I - Policy */
 void
 cupsdDeleteAllPolicies(void)
 {
-  cupsd_policy_t	*p;		/* Current policy */
-  cupsd_location_t	*po;		/* Current policy op */
   cupsd_printer_t	*printer;	/* Current printer */
 
 
@@ -228,23 +183,11 @@ cupsdDeleteAllPolicies(void)
        printer = (cupsd_printer_t *)cupsArrayNext(Printers))
     printer->op_policy_ptr = NULL;
 
+  DefaultPolicyPtr = NULL;
+
  /*
   * Then free all of the policies...
   */
-
-  for (p = (cupsd_policy_t *)cupsArrayFirst(Policies);
-       p;
-       p = (cupsd_policy_t *)cupsArrayNext(Policies))
-  {
-    for (po = (cupsd_location_t *)cupsArrayFirst(p->ops);
-         po;
-	 po = (cupsd_location_t *)cupsArrayNext(p->ops))
-      cupsdDeleteLocation(po);
-
-    cupsArrayDelete(p->ops);
-    cupsdClearString(&p->name);
-    free(p);
-  }
 
   cupsArrayDelete(Policies);
 
@@ -327,6 +270,197 @@ cupsdFindPolicyOp(cupsd_policy_t *p,	/* I - Policy */
 
 
 /*
+ * 'cupsdGetPrivateAttrs()' - Get the private attributes for the current
+ *                            request.
+ */
+
+cups_array_t *				/* O - Array or NULL for no restrictions */
+cupsdGetPrivateAttrs(
+    cupsd_policy_t  *policy,		/* I - Policy */
+    cupsd_client_t  *con,		/* I - Client connection */
+    cupsd_printer_t *printer,		/* I - Printer, if any */
+    const char      *owner)		/* I - Owner of object */
+{
+  char		*name;			/* Current name in access list */
+  cups_array_t	*access_ptr,		/* Access array */
+		*attrs_ptr;		/* Attributes array */
+  const char	*username;		/* Username associated with request */
+  ipp_attribute_t *attr;		/* Attribute from request */
+  struct passwd	*pw;			/* User info */
+
+
+#ifdef DEBUG
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdGetPrivateAttrs(policy=%p(%s), con=%p(%d), "
+		  "printer=%p(%s), owner=\"%s\")", policy, policy->name, con,
+		  con->http.fd, printer, printer ? printer->name : "", owner);
+#endif /* DEBUG */
+
+ /*
+  * Get the access and attributes lists that correspond to the request...
+  */
+
+#ifdef DEBUG
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: %s",
+                  ippOpString(con->request->request.op.operation_id));
+#endif /* DEBUG */
+
+  switch (con->request->request.op.operation_id)
+  {
+    case IPP_GET_SUBSCRIPTIONS :
+    case IPP_GET_SUBSCRIPTION_ATTRIBUTES :
+    case IPP_GET_NOTIFICATIONS :
+        access_ptr = policy->sub_access;
+	attrs_ptr  = policy->sub_attrs;
+	break;
+
+    default :
+        access_ptr = policy->job_access;
+	attrs_ptr  = policy->job_attrs;
+        break;
+  }
+
+ /*
+  * If none of the attributes are private, return NULL now...
+  */
+
+  if ((name = (char *)cupsArrayFirst(attrs_ptr)) != NULL &&
+      !strcasecmp(name, "none"))
+  {
+#ifdef DEBUG
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: Returning NULL.");
+#endif /* DEBUG */
+
+    return (NULL);
+  }
+
+ /*
+  * Otherwise check the user against the access list...
+  */
+
+  if (con->username[0])
+    username = con->username;
+  else if ((attr = ippFindAttribute(con->request, "requesting-user-name",
+                                    IPP_TAG_NAME)) != NULL)
+    username = attr->values[0].string.text;
+  else
+    username = "anonymous";
+
+  if (username[0])
+  {
+    pw = getpwnam(username);
+    endpwent();
+  }
+  else
+    pw = NULL;
+
+#ifdef DEBUG
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: username=\"%s\"",
+                  username);
+#endif /* DEBUG */
+
+ /*
+  * Otherwise check the user against the access list...
+  */
+
+  for (name = (char *)cupsArrayFirst(access_ptr);
+       name;
+       name = (char *)cupsArrayNext(access_ptr))
+  {
+#ifdef DEBUG
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: name=%s", name);
+#endif /* DEBUG */
+
+    if (printer && !strcasecmp(name, "@ACL"))
+    {
+      char	*acl;			/* Current ACL user/group */
+
+      for (acl = (char *)cupsArrayFirst(printer->users);
+	   acl;
+	   acl = (char *)cupsArrayNext(printer->users))
+      {
+	if (acl[0] == '@')
+	{
+	 /*
+	  * Check group membership...
+	  */
+
+	  if (cupsdCheckGroup(username, pw, acl + 1))
+	    break;
+	}
+	else if (acl[0] == '#')
+	{
+	 /*
+	  * Check UUID...
+	  */
+
+	  if (cupsdCheckGroup(username, pw, acl))
+	    break;
+	}
+	else if (!strcasecmp(username, acl))
+	  break;
+      }
+    }
+    else if (owner && !strcasecmp(name, "@OWNER") &&
+             !strcasecmp(username, owner))
+    {
+#ifdef DEBUG
+      cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		      "cupsdGetPrivateAttrs: Returning NULL.");
+#endif /* DEBUG */
+
+      return (NULL);
+    }
+    else if (!strcasecmp(name, "@SYSTEM"))
+    {
+      int i;				/* Looping var */
+
+      for (i = 0; i < NumSystemGroups; i ++)
+	if (cupsdCheckGroup(username, pw, SystemGroups[i]))
+	{
+#ifdef DEBUG
+	  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "cupsdGetPrivateAttrs: Returning NULL.");
+#endif /* DEBUG */
+
+	  return (NULL);
+	}
+    }
+    else if (name[0] == '@')
+    {
+      if (cupsdCheckGroup(username, pw, name + 1))
+      {
+#ifdef DEBUG
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                "cupsdGetPrivateAttrs: Returning NULL.");
+#endif /* DEBUG */
+
+	return (NULL);
+      }
+    }
+    else if (!strcasecmp(username, name))
+    {
+#ifdef DEBUG
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: Returning NULL.");
+#endif /* DEBUG */
+
+      return (NULL);
+    }
+  }
+
+ /*
+  * No direct access, so return private attributes list...
+  */
+
+#ifdef DEBUG
+  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdGetPrivateAttrs: Returning list.");
+#endif /* DEBUG */
+
+  return (attrs_ptr);
+}
+
+
+/*
  * 'compare_ops()' - Compare two operations.
  */
 
@@ -347,6 +481,23 @@ compare_policies(cupsd_policy_t *a,	/* I - First policy */
                  cupsd_policy_t *b)	/* I - Second policy */
 {
   return (strcasecmp(a->name, b->name));
+}
+
+
+/*
+ * 'free_policy()' - Free the memory used by a policy.
+ */
+
+static void
+free_policy(cupsd_policy_t *p)		/* I - Policy to free */
+{
+  cupsArrayDelete(p->job_access);
+  cupsArrayDelete(p->job_attrs);
+  cupsArrayDelete(p->sub_access);
+  cupsArrayDelete(p->sub_attrs);
+  cupsArrayDelete(p->ops);
+  cupsdClearString(&p->name);
+  free(p);
 }
 
 

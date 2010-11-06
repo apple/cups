@@ -294,6 +294,9 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!", 
+		      job->id);
+
       stop_job(job, CUPSD_JOB_FORCE);
       continue;
     }
@@ -2722,6 +2725,12 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
   job->profile = NULL;
 
  /*
+  * Clear the unresponsive job watchdog timer...
+  */
+
+  job->kill_time = 0;
+
+ /*
   * Close pipes and status buffer...
   */
 
@@ -3068,7 +3077,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
       output_mode = _PWG_OUTPUT_MODE_COLOR;
 
     if ((attr = ippFindAttribute(job->attrs, "print-quality",
-				 IPP_TAG_INTEGER)) != NULL &&
+				 IPP_TAG_ENUM)) != NULL &&
 	attr->values[0].integer >= IPP_QUALITY_DRAFT &&
 	attr->values[0].integer <= IPP_QUALITY_HIGH)
       print_quality = attr->values[0].integer - IPP_QUALITY_DRAFT;

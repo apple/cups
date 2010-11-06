@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsd.conf 5 "CUPS" "28 January 2010" "Apple Inc."
+.TH cupsd.conf 5 "CUPS" "5 November 2010" "Apple Inc."
 .SH NAME
 cupsd.conf \- server configuration file for cups
 .SH DESCRIPTION
@@ -400,6 +400,26 @@ JobKillDelay seconds
 Specifies the number of seconds to wait before killing the filters and backend
 associated with a canceled or held job.
 .TP 5
+JobPrivateAccess all
+.TP 5
+JobPrivateAccess default
+.TP 5
+JobPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+.br
+Specifies an access list for a job's private values. The "default" access list
+is "@OWNER @SYSTEM". "@ACL" maps to the printer's requesting-user-name-allowed
+or requesting-user-name-denied values.
+.TP 5
+JobPrivateValues all
+.TP 5
+JobPrivateValues default
+.TP 5
+JobPrivateValues none
+.TP 5
+JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
+Specifies the list of job values to make private. The "default" values are
+"job-name", "job-originating-host-name", and "job-originating-user-name".
+.TP 5
 JobRetryInterval seconds
 .br
 Specifies the interval between retries of jobs in seconds.
@@ -686,6 +706,27 @@ SSLPort
 .br
 Listens on the specified port for encrypted connections.
 .TP 5
+SubscriptionPrivateAccess all
+.TP 5
+SubscriptionPrivateAccess default
+.TP 5
+SubscriptionPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+.br
+Specifies an access list for a subscription's private values. The "default"
+access list is "@OWNER @SYSTEM". "@ACL" maps to the printer's
+requesting-user-name-allowed or requesting-user-name-denied values.
+.TP 5
+SubscriptionPrivateValues all
+.TP 5
+SubscriptionPrivateValues default
+.TP 5
+SubscriptionPrivateValues none
+.TP 5
+SubscriptionPrivateValues attribute-name-1 [ ... attribute-name-N ]
+Specifies the list of job values to make private. The "default" values are
+"notify-events", "notify-pull-method", "notify-recipient-uri",
+"notify-subscriber-user-name", and "notify-user-data".
+.TP 5
 SystemGroup group-name [group-name ...]
 .br
 Specifies the group(s) to use for System class authentication.
@@ -708,7 +749,7 @@ Specifies the user name or ID that is used when running external programs.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2010 by Apple Inc.
 .\"
 .\" End of "$Id: cupsd.conf.man.in 7935 2008-09-11 01:54:11Z mike $".
 .\"

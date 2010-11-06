@@ -1,7 +1,7 @@
 /*
  * "$Id: classes.h 6649 2007-07-11 21:46:42Z mike $"
  *
- *   Printer class definitions for the Common UNIX Printing System (CUPS).
+ *   Printer class definitions for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.

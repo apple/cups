@@ -1,10 +1,9 @@
 /*
  * "$Id: dirsvc.h 7933 2008-09-11 00:44:58Z mike $"
  *
- *   Directory services definitions for the Common UNIX Printing System
- *   (CUPS) scheduler.
+ *   Directory services definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -62,7 +61,7 @@ typedef struct
 
 typedef struct
 {
-  cupsd_authmask_t	from;		/* Source address/name mask */
+  cups_array_t		*from;		/* Source address/name mask(s) */
   http_addr_t		to;		/* Destination address */
 } cupsd_dirsvc_relay_t;
 

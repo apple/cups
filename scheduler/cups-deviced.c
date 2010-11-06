@@ -1,9 +1,9 @@
 /*
  * "$Id: cups-deviced.c 7816 2008-07-30 20:53:31Z mike $"
  *
- *   Device scanning mini-daemon for the Common UNIX Printing System (CUPS).
+ *   Device scanning mini-daemon for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

@@ -24,7 +24,9 @@ PRE {
 }
 
 PRE.command {
+  border: dotted thin #7f7f7f;
   margin-left: 36pt;
+  padding: 10px;
 }
 
 P.compact {
@@ -1805,7 +1807,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 &nbsp;&nbsp;&nbsp;&nbsp;char *product;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_profile_t">ppd_profile_t</a> *profiles;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *protocols;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;void *pwg;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char *shortnickname;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#ppd_size_t">ppd_size_t</a> *sizes;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int throughput;<br>
@@ -1888,8 +1889,6 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">sRGB color profiles </dd>
 <dt>protocols <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">Protocols (BCP, TBCP) string </dd>
-<dt>pwg </dt>
-<dd class="description">PWG to/from PPD mappings</dd>
 <dt>shortnickname </dt>
 <dd class="description">Short version of nickname</dd>
 <dt>sizes </dt>

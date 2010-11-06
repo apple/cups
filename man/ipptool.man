@@ -11,12 +11,14 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH ipptool 1 "CUPS" "2 August 2010" "Apple Inc."
+.TH ipptool 1 "CUPS" "17 October 2010" "Apple Inc."
 .SH NAME
 ipptool - perform internet printing protocol requests
 .SH SYNOPSIS
 .B ipptool
-[ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -V
+[ -C ] [ -E ] [ -I ] [ -L ] [ -S ] [ -T
+.I seconds
+] [ -V
 .I version
 ] [ -X ] [ -c ] [ -d
 .I name=value
@@ -52,6 +54,9 @@ Specifies that requests should be sent using the HTTP/1.0 "Content-Length:" head
 -S
 Forces (dedicated) SSL encryption when connecting to the server.
 .TP 5
+-T seconds
+Specifies a timeout for IPP requests in seconds.
+.TP 5
 -V version
 Specifies the default IPP version to use: 1.0, 1.1, 2.0, 2.1, or 2.2. If not specified, version 1.1 is used.
 .TP 5
@@ -68,7 +73,7 @@ Defines the named variable.
 Defines the default request filename for tests.
 .TP 5
 -i seconds
-Specifies that the (last) file should be repeated at the specified interval. This option is incompatible with the \fI-x\fR (XML plist output) option.
+Specifies that the (last) file should be repeated at the specified interval. This option is incompatible with the \fI-X\fR (XML plist output) option.
 .TP 5
 -l
 Specifies that plain text output is desired.

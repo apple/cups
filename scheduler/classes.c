@@ -1,7 +1,7 @@
 /*
  * "$Id: classes.c 7724 2008-07-14 06:06:06Z mike $"
  *
- *   Printer class routines for the Common UNIX Printing System (CUPS).
+ *   Printer class routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -584,7 +584,7 @@ cupsdLoadAllClasses(void)
       if (value)
       {
         p->deny_users = 0;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -595,7 +595,7 @@ cupsdLoadAllClasses(void)
       if (value)
       {
         p->deny_users = 1;
-        cupsdAddPrinterUser(p, value);
+        cupsdAddString(&(p->users), value);
       }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -685,7 +685,8 @@ cupsdSaveAllClasses(void)
   cups_file_t		*fp;		/* classes.conf file */
   char			temp[1024],	/* Temporary string */
 			backup[1024],	/* printers.conf.O file */
-			value[2048];	/* Value string */
+			value[2048],	/* Value string */
+			*name;		/* Current user name */
   cupsd_printer_t	*pclass;	/* Current printer class */
   int			i;		/* Looping var */
   time_t		curtime;	/* Current time */
@@ -825,9 +826,10 @@ cupsdSaveAllClasses(void)
     cupsFilePrintf(fp, "PageLimit %d\n", pclass->page_limit);
     cupsFilePrintf(fp, "KLimit %d\n", pclass->k_limit);
 
-    for (i = 0; i < pclass->num_users; i ++)
-      cupsFilePutConf(fp, pclass->deny_users ? "DenyUser" : "AllowUser",
-                      pclass->users[i]);
+    for (name = (char *)cupsArrayFirst(pclass->users);
+         name;
+	 name = (char *)cupsArrayNext(pclass->users))
+      cupsFilePutConf(fp, pclass->deny_users ? "DenyUser" : "AllowUser", name);
 
      if (pclass->op_policy)
       cupsFilePutConf(fp, "OpPolicy", pclass->op_policy);

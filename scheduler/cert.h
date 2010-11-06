@@ -1,10 +1,9 @@
 /*
  * "$Id: cert.h 7383 2008-03-20 20:58:07Z mike $"
  *
- *   Authentication certificate definitions for the Common UNIX
- *   Printing System (CUPS).
+ *   Authentication certificate definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

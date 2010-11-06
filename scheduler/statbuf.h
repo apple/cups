@@ -1,10 +1,9 @@
 /*
  * "$Id: statbuf.h 7674 2008-06-18 23:18:32Z mike $"
  *
- *   Status buffer definitions for the Common UNIX Printing System (CUPS)
- *   scheduler.
+ *   Status buffer definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -19,7 +18,7 @@
  * Constants...
  */
 
-#define CUPSD_SB_BUFFER_SIZE	1024	/* Bytes or job status buffer */
+#define CUPSD_SB_BUFFER_SIZE	2048	/* Bytes for job status buffer */
 
 
 /*

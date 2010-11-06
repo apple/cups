@@ -19,8 +19,11 @@ PRE {
 }
 
 PRE.command {
+  background: #f0f0f0;
+  border: dotted thin #7f7f7f;
   color: #7f0000;
   margin-left: 36pt;
+  padding: 10px;
 }
 
 P.example {

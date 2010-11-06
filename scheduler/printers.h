@@ -1,9 +1,9 @@
 /*
  * "$Id: printers.h 7564 2008-05-15 00:57:43Z mike $"
  *
- *   Printer definitions for the Common UNIX Printing System (CUPS) scheduler.
+ *   Printer definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -38,7 +38,7 @@ typedef struct
 
 typedef struct cupsd_job_s cupsd_job_t;
 
-typedef struct cupsd_printer_s
+struct cupsd_printer_s
 {
   char		*uri,			/* Printer URI */
 		*hostname,		/* Host printer resides on */
@@ -81,9 +81,8 @@ typedef struct cupsd_printer_s
 		page_limit,		/* Maximum number of pages */
 		k_limit;		/* Maximum number of kilobytes */
   cups_array_t	*quotas;		/* Quota records */
-  int		deny_users,		/* 1 = deny, 0 = allow */
-		num_users;		/* Number of allowed/denied users */
-  const char	**users;		/* Allowed/denied users */
+  int		deny_users;		/* 1 = deny, 0 = allow */
+  cups_array_t	*users;			/* Allowed/denied users */
   int		num_history;		/* Number of history collections */
   ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
@@ -109,7 +108,7 @@ typedef struct cupsd_printer_s
   DNSServiceRef	ipp_ref,		/* Reference for _ipp._tcp,_cups */
 		printer_ref;		/* Reference for _printer._tcp */
 #endif /* HAVE_DNSSD */
-} cupsd_printer_t;
+};
 
 
 /*
@@ -139,8 +138,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
 extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
-extern void		cupsdAddPrinterUser(cupsd_printer_t *p,
-			                    const char *username);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern int		cupsdDeletePrinter(cupsd_printer_t *p, int update);
@@ -148,7 +145,6 @@ extern cupsd_printer_t	*cupsdFindDest(const char *name);
 extern cupsd_printer_t	*cupsdFindPrinter(const char *name);
 extern cupsd_quota_t	*cupsdFindQuota(cupsd_printer_t *p,
 			                const char *username);
-extern void		cupsdFreePrinterUsers(cupsd_printer_t *p);
 extern void		cupsdFreeQuotas(cupsd_printer_t *p);
 extern void		cupsdLoadAllPrinters(void);
 extern void		cupsdRenamePrinter(cupsd_printer_t *p,

@@ -1,9 +1,9 @@
 /*
  * "$Id: util.h 7711 2008-07-02 04:39:27Z mike $"
  *
- *   Mini-daemon utility definitions for the Common UNIX Printing System (CUPS).
+ *   Mini-daemon utility definitions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

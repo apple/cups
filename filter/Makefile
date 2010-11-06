@@ -245,6 +245,12 @@ apihelp:
 		--header raster-driver.header \
 		--intro raster-driver.shtml \
 		>../doc/help/raster-driver.html
+	mxmldoc --section "Specifications" \
+		--title "CUPS PPD Extensions" \
+		--css ../doc/cups-printable.css \
+		--header spec-ppd.header \
+		--intro spec-ppd.shtml \
+		>../doc/help/spec-ppd.html
 
 framedhelp:
 	echo Generating CUPS API help files...
@@ -271,6 +277,12 @@ framedhelp:
 		--css ../doc/cups-printable.css \
 		--header raster-driver.header \
 		--intro raster-driver.shtml
+	mxmldoc --section "Specifications" \
+		--title "CUPS PPD Extensions" \
+		--framed ../cups/spec-ppd \
+		--css ../doc/cups-printable.css \
+		--header spec-ppd.header \
+		--intro spec-ppd.shtml \
 
 
 #

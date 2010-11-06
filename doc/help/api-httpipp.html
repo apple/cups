@@ -24,7 +24,9 @@ PRE {
 }
 
 PRE.command {
+  border: dotted thin #7f7f7f;
   margin-left: 36pt;
+  padding: 10px;
 }
 
 P.compact {
@@ -393,11 +395,14 @@ div.contents ul.subcontents li {
 <li><a href="#cupsGetFd" title="Get a file from the server.">cupsGetFd</a></li>
 <li><a href="#cupsGetFile" title="Get a file from the server.">cupsGetFile</a></li>
 <li><a href="#cupsGetResponse" title="Get a response to an IPP request.">cupsGetResponse</a></li>
+<li><a href="#cupsLastError" title="Return the last IPP status code.">cupsLastError</a></li>
+<li><a href="#cupsLastErrorString" title="Return the last IPP status-message.">cupsLastErrorString</a></li>
 <li><a href="#cupsPutFd" title="Put a file on the server.">cupsPutFd</a></li>
 <li><a href="#cupsPutFile" title="Put a file on the server.">cupsPutFile</a></li>
 <li><a href="#cupsReadResponseData" title="Read additional data after the IPP response.">cupsReadResponseData</a></li>
 <li><a href="#cupsSendRequest" title="Send an IPP request.">cupsSendRequest</a></li>
 <li><a href="#cupsWriteRequestData" title="Write additional data after an IPP request.">cupsWriteRequestData</a></li>
+<li><a href="#httpAddCredential" title="Allocates and adds a single credential to an array.">httpAddCredential</a></li>
 <li><a href="#httpAddrAny" title="Check for the &quot;any&quot; address.">httpAddrAny</a></li>
 <li><a href="#httpAddrEqual" title="Compare two addresses.">httpAddrEqual</a></li>
 <li><a href="#httpAddrLength" title="Return the length of the address in bytes.">httpAddrLength</a></li>
@@ -412,9 +417,11 @@ components with a formatted resource.">httpAssembleURIf</a></li>
 <li><a href="#httpCheck" title="Check to see if there is a pending response from the server.">httpCheck</a></li>
 <li><a href="#httpClearCookie" title="Clear the cookie value(s).">httpClearCookie</a></li>
 <li><a href="#httpClearFields" title="Clear HTTP request fields.">httpClearFields</a></li>
-<li><a href="#httpClose" title="Close an HTTP connection...">httpClose</a></li>
+<li><a href="#httpClose" title="Close an HTTP connection.">httpClose</a></li>
 <li><a href="#httpConnect" title="Connect to a HTTP server.">httpConnect</a></li>
 <li><a href="#httpConnectEncrypt" title="Connect to a HTTP server using encryption.">httpConnectEncrypt</a></li>
+<li><a href="#httpCopyCredentials" title="Copy the credentials associated with an encrypted
+connection.">httpCopyCredentials</a></li>
 <li><a href="#httpDecode64" title="Base64-decode a string.">httpDecode64</a></li>
 <li><a href="#httpDecode64_2" title="Base64-decode a string.">httpDecode64_2</a></li>
 <li><a href="#httpDelete" title="Send a DELETE request to the server.">httpDelete</a></li>
@@ -424,6 +431,7 @@ components with a formatted resource.">httpAssembleURIf</a></li>
 <li><a href="#httpError" title="Get the last error on a connection.">httpError</a></li>
 <li><a href="#httpFlush" title="Flush data from a HTTP connection.">httpFlush</a></li>
 <li><a href="#httpFlushWrite" title="Flush data in write buffer.">httpFlushWrite</a></li>
+<li><a href="#httpFreeCredentials" title="Free an array of credentials.">httpFreeCredentials</a></li>
 <li><a href="#httpGet" title="Send a GET request to the server.">httpGet</a></li>
 <li><a href="#httpGetAuthString" title="Get the current authorization string.">httpGetAuthString</a></li>
 <li><a href="#httpGetBlocking" title="Get the blocking/non-block state of a connection.">httpGetBlocking</a></li>
@@ -465,7 +473,9 @@ components.">httpSeparate2</a></li>
 <li><a href="#httpSeparateURI" title="Separate a Universal Resource Identifier into its
 components.">httpSeparateURI</a></li>
 <li><a href="#httpSetAuthString" title="Set the current authorization string.">httpSetAuthString</a></li>
-<li><a href="#httpSetCookie" title="Set the cookie value(s)...">httpSetCookie</a></li>
+<li><a href="#httpSetCookie" title="Set the cookie value(s).">httpSetCookie</a></li>
+<li><a href="#httpSetCredentials" title="Set the credentials associated with an encrypted
+connection.">httpSetCredentials</a></li>
 <li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
 <li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
 <li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
@@ -525,6 +535,7 @@ used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_t</a></li>
 	<li><a href="#http_auth_t" title="HTTP authentication types">http_auth_t</a></li>
+	<li><a href="#http_credential_t" title="Credential data ">http_credential_t</a></li>
 	<li><a href="#http_encoding_t" title="HTTP transfer encoding values">http_encoding_t</a></li>
 	<li><a href="#http_encryption_t" title="HTTP encryption values">http_encryption_t</a></li>
 	<li><a href="#http_field_t" title="HTTP field names">http_field_t</a></li>
@@ -557,6 +568,7 @@ are server-oriented...">http_state_t</a></li>
 used to enumerate all of the
 addresses that are associated
 with a hostname. ">http_addrlist_s</a></li>
+	<li><a href="#http_credential_s" title="Credential data ">http_credential_s</a></li>
 	<li><a href="#ipp_attribute_s" title="Attribute">ipp_attribute_s</a></li>
 	<li><a href="#ipp_s" title="IPP Request/Response/Notification">ipp_s</a></li>
 </ul></li>
@@ -1172,6 +1184,18 @@ cupsSendDocument() or cupsSendRequest(). For requests that return
 additional data, use httpRead() after getting a successful response.
 
 </p>
+<h3 class="function"><a name="cupsLastError">cupsLastError</a></h3>
+<p class="description">Return the last IPP status code.</p>
+<p class="code">
+ipp_status_t cupsLastError (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">IPP status code from last request</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="cupsLastErrorString">cupsLastErrorString</a></h3>
+<p class="description">Return the last IPP status-message.</p>
+<p class="code">
+const char *cupsLastErrorString (void);</p>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">status-message text from last request</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.20/Mac OS X 10.4&nbsp;</span><a name="cupsPutFd">cupsPutFd</a></h3>
 <p class="description">Put a file on the server.</p>
 <p class="code">
@@ -1269,7 +1293,7 @@ files for CUPS_GET_PPD and CUPS_GET_DOCUMENT requests, respectively.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">Use httpWrite() to write any additional data (document, PPD file, etc.)
 for the request, cupsGetResponse() to get the IPP response, and httpRead()
-to read any additional data following the response. Only one request can be 
+to read any additional data following the response. Only one request can be
 sent/queued at a time.<br>
 <br>
 Unlike cupsDoFileRequest(), cupsDoIORequest(), and cupsDoRequest(), the
@@ -1298,6 +1322,29 @@ request is not freed.
 <h4 class="discussion">Discussion</h4>
 <p class="discussion">This function is used after <a href="#cupsSendRequest"><code>cupsSendRequest</code></a> to provide a PPD and
 after <a href="#cupsStartDocument"><code>cupsStartDocument</code></a> to provide a document file.
+
+</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpAddCredential">httpAddCredential</a></h3>
+<p class="description">Allocates and adds a single credential to an array.</p>
+<p class="code">
+int httpAddCredential (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *credentials,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;const void *data,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t datalen<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>credentials</dt>
+<dd class="description">Credentials array</dd>
+<dt>data</dt>
+<dd class="description">PEM-encoded X.509 data</dd>
+<dt>datalen</dt>
+<dd class="description">Length of data</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">0 on success, -1 on error</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">Use <code>cupsArrayNew(NULL, NULL)</code> to create a credentials array.
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpAddrAny">httpAddrAny</a></h3>
@@ -1531,7 +1578,7 @@ void httpClearFields (<br>
 <dd class="description">Connection to server</dd>
 </dl>
 <h3 class="function"><a name="httpClose">httpClose</a></h3>
-<p class="description">Close an HTTP connection...</p>
+<p class="description">Close an HTTP connection.</p>
 <p class="code">
 void httpClose (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http<br>
@@ -1580,6 +1627,23 @@ void httpClose (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New HTTP connection</p>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpCopyCredentials">httpCopyCredentials</a></h3>
+<p class="description">Copy the credentials associated with an encrypted
+connection.</p>
+<p class="code">
+int httpCopyCredentials (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t **credentials<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>credentials</dt>
+<dd class="description">Array of credentials</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status of call (0 = success)</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="httpDecode64">httpDecode64</a></h3>
 <p class="description">Base64-decode a string.</p>
 <p class="code">
@@ -1732,6 +1796,17 @@ int httpFlushWrite (<br>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">Bytes written or -1 on error</p>
+<h3 class="function"><a name="httpFreeCredentials">httpFreeCredentials</a></h3>
+<p class="description">Free an array of credentials.</p>
+<p class="code">
+void httpFreeCredentials (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *credentials<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>credentials</dt>
+<dd class="description">Array of credentials</dd>
+</dl>
 <h3 class="function"><a name="httpGet">httpGet</a></h3>
 <p class="description">Send a GET request to the server.</p>
 <p class="code">
@@ -2356,7 +2431,7 @@ httpHead(), httpOptions(), httpPost, or httpPut().
 
 </p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span><a name="httpSetCookie">httpSetCookie</a></h3>
-<p class="description">Set the cookie value(s)...</p>
+<p class="description">Set the cookie value(s).</p>
 <p class="code">
 void httpSetCookie (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
@@ -2369,6 +2444,23 @@ void httpSetCookie (<br>
 <dt>cookie</dt>
 <dd class="description">Cookie string</dd>
 </dl>
+<h3 class="function"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="httpSetCredentials">httpSetCredentials</a></h3>
+<p class="description">Set the credentials associated with an encrypted
+connection.</p>
+<p class="code">
+int httpSetCredentials (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#http_t">http_t</a> *http,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cups_array_t *credentials<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>http</dt>
+<dd class="description">Connection to server</dd>
+<dt>credentials</dt>
+<dd class="description">Array of credentials</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Status of call (0 = success)</p>
 <h3 class="function"><span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span><a name="httpSetExpect">httpSetExpect</a></h3>
 <p class="description">Set the Expect: header in a request.</p>
 <p class="code">
@@ -3267,6 +3359,11 @@ typedef struct <a href="#http_addrlist_s">http_addrlist_s</a> / http_addrlist_t;
 <p class="code">
 typedef enum <a href="#http_auth_e">http_auth_e</a> http_auth_t;
 </p>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="http_credential_t">http_credential_t</a></h3>
+<p class="description">Credential data </p>
+<p class="code">
+typedef struct <a href="#http_credential_s">http_credential_s</a> http_credential_t;
+</p>
 <h3 class="typedef"><a name="http_encoding_t">http_encoding_t</a></h3>
 <p class="description">HTTP transfer encoding values</p>
 <p class="code">
@@ -3308,7 +3405,7 @@ typedef struct _http_s http_t;
 <p class="code">
 typedef enum <a href="#http_uri_coding_e">http_uri_coding_e</a> http_uri_coding_t;
 </p>
-<h3 class="typedef"><span class="info">&nbsp;CUPS1.2&nbsp;</span><a name="http_uri_status_t">http_uri_status_t</a></h3>
+<h3 class="typedef"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="http_uri_status_t">http_uri_status_t</a></h3>
 <p class="description">URI separation status </p>
 <p class="code">
 typedef enum <a href="#http_uri_status_e">http_uri_status_e</a> http_uri_status_t;
@@ -3410,6 +3507,19 @@ with a hostname. </p>
 <dt>next </dt>
 <dd class="description">Pointer to next address in list</dd>
 </dl>
+<h3 class="struct"><span class="info">&nbsp;CUPS 1.5&nbsp;</span><a name="http_credential_s">http_credential_s</a></h3>
+<p class="description">Credential data </p>
+<p class="code">struct http_credential_s {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *data;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;size_t datalen;<br>
+};</p>
+<h4 class="members">Members</h4>
+<dl>
+<dt>data </dt>
+<dd class="description">Pointer to credential data</dd>
+<dt>datalen </dt>
+<dd class="description">Credential length</dd>
+</dl>
 <h3 class="struct"><a name="ipp_attribute_s">ipp_attribute_s</a></h3>
 <p class="description">Attribute</p>
 <p class="code">struct ipp_attribute_s {<br>
@@ -3460,8 +3570,8 @@ with a hostname. </p>
 <dd class="description">Request header</dd>
 <dt>state </dt>
 <dd class="description">State of request</dd>
-<dt>use </dt>
-<dd class="description">Use count</dd>
+<dt>use <span class="info">&nbsp;CUPS 1.4.4/Mac OS X 10.6.?&nbsp;</span></dt>
+<dd class="description">Use count </dd>
 </dl>
 <h2 class="title"><a name="UNIONS">Unions</a></h2>
 <h3 class="union"><a name="ipp_request_u">ipp_request_u</a></h3>
@@ -3646,8 +3756,8 @@ are server-oriented...</p>
 <dl>
 <dt>HTTP_ACCEPTED </dt>
 <dd class="description">DELETE command was successful</dd>
-<dt>HTTP_AUTHORIZATION_CANCELED </dt>
-<dd class="description">User cancelled authorization</dd>
+<dt>HTTP_AUTHORIZATION_CANCELED <span class="info">&nbsp;CUPS 1.4&nbsp;</span></dt>
+<dd class="description">User canceled authorization </dd>
 <dt>HTTP_BAD_GATEWAY </dt>
 <dd class="description">Bad gateway</dd>
 <dt>HTTP_BAD_REQUEST </dt>
@@ -3698,6 +3808,8 @@ are server-oriented...</p>
 <dd class="description">Only a partial file was recieved/sent</dd>
 <dt>HTTP_PAYMENT_REQUIRED </dt>
 <dd class="description">Payment required</dd>
+<dt>HTTP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dd class="description">Error negotiating a secure connection </dd>
 <dt>HTTP_PRECONDITION </dt>
 <dd class="description">Precondition failed</dd>
 <dt>HTTP_PROXY_AUTHENTICATION </dt>
@@ -3748,7 +3860,7 @@ are server-oriented...</p>
 <dt>HTTP_URI_CODING_USERNAME </dt>
 <dd class="description">En/decode the username portion</dd>
 </dl>
-<h3 class="enumeration"><span class="info">&nbsp;CUPS1.2&nbsp;</span><a name="http_uri_status_e">http_uri_status_e</a></h3>
+<h3 class="enumeration"><span class="info">&nbsp;CUPS 1.2&nbsp;</span><a name="http_uri_status_e">http_uri_status_e</a></h3>
 <p class="description">URI separation status </p>
 <h4 class="constants">Constants</h4>
 <dl>
@@ -4032,6 +4144,8 @@ are server-oriented...</p>
 <dd class="description">client-error-attributes-or-values-not-supported</dd>
 <dt>IPP_ATTRIBUTES_NOT_SETTABLE </dt>
 <dd class="description">client-error-attributes-not-settable</dd>
+<dt>IPP_AUTHENTICATION_CANCELED <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dd class="description">Authentication canceled by user </dd>
 <dt>IPP_BAD_REQUEST </dt>
 <dd class="description">client-error-bad-request</dd>
 <dt>IPP_CHARSET </dt>
@@ -4092,6 +4206,8 @@ are server-oriented...</p>
 <dd class="description">successful-ok-too-many-events</dd>
 <dt>IPP_OPERATION_NOT_SUPPORTED </dt>
 <dd class="description">server-error-operation-not-supported</dd>
+<dt>IPP_PKI_ERROR <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dd class="description">Error negotiating a secure connection </dd>
 <dt>IPP_PRINTER_BUSY </dt>
 <dd class="description">server-error-busy</dd>
 <dt>IPP_PRINTER_IS_DEACTIVATED </dt>
@@ -4110,6 +4226,8 @@ are server-oriented...</p>
 <dd class="description">client-error-timeout</dd>
 <dt>IPP_TOO_MANY_SUBSCRIPTIONS </dt>
 <dd class="description">client-error-too-many-subscriptions</dd>
+<dt>IPP_UPGRADE_REQUIRED </dt>
+<dd class="description">TLS upgrade required</dd>
 <dt>IPP_URI_SCHEME </dt>
 <dd class="description">client-error-uri-scheme-not-supported</dd>
 <dt>IPP_VERSION_NOT_SUPPORTED </dt>

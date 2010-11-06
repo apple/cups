@@ -1,9 +1,9 @@
 /*
  * "$Id: util.c 7621 2008-06-06 18:55:35Z mike $"
  *
- *   Mini-daemon utility functions for the Common UNIX Printing System (CUPS).
+ *   Mini-daemon utility functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -163,13 +163,16 @@ cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
   cups_array_t	*a;			/* CUPS array */
   const char	*start,			/* Start of string */
 		*end;			/* End of string */
-  char		*ptr;			/* New string */
+  char		buffer[8192];		/* New string */
 
 
   if (!s)
     return (NULL);
 
-  if ((a = cupsArrayNew((cups_array_func_t)strcmp, NULL)) != NULL)
+  if ((a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
+                         (cups_ahash_func_t)NULL, 0,
+			 (cups_acopy_func_t)_cupsStrAlloc,
+			 (cups_afree_func_t)_cupsStrFree)) != NULL)
   {
     for (start = end = s; *end; start = end + 1)
     {
@@ -178,17 +181,26 @@ cupsdCreateStringsArray(const char *s)	/* I - Comma-delimited strings */
       */
 
       if ((end = strchr(start, ',')) == NULL)
-        end = start + strlen(start);
+      {
+       /*
+        * Last delimited string...
+	*/
+
+        cupsArrayAdd(a, (char *)start);
+	break;
+      }
 
      /*
-      * Duplicate the string and add it to the array...
+      * Copy the string and add it to the array...
       */
 
-      if ((ptr = calloc(1, end - start + 1)) == NULL)
+      if ((end - start + 1) > sizeof(buffer))
         break;
 
-      memcpy(ptr, start, end - start);
-      cupsArrayAdd(a, ptr);
+      memcpy(buffer, start, end - start);
+      buffer[end - start] = '\0';
+
+      cupsArrayAdd(a, buffer);
     }
   }
 

@@ -80,6 +80,8 @@
  *   httpSetExpect()           - Set the Expect: header in a request.
  *   httpSetField()            - Set the value of an HTTP header.
  *   httpSetLength()           - Set the content-length and content-encoding.
+ *   _httpSetTimeout()         - Set read/write timeouts and an optional
+ *                               callback.
  *   httpTrace()               - Send an TRACE request to the server.
  *   httpUpdate()              - Update the current HTTP state for incoming
  *                               data.
@@ -1347,8 +1349,15 @@ httpGets(char   *line,			/* I - Line to read into */
 #ifdef WIN32
         DEBUG_printf(("3httpGets: recv() error %d!", WSAGetLastError()));
 
-        if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+        if (WSAGetLastError() == WSAEINTR)
 	  continue;
+	else if (WSAGetLastError() == WSAEWOULDBLOCK)
+	{
+	  if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	    continue;
+
+	  http->error = WSAGetLastError();
+	}
 	else if (WSAGetLastError() != http->error)
 	{
 	  http->error = WSAGetLastError();
@@ -1358,8 +1367,17 @@ httpGets(char   *line,			/* I - Line to read into */
 #else
         DEBUG_printf(("3httpGets: recv() error %d!", errno));
 
-        if (errno == EINTR || errno == EAGAIN)
+        if (errno == EINTR)
 	  continue;
+	else if (errno == EWOULDBLOCK || errno == EAGAIN)
+	{
+	  if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+	    continue;
+	  else if (!http->timeout_cb && errno == EAGAIN)
+	    continue;
+
+	  http->error = errno;
+	}
 	else if (errno != http->error)
 	{
 	  http->error = errno;
@@ -1925,13 +1943,34 @@ httpRead2(http_t *http,			/* I - Connection to server */
     else if (bytes < 0)
     {
 #ifdef WIN32
-      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
+      if (WSAGetLastError() != WSAEINTR)
       {
         http->error = WSAGetLastError();
         return (-1);
       }
+      else if (WSAGetLastError() == WSAEWOULDBLOCK)
+      {
+        if (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data))
+	{
+	  http->error = WSAEWOULDBLOCK;
+	  return (-1);
+	}
+      }
 #else
-      if (errno != EINTR && errno != EAGAIN)
+      if (errno == EWOULDBLOCK || errno == EAGAIN)
+      {
+        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+	else if (!http->timeout_cb && errno != EAGAIN)
+	{
+	  http->error = errno;
+	  return (-1);
+	}
+      }
+      else if (errno != EINTR)
       {
         http->error = errno;
         return (-1);
@@ -1979,13 +2018,29 @@ httpRead2(http_t *http,			/* I - Connection to server */
                   CUPS_LLCAST length));
 
 #ifdef WIN32
-    while ((bytes = (ssize_t) recv(http->fd, buffer, (int)length, 0)) < 0)
-      if (WSAGetLastError() != WSAEINTR && WSAGetLastError() != WSAEWOULDBLOCK)
+    while ((bytes = (ssize_t)recv(http->fd, buffer, (int)length, 0)) < 0)
+    {
+      if (WSAGetLastError() == WSAEWOULDBLOCK)
+      {
+        if (!http->timeout_cb || !(*http->timeout_cb)(http, http->timeout_data))
+	  break;
+      }
+      else if (WSAGetLastError() != WSAEINTR)
         break;
+    }
 #else
     while ((bytes = recv(http->fd, buffer, length, 0)) < 0)
-      if (errno != EINTR && errno != EAGAIN)
+    {
+      if (errno == EWOULDBLOCK || errno == EAGAIN)
+      {
+        if (http->timeout_cb && !(*http->timeout_cb)(http, http->timeout_data))
+	  break;
+        else if (!http->timeout_cb && errno != EAGAIN)
+	  break;
+      }
+      else if (errno != EINTR)
         break;
+    }
 #endif /* WIN32 */
 
     DEBUG_printf(("2httpRead2: read " CUPS_LLFMT " bytes from socket...",
@@ -2004,12 +2059,12 @@ httpRead2(http_t *http,			/* I - Connection to server */
   else if (bytes < 0)
   {
 #ifdef WIN32
-    if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+    if (WSAGetLastError() == WSAEINTR)
       bytes = 0;
     else
       http->error = WSAGetLastError();
 #else
-    if (errno == EINTR || errno == EAGAIN)
+    if (errno == EINTR || (errno == EAGAIN && !http->timeout_cb))
       bytes = 0;
     else
       http->error = errno;
@@ -2215,6 +2270,14 @@ httpReconnect(http_t *http)		/* I - Connection to server */
   }
 
   DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
+
+  if (http->timeout_value.tv_sec > 0)
+  {
+    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
+               sizeof(http->timeout_value));
+    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
+               sizeof(http->timeout_value));
+  }
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;
@@ -2466,6 +2529,39 @@ httpSetLength(http_t *http,		/* I - Connection to server */
     http->fields[HTTP_FIELD_TRANSFER_ENCODING][0] = '\0';
     snprintf(http->fields[HTTP_FIELD_CONTENT_LENGTH], HTTP_MAX_VALUE,
              CUPS_LLFMT, CUPS_LLCAST length);
+  }
+}
+
+
+/*
+ * '_httpSetTimeout()' - Set read/write timeouts and an optional callback.
+ *
+ * The optional timeout callback receives both the HTTP connection and a user
+ * data pointer and must return 1 to continue or 0 to error out.
+ */
+
+void
+_httpSetTimeout(
+    http_t             *http,		/* I - Connection to server */
+    double             timeout,		/* I - Number of seconds for timeout,
+                                               must be greater than 0 */
+    _http_timeout_cb_t cb,		/* I - Callback function or NULL */
+    void               *user_data)	/* I - User data pointer */
+{
+  if (!http || timeout <= 0.0)
+    return;
+
+  http->timeout_cb            = cb;
+  http->timeout_data          = user_data;
+  http->timeout_value.tv_sec  = (int)timeout;
+  http->timeout_value.tv_usec = (int)(timeout * 1000000) % 1000000;
+
+  if (http->fd >= 0)
+  {
+    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
+               sizeof(http->timeout_value));
+    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
+               sizeof(http->timeout_value));
   }
 }
 
@@ -4175,16 +4271,34 @@ http_write(http_t     *http,		/* I - Connection to server */
     if (bytes < 0)
     {
 #ifdef WIN32
-      if (WSAGetLastError() == WSAEINTR || WSAGetLastError() == WSAEWOULDBLOCK)
+      if (WSAGetLastError() == WSAEINTR)
         continue;
-      else if (WSAGetLastError() != http->error && WSAGetLastError() != WSAECONNRESET)
+      else if (WSAGetLastError() == WSAEWOULDBLOCK)
+      {
+        if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+          continue;
+
+        http->error = WSAGetLastError();
+      }
+      else if (WSAGetLastError() != http->error &&
+               WSAGetLastError() != WSAECONNRESET)
       {
         http->error = WSAGetLastError();
 	continue;
       }
+
 #else
-      if (errno == EINTR || errno == EAGAIN)
+      if (errno == EINTR)
         continue;
+      else if (errno == EWOULDBLOCK || errno == EAGAIN)
+      {
+	if (http->timeout_cb && (*http->timeout_cb)(http, http->timeout_data))
+          continue;
+        else if (!http->timeout_cb && errno == EAGAIN)
+	  continue;
+
+        http->error = errno;
+      }
       else if (errno != http->error && errno != ECONNRESET)
       {
         http->error = errno;

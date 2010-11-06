@@ -24,7 +24,9 @@ PRE {
 }
 
 PRE.command {
+  border: dotted thin #7f7f7f;
   margin-left: 36pt;
+  padding: 10px;
 }
 
 P.compact {
@@ -340,9 +342,9 @@ div.contents ul.subcontents li {
 <!--
   "$Id$"
 
-  Raster API header for the Common UNIX Printing System (CUPS).
+  Raster API documentation for CUPS.
 
-  Copyright 2008-2009 by Apple Inc.
+  Copyright 2008-2010 by Apple Inc.
 
   These coded instructions, statements, and computer programs are the
   property of Apple Inc. and are protected by Federal copyright
@@ -1186,20 +1188,52 @@ factor not applied) </dd>
 <p class="description">cupsColorSpace attribute values</p>
 <h4 class="constants">Constants</h4>
 <dl>
+<dt>CUPS_CSPACE_ADOBERGB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Red, green, blue (Adobe RGB) </dd>
 <dt>CUPS_CSPACE_CIELab <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE Lab </dd>
 <dt>CUPS_CSPACE_CIEXYZ <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">CIE XYZ </dd>
 <dt>CUPS_CSPACE_CMY </dt>
-<dd class="description">Cyan, magenta, yellow</dd>
+<dd class="description">Cyan, magenta, yellow (DeviceCMY)</dd>
 <dt>CUPS_CSPACE_CMYK </dt>
-<dd class="description">Cyan, magenta, yellow, black</dd>
-<dt>CUPS_CSPACE_GMCK </dt>
-<dd class="description">Gold, magenta, yellow, black</dd>
-<dt>CUPS_CSPACE_GMCS </dt>
-<dd class="description">Gold, magenta, yellow, silver</dd>
-<dt>CUPS_CSPACE_GOLD </dt>
-<dd class="description">Gold foil</dd>
+<dd class="description">Cyan, magenta, yellow, black (DeviceCMYK)</dd>
+<dt>CUPS_CSPACE_DEVICE1 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 1 color </dd>
+<dt>CUPS_CSPACE_DEVICE2 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 2 colors </dd>
+<dt>CUPS_CSPACE_DEVICE3 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 3 colors </dd>
+<dt>CUPS_CSPACE_DEVICE4 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 4 colors </dd>
+<dt>CUPS_CSPACE_DEVICE5 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 5 colors </dd>
+<dt>CUPS_CSPACE_DEVICE6 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 6 colors </dd>
+<dt>CUPS_CSPACE_DEVICE7 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 7 colors </dd>
+<dt>CUPS_CSPACE_DEVICE8 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 8 colors </dd>
+<dt>CUPS_CSPACE_DEVICE9 <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 9 colors </dd>
+<dt>CUPS_CSPACE_DEVICEA <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 10 colors </dd>
+<dt>CUPS_CSPACE_DEVICEB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 11 colors </dd>
+<dt>CUPS_CSPACE_DEVICEC <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 12 colors </dd>
+<dt>CUPS_CSPACE_DEVICED <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 13 colors </dd>
+<dt>CUPS_CSPACE_DEVICEE <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 14 colors </dd>
+<dt>CUPS_CSPACE_DEVICEF <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">DeviceN, 15 colors </dd>
+<dt>CUPS_CSPACE_GMCK <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold, magenta, yellow, black </dd>
+<dt>CUPS_CSPACE_GMCS <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold, magenta, yellow, silver </dd>
+<dt>CUPS_CSPACE_GOLD <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Gold foil </dd>
 <dt>CUPS_CSPACE_ICC1 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 1 color </dd>
 <dt>CUPS_CSPACE_ICC2 <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
@@ -1231,28 +1265,31 @@ factor not applied) </dd>
 <dt>CUPS_CSPACE_ICCF <span class="info">&nbsp;CUPS 1.1.19/Mac OS X 10.3&nbsp;</span></dt>
 <dd class="description">ICC-based, 15 colors </dd>
 <dt>CUPS_CSPACE_K </dt>
-<dd class="description">Black</dd>
-<dt>CUPS_CSPACE_KCMY </dt>
-<dd class="description">Black, cyan, magenta, yellow</dd>
-<dt>CUPS_CSPACE_KCMYcm </dt>
-<dd class="description">Black, cyan, magenta, yellow, *
-light-cyan, light-magenta</dd>
+<dd class="description">Black (DeviceK)</dd>
+<dt>CUPS_CSPACE_KCMY <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Black, cyan, magenta, yellow </dd>
+<dt>CUPS_CSPACE_KCMYcm <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Black, cyan, magenta, yellow, light-cyan, light-magenta </dd>
 <dt>CUPS_CSPACE_RGB </dt>
-<dd class="description">Red, green, blue</dd>
+<dd class="description">Red, green, blue (DeviceRGB, sRGB by default)</dd>
 <dt>CUPS_CSPACE_RGBA </dt>
-<dd class="description">Red, green, blue, alpha</dd>
+<dd class="description">Red, green, blue, alpha (DeviceRGB, sRGB by default)</dd>
 <dt>CUPS_CSPACE_RGBW <span class="info">&nbsp;CUPS 1.2/Mac OS X 10.5&nbsp;</span></dt>
-<dd class="description">Red, green, blue, white </dd>
-<dt>CUPS_CSPACE_SILVER </dt>
-<dd class="description">Silver foil</dd>
+<dd class="description">Red, green, blue, white (DeviceRGB, sRGB by default) </dd>
+<dt>CUPS_CSPACE_SILVER <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Silver foil </dd>
+<dt>CUPS_CSPACE_SRGB <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Red, green, blue (sRGB) </dd>
+<dt>CUPS_CSPACE_SW <span class="info">&nbsp;CUPS 1.4.5&nbsp;</span></dt>
+<dd class="description">Luminance (gamma 2.2) </dd>
 <dt>CUPS_CSPACE_W </dt>
-<dd class="description">Luminance</dd>
-<dt>CUPS_CSPACE_WHITE </dt>
-<dd class="description">White ink (as black)</dd>
-<dt>CUPS_CSPACE_YMC </dt>
-<dd class="description">Yellow, magenta, cyan</dd>
-<dt>CUPS_CSPACE_YMCK </dt>
-<dd class="description">Yellow, magenta, cyan, black</dd>
+<dd class="description">Luminance (DeviceGray, gamma 2.2 by default)</dd>
+<dt>CUPS_CSPACE_WHITE <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">White ink (as black) </dd>
+<dt>CUPS_CSPACE_YMC <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Yellow, magenta, cyan </dd>
+<dt>CUPS_CSPACE_YMCK <span class="info">&nbsp;DEPRECATED&nbsp;</span></dt>
+<dd class="description">Yellow, magenta, cyan, black </dd>
 </dl>
 <h3 class="enumeration"><a name="cups_cut_e">cups_cut_e</a></h3>
 <p class="description">CutMedia attribute values</p>

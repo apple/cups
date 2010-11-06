@@ -1,9 +1,9 @@
 /*
  * "$Id: banners.c 7221 2008-01-16 22:20:08Z mike $"
  *
- *   Banner routines for the Common UNIX Printing System (CUPS).
+ *   Banner routines for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

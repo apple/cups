@@ -1,9 +1,9 @@
 /*
  * "$Id: subscriptions.c 7824 2008-08-01 21:11:55Z mike $"
  *
- *   Subscription routines for the Common UNIX Printing System (CUPS) scheduler.
+ *   Subscription routines for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -480,9 +480,6 @@ cupsdDeleteSubscription(
     cupsd_subscription_t *sub,		/* I - Subscription object */
     int                  update)	/* I - 1 = update subscriptions.conf */
 {
-  int	i;				/* Looping var */
-
-
  /*
   * Close the pipe to the notifier as needed...
   */
@@ -503,13 +500,7 @@ cupsdDeleteSubscription(
   cupsdClearString(&(sub->owner));
   cupsdClearString(&(sub->recipient));
 
-  if (sub->events)
-  {
-    for (i = 0; i < sub->num_events; i ++)
-      cupsd_delete_event(sub->events[i]);
-
-    free(sub->events);
-  }
+  cupsArrayDelete(sub->events);
 
   free(sub);
 
@@ -1426,7 +1417,10 @@ cupsd_send_notification(
 
   if (!sub->events)
   {
-    sub->events = calloc(MaxEvents, sizeof(cupsd_event_t *));
+    sub->events = cupsArrayNew3((cups_array_func_t)NULL, NULL,
+                                (cups_ahash_func_t)NULL, 0,
+				(cups_acopy_func_t)NULL,
+				(cups_afree_func_t)cupsd_delete_event);
 
     if (!sub->events)
     {
@@ -1441,19 +1435,15 @@ cupsd_send_notification(
   * Purge an old event as needed...
   */
 
-  if (sub->num_events >= MaxEvents)
+  if (cupsArrayCount(sub->events) >= MaxEvents)
   {
    /*
     * Purge the oldest event in the cache...
     */
 
-    cupsd_delete_event(sub->events[0]);
+    cupsArrayRemove(sub->events, cupsArrayFirst(sub->events));
 
-    sub->num_events --;
     sub->first_event_id ++;
-
-    memmove(sub->events, sub->events + 1,
-	    sub->num_events * sizeof(cupsd_event_t *));
   }
 
  /*
@@ -1463,8 +1453,7 @@ cupsd_send_notification(
   * event cache limit, we don't need to check for overflow here...
   */
 
-  sub->events[sub->num_events] = event;
-  sub->num_events ++;
+  cupsArrayAdd(sub->events, event);
 
  /*
   * Deliver the event...

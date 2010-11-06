@@ -16,7 +16,9 @@ PRE {
 }
 
 PRE.command {
+  border: dotted thin #7f7f7f;
   margin-left: 36pt;
+  padding: 10px;
 }
 
 P.compact {

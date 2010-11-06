@@ -1,9 +1,9 @@
 /*
  * "$Id: env.c 7673 2008-06-18 22:31:26Z mike $"
  *
- *   Environment management routines for the Common UNIX Printing System (CUPS).
+ *   Environment management routines for the CUPS scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

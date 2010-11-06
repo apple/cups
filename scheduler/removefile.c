@@ -1,9 +1,9 @@
 /*
  * "$Id: removefile.c 7720 2008-07-11 22:46:21Z mike $"
  *
- *   "Secure" file removal function for the Common UNIX Printing System (CUPS).
+ *   "Secure" file removal function for the CUPS scheduler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -107,8 +107,10 @@ cupsdRemoveFile(const char *filename)	/* I - File to remove */
     return (-1);
   }
 
+  CUPS_SRAND(time(NULL));
+
   for (i = 0; i < sizeof(buffer); i ++)
-    buffer[i] = rand();
+    buffer[i] = CUPS_RAND();
   if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
   {
     close(fd);
@@ -130,7 +132,7 @@ cupsdRemoveFile(const char *filename)	/* I - File to remove */
   }
 
   for (i = 0; i < sizeof(buffer); i ++)
-    buffer[i] = rand();
+    buffer[i] = CUPS_RAND();
   if (overwrite_data(fd, buffer, sizeof(buffer), (int)info.st_size))
   {
     close(fd);

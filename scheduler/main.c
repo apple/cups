@@ -14,26 +14,29 @@
  *
  * Contents:
  *
- *   main()                    - Main entry for the CUPS scheduler.
- *   cupsdClosePipe()          - Close a pipe as necessary.
- *   cupsdOpenPipe()           - Create a pipe which is closed on exec.
- *   cupsdHoldSignals()        - Hold child and termination signals.
- *   cupsdReleaseSignals()     - Release signals for delivery.
- *   cupsdSetString()          - Set a string value.
- *   cupsdSetStringf()         - Set a formatted string value.
- *   cupsd_clean_files()       - Clean out old files.
- *   launchd_checkin()         - Check-in with launchd and collect the
- *                               listening fds.
- *   launchd_checkout()        - Check-out with launchd.
- *   parent_handler()          - Catch USR1/CHLD signals...
- *   process_children()        - Process all dead children...
- *   select_timeout()          - Calculate the select timeout value.
- *   sigchld_handler()         - Handle 'child' signals from old processes.
- *   sighup_handler()          - Handle 'hangup' signals to reconfigure the
- *                               scheduler.
- *   sigterm_handler()         - Handle 'terminate' signals that stop the
- *                               scheduler.
- *   usage()                   - Show scheduler usage.
+ *   main()                - Main entry for the CUPS scheduler.
+ *   cupsdAddString()      - Copy and add a string to an array.
+ *   cupsdCheckProcess()   - Tell the main loop to check for dead children.
+ *   cupsdClearString()    - Clear a string.
+ *   cupsdClosePipe()      - Close a pipe as necessary.
+ *   cupsdFreeStrings()    - Free an array of strings.
+ *   cupsdHoldSignals()    - Hold child and termination signals.
+ *   cupsdOpenPipe()       - Create a pipe which is closed on exec.
+ *   cupsdReleaseSignals() - Release signals for delivery.
+ *   cupsdSetString()      - Set a string value.
+ *   cupsdSetStringf()     - Set a formatted string value.
+ *   cupsd_clean_files()   - Clean out old files.
+ *   launchd_checkin()     - Check-in with launchd and collect the listening
+ *                           fds.
+ *   launchd_checkout()    - Update the launchd KeepAlive file as needed.
+ *   parent_handler()      - Catch USR1/CHLD signals...
+ *   process_children()    - Process all dead children...
+ *   select_timeout()      - Calculate the select timeout value.
+ *   sigchld_handler()     - Handle 'child' signals from old processes.
+ *   sighup_handler()      - Handle 'hangup' signals to reconfigure the
+ *                           scheduler.
+ *   sigterm_handler()     - Handle 'terminate' signals that stop the scheduler.
+ *   usage()               - Show scheduler usage.
  */
 
 /*
@@ -1179,6 +1182,24 @@ main(int  argc,				/* I - Number of command-line args */
 
 
 /*
+ * 'cupsdAddString()' - Copy and add a string to an array.
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+cupsdAddString(cups_array_t **a,	/* IO - String array */
+               const char   *s)		/* I  - String to copy and add */
+{
+  if (!*a)
+    *a = cupsArrayNew3((cups_array_func_t)strcmp, NULL,
+		       (cups_ahash_func_t)NULL, 0,
+		       (cups_acopy_func_t)_cupsStrAlloc,
+		       (cups_afree_func_t)_cupsStrFree);
+
+  return (cupsArrayAdd(*a, (char *)s));
+}
+
+
+/*
  * 'cupsdCheckProcess()' - Tell the main loop to check for dead children.
  */
 
@@ -1190,6 +1211,21 @@ cupsdCheckProcess(void)
   */
 
   dead_children = 1;
+}
+
+
+/*
+ * 'cupsdClearString()' - Clear a string.
+ */
+
+void
+cupsdClearString(char **s)		/* O - String value */
+{
+  if (s && *s)
+  {
+    _cupsStrFree(*s);
+    *s = NULL;
+  }
 }
 
 
@@ -1215,6 +1251,49 @@ cupsdClosePipe(int *fds)		/* I - Pipe file descriptors (2) */
     close(fds[1]);
     fds[1] = -1;
   }
+}
+
+
+/*
+ * 'cupsdFreeStrings()' - Free an array of strings.
+ */
+
+void
+cupsdFreeStrings(cups_array_t **a)	/* IO - String array */
+{
+  if (*a)
+  {
+    cupsArrayDelete(*a);
+    *a = NULL;
+  }
+}
+
+
+/*
+ * 'cupsdHoldSignals()' - Hold child and termination signals.
+ */
+
+void
+cupsdHoldSignals(void)
+{
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  sigset_t		newmask;	/* New POSIX signal mask */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
+  holdcount ++;
+  if (holdcount > 1)
+    return;
+
+#ifdef HAVE_SIGSET
+  sighold(SIGTERM);
+  sighold(SIGCHLD);
+#elif defined(HAVE_SIGACTION)
+  sigemptyset(&newmask);
+  sigaddset(&newmask, SIGTERM);
+  sigaddset(&newmask, SIGCHLD);
+  sigprocmask(SIG_BLOCK, &newmask, &holdmask);
+#endif /* HAVE_SIGSET */
 }
 
 
@@ -1268,49 +1347,6 @@ cupsdOpenPipe(int *fds)			/* O - Pipe file descriptors (2) */
   */
 
   return (0);
-}
-
-
-/*
- * 'cupsdClearString()' - Clear a string.
- */
-
-void
-cupsdClearString(char **s)		/* O - String value */
-{
-  if (s && *s)
-  {
-    _cupsStrFree(*s);
-    *s = NULL;
-  }
-}
-
-
-/*
- * 'cupsdHoldSignals()' - Hold child and termination signals.
- */
-
-void
-cupsdHoldSignals(void)
-{
-#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
-  sigset_t		newmask;	/* New POSIX signal mask */
-#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
-
-
-  holdcount ++;
-  if (holdcount > 1)
-    return;
-
-#ifdef HAVE_SIGSET
-  sighold(SIGTERM);
-  sighold(SIGCHLD);
-#elif defined(HAVE_SIGACTION)
-  sigemptyset(&newmask);
-  sigaddset(&newmask, SIGTERM);
-  sigaddset(&newmask, SIGCHLD);
-  sigprocmask(SIG_BLOCK, &newmask, &holdmask);
-#endif /* HAVE_SIGSET */
 }
 
 
@@ -2159,9 +2195,10 @@ usage(int status)			/* O - Exit status */
 		  "\n"
 		  "-c config-file      Load alternate configuration file\n"
 		  "-f                  Run in the foreground\n"
-		  "-F                  Run in the foreground but detach\n"
+		  "-F                  Run in the foreground but detach from console\n"
 		  "-h                  Show this usage message\n"
-		  "-l                  Run cupsd from launchd(8)\n"));
+		  "-l                  Run cupsd from launchd(8)\n"
+		  "-t                  Test the configuration file\n"));
   exit(status);
 }
 

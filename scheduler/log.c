@@ -1,7 +1,7 @@
 /*
  * "$Id: log.c 7918 2008-09-08 22:03:01Z mike $"
  *
- *   Log file routines for the Common UNIX Printing System (CUPS).
+ *   Log file routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.

@@ -1,9 +1,9 @@
 /*
  * "$Id: subscriptions.h 7824 2008-08-01 21:11:55Z mike $"
  *
- *   Subscription definitions for the Common UNIX Printing System (CUPS) scheduler.
+ *   Subscription definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -100,9 +100,8 @@ typedef struct cupsd_subscription_s	/**** Subscription structure ****/
   time_t		last;		/* Time of last notification */
   time_t		expire;		/* Lease expiration time */
   int			first_event_id,	/* First event-id in cache */
-			next_event_id,	/* Next event-id to use */
-			num_events;	/* Number of cached events */
-  cupsd_event_t		**events;	/* Cached events */
+			next_event_id;	/* Next event-id to use */
+  cups_array_t		*events;	/* Cached events */
 } cupsd_subscription_t;
 
 

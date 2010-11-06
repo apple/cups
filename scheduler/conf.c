@@ -1,7 +1,7 @@
 /*
- * "$Id: conf.c 7952 2008-09-17 00:56:20Z mike $"
+ * "$Id: conf.c 9352 2010-11-06 04:55:26Z mike $"
  *
- *   Configuration routines for the Common UNIX Printing System (CUPS).
+ *   Configuration routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -29,6 +29,7 @@
  *   read_configuration()     - Read a configuration file.
  *   read_location()          - Read a <Location path> definition.
  *   read_policy()            - Read a <Policy name> definition.
+ *   set_policy_defaults()    - Set default policy values as needed.
  */
 
 /*
@@ -209,6 +210,7 @@ static int		parse_protocols(const char *s);
 static int		read_configuration(cups_file_t *fp);
 static int		read_location(cups_file_t *fp, char *name, int linenum);
 static int		read_policy(cups_file_t *fp, char *name, int linenum);
+static void		set_policy_defaults(cupsd_policy_t *pol);
 
 
 /*
@@ -462,8 +464,7 @@ cupsdReadConfiguration(void)
   if (NumRelays > 0)
   {
     for (i = 0; i < NumRelays; i ++)
-      if (Relays[i].from.type == CUPSD_AUTH_NAME)
-	free(Relays[i].from.mask.name.name);
+      cupsArrayDelete(Relays[i].from);
 
     free(Relays);
 
@@ -1166,6 +1167,27 @@ cupsdReadConfiguration(void)
       DefaultPolicyPtr = p = cupsdAddPolicy("default");
 
       cupsdLogMessage(CUPSD_LOG_INFO, "<Policy default>");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "JobPrivateAccess default");
+      cupsdAddString(&(p->job_access), "@OWNER");
+      cupsdAddString(&(p->job_access), "@SYSTEM");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "JobPrivateValues default");
+      cupsdAddString(&(p->job_attrs), "job-name");
+      cupsdAddString(&(p->job_attrs), "job-originating-host-name");
+      cupsdAddString(&(p->job_attrs), "job-originating-user-name");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateAccess default");
+      cupsdAddString(&(p->sub_access), "@OWNER");
+      cupsdAddString(&(p->sub_access), "@SYSTEM");
+
+      cupsdLogMessage(CUPSD_LOG_INFO, "SubscriptionPrivateValues default");
+      cupsdAddString(&(p->job_attrs), "notify-events");
+      cupsdAddString(&(p->job_attrs), "notify-pull-method");
+      cupsdAddString(&(p->job_attrs), "notify-recipient-uri");
+      cupsdAddString(&(p->job_attrs), "notify-subscriber-user-name");
+      cupsdAddString(&(p->job_attrs), "notify-user-data");
+
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "<Limit Create-Job Print-Job Print-URI Validate-Job>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1185,7 +1207,7 @@ cupsdReadConfiguration(void)
 		      "Set-Job-Attributes Create-Job-Subscription "
 		      "Renew-Subscription Cancel-Subscription "
 		      "Get-Notifications Reprocess-Job Cancel-Current-Job "
-		      "Suspend-Current-Job Resume-Job Cancel-Jobs "
+		      "Suspend-Current-Job Resume-Job "
 		      "Cancel-My-Jobs Close-Job CUPS-Move-Job "
 		      "CUPS-Authenticate-Job CUPS-Get-Document>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1213,7 +1235,6 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_CANCEL_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_SUSPEND_CURRENT_JOB);
       cupsdAddPolicyOp(p, po, IPP_RESUME_JOB);
-      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOBS);
       cupsdAddPolicyOp(p, po, IPP_CANCEL_MY_JOBS);
       cupsdAddPolicyOp(p, po, IPP_CLOSE_JOB);
       cupsdAddPolicyOp(p, po, CUPS_MOVE_JOB);
@@ -1229,7 +1250,7 @@ cupsdReadConfiguration(void)
 		      "Hold-New-Jobs Release-Held-New-Jobs "
 		      "Deactivate-Printer Activate-Printer Restart-Printer "
 		      "Shutdown-Printer Startup-Printer Promote-Job "
-		      "Schedule-Job-After CUPS-Add-Printer "
+		      "Schedule-Job-After Cancel-Jobs CUPS-Add-Printer "
 		      "CUPS-Delete-Printer CUPS-Add-Class CUPS-Delete-Class "
 		      "CUPS-Accept-Jobs CUPS-Reject-Jobs CUPS-Set-Default>");
       cupsdLogMessage(CUPSD_LOG_INFO, "Order Deny,Allow");
@@ -1257,6 +1278,7 @@ cupsdReadConfiguration(void)
       cupsdAddPolicyOp(p, po, IPP_STARTUP_PRINTER);
       cupsdAddPolicyOp(p, po, IPP_PROMOTE_JOB);
       cupsdAddPolicyOp(p, po, IPP_SCHEDULE_JOB_AFTER);
+      cupsdAddPolicyOp(p, po, IPP_CANCEL_JOBS);
       cupsdAddPolicyOp(p, po, CUPS_ADD_PRINTER);
       cupsdAddPolicyOp(p, po, CUPS_DELETE_PRINTER);
       cupsdAddPolicyOp(p, po, CUPS_ADD_CLASS);
@@ -1888,9 +1910,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	*/
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, zeros, zeros);
+	  cupsdAddIPMask(&(loc->allow), zeros, zeros);
 	else
-	  cupsdDenyIP(loc, zeros, zeros);
+	  cupsdAddIPMask(&(loc->deny), zeros, zeros);
       }
       else if (!strcasecmp(value, "none"))
       {
@@ -1899,9 +1921,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	*/
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, ones, zeros);
+	  cupsdAddIPMask(&(loc->allow), ones, zeros);
 	else
-	  cupsdDenyIP(loc, ones, zeros);
+	  cupsdAddIPMask(&(loc->deny), ones, zeros);
       }
 #ifdef AF_INET6
       else if (value[0] == '*' || value[0] == '.' ||
@@ -1918,9 +1940,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	  value ++;
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowHost(loc, value);
+	  cupsdAddNameMask(&(loc->allow), value);
 	else
-	  cupsdDenyHost(loc, value);
+	  cupsdAddNameMask(&(loc->deny), value);
       }
       else
       {
@@ -1936,9 +1958,9 @@ parse_aaa(cupsd_location_t *loc,	/* I - Location */
 	}
 
 	if (!strcasecmp(line, "Allow"))
-	  cupsdAllowIP(loc, ip, mask);
+	  cupsdAddIPMask(&(loc->allow), ip, mask);
 	else
-	  cupsdDenyIP(loc, ip, mask);
+	  cupsdAddIPMask(&(loc->deny), ip, mask);
       }
 
      /*
@@ -2407,8 +2429,6 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 					/* Line from file */
 			temp[HTTP_MAX_BUFFER],
 					/* Temporary buffer for value */
-			temp2[HTTP_MAX_BUFFER],
-					/* Temporary buffer 2 for value */
 			*ptr,		/* Pointer into line/temp */
 			*value,		/* Pointer to value */
 			*valueptr;	/* Pointer into value */
@@ -2704,7 +2724,8 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       if ((location = cupsdFindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
-        location = cupsdAddLocation("CUPS_INTERNAL_BROWSE_ACL");
+        if ((location = cupsdNewLocation("CUPS_INTERNAL_BROWSE_ACL")) != NULL)
+	  cupsdAddLocation(location);
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -2752,35 +2773,43 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       */
 
       if ((location = cupsdFindLocation("CUPS_INTERNAL_BROWSE_ACL")) == NULL)
-        location = cupsdAddLocation("CUPS_INTERNAL_BROWSE_ACL");
+        if ((location = cupsdNewLocation("CUPS_INTERNAL_BROWSE_ACL")) != NULL)
+	  cupsdAddLocation(location);
+
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Unable to initialize browse access control list!");
       else
       {
+	if (!strncasecmp(value, "from", 4))
+	{
+	 /*
+	  * Skip leading "from"...
+	  */
+
+	  value += 4;
+	}
+
 	while (*value)
 	{
-	  if (!strncasecmp(value, "from", 4))
-	  {
-	   /*
-	    * Strip leading "from"...
-	    */
+	 /*
+	  * Skip leading whitespace...
+	  */
 
-	    value += 4;
+	  while (isspace(*value & 255))
+	    value ++;
 
-	    while (isspace(*value & 255))
-	      value ++;
-
-	    if (!*value)
-	      break;
-	  }
+	  if (!*value)
+	    break;
 
 	 /*
 	  * Find the end of the value...
 	  */
 
-	  for (valueptr = value; *valueptr && !isspace(*valueptr & 255); valueptr ++);
+	  for (valueptr = value;
+	       *valueptr && !isspace(*valueptr & 255);
+	       valueptr ++);
 
 	  while (isspace(*valueptr & 255))
 	    *valueptr++ = '\0';
@@ -2808,9 +2837,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    */
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, zeros, zeros);
+	      cupsdAddIPMask(&(location->allow), zeros, zeros);
 	    else
-	      cupsdDenyIP(location, zeros, zeros);
+	      cupsdAddIPMask(&(location->deny), zeros, zeros);
 	  }
 	  else if (!strcasecmp(value, "none"))
 	  {
@@ -2819,28 +2848,26 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    */
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, ones, zeros);
+	      cupsdAddIPMask(&(location->allow), ones, zeros);
 	    else
-	      cupsdDenyIP(location, ones, zeros);
+	      cupsdAddIPMask(&(location->deny), ones, zeros);
 	  }
 #ifdef AF_INET6
 	  else if (value[0] == '*' || value[0] == '.' ||
 		   (!isdigit(value[0] & 255) && value[0] != '['))
 #else
-	  else if (value[0] == '*' || value[0] == '.' || !isdigit(value[0] & 255))
+	  else if (value[0] == '*' || value[0] == '.' ||
+	           !isdigit(value[0] & 255))
 #endif /* AF_INET6 */
 	  {
 	   /*
 	    * Host or domain name...
 	    */
 
-	    if (value[0] == '*')
-	      value ++;
-
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowHost(location, value);
+	      cupsdAddNameMask(&(location->allow), value);
 	    else
-	      cupsdDenyHost(location, value);
+	      cupsdAddNameMask(&(location->deny), value);
 	  }
 	  else
 	  {
@@ -2856,9 +2883,9 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    }
 
 	    if (!strcasecmp(line, "BrowseAllow"))
-	      cupsdAllowIP(location, ip, mask);
+	      cupsdAddIPMask(&(location->allow), ip, mask);
 	    else
-	      cupsdDenyIP(location, ip, mask);
+	      cupsdAddIPMask(&(location->deny), ip, mask);
 	  }
 
 	 /*
@@ -2896,14 +2923,29 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
       if (!strncasecmp(value, "from ", 5))
       {
        /*
-        * Strip leading "from"...
+	* Skip leading "from"...
 	*/
 
 	value += 5;
 
+       /*
+        * Skip leading whitespace...
+	*/
+
 	while (isspace(*value))
 	  value ++;
       }
+
+     /*
+      * Find the end of the from value...
+      */
+
+      for (valueptr = value;
+	   *valueptr && !isspace(*valueptr & 255);
+	   valueptr ++);
+
+      while (isspace(*valueptr & 255))
+	*valueptr++ = '\0';
 
      /*
       * Figure out what form the from address takes:
@@ -2930,24 +2972,13 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         * Host or domain name...
 	*/
 
-	if (value[0] == '*')
-	  value ++;
-
-        strlcpy(temp, value, sizeof(temp));
-	if ((ptr = strchr(temp, ' ')) != NULL)
-	  *ptr = '\0';
-
-        relay->from.type = CUPSD_AUTH_NAME;
-
-	if ((relay->from.mask.name.name = strdup(temp)) == NULL)
+        if (!cupsdAddNameMask(&(relay->from), value))
 	{
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
 			  "Unable to allocate BrowseRelay name at line %d - %s.",
 			  linenum, strerror(errno));
 	  continue;
 	}
-
-	relay->from.mask.name.length = strlen(temp);
       }
       else
       {
@@ -2962,41 +2993,32 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  break;
 	}
 
-        relay->from.type = CUPSD_AUTH_IP;
-	memcpy(relay->from.mask.ip.address, ip,
-	       sizeof(relay->from.mask.ip.address));
-	memcpy(relay->from.mask.ip.netmask, mask,
-	       sizeof(relay->from.mask.ip.netmask));
-      }
-
-     /*
-      * Skip value and trailing whitespace...
-      */
-
-      for (; *value; value ++)
-	if (isspace(*value))
-	  break;
-
-      while (isspace(*value))
-        value ++;
-
-      if (!strncasecmp(value, "to ", 3))
-      {
-       /*
-        * Strip leading "to"...
-	*/
-
-	value += 3;
-
-	while (isspace(*value))
-	  value ++;
+        if (!cupsdAddIPMask(&(relay->from), ip, mask))
+	{
+	  cupsdLogMessage(CUPSD_LOG_ERROR,
+			  "Unable to allocate BrowseRelay IP at line %d - %s.",
+			  linenum, strerror(errno));
+	  continue;
+	}
       }
 
      /*
       * Get "to" address and port...
       */
 
-      if ((addrlist = get_address(value, BrowsePort)) != NULL)
+      if (!strncasecmp(valueptr, "to ", 3))
+      {
+       /*
+        * Strip leading "to"...
+	*/
+
+	valueptr += 3;
+
+	while (isspace(*valueptr))
+	  valueptr ++;
+      }
+
+      if ((addrlist = get_address(valueptr, BrowsePort)) != NULL)
       {
        /*
         * Only IPv4 addresses are supported...
@@ -3012,37 +3034,29 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
 	  httpAddrString(&(relay->to), temp, sizeof(temp));
 
-	  if (relay->from.type == CUPSD_AUTH_IP)
-	    snprintf(temp2, sizeof(temp2), "%u.%u.%u.%u/%u.%u.%u.%u",
-		     relay->from.mask.ip.address[0] >> 24,
-		     (relay->from.mask.ip.address[0] >> 16) & 255,
-		     (relay->from.mask.ip.address[0] >> 8) & 255,
-		     relay->from.mask.ip.address[0] & 255,
-		     relay->from.mask.ip.netmask[0] >> 24,
-		     (relay->from.mask.ip.netmask[0] >> 16) & 255,
-		     (relay->from.mask.ip.netmask[0] >> 8) & 255,
-		     relay->from.mask.ip.netmask[0] & 255);
-	  else
-	    strlcpy(temp2, relay->from.mask.name.name, sizeof(temp2));
-
 	  cupsdLogMessage(CUPSD_LOG_INFO, "Relaying from %s to %s:%d (IPv4)",
-			  temp2, temp, ntohs(relay->to.ipv4.sin_port));
+			  value, temp, ntohs(relay->to.ipv4.sin_port));
 
 	  NumRelays ++;
 	}
 	else
+	{
+	  cupsArrayDelete(relay->from);
+	  relay->from = NULL;
+
 	  cupsdLogMessage(CUPSD_LOG_ERROR, "Bad relay address %s at line %d.",
-	                  value, linenum);
+	                  valueptr, linenum);
+	}
 
 	httpAddrFreeList(addrlist);
       }
       else
       {
-        if (relay->from.type == CUPSD_AUTH_NAME)
-	  free(relay->from.mask.name.name);
+	cupsArrayDelete(relay->from);
+	relay->from = NULL;
 
         cupsdLogMessage(CUPSD_LOG_ERROR, "Bad relay address %s at line %d.",
-	                value, linenum);
+	                valueptr, linenum);
       }
     }
     else if (!strcasecmp(line, "BrowsePoll") && value)
@@ -3563,8 +3577,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 			*valptr;	/* Pointer into value */
 
 
-  if ((parent = cupsdAddLocation(location)) == NULL)
+  if ((parent = cupsdNewLocation(location)) == NULL)
     return (0);
+
+  cupsdAddLocation(parent);
 
   parent->limit = CUPSD_AUTH_LIMIT_ALL;
   loc           = parent;
@@ -3589,8 +3605,10 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	  continue;
       }
 
-      if ((loc = cupsdCopyLocation(&parent)) == NULL)
+      if ((loc = cupsdCopyLocation(parent)) == NULL)
         return (0);
+
+      cupsdAddLocation(loc);
 
       loc->limit = 0;
       while (*value)
@@ -3694,106 +3712,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	                "Missing </Limit> before </Policy> on line %d!",
 	                linenum);
 
-     /*
-      * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
-      * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
-      * upgrades do not introduce new security issues...
-      */
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Validate-Job using the Print-Job limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Validate-Job defined in policy %s "
-			  "- using Print-Job's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOB)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Cancel-Jobs using the Cancel-Job limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Cancel-Jobs defined in policy %s "
-			  "- using Cancel-Job's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
-	  * a template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Cancel-My-Jobs defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for Close-Job using the Send-Document limit as a
-	  * template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for Close-Job defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
-	}
-      }
-
-      if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
-          op->op == IPP_ANY_OPERATION)
-      {
-        if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
-            op->op != IPP_ANY_OPERATION)
-	{
-	 /*
-	  * Add a new limit for CUPS-Get-Document using the Send-Document
-	  * limit as a template...
-	  */
-
-          cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "No limit for CUPS-Get-Document defined in policy %s "
-			  "- using Send-Document's policy", pol->name);
-
-          cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
-	}
-      }
+      set_policy_defaults(pol);
 
       return (linenum);
     }
@@ -3874,6 +3793,109 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
       op = NULL;
     }
+    else if (!strcasecmp(line, "JobPrivateAccess") ||
+	     !strcasecmp(line, "JobPrivateValues") ||
+	     !strcasecmp(line, "SubscriptionPrivateAccess") ||
+	     !strcasecmp(line, "SubscriptionPrivateValues"))
+    {
+      if (op)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "%s directive must appear outside <Limit>...</Limit> "
+			"on line %d.", line, linenum);
+	if (FatalErrors & CUPSD_FATAL_CONFIG)
+	  return (0);
+      }
+      else
+      {
+       /*
+        * Pull out whitespace-delimited values...
+	*/
+
+	while (*value)
+	{
+	 /*
+	  * Find the end of the current value...
+	  */
+
+	  for (valptr = value; !isspace(*valptr & 255) && *valptr; valptr ++);
+
+	  if (*valptr)
+	    *valptr++ = '\0';
+
+         /*
+	  * Save it appropriately...
+	  */
+
+	  if (!strcasecmp(line, "JobPrivateAccess"))
+	  {
+	   /*
+	    * JobPrivateAccess {all|default|user/group list|@@ACL}
+	    */
+
+            if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->job_access), "@OWNER");
+	      cupsdAddString(&(pol->job_access), "@SYSTEM");
+	    }
+	    else
+	      cupsdAddString(&(pol->job_access), value);
+	  }
+	  else if (!strcasecmp(line, "JobPrivateValues"))
+	  {
+	   /*
+	    * JobPrivateValues {all|none|default|attribute list}
+	    */
+
+	    if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->job_attrs), "job-name");
+	      cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
+	      cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+	    }
+	    else
+	      cupsdAddString(&(pol->job_attrs), value);
+	  }
+	  else if (!strcasecmp(line, "SubscriptionPrivateAccess"))
+	  {
+	   /*
+	    * SubscriptionPrivateAccess {all|default|user/group list|@@ACL}
+	    */
+
+            if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->sub_access), "@OWNER");
+	      cupsdAddString(&(pol->sub_access), "@SYSTEM");
+	    }
+	    else
+	      cupsdAddString(&(pol->sub_access), value);
+	  }
+	  else /* if (!strcasecmp(line, "SubscriptionPrivateValues")) */
+	  {
+	   /*
+	    * SubscriptionPrivateValues {all|none|default|attribute list}
+	    */
+
+	    if (!strcasecmp(value, "default"))
+	    {
+	      cupsdAddString(&(pol->sub_attrs), "notify-events");
+	      cupsdAddString(&(pol->sub_attrs), "notify-pull-method");
+	      cupsdAddString(&(pol->sub_attrs), "notify-recipient-uri");
+	      cupsdAddString(&(pol->sub_attrs), "notify-subscriber-user-name");
+	      cupsdAddString(&(pol->sub_attrs), "notify-user-data");
+	    }
+	    else
+	      cupsdAddString(&(pol->sub_attrs), value);
+	  }
+
+	 /*
+	  * Find the next string on the line...
+	  */
+
+	  for (value = valptr; isspace(*value & 255); value ++);
+	}
+      }
+    }
     else if (!op)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
@@ -3907,5 +3929,183 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 
 
 /*
- * End of "$Id: conf.c 7952 2008-09-17 00:56:20Z mike $".
+ * 'set_policy_defaults()' - Set default policy values as needed.
+ */
+
+static void
+set_policy_defaults(cupsd_policy_t *pol)/* I - Policy */
+{
+  cupsd_location_t	*op;		/* Policy operation */
+
+
+ /*
+  * Verify that we have an explicit policy for Validate-Job, Cancel-Jobs,
+  * Cancel-My-Jobs, Close-Job, and CUPS-Get-Document, which ensures that
+  * upgrades do not introduce new security issues...
+  */
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_VALIDATE_JOB)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_PRINT_JOB)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Validate-Job using the Print-Job limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Validate-Job defined in policy %s "
+		      "- using Print-Job's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_VALIDATE_JOB);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Validate-Job defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_JOBS)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_PAUSE_PRINTER)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Cancel-Jobs using the Pause-Printer limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-Jobs defined in policy %s "
+		      "- using Pause-Printer's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CANCEL_JOBS);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-Jobs defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CANCEL_MY_JOBS)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Cancel-My-Jobs using the Send-Document limit as
+      * a template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-My-Jobs defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CANCEL_MY_JOBS);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Cancel-My-Jobs defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, IPP_CLOSE_JOB)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for Close-Job using the Send-Document limit as a
+      * template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Close-Job defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, IPP_CLOSE_JOB);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for Close-Job defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+  if ((op = cupsdFindPolicyOp(pol, CUPS_GET_DOCUMENT)) == NULL ||
+      op->op == IPP_ANY_OPERATION)
+  {
+    if ((op = cupsdFindPolicyOp(pol, IPP_SEND_DOCUMENT)) != NULL &&
+	op->op != IPP_ANY_OPERATION)
+    {
+     /*
+      * Add a new limit for CUPS-Get-Document using the Send-Document
+      * limit as a template...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for CUPS-Get-Document defined in policy %s "
+		      "- using Send-Document's policy.", pol->name);
+
+      cupsdAddPolicyOp(pol, op, CUPS_GET_DOCUMENT);
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "No limit for CUPS-Get-Document defined in policy %s "
+		      "and no suitable template found.", pol->name);
+  }
+
+ /*
+  * Verify we have JobPrivateAccess, JobPrivateValues,
+  * SubscriptionPrivateAccess, and SubscriptionPrivateValues in the policy.
+  */
+
+  if (!pol->job_access)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No JobPrivateAccess defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->job_access), "@OWNER");
+    cupsdAddString(&(pol->job_access), "@SYSTEM");
+  }
+
+  if (!pol->job_attrs)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No JobPrivateValues defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->job_attrs), "job-name");
+    cupsdAddString(&(pol->job_attrs), "job-originating-host-name");
+    cupsdAddString(&(pol->job_attrs), "job-originating-user-name");
+  }
+
+  if (!pol->sub_access)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No SubscriptionPrivateAccess defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->sub_access), "@OWNER");
+    cupsdAddString(&(pol->sub_access), "@SYSTEM");
+  }
+
+  if (!pol->sub_attrs)
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+		    "No SubscriptionPrivateValues defined in policy %s "
+		    "- using defaults.", pol->name);
+    cupsdAddString(&(pol->sub_attrs), "notify-events");
+    cupsdAddString(&(pol->sub_attrs), "notify-pull-method");
+    cupsdAddString(&(pol->sub_attrs), "notify-recipient-uri");
+    cupsdAddString(&(pol->sub_attrs), "notify-subscriber-user-name");
+    cupsdAddString(&(pol->sub_attrs), "notify-user-data");
+  }
+}
+
+
+/*
+ * End of "$Id: conf.c 9352 2010-11-06 04:55:26Z mike $".
  */

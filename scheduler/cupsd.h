@@ -177,8 +177,10 @@ VAR int			Launchd		VALUE(0);
  * Prototypes...
  */
 
+extern int	cupsdAddString(cups_array_t **a, const char *s);
 extern void	cupsdCheckProcess(void);
 extern void	cupsdClearString(char **s);
+extern void	cupsdFreeStrings(cups_array_t **a);
 extern void	cupsdHoldSignals(void);
 extern void	cupsdReleaseSignals(void);
 extern void	cupsdSetString(char **s, const char *v);

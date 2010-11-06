@@ -1,9 +1,9 @@
 /*
  * "$Id: array.h 7266 2008-01-29 02:15:29Z mike $"
  *
- *   Sorted array definitions for the Common UNIX Printing System (CUPS).
+ *   Sorted array definitions for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -45,6 +45,10 @@ typedef int (*cups_array_func_t)(void *first, void *second, void *data);
 					/**** Array comparison function ****/
 typedef int (*cups_ahash_func_t)(void *element, void *data);
 					/**** Array hash function ****/
+typedef void *(*cups_acopy_func_t)(void *element, void *data);
+					/**** Array element copy function ****/
+typedef void (*cups_afree_func_t)(void *element, void *data);
+					/**** Array element free function ****/
 
 
 /*
@@ -67,6 +71,10 @@ extern void		*cupsArrayLast(cups_array_t *a) _CUPS_API_1_2;
 extern cups_array_t	*cupsArrayNew(cups_array_func_t f, void *d) _CUPS_API_1_2;
 extern cups_array_t	*cupsArrayNew2(cups_array_func_t f, void *d,
 			               cups_ahash_func_t h, int hsize) _CUPS_API_1_3;
+extern cups_array_t	*cupsArrayNew3(cups_array_func_t f, void *d,
+			               cups_ahash_func_t h, int hsize,
+				       cups_acopy_func_t cf,
+				       cups_afree_func_t ff) _CUPS_API_1_5;
 extern void		*cupsArrayNext(cups_array_t *a) _CUPS_API_1_2;
 extern void		*cupsArrayPrev(cups_array_t *a) _CUPS_API_1_2;
 extern int		cupsArrayRemove(cups_array_t *a, void *e) _CUPS_API_1_2;

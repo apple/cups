@@ -167,7 +167,8 @@ static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
 		                        int quickcopy);
 static void	close_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static void	copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
-		           ipp_tag_t group, int quickcopy);
+		           ipp_tag_t group, int quickcopy,
+			   cups_array_t *exclude);
 static int	copy_banner(cupsd_client_t *con, cupsd_job_t *job,
 		            const char *name);
 static int	copy_file(const char *from, const char *to);
@@ -175,13 +176,14 @@ static int	copy_model(cupsd_client_t *con, const char *from,
 		           const char *to);
 static void	copy_job_attrs(cupsd_client_t *con,
 		               cupsd_job_t *job,
-			       cups_array_t *ra);
+			       cups_array_t *ra, cups_array_t *exclude);
 static void	copy_printer_attrs(cupsd_client_t *con,
 		                   cupsd_printer_t *printer,
 				   cups_array_t *ra);
 static void	copy_subscription_attrs(cupsd_client_t *con,
 		                        cupsd_subscription_t *sub,
-					cups_array_t *ra);
+					cups_array_t *ra,
+					cups_array_t *exclude);
 static void	create_job(cupsd_client_t *con, ipp_attribute_t *uri);
 static cups_array_t *create_requested_array(ipp_t *request);
 static void	create_subscription(cupsd_client_t *con, ipp_attribute_t *uri);
@@ -4396,8 +4398,8 @@ static int				/* O - 1 if OK, 0 if forbidden,
 check_quotas(cupsd_client_t  *con,	/* I - Client connection */
              cupsd_printer_t *p)	/* I - Printer or class */
 {
-  int		i;			/* Looping var */
-  char		username[33];		/* Username */
+  char		username[33],		/* Username */
+		*name;			/* Current user name */
   cupsd_quota_t	*q;			/* Quota data */
 #ifdef HAVE_MBR_UID_TO_UUID
  /*
@@ -4464,10 +4466,10 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
   * Check against users...
   */
 
-  if (p->num_users == 0 && p->k_limit == 0 && p->page_limit == 0)
+  if (cupsArrayCount(p->users) == 0 && p->k_limit == 0 && p->page_limit == 0)
     return (1);
 
-  if (p->num_users)
+  if (cupsArrayCount(p->users))
   {
 #ifdef HAVE_MBR_UID_TO_UUID
    /*
@@ -4498,21 +4500,22 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
     endpwent();
 #endif /* HAVE_MBR_UID_TO_UUID */
 
-    for (i = 0; i < p->num_users; i ++)
-      if (p->users[i][0] == '@')
+    for (name = (char *)cupsArrayFirst(p->users);
+         name;
+	 name = (char *)cupsArrayNext(p->users))
+      if (name[0] == '@')
       {
        /*
         * Check group membership...
 	*/
 
 #ifdef HAVE_MBR_UID_TO_UUID
-        if (p->users[i][1] == '#')
+        if (name[1] == '#')
 	{
-	  if (uuid_parse((char *)p->users[i] + 2, grp_uuid))
+	  if (uuid_parse(name + 2, grp_uuid))
 	    uuid_clear(grp_uuid);
 	}
-	else if ((mbr_err = mbr_group_name_to_uuid((char *)p->users[i] + 1,
-	                                           grp_uuid)) != 0)
+	else if ((mbr_err = mbr_group_name_to_uuid(name + 1, grp_uuid)) != 0)
 	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4521,10 +4524,10 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "check_quotas: UUID lookup failed for ACL entry "
-			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+			  "\"%s\" (err=%d)", name, mbr_err);
 	  cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Access control entry \"%s\" not a valid group name; "
-			  "entry ignored", p->users[i]);
+			  "entry ignored", name);
 	}
 
 	if ((mbr_err = mbr_check_membership(usr_uuid, grp_uuid,
@@ -4536,7 +4539,7 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
 	  cupsdLogMessage(CUPSD_LOG_DEBUG,
 			  "check_quotas: group \"%s\" membership check "
-			  "failed (err=%d)", p->users[i] + 1, mbr_err);
+			  "failed (err=%d)", name + 1, mbr_err);
 	  is_member = 0;
 	}
 
@@ -4548,20 +4551,19 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 	  break;
 
 #else
-        if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+        if (cupsdCheckGroup(username, pw, name + 1))
 	  break;
 #endif /* HAVE_MBR_UID_TO_UUID */
       }
 #ifdef HAVE_MBR_UID_TO_UUID
       else
       {
-        if (p->users[i][0] == '#')
+        if (name[0] == '#')
 	{
-	  if (uuid_parse((char *)p->users[i] + 1, usr2_uuid))
+	  if (uuid_parse(name + 1, usr2_uuid))
 	    uuid_clear(usr2_uuid);
         }
-        else if ((mbr_err = mbr_user_name_to_uuid((char *)p->users[i],
-					          usr2_uuid)) != 0)
+        else if ((mbr_err = mbr_user_name_to_uuid(name, usr2_uuid)) != 0)
     	{
 	 /*
 	  * Invalid ACL entries are ignored for matching; just record a
@@ -4570,21 +4572,21 @@ check_quotas(cupsd_client_t  *con,	/* I - Client connection */
 
           cupsdLogMessage(CUPSD_LOG_DEBUG,
 	                  "check_quotas: UUID lookup failed for ACL entry "
-			  "\"%s\" (err=%d)", p->users[i], mbr_err);
+			  "\"%s\" (err=%d)", name, mbr_err);
           cupsdLogMessage(CUPSD_LOG_WARN,
 	                  "Access control entry \"%s\" not a valid user name; "
-			  "entry ignored", p->users[i]);
+			  "entry ignored", name);
 	}
 
 	if (!uuid_compare(usr_uuid, usr2_uuid))
 	  break;
       }
 #else
-      else if (!strcasecmp(username, p->users[i]))
+      else if (!strcasecmp(username, name))
 	break;
 #endif /* HAVE_MBR_UID_TO_UUID */
 
-    if ((i < p->num_users) == p->deny_users)
+    if ((name != NULL) == p->deny_users)
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
                       "Denying user \"%s\" access to printer \"%s\"...",
@@ -4940,7 +4942,8 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
            ipp_t        *from,		/* I - Source request */
            cups_array_t *ra,		/* I - Requested attributes */
 	   ipp_tag_t    group,		/* I - Group to copy */
-	   int          quickcopy)	/* I - Do a quick copy? */
+	   int          quickcopy,	/* I - Do a quick copy? */
+	   cups_array_t *exclude)	/* I - Attributes to exclude? */
 {
   ipp_attribute_t	*fromattr;	/* Source attribute */
 
@@ -4961,6 +4964,23 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
     if ((group != IPP_TAG_ZERO && fromattr->group_tag != group &&
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
+
+    if (exclude && 
+        (cupsArrayFind(exclude, fromattr->name) ||
+	 cupsArrayFind(exclude, "all")))
+    {
+     /*
+      * We need to exclude this attribute for security reasons; we require the
+      * job-id and job-printer-uri attributes regardless of the security
+      * settings for IPP conformance.
+      *
+      * Subscription attribute security is handled by copy_subscription_attrs().
+      */
+
+      if (strcmp(fromattr->name, "job-id") &&
+	  strcmp(fromattr->name, "job-printer-uri"))
+        continue;
+    }
 
     if (!ra || cupsArrayFind(ra, fromattr->name))
     {
@@ -5608,7 +5628,8 @@ copy_model(cupsd_client_t *con,		/* I - Client connection */
 static void
 copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
 	       cupsd_job_t    *job,	/* I - Job */
-	       cups_array_t   *ra)	/* I - Requested attributes array */
+	       cups_array_t   *ra,	/* I - Requested attributes array */
+	       cups_array_t   *exclude)	/* I - Private attributes array */
 {
   char	job_uri[HTTP_MAX_URI];		/* Job URI */
 
@@ -5621,26 +5642,34 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
                    con->servername, con->serverport, "/jobs/%d",
         	   job->id);
 
-  if (!ra || cupsArrayFind(ra, "document-count"))
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-        	  "document-count", job->num_files);
+  if (!cupsArrayFind(exclude, "all"))
+  {
+    if ((!exclude || !cupsArrayFind(exclude, "document-count")) &&
+        (!ra || cupsArrayFind(ra, "document-count")))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+		    "document-count", job->num_files);
 
-  if (!ra || cupsArrayFind(ra, "job-media-progress"))
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-        	  "job-media-progress", job->progress);
+    if ((!exclude || !cupsArrayFind(exclude, "job-media-progress")) &&
+        (!ra || cupsArrayFind(ra, "job-media-progress")))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+		    "job-media-progress", job->progress);
 
-  if (!ra || cupsArrayFind(ra, "job-more-info"))
-    ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
-        	 "job-more-info", NULL, job_uri);
+    if ((!exclude || !cupsArrayFind(exclude, "job-more-info")) &&
+        (!ra || cupsArrayFind(ra, "job-more-info")))
+      ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
+		   "job-more-info", NULL, job_uri);
 
-  if (job->state_value > IPP_JOB_PROCESSING &&
-      (!ra || cupsArrayFind(ra, "job-preserved")))
-    ippAddBoolean(con->response, IPP_TAG_JOB, "job-preserved",
-                  job->num_files > 0);
+    if (job->state_value > IPP_JOB_PROCESSING &&
+	(!exclude || !cupsArrayFind(exclude, "job-preserved")) &&
+        (!ra || cupsArrayFind(ra, "job-preserved")))
+      ippAddBoolean(con->response, IPP_TAG_JOB, "job-preserved",
+		    job->num_files > 0);
 
-  if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
-    ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
-                  "job-printer-up-time", time(NULL));
+    if ((!exclude || !cupsArrayFind(exclude, "job-printer-up-time")) &&
+        (!ra || cupsArrayFind(ra, "job-printer-up-time")))
+      ippAddInteger(con->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+		    "job-printer-up-time", time(NULL));
+  }
 
   if (!ra || cupsArrayFind(ra, "job-state-reasons"))
     add_job_state_reasons(con, job);
@@ -5649,7 +5678,7 @@ copy_job_attrs(cupsd_client_t *con,	/* I - Client connection */
     ippAddString(con->response, IPP_TAG_JOB, IPP_TAG_URI,
         	 "job-uri", NULL, job_uri);
 
-  copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0);
+  copy_attrs(con->response, job->attrs, ra, IPP_TAG_JOB, 0, exclude);
 }
 
 
@@ -5821,7 +5850,7 @@ copy_printer_attrs(
 
     for (i = 0; i < printer->num_history; i ++)
       copy_attrs(history->values[i].collection = ippNew(), printer->history[i],
-                 NULL, IPP_TAG_ZERO, 0);
+                 NULL, IPP_TAG_ZERO, 0, NULL);
   }
 
   if (!ra || cupsArrayFind(ra, "printer-state-message"))
@@ -5875,10 +5904,10 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "queued-job-count"))
     add_queued_job_count(con, printer);
 
-  copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0);
+  copy_attrs(con->response, printer->attrs, ra, IPP_TAG_ZERO, 0, NULL);
   if (printer->ppd_attrs)
-    copy_attrs(con->response, printer->ppd_attrs, ra, IPP_TAG_ZERO, 0);
-  copy_attrs(con->response, CommonData, ra, IPP_TAG_ZERO, IPP_TAG_COPY);
+    copy_attrs(con->response, printer->ppd_attrs, ra, IPP_TAG_ZERO, 0, NULL);
+  copy_attrs(con->response, CommonData, ra, IPP_TAG_ZERO, IPP_TAG_COPY, NULL);
 }
 
 
@@ -5890,7 +5919,8 @@ static void
 copy_subscription_attrs(
     cupsd_client_t       *con,		/* I - Client connection */
     cupsd_subscription_t *sub,		/* I - Subscription */
-    cups_array_t         *ra)		/* I - Requested attributes array */
+    cups_array_t         *ra,		/* I - Requested attributes array */
+    cups_array_t         *exclude)	/* I - Private attributes array */
 {
   ipp_attribute_t	*attr;		/* Current attribute */
   char			printer_uri[HTTP_MAX_URI];
@@ -5900,55 +5930,91 @@ copy_subscription_attrs(
   const char		*name;		/* Current event name */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "copy_subscription_attrs(con=%p, sub=%p, ra=%p, exclude=%p)",
+		  con, sub, ra, exclude);
+
  /*
   * Copy the subscription attributes to the response using the
   * requested-attributes attribute that may be provided by the client.
   */
 
-  if (!ra || cupsArrayFind(ra, "notify-events"))
+  if (!exclude || !cupsArrayFind(exclude, "all"))
   {
-    if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
+    if ((!exclude || !cupsArrayFind(exclude, "notify-events")) &&
+        (!ra || cupsArrayFind(ra, "notify-events")))
     {
-     /*
-      * Simple event list...
-      */
+      cupsdLogMessage(CUPSD_LOG_DEBUG2, "copy_subscription_attrs: notify-events");
 
-      ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
-                   (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
-                   "notify-events", NULL, name);
+      if ((name = cupsdEventName((cupsd_eventmask_t)sub->mask)) != NULL)
+      {
+       /*
+	* Simple event list...
+	*/
+
+	ippAddString(con->response, IPP_TAG_SUBSCRIPTION,
+		     (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
+		     "notify-events", NULL, name);
+      }
+      else
+      {
+       /*
+	* Complex event list...
+	*/
+
+	for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+	  if (sub->mask & mask)
+	    count ++;
+
+	attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
+			     (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
+			     "notify-events", count, NULL, NULL);
+
+	for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
+	  if (sub->mask & mask)
+	  {
+	    attr->values[count].string.text =
+		(char *)cupsdEventName((cupsd_eventmask_t)mask);
+
+	    count ++;
+	  }
+      }
     }
-    else
-    {
-     /*
-      * Complex event list...
-      */
 
-      for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
-	if (sub->mask & mask)
-          count ++;
+    if ((!exclude || !cupsArrayFind(exclude, "notify-lease-duration")) &&
+        (!sub->job && (!ra || cupsArrayFind(ra, "notify-lease-duration"))))
+      ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+		    "notify-lease-duration", sub->lease);
 
-      attr = ippAddStrings(con->response, IPP_TAG_SUBSCRIPTION,
-                           (ipp_tag_t)(IPP_TAG_KEYWORD | IPP_TAG_COPY),
-                           "notify-events", count, NULL, NULL);
+    if ((!exclude || !cupsArrayFind(exclude, "notify-recipient-uri")) &&
+        (sub->recipient && (!ra || cupsArrayFind(ra, "notify-recipient-uri"))))
+      ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
+		   "notify-recipient-uri", NULL, sub->recipient);
+    else if ((!exclude || !cupsArrayFind(exclude, "notify-pull-method")) &&
+             (!ra || cupsArrayFind(ra, "notify-pull-method")))
+      ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
+		   "notify-pull-method", NULL, "ippget");
 
-      for (mask = 1, count = 0; mask < CUPSD_EVENT_ALL; mask <<= 1)
-	if (sub->mask & mask)
-	{
-          attr->values[count].string.text =
-	      (char *)cupsdEventName((cupsd_eventmask_t)mask);
+    if ((!exclude || !cupsArrayFind(exclude, "notify-subscriber-user-name")) &&
+        (!ra || cupsArrayFind(ra, "notify-subscriber-user-name")))
+      ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
+		   "notify-subscriber-user-name", NULL, sub->owner);
 
-          count ++;
-	}
-    }
+    if ((!exclude || !cupsArrayFind(exclude, "notify-time-interval")) &&
+        (!ra || cupsArrayFind(ra, "notify-time-interval")))
+      ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
+		    "notify-time-interval", sub->interval);
+
+    if (sub->user_data_len > 0 &&
+	(!exclude || !cupsArrayFind(exclude, "notify-user-data")) &&
+        (!ra || cupsArrayFind(ra, "notify-user-data")))
+      ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
+			sub->user_data, sub->user_data_len);
   }
 
   if (sub->job && (!ra || cupsArrayFind(ra, "notify-job-id")))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
                   "notify-job-id", sub->job->id);
-
-  if (!sub->job && (!ra || cupsArrayFind(ra, "notify-lease-duration")))
-    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-lease-duration", sub->lease);
 
   if (sub->dest && (!ra || cupsArrayFind(ra, "notify-printer-uri")))
   {
@@ -5959,28 +6025,9 @@ copy_subscription_attrs(
         	 "notify-printer-uri", NULL, printer_uri);
   }
 
-  if (sub->recipient && (!ra || cupsArrayFind(ra, "notify-recipient-uri")))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_URI,
-        	 "notify-recipient-uri", NULL, sub->recipient);
-  else if (!ra || cupsArrayFind(ra, "notify-pull-method"))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_KEYWORD,
-                 "notify-pull-method", NULL, "ippget");
-
-  if (!ra || cupsArrayFind(ra, "notify-subscriber-user-name"))
-    ippAddString(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_NAME,
-        	 "notify-subscriber-user-name", NULL, sub->owner);
-
   if (!ra || cupsArrayFind(ra, "notify-subscription-id"))
     ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
                   "notify-subscription-id", sub->id);
-
-  if (!ra || cupsArrayFind(ra, "notify-time-interval"))
-    ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_INTEGER,
-                  "notify-time-interval", sub->interval);
-
-  if (sub->user_data_len > 0 && (!ra || cupsArrayFind(ra, "notify-user-data")))
-    ippAddOctetString(con->response, IPP_TAG_SUBSCRIPTION, "notify-user-data",
-                      sub->user_data, sub->user_data_len);
 }
 
 
@@ -7004,12 +7051,14 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   int		jobid;			/* Job ID */
   cupsd_job_t	*job;			/* Current job */
   cupsd_printer_t *printer;		/* Current printer */
-  char		scheme[HTTP_MAX_URI],	/* Method portion of URI */
+  cupsd_policy_t *policy;		/* Current security policy */
+  char		scheme[HTTP_MAX_URI],	/* Scheme portion of URI */
 		username[HTTP_MAX_URI],	/* Username portion of URI */
 		host[HTTP_MAX_URI],	/* Host portion of URI */
 		resource[HTTP_MAX_URI];	/* Resource portion of URI */
   int		port;			/* Port portion of URI */
-  cups_array_t	*ra;			/* Requested attributes array */
+  cups_array_t	*ra,			/* Requested attributes array */
+		*exclude;		/* Private attributes array */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_job_attrs(%p[%d], %s)", con,
@@ -7082,19 +7131,17 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
     printer = cupsdFindDest(job->dest);
 
   if (printer)
-  {
-    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
-                                   NULL)) != HTTP_OK)
-    {
-      send_http_error(con, status, printer);
-      return;
-    }
-  }
-  else if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    policy = printer->op_policy_ptr;
+  else
+    policy = DefaultPolicyPtr;
+
+  if ((status = cupsdCheckPolicy(policy, con, job->username)) != HTTP_OK)
   {
     send_http_error(con, status, NULL);
     return;
   }
+
+  exclude = cupsdGetPrivateAttrs(policy, con, printer, job->username);
 
  /*
   * Copy attributes...
@@ -7103,7 +7150,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
   cupsdLoadJob(job);
 
   ra = create_requested_array(con->request);
-  copy_job_attrs(con, job, ra);
+  copy_job_attrs(con, job, ra, exclude);
   cupsArrayDelete(ra);
 
   con->response->request.status.status_code = IPP_OK;
@@ -7137,7 +7184,9 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   cupsd_job_t	*job;			/* Current job pointer */
   cupsd_printer_t *printer;		/* Printer */
   cups_array_t	*list;			/* Which job list... */
-  cups_array_t	*ra;			/* Requested attributes array */
+  cups_array_t	*ra,			/* Requested attributes array */
+		*exclude;		/* Private attributes array */
+  cupsd_policy_t *policy;		/* Current policy */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs(%p[%d], %s)", con, con->http.fd,
@@ -7200,15 +7249,11 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
   */
 
   if (printer)
-  {
-    if ((status = cupsdCheckPolicy(printer->op_policy_ptr, con,
-                                   NULL)) != HTTP_OK)
-    {
-      send_http_error(con, status, printer);
-      return;
-    }
-  }
-  else if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+    policy = printer->op_policy_ptr;
+  else
+    policy = DefaultPolicyPtr;
+
+  if ((status = cupsdCheckPolicy(policy, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status, NULL);
     return;
@@ -7395,7 +7440,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
       if (i > 0)
 	ippAddSeparator(con->response);
 
-      copy_job_attrs(con, job, ra);
+      exclude = cupsdGetPrivateAttrs(job->printer ?
+                                         job->printer->op_policy_ptr :
+					 policy, con, job->printer,
+					 job->username);
+
+      copy_job_attrs(con, job, ra, exclude);
     }
   }
   else
@@ -7451,7 +7501,12 @@ get_jobs(cupsd_client_t  *con,		/* I - Client connection */
 
       count ++;
 
-      copy_job_attrs(con, job, ra);
+      exclude = cupsdGetPrivateAttrs(job->printer ?
+                                         job->printer->op_policy_ptr :
+					 policy, con, job->printer,
+					 job->username);
+
+      copy_job_attrs(con, job, ra, exclude);
     }
 
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "get_jobs: count=%d", count);
@@ -7577,7 +7632,7 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
     * If we don't have any new events, nothing to do here...
     */
 
-    if (min_seq > (sub->first_event_id + sub->num_events))
+    if (min_seq > (sub->first_event_id + cupsArrayCount(sub->events)))
       continue;
 
    /*
@@ -7589,12 +7644,13 @@ get_notifications(cupsd_client_t *con)	/* I - Client connection */
     else
       j = min_seq - sub->first_event_id;
 
-    for (; j < sub->num_events; j ++)
+    for (; j < cupsArrayCount(sub->events); j ++)
     {
       ippAddSeparator(con->response);
 
-      copy_attrs(con->response, sub->events[j]->attrs, NULL,
-        	 IPP_TAG_EVENT_NOTIFICATION, 0);
+      copy_attrs(con->response,
+                 ((cupsd_event_t *)cupsArrayIndex(sub->events, j))->attrs, NULL,
+        	 IPP_TAG_EVENT_NOTIFICATION, 0, NULL);
     }
   }
 }
@@ -8162,7 +8218,8 @@ get_printers(cupsd_client_t *con,	/* I - Client connection */
       * access...
       */
 
-      if (printer->num_users && username && !user_allowed(printer, username))
+      if (cupsArrayCount(printer->users) && username &&
+	  !user_allowed(printer, username))
         continue;
 
      /*
@@ -8199,7 +8256,9 @@ get_subscription_attrs(
 {
   http_status_t		status;		/* Policy status */
   cupsd_subscription_t	*sub;		/* Subscription */
-  cups_array_t		*ra;		/* Requested attributes array */
+  cupsd_policy_t	*policy;	/* Current security policy */
+  cups_array_t		*ra,		/* Requested attributes array */
+			*exclude;	/* Private attributes array */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -8225,13 +8284,18 @@ get_subscription_attrs(
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(sub->dest ? sub->dest->op_policy_ptr :
-                                             DefaultPolicyPtr,
-                                 con, sub->owner)) != HTTP_OK)
+  if (sub->dest)
+    policy = sub->dest->op_policy_ptr;
+  else
+    policy = DefaultPolicyPtr;
+
+  if ((status = cupsdCheckPolicy(policy, con, sub->owner)) != HTTP_OK)
   {
     send_http_error(con, status, sub->dest);
     return;
   }
+
+  exclude = cupsdGetPrivateAttrs(policy, con, sub->dest, sub->owner);
 
  /*
   * Copy the subscription attributes to the response using the
@@ -8240,7 +8304,7 @@ get_subscription_attrs(
 
   ra = create_requested_array(con->request);
 
-  copy_subscription_attrs(con, sub, ra);
+  copy_subscription_attrs(con, sub, ra, exclude);
 
   cupsArrayDelete(ra);
 
@@ -8274,6 +8338,8 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   int			port;		/* Port portion of URI */
   cupsd_job_t		*job;		/* Job pointer */
   cupsd_printer_t	*printer;	/* Printer */
+  cupsd_policy_t	*policy;	/* Policy */
+  cups_array_t		*exclude;	/* Private attributes array */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2,
@@ -8337,9 +8403,12 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(printer ? printer->op_policy_ptr :
-                                           DefaultPolicyPtr,
-                                 con, NULL)) != HTTP_OK)
+  if (printer)
+    policy = printer->op_policy_ptr;
+  else
+    policy = DefaultPolicyPtr;
+
+  if ((status = cupsdCheckPolicy(policy, con, NULL)) != HTTP_OK)
   {
     send_http_error(con, status, printer);
     return;
@@ -8376,7 +8445,12 @@ get_subscriptions(cupsd_client_t  *con,	/* I - Client connection */
         (!username[0] || !strcasecmp(username, sub->owner)))
     {
       ippAddSeparator(con->response);
-      copy_subscription_attrs(con, sub, ra);
+
+      exclude = cupsdGetPrivateAttrs(sub->dest ? sub->dest->op_policy_ptr :
+						 policy, con, sub->dest,
+						 sub->owner);
+
+      copy_subscription_attrs(con, sub, ra, exclude);
 
       count ++;
       if (limit && count >= limit)
@@ -11198,7 +11272,7 @@ set_printer_defaults(
     }
     else if (!strcmp(attr->name, "requesting-user-name-allowed"))
     {
-      cupsdFreePrinterUsers(printer);
+      cupsdFreeStrings(&(printer->users));
 
       printer->deny_users = 0;
 
@@ -11207,12 +11281,12 @@ set_printer_defaults(
 	   strcmp(attr->values[0].string.text, "all")))
       {
 	for (i = 0; i < attr->num_values; i ++)
-	  cupsdAddPrinterUser(printer, attr->values[i].string.text);
+	  cupsdAddString(&(printer->users), attr->values[i].string.text);
       }
     }
     else if (!strcmp(attr->name, "requesting-user-name-denied"))
     {
-      cupsdFreePrinterUsers(printer);
+      cupsdFreeStrings(&(printer->users));
 
       printer->deny_users = 1;
 
@@ -11221,7 +11295,7 @@ set_printer_defaults(
 	   strcmp(attr->values[0].string.text, "none")))
       {
 	for (i = 0; i < attr->num_values; i ++)
-	  cupsdAddPrinterUser(printer, attr->values[i].string.text);
+	  cupsdAddString(&(printer->users), attr->values[i].string.text);
       }
     }
     else if (!strcmp(attr->name, "job-quota-period"))
@@ -11401,6 +11475,7 @@ static void
 start_printer(cupsd_client_t  *con,	/* I - Client connection */
               ipp_attribute_t *uri)	/* I - Printer URI */
 {
+  int			i;		/* Temporary variable */
   http_status_t		status;		/* Policy status */
   cups_ptype_t		dtype;		/* Destination type (printer/class) */
   cupsd_printer_t	*printer;	/* Printer data */
@@ -11450,6 +11525,21 @@ start_printer(cupsd_client_t  *con,	/* I - Client connection */
                     printer->name, get_username(con));
 
   cupsdCheckJobs();
+
+ /*
+  * Check quotas...
+  */
+
+  if ((i = check_quotas(con, printer)) < 0)
+  {
+    send_ipp_status(con, IPP_NOT_POSSIBLE, _("Quota limit reached."));
+    return;
+  }
+  else if (i == 0)
+  {
+    send_ipp_status(con, IPP_NOT_AUTHORIZED, _("Not allowed to print."));
+    return;
+  }
 
  /*
   * Everything was ok, so return OK status...
@@ -11634,13 +11724,13 @@ static int				/* O - 0 if not allowed, 1 if allowed */
 user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
              const char      *username)	/* I - Username */
 {
-  int		i;			/* Looping var */
   struct passwd	*pw;			/* User password data */
   char		baseuser[256],		/* Base username */
-		*baseptr;		/* Pointer to "@" in base username */
+		*baseptr,		/* Pointer to "@" in base username */
+		*name;			/* Current user name */
 
 
-  if (p->num_users == 0)
+  if (cupsArrayCount(p->users) == 0)
     return (1);
 
   if (!strcmp(username, "root"))
@@ -11663,31 +11753,33 @@ user_allowed(cupsd_printer_t *p,	/* I - Printer or class */
   pw = getpwnam(username);
   endpwent();
 
-  for (i = 0; i < p->num_users; i ++)
+  for (name = (char *)cupsArrayFirst(p->users);
+       name;
+       name = (char *)cupsArrayNext(p->users))
   {
-    if (p->users[i][0] == '@')
+    if (name[0] == '@')
     {
      /*
       * Check group membership...
       */
 
-      if (cupsdCheckGroup(username, pw, p->users[i] + 1))
+      if (cupsdCheckGroup(username, pw, name + 1))
         break;
     }
-    else if (p->users[i][0] == '#')
+    else if (name[0] == '#')
     {
      /*
       * Check UUID...
       */
 
-      if (cupsdCheckGroup(username, pw, p->users[i]))
+      if (cupsdCheckGroup(username, pw, name))
         break;
     }
-    else if (!strcasecmp(username, p->users[i]))
+    else if (!strcasecmp(username, name))
       break;
   }
 
-  return ((i < p->num_users) != p->deny_users);
+  return ((name != NULL) != p->deny_users);
 }
 
 

@@ -1,9 +1,9 @@
 /*
  * "$Id: sysman.h 7928 2008-09-10 22:14:22Z mike $"
  *
- *   System management definitions for the Common UNIX Printing System (CUPS).
+ *   System management definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the

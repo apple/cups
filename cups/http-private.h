@@ -169,6 +169,8 @@ typedef void *http_tls_t;
 #  endif /* HAVE_LIBSSL */
 
 
+typedef int (*_http_timeout_cb_t)(http_t *http, void *user_data);
+
 struct _http_s				/**** HTTP connection structure. ****/
 {
   int			fd;		/* File descriptor for this socket */
@@ -224,11 +226,14 @@ struct _http_s				/**** HTTP connection structure. ****/
   gss_name_t		gssname;	/* Authentication server name @since CUPS 1.3@ */
 #  endif /* HAVE_GSSAPI */
 #  ifdef HAVE_AUTHORIZATION_H
-  AuthorizationRef	auth_ref;	/* Authorization ref */
+  AuthorizationRef	auth_ref;	/* Authorization ref @since CUPS 1.3@ */
 #  endif /* HAVE_AUTHORIZATION_H */
   /**** New in CUPS 1.5 ****/
   http_tls_credentials_t tls_credentials;
-					/* TLS credentials */
+					/* TLS credentials @since CUPS 1.5@ */
+  _http_timeout_cb_t	timeout_cb;	/* Timeout callback @since CUPS 1.5@ */
+  void			*timeout_data;	/* User data pointer @since CUPS 1.5@ */
+  struct timeval	timeout_value;	/* Timeout in seconds */
 };
 
 
@@ -314,6 +319,8 @@ extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
 extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
 			                 size_t resolved_size, int log);
+extern void		_httpSetTimeout(http_t *http, double timeout,
+			                _http_timeout_cb_t cb, void *user_data);
 extern int		_httpWait(http_t *http, int msec, int usessl);
 
 

@@ -1,9 +1,9 @@
 /*
  * "$Id: client.h 7935 2008-09-11 01:54:11Z mike $"
  *
- *   Client definitions for the Common UNIX Printing System (CUPS) scheduler.
+ *   Client definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the

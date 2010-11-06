@@ -1,7 +1,7 @@
 /*
  * "$Id: client.c 7950 2008-09-17 00:21:59Z mike $"
  *
- *   Client routines for the Common UNIX Printing System (CUPS) scheduler.
+ *   Client routines for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -2545,26 +2545,27 @@ cupsdSendHeader(
       * parameter as needed...
       */
 
-      int 	i;			/* Looping var */
-      char	*auth_key;		/* Auth key buffer */
+      char	*name,			/* Current user name */
+		*auth_key;		/* Auth key buffer */
       size_t	auth_size;		/* Size of remaining buffer */
 
       auth_key  = auth_str + strlen(auth_str);
       auth_size = sizeof(auth_str) - (auth_key - auth_str);
 
-      for (i = 0; i < con->best->num_names; i ++)
+      for (name = (char *)cupsArrayFirst(con->best->names);
+           name;
+	   name = (char *)cupsArrayNext(con->best->names))
       {
 #ifdef HAVE_AUTHORIZATION_H
-	if (!strncasecmp(con->best->names[i], "@AUTHKEY(", 9))
+	if (!strncasecmp(name, "@AUTHKEY(", 9))
 	{
-	  snprintf(auth_key, auth_size, ", authkey=\"%s\"",
-	           con->best->names[i] + 9);
+	  snprintf(auth_key, auth_size, ", authkey=\"%s\"", name + 9);
 	  /* end parenthesis is stripped in conf.c */
 	  break;
         }
 	else
 #endif /* HAVE_AUTHORIZATION_H */
-	if (!strcasecmp(con->best->names[i], "@SYSTEM"))
+	if (!strcasecmp(name, "@SYSTEM"))
 	{
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
@@ -3513,7 +3514,19 @@ get_cdsa_certificate(
       goto cleanup;
     }
 
+    CFRelease(search);
+    search = NULL;
+    if ((err = SecIdentitySearchCreateWithPolicy(policy, NULL, CSSM_KEYUSE_SIGN,
+					       keychain, FALSE, &search)))
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Cannot create identity search reference: %s (%d)",
+		      cssmErrorString(err), (int)err);
+      goto cleanup;
+    }
+
     err = SecIdentitySearchCopyNext(search, &identity);
+
   }
 
   if (err)
@@ -4477,11 +4490,21 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
 		*argv[4],		/* Command-line arguments */
 		*envp[MAX_ENV + 1],	/* Environment variables */
 		keychain[1024],		/* Keychain argument */
-		infofile[1024];		/* Type-in information for cert */
+		infofile[1024],		/* Type-in information for cert */
+		localname[1024],	/* Local hostname */
+		*servername;		/* Name of server in cert */
   cups_file_t	*fp;			/* Seed/info file */
   int		infofd;			/* Info file descriptor */
 
 
+  if (con->servername && isdigit(con->servername[0] & 255) && DNSSDHostName)
+  {
+    snprintf(localname, sizeof(localname), "%s.local", DNSSDHostName);
+    servername = localname;
+  }
+  else
+    servername = con->servername;
+	
  /*
   * Run the "certtool" command to generate a self-signed certificate...
   */
@@ -4509,7 +4532,7 @@ make_certificate(cupsd_client_t *con)	/* I - Client connection */
   }
 
   cupsFilePrintf(fp, "%s\nr\n\ny\nb\ns\ny\n%s\n\n\n\n\n%s\ny\n",
-        	 con->servername, con->servername, ServerAdmin);
+        	 servername, servername, ServerAdmin);
   cupsFileClose(fp);
 
   cupsdLogMessage(CUPSD_LOG_INFO,

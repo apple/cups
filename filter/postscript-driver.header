@@ -1,3 +1,18 @@
+<!--
+  "$Id$"
+
+  PostScript printer driver documentation for CUPS.
+
+  Copyright 2007-2010 by Apple Inc.
+  Copyright 1997-2007 by Easy Software Products.
+
+  These coded instructions, statements, and computer programs are the
+  property of Apple Inc. and are protected by Federal copyright
+  law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+  which should have been included with this file.  If this file is
+  file is missing or damaged, see the license at "http://www.cups.org/".
+-->
+
 <h1 class='title'>Developing PostScript Printer Drivers</h1>
 
 <p>This document describes how to develop printer drivers for PostScript printers. Topics include: <a href='#BASICS'>printer driver basics</a>, <a href='#CREATE'>creating new PPD files</a>, <a href='#IMPORT'>importing existing PPD files</a>, <a href='#FILTERS'>using custom filters</a>, <a href='#COLOR'>implementing color management</a>, and <a href='#MACOSX'>adding Mac OS X features</a>.</p>

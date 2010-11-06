@@ -1,9 +1,9 @@
 /*
  * "$Id: sysman.c 7928 2008-09-10 22:14:22Z mike $"
  *
- *   System management definitions for the Common UNIX Printing System (CUPS).
+ *   System management functions for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -52,7 +52,7 @@
  *
  * Power management support is currently only implemented on MacOS X, but
  * essentially we use four functions to let the OS know when it is OK to
- * put the system to idle sleep, typically when we are not in the middle of
+ * put the system to sleep, typically when we are not in the middle of
  * printing a job.
  *
  * Once put to sleep, we invalidate all remote printers since it is common

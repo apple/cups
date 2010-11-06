@@ -36,6 +36,7 @@
  *   print_xml_string()  - Print an XML string with escaping.
  *   print_xml_trailer() - Print the XML trailer with success/fail value.
  *   set_variable()      - Set a variable value.
+ *   timeout_cb()        - Handle HTTP timeouts.
  *   usage()             - Show program usage.
  *   validate_attr()     - Determine whether an attribute is valid.
  *   with_value()        - Test a WITH-VALUE predicate.
@@ -115,6 +116,7 @@ typedef struct _cups_vars_s		/**** Set of variables ****/
 		resource[1024];		/* Resource path from URI */
   int 		port;			/* Port number from URI */
   http_encryption_t encryption;		/* Encryption for connection? */
+  double	timeout;		/* Timeout for connection */
   cups_array_t	*vars;			/* Array of variables */
 } _cups_vars_t;
 
@@ -191,6 +193,7 @@ static void	print_xml_string(const char *element, const char *s);
 static void	print_xml_trailer(int success, const char *message);
 static void	set_variable(_cups_vars_t *vars, const char *name,
 		             const char *value);
+static int	timeout_cb(http_t *http, void *user_data);
 static void	usage(void);
 static int	validate_attr(ipp_attribute_t *attr, int print);
 static int      with_value(char *value, int regex, ipp_attribute_t *attr,
@@ -213,7 +216,7 @@ main(int  argc,				/* I - Number of command-line args */
 			filename[1024],	/* Real filename */
 			testname[1024];	/* Real test filename */
   const char		*testfile;	/* Test file to use */
-  int			interval,	/* Test interval */
+  int			interval,	/* Test interval in microseconds */
 			repeat;		/* Repeat count */
   _cups_vars_t		vars;		/* Variables */
   http_uri_status_t	uri_status;	/* URI separation status */
@@ -280,6 +283,19 @@ main(int  argc,				/* I - Number of command-line args */
 			      _("%s: Sorry, no encryption support compiled in\n"),
 			      argv[0]);
 #endif /* HAVE_SSL */
+	      break;
+
+	  case 'T' : /* Set timeout */
+	      i ++;
+
+	      if (i >= argc)
+	      {
+		_cupsLangPuts(stderr,
+		              _("ipptool: Missing timeout for \"-T\".\n"));
+		usage();
+              }
+
+	      vars.timeout = _cupsStrScand(argv[i], NULL, localeconv());
 	      break;
 
 	  case 'V' : /* Set IPP version */
@@ -378,7 +394,16 @@ main(int  argc,				/* I - Number of command-line args */
 		usage();
               }
 	      else
-		interval = atoi(argv[i]);
+	      {
+		interval = (int)(_cupsStrScand(argv[i], NULL, localeconv()) *
+		                 1000000.0);
+		if (interval <= 0)
+		{
+		  _cupsLangPuts(stderr,
+				_("ipptool: Invalid seconds for \"-i\".\n"));
+		  usage();
+		}
+              }
 
               if (Output == _CUPS_OUTPUT_PLIST && interval)
 	      {
@@ -517,20 +542,20 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (Output == _CUPS_OUTPUT_PLIST)
     print_xml_trailer(!status, NULL);
-  else if (interval && repeat > 0)
+  else if (interval > 0 && repeat > 0)
   {
     while (repeat > 1)
     {
-      sleep(interval);
+      usleep(interval);
       do_tests(&vars, testfile);
       repeat --;
     }
   }
-  else if (interval)
+  else if (interval > 0)
   {
     for (;;)
     {
-      sleep(interval);
+      usleep(interval);
       do_tests(&vars, testfile);
     }
   }
@@ -627,6 +652,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
     pass = 0;
     goto test_exit;
   }
+
+  if (vars->timeout > 0.0)
+    _httpSetTimeout(http, vars->timeout, timeout_cb, NULL);
 
  /*
   * Loop on tests...
@@ -1194,7 +1222,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         * Delay before operation...
 	*/
 
-        int delay;
+        double delay;
 
 	if (!get_token(fp, token, sizeof(token), &linenum))
 	{
@@ -1203,7 +1231,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 
-	if ((delay = atoi(token)) <= 0)
+	if ((delay = _cupsStrScand(token, NULL, localeconv())) <= 0.0)
 	{
 	  print_fatal_error("Bad DELAY value \"%s\" on line %d.", token,
 	                    linenum);
@@ -1213,9 +1241,9 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	else
 	{
 	  if (Output == _CUPS_OUTPUT_TEST)
-	    printf("    [%d second delay]\n", delay);
+	    printf("    [%g second delay]\n", delay);
 
-	  sleep(delay);
+	  usleep((int)(1000000.0 * delay));
 	}
       }
       else if (!strcasecmp(token, "ATTR"))
@@ -3688,6 +3716,21 @@ set_variable(_cups_vars_t *vars,	/* I - Variables */
 
 
 /*
+ * 'timeout_cb()' - Handle HTTP timeouts.
+ */
+
+static int				/* O - 1 to continue, 0 to cancel */
+timeout_cb(http_t *http,		/* I - Connection to server (unused) */
+           void   *user_data)		/* I - User data (unused) */
+{
+  (void)http;
+  (void)user_data;
+
+  return (0);
+}
+
+
+/*
  * 'usage()' - Show program usage.
  */
 
@@ -3705,6 +3748,7 @@ usage(void)
 		  "-I             Ignore errors\n"
 		  "-L             Send requests using content-length\n"
 		  "-S             Test with SSL encryption.\n"
+		  "-T             Set the receive/send timeout in seconds.\n"
 		  "-V version     Set default IPP version.\n"
 		  "-X             Produce XML plist instead of plain text.\n"
 		  "-d name=value  Define variable.\n"
@@ -4523,6 +4567,65 @@ with_value(char            *value,	/* I - Value string */
 	{
 	  for (i = 0; i < attr->num_values; i ++)
 	    print_test_error("GOT: %s=%d", attr->name, attr->values[i].integer);
+	}
+	break;
+
+    case IPP_TAG_RANGE :
+        for (i = 0; i < attr->num_values; i ++)
+        {
+	  char	op,			/* Comparison operator */
+	  	*nextptr;		/* Next pointer */
+	  int	intvalue;		/* Integer value */
+
+
+          valptr = value;
+	  if (!strncmp(valptr, "no-value,", 9))
+	    valptr += 9;
+
+	  while (isspace(*valptr & 255) || isdigit(*valptr & 255) ||
+		 *valptr == '-' || *valptr == ',' || *valptr == '<' ||
+		 *valptr == '=' || *valptr == '>')
+	  {
+	    op = '=';
+	    while (*valptr && !isdigit(*valptr & 255) && *valptr != '-')
+	    {
+	      if (*valptr == '<' || *valptr == '>' || *valptr == '=')
+		op = *valptr;
+	      valptr ++;
+	    }
+
+            if (!*valptr)
+	      break;
+
+	    intvalue = strtol(valptr, &nextptr, 0);
+	    if (nextptr == valptr)
+	      break;
+	    valptr = nextptr;
+
+	    switch (op)
+	    {
+	      case '=' :
+	          if (attr->values[i].range.upper == intvalue)
+		    return (1);
+		  break;
+	      case '<' :
+	          if (attr->values[i].range.upper < intvalue)
+		    return (1);
+		  break;
+	      case '>' :
+	          if (attr->values[i].range.upper > intvalue)
+		    return (1);
+		  break;
+	    }
+	  }
+        }
+
+	if (report)
+	{
+	  for (i = 0; i < attr->num_values; i ++)
+	    print_test_error("GOT: %s=%d-%d", attr->name,
+	                     attr->values[i].range.lower,
+	                     attr->values[i].range.upper);
 	}
 	break;
 

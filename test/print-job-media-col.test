@@ -32,6 +32,7 @@
 		MEMBER integer media-top-margin 0
 		MEMBER integer media-bottom-margin 0
 	}
+	ATTR enum print-quality 5
 
 	FILE $filename
 

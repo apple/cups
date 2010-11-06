@@ -95,7 +95,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   int			similar;	/* Are the old and new size similar? */
   _pwg_size_t           *old_size;	/* Current old size */
   int			old_imageable,	/* Old imageable length in 2540ths */
-			old_borderless;	/* Old borderless state */
+			old_borderless,	/* Old borderless state */
+			old_known_pwg;	/* Old PWG name is well-known */
   int			new_width,	/* New width in 2540ths */
 			new_length,	/* New length in 2540ths */
 			new_left,	/* New left margin in 2540ths */
@@ -103,7 +104,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 			new_right,	/* New right margin in 2540ths */
 			new_top,	/* New top margin in 2540ths */
 			new_imageable,	/* New imageable length in 2540ths */
-			new_borderless;	/* New borderless state */
+			new_borderless,	/* New borderless state */
+			new_known_pwg;	/* New PWG name is well-known */
   _pwg_size_t           *new_size;	/* New size to add, if any */
 
 
@@ -178,7 +180,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       * Standard name and no conflicts, use it!
       */
 
-      pwg_name = pwg_media->pwg;
+      pwg_name      = pwg_media->pwg;
+      new_known_pwg = 1;
     }
     else
     {
@@ -188,7 +191,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       *     pp_lowerppd_WIDTHxHEIGHTuu
       */
 
-      pwg_name = pwg_keyword;
+      pwg_name      = pwg_keyword;
+      new_known_pwg = 0;
 
       pwg_unppdize_name(ppd_size->name, ppd_name, sizeof(ppd_name));
       _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), NULL, ppd_name,
@@ -208,8 +212,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     new_right      = _PWG_FROMPTS(ppd_size->width - ppd_size->right);
     new_top        = _PWG_FROMPTS(ppd_size->length - ppd_size->top);
     new_imageable  = new_length - new_top - new_bottom;
-    new_borderless = (new_bottom == 0 && new_top == 0) ||
-                     (new_left == 0 && new_right == 0);
+    new_borderless = new_bottom == 0 && new_top == 0 &&
+                     new_left == 0 && new_right == 0;
 
     for (k = pwg->num_sizes, similar = 0, old_size = pwg->sizes, new_size = NULL;
          k > 0 && !similar;
@@ -218,16 +222,20 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       old_imageable  = old_size->length - old_size->top - old_size->bottom;
       old_borderless = old_size->left == 0 && old_size->bottom == 0 &&
 	               old_size->right == 0 && old_size->top == 0;
-
+      old_known_pwg  = strncmp(old_size->map.pwg, "oe_", 3) &&
+		       strncmp(old_size->map.pwg, "om_", 3);
+		
       similar = old_borderless == new_borderless &&
                 _PWG_EQUIVALENT(old_size->width, new_width) &&
 	        _PWG_EQUIVALENT(old_size->length, new_length);
 
-      if (similar && new_imageable > old_imageable)
+      if (similar && 
+          (new_known_pwg || (!old_known_pwg && new_imageable > old_imageable)))
       {
        /*
-	* The new paper has a larger imageable area so it will replace
-	* the older paper.
+	* The new paper has a larger imageable area so it could replace
+	* the older paper.  Regardless of the imageable area, we always
+	* prefer the size with a well-known PWG name.
 	*/
 
 	new_size = old_size;

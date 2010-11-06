@@ -1,7 +1,7 @@
 /*
  * "$Id: conf.h 7935 2008-09-11 01:54:11Z mike $"
  *
- *   Configuration file definitions for CUPS.
+ *   Configuration file definitions for the CUPS scheduler.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.

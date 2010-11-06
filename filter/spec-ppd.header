@@ -1,7 +1,7 @@
 <!--
   "$Id$"
 
-  Raster printer driver documentation for CUPS.
+  PPD extension documentation for CUPS.
 
   Copyright 2007-2010 by Apple Inc.
   Copyright 1997-2007 by Easy Software Products.
@@ -13,20 +13,20 @@
   file is missing or damaged, see the license at "http://www.cups.org/".
 -->
 
-<h1 class='title'>Developing Raster Printer Drivers</h1>
+<H1 CLASS="title">CUPS PPD Extensions</H1>
 
-<p>This document describes how to develop printer drivers for raster printers. Topics include: <a href='#BASICS'>printer driver basics</a>, <a href='#CREATE'>creating new PPD files</a>, <a href='#FILTERS'>using filters</a>, <a href='#COLOR'>implementing color management</a>, and <a href='#MACOSX'>adding Mac OS X features</a>.</p>
+<p>This specification describes the attributes and extensions that CUPS adds to <a href="http://partners.adobe.com/public/developer/en/ps/5003.PPD_Spec_v4.3.pdf" target="_blank">Adobe TechNote #5003: PostScript Printer Description File Format Specification Version 4.3</a>. PostScript Printer Description ("PPD") files describe the capabilities of each printer and are used by CUPS to support printer-specific features and intelligent filtering.</p>
 
 <div class='summary'><table summary='General Information'>
 <tbody>
 <tr>
 	<th>See Also</th>
 	<td>Programming: <a href='postscript-driver.html'>Developing PostScript Printer Drivers</a><br>
+	Programming: <a href='raster-driver.html'>Developing Raster Printer Drivers</a><br>
 	Programming: <a href='api-filter.html'>Filter and Backend Programming</a><br>
 	Programming: <a href='ppd-compiler.html'>Introduction to the PPD Compiler</a><br>
 	Programming: <a href='api-raster.html'>Raster API</a><br>
-	References: <a href='ref-ppdcfile.html'>PPD Compiler Driver Information File Reference</a><br>
-	Specifications: <a href='spec-ppd.html'>CUPS PPD Extensions</a></td>
+	References: <a href='ref-ppdcfile.html'>PPD Compiler Driver Information File Reference</a></td>
 </tr>
 </tbody>
 </table></div>

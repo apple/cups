@@ -1479,6 +1479,48 @@ the file is assumed to be relative to the <A
 HREF="#ServerRoot"><CODE>ServerRoot</CODE></A> directory.</P>
 
 
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="JobPrivateAccess">JobPrivateAccess</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+JobPrivateAccess all
+JobPrivateAccess default
+JobPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>JobPrivateAccess</CODE> directive specifies the access list for a
+job's private values. The "default" access list is "@OWNER @SYSTEM". "@ACL" maps
+to the printer's requesting-user-name-allowed or requesting-user-name-denied
+values.</P>
+
+<P>The <CODE>JobPrivateAccess</CODE> directive must appear inside a <A
+HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="JobPrivateValues">JobPrivateValues</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+JobPrivateValues all
+JobPrivateValues default
+JobPrivateValues none
+JobPrivateValues attribute-name-1 [ ... attribute-name-N ]
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>JobPrivateValues</CODE> directive specifies the list of job values
+to make private. The "default" values are "job-name",
+"job-originating-host-name", and "job-originating-user-name".</P>
+
+<P>The <CODE>JobPrivateValues</CODE> directive must appear inside a <A
+HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
+
+
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="JobRetryInterval">JobRetryInterval</A></H2>
 
 <H3>Examples</H3>
@@ -2983,6 +3025,49 @@ SSLPort 443
 <P>The <CODE>SSLPort</CODE> directive specifies a port to listen
 on for secure connections. Multiple <CODE>SSLPort</CODE> lines
 can be specified to listen on multiple ports.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="SubscriptionPrivateAccess">SubscriptionPrivateAccess</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+SubscriptionPrivateAccess all
+SubscriptionPrivateAccess default
+SubscriptionPrivateAccess {user|@group|@ACL|@OWNER|@SYSTEM}+
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>SubscriptionPrivateAccess</CODE> directive specifies the access list for a
+subscription's private values. The "default" access list is "@OWNER @SYSTEM".
+"@ACL" maps to the printer's requesting-user-name-allowed or
+requesting-user-name-denied values.</P>
+
+<P>The <CODE>SubscriptionPrivateAccess</CODE> directive must appear inside a <A
+HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
+
+
+<H2 CLASS="title"><SPAN CLASS="info">CUPS 1.5</SPAN><A NAME="SubscriptionPrivateValues">SubscriptionPrivateValues</A></H2>
+
+<H3>Examples</H3>
+
+<PRE CLASS="command">
+SubscriptionPrivateValues all
+SubscriptionPrivateValues default
+SubscriptionPrivateValues none
+SubscriptionPrivateValues attribute-name-1 [ ... attribute-name-N ]
+</PRE>
+
+<H3>Description</H3>
+
+<P>The <CODE>SubscriptionPrivateValues</CODE> directive specifies the list of
+subscription values to make private. The "default" values are "notify-events",
+"notify-pull-method", "notify-recipient-uri", "notify-subscriber-user-name", and
+"notify-user-data".</P>
+
+<P>The <CODE>SubscriptionPrivateValues</CODE> directive must appear inside a <A
+HREF="#Policy"><CODE>Policy</CODE></A> section.</P>
 
 
 <H2 CLASS="title"><A NAME="SystemGroup">SystemGroup</A></H2>

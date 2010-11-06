@@ -803,6 +803,7 @@ cupsWriteRequestData(
     if ((http = cg->http) == NULL)
     {
       _cupsSetError(IPP_INTERNAL_ERROR, _("No active connection"), 1);
+      DEBUG_puts("1cupsWriteRequestData: Returning HTTP_ERROR.");
       return (HTTP_ERROR);
     }
   }
@@ -814,7 +815,11 @@ cupsWriteRequestData(
   wused = http->wused;
 
   if (httpWrite2(http, buffer, length) < 0)
+  {
+    DEBUG_puts("1cupsWriteRequestData: Returning HTTP_ERROR.");
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(http->error), 0);
     return (HTTP_ERROR);
+  }
 
  /*
   * Finally, check if we have any pending data from the server...
@@ -833,12 +838,17 @@ cupsWriteRequestData(
       http_status_t	status;		/* Status from httpUpdate */
 
       if ((status = httpUpdate(http)) >= HTTP_BAD_REQUEST)
+      {
+        _cupsSetHTTPError(status);
         httpFlush(http);
+      }
 
+      DEBUG_printf(("1cupsWriteRequestData: Returning %d.\n", status));
       return (status);
     }
   }
 
+  DEBUG_puts("1cupsWriteRequestData: Returning HTTP_CONTINUE.");
   return (HTTP_CONTINUE);
 }
 
@@ -1002,6 +1012,10 @@ _cupsSetHTTPError(http_status_t status)	/* I - HTTP status code */
 
     case HTTP_PKI_ERROR :
 	_cupsSetError(IPP_PKI_ERROR, httpStatus(status), 0);
+        break;
+
+    case HTTP_ERROR :
+	_cupsSetError(IPP_INTERNAL_ERROR, httpStatus(status), 0);
         break;
 
     default :

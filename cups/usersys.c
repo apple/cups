@@ -539,91 +539,45 @@ _cupsSetDefaults(void)
   cups_expiredcerts = getenv("CUPS_EXPIREDCERTS");
 
  /*
-  * Then, if needed, the .cups/client.conf or .cupsrc file in the home
-  * directory...
+  * Then, if needed, read the ~/.cups/client.conf or /etc/cups/client.conf
+  * files to get the default values...
   */
-
-  if ((cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
-       !cg->ipp_port) && (home = getenv("HOME")) != NULL)
-  {
-   /*
-    * Look for ~/.cups/client.conf...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
-    if ((fp = cupsFileOpen(filename, "r")) != NULL)
-    {
-      cups_read_client_conf(fp, cg, cups_encryption, cups_server,
-			    cups_anyroot, cups_expiredroot,
-			    cups_expiredcerts);
-
-      cupsFileClose(fp);
-    }
-  }
 
   if (cg->encryption == (http_encryption_t)-1 || !cg->server[0] ||
       !cg->ipp_port)
   {
-   /*
-    * Look for CUPS_SERVERROOT/client.conf...
-    */
-
-    snprintf(filename, sizeof(filename), "%s/client.conf", cg->cups_serverroot);
-    if ((fp = cupsFileOpen(filename, "r")) != NULL)
+    if ((home = getenv("HOME")) != NULL)
     {
-      cups_read_client_conf(fp, cg, cups_encryption, cups_server,
-			    cups_anyroot, cups_expiredroot,
-			    cups_expiredcerts);
-      cupsFileClose(fp);
-    }
-  }
-
- /*
-  * If we still have things that aren't set, use the compiled in defaults...
-  */
-
-  if (cg->encryption == (http_encryption_t)-1)
-    cg->encryption = HTTP_ENCRYPT_IF_REQUESTED;
-
-  if (!cg->server[0])
-  {
-    if (!cups_server)
-    {
-#ifdef CUPS_DEFAULT_DOMAINSOCKET
      /*
-      * If we are compiled with domain socket support, only use the
-      * domain socket if it exists and has the right permissions...
+      * Look for ~/.cups/client.conf...
       */
 
-      struct stat	sockinfo;	/* Domain socket information */
-
-      if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
-	  (sockinfo.st_mode & S_IRWXO) == S_IRWXO)
-	cups_server = CUPS_DEFAULT_DOMAINSOCKET;
-      else
-#endif /* CUPS_DEFAULT_DOMAINSOCKET */
-      cups_server = "localhost";
+      snprintf(filename, sizeof(filename), "%s/.cups/client.conf", home);
+      fp = cupsFileOpen(filename, "r");
     }
-
-    cupsSetServer(cups_server);
-  }
-
-  if (!cg->ipp_port)
-  {
-    const char		*ipp_port;	/* IPP_PORT environment variable */
-    struct servent	*service;	/* Port number info */
-
-
-    if ((ipp_port = getenv("IPP_PORT")) != NULL)
-    {
-      if ((cg->ipp_port = atoi(ipp_port)) <= 0)
-        cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
-    }
-    else if ((service = getservbyname("ipp", NULL)) == NULL ||
-             service->s_port <= 0)
-      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
     else
-      cg->ipp_port = ntohs(service->s_port);
+      fp = NULL;
+
+    if (!fp)
+    {
+     /*
+      * Look for CUPS_SERVERROOT/client.conf...
+      */
+
+      snprintf(filename, sizeof(filename), "%s/client.conf",
+               cg->cups_serverroot);
+      fp = cupsFileOpen(filename, "r");
+    }
+
+   /*
+    * Read the configuration file and apply any environment variables; both
+    * functions handle NULL cups_file_t pointers...
+    */
+
+    cups_read_client_conf(fp, cg, cups_encryption, cups_server,
+			  cups_anyroot, cups_expiredroot,
+			  cups_expiredcerts);
+    cupsFileClose(fp);
   }
 }
 
@@ -736,6 +690,44 @@ cups_read_client_conf(
 
     if (!cg->ipp_port && value)
       cg->ipp_port = atoi(value);
+  }
+
+  if (!cg->server[0])
+  {
+#ifdef CUPS_DEFAULT_DOMAINSOCKET
+   /*
+    * If we are compiled with domain socket support, only use the
+    * domain socket if it exists and has the right permissions...
+    */
+
+    struct stat	sockinfo;		/* Domain socket information */
+
+    if (!stat(CUPS_DEFAULT_DOMAINSOCKET, &sockinfo) &&
+	(sockinfo.st_mode & S_IRWXO) == S_IRWXO)
+      cups_server = CUPS_DEFAULT_DOMAINSOCKET;
+    else
+#endif /* CUPS_DEFAULT_DOMAINSOCKET */
+      cups_server = "localhost";
+
+    cupsSetServer(cups_server);
+  }
+
+  if (!cg->ipp_port)
+  {
+    const char		*ipp_port;	/* IPP_PORT environment variable */
+    struct servent	*service;	/* Port number info */
+
+
+    if ((ipp_port = getenv("IPP_PORT")) != NULL)
+    {
+      if ((cg->ipp_port = atoi(ipp_port)) <= 0)
+        cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
+    }
+    else if ((service = getservbyname("ipp", NULL)) == NULL ||
+             service->s_port <= 0)
+      cg->ipp_port = CUPS_DEFAULT_IPP_PORT;
+    else
+      cg->ipp_port = ntohs(service->s_port);
   }
 
   if (cups_anyroot)

@@ -1,9 +1,9 @@
 /*
  * "$Id: auth.c 7830 2008-08-04 20:38:50Z mike $"
  *
- *   Authorization routines for the Common UNIX Printing System (CUPS).
+ *   Authorization routines for the CUPS scheduler.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -17,12 +17,11 @@
  *
  * Contents:
  *
+ *   cupsdAddIPMask()          - Add an IP address authorization mask.
  *   cupsdAddLocation()        - Add a location for authorization.
  *   cupsdAddName()            - Add a name to a location...
- *   cupsdAllowHost()          - Add a host name that is allowed to access the
- *                               location.
- *   cupsdAllowIP()            - Add an IP address or network that is allowed to
- *                               access the location.
+ *   cupsdAddNameMask()        - Add a host or interface name authorization
+ *                               mask.
  *   cupsdAuthorize()          - Validate any authorization credentials.
  *   cupsdCheckAccess()        - Check whether the given address is allowed to
  *                               access a location.
@@ -32,22 +31,19 @@
  *   cupsdCopyLocation()       - Make a copy of a location...
  *   cupsdDeleteAllLocations() - Free all memory used for location
  *                               authorization.
- *   cupsdDeleteLocation()     - Free all memory used by a location.
- *   cupsdDenyHost()           - Add a host name that is not allowed to access
- *                               the location.
- *   cupsdDenyIP()             - Add an IP address or network that is not
- *                               allowed to access the location.
  *   cupsdFindBest()           - Find the location entry that best matches the
  *                               resource.
  *   cupsdFindLocation()       - Find the named location.
+ *   cupsdFreeLocation()       - Free all memory used by a location.
  *   cupsdIsAuthorized()       - Check to see if the user is authorized...
- *   add_allow()               - Add an allow mask to the location.
- *   add_deny()                - Add a deny mask to the location.
+ *   cupsdNewLocation()        - Create a new location for authorization.
  *   check_authref()           - Check if an authorization services reference
  *                               has the supplied right.
  *   compare_locations()       - Compare two locations.
+ *   copy_authmask()           - Copy function for auth masks.
  *   cups_crypt()              - Encrypt the password using the DES or MD5
  *                               algorithms, as needed.
+ *   free_authmask()           - Free function for auth masks.
  *   get_md5_password()        - Get an MD5 password.
  *   pam_func()                - PAM conversation function.
  *   to64()                    - Base64-encode an integer value...
@@ -108,16 +104,16 @@ extern void	krb5_ipc_client_clear_target(void);
  * Local functions...
  */
 
-static cupsd_authmask_t	*add_allow(cupsd_location_t *loc);
-static cupsd_authmask_t	*add_deny(cupsd_location_t *loc);
 #ifdef HAVE_AUTHORIZATION_H
 static int		check_authref(cupsd_client_t *con, const char *right);
 #endif /* HAVE_AUTHORIZATION_H */
 static int		compare_locations(cupsd_location_t *a,
 			                  cupsd_location_t *b);
+static cupsd_authmask_t	*copy_authmask(cupsd_authmask_t *am, void *data);
 #if !HAVE_LIBPAM && !defined(HAVE_USERSEC_H)
 static char		*cups_crypt(const char *pw, const char *salt);
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+static void		free_authmask(cupsd_authmask_t *am, void *data);
 static char		*get_md5_password(const char *username,
 			                  const char *group, char passwd[33]);
 #if HAVE_LIBPAM
@@ -151,54 +147,66 @@ static cupsd_authdata_t	*auth_data;	/* Current client being authenticated */
 
 
 /*
+ * 'cupsdAddIPMask()' - Add an IP address authorization mask.
+ */
+
+int					/* O  - 1 on success, 0 on failure */
+cupsdAddIPMask(
+    cups_array_t   **masks,		/* IO - Masks array (created as needed) */
+    const unsigned address[4],		/* I  - IP address */
+    const unsigned netmask[4])		/* I  - IP netmask */
+{
+  cupsd_authmask_t	temp;		/* New host/domain mask */
+
+
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddIPMask(masks=%p(%p), address=%x:%x:%x:%x, "
+		  "netmask=%x:%x:%x:%x)",
+		  masks, *masks,
+		  address[0], address[1], address[2], address[3],
+		  netmask[0], netmask[1], netmask[2], netmask[3]);
+
+  temp.type = CUPSD_AUTH_IP;
+  memcpy(temp.mask.ip.address, address, sizeof(temp.mask.ip.address));
+  memcpy(temp.mask.ip.netmask, netmask, sizeof(temp.mask.ip.netmask));
+
+ /*
+  * Create the masks array as needed and add...
+  */
+
+  if (!*masks)
+    *masks = cupsArrayNew3(NULL, NULL, NULL, 0,
+			   (cups_acopy_func_t)copy_authmask,
+			   (cups_afree_func_t)free_authmask);
+
+  return (cupsArrayAdd(*masks, &temp));
+}
+
+
+/*
  * 'cupsdAddLocation()' - Add a location for authorization.
  */
 
-cupsd_location_t *			/* O - Pointer to new location record */
-cupsdAddLocation(const char *location)	/* I - Location path */
+void
+cupsdAddLocation(cupsd_location_t *loc)	/* I - Location to add */
 {
-  cupsd_location_t	*temp;		/* New location */
-
-
  /*
   * Make sure the locations array is created...
   */
 
   if (!Locations)
-    Locations = cupsArrayNew((cups_array_func_t)compare_locations, NULL);
+    Locations = cupsArrayNew3((cups_array_func_t)compare_locations, NULL,
+                              (cups_ahash_func_t)NULL, 0,
+			      (cups_acopy_func_t)NULL,
+			      (cups_afree_func_t)cupsdFreeLocation);
 
-  if (!Locations)
-    return (NULL);
-
- /*
-  * Try to allocate memory for the new location.
-  */
-
-  if ((temp = calloc(1, sizeof(cupsd_location_t))) == NULL)
-    return (NULL);
-
- /*
-  * Initialize the record and copy the name over...
-  */
-
-  if ((temp->location = strdup(location)) == NULL)
+  if (Locations)
   {
-    free(temp);
-    return (NULL);
+    cupsArrayAdd(Locations, loc);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddLocation: Added location \"%s\"",
+                    loc->location ? loc->location : "(null)");
   }
-
-  temp->length = strlen(temp->location);
-
-  cupsArrayAdd(Locations, temp);
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddLocation: added location \'%s\'",
-                  location);
-
- /*
-  * Return the new record...
-  */
-
-  return (temp);
 }
 
 
@@ -210,126 +218,98 @@ void
 cupsdAddName(cupsd_location_t *loc,	/* I - Location to add to */
              char             *name)	/* I - Name to add */
 {
-  char	**temp;				/* Pointer to names array */
-
-
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAddName(loc=%p, name=\"%s\")",
                   loc, name);
 
-  if (loc->num_names == 0)
-    temp = malloc(sizeof(char *));
-  else
-    temp = realloc(loc->names, (loc->num_names + 1) * sizeof(char *));
+  if (!loc->names)
+    loc->names = cupsArrayNew3(NULL, NULL, NULL, 0,
+                               (cups_acopy_func_t)_cupsStrAlloc,
+                               (cups_afree_func_t)_cupsStrFree);
 
-  if (temp == NULL)
-  {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to add name to location %s: %s",
-                    loc->location ? loc->location : "nil", strerror(errno));
-    return;
-  }
-
-  loc->names = temp;
-
-  if ((temp[loc->num_names] = strdup(name)) == NULL)
+  if (!cupsArrayAdd(loc->names, name))
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
                     "Unable to duplicate name for location %s: %s",
                     loc->location ? loc->location : "nil", strerror(errno));
     return;
   }
-
-  loc->num_names ++;
 }
 
 
 /*
- * 'cupsdAllowHost()' - Add a host name that is allowed to access the location.
+ * 'cupsdAddNameMask()' - Add a host or interface name authorization mask.
  */
 
-void
-cupsdAllowHost(cupsd_location_t *loc,	/* I - Location to add to */
-               char             *name)	/* I - Name of host or domain to add */
+int					/* O  - 1 on success, 0 on failure */
+cupsdAddNameMask(cups_array_t **masks,	/* IO - Masks array (created as needed) */
+                 char         *name)	/* I  - Host or interface name */
 {
-  cupsd_authmask_t	*temp;		/* New host/domain mask */
+  cupsd_authmask_t	temp;		/* New host/domain mask */
   char			ifname[32],	/* Interface name */
 			*ifptr;		/* Pointer to end of name */
 
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdAllowHost(loc=%p(%s), name=\"%s\")",
-                  loc, loc->location ? loc->location : "nil", name);
-
-  if ((temp = add_allow(loc)) == NULL)
-    return;
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "cupsdAddNameMask(masks=%p(%p), name=\"%s\")",
+                  masks, *masks, name);
 
   if (!strcasecmp(name, "@LOCAL"))
   {
    /*
-    * Allow *interface*...
+    * Deny *interface*...
     */
 
-    temp->type             = CUPSD_AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("*");
-    temp->mask.name.length = 1;
+    temp.type           = CUPSD_AUTH_INTERFACE;
+    temp.mask.name.name = (char *)"*";
   }
   else if (!strncasecmp(name, "@IF(", 4))
   {
    /*
-    * Allow *interface*...
+    * Deny *interface*...
     */
 
     strlcpy(ifname, name + 4, sizeof(ifname));
 
-    ifptr = ifname + strlen(ifname);
+    ifptr = ifname + strlen(ifname) - 1;
 
-    if (ifptr[-1] == ')')
+    if (ifptr >= ifname && *ifptr == ')')
     {
       ifptr --;
       *ifptr = '\0';
     }
 
-    temp->type             = CUPSD_AUTH_INTERFACE;
-    temp->mask.name.name   = strdup(ifname);
-    temp->mask.name.length = ifptr - ifname;
+    temp.type             = CUPSD_AUTH_INTERFACE;
+    temp.mask.name.name   = ifname;
   }
   else
   {
    /*
-    * Allow name...
+    * Deny name...
     */
 
-    temp->type             = CUPSD_AUTH_NAME;
-    temp->mask.name.name   = strdup(name);
-    temp->mask.name.length = strlen(name);
+    if (*name == '*')
+      name ++;
+
+    temp.type             = CUPSD_AUTH_NAME;
+    temp.mask.name.name   = (char *)name;
   }
-}
 
+ /*
+  * Set the name length...
+  */
 
-/*
- * 'cupsdAllowIP()' - Add an IP address or network that is allowed to access
- *                    the location.
- */
+  temp.mask.name.length = strlen(temp.mask.name.name);
 
-void
-cupsdAllowIP(
-    cupsd_location_t *loc,		/* I - Location to add to */
-    const unsigned   address[4],	/* I - IP address to add */
-    const unsigned   netmask[4])	/* I - Netmask of address */
-{
-  cupsd_authmask_t	*temp;		/* New host/domain mask */
+ /*
+  * Create the masks array as needed and add...
+  */
 
+  if (!*masks)
+    *masks = cupsArrayNew3(NULL, NULL, NULL, 0,
+			   (cups_acopy_func_t)copy_authmask,
+			   (cups_afree_func_t)free_authmask);
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                  "cupsdAllowIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
-		  loc, loc->location ? loc->location : "nil",
-		  address[0], address[1], address[2], address[3],
-		  netmask[0], netmask[1], netmask[2], netmask[3]);
-
-  if ((temp = add_allow(loc)) == NULL)
-    return;
-
-  temp->type = CUPSD_AUTH_IP;
-  memcpy(temp->mask.ip.address, address, sizeof(temp->mask.ip.address));
-  memcpy(temp->mask.ip.netmask, netmask, sizeof(temp->mask.ip.netmask));
+  return (cupsArrayAdd(*masks, &temp));
 }
 
 
@@ -1232,20 +1212,20 @@ cupsdCheckAccess(
       case CUPSD_AUTH_ALLOW : /* Order Deny,Allow */
           allow = 1;
 
-          if (cupsdCheckAuth(ip, name, namelen, loc->num_deny, loc->deny))
+          if (cupsdCheckAuth(ip, name, namelen, loc->deny))
 	    allow = 0;
 
-          if (cupsdCheckAuth(ip, name, namelen, loc->num_allow, loc->allow))
+          if (cupsdCheckAuth(ip, name, namelen, loc->allow))
 	    allow = 1;
 	  break;
 
       case CUPSD_AUTH_DENY : /* Order Allow,Deny */
           allow = 0;
 
-          if (cupsdCheckAuth(ip, name, namelen, loc->num_allow, loc->allow))
+          if (cupsdCheckAuth(ip, name, namelen, loc->allow))
 	    allow = 1;
 
-          if (cupsdCheckAuth(ip, name, namelen, loc->num_deny, loc->deny))
+          if (cupsdCheckAuth(ip, name, namelen, loc->deny))
 	    allow = 0;
 	  break;
     }
@@ -1260,24 +1240,25 @@ cupsdCheckAccess(
  */
 
 int					/* O - 1 if mask matches, 0 otherwise */
-cupsdCheckAuth(
-    unsigned         ip[4],		/* I - Client address */
-    char             *name,		/* I - Client hostname */
-    int              name_len,		/* I - Length of hostname */
-    int              num_masks,		/* I - Number of masks */
-    cupsd_authmask_t *masks)		/* I - Masks */
+cupsdCheckAuth(unsigned     ip[4],	/* I - Client address */
+	       char         *name,	/* I - Client hostname */
+	       int          name_len,	/* I - Length of hostname */
+	       cups_array_t *masks)	/* I - Masks */
 {
-  int		i;			/* Looping var */
-  cupsd_netif_t	*iface;			/* Network interface */
-  unsigned	netip4;			/* IPv4 network address */
+  int			i;		/* Looping var */
+  cupsd_authmask_t	*mask;		/* Current mask */
+  cupsd_netif_t		*iface;		/* Network interface */
+  unsigned		netip4;		/* IPv4 network address */
 #ifdef AF_INET6
-  unsigned	netip6[4];		/* IPv6 network address */
+  unsigned		netip6[4];	/* IPv6 network address */
 #endif /* AF_INET6 */
 
 
-  while (num_masks > 0)
+  for (mask = (cupsd_authmask_t *)cupsArrayFirst(masks);
+       mask;
+       mask = (cupsd_authmask_t *)cupsArrayNext(masks))
   {
-    switch (masks->type)
+    switch (mask->type)
     {
       case CUPSD_AUTH_INTERFACE :
          /*
@@ -1293,7 +1274,7 @@ cupsdCheckAuth(
           netip6[3] = htonl(ip[3]);
 #endif /* AF_INET6 */
 
-          if (!strcmp(masks->mask.name.name, "*"))
+          if (!strcmp(mask->mask.name.name, "*"))
 	  {
 #ifdef __APPLE__
            /*
@@ -1361,7 +1342,7 @@ cupsdCheckAuth(
 	         iface;
 		 iface = (cupsd_netif_t *)cupsArrayNext(NetIFList))
 	    {
-              if (strcmp(masks->mask.name.name, iface->name))
+              if (strcmp(mask->mask.name.name, iface->name))
                 continue;
 
               if (iface->address.addr.sa_family == AF_INET)
@@ -1401,17 +1382,17 @@ cupsdCheckAuth(
 	  * Check for exact name match...
 	  */
 
-          if (!strcasecmp(name, masks->mask.name.name))
+          if (!strcasecmp(name, mask->mask.name.name))
 	    return (1);
 
          /*
 	  * Check for domain match...
 	  */
 
-	  if (name_len >= masks->mask.name.length &&
-	      masks->mask.name.name[0] == '.' &&
-	      !strcasecmp(name + name_len - masks->mask.name.length,
-	                  masks->mask.name.name))
+	  if (name_len >= mask->mask.name.length &&
+	      mask->mask.name.name[0] == '.' &&
+	      !strcasecmp(name + name_len - mask->mask.name.length,
+	                  mask->mask.name.name))
 	    return (1);
           break;
 
@@ -1421,17 +1402,14 @@ cupsdCheckAuth(
 	  */
 
           for (i = 0; i < 4; i ++)
-	    if ((ip[i] & masks->mask.ip.netmask[i]) !=
-	            masks->mask.ip.address[i])
+	    if ((ip[i] & mask->mask.ip.netmask[i]) !=
+	            mask->mask.ip.address[i])
 	      break;
 
 	  if (i == 4)
 	    return (1);
           break;
     }
-
-    masks ++;
-    num_masks --;
   }
 
   return (0);
@@ -1731,137 +1709,78 @@ cupsdCopyKrb5Creds(cupsd_client_t *con)	/* I - Client connection */
 
 cupsd_location_t *			/* O - New location */
 cupsdCopyLocation(
-    cupsd_location_t **loc)		/* IO - Original location */
+    cupsd_location_t *loc)		/* I - Original location */
 {
-  int			i;		/* Looping var */
   cupsd_location_t	*temp;		/* New location */
-  char			location[HTTP_MAX_URI];
-					/* Location of resource */
 
 
  /*
-  * Use a local copy of location because cupsdAddLocation may cause
-  * this memory to be moved...
+  * Make a copy of the original location...
   */
 
-  strlcpy(location, (*loc)->location, sizeof(location));
-
-  if ((temp = cupsdAddLocation(location)) == NULL)
+  if ((temp = calloc(1, sizeof(cupsd_location_t))) == NULL)
     return (NULL);
 
  /*
   * Copy the information from the original location to the new one.
   */
 
-  temp->limit      = (*loc)->limit;
-  temp->order_type = (*loc)->order_type;
-  temp->type       = (*loc)->type;
-  temp->level      = (*loc)->level;
-  temp->satisfy    = (*loc)->satisfy;
-  temp->encryption = (*loc)->encryption;
+  if (!loc)
+    return (temp);
 
-  if ((temp->num_names  = (*loc)->num_names) > 0)
+  if (loc->location)
+    temp->location = _cupsStrAlloc(loc->location);
+
+  temp->limit      = loc->limit;
+  temp->order_type = loc->order_type;
+  temp->type       = loc->type;
+  temp->level      = loc->level;
+  temp->satisfy    = loc->satisfy;
+  temp->encryption = loc->encryption;
+
+  if (loc->names)
   {
-   /*
-    * Copy the names array...
-    */
-
-    if ((temp->names = calloc(temp->num_names, sizeof(char *))) == NULL)
+    if ((temp->names = cupsArrayDup(loc->names)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdCopyLocation: Unable to allocate memory for %d names: %s",
-                      temp->num_names, strerror(errno));
+                      "Unable to allocate memory for %d names: %s",
+		      cupsArrayCount(loc->names), strerror(errno));
 
-      cupsdDeleteLocation(temp);
+      cupsdFreeLocation(temp);
       return (NULL);
     }
-
-    for (i = 0; i < temp->num_names; i ++)
-      if ((temp->names[i] = strdup((*loc)->names[i])) == NULL)
-      {
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "cupsdCopyLocation: Unable to copy name \"%s\": %s",
-                        (*loc)->names[i], strerror(errno));
-
-        cupsdDeleteLocation(temp);
-	return (NULL);
-      }
   }
 
-  if ((temp->num_allow  = (*loc)->num_allow) > 0)
+  if (loc->allow)
   {
    /*
     * Copy allow rules...
     */
 
-    if ((temp->allow = calloc(temp->num_allow, sizeof(cupsd_authmask_t))) == NULL)
+    if ((temp->allow = cupsArrayDup(loc->allow)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdCopyLocation: Unable to allocate memory for %d allow rules: %s",
-                      temp->num_allow, strerror(errno));
-      cupsdDeleteLocation(temp);
+                      "Unable to allocate memory for %d allow rules: %s",
+                      cupsArrayCount(loc->allow), strerror(errno));
+      cupsdFreeLocation(temp);
       return (NULL);
     }
-
-    for (i = 0; i < temp->num_allow; i ++)
-      switch (temp->allow[i].type = (*loc)->allow[i].type)
-      {
-        case CUPSD_AUTH_NAME :
-	    temp->allow[i].mask.name.length = (*loc)->allow[i].mask.name.length;
-	    temp->allow[i].mask.name.name   = strdup((*loc)->allow[i].mask.name.name);
-
-            if (temp->allow[i].mask.name.name == NULL)
-	    {
-	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdCopyLocation: Unable to copy allow name \"%s\": %s",
-                	      (*loc)->allow[i].mask.name.name, strerror(errno));
-              cupsdDeleteLocation(temp);
-	      return (NULL);
-	    }
-	    break;
-	case CUPSD_AUTH_IP :
-	    memcpy(&(temp->allow[i].mask.ip), &((*loc)->allow[i].mask.ip),
-	           sizeof(cupsd_ipmask_t));
-	    break;
-      }
   }
 
-  if ((temp->num_deny  = (*loc)->num_deny) > 0)
+  if (loc->deny)
   {
    /*
     * Copy deny rules...
     */
 
-    if ((temp->deny = calloc(temp->num_deny, sizeof(cupsd_authmask_t))) == NULL)
+    if ((temp->deny = cupsArrayDup(loc->deny)) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "cupsdCopyLocation: Unable to allocate memory for %d deny rules: %s",
-                      temp->num_deny, strerror(errno));
-      cupsdDeleteLocation(temp);
+                      "Unable to allocate memory for %d deny rules: %s",
+                      cupsArrayCount(loc->deny), strerror(errno));
+      cupsdFreeLocation(temp);
       return (NULL);
     }
-
-    for (i = 0; i < temp->num_deny; i ++)
-      switch (temp->deny[i].type = (*loc)->deny[i].type)
-      {
-        case CUPSD_AUTH_NAME :
-	    temp->deny[i].mask.name.length = (*loc)->deny[i].mask.name.length;
-	    temp->deny[i].mask.name.name   = strdup((*loc)->deny[i].mask.name.name);
-
-            if (temp->deny[i].mask.name.name == NULL)
-	    {
-	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "cupsdCopyLocation: Unable to copy deny name \"%s\": %s",
-                	      (*loc)->deny[i].mask.name.name, strerror(errno));
-              cupsdDeleteLocation(temp);
-	      return (NULL);
-	    }
-	    break;
-	case CUPSD_AUTH_IP :
-	    memcpy(&(temp->deny[i].mask.ip), &((*loc)->deny[i].mask.ip),
-	           sizeof(cupsd_ipmask_t));
-	    break;
-      }
   }
 
   return (temp);
@@ -1875,154 +1794,12 @@ cupsdCopyLocation(
 void
 cupsdDeleteAllLocations(void)
 {
-  cupsd_location_t	*loc;		/* Current location */
-
-
  /*
-  * Free all of the allow/deny records first...
-  */
-
-  for (loc = (cupsd_location_t *)cupsArrayFirst(Locations);
-       loc;
-       loc = (cupsd_location_t *)cupsArrayNext(Locations))
-    cupsdDeleteLocation(loc);
-
- /*
-  * Then free the location array...
+  * Free the location array, which will free all of the locations...
   */
 
   cupsArrayDelete(Locations);
   Locations = NULL;
-}
-
-
-/*
- * 'cupsdDeleteLocation()' - Free all memory used by a location.
- */
-
-void
-cupsdDeleteLocation(
-    cupsd_location_t *loc)		/* I - Location to delete */
-{
-  int			i;		/* Looping var */
-  cupsd_authmask_t	*mask;		/* Current mask */
-
-
-  cupsArrayRemove(Locations, loc);
-
-  for (i = loc->num_names - 1; i >= 0; i --)
-    free(loc->names[i]);
-
-  if (loc->num_names > 0)
-    free(loc->names);
-
-  for (i = loc->num_allow, mask = loc->allow; i > 0; i --, mask ++)
-    if (mask->type == CUPSD_AUTH_NAME || mask->type == CUPSD_AUTH_INTERFACE)
-      free(mask->mask.name.name);
-
-  if (loc->num_allow > 0)
-    free(loc->allow);
-
-  for (i = loc->num_deny, mask = loc->deny; i > 0; i --, mask ++)
-    if (mask->type == CUPSD_AUTH_NAME || mask->type == CUPSD_AUTH_INTERFACE)
-      free(mask->mask.name.name);
-
-  if (loc->num_deny > 0)
-    free(loc->deny);
-
-  free(loc->location);
-  free(loc);
-}
-
-
-/*
- * 'cupsdDenyHost()' - Add a host name that is not allowed to access the
- *                     location.
- */
-
-void
-cupsdDenyHost(cupsd_location_t *loc,	/* I - Location to add to */
-              char             *name)	/* I - Name of host or domain to add */
-{
-  cupsd_authmask_t	*temp;		/* New host/domain mask */
-  char			ifname[32],	/* Interface name */
-			*ifptr;		/* Pointer to end of name */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdDenyHost(loc=%p(%s), name=\"%s\")",
-                  loc, loc->location ? loc->location : "nil", name);
-
-  if ((temp = add_deny(loc)) == NULL)
-    return;
-
-  if (!strcasecmp(name, "@LOCAL"))
-  {
-   /*
-    * Deny *interface*...
-    */
-
-    temp->type             = CUPSD_AUTH_INTERFACE;
-    temp->mask.name.name   = strdup("*");
-    temp->mask.name.length = 1;
-  }
-  else if (!strncasecmp(name, "@IF(", 4))
-  {
-   /*
-    * Deny *interface*...
-    */
-
-    strlcpy(ifname, name + 4, sizeof(ifname));
-
-    ifptr = ifname + strlen(ifname);
-
-    if (ifptr[-1] == ')')
-    {
-      ifptr --;
-      *ifptr = '\0';
-    }
-
-    temp->type             = CUPSD_AUTH_INTERFACE;
-    temp->mask.name.name   = strdup(ifname);
-    temp->mask.name.length = ifptr - ifname;
-  }
-  else
-  {
-   /*
-    * Deny name...
-    */
-
-    temp->type             = CUPSD_AUTH_NAME;
-    temp->mask.name.name   = strdup(name);
-    temp->mask.name.length = strlen(name);
-  }
-}
-
-
-/*
- * 'cupsdDenyIP()' - Add an IP address or network that is not allowed to
- *                   access the location.
- */
-
-void
-cupsdDenyIP(cupsd_location_t *loc,	/* I - Location to add to */
-	    const unsigned   address[4],/* I - IP address to add */
-	    const unsigned   netmask[4])/* I - Netmask of address */
-{
-  cupsd_authmask_t	*temp;		/* New host/domain mask */
-
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
-                  "cupsdDenyIP(loc=%p(%s), address=%x:%x:%x:%x, netmask=%x:%x:%x:%x)",
-		  loc, loc->location ? loc->location : "nil",
-		  address[0], address[1], address[2], address[3],
-		  netmask[0], netmask[1], netmask[2], netmask[3]);
-
-  if ((temp = add_deny(loc)) == NULL)
-    return;
-
-  temp->type = CUPSD_AUTH_IP;
-  memcpy(temp->mask.ip.address, address, sizeof(temp->mask.ip.address));
-  memcpy(temp->mask.ip.netmask, netmask, sizeof(temp->mask.ip.netmask));
 }
 
 
@@ -2158,6 +1935,22 @@ cupsdFindLocation(const char *location)	/* I - Connection */
 
 
 /*
+ * 'cupsdFreeLocation()' - Free all memory used by a location.
+ */
+
+void
+cupsdFreeLocation(cupsd_location_t *loc)/* I - Location to free */
+{
+  cupsArrayDelete(loc->names);
+  cupsArrayDelete(loc->allow);
+  cupsArrayDelete(loc->deny);
+
+  _cupsStrFree(loc->location);
+  free(loc);
+}
+
+
+/*
  * 'cupsdIsAuthorized()' - Check to see if the user is authorized...
  */
 
@@ -2165,13 +1958,14 @@ http_status_t				/* O - HTTP_OK if authorized or error code */
 cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
                   const char     *owner)/* I - Owner of object */
 {
-  int			i, j,		/* Looping vars */
+  int			i,		/* Looping vars */
 			auth,		/* Authorization status */
 			type;		/* Type of authentication */
   unsigned		address[4];	/* Authorization address */
   cupsd_location_t	*best;		/* Best match for location so far */
   int			hostlen;	/* Length of hostname */
-  char			username[256],	/* Username to authorize */
+  char			*name,		/* Current username */
+			username[256],	/* Username to authorize */
 			ownername[256],	/* Owner name to authorize */
 			*ptr;		/* Pointer into username */
   struct passwd		*pw;		/* User password data */
@@ -2223,7 +2017,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
                   "cupsdIsAuthorized: level=CUPSD_AUTH_%s, type=%s, "
 		  "satisfy=CUPSD_AUTH_SATISFY_%s, num_names=%d",
                   levels[best->level], types[type],
-	          best->satisfy ? "ANY" : "ALL", best->num_names);
+	          best->satisfy ? "ANY" : "ALL", cupsArrayCount(best->names));
 
   if (best->limit == CUPSD_AUTH_LIMIT_IPP)
     cupsdLogMessage(CUPSD_LOG_DEBUG2, "cupsdIsAuthorized: op=%x(%s)",
@@ -2294,7 +2088,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   */
 
   if (best->level == CUPSD_AUTH_ANON ||	/* Anonymous access - allow it */
-      (type == CUPSD_AUTH_NONE && best->num_names == 0))
+      (type == CUPSD_AUTH_NONE && cupsArrayCount(best->names) == 0))
     return (HTTP_OK);
 
   if (!con->username[0] && type == CUPSD_AUTH_NONE &&
@@ -2393,7 +2187,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     * any valid user is OK...
     */
 
-    if (best->num_names == 0)
+    if (cupsArrayCount(best->names) == 0)
       return (HTTP_OK);
 
    /*
@@ -2411,13 +2205,13 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
     if (con->authref)
     {
-      for (i = 0; i < best->num_names; i ++)
+      for (name = (char *)cupsArrayFirst(best->names);
+           name;
+	   name = (char *)cupsArrayNext(best->names))
       {
-	if (!strncasecmp(best->names[i], "@AUTHKEY(", 9) && 
-	    check_authref(con, best->names[i] + 9))
+	if (!strncasecmp(name, "@AUTHKEY(", 9) && check_authref(con, name + 9))
 	  return (HTTP_OK);
-	else if (!strcasecmp(best->names[i], "@SYSTEM") &&
-	         SystemGroupAuthKey &&
+	else if (!strcasecmp(name, "@SYSTEM") && SystemGroupAuthKey &&
 		 check_authref(con, SystemGroupAuthKey))
 	  return (HTTP_OK);
       }
@@ -2426,23 +2220,25 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
     }
 #endif /* HAVE_AUTHORIZATION_H */
 
-    for (i = 0; i < best->num_names; i ++)
+    for (name = (char *)cupsArrayFirst(best->names);
+	 name;
+	 name = (char *)cupsArrayNext(best->names))
     {
-      if (!strcasecmp(best->names[i], "@OWNER") && owner &&
+      if (!strcasecmp(name, "@OWNER") && owner &&
           !strcasecmp(username, ownername))
 	return (HTTP_OK);
-      else if (!strcasecmp(best->names[i], "@SYSTEM"))
+      else if (!strcasecmp(name, "@SYSTEM"))
       {
-        for (j = 0; j < NumSystemGroups; j ++)
-	  if (cupsdCheckGroup(username, pw, SystemGroups[j]))
+        for (i = 0; i < NumSystemGroups; i ++)
+	  if (cupsdCheckGroup(username, pw, SystemGroups[i]))
 	    return (HTTP_OK);
       }
-      else if (best->names[i][0] == '@')
+      else if (name[0] == '@')
       {
-        if (cupsdCheckGroup(username, pw, best->names[i] + 1))
+        if (cupsdCheckGroup(username, pw, name + 1))
           return (HTTP_OK);
       }
-      else if (!strcasecmp(username, best->names[i]))
+      else if (!strcasecmp(username, name))
         return (HTTP_OK);
     }
 
@@ -2460,19 +2256,21 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   * Check to see if this user is in any of the named groups...
   */
 
-  for (i = 0; i < best->num_names; i ++)
+  for (name = (char *)cupsArrayFirst(best->names);
+       name;
+       name = (char *)cupsArrayNext(best->names))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG2,
                     "cupsdIsAuthorized: Checking group \"%s\" membership...",
-                    best->names[i]);
+                    name);
 
-    if (!strcasecmp(best->names[i], "@SYSTEM"))
+    if (!strcasecmp(name, "@SYSTEM"))
     {
-      for (j = 0; j < NumSystemGroups; j ++)
-	if (cupsdCheckGroup(username, pw, SystemGroups[j]))
+      for (i = 0; i < NumSystemGroups; i ++)
+	if (cupsdCheckGroup(username, pw, SystemGroups[i]))
 	  return (HTTP_OK);
     }
-    else if (cupsdCheckGroup(username, pw, best->names[i]))
+    else if (cupsdCheckGroup(username, pw, name))
       return (HTTP_OK);
   }
 
@@ -2488,85 +2286,41 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
 
 
 /*
- * 'add_allow()' - Add an allow mask to the location.
+ * 'cupsdNewLocation()' - Create a new location for authorization.
+ *
+ * Note: Still need to call cupsdAddLocation() to add it to the list of global
+ * locations.
  */
 
-static cupsd_authmask_t *		/* O - New mask record */
-add_allow(cupsd_location_t *loc)	/* I - Location to add to */
+cupsd_location_t *			/* O - Pointer to new location record */
+cupsdNewLocation(const char *location)	/* I - Location path */
 {
-  cupsd_authmask_t	*temp;		/* New mask record */
+  cupsd_location_t	*temp;		/* New location */
 
 
  /*
-  * Range-check...
+  * Try to allocate memory for the new location.
   */
 
-  if (loc == NULL)
+  if ((temp = calloc(1, sizeof(cupsd_location_t))) == NULL)
     return (NULL);
 
  /*
-  * Try to allocate memory for the record...
+  * Initialize the record and copy the name over...
   */
 
-  if (loc->num_allow == 0)
-    temp = malloc(sizeof(cupsd_authmask_t));
-  else
-    temp = realloc(loc->allow, sizeof(cupsd_authmask_t) * (loc->num_allow + 1));
-
-  if (temp == NULL)
+  if ((temp->location = _cupsStrAlloc(location)) == NULL)
+  {
+    free(temp);
     return (NULL);
+  }
 
-  loc->allow = temp;
-  temp       += loc->num_allow;
-  loc->num_allow ++;
-
- /*
-  * Clear the mask record and return...
-  */
-
-  memset(temp, 0, sizeof(cupsd_authmask_t));
-  return (temp);
-}
-
-
-/*
- * 'add_deny()' - Add a deny mask to the location.
- */
-
-static cupsd_authmask_t *		/* O - New mask record */
-add_deny(cupsd_location_t *loc)		/* I - Location to add to */
-{
-  cupsd_authmask_t	*temp;		/* New mask record */
-
+  temp->length = strlen(temp->location);
 
  /*
-  * Range-check...
+  * Return the new record...
   */
 
-  if (loc == NULL)
-    return (NULL);
-
- /*
-  * Try to allocate memory for the record...
-  */
-
-  if (loc->num_deny == 0)
-    temp = malloc(sizeof(cupsd_authmask_t));
-  else
-    temp = realloc(loc->deny, sizeof(cupsd_authmask_t) * (loc->num_deny + 1));
-
-  if (temp == NULL)
-    return (NULL);
-
-  loc->deny = temp;
-  temp      += loc->num_deny;
-  loc->num_deny ++;
-
- /*
-  * Clear the mask record and return...
-  */
-
-  memset(temp, 0, sizeof(cupsd_authmask_t));
   return (temp);
 }
 
@@ -2633,6 +2387,45 @@ compare_locations(cupsd_location_t *a,	/* I - First location */
                   cupsd_location_t *b)	/* I - Second location */
 {
   return (strcmp(b->location, a->location));
+}
+
+
+/*
+ * 'copy_authmask()' - Copy function for auth masks.
+ */
+
+static cupsd_authmask_t	*		/* O - New auth mask */
+copy_authmask(cupsd_authmask_t *mask,	/* I - Existing auth mask */
+              void             *data)	/* I - User data (unused) */
+{
+  cupsd_authmask_t	*temp;		/* New auth mask */
+
+
+  (void)data;
+
+  if ((temp = malloc(sizeof(cupsd_authmask_t))) != NULL)
+  {
+    memcpy(temp, mask, sizeof(cupsd_authmask_t));
+
+    if (temp->type == CUPSD_AUTH_NAME || temp->type == CUPSD_AUTH_INTERFACE)
+    {
+     /*
+      * Make a copy of the name...
+      */
+
+      if ((temp->mask.name.name = _cupsStrAlloc(temp->mask.name.name)) == NULL)
+      {
+       /*
+        * Failed to make copy...
+	*/
+
+        free(temp);
+	temp = NULL;
+      }
+    }
+  }
+
+  return (temp);
 }
 
 
@@ -2757,6 +2550,23 @@ cups_crypt(const char *pw,		/* I - Password string */
   }
 }
 #endif /* !HAVE_LIBPAM && !HAVE_USERSEC_H */
+
+
+/*
+ * 'free_authmask()' - Free function for auth masks.
+ */
+
+static void
+free_authmask(cupsd_authmask_t *mask,	/* I - Auth mask to free */
+              void             *data)	/* I - User data (unused) */
+{
+  (void)data;
+
+  if (mask->type == CUPSD_AUTH_NAME || mask->type == CUPSD_AUTH_INTERFACE)
+    _cupsStrFree(mask->mask.name.name);
+
+  free(mask);
+}
 
 
 /*
