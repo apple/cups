@@ -902,7 +902,7 @@ cupsAdminGetServerSettings(
     if (!cg->http)
     {
       if ((cg->http = _httpCreate(cupsServer(), ippPort(),
-                                  cupsEncryption())) == NULL)
+                                  cupsEncryption(), AF_UNSPEC)) == NULL)
       {
 	if (errno)
 	  _cupsSetError(IPP_SERVICE_UNAVAILABLE, NULL, 0);
