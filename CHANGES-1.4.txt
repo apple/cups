@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.6
 
+	- The cupsAdminSetServerSettings() function disabled sharing when
+	  debug logging was enabled (STR #3712)
 
 
 CHANGES IN CUPS V1.4.5
