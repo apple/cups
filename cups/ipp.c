@@ -1271,7 +1271,9 @@ ippReadIO(void       *src,		/* I - Data source */
 
 	      attr->value_tag = tag;
 	    }
-	    else if ((value_tag >= IPP_TAG_TEXTLANG &&
+	    else if (value_tag == IPP_TAG_TEXTLANG ||
+	             value_tag == IPP_TAG_NAMELANG ||
+		     (value_tag >= IPP_TAG_TEXT &&
 		      value_tag <= IPP_TAG_MIMETYPE))
             {
 	     /*
@@ -1279,8 +1281,9 @@ ippReadIO(void       *src,		/* I - Data source */
 	      * forms; accept sets of differing values...
 	      */
 
-	      if ((tag < IPP_TAG_TEXTLANG || tag > IPP_TAG_MIMETYPE) &&
-	          tag != IPP_TAG_NOVALUE)
+	      if (tag != IPP_TAG_TEXTLANG && tag != IPP_TAG_NAMELANG &&
+	          (tag < IPP_TAG_TEXT || tag > IPP_TAG_MIMETYPE) &&
+		  tag != IPP_TAG_NOVALUE)
 	      {
 		DEBUG_printf(("1ippReadIO: 1setOf value tag %x(%s) != %x(%s)",
 			      value_tag, ippTagString(value_tag), tag,
@@ -2762,6 +2765,7 @@ _ippFreeAttr(ipp_attribute_t *attr)	/* I - Attribute to free */
   {
     case IPP_TAG_TEXT :
     case IPP_TAG_NAME :
+    case IPP_TAG_RESERVED_STRING :
     case IPP_TAG_KEYWORD :
     case IPP_TAG_URI :
     case IPP_TAG_URISCHEME :

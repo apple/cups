@@ -93,7 +93,8 @@ typedef enum ipp_tag_e			/**** Format tags for attributes ****/
   IPP_TAG_END_COLLECTION,		/* End of collection value */
   IPP_TAG_TEXT = 0x41,			/* Text value */
   IPP_TAG_NAME,				/* Name value */
-  IPP_TAG_KEYWORD = 0x44,		/* Keyword value */
+  IPP_TAG_RESERVED_STRING,		/* Reserved for future string value @private@ */
+  IPP_TAG_KEYWORD,			/* Keyword value */
   IPP_TAG_URI,				/* URI value */
   IPP_TAG_URISCHEME,			/* URI scheme value */
   IPP_TAG_CHARSET,			/* Character set value */
