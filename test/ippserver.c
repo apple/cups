@@ -20,6 +20,8 @@
  */
 
 #include <cups/cups-private.h>
+#include <dns_sd.h>
+#include <sys/stat.h>
 
 
 /*
@@ -117,9 +119,11 @@ static void		copy_job_attrs(_ipp_client_t *client, _ipp_job_t *job,
 			               cups_array_t *ra);
 static _ipp_client_t	*create_client(_ipp_printer_t *printer, int fd);
 static _ipp_job_t	*create_job(_ipp_client_t *client);
+static int		create_listener(int family, int *port);
 static _ipp_printer_t	*create_printer(const char *name, const char *location,
-			                const char *make_and_model,
-					const char *icon, const char *device_id,
+			                const char *make, const char *model,
+					const char *icon, const char *formats,
+					int ppm, int ppm_color, int duplex,
 					int port, const char *regtype,
 					const char *directory);
 static cups_array_t	*create_requested_array(_ipp_client_t *client);
@@ -142,12 +146,19 @@ static void		ipp_print_job(_ipp_client_t *client);
 static void		ipp_send_document(_ipp_client_t *client);
 static void		ipp_validate_job(_ipp_client_t *client);
 static void		*process_client(_ipp_client_t *client);
+static int		register_printer(_ipp_printer_t *printer,
+			                 const char *make, const char *model,
+					 int color, int duplex,
+					 const char *regtype);
 static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
 			            const char *message, ...)
 #ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 3, 4)))
 #endif /* __GNUC__ */
 ;
+static void		run_printer(_ipp_printer_t *printer);
+static void		usage(void);
+
 
 /*
  * 'main()' - Main entry to the sample server.
@@ -157,6 +168,159 @@ int					/* O - Exit status */
 main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
+  int		i;			/* Looping var */
+  const char	*opt,			/* Current option character */
+		*name = NULL,		/* Printer name */
+		*location = "",		/* Location of printer */
+		*make = "Test",		/* Manufacturer */
+		*model = "Printer",	/* Model */
+		*icon = "printer.png",	/* Icon file */
+		*formats = "application/pdf,image/jpeg",
+	      				/* Supported formats */
+		*regtype = "_ipp._tcp";	/* Bonjour service type */
+  int		port = 0,		/* Port number (0 = auto) */
+		duplex = 0,		/* Duplex mode */
+		ppm = 10,		/* Pages per minute for mono */
+		ppm_color = 0;		/* Pages per minute for color */
+  char		directory[1024] = "";	/* Spool directory */
+  _ipp_printer_t *printer;		/* Printer object */
+
+
+ /*
+  * Parse command-line arguments...
+  */
+
+  for (i = 1; i < argc; i ++)
+    if (argv[i][0] == '-')
+    {
+      for (opt = argv[i] + 1; *opt; opt ++)
+        switch (*opt)
+	{
+	  case '2' : /* -2 */
+	      duplex = 1;
+	      break;
+
+	  case 'M' : /* -M make */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      make = argv[i];
+	      break;
+
+	  case 'd' : /* -d spool-directory */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      strlcpy(directory, argv[i], sizeof(directory));
+	      break;
+
+	  case 'f' : /* -f type/subtype[,type/subtype,...] */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      formats = argv[i];
+	      break;
+
+	  case 'i' : /* -i icon.png */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      icon = argv[i];
+	      break;
+
+	  case 'l' : /* -l location */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      location = argv[i];
+	      break;
+
+	  case 'm' : /* -m model */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      model = argv[i];
+	      break;
+
+	  case 'p' : /* -p port */
+	      i ++;
+	      if (i >= argc || !isdigit(argv[i][0] & 255))
+	        usage();
+	      port = atoi(argv[i]);
+	      break;
+
+	  case 'r' : /* -r regtype */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      regtype = argv[i];
+	      break;
+
+	  case 's' : /* -s speed[,color-speed] */
+	      i ++;
+	      if (i >= argc)
+	        usage();
+	      if (sscanf(argv[i], "%d,%d", &ppm, &ppm_color) < 1)
+	        usage();
+	      break;
+
+          default : /* Unknown */
+	      fprintf(stderr, "Unknown option \"-%c\".\n", *opt);
+	      usage();
+	}
+    }
+    else if (!name)
+    {
+      name = argv[i];
+    }
+    else
+    {
+      fprintf(stderr, "Unexpected command-line argument \"%s\"\n", argv[i]);
+      usage();
+    }
+
+  if (!name)
+    usage();
+
+ /*
+  * Apply defaults as needed...
+  */
+
+  if (!directory[0])
+  {
+    snprintf(directory, sizeof(directory), "/tmp/ippserver.%d", (int)getpid());
+
+    if (mkdir(directory, 0777) && errno != EEXIST)
+    {
+      fprintf(stderr, "Unable to create spool directory \"%s\": %s\n",
+	      directory, strerror(errno));
+      usage();
+    }
+
+    printf("Using spool directory \"%s\".\n", directory);
+  }
+
+ /*
+  * Create the printer...
+  */
+
+  if ((printer = create_printer(name, location, make, model, icon, formats, ppm,
+                                ppm_color, duplex, port, regtype,
+				directory)) == NULL)
+    return (1);
+
+ /*
+  * Run the print service...
+  */
+
+  run_printer(printer);
+
+ /*
+  * Destroy the printer and exit...
+  */
+
+  delete_printer(printer);
+
   return (0);
 }
 
@@ -416,7 +580,7 @@ copy_job_attrs(_ipp_client_t *client,	/* I - Client */
 	  break;
 
       case IPP_JOB_HELD :
-	  if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO)
+	  if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
 	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 			 "job-state-reasons", NULL, "job-hold-until-specified");
 	  else
@@ -483,27 +647,95 @@ create_job(_ipp_client_t *client)	/* I - Client */
 
 
 /*
+ * 'create_listener()' - Create a listener socket.
+ */
+
+static int				/* O  - Listener socket or -1 on error */
+create_listener(int family,		/* I  - Address family */
+                int *port)		/* IO - Port number */
+{
+  int		sock,			/* Listener socket */
+		val;			/* Socket value */
+  http_addr_t	address;		/* Listen address */
+  socklen_t	addrlen;		/* Length of listen address */
+
+
+  if ((sock = socket(family, SOCK_STREAM, 0)) < 0)
+    return (-1);
+
+  val = 1;
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+
+#ifdef IPV6_V6ONLY
+  if (family == AF_INET6)
+    setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
+#endif /* IPV6_V6ONLY */
+
+  if (!port)
+  {
+   /*
+    * Get the auto-assigned port number for the IPv4 socket...
+    */
+
+    addrlen = sizeof(address);
+    if (getsockname(sock, (struct sockaddr *)&address, &addrlen))
+      *port = 8631;
+    else if (family == AF_INET)
+      *port = ntohl(address.ipv4.sin_port);
+    else
+      *port = ntohl(address.ipv6.sin6_port);
+  }
+
+  memset(&address, 0, sizeof(address));
+  if (family == AF_INET)
+  {
+    address.ipv4.sin_family = family;
+    address.ipv4.sin_port   = htonl(*port);
+  }
+  else
+  {
+    address.ipv6.sin6_family = family;
+    address.ipv6.sin6_port   = htonl(*port);
+  }
+
+  if (bind(sock, (struct sockaddr *)&address, httpAddrLength(&address)))
+  {
+    close(sock);
+    return (-1);
+  }
+
+  if (listen(sock, 5))
+  {
+    close(sock);
+    return (-1);
+  }
+
+  return (sock);
+}
+
+
+/*
  * 'create_printer()' - Create, register, and listen for connections to a
  *                      printer object.
  */
 
 static _ipp_printer_t *			/* O - Printer */
-create_printer(
-    const char *name,			/* I - printer-name */
-    const char *location,		/* I - printer-location */
-    const char *make_and_model,		/* I - printer-make-and-model */
-    const char *icon,			/* I - printer-icons */
-    const char *device_id,		/* I - printer-device-id */
-    int        port,			/* I - Port for listeners or 0 for auto */
-    const char *regtype,		/* I - Bonjour service type */
-    const char *directory)		/* I - Spool directory */
+create_printer(const char *name,	/* I - printer-name */
+	       const char *location,	/* I - printer-location */
+	       const char *make,	/* I - printer-make-and-model */
+	       const char *model,	/* I - printer-make-and-model */
+	       const char *icon,	/* I - printer-icons */
+	       const char *formats,	/* I - document-format-supported */
+	       int        ppm,		/* I - Pages per minute in grayscale */
+	       int        ppm_color,	/* I - Pages per minute in color (0 for gray) */
+	       int        duplex,	/* I - 1 = duplex, 0 = simplex */
+	       int        port,		/* I - Port for listeners or 0 for auto */
+	       const char *regtype,	/* I - Bonjour service type */
+	       const char *directory)	/* I - Spool directory */
 {
   _ipp_printer_t	*printer;	/* Printer */
-  http_addr_t		address;	/* Listen address */
-  socklen_t		addrlen;	/* Length of listen address */
   char			hostname[256],	/* Hostname */
 			uri[1024];	/* Printer URI */
-  int			val;		/* Socket value */
 
 
  /*
@@ -516,8 +748,9 @@ create_printer(
   printer->name          = _cupsStrAlloc(name);
   printer->dnssd_name    = _cupsStrRetain(printer->name);
   printer->directory     = _cupsStrAlloc(directory);
-  printer->hostname      = _cupsStrAlloc(httpGetHostName(NULL, hostname,
+  printer->hostname      = _cupsStrAlloc(httpGetHostname(NULL, hostname,
                                                          sizeof(hostname)));
+  printer->port          = port;
   printer->state         = IPP_PRINTER_IDLE;
   printer->state_reasons = _IPP_PRINTER_NONE;
   printer->jobs          = cupsArrayNew((cups_array_func_t)compare_jobs, NULL);
@@ -529,50 +762,27 @@ create_printer(
   * Create the listener sockets...
   */
 
-  if ((printer->ipv4 = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((printer->ipv4 = create_listener(AF_INET, &(printer->port))) < 0)
   {
     perror("Unable to create IPv4 listener");
-    delete_printer(printer);
-    return (NULL);
+    goto bad_printer;
   }
 
-  val = 1;
-  setsockopt(printer->ipv4, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-
-  if (!port)
+  if ((printer->ipv6 = create_listener(AF_INET6, &(printer->port))) < 0)
   {
-   /*
-    * Get the auto-assigned port number for the IPv4 socket...
-    */
-
-    addrlen = sizeof(address);
-    if (getsockname(printer->ipv4, &address, &addrlen))
-      port = 8631;
-    else
-      port = ntohl(address.ipv4.port);
-  }
-
-  memset(&address, 0, sizeof(address));
-  address.ipv4.sa_family = AF_INET;
-  address.ipv4.port      = htonl(port);
-
-  if (bind(printer->ipv4, &address, httpAddLength(&address)))
-  {
-    perror("Unable to bind IPv4 listener");
-    delete_printer(printer);
-    return (NULL);
-  }
-
-  if (listen(printer->ipv4, 5))
-  {
-    perror("Unable to listen on IPv4 listener");
-    delete_printer(printer);
-    return (NULL);
+    perror("Unable to create IPv6 listener");
+    goto bad_printer;
   }
 
  /*
   * Register the printer with Bonjour...
   */
+
+  if (register_printer(printer, make, model, ppm_color != 0, duplex, regtype))
+  {
+    fputs("Unable to register printer with Bonjour.\n", stderr);
+    goto bad_printer;
+  }
 
  /*
   * Create the printer attributes...
@@ -583,6 +793,16 @@ create_printer(
   */
 
   return (printer);
+
+
+ /*
+  * If we get here we were unable to create the printer...
+  */
+
+  bad_printer:
+
+  delete_printer(printer);
+  return (NULL);
 }
 
 
@@ -917,6 +1137,8 @@ ipp_send_document(_ipp_client_t *client)/* I - Client */
 
 static void
 ipp_validate_job(_ipp_client_t *client)	/* I - Client */
+{
+}
 
 
 /*
@@ -925,6 +1147,22 @@ ipp_validate_job(_ipp_client_t *client)	/* I - Client */
 
 static void *				/* O - Exit status */
 process_client(_ipp_client_t *client)	/* I - Client */
+{
+}
+
+
+/*
+ * 'register_printer()' - Register a printer object via Bonjour.
+ */
+
+static int				/* O - 0 on success, -1 on error */
+register_printer(
+    _ipp_printer_t *printer,		/* I - Printer */
+    const char     *make,		/* I - Manufacturer */
+    const char     *model,		/* I - Model name */
+    int            color,		/* I - 1 = color, 0 = monochrome */
+    int            duplex,		/* I - 1 = duplex, 0 = simplex */
+    const char     *regtype)		/* I - Service type */
 {
 }
 
@@ -939,6 +1177,42 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 	    const char    *message,	/* I - printf-style status-message */
 	    ...)			/* I - Additional args as needed */
 {
+}
+
+
+/*
+ * 'run_printer()' - Run the printer service.
+ */
+
+static void
+run_printer(_ipp_printer_t *printer)	/* I - Printer */
+{
+}
+
+
+/*
+ * 'usage()' - Show program usage.
+ */
+
+static void
+usage(void)
+{
+  puts("Usage: ippserver [options] \"name\"");
+  puts("");
+  puts("Options:");
+  puts("-p port           Port number (default=auto)");
+  puts("-r regtype        Bonjour service type (default=_ipp._tcp)");
+  puts("-i iconfile.png   PNG icon file (default=printer.png)");
+  puts("-");
+  puts("-");
+  puts("-");
+  puts("-");
+  puts("-");
+  puts("-");
+  puts("-");
+  puts("-");
+
+  exit(1);
 }
 
 
