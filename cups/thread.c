@@ -13,8 +13,13 @@
  *
  * Contents:
  *
+ *   _cupsMutexInit()    - Initialize a mutex.
  *   _cupsMutexLock()    - Lock a mutex.
  *   _cupsMutexUnlock()  - Unlock a mutex.
+ *   _cupsRWInit()       - Initialize a reader/writer lock.
+ *   _cupsRWLockRead()   - Acquire a reader/writer lock for reading.
+ *   _cupsRWLockWrite()  - Acquire a reader/writer lock for writing.
+ *   _cupsRWUnlock()     - Release a reader/writer lock.
  *   _cupsThreadCreate() - Create a thread.
  */
 
@@ -27,6 +32,17 @@
 
 
 #if defined(HAVE_PTHREAD_H)
+/*
+ * '_cupsMutexInit()' - Initialize a mutex.
+ */
+
+void
+_cupsMutexInit(_cups_mutex_t *mutex)	/* I - Mutex */
+{
+  pthread_mutex_init(mutex, NULL);
+}
+
+
 /*
  * '_cupsMutexLock()' - Lock a mutex.
  */
@@ -50,6 +66,50 @@ _cupsMutexUnlock(_cups_mutex_t *mutex)	/* I - Mutex */
 
 
 /*
+ * '_cupsRWInit()' - Initialize a reader/writer lock.
+ */
+
+void
+_cupsRWInit(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  pthread_rwlock_init(rwlock, NULL);
+}
+
+
+/*
+ * '_cupsRWLockRead()' - Acquire a reader/writer lock for reading.
+ */
+
+void
+_cupsRWLockRead(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  pthread_rwlock_rdlock(rwlock);
+}
+
+
+/*
+ * '_cupsRWLockWrite()' - Acquire a reader/writer lock for writing.
+ */
+
+void
+_cupsRWLockWrite(_cups_rwlock_t *rwlock)/* I - Reader/writer lock */
+{
+  pthread_rwlock_wrlock(rwlock);
+}
+
+
+/*
+ * '_cupsRWUnlock()' - Release a reader/writer lock.
+ */
+
+void
+_cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  pthread_rwlock_unlock(rwlock);
+}
+
+
+/*
  * '_cupsThreadCreate()' - Create a thread.
  */
 
@@ -66,6 +126,18 @@ _cupsThreadCreate(
 
 #elif defined(WIN32)
 #  include <process.h>
+
+
+/*
+ * '_cupsMutexInit()' - Initialize a mutex.
+ */
+
+void
+_cupsMutexInit(_cups_mutex_t *mutex)	/* I - Mutex */
+{
+  InitializeCriticalSection(&mutex->m_criticalSection);
+  mutex->m_init = 1;
+}
 
 
 /*
@@ -104,6 +176,50 @@ _cupsMutexUnlock(_cups_mutex_t *mutex)	/* I - Mutex */
 
 
 /*
+ * '_cupsRWInit()' - Initialize a reader/writer lock.
+ */
+
+void
+_cupsRWInit(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  _cupsMutexInit((_cups_mutex_t *)rwlock);
+}
+
+
+/*
+ * '_cupsRWLockRead()' - Acquire a reader/writer lock for reading.
+ */
+
+void
+_cupsRWLockRead(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  _cupsMutexLock((_cups_mutex_t *)rwlock);
+}
+
+
+/*
+ * '_cupsRWLockWrite()' - Acquire a reader/writer lock for writing.
+ */
+
+void
+_cupsRWLockWrite(_cups_rwlock_t *rwlock)/* I - Reader/writer lock */
+{
+  _cupsMutexLock((_cups_mutex_t *)rwlock);
+}
+
+
+/*
+ * '_cupsRWUnlock()' - Release a reader/writer lock.
+ */
+
+void
+_cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  _cupsMutexUnlock((_cups_mutex_t *)rwlock);
+}
+
+
+/*
  * '_cupsThreadCreate()' - Create a thread.
  */
 
@@ -119,12 +235,24 @@ _cupsThreadCreate(
 
 #else
 /*
+ * '_cupsMutexInit()' - Initialize a mutex.
+ */
+
+void
+_cupsMutexInit(_cups_mutex_t *mutex)	/* I - Mutex */
+{
+  (void)mutex;
+}
+
+
+/*
  * '_cupsMutexLock()' - Lock a mutex.
  */
 
 void
 _cupsMutexLock(_cups_mutex_t *mutex)	/* I - Mutex */
 {
+  (void)mutex;
 }
 
 
@@ -135,6 +263,51 @@ _cupsMutexLock(_cups_mutex_t *mutex)	/* I - Mutex */
 void
 _cupsMutexUnlock(_cups_mutex_t *mutex)	/* I - Mutex */
 {
+  (void)mutex;
+}
+
+
+/*
+ * '_cupsRWInit()' - Initialize a reader/writer lock.
+ */
+
+void
+_cupsRWInit(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  (void)rwlock;
+}
+
+
+/*
+ * '_cupsRWLockRead()' - Acquire a reader/writer lock for reading.
+ */
+
+void
+_cupsRWLockRead(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  (void)rwlock;
+}
+
+
+/*
+ * '_cupsRWLockWrite()' - Acquire a reader/writer lock for writing.
+ */
+
+void
+_cupsRWLockWrite(_cups_rwlock_t *rwlock)/* I - Reader/writer lock */
+{
+  (void)rwlock;
+}
+
+
+/*
+ * '_cupsRWUnlock()' - Release a reader/writer lock.
+ */
+
+void
+_cupsRWUnlock(_cups_rwlock_t *rwlock)	/* I - Reader/writer lock */
+{
+  (void)rwlock;
 }
 #endif /* HAVE_PTHREAD_H */
 

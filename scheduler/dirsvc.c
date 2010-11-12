@@ -1915,13 +1915,13 @@ cupsdUpdateDNSSDName(void)
 {
   DNSServiceErrorType error;		/* Error from service creation */
   char		webif[1024];		/* Web interface share name */
-#ifdef HAVE_COREFOUNDATION_H
+#  ifdef HAVE_SYSTEMCONFIGURATION
   SCDynamicStoreRef sc;			/* Context for dynamic store */
   CFDictionaryRef btmm;			/* Back-to-My-Mac domains */
   CFStringEncoding nameEncoding;	/* Encoding of computer name */
   CFStringRef	nameRef;		/* Host name CFString */
   char		nameBuffer[1024];	/* C-string buffer */
-#endif	/* HAVE_COREFOUNDATION_H */
+#  endif /* HAVE_SYSTEMCONFIGURATION */
 
 
  /*
@@ -1937,7 +1937,7 @@ cupsdUpdateDNSSDName(void)
   * Get the computer name as a c-string...
   */
 
-#ifdef HAVE_COREFOUNDATION_H
+#  ifdef HAVE_SYSTEMCONFIGURATION
   sc = SCDynamicStoreCreate(kCFAllocatorDefault, CFSTR("cupsd"), NULL, NULL);
 
   if (sc)
@@ -2028,7 +2028,7 @@ cupsdUpdateDNSSDName(void)
     CFRelease(sc);
   }
   else
-#endif	/* HAVE_COREFOUNDATION_H */
+#  endif /* HAVE_SYSTEMCONFIGURATION */
   {
     cupsdSetString(&DNSSDComputerName, ServerName);
     cupsdSetString(&DNSSDHostName, ServerName);
