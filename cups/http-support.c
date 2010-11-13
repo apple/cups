@@ -1298,7 +1298,10 @@ _httpDecodeURI(char       *dst,		/* I - Destination buffer */
                const char *src,		/* I - Source URI */
 	       size_t     dstsize)	/* I - Size of destination buffer */
 {
-  return (http_copy_decode(dst, src, (int)dstsize, NULL, 1));
+  if (http_copy_decode(dst, src, (int)dstsize, NULL, 1))
+    return (dst);
+  else
+    return (NULL);
 }
 
 

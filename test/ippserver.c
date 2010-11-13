@@ -22,6 +22,7 @@
 #include <cups/cups-private.h>
 #include <dns_sd.h>
 #include <sys/stat.h>
+#include <poll.h>
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
@@ -117,6 +118,7 @@ typedef struct _ipp_client_s		/**** Client data ****/
   time_t		start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
   char			uri[1024];	/* Request URI */
+  http_addr_t		addr;		/* Client address */
   _ipp_printer_t	*printer;	/* Printer */
   _ipp_job_t		*job;		/* Current job, if any */
 } _ipp_client_t;
@@ -134,7 +136,7 @@ static void		copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
 			           ipp_tag_t group_tag, int quickcopy);
 static void		copy_job_attrs(_ipp_client_t *client, _ipp_job_t *job,
 			               cups_array_t *ra);
-static _ipp_client_t	*create_client(_ipp_printer_t *printer, int fd);
+static _ipp_client_t	*create_client(_ipp_printer_t *printer, int sock);
 static _ipp_job_t	*create_job(_ipp_client_t *client);
 static int		create_listener(int family, int *port);
 static ipp_t		*create_media_col(const char *media, const char *type,
@@ -157,6 +159,7 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *regtype,
 				       const char *domain,
 				       _ipp_printer_t *printer);
+static char		*html_string(char *dst, const char *src, size_t dstlen);
 static void		ipp_cancel_job(_ipp_client_t *client);
 static void		ipp_create_job(_ipp_client_t *client);
 static void		ipp_get_job_attributes(_ipp_client_t *client);
@@ -203,7 +206,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*formats = "application/pdf,image/jpeg",
 	      				/* Supported formats */
 		*regtype = "_ipp._tcp";	/* Bonjour service type */
-  int		port = 0,		/* Port number (0 = auto) */
+  int		port = 8631,		/* Port number (0 = auto) TODO: FIX */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
 		ppm_color = 0;		/* Pages per minute for color */
@@ -660,7 +663,7 @@ copy_job_attrs(_ipp_client_t *client,	/* I - Client */
 
 static _ipp_client_t *			/* O - Client */
 create_client(_ipp_printer_t *printer,	/* I - Printer */
-              int            fd)	/* I - Listen socket */
+              int            sock)	/* I - Listen socket */
 {
   _ipp_client_t	*client;		/* Client */
   int		val;			/* Parameter value */
@@ -674,7 +677,7 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
   }
 
   client->http.activity = time(NULL);
-  client->http.hostaddr = &(client->clientaddr);
+  client->http.hostaddr = &(client->addr);
   client->http.blocking = 1;
 
  /*
@@ -683,7 +686,7 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
 
   addrlen = sizeof(http_addr_t);
 
-  if ((client->http.fd = accept(sock, (struct sockaddr *)client->http.hostaddr,
+  if ((client->http.fd = accept(sock, (struct sockaddr *)&(client->addr),
                                 &addrlen)) < 0)
   {
     perror("Unable to accept client connection");
@@ -693,7 +696,7 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     return (NULL);
   }
 
-  httpAddrString(client->http.hostaddr, client->http.hostname,
+  httpAddrString(&(client->addr), client->http.hostname,
 		 sizeof(client->http.hostname));
 
   fprintf(stderr, "Accepted connection from %s:%d (%s)",
@@ -751,19 +754,23 @@ create_listener(int family,		/* I  - Address family */
     setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof(val));
 #endif /* IPV6_V6ONLY */
 
-  if (!port)
+  if (!*port)
   {
    /*
     * Get the auto-assigned port number for the IPv4 socket...
     */
 
+    /* TODO: This code does not appear to work - port is always 0... */
     addrlen = sizeof(address);
     if (getsockname(sock, (struct sockaddr *)&address, &addrlen))
+    {
+      perror("getsockname() failed");
       *port = 8631;
-    else if (family == AF_INET)
-      *port = ntohl(address.ipv4.sin_port);
+    }
     else
-      *port = ntohl(address.ipv6.sin6_port);
+      *port = _httpAddrPort(&address);
+
+    fprintf(stderr, "Listening on port %d.\n", *port);
   }
 
   memset(&address, 0, sizeof(address));
@@ -856,7 +863,7 @@ create_printer(const char *name,	/* I - printer-name */
 	       const char *regtype,	/* I - Bonjour service type */
 	       const char *directory)	/* I - Spool directory */
 {
-  int			i, j, k;	/* Looping vars */
+  int			i, j;		/* Looping vars */
   _ipp_printer_t	*printer;	/* Printer */
   char			hostname[256],	/* Hostname */
 			uri[1024],	/* Printer URI */
@@ -1069,6 +1076,9 @@ create_printer(const char *name,	/* I - printer-name */
                   printer->hostname, printer->port, "/icon.png");
   httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), "http", NULL,
                   printer->hostname, printer->port, "/");
+
+  fprintf(stderr, "printer-more-info=\"%s\"\n", adminurl);
+  fprintf(stderr, "printer-uri=\"%s\"\n", uri);
 
   snprintf(make_model, sizeof(make_model), "%s %s", make, model);
 
@@ -1447,7 +1457,7 @@ create_printer(const char *name,	/* I - printer-name */
   * Register the printer with Bonjour...
   */
 
-  if (!register_printer(printer, location, make, model, formats, adminurl,
+  if (!register_printer(printer, location, make, model, docformats, adminurl,
                         ppm_color > 0, duplex, regtype))
     goto bad_printer;
 
@@ -1722,6 +1732,54 @@ dnssd_callback(
 
 
 /*
+ * 'html_string()' - Copy a string, converting HTML reserved characters to
+ *                   entities.
+ */
+
+static char *				/* O - HTML string */
+html_string(char       *dst,		/* I - HTML string buffer */
+            const char *src,		/* I - Source string */
+	    size_t     dstlen)		/* I - Size of HTML string buffer */
+{
+  char	*dstptr,			/* Pointer into HTML string buffer */
+	*dstend;			/* End of HTML string buffer */
+
+
+  for (dstptr = dst, dstend = dst + dstlen - 6; *src && dstptr < dstend; src ++)
+  {
+    if (*src == '<')
+    {
+      *dstptr++ = '&';
+      *dstptr++ = 'l';
+      *dstptr++ = 't';
+      *dstptr++ = ';';
+    }
+    else if (*src == '>')
+    {
+      *dstptr++ = '&';
+      *dstptr++ = 'g';
+      *dstptr++ = 't';
+      *dstptr++ = ';';
+    }
+    else if (*src == '&')
+    {
+      *dstptr++ = '&';
+      *dstptr++ = 'a';
+      *dstptr++ = 'm';
+      *dstptr++ = 'p';
+      *dstptr++ = ';';
+    }
+    else
+      *dstptr++ = *src;
+  }
+
+  *dstptr = '\0';
+
+  return (dst);
+}
+
+
+/*
  * 'ipp_cancel_job()' - Cancel a job.
  */
 
@@ -1841,10 +1899,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 			uri[1024],	/* URI */
 			version[64],	/* HTTP version number string */
 			*ptr;		/* Pointer into strings */
-  const char		*ext,		/* Extension */
-			*type;		/* Content type */
   int			major, minor;	/* HTTP version numbers */
-  int			urilen;		/* Length of URI string */
   http_status_t		status;		/* Transfer status */
   ipp_state_t		state;		/* State of IPP transfer */
 
@@ -1888,7 +1943,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   * Parse the request line...
   */
 
-  fprintf(stder, "%s %s\n", client->http.hostname, line);
+  fprintf(stderr, "%s %s\n", client->http.hostname, line);
 
   switch (sscanf(line, "%63s%1023s%63s", operation, uri, version))
   {
@@ -2034,8 +2089,16 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 
 	return (respond_http(client, HTTP_OK, NULL, 0));
 
-    case HTTP_GET :
     case HTTP_HEAD :
+        if (!strcmp(client->uri, "/icon.png"))
+	  return (respond_http(client, HTTP_OK, "image/png", 0));
+	else if (!strcmp(client->uri, "/"))
+	  return (respond_http(client, HTTP_OK, "text/html", 0));
+	else
+	  return (respond_http(client, HTTP_NOT_FOUND, NULL, 0));
+	break;
+
+    case HTTP_GET :
         if (!strcmp(client->uri, "/icon.png"))
 	{
 	 /*
@@ -2047,8 +2110,8 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  char		buffer[4096];	/* Copy buffer */
 	  ssize_t	bytes;		/* Bytes */
 
-          if (!stat(printer->icon, &fileinfo) &&
-	      (fd = open(printer->icon, O_RDONLY)) >= 0)
+          if (!stat(client->printer->icon, &fileinfo) &&
+	      (fd = open(client->printer->icon, O_RDONLY)) >= 0)
 	  {
 	    if (!respond_http(client, HTTP_OK, "image/png", fileinfo.st_size))
 	    {
@@ -2056,23 +2119,51 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	      return (0);
 	    }
 
-            if (client->operation == HTTP_GET)
-	    {
-	      while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
-		httpWrite(&(client->http), buffer, bytes);
+	    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0)
+	      httpWrite2(&(client->http), buffer, bytes);
 
-	      httpWriteFlush(&(client->http));
-	    }
+	    httpFlushWrite(&(client->http));
 
 	    close(fd);
 	  }
 	  else
 	    return (respond_http(client, HTTP_NOT_FOUND, NULL, 0));
 	}
-	else if (strcmp(client->uri, "/"))
-	  return (respond_http(client, HTTP_NOT_FOUND, NULL, 0));
+	else if (!strcmp(client->uri, "/"))
+	{
+	 /*
+	  * Show web status page...
+	  */
+
+          char	html_name[1024];	/* HTML-safe name string */
+
+          httpPrintf(&(client->http),
+	             "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" "
+		     "\"http://www.w3.org/TR/html4/strict.dtd\">\n"
+		     "<html>\n"
+		     "<head>\n"
+		     "<title>%s</title>\n"
+		     "<link rel=\"SHORTCUT ICON\" href=\"/icon.png\" "
+		     "type=\"image/png\">\n"
+		     "</head>\n"
+		     "<body>\n"
+		     "</body>\n"
+		     "<h1>%s</h1>\n"
+		     "<p>%s, %d job(s).</p>\n"
+		     "</body>\n"
+		     "</html>\n",
+		     html_string(html_name, client->printer->name,
+		                 sizeof(html_name)), html_name,
+		     client->printer->state == IPP_PRINTER_IDLE ? "Idle" :
+		         client->printer->state == IPP_PRINTER_PROCESSING ?
+			 "Printing" : "Stopped",
+		     cupsArrayCount(client->printer->jobs));
+          httpWrite2(&(client->http), "", 0);
+
+	  return (1);
+	}
 	else
-	  return (process_web(client));
+	  return (respond_http(client, HTTP_NOT_FOUND, NULL, 0));
 	break;
 
     case HTTP_POST :
@@ -2081,7 +2172,7 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	     client->http.data_encoding == HTTP_ENCODE_LENGTH))
 	{
 	 /*
-	  * Negative content lengths are invalid!
+	  * Negative content lengths are invalid...
 	  */
 
 	  return (respond_http(client, HTTP_BAD_REQUEST, NULL, 0));
@@ -2090,25 +2181,11 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	if (strcmp(client->http.fields[HTTP_FIELD_CONTENT_TYPE],
 	           "application/ipp"))
         {
-         /*
-          * Not an IPP POST, either update the web interface or return an
-          * error.
-          */
+	 /*
+	  * Not an IPP request...
+	  */
 
-          if (client->http.expect == HTTP_CONTINUE)
-	  {
-	   /*
-	    * Send 100-continue header...
-	    */
-
-	    if (!respond_http(client, HTTP_CONTINUE, NULL, 0))
-	      return (0);
-	  }
-
-          if (EnableWeb)
-            return (liteProcessWeb(con));
-          else
-	    return (respond_http(client, HTTP_BAD_REQUEST, NULL, 0));
+	  return (respond_http(client, HTTP_BAD_REQUEST, NULL, 0));
 	}
 
        /*
@@ -2120,20 +2197,17 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
         while ((state = ippRead(&(client->http), client->request)) != IPP_DATA)
 	  if (state == IPP_ERROR)
 	  {
-            liteLog(con, "IPP read error (%s)\n",
+            fprintf(stderr, "%s IPP read error (%s).\n", client->http.hostname,
 	            ippOpString(client->request->request.op.operation_id));
-
 	    respond_http(client, HTTP_BAD_REQUEST, NULL, 0);
 	    return (0);
 	  }
-
-	client->bytes += ippLength(client->request);
 
        /*
         * Now that we have the IPP request, process the request...
 	*/
 
-        return (liteProcessIPP(con));
+        return (process_ipp(client));
 
     default :
         break; /* Anti-compiler-warning-code */
@@ -2248,7 +2322,7 @@ register_printer(
                                   kDNSServiceFlagsShareConnection,
                                   0 /* interfaceIndex */, printer->dnssd_name,
 				  regtype, NULL /* domain */,
-				  NULL /* host */, printer->port,
+				  NULL /* host */, htonl(printer->port),
 				  TXTRecordGetLength(&(printer->ipp_txt)),
 				  TXTRecordGetBytesPtr(&(printer->ipp_txt)),
 			          (DNSServiceRegisterReply)dnssd_callback,
@@ -2276,7 +2350,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
   char	message[1024];			/* Text message */
 
 
-  fprintf(stderr, ">>>> %s\n", httpStatus(code));
+  fprintf(stderr, "%s %s\n", client->http.hostname, httpStatus(code));
 
   if (code == HTTP_CONTINUE)
   {
