@@ -80,6 +80,7 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 			ipv6;		/* IPv6 listener */
   DNSServiceRef		common_ref,	/* Shared service connection */
 			ipp_ref,	/* Bonjour IPP service */
+			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
   TXTRecordRef		ipp_txt;	/* Bonjour IPP TXT record */
   char			*name,		/* printer-name */
@@ -159,7 +160,14 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *regtype,
 				       const char *domain,
 				       _ipp_printer_t *printer);
-static char		*html_string(char *dst, const char *src, size_t dstlen);
+static void		html_escape(_ipp_client_t *client, const char *s,
+			            size_t slen);
+static void		html_printf(_ipp_client_t *client, const char *format,
+			            ...)
+#  ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#  endif /* __GNUC__ */
+;
 static void		ipp_cancel_job(_ipp_client_t *client);
 static void		ipp_create_job(_ipp_client_t *client);
 static void		ipp_get_job_attributes(_ipp_client_t *client);
@@ -676,6 +684,7 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
     return (NULL);
   }
 
+  client->printer       = printer;
   client->http.activity = time(NULL);
   client->http.hostaddr = &(client->addr);
   client->http.blocking = 1;
@@ -699,8 +708,7 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
   httpAddrString(&(client->addr), client->http.hostname,
 		 sizeof(client->http.hostname));
 
-  fprintf(stderr, "Accepted connection from %s:%d (%s)",
-	  client->http.hostname, _httpAddrPort(client->http.hostaddr),
+  fprintf(stderr, "Accepted connection from %s (%s)\n", client->http.hostname,
 	  client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
 
  /*
@@ -777,12 +785,12 @@ create_listener(int family,		/* I  - Address family */
   if (family == AF_INET)
   {
     address.ipv4.sin_family = family;
-    address.ipv4.sin_port   = htonl(*port);
+    address.ipv4.sin_port   = htons(*port);
   }
   else
   {
     address.ipv6.sin6_family = family;
-    address.ipv6.sin6_port   = htonl(*port);
+    address.ipv6.sin6_port   = htons(*port);
   }
 
   if (bind(sock, (struct sockaddr *)&address, httpAddrLength(&address)))
@@ -1689,6 +1697,29 @@ create_requested_array(
 static void
 delete_client(_ipp_client_t *client)	/* I - Client */
 {
+  fprintf(stderr, "Closing connection from %s (%s)\n", client->http.hostname,
+	  client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
+
+ /*
+  * Flush pending writes before closing...
+  */
+
+  httpFlushWrite(&(client->http));
+
+  if (client->http.fd >= 0)
+    close(client->http.fd);
+
+ /*
+  * Free memory...
+  */
+
+  httpClearCookie(&(client->http));
+  httpClearFields(&(client->http));
+
+  ippDelete(client->request);
+  ippDelete(client->response);
+
+  free(client);
 }
 
 
@@ -1732,50 +1763,260 @@ dnssd_callback(
 
 
 /*
- * 'html_string()' - Copy a string, converting HTML reserved characters to
- *                   entities.
+ * 'html_escape()' - Write a HTML-safe string.
  */
 
-static char *				/* O - HTML string */
-html_string(char       *dst,		/* I - HTML string buffer */
-            const char *src,		/* I - Source string */
-	    size_t     dstlen)		/* I - Size of HTML string buffer */
+static void
+html_escape(_ipp_client_t *client,	/* I - Client connection */
+	    const char    *s,		/* I - String to write */
+	    size_t        slen)		/* I - Number of characters to write */
 {
-  char	*dstptr,			/* Pointer into HTML string buffer */
-	*dstend;			/* End of HTML string buffer */
+  const char	*start,			/* Start of segment */
+		*end;			/* End of string */
 
 
-  for (dstptr = dst, dstend = dst + dstlen - 6; *src && dstptr < dstend; src ++)
+  start = s;
+  end   = s + (slen > 0 ? slen : strlen(s));
+
+  while (*s && s < end)
   {
-    if (*src == '<')
+    if (*s == '&' || *s == '<')
     {
-      *dstptr++ = '&';
-      *dstptr++ = 'l';
-      *dstptr++ = 't';
-      *dstptr++ = ';';
+      if (s > start)
+        httpWrite2(&(client->http), start, s - start);
+
+      if (*s == '&')
+        httpWrite2(&(client->http), "&amp;", 5);
+      else
+        httpWrite2(&(client->http), "&lt;", 4);
+
+      start = s + 1;
     }
-    else if (*src == '>')
-    {
-      *dstptr++ = '&';
-      *dstptr++ = 'g';
-      *dstptr++ = 't';
-      *dstptr++ = ';';
-    }
-    else if (*src == '&')
-    {
-      *dstptr++ = '&';
-      *dstptr++ = 'a';
-      *dstptr++ = 'm';
-      *dstptr++ = 'p';
-      *dstptr++ = ';';
-    }
-    else
-      *dstptr++ = *src;
+
+    s ++;
   }
 
-  *dstptr = '\0';
+  if (s > start)
+    httpWrite2(&(client->http), start, s - start);
+}
 
-  return (dst);
+
+/*
+ * 'html_printf()' - Send formatted text to the client, quoting as needed.
+ */
+
+static void
+html_printf(_ipp_client_t *client,	/* I - Client connection */
+	    const char    *format,	/* I - Printf-style format string */
+	    ...)			/* I - Additional arguments as needed */
+{
+  va_list	ap;			/* Pointer to arguments */
+  const char	*start;			/* Start of string */
+  char		size,			/* Size character (h, l, L) */
+		type;			/* Format type character */
+  int		width,			/* Width of field */
+		prec;			/* Number of characters of precision */
+  char		tformat[100],		/* Temporary format string for sprintf() */
+		*tptr,			/* Pointer into temporary format */
+		temp[1024];		/* Buffer for formatted numbers */
+  char		*s;			/* Pointer to string */
+
+
+ /*
+  * Loop through the format string, formatting as needed...
+  */
+
+  va_start(ap, format);
+  start = format;
+
+  while (*format)
+  {
+    if (*format == '%')
+    {
+      if (format > start)
+        httpWrite2(&(client->http), start, format - start);
+
+      tptr    = tformat;
+      *tptr++ = *format++;
+
+      if (*format == '%')
+      {
+        httpWrite2(&(client->http), "%", 1);
+        format ++;
+	continue;
+      }
+      else if (strchr(" -+#\'", *format))
+        *tptr++ = *format++;
+
+      if (*format == '*')
+      {
+       /*
+        * Get width from argument...
+	*/
+
+	format ++;
+	width = va_arg(ap, int);
+
+	snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", width);
+	tptr += strlen(tptr);
+      }
+      else
+      {
+	width = 0;
+
+	while (isdigit(*format & 255))
+	{
+	  if (tptr < (tformat + sizeof(tformat) - 1))
+	    *tptr++ = *format;
+
+	  width = width * 10 + *format++ - '0';
+	}
+      }
+
+      if (*format == '.')
+      {
+	if (tptr < (tformat + sizeof(tformat) - 1))
+	  *tptr++ = *format;
+
+        format ++;
+
+        if (*format == '*')
+	{
+         /*
+	  * Get precision from argument...
+	  */
+
+	  format ++;
+	  prec = va_arg(ap, int);
+
+	  snprintf(tptr, sizeof(tformat) - (tptr - tformat), "%d", prec);
+	  tptr += strlen(tptr);
+	}
+	else
+	{
+	  prec = 0;
+
+	  while (isdigit(*format & 255))
+	  {
+	    if (tptr < (tformat + sizeof(tformat) - 1))
+	      *tptr++ = *format;
+
+	    prec = prec * 10 + *format++ - '0';
+	  }
+	}
+      }
+
+      if (*format == 'l' && format[1] == 'l')
+      {
+        size = 'L';
+
+	if (tptr < (tformat + sizeof(tformat) - 2))
+	{
+	  *tptr++ = 'l';
+	  *tptr++ = 'l';
+	}
+
+	format += 2;
+      }
+      else if (*format == 'h' || *format == 'l' || *format == 'L')
+      {
+	if (tptr < (tformat + sizeof(tformat) - 1))
+	  *tptr++ = *format;
+
+        size = *format++;
+      }
+      else
+        size = 0;
+
+
+      if (!*format)
+      {
+        start = format;
+        break;
+      }
+
+      if (tptr < (tformat + sizeof(tformat) - 1))
+        *tptr++ = *format;
+
+      type  = *format++;
+      *tptr = '\0';
+      start = format;
+
+      switch (type)
+      {
+	case 'E' : /* Floating point formats */
+	case 'G' :
+	case 'e' :
+	case 'f' :
+	case 'g' :
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+	    sprintf(temp, tformat, va_arg(ap, double));
+
+            httpWrite2(&(client->http), temp, strlen(temp));
+	    break;
+
+        case 'B' : /* Integer formats */
+	case 'X' :
+	case 'b' :
+        case 'd' :
+	case 'i' :
+	case 'o' :
+	case 'u' :
+	case 'x' :
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+#  ifdef HAVE_LONG_LONG
+            if (size == 'L')
+	      sprintf(temp, tformat, va_arg(ap, long long));
+	    else
+#  endif /* HAVE_LONG_LONG */
+            if (size == 'l')
+	      sprintf(temp, tformat, va_arg(ap, long));
+	    else
+	      sprintf(temp, tformat, va_arg(ap, int));
+
+            httpWrite2(&(client->http), temp, strlen(temp));
+	    break;
+
+	case 'p' : /* Pointer value */
+	    if ((width + 2) > sizeof(temp))
+	      break;
+
+	    sprintf(temp, tformat, va_arg(ap, void *));
+
+            httpWrite2(&(client->http), temp, strlen(temp));
+	    break;
+
+        case 'c' : /* Character or character array */
+            if (width <= 1)
+            {
+              temp[0] = va_arg(ap, int);
+              temp[1] = '\0';
+              html_escape(client, temp, 1);
+            }
+            else
+              html_escape(client, va_arg(ap, char *), (size_t)width);
+	    break;
+
+	case 's' : /* String */
+	    if ((s = va_arg(ap, char *)) == NULL)
+	      s = "(null)";
+
+            html_escape(client, s, strlen(s));
+	    break;
+      }
+    }
+    else
+      format ++;
+  }
+
+  if (format > start)
+    httpWrite2(&(client->http), start, format - start);
+
+  va_end(ap);
 }
 
 
@@ -2135,29 +2376,29 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 	  * Show web status page...
 	  */
 
-          char	html_name[1024];	/* HTML-safe name string */
+          if (!respond_http(client, HTTP_OK, "text/html", 0))
+	    return (0);
 
-          httpPrintf(&(client->http),
-	             "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" "
-		     "\"http://www.w3.org/TR/html4/strict.dtd\">\n"
-		     "<html>\n"
-		     "<head>\n"
-		     "<title>%s</title>\n"
-		     "<link rel=\"SHORTCUT ICON\" href=\"/icon.png\" "
-		     "type=\"image/png\">\n"
-		     "</head>\n"
-		     "<body>\n"
-		     "</body>\n"
-		     "<h1>%s</h1>\n"
-		     "<p>%s, %d job(s).</p>\n"
-		     "</body>\n"
-		     "</html>\n",
-		     html_string(html_name, client->printer->name,
-		                 sizeof(html_name)), html_name,
-		     client->printer->state == IPP_PRINTER_IDLE ? "Idle" :
-		         client->printer->state == IPP_PRINTER_PROCESSING ?
-			 "Printing" : "Stopped",
-		     cupsArrayCount(client->printer->jobs));
+          html_printf(client,
+	              "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" "
+		      "\"http://www.w3.org/TR/html4/strict.dtd\">\n"
+		      "<html>\n"
+		      "<head>\n"
+		      "<title>%s</title>\n"
+		      "<link rel=\"SHORTCUT ICON\" href=\"/icon.png\" "
+		      "type=\"image/png\">\n"
+		      "</head>\n"
+		      "<body>\n"
+		      "</body>\n"
+		      "<h1>%s</h1>\n"
+		      "<p>%s, %d job(s).</p>\n"
+		      "</body>\n"
+		      "</html>\n",
+		      client->printer->name, client->printer->name,
+		      client->printer->state == IPP_PRINTER_IDLE ? "Idle" :
+		          client->printer->state == IPP_PRINTER_PROCESSING ?
+			  "Printing" : "Stopped",
+		      cupsArrayCount(client->printer->jobs));
           httpWrite2(&(client->http), "", 0);
 
 	  return (1);
@@ -2322,9 +2563,30 @@ register_printer(
                                   kDNSServiceFlagsShareConnection,
                                   0 /* interfaceIndex */, printer->dnssd_name,
 				  regtype, NULL /* domain */,
-				  NULL /* host */, htonl(printer->port),
+				  NULL /* host */, htons(printer->port),
 				  TXTRecordGetLength(&(printer->ipp_txt)),
 				  TXTRecordGetBytesPtr(&(printer->ipp_txt)),
+			          (DNSServiceRegisterReply)dnssd_callback,
+			          printer)) != kDNSServiceErr_NoError)
+  {
+    fprintf(stderr, "Unable to register \"%s.%s\": %d\n",
+            printer->dnssd_name, regtype, error);
+    return (0);
+  }
+
+ /*
+  * Similarly, register the _http._tcp,_printer (HTTP) service type with the
+  * real port number to advertise our IPP printer...
+  */
+
+  printer->http_ref = printer->common_ref;
+
+  if ((error = DNSServiceRegister(&(printer->http_ref),
+                                  kDNSServiceFlagsShareConnection,
+                                  0 /* interfaceIndex */, printer->dnssd_name,
+				  "_http._tcp,_printer", NULL /* domain */,
+				  NULL /* host */, htons(printer->port),
+				  0 /* txtLen */, NULL, /* txtRecord */
 			          (DNSServiceRegisterReply)dnssd_callback,
 			          printer)) != kDNSServiceErr_NoError)
   {
