@@ -1134,6 +1134,8 @@ create_printer(const char *name,	/* I - printer-name */
     return (NULL);
   }
 
+  printer->ipv4          = -1;
+  printer->ipv6          = -1;
   printer->name          = _cupsStrAlloc(name);
   printer->dnssd_name    = _cupsStrRetain(printer->name);
   printer->directory     = _cupsStrAlloc(directory);
@@ -1823,6 +1825,15 @@ delete_client(_ipp_client_t *client)	/* I - Client */
 static void
 delete_job(_ipp_job_t *job)		/* I - Job */
 {
+  ippDelete(job->attrs);
+
+  if (job->filename)
+  {
+    unlink(job->filename);
+    free(job->filename);
+  }
+
+  free(job);
 }
 
 
@@ -1834,6 +1845,43 @@ delete_job(_ipp_job_t *job)		/* I - Job */
 static void
 delete_printer(_ipp_printer_t *printer)	/* I - Printer */
 {
+  if (printer->ipv4 >= 0)
+    close(printer->ipv4);
+
+  if (printer->ipv6 >= 0)
+    close(printer->ipv6);
+
+  if (printer->printer_ref)
+    DNSServiceRefDeallocate(printer->printer_ref);
+
+  if (printer->ipp_ref)
+    DNSServiceRefDeallocate(printer->ipp_ref);
+
+  if (printer->http_ref)
+    DNSServiceRefDeallocate(printer->http_ref);
+
+  if (printer->common_ref)
+    DNSServiceRefDeallocate(printer->common_ref);
+
+  TXTRecordDeallocate(&(printer->ipp_txt));
+
+  if (printer->name)
+    _cupsStrFree(printer->name);
+  if (printer->dnssd_name)
+    _cupsStrFree(printer->dnssd_name);
+  if (printer->icon)
+    _cupsStrFree(printer->icon);
+  if (printer->directory)
+    _cupsStrFree(printer->directory);
+  if (printer->hostname)
+    _cupsStrFree(printer->hostname);
+  if (printer->uri)
+    _cupsStrFree(printer->uri);
+
+  ippDelete(printer->attrs);
+  cupsArrayDelete(printer->jobs);
+
+  free(printer);
 }
 
 
