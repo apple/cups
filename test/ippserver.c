@@ -87,8 +87,10 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 			*dnssd_name,	/* printer-dnssd-name */
 			*icon,		/* Icon filename */
 			*directory,	/* Spool directory */
-			*hostname;	/* Hostname */
+			*hostname,	/* Hostname */
+			*uri;		/* printer-uri-supported */
   int			port;		/* Port */
+  size_t		urilen;		/* Length of printer URI */
   ipp_t			*attrs;		/* Static attributes */
   ipp_pstate_t		state;		/* printer-state value */
   _ipp_preasons_t	state_reasons;	/* printer-state-reasons values */  
@@ -99,13 +101,15 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 
 typedef struct _ipp_job_s		/**** Job data ****/
 {
-  int			id,		/* Job ID */
-			use;		/* Use count */
-  char			*name;		/* job-name */
+  int			id;		/* Job ID */
+  char			*name,		/* job-name */
+			*username,	/* job-originating-user-name */
+			*format;	/* document-format */
   ipp_jstate_t		state;		/* job-state value */
-  time_t		completed;	/* time-at-completed value */
+  time_t		processing,	/* time-at-processing value */
+			completed;	/* time-at-completed value */
   ipp_t			*attrs;		/* Static attributes */
-  int			canceled;	/* Non-zero when job canceled */
+  int			cancel;		/* Non-zero when job canceled */
   char			*filename;	/* Print file name */
   int			fd;		/* Print file descriptor */
   _ipp_printer_t	*printer;	/* Printer */
@@ -118,6 +122,7 @@ typedef struct _ipp_client_s		/**** Client data ****/
 			*response;	/* IPP response */
   time_t		start;		/* Request start time */
   http_state_t		operation;	/* Request operation */
+  ipp_op_t		operation_id;	/* IPP operation-id */
   char			uri[1024];	/* Request URI */
   http_addr_t		addr;		/* Client address */
   _ipp_printer_t	*printer;	/* Printer */
@@ -160,6 +165,7 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *regtype,
 				       const char *domain,
 				       _ipp_printer_t *printer);
+static _ipp_job_t	*find_job(_ipp_client_t *client);
 static void		html_escape(_ipp_client_t *client, const char *s,
 			            size_t slen);
 static void		html_printf(_ipp_client_t *client, const char *format,
@@ -621,16 +627,16 @@ copy_job_attrs(_ipp_client_t *client,	/* I - Client */
 	  break;
 
       case IPP_JOB_HELD :
-	  if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "job-state-reasons", NULL, "job-hold-until-specified");
-	  else
+          if (job->fd >= 0)
 	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 			 "job-state-reasons", NULL, "job-incoming");
+	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
+	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+			 "job-state-reasons", NULL, "job-hold-until-specified");
 	  break;
 
       case IPP_JOB_PROCESSING :
-	  if (job->canceled)
+	  if (job->cancel)
 	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
 			 "job-state-reasons", NULL, "processing-to-stop-point");
 	  else
@@ -659,6 +665,14 @@ copy_job_attrs(_ipp_client_t *client,	/* I - Client */
 	  break;
     }
   }
+
+  if ((!ra || cupsArrayFind(ra, "time-at-completed")) && job->completed)
+    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                  "time-at-completed", job->completed);
+
+  if ((!ra || cupsArrayFind(ra, "time-at-processing")) && job->processing)
+    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+                  "time-at-processing", job->processing);
 
   copy_attrs(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
 }
@@ -734,6 +748,81 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
 static _ipp_job_t *			/* O - Job */
 create_job(_ipp_client_t *client)	/* I - Client */
 {
+  _ipp_job_t		*job;		/* Job */
+  ipp_attribute_t	*attr;		/* Job attribute */
+  char			uri[1024];	/* job-uri value */
+
+
+ /*
+  * Initialize the job information...
+  */
+
+  if ((job = calloc(1, sizeof(_ipp_job_t))) == NULL)
+  {
+    perror("Unable to allocate memory for job");
+    return (NULL);
+  }
+
+  job->printer    = client->printer;
+  job->attrs      = client->request;
+  job->state      = IPP_JOB_HELD;
+  job->fd         = -1;
+  client->request = NULL;
+
+ /*
+  * Set all but the first two attributes to the job attributes group...
+  */
+
+  for (attr = job->attrs->attrs->next->next; attr; attr = attr->next)
+    attr->group_tag = IPP_TAG_JOB;
+
+ /*
+  * Get the requesting-user-name, document format, and priority...
+  */
+
+  if ((attr = ippFindAttribute(job->attrs, "requesting-user-name",
+                               IPP_TAG_NAME)) != NULL)
+  {
+    _cupsStrFree(attr->name);
+    attr->name = _cupsStrAlloc("job-originating-user-name");
+  }
+  else
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME,
+                        "job-originating-user-name", NULL, "anonymous");
+
+  if (attr)
+    job->username = attr->values[0].string.text;
+  else
+    job->username = "anonymous";
+
+  if ((attr = ippFindAttribute(job->attrs, "document-format",
+                               IPP_TAG_MIMETYPE)) != NULL)
+    job->format = attr->values[0].string.text;
+  else
+    job->format = "application/octet-stream";
+
+ /*
+  * Add job description attributes and add to the jobs array...
+  */
+
+  _cupsRWLockWrite(&(client->printer->rwlock));
+
+  job->id = client->printer->next_job_id ++;
+
+  snprintf(uri, sizeof(uri), "%s/%d", client->printer->uri, job->id);
+
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "job-id", job->id);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uri", NULL, uri);
+  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-printer-uri", NULL,
+               client->printer->uri);
+  ippAddInteger(job->attrs, IPP_TAG_JOB, IPP_TAG_INTEGER, "time-at-creation",
+                (int)time(NULL));
+
+  cupsArrayAdd(client->printer->jobs, job);
+
+  _cupsRWUnlock(&(client->printer->rwlock));
+
+  return (job);
 }
 
 
@@ -1056,6 +1145,11 @@ create_printer(const char *name,	/* I - printer-name */
   printer->jobs          = cupsArrayNew((cups_array_func_t)compare_jobs, NULL);
   printer->next_job_id   = 1;
 
+  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+		  printer->hostname, printer->port, "/ipp");
+  printer->uri    = _cupsStrAlloc(uri);
+  printer->urilen = strlen(uri);
+
   _cupsRWInit(&(printer->rwlock));
 
  /*
@@ -1078,8 +1172,6 @@ create_printer(const char *name,	/* I - printer-name */
   * Prepare values for the printer attributes...
   */
 
-  httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
-		  printer->hostname, printer->port, "/ipp");
   httpAssembleURI(HTTP_URI_CODING_ALL, icons, sizeof(icons), "http", NULL,
                   printer->hostname, printer->port, "/icon.png");
   httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), "http", NULL,
@@ -1763,11 +1855,45 @@ dnssd_callback(
 
 
 /*
+ * 'find_job()' - Find a job specified in a request.
+ */
+
+static _ipp_job_t *			/* O - Job or NULL */
+find_job(_ipp_client_t *client)		/* I - Client */
+{
+  ipp_attribute_t	*attr;		/* job-id or job-uri attribute */
+  _ipp_job_t		key,		/* Job search key */
+			*job;		/* Matching job, if any */
+
+
+  key.id = 0;
+
+  if ((attr = ippFindAttribute(client->request, "job-uri",
+                               IPP_TAG_URI)) != NULL)
+  {
+    if (!strncmp(attr->values[0].string.text, client->printer->uri,
+                 client->printer->urilen) &&
+        attr->values[0].string.text[client->printer->urilen] == '/')
+      key.id = atoi(attr->values[0].string.text + client->printer->urilen + 1);
+  }
+  else if ((attr = ippFindAttribute(client->request, "job-id",
+                                    IPP_TAG_INTEGER)) != NULL)
+    key.id = attr->values[0].integer;
+
+  _cupsRWLockRead(&(client->printer->rwlock));
+  job = (_ipp_job_t *)cupsArrayFind(client->printer->jobs, &key);
+  _cupsRWUnlock(&(client->printer->rwlock));
+
+  return (job);
+}
+
+
+/*
  * 'html_escape()' - Write a HTML-safe string.
  */
 
 static void
-html_escape(_ipp_client_t *client,	/* I - Client connection */
+html_escape(_ipp_client_t *client,	/* I - Client */
 	    const char    *s,		/* I - String to write */
 	    size_t        slen)		/* I - Number of characters to write */
 {
@@ -1806,7 +1932,7 @@ html_escape(_ipp_client_t *client,	/* I - Client connection */
  */
 
 static void
-html_printf(_ipp_client_t *client,	/* I - Client connection */
+html_printf(_ipp_client_t *client,	/* I - Client */
 	    const char    *format,	/* I - Printf-style format string */
 	    ...)			/* I - Additional arguments as needed */
 {
@@ -2027,6 +2153,59 @@ html_printf(_ipp_client_t *client,	/* I - Client connection */
 static void
 ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
 {
+  _ipp_job_t		*job;		/* Job information */
+
+
+ /*
+  * Get the job...
+  */
+
+  if ((job = find_job(client)) == NULL)
+    return;
+
+ /*
+  * See if the job is already completed, canceled, or aborted; if so,
+  * we can't cancel...
+  */
+
+  switch (job->state)
+  {
+    case IPP_JOB_CANCELED :
+	respond_ipp(client, IPP_NOT_POSSIBLE,
+		    "Job #%d is already canceled - can\'t cancel.", job->id);
+        break;
+
+    case IPP_JOB_ABORTED :
+	respond_ipp(client, IPP_NOT_POSSIBLE,
+		    "Job #%d is already aborted - can\'t cancel.", job->id);
+        break;
+
+    case IPP_JOB_COMPLETED :
+	respond_ipp(client, IPP_NOT_POSSIBLE,
+		    "Job #%d is already completed - can\'t cancel.", job->id);
+        break;
+
+    default :
+       /*
+        * Cancel the job...
+	*/
+
+	_cupsRWLockWrite(&(client->printer->rwlock));
+
+	if (job->state == IPP_JOB_PROCESSING ||
+	    (job->state == IPP_JOB_HELD && job->fd >= 0))
+          job->cancel = 1;
+	else
+	{
+	  job->state     = IPP_JOB_CANCELED;
+	  job->completed = time(NULL);
+	}
+
+	_cupsRWUnlock(&(client->printer->rwlock));
+
+	respond_ipp(client, IPP_OK, NULL);
+        break;
+  }
 }
 
 
@@ -2465,6 +2644,206 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
 static int				/* O - 1 on success, 0 on error */
 process_ipp(_ipp_client_t *client)	/* I - Client */
 {
+  ipp_tag_t		group;		/* Current group tag */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  ipp_attribute_t	*charset;	/* Character set attribute */
+  ipp_attribute_t	*language;	/* Language attribute */
+  ipp_attribute_t	*uri;		/* Printer URI attribute */
+
+
+ /*
+  * First build an empty response message for this request...
+  */
+
+  client->operation_id = client->request->request.op.operation_id;
+  client->response     = ippNew();
+
+  client->response->request.status.version[0] =
+      client->request->request.op.version[0];
+  client->response->request.status.version[1] =
+      client->request->request.op.version[1];
+  client->response->request.status.request_id =
+      client->request->request.op.request_id;
+
+ /*
+  * Then validate the request header and required attributes...
+  */
+
+  if (client->request->request.any.version[0] < 1 ||
+      client->request->request.any.version[0] > 2)
+  {
+   /*
+    * Return an error, since we only support IPP 1.x and 2.x.
+    */
+
+    respond_ipp(client, IPP_VERSION_NOT_SUPPORTED,
+                "Bad request version number %d.%d.",
+		client->request->request.any.version[0],
+	        client->request->request.any.version[1]);
+  }
+  else if (client->request->request.any.request_id <= 0)
+    respond_ipp(client, IPP_BAD_REQUEST, "Bad request-id %d.",
+                client->request->request.any.request_id);
+  else if (!client->request->attrs)
+    respond_ipp(client, IPP_BAD_REQUEST, "No attributes in request.");
+  else
+  {
+   /*
+    * Make sure that the attributes are provided in the correct order and
+    * don't repeat groups...
+    */
+
+    for (attr = client->request->attrs, group = attr->group_tag;
+	 attr;
+	 attr = attr->next)
+      if (attr->group_tag < group && attr->group_tag != IPP_TAG_ZERO)
+      {
+       /*
+	* Out of order; return an error...
+	*/
+
+	respond_ipp(client, IPP_BAD_REQUEST,
+		       "Attribute groups are out of order (%x < %x).",
+		       attr->group_tag, group);
+	break;
+      }
+      else
+	group = attr->group_tag;
+
+    if (!attr)
+    {
+     /*
+      * Then make sure that the first three attributes are:
+      *
+      *     attributes-charset
+      *     attributes-natural-language
+      *     printer-uri/job-uri
+      */
+
+      attr = client->request->attrs;
+      if (attr && attr->name &&
+          !strcmp(attr->name, "attributes-charset") &&
+	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_CHARSET)
+	charset = attr;
+      else
+	charset = NULL;
+
+      if (attr)
+        attr = attr->next;
+
+      if (attr && attr->name &&
+          !strcmp(attr->name, "attributes-natural-language") &&
+	  (attr->value_tag & IPP_TAG_MASK) == IPP_TAG_LANGUAGE)
+	language = attr;
+      else
+	language = NULL;
+
+      if ((attr = ippFindAttribute(client->request, "printer-uri",
+                                   IPP_TAG_URI)) != NULL)
+	uri = attr;
+      else if ((attr = ippFindAttribute(client->request, "job-uri",
+                                        IPP_TAG_URI)) != NULL)
+	uri = attr;
+      else
+	uri = NULL;
+
+      ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+		   "attributes-charset", NULL,
+		   charset ? charset->values[0].string.text : "utf-8");
+
+      ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+		   "attributes-natural-language", NULL,
+		   language ? language->values[0].string.text : "en");
+
+      if (charset &&
+          strcasecmp(charset->values[0].string.text, "us-ascii") &&
+          strcasecmp(charset->values[0].string.text, "utf-8"))
+      {
+       /*
+        * Bad character set...
+	*/
+
+	respond_ipp(client, IPP_BAD_REQUEST,
+	            "Unsupported character set \"%s\".",
+	            charset->values[0].string.text);
+      }
+      else if (!charset || !language || !uri)
+      {
+       /*
+	* Return an error, since attributes-charset,
+	* attributes-natural-language, and printer-uri/job-uri are required
+	* for all operations.
+	*/
+
+	respond_ipp(client, IPP_BAD_REQUEST, "Missing required attributes.");
+      }
+      else if (strcmp(uri->values[0].string.text, client->printer->uri) &&
+               strncmp(uri->values[0].string.text, client->printer->uri,
+	               client->printer->urilen))
+      {
+        respond_ipp(client, IPP_NOT_FOUND, "%s %s not found.", uri->name,
+	            uri->values[0].string.text);
+      }
+      else
+      {
+       /*
+        * Try processing the operation...
+	*/
+
+        if (client->http.expect == HTTP_CONTINUE)
+	{
+	 /*
+	  * Send 100-continue header...
+	  */
+
+	  if (!respond_http(client, HTTP_CONTINUE, NULL, 0))
+	    return (0);
+	}
+
+	switch (client->request->request.op.operation_id)
+	{
+	  case IPP_PRINT_JOB :
+              ipp_print_job(client);
+              break;
+
+	  case IPP_VALIDATE_JOB :
+              ipp_validate_job(client);
+              break;
+
+	  case IPP_CANCEL_JOB :
+              ipp_cancel_job(client);
+              break;
+
+	  case IPP_GET_JOB_ATTRIBUTES :
+              ipp_get_job_attributes(client);
+              break;
+
+	  case IPP_GET_JOBS :
+              ipp_get_jobs(client);
+              break;
+
+	  case IPP_GET_PRINTER_ATTRIBUTES :
+              ipp_get_printer_attributes(client);
+              break;
+
+	  default :
+	      respond_ipp(client, IPP_OPERATION_NOT_SUPPORTED,
+	                  "Operation not supported.");
+	      break;
+	}
+      }
+    }
+  }
+
+ /*
+  * Send the HTTP header and return...
+  */
+
+  if (client->http.state != HTTP_POST_SEND)
+    httpFlush(&(client->http));		/* Flush trailing (junk) data */
+
+  return (respond_http(client, HTTP_OK, "application/ipp",
+                       ippLength(client->response)));
 }
 
 
@@ -2707,10 +3086,7 @@ respond_http(_ipp_client_t *client,	/* I - Client */
     */
 
     if (httpPrintf(&(client->http), "%s", message) < 0)
-    {
-      DEBUG_puts("liteWriteHTTP: Unable to send plain text message.");
       return (0);
-    }
   }
   else if (client->response)
   {
@@ -2747,6 +3123,34 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 	    const char    *message,	/* I - printf-style status-message */
 	    ...)			/* I - Additional args as needed */
 {
+  va_list	ap;			/* Pointer to additional args */
+  char		formatted[1024];	/* Formatted errror message */
+
+
+  client->response->request.status.status_code = status;
+
+  if (!client->response->attrs)
+  {
+    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
+                 "attributes-charset", NULL, "utf-8");
+    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
+                 "attributes-natural-language", NULL, "en-US");
+  }
+
+  if (message)
+  {
+    va_start(ap, message);
+    vsnprintf(formatted, sizeof(formatted), message, ap);
+    va_end(ap);
+
+    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_TEXT,
+		 "status-message", NULL, formatted);
+  }
+  else
+    formatted[0] = '\0';
+
+  fprintf(stderr, "%s %s %s (%s)\n", client->http.hostname,
+          ippOpString(client->operation_id), ippErrorString(status), formatted);
 }
 
 
@@ -2819,6 +3223,12 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
 
     if (polldata[2].revents & POLLIN)
       DNSServiceProcessResult(printer->common_ref);
+
+   /*
+    * Clean out old jobs...
+    */
+
+    clean_jobs(printer);
   }
 }
 
