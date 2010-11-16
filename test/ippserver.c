@@ -69,10 +69,65 @@ enum _ipp_preasons_e			/* printer-state-reasons bit values */
 };
 typedef unsigned int _ipp_preasons_t;	/* Bitfield for printer-state-reasons */
 
+typedef enum _ipp_media_class_e
+{
+  _IPP_GENERAL,				/* General-purpose size */
+  _IPP_PHOTO_ONLY,			/* Photo-only size */
+  _IPP_ENV_ONLY				/* Envelope-only size */
+} _ipp_media_class_t;
+
+static const char * const media_supported[] =
+{					/* media-supported values */
+  "iso_a4_210x297mm",			/* A4 */
+  "iso_a5_148x210mm",			/* A5 */
+  "iso_a6_105x148mm",			/* A6 */
+  "iso_dl_110x220mm",			/* DL */
+  "na_legal_8.5x14in",			/* Legal */
+  "na_letter_8.5x11in",			/* Letter */
+  "na_number-10_4.125x9.5in",		/* #10 */
+  "na_index-3x5_3x5in",			/* 3x5 */
+  "oe_photo-l_3.5x5in",			/* L */
+  "na_index-4x6_4x6in",			/* 4x6 */
+  "na_5x7_5x7in"			/* 5x7 */
+};
+static const int media_col_sizes[][3] =
+{					/* media-col-database sizes */
+  { 21000, 29700, _IPP_GENERAL },	/* A4 */
+  { 14800, 21000, _IPP_PHOTO_ONLY },	/* A5 */
+  { 10500, 14800, _IPP_PHOTO_ONLY },	/* A6 */
+  { 11000, 22000, _IPP_ENV_ONLY },	/* DL */
+  { 21590, 35560, _IPP_GENERAL },	/* Legal */
+  { 21590, 27940, _IPP_GENERAL },	/* Letter */
+  { 10477, 24130, _IPP_ENV_ONLY },	/* #10 */
+  {  7630, 12700, _IPP_PHOTO_ONLY },	/* 3x5 */
+  {  8890, 12700, _IPP_PHOTO_ONLY },	/* L */
+  { 10160, 15240, _IPP_PHOTO_ONLY },	/* 4x6 */
+  { 12700, 17780, _IPP_PHOTO_ONLY }	/* 5x7 */
+};
+static const char * const media_type_supported[] =
+				      /* media-type-supported values */
+{
+  "auto",
+  "cardstock",
+  "envelope",
+  "labels",
+  "other",
+  "photographic-glossy",
+  "photographic-high-gloss",
+  "photographic-matte",
+  "photographic-satin",
+  "photographic-semi-gloss",
+  "stationery",
+  "stationery-letterhead",
+  "transparency"
+};
+
 
 /*
  * Structures...
  */
+
+typedef struct _ipp_job_s _ipp_job_t;
 
 typedef struct _ipp_printer_s		/**** Printer data ****/
 {
@@ -95,11 +150,12 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
   ipp_pstate_t		state;		/* printer-state value */
   _ipp_preasons_t	state_reasons;	/* printer-state-reasons values */  
   cups_array_t		*jobs;		/* Jobs */
+  _ipp_job_t		*active_job;	/* Current active/pending job */
   int			next_job_id;	/* Next job-id value */
   _cups_rwlock_t	rwlock;		/* Printer lock */
 } _ipp_printer_t;
 
-typedef struct _ipp_job_s		/**** Job data ****/
+struct _ipp_job_s			/**** Job data ****/
 {
   int			id;		/* Job ID */
   char			*name,		/* job-name */
@@ -113,7 +169,7 @@ typedef struct _ipp_job_s		/**** Job data ****/
   char			*filename;	/* Print file name */
   int			fd;		/* Print file descriptor */
   _ipp_printer_t	*printer;	/* Printer */
-} _ipp_job_t;
+};
 
 typedef struct _ipp_client_s		/**** Client data ****/
 {
@@ -136,12 +192,12 @@ typedef struct _ipp_client_s		/**** Client data ****/
 
 static void		clean_jobs(_ipp_printer_t *printer);
 static int		compare_jobs(_ipp_job_t *a, _ipp_job_t *b);
-static ipp_attribute_t	*copy_attr(ipp_t *to, ipp_attribute_t *attr,
-		                   ipp_tag_t group_tag, int quickcopy);
-static void		copy_attrs(ipp_t *to, ipp_t *from, cups_array_t *ra,
-			           ipp_tag_t group_tag, int quickcopy);
-static void		copy_job_attrs(_ipp_client_t *client, _ipp_job_t *job,
-			               cups_array_t *ra);
+static ipp_attribute_t	*copy_attribute(ipp_t *to, ipp_attribute_t *attr,
+		                        ipp_tag_t group_tag, int quickcopy);
+static void		copy_attributes(ipp_t *to, ipp_t *from, cups_array_t *ra,
+			                ipp_tag_t group_tag, int quickcopy);
+static void		copy_job_attributes(_ipp_client_t *client,
+			                    _ipp_job_t *job, cups_array_t *ra);
 static _ipp_client_t	*create_client(_ipp_printer_t *printer, int sock);
 static _ipp_job_t	*create_job(_ipp_client_t *client);
 static int		create_listener(int family, int *port);
@@ -185,6 +241,7 @@ static void		ipp_validate_job(_ipp_client_t *client);
 static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
+static void		*process_job(_ipp_job_t *job);
 static int		register_printer(_ipp_printer_t *printer,
 			                 const char *location, const char *make,
 					 const char *model, const char *formats,
@@ -200,6 +257,7 @@ __attribute__ ((__format__ (__printf__, 3, 4)))
 ;
 static void		run_printer(_ipp_printer_t *printer);
 static void		usage(int status);
+static int		valid_job_attributes(_ipp_client_t *client);
 
 
 /*
@@ -395,14 +453,15 @@ compare_jobs(_ipp_job_t *a,		/* I - First job */
 
 
 /*
- * 'copy_attr()' - Copy a single attribute.
+ * 'copy_attribute()' - Copy a single attribute.
  */
 
 static ipp_attribute_t *		/* O - New attribute */
-copy_attr(ipp_t           *to,		/* O - Destination request/response */
-          ipp_attribute_t *attr,	/* I - Attribute to copy */
-          ipp_tag_t       group_tag,	/* I - Group to put the copy in */
-          int             quickcopy)	/* I - Do a quick copy? */
+copy_attribute(
+    ipp_t           *to,		/* O - Destination request/response */
+    ipp_attribute_t *attr,		/* I - Attribute to copy */
+    ipp_tag_t       group_tag,		/* I - Group to put the copy in */
+    int             quickcopy)		/* I - Do a quick copy? */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*toattr;	/* Destination attribute */
@@ -568,15 +627,15 @@ copy_attr(ipp_t           *to,		/* O - Destination request/response */
 
 
 /*
- * 'copy_attrs()' - Copy attributes from one request to another.
+ * 'copy_attributes()' - Copy attributes from one request to another.
  */
 
 static void
-copy_attrs(ipp_t        *to,		/* I - Destination request */
-	   ipp_t        *from,		/* I - Source request */
-	   cups_array_t *ra,		/* I - Requested attributes */
-	   ipp_tag_t    group_tag,	/* I - Group to copy */
-	   int          quickcopy)	/* I - Do a quick copy? */
+copy_attributes(ipp_t        *to,	/* I - Destination request */
+	        ipp_t        *from,	/* I - Source request */
+	        cups_array_t *ra,	/* I - Requested attributes */
+	        ipp_tag_t    group_tag,	/* I - Group to copy */
+	        int          quickcopy)	/* I - Do a quick copy? */
 {
   ipp_attribute_t	*fromattr;	/* Source attribute */
 
@@ -595,7 +654,7 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
       continue;
 
     if (!ra || cupsArrayFind(ra, fromattr->name))
-      copy_attr(to, fromattr, quickcopy, fromattr->group_tag);
+      copy_attribute(to, fromattr, quickcopy, fromattr->group_tag);
   }
 }
 
@@ -605,9 +664,10 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
  */
 
 static void
-copy_job_attrs(_ipp_client_t *client,	/* I - Client */
-               _ipp_job_t    *job,	/* I - Job */
-	       cups_array_t  *ra)	/* I - requested-attributes */
+copy_job_attributes(
+    _ipp_client_t *client,		/* I - Client */
+    _ipp_job_t    *job,			/* I - Job */
+    cups_array_t  *ra)			/* I - requested-attributes */
 {
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -674,7 +734,7 @@ copy_job_attrs(_ipp_client_t *client,	/* I - Client */
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
                   "time-at-processing", job->processing);
 
-  copy_attrs(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
+  copy_attributes(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
 }
 
 
@@ -753,8 +813,20 @@ create_job(_ipp_client_t *client)	/* I - Client */
   char			uri[1024];	/* job-uri value */
 
 
+  _cupsRWLockWrite(&(client->printer->rwlock));
+  if (client->printer->active_job &&
+      client->printer->active_job->state < IPP_JOB_CANCELED)
+  {
+   /*
+    * Only accept a single job at a time...
+    */
+
+    _cupsRWLockWrite(&(client->printer->rwlock));
+    return (NULL);
+  }
+
  /*
-  * Initialize the job information...
+  * Allocate and initialize the job object...
   */
 
   if ((job = calloc(1, sizeof(_ipp_job_t))) == NULL)
@@ -805,8 +877,6 @@ create_job(_ipp_client_t *client)	/* I - Client */
   * Add job description attributes and add to the jobs array...
   */
 
-  _cupsRWLockWrite(&(client->printer->rwlock));
-
   job->id = client->printer->next_job_id ++;
 
   snprintf(uri, sizeof(uri), "%s/%d", client->printer->uri, job->id);
@@ -819,6 +889,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
                 (int)time(NULL));
 
   cupsArrayAdd(client->printer->jobs, job);
+  client->printer->active_job = job;
 
   _cupsRWUnlock(&(client->printer->rwlock));
 
@@ -919,7 +990,8 @@ create_media_col(const char *media,	/* I - Media name */
   ippAddInteger(media_size, IPP_TAG_PRINTER, IPP_TAG_INTEGER, "y-dimension",
                 length);
 
-  snprintf(media_key, sizeof(media_key), "%s_%s", media, type);
+  snprintf(media_key, sizeof(media_key), "%s_%s%s", media, type,
+           margins == 0 ? "_borderless" : "");
 
   ippAddString(media_col, IPP_TAG_PRINTER, IPP_TAG_KEYWORD, "media-key", NULL,
                media_key);
@@ -1022,45 +1094,13 @@ create_printer(const char *name,	/* I - printer-name */
     "copies",
     "ipp-attribute-fidelity",
     "job-name",
+    "job-priority",
     "media",
     "media-col",
     "multiple-document-handling",
-    "output-bin",
     "orientation-requested",
     "print-quality",
-    "printer-resolution",
     "sides"
-  };
-  static const char * const media_supported[] =
-  {					/* media-supported values */
-    "iso_a4_210x297mm",			/* A4 */
-    "iso_a5_148x210mm",			/* A5 */
-    "iso_a6_105x148mm",			/* A6 */
-    "iso_dl_110x220mm",			/* DL */
-    "na_legal_8.5x14in",		/* Legal */
-    "na_letter_8.5x11in",		/* Letter */
-    "na_number-10_4.125x9.5in",		/* #10 */
-    "na_index-3x5_3x5in",		/* 3x5 */
-    "oe_photo-l_3.5x5in",		/* L */
-    "na_index-4x6_4x6in",		/* 4x6 */
-    "na_5x7_5x7in"			/* 5x7 */
-  };
-#define _IPP_GENERAL	0		/* General-purpose size */
-#define _IPP_PHOTO_ONLY	1		/* Photo-only size */
-#define _IPP_ENV_ONLY	2		/* Envelope-only size */
-  static const int media_col_sizes[][3] =
-  {					/* media-col-database sizes */
-    { 21000, 29700, _IPP_GENERAL },	/* A4 */
-    { 14800, 21000, _IPP_PHOTO_ONLY },	/* A5 */
-    { 10500, 14800, _IPP_PHOTO_ONLY },	/* A6 */
-    { 11000, 22000, _IPP_ENV_ONLY },	/* DL */
-    { 21590, 35560, _IPP_GENERAL },	/* Legal */
-    { 21590, 27940, _IPP_GENERAL },	/* Letter */
-    { 10477, 24130, _IPP_ENV_ONLY },	/* #10 */
-    {  7630, 12700, _IPP_PHOTO_ONLY },	/* 3x5 */
-    {  8890, 12700, _IPP_PHOTO_ONLY },	/* L */
-    { 10160, 15240, _IPP_PHOTO_ONLY },	/* 4x6 */
-    { 12700, 17780, _IPP_PHOTO_ONLY }	/* 5x7 */
   };
   static const char * const media_col_supported[] =
   {					/* media-col-supported values */
@@ -1070,23 +1110,6 @@ create_printer(const char *name,	/* I - printer-name */
     "media-size",
     "media-top-margin",
     "media-type"
-  };
-  static const char * const media_type_supported[] =
-					/* media-type-supported values */
-  {
-    "auto",
-    "cardstock",
-    "envelope",
-    "labels",
-    "other",
-    "photographic-glossy",
-    "photographic-high-gloss",
-    "photographic-matte",
-    "photographic-satin",
-    "photographic-semi-gloss",
-    "stationery",
-    "stationery-letterhead",
-    "transparency"
   };
   static const int	media_xxx_margin_supported[] =
   {					/* media-xxx-margin-supported values */
@@ -1384,6 +1407,7 @@ create_printer(const char *name,	/* I - printer-name */
 	    create_media_col(media_supported[i], media_type_supported[j],
 			     media_col_sizes[i][0], media_col_sizes[i][1],
 			     media_xxx_margin_supported[0]);
+	media_col_value ++;
       }
     }
   }
@@ -2257,6 +2281,7 @@ ipp_cancel_job(_ipp_client_t *client)	/* I - Client */
 }
 
 
+#if 0
 /*
  * 'ipp_create_job()' - Create a job object.
  */
@@ -2265,6 +2290,7 @@ static void
 ipp_create_job(_ipp_client_t *client)	/* I - Client */
 {
 }
+#endif /* 0 */
 
 
 /*
@@ -2275,6 +2301,21 @@ static void
 ipp_get_job_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
+  _ipp_job_t	*job;			/* Job */
+  cups_array_t	*ra;			/* requested-attributes */
+
+
+  if ((job = find_job(client)) == NULL)
+  {
+    respond_ipp(client, IPP_NOT_FOUND, "Job not found.");
+    return;
+  }
+
+  respond_ipp(client, IPP_OK, NULL);
+
+  ra = create_requested_array(client);
+  copy_job_attributes(client, job, ra);
+  cupsArrayDelete(ra);
 }
 
 
@@ -2285,6 +2326,182 @@ ipp_get_job_attributes(
 static void
 ipp_get_jobs(_ipp_client_t *client)	/* I - Client */
 {
+  ipp_attribute_t	*attr;		/* Current attribute */
+  int			job_comparison;	/* Job comparison */
+  ipp_jstate_t		job_state;	/* job-state value */
+  int			first_job_id,	/* First job ID */
+			limit,		/* Maximum number of jobs to return */
+			count;		/* Number of jobs that match */
+  const char		*username;	/* Username */
+  _ipp_job_t		*job;		/* Current job pointer */
+  cups_array_t		*ra;		/* Requested attributes array */
+
+
+ /*
+  * See if the "which-jobs" attribute have been specified...
+  */
+
+  if ((attr = ippFindAttribute(client->request, "which-jobs",
+                               IPP_TAG_KEYWORD)) != NULL)
+    fprintf(stderr, "%s Get-Jobs which-jobs=%s", client->http.hostname,
+            attr->values[0].string.text);
+
+  if (!attr || !strcmp(attr->values[0].string.text, "not-completed"))
+  {
+    job_comparison = -1;
+    job_state      = IPP_JOB_STOPPED;
+  }
+  else if (!strcmp(attr->values[0].string.text, "completed"))
+  {
+    job_comparison = 1;
+    job_state      = IPP_JOB_CANCELED;
+  }
+  else if (!strcmp(attr->values[0].string.text, "aborted"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_ABORTED;
+  }
+  else if (!strcmp(attr->values[0].string.text, "all"))
+  {
+    job_comparison = 1;
+    job_state      = IPP_JOB_PENDING;
+  }
+  else if (!strcmp(attr->values[0].string.text, "canceled"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_CANCELED;
+  }
+  else if (!strcmp(attr->values[0].string.text, "pending"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_PENDING;
+  }
+  else if (!strcmp(attr->values[0].string.text, "pending-held"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_HELD;
+  }
+  else if (!strcmp(attr->values[0].string.text, "processing"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_PROCESSING;
+  }
+  else if (!strcmp(attr->values[0].string.text, "processing-stopped"))
+  {
+    job_comparison = 0;
+    job_state      = IPP_JOB_STOPPED;
+  }
+  else
+  {
+    respond_ipp(client, IPP_ATTRIBUTES,
+                "The which-jobs value \"%s\" is not supported.",
+                attr->values[0].string.text);
+    ippAddString(client->response, IPP_TAG_UNSUPPORTED_GROUP, IPP_TAG_KEYWORD,
+                 "which-jobs", NULL, attr->values[0].string.text);
+    return;
+  }
+
+ /*
+  * See if they want to limit the number of jobs reported...
+  */
+
+  if ((attr = ippFindAttribute(client->request, "limit",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    limit = attr->values[0].integer;
+
+    fprintf(stderr, "%s Get-Jobs limit=%d", client->http.hostname, limit);
+  }
+  else
+    limit = 0;
+
+  if ((attr = ippFindAttribute(client->request, "first-job-id",
+                               IPP_TAG_INTEGER)) != NULL)
+  {
+    first_job_id = attr->values[0].integer;
+
+    fprintf(stderr, "%s Get-Jobs first-job-id=%d", client->http.hostname,
+            first_job_id);
+  }
+  else
+    first_job_id = 1;
+
+ /*
+  * See if we only want to see jobs for a specific user...
+  */
+
+  username = NULL;
+
+  if ((attr = ippFindAttribute(client->request, "my-jobs",
+                               IPP_TAG_BOOLEAN)) != NULL)
+  {
+    fprintf(stderr, "%s Get-Jobs my-jobs=%s\n", client->http.hostname,
+            attr->values[0].boolean ? "true" : "false");
+
+    if (attr->values[0].boolean)
+    {
+      if ((attr = ippFindAttribute(client->request, "requesting-user-name",
+					IPP_TAG_NAME)) == NULL)
+      {
+	respond_ipp(client, IPP_BAD_REQUEST,
+	            "Need requesting-user-name with my-jobs.");
+	return;
+      }
+
+      username = attr->values[0].string.text;
+
+      fprintf(stderr, "%s Get-Jobs requesting-user-name=\"%s\"\n",
+              client->http.hostname, username);
+    }
+  }
+
+ /*
+  * OK, build a list of jobs for this printer...
+  */
+
+  if ((ra = create_requested_array(client)) == NULL &&
+      !ippFindAttribute(client->request, "requested-attributes",
+                        IPP_TAG_KEYWORD))
+  {
+   /*
+    * IPP conformance - Get-Jobs has a default requested-attributes value of
+    * "job-id" and "job-uri".
+    */
+
+    ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+    cupsArrayAdd(ra, "job-id");
+    cupsArrayAdd(ra, "job-uri");
+  }
+
+  respond_ipp(client, IPP_OK, NULL);
+
+  _cupsRWLockRead(&(client->printer->rwlock));
+
+  for (count = 0, job = (_ipp_job_t *)cupsArrayFirst(client->printer->jobs);
+       (limit <= 0 || count < limit) && job;
+       job = (_ipp_job_t *)cupsArrayNext(client->printer->jobs))
+  {
+   /*
+    * Filter out jobs that don't match...
+    */
+
+    if ((job_comparison < 0 && job->state > job_state) ||
+	(job_comparison == 0 && job->state != job_state) ||
+	(job_comparison > 0 && job->state < job_state) ||
+	job->id < first_job_id ||
+	(username && job->username && strcasecmp(username, job->username)))
+      continue;
+
+    if (count > 0)
+      ippAddSeparator(client->response);
+
+    count ++;
+    copy_job_attributes(client, job, ra);
+  }
+
+  cupsArrayDelete(ra);
+
+  _cupsRWUnlock(&(client->printer->rwlock));
 }
 
 
@@ -2296,6 +2513,89 @@ static void
 ipp_get_printer_attributes(
     _ipp_client_t *client)		/* I - Client */
 {
+  cups_array_t		*ra;		/* Requested attributes array */
+  _ipp_printer_t	*printer;	/* Printer */
+
+
+ /*
+  * Send the attributes...
+  */
+
+  ra      = create_requested_array(client);
+  printer = client->printer;
+
+  _cupsRWLockRead(&(printer->rwlock));
+
+  if (!ra || cupsArrayFind(ra, "printer-state"))
+    ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                  "printer-state", printer->state);
+
+  if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
+  {
+    if (printer->state_reasons == _IPP_PRINTER_NONE)
+      ippAddString(client->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+		   "printer-state-reasons", NULL, "none");
+    else
+    {
+      int			num_reasons = 0;/* Number of reasons */
+      const char		*reasons[32];	/* Reason strings */
+
+      if (printer->state_reasons & _IPP_PRINTER_OTHER)
+	reasons[num_reasons ++] = "other";
+      if (printer->state_reasons & _IPP_PRINTER_COVER_OPEN)
+	reasons[num_reasons ++] = "cover-open";
+      if (printer->state_reasons & _IPP_PRINTER_INPUT_TRAY_MISSING)
+	reasons[num_reasons ++] = "input-tray-missing";
+      if (printer->state_reasons & _IPP_PRINTER_MARKER_SUPPLY_EMPTY)
+	reasons[num_reasons ++] = "marker-supply-empty-warning";
+      if (printer->state_reasons & _IPP_PRINTER_MARKER_SUPPLY_LOW)
+	reasons[num_reasons ++] = "marker-supply-low-report";
+      if (printer->state_reasons & _IPP_PRINTER_MARKER_WASTE_ALMOST_FULL)
+	reasons[num_reasons ++] = "marker-waste-almost-full-report";
+      if (printer->state_reasons & _IPP_PRINTER_MARKER_WASTE_FULL)
+	reasons[num_reasons ++] = "marker-waste-full-warning";
+      if (printer->state_reasons & _IPP_PRINTER_MEDIA_EMPTY)
+	reasons[num_reasons ++] = "media-empty-warning";
+      if (printer->state_reasons & _IPP_PRINTER_MEDIA_JAM)
+	reasons[num_reasons ++] = "media-jam-warning";
+      if (printer->state_reasons & _IPP_PRINTER_MEDIA_LOW)
+	reasons[num_reasons ++] = "media-low-report";
+      if (printer->state_reasons & _IPP_PRINTER_MEDIA_NEEDED)
+	reasons[num_reasons ++] = "media-needed-report";
+      if (printer->state_reasons & _IPP_PRINTER_MOVING_TO_PAUSED)
+	reasons[num_reasons ++] = "moving-to-paused";
+      if (printer->state_reasons & _IPP_PRINTER_PAUSED)
+	reasons[num_reasons ++] = "paused";
+      if (printer->state_reasons & _IPP_PRINTER_SPOOL_AREA_FULL)
+	reasons[num_reasons ++] = "spool-area-full";
+      if (printer->state_reasons & _IPP_PRINTER_TONER_EMPTY)
+	reasons[num_reasons ++] = "toner-empty-warning";
+      if (printer->state_reasons & _IPP_PRINTER_TONER_LOW)
+	reasons[num_reasons ++] = "toner-low-report";
+
+      ippAddStrings(client->response, IPP_TAG_PRINTER,
+                    IPP_TAG_KEYWORD | IPP_TAG_COPY,  "printer-state-reasons",
+		    num_reasons, NULL, reasons);
+    }
+  }
+
+  if (!ra || cupsArrayFind(ra, "printer-up-time"))
+    ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "printer-up-time", (int)time(NULL));
+
+  if (!ra || cupsArrayFind(ra, "queued-job-count"))
+    ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+                  "queued-job-count",
+		  printer->active_job &&
+		      printer->active_job->state < IPP_JOB_CANCELED);
+
+  copy_attributes(client->response, printer->attrs, ra, IPP_TAG_ZERO, 0);
+
+  _cupsRWUnlock(&(printer->rwlock));
+
+  cupsArrayDelete(ra);
+
+  respond_ipp(client, IPP_OK, NULL);
 }
 
 
@@ -2306,9 +2606,154 @@ ipp_get_printer_attributes(
 static void
 ipp_print_job(_ipp_client_t *client)	/* I - Client */
 {
+  _ipp_job_t		*job;		/* New job */
+  char			filename[1024],	/* Filename buffer */
+			buffer[4096];	/* Copy buffer */
+  ssize_t		bytes;		/* Bytes read */
+  cups_array_t		*ra;		/* Attributes to send in response */
+
+
+ /*
+  * Validate print job attributes...
+  */
+
+  if (!valid_job_attributes(client))
+  {
+    httpFlush(&(client->http));
+    return;
+  }
+
+ /*
+  * Do we have a file to print?
+  */
+
+  if (client->http.state == HTTP_POST_SEND)
+  {
+    respond_ipp(client, IPP_BAD_REQUEST, "No file in request.");
+    return;
+  }
+
+ /*
+  * Print the job...
+  */
+
+  if ((job = create_job(client)) == NULL)
+  {
+    respond_ipp(client, IPP_PRINTER_BUSY, "Currently printing another job.");
+    return;
+  }
+
+ /*
+  * Create a file for the request data...
+  */
+
+  if (!strcasecmp(job->format, "image/jpeg"))
+    snprintf(filename, sizeof(filename), "%s/%d.jpg",
+             client->printer->directory, job->id);
+  else if (!strcasecmp(job->format, "image/png"))
+    snprintf(filename, sizeof(filename), "%s/%d.png",
+             client->printer->directory, job->id);
+  else if (!strcasecmp(job->format, "application/pdf"))
+    snprintf(filename, sizeof(filename), "%s/%d.pdf", 
+             client->printer->directory, job->id);
+  else if (!strcasecmp(job->format, "application/postscript"))
+    snprintf(filename, sizeof(filename), "%s/%d.ps", 
+             client->printer->directory, job->id);
+  else
+    snprintf(filename, sizeof(filename), "%s/%d.prn", 
+             client->printer->directory, job->id);
+
+  if ((job->fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600)) < 0)
+  {
+    job->state = IPP_JOB_ABORTED;
+
+    respond_ipp(client, IPP_INTERNAL_ERROR,
+                "Unable to create print file: %s", strerror(errno));
+    return;
+  }
+
+  while ((bytes = httpRead2(&(client->http), buffer, sizeof(buffer))) > 0)
+  {
+    if (write(job->fd, buffer, bytes) < bytes)
+    {
+      int error = errno;		/* Write error */
+
+      job->state = IPP_JOB_ABORTED;
+
+      close(job->fd);
+      job->fd = -1;
+
+      unlink(filename);
+
+      respond_ipp(client, IPP_INTERNAL_ERROR,
+                  "Unable to write print file: %s", strerror(error));
+      return;
+    }
+  }
+
+  if (bytes < 0)
+  {
+   /*
+    * Got an error while reading the print data, so abort this job.
+    */
+
+    job->state = IPP_JOB_ABORTED;
+
+    close(job->fd);
+    job->fd = -1;
+
+    unlink(filename);
+
+    respond_ipp(client, IPP_INTERNAL_ERROR, "Unable to read print file.");
+    return;
+  }
+
+  if (close(job->fd))
+  {
+    int error = errno;		/* Write error */
+
+    job->state = IPP_JOB_ABORTED;
+    job->fd    = -1;
+
+    unlink(filename);
+
+    respond_ipp(client, IPP_INTERNAL_ERROR, "Unable to write print file: %s",
+                strerror(error));
+    return;
+  }
+
+  job->fd       = -1;
+  job->filename = strdup(filename);
+  job->state    = IPP_JOB_PENDING;
+
+ /*
+  * Process the job...
+  */
+
+  if (!_cupsThreadCreate((_cups_thread_func_t)process_job, job))
+  {
+    job->state = IPP_JOB_ABORTED;
+    respond_ipp(client, IPP_INTERNAL_ERROR, "Unable to process job.");
+    return;
+  }
+
+ /*
+  * Return the job info...
+  */
+
+  respond_ipp(client, IPP_OK, NULL);
+
+  ra = cupsArrayNew((cups_array_func_t)strcmp, NULL);
+  cupsArrayAdd(ra, "job-id");
+  cupsArrayAdd(ra, "job-state");
+  cupsArrayAdd(ra, "job-state-reasons");
+  cupsArrayAdd(ra, "job-uri");
+
+  copy_job_attributes(client, job, ra);
 }
 
 
+#if 0
 /*
  * 'ipp_send_document()' - Add an attached document to a job object created with
  *                         Create-Job.
@@ -2318,6 +2763,7 @@ static void
 ipp_send_document(_ipp_client_t *client)/* I - Client */
 {
 }
+#endif /* 0 */
 
 
 /*
@@ -2895,6 +3341,25 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 }
 
 
+/*
+ * 'process_job()' - Process a print job.
+ */
+
+static void *				/* O - Thread exit status */
+process_job(_ipp_job_t *job)		/* I - Job */
+{
+  job->state = IPP_JOB_PROCESSING;
+
+  sleep(5);
+
+  if (job->cancel)
+    job->state = IPP_JOB_CANCELED;
+  else
+    job->state = IPP_JOB_COMPLETED;
+
+  return (NULL);
+}
+
 
 /*
  * 'register_printer()' - Register a printer object via Bonjour.
@@ -3312,6 +3777,306 @@ usage(int status)			/* O - Exit status */
   puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
 
   exit(status);
+}
+
+
+/*
+ * 'valid_job_attributes()' - Determine whether the job attributes are valid.
+ *
+ * When one or more job attributes are invalid, this function adds a suitable
+ * response and attributes to the unsupported group.
+ */
+
+static int				/* O - 1 if valid, 0 if not */
+valid_job_attributes(
+    _ipp_client_t *client)		/* I - Client */
+{
+  int			i;		/* Looping var */
+  ipp_attribute_t	*attr,		/* Current attribute */
+			*supported;	/* document-format-supported */
+  const char		*format = NULL;	/* document-format value */
+  int			valid = 1;	/* Valid attributes? */
+
+
+ /*
+  * Check operation attributes...
+  */
+
+#define respond_unsupported(client, attr) \
+  if (valid) \
+  { \
+    respond_ipp(client, IPP_ATTRIBUTES, "Unsupported %s %s%s value.", \
+		attr->name, attr->num_values > 1 ? "1setOf " : "", \
+		ippTagString(attr->value_tag)); \
+    valid = 0; \
+  } \
+  copy_attribute(client->response, attr, 0, IPP_TAG_UNSUPPORTED_GROUP)
+
+  if ((attr = ippFindAttribute(client->request, "compression",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+   /*
+    * If compression is specified, only accept "none"...
+    */
+
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD ||
+        strcmp(attr->values[0].string.text, "none"))
+    {
+      respond_unsupported(client, attr);
+    }
+    else
+      fprintf(stderr, "%s Print-Job compression=\"%s\"\n", client->http.hostname,
+	      attr->values[0].string.text);
+  }
+
+ /*
+  * Is it a format we support?
+  */
+
+  if ((attr = ippFindAttribute(client->request, "document-format",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_MIMETYPE)
+    {
+      respond_unsupported(client, attr);
+    }
+    else
+      format = attr->values[0].string.text;
+  }
+  else
+    format = "application/octet-stream";
+
+  if (!strcmp(format, "application/octet-stream") &&
+      client->request->request.op.operation_id != IPP_VALIDATE_JOB)
+  {
+   /*
+    * Auto-type the file using the first 4 bytes of the file...
+    */
+
+    unsigned char	header[4];	/* First 4 bytes of file */
+
+    memset(header, 0, sizeof(header));
+    _httpPeek(&(client->http), (char *)header, sizeof(header));
+
+    if (!memcmp(header, "%PDF", 4))
+      format = "application/pdf";
+    else if (!memcmp(header, "%!", 2))
+      format = "application/postscript";
+    else if (!memcmp(header, "\377\330\377", 3) &&
+	     header[3] >= 0xe0 && header[3] <= 0xef)
+      format = "image/jpeg";
+    else if (!memcmp(header, "\211PNG", 4))
+      format = "image/png";
+
+    if (format)
+      fprintf(stderr, "%s %s Auto-typed document-format=\"%s\"\n",
+	      client->http.hostname,
+	      ippOpString(client->request->request.op.operation_id), format);
+
+    if (!attr)
+      ippAddString(client->request, IPP_TAG_JOB, IPP_TAG_MIMETYPE,
+                   "document-format", NULL, format);
+    else
+    {
+      _cupsStrFree(attr->values[0].string.text);
+      attr->values[0].string.text = _cupsStrAlloc(format);
+    }
+  }
+
+  if ((supported = ippFindAttribute(client->printer->attrs,
+                                    "document-format-supported",
+			            IPP_TAG_MIMETYPE)) != NULL)
+  {
+    for (i = 0; i < attr->num_values; i ++)
+      if (!strcasecmp(format, attr->values[i].string.text))
+	break;
+
+    if (i >= attr->num_values)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+ /*
+  * Check the various job template attributes...
+  */
+
+  if ((attr = ippFindAttribute(client->request, "copies",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_INTEGER ||
+        attr->values[0].integer < 1 || attr->values[0].integer > 999)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "ipp-attribute-fidelity",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_BOOLEAN)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-hold-until",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 ||
+        (attr->value_tag != IPP_TAG_NAME &&
+	 attr->value_tag != IPP_TAG_NAMELANG &&
+	 attr->value_tag != IPP_TAG_KEYWORD) ||
+	strcmp(attr->values[0].string.text, "no-hold"))
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-name",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 ||
+        (attr->value_tag != IPP_TAG_NAME &&
+	 attr->value_tag != IPP_TAG_NAMELANG))
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-priority",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_INTEGER ||
+        attr->values[0].integer < 1 || attr->values[0].integer > 100)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "job-sheets",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 ||
+        (attr->value_tag != IPP_TAG_NAME &&
+	 attr->value_tag != IPP_TAG_NAMELANG &&
+	 attr->value_tag != IPP_TAG_KEYWORD) ||
+	strcmp(attr->values[0].string.text, "none"))
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "media",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 ||
+        (attr->value_tag != IPP_TAG_NAME &&
+	 attr->value_tag != IPP_TAG_NAMELANG &&
+	 attr->value_tag != IPP_TAG_KEYWORD))
+    {
+      respond_unsupported(client, attr);
+    }
+    else
+    {
+      for (i = 0;
+           i < (int)(sizeof(media_supported) / sizeof(media_supported[0]));
+	   i ++)
+        if (!strcmp(attr->values[0].string.text, media_supported[i]))
+	  break;
+
+      if (i >= (int)(sizeof(media_supported) / sizeof(media_supported[0])))
+      {
+	respond_unsupported(client, attr);
+      }
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "media-col",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_BEGIN_COLLECTION)
+    {
+      respond_unsupported(client, attr);
+    }
+    /* TODO: check for valid media-col */
+  }
+
+  if ((attr = ippFindAttribute(client->request, "multiple-document-handling",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD ||
+        (strcmp(attr->values[0].string.text,
+		"separate-documents-uncollated-copies") &&
+	 strcmp(attr->values[0].string.text,
+		"separate-documents-collated-copies")))
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "orientation-requested",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_ENUM ||
+        attr->values[0].integer < IPP_PORTRAIT ||
+        attr->values[0].integer > IPP_REVERSE_PORTRAIT)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "page-ranges",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    respond_unsupported(client, attr);
+  }
+
+  if ((attr = ippFindAttribute(client->request, "print-quality",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_ENUM ||
+        attr->values[0].integer < IPP_QUALITY_DRAFT ||
+        attr->values[0].integer > IPP_QUALITY_HIGH)
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  if ((attr = ippFindAttribute(client->request, "printer-resolution",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    respond_unsupported(client, attr);
+  }
+
+  if ((attr = ippFindAttribute(client->request, "sides",
+                               IPP_TAG_ZERO)) != NULL)
+  {
+    if (attr->num_values != 1 || attr->value_tag != IPP_TAG_KEYWORD)
+    {
+      respond_unsupported(client, attr);
+    }
+
+    if ((supported = ippFindAttribute(client->printer->attrs, "sides",
+                                      IPP_TAG_KEYWORD)) != NULL)
+    {
+      for (i = 0; i < supported->num_values; i ++)
+        if (!strcmp(attr->values[0].string.text,
+	            supported->values[i].string.text))
+	  break;
+
+      if (i >= supported->num_values)
+      {
+	respond_unsupported(client, attr);
+      }
+    }
+    else
+    {
+      respond_unsupported(client, attr);
+    }
+  }
+
+  return (valid);
 }
 
 
