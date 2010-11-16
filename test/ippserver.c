@@ -13,6 +13,53 @@
  *
  * Contents:
  *
+ *   main()                       - Main entry to the sample server.
+ *   clean_jobs()                 - Clean out old (completed) jobs.
+ *   compare_jobs()               - Compare two jobs.
+ *   copy_attribute()             - Copy a single attribute.
+ *   copy_attributes()            - Copy attributes from one request to another.
+ *   copy_job_attrs()             - Copy job attributes to the response.
+ *   create_client()              - Accept a new network connection and create a
+ *                                  client object.
+ *   create_job()                 - Create a new job object from a Print-Job or
+ *                                  Create-Job request.
+ *   create_listener()            - Create a listener socket.
+ *   create_media_col()           - Create a media-col value.
+ *   create_printer()             - Create, register, and listen for connections
+ *                                  to a printer object.
+ *   create_requested_array()     - Create an array for requested-attributes.
+ *   delete_client()              - Close the socket and free all memory used by
+ *                                  a client object.
+ *   delete_job()                 - Remove from the printer and free all memory
+ *                                  used by a job object.
+ *   delete_printer()             - Unregister, close listen sockets, and free
+ *                                  all memory used by a printer object.
+ *   dnssd_callback()             - Handle Bonjour registration events.
+ *   find_job()                   - Find a job specified in a request.
+ *   html_escape()                - Write a HTML-safe string.
+ *   html_printf()                - Send formatted text to the client, quoting
+ *                                  as needed.
+ *   ipp_cancel_job()             - Cancel a job.
+ *   ipp_create_job()             - Create a job object.
+ *   ipp_get_job_attributes()     - Get the attributes for a job object.
+ *   ipp_get_jobs()               - Get a list of job objects.
+ *   ipp_get_printer_attributes() - Get the attributes for a printer object.
+ *   ipp_print_job()              - Create a job object with an attached
+ *                                  document.
+ *   ipp_send_document()          - Add an attached document to a job object
+ *                                  created with Create-Job.
+ *   ipp_validate_job()           - Validate job creation attributes.
+ *   process_client()             - Process client requests on a thread.
+ *   process_http()               - Process a HTTP request.
+ *   process_ipp()                - Process an IPP request.
+ *   process_job()                - Process a print job.
+ *   register_printer()           - Register a printer object via Bonjour.
+ *   respond_http()               - Send a HTTP response.
+ *   respond_ipp()                - Send an IPP response.
+ *   run_printer()                - Run the printer service.
+ *   usage()                      - Show program usage.
+ *   valid_job_attributes()       - Determine whether the job attributes are
+ *                                  valid.
  */
 
 /*
@@ -437,6 +484,27 @@ main(int  argc,				/* I - Number of command-line args */
 static void
 clean_jobs(_ipp_printer_t *printer)	/* I - Printer */
 {
+  _ipp_job_t	*job;			/* Current job */
+  time_t	cleantime;		/* Clean time */
+
+
+  if (cupsArrayCount(printer->jobs) == 0)
+    return;
+
+  cleantime = time(NULL) - 60;
+
+  _cupsRWLockWrite(&(printer->rwlock));
+  for (job = (_ipp_job_t *)cupsArrayFirst(printer->jobs);
+       job;
+       job = (_ipp_job_t *)cupsArrayNext(printer->jobs))
+    if (job->completed && job->completed < cleantime)
+    {
+      cupsArrayRemove(printer->jobs, job);
+      delete_job(job);
+    }
+    else
+      break;
+  _cupsRWUnlock(&(printer->rwlock));
 }
 
 
@@ -3348,7 +3416,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
 static void *				/* O - Thread exit status */
 process_job(_ipp_job_t *job)		/* I - Job */
 {
-  job->state = IPP_JOB_PROCESSING;
+  job->state          = IPP_JOB_PROCESSING;
+  job->printer->state = IPP_PRINTER_PROCESSING;
 
   sleep(5);
 
@@ -3356,6 +3425,10 @@ process_job(_ipp_job_t *job)		/* I - Job */
     job->state = IPP_JOB_CANCELED;
   else
     job->state = IPP_JOB_COMPLETED;
+
+  job->completed           = time(NULL);
+  job->printer->state      = IPP_PRINTER_IDLE;
+  job->printer->active_job = NULL;
 
   return (NULL);
 }
