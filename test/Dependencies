@@ -1,5 +1,13 @@
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
+ippserver.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
+ippserver.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h
+ippserver.o: ../cups/array.h ../cups/language.h ../cups/string-private.h
+ippserver.o: ../config.h ../cups/debug-private.h ../cups/ppd-private.h
+ippserver.o: ../cups/ppd.h ../cups/cups.h ../cups/pwg-private.h
+ippserver.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
+ippserver.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
+ippserver.o: ../cups/transcode.h ../cups/thread-private.h
 ipptool.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
 ipptool.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
 ipptool.o: ../cups/language.h ../cups/string-private.h ../config.h

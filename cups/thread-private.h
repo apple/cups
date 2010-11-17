@@ -35,8 +35,10 @@ extern "C" {
 #    include <pthread.h>
 typedef void *(*_cups_thread_func_t)(void *arg);
 typedef pthread_mutex_t _cups_mutex_t;
+typedef pthread_rwlock_t _cups_rwlock_t;
 typedef pthread_key_t	_cups_threadkey_t;
 #    define _CUPS_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#    define _CUPS_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
 #    define _CUPS_THREADKEY_INITIALIZER -1
 #    define _cupsThreadGetData(k) pthread_getspecific(k)
 #    define _cupsThreadSetData(k,p) pthread_setspecific(k,p)
@@ -51,16 +53,20 @@ typedef struct _cups_mutex_s
   CRITICAL_SECTION	m_criticalSection;
 					/* Win32 Critical Section */
 } _cups_mutex_t;
+typedef _cups_mutex_t _cups_rwlock_t;	/* TODO: Implement Win32 reader/writer lock */
 typedef DWORD	_cups_threadkey_t;
 #    define _CUPS_MUTEX_INITIALIZER { 0, 0 }
+#    define _CUPS_RWLOCK_INITIALIZER { 0, 0 }
 #    define _CUPS_THREADKEY_INITIALIZER 0
 #    define _cupsThreadGetData(k) TlsGetValue(k)
 #    define _cupsThreadSetData(k,p) TlsSetValue(k,p)
 
 #  else
 typedef char	_cups_mutex_t;
+typedef char	_cups_rwlock_t;
 typedef void	*_cups_threadkey_t;
 #    define _CUPS_MUTEX_INITIALIZER 0
+#    define _CUPS_RWLOCK_INITIALIZER 0
 #    define _CUPS_THREADKEY_INITIALIZER (void *)0
 #    define _cupsThreadGetData(k) k
 #    define _cupsThreadSetData(k,p) k=p
@@ -71,8 +77,13 @@ typedef void	*_cups_threadkey_t;
  * Functions...
  */
 
+extern void	_cupsMutexInit(_cups_mutex_t *mutex);
 extern void	_cupsMutexLock(_cups_mutex_t *mutex);
 extern void	_cupsMutexUnlock(_cups_mutex_t *mutex);
+extern void	_cupsRWInit(_cups_rwlock_t *rwlock);
+extern void	_cupsRWLockRead(_cups_rwlock_t *rwlock);
+extern void	_cupsRWLockWrite(_cups_rwlock_t *rwlock);
+extern void	_cupsRWUnlock(_cups_rwlock_t *rwlock);
 extern int	_cupsThreadCreate(_cups_thread_func_t func, void *arg);
 
 

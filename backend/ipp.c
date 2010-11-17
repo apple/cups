@@ -1719,7 +1719,8 @@ monitor_printer(
   * Make a copy of the printer connection...
   */
 
-  http = _httpCreate(monitor->hostname, monitor->port, monitor->encryption);
+  http = _httpCreate(monitor->hostname, monitor->port, monitor->encryption,
+                     AF_UNSPEC);
   cupsSetPasswordCB(password_cb);
 
  /*

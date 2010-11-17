@@ -33,6 +33,12 @@
 #ifdef HAVE_RESOLV_H
 #  include <resolv.h>
 #endif /* HAVE_RESOLV_H */
+#ifdef HAVE_COREFOUNDATION
+#  include <CoreFoundation/CoreFoundation.h>
+#endif /* HAVE_COREFOUNDATION */
+#ifdef HAVE_SYSTEMCONFIGURATION
+#  include <SystemConfiguration/SystemConfiguration.h>
+#endif /* HAVE_SYSTEMCONFIGURATION */
 
 
 /*
@@ -579,9 +585,6 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
                 char   *s,		/* I - String buffer for name */
                 int    slen)		/* I - Size of buffer */
 {
-  struct hostent	*host;		/* Host entry to get FQDN */
-
-
   if (!s || slen <= 1)
     return (NULL);
 
@@ -603,12 +606,50 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
     if (!strchr(s, '.'))
     {
+#ifdef HAVE_SYSTEMCONFIGURATION
+     /*
+      * The hostname is not a FQDN, so use the local hostname from the
+      * SystemConfiguration framework...
+      */
+
+      SCDynamicStoreRef	sc = SCDynamicStoreCreate(kCFAllocatorDefault,
+                                                  CFSTR("libcups"), NULL, NULL);
+					/* System configuration data */
+      CFStringRef	local = sc ? SCDynamicStoreCopyLocalHostName(sc) : NULL;
+					/* Local host name */
+      char		localStr[1024];	/* Local host name C string */
+
+      if (local && CFStringGetCString(local, localStr, sizeof(localStr),
+                                      kCFStringEncodingUTF8))
+      {
+       /*
+        * Append ".local." to the hostname we get...
+	*/
+
+        snprintf(s, slen, "%s.local.", localStr);
+      }
+
+      if (local)
+        CFRelease(local);
+      if (sc)
+        CFRelease(sc);
+
+#else
      /*
       * The hostname is not a FQDN, so look it up...
       */
 
+      struct hostent	*host;		/* Host entry to get FQDN */
+
       if ((host = gethostbyname(s)) != NULL && host->h_name)
+      {
+       /*
+        * Use the resolved hostname...
+	*/
+
 	strlcpy(s, host->h_name, slen);
+      }
+#endif /* HAVE_SYSTEMCONFIGURATION */
     }
   }
 

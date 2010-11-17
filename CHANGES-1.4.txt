@@ -3,12 +3,16 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.6
 
+	- The cupsAdminSetServerSettings() function disabled sharing when
+	  debug logging was enabled (STR #3712)
 
 
 CHANGES IN CUPS V1.4.5
 
 	- Documentation fixes (STR #3542, STR #3650)
 	- Localization fixes (STR #3635, STR #3636, STR #3647, STR #3666)
+	- Security: Fixed a memory corruption bug reported in CVE-2010-2941
+	  (STR #3648)
 	- The CUPS API incorrectly mapped the HTTP_UNAUTHORIZED status to the
 	  IPP_NOT_AUTHORIZED status code, when IPP_NOT_AUTHENTICATED would be
 	  the correct mapping (STR #3684)

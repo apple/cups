@@ -31,13 +31,20 @@ TESTFILES	=	\
 			testfile.pdf \
 			testfile.ps \
 			testfile.txt
+OBJS		=	\
+			ippserver.o \
+			ipptool.o
+TARGETS		=	\
+			ippserver \
+			ipptool \
+			ipptool-static
 
 
 #
 # Make all targets...
 #
 
-all:	ipptool ipptool-static
+all:		$(TARGETS)
 
 
 #
@@ -59,7 +66,7 @@ unittests:
 #
 
 clean:
-	$(RM) ipptool ipptool.o ipptool-static
+	$(RM) $(TARGETS) $(OBJS)
 
 
 #
@@ -67,7 +74,7 @@ clean:
 #
 
 depend:
-	makedepend -Y -I.. -fDependencies ipptool.c >/dev/null 2>&1
+	makedepend -Y -I.. -fDependencies $(OBJS:.o=.c) >/dev/null 2>&1
 
 
 #
@@ -122,6 +129,16 @@ install-libs:
 #
 
 uninstall:
+
+
+#
+# ippserver
+#
+
+ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippserver.o  ../cups/$(LIBCUPSSTATIC) \
+		$(LIBGSSAPI) $(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ)
 
 
 #

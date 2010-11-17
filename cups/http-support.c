@@ -36,6 +36,7 @@
  *   httpStatus()         - Return a short string describing a HTTP status code.
  *   _cups_hstrerror()    - hstrerror() emulation function for Solaris and
  *                          others...
+ *   _httpDecodeURI()     - Percent-decode a HTTP request URI.
  *   _httpEncodeURI()     - Percent-encode a HTTP request URI.
  *   _httpResolveURI()    - Resolve a DNS-SD URI.
  *   http_copy_decode()   - Copy and decode a URI.
@@ -1286,6 +1287,22 @@ _cups_hstrerror(int error)		/* I - Error number */
     return (errors[error]);
 }
 #endif /* !HAVE_HSTRERROR */
+
+
+/*
+ * '_httpDecodeURI()' - Percent-decode a HTTP request URI.
+ */
+
+char *					/* O - Decoded URI or NULL on error */
+_httpDecodeURI(char       *dst,		/* I - Destination buffer */
+               const char *src,		/* I - Source URI */
+	       size_t     dstsize)	/* I - Size of destination buffer */
+{
+  if (http_copy_decode(dst, src, (int)dstsize, NULL, 1))
+    return (dst);
+  else
+    return (NULL);
+}
 
 
 /*

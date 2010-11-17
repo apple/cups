@@ -117,6 +117,7 @@ typedef struct _cups_vars_s		/**** Set of variables ****/
   int 		port;			/* Port number from URI */
   http_encryption_t encryption;		/* Encryption for connection? */
   double	timeout;		/* Timeout for connection */
+  int		family;			/* Address family */
   cups_array_t	*vars;			/* Array of variables */
 } _cups_vars_t;
 
@@ -232,7 +233,8 @@ main(int  argc,				/* I - Number of command-line args */
   _cupsSetLocale(argv);
 
   memset(&vars, 0, sizeof(vars));
-  vars.vars = cupsArrayNew((cups_array_func_t)compare_vars, NULL);
+  vars.family = AF_UNSPEC;
+  vars.vars   = cupsArrayNew((cups_array_func_t)compare_vars, NULL);
 
  /*
   * We need at least:
@@ -253,6 +255,16 @@ main(int  argc,				/* I - Number of command-line args */
       {
         switch (*opt)
         {
+	  case '4' : /* Connect using IPv4 only */
+	      vars.family = AF_INET;
+	      break;
+
+#ifdef AF_INET6
+	  case '6' : /* Connect using IPv6 only */
+	      vars.family = AF_INET6;
+	      break;
+#endif /* AF_INET6 */
+
           case 'C' : /* Enable HTTP chunking */
               Transfer = _CUPS_TRANSFER_CHUNKED;
               break;
@@ -644,8 +656,16 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Connect to the server...
   */
 
-  if ((http = httpConnectEncrypt(vars->hostname, vars->port,
-                                 vars->encryption)) == NULL)
+  if ((http = _httpCreate(vars->hostname, vars->port, vars->encryption,
+			  vars->family)) == NULL)
+  {
+    print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
+                      vars->port, strerror(errno));
+    pass = 0;
+    goto test_exit;
+  }
+
+  if (httpReconnect(http))
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,
                       vars->port, strerror(errno));
@@ -3743,10 +3763,12 @@ usage(void)
 		  "\n"
 		  "Options:\n"
 		  "\n"
-		  "-C             Send requests using chunking (default)\n"
+		  "-4             Connect using IPv4.\n"
+		  "-6             Connect using IPv6.\n"
+		  "-C             Send requests using chunking (default).\n"
 		  "-E             Test with TLS encryption.\n"
-		  "-I             Ignore errors\n"
-		  "-L             Send requests using content-length\n"
+		  "-I             Ignore errors.\n"
+		  "-L             Send requests using content-length.\n"
 		  "-S             Test with SSL encryption.\n"
 		  "-T             Set the receive/send timeout in seconds.\n"
 		  "-V version     Set default IPP version.\n"

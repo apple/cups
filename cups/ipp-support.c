@@ -1,5 +1,5 @@
 /*
- * "$Id: ipp-support.c 7847 2008-08-19 04:22:14Z mike $"
+ * "$Id: ipp-support.c 9371 2010-11-17 06:21:32Z mike $"
  *
  *   Internet Printing Protocol support functions for CUPS.
  *
@@ -343,7 +343,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
         bufptr ++;
     }
 
-    switch (attr->value_tag)
+    switch (attr->value_tag & ~IPP_TAG_COPY)
     {
       case IPP_TAG_ENUM :
           if (!strcmp(attr->name, "printer-state") &&
@@ -763,5 +763,51 @@ ippTagValue(const char *name)		/* I - Tag name */
 
 
 /*
- * End of "$Id: ipp-support.c 7847 2008-08-19 04:22:14Z mike $".
+ * 'ipp_col_string()' - Convert a collection to a string.
+ */
+
+static size_t				/* O - Number of bytes */
+ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
+               char   *buffer,		/* I - Buffer or NULL */
+               size_t bufsize)		/* I - Size of buffer */
+{
+  char			*bufptr,	/* Position in buffer */
+			*bufend,	/* End of buffer */
+			temp[256];	/* Temporary string */
+  ipp_attribute_t	*attr;		/* Current member attribute */
+
+
+  bufptr = buffer;
+  bufend = buffer + bufsize - 1;
+
+  if (buffer && bufptr < bufend)
+    *bufptr = '{';
+  bufptr ++;
+
+  for (attr = col->attrs; attr; attr = attr->next)
+  {
+    if (!attr->name)
+      continue;
+
+    if (buffer && bufptr < bufend)
+      bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
+    else
+      bufptr += strlen(attr->name) + 1;
+
+    if (buffer && bufptr < bufend)
+      bufptr += _ippAttrString(attr, bufptr, bufend - bufptr + 1);
+    else
+      bufptr += _ippAttrString(attr, temp, sizeof(temp));
+  }
+
+  if (buffer && bufptr < bufend)
+    *bufptr = '}';
+  bufptr ++;
+
+  return (bufptr - buffer);
+}
+
+
+/*
+ * End of "$Id: ipp-support.c 9371 2010-11-17 06:21:32Z mike $".
  */
