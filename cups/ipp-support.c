@@ -343,7 +343,7 @@ _ippAttrString(ipp_attribute_t *attr,	/* I - Attribute */
         bufptr ++;
     }
 
-    switch (attr->value_tag)
+    switch (attr->value_tag & ~IPP_TAG_COPY)
     {
       case IPP_TAG_ENUM :
           if (!strcmp(attr->name, "printer-state") &&
@@ -780,7 +780,7 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
   bufptr = buffer;
   bufend = buffer + bufsize - 1;
 
-  if (bufptr < bufend)
+  if (buffer && bufptr < bufend)
     *bufptr = '{';
   bufptr ++;
 
@@ -789,18 +789,18 @@ ipp_col_string(ipp_t  *col,		/* I - Collection attribute */
     if (!attr->name)
       continue;
 
-    if (bufptr < bufend)
+    if (buffer && bufptr < bufend)
       bufptr += snprintf(bufptr, bufend - bufptr + 1, "%s=", attr->name);
     else
-      bufptr += snprintf(temp, sizeof(temp), "%s=", attr->name);
+      bufptr += strlen(attr->name) + 1;
 
-    if (bufptr < bufend)
+    if (buffer && bufptr < bufend)
       bufptr += _ippAttrString(attr, bufptr, bufend - bufptr + 1);
     else
       bufptr += _ippAttrString(attr, temp, sizeof(temp));
   }
 
-  if (bufptr < bufend)
+  if (buffer && bufptr < bufend)
     *bufptr = '}';
   bufptr ++;
 

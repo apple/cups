@@ -258,6 +258,7 @@ static _ipp_printer_t	*create_printer(const char *name, const char *location,
 					const char *regtype,
 					const char *directory);
 static cups_array_t	*create_requested_array(_ipp_client_t *client);
+static void		debug_attributes(const char *title, ipp_t *ipp);
 static void		delete_client(_ipp_client_t *client);
 static void		delete_job(_ipp_job_t *job);
 static void		delete_printer(_ipp_printer_t *printer);
@@ -278,12 +279,16 @@ __attribute__ ((__format__ (__printf__, 2, 3)))
 #  endif /* __GNUC__ */
 ;
 static void		ipp_cancel_job(_ipp_client_t *client);
+#if 0
 static void		ipp_create_job(_ipp_client_t *client);
+#endif /* 0 */
 static void		ipp_get_job_attributes(_ipp_client_t *client);
 static void		ipp_get_jobs(_ipp_client_t *client);
 static void		ipp_get_printer_attributes(_ipp_client_t *client);
 static void		ipp_print_job(_ipp_client_t *client);
+#if 0
 static void		ipp_send_document(_ipp_client_t *client);
+#endif /* 0 */
 static void		ipp_validate_job(_ipp_client_t *client);
 static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
@@ -566,6 +571,12 @@ copy_attribute(
     case IPP_TAG_CHARSET :
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
+        fprintf(stderr, "Copying %s%s %s=\"%s\"%s\n",
+	        attr->num_values > 1 ? "1setOf " : "",
+	        ippTagString(attr->value_tag & ~IPP_TAG_COPY), attr->name,
+		attr->values[0].string.text,
+		attr->num_values > 1 ? ", ..." : "");
+		
         toattr = ippAddStrings(to, group_tag,
 	                       (ipp_tag_t)(attr->value_tag | quickcopy),
 	                       attr->name, attr->num_values, NULL, NULL);
@@ -737,6 +748,8 @@ copy_job_attributes(
     _ipp_job_t    *job,			/* I - Job */
     cups_array_t  *ra)			/* I - requested-attributes */
 {
+  copy_attributes(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
+
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
                   "job-printer-up-time", (int)time(NULL));
@@ -801,8 +814,6 @@ copy_job_attributes(
   if ((!ra || cupsArrayFind(ra, "time-at-processing")) && job->processing)
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
                   "time-at-processing", job->processing);
-
-  copy_attributes(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
 }
 
 
@@ -1480,6 +1491,9 @@ create_printer(const char *name,	/* I - printer-name */
     }
   }
 
+  fprintf(stderr, "num_database=%d, media_col_value=%d\n", num_database,
+          (int)(media_col_value - media_col_database->values));
+
   /* media-col-default */
   media_col_default = create_media_col(media_supported[0],
                                        media_type_supported[0],
@@ -1646,6 +1660,8 @@ create_printer(const char *name,	/* I - printer-name */
                 sizeof(which_jobs) / sizeof(which_jobs[0]), NULL, which_jobs);
 
   free(formats[0]);
+
+  debug_attributes("Printer", printer->attrs);
 
  /*
   * Register the printer with Bonjour...
@@ -1876,6 +1892,39 @@ create_requested_array(
 
 
 /*
+ * 'debug_attributes()' - Print attributes in a request or response.
+ */
+
+static void
+debug_attributes(const char *title,	/* I - Title */
+                 ipp_t      *ipp)	/* I - Request/response */
+{
+  ipp_tag_t		group_tag;	/* Current group */
+  ipp_attribute_t	*attr;		/* Current attribute */
+  char			buffer[2048];	/* String buffer for value */
+
+
+  fprintf(stderr, "%s:\n", title);
+  for (attr = ipp->attrs, group_tag = IPP_TAG_ZERO; attr; attr = attr->next)
+  {
+    if (attr->group_tag != group_tag)
+    {
+      group_tag = attr->group_tag;
+      fprintf(stderr, "  %s\n", ippTagString(group_tag));
+    }
+
+    if (attr->name)
+    {
+      _ippAttrString(attr, buffer, sizeof(buffer));
+      fprintf(stderr, "    %s (%s%s) %s\n", attr->name,
+	      attr->num_values > 1 ? "1setOf " : "",
+	      ippTagString(attr->value_tag), buffer);
+    }
+  }
+}
+
+
+/*
  * 'delete_client()' - Close the socket and free all memory used by a client
  *                     object.
  */
@@ -1903,6 +1952,7 @@ delete_client(_ipp_client_t *client)	/* I - Client */
   httpClearFields(&(client->http));
 
   ippDelete(client->request);
+
   ippDelete(client->response);
 
   free(client);
@@ -2592,7 +2642,12 @@ ipp_get_printer_attributes(
   ra      = create_requested_array(client);
   printer = client->printer;
 
+  respond_ipp(client, IPP_OK, NULL);
+
   _cupsRWLockRead(&(printer->rwlock));
+
+  copy_attributes(client->response, printer->attrs, ra, IPP_TAG_ZERO,
+		  IPP_TAG_COPY);
 
   if (!ra || cupsArrayFind(ra, "printer-state"))
     ippAddInteger(client->response, IPP_TAG_PRINTER, IPP_TAG_ENUM,
@@ -2657,13 +2712,9 @@ ipp_get_printer_attributes(
 		  printer->active_job &&
 		      printer->active_job->state < IPP_JOB_CANCELED);
 
-  copy_attributes(client->response, printer->attrs, ra, IPP_TAG_ZERO, 0);
-
   _cupsRWUnlock(&(printer->rwlock));
 
   cupsArrayDelete(ra);
-
-  respond_ipp(client, IPP_OK, NULL);
 }
 
 
@@ -3213,6 +3264,8 @@ process_ipp(_ipp_client_t *client)	/* I - Client */
   ipp_attribute_t	*uri;		/* Printer URI attribute */
 
 
+  debug_attributes("Request", client->request);
+
  /*
   * First build an empty response message for this request...
   */
@@ -3680,10 +3733,11 @@ respond_http(_ipp_client_t *client,	/* I - Client */
     * Send an IPP response...
     */
 
+    debug_attributes("Response", client->response);
+
     client->http.data_encoding  = HTTP_ENCODE_LENGTH;
     client->http.data_remaining = (off_t)ippLength(client->response);
-
-    client->response->state = IPP_IDLE;
+    client->response->state     = IPP_IDLE;
 
     if (ippWrite(&(client->http), client->response) != IPP_DATA)
       return (0);
