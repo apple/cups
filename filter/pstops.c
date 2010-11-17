@@ -2417,18 +2417,6 @@ set_pstops_options(
   doc->new_bounding_box[3] = INT_MIN;
 
  /*
-  * See what the source content type is.  When printing PostScript content we
-  * want to do scaling and orientation, but otherwise we don't want to change
-  * anything...
-  */
-
-  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
-    content_type = "application/postscript";
-
-  if (!strcasecmp(content_type, "application/postscript"))
-    Orientation = 0;
-
- /*
   * AP_FIRSTPAGE_* and the corresponding non-first-page options.
   */
 
@@ -2521,6 +2509,9 @@ set_pstops_options(
   *
   * (Only for original PostScript content)
   */
+
+  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+    content_type = "application/postscript";
 
   if (!strcasecmp(content_type, "application/postscript"))
   {
