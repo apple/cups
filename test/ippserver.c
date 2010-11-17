@@ -250,7 +250,8 @@ static _ipp_job_t	*create_job(_ipp_client_t *client);
 static int		create_listener(int family, int *port);
 static ipp_t		*create_media_col(const char *media, const char *type,
 					  int width, int length, int margins);
-static _ipp_printer_t	*create_printer(const char *name, const char *location,
+static _ipp_printer_t	*create_printer(const char *servername,
+			                const char *name, const char *location,
 			                const char *make, const char *model,
 					const char *icon,
 					const char *docformats, int ppm,
@@ -313,6 +314,13 @@ static int		valid_job_attributes(_ipp_client_t *client);
 
 
 /*
+ * Globals...
+ */
+
+static int		Verbosity = 0;
+
+
+/*
  * 'main()' - Main entry to the sample server.
  */
 
@@ -322,6 +330,7 @@ main(int  argc,				/* I - Number of command-line args */
 {
   int		i;			/* Looping var */
   const char	*opt,			/* Current option character */
+		*servername = NULL,	/* Server host name */
 		*name = NULL,		/* Printer name */
 		*location = "",		/* Location of printer */
 		*make = "Test",		/* Manufacturer */
@@ -398,6 +407,13 @@ main(int  argc,				/* I - Number of command-line args */
 	      model = argv[i];
 	      break;
 
+	  case 'n' : /* -n hostname */
+	      i ++;
+	      if (i >= argc)
+	        usage(1);
+	      servername = argv[i];
+	      break;
+
 	  case 'p' : /* -p port */
 	      i ++;
 	      if (i >= argc || !isdigit(argv[i][0] & 255))
@@ -418,6 +434,10 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(1);
 	      if (sscanf(argv[i], "%d,%d", &ppm, &ppm_color) < 1)
 	        usage(1);
+	      break;
+
+	  case 'v' : /* -v */
+	      Verbosity ++;
 	      break;
 
           default : /* Unknown */
@@ -461,8 +481,8 @@ main(int  argc,				/* I - Number of command-line args */
   * Create the printer...
   */
 
-  if ((printer = create_printer(name, location, make, model, icon, formats, ppm,
-                                ppm_color, duplex, port, regtype,
+  if ((printer = create_printer(servername, name, location, make, model, icon,
+                                formats, ppm, ppm_color, duplex, port, regtype,
 				directory)) == NULL)
     return (1);
 
@@ -540,6 +560,17 @@ copy_attribute(
   ipp_attribute_t	*toattr;	/* Destination attribute */
 
 
+  if (Verbosity && attr->name)
+  {
+    char	buffer[2048];		/* Attribute value */
+
+    _ippAttrString(attr, buffer, sizeof(buffer));
+
+    fprintf(stderr, "Copying %s (%s%s) %s\n", attr->name,
+	    attr->num_values > 1 ? "1setOf " : "",
+	    ippTagString(attr->value_tag & ~IPP_TAG_COPY), buffer);
+  }
+
   switch (attr->value_tag & ~IPP_TAG_COPY)
   {
     case IPP_TAG_ZERO :
@@ -571,12 +602,6 @@ copy_attribute(
     case IPP_TAG_CHARSET :
     case IPP_TAG_LANGUAGE :
     case IPP_TAG_MIMETYPE :
-        fprintf(stderr, "Copying %s%s %s=\"%s\"%s\n",
-	        attr->num_values > 1 ? "1setOf " : "",
-	        ippTagString(attr->value_tag & ~IPP_TAG_COPY), attr->name,
-		attr->values[0].string.text,
-		attr->num_values > 1 ? ", ..." : "");
-		
         toattr = ippAddStrings(to, group_tag,
 	                       (ipp_tag_t)(attr->value_tag | quickcopy),
 	                       attr->name, attr->num_values, NULL, NULL);
@@ -733,7 +758,7 @@ copy_attributes(ipp_t        *to,	/* I - Destination request */
       continue;
 
     if (!ra || cupsArrayFind(ra, fromattr->name))
-      copy_attribute(to, fromattr, quickcopy, fromattr->group_tag);
+      copy_attribute(to, fromattr, fromattr->group_tag, quickcopy);
   }
 }
 
@@ -1098,7 +1123,8 @@ create_media_col(const char *media,	/* I - Media name */
  */
 
 static _ipp_printer_t *			/* O - Printer */
-create_printer(const char *name,	/* I - printer-name */
+create_printer(const char *servername,	/* I - Server hostname (NULL for default) */
+               const char *name,	/* I - printer-name */
 	       const char *location,	/* I - printer-location */
 	       const char *make,	/* I - printer-make-and-model */
 	       const char *model,	/* I - printer-make-and-model */
@@ -1241,8 +1267,9 @@ create_printer(const char *name,	/* I - printer-name */
   printer->name          = _cupsStrAlloc(name);
   printer->dnssd_name    = _cupsStrRetain(printer->name);
   printer->directory     = _cupsStrAlloc(directory);
-  printer->hostname      = _cupsStrAlloc(httpGetHostname(NULL, hostname,
-                                                         sizeof(hostname)));
+  printer->hostname      = _cupsStrAlloc(servername ? servername :
+                                             httpGetHostname(NULL, hostname,
+                                                             sizeof(hostname)));
   printer->port          = port;
   printer->state         = IPP_PRINTER_IDLE;
   printer->state_reasons = _IPP_PRINTER_NONE;
@@ -1903,6 +1930,9 @@ debug_attributes(const char *title,	/* I - Title */
   ipp_attribute_t	*attr;		/* Current attribute */
   char			buffer[2048];	/* String buffer for value */
 
+
+  if (Verbosity == 0)
+    return;
 
   fprintf(stderr, "%s:\n", title);
   for (attr = ipp->attrs, group_tag = IPP_TAG_ZERO; attr; attr = attr->next)
@@ -3831,7 +3861,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
       timeout = -1;
 
     if (poll(polldata, (int)(sizeof(polldata) / sizeof(polldata[0])),
-             timeout) < 0)
+             timeout) < 0 && errno != EINTR)
     {
       perror("poll() failed");
       break;
@@ -3899,9 +3929,11 @@ usage(int status)			/* O - Exit status */
   puts("-i iconfile.png         PNG icon file (default=printer.png)");
   puts("-l location             Location of printer (default=empty string)");
   puts("-m model                Model name (default=Printer)");
+  puts("-n hostname             Hostname for printer");
   puts("-p port                 Port number (default=auto)");
   puts("-r regtype              Bonjour service type (default=_ipp._tcp)");
   puts("-s speed[,color-speed]  Speed in pages per minute (default=10,0)");
+  puts("-v[vvv]                 Be (very) verbose");
 
   exit(status);
 }
