@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   Sample IPP server for CUPS.
+ *   Sample IPP/2.0 server for CUPS.
  *
  *   Copyright 2010 by Apple Inc.
  *
@@ -28,6 +28,7 @@
  *   create_printer()             - Create, register, and listen for connections
  *                                  to a printer object.
  *   create_requested_array()     - Create an array for requested-attributes.
+ *   debug_attributes()           - Print attributes in a request or response.
  *   delete_client()              - Close the socket and free all memory used by
  *                                  a client object.
  *   delete_job()                 - Remove from the printer and free all memory
@@ -317,7 +318,8 @@ static int		valid_job_attributes(_ipp_client_t *client);
  * Globals...
  */
 
-static int		Verbosity = 0;
+static int		KeepFiles = 0,
+			Verbosity = 0;
 
 
 /*
@@ -393,6 +395,10 @@ main(int  argc,				/* I - Number of command-line args */
 	      icon = argv[i];
 	      break;
 
+	  case 'k' : /* -k (keep files) */
+	      KeepFiles = 1;
+	      break;
+
 	  case 'l' : /* -l location */
 	      i ++;
 	      if (i >= argc)
@@ -436,7 +442,7 @@ main(int  argc,				/* I - Number of command-line args */
 	        usage(1);
 	      break;
 
-	  case 'v' : /* -v */
+	  case 'v' : /* -v (be verbose) */
 	      Verbosity ++;
 	      break;
 
@@ -474,7 +480,8 @@ main(int  argc,				/* I - Number of command-line args */
       usage(1);
     }
 
-    printf("Using spool directory \"%s\".\n", directory);
+    if (Verbosity)
+      fprintf(stderr, "Using spool directory \"%s\".\n", directory);
   }
 
  /*
@@ -832,12 +839,14 @@ copy_job_attributes(
     }
   }
 
-  if ((!ra || cupsArrayFind(ra, "time-at-completed")) && job->completed)
-    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+  if (!ra || cupsArrayFind(ra, "time-at-completed"))
+    ippAddInteger(client->response, IPP_TAG_JOB,
+                  job->completed ? IPP_TAG_INTEGER : IPP_TAG_NOVALUE,
                   "time-at-completed", job->completed);
 
-  if ((!ra || cupsArrayFind(ra, "time-at-processing")) && job->processing)
-    ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
+  if (!ra || cupsArrayFind(ra, "time-at-processing"))
+    ippAddInteger(client->response, IPP_TAG_JOB,
+                  job->processing ? IPP_TAG_INTEGER : IPP_TAG_NOVALUE,
                   "time-at-processing", job->processing);
 }
 
@@ -886,8 +895,9 @@ create_client(_ipp_printer_t *printer,	/* I - Printer */
   httpAddrString(&(client->addr), client->http.hostname,
 		 sizeof(client->http.hostname));
 
-  fprintf(stderr, "Accepted connection from %s (%s)\n", client->http.hostname,
-	  client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
+  if (Verbosity)
+    fprintf(stderr, "Accepted connection from %s (%s)\n", client->http.hostname,
+	    client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
 
  /*
   * Using TCP_NODELAY improves responsiveness, especially on systems
@@ -1308,8 +1318,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   httpAssembleURI(HTTP_URI_CODING_ALL, adminurl, sizeof(adminurl), "http", NULL,
                   printer->hostname, printer->port, "/");
 
-  fprintf(stderr, "printer-more-info=\"%s\"\n", adminurl);
-  fprintf(stderr, "printer-uri=\"%s\"\n", uri);
+  if (Verbosity)
+  {
+    fprintf(stderr, "printer-more-info=\"%s\"\n", adminurl);
+    fprintf(stderr, "printer-uri=\"%s\"\n", uri);
+  }
 
   snprintf(make_model, sizeof(make_model), "%s %s", make, model);
 
@@ -1417,6 +1430,14 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                 "document-format-supported", num_formats, NULL,
 		(const char * const *)formats);
 
+  /* finishings-default */
+  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                "finishings-default", IPP_FINISHINGS_NONE);
+
+  /* finishings-supported */
+  ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
+                "finishings-supported", IPP_FINISHINGS_NONE);
+
   /* generated-natural-language-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_LANGUAGE | IPP_TAG_COPY,
                "generated-natural-language-supported", NULL, "en");
@@ -1518,9 +1539,6 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
     }
   }
 
-  fprintf(stderr, "num_database=%d, media_col_value=%d\n", num_database,
-          (int)(media_col_value - media_col_database->values));
-
   /* media-col-default */
   media_col_default = create_media_col(media_supported[0],
                                        media_type_supported[0],
@@ -1605,6 +1623,14 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddIntegers(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
                  "orientation-requested-supported", 4, orients);
 
+  /* output-bin-default */
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "output-bin-default", NULL, "face-down");
+
+  /* output-bin-supported */
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+               "output-bin-supported", NULL, "face-down");
+
   /* pages-per-minute */
   ippAddInteger(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                 "pages-per-minute", ppm);
@@ -1660,6 +1686,14 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   /* printer-name */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_NAME, "printer-name",
                NULL, name);
+
+  /* printer-resolution-default */
+  ippAddResolution(printer->attrs, IPP_TAG_PRINTER,
+                   "printer-resolution-default", IPP_RES_PER_INCH, 600, 600);
+
+  /* printer-resolution-supported */
+  ippAddResolution(printer->attrs, IPP_TAG_PRINTER,
+                   "printer-resolution-supported", IPP_RES_PER_INCH, 600, 600);
 
   /* printer-uri-supported */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
@@ -1931,7 +1965,7 @@ debug_attributes(const char *title,	/* I - Title */
   char			buffer[2048];	/* String buffer for value */
 
 
-  if (Verbosity == 0)
+  if (Verbosity <= 1)
     return;
 
   fprintf(stderr, "%s:\n", title);
@@ -1962,8 +1996,9 @@ debug_attributes(const char *title,	/* I - Title */
 static void
 delete_client(_ipp_client_t *client)	/* I - Client */
 {
-  fprintf(stderr, "Closing connection from %s (%s)\n", client->http.hostname,
-	  client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
+  if (Verbosity)
+    fprintf(stderr, "Closing connection from %s (%s)\n", client->http.hostname,
+	    client->http.hostaddr->addr.sa_family == AF_INET ? "IPv4" : "IPv6");
 
  /*
   * Flush pending writes before closing...
@@ -1997,11 +2032,16 @@ delete_client(_ipp_client_t *client)	/* I - Client */
 static void
 delete_job(_ipp_job_t *job)		/* I - Job */
 {
+  if (Verbosity)
+    fprintf(stderr, "Removing job #%d from history.\n", job->id);
+
   ippDelete(job->attrs);
 
   if (job->filename)
   {
-    unlink(job->filename);
+    if (!KeepFiles)
+      unlink(job->filename);
+
     free(job->filename);
   }
 
@@ -2071,6 +2111,21 @@ dnssd_callback(
     const char          *domain,	/* I - Domain for service */
     _ipp_printer_t      *printer)	/* I - Printer */
 {
+  if (errorCode)
+  {
+    fprintf(stderr, "DNSServiceRegister for %s failed with error %d.\n",
+            regtype, (int)errorCode);
+    return;
+  }
+  else if (strcasecmp(name, printer->dnssd_name))
+  {
+    if (Verbosity)
+      fprintf(stderr, "Now using DNS-SD service name \"%s\".\n", name);
+
+    /* No lock needed since only the main thread accesses/changes this */
+    _cupsStrFree(printer->dnssd_name);
+    printer->dnssd_name = _cupsStrAlloc(name);
+  }
 }
 
 
