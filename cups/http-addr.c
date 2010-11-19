@@ -606,7 +606,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
     if (!strchr(s, '.'))
     {
-#ifdef HAVE_SYSTEMCONFIGURATION
+#ifdef HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME
      /*
       * The hostname is not a FQDN, so use the local hostname from the
       * SystemConfiguration framework...
@@ -649,7 +649,7 @@ httpGetHostname(http_t *http,		/* I - HTTP connection or NULL */
 
 	strlcpy(s, host->h_name, slen);
       }
-#endif /* HAVE_SYSTEMCONFIGURATION */
+#endif /* HAVE_SCDYNAMICSTORECOPYCOMPUTERNAME */
     }
   }
 
