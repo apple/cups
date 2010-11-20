@@ -115,7 +115,7 @@ print_device(const char *uri,		/* I - Device URI */
   while ((printer = find_device(print_cb, uri)) == NULL)
   {
     _cupsLangPrintFilter(stderr, "INFO",
-			 _("Waiting for printer to become available.\n"));
+			 _("Waiting for printer to become available."));
     sleep(5);
   }
 
@@ -176,7 +176,7 @@ print_device(const char *uri,		/* I - Device URI */
 	                        bytes, 3600000) < 0)
 	  {
 	    _cupsLangPrintFilter(stderr, "ERROR",
-			         _("Unable to send data to printer.\n"));
+			         _("Unable to send data to printer."));
 	    tbytes = -1;
 	    break;
 	  }
@@ -777,7 +777,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
 	    {
 	      _cupsLangPrintFilter(stderr, "ERROR",
 			           _("ERROR: Unable to send data to "
-				     "printer.\n"));
+				     "printer."));
 	      tbytes = -1;
 	      break;
 	    }

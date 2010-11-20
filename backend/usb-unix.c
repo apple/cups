@@ -115,7 +115,7 @@ print_device(const char *uri,		/* I - Device URI */
 
         _cupsLangPrintFilter(stderr, "INFO",
 			     _("Unable to contact printer, queuing on next "
-			       "printer in class.\n"));
+			       "printer in class."));
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -129,7 +129,7 @@ print_device(const char *uri,		/* I - Device URI */
       if (errno == EBUSY)
       {
         _cupsLangPrintFilter(stderr, "INFO",
-			     _("Printer busy, will retry in 10 seconds.\n"));
+			     _("Printer busy, will retry in 10 seconds."));
 	sleep(10);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT ||
@@ -137,7 +137,7 @@ print_device(const char *uri,		/* I - Device URI */
       {
         _cupsLangPrintFilter(stderr, "INFO",
 			     _("Printer not connected, will retry in 30 "
-			       "seconds.\n"));
+			       "seconds."));
 	sleep(30);
       }
       else
@@ -426,7 +426,7 @@ open_device(const char *uri,		/* I - Device URI */
 
       if (busy)
 	_cupsLangPrintFilter(stderr, "INFO",
-			     _("Printer is busy, will retry in 5 seconds.\n"));
+			     _("Printer is busy, will retry in 5 seconds."));
 
       sleep(5);
     }
@@ -510,7 +510,7 @@ open_device(const char *uri,		/* I - Device URI */
       if (busy)
       {
 	_cupsLangPrintFilter(stderr, "INFO",
-			     _("Printer is busy, will retry in 5 seconds.\n"));
+			     _("Printer is busy, will retry in 5 seconds."));
 	sleep(5);
       }
     }

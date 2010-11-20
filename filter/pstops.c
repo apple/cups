@@ -296,7 +296,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
-      _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (1);
     }
   }
@@ -441,15 +441,13 @@ add_page(pstops_doc_t *doc,		/* I - Document information */
 
   if (!doc->pages)
   {
-    _cupsLangPrintError(stderr, "EMERG",
-                        _("Unable to allocate memory for pages array"));
+    _cupsLangPrintError("EMERG", _("Unable to allocate memory for pages array"));
     exit(1);
   }
 
   if ((pageinfo = calloc(1, sizeof(pstops_page_t))) == NULL)
   {
-    _cupsLangPrintError(stderr, "EMERG",
-                        _("Unable to allocate memory for page info"));
+    _cupsLangPrintError("EMERG", _("Unable to allocate memory for page info"));
     exit(1);
   }
 
@@ -561,7 +559,7 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 
   if (cupsFileSeek(fp, offset) < 0)
   {
-    _cupsLangPrintError(stderr, "ERROR", _("Unable to see in file"));
+    _cupsLangPrintError("ERROR", _("Unable to see in file"));
     return;
   }
 
@@ -2106,7 +2104,7 @@ doc_printf(pstops_doc_t *doc,		/* I - Document information */
   if (bytes > sizeof(buffer))
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Buffer overflow detected, aborting.\n"));
+                         _("Buffer overflow detected, aborting."));
     exit(1);
   }
 
@@ -2245,7 +2243,7 @@ include_feature(
 
   if ((option = ppdFindOption(ppd, name + 1)) == NULL)
   {
-    _cupsLangPrintFilter(stderr, "WARNING", _("Unknown option \"%s\".\n"),
+    _cupsLangPrintFilter(stderr, "WARNING", _("Unknown option \"%s\"."),
                          name + 1);
     return (num_options);
   }
@@ -2255,14 +2253,14 @@ include_feature(
   {
     _cupsLangPrintFilter(stderr, "WARNING",
                          _("Option \"%s\" cannot be included via "
-			   "%%%%IncludeFeature.\n"), name + 1);
+			   "%%%%IncludeFeature."), name + 1);
     return (num_options);
   }
 
   if (!ppdFindChoice(option, value))
   {
     _cupsLangPrintFilter(stderr, "WARNING",
-			 _("Unknown choice \"%s\" for option \"%s\".\n"),
+			 _("Unknown choice \"%s\" for option \"%s\"."),
 			 value, name + 1);
     return (num_options);
   }
@@ -2454,7 +2452,7 @@ set_pstops_options(
     {
       _cupsLangPrintFilter(stderr, "ERROR",
                            _("Unsupported brightness value %s, using "
-			     "brightness=100.\n"), val);
+			     "brightness=100."), val);
       doc->brightness = 1.0f;
     }
     else
@@ -2535,7 +2533,7 @@ set_pstops_options(
     if (intval < 1 || intval > 10000)
     {
       _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Unsupported gamma value %s, using gamma=1000.\n"),
+                           _("Unsupported gamma value %s, using gamma=1000."),
 			   val);
       doc->gamma = 1.0f;
     }
@@ -2580,7 +2578,7 @@ set_pstops_options(
       default :
           _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("Unsupported number-up value %d, using "
-				 "number-up=1.\n"), intval);
+				 "number-up=1."), intval);
           doc->number_up = 1;
 	  break;
     }
@@ -2614,7 +2612,7 @@ set_pstops_options(
     {
       _cupsLangPrintFilter(stderr, "ERROR",
                            _("Unsupported number-up-layout value %s, using "
-			     "number-up-layout=lrtb.\n"), val);
+			     "number-up-layout=lrtb."), val);
       doc->number_up_layout = PSTOPS_LAYOUT_LRTB;
     }
   }
@@ -2665,7 +2663,7 @@ set_pstops_options(
     {
       _cupsLangPrintFilter(stderr, "ERROR",
                            _("Unsupported page-border value %s, using "
-			     "page-border=none.\n"), val);
+			     "page-border=none."), val);
       doc->page_border = PSTOPS_BORDERNONE;
     }
   }

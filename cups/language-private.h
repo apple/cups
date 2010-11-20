@@ -58,7 +58,8 @@ extern const char	*_cupsAppleLanguage(const char *locale, char *language,
 #  endif /* __APPLE__ */
 extern void		_cupsCharmapFlush(void);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
-extern void		_cupsLangPrintError(const char *message);
+extern void		_cupsLangPrintError(const char *prefix,
+			                    const char *message);
 extern int		_cupsLangPrintFilter(FILE *fp, const char *prefix,
 			                     const char *message, ...)
 #  ifdef __GNUC__

@@ -271,7 +271,7 @@ psTextInitialize(void)
     */
 
     fclose(fp);
-    _cupsLangPrintFilter(stderr, "ERROR", _("Bad charset file \"%s\".\n"),
+    _cupsLangPrintFilter(stderr, "ERROR", _("Bad charset file \"%s\"."),
                          filename);
     exit(1);
   }
@@ -317,7 +317,7 @@ psTextInitialize(void)
       */
 
       _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Bad font description line \"%s\".\n"), valptr);
+                           _("Bad font description line \"%s\"."), valptr);
       fclose(fp);
       exit(1);
     }
@@ -330,7 +330,7 @@ psTextInitialize(void)
       fonts->directions[fonts->num_fonts] = -1;
     else
     {
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad text direction \"%s\".\n"),
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad text direction \"%s\"."),
                            valptr);
       fclose(fp);
       exit(1);
@@ -355,7 +355,7 @@ psTextInitialize(void)
       */
 
       _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Bad font description line \"%s\".\n"), valptr);
+                           _("Bad font description line \"%s\"."), valptr);
       fclose(fp);
       exit(1);
     }
@@ -368,7 +368,7 @@ psTextInitialize(void)
       fonts->widths[fonts->num_fonts] = 2;
     else 
     {
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad text width \"%s\".\n"),
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad text width \"%s\"."),
                            valptr);
       fclose(fp);
       exit(1);
@@ -431,7 +431,7 @@ psTextInitialize(void)
 
   if (cupsArrayCount(fonts->unique) == 0)
   {
-    _cupsLangPrintFilter(stderr, "ERROR", _("No fonts in charset file.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR", _("No fonts in charset file."));
     exit(1);
   }
 

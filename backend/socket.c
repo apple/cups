@@ -153,8 +153,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      _cupsLangPrintError(stderr, "ERROR",
-			  _("Unable to open print file"));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (CUPS_BACKEND_FAILED);
     }
 
@@ -265,12 +264,12 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Unable to locate printer \"%s\".\n"), hostname);
+                         _("Unable to locate printer \"%s\"."), hostname);
     return (CUPS_BACKEND_STOP);
   }
 
   fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
-  _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer.\n"));
+  _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
   for (delay = 5;;)
   {
@@ -290,7 +289,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
         _cupsLangPrintFilter(stderr, "INFO",
 			     _("Unable to contact printer, queuing on next "
-			       "printer in class.\n"));
+			       "printer in class."));
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -309,7 +308,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
 	  _cupsLangPrintFilter(stderr, "ERROR",
-	                       _("The printer is not responding.\n"));
+	                       _("The printer is not responding."));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -318,20 +317,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	  case EHOSTDOWN :
 	      _cupsLangPrintFilter(stderr, "WARNING",
 				   _("Network printer \"%s\" may not exist or "
-				     "is unavailable at this time.\n"),
+				     "is unavailable at this time."),
 				   hostname);
 	      break;
 
 	  case EHOSTUNREACH :
 	      _cupsLangPrintFilter(stderr, "WARNING",
 				   _("Network printer \"%s\" is unreachable at "
-				     "this time.\n"), hostname);
+				     "this time."), hostname);
 	      break;
 
 	  case ECONNREFUSED :
 	  default :
 	      _cupsLangPrintFilter(stderr, "WARNING",
-				   _("Network printer \"%s\" is busy.\n"),
+				   _("Network printer \"%s\" is busy."),
 				   hostname);
 	      break;
         }
@@ -344,7 +343,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Network printer \"%s\" is not responding.\n"),
+	                     _("Network printer \"%s\" is not responding."),
 			     hostname);
 	sleep(30);
       }
@@ -354,7 +353,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
   fputs("STATE: -connecting-to-device\n", stderr);
-  _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer.\n"));
+  _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
 #ifdef AF_INET6
   if (addr->addr.addr.sa_family == AF_INET6)
@@ -400,7 +399,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
                             backendNetworkSideCB);
 
     if (print_fd != 0 && tbytes >= 0)
-      _cupsLangPrintFilter(stderr, "INFO", _("Print file sent.\n"));
+      _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
 
 #ifdef __APPLE__
@@ -420,7 +419,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Shutdown the socket and wait for the other end to finish...
     */
 
-    _cupsLangPrintFilter(stderr, "INFO", _("Waiting for printer to finish.\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Waiting for printer to finish."));
 
     shutdown(device_fd, 1);
 
@@ -452,7 +451,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     close(print_fd);
 
   if (tbytes >= 0)
-    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print.\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
 
   return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
 }

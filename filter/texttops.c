@@ -177,7 +177,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       SizeLines <= 0 || SizeLines > 32767)
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Unable to print %dx%d text page.\n"),
+                         _("Unable to print %dx%d text page."),
                          SizeColumns, SizeLines);
     exit(1);
   }
@@ -185,7 +185,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   if ((Page = calloc(sizeof(lchar_t *), SizeLines)) == NULL)
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Unable to print %dx%d text page.\n"),
+                         _("Unable to print %dx%d text page."),
                          SizeColumns, SizeLines);
     exit(1);
   }
@@ -193,7 +193,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   if ((Page[0] = calloc(sizeof(lchar_t), SizeColumns * SizeLines)) == NULL)
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Unable to print %dx%d text page.\n"),
+                         _("Unable to print %dx%d text page."),
                          SizeColumns, SizeLines);
     exit(1);
   }
@@ -213,7 +213,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   if (ColumnWidth <= 0)
   {
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("Unable to print %d text columns.\n"), PageColumns);
+                         _("Unable to print %d text columns."), PageColumns);
     exit(1);
   }
 

@@ -708,7 +708,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("%s job-id user title copies options [file]\n"),
+                         _("%s job-id user title copies options [file]"),
 			 "rastertohp");
     return (1);
   }
@@ -721,7 +721,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
-      _cupsLangPrintError(stderr, "ERROR", _("Unable to open raster file"));
+      _cupsLangPrintError("ERROR", _("Unable to open raster file"));
       sleep(1);
       return (1);
     }
@@ -761,7 +761,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     int			linenum;	/* Line number */
 
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("The PPD file could not be opened.\n"));
+                         _("The PPD file could not be opened."));
 
     status = ppdLastError(&linenum);
 
@@ -814,7 +814,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((y & 127) == 0)
       {
         _cupsLangPrintFilter(stderr, "INFO",
-	                     _("Printing page %d, %d%% complete.\n"),
+	                     _("Printing page %d, %d%% complete."),
 			     Page, 100 * y / header.cupsHeight);
         fprintf(stderr, "ATTR: job-media-progress=%d\n",
 		100 * y / header.cupsHeight);
@@ -842,7 +842,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Eject the page...
     */
 
-    _cupsLangPrintFilter(stderr, "INFO", _("Finished page %d.\n"), Page);
+    _cupsLangPrintFilter(stderr, "INFO", _("Finished page %d."), Page);
 
     EndPage();
 
@@ -873,12 +873,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    _cupsLangPrintFilter(stderr, "ERROR", _("No pages were found.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR", _("No pages were found."));
     return (1);
   }
   else
   {
-    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print.\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
     return (0);
   }
 }

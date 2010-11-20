@@ -1157,7 +1157,7 @@ get_job_file(const char *job)		/* I - Job ID */
 
   if ((tempfd = cupsTempFd(TempFile, sizeof(TempFile))) == -1)
   {
-    _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
+    _cupsLangPrintError("ERROR", _("Unable to create temporary file"));
     httpClose(http);
     exit(1);
   }

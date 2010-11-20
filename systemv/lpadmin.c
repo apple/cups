@@ -1235,7 +1235,7 @@ set_printer_options(
 
     if ((out = cupsTempFile2(tempfile, sizeof(tempfile))) < 0)
     {
-      _cupsLangPrintError(_("ERROR: Unable to create temporary file"));
+      _cupsLangPrintError(NULL, _("lpadmin: Unable to create temporary file"));
       ippDelete(request);
       if (ppdfile != file)
         unlink(ppdfile);

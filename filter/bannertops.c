@@ -217,7 +217,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
     if (!*ptr)
     {
       _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Missing value on line %d of banner file.\n"),
+                           _("Missing value on line %d of banner file."),
 			   linenum);
       continue;
     }

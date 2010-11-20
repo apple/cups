@@ -36,7 +36,8 @@
  */
 
 void
-_cupsLangPrintError(const char *message)/* I - Message */
+_cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
+                    const char *message)/* I - Message */
 {
   int		bytes;			/* Number of bytes formatted */
   int		last_errno;		/* Last error */
@@ -71,7 +72,7 @@ _cupsLangPrintError(const char *message)/* I - Message */
   * Format the message...
   */
 
-  snprintf(buffer, sizeof(buffer), "%s: %s\n",
+  snprintf(buffer, sizeof(buffer), "%s%s: %s\n", prefix ? prefix : "",
 	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
 
  /*
@@ -122,7 +123,7 @@ _cupsLangPrintFilter(
   */
 
   va_start(ap, message);
-  snprintf(temp, sizeof(temp), "%s: %s", prefix,
+  snprintf(temp, sizeof(temp), "%s: %s\n", prefix,
 	   _cupsLangString(cg->lang_default, message));
   vsnprintf(buffer, sizeof(buffer), temp, ap);
   va_end(ap);

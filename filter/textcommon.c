@@ -610,7 +610,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (PageColumns < 1)
     {
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad columns value %d.\n"),
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad columns value %d."),
                            PageColumns);
       return (1);
     }
@@ -622,7 +622,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (CharsPerInch <= 0.0)
     {
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad cpi value %f.\n"),
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad cpi value %f."),
                            CharsPerInch);
       return (1);
     }
@@ -634,7 +634,7 @@ TextMain(const char *name,	/* I - Name of filter */
 
     if (LinesPerInch <= 0.0)
     {
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad lpi value %f.\n"),
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad lpi value %f."),
                            LinesPerInch);
       return (1);
     }

@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   {
     _cupsLangPrintFilter(stderr, "ERROR",
 			 _("No device URI found in argv[0] or in DEVICE_URI "
-                           "environment variable.\n"));
+                           "environment variable."));
     return (1);
   }
 
@@ -234,7 +234,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (CUPS_BACKEND_FAILED);
     }
 
