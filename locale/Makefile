@@ -79,6 +79,10 @@ install-languages:
 		fi ; \
 	done
 
+install-langbundle: po2strings
+	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj"
+	./po2strings cups.pot "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj/cups.strings"
+
 
 #
 # Install programs...
@@ -111,6 +115,9 @@ uninstall-languages:
 	-for loc in $(LANGUAGES) ; do \
 		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
+
+uninstall-langbundle:
+	$(RM) "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj/cups.strings"
 
 
 #

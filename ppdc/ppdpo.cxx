@@ -250,14 +250,15 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: ppdpo [options] -o filename.po filename.drv [ ... "
-		  "filenameN.drv ]\n"
-		  "Options:\n"
-		  "  -D name=value        Set named variable to value.\n"
-		  "  -I include-dir    Add include directory to search path.\n"
-		  "  -v                Be verbose (more v's for more "
-		  "verbosity).\n"));
+  _cupsLangPuts(stdout, _("Usage: ppdpo [options] -o filename.po filename.drv "
+                          "[ ... filenameN.drv ]\n"));
+  _cupsLangPuts(stdout, _("Options:\n"));
+  _cupsLangPuts(stdout, _("  -D name=value     Set named variable to "
+                          "value.\n"));
+  _cupsLangPuts(stdout, _("  -I include-dir    Add include directory to search "
+                          "path.\n"));
+  _cupsLangPuts(stdout, _("  -v                Be verbose (more v's for more "
+		          "verbosity).\n"));
 
   exit(1);
 }

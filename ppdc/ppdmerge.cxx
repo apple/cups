@@ -107,7 +107,8 @@ main(int  argc,				// I - Number of command-line arguments
 	
         status = ppdLastError(&linenum);
 	
-	_cupsLangPrintf(stderr, _("%s: Unable to open PPD file: %s on line %d.\n"),
+	_cupsLangPrintf(stderr,
+	                _("%s: Unable to open PPD file: %s on line %d.\n"),
 	                "ppdmerge", ppdErrorString(status), linenum);
 	
         _cupsLangPrintf(stderr, "%d: ", linenum);
@@ -172,7 +173,7 @@ main(int  argc,				// I - Number of command-line arguments
       else
       {
         // Don't need this PPD...
-	_cupsLangPrintf(stderr, _("ppdmerge: Ignoring PPD file %s...\n"),
+	_cupsLangPrintf(stderr, _("ppdmerge: Ignoring PPD file %s.\n"),
 	                argv[i]);
         ppdClose(ppd);
       }
@@ -363,11 +364,10 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: ppdmerge [options] filename.ppd "
-		  "[ ... filenameN.ppd ]\n"
-		  "Options:\n"
-                  "  -o filename.ppd[.gz]\n"));
+  _cupsLangPuts(stdout, _("Usage: ppdmerge [options] filename.ppd [ ... "
+                          "filenameN.ppd ]\n"));
+  _cupsLangPuts(stdout, _("Options:\n"));
+  _cupsLangPuts(stdout, _("  -o filename.ppd[.gz]\n"));
 
   exit(1);
 }
