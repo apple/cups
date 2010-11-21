@@ -194,18 +194,14 @@ main(int  argc,				/* I - Number of command-line args */
         }
 
      /*
-      * Make sure filter message prefixes are preserved...
+      * Make sure filter message prefixes are not translated...
       */
 
-      if ((!strncmp(msg->id, "ALERT:", 6) && strncmp(msg->str, "ALERT:", 6)) ||
-          (!strncmp(msg->id, "CRIT:", 5) && strncmp(msg->str, "CRIT:", 5)) ||
-          (!strncmp(msg->id, "DEBUG:", 6) && strncmp(msg->str, "DEBUG:", 6)) ||
-          (!strncmp(msg->id, "DEBUG2:", 7) && strncmp(msg->str, "DEBUG2:", 7)) ||
-          (!strncmp(msg->id, "EMERG:", 6) && strncmp(msg->str, "EMERG:", 6)) ||
-          (!strncmp(msg->id, "ERROR:", 6) && strncmp(msg->str, "ERROR:", 6)) ||
-          (!strncmp(msg->id, "INFO:", 5) && strncmp(msg->str, "INFO:", 5)) ||
-          (!strncmp(msg->id, "NOTICE:", 7) && strncmp(msg->str, "NOTICE:", 7)) ||
-          (!strncmp(msg->id, "WARNING:", 8) && strncmp(msg->str, "WARNING:", 8)))
+      if (!strncmp(msg->id, "ALERT:", 6) || !strncmp(msg->id, "CRIT:", 5) ||
+          !strncmp(msg->id, "DEBUG:", 6) || !strncmp(msg->id, "DEBUG2:", 7) ||
+          !strncmp(msg->id, "EMERG:", 6) || !strncmp(msg->id, "ERROR:", 6) ||
+          !strncmp(msg->id, "INFO:", 5) || !strncmp(msg->id, "NOTICE:", 7) ||
+          !strncmp(msg->id, "WARNING:", 8))
       {
         if (pass)
 	{
@@ -213,8 +209,7 @@ main(int  argc,				/* I - Number of command-line args */
 	  puts("FAIL");
 	}
 
-	printf("    Bad prefix on filter message \"%s\"\n      for \"%s\"\n\n",
-	       abbreviate(msg->str, strbuf, sizeof(strbuf)),
+	printf("    Bad prefix on filter message \"%s\"\n\n",
 	       abbreviate(msg->id, idbuf, sizeof(idbuf)));
       }
     }

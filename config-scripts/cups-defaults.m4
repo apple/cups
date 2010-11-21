@@ -36,7 +36,7 @@ AC_ARG_WITH(bundledir, [  --with-bundledir     set Mac OS X localization bundle 
 
 AC_SUBST(CUPS_BUNDLEDIR)
 if test "x$CUPS_BUNDLEDIR" != x; then
-	AC_DEFINE(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
+	AC_DEFINE_UNQUOTED(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
 fi
 
 dnl Default ConfigFilePerm
