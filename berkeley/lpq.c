@@ -94,8 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (http)
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
-            _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in\n"),
+            _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -110,8 +109,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option!n"),
-		        	argv[0]);
+				  "\"-U\" option."), argv[0]);
 	        return (1);
 	      }
 
@@ -149,11 +147,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    {
 	      if (instance)
 		_cupsLangPrintf(stderr,
-		                _("%s: Error - unknown destination \"%s/%s\"\n"),
+		                _("%s: Error - unknown destination \"%s/%s\"."),
 		        	argv[0], dest, instance);
               else
-		_cupsLangPrintf(stderr,
-		                _("%s: Unknown destination \"%s\"\n"),
+		_cupsLangPrintf(stderr, _("%s: Unknown destination \"%s\"."),
 				argv[0], dest);
 
 	      return (1);
@@ -181,8 +178,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-h\' option\n"),
-				argv[0]);
+			          "\"-h\" option."), argv[0]);
 		return (1);
               }
 	      else
@@ -238,11 +234,11 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
 	_cupsLangPrintf(stderr,
 	                _("%s: error - %s environment variable names "
-			  "non-existent destination \"%s\"\n"),
-        	        argv[0], val, dest);
+			  "non-existent destination \"%s\"."), argv[0], val,
+			dest);
       else
 	_cupsLangPrintf(stderr,
-	                _("%s: error - no default destination available.\n"),
+	                _("%s: error - no default destination available."),
 			argv[0]);
       httpClose(http);
       cupsFreeDests(num_dests, dests);
@@ -296,7 +292,7 @@ connect_server(const char *command,	/* I - Command name */
 
     if (http == NULL)
     {
-      _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"), command);
+      _cupsLangPrintf(stderr, _("%s: Unable to connect to server."), command);
       exit(1);
     }
   }
@@ -418,7 +414,7 @@ show_jobs(const char *command,		/* I - Command name */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+      _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
       ippDelete(response);
       return (0);
     }
@@ -512,11 +508,11 @@ show_jobs(const char *command,		/* I - Command name */
 #ifdef __osf__
 	_cupsLangPuts(stdout,
 	              _("Rank   Owner      Pri  Job        Files"
-		        "                       Total Size\n"));
+		        "                       Total Size"));
 #else
 	_cupsLangPuts(stdout,
 	              _("Rank    Owner   Job     File(s)"
-		        "                         Total Size\n"));
+		        "                         Total Size"));
 #endif /* __osf__ */
 
       jobcount ++;
@@ -552,20 +548,20 @@ show_jobs(const char *command,		/* I - Command name */
 	else
 	  strlcpy(namestr, jobname, sizeof(namestr));
 
-        _cupsLangPrintf(stdout, _("%s: %-33.33s [job %d localhost]\n"),
+        _cupsLangPrintf(stdout, _("%s: %-33.33s [job %d localhost]"),
 	                jobuser, rankstr, jobid);
-        _cupsLangPrintf(stdout, _("        %-39.39s %.0f bytes\n"),
+        _cupsLangPrintf(stdout, _("        %-39.39s %.0f bytes"),
 	                namestr, 1024.0 * jobsize);
       }
       else
 #ifdef __osf__
         _cupsLangPrintf(stdout,
-	                _("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes\n"),
+	                _("%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes"),
 			rankstr, jobuser, jobpriority, jobid, jobname,
 			1024.0 * jobsize);
 #else
         _cupsLangPrintf(stdout,
-	                _("%-7s %-7.7s %-7d %-31.31s %.0f bytes\n"),
+	                _("%-7s %-7.7s %-7d %-31.31s %.0f bytes"),
 			rankstr, jobuser, jobid, jobname, 1024.0 * jobsize);
 #endif /* __osf */
 
@@ -577,12 +573,12 @@ show_jobs(const char *command,		/* I - Command name */
   }
   else
   {
-    _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+    _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
     return (0);
   }
 
   if (jobcount == 0)
-    _cupsLangPuts(stdout, _("no entries\n"));
+    _cupsLangPuts(stdout, _("no entries"));
 
   return (jobcount);
 }
@@ -631,7 +627,7 @@ show_printer(const char *command,	/* I - Command name */
   {
     if (response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+      _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
       ippDelete(response);
       return;
     }
@@ -644,21 +640,21 @@ show_printer(const char *command,	/* I - Command name */
     switch (state)
     {
       case IPP_PRINTER_IDLE :
-          _cupsLangPrintf(stdout, _("%s is ready\n"), dest);
+          _cupsLangPrintf(stdout, _("%s is ready"), dest);
 	  break;
       case IPP_PRINTER_PROCESSING :
-          _cupsLangPrintf(stdout, _("%s is ready and printing\n"),
+          _cupsLangPrintf(stdout, _("%s is ready and printing"),
 	                  dest);
 	  break;
       case IPP_PRINTER_STOPPED :
-          _cupsLangPrintf(stdout, _("%s is not ready\n"), dest);
+          _cupsLangPrintf(stdout, _("%s is not ready"), dest);
 	  break;
     }
 
     ippDelete(response);
   }
   else
-    _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+    _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
 }
 
 
@@ -671,7 +667,7 @@ usage(void)
 {
   _cupsLangPuts(stderr,
                 _("Usage: lpq [-P dest] [-U username] [-h hostname[:port]] "
-		  "[-l] [+interval]\n"));
+		  "[-l] [+interval]"));
   exit(1);
 }
 

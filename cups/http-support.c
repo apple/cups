@@ -1361,7 +1361,7 @@ _httpResolveURI(
 #endif /* DEBUG */
   {
     if (logit)
-      _cupsLangPrintf(stderr, _("Bad device URI \"%s\"\n"), uri);
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad device URI \"%s\"."), uri);
 
     DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
     DEBUG_puts("5_httpResolveURI: Returning NULL");
@@ -1458,7 +1458,7 @@ _httpResolveURI(
 	for (;;)
 	{
 	  if (logit)
-	    _cupsLangPuts(stderr, _("INFO: Looking for printer...\n"));
+	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
 
 	 /*
 	  * For the first minute, wakeup every 2 seconds to emit a
@@ -1562,7 +1562,7 @@ _httpResolveURI(
 #endif /* HAVE_DNSSD */
 
     if (logit && !uri)
-      _cupsLangPuts(stderr, _("Unable to find printer\n"));
+      _cupsLangPrintFilter(stderr, "ERROR", _("Unable to find printer."));
   }
 
   DEBUG_printf(("5_httpResolveURI: Returning \"%s\"", uri));

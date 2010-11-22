@@ -490,7 +490,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -525,7 +525,7 @@ cupsAdminExportSamba(
 	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
 	if (logfile)
-	  _cupsLangPrintf(logfile, "%s\n", message);
+	  _cupsLangPuts(logfile, message);
 
         unlink(authfile);
 
@@ -568,7 +568,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -613,7 +613,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -642,7 +642,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -694,7 +694,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -729,7 +729,7 @@ cupsAdminExportSamba(
 	_cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
 	if (logfile)
-	  _cupsLangPrintf(logfile, "%s\n", message);
+	  _cupsLangPuts(logfile, message);
 
         unlink(authfile);
 
@@ -772,7 +772,7 @@ cupsAdminExportSamba(
       _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
       if (logfile)
-	_cupsLangPrintf(logfile, "%s\n", message);
+	_cupsLangPuts(logfile, message);
 
       unlink(authfile);
 
@@ -795,7 +795,7 @@ cupsAdminExportSamba(
               sizeof(message));
 
     _cupsSetError(IPP_NOT_FOUND, message, 0);
-    _cupsLangPrintf(logfile, "%s\n", message);
+    _cupsLangPuts(logfile, message);
   }
 
   if (have_drivers == 0)
@@ -824,7 +824,7 @@ cupsAdminExportSamba(
     _cupsSetError(IPP_INTERNAL_ERROR, message, 0);
 
     if (logfile)
-      _cupsLangPrintf(logfile, "%s\n", message);
+      _cupsLangPuts(logfile, message);
 
     unlink(authfile);
 
@@ -2164,7 +2164,7 @@ do_samba_command(const char *command,	/* I - Command to run */
 
   if (logfile)
     _cupsLangPrintf(logfile,
-                    _("Running command: %s %s -N -A %s -c \'%s\'\n"),
+                    _("Running command: %s %s -N -A %s -c \'%s\'"),
         	    command, address, authfile, subcmd);
 
   if ((pid = fork()) == 0)
@@ -2200,7 +2200,7 @@ do_samba_command(const char *command,	/* I - Command to run */
     status = -1;
 
     if (logfile)
-      _cupsLangPrintf(logfile, _("Unable to run \"%s\": %s\n"),
+      _cupsLangPrintf(logfile, _("Unable to run \"%s\": %s"),
                       command, strerror(errno));
   }
   else
@@ -2213,7 +2213,7 @@ do_samba_command(const char *command,	/* I - Command to run */
   }
 
   if (logfile)
-    _cupsLangPuts(logfile, "\n");
+    _cupsLangPuts(logfile, "");
 
   DEBUG_printf(("9do_samba_command: status=%d", status));
 

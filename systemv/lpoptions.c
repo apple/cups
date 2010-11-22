@@ -96,8 +96,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	        (dest = cupsGetDest(printer, instance, num_dests,
 		                    dests)) == NULL)
 	    {
-	      _cupsLangPuts(stderr,
-	                    _("lpoptions: Unknown printer or class\n"));
+	      _cupsLangPuts(stderr, _("lpoptions: Unknown printer or class."));
 	      return (1);
 	    }
 
@@ -113,7 +112,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetDests(num_dests, dests);
 
 	    for (j = 0; j < dest->num_options; j ++)
-	      if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+	      if (cupsGetOption(dest->options[j].name, num_options,
+	                        options) == NULL)
 		num_options = cupsAddOption(dest->options[j].name,
 	                                    dest->options[j].value,
 	                                    num_options, &options);
@@ -147,7 +147,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    }
 
             if (dest == NULL)
-	      _cupsLangPuts(stderr, _("lpoptions: No printers\n"));
+	      _cupsLangPuts(stderr, _("lpoptions: No printers."));
 	    else
 	      list_options(dest);
 
@@ -165,7 +165,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (dest == NULL)
               {
-		_cupsLangPuts(stderr, _("lpoptions: No printers\n"));
+		_cupsLangPuts(stderr, _("lpoptions: No printers."));
                 return (1);
               }
 
@@ -217,7 +217,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("lpoptions: Unable to add printer or "
-				  "instance: %s\n"),
+				  "instance: %s"),
 				strerror(errno));
 		return (1);
 	      }
@@ -241,12 +241,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	      if (dest == NULL)
               {
-		_cupsLangPuts(stderr, _("lpoptions: No printers\n"));
+		_cupsLangPuts(stderr, _("lpoptions: No printers."));
                 return (1);
               }
 
 	      for (j = 0; j < dest->num_options; j ++)
-		if (cupsGetOption(dest->options[j].name, num_options, options) == NULL)
+		if (cupsGetOption(dest->options[j].name, num_options,
+		                  options) == NULL)
 		  num_options = cupsAddOption(dest->options[j].name,
 	                                      dest->options[j].value,
 	                                      num_options, &options);
@@ -299,7 +300,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    if (num_dests == 0)
 	      num_dests = cupsGetDests(&dests);
 
-            if ((dest = cupsGetDest(printer, instance, num_dests, dests)) != NULL)
+            if ((dest = cupsGetDest(printer, instance, num_dests,
+	                            dests)) != NULL)
 	    {
               cupsFreeOptions(dest->num_options, dest->options);
 
@@ -369,26 +371,33 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (changes == 0)
   {
+    char	buffer[10240],		/* String for options */
+		*ptr;			/* Pointer into string */
+
     num_options = dest->num_options;
     options     = dest->options;
 
-    for (i = 0; i < num_options; i ++)
+    for (i = 0, ptr = buffer;
+         ptr < (buffer + sizeof(buffer) - 1) && i < num_options;
+	 i ++)
     {
       if (i)
-        _cupsLangPuts(stdout, " ");
+        *ptr++ = ' ';
 
       if (!options[i].value[0])
-        _cupsLangPrintf(stdout, "%s", options[i].name);
+        strlcpy(ptr, options[i].name, sizeof(buffer) - (ptr - buffer));
       else if (strchr(options[i].value, ' ') != NULL ||
                strchr(options[i].value, '\t') != NULL)
-	_cupsLangPrintf(stdout, "%s=\'%s\'", options[i].name,
-	                options[i].value);
+	snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s=\'%s\'",
+	         options[i].name, options[i].value);
       else
-	_cupsLangPrintf(stdout, "%s=%s", options[i].name,
-	                options[i].value);
+	snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s=%s",
+	         options[i].name, options[i].value);
+
+      ptr += strlen(ptr);
     }
 
-    _cupsLangPuts(stdout, "\n");
+    _cupsLangPuts(stdout, buffer);
   }
 
   return (0);
@@ -406,6 +415,8 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
   ppd_option_t	*option;		/* Current option */
   ppd_choice_t	*choice;		/* Current choice */
   ppd_group_t	*subgroup;		/* Current subgroup */
+  char		buffer[10240],		/* Option string buffer */
+		*ptr;			/* Pointer into option string */
 
 
   for (i = group->num_options, option = group->options; i > 0; i --, option ++)
@@ -413,11 +424,13 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
     if (!strcasecmp(option->keyword, "PageRegion"))
       continue;
 
-    _cupsLangPrintf(stdout, "%s/%s:", option->keyword, option->text);
+    snprintf(buffer, sizeof(buffer), "%s/%s:", option->keyword, option->text);
 
-    for (j = option->num_choices, choice = option->choices;
-         j > 0;
+    for (j = option->num_choices, choice = option->choices,
+             ptr = buffer + strlen(buffer);
+         j > 0 && ptr < (buffer + sizeof(buffer) - 1);
 	 j --, choice ++)
+    {
       if (!strcasecmp(choice->choice, "Custom"))
       {
         ppd_coption_t	*coption;	/* Custom option */
@@ -437,18 +450,19 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
         if ((coption = ppdFindCustomOption(ppd, option->keyword)) == NULL ||
 	    cupsArrayCount(coption->params) == 0)
-	  _cupsLangPrintf(stdout, " %sCustom", choice->marked ? "*" : "");
+	  snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %sCustom",
+	           choice->marked ? "*" : "");
         else if (!strcasecmp(option->keyword, "PageSize") ||
-	        !strcasecmp(option->keyword, "PageRegion"))
-	  _cupsLangPrintf(stdout, " %sCustom.WIDTHxHEIGHT",
-	                  choice->marked ? "*" : "");
+	         !strcasecmp(option->keyword, "PageRegion"))
+	  snprintf(ptr, sizeof(buffer) - (ptr - buffer),
+	           " %sCustom.WIDTHxHEIGHT", choice->marked ? "*" : "");
         else
 	{
 	  cparam = (ppd_cparam_t *)cupsArrayFirst(coption->params);
 
 	  if (cupsArrayCount(coption->params) == 1)
-	    _cupsLangPrintf(stdout, " %sCustom.%s", choice->marked ? "*" : "",
-	                    types[cparam->type]);
+	    snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %sCustom.%s",
+	             choice->marked ? "*" : "", types[cparam->type]);
 	  else
 	  {
 	    const char	*prefix;	/* Prefix string */
@@ -461,22 +475,27 @@ list_group(ppd_file_t  *ppd,		/* I - PPD file */
 
 	    while (cparam)
 	    {
-	      _cupsLangPrintf(stdout, "%s%s=%s", prefix, cparam->name,
-	                      types[cparam->type]);
+	      snprintf(ptr, sizeof(buffer) - (ptr - buffer), "%s%s=%s", prefix,
+	               cparam->name, types[cparam->type]);
 	      cparam = (ppd_cparam_t *)cupsArrayNext(coption->params);
 	      prefix = " ";
+	      ptr += strlen(ptr);
 	    }
 
-	    _cupsLangPuts(stdout, "}");
+            if (ptr < (buffer + sizeof(buffer) - 1))
+	      strlcpy(ptr, "}", sizeof(buffer) - (ptr - buffer));
 	  }
 	}
       }
       else if (choice->marked)
-        _cupsLangPrintf(stdout, " *%s", choice->choice);
+        snprintf(ptr, sizeof(buffer) - (ptr - buffer), " *%s", choice->choice);
       else
-        _cupsLangPrintf(stdout, " %s", choice->choice);
+        snprintf(ptr, sizeof(buffer) - (ptr - buffer), " %s", choice->choice);
 
-    _cupsLangPuts(stdout, "\n");
+      ptr += strlen(ptr);
+    }
+
+    _cupsLangPuts(stdout, buffer);
   }
 
   for (i = group->num_subgroups, subgroup = group->subgroups; i > 0; i --, subgroup ++)
@@ -499,8 +518,7 @@ list_options(cups_dest_t *dest)		/* I - Destination to list */
 
   if ((filename = cupsGetPPD(dest->name)) == NULL)
   {
-    _cupsLangPrintf(stderr,
-                    _("lpoptions: Unable to get PPD file for %s: %s\n"),
+    _cupsLangPrintf(stderr, _("lpoptions: Unable to get PPD file for %s: %s"),
 		    dest->name, cupsLastErrorString());
     return;
   }
@@ -508,8 +526,7 @@ list_options(cups_dest_t *dest)		/* I - Destination to list */
   if ((ppd = ppdOpenFile(filename)) == NULL)
   {
     unlink(filename);
-    _cupsLangPrintf(stderr,
-                    _("lpoptions: Unable to open PPD file for %s\n"),
+    _cupsLangPrintf(stderr, _("lpoptions: Unable to open PPD file for %s."),
 		    dest->name);
     return;
   }
@@ -537,7 +554,7 @@ usage(void)
 		  "       lpoptions [-h server] [-E] [-p printer] -l\n"
 		  "       lpoptions [-h server] [-E] -p printer -o "
 		  "option[=value] ...\n"
-		  "       lpoptions [-h server] [-E] -x printer\n"));
+		  "       lpoptions [-h server] [-E] -x printer"));
 
   exit(1);
 }

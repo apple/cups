@@ -790,7 +790,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     Page ++;
 
     fprintf(stderr, "PAGE: %d %d\n", Page, header.NumCopies);
-    _cupsLangPrintFilter(stderr, "INFO", _("Starting page %d.\n"), Page);
+    _cupsLangPrintFilter(stderr, "INFO", _("Starting page %d."), Page);
 
    /*
     * Start the page...

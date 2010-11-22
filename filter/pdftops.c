@@ -100,7 +100,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
-                    _("Usage: %s job user title copies options [filename]\n"),
+                    _("Usage: %s job user title copies options [filename]"),
                     argv[0]);
     return (1);
   }

@@ -46,8 +46,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc != 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options file\n"),
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options file"),
+                    argv[0]);
     return (1);
   }
 
@@ -67,8 +68,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
   {
-    fprintf(stderr, _("ERROR: Unable to open file \"%s\": %s\n"), argv[6],
-            strerror(errno));
+    _cupsLangPrintError("ERROR", _("Unable to open print file"));
     return (1);
   }
 
@@ -88,9 +88,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
       if (fwrite(buffer, 1, bytes, stdout) < bytes)
       {
-	fprintf(stderr,
-	        _("ERROR: Unable to write uncompressed document data: %s\n"),
-        	strerror(ferror(stdout)));
+	_cupsLangPrintFilter(stderr, "ERROR",
+			     _("Unable to write uncompressed print data: %s"),
+			     strerror(ferror(stdout)));
 	cupsFileClose(fp);
 
 	return (1);

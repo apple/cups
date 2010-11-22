@@ -170,7 +170,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (getuid() && getuid() != geteuid() && (op != CHANGE || username))
   {
     _cupsLangPuts(stderr,
-                  _("lppasswd: Only root can add or delete passwords\n"));
+                  _("lppasswd: Only root can add or delete passwords."));
     return (1);
   }
 
@@ -196,7 +196,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((oldpass = strdup(passwd)) == NULL)
     {
       _cupsLangPrintf(stderr,
-                      _("lppasswd: Unable to copy password string: %s\n"),
+                      _("lppasswd: Unable to copy password string: %s"),
 		      strerror(errno));
       return (1);
     }
@@ -215,7 +215,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if ((newpass = strdup(passwd)) == NULL)
     {
       _cupsLangPrintf(stderr,
-                      _("lppasswd: Unable to copy password string: %s\n"),
+                      _("lppasswd: Unable to copy password string: %s"),
 		      strerror(errno));
       return (1);
     }
@@ -227,7 +227,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (strcmp(passwd, newpass) != 0)
     {
       _cupsLangPuts(stderr,
-                    _("lppasswd: Sorry, passwords don't match\n"));
+                    _("lppasswd: Sorry, passwords don't match."));
       return (1);
     }
 
@@ -250,12 +250,10 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (strlen(newpass) < 6 || strstr(newpass, username) != NULL || flag != 3)
     {
-      _cupsLangPuts(stderr,
-                    _("lppasswd: Sorry, password rejected.\n"
-		      "Your password must be at least 6 characters long, "
-		      "cannot contain\n"
-		      "your username, and must contain at least one letter "
-		      "and number.\n"));
+      _cupsLangPuts(stderr, _("lppasswd: Sorry, password rejected."));
+      _cupsLangPuts(stderr, _("Your password must be at least 6 characters "
+                              "long, cannot contain your username, and must "
+			      "contain at least one letter and number."));
       return (1);
     }
   }
@@ -301,10 +299,9 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((fd = open(passwdnew, O_WRONLY | O_CREAT | O_EXCL, 0400)) < 0)
   {
     if (errno == EEXIST)
-      _cupsLangPuts(stderr, _("lppasswd: Password file busy\n"));
+      _cupsLangPuts(stderr, _("lppasswd: Password file busy."));
     else
-      _cupsLangPrintf(stderr,
-                      _("lppasswd: Unable to open password file: %s\n"),
+      _cupsLangPrintf(stderr, _("lppasswd: Unable to open password file: %s"),
 		      strerror(errno));
 
     return (1);
@@ -312,8 +309,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if ((outfile = fdopen(fd, "w")) == NULL)
   {
-    _cupsLangPrintf(stderr,
-                    _("lppasswd: Unable to open password file: %s\n"),
+    _cupsLangPrintf(stderr, _("lppasswd: Unable to open password file: %s"),
 		    strerror(errno));
 
     unlink(passwdnew);
@@ -330,8 +326,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   infile = fopen(passwdmd5, "r");
   if (infile == NULL && errno != ENOENT && op != ADD)
   {
-    _cupsLangPrintf(stderr,
-                    _("lppasswd: Unable to open password file: %s\n"),
+    _cupsLangPrintf(stderr, _("lppasswd: Unable to open password file: %s"),
 		    strerror(errno));
 
     fclose(outfile);
@@ -366,7 +361,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (fputs(line, outfile) == EOF)
       {
 	_cupsLangPrintf(stderr,
-                	_("lppasswd: Unable to write to password file: %s\n"),
+	                _("lppasswd: Unable to write to password file: %s"),
 			strerror(errno));
         error = 1;
 	break;
@@ -379,7 +374,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	if (fputs(line, outfile) == EOF)
 	{
 	  _cupsLangPrintf(stderr,
-                	  _("lppasswd: Unable to write to password file: %s\n"),
+                	  _("lppasswd: Unable to write to password file: %s"),
 			  strerror(errno));
 	  error = 1;
 	  break;
@@ -391,7 +386,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       (strcmp(username, userline) || strcmp(groupname, groupline)))
   {
     _cupsLangPrintf(stderr,
-                    _("lppasswd: user \"%s\" and group \"%s\" do not exist.\n"),
+                    _("lppasswd: user \"%s\" and group \"%s\" do not exist."),
         	    username, groupname);
     error = 1;
   }
@@ -400,8 +395,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (oldpass &&
         strcmp(httpMD5(username, "CUPS", oldpass, md5new), md5line) != 0)
     {
-      _cupsLangPuts(stderr,
-                    _("lppasswd: Sorry, password doesn't match\n"));
+      _cupsLangPuts(stderr, _("lppasswd: Sorry, password doesn't match."));
       error = 1;
     }
     else
@@ -411,7 +405,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (fputs(line, outfile) == EOF)
       {
 	_cupsLangPrintf(stderr,
-                	_("lppasswd: Unable to write to password file: %s\n"),
+                	_("lppasswd: Unable to write to password file: %s"),
 			strerror(errno));
         error = 1;
       }
@@ -434,7 +428,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (error)
   {
-    _cupsLangPuts(stderr, _("lppasswd: Password file not updated\n"));
+    _cupsLangPuts(stderr, _("lppasswd: Password file not updated."));
     
     unlink(passwdnew);
 
@@ -449,7 +443,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if (link(passwdmd5, passwdold) && errno != ENOENT)
   {
     _cupsLangPrintf(stderr,
-                    _("lppasswd: failed to backup old password file: %s\n"),
+                    _("lppasswd: failed to backup old password file: %s"),
 		    strerror(errno));
     unlink(passwdnew);
     return (1);
@@ -461,8 +455,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (rename(passwdnew, passwdmd5) < 0)
   {
-    _cupsLangPrintf(stderr,
-                    _("lppasswd: failed to rename password file: %s\n"),
+    _cupsLangPrintf(stderr, _("lppasswd: failed to rename password file: %s"),
 		    strerror(errno));
     unlink(passwdnew);
     return (1);
@@ -480,12 +473,12 @@ static void
 usage(FILE *fp)		/* I - File to send usage to */
 {
   if (getuid())
-    _cupsLangPuts(fp, _("Usage: lppasswd [-g groupname]\n"));
+    _cupsLangPuts(fp, _("Usage: lppasswd [-g groupname]"));
   else
     _cupsLangPuts(fp, 
                   _("Usage: lppasswd [-g groupname] [username]\n"
 		    "       lppasswd [-g groupname] -a [username]\n"
-		    "       lppasswd [-g groupname] -x [username]\n"));
+		    "       lppasswd [-g groupname] -x [username]"));
 
   exit(1);
 }

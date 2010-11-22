@@ -70,7 +70,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in\n"),
+	                    _("%s: Sorry, no encryption support."),
 	                    argv[0]);
 #endif /* HAVE_SSL */
 	    break;
@@ -85,7 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr,
-		              _("Error: need hostname after \'-h\' option\n"));
+		              _("Error: need hostname after \"-h\" option."));
 		return (1);
               }
 
@@ -94,7 +94,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \'%c\'\n"),
+	    _cupsLangPrintf(stderr, _("lpmove: Unknown option \"%c\"."),
 	                    argv[i][1]);
 	    return (1);
       }
@@ -116,14 +116,13 @@ main(int  argc,				/* I - Number of command-line arguments */
       dest = argv[i];
     else
     {
-      _cupsLangPrintf(stderr, _("lpmove: Unknown argument \'%s\'\n"),
-                      argv[i]);
+      _cupsLangPrintf(stderr, _("lpmove: Unknown argument \"%s\"."), argv[i]);
       return (1);
     }
 
   if ((!jobid && !src) || !dest)
   {
-    _cupsLangPuts(stdout, _("Usage: lpmove job/src dest\n"));
+    _cupsLangPuts(stdout, _("Usage: lpmove job/src dest"));
     return (1);
   }
 
@@ -131,8 +130,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (http == NULL)
   {
-    _cupsLangPrintf(stderr,
-		    _("lpmove: Unable to connect to server: %s\n"),
+    _cupsLangPrintf(stderr, _("lpmove: Unable to connect to server: %s"),
 		    strerror(errno));
     return (1);
   }
@@ -202,7 +200,7 @@ move_job(http_t     *http,		/* I - HTTP connection to server */
 
   if (cupsLastError() > IPP_OK_CONFLICT)
   {
-    _cupsLangPrintf(stderr, "lpmove: %s\n", cupsLastErrorString());
+    _cupsLangPrintf(stderr, "lpmove: %s", cupsLastErrorString());
     return (1);
   }
   else

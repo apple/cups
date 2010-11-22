@@ -27,9 +27,8 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
+#include <cups/cups-private.h>
 #include <cups/ppd.h>
-#include <cups/string-private.h>
 #include <cups/sidechannel.h>
 
 
@@ -70,7 +69,9 @@ main(int  argc,				/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: commandtops job-id user title copies options [file]\n", stderr);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options file"),
+                    argv[0]);
     return (1);
   }
 

@@ -83,7 +83,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
       _cupsLangPrintf(stderr,
-	              _("%s: Sorry, no encryption support compiled in\n"),
+	              _("%s: Sorry, no encryption support."),
 	              argv[0]);
 #endif /* HAVE_SSL */
     }
@@ -141,7 +141,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 	if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                        cupsEncryption())) == NULL)
 	{
-	  _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"), argv[0]);
+	  _cupsLangPrintf(stderr, _("%s: Unable to connect to server."),
+	                  argv[0]);
 	  exit(1);
 	}
       }
@@ -167,7 +168,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    _cupsLangPrintf(stderr, _("%s: Unable to connect to server\n"), argv[0]);
+    _cupsLangPrintf(stderr, _("%s: Unable to connect to server."), argv[0]);
     exit(1);
   }
 
@@ -229,8 +230,7 @@ export_dest(http_t     *http,		/* I - Connection to server */
   if (!cupsAdminCreateWindowsPPD(http, dest, ppdfile, sizeof(ppdfile)))
   {
     _cupsLangPrintf(stderr,
-                    _("cupsaddsmb: No PPD file for printer \"%s\" - "
-		      "%s\n"),
+                    _("cupsaddsmb: No PPD file for printer \"%s\" - %s"),
         	    dest, cupsLastErrorString());
     return (1);
   }
@@ -278,17 +278,19 @@ export_dest(http_t     *http,		/* I - Connection to server */
 void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: cupsaddsmb [options] printer1 ... printerN\n"
-		  "       cupsaddsmb [options] -a\n"
-		  "\n"
-		  "Options:\n"
-		  "  -E               Encrypt the connection to the server\n"
-		  "  -H samba-server  Use the named SAMBA server\n"
-		  "  -U samba-user    Authenticate using the named SAMBA user\n"
-		  "  -a               Export all printers\n"
-		  "  -h cups-server   Use the named CUPS server\n"
-		  "  -v               Be verbose (show commands)\n"));
+  _cupsLangPuts(stdout, _("Usage: cupsaddsmb [options] printer1 ... printerN"));
+  _cupsLangPuts(stdout, _("       cupsaddsmb [options] -a"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("  -E               Encrypt the connection to the "
+                          "server."));
+  _cupsLangPuts(stdout, _("  -H samba-server  Use the named SAMBA server."));
+  _cupsLangPuts(stdout, _("  -U samba-user    Authenticate using the named "
+                          "SAMBA user."));
+  _cupsLangPuts(stdout, _("  -a               Export all printers."));
+  _cupsLangPuts(stdout, _("  -h cups-server   Use the named CUPS server."));
+  _cupsLangPuts(stdout, _("  -v               Be verbose (show commands)."));
+
   exit(1);
 }
 

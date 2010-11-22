@@ -65,8 +65,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     op = IPP_RESUME_PRINTER;
   else
   {
-    _cupsLangPrintf(stderr, _("%s: Don't know what to do\n"),
-                    command);
+    _cupsLangPrintf(stderr, _("%s: Don't know what to do."), command);
     return (1);
   }
 
@@ -86,8 +85,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	    cupsSetEncryption(HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in\n"),
-	        	    command);
+	                    _("%s: Sorry, no encryption support."), command);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -101,8 +99,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option\n"),
-		        	command);
+				  "\"-U\" option."), command);
 	        return (1);
 	      }
 
@@ -124,8 +121,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected hostname after "
-				  "\'-h\' option\n"),
-		        	command);
+				  "\"-h\" option."), command);
 	        return (1);
 	      }
 
@@ -143,8 +139,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected reason text after "
-				  "\'-r\' option\n"),
-				command);
+				  "\"-r\" option."), command);
 		return (1);
 	      }
 
@@ -159,14 +154,14 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      op = IPP_RELEASE_HELD_NEW_JOBS;
 	    else
 	    {
-	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%s\'\n"),
+	      _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%s\"."),
 			      command, argv[i]);
 	      return (1);
 	    }
 	    break;
 
 	default :
-	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \'%c\'\n"),
+	    _cupsLangPrintf(stderr, _("%s: Error - unknown option \"%c\"."),
 	                    command, argv[i][1]);
 	    return (1);
       }
@@ -200,7 +195,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (cupsLastError() > IPP_OK_CONFLICT)
       {
 	_cupsLangPrintf(stderr,
-			_("%s: Operation failed: %s\n"),
+			_("%s: Operation failed: %s"),
 			command, ippErrorString(cupsLastError()));
 	return (1);
       }
@@ -229,7 +224,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
         if (cupsLastError() > IPP_OK_CONFLICT)
 	{
-	  _cupsLangPrintf(stderr, "%s: %s\n", command, cupsLastErrorString());
+	  _cupsLangPrintf(stderr, "%s: %s", command, cupsLastErrorString());
 	  return (1);
 	}
       }

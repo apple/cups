@@ -776,8 +776,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
 				  bytes, 5000) < 0)
 	    {
 	      _cupsLangPrintFilter(stderr, "ERROR",
-			           _("ERROR: Unable to send data to "
-				     "printer."));
+			           _("Unable to send data to printer."));
 	      tbytes = -1;
 	      break;
 	    }

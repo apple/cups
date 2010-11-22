@@ -982,7 +982,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     */
 
     _cupsLangPrintFilter(stderr, "ERROR",
-                         _("%s job-id user title copies options [file]\n"),
+                         _("%s job-id user title copies options [file]"),
                          "rastertoepson");
     return (1);
   }

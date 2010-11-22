@@ -195,7 +195,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 	        _cupsLangPuts(stderr, _("cupsd: Expected config filename "
-		                        "after \"-c\" option\n"));
+		                        "after \"-c\" option."));
 	        usage(1);
 	      }
 
@@ -226,14 +226,14 @@ main(int  argc,				/* I - Number of command-line args */
                 if ((current = malloc(1024)) == NULL)
 		{
 		  _cupsLangPuts(stderr,
-		                _("cupsd: Unable to get current directory\n"));
+		                _("cupsd: Unable to get current directory."));
                   return (1);
 		}
 
 		if (!getcwd(current, 1024))
 		{
 		  _cupsLangPuts(stderr,
-		                _("cupsd: Unable to get current directory\n"));
+		                _("cupsd: Unable to get current directory."));
                   free(current);
 		  return (1);
 		}
@@ -261,7 +261,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      fg      = 1;
 #else
 	      _cupsLangPuts(stderr, _("cupsd: launchd(8) support not compiled "
-	                              "in, running in normal mode.\n"));
+	                              "in, running in normal mode."));
               fg = 0;
 #endif /* HAVE_LAUNCHD */
 	      break;
@@ -294,13 +294,13 @@ main(int  argc,				/* I - Number of command-line args */
 
 	  default : /* Unknown option */
               _cupsLangPrintf(stderr, _("cupsd: Unknown option \"%c\" - "
-	                                "aborting\n"), *opt);
+	                                "aborting."), *opt);
 	      usage(1);
 	      break;
 	}
     else
     {
-      _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting\n"),
+      _cupsLangPrintf(stderr, _("cupsd: Unknown argument \"%s\" - aborting."),
                       argv[i]);
       usage(1);
     }
@@ -2190,15 +2190,20 @@ sigterm_handler(int sig)		/* I - Signal number */
 static void
 usage(int status)			/* O - Exit status */
 {
-  _cupsLangPuts(status ? stderr : stdout,
-                _("Usage: cupsd [-c config-file] [-f] [-F] [-h] [-l]\n"
-		  "\n"
-		  "-c config-file      Load alternate configuration file\n"
-		  "-f                  Run in the foreground\n"
-		  "-F                  Run in the foreground but detach from console\n"
-		  "-h                  Show this usage message\n"
-		  "-l                  Run cupsd from launchd(8)\n"
-		  "-t                  Test the configuration file\n"));
+  FILE	*fp = status ? stderr : stdout;	/* Output file */
+
+
+  _cupsLangPuts(fp, _("Usage: cupsd [options]"));
+  _cupsLangPuts(fp, _("Options:"));
+  _cupsLangPuts(fp, _("-c config-file      Load alternate configuration "
+                      "file."));
+  _cupsLangPuts(fp, _("-f                  Run in the foreground."));
+  _cupsLangPuts(fp, _("-F                  Run in the foreground but detach "
+                      "from console."));
+  _cupsLangPuts(fp, _("-h                  Show this usage message."));
+  _cupsLangPuts(fp, _("-l                  Run cupsd from launchd(8)."));
+  _cupsLangPuts(fp, _("-t                  Test the configuration file."));
+
   exit(status);
 }
 

@@ -28,10 +28,6 @@ dnssd.o: ../cups/http-private.h ../cups/http.h ../cups/md5-private.h
 dnssd.o: ../cups/ipp-private.h ../cups/ipp.h ../cups/language-private.h
 dnssd.o: ../cups/transcode.h ../cups/thread-private.h ../cups/snmp-private.h
 dnssd.o: ../cups/backend.h ../cups/sidechannel.h ../cups/array.h
-pap.o: ../config.h ../cups/cups.h ../cups/file.h ../cups/versioning.h
-pap.o: ../cups/ipp.h ../cups/http.h ../cups/array.h ../cups/language.h
-pap.o: ../cups/backend.h ../cups/sidechannel.h ../cups/language-private.h
-pap.o: ../cups/transcode.h
 parallel.o: backend-private.h ../cups/cups-private.h ../cups/cups.h
 parallel.o: ../cups/file.h ../cups/versioning.h ../cups/ipp.h ../cups/http.h
 parallel.o: ../cups/array.h ../cups/language.h ../cups/string-private.h

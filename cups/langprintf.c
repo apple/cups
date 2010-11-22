@@ -179,9 +179,11 @@ _cupsLangPrintf(FILE       *fp,		/* I - File to write to */
   */
 
   va_start(ap, message);
-  vsnprintf(buffer, sizeof(buffer),
+  vsnprintf(buffer, sizeof(buffer) - 1,
 	    _cupsLangString(cg->lang_default, message), ap);
   va_end(ap);
+
+  strlcat(buffer, "\n", sizeof(buffer));
 
  /*
   * Transcode to the destination charset...
@@ -233,7 +235,10 @@ _cupsLangPuts(FILE       *fp,		/* I - File to write to */
   bytes = cupsUTF8ToCharset(output,
 			    (cups_utf8_t *)_cupsLangString(cg->lang_default,
 							   message),
-			    sizeof(output), cg->lang_default->encoding);
+			    sizeof(output) - 4, cg->lang_default->encoding);
+  bytes += cupsUTF8ToCharset(output + bytes, (cups_utf8_t *)"\n",
+                             sizeof(output) - bytes,
+			     cg->lang_default->encoding);
 
  /*
   * Write the string and return the number of bytes written...

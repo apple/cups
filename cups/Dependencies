@@ -237,6 +237,10 @@ testppd.o: ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.h
 testppd.o: language-private.h ../cups/transcode.h thread-private.h
 testpwg.o: ppd-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testpwg.o: array.h language.h ../cups/ppd.h cups.h pwg-private.h
+testpwg.o: file-private.h cups-private.h string-private.h ../config.h
+testpwg.o: debug-private.h http-private.h ../cups/http.h md5-private.h
+testpwg.o: ipp-private.h ../cups/ipp.h language-private.h ../cups/transcode.h
+testpwg.o: thread-private.h
 testsnmp.o: cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testsnmp.o: array.h language.h string-private.h ../config.h debug-private.h
 testsnmp.o: ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
@@ -482,6 +486,10 @@ testppd.32.o: testppd.c  ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.
 testppd.32.o: testppd.c  language-private.h ../cups/transcode.h thread-private.h
 testpwg.32.o: testpwg.c  ppd-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testpwg.32.o: testpwg.c  array.h language.h ../cups/ppd.h cups.h pwg-private.h
+testpwg.32.o: testpwg.c  file-private.h cups-private.h string-private.h ../config.h
+testpwg.32.o: testpwg.c  debug-private.h http-private.h ../cups/http.h md5-private.h
+testpwg.32.o: testpwg.c  ipp-private.h ../cups/ipp.h language-private.h ../cups/transcode.h
+testpwg.32.o: testpwg.c  thread-private.h
 testsnmp.32.o: testsnmp.c  cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testsnmp.32.o: testsnmp.c  array.h language.h string-private.h ../config.h debug-private.h
 testsnmp.32.o: testsnmp.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
@@ -727,6 +735,10 @@ testppd.64.o: testppd.c  ../cups/http.h md5-private.h ipp-private.h ../cups/ipp.
 testppd.64.o: testppd.c  language-private.h ../cups/transcode.h thread-private.h
 testpwg.64.o: testpwg.c  ppd-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testpwg.64.o: testpwg.c  array.h language.h ../cups/ppd.h cups.h pwg-private.h
+testpwg.64.o: testpwg.c  file-private.h cups-private.h string-private.h ../config.h
+testpwg.64.o: testpwg.c  debug-private.h http-private.h ../cups/http.h md5-private.h
+testpwg.64.o: testpwg.c  ipp-private.h ../cups/ipp.h language-private.h ../cups/transcode.h
+testpwg.64.o: testpwg.c  thread-private.h
 testsnmp.64.o: testsnmp.c  cups-private.h ../cups/cups.h file.h versioning.h ipp.h http.h
 testsnmp.64.o: testsnmp.c  array.h language.h string-private.h ../config.h debug-private.h
 testsnmp.64.o: testsnmp.c  ppd-private.h ../cups/ppd.h cups.h pwg-private.h http-private.h
