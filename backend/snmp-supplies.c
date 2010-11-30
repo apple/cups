@@ -66,7 +66,9 @@ static http_addr_t	current_addr;	/* Current address */
 static int		current_state = -1;
 					/* Current device state bits */
 static int		charset = -1;	/* Character set for supply names */
-static int		num_supplies = 0;
+static int		laser_printer = -1,
+					/* Laser printer with toner? */
+			num_supplies = 0;
 					/* Number of supplies found */
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
 					/* Supply information */
@@ -197,7 +199,6 @@ backendSNMPSupplies(
 					/* marker-levels value string */
 		*ptr;			/* Pointer into value string */
     cups_snmp_t	packet;			/* SNMP response packet */
-      
 
    /*
     * Generate the marker-levels value string...
@@ -242,13 +243,33 @@ backendSNMPSupplies(
     else
       change_state = current_state ^ new_state;
 
+    fprintf(stderr, "DEBUG: new_state=%x, change_state=%x, laser_printer=%d\n",
+            new_state, change_state, laser_printer);
+
     for (i = 0;
          i < (int)(sizeof(printer_states) / sizeof(printer_states[0]));
          i ++)
       if (change_state & printer_states[i].bit)
-	fprintf(stderr, "STATE: %c%s\n",
-	        (new_state & printer_states[i].bit) ? '+' : '-',
-		printer_states[i].keyword);
+      {
+        if (!laser_printer && !strncmp(printer_states[i].keyword, "toner-", 6))
+	{
+	 /*
+	  * Map toner-xxx to marker-supply-xxx to avoid confusing "out of toner"
+	  * messages on inkjet print queues...
+	  */
+
+	  if (printer_states[i].bit == CUPS_TC_lowToner)
+	    fprintf(stderr, "STATE: %cmarker-supply-low-report\n",
+	            (new_state & CUPS_TC_lowToner) ? '+' : '-');
+          else
+	    fprintf(stderr, "STATE: %cmarker-supply-empty-warning\n",
+	            (new_state & CUPS_TC_noToner) ? '+' : '-');
+	}
+	else
+	  fprintf(stderr, "STATE: %c%s\n",
+		  (new_state & printer_states[i].bit) ? '+' : '-',
+		  printer_states[i].keyword);
+      }
 
     current_state = new_state;
 
@@ -590,12 +611,17 @@ backend_init_supplies(
   * Output the marker-types attribute...
   */
 
+  laser_printer = 0;
+
   for (i = 0, ptr = value; i < num_supplies; i ++, ptr += strlen(ptr))
   {
     if (i)
       *ptr++ = ',';
 
     type = supplies[i].type;
+
+    if (type == CUPS_TC_toner)
+      laser_printer = 1;
 
     if (type < CUPS_TC_other || type > CUPS_TC_covers)
       strcpy(ptr, "unknown");

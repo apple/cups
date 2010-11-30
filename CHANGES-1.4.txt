@@ -7,6 +7,8 @@ CHANGES IN CUPS V1.4.7
 	  the print filters (STR #3731)
 	- The PostScript filter did not apply the mirror and number-up options
 	  properly, leading to offset and clipped output (STR #3732)
+	- The network backends always reported "low toner" or "out of toner"
+	  states, even for inkjet printers (STR #3733)
 
 
 CHANGES IN CUPS V1.4.6
