@@ -694,6 +694,13 @@
 #undef CUPS_BUNDLEDIR
 
 
+/*
+ * Do we have the ColorSyncRegisterDevice function?
+ */
+
+#undef HAVE_COLORSYNCREGISTERDEVICE
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*
