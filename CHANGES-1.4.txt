@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.6
 
 	- Regression: The pstops filter did not support landscape printing of
 	  PostScript files (STR #3722)
+	- The scheduler did not always show the most recent status message from
+	  the print filters.
 	- The scheduler killed retried (fax) jobs after restarting them
 	  (STR #3697)
 	- The cupsAdminSetServerSettings() function disabled sharing when
