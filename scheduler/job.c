@@ -4427,7 +4427,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 
 	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 
-	if (loglevel < job->status_level)
+	if (loglevel <= job->status_level && job->status_level > CUPSD_LOG_ERROR)
 	{
 	 /*
 	  * Some messages show in the job-printer-state-message attribute...
