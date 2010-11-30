@@ -25,8 +25,7 @@
  * Include necessary headers...
  */
 
-#include <cups/string-private.h>
-#include <cups/cups.h>
+#include <cups/cups-private.h>
 #include <cups/ppd.h>
 
 
@@ -58,7 +57,9 @@ main(int  argc,				/* I - Number of command-line args */
 
   if (argc < 6 || argc > 7)
   {
-    fputs("ERROR: tbcp job-id user title copies options [file]\n", stderr);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]"),
+		    argv[0]);
     return (1);
   }
 

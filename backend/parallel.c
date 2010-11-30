@@ -1,9 +1,9 @@
 /*
  * "$Id: parallel.c 7810 2008-07-29 01:11:15Z mike $"
  *
- *   Parallel port backend for the Common UNIX Printing System (CUPS).
+ *   Parallel port backend for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -124,7 +124,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   else if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
-		    _("Usage: %s job-id user title copies options [file]\n"),
+		    _("Usage: %s job-id user title copies options [file]"),
 		    argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
@@ -147,9 +147,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((print_fd = open(argv[6], O_RDONLY)) < 0)
     {
-      _cupsLangPrintf(stderr,
-                      _("ERROR: Unable to open print file \"%s\": %s\n"),
-		      argv[6], strerror(errno));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (CUPS_BACKEND_FAILED);
     }
 
@@ -217,9 +215,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	* available printer in the class.
 	*/
 
-        _cupsLangPuts(stderr,
-	              _("INFO: Unable to contact printer, queuing on next "
-			"printer in class...\n"));
+        _cupsLangPrintFilter(stderr, "INFO",
+			     _("Unable to contact printer, queuing on next "
+			       "printer in class."));
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -232,22 +230,20 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
       if (errno == EBUSY)
       {
-        _cupsLangPuts(stderr,
-	              _("INFO: Printer busy; will retry in 30 seconds...\n"));
+        _cupsLangPrintFilter(stderr, "INFO",
+	                     _("Printer busy; will retry in 30 seconds."));
 	sleep(30);
       }
       else if (errno == ENXIO || errno == EIO || errno == ENOENT)
       {
-        _cupsLangPuts(stderr,
-	              _("INFO: Printer not connected; will retry in 30 "
-		        "seconds...\n"));
+        _cupsLangPrintFilter(stderr, "INFO",
+	                     _("Printer not connected; will retry in 30 "
+		               "seconds."));
 	sleep(30);
       }
       else
       {
-	_cupsLangPrintf(stderr,
-		        _("ERROR: Unable to open device file \"%s\": %s\n"),
-			resource, strerror(errno));
+	_cupsLangPrintError("ERROR", _("Unable to open device file"));
 	return (CUPS_BACKEND_FAILED);
       }
     }
@@ -287,13 +283,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     tbytes = backendRunLoop(print_fd, device_fd, -1, NULL, use_bc, 1, side_cb);
 
     if (print_fd != 0 && tbytes >= 0)
-      _cupsLangPrintf(stderr,
-#ifdef HAVE_LONG_LONG
-		      _("INFO: Sent print file, %lld bytes...\n"),
-#else
-		      _("INFO: Sent print file, %ld bytes...\n"),
-#endif /* HAVE_LONG_LONG */
-		      CUPS_LLCAST tbytes);
+      _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
   }
 
  /*

@@ -3,7 +3,7 @@
 //
 //   PPD file message catalog program for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2008 by Apple Inc.
+//   Copyright 2007-2010 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -90,7 +90,7 @@ main(int  argc,				// I - Number of command-line arguments
 
               if (verbose > 1)
 	        _cupsLangPrintf(stdout,
-		                _("ppdc: Adding include directory \"%s\"...\n"),
+		                _("ppdc: Adding include directory \"%s\"."),
 				argv[i]);
 
 	      ppdcSource::add_include(argv[i]);
@@ -120,7 +120,7 @@ main(int  argc,				// I - Number of command-line arguments
       // Open and load the driver info file...
       if (verbose > 1)
         _cupsLangPrintf(stdout,
-	                _("ppdc: Loading driver information file \"%s\"...\n"),
+	                _("ppdc: Loading driver information file \"%s\"."),
 			argv[i]);
 
       src = new ppdcSource(argv[i]);
@@ -131,8 +131,7 @@ main(int  argc,				// I - Number of command-line arguments
 	   d = (ppdcDriver *)src->drivers->next())
       {
 	if (verbose)
-	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Adding/updating UI text from %s...\n"),
+	  _cupsLangPrintf(stderr, _("ppdc: Adding/updating UI text from %s."),
 			  argv[i]);
 
         add_ui_strings(d, catalog);
@@ -250,14 +249,15 @@ add_ui_strings(ppdcDriver  *d,		// I - Driver data
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: ppdpo [options] -o filename.po filename.drv [ ... "
-		  "filenameN.drv ]\n"
-		  "Options:\n"
-		  "  -D name=value        Set named variable to value.\n"
-		  "  -I include-dir    Add include directory to search path.\n"
-		  "  -v                Be verbose (more v's for more "
-		  "verbosity).\n"));
+  _cupsLangPuts(stdout, _("Usage: ppdpo [options] -o filename.po filename.drv "
+                          "[ ... filenameN.drv ]"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("  -D name=value     Set named variable to "
+                          "value."));
+  _cupsLangPuts(stdout, _("  -I include-dir    Add include directory to search "
+                          "path."));
+  _cupsLangPuts(stdout, _("  -v                Be verbose (more v's for more "
+		          "verbosity)."));
 
   exit(1);
 }

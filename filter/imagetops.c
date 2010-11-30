@@ -112,8 +112,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    fprintf(stderr, _("Usage: %s job-id user title copies options [file]\n"),
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options file"),
+                    argv[0]);
     return (1);
   }
 
@@ -130,11 +131,11 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if ((fd = cupsTempFd(filename, sizeof(filename))) < 0)
     {
-      perror("ERROR: Unable to copy image file");
+      _cupsLangPrintError("ERROR", _("Unable to copy print file"));
       return (1);
     }
 
-    fprintf(stderr, "DEBUG: imagetoraster - copying to temp print file \"%s\"\n",
+    fprintf(stderr, "DEBUG: imagetops - copying to temp print file \"%s\".\n",
             filename);
 
     while ((bytes = fread(buffer, 1, sizeof(buffer), stdin)) > 0)
@@ -310,7 +311,8 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (img == NULL)
   {
-    fputs(_("ERROR: Unable to open image file for printing\n"), stderr);
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("The print file could not be opened."));
     ppdClose(ppd);
     return (1);
   }
@@ -805,7 +807,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         if (ppd && ppd->num_filters == 0)
           fprintf(stderr, "PAGE: %d %d\n", page, realcopies);
 
-	fprintf(stderr, _("INFO: Printing page %d...\n"), page);
+	_cupsLangPrintFilter(stderr, "INFO", _("Printing page %d."), page);
 
         printf("%%%%Page: %d %d\n", page, page);
 

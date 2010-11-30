@@ -148,7 +148,7 @@ main(int  argc,				/* I - Number of command-line args */
   if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
                                  cupsEncryption())) == NULL)
   {
-    _cupsLangPrintf(stderr, _("cupsctl: Unable to connect to server: %s\n"),
+    _cupsLangPrintf(stderr, _("cupsctl: Unable to connect to server: %s"),
                     strerror(errno));
     return (1);
   }
@@ -161,19 +161,19 @@ main(int  argc,				/* I - Number of command-line args */
   {
     if (!cupsAdminSetServerSettings(http, num_settings, settings))
     {
-      _cupsLangPrintf(stderr, "cupsctl: %s\n", cupsLastErrorString());
+      _cupsLangPrintf(stderr, "cupsctl: %s", cupsLastErrorString());
       return (1);
     }
   }
   else if (!cupsAdminGetServerSettings(http, &num_settings, &settings))
   {
-    _cupsLangPrintf(stderr, "cupsctl: %s\n", cupsLastErrorString());
+    _cupsLangPrintf(stderr, "cupsctl: %s", cupsLastErrorString());
     return (1);
   }
   else
   {
     for (i = 0; i < num_settings; i ++)
-      _cupsLangPrintf(stdout, "%s=%s\n", settings[i].name, settings[i].value);
+      _cupsLangPrintf(stdout, "%s=%s", settings[i].name, settings[i].value);
   }
 
   cupsFreeOptions(num_settings, settings);
@@ -191,29 +191,33 @@ usage(const char *opt)			/* I - Option character/string */
   if (opt)
   {
     if (*opt == '-')
-      _cupsLangPrintf(stderr, _("cupsctl: Unknown option \"%s\"\n"), opt);
+      _cupsLangPrintf(stderr, _("cupsctl: Unknown option \"%s\""), opt);
     else
-      _cupsLangPrintf(stderr, _("cupsctl: Unknown option \"-%c\"\n"), *opt);
+      _cupsLangPrintf(stderr, _("cupsctl: Unknown option \"-%c\""), *opt);
   }
 
-  _cupsLangPuts(stdout,
-                _("Usage: cupsctl [options] [param=value ... paramN=valueN]\n"
-		  "\n"
-		  "Options:\n"
-		  "\n"
-		  "    -E                      Enable encryption\n"
-		  "    -U username             Specify username\n"
-		  "    -h server[:port]        Specify server address\n"
-		  "\n"
-		  "    --[no-]debug-logging    Turn debug logging on/off\n"
-		  "    --[no-]remote-admin     Turn remote administration "
-		  "on/off\n"
-		  "    --[no-]remote-any       Allow/prevent access from the "
-		  "Internet\n"
-		  "    --[no-]remote-printers  Show/hide remote printers\n"
-		  "    --[no-]share-printers   Turn printer sharing on/off\n"
-		  "    --[no-]user-cancel-any  Allow/prevent users to cancel "
-		  "any job\n"));
+  _cupsLangPuts(stdout, _("Usage: cupsctl [options] [param=value ... "
+                          "paramN=valueN]"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("    -E                      Enable encryption."));
+  _cupsLangPuts(stdout, _("    -U username             Specify username."));
+  _cupsLangPuts(stdout, _("    -h server[:port]        Specify server "
+                          "address."));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("    --[no-]debug-logging    Turn debug logging "
+                          "on/off."));
+  _cupsLangPuts(stdout, _("    --[no-]remote-admin     Turn remote "
+                          "administration on/off."));
+  _cupsLangPuts(stdout, _("    --[no-]remote-any       Allow/prevent access "
+                          "from the Internet."));
+  _cupsLangPuts(stdout, _("    --[no-]remote-printers  Show/hide remote "
+                          "printers."));
+  _cupsLangPuts(stdout, _("    --[no-]share-printers   Turn printer sharing "
+                          "on/off."));
+  _cupsLangPuts(stdout, _("    --[no-]user-cancel-any  Allow/prevent users to "
+                          "cancel any job."));
 
   exit(1);
 }

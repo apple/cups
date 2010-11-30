@@ -687,6 +687,13 @@
 #undef HAVE_SYS_VFS_H
 
 
+/*
+ * Location of Mac OS X localization bundle, if any.
+ */
+
+#undef CUPS_BUNDLEDIR
+
+
 #endif /* !_CUPS_CONFIG_H_ */
 
 /*

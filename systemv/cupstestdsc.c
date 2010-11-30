@@ -156,7 +156,8 @@ check_file(const char *filename)	/* I - File to read from */
   status           = 0;
   version          = 0.0f;
 
-  _cupsLangPrintf(stdout, "%s: ", filename);
+  /* TODO: Fixme */
+  printf("%s: ", filename);
   fflush(stdout);
 
   while ((bytes = cupsFileGetLine(fp, line, sizeof(line))) > 0)
@@ -168,12 +169,12 @@ check_file(const char *filename)	/* I - File to read from */
       if (!saw_long_line)
       {
 	if (!status)
-          _cupsLangPuts(stdout, _("FAIL\n"));
+          _cupsLangPuts(stdout, _("FAIL"));
 
 	status ++;
 	_cupsLangPrintf(stdout,
-                	_("    Line %d is longer than 255 characters (%d)\n"
-		          "        REF: Page 25, Line Length\n"),
+                	_("    Line %d is longer than 255 characters (%d).\n"
+		          "        REF: Page 25, Line Length"),
 			linenum, (int)bytes);
       }
 
@@ -185,11 +186,11 @@ check_file(const char *filename)	/* I - File to read from */
       if (strncmp(line, "%!PS-Adobe-", 11))
       {
 	if (!status)
-          _cupsLangPuts(stdout, _("FAIL\n"));
+          _cupsLangPuts(stdout, _("FAIL"));
 
 	_cupsLangPuts(stdout,
-	              _("    Missing %!PS-Adobe-3.0 on first line\n"
-		        "        REF: Page 17, 3.1 Conforming Documents\n"));
+	              _("    Missing %!PS-Adobe-3.0 on first line.\n"
+		        "        REF: Page 17, 3.1 Conforming Documents"));
 	cupsFileClose(fp);
 	return (1);
       }
@@ -210,12 +211,12 @@ check_file(const char *filename)	/* I - File to read from */
         if (atoi(line + 8) <= 0)
 	{
 	  if (!status)
-            _cupsLangPuts(stdout, _("FAIL\n"));
+            _cupsLangPuts(stdout, _("FAIL"));
 
 	  status ++;
 	  _cupsLangPrintf(stdout,
-	                  _("    Bad %%%%Pages: on line %d\n"
-		            "        REF: Page 43, %%%%Pages:\n"),
+	                  _("    Bad %%%%Pages: on line %d.\n"
+		            "        REF: Page 43, %%%%Pages:"),
 			  linenum);
 	}
 	else
@@ -227,11 +228,11 @@ check_file(const char *filename)	/* I - File to read from */
 	           lbrt + 3) != 4)
         {
 	  if (!status)
-            _cupsLangPuts(stdout, _("FAIL\n"));
+            _cupsLangPuts(stdout, _("FAIL"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d\n"
-		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d.\n"
+		        	    "        REF: Page 39, %%%%BoundingBox:"),
 			  linenum);
 	}
 	else
@@ -251,11 +252,11 @@ check_file(const char *filename)	/* I - File to read from */
 	else if (atoi(line + 8) <= 0)
 	{
 	  if (!status)
-            _cupsLangPuts(stdout, _("FAIL\n"));
+            _cupsLangPuts(stdout, _("FAIL"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%Pages: on line %d\n"
-		        	    "        REF: Page 43, %%%%Pages:\n"),
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Pages: on line %d.\n"
+		        	    "        REF: Page 43, %%%%Pages:"),
 			  linenum);
 	}
 	else
@@ -269,11 +270,11 @@ check_file(const char *filename)	/* I - File to read from */
 	                lbrt + 3) != 4)
         {
 	  if (!status)
-            _cupsLangPuts(stdout, _("FAIL\n"));
+            _cupsLangPuts(stdout, _("FAIL"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d\n"
-		        	    "        REF: Page 39, %%%%BoundingBox:\n"),
+	  _cupsLangPrintf(stdout, _("    Bad %%%%BoundingBox: on line %d.\n"
+		        	    "        REF: Page 39, %%%%BoundingBox:"),
 			  linenum);
 	}
 	else
@@ -298,11 +299,11 @@ check_file(const char *filename)	/* I - File to read from */
 	    page_number != (last_page_number + 1) || page_number < 1)
 	{
 	  if (!status)
-            _cupsLangPuts(stdout, _("FAIL\n"));
+            _cupsLangPuts(stdout, _("FAIL"));
 
 	  status ++;
-	  _cupsLangPrintf(stdout, _("    Bad %%%%Page: on line %d\n"
-		        	    "        REF: Page 53, %%%%Page:\n"),
+	  _cupsLangPrintf(stdout, _("    Bad %%%%Page: on line %d.\n"
+		        	    "        REF: Page 53, %%%%Page:"),
 		          linenum);
 	}
 	else
@@ -335,78 +336,78 @@ check_file(const char *filename)	/* I - File to read from */
   if (saw_bounding_box <= 0)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%BoundingBox: comment\n"
-		            "        REF: Page 39, %%BoundingBox:\n"));
+    _cupsLangPuts(stdout, _("    Missing or bad %%BoundingBox: comment.\n"
+		            "        REF: Page 39, %%BoundingBox:"));
   }
 
   if (saw_pages <= 0)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%Pages: comment\n"
-		            "        REF: Page 43, %%Pages:\n"));
+    _cupsLangPuts(stdout, _("    Missing or bad %%Pages: comment.\n"
+		            "        REF: Page 43, %%Pages:"));
   }
 
   if (!saw_end_comments)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing %%EndComments comment\n"
-		            "        REF: Page 41, %%EndComments\n"));
+    _cupsLangPuts(stdout, _("    Missing %%EndComments comment."
+		            "        REF: Page 41, %%EndComments"));
   }
 
   if (!saw_page)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Missing or bad %%Page: comments\n"
-		            "        REF: Page 53, %%Page:\n"));
+    _cupsLangPuts(stdout, _("    Missing or bad %%Page: comments.\n"
+		            "        REF: Page 53, %%Page:"));
   }
 
   if (level < 0)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Too many %%EndDocument comments\n"));
+    _cupsLangPuts(stdout, _("    Too many %%EndDocument comments."));
   }
   else if (level > 0)
   {
     if (!status)
-      _cupsLangPuts(stdout, _("FAIL\n"));
+      _cupsLangPuts(stdout, _("FAIL"));
 
     status ++;
-    _cupsLangPuts(stdout, _("    Too many %%BeginDocument comments\n"));
+    _cupsLangPuts(stdout, _("    Too many %%BeginDocument comments."));
   }
 
   if (saw_long_line > 1)
     _cupsLangPrintf(stderr,
-                    _("    Saw %d lines that exceeded 255 characters\n"),
+                    _("    Saw %d lines that exceeded 255 characters."),
                     saw_long_line);
 
   if (!status)
-    _cupsLangPuts(stdout, _("PASS\n"));
+    _cupsLangPuts(stdout, _("PASS"));
 
   if (binary)
-    _cupsLangPuts(stdout, _("    Warning: file contains binary data\n"));
+    _cupsLangPuts(stdout, _("    Warning: file contains binary data."));
 
   if (version < 3.0f)
     _cupsLangPrintf(stdout,
-                    _("    Warning: obsolete DSC version %.1f in file\n"),
+                    _("    Warning: obsolete DSC version %.1f in file."),
 		    version);
 
   if (saw_end_comments < 0)
-    _cupsLangPuts(stdout, _("    Warning: no %%EndComments comment in file\n"));
+    _cupsLangPuts(stdout, _("    Warning: no %%EndComments comment in file."));
 
   cupsFileClose(fp);
 
@@ -421,17 +422,17 @@ check_file(const char *filename)	/* I - File to read from */
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: cupstestdsc [options] filename.ps [... filename.ps]\n"
-                  "       cupstestdsc [options] -\n"
-		  "\n"
-		  "Options:\n"
-		  "\n"
-		  "    -h       Show program usage\n"
-		  "\n"
-		  "    Note: this program only validates the DSC comments, "
-		  "not the PostScript itself.\n"));
-  
+  _cupsLangPuts(stdout, _("Usage: cupstestdsc [options] filename.ps [... "
+                          "filename.ps]"));
+  _cupsLangPuts(stdout, _("       cupstestdsc [options] -"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("    -h       Show program usage"));
+  _cupsLangPuts(stdout, "");
+  _cupsLangPuts(stdout, _("Note: this program only validates the DSC comments, "
+		          "not the PostScript itself."));
+
   exit(1);
 }
 

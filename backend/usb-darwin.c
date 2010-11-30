@@ -373,7 +373,8 @@ print_device(const char *uri,		/* I - Device URI */
   if (!g.make || !g.model)
   {
     fprintf(stderr, "DEBUG: Fatal USB error.\n");
-    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("There was an unrecoverable USB error."));
 
     if (!g.make)
       fputs("DEBUG: USB make string is NULL\n", stderr);
@@ -431,7 +432,8 @@ print_device(const char *uri,		/* I - Device URI */
         strlcpy(print_buffer, "USB class driver", sizeof(print_buffer));
 
       fputs("STATE: +apple-missing-usbclassdriver-error\n", stderr);
-      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
+      _cupsLangPrintFilter(stderr, "ERROR",
+			   _("There was an unrecoverable USB error."));
       fprintf(stderr, "DEBUG: Could not load %s\n", print_buffer);
 
       if (driverBundlePath)
@@ -449,8 +451,8 @@ print_device(const char *uri,		/* I - Device URI */
       countdown -= PRINTER_POLLING_INTERVAL;
       if (countdown <= 0)
       {
-	_cupsLangPuts(stderr,
-		      _("INFO: Waiting for printer to become available...\n"));
+	_cupsLangPrintFilter(stderr, "INFO",
+		             _("Waiting for printer to become available."));
 	fprintf(stderr, "DEBUG: USB printer status: 0x%08x\n", (int)status);
 	countdown = SUBSEQUENT_LOG_INTERVAL;	/* subsequent log entries, every 15 seconds */
       }
@@ -497,7 +499,8 @@ print_device(const char *uri,		/* I - Device URI */
     if (pthread_create(&sidechannel_thread_id, NULL, sidechannel_thread, NULL))
     {
       fprintf(stderr, "DEBUG: Fatal USB error.\n");
-      _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
+      _cupsLangPrintFilter(stderr, "ERROR",
+			   _("There was an unrecoverable USB error."));
       fputs("DEBUG: Couldn't create side-channel thread\n", stderr);
       registry_close();
       return (CUPS_BACKEND_STOP);
@@ -517,7 +520,8 @@ print_device(const char *uri,		/* I - Device URI */
   if (pthread_create(&read_thread_id, NULL, read_thread, NULL))
   {
     fprintf(stderr, "DEBUG: Fatal USB error.\n");
-    _cupsLangPuts(stderr, _("ERROR: There was an unrecoverable USB error.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("There was an unrecoverable USB error."));
     fputs("DEBUG: Couldn't create read thread\n", stderr);
     registry_close();
     return (CUPS_BACKEND_STOP);
@@ -534,7 +538,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   while (status == noErr && copies-- > 0)
   {
-    _cupsLangPuts(stderr, _("INFO: Sending print data...\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Sending data to printer."));
 
     if (print_fd != STDIN_FILENO)
     {
@@ -603,7 +607,8 @@ print_device(const char *uri,		/* I - Device URI */
 	}
 	else if (errno != EAGAIN && errno != EINTR)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unable to read print data."));
 	  perror("DEBUG: select");
 	  registry_close();
           return (CUPS_BACKEND_FAILED);
@@ -646,7 +651,8 @@ print_device(const char *uri,		/* I - Device URI */
 
 	  if (errno != EAGAIN && errno != EINTR)
 	  {
-	    _cupsLangPuts(stderr, _("ERROR: Unable to read print data.\n"));
+	    _cupsLangPrintFilter(stderr, "ERROR",
+				 _("Unable to read print data."));
 	    perror("DEBUG: read");
 	    registry_close();
 	    return (CUPS_BACKEND_FAILED);
@@ -722,7 +728,8 @@ print_device(const char *uri,		/* I - Device URI */
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
 	  */
-	  _cupsLangPuts(stderr, _("ERROR: Unable to send print data to printer.\n"));
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unable to send data to printer."));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
 	          iostatus);
 
@@ -1279,7 +1286,7 @@ static Boolean find_device_cb(void *refcon,
   if (!keepLooking && g.status_timer != NULL)
   {
     fputs("STATE: -offline-report\n", stderr);
-    _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Printer is now online."));
     CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), g.status_timer, kCFRunLoopDefaultMode);
     CFRelease(g.status_timer);
     g.status_timer = NULL;
@@ -1297,7 +1304,7 @@ static void status_timer_cb(CFRunLoopTimerRef timer,
 			    void *info)
 {
   fputs("STATE: +offline-report\n", stderr);
-  _cupsLangPuts(stderr, _("INFO: Printer is offline.\n"));
+  _cupsLangPrintFilter(stderr, "INFO", _("Printer is offline."));
 
   if (getenv("CLASS") != NULL)
   {
@@ -1843,9 +1850,9 @@ static void parse_options(char *options,
 	       !strcasecmp(value, "false"))
 	*wait_eof = false;
       else
-	_cupsLangPrintf(stderr,
-	                _("WARNING: Boolean expected for waiteof option "
-			  "\"%s\"\n"), value);
+	_cupsLangPrintFilter(stderr, "WARNING",
+			     _("Boolean expected for waiteof option \"%s\"."),
+			     value);
     }
     else if (!strcasecmp(name, "serial"))
       strlcpy(serial, value, serial_size);
@@ -1982,7 +1989,8 @@ static void run_legacy_backend(int argc,
 #  else
 	perror("DEBUG: Unable to set binary preference to ppc");
 #  endif /* __x86_64__ */
-	_cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
+	_cupsLangPrintFilter(stderr, "ERROR",
+	                     _("Unable to use legacy USB class driver."));
 	exit(CUPS_BACKEND_STOP);
       }
     }
@@ -2005,7 +2013,8 @@ static void run_legacy_backend(int argc,
     {
       fprintf(stderr, "DEBUG: Unable to exec %s: %s\n", usbpath,
               strerror(err));
-      _cupsLangPrintf(stderr, _("Unable to use legacy USB class driver\n"));
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unable to use legacy USB class driver."));
       exit(CUPS_BACKEND_STOP);
     }
 

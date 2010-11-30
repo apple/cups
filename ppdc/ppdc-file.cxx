@@ -46,7 +46,7 @@ ppdcFile::ppdcFile(const char  *f,		// I - File to open
   line     = 1;
 
   if (!fp)
-    _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s\n"), "ppdc", f,
+    _cupsLangPrintf(stderr, _("ppdc: Unable to open %s: %s"), f,
                     strerror(errno));
 }
 

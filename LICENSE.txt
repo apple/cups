@@ -1,6 +1,6 @@
                           CUPS License Agreement
 
-		      Copyright 2007-2009 by Apple Inc.
+		      Copyright 2007-2010 by Apple Inc.
 			     1 Infinite Loop
 			  Cupertino, CA 95014 USA
 
@@ -16,10 +16,8 @@ copy of the exceptions and licenses follow this introduction.
 
 The GNU LGPL applies to the CUPS and CUPS Imaging libraries
 located in the "cups" and "filter" subdirectories of the CUPS
-source distribution and in the "cups" include directory and
-library files in the binary distributions. The GNU GPL applies to
-the remainder of the CUPS distribution, including the "pdftops"
-filter which is based upon Xpdf.
+source distribution and the files in the "test" subdirectory. The
+GNU GPL applies to the remainder of the CUPS distribution.
 
 For those not familiar with the GNU GPL, the license basically
 allows you to:

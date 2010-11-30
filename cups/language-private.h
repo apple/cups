@@ -47,36 +47,6 @@ typedef struct _cups_message_s		/**** Message catalog entry ****/
 	*str;				/* Localized string */
 } _cups_message_t;
 
-typedef struct _cups_cmap_s		/**** SBCS Charmap Struct ****/
-{
-  struct _cups_cmap_s	*next;		/* Next charmap in cache */
-  int			used;		/* Number of times entry used */
-  cups_encoding_t	encoding;	/* Legacy charset encoding */
-  cups_ucs2_t		char2uni[256];	/* Map Legacy SBCS -> UCS-2 */
-  cups_sbcs_t		*uni2char[256]; /* Map UCS-2 -> Legacy SBCS */
-} _cups_cmap_t;
-
-typedef struct _cups_wide2uni_s		/**** Wide to Unicode ****/
-{
-  cups_vbcs_t		widechar;	/* VBCS 32-bit Char (EUC) */
-  cups_ucs2_t		unichar;	/* UCS-2 Char */
-} _cups_wide2uni_t;
-
-typedef struct _cups_vmap_s		/**** VBCS Charmap Struct ****/
-{
-  struct _cups_vmap_s	*next;		/* Next charmap in cache */
-  int			used;		/* Number of times entry used */
-  cups_encoding_t	encoding;	/* Legacy charset encoding */
-  cups_ucs2_t		*char2uni[256]; /* Map 16-bit Char -> UCS-2 */
-  int			charcount;	/* Count of 16-bit VBCS Chars */
-  _cups_wide2uni_t	*wide2uni;	/* Map 32-bit Char -> UCS-2 */
-  int			widecount;	/* Count of 32-bit VBCS Chars */
-  cups_vbcs_t		*uni2char[256]; /* Map UCS-2 -> 32-bit VBCS */
-  cups_sbcs_t		lead2char[256]; /* Legacy Lead Char - 2-byte */
-  cups_sbcs_t		lead3char[256]; /* Legacy Lead Char - 3-byte */
-  cups_sbcs_t		lead4char[256]; /* Legacy Lead Char - 4-byte */
-} _cups_vmap_t;
-
 
 /*
  * Prototypes...
@@ -88,14 +58,22 @@ extern const char	*_cupsAppleLanguage(const char *locale, char *language,
 #  endif /* __APPLE__ */
 extern void		_cupsCharmapFlush(void);
 extern const char	*_cupsEncodingName(cups_encoding_t encoding);
-extern void		_cupsLangPrintError(const char *message);
+extern void		_cupsLangPrintError(const char *prefix,
+			                    const char *message);
+extern int		_cupsLangPrintFilter(FILE *fp, const char *prefix,
+			                     const char *message, ...)
+#  ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#  endif /* __GNUC__ */
+;
 extern int		_cupsLangPrintf(FILE *fp, const char *message, ...)
 #  ifdef __GNUC__
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #  endif /* __GNUC__ */
 ;
 extern int		_cupsLangPuts(FILE *fp, const char *message);
-extern const char	*_cupsLangString(cups_lang_t *lang, const char *message);
+extern const char	*_cupsLangString(cups_lang_t *lang,
+			                 const char *message);
 extern void		_cupsMessageFree(cups_array_t *a);
 extern cups_array_t	*_cupsMessageLoad(const char *filename, int unquote);
 extern const char	*_cupsMessageLookup(cups_array_t *a, const char *m);

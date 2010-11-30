@@ -90,7 +90,7 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
       if (errno != EAGAIN || errno != EINTR)
       {
-	perror("ERROR: Unable to read print data");
+        _cupsLangPrintError("ERROR", _("Unable to read print data"));
 	return (-1);
       }
 
@@ -119,8 +119,7 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
         if (errno != ENOSPC && errno != ENXIO && errno != EAGAIN &&
 	    errno != EINTR && errno != ENOTTY)
 	{
-	  _cupsLangPrintf(stderr, _("ERROR: Unable to write print data: %s\n"),
-			  strerror(errno));
+	  _cupsLangPrintError("ERROR", _("Unable to write print data"));
 	  return (-1);
 	}
       }
@@ -249,7 +248,8 @@ backendRunLoop(
 	if (errno == ENXIO && offline != 1 && update_state)
 	{
 	  fputs("STATE: +offline-report\n", stderr);
-	  _cupsLangPuts(stderr, _("INFO: Printer is currently offline.\n"));
+	  _cupsLangPrintFilter(stderr, "INFO",
+	                       _("Printer is not currently connected."));
 	  offline = 1;
 	}
 	else if (errno == EINTR && total_bytes == 0)
@@ -318,7 +318,7 @@ backendRunLoop(
 
 	if (errno != EAGAIN || errno != EINTR)
 	{
-	  perror("ERROR: Unable to read print data");
+	  _cupsLangPrintError("ERROR", _("Unable to read print data"));
 	  return (-1);
 	}
 
@@ -357,7 +357,7 @@ backendRunLoop(
 	  if (paperout != 1 && update_state)
 	  {
 	    fputs("STATE: +media-empty-warning\n", stderr);
-	    _cupsLangPuts(stderr, _("DEBUG: Out of paper\n"));
+	    fputs("DEBUG: Out of paper\n", stderr);
 	    paperout = 1;
 	  }
         }
@@ -366,14 +366,14 @@ backendRunLoop(
 	  if (offline != 1 && update_state)
 	  {
 	    fputs("STATE: +offline-report\n", stderr);
-	    _cupsLangPuts(stderr, _("INFO: Printer is currently off-line.\n"));
+	    _cupsLangPrintFilter(stderr, "INFO",
+	                         _("Printer is not currently connected."));
 	    offline = 1;
 	  }
 	}
 	else if (errno != EAGAIN && errno != EINTR && errno != ENOTTY)
 	{
-	  fprintf(stderr, _("ERROR: Unable to write print data: %s\n"),
-	          strerror(errno));
+	  _cupsLangPrintError("ERROR", _("Unable to write print data"));
 	  return (-1);
 	}
       }
@@ -388,7 +388,7 @@ backendRunLoop(
 	if (offline && update_state)
 	{
 	  fputs("STATE: -offline-report\n", stderr);
-	  _cupsLangPuts(stderr, _("INFO: Printer is now online.\n"));
+	  _cupsLangPrintFilter(stderr, "INFO", _("Printer is now connected."));
 	  offline = 0;
 	}
 

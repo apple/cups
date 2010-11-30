@@ -167,8 +167,9 @@ main(int  argc,				/* I - Number of command-line args */
     exec_backend(argv);
   else if (argc != 1)
   {
-    fprintf(stderr, "Usage: %s job user title copies options [filename(s)]\n",
-            argv[0]);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]"),
+		    argv[0]);
     return (1);
   }
 

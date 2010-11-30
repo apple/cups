@@ -728,7 +728,7 @@ ppdcDriver::write_ppd_file(
 	  // No, skip this one...
           _cupsLangPrintf(stderr,
 	                  _("ppdc: No message catalog provided for locale "
-			    "%s\n"), locale->value);
+			    "%s."), locale->value);
           continue;
 	}
 

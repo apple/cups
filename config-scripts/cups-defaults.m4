@@ -24,6 +24,21 @@ AC_ARG_WITH(languages, [  --with-languages        set installed languages, defau
 	esac])
 AC_SUBST(LANGUAGES)
 
+dnl Mac OS X bundle-based localization support
+AC_ARG_WITH(bundledir, [  --with-bundledir     set Mac OS X localization bundle directory ],
+	CUPS_BUNDLEDIR="$withval",
+	if test "x$uname" = xDarwin; then
+		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Frameworks/PrintCore.framework"
+		LANGUAGES=""
+	else
+		CUPS_BUNDLEDIR=""
+	fi)
+
+AC_SUBST(CUPS_BUNDLEDIR)
+if test "x$CUPS_BUNDLEDIR" != x; then
+	AC_DEFINE_UNQUOTED(CUPS_BUNDLEDIR, "$CUPS_BUNDLEDIR")
+fi
+
 dnl Default ConfigFilePerm
 AC_ARG_WITH(config_file_perm, [  --with-config-file-perm set default ConfigFilePerm value, default=0640],
 	CUPS_CONFIG_FILE_PERM="$withval",

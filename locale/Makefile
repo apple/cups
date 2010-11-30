@@ -79,6 +79,10 @@ install-languages:
 		fi ; \
 	done
 
+install-langbundle: po2strings
+	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj"
+	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj"
+
 
 #
 # Install programs...
@@ -112,29 +116,36 @@ uninstall-languages:
 		$(RM) $(LOCALEDIR)/$$loc/cups_$$loc.po ; \
 	done
 
+uninstall-langbundle:
+	$(RM) "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj/cups.strings"
+
 
 #
-# pot - Creates/updates the cups.pot template file, and merges changes
-#       into existing message catalogs.
+# pot - Creates/updates the cups.pot template file, merges changes into existing
+#       message catalogs, and updates the cups.strings file.  We don't use
+#       xgettext to update the cups.strings file due to known xgettext bugs.
 #
 
-pot:
+pot:	checkpo po2strings
 	echo Updating cups.pot...
 	mv cups.pot cups.pot.bck
 	touch cups.pot
-	cd ..; xgettext -o locale/cups.pot -j -s --keyword=_ --no-wrap \
+	cd ..; xgettext -o locale/cups.pot -s \
+		--keyword=_ --no-wrap \
 		--copyright-holder="Apple Inc." \
+		--package-name="CUPS" --package-version="1.5" \
 		--msgid-bugs-address="http://www.cups.org/str.php" \
 		*/*.c */*.cxx
-	(cat cups.header; \
-	 cat cups.pot | sed -e '1,6d' -e '1,$$s/PACKAGE VERSION/CUPS 1.4/' \
-	     -e '1,$$s/charset=CHARSET/charset=utf-8/'; \
-	 cat cups.footer) > cups.pot.N
+	(cat cups.header; tail +6 cups.pot; cat cups.footer) > cups.pot.N
 	mv cups.pot.N cups.pot
+	echo Checking cups.pot...
+	./checkpo cups.pot
 	for loc in $(LANGUAGES) ; do \
 		echo Merging changes into cups_$$loc.po... ; \
 		msgmerge -o cups_$$loc.po -s -N --no-location cups_$$loc.po cups.pot ; \
 	done
+	echo Updating cups.strings...
+	./po2strings cups.pot cups.strings
 
 
 #

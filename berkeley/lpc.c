@@ -73,7 +73,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Do the command prompt thing...
     */
 
-    _cupsLangPuts(stdout, _("lpc> "));
+    _cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no-newline version */
     while (fgets(line, sizeof(line), stdin) != NULL)
     {
      /*
@@ -101,7 +101,7 @@ main(int  argc,				/* I - Number of command-line arguments */
         * Nothing left, just show a prompt...
 	*/
 
-	_cupsLangPuts(stdout, _("lpc> "));
+	_cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no newline version */
 	continue;
       }
 
@@ -137,7 +137,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       * Put another prompt out to the user...
       */
 
-      _cupsLangPuts(stdout, _("lpc> "));
+      _cupsLangPuts(stdout, _("lpc> ")); /* TODO: Need no newline version */
     }
   }
 
@@ -186,7 +186,7 @@ do_command(http_t     *http,		/* I - HTTP connection to server */
     show_help(params);
   else
     _cupsLangPrintf(stdout,
-                    _("%s is not implemented by the CUPS version of lpc.\n"),
+                    _("%s is not implemented by the CUPS version of lpc."),
 		    command);
 }
 
@@ -203,14 +203,14 @@ show_help(const char *command)		/* I - Command to describe or NULL */
     _cupsLangPrintf(stdout,
                     _("Commands may be abbreviated.  Commands are:\n"
 		      "\n"
-		      "exit    help    quit    status  ?\n"));
+		      "exit    help    quit    status  ?"));
   }
   else if (!compare_strings(command, "help", 1) || !strcmp(command, "?"))
-    _cupsLangPrintf(stdout, _("help\t\tget help on commands\n"));
+    _cupsLangPrintf(stdout, _("help\t\tGet help on commands."));
   else if (!compare_strings(command, "status", 4))
-    _cupsLangPrintf(stdout, _("status\t\tshow status of daemon and queue\n"));
+    _cupsLangPrintf(stdout, _("status\t\tShow status of daemon and queue."));
   else
-    _cupsLangPrintf(stdout, _("?Invalid help command unknown\n"));
+    _cupsLangPrintf(stdout, _("?Invalid help command unknown."));
 }
 
 
@@ -400,7 +400,7 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
         printf("%s:\n", printer);
 	if (!strncmp(device, "file:", 5))
 	  _cupsLangPrintf(stdout,
-	                  _("\tprinter is on device \'%s\' speed -1\n"),
+	                  _("\tprinter is on device \'%s\' speed -1"),
 			  device + 5);
 	else
 	{
@@ -412,27 +412,27 @@ show_status(http_t     *http,		/* I - HTTP connection to server */
 	  {
 	    *delimiter = '\0';
 	    _cupsLangPrintf(stdout,
-	                    _("\tprinter is on device \'%s\' speed -1\n"),
+	                    _("\tprinter is on device \'%s\' speed -1"),
 			    device);
 	  }
 	}
 
         if (accepting)
-	  _cupsLangPuts(stdout, _("\tqueuing is enabled\n"));
+	  _cupsLangPuts(stdout, _("\tqueuing is enabled"));
 	else
-	  _cupsLangPuts(stdout, _("\tqueuing is disabled\n"));
+	  _cupsLangPuts(stdout, _("\tqueuing is disabled"));
 
         if (pstate != IPP_PRINTER_STOPPED)
-	  _cupsLangPuts(stdout, _("\tprinting is enabled\n"));
+	  _cupsLangPuts(stdout, _("\tprinting is enabled"));
 	else
-	  _cupsLangPuts(stdout, _("\tprinting is disabled\n"));
+	  _cupsLangPuts(stdout, _("\tprinting is disabled"));
 
 	if (jobcount == 0)
-	  _cupsLangPuts(stdout, _("\tno entries\n"));
+	  _cupsLangPuts(stdout, _("\tno entries"));
 	else
-	  _cupsLangPrintf(stdout, _("\t%d entries\n"), jobcount);
+	  _cupsLangPrintf(stdout, _("\t%d entries"), jobcount);
 
-	_cupsLangPuts(stdout, _("\tdaemon present\n"));
+	_cupsLangPuts(stdout, _("\tdaemon present"));
       }
 
       if (attr == NULL)

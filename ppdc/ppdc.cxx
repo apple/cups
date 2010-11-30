@@ -110,7 +110,7 @@ main(int  argc,				// I - Number of command-line arguments
 
               if (verbose > 1)
 	        _cupsLangPrintf(stdout,
-				_("ppdc: Adding include directory \"%s\"...\n"),
+				_("ppdc: Adding include directory \"%s\"."),
 				argv[i]);
 
 	      ppdcSource::add_include(argv[i]);
@@ -123,7 +123,7 @@ main(int  argc,				// I - Number of command-line arguments
 
               if (verbose > 1)
 	        _cupsLangPrintf(stdout,
-		                _("ppdc: Loading messages from \"%s\"...\n"),
+		                _("ppdc: Loading messages from \"%s\"."),
 				argv[i]);
 
               if (!catalog)
@@ -133,7 +133,7 @@ main(int  argc,				// I - Number of command-line arguments
 	      {
         	_cupsLangPrintf(stderr,
 		                _("ppdc: Unable to load localization file "
-				  "\"%s\" - %s\n"), argv[i], strerror(errno));
+				  "\"%s\" - %s"), argv[i], strerror(errno));
                 return (1);
 	      }
 	      break;
@@ -146,7 +146,7 @@ main(int  argc,				// I - Number of command-line arguments
               if (verbose > 1)
 	        _cupsLangPrintf(stdout,
 				_("ppdc: Writing PPD files to directory "
-				  "\"%s\"...\n"), argv[i]);
+				  "\"%s\"."), argv[i]);
 
 	      outdir = argv[i];
 	      break;
@@ -185,7 +185,7 @@ main(int  argc,				// I - Number of command-line arguments
         	if (verbose > 1)
 	          _cupsLangPrintf(stdout,
 		                  _("ppdc: Loading messages for locale "
-				    "\"%s\"...\n"), argv[i]);
+				    "\"%s\"."), argv[i]);
 
         	if (catalog)
 	          catalog->release();
@@ -196,7 +196,7 @@ main(int  argc,				// I - Number of command-line arguments
 		{
         	  _cupsLangPrintf(stderr,
 				  _("ppdc: Unable to find localization for "
-				    "\"%s\" - %s\n"), argv[i], strerror(errno));
+				    "\"%s\" - %s"), argv[i], strerror(errno));
                   return (1);
 		}
 	      }
@@ -248,7 +248,7 @@ main(int  argc,				// I - Number of command-line arguments
       // Open and load the driver info file...
       if (verbose > 1)
         _cupsLangPrintf(stdout,
-	                _("ppdc: Loading driver information file \"%s\"...\n"),
+	                _("ppdc: Loading driver information file \"%s\"."),
 			argv[i]);
 
       src->read_file(argv[i]);
@@ -263,7 +263,7 @@ main(int  argc,				// I - Number of command-line arguments
       if (errno != EEXIST)
       {
 	_cupsLangPrintf(stderr,
-	                _("ppdc: Unable to create output directory %s: %s\n"),
+	                _("ppdc: Unable to create output directory %s: %s"),
 	        outdir, strerror(errno));
         return (1);
       }
@@ -284,7 +284,7 @@ main(int  argc,				// I - Number of command-line arguments
         if (pipe(fds))
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Unable to create output pipes: %s\n"),
+	                  _("ppdc: Unable to create output pipes: %s"),
 	                  strerror(errno));
 	  return (1);
 	}
@@ -300,14 +300,13 @@ main(int  argc,				// I - Number of command-line arguments
 	  execlp("cupstestppd", "cupstestppd", "-", (char *)0);
 
 	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Unable to execute cupstestppd: %s\n"),
+	                  _("ppdc: Unable to execute cupstestppd: %s"),
 			  strerror(errno));
 	  return (errno);
 	}
 	else if (pid < 0)
 	{
-	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Unable to execute cupstestppd: %s\n"),
+	  _cupsLangPrintf(stderr, _("ppdc: Unable to execute cupstestppd: %s"),
 			  strerror(errno));
 	  return (errno);
 	}
@@ -363,7 +362,7 @@ main(int  argc,				// I - Number of command-line arguments
 
         if (cupsArrayFind(filenames, filename))
 	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Warning - overlapping filename \"%s\".\n"),
+	                  _("ppdc: Warning - overlapping filename \"%s\"."),
 			  filename);
 	else
 	  cupsArrayAdd(filenames, strdup(filename));
@@ -372,13 +371,13 @@ main(int  argc,				// I - Number of command-line arguments
 	if (!fp)
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ppdc: Unable to create PPD file \"%s\" - %s.\n"),
+	                  _("ppdc: Unable to create PPD file \"%s\" - %s."),
 			  filename, strerror(errno));
 	  return (1);
 	}
 
 	if (verbose)
-	  _cupsLangPrintf(stdout, _("ppdc: Writing %s...\n"), filename);
+	  _cupsLangPrintf(stdout, _("ppdc: Writing %s."), filename);
       }
 
      /*
@@ -433,27 +432,33 @@ main(int  argc,				// I - Number of command-line arguments
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: ppdc [options] filename.drv [ ... filenameN.drv ]\n"
-		  "Options:\n"
-		  "  -D name=value        Set named variable to value.\n"
-		  "  -I include-dir       Add include directory to search "
-		  "path.\n"
-		  "  -c catalog.po        Load the specified message catalog.\n"
-		  "  -d output-dir        Specify the output directory.\n"
-		  "  -l lang[,lang,...]   Specify the output language(s) "
-		  "(locale).\n"
-		  "  -m                   Use the ModelName value as the "
-		  "filename.\n"
-		  "  -t                   Test PPDs instead of generating "
-		  "them.\n"
-		  "  -v                   Be verbose (more v's for more "
-		  "verbosity).\n"
-		  "  -z                   Compress PPD files using GNU zip.\n"
-		  "  --cr                 End lines with CR (Mac OS 9).\n"
-		  "  --crlf               End lines with CR + LF (Windows).\n"
-		  "  --lf                 End lines with LF (UNIX/Linux/Mac "
-		  "OS X).\n"));
+  _cupsLangPuts(stdout, _("Usage: ppdc [options] filename.drv [ ... "
+                          "filenameN.drv ]"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("  -D name=value        Set named variable to "
+                          "value."));
+  _cupsLangPuts(stdout, _("  -I include-dir       Add include directory to "
+                          "search path."));
+  _cupsLangPuts(stdout, _("  -c catalog.po        Load the specified message "
+                          "catalog."));
+  _cupsLangPuts(stdout, _("  -d output-dir        Specify the output "
+                          "directory."));
+  _cupsLangPuts(stdout, _("  -l lang[,lang,...]   Specify the output "
+                          "language(s) (locale)."));
+  _cupsLangPuts(stdout, _("  -m                   Use the ModelName value as "
+                          "the filename."));
+  _cupsLangPuts(stdout, _("  -t                   Test PPDs instead of "
+                          "generating them."));
+  _cupsLangPuts(stdout, _("  -v                   Be verbose (more v's for "
+                          "more verbosity)."));
+  _cupsLangPuts(stdout, _("  -z                   Compress PPD files using GNU "
+                          "zip."));
+  _cupsLangPuts(stdout, _("  --cr                 End lines with CR (Mac OS "
+                          "9)."));
+  _cupsLangPuts(stdout, _("  --crlf               End lines with CR + LF "
+                          "(Windows)."));
+  _cupsLangPuts(stdout, _("  --lf                 End lines with LF (UNIX/"
+                          "Linux/Mac OS X)."));
 
   exit(1);
 }

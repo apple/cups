@@ -3,7 +3,7 @@
 //
 //   Shared message catalog class for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2009 by Apple Inc.
+//   Copyright 2007-2010 by Apple Inc.
 //   Copyright 2002-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -338,7 +338,7 @@ ppdcCatalog::load_messages(
       if ((ptr = (char *)strrchr(line, '\"')) == NULL)
       {
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Expected quoted string on line %d of %s\n"),
+	                _("ppdc: Expected quoted string on line %d of %s."),
 			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
@@ -350,7 +350,7 @@ ppdcCatalog::load_messages(
       if ((ptr = strchr(line, '\"')) == NULL)
       {
 	_cupsLangPrintf(stderr,
-	                _("ERROR: Expected quoted string on line %d of %s\n"),
+	                _("ppdc: Expected quoted string on line %d of %s."),
 			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
@@ -415,8 +415,8 @@ ppdcCatalog::load_messages(
 	if (!haveid)
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("ERROR: Need a msgid line before any "
-			    "translation strings on line %d of %s\n"),
+	                  _("ppdc: Need a msgid line before any "
+			    "translation strings on line %d of %s."),
 			  linenum, f);
 	  cupsFileClose(fp);
 	  return (-1);
@@ -432,7 +432,7 @@ ppdcCatalog::load_messages(
 	strlcat(id, ptr, sizeof(id));
       else
       {
-	_cupsLangPrintf(stderr, _("ERROR: Unexpected text on line %d of %s\n"),
+	_cupsLangPrintf(stderr, _("ppdc: Unexpected text on line %d of %s."),
 			linenum, f);
 	cupsFileClose(fp);
 	return (-1);
@@ -460,7 +460,7 @@ ppdcCatalog::load_messages(
   unknown_load_format:
 
   _cupsLangPrintf(stderr,
-                  _("ERROR: Unknown message catalog format for \"%s\"\n"), f);
+                  _("ppdc: Unknown message catalog format for \"%s\"."), f);
   cupsFileClose(fp);
   return (-1);
 }

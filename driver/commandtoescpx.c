@@ -22,9 +22,8 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
+#include <cups/cups-private.h>
 #include "driver.h"
-#include <cups/string-private.h>
 #include "data/escp.h"
 
 
@@ -54,7 +53,9 @@ main(int  argc,					/* I - Number of command-line arguments */
     * and return.
     */
 
-    fputs("ERROR: commandtoescpx job-id user title copies options [file]\n", stderr);
+    _cupsLangPrintf(stderr,
+                    _("Usage: %s job-id user title copies options [file]"),
+		    argv[0]);
     return (1);
   }
 

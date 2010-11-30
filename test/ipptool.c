@@ -12,6 +12,8 @@
  *   which should have been included with this file.  If this file is
  *   file is missing or damaged, see the license at "http://www.cups.org/".
  *
+ *   This file is subject to the Apple OS-Developed Software exception.
+ *
  * Contents:
  *
  *   main()              - Parse options and do tests.
@@ -273,8 +275,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_SSL
 	      vars.encryption = HTTP_ENCRYPT_REQUIRED;
 #else
-	      _cupsLangPrintf(stderr,
-			      _("%s: Sorry, no encryption support compiled in\n"),
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 			      argv[0]);
 #endif /* HAVE_SSL */
 	      break;
@@ -291,8 +292,7 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_SSL
 	      vars.encryption = HTTP_ENCRYPT_ALWAYS;
 #else
-	      _cupsLangPrintf(stderr,
-			      _("%s: Sorry, no encryption support compiled in\n"),
+	      _cupsLangPrintf(stderr, _("%s: Sorry, no encryption support."),
 			      argv[0]);
 #endif /* HAVE_SSL */
 	      break;
@@ -303,7 +303,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing timeout for \"-T\".\n"));
+		              _("ipptool: Missing timeout for \"-T\"."));
 		usage();
               }
 
@@ -316,7 +316,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing version for \"-V\".\n"));
+		              _("ipptool: Missing version for \"-V\"."));
 		usage();
               }
 
@@ -333,7 +333,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      else
 	      {
 		_cupsLangPrintf(stderr,
-		                _("ipptool: Bad version %s for \"-V\".\n"),
+		                _("ipptool: Bad version %s for \"-V\"."),
 				argv[i]);
 		usage();
 	      }
@@ -345,7 +345,7 @@ main(int  argc,				/* I - Number of command-line args */
               if (interval || repeat)
 	      {
 	        _cupsLangPuts(stderr, _("ipptool: \"-i\" and \"-n\" are "
-	                                "incompatible with -X\".\n"));
+	                                "incompatible with -X\"."));
 		usage();
 	      }
 	      break;
@@ -360,7 +360,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing name=value for \"-d\".\n"));
+		              _("ipptool: Missing name=value for \"-d\"."));
 		usage();
               }
 
@@ -379,7 +379,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing filename for \"-f\".\n"));
+		              _("ipptool: Missing filename for \"-f\"."));
 		usage();
               }
 
@@ -402,7 +402,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing seconds for \"-i\".\n"));
+		              _("ipptool: Missing seconds for \"-i\"."));
 		usage();
               }
 	      else
@@ -412,7 +412,7 @@ main(int  argc,				/* I - Number of command-line args */
 		if (interval <= 0)
 		{
 		  _cupsLangPuts(stderr,
-				_("ipptool: Invalid seconds for \"-i\".\n"));
+				_("ipptool: Invalid seconds for \"-i\"."));
 		  usage();
 		}
               }
@@ -420,7 +420,7 @@ main(int  argc,				/* I - Number of command-line args */
               if (Output == _CUPS_OUTPUT_PLIST && interval)
 	      {
 	        _cupsLangPuts(stderr, _("ipptool: \"-i\" is incompatible with "
-			                "\"-X\".\n"));
+			                "\"-X\"."));
 		usage();
 	      }
 	      break;
@@ -435,7 +435,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      if (i >= argc)
 	      {
 		_cupsLangPuts(stderr,
-		              _("ipptool: Missing count for \"-n\".\n"));
+		              _("ipptool: Missing count for \"-n\"."));
 		usage();
               }
 	      else
@@ -444,7 +444,7 @@ main(int  argc,				/* I - Number of command-line args */
               if (Output == _CUPS_OUTPUT_PLIST && repeat)
 	      {
 	        _cupsLangPuts(stderr, _("ipptool: \"-n\" is incompatible with "
-			                "\"-X\".\n"));
+			                "\"-X\"."));
 		usage();
 	      }
 	      break;
@@ -462,7 +462,7 @@ main(int  argc,				/* I - Number of command-line args */
 	      break;
 
 	  default :
-	      _cupsLangPrintf(stderr, _("ipptool: Unknown option \"-%c\".\n"),
+	      _cupsLangPrintf(stderr, _("ipptool: Unknown option \"-%c\"."),
 	                      *opt);
 	      usage();
 	      break;
@@ -482,7 +482,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (vars.uri)
       {
-        _cupsLangPuts(stderr, _("ipptool: May only specify a single URI.\n"));
+        _cupsLangPuts(stderr, _("ipptool: May only specify a single URI."));
         usage();
       }
 
@@ -501,7 +501,7 @@ main(int  argc,				/* I - Number of command-line args */
 
       if (uri_status != HTTP_URI_OK)
       {
-        _cupsLangPrintf(stderr, _("ipptool: Bad URI - %s.\n"),
+        _cupsLangPrintf(stderr, _("ipptool: Bad URI - %s."),
 	                URIStatusStrings[uri_status - HTTP_URI_OVERFLOW]);
         return (1);
       }
@@ -3499,7 +3499,7 @@ print_fatal_error(const char *s,	/* I - Printf-style format string */
     print_xml_trailer(0, buffer);
   }
   else
-    _cupsLangPrintf(stderr, "ipptool: %s\n", buffer);
+    _cupsLangPrintf(stderr, "ipptool: %s", buffer);
 }
 
 
@@ -3757,31 +3757,34 @@ timeout_cb(http_t *http,		/* I - Connection to server (unused) */
 static void
 usage(void)
 {
-  _cupsLangPuts(stderr,
-                _("Usage: ipptool [options] URI filename [ ... "
-		  "filenameN ]\n"
-		  "\n"
-		  "Options:\n"
-		  "\n"
-		  "-4             Connect using IPv4.\n"
-		  "-6             Connect using IPv6.\n"
-		  "-C             Send requests using chunking (default).\n"
-		  "-E             Test with TLS encryption.\n"
-		  "-I             Ignore errors.\n"
-		  "-L             Send requests using content-length.\n"
-		  "-S             Test with SSL encryption.\n"
-		  "-T             Set the receive/send timeout in seconds.\n"
-		  "-V version     Set default IPP version.\n"
-		  "-X             Produce XML plist instead of plain text.\n"
-		  "-d name=value  Define variable.\n"
-		  "-f filename    Set default request filename.\n"
-		  "-i seconds     Repeat the last file with the given time "
-		  "interval.\n"
-		  "-n count       Repeat the last file the given number of "
-		  "times.\n"
-		  "-q             Be quiet - no output except errors.\n"
-		  "-t             Produce a test report.\n"
-		  "-v             Show all attributes sent and received.\n"));
+  _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... "
+		          "filenameN ]"));
+  _cupsLangPuts(stderr, _("Options:"));
+  _cupsLangPuts(stderr, _("  -4             Connect using IPv4."));
+  _cupsLangPuts(stderr, _("  -6             Connect using IPv6."));
+  _cupsLangPuts(stderr, _("  -C             Send requests using chunking "
+                          "(default)."));
+  _cupsLangPuts(stderr, _("  -E             Test with TLS encryption."));
+  _cupsLangPuts(stderr, _("  -I             Ignore errors."));
+  _cupsLangPuts(stderr, _("  -L             Send requests using "
+                          "content-length."));
+  _cupsLangPuts(stderr, _("  -S             Test with SSL encryption."));
+  _cupsLangPuts(stderr, _("  -T             Set the receive/send timeout in "
+                          "seconds."));
+  _cupsLangPuts(stderr, _("  -V version     Set default IPP version."));
+  _cupsLangPuts(stderr, _("  -X             Produce XML plist instead of plain "
+                          "text."));
+  _cupsLangPuts(stderr, _("  -d name=value  Define variable."));
+  _cupsLangPuts(stderr, _("  -f filename    Set default request filename."));
+  _cupsLangPuts(stderr, _("  -i seconds     Repeat the last file with the "
+                          "given time interval."));
+  _cupsLangPuts(stderr, _("  -n count       Repeat the last file the given "
+                          "number of times."));
+  _cupsLangPuts(stderr, _("  -q             Be quiet - no output except "
+                          "errors."));
+  _cupsLangPuts(stderr, _("  -t             Produce a test report."));
+  _cupsLangPuts(stderr, _("  -v             Show all attributes sent and "
+                          "received."));
 
   exit(1);
 }

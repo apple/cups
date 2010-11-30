@@ -115,8 +115,8 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
-                    _("Usage: %s job-id user title copies options [file]\n"),
-                    "bannertops");
+                    _("Usage: %s job-id user title copies options file"),
+                    argv[0]);
     return (1);
   }
 
@@ -180,9 +180,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
 
   if (!fp)
   {
-    _cupsLangPrintf(stderr,
-	            _("ERROR: Unable to open banner file \"%s\" - %s\n"),
-                    filename ? filename : "(stdin)", strerror(errno));
+    _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
     exit(1);
   }
 
@@ -218,9 +216,9 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
 
     if (!*ptr)
     {
-      _cupsLangPrintf(stderr,
-                      _("ERROR: Missing value on line %d of banner file\n"),
-		      linenum);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Missing value on line %d of banner file."),
+			   linenum);
       continue;
     }
 

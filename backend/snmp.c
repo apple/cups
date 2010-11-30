@@ -214,7 +214,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (argc > 2)
   {
-    fputs(_("Usage: snmp [host-or-ip-address]\n"), stderr);
+    _cupsLangPuts(stderr, _("Usage: snmp [host-or-ip-address]"));
     return (1);
   }
 

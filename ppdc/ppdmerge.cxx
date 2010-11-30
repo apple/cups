@@ -93,7 +93,7 @@ main(int  argc,				// I - Number of command-line arguments
       // Open and load the PPD file...
       if ((infile = cupsFileOpen(argv[i], "r")) == NULL)
       {
-        _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s\n"), "ppdmerge",
+        _cupsLangPrintf(stderr, _("%s: Unable to open %s: %s"), "ppdmerge",
 	                argv[i], strerror(errno));
 	return (1);
       }
@@ -102,28 +102,29 @@ main(int  argc,				// I - Number of command-line arguments
       if ((ppd = ppdOpen2(infile)) == NULL)
       {
         ppd_status_t	status;		// PPD open status
-	int		linenum;	// Line number
+	int		curline,	// Current line
+			linenum;	// Line number
 	
 	
         status = ppdLastError(&linenum);
 	
-	_cupsLangPrintf(stderr, _("%s: Unable to open PPD file: %s on line %d.\n"),
+	_cupsLangPrintf(stderr,
+	                _("%s: Unable to open PPD file: %s on line %d."),
 	                "ppdmerge", ppdErrorString(status), linenum);
-	
-        _cupsLangPrintf(stderr, "%d: ", linenum);
         cupsFileRewind(infile);
 	
         line[0] = '\0';
+	curline = 0;
 	
         while (cupsFileGets(infile, line, sizeof(line)))
 	{
-	  linenum --;
-	  if (!linenum)
+	  curline ++;
+	  if (curline >= linenum)
 	    break;
 	}
-	
-	_cupsLangPrintf(stderr, "%s\n", line);
-	
+
+	_cupsLangPrintf(stderr, "%d: %s", linenum, line);
+
         cupsFileClose(infile);
 	return (1);
       }
@@ -132,7 +133,7 @@ main(int  argc,				// I - Number of command-line arguments
       if ((locale = ppd_locale(ppd)) == NULL)
       {
         _cupsLangPrintf(stderr,
-	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s\n"),
+	                _("ppdmerge: Bad LanguageVersion \"%s\" in %s."),
 			ppd->lang_version, argv[i]);
         cupsFileClose(infile);
 	ppdClose(ppd);
@@ -156,7 +157,7 @@ main(int  argc,				// I - Number of command-line arguments
 	  if (rename(inname, bckname))
 	  {
 	    _cupsLangPrintf(stderr,
-	                    _("ppdmerge: Unable to backup %s to %s- %s\n"),
+	                    _("ppdmerge: Unable to backup %s to %s - %s"),
 			    inname, bckname, strerror(errno));
 	    return (1);
 	  }
@@ -172,7 +173,7 @@ main(int  argc,				// I - Number of command-line arguments
       else
       {
         // Don't need this PPD...
-	_cupsLangPrintf(stderr, _("ppdmerge: Ignoring PPD file %s...\n"),
+	_cupsLangPrintf(stderr, _("ppdmerge: Ignoring PPD file %s."),
 	                argv[i]);
         ppdClose(ppd);
       }
@@ -363,11 +364,10 @@ ppd_locale(ppd_file_t *ppd)		// I - PPD file
 static void
 usage(void)
 {
-  _cupsLangPuts(stdout,
-                _("Usage: ppdmerge [options] filename.ppd "
-		  "[ ... filenameN.ppd ]\n"
-		  "Options:\n"
-                  "  -o filename.ppd[.gz]\n"));
+  _cupsLangPuts(stdout, _("Usage: ppdmerge [options] filename.ppd [ ... "
+                          "filenameN.ppd ]"));
+  _cupsLangPuts(stdout, _("Options:"));
+  _cupsLangPuts(stdout, _("  -o filename.ppd[.gz]"));
 
   exit(1);
 }

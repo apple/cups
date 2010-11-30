@@ -154,6 +154,7 @@ install-languages:
 		fi \
 	done
 
+install-langbundle:
 
 
 #
@@ -194,6 +195,8 @@ uninstall-languages:
 		done \
 		$(RMDIR) $(DATADIR)/templates/$$lang; \
 	done
+
+uninstall-langbundle:
 
 
 #

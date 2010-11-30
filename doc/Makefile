@@ -197,6 +197,8 @@ install-languages:
 		fi; \
 	done
 
+install-langbundle:
+
 
 #
 # Install programs...
@@ -243,6 +245,8 @@ uninstall-languages:
 		$(RM) $(DOCDIR)/$$lang/cups.css; \
 		$(RMDIR) $(DOCDIR)/$$lang; \
 	done
+
+install-langbundle:
 
 
 #

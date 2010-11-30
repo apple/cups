@@ -1796,9 +1796,9 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (argc < 6 || argc > 7)
   {
-    _cupsLangPrintf(stderr,
-                    _("ERROR: %s job-id user title copies options [file]\n"),
-                    "rastertopclx");
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("%s job-id user title copies options [file]"),
+                         "rastertopclx");
     return (1);
   }
 
@@ -1815,7 +1815,8 @@ main(int  argc,				/* I - Number of command-line arguments */
     ppd_status_t	status;		/* PPD error */
     int			linenum;	/* Line number */
 
-    _cupsLangPrintf(stderr, _("ERROR: The PPD file could not be opened.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("The PPD file could not be opened."));
 
     status = ppdLastError(&linenum);
 
@@ -1835,8 +1836,7 @@ main(int  argc,				/* I - Number of command-line arguments */
   {
     if ((fd = open(argv[6], O_RDONLY)) == -1)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to open raster file - %s\n"),
-                      strerror(errno));
+      _cupsLangPrintError("ERROR", _("Unable to open raster file"));
       return (1);
     }
   }
@@ -1884,7 +1884,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     Page ++;
 
     fprintf(stderr, "PAGE: %d %d\n", Page, header.NumCopies);
-    _cupsLangPrintf(stderr, _("INFO: Starting page %d...\n"), Page);
+    _cupsLangPrintFilter(stderr, "INFO", _("Starting page %d."), Page);
 
     StartPage(ppd, &header, atoi(argv[1]), argv[2], argv[3],
               num_options, options);
@@ -1899,8 +1899,13 @@ main(int  argc,				/* I - Number of command-line arguments */
 	break;
 
       if ((y & 127) == 0)
-        _cupsLangPrintf(stderr, _("INFO: Printing page %d, %d%% complete...\n"),
-                        Page, 100 * y / header.cupsHeight);
+      {
+        _cupsLangPrintFilter(stderr, "INFO",
+	                     _("Printing page %d, %d%% complete."),
+			     Page, 100 * y / header.cupsHeight);
+        fprintf(stderr, "ATTR: job-media-progress=%d\n",
+		100 * y / header.cupsHeight);
+      }
 
      /*
       * Read and write a line of graphics or whitespace...
@@ -1916,7 +1921,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     * Eject the page...
     */
 
-    _cupsLangPrintf(stderr, _("INFO: Finished page %d...\n"), Page);
+    _cupsLangPrintFilter(stderr, "INFO", _("Finished page %d."), Page);
 
     EndPage(ppd, &header);
 
@@ -1935,12 +1940,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
   if (Page == 0)
   {
-    _cupsLangPuts(stderr, _("ERROR: No pages were found.\n"));
+    _cupsLangPrintFilter(stderr, "ERROR", _("No pages were found."));
     return (1);
   }
   else
   {
-    _cupsLangPuts(stderr, _("INFO: Ready to print.\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
     return (0);
   }
 }

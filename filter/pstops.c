@@ -260,7 +260,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
-                    _("Usage: %s job-id user title copies options [file]\n"),
+                    _("Usage: %s job-id user title copies options file"),
                     argv[0]);
     return (1);
   }
@@ -296,8 +296,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     if ((fp = cupsFileOpen(argv[6], "r")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to open file \"%s\" - %s\n"),
-                      argv[6], strerror(errno));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (1);
     }
   }
@@ -442,17 +441,13 @@ add_page(pstops_doc_t *doc,		/* I - Document information */
 
   if (!doc->pages)
   {
-    _cupsLangPrintf(stderr,
-                    _("EMERG: Unable to allocate memory for pages array: %s\n"),
-                    strerror(errno));
+    _cupsLangPrintError("EMERG", _("Unable to allocate memory for pages array"));
     exit(1);
   }
 
   if ((pageinfo = calloc(1, sizeof(pstops_page_t))) == NULL)
   {
-    _cupsLangPrintf(stderr,
-                    _("EMERG: Unable to allocate memory for page info: %s\n"),
-                    strerror(errno));
+    _cupsLangPrintError("EMERG", _("Unable to allocate memory for page info"));
     exit(1);
   }
 
@@ -564,13 +559,7 @@ copy_bytes(cups_file_t *fp,		/* I - File to read from */
 
   if (cupsFileSeek(fp, offset) < 0)
   {
-    _cupsLangPrintf(stderr,
-#ifdef HAVE_LONG_LONG
-		    _("ERROR: Unable to seek to offset %lld in file - %s\n"),
-#else
-		    _("ERROR: Unable to seek to offset %ld in file - %s\n"),
-#endif /* HAVE_LONG_LONG */
-		    CUPS_LLCAST offset, strerror(errno));
+    _cupsLangPrintError("ERROR", _("Unable to see in file"));
     return;
   }
 
@@ -2114,9 +2103,8 @@ doc_printf(pstops_doc_t *doc,		/* I - Document information */
 
   if (bytes > sizeof(buffer))
   {
-    _cupsLangPrintf(stderr,
-		    _("ERROR: doc_printf overflow (%d bytes) detected, "
-		      "aborting\n"), (int)bytes);
+    _cupsLangPrintFilter(stderr, "ERROR",
+                         _("Buffer overflow detected, aborting."));
     exit(1);
   }
 
@@ -2255,23 +2243,25 @@ include_feature(
 
   if ((option = ppdFindOption(ppd, name + 1)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("WARNING: Unknown option \"%s\"\n"), name + 1);
+    _cupsLangPrintFilter(stderr, "WARNING", _("Unknown option \"%s\"."),
+                         name + 1);
     return (num_options);
   }
 
   if (option->section == PPD_ORDER_EXIT ||
       option->section == PPD_ORDER_JCL)
   {
-    _cupsLangPrintf(stderr, _("WARNING: Option \"%s\" cannot be included via "
-                              "IncludeFeature\n"), name + 1);
+    _cupsLangPrintFilter(stderr, "WARNING",
+                         _("Option \"%s\" cannot be included via "
+			   "%%%%IncludeFeature."), name + 1);
     return (num_options);
   }
 
   if (!ppdFindChoice(option, value))
   {
-    _cupsLangPrintf(stderr,
-                    _("WARNING: Unknown choice \"%s\" for option \"%s\"\n"),
-                    value, name + 1);
+    _cupsLangPrintFilter(stderr, "WARNING",
+			 _("Unknown choice \"%s\" for option \"%s\"."),
+			 value, name + 1);
     return (num_options);
   }
 
@@ -2417,18 +2407,6 @@ set_pstops_options(
   doc->new_bounding_box[3] = INT_MIN;
 
  /*
-  * See what the source content type is.  When printing PostScript content we
-  * want to do scaling and orientation, but otherwise we don't want to change
-  * anything...
-  */
-
-  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
-    content_type = "application/postscript";
-
-  if (!strcasecmp(content_type, "application/postscript"))
-    Orientation = 0;
-
- /*
   * AP_FIRSTPAGE_* and the corresponding non-first-page options.
   */
 
@@ -2472,8 +2450,9 @@ set_pstops_options(
 
     if (intval < 10 || intval > 1000)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unsupported brightness value %s, using "
-                                "brightness=100\n"), val);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unsupported brightness value %s, using "
+			     "brightness=100."), val);
       doc->brightness = 1.0f;
     }
     else
@@ -2522,6 +2501,9 @@ set_pstops_options(
   * (Only for original PostScript content)
   */
 
+  if ((content_type = getenv("CONTENT_TYPE")) == NULL)
+    content_type = "application/postscript";
+
   if (!strcasecmp(content_type, "application/postscript"))
   {
     if ((val = cupsGetOption("fitplot", num_options, options)) != NULL &&
@@ -2550,8 +2532,9 @@ set_pstops_options(
 
     if (intval < 1 || intval > 10000)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unsupported gamma value %s, using "
-                                "gamma=1000\n"), val);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unsupported gamma value %s, using gamma=1000."),
+			   val);
       doc->gamma = 1.0f;
     }
     else
@@ -2593,9 +2576,9 @@ set_pstops_options(
           doc->number_up = intval;
 	  break;
       default :
-          _cupsLangPrintf(stderr,
-			  _("ERROR: Unsupported number-up value %d, using "
-			    "number-up=1\n"), intval);
+          _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unsupported number-up value %d, using "
+				 "number-up=1."), intval);
           doc->number_up = 1;
 	  break;
     }
@@ -2627,8 +2610,9 @@ set_pstops_options(
       doc->number_up_layout = PSTOPS_LAYOUT_BTRL;
     else
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unsupported number-up-layout value %s, "
-                                "using number-up-layout=lrtb\n"), val);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unsupported number-up-layout value %s, using "
+			     "number-up-layout=lrtb."), val);
       doc->number_up_layout = PSTOPS_LAYOUT_LRTB;
     }
   }
@@ -2677,8 +2661,9 @@ set_pstops_options(
       doc->page_border = PSTOPS_BORDERDOUBLE2;
     else
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unsupported page-border value %s, "
-                                "using page-border=none\n"), val);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unsupported page-border value %s, using "
+			     "page-border=none."), val);
       doc->page_border = PSTOPS_BORDERNONE;
     }
   }

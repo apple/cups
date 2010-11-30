@@ -261,7 +261,8 @@ ppdcSource::import_ppd(const char *f)	// I - Filename
         if (sscanf(attr->value, "%s%*[^\"]\"%[^\"]\"%s%s", encoding, version,
 	           charset, status) != 4)
 	{
-	  _cupsLangPrintf(stderr, _("Bad font attribute: %s\n"), attr->value);
+	  _cupsLangPrintf(stderr, _("ppdc: Bad font attribute: %s"),
+	                  attr->value);
 	  continue;
 	}
 

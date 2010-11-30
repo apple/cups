@@ -1,7 +1,7 @@
 /*
  * "$Id: lpd.c 7740 2008-07-14 23:58:05Z mike $"
  *
- *   Line Printer Daemon backend for the Common UNIX Printing System (CUPS).
+ *   Line Printer Daemon backend for CUPS.
  *
  *   Copyright 2007-2010 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
@@ -182,7 +182,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   else if (argc < 6 || argc > 7)
   {
     _cupsLangPrintf(stderr,
-                    _("Usage: %s job-id user title copies options [file]\n"),
+                    _("Usage: %s job-id user title copies options [file]"),
                     argv[0]);
     return (CUPS_BACKEND_FAILED);
   }
@@ -324,8 +324,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
         if (strchr("cdfglnoprtv", value[0]))
 	  format = value[0];
 	else
-	  _cupsLangPrintf(stderr, _("ERROR: Unknown format character \"%c\"\n"),
-		          value[0]);
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unknown format character: \"%c\"."),
+			       value[0]);
       }
       else if (!strcasecmp(name, "mode") && value[0])
       {
@@ -338,8 +339,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	else if (!strcasecmp(value, "stream"))
 	  mode = MODE_STREAM;
 	else
-	  _cupsLangPrintf(stderr, _("ERROR: Unknown print mode \"%s\"\n"),
-	                  value);
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unknown print mode: \"%s\"."), value);
       }
       else if (!strcasecmp(name, "order") && value[0])
       {
@@ -352,8 +353,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	else if (!strcasecmp(value, "data,control"))
 	  order = ORDER_DATA_CONTROL;
 	else
-	  _cupsLangPrintf(stderr, _("ERROR: Unknown file order \"%s\"\n"),
-	                  value);
+	  _cupsLangPrintFilter(stderr, "ERROR",
+	                       _("Unknown file order: \"%s\"."), value);
       }
       else if (!strcasecmp(name, "reserve"))
       {
@@ -433,8 +434,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
-		      hostname);
+      _cupsLangPrintFilter(stderr, "ERROR",
+                           _("Unable to locate printer \"%s\"."), hostname);
       return (CUPS_BACKEND_STOP);
     }
 
@@ -446,7 +447,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       return (CUPS_BACKEND_FAILED);
     }
 
-    _cupsLangPuts(stderr, _("INFO: Copying print data...\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
 
     backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0, 
 		   backendNetworkSideCB);
@@ -472,8 +473,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     if (fd == -1)
     {
-      _cupsLangPrintf(stderr, _("ERROR: Unable to open print file %s: %s\n"),
-                      filename, strerror(errno));
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
       return (CUPS_BACKEND_FAILED);
     }
   }
@@ -602,9 +602,9 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
   if (recv(fd, &status, 1, 0) < 1)
   {
-    _cupsLangPrintf(stderr,
-		    _("WARNING: Remote host did not respond with command "
-		      "status byte after %d seconds\n"), timeout);
+    _cupsLangPrintFilter(stderr, "WARNING",
+		         _("Printer did not respond after %d seconds."),
+			 timeout);
     status = errno;
   }
 
@@ -689,8 +689,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintf(stderr, _("ERROR: Unable to locate printer \'%s\'\n"),
-                    hostname);
+    _cupsLangPrintFilter(stderr, "ERROR", _("Unable to locate printer \"%s\"."),
+			 hostname);
     return (CUPS_BACKEND_STOP);
   }
 
@@ -712,7 +712,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
     fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n", hostname,
             port, printer);
-    _cupsLangPuts(stderr, _("INFO: Connecting to printer...\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,
              delay = 5;;
@@ -810,9 +810,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 	* available printer in the class.
 	*/
 
-        _cupsLangPuts(stderr,
-	              _("INFO: Unable to contact printer, queuing on next "
-			"printer in class...\n"));
+        _cupsLangPrintFilter(stderr, "INFO",
+			     _("Unable to contact printer, queuing on next "
+			       "printer in class."));
 
         httpAddrFreeList(addrlist);
 
@@ -832,31 +832,31 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       {
         if (contimeout && (time(NULL) - start_time) > contimeout)
 	{
-	  _cupsLangPuts(stderr, _("ERROR: The printer is not responding.\n"));
+	  _cupsLangPrintFilter(stderr, "ERROR",
+			       _("The printer is not responding."));
 	  return (CUPS_BACKEND_FAILED);
 	}
 
 	switch (error)
 	{
 	  case EHOSTDOWN :
-	      _cupsLangPrintf(stderr,
-			      _("WARNING: Network printer \'%s\' may not exist "
-			        "or is unavailable at this time.\n"), 
-			      hostname);
+	      _cupsLangPrintFilter(stderr, "WARNING",
+			           _("Network printer \"%s\" may not exist or "
+			             "is unavailable at this time."),
+				   hostname);
 	      break;
 
 	  case EHOSTUNREACH :
-	      _cupsLangPrintf(stderr,
-			      _("WARNING: Network printer \'%s\' is "
-			        "unreachable at this time.\n"), 
-			      hostname);
+	      _cupsLangPrintFilter(stderr, "WARNING",
+			           _("Network printer \"%s\" is unreachable at "
+				     "this time."), hostname);
 	      break;
 
 	  case ECONNREFUSED :
 	  default :
-	      _cupsLangPrintf(stderr,
-			      _("WARNING: Network printer \'%s\' is busy.\n"),
-			      hostname);
+	      _cupsLangPrintFilter(stderr, "WARNING",
+			           _("Network printer \"%s\" is busy."),
+			           hostname);
 	      break;
         }
 
@@ -875,14 +875,15 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
       else
       {
-	_cupsLangPrintf(stderr, _("ERROR: Network printer \'%s\' is not "
-	                          "responding.\n"), hostname);
+	_cupsLangPrintFilter(stderr, "ERROR",
+	                     _("Network printer \"%s\" is not responding."),
+			     hostname);
 	sleep(30);
       }
     }
 
     fputs("STATE: -connecting-to-device\n", stderr);
-    _cupsLangPuts(stderr, _("INFO: Connected to printer...\n"));
+    _cupsLangPrintFilter(stderr, "INFO", _("Connected to printer."));
 
 #ifdef AF_INET6
     if (addr->addr.addr.sa_family == AF_INET6)
@@ -1013,8 +1014,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         return (CUPS_BACKEND_FAILED);
       }
 
-      _cupsLangPrintf(stderr, _("INFO: Sending control file (%u bytes)\n"),
-		      (unsigned)strlen(control));
+      fprintf(stderr, "DEBUG: Sending control file (%u bytes)\n",
+	      (unsigned)strlen(control));
 
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
@@ -1028,9 +1029,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
         if (read(fd, &status, 1) < 1)
 	{
-	  _cupsLangPrintf(stderr,
-			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds\n"), timeout);
+	  _cupsLangPrintFilter(stderr, "WARNING",
+			       _("Printer did not respond after %d seconds."),
+			       timeout);
 	  status = errno;
 	}
 
@@ -1038,11 +1039,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
 
       if (status != 0)
-	_cupsLangPrintf(stderr,
-			_("ERROR: Remote host did not accept control file "
-			  "(%d)\n"), status);
+	_cupsLangPrintFilter(stderr, "ERROR",
+			     _("Remote host did not accept control file (%d)."),
+			     status);
       else
-	_cupsLangPuts(stderr, _("INFO: Control file sent successfully\n"));
+	_cupsLangPrintFilter(stderr, "INFO",
+	                     _("Control file sent successfully."));
     }
     else
       status = 0;
@@ -1069,13 +1071,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         return (CUPS_BACKEND_FAILED);
       }
 
-      _cupsLangPrintf(stderr,
-#ifdef HAVE_LONG_LONG
-		      _("INFO: Sending data file (%lld bytes)\n"),
-#else
-		      _("INFO: Sending data file (%ld bytes)\n"),
-#endif /* HAVE_LONG_LONG */
-		      CUPS_LLCAST filestats.st_size);
+      fprintf(stderr, "DEBUG: Sending data file (" CUPS_LLFMT " bytes)\n",
+	      CUPS_LLCAST filestats.st_size);
 
       tbytes = 0;
       for (copy = 0; copy < manual_copies; copy ++)
@@ -1084,9 +1081,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
 	while ((nbytes = read(print_fd, buffer, sizeof(buffer))) > 0)
 	{
-	  _cupsLangPrintf(stderr,
-	                  _("INFO: Spooling LPR job, %.0f%% complete...\n"),
-			  100.0 * tbytes / filestats.st_size);
+	  _cupsLangPrintFilter(stderr, "INFO",
+			       _("Spooling job, %.0f%% complete."),
+			       100.0 * tbytes / filestats.st_size);
 
 	  if (lpd_write(fd, buffer, nbytes) < nbytes)
 	  {
@@ -1120,9 +1117,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
           if (recv(fd, &status, 1, 0) < 1)
 	  {
-	    _cupsLangPrintf(stderr,
-			    _("WARNING: Remote host did not respond with data "
-			      "status byte after %d seconds\n"), timeout);
+	    _cupsLangPrintFilter(stderr, "WARNING",
+			         _("Printer did not respond after %d seconds."),
+			         timeout);
 	    status = 0;
           }
 
@@ -1133,11 +1130,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         status = 0;
 
       if (status != 0)
-	_cupsLangPrintf(stderr,
-	                _("ERROR: Remote host did not accept data file (%d)\n"),
-			status);
+	_cupsLangPrintFilter(stderr, "ERROR",
+			     _("Remote host did not accept data file (%d)."),
+			     status);
       else
-	_cupsLangPuts(stderr, _("INFO: Data file sent successfully\n"));
+	_cupsLangPrintFilter(stderr, "INFO",
+	                     _("Data file sent successfully."));
     }
 
     if (status == 0 && order == ORDER_DATA_CONTROL)
@@ -1161,8 +1159,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         return (CUPS_BACKEND_FAILED);
       }
 
-      _cupsLangPrintf(stderr, _("INFO: Sending control file (%lu bytes)\n"),
-		      (unsigned long)strlen(control));
+      fprintf(stderr, "DEBUG: Sending control file (%lu bytes)\n",
+	      (unsigned long)strlen(control));
 
       if (lpd_write(fd, control, strlen(control) + 1) < (strlen(control) + 1))
       {
@@ -1175,9 +1173,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
         if (read(fd, &status, 1) < 1)
 	{
-	  _cupsLangPrintf(stderr,
-			  _("WARNING: Remote host did not respond with control "
-			    "status byte after %d seconds\n"), timeout);
+	  _cupsLangPrintFilter(stderr, "WARNING",
+			       _("Printer did not respond after %d seconds."),
+			       timeout);
 	  status = errno;
 	}
 
@@ -1185,11 +1183,12 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       }
 
       if (status != 0)
-	_cupsLangPrintf(stderr,
-			_("ERROR: Remote host did not accept control file "
-			  "(%d)\n"), status);
+	_cupsLangPrintFilter(stderr, "ERROR",
+			     _("Remote host did not accept control file (%d)."),
+			     status);
       else
-	_cupsLangPuts(stderr, _("INFO: Control file sent successfully\n"));
+	_cupsLangPrintFilter(stderr, "INFO",
+	                     _("Control file sent successfully."));
     }
 
    /*

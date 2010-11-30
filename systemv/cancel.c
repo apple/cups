@@ -78,8 +78,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      httpEncryption(http, HTTP_ENCRYPT_REQUIRED);
 #else
             _cupsLangPrintf(stderr,
-	                    _("%s: Sorry, no encryption support compiled in\n"),
-	                    argv[0]);
+	                    _("%s: Sorry, no encryption support."), argv[0]);
 #endif /* HAVE_SSL */
 	    break;
 
@@ -93,8 +92,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		                _("%s: Error - expected username after "
-				  "\'-U\' option\n"),
-		        	argv[0]);
+				  "\"-U\" option."), argv[0]);
 	        return (1);
 	      }
 
@@ -124,8 +122,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected hostname after "
-			          "\'-h\' option\n"),
-				argv[0]);
+			          "\"-h\" option."), argv[0]);
 		return (1);
               }
 	      else
@@ -146,8 +143,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      {
 	        _cupsLangPrintf(stderr,
 		        	_("%s: Error - expected username after "
-			          "\'-u\' option\n"),
-				argv[0]);
+			          "\"-u\" option."), argv[0]);
 		return (1);
               }
 	      else
@@ -157,7 +153,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 
 	default :
 	    _cupsLangPrintf(stderr,
-	                    _("%s: Error - unknown option \'%c\'\n"),
+	                    _("%s: Error - unknown option \"%c\"."),
 			    argv[0], argv[i][1]);
 	    return (1);
       }
@@ -215,7 +211,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	*/
 
         _cupsLangPrintf(stderr,
-	                _("%s: Error - unknown destination \"%s\"\n"),
+	                _("%s: Error - unknown destination \"%s\"."),
 			argv[0], argv[i]);
 	return (1);
       }
@@ -238,8 +234,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	                               cupsEncryption())) == NULL)
 	{
 	  _cupsLangPrintf(stderr,
-	                  _("%s: Unable to contact server\n"),
-			  argv[0]);
+	                  _("%s: Unable to contact server."), argv[0]);
 	  return (1);
 	}
 
@@ -296,7 +291,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if (response == NULL ||
           response->request.status.status_code > IPP_OK_CONFLICT)
       {
-	_cupsLangPrintf(stderr, _("%s: %s failed: %s\n"), argv[0],
+	_cupsLangPrintf(stderr, _("%s: %s failed: %s"), argv[0],
 	        	op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
         		cupsLastErrorString());
 
@@ -319,8 +314,7 @@ main(int  argc,				/* I - Number of command-line arguments */
       if ((http = httpConnectEncrypt(cupsServer(), ippPort(),
 	                             cupsEncryption())) == NULL)
       {
-	_cupsLangPrintf(stderr, _("%s: Unable to contact server\n"),
-	                argv[0]);
+	_cupsLangPrintf(stderr, _("%s: Unable to contact server."), argv[0]);
 	return (1);
       }
 
@@ -360,7 +354,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     if (response == NULL ||
         response->request.status.status_code > IPP_OK_CONFLICT)
     {
-      _cupsLangPrintf(stderr, _("%s: %s failed: %s\n"), argv[0],
+      _cupsLangPrintf(stderr, _("%s: %s failed: %s"), argv[0],
 		      op == IPP_PURGE_JOBS ? "purge-jobs" : "cancel-job",
         	      cupsLastErrorString());
 
