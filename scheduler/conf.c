@@ -633,7 +633,7 @@ cupsdReadConfiguration(void)
   RootCertDuration         = 300;
   Timeout                  = DEFAULT_TIMEOUT;
   NumSystemGroups          = 0;
-  WebInterface             = FALSE;
+  WebInterface             = CUPS_DEFAULT_WEBIF;
 
   BrowseInterval           = DEFAULT_INTERVAL;
   BrowsePort               = ippPort();

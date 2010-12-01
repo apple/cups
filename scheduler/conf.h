@@ -221,7 +221,7 @@ VAR int			MaxClients		VALUE(100),
 					/* Share printers by default? */
 			MultipleOperationTimeout VALUE(DEFAULT_TIMEOUT),
 					/* multiple-operation-time-out value */
-			WebInterface		VALUE(FALSE);
+			WebInterface		VALUE(CUPS_DEFAULT_WEBIF);
 					/* Enable the web interface? */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Access log file */
