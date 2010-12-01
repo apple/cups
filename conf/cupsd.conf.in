@@ -26,6 +26,9 @@ BrowseLocalProtocols @CUPS_BROWSE_LOCAL_PROTOCOLS@
 # Default authentication type, when authentication is required...
 DefaultAuthType Basic
 
+# Web interface setting...
+WebInterface @CUPS_WEBIF@
+
 # Restrict access to the server...
 <Location />
   Order allow,deny

@@ -1369,13 +1369,27 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      }
 	    }
 
-	    if ((!strncmp(con->uri, "/admin", 6) &&
-	         strncmp(con->uri, "/admin/conf/", 12) &&
-	         strncmp(con->uri, "/admin/log/", 11)) ||
-		!strncmp(con->uri, "/printers", 9) ||
-		!strncmp(con->uri, "/classes", 8) ||
-		!strncmp(con->uri, "/help", 5) ||
-		!strncmp(con->uri, "/jobs", 5))
+            if (!WebInterface)
+	    {
+	     /*
+	      * Web interface is disabled. Show an appropriate message...
+	      */
+
+	      if (!cupsdSendError(con, HTTP_WEBIF_DISABLED, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+
+	      break;
+	    }
+	    else if ((!strncmp(con->uri, "/admin", 6) &&
+		      strncmp(con->uri, "/admin/conf/", 12) &&
+		      strncmp(con->uri, "/admin/log/", 11)) ||
+		     !strncmp(con->uri, "/printers", 9) ||
+		     !strncmp(con->uri, "/classes", 8) ||
+		     !strncmp(con->uri, "/help", 5) ||
+		     !strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
 	      * Send CGI output...
@@ -1580,6 +1594,20 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	    if (!strcmp(con->http.fields[HTTP_FIELD_CONTENT_TYPE],
 	                "application/ipp"))
               con->request = ippNew();
+            else if (!WebInterface)
+	    {
+	     /*
+	      * Web interface is disabled. Show an appropriate message...
+	      */
+
+	      if (!cupsdSendError(con, HTTP_WEBIF_DISABLED, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+
+	      break;
+	    }
 	    else if ((!strncmp(con->uri, "/admin", 6) &&
 	              strncmp(con->uri, "/admin/conf/", 12) &&
 	              strncmp(con->uri, "/admin/log/", 11)) ||
@@ -1795,6 +1823,52 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 		break;
 	      }
+	    }
+            else if (!strncmp(con->uri, "/printers/", 10) &&
+		     !strcmp(con->uri + strlen(con->uri) - 4, ".png"))
+	    {
+	     /*
+	      * Send PNG file - get the real printer name since printer
+	      * names are not case sensitive but filenames can be...
+	      */
+
+              con->uri[strlen(con->uri) - 4] = '\0';	/* Drop ".ppd" */
+
+              if ((p = cupsdFindPrinter(con->uri + 10)) != NULL)
+		snprintf(con->uri, sizeof(con->uri), "/icons/%s.png", p->name);
+	      else
+	      {
+		if (!cupsdSendError(con, HTTP_NOT_FOUND, CUPSD_AUTH_NONE))
+		{
+		  cupsdCloseClient(con);
+		  return;
+		}
+
+		break;
+	      }
+	    }
+	    else if (!WebInterface)
+	    {
+              if (!cupsdSendHeader(con, HTTP_OK, line, CUPSD_AUTH_NONE))
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+
+	      if (httpPrintf(HTTP(con), "\r\n") < 0)
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+
+	      if (cupsdFlushHeader(con) < 0)
+	      {
+		cupsdCloseClient(con);
+		return;
+	      }
+
+	      con->http.state = HTTP_WAITING;
+	      break;
 	    }
 
 	    if ((!strncmp(con->uri, "/admin", 6) &&
@@ -2411,6 +2485,10 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	       "CONTENT=\"3;URL=https://%s:%d%s\">\n",
 	       con->servername, con->serverport, con->uri);
     }
+    else if (code == HTTP_WEBIF_DISABLED)
+      text = _cupsLangString(con->language,
+                             _("The web interface is currently disabled. Run "
+			       "\"cupsctl WebInterface=yes\" to enable it."));
     else
       text = "";
 
@@ -2421,17 +2499,17 @@ cupsdSendError(cupsd_client_t *con,	/* I - Connection */
 	     "<HEAD>\n"
              "\t<META HTTP-EQUIV=\"Content-Type\" "
 	     "CONTENT=\"text/html; charset=utf-8\">\n"
-	     "\t<TITLE>%d %s</TITLE>\n"
+	     "\t<TITLE>%s - " CUPS_SVERSION "</TITLE>\n"
 	     "\t<LINK REL=\"STYLESHEET\" TYPE=\"text/css\" "
 	     "HREF=\"/cups.css\">\n"
 	     "%s"
 	     "</HEAD>\n"
              "<BODY>\n"
-	     "<H1>%d %s</H1>\n"
+	     "<H1>%s</H1>\n"
 	     "<P>%s</P>\n"
 	     "</BODY>\n"
 	     "</HTML>\n",
-	     code, httpStatus(code), redirect, code, httpStatus(code), text);
+	     httpStatus(code), redirect, httpStatus(code), text);
 
     if (httpPrintf(HTTP(con), "Content-Type: text/html; charset=utf-8\r\n") < 0)
       return (0);
@@ -2485,6 +2563,15 @@ cupsdSendHeader(
 
     return (httpPrintf(HTTP(con), "HTTP/%d.%d 100 Continue\r\n\r\n",
 		       con->http.version / 100, con->http.version % 100) > 0);
+  }
+  else if (code == HTTP_WEBIF_DISABLED)
+  {
+   /*
+    * Treat our special "web interface is disabled" status as "200 OK" for web
+    * browsers.
+    */
+
+    code = HTTP_OK;
   }
 
   httpFlushWrite(HTTP(con));

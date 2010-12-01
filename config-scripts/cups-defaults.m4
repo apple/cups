@@ -470,6 +470,26 @@ fi
 
 AC_SUBST(FONTS)
 
+dnl Web interface...
+AC_ARG_ENABLE(webif, [  --enable-webif        Enable the web interface by default, default=no for Mac OS X])
+case "x$enable_webif" in
+	xno)
+		CUPS_WEBIF=No
+		;;
+	xyes)
+		CUPS_WEBIF=Yes
+		;;
+	*)
+		if test $uname = Darwin; then
+			CUPS_WEBIF=No
+		else
+			CUPS_WEBIF=Yes
+		fi
+		;;
+esac
+
+AC_SUBST(CUPS_WEBIF)
+
 dnl
 dnl End of "$Id$".
 dnl

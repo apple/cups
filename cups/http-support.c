@@ -1253,6 +1253,9 @@ httpStatus(http_status_t status)	/* I - HTTP status code */
     case HTTP_PKI_ERROR :
         s = _("SSL/TLS Negotiation Error");
 	break;
+    case HTTP_WEBIF_DISABLED :
+        s = _("Web Interface is Disabled");
+	break;
 
     default :
         s = _("Unknown");
