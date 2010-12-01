@@ -3191,7 +3191,7 @@ WebInterface no
 
 <H3>Description</H3>
 
-<P>The <CODE>WebInterface</CODE> directive specifies whether the web interface is enabled. The default value is <CODE>no</CODE>.</P>
+<P>The <CODE>WebInterface</CODE> directive specifies whether the web interface is enabled. The default value is <CODE>@CUPS_WEBIF@</CODE>.</P>
 
 </BODY>
 </HTML>
