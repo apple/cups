@@ -80,8 +80,8 @@ install-languages:
 	done
 
 install-langbundle: po2strings
-	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj"
-	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj"
+	$(INSTALL_DIR) -m 755 "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj"
+	$(INSTALL_DATA) cups.strings "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj"
 
 
 #
@@ -117,7 +117,7 @@ uninstall-languages:
 	done
 
 uninstall-langbundle:
-	$(RM) "$(BUILDROOT)$(CUPS_BUNDLEDIR)/Resources/English.lproj/cups.strings"
+	$(RM) "$(BUILDROOT)$(BUNDLEDIR)/Resources/English.lproj/cups.strings"
 
 
 #
