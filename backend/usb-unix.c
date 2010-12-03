@@ -142,7 +142,7 @@ print_device(const char *uri,		/* I - Device URI */
       }
       else
       {
-	_cupsLangPrintError(stderr, "ERROR", _("Unable to open device file"));
+	_cupsLangPrintError("ERROR", _("Unable to open device file"));
 	return (CUPS_BACKEND_FAILED);
       }
     }
