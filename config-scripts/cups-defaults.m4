@@ -470,6 +470,31 @@ fi
 
 AC_SUBST(FONTS)
 
+dnl Web interface...
+AC_ARG_ENABLE(webif, [  --enable-webif          enable the web interface by default, default=no for Mac OS X])
+case "x$enable_webif" in
+	xno)
+		CUPS_WEBIF=No
+		CUPS_DEFAULT_WEBIF=0
+		;;
+	xyes)
+		CUPS_WEBIF=Yes
+		CUPS_DEFAULT_WEBIF=1
+		;;
+	*)
+		if test $uname = Darwin; then
+			CUPS_WEBIF=No
+			CUPS_DEFAULT_WEBIF=0
+		else
+			CUPS_WEBIF=Yes
+			CUPS_DEFAULT_WEBIF=1
+		fi
+		;;
+esac
+
+AC_SUBST(CUPS_WEBIF)
+AC_DEFINE_UNQUOTED(CUPS_DEFAULT_WEBIF, $CUPS_DEFAULT_WEBIF)
+
 dnl
 dnl End of "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $".
 dnl

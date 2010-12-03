@@ -100,10 +100,17 @@
 
 
 /*
- * Do we have domain socket support?
+ * Do we have domain socket support, and if so what is the default one?
  */
 
 #undef CUPS_DEFAULT_DOMAINSOCKET
+
+
+/*
+ * Default WebInterface value...
+ */
+
+#undef CUPS_DEFAULT_WEBIF
 
 
 /*
@@ -692,6 +699,13 @@
  */
 
 #undef CUPS_BUNDLEDIR
+
+
+/*
+ * Do we have the ColorSyncRegisterDevice function?
+ */
+
+#undef HAVE_COLORSYNCREGISTERDEVICE
 
 
 #endif /* !_CUPS_CONFIG_H_ */

@@ -742,6 +742,11 @@ Specifies the HTTP request timeout in seconds.
 User user-name
 .br
 Specifies the user name or ID that is used when running external programs.
+.TP 5
+WebInterface yes
+.TP 5
+WebInterface no
+Specifies whether the web interface is enabled.
 .SH SEE ALSO
 \fIclasses.conf(5)\fR, \fIcupsd(8)\fR, \fImime.convs(5)\fR,
 \fImime.types(5)\fR, \fIprinters.conf(5)\fR,

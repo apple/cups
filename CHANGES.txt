@@ -1,8 +1,10 @@
-CHANGES.txt - 2010-11-05
+CHANGES.txt - 2010-12-01
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The web interface can now be disabled using the WebInterface directive
+	  in cupsd.conf (STR #2625)
 	- The scheduler now provides privacy controls for jobs and subscriptions
 	  (STR #2969)
 	- Added new cupsArrayNew3 API which offers memory management of array

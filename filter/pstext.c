@@ -244,7 +244,7 @@ psTextInitialize(void)
   }
   else
   {
-    _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
+    _cupsLangPrintError("ERROR", _("Unable to open print file"));
     exit(1);
   }
 
@@ -260,7 +260,7 @@ psTextInitialize(void)
     * Can't open charset file!
     */
 
-    _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
+    _cupsLangPrintError("ERROR", _("Unable to open print file"));
     exit(1);
   }
 

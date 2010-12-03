@@ -160,6 +160,8 @@ install:	install-data install-headers install-libs install-exec
 #
 
 install-data:
+	echo Making all in cups...
+	(cd cups; $(MAKE) $(MFLAGS) all)
 	for dir in $(DIRS); do\
 		echo Installing data files in $$dir... ;\
 		(cd $$dir; $(MAKE) $(MFLAGS) install-data) || exit 1;\

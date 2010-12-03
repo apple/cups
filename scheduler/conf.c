@@ -180,7 +180,8 @@ static const cupsd_var_t	variables[] =
 #endif /* HAVE_AUTHORIZATION_H */
   { "TempDir",			&TempDir,		CUPSD_VARTYPE_PATHNAME },
   { "Timeout",			&Timeout,		CUPSD_VARTYPE_INTEGER },
-  { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN }
+  { "UseNetworkDefault",	&UseNetworkDefault,	CUPSD_VARTYPE_BOOLEAN },
+  { "WebInterface",		&WebInterface,		CUPSD_VARTYPE_BOOLEAN }
 };
 #define NUM_VARS	(sizeof(variables) / sizeof(variables[0]))
 
@@ -632,6 +633,7 @@ cupsdReadConfiguration(void)
   RootCertDuration         = 300;
   Timeout                  = DEFAULT_TIMEOUT;
   NumSystemGroups          = 0;
+  WebInterface             = CUPS_DEFAULT_WEBIF;
 
   BrowseInterval           = DEFAULT_INTERVAL;
   BrowsePort               = ippPort();

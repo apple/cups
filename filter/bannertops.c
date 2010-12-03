@@ -180,7 +180,7 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
 
   if (!fp)
   {
-    _cupsLangPrintError(stderr, "ERROR", _("Unable to open print file"));
+    _cupsLangPrintError("ERROR", _("Unable to open print file"));
     exit(1);
   }
 

@@ -219,8 +219,10 @@ VAR int			MaxClients		VALUE(100),
 					/* Format of printcap file? */
 			DefaultShared		VALUE(TRUE),
 					/* Share printers by default? */
-			MultipleOperationTimeout VALUE(DEFAULT_TIMEOUT);
+			MultipleOperationTimeout VALUE(DEFAULT_TIMEOUT),
 					/* multiple-operation-time-out value */
+			WebInterface		VALUE(CUPS_DEFAULT_WEBIF);
+					/* Enable the web interface? */
 VAR cups_file_t		*AccessFile		VALUE(NULL),
 					/* Access log file */
 			*ErrorFile		VALUE(NULL),

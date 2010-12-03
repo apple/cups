@@ -1,6 +1,16 @@
 CHANGES-1.4.txt
 ---------------
 
+CHANGES IN CUPS V1.4.7
+
+	- The scheduler did not always show the most recent status message from
+	  the print filters (STR #3731)
+	- The PostScript filter did not apply the mirror and number-up options
+	  properly, leading to offset and clipped output (STR #3732)
+	- The network backends always reported "low toner" or "out of toner"
+	  states, even for inkjet printers (STR #3733)
+
+
 CHANGES IN CUPS V1.4.6
 
 	- Regression: The pstops filter did not support landscape printing of

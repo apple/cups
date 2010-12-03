@@ -251,7 +251,8 @@ typedef enum http_status_e		/**** HTTP status codes ****/
   HTTP_NOT_SUPPORTED,			/* HTTP version not supported */
 
   HTTP_AUTHORIZATION_CANCELED = 1000,	/* User canceled authorization @since CUPS 1.4@ */
-  HTTP_PKI_ERROR			/* Error negotiating a secure connection @since CUPS 1.5@ */
+  HTTP_PKI_ERROR,			/* Error negotiating a secure connection @since CUPS 1.5@ */
+  HTTP_WEBIF_DISABLED			/* Web interface is disabled @private@ */
 } http_status_t;
 
 typedef enum http_uri_status_e		/**** URI separation status @since CUPS 1.2@ ****/

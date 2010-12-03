@@ -323,6 +323,12 @@ case $uname in
 		dnl Check for dynamic store function...
 		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName)
 
+		dnl Check for new ColorSync APIs...
+		SAVELIBS="$LIBS"
+		LIBS="$LIBS -framework ApplicationServices"
+		AC_CHECK_FUNCS(ColorSyncRegisterDevice)
+		LIBS="$SAVELIBS"
+
 		dnl Check for the new membership functions in MacOSX 10.4...
 		AC_CHECK_HEADER(membership.h,AC_DEFINE(HAVE_MEMBERSHIP_H))
 		AC_CHECK_HEADER(membershipPriv.h,AC_DEFINE(HAVE_MEMBERSHIPPRIV_H))
