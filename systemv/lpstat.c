@@ -1271,7 +1271,8 @@ show_jobs(const char *dests,		/* I - Destinations */
 		*reasons;		/* Job state reasons attribute */
   const char	*dest,			/* Pointer into job-printer-uri */
 		*username,		/* Pointer to job-originating-user-name */
-		*title;			/* Pointer to job-name */
+		*title,			/* Pointer to job-name */
+		*message;		/* Pointer to job-printer-state-message */
   int		rank,			/* Rank in queue */
 		jobid,			/* job-id */
 		size;			/* job-k-octets */
@@ -1285,6 +1286,7 @@ show_jobs(const char *dests,		/* I - Destinations */
 		  "job-k-octets",
 		  "job-name",
 		  "job-originating-user-name",
+		  "job-printer-state-message",
 		  "job-printer-uri",
 		  "job-state-reasons",
 		  "time-at-creation"
@@ -1366,6 +1368,7 @@ show_jobs(const char *dests,		/* I - Destinations */
       dest     = NULL;
       jobtime  = 0;
       title    = "no title";
+      message  = NULL;
       reasons  = NULL;
 
       while (attr != NULL && attr->group_tag == IPP_TAG_JOB)
@@ -1373,30 +1376,29 @@ show_jobs(const char *dests,		/* I - Destinations */
         if (!strcmp(attr->name, "job-id") &&
 	    attr->value_tag == IPP_TAG_INTEGER)
 	  jobid = attr->values[0].integer;
-
-        if (!strcmp(attr->name, "job-k-octets") &&
-	    attr->value_tag == IPP_TAG_INTEGER)
+        else if (!strcmp(attr->name, "job-k-octets") &&
+		 attr->value_tag == IPP_TAG_INTEGER)
 	  size = attr->values[0].integer;
-
-        if (!strcmp(attr->name, "time-at-creation") &&
-	    attr->value_tag == IPP_TAG_INTEGER)
+        else if (!strcmp(attr->name, "time-at-creation") &&
+		 attr->value_tag == IPP_TAG_INTEGER)
 	  jobtime = attr->values[0].integer;
-
-        if (!strcmp(attr->name, "job-printer-uri") &&
-	    attr->value_tag == IPP_TAG_URI)
+        else if (!strcmp(attr->name, "job-printer-state-message") &&
+	         attr->value_tag == IPP_TAG_TEXT)
+	  message = attr->values[0].string.text;
+        else if (!strcmp(attr->name, "job-printer-uri") &&
+	         attr->value_tag == IPP_TAG_URI)
+	{
 	  if ((dest = strrchr(attr->values[0].string.text, '/')) != NULL)
 	    dest ++;
-
-        if (!strcmp(attr->name, "job-originating-user-name") &&
-	    attr->value_tag == IPP_TAG_NAME)
+        }
+        else if (!strcmp(attr->name, "job-originating-user-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
 	  username = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "job-name") &&
-	    attr->value_tag == IPP_TAG_NAME)
+        else if (!strcmp(attr->name, "job-name") &&
+	         attr->value_tag == IPP_TAG_NAME)
 	  title = attr->values[0].string.text;
-
-        if (!strcmp(attr->name, "job-state-reasons") &&
-	    attr->value_tag == IPP_TAG_KEYWORD)
+        else if (!strcmp(attr->name, "job-state-reasons") &&
+	         attr->value_tag == IPP_TAG_KEYWORD)
 	  reasons = attr;
 
         attr = attr->next;
@@ -1453,6 +1455,9 @@ show_jobs(const char *dests,		/* I - Destinations */
 			    1024.0 * size, date);
           if (long_status)
           {
+	    if (message)
+	      _cupsLangPrintf(stdout, _("\tStatus: %s"), message);
+
 	    if (reasons)
 	    {
 	      char	alerts[1024],	/* Alerts string */
