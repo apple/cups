@@ -260,7 +260,7 @@ WriteProlog(const char *title,		/* I - Title of job */
   }
   else
   {
-    _cupsLangPrintError(stderr, "ERROR", _("Unable to open psglyphs"));
+    _cupsLangPrintError("ERROR", _("Unable to open psglyphs"));
     exit(1);
   }
 
@@ -279,7 +279,7 @@ WriteProlog(const char *title,		/* I - Title of job */
       * Can't open charset file!
       */
 
-      _cupsLangPrintError(stderr, "ERROR", _("Unable to open charset file"));
+      _cupsLangPrintError("ERROR", _("Unable to open charset file"));
       exit(1);
     }
 
