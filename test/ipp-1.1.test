@@ -681,6 +681,7 @@
 	ATTR name requesting-user-name $user
 
 	STATUS successful-ok
+	STATUS client-error-not-possible
 }
 
 
