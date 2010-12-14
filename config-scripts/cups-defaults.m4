@@ -28,7 +28,7 @@ dnl Mac OS X bundle-based localization support
 AC_ARG_WITH(bundledir, [  --with-bundledir     set Mac OS X localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
 	if test "x$uname" = xDarwin; then
-		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Frameworks/PrintCore.framework"
+		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
 		LANGUAGES=""
 	else
 		CUPS_BUNDLEDIR=""

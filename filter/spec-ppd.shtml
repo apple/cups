@@ -317,7 +317,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 
 <h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsUIResolver'>cupsUIResolver</a></h3>
 
-<p class='summary'>*cupsUIResolution resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
+<p class='summary'>*cupsUIResolver resolver: "*Keyword1 OptionKeyword1 *Keyword2 OptionKeyword2 ..."</p>
 
 <p>Specifies two or more options to mark/select to resolve a constraint. The "resolver" string identifies a particular action to take for one or more <a href='#cupsUIConstraints'><tt>cupsUIConstraints</tt></a>. The same action can be used for multiple constraints. The option keyword pairs are treated as an ordered list of option selections to try - only the first N selections will be used, where N is the minimum number of selections required. Because <a href="api-ppd.html#cupsResolveConflicts"><code>cupsResolveConflicts()</code></a> will not change the most recent option selection passed to it, at least two options from the constraints must be listed to avoid situations where conflicts cannot be resolved.</p>
 

@@ -52,7 +52,7 @@ WebInterface @CUPS_WEBIF@
   JobPrivateAccess default
   JobPrivateValues default
   SubscriptionPrivateAccess default
-  SubscriptionPrivateAccess default
+  SubscriptionPrivateValues default
 
   # Job-related operations must be done by the owner or an administrator...
   <Limit Create-Job Print-Job Print-URI Validate-Job>
@@ -95,7 +95,7 @@ WebInterface @CUPS_WEBIF@
   JobPrivateAccess default
   JobPrivateValues default
   SubscriptionPrivateAccess default
-  SubscriptionPrivateAccess default
+  SubscriptionPrivateValues default
 
   # Job-related operations must be done by the owner or an administrator...
   <Limit Create-Job Print-Job Print-URI Validate-Job>
