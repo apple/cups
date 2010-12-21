@@ -77,10 +77,15 @@ cupsMarkOptions(
 		s[255];			/* Temporary string */
   const char	*val,			/* Pointer into value */
 		*media,			/* media option */
+		*output_bin,		/* output-bin option */
+		*output_mode,		/* output-mode option */
 		*page_size,		/* PageSize option */
-		*ppd_keyword;		/* PPD keyword */
+		*ppd_keyword,		/* PPD keyword */
+		*print_quality,		/* print-quality option */
+		*sides;			/* sides option */
   cups_option_t	*optptr;		/* Current option */
   ppd_attr_t	*attr;			/* PPD attribute */
+  _pwg_t	*pwg;			/* PWG mapping data */
 
 
  /*
@@ -93,29 +98,39 @@ cupsMarkOptions(
   ppd_debug_marked(ppd, "Before...");
 
  /*
-  * Do special handling for media and PageSize...
+  * Do special handling for finishings, media, output-bin, output-mode,
+  * print-color-mode, print-quality, and PageSize...
   */
 
-  media     = cupsGetOption("media", num_options, options);
-  page_size = cupsGetOption("PageSize", num_options, options);
+  media         = cupsGetOption("media", num_options, options);
+  output_bin    = cupsGetOption("output-bin", num_options, options);
+  output_mode   = cupsGetOption("output-mode", num_options, options);
+  page_size     = cupsGetOption("PageSize", num_options, options);
+  print_quality = cupsGetOption("print-quality", num_options, options);
+  sides         = cupsGetOption("sides", num_options, options);
 
-  if (media)
+  if ((media || output_bin || output_mode || print_quality || sides) &&
+      !ppd->pwg)
   {
    /*
     * Load PWG mapping data as needed...
     */
 
-    if (!ppd->pwg)
-      ppd->pwg = _pwgCreateWithPPD(ppd);
+    ppd->pwg = _pwgCreateWithPPD(ppd);
+  }
 
+  pwg = (_pwg_t *)ppd->pwg;
+
+  if (media)
+  {
    /*
-    * Loop through the option string, separating it at commas and
-    * marking each individual option as long as the corresponding
-    * PPD option (PageSize, InputSlot, etc.) is not also set.
+    * Loop through the option string, separating it at commas and marking each
+    * individual option as long as the corresponding PPD option (PageSize,
+    * InputSlot, etc.) is not also set.
     *
-    * For PageSize, we also check for an empty option value since
-    * some versions of MacOS X use it to specify auto-selection
-    * of the media based solely on the size.
+    * For PageSize, we also check for an empty option value since some versions
+    * of MacOS X use it to specify auto-selection of the media based solely on
+    * the size.
     */
 
     for (val = media; *val;)
@@ -139,18 +154,111 @@ cupsMarkOptions(
       {
         if (!strncasecmp(s, "Custom.", 7) || ppdPageSize(ppd, s))
           ppd_mark_option(ppd, "PageSize", s);
-        else if ((ppd_keyword = _pwgGetPageSize((_pwg_t *)ppd->pwg, NULL, s,
-	                                        NULL)) != NULL)
+        else if ((ppd_keyword = _pwgGetPageSize(pwg, NULL, s, NULL)) != NULL)
 	  ppd_mark_option(ppd, "PageSize", ppd_keyword);
       }
 
-      if (!cupsGetOption("InputSlot", num_options, options) &&
-	  (ppd_keyword = _pwgGetInputSlot((_pwg_t *)ppd->pwg, NULL, s)) != NULL)
-	ppd_mark_option(ppd, "InputSlot", ppd_keyword);
+      if (pwg && pwg->source_option &&
+          !cupsGetOption(pwg->source_option, num_options, options) &&
+	  (ppd_keyword = _pwgGetInputSlot(pwg, NULL, s)) != NULL)
+	ppd_mark_option(ppd, pwg->source_option, ppd_keyword);
 
       if (!cupsGetOption("MediaType", num_options, options) &&
-	  (ppd_keyword = _pwgGetMediaType((_pwg_t *)ppd->pwg, NULL, s)) != NULL)
+	  (ppd_keyword = _pwgGetMediaType(pwg, NULL, s)) != NULL)
 	ppd_mark_option(ppd, "MediaType", ppd_keyword);
+    }
+  }
+
+  if (pwg)
+  {
+    if (!cupsGetOption("com.apple.print.DocumentTicket.PMSpoolFormat",
+                       num_options, options) &&
+        !cupsGetOption("APPrinterPreset", num_options, options) &&
+        (output_mode || print_quality))
+    {
+     /*
+      * Map output-mode and print-quality to a preset...
+      */
+
+      _pwg_output_mode_t	pwg_om;	/* output-mode index */
+      _pwg_print_quality_t	pwg_pq;	/* print-quality index */
+      cups_option_t		*preset;/* Current preset option */
+
+      if (output_mode && !strcmp(output_mode, "monochrome"))
+	pwg_om = _PWG_OUTPUT_MODE_MONOCHROME;
+      else
+	pwg_om = _PWG_OUTPUT_MODE_COLOR;
+
+      if (print_quality)
+      {
+	pwg_pq = atoi(print_quality) - IPP_QUALITY_DRAFT;
+	if (pwg_pq < _PWG_PRINT_QUALITY_DRAFT)
+	  pwg_pq = _PWG_PRINT_QUALITY_DRAFT;
+	else if (pwg_pq > _PWG_PRINT_QUALITY_HIGH)
+	  pwg_pq = _PWG_PRINT_QUALITY_HIGH;
+      }
+      else
+	pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
+
+      if (pwg->num_presets[pwg_om][pwg_pq] == 0)
+      {
+       /*
+	* Try to find a preset that works so that we maximize the chances of us
+	* getting a good print using IPP attributes.
+	*/
+
+	if (pwg->num_presets[pwg_om][_PWG_PRINT_QUALITY_NORMAL] > 0)
+	  pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
+	else if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_pq] > 0)
+	  pwg_om = _PWG_OUTPUT_MODE_COLOR;
+	else
+	{
+	  pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
+	  pwg_om = _PWG_OUTPUT_MODE_COLOR;
+	}
+      }
+
+      if (pwg->num_presets[pwg_om][pwg_pq] > 0)
+      {
+       /*
+	* Copy the preset options as long as the corresponding names are not
+	* already defined in the IPP request...
+	*/
+
+	for (i = pwg->num_presets[pwg_om][pwg_pq],
+		 preset = pwg->presets[pwg_om][pwg_pq];
+	     i > 0;
+	     i --, preset ++)
+	{
+	  if (!cupsGetOption(preset->name, num_options, options))
+	    ppd_mark_option(ppd, preset->name, preset->value);
+	}
+      }
+    }
+
+    if (output_bin && !cupsGetOption("OutputBin", num_options, options) &&
+	(ppd_keyword = _pwgGetOutputBin(pwg, output_bin)) != NULL) 
+    {
+     /*
+      * Map output-bin to OutputBin...
+      */
+
+      ppd_mark_option(ppd, "OutputBin", ppd_keyword);
+    }
+
+    if (sides && pwg->sides_option &&
+        !cupsGetOption(pwg->sides_option, num_options, options))
+    {
+     /*
+      * Map sides to duplex option...
+      */
+
+      if (!strcmp(sides, "one-sided"))
+        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_1sided);
+      else if (!strcmp(sides, "two-sided-long-edge"))
+        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_2sided_long);
+      else if (!strcmp(sides, "two-sided-short-edge"))
+        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_2sided_short);
     }
   }
 
@@ -162,6 +270,7 @@ cupsMarkOptions(
     if (!strcasecmp(optptr->name, "media") ||
         !strcasecmp(optptr->name, "output-bin") ||
 	!strcasecmp(optptr->name, "output-mode") ||
+	!strcasecmp(optptr->name, "print-quality") ||
 	!strcasecmp(optptr->name, "sides"))
       continue;
     else if (!strcasecmp(optptr->name, "resolution") ||
@@ -225,60 +334,6 @@ cupsMarkOptions(
 	*/
 
         ppd_mark_choices(ppd, attr->value);
-      }
-    }
-    else if (!strcasecmp(optptr->name, "print-quality"))
-    {
-      ppd_option_t	*output_mode = ppdFindOption(ppd, "OutputMode");
-					/* OutputMode option */
-
-      if (!strcmp(optptr->value, "3"))
-      {
-       /*
-        * Draft quality...
-	*/
-
-	if (ppdFindChoice(output_mode, "Draft"))
-	  ppd_mark_option(ppd, "OutputMode", "Draft");
-	else if (ppdFindChoice(output_mode, "Fast"))
-	  ppd_mark_option(ppd, "OutputMode", "Fast");
-
-        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
-	                        "DraftGray_with_Paper_Auto-Detect")) != NULL)
-          ppd_mark_choices(ppd, attr->value);
-      }
-      else if (!strcmp(optptr->value, "4"))
-      {
-       /*
-        * Normal quality...
-	*/
-
-	if (ppdFindChoice(output_mode, "Normal"))
-	  ppd_mark_option(ppd, "OutputMode", "Normal");
-	else if (ppdFindChoice(output_mode, "Good"))
-	  ppd_mark_option(ppd, "OutputMode", "Good");
-
-        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
-	                        "Color_with_Paper_Auto-Detect")) != NULL)
-          ppd_mark_choices(ppd, attr->value);
-        else if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
-	                        "Gray_with_Paper_Auto-Detect")) != NULL)
-          ppd_mark_choices(ppd, attr->value);
-      }
-      else if (!strcmp(optptr->value, "5"))
-      {
-       /*
-        * High/best/photo quality...
-	*/
-
-	if (ppdFindChoice(output_mode, "Best"))
-	  ppd_mark_option(ppd, "OutputMode", "Best");
-	else if (ppdFindChoice(output_mode, "High"))
-	  ppd_mark_option(ppd, "OutputMode", "High");
-
-        if ((attr = ppdFindAttr(ppd, "APPrinterPreset",
-	                        "Photo_on_Photo_Paper")) != NULL)
-          ppd_mark_choices(ppd, attr->value);
       }
     }
     else if (!strcasecmp(optptr->name, "APPrinterPreset"))

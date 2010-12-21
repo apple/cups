@@ -3062,6 +3062,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
       !ippFindAttribute(job->attrs,
                         "com.apple.print.DocumentTicket.PMSpoolFormat",
 			IPP_TAG_ZERO) &&
+      !ippFindAttribute(job->attrs, "APPrinterPreset", IPP_TAG_ZERO) &&
       (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
        ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
@@ -3123,25 +3124,6 @@ get_options(cupsd_job_t *job,		/* I - Job */
 
   if (pwg)
   {
-    if (pwg->sides_option &&
-        !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
-	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)
-    {
-     /*
-      * Add a duplex option...
-      */
-
-      if (!strcmp(attr->values[0].string.text, "one-sided"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_1sided,
-				    num_pwgppds, &pwgppds);
-      else if (!strcmp(attr->values[0].string.text, "two-sided-long-edge"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_long,
-				    num_pwgppds, &pwgppds);
-      else if (!strcmp(attr->values[0].string.text, "two-sided-short-edge"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_short,
-				    num_pwgppds, &pwgppds);
-    }
-
     if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "HPPaperSource", IPP_TAG_ZERO))
     {
@@ -3173,7 +3155,32 @@ get_options(cupsd_job_t *job,		/* I - Job */
 	(attr->value_tag == IPP_TAG_KEYWORD ||
 	 attr->value_tag == IPP_TAG_NAME) &&
 	(ppd = _pwgGetOutputBin(pwg, attr->values[0].string.text)) != NULL) 
+    {
+     /*
+      * Map output-bin to OutputBin option...
+      */
+
       num_pwgppds = cupsAddOption("OutputBin", ppd, num_pwgppds, &pwgppds);
+    }
+
+    if (pwg->sides_option &&
+        !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
+	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)
+    {
+     /*
+      * Map sides to duplex option...
+      */
+
+      if (!strcmp(attr->values[0].string.text, "one-sided"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_1sided,
+				    num_pwgppds, &pwgppds);
+      else if (!strcmp(attr->values[0].string.text, "two-sided-long-edge"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_long,
+				    num_pwgppds, &pwgppds);
+      else if (!strcmp(attr->values[0].string.text, "two-sided-short-edge"))
+        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_short,
+				    num_pwgppds, &pwgppds);
+    }
   }
 
  /*
