@@ -292,6 +292,7 @@ cups-deviced.o: ../cups/cups.h ../cups/pwg-private.h ../cups/http-private.h
 cups-deviced.o: ../cups/http.h ../cups/md5-private.h ../cups/ipp-private.h
 cups-deviced.o: ../cups/ipp.h ../cups/language-private.h ../cups/transcode.h
 cups-deviced.o: ../cups/thread-private.h ../cups/array.h ../cups/dir.h
+cups-exec.o: ../cups/string-private.h ../config.h
 cups-lpd.o: ../cups/cups-private.h ../cups/cups.h ../cups/file.h
 cups-lpd.o: ../cups/versioning.h ../cups/ipp.h ../cups/http.h ../cups/array.h
 cups-lpd.o: ../cups/language.h ../cups/string-private.h ../config.h
