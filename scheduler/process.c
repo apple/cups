@@ -442,6 +442,7 @@ cupsdStartProcess(
          i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 4) && argv[i];
 	 i ++)
       real_argv[i + 3] = argv[i];
+
     real_argv[i + 3] = NULL;
 
     argv    = real_argv;
