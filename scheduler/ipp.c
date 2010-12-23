@@ -3849,7 +3849,7 @@ apple_register_profiles(
 				      (const void **)deviceDictKeys,
 				      (const void **)deviceDictVals,
 				      sizeof(deviceDictKeys) /
-				          sizeof(deviceDictVals),
+				          sizeof(deviceDictKeys[0]),
 				      &kCFTypeDictionaryKeyCallBacks,
 				      &kCFTypeDictionaryValueCallBacks);
       deviceUUID = ColorSyncCreateUUIDFromUInt32(device_id);
