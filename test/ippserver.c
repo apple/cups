@@ -70,7 +70,9 @@
  */
 
 #include <cups/cups-private.h>
-#include <dns_sd.h>
+#ifdef HAVE_DNSSD
+#  include <dns_sd.h>
+#endif /* HAVE_DNSSD */
 #include <sys/stat.h>
 #include <poll.h>
 #ifdef HAVE_SYS_MOUNT_H
@@ -183,13 +185,15 @@ typedef struct _ipp_printer_s		/**** Printer data ****/
 {
   int			ipv4,		/* IPv4 listener */
 			ipv6;		/* IPv6 listener */
+#ifdef HAVE_DNSSD
   DNSServiceRef		common_ref,	/* Shared service connection */
 			ipp_ref,	/* Bonjour IPP service */
 			http_ref,	/* Bonjour HTTP service */
 			printer_ref;	/* Bonjour LPD service */
   TXTRecordRef		ipp_txt;	/* Bonjour IPP TXT record */
+  char			*dnssd_name;	/* printer-dnssd-name */
+#endif /* HAVE_DNSSD */
   char			*name,		/* printer-name */
-			*dnssd_name,	/* printer-dnssd-name */
 			*icon,		/* Icon filename */
 			*directory,	/* Spool directory */
 			*hostname,	/* Hostname */
@@ -259,13 +263,16 @@ static _ipp_printer_t	*create_printer(const char *servername,
 					const char *icon,
 					const char *docformats, int ppm,
 					int ppm_color, int duplex, int port,
+#ifdef HAVE_DNSSD
 					const char *regtype,
+#endif /* HAVE_DNSSD */
 					const char *directory);
 static cups_array_t	*create_requested_array(_ipp_client_t *client);
 static void		debug_attributes(const char *title, ipp_t *ipp);
 static void		delete_client(_ipp_client_t *client);
 static void		delete_job(_ipp_job_t *job);
 static void		delete_printer(_ipp_printer_t *printer);
+#ifdef HAVE_DNSSD
 static void		dnssd_callback(DNSServiceRef sdRef,
 				       DNSServiceFlags flags,
 				       DNSServiceErrorType errorCode,
@@ -273,6 +280,7 @@ static void		dnssd_callback(DNSServiceRef sdRef,
 				       const char *regtype,
 				       const char *domain,
 				       _ipp_printer_t *printer);
+#endif /* HAVE_DNSSD */
 static _ipp_job_t	*find_job(_ipp_client_t *client);
 static void		html_escape(_ipp_client_t *client, const char *s,
 			            size_t slen);
@@ -298,11 +306,13 @@ static void		*process_client(_ipp_client_t *client);
 static int		process_http(_ipp_client_t *client);
 static int		process_ipp(_ipp_client_t *client);
 static void		*process_job(_ipp_job_t *job);
+#ifdef HAVE_DNSSD
 static int		register_printer(_ipp_printer_t *printer,
 			                 const char *location, const char *make,
 					 const char *model, const char *formats,
 					 const char *adminurl, int color,
 					 int duplex, const char *regtype);
+#endif /* HAVE_DNSSD */
 static int		respond_http(_ipp_client_t *client, http_status_t code,
 				     const char *type, size_t length);
 static void		respond_ipp(_ipp_client_t *client, ipp_status_t status,
@@ -340,9 +350,11 @@ main(int  argc,				/* I - Number of command-line args */
 		*make = "Test",		/* Manufacturer */
 		*model = "Printer",	/* Model */
 		*icon = "printer.png",	/* Icon file */
-		*formats = "application/pdf,image/jpeg",
+		*formats = "application/pdf,image/jpeg";
 	      				/* Supported formats */
-		*regtype = "_ipp._tcp";	/* Bonjour service type */
+#ifdef HAVE_DNSSD
+  const char	*regtype = "_ipp._tcp";	/* Bonjour service type */
+#endif /* HAVE_DNSSD */
   int		port = 8631,		/* Port number (0 = auto) TODO: FIX */
 		duplex = 0,		/* Duplex mode */
 		ppm = 10,		/* Pages per minute for mono */
@@ -429,12 +441,14 @@ main(int  argc,				/* I - Number of command-line args */
 	      port = atoi(argv[i]);
 	      break;
 
+#ifdef HAVE_DNSSD
 	  case 'r' : /* -r regtype */
 	      i ++;
 	      if (i >= argc)
 	        usage(1);
 	      regtype = argv[i];
 	      break;
+#endif /* HAVE_DNSSD */
 
 	  case 's' : /* -s speed[,color-speed] */
 	      i ++;
@@ -491,7 +505,10 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if ((printer = create_printer(servername, name, location, make, model, icon,
-                                formats, ppm, ppm_color, duplex, port, regtype,
+                                formats, ppm, ppm_color, duplex, port,
+#ifdef HAVE_DNSSD
+				regtype,
+#endif /* HAVE_DNSSD */
 				directory)) == NULL)
     return (1);
 
@@ -1146,7 +1163,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 	       int        ppm_color,	/* I - Pages per minute in color (0 for gray) */
 	       int        duplex,	/* I - 1 = duplex, 0 = simplex */
 	       int        port,		/* I - Port for listeners or 0 for auto */
+#ifdef HAVE_DNSSD
 	       const char *regtype,	/* I - Bonjour service type */
+#endif /* HAVE_DNSSD */
 	       const char *directory)	/* I - Spool directory */
 {
   int			i, j;		/* Looping vars */
@@ -1277,7 +1296,9 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   printer->ipv4          = -1;
   printer->ipv6          = -1;
   printer->name          = _cupsStrAlloc(name);
+#ifdef HAVE_DNSSD */
   printer->dnssd_name    = _cupsStrRetain(printer->name);
+#endif /* HAVE_DNSSD */
   printer->directory     = _cupsStrAlloc(directory);
   printer->hostname      = _cupsStrAlloc(servername ? servername :
                                              httpGetHostname(NULL, hostname,
@@ -1726,6 +1747,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   debug_attributes("Printer", printer->attrs);
 
+#ifdef HAVE_DNSSD
  /*
   * Register the printer with Bonjour...
   */
@@ -1733,6 +1755,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   if (!register_printer(printer, location, make, model, docformats, adminurl,
                         ppm_color > 0, duplex, regtype))
     goto bad_printer;
+#endif /* HAVE_DNSSD */
 
  /*
   * Return it!
@@ -2065,6 +2088,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
   if (printer->ipv6 >= 0)
     close(printer->ipv6);
 
+#if HAVE_DNSSD
   if (printer->printer_ref)
     DNSServiceRefDeallocate(printer->printer_ref);
 
@@ -2079,10 +2103,12 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
 
   TXTRecordDeallocate(&(printer->ipp_txt));
 
-  if (printer->name)
-    _cupsStrFree(printer->name);
   if (printer->dnssd_name)
     _cupsStrFree(printer->dnssd_name);
+#endif /* HAVE_DNSSD */
+
+  if (printer->name)
+    _cupsStrFree(printer->name);
   if (printer->icon)
     _cupsStrFree(printer->icon);
   if (printer->directory)
@@ -2099,6 +2125,7 @@ delete_printer(_ipp_printer_t *printer)	/* I - Printer */
 }
 
 
+#ifdef HAVE_DNSSD
 /*
  * 'dnssd_callback()' - Handle Bonjour registration events.
  */
@@ -2129,6 +2156,7 @@ dnssd_callback(
     printer->dnssd_name = _cupsStrAlloc(name);
   }
 }
+#endif /* HAVE_DNSSD */
 
 
 /*
@@ -3574,6 +3602,7 @@ process_job(_ipp_job_t *job)		/* I - Job */
 }
 
 
+#ifdef HAVE_DNSSD
 /*
  * 'register_printer()' - Register a printer object via Bonjour.
  */
@@ -3702,6 +3731,7 @@ register_printer(
 
   return (1);
 }
+#endif /* HAVE_DNSSD */
 
 
 /*
@@ -3888,6 +3918,7 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 static void
 run_printer(_ipp_printer_t *printer)	/* I - Printer */
 {
+  int		num_fds;		/* Number of file descriptors */
   struct pollfd	polldata[3];		/* poll() data */
   int		timeout;		/* Timeout for poll() */
   _ipp_client_t	*client;		/* New client */
@@ -3903,8 +3934,12 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
   polldata[1].fd     = printer->ipv6;
   polldata[1].events = POLLIN;
 
-  polldata[2].fd     = DNSServiceRefSockFD(printer->common_ref);
-  polldata[2].events = POLLIN;
+  num_fds = 2;
+
+#ifdef HAVE_DNSSD
+  polldata[num_fds   ].fd     = DNSServiceRefSockFD(printer->common_ref);
+  polldata[num_fds ++].events = POLLIN;
+#endif /* HAVE_DNSSD */
 
  /*
   * Loop until we are killed or have a hard error...
@@ -3948,8 +3983,10 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
       }
     }
 
+#ifdef HAVE_DNSSD
     if (polldata[2].revents & POLLIN)
       DNSServiceProcessResult(printer->common_ref);
+#endif /* HAVE_DNSSD */
 
    /*
     * Clean out old jobs...
