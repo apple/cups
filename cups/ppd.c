@@ -3,7 +3,7 @@
  *
  *   PPD file routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -41,7 +41,6 @@
  *   ppd_compare_attrs()    - Compare two attributes.
  *   ppd_compare_choices()  - Compare two choices...
  *   ppd_compare_coptions() - Compare two custom options.
- *   ppd_compare_cparams()  - Compare two custom parameters.
  *   ppd_compare_options()  - Compare two options.
  *   ppd_decode()           - Decode a string value...
  *   ppd_free_group()       - Free a single UI group.
@@ -109,7 +108,6 @@ static int		ppd_compare_attrs(ppd_attr_t *a, ppd_attr_t *b);
 static int		ppd_compare_choices(ppd_choice_t *a, ppd_choice_t *b);
 static int		ppd_compare_coptions(ppd_coption_t *a,
 			                     ppd_coption_t *b);
-static int		ppd_compare_cparams(ppd_cparam_t *a, ppd_cparam_t *b);
 static int		ppd_compare_options(ppd_option_t *a, ppd_option_t *b);
 static int		ppd_decode(char *string);
 static void		ppd_free_group(ppd_group_t *group);
@@ -2310,18 +2308,6 @@ ppd_compare_coptions(ppd_coption_t *a,	/* I - First option */
 
 
 /*
- * 'ppd_compare_cparams()' - Compare two custom parameters.
- */
-
-static int				/* O - Result of comparison */
-ppd_compare_cparams(ppd_cparam_t *a,	/* I - First parameter */
-                    ppd_cparam_t *b)	/* I - Second parameter */
-{
-  return (strcasecmp(a->name, b->name));
-}
-
-
-/*
  * 'ppd_compare_options()' - Compare two options.
  */
 
@@ -2476,7 +2462,7 @@ ppd_get_coption(ppd_file_t *ppd,	/* I - PPD file */
 
   strlcpy(copt->keyword, name, sizeof(copt->keyword));
 
-  copt->params = cupsArrayNew((cups_array_func_t)ppd_compare_cparams, NULL);
+  copt->params = cupsArrayNew((cups_array_func_t)NULL, NULL);
 
   cupsArrayAdd(ppd->coptions, copt);
 

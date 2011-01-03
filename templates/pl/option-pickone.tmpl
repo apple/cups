@@ -5,14 +5,14 @@
 </SELECT>
 {iscustom=1?<TABLE NAME="paramtable" id="{keyword}-params">{[params]
 <TR><TH CLASS="sublabel">{paramtext}:</TH>
-<TD>{params=Units?<SELECT NAME="{keyword}.{params}">
+<TD>{params=Units?<SELECT NAME="{keyword-1}.{params}">
 <OPTION VALUE="pt"{paramvalue=pt? SELECTED:}>Punkty</OPTION>
 <OPTION VALUE="mm"{paramvalue=mm? SELECTED:}>Milimetry</OPTION>
 <OPTION VALUE="cm"{paramvalue=cm? SELECTED:}>Centymetry</OPTION>
 <OPTION VALUE="in"{paramvalue=in? SELECTED:}>Cale</OPTION>
 <OPTION VALUE="ft"{paramvalue=ft? SELECTED:}>Stopy</OPTION>
 <OPTION VALUE="m"{paramvalue=m? SELECTED:}>Metry</OPTION>
-</SELECT>:<INPUT TYPE="{inputtype}" NAME="{keyword}.{params}" VALUE="{paramvalue}">}</TD></TR>
+</SELECT>:<INPUT TYPE="{inputtype}" NAME="{keyword-1}.{params}" VALUE="{paramvalue}">}</TD></TR>
 }</TABLE>
 </TD>:}
 </TR>
