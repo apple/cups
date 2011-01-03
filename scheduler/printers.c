@@ -770,6 +770,8 @@ cupsdDeletePrinter(
 
   cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, update);
 
+  p->state = IPP_PRINTER_STOPPED;	/* Force for browsed printers */
+
   if (p->job)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
                      update ? "Job stopped due to printer being deleted." :
