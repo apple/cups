@@ -3,6 +3,8 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.7
 
+	- The scheduler incorrectly mapped custom page sizes to standard sizes
+	  (STR #3764)
 	- cupsfilter and pstops did not map IPP attributes to PPD options due to
 	  a change in cupsMarkOptions (STR #3756)
 	- The scheduler did not always show the most recent status message from
