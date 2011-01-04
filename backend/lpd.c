@@ -3,7 +3,7 @@
  *
  *   Line Printer Daemon backend for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -191,8 +191,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and printer name from the URI...
   */
 
-  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
-    return (CUPS_BACKEND_FAILED);
+  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_FAILED);
+  }
 
   httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
                   username, sizeof(username), hostname, sizeof(hostname), &port,
@@ -225,36 +231,15 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 #ifdef __APPLE__
  /*
-  * We want to pass utf-8 characters, not re-map them (3071945)
+  * We want to pass UTF-8 characters by default, not re-map them (3071945)
   */
 
   sanitize_title = 0;
-
+#else
  /*
-  * Get the default timeout from a system preference...
+  * Otherwise we want to re-map UTF-8 to "safe" characters by default...
   */
 
-  {
-    CFPropertyListRef	pvalue;		/* Preference value */
-    SInt32		toval;		/* Timeout value */
-
-
-    pvalue = CFPreferencesCopyValue(CFSTR("timeout"),
-                                    CFSTR("com.apple.print.backends"),
-				    kCFPreferencesAnyUser,
-				    kCFPreferencesCurrentHost);
-    if (pvalue)
-    {
-      if (CFGetTypeID(pvalue) == CFNumberGetTypeID())
-      {
-	CFNumberGetValue(pvalue, kCFNumberSInt32Type, &toval);
-	contimeout = (int)toval;
-      }
-
-      CFRelease(pvalue);
-    }
-  }
-#else
   sanitize_title = 1;
 #endif /* __APPLE__ */
 
@@ -432,11 +417,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     fputs("STATE: +connecting-to-device\n", stderr);
     fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
-    if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
+    while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
     {
-      _cupsLangPrintFilter(stderr, "ERROR",
+      _cupsLangPrintFilter(stderr, "INFO",
                            _("Unable to locate printer \"%s\"."), hostname);
-      return (CUPS_BACKEND_STOP);
+      sleep(10);
+
+      if (getenv("CLASS") != NULL)
+	exit(CUPS_BACKEND_FAILED);
     }
 
     snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
@@ -687,11 +675,14 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   fputs("STATE: +connecting-to-device\n", stderr);
   fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
-  if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintFilter(stderr, "ERROR", _("Unable to locate printer \"%s\"."),
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer \"%s\"."),
 			 hostname);
-    return (CUPS_BACKEND_STOP);
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      exit(CUPS_BACKEND_FAILED);
   }
 
  /*

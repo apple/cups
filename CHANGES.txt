@@ -1,8 +1,9 @@
-CHANGES.txt - 2010-12-22
+CHANGES.txt - 2011-01-04
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Name resolution errors no longer cause queues to stop (STR #3719)
 	- Added a new cups-exec helper program that applies security profiles
 	  to filters, port monitors, backends, CGI programs, and mini-daemons.
 	- The web interface can now be disabled using the WebInterface directive

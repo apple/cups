@@ -3,7 +3,7 @@
  *
  *   IPP backend for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -257,8 +257,14 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
-    return (CUPS_BACKEND_FAILED);
+  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_FAILED);
+  }
 
   httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
                   username, sizeof(username), hostname, sizeof(hostname), &port,
@@ -500,7 +506,8 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
     _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
-    if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
+    if ((http = httpConnectEncrypt(hostname, port,
+				   cupsEncryption())) == NULL)
     {
 #if 0 /* These need to go in here someplace when we see HTTP_PKI_ERROR or IPP_PKI_ERROR */
       fputs("STATE: +cups-certificate-error\n", stderr);
