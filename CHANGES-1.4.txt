@@ -24,6 +24,7 @@ CHANGES IN CUPS V1.4.7
 
 CHANGES IN CUPS V1.4.6
 
+	- Fixed a "make check" issue on Solaris (STR #3729)
 	- Regression: The pstops filter did not support landscape printing of
 	  PostScript files (STR #3722)
 	- The scheduler killed retried (fax) jobs after restarting them
