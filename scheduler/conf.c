@@ -495,7 +495,7 @@ cupsdReadConfiguration(void)
   cupsdSetString(&ErrorLog, CUPS_LOGDIR "/error_log");
   cupsdSetString(&PageLog, CUPS_LOGDIR "/page_log");
   cupsdSetString(&PageLogFormat,
-                 "%p %j %u %T %P %C %{job-billing} "
+                 "%p %u %j %T %P %C %{job-billing} "
 		 "%{job-originating-host-name} %{job-name} %{media} %{sides}");
   cupsdSetString(&Printcap, CUPS_DEFAULT_PRINTCAP);
   cupsdSetString(&PrintcapGUI, "/usr/bin/glpoptions");
