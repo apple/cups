@@ -3,6 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.7
 
+	- Documentation changes (STR #3720)
 	- The web interface did not allow setting of a default custom page size
 	  (STR #3707)
 	- The scheduler could crash if a browsed printer times out while a job
