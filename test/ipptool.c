@@ -4630,7 +4630,8 @@ with_value(char            *value,	/* I - Value string */
 	    switch (op)
 	    {
 	      case '=' :
-	          if (attr->values[i].range.upper == intvalue)
+	          if (attr->values[i].range.lower == intvalue ||
+		      attr->values[i].range.upper == intvalue)
 		    return (1);
 		  break;
 	      case '<' :
