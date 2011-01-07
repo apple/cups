@@ -4,6 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3720)
+	- PIE support was broken (STR #3691)
 	- "make check" failed if LC_MESSAGES was set (STR #3765)
 	- Fixed the configure script to always look for the pkg-config script
 	  (STR #3761)

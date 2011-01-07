@@ -114,11 +114,6 @@ if test -n "$GCC"; then
 		fi
 	fi
 
-	# Generate position-independent code as needed...
-	if test $PICFLAG = 1 -a $uname != AIX; then
-    		OPTIM="-fPIC $OPTIM"
-	fi
-
 	# The -fstack-protector option is available with some versions of
 	# GCC and adds "stack canaries" which detect when the return address
 	# has been overwritten, preventing many types of exploit attacks.
@@ -142,6 +137,11 @@ if test -n "$GCC"; then
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 	CFLAGS="$OLDCFLAGS"
+
+	# Generate position-independent code as needed...
+	if test $PICFLAG = 1 -a $uname != AIX -a "x$PIEFLAGS" = x; then
+    		OPTIM="-fPIC $OPTIM"
+	fi
 
 	if test "x$with_optim" = x; then
 		# Add useful warning options for tracking down problems...
