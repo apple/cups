@@ -3,7 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.7
 
-	- Documentation changes (STR #3710, STR #3720, STR #3745)
+	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750)
 	- The cupsctl program now displays an error if you try to directly set
 	  the Port or Listen directives (STR #3749)
 	- PPD files with "*JobPatchFile: bla" no longer fail to load in relaxed

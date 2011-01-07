@@ -715,11 +715,12 @@ can also be used to relay printer information from polled servers
 with the line:</P>
 
 <PRE CLASS="command">
-BrowseRelay 127.0.0.1 @LOCAL
+BrowseRelay 127.0.0.1 192.0.2.255
 </PRE>
 
 <P>This effectively provides access to printers on a WAN for all
-clients on the LAN(s).</P>
+clients on the LAN. Use multiple <CODE>BrowseRelay</CODE> lines to
+relay information to multiple subnets.</P>
 
 
 <H2 CLASS="title"><A NAME="BrowseRemoteOptions">BrowseRemoteOptions</A></H2>
