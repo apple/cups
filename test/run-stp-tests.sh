@@ -463,6 +463,9 @@ export HOME
 LANG=C
 export LANG
 
+LC_MESSAGES=C
+export LC_MESSAGES
+
 #
 # Start the server; run as foreground daemon in the background...
 #
