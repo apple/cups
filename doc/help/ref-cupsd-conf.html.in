@@ -1009,6 +1009,7 @@ size.</P>
 
 <PRE CLASS="command">
 DefaultPolicy default
+DefaultPolicy authenticated
 DefaultPolicy foo
 </PRE>
 
@@ -1016,7 +1017,9 @@ DefaultPolicy foo
 
 <P>The <CODE>DefaultPolicy</CODE> directive specifies the default
 policy to use for IPP operation. The default is
-<CODE>default</CODE>.</P>
+<CODE>default</CODE>. CUPS also includes a policy called
+<CODE>authenticated</CODE> that requires a username and password for printing
+and other job operations.</P>
 
 
 <H2 CLASS="title"><SPAN CLASS="info">CUPS 1.2/Mac OS X 10.5</SPAN><A NAME="DefaultShared">DefaultShared</A></H2>
