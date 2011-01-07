@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3720)
+	- Fixed the configure script to always look for the pkg-config script
+	  (STR #3761)
 	- The scheduler now only looks up interface hostnames if HostNameLookups
 	  are enabled (STR #3737)
 	- Fixed a compilation problem on DragonFly BSD (STR #3738)
