@@ -1204,7 +1204,7 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
         }
       }
 
-      if (!name[0])
+      if (!name[0] && cg->ppd_conform == PPD_CONFORM_STRICT)
       {
        /*
         * Found "*JobPatchFile: string"...
