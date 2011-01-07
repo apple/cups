@@ -3,7 +3,7 @@
  *
  *   Client routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -4925,8 +4925,18 @@ pipe_command(cupsd_client_t *con,	/* I - Client connection */
 
   sprintf(server_port, "SERVER_PORT=%d", con->serverport);
 
-  snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s",
-           con->servername);
+  if (con->http.fields[HTTP_FIELD_HOST][0])
+  {
+    char *nameptr;			/* Pointer to ":port" */
+
+    snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s",
+	     con->http.fields[HTTP_FIELD_HOST]);
+    if ((nameptr = strrchr(server_name, ':')) != NULL && !strchr(nameptr, ']'))
+      *nameptr = '\0';			/* Strip trailing ":port" */
+  }
+  else
+    snprintf(server_name, sizeof(server_name), "SERVER_NAME=%s",
+	     con->servername);
 
   envc = cupsdLoadEnv(envp, (int)(sizeof(envp) / sizeof(envp[0])));
 
