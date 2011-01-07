@@ -4,6 +4,7 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720)
+	- Hardwired remote printers with options did not work (STR #3717)
 	- Accessing the CUPS web interface using a CNAME-based hostname would
 	  sometimes fail due to redirection to the actual hostname (STR #3701)
 	- Subscription events had a misspelled attribute (STR #3693)

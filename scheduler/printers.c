@@ -3,7 +3,7 @@
  *
  *   Printer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2367,8 +2367,24 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     * Tell the client this is a remote printer of some type...
     */
 
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-	         "printer-uri-supported", NULL, p->uri);
+    if (strchr(p->uri, '?'))
+    {
+     /*
+      * Strip trailing "?options" from URI...
+      */
+
+      char *ptr;			/* Pointer into URI */
+
+      strlcpy(resource, p->uri, sizeof(resource));
+      if ((ptr = strchr(resource, '?')) != NULL)
+        *ptr = '\0';
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		   "printer-uri-supported", NULL, resource);
+    }
+    else
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		   "printer-uri-supported", NULL, p->uri);
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
 		 NULL, p->uri);
@@ -5112,8 +5128,25 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * remote printer...
       */
 
-      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-		   "printer-uri-supported", NULL, p->device_uri);
+      if (strchr(p->device_uri, '?'))
+      {
+       /*
+	* Strip trailing "?options" from URI...
+	*/
+
+	char	resource[HTTP_MAX_URI],	/* New URI */
+		*ptr;			/* Pointer into URI */
+
+	strlcpy(resource, p->device_uri, sizeof(resource));
+	if ((ptr = strchr(resource, '?')) != NULL)
+	  *ptr = '\0';
+
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		     "printer-uri-supported", NULL, resource);
+      }
+      else
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		     "printer-uri-supported", NULL, p->device_uri);
 
      /*
       * Then set the make-and-model accordingly...
