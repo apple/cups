@@ -3,7 +3,7 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.7
 
-	- Documentation changes (STR #3710, STR #3720)
+	- Documentation changes (STR #3710, STR #3720, STR #3745)
 	- The scheduler generated a bad notify-text string for printer state
 	  change notifications (STR #3739)
 	- The scheduler incorrectly updated printers.conf when it really needed

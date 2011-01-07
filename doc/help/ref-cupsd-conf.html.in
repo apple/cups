@@ -1068,7 +1068,7 @@ printers are shared (published) by default. The default is
 <P>The <CODE>Deny</CODE> directive specifies a hostname, IP
 address, or network that is denied access to the server.
 <CODE>Deny</CODE> directives are cummulative, so multiple
-<CODE>Deny</CODE> directives can be used to allow access for
+<CODE>Deny</CODE> directives can be used to deny access for
 multiple hosts or networks.</P>
 
 <P>Host and domain name matching require that you enable the <A
