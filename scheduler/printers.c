@@ -47,6 +47,8 @@
  *   compare_printers()         - Compare two printers.
  *   delete_printer_filters()   - Delete all MIME filters for a printer.
  *   delete_string_array()      - Delete an array of CUPS strings.
+ *   dirty_printer()            - Mark config and state files dirty for the
+ *                                specified printer.
  *   load_ppd()                 - Load a cached PPD file, updating the cache as
  *                                needed.
  *   new_media_col()            - Create a media-col collection value.
@@ -92,6 +94,7 @@ static void	add_string_array(cups_array_t **a, const char *s);
 static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
 static void	delete_string_array(cups_array_t **a);
+static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
 static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
 		               const char *type);
@@ -2746,10 +2749,7 @@ cupsdSetPrinterReasons(
     p->num_reasons = 0;
     changed        = 1;
 
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-    if (PrintcapFormat == PRINTCAP_PLIST)
-      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+    dirty_printer(p);
   }
 
   if (!strcmp(s, "none"))
@@ -2802,12 +2802,7 @@ cupsdSetPrinterReasons(
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
           if (strcmp(reason, "connecting-to-device"))
-	  {
-	    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-	    if (PrintcapFormat == PRINTCAP_PLIST)
-	      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-          }
+	    dirty_printer(p);
 	  break;
 	}
     }
@@ -2839,12 +2834,7 @@ cupsdSetPrinterReasons(
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
 
 	if (strcmp(reason, "connecting-to-device"))
-	{
-	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-	  if (PrintcapFormat == PRINTCAP_PLIST)
-	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-	}
+	  dirty_printer(p);
       }
     }
   }
@@ -2882,9 +2872,6 @@ cupsdSetPrinterState(
  /*
   * Set the new state...
   */
-
-  if (PrintcapFormat == PRINTCAP_PLIST)
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 
   old_state = p->state;
   p->state  = s;
@@ -2946,12 +2933,7 @@ cupsdSetPrinterState(
 
   if (update &&
       (old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
-  {
-    if (p->type & CUPS_PRINTER_CLASS)
-      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
-    else
-      cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-  }
+    dirty_printer(p);
 }
 
 
@@ -3968,6 +3950,26 @@ delete_string_array(cups_array_t **a)	/* I - Array */
 
   cupsArrayDelete(*a);
   *a = NULL;
+}
+
+
+/*
+ * 'dirty_printer()' - Mark config and state files dirty for the specified
+ *                     printer.
+ */
+
+static void
+dirty_printer(cupsd_printer_t *p)	/* I - Printer */
+{
+  if (p->type & CUPS_PRINTER_DISCOVERED)
+    cupsdMarkDirty(CUPSD_DIRTY_REMOTE);
+  else if (p->type & CUPS_PRINTER_CLASS)
+    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
+  else
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
+  if (PrintcapFormat == PRINTCAP_PLIST)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
 }
 
 
