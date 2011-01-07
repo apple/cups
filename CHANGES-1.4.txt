@@ -4,6 +4,8 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3720)
+	- The scheduler now only looks up interface hostnames if HostNameLookups
+	  are enabled (STR #3737)
 	- Fixed a compilation problem on DragonFly BSD (STR #3738)
 	- The default PageLogFormat value had the username and job ID swapped
 	  from CUPS 1.3.x (STR #3727)
