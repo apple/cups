@@ -2882,7 +2882,7 @@ cupsdSetPrinterState(
                       CUPSD_EVENT_PRINTER_STATE, p, NULL,
 		  "%s \"%s\" state changed to %s.",
 		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
-		  p->name, printer_states[p->state]);
+		  p->name, printer_states[p->state - IPP_PRINTER_IDLE]);
 
    /*
     * Let the browse code know this needs to be updated...
