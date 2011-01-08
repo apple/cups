@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Administration CGI for the Common UNIX Printing System (CUPS).
+ *   Administration CGI for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1040,7 +1040,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       }
     }
   }
-  else if (strchr(var, '/') == NULL)
+  else if (!strchr(var, '/') ||
+           (!strncmp(var, "lpd://", 6) && !strchr(var + 6, '/')))
   {
     if ((attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {
