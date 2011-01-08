@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
 	  STR #3757)
+	- The libusb-based USB backend printed slowly to the LaserJet 1300 and
+	  other printers (STR #3405)
 	- "lp" and "lpr" failed to print with Kerberos enabled (STR #3768)
 	- The web interface now shows the manual URI entry form for auto-
 	  detected LPD printers without a queue name (STR #3755)
