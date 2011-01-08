@@ -5,6 +5,7 @@ CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
 	  STR #3757)
+	- "lp" and "lpr" failed to print with Kerberos enabled (STR #3768)
 	- The web interface now shows the manual URI entry form for auto-
 	  detected LPD printers without a queue name (STR #3755)
 	- The cupsctl program now displays an error if you try to directly set
