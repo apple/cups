@@ -3,7 +3,7 @@
  *
  *   Internationalization test for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -423,6 +423,7 @@ main(int  argc,				/* I - Argument Count */
       puts("PASS");
   }
 
+#ifndef __linux
   fputs("cupsCharsetToUTF8(CUPS_EUC_JP): ", stdout);
 
   strcpy(legsrc, legdest);
@@ -444,6 +445,7 @@ main(int  argc,				/* I - Argument Count */
   }
   else
     puts("PASS");
+#endif /* !__linux */
 
  /*
   * Test UTF-8 to/from legacy charset (Windows 950)...
