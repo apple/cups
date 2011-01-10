@@ -1368,8 +1368,7 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 		break;
 	      }
 	    }
-
-            if (!WebInterface)
+	    else if (!WebInterface)
 	    {
 	     /*
 	      * Web interface is disabled. Show an appropriate message...
@@ -1383,13 +1382,14 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 
 	      break;
 	    }
-	    else if ((!strncmp(con->uri, "/admin", 6) &&
-		      strncmp(con->uri, "/admin/conf/", 12) &&
-		      strncmp(con->uri, "/admin/log/", 11)) ||
-		     !strncmp(con->uri, "/printers", 9) ||
-		     !strncmp(con->uri, "/classes", 8) ||
-		     !strncmp(con->uri, "/help", 5) ||
-		     !strncmp(con->uri, "/jobs", 5))
+
+	    if ((!strncmp(con->uri, "/admin", 6) &&
+		  strncmp(con->uri, "/admin/conf/", 12) &&
+		  strncmp(con->uri, "/admin/log/", 11)) ||
+		 !strncmp(con->uri, "/printers", 9) ||
+		 !strncmp(con->uri, "/classes", 8) ||
+		 !strncmp(con->uri, "/help", 5) ||
+		 !strncmp(con->uri, "/jobs", 5))
 	    {
 	     /*
 	      * Send CGI output...
