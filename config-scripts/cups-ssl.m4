@@ -3,7 +3,7 @@ dnl "$Id$"
 dnl
 dnl   OpenSSL/GNUTLS stuff for CUPS.
 dnl
-dnl   Copyright 2007-2010 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -40,6 +40,8 @@ if test x$enable_ssl != xno; then
 		dnl Check for the various security headers...
 		AC_CHECK_HEADER(Security/SecCertificate.h,
 		    AC_DEFINE(HAVE_SECCERTIFICATE_H))
+		AC_CHECK_HEADER(Security/SecItem.h,
+		    AC_DEFINE(HAVE_SECITEM_H))
 		AC_CHECK_HEADER(Security/SecItemPriv.h,
 		    AC_DEFINE(HAVE_SECITEMPRIV_H))
 		AC_CHECK_HEADER(Security/SecPolicy.h,
