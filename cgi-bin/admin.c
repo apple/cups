@@ -145,7 +145,30 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
-    if (!strcmp(op, "set-allowed-users"))
+    if (!*op)
+    {
+      const char *printer = getenv("PRINTER_NAME"),
+					/* Printer or class name */
+		*server_port = getenv("SERVER_PORT");
+					/* Port number string */
+      int	port = atoi(server_port ? server_port : "0");
+      					/* Port number */
+      char	uri[1024];		/* URL */
+
+      if (printer)
+        httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri),
+	                 getenv("HTTPS") ? "https" : "http", NULL,
+			 getenv("SERVER_NAME"), port, "/%s/%s",
+			 cgiGetVariable("IS_CLASS") ? "classes" : "printers",
+			 printer);
+      else
+        httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri),
+	                getenv("HTTPS") ? "https" : "http", NULL,
+			getenv("SERVER_NAME"), port, "/admin");
+
+      printf("Location: %s\n\n", uri);
+    }
+    else if (!strcmp(op, "set-allowed-users"))
       do_set_allowed_users(http);
     else if (!strcmp(op, "set-as-default"))
       do_set_default(http);
