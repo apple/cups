@@ -357,7 +357,8 @@ ppdErrorString(ppd_status_t status)	/* I - PPD status */
 		  _("Illegal whitespace character"),
 		  _("Bad custom parameter"),
 		  _("Missing option keyword"),
-		  _("Bad value string")
+		  _("Bad value string"),
+		  _("Missing CloseGroup")
 		};
 
 
@@ -1932,6 +1933,16 @@ ppdOpen2(cups_file_t *fp)		/* I - File to read from */
       ppd_add_attr(ppd, keyword, name, text, string);
     else
       _cupsStrFree(string);
+  }
+
+ /*
+  * Check for a missing CloseGroup...
+  */
+
+  if (group && cg->ppd_conform == PPD_CONFORM_STRICT)
+  {
+    cg->ppd_status = PPD_MISSING_CLOSE_GROUP;
+    goto error;
   }
 
   ppd_free(line.buffer);
