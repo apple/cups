@@ -10689,8 +10689,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (!filetype)
       filetype = mimeType(MimeDatabase, super, type);
 
-    cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
-		filetype->super, filetype->type);
+    if (filetype)
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
+		  filetype->super, filetype->type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);

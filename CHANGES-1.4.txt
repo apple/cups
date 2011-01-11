@@ -7,6 +7,9 @@ CHANGES IN CUPS V1.4.7
 	  STR #3757)
 	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
 	  STR #3755, STR #3769)
+	- Configure script fixes (STR #3659, STR #3691)
+	- Fixed a crash bug in the scheduler when the application/octet-stream
+	  MIME type was not defined (STR #3690)
 	- Polled printers were advertised more slowly than necessary (STR #3574)
 	- Fixed a compile problem on Solaris (STR #3718)
 	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
@@ -27,7 +30,6 @@ CHANGES IN CUPS V1.4.7
 	- Accessing the CUPS web interface using a CNAME-based hostname would
 	  sometimes fail due to redirection to the actual hostname (STR #3701)
 	- Subscription events had a misspelled attribute (STR #3693)
-	- PIE support was broken (STR #3691)
 	- "make check" failed if LC_MESSAGES was set (STR #3765)
 	- Fixed the configure script to always look for the pkg-config script
 	  (STR #3761)
