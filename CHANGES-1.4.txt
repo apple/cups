@@ -7,6 +7,7 @@ CHANGES IN CUPS V1.4.7
 	  STR #3757)
 	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
 	  STR #3755, STR #3769)
+	- Polled printers were advertised more slowly than necessary (STR #3574)
 	- Fixed a compile problem on Solaris (STR #3718)
 	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
 	  issues (STR #3705)

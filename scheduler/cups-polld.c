@@ -310,7 +310,7 @@ poll_server(http_t      *http,		/* I - HTTP connection */
     fprintf(stderr, "DEBUG: %s Found %d printers.\n", prefix, max_count);
 
     count     = 0;
-    max_count = max_count / interval + 1;
+    max_count = 2 * max_count / interval + 1;
 
    /*
     * Loop through the printers or classes returned in the list...
