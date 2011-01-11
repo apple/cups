@@ -2349,7 +2349,8 @@ dnssdBuildTxtRecord(
     int             for_lpd)		/* I - 1 = LPD, 0 = IPP */
 {
   int		i;			/* Looping var */
-  char		adminurl_str[256],	/* URL for the admin page */
+  char		admin_hostname[256],	/* .local hostname for admin page */
+		adminurl_str[256],	/* URL for the admin page */
   		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
@@ -2380,8 +2381,9 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "ty";
   keyvalue[i++][1] = p->make_model ? p->make_model : "Unknown";
 
+  snprintf(admin_hostname, sizeof(admin_hostname), "%s.local", DNSSDHostName);
   httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str),
-                   "http", NULL, DNSSDHostName, DNSSDPort, "/%s/%s",
+                   "http", NULL, admin_hostname, DNSSDPort, "/%s/%s",
 		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
 		   p->name);
   keyvalue[i  ][0] = "adminurl";
@@ -2645,7 +2647,8 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 			name[1024],	/* Service name */
 			*nameptr;	/* Pointer into name */
   int			ipp_len,	/* IPP TXT record length */
-			printer_len;	/* LPD TXT record length */
+			printer_len,	/* LPD TXT record length */
+			printer_port;	/* LPD port number */
   const char		*regtype;	/* Registration type */
 
 
@@ -2793,75 +2796,82 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
 
   if (BrowseLocalProtocols & BROWSE_LPD)
   {
-    printer_len = 0;			/* anti-compiler-warning-code */
-    printer_txt = dnssdBuildTxtRecord(&printer_len, p, 1);
-
-    if (p->printer_ref &&
-	(printer_len != p->printer_len ||
-	 memcmp(printer_txt, p->printer_txt, printer_len)))
-    {
-     /*
-      * Update the existing registration...
-      */
-
-      /* A TTL of 0 means use record's original value (Radar 3176248) */
-      if ((se = DNSServiceUpdateRecord(p->printer_ref, NULL, 0, printer_len,
-			               printer_txt,
-				       0)) == kDNSServiceErr_NoError)
-      {
-	if (p->printer_txt)
-	  free(p->printer_txt);
-
-	p->printer_txt = printer_txt;
-	p->printer_len = printer_len;
-	printer_txt    = NULL;
-      }
-      else
-      {
-       /*
-	* Failed to update record, lets close this reference and move on...
-	*/
-
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-			"Unable to update LPD DNS-SD record for %s - %d",
-			p->name, se);
-
-	DNSServiceRefDeallocate(p->printer_ref);
-	p->printer_ref = NULL;
-      }
-    }
-    
-    if (!p->printer_ref)
-    {
-     /*
-      * Initial registration...
-      */
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG, 
-		      "Registering DNS-SD printer %s with name \"%s\" and "
-		      "type \"_printer._tcp\"", p->name, name);
-
-      p->printer_ref = DNSSDRef;
-      if ((se = DNSServiceRegister(&p->printer_ref,
-                                   kDNSServiceFlagsShareConnection,
-				   0, name, "_printer._tcp", NULL, NULL,
-				   htons(515), printer_len, printer_txt,
-				   dnssdRegisterCallback,
-				   p)) == kDNSServiceErr_NoError)
-      {
-	p->printer_txt = printer_txt;
-	p->printer_len = printer_len;
-	printer_txt    = NULL;
-      }
-      else
-	cupsdLogMessage(CUPSD_LOG_WARN,
-	                "DNS-SD LPD registration of \"%s\" failed: %d",
-			p->name, se);
-    }
-
-    if (printer_txt)
-      free(printer_txt);
+    printer_len  = 0;			/* anti-compiler-warning-code */
+    printer_port = 515;
+    printer_txt  = dnssdBuildTxtRecord(&printer_len, p, 1);
   }
+  else
+  {
+    printer_len  = 0;
+    printer_port = 0;
+    printer_txt  = NULL;
+  }
+
+  if (p->printer_ref &&
+      (printer_len != p->printer_len ||
+       memcmp(printer_txt, p->printer_txt, printer_len)))
+  {
+   /*
+    * Update the existing registration...
+    */
+
+    /* A TTL of 0 means use record's original value (Radar 3176248) */
+    if ((se = DNSServiceUpdateRecord(p->printer_ref, NULL, 0, printer_len,
+				     printer_txt,
+				     0)) == kDNSServiceErr_NoError)
+    {
+      if (p->printer_txt)
+	free(p->printer_txt);
+
+      p->printer_txt = printer_txt;
+      p->printer_len = printer_len;
+      printer_txt    = NULL;
+    }
+    else
+    {
+     /*
+      * Failed to update record, lets close this reference and move on...
+      */
+
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to update LPD DNS-SD record for %s - %d",
+		      p->name, se);
+
+      DNSServiceRefDeallocate(p->printer_ref);
+      p->printer_ref = NULL;
+    }
+  }
+  
+  if (!p->printer_ref)
+  {
+   /*
+    * Initial registration...
+    */
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG, 
+		    "Registering DNS-SD printer %s with name \"%s\" and "
+		    "type \"_printer._tcp\"", p->name, name);
+
+    p->printer_ref = DNSSDRef;
+    if ((se = DNSServiceRegister(&p->printer_ref,
+				 kDNSServiceFlagsShareConnection,
+				 0, name, "_printer._tcp", NULL, NULL,
+				 htons(printer_port), printer_len, printer_txt,
+				 dnssdRegisterCallback,
+				 p)) == kDNSServiceErr_NoError)
+    {
+      p->printer_txt = printer_txt;
+      p->printer_len = printer_len;
+      printer_txt    = NULL;
+    }
+    else
+      cupsdLogMessage(CUPSD_LOG_WARN,
+		      "DNS-SD LPD registration of \"%s\" failed: %d",
+		      p->name, se);
+  }
+
+  if (printer_txt)
+    free(printer_txt);
 }
 
 
