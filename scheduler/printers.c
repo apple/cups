@@ -71,11 +71,10 @@
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
-#ifdef HAVE_SYS_STATFS_H
-#  include <sys/statfs.h>
-#endif /* HAVE_SYS_STATFS_H */
 #ifdef HAVE_SYS_STATVFS_H
 #  include <sys/statvfs.h>
+#elif defined(HAVE_SYS_STATFS_H)
+#  include <sys/statfs.h>
 #endif /* HAVE_SYS_STATVFS_H */
 #ifdef HAVE_SYS_VFS_H
 #  include <sys/vfs.h>
@@ -258,13 +257,13 @@ cupsdCreateCommonData(void)
 			*notifier;	/* Current notifier */
   cupsd_policy_t	*p;		/* Current policy */
   int			k_supported;	/* Maximum file size supported */
-#ifdef HAVE_STATFS
-  struct statfs		spoolinfo;	/* FS info for spool directory */
-  double		spoolsize;	/* FS size */
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   struct statvfs	spoolinfo;	/* FS info for spool directory */
   double		spoolsize;	/* FS size */
-#endif /* HAVE_STATFS */
+#elif defined(HAVE_STATFS)
+  struct statfs		spoolinfo;	/* FS info for spool directory */
+  double		spoolsize;	/* FS size */
+#endif /* HAVE_STATVFS */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const int orients[4] =/* orientation-requested-supported values */
@@ -470,16 +469,7 @@ cupsdCreateCommonData(void)
   * or the filesystem is larger than 2TiB, always report INT_MAX.
   */
 
-#ifdef HAVE_STATFS
-  if (statfs(RequestRoot, &spoolinfo))
-    k_supported = INT_MAX;
-  else if ((spoolsize = (double)spoolinfo.f_bsize * spoolinfo.f_blocks / 1024) >
-               INT_MAX)
-    k_supported = INT_MAX;
-  else
-    k_supported = (int)spoolsize;
-
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   if (statvfs(RequestRoot, &spoolinfo))
     k_supported = INT_MAX;
   else if ((spoolsize = (double)spoolinfo.f_frsize * spoolinfo.f_blocks / 1024) >
@@ -488,9 +478,18 @@ cupsdCreateCommonData(void)
   else
     k_supported = (int)spoolsize;
 
+#elif defined(HAVE_STATFS)
+  if (statfs(RequestRoot, &spoolinfo))
+    k_supported = INT_MAX;
+  else if ((spoolsize = (double)spoolinfo.f_bsize * spoolinfo.f_blocks / 1024) >
+               INT_MAX)
+    k_supported = INT_MAX;
+  else
+    k_supported = (int)spoolsize;
+
 #else
   k_supported = INT_MAX;
-#endif /* HAVE_STATFS */
+#endif /* HAVE_STATVFS */
 
  /*
   * This list of attributes is sorted to improve performance when the
