@@ -117,7 +117,9 @@ TD.unsel {
 TD.sel A, TD.sel A:hover, TD.unsel A:link:hover, TD.unsel A:visited:hover,
 TD.unsel A:active, TD.unsel A, TD.unsel A:visited {
   color: #666666;
+  display: block;
   font-weight: normal;
+  padding: 8px;
   text-decoration: none;
 }
 

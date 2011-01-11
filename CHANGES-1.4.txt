@@ -5,21 +5,15 @@ CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
 	  STR #3757)
-	- Choosing "maintenance" from the web interface displayed an error
-	  instead of the original page (STR #3345)
-	- Setting the allowed users and other administrative settings failed for
-	  classes (STR #3769)
+	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
+	  STR #3755, STR #3769)
 	- Fixed a compile problem on Solaris (STR #3718)
 	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
 	  issues (STR #3705)
 	- The SetEnv and PassEnv directives had no effect (STR #3664)
-	- The web interface no longer tries to use multi-part delivery when
-	  adding printers (STR #3455)
 	- The libusb-based USB backend printed slowly to the LaserJet 1300 and
 	  other printers (STR #3405)
 	- "lp" and "lpr" failed to print with Kerberos enabled (STR #3768)
-	- The web interface now shows the manual URI entry form for auto-
-	  detected LPD printers without a queue name (STR #3755)
 	- The cupsctl program now displays an error if you try to directly set
 	  the Port or Listen directives (STR #3749)
 	- PPD files with "*JobPatchFile: bla" no longer fail to load in relaxed
@@ -41,8 +35,6 @@ CHANGES IN CUPS V1.4.7
 	- Fixed a compilation problem on DragonFly BSD (STR #3738)
 	- The default PageLogFormat value had the username and job ID swapped
 	  from CUPS 1.3.x (STR #3727)
-	- The web interface did not allow setting of a default custom page size
-	  (STR #3707)
 	- The scheduler could crash if a browsed printer times out while a job
 	  is printing (STR #3754)
 	- The scheduler incorrectly mapped custom page sizes to standard sizes
