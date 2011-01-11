@@ -30,7 +30,7 @@ have_ssl=0
 
 if test x$enable_ssl != xno; then
     dnl Look for CDSA...
-    if test $have_ssl = 0 -a "x${enable_cdsassl}" != "xno"; then
+    if test $have_ssl = 0 -a "x$enable_cdsassl" != "xno"; then
 	if test $uname = Darwin; then
 	    AC_CHECK_HEADER(Security/SecureTransport.h, [
 	    	have_ssl=1
@@ -76,7 +76,7 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl Then look for GNU TLS...
-    if test $have_ssl = 0 -a "x${enable_gnutls}" != "xno" -a "x$PKGCONFIG" != x; then
+    if test $have_ssl = 0 -a "x$enable_gnutls" != "xno" -a "x$PKGCONFIG" != x; then
     	AC_PATH_PROG(LIBGNUTLSCONFIG,libgnutls-config)
     	AC_PATH_PROG(LIBGCRYPTCONFIG,libgcrypt-config)
 	if $PKGCONFIG --exists gnutls; then
@@ -113,7 +113,7 @@ if test x$enable_ssl != xno; then
     fi
 
     dnl Check for the OpenSSL library last...
-    if test $have_ssl = 0 -a "x${enable_openssl}" != "xno"; then
+    if test $have_ssl = 0 -a "x$enable_openssl" != "xno"; then
 	AC_CHECK_HEADER(openssl/ssl.h,
 	    dnl Save the current libraries so the crypto stuff isn't always
 	    dnl included...
@@ -150,6 +150,8 @@ fi
 if test $have_ssl = 1; then
     AC_MSG_RESULT([    Using SSLLIBS="$SSLLIBS"])
     AC_MSG_RESULT([    Using SSLFLAGS="$SSLFLAGS"])
+elif test x$enable_cdsa = xyes -o x$enable_gnutls = xyes -o x$enable_openssl = xyes; then
+    AC_MSG_ERROR([Unable to enable SSL support.])
 fi
 
 AC_SUBST(SSLFLAGS)
