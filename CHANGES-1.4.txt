@@ -5,6 +5,8 @@ CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
 	  STR #3757)
+	- Setting the allowed users and other administrative settings failed for
+	  classes (STR #3769)
 	- Fixed a compile problem on Solaris (STR #3718)
 	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
 	  issues (STR #3705)
