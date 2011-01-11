@@ -3,7 +3,7 @@
  *
  *   Configuration routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -691,6 +691,12 @@ cupsdReadConfiguration(void)
 #endif /* HAVE_LAUNCHD */
 
  /*
+  * Setup environment variables...
+  */
+
+  cupsdInitEnv();
+
+ /*
   * Read the configuration file...
   */
 
@@ -1033,10 +1039,10 @@ cupsdReadConfiguration(void)
   }
 
  /*
-  * Setup environment variables...
+  * Update environment variables...
   */
 
-  cupsdInitEnv();
+  cupsdUpdateEnv();
 
  /*
   * Update default paper size setting as needed...
