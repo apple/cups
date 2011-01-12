@@ -4760,7 +4760,18 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         p->type |= CUPS_PRINTER_COMMANDS;
     }
 
-    if (ppd->num_filters == 0)
+    if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
+	ppd_attr->value &&
+	(!ppd_attr->value[0] || !strcasecmp(ppd_attr->value, "none")))
+    {
+     /*
+      * Printer does not support CUPS command files (or any commands as far as
+      * CUPS is concerned...
+      */
+
+      p->type &= ~CUPS_PRINTER_COMMANDS;
+    }
+    else if (ppd->num_filters == 0)
     {
      /*
       * If there are no filters, add PostScript printing filters.
@@ -4805,8 +4816,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       int	count;			/* Number of commands */
 
 
-      if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
-	  ppd_attr->value && ppd_attr->value[0])
+      if (ppd_attr && ppd_attr->value && ppd_attr->value[0])
       {
 	for (count = 0, start = ppd_attr->value; *start; count ++)
 	{
@@ -4826,7 +4836,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       if (count > 0)
       {
        /*
-	* Make a copy of the commands string and count how many ...
+	* Make a copy of the commands string and count how many commands there
+	* are...
 	*/
 
 	attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
