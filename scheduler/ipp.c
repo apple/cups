@@ -3,7 +3,7 @@
  *
  *   IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -5495,7 +5495,11 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_ENUM :
 	      if (!strncmp(s, "time-at-", 8))
 	      {
-	        struct timeval tv = { attr->values[i].integer, 0 };
+	        struct timeval tv;	/* Time value */
+
+		tv.tv_sec  = attr->values[i].integer;
+		tv.tv_usec = 0;
+
 	        cupsFilePuts(out, cupsdGetDateTime(&tv, CUPSD_TIME_STANDARD));
 	      }
 	      else

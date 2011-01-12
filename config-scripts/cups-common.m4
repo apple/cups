@@ -219,7 +219,7 @@ else
 fi
 
 if test $check_libusb = yes; then
-	AC_CHECK_LIB(usb, usb_init,[
+	AC_CHECK_LIB(usb, usb_get_string_simple,[
 		AC_CHECK_HEADER(usb.h,
 			AC_DEFINE(HAVE_USB_H)
 			LIBUSB="-lusb")])

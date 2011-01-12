@@ -8,10 +8,10 @@ CHANGES IN CUPS V1.4.7
 	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
 	  STR #3755, STR #3769)
 	- Configure script fixes (STR #3659, STR #3691)
+	- Compilation fixes (STR #3718, STR #3771)
 	- Fixed a crash bug in the scheduler when the application/octet-stream
 	  MIME type was not defined (STR #3690)
 	- Polled printers were advertised more slowly than necessary (STR #3574)
-	- Fixed a compile problem on Solaris (STR #3718)
 	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
 	  issues (STR #3705)
 	- The SetEnv and PassEnv directives had no effect (STR #3664)
