@@ -289,10 +289,11 @@ if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x; then
 		SERVERLIBS="$SERVERLIBS `$PKGCONFIG --libs dbus-1`"
 		DBUS_NOTIFIER="dbus"
 		DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs dbus-1`"
-		AC_CHECK_LIB(dbus-1,
-			dbus_message_iter_init_append,
-			AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
-			`$PKGCONFIG --libs dbus-1`)
+		SAVELIBS="$LIBS"
+		LIBS="$LIBS $DBUS_NOTIFIERLIBS"
+		AC_CHECK_FUNC(dbus_message_iter_init_append,
+			      AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
+		LIBS="$SAVELIBS"
 	else
 		AC_MSG_RESULT(no)
 	fi
