@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>PPD API</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>PPD API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -377,65 +378,64 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-<li><a href="#LOADING">Loading a PPD File</a></li>
-<li><a href="#OPTIONS_AND_GROUPS">Options and Groups</a></li>
-<li><a href="#CONSTRAINTS">Constraints</a></li>
-<li><a href="#PAGE_SIZES">Page Sizes</a></li>
-<li><a href="#ATTRIBUTES">Attributes</a></li>
+	<li><a href="#LOADING">Loading a PPD File</a></li>
+	<li><a href="#OPTIONS_AND_GROUPS">Options and Groups</a></li>
+	<li><a href="#CONSTRAINTS">Constraints</a></li>
+	<li><a href="#PAGE_SIZES">Page Sizes</a></li>
+	<li><a href="#ATTRIBUTES">Attributes</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsGetConflicts" title="Get a list of conflicting options in a marked PPD.">cupsGetConflicts</a></li>
-<li><a href="#cupsMarkOptions" title="Mark command-line options in a PPD file.">cupsMarkOptions</a></li>
-<li><a href="#cupsResolveConflicts" title="Resolve conflicts in a marked PPD.">cupsResolveConflicts</a></li>
-<li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
-<li><a href="#ppdCollect" title="Collect all marked options that reside in the specified
+	<li><a href="#cupsGetConflicts" title="Get a list of conflicting options in a marked PPD.">cupsGetConflicts</a></li>
+	<li><a href="#cupsMarkOptions" title="Mark command-line options in a PPD file.">cupsMarkOptions</a></li>
+	<li><a href="#cupsResolveConflicts" title="Resolve conflicts in a marked PPD.">cupsResolveConflicts</a></li>
+	<li><a href="#ppdClose" title="Free all memory used by the PPD file.">ppdClose</a></li>
+	<li><a href="#ppdCollect" title="Collect all marked options that reside in the specified
 section.">ppdCollect</a></li>
-<li><a href="#ppdCollect2" title="Collect all marked options that reside in the
+	<li><a href="#ppdCollect2" title="Collect all marked options that reside in the
 specified section and minimum order.">ppdCollect2</a></li>
-<li><a href="#ppdConflicts" title="Check to see if there are any conflicts among the
+	<li><a href="#ppdConflicts" title="Check to see if there are any conflicts among the
 marked option choices.">ppdConflicts</a></li>
-<li><a href="#ppdEmit" title="Emit code for marked options to a file.">ppdEmit</a></li>
-<li><a href="#ppdEmitAfterOrder" title="Emit a subset of the code for marked options to a file.">ppdEmitAfterOrder</a></li>
-<li><a href="#ppdEmitFd" title="Emit code for marked options to a file.">ppdEmitFd</a></li>
-<li><a href="#ppdEmitJCL" title="Emit code for JCL options to a file.">ppdEmitJCL</a></li>
-<li><a href="#ppdEmitJCLEnd" title="Emit JCLEnd code to a file.">ppdEmitJCLEnd</a></li>
-<li><a href="#ppdEmitString" title="Get a string containing the code for marked options.">ppdEmitString</a></li>
-<li><a href="#ppdErrorString" title="Returns the text assocated with a status.">ppdErrorString</a></li>
-<li><a href="#ppdFindAttr" title="Find the first matching attribute.">ppdFindAttr</a></li>
-<li><a href="#ppdFindChoice" title="Return a pointer to an option choice.">ppdFindChoice</a></li>
-<li><a href="#ppdFindCustomOption" title="Find a custom option.">ppdFindCustomOption</a></li>
-<li><a href="#ppdFindCustomParam" title="Find a parameter for a custom option.">ppdFindCustomParam</a></li>
-<li><a href="#ppdFindMarkedChoice" title="Return the marked choice for the specified option.">ppdFindMarkedChoice</a></li>
-<li><a href="#ppdFindNextAttr" title="Find the next matching attribute.">ppdFindNextAttr</a></li>
-<li><a href="#ppdFindOption" title="Return a pointer to the specified option.">ppdFindOption</a></li>
-<li><a href="#ppdFirstCustomParam" title="Return the first parameter for a custom option.">ppdFirstCustomParam</a></li>
-<li><a href="#ppdFirstOption" title="Return the first option in the PPD file.">ppdFirstOption</a></li>
-<li><a href="#ppdInstallableConflict" title="Test whether an option choice conflicts with
+	<li><a href="#ppdEmit" title="Emit code for marked options to a file.">ppdEmit</a></li>
+	<li><a href="#ppdEmitAfterOrder" title="Emit a subset of the code for marked options to a file.">ppdEmitAfterOrder</a></li>
+	<li><a href="#ppdEmitFd" title="Emit code for marked options to a file.">ppdEmitFd</a></li>
+	<li><a href="#ppdEmitJCL" title="Emit code for JCL options to a file.">ppdEmitJCL</a></li>
+	<li><a href="#ppdEmitJCLEnd" title="Emit JCLEnd code to a file.">ppdEmitJCLEnd</a></li>
+	<li><a href="#ppdEmitString" title="Get a string containing the code for marked options.">ppdEmitString</a></li>
+	<li><a href="#ppdErrorString" title="Returns the text assocated with a status.">ppdErrorString</a></li>
+	<li><a href="#ppdFindAttr" title="Find the first matching attribute.">ppdFindAttr</a></li>
+	<li><a href="#ppdFindChoice" title="Return a pointer to an option choice.">ppdFindChoice</a></li>
+	<li><a href="#ppdFindCustomOption" title="Find a custom option.">ppdFindCustomOption</a></li>
+	<li><a href="#ppdFindCustomParam" title="Find a parameter for a custom option.">ppdFindCustomParam</a></li>
+	<li><a href="#ppdFindMarkedChoice" title="Return the marked choice for the specified option.">ppdFindMarkedChoice</a></li>
+	<li><a href="#ppdFindNextAttr" title="Find the next matching attribute.">ppdFindNextAttr</a></li>
+	<li><a href="#ppdFindOption" title="Return a pointer to the specified option.">ppdFindOption</a></li>
+	<li><a href="#ppdFirstCustomParam" title="Return the first parameter for a custom option.">ppdFirstCustomParam</a></li>
+	<li><a href="#ppdFirstOption" title="Return the first option in the PPD file.">ppdFirstOption</a></li>
+	<li><a href="#ppdInstallableConflict" title="Test whether an option choice conflicts with
 an installable option.">ppdInstallableConflict</a></li>
-<li><a href="#ppdIsMarked" title="Check to see if an option is marked.">ppdIsMarked</a></li>
-<li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
-<li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
-<li><a href="#ppdLocalizeAttr" title="Localize an attribute.">ppdLocalizeAttr</a></li>
-<li><a href="#ppdLocalizeIPPReason" title="Get the localized version of a cupsIPPReason
+	<li><a href="#ppdIsMarked" title="Check to see if an option is marked.">ppdIsMarked</a></li>
+	<li><a href="#ppdLastError" title="Return the status from the last ppdOpen*().">ppdLastError</a></li>
+	<li><a href="#ppdLocalize" title="Localize the PPD file to the current locale.">ppdLocalize</a></li>
+	<li><a href="#ppdLocalizeAttr" title="Localize an attribute.">ppdLocalizeAttr</a></li>
+	<li><a href="#ppdLocalizeIPPReason" title="Get the localized version of a cupsIPPReason
 attribute.">ppdLocalizeIPPReason</a></li>
-<li><a href="#ppdLocalizeMarkerName" title="Get the localized version of a marker-names
+	<li><a href="#ppdLocalizeMarkerName" title="Get the localized version of a marker-names
 attribute value.">ppdLocalizeMarkerName</a></li>
-<li><a href="#ppdMarkDefaults" title="Mark all default options in the PPD file.">ppdMarkDefaults</a></li>
-<li><a href="#ppdMarkOption" title="Mark an option in a PPD file and return the number of
+	<li><a href="#ppdMarkDefaults" title="Mark all default options in the PPD file.">ppdMarkDefaults</a></li>
+	<li><a href="#ppdMarkOption" title="Mark an option in a PPD file and return the number of
 conflicts.">ppdMarkOption</a></li>
-<li><a href="#ppdNextCustomParam" title="Return the next parameter for a custom option.">ppdNextCustomParam</a></li>
-<li><a href="#ppdNextOption" title="Return the next option in the PPD file.">ppdNextOption</a></li>
-<li><a href="#ppdOpen" title="Read a PPD file into memory.">ppdOpen</a></li>
-<li><a href="#ppdOpen2" title="Read a PPD file into memory.">ppdOpen2</a></li>
-<li><a href="#ppdOpenFd" title="Read a PPD file into memory.">ppdOpenFd</a></li>
-<li><a href="#ppdOpenFile" title="Read a PPD file into memory.">ppdOpenFile</a></li>
-<li><a href="#ppdPageLength" title="Get the page length for the given size.">ppdPageLength</a></li>
-<li><a href="#ppdPageSize" title="Get the page size record for the given size.">ppdPageSize</a></li>
-<li><a href="#ppdPageSizeLimits" title="Return the custom page size limits.">ppdPageSizeLimits</a></li>
-<li><a href="#ppdPageWidth" title="Get the page width for the given size.">ppdPageWidth</a></li>
-<li><a href="#ppdSetConformance" title="Set the conformance level for PPD files.">ppdSetConformance</a></li>
+	<li><a href="#ppdNextCustomParam" title="Return the next parameter for a custom option.">ppdNextCustomParam</a></li>
+	<li><a href="#ppdNextOption" title="Return the next option in the PPD file.">ppdNextOption</a></li>
+	<li><a href="#ppdOpen" title="Read a PPD file into memory.">ppdOpen</a></li>
+	<li><a href="#ppdOpen2" title="Read a PPD file into memory.">ppdOpen2</a></li>
+	<li><a href="#ppdOpenFd" title="Read a PPD file into memory.">ppdOpenFd</a></li>
+	<li><a href="#ppdOpenFile" title="Read a PPD file into memory.">ppdOpenFile</a></li>
+	<li><a href="#ppdPageLength" title="Get the page length for the given size.">ppdPageLength</a></li>
+	<li><a href="#ppdPageSize" title="Get the page size record for the given size.">ppdPageSize</a></li>
+	<li><a href="#ppdPageSizeLimits" title="Return the custom page size limits.">ppdPageSizeLimits</a></li>
+	<li><a href="#ppdPageWidth" title="Get the page width for the given size.">ppdPageWidth</a></li>
+	<li><a href="#ppdSetConformance" title="Set the conformance level for PPD files.">ppdSetConformance</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#ppd_attr_t" title="PPD Attribute Structure ">ppd_attr_t</a></li>
@@ -483,6 +483,7 @@ conflicts.">ppdMarkOption</a></li>
 	<li><a href="#ppd_status_e" title="Status Codes ">ppd_status_e</a></li>
 	<li><a href="#ppd_ui_e" title="UI Types">ppd_ui_e</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 
@@ -2176,6 +2177,8 @@ typedef enum <a href="#ppd_ui_e">ppd_ui_e</a> ppd_ui_t;
 <dd class="description">Line longer than 255 chars</dd>
 <dt>PPD_MISSING_ASTERISK </dt>
 <dd class="description">Missing asterisk in column 0</dd>
+<dt>PPD_MISSING_CLOSE_GROUP </dt>
+<dd class="description">Missing CloseGroup</dd>
 <dt>PPD_MISSING_OPTION_KEYWORD </dt>
 <dd class="description">Missing option keyword</dd>
 <dt>PPD_MISSING_PPDADOBE4 </dt>

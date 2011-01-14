@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>Printer Driver API</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>Printer Driver API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -375,40 +376,39 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsCMYKDelete" title="Delete a color separation.">cupsCMYKDelete</a></li>
-<li><a href="#cupsCMYKDoBlack" title="Do a black separation...">cupsCMYKDoBlack</a></li>
-<li><a href="#cupsCMYKDoCMYK" title="Do a CMYK separation...">cupsCMYKDoCMYK</a></li>
-<li><a href="#cupsCMYKDoGray" title="Do a grayscale separation...">cupsCMYKDoGray</a></li>
-<li><a href="#cupsCMYKDoRGB" title="Do an sRGB separation...">cupsCMYKDoRGB</a></li>
-<li><a href="#cupsCMYKLoad" title="Load a CMYK color profile from PPD attributes.">cupsCMYKLoad</a></li>
-<li><a href="#cupsCMYKNew" title="Create a new CMYK color separation.">cupsCMYKNew</a></li>
-<li><a href="#cupsCMYKSetBlack" title="Set the transition range for CMY to black.">cupsCMYKSetBlack</a></li>
-<li><a href="#cupsCMYKSetCurve" title="Set a color transform curve using points.">cupsCMYKSetCurve</a></li>
-<li><a href="#cupsCMYKSetGamma" title="Set a color transform curve using gamma and density.">cupsCMYKSetGamma</a></li>
-<li><a href="#cupsCMYKSetInkLimit" title="Set the limit on the amount of ink.">cupsCMYKSetInkLimit</a></li>
-<li><a href="#cupsCMYKSetLtDk" title="Set light/dark ink transforms.">cupsCMYKSetLtDk</a></li>
-<li><a href="#cupsCheckBytes" title="Check to see if all bytes are zero.">cupsCheckBytes</a></li>
-<li><a href="#cupsCheckValue" title="Check to see if all bytes match the given value.">cupsCheckValue</a></li>
-<li><a href="#cupsDitherDelete" title="Free a dithering buffer.">cupsDitherDelete</a></li>
-<li><a href="#cupsDitherLine" title="Dither a line of pixels...">cupsDitherLine</a></li>
-<li><a href="#cupsDitherNew" title="Create an error-diffusion dithering buffer.">cupsDitherNew</a></li>
-<li><a href="#cupsFindAttr" title="Find a PPD attribute based on the colormodel,
+	<li><a href="#cupsCMYKDelete" title="Delete a color separation.">cupsCMYKDelete</a></li>
+	<li><a href="#cupsCMYKDoBlack" title="Do a black separation...">cupsCMYKDoBlack</a></li>
+	<li><a href="#cupsCMYKDoCMYK" title="Do a CMYK separation...">cupsCMYKDoCMYK</a></li>
+	<li><a href="#cupsCMYKDoGray" title="Do a grayscale separation...">cupsCMYKDoGray</a></li>
+	<li><a href="#cupsCMYKDoRGB" title="Do an sRGB separation...">cupsCMYKDoRGB</a></li>
+	<li><a href="#cupsCMYKLoad" title="Load a CMYK color profile from PPD attributes.">cupsCMYKLoad</a></li>
+	<li><a href="#cupsCMYKNew" title="Create a new CMYK color separation.">cupsCMYKNew</a></li>
+	<li><a href="#cupsCMYKSetBlack" title="Set the transition range for CMY to black.">cupsCMYKSetBlack</a></li>
+	<li><a href="#cupsCMYKSetCurve" title="Set a color transform curve using points.">cupsCMYKSetCurve</a></li>
+	<li><a href="#cupsCMYKSetGamma" title="Set a color transform curve using gamma and density.">cupsCMYKSetGamma</a></li>
+	<li><a href="#cupsCMYKSetInkLimit" title="Set the limit on the amount of ink.">cupsCMYKSetInkLimit</a></li>
+	<li><a href="#cupsCMYKSetLtDk" title="Set light/dark ink transforms.">cupsCMYKSetLtDk</a></li>
+	<li><a href="#cupsCheckBytes" title="Check to see if all bytes are zero.">cupsCheckBytes</a></li>
+	<li><a href="#cupsCheckValue" title="Check to see if all bytes match the given value.">cupsCheckValue</a></li>
+	<li><a href="#cupsDitherDelete" title="Free a dithering buffer.">cupsDitherDelete</a></li>
+	<li><a href="#cupsDitherLine" title="Dither a line of pixels...">cupsDitherLine</a></li>
+	<li><a href="#cupsDitherNew" title="Create an error-diffusion dithering buffer.">cupsDitherNew</a></li>
+	<li><a href="#cupsFindAttr" title="Find a PPD attribute based on the colormodel,
 media, and resolution.">cupsFindAttr</a></li>
-<li><a href="#cupsLutDelete" title="Free the memory used by a lookup table.">cupsLutDelete</a></li>
-<li><a href="#cupsLutLoad" title="Load a LUT from a PPD file.">cupsLutLoad</a></li>
-<li><a href="#cupsLutNew" title="Make a lookup table from a list of pixel values.">cupsLutNew</a></li>
-<li><a href="#cupsPackHorizontal" title="Pack pixels horizontally...">cupsPackHorizontal</a></li>
-<li><a href="#cupsPackHorizontal2" title="Pack 2-bit pixels horizontally...">cupsPackHorizontal2</a></li>
-<li><a href="#cupsPackHorizontalBit" title="Pack pixels horizontally by bit...">cupsPackHorizontalBit</a></li>
-<li><a href="#cupsPackVertical" title="Pack pixels vertically...">cupsPackVertical</a></li>
-<li><a href="#cupsRGBDelete" title="Delete a color separation.">cupsRGBDelete</a></li>
-<li><a href="#cupsRGBDoGray" title="Do a grayscale separation...">cupsRGBDoGray</a></li>
-<li><a href="#cupsRGBDoRGB" title="Do a RGB separation...">cupsRGBDoRGB</a></li>
-<li><a href="#cupsRGBLoad" title="Load a RGB color profile from a PPD file.">cupsRGBLoad</a></li>
-<li><a href="#cupsRGBNew" title="Create a new RGB color separation.">cupsRGBNew</a></li>
+	<li><a href="#cupsLutDelete" title="Free the memory used by a lookup table.">cupsLutDelete</a></li>
+	<li><a href="#cupsLutLoad" title="Load a LUT from a PPD file.">cupsLutLoad</a></li>
+	<li><a href="#cupsLutNew" title="Make a lookup table from a list of pixel values.">cupsLutNew</a></li>
+	<li><a href="#cupsPackHorizontal" title="Pack pixels horizontally...">cupsPackHorizontal</a></li>
+	<li><a href="#cupsPackHorizontal2" title="Pack 2-bit pixels horizontally...">cupsPackHorizontal2</a></li>
+	<li><a href="#cupsPackHorizontalBit" title="Pack pixels horizontally by bit...">cupsPackHorizontalBit</a></li>
+	<li><a href="#cupsPackVertical" title="Pack pixels vertically...">cupsPackVertical</a></li>
+	<li><a href="#cupsRGBDelete" title="Delete a color separation.">cupsRGBDelete</a></li>
+	<li><a href="#cupsRGBDoGray" title="Do a grayscale separation...">cupsRGBDoGray</a></li>
+	<li><a href="#cupsRGBDoRGB" title="Do a RGB separation...">cupsRGBDoRGB</a></li>
+	<li><a href="#cupsRGBLoad" title="Load a RGB color profile from a PPD file.">cupsRGBLoad</a></li>
+	<li><a href="#cupsRGBNew" title="Create a new RGB color separation.">cupsRGBNew</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_cmyk_t" title="Simple CMYK lookup table">cups_cmyk_t</a></li>
@@ -428,6 +428,7 @@ media, and resolution.">cupsFindAttr</a></li>
 	<li><a href="#cups_scmy_lut[256]" title="sRGB gamma lookup table (inverted)">cups_scmy_lut[256]</a></li>
 	<li><a href="#cups_srgb_lut[256]" title="sRGB gamma lookup table">cups_srgb_lut[256]</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 
