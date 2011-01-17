@@ -3,7 +3,7 @@ dnl "$Id: cups-common.m4 8781 2009-08-28 17:34:54Z mike $"
 dnl
 dnl   Common configuration stuff for CUPS.
 dnl
-dnl   Copyright 2007-2010 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -87,6 +87,9 @@ if test x$enable_static = xyes; then
 fi
 
 AC_SUBST(INSTALLSTATIC)
+
+dnl Check for pkg-config, which is used for some other tests later on...
+AC_PATH_PROG(PKGCONFIG, pkg-config)
 
 dnl Check for libraries...
 AC_SEARCH_LIBS(crypt, crypt)
@@ -216,7 +219,7 @@ else
 fi
 
 if test $check_libusb = yes; then
-	AC_CHECK_LIB(usb, usb_init,[
+	AC_CHECK_LIB(usb, usb_get_string_simple,[
 		AC_CHECK_HEADER(usb.h,
 			AC_DEFINE(HAVE_USB_H)
 			LIBUSB="-lusb")])
@@ -277,24 +280,22 @@ AC_ARG_WITH(dbusdir, [  --with-dbusdir          set DBUS configuration directory
 DBUS_NOTIFIER=""
 DBUS_NOTIFIERLIBS=""
 
-if test "x$enable_dbus" != xno; then
-	AC_PATH_PROG(PKGCONFIG, pkg-config)
-	if test "x$PKGCONFIG" != x; then
-		AC_MSG_CHECKING(for DBUS)
-		if $PKGCONFIG --exists dbus-1; then
-			AC_MSG_RESULT(yes)
-			AC_DEFINE(HAVE_DBUS)
-			CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
-			SERVERLIBS="$SERVERLIBS `$PKGCONFIG --libs dbus-1`"
-			DBUS_NOTIFIER="dbus"
-			DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs dbus-1`"
-			AC_CHECK_LIB(dbus-1,
-				dbus_message_iter_init_append,
-				AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND),,
-				`$PKGCONFIG --libs dbus-1`)
-		else
-			AC_MSG_RESULT(no)
-		fi
+if test "x$enable_dbus" != xno -a "x$PKGCONFIG" != x; then
+	AC_MSG_CHECKING(for DBUS)
+	if $PKGCONFIG --exists dbus-1; then
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_DBUS)
+		CFLAGS="$CFLAGS `$PKGCONFIG --cflags dbus-1` -DDBUS_API_SUBJECT_TO_CHANGE"
+		SERVERLIBS="$SERVERLIBS `$PKGCONFIG --libs dbus-1`"
+		DBUS_NOTIFIER="dbus"
+		DBUS_NOTIFIERLIBS="`$PKGCONFIG --libs dbus-1`"
+		SAVELIBS="$LIBS"
+		LIBS="$LIBS $DBUS_NOTIFIERLIBS"
+		AC_CHECK_FUNC(dbus_message_iter_init_append,
+			      AC_DEFINE(HAVE_DBUS_MESSAGE_ITER_INIT_APPEND))
+		LIBS="$SAVELIBS"
+	else
+		AC_MSG_RESULT(no)
 	fi
 fi
 

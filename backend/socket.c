@@ -3,7 +3,7 @@
  *
  *   AppSocket backend for the Common UNIX Printing System (CUPS).
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -164,8 +164,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Extract the hostname and port number from the URI...
   */
 
-  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
-    return (CUPS_BACKEND_FAILED);
+  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_FAILED);
+  }
 
   httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
                   username, sizeof(username), hostname, sizeof(hostname), &port,
@@ -261,11 +267,14 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   fputs("STATE: +connecting-to-device\n", stderr);
   fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
 
-  if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
   {
-    _cupsLangPrintFilter(stderr, "ERROR",
+    _cupsLangPrintFilter(stderr, "INFO",
                          _("Unable to locate printer \"%s\"."), hostname);
-    return (CUPS_BACKEND_STOP);
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_STOP);
   }
 
   fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);

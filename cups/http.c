@@ -3,7 +3,7 @@
  *
  *   HTTP routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -159,7 +159,9 @@ static int		http_write_chunk(http_t *http, const char *buffer,
 			                 int length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
+#  ifdef HAVE_CDSASSL
 static int		http_set_credentials(http_t *http);
+#  endif /* HAVE_CDSASSL */
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
@@ -3594,6 +3596,7 @@ http_send(http_t       *http,	/* I - Connection to server */
 
 
 #ifdef HAVE_SSL
+#  ifdef HAVE_CDSASSL
 /*
  * 'http_set_credentials()' - Set the SSL/TLS credentials.
  */
@@ -3602,22 +3605,13 @@ static int				/* O - Status of connection */
 http_set_credentials(http_t *http)	/* I - Connection to server */
 {
   _cups_globals_t *cg = _cupsGlobals();	/* Pointer to library globals */
-#  ifdef HAVE_CDSASSL
   OSStatus		error = 0;	/* Error code */
   http_tls_credentials_t credentials = NULL;
 					/* TLS credentials */
-#  endif /* HAVE_CDSASSL */
 
 
   DEBUG_printf(("7http_set_credentials(%p)", http));
 
-#  ifdef HAVE_LIBSSL
-  return (-1);
-
-#  elif defined(HAVE_GNUTLS)
-  return (-1);
-
-#  elif defined(HAVE_CDSASSL)
  /*
   * Prefer connection specific credentials...
   */
@@ -3692,11 +3686,8 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
     DEBUG_puts("4http_set_credentials: No credentials to set.");
 
   return (error);
-
-#  elif defined(HAVE_SSPISSL)
-  return (-1);
-#  endif /* HAVE_LIBSSL */
 }
+#  endif /* HAVE_CDSASSL */
 
 
 /*

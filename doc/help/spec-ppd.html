@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Specifications -->
 <head>
-<title>CUPS PPD Extensions</title>
-<meta name="keywords" content="Specifications">
-<meta name="creator" content="Mini-XML v2.7">
+	<title>CUPS PPD Extensions	</title>
+	<meta name="keywords" content="Specifications">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -373,66 +374,66 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#SYNTAX">PPD File Syntax</a></li>
 <li><a href="#AUTOCONFIG">Auto-Configuration</a><ul class="subcontents">
-<li><a href="#APAutoSetupTool">APAutoSetupTool</a></li>
-<li><a href="#QUERYKEYWORD">?MainKeyword</a></li>
-<li><a href="#OID">OIDMainKeyword</a></li>
+	<li><a href="#APAutoSetupTool">APAutoSetupTool</a></li>
+	<li><a href="#QUERYKEYWORD">?MainKeyword</a></li>
+	<li><a href="#OID">OIDMainKeyword</a></li>
 </ul></li>
 <li><a href="#PROFILES">Color Profiles</a><ul class="subcontents">
-<li><a href="#cupsColorProfile">cupsColorProfile</a></li>
-<li><a href="#cupsICCProfile">cupsICCProfile</a></li>
-<li><a href="#APCustom">Custom Color Matching Support</a></li>
+	<li><a href="#cupsColorProfile">cupsColorProfile</a></li>
+	<li><a href="#cupsICCProfile">cupsICCProfile</a></li>
+	<li><a href="#APCustom">Custom Color Matching Support</a></li>
 </ul></li>
 <li><a href="#CONSTRAINTS">Constraints</a><ul class="subcontents">
-<li><a href="#cupsUIConstraints">cupsUIConstraints</a></li>
-<li><a href="#cupsUIResolver">cupsUIResolver</a></li>
+	<li><a href="#cupsUIConstraints">cupsUIConstraints</a></li>
+	<li><a href="#cupsUIResolver">cupsUIResolver</a></li>
 </ul></li>
 <li><a href="#I18N">Globalized PPD Support</a></li>
 <li><a href="#OPTIONS">CUPS 1.3/Mac OS X 10.6Custom Options</a></li>
 <li><a href="#RASTERPS">Writing PostScript Option Commands for Raster Drivers</a></li>
 <li><a href="#MEDIA">Media Keywords</a><ul class="subcontents">
-<li><a href="#cupsMediaQualifier2">cupsMediaQualifier2</a></li>
-<li><a href="#cupsMediaQualifier3">cupsMediaQualifier3</a></li>
-<li><a href="#cupsMinSize">cupsMinSize</a></li>
-<li><a href="#cupsMaxSize">cupsMaxSize</a></li>
+	<li><a href="#cupsMediaQualifier2">cupsMediaQualifier2</a></li>
+	<li><a href="#cupsMediaQualifier3">cupsMediaQualifier3</a></li>
+	<li><a href="#cupsMinSize">cupsMinSize</a></li>
+	<li><a href="#cupsMaxSize">cupsMaxSize</a></li>
 </ul></li>
 <li><a href="#ATTRIBUTES">General Attributes</a><ul class="subcontents">
-<li><a href="#cupsBackSide">cupsBackSide</a></li>
-<li><a href="#cupsCommands">cupsCommands</a></li>
-<li><a href="#cupsEvenDuplex">cupsEvenDuplex</a></li>
-<li><a href="#cupsFax">cupsFax</a></li>
-<li><a href="#cupsFilter">cupsFilter</a></li>
-<li><a href="#cupsFlipDuplex">cupsFlipDuplex</a></li>
-<li><a href="#cupsIPPFinishings">cupsIPPFinishings</a></li>
-<li><a href="#cupsIPPReason">cupsIPPReason</a></li>
-<li><a href="#cupsLanguages">cupsLanguages</a></li>
-<li><a href="#cupsManualCopies">cupsManualCopies</a></li>
-<li><a href="#cupsMarkerName">cupsMarkerName</a></li>
-<li><a href="#cupsMarkerNotice">cupsMarkerNotice</a></li>
-<li><a href="#cupsModelNumber">cupsModelNumber</a></li>
-<li><a href="#cupsPJLCharset">cupsPJLCharset</a></li>
-<li><a href="#cupsPJLDisplay">cupsPJLDisplay</a></li>
-<li><a href="#cupsPortMonitor">cupsPortMonitor</a></li>
-<li><a href="#cupsPreFilter">cupsPreFilter</a></li>
-<li><a href="#cupsPrintQuality">cupsPrintQuality</a></li>
-<li><a href="#cupsSNMPSupplies">cupsSNMPSupplies</a></li>
-<li><a href="#cupsVersion">cupsVersion</a></li>
+	<li><a href="#cupsBackSide">cupsBackSide</a></li>
+	<li><a href="#cupsCommands">cupsCommands</a></li>
+	<li><a href="#cupsEvenDuplex">cupsEvenDuplex</a></li>
+	<li><a href="#cupsFax">cupsFax</a></li>
+	<li><a href="#cupsFilter">cupsFilter</a></li>
+	<li><a href="#cupsFlipDuplex">cupsFlipDuplex</a></li>
+	<li><a href="#cupsIPPFinishings">cupsIPPFinishings</a></li>
+	<li><a href="#cupsIPPReason">cupsIPPReason</a></li>
+	<li><a href="#cupsLanguages">cupsLanguages</a></li>
+	<li><a href="#cupsManualCopies">cupsManualCopies</a></li>
+	<li><a href="#cupsMarkerName">cupsMarkerName</a></li>
+	<li><a href="#cupsMarkerNotice">cupsMarkerNotice</a></li>
+	<li><a href="#cupsModelNumber">cupsModelNumber</a></li>
+	<li><a href="#cupsPJLCharset">cupsPJLCharset</a></li>
+	<li><a href="#cupsPJLDisplay">cupsPJLDisplay</a></li>
+	<li><a href="#cupsPortMonitor">cupsPortMonitor</a></li>
+	<li><a href="#cupsPreFilter">cupsPreFilter</a></li>
+	<li><a href="#cupsPrintQuality">cupsPrintQuality</a></li>
+	<li><a href="#cupsSNMPSupplies">cupsSNMPSupplies</a></li>
+	<li><a href="#cupsVersion">cupsVersion</a></li>
 </ul></li>
 <li><a href="#MACOSX">Mac OS X Attributes</a><ul class="subcontents">
-<li><a href="#APDialogExtension">APDialogExtension</a></li>
-<li><a href="#APDuplexRequiresFlippedMargin">APDuplexRequiresFlippedMargin</a></li>
-<li><a href="#APHelpBook">APHelpBook</a></li>
-<li><a href="#APICADriver">APICADriver</a></li>
-<li><a href="#APPrinterIconPath">APPrinterIconPath</a></li>
-<li><a href="#APPrinterLowInkTool">APPrinterLowInkTool</a></li>
-<li><a href="#APPrinterPreset">APPrinterPreset</a></li>
-<li><a href="#APPrinterUtilityPath">APPrinterUtilityPath</a></li>
-<li><a href="#APScannerOnly">APScannerOnly</a></li>
-<li><a href="#APScanAppBundleID">APScanAppBundleID</a></li>
+	<li><a href="#APDialogExtension">APDialogExtension</a></li>
+	<li><a href="#APDuplexRequiresFlippedMargin">APDuplexRequiresFlippedMargin</a></li>
+	<li><a href="#APHelpBook">APHelpBook</a></li>
+	<li><a href="#APICADriver">APICADriver</a></li>
+	<li><a href="#APPrinterIconPath">APPrinterIconPath</a></li>
+	<li><a href="#APPrinterLowInkTool">APPrinterLowInkTool</a></li>
+	<li><a href="#APPrinterPreset">APPrinterPreset</a></li>
+	<li><a href="#APPrinterUtilityPath">APPrinterUtilityPath</a></li>
+	<li><a href="#APScannerOnly">APScannerOnly</a></li>
+	<li><a href="#APScanAppBundleID">APScanAppBundleID</a></li>
 </ul></li>
 <li><a href="#HISTORY">Change History</a></li>
+</ul>
 <h2 class='title'><a name='SYNTAX'>PPD File Syntax</a></h2>
 
 <p>The PPD format is text-based and uses lines of up to 255 characters terminated by a carriage return, linefeed, or combination of carriage return and line feed. The following ABNF definition [<a href="http://tools.ietf.org/html/rfc5234" target="_blank">RFC5234</a>] defines the general format of lines in a PPD file:</p>

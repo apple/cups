@@ -1,9 +1,9 @@
 /*
  * "$Id: html.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   HTML support functions for the Common UNIX Printing System (CUPS).
+ *   HTML support functions for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -208,31 +208,13 @@ cgiStartMultipart(void)
 int					/* O - 1 if multi-part supported, 0 otherwise */
 cgiSupportsMultipart(void)
 {
-  const char	*user_agent;		/* User-Agent string */
-  static int	supports_multipart = -1;/* Cached value */
+ /*
+  * Too many bug reports for browsers that don't support it, and too much pain
+  * to whitelist known-good browsers, so for now we just punt on multi-part
+  * support... :(
+  */
 
-
-  if (supports_multipart < 0)
-  {
-   /*
-    * CUPS STR #3049: Apparently some browsers don't support multi-part
-    * documents, which makes them useless for many web sites.  Rather than
-    * abandoning those users, we'll offer a degraded single-part mode...
-    *
-    * Currently we know that anything based on Gecko, MSIE, and Safari all
-    * work.  We'll add more as they are reported/tested.
-    */
-
-    if ((user_agent = getenv("HTTP_USER_AGENT")) != NULL &&
-        (strstr(user_agent, " Gecko/") != NULL ||
-	 strstr(user_agent, " MSIE ") != NULL ||
-	 strstr(user_agent, " Safari/") != NULL))
-      supports_multipart = 1;
-    else
-      supports_multipart = 0;
-  }
-
-  return (supports_multipart);
+  return (0);
 }
 
 

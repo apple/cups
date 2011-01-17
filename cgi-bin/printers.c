@@ -1,9 +1,9 @@
 /*
  * "$Id: printers.c 7940 2008-09-16 00:45:16Z mike $"
  *
- *   Printer status CGI for the Common UNIX Printing System (CUPS).
+ *   Printer status CGI for CUPS.
  *
- *   Copyright 2007-2008 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -148,7 +148,21 @@ main(int  argc,				/* I - Number of command-line arguments */
   }
   else if (printer)
   {
-    if (!strcmp(op, "start-printer"))
+    if (!*op)
+    {
+      const char *server_port = getenv("SERVER_PORT");
+					/* Port number string */
+      int	port = atoi(server_port ? server_port : "0");
+      					/* Port number */
+      char	uri[1024];		/* URL */
+
+      httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri),
+		       getenv("HTTPS") ? "https" : "http", NULL,
+		       getenv("SERVER_NAME"), port, "/printers/%s", printer);
+
+      printf("Location: %s\n\n", uri);
+    }
+    else if (!strcmp(op, "start-printer"))
       do_printer_op(http, printer, IPP_RESUME_PRINTER,
                     cgiText(_("Resume Printer")));
     else if (!strcmp(op, "stop-printer"))

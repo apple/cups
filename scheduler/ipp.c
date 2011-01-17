@@ -3,7 +3,7 @@
  *
  *   IPP routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -3849,7 +3849,7 @@ apple_register_profiles(
 				      (const void **)deviceDictKeys,
 				      (const void **)deviceDictVals,
 				      sizeof(deviceDictKeys) /
-				          sizeof(deviceDictVals),
+				          sizeof(deviceDictKeys[0]),
 				      &kCFTypeDictionaryKeyCallBacks,
 				      &kCFTypeDictionaryValueCallBacks);
       deviceUUID = ColorSyncCreateUUIDFromUInt32(device_id);
@@ -5495,7 +5495,11 @@ copy_banner(cupsd_client_t *con,	/* I - Client connection */
 	  case IPP_TAG_ENUM :
 	      if (!strncmp(s, "time-at-", 8))
 	      {
-	        struct timeval tv = { attr->values[i].integer, 0 };
+	        struct timeval tv;	/* Time value */
+
+		tv.tv_sec  = attr->values[i].integer;
+		tv.tv_usec = 0;
+
 	        cupsFilePuts(out, cupsdGetDateTime(&tv, CUPSD_TIME_STANDARD));
 	      }
 	      else
@@ -10689,8 +10693,9 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (!filetype)
       filetype = mimeType(MimeDatabase, super, type);
 
-    cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
-		filetype->super, filetype->type);
+    if (filetype)
+      cupsdLogJob(job, CUPSD_LOG_DEBUG, "Request file type is %s/%s.",
+		  filetype->super, filetype->type);
   }
   else
     filetype = mimeType(MimeDatabase, super, type);

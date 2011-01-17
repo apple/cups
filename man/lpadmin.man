@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: lpadmin.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
-.\"   lpadmin man page for the Common UNIX Printing System (CUPS).
+.\"   lpadmin man page for CUPS.
 .\"
-.\"   Copyright 2007-2010 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH lpadmin 8 "CUPS" "1 September 2010" "Apple Inc."
+.TH lpadmin 8 "CUPS" "7 January 2011" "Apple Inc."
 .SH NAME
 lpadmin \- configure cups printers and classes
 .SH SYNOPSIS
@@ -132,7 +132,7 @@ classes.
 -o printer-is-shared=true/false
 .br
 Sets the destination to shared/published or unshared/unpublished.
-Shared/published destinations are publically announced by the server
+Shared/published destinations are publicly announced by the server
 on the LAN based on the browsing configuration in
 \fBcupsd.conf\fR, while unshared/unpublished destinations are not
 announced. The default value is "true".
@@ -202,7 +202,7 @@ System V or Solaris printing system configuration options.
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2010 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: lpadmin.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

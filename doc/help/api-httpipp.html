@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>HTTP and IPP APIs</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>HTTP and IPP APIs	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -378,152 +379,151 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-<li><a href="#CREATING_URI_STRINGS">Creating URI Strings</a></li>
-<li><a href="#SENDING_REQUESTS_WITH_FILES">Sending Requests with Files</a></li>
-<li><a href="#ASYNCHRONOUS_REQUEST_PROCESSING">Asynchronous Request Processing</a></li>
+	<li><a href="#CREATING_URI_STRINGS">Creating URI Strings</a></li>
+	<li><a href="#SENDING_REQUESTS_WITH_FILES">Sending Requests with Files</a></li>
+	<li><a href="#ASYNCHRONOUS_REQUEST_PROCESSING">Asynchronous Request Processing</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsDoAuthentication" title="Authenticate a request.">cupsDoAuthentication</a></li>
-<li><a href="#cupsDoFileRequest" title="Do an IPP request with a file.">cupsDoFileRequest</a></li>
-<li><a href="#cupsDoIORequest" title="Do an IPP request with file descriptors.">cupsDoIORequest</a></li>
-<li><a href="#cupsDoRequest" title="Do an IPP request.">cupsDoRequest</a></li>
-<li><a href="#cupsEncodeOptions" title="Encode printer options into IPP attributes.">cupsEncodeOptions</a></li>
-<li><a href="#cupsEncodeOptions2" title="Encode printer options into IPP attributes for a group.">cupsEncodeOptions2</a></li>
-<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
-<li><a href="#cupsGetFd" title="Get a file from the server.">cupsGetFd</a></li>
-<li><a href="#cupsGetFile" title="Get a file from the server.">cupsGetFile</a></li>
-<li><a href="#cupsGetResponse" title="Get a response to an IPP request.">cupsGetResponse</a></li>
-<li><a href="#cupsLastError" title="Return the last IPP status code.">cupsLastError</a></li>
-<li><a href="#cupsLastErrorString" title="Return the last IPP status-message.">cupsLastErrorString</a></li>
-<li><a href="#cupsPutFd" title="Put a file on the server.">cupsPutFd</a></li>
-<li><a href="#cupsPutFile" title="Put a file on the server.">cupsPutFile</a></li>
-<li><a href="#cupsReadResponseData" title="Read additional data after the IPP response.">cupsReadResponseData</a></li>
-<li><a href="#cupsSendRequest" title="Send an IPP request.">cupsSendRequest</a></li>
-<li><a href="#cupsWriteRequestData" title="Write additional data after an IPP request.">cupsWriteRequestData</a></li>
-<li><a href="#httpAddCredential" title="Allocates and adds a single credential to an array.">httpAddCredential</a></li>
-<li><a href="#httpAddrAny" title="Check for the &quot;any&quot; address.">httpAddrAny</a></li>
-<li><a href="#httpAddrEqual" title="Compare two addresses.">httpAddrEqual</a></li>
-<li><a href="#httpAddrLength" title="Return the length of the address in bytes.">httpAddrLength</a></li>
-<li><a href="#httpAddrLocalhost" title="Check for the local loopback address.">httpAddrLocalhost</a></li>
-<li><a href="#httpAddrLookup" title="Lookup the hostname associated with the address.">httpAddrLookup</a></li>
-<li><a href="#httpAddrString" title="Convert an address to a numeric string.">httpAddrString</a></li>
-<li><a href="#httpAssembleURI" title="Assemble a uniform resource identifier from its
+	<li><a href="#cupsDoAuthentication" title="Authenticate a request.">cupsDoAuthentication</a></li>
+	<li><a href="#cupsDoFileRequest" title="Do an IPP request with a file.">cupsDoFileRequest</a></li>
+	<li><a href="#cupsDoIORequest" title="Do an IPP request with file descriptors.">cupsDoIORequest</a></li>
+	<li><a href="#cupsDoRequest" title="Do an IPP request.">cupsDoRequest</a></li>
+	<li><a href="#cupsEncodeOptions" title="Encode printer options into IPP attributes.">cupsEncodeOptions</a></li>
+	<li><a href="#cupsEncodeOptions2" title="Encode printer options into IPP attributes for a group.">cupsEncodeOptions2</a></li>
+	<li><a href="#cupsGetDevices" title="Get available printer devices.">cupsGetDevices</a></li>
+	<li><a href="#cupsGetFd" title="Get a file from the server.">cupsGetFd</a></li>
+	<li><a href="#cupsGetFile" title="Get a file from the server.">cupsGetFile</a></li>
+	<li><a href="#cupsGetResponse" title="Get a response to an IPP request.">cupsGetResponse</a></li>
+	<li><a href="#cupsLastError" title="Return the last IPP status code.">cupsLastError</a></li>
+	<li><a href="#cupsLastErrorString" title="Return the last IPP status-message.">cupsLastErrorString</a></li>
+	<li><a href="#cupsPutFd" title="Put a file on the server.">cupsPutFd</a></li>
+	<li><a href="#cupsPutFile" title="Put a file on the server.">cupsPutFile</a></li>
+	<li><a href="#cupsReadResponseData" title="Read additional data after the IPP response.">cupsReadResponseData</a></li>
+	<li><a href="#cupsSendRequest" title="Send an IPP request.">cupsSendRequest</a></li>
+	<li><a href="#cupsWriteRequestData" title="Write additional data after an IPP request.">cupsWriteRequestData</a></li>
+	<li><a href="#httpAddCredential" title="Allocates and adds a single credential to an array.">httpAddCredential</a></li>
+	<li><a href="#httpAddrAny" title="Check for the &quot;any&quot; address.">httpAddrAny</a></li>
+	<li><a href="#httpAddrEqual" title="Compare two addresses.">httpAddrEqual</a></li>
+	<li><a href="#httpAddrLength" title="Return the length of the address in bytes.">httpAddrLength</a></li>
+	<li><a href="#httpAddrLocalhost" title="Check for the local loopback address.">httpAddrLocalhost</a></li>
+	<li><a href="#httpAddrLookup" title="Lookup the hostname associated with the address.">httpAddrLookup</a></li>
+	<li><a href="#httpAddrString" title="Convert an address to a numeric string.">httpAddrString</a></li>
+	<li><a href="#httpAssembleURI" title="Assemble a uniform resource identifier from its
 components.">httpAssembleURI</a></li>
-<li><a href="#httpAssembleURIf" title="Assemble a uniform resource identifier from its
+	<li><a href="#httpAssembleURIf" title="Assemble a uniform resource identifier from its
 components with a formatted resource.">httpAssembleURIf</a></li>
-<li><a href="#httpBlocking" title="Set blocking/non-blocking behavior on a connection.">httpBlocking</a></li>
-<li><a href="#httpCheck" title="Check to see if there is a pending response from the server.">httpCheck</a></li>
-<li><a href="#httpClearCookie" title="Clear the cookie value(s).">httpClearCookie</a></li>
-<li><a href="#httpClearFields" title="Clear HTTP request fields.">httpClearFields</a></li>
-<li><a href="#httpClose" title="Close an HTTP connection.">httpClose</a></li>
-<li><a href="#httpConnect" title="Connect to a HTTP server.">httpConnect</a></li>
-<li><a href="#httpConnectEncrypt" title="Connect to a HTTP server using encryption.">httpConnectEncrypt</a></li>
-<li><a href="#httpCopyCredentials" title="Copy the credentials associated with an encrypted
+	<li><a href="#httpBlocking" title="Set blocking/non-blocking behavior on a connection.">httpBlocking</a></li>
+	<li><a href="#httpCheck" title="Check to see if there is a pending response from the server.">httpCheck</a></li>
+	<li><a href="#httpClearCookie" title="Clear the cookie value(s).">httpClearCookie</a></li>
+	<li><a href="#httpClearFields" title="Clear HTTP request fields.">httpClearFields</a></li>
+	<li><a href="#httpClose" title="Close an HTTP connection.">httpClose</a></li>
+	<li><a href="#httpConnect" title="Connect to a HTTP server.">httpConnect</a></li>
+	<li><a href="#httpConnectEncrypt" title="Connect to a HTTP server using encryption.">httpConnectEncrypt</a></li>
+	<li><a href="#httpCopyCredentials" title="Copy the credentials associated with an encrypted
 connection.">httpCopyCredentials</a></li>
-<li><a href="#httpDecode64" title="Base64-decode a string.">httpDecode64</a></li>
-<li><a href="#httpDecode64_2" title="Base64-decode a string.">httpDecode64_2</a></li>
-<li><a href="#httpDelete" title="Send a DELETE request to the server.">httpDelete</a></li>
-<li><a href="#httpEncode64" title="Base64-encode a string.">httpEncode64</a></li>
-<li><a href="#httpEncode64_2" title="Base64-encode a string.">httpEncode64_2</a></li>
-<li><a href="#httpEncryption" title="Set the required encryption on the link.">httpEncryption</a></li>
-<li><a href="#httpError" title="Get the last error on a connection.">httpError</a></li>
-<li><a href="#httpFlush" title="Flush data from a HTTP connection.">httpFlush</a></li>
-<li><a href="#httpFlushWrite" title="Flush data in write buffer.">httpFlushWrite</a></li>
-<li><a href="#httpFreeCredentials" title="Free an array of credentials.">httpFreeCredentials</a></li>
-<li><a href="#httpGet" title="Send a GET request to the server.">httpGet</a></li>
-<li><a href="#httpGetAuthString" title="Get the current authorization string.">httpGetAuthString</a></li>
-<li><a href="#httpGetBlocking" title="Get the blocking/non-block state of a connection.">httpGetBlocking</a></li>
-<li><a href="#httpGetCookie" title="Get any cookie data from the response.">httpGetCookie</a></li>
-<li><a href="#httpGetDateString" title="Get a formatted date/time string from a time value.">httpGetDateString</a></li>
-<li><a href="#httpGetDateString2" title="Get a formatted date/time string from a time value.">httpGetDateString2</a></li>
-<li><a href="#httpGetDateTime" title="Get a time value from a formatted date/time string.">httpGetDateTime</a></li>
-<li><a href="#httpGetFd" title="Get the file descriptor associated with a connection.">httpGetFd</a></li>
-<li><a href="#httpGetField" title="Get a field value from a request/response.">httpGetField</a></li>
-<li><a href="#httpGetHostByName" title="Lookup a hostname or IPv4 address, and return
+	<li><a href="#httpDecode64" title="Base64-decode a string.">httpDecode64</a></li>
+	<li><a href="#httpDecode64_2" title="Base64-decode a string.">httpDecode64_2</a></li>
+	<li><a href="#httpDelete" title="Send a DELETE request to the server.">httpDelete</a></li>
+	<li><a href="#httpEncode64" title="Base64-encode a string.">httpEncode64</a></li>
+	<li><a href="#httpEncode64_2" title="Base64-encode a string.">httpEncode64_2</a></li>
+	<li><a href="#httpEncryption" title="Set the required encryption on the link.">httpEncryption</a></li>
+	<li><a href="#httpError" title="Get the last error on a connection.">httpError</a></li>
+	<li><a href="#httpFlush" title="Flush data from a HTTP connection.">httpFlush</a></li>
+	<li><a href="#httpFlushWrite" title="Flush data in write buffer.">httpFlushWrite</a></li>
+	<li><a href="#httpFreeCredentials" title="Free an array of credentials.">httpFreeCredentials</a></li>
+	<li><a href="#httpGet" title="Send a GET request to the server.">httpGet</a></li>
+	<li><a href="#httpGetAuthString" title="Get the current authorization string.">httpGetAuthString</a></li>
+	<li><a href="#httpGetBlocking" title="Get the blocking/non-block state of a connection.">httpGetBlocking</a></li>
+	<li><a href="#httpGetCookie" title="Get any cookie data from the response.">httpGetCookie</a></li>
+	<li><a href="#httpGetDateString" title="Get a formatted date/time string from a time value.">httpGetDateString</a></li>
+	<li><a href="#httpGetDateString2" title="Get a formatted date/time string from a time value.">httpGetDateString2</a></li>
+	<li><a href="#httpGetDateTime" title="Get a time value from a formatted date/time string.">httpGetDateTime</a></li>
+	<li><a href="#httpGetFd" title="Get the file descriptor associated with a connection.">httpGetFd</a></li>
+	<li><a href="#httpGetField" title="Get a field value from a request/response.">httpGetField</a></li>
+	<li><a href="#httpGetHostByName" title="Lookup a hostname or IPv4 address, and return
 address records for the specified name.">httpGetHostByName</a></li>
-<li><a href="#httpGetHostname" title="Get the FQDN for the connection or local system.">httpGetHostname</a></li>
-<li><a href="#httpGetLength" title="Get the amount of data remaining from the
+	<li><a href="#httpGetHostname" title="Get the FQDN for the connection or local system.">httpGetHostname</a></li>
+	<li><a href="#httpGetLength" title="Get the amount of data remaining from the
 content-length or transfer-encoding fields.">httpGetLength</a></li>
-<li><a href="#httpGetLength2" title="Get the amount of data remaining from the
+	<li><a href="#httpGetLength2" title="Get the amount of data remaining from the
 content-length or transfer-encoding fields.">httpGetLength2</a></li>
-<li><a href="#httpGetStatus" title="Get the status of the last HTTP request.">httpGetStatus</a></li>
-<li><a href="#httpGetSubField" title="Get a sub-field value.">httpGetSubField</a></li>
-<li><a href="#httpGetSubField2" title="Get a sub-field value.">httpGetSubField2</a></li>
-<li><a href="#httpGets" title="Get a line of text from a HTTP connection.">httpGets</a></li>
-<li><a href="#httpHead" title="Send a HEAD request to the server.">httpHead</a></li>
-<li><a href="#httpInitialize" title="Initialize the HTTP interface library and set the
+	<li><a href="#httpGetStatus" title="Get the status of the last HTTP request.">httpGetStatus</a></li>
+	<li><a href="#httpGetSubField" title="Get a sub-field value.">httpGetSubField</a></li>
+	<li><a href="#httpGetSubField2" title="Get a sub-field value.">httpGetSubField2</a></li>
+	<li><a href="#httpGets" title="Get a line of text from a HTTP connection.">httpGets</a></li>
+	<li><a href="#httpHead" title="Send a HEAD request to the server.">httpHead</a></li>
+	<li><a href="#httpInitialize" title="Initialize the HTTP interface library and set the
 default HTTP proxy (if any).">httpInitialize</a></li>
-<li><a href="#httpMD5" title="Compute the MD5 sum of the username:group:password.">httpMD5</a></li>
-<li><a href="#httpMD5Final" title="Combine the MD5 sum of the username, group, and password
+	<li><a href="#httpMD5" title="Compute the MD5 sum of the username:group:password.">httpMD5</a></li>
+	<li><a href="#httpMD5Final" title="Combine the MD5 sum of the username, group, and password
 with the server-supplied nonce value, method, and
 request-uri.">httpMD5Final</a></li>
-<li><a href="#httpMD5String" title="Convert an MD5 sum to a character string.">httpMD5String</a></li>
-<li><a href="#httpOptions" title="Send an OPTIONS request to the server.">httpOptions</a></li>
-<li><a href="#httpPost" title="Send a POST request to the server.">httpPost</a></li>
-<li><a href="#httpPut" title="Send a PUT request to the server.">httpPut</a></li>
-<li><a href="#httpRead" title="Read data from a HTTP connection.">httpRead</a></li>
-<li><a href="#httpRead2" title="Read data from a HTTP connection.">httpRead2</a></li>
-<li><a href="#httpReconnect" title="Reconnect to a HTTP server.">httpReconnect</a></li>
-<li><a href="#httpSeparate" title="Separate a Universal Resource Identifier into its
+	<li><a href="#httpMD5String" title="Convert an MD5 sum to a character string.">httpMD5String</a></li>
+	<li><a href="#httpOptions" title="Send an OPTIONS request to the server.">httpOptions</a></li>
+	<li><a href="#httpPost" title="Send a POST request to the server.">httpPost</a></li>
+	<li><a href="#httpPut" title="Send a PUT request to the server.">httpPut</a></li>
+	<li><a href="#httpRead" title="Read data from a HTTP connection.">httpRead</a></li>
+	<li><a href="#httpRead2" title="Read data from a HTTP connection.">httpRead2</a></li>
+	<li><a href="#httpReconnect" title="Reconnect to a HTTP server.">httpReconnect</a></li>
+	<li><a href="#httpSeparate" title="Separate a Universal Resource Identifier into its
 components.">httpSeparate</a></li>
-<li><a href="#httpSeparate2" title="Separate a Universal Resource Identifier into its
+	<li><a href="#httpSeparate2" title="Separate a Universal Resource Identifier into its
 components.">httpSeparate2</a></li>
-<li><a href="#httpSeparateURI" title="Separate a Universal Resource Identifier into its
+	<li><a href="#httpSeparateURI" title="Separate a Universal Resource Identifier into its
 components.">httpSeparateURI</a></li>
-<li><a href="#httpSetAuthString" title="Set the current authorization string.">httpSetAuthString</a></li>
-<li><a href="#httpSetCookie" title="Set the cookie value(s).">httpSetCookie</a></li>
-<li><a href="#httpSetCredentials" title="Set the credentials associated with an encrypted
+	<li><a href="#httpSetAuthString" title="Set the current authorization string.">httpSetAuthString</a></li>
+	<li><a href="#httpSetCookie" title="Set the cookie value(s).">httpSetCookie</a></li>
+	<li><a href="#httpSetCredentials" title="Set the credentials associated with an encrypted
 connection.">httpSetCredentials</a></li>
-<li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
-<li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
-<li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
-<li><a href="#httpStatus" title="Return a short string describing a HTTP status code.">httpStatus</a></li>
-<li><a href="#httpTrace" title="Send an TRACE request to the server.">httpTrace</a></li>
-<li><a href="#httpUpdate" title="Update the current HTTP state for incoming data.">httpUpdate</a></li>
-<li><a href="#httpWait" title="Wait for data available on a connection.">httpWait</a></li>
-<li><a href="#httpWrite" title="Write data to a HTTP connection.">httpWrite</a></li>
-<li><a href="#httpWrite2" title="Write data to a HTTP connection.">httpWrite2</a></li>
-<li><a href="#ippAddBoolean" title="Add a boolean attribute to an IPP message.">ippAddBoolean</a></li>
-<li><a href="#ippAddBooleans" title="Add an array of boolean values.">ippAddBooleans</a></li>
-<li><a href="#ippAddCollection" title="Add a collection value.">ippAddCollection</a></li>
-<li><a href="#ippAddCollections" title="Add an array of collection values.">ippAddCollections</a></li>
-<li><a href="#ippAddDate" title="Add a date attribute to an IPP message.">ippAddDate</a></li>
-<li><a href="#ippAddInteger" title="Add a integer attribute to an IPP message.">ippAddInteger</a></li>
-<li><a href="#ippAddIntegers" title="Add an array of integer values.">ippAddIntegers</a></li>
-<li><a href="#ippAddOctetString" title="Add an octetString value to an IPP message.">ippAddOctetString</a></li>
-<li><a href="#ippAddRange" title="Add a range of values to an IPP message.">ippAddRange</a></li>
-<li><a href="#ippAddRanges" title="Add ranges of values to an IPP message.">ippAddRanges</a></li>
-<li><a href="#ippAddResolution" title="Add a resolution value to an IPP message.">ippAddResolution</a></li>
-<li><a href="#ippAddResolutions" title="Add resolution values to an IPP message.">ippAddResolutions</a></li>
-<li><a href="#ippAddSeparator" title="Add a group separator to an IPP message.">ippAddSeparator</a></li>
-<li><a href="#ippAddString" title="Add a language-encoded string to an IPP message.">ippAddString</a></li>
-<li><a href="#ippAddStrings" title="Add language-encoded strings to an IPP message.">ippAddStrings</a></li>
-<li><a href="#ippDateToTime" title="Convert from RFC 1903 Date/Time format to UNIX time
+	<li><a href="#httpSetExpect" title="Set the Expect: header in a request.">httpSetExpect</a></li>
+	<li><a href="#httpSetField" title="Set the value of an HTTP header.">httpSetField</a></li>
+	<li><a href="#httpSetLength" title="Set the content-length and content-encoding.">httpSetLength</a></li>
+	<li><a href="#httpStatus" title="Return a short string describing a HTTP status code.">httpStatus</a></li>
+	<li><a href="#httpTrace" title="Send an TRACE request to the server.">httpTrace</a></li>
+	<li><a href="#httpUpdate" title="Update the current HTTP state for incoming data.">httpUpdate</a></li>
+	<li><a href="#httpWait" title="Wait for data available on a connection.">httpWait</a></li>
+	<li><a href="#httpWrite" title="Write data to a HTTP connection.">httpWrite</a></li>
+	<li><a href="#httpWrite2" title="Write data to a HTTP connection.">httpWrite2</a></li>
+	<li><a href="#ippAddBoolean" title="Add a boolean attribute to an IPP message.">ippAddBoolean</a></li>
+	<li><a href="#ippAddBooleans" title="Add an array of boolean values.">ippAddBooleans</a></li>
+	<li><a href="#ippAddCollection" title="Add a collection value.">ippAddCollection</a></li>
+	<li><a href="#ippAddCollections" title="Add an array of collection values.">ippAddCollections</a></li>
+	<li><a href="#ippAddDate" title="Add a date attribute to an IPP message.">ippAddDate</a></li>
+	<li><a href="#ippAddInteger" title="Add a integer attribute to an IPP message.">ippAddInteger</a></li>
+	<li><a href="#ippAddIntegers" title="Add an array of integer values.">ippAddIntegers</a></li>
+	<li><a href="#ippAddOctetString" title="Add an octetString value to an IPP message.">ippAddOctetString</a></li>
+	<li><a href="#ippAddRange" title="Add a range of values to an IPP message.">ippAddRange</a></li>
+	<li><a href="#ippAddRanges" title="Add ranges of values to an IPP message.">ippAddRanges</a></li>
+	<li><a href="#ippAddResolution" title="Add a resolution value to an IPP message.">ippAddResolution</a></li>
+	<li><a href="#ippAddResolutions" title="Add resolution values to an IPP message.">ippAddResolutions</a></li>
+	<li><a href="#ippAddSeparator" title="Add a group separator to an IPP message.">ippAddSeparator</a></li>
+	<li><a href="#ippAddString" title="Add a language-encoded string to an IPP message.">ippAddString</a></li>
+	<li><a href="#ippAddStrings" title="Add language-encoded strings to an IPP message.">ippAddStrings</a></li>
+	<li><a href="#ippDateToTime" title="Convert from RFC 1903 Date/Time format to UNIX time
 in seconds.">ippDateToTime</a></li>
-<li><a href="#ippDelete" title="Delete an IPP message.">ippDelete</a></li>
-<li><a href="#ippDeleteAttribute" title="Delete a single attribute in an IPP message.">ippDeleteAttribute</a></li>
-<li><a href="#ippErrorString" title="Return a name for the given status code.">ippErrorString</a></li>
-<li><a href="#ippErrorValue" title="Return a status code for the given name.">ippErrorValue</a></li>
-<li><a href="#ippFindAttribute" title="Find a named attribute in a request...">ippFindAttribute</a></li>
-<li><a href="#ippFindNextAttribute" title="Find the next named attribute in a request...">ippFindNextAttribute</a></li>
-<li><a href="#ippLength" title="Compute the length of an IPP message.">ippLength</a></li>
-<li><a href="#ippNew" title="Allocate a new IPP message.">ippNew</a></li>
-<li><a href="#ippNewRequest" title="Allocate a new IPP request message.">ippNewRequest</a></li>
-<li><a href="#ippOpString" title="Return a name for the given operation id.">ippOpString</a></li>
-<li><a href="#ippOpValue" title="Return an operation id for the given name.">ippOpValue</a></li>
-<li><a href="#ippPort" title="Return the default IPP port number.">ippPort</a></li>
-<li><a href="#ippRead" title="Read data for an IPP message from a HTTP connection.">ippRead</a></li>
-<li><a href="#ippReadFile" title="Read data for an IPP message from a file.">ippReadFile</a></li>
-<li><a href="#ippReadIO" title="Read data for an IPP message.">ippReadIO</a></li>
-<li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
-<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
-<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
-<li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
-<li><a href="#ippWrite" title="Write data for an IPP message to a HTTP connection.">ippWrite</a></li>
-<li><a href="#ippWriteFile" title="Write data for an IPP message to a file.">ippWriteFile</a></li>
-<li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
+	<li><a href="#ippDelete" title="Delete an IPP message.">ippDelete</a></li>
+	<li><a href="#ippDeleteAttribute" title="Delete a single attribute in an IPP message.">ippDeleteAttribute</a></li>
+	<li><a href="#ippErrorString" title="Return a name for the given status code.">ippErrorString</a></li>
+	<li><a href="#ippErrorValue" title="Return a status code for the given name.">ippErrorValue</a></li>
+	<li><a href="#ippFindAttribute" title="Find a named attribute in a request...">ippFindAttribute</a></li>
+	<li><a href="#ippFindNextAttribute" title="Find the next named attribute in a request...">ippFindNextAttribute</a></li>
+	<li><a href="#ippLength" title="Compute the length of an IPP message.">ippLength</a></li>
+	<li><a href="#ippNew" title="Allocate a new IPP message.">ippNew</a></li>
+	<li><a href="#ippNewRequest" title="Allocate a new IPP request message.">ippNewRequest</a></li>
+	<li><a href="#ippOpString" title="Return a name for the given operation id.">ippOpString</a></li>
+	<li><a href="#ippOpValue" title="Return an operation id for the given name.">ippOpValue</a></li>
+	<li><a href="#ippPort" title="Return the default IPP port number.">ippPort</a></li>
+	<li><a href="#ippRead" title="Read data for an IPP message from a HTTP connection.">ippRead</a></li>
+	<li><a href="#ippReadFile" title="Read data for an IPP message from a file.">ippReadFile</a></li>
+	<li><a href="#ippReadIO" title="Read data for an IPP message.">ippReadIO</a></li>
+	<li><a href="#ippSetPort" title="Set the default port number.">ippSetPort</a></li>
+	<li><a href="#ippTagString" title="Return the tag name corresponding to a tag value.">ippTagString</a></li>
+	<li><a href="#ippTagValue" title="Return the tag value corresponding to a tag name.">ippTagValue</a></li>
+	<li><a href="#ippTimeToDate" title="Convert from UNIX time to RFC 1903 format.">ippTimeToDate</a></li>
+	<li><a href="#ippWrite" title="Write data for an IPP message to a HTTP connection.">ippWrite</a></li>
+	<li><a href="#ippWriteFile" title="Write data for an IPP message to a file.">ippWriteFile</a></li>
+	<li><a href="#ippWriteIO" title="Write data for an IPP message.">ippWriteIO</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#http_addr_t" title="Socket address union, which
@@ -599,6 +599,7 @@ are server-oriented...">http_state_e</a></li>
 	<li><a href="#ipp_status_e" title="IPP status codes">ipp_status_e</a></li>
 	<li><a href="#ipp_tag_e" title="Format tags for attributes">ipp_tag_e</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 

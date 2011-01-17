@@ -3,6 +3,50 @@ CHANGES-1.4.txt
 
 CHANGES IN CUPS V1.4.7
 
+	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
+	  STR #3757, STR #3758)
+	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
+	  STR #3755, STR #3769)
+	- Configure script fixes (STR #3659, STR #3691)
+	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- The scheduler did not retry fax jobs properly.
+	- The scheduler now recognizes an empty cupsCommands PPD keyword as
+	  meaning that CUPS commands are not supported for a printer (STR #3773)
+	- Fixed a crash bug in the scheduler when the application/octet-stream
+	  MIME type was not defined (STR #3690)
+	- Polled printers were advertised more slowly than necessary (STR #3574)
+	- cupsResolveConflicts() did not handle resolving multiple UIConstraints
+	  issues (STR #3705)
+	- The SetEnv and PassEnv directives had no effect (STR #3664)
+	- The libusb-based USB backend printed slowly to the LaserJet 1300 and
+	  other printers (STR #3405)
+	- "lp" and "lpr" failed to print with Kerberos enabled (STR #3768)
+	- The cupsctl program now displays an error if you try to directly set
+	  the Port or Listen directives (STR #3749)
+	- PPD files with "*JobPatchFile: bla" no longer fail to load in relaxed
+	  conformance mode (STR #3747)
+	- The scheduler generated a bad notify-text string for printer state
+	  change notifications (STR #3739)
+	- The scheduler incorrectly updated printers.conf when it really needed
+	  to update classes.conf or remote.cache (STR #3726)
+	- Hardwired remote printers with options did not work (STR #3717)
+	- Accessing the CUPS web interface using a CNAME-based hostname would
+	  sometimes fail due to redirection to the actual hostname (STR #3701)
+	- Subscription events had a misspelled attribute (STR #3693)
+	- "make check" failed if LC_MESSAGES was set (STR #3765)
+	- Fixed the configure script to always look for the pkg-config script
+	  (STR #3761)
+	- The scheduler now only looks up interface hostnames if HostNameLookups
+	  are enabled (STR #3737)
+	- Fixed a compilation problem on DragonFly BSD (STR #3738)
+	- The default PageLogFormat value had the username and job ID swapped
+	  from CUPS 1.3.x (STR #3727)
+	- The scheduler could crash if a browsed printer times out while a job
+	  is printing (STR #3754)
+	- The scheduler incorrectly mapped custom page sizes to standard sizes
+	  (STR #3764)
+	- cupsfilter and pstops did not map IPP attributes to PPD options due to
+	  a change in cupsMarkOptions (STR #3756)
 	- The scheduler did not always show the most recent status message from
 	  the print filters (STR #3731)
 	- The PostScript filter did not apply the mirror and number-up options
@@ -13,6 +57,7 @@ CHANGES IN CUPS V1.4.7
 
 CHANGES IN CUPS V1.4.6
 
+	- Fixed a "make check" issue on Solaris (STR #3729)
 	- Regression: The pstops filter did not support landscape printing of
 	  PostScript files (STR #3722)
 	- The scheduler killed retried (fax) jobs after restarting them

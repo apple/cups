@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>Array API</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>Array API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -375,34 +376,33 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-<li><a href="#MANAGING_ARRAYS">Managing Arrays</a></li>
-<li><a href="#FINDING_AND_ENUMERATING">Finding and Enumerating Elements</a></li>
+	<li><a href="#MANAGING_ARRAYS">Managing Arrays</a></li>
+	<li><a href="#FINDING_AND_ENUMERATING">Finding and Enumerating Elements</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsArrayAdd" title="Add an element to the array.">cupsArrayAdd</a></li>
-<li><a href="#cupsArrayClear" title="Clear the array.">cupsArrayClear</a></li>
-<li><a href="#cupsArrayCount" title="Get the number of elements in the array.">cupsArrayCount</a></li>
-<li><a href="#cupsArrayCurrent" title="Return the current element in the array.">cupsArrayCurrent</a></li>
-<li><a href="#cupsArrayDelete" title="Free all memory used by the array.">cupsArrayDelete</a></li>
-<li><a href="#cupsArrayDup" title="Duplicate the array.">cupsArrayDup</a></li>
-<li><a href="#cupsArrayFind" title="Find an element in the array.">cupsArrayFind</a></li>
-<li><a href="#cupsArrayFirst" title="Get the first element in the array.">cupsArrayFirst</a></li>
-<li><a href="#cupsArrayGetIndex" title="Get the index of the current element.">cupsArrayGetIndex</a></li>
-<li><a href="#cupsArrayGetInsert" title="Get the index of the last inserted element.">cupsArrayGetInsert</a></li>
-<li><a href="#cupsArrayIndex" title="Get the N-th element in the array.">cupsArrayIndex</a></li>
-<li><a href="#cupsArrayInsert" title="Insert an element in the array.">cupsArrayInsert</a></li>
-<li><a href="#cupsArrayLast" title="Get the last element in the array.">cupsArrayLast</a></li>
-<li><a href="#cupsArrayNew" title="Create a new array.">cupsArrayNew</a></li>
-<li><a href="#cupsArrayNew2" title="Create a new array with hash.">cupsArrayNew2</a></li>
-<li><a href="#cupsArrayNew3" title="Create a new array with hash and/or free function.">cupsArrayNew3</a></li>
-<li><a href="#cupsArrayNext" title="Get the next element in the array.">cupsArrayNext</a></li>
-<li><a href="#cupsArrayPrev" title="Get the previous element in the array.">cupsArrayPrev</a></li>
-<li><a href="#cupsArrayRemove" title="Remove an element from the array.">cupsArrayRemove</a></li>
-<li><a href="#cupsArrayRestore" title="Reset the current element to the last cupsArraySave.">cupsArrayRestore</a></li>
-<li><a href="#cupsArraySave" title="Mark the current element for a later cupsArrayRestore.">cupsArraySave</a></li>
-<li><a href="#cupsArrayUserData" title="Return the user data for an array.">cupsArrayUserData</a></li>
+	<li><a href="#cupsArrayAdd" title="Add an element to the array.">cupsArrayAdd</a></li>
+	<li><a href="#cupsArrayClear" title="Clear the array.">cupsArrayClear</a></li>
+	<li><a href="#cupsArrayCount" title="Get the number of elements in the array.">cupsArrayCount</a></li>
+	<li><a href="#cupsArrayCurrent" title="Return the current element in the array.">cupsArrayCurrent</a></li>
+	<li><a href="#cupsArrayDelete" title="Free all memory used by the array.">cupsArrayDelete</a></li>
+	<li><a href="#cupsArrayDup" title="Duplicate the array.">cupsArrayDup</a></li>
+	<li><a href="#cupsArrayFind" title="Find an element in the array.">cupsArrayFind</a></li>
+	<li><a href="#cupsArrayFirst" title="Get the first element in the array.">cupsArrayFirst</a></li>
+	<li><a href="#cupsArrayGetIndex" title="Get the index of the current element.">cupsArrayGetIndex</a></li>
+	<li><a href="#cupsArrayGetInsert" title="Get the index of the last inserted element.">cupsArrayGetInsert</a></li>
+	<li><a href="#cupsArrayIndex" title="Get the N-th element in the array.">cupsArrayIndex</a></li>
+	<li><a href="#cupsArrayInsert" title="Insert an element in the array.">cupsArrayInsert</a></li>
+	<li><a href="#cupsArrayLast" title="Get the last element in the array.">cupsArrayLast</a></li>
+	<li><a href="#cupsArrayNew" title="Create a new array.">cupsArrayNew</a></li>
+	<li><a href="#cupsArrayNew2" title="Create a new array with hash.">cupsArrayNew2</a></li>
+	<li><a href="#cupsArrayNew3" title="Create a new array with hash and/or free function.">cupsArrayNew3</a></li>
+	<li><a href="#cupsArrayNext" title="Get the next element in the array.">cupsArrayNext</a></li>
+	<li><a href="#cupsArrayPrev" title="Get the previous element in the array.">cupsArrayPrev</a></li>
+	<li><a href="#cupsArrayRemove" title="Remove an element from the array.">cupsArrayRemove</a></li>
+	<li><a href="#cupsArrayRestore" title="Reset the current element to the last cupsArraySave.">cupsArrayRestore</a></li>
+	<li><a href="#cupsArraySave" title="Mark the current element for a later cupsArrayRestore.">cupsArraySave</a></li>
+	<li><a href="#cupsArrayUserData" title="Return the user data for an array.">cupsArrayUserData</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_acopy_func_t" title="Array element copy function">cups_acopy_func_t</a></li>
@@ -411,6 +411,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cups_array_func_t" title="Array comparison function">cups_array_func_t</a></li>
 	<li><a href="#cups_array_t" title="CUPS array type">cups_array_t</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 

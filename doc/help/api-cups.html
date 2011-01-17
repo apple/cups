@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>CUPS API</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>CUPS API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -381,85 +382,84 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a><ul class="subcontents">
-<li><a href="#CLIENTS_AND_SERVERS">Clients and Servers</a></li>
-<li><a href="#PRINTERS_AND_CLASSES">Printers and Classes</a></li>
-<li><a href="#OPTIONS">Options</a></li>
-<li><a href="#PRINT_JOBS">Print Jobs</a></li>
-<li><a href="#ERROR_HANDLING">Error Handling</a></li>
-<li><a href="#PASSWORDS_AND_AUTHENTICATION">Passwords and Authentication</a></li>
+	<li><a href="#CLIENTS_AND_SERVERS">Clients and Servers</a></li>
+	<li><a href="#PRINTERS_AND_CLASSES">Printers and Classes</a></li>
+	<li><a href="#OPTIONS">Options</a></li>
+	<li><a href="#PRINT_JOBS">Print Jobs</a></li>
+	<li><a href="#ERROR_HANDLING">Error Handling</a></li>
+	<li><a href="#PASSWORDS_AND_AUTHENTICATION">Passwords and Authentication</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsAddDest" title="Add a destination to the list of destinations.">cupsAddDest</a></li>
-<li><a href="#cupsAddOption" title="Add an option to an option array.">cupsAddOption</a></li>
-<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
-<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
-<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
-<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
-<li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
-<li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
-<li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
-<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
-<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
-<li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
-<li><a href="#cupsFreeJobs" title="Free memory used by job data.">cupsFreeJobs</a></li>
-<li><a href="#cupsFreeOptions" title="Free all memory used by options.">cupsFreeOptions</a></li>
-<li><a href="#cupsGetClasses" title="Get a list of printer classes from the default server.">cupsGetClasses</a></li>
-<li><a href="#cupsGetDefault" title="Get the default printer or class for the default server.">cupsGetDefault</a></li>
-<li><a href="#cupsGetDefault2" title="Get the default printer or class for the specified server.">cupsGetDefault2</a></li>
-<li><a href="#cupsGetDest" title="Get the named destination from the list.">cupsGetDest</a></li>
-<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
-<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
-<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
-<li><a href="#cupsGetJobs2" title="Get the jobs from the specified server.">cupsGetJobs2</a></li>
-<li><a href="#cupsGetNamedDest" title="Get options for the named destination.">cupsGetNamedDest</a></li>
-<li><a href="#cupsGetOption" title="Get an option value.">cupsGetOption</a></li>
-<li><a href="#cupsGetPPD" title="Get the PPD file for a printer on the default server.">cupsGetPPD</a></li>
-<li><a href="#cupsGetPPD2" title="Get the PPD file for a printer from the specified server.">cupsGetPPD2</a></li>
-<li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
+	<li><a href="#cupsAddDest" title="Add a destination to the list of destinations.">cupsAddDest</a></li>
+	<li><a href="#cupsAddOption" title="Add an option to an option array.">cupsAddOption</a></li>
+	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
+	<li><a href="#cupsAdminExportSamba" title="Export a printer to Samba.">cupsAdminExportSamba</a></li>
+	<li><a href="#cupsAdminGetServerSettings" title="Get settings from the server.">cupsAdminGetServerSettings</a></li>
+	<li><a href="#cupsAdminSetServerSettings" title="Set settings on the server.">cupsAdminSetServerSettings</a></li>
+	<li><a href="#cupsCancelJob" title="Cancel a print job on the default server.">cupsCancelJob</a></li>
+	<li><a href="#cupsCancelJob2" title="Cancel or purge a print job.">cupsCancelJob2</a></li>
+	<li><a href="#cupsCreateJob" title="Create an empty job for streaming.">cupsCreateJob</a></li>
+	<li><a href="#cupsEncryption" title="Get the current encryption settings.">cupsEncryption</a></li>
+	<li><a href="#cupsFinishDocument" title="Finish sending a document.">cupsFinishDocument</a></li>
+	<li><a href="#cupsFreeDests" title="Free the memory used by the list of destinations.">cupsFreeDests</a></li>
+	<li><a href="#cupsFreeJobs" title="Free memory used by job data.">cupsFreeJobs</a></li>
+	<li><a href="#cupsFreeOptions" title="Free all memory used by options.">cupsFreeOptions</a></li>
+	<li><a href="#cupsGetClasses" title="Get a list of printer classes from the default server.">cupsGetClasses</a></li>
+	<li><a href="#cupsGetDefault" title="Get the default printer or class for the default server.">cupsGetDefault</a></li>
+	<li><a href="#cupsGetDefault2" title="Get the default printer or class for the specified server.">cupsGetDefault2</a></li>
+	<li><a href="#cupsGetDest" title="Get the named destination from the list.">cupsGetDest</a></li>
+	<li><a href="#cupsGetDests" title="Get the list of destinations from the default server.">cupsGetDests</a></li>
+	<li><a href="#cupsGetDests2" title="Get the list of destinations from the specified server.">cupsGetDests2</a></li>
+	<li><a href="#cupsGetJobs" title="Get the jobs from the default server.">cupsGetJobs</a></li>
+	<li><a href="#cupsGetJobs2" title="Get the jobs from the specified server.">cupsGetJobs2</a></li>
+	<li><a href="#cupsGetNamedDest" title="Get options for the named destination.">cupsGetNamedDest</a></li>
+	<li><a href="#cupsGetOption" title="Get an option value.">cupsGetOption</a></li>
+	<li><a href="#cupsGetPPD" title="Get the PPD file for a printer on the default server.">cupsGetPPD</a></li>
+	<li><a href="#cupsGetPPD2" title="Get the PPD file for a printer from the specified server.">cupsGetPPD2</a></li>
+	<li><a href="#cupsGetPPD3" title="Get the PPD file for a printer on the specified
 server if it has changed.">cupsGetPPD3</a></li>
-<li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
-<li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
+	<li><a href="#cupsGetPassword" title="Get a password from the user.">cupsGetPassword</a></li>
+	<li><a href="#cupsGetPassword2" title="Get a password from the user using the advanced
 password callback.">cupsGetPassword2</a></li>
-<li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
-<li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
-<li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
-<li><a href="#cupsLangEncoding" title="Return the character encoding (us-ascii, etc.)
+	<li><a href="#cupsGetPrinters" title="Get a list of printers from the default server.">cupsGetPrinters</a></li>
+	<li><a href="#cupsGetServerPPD" title="Get an available PPD file from the server.">cupsGetServerPPD</a></li>
+	<li><a href="#cupsLangDefault" title="Return the default language.">cupsLangDefault</a></li>
+	<li><a href="#cupsLangEncoding" title="Return the character encoding (us-ascii, etc.)
 for the given language.">cupsLangEncoding</a></li>
-<li><a href="#cupsLangFlush" title="Flush all language data out of the cache.">cupsLangFlush</a></li>
-<li><a href="#cupsLangFree" title="Free language data.">cupsLangFree</a></li>
-<li><a href="#cupsLangGet" title="Get a language.">cupsLangGet</a></li>
-<li><a href="#cupsNotifySubject" title="Return the subject for the given notification message.">cupsNotifySubject</a></li>
-<li><a href="#cupsNotifyText" title="Return the text for the given notification message.">cupsNotifyText</a></li>
-<li><a href="#cupsParseOptions" title="Parse options from a command-line argument.">cupsParseOptions</a></li>
-<li><a href="#cupsPrintFile" title="Print a file to a printer or class on the default server.">cupsPrintFile</a></li>
-<li><a href="#cupsPrintFile2" title="Print a file to a printer or class on the specified
+	<li><a href="#cupsLangFlush" title="Flush all language data out of the cache.">cupsLangFlush</a></li>
+	<li><a href="#cupsLangFree" title="Free language data.">cupsLangFree</a></li>
+	<li><a href="#cupsLangGet" title="Get a language.">cupsLangGet</a></li>
+	<li><a href="#cupsNotifySubject" title="Return the subject for the given notification message.">cupsNotifySubject</a></li>
+	<li><a href="#cupsNotifyText" title="Return the text for the given notification message.">cupsNotifyText</a></li>
+	<li><a href="#cupsParseOptions" title="Parse options from a command-line argument.">cupsParseOptions</a></li>
+	<li><a href="#cupsPrintFile" title="Print a file to a printer or class on the default server.">cupsPrintFile</a></li>
+	<li><a href="#cupsPrintFile2" title="Print a file to a printer or class on the specified
 server.">cupsPrintFile2</a></li>
-<li><a href="#cupsPrintFiles" title="Print one or more files to a printer or class on the
+	<li><a href="#cupsPrintFiles" title="Print one or more files to a printer or class on the
 default server.">cupsPrintFiles</a></li>
-<li><a href="#cupsPrintFiles2" title="Print one or more files to a printer or class on the
+	<li><a href="#cupsPrintFiles2" title="Print one or more files to a printer or class on the
 specified server.">cupsPrintFiles2</a></li>
-<li><a href="#cupsRemoveDest" title="Remove a destination from the destination list.">cupsRemoveDest</a></li>
-<li><a href="#cupsRemoveOption" title="Remove an option from an option array.">cupsRemoveOption</a></li>
-<li><a href="#cupsServer" title="Return the hostname/address of the current server.">cupsServer</a></li>
-<li><a href="#cupsSetClientCertCB" title="Set the client certificate callback.">cupsSetClientCertCB</a></li>
-<li><a href="#cupsSetCredentials" title="Set the default credentials to be used for SSL/TLS
+	<li><a href="#cupsRemoveDest" title="Remove a destination from the destination list.">cupsRemoveDest</a></li>
+	<li><a href="#cupsRemoveOption" title="Remove an option from an option array.">cupsRemoveOption</a></li>
+	<li><a href="#cupsServer" title="Return the hostname/address of the current server.">cupsServer</a></li>
+	<li><a href="#cupsSetClientCertCB" title="Set the client certificate callback.">cupsSetClientCertCB</a></li>
+	<li><a href="#cupsSetCredentials" title="Set the default credentials to be used for SSL/TLS
 connections.">cupsSetCredentials</a></li>
-<li><a href="#cupsSetDefaultDest" title="Set the default destination.">cupsSetDefaultDest</a></li>
-<li><a href="#cupsSetDests" title="Save the list of destinations for the default server.">cupsSetDests</a></li>
-<li><a href="#cupsSetDests2" title="Save the list of destinations for the specified server.">cupsSetDests2</a></li>
-<li><a href="#cupsSetEncryption" title="Set the encryption preference.">cupsSetEncryption</a></li>
-<li><a href="#cupsSetPasswordCB" title="Set the password callback for CUPS.">cupsSetPasswordCB</a></li>
-<li><a href="#cupsSetPasswordCB2" title="Set the advanced password callback for CUPS.">cupsSetPasswordCB2</a></li>
-<li><a href="#cupsSetServer" title="Set the default server name and port.">cupsSetServer</a></li>
-<li><a href="#cupsSetServerCertCB" title="Set the server certificate callback.">cupsSetServerCertCB</a></li>
-<li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
-<li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
-<li><a href="#cupsTempFd" title="Creates a temporary file.">cupsTempFd</a></li>
-<li><a href="#cupsTempFile" title="Generates a temporary filename.">cupsTempFile</a></li>
-<li><a href="#cupsTempFile2" title="Creates a temporary CUPS file.">cupsTempFile2</a></li>
-<li><a href="#cupsUser" title="Return the current user's name.">cupsUser</a></li>
+	<li><a href="#cupsSetDefaultDest" title="Set the default destination.">cupsSetDefaultDest</a></li>
+	<li><a href="#cupsSetDests" title="Save the list of destinations for the default server.">cupsSetDests</a></li>
+	<li><a href="#cupsSetDests2" title="Save the list of destinations for the specified server.">cupsSetDests2</a></li>
+	<li><a href="#cupsSetEncryption" title="Set the encryption preference.">cupsSetEncryption</a></li>
+	<li><a href="#cupsSetPasswordCB" title="Set the password callback for CUPS.">cupsSetPasswordCB</a></li>
+	<li><a href="#cupsSetPasswordCB2" title="Set the advanced password callback for CUPS.">cupsSetPasswordCB2</a></li>
+	<li><a href="#cupsSetServer" title="Set the default server name and port.">cupsSetServer</a></li>
+	<li><a href="#cupsSetServerCertCB" title="Set the server certificate callback.">cupsSetServerCertCB</a></li>
+	<li><a href="#cupsSetUser" title="Set the default user name.">cupsSetUser</a></li>
+	<li><a href="#cupsStartDocument" title="Add a document to a job created with cupsCreateJob().">cupsStartDocument</a></li>
+	<li><a href="#cupsTempFd" title="Creates a temporary file.">cupsTempFd</a></li>
+	<li><a href="#cupsTempFile" title="Generates a temporary filename.">cupsTempFile</a></li>
+	<li><a href="#cupsTempFile2" title="Creates a temporary CUPS file.">cupsTempFile2</a></li>
+	<li><a href="#cupsUser" title="Return the current user's name.">cupsUser</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_client_cert_cb_t" title="Client credentials callback ">cups_client_cert_cb_t</a></li>
@@ -480,6 +480,7 @@ connections.">cupsSetCredentials</a></li>
 <li><a href="#ENUMERATIONS">Constants</a><ul class="code">
 	<li><a href="#cups_ptype_e" title="Printer type/capability bit constants">cups_ptype_e</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 

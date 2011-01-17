@@ -364,7 +364,7 @@ Version "1.5"
     Attribute NickName "" "Generic PostScript Printer"
     PCFileName "generic.ppd"
     Throughput 8
-    ColorDevice No
+    ColorDevice Yes
     Attribute PSVersion "" "(2016.0) 0"
     Attribute LanguageLevel "" 2
 
@@ -387,7 +387,7 @@ Version "1.5"
 
     Option "InputSlot/Media Source" PickOne AnySetup 10
       *Choice "Default/Printer Default" ""
-      Choice "Tray1/Tray 1" "<</ManualFeed false>>setpagedevice"
+      Choice "Upper/Cassette" "<</ManualFeed false>>setpagedevice"
       Choice "Manual/Manual Feed" "<</ManualFeed true>>setpagedevice"
 
     Duplex Yes

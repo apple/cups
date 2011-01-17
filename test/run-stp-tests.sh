@@ -5,7 +5,7 @@
 #   Perform the complete set of IPP compliance tests specified in the
 #   CUPS Software Test Plan.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -24,10 +24,20 @@ argcount=$#
 make
 
 #
+# Solaris has a non-POSIX grep in /bin...
+#
+
+if test -x /usr/xpg4/bin/grep; then
+	GREP=/usr/xpg4/bin/grep
+else
+	GREP=grep
+fi
+
+#
 # Figure out the proper echo options...
 #
 
-if (echo "testing\c"; echo 1,2,3) | grep c >/dev/null; then
+if (echo "testing\c"; echo 1,2,3) | $GREP c >/dev/null; then
         ac_n=-n
         ac_c=
 else
@@ -453,6 +463,9 @@ export HOME
 LANG=C
 export LANG
 
+LC_MESSAGES=C
+export LC_MESSAGES
+
 #
 # Start the server; run as foreground daemon in the background...
 #
@@ -625,7 +638,7 @@ else
 fi
 
 # Pages printed on Test1 (within 1 page for timing-dependent cancel issues)
-count=`grep '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+count=`$GREP '^Test1 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=`expr $pjobs \* 2 + 34`
 expected2=`expr $expected + 2`
 if test $count -lt $expected -a $count -gt $expected2; then
@@ -638,7 +651,7 @@ else
 fi
 
 # Paged printed on Test2
-count=`grep '^Test2 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
+count=`$GREP '^Test2 ' /tmp/cups-$user/log/page_log | awk 'BEGIN{count=0}{count=count+$7}END{print count}'`
 expected=`expr $pjobs \* 2 + 3`
 if test $count != $expected; then
 	echo "FAIL: Printer 'Test2' produced $count page(s), expected $expected."
@@ -662,11 +675,11 @@ else
 fi
 
 # Did CUPS-Get-Default get logged?
-if grep -q CUPS-Get-Default /tmp/cups-$user/log/access_log; then
+if $GREP -q CUPS-Get-Default /tmp/cups-$user/log/access_log; then
 	echo "FAIL: CUPS-Get-Default logged with 'AccessLogLevel actions'"
 	echo "<P>FAIL: CUPS-Get-Default logged with 'AccessLogLevel actions'</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep CUPS-Get-Default /tmp/cups-$user/log/access_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP CUPS-Get-Default /tmp/cups-$user/log/access_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -675,13 +688,13 @@ else
 fi
 
 # Emergency log messages
-count=`grep '^X ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^X ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 0; then
 	echo "FAIL: $count emergency messages, expected 0."
-	grep '^X ' /tmp/cups-$user/log/error_log
+	$GREP '^X ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count emergency messages, expected 0.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^X ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^X ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -690,13 +703,13 @@ else
 fi
 
 # Alert log messages
-count=`grep '^A ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^A ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 0; then
 	echo "FAIL: $count alert messages, expected 0."
-	grep '^A ' /tmp/cups-$user/log/error_log
+	$GREP '^A ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count alert messages, expected 0.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^A ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^A ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -705,13 +718,13 @@ else
 fi
 
 # Critical log messages
-count=`grep '^C ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^C ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 0; then
 	echo "FAIL: $count critical messages, expected 0."
-	grep '^C ' /tmp/cups-$user/log/error_log
+	$GREP '^C ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count critical messages, expected 0.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^C ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^C ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -720,13 +733,13 @@ else
 fi
 
 # Error log messages
-count=`grep '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^E ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 18; then
 	echo "FAIL: $count error messages, expected 18."
-	grep '^E ' /tmp/cups-$user/log/error_log
+	$GREP '^E ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count error messages, expected 18.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^E ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -735,13 +748,13 @@ else
 fi
 
 # Warning log messages
-count=`grep '^W ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^W ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 9; then
 	echo "FAIL: $count warning messages, expected 9."
-	grep '^W ' /tmp/cups-$user/log/error_log
+	$GREP '^W ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count warning messages, expected 9.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^W ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^W ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -750,13 +763,13 @@ else
 fi
 
 # Notice log messages
-count=`grep '^N ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^N ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count != 0; then
 	echo "FAIL: $count notice messages, expected 0."
-	grep '^N ' /tmp/cups-$user/log/error_log
+	$GREP '^N ' /tmp/cups-$user/log/error_log
 	echo "<P>FAIL: $count notice messages, expected 0.</P>" >>$strfile
 	echo "<PRE>" >>$strfile
-	grep '^N ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+	$GREP '^N ' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 	echo "</PRE>" >>$strfile
 	fail=`expr $fail + 1`
 else
@@ -765,7 +778,7 @@ else
 fi
 
 # Info log messages
-count=`grep '^I ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^I ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count = 0; then
 	echo "FAIL: $count info messages, expected more than 0."
 	echo "<P>FAIL: $count info messages, expected more than 0.</P>" >>$strfile
@@ -776,7 +789,7 @@ else
 fi
 
 # Debug log messages
-count=`grep '^D ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^D ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count = 0; then
 	echo "FAIL: $count debug messages, expected more than 0."
 	echo "<P>FAIL: $count debug messages, expected more than 0.</P>" >>$strfile
@@ -787,7 +800,7 @@ else
 fi
 
 # Debug2 log messages
-count=`grep '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
+count=`$GREP '^d ' /tmp/cups-$user/log/error_log | wc -l | awk '{print $1}'`
 if test $count = 0; then
 	echo "FAIL: $count debug2 messages, expected more than 0."
 	echo "<P>FAIL: $count debug2 messages, expected more than 0.</P>" >>$strfile
@@ -798,13 +811,17 @@ else
 fi
 
 # Page log file...
-if grep -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
-	echo "PASS: page_log formatted correctly."
-	echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
-else
-	echo "FAIL: page_log formatted incorrectly."
-	echo "<P>FAIL: page_log formatted incorrectly - no page size information.</P>" >>$strfile
-	fail=`expr $fail + 1`
+if test `uname` = Darwin; then
+	# Currently just test for Mac OS X since others do not have UI to
+	# select a user-wide default media size...
+	if $GREP -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
+		echo "PASS: page_log formatted correctly."
+		echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
+	else
+		echo "FAIL: page_log formatted incorrectly."
+		echo "<P>FAIL: page_log formatted incorrectly - no page size information.</P>" >>$strfile
+		fail=`expr $fail + 1`
+	fi
 fi
 
 # Log files...
@@ -815,7 +832,7 @@ echo "</PRE>" >>$strfile
 
 echo "<H2>error_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
-grep -v '^d' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
+$GREP -v '^d' /tmp/cups-$user/log/error_log | sed -e '1,$s/&/&amp;/g' -e '1,$s/</&lt;/g' >>$strfile
 echo "</PRE>" >>$strfile
 
 echo "<H2>page_log</H2>" >>$strfile

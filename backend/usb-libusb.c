@@ -3,7 +3,7 @@
  *
  *   Libusb interface code for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -101,7 +101,7 @@ print_device(const char *uri,		/* I - Device URI */
   usb_printer_t	*printer;		/* Printer */
   ssize_t	bytes,			/* Bytes read/written */
 		tbytes;			/* Total bytes written */
-  char		buffer[8192];		/* Print data buffer */
+  char		buffer[512];		/* Print data buffer */
   struct sigaction action;		/* Actions for POSIX signals */
   struct pollfd	pfds[2];		/* Poll descriptors */
 
@@ -748,7 +748,7 @@ side_cb(usb_printer_t *printer,		/* I - Printer */
 {
   ssize_t		bytes,		/* Bytes read/written */
 			tbytes;		/* Total bytes written */
-  char			buffer[8192];	/* Print data buffer */
+  char			buffer[512];	/* Print data buffer */
   struct pollfd		pfd;		/* Poll descriptor */
   cups_sc_command_t	command;	/* Request command */
   cups_sc_status_t	status;		/* Request/response status */

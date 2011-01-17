@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: cupsctl.man 7600 2008-05-20 21:06:23Z mike $"
 .\"
-.\"   cupsctl man page for the Common UNIX Printing System (CUPS).
+.\"   cupsctl man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 2007 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cupsctl 8 "CUPS" "5 July 2007" "Apple Inc."
+.TH cupsctl 8 "CUPS" "10 January 2011" "Apple Inc."
 .SH NAME
 cupsctl \- configure cupsd.conf options
 .SH SYNOPSIS
@@ -94,12 +94,14 @@ Enable printing using the file: pseudo-device:
 .nf
     cupsctl FileDevice=Yes
 .fi
+.SH KNOWN ISSUES
+You cannot set the Listen or Port directives using \fIcupsctl\fR.
 .SH SEE ALSO
 \fIcupsd.conf(5)\fR, \fIcupsd(8)\fR,
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: cupsctl.man 7600 2008-05-20 21:06:23Z mike $".
 .\"

@@ -3,7 +3,7 @@
  *
  *   IPP backend for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -21,6 +21,7 @@
  *   check_printer_state()  - Check the printer state.
  *   compress_files()       - Compress print files...
  *   monitor_printer()      - Monitor the printer state...
+ *   new_request()          - Create a new print creation or validation request.
  *   password_cb()          - Disable the password prompt for
  *                            cupsDoFileRequest().
  *   report_attr()          - Report an IPP attribute value.
@@ -109,6 +110,12 @@ static ipp_pstate_t	check_printer_state(http_t *http, const char *uri,
 static void		compress_files(int num_files, char **files);
 #endif /* HAVE_LIBZ */
 static void		*monitor_printer(_cups_monitor_t *monitor);
+static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
+			             const char *user, const char *title,
+				     int num_options, cups_option_t *options,
+				     const char *compression, int copies,
+				     const char *format, _pwg_t *pwg,
+				     ipp_attribute_t *media_col_sup);
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
 static int		report_printer_state(ipp_t *ipp, int job_id);
@@ -158,8 +165,8 @@ main(int  argc,				/* I - Number of command-line args */
   time_t	start_time;		/* Time of first connect */
   int		contimeout;		/* Connection timeout */
   int		delay;			/* Delay for retries... */
-  int		compression,		/* Do compression of the job data? */
-		waitjob,		/* Wait for job complete? */
+  const char	*compression;		/* Compression mode */
+  int		waitjob,		/* Wait for job complete? */
 		waitprinter;		/* Wait for printer ready? */
   _cups_monitor_t monitor;		/* Monitoring data */
   ipp_attribute_t *job_id_attr;		/* job-id attribute */
@@ -170,12 +177,15 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *cups_version;	/* cups-version */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
+  ipp_attribute_t *operations_sup;	/* operations-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
+  int		validate_job;		/* Does printer support Validate-Job? */
   int		copies,			/* Number of copies for job */
 		copies_remaining;	/* Number of copies remaining */
   const char	*content_type,		/* CONTENT_TYPE environment variable */
-		*final_content_type;	/* FINAL_CONTENT_TYPE environment var */
+		*final_content_type,	/* FINAL_CONTENT_TYPE environment var */
+		*document_format;	/* document-format value */
   int		fd;			/* File descriptor */
   off_t		bytes;			/* Bytes copied */
   char		buffer[16384];		/* Copy buffer */
@@ -183,6 +193,8 @@ main(int  argc,				/* I - Number of command-line args */
   struct sigaction action;		/* Actions for POSIX signals */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
+  ppd_file_t	*ppd;			/* PPD file */
+  _pwg_t	*pwg;			/* PWG<->PPD mapping data */
 
 
  /*
@@ -257,8 +269,14 @@ main(int  argc,				/* I - Number of command-line args */
   * Extract the hostname and printer name from the URI...
   */
 
-  if ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
-    return (CUPS_BACKEND_FAILED);
+  while ((device_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      return (CUPS_BACKEND_FAILED);
+  }
 
   httpSeparateURI(HTTP_URI_CODING_ALL, device_uri, scheme, sizeof(scheme),
                   username, sizeof(username), hostname, sizeof(hostname), &port,
@@ -276,7 +294,7 @@ main(int  argc,				/* I - Number of command-line args */
   * See if there are any options...
   */
 
-  compression = 0;
+  compression = NULL;
   version     = 20;
   waitjob     = 1;
   waitprinter = 1;
@@ -393,10 +411,9 @@ main(int  argc,				/* I - Number of command-line args */
 #ifdef HAVE_LIBZ
       else if (!strcasecmp(name, "compression"))
       {
-        compression = !strcasecmp(value, "true") ||
-	              !strcasecmp(value, "yes") ||
-	              !strcasecmp(value, "on") ||
-	              !strcasecmp(value, "gzip");
+        if (!strcasecmp(value, "true") || !strcasecmp(value, "yes") ||
+	    !strcasecmp(value, "on") || !strcasecmp(value, "gzip"))
+	  compression = "gzip";
       }
 #endif /* HAVE_LIBZ */
       else if (!strcasecmp(name, "contimeout"))
@@ -432,8 +449,7 @@ main(int  argc,				/* I - Number of command-line args */
     num_files    = 0;
     send_options = !strcasecmp(final_content_type, "application/pdf") ||
                    !strcasecmp(final_content_type, "application/vnd.cups-pdf") ||
-                   !strcasecmp(final_content_type, "image/jpeg") ||
-                   !strcasecmp(final_content_type, "image/png");
+                   !strncasecmp(final_content_type, "image/", 6);
 
     fputs("DEBUG: Sending stdin for job...\n", stderr);
   }
@@ -500,7 +516,8 @@ main(int  argc,				/* I - Number of command-line args */
     fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
     _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
-    if ((http = httpConnectEncrypt(hostname, port, cupsEncryption())) == NULL)
+    if ((http = httpConnectEncrypt(hostname, port,
+				   cupsEncryption())) == NULL)
     {
 #if 0 /* These need to go in here someplace when we see HTTP_PKI_ERROR or IPP_PKI_ERROR */
       fputs("STATE: +cups-certificate-error\n", stderr);
@@ -637,11 +654,13 @@ main(int  argc,				/* I - Number of command-line args */
   * copies...
   */
 
-  copies_sup    = NULL;
-  cups_version  = NULL;
-  format_sup    = NULL;
-  media_col_sup = NULL;
-  supported     = NULL;
+  copies_sup     = NULL;
+  cups_version   = NULL;
+  format_sup     = NULL;
+  media_col_sup  = NULL;
+  supported      = NULL;
+  operations_sup = NULL;
+  validate_job   = 0;
 
   do
   {
@@ -812,6 +831,34 @@ main(int  argc,				/* I - Number of command-line args */
 	        media_col_sup->values[i].string.text);
     }
 
+    if ((operations_sup = ippFindAttribute(supported, "operations-supported",
+					   IPP_TAG_ENUM)) != NULL)
+    {
+      for (i = 0; i < operations_sup->num_values; i ++)
+        if (operations_sup->values[i].integer == IPP_VALIDATE_JOB)
+	{
+	  validate_job = 1;
+	  break;
+	}
+
+      if (!validate_job)
+      {
+        _cupsLangPrintFilter(stderr, "WARNING",
+	                     _("This printer does not conform to the IPP "
+			       "standard and may not work."));
+        fputs("DEBUG: operations-supported does not list Validate-Job.\n",
+	      stderr);
+      }
+    }
+    else
+    {
+      _cupsLangPrintFilter(stderr, "WARNING",
+			   _("This printer does not conform to the IPP "
+			     "standard and may not work."));
+      fputs("DEBUG: operations-supported not returned in "
+            "Get-Printer-Attributes request.\n", stderr);
+    }
+
     report_printer_state(supported, 0);
   }
   while (ipp_status > IPP_OK_CONFLICT);
@@ -875,6 +922,44 @@ main(int  argc,				/* I - Number of command-line args */
     copies_remaining = copies;
 
  /*
+  * Prepare remaining printing options...
+  */
+
+  options = NULL;
+  pwg     = NULL;
+
+  if (send_options)
+  {
+    num_options = cupsParseOptions(argv[5], 0, &options);
+
+    if (!cups_version && media_col_sup)
+    {
+     /*
+      * Load the PPD file and generate PWG attribute mapping information...
+      */
+
+      ppd = ppdOpenFile(getenv("PPD"));
+      pwg = _pwgCreateWithPPD(ppd);
+
+      ppdClose(ppd);
+    }
+  }
+  else
+    num_options = 0;
+
+  document_format = NULL;
+
+  if (format_sup != NULL)
+  {
+    for (i = 0; i < format_sup->num_values; i ++)
+      if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
+      {
+        document_format = final_content_type;
+	break;
+      }
+  }
+
+ /*
   * Start monitoring the printer in the background...
   */
 
@@ -892,12 +977,71 @@ main(int  argc,				/* I - Number of command-line args */
   _cupsThreadCreate((_cups_thread_func_t)monitor_printer, &monitor);
 
  /*
+  * Validate access to the printer...
+  */
+
+  while (!job_canceled)
+  {
+    request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2], argv[3],
+                          num_options, options, compression,
+			  copies_sup ? copies : 1, document_format, pwg,
+			  media_col_sup);
+
+    ippDelete(cupsDoRequest(http, request, resource));
+
+    ipp_status = cupsLastError();
+
+    if (ipp_status > IPP_OK_CONFLICT)
+    {
+      if (job_canceled)
+        break;
+
+      if (ipp_status == IPP_SERVICE_UNAVAILABLE ||
+	  ipp_status == IPP_PRINTER_BUSY)
+      {
+        _cupsLangPrintFilter(stderr, "INFO",
+			     _("Printer busy; will retry in 10 seconds."));
+	sleep(10);
+      }
+      else
+      {
+       /*
+	* Update auth-info-required as needed...
+	*/
+
+        _cupsLangPrintFilter(stderr, "ERROR", "%s", cupsLastErrorString());
+
+	if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+	{
+	  fprintf(stderr, "DEBUG: WWW-Authenticate=\"%s\"\n",
+		  httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE));
+
+         /*
+	  * Normal authentication goes through the password callback, which sets
+	  * auth_info_required to "username,password".  Kerberos goes directly
+	  * through GSSAPI, so look for Negotiate in the WWW-Authenticate header
+	  * here and set auth_info_required as needed...
+	  */
+
+	  if (!strncmp(httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE),
+		       "Negotiate", 9))
+	    auth_info_required = "negotiate";
+	}
+
+	goto cleanup;
+      }
+    }
+    else
+      break;
+  }
+
+ /*
   * Then issue the print-job request...
   */
 
-  job_id  = 0;
+  job_id = 0;
 
-  while (copies_remaining > 0)
+  while (!job_canceled && copies_remaining > 0)
   {
    /*
     * Check for side-channel requests...
@@ -906,238 +1050,16 @@ main(int  argc,				/* I - Number of command-line args */
     backendCheckSideChannel(snmp_fd, http->hostaddr);
 
    /*
-    * Build the IPP request...
+    * Build the IPP job creation request...
     */
 
     if (job_canceled)
       break;
 
-    if (num_files > 1)
-      request = ippNewRequest(IPP_CREATE_JOB);
-    else
-      request = ippNewRequest(IPP_PRINT_JOB);
-
-    request->request.op.version[0] = version / 10;
-    request->request.op.version[1] = version % 10;
-
-    fprintf(stderr, "DEBUG: %s IPP/%d.%d\n",
-            ippOpString(request->request.op.operation_id),
-	    request->request.op.version[0],
-	    request->request.op.version[1]);
-
-    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
-        	 NULL, uri);
-    fprintf(stderr, "DEBUG: printer-uri=\"%s\"\n", uri);
-
-    if (argv[2][0])
-    {
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
-                   "requesting-user-name", NULL, argv[2]);
-      fprintf(stderr, "DEBUG: requesting-user-name=\"%s\"\n", argv[2]);
-    }
-
-    if (argv[3][0])
-    {
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
-        	   argv[3]);
-      fprintf(stderr, "DEBUG: job-name=\"%s\"\n", argv[3]);
-    }
-
-#ifdef HAVE_LIBZ
-    if (compression)
-      ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
-                   "compression", NULL, "gzip");
-#endif /* HAVE_LIBZ */
-
-   /*
-    * Handle options on the command-line...
-    */
-
-    options     = NULL;
-    num_options = cupsParseOptions(argv[5], 0, &options);
-
-    if (format_sup != NULL)
-    {
-      for (i = 0; i < format_sup->num_values; i ++)
-        if (!strcasecmp(final_content_type, format_sup->values[i].string.text))
-          break;
-
-      if (i < format_sup->num_values)
-        ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
-	             "document-format", NULL, final_content_type);
-    }
-
-    if (send_options)
-    {
-      if (cups_version || !media_col_sup)
-      {
-       /*
-        * When talking to another CUPS server, send all options...
-	*/
-
-        cupsEncodeOptions(request, num_options, options);
-      }
-      else
-      {
-       /*
-        * Otherwise send standard IPP attributes...
-	*/
-
-	char		cachefile[1024];/* Printer PWG cache file */
-	const char	*cups_cachedir;	/* Location of cache file */
-        _pwg_t		*pwg;		/* PWG mapping data */
-	const char	*keyword;	/* PWG keyword */
-	_pwg_size_t	*size;		/* PWG media size */
-
-
-        if ((cups_cachedir = getenv("CUPS_CACHEDIR")) == NULL)
-	  cups_cachedir = CUPS_CACHEDIR;
-
-	snprintf(cachefile, sizeof(cachefile), "%s/%s.pwg", cups_cachedir,
-	         getenv("PRINTER"));
-
-	if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
-	  keyword = cupsGetOption("media", num_options, options);
-
-        pwg  = _pwgCreateWithFile(cachefile);
-	size = _pwgGetSize(pwg, keyword);
-
-	if (media_col_sup && size)
-	{
-	  ipp_t		*media_col,	/* media-col value */
-	  		*media_size;	/* media-size value */
-	  const char	*media_source,	/* media-source value */
-			*media_type;	/* media-type value */
-
-	  media_size = ippNew();
-	  ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                "x-dimension", size->width);
-	  ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                "y-dimension", size->length);
-
-	  media_col = ippNew();
-	  ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
-
-	  media_source = _pwgGetSource(pwg, cupsGetOption("InputSlot",
-	                                                  num_options,
-							  options));
-	  media_type   = _pwgGetType(pwg, cupsGetOption("MediaType",
-	                                                num_options, options));
-
-	  for (i = 0; i < media_col_sup->num_values; i ++)
-	  {
-	    if (!strcmp(media_col_sup->values[i].string.text,
-	                "media-left-margin"))
-	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                    "media-left-margin", size->left);
-	    else if (!strcmp(media_col_sup->values[i].string.text,
-	                     "media-bottom-margin"))
-	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                    "media-bottom-margin", size->left);
-	    else if (!strcmp(media_col_sup->values[i].string.text,
-	                     "media-right-margin"))
-	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                    "media-right-margin", size->left);
-	    else if (!strcmp(media_col_sup->values[i].string.text,
-	                     "media-top-margin"))
-	      ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
-	                    "media-top-margin", size->left);
-	    else if (!strcmp(media_col_sup->values[i].string.text,
-	                     "media-source") && media_source)
-	      ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
-			   "media-source", NULL, media_source);
-	    else if (!strcmp(media_col_sup->values[i].string.text,
-	                     "media-type") && media_type)
-	      ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
-			   "media-type", NULL, media_type);
-          }
-
-          ippAddCollection(request, IPP_TAG_JOB, "media-col", media_col);
-	}
-	else if (size)
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media",
-	               NULL, size->map.pwg);
-        else if (keyword)
-        {
-	  _pwg_media_t	*found;		/* PWG media */
-
-
-          if ((found = _pwgMediaForPPD(keyword)) != NULL)
-	    keyword = found->pwg;
-	  else if ((found = _pwgMediaForLegacy(keyword)) != NULL)
-	    keyword = found->pwg;
-
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media",
-	               NULL, keyword);
-        }
-
-        if ((keyword = cupsGetOption("output-bin", num_options,
-	                             options)) == NULL)
-	  keyword = _pwgGetBin(pwg, cupsGetOption("OutputBin", num_options,
-	                                          options));
-
-	if (keyword)
-          ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
-	               NULL, keyword);
-
-	if ((keyword = cupsGetOption("output-mode", num_options,
-				     options)) != NULL)
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-		       NULL, keyword);
-	else if ((keyword = cupsGetOption("ColorModel", num_options,
-		                                options)) != NULL)
-	{
-	  if (!strcasecmp(keyword, "Gray"))
-	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			         NULL, "monochrome");
-		else if (!strcasecmp(keyword, "Color"))
-		  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
-			           NULL, "color");
-	}
-
-	if ((keyword = cupsGetOption("print-quality", num_options,
-				     options)) != NULL)
-	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-		        atoi(keyword));
-        else if ((keyword = cupsGetOption("cupsPrintQuality", num_options,
-	                                  options)) != NULL)
-        {
-	  if (!strcasecmp(keyword, "draft"))
-	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-	                  IPP_QUALITY_DRAFT);
-	  else if (!strcasecmp(keyword, "normal"))
-	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-	                  IPP_QUALITY_NORMAL);
-	  else if (!strcasecmp(keyword, "high"))
-	    ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
-	                  IPP_QUALITY_HIGH);
-	}
-
-	if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
-	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-		       NULL, keyword);
-	else if ((keyword = cupsGetOption("Duplex", num_options,
-	                                  options)) != NULL)
-	{
-	  if (!strcasecmp(keyword, "None"))
-	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-			 NULL, "one-sided");
-	  else if (!strcasecmp(keyword, "DuplexNoTumble"))
-	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-			 NULL, "two-sided-long-edge");
-	  if (!strcasecmp(keyword, "DuplexTumble"))
-	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
-			 NULL, "two-sided-short-edge");
-        }
-
-	_pwgDestroy(pwg);
-      }
-
-      if (copies_sup && copies > 1)
-        ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
-    }
-
-    cupsFreeOptions(num_options, options);
+    request = new_request(num_files > 1 ? IPP_CREATE_JOB : IPP_PRINT_JOB,
+			  version, uri, argv[2], argv[3], num_options, options,
+			  compression, copies_sup ? copies : 1, document_format,
+			  pwg, media_col_sup);
 
    /*
     * Do the request...
@@ -1490,6 +1412,11 @@ main(int  argc,				/* I - Number of command-line args */
   * Free memory...
   */
 
+  cleanup:
+
+  cupsFreeOptions(num_options, options);
+  _pwgDestroy(pwg);
+
   httpClose(http);
 
   ippDelete(supported);
@@ -1810,6 +1737,230 @@ monitor_printer(
   httpClose(http);
 
   return (NULL);
+}
+
+
+/*
+ * 'new_request()' - Create a new print creation or validation request.
+ */
+
+static ipp_t *				/* O - Request data */
+new_request(
+    ipp_op_t        op,			/* I - IPP operation code */
+    int             version,		/* I - IPP version number */
+    const char      *uri,		/* I - printer-uri value */
+    const char      *user,		/* I - requesting-user-name value */
+    const char      *title,		/* I - job-name value */
+    int             num_options,	/* I - Number of options to send */
+    cups_option_t   *options,		/* I - Options to send */
+    const char      *compression,	/* I - compression value or NULL */
+    int             copies,		/* I - copies value or 0 */ 
+    const char      *format,		/* I - documet-format value or NULL */
+    _pwg_t          *pwg,		/* I - PWG<->PPD mapping data */
+    ipp_attribute_t *media_col_sup)	/* I - media-col-supported values */
+{
+  int		i;			/* Looping var */
+  ipp_t		*request;		/* Request data */
+  const char	*keyword;		/* PWG keyword */
+  _pwg_size_t	*size;			/* PWG media size */
+  ipp_t		*media_col,		/* media-col value */
+		*media_size;		/* media-size value */
+  const char	*media_source,		/* media-source value */
+		*media_type;		/* media-type value */
+
+
+ /*
+  * Create the IPP request...
+  */
+
+  request                        = ippNewRequest(op);
+  request->request.op.version[0] = version / 10;
+  request->request.op.version[1] = version % 10;
+
+  fprintf(stderr, "DEBUG: %s IPP/%d.%d\n",
+	  ippOpString(request->request.op.operation_id),
+	  request->request.op.version[0],
+	  request->request.op.version[1]);
+
+ /*
+  * Add standard attributes...
+  */
+
+  ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+	       NULL, uri);
+  fprintf(stderr, "DEBUG: printer-uri=\"%s\"\n", uri);
+
+  if (user && *user)
+  {
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME,
+		 "requesting-user-name", NULL, user);
+    fprintf(stderr, "DEBUG: requesting-user-name=\"%s\"\n", user);
+  }
+
+  if (title && *title)
+  {
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_NAME, "job-name", NULL,
+		 title);
+    fprintf(stderr, "DEBUG: job-name=\"%s\"\n", title);
+  }
+
+  if (format)
+  {
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_MIMETYPE,
+		 "document-format", NULL, format);
+    fprintf(stderr, "DEBUG: document-format=\"%s\"\n", format);
+  }
+
+#ifdef HAVE_LIBZ
+  if (compression)
+  {
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_KEYWORD,
+		 "compression", NULL, compression);
+    fprintf(stderr, "DEBUG: compression=\"%s\"\n", compression);
+  }
+#endif /* HAVE_LIBZ */
+
+ /*
+  * Handle options on the command-line...
+  */
+
+  if (num_options > 0)
+  {
+    if (pwg)
+    {
+     /*
+      * Send standard IPP attributes...
+      */
+
+      if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
+	keyword = cupsGetOption("media", num_options, options);
+
+      if ((size = _pwgGetSize(pwg, keyword)) != NULL)
+      {
+       /*
+        * Add a media-col value...
+	*/
+
+	media_size = ippNew();
+	ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+		      "x-dimension", size->width);
+	ippAddInteger(media_size, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+		      "y-dimension", size->length);
+
+	media_col = ippNew();
+	ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
+
+	media_source = _pwgGetSource(pwg, cupsGetOption("InputSlot",
+							num_options,
+							options));
+	media_type   = _pwgGetType(pwg, cupsGetOption("MediaType",
+						      num_options, options));
+
+	for (i = 0; i < media_col_sup->num_values; i ++)
+	{
+	  if (!strcmp(media_col_sup->values[i].string.text,
+		      "media-left-margin"))
+	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+			  "media-left-margin", size->left);
+	  else if (!strcmp(media_col_sup->values[i].string.text,
+			   "media-bottom-margin"))
+	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+			  "media-bottom-margin", size->left);
+	  else if (!strcmp(media_col_sup->values[i].string.text,
+			   "media-right-margin"))
+	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+			  "media-right-margin", size->left);
+	  else if (!strcmp(media_col_sup->values[i].string.text,
+			   "media-top-margin"))
+	    ippAddInteger(media_col, IPP_TAG_ZERO, IPP_TAG_INTEGER,
+			  "media-top-margin", size->left);
+	  else if (!strcmp(media_col_sup->values[i].string.text,
+			   "media-source") && media_source)
+	    ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
+			 "media-source", NULL, media_source);
+	  else if (!strcmp(media_col_sup->values[i].string.text,
+			   "media-type") && media_type)
+	    ippAddString(media_col, IPP_TAG_ZERO, IPP_TAG_KEYWORD,
+			 "media-type", NULL, media_type);
+	}
+
+	ippAddCollection(request, IPP_TAG_JOB, "media-col", media_col);
+      }
+
+      if ((keyword = cupsGetOption("output-bin", num_options,
+				   options)) == NULL)
+	keyword = _pwgGetBin(pwg, cupsGetOption("OutputBin", num_options,
+						options));
+
+      if (keyword)
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
+		     NULL, keyword);
+
+      if ((keyword = cupsGetOption("output-mode", num_options,
+				   options)) != NULL)
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+		     NULL, keyword);
+      else if ((keyword = cupsGetOption("ColorModel", num_options,
+					options)) != NULL)
+      {
+	if (!strcasecmp(keyword, "Gray"))
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			       NULL, "monochrome");
+	else
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-mode",
+			   NULL, "color");
+      }
+
+      if ((keyword = cupsGetOption("print-quality", num_options,
+				   options)) != NULL)
+	ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+		      atoi(keyword));
+      else if ((keyword = cupsGetOption("cupsPrintQuality", num_options,
+					options)) != NULL)
+      {
+	if (!strcasecmp(keyword, "draft"))
+	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+			IPP_QUALITY_DRAFT);
+	else if (!strcasecmp(keyword, "normal"))
+	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+			IPP_QUALITY_NORMAL);
+	else if (!strcasecmp(keyword, "high"))
+	  ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_ENUM, "print-quality",
+			IPP_QUALITY_HIGH);
+      }
+
+      if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
+	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+		     NULL, keyword);
+      else if (pwg->sides_option &&
+               (keyword = cupsGetOption(pwg->sides_option, num_options,
+					options)) != NULL)
+      {
+	if (!strcasecmp(keyword, pwg->sides_1sided))
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+		       NULL, "one-sided");
+	else if (!strcasecmp(keyword, pwg->sides_2sided_long))
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+		       NULL, "two-sided-long-edge");
+	if (!strcasecmp(keyword, pwg->sides_2sided_short))
+	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
+		       NULL, "two-sided-short-edge");
+      }
+    }
+    else
+    {
+     /*
+      * When talking to another CUPS server, send all options...
+      */
+
+      cupsEncodeOptions(request, num_options, options);
+    }
+
+    if (copies > 1)
+      ippAddInteger(request, IPP_TAG_JOB, IPP_TAG_INTEGER, "copies", copies);
+  }
+
+  return (request);
 }
 
 

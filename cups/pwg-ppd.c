@@ -1015,55 +1015,59 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
   closest  = NULL;
   dclosest = 999999999;
 
-  for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+  if (!ppd_name || strncasecmp(ppd_name, "Custom.", 7) ||
+      strncasecmp(ppd_name, "custom_", 7))
   {
-   /*
-    * Adobe uses a size matching algorithm with an epsilon of 5 points, which
-    * is just about 176/2540ths...
-    */
-
-    dwidth  = size->width - jobsize.width;
-    dlength = size->length - jobsize.length;
-
-    if (dwidth <= -176 || dwidth >= 176 || dlength <= -176 || dlength >= 176)
-      continue;
-
-    if (margins_set)
+    for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
     {
      /*
-      * Use a tighter epsilon of 1 point (35/2540ths) for margins...
+      * Adobe uses a size matching algorithm with an epsilon of 5 points, which
+      * is just about 176/2540ths...
       */
 
-      dleft   = size->left - jobsize.left;
-      dright  = size->right - jobsize.right;
-      dtop    = size->top - jobsize.top;
-      dbottom = size->bottom - jobsize.bottom;
+      dwidth  = size->width - jobsize.width;
+      dlength = size->length - jobsize.length;
 
-      if (dleft <= -35 || dleft >= 35 || dright <= -35 || dright >= 35 ||
-          dtop <= -35 || dtop >= 35 || dbottom <= -35 || dbottom >= 35)
-      {
-        dleft   = dleft < 0 ? -dleft : dleft;
-        dright  = dright < 0 ? -dright : dright;
-        dbottom = dbottom < 0 ? -dbottom : dbottom;
-        dtop    = dtop < 0 ? -dtop : dtop;
-	dmin    = dleft + dright + dbottom + dtop;
-
-        if (dmin < dclosest)
-	{
-	  dclosest = dmin;
-	  closest  = size;
-	}
-
+      if (dwidth <= -176 || dwidth >= 176 || dlength <= -176 || dlength >= 176)
 	continue;
+
+      if (margins_set)
+      {
+       /*
+	* Use a tighter epsilon of 1 point (35/2540ths) for margins...
+	*/
+
+	dleft   = size->left - jobsize.left;
+	dright  = size->right - jobsize.right;
+	dtop    = size->top - jobsize.top;
+	dbottom = size->bottom - jobsize.bottom;
+
+	if (dleft <= -35 || dleft >= 35 || dright <= -35 || dright >= 35 ||
+	    dtop <= -35 || dtop >= 35 || dbottom <= -35 || dbottom >= 35)
+	{
+	  dleft   = dleft < 0 ? -dleft : dleft;
+	  dright  = dright < 0 ? -dright : dright;
+	  dbottom = dbottom < 0 ? -dbottom : dbottom;
+	  dtop    = dtop < 0 ? -dtop : dtop;
+	  dmin    = dleft + dright + dbottom + dtop;
+
+	  if (dmin < dclosest)
+	  {
+	    dclosest = dmin;
+	    closest  = size;
+	  }
+
+	  continue;
+	}
       }
+
+      if (exact)
+	*exact = 1;
+
+      DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", size->map.ppd));
+
+      return (size->map.ppd);
     }
-
-    if (exact)
-      *exact = 1;
-
-    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", size->map.ppd));
-
-    return (size->map.ppd);
   }
 
   if (closest)

@@ -1,9 +1,9 @@
 /*
  * "$Id: admin.c 8029 2008-10-08 21:07:45Z mike $"
  *
- *   Administration CGI for the Common UNIX Printing System (CUPS).
+ *   Administration CGI for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -145,7 +145,30 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     fprintf(stderr, "DEBUG: op=\"%s\"...\n", op);
 
-    if (!strcmp(op, "set-allowed-users"))
+    if (!*op)
+    {
+      const char *printer = getenv("PRINTER_NAME"),
+					/* Printer or class name */
+		*server_port = getenv("SERVER_PORT");
+					/* Port number string */
+      int	port = atoi(server_port ? server_port : "0");
+      					/* Port number */
+      char	uri[1024];		/* URL */
+
+      if (printer)
+        httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri),
+	                 getenv("HTTPS") ? "https" : "http", NULL,
+			 getenv("SERVER_NAME"), port, "/%s/%s",
+			 cgiGetVariable("IS_CLASS") ? "classes" : "printers",
+			 printer);
+      else
+        httpAssembleURI(HTTP_URI_CODING_ALL, uri, sizeof(uri),
+	                getenv("HTTPS") ? "https" : "http", NULL,
+			getenv("SERVER_NAME"), port, "/admin");
+
+      printf("Location: %s\n\n", uri);
+    }
+    else if (!strcmp(op, "set-allowed-users"))
       do_set_allowed_users(http);
     else if (!strcmp(op, "set-as-default"))
       do_set_default(http);
@@ -1040,7 +1063,8 @@ do_am_printer(http_t *http,		/* I - HTTP connection */
       }
     }
   }
-  else if (strchr(var, '/') == NULL)
+  else if (!strchr(var, '/') ||
+           (!strncmp(var, "lpd://", 6) && !strchr(var + 6, '/')))
   {
     if ((attr = ippFindAttribute(oldinfo, "device-uri", IPP_TAG_URI)) != NULL)
     {

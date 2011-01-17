@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   DNS-SD discovery backend for the Common UNIX Printing System (CUPS).
+ *   DNS-SD discovery backend for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -492,8 +492,14 @@ exec_backend(char **argv)		/* I - Command-line arguments */
 
   job_canceled = -1;
 
-  if ((resolved_uri = cupsBackendDeviceURI(argv)) == NULL)
-    exit(CUPS_BACKEND_FAILED);
+  while ((resolved_uri = cupsBackendDeviceURI(argv)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer."));
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+      exit(CUPS_BACKEND_FAILED);
+  }
 
  /*
   * Extract the scheme from the URI...

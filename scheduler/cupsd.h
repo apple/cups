@@ -3,7 +3,7 @@
  *
  *   Main header file for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -202,6 +202,7 @@ extern void	cupsdSetEnvf(const char *name, const char *value, ...)
 __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif /* __GNUC__ */
 ;
+extern void	cupsdUpdateEnv(void);
 
 extern void	*cupsdCreateProfile(int job_id);
 extern void	cupsdDestroyProfile(void *profile);

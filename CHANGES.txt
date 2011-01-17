@@ -1,8 +1,14 @@
-CHANGES.txt - 2010-12-01
+CHANGES.txt - 2011-01-10
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The cupstestppd program now shows an error for files missing a
+	  CloseGroup keyword (STR #3668)
+	- Name resolution errors no longer cause queues to stop (STR #3719,
+	  STR #3753)
+	- Added a new cups-exec helper program that applies security profiles
+	  to filters, port monitors, backends, CGI programs, and mini-daemons.
 	- The web interface can now be disabled using the WebInterface directive
 	  in cupsd.conf (STR #2625)
 	- The scheduler now provides privacy controls for jobs and subscriptions

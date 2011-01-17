@@ -3,7 +3,7 @@
  *
  *   Printer routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -47,6 +47,8 @@
  *   compare_printers()         - Compare two printers.
  *   delete_printer_filters()   - Delete all MIME filters for a printer.
  *   delete_string_array()      - Delete an array of CUPS strings.
+ *   dirty_printer()            - Mark config and state files dirty for the
+ *                                specified printer.
  *   load_ppd()                 - Load a cached PPD file, updating the cache as
  *                                needed.
  *   new_media_col()            - Create a media-col collection value.
@@ -69,11 +71,10 @@
 #ifdef HAVE_SYS_MOUNT_H
 #  include <sys/mount.h>
 #endif /* HAVE_SYS_MOUNT_H */
-#ifdef HAVE_SYS_STATFS_H
-#  include <sys/statfs.h>
-#endif /* HAVE_SYS_STATFS_H */
 #ifdef HAVE_SYS_STATVFS_H
 #  include <sys/statvfs.h>
+#elif defined(HAVE_SYS_STATFS_H)
+#  include <sys/statfs.h>
 #endif /* HAVE_SYS_STATVFS_H */
 #ifdef HAVE_SYS_VFS_H
 #  include <sys/vfs.h>
@@ -92,6 +93,7 @@ static void	add_string_array(cups_array_t **a, const char *s);
 static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
 static void	delete_string_array(cups_array_t **a);
+static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
 static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
 		               const char *type);
@@ -255,13 +257,13 @@ cupsdCreateCommonData(void)
 			*notifier;	/* Current notifier */
   cupsd_policy_t	*p;		/* Current policy */
   int			k_supported;	/* Maximum file size supported */
-#ifdef HAVE_STATFS
-  struct statfs		spoolinfo;	/* FS info for spool directory */
-  double		spoolsize;	/* FS size */
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   struct statvfs	spoolinfo;	/* FS info for spool directory */
   double		spoolsize;	/* FS size */
-#endif /* HAVE_STATFS */
+#elif defined(HAVE_STATFS)
+  struct statfs		spoolinfo;	/* FS info for spool directory */
+  double		spoolsize;	/* FS size */
+#endif /* HAVE_STATVFS */
   static const int nups[] =		/* number-up-supported values */
 		{ 1, 2, 4, 6, 9, 16 };
   static const int orients[4] =/* orientation-requested-supported values */
@@ -467,16 +469,7 @@ cupsdCreateCommonData(void)
   * or the filesystem is larger than 2TiB, always report INT_MAX.
   */
 
-#ifdef HAVE_STATFS
-  if (statfs(RequestRoot, &spoolinfo))
-    k_supported = INT_MAX;
-  else if ((spoolsize = (double)spoolinfo.f_bsize * spoolinfo.f_blocks / 1024) >
-               INT_MAX)
-    k_supported = INT_MAX;
-  else
-    k_supported = (int)spoolsize;
-
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   if (statvfs(RequestRoot, &spoolinfo))
     k_supported = INT_MAX;
   else if ((spoolsize = (double)spoolinfo.f_frsize * spoolinfo.f_blocks / 1024) >
@@ -485,9 +478,18 @@ cupsdCreateCommonData(void)
   else
     k_supported = (int)spoolsize;
 
+#elif defined(HAVE_STATFS)
+  if (statfs(RequestRoot, &spoolinfo))
+    k_supported = INT_MAX;
+  else if ((spoolsize = (double)spoolinfo.f_bsize * spoolinfo.f_blocks / 1024) >
+               INT_MAX)
+    k_supported = INT_MAX;
+  else
+    k_supported = (int)spoolsize;
+
 #else
   k_supported = INT_MAX;
-#endif /* HAVE_STATFS */
+#endif /* HAVE_STATVFS */
 
  /*
   * This list of attributes is sorted to improve performance when the
@@ -769,6 +771,8 @@ cupsdDeletePrinter(
   */
 
   cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, update);
+
+  p->state = IPP_PRINTER_STOPPED;	/* Force for browsed printers */
 
   if (p->job)
     cupsdSetJobState(p->job, IPP_JOB_PENDING, CUPSD_JOB_FORCE,
@@ -2365,8 +2369,24 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
     * Tell the client this is a remote printer of some type...
     */
 
-    ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-	         "printer-uri-supported", NULL, p->uri);
+    if (strchr(p->uri, '?'))
+    {
+     /*
+      * Strip trailing "?options" from URI...
+      */
+
+      char *ptr;			/* Pointer into URI */
+
+      strlcpy(resource, p->uri, sizeof(resource));
+      if ((ptr = strchr(resource, '?')) != NULL)
+        *ptr = '\0';
+
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		   "printer-uri-supported", NULL, resource);
+    }
+    else
+      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		   "printer-uri-supported", NULL, p->uri);
 
     ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-more-info",
 		 NULL, p->uri);
@@ -2728,10 +2748,7 @@ cupsdSetPrinterReasons(
     p->num_reasons = 0;
     changed        = 1;
 
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-    if (PrintcapFormat == PRINTCAP_PLIST)
-      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+    dirty_printer(p);
   }
 
   if (!strcmp(s, "none"))
@@ -2784,12 +2801,7 @@ cupsdSetPrinterReasons(
 	    cupsdSetPrinterState(p, IPP_PRINTER_IDLE, 1);
 
           if (strcmp(reason, "connecting-to-device"))
-	  {
-	    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-	    if (PrintcapFormat == PRINTCAP_PLIST)
-	      cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-          }
+	    dirty_printer(p);
 	  break;
 	}
     }
@@ -2821,12 +2833,7 @@ cupsdSetPrinterReasons(
 	  cupsdSetPrinterState(p, IPP_PRINTER_STOPPED, 1);
 
 	if (strcmp(reason, "connecting-to-device"))
-	{
-	  cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-
-	  if (PrintcapFormat == PRINTCAP_PLIST)
-	    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-	}
+	  dirty_printer(p);
       }
     }
   }
@@ -2865,9 +2872,6 @@ cupsdSetPrinterState(
   * Set the new state...
   */
 
-  if (PrintcapFormat == PRINTCAP_PLIST)
-    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
-
   old_state = p->state;
   p->state  = s;
 
@@ -2877,7 +2881,7 @@ cupsdSetPrinterState(
                       CUPSD_EVENT_PRINTER_STATE, p, NULL,
 		  "%s \"%s\" state changed to %s.",
 		  (p->type & CUPS_PRINTER_CLASS) ? "Class" : "Printer",
-		  p->name, printer_states[p->state]);
+		  p->name, printer_states[p->state - IPP_PRINTER_IDLE]);
 
    /*
     * Let the browse code know this needs to be updated...
@@ -2928,12 +2932,7 @@ cupsdSetPrinterState(
 
   if (update &&
       (old_state == IPP_PRINTER_STOPPED) != (s == IPP_PRINTER_STOPPED))
-  {
-    if (p->type & CUPS_PRINTER_CLASS)
-      cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
-    else
-      cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
-  }
+    dirty_printer(p);
 }
 
 
@@ -3954,6 +3953,26 @@ delete_string_array(cups_array_t **a)	/* I - Array */
 
 
 /*
+ * 'dirty_printer()' - Mark config and state files dirty for the specified
+ *                     printer.
+ */
+
+static void
+dirty_printer(cupsd_printer_t *p)	/* I - Printer */
+{
+  if (p->type & CUPS_PRINTER_DISCOVERED)
+    cupsdMarkDirty(CUPSD_DIRTY_REMOTE);
+  else if (p->type & CUPS_PRINTER_CLASS)
+    cupsdMarkDirty(CUPSD_DIRTY_CLASSES);
+  else
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
+
+  if (PrintcapFormat == PRINTCAP_PLIST)
+    cupsdMarkDirty(CUPSD_DIRTY_PRINTCAP);
+}
+
+
+/*
  * 'load_ppd()' - Load a cached PPD file, updating the cache as needed.
  */
 
@@ -4741,7 +4760,18 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         p->type |= CUPS_PRINTER_COMMANDS;
     }
 
-    if (ppd->num_filters == 0)
+    if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
+	ppd_attr->value &&
+	(!ppd_attr->value[0] || !strcasecmp(ppd_attr->value, "none")))
+    {
+     /*
+      * Printer does not support CUPS command files (or any commands as far as
+      * CUPS is concerned...
+      */
+
+      p->type &= ~CUPS_PRINTER_COMMANDS;
+    }
+    else if (ppd->num_filters == 0)
     {
      /*
       * If there are no filters, add PostScript printing filters.
@@ -4786,8 +4816,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       int	count;			/* Number of commands */
 
 
-      if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
-	  ppd_attr->value && ppd_attr->value[0])
+      if (ppd_attr && ppd_attr->value && ppd_attr->value[0])
       {
 	for (count = 0, start = ppd_attr->value; *start; count ++)
 	{
@@ -4807,7 +4836,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       if (count > 0)
       {
        /*
-	* Make a copy of the commands string and count how many ...
+	* Make a copy of the commands string and count how many commands there
+	* are...
 	*/
 
 	attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -5110,8 +5140,25 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * remote printer...
       */
 
-      ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
-		   "printer-uri-supported", NULL, p->device_uri);
+      if (strchr(p->device_uri, '?'))
+      {
+       /*
+	* Strip trailing "?options" from URI...
+	*/
+
+	char	resource[HTTP_MAX_URI],	/* New URI */
+		*ptr;			/* Pointer into URI */
+
+	strlcpy(resource, p->device_uri, sizeof(resource));
+	if ((ptr = strchr(resource, '?')) != NULL)
+	  *ptr = '\0';
+
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		     "printer-uri-supported", NULL, resource);
+      }
+      else
+	ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI,
+		     "printer-uri-supported", NULL, p->device_uri);
 
      /*
       * Then set the make-and-model accordingly...

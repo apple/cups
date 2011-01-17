@@ -3,7 +3,7 @@
  *
  *   "lpadmin" command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1230,7 +1230,7 @@ set_printer_options(
     ppdMarkDefaults(ppd);
     cupsMarkOptions(ppd, num_options, options);
 
-    if ((out = cupsTempFile2(tempfile, sizeof(tempfile))) < 0)
+    if ((out = cupsTempFile2(tempfile, sizeof(tempfile))) == NULL)
     {
       _cupsLangPrintError(NULL, _("lpadmin: Unable to create temporary file"));
       ippDelete(request);

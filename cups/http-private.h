@@ -120,7 +120,9 @@ extern ssize_t	_httpWriteGNUTLS(gnutls_transport_ptr ptr, const void *data,
 #    include <CoreFoundation/CoreFoundation.h>
 #    include <Security/Security.h>
 #    include <Security/SecureTransport.h>
-#    include <Security/SecItem.h>
+#    ifdef HAVE_SECITEM_H
+#      include <Security/SecItem.h>
+#    endif /* HAVE_SECITEM_H */
 #    ifdef HAVE_SECBASEPRIV_H
 #      include <Security/SecBasePriv.h>
 #    elif defined(HAVE_CSSMERRORSTRING) /* Declare prototype for function in that header... */

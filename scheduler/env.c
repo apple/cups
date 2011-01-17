@@ -3,7 +3,7 @@
  *
  *   Environment management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -14,12 +14,14 @@
  *
  * Contents:
  *
- *   cupsdInitEnv()  - Initialize the current environment with standard
- *                     variables.
- *   cupsdLoadEnv()  - Copy common environment variables into an array.
- *   cupsdSetEnv()   - Set a common environment variable.
- *   cupsdSetEnvf()  - Set a formatted common environment variable.
- *   clear_env()     - Clear common environment variables.
+ *   cupsdInitEnv()   - Initialize the current environment with standard
+ *                      variables.
+ *   cupsdLoadEnv()   - Copy common environment variables into an array.
+ *   cupsdSetEnv()    - Set a common environment variable.
+ *   cupsdSetEnvf()   - Set a formatted common environment variable.
+ *   cupsdUpdateEnv() - Update the environment for the configured directories.
+ *   clear_env()      - Clear common environment variables.
+ *   find_env()       - Find a common environment variable.
  */
 
 /*
@@ -42,6 +44,7 @@ static char	*common_env[MAX_ENV];	/* Common env vars */
  */
 
 static void	clear_env(void);
+static int	find_env(const char *name);
 
 
 /*
@@ -68,34 +71,6 @@ cupsdInitEnv(void)
   cupsdSetString(common_env, "<CFProcessPath>");
   num_common_env = 1;
 #endif	/* __APPLE__ */
-
- /*
-  * Set common variables...
-  */
-
-  cupsdSetEnv("CUPS_CACHEDIR", CacheDir);
-  cupsdSetEnv("CUPS_DATADIR", DataDir);
-  cupsdSetEnv("CUPS_DOCROOT", DocumentRoot);
-  cupsdSetEnv("CUPS_FONTPATH", FontPath);
-  cupsdSetEnv("CUPS_REQUESTROOT", RequestRoot);
-  cupsdSetEnv("CUPS_SERVERBIN", ServerBin);
-  cupsdSetEnv("CUPS_SERVERROOT", ServerRoot);
-  cupsdSetEnv("CUPS_STATEDIR", StateDir);
-  cupsdSetEnv("DYLD_LIBRARY_PATH", NULL);
-  cupsdSetEnv("HOME", TempDir);
-  cupsdSetEnv("LD_ASSUME_KERNEL", NULL);
-  cupsdSetEnv("LD_LIBRARY_PATH", NULL);
-  cupsdSetEnv("LD_PRELOAD", NULL);
-  cupsdSetEnv("NLSPATH", NULL);
-  cupsdSetEnvf("PATH", "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR
-                       ":/bin:/usr/bin", ServerBin);
-  cupsdSetEnv("SERVER_ADMIN", ServerAdmin);
-  cupsdSetEnv("SHLIB_PATH", NULL);
-  cupsdSetEnv("SOFTWARE", CUPS_MINIMAL);
-  cupsdSetEnv("TMPDIR", TempDir);
-  cupsdSetEnv("TZ", NULL);
-  cupsdSetEnv("USER", "root");
-  cupsdSetEnv("VG_ARGS", NULL);
 }
 
 
@@ -142,8 +117,7 @@ void
 cupsdSetEnv(const char *name,		/* I - Name of variable */
             const char *value)		/* I - Value of variable */
 {
-  int	i,				/* Looping var */
-	namelen;			/* Length of name */
+  int	i;				/* Index into environent array */
 
 
  /*
@@ -160,11 +134,7 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
   * See if this variable has already been defined...
   */
 
-  for (i = 0, namelen = strlen(name); i < num_common_env; i ++)
-    if (!strncmp(common_env[i], name, namelen) && common_env[i][namelen] == '=')
-      break;
-
-  if (i >= num_common_env)
+  if ((i = find_env(name)) < 0)
   {
    /*
     * Check for room...
@@ -177,6 +147,7 @@ cupsdSetEnv(const char *name,		/* I - Name of variable */
       return;
     }
 
+    i = num_common_env;
     num_common_env ++;
   }
 
@@ -216,6 +187,46 @@ cupsdSetEnvf(const char *name,		/* I - Name of variable */
   */
 
   cupsdSetEnv(name, v);
+}
+
+
+/*
+ * 'cupsdUpdateEnv()' - Update the environment for the configured directories.
+ */
+
+void
+cupsdUpdateEnv(void)
+{
+ /*
+  * Set common variables...
+  */
+
+#define set_if_undefined(name,value) if (find_env(name) < 0) cupsdSetEnv(name,value)
+
+  set_if_undefined("CUPS_CACHEDIR", CacheDir);
+  set_if_undefined("CUPS_DATADIR", DataDir);
+  set_if_undefined("CUPS_DOCROOT", DocumentRoot);
+  set_if_undefined("CUPS_FONTPATH", FontPath);
+  set_if_undefined("CUPS_REQUESTROOT", RequestRoot);
+  set_if_undefined("CUPS_SERVERBIN", ServerBin);
+  set_if_undefined("CUPS_SERVERROOT", ServerRoot);
+  set_if_undefined("CUPS_STATEDIR", StateDir);
+  set_if_undefined("DYLD_LIBRARY_PATH", NULL);
+  set_if_undefined("HOME", TempDir);
+  set_if_undefined("LD_ASSUME_KERNEL", NULL);
+  set_if_undefined("LD_LIBRARY_PATH", NULL);
+  set_if_undefined("LD_PRELOAD", NULL);
+  set_if_undefined("NLSPATH", NULL);
+  if (find_env("PATH") < 0)
+    cupsdSetEnvf("PATH", "%s/filter:" CUPS_BINDIR ":" CUPS_SBINDIR
+			 ":/bin:/usr/bin", ServerBin);
+  set_if_undefined("SERVER_ADMIN", ServerAdmin);
+  set_if_undefined("SHLIB_PATH", NULL);
+  set_if_undefined("SOFTWARE", CUPS_MINIMAL);
+  set_if_undefined("TMPDIR", TempDir);
+  set_if_undefined("TZ", NULL);
+  set_if_undefined("USER", "root");
+  set_if_undefined("VG_ARGS", NULL);
 }
 
 

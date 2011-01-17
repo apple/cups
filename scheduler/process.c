@@ -32,10 +32,6 @@
 #ifdef __APPLE__
 #  include <libgen.h>
 #endif /* __APPLE__ */
-#ifdef HAVE_SANDBOX_H
-#  define __APPLE_API_PRIVATE
-#  include <sandbox.h>
-#endif /* HAVE_SANDBOX_H */
 
 
 /*
@@ -83,7 +79,7 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 		temp[1024];		/* Quoted TempDir */
 
 
-  if (!UseProfiles || RunUser)
+  if (!UseProfiles)
   {
    /*
     * Only use sandbox profiles as root...
@@ -104,6 +100,9 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
     return (NULL);
   }
 
+  fchown(cupsFileNumber(fp), RunUser, Group);
+  fchmod(cupsFileNumber(fp), 0640);
+
   cupsd_requote(cache, CacheDir, sizeof(cache));
   cupsd_requote(request, RequestRoot, sizeof(request));
   cupsd_requote(root, ServerRoot, sizeof(root));
@@ -118,10 +117,15 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
                  "  (regex"
 		 " #\"^%s$\""		/* RequestRoot */
 		 " #\"^%s/\""		/* RequestRoot/... */
-		 " #\"^/Users$\""
-		 " #\"^/Users/\""
 		 "))\n",
 		 request, request);
+  if (!RunUser)
+    cupsFilePuts(fp,
+		 "(deny file-write* file-read-data file-read-metadata\n"
+		 "  (regex"
+		 " #\"^/Users$\""
+		 " #\"^/Users/\""
+		 "))\n");
   cupsFilePrintf(fp,
                  "(deny file-write*\n"
                  "  (regex"
@@ -290,6 +294,9 @@ cupsdStartProcess(
     cupsd_job_t *job,			/* I - Job associated with process */
     int         *pid)			/* O - Process ID */
 {
+  int		i;			/* Looping var */
+  char		*real_argv[103],	/* Real command-line arguments */
+		cups_exec[1024];	/* Path to "cups-exec" program */
   int		user;			/* Command UID */
   struct stat	commandinfo;		/* Command file information */
   cupsd_proc_t	*proc;			/* New process record */
@@ -303,12 +310,20 @@ cupsdStartProcess(
 #endif /* __APPLE__ */
 
 
+ /*
+  * Figure out the UID for the child process...
+  */
+
   if (RunUser)
     user = RunUser;
   else if (root)
     user = 0;
   else
     user = User;
+
+ /*
+  * Check the permissions of the command we are running...
+  */
 
   if (stat(command, &commandinfo))
   {
@@ -412,6 +427,29 @@ cupsdStartProcess(
 #endif	/* __APPLE__ */
 
  /*
+  * Use helper program when we have a sandbox profile...
+  */
+
+  if (profile)
+  {
+    snprintf(cups_exec, sizeof(cups_exec), "%s/daemon/cups-exec", ServerBin);
+
+    real_argv[0] = cups_exec;
+    real_argv[1] = profile;
+    real_argv[2] = (char *)command;
+
+    for (i = 0;
+         i < (int)(sizeof(real_argv) / sizeof(real_argv[0]) - 4) && argv[i];
+	 i ++)
+      real_argv[i + 3] = argv[i];
+
+    real_argv[i + 3] = NULL;
+
+    argv    = real_argv;
+    command = cups_exec;
+  }
+
+ /*
   * Block signals before forking...
   */
 
@@ -483,24 +521,6 @@ cupsdStartProcess(
     if (!root)
       nice(FilterNice);
 
-#ifdef HAVE_SANDBOX_H
-   /*
-    * Run in a separate security profile...
-    */
-
-    if (profile)
-    {
-      char *error = NULL;		/* Sandbox error, if any */
-
-      if (sandbox_init((char *)profile, SANDBOX_NAMED_EXTERNAL, &error))
-      {
-        fprintf(stderr, "ERROR: sandbox_init failed: %s (%s)\n", error,
-	        strerror(errno));
-	sandbox_free_error(error);
-      }
-    }
-#endif /* HAVE_SANDBOX_H */
-
    /*
     * Change user to something "safe"...
     */
@@ -565,8 +585,8 @@ cupsdStartProcess(
     cupsdReleaseSignals();
 
    /*
-    * Execute the command; if for some reason this doesn't work,
-    * return the error code...
+    * Execute the command; if for some reason this doesn't work, log an error
+    * exit with a non-zero value...
     */
 
     if (envp)
@@ -576,7 +596,7 @@ cupsdStartProcess(
 
     perror(command);
 
-    exit(errno);
+    exit(1);
   }
   else if (*pid < 0)
   {

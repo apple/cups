@@ -1,9 +1,9 @@
 .\"
 .\" "$Id: cups-driverd.man.in 7662 2008-06-17 14:34:20Z mike $"
 .\"
-.\"   cups-driverd man page for the Common UNIX Printing System (CUPS).
+.\"   cups-driverd man page for CUPS.
 .\"
-.\"   Copyright 2007-2009 by Apple Inc.
+.\"   Copyright 2007-2011 by Apple Inc.
 .\"   Copyright 1997-2006 by Easy Software Products.
 .\"
 .\"   These coded instructions, statements, and computer programs are the
@@ -12,7 +12,7 @@
 .\"   which should have been included with this file.  If this file is
 .\"   file is missing or damaged, see the license at "http://www.cups.org/".
 .\"
-.TH cups-driverd 8 "CUPS" "16 June 2008" "Apple Inc."
+.TH cups-driverd 8 "CUPS" "6 January 2011" "Apple Inc."
 .SH NAME
 cups-driverd \- cups driver daemon
 .SH SYNOPSIS
@@ -49,7 +49,7 @@ and may be compressed using the \fIgzip(1)\fR program. Driver
 programs must implement the command-line interface shown in the
 next section.
 .SS DRIVER PROGRAMS
-Driver programs provide an interface to dynamically-generated PPD
+Driver programs provide a  interface to dynamically-generated PPD
 files. The following arguments are currently defined:
 .TP 5
 drivername list
@@ -59,12 +59,20 @@ Lists the supported PPD files to stdout.
 drivername cat ppdname
 .br
 Writes the named PPD file to stdout.
+.PP
+Driver programs MUST NOT query hardware or make other long-term operations that
+would delay the return of a driver list. See the NOTES section below for
+specific recommendations.
 .SS LISTING FILES (drivername list)
 When run with the single argument "list", the program must list
 the available PPD files it can generate to stdout using the
 following format:
 .nf
+    "drivername:ppdname" language "make" "make and model"
     "drivername:ppdname" language "make" "make and model" "1284 device id"
+    "drivername:ppdname" language "make" "make and model" "1284 device id" "(PPD product)"
+    "drivername:ppdname" language "make" "make and model" "1284 device id" "(PPD product)" "PostScript version"
+    "drivername:ppdname" language "make" "make and model" "1284 device id" "(PPD product)" "PostScript version" "type"
 .fi
 .LP
 \fIDrivername\fR is the name of the driver program. \fIPpdname\fR
@@ -73,7 +81,11 @@ the locale associated with the default language of the PPD file,
 typically "en". \fIMake\fR is the Manufacturer name from the PPD
 file. \fIMake and model\fR is the NickName name from the PPD
 file. \fI1284 device id\fR is the 1284DeviceId from the PPD file,
-if any.
+if any. \fI(PPD product)\fR is the Product string as it would appear in the PPD
+file or from a PostScript query. \fIPostScript version\fR is the PSVersion
+string as it would appear in the PPD file or from a PostScript query. \fIType\fR
+is "postscript" for PostScript printers, "pdf" for PDF printers, "raster" for
+raster printers, or "fax" for facsimile devices.
 .SS WRITING FILES (drivername cat ppdname)
 When the driver program is run with the "cat ppdname" arguments,
 it must write the named PPD file to stdout, uncompressed. If the
@@ -94,12 +106,17 @@ Error messages
 INFO: [drivername]
 .br
 Informational messages
+.SH NOTES
+Due to performance considerations, driver programs have been officially
+deprecated and should not be used for new development. Currently only the
+CUPS web interface and \fIlpinfo(8)\fR command will request lists from all
+driver programs.
 .SH SEE ALSO
-cupsd(8), cupsd.conf(5), cupstestppd(1),
+cupsd(8), cupsd.conf(5), cupstestppd(1), lpinfo(8),
 .br
 http://localhost:631/help
 .SH COPYRIGHT
-Copyright 2007-2009 by Apple Inc.
+Copyright 2007-2011 by Apple Inc.
 .\"
 .\" End of "$Id: cups-driverd.man.in 7662 2008-06-17 14:34:20Z mike $".
 .\"

@@ -3,7 +3,7 @@
  *
  *   Option marking routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -482,13 +482,13 @@ cupsResolveConflicts(
           }
         }
       }
+    }
 
-      if (!changed)
-      {
-	DEBUG_puts("1ppdResolveConflicts: Unable to automatically resolve "
-		   "constraint!");
-	goto error;
-      }
+    if (!changed)
+    {
+      DEBUG_puts("1ppdResolveConflicts: Unable to automatically resolve "
+		 "constraint!");
+      goto error;
     }
 
     cupsArrayClear(pass);

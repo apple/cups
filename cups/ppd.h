@@ -3,7 +3,7 @@
  *
  *   PostScript Printer Description definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -118,6 +118,7 @@ typedef enum ppd_status_e		/**** Status Codes @since CUPS 1.1.19/Mac OS X 10.3@ 
   PPD_BAD_CUSTOM_PARAM,			/* Bad custom parameter */
   PPD_MISSING_OPTION_KEYWORD,		/* Missing option keyword */
   PPD_BAD_VALUE,			/* Bad value string */
+  PPD_MISSING_CLOSE_GROUP,		/* Missing CloseGroup */
   PPD_MAX_STATUS			/* @private@ */
 } ppd_status_t;
 

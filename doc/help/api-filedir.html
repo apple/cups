@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>File and Directory APIs</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>File and Directory APIs	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -377,42 +378,41 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cupsDirClose" title="Close a directory.">cupsDirClose</a></li>
-<li><a href="#cupsDirOpen" title="Open a directory.">cupsDirOpen</a></li>
-<li><a href="#cupsDirRead" title="Read the next directory entry.">cupsDirRead</a></li>
-<li><a href="#cupsDirRewind" title="Rewind to the start of the directory.">cupsDirRewind</a></li>
-<li><a href="#cupsFileClose" title="Close a CUPS file.">cupsFileClose</a></li>
-<li><a href="#cupsFileCompression" title="Return whether a file is compressed.">cupsFileCompression</a></li>
-<li><a href="#cupsFileEOF" title="Return the end-of-file status.">cupsFileEOF</a></li>
-<li><a href="#cupsFileFind" title="Find a file using the specified path.">cupsFileFind</a></li>
-<li><a href="#cupsFileFlush" title="Flush pending output.">cupsFileFlush</a></li>
-<li><a href="#cupsFileGetChar" title="Get a single character from a file.">cupsFileGetChar</a></li>
-<li><a href="#cupsFileGetConf" title="Get a line from a configuration file...">cupsFileGetConf</a></li>
-<li><a href="#cupsFileGetLine" title="Get a CR and/or LF-terminated line that may
+	<li><a href="#cupsDirClose" title="Close a directory.">cupsDirClose</a></li>
+	<li><a href="#cupsDirOpen" title="Open a directory.">cupsDirOpen</a></li>
+	<li><a href="#cupsDirRead" title="Read the next directory entry.">cupsDirRead</a></li>
+	<li><a href="#cupsDirRewind" title="Rewind to the start of the directory.">cupsDirRewind</a></li>
+	<li><a href="#cupsFileClose" title="Close a CUPS file.">cupsFileClose</a></li>
+	<li><a href="#cupsFileCompression" title="Return whether a file is compressed.">cupsFileCompression</a></li>
+	<li><a href="#cupsFileEOF" title="Return the end-of-file status.">cupsFileEOF</a></li>
+	<li><a href="#cupsFileFind" title="Find a file using the specified path.">cupsFileFind</a></li>
+	<li><a href="#cupsFileFlush" title="Flush pending output.">cupsFileFlush</a></li>
+	<li><a href="#cupsFileGetChar" title="Get a single character from a file.">cupsFileGetChar</a></li>
+	<li><a href="#cupsFileGetConf" title="Get a line from a configuration file...">cupsFileGetConf</a></li>
+	<li><a href="#cupsFileGetLine" title="Get a CR and/or LF-terminated line that may
 contain binary data.">cupsFileGetLine</a></li>
-<li><a href="#cupsFileGets" title="Get a CR and/or LF-terminated line.">cupsFileGets</a></li>
-<li><a href="#cupsFileLock" title="Temporarily lock access to a file.">cupsFileLock</a></li>
-<li><a href="#cupsFileNumber" title="Return the file descriptor associated with a CUPS file.">cupsFileNumber</a></li>
-<li><a href="#cupsFileOpen" title="Open a CUPS file.">cupsFileOpen</a></li>
-<li><a href="#cupsFileOpenFd" title="Open a CUPS file using a file descriptor.">cupsFileOpenFd</a></li>
-<li><a href="#cupsFilePeekChar" title="Peek at the next character from a file.">cupsFilePeekChar</a></li>
-<li><a href="#cupsFilePrintf" title="Write a formatted string.">cupsFilePrintf</a></li>
-<li><a href="#cupsFilePutChar" title="Write a character.">cupsFilePutChar</a></li>
-<li><a href="#cupsFilePutConf" title="Write a configuration line.">cupsFilePutConf</a></li>
-<li><a href="#cupsFilePuts" title="Write a string.">cupsFilePuts</a></li>
-<li><a href="#cupsFileRead" title="Read from a file.">cupsFileRead</a></li>
-<li><a href="#cupsFileRewind" title="Set the current file position to the beginning of the
+	<li><a href="#cupsFileGets" title="Get a CR and/or LF-terminated line.">cupsFileGets</a></li>
+	<li><a href="#cupsFileLock" title="Temporarily lock access to a file.">cupsFileLock</a></li>
+	<li><a href="#cupsFileNumber" title="Return the file descriptor associated with a CUPS file.">cupsFileNumber</a></li>
+	<li><a href="#cupsFileOpen" title="Open a CUPS file.">cupsFileOpen</a></li>
+	<li><a href="#cupsFileOpenFd" title="Open a CUPS file using a file descriptor.">cupsFileOpenFd</a></li>
+	<li><a href="#cupsFilePeekChar" title="Peek at the next character from a file.">cupsFilePeekChar</a></li>
+	<li><a href="#cupsFilePrintf" title="Write a formatted string.">cupsFilePrintf</a></li>
+	<li><a href="#cupsFilePutChar" title="Write a character.">cupsFilePutChar</a></li>
+	<li><a href="#cupsFilePutConf" title="Write a configuration line.">cupsFilePutConf</a></li>
+	<li><a href="#cupsFilePuts" title="Write a string.">cupsFilePuts</a></li>
+	<li><a href="#cupsFileRead" title="Read from a file.">cupsFileRead</a></li>
+	<li><a href="#cupsFileRewind" title="Set the current file position to the beginning of the
 file.">cupsFileRewind</a></li>
-<li><a href="#cupsFileSeek" title="Seek in a file.">cupsFileSeek</a></li>
-<li><a href="#cupsFileStderr" title="Return a CUPS file associated with stderr.">cupsFileStderr</a></li>
-<li><a href="#cupsFileStdin" title="Return a CUPS file associated with stdin.">cupsFileStdin</a></li>
-<li><a href="#cupsFileStdout" title="Return a CUPS file associated with stdout.">cupsFileStdout</a></li>
-<li><a href="#cupsFileTell" title="Return the current file position.">cupsFileTell</a></li>
-<li><a href="#cupsFileUnlock" title="Unlock access to a file.">cupsFileUnlock</a></li>
-<li><a href="#cupsFileWrite" title="Write to a file.">cupsFileWrite</a></li>
+	<li><a href="#cupsFileSeek" title="Seek in a file.">cupsFileSeek</a></li>
+	<li><a href="#cupsFileStderr" title="Return a CUPS file associated with stderr.">cupsFileStderr</a></li>
+	<li><a href="#cupsFileStdin" title="Return a CUPS file associated with stdin.">cupsFileStdin</a></li>
+	<li><a href="#cupsFileStdout" title="Return a CUPS file associated with stdout.">cupsFileStdout</a></li>
+	<li><a href="#cupsFileTell" title="Return the current file position.">cupsFileTell</a></li>
+	<li><a href="#cupsFileUnlock" title="Unlock access to a file.">cupsFileUnlock</a></li>
+	<li><a href="#cupsFileWrite" title="Write to a file.">cupsFileWrite</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cups_dentry_t" title="Directory entry type">cups_dentry_t</a></li>
@@ -422,6 +422,7 @@ file.">cupsFileRewind</a></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
 	<li><a href="#cups_dentry_s" title="Directory entry type">cups_dentry_s</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 

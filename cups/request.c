@@ -638,10 +638,23 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     */
 
     httpClearFields(http);
-    httpSetLength(http, length);
-    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
-    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
     httpSetExpect(http, expect);
+    httpSetField(http, HTTP_FIELD_CONTENT_TYPE, "application/ipp");
+    httpSetLength(http, length);
+
+#ifdef HAVE_GSSAPI
+    if (http->authstring && !strncmp(http->authstring, "Negotiate", 9))
+    {
+     /*
+      * Do not use cached Kerberos credentials since they will look like a
+      * "replay" attack...
+      */
+
+      cupsDoAuthentication(http, "POST", resource);
+    }
+    else
+#endif /* HAVE_GSSAPI */
+    httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
     DEBUG_printf(("2cupsSendRequest: authstring=\"%s\"", http->authstring));
 

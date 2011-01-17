@@ -1,9 +1,9 @@
 #
 # "$Id: Makefile 7941 2008-09-16 00:46:13Z mike $"
 #
-#   Documentation makefile for the Common UNIX Printing System (CUPS).
+#   Documentation makefile for CUPS.
 #
-#   Copyright 2007-2009 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -40,6 +40,8 @@ HELPIMAGES	=	\
 			images/cups-postscript-chain.png \
 			images/cups-raster-chain.png \
 			images/raster.png \
+			images/raster-organization.png \
+			images/sample-image.png \
 			images/smiley.jpg
 HELPFILES	=	\
 			help/accounting.html \
