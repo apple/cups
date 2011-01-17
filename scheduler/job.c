@@ -56,8 +56,6 @@
  *   load_next_job_id()         - Load the NextJobId value from the job.cache
  *                                file.
  *   load_request_root()        - Load jobs from the RequestRoot directory.
- *   set_hold_until()           - Set the hold time and update job-hold-until
- *                                attribute.
  *   set_time()                 - Set one of the "time-at-xyz" attributes.
  *   start_job()                - Start a print job.
  *   stop_job()                 - Stop a print job.
@@ -177,7 +175,6 @@ static size_t	ipp_length(ipp_t *ipp);
 static void	load_job_cache(const char *filename);
 static void	load_next_job_id(const char *filename);
 static void	load_request_root(void);
-static void	set_hold_until(cupsd_job_t *job, time_t holdtime);
 static void	set_time(cupsd_job_t *job, const char *name);
 static void	start_job(cupsd_job_t *job, cupsd_printer_t *printer);
 static void	stop_job(cupsd_job_t *job, cupsd_jobaction_t action);
@@ -3889,58 +3886,6 @@ load_request_root(void)
     }
 
   cupsDirClose(dir);
-}
-
-
-/*
- * 'set_hold_until()' - Set the hold time and update job-hold-until attribute.
- */
-
-static void
-set_hold_until(cupsd_job_t *job, 	/* I - Job to update */
-	       time_t      holdtime)	/* I - Hold until time */
-{
-  ipp_attribute_t	*attr;		/* job-hold-until attribute */
-  struct tm		*holddate;	/* Hold date */
-  char			holdstr[64];	/* Hold time */
-
-
- /*
-  * Set the hold_until value and hold the job...
-  */
-
-  cupsdLogMessage(CUPSD_LOG_DEBUG, "set_hold_until: hold_until = %d",
-                  (int)holdtime);
-
-  job->state->values[0].integer = IPP_JOB_HELD;
-  job->state_value              = IPP_JOB_HELD;
-  job->hold_until               = holdtime;
-
- /*
-  * Update the job-hold-until attribute with a string representing GMT
-  * time (HH:MM:SS)...
-  */
-
-  holddate = gmtime(&holdtime);
-  snprintf(holdstr, sizeof(holdstr), "%d:%d:%d", holddate->tm_hour,
-	   holddate->tm_min, holddate->tm_sec);
-
-  if ((attr = ippFindAttribute(job->attrs, "job-hold-until",
-                               IPP_TAG_KEYWORD)) == NULL)
-    attr = ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_NAME);
-
- /*
-  * Either add the attribute or update the value of the existing one
-  */
-
-  if (attr == NULL)
-    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_KEYWORD, "job-hold-until",
-                 NULL, holdstr);
-  else
-    cupsdSetString(&attr->values[0].string.text, holdstr);
-
-  job->dirty = 1;
-  cupsdMarkDirty(CUPSD_DIRTY_JOBS);
 }
 
 
