@@ -3,7 +3,7 @@
  *
  *   Job management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2883,13 +2883,13 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 		* Try again in N seconds...
 		*/
 
-		set_hold_until(job, time(NULL) + JobRetryInterval);
-
 		snprintf(buffer, sizeof(buffer),
 			 "Job held for %d seconds since it could not be sent.",
 			 JobRetryInterval);
-		job_state = IPP_JOB_HELD;
-		message   = buffer;
+
+		job->hold_until = time(NULL) + JobRetryInterval;
+		job_state       = IPP_JOB_HELD;
+		message         = buffer;
 	      }
             }
 	  }
