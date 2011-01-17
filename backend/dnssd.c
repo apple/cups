@@ -498,7 +498,7 @@ exec_backend(char **argv)		/* I - Command-line arguments */
     sleep(10);
 
     if (getenv("CLASS") != NULL)
-      return (CUPS_BACKEND_FAILED);
+      exit(CUPS_BACKEND_FAILED);
   }
 
  /*
