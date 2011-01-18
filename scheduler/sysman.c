@@ -3,7 +3,7 @@
  *
  *   System management functions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -832,8 +832,37 @@ sysUpdate(void)
 			   sysevent.powerNotificationID);
       else
       {
-        LastSysEvent = sysevent;
-        SleepJobs    = time(NULL) + 15;
+       /*
+	* If there are active printers that don't have the connecting-to-device
+	* printer-state-reason then delay the sleep request (i.e. this reason
+	* indicates a job that is not yet connected to the printer)...
+	*/
+
+	for (p = (cupsd_printer_t *)cupsArrayFirst(Printers);
+	     p;
+	     p = (cupsd_printer_t *)cupsArrayNext(Printers))
+	{
+	  if (p->job)
+	  {
+	    for (i = 0; i < p->num_reasons; i ++)
+	      if (!strcmp(p->reasons[i], "connecting-to-device"))
+		break;
+
+	    if (!p->num_reasons || i >= p->num_reasons)
+	      break;
+	  }
+	}
+
+	if (p)
+	{
+	  LastSysEvent = sysevent;
+	  SleepJobs    = time(NULL) + 10;
+	}
+	else
+	{
+	  IOAllowPowerChange(sysevent.powerKernelPort,
+			     sysevent.powerNotificationID);
+	}
       }
     }
 
