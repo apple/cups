@@ -3258,7 +3258,7 @@ apple_register_profiles(
   ppd_option_t		*cm_option;	/* Color model option */
   ppd_choice_t		*cm_choice;	/* Color model choice */
   int			num_profiles;	/* Number of profiles */
-  CMError		error = 0;	/* Last error */
+  OSStatus		error = 0;	/* Last error */
   unsigned		device_id,	/* Printer device ID */
 			profile_id,	/* Profile ID */
 			default_profile_id = 0;
