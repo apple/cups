@@ -1,5 +1,5 @@
 /*
- * "$Id: env.c 7673 2008-06-18 22:31:26Z mike $"
+ * "$Id: env.c 9459 2011-01-11 03:48:42Z mike $"
  *
  *   Environment management routines for the CUPS scheduler.
  *
@@ -248,5 +248,24 @@ clear_env(void)
 
 
 /*
- * End of "$Id: env.c 7673 2008-06-18 22:31:26Z mike $".
+ * 'find_env()' - Find a common environment variable.
+ */
+
+static int				/* O - Index or -1 if not found */
+find_env(const char *name)		/* I - Variable name */
+{
+  int		i;			/* Looping var */
+  size_t	namelen;		/* Length of name */
+
+
+  for (i = 0, namelen = strlen(name); i < num_common_env; i ++)
+    if (!strncmp(common_env[i], name, namelen) && common_env[i][namelen] == '=')
+      return (i);
+
+  return (-1);
+}
+
+
+/*
+ * End of "$Id: env.c 9459 2011-01-11 03:48:42Z mike $".
  */
