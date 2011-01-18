@@ -295,6 +295,7 @@ cupsdStartProcess(
     int         *pid)			/* O - Process ID */
 {
   int		i;			/* Looping var */
+  const char	*exec_path = command;	/* Command to be exec'd */
   char		*real_argv[103],	/* Real command-line arguments */
 		cups_exec[1024];	/* Path to "cups-exec" program */
   int		user;			/* Command UID */
@@ -445,8 +446,8 @@ cupsdStartProcess(
 
     real_argv[i + 3] = NULL;
 
-    argv    = real_argv;
-    command = cups_exec;
+    argv      = real_argv;
+    exec_path = cups_exec;
   }
 
  /*
@@ -590,9 +591,9 @@ cupsdStartProcess(
     */
 
     if (envp)
-      execve(command, argv, envp);
+      execve(exec_path, argv, envp);
     else
-      execv(command, argv);
+      execv(exec_path, argv);
 
     perror(command);
 
@@ -620,7 +621,7 @@ cupsdStartProcess(
       {
         proc->pid    = *pid;
 	proc->job_id = job ? job->id : 0;
-	strcpy(proc->name, command);
+	_cups_strcpy(proc->name, command);
 
 	cupsArrayAdd(process_array, proc);
       }
