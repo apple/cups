@@ -3,7 +3,7 @@
  *
  *   Process management routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -173,10 +173,28 @@ cupsdCreateProfile(int job_id)		/* I - Job ID or 0 for none */
 	       " #\"^/Library/Printers/PPD Plugins/\""
 	       "))\n");
   if (job_id)
+  {
+   /*
+    * Allow job filters to read the spool file(s)...
+    */
+
     cupsFilePrintf(fp,
                    "(allow file-read-data file-read-metadata\n"
                    "  (regex #\"^%s/([ac]%05d|d%05d-[0-9][0-9][0-9])$\"))\n",
 		   request, job_id, job_id);
+  }
+  else
+  {
+   /*
+    * Allow email notifications from notifiers...
+    */
+
+    cupsFilePuts(fp,
+		 "(allow process-exec\n"
+		 "  (literal \"/usr/sbin/sendmail\")\n"
+		 "  (with no-sandbox)\n"
+		 ")\n");
+  }
 
   cupsFileClose(fp);
 

@@ -3,7 +3,7 @@
  *
  *   "mailto" notifier for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -25,9 +25,7 @@
  * Include necessary headers...
  */
 
-#include <cups/cups.h>
-#include <cups/language-private.h>
-#include <cups/string-private.h>
+#include <cups/cups-private.h>
 #include <sys/wait.h>
 #include <signal.h>
 
@@ -331,8 +329,16 @@ email_message(const char *to,		/* I - Recipient of message */
 
     cupsFileClose(fp);
 
-    if (wait(&status))
-      status = errno << 8;
+    while (wait(&status))
+    {
+      if (errno != EINTR)
+      {
+        fprintf(stderr, "DEBUG: Unable to get child status: %s\n",
+	        strerror(errno));
+        status = 0;
+	break;
+      }
+    }
 
    /*
     * Report any non-zero status...
@@ -425,9 +431,14 @@ load_configuration(void)
 
   if ((fp = cupsFileOpen(line, "r")) == NULL)
   {
-    fprintf(stderr, "ERROR: Unable to open \"%s\" - %s\n", line,
-            strerror(errno));
-    return (1);
+    if (errno != ENOENT)
+    {
+      fprintf(stderr, "ERROR: Unable to open \"%s\" - %s\n", line,
+	      strerror(errno));
+      return (1);
+    }
+    else
+      return (0);
   }
 
   linenum = 0;
@@ -600,88 +611,9 @@ void
 print_attributes(ipp_t *ipp,		/* I - IPP request */
                  int   indent)		/* I - Indentation */
 {
-  int			i;		/* Looping var */
   ipp_tag_t		group;		/* Current group */
   ipp_attribute_t	*attr;		/* Current attribute */
-  ipp_value_t		*val;		/* Current value */
-  static const char * const tags[] =	/* Value/group tag strings */
-			{
-			  "reserved-00",
-			  "operation-attributes-tag",
-			  "job-attributes-tag",
-			  "end-of-attributes-tag",
-			  "printer-attributes-tag",
-			  "unsupported-attributes-tag",
-			  "subscription-attributes-tag",
-			  "event-attributes-tag",
-			  "reserved-08",
-			  "reserved-09",
-			  "reserved-0A",
-			  "reserved-0B",
-			  "reserved-0C",
-			  "reserved-0D",
-			  "reserved-0E",
-			  "reserved-0F",
-			  "unsupported",
-			  "default",
-			  "unknown",
-			  "no-value",
-			  "reserved-14",
-			  "not-settable",
-			  "delete-attr",
-			  "admin-define",
-			  "reserved-18",
-			  "reserved-19",
-			  "reserved-1A",
-			  "reserved-1B",
-			  "reserved-1C",
-			  "reserved-1D",
-			  "reserved-1E",
-			  "reserved-1F",
-			  "reserved-20",
-			  "integer",
-			  "boolean",
-			  "enum",
-			  "reserved-24",
-			  "reserved-25",
-			  "reserved-26",
-			  "reserved-27",
-			  "reserved-28",
-			  "reserved-29",
-			  "reserved-2a",
-			  "reserved-2b",
-			  "reserved-2c",
-			  "reserved-2d",
-			  "reserved-2e",
-			  "reserved-2f",
-			  "octetString",
-			  "dateTime",
-			  "resolution",
-			  "rangeOfInteger",
-			  "begCollection",
-			  "textWithLanguage",
-			  "nameWithLanguage",
-			  "endCollection",
-			  "reserved-38",
-			  "reserved-39",
-			  "reserved-3a",
-			  "reserved-3b",
-			  "reserved-3c",
-			  "reserved-3d",
-			  "reserved-3e",
-			  "reserved-3f",
-			  "reserved-40",
-			  "textWithoutLanguage",
-			  "nameWithoutLanguage",
-			  "reserved-43",
-			  "keyword",
-			  "uri",
-			  "uriScheme",
-			  "charset",
-			  "naturalLanguage",
-			  "mimeMediaType",
-			  "memberName"
-			};
+  char			buffer[1024];	/* Value buffer */
 
 
   for (group = IPP_TAG_ZERO, attr = ipp->attrs; attr; attr = attr->next)
@@ -697,91 +629,14 @@ print_attributes(ipp_t *ipp,		/* I - IPP request */
     {
       group = attr->group_tag;
 
-      fprintf(stderr, "DEBUG: %*s%s:\n\n", indent - 4, "", tags[group]);
+      fprintf(stderr, "DEBUG: %*s%s:\n\n", indent - 4, "", ippTagString(group));
     }
 
-    fprintf(stderr, "DEBUG: %*s%s (", indent, "", attr->name);
-    if (attr->num_values > 1)
-      fputs("1setOf ", stderr);
-    fprintf(stderr, "%s):", tags[attr->value_tag]);
+    _ippAttrString(attr, buffer, sizeof(buffer));
 
-    switch (attr->value_tag)
-    {
-      case IPP_TAG_ENUM :
-      case IPP_TAG_INTEGER :
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    fprintf(stderr, " %d", val->integer);
-          fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_BOOLEAN :
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    fprintf(stderr, " %s", val->boolean ? "true" : "false");
-          fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_RANGE :
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    fprintf(stderr, " %d-%d", val->range.lower, val->range.upper);
-	  fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_DATE :
-          {
-	    time_t	vtime;		/* Date/Time value */
-	    struct tm	*vdate;		/* Date info */
-	    char	vstring[256];	/* Formatted time */
-
-	    for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    {
-	      vtime = ippDateToTime(val->date);
-	      vdate = localtime(&vtime);
-	      strftime(vstring, sizeof(vstring), "%c", vdate);
-	      fprintf(stderr, " (%s)", vstring);
-	    }
-          }
-	  fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_RESOLUTION :
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    fprintf(stderr, " %dx%d%s", val->resolution.xres,
-	            val->resolution.yres,
-	            val->resolution.units == IPP_RES_PER_INCH ? "dpi" : "dpc");
-	  fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_STRING :
-      case IPP_TAG_TEXTLANG :
-      case IPP_TAG_NAMELANG :
-      case IPP_TAG_TEXT :
-      case IPP_TAG_NAME :
-      case IPP_TAG_KEYWORD :
-      case IPP_TAG_URI :
-      case IPP_TAG_URISCHEME :
-      case IPP_TAG_CHARSET :
-      case IPP_TAG_LANGUAGE :
-      case IPP_TAG_MIMETYPE :
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	    fprintf(stderr, " \"%s\"", val->string.text);
-	  fputc('\n', stderr);
-          break;
-
-      case IPP_TAG_BEGIN_COLLECTION :
-	  fputc('\n', stderr);
-
-          for (i = 0, val = attr->values; i < attr->num_values; i ++, val ++)
-	  {
-	    if (i)
-	      fputc('\n', stderr);
-	    print_attributes(val->collection, indent + 4);
-	  }
-          break;
-
-      default :
-          fprintf(stderr, "UNKNOWN (%d values)\n", attr->num_values);
-          break;
-    }
+    fprintf(stderr, "DEBUG: %*s%s (%s%s) %s", indent, "", attr->name,
+            attr->num_values > 1 ? "1setOf " : "",
+	    ippTagString(attr->value_tag), buffer);
   }
 }
 
