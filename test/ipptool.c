@@ -3,7 +3,7 @@
  *
  *   ipptool command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1314,7 +1314,37 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      ippAddInteger(request, group, value, attr, atoi(token));
+	      if (!strchr(token, ','))
+		ippAddInteger(request, group, value, attr,
+		              strtol(token, &tokenptr, 0));
+	      else
+	      {
+	        int	values[100],	/* Values */
+			num_values = 1;	/* Number of values */
+
+		values[0] = strtol(token, &tokenptr, 10);
+		while (tokenptr && *tokenptr &&
+		       num_values < (int)(sizeof(values) / sizeof(values[0])))
+		{
+		  if (*tokenptr == ',')
+		    tokenptr ++;
+		  else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
+		    break;
+
+		  values[num_values] = strtol(tokenptr, &tokenptr, 0);
+		  num_values ++;
+		}
+
+		ippAddIntegers(request, group, value, attr, num_values, values);
+	      }
+
+	      if (!tokenptr || *tokenptr)
+	      {
+		print_fatal_error("Bad %s value \"%s\" on line %d.",
+				  ippTagString(value), token, linenum);
+		pass = 0;
+		goto test_exit;
+	      }
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
@@ -1331,8 +1361,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
-	        (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
-	        strcasecmp(ptr, "other")))
+	            (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
+	             strcasecmp(ptr, "other")))
 	        {
 	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
 		                    token, linenum);
