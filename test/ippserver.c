@@ -3,7 +3,7 @@
  *
  *   Sample IPP/2.0 server for CUPS.
  *
- *   Copyright 2010 by Apple Inc.
+ *   Copyright 2010-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -1446,7 +1446,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
 
   /* document-format-default */
   ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE | IPP_TAG_COPY,
-               "document-format-default", NULL, "application/octet-stream");
+               "document-format-default", NULL, defformat);
 
   /* document-format-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
@@ -3952,8 +3952,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
     else
       timeout = -1;
 
-    if (poll(polldata, (int)(sizeof(polldata) / sizeof(polldata[0])),
-             timeout) < 0 && errno != EINTR)
+    if (poll(polldata, num_fds, timeout) < 0 && errno != EINTR)
     {
       perror("poll() failed");
       break;
@@ -4140,14 +4139,12 @@ valid_job_attributes(
                                     "document-format-supported",
 			            IPP_TAG_MIMETYPE)) != NULL)
   {
-    for (i = 0; i < attr->num_values; i ++)
-      if (!strcasecmp(format, attr->values[i].string.text))
+    for (i = 0; i < supported->num_values; i ++)
+      if (!strcasecmp(format, supported->values[i].string.text))
 	break;
 
-    if (i >= attr->num_values)
-    {
+    if (i >= supported->num_values)
       respond_unsupported(client, attr);
-    }
   }
 
  /*

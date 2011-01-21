@@ -2607,7 +2607,8 @@ do_list_printers(http_t *http)		/* I - HTTP connection */
 	      if (isalnum(*ptr & 255) || *ptr == '_' || *ptr == '-' ||
 	          *ptr == '.')
 	        *option_ptr++ = *ptr;
-	      else if ((*ptr == ' ' || *ptr == '/') && option_ptr[-1] != '_')
+	      else if ((*ptr == ' ' || *ptr == '/') && option_ptr > option &&
+	               option_ptr[-1] != '_')
 	        *option_ptr++ = '_';
 	      else if (*ptr == '?' || *ptr == '(')
 	        break;

@@ -5056,16 +5056,20 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
               CGImageDestinationFinalize(destRef);
               CFRelease(destRef);
             }
-
-            CGImageRelease(imageRef);
           }
 
-          CFRelease(sourceRef);
-          CFRelease(icnsFileUrl);
-        }
+          if (imageRef)
+            CGImageRelease(imageRef);
 
-        CFRelease(outUrl);
+          CFRelease(sourceRef);
+        }
       }
+
+      if (outUrl)
+        CFRelease(outUrl);
+
+      if (icnsFileUrl)
+        CFRelease(icnsFileUrl);
     }
 #endif /* HAVE_APPLICATIONSERVICES_H */
 

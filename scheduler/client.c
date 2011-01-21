@@ -3319,13 +3319,13 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   return (1);
 
 #  elif defined(HAVE_CDSASSL)
-  OSStatus	error;			/* Error code */
+  OSStatus	error = 0;		/* Error code */
+  CFArrayRef	peerCerts;		/* Peer certificates */
 
 
   cupsdLogMessage(CUPSD_LOG_DEBUG2, "encrypt_client(con=%p(%d))", con,
                   con->http.fd);
 
-  error                     = 0;
   con->http.tls_credentials = get_cdsa_certificate(con);
 
   if (!con->http.tls_credentials)
@@ -3404,9 +3404,7 @@ encrypt_client(cupsd_client_t *con)	/* I - Client to encrypt */
   cupsdLogMessage(CUPSD_LOG_DEBUG, "Connection from %s now encrypted.",
                   con->http.hostname);
 
-  CFArrayRef		peerCerts;	/* Peer certificates */
-
-  if (!(error = SSLCopyPeerCertificates(con->http.tls, &peerCerts)) && peerCerts)
+  if (!SSLCopyPeerCertificates(con->http.tls, &peerCerts) && peerCerts)
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG, "Received %d peer certificates!",
 		    (int)CFArrayGetCount(peerCerts));
@@ -3468,14 +3466,16 @@ get_cdsa_certificate(
   servername = CFStringCreateWithCString(kCFAllocatorDefault, con->servername,
 					 kCFStringEncodingUTF8);
 
-  if ((policy = SecPolicyCreateSSL(1, servername)) == NULL)
+  policy = SecPolicyCreateSSL(1, servername);
+
+  if (servername)
+    CFRelease(servername);
+
+  if (!policy)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
     goto cleanup;
   }
-
-  if (servername)
-    CFRelease(servername);
 
   if (!(query = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
 					  &kCFTypeDictionaryKeyCallBacks,
@@ -3510,14 +3510,16 @@ get_cdsa_certificate(
   
     CFRelease(policy);
 
-    if ((policy = SecPolicyCreateSSL(1, servername)) == NULL)
+    policy = SecPolicyCreateSSL(1, servername);
+
+    if (servername)
+      CFRelease(servername);
+
+    if (!policy)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR, "Cannot create ssl policy reference");
       goto cleanup;
     }
-
-    if (servername)
-      CFRelease(servername);
 
     CFDictionarySetValue(query, kSecMatchPolicy, policy);
 

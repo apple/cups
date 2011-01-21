@@ -3,7 +3,7 @@
  *
  *   I18N/language support for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -16,6 +16,26 @@
  *
  * Contents:
  *
+ *   _cupsAppleLanguage()   - Get the Apple language identifier associated with
+ *                            a locale ID.
+ *   _cupsEncodingName()    - Return the character encoding name string for the
+ *                            given encoding enumeration.
+ *   cupsLangDefault()      - Return the default language.
+ *   cupsLangEncoding()     - Return the character encoding (us-ascii, etc.) for
+ *                            the given language.
+ *   cupsLangFlush()        - Flush all language data out of the cache.
+ *   cupsLangFree()         - Free language data.
+ *   cupsLangGet()          - Get a language.
+ *   _cupsLangString()      - Get a message string.
+ *   _cupsMessageFree()     - Free a messages array.
+ *   _cupsMessageLoad()     - Load a .po file into a messages array.
+ *   _cupsMessageLookup()   - Lookup a message string.
+ *   appleLangDefault()     - Get the default locale string.
+ *   appleMessageLoad()     - Load a message catalog from a localizable bundle.
+ *   cups_cache_lookup()    - Lookup a language in the cache...
+ *   cups_message_compare() - Compare two messages.
+ *   cups_message_free()    - Free a message.
+ *   cups_unquote()         - Unquote characters in strings...
  */
 
 /*
@@ -1092,6 +1112,9 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
       match->str = strdup(m);
 
     cupsArrayAdd(a, match);
+
+    if (cfm)
+      CFRelease(cfm);
   }
 #endif /* __APPLE__ && CUPS_BUNDLEDIR */
 
@@ -1222,12 +1245,21 @@ appleLangDefault(void)
 
 
 #  ifdef CUPS_BUNDLEDIR
+#    ifndef CF_RETURNS_RETAINED
+#      if __has_feature(attribute_cf_returns_retained)
+#        define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
+#      else
+#        define CF_RETURNS_RETAINED
+#      endif /* __has_feature(attribute_cf_returns_retained) */
+#    endif /* !CF_RETURNED_RETAINED */
+
 /*
  * 'appleMessageLoad()' - Load a message catalog from a localizable bundle.
  */
 
 static cups_array_t *			/* O - Message catalog */
 appleMessageLoad(const char *locale)	/* I - Locale ID */
+CF_RETURNS_RETAINED
 {
   char			filename[1024],	/* Path to cups.strings file */
 			applelang[256];	/* Apple language ID */

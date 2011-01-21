@@ -2550,6 +2550,9 @@ dnssdPackTxtRecord(int  *txt_len,	/* O - TXT record length */
   * Calculate the buffer size
   */
 
+  if (count <= 0)
+    return (NULL);
+
   for (length = i = 0; i < count; i++)
     length += 1 + strlen(keyvalue[i][0]) + 
 	      (keyvalue[i][1] ? 1 + strlen(keyvalue[i][1]) : 0);
