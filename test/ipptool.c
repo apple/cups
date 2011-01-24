@@ -1857,10 +1857,12 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>Operation</key>");
       print_xml_string("string", ippOpString(op));
       puts("<key>RequestAttributes</key>");
+      puts("<array>");
       puts("<dict>");
       for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
 	print_attr(attrptr);
       puts("</dict>");
+      puts("</array>");
     }
     else if (Output == _CUPS_OUTPUT_TEST)
     {
@@ -2129,12 +2131,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>StatusCode</key>");
       print_xml_string("string", ippErrorString(cupsLastError()));
       puts("<key>ResponseAttributes</key>");
+      puts("<array>");
       puts("<dict>");
       for (attrptr = response ? response->attrs : NULL;
 	   attrptr;
 	   attrptr = attrptr->next)
 	print_attr(attrptr);
       puts("</dict>");
+      puts("</array>");
     }
     else if (Output == _CUPS_OUTPUT_TEST)
     {
@@ -3174,7 +3178,8 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
   {
     if (!attr->name)
     {
-      printf("<key>%s</key>\n<true />\n", ippTagString(attr->group_tag));
+      puts("</dict>");
+      puts("<dict>");
       return;
     }
 
@@ -3279,7 +3284,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 	    puts("</string></dict>");
 	  }
 	  else
-	    printf("\"%s\",%s ", attr->values[i].string.text,
+	    printf("\"%s\"(%s) ", attr->values[i].string.text,
 		   attr->values[i].string.charset);
 	break;
 
