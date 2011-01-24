@@ -3510,41 +3510,54 @@ apple_register_profiles(
         * See if this is the default profile...
 	*/
 
-        if (!default_profile_id)
+        if (!default_profile_id && q1_choice && q2_choice && q3_choice)
 	{
-	  if (q2_choice)
-	  {
-	    if (q3_choice)
-	    {
-	      snprintf(selector, sizeof(selector), "%s.%s.%s",
-	               q1_choice, q2_choice, q3_choice);
-              if (!strcmp(selector, attr->spec))
-	        default_profile_id = profile_id;
-            }
+	  snprintf(selector, sizeof(selector), "%s.%s.%s", q1_choice, q2_choice,
+	           q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-            if (!default_profile_id)
-	    {
-	      snprintf(selector, sizeof(selector), "%s.%s.", q1_choice,
-	               q2_choice);
-              if (!strcmp(selector, attr->spec))
-	        default_profile_id = profile_id;
-	    }
-          }
+        if (!default_profile_id && q1_choice && q2_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s.%s.", q1_choice, q2_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-          if (!default_profile_id && q3_choice)
-	  {
-	    snprintf(selector, sizeof(selector), "%s..%s", q1_choice,
-	             q3_choice);
-	    if (!strcmp(selector, attr->spec))
-	      default_profile_id = profile_id;
-	  }
+        if (!default_profile_id && q1_choice && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s..%s", q1_choice, q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-          if (!default_profile_id)
-	  {
-	    snprintf(selector, sizeof(selector), "%s..", q1_choice);
-	    if (!strcmp(selector, attr->spec))
-	      default_profile_id = profile_id;
-	  }
+        if (!default_profile_id && q1_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s..", q1_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q2_choice && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), ".%s.%s", q2_choice, q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q2_choice)
+	{
+	  snprintf(selector, sizeof(selector), ".%s.", q2_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), "..%s", q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
 	}
       }
 
