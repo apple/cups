@@ -7292,7 +7292,8 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con,
+                                 job->username)) != HTTP_OK)
   {
     send_http_error(con, status, NULL);
     return;
