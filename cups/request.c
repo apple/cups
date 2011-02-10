@@ -249,7 +249,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       {
 	if (httpCheck(http))
 	{
-	  if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	  _httpUpdate(http, &status);
+
+	  if (status != HTTP_CONTINUE)
 	    break;
         }
 
@@ -389,9 +391,11 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   DEBUG_printf(("2cupsGetResponse: Update loop, http->status=%d...",
                 http->status));
 
-  status = http->status;
-  while (status == HTTP_CONTINUE)
+  do
+  {
     status = httpUpdate(http);
+  }
+  while (http->state == HTTP_POST_RECV);
 
   DEBUG_printf(("2cupsGetResponse: status=%d", status));
 

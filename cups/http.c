@@ -3081,13 +3081,6 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       http->data_encoding  = HTTP_ENCODE_LENGTH;
       http->data_remaining = 0;
     }
-
-    if (http->state == HTTP_POST_RECV)
-      http->state ++;
-    else if (http->state == HTTP_PUT_RECV)
-      http->state = HTTP_STATUS;
-    else
-      http->state = HTTP_WAITING;
   }
 
   return (bytes);
