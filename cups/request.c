@@ -153,7 +153,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   if (!http)
     if ((http = _cupsConnect()) == NULL)
+    {
+      ippDelete(request);
+
       return (NULL);
+    }
 
  /*
   * See if we have a file to send...
