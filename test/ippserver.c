@@ -3,7 +3,7 @@
  *
  *   Sample IPP/2.0 server for CUPS.
  *
- *   Copyright 2010 by Apple Inc.
+ *   Copyright 2010-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -799,7 +799,7 @@ copy_job_attributes(
     _ipp_job_t    *job,			/* I - Job */
     cups_array_t  *ra)			/* I - requested-attributes */
 {
-  copy_attributes(client->response, job->attrs, ra, 0, IPP_TAG_ZERO);
+  copy_attributes(client->response, job->attrs, ra, IPP_TAG_ZERO, 0);
 
   if (!ra || cupsArrayFind(ra, "job-printer-up-time"))
     ippAddInteger(client->response, IPP_TAG_JOB, IPP_TAG_INTEGER,
@@ -814,46 +814,55 @@ copy_job_attributes(
     switch (job->state)
     {
       case IPP_JOB_PENDING :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-		       "job-state-reasons", NULL, "none");
+	  ippAddString(client->response, IPP_TAG_JOB,
+	               IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+		       NULL, "none");
 	  break;
 
       case IPP_JOB_HELD :
           if (job->fd >= 0)
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "job-state-reasons", NULL, "job-incoming");
+	    ippAddString(client->response, IPP_TAG_JOB,
+	                 IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+			 NULL, "job-incoming");
 	  else if (ippFindAttribute(job->attrs, "job-hold-until", IPP_TAG_ZERO))
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "job-state-reasons", NULL, "job-hold-until-specified");
+	    ippAddString(client->response, IPP_TAG_JOB,
+	                 IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+			 NULL, "job-hold-until-specified");
 	  break;
 
       case IPP_JOB_PROCESSING :
 	  if (job->cancel)
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "job-state-reasons", NULL, "processing-to-stop-point");
+	    ippAddString(client->response, IPP_TAG_JOB,
+	                 IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+			 NULL, "processing-to-stop-point");
 	  else
-	    ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-			 "job-state-reasons", NULL, "job-printing");
+	    ippAddString(client->response, IPP_TAG_JOB,
+	                 IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+			 NULL, "job-printing");
 	  break;
 
       case IPP_JOB_STOPPED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-		       "job-state-reasons", NULL, "job-stopped");
+	  ippAddString(client->response, IPP_TAG_JOB,
+	               IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+		       NULL, "job-stopped");
 	  break;
 
       case IPP_JOB_CANCELED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-		       "job-state-reasons", NULL, "job-canceled-by-user");
+	  ippAddString(client->response, IPP_TAG_JOB,
+	               IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+		       NULL, "job-canceled-by-user");
 	  break;
 
       case IPP_JOB_ABORTED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-		       "job-state-reasons", NULL, "aborted-by-system");
+	  ippAddString(client->response, IPP_TAG_JOB,
+	               IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+		       NULL, "aborted-by-system");
 	  break;
 
       case IPP_JOB_COMPLETED :
-	  ippAddString(client->response, IPP_TAG_JOB, IPP_TAG_KEYWORD,
-		       "job-state-reasons", NULL, "job-completed-successfully");
+	  ippAddString(client->response, IPP_TAG_JOB,
+	               IPP_TAG_KEYWORD | IPP_TAG_COPY, "job-state-reasons",
+		       NULL, "job-completed-successfully");
 	  break;
     }
   }
@@ -992,7 +1001,7 @@ create_job(_ipp_client_t *client)	/* I - Client */
     attr->name = _cupsStrAlloc("job-originating-user-name");
   }
   else
-    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME,
+    attr = ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_NAME | IPP_TAG_COPY,
                         "job-originating-user-name", NULL, "anonymous");
 
   if (attr)
@@ -1189,13 +1198,13 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ipp_value_t		*media_col_value;
 					/* Current media-col-database value */
   int			k_supported;	/* Maximum file size supported */
-#ifdef HAVE_STATFS
-  struct statfs		spoolinfo;	/* FS info for spool directory */
-  double		spoolsize;	/* FS size */
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   struct statvfs	spoolinfo;	/* FS info for spool directory */
   double		spoolsize;	/* FS size */
-#endif /* HAVE_STATFS */
+#elif defined(HAVE_STATFS)
+  struct statfs		spoolinfo;	/* FS info for spool directory */
+  double		spoolsize;	/* FS size */
+#endif /* HAVE_STATVFS */
   static const int	orients[4] =	/* orientation-requested-supported values */
   {
     IPP_PORTRAIT,
@@ -1391,16 +1400,7 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   * or the filesystem is larger than 2TiB, always report INT_MAX.
   */
 
-#ifdef HAVE_STATFS
-  if (statfs(printer->directory, &spoolinfo))
-    k_supported = INT_MAX;
-  else if ((spoolsize = (double)spoolinfo.f_bsize *
-                        spoolinfo.f_blocks / 1024) > INT_MAX)
-    k_supported = INT_MAX;
-  else
-    k_supported = (int)spoolsize;
-
-#elif defined(HAVE_STATVFS)
+#ifdef HAVE_STATVFS
   if (statvfs(printer->directory, &spoolinfo))
     k_supported = INT_MAX;
   else if ((spoolsize = (double)spoolinfo.f_frsize *
@@ -1409,9 +1409,18 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   else
     k_supported = (int)spoolsize;
 
+#elif defined(HAVE_STATFS)
+  if (statfs(printer->directory, &spoolinfo))
+    k_supported = INT_MAX;
+  else if ((spoolsize = (double)spoolinfo.f_bsize *
+                        spoolinfo.f_blocks / 1024) > INT_MAX)
+    k_supported = INT_MAX;
+  else
+    k_supported = (int)spoolsize;
+
 #else
   k_supported = INT_MAX;
-#endif /* HAVE_STATFS */
+#endif /* HAVE_STATVFS */
 
  /*
   * Create the printer attributes.  This list of attributes is sorted to improve
@@ -1445,8 +1454,8 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
   ippAddRange(printer->attrs, IPP_TAG_PRINTER, "copies-supported", 1, 999);
 
   /* document-format-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE | IPP_TAG_COPY,
-               "document-format-default", NULL, "application/octet-stream");
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
+               "document-format-default", NULL, defformat);
 
   /* document-format-supported */
   ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_MIMETYPE,
@@ -1647,11 +1656,11 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                  "orientation-requested-supported", 4, orients);
 
   /* output-bin-default */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "output-bin-default", NULL, "face-down");
 
   /* output-bin-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "output-bin-supported", NULL, "face-down");
 
   /* pages-per-minute */
@@ -1727,15 +1736,15 @@ create_printer(const char *servername,	/* I - Server hostname (NULL for default)
                "sides-default", NULL, "one-sided");
 
   /* sides-supported */
-  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+  ippAddStrings(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "sides-supported", duplex ? 3 : 1, NULL, sides_supported);
 
   /* uri-authentication-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "uri-authentication-supported", NULL, "none");
 
   /* uri-security-supported */
-  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+  ippAddString(printer->attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                "uri-security-supported", NULL, "none");
 
   /* which-jobs-supported */
@@ -2771,8 +2780,9 @@ ipp_get_printer_attributes(
   if (!ra || cupsArrayFind(ra, "printer-state-reasons"))
   {
     if (printer->state_reasons == _IPP_PRINTER_NONE)
-      ippAddString(client->response, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		   "printer-state-reasons", NULL, "none");
+      ippAddString(client->response, IPP_TAG_PRINTER,
+                   IPP_TAG_KEYWORD | IPP_TAG_COPY, "printer-state-reasons",
+		   NULL, "none");
     else
     {
       int			num_reasons = 0;/* Number of reasons */
@@ -2984,6 +2994,7 @@ ipp_print_job(_ipp_client_t *client)	/* I - Client */
   cupsArrayAdd(ra, "job-uri");
 
   copy_job_attributes(client, job, ra);
+  cupsArrayDelete(ra);
 }
 
 
@@ -3222,6 +3233,38 @@ process_http(_ipp_client_t *client)	/* I - Client connection */
   {
     if (!respond_http(client, HTTP_NOT_IMPLEMENTED, NULL, 0))
       return (0);
+  }
+
+ /*
+  * Handle HTTP Expect...
+  */
+
+  if (client->http.expect &&
+      (client->operation == HTTP_POST || client->operation == HTTP_PUT))
+  {
+    if (client->http.expect == HTTP_CONTINUE)
+    {
+     /*
+      * Send 100-continue header...
+      */
+
+      if (!respond_http(client, HTTP_CONTINUE, NULL, 0))
+	return (0);
+    }
+    else
+    {
+     /*
+      * Send 417-expectation-failed header...
+      */
+
+      if (!respond_http(client, HTTP_EXPECTATION_FAILED, NULL, 0))
+	return (0);
+
+      httpPrintf(&(client->http), "Content-Length: 0\r\n");
+      httpPrintf(&(client->http), "\r\n");
+      httpFlushWrite(&(client->http));
+      client->http.data_encoding = HTTP_ENCODE_LENGTH;
+    }
   }
 
  /*
@@ -3888,10 +3931,12 @@ respond_ipp(_ipp_client_t *client,	/* I - Client */
 
   if (!client->response->attrs)
   {
-    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_CHARSET,
-                 "attributes-charset", NULL, "utf-8");
-    ippAddString(client->response, IPP_TAG_OPERATION, IPP_TAG_LANGUAGE,
-                 "attributes-natural-language", NULL, "en-US");
+    ippAddString(client->response, IPP_TAG_OPERATION,
+                 IPP_TAG_CHARSET | IPP_TAG_COPY, "attributes-charset", NULL,
+		 "utf-8");
+    ippAddString(client->response, IPP_TAG_OPERATION,
+                 IPP_TAG_LANGUAGE | IPP_TAG_COPY, "attributes-natural-language",
+		 NULL, "en-us");
   }
 
   if (message)
@@ -3952,8 +3997,7 @@ run_printer(_ipp_printer_t *printer)	/* I - Printer */
     else
       timeout = -1;
 
-    if (poll(polldata, (int)(sizeof(polldata) / sizeof(polldata[0])),
-             timeout) < 0 && errno != EINTR)
+    if (poll(polldata, num_fds, timeout) < 0 && errno != EINTR)
     {
       perror("poll() failed");
       break;
@@ -4063,7 +4107,7 @@ valid_job_attributes(
 		ippTagString(attr->value_tag)); \
     valid = 0; \
   } \
-  copy_attribute(client->response, attr, 0, IPP_TAG_UNSUPPORTED_GROUP)
+  copy_attribute(client->response, attr, IPP_TAG_UNSUPPORTED_GROUP, 0)
 
   if ((attr = ippFindAttribute(client->request, "compression",
                                IPP_TAG_ZERO)) != NULL)
@@ -4094,7 +4138,13 @@ valid_job_attributes(
       respond_unsupported(client, attr);
     }
     else
+    {
       format = attr->values[0].string.text;
+
+      fprintf(stderr, "%s %s document-format=\"%s\"\n",
+	      client->http.hostname,
+	      ippOpString(client->request->request.op.operation_id), format);
+    }
   }
   else
     format = "application/octet-stream";
@@ -4140,14 +4190,12 @@ valid_job_attributes(
                                     "document-format-supported",
 			            IPP_TAG_MIMETYPE)) != NULL)
   {
-    for (i = 0; i < attr->num_values; i ++)
-      if (!strcasecmp(format, attr->values[i].string.text))
+    for (i = 0; i < supported->num_values; i ++)
+      if (!strcasecmp(format, supported->values[i].string.text))
 	break;
 
-    if (i >= attr->num_values)
-    {
+    if (i >= supported->num_values)
       respond_unsupported(client, attr);
-    }
   }
 
  /*

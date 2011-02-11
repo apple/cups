@@ -142,6 +142,15 @@ ippserver:	ippserver.o ../cups/$(LIBCUPSSTATIC)
 
 
 #
+# ippserver-shared
+#
+
+ippserver-shared:	ippserver.o ../cups/$(LIBCUPS)
+	echo Linking $@...
+	$(CC) $(LDFLAGS) -o $@ ippserver.o $(LIBS)
+
+
+#
 # ipptool
 #
 

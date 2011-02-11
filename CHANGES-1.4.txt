@@ -9,6 +9,13 @@ CHANGES IN CUPS V1.4.7
 	  STR #3755, STR #3769)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- The scheduler did not always register the correct default ICC profile
+	  on Mac OS X.
+	- The scheduler did not use the job owner when authorizing access for
+	  the CUPS-Get-Document operation, preventing non-admins from accessing
+	  their own jobs.
+	- CUPS did not work with some printers that incorrectly implemented the
+	  HTTP/1.1 standard (STR #3778, STR #3791)
 	- The scheduler did not retry fax jobs properly.
 	- The scheduler now recognizes an empty cupsCommands PPD keyword as
 	  meaning that CUPS commands are not supported for a printer (STR #3773)

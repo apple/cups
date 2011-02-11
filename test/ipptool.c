@@ -3,7 +3,7 @@
  *
  *   ipptool command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -175,7 +175,7 @@ static char	*get_token(FILE *fp, char *buf, int buflen,
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
 static const char *password_cb(const char *prompt);
-static void	print_attr(ipp_attribute_t *attr);
+static void	print_attr(ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
 		          char **displayed, size_t *widths);
@@ -1314,7 +1314,37 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	  case IPP_TAG_INTEGER :
 	  case IPP_TAG_ENUM :
-	      ippAddInteger(request, group, value, attr, atoi(token));
+	      if (!strchr(token, ','))
+		ippAddInteger(request, group, value, attr,
+		              strtol(token, &tokenptr, 0));
+	      else
+	      {
+	        int	values[100],	/* Values */
+			num_values = 1;	/* Number of values */
+
+		values[0] = strtol(token, &tokenptr, 10);
+		while (tokenptr && *tokenptr &&
+		       num_values < (int)(sizeof(values) / sizeof(values[0])))
+		{
+		  if (*tokenptr == ',')
+		    tokenptr ++;
+		  else if (!isdigit(*tokenptr & 255) && *tokenptr != '-')
+		    break;
+
+		  values[num_values] = strtol(tokenptr, &tokenptr, 0);
+		  num_values ++;
+		}
+
+		ippAddIntegers(request, group, value, attr, num_values, values);
+	      }
+
+	      if (!tokenptr || *tokenptr)
+	      {
+		print_fatal_error("Bad %s value \"%s\" on line %d.",
+				  ippTagString(value), token, linenum);
+		pass = 0;
+		goto test_exit;
+	      }
 	      break;
 
 	  case IPP_TAG_RESOLUTION :
@@ -1331,8 +1361,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	        }
 
 	        if (ptr <= token || xres <= 0 || yres <= 0 || !ptr ||
-	        (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
-	        strcasecmp(ptr, "other")))
+	            (strcasecmp(ptr, "dpi") && strcasecmp(ptr, "dpc") &&
+	             strcasecmp(ptr, "other")))
 	        {
 	          print_fatal_error("Bad resolution value \"%s\" on line %d.",
 		                    token, linenum);
@@ -1827,10 +1857,14 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>Operation</key>");
       print_xml_string("string", ippOpString(op));
       puts("<key>RequestAttributes</key>");
+      puts("<array>");
       puts("<dict>");
-      for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
-	print_attr(attrptr);
+      for (attrptr = request->attrs, group = attrptr->group_tag;
+           attrptr;
+	   attrptr = attrptr->next)
+	print_attr(attrptr, &group);
       puts("</dict>");
+      puts("</array>");
     }
     else if (Output == _CUPS_OUTPUT_TEST)
     {
@@ -1839,7 +1873,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         printf("    %s:\n", ippOpString(op));
 
         for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
-          print_attr(attrptr);
+          print_attr(attrptr, NULL);
       }
 
       printf("    %-69.69s [", name);
@@ -2099,12 +2133,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>StatusCode</key>");
       print_xml_string("string", ippErrorString(cupsLastError()));
       puts("<key>ResponseAttributes</key>");
+      puts("<array>");
       puts("<dict>");
-      for (attrptr = response ? response->attrs : NULL;
+      for (attrptr = response ? response->attrs : NULL,
+               group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	   attrptr;
 	   attrptr = attrptr->next)
-	print_attr(attrptr);
+	print_attr(attrptr, &group);
       puts("</dict>");
+      puts("</array>");
     }
     else if (Output == _CUPS_OUTPUT_TEST)
     {
@@ -2121,7 +2158,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	     attrptr != NULL;
 	     attrptr = attrptr->next)
 	{
-	  print_attr(attrptr);
+	  print_attr(attrptr, NULL);
 	}
       }
     }
@@ -2187,7 +2224,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    {
 	      if (!strcmp(displayed[i], attrptr->name))
 	      {
-		print_attr(attrptr);
+		print_attr(attrptr, NULL);
 		break;
 	      }
 	    }
@@ -2342,9 +2379,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (i == num_statuses && num_statuses > 0)
 	{
-	  print_test_error("Bad status-code (%s)",
-	                   ippErrorString(cupsLastError()));
-	  print_test_error("status-message=\"%s\"", cupsLastErrorString());
+	  for (i = 0; i < num_statuses; i ++)
+	  {
+	    if (statuses[i].if_defined &&
+		!get_variable(vars, statuses[i].if_defined))
+	      continue;
+
+	    if (statuses[i].if_not_defined &&
+		get_variable(vars, statuses[i].if_not_defined))
+	      continue;
+
+	    print_test_error("EXPECTED: STATUS %s (got %s)",
+			     ippErrorString(statuses[i].status),
+			     ippErrorString(cupsLastError()));
+	  }
+
+	  if ((attrptr = ippFindAttribute(response, "status-message",
+					  IPP_TAG_TEXT)) != NULL)
+	    print_test_error("status-message=\"%s\"",
+	                     attrptr->values[0].string.text);
         }
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
@@ -3134,7 +3187,8 @@ password_cb(const char *prompt)		/* I - Prompt (unused) */
  */
 
 static void
-print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
+print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
+           ipp_tag_t       *group)	/* IO - Current group */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*colattr;	/* Collection attribute */
@@ -3142,11 +3196,17 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
   if (Output == _CUPS_OUTPUT_PLIST)
   {
-    if (!attr->name)
+    if (!attr->name || (group && *group != attr->group_tag))
     {
-      printf("<key>%s</key>\n<true />\n", ippTagString(attr->group_tag));
-      return;
+      puts("</dict>");
+      puts("<dict>");
+
+      if (group)
+        *group = attr->group_tag;
     }
+
+    if (!attr->name)
+      return;
 
     print_xml_string("key", attr->name);
     if (attr->num_values > 1)
@@ -3249,7 +3309,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 	    puts("</string></dict>");
 	  }
 	  else
-	    printf("\"%s\",%s ", attr->values[i].string.text,
+	    printf("\"%s\"(%s) ", attr->values[i].string.text,
 		   attr->values[i].string.charset);
 	break;
 
@@ -3262,7 +3322,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 	    for (colattr = attr->values[i].collection->attrs;
 	         colattr;
 		 colattr = colattr->next)
-	      print_attr(colattr);
+	      print_attr(colattr, NULL);
 	    puts("</dict>");
 	  }
 	  else

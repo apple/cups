@@ -1,8 +1,12 @@
-CHANGES.txt - 2011-01-10
+CHANGES.txt - 2011-01-21
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- The scheduler now provides default values for the pages-per-minute and
+	  pages-per-minute-color attributes for PPD files that lack a
+	  Throughput keyword.
+	- Email notifications did not work on Mac OS X.
 	- The cupstestppd program now shows an error for files missing a
 	  CloseGroup keyword (STR #3668)
 	- Name resolution errors no longer cause queues to stop (STR #3719,

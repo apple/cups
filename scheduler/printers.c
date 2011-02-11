@@ -4120,6 +4120,18 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		      "pages-per-minute-color", ppd->throughput);
     }
+    else
+    {
+     /*
+      * When there is no speed information, just say "1 page per minute".
+      */
+
+      ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+		    "pages-per-minute", 1);
+      if (ppd->color_device)
+	ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
+		      "pages-per-minute-color", 1);
+    }
 
     num_qualities = 0;
 
@@ -5044,16 +5056,20 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
               CGImageDestinationFinalize(destRef);
               CFRelease(destRef);
             }
-
-            CGImageRelease(imageRef);
           }
 
-          CFRelease(sourceRef);
-          CFRelease(icnsFileUrl);
-        }
+          if (imageRef)
+            CGImageRelease(imageRef);
 
-        CFRelease(outUrl);
+          CFRelease(sourceRef);
+        }
       }
+
+      if (outUrl)
+        CFRelease(outUrl);
+
+      if (icnsFileUrl)
+        CFRelease(icnsFileUrl);
     }
 #endif /* HAVE_APPLICATIONSERVICES_H */
 

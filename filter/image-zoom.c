@@ -1,9 +1,9 @@
 /*
  * "$Id: image-zoom.c 6649 2007-07-11 21:46:42Z mike $"
  *
- *   cupsImage zoom routines for the Common UNIX Printing System (CUPS).
+ *   cupsImage zoom routines for CUPS.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -136,7 +136,7 @@ _cupsImageZoomNew(
     z->ystep   = z->height / z->ysize;
     z->yincr   = 1;
     z->instep  = z->xstep * z->depth;
-    z->inincr  = z->xincr * z->depth;
+    z->inincr  = /* z->xincr * */ z->depth; /* z->xincr is always 1 */
 
     if (z->width < img->ysize)
       z->xmax = z->width;
@@ -163,7 +163,7 @@ _cupsImageZoomNew(
     z->ystep   = z->height / z->ysize;
     z->yincr   = 1;
     z->instep  = z->xstep * z->depth;
-    z->inincr  = z->xincr * z->depth;
+    z->inincr  = /* z->xincr * */ z->depth; /* z->xincr is always 1 */
 
     if (z->width < img->xsize)
       z->xmax = z->width;

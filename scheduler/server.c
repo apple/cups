@@ -131,7 +131,7 @@ cupsdStopServer(void)
   * Send one last notification as the server shuts down.
   */
 
-  cupsdLogMessage(CUPSD_LOG_DEBUG,
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
                   "notify_post(\"com.apple.printerListChange\") last");
   notify_post("com.apple.printerListChange");
 #endif /* HAVE_NOTIFY_POST */

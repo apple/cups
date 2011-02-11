@@ -83,6 +83,8 @@
  *   _httpSetTimeout()         - Set read/write timeouts and an optional
  *                               callback.
  *   httpTrace()               - Send an TRACE request to the server.
+ *   _httpUpdate()             - Update the current HTTP status for incoming
+ *                               data.
  *   httpUpdate()              - Update the current HTTP state for incoming
  *                               data.
  *   _httpWait()               - Wait for data available on a connection (no
@@ -2582,17 +2584,171 @@ httpTrace(http_t     *http,		/* I - Connection to server */
 
 
 /*
+ * '_httpUpdate()' - Update the current HTTP status for incoming data.
+ *
+ * Note: Unlike httpUpdate(), this function does not flush pending write data
+ * and only retrieves a single status line from the HTTP connection.
+ */
+
+int					/* O - 1 to continue, 0 to stop */
+_httpUpdate(http_t        *http,	/* I - Connection to server */
+            http_status_t *status)	/* O - Current HTTP status */
+{
+  char		line[32768],		/* Line from connection... */
+		*value;			/* Pointer to value on line */
+  http_field_t	field;			/* Field index */
+  int		major, minor;		/* HTTP version numbers */
+
+
+  DEBUG_printf(("_httpUpdate(http=%p, status=%p), state=%s", http, status,
+                http_states[http->state]));
+
+ /*
+  * Grab a single line from the connection...
+  */
+
+  if (!httpGets(line, sizeof(line), http))
+  {
+    *status = HTTP_ERROR;
+    return (0);
+  }
+
+  DEBUG_printf(("2_httpUpdate: Got \"%s\"", line));
+
+  if (line[0] == '\0')
+  {
+   /*
+    * Blank line means the start of the data section (if any).  Return
+    * the result code, too...
+    *
+    * If we get status 100 (HTTP_CONTINUE), then we *don't* change states.
+    * Instead, we just return HTTP_CONTINUE to the caller and keep on
+    * tryin'...
+    */
+
+    if (http->status == HTTP_CONTINUE)
+    {
+      *status = http->status;
+      return (0);
+    }
+
+    if (http->status < HTTP_BAD_REQUEST)
+      http->digest_tries = 0;
+
+#ifdef HAVE_SSL
+    if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
+    {
+      if (http_setup_ssl(http) != 0)
+      {
+#  ifdef WIN32
+	closesocket(http->fd);
+#  else
+	close(http->fd);
+#  endif /* WIN32 */
+
+	*status = http->status = HTTP_ERROR;
+	return (0);
+      }
+
+      *status = HTTP_CONTINUE;
+      return (0);
+    }
+#endif /* HAVE_SSL */
+
+    httpGetLength2(http);
+
+    switch (http->state)
+    {
+      case HTTP_GET :
+      case HTTP_POST :
+      case HTTP_POST_RECV :
+      case HTTP_PUT :
+	  http->state ++;
+      case HTTP_POST_SEND :
+      case HTTP_HEAD :
+	  break;
+
+      default :
+	  http->state = HTTP_WAITING;
+	  break;
+    }
+
+    *status = http->status;
+    return (0);
+  }
+  else if (!strncmp(line, "HTTP/", 5))
+  {
+   /*
+    * Got the beginning of a response...
+    */
+
+    int	intstatus;			/* Status value as an integer */
+
+    if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &intstatus) != 3)
+    {
+      *status = http->status = HTTP_ERROR;
+      return (0);
+    }
+
+    http->version = (http_version_t)(major * 100 + minor);
+    *status       = http->status = (http_status_t)intstatus;
+  }
+  else if ((value = strchr(line, ':')) != NULL)
+  {
+   /*
+    * Got a value...
+    */
+
+    *value++ = '\0';
+    while (_cups_isspace(*value))
+      value ++;
+
+   /*
+    * Be tolerants of servers that send unknown attribute fields...
+    */
+
+    if (!strcasecmp(line, "expect"))
+    {
+     /*
+      * "Expect: 100-continue" or similar...
+      */
+
+      http->expect = (http_status_t)atoi(value);
+    }
+    else if (!strcasecmp(line, "cookie"))
+    {
+     /*
+      * "Cookie: name=value[; name=value ...]" - replaces previous cookies...
+      */
+
+      httpSetCookie(http, value);
+    }
+    else if ((field = http_field(line)) != HTTP_FIELD_UNKNOWN)
+      httpSetField(http, field, value);
+#ifdef DEBUG
+    else
+      DEBUG_printf(("1_httpUpdate: unknown field %s seen!", line));
+#endif /* DEBUG */
+  }
+  else
+  {
+    DEBUG_printf(("1_httpUpdate: Bad response line \"%s\"!", line));
+    *status = http->status = HTTP_ERROR;
+    return (0);
+  }
+
+  return (1);
+}
+
+
+/*
  * 'httpUpdate()' - Update the current HTTP state for incoming data.
  */
 
 http_status_t				/* O - HTTP status */
 httpUpdate(http_t *http)		/* I - Connection to server */
 {
-  char		line[32768],		/* Line from connection... */
-		*value;			/* Pointer to value on line */
-  http_field_t	field;			/* Field index */
-  int		major, minor,		/* HTTP version numbers */
-		status;			/* Request status */
+  http_status_t	status;			/* Request status */
 
 
   DEBUG_printf(("httpUpdate(http=%p), state=%s", http,
@@ -2621,122 +2777,7 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   * Grab all of the lines we can from the connection...
   */
 
-  while (httpGets(line, sizeof(line), http) != NULL)
-  {
-    DEBUG_printf(("2httpUpdate: Got \"%s\"", line));
-
-    if (line[0] == '\0')
-    {
-     /*
-      * Blank line means the start of the data section (if any).  Return
-      * the result code, too...
-      *
-      * If we get status 100 (HTTP_CONTINUE), then we *don't* change states.
-      * Instead, we just return HTTP_CONTINUE to the caller and keep on
-      * tryin'...
-      */
-
-      if (http->status == HTTP_CONTINUE)
-        return (http->status);
-
-      if (http->status < HTTP_BAD_REQUEST)
-        http->digest_tries = 0;
-
-#ifdef HAVE_SSL
-      if (http->status == HTTP_SWITCHING_PROTOCOLS && !http->tls)
-      {
-	if (http_setup_ssl(http) != 0)
-	{
-#  ifdef WIN32
-	  closesocket(http->fd);
-#  else
-	  close(http->fd);
-#  endif /* WIN32 */
-
-	  return (HTTP_ERROR);
-	}
-
-        return (HTTP_CONTINUE);
-      }
-#endif /* HAVE_SSL */
-
-      httpGetLength2(http);
-
-      switch (http->state)
-      {
-        case HTTP_GET :
-	case HTTP_POST :
-	case HTTP_POST_RECV :
-	case HTTP_PUT :
-	    http->state ++;
-	case HTTP_POST_SEND :
-	case HTTP_HEAD :
-	    break;
-
-	default :
-	    http->state = HTTP_WAITING;
-	    break;
-      }
-
-      return (http->status);
-    }
-    else if (!strncmp(line, "HTTP/", 5))
-    {
-     /*
-      * Got the beginning of a response...
-      */
-
-      if (sscanf(line, "HTTP/%d.%d%d", &major, &minor, &status) != 3)
-        return (HTTP_ERROR);
-
-      http->version = (http_version_t)(major * 100 + minor);
-      http->status  = (http_status_t)status;
-    }
-    else if ((value = strchr(line, ':')) != NULL)
-    {
-     /*
-      * Got a value...
-      */
-
-      *value++ = '\0';
-      while (_cups_isspace(*value))
-        value ++;
-
-     /*
-      * Be tolerants of servers that send unknown attribute fields...
-      */
-
-      if (!strcasecmp(line, "expect"))
-      {
-       /*
-        * "Expect: 100-continue" or similar...
-	*/
-
-        http->expect = (http_status_t)atoi(value);
-      }
-      else if (!strcasecmp(line, "cookie"))
-      {
-       /*
-        * "Cookie: name=value[; name=value ...]" - replaces previous cookies...
-	*/
-
-        httpSetCookie(http, value);
-      }
-      else if ((field = http_field(line)) == HTTP_FIELD_UNKNOWN)
-      {
-        DEBUG_printf(("1httpUpdate: unknown field %s seen!", line));
-        continue;
-      }
-      else
-        httpSetField(http, field, value);
-    }
-    else
-    {
-      DEBUG_printf(("1httpUpdate: Bad response line \"%s\"!", line));
-      http->status = HTTP_ERROR;
-      return (HTTP_ERROR);
-    }
-  }
+  while (_httpUpdate(http, &status));
 
  /*
   * See if there was an error...
@@ -2757,10 +2798,10 @@ httpUpdate(http_t *http)		/* I - Connection to server */
   }
 
  /*
-  * If we haven't already returned, then there is nothing new...
+  * Return the current status...
   */
 
-  return (HTTP_CONTINUE);
+  return (status);
 }
 
 
@@ -3040,13 +3081,6 @@ httpWrite2(http_t     *http,		/* I - Connection to server */
       http->data_encoding  = HTTP_ENCODE_LENGTH;
       http->data_remaining = 0;
     }
-
-    if (http->state == HTTP_POST_RECV)
-      http->state ++;
-    else if (http->state == HTTP_PUT_RECV)
-      http->state = HTTP_STATUS;
-    else
-      http->state = HTTP_WAITING;
   }
 
   return (bytes);

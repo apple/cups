@@ -3,7 +3,7 @@
  *
  *   IPP utilities for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -153,7 +153,11 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
   if (!http)
     if ((http = _cupsConnect()) == NULL)
+    {
+      ippDelete(request);
+
       return (NULL);
+    }
 
  /*
   * See if we have a file to send...
@@ -245,7 +249,9 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       {
 	if (httpCheck(http))
 	{
-	  if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+	  _httpUpdate(http, &status);
+
+	  if (status >= HTTP_MULTIPLE_CHOICES)
 	    break;
         }
 
@@ -385,9 +391,11 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
   DEBUG_printf(("2cupsGetResponse: Update loop, http->status=%d...",
                 http->status));
 
-  status = http->status;
-  while (status == HTTP_CONTINUE)
+  do
+  {
     status = httpUpdate(http);
+  }
+  while (http->state == HTTP_POST_RECV);
 
   DEBUG_printf(("2cupsGetResponse: status=%d", status));
 
@@ -692,7 +700,8 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       {
         got_status = 1;
 
-	if ((status = httpUpdate(http)) != HTTP_CONTINUE)
+        _httpUpdate(http, &status);
+	if (status >= HTTP_MULTIPLE_CHOICES)
 	  break;
       }
 
@@ -700,15 +709,18 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Wait up to 1 second to get the 100-continue response as needed...
     */
 
-    if (!got_status && expect == HTTP_CONTINUE)
+    if (!got_status)
     {
-      DEBUG_puts("2cupsSendRequest: Waiting for 100-continue...");
+      if (expect == HTTP_CONTINUE)
+      {
+	DEBUG_puts("2cupsSendRequest: Waiting for 100-continue...");
 
-      if (httpWait(http, 1000))
-        status = httpUpdate(http);
+	if (httpWait(http, 1000))
+	  _httpUpdate(http, &status);
+      }
+      else if (httpCheck(http))
+	_httpUpdate(http, &status);
     }
-    else if (httpCheck(http))
-      status = httpUpdate(http);
 
     DEBUG_printf(("2cupsSendRequest: status=%d", status));
 
@@ -716,7 +728,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     * Process the current HTTP status...
     */
 
-    if (status >= HTTP_BAD_REQUEST)
+    if (status >= HTTP_MULTIPLE_CHOICES)
       httpFlush(http);
 
     switch (status)
@@ -848,9 +860,10 @@ cupsWriteRequestData(
 
     if (_httpWait(http, 0, 1))
     {
-      http_status_t	status;		/* Status from httpUpdate */
+      http_status_t	status;		/* Status from _httpUpdate */
 
-      if ((status = httpUpdate(http)) >= HTTP_BAD_REQUEST)
+      _httpUpdate(http, &status);
+      if (status >= HTTP_MULTIPLE_CHOICES)
       {
         _cupsSetHTTPError(status);
         httpFlush(http);

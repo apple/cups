@@ -2122,7 +2122,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
     }
 
     *valptr++ = '\n';
-    *valptr++ = '\0';
+    *valptr   = '\0';
 
     fputs(value, stderr);
   }
@@ -2158,7 +2158,7 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   if (value[0])
   {
     *valptr++ = '\n';
-    *valptr++ = '\0';
+    *valptr   = '\0';
     fputs(value, stderr);
   }
 

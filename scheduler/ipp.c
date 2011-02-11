@@ -3258,7 +3258,7 @@ apple_register_profiles(
   ppd_option_t		*cm_option;	/* Color model option */
   ppd_choice_t		*cm_choice;	/* Color model choice */
   int			num_profiles;	/* Number of profiles */
-  CMError		error = 0;	/* Last error */
+  OSStatus		error = 0;	/* Last error */
   unsigned		device_id,	/* Printer device ID */
 			profile_id,	/* Profile ID */
 			default_profile_id = 0;
@@ -3510,41 +3510,54 @@ apple_register_profiles(
         * See if this is the default profile...
 	*/
 
-        if (!default_profile_id)
+        if (!default_profile_id && q1_choice && q2_choice && q3_choice)
 	{
-	  if (q2_choice)
-	  {
-	    if (q3_choice)
-	    {
-	      snprintf(selector, sizeof(selector), "%s.%s.%s",
-	               q1_choice, q2_choice, q3_choice);
-              if (!strcmp(selector, attr->spec))
-	        default_profile_id = profile_id;
-            }
+	  snprintf(selector, sizeof(selector), "%s.%s.%s", q1_choice, q2_choice,
+	           q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-            if (!default_profile_id)
-	    {
-	      snprintf(selector, sizeof(selector), "%s.%s.", q1_choice,
-	               q2_choice);
-              if (!strcmp(selector, attr->spec))
-	        default_profile_id = profile_id;
-	    }
-          }
+        if (!default_profile_id && q1_choice && q2_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s.%s.", q1_choice, q2_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-          if (!default_profile_id && q3_choice)
-	  {
-	    snprintf(selector, sizeof(selector), "%s..%s", q1_choice,
-	             q3_choice);
-	    if (!strcmp(selector, attr->spec))
-	      default_profile_id = profile_id;
-	  }
+        if (!default_profile_id && q1_choice && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s..%s", q1_choice, q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
 
-          if (!default_profile_id)
-	  {
-	    snprintf(selector, sizeof(selector), "%s..", q1_choice);
-	    if (!strcmp(selector, attr->spec))
-	      default_profile_id = profile_id;
-	  }
+        if (!default_profile_id && q1_choice)
+	{
+	  snprintf(selector, sizeof(selector), "%s..", q1_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q2_choice && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), ".%s.%s", q2_choice, q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q2_choice)
+	{
+	  snprintf(selector, sizeof(selector), ".%s.", q2_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
+	}
+
+        if (!default_profile_id && q3_choice)
+	{
+	  snprintf(selector, sizeof(selector), "..%s", q3_choice);
+	  if (!strcmp(selector, attr->spec))
+	    default_profile_id = profile_id;
 	}
       }
 
@@ -7292,7 +7305,8 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
   * Check policy...
   */
 
-  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con, NULL)) != HTTP_OK)
+  if ((status = cupsdCheckPolicy(DefaultPolicyPtr, con,
+                                 job->username)) != HTTP_OK)
   {
     send_http_error(con, status, NULL);
     return;

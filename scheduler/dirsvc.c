@@ -3,7 +3,7 @@
  *
  *   Directory services routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2550,6 +2550,9 @@ dnssdPackTxtRecord(int  *txt_len,	/* O - TXT record length */
   * Calculate the buffer size
   */
 
+  if (count <= 0)
+    return (NULL);
+
   for (length = i = 0; i < count; i++)
     length += 1 + strlen(keyvalue[i][0]) + 
 	      (keyvalue[i][1] ? 1 + strlen(keyvalue[i][1]) : 0);
@@ -3018,7 +3021,7 @@ get_auth_info_required(
     return (buffer);
   }
 
-  return (NULL);
+  return ("none");
 }
 
 
