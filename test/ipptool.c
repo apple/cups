@@ -2376,9 +2376,25 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 
 	if (i == num_statuses && num_statuses > 0)
 	{
-	  print_test_error("Bad status-code (%s)",
-	                   ippErrorString(cupsLastError()));
-	  print_test_error("status-message=\"%s\"", cupsLastErrorString());
+	  for (i = 0; i < num_statuses; i ++)
+	  {
+	    if (statuses[i].if_defined &&
+		!get_variable(vars, statuses[i].if_defined))
+	      continue;
+
+	    if (statuses[i].if_not_defined &&
+		get_variable(vars, statuses[i].if_not_defined))
+	      continue;
+
+	    print_test_error("EXPECTED: STATUS %s (got %s)",
+			     ippErrorString(statuses[i].status),
+			     ippErrorString(cupsLastError()));
+	  }
+
+	  if ((attrptr = ippFindAttribute(response, "status-message",
+					  IPP_TAG_TEXT)) != NULL)
+	    print_test_error("status-message=\"%s\"",
+	                     attrptr->values[0].string.text);
         }
 
 	for (i = num_expects, expect = expects; i > 0; i --, expect ++)
