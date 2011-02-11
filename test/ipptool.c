@@ -175,7 +175,7 @@ static char	*get_token(FILE *fp, char *buf, int buflen,
 static char	*get_variable(_cups_vars_t *vars, const char *name);
 static char	*iso_date(ipp_uchar_t *date);
 static const char *password_cb(const char *prompt);
-static void	print_attr(ipp_attribute_t *attr);
+static void	print_attr(ipp_attribute_t *attr, ipp_tag_t *group);
 static void	print_col(ipp_t *col);
 static void	print_csv(ipp_attribute_t *attr, int num_displayed,
 		          char **displayed, size_t *widths);
@@ -1859,8 +1859,10 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>RequestAttributes</key>");
       puts("<array>");
       puts("<dict>");
-      for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
-	print_attr(attrptr);
+      for (attrptr = request->attrs, group = attrptr->group_tag;
+           attrptr;
+	   attrptr = attrptr->next)
+	print_attr(attrptr, &group);
       puts("</dict>");
       puts("</array>");
     }
@@ -1871,7 +1873,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
         printf("    %s:\n", ippOpString(op));
 
         for (attrptr = request->attrs; attrptr; attrptr = attrptr->next)
-          print_attr(attrptr);
+          print_attr(attrptr, NULL);
       }
 
       printf("    %-69.69s [", name);
@@ -2133,10 +2135,11 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       puts("<key>ResponseAttributes</key>");
       puts("<array>");
       puts("<dict>");
-      for (attrptr = response ? response->attrs : NULL;
+      for (attrptr = response ? response->attrs : NULL,
+               group = attrptr ? attrptr->group_tag : IPP_TAG_ZERO;
 	   attrptr;
 	   attrptr = attrptr->next)
-	print_attr(attrptr);
+	print_attr(attrptr, &group);
       puts("</dict>");
       puts("</array>");
     }
@@ -2155,7 +2158,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	     attrptr != NULL;
 	     attrptr = attrptr->next)
 	{
-	  print_attr(attrptr);
+	  print_attr(attrptr, NULL);
 	}
       }
     }
@@ -2221,7 +2224,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	    {
 	      if (!strcmp(displayed[i], attrptr->name))
 	      {
-		print_attr(attrptr);
+		print_attr(attrptr, NULL);
 		break;
 	      }
 	    }
@@ -3184,7 +3187,8 @@ password_cb(const char *prompt)		/* I - Prompt (unused) */
  */
 
 static void
-print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
+print_attr(ipp_attribute_t *attr,	/* I  - Attribute to print */
+           ipp_tag_t       *group)	/* IO - Current group */
 {
   int			i;		/* Looping var */
   ipp_attribute_t	*colattr;	/* Collection attribute */
@@ -3192,12 +3196,17 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 
   if (Output == _CUPS_OUTPUT_PLIST)
   {
-    if (!attr->name)
+    if (!attr->name || (group && *group != attr->group_tag))
     {
       puts("</dict>");
       puts("<dict>");
-      return;
+
+      if (group)
+        *group = attr->group_tag;
     }
+
+    if (!attr->name)
+      return;
 
     print_xml_string("key", attr->name);
     if (attr->num_values > 1)
@@ -3313,7 +3322,7 @@ print_attr(ipp_attribute_t *attr)	/* I - Attribute to print */
 	    for (colattr = attr->values[i].collection->attrs;
 	         colattr;
 		 colattr = colattr->next)
-	      print_attr(colattr);
+	      print_attr(colattr, NULL);
 	    puts("</dict>");
 	  }
 	  else
