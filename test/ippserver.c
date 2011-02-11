@@ -4107,7 +4107,7 @@ valid_job_attributes(
 		ippTagString(attr->value_tag)); \
     valid = 0; \
   } \
-  copy_attribute(client->response, attr, 0, IPP_TAG_UNSUPPORTED_GROUP)
+  copy_attribute(client->response, attr, IPP_TAG_UNSUPPORTED_GROUP, 0)
 
   if ((attr = ippFindAttribute(client->request, "compression",
                                IPP_TAG_ZERO)) != NULL)
@@ -4138,7 +4138,13 @@ valid_job_attributes(
       respond_unsupported(client, attr);
     }
     else
+    {
       format = attr->values[0].string.text;
+
+      fprintf(stderr, "%s %s document-format=\"%s\"\n",
+	      client->http.hostname,
+	      ippOpString(client->request->request.op.operation_id), format);
+    }
   }
   else
     format = "application/octet-stream";
