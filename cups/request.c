@@ -251,7 +251,7 @@ cupsDoIORequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 	{
 	  _httpUpdate(http, &status);
 
-	  if (status != HTTP_CONTINUE)
+	  if (status >= HTTP_MULTIPLE_CHOICES)
 	    break;
         }
 
