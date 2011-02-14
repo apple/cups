@@ -1979,7 +1979,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
   else if ((attr = ippFindAttribute(job->attrs, "job-sheets",
                                     IPP_TAG_ZERO)) != NULL)
-    job->sheets = attr;
+    job->job_sheets = attr;
 
  /*
   * Fill in the response info...

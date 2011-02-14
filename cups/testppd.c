@@ -826,10 +826,23 @@ main(int  argc,				/* I - Number of command-line arguments */
 
     if (!strncmp(argv[1], "-d", 2))
     {
-      filename = cupsGetPPD(argv[1] + 2);
+      const char *printer;		/* Printer name */
+
+      if (argv[1][2])
+	printer = argv[1] + 2;
+      else if (argv[2])
+	printer = argv[2];
+      else
+      {
+        puts("Usage: ./testppd -d printer");
+	return (1);
+      }
+
+      filename = cupsGetPPD(printer);
+
       if (!filename)
       {
-        printf("%s: %s\n", argv[1], cupsLastErrorString());
+        printf("%s: %s\n", printer, cupsLastErrorString());
         return (1);
       }
     }
