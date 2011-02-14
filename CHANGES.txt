@@ -1,8 +1,11 @@
-CHANGES.txt - 2011-01-21
+CHANGES.txt - 2011-02-14
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added new cupsRasterOpenIO function and CUPS_RASTER_WRITE_PWG to the
+	  CUPS imaging library to support printing to IPP Everywhere raster
+	  printers.
 	- The scheduler now provides default values for the pages-per-minute and
 	  pages-per-minute-color attributes for PPD files that lack a
 	  Throughput keyword.
