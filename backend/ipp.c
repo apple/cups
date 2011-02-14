@@ -86,6 +86,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "marker-names",
   "marker-types",
   "media-col-supported",
+  "operations-supported",
   "printer-alert",
   "printer-alert-description",
   "printer-is-accepting-jobs",
