@@ -72,7 +72,8 @@ _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
   * Format the message...
   */
 
-  snprintf(buffer, sizeof(buffer), "%s%s: %s\n", prefix ? prefix : "",
+  snprintf(buffer, sizeof(buffer), "%s%s%s: %s\n", prefix ? prefix : "",
+           prefix ? ": " : "",
 	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
 
  /*

@@ -85,8 +85,10 @@ psTextEmbedFonts(ps_text_t *fonts)	/* I - Font data */
       fclose(fp);
     }
     else
-      fprintf(stderr, "DEBUG: Unable to open font file \"%s\" - %s\n",
-              filename, strerror(errno));
+    {
+      _cupsLangPrintError("ERROR", _("Unable to open print file"));
+      fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", filename);
+    }
 
     puts("\n%%EndResource");
   }
@@ -245,6 +247,7 @@ psTextInitialize(void)
   else
   {
     _cupsLangPrintError("ERROR", _("Unable to open print file"));
+    fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", filename);
     exit(1);
   }
 
@@ -261,6 +264,7 @@ psTextInitialize(void)
     */
 
     _cupsLangPrintError("ERROR", _("Unable to open print file"));
+    fprintf(stderr, "DEBUG: Unable to open \"%s\".\n", filename);
     exit(1);
   }
 
