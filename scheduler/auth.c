@@ -3,7 +3,7 @@
  *
  *   Authorization routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -954,7 +954,8 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     cupsd_ucred_t	peercred;	/* Peer credentials */
     socklen_t		peersize;	/* Size of peer credentials */
     krb5_ccache		peerccache;	/* Peer Kerberos credentials */
-    const char		*peername;	/* Peer username */
+    krb5_principal	peerprncpl;	/* Peer's default principal */
+    char		*peername;	/* Peer username */
 
     peersize = sizeof(peercred);
 
@@ -998,24 +999,42 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "Unable to get credentials cache for UID %d (%d/%s)",
 		      (int)CUPSD_UCRED_UID(peercred), error, strerror(errno));
+      krb5_ipc_client_clear_target();
       return;
     }
 
-    if ((peername = krb5_cc_get_name(KerberosContext, peerccache)) != NULL)
+    if ((error = krb5_cc_get_principal(KerberosContext, peerccache,
+                                       &peerprncpl)) != 0)
     {
-      strlcpy(username, peername, sizeof(username));
-
-      con->have_gss = 1;
-      con->type     = CUPSD_AUTH_NEGOTIATE;
-
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "cupsdAuthorize: Authorized as %s using Negotiate",
-		      username);
+      cupsdLogMessage(CUPSD_LOG_ERROR,
+		      "Unable to get Kerberos principal for UID %d",
+		      (int)CUPSD_UCRED_UID(peercred));
+      krb5_cc_close(KerberosContext, peerccache);
+      krb5_ipc_client_clear_target();
+      return;
     }
-    else
+
+    if ((error = krb5_unparse_name(KerberosContext, peerprncpl,
+                                   &peername)) != 0)
+    {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "Unable to get Kerberos name for UID %d",
 		      (int)CUPSD_UCRED_UID(peercred));
+      krb5_cc_close(KerberosContext, peerccache);
+      krb5_ipc_client_clear_target();
+      return;
+    }
+
+    strlcpy(username, peername, sizeof(username));
+
+    con->have_gss = 1;
+    con->type     = CUPSD_AUTH_NEGOTIATE;
+
+    free(peername);
+
+    cupsdLogMessage(CUPSD_LOG_DEBUG,
+		    "cupsdAuthorize: Authorized as %s using Negotiate",
+		    username);
 
     krb5_cc_close(KerberosContext, peerccache);
     krb5_ipc_client_clear_target();
