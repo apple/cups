@@ -388,7 +388,8 @@ div.contents ul.subcontents li {
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
 	<li><a href="#cupsRasterClose" title="Close a raster stream.">cupsRasterClose</a></li>
 	<li><a href="#cupsRasterInterpretPPD" title="Interpret PPD commands to create a page header.">cupsRasterInterpretPPD</a></li>
-	<li><a href="#cupsRasterOpen" title="Open a raster stream.">cupsRasterOpen</a></li>
+	<li><a href="#cupsRasterOpen" title="Open a raster stream using a file descriptor.">cupsRasterOpen</a></li>
+	<li><a href="#cupsRasterOpenIO" title="Open a raster stream using a callback function.">cupsRasterOpenIO</a></li>
 	<li><a href="#cupsRasterReadHeader" title="Read a raster page header and store it in a
 version 1 page header structure.">cupsRasterReadHeader</a></li>
 	<li><a href="#cupsRasterReadHeader2" title="Read a raster page header and store it in a
@@ -413,6 +414,7 @@ page header structure.">cupsRasterWriteHeader2</a></li>
 	<li><a href="#cups_orient_t" title="Orientation attribute values">cups_orient_t</a></li>
 	<li><a href="#cups_page_header2_t" title="Version 2 page header ">cups_page_header2_t</a></li>
 	<li><a href="#cups_page_header_t" title="Version 1 page header ">cups_page_header_t</a></li>
+	<li><a href="#cups_raster_iocb_t" title="cupsRasterOpenIO callback function">cups_raster_iocb_t</a></li>
 	<li><a href="#cups_raster_t" title="Raster stream data">cups_raster_t</a></li>
 </ul></li>
 <li><a href="#STRUCTURES">Structures</a><ul class="code">
@@ -658,7 +660,7 @@ are supported.
 
 </p>
 <h3 class="function"><a name="cupsRasterOpen">cupsRasterOpen</a></h3>
-<p class="description">Open a raster stream.</p>
+<p class="description">Open a raster stream using a file descriptor.</p>
 <p class="code">
 <a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpen (<br>
 &nbsp;&nbsp;&nbsp;&nbsp;int fd,<br>
@@ -669,7 +671,10 @@ are supported.
 <dt>fd</dt>
 <dd class="description">File descriptor</dd>
 <dt>mode</dt>
-<dd class="description">Mode - <code>CUPS_RASTER_READ</code>, <code>CUPS_RASTER_WRITE</code>, or <code>CUPS_RASTER_WRITE_COMPRESSED</code></dd>
+<dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESSED</code>,
+or <code>CUPS_RASTER_WRITE_PWG</code></dd>
 </dl>
 <h4 class="returnvalue">Return Value</h4>
 <p class="description">New stream</p>
@@ -679,9 +684,40 @@ For most printer driver filters, &quot;fd&quot; will be 0 (stdin).  For most ras
 image processor (RIP) filters that generate raster data, &quot;fd&quot; will be 1
 (stdout).<br>
 <br>
-When writing raster data, the <code>CUPS_RASTER_WRITE</code> or
-<code>CUPS_RASTER_WRITE_COMPRESS</code> mode can be used - compressed output
-is generally 25-50% smaller but adds a 100-300% execution time overhead.</p>
+When writing raster data, the <code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESS</code>, or <code>CUPS_RASTER_WRITE_PWG</code> mode can
+be used - compressed and PWG output is generally 25-50% smaller but adds a
+100-300% execution time overhead.</p>
+<h3 class="function"><a name="cupsRasterOpenIO">cupsRasterOpenIO</a></h3>
+<p class="description">Open a raster stream using a callback function.</p>
+<p class="code">
+<a href="#cups_raster_t">cups_raster_t</a> *cupsRasterOpenIO (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_raster_iocb_t">cups_raster_iocb_t</a> iocb,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;void *ctx,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#cups_mode_t">cups_mode_t</a> mode<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>iocb</dt>
+<dd class="description">Read/write callback</dd>
+<dt>ctx</dt>
+<dd class="description">Context pointer for callback</dd>
+<dt>mode</dt>
+<dd class="description">Mode - <code>CUPS_RASTER_READ</code>,
+<code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESSED</code>,
+or <code>CUPS_RASTER_WRITE_PWG</code></dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">New stream</p>
+<h4 class="discussion">Discussion</h4>
+<p class="discussion">This function associates a raster stream with the given callback function and
+context pointer.<br>
+<br>
+When writing raster data, the <code>CUPS_RASTER_WRITE</code>,
+<code>CUPS_RASTER_WRITE_COMPRESS</code>, or <code>CUPS_RASTER_WRITE_PWG</code> mode can
+be used - compressed and PWG output is generally 25-50% smaller but adds a
+100-300% execution time overhead.</p>
 <h3 class="function"><span class="info">&nbsp;DEPRECATED&nbsp;</span><a name="cupsRasterReadHeader">cupsRasterReadHeader</a></h3>
 <p class="description">Read a raster page header and store it in a
 version 1 page header structure.</p>
@@ -872,6 +908,11 @@ typedef struct <a href="#cups_page_header2_s">cups_page_header2_s</a> cups_page_
 <p class="description">Version 1 page header </p>
 <p class="code">
 typedef struct <a href="#cups_page_header_s">cups_page_header_s</a> cups_page_header_t;
+</p>
+<h3 class="typedef"><a name="cups_raster_iocb_t">cups_raster_iocb_t</a></h3>
+<p class="description">cupsRasterOpenIO callback function</p>
+<p class="code">
+typedef ssize_t (*cups_raster_iocb_t)(void *ctx, unsigned char *buffer, size_t length);
 </p>
 <h3 class="typedef"><a name="cups_raster_t">cups_raster_t</a></h3>
 <p class="description">Raster stream data</p>
@@ -1343,6 +1384,8 @@ factor not applied) </dd>
 <dd class="description">Open stream for writing</dd>
 <dt>CUPS_RASTER_WRITE_COMPRESSED <span class="info">&nbsp;CUPS 1.3/Mac OS X 10.5&nbsp;</span></dt>
 <dd class="description">Open stream for compressed writing </dd>
+<dt>CUPS_RASTER_WRITE_PWG <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dd class="description">Open stream for compressed writing in PWG mode </dd>
 </dl>
 <h3 class="enumeration"><a name="cups_order_e">cups_order_e</a></h3>
 <p class="description">cupsColorOrder attribute values</p>

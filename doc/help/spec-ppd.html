@@ -466,19 +466,14 @@ LINE-END = CR / LF / CR LF
 
 <p>CUPS supports several methods of auto-configuration via PPD keywords.</p>
 
-<h3><span class='info'>Deprecated</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
+<h3><span class='info'>Mac OS X 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
 
 <p class='summary'>*APAutoSetupTool: "/LibraryPrinters/vendor/filename"</p>
 
-<p>This deprecated keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
+<p>This Mac OS X keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
 
 <p>The program is provided with two arguments: the printer's device URI and the PPD file to be used for the printer. The program must write an updated PPD file to stdout.</p>
 
-<blockquote><b>Note:</b>
-
-<p>This keyword is deprecated. New printer drivers SHOULD provide a CUPS command filter and support the "AutoConfigure" command. Alternately, drivers MAY use the <a href="#OID">SNMP OID</a> keywords to configure network printers or <a href="#QUERYKEYWORD">PostScript query keywords</a> to configure PostScript printers.</p>
-
-</blockquote>
 <p>Examples:</p>
 
 <pre class='command'>
