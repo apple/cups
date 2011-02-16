@@ -1858,12 +1858,15 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
       print_xml_string("string", ippOpString(op));
       puts("<key>RequestAttributes</key>");
       puts("<array>");
-      puts("<dict>");
-      for (attrptr = request->attrs, group = attrptr->group_tag;
-           attrptr;
-	   attrptr = attrptr->next)
-	print_attr(attrptr, &group);
-      puts("</dict>");
+      if (request->attrs)
+      {
+	puts("<dict>");
+	for (attrptr = request->attrs, group = attrptr->group_tag;
+	     attrptr;
+	     attrptr = attrptr->next)
+	  print_attr(attrptr, &group);
+	puts("</dict>");
+      }
       puts("</array>");
     }
     else if (Output == _CUPS_OUTPUT_TEST)
