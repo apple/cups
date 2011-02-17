@@ -47,6 +47,7 @@ _httpResolveURI
 _httpSetTimeout
 _httpWait
 _ippAddAttr
+_ippFindOption
 _ippFreeAttr
 _ppdFreeLanguages
 _ppdGetEncoding
