@@ -1253,7 +1253,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\cups\pwgmedia.c"
+				RelativePath="..\cups\pwg-file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\pwg-media.c"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\pwg-ppd.c"
 				>
 			</File>
 			<File
@@ -1503,7 +1511,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\cups\debug.h"
+				RelativePath="..\cups\cups-private.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\debug-private.h"
 				>
 			</File>
 			<File
@@ -1515,11 +1527,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\cups\globals.h"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\http-private.h"
+				RelativePath="..\cups\file-private.h"
 				>
 			</File>
 			<File
@@ -1527,11 +1535,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\cups\i18n.h"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\ipp-private.h"
+				RelativePath="..\cups\http-private.h"
 				>
 			</File>
 			<File
@@ -1539,19 +1543,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\cups\ipp-private.h"
+				>
+			</File>
+			<File
 				RelativePath="..\cups\language.h"
 				>
 			</File>
 			<File
-				RelativePath="..\cups\md5-apple.h"
+				RelativePath="..\cups\language-private.h"
 				>
 			</File>
 			<File
-				RelativePath="..\cups\md5.h"
-				>
-			</File>
-			<File
-				RelativePath="..\cups\normalize.h"
+				RelativePath="..\cups\md5-private.h"
 				>
 			</File>
 			<File
@@ -1559,11 +1563,31 @@
 				>
 			</File>
 			<File
-				RelativePath="..\cups\string.h"
+				RelativePath="..\cups\ppd-private.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\pwg-private.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\sspi-private.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\string-private.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\thread-private.h"
 				>
 			</File>
 			<File
 				RelativePath="..\cups\transcode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\cups\versioning.h"
 				>
 			</File>
 		</Filter>
