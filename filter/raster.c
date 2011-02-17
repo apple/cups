@@ -18,6 +18,27 @@
  *
  * Contents:
  *
+ *   cupsRasterClose()         - Close a raster stream.
+ *   cupsRasterOpen()          - Open a raster stream using a file descriptor.
+ *   cupsRasterOpenIO()        - Open a raster stream using a callback function.
+ *   cupsRasterReadHeader()    - Read a raster page header and store it in a
+ *                               version 1 page header structure.
+ *   cupsRasterReadHeader2()   - Read a raster page header and store it in a
+ *                               version 2 page header structure.
+ *   cupsRasterReadPixels()    - Read raster pixels.
+ *   cupsRasterWriteHeader()   - Write a raster page header from a version 1
+ *                               page header structure.
+ *   cupsRasterWriteHeader2()  - Write a raster page header from a version 2
+ *                               page header structure.
+ *   cupsRasterWritePixels()   - Write raster pixels.
+ *   cups_raster_read_header() - Read a raster page header.
+ *   cups_raster_read()        - Read through the raster buffer.
+ *   cups_raster_update()      - Update the raster header and row count for the
+ *                               current page.
+ *   cups_raster_write()       - Write a row of compressed raster data...
+ *   cups_read_fd()            - Read bytes from a file.
+ *   cups_swap()               - Swap bytes in raster data...
+ *   cups_write_fd()           - Write bytes to a file.
  */
 
 /*
@@ -27,6 +48,7 @@
 #include "image-private.h"
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
+#  include <winsock2.h>
 #else
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
