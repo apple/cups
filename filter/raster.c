@@ -48,7 +48,7 @@
 #include "image-private.h"
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
-#  include <winsock2.h>
+#  include <winsock2.h>			/* for htonl() definition */
 #else
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
