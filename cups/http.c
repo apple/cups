@@ -2276,6 +2276,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
   DEBUG_printf(("2httpReconnect: New socket=%d", http->fd));
 
+#ifndef WIN32
   if (http->timeout_value.tv_sec > 0)
   {
     setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
@@ -2283,6 +2284,7 @@ httpReconnect(http_t *http)		/* I - Connection to server */
     setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
   }
+#endif /* !WIN32 */
 
   http->hostaddr = &(addr->addr);
   http->error    = 0;
@@ -2561,6 +2563,7 @@ _httpSetTimeout(
   http->timeout_value.tv_sec  = (int)timeout;
   http->timeout_value.tv_usec = (int)(timeout * 1000000) % 1000000;
 
+#ifndef WIN32
   if (http->fd >= 0)
   {
     setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
@@ -2568,6 +2571,7 @@ _httpSetTimeout(
     setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
   }
+#endif /* !WIN32 */
 }
 
 

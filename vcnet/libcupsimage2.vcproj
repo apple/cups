@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)\libcupsimage2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\filter\libcupsimage2.def"
@@ -149,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)\libcupsimage2.dll"
 				LinkIncremental="2"
 				ModuleDefinitionFile="..\filter\libcupsimage2.def"
@@ -226,7 +226,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)\libcupsimage2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\filter\libcupsimage2.def"
@@ -260,7 +260,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not &quot;%RC_XBS%&quot; == &quot;YES&quot; goto END&#x0D;&#x0A;if not exist &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;   mkdir &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;&#x0D;&#x0A;xcopy /I/Y &quot;$(TargetPath)&quot;                                                                  &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;&#x0D;&#x0A;:END&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -309,7 +309,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies=""
+				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)\libcupsimage2.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="..\filter\libcupsimage2.def"

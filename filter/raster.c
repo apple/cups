@@ -76,7 +76,7 @@ struct _cups_raster_s			/**** Raster stream data ****/
   unsigned char		*buffer,	/* Read/write buffer */
 			*bufptr,	/* Current (read) position in buffer */
 			*bufend;	/* End of current (read) buffer */
-  int			bufsize;	/* Buffer size */
+  size_t		bufsize;	/* Buffer size */
 };
 
 
@@ -357,7 +357,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
     r->remaining -= len / r->header.cupsBytesPerLine;
 
-    if ((*r->iocb)(r->ctx, p, len) < len)
+    if ((*r->iocb)(r->ctx, p, len) < (ssize_t)len)
       return (0);
 
    /*
@@ -508,7 +508,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       * Copy fragment from buffer...
       */
 
-      if ((bytes = r->pend - r->pcurrent) > remaining)
+      if ((unsigned)(bytes = r->pend - r->pcurrent) > remaining)
         bytes = remaining;
 
       memcpy(p, r->pcurrent, bytes);
@@ -691,7 +691,7 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
       * Allocate a write buffer as needed...
       */
 
-      if (len > r->bufsize)
+      if ((size_t)len > r->bufsize)
       {
 	if (r->buffer)
 	  bufptr = realloc(r->buffer, len);
@@ -922,7 +922,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
   count = 2 * r->header.cupsBytesPerLine;
 
-  if (count > r->bufsize)
+  if ((size_t)count > r->bufsize)
   {
     int offset = r->bufptr - r->buffer;	/* Offset to current start of buffer */
     int end = r->bufend - r->buffer;	/* Offset to current end of buffer */
@@ -1184,7 +1184,7 @@ cups_raster_write(
   */
 
   count = r->header.cupsBytesPerLine * 2;
-  if (count > r->bufsize)
+  if ((size_t)count > r->bufsize)
   {
     if (r->buffer)
       wptr = realloc(r->buffer, count);
