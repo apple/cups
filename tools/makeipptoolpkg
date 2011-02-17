@@ -4,7 +4,7 @@
 #
 #   Make an ipptool package for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products, all rights reserved.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -51,6 +51,7 @@ cp IPPTOOL.txt LICENSE.txt $pkgdir
 cp doc/help/man-ipptool*.html $pkgdir
 cp test/create-printer-subscription.test $pkgdir
 cp test/get-completed-jobs.test test/get-jobs.test $pkgdir
+cp test/get-printer-attributes.test $pkgdir
 cp test/ipp-[12].*.test $pkgdir
 cp test/ipptool-static $pkgdir/ipptool
 cp test/testfile.* $pkgdir
