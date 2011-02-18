@@ -4986,8 +4986,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
           for (i = 0; i < CGImageSourceGetCount(sourceRef); i ++)
           {
             imageRef = CGImageSourceCreateImageAtIndex(sourceRef, i, NULL);
-            if (imageRef &&
-                CGImageGetWidth(imageRef) == CGImageGetHeight(imageRef))
+	    if (!imageRef)
+	      continue;
+
+            if (CGImageGetWidth(imageRef) == CGImageGetHeight(imageRef))
             {
              /*
               * Loop through remembering the icon closest to 128 but >= 128
@@ -5011,9 +5013,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                 CGImageRetain(imageRef);
                 biggestIconRef = imageRef;
               }
+	    }
 
-              CGImageRelease(imageRef);
-            }
+	    CGImageRelease(imageRef);
           }
 
           if (biggestIconRef)
@@ -5028,7 +5030,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                                              biggestIconRef;
             CGImageRetain(imageRef);
             CGImageRelease(biggestIconRef);
-            CGImageRelease(closestTo128IconRef);
+            if (closestTo128IconRef)
+	      CGImageRelease(closestTo128IconRef);
             destRef = CGImageDestinationCreateWithURL(outUrl, kUTTypePNG, 1,
                                                       NULL);
             if (destRef)
@@ -5056,10 +5059,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
               CGImageDestinationFinalize(destRef);
               CFRelease(destRef);
             }
-          }
 
-          if (imageRef)
             CGImageRelease(imageRef);
+          }
 
           CFRelease(sourceRef);
         }
