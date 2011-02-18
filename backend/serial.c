@@ -3,7 +3,7 @@
  *
  *   Serial port backend for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -722,7 +722,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (print_fd != 0)
     close(print_fd);
 
-  return (total_bytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  return (CUPS_BACKEND_OK);
 }
 
 
@@ -1217,11 +1217,11 @@ list_devices(void)
 
 
 	/* Check if hidden... */
-	hiddenVal = IORegistryEntrySearchCFProperty(serialService, 
+	hiddenVal = IORegistryEntrySearchCFProperty(serialService,
 						    kIOServicePlane,
 						    CFSTR("HiddenPort"),
 						    kCFAllocatorDefault,
-						    kIORegistryIterateRecursively | 
+						    kIORegistryIterateRecursively |
 						    kIORegistryIterateParents);
 	if (hiddenVal)
 	  CFRelease(hiddenVal);	/* This interface should not be used */
@@ -1237,7 +1237,7 @@ list_devices(void)
 					sizeof(serialName),
 					kCFStringEncodingASCII);
 	    CFRelease(serialNameAsCFString);
-  
+
 	    if (result)
 	    {
 	      bsdPathAsCFString =
@@ -1250,7 +1250,7 @@ list_devices(void)
 					    sizeof(bsdPath),
 					    kCFStringEncodingASCII);
 		CFRelease(bsdPathAsCFString);
-  
+
 		if (result)
 		  printf("serial serial:%s?baud=115200 \"Unknown\" \"%s\"\n",
 			 bsdPath, serialName);
