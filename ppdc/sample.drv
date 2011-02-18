@@ -3,7 +3,7 @@
 //
 //   Driver info file for CUPS-supplied PPDs.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 1993-2006 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -117,7 +117,7 @@ Attribute "FileSystem" "" "False"
 Attribute "LandscapeOrientation" "" "Plus90"
 Attribute "TTRasterizer" "" "Type42"
 
-Copyright "Copyright 2007-2010 by Apple Inc."
+Copyright "Copyright 2007-2011 by Apple Inc."
 Copyright "Copyright 1997-2007 by Easy Software Products."
 Copyright ""
 Copyright "These coded instructions, statements, and computer programs are the"
@@ -154,9 +154,9 @@ Version "1.5"
   MediaSize w41h144
   MediaSize w153h198
 
-  Resolution k 1 0 0 0 136dpi 
-  Resolution k 1 0 0 0 203dpi 
-  *Resolution k 1 0 0 0 300dpi 
+  Resolution k 1 0 0 0 136dpi
+  Resolution k 1 0 0 0 203dpi
+  *Resolution k 1 0 0 0 300dpi
 
   Darkness 0 Light
   Darkness 1 Medium
@@ -211,7 +211,7 @@ Version "1.5"
     MediaSize A4
     MediaSize FanFoldUS
 
-    Resolution k 1 8 0 0 60x720dpi
+    Resolution k 1 8 0 0 60x72dpi
     *Resolution k 1 8 0 0 120x72dpi
     Resolution k 1 8 0 0 240x72dpi
   }
@@ -443,7 +443,7 @@ Version "1.5"
     Resolution - 1 0 0 0 600dpi
 
     *InputSlot 1 Tray
-    InputSlot 2 "Manual/Manual Feed" 
+    InputSlot 2 "Manual/Manual Feed"
     InputSlot 3 "Envelope/Envelope Feed"
 
     *MediaType 0 "Plain/Plain Paper"
@@ -527,7 +527,7 @@ Version "1.5"
 
   *MediaSize w288h432
 
-  *Resolution k 1 0 0 0 300dpi 
+  *Resolution k 1 0 0 0 300dpi
 
   Group "PrinterSettings/Printer Settings"
     Option "inPrintDensity/Print Density" PickOne DocumentSetup 20.0
@@ -652,7 +652,7 @@ Version "1.5"
     ModelNumber $EPSON_9PIN
     ColorDevice No
 
-    Resolution k 1 8 0 0 60x720dpi
+    Resolution k 1 8 0 0 60x72dpi
     *Resolution k 1 8 0 0 120x72dpi
     Resolution k 1 8 0 0 240x72dpi
   }
