@@ -877,7 +877,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (line[0])
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-				"Bad request line \"%s\" from %s!", line,
+				"Bad request line \"%s\" from %s!",
+			        _httpEncodeURI(buf, line, sizeof(buf)),
 				con->http.hostname);
 		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
@@ -890,7 +891,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      if (sscanf(version, "HTTP/%d.%d", &major, &minor) != 2)
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-		                "Bad request line \"%s\" from %s!", line,
+		                "Bad request line \"%s\" from %s!",
+			        _httpEncodeURI(buf, line, sizeof(buf)),
 	                        con->http.hostname);
 		cupsdSendError(con, HTTP_BAD_REQUEST, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
@@ -909,7 +911,8 @@ cupsdReadClient(cupsd_client_t *con)	/* I - Client to read from */
 	      {
 		cupsdLogMessage(CUPSD_LOG_ERROR,
 		                "Unsupported request line \"%s\" from %s!",
-				line, con->http.hostname);
+			        _httpEncodeURI(buf, line, sizeof(buf)),
+				con->http.hostname);
 	        cupsdSendError(con, HTTP_NOT_SUPPORTED, CUPSD_AUTH_NONE);
 		cupsdCloseClient(con);
 		return;

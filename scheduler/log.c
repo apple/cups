@@ -3,7 +3,7 @@
  *
  *   Log file routines for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -696,7 +696,8 @@ cupsdLogRequest(cupsd_client_t *con,	/* I - Request to log */
 
   cupsFilePrintf(AccessFile,
                  "%s - %s %s \"%s %s HTTP/%d.%d\" %d " CUPS_LLFMT " %s %s\n",
-        	 con->http.hostname, con->username[0] != '\0' ? con->username : "-",
+        	 con->http.hostname,
+		 con->username[0] != '\0' ? con->username : "-",
 		 cupsdGetDateTime(&(con->start), LogTimeFormat),
 		 states[con->operation],
 		 _httpEncodeURI(temp, con->uri, sizeof(temp)),
