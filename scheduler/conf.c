@@ -316,16 +316,16 @@ cupsdCheckPermissions(
 
   if (!dir_created && !is_dir && !S_ISREG(fileinfo.st_mode))
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a regular file!", filename);
+    cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a regular file.", filename);
     return (-1);
   }
 
   if (!dir_created && is_dir && !S_ISDIR(fileinfo.st_mode))
   {
     if (create_dir >= 0)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory!", filename);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "\"%s\" is not a directory.", filename);
     else
-      syslog(LOG_ERR, "\"%s\" is not a directory!", filename);
+      syslog(LOG_ERR, "\"%s\" is not a directory.", filename);
 
     return (-1);
   }
@@ -864,7 +864,7 @@ cupsdReadConfiguration(void)
       */
 
       cupsdLogMessage(CUPSD_LOG_NOTICE,
-                      "Group and SystemGroup cannot use the same groups!");
+                      "Group and SystemGroup cannot use the same groups.");
       cupsdLogMessage(CUPSD_LOG_INFO, "Resetting Group to \"nobody\"...");
 
       group = getgrnam("nobody");
@@ -897,7 +897,7 @@ cupsdReadConfiguration(void)
 
     cupsdLogMessage(CUPSD_LOG_EMERG,
                     "No valid Listen or Port lines were found in the "
-		    "configuration file!");
+		    "configuration file.");
 
    /*
     * Commit suicide...
@@ -1002,13 +1002,13 @@ cupsdReadConfiguration(void)
         cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to access TMPDIR (%s): %s",
 	                tmpdir, strerror(errno));
       else if (!S_ISDIR(tmpinfo.st_mode))
-        cupsdLogMessage(CUPSD_LOG_ERROR, "TMPDIR (%s) is not a directory!",
+        cupsdLogMessage(CUPSD_LOG_ERROR, "TMPDIR (%s) is not a directory.",
 	                tmpdir);
       else if ((tmpinfo.st_uid != User || !(tmpinfo.st_mode & S_IWUSR)) &&
                (tmpinfo.st_gid != Group || !(tmpinfo.st_mode & S_IWGRP)) &&
 	       !(tmpinfo.st_mode & S_IWOTH))
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "TMPDIR (%s) has the wrong permissions!", tmpdir);
+	                "TMPDIR (%s) has the wrong permissions.", tmpdir);
       else
         cupsdSetString(&TempDir, tmpdir);
     }
@@ -1132,7 +1132,7 @@ cupsdReadConfiguration(void)
 
   if (BrowseTimeout < (2 * BrowseInterval) || BrowseTimeout <= 0)
   {
-    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid BrowseTimeout value %d!",
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Invalid BrowseTimeout value %d.",
                     BrowseTimeout);
 
     if (BrowseInterval)
@@ -1140,7 +1140,7 @@ cupsdReadConfiguration(void)
     else
       BrowseTimeout = DEFAULT_TIMEOUT;
 
-    cupsdLogMessage(CUPSD_LOG_ALERT, "Reset BrowseTimeout to %d!",
+    cupsdLogMessage(CUPSD_LOG_ALERT, "Reset BrowseTimeout to %d.",
                     BrowseTimeout);
   }
 
@@ -1159,14 +1159,14 @@ cupsdReadConfiguration(void)
 
 
     if (DefaultPolicy)
-      cupsdLogMessage(CUPSD_LOG_ERROR, "Default policy \"%s\" not found!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "Default policy \"%s\" not found.",
                       DefaultPolicy);
 
     cupsdSetString(&DefaultPolicy, "default");
 
     if ((DefaultPolicyPtr = cupsdFindPolicy("default")) != NULL)
       cupsdLogMessage(CUPSD_LOG_INFO,
-                      "Using policy \"default\" as the default!");
+                      "Using policy \"default\" as the default.");
     else
     {
       cupsdLogMessage(CUPSD_LOG_INFO,
@@ -1369,7 +1369,7 @@ cupsdReadConfiguration(void)
     if (!MimeDatabase)
     {
       cupsdLogMessage(CUPSD_LOG_EMERG,
-                      "Unable to load MIME database from \"%s\" or \"%s\"!",
+                      "Unable to load MIME database from \"%s\" or \"%s\".",
 		      mimedir, ServerRoot);
       if (FatalErrors & CUPSD_FATAL_CONFIG)
         return (0);
@@ -1392,7 +1392,7 @@ cupsdReadConfiguration(void)
     if ((MimeTypes = calloc(NumMimeTypes, sizeof(const char *))) == NULL)
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to allocate memory for %d MIME types!",
+                      "Unable to allocate memory for %d MIME types.",
 		      NumMimeTypes);
       NumMimeTypes = 0;
     }
@@ -1522,7 +1522,7 @@ get_address(const char  *value,		/* I - Value string */
 
   if (!*value)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad (empty) address!");
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Bad (empty) address.");
     return (NULL);
   }
 
@@ -1571,7 +1571,7 @@ get_address(const char  *value,		/* I - Value string */
   */
 
   if ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed!",
+    cupsdLogMessage(CUPSD_LOG_ERROR, "Hostname lookup for \"%s\" failed.",
                     hostname ? hostname : "(nil)");
 
   return (addrlist);
@@ -2264,7 +2264,7 @@ parse_fatal_errors(const char *s)	/* I - FatalErrors string */
       fatal &= ~CUPSD_FATAL_PERMISSIONS;
     else if (strcasecmp(valstart, "none"))
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown FatalErrors kind \"%s\" ignored!", valstart);
+                      "Unknown FatalErrors kind \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
       if (!isspace(*valstart & 255) || *valstart != ',')
@@ -2413,7 +2413,7 @@ parse_protocols(const char *s)		/* I - Space-delimited protocols */
       protocols |= BROWSE_ALL;
     else if (strcasecmp(valstart, "none"))
       cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unknown browse protocol \"%s\" ignored!", valstart);
+                      "Unknown browse protocol \"%s\" ignored.", valstart);
 
     for (valstart = valend; *valstart; valstart ++)
       if (!isspace(*valstart & 255) || *valstart != ',')
@@ -2570,7 +2570,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	{
 	  httpAddrString(&lis->address, temp, sizeof(temp));
 	  cupsdLogMessage(CUPSD_LOG_WARN,
-	                  "Duplicate listen address \"%s\" ignored!", temp);
+	                  "Duplicate listen address \"%s\" ignored.", temp);
           continue;
 	}
 
@@ -2737,7 +2737,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to initialize browse access control list!");
+	                "Unable to initialize browse access control list.");
       else if (!strncasecmp(value, "deny", 4))
         location->order_type = CUPSD_AUTH_ALLOW;
       else if (!strncasecmp(value, "allow", 5))
@@ -2787,7 +2787,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (location == NULL)
         cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unable to initialize browse access control list!");
+	                "Unable to initialize browse access control list.");
       else
       {
 	if (!strncasecmp(value, "from", 4))
@@ -3092,7 +3092,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  portnum = ntohs(service->s_port);
 	else
 	{
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "Lookup of service \"%s\" failed!",
+	  cupsdLogMessage(CUPSD_LOG_ERROR, "Lookup of service \"%s\" failed.",
 	                  portname);
           continue;
 	}
@@ -3218,7 +3218,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	}
 	else
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unknown User \"%s\" on line %d, ignoring!",
+	                  "Unknown User \"%s\" on line %d, ignoring.",
 	                  value, linenum);
       }
     }
@@ -3239,7 +3239,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	  Group = group->gr_gid;
 	else
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Unknown Group \"%s\" on line %d, ignoring!",
+	                  "Unknown Group \"%s\" on line %d, ignoring.",
 	                  value, linenum);
       }
     }
@@ -3251,7 +3251,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
       if (!parse_groups(value))
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Unknown SystemGroup \"%s\" on line %d, ignoring!",
+	                "Unknown SystemGroup \"%s\" on line %d, ignoring.",
 	                value, linenum);
     }
     else if (!strcasecmp(line, "HostNameLookups") && value)
@@ -3481,7 +3481,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
         case CUPSD_VARTYPE_INTEGER :
 	    if (!value)
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Missing integer value for %s on line %d!",
+	                      "Missing integer value for %s on line %d.",
 			      line, linenum);
 	    else
 	    {
@@ -3505,7 +3505,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 
               if (n < 0)
 		cupsdLogMessage(CUPSD_LOG_ERROR,
-	                	"Bad negative integer value for %s on line %d!",
+	                	"Bad negative integer value for %s on line %d.",
 				line, linenum);
 	      else
 		*((int *)var->ptr) = n;
@@ -3515,7 +3515,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	case CUPSD_VARTYPE_BOOLEAN :
 	    if (!value)
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Missing boolean value for %s on line %d!",
+	                      "Missing boolean value for %s on line %d.",
 			      line, linenum);
             else if (!strcasecmp(value, "true") ||
 	             !strcasecmp(value, "on") ||
@@ -3539,7 +3539,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
             if (!value)
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
-	                      "Missing pathname value for %s on line %d!",
+	                      "Missing pathname value for %s on line %d.",
 			      line, linenum);
               break;
 	    }
@@ -3553,7 +3553,7 @@ read_configuration(cups_file_t *fp)	/* I - File to read from */
 	    {
 	      cupsdLogMessage(CUPSD_LOG_ERROR,
 	                      "File or directory for \"%s %s\" on line %d "
-			      "does not exist!", line, value, linenum);
+			      "does not exist.", line, value, linenum);
               break;
 	    }
 
@@ -3585,13 +3585,19 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 			*valptr;	/* Pointer into value */
 
 
-  if ((parent = cupsdNewLocation(location)) == NULL)
+  if ((parent = cupsdFindLocation(location)) != NULL)
+    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Location %s> on line %d.",
+                    location, linenum);
+  else if ((parent = cupsdNewLocation(location)) == NULL)
     return (0);
+  else
+  {
+    cupsdAddLocation(parent);
 
-  cupsdAddLocation(parent);
+    parent->limit = CUPSD_AUTH_LIMIT_ALL;
+  }
 
-  parent->limit = CUPSD_AUTH_LIMIT_ALL;
-  loc           = parent;
+  loc = parent;
 
   while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
   {
@@ -3641,7 +3647,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
 	else if (!strcmp(value, "TRACE"))
 	  loc->limit |= CUPSD_AUTH_LIMIT_TRACE;
 	else
-	  cupsdLogMessage(CUPSD_LOG_WARN, "Unknown request type %s on line %d!",
+	  cupsdLogMessage(CUPSD_LOG_WARN, "Unknown request type %s on line %d.",
 	                  value, linenum);
 
         for (value = valptr; isspace(*value & 255); value ++);
@@ -3666,7 +3672,7 @@ read_location(cups_file_t *fp,		/* I - Configuration file */
   }
 
   cupsdLogMessage(CUPSD_LOG_ERROR,
-                  "Unexpected end-of-file at line %d while reading location!",
+                  "Unexpected end-of-file at line %d while reading location.",
                   linenum);
 
   return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
@@ -3697,7 +3703,10 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   * Create the policy...
   */
 
-  if ((pol = cupsdAddPolicy(policy)) == NULL)
+  if ((pol = cupsdFindPolicy(policy)) != NULL)
+    cupsdLogMessage(CUPSD_LOG_WARN, "Duplicate <Policy %s> on line %d.",
+                    policy, linenum);
+  else if ((pol = cupsdAddPolicy(policy)) == NULL)
     return (0);
 
  /*
@@ -3717,7 +3726,7 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
     {
       if (op)
         cupsdLogMessage(CUPSD_LOG_WARN,
-	                "Missing </Limit> before </Policy> on line %d!",
+	                "Missing </Limit> before </Policy> on line %d.",
 	                linenum);
 
       set_policy_defaults(pol);
@@ -3754,14 +3763,14 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
 	    ops[num_ops] = IPP_ANY_OPERATION;
 	  else if ((ops[num_ops] = ippOpValue(value)) == IPP_BAD_OPERATION)
 	    cupsdLogMessage(CUPSD_LOG_ERROR,
-	                    "Bad IPP operation name \"%s\" on line %d!",
+	                    "Bad IPP operation name \"%s\" on line %d.",
 	                    value, linenum);
           else
 	    num_ops ++;
 	}
 	else
 	  cupsdLogMessage(CUPSD_LOG_ERROR,
-	                  "Too many operations listed on line %d!",
+	                  "Too many operations listed on line %d.",
 	                  linenum);
 
         for (value = valptr; isspace(*value & 255); value ++);
@@ -3929,8 +3938,8 @@ read_policy(cups_file_t *fp,		/* I - Configuration file */
   }
 
   cupsdLogMessage(CUPSD_LOG_ERROR,
-                  "Unexpected end-of-file at line %d while reading policy \"%s\"!",
-                  linenum, policy);
+                  "Unexpected end-of-file at line %d while reading policy "
+                  "\"%s\".", linenum, policy);
 
   return ((FatalErrors & CUPSD_FATAL_CONFIG) ? 0 : linenum);
 }
