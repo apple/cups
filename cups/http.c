@@ -479,7 +479,7 @@ httpConnectEncrypt(
   * Create the HTTP structure...
   */
 
-  if ((http = _httpCreate(host, port, encryption, AF_UNSPEC)) == NULL)
+  if ((http = _httpCreate(host, port, NULL, encryption, AF_UNSPEC)) == NULL)
     return (NULL);
 
  /*
@@ -632,12 +632,12 @@ http_t *				/* O - HTTP connection */
 _httpCreate(
     const char        *host,		/* I - Hostname */
     int               port,		/* I - Port number */
+    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
     http_encryption_t encryption,	/* I - Encryption to use */
     int               family)		/* I - Address family or AF_UNSPEC */
 {
-  http_t		*http;		/* New HTTP connection */
-  http_addrlist_t	*addrlist;	/* Host address data */
-  char			service[255];	/* Service name */
+  http_t	*http;			/* New HTTP connection */
+  char		service[255];		/* Service name */
 
 
   DEBUG_printf(("4_httpCreate(host=\"%s\", port=%d, encryption=%d)",
@@ -654,8 +654,9 @@ _httpCreate(
 
   sprintf(service, "%d", port);
 
-  if ((addrlist = httpAddrGetList(host, family, service)) == NULL)
-    return (NULL);
+  if (!addrlist)
+    if ((addrlist = httpAddrGetList(host, family, service)) == NULL)
+      return (NULL);
 
  /*
   * Allocate memory for the structure...

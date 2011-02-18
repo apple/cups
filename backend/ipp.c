@@ -149,6 +149,7 @@ main(int  argc,				/* I - Number of command-line args */
 		*name,			/* Name of option */
 		*value,			/* Value of option */
 		sep;			/* Separator character */
+  http_addrlist_t *addrlist;		/* Address of printer */
   int		snmp_fd,		/* SNMP socket */
 		start_count,		/* Page count via SNMP at start */
 		page_count,		/* Page count via SNMP */
@@ -156,6 +157,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		num_files;		/* Number of files to print */
   char		**files;		/* Files to print */
   int		port;			/* Port number (not used) */
+  char		portname[255];		/* Port name */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
   http_status_t	http_status;		/* Status of HTTP request */
   ipp_status_t	ipp_status;		/* Status of IPP request */
@@ -504,28 +506,68 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * Try finding the remote server...
+  */
+
+  start_time = time(NULL);
+
+  sprintf(portname, "%d", port);
+
+  fputs("STATE: +connecting-to-device\n", stderr);
+  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
+
+  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO",
+                         _("Unable to locate printer \"%s\"."), hostname);
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+    {
+      fputs("STATE: -connecting-to-device\n", stderr);
+      return (CUPS_BACKEND_STOP);
+    }
+  }
+
+  http = _httpCreate(hostname, port, addrlist, cupsEncryption(), AF_UNSPEC);
+
+ /*
+  * See if the printer supports SNMP...
+  */
+
+  if ((snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family)) >= 0)
+  {
+    have_supplies = !backendSNMPSupplies(snmp_fd, &(addrlist->addr),
+                                         &start_count, NULL);
+  }
+  else
+    have_supplies = start_count = 0;
+
+ /*
+  * Wait for data from the filter...
+  */
+
+  if (num_files == 0)
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+      return (CUPS_BACKEND_OK);
+
+ /*
   * Try connecting to the remote server...
   */
 
-  delay      = 5;
-  start_time = time(NULL);
-
-  fputs("STATE: +connecting-to-device\n", stderr);
+  delay = 5;
 
   do
   {
     fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
     _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
-    if ((http = httpConnectEncrypt(hostname, port,
-				   cupsEncryption())) == NULL)
+    if (httpReconnect(http))
     {
-#if 0 /* These need to go in here someplace when we see HTTP_PKI_ERROR or IPP_PKI_ERROR */
-      fputs("STATE: +cups-certificate-error\n", stderr);
-      fputs("STATE: -cups-certificate-error\n", stderr);
-#endif /* 0 */
-
       int error = errno;		/* Connection error */
+
+      if (http->status == HTTP_PKI_ERROR)
+	fputs("STATE: +cups-certificate-error\n", stderr);
 
       if (job_canceled)
 	break;
@@ -549,6 +591,8 @@ main(int  argc,				/* I - Number of command-line args */
 
 	sleep(5);
 
+	fputs("STATE: -connecting-to-device\n", stderr);
+
         return (CUPS_BACKEND_FAILED);
       }
 
@@ -561,6 +605,7 @@ main(int  argc,				/* I - Number of command-line args */
 	{
 	  _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("The printer is not responding."));
+	  fputs("STATE: -connecting-to-device\n", stderr);
 	  return (CUPS_BACKEND_FAILED);
 	}
 
@@ -592,13 +637,6 @@ main(int  argc,				/* I - Number of command-line args */
 	if (delay < 30)
 	  delay += 5;
       }
-      else if (h_errno)
-      {
-	_cupsLangPrintFilter(stderr, "ERROR",
-	                     _("Unable to locate network printer \"%s\"."),
-			     hostname);
-	return (CUPS_BACKEND_STOP);
-      }
       else
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
@@ -610,8 +648,10 @@ main(int  argc,				/* I - Number of command-line args */
       if (job_canceled)
 	break;
     }
+    else
+      fputs("STATE: -cups-certificate-error\n", stderr);
   }
-  while (http == NULL);
+  while (http->fd < 0);
 
   if (job_canceled || !http)
     return (CUPS_BACKEND_FAILED);
@@ -630,16 +670,6 @@ main(int  argc,				/* I - Number of command-line args */
       fprintf(stderr, "DEBUG: Connected to %s:%d (IPv4)...\n",
 	      httpAddrString(http->hostaddr, addrname, sizeof(addrname)),
 	      ntohs(http->hostaddr->ipv4.sin_port));
-
- /*
-  * See if the printer supports SNMP...
-  */
-
-  if ((snmp_fd = _cupsSNMPOpen(http->hostaddr->addr.sa_family)) >= 0)
-    have_supplies = !backendSNMPSupplies(snmp_fd, http->hostaddr, &start_count,
-                                         NULL);
-  else
-    have_supplies = start_count = 0;
 
  /*
   * Build a URI for the printer and fill the standard IPP attributes for
@@ -958,6 +988,17 @@ main(int  argc,				/* I - Number of command-line args */
         document_format = final_content_type;
 	break;
       }
+
+    if (!document_format)
+    {
+      for (i = 0; i < format_sup->num_values; i ++)
+	if (!strcasecmp("application/octet-stream",
+	                format_sup->values[i].string.text))
+	{
+	  document_format = "application/octet-stream";
+	  break;
+	}
+    }
   }
 
  /*
@@ -992,7 +1033,8 @@ main(int  argc,				/* I - Number of command-line args */
 
     ipp_status = cupsLastError();
 
-    if (ipp_status > IPP_OK_CONFLICT)
+    if (ipp_status > IPP_OK_CONFLICT &&
+        ipp_status != IPP_OPERATION_NOT_SUPPORTED)
     {
       if (job_canceled)
         break;
@@ -1645,7 +1687,7 @@ monitor_printer(
   * Make a copy of the printer connection...
   */
 
-  http = _httpCreate(monitor->hostname, monitor->port, monitor->encryption,
+  http = _httpCreate(monitor->hostname, monitor->port, NULL, monitor->encryption,
                      AF_UNSPEC);
   cupsSetPasswordCB(password_cb);
 

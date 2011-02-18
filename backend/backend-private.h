@@ -277,6 +277,14 @@ extern "C" {
 
 
 /*
+ * Types...
+ */
+
+typedef int (*_cups_sccb_t)(int print_fd, int device_fd, int snmp_fd,
+			    http_addr_t *addr, int use_bc);
+
+
+/*
  * Prototypes...
  */
 
@@ -295,16 +303,14 @@ extern int		backendNetworkSideCB(int print_fd, int device_fd,
 			                     int snmp_fd, http_addr_t *addr,
 					     int use_bc);
 extern ssize_t		backendRunLoop(int print_fd, int device_fd, int snmp_fd,
-			               http_addr_t *addr, int use_bc, 
-			               int update_state, 
-				       int (*side_cb)(int print_fd,
-				                      int device_fd,
-						      int snmp_fd,
-						      http_addr_t *addr,
-						      int use_bc));
+			               http_addr_t *addr, int use_bc,
+			               int update_state, _cups_sccb_t side_cb);
 extern int		backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
 			                    int *page_count,
 					    int *printer_state);
+extern int		backendWaitLoop(int snmp_fd, http_addr_t *addr,
+			                _cups_sccb_t side_cb);
+
 
 #  ifdef __cplusplus
 }

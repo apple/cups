@@ -257,7 +257,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   }
 
  /*
-  * Then try to connect to the remote host...
+  * Then try finding the remote host...
   */
 
   start_time = time(NULL);
@@ -274,8 +274,35 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     sleep(10);
 
     if (getenv("CLASS") != NULL)
+    {
+      fputs("STATE: -connecting-to-device\n", stderr);
       return (CUPS_BACKEND_STOP);
+    }
   }
+
+ /*
+  * See if the printer supports SNMP...
+  */
+
+  if ((snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family)) >= 0)
+  {
+    have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count,
+                                         NULL);
+  }
+  else
+    have_supplies = start_count = 0;
+
+ /*
+  * Wait for data from the filter...
+  */
+
+  if (print_fd == 0)
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+      return (CUPS_BACKEND_OK);
+
+ /*
+  * Connect to the printer...
+  */
 
   fprintf(stderr, "DEBUG: Connecting to %s:%d\n", hostname, port);
   _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
@@ -377,18 +404,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 	      ntohs(addr->addr.ipv4.sin_port));
 
  /*
-  * See if the printer supports SNMP...
-  */
-
-  if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
-  {
-    have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count,
-                                         NULL);
-  }
-  else
-    have_supplies = start_count = 0;
-
- /*
   * Print everything...
   */
 
@@ -459,10 +474,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   if (print_fd != 0)
     close(print_fd);
 
-  if (tbytes >= 0)
-    _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
+  _cupsLangPrintFilter(stderr, "INFO", _("Ready to print."));
 
-  return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  return (CUPS_BACKEND_OK);
 }
 
 

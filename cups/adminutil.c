@@ -901,7 +901,7 @@ cupsAdminGetServerSettings(
 
     if (!cg->http)
     {
-      if ((cg->http = _httpCreate(cupsServer(), ippPort(),
+      if ((cg->http = _httpCreate(cupsServer(), ippPort(), NULL,
                                   cupsEncryption(), AF_UNSPEC)) == NULL)
       {
 	if (errno)

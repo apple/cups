@@ -656,7 +656,7 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
   * Connect to the server...
   */
 
-  if ((http = _httpCreate(vars->hostname, vars->port, vars->encryption,
+  if ((http = _httpCreate(vars->hostname, vars->port, NULL, vars->encryption,
 			  vars->family)) == NULL)
   {
     print_fatal_error("Unable to connect to %s on port %d - %s", vars->hostname,

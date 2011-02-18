@@ -88,11 +88,12 @@ static int	abort_job = 0;		/* Non-zero if we get SIGTERM */
  */
 
 static int	lpd_command(int lpd_fd, int timeout, char *format, ...);
-static int	lpd_queue(const char *hostname, int port, const char *printer,
-		          int print_fd, int mode, const char *user,
-			  const char *title, int copies, int banner,
-			  int format, int order, int reserve,
-			  int manual_copies, int timeout, int contimeout);
+static int	lpd_queue(const char *hostname, http_addrlist_t *addrlist,
+			  const char *printer, int print_fd, int snmp_fd,
+			  int mode, const char *user, const char *title,
+			  int copies, int banner, int format, int order,
+			  int reserve, int manual_copies, int timeout,
+			  int contimeout);
 static void	lpd_timeout(int sig);
 static int	lpd_write(int lpd_fd, char *buffer, int length);
 #ifndef HAVE_RRESVPORT_AF
@@ -125,6 +126,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 		*filename,		/* File to print */
 		title[256];		/* Title string */
   int		port;			/* Port number */
+  char		portname[256];		/* Port name (string) */
+  http_addrlist_t *addrlist;		/* List of addresses for printer */
+  int		snmp_fd;		/* SNMP socket */
   int		fd;			/* Print file */
   int		status;			/* Status of LPD job */
   int		mode;			/* Print mode */
@@ -399,6 +403,38 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     order = ORDER_CONTROL_DATA;
 
  /*
+  * Find the printer...
+  */
+
+  snprintf(portname, sizeof(portname), "%d", port);
+
+  fputs("STATE: +connecting-to-device\n", stderr);
+  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
+
+  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
+  {
+    _cupsLangPrintFilter(stderr, "INFO",
+			 _("Unable to locate printer \"%s\"."), hostname);
+    sleep(10);
+
+    if (getenv("CLASS") != NULL)
+    {
+      fputs("STATE: -connecting-to-device\n", stderr);
+      exit(CUPS_BACKEND_FAILED);
+    }
+  }
+
+  snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
+
+ /*
+  * Wait for data from the filter...
+  */
+
+  if (argc == 6)
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+      return (CUPS_BACKEND_OK);
+
+ /*
   * If we have 7 arguments, print the file named on the command-line.
   * Otherwise, copy stdin to a temporary file and print the temporary
   * file.
@@ -410,25 +446,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
     * Copy stdin to a temporary file...
     */
 
-    http_addrlist_t	*addrlist;	/* Address list */
-    int			snmp_fd;	/* SNMP socket */
-
-
-    fputs("STATE: +connecting-to-device\n", stderr);
-    fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-    while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, "1")) == NULL)
-    {
-      _cupsLangPrintFilter(stderr, "INFO",
-                           _("Unable to locate printer \"%s\"."), hostname);
-      sleep(10);
-
-      if (getenv("CLASS") != NULL)
-	exit(CUPS_BACKEND_FAILED);
-    }
-
-    snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family);
-
     if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
     {
       perror("DEBUG: Unable to create temporary file");
@@ -439,11 +456,6 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
     backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0, 
 		   backendNetworkSideCB);
-
-    if (snmp_fd >= 0)
-      _cupsSNMPClose(snmp_fd);
-
-    httpAddrFreeList(addrlist);
   }
   else if (argc == 6)
   {
@@ -503,18 +515,16 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       copies        = atoi(argv[4]);
     }
 
-    status = lpd_queue(hostname, port, resource + 1, fd, mode,
-                       username, title, copies,
-		       banner, format, order, reserve, manual_copies,
-		       timeout, contimeout);
+    status = lpd_queue(hostname, addrlist, resource + 1, fd, snmp_fd, mode,
+                       username, title, copies, banner, format, order, reserve,
+		       manual_copies, timeout, contimeout);
 
     if (!status)
       fprintf(stderr, "PAGE: 1 %d\n", atoi(argv[4]));
   }
   else
-    status = lpd_queue(hostname, port, resource + 1, fd, mode,
-                       username, title, 1,
-		       banner, format, order, reserve, 1,
+    status = lpd_queue(hostname, addrlist, resource + 1, fd, snmp_fd, mode,
+                       username, title, 1, banner, format, order, reserve, 1,
 		       timeout, contimeout);
 
  /*
@@ -526,6 +536,9 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if (fd)
     close(fd);
+
+  if (snmp_fd >= 0)
+    _cupsSNMPClose(snmp_fd);
 
  /*
   * Return the queue status...
@@ -552,7 +565,7 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
 
 
  /*
-  * Don't try to send commands if the job has been cancelled...
+  * Don't try to send commands if the job has been canceled...
   */
 
   if (abort_job)
@@ -609,21 +622,22 @@ lpd_command(int  fd,		/* I - Socket connection to LPD host */
  */
 
 static int				/* O - Zero on success, non-zero on failure */
-lpd_queue(const char *hostname,		/* I - Host to connect to */
-          int        port,		/* I - Port to connect on */
-          const char *printer,		/* I - Printer/queue name */
-	  int        print_fd,		/* I - File to print */
-	  int        mode,		/* I - Print mode */
-          const char *user,		/* I - Requesting user */
-	  const char *title,		/* I - Job title */
-	  int        copies,		/* I - Number of copies */
-	  int        banner,		/* I - Print LPD banner? */
-          int        format,		/* I - Format specifier */
-          int        order,		/* I - Order of data/control files */
-	  int        reserve,		/* I - Reserve ports? */
-	  int        manual_copies,	/* I - Do copies by hand... */
-	  int        timeout,		/* I - Timeout... */
-	  int        contimeout)	/* I - Connection timeout */
+lpd_queue(const char      *hostname,	/* I - Host to connect to */
+          http_addrlist_t *addrlist,	/* I - List of host addresses */
+          const char      *printer,	/* I - Printer/queue name */
+	  int             print_fd,	/* I - File to print */
+	  int             snmp_fd,	/* I - SNMP socket */
+	  int             mode,		/* I - Print mode */
+          const char      *user,	/* I - Requesting user */
+	  const char      *title,	/* I - Job title */
+	  int             copies,	/* I - Number of copies */
+	  int             banner,	/* I - Print LPD banner? */
+          int             format,	/* I - Format specifier */
+          int             order,	/* I - Order of data/control files */
+	  int             reserve,	/* I - Reserve ports? */
+	  int             manual_copies,/* I - Do copies by hand... */
+	  int             timeout,	/* I - Timeout... */
+	  int             contimeout)	/* I - Connection timeout */
 {
   char			localhost[255];	/* Local host name */
   int			error;		/* Error number */
@@ -633,13 +647,10 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
   char			control[10240],	/* LPD control 'file' */
 			*cptr;		/* Pointer into control file string */
   char			status;		/* Status byte from command */
-  char			portname[255];	/* Port name */
   int			delay;		/* Delay for retries... */
   char			addrname[256];	/* Address name */
-  http_addrlist_t	*addrlist,	/* Address list */
-			*addr;		/* Socket address */
-  int			snmp_fd,	/* SNMP socket */
-			have_supplies;	/* Printer supports supply levels? */
+  http_addrlist_t	*addr;		/* Socket address */
+  int			have_supplies;	/* Printer supports supply levels? */
   int			copy;		/* Copies written */
   time_t		start_time;	/* Time of first connect */
   size_t		nbytes;		/* Number of bytes written */
@@ -667,25 +678,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 #endif /* HAVE_SIGSET */
 
  /*
-  * Find the printer...
-  */
-
-  sprintf(portname, "%d", port);
-
-  fputs("STATE: +connecting-to-device\n", stderr);
-  fprintf(stderr, "DEBUG: Looking up \"%s\"...\n", hostname);
-
-  while ((addrlist = httpAddrGetList(hostname, AF_UNSPEC, portname)) == NULL)
-  {
-    _cupsLangPrintFilter(stderr, "INFO", _("Unable to locate printer \"%s\"."),
-			 hostname);
-    sleep(10);
-
-    if (getenv("CLASS") != NULL)
-      exit(CUPS_BACKEND_FAILED);
-  }
-
- /*
   * Remember when we started trying to connect to the printer...
   */
 
@@ -702,7 +694,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     */
 
     fprintf(stderr, "DEBUG: Connecting to %s:%d for printer %s\n", hostname,
-            port, printer);
+            _httpAddrPort(&(addrlist->addr)), printer);
     _cupsLangPrintFilter(stderr, "INFO", _("Connecting to printer."));
 
     for (lport = reserve == RESERVE_RFC1179 ? 732 : 1024, addr = addrlist,
@@ -710,15 +702,11 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
          addr = addr->next)
     {
      /*
-      * Stop if this job has been cancelled...
+      * Stop if this job has been canceled...
       */
 
       if (abort_job)
-      {
-        httpAddrFreeList(addrlist);
-
         return (CUPS_BACKEND_FAILED);
-      }
 
      /*
       * Choose the next priviledged port...
@@ -776,8 +764,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
       if (abort_job)
       {
-        httpAddrFreeList(addrlist);
-
 	close(fd);
 
 	return (CUPS_BACKEND_FAILED);
@@ -804,8 +790,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
         _cupsLangPrintFilter(stderr, "INFO",
 			     _("Unable to contact printer, queuing on next "
 			       "printer in class."));
-
-        httpAddrFreeList(addrlist);
 
        /*
         * Sleep 5 seconds to keep the job from requeuing too rapidly...
@@ -892,8 +876,9 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * See if the printer supports SNMP...
     */
 
-    if ((snmp_fd = _cupsSNMPOpen(addr->addr.addr.sa_family)) >= 0)
-      have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), NULL, NULL);
+    if (snmp_fd >= 0)
+      have_supplies = !backendSNMPSupplies(snmp_fd, &(addrlist->addr), NULL,
+                                           NULL);
     else
       have_supplies = 0;
 
@@ -901,7 +886,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     * Check for side-channel requests...
     */
 
-    backendCheckSideChannel(snmp_fd, &(addr->addr));
+    backendCheckSideChannel(snmp_fd, &(addrlist->addr));
 
    /*
     * Next, open the print file and figure out its size...
@@ -915,7 +900,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
 
       if (fstat(print_fd, &filestats))
       {
-	httpAddrFreeList(addrlist);
 	close(fd);
 
 	perror("DEBUG: unable to stat print file");
@@ -946,7 +930,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     if (lpd_command(fd, timeout, "\002%s\n",
                     printer))		/* Receive print job(s) */
     {
-      httpAddrFreeList(addrlist);
       close(fd);
       return (CUPS_BACKEND_FAILED);
     }
@@ -999,7 +982,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       (int)getpid() % 1000, localhost))
       {
-        httpAddrFreeList(addrlist);
 	close(fd);
 
         return (CUPS_BACKEND_FAILED);
@@ -1056,7 +1038,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
                       CUPS_LLCAST filestats.st_size, (int)getpid() % 1000,
 		      localhost))
       {
-        httpAddrFreeList(addrlist);
 	close(fd);
 
         return (CUPS_BACKEND_FAILED);
@@ -1144,7 +1125,6 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
       if (lpd_command(fd, timeout, "\002%d cfA%03.3d%.15s\n", strlen(control),
                       (int)getpid() % 1000, localhost))
       {
-        httpAddrFreeList(addrlist);
 	close(fd);
 
         return (CUPS_BACKEND_FAILED);
@@ -1196,11 +1176,7 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     close(fd);
 
     if (status == 0)
-    {
-      httpAddrFreeList(addrlist);
-
       return (CUPS_BACKEND_OK);
-    }
 
    /*
     * Waiting for a retry...
@@ -1209,10 +1185,8 @@ lpd_queue(const char *hostname,		/* I - Host to connect to */
     sleep(30);
   }
 
-  httpAddrFreeList(addrlist);
-
  /*
-  * If we get here, then the job has been cancelled...
+  * If we get here, then the job has been canceled...
   */
 
   return (CUPS_BACKEND_FAILED);
