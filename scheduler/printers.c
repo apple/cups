@@ -3650,7 +3650,7 @@ add_printer_filter(
           (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
       {
 	snprintf(p->state_message, sizeof(p->state_message),
-		 "Printer driver \"%s\" has insecure permissions (%d/0%o)",
+		 "Printer driver \"%s\" has insecure permissions (%d/0%o).",
 		 filename, (int)fileinfo.st_uid, fileinfo.st_mode);
 
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
@@ -3673,7 +3673,7 @@ add_printer_filter(
 	{
 	  snprintf(p->state_message, sizeof(p->state_message),
 		   "Printer driver directory \"%s\" has insecure permissions "
-		   "(%d/0%o)", filename, (int)fileinfo.st_uid,
+		   "(%d/0%o).", filename, (int)fileinfo.st_uid,
 		   fileinfo.st_mode);
 
 	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
@@ -3843,6 +3843,8 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	  strlcat(pdl, "image/jpeg,", sizeof(pdl));
 	else if (!strcasecmp(type->type, "png"))
 	  strlcat(pdl, "image/png,", sizeof(pdl));
+	else if (!strcasecmp(type->type, "pwg-raster"))
+	  strlcat(pdl, "image/pwg-raster,", sizeof(pdl));
       }
     }
 
