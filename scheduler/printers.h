@@ -3,7 +3,7 @@
  *
  *   Printer definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -94,7 +94,8 @@ struct cupsd_printer_s
 		*alert_description;	/* PSX printer-alert-description value */
   time_t	marker_time;		/* Last time marker attributes were updated */
   cups_array_t	*filters,		/* Filters for queue */
-		*pre_filters;		/* Pre-filters for queue */
+		*pre_filters,		/* Pre-filters for queue */
+		*dest_types;		/* Destination types for queue */
   _pwg_t	*pwg;			/* PWG<->PPD mapping data */
 
 #ifdef HAVE_DNSSD

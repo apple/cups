@@ -2,9 +2,9 @@
 *%
 *% "$Id$"
 *%
-*%   Test HP PPD file for the Common UNIX Printing System (CUPS).
+*%   Test HP PPD file for CUPS.
 *%
-*%   Copyright 2007 by Apple Inc.
+*%   Copyright 2007-2011 by Apple Inc.
 *%   Copyright 1997-2005 by Easy Software Products.
 *%
 *%   These coded instructions, statements, and computer programs are the
@@ -19,10 +19,11 @@
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TESTHP.PPD"
 *Manufacturer:	"ESP"
-*Product:	"(CUPS v1.1)"
+*Product:	"(CUPS v1.5)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
-*cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
+*% cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
+*cupsFilter2:	"application/vnd.cups-raster application/vnd.hp-pcl 50 rastertohp"
 *ModelName:     "Test HP Printer"
 *ShortNickName: "Test HP Printer"
 *NickName:      "Test HP Printer CUPS v1.1"

@@ -1,8 +1,10 @@
-CHANGES.txt - 2011-02-16
+CHANGES.txt - 2011-02-18
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added support for a new cupsFilter2 keyword in PPD files to allow for
+	  the propagation of the actual MIME media type produced by a filter.
 	- The scheduler did not always get the correct Kerberos username when
 	  authenticating (STR #3670)
 	- Added new cupsRasterOpenIO function and CUPS_RASTER_WRITE_PWG to the
