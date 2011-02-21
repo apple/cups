@@ -442,7 +442,7 @@ cupsLangGet(const char *language)	/* I - Language or locale */
   strcpy(charset, "UTF8");
 
  /*
-  * Apple's setlocale doesn't give us the user's localization 
+  * Apple's setlocale doesn't give us the user's localization
   * preference so we have to look it up this way...
   */
 
@@ -946,7 +946,7 @@ _cupsMessageLoad(const char *filename,	/* I - Message catalog to load */
    /*
     * Find start of value...
     */
-    
+
     if ((ptr = strchr(s, '\"')) == NULL)
       continue;
 
@@ -1107,9 +1107,16 @@ _cupsMessageLookup(cups_array_t *a,	/* I - Message array */
 
       CFStringGetCString(cfstr, buffer, sizeof(buffer), kCFStringEncodingUTF8);
       match->str = strdup(buffer);
+
+      DEBUG_printf(("1_cupsMessageLookup: Found \"%s\" as \"%s\"...",
+                    m, buffer));
     }
     else
+    {
       match->str = strdup(m);
+
+      DEBUG_printf(("1_cupsMessageLookup: Did not find \"%s\"...", m));
+    }
 
     cupsArrayAdd(a, match);
 
@@ -1206,7 +1213,7 @@ appleLangDefault(void)
 	      {
 		DEBUG_printf(("9appleLangDefault: mapping \"%s\" to \"%s\"...",
 			      cg->language, apple_language_locale[i].locale));
-		strlcpy(cg->language, apple_language_locale[i].locale, 
+		strlcpy(cg->language, apple_language_locale[i].locale,
 			sizeof(cg->language));
 		break;
 	      }
@@ -1227,7 +1234,7 @@ appleLangDefault(void)
 
       CFRelease(localizationList);
     }
-  
+
    /*
     * If we didn't find the language, default to en_US...
     */
@@ -1264,8 +1271,14 @@ CF_RETURNS_RETAINED
   char			filename[1024],	/* Path to cups.strings file */
 			applelang[256];	/* Apple language ID */
   CFURLRef		url;		/* URL to cups.strings file */
-  CFReadStreamRef	stream;		/* File */
-  CFDictionaryRef	dict;		/* Localization dictionary */
+  CFReadStreamRef	stream = NULL;	/* File stream */
+  CFPropertyListRef	plist = NULL;	/* Localization file */
+#ifdef DEBUG
+  CFErrorRef		error = NULL;	/* Error when opening file */
+#endif /* DEBUG */
+
+
+  DEBUG_printf(("appleMessageLoad(locale=\"%s\")", locale));
 
  /*
   * Load the cups.strings file...
@@ -1274,23 +1287,87 @@ CF_RETURNS_RETAINED
   snprintf(filename, sizeof(filename),
            CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings",
 	   _cupsAppleLanguage(locale, applelang, sizeof(applelang)));
+  DEBUG_printf(("1appleMessageLoad: filename=\"%s\"", filename));
 
-  url    = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
-                                                   (UInt8 *)filename,
-						   strlen(filename), false);
-  stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
-  dict   = (CFDictionaryRef)CFPropertyListCreateWithStream(
-	       kCFAllocatorDefault, stream, 0, kCFPropertyListImmutable, NULL,
-	       NULL);
-  CFRelease(stream);
-  CFRelease(url);
+  if (access(filename, 0))
+  {
+   /*
+    * Try alternate lproj directory names...
+    */
+
+    if (!strncmp(locale, "en", 2))
+      locale = "English";
+    else if (!strncmp(locale, "nb", 2) || !strncmp(locale, "nl", 2))
+      locale = "Dutch";
+    else if (!strncmp(locale, "fr", 2))
+      locale = "French";
+    else if (!strncmp(locale, "de", 2))
+      locale = "German";
+    else if (!strncmp(locale, "it", 2))
+      locale = "Italian";
+    else if (!strncmp(locale, "ja", 2))
+      locale = "Japanese";
+    else if (!strncmp(locale, "es", 2))
+      locale = "Spanish";
+
+    snprintf(filename, sizeof(filename),
+	     CUPS_BUNDLEDIR "/Resources/%s.lproj/cups.strings", locale);
+    DEBUG_printf(("1appleMessageLoad: alternate filename=\"%s\"", filename));
+  }
+
+  url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
+                                                (UInt8 *)filename,
+						strlen(filename), false);
+  if (url)
+  {
+    stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
+    if (stream)
+    {
+      CFReadStreamOpen(stream);
+
+#ifdef DEBUG
+      plist = CFPropertyListCreateWithStream(kCFAllocatorDefault, stream, 0,
+                                             kCFPropertyListImmutable, NULL,
+                                             &error);
+      if (error)
+      {
+        CFStringRef	msg = CFErrorCopyDescription(error);
+    					/* Error message */
+
+        CFStringGetCString(msg, filename, sizeof(filename),
+                           kCFStringEncodingUTF8);
+        DEBUG_printf(("1appleMessageLoad: %s", filename));
+
+        CFRelease(error);
+      }
+
+#else
+      plist = CFPropertyListCreateWithStream(kCFAllocatorDefault, stream, 0,
+                                             kCFPropertyListImmutable, NULL,
+                                             NULL);
+#endif /* DEBUG */
+
+      if (plist && CFGetTypeID(plist) != CFDictionaryGetTypeID())
+      {
+         CFRelease(plist);
+         plist = NULL;
+      }
+
+      CFRelease(stream);
+    }
+
+    CFRelease(url);
+  }
+
+  DEBUG_printf(("1appleMessageLoad: url=%p, stream=%p, plist=%p", url, stream,
+                plist));
 
  /*
   * Create and return an empty array to act as a cache for messages, passing the
-  * dictionary as the user data.
+  * plist as the user data.
   */
 
-  return (cupsArrayNew3((cups_array_func_t)cups_message_compare, (void *)dict,
+  return (cupsArrayNew3((cups_array_func_t)cups_message_compare, (void *)plist,
                         (cups_ahash_func_t)NULL, 0,
 			(cups_acopy_func_t)NULL,
 			(cups_afree_func_t)cups_message_free));
