@@ -3,7 +3,7 @@
  *
  *   GZIP/raw pre-filter for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1993-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -76,8 +76,6 @@ main(int  argc,				/* I - Number of command-line arguments */
   * Copy the file to stdout...
   */
 
-  setbuf(stdout, NULL);
-
   while (copies > 0)
   {
     if (!getenv("FINAL_CONTENT_TYPE"))
@@ -86,11 +84,11 @@ main(int  argc,				/* I - Number of command-line arguments */
     cupsFileRewind(fp);
 
     while ((bytes = cupsFileRead(fp, buffer, sizeof(buffer))) > 0)
-      if (fwrite(buffer, 1, bytes, stdout) < bytes)
+      if (write(1, buffer, bytes) < bytes)
       {
 	_cupsLangPrintFilter(stderr, "ERROR",
 			     _("Unable to write uncompressed print data: %s"),
-			     strerror(ferror(stdout)));
+			     strerror(errno));
 	cupsFileClose(fp);
 
 	return (1);
