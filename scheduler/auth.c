@@ -401,7 +401,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     return;
   }
 #ifdef HAVE_AUTHORIZATION_H
-  else if (!strncmp(authorization, "AuthRef", 6) && 
+  else if (!strncmp(authorization, "AuthRef", 6) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
     OSStatus		status;		/* Status */
@@ -435,21 +435,58 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
-    strlcpy(username, "_AUTHREF_", sizeof(username));
+    username[0] = '\0';
 
-    if (!AuthorizationCopyInfo(con->authref, kAuthorizationEnvironmentUsername, 
+    if (!AuthorizationCopyInfo(con->authref, kAuthorizationEnvironmentUsername,
 			       &authinfo))
     {
       if (authinfo->count == 1 && authinfo->items[0].value &&
           authinfo->items[0].valueLength >= 2)
+      {
         strlcpy(username, authinfo->items[0].value, sizeof(username));
+
+        cupsdLogMessage(CUPSD_LOG_DEBUG,
+		        "cupsdAuthorize: Authorized as \"%s\" using AuthRef",
+		        username);
+      }
 
       AuthorizationFreeItemSet(authinfo);
     }
 
-    cupsdLogMessage(CUPSD_LOG_DEBUG,
-		    "cupsdAuthorize: Authorized as \"%s\" using AuthRef",
-		    username);
+    if (!username[0])
+    {
+     /*
+      * No username in AuthRef, grab username using peer credentials...
+      */
+
+      struct passwd	*pwd;		/* Password entry for this user */
+      cupsd_ucred_t	peercred;	/* Peer credentials */
+      socklen_t		peersize;	/* Size of peer credentials */
+
+      peersize = sizeof(peercred);
+
+      if (getsockopt(con->http.fd, 0, LOCAL_PEERCRED, &peercred, &peersize))
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to get peer credentials - %s",
+                        strerror(errno));
+        return;
+      }
+
+      if ((pwd = getpwuid(CUPSD_UCRED_UID(peercred))) == NULL)
+      {
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+                        "Unable to find UID %d for peer credentials.",
+                        (int)CUPSD_UCRED_UID(peercred));
+        return;
+      }
+
+      strlcpy(username, pwd->pw_name, sizeof(username));
+
+      cupsdLogMessage(CUPSD_LOG_DEBUG,
+		      "cupsdAuthorize: Authorized as \"%s\" using "
+		      "AuthRef + PeerCred", username);
+    }
+
     con->type = CUPSD_AUTH_BASIC;
   }
 #endif /* HAVE_AUTHORIZATION_H */
@@ -944,7 +981,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 #ifdef HAVE_GSSAPI
 #  ifdef HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID
   else if (con->http.hostaddr->addr.sa_family == AF_LOCAL &&
-           !strncmp(authorization, "Negotiate", 9)) 
+           !strncmp(authorization, "Negotiate", 9))
   {
    /*
     * Pull the credentials directly from the user...
@@ -1040,7 +1077,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     krb5_ipc_client_clear_target();
   }
 #  endif /* HAVE_KRB5_IPC_CLIENT_SET_TARGET_UID */
-  else if (!strncmp(authorization, "Negotiate", 9)) 
+  else if (!strncmp(authorization, "Negotiate", 9))
   {
     int			len;		/* Length of authorization string */
     gss_ctx_id_t	context;	/* Authorization context */
@@ -1103,7 +1140,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     client_name  = GSS_C_NO_NAME;
     major_status = gss_accept_sec_context(&minor_status,
 					  &context,
-					  GSS_C_NO_CREDENTIAL, 
+					  GSS_C_NO_CREDENTIAL,
 					  &input_token,
 					  GSS_C_NO_CHANNEL_BINDINGS,
 					  &client_name,
@@ -1139,7 +1176,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 			 "cupsdAuthorize: Credentials not complete");
     else if (major_status == GSS_S_COMPLETE)
     {
-      major_status = gss_display_name(&minor_status, client_name, 
+      major_status = gss_display_name(&minor_status, client_name,
 				      &output_token, NULL);
 
       if (GSS_ERROR(major_status))
@@ -2093,7 +2130,7 @@ cupsdIsAuthorized(cupsd_client_t *con,	/* I - Connection */
   if ((best->encryption >= HTTP_ENCRYPT_REQUIRED && !con->http.tls &&
       strcasecmp(con->http.hostname, "localhost") &&
       best->satisfy == CUPSD_AUTH_SATISFY_ALL) &&
-      !(type == CUPSD_AUTH_NEGOTIATE || 
+      !(type == CUPSD_AUTH_NEGOTIATE ||
         (type == CUPSD_AUTH_NONE && DefaultAuthType == CUPSD_AUTH_NEGOTIATE)))
   {
     cupsdLogMessage(CUPSD_LOG_DEBUG,
@@ -2375,11 +2412,11 @@ check_authref(cupsd_client_t *con,	/* I - Connection */
   authrights.count = 1;
   authrights.items = &authright;
 
-  authflags = kAuthorizationFlagDefaults | 
+  authflags = kAuthorizationFlagDefaults |
 	      kAuthorizationFlagExtendRights;
 
-  if ((status = AuthorizationCopyRights(con->authref, &authrights, 
-					kAuthorizationEmptyEnvironment, 
+  if ((status = AuthorizationCopyRights(con->authref, &authrights,
+					kAuthorizationEmptyEnvironment,
 					authflags, NULL)) != 0)
   {
     cupsdLogMessage(CUPSD_LOG_ERROR,
