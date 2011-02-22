@@ -401,7 +401,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     return;
   }
 #ifdef HAVE_AUTHORIZATION_H
-  else if (!strncmp(authorization, "AuthRef", 6) &&
+  else if (!strncmp(authorization, "AuthRef ", 8) &&
            !strcasecmp(con->http.hostname, "localhost"))
   {
     OSStatus		status;		/* Status */
@@ -412,7 +412,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the Authorization Services data...
     */
 
-    authorization += 7;
+    authorization += 8;
     while (isspace(*authorization & 255))
       authorization ++;
 
