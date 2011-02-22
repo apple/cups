@@ -1373,7 +1373,7 @@ main(int  argc,				/* I - Number of command-line args */
 
           if (job_state->values[0].integer > IPP_JOB_STOPPED)
 	  {
-	    if ((job_sheets = ippFindAttribute(response, 
+	    if ((job_sheets = ippFindAttribute(response,
 	                                       "job-media-sheets-completed",
 	                                       IPP_TAG_INTEGER)) != NULL)
 	      fprintf(stderr, "PAGE: total %d\n",
@@ -1437,7 +1437,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Collect the final page count as needed...
   */
 
-  if (have_supplies && 
+  if (have_supplies &&
       !backendSNMPSupplies(snmp_fd, http->hostaddr, &page_count, NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
@@ -1797,7 +1797,7 @@ new_request(
     int             num_options,	/* I - Number of options to send */
     cups_option_t   *options,		/* I - Options to send */
     const char      *compression,	/* I - compression value or NULL */
-    int             copies,		/* I - copies value or 0 */ 
+    int             copies,		/* I - copies value or 0 */
     const char      *format,		/* I - documet-format value or NULL */
     _pwg_t          *pwg,		/* I - PWG<->PPD mapping data */
     ipp_attribute_t *media_col_sup)	/* I - media-col-supported values */
@@ -2126,6 +2126,8 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   const char		*prefix;	/* Prefix for STATE: line */
   char			value[1024],	/* State/message string */
 			*valptr;	/* Pointer into string */
+  static int		ipp_supplies = -1;
+					/* Report supply levels? */
 
 
  /*
@@ -2209,23 +2211,43 @@ report_printer_state(ipp_t *ipp,	/* I - IPP response */
   * Relay the current marker-* attribute values...
   */
 
-  if ((marker = ippFindAttribute(ipp, "marker-colors", IPP_TAG_NAME)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-high-levels",
-                                 IPP_TAG_INTEGER)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-levels",
-                                 IPP_TAG_INTEGER)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-low-levels",
-                                 IPP_TAG_INTEGER)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-message", IPP_TAG_TEXT)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-names", IPP_TAG_NAME)) != NULL)
-    report_attr(marker);
-  if ((marker = ippFindAttribute(ipp, "marker-types", IPP_TAG_KEYWORD)) != NULL)
-    report_attr(marker);
+  if (ipp_supplies < 0)
+  {
+    ppd_file_t	*ppd;			/* PPD file */
+    ppd_attr_t	*ppdattr;		/* Attribute in PPD file */
+
+    if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL &&
+        (ppdattr = ppdFindAttr(ppd, "cupsIPPSupplies", NULL)) != NULL &&
+        ppdattr->value && strcasecmp(ppdattr->value, "true"))
+      ipp_supplies = 0;
+    else
+      ipp_supplies = 1;
+
+    ppdClose(ppd);
+  }
+
+  if (ipp_supplies > 0)
+  {
+    if ((marker = ippFindAttribute(ipp, "marker-colors", IPP_TAG_NAME)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-high-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-low-levels",
+                                   IPP_TAG_INTEGER)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-message",
+                                   IPP_TAG_TEXT)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-names", IPP_TAG_NAME)) != NULL)
+      report_attr(marker);
+    if ((marker = ippFindAttribute(ipp, "marker-types",
+                                   IPP_TAG_KEYWORD)) != NULL)
+      report_attr(marker);
+  }
 
   return (count);
 }

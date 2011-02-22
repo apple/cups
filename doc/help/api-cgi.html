@@ -2,9 +2,10 @@
 <html>
 <!-- SECTION: Programming -->
 <head>
-<title>CGI API</title>
-<meta name="keywords" content="Programming">
-<meta name="creator" content="Mini-XML v2.6">
+	<title>CGI API	</title>
+	<meta name="keywords" content="Programming">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta name="creator" content="Mini-XML v2.7">
 <style type="text/css"><!--
 BODY {
   font-family: lucida grande, geneva, helvetica, arial, sans-serif;
@@ -375,53 +376,52 @@ div.contents ul.subcontents li {
 </table></div>
 <h2 class="title">Contents</h2>
 <ul class="contents">
-<ul class="subcontents">
 <li><a href="#OVERVIEW">Overview</a></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
-<li><a href="#cgiCheckVariables" title="Check for the presence of &quot;required&quot; variables.">cgiCheckVariables</a></li>
-<li><a href="#cgiClearVariables" title="Clear all form variables.">cgiClearVariables</a></li>
-<li><a href="#cgiCompileSearch" title="Compile a search string.">cgiCompileSearch</a></li>
-<li><a href="#cgiCopyTemplateFile" title="Copy a template file and replace all the
+	<li><a href="#cgiCheckVariables" title="Check for the presence of &quot;required&quot; variables.">cgiCheckVariables</a></li>
+	<li><a href="#cgiClearVariables" title="Clear all form variables.">cgiClearVariables</a></li>
+	<li><a href="#cgiCompileSearch" title="Compile a search string.">cgiCompileSearch</a></li>
+	<li><a href="#cgiCopyTemplateFile" title="Copy a template file and replace all the
 '{variable}' strings with the variable value.">cgiCopyTemplateFile</a></li>
-<li><a href="#cgiCopyTemplateLang" title="Copy a template file using a language...">cgiCopyTemplateLang</a></li>
-<li><a href="#cgiDoSearch" title="Do a search of some text.">cgiDoSearch</a></li>
-<li><a href="#cgiEndHTML" title="End a HTML page.">cgiEndHTML</a></li>
-<li><a href="#cgiEndMultipart" title="End the delivery of a multipart web page.">cgiEndMultipart</a></li>
-<li><a href="#cgiFormEncode" title="Encode a string as a form variable.">cgiFormEncode</a></li>
-<li><a href="#cgiFreeSearch" title="Free a compiled search context.">cgiFreeSearch</a></li>
-<li><a href="#cgiGetArray" title="Get an element from a form array.">cgiGetArray</a></li>
-<li><a href="#cgiGetAttributes" title="Get the list of attributes that are needed
+	<li><a href="#cgiCopyTemplateLang" title="Copy a template file using a language...">cgiCopyTemplateLang</a></li>
+	<li><a href="#cgiDoSearch" title="Do a search of some text.">cgiDoSearch</a></li>
+	<li><a href="#cgiEndHTML" title="End a HTML page.">cgiEndHTML</a></li>
+	<li><a href="#cgiEndMultipart" title="End the delivery of a multipart web page.">cgiEndMultipart</a></li>
+	<li><a href="#cgiFormEncode" title="Encode a string as a form variable.">cgiFormEncode</a></li>
+	<li><a href="#cgiFreeSearch" title="Free a compiled search context.">cgiFreeSearch</a></li>
+	<li><a href="#cgiGetArray" title="Get an element from a form array.">cgiGetArray</a></li>
+	<li><a href="#cgiGetAttributes" title="Get the list of attributes that are needed
 by the template file.">cgiGetAttributes</a></li>
-<li><a href="#cgiGetCookie" title="Get a cookie value.">cgiGetCookie</a></li>
-<li><a href="#cgiGetFile" title="Get the file (if any) that was submitted in the form.">cgiGetFile</a></li>
-<li><a href="#cgiGetIPPObjects" title="Get the objects in an IPP response.">cgiGetIPPObjects</a></li>
-<li><a href="#cgiGetSize" title="Get the size of a form array value.">cgiGetSize</a></li>
-<li><a href="#cgiGetTemplateDir" title="Get the templates directory...">cgiGetTemplateDir</a></li>
-<li><a href="#cgiGetVariable" title="Get a CGI variable from the database.">cgiGetVariable</a></li>
-<li><a href="#cgiInitialize" title="Initialize the CGI variable &quot;database&quot;.">cgiInitialize</a></li>
-<li><a href="#cgiIsPOST" title="Determine whether this page was POSTed.">cgiIsPOST</a></li>
-<li><a href="#cgiMoveJobs" title="Move one or more jobs.">cgiMoveJobs</a></li>
-<li><a href="#cgiPrintCommand" title="Print a CUPS command job.">cgiPrintCommand</a></li>
-<li><a href="#cgiPrintTestPage" title="Print a test page.">cgiPrintTestPage</a></li>
-<li><a href="#cgiRewriteURL" title="Rewrite a printer URI into a web browser URL...">cgiRewriteURL</a></li>
-<li><a href="#cgiSetArray" title="Set array element N to the specified string.">cgiSetArray</a></li>
-<li><a href="#cgiSetCookie" title="Set a cookie value.">cgiSetCookie</a></li>
-<li><a href="#cgiSetIPPObjectVars" title="Set CGI variables from an IPP object.">cgiSetIPPObjectVars</a></li>
-<li><a href="#cgiSetIPPVars" title="Set CGI variables from an IPP response.">cgiSetIPPVars</a></li>
-<li><a href="#cgiSetServerVersion" title="Set the server name and CUPS version...">cgiSetServerVersion</a></li>
-<li><a href="#cgiSetSize" title="Set the array size.">cgiSetSize</a></li>
-<li><a href="#cgiSetVariable" title="Set a CGI variable in the database.">cgiSetVariable</a></li>
-<li><a href="#cgiShowIPPError" title="Show the last IPP error message.">cgiShowIPPError</a></li>
-<li><a href="#cgiShowJobs" title="Show print jobs.">cgiShowJobs</a></li>
-<li><a href="#cgiStartHTML" title="Start a HTML page.">cgiStartHTML</a></li>
-<li><a href="#cgiStartMultipart" title="Start a multipart delivery of a web page.">cgiStartMultipart</a></li>
-<li><a href="#cgiSupportsMultipart" title="Does the browser support multi-part documents?">cgiSupportsMultipart</a></li>
-<li><a href="#cgiText" title="Return localized text.">cgiText</a></li>
-<li><a href="#helpDeleteIndex" title="Delete an index, freeing all memory used.">helpDeleteIndex</a></li>
-<li><a href="#helpFindNode" title="Find a node in an index.">helpFindNode</a></li>
-<li><a href="#helpLoadIndex" title="Load a help index from disk.">helpLoadIndex</a></li>
-<li><a href="#helpSaveIndex" title="Save a help index to disk.">helpSaveIndex</a></li>
-<li><a href="#helpSearchIndex" title="Search an index.">helpSearchIndex</a></li>
+	<li><a href="#cgiGetCookie" title="Get a cookie value.">cgiGetCookie</a></li>
+	<li><a href="#cgiGetFile" title="Get the file (if any) that was submitted in the form.">cgiGetFile</a></li>
+	<li><a href="#cgiGetIPPObjects" title="Get the objects in an IPP response.">cgiGetIPPObjects</a></li>
+	<li><a href="#cgiGetSize" title="Get the size of a form array value.">cgiGetSize</a></li>
+	<li><a href="#cgiGetTemplateDir" title="Get the templates directory...">cgiGetTemplateDir</a></li>
+	<li><a href="#cgiGetVariable" title="Get a CGI variable from the database.">cgiGetVariable</a></li>
+	<li><a href="#cgiInitialize" title="Initialize the CGI variable &quot;database&quot;.">cgiInitialize</a></li>
+	<li><a href="#cgiIsPOST" title="Determine whether this page was POSTed.">cgiIsPOST</a></li>
+	<li><a href="#cgiMoveJobs" title="Move one or more jobs.">cgiMoveJobs</a></li>
+	<li><a href="#cgiPrintCommand" title="Print a CUPS command job.">cgiPrintCommand</a></li>
+	<li><a href="#cgiPrintTestPage" title="Print a test page.">cgiPrintTestPage</a></li>
+	<li><a href="#cgiRewriteURL" title="Rewrite a printer URI into a web browser URL...">cgiRewriteURL</a></li>
+	<li><a href="#cgiSetArray" title="Set array element N to the specified string.">cgiSetArray</a></li>
+	<li><a href="#cgiSetCookie" title="Set a cookie value.">cgiSetCookie</a></li>
+	<li><a href="#cgiSetIPPObjectVars" title="Set CGI variables from an IPP object.">cgiSetIPPObjectVars</a></li>
+	<li><a href="#cgiSetIPPVars" title="Set CGI variables from an IPP response.">cgiSetIPPVars</a></li>
+	<li><a href="#cgiSetServerVersion" title="Set the server name and CUPS version...">cgiSetServerVersion</a></li>
+	<li><a href="#cgiSetSize" title="Set the array size.">cgiSetSize</a></li>
+	<li><a href="#cgiSetVariable" title="Set a CGI variable in the database.">cgiSetVariable</a></li>
+	<li><a href="#cgiShowIPPError" title="Show the last IPP error message.">cgiShowIPPError</a></li>
+	<li><a href="#cgiShowJobs" title="Show print jobs.">cgiShowJobs</a></li>
+	<li><a href="#cgiStartHTML" title="Start a HTML page.">cgiStartHTML</a></li>
+	<li><a href="#cgiStartMultipart" title="Start a multipart delivery of a web page.">cgiStartMultipart</a></li>
+	<li><a href="#cgiSupportsMultipart" title="Does the browser support multi-part documents?">cgiSupportsMultipart</a></li>
+	<li><a href="#cgiText" title="Return localized text.">cgiText</a></li>
+	<li><a href="#helpDeleteIndex" title="Delete an index, freeing all memory used.">helpDeleteIndex</a></li>
+	<li><a href="#helpFindNode" title="Find a node in an index.">helpFindNode</a></li>
+	<li><a href="#helpLoadIndex" title="Load a help index from disk.">helpLoadIndex</a></li>
+	<li><a href="#helpSaveIndex" title="Save a help index to disk.">helpSaveIndex</a></li>
+	<li><a href="#helpSearchIndex" title="Search an index.">helpSearchIndex</a></li>
 </ul></li>
 <li><a href="#TYPES">Data Types</a><ul class="code">
 	<li><a href="#cgi_file_t" title="Uploaded file data">cgi_file_t</a></li>
@@ -435,6 +435,7 @@ by the template file.">cgiGetAttributes</a></li>
 	<li><a href="#help_node_s" title="Help node structure...">help_node_s</a></li>
 	<li><a href="#help_word_s" title="Help word structure...">help_word_s</a></li>
 </ul></li>
+</ul>
 <!--
   "$Id$"
 
