@@ -15,14 +15,14 @@
 *%
 *FormatVersion:	"4.3"
 *FileVersion:	"1.1"
-*LanguageVersion: English 
+*LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName:	"TESTHP.PPD"
 *Manufacturer:	"ESP"
 *Product:	"(CUPS v1.5)"
 *cupsVersion:	1.1
 *cupsManualCopies: True
-*% cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
+*cupsFilter:	"application/vnd.cups-raster 50 rastertohp"
 *cupsFilter2:	"application/vnd.cups-raster application/vnd.hp-pcl 50 rastertohp"
 *ModelName:     "Test HP Printer"
 *ShortNickName: "Test HP Printer"
@@ -83,7 +83,7 @@
 *PageRegion EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 
-*DefaultImageableArea: Letter 
+*DefaultImageableArea: Letter
 *ImageableArea Letter/US Letter:	"18 36 594 756"
 *ImageableArea Legal/US Legal:		"18 36 594 972"
 *ImageableArea Executive/US Executive:	"18 36 504 684"
