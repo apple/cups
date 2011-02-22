@@ -445,7 +445,7 @@ backendWaitLoop(
 	  snmp_fd, addr, side_cb);
 
  /*
-  * Now loop until we are out of data from print_fd...
+  * Now loop until we are out of data from stdin...
   */
 
   for (;;)
