@@ -1,5 +1,6 @@
 _cups_debug_fd
 _cupsGet1284Values
+_cupsGetDests
 _cupsGetPassword
 _cupsGlobals
 _cupsLangPrintError
