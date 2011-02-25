@@ -152,7 +152,7 @@
 				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="2"
-				ModuleDefinitionFile="..\vc2005\libcups2.def"
+				ModuleDefinitionFile="..\cups\libcups2.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(PlatformName)\$(ConfigurationName)\libcups2.pdb"
 				SubSystem="2"
@@ -260,7 +260,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not &quot;%RC_XBS%&quot; == &quot;YES&quot; goto END&#x0D;&#x0A;if not exist &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;   mkdir &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;&#x0D;&#x0A;xcopy /I/Y &quot;$(TargetPath)&quot;                                                                  &quot;$(DSTROOT)\Program Files\Bonjour\$(PlatformName)&quot;&#x0D;&#x0A;:END&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -312,7 +312,7 @@
 				AdditionalDependencies="ws2_32.lib advapi32.lib"
 				OutputFile="$(OutDir)\libcups2.dll"
 				LinkIncremental="1"
-				ModuleDefinitionFile="..\vc2005\libcups2.def"
+				ModuleDefinitionFile="..\cups\libcups2.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="libcups2.pdb"
 				SubSystem="2"

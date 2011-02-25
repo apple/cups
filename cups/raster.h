@@ -55,6 +55,8 @@ extern "C" {
 #  define CUPS_RASTER_SYNCv2	0x52615332	/* RaS2 */
 #  define CUPS_RASTER_REVSYNCv2	0x32536152	/* 2SaR */
 
+#  define CUPS_RASTER_SYNC_PWG	CUPS_RASTER_SYNCv2
+
 
 /*
  * The following definition can be used to determine if the
@@ -171,7 +173,8 @@ enum cups_mode_e			/**** cupsRasterOpen modes ****/
 {
   CUPS_RASTER_READ = 0,			/* Open stream for reading */
   CUPS_RASTER_WRITE = 1,		/* Open stream for writing */
-  CUPS_RASTER_WRITE_COMPRESSED = 2	/* Open stream for compressed writing @since CUPS 1.3/Mac OS X 10.5@ */
+  CUPS_RASTER_WRITE_COMPRESSED = 2,	/* Open stream for compressed writing @since CUPS 1.3/Mac OS X 10.5@ */
+  CUPS_RASTER_WRITE_PWG = 3		/* Open stream for compressed writing in PWG mode @since CUPS 1.5@ */
 };
 
 typedef enum cups_mode_e cups_mode_t;	/**** cupsRasterOpen modes ****/
@@ -331,6 +334,19 @@ typedef int (*cups_interpret_cb_t)(cups_page_header2_t *header, int preferred_bi
 					 * dictionary and is 0 if undefined.
 					 ****/
 
+/**** New in CUPS 1.5 ****/
+typedef ssize_t (*cups_raster_iocb_t)(void *ctx, unsigned char *buffer, size_t length);
+					/**** cupsRasterOpenIO callback function
+					 *
+					 * This function is specified when
+					 * creating a raster stream with
+					 * @link cupsRasterOpenIO@ and handles
+					 * generic reading and writing of raster
+					 * data. It must return -1 on error or
+					 * the number of bytes specified by
+					 * "length" on success.
+					 ****/
+
 
 /*
  * Prototypes...
@@ -360,6 +376,10 @@ extern unsigned		cupsRasterWriteHeader2(cups_raster_t *r,
 
 /**** New in CUPS 1.3 ****/
 extern const char	*cupsRasterErrorString(void) _CUPS_API_1_3;
+
+/**** New in CUPS 1.5 ****/
+extern cups_raster_t	*cupsRasterOpenIO(cups_raster_iocb_t iocb, void *ctx,
+			                  cups_mode_t mode);
 
 #  ifdef __cplusplus
 }

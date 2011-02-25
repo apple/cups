@@ -311,6 +311,7 @@
 
 #undef HAVE_SECIDENTITYSEARCHCREATEWITHPOLICY
 
+
 /*
  * Do we have the SecPolicyCreateSSL function?
  */

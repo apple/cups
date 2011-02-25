@@ -313,7 +313,8 @@ extern int		_httpAddrPort(http_addr_t *addr);
 extern http_tls_credentials_t
 			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,
-			             http_encryption_t encryption,
+			             http_addrlist_t *addrlist,
+				     http_encryption_t encryption,
 				     int family);
 extern char		*_httpDecodeURI(char *dst, const char *src,
 			                size_t dstsize);

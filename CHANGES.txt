@@ -1,8 +1,17 @@
-CHANGES.txt - 2011-01-21
+CHANGES.txt - 2011-02-21
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added support for a new cupsIPPSupplies keyword in PPD files to allow
+	  drivers to disable IPP supply level reporting.
+	- Added support for a new cupsFilter2 keyword in PPD files to allow for
+	  the propagation of the actual MIME media type produced by a filter.
+	- The scheduler did not always get the correct Kerberos username when
+	  authenticating (STR #3670)
+	- Added new cupsRasterOpenIO function and CUPS_RASTER_WRITE_PWG to the
+	  CUPS imaging library to support printing to IPP Everywhere raster
+	  printers.
 	- The scheduler now provides default values for the pages-per-minute and
 	  pages-per-minute-color attributes for PPD files that lack a
 	  Throughput keyword.
@@ -21,7 +30,7 @@ CHANGES IN CUPS V1.5b1
 	  elements.
 	- Added several new color spaces to the CUPS raster format (STR #3419)
 	- The Validate-Job operation now uses the same policy as Print-Job by
-	  default. 
+	  default.
 	- CUPS now uses iconv to implement all of its character encoding
 	  support (STR #3097)
 	- The scheduler now implements the Cancel-Jobs, Cancel-My-Jobs, and

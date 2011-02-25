@@ -263,10 +263,10 @@ cupsRasterInterpretPPD(
   if ((val = cupsGetOption("cupsBorderlessScalingFactor", num_options,
                            options)) != NULL)
   {
-    float sc = atof(val);
+    double sc = atof(val);		/* Scale factor */
 
     if (sc >= 0.1 && sc <= 2.0)
-      h->cupsBorderlessScalingFactor = sc;
+      h->cupsBorderlessScalingFactor = (float)sc;
   }
 
  /*
@@ -301,20 +301,26 @@ cupsRasterInterpretPPD(
     top    = 792.0f;
   }
 
-  h->PageSize[0]           = h->cupsPageSize[0] *
-                             h->cupsBorderlessScalingFactor;
-  h->PageSize[1]           = h->cupsPageSize[1] *
-                             h->cupsBorderlessScalingFactor;
-  h->Margins[0]            = left * h->cupsBorderlessScalingFactor;
-  h->Margins[1]            = bottom * h->cupsBorderlessScalingFactor;
-  h->ImagingBoundingBox[0] = left * h->cupsBorderlessScalingFactor;
-  h->ImagingBoundingBox[1] = bottom * h->cupsBorderlessScalingFactor;
-  h->ImagingBoundingBox[2] = right * h->cupsBorderlessScalingFactor;
-  h->ImagingBoundingBox[3] = top * h->cupsBorderlessScalingFactor;
-  h->cupsImagingBBox[0]    = left;
-  h->cupsImagingBBox[1]    = bottom;
-  h->cupsImagingBBox[2]    = right;
-  h->cupsImagingBBox[3]    = top;
+  h->PageSize[0]           = (unsigned)(h->cupsPageSize[0] *
+                                        h->cupsBorderlessScalingFactor);
+  h->PageSize[1]           = (unsigned)(h->cupsPageSize[1] *
+                                        h->cupsBorderlessScalingFactor);
+  h->Margins[0]            = (unsigned)(left *
+                                        h->cupsBorderlessScalingFactor);
+  h->Margins[1]            = (unsigned)(bottom *
+                                        h->cupsBorderlessScalingFactor);
+  h->ImagingBoundingBox[0] = (unsigned)(left *
+                                        h->cupsBorderlessScalingFactor);
+  h->ImagingBoundingBox[1] = (unsigned)(bottom *
+                                        h->cupsBorderlessScalingFactor);
+  h->ImagingBoundingBox[2] = (unsigned)(right *
+                                        h->cupsBorderlessScalingFactor);
+  h->ImagingBoundingBox[3] = (unsigned)(top *
+                                        h->cupsBorderlessScalingFactor);
+  h->cupsImagingBBox[0]    = (float)left;
+  h->cupsImagingBBox[1]    = (float)bottom;
+  h->cupsImagingBBox[2]    = (float)right;
+  h->cupsImagingBBox[3]    = (float)top;
 
  /*
   * Use the callback to validate the page header...
@@ -1454,8 +1460,8 @@ setpagedevice(
       if (obj[1].type == CUPS_PS_NUMBER && obj[2].type == CUPS_PS_NUMBER &&
           obj[3].type == CUPS_PS_END_ARRAY)
       {
-        h->cupsPageSize[0] = obj[1].value.number;
-	h->cupsPageSize[1] = obj[2].value.number;
+        h->cupsPageSize[0] = (float)obj[1].value.number;
+	h->cupsPageSize[1] = (float)obj[2].value.number;
 
         h->PageSize[0] = (unsigned)obj[1].value.number;
 	h->PageSize[1] = (unsigned)obj[2].value.number;
@@ -1492,7 +1498,7 @@ setpagedevice(
       h->cupsRowStep = (unsigned)obj->value.number;
     else if (!strcmp(name, "cupsBorderlessScalingFactor") &&
              obj->type == CUPS_PS_NUMBER)
-      h->cupsBorderlessScalingFactor = obj->value.number;
+      h->cupsBorderlessScalingFactor = (float)obj->value.number;
     else if (!strncmp(name, "cupsInteger", 11) && obj->type == CUPS_PS_NUMBER)
     {
       if ((i = atoi(name + 11)) < 0 || i > 15)
@@ -1505,7 +1511,7 @@ setpagedevice(
       if ((i = atoi(name + 8)) < 0 || i > 15)
         return (-1);
 
-      h->cupsReal[i] = obj->value.number;
+      h->cupsReal[i] = (float)obj->value.number;
     }
     else if (!strncmp(name, "cupsString", 10) && obj->type == CUPS_PS_STRING)
     {

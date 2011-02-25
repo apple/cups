@@ -1979,7 +1979,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
   }
   else if ((attr = ippFindAttribute(job->attrs, "job-sheets",
                                     IPP_TAG_ZERO)) != NULL)
-    job->sheets = attr;
+    job->job_sheets = attr;
 
  /*
   * Fill in the response info...
@@ -3203,7 +3203,7 @@ apple_init_profile(
 #  ifdef HAVE_COLORSYNCREGISTERDEVICE
  if (iccfile)
  {
-    url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, 
+    url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault,
 						  (const UInt8 *)iccfile,
                                                   strlen(iccfile), false);
 
@@ -4177,7 +4177,11 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
 
   cupsdReleaseJob(job);
 
+  cupsdAddEvent(CUPSD_EVENT_JOB_STATE, NULL, job, "Job authenticated by user");
+
   cupsdLogJob(job, CUPSD_LOG_INFO, "Authenticated by \"%s\".", con->username);
+
+  cupsdCheckJobs();
 }
 
 
@@ -5284,7 +5288,7 @@ copy_attrs(ipp_t        *to,		/* I - Destination request */
          fromattr->group_tag != IPP_TAG_ZERO) || !fromattr->name)
       continue;
 
-    if (exclude && 
+    if (exclude &&
         (cupsArrayFind(exclude, fromattr->name) ||
 	 cupsArrayFind(exclude, "all")))
     {

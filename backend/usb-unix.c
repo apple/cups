@@ -1,11 +1,11 @@
 /*
  * "$Id: usb-unix.c 7810 2008-07-29 01:11:15Z mike $"
  *
- *   USB port backend for the Common UNIX Printing System (CUPS).
+ *   USB port backend for CUPS.
  *
  *   This file is included from "usb.c" when compiled on UNIX/Linux.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -201,7 +201,7 @@ print_device(const char *uri,		/* I - Device URI */
 
   close(device_fd);
 
-  return (tbytes < 0 ? CUPS_BACKEND_FAILED : CUPS_BACKEND_OK);
+  return (CUPS_BACKEND_OK);
 }
 
 

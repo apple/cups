@@ -3,7 +3,7 @@
  *
  *   Private definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -31,6 +31,10 @@
 #  include "language-private.h"
 #  include "pwg-private.h"
 #  include "thread-private.h"
+#  ifdef __APPLE__
+#    include <sys/cdefs.h>
+#    include <CoreFoundation/CoreFoundation.h>
+#  endif /* __APPLE__ */
 
 
 /*
@@ -155,9 +159,18 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
  * Prototypes...
  */
 
+#  ifdef __APPLE__
+extern CFStringRef	_cupsAppleCopyDefaultPaperID(void);
+extern int		_cupsAppleGetUseLastPrinter(void);
+extern void		_cupsAppleSetDefaultPaperID(CFStringRef name);
+extern void		_cupsAppleSetUseLastPrinter(int uselast);
+#  endif /* __APPLE__ */
+
 extern http_t		*_cupsConnect(void);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
+extern int		_cupsGetDests(http_t *http, ipp_op_t op,
+			              const char *name, cups_dest_t **dests);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);

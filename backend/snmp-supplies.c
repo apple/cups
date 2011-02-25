@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   SNMP supplies functions for the Common UNIX Printing System (CUPS).
+ *   SNMP supplies functions for CUPS.
  *
- *   Copyright 2008-2009 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -36,6 +36,17 @@
 #define CUPS_MAX_SUPPLIES	32	/* Maximum number of supplies for a printer */
 #define CUPS_SUPPLY_TIMEOUT	2.0	/* Timeout for SNMP lookups */
 
+#define CUPS_DEVELOPER_LOW		1
+#define CUPS_DEVELOPER_EMPTY		2
+#define CUPS_MARKER_SUPPLY_LOW		4
+#define CUPS_MARKER_SUPPLY_EMPTY	8
+#define CUPS_MARKER_WASTE_ALMOST_FULL	16
+#define CUPS_MARKER_WASTE_FULL		32
+#define CUPS_OPC_NEAR_EOL		64
+#define CUPS_OPC_LIFE_OVER		128
+#define CUPS_TONER_LOW			256
+#define CUPS_TONER_EMPTY		512
+
 
 /*
  * Local structures...
@@ -66,12 +77,12 @@ static http_addr_t	current_addr;	/* Current address */
 static int		current_state = -1;
 					/* Current device state bits */
 static int		charset = -1;	/* Character set for supply names */
-static int		laser_printer = -1,
-					/* Laser printer with toner? */
-			num_supplies = 0;
+static int		num_supplies = 0;
 					/* Number of supplies found */
 static backend_supplies_t supplies[CUPS_MAX_SUPPLIES];
 					/* Supply information */
+static int		supply_state = -1;
+					/* Supply state info */
 
 static const int	hrDeviceDescr[] =
 			{ CUPS_OID_hrDeviceDescr, 1, -1 };
@@ -142,8 +153,8 @@ static const backend_state_t const printer_states[] =
 			{
 			  { CUPS_TC_lowPaper, "media-low-report" },
 			  { CUPS_TC_noPaper | CUPS_TC_inputTrayEmpty, "media-empty-warning" },
-			  { CUPS_TC_lowToner, "toner-low-report" },
-			  { CUPS_TC_noToner, "toner-empty-warning" },
+			  /* { CUPS_TC_lowToner, "toner-low-report" }, */ /* now use prtMarkerSupplies */
+			  /* { CUPS_TC_noToner, "toner-empty-warning" }, */ /* now use prtMarkerSupplies */
 			  { CUPS_TC_doorOpen, "door-open-report" },
 			  { CUPS_TC_jammed, "media-jam-warning" },
 			  /* { CUPS_TC_offline, "offline-report" }, */ /* unreliable */
@@ -153,6 +164,20 @@ static const backend_state_t const printer_states[] =
 			  { CUPS_TC_markerSupplyMissing, "marker-supply-missing-warning" },
 			  { CUPS_TC_outputNearFull, "output-area-almost-full-report" },
 			  { CUPS_TC_outputFull, "output-area-full-warning" }
+			};
+
+static const backend_state_t const supply_states[] =
+			{
+			  { CUPS_DEVELOPER_LOW, "developer-low-report" },
+			  { CUPS_DEVELOPER_EMPTY, "developer-empty-warning" },
+			  { CUPS_MARKER_SUPPLY_LOW, "marker-supply-low-report" },
+			  { CUPS_MARKER_SUPPLY_EMPTY, "marker-supply-empty-warning" },
+			  { CUPS_MARKER_WASTE_ALMOST_FULL, "marker-waste-almost-full-report" },
+			  { CUPS_MARKER_WASTE_FULL, "marker-waste-full-warning" },
+			  { CUPS_OPC_NEAR_EOL, "opc-near-eol-report" },
+			  { CUPS_OPC_LIFE_OVER, "opc-life-over-warning" },
+			  { CUPS_TONER_LOW, "toner-low-report" },
+			  { CUPS_TONER_EMPTY, "toner-empty-warning" }
 			};
 
 
@@ -193,8 +218,10 @@ backendSNMPSupplies(
   if (num_supplies > 0)
   {
     int		i,			/* Looping var */
+		percent,		/* Percent full */
 		new_state,		/* New state value */
-		change_state;		/* State change */
+		change_state,		/* State change */
+		new_supply_state = 0;	/* Supply state */
     char	value[CUPS_MAX_SUPPLIES * 4],
 					/* marker-levels value string */
 		*ptr;			/* Pointer into value string */
@@ -206,16 +233,84 @@ backendSNMPSupplies(
 
     for (i = 0, ptr = value; i < num_supplies; i ++, ptr += strlen(ptr))
     {
+      percent = 100 * supplies[i].level / supplies[i].max_capacity;
+
+      if (percent <= 10)
+      {
+        switch (supplies[i].type)
+        {
+          case CUPS_TC_toner :
+          case CUPS_TC_tonerCartridge :
+              if (percent <= 1)
+                new_supply_state |= CUPS_TONER_EMPTY;
+              else
+                new_supply_state |= CUPS_TONER_LOW;
+              break;
+          case CUPS_TC_wasteToner :
+          case CUPS_TC_wasteInk :
+              if (percent <= 1)
+                new_supply_state |= CUPS_MARKER_WASTE_FULL;
+              else
+                new_supply_state |= CUPS_MARKER_WASTE_ALMOST_FULL;
+              break;
+          case CUPS_TC_ink :
+          case CUPS_TC_inkCartridge :
+          case CUPS_TC_inkRibbon :
+          case CUPS_TC_solidWax :
+          case CUPS_TC_ribbonWax :
+              if (percent <= 1)
+                new_supply_state |= CUPS_MARKER_SUPPLY_EMPTY;
+              else
+                new_supply_state |= CUPS_MARKER_SUPPLY_LOW;
+              break;
+          case CUPS_TC_developer :
+              if (percent <= 1)
+                new_supply_state |= CUPS_DEVELOPER_EMPTY;
+              else
+                new_supply_state |= CUPS_DEVELOPER_LOW;
+              break;
+          case CUPS_TC_coronaWire :
+          case CUPS_TC_fuser :
+          case CUPS_TC_opc :
+          case CUPS_TC_transferUnit :
+              if (percent <= 1)
+                new_supply_state |= CUPS_OPC_LIFE_OVER;
+              else
+                new_supply_state |= CUPS_OPC_NEAR_EOL;
+              break;
+        }
+      }
+
       if (i)
         *ptr++ = ',';
 
       if (supplies[i].max_capacity > 0)
-        sprintf(ptr, "%d", 100 * supplies[i].level / supplies[i].max_capacity);
+        sprintf(ptr, "%d", percent);
       else
         strcpy(ptr, "-1");
     }
 
     fprintf(stderr, "ATTR: marker-levels=%s\n", value);
+
+    if (supply_state < 0)
+      change_state = 0xffff;
+    else
+      change_state = supply_state ^ new_supply_state;
+
+    fprintf(stderr, "DEBUG: new_supply_state=%x, change_state=%x\n",
+            new_supply_state, change_state);
+
+    for (i = 0;
+         i < (int)(sizeof(supply_states) / sizeof(supply_states[0]));
+         i ++)
+      if (change_state & supply_states[i].bit)
+      {
+	fprintf(stderr, "STATE: %c%s\n",
+		(new_supply_state & supply_states[i].bit) ? '+' : '-',
+		supply_states[i].keyword);
+      }
+
+    supply_state = new_supply_state;
 
    /*
     * Get the current printer status bits...
@@ -243,32 +338,17 @@ backendSNMPSupplies(
     else
       change_state = current_state ^ new_state;
 
-    fprintf(stderr, "DEBUG: new_state=%x, change_state=%x, laser_printer=%d\n",
-            new_state, change_state, laser_printer);
+    fprintf(stderr, "DEBUG: new_state=%x, change_state=%x\n", new_state,
+            change_state);
 
     for (i = 0;
          i < (int)(sizeof(printer_states) / sizeof(printer_states[0]));
          i ++)
       if (change_state & printer_states[i].bit)
       {
-        if (!laser_printer && !strncmp(printer_states[i].keyword, "toner-", 6))
-	{
-	 /*
-	  * Map toner-xxx to marker-supply-xxx to avoid confusing "out of toner"
-	  * messages on inkjet print queues...
-	  */
-
-	  if (printer_states[i].bit == CUPS_TC_lowToner)
-	    fprintf(stderr, "STATE: %cmarker-supply-low-report\n",
-	            (new_state & CUPS_TC_lowToner) ? '+' : '-');
-          else
-	    fprintf(stderr, "STATE: %cmarker-supply-empty-warning\n",
-	            (new_state & CUPS_TC_noToner) ? '+' : '-');
-	}
-	else
-	  fprintf(stderr, "STATE: %c%s\n",
-		  (new_state & printer_states[i].bit) ? '+' : '-',
-		  printer_states[i].keyword);
+	fprintf(stderr, "STATE: %c%s\n",
+		(new_state & printer_states[i].bit) ? '+' : '-',
+		printer_states[i].keyword);
       }
 
     current_state = new_state;
@@ -611,17 +691,12 @@ backend_init_supplies(
   * Output the marker-types attribute...
   */
 
-  laser_printer = 0;
-
   for (i = 0, ptr = value; i < num_supplies; i ++, ptr += strlen(ptr))
   {
     if (i)
       *ptr++ = ',';
 
     type = supplies[i].type;
-
-    if (type == CUPS_TC_toner)
-      laser_printer = 1;
 
     if (type < CUPS_TC_other || type > CUPS_TC_covers)
       strcpy(ptr, "unknown");

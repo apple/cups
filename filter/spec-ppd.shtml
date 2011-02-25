@@ -30,19 +30,14 @@ LINE-END = CR / LF / CR LF
 
 <p>CUPS supports several methods of auto-configuration via PPD keywords.</p>
 
-<h3><span class='info'>Deprecated</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
+<h3><span class='info'>Mac OS X 10.5</span><a name='APAutoSetupTool'>APAutoSetupTool</a></h3>
 
 <p class='summary'>*APAutoSetupTool: "/LibraryPrinters/vendor/filename"</p>
 
-<p>This deprecated keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
+<p>This Mac OS X keyword defines a program that sets the default option choices. It is run when a printer is added from the <var>Add Printer</var> window or the <var>Nearby Printers</var> list in the <var>Print</var> dialog.</p>
 
 <p>The program is provided with two arguments: the printer's device URI and the PPD file to be used for the printer. The program must write an updated PPD file to stdout.</p>
 
-<blockquote><b>Note:</b>
-
-<p>This keyword is deprecated. New printer drivers SHOULD provide a CUPS command filter and support the "AutoConfigure" command. Alternately, drivers MAY use the <a href="#OID">SNMP OID</a> keywords to configure network printers or <a href="#QUERYKEYWORD">PostScript query keywords</a> to configure PostScript printers.</p>
-
-</blockquote>
 <p>Examples:</p>
 
 <pre class='command'>
@@ -136,13 +131,13 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Specify a profile for printing at 360dpi on all media types</em> 
+<em>*% Specify a profile for printing at 360dpi on all media types</em>
 *cupsColorProfile 360dpi/-: "1.0 1.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
 
-<em>*% Specify a profile for printing at 720dpi on Glossy media</em> 
+<em>*% Specify a profile for printing at 720dpi on Glossy media</em>
 *cupsColorProfile 720dpi/Glossy: "1.0 2.5 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
 
-<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+<em>*% Specify a default profile for printing at all other resolutions and media types</em>
 *cupsColorProfile -/-: "0.9 2.0 1.0 0.0 -0.2 -0.4 1.0 0.0 -0.2 0.0 1.0"
 </pre>
 
@@ -158,13 +153,13 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em> 
+<em>*% Specify a profile for CMYK printing at 360dpi on all media types</em>
 *cupsICCProfile CMYK..360dpi/360dpi CMYK: "/Library/Printers/vendor/Profiles/foo-360-cmyk.icc"
 
-<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em> 
+<em>*% Specify a profile for RGB printing at 720dpi on Glossy media</em>
 *cupsColorProfile RGB.Glossy.720dpi/720dpi Glossy: "/Library/Printers/vendor/Profiles/foo-720-glossy-rgb.icc"
 
-<em>*% Specify a default profile for printing at all other resolutions and media types</em> 
+<em>*% Specify a default profile for printing at all other resolutions and media types</em>
 *cupsICCProfile ../Default: "/Library/Printers/vendor/Profiles/foo-default.icc"
 </pre>
 
@@ -298,10 +293,10 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Specify that 2-sided printing cannot happen on transparencies</em> 
+<em>*% Specify that 2-sided printing cannot happen on transparencies</em>
 *cupsUIConstraints transparency: "*Duplex *MediaType Transparency"
 
-<em>*% Specify that envelope printing cannot happen from the paper trays</em> 
+<em>*% Specify that envelope printing cannot happen from the paper trays</em>
 *cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
 *cupsUIConstraints envelope: "*PageSize Env10 *InputSlot Tray1"
 *cupsUIConstraints envelope: "*PageSize EnvDL *InputSlot Tray2"
@@ -310,7 +305,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <em>*% Specify an installable option constraint for the envelope feeder</em>
 *cupsUIConstraints: "*InputSlot EnvFeeder *InstalledEnvFeeder"
 
-<em>*% Specify that photo printing cannot happen on plain paper or transparencies at 1200dpi</em> 
+<em>*% Specify that photo printing cannot happen on plain paper or transparencies at 1200dpi</em>
 *cupsUIConstraints photo: "*OutputMode Photo *MediaType Plain *Resolution 1200dpi"
 *cupsUIConstraints photo: "*OutputMode Photo *MediaType Transparency *Resolution 1200dpi"
 </pre>
@@ -324,7 +319,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Specify the options to change for the 2-sided transparency constraint</em> 
+<em>*% Specify the options to change for the 2-sided transparency constraint</em>
 *cupsUIResolver transparency: "*Duplex None *MediaType Plain"
 
 <em>*% Specify the options to change for the envelope printing constraints.  Notice
@@ -332,7 +327,7 @@ f(x) = density * x <sup style='font-size: 100%'>gamma</sup>
 *% manual feed first, then we change the page size...</em>
 *cupsUIResolver envelope: "*InputSlot EnvFeeder *InputSlot ManualFeed *PageSize Letter"
 
-<em>*% Specify the options to change for the photo printing constraints</em> 
+<em>*% Specify the options to change for the photo printing constraints</em>
 *cupsUIResolver photo: "*OutputMode Best *Resolution 600dpi"
 </pre>
 
@@ -459,7 +454,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Base JCL key code option</em> 
+<em>*% Base JCL key code option</em>
 *JCLOpenUI JCLPasscode/Key Code: PickOne
 *OrderDependency: 10 JCLSetup *JCLPasscode
 *DefaultJCLPasscode: None
@@ -469,7 +464,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 *JCLPasscode 3333: "@PJL SET PASSCODE = 3333&lt;0A&gt;"
 *JCLCloseUI: *JCLPasscode
 
-<em>*% Custom JCL key code option</em> 
+<em>*% Custom JCL key code option</em>
 *CustomJCLPasscode True: "@PJL SET PASSCODE = \1&lt;0A&gt;"
 *ParamCustomJCLPasscode Code/Key Code: 1 passcode 4 4
 
@@ -487,7 +482,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 *ParamCustomWatermarkText Text: 1 string 0 32
 
 
-<em>*% Base PostScript gamma/density option</em> 
+<em>*% Base PostScript gamma/density option</em>
 *OpenUI GammaDensity/Gamma and Density: PickOne
 *OrderDependency: 10 AnySetup *GammaDensity
 *DefaultGammaDensity: Normal
@@ -496,7 +491,7 @@ option value is "1234" then CUPS will output the string "@PJL SET PASSCODE=1234"
 *GammaDensity Dark/Darker: "&lt;&lt;/cupsReal1 1.1/cupsReal2 1.5&gt;&gt;setpagedevice"
 *CloseUI: *GammaDensity
 
-<em>*% Custom PostScript gamma/density option</em> 
+<em>*% Custom PostScript gamma/density option</em>
 *CustomGammaDensity True: "&lt;&lt;/cupsReal1 3 -1 roll/cupsReal2 5 -1&gt;&gt;setpagedevice"
 *ParamCustomGammaDensity Gamma: 1 curve 0.1 10
 *ParamCustomGammaDensity Density: 2 real 0 2
@@ -1048,10 +1043,10 @@ will be ignored.</p>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Flip the page image for the back side of duplexed output</em> 
+<em>*% Flip the page image for the back side of duplexed output</em>
 *cupsBackSide: Flipped
 
-<em>*% Rotate the page image for the back side of duplexed output</em> 
+<em>*% Rotate the page image for the back side of duplexed output</em>
 *cupsBackSide: Rotated
 </pre>
 
@@ -1069,7 +1064,7 @@ by whitespace.</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Specify the list of commands we support</em> 
+<em>*% Specify the list of commands we support</em>
 *cupsCommands: "AutoConfigure Clean PrintSelfTestPage ReportLevels com.vendor.foo"
 </pre>
 
@@ -1085,7 +1080,7 @@ printing is selected. The default value is <code>false</code>.</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Always send an even number of pages when duplexing</em> 
+<em>*% Always send an even number of pages when duplexing</em>
 *cupsEvenDuplex: true
 </pre>
 
@@ -1113,14 +1108,33 @@ the special filter program "-" may be specified.</p>
 <p>Examples:</p>
 
 <pre class='command'>
-<em>*% Standard raster printer driver filter</em> 
+<em>*% Standard raster printer driver filter</em>
 *cupsFilter: "application/vnd.cups-raster 100 rastertofoo"
 
-<em>*% Plain text filter</em> 
+<em>*% Plain text filter</em>
 *cupsFilter: "text/plain 10 texttofoo"
 
-<em>*% Pass-through filter for PostScript printers</em> 
+<em>*% Pass-through filter for PostScript printers</em>
 *cupsFilter: "application/vnd.cups-postscript 0 -"
+</pre>
+
+<h3><a name='cupsFilter2'>cupsFilter2</a></h3>
+
+<p class='summary'>*cupsFilter2: "source/type destination/type cost program"</p>
+
+<p>This string keyword provides a conversion rule from the given source type to the printer's native format using the filter "program". If a printer supports the source type directly, the special filter program "-" may be specified. The destination type is automatically created as needed and is passed to the filters and backend as the FINAL_CONTENT_TYPE value.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Standard raster printer driver filter</em>
+*cupsFilter2: "application/vnd.cups-raster application/vnd.foo 100 rastertofoo"
+
+<em>*% Plain text filter</em>
+*cupsFilter2: "text/plain application/vnd.foo 10 texttofoo"
+
+<em>*% Pass-through filter for PostScript printers</em>
+*cupsFilter2: "application/vnd.cups-postscript application/postscript 0 -"
 </pre>
 
 <h3><span class='info'>Deprecated</span><a name='cupsFlipDuplex'>cupsFlipDuplex</a></h3>
@@ -1218,6 +1232,19 @@ http://www.vendor.com/help"
 *End
 </pre>
 
+<h3><span class='info'>CUPS 1.5</span><a name='cupsIPPSupplies'>cupsIPPSupplies</a></h3>
+
+<p class='summary'>*cupsIPPSupplies: boolean</p>
+
+<p>This keyword tells the IPP backend whether it should report the current marker-xxx supply attribute values. The default value is <code>True</code>.
+
+<p>Example:</p>
+
+<pre class='command'>
+<em>*% Do not use IPP marker-xxx attributes to report supply levels</em>
+*cupsIPPSupplies: False
+</pre>
+
 <h3><span class='info'>CUPS 1.2/Mac OS X 10.5</span><a name='cupsLanguages'>cupsLanguages</a></h3>
 
 <p class='summary'>*cupsLanguages: "locale list"</p>
@@ -1229,7 +1256,7 @@ list of locale names ("en", "en_US", "fr_CA", etc.)</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Specify Canadian, UK, and US English, and Candian and French French</em> 
+<em>*% Specify Canadian, UK, and US English, and Candian and French French</em>
 *cupsLanguages: "en_CA en_UK en_US fr_CA fr_FR"
 </pre>
 
@@ -1244,7 +1271,7 @@ hardware. The default value is <code>false</code>.</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Tell the RIP filters to generate the copies for us</em> 
+<em>*% Tell the RIP filters to generate the copies for us</em>
 *cupsManualCopies: true
 </pre>
 
@@ -1287,7 +1314,7 @@ the output for a specific model of printer.</p>
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Specify an integer for a driver-specific model number</em> 
+<em>*% Specify an integer for a driver-specific model number</em>
 *cupsModelNumber: 1234
 </pre>
 
@@ -1353,7 +1380,7 @@ to disable the port monitor for the given URI scheme.</p>
 *cupsPortMonitor socket/AppSocket Printing: "tbcp"
 *cupsPortMonitor usb/USB Printing: "none"
 
-<em>*% Specify a printer-specific port monitor for an Epson USB printer</em> 
+<em>*% Specify a printer-specific port monitor for an Epson USB printer</em>
 *cupsPortMonitor usb/USB Status Monitor: "epson-usb"
 </pre>
 
@@ -1362,7 +1389,7 @@ to disable the port monitor for the given URI scheme.</p>
 <p class='summary'>*cupsPreFilter: "source/type cost program"</p>
 
 <p>This string keyword provides a pre-filter rule. The pre-filter
-program will be inserted in the conversion chain immediately 
+program will be inserted in the conversion chain immediately
 before the filter that accepts the given MIME type.</p>
 
 <p>Examples:</p>
@@ -1426,7 +1453,7 @@ PPD file extensions was used. Currently it must be the string
 <p>Example:</p>
 
 <pre class='command'>
-<em>*% Specify a CUPS 1.2 driver</em> 
+<em>*% Specify a CUPS 1.2 driver</em>
 *cupsVersion: "1.2"
 </pre>
 
@@ -1534,7 +1561,7 @@ and the <tt>Tumble</tt> page attribute.</p>
 <em>*% Rotate the back side images</em>
 *cupsBackSide: Rotated
 
-<em>*% Don't swap the top and bottom margins for the back side</em> 
+<em>*% Don't swap the top and bottom margins for the back side</em>
 *APDuplexRequiresFlippedMargin: false
 </pre>
 

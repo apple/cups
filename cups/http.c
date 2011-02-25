@@ -479,7 +479,7 @@ httpConnectEncrypt(
   * Create the HTTP structure...
   */
 
-  if ((http = _httpCreate(host, port, encryption, AF_UNSPEC)) == NULL)
+  if ((http = _httpCreate(host, port, NULL, encryption, AF_UNSPEC)) == NULL)
     return (NULL);
 
  /*
@@ -632,12 +632,12 @@ http_t *				/* O - HTTP connection */
 _httpCreate(
     const char        *host,		/* I - Hostname */
     int               port,		/* I - Port number */
+    http_addrlist_t   *addrlist,	/* I - Address list or NULL */
     http_encryption_t encryption,	/* I - Encryption to use */
     int               family)		/* I - Address family or AF_UNSPEC */
 {
-  http_t		*http;		/* New HTTP connection */
-  http_addrlist_t	*addrlist;	/* Host address data */
-  char			service[255];	/* Service name */
+  http_t	*http;			/* New HTTP connection */
+  char		service[255];		/* Service name */
 
 
   DEBUG_printf(("4_httpCreate(host=\"%s\", port=%d, encryption=%d)",
@@ -654,8 +654,9 @@ _httpCreate(
 
   sprintf(service, "%d", port);
 
-  if ((addrlist = httpAddrGetList(host, family, service)) == NULL)
-    return (NULL);
+  if (!addrlist)
+    if ((addrlist = httpAddrGetList(host, family, service)) == NULL)
+      return (NULL);
 
  /*
   * Allocate memory for the structure...
@@ -2278,10 +2279,21 @@ httpReconnect(http_t *http)		/* I - Connection to server */
 
   if (http->timeout_value.tv_sec > 0)
   {
+#ifdef WIN32
+    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
+			  http->timeout_value.tv_usec / 1000;
+			  		/* Timeout in milliseconds */
+
+    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
+               sizeof(timeout_value));
+    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
+               sizeof(timeout_value));
+#else
     setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
     setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
+#endif /* WIN32 */
   }
 
   http->hostaddr = &(addr->addr);
@@ -2563,10 +2575,21 @@ _httpSetTimeout(
 
   if (http->fd >= 0)
   {
+#ifdef WIN32
+    DWORD timeout_value = http->timeout_value.tv_sec * 1000 +
+			  http->timeout_value.tv_usec / 1000;
+			  		/* Timeout in milliseconds */
+
+    setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout_value,
+               sizeof(timeout_value));
+    setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout_value,
+               sizeof(timeout_value));
+#else
     setsockopt(http->fd, SOL_SOCKET, SO_RCVTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
     setsockopt(http->fd, SOL_SOCKET, SO_SNDTIMEO, &(http->timeout_value),
                sizeof(http->timeout_value));
+#endif /* WIN32 */
   }
 }
 

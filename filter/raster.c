@@ -3,7 +3,7 @@
  *
  *   Raster file routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
@@ -19,7 +19,8 @@
  * Contents:
  *
  *   cupsRasterClose()         - Close a raster stream.
- *   cupsRasterOpen()          - Open a raster stream.
+ *   cupsRasterOpen()          - Open a raster stream using a file descriptor.
+ *   cupsRasterOpenIO()        - Open a raster stream using a callback function.
  *   cupsRasterReadHeader()    - Read a raster page header and store it in a
  *                               version 1 page header structure.
  *   cupsRasterReadHeader2()   - Read a raster page header and store it in a
@@ -30,14 +31,14 @@
  *   cupsRasterWriteHeader2()  - Write a raster page header from a version 2
  *                               page header structure.
  *   cupsRasterWritePixels()   - Write raster pixels.
- *   cups_raster_read()        - Read through the raster buffer.
  *   cups_raster_read_header() - Read a raster page header.
+ *   cups_raster_read()        - Read through the raster buffer.
  *   cups_raster_update()      - Update the raster header and row count for the
  *                               current page.
- *   cups_raster_write()       - Write a row of raster data...
- *   cups_read()               - Read bytes from a file.
+ *   cups_raster_write()       - Write a row of compressed raster data...
+ *   cups_read_fd()            - Read bytes from a file.
  *   cups_swap()               - Swap bytes in raster data...
- *   cups_write()              - Write bytes to a file.
+ *   cups_write_fd()           - Write bytes to a file.
  */
 
 /*
@@ -47,6 +48,7 @@
 #include "image-private.h"
 #if defined(WIN32) || defined(__EMX__)
 #  include <io.h>
+#  include <winsock2.h>			/* for htonl() definition */
 #else
 #  include <unistd.h>
 #endif /* WIN32 || __EMX__ */
@@ -59,7 +61,8 @@
 struct _cups_raster_s			/**** Raster stream data ****/
 {
   unsigned		sync;		/* Sync word from start of stream */
-  int			fd;		/* File descriptor */
+  void			*ctx;		/* File descriptor */
+  cups_raster_iocb_t	iocb;		/* IO callback */
   cups_mode_t		mode;		/* Read/write mode */
   cups_page_header2_t	header;		/* Raster header for current page */
   int			count,		/* Current row run-length count */
@@ -73,7 +76,7 @@ struct _cups_raster_s			/**** Raster stream data ****/
   unsigned char		*buffer,	/* Read/write buffer */
 			*bufptr,	/* Current (read) position in buffer */
 			*bufend;	/* End of current (read) buffer */
-  int			bufsize;	/* Buffer size */
+  size_t		bufsize;	/* Buffer size */
 };
 
 
@@ -85,10 +88,11 @@ static unsigned	cups_raster_read_header(cups_raster_t *r);
 static int	cups_raster_read(cups_raster_t *r, unsigned char *buf,
 		                 int bytes);
 static void	cups_raster_update(cups_raster_t *r);
-static int	cups_raster_write(cups_raster_t *r, const unsigned char *pixels);
-static int	cups_read(int fd, unsigned char *buf, int bytes);
+static int	cups_raster_write(cups_raster_t *r,
+		                  const unsigned char *pixels);
+static ssize_t	cups_read_fd(void *ctx, unsigned char *buf, size_t bytes);
 static void	cups_swap(unsigned char *buf, int bytes);
-static int	cups_write(int fd, const unsigned char *buf, int bytes);
+static ssize_t	cups_write_fd(void *ctx, unsigned char *buf, size_t bytes);
 
 
 /*
@@ -115,21 +119,53 @@ cupsRasterClose(cups_raster_t *r)	/* I - Stream to close */
 
 
 /*
- * 'cupsRasterOpen()' - Open a raster stream.
+ * 'cupsRasterOpen()' - Open a raster stream using a file descriptor.
  *
  * This function associates a raster stream with the given file descriptor.
  * For most printer driver filters, "fd" will be 0 (stdin).  For most raster
  * image processor (RIP) filters that generate raster data, "fd" will be 1
  * (stdout).
  *
- * When writing raster data, the @code CUPS_RASTER_WRITE@ or
- * @code CUPS_RASTER_WRITE_COMPRESS@ mode can be used - compressed output
- * is generally 25-50% smaller but adds a 100-300% execution time overhead.
+ * When writing raster data, the @code CUPS_RASTER_WRITE@,
+ * @code CUPS_RASTER_WRITE_COMPRESS@, or @code CUPS_RASTER_WRITE_PWG@ mode can
+ * be used - compressed and PWG output is generally 25-50% smaller but adds a
+ * 100-300% execution time overhead.
  */
 
 cups_raster_t *				/* O - New stream */
 cupsRasterOpen(int         fd,		/* I - File descriptor */
-               cups_mode_t mode)	/* I - Mode - @code CUPS_RASTER_READ@, @code CUPS_RASTER_WRITE@, or @code CUPS_RASTER_WRITE_COMPRESSED@ */
+               cups_mode_t mode)	/* I - Mode - @code CUPS_RASTER_READ@,
+	                                       @code CUPS_RASTER_WRITE@,
+					       @code CUPS_RASTER_WRITE_COMPRESSED@,
+					       or @code CUPS_RASTER_WRITE_PWG@ */
+{
+  if (mode == CUPS_RASTER_READ)
+    return (cupsRasterOpenIO(cups_read_fd, (void *)((intptr_t)fd), mode));
+  else
+    return (cupsRasterOpenIO(cups_write_fd, (void *)((intptr_t)fd), mode));
+}
+
+
+/*
+ * 'cupsRasterOpenIO()' - Open a raster stream using a callback function.
+ *
+ * This function associates a raster stream with the given callback function and
+ * context pointer.
+ *
+ * When writing raster data, the @code CUPS_RASTER_WRITE@,
+ * @code CUPS_RASTER_WRITE_COMPRESS@, or @code CUPS_RASTER_WRITE_PWG@ mode can
+ * be used - compressed and PWG output is generally 25-50% smaller but adds a
+ * 100-300% execution time overhead.
+ */
+
+cups_raster_t *				/* O - New stream */
+cupsRasterOpenIO(
+    cups_raster_iocb_t iocb,		/* I - Read/write callback */
+    void               *ctx,		/* I - Context pointer for callback */
+    cups_mode_t        mode)		/* I - Mode - @code CUPS_RASTER_READ@,
+	                                       @code CUPS_RASTER_WRITE@,
+					       @code CUPS_RASTER_WRITE_COMPRESSED@,
+					       or @code CUPS_RASTER_WRITE_PWG@ */
 {
   cups_raster_t	*r;			/* New stream */
 
@@ -143,8 +179,9 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     return (NULL);
   }
 
-  r->fd   = fd;
-  r->mode = mode == CUPS_RASTER_WRITE_COMPRESSED ? CUPS_RASTER_WRITE : mode;
+  r->ctx  = ctx;
+  r->iocb = iocb;
+  r->mode = mode;
 
   if (mode == CUPS_RASTER_READ)
   {
@@ -152,7 +189,8 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     * Open for read - get sync word...
     */
 
-    if (!cups_read(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync)))
+    if ((*r->iocb)(r->ctx, (unsigned char *)&(r->sync), sizeof(r->sync)) !=
+            sizeof(r->sync))
     {
       _cupsRasterAddError("Unable to read header from raster stream: %s\n",
                           strerror(errno));
@@ -189,15 +227,26 @@ cupsRasterOpen(int         fd,		/* I - File descriptor */
     * Open for write - put sync word...
     */
 
-    if (mode == CUPS_RASTER_WRITE_COMPRESSED)
+    switch (mode)
     {
-      r->compressed = 1;
-      r->sync       = CUPS_RASTER_SYNCv2;
-    }
-    else
-      r->sync = CUPS_RASTER_SYNC;
+      default :
+      case CUPS_RASTER_WRITE :
+          r->sync = CUPS_RASTER_SYNC;
+	  break;
 
-    if (cups_write(r->fd, (unsigned char *)&(r->sync), sizeof(r->sync))
+      case CUPS_RASTER_WRITE_COMPRESSED :
+          r->compressed = 1;
+          r->sync       = CUPS_RASTER_SYNCv2;
+	  break;
+
+      case CUPS_RASTER_WRITE_PWG :
+          r->compressed = 1;
+          r->sync       = htonl(CUPS_RASTER_SYNC_PWG);
+          r->swapped    = r->sync != CUPS_RASTER_SYNC_PWG;
+	  break;
+    }
+
+    if ((*r->iocb)(r->ctx, (unsigned char *)&(r->sync), sizeof(r->sync))
             < sizeof(r->sync))
     {
       _cupsRasterAddError("Unable to write raster stream header: %s\n",
@@ -308,17 +357,17 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
     r->remaining -= len / r->header.cupsBytesPerLine;
 
-    if (!cups_read(r->fd, p, len))
+    if ((*r->iocb)(r->ctx, p, len) < (ssize_t)len)
       return (0);
 
    /*
     * Swap bytes as needed...
     */
 
-    if ((r->header.cupsBitsPerColor == 16 ||
+    if (r->swapped &&
+        (r->header.cupsBitsPerColor == 16 ||
          r->header.cupsBitsPerPixel == 12 ||
-         r->header.cupsBitsPerPixel == 16) &&
-        r->swapped)
+         r->header.cupsBitsPerPixel == 16))
       cups_swap(p, len);
 
    /*
@@ -349,7 +398,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 	ptr = r->pixels;
 
      /*
-      * Read using a modified TIFF "packbits" compression...
+      * Read using a modified PackBits compression...
       */
 
       if (!cups_raster_read(r, &byte, 1))
@@ -459,7 +508,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
       * Copy fragment from buffer...
       */
 
-      if ((bytes = r->pend - r->pcurrent) > remaining)
+      if ((unsigned)(bytes = r->pend - r->pcurrent) > remaining)
         bytes = remaining;
 
       memcpy(p, r->pcurrent, bytes);
@@ -495,7 +544,7 @@ cupsRasterWriteHeader(
     cups_raster_t      *r,		/* I - Raster stream */
     cups_page_header_t *h)		/* I - Raster page header */
 {
-  if (r == NULL || r->mode != CUPS_RASTER_WRITE)
+  if (r == NULL || r->mode == CUPS_RASTER_READ)
     return (0);
 
  /*
@@ -512,8 +561,31 @@ cupsRasterWriteHeader(
   * Write the raster header...
   */
 
-  return (cups_write(r->fd, (unsigned char *)&(r->header), sizeof(r->header))
-              > 0);
+  if (r->mode == CUPS_RASTER_WRITE_PWG)
+  {
+   /*
+    * PWG raster data is always network byte order with most of the page header
+    * zeroed.
+    */
+
+    cups_page_header2_t	fh;		/* File page header */
+
+    memset(&fh, 0, sizeof(fh));
+    fh.HWResolution[0]  = htonl(r->header.HWResolution[0]);
+    fh.HWResolution[1]  = htonl(r->header.HWResolution[1]);
+    fh.cupsWidth        = htonl(r->header.cupsWidth);
+    fh.cupsHeight       = htonl(r->header.cupsHeight);
+    fh.cupsBitsPerColor = htonl(r->header.cupsBitsPerColor);
+    fh.cupsBitsPerPixel = htonl(r->header.cupsBitsPerPixel);
+    fh.cupsBytesPerLine = htonl(r->header.cupsBytesPerLine);
+    fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
+    fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
+
+    return ((*r->iocb)(r->ctx, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
+  }
+  else
+    return ((*r->iocb)(r->ctx, (unsigned char *)&(r->header), sizeof(r->header))
+		== sizeof(r->header));
 }
 
 
@@ -531,7 +603,7 @@ cupsRasterWriteHeader2(
     cups_raster_t       *r,		/* I - Raster stream */
     cups_page_header2_t *h)		/* I - Raster page header */
 {
-  if (r == NULL || r->mode != CUPS_RASTER_WRITE)
+  if (r == NULL || r->mode == CUPS_RASTER_READ)
     return (0);
 
  /*
@@ -547,8 +619,31 @@ cupsRasterWriteHeader2(
   * Write the raster header...
   */
 
-  return (cups_write(r->fd, (unsigned char *)&(r->header), sizeof(r->header))
-              > 0);
+  if (r->mode == CUPS_RASTER_WRITE_PWG)
+  {
+   /*
+    * PWG raster data is always network byte order with most of the page header
+    * zeroed.
+    */
+
+    cups_page_header2_t	fh;		/* File page header */
+
+    memset(&fh, 0, sizeof(fh));
+    fh.HWResolution[0]  = htonl(r->header.HWResolution[0]);
+    fh.HWResolution[1]  = htonl(r->header.HWResolution[1]);
+    fh.cupsWidth        = htonl(r->header.cupsWidth);
+    fh.cupsHeight       = htonl(r->header.cupsHeight);
+    fh.cupsBitsPerColor = htonl(r->header.cupsBitsPerColor);
+    fh.cupsBitsPerPixel = htonl(r->header.cupsBitsPerPixel);
+    fh.cupsBytesPerLine = htonl(r->header.cupsBytesPerLine);
+    fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
+    fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
+
+    return ((*r->iocb)(r->ctx, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
+  }
+  else
+    return ((*r->iocb)(r->ctx, (unsigned char *)&(r->header), sizeof(r->header))
+		== sizeof(r->header));
 }
 
 
@@ -572,18 +667,65 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
   DEBUG_printf(("cupsRasterWritePixels(r=%p, p=%p, len=%u), remaining=%u\n",
 		r, p, len, r->remaining));
 
-  if (r == NULL || r->mode != CUPS_RASTER_WRITE || r->remaining == 0)
+  if (r == NULL || r->mode == CUPS_RASTER_READ || r->remaining == 0)
     return (0);
 
   if (!r->compressed)
   {
    /*
-    * Without compression, just write the raster data raw...
+    * Without compression, just write the raster data raw unless the data needs
+    * to be swapped...
     */
 
     r->remaining -= len / r->header.cupsBytesPerLine;
 
-    return (cups_write(r->fd, p, len));
+    if (r->swapped &&
+        (r->header.cupsBitsPerColor == 16 ||
+         r->header.cupsBitsPerPixel == 12 ||
+         r->header.cupsBitsPerPixel == 16))
+    {
+      unsigned char	*bufptr;	/* Pointer into write buffer */
+      unsigned		count;		/* Remaining count */
+
+     /*
+      * Allocate a write buffer as needed...
+      */
+
+      if ((size_t)len > r->bufsize)
+      {
+	if (r->buffer)
+	  bufptr = realloc(r->buffer, len);
+	else
+	  bufptr = malloc(len);
+
+	if (!bufptr)
+	  return (0);
+
+	r->buffer  = bufptr;
+	r->bufsize = len;
+      }
+
+     /*
+      * Byte swap the pixels...
+      */
+
+      for (bufptr = r->buffer, count = len; count > 1; count -= 2, bufptr += 2)
+      {
+        bufptr[1] = *p++;
+        bufptr[0] = *p++;
+      }
+
+      if (count)			/* This should never happen... */
+        *bufptr = *p;
+
+     /*
+      * Write the byte-swapped buffer...
+      */
+
+      return ((*r->iocb)(r->ctx, r->buffer, len));      
+    }
+    else
+      return ((*r->iocb)(r->ctx, p, len));
   }
 
  /*
@@ -772,7 +914,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   DEBUG_printf(("cups_raster_read(r=%p, buf=%p, bytes=%d)\n", r, buf, bytes));
 
   if (!r->compressed)
-    return (cups_read(r->fd, buf, bytes));
+    return ((*r->iocb)(r->ctx, buf, bytes));
 
  /*
   * Allocate a read buffer as needed...
@@ -780,7 +922,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
   count = 2 * r->header.cupsBytesPerLine;
 
-  if (count > r->bufsize)
+  if ((size_t)count > r->bufsize)
   {
     int offset = r->bufptr - r->buffer;	/* Offset to current start of buffer */
     int end = r->bufend - r->buffer;	/* Offset to current end of buffer */
@@ -821,7 +963,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
         * Read into the raster buffer and then copy...
 	*/
 
-        remaining = cups_read(r->fd, r->buffer, r->bufsize);
+        remaining = (*r->iocb)(r->ctx, r->buffer, r->bufsize);
 	if (remaining <= 0)
 	  return (0);
 
@@ -834,7 +976,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
         * Read directly into "buf"...
 	*/
 
-	count = cups_read(r->fd, buf, count);
+	count = (*r->iocb)(r->ctx, buf, count);
 
 	if (count <= 0)
 	  return (0);
@@ -1042,7 +1184,7 @@ cups_raster_write(
   */
 
   count = r->header.cupsBytesPerLine * 2;
-  if (count > r->bufsize)
+  if ((size_t)count > r->bufsize)
   {
     if (r->buffer)
       wptr = realloc(r->buffer, count);
@@ -1123,21 +1265,23 @@ cups_raster_write(
     }
   }
 
-  return (cups_write(r->fd, r->buffer, wptr - r->buffer));
+  return ((*r->iocb)(r->ctx, r->buffer, wptr - r->buffer));
 }
 
 
 /*
- * 'cups_read()' - Read bytes from a file.
+ * 'cups_read_fd()' - Read bytes from a file.
  */
 
-static int				/* O - Bytes read or -1 */
-cups_read(int           fd,		/* I - File descriptor */
-          unsigned char *buf,		/* I - Buffer for read */
-	  int           bytes)		/* I - Number of bytes to read */
+static ssize_t				/* O - Bytes read or -1 */
+cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
+             unsigned char *buf,	/* I - Buffer for read */
+	     size_t        bytes)	/* I - Number of bytes to read */
 {
-  int	count,				/* Number of bytes read */
-	total;				/* Total bytes read */
+  int		fd = (int)((intptr_t)ctx);
+					/* File descriptor */
+  ssize_t	count;			/* Number of bytes read */
+  size_t	total;			/* Total bytes read */
 
 
   for (total = 0; total < bytes; total += count, buf += count)
@@ -1155,7 +1299,7 @@ cups_read(int           fd,		/* I - File descriptor */
     }
   }
 
-  return (total);
+  return ((ssize_t)total);
 }
 
 
@@ -1186,16 +1330,18 @@ cups_swap(unsigned char *buf,		/* I - Buffer to swap */
 
 
 /*
- * 'cups_write()' - Write bytes to a file.
+ * 'cups_write_fd()' - Write bytes to a file.
  */
 
-static int				/* O - Bytes written or -1 */
-cups_write(int                 fd,	/* I - File descriptor */
-           const unsigned char *buf,	/* I - Bytes to write */
-	   int                 bytes)	/* I - Number of bytes to write */
+static ssize_t				/* O - Bytes written or -1 */
+cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
+              unsigned char *buf,	/* I - Bytes to write */
+	      size_t        bytes)	/* I - Number of bytes to write */
 {
-  int	count,				/* Number of bytes written */
-	total;				/* Total bytes written */
+  int		fd = (int)((intptr_t)ctx);
+					/* File descriptor */
+  ssize_t	count;			/* Number of bytes written */
+  size_t	total;			/* Total bytes written */
 
 
   for (total = 0; total < bytes; total += count, buf += count)
@@ -1211,7 +1357,7 @@ cups_write(int                 fd,	/* I - File descriptor */
     }
   }
 
-  return (total);
+  return ((ssize_t)total);
 }
 
 

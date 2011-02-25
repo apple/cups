@@ -3589,26 +3589,44 @@ add_printer_filter(
 {
   char		super[MIME_MAX_SUPER],	/* Super-type for filter */
 		type[MIME_MAX_TYPE],	/* Type for filter */
+		dsuper[MIME_MAX_SUPER],	/* Destination super-type for filter */
+		dtype[MIME_MAX_TYPE],	/* Destination type for filter */
+		dest[MIME_MAX_SUPER + MIME_MAX_TYPE + 2],
+					/* Destination super/type */
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
-  mime_type_t	*temptype;		/* MIME type looping var */
+  mime_type_t	*temptype,		/* MIME type looping var */
+		*desttype;		/* Destination MIME type */
   char		filename[1024],		/* Full filter filename */
 		*dirsep;		/* Pointer to directory separator */
   struct stat	fileinfo;		/* File information */
 
 
  /*
-  * Parse the filter string; it should be in the following format:
+  * Parse the filter string; it should be in one of the following formats:
   *
-  *     super/type cost program
+  *     source/type cost program
+  *     source/type dest/type cost program
   */
 
-  if (sscanf(filter, "%15[^/]/%31s%d%*[ \t]%1023[^\n]", super, type, &cost,
-             program) != 4)
+  if (sscanf(filter, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
+             super, type, dsuper, dtype, &cost, program) == 6)
   {
-    cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
-                    p->name, filter);
-    return;
+    snprintf(dest, sizeof(dest), "%s/%s", dsuper, dtype);
+  }
+  else
+  {
+    if (sscanf(filter, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type, &cost,
+               program) == 4)
+    {
+      strlcpy(dest, p->name, sizeof(dest));
+    }
+    else
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
+                      p->name, filter);
+      return;
+    }
   }
 
  /*
@@ -3628,38 +3646,34 @@ add_printer_filter(
       memset(&fileinfo, 0, sizeof(fileinfo));
 
       snprintf(p->state_message, sizeof(p->state_message),
-               "Filter \"%s\" for printer \"%s\" not available: %s",
-	       filename, p->name, strerror(errno));
+               "Printer driver \"%s\" not available: %s", filename,
+	       strerror(errno));
       cupsdSetPrinterReasons(p, "+cups-missing-filter-warning");
 
-      cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: %s", p->name, p->state_message);
     }
 
    /*
     * When running as root, do additional security checks...
     */
 
-    if (!RunUser)
+    else if (!RunUser)
     {
      /*
       * Only use filters that are owned by root and do not have world write
       * permissions.
       */
 
-      if (fileinfo.st_uid || (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
+      if (fileinfo.st_uid ||
+          (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
       {
-	if (fileinfo.st_uid)
-	  snprintf(p->state_message, sizeof(p->state_message),
-		   "Filter \"%s\" for printer \"%s\" not owned by root",
-		   filename, p->name);
-	else
-	  snprintf(p->state_message, sizeof(p->state_message),
-		   "Filter \"%s\" for printer \"%s\" has insecure permissions "
-		   "(0%o)", filename, p->name, fileinfo.st_mode);
+	snprintf(p->state_message, sizeof(p->state_message),
+		 "Printer driver \"%s\" has insecure permissions (%d/0%o).",
+		 filename, (int)fileinfo.st_uid, fileinfo.st_mode);
 
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
-	cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+	cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
       }
       else if (fileinfo.st_mode)
       {
@@ -3675,18 +3689,14 @@ add_printer_filter(
 	    (fileinfo.st_uid ||
 	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
 	{
-	  if (fileinfo.st_uid)
-	    snprintf(p->state_message, sizeof(p->state_message),
-		     "Filter directory \"%s\" for printer \"%s\" not owned by "
-		     "root", filename, p->name);
-	  else
-	    snprintf(p->state_message, sizeof(p->state_message),
-		     "Filter directory \"%s\" for printer \"%s\" has insecure "
-		     "permissions (0%o)", filename, p->name, fileinfo.st_mode);
+	  snprintf(p->state_message, sizeof(p->state_message),
+		   "Printer driver directory \"%s\" has insecure permissions "
+		   "(%d/0%o).", filename, (int)fileinfo.st_uid,
+		   fileinfo.st_mode);
 
 	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
-	  cupsdLogMessage(CUPSD_LOG_ERROR, "%s", p->state_message);
+	  cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
 	}
       }
     }
@@ -3696,6 +3706,15 @@ add_printer_filter(
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
 
+  if ((desttype = mimeType(MimeDatabase, "printer", dest)) == NULL)
+  {
+    desttype = mimeAddType(MimeDatabase, "printer", dest);
+    if (!p->dest_types)
+      p->dest_types = cupsArrayNew(NULL, NULL);
+
+    cupsArrayAdd(p->dest_types, desttype);
+  }
+
   for (temptype = mimeFirstType(MimeDatabase);
        temptype;
        temptype = mimeNextType(MimeDatabase))
@@ -3703,12 +3722,33 @@ add_printer_filter(
          !strcasecmp(temptype->super, super)) &&
         (type[0] == '*' || !strcasecmp(temptype->type, type)))
     {
-      cupsdLogMessage(CUPSD_LOG_DEBUG2,
-                      "add_printer_filter: %s: adding filter %s/%s %s/%s %d %s",
-                      p->name, temptype->super, temptype->type,
-		      filtertype->super, filtertype->type,
-                      cost, program);
-      mimeAddFilter(MimeDatabase, temptype, filtertype, cost, program);
+      if (desttype != filtertype)
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		        "add_printer_filter: %s: adding filter %s/%s %s/%s %d "
+		        "%s", p->name, temptype->super, temptype->type,
+		        desttype->super, desttype->type,
+		        cost, program);
+        mimeAddFilter(MimeDatabase, temptype, desttype, cost, program);
+
+        if (!mimeFilterLookup(MimeDatabase, desttype, filtertype))
+        {
+          cupsdLogMessage(CUPSD_LOG_DEBUG2,
+	                  "add_printer_filter: %s: adding filter %s/%s %s/%s "
+	                  "0 -", p->name, desttype->super, desttype->type,
+		          filtertype->super, filtertype->type);
+          mimeAddFilter(MimeDatabase, desttype, filtertype, cost, "-");
+        }
+      }
+      else
+      {
+        cupsdLogMessage(CUPSD_LOG_DEBUG2,
+		        "add_printer_filter: %s: adding filter %s/%s %s/%s %d "
+		        "%s", p->name, temptype->super, temptype->type,
+		        filtertype->super, filtertype->type,
+		        cost, program);
+        mimeAddFilter(MimeDatabase, temptype, filtertype, cost, program);
+      }
     }
 }
 
@@ -3758,6 +3798,9 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
        type;
        type = mimeNextType(MimeDatabase))
   {
+    if (!strcasecmp(type->super, "printer"))
+      continue;
+
     snprintf(mimetype, sizeof(mimetype), "%s/%s", type->super, type->type);
 
     if ((filters = mimeFilter(MimeDatabase, type, p->filetype, NULL)) != NULL)
@@ -3851,6 +3894,8 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 	  strlcat(pdl, "image/jpeg,", sizeof(pdl));
 	else if (!strcasecmp(type->type, "png"))
 	  strlcat(pdl, "image/png,", sizeof(pdl));
+	else if (!strcasecmp(type->type, "pwg-raster"))
+	  strlcat(pdl, "image/pwg-raster,", sizeof(pdl));
       }
     }
 
@@ -3901,6 +3946,7 @@ delete_printer_filters(
     cupsd_printer_t *p)			/* I - Printer to remove from */
 {
   mime_filter_t	*filter;		/* MIME filter looping var */
+  mime_type_t	*type;			/* Destination types for filters */
 
 
  /*
@@ -3918,7 +3964,8 @@ delete_printer_filters(
   for (filter = mimeFirstFilter(MimeDatabase);
        filter;
        filter = mimeNextFilter(MimeDatabase))
-    if (filter->dst == p->filetype || filter->dst == p->prefiltertype)
+    if (filter->dst == p->filetype || filter->dst == p->prefiltertype ||
+        cupsArrayFind(p->dest_types, filter->dst))
     {
      /*
       * Delete the current filter...
@@ -3926,6 +3973,14 @@ delete_printer_filters(
 
       mimeDeleteFilter(MimeDatabase, filter);
     }
+
+  for (type = (mime_type_t *)cupsArrayFirst(p->dest_types);
+       type;
+       type = (mime_type_t *)cupsArrayNext(p->dest_types))
+    mimeDeleteType(MimeDatabase, type);
+
+  cupsArrayDelete(p->dest_types);
+  p->dest_types = NULL;
 
   cupsdSetPrinterReasons(p, "-cups-insecure-filter-warning"
                             ",cups-missing-filter-warning");
@@ -4761,15 +4816,37 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Add any filters in the PPD file...
     */
 
-    DEBUG_printf(("ppd->num_filters = %d\n", ppd->num_filters));
-    for (i = 0; i < ppd->num_filters; i ++)
+    if ((ppd_attr = ppdFindAttr(ppd, "cupsFilter2", NULL)) != NULL)
     {
-      DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
-      add_string_array(&(p->filters), ppd->filters[i]);
+     /*
+      * Use new cupsFilter2 filter syntax...
+      */
 
-      if (!strncasecmp(ppd->filters[i], "application/vnd.cups-command", 28) &&
-          isspace(ppd->filters[i][28] & 255))
-        p->type |= CUPS_PRINTER_COMMANDS;
+      for (; ppd_attr; ppd_attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL))
+      {
+        add_string_array(&(p->filters), ppd_attr->value);
+
+        if (!strncasecmp(ppd_attr->value, "application/vnd.cups-command", 28) &&
+            isspace(ppd_attr->value[28] & 255))
+          p->type |= CUPS_PRINTER_COMMANDS;
+      }
+    }
+    else
+    {
+     /*
+      * Use old cupsFilter syntax...
+      */
+
+      DEBUG_printf(("ppd->num_filters = %d\n", ppd->num_filters));
+      for (i = 0; i < ppd->num_filters; i ++)
+      {
+        DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
+        add_string_array(&(p->filters), ppd->filters[i]);
+
+        if (!strncasecmp(ppd->filters[i], "application/vnd.cups-command", 28) &&
+            isspace(ppd->filters[i][28] & 255))
+          p->type |= CUPS_PRINTER_COMMANDS;
+      }
     }
 
     if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
@@ -4815,7 +4892,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	*/
 
 	add_string_array(&(p->filters),
-	                 "application/vnd.cups-command 0 commandtops");
+	                 "application/vnd.cups-command application/postscript "
+			 "0 commandtops");
 	p->type |= CUPS_PRINTER_COMMANDS;
       }
     }
@@ -4986,8 +5064,10 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
           for (i = 0; i < CGImageSourceGetCount(sourceRef); i ++)
           {
             imageRef = CGImageSourceCreateImageAtIndex(sourceRef, i, NULL);
-            if (imageRef &&
-                CGImageGetWidth(imageRef) == CGImageGetHeight(imageRef))
+	    if (!imageRef)
+	      continue;
+
+            if (CGImageGetWidth(imageRef) == CGImageGetHeight(imageRef))
             {
              /*
               * Loop through remembering the icon closest to 128 but >= 128
@@ -5011,9 +5091,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                 CGImageRetain(imageRef);
                 biggestIconRef = imageRef;
               }
+	    }
 
-              CGImageRelease(imageRef);
-            }
+	    CGImageRelease(imageRef);
           }
 
           if (biggestIconRef)
@@ -5028,7 +5108,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                                              biggestIconRef;
             CGImageRetain(imageRef);
             CGImageRelease(biggestIconRef);
-            CGImageRelease(closestTo128IconRef);
+            if (closestTo128IconRef)
+	      CGImageRelease(closestTo128IconRef);
             destRef = CGImageDestinationCreateWithURL(outUrl, kUTTypePNG, 1,
                                                       NULL);
             if (destRef)
@@ -5056,10 +5137,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
               CGImageDestinationFinalize(destRef);
               CFRelease(destRef);
             }
-          }
 
-          if (imageRef)
             CGImageRelease(imageRef);
+          }
 
           CFRelease(sourceRef);
         }

@@ -1,8 +1,11 @@
 LIBRARY libcups2
 VERSION 2.9
 EXPORTS
+_cupsGet1284Values
+_cupsGetDests
 _cupsGetPassword
 _cupsGlobals
+_cupsLangPrintError
 _cupsLangPrintf
 _cupsLangPuts
 _cupsLangString
@@ -18,13 +21,19 @@ _cupsStrAlloc
 _cupsStrFlush
 _cupsStrFormatd
 _cupsStrFree
+_cupsStrRetain
 _cupsStrScand
 _cupsStrStatistics
 _cups_strcpy
 _cups_strlcat
 _cups_strlcpy
+_httpAddrPort
+_httpCreate
+_httpEncodeURI
+_httpPeek
 _httpResolveURI
 _httpSetTimeout
+_httpWait
 _ippAddAttr
 _ippAttrString
 _ippFindOption
@@ -33,6 +42,9 @@ _ppdFreeLanguages
 _ppdGetEncoding
 _ppdGetLanguages
 _ppdHashName
+_ppdLocalizedAttr
+_ppdNormalizeMakeAndModel
+_ppdParseOptions
 _pwgCreateWithFile
 _pwgDestroy
 _pwgWriteFile
@@ -66,10 +78,14 @@ cupsArrayDelete
 cupsArrayDup
 cupsArrayFind
 cupsArrayFirst
+cupsArrayGetIndex
+cupsArrayGetInsert
 cupsArrayIndex
 cupsArrayInsert
 cupsArrayLast
 cupsArrayNew
+cupsArrayNew2
+cupsArrayNew3
 cupsArrayNext
 cupsArrayPrev
 cupsArrayRemove
@@ -155,12 +171,14 @@ cupsRemoveOption
 cupsResolveConflicts
 cupsSendRequest
 cupsServer
+cupsSetClientCertCB
 cupsSetCredentials
 cupsSetDests
 cupsSetDests2
 cupsSetEncryption
 cupsSetPasswordCB
 cupsSetServer
+cupsSetServerCertCB
 cupsSetUser
 cupsTempFd
 cupsTempFile

@@ -354,20 +354,23 @@ cupsdStartProcess(
 		    "profile=%p, job=%p(%d), pid=%p) = %d",
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
 		    root, profile, job, job ? job->id : 0, pid, *pid);
-    cupsdLogMessage(CUPSD_LOG_ERROR, "Unable to execute %s: %s", command,
-                    strerror(errno));
+    cupsdLogMessage(CUPSD_LOG_ERROR,
+                    "%s%s \"%s\" not available: %s",
+		    job && job->printer ? job->printer->name : "",
+		    job && job->printer ? ": Printer driver" : "Program",
+		    command, strerror(errno));
 
     if (job && job->printer)
     {
       if (cupsdSetPrinterReasons(job->printer, "+cups-missing-filter-warning"))
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		      "Printer driver %s is missing.", command);
+		      "Printer driver \"%s\" not available.", command);
     }
 
     return (0);
   }
   else if (!RunUser &&
-           ((commandinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) ||
+           ((commandinfo.st_mode & (S_ISUID | S_IWOTH)) ||
             commandinfo.st_uid))
   {
     *pid = 0;
@@ -379,15 +382,18 @@ cupsdStartProcess(
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
 		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to execute %s: insecure file permissions (0%o)",
-		    command, commandinfo.st_mode);
+                    "%s%s \"%s\" has insecure permissions (%d/0%o).",
+		    job && job->printer ? job->printer->name : "",
+		    job && job->printer ? ": Printer driver" : "Program",
+		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
 
     if (job && job->printer)
     {
       if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-		      "Printer driver %s has insecure file permissions (0%o).",
-		      command, commandinfo.st_mode);
+		      "Printer driver \"%s\" has insecure permissions "
+		      "(%d/0%o).", command,
+		      (int)commandinfo.st_uid, commandinfo.st_mode);
     }
 
     errno = EPERM;
@@ -407,11 +413,30 @@ cupsdStartProcess(
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
 		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "Unable to execute %s: no execute permissions (0%o)",
-		    command, commandinfo.st_mode);
+                    "%s%s \"%s\" does not have execute permissions (%d/0%o).",
+		    job && job->printer ? job->printer->name : "",
+		    job && job->printer ? ": Printer driver" : "Program",
+		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
 
     errno = EPERM;
     return (0);
+  }
+  else if (!RunUser && (commandinfo.st_mode & S_IWGRP))
+  {
+    cupsdLogMessage(CUPSD_LOG_WARN,
+                    "%s%s \"%s\" has insecure permissions (%d/0%o).",
+		    job && job->printer ? job->printer->name : "",
+		    job && job->printer ? ": Printer driver" : "Program",
+		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
+
+    if (job && job->printer)
+    {
+      if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
+	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
+		      "Printer driver \"%s\" has insecure permissions "
+		      "(%d/0%o).", command, (int)commandinfo.st_uid,
+		      commandinfo.st_mode);
+    }
   }
 
 #if defined(__APPLE__)

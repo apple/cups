@@ -1,9 +1,9 @@
 /*
- * "$Id: runloop.c 7895 2008-09-02 19:19:43Z mike $"
+ * "$Id: runloop.c 9565 2011-02-23 00:08:08Z mike $"
  *
- *   Common run loop APIs for CUPS.
+ *   Common run loop APIs for CUPS backends.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -18,6 +18,8 @@
  *
  *   backendDrainOutput() - Drain pending print data to the device.
  *   backendRunLoop()     - Read and write print and back-channel data.
+ *   backendWaitLoop()    - Wait for input from stdin while handling
+ *                          side-channel queries.
  */
 
 /*
@@ -141,14 +143,13 @@ backendDrainOutput(int print_fd,	/* I - Print file descriptor */
 
 ssize_t					/* O - Total bytes on success, -1 on error */
 backendRunLoop(
-    int         print_fd,		/* I - Print file descriptor */
-    int         device_fd,		/* I - Device file descriptor */
-    int         snmp_fd,		/* I - SNMP socket or -1 if none */
-    http_addr_t *addr,			/* I - Address of device */
-    int         use_bc,			/* I - Use back-channel? */
-    int         update_state,		/* I - Update printer-state-reasons? */
-    int         (*side_cb)(int, int, int, http_addr_t *, int))
-					/* I - Side-channel callback */
+    int          print_fd,		/* I - Print file descriptor */
+    int          device_fd,		/* I - Device file descriptor */
+    int          snmp_fd,		/* I - SNMP socket or -1 if none */
+    http_addr_t  *addr,			/* I - Address of device */
+    int          use_bc,		/* I - Use back-channel? */
+    int          update_state,		/* I - Update printer-state-reasons? */
+    _cups_sccb_t side_cb)		/* I - Side-channel callback */
 {
   int		nfds;			/* Maximum file descriptor value + 1 */
   fd_set	input,			/* Input set for reading */
@@ -255,7 +256,7 @@ backendRunLoop(
 	else if (errno == EINTR && total_bytes == 0)
 	{
 	  fputs("DEBUG: Received an interrupt before any bytes were "
-	        "written, aborting\n", stderr);
+	        "written, aborting.\n", stderr);
           return (0);
 	}
 
@@ -422,5 +423,103 @@ backendRunLoop(
 
 
 /*
- * End of "$Id: runloop.c 7895 2008-09-02 19:19:43Z mike $".
+ * 'backendWaitLoop()' - Wait for input from stdin while handling side-channel
+ *                       queries.
+ */
+
+int					/* O - 1 if data is ready, 0 if not */
+backendWaitLoop(
+    int          snmp_fd,		/* I - SNMP socket or -1 if none */
+    http_addr_t  *addr,			/* I - Address of device */
+    _cups_sccb_t side_cb)		/* I - Side-channel callback */
+{
+  fd_set	input;			/* Input set for reading */
+  time_t	curtime,		/* Current time */
+		snmp_update = 0;
+#if defined(HAVE_SIGACTION) && !defined(HAVE_SIGSET)
+  struct sigaction action;		/* Actions for POSIX signals */
+#endif /* HAVE_SIGACTION && !HAVE_SIGSET */
+
+
+  fprintf(stderr, "DEBUG: backendWaitLoop(snmp_fd=%d, addr=%p, side_cb=%p)\n",
+	  snmp_fd, addr, side_cb);
+
+ /*
+  * Now loop until we receive data from stdin...
+  */
+
+  for (;;)
+  {
+   /*
+    * Use select() to determine whether we have data to copy around...
+    */
+
+    FD_ZERO(&input);
+    FD_SET(0, &input);
+    if (side_cb)
+      FD_SET(CUPS_SC_FD, &input);
+
+    if (select(CUPS_SC_FD + 1, &input, NULL, NULL, NULL) < 0)
+    {
+     /*
+      * Pause printing to clear any pending errors...
+      */
+
+      if (errno == EINTR)
+      {
+	fputs("DEBUG: Received an interrupt before any bytes were "
+	      "written, aborting.\n", stderr);
+	return (0);
+      }
+
+      sleep(1);
+      continue;
+    }
+
+   /*
+    * Check for input on stdin...
+    */
+
+    if (FD_ISSET(0, &input))
+      break;
+
+   /*
+    * Check if we have a side-channel request ready...
+    */
+
+    if (side_cb && FD_ISSET(CUPS_SC_FD, &input))
+    {
+     /*
+      * Do the side-channel request, then start back over in the select
+      * loop since it may have read from print_fd...
+      */
+
+      if ((*side_cb)(0, -1, snmp_fd, addr, 0))
+        side_cb = NULL;
+      continue;
+    }
+
+   /*
+    * Do SNMP updates periodically...
+    */
+
+    if (snmp_fd >= 0 && time(&curtime) >= snmp_update)
+    {
+      if (backendSNMPSupplies(snmp_fd, addr, NULL, NULL))
+        snmp_update = INT_MAX;
+      else
+        snmp_update = curtime + 5;
+    }
+  }
+
+ /*
+  * Return with success...
+  */
+
+  return (1);
+}
+
+
+/*
+ * End of "$Id: runloop.c 9565 2011-02-23 00:08:08Z mike $".
  */

@@ -4,11 +4,16 @@ CHANGES-1.4.txt
 CHANGES IN CUPS V1.4.7
 
 	- Documentation changes (STR #3710, STR #3720, STR #3745, STR #3750,
-	  STR #3757, STR #3758)
+	  STR #3757, STR #3758, STR #3782)
 	- Web interface fixes (STR #3412, STR #3345, STR #3455, STR #3707,
-	  STR #3755, STR #3769)
+	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- The gziptoany filter did not report the correct error if it was unable
+	  to write the uncompressed document to the next filter or backend in
+	  the chain (STR #3797)
+	- The Epson and Oki 9-pin drivers had a bad resolution option
+	  (STR #3798)
 	- The scheduler did not always register the correct default ICC profile
 	  on Mac OS X.
 	- The scheduler did not use the job owner when authorizing access for

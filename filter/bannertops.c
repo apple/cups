@@ -202,6 +202,8 @@ load_banner(const char *filename)	/* I - Filename or NULL for stdin */
 
     linenum ++;
 
+    fprintf(stderr, "DEBUG: %4d %s\n", linenum, line);
+
     if (line[0] == '#' || !line[0])
       continue;
 
