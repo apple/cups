@@ -25,6 +25,7 @@
  *   cupsFreeDests()                - Free the memory used by the list of
  *                                    destinations.
  *   cupsGetDest()                  - Get the named destination from the list.
+ *   _cupsGetDests()                - Get destinations from a server.
  *   cupsGetDests()                 - Get the list of destinations from the
  *                                    default server.
  *   cupsGetDests2()                - Get the list of destinations from the
@@ -52,7 +53,6 @@
  *   cups_get_default()             - Get the default destination from an
  *                                    lpoptions file.
  *   cups_get_dests()               - Get destinations from a file.
- *   _cupsGetDests()              - Get destinations from a server.
  *   cups_make_string()             - Make a comma-separated string of values
  *                                    from an IPP attribute.
  */
