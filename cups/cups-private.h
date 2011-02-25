@@ -161,8 +161,10 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
 #  ifdef __APPLE__
 extern CFStringRef	_cupsAppleCopyDefaultPaperID(void);
+extern CFStringRef	_cupsAppleCopyDefaultPrinter(void);
 extern int		_cupsAppleGetUseLastPrinter(void);
 extern void		_cupsAppleSetDefaultPaperID(CFStringRef name);
+extern void		_cupsAppleSetDefaultPrinter(CFStringRef name);
 extern void		_cupsAppleSetUseLastPrinter(int uselast);
 #  endif /* __APPLE__ */
 
@@ -170,8 +172,7 @@ extern http_t		*_cupsConnect(void);
 extern int		_cupsGet1284Values(const char *device_id,
 			                   cups_option_t **values);
 extern int		_cupsGetDests(http_t *http, ipp_op_t op,
-			              const char *name, int num_dests,
-				      cups_dest_t **dests);
+			              const char *name, cups_dest_t **dests);
 extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
