@@ -291,7 +291,7 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!", 
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!",
 		      job->id);
 
       stop_job(job, CUPSD_JOB_FORCE);
@@ -904,9 +904,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
     if (filter && filter->dst)
     {
-      if (strchr(filter->dst->type, '/'))
+      if ((ptr = strchr(filter->dst->type, '/')) != NULL)
 	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s", filter->dst->type);
+		 "FINAL_CONTENT_TYPE=%s", ptr + 1);
       else
 	snprintf(final_content_type, sizeof(final_content_type),
 		 "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
@@ -3155,7 +3155,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 				 IPP_TAG_ZERO)) != NULL &&
 	(attr->value_tag == IPP_TAG_KEYWORD ||
 	 attr->value_tag == IPP_TAG_NAME) &&
-	(ppd = _pwgGetOutputBin(pwg, attr->values[0].string.text)) != NULL) 
+	(ppd = _pwgGetOutputBin(pwg, attr->values[0].string.text)) != NULL)
     {
      /*
       * Map output-bin to OutputBin option...

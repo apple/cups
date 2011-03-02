@@ -3612,14 +3612,24 @@ add_printer_filter(
   if (sscanf(filter, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
              super, type, dsuper, dtype, &cost, program) == 6)
   {
-    snprintf(dest, sizeof(dest), "%s/%s", dsuper, dtype);
+    snprintf(dest, sizeof(dest), "%s/%s/%s", p->name, dsuper, dtype);
+
+    if ((desttype = mimeType(MimeDatabase, "printer", dest)) == NULL)
+    {
+      desttype = mimeAddType(MimeDatabase, "printer", dest);
+      if (!p->dest_types)
+        p->dest_types = cupsArrayNew(NULL, NULL);
+
+      cupsArrayAdd(p->dest_types, desttype);
+    }
+
   }
   else
   {
     if (sscanf(filter, "%15[^/]/%255s%d%*[ \t]%1023[^\n]", super, type, &cost,
                program) == 4)
     {
-      strlcpy(dest, p->name, sizeof(dest));
+      desttype = filtertype;
     }
     else
     {
@@ -3705,15 +3715,6 @@ add_printer_filter(
  /*
   * Add the filter to the MIME database, supporting wildcards as needed...
   */
-
-  if ((desttype = mimeType(MimeDatabase, "printer", dest)) == NULL)
-  {
-    desttype = mimeAddType(MimeDatabase, "printer", dest);
-    if (!p->dest_types)
-      p->dest_types = cupsArrayNew(NULL, NULL);
-
-    cupsArrayAdd(p->dest_types, desttype);
-  }
 
   for (temptype = mimeFirstType(MimeDatabase);
        temptype;
