@@ -155,7 +155,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
     if (!strcasecmp(ppd_size->name, "Custom"))
       continue;
-	
+
    /*
     * Convert the PPD size name to the corresponding PWG keyword name.
     */
@@ -224,12 +224,12 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	               old_size->right == 0 && old_size->top == 0;
       old_known_pwg  = strncmp(old_size->map.pwg, "oe_", 3) &&
 		       strncmp(old_size->map.pwg, "om_", 3);
-		
+
       similar = old_borderless == new_borderless &&
                 _PWG_EQUIVALENT(old_size->width, new_width) &&
 	        _PWG_EQUIVALENT(old_size->length, new_length);
 
-      if (similar && 
+      if (similar &&
           (new_known_pwg || (!old_known_pwg && new_imageable > old_imageable)))
       {
        /*
@@ -253,7 +253,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
       new_size = pwg_size ++;
       pwg->num_sizes ++;
-    } 
+    }
 
     if (new_size)
     {
@@ -512,7 +512,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
         if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && paper_coating &&
 	    strcmp(paper_coating, "none") &&
-	    strcmp(paper_coating, "autodetect"))		
+	    strcmp(paper_coating, "autodetect"))
 	  continue;
 
        /*
@@ -895,7 +895,7 @@ const char *				/* O - PPD PageSize or NULL */
 _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
                 ipp_t      *job,	/* I - Job attributes or NULL */
 		const char *keyword,	/* I - Keyword string or NULL */
-		int        *exact)	/* I - 1 if exact match, 0 otherwise */
+		int        *exact)	/* O - 1 if exact match, 0 otherwise */
 {
   int		i;			/* Looping var */
   _pwg_size_t	*size,			/* Current size */
@@ -966,14 +966,15 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
       DEBUG_printf(("2_pwgGetPageSize: size[%d]=[\"%s\" \"%s\"]",
                     (int)(size - pwg->sizes), size->map.pwg, size->map.ppd));
 
-      if (!strcasecmp(ppd_name, size->map.ppd))
+      if (!strcasecmp(ppd_name, size->map.ppd) ||
+          !strcasecmp(ppd_name, size->map.pwg))
       {
 	if (exact)
 	  *exact = 1;
 
         DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", ppd_name));
 
-        return (ppd_name);
+        return (size->map.ppd);
       }
     }
   }

@@ -441,6 +441,21 @@ main(int  argc,				/* I - Number of command-line arguments */
     else
       puts("PASS");
 
+    fputs("cupsMarkOptions(media=oe_letter-fullbleed_8.5x11in): ", stdout);
+    num_options = cupsAddOption("media", "oe_letter-fullbleed_8.5x11in", 0,
+                                &options);
+    cupsMarkOptions(ppd, num_options, options);
+    cupsFreeOptions(num_options, options);
+
+    size = ppdPageSize(ppd, NULL);
+    if (!size || strcmp(size->name, "Letter.Fullbleed"))
+    {
+      printf("FAIL (%s)\n", size ? size->name : "unknown");
+      status ++;
+    }
+    else
+      puts("PASS");
+
     fputs("cupsMarkOptions(media=A4): ", stdout);
     num_options = cupsAddOption("media", "A4", 0, &options);
     cupsMarkOptions(ppd, num_options, options);

@@ -386,7 +386,7 @@ cupsFileFlush(cups_file_t *fp)		/* I - CUPS file */
 
     fp->ptr = fp->buf;
   }
-   
+
   return (0);
 }
 
@@ -406,7 +406,7 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
 
   if (!fp || (fp->mode != 'r' && fp->mode != 's'))
   {
-    DEBUG_puts("3cupsFileGetChar: Bad arguments!");
+    DEBUG_puts("5cupsFileGetChar: Bad arguments!");
     return (-1);
   }
 
@@ -417,7 +417,7 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   if (fp->ptr >= fp->end)
     if (cups_fill(fp) < 0)
     {
-      DEBUG_puts("3cupsFileGetChar: Unable to fill buffer!");
+      DEBUG_puts("5cupsFileGetChar: Unable to fill buffer!");
       return (-1);
     }
 
@@ -425,11 +425,11 @@ cupsFileGetChar(cups_file_t *fp)	/* I - CUPS file */
   * Return the next character in the buffer...
   */
 
-  DEBUG_printf(("3cupsFileGetChar: Returning %d...", *(fp->ptr) & 255));
+  DEBUG_printf(("5cupsFileGetChar: Returning %d...", *(fp->ptr) & 255));
 
   fp->pos ++;
 
-  DEBUG_printf(("4cupsFileGetChar: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
+  DEBUG_printf(("6cupsFileGetChar: pos=" CUPS_LLFMT, CUPS_LLCAST fp->pos));
 
   return (*(fp->ptr)++ & 255);
 }
