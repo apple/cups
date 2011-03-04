@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.4.7
 	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- The DBUS notifier did not report job state changes (STR #3805)
 	- The scheduler did not always report that the "normal" print-quality
 	  value was supported (STR #3803)
 	- The gziptoany filter did not report the correct error if it was unable
