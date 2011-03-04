@@ -474,9 +474,9 @@ backend_init_supplies(
   * See if we should be getting supply levels via SNMP...
   */
 
-  if ((ppd = ppdOpenFile(getenv("PPD"))) != NULL &&
-      (ppdattr = ppdFindAttr(ppd, "cupsSNMPSupplies", NULL)) != NULL &&
-      ppdattr->value && strcasecmp(ppdattr->value, "true"))
+  if ((ppd = ppdOpenFile(getenv("PPD"))) == NULL ||
+      ((ppdattr = ppdFindAttr(ppd, "cupsSNMPSupplies", NULL)) != NULL &&
+       ppdattr->value && strcasecmp(ppdattr->value, "true")))
   {
     ppdClose(ppd);
     return;
