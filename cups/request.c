@@ -660,6 +660,7 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
 
       httpSetField(http, HTTP_FIELD_WWW_AUTHENTICATE, "Negotiate");
       cupsDoAuthentication(http, "POST", resource);
+      httpSetField(http, HTTP_FIELD_WWW_AUTHENICATE, "");
     }
 #endif /* HAVE_GSSAPI */
 
