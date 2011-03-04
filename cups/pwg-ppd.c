@@ -3,7 +3,7 @@
  *
  *   PWG PPD mapping API implementation for CUPS.
  *
- *   Copyright 2010 by Apple Inc.
+ *   Copyright 2010-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
