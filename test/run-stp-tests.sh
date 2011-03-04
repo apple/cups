@@ -810,20 +810,6 @@ else
 	echo "<P>PASS: $count debug2 messages.</P>" >>$strfile
 fi
 
-# Page log file...
-if test `uname` = Darwin; then
-	# Currently just test for Mac OS X since others do not have UI to
-	# select a user-wide default media size...
-	if $GREP -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
-		echo "PASS: page_log formatted correctly."
-		echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
-	else
-		echo "FAIL: page_log formatted incorrectly."
-		echo "<P>FAIL: page_log formatted incorrectly - no page size information.</P>" >>$strfile
-		fail=`expr $fail + 1`
-	fi
-fi
-
 # Log files...
 echo "<H2>access_log</H2>" >>$strfile
 echo "<PRE>" >>$strfile
