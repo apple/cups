@@ -392,6 +392,7 @@ Version "1.5"
 
     Duplex Yes
     Installable "Option1/Duplexer"
+    Attribute "?Option1" "" "save currentpagedevice/Duplex known{(True)}{(False)}ifelse = flush restore"
   }
 }
 

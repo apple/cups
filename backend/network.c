@@ -1,9 +1,9 @@
 /*
  * "$Id$"
  *
- *   Common network APIs for the Common UNIX Printing System (CUPS).
+ *   Common backend network APIs for CUPS.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -278,6 +278,12 @@ backendNetworkSideCB(
 	  status  = CUPS_SC_STATUS_OK;
 	  break;
 	}
+
+    case CUPS_SC_CMD_GET_CONNECTED :
+	status  = CUPS_SC_STATUS_OK;
+        data[0] = device_fd != -1;
+        datalen = 1;
+        break;
 
     default :
         status  = CUPS_SC_STATUS_NOT_IMPLEMENTED;

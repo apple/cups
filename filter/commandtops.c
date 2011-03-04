@@ -3,7 +3,7 @@
  *
  *   PostScript command filter for CUPS.
  *
- *   Copyright 2008-2010 by Apple Inc.
+ *   Copyright 2008-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -162,6 +162,19 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
   */
 
   begin_ps(ppd, user);
+  fflush(stdout);
+
+ /*
+  * Wait for the printer to become connected...
+  */
+
+  do
+  {
+    sleep(1);
+    datalen = 1;
+  }
+  while (cupsSideChannelDoRequest(CUPS_SC_CMD_GET_CONNECTED, buffer, &datalen,
+                                  5.0) == CUPS_SC_STATUS_OK && !buffer[0]);
 
  /*
   * Then loop through every option in the PPD file and ask for the current
@@ -199,7 +212,7 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
     * Read the response data...
     */
 
-    while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer) - 1, 5.0)) > 0)
+    while ((bytes = cupsBackChannelRead(buffer, sizeof(buffer) - 1, 90.0)) > 0)
     {
      /*
       * Trim whitespace from both ends...
@@ -215,11 +228,20 @@ auto_configure(ppd_file_t *ppd,		/* I - PPD file */
 
       for (bufptr = buffer; isspace(*bufptr & 255); bufptr ++);
 
+      fprintf(stderr, "DEBUG: Got \"%s\" (%d bytes)\n", bufptr, (int)bytes);
+
      /*
       * Skip blank lines...
       */
 
       if (!*bufptr)
+        continue;
+
+     /*
+      * Verify the result is a valid option choice...
+      */
+
+      if (!ppdFindChoice(option, bufptr))
         continue;
 
      /*

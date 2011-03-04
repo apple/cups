@@ -9,6 +9,7 @@ CHANGES IN CUPS V1.4.7
 	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- Fixed an issue with PostScript printer auto-configuration (STR #3443)
 	- Fixed some compatibility issues with the libusb-based USB backend
 	  (STR #3799)
 	- The network backends no longer try to collect SNMP supply and status

@@ -3,7 +3,7 @@
  *
  *   Side-channel API code for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -205,7 +205,7 @@ cupsSideChannelRead(
   */
 
   if (buffer[0] < CUPS_SC_CMD_SOFT_RESET ||
-      buffer[0] > CUPS_SC_CMD_SNMP_GET_NEXT)
+      buffer[0] >= CUPS_SC_CMD_MAX)
   {
     DEBUG_printf(("1cupsSideChannelRead: Bad command %d!", buffer[0]));
     *command = CUPS_SC_CMD_NONE;
@@ -499,7 +499,7 @@ cupsSideChannelWrite(
   * Range check input...
   */
 
-  if (command < CUPS_SC_CMD_SOFT_RESET || command > CUPS_SC_CMD_SNMP_GET_NEXT ||
+  if (command < CUPS_SC_CMD_SOFT_RESET || command >= CUPS_SC_CMD_MAX ||
       datalen < 0 || datalen > 16384 || (datalen > 0 && !data))
     return (-1);
 
