@@ -4196,9 +4196,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       if (ppdFindChoice(output_mode, "draft") ||
           ppdFindChoice(output_mode, "fast"))
         qualities[num_qualities ++] = IPP_QUALITY_DRAFT;
-      if (ppdFindChoice(output_mode, "normal") ||
-          ppdFindChoice(output_mode, "good"))
-        qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
+
+      qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
+
       if (ppdFindChoice(output_mode, "best") ||
           ppdFindChoice(output_mode, "high"))
         qualities[num_qualities ++] = IPP_QUALITY_HIGH;
@@ -4220,8 +4220,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
       qualities[num_qualities ++] = IPP_QUALITY_HIGH;
     }
-
-    if (num_qualities == 0)
+    else
       qualities[num_qualities ++] = IPP_QUALITY_NORMAL;
 
     ippAddIntegers(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
