@@ -658,10 +658,11 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * "replay" attack...
       */
 
+      httpSetField(http, HTTP_FIELD_WWW_AUTHENTICATE, "Negotiate");
       cupsDoAuthentication(http, "POST", resource);
     }
-    else
 #endif /* HAVE_GSSAPI */
+
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
     DEBUG_printf(("2cupsSendRequest: authstring=\"%s\"", http->authstring));
