@@ -431,6 +431,7 @@ int					/* O - 1 if data is ready, 0 if not */
 backendWaitLoop(
     int          snmp_fd,		/* I - SNMP socket or -1 if none */
     http_addr_t  *addr,			/* I - Address of device */
+    int          use_bc,		/* I - Use back-channel? */
     _cups_sccb_t side_cb)		/* I - Side-channel callback */
 {
   fd_set	input;			/* Input set for reading */
@@ -494,7 +495,7 @@ backendWaitLoop(
       * loop since it may have read from print_fd...
       */
 
-      if ((*side_cb)(0, -1, snmp_fd, addr, 0))
+      if ((*side_cb)(0, -1, snmp_fd, addr, use_bc))
         side_cb = NULL;
       continue;
     }

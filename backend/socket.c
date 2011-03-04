@@ -297,7 +297,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (print_fd == 0)
-    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 1, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
 
  /*

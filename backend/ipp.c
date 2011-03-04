@@ -548,7 +548,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (num_files == 0)
-    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 0, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
 
  /*
