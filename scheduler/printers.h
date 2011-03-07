@@ -83,8 +83,6 @@ struct cupsd_printer_s
   cups_array_t	*quotas;		/* Quota records */
   int		deny_users;		/* 1 = deny, 0 = allow */
   cups_array_t	*users;			/* Allowed/denied users */
-  int		num_history;		/* Number of history collections */
-  ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
   int		num_options;		/* Number of default options */
   cups_option_t	*options;		/* Default options */
@@ -138,7 +136,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
  */
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
-extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern int		cupsdDeletePrinter(cupsd_printer_t *p, int update);

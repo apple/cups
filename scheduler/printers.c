@@ -15,7 +15,6 @@
  * Contents:
  *
  *   cupsdAddPrinter()          - Add a printer to the system.
- *   cupsdAddPrinterHistory()   - Add the current printer state to the history.
  *   cupsdCreateCommonData()    - Create the common printer data.
  *   cupsdDeleteAllPrinters()   - Delete all printers from the system.
  *   cupsdDeletePrinter()       - Delete a printer from the system.
@@ -155,9 +154,6 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
 
   p->op_policy_ptr = DefaultPolicyPtr;
 
-  if (MaxPrinterHistory)
-    p->history = calloc(MaxPrinterHistory, sizeof(ipp_t *));
-
  /*
   * Insert the printer in the printer list alphabetically...
   */
@@ -177,67 +173,6 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   */
 
   return (p);
-}
-
-
-/*
- * 'cupsdAddPrinterHistory()' - Add the current printer state to the history.
- */
-
-void
-cupsdAddPrinterHistory(
-    cupsd_printer_t *p)			/* I - Printer */
-{
-  ipp_t	*history;			/* History collection */
-
-
- /*
-  * Stop early if we aren't keeping history data...
-  */
-
-  if (MaxPrinterHistory <= 0)
-    return;
-
- /*
-  * Retire old history data as needed...
-  */
-
-  p->sequence_number ++;
-
-  if (p->num_history >= MaxPrinterHistory)
-  {
-    p->num_history --;
-    ippDelete(p->history[0]);
-    memmove(p->history, p->history + 1, p->num_history * sizeof(ipp_t *));
-  }
-
- /*
-  * Create a collection containing the current printer-state, printer-up-time,
-  * printer-state-message, and printer-state-reasons attributes.
-  */
-
-  history = ippNew();
-  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_ENUM, "printer-state",
-                p->state);
-  ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-accepting-jobs",
-                p->accepting);
-  ippAddBoolean(history, IPP_TAG_PRINTER, "printer-is-shared", p->shared);
-  ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-state-message",
-               NULL, p->state_message);
-  if (p->num_reasons == 0)
-    ippAddString(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                 "printer-state-reasons", NULL, "none");
-  else
-    ippAddStrings(history, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-                  "printer-state-reasons", p->num_reasons, NULL,
-		  (const char * const *)p->reasons);
-  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "printer-state-change-time", p->state_time);
-  ippAddInteger(history, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
-                "printer-state-sequence-number", p->sequence_number);
-
-  p->history[p->num_history] = history;
-  p->num_history ++;
 }
 
 
@@ -880,14 +815,6 @@ cupsdDeletePrinter(
   if (p->printers != NULL)
     free(p->printers);
 
-  if (MaxPrinterHistory)
-  {
-    for (i = 0; i < p->num_history; i ++)
-      ippDelete(p->history[i]);
-
-    free(p->history);
-  }
-
   delete_printer_filters(p);
 
   for (i = 0; i < p->num_reasons; i ++)
@@ -1059,7 +986,6 @@ cupsdLoadAllPrinters(void)
 	*/
 
         cupsdSetPrinterAttrs(p);
-	cupsdAddPrinterHistory(p);
 
         if (strncmp(p->device_uri, "file:", 5) &&
 	    p->state != IPP_PRINTER_STOPPED)
@@ -2911,12 +2837,6 @@ cupsdSetPrinterState(
 
   if (s == IPP_PRINTER_PROCESSING)
     p->state_message[0] = '\0';
-
- /*
-  * Update the printer history...
-  */
-
-  cupsdAddPrinterHistory(p);
 
  /*
   * Let the browse protocols reflect the change...

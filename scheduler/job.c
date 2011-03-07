@@ -4210,10 +4210,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	return;
       }
       else if (cupsdSetPrinterReasons(job->printer, message))
-      {
-	cupsdAddPrinterHistory(job->printer);
 	event |= CUPSD_EVENT_PRINTER_STATE;
-      }
 
       update_job_attrs(job, 0);
     }
@@ -4379,7 +4376,6 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
 	strlcpy(job->printer->state_message, ptr,
 		sizeof(job->printer->state_message));
-	cupsdAddPrinterHistory(job->printer);
 
 	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 

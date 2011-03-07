@@ -183,8 +183,6 @@ VAR int			MaxClients		VALUE(100),
 					/* Maximum number of copies per job */
 			MaxLogSize		VALUE(1024 * 1024),
 					/* Maximum size of log files */
-			MaxPrinterHistory	VALUE(10),
-					/* Maximum printer state history */
 			MaxRequestSize		VALUE(0),
 					/* Maximum size of IPP requests */
 			HostNameLookups		VALUE(FALSE),
