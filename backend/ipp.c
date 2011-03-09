@@ -1480,7 +1480,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Return the queue status...
   */
 
-  fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
+  if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+      ipp_status <= IPP_OK_CONFLICT)
+    fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 
   if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
     return (CUPS_BACKEND_AUTH_REQUIRED);
