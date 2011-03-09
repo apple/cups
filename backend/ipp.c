@@ -946,7 +946,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     copies_remaining = 1;
 
-    if (argc < 7)
+    if (argc < 7 && !send_options)
       copies = 1;
   }
   else
