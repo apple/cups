@@ -167,7 +167,8 @@ main(int  argc,				/* I - Number of command-line args */
 		*supported;		/* get-printer-attributes response */
   time_t	start_time;		/* Time of first connect */
   int		contimeout;		/* Connection timeout */
-  int		delay;			/* Delay for retries... */
+  int		delay,			/* Delay for retries */
+		prev_delay;		/* Previous delay */
   const char	*compression;		/* Compression mode */
   int		waitjob,		/* Wait for job complete? */
 		waitprinter;		/* Wait for printer ready? */
@@ -555,7 +556,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Try connecting to the remote server...
   */
 
-  delay = 5;
+  delay = _cupsNextDelay(0, &prev_delay);
 
   do
   {
@@ -634,8 +635,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	sleep(delay);
 
-	if (delay < 30)
-	  delay += 5;
+        delay = _cupsNextDelay(delay, &prev_delay);
       }
       else
       {
@@ -759,8 +759,7 @@ main(int  argc,				/* I - Number of command-line args */
 
 	sleep(delay);
 
-	if (delay < 30)
-	  delay += 5;
+        delay = _cupsNextDelay(delay, &prev_delay);
       }
       else if ((ipp_status == IPP_BAD_REQUEST ||
 	        ipp_status == IPP_VERSION_NOT_SUPPORTED) && version > 10)
@@ -1299,7 +1298,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     _cupsLangPrintFilter(stderr, "INFO", _("Waiting for job to complete."));
 
-    for (delay = 1; !job_canceled;)
+    for (delay = _cupsNextDelay(0, &prev_delay); !job_canceled;)
     {
      /*
       * Check for side-channel requests...
@@ -1333,6 +1332,7 @@ main(int  argc,				/* I - Number of command-line args */
       * Do the request...
       */
 
+      httpReconnect(http);
       response   = cupsDoRequest(http, request, resource);
       ipp_status = cupsLastError();
 
@@ -1400,23 +1400,13 @@ main(int  argc,				/* I - Number of command-line args */
 
       ippDelete(response);
 
-#if 0
      /*
-      * Check the printer state and report it if necessary...
-      */
-
-      check_printer_state(http, uri, resource, argv[2], version, job_id);
-#endif /* 0 */
-
-     /*
-      * Wait 1-10 seconds before polling again...
+      * Wait before polling again...
       */
 
       sleep(delay);
 
-      delay ++;
-      if (delay > 10)
-        delay = 1;
+      delay = _cupsNextDelay(delay, &prev_delay);
     }
   }
 
@@ -1697,8 +1687,7 @@ monitor_printer(
   * Loop until the job is canceled, aborted, or completed.
   */
 
-  delay      = 1;
-  prev_delay = 0;
+  delay = _cupsNextDelay(0, &prev_delay);
 
   while (monitor->job_state < IPP_JOB_CANCELED && !job_canceled)
   {
@@ -1764,15 +1753,12 @@ monitor_printer(
     }
 
    /*
-    * Sleep for N seconds, and then update the next sleep time using a
-    * Fibonacci series (1 1 2 3 5 8)...
+    * Sleep for N seconds...
     */
 
     sleep(delay);
 
-    temp_delay = delay;
-    delay      = (delay + prev_delay) % 12;
-    prev_delay = delay < temp_delay ? 0 : temp_delay;
+    delay = _cupsNextDelay(delay, &prev_delay);
   }
 
  /*

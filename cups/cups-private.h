@@ -177,6 +177,7 @@ extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsGlobalUnlock(void);
+extern int		_cupsNextDelay(int current, int *previous);
 extern void		_cupsSetDefaults(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
