@@ -314,8 +314,9 @@ cups_globals_free(_cups_globals_t *cg)	/* I - Pointer to global data */
     free(buffer);
   }
 
-  cupsArrayDelete(cg->pwg_size_lut);
   cupsArrayDelete(cg->leg_size_lut);
+  cupsArrayDelete(cg->ppd_size_lut);
+  cupsArrayDelete(cg->pwg_size_lut);
 
   httpClose(cg->http);
 
