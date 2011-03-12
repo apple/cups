@@ -122,10 +122,10 @@ cupsDoAuthentication(
     {
       DEBUG_printf(("2cupsDoAuthentication: authstring=\"%s\"",
                     http->authstring));
-  
+
       if (http->status == HTTP_UNAUTHORIZED)
 	http->digest_tries ++;
-  
+
       return (0);
     }
     else if (localauth == -1)
@@ -507,7 +507,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
  /*
   * Delete any previous authorization reference...
   */
-  
+
   if (http->auth_ref)
   {
     AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
@@ -515,10 +515,10 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 
   if (!getenv("GATEWAY_INTERFACE") &&
-      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
+      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
 		       auth_key, sizeof(auth_key)))
   {
-    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 
+    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment,
 				 kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
@@ -535,13 +535,13 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     auth_rights.count = 1;
     auth_rights.items = &auth_right;
 
-    auth_flags = kAuthorizationFlagDefaults | 
+    auth_flags = kAuthorizationFlagDefaults |
 		 kAuthorizationFlagPreAuthorize |
-		 kAuthorizationFlagInteractionAllowed | 
+		 kAuthorizationFlagInteractionAllowed |
 		 kAuthorizationFlagExtendRights;
 
-    status = AuthorizationCopyRights(http->auth_ref, &auth_rights, 
-				     kAuthorizationEmptyEnvironment, 
+    status = AuthorizationCopyRights(http->auth_ref, &auth_rights,
+				     kAuthorizationEmptyEnvironment,
 				     auth_flags, NULL);
     if (status == errAuthorizationSuccess)
       status = AuthorizationMakeExternalForm(http->auth_ref, &auth_extrn);
@@ -552,7 +552,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       * Set the authorization string and return...
       */
 
-      httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn, 
+      httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn,
 		     sizeof(auth_extrn));
 
       httpSetAuthString(http, "AuthRef", buffer);
@@ -580,11 +580,14 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * information...
   */
 
-#    ifdef HAVE_GSSAPI
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
-#    else
   if (
+#    ifdef HAVE_GSSAPI
+      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
 #    endif /* HAVE_GSSAPI */
+#    ifdef HAVE_AUTHORIZATION_H
+      !httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
+		        auth_key, sizeof(auth_key)) &&
+#    endif /* HAVE_AUTHORIZATION_H */
       http->hostaddr->addr.sa_family == AF_LOCAL &&
       !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
   {
