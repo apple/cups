@@ -4021,13 +4021,13 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ippDelete(p->ppd_attrs);
   p->ppd_attrs = ippNew();
 
-  _pwgDestroy(p->pwg);
-  p->pwg = NULL;
+  _ppdCacheDestroy(p->pc);
+  p->pc = NULL;
 
   if (pwg_info.st_mtime >= ppd_info.st_mtime)
-    p->pwg = _pwgCreateWithFile(pwg_name);
+    p->pc = _ppdCacheCreateWithFile(pwg_name);
 
-  if (cache_info.st_mtime >= ppd_info.st_mtime && p->pwg &&
+  if (cache_info.st_mtime >= ppd_info.st_mtime && p->pc &&
       (cache = cupsFileOpen(cache_name, "r")) != NULL)
   {
    /*
@@ -4052,8 +4052,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
-  _pwgDestroy(p->pwg);
-  p->pwg = NULL;
+  _ppdCacheDestroy(p->pc);
+  p->pc = NULL;
 
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
 
@@ -4072,7 +4072,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Add make/model and other various attributes...
     */
 
-    p->pwg = _pwgCreateWithPPD(ppd);
+    p->pc = _ppdCacheCreateWithPPD(ppd);
 
     ppdMarkDefaults(ppd);
 
@@ -4175,7 +4175,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Add media options from the PPD file...
     */
 
-    if (ppd->num_sizes == 0 || !p->pwg)
+    if (ppd->num_sizes == 0 || !p->pc)
     {
       if (!ppdFindAttr(ppd, "APScannerOnly", NULL))
 	cupsdLogMessage(CUPSD_LOG_CRIT,
@@ -4194,7 +4194,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       */
 
       if ((size = ppdPageSize(ppd, NULL)) != NULL)
-        pwgsize = _pwgGetSize(p->pwg, size->name);
+        pwgsize = _ppdCacheGetSize(p->pc, size->name);
       else
         pwgsize = NULL;
 
@@ -4214,12 +4214,12 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	media_type = ppdFindMarkedChoice(ppd, "MediaType");
 	col        = new_media_col(pwgsize,
 			           input_slot ?
-				       _pwgGetSource(p->pwg,
-				                     input_slot->choice) :
+				       _ppdCacheGetSource(p->pc,
+				                          input_slot->choice) :
 				       NULL,
 				   media_type ?
-				       _pwgGetType(p->pwg,
-				                   media_type->choice) :
+				       _ppdCacheGetType(p->pc,
+				                        media_type->choice) :
 				       NULL);
 
 	ippAddCollection(p->ppd_attrs, IPP_TAG_PRINTER, "media-col-default",
@@ -4231,8 +4231,8 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-supported
       */
 
-      num_media = p->pwg->num_sizes;
-      if (p->pwg->custom_min_keyword)
+      num_media = p->pc->num_sizes;
+      if (p->pc->custom_min_keyword)
 	num_media += 2;
 
       if ((attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
@@ -4241,16 +4241,16 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       {
 	val = attr->values;
 
-        for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes;
+        for (i = p->pc->num_sizes, pwgsize = p->pc->sizes;
 	     i > 0;
 	     i --, pwgsize ++, val ++)
 	  val->string.text = _cupsStrRetain(pwgsize->map.pwg);
 
-        if (p->pwg->custom_min_keyword)
+        if (p->pc->custom_min_keyword)
 	{
-	  val->string.text = _cupsStrRetain(p->pwg->custom_min_keyword);
+	  val->string.text = _cupsStrRetain(p->pc->custom_min_keyword);
 	  val ++;
-	  val->string.text = _cupsStrRetain(p->pwg->custom_max_keyword);
+	  val->string.text = _cupsStrRetain(p->pc->custom_max_keyword);
         }
       }
 
@@ -4258,12 +4258,12 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-source-supported
       */
 
-      if (p->pwg->num_sources > 0 &&
+      if (p->pc->num_sources > 0 &&
           (attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	                        "media-source-supported", p->pwg->num_sources,
+	                        "media-source-supported", p->pc->num_sources,
 			        NULL, NULL)) != NULL)
       {
-	for (i = p->pwg->num_sources, pwgsource = p->pwg->sources,
+	for (i = p->pc->num_sources, pwgsource = p->pc->sources,
 	         val = attr->values;
 	     i > 0;
 	     i --, pwgsource ++, val ++)
@@ -4274,12 +4274,12 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-type-supported
       */
 
-      if (p->pwg->num_types > 0 &&
+      if (p->pc->num_types > 0 &&
           (attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	                        "media-type-supported", p->pwg->num_types,
+	                        "media-type-supported", p->pc->num_types,
 			        NULL, NULL)) != NULL)
       {
-	for (i = p->pwg->num_types, pwgtype = p->pwg->types,
+	for (i = p->pc->num_types, pwgtype = p->pc->types,
 	         val = attr->values;
 	     i > 0;
 	     i --, pwgtype ++, val ++)
@@ -4290,7 +4290,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-*-margin-supported
       */
 
-      for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes, num_margins = 0;
+      for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, num_margins = 0;
 	   i > 0 && num_margins < (int)(sizeof(margins) / sizeof(margins[0]));
 	   i --, pwgsize ++)
       {
@@ -4312,7 +4312,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		      "media-bottom-margin-supported", 0);
 
-      for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes, num_margins = 0;
+      for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, num_margins = 0;
 	   i > 0 && num_margins < (int)(sizeof(margins) / sizeof(margins[0]));
 	   i --, pwgsize ++)
       {
@@ -4334,7 +4334,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		      "media-left-margin-supported", 0);
 
-      for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes, num_margins = 0;
+      for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, num_margins = 0;
 	   i > 0 && num_margins < (int)(sizeof(margins) / sizeof(margins[0]));
 	   i --, pwgsize ++)
       {
@@ -4356,7 +4356,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
         ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
 		      "media-right-margin-supported", 0);
 
-      for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes, num_margins = 0;
+      for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, num_margins = 0;
 	   i > 0 && num_margins < (int)(sizeof(margins) / sizeof(margins[0]));
 	   i --, pwgsize ++)
       {
@@ -4382,23 +4382,23 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       * media-col-database
       */
 
-      num_media = p->pwg->num_sizes;
-      if (p->pwg->num_sources)
+      num_media = p->pc->num_sizes;
+      if (p->pc->num_sources)
       {
-        if (p->pwg->num_types > 0)
-	  num_media += p->pwg->num_sizes * p->pwg->num_sources *
-	               p->pwg->num_types;
+        if (p->pc->num_types > 0)
+	  num_media += p->pc->num_sizes * p->pc->num_sources *
+	               p->pc->num_types;
 	else
-          num_media += p->pwg->num_sizes * p->pwg->num_sources;
+          num_media += p->pc->num_sizes * p->pc->num_sources;
       }
-      else if (p->pwg->num_types)
-        num_media += p->pwg->num_sizes * p->pwg->num_types;
+      else if (p->pc->num_types)
+        num_media += p->pc->num_sizes * p->pc->num_types;
 
       if ((attr = ippAddCollections(p->ppd_attrs, IPP_TAG_PRINTER,
                                     "media-col-database", num_media,
 				    NULL)) != NULL)
       {
-        for (i = p->pwg->num_sizes, pwgsize = p->pwg->sizes, val = attr->values;
+        for (i = p->pc->num_sizes, pwgsize = p->pc->sizes, val = attr->values;
 	     i > 0;
 	     i --, pwgsize ++)
 	{
@@ -4416,17 +4416,17 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	  * type...
 	  */
 
-	  if (p->pwg->num_sources > 0)
+	  if (p->pc->num_sources > 0)
 	  {
-	    for (j = p->pwg->num_sources, pwgsource = p->pwg->sources;
+	    for (j = p->pc->num_sources, pwgsource = p->pc->sources;
 	         j > 0;
 		 j --, pwgsource ++)
 	    {
 	      ppdMarkOption(ppd, "InputSlot", pwgsource->ppd);
 
-	      if (p->pwg->num_types > 0)
+	      if (p->pc->num_types > 0)
 	      {
-	        for (k = p->pwg->num_types, pwgtype = p->pwg->types;
+	        for (k = p->pc->num_types, pwgtype = p->pc->types;
 		     k > 0;
 		     k --, pwgtype ++)
 		{
@@ -4445,9 +4445,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 	      }
 	    }
 	  }
-	  else if (p->pwg->num_types > 0)
+	  else if (p->pc->num_types > 0)
 	  {
-	    for (j = p->pwg->num_types, pwgtype = p->pwg->types;
+	    for (j = p->pc->num_types, pwgtype = p->pc->types;
 	         j > 0;
 		 j --, pwgtype ++)
 	    {
@@ -4472,35 +4472,35 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     * Output bin...
     */
 
-    if (p->pwg && p->pwg->num_bins > 0)
+    if (p->pc && p->pc->num_bins > 0)
     {
       attr = ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-			   "output-bin-supported", p->pwg->num_bins,
+			   "output-bin-supported", p->pc->num_bins,
 			   NULL, NULL);
 
       if (attr != NULL)
       {
 	for (i = 0, val = attr->values;
-	     i < p->pwg->num_bins;
+	     i < p->pc->num_bins;
 	     i ++, val ++)
-	  val->string.text = _cupsStrAlloc(p->pwg->bins[i].pwg);
+	  val->string.text = _cupsStrAlloc(p->pc->bins[i].pwg);
       }
 
       if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
       {
-	for (i = 0; i < p->pwg->num_bins; i ++)
-	  if (!strcmp(p->pwg->bins[i].ppd, output_bin->defchoice))
+	for (i = 0; i < p->pc->num_bins; i ++)
+	  if (!strcmp(p->pc->bins[i].ppd, output_bin->defchoice))
 	    break;
 
-        if (i >= p->pwg->num_bins)
+        if (i >= p->pc->num_bins)
 	  i = 0;
 
 	ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-		     "output-bin-default", NULL, p->pwg->bins[i].pwg);
+		     "output-bin-default", NULL, p->pc->bins[i].pwg);
       }
       else
         ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
-	             "output-bin-default", NULL, p->pwg->bins[0].pwg);
+	             "output-bin-default", NULL, p->pc->bins[0].pwg);
     }
     else if (((ppd_attr = ppdFindAttr(ppd, "DefaultOutputOrder",
                                      NULL)) != NULL &&
@@ -4528,7 +4528,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
 
    /*
-    * output-mode...
+    * output-mode and print-color-mode...
     */
 
     if (ppd->color_device)
@@ -4543,6 +4543,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                     "output-mode-supported", 2, NULL, output_modes);
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "output-mode-default", NULL, "color");
+
+      ippAddStrings(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                    "print-color-mode-supported", 2, NULL, output_modes);
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "print-color-mode-default", NULL, "color");
     }
     else
     {
@@ -4550,6 +4555,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
                    "output-mode-supported", NULL, "monochrome");
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
                    "output-mode-default", NULL, "monochrome");
+
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "print-color-mode-supported", NULL, "monochrome");
+      ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_KEYWORD,
+                   "print-color-mode-default", NULL, "monochrome");
     }
 
    /*
@@ -5230,7 +5240,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     cupsFileClose(cache);
 
-    _pwgWriteFile(p->pwg, pwg_name);
+    _ppdCacheWriteFile(p->pc, pwg_name);
   }
   else
   {

@@ -94,7 +94,7 @@ struct cupsd_printer_s
   cups_array_t	*filters,		/* Filters for queue */
 		*pre_filters,		/* Pre-filters for queue */
 		*dest_types;		/* Destination types for queue */
-  _pwg_t	*pwg;			/* PWG<->PPD mapping data */
+  _ppd_cache_t	*pc;			/* PPD cache and mapping data */
 
 #ifdef HAVE_DNSSD
   char		*reg_name,		/* Name used for service registration */

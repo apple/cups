@@ -56,9 +56,8 @@ LIBOBJS	=	\
 		options.o \
 		page.o \
 		ppd.o \
-		pwg-file.o \
+		ppd-cache.o \
 		pwg-media.o \
-		pwg-ppd.o \
 		request.o \
 		sidechannel.o \
 		snmp.o \

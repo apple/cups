@@ -310,11 +310,11 @@ ppdClose(ppd_file_t *ppd)		/* I - PPD file record */
   }
 
  /*
-  * Free any PWG mapping data...
+  * Free any PPD cache/mapping data...
   */
 
-  if (ppd->pwg)
-    _pwgDestroy((_pwg_t *)ppd->pwg);
+  if (ppd->cache)
+    _ppdCacheDestroy(ppd->cache);
 
  /*
   * Free the whole record...

@@ -1540,7 +1540,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!ippFindAttribute(con->request, "PageRegion", IPP_TAG_ZERO) &&
       !ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
-      _pwgGetPageSize(printer->pwg, con->request, NULL, &exact))
+      _ppdCacheGetPageSize(printer->pc, con->request, NULL, &exact))
   {
     if (!exact &&
         (media_col = ippFindAttribute(con->request, "media-col",

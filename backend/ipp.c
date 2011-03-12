@@ -115,7 +115,7 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 			             const char *user, const char *title,
 				     int num_options, cups_option_t *options,
 				     const char *compression, int copies,
-				     const char *format, _pwg_t *pwg,
+				     const char *format, _ppd_cache_t *pc,
 				     ipp_attribute_t *media_col_sup);
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
@@ -198,7 +198,7 @@ main(int  argc,				/* I - Number of command-line args */
 #endif /* HAVE_SIGACTION && !HAVE_SIGSET */
   int		version;		/* IPP version */
   ppd_file_t	*ppd;			/* PPD file */
-  _pwg_t	*pwg;			/* PWG<->PPD mapping data */
+  _ppd_cache_t	*pc;			/* PPD cache and mapping data */
 
 
  /*
@@ -956,7 +956,7 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   options = NULL;
-  pwg     = NULL;
+  pc      = NULL;
 
   if (send_options)
   {
@@ -969,7 +969,7 @@ main(int  argc,				/* I - Number of command-line args */
       */
 
       ppd = ppdOpenFile(getenv("PPD"));
-      pwg = _pwgCreateWithPPD(ppd);
+      pc  = _ppdCacheCreateWithPPD(ppd);
 
       ppdClose(ppd);
     }
@@ -1025,7 +1025,7 @@ main(int  argc,				/* I - Number of command-line args */
   {
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2], argv[3],
                           num_options, options, compression,
-			  copies_sup ? copies : 1, document_format, pwg,
+			  copies_sup ? copies : 1, document_format, pc,
 			  media_col_sup);
 
     ippDelete(cupsDoRequest(http, request, resource));
@@ -1101,7 +1101,7 @@ main(int  argc,				/* I - Number of command-line args */
     request = new_request(num_files > 1 ? IPP_CREATE_JOB : IPP_PRINT_JOB,
 			  version, uri, argv[2], argv[3], num_options, options,
 			  compression, copies_sup ? copies : 1, document_format,
-			  pwg, media_col_sup);
+			  pc, media_col_sup);
 
    /*
     * Do the request...
@@ -1448,7 +1448,7 @@ main(int  argc,				/* I - Number of command-line args */
   cleanup:
 
   cupsFreeOptions(num_options, options);
-  _pwgDestroy(pwg);
+  _ppdCacheDestroy(pc);
 
   httpClose(http);
 
@@ -1671,8 +1671,7 @@ monitor_printer(
 		*response;		/* IPP response */
   ipp_attribute_t *attr;		/* Attribute in response */
   int		delay,			/* Current delay */
-		prev_delay,		/* Previous delay */
-		temp_delay;		/* Temporary delay value */
+		prev_delay;		/* Previous delay */
 
 
  /*
@@ -1787,7 +1786,7 @@ new_request(
     const char      *compression,	/* I - compression value or NULL */
     int             copies,		/* I - copies value or 0 */
     const char      *format,		/* I - documet-format value or NULL */
-    _pwg_t          *pwg,		/* I - PWG<->PPD mapping data */
+    _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
     ipp_attribute_t *media_col_sup)	/* I - media-col-supported values */
 {
   int		i;			/* Looping var */
@@ -1857,7 +1856,7 @@ new_request(
 
   if (num_options > 0)
   {
-    if (pwg)
+    if (pc)
     {
      /*
       * Send standard IPP attributes...
@@ -1866,7 +1865,7 @@ new_request(
       if ((keyword = cupsGetOption("PageSize", num_options, options)) == NULL)
 	keyword = cupsGetOption("media", num_options, options);
 
-      if ((size = _pwgGetSize(pwg, keyword)) != NULL)
+      if ((size = _ppdCacheGetSize(pc, keyword)) != NULL)
       {
        /*
         * Add a media-col value...
@@ -1881,11 +1880,12 @@ new_request(
 	media_col = ippNew();
 	ippAddCollection(media_col, IPP_TAG_ZERO, "media-size", media_size);
 
-	media_source = _pwgGetSource(pwg, cupsGetOption("InputSlot",
-							num_options,
-							options));
-	media_type   = _pwgGetType(pwg, cupsGetOption("MediaType",
-						      num_options, options));
+	media_source = _ppdCacheGetSource(pc, cupsGetOption("InputSlot",
+							    num_options,
+							    options));
+	media_type   = _ppdCacheGetType(pc, cupsGetOption("MediaType",
+						          num_options,
+							  options));
 
 	for (i = 0; i < media_col_sup->num_values; i ++)
 	{
@@ -1920,8 +1920,8 @@ new_request(
 
       if ((keyword = cupsGetOption("output-bin", num_options,
 				   options)) == NULL)
-	keyword = _pwgGetBin(pwg, cupsGetOption("OutputBin", num_options,
-						options));
+	keyword = _ppdCacheGetBin(pc, cupsGetOption("OutputBin", num_options,
+						    options));
 
       if (keyword)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "output-bin",
@@ -1963,17 +1963,17 @@ new_request(
       if ((keyword = cupsGetOption("sides", num_options, options)) != NULL)
 	ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		     NULL, keyword);
-      else if (pwg->sides_option &&
-               (keyword = cupsGetOption(pwg->sides_option, num_options,
+      else if (pc->sides_option &&
+               (keyword = cupsGetOption(pc->sides_option, num_options,
 					options)) != NULL)
       {
-	if (!strcasecmp(keyword, pwg->sides_1sided))
+	if (!strcasecmp(keyword, pc->sides_1sided))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "one-sided");
-	else if (!strcasecmp(keyword, pwg->sides_2sided_long))
+	else if (!strcasecmp(keyword, pc->sides_2sided_long))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-long-edge");
-	if (!strcasecmp(keyword, pwg->sides_2sided_short))
+	if (!strcasecmp(keyword, pc->sides_2sided_short))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-short-edge");
       }

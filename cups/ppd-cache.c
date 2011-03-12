@@ -1,7 +1,7 @@
 /*
  * "$Id$"
  *
- *   PWG PPD mapping API implementation for CUPS.
+ *   PPD cache implementation for CUPS.
  *
  *   Copyright 2010-2011 by Apple Inc.
  *
@@ -15,28 +15,35 @@
  *
  * Contents:
  *
- *   _pwgCreateWithPPD()      - Create PWG mapping data from a PPD file.
- *   _pwgGetBin()             - Get the PWG output-bin keyword associated with a
- *                              PPD OutputBin.
- *   _pwgGetInputSlot()       - Get the PPD InputSlot associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetMediaType()       - Get the PPD MediaType associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetOutputBin()       - Get the PPD OutputBin associated with the
- *                              keyword string.
- *   _pwgGetPageSize()        - Get the PPD PageSize associated with the job
- *                              attributes or a keyword string.
- *   _pwgGetSize()            - Get the PWG size associated with a PPD PageSize.
- *   _pwgGetSource()          - Get the PWG media-source associated with a PPD
- *                              InputSlot.
- *   _pwgGetType()            - Get the PWG media-type associated with a PPD
- *                              MediaType.
- *   _pwgInputSlotForSource() - Get the InputSlot name for the given PWG source.
- *   _pwgMediaTypeForType()   - Get the MediaType name for the given PWG type.
- *   _pwgPageSizeForMedia()   - Get the PageSize name for the given media.
- *   pwg_ppdize_name()        - Convert an IPP keyword to a PPD keyword.
- *   pwg_unppdize_name()      - Convert a PPD keyword to a lowercase IPP
- *                              keyword.
+ *   _ppdCacheCreateWithFile()     - Create PWG mapping data from a written
+ *                                   file.
+ *   _ppdCacheCreateWithPPD()      - Create PWG mapping data from a PPD file.
+ *   _ppdCacheDestroy()            - Free all memory used for PWG mapping data.
+ *   _ppdCacheGetBin()             - Get the PWG output-bin keyword associated
+ *                                   with a PPD OutputBin.
+ *   _ppdCacheGetInputSlot()       - Get the PPD InputSlot associated with the
+ *                                   job attributes or a keyword string.
+ *   _ppdCacheGetMediaType()       - Get the PPD MediaType associated with the
+ *                                   job attributes or a keyword string.
+ *   _ppdCacheGetOutputBin()       - Get the PPD OutputBin associated with the
+ *                                   keyword string.
+ *   _ppdCacheGetPageSize()        - Get the PPD PageSize associated with the
+ *                                   job attributes or a keyword string.
+ *   _ppdCacheGetSize()            - Get the PWG size associated with a PPD
+ *                                   PageSize.
+ *   _ppdCacheGetSource()          - Get the PWG media-source associated with a
+ *                                   PPD InputSlot.
+ *   _ppdCacheGetType()            - Get the PWG media-type associated with a
+ *                                   PPD MediaType.
+ *   _pwgInputSlotForSource() - Get the InputSlot name for the given PWG
+ *                                   source.
+ *   _pwgMediaTypeForType()   - Get the MediaType name for the given PWG
+ *                                   type.
+ *   _ppdCacheWriteFile()          - Write PWG mapping data to a file.
+ *   _pwgPageSizeForMedia()        - Get the PageSize name for the given media.
+ *   pwg_ppdize_name()             - Convert an IPP keyword to a PPD keyword.
+ *   pwg_unppdize_name()           - Convert a PPD keyword to a lowercase IPP
+ *                                   keyword.
  */
 
 /*
@@ -63,14 +70,415 @@ static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
 
 
 /*
- * '_pwgCreateWithPPD()' - Create PWG mapping data from a PPD file.
+ * '_ppdCacheCreateWithFile()' - Create PWG mapping data from a written file.
+ *
+ * Use the @link _ppdCacheWriteFile@ function to write PWG mapping data to a file.
  */
 
-_pwg_t *				/* O - PWG mapping data */
-_pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
+_ppd_cache_t *				/* O - PPD cache and mapping data */
+_ppdCacheCreateWithFile(
+    const char *filename)		/* I - File to read */
+{
+  cups_file_t	*fp;			/* File */
+  _ppd_cache_t	*pc;			/* PWG mapping data */
+  _pwg_size_t	*size;			/* Current size */
+  _pwg_map_t	*map;			/* Current map */
+  int		linenum,		/* Current line number */
+		num_bins,		/* Number of bins in file */
+		num_sizes,		/* Number of sizes in file */
+		num_sources,		/* Number of sources in file */
+		num_types;		/* Number of types in file */
+  char		line[2048],		/* Current line */
+		*value,			/* Pointer to value in line */
+		*valueptr,		/* Pointer into value */
+		pwg_keyword[128],	/* PWG keyword */
+		ppd_keyword[PPD_MAX_NAME];
+					/* PPD keyword */
+  _pwg_print_color_mode_t print_color_mode;
+					/* Print color mode for preset */
+  _pwg_print_quality_t print_quality;	/* Print quality for preset */
+
+
+  DEBUG_printf(("_ppdCacheCreateWithFile(filename=\"%s\")", filename));
+
+ /*
+  * Range check input...
+  */
+
+  if (!filename)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    return (NULL);
+  }
+
+ /*
+  * Open the file...
+  */
+
+  if ((fp = cupsFileOpen(filename, "r")) == NULL)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    return (NULL);
+  }
+
+ /*
+  * Allocate the mapping data structure...
+  */
+
+  if ((pc = calloc(1, sizeof(_ppd_cache_t))) == NULL)
+  {
+    DEBUG_puts("_ppdCacheCreateWithFile: Unable to allocate _ppd_cache_t.");
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    goto create_error;
+  }
+
+ /*
+  * Read the file...
+  */
+
+  linenum     = 0;
+  num_bins    = 0;
+  num_sizes   = 0;
+  num_sources = 0;
+  num_types   = 0;
+
+  while (cupsFileGetConf(fp, line, sizeof(line), &value, &linenum))
+  {
+    DEBUG_printf(("_ppdCacheCreateWithFile: line=\"%s\", value=\"%s\", "
+                  "linenum=%d", line, value, linenum));
+
+    if (!value)
+    {
+      DEBUG_printf(("_ppdCacheCreateWithFile: Missing value on line %d.",
+                    linenum));
+      _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+      goto create_error;
+    }
+    else if (!strcasecmp(line, "NumBins"))
+    {
+      if (num_bins > 0)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: NumBins listed multiple times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((num_bins = atoi(value)) <= 0 || num_bins > 65536)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumBins value %d on line "
+		      "%d.", num_sizes, linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((pc->bins = calloc(num_bins, sizeof(_pwg_map_t))) == NULL)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d bins.",
+	              num_sizes));
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	goto create_error;
+      }
+    }
+    else if (!strcasecmp(line, "Bin"))
+    {
+      if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad Bin on line %d.", linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if (pc->num_bins >= num_bins)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Too many Bin's on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      map      = pc->bins + pc->num_bins;
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(ppd_keyword);
+
+      pc->num_bins ++;
+    }
+    else if (!strcasecmp(line, "NumSizes"))
+    {
+      if (num_sizes > 0)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: NumSizes listed multiple times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((num_sizes = atoi(value)) <= 0 || num_sizes > 65536)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumSizes value %d on line "
+	              "%d.", num_sizes, linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((pc->sizes = calloc(num_sizes, sizeof(_pwg_size_t))) == NULL)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sizes.",
+	              num_sizes));
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	goto create_error;
+      }
+    }
+    else if (!strcasecmp(line, "Size"))
+    {
+      if (pc->num_sizes >= num_sizes)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Too many Size's on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      size = pc->sizes + pc->num_sizes;
+
+      if (sscanf(value, "%127s%40s%d%d%d%d%d%d", pwg_keyword, ppd_keyword,
+		 &(size->width), &(size->length), &(size->left),
+		 &(size->bottom), &(size->right), &(size->top)) != 8)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad Size on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      size->map.pwg = _cupsStrAlloc(pwg_keyword);
+      size->map.ppd = _cupsStrAlloc(ppd_keyword);
+
+      pc->num_sizes ++;
+    }
+    else if (!strcasecmp(line, "CustomSize"))
+    {
+      if (pc->custom_max_width > 0)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Too many CustomSize's on line "
+	              "%d.", linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if (sscanf(value, "%d%d%d%d%d%d%d%d", &(pc->custom_max_width),
+                 &(pc->custom_max_length), &(pc->custom_min_width),
+		 &(pc->custom_min_length), &(pc->custom_size.left),
+		 &(pc->custom_size.bottom), &(pc->custom_size.right),
+		 &(pc->custom_size.top)) != 8)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad CustomSize on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), "custom", "max",
+		       pc->custom_max_width, pc->custom_max_length);
+      pc->custom_max_keyword = _cupsStrAlloc(pwg_keyword);
+
+      _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), "custom", "min",
+		       pc->custom_min_width, pc->custom_min_length);
+      pc->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
+    }
+    else if (!strcasecmp(line, "SourceOption"))
+    {
+      pc->source_option = _cupsStrAlloc(value);
+    }
+    else if (!strcasecmp(line, "NumSources"))
+    {
+      if (num_sources > 0)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: NumSources listed multiple "
+	           "times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((num_sources = atoi(value)) <= 0 || num_sources > 65536)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumSources value %d on "
+	              "line %d.", num_sources, linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((pc->sources = calloc(num_sources, sizeof(_pwg_map_t))) == NULL)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d sources.",
+	              num_sources));
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	goto create_error;
+      }
+    }
+    else if (!strcasecmp(line, "Source"))
+    {
+      if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad Source on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if (pc->num_sources >= num_sources)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Too many Source's on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      map      = pc->sources + pc->num_sources;
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(ppd_keyword);
+
+      pc->num_sources ++;
+    }
+    else if (!strcasecmp(line, "NumTypes"))
+    {
+      if (num_types > 0)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: NumTypes listed multiple times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((num_types = atoi(value)) <= 0 || num_types > 65536)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad NumTypes value %d on "
+	              "line %d.", num_types, linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if ((pc->types = calloc(num_types, sizeof(_pwg_map_t))) == NULL)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Unable to allocate %d types.",
+	              num_types));
+	_cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+	goto create_error;
+      }
+    }
+    else if (!strcasecmp(line, "Type"))
+    {
+      if (sscanf(value, "%127s%40s", pwg_keyword, ppd_keyword) != 2)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad Type on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if (pc->num_types >= num_types)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Too many Type's on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      map      = pc->types + pc->num_types;
+      map->pwg = _cupsStrAlloc(pwg_keyword);
+      map->ppd = _cupsStrAlloc(ppd_keyword);
+
+      pc->num_types ++;
+    }
+    else if (!strcasecmp(line, "Preset"))
+    {
+     /*
+      * Preset output-mode print-quality name=value ...
+      */
+
+      print_color_mode = (_pwg_print_color_mode_t)strtol(value, &valueptr, 10);
+      print_quality    = (_pwg_print_quality_t)strtol(valueptr, &valueptr, 10);
+
+      if (print_color_mode < _PWG_PRINT_COLOR_MODE_MONOCHROME ||
+          print_color_mode >= _PWG_PRINT_COLOR_MODE_MAX ||
+	  print_quality < _PWG_PRINT_QUALITY_DRAFT ||
+	  print_quality >= _PWG_PRINT_QUALITY_MAX ||
+	  valueptr == value || !*valueptr)
+      {
+        DEBUG_printf(("_ppdCacheCreateWithFile: Bad Preset on line %d.",
+	              linenum));
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      pc->num_presets[print_color_mode][print_quality] =
+          cupsParseOptions(valueptr, 0,
+	                   pc->presets[print_color_mode] + print_quality);
+    }
+    else if (!strcasecmp(line, "SidesOption"))
+      pc->sides_option = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides1Sided"))
+      pc->sides_1sided = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides2SidedLong"))
+      pc->sides_2sided_long = _cupsStrAlloc(value);
+    else if (!strcasecmp(line, "Sides2SidedShort"))
+      pc->sides_2sided_short = _cupsStrAlloc(value);
+    else
+    {
+      DEBUG_printf(("_ppdCacheCreateWithFile: Unknown %s on line %d.", line,
+		    linenum));
+      _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+      goto create_error;
+    }
+  }
+
+  if (pc->num_sizes < num_sizes)
+  {
+    DEBUG_printf(("_ppdCacheCreateWithFile: Not enough sizes (%d < %d).",
+                  pc->num_sizes, num_sizes));
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    goto create_error;
+  }
+
+  if (pc->num_sources < num_sources)
+  {
+    DEBUG_printf(("_ppdCacheCreateWithFile: Not enough sources (%d < %d).",
+                  pc->num_sources, num_sources));
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    goto create_error;
+  }
+
+  if (pc->num_types < num_types)
+  {
+    DEBUG_printf(("_ppdCacheCreateWithFile: Not enough types (%d < %d).",
+                  pc->num_types, num_types));
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    goto create_error;
+  }
+
+  cupsFileClose(fp);
+
+  return (pc);
+
+ /*
+  * If we get here the file was bad - free any data and return...
+  */
+
+  create_error:
+
+  cupsFileClose(fp);
+  _ppdCacheDestroy(pc);
+
+  return (NULL);
+}
+
+
+/*
+ * '_ppdCacheCreateWithPPD()' - Create PWG mapping data from a PPD file.
+ */
+
+_ppd_cache_t *				/* O - PPD cache and mapping data */
+_ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 {
   int			i, j, k;	/* Looping vars */
-  _pwg_t		*pwg;		/* PWG mapping data */
+  _ppd_cache_t		*pc;		/* PWG mapping data */
   ppd_option_t		*input_slot,	/* InputSlot option */
 			*media_type,	/* MediaType option */
 			*output_bin,	/* OutputBin option */
@@ -89,7 +497,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 					/* Normalized PPD name */
   const char		*pwg_name;	/* Standard PWG media name */
   _pwg_media_t		*pwg_media;	/* PWG media data */
-  _pwg_output_mode_t	pwg_output_mode;/* output-mode index */
+  _pwg_print_color_mode_t pwg_print_color_mode;
+					/* print-color-mode index */
   _pwg_print_quality_t	pwg_print_quality;
 					/* print-quality index */
   int			similar;	/* Are the old and new size similar? */
@@ -109,7 +518,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   _pwg_size_t           *new_size;	/* New size to add, if any */
 
 
-  DEBUG_printf(("_pwgCreateWithPPD(ppd=%p)", ppd));
+  DEBUG_printf(("_ppdCacheCreateWithPPD(ppd=%p)", ppd));
 
  /*
   * Range check input...
@@ -122,9 +531,9 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   * Allocate memory...
   */
 
-  if ((pwg = calloc(1, sizeof(_pwg_t))) == NULL)
+  if ((pc = calloc(1, sizeof(_ppd_cache_t))) == NULL)
   {
-    DEBUG_puts("_pwgCreateWithPPD: Unable to allocate _pwg_t.");
+    DEBUG_puts("_ppdCacheCreateWithPPD: Unable to allocate _ppd_cache_t.");
     goto create_error;
   }
 
@@ -134,18 +543,18 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (ppd->num_sizes == 0)
   {
-    DEBUG_puts("_pwgCreateWithPPD: No page sizes in PPD.");
+    DEBUG_puts("_ppdCacheCreateWithPPD: No page sizes in PPD.");
     goto create_error;
   }
 
-  if ((pwg->sizes = calloc(ppd->num_sizes, sizeof(_pwg_size_t))) == NULL)
+  if ((pc->sizes = calloc(ppd->num_sizes, sizeof(_pwg_size_t))) == NULL)
   {
-    DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_size_t's.",
-                  ppd->num_sizes));
+    DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
+                  "_pwg_size_t's.", ppd->num_sizes));
     goto create_error;
   }
 
-  for (i = ppd->num_sizes, pwg_size = pwg->sizes, ppd_size = ppd->sizes;
+  for (i = ppd->num_sizes, pwg_size = pc->sizes, ppd_size = ppd->sizes;
        i > 0;
        i --, ppd_size ++)
   {
@@ -166,8 +575,8 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       * Standard name, do we have conflicts?
       */
 
-      for (j = 0; j < pwg->num_sizes; j ++)
-        if (!strcmp(pwg->sizes[j].map.pwg, pwg_media->pwg))
+      for (j = 0; j < pc->num_sizes; j ++)
+        if (!strcmp(pc->sizes[j].map.pwg, pwg_media->pwg))
 	{
 	  pwg_media = NULL;
 	  break;
@@ -215,7 +624,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     new_borderless = new_bottom == 0 && new_top == 0 &&
                      new_left == 0 && new_right == 0;
 
-    for (k = pwg->num_sizes, similar = 0, old_size = pwg->sizes, new_size = NULL;
+    for (k = pc->num_sizes, similar = 0, old_size = pc->sizes, new_size = NULL;
          k > 0 && !similar;
          k --, old_size ++)
     {
@@ -252,7 +661,7 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
       */
 
       new_size = pwg_size ++;
-      pwg->num_sizes ++;
+      pc->num_sizes ++;
     }
 
     if (new_size)
@@ -281,21 +690,21 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), "custom", "max",
 		     _PWG_FROMPTS(ppd->custom_max[0]),
 		     _PWG_FROMPTS(ppd->custom_max[1]));
-    pwg->custom_max_keyword = _cupsStrAlloc(pwg_keyword);
-    pwg->custom_max_width   = _PWG_FROMPTS(ppd->custom_max[0]);
-    pwg->custom_max_length  = _PWG_FROMPTS(ppd->custom_max[1]);
+    pc->custom_max_keyword = _cupsStrAlloc(pwg_keyword);
+    pc->custom_max_width   = _PWG_FROMPTS(ppd->custom_max[0]);
+    pc->custom_max_length  = _PWG_FROMPTS(ppd->custom_max[1]);
 
     _pwgGenerateSize(pwg_keyword, sizeof(pwg_keyword), "custom", "min",
 		     _PWG_FROMPTS(ppd->custom_min[0]),
 		     _PWG_FROMPTS(ppd->custom_min[1]));
-    pwg->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
-    pwg->custom_min_width   = _PWG_FROMPTS(ppd->custom_min[0]);
-    pwg->custom_min_length  = _PWG_FROMPTS(ppd->custom_min[1]);
+    pc->custom_min_keyword = _cupsStrAlloc(pwg_keyword);
+    pc->custom_min_width   = _PWG_FROMPTS(ppd->custom_min[0]);
+    pc->custom_min_length  = _PWG_FROMPTS(ppd->custom_min[1]);
 
-    pwg->custom_size.left   = _PWG_FROMPTS(ppd->custom_margins[0]);
-    pwg->custom_size.bottom = _PWG_FROMPTS(ppd->custom_margins[1]);
-    pwg->custom_size.right  = _PWG_FROMPTS(ppd->custom_margins[2]);
-    pwg->custom_size.top    = _PWG_FROMPTS(ppd->custom_margins[3]);
+    pc->custom_size.left   = _PWG_FROMPTS(ppd->custom_margins[0]);
+    pc->custom_size.bottom = _PWG_FROMPTS(ppd->custom_margins[1]);
+    pc->custom_size.right  = _PWG_FROMPTS(ppd->custom_margins[2]);
+    pc->custom_size.top    = _PWG_FROMPTS(ppd->custom_margins[3]);
   }
 
  /*
@@ -307,20 +716,20 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (input_slot)
   {
-    pwg->source_option = _cupsStrAlloc(input_slot->keyword);
+    pc->source_option = _cupsStrAlloc(input_slot->keyword);
 
-    if ((pwg->sources = calloc(input_slot->num_choices,
+    if ((pc->sources = calloc(input_slot->num_choices,
                                sizeof(_pwg_map_t))) == NULL)
     {
-      DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
-                    "for InputSlot.", input_slot->num_choices));
+      DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
+                    "_pwg_map_t's for InputSlot.", input_slot->num_choices));
       goto create_error;
     }
 
-    pwg->num_sources = input_slot->num_choices;
+    pc->num_sources = input_slot->num_choices;
 
     for (i = input_slot->num_choices, choice = input_slot->choices,
-             map = pwg->sources;
+             map = pc->sources;
 	 i > 0;
 	 i --, choice ++, map ++)
     {
@@ -373,18 +782,18 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((media_type = ppdFindOption(ppd, "MediaType")) != NULL)
   {
-    if ((pwg->types = calloc(media_type->num_choices,
+    if ((pc->types = calloc(media_type->num_choices,
                              sizeof(_pwg_map_t))) == NULL)
     {
-      DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
-                    "for MediaType.", media_type->num_choices));
+      DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
+                    "_pwg_map_t's for MediaType.", media_type->num_choices));
       goto create_error;
     }
 
-    pwg->num_types = media_type->num_choices;
+    pc->num_types = media_type->num_choices;
 
     for (i = media_type->num_choices, choice = media_type->choices,
-             map = pwg->types;
+             map = pc->types;
 	 i > 0;
 	 i --, choice ++, map ++)
     {
@@ -436,18 +845,18 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if ((output_bin = ppdFindOption(ppd, "OutputBin")) != NULL)
   {
-    if ((pwg->bins = calloc(output_bin->num_choices,
+    if ((pc->bins = calloc(output_bin->num_choices,
                              sizeof(_pwg_map_t))) == NULL)
     {
-      DEBUG_printf(("_pwgCreateWithPPD: Unable to allocate %d _pwg_map_t's "
-                    "for OutputBin.", output_bin->num_choices));
+      DEBUG_printf(("_ppdCacheCreateWithPPD: Unable to allocate %d "
+                    "_pwg_map_t's for OutputBin.", output_bin->num_choices));
       goto create_error;
     }
 
-    pwg->num_bins = output_bin->num_choices;
+    pc->num_bins = output_bin->num_choices;
 
     for (i = output_bin->num_choices, choice = output_bin->choices,
-             map = pwg->bins;
+             map = pc->bins;
 	 i > 0;
 	 i --, choice ++, map ++)
     {
@@ -526,28 +935,28 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
         if (output_mode)
 	{
 	  if (!strcmp(output_mode, "monochrome"))
-	    pwg_output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_MONOCHROME;
 	  else
-	    pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
 	}
 	else if (color_model_val)
 	{
 	  if (!strcasecmp(color_model_val, "Gray"))
-	    pwg_output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_MONOCHROME;
 	  else
-	    pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+	    pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
 	}
 	else
-	  pwg_output_mode = _PWG_OUTPUT_MODE_COLOR;
+	  pwg_print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
 
        /*
         * Save the options for this combination as needed...
 	*/
 
-        if (!pwg->num_presets[pwg_output_mode][pwg_print_quality])
-	  pwg->num_presets[pwg_output_mode][pwg_print_quality] =
+        if (!pc->num_presets[pwg_print_color_mode][pwg_print_quality])
+	  pc->num_presets[pwg_print_color_mode][pwg_print_quality] =
 	      _ppdParseOptions(ppd_attr->value, 0,
-	                       pwg->presets[pwg_output_mode] +
+	                       pc->presets[pwg_print_color_mode] +
 			           pwg_print_quality, _PPD_PARSE_OPTIONS);
       }
 
@@ -556,9 +965,9 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     while ((ppd_attr = ppdFindNextAttr(ppd, "APPrinterPreset", NULL)) != NULL);
   }
 
-  if (!pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_DRAFT] &&
-      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_NORMAL] &&
-      !pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][_PWG_PRINT_QUALITY_HIGH])
+  if (!pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][_PWG_PRINT_QUALITY_DRAFT] &&
+      !pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][_PWG_PRINT_QUALITY_NORMAL] &&
+      !pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][_PWG_PRINT_QUALITY_HIGH])
   {
    /*
     * Try adding some common color options to create grayscale presets.  These
@@ -612,20 +1021,20 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	   pwg_print_quality < _PWG_PRINT_QUALITY_MAX;
 	   pwg_print_quality ++)
       {
-	if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_print_quality])
+	if (pc->num_presets[_PWG_PRINT_COLOR_MODE_COLOR][pwg_print_quality])
 	{
 	 /*
 	  * Copy the color options...
 	  */
 
-	  num_options = pwg->num_presets[_PWG_OUTPUT_MODE_COLOR]
+	  num_options = pc->num_presets[_PWG_PRINT_COLOR_MODE_COLOR]
 					[pwg_print_quality];
 	  options     = calloc(sizeof(cups_option_t), num_options);
 
 	  if (options)
 	  {
 	    for (i = num_options, moption = options,
-		     coption = pwg->presets[_PWG_OUTPUT_MODE_COLOR]
+		     coption = pc->presets[_PWG_PRINT_COLOR_MODE_COLOR]
 					   [pwg_print_quality];
 		 i > 0;
 		 i --, moption ++, coption ++)
@@ -634,9 +1043,9 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	      moption->value = _cupsStrRetain(coption->value);
 	    }
 
-	    pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	    pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][pwg_print_quality] =
 		num_options;
-	    pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	    pc->presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][pwg_print_quality] =
 		options;
 	  }
 	}
@@ -647,11 +1056,11 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	* Add the grayscale option to the preset...
 	*/
 
-	pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME][pwg_print_quality] =
+	pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME][pwg_print_quality] =
 	    cupsAddOption(color_option, gray_choice,
-			  pwg->num_presets[_PWG_OUTPUT_MODE_MONOCHROME]
+			  pc->num_presets[_PWG_PRINT_COLOR_MODE_MONOCHROME]
 					  [pwg_print_quality],
-			  pwg->presets[_PWG_OUTPUT_MODE_MONOCHROME] +
+			  pc->presets[_PWG_PRINT_COLOR_MODE_MONOCHROME] +
 			      pwg_print_quality);
       }
     }
@@ -669,28 +1078,28 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 
   if (duplex)
   {
-    pwg->sides_option = _cupsStrAlloc(duplex->keyword);
+    pc->sides_option = _cupsStrAlloc(duplex->keyword);
 
     for (i = duplex->num_choices, choice = duplex->choices;
          i > 0;
 	 i --, choice ++)
     {
       if ((!strcasecmp(choice->choice, "None") ||
-	   !strcasecmp(choice->choice, "False")) && !pwg->sides_1sided)
-        pwg->sides_1sided = _cupsStrAlloc(choice->choice);
+	   !strcasecmp(choice->choice, "False")) && !pc->sides_1sided)
+        pc->sides_1sided = _cupsStrAlloc(choice->choice);
       else if ((!strcasecmp(choice->choice, "DuplexNoTumble") ||
 	        !strcasecmp(choice->choice, "LongEdge") ||
-	        !strcasecmp(choice->choice, "Top")) && !pwg->sides_2sided_long)
-        pwg->sides_2sided_long = _cupsStrAlloc(choice->choice);
+	        !strcasecmp(choice->choice, "Top")) && !pc->sides_2sided_long)
+        pc->sides_2sided_long = _cupsStrAlloc(choice->choice);
       else if ((!strcasecmp(choice->choice, "DuplexTumble") ||
 	        !strcasecmp(choice->choice, "ShortEdge") ||
 	        !strcasecmp(choice->choice, "Bottom")) &&
-	       !pwg->sides_2sided_short)
-        pwg->sides_2sided_short = _cupsStrAlloc(choice->choice);
+	       !pc->sides_2sided_short)
+        pc->sides_2sided_short = _cupsStrAlloc(choice->choice);
     }
   }
 
-  return (pwg);
+  return (pc);
 
  /*
   * If we get here we need to destroy the PWG mapping data and return NULL...
@@ -699,20 +1108,101 @@ _pwgCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   create_error:
 
   _cupsSetError(IPP_INTERNAL_ERROR, _("Out of memory."), 1);
-  _pwgDestroy(pwg);
+  _ppdCacheDestroy(pc);
 
   return (NULL);
 }
 
 
 /*
- * '_pwgGetBin()' - Get the PWG output-bin keyword associated with a PPD
+ * '_ppdCacheDestroy()' - Free all memory used for PWG mapping data.
+ */
+
+void
+_ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
+{
+  int		i;			/* Looping var */
+  _pwg_map_t	*map;			/* Current map */
+  _pwg_size_t	*size;			/* Current size */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pc)
+    return;
+
+ /*
+  * Free memory as needed...
+  */
+
+  if (pc->bins)
+  {
+    for (i = pc->num_bins, map = pc->bins; i > 0; i --, map ++)
+    {
+      _cupsStrFree(map->pwg);
+      _cupsStrFree(map->ppd);
+    }
+
+    free(pc->bins);
+  }
+
+  if (pc->sizes)
+  {
+    for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
+    {
+      _cupsStrFree(size->map.pwg);
+      _cupsStrFree(size->map.ppd);
+    }
+
+    free(pc->sizes);
+  }
+
+  if (pc->source_option)
+    _cupsStrFree(pc->source_option);
+
+  if (pc->sources)
+  {
+    for (i = pc->num_sources, map = pc->sources; i > 0; i --, map ++)
+    {
+      _cupsStrFree(map->pwg);
+      _cupsStrFree(map->ppd);
+    }
+
+    free(pc->sources);
+  }
+
+  if (pc->types)
+  {
+    for (i = pc->num_types, map = pc->types; i > 0; i --, map ++)
+    {
+      _cupsStrFree(map->pwg);
+      _cupsStrFree(map->ppd);
+    }
+
+    free(pc->types);
+  }
+
+  if (pc->custom_max_keyword)
+    _cupsStrFree(pc->custom_max_keyword);
+
+  if (pc->custom_min_keyword)
+    _cupsStrFree(pc->custom_min_keyword);
+
+  free(pc);
+}
+
+
+/*
+ * '_ppdCacheGetBin()' - Get the PWG output-bin keyword associated with a PPD
  *                  OutputBin.
  */
 
 const char *				/* O - output-bin or NULL */
-_pwgGetBin(_pwg_t     *pwg,		/* I - PWG mapping data */
-	   const char *output_bin)	/* I - PPD OutputBin string */
+_ppdCacheGetBin(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *output_bin)		/* I - PPD OutputBin string */
 {
   int	i;				/* Looping var */
 
@@ -721,7 +1211,7 @@ _pwgGetBin(_pwg_t     *pwg,		/* I - PWG mapping data */
   * Range check input...
   */
 
-  if (!pwg || !output_bin)
+  if (!pc || !output_bin)
     return (NULL);
 
  /*
@@ -729,29 +1219,30 @@ _pwgGetBin(_pwg_t     *pwg,		/* I - PWG mapping data */
   */
 
 
-  for (i = 0; i < pwg->num_bins; i ++)
-    if (!strcasecmp(output_bin, pwg->bins[i].ppd))
-      return (pwg->bins[i].pwg);
+  for (i = 0; i < pc->num_bins; i ++)
+    if (!strcasecmp(output_bin, pc->bins[i].ppd))
+      return (pc->bins[i].pwg);
 
   return (NULL);
 }
 
 
 /*
- * '_pwgGetInputSlot()' - Get the PPD InputSlot associated with the job
+ * '_ppdCacheGetInputSlot()' - Get the PPD InputSlot associated with the job
  *                        attributes or a keyword string.
  */
 
 const char *				/* O - PPD InputSlot or NULL */
-_pwgGetInputSlot(_pwg_t     *pwg,	/* I - PWG mapping data */
-                 ipp_t      *job,	/* I - Job attributes or NULL */
-		 const char *keyword)	/* I - Keyword string or NULL */
+_ppdCacheGetInputSlot(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    ipp_t        *job,			/* I - Job attributes or NULL */
+    const char   *keyword)		/* I - Keyword string or NULL */
 {
  /*
   * Range check input...
   */
 
-  if (!pwg || pwg->num_sources == 0 || (!job && !keyword))
+  if (!pc || pc->num_sources == 0 || (!job && !keyword))
     return (NULL);
 
   if (job && !keyword)
@@ -792,9 +1283,9 @@ _pwgGetInputSlot(_pwg_t     *pwg,	/* I - PWG mapping data */
   {
     int	i;				/* Looping var */
 
-    for (i = 0; i < pwg->num_sources; i ++)
-      if (!strcasecmp(keyword, pwg->sources[i].pwg))
-        return (pwg->sources[i].ppd);
+    for (i = 0; i < pc->num_sources; i ++)
+      if (!strcasecmp(keyword, pc->sources[i].pwg))
+        return (pc->sources[i].ppd);
   }
 
   return (NULL);
@@ -802,20 +1293,21 @@ _pwgGetInputSlot(_pwg_t     *pwg,	/* I - PWG mapping data */
 
 
 /*
- * '_pwgGetMediaType()' - Get the PPD MediaType associated with the job
+ * '_ppdCacheGetMediaType()' - Get the PPD MediaType associated with the job
  *                        attributes or a keyword string.
  */
 
 const char *				/* O - PPD MediaType or NULL */
-_pwgGetMediaType(_pwg_t     *pwg,	/* I - PWG mapping data */
-                 ipp_t      *job,	/* I - Job attributes or NULL */
-		 const char *keyword)	/* I - Keyword string or NULL */
+_ppdCacheGetMediaType(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    ipp_t        *job,			/* I - Job attributes or NULL */
+    const char   *keyword)		/* I - Keyword string or NULL */
 {
  /*
   * Range check input...
   */
 
-  if (!pwg || pwg->num_types == 0 || (!job && !keyword))
+  if (!pc || pc->num_types == 0 || (!job && !keyword))
     return (NULL);
 
   if (job && !keyword)
@@ -845,9 +1337,9 @@ _pwgGetMediaType(_pwg_t     *pwg,	/* I - PWG mapping data */
   {
     int	i;				/* Looping var */
 
-    for (i = 0; i < pwg->num_types; i ++)
-      if (!strcasecmp(keyword, pwg->types[i].pwg))
-        return (pwg->types[i].ppd);
+    for (i = 0; i < pc->num_types; i ++)
+      if (!strcasecmp(keyword, pc->types[i].pwg))
+        return (pc->types[i].ppd);
   }
 
   return (NULL);
@@ -855,13 +1347,14 @@ _pwgGetMediaType(_pwg_t     *pwg,	/* I - PWG mapping data */
 
 
 /*
- * '_pwgGetOutputBin()' - Get the PPD OutputBin associated with the keyword
+ * '_ppdCacheGetOutputBin()' - Get the PPD OutputBin associated with the keyword
  *                        string.
  */
 
 const char *				/* O - PPD OutputBin or NULL */
-_pwgGetOutputBin(_pwg_t     *pwg,	/* I - PWG mapping data */
-		 const char *output_bin)/* I - Keyword string */
+_ppdCacheGetOutputBin(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *output_bin)		/* I - Keyword string */
 {
   int	i;				/* Looping var */
 
@@ -870,7 +1363,7 @@ _pwgGetOutputBin(_pwg_t     *pwg,	/* I - PWG mapping data */
   * Range check input...
   */
 
-  if (!pwg || !output_bin)
+  if (!pc || !output_bin)
     return (NULL);
 
  /*
@@ -878,24 +1371,25 @@ _pwgGetOutputBin(_pwg_t     *pwg,	/* I - PWG mapping data */
   */
 
 
-  for (i = 0; i < pwg->num_bins; i ++)
-    if (!strcasecmp(output_bin, pwg->bins[i].pwg))
-      return (pwg->bins[i].ppd);
+  for (i = 0; i < pc->num_bins; i ++)
+    if (!strcasecmp(output_bin, pc->bins[i].pwg))
+      return (pc->bins[i].ppd);
 
   return (NULL);
 }
 
 
 /*
- * '_pwgGetPageSize()' - Get the PPD PageSize associated with the job
+ * '_ppdCacheGetPageSize()' - Get the PPD PageSize associated with the job
  *                       attributes or a keyword string.
  */
 
 const char *				/* O - PPD PageSize or NULL */
-_pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
-                ipp_t      *job,	/* I - Job attributes or NULL */
-		const char *keyword,	/* I - Keyword string or NULL */
-		int        *exact)	/* O - 1 if exact match, 0 otherwise */
+_ppdCacheGetPageSize(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    ipp_t        *job,			/* I - Job attributes or NULL */
+    const char   *keyword,		/* I - Keyword string or NULL */
+    int          *exact)		/* O - 1 if exact match, 0 otherwise */
 {
   int		i;			/* Looping var */
   _pwg_size_t	*size,			/* Current size */
@@ -913,14 +1407,14 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
   const char	*ppd_name;		/* PPD media name */
 
 
-  DEBUG_printf(("_pwgGetPageSize(pwg=%p, job=%p, keyword=\"%s\", exact=%p)",
-	        pwg, job, keyword, exact));
+  DEBUG_printf(("_ppdCacheGetPageSize(pc=%p, job=%p, keyword=\"%s\", exact=%p)",
+	        pc, job, keyword, exact));
 
  /*
   * Range check input...
   */
 
-  if (!pwg || (!job && !keyword))
+  if (!pc || (!job && !keyword))
     return (NULL);
 
   if (exact)
@@ -942,10 +1436,10 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
 #ifdef DEBUG
     if (attr)
-      DEBUG_printf(("1_pwgGetPageSize: Found attribute %s (%s)", attr->name,
-		    ippTagString(attr->value_tag)));
+      DEBUG_printf(("1_ppdCacheGetPageSize: Found attribute %s (%s)",
+                    attr->name, ippTagString(attr->value_tag)));
     else
-      DEBUG_puts("1_pwgGetPageSize: Did not find media attribute.");
+      DEBUG_puts("1_ppdCacheGetPageSize: Did not find media attribute.");
 #endif /* DEBUG */
 
     if (attr && (attr->value_tag == IPP_TAG_NAME ||
@@ -953,7 +1447,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
       ppd_name = attr->values[0].string.text;
   }
 
-  DEBUG_printf(("1_pwgGetPageSize: ppd_name=\"%s\"", ppd_name));
+  DEBUG_printf(("1_ppdCacheGetPageSize: ppd_name=\"%s\"", ppd_name));
 
   if (ppd_name)
   {
@@ -961,10 +1455,10 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
     * Try looking up the named PPD size first...
     */
 
-    for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+    for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
     {
-      DEBUG_printf(("2_pwgGetPageSize: size[%d]=[\"%s\" \"%s\"]",
-                    (int)(size - pwg->sizes), size->map.pwg, size->map.ppd));
+      DEBUG_printf(("2_ppdCacheGetPageSize: size[%d]=[\"%s\" \"%s\"]",
+                    (int)(size - pc->sizes), size->map.pwg, size->map.ppd));
 
       if (!strcasecmp(ppd_name, size->map.ppd) ||
           !strcasecmp(ppd_name, size->map.pwg))
@@ -972,7 +1466,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 	if (exact)
 	  *exact = 1;
 
-        DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", ppd_name));
+        DEBUG_printf(("1_ppdCacheGetPageSize: Returning \"%s\"", ppd_name));
 
         return (size->map.ppd);
       }
@@ -1019,7 +1513,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
   if (!ppd_name || strncasecmp(ppd_name, "Custom.", 7) ||
       strncasecmp(ppd_name, "custom_", 7))
   {
-    for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+    for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
     {
      /*
       * Adobe uses a size matching algorithm with an epsilon of 5 points, which
@@ -1065,7 +1559,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
       if (exact)
 	*exact = 1;
 
-      DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\"", size->map.ppd));
+      DEBUG_printf(("1_ppdCacheGetPageSize: Returning \"%s\"", size->map.ppd));
 
       return (size->map.ppd);
     }
@@ -1073,7 +1567,7 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
 
   if (closest)
   {
-    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\" (closest)",
+    DEBUG_printf(("1_ppdCacheGetPageSize: Returning \"%s\" (closest)",
                   closest->map.ppd));
 
     return (closest->map.ppd);
@@ -1083,24 +1577,24 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
   * If we get here we need to check for custom page size support...
   */
 
-  if (jobsize.width >= pwg->custom_min_width &&
-      jobsize.width <= pwg->custom_max_width &&
-      jobsize.length >= pwg->custom_min_length &&
-      jobsize.length <= pwg->custom_max_length)
+  if (jobsize.width >= pc->custom_min_width &&
+      jobsize.width <= pc->custom_max_width &&
+      jobsize.length >= pc->custom_min_length &&
+      jobsize.length <= pc->custom_max_length)
   {
    /*
     * In range, format as Custom.WWWWxLLLL (points).
     */
 
-    snprintf(pwg->custom_ppd_size, sizeof(pwg->custom_ppd_size), "Custom.%dx%d",
+    snprintf(pc->custom_ppd_size, sizeof(pc->custom_ppd_size), "Custom.%dx%d",
              (int)_PWG_TOPTS(jobsize.width), (int)_PWG_TOPTS(jobsize.length));
 
     if (margins_set && exact)
     {
-      dleft   = pwg->custom_size.left - jobsize.left;
-      dright  = pwg->custom_size.right - jobsize.right;
-      dtop    = pwg->custom_size.top - jobsize.top;
-      dbottom = pwg->custom_size.bottom - jobsize.bottom;
+      dleft   = pc->custom_size.left - jobsize.left;
+      dright  = pc->custom_size.right - jobsize.right;
+      dtop    = pc->custom_size.top - jobsize.top;
+      dbottom = pc->custom_size.bottom - jobsize.bottom;
 
       if (dleft > -35 && dleft < 35 && dright > -35 && dright < 35 &&
           dtop > -35 && dtop < 35 && dbottom > -35 && dbottom < 35)
@@ -1109,29 +1603,30 @@ _pwgGetPageSize(_pwg_t     *pwg,	/* I - PWG mapping data */
     else if (exact)
       *exact = 1;
 
-    DEBUG_printf(("1_pwgGetPageSize: Returning \"%s\" (custom)",
-                  pwg->custom_ppd_size));
+    DEBUG_printf(("1_ppdCacheGetPageSize: Returning \"%s\" (custom)",
+                  pc->custom_ppd_size));
 
-    return (pwg->custom_ppd_size);
+    return (pc->custom_ppd_size);
   }
 
  /*
   * No custom page size support or the size is out of range - return NULL.
   */
 
-  DEBUG_puts("1_pwgGetPageSize: Returning NULL");
+  DEBUG_puts("1_ppdCacheGetPageSize: Returning NULL");
 
   return (NULL);
 }
 
 
 /*
- * '_pwgGetSize()' - Get the PWG size associated with a PPD PageSize.
+ * '_ppdCacheGetSize()' - Get the PWG size associated with a PPD PageSize.
  */
 
 _pwg_size_t *				/* O - PWG size or NULL */
-_pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
-            const char *page_size)	/* I - PPD PageSize */
+_ppdCacheGetSize(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *page_size)		/* I - PPD PageSize */
 {
   int		i;
   _pwg_size_t	*size;			/* Current size */
@@ -1141,7 +1636,7 @@ _pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
   * Range check input...
   */
 
-  if (!pwg || !page_size)
+  if (!pc || !page_size)
     return (NULL);
 
   if (!strncasecmp(page_size, "Custom.", 7))
@@ -1201,17 +1696,17 @@ _pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
       l *= 2540.0 / 72.0;
     }
 
-    pwg->custom_size.width  = (int)w;
-    pwg->custom_size.length = (int)l;
+    pc->custom_size.width  = (int)w;
+    pc->custom_size.length = (int)l;
 
-    return (&(pwg->custom_size));
+    return (&(pc->custom_size));
   }
 
  /*
   * Not a custom size - look it up...
   */
 
-  for (i = pwg->num_sizes, size = pwg->sizes; i > 0; i --, size ++)
+  for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
     if (!strcasecmp(page_size, size->map.ppd))
       return (size);
 
@@ -1220,12 +1715,14 @@ _pwgGetSize(_pwg_t     *pwg,		/* I - PWG mapping data */
 
 
 /*
- * '_pwgGetSource()' - Get the PWG media-source associated with a PPD InputSlot.
+ * '_ppdCacheGetSource()' - Get the PWG media-source associated with a PPD
+ *                          InputSlot.
  */
 
 const char *				/* O - PWG media-source keyword */
-_pwgGetSource(_pwg_t     *pwg,		/* I - PWG mapping data */
-              const char *input_slot)	/* I - PPD InputSlot */
+_ppdCacheGetSource(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *input_slot)		/* I - PPD InputSlot */
 {
   int		i;			/* Looping var */
   _pwg_map_t	*source;		/* Current source */
@@ -1235,10 +1732,10 @@ _pwgGetSource(_pwg_t     *pwg,		/* I - PWG mapping data */
   * Range check input...
   */
 
-  if (!pwg || !input_slot)
+  if (!pc || !input_slot)
     return (NULL);
 
-  for (i = pwg->num_sources, source = pwg->sources; i > 0; i --, source ++)
+  for (i = pc->num_sources, source = pc->sources; i > 0; i --, source ++)
     if (!strcasecmp(input_slot, source->ppd))
       return (source->pwg);
 
@@ -1247,12 +1744,14 @@ _pwgGetSource(_pwg_t     *pwg,		/* I - PWG mapping data */
 
 
 /*
- * '_pwgGetType()' - Get the PWG media-type associated with a PPD MediaType.
+ * '_ppdCacheGetType()' - Get the PWG media-type associated with a PPD
+ *                        MediaType.
  */
 
 const char *				/* O - PWG media-type keyword */
-_pwgGetType(_pwg_t     *pwg,		/* I - PWG mapping data */
-	    const char *media_type)	/* I - PPD MediaType */
+_ppdCacheGetType(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *media_type)		/* I - PPD MediaType */
 {
   int		i;			/* Looping var */
   _pwg_map_t	*type;			/* Current type */
@@ -1262,10 +1761,10 @@ _pwgGetType(_pwg_t     *pwg,		/* I - PWG mapping data */
   * Range check input...
   */
 
-  if (!pwg || !media_type)
+  if (!pc || !media_type)
     return (NULL);
 
-  for (i = pwg->num_types, type = pwg->types; i > 0; i --, type ++)
+  for (i = pc->num_types, type = pc->types; i > 0; i --, type ++)
     if (!strcasecmp(media_type, type->ppd))
       return (type->pwg);
 
@@ -1274,7 +1773,142 @@ _pwgGetType(_pwg_t     *pwg,		/* I - PWG mapping data */
 
 
 /*
- * '_pwgInputSlotForSource()' - Get the InputSlot name for the given PWG source.
+ * '_ppdCacheWriteFile()' - Write PWG mapping data to a file.
+ */
+
+int					/* O - 1 on success, 0 on failure */
+_ppdCacheWriteFile(
+    _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
+    const char   *filename)		/* I - File to write */
+{
+  int		i, j, k;		/* Looping vars */
+  cups_file_t	*fp;			/* Output file */
+  _pwg_size_t	*size;			/* Current size */
+  _pwg_map_t	*map;			/* Current map */
+  cups_option_t	*option;		/* Current option */
+
+
+ /*
+  * Range check input...
+  */
+
+  if (!pc || !filename)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
+    return (0);
+  }
+
+ /*
+  * Open the file and write with compression...
+  */
+
+  if ((fp = cupsFileOpen(filename, "w9")) == NULL)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    return (0);
+  }
+
+ /*
+  * Standard header...
+  */
+
+  cupsFilePuts(fp, "#CUPS-PWGPPD\n");
+
+ /*
+  * Output bins...
+  */
+
+  if (pc->num_bins > 0)
+  {
+    cupsFilePrintf(fp, "NumBins %d\n", pc->num_bins);
+    for (i = pc->num_bins, map = pc->bins; i > 0; i --, map ++)
+      cupsFilePrintf(fp, "Bin %s %s\n", map->pwg, map->ppd);
+  }
+
+ /*
+  * Media sizes...
+  */
+
+  cupsFilePrintf(fp, "NumSizes %d\n", pc->num_sizes);
+  for (i = pc->num_sizes, size = pc->sizes; i > 0; i --, size ++)
+    cupsFilePrintf(fp, "Size %s %s %d %d %d %d %d %d\n", size->map.pwg,
+		   size->map.ppd, size->width, size->length, size->left,
+		   size->bottom, size->right, size->top);
+  if (pc->custom_max_width > 0)
+    cupsFilePrintf(fp, "CustomSize %d %d %d %d %d %d %d %d\n",
+                   pc->custom_max_width, pc->custom_max_length,
+		   pc->custom_min_width, pc->custom_min_length,
+		   pc->custom_size.left, pc->custom_size.bottom,
+		   pc->custom_size.right, pc->custom_size.top);
+
+ /*
+  * Media sources...
+  */
+
+  if (pc->source_option)
+    cupsFilePrintf(fp, "SourceOption %s\n", pc->source_option);
+
+  if (pc->num_sources > 0)
+  {
+    cupsFilePrintf(fp, "NumSources %d\n", pc->num_sources);
+    for (i = pc->num_sources, map = pc->sources; i > 0; i --, map ++)
+      cupsFilePrintf(fp, "Source %s %s\n", map->pwg, map->ppd);
+  }
+
+ /*
+  * Media types...
+  */
+
+  if (pc->num_types > 0)
+  {
+    cupsFilePrintf(fp, "NumTypes %d\n", pc->num_types);
+    for (i = pc->num_types, map = pc->types; i > 0; i --, map ++)
+      cupsFilePrintf(fp, "Type %s %s\n", map->pwg, map->ppd);
+  }
+
+ /*
+  * Presets...
+  */
+
+  for (i = _PWG_PRINT_COLOR_MODE_MONOCHROME; i < _PWG_PRINT_COLOR_MODE_MAX; i ++)
+    for (j = _PWG_PRINT_QUALITY_DRAFT; j < _PWG_PRINT_QUALITY_MAX; j ++)
+      if (pc->num_presets[i][j])
+      {
+	cupsFilePrintf(fp, "Preset %d %d", i, j);
+	for (k = pc->num_presets[i][j], option = pc->presets[i][j];
+	     k > 0;
+	     k --, option ++)
+	  cupsFilePrintf(fp, " %s=%s", option->name, option->value);
+	cupsFilePutChar(fp, '\n');
+      }
+
+ /*
+  * Duplex/sides...
+  */
+
+  if (pc->sides_option)
+    cupsFilePrintf(fp, "SidesOption %s\n", pc->sides_option);
+
+  if (pc->sides_1sided)
+    cupsFilePrintf(fp, "Sides1Sided %s\n", pc->sides_1sided);
+
+  if (pc->sides_2sided_long)
+    cupsFilePrintf(fp, "Sides2SidedLong %s\n", pc->sides_2sided_long);
+
+  if (pc->sides_2sided_short)
+    cupsFilePrintf(fp, "Sides2SidedShort %s\n", pc->sides_2sided_short);
+
+ /*
+  * Close and return...
+  */
+
+  return (!cupsFileClose(fp));
+}
+
+
+/*
+ * '_pwgInputSlotForSource()' - Get the InputSlot name for the given PWG
+ *                              media-source.
  */
 
 const char *				/* O - InputSlot name */
@@ -1320,12 +1954,13 @@ _pwgInputSlotForSource(
 
 
 /*
- * '_pwgMediaTypeForType()' - Get the MediaType name for the given PWG type.
+ * '_pwgMediaTypeForType()' - Get the MediaType name for the given PWG
+ *                            media-type.
  */
 
 const char *				/* O - MediaType name */
 _pwgMediaTypeForType(
-    const char *media_type,		/* I - PWG media-source */
+    const char *media_type,		/* I - PWG media-type */
     char       *name,			/* I - Name buffer */
     size_t     namesize)		/* I - Size of name buffer */
 {

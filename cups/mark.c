@@ -3,7 +3,7 @@
  *
  *   Option marking routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -62,8 +62,9 @@ static void	ppd_mark_option(ppd_file_t *ppd, const char *option,
  * 'cupsMarkOptions()' - Mark command-line options in a PPD file.
  *
  * This function maps the IPP "finishings", "media", "mirror",
- * "multiple-document-handling", "output-bin", "printer-resolution", and
- * "sides" attributes to their corresponding PPD options and choices.
+ * "multiple-document-handling", "output-bin", "print-color-mode",
+ * "print-quality", "printer-resolution", and "sides" attributes to their
+ * corresponding PPD options and choices.
  */
 
 int					/* O - 1 if conflicts exist, 0 otherwise */
@@ -78,14 +79,14 @@ cupsMarkOptions(
   const char	*val,			/* Pointer into value */
 		*media,			/* media option */
 		*output_bin,		/* output-bin option */
-		*output_mode,		/* output-mode option */
 		*page_size,		/* PageSize option */
 		*ppd_keyword,		/* PPD keyword */
+		*print_color_mode,	/* print-color-mode option */
 		*print_quality,		/* print-quality option */
 		*sides;			/* sides option */
   cups_option_t	*optptr;		/* Current option */
   ppd_attr_t	*attr;			/* PPD attribute */
-  _pwg_t	*pwg;			/* PWG mapping data */
+  _ppd_cache_t	*cache;			/* PPD cache and mapping data */
 
 
  /*
@@ -104,22 +105,25 @@ cupsMarkOptions(
 
   media         = cupsGetOption("media", num_options, options);
   output_bin    = cupsGetOption("output-bin", num_options, options);
-  output_mode   = cupsGetOption("output-mode", num_options, options);
   page_size     = cupsGetOption("PageSize", num_options, options);
   print_quality = cupsGetOption("print-quality", num_options, options);
   sides         = cupsGetOption("sides", num_options, options);
 
-  if ((media || output_bin || output_mode || print_quality || sides) &&
-      !ppd->pwg)
+  if ((print_color_mode = cupsGetOption("print-color-mode", num_options,
+                                        options)) == NULL)
+    print_color_mode = cupsGetOption("output-mode", num_options, options);
+
+  if ((media || output_bin || print_color_mode || print_quality || sides) &&
+      !ppd->cache)
   {
    /*
-    * Load PWG mapping data as needed...
+    * Load PPD cache and mapping data as needed...
     */
 
-    ppd->pwg = _pwgCreateWithPPD(ppd);
+    ppd->cache = _ppdCacheCreateWithPPD(ppd);
   }
 
-  pwg = (_pwg_t *)ppd->pwg;
+  cache = ppd->cache;
 
   if (media)
   {
@@ -154,40 +158,40 @@ cupsMarkOptions(
       {
         if (!strncasecmp(s, "Custom.", 7) || ppdPageSize(ppd, s))
           ppd_mark_option(ppd, "PageSize", s);
-        else if ((ppd_keyword = _pwgGetPageSize(pwg, NULL, s, NULL)) != NULL)
+        else if ((ppd_keyword = _ppdCacheGetPageSize(cache, NULL, s, NULL)) != NULL)
 	  ppd_mark_option(ppd, "PageSize", ppd_keyword);
       }
 
-      if (pwg && pwg->source_option &&
-          !cupsGetOption(pwg->source_option, num_options, options) &&
-	  (ppd_keyword = _pwgGetInputSlot(pwg, NULL, s)) != NULL)
-	ppd_mark_option(ppd, pwg->source_option, ppd_keyword);
+      if (cache && cache->source_option &&
+          !cupsGetOption(cache->source_option, num_options, options) &&
+	  (ppd_keyword = _ppdCacheGetInputSlot(cache, NULL, s)) != NULL)
+	ppd_mark_option(ppd, cache->source_option, ppd_keyword);
 
       if (!cupsGetOption("MediaType", num_options, options) &&
-	  (ppd_keyword = _pwgGetMediaType(pwg, NULL, s)) != NULL)
+	  (ppd_keyword = _ppdCacheGetMediaType(cache, NULL, s)) != NULL)
 	ppd_mark_option(ppd, "MediaType", ppd_keyword);
     }
   }
 
-  if (pwg)
+  if (cache)
   {
     if (!cupsGetOption("com.apple.print.DocumentTicket.PMSpoolFormat",
                        num_options, options) &&
         !cupsGetOption("APPrinterPreset", num_options, options) &&
-        (output_mode || print_quality))
+        (print_color_mode || print_quality))
     {
      /*
       * Map output-mode and print-quality to a preset...
       */
 
-      _pwg_output_mode_t	pwg_om;	/* output-mode index */
+      _pwg_print_color_mode_t	pwg_pcm;/* print-color-mode index */
       _pwg_print_quality_t	pwg_pq;	/* print-quality index */
       cups_option_t		*preset;/* Current preset option */
 
-      if (output_mode && !strcmp(output_mode, "monochrome"))
-	pwg_om = _PWG_OUTPUT_MODE_MONOCHROME;
+      if (print_color_mode && !strcmp(print_color_mode, "monochrome"))
+	pwg_pcm = _PWG_PRINT_COLOR_MODE_MONOCHROME;
       else
-	pwg_om = _PWG_OUTPUT_MODE_COLOR;
+	pwg_pcm = _PWG_PRINT_COLOR_MODE_COLOR;
 
       if (print_quality)
       {
@@ -200,33 +204,33 @@ cupsMarkOptions(
       else
 	pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
 
-      if (pwg->num_presets[pwg_om][pwg_pq] == 0)
+      if (cache->num_presets[pwg_pcm][pwg_pq] == 0)
       {
        /*
 	* Try to find a preset that works so that we maximize the chances of us
 	* getting a good print using IPP attributes.
 	*/
 
-	if (pwg->num_presets[pwg_om][_PWG_PRINT_QUALITY_NORMAL] > 0)
+	if (cache->num_presets[pwg_pcm][_PWG_PRINT_QUALITY_NORMAL] > 0)
 	  pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
-	else if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][pwg_pq] > 0)
-	  pwg_om = _PWG_OUTPUT_MODE_COLOR;
+	else if (cache->num_presets[_PWG_PRINT_COLOR_MODE_COLOR][pwg_pq] > 0)
+	  pwg_pcm = _PWG_PRINT_COLOR_MODE_COLOR;
 	else
 	{
-	  pwg_pq = _PWG_PRINT_QUALITY_NORMAL;
-	  pwg_om = _PWG_OUTPUT_MODE_COLOR;
+	  pwg_pq  = _PWG_PRINT_QUALITY_NORMAL;
+	  pwg_pcm = _PWG_PRINT_COLOR_MODE_COLOR;
 	}
       }
 
-      if (pwg->num_presets[pwg_om][pwg_pq] > 0)
+      if (cache->num_presets[pwg_pcm][pwg_pq] > 0)
       {
        /*
 	* Copy the preset options as long as the corresponding names are not
 	* already defined in the IPP request...
 	*/
 
-	for (i = pwg->num_presets[pwg_om][pwg_pq],
-		 preset = pwg->presets[pwg_om][pwg_pq];
+	for (i = cache->num_presets[pwg_pcm][pwg_pq],
+		 preset = cache->presets[pwg_pcm][pwg_pq];
 	     i > 0;
 	     i --, preset ++)
 	{
@@ -237,7 +241,7 @@ cupsMarkOptions(
     }
 
     if (output_bin && !cupsGetOption("OutputBin", num_options, options) &&
-	(ppd_keyword = _pwgGetOutputBin(pwg, output_bin)) != NULL) 
+	(ppd_keyword = _ppdCacheGetOutputBin(cache, output_bin)) != NULL) 
     {
      /*
       * Map output-bin to OutputBin...
@@ -246,19 +250,19 @@ cupsMarkOptions(
       ppd_mark_option(ppd, "OutputBin", ppd_keyword);
     }
 
-    if (sides && pwg->sides_option &&
-        !cupsGetOption(pwg->sides_option, num_options, options))
+    if (sides && cache->sides_option &&
+        !cupsGetOption(cache->sides_option, num_options, options))
     {
      /*
       * Map sides to duplex option...
       */
 
       if (!strcmp(sides, "one-sided"))
-        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_1sided);
+        ppd_mark_option(ppd, cache->sides_option, cache->sides_1sided);
       else if (!strcmp(sides, "two-sided-long-edge"))
-        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_2sided_long);
+        ppd_mark_option(ppd, cache->sides_option, cache->sides_2sided_long);
       else if (!strcmp(sides, "two-sided-short-edge"))
-        ppd_mark_option(ppd, pwg->sides_option, pwg->sides_2sided_short);
+        ppd_mark_option(ppd, cache->sides_option, cache->sides_2sided_short);
     }
   }
 
