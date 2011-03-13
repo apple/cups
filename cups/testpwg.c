@@ -15,6 +15,9 @@
  *
  * Contents:
  *
+ *   main()           - Main entry.
+ *   test_pagesize()  - Test the PWG mapping functions.
+ *   test_ppd_cache() - Test the PPD cache functions.
  */
 
 /*
@@ -341,7 +344,7 @@ test_ppd_cache(_ppd_cache_t *pc,	/* I - PWG mapping data */
   */
 
   fputs("_ppdCacheWriteFile(test.pwg): ", stdout);
-  if (!_ppdCacheWriteFile(pc, "test.pwg"))
+  if (!_ppdCacheWriteFile(pc, "test.pwg", NULL))
   {
     puts("FAIL");
     status ++;
@@ -350,13 +353,14 @@ test_ppd_cache(_ppd_cache_t *pc,	/* I - PWG mapping data */
     puts("PASS");
 
   fputs("_ppdCacheCreateWithFile(test.pwg): ", stdout);
-  if ((pc2 = _ppdCacheCreateWithFile("test.pwg")) == NULL)
+  if ((pc2 = _ppdCacheCreateWithFile("test.pwg", NULL)) == NULL)
   {
     puts("FAIL");
     status ++;
   }
   else
   {
+    // TODO: FINISH ADDING ALL VALUES IN STRUCTURE
     if (pc2->num_sizes != pc->num_sizes)
     {
       if (!status)

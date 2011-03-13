@@ -42,10 +42,8 @@
  *   add_printer_filter()       - Add a MIME filter for a printer.
  *   add_printer_formats()      - Add document-format-supported values for a
  *                                printer.
- *   add_string_array()         - Add a string to an array of CUPS strings.
  *   compare_printers()         - Compare two printers.
  *   delete_printer_filters()   - Delete all MIME filters for a printer.
- *   delete_string_array()      - Delete an array of CUPS strings.
  *   dirty_printer()            - Mark config and state files dirty for the
  *                                specified printer.
  *   load_ppd()                 - Load a cached PPD file, updating the cache as
@@ -88,10 +86,8 @@ static void	add_printer_defaults(cupsd_printer_t *p);
 static void	add_printer_filter(cupsd_printer_t *p, mime_type_t *type,
 				   const char *filter);
 static void	add_printer_formats(cupsd_printer_t *p);
-static void	add_string_array(cups_array_t **a, const char *s);
 static int	compare_printers(void *first, void *second, void *data);
 static void	delete_printer_filters(cupsd_printer_t *p);
-static void	delete_string_array(cups_array_t **a);
 static void	dirty_printer(cupsd_printer_t *p);
 static void	load_ppd(cupsd_printer_t *p);
 static ipp_t	*new_media_col(_pwg_size_t *size, const char *source,
@@ -826,9 +822,6 @@ cupsdDeletePrinter(
   mimeDeleteType(MimeDatabase, p->filetype);
   mimeDeleteType(MimeDatabase, p->prefiltertype);
 
-  delete_string_array(&(p->filters));
-  delete_string_array(&(p->pre_filters));
-
   cupsdFreeStrings(&(p->users));
   cupsdFreeQuotas(p);
 
@@ -850,7 +843,6 @@ cupsdDeletePrinter(
   cupsdClearString(&p->alert_description);
 
 #ifdef HAVE_DNSSD
-  cupsdClearString(&p->product);
   cupsdClearString(&p->pdl);
 #endif /* HAVE_DNSSD */
 
@@ -1173,44 +1165,6 @@ cupsdLoadAllPrinters(void)
     {
       if (value)
         p->type = atoi(value);
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Syntax error on line %d of printers.conf.", linenum);
-    }
-    else if (!strcasecmp(line, "Product"))
-    {
-      if (value)
-      {
-#ifdef HAVE_DNSSD
-        p->product = _cupsStrAlloc(value);
-#endif /* HAVE_DNSSD */
-      }
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Syntax error on line %d of printers.conf.", linenum);
-    }
-    else if (!strcasecmp(line, "Filter"))
-    {
-      if (value)
-      {
-        if (!p->filters)
-	  p->filters = cupsArrayNew(NULL, NULL);
-
-	cupsArrayAdd(p->filters, _cupsStrAlloc(value));
-      }
-      else
-	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "Syntax error on line %d of printers.conf.", linenum);
-    }
-    else if (!strcasecmp(line, "PreFilter"))
-    {
-      if (value)
-      {
-        if (!p->pre_filters)
-	  p->pre_filters = cupsArrayNew(NULL, NULL);
-
-	cupsArrayAdd(p->pre_filters, _cupsStrAlloc(value));
-      }
       else
 	cupsdLogMessage(CUPSD_LOG_ERROR,
 	                "Syntax error on line %d of printers.conf.", linenum);
@@ -1596,21 +1550,6 @@ cupsdSaveAllPrinters(void)
         cupsFilePutConf(fp, "Reason", printer->reasons[i]);
 
     cupsFilePrintf(fp, "Type %d\n", printer->type);
-
-#ifdef HAVE_DNSSD
-    if (printer->product)
-      cupsFilePutConf(fp, "Product", printer->product);
-#endif /* HAVE_DNSSD */
-
-    for (ptr = (char *)cupsArrayFirst(printer->filters);
-         ptr;
-	 ptr = (char *)cupsArrayNext(printer->filters))
-      cupsFilePutConf(fp, "Filter", ptr);
-
-    for (ptr = (char *)cupsArrayFirst(printer->pre_filters);
-         ptr;
-	 ptr = (char *)cupsArrayNext(printer->pre_filters))
-      cupsFilePutConf(fp, "PreFilter", ptr);
 
     if (printer->accepting)
       cupsFilePuts(fp, "Accepting Yes\n");
@@ -2395,18 +2334,55 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
       cupsdSetPrinterReasons(p, "-cups-missing-filter-warning,"
                                 "cups-insecure-filter-warning");
 
-      for (filter = (char *)cupsArrayFirst(p->filters);
-	   filter;
-	   filter = (char *)cupsArrayNext(p->filters))
-	add_printer_filter(p, p->filetype, filter);
+      if (p->pc && p->pc->filters)
+      {
+	for (filter = (char *)cupsArrayFirst(p->pc->filters);
+	     filter;
+	     filter = (char *)cupsArrayNext(p->pc->filters))
+	  add_printer_filter(p, p->filetype, filter);
+      }
+      else if (!(p->type & CUPS_PRINTER_REMOTE))
+      {
+	char	interface[1024];	/* Interface script */
 
-      if (p->pre_filters)
+
+	snprintf(interface, sizeof(interface), "%s/interfaces/%s", ServerRoot,
+		 p->name);
+	if (!access(interface, X_OK))
+	{
+	 /*
+	  * Yes, we have a System V style interface script; use it!
+	  */
+
+	  snprintf(interface, sizeof(interface), "*/* 0 %s/interfaces/%s",
+		   ServerRoot, p->name);
+	  add_printer_filter(p, p->filetype, interface);
+	}
+	else
+	{
+	 /*
+	  * Add a filter from application/vnd.cups-raw to printer/name to
+	  * handle "raw" printing by users.
+	  */
+
+	  add_printer_filter(p, p->filetype, "application/vnd.cups-raw 0 -");
+
+	 /*
+	  * Add a PostScript filter, since this is still possibly PS printer.
+	  */
+
+	  add_printer_filter(p, p->filetype,
+	                     "application/vnd.cups-postscript 0 -");
+	}
+      }
+
+      if (p->pc && p->pc->prefilters)
       {
         p->prefiltertype = mimeAddType(MimeDatabase, "prefilter", p->name);
 
-        for (filter = (char *)cupsArrayFirst(p->pre_filters);
+        for (filter = (char *)cupsArrayFirst(p->pc->prefilters);
 	     filter;
-	     filter = (char *)cupsArrayNext(p->pre_filters))
+	     filter = (char *)cupsArrayNext(p->pc->prefilters))
 	  add_printer_filter(p, p->prefiltertype, filter);
       }
     }
@@ -3522,6 +3498,11 @@ add_printer_filter(
   struct stat	fileinfo;		/* File information */
 
 
+  cupsdLogMessage(CUPSD_LOG_DEBUG2,
+                  "add_printer_filter(p=%p(%s), filtertype=%p(%s/%s), "
+		  "filter=\"%s\")", p, p->name, filtertype, filtertype->super,
+		  filtertype->type, filter);
+
  /*
   * Parse the filter string; it should be in one of the following formats:
   *
@@ -3830,21 +3811,6 @@ add_printer_formats(cupsd_printer_t *p)	/* I - Printer */
 
 
 /*
- * 'add_string_array()' - Add a string to an array of CUPS strings.
- */
-
-static void
-add_string_array(cups_array_t **a,	/* I - Array */
-		 const char   *s)	/* I - String */
-{
-  if (!*a)
-    *a = cupsArrayNew(NULL, NULL);
-
-  cupsArrayAdd(*a, _cupsStrAlloc(s));
-}
-
-
-/*
  * 'compare_printers()' - Compare two printers.
  */
 
@@ -3909,26 +3875,6 @@ delete_printer_filters(
 
 
 /*
- * 'delete_string_array()' - Delete an array of CUPS strings.
- */
-
-static void
-delete_string_array(cups_array_t **a)	/* I - Array */
-{
-  char	*ptr;				/* Current string */
-
-
-  for (ptr = (char *)cupsArrayFirst(*a);
-       ptr;
-       ptr = (char *)cupsArrayNext(*a))
-    _cupsStrFree(ptr);
-
-  cupsArrayDelete(*a);
-  *a = NULL;
-}
-
-
-/*
  * 'dirty_printer()' - Mark config and state files dirty for the specified
  *                     printer.
  */
@@ -3956,11 +3902,8 @@ static void
 load_ppd(cupsd_printer_t *p)		/* I - Printer */
 {
   int		i, j, k;		/* Looping vars */
-  cups_file_t	*cache;			/* IPP cache file */
-  char		cache_name[1024];	/* IPP cache filename */
-  struct stat	cache_info;		/* IPP cache file info */
-  char		pwg_name[1024];		/* PWG cache filename */
-  struct stat	pwg_info;		/* PWG cache file info */
+  char		cache_name[1024];	/* Cache filename */
+  struct stat	cache_info;		/* Cache file info */
   ppd_file_t	*ppd;			/* PPD file */
   char		ppd_name[1024];		/* PPD filename */
   struct stat	ppd_info;		/* PPD file info */
@@ -3988,6 +3931,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		qualities[3];		/* print-quality values */
   int		num_margins,		/* Number of media-*-margin-supported values */
 		margins[16];		/* media-*-margin-supported values */
+  const char	*filter;		/* Current filter */
   static const char * const sides[3] =	/* sides-supported values */
 		{
 		  "one-sided",
@@ -4006,13 +3950,9 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   * Check to see if the cache is up-to-date...
   */
 
-  snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp4", CacheDir, p->name);
+  snprintf(cache_name, sizeof(cache_name), "%s/%s.data", CacheDir, p->name);
   if (stat(cache_name, &cache_info))
     cache_info.st_mtime = 0;
-
-  snprintf(pwg_name, sizeof(pwg_name), "%s/%s.pwg3", CacheDir, p->name);
-  if (stat(pwg_name, &pwg_info))
-    pwg_info.st_mtime = 0;
 
   snprintf(ppd_name, sizeof(ppd_name), "%s/ppd/%s.ppd", ServerRoot, p->name);
   if (stat(ppd_name, &ppd_info))
@@ -4024,26 +3964,19 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   _ppdCacheDestroy(p->pc);
   p->pc = NULL;
 
-  if (pwg_info.st_mtime >= ppd_info.st_mtime)
-    p->pc = _ppdCacheCreateWithFile(pwg_name);
-
-  if (cache_info.st_mtime >= ppd_info.st_mtime && p->pc &&
-      (cache = cupsFileOpen(cache_name, "r")) != NULL)
+  if (cache_info.st_mtime >= ppd_info.st_mtime)
   {
-   /*
-    * Load cached information and return...
-    */
-
     cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", cache_name);
 
-    if (ippReadIO(cache, (ipp_iocb_t)cupsFileRead, 1, NULL,
-                  p->ppd_attrs) == IPP_DATA)
+    if ((p->pc = _ppdCacheCreateWithFile(cache_name, &p->ppd_attrs)) != NULL &&
+        p->ppd_attrs)
     {
-      cupsFileClose(cache);
+     /*
+      * Loaded successfully!
+      */
+
       return;
     }
-
-    cupsFileClose(cache);
   }
 
  /*
@@ -4052,13 +3985,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
   cupsdMarkDirty(CUPSD_DIRTY_PRINTERS);
 
-  _ppdCacheDestroy(p->pc);
-  p->pc = NULL;
-
   cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Loading %s...", ppd_name);
-
-  delete_string_array(&(p->filters));
-  delete_string_array(&(p->pre_filters));
 
   p->type &= ~CUPS_PRINTER_OPTIONS;
   p->type |= CUPS_PRINTER_BW;
@@ -4725,106 +4652,21 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     }
 
    /*
-    * Add a filter from application/vnd.cups-raw to printer/name to
-    * handle "raw" printing by users.
+    * Scan the filters in the PPD file...
     */
 
-    add_string_array(&(p->filters), "application/vnd.cups-raw 0 -");
-
-   /*
-    * Add any pre-filters in the PPD file...
-    */
-
-    if ((ppd_attr = ppdFindAttr(ppd, "cupsPreFilter", NULL)) != NULL)
+    if (p->pc)
     {
-      for (; ppd_attr; ppd_attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL))
-	if (ppd_attr->value)
-	  add_string_array(&(p->pre_filters), ppd_attr->value);
-    }
-
-   /*
-    * Add any filters in the PPD file...
-    */
-
-    if ((ppd_attr = ppdFindAttr(ppd, "cupsFilter2", NULL)) != NULL)
-    {
-     /*
-      * Use new cupsFilter2 filter syntax...
-      */
-
-      for (; ppd_attr; ppd_attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL))
+      for (filter = (const char *)cupsArrayFirst(p->pc->filters);
+	   filter;
+	   filter = (const char *)cupsArrayNext(p->pc->filters))
       {
-        add_string_array(&(p->filters), ppd_attr->value);
-
-        if (!strncasecmp(ppd_attr->value, "application/vnd.cups-command", 28) &&
-            isspace(ppd_attr->value[28] & 255))
-          p->type |= CUPS_PRINTER_COMMANDS;
-      }
-    }
-    else
-    {
-     /*
-      * Use old cupsFilter syntax...
-      */
-
-      DEBUG_printf(("ppd->num_filters = %d\n", ppd->num_filters));
-      for (i = 0; i < ppd->num_filters; i ++)
-      {
-        DEBUG_printf(("ppd->filters[%d] = \"%s\"\n", i, ppd->filters[i]));
-        add_string_array(&(p->filters), ppd->filters[i]);
-
-        if (!strncasecmp(ppd->filters[i], "application/vnd.cups-command", 28) &&
-            isspace(ppd->filters[i][28] & 255))
-          p->type |= CUPS_PRINTER_COMMANDS;
-      }
-    }
-
-    if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL &&
-	ppd_attr->value &&
-	(!ppd_attr->value[0] || !strcasecmp(ppd_attr->value, "none")))
-    {
-     /*
-      * Printer does not support CUPS command files (or any commands as far as
-      * CUPS is concerned...
-      */
-
-      p->type &= ~CUPS_PRINTER_COMMANDS;
-    }
-    else if (ppd->num_filters == 0)
-    {
-     /*
-      * If there are no filters, add PostScript printing filters.
-      */
-
-      add_string_array(&(p->filters),
-                       "application/vnd.cups-command 0 commandtops");
-      add_string_array(&(p->filters),
-                       "application/vnd.cups-postscript 0 -");
-
-      p->type |= CUPS_PRINTER_COMMANDS;
-    }
-    else if (!(p->type & CUPS_PRINTER_COMMANDS))
-    {
-     /*
-      * See if this is a PostScript device without a command filter...
-      */
-
-      for (i = 0; i < ppd->num_filters; i ++)
-	if (!strncasecmp(ppd->filters[i],
-			 "application/vnd.cups-postscript", 31) &&
-            isspace(ppd->filters[i][31] & 255))
+	if (!strncasecmp(filter, "application/vnd.cups-command", 28) &&
+	    _cups_isspace(filter[28]))
+	{
+	  p->type |= CUPS_PRINTER_COMMANDS;
 	  break;
-
-      if (i < ppd->num_filters)
-      {
-       /*
-	* Add the generic PostScript command filter...
-	*/
-
-	add_string_array(&(p->filters),
-	                 "application/vnd.cups-command application/postscript "
-			 "0 commandtops");
-	p->type |= CUPS_PRINTER_COMMANDS;
+	}
       }
     }
 
@@ -4835,12 +4677,11 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 		*end;			/* End of name */
       int	count;			/* Number of commands */
 
-
-      if (ppd_attr && ppd_attr->value && ppd_attr->value[0])
+      if ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) != NULL)
       {
 	for (count = 0, start = ppd_attr->value; *start; count ++)
 	{
-	  while (isspace(*start & 255))
+	  while (_cups_isspace(*start))
 	    start ++;
 
 	  if (!*start)
@@ -4946,10 +4787,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       else if (strstr(ppd->protocols, "BCP"))
 	attr->values[i].string.text = _cupsStrAlloc("bcp");
     }
-
-#ifdef HAVE_DNSSD
-    cupsdSetString(&p->product, ppd->product);
-#endif /* HAVE_DNSSD */
 
     if (ppdFindAttr(ppd, "APRemoteQueueID", NULL))
       p->type |= CUPS_PRINTER_REMOTE;
@@ -5109,19 +4946,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
     cupsdLogMessage(CUPSD_LOG_INFO,
 		    "Hint: Run \"cupstestppd %s\" and fix any errors.",
 		    ppd_name);
-
-   /*
-    * Add a filter from application/vnd.cups-raw to printer/name to
-    * handle "raw" printing by users.
-    */
-
-    add_string_array(&(p->filters), "application/vnd.cups-raw 0 -");
-
-   /*
-    * Add a PostScript filter, since this is still possibly PS printer.
-    */
-
-    add_string_array(&(p->filters), "application/vnd.cups-postscript 0 -");
   }
   else
   {
@@ -5143,10 +4967,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
       ippAddString(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT,
 		   "printer-make-and-model", NULL,
 		   "Local System V Printer");
-
-      snprintf(interface, sizeof(interface), "*/* 0 %s/interfaces/%s",
-	       ServerRoot, p->name);
-      add_string_array(&(p->filters), interface);
     }
     else if (!strncmp(p->device_uri, "ipp://", 6) &&
 	     (strstr(p->device_uri, "/printers/") != NULL ||
@@ -5219,7 +5039,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
   ippAddInteger(p->ppd_attrs, IPP_TAG_PRINTER, IPP_TAG_ENUM,
 		"finishings-default", IPP_FINISHINGS_NONE);
 
-  if (ppd && (cache = cupsFileOpen(cache_name, "w9")) != NULL)
+  if (ppd && p->pc)
   {
    /*
     * Save cached PPD attributes to disk...
@@ -5227,20 +5047,7 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "load_ppd: Saving %s...", cache_name);
 
-    p->ppd_attrs->state = IPP_IDLE;
-
-    if (ippWriteIO(cache, (ipp_iocb_t)cupsFileWrite, 1, NULL,
-                   p->ppd_attrs) != IPP_DATA)
-    {
-      cupsdLogMessage(CUPSD_LOG_ERROR,
-                      "Unable to save PPD cache file \"%s\" - %s", cache_name,
-		      strerror(errno));
-      unlink(cache_name);
-    }
-
-    cupsFileClose(cache);
-
-    _ppdCacheWriteFile(p->pc, pwg_name);
+    _ppdCacheWriteFile(p->pc, cache_name, p->ppd_attrs);
   }
   else
   {
@@ -5250,9 +5057,6 @@ load_ppd(cupsd_printer_t *p)		/* I - Printer */
 
     if (cache_info.st_mtime)
       unlink(cache_name);
-
-    if (pwg_info.st_mtime)
-      unlink(pwg_name);
   }
 }
 

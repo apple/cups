@@ -3,7 +3,7 @@
  *
  *   Private PPD definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -49,7 +49,7 @@ extern "C" {
  * Constants...
  */
 
-#  define PPD_CACHE_VERSION	1	/* Version number in cache file */
+#  define _PPD_CACHE_VERSION	1	/* Version number in cache file */
 
 
 /*
@@ -124,7 +124,6 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*product;		/* Product value */
   cups_array_t	*filters,		/* cupsFilter/cupsFilter2 values */
 		*prefilters;		/* cupsPreFilter values */
-  ipp_t		*attrs;			/* Printer description attributes, if any */
 };
 
 
@@ -132,7 +131,8 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
  * Prototypes...
  */
 
-extern _ppd_cache_t	*_ppdCacheCreateWithFile(const char *filename);
+extern _ppd_cache_t	*_ppdCacheCreateWithFile(const char *filename,
+			                         ipp_t **attrs);
 extern _ppd_cache_t	*_ppdCacheCreateWithPPD(ppd_file_t *ppd);
 extern void		_ppdCacheDestroy(_ppd_cache_t *pc);
 extern const char	*_ppdCacheGetBin(_ppd_cache_t *pc,
@@ -152,7 +152,7 @@ extern const char	*_ppdCacheGetSource(_ppd_cache_t *pc,
 extern const char	*_ppdCacheGetType(_ppd_cache_t *pc,
 			                  const char *media_type);
 extern int		_ppdCacheWriteFile(_ppd_cache_t *pc,
-			                   const char *filename);
+			                   const char *filename, ipp_t *attrs);
 extern void		_ppdFreeLanguages(cups_array_t *languages);
 extern cups_encoding_t	_ppdGetEncoding(const char *name);
 extern cups_array_t	*_ppdGetLanguages(ppd_file_t *ppd);

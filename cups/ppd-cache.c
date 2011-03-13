@@ -15,35 +15,35 @@
  *
  * Contents:
  *
- *   _ppdCacheCreateWithFile()     - Create PWG mapping data from a written
- *                                   file.
- *   _ppdCacheCreateWithPPD()      - Create PWG mapping data from a PPD file.
- *   _ppdCacheDestroy()            - Free all memory used for PWG mapping data.
- *   _ppdCacheGetBin()             - Get the PWG output-bin keyword associated
- *                                   with a PPD OutputBin.
- *   _ppdCacheGetInputSlot()       - Get the PPD InputSlot associated with the
- *                                   job attributes or a keyword string.
- *   _ppdCacheGetMediaType()       - Get the PPD MediaType associated with the
- *                                   job attributes or a keyword string.
- *   _ppdCacheGetOutputBin()       - Get the PPD OutputBin associated with the
- *                                   keyword string.
- *   _ppdCacheGetPageSize()        - Get the PPD PageSize associated with the
- *                                   job attributes or a keyword string.
- *   _ppdCacheGetSize()            - Get the PWG size associated with a PPD
- *                                   PageSize.
- *   _ppdCacheGetSource()          - Get the PWG media-source associated with a
- *                                   PPD InputSlot.
- *   _ppdCacheGetType()            - Get the PWG media-type associated with a
- *                                   PPD MediaType.
- *   _pwgInputSlotForSource() - Get the InputSlot name for the given PWG
- *                                   source.
- *   _pwgMediaTypeForType()   - Get the MediaType name for the given PWG
- *                                   type.
- *   _ppdCacheWriteFile()          - Write PWG mapping data to a file.
- *   _pwgPageSizeForMedia()        - Get the PageSize name for the given media.
- *   pwg_ppdize_name()             - Convert an IPP keyword to a PPD keyword.
- *   pwg_unppdize_name()           - Convert a PPD keyword to a lowercase IPP
- *                                   keyword.
+ *   _ppdCacheCreateWithFile() - Create PPD cache and mapping data from a
+ *                               written file.
+ *   _ppdCacheCreateWithPPD()  - Create PWG mapping data from a PPD file.
+ *   _ppdCacheDestroy()        - Free all memory used for PWG mapping data.
+ *   _ppdCacheGetBin()         - Get the PWG output-bin keyword associated with
+ *                               a PPD OutputBin.
+ *   _ppdCacheGetInputSlot()   - Get the PPD InputSlot associated with the job
+ *                               attributes or a keyword string.
+ *   _ppdCacheGetMediaType()   - Get the PPD MediaType associated with the job
+ *                               attributes or a keyword string.
+ *   _ppdCacheGetOutputBin()   - Get the PPD OutputBin associated with the
+ *                               keyword string.
+ *   _ppdCacheGetPageSize()    - Get the PPD PageSize associated with the job
+ *                               attributes or a keyword string.
+ *   _ppdCacheGetSize()        - Get the PWG size associated with a PPD
+ *                               PageSize.
+ *   _ppdCacheGetSource()      - Get the PWG media-source associated with a PPD
+ *                               InputSlot.
+ *   _ppdCacheGetType()        - Get the PWG media-type associated with a PPD
+ *                               MediaType.
+ *   _ppdCacheWriteFile()      - Write PWG mapping data to a file.
+ *   _pwgInputSlotForSource()  - Get the InputSlot name for the given PWG
+ *                               media-source.
+ *   _pwgMediaTypeForType()    - Get the MediaType name for the given PWG
+ *                               media-type.
+ *   _pwgPageSizeForMedia()    - Get the PageSize name for the given media.
+ *   pwg_ppdize_name()         - Convert an IPP keyword to a PPD keyword.
+ *   pwg_unppdize_name()       - Convert a PPD keyword to a lowercase IPP
+ *                               keyword.
  */
 
 /*
@@ -70,14 +70,17 @@ static void	pwg_unppdize_name(const char *ppd, char *name, size_t namesize);
 
 
 /*
- * '_ppdCacheCreateWithFile()' - Create PWG mapping data from a written file.
+ * '_ppdCacheCreateWithFile()' - Create PPD cache and mapping data from a
+ *                               written file.
  *
- * Use the @link _ppdCacheWriteFile@ function to write PWG mapping data to a file.
+ * Use the @link _ppdCacheWriteFile@ function to write PWG mapping data to a
+ * file.
  */
 
-_ppd_cache_t *				/* O - PPD cache and mapping data */
+_ppd_cache_t *				/* O  - PPD cache and mapping data */
 _ppdCacheCreateWithFile(
-    const char *filename)		/* I - File to read */
+    const char *filename,		/* I  - File to read */
+    ipp_t      **attrs)			/* IO - IPP attributes, if any */
 {
   cups_file_t	*fp;			/* File */
   _ppd_cache_t	*pc;			/* PWG mapping data */
@@ -105,6 +108,9 @@ _ppdCacheCreateWithFile(
   * Range check input...
   */
 
+  if (attrs)
+    *attrs = NULL;
+
   if (!filename)
   {
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(EINVAL), 0);
@@ -122,13 +128,34 @@ _ppdCacheCreateWithFile(
   }
 
  /*
+  * Read the first line and make sure it has "#CUPS-PPD-CACHE-version" in it...
+  */
+
+  if (!cupsFileGets(fp, line, sizeof(line)))
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    DEBUG_puts("_ppdCacheCreateWithFile: Unable to read first line.");
+    cupsFileClose(fp);
+    return (NULL);
+  }
+
+  if (strncmp(line, "#CUPS-PPD-CACHE-", 16) ||
+      atoi(line + 16) != _PPD_CACHE_VERSION)
+  {
+    _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+    DEBUG_printf(("_ppdCacheCreateWithFile: Wrong first line \"%s\".", line));
+    cupsFileClose(fp);
+    return (NULL);
+  }
+
+ /*
   * Allocate the mapping data structure...
   */
 
   if ((pc = calloc(1, sizeof(_ppd_cache_t))) == NULL)
   {
-    DEBUG_puts("_ppdCacheCreateWithFile: Unable to allocate _ppd_cache_t.");
     _cupsSetError(IPP_INTERNAL_ERROR, strerror(errno), 0);
+    DEBUG_puts("_ppdCacheCreateWithFile: Unable to allocate _ppd_cache_t.");
     goto create_error;
   }
 
@@ -153,6 +180,79 @@ _ppdCacheCreateWithFile(
                     linenum));
       _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
       goto create_error;
+    }
+    else if (!strcasecmp(line, "Filter"))
+    {
+      if (!pc->filters)
+        pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0,
+	                            (cups_acopy_func_t)_cupsStrAlloc,
+				    (cups_afree_func_t)_cupsStrFree);
+
+      cupsArrayAdd(pc->filters, value);
+    }
+    else if (!strcasecmp(line, "PreFilter"))
+    {
+      if (!pc->prefilters)
+        pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0,
+	                               (cups_acopy_func_t)_cupsStrAlloc,
+				       (cups_afree_func_t)_cupsStrFree);
+
+      cupsArrayAdd(pc->prefilters, value);
+    }
+    else if (!strcasecmp(line, "Product"))
+    {
+      pc->product = _cupsStrAlloc(value);
+    }
+    else if (!strcasecmp(line, "IPP"))
+    {
+      off_t	pos = cupsFileTell(fp),	/* Position in file */
+		length = strtol(value, NULL, 10);
+					/* Length of IPP attributes */
+
+      if (attrs && *attrs)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: IPP listed multiple times.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+      else if (length <= 0)
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP length.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
+
+      if (attrs)
+      {
+       /*
+        * Read IPP attributes into the provided variable...
+	*/
+
+        *attrs = ippNew();
+
+        if (ippReadIO(fp, (ipp_iocb_t)cupsFileRead, 1, NULL,
+		      *attrs) != IPP_DATA)
+	{
+	  DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP data.");
+	  _cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	  goto create_error;
+	}
+      }
+      else
+      {
+       /*
+        * Skip the IPP data entirely...
+	*/
+
+        cupsFileSeek(fp, pos + length);
+      }
+
+      if (cupsFileTell(fp) != (pos + length))
+      {
+        DEBUG_puts("_ppdCacheCreateWithFile: Bad IPP data.");
+	_cupsSetError(IPP_INTERNAL_ERROR, _("Bad PPD cache file."), 1);
+	goto create_error;
+      }
     }
     else if (!strcasecmp(line, "NumBins"))
     {
@@ -466,6 +566,9 @@ _ppdCacheCreateWithFile(
   cupsFileClose(fp);
   _ppdCacheDestroy(pc);
 
+  if (attrs)
+    ippDelete(*attrs);
+
   return (NULL);
 }
 
@@ -516,6 +619,7 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 			new_borderless,	/* New borderless state */
 			new_known_pwg;	/* New PWG name is well-known */
   _pwg_size_t           *new_size;	/* New size to add, if any */
+  const char		*filter;	/* Current filter */
 
 
   DEBUG_printf(("_ppdCacheCreateWithPPD(ppd=%p)", ppd));
@@ -876,9 +980,8 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     const char	*quality,		/* com.apple.print.preset.quality value */
 		*output_mode,		/* com.apple.print.preset.output-mode value */
 		*color_model_val,	/* ColorModel choice */
-		*graphics_type,		/* com.apple.print.preset.graphicsType value */
-		*paper_coating;		/* com.apple.print.preset.media-front-coating value */
-
+		*graphicsType,		/* com.apple.print.preset.graphicsType value */
+		*media_front_coating;	/* com.apple.print.preset.media-front-coating value */
 
     do
     {
@@ -903,11 +1006,11 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	* Ignore graphicsType "Photo" presets that are not high quality.
 	*/
 
-	graphics_type = cupsGetOption("com.apple.print.preset.graphicsType",
+	graphicsType = cupsGetOption("com.apple.print.preset.graphicsType",
 				      num_options, options);
 
-	if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && graphics_type &&
-	    !strcmp(graphics_type, "Photo"))
+	if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && graphicsType &&
+	    !strcmp(graphicsType, "Photo"))
 	  continue;
 
        /*
@@ -915,13 +1018,14 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
 	* isn't "none" or "autodetect".
 	*/
 
-	paper_coating = cupsGetOption(
-	                    "com.apple.print.preset.media-front-coating",
-			    num_options, options);
+	media_front_coating = cupsGetOption(
+	                          "com.apple.print.preset.media-front-coating",
+			          num_options, options);
 
-        if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH && paper_coating &&
-	    strcmp(paper_coating, "none") &&
-	    strcmp(paper_coating, "autodetect"))
+        if (pwg_print_quality != _PWG_PRINT_QUALITY_HIGH &&
+	    media_front_coating &&
+	    strcmp(media_front_coating, "none") &&
+	    strcmp(media_front_coating, "autodetect"))
 	  continue;
 
        /*
@@ -1099,6 +1203,90 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
   }
 
+ /*
+  * Copy filters and pre-filters...
+  */
+
+  pc->filters = cupsArrayNew3(NULL, NULL, NULL, 0,
+			      (cups_acopy_func_t)_cupsStrAlloc,
+			      (cups_afree_func_t)_cupsStrFree);
+
+  cupsArrayAdd(pc->filters,
+               "application/vnd.cups-raw application/octet-stream 0 -");
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsFilter2", NULL)) != NULL)
+  {
+    do
+    {
+      cupsArrayAdd(pc->filters, ppd_attr->value);
+    }
+    while ((ppd_attr = ppdFindNextAttr(ppd, "cupsFilter2", NULL)) != NULL);
+  }
+  else if (ppd->num_filters > 0)
+  {
+    for (i = 0; i < ppd->num_filters; i ++)
+      cupsArrayAdd(pc->filters, ppd->filters[i]);
+  }
+  else
+    cupsArrayAdd(pc->filters, "application/vnd.cups-postscript 0 -");
+
+ /*
+  * See if we have a command filter...
+  */
+
+  for (filter = (const char *)cupsArrayFirst(pc->filters);
+       filter;
+       filter = (const char *)cupsArrayNext(pc->filters))
+    if (!strncasecmp(filter, "application/vnd.cups-command", 28) &&
+        _cups_isspace(filter[28]))
+      break;
+
+  if (!filter &&
+      ((ppd_attr = ppdFindAttr(ppd, "cupsCommands", NULL)) == NULL ||
+       strcasecmp(ppd_attr->value, "none")))
+  {
+   /*
+    * No command filter and no cupsCommands keyword telling us not to use one.
+    * See if this is a PostScript printer, and if so add a PostScript command
+    * filter...
+    */
+
+    for (filter = (const char *)cupsArrayFirst(pc->filters);
+	 filter;
+	 filter = (const char *)cupsArrayNext(pc->filters))
+      if (!strncasecmp(filter, "application/vnd.cups-postscript", 31) &&
+	  _cups_isspace(filter[31]))
+	break;
+
+    if (filter)
+      cupsArrayAdd(pc->filters,
+                   "application/vnd.cups-command application/postscript 0 -");
+  }
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsPreFilter", NULL)) != NULL)
+  {
+    pc->prefilters = cupsArrayNew3(NULL, NULL, NULL, 0,
+				   (cups_acopy_func_t)_cupsStrAlloc,
+				   (cups_afree_func_t)_cupsStrFree);
+
+    do
+    {
+      cupsArrayAdd(pc->prefilters, ppd_attr->value);
+    }
+    while ((ppd_attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL)) != NULL);
+  }
+
+ /*
+  * Copy the product string, if any...
+  */
+
+  if (ppd->product)
+    pc->product = _cupsStrAlloc(ppd->product);
+
+ /*
+  * Return the cache data...
+  */
+
   return (pc);
 
  /*
@@ -1189,6 +1377,10 @@ _ppdCacheDestroy(_ppd_cache_t *pc)	/* I - PPD cache and mapping data */
 
   if (pc->custom_min_keyword)
     _cupsStrFree(pc->custom_min_keyword);
+
+  _cupsStrFree(pc->product);
+  cupsArrayDelete(pc->filters);
+  cupsArrayDelete(pc->prefilters);
 
   free(pc);
 }
@@ -1779,13 +1971,15 @@ _ppdCacheGetType(
 int					/* O - 1 on success, 0 on failure */
 _ppdCacheWriteFile(
     _ppd_cache_t *pc,			/* I - PPD cache and mapping data */
-    const char   *filename)		/* I - File to write */
+    const char   *filename,		/* I - File to write */
+    ipp_t        *attrs)		/* I - Attributes to write, if any */
 {
   int		i, j, k;		/* Looping vars */
   cups_file_t	*fp;			/* Output file */
   _pwg_size_t	*size;			/* Current size */
   _pwg_map_t	*map;			/* Current map */
   cups_option_t	*option;		/* Current option */
+  const char	*value;			/* Filter/pre-filter value */
 
 
  /*
@@ -1812,7 +2006,7 @@ _ppdCacheWriteFile(
   * Standard header...
   */
 
-  cupsFilePuts(fp, "#CUPS-PWGPPD\n");
+  cupsFilePrintf(fp, "#CUPS-PPD-CACHE-%d\n", _PPD_CACHE_VERSION);
 
  /*
   * Output bins...
@@ -1897,6 +2091,35 @@ _ppdCacheWriteFile(
 
   if (pc->sides_2sided_short)
     cupsFilePrintf(fp, "Sides2SidedShort %s\n", pc->sides_2sided_short);
+
+ /*
+  * Product, cupsFilter, cupsFilter2, and cupsPreFilter...
+  */
+
+  if (pc->product)
+    cupsFilePutConf(fp, "Product", pc->product);
+
+  for (value = (const char *)cupsArrayFirst(pc->filters);
+       value;
+       value = (const char *)cupsArrayNext(pc->filters))
+    cupsFilePutConf(fp, "Filter", value);
+
+  for (value = (const char *)cupsArrayFirst(pc->prefilters);
+       value;
+       value = (const char *)cupsArrayNext(pc->prefilters))
+    cupsFilePutConf(fp, "PreFilter", value);
+
+ /*
+  * IPP attributes, if any...
+  */
+
+  if (attrs)
+  {
+    cupsFilePrintf(fp, "IPP " CUPS_LLFMT "\n", CUPS_LLCAST ippLength(attrs));
+
+    attrs->state = IPP_IDLE;
+    ippWriteIO(fp, (ipp_iocb_t)cupsFileWrite, 1, NULL, attrs);
+  }
 
  /*
   * Close and return...
