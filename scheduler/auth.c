@@ -510,7 +510,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       if (!strncasecmp(name, "@AUTHKEY(", 9) || !strcasecmp(name, "@SYSTEM"))
       {
 	cupsdLogMessage(CUPSD_LOG_ERROR,
-	                "PeerCred authentication not allows for resource.");
+	                "PeerCred authentication not allowed for resource.");
 	return;
       }
 #endif /* HAVE_AUTHORIZATION_H */
