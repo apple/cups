@@ -15,6 +15,7 @@ _cupsMD5Init
 _cupsMessageFree
 _cupsMessageLoad
 _cupsMessageLookup
+_cupsNextDelay
 _cupsSetError
 _cupsSetLocale
 _cupsStrAlloc

@@ -19,6 +19,7 @@
  *   main()            - Test the raster functions.
  *   do_ppd_tests()    - Test the default option commands in a PPD file.
  *   do_ps_tests()     - Test standard PostScript commands.
+ *   do_ras_file()     - Test reading of a raster file.
  *   do_raster_tests() - Test reading and writing of raster data.
  *   print_changes()   - Print differences in the page header.
  */
@@ -28,6 +29,12 @@
  */
 
 #include "image-private.h"
+#ifdef WIN32
+#  include <io.h>
+#else
+#  include <unistd.h>
+#  include <fcntl.h>
+#endif /* WIN32 */
 
 
 /*
@@ -193,6 +200,7 @@ static cups_page_header2_t setpagedevice_header =
 static int	do_ppd_tests(const char *filename, int num_options,
 		             cups_option_t *options);
 static int	do_ps_tests(void);
+static int	do_ras_file(const char *filename);
 static int	do_raster_tests(cups_mode_t mode);
 static void	print_changes(cups_page_header2_t *header,
 		              cups_page_header2_t *expected);
@@ -207,6 +215,7 @@ main(int  argc,				/* I - Number of command-line args */
      char *argv[])			/* I - Command-line arguments */
 {
   int		errors;			/* Number of errors */
+  const char	*ext;			/* Filename extension */
 
 
   if (argc == 1)
@@ -239,6 +248,7 @@ main(int  argc,				/* I - Number of command-line args */
             else
             {
               puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+              puts("       testraster [filename.ras ...]");
               return (1);
             }
           }
@@ -246,11 +256,23 @@ main(int  argc,				/* I - Number of command-line args */
         else
         {
           puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+	  puts("       testraster [filename.ras ...]");
           return (1);
         }
       }
+      else if ((ext = strrchr(argv[i], '.')) != NULL)
+      {
+        if (!strcmp(ext, ".ppd"))
+	  errors += do_ppd_tests(argv[i], num_options, options);
+	else
+	  errors += do_ras_file(argv[i]);
+      }
       else
-        errors += do_ppd_tests(argv[i], num_options, options);
+      {
+	puts("Usage: testraster [-o name=value ...] [filename.ppd ...]");
+	puts("       testraster [filename.ras ...]");
+	return (1);
+      }
     }
 
     cupsFreeOptions(num_options, options);
@@ -352,7 +374,7 @@ do_ps_tests(void)
   }
   else
     puts("PASS");
-    
+
   fputs("_cupsRasterExecPS(\"roll\"): ", stdout);
   fflush(stdout);
 
@@ -431,92 +453,66 @@ do_ps_tests(void)
   else
     puts("PASS");
 
-#if 0
-  fputs("_cupsRasterExecPS(\"\"): ", stdout);
-  fflush(stdout);
+  return (errors);
+}
 
-  if (_cupsRasterExecPS(&header, &preferred_bits,
-                        ""))
-  {
-    puts("FAIL (error from function)");
-    errors ++;
-  }
-  else if (header.)
-  {
-    printf("FAIL ()\n");
-    errors ++;
-  }
-  else
-    puts("PASS");
 
-  fputs("_cupsRasterExecPS(\"\"): ", stdout);
-  fflush(stdout);
+/*
+ * 'do_ras_file()' - Test reading of a raster file.
+ */
 
-  if (_cupsRasterExecPS(&header, &preferred_bits,
-                        ""))
-  {
-    puts("FAIL (error from function)");
-    errors ++;
-  }
-  else if (header.)
-  {
-    printf("FAIL ()\n");
-    errors ++;
-  }
-  else
-    puts("PASS");
+static int				/* O - Number of errors */
+do_ras_file(const char *filename)	/* I - Filename */
+{
+  unsigned		y;		/* Looping vars */
+  int			fd;		/* File descriptor */
+  cups_raster_t		*ras;		/* Raster stream */
+  cups_page_header2_t	header;		/* Page header */
+  unsigned char		*data;		/* Raster data */
+  int			errors = 0;	/* Number of errors */
+  unsigned		pages = 0;	/* Number of pages */
 
-  fputs("_cupsRasterExecPS(\"\"): ", stdout);
-  fflush(stdout);
 
-  if (_cupsRasterExecPS(&header, &preferred_bits,
-                        ""))
+  if ((fd = open(filename, O_RDONLY)) < 0)
   {
-    puts("FAIL (error from function)");
-    errors ++;
+    printf("%s: %s\n", filename, strerror(errno));
+    return (1);
   }
-  else if (header.)
-  {
-    printf("FAIL ()\n");
-    errors ++;
-  }
-  else
-    puts("PASS");
 
-  fputs("_cupsRasterExecPS(\"\"): ", stdout);
-  fflush(stdout);
+  if ((ras = cupsRasterOpen(fd, CUPS_RASTER_READ)) == NULL)
+  {
+    printf("%s: cupsRasterOpen failed.\n", filename);
+    close(fd);
+    return (1);
+  }
 
-  if (_cupsRasterExecPS(&header, &preferred_bits,
-                        ""))
-  {
-    puts("FAIL (error from function)");
-    errors ++;
-  }
-  else if (header.)
-  {
-    printf("FAIL ()\n");
-    errors ++;
-  }
-  else
-    puts("PASS");
+  printf("%s:\n", filename);
 
-  fputs("_cupsRasterExecPS(\"\"): ", stdout);
-  fflush(stdout);
+  while (cupsRasterReadHeader2(ras, &header))
+  {
+    pages ++;
+    data = malloc(header.cupsBytesPerLine);
 
-  if (_cupsRasterExecPS(&header, &preferred_bits,
-                        ""))
-  {
-    puts("FAIL (error from function)");
-    errors ++;
+    printf("    Page %u: %ux%ux%u@%ux%udpi", pages,
+           header.cupsWidth, header.cupsHeight, header.cupsBitsPerPixel,
+           header.HWResolution[0], header.HWResolution[1]);
+    fflush(stdout);
+
+    for (y = 0; y < header.cupsHeight; y ++)
+      if (cupsRasterReadPixels(ras, data, header.cupsBytesPerLine) <
+              header.cupsBytesPerLine)
+        break;
+
+    if (y < header.cupsHeight)
+      printf(" ERROR AT LINE %d\n", y);
+    else
+      putchar('\n');
+
+    free(data);
   }
-  else if (header.)
-  {
-    printf("FAIL ()\n");
-    errors ++;
-  }
-  else
-    puts("PASS");
-#endif /* 0 */
+
+  cupsRasterClose(ras);
+  close(fd);
 
   return (errors);
 }

@@ -9,6 +9,15 @@ CHANGES IN CUPS V1.4.7
 	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- Fixed an issue when reading compressed CUPS raster streams (STR #3812)
+	- Fixed an issue with PostScript printer auto-configuration (STR #3443)
+	- Fixed some compatibility issues with the libusb-based USB backend
+	  (STR #3799)
+	- The network backends no longer try to collect SNMP supply and status
+	  information for raw queues (STR #3809)
+	- The DBUS notifier did not report job state changes (STR #3805)
+	- The scheduler did not always report that the "normal" print-quality
+	  value was supported (STR #3803)
 	- The gziptoany filter did not report the correct error if it was unable
 	  to write the uncompressed document to the next filter or backend in
 	  the chain (STR #3797)

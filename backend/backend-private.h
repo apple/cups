@@ -3,7 +3,7 @@
  *
  *   Backend support definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -309,7 +309,7 @@ extern int		backendSNMPSupplies(int snmp_fd, http_addr_t *addr,
 			                    int *page_count,
 					    int *printer_state);
 extern int		backendWaitLoop(int snmp_fd, http_addr_t *addr,
-			                _cups_sccb_t side_cb);
+			                int use_bc, _cups_sccb_t side_cb);
 
 
 #  ifdef __cplusplus

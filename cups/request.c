@@ -22,6 +22,7 @@
  *   cupsGetResponse()      - Get a response to an IPP request.
  *   cupsLastError()        - Return the last IPP status code.
  *   cupsLastErrorString()  - Return the last IPP status-message.
+ *   _cupsNextDelay()       - Return the next retry delay value.
  *   cupsReadResponseData() - Read additional data after the IPP response.
  *   cupsSendRequest()      - Send an IPP request.
  *   cupsWriteRequestData() - Write additional data after an IPP request.
@@ -414,10 +415,12 @@ cupsGetResponse(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
     if (state == IPP_ERROR)
     {
      /*
-      * Delete the response...
+      * Flush remaining data and delete the response...
       */
 
       DEBUG_puts("1cupsGetResponse: IPP read error!");
+
+      httpFlush(http);
 
       ippDelete(response);
       response = NULL;
@@ -509,6 +512,36 @@ const char *				/* O - status-message text from last request */
 cupsLastErrorString(void)
 {
   return (_cupsGlobals()->last_status_message);
+}
+
+
+/*
+ * '_cupsNextDelay()' - Return the next retry delay value.
+ *
+ * This function currently returns the Fibonacci sequence 1 1 2 3 5 8.
+ *
+ * Pass 0 for the current delay value to initialize the sequence.
+ */
+
+int					/* O  - Next delay value */
+_cupsNextDelay(int current,		/* I  - Current delay value or 0 */
+               int *previous)		/* IO - Previous delay value */
+{
+  int	next;				/* Next delay value */
+
+
+  if (current > 0)
+  {
+    next      = (current + *previous) % 12;
+    *previous = next < current ? 0 : current;
+  }
+  else
+  {
+    next      = 1;
+    *previous = 0;
+  }
+
+  return (next);
 }
 
 
@@ -658,10 +691,10 @@ cupsSendRequest(http_t     *http,	/* I - Connection to server or @code CUPS_HTTP
       * "replay" attack...
       */
 
-      cupsDoAuthentication(http, "POST", resource);
+      _cupsSetNegotiateAuthString(http);
     }
-    else
 #endif /* HAVE_GSSAPI */
+
     httpSetField(http, HTTP_FIELD_AUTHORIZATION, http->authstring);
 
     DEBUG_printf(("2cupsSendRequest: authstring=\"%s\"", http->authstring));

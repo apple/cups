@@ -1,13 +1,13 @@
 /*
  * "$Id$"
  *
- *   PPD/driver support for the Common UNIX Printing System (CUPS).
+ *   PPD/driver support for CUPS.
  *
  *   This program handles listing and installing static PPD files, PPD files
  *   created from driver information files, and dynamically generated PPD files
  *   using driver helper programs.
  *
- *   Copyright 2007-2009 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -2391,15 +2391,34 @@ regex_device_id(const char *device_id)	/* I - IEEE-1284 device ID */
 
       *ptr++ = '(';
 
-      while (*device_id && *device_id != ';' && ptr < (res + sizeof(res) - 4))
+      while (*device_id && *device_id != ';' && ptr < (res + sizeof(res) - 8))
       {
         if (strchr("[]{}().*\\|", *device_id))
 	  *ptr++ = '\\';
-	*ptr++ = *device_id++;
+        if (*device_id == ':')
+	{
+	 /*
+	  * KEY:.*value
+	  */
+
+	  *ptr++ = *device_id++;
+	  *ptr++ = '.';
+	  *ptr++ = '*';
+	}
+	else
+	  *ptr++ = *device_id++;
       }
 
       if (*device_id == ';' || !*device_id)
+      {
+       /*
+        * KEY:.*value.*;
+	*/
+
+	*ptr++ = '.';
+	*ptr++ = '*';
         *ptr++ = ';';
+      }
       *ptr++ = ')';
       if (cmd)
         *ptr++ = '?';

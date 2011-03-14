@@ -84,6 +84,7 @@ struct _cups_raster_s			/**** Raster stream data ****/
  * Local functions...
  */
 
+static int	cups_raster_io(cups_raster_t *r, unsigned char *buf, int bytes);
 static unsigned	cups_raster_read_header(cups_raster_t *r);
 static int	cups_raster_read(cups_raster_t *r, unsigned char *buf,
 		                 int bytes);
@@ -189,7 +190,7 @@ cupsRasterOpenIO(
     * Open for read - get sync word...
     */
 
-    if ((*r->iocb)(r->ctx, (unsigned char *)&(r->sync), sizeof(r->sync)) !=
+    if (cups_raster_io(r, (unsigned char *)&(r->sync), sizeof(r->sync)) !=
             sizeof(r->sync))
     {
       _cupsRasterAddError("Unable to read header from raster stream: %s\n",
@@ -246,7 +247,7 @@ cupsRasterOpenIO(
 	  break;
     }
 
-    if ((*r->iocb)(r->ctx, (unsigned char *)&(r->sync), sizeof(r->sync))
+    if (cups_raster_io(r, (unsigned char *)&(r->sync), sizeof(r->sync))
             < sizeof(r->sync))
     {
       _cupsRasterAddError("Unable to write raster stream header: %s\n",
@@ -284,7 +285,7 @@ cupsRasterReadHeader(
 
   if (!cups_raster_read_header(r))
     return (0);
-  
+
  /*
   * Copy the header to the user-supplied buffer...
   */
@@ -313,7 +314,7 @@ cupsRasterReadHeader2(
 
   if (!cups_raster_read_header(r))
     return (0);
-  
+
  /*
   * Copy the header to the user-supplied buffer...
   */
@@ -357,7 +358,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
 
     r->remaining -= len / r->header.cupsBytesPerLine;
 
-    if ((*r->iocb)(r->ctx, p, len) < (ssize_t)len)
+    if (cups_raster_io(r, p, len) < (ssize_t)len)
       return (0);
 
    /*
@@ -538,7 +539,7 @@ cupsRasterReadPixels(cups_raster_t *r,	/* I - Raster stream */
  *
  * @deprecated@
  */
- 
+
 unsigned				/* O - 1 on success, 0 on failure */
 cupsRasterWriteHeader(
     cups_raster_t      *r,		/* I - Raster stream */
@@ -581,10 +582,10 @@ cupsRasterWriteHeader(
     fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
     fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
 
-    return ((*r->iocb)(r->ctx, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
+    return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
   }
   else
-    return ((*r->iocb)(r->ctx, (unsigned char *)&(r->header), sizeof(r->header))
+    return (cups_raster_io(r, (unsigned char *)&(r->header), sizeof(r->header))
 		== sizeof(r->header));
 }
 
@@ -597,7 +598,7 @@ cupsRasterWriteHeader(
  *
  * @since CUPS 1.2/Mac OS X 10.5@
  */
- 
+
 unsigned				/* O - 1 on success, 0 on failure */
 cupsRasterWriteHeader2(
     cups_raster_t       *r,		/* I - Raster stream */
@@ -639,10 +640,10 @@ cupsRasterWriteHeader2(
     fh.cupsColorOrder   = htonl(r->header.cupsColorOrder);
     fh.cupsColorSpace   = htonl(r->header.cupsColorSpace);
 
-    return ((*r->iocb)(r->ctx, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
+    return (cups_raster_io(r, (unsigned char *)&fh, sizeof(fh)) == sizeof(fh));
   }
   else
-    return ((*r->iocb)(r->ctx, (unsigned char *)&(r->header), sizeof(r->header))
+    return (cups_raster_io(r, (unsigned char *)&(r->header), sizeof(r->header))
 		== sizeof(r->header));
 }
 
@@ -722,10 +723,10 @@ cupsRasterWritePixels(cups_raster_t *r,	/* I - Raster stream */
       * Write the byte-swapped buffer...
       */
 
-      return ((*r->iocb)(r->ctx, r->buffer, len));      
+      return (cups_raster_io(r, r->buffer, len));
     }
     else
-      return ((*r->iocb)(r->ctx, p, len));
+      return (cups_raster_io(r, p, len));
   }
 
  /*
@@ -898,6 +899,37 @@ cups_raster_read_header(
 
 
 /*
+ * 'cups_raster_io()' - Read/write bytes from a context, handling interruptions.
+ */
+
+static int				/* O - Bytes read or -1 */
+cups_raster_io(cups_raster_t *r,		/* I - Raster stream */
+           unsigned char *buf,		/* I - Buffer for read/write */
+           int           bytes)		/* I - Number of bytes to read/write */
+{
+  ssize_t	count;			/* Number of bytes read/written */
+  size_t	total;			/* Total bytes read/written */
+
+
+  DEBUG_printf(("4cups_raster_io(r=%p, buf=%p, bytes=%d)", r, buf, bytes));
+
+  for (total = 0; total < bytes; total += count, buf += count)
+  {
+    count = (*r->iocb)(r->ctx, buf, bytes - total);
+
+    DEBUG_printf(("5cups_raster_io: count=%d, total=%d", (int)count,
+                  (int)total));
+    if (count == 0)
+      return (0);
+    else if (count < 0)
+      return (-1);
+  }
+
+  return ((int)total);
+}
+
+
+/*
  * 'cups_raster_read()' - Read through the raster buffer.
  */
 
@@ -914,7 +946,7 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
   DEBUG_printf(("cups_raster_read(r=%p, buf=%p, bytes=%d)\n", r, buf, bytes));
 
   if (!r->compressed)
-    return ((*r->iocb)(r->ctx, buf, bytes));
+    return (cups_raster_io(r, buf, bytes));
 
  /*
   * Allocate a read buffer as needed...
@@ -1256,7 +1288,7 @@ cups_raster_write(
         count ++;
 	ptr += bpp;
       }
- 
+
       *wptr++ = 257 - count;
 
       count *= bpp;
@@ -1265,7 +1297,7 @@ cups_raster_write(
     }
   }
 
-  return ((*r->iocb)(r->ctx, r->buffer, wptr - r->buffer));
+  return (cups_raster_io(r, r->buffer, wptr - r->buffer));
 }
 
 
@@ -1276,30 +1308,18 @@ cups_raster_write(
 static ssize_t				/* O - Bytes read or -1 */
 cups_read_fd(void          *ctx,	/* I - File descriptor as pointer */
              unsigned char *buf,	/* I - Buffer for read */
-	     size_t        bytes)	/* I - Number of bytes to read */
+	     size_t        bytes)	/* I - Maximum number of bytes to read */
 {
   int		fd = (int)((intptr_t)ctx);
 					/* File descriptor */
   ssize_t	count;			/* Number of bytes read */
-  size_t	total;			/* Total bytes read */
 
 
-  for (total = 0; total < bytes; total += count, buf += count)
-  {
-    count = read(fd, buf, bytes - total);
+  while ((count = read(fd, buf, bytes)) < 0)
+    if (errno != EINTR && errno != EAGAIN)
+      return (-1);
 
-    if (count == 0)
-      return (0);
-    else if (count < 0)
-    {
-      if (errno == EINTR)
-        count = 0;
-      else
-        return (-1);
-    }
-  }
-
-  return ((ssize_t)total);
+  return (count);
 }
 
 
@@ -1341,23 +1361,13 @@ cups_write_fd(void          *ctx,	/* I - File descriptor pointer */
   int		fd = (int)((intptr_t)ctx);
 					/* File descriptor */
   ssize_t	count;			/* Number of bytes written */
-  size_t	total;			/* Total bytes written */
 
 
-  for (total = 0; total < bytes; total += count, buf += count)
-  {
-    count = write(fd, buf, bytes - total);
+  while ((count = write(fd, buf, bytes)) < 0)
+    if (errno != EINTR && errno != EAGAIN)
+      return (-1);
 
-    if (count < 0)
-    {
-      if (errno == EINTR)
-        count = 0;
-      else
-        return (-1);
-    }
-  }
-
-  return ((ssize_t)total);
+  return (count);
 }
 
 

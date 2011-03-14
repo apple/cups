@@ -926,8 +926,6 @@ accept_jobs(cupsd_client_t  *con,	/* I - Client connection */
   printer->accepting        = 1;
   printer->state_message[0] = '\0';
 
-  cupsdAddPrinterHistory(printer);
-
   cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
                 "Now accepting jobs.");
 
@@ -1137,7 +1135,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
                     pclass->name, attr->values[0].boolean, pclass->accepting);
 
     pclass->accepting = attr->values[0].boolean;
-    cupsdAddPrinterHistory(pclass);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL, "%s accepting jobs.",
 		  pclass->accepting ? "Now" : "No longer");
@@ -1184,7 +1181,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   {
     strlcpy(pclass->state_message, attr->values[0].string.text,
             sizeof(pclass->state_message));
-    cupsdAddPrinterHistory(pclass);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, pclass, NULL, "%s",
                   pclass->state_message);
@@ -1275,8 +1271,6 @@ add_class(cupsd_client_t  *con,		/* I - Client connection */
   }
   else
   {
-    cupsdAddPrinterHistory(pclass);
-
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
 		  pclass, NULL, "New class \"%s\" added by \"%s\".",
 		  pclass->name, get_username(con));
@@ -1546,7 +1540,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
 
   if (!ippFindAttribute(con->request, "PageRegion", IPP_TAG_ZERO) &&
       !ippFindAttribute(con->request, "PageSize", IPP_TAG_ZERO) &&
-      _pwgGetPageSize(printer->pwg, con->request, NULL, &exact))
+      _ppdCacheGetPageSize(printer->pc, con->request, NULL, &exact))
   {
     if (!exact &&
         (media_col = ippFindAttribute(con->request, "media-col",
@@ -2697,7 +2691,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
                     printer->name, attr->values[0].boolean, printer->accepting);
 
     printer->accepting = attr->values[0].boolean;
-    cupsdAddPrinterHistory(printer);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
                   "%s accepting jobs.",
@@ -2745,7 +2738,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   {
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
-    cupsdAddPrinterHistory(printer);
 
     cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL, "%s",
                   printer->state_message);
@@ -2952,11 +2944,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     char cache_name[1024];		/* Cache filename for printer attrs */
 
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.ipp4", CacheDir,
-             printer->name);
-    unlink(cache_name);
-
-    snprintf(cache_name, sizeof(cache_name), "%s/%s.pwg3", CacheDir,
+    snprintf(cache_name, sizeof(cache_name), "%s/%s.data", CacheDir,
              printer->name);
     unlink(cache_name);
 
@@ -3047,8 +3035,6 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
   }
   else
   {
-    cupsdAddPrinterHistory(printer);
-
     cupsdAddEvent(CUPSD_EVENT_PRINTER_ADDED,
                   printer, NULL, "New printer \"%s\" added by \"%s\".",
 		  printer->name, get_username(con));
@@ -6025,7 +6011,6 @@ copy_printer_attrs(
 					/* Printer icons */
   time_t		curtime;	/* Current time */
   int			i;		/* Looping var */
-  ipp_attribute_t	*history;	/* History collection */
 
 
  /*
@@ -6163,23 +6148,6 @@ copy_printer_attrs(
     ippAddInteger(con->response, IPP_TAG_PRINTER, IPP_TAG_INTEGER,
                   "printer-state-change-time", printer->state_time);
 
-  if (MaxPrinterHistory > 0 && printer->num_history > 0 &&
-      cupsArrayFind(ra, "printer-state-history"))
-  {
-   /*
-    * Printer history is only sent if specifically requested, so that
-    * older CUPS/IPP clients won't barf on the collection attributes.
-    */
-
-    history = ippAddCollections(con->response, IPP_TAG_PRINTER,
-                                "printer-state-history",
-                                printer->num_history, NULL);
-
-    for (i = 0; i < printer->num_history; i ++)
-      copy_attrs(history->values[i].collection = ippNew(), printer->history[i],
-                 NULL, IPP_TAG_ZERO, 0, NULL);
-  }
-
   if (!ra || cupsArrayFind(ra, "printer-state-message"))
     ippAddString(con->response, IPP_TAG_PRINTER, IPP_TAG_TEXT,
         	 "printer-state-message", NULL, printer->state_message);
@@ -6190,7 +6158,6 @@ copy_printer_attrs(
   if (!ra || cupsArrayFind(ra, "printer-type"))
   {
     int type;				/* printer-type value */
-
 
    /*
     * Add the CUPS-specific printer-type attribute...
@@ -7043,13 +7010,10 @@ delete_printer(cupsd_client_t  *con,	/* I - Client connection */
            printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.ipp4", CacheDir, printer->name);
-  unlink(filename);
-
   snprintf(filename, sizeof(filename), "%s/%s.png", CacheDir, printer->name);
   unlink(filename);
 
-  snprintf(filename, sizeof(filename), "%s/%s.pwg3", CacheDir, printer->name);
+  snprintf(filename, sizeof(filename), "%s/%s.data", CacheDir, printer->name);
   unlink(filename);
 
 #ifdef __APPLE__
@@ -8980,7 +8944,6 @@ hold_new_jobs(cupsd_client_t  *con,	/* I - Connection */
   printer->holding_new_jobs = 1;
 
   cupsdSetPrinterReasons(printer, "+hold-new-jobs");
-  cupsdAddPrinterHistory(printer);
 
   if (dtype & CUPS_PRINTER_CLASS)
     cupsdLogMessage(CUPSD_LOG_INFO,
@@ -9827,8 +9790,6 @@ reject_jobs(cupsd_client_t  *con,	/* I - Client connection */
     strlcpy(printer->state_message, attr->values[0].string.text,
             sizeof(printer->state_message));
 
-  cupsdAddPrinterHistory(printer);
-
   cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, printer, NULL,
                 "No longer accepting jobs.");
 
@@ -9904,7 +9865,6 @@ release_held_new_jobs(
   printer->holding_new_jobs = 0;
 
   cupsdSetPrinterReasons(printer, "-hold-new-jobs");
-  cupsdAddPrinterHistory(printer);
 
   if (dtype & CUPS_PRINTER_CLASS)
     cupsdLogMessage(CUPSD_LOG_INFO,

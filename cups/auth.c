@@ -3,7 +3,7 @@
  *
  *   Authentication functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   This file contains Kerberos support code, copyright 2006 by
@@ -122,10 +122,10 @@ cupsDoAuthentication(
     {
       DEBUG_printf(("2cupsDoAuthentication: authstring=\"%s\"",
                     http->authstring));
-  
+
       if (http->status == HTTP_UNAUTHORIZED)
 	http->digest_tries ++;
-  
+
       return (0);
     }
     else if (localauth == -1)
@@ -140,7 +140,8 @@ cupsDoAuthentication(
   */
 
   if ((http->digest_tries > 1 || !http->userpass[0]) &&
-      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
+      (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5) ||
+       !strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6)))
   {
    /*
     * Nope - get a new password from the user...
@@ -185,171 +186,22 @@ cupsDoAuthentication(
   * Got a password; encode it for the server...
   */
 
+#ifdef HAVE_GSSAPI
   if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
   {
-#ifdef HAVE_GSSAPI
    /*
     * Kerberos authentication...
     */
 
-    OM_uint32		minor_status,	/* Minor status code */
-			major_status;	/* Major status code */
-    gss_buffer_desc	output_token = GSS_C_EMPTY_BUFFER,
-					/* Output token */
-			input_token = GSS_C_EMPTY_BUFFER;
-					/* Input token */
-    char		*gss_service_name;
-					/* GSS service name */
-#  ifdef USE_SPNEGO
-    const char		*authorization;
-					/* Pointer into Authorization string */
-#  endif /* USE_SPNEGO */
-
-
-#  ifdef __APPLE__
-   /*
-    * If the weak-linked GSSAPI/Kerberos library is not present, don't try
-    * to use it...
-    */
-
-    if (gss_init_sec_context == NULL)
+    if (_cupsSetNegotiateAuthString(http))
     {
-      DEBUG_puts("1cupsDoAuthentication: Weak-linked GSSAPI/Kerberos framework "
-                 "is not present");
       http->status = HTTP_AUTHORIZATION_CANCELED;
-
       return (-1);
     }
-#  endif /* __APPLE__ */
-
-    if (http->gssname == GSS_C_NO_NAME)
-    {
-      if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
-	gss_service_name = CUPS_DEFAULT_GSSSERVICENAME;
-      else
-	DEBUG_puts("2cupsDoAuthentication: GSS service name set via "
-	           "environment variable");
-
-      http->gssname = cups_get_gssname(http, gss_service_name);
-    }
-
-#  ifdef USE_SPNEGO /* We don't implement SPNEGO just yet... */
-   /*
-    * Find the start of the Kerberos input token...
-    */
-
-    authorization = httpGetField(http, HTTP_FIELD_WWW_AUTHENTICATE);
-
-    authorization += 9;
-    while (*authorization && _cups_isspace(*authorization))
-      authorization ++;
-
-    if (*authorization)
-    {
-     /*
-      * Decode the authorization string to get the input token...
-      */
-
-      int len = strlen(authorization);
-
-      input_token.value  = malloc(len);
-      input_token.value  = httpDecode64_2(input_token.value, &len,
-					  authorization);
-      input_token.length = len;
-
-#    ifdef DEBUG
-      {
-        char *ptr = (char *)input_token.value;
-	int left = len;
-
-        fputs("input_token=", stdout);
-	while (left > 0)
-	{
-	  if (*ptr < ' ')
-	    printf("\\%03o", *ptr & 255);
-	  else
-	    putchar(*ptr);
-	  ptr ++;
-	  left --;
-	}
-	putchar('\n');
-      }
-#    endif /* DEBUG */
-    }
-#  endif /* USE_SPNEGO */
-
-    if (http->gssctx != GSS_C_NO_CONTEXT)
-    {
-      gss_delete_sec_context(&minor_status, &http->gssctx, GSS_C_NO_BUFFER);
-      http->gssctx = GSS_C_NO_CONTEXT;
-    }
-
-    major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
-					 &http->gssctx,
-					 http->gssname, http->gssmech,
-#ifdef GSS_C_DELEG_POLICY_FLAG
-					 GSS_C_DELEG_POLICY_FLAG |
-#endif /* GSS_C_DELEG_POLICY_FLAG */
-					 GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
-					 GSS_C_INDEFINITE,
-					 GSS_C_NO_CHANNEL_BINDINGS,
-					 &input_token, &http->gssmech,
-					 &output_token, NULL, NULL);
-
-    if (input_token.value)
-      free(input_token.value);
-
-    if (GSS_ERROR(major_status))
-    {
-      cups_gss_printf(major_status, minor_status,
-		      "cupsDoAuthentication: Unable to initialize security "
-		      "context");
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-
-      return (-1);
-    }
-
-    if (major_status == GSS_S_CONTINUE_NEEDED)
-      cups_gss_printf(major_status, minor_status,
-		      "cupsDoAuthentication: Continuation needed!");
-
-    if (output_token.length > 0 && output_token.length <= 65536)
-    {
-     /*
-      * Allocate the authorization string since Windows KDCs can have
-      * arbitrarily large credentials...
-      */
-
-      int authsize = 10 +				/* "Negotiate " */
-                     output_token.length * 4 / 3 + 1 +	/* Base64 */
-		     1;					/* nul */
-
-      httpSetAuthString(http, NULL, NULL);
-
-      if ((http->authstring = malloc(authsize)) == NULL)
-      {
-        http->authstring = http->_authstring;
-	authsize         = sizeof(http->_authstring);
-      }
-
-      strcpy(http->authstring, "Negotiate ");
-      httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
-		     output_token.length);
- 
-      gss_release_buffer(&minor_status, &output_token);
-    }
-    else
-    {
-      DEBUG_printf(("1cupsDoAuthentication: Kerberos credentials too large - "
-                    "%d bytes!", (int)output_token.length));
-      http->status = HTTP_AUTHORIZATION_CANCELED;
-      gss_release_buffer(&minor_status, &output_token);
-
-      return (-1);
-    }
-#endif /* HAVE_GSSAPI */
   }
-  else if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
+  else
+#endif /* HAVE_GSSAPI */
+  if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Basic", 5))
   {
    /*
     * Basic authentication...
@@ -362,7 +214,7 @@ cupsDoAuthentication(
                    (int)strlen(http->userpass));
     httpSetAuthString(http, "Basic", encode);
   }
-  else
+  else if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Digest", 6))
   {
    /*
     * Digest authentication...
@@ -382,6 +234,13 @@ cupsDoAuthentication(
 	     "response=\"%s\"", cupsUser(), realm, nonce, resource, encode);
     httpSetAuthString(http, "Digest", digest);
   }
+  else
+  {
+    DEBUG_printf(("1cupsDoAuthentication: Unknown auth type: \"%s\"",
+                  http->fields[HTTP_FIELD_WWW_AUTHENTICATE]));
+    http->status = HTTP_AUTHORIZATION_CANCELED;
+    return (-1);
+  }
 
   DEBUG_printf(("1cupsDoAuthentication: authstring=\"%s\"", http->authstring));
 
@@ -390,6 +249,114 @@ cupsDoAuthentication(
 
 
 #ifdef HAVE_GSSAPI
+/*
+ * '_cupsSetNegotiateAuthString()' - Set the Kerberos authentication string.
+ */
+
+int					/* O - 0 on success, -1 on error */
+_cupsSetNegotiateAuthString(
+    http_t *http)			/* I - Connection to server */
+{
+  OM_uint32	minor_status,		/* Minor status code */
+		major_status;		/* Major status code */
+  gss_buffer_desc output_token = GSS_C_EMPTY_BUFFER;
+				      /* Output token */
+  char		*gss_service_name;    /* GSS service name */
+
+
+#  ifdef __APPLE__
+ /*
+  * If the weak-linked GSSAPI/Kerberos library is not present, don't try
+  * to use it...
+  */
+
+  if (gss_init_sec_context == NULL)
+  {
+    DEBUG_puts("1_cupsSetNegotiateAuthString: Weak-linked GSSAPI/Kerberos "
+               "framework is not present");
+    return (-1);
+  }
+#  endif /* __APPLE__ */
+
+  if (http->gssname == GSS_C_NO_NAME)
+  {
+    if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
+      gss_service_name = CUPS_DEFAULT_GSSSERVICENAME;
+    else
+      DEBUG_puts("2_cupsSetNegotiateAuthString: GSS service name set via "
+		 "environment variable");
+
+    http->gssname = cups_get_gssname(http, gss_service_name);
+  }
+
+  if (http->gssctx != GSS_C_NO_CONTEXT)
+  {
+    gss_delete_sec_context(&minor_status, &http->gssctx, GSS_C_NO_BUFFER);
+    http->gssctx = GSS_C_NO_CONTEXT;
+  }
+
+  major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
+				       &http->gssctx,
+				       http->gssname, http->gssmech,
+#ifdef GSS_C_DELEG_POLICY_FLAG
+				       GSS_C_DELEG_POLICY_FLAG |
+#endif /* GSS_C_DELEG_POLICY_FLAG */
+				       GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
+				       GSS_C_INDEFINITE,
+				       GSS_C_NO_CHANNEL_BINDINGS,
+				       GSS_C_NO_BUFFER, &http->gssmech,
+				       &output_token, NULL, NULL);
+
+  if (GSS_ERROR(major_status))
+  {
+    cups_gss_printf(major_status, minor_status,
+		    "_cupsSetNegotiateAuthString: Unable to initialize "
+		    "security context");
+    return (-1);
+  }
+
+  if (major_status == GSS_S_CONTINUE_NEEDED)
+    cups_gss_printf(major_status, minor_status,
+		    "_cupsSetNegotiateAuthString: Continuation needed!");
+
+  if (output_token.length > 0 && output_token.length <= 65536)
+  {
+   /*
+    * Allocate the authorization string since Windows KDCs can have
+    * arbitrarily large credentials...
+    */
+
+    int authsize = 10 +				/* "Negotiate " */
+		   output_token.length * 4 / 3 + 1 +	/* Base64 */
+		   1;					/* nul */
+
+    httpSetAuthString(http, NULL, NULL);
+
+    if ((http->authstring = malloc(authsize)) == NULL)
+    {
+      http->authstring = http->_authstring;
+      authsize         = sizeof(http->_authstring);
+    }
+
+    strcpy(http->authstring, "Negotiate ");
+    httpEncode64_2(http->authstring + 10, authsize - 10, output_token.value,
+		   output_token.length);
+
+    gss_release_buffer(&minor_status, &output_token);
+  }
+  else
+  {
+    DEBUG_printf(("1_cupsSetNegotiateAuthString: Kerberos credentials too "
+                  "large - %d bytes!", (int)output_token.length));
+    gss_release_buffer(&minor_status, &output_token);
+
+    return (-1);
+  }
+
+  return (0);
+}
+
+
 /*
  * 'cups_get_gssname()' - Get CUPS service credentials for authentication.
  */
@@ -540,7 +507,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
  /*
   * Delete any previous authorization reference...
   */
-  
+
   if (http->auth_ref)
   {
     AuthorizationFree(http->auth_ref, kAuthorizationFlagDefaults);
@@ -548,10 +515,10 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   }
 
   if (!getenv("GATEWAY_INTERFACE") &&
-      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey", 
+      httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
 		       auth_key, sizeof(auth_key)))
   {
-    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, 
+    status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment,
 				 kAuthorizationFlagDefaults, &http->auth_ref);
     if (status != errAuthorizationSuccess)
     {
@@ -568,13 +535,13 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     auth_rights.count = 1;
     auth_rights.items = &auth_right;
 
-    auth_flags = kAuthorizationFlagDefaults | 
+    auth_flags = kAuthorizationFlagDefaults |
 		 kAuthorizationFlagPreAuthorize |
-		 kAuthorizationFlagInteractionAllowed | 
+		 kAuthorizationFlagInteractionAllowed |
 		 kAuthorizationFlagExtendRights;
 
-    status = AuthorizationCopyRights(http->auth_ref, &auth_rights, 
-				     kAuthorizationEmptyEnvironment, 
+    status = AuthorizationCopyRights(http->auth_ref, &auth_rights,
+				     kAuthorizationEmptyEnvironment,
 				     auth_flags, NULL);
     if (status == errAuthorizationSuccess)
       status = AuthorizationMakeExternalForm(http->auth_ref, &auth_extrn);
@@ -585,7 +552,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
       * Set the authorization string and return...
       */
 
-      httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn, 
+      httpEncode64_2(buffer, sizeof(buffer), (void *)&auth_extrn,
 		     sizeof(auth_extrn));
 
       httpSetAuthString(http, "AuthRef", buffer);
@@ -613,11 +580,14 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
   * information...
   */
 
-#    ifdef HAVE_GSSAPI
-  if (strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
-#    else
   if (
+#    ifdef HAVE_GSSAPI
+      strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9) &&
 #    endif /* HAVE_GSSAPI */
+#    ifdef HAVE_AUTHORIZATION_H
+      !httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
+		        auth_key, sizeof(auth_key)) &&
+#    endif /* HAVE_AUTHORIZATION_H */
       http->hostaddr->addr.sa_family == AF_LOCAL &&
       !getenv("GATEWAY_INTERFACE"))	/* Not via CGI programs... */
   {

@@ -145,7 +145,6 @@ static const cupsd_var_t	variables[] =
   { "MaxJobsPerUser",		&MaxJobsPerUser,	CUPSD_VARTYPE_INTEGER },
   { "MaxLeaseDuration",		&MaxLeaseDuration,	CUPSD_VARTYPE_INTEGER },
   { "MaxLogSize",		&MaxLogSize,		CUPSD_VARTYPE_INTEGER },
-  { "MaxPrinterHistory",	&MaxPrinterHistory,	CUPSD_VARTYPE_INTEGER },
   { "MaxRequestSize",		&MaxRequestSize,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptions",		&MaxSubscriptions,	CUPSD_VARTYPE_INTEGER },
   { "MaxSubscriptionsPerJob",	&MaxSubscriptionsPerJob,	CUPSD_VARTYPE_INTEGER },
@@ -626,7 +625,6 @@ cupsdReadConfiguration(void)
   MaxClients               = 100;
   MaxClientsPerHost        = 0;
   MaxLogSize               = 1024 * 1024;
-  MaxPrinterHistory        = 0;
   MaxRequestSize           = 0;
   MultipleOperationTimeout = DEFAULT_TIMEOUT;
   ReloadTimeout	           = DEFAULT_KEEPALIVE;

@@ -3,7 +3,7 @@
  *
  *   PWG test program for CUPS.
  *
- *   Copyright 2009-2010 by Apple Inc.
+ *   Copyright 2009-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -15,9 +15,9 @@
  *
  * Contents:
  *
- *   main()          - Main entry.
- *   test_pagesize() - Test the PWG mapping functions.
- *   test_pwg()      - Test the PWG mapping functions.
+ *   main()           - Main entry.
+ *   test_pagesize()  - Test the PWG mapping functions.
+ *   test_ppd_cache() - Test the PPD cache functions.
  */
 
 /*
@@ -32,9 +32,9 @@
  * Local functions...
  */
 
-static int	test_pwg(_pwg_t *pwg, ppd_file_t *ppd);
-static int	test_pagesize(_pwg_t *pwg, ppd_file_t *ppd,
+static int	test_pagesize(_ppd_cache_t *pc, ppd_file_t *ppd,
 		              const char *ppdsize);
+static int	test_ppd_cache(_ppd_cache_t *pc, ppd_file_t *ppd);
 
 
 /*
@@ -48,7 +48,7 @@ main(int  argc,				/* I - Number of command-line args */
   int		status;			/* Status of tests (0 = success, 1 = fail) */
   const char	*ppdfile;		/* PPD filename */
   ppd_file_t	*ppd;			/* PPD file */
-  _pwg_t	*pwg;			/* PWG mapping data */
+  _ppd_cache_t	*pc;			/* PPD cache and PWG mapping data */
   _pwg_media_t	*pwgmedia;		/* PWG media size */
 
 
@@ -78,8 +78,8 @@ main(int  argc,				/* I - Number of command-line args */
   else
     puts("PASS");
 
-  fputs("_pwgCreateWithPPD(ppd): ", stdout);
-  if ((pwg = _pwgCreateWithPPD(ppd)) == NULL)
+  fputs("_ppdCacheCreateWithPPD(ppd): ", stdout);
+  if ((pc = _ppdCacheCreateWithPPD(ppd)) == NULL)
   {
     puts("FAIL");
     status ++;
@@ -87,7 +87,7 @@ main(int  argc,				/* I - Number of command-line args */
   else
   {
     puts("PASS");
-    status += test_pwg(pwg, ppd);
+    status += test_ppd_cache(pc, ppd);
 
     if (argc == 3)
     {
@@ -112,13 +112,14 @@ main(int  argc,				/* I - Number of command-line args */
 	  media = NULL;
 
 	if (media)
-	  printf("_pwgGetPageSize(media=%s): ", media->values[0].string.text);
+	  printf("_ppdCacheGetPageSize(media=%s): ",
+	         media->values[0].string.text);
 	else
-	  fputs("_pwgGetPageSize(media-col): ", stdout);
+	  fputs("_ppdCacheGetPageSize(media-col): ", stdout);
 
         fflush(stdout);
 
-	if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
+	if ((pagesize = _ppdCacheGetPageSize(pc, job, NULL, NULL)) == NULL)
 	{
 	  puts("FAIL (Not Found)");
 	  status = 1;
@@ -142,11 +143,11 @@ main(int  argc,				/* I - Number of command-line args */
     }
 
    /*
-    * _pwgDestroy should never fail...
+    * _ppdCacheDestroy should never fail...
     */
 
-    fputs("_pwgDestroy(pwg): ", stdout);
-    _pwgDestroy(pwg);
+    fputs("_ppdCacheDestroy(pc): ", stdout);
+    _ppdCacheDestroy(pc);
     puts("PASS");
   }
 
@@ -268,9 +269,9 @@ main(int  argc,				/* I - Number of command-line args */
  */
 
 static int				/* O - 1 on failure, 0 on success */
-test_pagesize(_pwg_t     *pwg,		/* I - PWG mapping data */
-              ppd_file_t *ppd,		/* I - PPD file */
-	      const char *ppdsize)	/* I - PPD page size */
+test_pagesize(_ppd_cache_t *pc,		/* I - PWG mapping data */
+              ppd_file_t   *ppd,	/* I - PPD file */
+	      const char   *ppdsize)	/* I - PPD page size */
 {
   int		status = 0;		/* Return status */
   ipp_t		*job;			/* Job attributes */
@@ -279,10 +280,10 @@ test_pagesize(_pwg_t     *pwg,		/* I - PWG mapping data */
 
   if (ppdPageSize(ppd, ppdsize))
   {
-    printf("_pwgGetPageSize(keyword=%s): ", ppdsize);
+    printf("_ppdCacheGetPageSize(keyword=%s): ", ppdsize);
     fflush(stdout);
 
-    if ((pagesize = _pwgGetPageSize(pwg, NULL, ppdsize, NULL)) == NULL)
+    if ((pagesize = _ppdCacheGetPageSize(pc, NULL, ppdsize, NULL)) == NULL)
     {
       puts("FAIL (Not Found)");
       status = 1;
@@ -298,10 +299,10 @@ test_pagesize(_pwg_t     *pwg,		/* I - PWG mapping data */
     job = ippNew();
     ippAddString(job, IPP_TAG_JOB, IPP_TAG_KEYWORD, "media", NULL, ppdsize);
 
-    printf("_pwgGetPageSize(media=%s): ", ppdsize);
+    printf("_ppdCacheGetPageSize(media=%s): ", ppdsize);
     fflush(stdout);
 
-    if ((pagesize = _pwgGetPageSize(pwg, job, NULL, NULL)) == NULL)
+    if ((pagesize = _ppdCacheGetPageSize(pc, job, NULL, NULL)) == NULL)
     {
       puts("FAIL (Not Found)");
       status = 1;
@@ -322,16 +323,16 @@ test_pagesize(_pwg_t     *pwg,		/* I - PWG mapping data */
 
 
 /*
- * 'test_pwg()' - Test the PWG mapping functions.
+ * 'test_ppd_cache()' - Test the PPD cache functions.
  */
 
 static int				/* O - 1 on failure, 0 on success */
-test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
-         ppd_file_t *ppd)		/* I - PPD file */
+test_ppd_cache(_ppd_cache_t *pc,	/* I - PWG mapping data */
+               ppd_file_t   *ppd)	/* I - PPD file */
 {
   int		i,			/* Looping var */
 		status = 0;		/* Return status */
-  _pwg_t	*pwg2;			/* Loaded data */
+  _ppd_cache_t	*pc2;			/* Loaded data */
   _pwg_size_t	*size,			/* Size from original */
 		*size2;			/* Size from saved */
   _pwg_map_t	*map,			/* Map from original */
@@ -342,8 +343,8 @@ test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
   * Verify that we can write and read back the same data...
   */
 
-  fputs("_pwgWriteFile(test.pwg): ", stdout);
-  if (!_pwgWriteFile(pwg, "test.pwg"))
+  fputs("_ppdCacheWriteFile(test.pwg): ", stdout);
+  if (!_ppdCacheWriteFile(pc, "test.pwg", NULL))
   {
     puts("FAIL");
     status ++;
@@ -351,27 +352,28 @@ test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
   else
     puts("PASS");
 
-  fputs("_pwgCreateWithFile(test.pwg): ", stdout);
-  if ((pwg2 = _pwgCreateWithFile("test.pwg")) == NULL)
+  fputs("_ppdCacheCreateWithFile(test.pwg): ", stdout);
+  if ((pc2 = _ppdCacheCreateWithFile("test.pwg", NULL)) == NULL)
   {
     puts("FAIL");
     status ++;
   }
   else
   {
-    if (pwg2->num_sizes != pwg->num_sizes)
+    // TODO: FINISH ADDING ALL VALUES IN STRUCTURE
+    if (pc2->num_sizes != pc->num_sizes)
     {
       if (!status)
         puts("FAIL");
 
-      printf("    SAVED num_sizes=%d, ORIG num_sizes=%d\n", pwg2->num_sizes,
-             pwg->num_sizes);
+      printf("    SAVED num_sizes=%d, ORIG num_sizes=%d\n", pc2->num_sizes,
+             pc->num_sizes);
 
       status ++;
     }
     else
     {
-      for (i = pwg->num_sizes, size = pwg->sizes, size2 = pwg2->sizes;
+      for (i = pc->num_sizes, size = pc->sizes, size2 = pc2->sizes;
            i > 0;
 	   i --, size ++, size2 ++)
       {
@@ -424,7 +426,7 @@ test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
 	}
       }
 
-      for (i = pwg->num_sources, map = pwg->sources, map2 = pwg2->sources;
+      for (i = pc->num_sources, map = pc->sources, map2 = pc2->sources;
            i > 0;
 	   i --, map ++, map2 ++)
       {
@@ -447,7 +449,7 @@ test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
 	}
       }
 
-      for (i = pwg->num_types, map = pwg->types, map2 = pwg2->types;
+      for (i = pc->num_types, map = pc->types, map2 = pc2->types;
            i > 0;
 	   i --, map ++, map2 ++)
       {
@@ -474,17 +476,17 @@ test_pwg(_pwg_t     *pwg,		/* I - PWG mapping data */
     if (!status)
       puts("PASS");
 
-    _pwgDestroy(pwg2);
+    _ppdCacheDestroy(pc2);
   }
 
  /*
   * Test PageSize mapping code...
   */
 
-  status += test_pagesize(pwg, ppd, "Letter");
-  status += test_pagesize(pwg, ppd, "na-letter");
-  status += test_pagesize(pwg, ppd, "A4");
-  status += test_pagesize(pwg, ppd, "iso-a4");
+  status += test_pagesize(pc, ppd, "Letter");
+  status += test_pagesize(pc, ppd, "na-letter");
+  status += test_pagesize(pc, ppd, "A4");
+  status += test_pagesize(pc, ppd, "iso-a4");
 
   return (status);
 }

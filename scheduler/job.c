@@ -291,7 +291,7 @@ cupsdCheckJobs(void)
 
     if (job->kill_time && job->kill_time <= curtime)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!", 
+      cupsdLogMessage(CUPSD_LOG_ERROR, "[Job %d] Stopping unresponsive job!",
 		      job->id);
 
       stop_job(job, CUPSD_JOB_FORCE);
@@ -904,9 +904,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
     if (filter && filter->dst)
     {
-      if (strchr(filter->dst->type, '/'))
+      if ((ptr = strchr(filter->dst->type, '/')) != NULL)
 	snprintf(final_content_type, sizeof(final_content_type),
-		 "FINAL_CONTENT_TYPE=%s", filter->dst->type);
+		 "FINAL_CONTENT_TYPE=%s", ptr + 1);
       else
 	snprintf(final_content_type, sizeof(final_content_type),
 		 "FINAL_CONTENT_TYPE=%s/%s", filter->dst->super,
@@ -3034,12 +3034,13 @@ get_options(cupsd_job_t *job,		/* I - Job */
   char			*optptr,	/* Pointer to options */
 			*valptr;	/* Pointer in value string */
   ipp_attribute_t	*attr;		/* Current attribute */
-  _pwg_t		*pwg;		/* PWG->PPD mapping data */
+  _ppd_cache_t		*pc;		/* PPD cache and mapping data */
   int			num_pwgppds;	/* Number of PWG->PPD options */
   cups_option_t		*pwgppds,	/* PWG->PPD options */
 			*pwgppd,	/* Current PWG->PPD option */
 			*preset;	/* Current preset option */
-  int			output_mode,	/* Output mode (if any) */
+  int			print_color_mode,
+					/* Output mode (if any) */
 			print_quality;	/* Print quality (if any) */
   const char		*ppd;		/* PPD option choice */
   int			exact;		/* Did we get an exact match? */
@@ -3055,28 +3056,31 @@ get_options(cupsd_job_t *job,		/* I - Job */
   * First build an options array for any PWG->PPD mapped option/choice pairs.
   */
 
-  pwg         = job->printer->pwg;
+  pc          = job->printer->pc;
   num_pwgppds = 0;
   pwgppds     = NULL;
 
-  if (pwg &&
+  if (pc &&
       !ippFindAttribute(job->attrs,
                         "com.apple.print.DocumentTicket.PMSpoolFormat",
 			IPP_TAG_ZERO) &&
       !ippFindAttribute(job->attrs, "APPrinterPreset", IPP_TAG_ZERO) &&
       (ippFindAttribute(job->attrs, "output-mode", IPP_TAG_ZERO) ||
+       ippFindAttribute(job->attrs, "print-color-mode", IPP_TAG_ZERO) ||
        ippFindAttribute(job->attrs, "print-quality", IPP_TAG_ZERO)))
   {
    /*
     * Map output-mode and print-quality to a preset...
     */
 
-    if ((attr = ippFindAttribute(job->attrs, "output-mode",
-				 IPP_TAG_KEYWORD)) != NULL &&
-	!strcmp(attr->values[0].string.text, "monochrome"))
-      output_mode = _PWG_OUTPUT_MODE_MONOCHROME;
+    if ((attr = ippFindAttribute(job->attrs, "print-color-mode",
+				 IPP_TAG_KEYWORD)) == NULL)
+      attr = ippFindAttribute(job->attrs, "output-mode", IPP_TAG_KEYWORD);
+
+    if (attr && !strcmp(attr->values[0].string.text, "monochrome"))
+      print_color_mode = _PWG_PRINT_COLOR_MODE_MONOCHROME;
     else
-      output_mode = _PWG_OUTPUT_MODE_COLOR;
+      print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
 
     if ((attr = ippFindAttribute(job->attrs, "print-quality",
 				 IPP_TAG_ENUM)) != NULL &&
@@ -3086,33 +3090,33 @@ get_options(cupsd_job_t *job,		/* I - Job */
     else
       print_quality = _PWG_PRINT_QUALITY_NORMAL;
 
-    if (pwg->num_presets[output_mode][print_quality] == 0)
+    if (pc->num_presets[print_color_mode][print_quality] == 0)
     {
      /*
       * Try to find a preset that works so that we maximize the chances of us
       * getting a good print using IPP attributes.
       */
 
-      if (pwg->num_presets[output_mode][_PWG_PRINT_QUALITY_NORMAL] > 0)
+      if (pc->num_presets[print_color_mode][_PWG_PRINT_QUALITY_NORMAL] > 0)
         print_quality = _PWG_PRINT_QUALITY_NORMAL;
-      else if (pwg->num_presets[_PWG_OUTPUT_MODE_COLOR][print_quality] > 0)
-        output_mode = _PWG_OUTPUT_MODE_COLOR;
+      else if (pc->num_presets[_PWG_PRINT_COLOR_MODE_COLOR][print_quality] > 0)
+        print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
       else
       {
-        print_quality = _PWG_PRINT_QUALITY_NORMAL;
-        output_mode   = _PWG_OUTPUT_MODE_COLOR;
+        print_quality    = _PWG_PRINT_QUALITY_NORMAL;
+        print_color_mode = _PWG_PRINT_COLOR_MODE_COLOR;
       }
     }
 
-    if (pwg->num_presets[output_mode][print_quality] > 0)
+    if (pc->num_presets[print_color_mode][print_quality] > 0)
     {
      /*
       * Copy the preset options as long as the corresponding names are not
       * already defined in the IPP request...
       */
 
-      for (i = pwg->num_presets[output_mode][print_quality],
-	       preset = pwg->presets[output_mode][print_quality];
+      for (i = pc->num_presets[print_color_mode][print_quality],
+	       preset = pc->presets[print_color_mode][print_quality];
 	   i > 0;
 	   i --, preset ++)
       {
@@ -3123,13 +3127,13 @@ get_options(cupsd_job_t *job,		/* I - Job */
     }
   }
 
-  if (pwg)
+  if (pc)
   {
     if (!ippFindAttribute(job->attrs, "InputSlot", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "HPPaperSource", IPP_TAG_ZERO))
     {
-      if ((ppd = _pwgGetInputSlot(pwg, job->attrs, NULL)) != NULL)
-	num_pwgppds = cupsAddOption(pwg->source_option, ppd, num_pwgppds,
+      if ((ppd = _ppdCacheGetInputSlot(pc, job->attrs, NULL)) != NULL)
+	num_pwgppds = cupsAddOption(pc->source_option, ppd, num_pwgppds,
 				    &pwgppds);
       else if (!ippFindAttribute(job->attrs, "AP_D_InputSlot", IPP_TAG_ZERO))
 	num_pwgppds = cupsAddOption("AP_D_InputSlot", "", num_pwgppds,
@@ -3137,12 +3141,12 @@ get_options(cupsd_job_t *job,		/* I - Job */
     }
 
     if (!ippFindAttribute(job->attrs, "MediaType", IPP_TAG_ZERO) &&
-	(ppd = _pwgGetMediaType(pwg, job->attrs, NULL)) != NULL)
+	(ppd = _ppdCacheGetMediaType(pc, job->attrs, NULL)) != NULL)
       num_pwgppds = cupsAddOption("MediaType", ppd, num_pwgppds, &pwgppds);
 
     if (!ippFindAttribute(job->attrs, "PageRegion", IPP_TAG_ZERO) &&
 	!ippFindAttribute(job->attrs, "PageSize", IPP_TAG_ZERO) &&
-	(ppd = _pwgGetPageSize(pwg, job->attrs, NULL, &exact)) != NULL)
+	(ppd = _ppdCacheGetPageSize(pc, job->attrs, NULL, &exact)) != NULL)
     {
       num_pwgppds = cupsAddOption("PageSize", ppd, num_pwgppds, &pwgppds);
 
@@ -3155,7 +3159,7 @@ get_options(cupsd_job_t *job,		/* I - Job */
 				 IPP_TAG_ZERO)) != NULL &&
 	(attr->value_tag == IPP_TAG_KEYWORD ||
 	 attr->value_tag == IPP_TAG_NAME) &&
-	(ppd = _pwgGetOutputBin(pwg, attr->values[0].string.text)) != NULL) 
+	(ppd = _ppdCacheGetOutputBin(pc, attr->values[0].string.text)) != NULL)
     {
      /*
       * Map output-bin to OutputBin option...
@@ -3164,8 +3168,8 @@ get_options(cupsd_job_t *job,		/* I - Job */
       num_pwgppds = cupsAddOption("OutputBin", ppd, num_pwgppds, &pwgppds);
     }
 
-    if (pwg->sides_option &&
-        !ippFindAttribute(job->attrs, pwg->sides_option, IPP_TAG_ZERO) &&
+    if (pc->sides_option &&
+        !ippFindAttribute(job->attrs, pc->sides_option, IPP_TAG_ZERO) &&
 	(attr = ippFindAttribute(job->attrs, "sides", IPP_TAG_KEYWORD)) != NULL)
     {
      /*
@@ -3173,13 +3177,13 @@ get_options(cupsd_job_t *job,		/* I - Job */
       */
 
       if (!strcmp(attr->values[0].string.text, "one-sided"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_1sided,
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_1sided,
 				    num_pwgppds, &pwgppds);
       else if (!strcmp(attr->values[0].string.text, "two-sided-long-edge"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_long,
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_long,
 				    num_pwgppds, &pwgppds);
       else if (!strcmp(attr->values[0].string.text, "two-sided-short-edge"))
-        num_pwgppds = cupsAddOption(pwg->sides_option, pwg->sides_2sided_short,
+        num_pwgppds = cupsAddOption(pc->sides_option, pc->sides_2sided_short,
 				    num_pwgppds, &pwgppds);
     }
   }
@@ -4210,10 +4214,7 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
 	return;
       }
       else if (cupsdSetPrinterReasons(job->printer, message))
-      {
-	cupsdAddPrinterHistory(job->printer);
 	event |= CUPSD_EVENT_PRINTER_STATE;
-      }
 
       update_job_attrs(job, 0);
     }
@@ -4379,7 +4380,6 @@ update_job(cupsd_job_t *job)		/* I - Job to check */
       {
 	strlcpy(job->printer->state_message, ptr,
 		sizeof(job->printer->state_message));
-	cupsdAddPrinterHistory(job->printer);
 
 	event |= CUPSD_EVENT_PRINTER_STATE | CUPSD_EVENT_JOB_PROGRESS;
 

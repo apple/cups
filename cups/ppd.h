@@ -273,6 +273,9 @@ typedef struct ppd_coption_s		/**** Custom Option @since CUPS 1.2/Mac OS X 10.5@
   cups_array_t	*params;		/* Parameters */
 } ppd_coption_t;
 
+typedef struct _ppd_cache_s _ppd_cache_t;
+					/**** PPD cache and mapping data @since CUPS 1.5@ @private@ ****/
+
 typedef struct ppd_file_s		/**** PPD File ****/
 {
   int		language_level;		/* Language level of device */
@@ -337,7 +340,7 @@ typedef struct ppd_file_s		/**** PPD File ****/
   cups_array_t	*cups_uiconstraints;	/* cupsUIConstraints @since CUPS 1.4/Mac OS X 10.6@ @private@ */
 
   /**** New in CUPS 1.5 ****/
-  void		*pwg;			/* PWG to/from PPD mappings @since CUPS 1.5@ @private@ */
+  _ppd_cache_t	*cache;			/* PPD cache and mapping data @since CUPS 1.5@ @private@ */
 } ppd_file_t;
 
 

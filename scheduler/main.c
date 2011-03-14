@@ -1800,7 +1800,6 @@ process_children(void)
 	    {
 	      strlcpy(job->printer->state_message, message,
 		       sizeof(job->printer->state_message));
-	      cupsdAddPrinterHistory(job->printer);
 	    }
 
 	    if (!job->attrs)

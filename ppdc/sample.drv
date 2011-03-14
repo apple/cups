@@ -315,6 +315,7 @@ Version "1.5"
     Throughput 8
     ModelNumber $HP_LASERJET
     ColorDevice No
+    Attribute 1284DeviceID "" "CMD:PCL;"
 
     UIConstraints "*Duplex  *Option1 False"
     UIConstraints "*PageSize A3 *InputSlot Envelope"
@@ -367,6 +368,7 @@ Version "1.5"
     ColorDevice Yes
     Attribute PSVersion "" "(2016.0) 0"
     Attribute LanguageLevel "" 2
+    Attribute 1284DeviceID "" "CMD:PS;"
 
     UIConstraints "*Duplex  *Option1 False"
 
@@ -392,6 +394,7 @@ Version "1.5"
 
     Duplex Yes
     Installable "Option1/Duplexer"
+    Attribute "?Option1" "" "save currentpagedevice/Duplex known{(True)}{(False)}ifelse = flush restore"
   }
 }
 
@@ -409,6 +412,7 @@ Version "1.5"
     ManualCopies Yes
     ColorDevice Yes
     Throughput 1
+    Attribute 1284DeviceID "" "MFG:HP;MDL:HP DeskJet;CMD:PCL;"
 
     UIConstraints "*PageSize A3 *InputSlot Envelope"
     UIConstraints "*PageSize A4 *InputSlot Envelope"
@@ -461,6 +465,7 @@ Version "1.5"
     Throughput 8
     ModelNumber $HP_LASERJET
     ColorDevice No
+    Attribute 1284DeviceID "" "MFG:HP;MDL:HP LaserJet;CMD:PCL;"
 
     UIConstraints "*Duplex  *Option1 False"
     UIConstraints "*PageSize A3 *InputSlot Envelope"

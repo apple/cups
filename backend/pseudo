@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# "$Id$"
+#
+#   Psuedo-backend for CUPS testing purposes.
+#
+#   Copyright 2011 by Apple Inc.
+#
+#   These coded instructions, statements, and computer programs are the
+#   property of Apple Inc. and are protected by Federal copyright
+#   law.  Distribution and use rights are outlined in the file "LICENSE.txt"
+#   which should have been included with this file.  If this file is
+#   file is missing or damaged, see the license at "http://www.cups.org/".
+#
+#   This file is subject to the Apple OS-Developed Software exception.
+#
+
+if test $# = 0; then
+	echo 'direct pseudo:///deskjet "HP DeskJet" "HP DeskJet (pseudo)" "MFG:HP;MDL:DeskJet;CMD:PCL;" "Nowhere"'
+	echo 'direct pseudo:///laserjet "HP LaserJet" "HP LaserJet (pseudo)" "MFG:HP;MDL:LaserJet;CMD:PCL;" "Nowhere"'
+	exit 0
+fi
+
+cat $6 >/dev/null
+sleep 5
+exit 0
+
+#
+# End of "$Id$".
+#

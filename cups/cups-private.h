@@ -1,5 +1,5 @@
 /*
- * "$Id$"
+ * "$Id: cups-private.h 9596 2011-03-11 18:26:36Z mike $"
  *
  *   Private definitions for CUPS.
  *
@@ -161,8 +161,10 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 
 #  ifdef __APPLE__
 extern CFStringRef	_cupsAppleCopyDefaultPaperID(void);
+extern CFStringRef	_cupsAppleCopyDefaultPrinter(void);
 extern int		_cupsAppleGetUseLastPrinter(void);
 extern void		_cupsAppleSetDefaultPaperID(CFStringRef name);
+extern void		_cupsAppleSetDefaultPrinter(CFStringRef name);
 extern void		_cupsAppleSetUseLastPrinter(int uselast);
 #  endif /* __APPLE__ */
 
@@ -175,10 +177,14 @@ extern const char	*_cupsGetPassword(const char *prompt);
 extern void		_cupsGlobalLock(void);
 extern _cups_globals_t	*_cupsGlobals(void);
 extern void		_cupsGlobalUnlock(void);
+extern int		_cupsNextDelay(int current, int *previous);
 extern void		_cupsSetDefaults(void);
 extern void		_cupsSetError(ipp_status_t status, const char *message,
 			              int localize);
 extern void		_cupsSetHTTPError(http_status_t status);
+#  ifdef HAVE_GSSAPI
+extern int		_cupsSetNegotiateAuthString(http_t *http);
+#  endif /* HAVE_GSSAPI */
 extern char		*_cupsUserDefault(char *name, size_t namesize);
 
 
@@ -192,5 +198,5 @@ extern char		*_cupsUserDefault(char *name, size_t namesize);
 #endif /* !_CUPS_CUPS_PRIVATE_H_ */
 
 /*
- * End of "$Id$".
+ * End of "$Id: cups-private.h 9596 2011-03-11 18:26:36Z mike $".
  */

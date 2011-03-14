@@ -332,7 +332,7 @@ main(int  argc,				/* I - Number of command-line args */
       const char *word2 = event + 4;	/* Second word */
 
       params = PARAMS_JOB;
-      if (!strcmp(word2, "state"))
+      if (!strcmp(word2, "state-changed"))
 	signame = "JobState";
       else if (!strcmp(word2, "created"))
 	signame = "JobCreated";

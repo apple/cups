@@ -251,6 +251,7 @@ ln -s $root/backend/ipp /tmp/cups-$user/bin/backend
 ln -s $root/backend/lpd /tmp/cups-$user/bin/backend
 ln -s $root/backend/mdns /tmp/cups-$user/bin/backend
 ln -s $root/backend/parallel /tmp/cups-$user/bin/backend
+ln -s $root/backend/pseudo /tmp/cups-$user/bin/backend
 ln -s $root/backend/serial /tmp/cups-$user/bin/backend
 ln -s $root/backend/snmp /tmp/cups-$user/bin/backend
 ln -s $root/backend/socket /tmp/cups-$user/bin/backend
@@ -808,20 +809,6 @@ if test $count = 0; then
 else
 	echo "PASS: $count debug2 messages."
 	echo "<P>PASS: $count debug2 messages.</P>" >>$strfile
-fi
-
-# Page log file...
-if test `uname` = Darwin; then
-	# Currently just test for Mac OS X since others do not have UI to
-	# select a user-wide default media size...
-	if $GREP -iq 'testfile.pdf na_letter_8.5x11in' /tmp/cups-$user/log/page_log; then
-		echo "PASS: page_log formatted correctly."
-		echo "<P>PASS: page_log formatted correctly.</P>" >>$strfile
-	else
-		echo "FAIL: page_log formatted incorrectly."
-		echo "<P>FAIL: page_log formatted incorrectly - no page size information.</P>" >>$strfile
-		fail=`expr $fail + 1`
-	fi
 fi
 
 # Log files...

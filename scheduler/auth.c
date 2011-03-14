@@ -501,11 +501,23 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     struct passwd	*pwd;		/* Password entry for this user */
     cupsd_ucred_t	peercred;	/* Peer credentials */
     socklen_t		peersize;	/* Size of peer credentials */
+#ifdef HAVE_AUTHORIZATION_H
+    const char		*name;		/* Authorizing name */
 
+    for (name = (char *)cupsArrayFirst(con->best->names);
+         name;
+         name = (char *)cupsArrayNext(con->best->names))
+      if (!strncasecmp(name, "@AUTHKEY(", 9) || !strcasecmp(name, "@SYSTEM"))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "PeerCred authentication not allowed for resource.");
+	return;
+      }
+#endif /* HAVE_AUTHORIZATION_H */
 
     if ((pwd = getpwnam(authorization + 9)) == NULL)
     {
-      cupsdLogMessage(CUPSD_LOG_ERROR, "User \"%s\" does not exist!",
+      cupsdLogMessage(CUPSD_LOG_ERROR, "User \"%s\" does not exist.",
                       authorization + 9);
       return;
     }

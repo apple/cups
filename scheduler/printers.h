@@ -70,7 +70,8 @@ struct cupsd_printer_s
   int		remote;			/* Remote queue? */
   mime_type_t	*filetype,		/* Pseudo-filetype for printer */
 		*prefiltertype;		/* Pseudo-filetype for pre-filters */
-  cups_array_t	*filetypes;		/* Supported file types */
+  cups_array_t	*filetypes,		/* Supported file types */
+		*dest_types;		/* Destination types for queue */
   cupsd_job_t	*job;			/* Current job in queue */
   ipp_t		*attrs,			/* Attributes supported by this printer */
 		*ppd_attrs;		/* Attributes based on the PPD */
@@ -83,8 +84,6 @@ struct cupsd_printer_s
   cups_array_t	*quotas;		/* Quota records */
   int		deny_users;		/* 1 = deny, 0 = allow */
   cups_array_t	*users;			/* Allowed/denied users */
-  int		num_history;		/* Number of history collections */
-  ipp_t		**history;		/* History data */
   int		sequence_number;	/* Increasing sequence number */
   int		num_options;		/* Number of default options */
   cups_option_t	*options;		/* Default options */
@@ -93,14 +92,10 @@ struct cupsd_printer_s
   char		*alert,			/* PSX printer-alert value */
 		*alert_description;	/* PSX printer-alert-description value */
   time_t	marker_time;		/* Last time marker attributes were updated */
-  cups_array_t	*filters,		/* Filters for queue */
-		*pre_filters,		/* Pre-filters for queue */
-		*dest_types;		/* Destination types for queue */
-  _pwg_t	*pwg;			/* PWG<->PPD mapping data */
+  _ppd_cache_t	*pc;			/* PPD cache and mapping data */
 
 #ifdef HAVE_DNSSD
   char		*reg_name,		/* Name used for service registration */
-		*product,		/* PPD Product string */
 		*pdl,			/* pdl value for TXT record */
 		*ipp_txt,		/* IPP TXT record contents */
 		*printer_txt;		/* LPD TXT record contents */
@@ -138,7 +133,6 @@ VAR cupsd_policy_t	*DefaultPolicyPtr
  */
 
 extern cupsd_printer_t	*cupsdAddPrinter(const char *name);
-extern void		cupsdAddPrinterHistory(cupsd_printer_t *p);
 extern void		cupsdCreateCommonData(void);
 extern void		cupsdDeleteAllPrinters(void);
 extern int		cupsdDeletePrinter(cupsd_printer_t *p, int update);

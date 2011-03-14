@@ -3,7 +3,7 @@
  *
  *   PWG media name API implementation for CUPS.
  *
- *   Copyright 2009-2010 by Apple Inc.
+ *   Copyright 2009-2011 by Apple Inc.
  *
  *   These coded instructions, statements, and computer programs are the
  *   property of Apple Inc. and are protected by Federal copyright
@@ -116,7 +116,7 @@ static _pwg_media_t const cups_pwg_media[] =
   _PWG_MEDIA_IN("na_f_44x68in", NULL, "AnsiF", 44, 68),
 
   /* Chinese Standard Sheet Media Inch Sizes */
-  _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, NULL, 7.75, 10.75),
+  _PWG_MEDIA_IN("roc_16k_7.75x10.75in", NULL, "roc16k", 7.75, 10.75),
   _PWG_MEDIA_IN("roc_8k_10.75x15.5in", NULL, NULL, 10.75, 15.5),
 
   /* ISO Standard Sheet Media Sizes */

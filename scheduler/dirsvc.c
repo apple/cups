@@ -2396,7 +2396,7 @@ dnssdBuildTxtRecord(
   keyvalue[i++][1] = for_lpd ? "100" : "0";
 
   keyvalue[i  ][0] = "product";
-  keyvalue[i++][1] = p->product ? p->product : "Unknown";
+  keyvalue[i++][1] = p->pc && p->pc->product ? p->pc->product : "Unknown";
 
   snprintf(type_str, sizeof(type_str), "0x%X", p->type | CUPS_PRINTER_REMOTE);
   snprintf(state_str, sizeof(state_str), "%d", p->state);

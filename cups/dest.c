@@ -1,5 +1,5 @@
 /*
- * "$Id: dest.c 7946 2008-09-16 23:27:54Z mike $"
+ * "$Id: dest.c 9568 2011-02-25 06:13:56Z mike $"
  *
  *   User-defined destination (and option) support for CUPS.
  *
@@ -19,8 +19,10 @@
  *   cupsAddDest()                  - Add a destination to the list of
  *                                    destinations.
  *   _cupsAppleCopyDefaultPaperID() - Get the default paper ID.
+ *   _cupsAppleCopyDefaultPrinter() - Get the default printer at this location.
  *   _cupsAppleGetUseLastPrinter()  - Get whether to use the last used printer.
  *   _cupsAppleSetDefaultPaperID()  - Set the default paper id.
+ *   _cupsAppleSetDefaultPrinter()  - Set the default printer for this location.
  *   _cupsAppleSetUseLastPrinter()  - Set whether to use the last used printer.
  *   cupsFreeDests()                - Free the memory used by the list of
  *                                    destinations.
@@ -46,7 +48,6 @@
  *                                    location.
  *   appleGetPaperSize()            - Get the default paper size.
  *   appleGetPrinter()              - Get a printer from the history array.
- *   appleSetDefault()              - Set the default printer for this location.
  *   cups_add_dest()                - Add a destination to the array.
  *   cups_compare_dests()           - Compare two destinations.
  *   cups_find_dest()               - Find a destination using a binary search.
@@ -70,13 +71,12 @@
 
 #ifdef __APPLE__
 #  include <SystemConfiguration/SystemConfiguration.h>
-#  define kDefaultPaperIDKey CFSTR("DefaultPaperID")
-#  define kLocationHistoryArrayKey CFSTR("kLocationHistoryArrayKeyTMP")
-#  define kLocationNetworkKey CFSTR("kLocationNetworkKey")
-#  define kLocationPrinterIDKey CFSTR("kLocationPrinterIDKey")
-#  define kPMPrintingPreferences CFSTR("com.apple.print.PrintingPrefs")
-#  define kCUPSPrintingPreferences CFSTR("org.cups.PrintingPrefs")
-#  define kUseLastPrinterAsCurrentPrinterKey CFSTR("UseLastPrinterAsCurrentPrinter")
+#  define kCUPSPrintingPrefs	CFSTR("org.cups.PrintingPrefs")
+#  define kDefaultPaperIDKey	CFSTR("DefaultPaperID")
+#  define kLastUsedPrintersKey	CFSTR("LastUsedPrinters")
+#  define kLocationNetworkKey	CFSTR("Network")
+#  define kLocationPrinterIDKey	CFSTR("PrinterID")
+#  define kUseLastPrinter	CFSTR("UseLastPrinter")
 #endif /* __APPLE__ */
 
 
@@ -90,7 +90,6 @@ static CFStringRef appleCopyNetwork(void);
 static char	*appleGetPaperSize(char *name, int namesize);
 static CFStringRef appleGetPrinter(CFArrayRef locations, CFStringRef network,
 		                   CFIndex *locindex);
-static void	appleSetDefault(const char *name);
 #endif /* __APPLE__ */
 static cups_dest_t *cups_add_dest(const char *name, const char *instance,
 		                  int *num_dests, cups_dest_t **dests);
@@ -187,17 +186,79 @@ cupsAddDest(const char  *name,		/* I  - Destination name */
 CFStringRef				/* O - Default paper ID */
 _cupsAppleCopyDefaultPaperID(void)
 {
-  CFStringRef	paper;			/* Default paper ID */
+  return (CFPreferencesCopyAppValue(kDefaultPaperIDKey,
+                                    kCUPSPrintingPrefs));
+}
 
 
-  paper = CFPreferencesCopyAppValue(kDefaultPaperIDKey,
-                                    kCUPSPrintingPreferences);
+/*
+ * '_cupsAppleCopyDefaultPrinter()' - Get the default printer at this location.
+ */
 
-  if (!paper)
-    paper = CFPreferencesCopyAppValue(kDefaultPaperIDKey,
-                                      kPMPrintingPreferences);
+CFStringRef				/* O - Default printer name */
+_cupsAppleCopyDefaultPrinter(void)
+{
+  CFStringRef	network;		/* Network location */
+  CFArrayRef	locations;		/* Location array */
+  CFStringRef	locprinter;		/* Current printer */
 
-  return (paper);
+
+ /*
+  * Use location-based defaults only if "use last printer" is selected in the
+  * system preferences...
+  */
+
+  if (!_cupsAppleGetUseLastPrinter())
+  {
+    DEBUG_puts("1_cupsAppleCopyDefaultPrinter: Not using last printer as "
+	       "default.");
+    return (NULL);
+  }
+
+ /*
+  * Get the current location...
+  */
+
+  if ((network = appleCopyNetwork()) == NULL)
+  {
+    DEBUG_puts("1_cupsAppleCopyDefaultPrinter: Unable to get current "
+               "network.");
+    return (NULL);
+  }
+
+//#  ifdef DEBUG
+//  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
+//  DEBUG_printf(("2_cupsUserDefault: network=\"%s\"", name));
+//#  endif /* DEBUG */
+
+ /*
+  * Lookup the network in the preferences...
+  */
+
+  if ((locations = appleCopyLocations()) == NULL)
+  {
+   /*
+    * Missing or bad location array, so no location-based default...
+    */
+
+    DEBUG_puts("1_cupsAppleCopyDefaultPrinter: Missing or bad last used "
+	       "printer array.");
+
+    CFRelease(network);
+
+    return (NULL);
+  }
+  
+  DEBUG_printf(("1_cupsAppleCopyDefaultPrinter: Got locations, %d entries.",
+                (int)CFArrayGetCount(locations)));
+
+  if ((locprinter = appleGetPrinter(locations, network, NULL)) != NULL)
+    CFRetain(locprinter);
+
+  CFRelease(network);
+  CFRelease(locations);
+
+  return (locprinter);
 }
 
 
@@ -215,13 +276,9 @@ _cupsAppleGetUseLastPrinter(void)
   if (getenv("CUPS_DISABLE_APPLE_DEFAULT"))
     return (0);
 
-  uselast = CFPreferencesGetAppBooleanValue(kUseLastPrinterAsCurrentPrinterKey,
-                                            kCUPSPrintingPreferences,
+  uselast = CFPreferencesGetAppBooleanValue(kUseLastPrinter,
+                                            kCUPSPrintingPrefs,
 					    &uselast_set);
-  if (!uselast_set)
-    uselast = CFPreferencesGetAppBooleanValue(kUseLastPrinterAsCurrentPrinterKey,
-					      kPMPrintingPreferences,
-					      &uselast_set);
   if (!uselast_set)
     return (1);
   else
@@ -237,7 +294,110 @@ void
 _cupsAppleSetDefaultPaperID(
     CFStringRef name)			/* I - New paper ID */
 {
-  CFPreferencesSetAppValue(kDefaultPaperIDKey, name, kCUPSPrintingPreferences);
+  CFPreferencesSetAppValue(kDefaultPaperIDKey, name, kCUPSPrintingPrefs);
+  CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+  notify_post("com.apple.printerPrefsChange");
+}
+
+
+/*
+ * '_cupsAppleSetDefaultPrinter()' - Set the default printer for this location.
+ */
+
+void
+_cupsAppleSetDefaultPrinter(
+    CFStringRef name)			/* I - Default printer/class name */
+{
+  CFStringRef		network;	/* Current network */
+  CFArrayRef		locations;	/* Old locations array */
+  CFIndex		locindex;	/* Index in locations array */
+  CFStringRef		locprinter;	/* Current printer */
+  CFMutableArrayRef	newlocations;	/* New locations array */
+  CFMutableDictionaryRef newlocation;	/* New location */
+
+
+ /*
+  * Get the current location...
+  */
+
+  if ((network = appleCopyNetwork()) == NULL)
+  {
+    DEBUG_puts("1_cupsAppleSetDefaultPrinter: Unable to get current network...");
+    return;
+  }
+
+ /*
+  * Lookup the network in the preferences...
+  */
+
+  if ((locations = appleCopyLocations()) != NULL)
+    locprinter = appleGetPrinter(locations, network, &locindex);
+  else
+  {
+    locprinter = NULL;
+    locindex   = -1;
+  }
+
+  if (!locprinter || CFStringCompare(locprinter, name, 0) != kCFCompareEqualTo)
+  {
+   /*
+    * Need to change the locations array...
+    */
+
+    if (locations)
+    {
+      newlocations = CFArrayCreateMutableCopy(kCFAllocatorDefault, 0,
+                                              locations);
+
+      if (locprinter)
+        CFArrayRemoveValueAtIndex(newlocations, locindex);
+    }
+    else
+      newlocations = CFArrayCreateMutable(kCFAllocatorDefault, 0,
+					  &kCFTypeArrayCallBacks);
+
+    newlocation = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+					    &kCFTypeDictionaryKeyCallBacks,
+					    &kCFTypeDictionaryValueCallBacks);
+
+    if (newlocation && newlocations)
+    {
+     /*
+      * Put the new location at the front of the array...
+      */
+
+      CFDictionaryAddValue(newlocation, kLocationNetworkKey, network);
+      CFDictionaryAddValue(newlocation, kLocationPrinterIDKey, name);
+      CFArrayInsertValueAtIndex(newlocations, 0, newlocation);
+
+     /*
+      * Limit the number of locations to 10...
+      */
+
+      while (CFArrayGetCount(newlocations) > 10)
+        CFArrayRemoveValueAtIndex(newlocations, 10);
+
+     /*
+      * Push the changes out...
+      */
+
+      CFPreferencesSetAppValue(kLastUsedPrintersKey, newlocations,
+                               kCUPSPrintingPrefs);
+      CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+      notify_post("com.apple.printerPrefsChange");
+    }
+
+    if (newlocations)
+      CFRelease(newlocations);
+
+    if (newlocation)
+      CFRelease(newlocation);
+  }
+
+  if (locations)
+    CFRelease(locations);
+
+  CFRelease(network);
 }
 
 
@@ -249,9 +409,11 @@ void
 _cupsAppleSetUseLastPrinter(
     int uselast)			/* O - 1 to use last printer, 0 otherwise */
 {
-  CFPreferencesSetAppValue(kUseLastPrinterAsCurrentPrinterKey, 
+  CFPreferencesSetAppValue(kUseLastPrinter, 
 			   uselast ? kCFBooleanTrue : kCFBooleanFalse,
-			   kCUPSPrintingPreferences);
+			   kCUPSPrintingPrefs);
+  CFPreferencesAppSynchronize(kCUPSPrintingPrefs);
+  notify_post("com.apple.printerPrefsChange");
 }
 #endif /* __APPLE__ */
 
@@ -1254,7 +1416,18 @@ cupsSetDests2(http_t      *http,	/* I - Connection to server or @code CUPS_HTTP_
   */
 
   if ((dest = cupsGetDest(NULL, NULL, num_dests, dests)) != NULL)
-    appleSetDefault(dest->name);
+  {
+    CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault,
+                                                 dest->name,
+                                                 kCFStringEncodingUTF8);
+					/* Default printer name */
+
+    if (name)
+    {
+      _cupsAppleSetDefaultPrinter(name);
+      CFRelease(name);
+    }
+  }
 #endif /* __APPLE__ */
 
 #ifdef HAVE_NOTIFY_POST
@@ -1281,9 +1454,7 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
 {
   const char	*env;			/* LPDEST or PRINTER env variable */
 #ifdef __APPLE__
-  CFStringRef	network;		/* Network location */
-  CFArrayRef	locations;		/* Location array */
-  CFStringRef	locprinter;		/* Current printer */
+  CFStringRef	locprinter;		/* Last printer as this location */
 #endif /* __APPLE__ */
 
 
@@ -1303,59 +1474,15 @@ _cupsUserDefault(char   *name,		/* I - Name buffer */
   * system preferences...
   */
 
-  if (!_cupsAppleGetUseLastPrinter())
+  if ((locprinter = _cupsAppleCopyDefaultPrinter()) != NULL)
   {
-    DEBUG_puts("1_cupsUserDefault: Not using last printer as default...");
-    name[0] = '\0';
-    return (NULL);
-  }
-
- /*
-  * Get the current location...
-  */
-
-  if ((network = appleCopyNetwork()) == NULL)
-  {
-    DEBUG_puts("1_cupsUserDefault: Unable to get current network...");
-    name[0] = '\0';
-    return (NULL);
-  }
-
-#  ifdef DEBUG
-  CFStringGetCString(network, name, namesize, kCFStringEncodingUTF8);
-  DEBUG_printf(("2_cupsUserDefault: network=\"%s\"", name));
-#  endif /* DEBUG */
-
- /*
-  * Lookup the network in the preferences...
-  */
-
-  if ((locations = appleCopyLocations()) == NULL)
-  {
-   /*
-    * Missing or bad location array, so no location-based default...
-    */
-
-    DEBUG_puts("1_cupsUserDefault: Missing or bad location history array...");
-
-    CFRelease(network);
-
-    name[0] = '\0';
-    return (NULL);
-  }
-  
-  DEBUG_printf(("2_cupsUserDefault: Got location, %d entries...",
-                (int)CFArrayGetCount(locations)));
-
-  if ((locprinter = appleGetPrinter(locations, network, NULL)) != NULL)
     CFStringGetCString(locprinter, name, namesize, kCFStringEncodingUTF8);
+    CFRelease(locprinter);
+  }
   else
     name[0] = '\0';
 
-  CFRelease(network);
-  CFRelease(locations);
-
-  DEBUG_printf(("1_cupsUserDefault: Returning \"%s\"...", name));
+  DEBUG_printf(("1_cupsUserDefault: Returning \"%s\".", name));
 
   return (*name ? name : NULL);
 
@@ -1385,8 +1512,8 @@ appleCopyLocations(void)
   * Look up the location array in the preferences...
   */
 
-  if ((locations = CFPreferencesCopyAppValue(kLocationHistoryArrayKey,
-                                             kPMPrintingPreferences)) == NULL)
+  if ((locations = CFPreferencesCopyAppValue(kLastUsedPrintersKey,
+                                             kCUPSPrintingPrefs)) == NULL)
     return (NULL);
 
   if (CFGetTypeID(locations) != CFArrayGetTypeID())
@@ -1412,22 +1539,50 @@ appleCopyNetwork(void)
   CFStringRef		network = NULL;	/* Current network ID */
   
 
-  if ((dynamicStore = SCDynamicStoreCreate(NULL, CFSTR("Printing"), NULL,
+  if ((dynamicStore = SCDynamicStoreCreate(NULL, CFSTR("libcups"), NULL,
                                            NULL)) != NULL)
   {
+   /*
+    * First use the IPv6 router address, if available, since that will generally
+    * be a globally-unique link-local address.
+    */
+
     if ((key = SCDynamicStoreKeyCreateNetworkGlobalEntity(
-                   NULL, kSCDynamicStoreDomainState, kSCEntNetIPv4)) != NULL)
+                   NULL, kSCDynamicStoreDomainState, kSCEntNetIPv6)) != NULL)
     {
       if ((ip_dict = SCDynamicStoreCopyValue(dynamicStore, key)) != NULL)
       {
 	if ((network = CFDictionaryGetValue(ip_dict,
-	                                    kSCPropNetIPv4Router)) != NULL)
+	                                    kSCPropNetIPv6Router)) != NULL)
           CFRetain(network);
 
         CFRelease(ip_dict);
       }
 
       CFRelease(key);
+    }
+
+   /*
+    * If that doesn't work, try the IPv4 router address. This isn't as unique
+    * and will likely be a 10.x.y.z or 192.168.y.z address...
+    */
+
+    if (!network)
+    {
+      if ((key = SCDynamicStoreKeyCreateNetworkGlobalEntity(
+		     NULL, kSCDynamicStoreDomainState, kSCEntNetIPv4)) != NULL)
+      {
+	if ((ip_dict = SCDynamicStoreCopyValue(dynamicStore, key)) != NULL)
+	{
+	  if ((network = CFDictionaryGetValue(ip_dict,
+					      kSCPropNetIPv4Router)) != NULL)
+	    CFRetain(network);
+
+	  CFRelease(ip_dict);
+	}
+
+	CFRelease(key);
+      }
     }
 
     CFRelease(dynamicStore);
@@ -1502,118 +1657,6 @@ appleGetPrinter(CFArrayRef  locations,	/* I - Location array */
 
   return (NULL);
 }
-
-
-/*
- * 'appleSetDefault()' - Set the default printer for this location.
- */
-
-static void
-appleSetDefault(const char *name)	/* I - Default printer/class name */
-{
-  CFStringRef		network;	/* Current network */
-  CFArrayRef		locations;	/* Old locations array */
-  CFIndex		locindex;	/* Index in locations array */
-  CFStringRef		locprinter;	/* Current printer */
-  CFMutableArrayRef	newlocations;	/* New locations array */
-  CFMutableDictionaryRef newlocation;	/* New location */
-  CFStringRef		newprinter;	/* New printer */
-
-
- /*
-  * Get the current location...
-  */
-
-  if ((network = appleCopyNetwork()) == NULL)
-  {
-    DEBUG_puts("1appleSetDefault: Unable to get current network...");
-    return;
-  }
-
-  if ((newprinter = CFStringCreateWithCString(kCFAllocatorDefault, name,
-                                              kCFStringEncodingUTF8)) == NULL)
-  {
-    CFRelease(network);
-    return;
-  }
-
- /*
-  * Lookup the network in the preferences...
-  */
-
-  if ((locations = appleCopyLocations()) != NULL)
-    locprinter = appleGetPrinter(locations, network, &locindex);
-  else
-  {
-    locprinter = NULL;
-    locindex   = -1;
-  }
-
-  if (!locprinter ||
-      CFStringCompare(locprinter, newprinter, 0) != kCFCompareEqualTo)
-  {
-   /*
-    * Need to change the locations array...
-    */
-
-    if (locations)
-    {
-      newlocations = CFArrayCreateMutableCopy(kCFAllocatorDefault, 0,
-                                              locations);
-
-      if (locprinter)
-        CFArrayRemoveValueAtIndex(newlocations, locindex);
-    }
-    else
-      newlocations = CFArrayCreateMutable(kCFAllocatorDefault, 0,
-					  &kCFTypeArrayCallBacks);
-
-    newlocation = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-					    &kCFTypeDictionaryKeyCallBacks,
-					    &kCFTypeDictionaryValueCallBacks);
-
-    if (newlocation && newlocations)
-    {
-     /*
-      * Put the new location at the front of the array...
-      */
-
-      CFDictionaryAddValue(newlocation, kLocationNetworkKey, network);
-      CFDictionaryAddValue(newlocation, kLocationPrinterIDKey, newprinter);
-      CFArrayInsertValueAtIndex(newlocations, 0, newlocation);
-
-     /*
-      * Limit the number of locations to 10...
-      */
-
-      while (CFArrayGetCount(newlocations) > 10)
-        CFArrayRemoveValueAtIndex(newlocations, 10);
-
-     /*
-      * Push the changes out...
-      */
-
-      CFPreferencesSetAppValue(kLocationHistoryArrayKey, newlocations,
-                               kPMPrintingPreferences);
-      CFPreferencesAppSynchronize(kPMPrintingPreferences);
-      notify_post("com.apple.printerPrefsChange");
-    }
-
-    if (newlocations)
-      CFRelease(newlocations);
-
-    if (newlocation)
-      CFRelease(newlocation);
-  }
-
-  if (locations)
-    CFRelease(locations);
-
-  CFRelease(network);
-  CFRelease(newprinter);
-}
-
-
 #endif /* __APPLE__ */
 
 
@@ -2122,5 +2165,5 @@ cups_make_string(
 
 
 /*
- * End of "$Id: dest.c 7946 2008-09-16 23:27:54Z mike $".
+ * End of "$Id: dest.c 9568 2011-02-25 06:13:56Z mike $".
  */

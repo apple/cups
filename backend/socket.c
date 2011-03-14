@@ -286,8 +286,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
   if ((snmp_fd = _cupsSNMPOpen(addrlist->addr.addr.sa_family)) >= 0)
   {
-    have_supplies = !backendSNMPSupplies(snmp_fd, &(addr->addr), &start_count,
-                                         NULL);
+    have_supplies = !backendSNMPSupplies(snmp_fd, &(addrlist->addr),
+                                         &start_count, NULL);
   }
   else
     have_supplies = start_count = 0;
@@ -297,7 +297,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   */
 
   if (print_fd == 0)
-    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), backendNetworkSideCB))
+    if (!backendWaitLoop(snmp_fd, &(addrlist->addr), 1, backendNetworkSideCB))
       return (CUPS_BACKEND_OK);
 
  /*
@@ -393,7 +393,7 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
 
 #ifdef AF_INET6
   if (addr->addr.addr.sa_family == AF_INET6)
-    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n", 
+    fprintf(stderr, "DEBUG: Connected to [%s]:%d (IPv6)...\n",
 	    httpAddrString(&addr->addr, addrname, sizeof(addrname)),
 	    ntohs(addr->addr.ipv6.sin6_port));
   else
@@ -419,8 +419,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
       lseek(print_fd, 0, SEEK_SET);
     }
 
-    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addr->addr), 1, 0, 
-                            backendNetworkSideCB);
+    tbytes = backendRunLoop(print_fd, device_fd, snmp_fd, &(addrlist->addr), 1,
+                            0, backendNetworkSideCB);
 
     if (print_fd != 0 && tbytes >= 0)
       _cupsLangPrintFilter(stderr, "INFO", _("Print file sent."));
@@ -454,8 +454,8 @@ main(int  argc,				/* I - Number of command-line arguments (6 or 7) */
   * Collect the final page count as needed...
   */
 
-  if (have_supplies && 
-      !backendSNMPSupplies(snmp_fd, &(addr->addr), &page_count, NULL) &&
+  if (have_supplies &&
+      !backendSNMPSupplies(snmp_fd, &(addrlist->addr), &page_count, NULL) &&
       page_count > start_count)
     fprintf(stderr, "PAGE: total %d\n", page_count - start_count);
 

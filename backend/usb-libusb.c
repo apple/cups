@@ -411,7 +411,7 @@ get_device_id(usb_printer_t *printer,	/* I - Printer */
 
   if (usb_control_msg(printer->handle,
                       USB_TYPE_CLASS | USB_ENDPOINT_IN | USB_RECIP_INTERFACE,
-		      0, printer->conf, printer->iface,
+		      0, printer->conf, (printer->iface << 8) | printer->altset,
 		      buffer, bufsize, 5000) < 0)
   {
     *buffer = '\0';
@@ -675,6 +675,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
     goto error;
   }
 
+#if 0 /* STR #3801: Claiming interface 0 causes problems with some printers */
   if (number != 0)
     while (usb_claim_interface(printer->handle, 0) < 0)
     {
@@ -685,6 +686,7 @@ open_device(usb_printer_t *printer,	/* I - Printer */
 
       goto error;
     }
+#endif /* 0 */
 
  /*
   * Set alternate setting...
