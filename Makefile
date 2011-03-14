@@ -1,5 +1,5 @@
 #
-# "$Id: Makefile 7961 2008-09-17 19:52:46Z mike $"
+# "$Id: Makefile 9391 2010-11-30 21:53:04Z mike $"
 #
 #   Top-level Makefile for CUPS.
 #
@@ -312,5 +312,12 @@ dist:	all
 
 
 #
-# End of "$Id: Makefile 7961 2008-09-17 19:52:46Z mike $".
+# Don't run top-level build targets in parallel...
+#
+
+.NOTPARALLEL:
+
+
+#
+# End of "$Id: Makefile 9391 2010-11-30 21:53:04Z mike $".
 #
