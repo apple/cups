@@ -1,8 +1,9 @@
-CHANGES.txt - 2011-03-07
+CHANGES.txt - 2011-03-15
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added support for the cupsSingleFile PPD keyword.
 	- Dropped support for the printer-state-history attribute (STR #3654)
 	- Added support for a new cupsIPPSupplies keyword in PPD files to allow
 	  drivers to disable IPP supply level reporting.
