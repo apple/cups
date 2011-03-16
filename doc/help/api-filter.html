@@ -411,6 +411,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cups_backend_t" title="Backend exit codes">cups_backend_t</a></li>
 	<li><a href="#cups_sc_bidi_t" title="Bidirectional capabilities">cups_sc_bidi_t</a></li>
 	<li><a href="#cups_sc_command_t" title="Request command codes">cups_sc_command_t</a></li>
+	<li><a href="#cups_sc_connected_t" title="Connectivity values">cups_sc_connected_t</a></li>
 	<li><a href="#cups_sc_state_t" title="Printer state bits">cups_sc_state_t</a></li>
 	<li><a href="#cups_sc_status_t" title="Response status codes">cups_sc_status_t</a></li>
 	<li><a href="#cups_sc_walk_func_t" title="SNMP walk callback">cups_sc_walk_func_t</a></li>
@@ -419,6 +420,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cups_backend_e" title="Backend exit codes">cups_backend_e</a></li>
 	<li><a href="#cups_sc_bidi_e" title="Bidirectional capability values">cups_sc_bidi_e</a></li>
 	<li><a href="#cups_sc_command_e" title="Request command codes">cups_sc_command_e</a></li>
+	<li><a href="#cups_sc_connected_e" title="Connectivity values">cups_sc_connected_e</a></li>
 	<li><a href="#cups_sc_state_e" title="Printer state bits">cups_sc_state_e</a></li>
 	<li><a href="#cups_sc_status_e" title="Response status codes">cups_sc_status_e</a></li>
 </ul></li>
@@ -1315,6 +1317,11 @@ typedef enum <a href="#cups_sc_bidi_e">cups_sc_bidi_e</a> cups_sc_bidi_t;
 <p class="code">
 typedef enum <a href="#cups_sc_command_e">cups_sc_command_e</a> cups_sc_command_t;
 </p>
+<h3 class="typedef"><a name="cups_sc_connected_t">cups_sc_connected_t</a></h3>
+<p class="description">Connectivity values</p>
+<p class="code">
+typedef enum <a href="#cups_sc_connected_e">cups_sc_connected_e</a> cups_sc_connected_t;
+</p>
 <h3 class="typedef"><a name="cups_sc_state_t">cups_sc_state_t</a></h3>
 <p class="description">Printer state bits</p>
 <p class="code">
@@ -1365,6 +1372,8 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datal
 <dd class="description">Drain all pending output</dd>
 <dt>CUPS_SC_CMD_GET_BIDI </dt>
 <dd class="description">Return bidirectional capabilities</dd>
+<dt>CUPS_SC_CMD_GET_CONNECTED <span class="info">&nbsp;CUPS 1.5&nbsp;</span></dt>
+<dd class="description">Return whether the backend is &quot;connected&quot; to the printer </dd>
 <dt>CUPS_SC_CMD_GET_DEVICE_ID </dt>
 <dd class="description">Return the IEEE-1284 device ID</dd>
 <dt>CUPS_SC_CMD_GET_STATE </dt>
@@ -1375,6 +1384,15 @@ typedef void (*cups_sc_walk_func_t)(const char *oid, const char *data, int datal
 <dd class="description">Query the next SNMP OID </dd>
 <dt>CUPS_SC_CMD_SOFT_RESET </dt>
 <dd class="description">Do a soft reset</dd>
+</dl>
+<h3 class="enumeration"><a name="cups_sc_connected_e">cups_sc_connected_e</a></h3>
+<p class="description">Connectivity values</p>
+<h4 class="constants">Constants</h4>
+<dl>
+<dt>CUPS_SC_CONNECTED </dt>
+<dd class="description">Backend is &quot;connected&quot; to printer</dd>
+<dt>CUPS_SC_NOT_CONNECTED </dt>
+<dd class="description">Backend is not &quot;connected&quot; to printer</dd>
 </dl>
 <h3 class="enumeration"><a name="cups_sc_state_e">cups_sc_state_e</a></h3>
 <p class="description">Printer state bits</p>
