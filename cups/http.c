@@ -538,7 +538,7 @@ httpCopyCredentials(
 #  elif defined(HAVE_GNUTLS)
   return (-1);
 
-#  elif defined(HAVE_CDSASSL)
+#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
   if (!(error = SSLCopyPeerCertificates(http->tls, &peerCerts)) && peerCerts)
   {
     if ((*credentials = cupsArrayNew(NULL, NULL)) != NULL)
@@ -599,7 +599,7 @@ _httpConvertCredentials(
        credential;
        credential = (http_credential_t *)cupsArrayNext(credentials))
   {
-    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data, 
+    if ((data = CFDataCreate(kCFAllocatorDefault, credential->data,
 			     credential->datalen)))
     {
       if ((secCert = SecCertificateCreateWithData(kCFAllocatorDefault, data))
@@ -3909,6 +3909,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
                   cg->expired_root, (int)error));
   }
 
+#    ifdef HAVE_SECCERTIFICATECOPYDATA
   if (!error)
   {
     if (cg->client_cert_cb)
@@ -3945,6 +3946,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
                     "error=%d", (int)error));
     }
   }
+#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 
   if (!error)
   {
@@ -3975,6 +3977,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    usleep(1000);
 	    break;
 
+#    ifdef HAVE_SECCERTIFICATECOPYDATA
 	case errSSLServerAuthCompleted :
 	    error = 0;
 	    if (cg->server_cert_cb)
@@ -3998,7 +4001,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	    if (cg->client_cert_cb)
 	    {
 	      names = NULL;
-	      if (!(error = SSLCopyDistinguishedNames(http->tls, &dn_array)) && 
+	      if (!(error = SSLCopyDistinguishedNames(http->tls, &dn_array)) &&
 		  dn_array)
 	      {
 		if ((names = cupsArrayNew(NULL, NULL)) != NULL)
@@ -4012,7 +4015,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 		      credential->datalen = CFDataGetLength(data);
 		      if ((credential->data = malloc(credential->datalen)))
 		      {
-			memcpy((void *)credential->data, CFDataGetBytePtr(data), 
+			memcpy((void *)credential->data, CFDataGetBytePtr(data),
 			       credential->datalen);
 			cupsArrayAdd(names, credential);
 		      }
@@ -4025,7 +4028,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 
 	      if (!error)
 	      {
-		error = (cg->client_cert_cb)(http, http->tls, names, 
+		error = (cg->client_cert_cb)(http, http->tls, names,
 					     cg->client_cert_data);
 
 		DEBUG_printf(("4_httpWait: Client certificate callback "
@@ -4035,6 +4038,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 	      httpFreeCredentials(names);
 	    }
 	    break;
+#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 
 	case errSSLUnknownRootCert :
 	    message = _("Unable to establish a secure connection to host "
