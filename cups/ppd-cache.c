@@ -203,6 +203,10 @@ _ppdCacheCreateWithFile(
     {
       pc->product = _cupsStrAlloc(value);
     }
+    else if (!strcasecmp(line, "SingleFile"))
+    {
+      pc->single_file = !strcasecmp(value, "true");
+    }
     else if (!strcasecmp(line, "IPP"))
     {
       off_t	pos = cupsFileTell(fp),	/* Position in file */
@@ -942,7 +946,6 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
   }
 
-
  /*
   * Copy and convert OutputBin data...
   */
@@ -1275,6 +1278,9 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
     }
     while ((ppd_attr = ppdFindNextAttr(ppd, "cupsPreFilter", NULL)) != NULL);
   }
+
+  if ((ppd_attr = ppdFindAttr(ppd, "cupsSingleFile", NULL)) != NULL)
+    pc->single_file = !strcasecmp(ppd_attr->value, "true");
 
  /*
   * Copy the product string, if any...
@@ -2108,6 +2114,8 @@ _ppdCacheWriteFile(
        value;
        value = (const char *)cupsArrayNext(pc->prefilters))
     cupsFilePutConf(fp, "PreFilter", value);
+
+  cupsFilePrintf(fp, "SingleFile %s\n", pc->single_file ? "true" : "false");
 
  /*
   * IPP attributes, if any...

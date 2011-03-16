@@ -993,7 +993,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     }
     else
     {
-      if (job->current_file == 1)
+      if (job->current_file == 1 ||
+          (job->printer->pc && job->printer->pc->single_file))
       {
 	if (strncmp(job->printer->device_uri, "file:", 5) != 0)
 	{
@@ -1078,7 +1079,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   if (strncmp(job->printer->device_uri, "file:", 5) != 0)
   {
-    if (job->current_file == 1 || job->printer->remote)
+    if (job->current_file == 1 || job->printer->remote ||
+        (job->printer->pc && job->printer->pc->single_file))
     {
       sscanf(job->printer->device_uri, "%254[^:]", scheme);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, scheme);
@@ -1118,9 +1120,12 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       }
     }
 
+    if (job->current_file == job->num_files ||
+        (job->printer->pc && job->printer->pc->single_file))
+      cupsdClosePipe(job->print_pipes);
+
     if (job->current_file == job->num_files)
     {
-      cupsdClosePipe(job->print_pipes);
       cupsdClosePipe(job->back_pipes);
       cupsdClosePipe(job->side_pipes);
 
@@ -1133,10 +1138,12 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
 
-    if (job->current_file == job->num_files)
-    {
+    if (job->current_file == job->num_files ||
+        (job->printer->pc && job->printer->pc->single_file))
       cupsdClosePipe(job->print_pipes);
 
+    if (job->current_file == job->num_files)
+    {
       close(job->status_pipes[1]);
       job->status_pipes[1] = -1;
     }

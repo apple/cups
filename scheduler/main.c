@@ -1831,7 +1831,9 @@ process_children(void)
 	{
 	  for (i = 0; job->filters[i] < 0; i ++);
 
-	  if (!job->filters[i])
+	  if (!job->filters[i] &&
+	      (!job->printer->pc || !job->printer->pc->single_file ||
+	       job->backend <= 0))
 	  {
 	   /*
 	    * Process the next file...
