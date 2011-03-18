@@ -1407,7 +1407,7 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 	    bundlestr, strerror(errno));
     fputs("STATE: +cups-missing-filter-warning\n", stderr);
 
-    if (errno == ENOENT)
+    if (errno == ENOENT && driverPath)
       return (load_classdriver(NULL, intf, printerDriver));
     else
       return (kr);
@@ -1423,7 +1423,12 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
     fputs("STATE: +cups-insecure-filter-warning\n", stderr);
 
     if (bundleinfo.st_uid || (bundleinfo.st_mode & S_IWOTH))
-      return (load_classdriver(NULL, intf, printerDriver));
+    {
+      if (driverPath)
+        return (load_classdriver(NULL, intf, printerDriver));
+      else
+        return (kr);
+    }
   }
 
  /*
