@@ -3916,15 +3916,34 @@ apple_unregister_profiles(
 #  ifdef HAVE_COLORSYNCREGISTERDEVICE
   if (ColorSyncUnregisterDevice != NULL)
   {
-    CFUUIDRef deviceUUID;		/* Printer UUID */
+   /*
+    * Because we may have registered the printer profiles using a prior device
+    * ID-based UUID, remove both the old style UUID and current UUID for the
+    * printer.
+    */
+
+    CFStringRef printerUUID;		/* Printer UUID */
+    CFUUIDRef deviceUUID;		/* Device UUID */
 
     deviceUUID = ColorSyncCreateUUIDFromUInt32(_ppdHashName(p->name));
-					/* TODO: Use printer-uuid value */
-
     if (deviceUUID)
     {
       ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
       CFRelease(deviceUUID);
+    }
+
+    printerUUID = CFStringCreateWithCString(kCFAllocatorDefault, p->uuid + 9,
+                                            kCFStringEncodingUTF8);
+    if (printerUUID)
+    {
+      deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
+      if (deviceUUID)
+      {
+	ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
+	CFRelease(deviceUUID);
+      }
+
+      CFRelease(printerUUID);
     }
   }
 
@@ -3934,6 +3953,7 @@ apple_unregister_profiles(
 #  endif /* HAVE_COLORSYNCREGISTERDEVICE */
 }
 #endif /* __APPLE__ */
+
 
 /*
  * 'apply_printer_defaults()' - Apply printer default options to a job.
