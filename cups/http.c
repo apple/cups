@@ -3767,9 +3767,9 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   const char	*message = NULL;	/* Error message */
+  char		*hostname;		/* Hostname */
 #    ifdef HAVE_SECCERTIFICATECOPYDATA
   cups_array_t	*credentials;		/* Credentials array */
-  char		*hostname;		/* Hostname */
   cups_array_t	*names;			/* CUPS distinguished names */
   CFArrayRef	dn_array;		/* CF distinguished names array */
   CFIndex	count;			/* Number of credentials */
