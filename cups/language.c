@@ -1323,6 +1323,13 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
     stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
     if (stream)
     {
+     /*
+      * Read the property list containing the localization data.
+      *
+      * NOTE: This code currently generates a clang "potential leak"
+      * warning, but the object is released in _cupsMessageFree().
+      */
+
       CFReadStreamOpen(stream);
 
 #ifdef DEBUG
@@ -1338,6 +1345,7 @@ appleMessageLoad(const char *locale)	/* I - Locale ID */
                            kCFStringEncodingUTF8);
         DEBUG_printf(("1appleMessageLoad: %s", filename));
 
+	CFRelease(msg);
         CFRelease(error);
       }
 
