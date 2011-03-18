@@ -1358,7 +1358,7 @@ cupsFileRead(cups_file_t *fp,		/* I - CUPS file */
   * Range check input...
   */
 
-  if (!fp || !buf || bytes < 0 || (fp->mode != 'r' && fp->mode != 's'))
+  if (!fp || !buf || (fp->mode != 'r' && fp->mode != 's'))
     return (-1);
 
   if (bytes == 0)
@@ -1805,7 +1805,7 @@ cupsFileWrite(cups_file_t *fp,		/* I - CUPS file */
   DEBUG_printf(("2cupsFileWrite(fp=%p, buf=%p, bytes=" CUPS_LLFMT ")",
                 fp, buf, CUPS_LLCAST bytes));
 
-  if (!fp || !buf || bytes < 0 || (fp->mode != 'w' && fp->mode != 's'))
+  if (!fp || !buf || (fp->mode != 'w' && fp->mode != 's'))
     return (-1);
 
   if (bytes == 0)
