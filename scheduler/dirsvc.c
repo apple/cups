@@ -2420,6 +2420,11 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "UUID";
   keyvalue[i++][1] = p->uuid + 9;
 
+#ifdef HAVE_SSL
+  keyvalue[i  ][0] = "TLS";
+  keyvalue[i++][1] = "1.2";
+#endif /* HAVE_SSL */
+
   keyvalue[i  ][0] = "Transparent";
   keyvalue[i++][1] = "F";
 
