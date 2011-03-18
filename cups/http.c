@@ -161,9 +161,9 @@ static int		http_write_chunk(http_t *http, const char *buffer,
 			                 int length);
 #ifdef HAVE_SSL
 static int		http_read_ssl(http_t *http, char *buf, int len);
-#  ifdef HAVE_CDSASSL
+#  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
 static int		http_set_credentials(http_t *http);
-#  endif /* HAVE_CDSASSL */
+#  endif /* HAVE_CDSASSL ** HAVE_SECCERTIFICATECOPYDATA */
 static int		http_setup_ssl(http_t *http);
 static void		http_shutdown_ssl(http_t *http);
 static int		http_upgrade(http_t *http);
