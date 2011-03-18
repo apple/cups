@@ -515,7 +515,7 @@ httpCopyCredentials(
 {
 #  ifdef HAVE_LIBSSL
 #  elif defined(HAVE_GNUTLS)
-#  elif defined(HAVE_CDSASSL)
+#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
   OSStatus		error;		/* Error code */
   CFIndex		count;		/* Number of credentials */
   CFArrayRef		peerCerts;	/* Peer certificates */
@@ -583,7 +583,7 @@ _httpConvertCredentials(
 #  elif defined(HAVE_GNUTLS)
   return (NULL);
 
-#  elif defined(HAVE_CDSASSL)
+#  elif defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
   CFMutableArrayRef	peerCerts;	/* Peer credentials reference */
   SecCertificateRef	secCert;	/* Certificate reference */
   CFDataRef		data;		/* Credential data reference */
@@ -3767,6 +3767,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
 #  elif defined(HAVE_CDSASSL)
   OSStatus	error;			/* Error code */
   const char	*message = NULL;	/* Error message */
+#    ifdef HAVE_SECCERTIFICATECOPYDATA
   cups_array_t	*credentials;		/* Credentials array */
   char		*hostname;		/* Hostname */
   cups_array_t	*names;			/* CUPS distinguished names */
@@ -3776,6 +3777,7 @@ http_setup_ssl(http_t *http)		/* I - Connection to server */
   int		i;			/* Looping var */
   http_credential_t
 		*credential;		/* Credential data */
+#    endif /* HAVE_SECCERTIFICATECOPYDATA */
 #  elif defined(HAVE_SSPISSL)
   TCHAR		username[256];		/* Username returned from GetUserName() */
   TCHAR		commonName[256];	/* Common name for certificate */
