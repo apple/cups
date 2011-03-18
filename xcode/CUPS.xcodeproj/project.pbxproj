@@ -47,7 +47,6 @@
 
 /* Begin PBXBuildFile section */
 		273BF6C71333B5370022CAAB /* testcups.c in Sources */ = {isa = PBXBuildFile; fileRef = 273BF6C61333B5370022CAAB /* testcups.c */; };
-		273BF6CA1333B5480022CAAB /* libcups_static.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 274FF6E01333B1C400317ECB /* libcups_static.dylib */; };
 		273BF6CE1333B5950022CAAB /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 273BF6CB1333B5950022CAAB /* CoreFoundation.framework */; };
 		273BF6CF1333B5950022CAAB /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 273BF6CC1333B5950022CAAB /* libiconv.dylib */; };
 		273BF6D01333B5950022CAAB /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 273BF6CD1333B5950022CAAB /* libz.dylib */; };
@@ -718,7 +717,7 @@
 		274FF66F13333ACF00317ECB /* cups-polld.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "cups-polld.c"; path = "../scheduler/cups-polld.c"; sourceTree = "<group>"; };
 		274FF67813333B2F00317ECB /* cupsfilter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupsfilter; sourceTree = BUILT_PRODUCTS_DIR; };
 		274FF68713333B6E00317ECB /* cupsfilter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupsfilter.c; path = ../scheduler/cupsfilter.c; sourceTree = "<group>"; };
-		274FF6E01333B1C400317ECB /* libcups_static.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		274FF6E01333B1C400317ECB /* libcups_static.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libcups_static.dylib; path = "/Users/msweet/c/cups-trunk/xcode/build/Release/libcups_static.dylib"; sourceTree = "<absolute>"; };
 		72220EAE1333047D00FCA411 /* libcups.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		72220EB51333052D00FCA411 /* adminutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = adminutil.c; path = ../cups/adminutil.c; sourceTree = "<group>"; };
 		72220EB71333056300FCA411 /* adminutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adminutil.h; path = ../cups/adminutil.h; sourceTree = "<group>"; };
@@ -885,7 +884,6 @@
 				273BF6D31333B5C30022CAAB /* Kerberos.framework in Frameworks */,
 				273BF6D41333B5C30022CAAB /* Security.framework in Frameworks */,
 				273BF6D81333B5F60022CAAB /* SystemConfiguration.framework in Frameworks */,
-				273BF6CA1333B5480022CAAB /* libcups_static.dylib in Frameworks */,
 				273BF6CF1333B5950022CAAB /* libiconv.dylib in Frameworks */,
 				273BF6D71333B5F60022CAAB /* libresolv.dylib in Frameworks */,
 				273BF6D01333B5950022CAAB /* libz.dylib in Frameworks */,
@@ -1338,7 +1336,6 @@
 				273BF6CB1333B5950022CAAB /* CoreFoundation.framework */,
 				273BF6CC1333B5950022CAAB /* libiconv.dylib */,
 				273BF6CD1333B5950022CAAB /* libz.dylib */,
-				274FF6E01333B1C400317ECB /* libcups_static.dylib */,
 				72220FB113330B4A00FCA411 /* Frameworks */,
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
