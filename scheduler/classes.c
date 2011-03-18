@@ -382,6 +382,14 @@ cupsdLoadAllClasses(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of classes.conf.", linenum);
     }
+    else if (!strcasecmp(line, "UUID"))
+    {
+      if (value && !strncmp(value, "urn:uuid:", 9))
+        cupsdSetString(&(p->uuid), value);
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Bad UUID on line %d of classes.conf.", linenum);
+    }
     else if (!strcasecmp(line, "AuthInfoRequired"))
     {
       if (!cupsdSetAuthInfoRequired(p, value, NULL))
@@ -765,6 +773,8 @@ cupsdSaveAllClasses(void)
       cupsFilePrintf(fp, "<DefaultClass %s>\n", pclass->name);
     else
       cupsFilePrintf(fp, "<Class %s>\n", pclass->name);
+
+    cupsFilePrintf(fp, "UUID %s\n", pclass->uuid);
 
     if (pclass->num_auth_info_required > 0)
     {

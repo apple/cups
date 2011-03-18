@@ -41,6 +41,7 @@ typedef struct cupsd_job_s cupsd_job_t;
 struct cupsd_printer_s
 {
   char		*uri,			/* Printer URI */
+		*uuid,			/* Printer UUID */
 		*hostname,		/* Host printer resides on */
 		*name,			/* Printer name */
 		*location,		/* Location code */

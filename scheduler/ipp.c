@@ -2333,45 +2333,16 @@ static void
 add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
              cupsd_job_t    *job)	/* I - Job */
 {
-  char			uuid[1024];	/* job-uuid string */
-  _cups_md5_state_t	md5state;	/* MD5 state */
-  unsigned char		md5sum[16];	/* MD5 digest/sum */
+  char			uuid[64];	/* job-uuid string */
 
 
  /*
-  * First see if the job already has a job-uuid attribute; if so, return...
+  * Add a job-uuid attribute if none exists...
   */
 
-  if (ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
-    return;
-
- /*
-  * No job-uuid attribute, so build a version 3 UUID with the local job
-  * ID at the end; see RFC 4122 for details.  Start with the MD5 sum of
-  * the ServerName, server name and port that the client connected to,
-  * and local job ID...
-  */
-
-  snprintf(uuid, sizeof(uuid), "%s:%s:%d:%d", ServerName, con->servername,
-	   con->serverport, job->id);
-
-  _cupsMD5Init(&md5state);
-  _cupsMD5Append(&md5state, (unsigned char *)uuid, strlen(uuid));
-  _cupsMD5Finish(&md5state, md5sum);
-
- /*
-  * Format the UUID URI using the MD5 sum and job ID.
-  */
-
-  snprintf(uuid, sizeof(uuid),
-           "urn:uuid:%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
-	   "%02x%02x%02x%02x%02x%02x",
-	   md5sum[0], md5sum[1], md5sum[2], md5sum[3], md5sum[4], md5sum[5],
-	   (md5sum[6] & 15) | 0x30, md5sum[7], (md5sum[8] & 0x3f) | 0x40,
-	   md5sum[9], md5sum[10], md5sum[11], md5sum[12], md5sum[13],
-	   md5sum[14], md5sum[15]);
-
-  ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL, uuid);
+  if (!ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
+    ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL,
+		 cupsdMakeUUID(job->dest, job->id, uuid, sizeof(uuid)));
 }
 
 
