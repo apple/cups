@@ -3813,7 +3813,8 @@ apple_register_profiles(
 	kCFPreferencesCurrentHost
       };
       CFDictionaryRef	deviceDict;	/* Device dictionary */
-      CFUUIDRef		deviceUUID;	/* Device UUID (TODO: use printer-uuid value) */
+      CFStringRef	printerUUID;	/* Printer UUID */
+      CFUUIDRef		deviceUUID;	/* Device UUID */
 
       deviceDict = CFDictionaryCreate(kCFAllocatorDefault,
 				      (const void **)deviceDictKeys,
@@ -3822,11 +3823,21 @@ apple_register_profiles(
 				          sizeof(deviceDictKeys[0]),
 				      &kCFTypeDictionaryKeyCallBacks,
 				      &kCFTypeDictionaryValueCallBacks);
-      deviceUUID = ColorSyncCreateUUIDFromUInt32(device_id);
-      if (deviceDict && deviceUUID &&
-          !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
-				   deviceDict))
-	error = 1001;
+      printerUUID = CFStringCreateWithCString(kCFAllocatorDefault,
+                                              p->uuid + 9, /* Skip urn:uuid: */
+					      kCFStringEncodingUTF8);
+      if (printerUUID)
+      {
+        deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
+	CFRelease(printerUUID);
+
+	if (!deviceDict || !deviceUUID ||
+	    !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
+				     deviceDict))
+	  error = 1001;
+      }
+      else
+        error = 1001;
 
       if (deviceUUID)
         CFRelease(deviceUUID);
