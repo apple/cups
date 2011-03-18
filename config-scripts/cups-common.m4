@@ -374,7 +374,9 @@ case $uname in
 		AC_CHECK_HEADER(Security/SecBasePriv.h,AC_DEFINE(HAVE_SECBASEPRIV_H))
 
 		dnl Check for sandbox/Seatbelt support
-		AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
+		if test $uversion -ge 100; then
+		    AC_CHECK_HEADER(sandbox.h,AC_DEFINE(HAVE_SANDBOX_H))
+		fi
                 ;;
 esac
 
