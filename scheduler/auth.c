@@ -1052,8 +1052,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
-    if ((error = krb5_cc_get_principal(KerberosContext, peerccache,
-                                       &peerprncpl)) != 0)
+    if (krb5_cc_get_principal(KerberosContext, peerccache, &peerprncpl))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "Unable to get Kerberos principal for UID %d",
@@ -1063,8 +1062,7 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       return;
     }
 
-    if ((error = krb5_unparse_name(KerberosContext, peerprncpl,
-                                   &peername)) != 0)
+    if (krb5_unparse_name(KerberosContext, peerprncpl, &peername))
     {
       cupsdLogMessage(CUPSD_LOG_ERROR,
 		      "Unable to get Kerberos name for UID %d",
