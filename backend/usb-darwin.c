@@ -723,7 +723,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
         }
 
-	if (iostatus || bytes < 0)
+	if (iostatus)
 	{
 	 /*
 	  * Write error - bail if we don't see an error we can retry...

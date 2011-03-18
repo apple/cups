@@ -34,6 +34,11 @@
 				274FF648133335A300317ECB /* PBXTargetDependency */,
 				274FF65E13333A3400317ECB /* PBXTargetDependency */,
 				274FF67213333AE400317ECB /* PBXTargetDependency */,
+				724379531333FECE009631B9 /* PBXTargetDependency */,
+				724379111333E4EA009631B9 /* PBXTargetDependency */,
+				7243792B1333E962009631B9 /* PBXTargetDependency */,
+				7243793F1333FD23009631B9 /* PBXTargetDependency */,
+				724379C31333FF7D009631B9 /* PBXTargetDependency */,
 			);
 			name = All;
 			productName = All;
@@ -279,6 +284,28 @@
 		72220FB913330BCE00FCA411 /* type.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220FB513330BCE00FCA411 /* type.c */; };
 		72220FBA13330BEE00FCA411 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
 		72220FBF13330C1000FCA411 /* libcupsmime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220FAC13330B2200FCA411 /* libcupsmime.dylib */; };
+		724379081333E4A5009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		7243790D1333E4E3009631B9 /* ipp.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790A1333E4E3009631B9 /* ipp.c */; };
+		7243790E1333E4E3009631B9 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790B1333E4E3009631B9 /* network.c */; };
+		7243790F1333E4E3009631B9 /* snmp-supplies.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790C1333E4E3009631B9 /* snmp-supplies.c */; };
+		724379131333E516009631B9 /* runloop.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379121333E516009631B9 /* runloop.c */; };
+		724379221333E928009631B9 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790B1333E4E3009631B9 /* network.c */; };
+		724379231333E928009631B9 /* runloop.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379121333E516009631B9 /* runloop.c */; };
+		724379241333E928009631B9 /* snmp-supplies.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790C1333E4E3009631B9 /* snmp-supplies.c */; };
+		724379271333E93D009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		724379291333E952009631B9 /* lpd.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379281333E952009631B9 /* lpd.c */; };
+		7243793B1333FB9D009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		7243793D1333FD19009631B9 /* socket.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243793C1333FD19009631B9 /* socket.c */; };
+		724379401333FD4B009631B9 /* network.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790B1333E4E3009631B9 /* network.c */; };
+		724379411333FD4B009631B9 /* runloop.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379121333E516009631B9 /* runloop.c */; };
+		724379421333FD4B009631B9 /* snmp-supplies.c in Sources */ = {isa = PBXBuildFile; fileRef = 7243790C1333E4E3009631B9 /* snmp-supplies.c */; };
+		724379511333FEBB009631B9 /* dnssd.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379501333FEBB009631B9 /* dnssd.c */; };
+		724379561333FF04009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		724379661333FF3B009631B9 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		724379681333FF3B009631B9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 724379671333FF3B009631B9 /* IOKit.framework */; };
+		724379C71333FFC7009631B9 /* usb.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379C51333FFC7009631B9 /* usb.c */; };
+		724379C91333FFF3009631B9 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 724379C81333FFF3009631B9 /* CoreFoundation.framework */; };
+		724379CB1334000E009631B9 /* ieee1284.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379CA1334000E009631B9 /* ieee1284.c */; };
 		7263EE2713330D2800BA4D44 /* libpam.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2613330D2800BA4D44 /* libpam.dylib */; };
 		7263EE2C13330D5C00BA4D44 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2913330D5C00BA4D44 /* Kerberos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7263EE2D13330D5C00BA4D44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2A13330D5C00BA4D44 /* Security.framework */; };
@@ -453,6 +480,76 @@
 			remoteGlobalIDString = 72220FAB13330B2200FCA411;
 			remoteInfo = libcupsmime;
 		};
+		724379061333E49B009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		724379101333E4EA009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 724378FC1333E43E009631B9;
+			remoteInfo = ipp;
+		};
+		724379251333E932009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		7243792A1333E962009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 724379171333E532009631B9;
+			remoteInfo = lpd;
+		};
+		724379391333FB95009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		7243793E1333FD23009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7243792F1333FB85009631B9;
+			remoteInfo = socket;
+		};
+		724379521333FECE009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 724379461333FEA9009631B9;
+			remoteInfo = dnssd;
+		};
+		724379541333FEFE009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		724379641333FF2E009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		724379C21333FF7D009631B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7243795A1333FF1D009631B9;
+			remoteInfo = usb;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -520,6 +617,51 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		72220F5913330A5A00FCA411 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		724378FB1333E43E009631B9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		724379161333E532009631B9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		7243792E1333FB85009631B9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		724379451333FEA9009631B9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		724379591333FF1D009631B9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -704,6 +846,24 @@
 		72220FB313330BCE00FCA411 /* mime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mime.c; path = ../scheduler/mime.c; sourceTree = "<group>"; };
 		72220FB413330BCE00FCA411 /* mime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mime.h; path = ../scheduler/mime.h; sourceTree = "<group>"; };
 		72220FB513330BCE00FCA411 /* type.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = type.c; path = ../scheduler/type.c; sourceTree = "<group>"; };
+		724378FD1333E43E009631B9 /* ipp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ipp; sourceTree = BUILT_PRODUCTS_DIR; };
+		724379091333E4E3009631B9 /* backend-private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "backend-private.h"; path = "../backend/backend-private.h"; sourceTree = "<group>"; };
+		7243790A1333E4E3009631B9 /* ipp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ipp.c; path = ../backend/ipp.c; sourceTree = "<group>"; };
+		7243790B1333E4E3009631B9 /* network.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = network.c; path = ../backend/network.c; sourceTree = "<group>"; };
+		7243790C1333E4E3009631B9 /* snmp-supplies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "snmp-supplies.c"; path = "../backend/snmp-supplies.c"; sourceTree = "<group>"; };
+		724379121333E516009631B9 /* runloop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = runloop.c; path = ../backend/runloop.c; sourceTree = "<group>"; };
+		724379181333E532009631B9 /* lpd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lpd; sourceTree = BUILT_PRODUCTS_DIR; };
+		724379281333E952009631B9 /* lpd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lpd.c; path = ../backend/lpd.c; sourceTree = "<group>"; };
+		724379301333FB85009631B9 /* socket */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = socket; sourceTree = BUILT_PRODUCTS_DIR; };
+		7243793C1333FD19009631B9 /* socket.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = socket.c; path = ../backend/socket.c; sourceTree = "<group>"; };
+		724379471333FEA9009631B9 /* dnssd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = dnssd; sourceTree = BUILT_PRODUCTS_DIR; };
+		724379501333FEBB009631B9 /* dnssd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dnssd.c; path = ../backend/dnssd.c; sourceTree = "<group>"; };
+		7243795B1333FF1D009631B9 /* usb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = usb; sourceTree = BUILT_PRODUCTS_DIR; };
+		724379671333FF3B009631B9 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
+		724379C41333FFC7009631B9 /* usb-darwin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "usb-darwin.c"; path = "../backend/usb-darwin.c"; sourceTree = "<group>"; };
+		724379C51333FFC7009631B9 /* usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = usb.c; path = ../backend/usb.c; sourceTree = "<group>"; };
+		724379C81333FFF3009631B9 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		724379CA1334000E009631B9 /* ieee1284.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ieee1284.c; path = ../backend/ieee1284.c; sourceTree = "<group>"; };
 		7263EE2613330D2800BA4D44 /* libpam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpam.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libpam.dylib; sourceTree = DEVELOPER_DIR; };
 		7263EE2913330D5C00BA4D44 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Kerberos.framework; sourceTree = DEVELOPER_DIR; };
 		7263EE2A13330D5C00BA4D44 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
@@ -845,6 +1005,48 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		724378FA1333E43E009631B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379081333E4A5009631B9 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379151333E532009631B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379271333E93D009631B9 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7243792D1333FB85009631B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7243793B1333FB9D009631B9 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379441333FEA9009631B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379561333FF04009631B9 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379581333FF1D009631B9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379C91333FFF3009631B9 /* CoreFoundation.framework in Frameworks */,
+				724379681333FF3B009631B9 /* IOKit.framework in Frameworks */,
+				724379661333FF3B009631B9 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -916,6 +1118,11 @@
 				274FF66313333A9B00317ECB /* cups-polld */,
 				274FF67813333B2F00317ECB /* cupsfilter */,
 				273BF6BD1333B5000022CAAB /* testcups */,
+				724378FD1333E43E009631B9 /* ipp */,
+				724379181333E532009631B9 /* lpd */,
+				724379301333FB85009631B9 /* socket */,
+				724379471333FEA9009631B9 /* dnssd */,
+				7243795B1333FF1D009631B9 /* usb */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1076,7 +1283,6 @@
 		72220FB113330B4A00FCA411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				72220EAE1333047D00FCA411 /* libcups.dylib */,
 				72220FAC13330B2200FCA411 /* libcupsmime.dylib */,
 				274FF5EE133330C800317ECB /* libcupsppdc.dylib */,
 				7263EE3913330EC500BA4D44 /* libldap.dylib */,
@@ -1101,9 +1307,30 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		724378F71333E3CE009631B9 /* backends */ = {
+			isa = PBXGroup;
+			children = (
+				724379091333E4E3009631B9 /* backend-private.h */,
+				724379501333FEBB009631B9 /* dnssd.c */,
+				724379CA1334000E009631B9 /* ieee1284.c */,
+				7243790A1333E4E3009631B9 /* ipp.c */,
+				724379281333E952009631B9 /* lpd.c */,
+				7243790B1333E4E3009631B9 /* network.c */,
+				724379121333E516009631B9 /* runloop.c */,
+				7243790C1333E4E3009631B9 /* snmp-supplies.c */,
+				7243793C1333FD19009631B9 /* socket.c */,
+				724379C51333FFC7009631B9 /* usb.c */,
+				724379C41333FFC7009631B9 /* usb-darwin.c */,
+			);
+			name = backends;
+			sourceTree = "<group>";
+		};
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
+				724379C81333FFF3009631B9 /* CoreFoundation.framework */,
+				724379671333FF3B009631B9 /* IOKit.framework */,
+				72220EAE1333047D00FCA411 /* libcups.dylib */,
 				273BF6D51333B5F60022CAAB /* libresolv.dylib */,
 				273BF6D61333B5F60022CAAB /* SystemConfiguration.framework */,
 				273BF6D11333B5C30022CAAB /* Kerberos.framework */,
@@ -1118,6 +1345,7 @@
 				72220EB41333050100FCA411 /* libcups */,
 				72220FB013330B3400FCA411 /* libcupsmime */,
 				274FF5F41333310400317ECB /* libcupsppdc */,
+				724378F71333E3CE009631B9 /* backends */,
 				274FF67313333B0A00317ECB /* commands */,
 				72220F5D13330A5A00FCA411 /* cupsd */,
 				274FF5D513332C2C00317ECB /* daemon */,
@@ -1433,6 +1661,96 @@
 			productReference = 72220FAC13330B2200FCA411 /* libcupsmime.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		724378FC1333E43E009631B9 /* ipp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 724379031333E43E009631B9 /* Build configuration list for PBXNativeTarget "ipp" */;
+			buildPhases = (
+				724378F91333E43E009631B9 /* Sources */,
+				724378FA1333E43E009631B9 /* Frameworks */,
+				724378FB1333E43E009631B9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				724379071333E49B009631B9 /* PBXTargetDependency */,
+			);
+			name = ipp;
+			productName = ipp;
+			productReference = 724378FD1333E43E009631B9 /* ipp */;
+			productType = "com.apple.product-type.tool";
+		};
+		724379171333E532009631B9 /* lpd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7243791E1333E532009631B9 /* Build configuration list for PBXNativeTarget "lpd" */;
+			buildPhases = (
+				724379141333E532009631B9 /* Sources */,
+				724379151333E532009631B9 /* Frameworks */,
+				724379161333E532009631B9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				724379261333E932009631B9 /* PBXTargetDependency */,
+			);
+			name = lpd;
+			productName = lpd;
+			productReference = 724379181333E532009631B9 /* lpd */;
+			productType = "com.apple.product-type.tool";
+		};
+		7243792F1333FB85009631B9 /* socket */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 724379361333FB85009631B9 /* Build configuration list for PBXNativeTarget "socket" */;
+			buildPhases = (
+				7243792C1333FB85009631B9 /* Sources */,
+				7243792D1333FB85009631B9 /* Frameworks */,
+				7243792E1333FB85009631B9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7243793A1333FB95009631B9 /* PBXTargetDependency */,
+			);
+			name = socket;
+			productName = socket;
+			productReference = 724379301333FB85009631B9 /* socket */;
+			productType = "com.apple.product-type.tool";
+		};
+		724379461333FEA9009631B9 /* dnssd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7243794D1333FEA9009631B9 /* Build configuration list for PBXNativeTarget "dnssd" */;
+			buildPhases = (
+				724379431333FEA9009631B9 /* Sources */,
+				724379441333FEA9009631B9 /* Frameworks */,
+				724379451333FEA9009631B9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				724379551333FEFE009631B9 /* PBXTargetDependency */,
+			);
+			name = dnssd;
+			productName = dnssd;
+			productReference = 724379471333FEA9009631B9 /* dnssd */;
+			productType = "com.apple.product-type.tool";
+		};
+		7243795A1333FF1D009631B9 /* usb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 724379611333FF1D009631B9 /* Build configuration list for PBXNativeTarget "usb" */;
+			buildPhases = (
+				724379571333FF1D009631B9 /* Sources */,
+				724379581333FF1D009631B9 /* Frameworks */,
+				724379591333FF1D009631B9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				724379651333FF2E009631B9 /* PBXTargetDependency */,
+			);
+			name = usb;
+			productName = usb;
+			productReference = 7243795B1333FF1D009631B9 /* usb */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1466,7 +1784,12 @@
 				274FF64E133339C400317ECB /* cups-lpd */,
 				274FF66213333A9B00317ECB /* cups-polld */,
 				274FF67713333B2F00317ECB /* cupsfilter */,
+				724379461333FEA9009631B9 /* dnssd */,
+				724378FC1333E43E009631B9 /* ipp */,
+				724379171333E532009631B9 /* lpd */,
+				7243792F1333FB85009631B9 /* socket */,
 				273BF6BC1333B5000022CAAB /* testcups */,
+				7243795A1333FF1D009631B9 /* usb */,
 			);
 		};
 /* End PBXProject section */
@@ -1703,6 +2026,56 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		724378F91333E43E009631B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7243790D1333E4E3009631B9 /* ipp.c in Sources */,
+				7243790E1333E4E3009631B9 /* network.c in Sources */,
+				7243790F1333E4E3009631B9 /* snmp-supplies.c in Sources */,
+				724379131333E516009631B9 /* runloop.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379141333E532009631B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379221333E928009631B9 /* network.c in Sources */,
+				724379231333E928009631B9 /* runloop.c in Sources */,
+				724379241333E928009631B9 /* snmp-supplies.c in Sources */,
+				724379291333E952009631B9 /* lpd.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7243792C1333FB85009631B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379401333FD4B009631B9 /* network.c in Sources */,
+				724379411333FD4B009631B9 /* runloop.c in Sources */,
+				724379421333FD4B009631B9 /* snmp-supplies.c in Sources */,
+				7243793D1333FD19009631B9 /* socket.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379431333FEA9009631B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379511333FEBB009631B9 /* dnssd.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		724379571333FF1D009631B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				724379C71333FFC7009631B9 /* usb.c in Sources */,
+				724379CB1334000E009631B9 /* ieee1284.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1820,6 +2193,56 @@
 			isa = PBXTargetDependency;
 			target = 72220FAB13330B2200FCA411 /* libcupsmime */;
 			targetProxy = 72220FBD13330C0B00FCA411 /* PBXContainerItemProxy */;
+		};
+		724379071333E49B009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 724379061333E49B009631B9 /* PBXContainerItemProxy */;
+		};
+		724379111333E4EA009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 724378FC1333E43E009631B9 /* ipp */;
+			targetProxy = 724379101333E4EA009631B9 /* PBXContainerItemProxy */;
+		};
+		724379261333E932009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 724379251333E932009631B9 /* PBXContainerItemProxy */;
+		};
+		7243792B1333E962009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 724379171333E532009631B9 /* lpd */;
+			targetProxy = 7243792A1333E962009631B9 /* PBXContainerItemProxy */;
+		};
+		7243793A1333FB95009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 724379391333FB95009631B9 /* PBXContainerItemProxy */;
+		};
+		7243793F1333FD23009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7243792F1333FB85009631B9 /* socket */;
+			targetProxy = 7243793E1333FD23009631B9 /* PBXContainerItemProxy */;
+		};
+		724379531333FECE009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 724379461333FEA9009631B9 /* dnssd */;
+			targetProxy = 724379521333FECE009631B9 /* PBXContainerItemProxy */;
+		};
+		724379551333FEFE009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 724379541333FEFE009631B9 /* PBXContainerItemProxy */;
+		};
+		724379651333FF2E009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 724379641333FF2E009631B9 /* PBXContainerItemProxy */;
+		};
+		724379C31333FF7D009631B9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7243795A1333FF1D009631B9 /* usb */;
+			targetProxy = 724379C21333FF7D009631B9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2391,6 +2814,229 @@
 			};
 			name = Release;
 		};
+		724379041333E43E009631B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_MODE_FLAG = "u+rwX,go-rwX";
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		724379051333E43E009631B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_MODE_FLAG = "u+rwX,go-rwX";
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7243791F1333E532009631B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		724379201333E532009631B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		724379371333FB85009631B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		724379381333FB85009631B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7243794E1333FEA9009631B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		7243794F1333FEA9009631B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/libexec/cups/backend;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		724379621333FF1D009631B9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../backend\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		724379631333FF1D009631B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../backend\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		72BF963C1333042100B1EAD7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2431,6 +3077,7 @@
 				273BF6C51333B5000022CAAB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		273BF6DA1333B6270022CAAB /* Build configuration list for PBXAggregateTarget "Tests" */ = {
 			isa = XCConfigurationList;
@@ -2439,6 +3086,7 @@
 				273BF6DC1333B6270022CAAB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		274FF5D213332B1F00317ECB /* Build configuration list for PBXNativeTarget "cups-driverd" */ = {
 			isa = XCConfigurationList;
@@ -2547,6 +3195,46 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		724379031333E43E009631B9 /* Build configuration list for PBXNativeTarget "ipp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				724379041333E43E009631B9 /* Debug */,
+				724379051333E43E009631B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		7243791E1333E532009631B9 /* Build configuration list for PBXNativeTarget "lpd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7243791F1333E532009631B9 /* Debug */,
+				724379201333E532009631B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		724379361333FB85009631B9 /* Build configuration list for PBXNativeTarget "socket" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				724379371333FB85009631B9 /* Debug */,
+				724379381333FB85009631B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		7243794D1333FEA9009631B9 /* Build configuration list for PBXNativeTarget "dnssd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7243794E1333FEA9009631B9 /* Debug */,
+				7243794F1333FEA9009631B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		724379611333FF1D009631B9 /* Build configuration list for PBXNativeTarget "usb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				724379621333FF1D009631B9 /* Debug */,
+				724379631333FF1D009631B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */ = {
 			isa = XCConfigurationList;
