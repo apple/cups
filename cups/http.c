@@ -562,6 +562,9 @@ httpCopyCredentials(
 
 #  elif defined(HAVE_SSPISSL)
   return (-1);
+
+#  else
+  return (-1);
 #  endif /* HAVE_LIBSSL */
 }
 
@@ -3653,7 +3656,7 @@ http_send(http_t       *http,	/* I - Connection to server */
 
 
 #ifdef HAVE_SSL
-#  ifdef HAVE_CDSASSL
+#  if defined(HAVE_CDSASSL) && defined(HAVE_SECCERTIFICATECOPYDATA)
 /*
  * 'http_set_credentials()' - Set the SSL/TLS credentials.
  */
@@ -3744,7 +3747,7 @@ http_set_credentials(http_t *http)	/* I - Connection to server */
 
   return (error);
 }
-#  endif /* HAVE_CDSASSL */
+#  endif /* HAVE_CDSASSL && HAVE_SECCERTIFICATECOPYDATA */
 
 
 /*
