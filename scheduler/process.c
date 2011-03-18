@@ -382,18 +382,20 @@ cupsdStartProcess(
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
 		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "%s%s \"%s\" has insecure permissions (%d/0%o).",
+                    "%s%s \"%s\" has insecure permissions "
+		    "(0%o/uid=%d/gid=%d).",
 		    job && job->printer ? job->printer->name : "",
 		    job && job->printer ? ": Printer driver" : "Program",
-		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
+		    command, commandinfo.st_mode,
+		    (int)commandinfo.st_uid, (int)commandinfo.st_gid);
 
     if (job && job->printer)
     {
       if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		      "Printer driver \"%s\" has insecure permissions "
-		      "(%d/0%o).", command,
-		      (int)commandinfo.st_uid, commandinfo.st_mode);
+		      "(0%o/uid=%d/gid=%d).", command, commandinfo.st_mode,
+		      (int)commandinfo.st_uid, (int)commandinfo.st_gid);
     }
 
     errno = EPERM;
@@ -413,29 +415,33 @@ cupsdStartProcess(
 		    command, argv, envp, infd, outfd, errfd, backfd, sidefd,
 		    root, profile, job, job ? job->id : 0, pid, *pid);
     cupsdLogMessage(CUPSD_LOG_ERROR,
-                    "%s%s \"%s\" does not have execute permissions (%d/0%o).",
+                    "%s%s \"%s\" does not have execute permissions "
+		    "(0%o/uid=%d/gid=%d).",
 		    job && job->printer ? job->printer->name : "",
 		    job && job->printer ? ": Printer driver" : "Program",
-		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
+		    command, commandinfo.st_mode, (int)commandinfo.st_uid,
+		    (int)commandinfo.st_gid);
 
     errno = EPERM;
     return (0);
   }
-  else if (!RunUser && (commandinfo.st_mode & S_IWGRP))
+  else if (!RunUser && commandinfo.st_gid && (commandinfo.st_mode & S_IWGRP))
   {
     cupsdLogMessage(CUPSD_LOG_WARN,
-                    "%s%s \"%s\" has insecure permissions (%d/0%o).",
+                    "%s%s \"%s\" has insecure permissions "
+		    "(0%o/uid=%d/gid=%d).",
 		    job && job->printer ? job->printer->name : "",
 		    job && job->printer ? ": Printer driver" : "Program",
-		    command, (int)commandinfo.st_uid, commandinfo.st_mode);
+		    command, commandinfo.st_mode,
+		    (int)commandinfo.st_uid, (int)commandinfo.st_gid);
 
     if (job && job->printer)
     {
       if (cupsdSetPrinterReasons(job->printer, "+cups-insecure-filter-warning"))
 	cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
 		      "Printer driver \"%s\" has insecure permissions "
-		      "(%d/0%o).", command, (int)commandinfo.st_uid,
-		      commandinfo.st_mode);
+		      "(0%o/uid=%d/gid=%d).", command, commandinfo.st_mode,
+		      (int)commandinfo.st_uid, (int)commandinfo.st_gid);
     }
   }
 

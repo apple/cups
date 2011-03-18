@@ -971,6 +971,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * Now create processes for all of the filters...
   */
 
+  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			               "cups-insecure-filter-warning");
+
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -1164,16 +1167,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);
-
- /*
-  * If we get here than we are able to run the printer driver filters, so clear
-  * the missing and insecure warnings...
-  */
-
-  if (cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			                   "cups-insecure-filter-warning"))
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-                  "Printer drivers now functional.");
 
   return;
 

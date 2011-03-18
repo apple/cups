@@ -3590,11 +3590,13 @@ add_printer_filter(
       */
 
       if (fileinfo.st_uid ||
-          (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
+          (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
+          (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
       {
 	snprintf(p->state_message, sizeof(p->state_message),
-		 "Printer driver \"%s\" has insecure permissions (%d/0%o).",
-		 filename, (int)fileinfo.st_uid, fileinfo.st_mode);
+		 "Printer driver \"%s\" has insecure permissions "
+		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
@@ -3612,12 +3614,13 @@ add_printer_filter(
 
 	if (!stat(filename, &fileinfo) &&
 	    (fileinfo.st_uid ||
+	     (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
 	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
 	{
 	  snprintf(p->state_message, sizeof(p->state_message),
 		   "Printer driver directory \"%s\" has insecure permissions "
-		   "(%d/0%o).", filename, (int)fileinfo.st_uid,
-		   fileinfo.st_mode);
+		   "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+		   (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
 	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
