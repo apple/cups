@@ -495,7 +495,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     cupsSetUser(username);
   }
-  else if (!getuid())
+  else
   {
    /*
     * Try loading authentication information from the environment.
