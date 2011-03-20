@@ -156,10 +156,19 @@ static const _apple_language_locale_t apple_language_locale[] =
  * Local functions...
  */
 
+
 #ifdef __APPLE__
 static const char	*appleLangDefault(void);
 #  ifdef CUPS_BUNDLEDIR
-static cups_array_t	*appleMessageLoad(const char *locale);
+#    ifndef CF_RETURNS_RETAINED
+#      if __has_feature(attribute_cf_returns_retained)
+#        define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
+#      else
+#        define CF_RETURNS_RETAINED
+#      endif /* __has_feature(attribute_cf_returns_retained) */
+#    endif /* !CF_RETURNED_RETAINED */
+static cups_array_t	*appleMessageLoad(const char *locale)
+			CF_RETURNS_RETAINED;
 #  endif /* CUPS_BUNDLEDIR */
 #endif /* __APPLE__ */
 static cups_lang_t	*cups_cache_lookup(const char *name,
@@ -1252,21 +1261,12 @@ appleLangDefault(void)
 
 
 #  ifdef CUPS_BUNDLEDIR
-#    ifndef CF_RETURNS_RETAINED
-#      if __has_feature(attribute_cf_returns_retained)
-#        define CF_RETURNS_RETAINED __attribute__((cf_returns_retained))
-#      else
-#        define CF_RETURNS_RETAINED
-#      endif /* __has_feature(attribute_cf_returns_retained) */
-#    endif /* !CF_RETURNED_RETAINED */
-
 /*
  * 'appleMessageLoad()' - Load a message catalog from a localizable bundle.
  */
 
 static cups_array_t *			/* O - Message catalog */
 appleMessageLoad(const char *locale)	/* I - Locale ID */
-CF_RETURNS_RETAINED
 {
   char			filename[1024],	/* Path to cups.strings file */
 			applelang[256];	/* Apple language ID */
@@ -1323,6 +1323,13 @@ CF_RETURNS_RETAINED
     stream = CFReadStreamCreateWithFile(kCFAllocatorDefault, url);
     if (stream)
     {
+     /*
+      * Read the property list containing the localization data.
+      *
+      * NOTE: This code currently generates a clang "potential leak"
+      * warning, but the object is released in _cupsMessageFree().
+      */
+
       CFReadStreamOpen(stream);
 
 #ifdef DEBUG
@@ -1338,6 +1345,7 @@ CF_RETURNS_RETAINED
                            kCFStringEncodingUTF8);
         DEBUG_printf(("1appleMessageLoad: %s", filename));
 
+	CFRelease(msg);
         CFRelease(error);
       }
 

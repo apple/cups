@@ -3,7 +3,7 @@
  *
  *   HTTP address list routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -284,7 +284,7 @@ httpAddrGetList(const char *hostname,	/* I - Hostname, IP address, or NULL for p
     struct addrinfo	hints,		/* Address lookup hints */
 			*results,	/* Address lookup results */
 			*current;	/* Current result */
-    char		ipv6[1024],	/* IPv6 address */
+    char		ipv6[64],	/* IPv6 address */
 			*ipv6zone;	/* Pointer to zone separator */
     int			ipv6len;	/* Length of IPv6 address */
     int			error;		/* getaddrinfo() error */

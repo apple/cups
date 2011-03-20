@@ -723,7 +723,7 @@ print_device(const char *uri,		/* I - Device URI */
 	  iostatus = (*g.classdriver)->WritePipe(g.classdriver, (UInt8*)print_ptr, &bytes, 0);
         }
 
-	if (iostatus || bytes < 0)
+	if (iostatus)
 	{
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
@@ -1403,18 +1403,32 @@ static kern_return_t load_classdriver(CFStringRef	    driverPath,
 
   if (stat(bundlestr, &bundleinfo))
   {
-    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": %s\n",
+    fprintf(stderr, "DEBUG: Class driver \"%s\" not available: %s\n",
 	    bundlestr, strerror(errno));
-    if (errno == ENOENT)
+    fputs("STATE: +cups-missing-filter-warning\n", stderr);
+
+    if (errno == ENOENT && driverPath)
       return (load_classdriver(NULL, intf, printerDriver));
     else
       return (kr);
   }
-  else if (bundleinfo.st_mode & S_IWOTH)
+  else if (bundleinfo.st_uid ||
+           (bundleinfo.st_gid && (bundleinfo.st_mode & S_IWGRP)) ||
+	   (bundleinfo.st_mode & S_IWOTH))
   {
-    fprintf(stderr, "DEBUG: Unable to load class driver \"%s\": insecure file "
-		    "permissions (0%o)\n", bundlestr, bundleinfo.st_mode);
-    return (kr);
+    fprintf(stderr, "DEBUG: Class driver \"%s\" has insecure file "
+		    "permissions (0%o/uid=%d/gid=%d).\n", bundlestr,
+		    bundleinfo.st_mode, (int)bundleinfo.st_uid,
+		    (int)bundleinfo.st_gid);
+    fputs("STATE: +cups-insecure-filter-warning\n", stderr);
+
+    if (bundleinfo.st_uid || (bundleinfo.st_mode & S_IWOTH))
+    {
+      if (driverPath)
+        return (load_classdriver(NULL, intf, printerDriver));
+      else
+        return (kr);
+    }
   }
 
  /*

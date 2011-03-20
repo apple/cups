@@ -182,6 +182,8 @@ extern void	cupsdCheckProcess(void);
 extern void	cupsdClearString(char **s);
 extern void	cupsdFreeStrings(cups_array_t **a);
 extern void	cupsdHoldSignals(void);
+extern char	*cupsdMakeUUID(const char *name, int number,
+			       char *buffer, size_t bufsize);
 extern void	cupsdReleaseSignals(void);
 extern void	cupsdSetString(char **s, const char *v);
 extern void	cupsdSetStringf(char **s, const char *f, ...)

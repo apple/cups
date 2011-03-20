@@ -391,6 +391,7 @@ div.contents ul.subcontents li {
 	<li><a href="#PASSWORDS_AND_AUTHENTICATION">Passwords and Authentication</a></li>
 </ul></li>
 <li><a href="#FUNCTIONS">Functions</a><ul class="code">
+	<li><a href="#appleGetPaperSize" title="Get the default paper size.">appleGetPaperSize</a></li>
 	<li><a href="#cupsAddDest" title="Add a destination to the list of destinations.">cupsAddDest</a></li>
 	<li><a href="#cupsAddOption" title="Add an option to an option array.">cupsAddOption</a></li>
 	<li><a href="#cupsAdminCreateWindowsPPD" title="Create the Windows PPD file for a printer.">cupsAdminCreateWindowsPPD</a></li>
@@ -925,6 +926,22 @@ fields for the username and password. The username should default to the
 string returned by the <a href="#cupsUser"><code>cupsUser</code></a>
 function.</p>
 <h2 class="title"><a name="FUNCTIONS">Functions</a></h2>
+<h3 class="function"><a name="appleGetPaperSize">appleGetPaperSize</a></h3>
+<p class="description">Get the default paper size.</p>
+<p class="code">
+char *appleGetPaperSize (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;char *name,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;int namesize<br>
+);</p>
+<h4 class="parameters">Parameters</h4>
+<dl>
+<dt>name</dt>
+<dd class="description">Paper size name buffer</dd>
+<dt>namesize</dt>
+<dd class="description">Size of buffer</dd>
+</dl>
+<h4 class="returnvalue">Return Value</h4>
+<p class="description">Default paper size</p>
 <h3 class="function"><a name="cupsAddDest">cupsAddDest</a></h3>
 <p class="description">Add a destination to the list of destinations.</p>
 <p class="code">

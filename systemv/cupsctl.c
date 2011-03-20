@@ -144,7 +144,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (cupsGetOption("Listen", num_settings, settings) ||
       cupsGetOption("Port", num_settings, settings))
   {
-    _cupsLangPuts(stderr, _("cupsctl: Cannot set Listen or Port directly.\n"));
+    _cupsLangPuts(stderr, _("cupsctl: Cannot set Listen or Port directly."));
     return (1);
   }
 

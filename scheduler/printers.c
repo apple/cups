@@ -107,7 +107,8 @@ cupsd_printer_t *			/* O - New printer */
 cupsdAddPrinter(const char *name)	/* I - Name of printer */
 {
   cupsd_printer_t	*p;		/* New printer */
-  char			uri[1024];	/* Printer URI */
+  char			uri[1024],	/* Printer URI */
+			uuid[64];	/* Printer UUID */
 
 
  /*
@@ -134,6 +135,7 @@ cupsdAddPrinter(const char *name)	/* I - Name of printer */
   httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
 		   ServerName, RemotePort, "/printers/%s", name);
   cupsdSetString(&p->uri, uri);
+  cupsdSetString(&p->uuid, cupsdMakeUUID(name, 0, uuid, sizeof(uuid)));
   cupsdSetDeviceURI(p, "file:///dev/null");
 
   p->state      = IPP_PRINTER_STOPPED;
@@ -1015,6 +1017,14 @@ cupsdLoadAllPrinters(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of printers.conf.", linenum);
     }
+    else if (!strcasecmp(line, "UUID"))
+    {
+      if (value && !strncmp(value, "urn:uuid:", 9))
+        cupsdSetString(&(p->uuid), value);
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Bad UUID on line %d of printers.conf.", linenum);
+    }
     else if (!strcasecmp(line, "AuthInfoRequired"))
     {
       if (!cupsdSetAuthInfoRequired(p, value, NULL))
@@ -1490,6 +1500,8 @@ cupsdSaveAllPrinters(void)
       cupsFilePrintf(fp, "<DefaultPrinter %s>\n", printer->name);
     else
       cupsFilePrintf(fp, "<Printer %s>\n", printer->name);
+
+    cupsFilePrintf(fp, "UUID %s\n", printer->uuid);
 
     if (printer->num_auth_info_required > 0)
     {
@@ -2180,6 +2192,8 @@ cupsdSetPrinterAttrs(cupsd_printer_t *p)/* I - Printer to setup */
                NULL, p->location ? p->location : "");
   ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_TEXT, "printer-info",
                NULL, p->info ? p->info : "");
+  ippAddString(p->attrs, IPP_TAG_PRINTER, IPP_TAG_URI, "printer-uuid", NULL,
+	       p->uuid);
 
   if (cupsArrayCount(p->users) > 0)
   {
@@ -3576,11 +3590,13 @@ add_printer_filter(
       */
 
       if (fileinfo.st_uid ||
-          (fileinfo.st_mode & (S_ISUID | S_IWGRP | S_IWOTH)) != 0)
+          (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
+          (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0)
       {
 	snprintf(p->state_message, sizeof(p->state_message),
-		 "Printer driver \"%s\" has insecure permissions (%d/0%o).",
-		 filename, (int)fileinfo.st_uid, fileinfo.st_mode);
+		 "Printer driver \"%s\" has insecure permissions "
+		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
@@ -3598,12 +3614,13 @@ add_printer_filter(
 
 	if (!stat(filename, &fileinfo) &&
 	    (fileinfo.st_uid ||
+	     (fileinfo.st_gid && (fileinfo.st_mode & S_IWGRP)) ||
 	     (fileinfo.st_mode & (S_ISUID | S_IWOTH)) != 0))
 	{
 	  snprintf(p->state_message, sizeof(p->state_message),
 		   "Printer driver directory \"%s\" has insecure permissions "
-		   "(%d/0%o).", filename, (int)fileinfo.st_uid,
-		   fileinfo.st_mode);
+		   "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
+		   (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
 	  cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 

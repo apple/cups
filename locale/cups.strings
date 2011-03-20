@@ -44,6 +44,8 @@
 
 "\tPrinter types: unknown" = "\tPrinter types: unknown";
 
+"\tStatus: %s" = "\tStatus: %s";
+
 "\tUsers allowed:" = "\tUsers allowed:";
 
 "\tUsers denied:" = "\tUsers denied:";
@@ -1064,7 +1066,7 @@
 
 "60dpi" = "60dpi";
 
-"60x720dpi" = "60x720dpi";
+"60x72dpi" = "60x72dpi";
 
 "65" = "65";
 
@@ -1236,7 +1238,7 @@
 
 "Bad OrderDependency" = "Bad OrderDependency";
 
-"Bad PWG mapping file." = "Bad PWG mapping file.";
+"Bad PPD cache file." = "Bad PPD cache file.";
 
 "Bad Request" = "Bad Request";
 
@@ -1353,6 +1355,8 @@
 "Cancel RSS Subscription" = "Cancel RSS Subscription";
 
 "Canceling print job." = "Canceling print job.";
+
+"Cassette" = "Cassette";
 
 "Change Settings" = "Change Settings";
 
@@ -1699,6 +1703,8 @@
 "Medium" = "Medium";
 
 "Memory allocation error" = "Memory allocation error";
+
+"Missing CloseGroup" = "Missing CloseGroup";
 
 "Missing PPD-Adobe-4.x header" = "Missing PPD-Adobe-4.x header";
 
@@ -2218,6 +2224,8 @@
 
 "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#)." = "The subscription name may not contain spaces, slashes (/), question marks (?), or the pound sign (#).";
 
+"The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it." = "The web interface is currently disabled. Run \"cupsctl WebInterface=yes\" to enable it.";
+
 "The which-jobs value \"%s\" is not supported." = "The which-jobs value \"%s\" is not supported.";
 
 "There are too many subscriptions." = "There are too many subscriptions.";
@@ -2227,6 +2235,8 @@
 "There was an unrecoverable USB error." = "There was an unrecoverable USB error.";
 
 "Thermal Transfer Media" = "Thermal Transfer Media";
+
+"This printer does not conform to the IPP standard and may not work." = "This printer does not conform to the IPP standard and may not work.";
 
 "Title: " = "Title: ";
 
@@ -2382,9 +2392,9 @@
 
 "Unable to install Windows 9x printer driver files (%d)" = "Unable to install Windows 9x printer driver files (%d)";
 
-"Unable to locate network printer \"%s\"." = "Unable to locate network printer \"%s\".";
-
 "Unable to locate printer \"%s\"." = "Unable to locate printer \"%s\".";
+
+"Unable to locate printer." = "Unable to locate printer.";
 
 "Unable to modify class:" = "Unable to modify class:";
 
@@ -2566,6 +2576,8 @@
 
 "Warning, no Windows 2000 printer drivers are installed" = "Warning, no Windows 2000 printer drivers are installed";
 
+"Web Interface is Disabled" = "Web Interface is Disabled";
+
 "Yes" = "Yes";
 
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>." = "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>.";
@@ -2591,6 +2603,8 @@
 "cups-driverd failed to execute." = "cups-driverd failed to execute.";
 
 "cupsaddsmb: No PPD file for printer \"%s\" - %s" = "cupsaddsmb: No PPD file for printer \"%s\" - %s";
+
+"cupsctl: Cannot set Listen or Port directly." = "cupsctl: Cannot set Listen or Port directly.";
 
 "cupsctl: Unable to connect to server: %s" = "cupsctl: Unable to connect to server: %s";
 

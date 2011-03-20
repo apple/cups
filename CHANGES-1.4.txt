@@ -9,6 +9,8 @@ CHANGES IN CUPS V1.4.7
 	  STR #3755, STR #3769, STR #3783)
 	- Configure script fixes (STR #3659, STR #3691)
 	- Compilation fixes (STR #3718, STR #3771, STR #3774)
+	- httpAddrString() did not return a URI-style IPv6 numeric address
+	  (STR #3814)
 	- Fixed an issue when reading compressed CUPS raster streams (STR #3812)
 	- Fixed an issue with PostScript printer auto-configuration (STR #3443)
 	- Fixed some compatibility issues with the libusb-based USB backend

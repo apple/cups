@@ -461,6 +461,14 @@ cupsdLoadRemoteCache(void)
       cupsdLogMessage(CUPSD_LOG_ERROR,
                       "Syntax error on line %d of remote.cache.", linenum);
     }
+    else if (!strcasecmp(line, "UUID"))
+    {
+      if (value && !strncmp(value, "urn:uuid:", 9))
+        cupsdSetString(&(p->uuid), value);
+      else
+        cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Bad UUID on line %d of remote.cache.", linenum);
+    }
     else if (!strcasecmp(line, "Info"))
     {
       if (value)
@@ -799,6 +807,8 @@ cupsdSaveRemoteCache(void)
       cupsFilePrintf(fp, "Printer %s>\n", printer->name);
 
     cupsFilePrintf(fp, "BrowseTime %d\n", (int)printer->browse_expire);
+
+    cupsFilePrintf(fp, "UUID %s\n", printer->uuid);
 
     if (printer->info)
       cupsFilePutConf(fp, "Info", printer->info);
@@ -2381,7 +2391,7 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "ty";
   keyvalue[i++][1] = p->make_model ? p->make_model : "Unknown";
 
-  snprintf(admin_hostname, sizeof(admin_hostname), "%s.local", DNSSDHostName);
+  snprintf(admin_hostname, sizeof(admin_hostname), "%s.local.", DNSSDHostName);
   httpAssembleURIf(HTTP_URI_CODING_ALL, adminurl_str, sizeof(adminurl_str),
                    "http", NULL, admin_hostname, DNSSDPort, "/%s/%s",
 		   (p->type & CUPS_PRINTER_CLASS) ? "classes" : "printers",
@@ -2398,20 +2408,28 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "product";
   keyvalue[i++][1] = p->pc && p->pc->product ? p->pc->product : "Unknown";
 
-  snprintf(type_str, sizeof(type_str), "0x%X", p->type | CUPS_PRINTER_REMOTE);
-  snprintf(state_str, sizeof(state_str), "%d", p->state);
+  keyvalue[i  ][0] = "pdl";
+  keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";
 
-  keyvalue[i  ][0] = "printer-state";
-  keyvalue[i++][1] = state_str;
+  if (get_auth_info_required(p, air_str, sizeof(air_str)))
+  {
+    keyvalue[i  ][0] = "air";
+    keyvalue[i++][1] = air_str;
+  }
 
-  keyvalue[i  ][0] = "printer-type";
-  keyvalue[i++][1] = type_str;
+  keyvalue[i  ][0] = "UUID";
+  keyvalue[i++][1] = p->uuid + 9;
+
+#ifdef HAVE_SSL
+  keyvalue[i  ][0] = "TLS";
+  keyvalue[i++][1] = "1.2";
+#endif /* HAVE_SSL */
 
   keyvalue[i  ][0] = "Transparent";
-  keyvalue[i++][1] = "T";
+  keyvalue[i++][1] = "F";
 
   keyvalue[i  ][0] = "Binary";
-  keyvalue[i++][1] = "T";
+  keyvalue[i++][1] = "F";
 
   keyvalue[i  ][0] = "Fax";
   keyvalue[i++][1] = (p->type & CUPS_PRINTER_FAX) ? "T" : "F";
@@ -2443,14 +2461,14 @@ dnssdBuildTxtRecord(
   keyvalue[i  ][0] = "Scan";
   keyvalue[i++][1] = (p->type & CUPS_PRINTER_MFP) ? "T" : "F";
 
-  keyvalue[i  ][0] = "pdl";
-  keyvalue[i++][1] = p->pdl ? p->pdl : "application/postscript";
+  snprintf(type_str, sizeof(type_str), "0x%X", p->type | CUPS_PRINTER_REMOTE);
+  snprintf(state_str, sizeof(state_str), "%d", p->state);
 
-  if (get_auth_info_required(p, air_str, sizeof(air_str)))
-  {
-    keyvalue[i  ][0] = "air";
-    keyvalue[i++][1] = air_str;
-  }
+  keyvalue[i  ][0] = "printer-state";
+  keyvalue[i++][1] = state_str;
+
+  keyvalue[i  ][0] = "printer-type";
+  keyvalue[i++][1] = type_str;
 
  /*
   * Then pack them into a proper txt record...
@@ -3157,7 +3175,8 @@ process_browse_data(
 					/* Local make and model */
   cupsd_printer_t *p;			/* Printer information */
   const char	*ipp_options,		/* ipp-options value */
-		*lease_duration;	/* lease-duration value */
+		*lease_duration,	/* lease-duration value */
+		*uuid;			/* uuid value */
   int		is_class;		/* Is this queue a class? */
 
 
@@ -3246,6 +3265,7 @@ process_browse_data(
   hptr     = strchr(host, '.');
   sptr     = strchr(ServerName, '.');
   is_class = type & CUPS_PRINTER_CLASS;
+  uuid     = cupsGetOption("uuid", num_attrs, attrs);
 
   if (!ServerNameIsIP && sptr != NULL && hptr != NULL)
   {
@@ -3456,6 +3476,12 @@ process_browse_data(
   {
     p->type = type;
     update  = 1;
+  }
+
+  if (uuid && strcmp(p->uuid, uuid))
+  {
+    cupsdSetString(&p->uuid, uuid);
+    update = 1;
   }
 
   if (location && (!p->location || strcmp(p->location, location)))
@@ -3866,9 +3892,10 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 			   (p->type & CUPS_PRINTER_CLASS) ? "/classes/%s" :
 			                                    "/printers/%s",
 			   p->name);
-	  snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
+	  snprintf(packet, sizeof(packet),
+	           "%x %x %s \"%s\" \"%s\" \"%s\" %s%s uuid=%s\n",
         	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "", air);
+		   p->browse_attrs ? p->browse_attrs : "", air, p->uuid);
 
 	  bytes = strlen(packet);
 
@@ -3908,9 +3935,9 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
 			                                    "/printers/%s",
 			   p->name);
 	  snprintf(packet, sizeof(packet),
-	           "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
+	           "%x %x %s \"%s\" \"%s\" \"%s\" %s%s uuid=%s\n",
         	   type, p->state, uri, location, info, make_model,
-		   p->browse_attrs ? p->browse_attrs : "", air);
+		   p->browse_attrs ? p->browse_attrs : "", air, p->uuid);
 
 	  bytes = strlen(packet);
 
@@ -3933,9 +3960,10 @@ send_cups_browse(cupsd_printer_t *p)	/* I - Printer to send */
       * the default server name...
       */
 
-      snprintf(packet, sizeof(packet), "%x %x %s \"%s\" \"%s\" \"%s\" %s%s\n",
+      snprintf(packet, sizeof(packet),
+               "%x %x %s \"%s\" \"%s\" \"%s\" %s%s uuid=%s\n",
        	       type, p->state, p->uri, location, info, make_model,
-	       p->browse_attrs ? p->browse_attrs : "", air);
+	       p->browse_attrs ? p->browse_attrs : "", air, p->uuid);
 
       bytes = strlen(packet);
       cupsdLogMessage(CUPSD_LOG_DEBUG2,

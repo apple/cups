@@ -3,7 +3,7 @@ dnl "$Id: cups-defaults.m4 7959 2008-09-17 19:30:58Z mike $"
 dnl
 dnl   Default cupsd configuration settings for CUPS.
 dnl
-dnl   Copyright 2007-2010 by Apple Inc.
+dnl   Copyright 2007-2011 by Apple Inc.
 dnl   Copyright 2006-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl   These coded instructions, statements, and computer programs are the
@@ -27,7 +27,7 @@ AC_SUBST(LANGUAGES)
 dnl Mac OS X bundle-based localization support
 AC_ARG_WITH(bundledir, [  --with-bundledir     set Mac OS X localization bundle directory ],
 	CUPS_BUNDLEDIR="$withval",
-	if test "x$uname" = xDarwin; then
+	if test "x$uname" = xDarwin -a $uversion -ge 100; then
 		CUPS_BUNDLEDIR="/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/PrintCore.framework/Versions/A"
 		LANGUAGES=""
 	else

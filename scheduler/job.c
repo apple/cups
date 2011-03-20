@@ -971,6 +971,9 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
   * Now create processes for all of the filters...
   */
 
+  cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
+			               "cups-insecure-filter-warning");
+
   for (i = 0, slot = 0, filter = (mime_filter_t *)cupsArrayFirst(filters);
        filter;
        i ++, filter = (mime_filter_t *)cupsArrayNext(filters))
@@ -993,7 +996,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     }
     else
     {
-      if (job->current_file == 1)
+      if (job->current_file == 1 ||
+          (job->printer->pc && job->printer->pc->single_file))
       {
 	if (strncmp(job->printer->device_uri, "file:", 5) != 0)
 	{
@@ -1078,7 +1082,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   if (strncmp(job->printer->device_uri, "file:", 5) != 0)
   {
-    if (job->current_file == 1 || job->printer->remote)
+    if (job->current_file == 1 || job->printer->remote ||
+        (job->printer->pc && job->printer->pc->single_file))
     {
       sscanf(job->printer->device_uri, "%254[^:]", scheme);
       snprintf(command, sizeof(command), "%s/backend/%s", ServerBin, scheme);
@@ -1118,9 +1123,12 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
       }
     }
 
+    if (job->current_file == job->num_files ||
+        (job->printer->pc && job->printer->pc->single_file))
+      cupsdClosePipe(job->print_pipes);
+
     if (job->current_file == job->num_files)
     {
-      cupsdClosePipe(job->print_pipes);
       cupsdClosePipe(job->back_pipes);
       cupsdClosePipe(job->side_pipes);
 
@@ -1133,10 +1141,12 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     filterfds[slot][0] = -1;
     filterfds[slot][1] = -1;
 
-    if (job->current_file == job->num_files)
-    {
+    if (job->current_file == job->num_files ||
+        (job->printer->pc && job->printer->pc->single_file))
       cupsdClosePipe(job->print_pipes);
 
+    if (job->current_file == job->num_files)
+    {
       close(job->status_pipes[1]);
       job->status_pipes[1] = -1;
     }
@@ -1157,16 +1167,6 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
 
   cupsdAddEvent(CUPSD_EVENT_JOB_STATE, job->printer, job, "Job #%d started.",
                 job->id);
-
- /*
-  * If we get here than we are able to run the printer driver filters, so clear
-  * the missing and insecure warnings...
-  */
-
-  if (cupsdSetPrinterReasons(job->printer, "-cups-missing-filter-warning,"
-			                   "cups-insecure-filter-warning"))
-    cupsdAddEvent(CUPSD_EVENT_PRINTER_STATE, job->printer, NULL,
-                  "Printer drivers now functional.");
 
   return;
 

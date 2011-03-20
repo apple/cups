@@ -94,6 +94,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "printer-state-message",
   "printer-state-reasons",
 };
+static char	tmpfilename[1024] = "";	/* Temporary spool file name */
 
 
 /*
@@ -155,7 +156,9 @@ main(int  argc,				/* I - Number of command-line args */
 		page_count,		/* Page count via SNMP */
 		have_supplies;		/* Printer supports supply levels? */
   int		num_files;		/* Number of files to print */
-  char		**files;		/* Files to print */
+  char		**files,		/* Files to print */
+		*compatfile = NULL;	/* Compatibility filename */
+  off_t		compatsize = 0;		/* Size of compatibility file */
   int		port;			/* Port number (not used) */
   char		portname[255];		/* Port name */
   char		uri[HTTP_MAX_URI];	/* Updated URI without user/pass */
@@ -492,7 +495,7 @@ main(int  argc,				/* I - Number of command-line args */
 
     cupsSetUser(username);
   }
-  else if (!getuid())
+  else
   {
    /*
     * Try loading authentication information from the environment.
@@ -728,9 +731,9 @@ main(int  argc,				/* I - Number of command-line args */
               http->version / 100, http->version % 100);
 
       _cupsLangPrintFilter(stderr, "ERROR",
-                           _("Unable to print: the printer does not conform to "
-		             "the IPP standard."));
-      exit(CUPS_BACKEND_STOP);
+                           _("This printer does not conform to the IPP "
+			     "standard. Please contact the manufacturer of "
+			     "your printer for assistance."));
     }
 
     supported  = cupsDoRequest(http, request, resource);
@@ -1001,6 +1004,40 @@ main(int  argc,				/* I - Number of command-line args */
   }
 
  /*
+  * If the printer does not support HTTP/1.1 (which IPP requires), copy stdin
+  * to a temporary file so that we can do a HTTP/1.0 submission...
+  *
+  * (I hate compatibility hacks!)
+  */
+
+  if (http->version < HTTP_1_1 && num_files == 0)
+  {
+    if ((fd = cupsTempFd(tmpfilename, sizeof(tmpfilename))) < 0)
+    {
+      perror("DEBUG: Unable to create temporary file");
+      return (CUPS_BACKEND_FAILED);
+    }
+
+    _cupsLangPrintFilter(stderr, "INFO", _("Copying print data."));
+
+    compatsize = backendRunLoop(-1, fd, snmp_fd, &(addrlist->addr), 0, 0,
+		                backendNetworkSideCB);
+
+    close(fd);
+
+    compatfile = tmpfilename;
+    files      = &compatfile;
+    num_files  = 1;
+  }
+  else if (http->version < HTTP_1_1 && num_files == 1)
+  {
+    struct stat	fileinfo;		/* File information */
+
+    if (!stat(files[0], &fileinfo))
+      compatsize = fileinfo.st_size;
+  }
+
+ /*
   * Start monitoring the printer in the background...
   */
 
@@ -1111,8 +1148,17 @@ main(int  argc,				/* I - Number of command-line args */
       response = cupsDoRequest(http, request, resource);
     else
     {
-      fputs("DEBUG: Sending file using chunking...\n", stderr);
-      http_status = cupsSendRequest(http, request, resource, 0);
+      size_t	length = 0;		/* Length of request */
+
+      if (compatsize > 0)
+      {
+        fputs("DEBUG: Sending file using HTTP/1.0 Content-Length...\n", stderr);
+        length = ippLength(request) + (size_t)compatsize;
+      }
+      else
+        fputs("DEBUG: Sending file using HTTP/1.1 chunking...\n", stderr);
+
+      http_status = cupsSendRequest(http, request, resource, length);
       if (http_status == HTTP_CONTINUE && request->state == IPP_DATA)
       {
         if (num_files == 1)
@@ -1458,6 +1504,9 @@ main(int  argc,				/* I - Number of command-line args */
   * Remove the temporary file(s) if necessary...
   */
 
+  if (tmpfilename[0])
+    unlink(tmpfilename);
+
 #ifdef HAVE_LIBZ
   if (compression)
   {
@@ -1471,10 +1520,12 @@ main(int  argc,				/* I - Number of command-line args */
   */
 
   if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+      ipp_status == IPP_AUTHENTICATION_CANCELED ||
       ipp_status <= IPP_OK_CONFLICT)
     fprintf(stderr, "ATTR: auth-info-required=%s\n", auth_info_required);
 
-  if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN)
+  if (ipp_status == IPP_NOT_AUTHORIZED || ipp_status == IPP_FORBIDDEN ||
+      ipp_status == IPP_AUTHENTICATION_CANCELED)
     return (CUPS_BACKEND_AUTH_REQUIRED);
   else if (ipp_status == IPP_INTERNAL_ERROR)
     return (CUPS_BACKEND_STOP);
@@ -2259,6 +2310,14 @@ sigterm_handler(int sig)		/* I - Signal */
     job_canceled = 1;
     return;
   }
+
+ /*
+  * The scheduler already tried to cancel us once, now just terminate
+  * after removing our temp files!
+  */
+
+  if (tmpfilename[0])
+    unlink(tmpfilename);
 
   exit(1);
 }

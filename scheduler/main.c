@@ -21,6 +21,7 @@
  *   cupsdClosePipe()      - Close a pipe as necessary.
  *   cupsdFreeStrings()    - Free an array of strings.
  *   cupsdHoldSignals()    - Hold child and termination signals.
+ *   cupsdMakeUUID()       - Make a UUID URI conforming to RFC 4122.
  *   cupsdOpenPipe()       - Create a pipe which is closed on exec.
  *   cupsdReleaseSignals() - Release signals for delivery.
  *   cupsdSetString()      - Set a string value.
@@ -1298,6 +1299,54 @@ cupsdHoldSignals(void)
 
 
 /*
+ * 'cupsdMakeUUID()' - Make a UUID URI conforming to RFC 4122.
+ *
+ * The buffer needs to be at least 46 bytes in size.
+ */
+
+char *					/* I - UUID string */
+cupsdMakeUUID(const char *name,		/* I - Object name */
+              int        number,	/* I - Object number */
+	      char       *buffer,	/* I - String buffer */
+	      size_t     bufsize)	/* I - Size of buffer */
+{
+  char			data[1024];	/* Source string for MD5 */
+  _cups_md5_state_t	md5state;	/* MD5 state */
+  unsigned char		md5sum[16];	/* MD5 digest/sum */
+
+
+ /*
+  * Build a version 3 UUID conforming to RFC 4122.
+  *
+  * Start with the MD5 sum of the ServerName, RemotePort, object name and
+  * number, and some random data on the end.
+  */
+
+  snprintf(data, sizeof(data), "%s:%d:%s:%d:%04x:%04x", ServerName,
+           RemotePort, name ? name : ServerName, number,
+	   CUPS_RAND() & 0xffff, CUPS_RAND() & 0xffff);
+
+  _cupsMD5Init(&md5state);
+  _cupsMD5Append(&md5state, (unsigned char *)data, strlen(data));
+  _cupsMD5Finish(&md5state, md5sum);
+
+ /*
+  * Generate the UUID from the MD5...
+  */
+
+  snprintf(buffer, bufsize,
+           "urn:uuid:%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+	   "%02x%02x%02x%02x%02x%02x",
+	   md5sum[0], md5sum[1], md5sum[2], md5sum[3], md5sum[4], md5sum[5],
+	   (md5sum[6] & 15) | 0x30, md5sum[7], (md5sum[8] & 0x3f) | 0x40,
+	   md5sum[9], md5sum[10], md5sum[11], md5sum[12], md5sum[13],
+	   md5sum[14], md5sum[15]);
+
+  return (buffer);
+}
+
+
+/*
  * 'cupsdOpenPipe()' - Create a pipe which is closed on exec.
  */
 
@@ -1831,7 +1880,9 @@ process_children(void)
 	{
 	  for (i = 0; job->filters[i] < 0; i ++);
 
-	  if (!job->filters[i])
+	  if (!job->filters[i] &&
+	      (!job->printer->pc || !job->printer->pc->single_file ||
+	       job->backend <= 0))
 	  {
 	   /*
 	    * Process the next file...

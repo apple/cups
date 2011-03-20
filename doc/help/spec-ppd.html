@@ -419,6 +419,7 @@ div.contents ul.subcontents li {
 	<li><a href="#cupsPortMonitor">cupsPortMonitor</a></li>
 	<li><a href="#cupsPreFilter">cupsPreFilter</a></li>
 	<li><a href="#cupsPrintQuality">cupsPrintQuality</a></li>
+	<li><a href="#cupsSingleFile">cupsSingleFile</a></li>
 	<li><a href="#cupsSNMPSupplies">cupsSNMPSupplies</a></li>
 	<li><a href="#cupsVersion">cupsVersion</a></li>
 </ul></li>
@@ -1556,7 +1557,7 @@ the special filter program "-" may be specified.</p>
 *cupsFilter: "application/vnd.cups-postscript 0 -"
 </pre>
 
-<h3><a name='cupsFilter2'>cupsFilter2</a></h3>
+<h3><span class='info'>CUPS 1.5</span><a name='cupsFilter2'>cupsFilter2</a></h3>
 
 <p class='summary'>*cupsFilter2: "source/type destination/type cost program"</p>
 
@@ -1863,6 +1864,22 @@ before the filter that accepts the given MIME type.</p>
 *cupsPrintQuality Normal/Normal: "code"
 *cupsPrintQuality High/Photo: "code"
 *CloseUI: *cupsPrintQuality
+</pre>
+
+<h3><span class='info'>CUPS 1.5</span><a name='cupsSingleFile'>cupsSingleFile</a></h3>
+
+<p class='summary'>*cupsSingleFile: Boolean</p>
+
+<p>This boolean keyword tells the scheduler whether to print multiple files in a job together or singly. The default is "False" which uses a single instance of the backend for all files in the print job. Setting this keyword to "True" will result in separate instances of the backend for each file in the print job.</p>
+
+<p>Examples:</p>
+
+<pre class='command'>
+<em>*% Send all print data to a single backend</em>
+*cupsSingleFile: False
+
+<em>*% Send each file using a separate backend</em>
+*cupsSingleFile: True
 </pre>
 
 <h3><span class='info'>CUPS 1.4/Mac OS X 10.6</span><a name='cupsSNMPSupplies'>cupsSNMPSupplies</a></h3>

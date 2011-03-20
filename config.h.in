@@ -306,6 +306,13 @@
 
 
 /*
+ * Do we have the SecCertificateCopyData function?
+ */
+
+#undef HAVE_SECCERTIFICATECOPYDATA
+
+
+/*
  * Do we have the SecIdentitySearchCreateWithPolicy function?
  */
 

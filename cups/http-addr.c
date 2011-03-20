@@ -3,7 +3,7 @@
  *
  *   HTTP address routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -360,8 +360,11 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 #ifdef AF_INET6
   else if (addr->addr.sa_family == AF_INET6)
   {
+    char	*sptr,			/* Pointer into string */
+		temps[64];		/* Temporary string for address */
+
 #  ifdef HAVE_GETNAMEINFO
-    if (getnameinfo(&addr->addr, httpAddrLength(addr), s, slen,
+    if (getnameinfo(&addr->addr, httpAddrLength(addr), temps, sizeof(temps),
                     NULL, 0, NI_NUMERICHOST))
     {
      /*
@@ -373,29 +376,36 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 
       return (NULL);
     }
+    else if ((sptr = strchr(temps, '%')) != NULL)
+    {
+     /*
+      * Convert "%zone" to "+zone" to match URI form...
+      */
+
+      *sptr = '+';
+    }
+
 #  else
-    char	*sptr;			/* Pointer into string */
     int		i;			/* Looping var */
     unsigned	temp;			/* Current value */
     const char	*prefix;		/* Prefix for address */
 
 
     prefix = "";
-    for (sptr = s, i = 0; i < 4 && addr->ipv6.sin6_addr.s6_addr32[i]; i ++)
+    for (sptr = temps, i = 0; i < 4 && addr->ipv6.sin6_addr.s6_addr32[i]; i ++)
     {
       temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
 
-      snprintf(sptr, slen, "%s%x", prefix, (temp >> 16) & 0xffff);
+      snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
+               (temp >> 16) & 0xffff);
       prefix = ":";
-      slen -= strlen(sptr);
       sptr += strlen(sptr);
 
       temp &= 0xffff;
 
       if (temp || i == 3 || addr->ipv6.sin6_addr.s6_addr32[i + 1])
       {
-        snprintf(sptr, slen, "%s%x", prefix, temp);
-	slen -= strlen(sptr);
+        snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix, temp);
 	sptr += strlen(sptr);
       }
     }
@@ -407,24 +417,24 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 
       if (i < 4)
       {
-        snprintf(sptr, slen, "%s:", prefix);
+        snprintf(sptr, sizeof(temps) - (sptr - temps), "%s:", prefix);
 	prefix = ":";
-	slen -= strlen(sptr);
 	sptr += strlen(sptr);
 
 	for (; i < 4; i ++)
 	{
           temp = ntohl(addr->ipv6.sin6_addr.s6_addr32[i]);
 
-          if ((temp & 0xffff0000) || addr->ipv6.sin6_addr.s6_addr32[i - 1])
+          if ((temp & 0xffff0000) ||
+	      (i > 0 && addr->ipv6.sin6_addr.s6_addr32[i - 1]))
 	  {
-            snprintf(sptr, slen, "%s%x", prefix, (temp >> 16) & 0xffff);
-	    slen -= strlen(sptr);
+            snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
+	             (temp >> 16) & 0xffff);
 	    sptr += strlen(sptr);
           }
 
-          snprintf(sptr, slen, "%s%x", prefix, temp & 0xffff);
-	  slen -= strlen(sptr);
+          snprintf(sptr, sizeof(temps) - (sptr - temps), "%s%x", prefix,
+	           temp & 0xffff);
 	  sptr += strlen(sptr);
 	}
       }
@@ -434,9 +444,7 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
         * Empty address...
 	*/
 
-        strlcpy(s, "::", slen);
-	sptr = s + 2;
-	slen -= 2;
+        strlcpy(temps, "::", sizeof(temps));
       }
       else
       {
@@ -444,12 +452,16 @@ httpAddrString(const http_addr_t *addr,	/* I - Address to convert */
 	* Empty at end...
 	*/
 
-        strlcpy(sptr, "::", slen);
-	sptr += 2;
-	slen -= 2;
+        strlcpy(sptr, "::", sizeof(temps) - (sptr - temps));
       }
     }
 #  endif /* HAVE_GETNAMEINFO */
+
+   /*
+    * Add "[v1." and "]" around IPv6 address to convert to URI form.
+    */
+
+    snprintf(s, slen, "[v1.%s]", temps);
   }
 #endif /* AF_INET6 */
   else
