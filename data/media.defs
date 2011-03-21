@@ -30,8 +30,8 @@
 #media "A2.Transverse/A2" 1684 1191
 #media "A3/A3" 842 1191
 #media "A3.Transverse/A3" 1191 842
-#media "A3Extra/A3 Extra" 913 1262
-#media "A3Extra.Transverse/A3 Extra" 913 1262
+#media "A3Extra/A3 Oversize" 913 1262
+#media "A3Extra.Transverse/A3 Oversize" 913 1262
 #media "A3Rotated/A3" 1191 842
 #media "A4/A4" 595 842
 #media "A4Extra/A4 Oversize" 667 914
@@ -54,10 +54,10 @@
 #media "AnsiC/ANSI C" 1224 1584
 #media "AnsiD/ANSI D" 1584 2448
 #media "AnsiE/ANSI E" 2448 3168
-#media "ARCHA/ARCH A" 648 864
-#media "ARCHA.Transverse/ARCH A" 864 648
-#media "ARCHB/Tabloid Extra" 864 1296
-#media "ARCHB.Transverse/Tabloid Extra" 1296 864
+#media "ARCHA/Letter Oversize" 648 864
+#media "ARCHA.Transverse/Letter Oversize" 864 648
+#media "ARCHB/Tabloid Oversize" 864 1296
+#media "ARCHB.Transverse/Tabloid Oversize" 1296 864
 #media "ARCHC/ARCH C" 1296 1728
 #media "ARCHC.Transverse/ARCH C" 1728 1296
 #media "ARCHD/ARCH D" 1728 2592
@@ -160,12 +160,12 @@
 #media "LegalExtra/US Legal Oversize" 684 1080
 #media "Letter/US Letter" 612 792
 #media "Letter.Transverse/US Letter" 792 612
-#media "LetterExtra/US Letter Extra" 684 864
-#media "LetterExtra.Transverse/US Letter Extra" 864 684
+#media "LetterExtra/US Letter Oversize" 684 864
+#media "LetterExtra.Transverse/US Letter Oversize" 864 684
 #media "LetterPlus/US Letter Oversize" 612 914
 #media "LetterRotated/US Letter" 792 612
 #media "LetterSmall/US Letter Small" 612 792
-#media "Monarch/Envelope Monarch" 279 540
+#media "Monarch/Monarch" 279 540
 #media "Note/Note" 612 792
 #media "Postcard/Postcard" 284 419
 #media "PostcardRotated/Postcard" 419 284
@@ -188,7 +188,6 @@
 
 #media "Photo4x6/Photo" 288 432
 #media "PhotoLabel/Photo Labels" 288 468
-#media "w288h418/Photo" 288 418
 #media "w936h1368/Super B/A3" 936 1368
 #media "w81h252/Address" 81 252
 #media "w101h252/Large Address" 101 252
