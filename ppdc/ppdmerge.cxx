@@ -367,7 +367,8 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdmerge [options] filename.ppd [ ... "
                           "filenameN.ppd ]"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -o filename.ppd[.gz] Set output file (otherwise stdout)."));
+  _cupsLangPuts(stdout, _("  -o filename.ppd[.gz]    Set output file "
+                          "(otherwise stdout)."));
 
   exit(1);
 }

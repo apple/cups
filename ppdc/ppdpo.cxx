@@ -252,11 +252,11 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdpo [options] -o filename.po filename.drv "
                           "[ ... filenameN.drv ]"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -D name=value        Set named variable to "
+  _cupsLangPuts(stdout, _("  -D name=value           Set named variable to "
                           "value."));
-  _cupsLangPuts(stdout, _("  -I include-dir       Add include directory to "
+  _cupsLangPuts(stdout, _("  -I include-dir          Add include directory to "
                           "search path."));
-  _cupsLangPuts(stdout, _("  -v                   Be verbose (more v's for "
+  _cupsLangPuts(stdout, _("  -v                      Be verbose (more v's for "
                           "more verbosity)."));
 
   exit(1);

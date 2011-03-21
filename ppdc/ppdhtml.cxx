@@ -172,10 +172,10 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdhtml [options] filename.drv "
                           ">filename.html"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -D name=value        Set named variable to "
+  _cupsLangPuts(stdout, _("  -D name=value           Set named variable to "
                           "value."));
-  _cupsLangPuts(stdout, _("  -I include-dir       Add include directory to "
-                          "search path."));
+  _cupsLangPuts(stdout, _("  -I include-dir          Add include directory "
+                          "to search path."));
 
   exit(1);
 }

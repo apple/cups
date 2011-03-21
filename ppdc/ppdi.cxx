@@ -128,9 +128,9 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdi [options] filename.ppd [ ... "
 			  "filenameN.ppd ]"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -I include-dir       Add include directory to "
+  _cupsLangPuts(stdout, _("  -I include-dir          Add include directory to "
                           "search path."));
-  _cupsLangPuts(stdout, _("  -o filename.drv      Set driver information "
+  _cupsLangPuts(stdout, _("  -o filename.drv         Set driver information "
                           "file (otherwise ppdi.drv)."));
 
   exit(1);

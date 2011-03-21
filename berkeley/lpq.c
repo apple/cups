@@ -3,7 +3,7 @@
  *
  *   "lpq" command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -233,12 +233,12 @@ main(int  argc,				/* I - Number of command-line arguments */
 
       if (dest && !cupsGetDest(dest, NULL, num_dests, dests))
 	_cupsLangPrintf(stderr,
-	                _("%s: error - %s environment variable names "
+	                _("%s: Error - %s environment variable names "
 			  "non-existent destination \"%s\"."), argv[0], val,
 			dest);
       else
 	_cupsLangPrintf(stderr,
-	                _("%s: error - no default destination available."),
+	                _("%s: Error - no default destination available."),
 			argv[0]);
       httpClose(http);
       cupsFreeDests(num_dests, dests);

@@ -282,16 +282,16 @@ usage(void)
   _cupsLangPuts(stdout, _("       cupsaddsmb [options] -a"));
   _cupsLangPuts(stdout, "");
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -E                   Encrypt the connection to "
+  _cupsLangPuts(stdout, _("  -E                      Encrypt the connection to "
                           "the server."));
-  _cupsLangPuts(stdout, _("  -H samba-server      Use the named SAMBA "
+  _cupsLangPuts(stdout, _("  -H samba-server         Use the named SAMBA "
                           "server."));
-  _cupsLangPuts(stdout, _("  -U samba-user        Authenticate using the "
+  _cupsLangPuts(stdout, _("  -U samba-user           Authenticate using the "
                           "named SAMBA user."));
-  _cupsLangPuts(stdout, _("  -a                   Export all printers."));
-  _cupsLangPuts(stdout, _("  -h cups-server       Use the named CUPS "
+  _cupsLangPuts(stdout, _("  -a                      Export all printers."));
+  _cupsLangPuts(stdout, _("  -h cups-server          Use the named CUPS "
                           "server."));
-  _cupsLangPuts(stdout, _("  -v                   Be verbose (show "
+  _cupsLangPuts(stdout, _("  -v                      Be verbose (show "
                           "commands)."));
 
   exit(1);

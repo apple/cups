@@ -179,7 +179,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (msgid && msgstr)
 	{
 	  if (*msgid)
-            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n\n", msgid,
+            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 	                   (use_msgid || !*msgstr) ? msgid : msgstr);
 
 	  free(msgid);
@@ -247,7 +247,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (msgid && msgstr)
   {
     if (*msgid)
-      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n\n", msgid,
+      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 		     (use_msgid || !*msgstr) ? msgid : msgstr);
 
     free(msgid);

@@ -3489,17 +3489,17 @@ usage(void)
   _cupsLangPuts(stdout, "");
   _cupsLangPuts(stdout, _("Options:"));
   _cupsLangPuts(stdout, "");
-  _cupsLangPuts(stdout, _("    -I {filename,filters,none,profiles}"));
-  _cupsLangPuts(stdout, _("                         Ignore specific warnings."));
-  _cupsLangPuts(stdout, _("    -R root-directory    Set alternate root."));
-  _cupsLangPuts(stdout, _("    -W {all,none,constraints,defaults,duplex,"
+  _cupsLangPuts(stdout, _("  -I {filename,filters,none,profiles}"));
+  _cupsLangPuts(stdout, _("                          Ignore specific warnings."));
+  _cupsLangPuts(stdout, _("  -R root-directory       Set alternate root."));
+  _cupsLangPuts(stdout, _("  -W {all,none,constraints,defaults,duplex,"
                           "filters,profiles,sizes,translations}"));
-  _cupsLangPuts(stdout, _("                         Issue warnings instead of "
+  _cupsLangPuts(stdout, _("                          Issue warnings instead of "
                           "errors."));
-  _cupsLangPuts(stdout, _("    -q                   Run silently."));
-  _cupsLangPuts(stdout, _("    -r                   Use 'relaxed' open mode."));
-  _cupsLangPuts(stdout, _("    -v                   Be slightly verbose."));
-  _cupsLangPuts(stdout, _("    -vv                  Be very verbose."));
+  _cupsLangPuts(stdout, _("  -q                      Run silently."));
+  _cupsLangPuts(stdout, _("  -r                      Use 'relaxed' open mode."));
+  _cupsLangPuts(stdout, _("  -v                      Be slightly verbose."));
+  _cupsLangPuts(stdout, _("  -vv                     Be very verbose."));
 
   exit(ERROR_USAGE);
 }

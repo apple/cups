@@ -208,22 +208,22 @@ usage(const char *opt)			/* I - Option character/string */
   _cupsLangPuts(stdout, "");
   _cupsLangPuts(stdout, _("Options:"));
   _cupsLangPuts(stdout, "");
-  _cupsLangPuts(stdout, _("    -E                      Enable encryption."));
-  _cupsLangPuts(stdout, _("    -U username             Specify username."));
-  _cupsLangPuts(stdout, _("    -h server[:port]        Specify server "
+  _cupsLangPuts(stdout, _("  -E                      Enable encryption."));
+  _cupsLangPuts(stdout, _("  -U username             Specify username."));
+  _cupsLangPuts(stdout, _("  -h server[:port]        Specify server "
                           "address."));
   _cupsLangPuts(stdout, "");
-  _cupsLangPuts(stdout, _("    --[no-]debug-logging    Turn debug logging "
+  _cupsLangPuts(stdout, _("  --[no-]debug-logging    Turn debug logging "
                           "on/off."));
-  _cupsLangPuts(stdout, _("    --[no-]remote-admin     Turn remote "
+  _cupsLangPuts(stdout, _("  --[no-]remote-admin     Turn remote "
                           "administration on/off."));
-  _cupsLangPuts(stdout, _("    --[no-]remote-any       Allow/prevent access "
+  _cupsLangPuts(stdout, _("  --[no-]remote-any       Allow/prevent access "
                           "from the Internet."));
-  _cupsLangPuts(stdout, _("    --[no-]remote-printers  Show/hide remote "
+  _cupsLangPuts(stdout, _("  --[no-]remote-printers  Show/hide remote "
                           "printers."));
-  _cupsLangPuts(stdout, _("    --[no-]share-printers   Turn printer sharing "
+  _cupsLangPuts(stdout, _("  --[no-]share-printers   Turn printer sharing "
                           "on/off."));
-  _cupsLangPuts(stdout, _("    --[no-]user-cancel-any  Allow/prevent users to "
+  _cupsLangPuts(stdout, _("  --[no-]user-cancel-any  Allow/prevent users to "
                           "cancel any job."));
 
   exit(1);
