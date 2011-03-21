@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CUPS 1.5\n"
 "Report-Msgid-Bugs-To: http://www.cups.org/str.php\n"
-"POT-Creation-Date: 2011-03-21 14:59-0700\n"
+"POT-Creation-Date: 2011-03-21 15:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1429,6 +1429,12 @@ msgstr ""
 #: berkeley/lpq.c:551
 #, c-format
 msgid "%s: %-33.33s [job %d localhost]"
+msgstr ""
+
+#. TRANSLATORS: Message is "subject: error"
+#: cups/langprintf.c:86
+#, c-format
+msgid "%s: %s"
 msgstr ""
 
 #: systemv/cancel.c:294 systemv/cancel.c:357

@@ -275,6 +275,8 @@
 "%s/%s accepting requests since %s" = "%s/%s accepting requests since %s";
 "%s/%s not accepting requests since %s -" = "%s/%s not accepting requests since %s -";
 "%s: %-33.33s [job %d localhost]" = "%s: %-33.33s [job %d localhost]";
+// TRANSLATORS: Message is "subject: error"
+"%s: %s" = "%s: %s";
 "%s: %s failed: %s" = "%s: %s failed: %s";
 "%s: Don't know what to do." = "%s: Don't know what to do.";
 "%s: Error - %s environment variable names non-existent destination \"%s\"." = "%s: Error - %s environment variable names non-existent destination \"%s\".";
