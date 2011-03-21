@@ -308,7 +308,7 @@ ppdLocalizeIPPReason(
 	message = _("There is a paper jam.");
       else if (!strncmp(reason, "offline", 7) ||
 		       !strncmp(reason, "shutdown", 8))
-	message = _("The printer is offline.");
+	message = _("The printer is not connected.");
       else if (!strncmp(reason, "toner-low", 9))
 	message = _("The printer is low on toner.");
       else if (!strncmp(reason, "toner-empty", 11))

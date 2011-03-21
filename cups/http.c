@@ -3456,9 +3456,7 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
     case 0 :
 	result = (int)processed;
 	break;
-    case errSSLClosedGraceful :
-	result = 0;
-	break;
+
     case errSSLWouldBlock :
 	if (processed)
 	  result = (int)processed;
@@ -3468,9 +3466,16 @@ http_read_ssl(http_t *http,		/* I - Connection to server */
 	  errno = EINTR;
 	}
 	break;
+
+    case errSSLClosedGraceful :
     default :
-	errno = EPIPE;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno = EPIPE;
+	}
 	break;
   }
 
@@ -4485,9 +4490,7 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
     case 0 :
 	result = (int)processed;
 	break;
-    case errSSLClosedGraceful :
-	result = 0;
-	break;
+
     case errSSLWouldBlock :
 	if (processed)
 	  result = (int)processed;
@@ -4497,13 +4500,20 @@ http_write_ssl(http_t     *http,	/* I - Connection to server */
 	  errno  = EINTR;
 	}
 	break;
+
+    case errSSLClosedGraceful :
     default :
-	errno  = EPIPE;
-	result = -1;
+	if (processed)
+	  result = (int)processed;
+	else
+	{
+	  result = -1;
+	  errno  = EPIPE;
+	}
 	break;
   }
 #  elif defined(HAVE_SSPISSL)
-  return _sspiWrite((_sspi_struct_t*) http->tls, (void*) buf, len);
+  return _sspiWrite((_sspi_struct_t *)http->tls, (void *)buf, len);
 #  endif /* HAVE_LIBSSL */
 
   DEBUG_printf(("3http_write_ssl: Returning %d.", (int)result));

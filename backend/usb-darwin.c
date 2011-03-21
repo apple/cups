@@ -131,7 +131,7 @@ extern char **environ;
 
 #define kUSBClassDriverProperty		CFSTR("USB Printing Class")
 
-#define kUSBGenericTOPrinterClassDriver	CFSTR("/System/Library/Printers/Libraries/USBGenericTOPrintingClass.plugin")
+#define kUSBGenericTOPrinterClassDriver	CFSTR("/System/Library/Printers/Libraries/USBGenericPrintingClass.plugin")
 #define kUSBPrinterClassDeviceNotOpen	-9664	/*kPMInvalidIOMContext*/
 
 
@@ -342,7 +342,7 @@ print_device(const char *uri,		/* I - Device URI */
   ssize_t	  total_bytes;		/* Total bytes written */
   UInt32	  bytes;		/* Bytes written */
   struct timeval  *timeout,		/* Timeout pointer */
-		  stimeout;		/* Timeout for select() */
+		  tv;			/* Time value */
   struct timespec cond_timeout;		/* pthread condition timeout */
 
 
@@ -562,15 +562,15 @@ print_device(const char *uri,		/* I - Device URI */
 
       if (g.print_bytes)
       {
-	stimeout.tv_sec  = 0;
-	stimeout.tv_usec = 100000;		/* 100ms */
-	timeout = &stimeout;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 100000;		/* 100ms */
+	timeout = &tv;
       }
       else if (g.drain_output)
       {
-	stimeout.tv_sec  = 0;
-	stimeout.tv_usec = 0;
-	timeout = &stimeout;
+	tv.tv_sec  = 0;
+	tv.tv_usec = 0;
+	timeout = &tv;
       }
       else
 	timeout = NULL;
@@ -728,6 +728,7 @@ print_device(const char *uri,		/* I - Device URI */
 	 /*
 	  * Write error - bail if we don't see an error we can retry...
 	  */
+
 	  _cupsLangPrintFilter(stderr, "ERROR",
 	                       _("Unable to send data to printer."));
 	  fprintf(stderr, "DEBUG: USB class driver WritePipe returned %x\n",
@@ -763,7 +764,7 @@ print_device(const char *uri,		/* I - Device URI */
    /*
     * Re-enable the SIGTERM handler so pthread_kill() will work...
     */
-  
+
     struct sigaction	action;		/* POSIX signal action */
 
     memset(&action, 0, sizeof(action));
@@ -788,26 +789,32 @@ print_device(const char *uri,		/* I - Device URI */
 
     g.sidechannel_thread_stop = 1;
     pthread_mutex_lock(&g.sidechannel_thread_mutex);
+
     if (!g.sidechannel_thread_done)
     {
-     /*
-      * Wait for the side-channel thread to exit...
-      */
+      gettimeofday(&tv, NULL);
+      cond_timeout.tv_sec  = tv.tv_sec + WAIT_SIDE_DELAY;
+      cond_timeout.tv_nsec = tv.tv_usec * 1000;
 
-      cond_timeout.tv_sec  = time(NULL) + WAIT_SIDE_DELAY;
-      cond_timeout.tv_nsec = 0;
-      if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
-			         &g.sidechannel_thread_mutex,
-				 &cond_timeout) != 0)
+      while (!g.sidechannel_thread_done)
+      {
+	if (pthread_cond_timedwait(&g.sidechannel_thread_cond,
+				   &g.sidechannel_thread_mutex,
+				   &cond_timeout) != 0)
+	  break;
+      }
+
+      if (!g.sidechannel_thread_done)
       {
        /*
 	* Force the side-channel thread to exit...
 	*/
 
-        fputs("DEBUG: Force the side-channel thread to exit...\n", stderr);
+	fputs("DEBUG: Force the side-channel thread to exit...\n", stderr);
 	pthread_kill(sidechannel_thread_id, SIGTERM);
       }
     }
+
     pthread_mutex_unlock(&g.sidechannel_thread_mutex);
 
     pthread_join(sidechannel_thread_id, NULL);
@@ -834,11 +841,18 @@ print_device(const char *uri,		/* I - Device URI */
 
   if (!g.read_thread_done)
   {
-    cond_timeout.tv_sec = time(NULL) + WAIT_EOF_DELAY;
-    cond_timeout.tv_nsec = 0;
+    gettimeofday(&tv, NULL);
+    cond_timeout.tv_sec  = tv.tv_sec + WAIT_EOF_DELAY;
+    cond_timeout.tv_nsec = tv.tv_usec * 1000;
 
-    if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
-                               &cond_timeout) != 0)
+    while (!g.read_thread_done)
+    {
+      if (pthread_cond_timedwait(&g.read_thread_cond, &g.read_thread_mutex,
+				 &cond_timeout) != 0)
+	break;
+    }
+
+    if (!g.read_thread_done)
     {
      /*
       * Force the read thread to exit...
@@ -849,6 +863,7 @@ print_device(const char *uri,		/* I - Device URI */
       pthread_kill(read_thread_id, SIGTERM);
     }
   }
+
   pthread_mutex_unlock(&g.read_thread_mutex);
 
   pthread_join(read_thread_id, NULL);	/* wait for the read thread to return */
@@ -2201,7 +2216,7 @@ static void parse_pserror(char *sockBuffer,
 static void soft_reset()
 {
   fd_set	  input_set;		/* Input set for select() */
-  struct timeval  stimeout;		/* Timeout for select() */
+  struct timeval  tv;			/* Time value */
   char		  buffer[2048];		/* Buffer */
   struct timespec cond_timeout;		/* pthread condition timeout */
 
@@ -2214,10 +2229,17 @@ static void soft_reset()
   {
     (*g.classdriver)->Abort(g.classdriver);
 
-    cond_timeout.tv_sec = time(NULL) + 1;
-    cond_timeout.tv_nsec = 0;
+    gettimeofday(&tv, NULL);
+    cond_timeout.tv_sec  = tv.tv_sec + 1;
+    cond_timeout.tv_nsec = tv.tv_usec * 1000;
 
-    pthread_cond_timedwait(&g.readwrite_lock_cond, &g.readwrite_lock_mutex, &cond_timeout);
+    while (g.readwrite_lock)
+    {
+      if (pthread_cond_timedwait(&g.readwrite_lock_cond,
+				 &g.readwrite_lock_mutex,
+				 &cond_timeout) != 0)
+	break;
+    }
   }
 
   g.readwrite_lock = 1;
@@ -2232,10 +2254,10 @@ static void soft_reset()
   FD_ZERO(&input_set);
   FD_SET(g.print_fd, &input_set);
 
-  stimeout.tv_sec  = 0;
-  stimeout.tv_usec = 0;
+  tv.tv_sec  = 0;
+  tv.tv_usec = 0;
 
-  while (select(g.print_fd+1, &input_set, NULL, NULL, &stimeout) > 0)
+  while (select(g.print_fd+1, &input_set, NULL, NULL, &tv) > 0)
     if (read(g.print_fd, buffer, sizeof(buffer)) <= 0)
       break;
 

@@ -372,6 +372,18 @@ cupsdCreateCommonData(void)
 		  "printer-resolution",
 		  "sides"
 		};
+  static const char * const pdf_versions[] =
+		{			/* pdf-versions-supported */
+		  "adobe-1.2",
+		  "adobe-1.3",
+		  "adobe-1.4",
+		  "adobe-1.5",
+		  "adobe-1.6",
+		  "adobe-1.7",
+		  "iso-19005-1_2005",
+		  "iso-32000-1_2008",
+		  "pwg-5102.3"
+		};
   static const char * const printer_settable[] =
 		{			/* printer-settable-attributes-supported */
 		  "printer-info",
@@ -530,6 +542,18 @@ cupsdCreateCommonData(void)
     ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_NAME | IPP_TAG_COPY,
                  "job-sheets-supported", NULL, "none");
 
+  /* jpeg-k-octets-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "jpeg-k-octets-supported", 0,
+              k_supported);
+
+  /* jpeg-x-dimension-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "jpeg-x-dimension-supported", 0,
+              65535);
+
+  /* jpeg-y-dimension-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "jpeg-y-dimension-supported", 1,
+              65535);
+
   /* media-col-supported */
   ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
                 "media-col-supported",
@@ -623,6 +647,16 @@ cupsdCreateCommonData(void)
 
   /* page-ranges-supported */
   ippAddBoolean(CommonData, IPP_TAG_PRINTER, "page-ranges-supported", 1);
+
+  /* pdf-k-octets-supported */
+  ippAddRange(CommonData, IPP_TAG_PRINTER, "pdf-k-octets-supported", 0,
+              k_supported);
+
+  /* pdf-versions-supported */
+  ippAddStrings(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,
+                "pdf-versions-supported",
+                sizeof(pdf_versions) / sizeof(pdf_versions[0]), NULL,
+                pdf_versions);
 
   /* pdl-override-supported */
   ippAddString(CommonData, IPP_TAG_PRINTER, IPP_TAG_KEYWORD | IPP_TAG_COPY,

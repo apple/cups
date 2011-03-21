@@ -88,7 +88,7 @@ cupsCharsetToUTF8(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
   cups_utf8_t	*destptr;		/* Pointer into UTF-8 buffer */
-#ifdef HAVE_ICONV_H 
+#ifdef HAVE_ICONV_H
   size_t	srclen,			/* Length of source string */
 		outBytesLeft;		/* Bytes remaining in output buffer */
 #endif /* HAVE_ICONV_H */
@@ -208,7 +208,7 @@ cupsUTF8ToCharset(
     const cups_encoding_t encoding)	/* I - Encoding */
 {
   char		*destptr;		/* Pointer into destination */
-#ifdef HAVE_ICONV_H 
+#ifdef HAVE_ICONV_H
   size_t	srclen,			/* Length of source string */
 		outBytesLeft;		/* Bytes remaining in output buffer */
 #endif /* HAVE_ICONV_H */

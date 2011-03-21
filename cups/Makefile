@@ -657,6 +657,17 @@ framedhelp:
 
 
 #
+# Lines of code computation...
+#
+
+sloc:
+	echo "libcupslite: \c"
+	sloccount $(LITEOBJS:.o=.c) 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
+	echo "libcups: \c"
+	sloccount $(LIBOBJS:.o=.c) 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
+
+
+#
 # Dependencies...
 #
 

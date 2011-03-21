@@ -2361,7 +2361,7 @@ dnssdBuildTxtRecord(
   int		i;			/* Looping var */
   char		admin_hostname[256],	/* .local hostname for admin page */
 		adminurl_str[256],	/* URL for the admin page */
-  		type_str[32],		/* Type to string buffer */
+		type_str[32],		/* Type to string buffer */
 		state_str[32],		/* State to string buffer */
 		rp_str[1024],		/* Queue name string buffer */
 		air_str[1024],		/* auth-info-required string buffer */
@@ -2759,11 +2759,10 @@ dnssdRegisterPrinter(cupsd_printer_t *p)/* I - Printer */
   if (!p->ipp_ref)
   {
    /*
-    * Initial registration.  Use the _fax subtype for fax queues...
+    * Initial registration.  Use the _fax-ipp regtype for fax queues...
     */
 
-    regtype = (p->type & CUPS_PRINTER_FAX) ? "_fax-ipp._tcp" :
-                                             "_ipp._tcp,_cups";
+    regtype = (p->type & CUPS_PRINTER_FAX) ? "_fax-ipp._tcp" : DNSSDRegType;
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, 
 		    "Registering DNS-SD printer %s with name \"%s\" and "

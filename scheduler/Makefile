@@ -229,7 +229,7 @@ install-exec:
 	$(INSTALL_BIN) cups-polld $(SERVERBIN)/daemon
 	if test "x$(SYMROOT)" != "x"; then \
 		$(INSTALL_DIR) $(SYMROOT); \
-		for file in $(DAEMONS); do \
+		for file in $(PROGRAMS); do \
 			cp $$file $(SYMROOT); \
 		done \
 	fi
@@ -556,6 +556,15 @@ testsub:	testsub.o ../cups/$(LIBCUPSSTATIC)
 	echo Linking $@...
 	$(CC) $(LDFLAGS) -o testsub testsub.o ../cups/$(LIBCUPSSTATIC) \
 		$(SSLLIBS) $(DNSSDLIBS) $(COMMONLIBS) $(LIBZ) $(LIBGSSAPI)
+
+
+#
+# Lines of code computation...
+#
+
+sloc:
+	echo "cupsd: \c"
+	sloccount $(CUPSDOBJS:.o=.c) $(LIBOBJS:.o=.c) cups-driverd.cxx cups-polld.c cups-lpd.c 2>/dev/null | grep "Total Physical" | awk '{print $$9}'
 
 
 #
