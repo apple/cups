@@ -188,21 +188,7 @@
 
 "      %s  Bad language \"%s\"." = "      %s  Bad language \"%s\".";
 
-"      %s  Bad permissions on APDialogExtension file \"%s\"." = "      %s  Bad permissions on APDialogExtension file \"%s\".";
-
-"      %s  Bad permissions on APPrinterIconPath file \"%s\"." = "      %s  Bad permissions on APPrinterIconPath file \"%s\".";
-
-"      %s  Bad permissions on APPrinterLowInkTool file \"%s\"." = "      %s  Bad permissions on APPrinterLowInkTool file \"%s\".";
-
-"      %s  Bad permissions on APPrinterUtilityPath file \"%s\"." = "      %s  Bad permissions on APPrinterUtilityPath file \"%s\".";
-
-"      %s  Bad permissions on APScanAppPath file \"%s\"." = "      %s  Bad permissions on APScanAppPath file \"%s\".";
-
-"      %s  Bad permissions on cupsFilter file \"%s\"." = "      %s  Bad permissions on cupsFilter file \"%s\".";
-
-"      %s  Bad permissions on cupsICCProfile file \"%s\"." = "      %s  Bad permissions on cupsICCProfile file \"%s\".";
-
-"      %s  Bad permissions on cupsPreFilter file \"%s\"." = "      %s  Bad permissions on cupsPreFilter file \"%s\".";
+"      %s  Bad permissions on %s file \"%s\"." = "      %s  Bad permissions on %s file \"%s\".";
 
 "      %s  Bad spelling of %s - should be %s." = "      %s  Bad spelling of %s - should be %s.";
 
@@ -214,15 +200,7 @@
 
 "      %s  Missing \"%s\" translation string for option %s." = "      %s  Missing \"%s\" translation string for option %s.";
 
-"      %s  Missing APDialogExtension file \"%s\"." = "      %s  Missing APDialogExtension file \"%s\".";
-
-"      %s  Missing APPrinterIconPath file \"%s\"." = "      %s  Missing APPrinterIconPath file \"%s\".";
-
-"      %s  Missing APPrinterLowInkTool file \"%s\"." = "      %s  Missing APPrinterLowInkTool file \"%s\".";
-
-"      %s  Missing APPrinterUtilityPath file \"%s\"." = "      %s  Missing APPrinterUtilityPath file \"%s\".";
-
-"      %s  Missing APScanAppPath file \"%s\"." = "      %s  Missing APScanAppPath file \"%s\".";
+"      %s  Missing %s file \"%s\"." = "      %s  Missing %s file \"%s\".";
 
 "      %s  Missing REQUIRED PageRegion option.\n                REF: Page 100, section 5.14." = "      %s  Missing REQUIRED PageRegion option.\n                REF: Page 100, section 5.14.";
 
@@ -231,12 +209,6 @@
 "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\"." = "      %s  Missing choice *%s %s in UIConstraints \"*%s %s *%s %s\".";
 
 "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"" = "      %s  Missing choice *%s %s in cupsUIConstraints %s: \"%s\"";
-
-"      %s  Missing cupsFilter file \"%s\"." = "      %s  Missing cupsFilter file \"%s\".";
-
-"      %s  Missing cupsICCProfile file \"%s\"." = "      %s  Missing cupsICCProfile file \"%s\".";
-
-"      %s  Missing cupsPreFilter file \"%s\"." = "      %s  Missing cupsPreFilter file \"%s\".";
 
 "      %s  Missing cupsUIResolver %s" = "      %s  Missing cupsUIResolver %s";
 
@@ -342,6 +314,10 @@
 
 "      **FAIL**  REQUIRED ShortNickName\n                REF: Page 64-65, section 5.3." = "      **FAIL**  REQUIRED ShortNickName\n                REF: Page 64-65, section 5.3.";
 
+"      **FAIL**  Unable to open PPD file - %s" = "      **FAIL**  Unable to open PPD file - %s";
+
+"      **FAIL**  Unable to open PPD file - %s on line %d." = "      **FAIL**  Unable to open PPD file - %s on line %d.";
+
 "    %d ERRORS FOUND" = "    %d ERRORS FOUND";
 
 "    --[no-]debug-logging    Turn debug logging on/off." = "    --[no-]debug-logging    Turn debug logging on/off.";
@@ -416,141 +392,127 @@
 
 "  --lf                 End lines with LF (UNIX/Linux/Mac OS X)." = "  --lf                 End lines with LF (UNIX/Linux/Mac OS X).";
 
-"  -4             Connect using IPv4." = "  -4             Connect using IPv4.";
+"  -4                   Connect using IPv4." = "  -4                   Connect using IPv4.";
 
-"  -6             Connect using IPv6." = "  -6             Connect using IPv6.";
+"  -6                   Connect using IPv6." = "  -6                   Connect using IPv6.";
 
-"  -C             Send requests using chunking (default)." = "  -C             Send requests using chunking (default).";
+"  -C                   Send requests using chunking (default)." = "  -C                   Send requests using chunking (default).";
 
 "  -D                   Remove the input file when finished." = "  -D                   Remove the input file when finished.";
 
 "  -D name=value        Set named variable to value." = "  -D name=value        Set named variable to value.";
 
-"  -D name=value     Set named variable to value." = "  -D name=value     Set named variable to value.";
+"  -E                   Encrypt the connection to the server." = "  -E                   Encrypt the connection to the server.";
 
-"  -E               Encrypt the connection to the server." = "  -E               Encrypt the connection to the server.";
+"  -E                   Test with TLS encryption." = "  -E                   Test with TLS encryption.";
 
-"  -E             Test with TLS encryption." = "  -E             Test with TLS encryption.";
+"  -F                   Run in the foreground but detach from console." = "  -F                   Run in the foreground but detach from console.";
 
-"  -H samba-server  Use the named SAMBA server." = "  -H samba-server  Use the named SAMBA server.";
+"  -H samba-server      Use the named SAMBA server." = "  -H samba-server      Use the named SAMBA server.";
 
-"  -I             Ignore errors." = "  -I             Ignore errors.";
-
-"  -I include-dir" = "  -I include-dir";
+"  -I                   Ignore errors." = "  -I                   Ignore errors.";
 
 "  -I include-dir       Add include directory to search path." = "  -I include-dir       Add include directory to search path.";
 
-"  -I include-dir    Add include directory to search path." = "  -I include-dir    Add include directory to search path.";
-
 "  -J title             Set title." = "  -J title             Set title.";
 
-"  -L             Send requests using content-length." = "  -L             Send requests using content-length.";
+"  -L                   Send requests using content-length." = "  -L                   Send requests using content-length.";
 
 "  -P filename.ppd      Set PPD file." = "  -P filename.ppd      Set PPD file.";
 
-"  -S             Test with SSL encryption." = "  -S             Test with SSL encryption.";
+"  -S                   Test with SSL encryption." = "  -S                   Test with SSL encryption.";
 
-"  -T             Set the receive/send timeout in seconds." = "  -T             Set the receive/send timeout in seconds.";
+"  -T                   Set the receive/send timeout in seconds." = "  -T                   Set the receive/send timeout in seconds.";
 
-"  -U samba-user    Authenticate using the named SAMBA user." = "  -U samba-user    Authenticate using the named SAMBA user.";
+"  -U samba-user        Authenticate using the named SAMBA user." = "  -U samba-user        Authenticate using the named SAMBA user.";
 
 "  -U username          Set username for job." = "  -U username          Set username for job.";
 
-"  -V version     Set default IPP version." = "  -V version     Set default IPP version.";
+"  -V version           Set default IPP version." = "  -V version           Set default IPP version.";
 
-"  -X             Produce XML plist instead of plain text." = "  -X             Produce XML plist instead of plain text.";
+"  -X                   Produce XML plist instead of plain text." = "  -X                   Produce XML plist instead of plain text.";
 
-"  -a               Export all printers." = "  -a               Export all printers.";
+"  -a                   Export all printers." = "  -a                   Export all printers.";
 
 "  -a 'name=value ...'  Set option(s)." = "  -a 'name=value ...'  Set option(s).";
 
 "  -c catalog.po        Load the specified message catalog." = "  -c catalog.po        Load the specified message catalog.";
 
+"  -c config-file       Load alternate configuration file." = "  -c config-file       Load alternate configuration file.";
+
 "  -c copies            Set number of copies." = "  -c copies            Set number of copies.";
 
-"  -c cupsd.conf    Set cupsd.conf file to use." = "  -c cupsd.conf    Set cupsd.conf file to use.";
+"  -c cupsd.conf        Set cupsd.conf file to use." = "  -c cupsd.conf        Set cupsd.conf file to use.";
 
-"  -d name=value  Define variable." = "  -d name=value  Define variable.";
+"  -d name=value        Set named variable to value." = "  -d name=value        Set named variable to value.";
 
 "  -d output-dir        Specify the output directory." = "  -d output-dir        Specify the output directory.";
 
 "  -d printer           Use the named printer." = "  -d printer           Use the named printer.";
 
-"  -d printer       Use the named printer." = "  -d printer       Use the named printer.";
-
 "  -e                   Use every filter from the PPD file." = "  -e                   Use every filter from the PPD file.";
 
-"  -e               Use every filter from the PPD file." = "  -e               Use every filter from the PPD file.";
+"  -f                   Run in the foreground." = "  -f                   Run in the foreground.";
+
+"  -f filename          Set default request filename." = "  -f filename          Set default request filename.";
 
 "  -f filename          Set file to be converted (otherwise stdin)." = "  -f filename          Set file to be converted (otherwise stdin).";
 
-"  -f filename    Set default request filename." = "  -f filename    Set default request filename.";
+"  -h                   Show this usage message." = "  -h                   Show this usage message.";
 
-"  -h cups-server   Use the named CUPS server." = "  -h cups-server   Use the named CUPS server.";
+"  -h cups-server       Use the named CUPS server." = "  -h cups-server       Use the named CUPS server.";
 
 "  -i mime/type         Set input MIME type (otherwise auto-typed)." = "  -i mime/type         Set input MIME type (otherwise auto-typed).";
 
-"  -i seconds     Repeat the last file with the given time interval." = "  -i seconds     Repeat the last file with the given time interval.";
+"  -i seconds           Repeat the last file with the given time interval." = "  -i seconds           Repeat the last file with the given time interval.";
 
-"  -j job-id[,N]    Filter file N from the specified job (default is file 1)." = "  -j job-id[,N]    Filter file N from the specified job (default is file 1).";
+"  -j job-id[,N]        Filter file N from the specified job (default is file 1)." = "  -j job-id[,N]        Filter file N from the specified job (default is file 1).";
 
 "  -j mime/type         Set output MIME type (otherwise application/pdf)." = "  -j mime/type         Set output MIME type (otherwise application/pdf).";
+
+"  -l                   Run cupsd from launchd(8)." = "  -l                   Run cupsd from launchd(8).";
 
 "  -l lang[,lang,...]   Specify the output language(s) (locale)." = "  -l lang[,lang,...]   Specify the output language(s) (locale).";
 
 "  -m                   Use the ModelName value as the filename." = "  -m                   Use the ModelName value as the filename.";
 
-"  -n copies        Set number of copies." = "  -n copies        Set number of copies.";
+"  -n copies            Set number of copies." = "  -n copies            Set number of copies.";
 
-"  -n count       Repeat the last file the given number of times." = "  -n count       Repeat the last file the given number of times.";
+"  -n count             Repeat the last file the given number of times." = "  -n count             Repeat the last file the given number of times.";
 
 "  -o filename          Set file to be generated (otherwise stdout)." = "  -o filename          Set file to be generated (otherwise stdout).";
 
-"  -o filename.drv" = "  -o filename.drv";
+"  -o filename.drv      Set driver information file (otherwise ppdi.drv)." = "  -o filename.drv      Set driver information file (otherwise ppdi.drv).";
 
-"  -o filename.ppd[.gz]" = "  -o filename.ppd[.gz]";
+"  -o filename.ppd[.gz] Set output file (otherwise stdout)." = "  -o filename.ppd[.gz] Set output file (otherwise stdout).";
 
-"  -o name=value    Set option(s)." = "  -o name=value    Set option(s).";
+"  -o name=value        Set option(s)." = "  -o name=value        Set option(s).";
 
-"  -p filename.ppd  Set PPD file." = "  -p filename.ppd  Set PPD file.";
+"  -p filename.ppd      Set PPD file." = "  -p filename.ppd      Set PPD file.";
 
-"  -q             Be quiet - no output except errors." = "  -q             Be quiet - no output except errors.";
+"  -q                   Be quiet - no output except errors." = "  -q                   Be quiet - no output except errors.";
+
+"  -t                   Produce a test report." = "  -t                   Produce a test report.";
 
 "  -t                   Test PPDs instead of generating them." = "  -t                   Test PPDs instead of generating them.";
 
-"  -t             Produce a test report." = "  -t             Produce a test report.";
+"  -t                   Test the configuration file." = "  -t                   Test the configuration file.";
 
-"  -t title         Set title." = "  -t title         Set title.";
+"  -t title             Set title." = "  -t title             Set title.";
 
 "  -u                   Remove the PPD file when finished." = "  -u                   Remove the PPD file when finished.";
 
 "  -v                   Be verbose (more v's for more verbosity)." = "  -v                   Be verbose (more v's for more verbosity).";
 
-"  -v                Be verbose (more v's for more verbosity)." = "  -v                Be verbose (more v's for more verbosity).";
+"  -v                   Be verbose (show commands)." = "  -v                   Be verbose (show commands).";
 
-"  -v               Be verbose (show commands)." = "  -v               Be verbose (show commands).";
-
-"  -v             Show all attributes sent and received." = "  -v             Show all attributes sent and received.";
+"  -v                   Show all attributes sent and received." = "  -v                   Show all attributes sent and received.";
 
 "  -z                   Compress PPD files using GNU zip." = "  -z                   Compress PPD files using GNU zip.";
 
 " FAIL" = " FAIL";
 
-" FAIL      **FAIL**  Unable to open PPD file - %s" = " FAIL      **FAIL**  Unable to open PPD file - %s";
-
-" FAIL      **FAIL**  Unable to open PPD file - %s on line %d." = " FAIL      **FAIL**  Unable to open PPD file - %s on line %d.";
-
 " PASS" = " PASS";
-
-"#10 Envelope" = "#10 Envelope";
-
-"#11 Envelope" = "#11 Envelope";
-
-"#12 Envelope" = "#12 Envelope";
-
-"#14 Envelope" = "#14 Envelope";
-
-"#9 Envelope" = "#9 Envelope";
 
 "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes" = "%-6s %-10.10s %-4d %-10d %-27.27s %.0f bytes";
 
@@ -789,18 +751,6 @@
 "-90" = "-90";
 
 "-95" = "-95";
-
-"-F                  Run in the foreground but detach from console." = "-F                  Run in the foreground but detach from console.";
-
-"-c config-file      Load alternate configuration file." = "-c config-file      Load alternate configuration file.";
-
-"-f                  Run in the foreground." = "-f                  Run in the foreground.";
-
-"-h                  Show this usage message." = "-h                  Show this usage message.";
-
-"-l                  Run cupsd from launchd(8)." = "-l                  Run cupsd from launchd(8).";
-
-"-t                  Test the configuration file." = "-t                  Test the configuration file.";
 
 "0" = "0";
 
@@ -1142,17 +1092,17 @@
 
 "A3" = "A3";
 
-"A3 (Oversize)" = "A3 (Oversize)";
+"A3 Oversize" = "A3 Oversize";
 
 "A4" = "A4";
 
-"A4 (Oversize)" = "A4 (Oversize)";
+"A4 Oversize" = "A4 Oversize";
 
-"A4 (Small)" = "A4 (Small)";
+"A4 Small" = "A4 Small";
 
 "A5" = "A5";
 
-"A5 (Oversize)" = "A5 (Oversize)";
+"A5 Oversize" = "A5 Oversize";
 
 "A6" = "A6";
 
@@ -1171,10 +1121,6 @@
 "ANSI D" = "ANSI D";
 
 "ANSI E" = "ANSI E";
-
-"ARCH A" = "ARCH A";
-
-"ARCH B" = "ARCH B";
 
 "ARCH C" = "ARCH C";
 
@@ -1222,6 +1168,10 @@
 
 "B5" = "B5";
 
+"B5 JIS" = "B5 JIS";
+
+"B5 Oversize" = "B5 Oversize";
+
 "B6" = "B6";
 
 "B7" = "B7";
@@ -1258,13 +1208,11 @@
 
 "Bad custom parameter" = "Bad custom parameter";
 
-"Bad device URI \"%s\"." = "Bad device URI \"%s\".";
+"Bad device-uri \"%s\"." = "Bad device-uri \"%s\".";
 
-"Bad device-uri \"%s\"" = "Bad device-uri \"%s\"";
+"Bad device-uri scheme \"%s\"." = "Bad device-uri scheme \"%s\".";
 
-"Bad device-uri scheme \"%s\"" = "Bad device-uri scheme \"%s\"";
-
-"Bad document-format \"%s\"" = "Bad document-format \"%s\"";
+"Bad document-format \"%s\"." = "Bad document-format \"%s\".";
 
 "Bad filename buffer" = "Bad filename buffer";
 
@@ -1272,35 +1220,35 @@
 
 "Bad font description line: %s" = "Bad font description line: %s";
 
-"Bad job-priority value" = "Bad job-priority value";
+"Bad job-priority value." = "Bad job-priority value.";
 
-"Bad job-sheets value \"%s\"" = "Bad job-sheets value \"%s\"";
+"Bad job-sheets value \"%s\"." = "Bad job-sheets value \"%s\".";
 
-"Bad job-sheets value type" = "Bad job-sheets value type";
+"Bad job-sheets value type." = "Bad job-sheets value type.";
 
-"Bad job-state value" = "Bad job-state value";
+"Bad job-state value." = "Bad job-state value.";
 
-"Bad job-uri attribute \"%s\"" = "Bad job-uri attribute \"%s\"";
+"Bad job-uri \"%s\"." = "Bad job-uri \"%s\".";
 
 "Bad lpi value %f." = "Bad lpi value %f.";
 
-"Bad notify-pull-method \"%s\"" = "Bad notify-pull-method \"%s\"";
+"Bad notify-pull-method \"%s\"." = "Bad notify-pull-method \"%s\".";
 
-"Bad notify-recipient-uri URI \"%s\"" = "Bad notify-recipient-uri URI \"%s\"";
+"Bad notify-recipient-uri \"%s\"." = "Bad notify-recipient-uri \"%s\".";
 
 "Bad number-up value %d." = "Bad number-up value %d.";
 
-"Bad option + choice on line %d" = "Bad option + choice on line %d";
+"Bad option + choice on line %d." = "Bad option + choice on line %d.";
 
 "Bad page-ranges values %d-%d." = "Bad page-ranges values %d-%d.";
 
-"Bad port-monitor \"%s\"" = "Bad port-monitor \"%s\"";
+"Bad port-monitor \"%s\"." = "Bad port-monitor \"%s\".";
 
-"Bad printer-state value %d" = "Bad printer-state value %d";
+"Bad printer-state value %d." = "Bad printer-state value %d.";
 
-"Bad request ID %d" = "Bad request ID %d";
+"Bad request ID %d." = "Bad request ID %d.";
 
-"Bad request version number %d.%d" = "Bad request version number %d.%d";
+"Bad request version number %d.%d." = "Bad request version number %d.%d.";
 
 "Bad subscription ID" = "Bad subscription ID";
 
@@ -1324,30 +1272,6 @@
 
 "Buffer overflow detected, aborting." = "Buffer overflow detected, aborting.";
 
-"C0 Envelope" = "C0 Envelope";
-
-"C1 Envelope" = "C1 Envelope";
-
-"C2 Envelope" = "C2 Envelope";
-
-"C3 Envelope" = "C3 Envelope";
-
-"C4" = "C4";
-
-"C4 Envelope" = "C4 Envelope";
-
-"C5" = "C5";
-
-"C5 Envelope" = "C5 Envelope";
-
-"C6" = "C6";
-
-"C6 Envelope" = "C6 Envelope";
-
-"C65 Envelope" = "C65 Envelope";
-
-"C7 Envelope" = "C7 Envelope";
-
 "CMYK" = "CMYK";
 
 "CPCL Label Printer" = "CPCL Label Printer";
@@ -1361,10 +1285,6 @@
 "Change Settings" = "Change Settings";
 
 "Character set \"%s\" not supported" = "Character set \"%s\" not supported";
-
-"Chou3 Envelope" = "Chou3 Envelope";
-
-"Chou4 Envelope" = "Chou4 Envelope";
 
 "Classes" = "Classes";
 
@@ -1408,10 +1328,6 @@
 
 "Cutter" = "Cutter";
 
-"DL" = "DL";
-
-"DL Envelope" = "DL Envelope";
-
 "Dark" = "Dark";
 
 "Darkness" = "Darkness";
@@ -1436,8 +1352,6 @@
 
 "Document %d not found in job %d." = "Document %d not found in job %d.";
 
-"Double Postcard" = "Double Postcard";
-
 "Driver Name: " = "Driver Name: ";
 
 "Driver Version: " = "Driver Version: ";
@@ -1452,7 +1366,7 @@
 
 "Edit Configuration File" = "Edit Configuration File";
 
-"Empty PPD file" = "Empty PPD file";
+"Empty PPD file." = "Empty PPD file.";
 
 "Ending Banner" = "Ending Banner";
 
@@ -1466,7 +1380,83 @@
 
 "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket." = "Enter your username and password or the root username and password to access this page. If you are using Kerberos authentication, make sure you have a valid Kerberos ticket.";
 
+"Envelope #10 " = "Envelope #10 ";
+
+"Envelope #11" = "Envelope #11";
+
+"Envelope #12" = "Envelope #12";
+
+"Envelope #14" = "Envelope #14";
+
+"Envelope #9" = "Envelope #9";
+
+"Envelope B4" = "Envelope B4";
+
+"Envelope B5" = "Envelope B5";
+
+"Envelope B6" = "Envelope B6";
+
+"Envelope C0" = "Envelope C0";
+
+"Envelope C1" = "Envelope C1";
+
+"Envelope C2" = "Envelope C2";
+
+"Envelope C3" = "Envelope C3";
+
+"Envelope C4" = "Envelope C4";
+
+"Envelope C5" = "Envelope C5";
+
+"Envelope C6" = "Envelope C6";
+
+"Envelope C65" = "Envelope C65";
+
+"Envelope C7" = "Envelope C7";
+
+"Envelope Choukei 3" = "Envelope Choukei 3";
+
+"Envelope Choukei 4" = "Envelope Choukei 4";
+
+"Envelope DL" = "Envelope DL";
+
 "Envelope Feed" = "Envelope Feed";
+
+"Envelope Invite" = "Envelope Invite";
+
+"Envelope Italian" = "Envelope Italian";
+
+"Envelope Kaku2" = "Envelope Kaku2";
+
+"Envelope Kaku3" = "Envelope Kaku3";
+
+"Envelope Monarch" = "Envelope Monarch";
+
+"Envelope PRC1 " = "Envelope PRC1 ";
+
+"Envelope PRC10" = "Envelope PRC10";
+
+"Envelope PRC2" = "Envelope PRC2";
+
+"Envelope PRC3" = "Envelope PRC3";
+
+"Envelope PRC4" = "Envelope PRC4";
+
+"Envelope PRC5" = "Envelope PRC5";
+
+"Envelope PRC5PRC5" = "Envelope PRC5PRC5";
+
+"Envelope PRC6" = "Envelope PRC6";
+
+"Envelope PRC7" = "Envelope PRC7";
+
+"Envelope PRC8" = "Envelope PRC8";
+
+"Envelope PRC9" = "Envelope PRC9";
+
+"Envelope Personal" = "Envelope Personal";
+
+"Envelope You4" = "Envelope You4";
 
 "Epson" = "Epson";
 
@@ -1494,11 +1484,19 @@
 
 "Every Label" = "Every Label";
 
+"Executive" = "Executive";
+
 "Expectation Failed" = "Expectation Failed";
 
 "Export Printers to Samba" = "Export Printers to Samba";
 
 "FAIL" = "FAIL";
+
+"FanFold German" = "FanFold German";
+
+"FanFold Legal German" = "FanFold Legal German";
+
+"Fanfold US" = "Fanfold US";
 
 "File Folder" = "File Folder";
 
@@ -1518,10 +1516,6 @@
 
 "Generic" = "Generic";
 
-"German FanFold" = "German FanFold";
-
-"German FanFold Legal" = "German FanFold Legal";
-
 "Get-Response-PDU uses indefinite length" = "Get-Response-PDU uses indefinite length";
 
 "Glossy Paper" = "Glossy Paper";
@@ -1535,36 +1529,6 @@
 "Hanging Folder" = "Hanging Folder";
 
 "Hanging Folder - 9/16 x 2\"" = "Hanging Folder - 9/16 x 2\"";
-
-"ISO B0" = "ISO B0";
-
-"ISO B1" = "ISO B1";
-
-"ISO B10" = "ISO B10";
-
-"ISO B2" = "ISO B2";
-
-"ISO B3" = "ISO B3";
-
-"ISO B4" = "ISO B4";
-
-"ISO B4 Envelope" = "ISO B4 Envelope";
-
-"ISO B5" = "ISO B5";
-
-"ISO B5 (Oversize)" = "ISO B5 (Oversize)";
-
-"ISO B5 Envelope" = "ISO B5 Envelope";
-
-"ISO B6" = "ISO B6";
-
-"ISO B6 Envelope" = "ISO B6 Envelope";
-
-"ISO B7" = "ISO B7";
-
-"ISO B8" = "ISO B8";
-
-"ISO B9" = "ISO B9";
 
 "ISOLatin1" = "ISOLatin1";
 
@@ -1600,9 +1564,25 @@
 
 "Internet Printing Protocol" = "Internet Printing Protocol";
 
-"Invite Envelope" = "Invite Envelope";
+"JB0" = "JB0";
 
-"Italian Envelope" = "Italian Envelope";
+"JB1" = "JB1";
+
+"JB10" = "JB10";
+
+"JB2" = "JB2";
+
+"JB3" = "JB3";
+
+"JB4" = "JB4";
+
+"JB6" = "JB6";
+
+"JB7" = "JB7";
+
+"JB8" = "JB8";
+
+"JB9" = "JB9";
 
 "JCL" = "JCL";
 
@@ -1650,10 +1630,6 @@
 
 "Jobs" = "Jobs";
 
-"Kaku2 Envelope" = "Kaku2 Envelope";
-
-"Kaku3 Envelope" = "Kaku3 Envelope";
-
 "LPD/LPR Host or Printer" = "LPD/LPR Host or Printer";
 
 "Label Printer" = "Label Printer";
@@ -1667,6 +1643,8 @@
 "Large Address - 1 4/10 x 3 1/2\"" = "Large Address - 1 4/10 x 3 1/2\"";
 
 "LaserJet Series PCL 4/5" = "LaserJet Series PCL 4/5";
+
+"Letter Oversize" = "Letter Oversize";
 
 "Light" = "Light";
 
@@ -1712,7 +1690,7 @@
 
 "Missing document-number attribute" = "Missing document-number attribute";
 
-"Missing double quote on line %d" = "Missing double quote on line %d";
+"Missing double quote on line %d." = "Missing double quote on line %d.";
 
 "Missing form variable" = "Missing form variable";
 
@@ -1728,9 +1706,9 @@
 
 "Missing required attributes" = "Missing required attributes";
 
-"Missing value on line %d" = "Missing value on line %d";
-
 "Missing value on line %d of banner file." = "Missing value on line %d of banner file.";
+
+"Missing value on line %d." = "Missing value on line %d.";
 
 "Missing value string" = "Missing value string";
 
@@ -1745,8 +1723,6 @@
 "Modify Printer" = "Modify Printer";
 
 "Monarch" = "Monarch";
-
-"Monarch Envelope" = "Monarch Envelope";
 
 "Move All Jobs" = "Move All Jobs";
 
@@ -1784,7 +1760,7 @@
 
 "No VarBind SEQUENCE" = "No VarBind SEQUENCE";
 
-"No Windows printer drivers are installed" = "No Windows printer drivers are installed";
+"No Windows printer drivers are installed." = "No Windows printer drivers are installed.";
 
 "No active connection" = "No active connection";
 
@@ -1896,31 +1872,11 @@
 
 "PCL Laser Printer" = "PCL Laser Printer";
 
-"PRC1 Envelope" = "PRC1 Envelope";
-
-"PRC10 Envelope" = "PRC10 Envelope";
-
 "PRC16K" = "PRC16K";
-
-"PRC2 Envelope" = "PRC2 Envelope";
-
-"PRC3 Envelope" = "PRC3 Envelope";
 
 "PRC32K" = "PRC32K";
 
-"PRC32K (Oversize)" = "PRC32K (Oversize)";
-
-"PRC4 Envelope" = "PRC4 Envelope";
-
-"PRC5 Envelope" = "PRC5 Envelope";
-
-"PRC6 Envelope" = "PRC6 Envelope";
-
-"PRC7 Envelope" = "PRC7 Envelope";
-
-"PRC8 Envelope" = "PRC8 Envelope";
-
-"PRC9 Envelope" = "PRC9 Envelope";
+"PRC32K Oversize" = "PRC32K Oversize";
 
 "Packet does not contain a Get-Response-PDU" = "Packet does not contain a Get-Response-PDU";
 
@@ -1940,8 +1896,6 @@
 
 "Peel-Off" = "Peel-Off";
 
-"Personal Envelope" = "Personal Envelope";
-
 "Photo" = "Photo";
 
 "Photo Labels" = "Photo Labels";
@@ -1955,6 +1909,10 @@
 "PostScript Printer" = "PostScript Printer";
 
 "Postcard" = "Postcard";
+
+"Postcard Double" = "Postcard Double";
+
+"Postcard Double " = "Postcard Double ";
 
 "Print Density" = "Print Density";
 
@@ -2132,7 +2090,7 @@
 
 "Tabloid" = "Tabloid";
 
-"Tabloid (Oversize)" = "Tabloid (Oversize)";
+"Tabloid Oversize" = "Tabloid Oversize";
 
 "Tear" = "Tear";
 
@@ -2190,9 +2148,9 @@
 
 "The printer is low on toner." = "The printer is low on toner.";
 
-"The printer is not responding." = "The printer is not responding.";
+"The printer is not connected." = "The printer is not connected.";
 
-"The printer is offline." = "The printer is offline.";
+"The printer is not responding." = "The printer is not responding.";
 
 "The printer is out of ink." = "The printer is out of ink.";
 
@@ -2238,6 +2196,8 @@
 
 "This printer does not conform to the IPP standard and may not work." = "This printer does not conform to the IPP standard and may not work.";
 
+"This printer does not conform to the IPP standard. Please contact the manufacturer of your printer for assistance." = "This printer does not conform to the IPP standard. Please contact the manufacturer of your printer for assistance.";
+
 "Title: " = "Title: ";
 
 "Too many active jobs." = "Too many active jobs.";
@@ -2260,21 +2220,17 @@
 
 "URI Too Long" = "URI Too Long";
 
-"US Executive" = "US Executive";
-
-"US Fanfold" = "US Fanfold";
-
 "US Ledger" = "US Ledger";
 
 "US Legal" = "US Legal";
 
-"US Legal (Oversize)" = "US Legal (Oversize)";
+"US Legal Oversize" = "US Legal Oversize";
 
 "US Letter" = "US Letter";
 
-"US Letter (Oversize)" = "US Letter (Oversize)";
+"US Letter Oversize" = "US Letter Oversize";
 
-"US Letter (Small)" = "US Letter (Small)";
+"US Letter Small" = "US Letter Small";
 
 "USB Serial Port #%d" = "USB Serial Port #%d";
 
@@ -2312,19 +2268,19 @@
 
 "Unable to contact printer, queuing on next printer in class." = "Unable to contact printer, queuing on next printer in class.";
 
-"Unable to copy 64-bit CUPS printer driver files (%d)" = "Unable to copy 64-bit CUPS printer driver files (%d)";
+"Unable to copy 64-bit CUPS printer driver files (%d)." = "Unable to copy 64-bit CUPS printer driver files (%d).";
 
-"Unable to copy 64-bit Windows printer driver files (%d)" = "Unable to copy 64-bit Windows printer driver files (%d)";
+"Unable to copy 64-bit Windows printer driver files (%d)." = "Unable to copy 64-bit Windows printer driver files (%d).";
 
-"Unable to copy CUPS printer driver files (%d)" = "Unable to copy CUPS printer driver files (%d)";
+"Unable to copy CUPS printer driver files (%d)." = "Unable to copy CUPS printer driver files (%d).";
 
 "Unable to copy PPD file" = "Unable to copy PPD file";
 
 "Unable to copy PPD file - %s" = "Unable to copy PPD file - %s";
 
-"Unable to copy Windows 2000 printer driver files (%d)" = "Unable to copy Windows 2000 printer driver files (%d)";
+"Unable to copy Windows 2000 printer driver files (%d)." = "Unable to copy Windows 2000 printer driver files (%d).";
 
-"Unable to copy Windows 9x printer driver files (%d)" = "Unable to copy Windows 9x printer driver files (%d)";
+"Unable to copy Windows 9x printer driver files (%d)." = "Unable to copy Windows 9x printer driver files (%d).";
 
 "Unable to copy interface script - %s" = "Unable to copy interface script - %s";
 
@@ -2388,9 +2344,9 @@
 
 "Unable to get printer status: %s" = "Unable to get printer status: %s";
 
-"Unable to install Windows 2000 printer driver files (%d)" = "Unable to install Windows 2000 printer driver files (%d)";
+"Unable to install Windows 2000 printer driver files (%d)." = "Unable to install Windows 2000 printer driver files (%d).";
 
-"Unable to install Windows 9x printer driver files (%d)" = "Unable to install Windows 9x printer driver files (%d)";
+"Unable to install Windows 9x printer driver files (%d)." = "Unable to install Windows 9x printer driver files (%d).";
 
 "Unable to locate printer \"%s\"." = "Unable to locate printer \"%s\".";
 
@@ -2430,8 +2386,6 @@
 
 "Unable to print test page:" = "Unable to print test page:";
 
-"Unable to print: the printer does not conform to the IPP standard." = "Unable to print: the printer does not conform to the IPP standard.";
-
 "Unable to read print data" = "Unable to read print data";
 
 "Unable to read print data." = "Unable to read print data.";
@@ -2446,7 +2400,7 @@
 
 "Unable to send raster data to the driver." = "Unable to send raster data to the driver.";
 
-"Unable to set Windows printer driver (%d)" = "Unable to set Windows printer driver (%d)";
+"Unable to set Windows printer driver (%d)." = "Unable to set Windows printer driver (%d).";
 
 "Unable to set options:" = "Unable to set options:";
 
@@ -2574,15 +2528,13 @@
 
 "Waiting for printer to finish." = "Waiting for printer to finish.";
 
-"Warning, no Windows 2000 printer drivers are installed" = "Warning, no Windows 2000 printer drivers are installed";
+"Warning, no Windows 2000 printer drivers are installed." = "Warning, no Windows 2000 printer drivers are installed.";
 
 "Web Interface is Disabled" = "Web Interface is Disabled";
 
 "Yes" = "Yes";
 
 "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>." = "You must access this page using the URL <A HREF=\"https://%s:%d%s\">https://%s:%d%s</A>.";
-
-"You4 Envelope" = "You4 Envelope";
 
 "Your password must be at least 6 characters long, cannot contain your username, and must contain at least one letter and number." = "Your password must be at least 6 characters long, cannot contain your username, and must contain at least one letter and number.";
 

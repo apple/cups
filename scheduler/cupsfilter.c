@@ -3,7 +3,7 @@
  *
  *   Filtering program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1355,16 +1355,17 @@ usage(const char *command,		/* I - Command name */
     _cupsLangPuts(stdout, _("Usage: cupsfilter -m mime/type [ options ] "
                             "filename"));
     _cupsLangPuts(stdout, _("Options:"));
-    _cupsLangPuts(stdout, _("  -c cupsd.conf    Set cupsd.conf file to use."));
-    _cupsLangPuts(stdout, _("  -d printer       Use the named printer."));
-    _cupsLangPuts(stdout, _("  -e               Use every filter from the PPD "
-                            "file."));
-    _cupsLangPuts(stdout, _("  -j job-id[,N]    Filter file N from the "
+    _cupsLangPuts(stdout, _("  -c cupsd.conf        Set cupsd.conf file to "
+                            "use."));
+    _cupsLangPuts(stdout, _("  -d printer           Use the named printer."));
+    _cupsLangPuts(stdout, _("  -e                   Use every filter from "
+                            "the PPD file."));
+    _cupsLangPuts(stdout, _("  -j job-id[,N]        Filter file N from the "
                             "specified job (default is file 1)."));
-    _cupsLangPuts(stdout, _("  -n copies        Set number of copies."));
-    _cupsLangPuts(stdout, _("  -o name=value    Set option(s)."));
-    _cupsLangPuts(stdout, _("  -p filename.ppd  Set PPD file."));
-    _cupsLangPuts(stdout, _("  -t title         Set title."));
+    _cupsLangPuts(stdout, _("  -n copies            Set number of copies."));
+    _cupsLangPuts(stdout, _("  -o name=value        Set option(s)."));
+    _cupsLangPuts(stdout, _("  -p filename.ppd      Set PPD file."));
+    _cupsLangPuts(stdout, _("  -t title             Set title."));
   }
   else
   {
@@ -1388,8 +1389,8 @@ usage(const char *command,		/* I - Command name */
     _cupsLangPuts(stdout, _("  -c copies            Set number of copies."));
     _cupsLangPuts(stdout, _("  -u                   Remove the PPD file when "
                             "finished."));
-    _cupsLangPuts(stdout, _("  -D                   Remove the input file when "
-                            "finished."));
+    _cupsLangPuts(stdout, _("  -D                   Remove the input file "
+                            "when finished."));
   }
 
   exit(1);

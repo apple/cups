@@ -25,10 +25,12 @@
 			);
 			dependencies = (
 				274FF5E313332D4300317ECB /* PBXTargetDependency */,
+				72F75A711336FACD004BB496 /* PBXTargetDependency */,
 				274FF5E513332D4300317ECB /* PBXTargetDependency */,
 				274FF622133331D300317ECB /* PBXTargetDependency */,
 				274FF5E713332D4300317ECB /* PBXTargetDependency */,
 				274FF6E21333B33F00317ECB /* PBXTargetDependency */,
+				72F75A731336FACD004BB496 /* PBXTargetDependency */,
 				274FF6391333348400317ECB /* PBXTargetDependency */,
 				274FF5E913332D4300317ECB /* PBXTargetDependency */,
 				274FF648133335A300317ECB /* PBXTargetDependency */,
@@ -154,7 +156,6 @@
 		274FF6C91333B1C400317ECB /* ipp.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EE7133305BB00FCA411 /* ipp.h */; settings = {ATTRIBUTES = (); }; };
 		274FF6CA1333B1C400317ECB /* language.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EEB133305BB00FCA411 /* language.h */; settings = {ATTRIBUTES = (); }; };
 		274FF6CB1333B1C400317ECB /* ppd.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EF7133305BB00FCA411 /* ppd.h */; settings = {ATTRIBUTES = (); }; };
-		274FF6CC1333B1C400317ECB /* raster.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EFA133305BB00FCA411 /* raster.h */; settings = {ATTRIBUTES = (); }; };
 		274FF6CD1333B1C400317ECB /* sidechannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EFD133305BB00FCA411 /* sidechannel.h */; settings = {ATTRIBUTES = (); }; };
 		274FF6CE1333B1C400317ECB /* transcode.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220F07133305BB00FCA411 /* transcode.h */; settings = {ATTRIBUTES = (); }; };
 		274FF6CF1333B1C400317ECB /* versioning.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220F0A133305BB00FCA411 /* versioning.h */; settings = {ATTRIBUTES = (); }; };
@@ -226,7 +227,6 @@
 		72220F31133305BB00FCA411 /* ppd.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EF7133305BB00FCA411 /* ppd.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220F32133305BB00FCA411 /* pwg-media.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EF8133305BB00FCA411 /* pwg-media.c */; };
 		72220F33133305BB00FCA411 /* pwg-private.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EF9133305BB00FCA411 /* pwg-private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		72220F34133305BB00FCA411 /* raster.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EFA133305BB00FCA411 /* raster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72220F35133305BB00FCA411 /* request.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EFB133305BB00FCA411 /* request.c */; };
 		72220F36133305BB00FCA411 /* sidechannel.c in Sources */ = {isa = PBXBuildFile; fileRef = 72220EFC133305BB00FCA411 /* sidechannel.c */; };
 		72220F37133305BB00FCA411 /* sidechannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EFD133305BB00FCA411 /* sidechannel.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -315,6 +315,12 @@
 		7263EE3613330E4E00BA4D44 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE3513330E4E00BA4D44 /* CoreFoundation.framework */; };
 		7263EE3813330E7500BA4D44 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE3713330E7500BA4D44 /* libz.dylib */; };
 		7263EE3A13330EC500BA4D44 /* libldap.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE3913330EC500BA4D44 /* libldap.dylib */; };
+		72F75A5C1336F988004BB496 /* cupstestppd.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A5B1336F988004BB496 /* cupstestppd.c */; };
+		72F75A671336FA38004BB496 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		72F75A6C1336FA8A004BB496 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A691336FA8A004BB496 /* error.c */; };
+		72F75A6D1336FA8A004BB496 /* interpret.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6A1336FA8A004BB496 /* interpret.c */; };
+		72F75A6E1336FA8A004BB496 /* raster.c in Sources */ = {isa = PBXBuildFile; fileRef = 72F75A6B1336FA8A004BB496 /* raster.c */; };
+		72F75A6F1336FAB6004BB496 /* raster.h in Headers */ = {isa = PBXBuildFile; fileRef = 72220EFA133305BB00FCA411 /* raster.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -549,6 +555,27 @@
 			remoteGlobalIDString = 7243795A1333FF1D009631B9;
 			remoteInfo = usb;
 		};
+		72F75A651336FA30004BB496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		72F75A701336FACD004BB496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72F75A601336F9A3004BB496;
+			remoteInfo = libcupsimage;
+		};
+		72F75A721336FACD004BB496 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72F75A511336F950004BB496;
+			remoteInfo = cupstestppd;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -669,6 +696,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		72F75A501336F950004BB496 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -717,7 +753,6 @@
 		274FF66F13333ACF00317ECB /* cups-polld.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "cups-polld.c"; path = "../scheduler/cups-polld.c"; sourceTree = "<group>"; };
 		274FF67813333B2F00317ECB /* cupsfilter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupsfilter; sourceTree = BUILT_PRODUCTS_DIR; };
 		274FF68713333B6E00317ECB /* cupsfilter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupsfilter.c; path = ../scheduler/cupsfilter.c; sourceTree = "<group>"; };
-		274FF6E01333B1C400317ECB /* libcups_static.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; name = libcups_static.dylib; path = "/Users/msweet/c/cups-trunk/xcode/build/Release/libcups_static.dylib"; sourceTree = "<absolute>"; };
 		72220EAE1333047D00FCA411 /* libcups.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		72220EB51333052D00FCA411 /* adminutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = adminutil.c; path = ../cups/adminutil.c; sourceTree = "<group>"; };
 		72220EB71333056300FCA411 /* adminutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adminutil.h; path = ../cups/adminutil.h; sourceTree = "<group>"; };
@@ -873,6 +908,13 @@
 		7263EE3513330E4E00BA4D44 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		7263EE3713330E7500BA4D44 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		7263EE3913330EC500BA4D44 /* libldap.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libldap.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libldap.dylib; sourceTree = DEVELOPER_DIR; };
+		72F75A4C1336F31B004BB496 /* libcups_static.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcups_static.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		72F75A521336F950004BB496 /* cupstestppd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cupstestppd; sourceTree = BUILT_PRODUCTS_DIR; };
+		72F75A5B1336F988004BB496 /* cupstestppd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cupstestppd.c; path = ../systemv/cupstestppd.c; sourceTree = "<group>"; };
+		72F75A611336F9A3004BB496 /* libcupsimage.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcupsimage.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		72F75A691336FA8A004BB496 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = error.c; path = ../filter/error.c; sourceTree = "<group>"; };
+		72F75A6A1336FA8A004BB496 /* interpret.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = interpret.c; path = ../filter/interpret.c; sourceTree = "<group>"; };
+		72F75A6B1336FA8A004BB496 /* raster.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = raster.c; path = ../filter/raster.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1045,6 +1087,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72F75A4F1336F950004BB496 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72F75A5E1336F9A3004BB496 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72F75A671336FA38004BB496 /* libcups.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1100,6 +1157,7 @@
 		274FF67313333B0A00317ECB /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				72F75A5B1336F988004BB496 /* cupstestppd.c */,
 				274FF68713333B6E00317ECB /* cupsfilter.c */,
 			);
 			name = commands;
@@ -1121,6 +1179,9 @@
 				724379301333FB85009631B9 /* socket */,
 				724379471333FEA9009631B9 /* dnssd */,
 				7243795B1333FF1D009631B9 /* usb */,
+				72F75A4C1336F31B004BB496 /* libcups_static.dylib */,
+				72F75A521336F950004BB496 /* cupstestppd */,
+				72F75A611336F9A3004BB496 /* libcupsimage.dylib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1340,6 +1401,7 @@
 				72220F45133305D000FCA411 /* Public Headers */,
 				72220F461333060C00FCA411 /* Private Headers */,
 				72220EB41333050100FCA411 /* libcups */,
+				72F75A681336FA42004BB496 /* libcupsimage */,
 				72220FB013330B3400FCA411 /* libcupsmime */,
 				274FF5F41333310400317ECB /* libcupsppdc */,
 				724378F71333E3CE009631B9 /* backends */,
@@ -1349,6 +1411,16 @@
 				273BF6B81333B4A90022CAAB /* tests */,
 				72220EAF1333047D00FCA411 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		72F75A681336FA42004BB496 /* libcupsimage */ = {
+			isa = PBXGroup;
+			children = (
+				72F75A691336FA8A004BB496 /* error.c */,
+				72F75A6A1336FA8A004BB496 /* interpret.c */,
+				72F75A6B1336FA8A004BB496 /* raster.c */,
+			);
+			name = libcupsimage;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1390,7 +1462,6 @@
 				274FF6C91333B1C400317ECB /* ipp.h in Headers */,
 				274FF6CA1333B1C400317ECB /* language.h in Headers */,
 				274FF6CB1333B1C400317ECB /* ppd.h in Headers */,
-				274FF6CC1333B1C400317ECB /* raster.h in Headers */,
 				274FF6CD1333B1C400317ECB /* sidechannel.h in Headers */,
 				274FF6CE1333B1C400317ECB /* transcode.h in Headers */,
 				274FF6CF1333B1C400317ECB /* versioning.h in Headers */,
@@ -1411,7 +1482,6 @@
 				72220F21133305BB00FCA411 /* ipp.h in Headers */,
 				72220F25133305BB00FCA411 /* language.h in Headers */,
 				72220F31133305BB00FCA411 /* ppd.h in Headers */,
-				72220F34133305BB00FCA411 /* raster.h in Headers */,
 				72220F37133305BB00FCA411 /* sidechannel.h in Headers */,
 				72220F41133305BB00FCA411 /* transcode.h in Headers */,
 				72220F44133305BB00FCA411 /* versioning.h in Headers */,
@@ -1436,6 +1506,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				72220FB813330BCE00FCA411 /* mime.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72F75A5F1336F9A3004BB496 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72F75A6F1336FAB6004BB496 /* raster.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1601,7 +1679,7 @@
 			);
 			name = libcups_static;
 			productName = libcups;
-			productReference = 274FF6E01333B1C400317ECB /* libcups_static.dylib */;
+			productReference = 72F75A4C1336F31B004BB496 /* libcups_static.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		72220EAD1333047D00FCA411 /* libcups */ = {
@@ -1748,6 +1826,41 @@
 			productReference = 7243795B1333FF1D009631B9 /* usb */;
 			productType = "com.apple.product-type.tool";
 		};
+		72F75A511336F950004BB496 /* cupstestppd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72F75A581336F951004BB496 /* Build configuration list for PBXNativeTarget "cupstestppd" */;
+			buildPhases = (
+				72F75A4E1336F950004BB496 /* Sources */,
+				72F75A4F1336F950004BB496 /* Frameworks */,
+				72F75A501336F950004BB496 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = cupstestppd;
+			productName = cupstestppd;
+			productReference = 72F75A521336F950004BB496 /* cupstestppd */;
+			productType = "com.apple.product-type.tool";
+		};
+		72F75A601336F9A3004BB496 /* libcupsimage */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72F75A621336F9A3004BB496 /* Build configuration list for PBXNativeTarget "libcupsimage" */;
+			buildPhases = (
+				72F75A5D1336F9A3004BB496 /* Sources */,
+				72F75A5E1336F9A3004BB496 /* Frameworks */,
+				72F75A5F1336F9A3004BB496 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				72F75A661336FA30004BB496 /* PBXTargetDependency */,
+			);
+			name = libcupsimage;
+			productName = libcupsimage;
+			productReference = 72F75A611336F9A3004BB496 /* libcupsimage.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1772,6 +1885,7 @@
 				273BF6D91333B6260022CAAB /* Tests */,
 				72220EAD1333047D00FCA411 /* libcups */,
 				274FF6891333B1C400317ECB /* libcups_static */,
+				72F75A601336F9A3004BB496 /* libcupsimage */,
 				72220FAB13330B2200FCA411 /* libcupsmime */,
 				274FF5ED133330C800317ECB /* libcupsppdc */,
 				72220F5A13330A5A00FCA411 /* cupsd */,
@@ -1781,6 +1895,7 @@
 				274FF64E133339C400317ECB /* cups-lpd */,
 				274FF66213333A9B00317ECB /* cups-polld */,
 				274FF67713333B2F00317ECB /* cupsfilter */,
+				72F75A511336F950004BB496 /* cupstestppd */,
 				724379461333FEA9009631B9 /* dnssd */,
 				724378FC1333E43E009631B9 /* ipp */,
 				724379171333E532009631B9 /* lpd */,
@@ -2073,6 +2188,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72F75A4E1336F950004BB496 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72F75A5C1336F988004BB496 /* cupstestppd.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72F75A5D1336F9A3004BB496 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72F75A6C1336FA8A004BB496 /* error.c in Sources */,
+				72F75A6D1336FA8A004BB496 /* interpret.c in Sources */,
+				72F75A6E1336FA8A004BB496 /* raster.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2241,6 +2374,21 @@
 			target = 7243795A1333FF1D009631B9 /* usb */;
 			targetProxy = 724379C21333FF7D009631B9 /* PBXContainerItemProxy */;
 		};
+		72F75A661336FA30004BB496 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 72F75A651336FA30004BB496 /* PBXContainerItemProxy */;
+		};
+		72F75A711336FACD004BB496 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72F75A601336F9A3004BB496 /* libcupsimage */;
+			targetProxy = 72F75A701336FACD004BB496 /* PBXContainerItemProxy */;
+		};
+		72F75A731336FACD004BB496 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72F75A511336F950004BB496 /* cupstestppd */;
+			targetProxy = 72F75A721336FACD004BB496 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -2263,7 +2411,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2281,7 +2428,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2319,7 +2465,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2339,7 +2484,6 @@
 				INSTALL_PATH = /usr/libexec/cups/daemon;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2380,7 +2524,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2402,7 +2545,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2426,7 +2568,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2445,7 +2586,6 @@
 				INSTALL_PATH = /usr/libexec/cups/daemon;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2469,7 +2609,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2488,7 +2627,6 @@
 				INSTALL_PATH = /usr/libexec/cups/daemon;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2512,7 +2650,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2531,7 +2668,6 @@
 				INSTALL_PATH = /usr/libexec/cups/daemon;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2555,7 +2691,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2574,7 +2709,6 @@
 				INSTALL_PATH = /usr/libexec/cups/daemon;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2598,7 +2732,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2617,7 +2750,6 @@
 				INSTALL_PATH = /usr/sbin;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2645,7 +2777,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = libcups_static;
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 			};
 			name = Debug;
@@ -2670,7 +2801,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = libcups_static;
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
 			};
 			name = Release;
@@ -2698,7 +2828,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2721,7 +2850,6 @@
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/cups;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/cups;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2744,7 +2872,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2763,7 +2890,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2787,7 +2913,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2807,7 +2932,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2829,10 +2953,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_MODE_FLAG = "u+rwX,go-rwX";
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2850,9 +2972,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_MODE_FLAG = "u+rwX,go-rwX";
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2873,10 +2993,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2893,9 +3011,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2916,10 +3032,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2936,9 +3050,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2959,10 +3071,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2979,9 +3089,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INSTALL_PATH = /usr/libexec/cups/backend;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -3005,10 +3113,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../backend\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -3028,9 +3134,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../backend\"",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -3046,6 +3150,7 @@
 					"-D_CUPS_SOURCE",
 					"-Wno-shorten-64-to-32",
 				);
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -3061,6 +3166,85 @@
 					"-D_CUPS_SOURCE",
 					"-Wno-shorten-64-to-32",
 				);
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		72F75A591336F951004BB496 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		72F75A5A1336F951004BB496 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		72F75A631336F9A3004BB496 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/lib;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		72F75A641336F9A3004BB496 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = /usr/lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -3200,6 +3384,7 @@
 				724379051333E43E009631B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7243791E1333E532009631B9 /* Build configuration list for PBXNativeTarget "lpd" */ = {
 			isa = XCConfigurationList;
@@ -3208,6 +3393,7 @@
 				724379201333E532009631B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		724379361333FB85009631B9 /* Build configuration list for PBXNativeTarget "socket" */ = {
 			isa = XCConfigurationList;
@@ -3216,6 +3402,7 @@
 				724379381333FB85009631B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7243794D1333FEA9009631B9 /* Build configuration list for PBXNativeTarget "dnssd" */ = {
 			isa = XCConfigurationList;
@@ -3224,6 +3411,7 @@
 				7243794F1333FEA9009631B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		724379611333FF1D009631B9 /* Build configuration list for PBXNativeTarget "usb" */ = {
 			isa = XCConfigurationList;
@@ -3232,6 +3420,7 @@
 				724379631333FF1D009631B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */ = {
 			isa = XCConfigurationList;
@@ -3241,6 +3430,22 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		72F75A581336F951004BB496 /* Build configuration list for PBXNativeTarget "cupstestppd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72F75A591336F951004BB496 /* Debug */,
+				72F75A5A1336F951004BB496 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		72F75A621336F9A3004BB496 /* Build configuration list for PBXNativeTarget "libcupsimage" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72F75A631336F9A3004BB496 /* Debug */,
+				72F75A641336F9A3004BB496 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

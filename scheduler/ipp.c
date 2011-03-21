@@ -306,7 +306,7 @@ cupsdProcessIPPRequest(
 	          con->request->request.any.version[1]);
 
     send_ipp_status(con, IPP_VERSION_NOT_SUPPORTED,
-                    _("Bad request version number %d.%d"),
+                    _("Bad request version number %d.%d."),
 		    con->request->request.any.version[0],
 	            con->request->request.any.version[1]);
   }
@@ -321,7 +321,7 @@ cupsdProcessIPPRequest(
 		  IPP_BAD_REQUEST, con->http.hostname,
                   con->request->request.any.request_id);
 
-    send_ipp_status(con, IPP_BAD_REQUEST, _("Bad request ID %d"),
+    send_ipp_status(con, IPP_BAD_REQUEST, _("Bad request ID %d."),
 		    con->request->request.any.request_id);
   }
   else if (!con->request->attrs)
@@ -1475,7 +1475,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
     if (attr->value_tag != IPP_TAG_KEYWORD &&
         attr->value_tag != IPP_TAG_NAME)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value type"));
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value type."));
       return (NULL);
     }
 
@@ -1491,7 +1491,7 @@ add_job(cupsd_client_t  *con,		/* I - Client connection */
       if (strcmp(attr->values[i].string.text, "none") &&
           !cupsdFindBanner(attr->values[i].string.text))
       {
-	send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value \"%s\""),
+	send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-sheets value \"%s\"."),
 			attr->values[i].string.text);
 	return (NULL);
       }
@@ -2160,7 +2160,7 @@ add_job_subscriptions(
 			    resource, sizeof(resource)) < HTTP_URI_OK)
         {
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-recipient-uri URI \"%s\""), recipient);
+	                  _("Bad notify-recipient-uri \"%s\"."), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
 	  return;
@@ -2196,7 +2196,7 @@ add_job_subscriptions(
         if (strcmp(pullmethod, "ippget"))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-pull-method \"%s\""), pullmethod);
+	                  _("Bad notify-pull-method \"%s\"."), pullmethod);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_ATTRIBUTES);
 	  return;
@@ -2551,7 +2551,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     if (uri_status < HTTP_URI_OK)
     {
-      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\""),
+      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri \"%s\"."),
 		      attr->values[0].string.text);
       cupsdLogMessage(CUPSD_LOG_DEBUG,
                       "add_printer: httpSeparateURI returned %d", uri_status);
@@ -2591,8 +2591,8 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
         * Could not find device in list!
 	*/
 
-	send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad device-uri scheme \"%s\""),
-        	        scheme);
+	send_ipp_status(con, IPP_NOT_POSSIBLE,
+                        _("Bad device-uri scheme \"%s\"."), scheme);
 	return;
       }
     }
@@ -2635,7 +2635,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
 
     if (!supported || i >= supported->num_values)
     {
-      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad port-monitor \"%s\""),
+      send_ipp_status(con, IPP_NOT_POSSIBLE, _("Bad port-monitor \"%s\"."),
         	      attr->values[0].string.text);
       return;
     }
@@ -2687,7 +2687,7 @@ add_printer(cupsd_client_t  *con,	/* I - Client connection */
     if (attr->values[0].integer != IPP_PRINTER_IDLE &&
         attr->values[0].integer != IPP_PRINTER_STOPPED)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad printer-state value %d"),
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad printer-state value %d."),
                       attr->values[0].integer);
       return;
     }
@@ -4062,7 +4062,7 @@ authenticate_job(cupsd_client_t  *con,	/* I - Client connection */
       * Not a valid URI!
       */
 
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-uri attribute \"%s\""),
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -4517,7 +4517,7 @@ cancel_job(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -6755,7 +6755,7 @@ create_subscription(
 			    resource, sizeof(resource)) < HTTP_URI_OK)
         {
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-recipient-uri URI \"%s\""), recipient);
+	                  _("Bad notify-recipient-uri \"%s\"."), recipient);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_URI_SCHEME);
 	  return;
@@ -6791,7 +6791,7 @@ create_subscription(
         if (strcmp(pullmethod, "ippget"))
 	{
           send_ipp_status(con, IPP_NOT_POSSIBLE,
-	                  _("Bad notify-pull-method \"%s\""), pullmethod);
+	                  _("Bad notify-pull-method \"%s\"."), pullmethod);
 	  ippAddInteger(con->response, IPP_TAG_SUBSCRIPTION, IPP_TAG_ENUM,
 	                "notify-status-code", IPP_ATTRIBUTES);
 	  return;
@@ -7249,7 +7249,7 @@ get_document(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -7395,7 +7395,7 @@ get_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -8839,7 +8839,7 @@ hold_job(cupsd_client_t  *con,		/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -9093,7 +9093,7 @@ move_job(cupsd_client_t  *con,		/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -9391,7 +9391,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
                type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad document-format \"%s\""),
+                      _("Bad document-format \"%s\"."),
 		      format->values[0].string.text);
       return;
     }
@@ -9407,7 +9407,7 @@ print_job(cupsd_client_t  *con,		/* I - Client connection */
     if (sscanf(default_format, "%15[^/]/%31[^;]", super, type) != 2)
     {
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad document-format \"%s\""),
+                      _("Bad document-format \"%s\"."),
 		      default_format);
       return;
     }
@@ -9943,7 +9943,7 @@ release_job(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -10169,7 +10169,7 @@ restart_job(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -10524,7 +10524,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -10623,7 +10623,7 @@ send_document(cupsd_client_t  *con,	/* I - Client connection */
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
                super, type) != 2)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\""),
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
 	              format->values[0].string.text);
       return;
     }
@@ -11114,7 +11114,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
       */
 
       send_ipp_status(con, IPP_BAD_REQUEST,
-                      _("Bad job-uri attribute \"%s\""),
+                      _("Bad job-uri \"%s\"."),
                       uri->values[0].string.text);
       return;
     }
@@ -11222,7 +11222,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (attr->value_tag != IPP_TAG_INTEGER)
       {
-	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-priority value"));
+	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-priority value."));
 
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
@@ -11252,7 +11252,7 @@ set_job_attrs(cupsd_client_t  *con,	/* I - Client connection */
 
       if (attr->value_tag != IPP_TAG_ENUM)
       {
-	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-state value"));
+	send_ipp_status(con, IPP_REQUEST_VALUE, _("Bad job-state value."));
 
 	if ((attr2 = copy_attribute(con->response, attr, 0)) != NULL)
           attr2->group_tag = IPP_TAG_UNSUPPORTED_GROUP;
@@ -12130,7 +12130,7 @@ validate_job(cupsd_client_t  *con,	/* I - Client connection */
     if (sscanf(format->values[0].string.text, "%15[^/]/%31[^;]",
                super, type) != 2)
     {
-      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\""),
+      send_ipp_status(con, IPP_BAD_REQUEST, _("Bad document-format \"%s\"."),
 		      format->values[0].string.text);
       return;
     }

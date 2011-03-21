@@ -3823,30 +3823,32 @@ usage(void)
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... "
 		          "filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
-  _cupsLangPuts(stderr, _("  -4             Connect using IPv4."));
-  _cupsLangPuts(stderr, _("  -6             Connect using IPv6."));
-  _cupsLangPuts(stderr, _("  -C             Send requests using chunking "
+  _cupsLangPuts(stderr, _("  -4                   Connect using IPv4."));
+  _cupsLangPuts(stderr, _("  -6                   Connect using IPv6."));
+  _cupsLangPuts(stderr, _("  -C                   Send requests using chunking "
                           "(default)."));
-  _cupsLangPuts(stderr, _("  -E             Test with TLS encryption."));
-  _cupsLangPuts(stderr, _("  -I             Ignore errors."));
-  _cupsLangPuts(stderr, _("  -L             Send requests using "
+  _cupsLangPuts(stderr, _("  -E                   Test with TLS encryption."));
+  _cupsLangPuts(stderr, _("  -I                   Ignore errors."));
+  _cupsLangPuts(stderr, _("  -L                   Send requests using "
                           "content-length."));
-  _cupsLangPuts(stderr, _("  -S             Test with SSL encryption."));
-  _cupsLangPuts(stderr, _("  -T             Set the receive/send timeout in "
-                          "seconds."));
-  _cupsLangPuts(stderr, _("  -V version     Set default IPP version."));
-  _cupsLangPuts(stderr, _("  -X             Produce XML plist instead of plain "
-                          "text."));
-  _cupsLangPuts(stderr, _("  -d name=value  Define variable."));
-  _cupsLangPuts(stderr, _("  -f filename    Set default request filename."));
-  _cupsLangPuts(stderr, _("  -i seconds     Repeat the last file with the "
-                          "given time interval."));
-  _cupsLangPuts(stderr, _("  -n count       Repeat the last file the given "
-                          "number of times."));
-  _cupsLangPuts(stderr, _("  -q             Be quiet - no output except "
+  _cupsLangPuts(stderr, _("  -S                   Test with SSL encryption."));
+  _cupsLangPuts(stderr, _("  -T                   Set the receive/send timeout "
+                          "in seconds."));
+  _cupsLangPuts(stderr, _("  -V version           Set default IPP version."));
+  _cupsLangPuts(stderr, _("  -X                   Produce XML plist instead of "
+                          "plain text."));
+  _cupsLangPuts(stderr, _("  -d name=value        Set named variable to "
+                          "value."));
+  _cupsLangPuts(stderr, _("  -f filename          Set default request "
+                          "filename."));
+  _cupsLangPuts(stderr, _("  -i seconds           Repeat the last file with "
+                          "the given time interval."));
+  _cupsLangPuts(stderr, _("  -n count             Repeat the last file the "
+                          "given number of times."));
+  _cupsLangPuts(stderr, _("  -q                   Be quiet - no output except "
                           "errors."));
-  _cupsLangPuts(stderr, _("  -t             Produce a test report."));
-  _cupsLangPuts(stderr, _("  -v             Show all attributes sent and "
+  _cupsLangPuts(stderr, _("  -t                   Produce a test report."));
+  _cupsLangPuts(stderr, _("  -v                   Show all attributes sent and "
                           "received."));
 
   exit(1);

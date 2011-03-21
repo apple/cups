@@ -3,7 +3,7 @@
 //
 //   PPD file compiler main entry for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 2002-2007 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -439,20 +439,20 @@ usage(void)
                           "value."));
   _cupsLangPuts(stdout, _("  -I include-dir       Add include directory to "
                           "search path."));
-  _cupsLangPuts(stdout, _("  -c catalog.po        Load the specified message "
-                          "catalog."));
+  _cupsLangPuts(stdout, _("  -c catalog.po        Load the specified "
+                          "message catalog."));
   _cupsLangPuts(stdout, _("  -d output-dir        Specify the output "
                           "directory."));
   _cupsLangPuts(stdout, _("  -l lang[,lang,...]   Specify the output "
                           "language(s) (locale)."));
-  _cupsLangPuts(stdout, _("  -m                   Use the ModelName value as "
-                          "the filename."));
+  _cupsLangPuts(stdout, _("  -m                   Use the ModelName value "
+                          "as the filename."));
   _cupsLangPuts(stdout, _("  -t                   Test PPDs instead of "
                           "generating them."));
   _cupsLangPuts(stdout, _("  -v                   Be verbose (more v's for "
                           "more verbosity)."));
-  _cupsLangPuts(stdout, _("  -z                   Compress PPD files using GNU "
-                          "zip."));
+  _cupsLangPuts(stdout, _("  -z                   Compress PPD files using "
+                          "GNU zip."));
   _cupsLangPuts(stdout, _("  --cr                 End lines with CR (Mac OS "
                           "9)."));
   _cupsLangPuts(stdout, _("  --crlf               End lines with CR + LF "
