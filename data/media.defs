@@ -3,7 +3,7 @@
  *
  *   Adobe standard media size definitions for the CUPS PPD file compiler.
  *
- *   Copyright 2007 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2005 by Easy Software Products.
  *
  *   These codedinstructions, statements, and computer programs are the
@@ -165,7 +165,7 @@
 #media "LetterPlus/US Letter Oversize" 612 914
 #media "LetterRotated/US Letter" 792 612
 #media "LetterSmall/US Letter Small" 612 792
-#media "Monarch/Monarch" 279 540
+#media "Monarch/Envelope Monarch" 279 540
 #media "Note/Note" 612 792
 #media "Postcard/Postcard" 284 419
 #media "PostcardRotated/Postcard" 419 284
