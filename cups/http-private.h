@@ -3,7 +3,7 @@
  *
  *   Private HTTP definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -168,6 +168,7 @@ typedef _sspi_struct_t * http_tls_t;
 typedef void *http_tls_credentials_t;
 #  else
 typedef void *http_tls_t;
+typedef void *http_tls_credentials_t;
 #  endif /* HAVE_LIBSSL */
 
 
