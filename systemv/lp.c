@@ -3,7 +3,7 @@
  *
  *   "lp" command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -285,7 +285,7 @@ main(int  argc,				/* I - Number of command-line arguments */
 	      if (i >= argc)
 	      {
 	        _cupsLangPrintf(stderr,
-		                _("%s: Error - expected option string after "
+		                _("%s: Error - expected option=value after "
 				  "\"-o\" option."), argv[0]);
 		return (1);
               }

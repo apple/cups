@@ -34,7 +34,7 @@
  * Local globals...
  */
 
-static int	started = 0;
+static int		started = 0;	/* Did we start the server already? */
 
 
 /*

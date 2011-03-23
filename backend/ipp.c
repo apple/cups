@@ -86,6 +86,7 @@ static const char * const pattrs[] =	/* Printer attributes we want */
   "marker-names",
   "marker-types",
   "media-col-supported",
+  "multiple-document-handling-supported",
   "operations-supported",
   "printer-alert",
   "printer-alert-description",
@@ -117,7 +118,8 @@ static ipp_t		*new_request(ipp_op_t op, int version, const char *uri,
 				     int num_options, cups_option_t *options,
 				     const char *compression, int copies,
 				     const char *format, _ppd_cache_t *pc,
-				     ipp_attribute_t *media_col_sup);
+				     ipp_attribute_t *media_col_sup,
+				     ipp_attribute_t *doc_handling_sup);
 static const char	*password_cb(const char *);
 static void		report_attr(ipp_attribute_t *attr);
 static int		report_printer_state(ipp_t *ipp, int job_id);
@@ -185,6 +187,7 @@ main(int  argc,				/* I - Number of command-line args */
   ipp_attribute_t *format_sup;		/* document-format-supported */
   ipp_attribute_t *media_col_sup;	/* media-col-supported */
   ipp_attribute_t *operations_sup;	/* operations-supported */
+  ipp_attribute_t *doc_handling_sup;	/* multiple-document-handling-supported */
   ipp_attribute_t *printer_state;	/* printer-state attribute */
   ipp_attribute_t *printer_accepting;	/* printer-is-accepting-jobs */
   int		validate_job;		/* Does printer support Validate-Job? */
@@ -688,13 +691,14 @@ main(int  argc,				/* I - Number of command-line args */
   * copies...
   */
 
-  copies_sup     = NULL;
-  cups_version   = NULL;
-  format_sup     = NULL;
-  media_col_sup  = NULL;
-  supported      = NULL;
-  operations_sup = NULL;
-  validate_job   = 0;
+  copies_sup       = NULL;
+  cups_version     = NULL;
+  format_sup       = NULL;
+  media_col_sup    = NULL;
+  supported        = NULL;
+  operations_sup   = NULL;
+  doc_handling_sup = NULL;
+  validate_job     = 0;
 
   do
   {
@@ -892,6 +896,10 @@ main(int  argc,				/* I - Number of command-line args */
             "Get-Printer-Attributes request.\n", stderr);
     }
 
+    doc_handling_sup = ippFindAttribute(supported,
+					"multiple-document-handling-supported",
+					IPP_TAG_KEYWORD);
+
     report_printer_state(supported, 0);
   }
   while (ipp_status > IPP_OK_CONFLICT);
@@ -1063,7 +1071,7 @@ main(int  argc,				/* I - Number of command-line args */
     request = new_request(IPP_VALIDATE_JOB, version, uri, argv[2], argv[3],
                           num_options, options, compression,
 			  copies_sup ? copies : 1, document_format, pc,
-			  media_col_sup);
+			  media_col_sup, doc_handling_sup);
 
     ippDelete(cupsDoRequest(http, request, resource));
 
@@ -1138,7 +1146,7 @@ main(int  argc,				/* I - Number of command-line args */
     request = new_request(num_files > 1 ? IPP_CREATE_JOB : IPP_PRINT_JOB,
 			  version, uri, argv[2], argv[3], num_options, options,
 			  compression, copies_sup ? copies : 1, document_format,
-			  pc, media_col_sup);
+			  pc, media_col_sup, doc_handling_sup);
 
    /*
     * Do the request...
@@ -1838,7 +1846,8 @@ new_request(
     int             copies,		/* I - copies value or 0 */
     const char      *format,		/* I - documet-format value or NULL */
     _ppd_cache_t    *pc,		/* I - PPD cache and mapping data */
-    ipp_attribute_t *media_col_sup)	/* I - media-col-supported values */
+    ipp_attribute_t *media_col_sup,	/* I - media-col-supported values */
+    ipp_attribute_t *doc_handling_sup)  /* I - multiple-document-handling-supported values */
 {
   int		i;			/* Looping var */
   ipp_t		*request;		/* Request data */
@@ -1847,7 +1856,8 @@ new_request(
   ipp_t		*media_col,		/* media-col value */
 		*media_size;		/* media-size value */
   const char	*media_source,		/* media-source value */
-		*media_type;		/* media-type value */
+		*media_type,		/* media-type value */
+		*collate_str;		/* multiple-document-handling value */
 
 
  /*
@@ -2027,6 +2037,23 @@ new_request(
 	if (!strcasecmp(keyword, pc->sides_2sided_short))
 	  ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD, "sides",
 		       NULL, "two-sided-short-edge");
+      }
+
+      if (doc_handling_sup &&
+ 	  (keyword = cupsGetOption("collate", num_options, options)) != NULL)
+      {
+        if (!strcasecmp(keyword, "true"))
+	  collate_str = "separate-documents-collated-copies";
+	else
+	  collate_str = "separate-documents-uncollated-copies";
+	
+        for (i = 0; i < doc_handling_sup->num_values; i ++)
+	  if (!strcmp(doc_handling_sup->values[i].string.text, collate_str))
+	  {
+	    ippAddString(request, IPP_TAG_JOB, IPP_TAG_KEYWORD,
+			 "multiple-document-handling", NULL, collate_str);
+	    break;
+          }
       }
     }
     else

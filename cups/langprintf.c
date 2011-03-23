@@ -3,7 +3,7 @@
  *
  *   Localized printf/puts functions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2002-2007 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -42,6 +42,7 @@ _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
   int		bytes;			/* Number of bytes formatted */
   int		last_errno;		/* Last error */
   char		buffer[2048],		/* Message buffer */
+		*bufptr,		/* Pointer into buffer */
 		output[8192];		/* Output buffer */
   _cups_globals_t *cg;			/* Global data */
 
@@ -72,9 +73,19 @@ _cupsLangPrintError(const char *prefix,	/* I - Non-localized message prefix */
   * Format the message...
   */
 
-  snprintf(buffer, sizeof(buffer), "%s%s%s: %s\n", prefix ? prefix : "",
-           prefix ? ": " : "",
+  if (prefix)
+  {
+    snprintf(buffer, sizeof(buffer), "%s:", prefix);
+    bufptr = buffer + strlen(buffer);
+  }
+  else
+    bufptr = buffer;
+
+  snprintf(bufptr, sizeof(buffer) - (bufptr - buffer),
+	   /* TRANSLATORS: Message is "subject: error" */
+	   _cupsLangString(cg->lang_default, _("%s: %s")),
 	   _cupsLangString(cg->lang_default, message), strerror(last_errno));
+  strlcat(buffer, "\n", sizeof(buffer));
 
  /*
   * Convert and write to stderr...

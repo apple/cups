@@ -441,7 +441,7 @@ _pwgInitSize(_pwg_size_t *size,		/* I - Size to initialize */
 	  const char	*suffix;	/* Suffix on media string */
 
 	  pwg = _pwgMediaForPPD(name);
-	  if (pwg && 
+	  if (pwg &&
 	      (suffix = name + strlen(name) - 10 /* .FullBleed */) > name &&
 	      !strcasecmp(suffix, ".FullBleed"))
 	  {

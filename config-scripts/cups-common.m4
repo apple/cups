@@ -320,6 +320,7 @@ case $uname in
 		AC_CHECK_HEADER(CoreFoundation/CoreFoundation.h,AC_DEFINE(HAVE_COREFOUNDATION_H))
 		AC_CHECK_HEADER(CoreFoundation/CFPriv.h,AC_DEFINE(HAVE_CFPRIV_H))
 		AC_CHECK_HEADER(CoreFoundation/CFBundlePriv.h,AC_DEFINE(HAVE_CFBUNDLEPRIV_H))
+		AC_CHECK_HEADER(IOKit/pwr_mgt/IOPMLibPrivate.h,AC_DEFINE(HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H))
 
 		dnl Check for dynamic store function...
 		AC_CHECK_FUNCS(SCDynamicStoreCopyComputerName)

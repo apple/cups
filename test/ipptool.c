@@ -1203,7 +1203,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 
-	if ((op = ippOpValue(token)) < 0 && (op = strtol(token, NULL, 0)) == 0)
+	if ((op = ippOpValue(token)) == (ipp_op_t)-1 &&
+	    (op = strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad OPERATION code \"%s\" on line %d.", token,
 	                    linenum);
@@ -1515,7 +1516,8 @@ do_tests(_cups_vars_t *vars,		/* I - Variables */
 	  goto test_exit;
 	}
 
-	if ((statuses[num_statuses].status = ippErrorValue(token)) < 0 &&
+	if ((statuses[num_statuses].status = ippErrorValue(token))
+	        == (ipp_status_t)-1 &&
 	    (statuses[num_statuses].status = strtol(token, NULL, 0)) == 0)
 	{
 	  print_fatal_error("Bad STATUS code \"%s\" on line %d.", token,
@@ -3823,31 +3825,36 @@ usage(void)
   _cupsLangPuts(stderr, _("Usage: ipptool [options] URI filename [ ... "
 		          "filenameN ]"));
   _cupsLangPuts(stderr, _("Options:"));
-  _cupsLangPuts(stderr, _("  -4             Connect using IPv4."));
-  _cupsLangPuts(stderr, _("  -6             Connect using IPv6."));
-  _cupsLangPuts(stderr, _("  -C             Send requests using chunking "
-                          "(default)."));
-  _cupsLangPuts(stderr, _("  -E             Test with TLS encryption."));
-  _cupsLangPuts(stderr, _("  -I             Ignore errors."));
-  _cupsLangPuts(stderr, _("  -L             Send requests using "
+  _cupsLangPuts(stderr, _("  -4                      Connect using IPv4."));
+  _cupsLangPuts(stderr, _("  -6                      Connect using IPv6."));
+  _cupsLangPuts(stderr, _("  -C                      Send requests using "
+                          "chunking (default)."));
+  _cupsLangPuts(stderr, _("  -E                      Test with TLS "
+                          "encryption."));
+  _cupsLangPuts(stderr, _("  -I                      Ignore errors."));
+  _cupsLangPuts(stderr, _("  -L                      Send requests using "
                           "content-length."));
-  _cupsLangPuts(stderr, _("  -S             Test with SSL encryption."));
-  _cupsLangPuts(stderr, _("  -T             Set the receive/send timeout in "
-                          "seconds."));
-  _cupsLangPuts(stderr, _("  -V version     Set default IPP version."));
-  _cupsLangPuts(stderr, _("  -X             Produce XML plist instead of plain "
-                          "text."));
-  _cupsLangPuts(stderr, _("  -d name=value  Define variable."));
-  _cupsLangPuts(stderr, _("  -f filename    Set default request filename."));
-  _cupsLangPuts(stderr, _("  -i seconds     Repeat the last file with the "
-                          "given time interval."));
-  _cupsLangPuts(stderr, _("  -n count       Repeat the last file the given "
-                          "number of times."));
-  _cupsLangPuts(stderr, _("  -q             Be quiet - no output except "
-                          "errors."));
-  _cupsLangPuts(stderr, _("  -t             Produce a test report."));
-  _cupsLangPuts(stderr, _("  -v             Show all attributes sent and "
-                          "received."));
+  _cupsLangPuts(stderr, _("  -S                      Test with SSL "
+			  "encryption."));
+  _cupsLangPuts(stderr, _("  -T                      Set the receive/send "
+                          "timeout in seconds."));
+  _cupsLangPuts(stderr, _("  -V version              Set default IPP "
+                          "version."));
+  _cupsLangPuts(stderr, _("  -X                      Produce XML plist instead "
+                          "of plain text."));
+  _cupsLangPuts(stderr, _("  -d name=value           Set named variable to "
+                          "value."));
+  _cupsLangPuts(stderr, _("  -f filename             Set default request "
+                          "filename."));
+  _cupsLangPuts(stderr, _("  -i seconds              Repeat the last file with "
+                          "the given time interval."));
+  _cupsLangPuts(stderr, _("  -n count                Repeat the last file the "
+                          "given number of times."));
+  _cupsLangPuts(stderr, _("  -q                      Be quiet - no output "
+                          "except errors."));
+  _cupsLangPuts(stderr, _("  -t                      Produce a test report."));
+  _cupsLangPuts(stderr, _("  -v                      Show all attributes sent "
+                          "and received."));
 
   exit(1);
 }

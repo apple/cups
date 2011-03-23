@@ -2115,7 +2115,7 @@ msgid "Banners"
 msgstr "標語"
 
 msgid "Billing Information: "
-msgstr "文件封面INFO: "
+msgstr "帳單資訊："
 
 msgid "Bond Paper"
 msgstr "證券紙"

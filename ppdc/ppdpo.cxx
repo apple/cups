@@ -3,7 +3,7 @@
 //
 //   PPD file message catalog program for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -252,12 +252,12 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdpo [options] -o filename.po filename.drv "
                           "[ ... filenameN.drv ]"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -D name=value     Set named variable to "
+  _cupsLangPuts(stdout, _("  -D name=value           Set named variable to "
                           "value."));
-  _cupsLangPuts(stdout, _("  -I include-dir    Add include directory to search "
-                          "path."));
-  _cupsLangPuts(stdout, _("  -v                Be verbose (more v's for more "
-		          "verbosity)."));
+  _cupsLangPuts(stdout, _("  -I include-dir          Add include directory to "
+                          "search path."));
+  _cupsLangPuts(stdout, _("  -v                      Be verbose (more v's for "
+                          "more verbosity)."));
 
   exit(1);
 }

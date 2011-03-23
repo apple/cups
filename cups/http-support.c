@@ -3,7 +3,7 @@
  *
  *   HTTP support routines for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1364,7 +1364,7 @@ _httpResolveURI(
 #endif /* DEBUG */
   {
     if (logit)
-      _cupsLangPrintFilter(stderr, "ERROR", _("Bad device URI \"%s\"."), uri);
+      _cupsLangPrintFilter(stderr, "ERROR", _("Bad device-uri \"%s\"."), uri);
 
     DEBUG_printf(("6_httpResolveURI: httpSeparateURI returned %d!", status));
     DEBUG_puts("5_httpResolveURI: Returning NULL");

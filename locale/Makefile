@@ -3,7 +3,7 @@
 #
 #   Locale file makefile for the Common UNIX Printing System (CUPS).
 #
-#   Copyright 2007-2008 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1993-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -130,7 +130,7 @@ pot:	checkpo po2strings
 	echo Updating cups.pot...
 	mv cups.pot cups.pot.bck
 	touch cups.pot
-	cd ..; xgettext -o locale/cups.pot -s \
+	cd ..; xgettext -o locale/cups.pot -cTRANSLATORS -s \
 		--keyword=_ --no-wrap \
 		--copyright-holder="Apple Inc." \
 		--package-name="CUPS" --package-version="1.5" \

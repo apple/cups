@@ -3,7 +3,7 @@
 //
 //   PPD file import utility for the CUPS PPD Compiler.
 //
-//   Copyright 2007-2010 by Apple Inc.
+//   Copyright 2007-2011 by Apple Inc.
 //   Copyright 2002-2005 by Easy Software Products.
 //
 //   These coded instructions, statements, and computer programs are the
@@ -128,8 +128,10 @@ usage(void)
   _cupsLangPuts(stdout, _("Usage: ppdi [options] filename.ppd [ ... "
 			  "filenameN.ppd ]"));
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -I include-dir"));
-  _cupsLangPuts(stdout, _("  -o filename.drv"));
+  _cupsLangPuts(stdout, _("  -I include-dir          Add include directory to "
+                          "search path."));
+  _cupsLangPuts(stdout, _("  -o filename.drv         Set driver information "
+                          "file (otherwise ppdi.drv)."));
 
   exit(1);
 }

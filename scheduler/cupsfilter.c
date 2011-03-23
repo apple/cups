@@ -3,7 +3,7 @@
  *
  *   Filtering program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -1352,44 +1352,56 @@ usage(const char *command,		/* I - Command name */
 
   if (!strcmp(command, "cupsfilter"))
   {
-    _cupsLangPuts(stdout, _("Usage: cupsfilter -m mime/type [ options ] "
-                            "filename"));
+    _cupsLangPuts(stdout, _("Usage: cupsfilter [ options ] filename"));
     _cupsLangPuts(stdout, _("Options:"));
-    _cupsLangPuts(stdout, _("  -c cupsd.conf    Set cupsd.conf file to use."));
-    _cupsLangPuts(stdout, _("  -d printer       Use the named printer."));
-    _cupsLangPuts(stdout, _("  -e               Use every filter from the PPD "
-                            "file."));
-    _cupsLangPuts(stdout, _("  -j job-id[,N]    Filter file N from the "
+    _cupsLangPuts(stdout, _("  -D                      Remove the input file "
+                            "when finished."));
+    _cupsLangPuts(stdout, _("  -P filename.ppd         Set PPD file."));
+    _cupsLangPuts(stdout, _("  -U username             Set username for job."));
+    _cupsLangPuts(stdout, _("  -c cupsd.conf           Set cupsd.conf file to "
+                            "use."));
+    _cupsLangPuts(stdout, _("  -d printer              Use the named "
+                            "printer."));
+    _cupsLangPuts(stdout, _("  -e                      Use every filter from "
+                            "the PPD file."));
+    _cupsLangPuts(stdout, _("  -i mime/type            Set input MIME type "
+                            "(otherwise auto-typed)."));
+    _cupsLangPuts(stdout, _("  -j job-id[,N]           Filter file N from the "
                             "specified job (default is file 1)."));
-    _cupsLangPuts(stdout, _("  -n copies        Set number of copies."));
-    _cupsLangPuts(stdout, _("  -o name=value    Set option(s)."));
-    _cupsLangPuts(stdout, _("  -p filename.ppd  Set PPD file."));
-    _cupsLangPuts(stdout, _("  -t title         Set title."));
+    _cupsLangPuts(stdout, _("  -m mime/type            Set output MIME type "
+			    "(otherwise application/pdf)."));
+    _cupsLangPuts(stdout, _("  -n copies               Set number of copies."));
+    _cupsLangPuts(stdout, _("  -o name=value           Set option(s)."));
+    _cupsLangPuts(stdout, _("  -p filename.ppd         Set PPD file."));
+    _cupsLangPuts(stdout, _("  -t title                Set title."));
+    _cupsLangPuts(stdout, _("  -u                      Remove the PPD file "
+                            "when finished."));
   }
   else
   {
     _cupsLangPuts(stdout, _("Usage: convert [ options ]"));
     _cupsLangPuts(stdout, _("Options:"));
-    _cupsLangPuts(stdout, _("  -d printer           Use the named printer."));
-    _cupsLangPuts(stdout, _("  -e                   Use every filter from the "
-                            "PPD file."));
-    _cupsLangPuts(stdout, _("  -f filename          Set file to be converted "
-                            "(otherwise stdin)."));
-    _cupsLangPuts(stdout, _("  -o filename          Set file to be generated "
-                            "(otherwise stdout)."));
-    _cupsLangPuts(stdout, _("  -i mime/type         Set input MIME type "
+    _cupsLangPuts(stdout, _("  -D                      Remove the input file "
+                            "when finished."));
+    _cupsLangPuts(stdout, _("  -J title                Set title."));
+    _cupsLangPuts(stdout, _("  -P filename.ppd         Set PPD file."));
+    _cupsLangPuts(stdout, _("  -U username             Set username for job."));
+    _cupsLangPuts(stdout, _("  -a 'name=value ...'     Set option(s)."));
+    _cupsLangPuts(stdout, _("  -c copies               Set number of copies."));
+    _cupsLangPuts(stdout, _("  -d printer              Use the named "
+                            "printer."));
+    _cupsLangPuts(stdout, _("  -e                      Use every filter from "
+                            "the PPD file."));
+    _cupsLangPuts(stdout, _("  -f filename             Set file to be "
+                            "converted (otherwise stdin)."));
+    _cupsLangPuts(stdout, _("  -i mime/type            Set input MIME type "
                             "(otherwise auto-typed)."));
-    _cupsLangPuts(stdout, _("  -j mime/type         Set output MIME type "
+    _cupsLangPuts(stdout, _("  -j mime/type            Set output MIME type "
 			    "(otherwise application/pdf)."));
-    _cupsLangPuts(stdout, _("  -P filename.ppd      Set PPD file."));
-    _cupsLangPuts(stdout, _("  -a 'name=value ...'  Set option(s)."));
-    _cupsLangPuts(stdout, _("  -U username          Set username for job."));
-    _cupsLangPuts(stdout, _("  -J title             Set title."));
-    _cupsLangPuts(stdout, _("  -c copies            Set number of copies."));
-    _cupsLangPuts(stdout, _("  -u                   Remove the PPD file when "
-                            "finished."));
-    _cupsLangPuts(stdout, _("  -D                   Remove the input file when "
-                            "finished."));
+    _cupsLangPuts(stdout, _("  -o filename             Set file to be "
+                            "generated (otherwise stdout)."));
+    _cupsLangPuts(stdout, _("  -u                      Remove the PPD file "
+                            "when finished."));
   }
 
   exit(1);

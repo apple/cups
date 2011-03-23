@@ -3,7 +3,7 @@
  *
  *   "cupsaddsmb" command for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 2001-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -282,14 +282,17 @@ usage(void)
   _cupsLangPuts(stdout, _("       cupsaddsmb [options] -a"));
   _cupsLangPuts(stdout, "");
   _cupsLangPuts(stdout, _("Options:"));
-  _cupsLangPuts(stdout, _("  -E               Encrypt the connection to the "
+  _cupsLangPuts(stdout, _("  -E                      Encrypt the connection to "
+                          "the server."));
+  _cupsLangPuts(stdout, _("  -H samba-server         Use the named SAMBA "
                           "server."));
-  _cupsLangPuts(stdout, _("  -H samba-server  Use the named SAMBA server."));
-  _cupsLangPuts(stdout, _("  -U samba-user    Authenticate using the named "
-                          "SAMBA user."));
-  _cupsLangPuts(stdout, _("  -a               Export all printers."));
-  _cupsLangPuts(stdout, _("  -h cups-server   Use the named CUPS server."));
-  _cupsLangPuts(stdout, _("  -v               Be verbose (show commands)."));
+  _cupsLangPuts(stdout, _("  -U samba-user           Authenticate using the "
+                          "named SAMBA user."));
+  _cupsLangPuts(stdout, _("  -a                      Export all printers."));
+  _cupsLangPuts(stdout, _("  -h cups-server          Use the named CUPS "
+                          "server."));
+  _cupsLangPuts(stdout, _("  -v                      Be verbose (show "
+                          "commands)."));
 
   exit(1);
 }

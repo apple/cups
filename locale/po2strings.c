@@ -130,21 +130,36 @@ main(int  argc,				/* I - Number of command-line args */
 
   while (cupsFileGets(po, s, sizeof(s)) != NULL)
   {
-    if ((s[0] == '#' && s[0] != '.') || !s[0])
+    if (s[0] == '#' && s[1] == '.')
+    {
+     /*
+      * Copy comment string...
+      */
+
+      if (msgid && msgstr)
+      {
+       /*
+        * First output the last localization string...
+	*/
+
+	if (*msgid)
+	  cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
+			 (use_msgid || !*msgstr) ? msgid : msgstr);
+
+	free(msgid);
+	free(msgstr);
+	msgid = msgstr = NULL;
+      }
+
+      cupsFilePrintf(strings, "//%s\n", s + 2);
+    }
+    else if (s[0] == '#' || !s[0])
     {
      /*
       * Skip blank and file comment lines...
       */
 
       continue;
-    }
-    else if (s[0] == '#')
-    {
-     /*
-      * Copy comment string...
-      */
-
-      cupsFilePrintf(strings, "//%s\n", s + 2);
     }
     else
     {
@@ -179,7 +194,7 @@ main(int  argc,				/* I - Number of command-line args */
         if (msgid && msgstr)
 	{
 	  if (*msgid)
-            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n\n", msgid,
+            cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 	                   (use_msgid || !*msgstr) ? msgid : msgstr);
 
 	  free(msgid);
@@ -247,7 +262,7 @@ main(int  argc,				/* I - Number of command-line args */
   if (msgid && msgstr)
   {
     if (*msgid)
-      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n\n", msgid,
+      cupsFilePrintf(strings, "\"%s\" = \"%s\";\n", msgid,
 		     (use_msgid || !*msgstr) ? msgid : msgstr);
 
     free(msgid);

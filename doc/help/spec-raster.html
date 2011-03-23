@@ -263,14 +263,14 @@
 	<TD>Unsigned Integer</TD>
 	<TD>cupsBitsPerColor</TD>
 	<TD>1, 2, 4, 8 bits for version 1 raster files<BR>
-	1, 2, 4, 8, and 16 bits for version 2 raster files</TD>
+	1, 2, 4, 8, and 16 bits for version 2/3 raster files</TD>
 </TR>
 <TR>
 	<TD>388-391</TD>
 	<TD>Unsigned Integer</TD>
 	<TD>cupsBitsPerPixel</TD>
 	<TD>1 to 32 bits for version 1 raster files<BR>
-	1 to 64 bits for version 2 raster files</TD>
+	1 to 240 bits for version 2/3 raster files</TD>
 </TR>
 <TR>
 	<TD>392-395</TD>
@@ -327,20 +327,20 @@
 	45 = ICCE (CIE Lab with hint for 14 colors)<BR>
 	46 = ICCF (CIE Lab with hint for 15 colors)<BR>
 	48 = Device1 (DeviceN for 1 color)<BR>
-	48 = Device2 (DeviceN for 2 colors)<BR>
-	48 = Device3 (DeviceN for 3 colors)<BR>
-	48 = Device4 (DeviceN for 4 colors)<BR>
-	48 = Device5 (DeviceN for 5 colors)<BR>
-	48 = Device6 (DeviceN for 6 colors)<BR>
-	48 = Device7 (DeviceN for 7 colors)<BR>
-	48 = Device8 (DeviceN for 8 colors)<BR>
-	48 = Device9 (DeviceN for 9 colors)<BR>
-	48 = DeviceA (DeviceN for 10 colors)<BR>
-	48 = DeviceB (DeviceN for 11 colors)<BR>
-	48 = DeviceC (DeviceN for 12 colors)<BR>
-	48 = DeviceD (DeviceN for 13 colors)<BR>
-	48 = DeviceE (DeviceN for 14 colors)<BR>
-	48 = DeviceF (DeviceN for 15 colors)
+	49 = Device2 (DeviceN for 2 colors)<BR>
+	50 = Device3 (DeviceN for 3 colors)<BR>
+	51 = Device4 (DeviceN for 4 colors)<BR>
+	52 = Device5 (DeviceN for 5 colors)<BR>
+	53 = Device6 (DeviceN for 6 colors)<BR>
+	54 = Device7 (DeviceN for 7 colors)<BR>
+	55 = Device8 (DeviceN for 8 colors)<BR>
+	56 = Device9 (DeviceN for 9 colors)<BR>
+	57 = DeviceA (DeviceN for 10 colors)<BR>
+	58 = DeviceB (DeviceN for 11 colors)<BR>
+	59 = DeviceC (DeviceN for 12 colors)<BR>
+	60 = DeviceD (DeviceN for 13 colors)<BR>
+	61 = DeviceE (DeviceN for 14 colors)<BR>
+	62 = DeviceF (DeviceN for 15 colors)
 	</TD>
 </TR>
 <TR>
@@ -397,7 +397,7 @@
 	<TD>420-423</TD>
 	<TD>Unsigned Integer</TD>
 	<TD>cupsNumColors</TD>
-	<TD>1 to 6 colors</TD>
+	<TD>1 to 15 colors</TD>
 </TR>
 <TR>
 	<TD>424-427</TD>

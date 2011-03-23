@@ -281,6 +281,16 @@ docset:	apihelp
 
 
 #
+# Lines of code computation...
+#
+
+sloc:
+	for dir in cups cupslite scheduler; do \
+		(cd $$dir; $(MAKE) $(MFLAGS) sloc) || exit 1;\
+	done
+
+
+#
 # Make software distributions using EPM (http://www.epmhome.org/)...
 #
 

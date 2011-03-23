@@ -40,6 +40,12 @@
 #ifdef HAVE_VPROC_TRANSACTION_BEGIN
 #  include <vproc.h>
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
+#ifdef __APPLE__
+#  include <IOKit/pwr_mgt/IOPMLib.h>
+#  ifdef HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H
+#    include <IOKit/pwr_mgt/IOPMLibPrivate.h>
+#  endif /* HAVE_IOKIT_PWR_MGT_IOPMLIBPRIVATE_H */
+#endif /* __APPLE__ */
 
 
 /*
@@ -58,6 +64,14 @@
  * Once put to sleep, we invalidate all remote printers since it is common
  * to wake up in a new location/on a new wireless network.
  */
+
+/*
+ * Local globals...
+ */
+
+#ifdef kIOPMAssertionTypeDenySystemSleep
+static IOPMAssertionID	dark_wake = 0;	/* "Dark wake" assertion for sharing */
+#endif /* kIOPMAssertionTypeDenySystemSleep */
 
 
 /*
@@ -136,8 +150,11 @@ cupsdMarkDirty(int what)		/* I - What file(s) are dirty? */
 void
 cupsdSetBusyState(void)
 {
-  int		newbusy;		/* New busy state */
-  static int	busy = 0;		/* Current busy state */
+  int			i;		/* Looping var */
+  cupsd_job_t		*job;		/* Current job */
+  cupsd_printer_t	*p;		/* Current printer */
+  int			newbusy;	/* New busy state */
+  static int		busy = 0;	/* Current busy state */
   static const char * const busy_text[] =
   {					/* Text for busy states */
     "Not busy",
@@ -154,9 +171,34 @@ cupsdSetBusyState(void)
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
 
 
+ /*
+  * Figure out how busy we are...
+  */
+
   newbusy = (DirtyCleanTime ? 1 : 0) |
-            (cupsArrayCount(PrintingJobs) ? 2 : 0) |
 	    (cupsArrayCount(ActiveClients) ? 4 : 0);
+
+  for (job = (cupsd_job_t *)cupsArrayFirst(PrintingJobs);
+       job;
+       job = (cupsd_job_t *)cupsArrayNext(PrintingJobs))
+  {
+    if ((p = job->printer) != NULL)
+    {
+      for (i = 0; i < p->num_reasons; i ++)
+	if (!strcmp(p->reasons[i], "connecting-to-device"))
+	  break;
+
+      if (!p->num_reasons || i >= p->num_reasons)
+	break;
+    }
+  }
+
+  if (job)
+    newbusy |= 2;
+
+ /*
+  * Manage state changes...
+  */
 
   if (newbusy != busy)
   {
@@ -171,6 +213,18 @@ cupsdSetBusyState(void)
       vtran = 0;
     }
 #endif /* HAVE_VPROC_TRANSACTION_BEGIN */
+
+#ifdef kIOPMAssertionTypeDenySystemSleep
+    if ((busy & 2) && !dark_wake)
+      IOPMAssertionCreateWithName(kIOPMAssertionTypeDenySystemSleep,
+			          kIOPMAssertionLevelOn,
+				  CFSTR("org.cups.cupsd"), &dark_wake);
+    else if (!(busy & 2) && dark_wake)
+    {
+      IOPMAssertionRelease(dark_wake);
+      dark_wake = 0;
+    }
+#endif /* kIOPMAssertionTypeDenySystemSleep */
 
     cupsdLogMessage(CUPSD_LOG_DEBUG, "cupsdSetBusyState: %s", busy_text[busy]);
   }

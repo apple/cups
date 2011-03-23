@@ -2245,14 +2245,15 @@ usage(int status)			/* O - Exit status */
 
   _cupsLangPuts(fp, _("Usage: cupsd [options]"));
   _cupsLangPuts(fp, _("Options:"));
-  _cupsLangPuts(fp, _("-c config-file      Load alternate configuration "
+  _cupsLangPuts(fp, _("  -c config-file          Load alternate configuration "
                       "file."));
-  _cupsLangPuts(fp, _("-f                  Run in the foreground."));
-  _cupsLangPuts(fp, _("-F                  Run in the foreground but detach "
-                      "from console."));
-  _cupsLangPuts(fp, _("-h                  Show this usage message."));
-  _cupsLangPuts(fp, _("-l                  Run cupsd from launchd(8)."));
-  _cupsLangPuts(fp, _("-t                  Test the configuration file."));
+  _cupsLangPuts(fp, _("  -f                      Run in the foreground."));
+  _cupsLangPuts(fp, _("  -F                      Run in the foreground but "
+                      "detach from console."));
+  _cupsLangPuts(fp, _("  -h                      Show this usage message."));
+  _cupsLangPuts(fp, _("  -l                      Run cupsd from launchd(8)."));
+  _cupsLangPuts(fp, _("  -t                      Test the configuration "
+                      "file."));
 
   exit(status);
 }

@@ -84,6 +84,9 @@ static const cupsd_var_t	variables[] =
 {
   { "AccessLog",		&AccessLog,		CUPSD_VARTYPE_STRING },
   { "AutoPurgeJobs", 		&JobAutoPurge,		CUPSD_VARTYPE_BOOLEAN },
+#ifdef HAVE_DNSSD
+  { "BrowseDNSSDRegType",	&DNSSDRegType,		CUPSD_VARTYPE_STRING },
+#endif /* HAVE_DNSSD */
   { "BrowseInterval",		&BrowseInterval,	CUPSD_VARTYPE_INTEGER },
 #ifdef HAVE_LDAP
   { "BrowseLDAPBindDN",		&BrowseLDAPBindDN,	CUPSD_VARTYPE_STRING },
@@ -642,6 +645,10 @@ cupsdReadConfiguration(void)
   BrowseWebIF              = FALSE;
   Browsing                 = CUPS_DEFAULT_BROWSING;
   DefaultShared            = CUPS_DEFAULT_DEFAULT_SHARED;
+
+#ifdef HAVE_DNSSD
+  cupsdSetString(&DNSSDRegType, "_ipp._tcp,_cups");
+#endif /* HAVE_DNSSD */
 
   cupsdSetString(&LPDConfigFile, CUPS_DEFAULT_LPD_CONFIG_FILE);
   cupsdSetString(&SMBConfigFile, CUPS_DEFAULT_SMB_CONFIG_FILE);
