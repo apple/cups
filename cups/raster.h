@@ -3,7 +3,7 @@
  *
  *   Raster file definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   This file is part of the CUPS Imaging library.
