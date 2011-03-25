@@ -30,9 +30,9 @@
  *   dump_ppds_dat()   - Dump the contents of the ppds.dat file.
  *   free_array()      - Free an array of strings.
  *   list_ppds()       - List PPD files.
- *   load_ppds()       - Load PPD files recursively.
  *   load_drv()        - Load the PPDs from a driver information file.
  *   load_drivers()    - Load driver-generated PPD files.
+ *   load_ppds()       - Load PPD files recursively.
  *   load_ppds_dat()   - Load the ppds.dat file.
  *   regex_device_id() - Compile a regular expression based on the 1284 device
  *                       ID.
@@ -922,10 +922,13 @@ list_ppds(int        request_id,	/* I - Request ID */
 
   if (ChangedPPD)
   {
-    if ((fp = cupsFileOpen(filename, "w")) != NULL)
+    char	newname[1024];		/* New filename */
+
+    snprintf(newname, sizeof(newname), "%s.%d", filename, (int)getpid());
+
+    if ((fp = cupsFileOpen(newname, "w")) != NULL)
     {
       unsigned ppdsync = PPD_SYNC;	/* Sync word */
-
 
       cupsFileWrite(fp, (char *)&ppdsync, sizeof(ppdsync));
 
@@ -936,8 +939,12 @@ list_ppds(int        request_id,	/* I - Request ID */
 
       cupsFileClose(fp);
 
-      fprintf(stderr, "INFO: [cups-driverd] Wrote \"%s\", %d PPDs...\n",
-              filename, cupsArrayCount(PPDsByName));
+      if (rename(newname, filename))
+	fprintf(stderr, "ERROR: [cups-driverd] Unable to rename \"%s\" - %s\n",
+		newname, strerror(errno));
+      else
+	fprintf(stderr, "INFO: [cups-driverd] Wrote \"%s\", %d PPDs...\n",
+		filename, cupsArrayCount(PPDsByName));
     }
     else
       fprintf(stderr, "ERROR: [cups-driverd] Unable to write \"%s\" - %s\n",
@@ -1333,6 +1340,373 @@ list_ppds(int        request_id,	/* I - Request ID */
   cupsdSendIPPTrailer();
 
   return (0);
+}
+
+
+/*
+ * 'load_drv()' - Load the PPDs from a driver information file.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+load_drv(const char  *filename,		/* I - Actual filename */
+         const char  *name,		/* I - Name to the rest of the world */
+         cups_file_t *fp,		/* I - File to read from */
+	 time_t      mtime,		/* I - Mod time of driver info file */
+	 off_t       size)		/* I - Size of driver info file */
+{
+  ppdcSource	*src;			// Driver information file
+  ppdcDriver	*d;			// Current driver
+  ppdcAttr	*device_id,		// 1284DeviceID attribute
+		*product,		// Current product value
+		*ps_version,		// PSVersion attribute
+		*cups_fax,		// cupsFax attribute
+		*nick_name;		// NickName attribute
+  ppdcFilter	*filter;		// Current filter
+  ppd_info_t	*ppd;			// Current PPD
+  int		products_found;		// Number of products found
+  char		uri[1024],		// Driver URI
+		make_model[1024];	// Make and model
+  int		type;			// Driver type
+
+
+ /*
+  * Load the driver info file...
+  */
+
+  src = new ppdcSource(filename, fp);
+
+  if (src->drivers->count == 0)
+  {
+    fprintf(stderr,
+            "ERROR: [cups-driverd] Bad driver information file \"%s\"!\n",
+	    filename);
+    src->release();
+    return (0);
+  }
+
+ /*
+  * Add a dummy entry for the file...
+  */
+
+  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
+          PPD_TYPE_DRV, "drv");
+  ChangedPPD = 1;
+
+ /*
+  * Then the drivers in the file...
+  */
+
+  for (d = (ppdcDriver *)src->drivers->first();
+       d;
+       d = (ppdcDriver *)src->drivers->next())
+  {
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "drv", "", "", 0,
+                     "/%s/%s", name,
+		     d->file_name ? d->file_name->value :
+		                    d->pc_file_name->value);
+
+    device_id  = d->find_attr("1284DeviceID", NULL);
+    ps_version = d->find_attr("PSVersion", NULL);
+    nick_name  = d->find_attr("NickName", NULL);
+
+    if (nick_name)
+      strlcpy(make_model, nick_name->value->value, sizeof(make_model));
+    else if (strncasecmp(d->model_name->value, d->manufacturer->value,
+                         strlen(d->manufacturer->value)))
+      snprintf(make_model, sizeof(make_model), "%s %s, %s",
+               d->manufacturer->value, d->model_name->value,
+	       d->version->value);
+    else
+      snprintf(make_model, sizeof(make_model), "%s, %s", d->model_name->value,
+               d->version->value);
+
+    if ((cups_fax = d->find_attr("cupsFax", NULL)) != NULL &&
+        !strcasecmp(cups_fax->value->value, "true"))
+      type = PPD_TYPE_FAX;
+    else if (d->type == PPDC_DRIVER_PS)
+      type = PPD_TYPE_POSTSCRIPT;
+    else if (d->type != PPDC_DRIVER_CUSTOM)
+      type = PPD_TYPE_RASTER;
+    else
+    {
+      for (filter = (ppdcFilter *)d->filters->first(),
+               type = PPD_TYPE_POSTSCRIPT;
+	   filter;
+	   filter = (ppdcFilter *)d->filters->next())
+        if (strcasecmp(filter->mime_type->value, "application/vnd.cups-raster"))
+	  type = PPD_TYPE_RASTER;
+        else if (strcasecmp(filter->mime_type->value,
+	                    "application/vnd.cups-pdf"))
+	  type = PPD_TYPE_PDF;
+    }
+
+    for (product = (ppdcAttr *)d->attrs->first(), products_found = 0,
+             ppd = NULL;
+         product;
+	 product = (ppdcAttr *)d->attrs->next())
+      if (!strcmp(product->name->value, "Product"))
+      {
+        if (!products_found)
+	  ppd = add_ppd(name, uri, "en", d->manufacturer->value, make_model,
+		        device_id ? device_id->value->value : "",
+		        product->value->value,
+		        ps_version ? ps_version->value->value : "(3010) 0",
+		        mtime, size, d->model_number, type, "drv");
+	else if (products_found < PPD_MAX_PROD)
+	  strlcpy(ppd->record.products[products_found], product->value->value,
+	          sizeof(ppd->record.products[0]));
+	else
+	  break;
+
+	products_found ++;
+      }
+
+    if (!products_found)
+      add_ppd(name, uri, "en", d->manufacturer->value, make_model,
+	      device_id ? device_id->value->value : "",
+	      d->model_name->value,
+	      ps_version ? ps_version->value->value : "(3010) 0",
+	      mtime, size, d->model_number, type, "drv");
+  }
+
+  src->release();
+
+  return (1);
+}
+
+
+/*
+ * 'load_drivers()' - Load driver-generated PPD files.
+ */
+
+static int				/* O - 1 on success, 0 on failure */
+load_drivers(cups_array_t *include,	/* I - Drivers to include */
+             cups_array_t *exclude)	/* I - Drivers to exclude */
+{
+  int		i;			/* Looping var */
+  char		*start,			/* Start of value */
+		*ptr;			/* Pointer into string */
+  const char	*server_bin,		/* CUPS_SERVERBIN env variable */
+		*scheme,		/* Scheme for this driver */
+		*scheme_end;		/* Pointer to end of scheme */
+  char		drivers[1024];		/* Location of driver programs */
+  int		pid;			/* Process ID for driver program */
+  cups_file_t	*fp;			/* Pipe to driver program */
+  cups_dir_t	*dir;			/* Directory pointer */
+  cups_dentry_t *dent;			/* Directory entry */
+  char		*argv[3],		/* Arguments for command */
+		filename[1024],		/* Name of driver */
+		line[2048],		/* Line from driver */
+		name[512],		/* ppd-name */
+		make[128],		/* ppd-make */
+		make_and_model[128],	/* ppd-make-and-model */
+		device_id[128],		/* ppd-device-id */
+		languages[128],		/* ppd-natural-language */
+		product[128],		/* ppd-product */
+		psversion[128],		/* ppd-psversion */
+		type_str[128];		/* ppd-type */
+  int		type;			/* PPD type */
+  ppd_info_t	*ppd;			/* Newly added PPD */
+
+
+ /*
+  * Try opening the driver directory...
+  */
+
+  if ((server_bin = getenv("CUPS_SERVERBIN")) == NULL)
+    server_bin = CUPS_SERVERBIN;
+
+  snprintf(drivers, sizeof(drivers), "%s/driver", server_bin);
+
+  if ((dir = cupsDirOpen(drivers)) == NULL)
+  {
+    fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory "
+		    "\"%s\": %s\n",
+	    drivers, strerror(errno));
+    return (0);
+  }
+
+ /*
+  * Loop through all of the device drivers...
+  */
+
+  argv[1] = (char *)"list";
+  argv[2] = NULL;
+
+  while ((dent = cupsDirRead(dir)) != NULL)
+  {
+   /*
+    * Only look at executable files...
+    */
+
+    if (!(dent->fileinfo.st_mode & 0111) || !S_ISREG(dent->fileinfo.st_mode))
+      continue;
+
+   /*
+    * Include/exclude specific drivers...
+    */
+
+    if (exclude)
+    {
+     /*
+      * Look for "scheme" or "scheme*" (prefix match), and skip any matches.
+      */
+
+      for (scheme = (char *)cupsArrayFirst(exclude);
+	   scheme;
+	   scheme = (char *)cupsArrayNext(exclude))
+      {
+        fprintf(stderr, "DEBUG: [cups-driverd] Exclude \"%s\" with \"%s\"?\n",
+		dent->filename, scheme);
+	scheme_end = scheme + strlen(scheme) - 1;
+
+	if ((scheme_end > scheme && *scheme_end == '*' &&
+	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	    !strcmp(scheme, dent->filename))
+	{
+	  fputs("DEBUG: [cups-driverd] Yes, exclude!\n", stderr);
+	  break;
+	}
+      }
+
+      if (scheme)
+        continue;
+    }
+
+    if (include)
+    {
+     /*
+      * Look for "scheme" or "scheme*" (prefix match), and skip any non-matches.
+      */
+
+      for (scheme = (char *)cupsArrayFirst(include);
+	   scheme;
+	   scheme = (char *)cupsArrayNext(include))
+      {
+        fprintf(stderr, "DEBUG: [cups-driverd] Include \"%s\" with \"%s\"?\n",
+		dent->filename, scheme);
+	scheme_end = scheme + strlen(scheme) - 1;
+
+	if ((scheme_end > scheme && *scheme_end == '*' &&
+	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
+	    !strcmp(scheme, dent->filename))
+	{
+	  fputs("DEBUG: [cups-driverd] Yes, include!\n", stderr);
+	  break;
+	}
+      }
+
+      if (!scheme)
+        continue;
+    }
+    else
+      scheme = dent->filename;
+
+   /*
+    * Run the driver with no arguments and collect the output...
+    */
+
+    argv[0] = dent->filename;
+    snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
+
+    if ((fp = cupsdPipeCommand(&pid, filename, argv, 0)) != NULL)
+    {
+      while (cupsFileGets(fp, line, sizeof(line)))
+      {
+       /*
+        * Each line is of the form:
+	*
+	*   "ppd-name" ppd-natural-language "ppd-make" "ppd-make-and-model" \
+	*       "ppd-device-id" "ppd-product" "ppd-psversion"
+	*/
+
+        device_id[0] = '\0';
+	product[0]   = '\0';
+	psversion[0] = '\0';
+	strcpy(type_str, "postscript");
+
+        if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
+	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
+			 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
+			 "%*[ \t]\"%127[^\"]\"",
+	           name, languages, make, make_and_model,
+		   device_id, product, psversion, type_str) < 4)
+        {
+	 /*
+	  * Bad format; strip trailing newline and write an error message.
+	  */
+
+          if (line[strlen(line) - 1] == '\n')
+	    line[strlen(line) - 1] = '\0';
+
+	  fprintf(stderr, "ERROR: [cups-driverd] Bad line from \"%s\": %s\n",
+	          dent->filename, line);
+	  break;
+        }
+	else
+	{
+	 /*
+	  * Add the device to the array of available devices...
+	  */
+
+          if ((start = strchr(languages, ',')) != NULL)
+	    *start++ = '\0';
+
+	  for (type = 0;
+               type < (int)(sizeof(ppd_types) / sizeof(ppd_types[0]));
+	       type ++)
+	    if (!strcmp(type_str, ppd_types[type]))
+              break;
+
+	  if (type >= (int)(sizeof(ppd_types) / sizeof(ppd_types[0])))
+	  {
+	    fprintf(stderr,
+	            "ERROR: [cups-driverd] Bad ppd-type \"%s\" ignored!\n",
+        	    type_str);
+	    type = PPD_TYPE_UNKNOWN;
+	  }
+
+          ppd = add_ppd(filename, name, languages, make, make_and_model,
+                        device_id, product, psversion, 0, 0, 0, type, scheme);
+
+          if (!ppd)
+	  {
+            cupsDirClose(dir);
+	    cupsFileClose(fp);
+	    return (0);
+	  }
+
+          if (start && *start)
+	  {
+	    for (i = 1; i < PPD_MAX_LANG && *start; i ++)
+	    {
+	      if ((ptr = strchr(start, ',')) != NULL)
+	        *ptr++ = '\0';
+	      else
+	        ptr = start + strlen(start);
+
+              strlcpy(ppd->record.languages[i], start,
+	              sizeof(ppd->record.languages[0]));
+
+	      start = ptr;
+	    }
+          }
+
+          fprintf(stderr, "DEBUG2: [cups-driverd] Added dynamic PPD \"%s\"...\n",
+	          name);
+	}
+      }
+
+      cupsFileClose(fp);
+    }
+    else
+      fprintf(stderr, "WARNING: [cups-driverd] Unable to execute \"%s\": %s\n",
+              filename, strerror(errno));
+  }
+
+  cupsDirClose(dir);
+
+  return (1);
 }
 
 
@@ -1904,373 +2278,6 @@ load_ppds(const char *d,		/* I - Actual directory */
 
 
 /*
- * 'load_drv()' - Load the PPDs from a driver information file.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-load_drv(const char  *filename,		/* I - Actual filename */
-         const char  *name,		/* I - Name to the rest of the world */
-         cups_file_t *fp,		/* I - File to read from */
-	 time_t      mtime,		/* I - Mod time of driver info file */
-	 off_t       size)		/* I - Size of driver info file */
-{
-  ppdcSource	*src;			// Driver information file
-  ppdcDriver	*d;			// Current driver
-  ppdcAttr	*device_id,		// 1284DeviceID attribute
-		*product,		// Current product value
-		*ps_version,		// PSVersion attribute
-		*cups_fax,		// cupsFax attribute
-		*nick_name;		// NickName attribute
-  ppdcFilter	*filter;		// Current filter
-  ppd_info_t	*ppd;			// Current PPD
-  int		products_found;		// Number of products found
-  char		uri[1024],		// Driver URI
-		make_model[1024];	// Make and model
-  int		type;			// Driver type
-
-
- /*
-  * Load the driver info file...
-  */
-
-  src = new ppdcSource(filename, fp);
-
-  if (src->drivers->count == 0)
-  {
-    fprintf(stderr,
-            "ERROR: [cups-driverd] Bad driver information file \"%s\"!\n",
-	    filename);
-    src->release();
-    return (0);
-  }
-
- /*
-  * Add a dummy entry for the file...
-  */
-
-  add_ppd(name, name, "", "", "", "", "", "", mtime, size, 0,
-          PPD_TYPE_DRV, "drv");
-  ChangedPPD = 1;
-
- /*
-  * Then the drivers in the file...
-  */
-
-  for (d = (ppdcDriver *)src->drivers->first();
-       d;
-       d = (ppdcDriver *)src->drivers->next())
-  {
-    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "drv", "", "", 0,
-                     "/%s/%s", name,
-		     d->file_name ? d->file_name->value :
-		                    d->pc_file_name->value);
-
-    device_id  = d->find_attr("1284DeviceID", NULL);
-    ps_version = d->find_attr("PSVersion", NULL);
-    nick_name  = d->find_attr("NickName", NULL);
-
-    if (nick_name)
-      strlcpy(make_model, nick_name->value->value, sizeof(make_model));
-    else if (strncasecmp(d->model_name->value, d->manufacturer->value,
-                         strlen(d->manufacturer->value)))
-      snprintf(make_model, sizeof(make_model), "%s %s, %s",
-               d->manufacturer->value, d->model_name->value,
-	       d->version->value);
-    else
-      snprintf(make_model, sizeof(make_model), "%s, %s", d->model_name->value,
-               d->version->value);
-
-    if ((cups_fax = d->find_attr("cupsFax", NULL)) != NULL &&
-        !strcasecmp(cups_fax->value->value, "true"))
-      type = PPD_TYPE_FAX;
-    else if (d->type == PPDC_DRIVER_PS)
-      type = PPD_TYPE_POSTSCRIPT;
-    else if (d->type != PPDC_DRIVER_CUSTOM)
-      type = PPD_TYPE_RASTER;
-    else
-    {
-      for (filter = (ppdcFilter *)d->filters->first(),
-               type = PPD_TYPE_POSTSCRIPT;
-	   filter;
-	   filter = (ppdcFilter *)d->filters->next())
-        if (strcasecmp(filter->mime_type->value, "application/vnd.cups-raster"))
-	  type = PPD_TYPE_RASTER;
-        else if (strcasecmp(filter->mime_type->value,
-	                    "application/vnd.cups-pdf"))
-	  type = PPD_TYPE_PDF;
-    }
-
-    for (product = (ppdcAttr *)d->attrs->first(), products_found = 0,
-             ppd = NULL;
-         product;
-	 product = (ppdcAttr *)d->attrs->next())
-      if (!strcmp(product->name->value, "Product"))
-      {
-        if (!products_found)
-	  ppd = add_ppd(name, uri, "en", d->manufacturer->value, make_model,
-		        device_id ? device_id->value->value : "",
-		        product->value->value,
-		        ps_version ? ps_version->value->value : "(3010) 0",
-		        mtime, size, d->model_number, type, "drv");
-	else if (products_found < PPD_MAX_PROD)
-	  strlcpy(ppd->record.products[products_found], product->value->value,
-	          sizeof(ppd->record.products[0]));
-	else
-	  break;
-
-	products_found ++;
-      }
-
-    if (!products_found)
-      add_ppd(name, uri, "en", d->manufacturer->value, make_model,
-	      device_id ? device_id->value->value : "",
-	      d->model_name->value,
-	      ps_version ? ps_version->value->value : "(3010) 0",
-	      mtime, size, d->model_number, type, "drv");
-  }
-
-  src->release();
-
-  return (1);
-}
-
-
-/*
- * 'load_drivers()' - Load driver-generated PPD files.
- */
-
-static int				/* O - 1 on success, 0 on failure */
-load_drivers(cups_array_t *include,	/* I - Drivers to include */
-             cups_array_t *exclude)	/* I - Drivers to exclude */
-{
-  int		i;			/* Looping var */
-  char		*start,			/* Start of value */
-		*ptr;			/* Pointer into string */
-  const char	*server_bin,		/* CUPS_SERVERBIN env variable */
-		*scheme,		/* Scheme for this driver */
-		*scheme_end;		/* Pointer to end of scheme */
-  char		drivers[1024];		/* Location of driver programs */
-  int		pid;			/* Process ID for driver program */
-  cups_file_t	*fp;			/* Pipe to driver program */
-  cups_dir_t	*dir;			/* Directory pointer */
-  cups_dentry_t *dent;			/* Directory entry */
-  char		*argv[3],		/* Arguments for command */
-		filename[1024],		/* Name of driver */
-		line[2048],		/* Line from driver */
-		name[512],		/* ppd-name */
-		make[128],		/* ppd-make */
-		make_and_model[128],	/* ppd-make-and-model */
-		device_id[128],		/* ppd-device-id */
-		languages[128],		/* ppd-natural-language */
-		product[128],		/* ppd-product */
-		psversion[128],		/* ppd-psversion */
-		type_str[128];		/* ppd-type */
-  int		type;			/* PPD type */
-  ppd_info_t	*ppd;			/* Newly added PPD */
-
-
- /*
-  * Try opening the driver directory...
-  */
-
-  if ((server_bin = getenv("CUPS_SERVERBIN")) == NULL)
-    server_bin = CUPS_SERVERBIN;
-
-  snprintf(drivers, sizeof(drivers), "%s/driver", server_bin);
-
-  if ((dir = cupsDirOpen(drivers)) == NULL)
-  {
-    fprintf(stderr, "ERROR: [cups-driverd] Unable to open driver directory "
-		    "\"%s\": %s\n",
-	    drivers, strerror(errno));
-    return (0);
-  }
-
- /*
-  * Loop through all of the device drivers...
-  */
-
-  argv[1] = (char *)"list";
-  argv[2] = NULL;
-
-  while ((dent = cupsDirRead(dir)) != NULL)
-  {
-   /*
-    * Only look at executable files...
-    */
-
-    if (!(dent->fileinfo.st_mode & 0111) || !S_ISREG(dent->fileinfo.st_mode))
-      continue;
-
-   /*
-    * Include/exclude specific drivers...
-    */
-
-    if (exclude)
-    {
-     /*
-      * Look for "scheme" or "scheme*" (prefix match), and skip any matches.
-      */
-
-      for (scheme = (char *)cupsArrayFirst(exclude);
-	   scheme;
-	   scheme = (char *)cupsArrayNext(exclude))
-      {
-        fprintf(stderr, "DEBUG: [cups-driverd] Exclude \"%s\" with \"%s\"?\n",
-		dent->filename, scheme);
-	scheme_end = scheme + strlen(scheme) - 1;
-
-	if ((scheme_end > scheme && *scheme_end == '*' &&
-	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
-	    !strcmp(scheme, dent->filename))
-	{
-	  fputs("DEBUG: [cups-driverd] Yes, exclude!\n", stderr);
-	  break;
-	}
-      }
-
-      if (scheme)
-        continue;
-    }
-
-    if (include)
-    {
-     /*
-      * Look for "scheme" or "scheme*" (prefix match), and skip any non-matches.
-      */
-
-      for (scheme = (char *)cupsArrayFirst(include);
-	   scheme;
-	   scheme = (char *)cupsArrayNext(include))
-      {
-        fprintf(stderr, "DEBUG: [cups-driverd] Include \"%s\" with \"%s\"?\n",
-		dent->filename, scheme);
-	scheme_end = scheme + strlen(scheme) - 1;
-
-	if ((scheme_end > scheme && *scheme_end == '*' &&
-	     !strncmp(scheme, dent->filename, scheme_end - scheme)) ||
-	    !strcmp(scheme, dent->filename))
-	{
-	  fputs("DEBUG: [cups-driverd] Yes, include!\n", stderr);
-	  break;
-	}
-      }
-
-      if (!scheme)
-        continue;
-    }
-    else
-      scheme = dent->filename;
-
-   /*
-    * Run the driver with no arguments and collect the output...
-    */
-
-    argv[0] = dent->filename;
-    snprintf(filename, sizeof(filename), "%s/%s", drivers, dent->filename);
-
-    if ((fp = cupsdPipeCommand(&pid, filename, argv, 0)) != NULL)
-    {
-      while (cupsFileGets(fp, line, sizeof(line)))
-      {
-       /*
-        * Each line is of the form:
-	*
-	*   "ppd-name" ppd-natural-language "ppd-make" "ppd-make-and-model" \
-	*       "ppd-device-id" "ppd-product" "ppd-psversion"
-	*/
-
-        device_id[0] = '\0';
-	product[0]   = '\0';
-	psversion[0] = '\0';
-	strcpy(type_str, "postscript");
-
-        if (sscanf(line, "\"%511[^\"]\"%127s%*[ \t]\"%127[^\"]\""
-	                 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
-			 "%*[ \t]\"%127[^\"]\"%*[ \t]\"%127[^\"]\""
-			 "%*[ \t]\"%127[^\"]\"",
-	           name, languages, make, make_and_model,
-		   device_id, product, psversion, type_str) < 4)
-        {
-	 /*
-	  * Bad format; strip trailing newline and write an error message.
-	  */
-
-          if (line[strlen(line) - 1] == '\n')
-	    line[strlen(line) - 1] = '\0';
-
-	  fprintf(stderr, "ERROR: [cups-driverd] Bad line from \"%s\": %s\n",
-	          dent->filename, line);
-	  break;
-        }
-	else
-	{
-	 /*
-	  * Add the device to the array of available devices...
-	  */
-
-          if ((start = strchr(languages, ',')) != NULL)
-	    *start++ = '\0';
-
-	  for (type = 0;
-               type < (int)(sizeof(ppd_types) / sizeof(ppd_types[0]));
-	       type ++)
-	    if (!strcmp(type_str, ppd_types[type]))
-              break;
-
-	  if (type >= (int)(sizeof(ppd_types) / sizeof(ppd_types[0])))
-	  {
-	    fprintf(stderr,
-	            "ERROR: [cups-driverd] Bad ppd-type \"%s\" ignored!\n",
-        	    type_str);
-	    type = PPD_TYPE_UNKNOWN;
-	  }
-
-          ppd = add_ppd(filename, name, languages, make, make_and_model,
-                        device_id, product, psversion, 0, 0, 0, type, scheme);
-
-          if (!ppd)
-	  {
-            cupsDirClose(dir);
-	    cupsFileClose(fp);
-	    return (0);
-	  }
-
-          if (start && *start)
-	  {
-	    for (i = 1; i < PPD_MAX_LANG && *start; i ++)
-	    {
-	      if ((ptr = strchr(start, ',')) != NULL)
-	        *ptr++ = '\0';
-	      else
-	        ptr = start + strlen(start);
-
-              strlcpy(ppd->record.languages[i], start,
-	              sizeof(ppd->record.languages[0]));
-
-	      start = ptr;
-	    }
-          }
-
-          fprintf(stderr, "DEBUG2: [cups-driverd] Added dynamic PPD \"%s\"...\n",
-	          name);
-	}
-      }
-
-      cupsFileClose(fp);
-    }
-    else
-      fprintf(stderr, "WARNING: [cups-driverd] Unable to execute \"%s\": %s\n",
-              filename, strerror(errno));
-  }
-
-  cupsDirClose(dir);
-
-  return (1);
-}
-
-
-/*
  * 'load_ppds_dat()' - Load the ppds.dat file.
  */
 
@@ -2301,7 +2308,6 @@ load_ppds_dat(char   *filename,		/* I - Filename buffer */
 
     unsigned ppdsync;			/* Sync word */
     int      num_ppds;			/* Number of PPDs */
-
 
     if (cupsFileRead(fp, (char *)&ppdsync, sizeof(ppdsync))
             == sizeof(ppdsync) &&
