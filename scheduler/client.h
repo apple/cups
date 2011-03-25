@@ -3,7 +3,7 @@
  *
  *   Client definitions for the CUPS scheduler.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -56,10 +56,7 @@ struct cupsd_client_s
   int			serverport;	/* Server port for connection */
 #ifdef HAVE_GSSAPI
   int			have_gss;	/* Have GSS credentials? */
-  gss_cred_id_t 	gss_creds;	/* Delegated credentials from client */
-  unsigned		gss_flags;	/* Credential flags */
-  gss_buffer_desc 	gss_output_token;
-					/* Output token for Negotiate header */
+  uid_t			gss_uid;	/* User ID for local prints */
 #endif /* HAVE_GSSAPI */
 #ifdef HAVE_AUTHORIZATION_H
   AuthorizationRef	authref;	/* Authorization ref */

@@ -1804,6 +1804,16 @@ cupsdSetAuthInfoRequired(
 
         p->auth_info_required[p->num_auth_info_required] = "negotiate";
 	p->num_auth_info_required ++;
+
+       /*
+        * Don't allow sharing of queues that require Kerberos authentication.
+	*/
+
+	if (p->shared)
+	{
+	  cupsdDeregisterPrinter(p, 1);
+	  p->shared = 0;
+	}
       }
       else if ((end - values) == 6 && !strncmp(values, "domain", 6))
       {
@@ -1881,6 +1891,16 @@ cupsdSetAuthInfoRequired(
 
       p->auth_info_required[p->num_auth_info_required] = "negotiate";
       p->num_auth_info_required ++;
+
+     /*
+      * Don't allow sharing of queues that require Kerberos authentication.
+      */
+
+      if (p->shared)
+      {
+	cupsdDeregisterPrinter(p, 1);
+	p->shared = 0;
+      }
 
       return (1);
     }

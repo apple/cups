@@ -944,11 +944,8 @@ cupsdContinueJob(cupsd_job_t *job)	/* I - Job */
     envp[envc ++] = job->auth_domain;
   if (job->auth_password)
     envp[envc ++] = job->auth_password;
-
-#ifdef HAVE_GSSAPI
-  if (job->ccname)
-    envp[envc ++] = job->ccname;
-#endif /* HAVE_GSSAPI */
+  if (job->auth_uid)
+    envp[envc ++] = job->auth_uid;
 
   envp[envc] = NULL;
 
@@ -1257,20 +1254,7 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
   cupsdClearString(&job->auth_username);
   cupsdClearString(&job->auth_domain);
   cupsdClearString(&job->auth_password);
-
-#ifdef HAVE_GSSAPI
- /*
-  * Destroy the credential cache and clear the KRB5CCNAME env var string.
-  */
-
-  if (job->ccache)
-  {
-    krb5_cc_destroy(KerberosContext, job->ccache);
-    job->ccache = NULL;
-  }
-
-  cupsdClearString(&job->ccname);
-#endif /* HAVE_GSSAPI */
+  cupsdClearString(&job->auth_uid);
 
   if (job->num_files > 0)
   {
@@ -1712,6 +1696,7 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
     cupsdClearString(&job->auth_username);
     cupsdClearString(&job->auth_domain);
     cupsdClearString(&job->auth_password);
+    cupsdClearString(&job->auth_uid);
 
     if ((fp = cupsFileOpen(jobfile, "r")) != NULL)
     {
@@ -1736,6 +1721,9 @@ cupsdLoadJob(cupsd_job_t *job)		/* I - Job */
 	else if (!strcmp(destptr->auth_info_required[i], "password"))
 	  cupsdSetStringf(&job->auth_password, "AUTH_PASSWORD=%s", data);
       }
+
+      if (cupsFileGets(fp, line, sizeof(line)) && isdigit(line[0] & 255))
+        cupsdSetStringf(&job->auth_uid, "AUTH_UID=%s", line);
 
       cupsFileClose(fp);
     }
@@ -2391,20 +2379,7 @@ cupsdSetJobState(
 	cupsdClearString(&job->auth_username);
 	cupsdClearString(&job->auth_domain);
 	cupsdClearString(&job->auth_password);
-
-#ifdef HAVE_GSSAPI
-       /*
-	* Destroy the credential cache and clear the KRB5CCNAME env var string.
-	*/
-
-	if (job->ccache)
-	{
-	  krb5_cc_destroy(KerberosContext, job->ccache);
-	  job->ccache = NULL;
-	}
-
-	cupsdClearString(&job->ccname);
-#endif /* HAVE_GSSAPI */
+	cupsdClearString(&job->auth_uid);
 
        /*
 	* Remove the print file for good if we aren't preserving jobs or
