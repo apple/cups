@@ -628,7 +628,7 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
     DEBUG_printf(("9cups_local_auth: Unable to open file %s: %s",
                   filename, strerror(errno)));
 
-#ifdef HAVE_GSSAPI
+#  ifdef HAVE_GSSAPI
     if (!strncmp(http->fields[HTTP_FIELD_WWW_AUTHENTICATE], "Negotiate", 9))
     {
      /*
@@ -637,8 +637,19 @@ cups_local_auth(http_t *http)		/* I - HTTP connection to server */
 
       return (1);
     }
-#endif /* HAVE_GSSAPI */
+#  endif /* HAVE_GSSAPI */
 
+#  ifdef HAVE_AUTHORIZATION_H
+    if (httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "authkey",
+		         auth_key, sizeof(auth_key)))
+    {
+     /*
+      * Don't use the root certificate as a replacement for an authkey...
+      */
+
+      return (1);
+    }
+#  endif /* HAVE_AUTHORIZATION_H */
     if (!httpGetSubField2(http, HTTP_FIELD_WWW_AUTHENTICATE, "trc", trc,
 	                  sizeof(trc)))
     {

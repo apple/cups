@@ -2660,7 +2660,7 @@ cupsdSendHeader(
 #ifdef HAVE_AUTHORIZATION_H
 	  if (SystemGroupAuthKey)
 	    snprintf(auth_key, auth_size,
-	             ", authkey=\"%s\", trc=\"y\"",
+	             ", authkey=\"%s\"",
 		     SystemGroupAuthKey);
           else
 #else

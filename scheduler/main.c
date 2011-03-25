@@ -947,6 +947,7 @@ main(int  argc,				/* I - Number of command-line args */
       browse_time = current_time;
     }
 
+#ifndef HAVE_AUTHORIZATION_H
    /*
     * Update the root certificate once every 5 minutes if we have client
     * connections...
@@ -962,6 +963,7 @@ main(int  argc,				/* I - Number of command-line args */
       cupsdDeleteCert(0);
       cupsdAddCert(0, "root", NULL);
     }
+#endif /* !HAVE_AUTHORIZATION_H */
 
    /*
     * Check for new data on the client sockets...

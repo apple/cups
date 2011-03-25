@@ -570,6 +570,20 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get Local certificate authentication data...
     */
 
+#ifdef HAVE_AUTHORIZATION_H
+    const char		*name;		/* Authorizing name */
+
+    for (name = (char *)cupsArrayFirst(con->best->names);
+         name;
+         name = (char *)cupsArrayNext(con->best->names))
+      if (!strncasecmp(name, "@AUTHKEY(", 9) || !strcasecmp(name, "@SYSTEM"))
+      {
+	cupsdLogMessage(CUPSD_LOG_ERROR,
+	                "Local authentication not allowed for resource.");
+	return;
+      }
+#endif /* HAVE_AUTHORIZATION_H */
+
     authorization += 5;
     while (isspace(*authorization & 255))
       authorization ++;
