@@ -1022,8 +1022,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     }
 #  endif /* __APPLE__ */
 
-//    con->gss_output_token.length = 0;
-
    /*
     * Find the start of the Kerberos input token...
     */
@@ -1087,12 +1085,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
     * Get the username associated with the client's credentials...
     */
 
-#if 0
-    if (!con->gss_creds)
-      cupsdLogMessage(CUPSD_LOG_DEBUG,
-		      "cupsdAuthorize: No delegated credentials!");
-#endif /* 0 */
-
     if (major_status == GSS_S_CONTINUE_NEEDED)
       cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
 			 "cupsdAuthorize: Credentials not complete");
@@ -1105,7 +1097,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
       {
 	cupsdLogGSSMessage(CUPSD_LOG_DEBUG, major_status, minor_status,
 			   "cupsdAuthorize: Error getting username");
-//	gss_release_cred(&minor_status, &con->gss_creds);
 	gss_release_name(&minor_status, &client_name);
 	gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 	return;
@@ -1122,8 +1113,6 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 
       con->type = CUPSD_AUTH_NEGOTIATE;
     }
-//    else
-//      gss_release_cred(&minor_status, &con->gss_creds);
 
     gss_delete_sec_context(&minor_status, &context, GSS_C_NO_BUFFER);
 

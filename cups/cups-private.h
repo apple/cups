@@ -68,6 +68,12 @@ typedef struct _cups_globals_s		/**** CUPS global state data ****/
 					/* Number of server settings */
   cups_option_t		*cupsd_settings;/* Server settings */
 
+  /* auth.c */
+#  ifdef HAVE_GSSAPI
+  char			gss_service_name[32];
+  					/* Kerberos service name */
+#  endif /* HAVE_GSSAPI */
+
   /* backend.c */
   char			resolved_uri[1024];
 					/* Buffer for cupsBackendDeviceURI */

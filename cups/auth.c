@@ -260,8 +260,8 @@ _cupsSetNegotiateAuthString(
   OM_uint32	minor_status,		/* Minor status code */
 		major_status;		/* Major status code */
   gss_buffer_desc output_token = GSS_C_EMPTY_BUFFER;
-				      /* Output token */
-  char		*gss_service_name;    /* GSS service name */
+					/* Output token */
+  _cups_globals_t *cg = _cupsGlobals();	/* Thread globals */
 
 
 #  ifdef __APPLE__
@@ -280,13 +280,10 @@ _cupsSetNegotiateAuthString(
 
   if (http->gssname == GSS_C_NO_NAME)
   {
-    if ((gss_service_name = getenv("CUPS_GSSSERVICENAME")) == NULL)
-      gss_service_name = CUPS_DEFAULT_GSSSERVICENAME;
-    else
-      DEBUG_puts("2_cupsSetNegotiateAuthString: GSS service name set via "
-		 "environment variable");
+    if (!cg->gss_service_name[0])
+      _cupsSetDefaults();
 
-    http->gssname = cups_get_gssname(http, gss_service_name);
+    http->gssname = cups_get_gssname(http, cg->gss_service_name);
   }
 
   if (http->gssctx != GSS_C_NO_CONTEXT)
@@ -298,9 +295,6 @@ _cupsSetNegotiateAuthString(
   major_status  = gss_init_sec_context(&minor_status, GSS_C_NO_CREDENTIAL,
 				       &http->gssctx,
 				       http->gssname, http->gssmech,
-#ifdef GSS_C_DELEG_POLICY_FLAG
-				       GSS_C_DELEG_POLICY_FLAG |
-#endif /* GSS_C_DELEG_POLICY_FLAG */
 				       GSS_C_MUTUAL_FLAG | GSS_C_INTEG_FLAG,
 				       GSS_C_INDEFINITE,
 				       GSS_C_NO_CHANNEL_BINDINGS,
