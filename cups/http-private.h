@@ -311,6 +311,9 @@ extern void	_cups_freeifaddrs(struct ifaddrs *addrs);
  */
 
 extern int		_httpAddrPort(http_addr_t *addr);
+extern char		*_httpAssembleUUID(const char *server, int port,
+					   const char *name, int number,
+					   char *buffer, size_t bufsize);
 extern http_tls_credentials_t
 			_httpConvertCredentials(cups_array_t *credentials);
 extern http_t		*_httpCreate(const char *host, int port,

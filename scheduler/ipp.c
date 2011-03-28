@@ -2337,7 +2337,8 @@ add_job_uuid(cupsd_client_t *con,	/* I - Client connection */
 
   if (!ippFindAttribute(job->attrs, "job-uuid", IPP_TAG_URI))
     ippAddString(job->attrs, IPP_TAG_JOB, IPP_TAG_URI, "job-uuid", NULL,
-		 cupsdMakeUUID(job->dest, job->id, uuid, sizeof(uuid)));
+		 _httpAssembleUUID(ServerName, RemotePort, job->dest, job->id,
+		                   uuid, sizeof(uuid)));
 }
 
 
