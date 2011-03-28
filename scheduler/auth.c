@@ -1062,11 +1062,13 @@ cupsdAuthorize(cupsd_client_t *con)	/* I - Client connection */
 					  GSS_C_NO_CHANNEL_BINDINGS,
 					  &client_name,
 					  NULL,
-					  NULL, // &con->gss_output_token,
-					  NULL, // &con->gss_flags,
+					  &output_token,
+					  NULL,
 					  NULL,
 					  NULL);
-//					  &con->gss_creds);
+
+    if (output_token.length > 0)
+      gss_release_buffer(&minor_status, &output_token);
 
     if (GSS_ERROR(major_status))
     {
