@@ -512,6 +512,16 @@ main(int  argc,				/* I - Number of command-line args */
     password = getenv("AUTH_PASSWORD");
   }
 
+#ifdef HAVE_GSSAPI
+ /*
+  * For Kerberos, become the printing user (if we can) to get the credentials
+  * that way.
+  */
+
+  if (!getuid() && (value = getenv("AUTH_UID")) != NULL)
+    seteuid(atoi(value));
+#endif /* HAVE_GSSAPI */
+
  /*
   * Try finding the remote server...
   */
