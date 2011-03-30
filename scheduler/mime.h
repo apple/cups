@@ -3,7 +3,7 @@
  *
  *   MIME type/conversion database definitions for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2007 by Easy Software Products, all rights reserved.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -97,6 +97,7 @@ typedef struct _mime_filter_s		/**** MIME Conversion Filter Data ****/
 		*dst;			/* Destination type */
   int		cost;			/* Relative cost */
   char		filter[MIME_MAX_FILTER];/* Filter program to use */
+  size_t	maxsize;		/* Maximum file size for this filter */
 } mime_filter_t;
 
 typedef struct _mime_s			/**** MIME Database ****/
@@ -135,6 +136,9 @@ extern mime_filter_t	*mimeAddFilter(mime_t *mime, mime_type_t *src,
 extern void		mimeDeleteFilter(mime_t *mime, mime_filter_t *filter);
 extern cups_array_t	*mimeFilter(mime_t *mime, mime_type_t *src,
 			            mime_type_t *dst, int *cost);
+extern cups_array_t	*mimeFilter2(mime_t *mime, mime_type_t *src,
+			             size_t srcsize, mime_type_t *dst,
+				     int *cost);
 extern mime_filter_t	*mimeFilterLookup(mime_t *mime, mime_type_t *src,
 			                  mime_type_t *dst);
 extern mime_filter_t	*mimeFirstFilter(mime_t *mime);

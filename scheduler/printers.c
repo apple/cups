@@ -3563,6 +3563,7 @@ add_printer_filter(
 					/* Destination super/type */
 		program[1024];		/* Program/filter name */
   int		cost;			/* Cost of filter */
+  size_t	maxsize = 0;		/* Maximum supported file size */
   mime_type_t	*temptype,		/* MIME type looping var */
 		*desttype;		/* Destination MIME type */
   char		filename[1024],		/* Full filter filename */
@@ -3579,7 +3580,9 @@ add_printer_filter(
   * Parse the filter string; it should be in one of the following formats:
   *
   *     source/type cost program
+  *     source/type cost maxsize(nnnn) program
   *     source/type dest/type cost program
+  *     source/type dest/type cost maxsize(nnnn) program
   */
 
   if (sscanf(filter, "%15[^/]/%255s%*[ \t]%15[^/]/%255s%d%*[ \t]%1023[^\n]",
@@ -3610,6 +3613,26 @@ add_printer_filter(
                       p->name, filter);
       return;
     }
+  }
+
+  if (!strncmp(program, "maxsize(", 8))
+  {
+    char	*ptr;			/* Pointer into maxsize(nnnn) program */
+
+    maxsize = strtoll(program + 8, &ptr, 10);
+
+    if (*ptr != ')')
+    {
+      cupsdLogMessage(CUPSD_LOG_ERROR, "%s: invalid filter string \"%s\"!",
+                      p->name, filter);
+      return;
+    }
+
+    ptr ++;
+    while (_cups_isspace(*ptr))
+      ptr ++;
+
+    _cups_strcpy(program, ptr);
   }
 
  /*
