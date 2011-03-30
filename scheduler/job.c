@@ -2680,10 +2680,17 @@ finalize_job(cupsd_job_t *job,		/* I - Job */
 
  /*
   * Clear the "connecting-to-device" reason, which is only valid when a printer
-  * is processing...
+  * is processing, along with any remote printing job state...
   */
 
-  cupsdSetPrinterReasons(job->printer, "-connecting-to-device");
+  cupsdSetPrinterReasons(job->printer, "-connecting-to-device,"
+				       "cups-remote-pending,"
+				       "cups-remote-pending-held,"
+				       "cups-remote-processing,"
+				       "cups-remote-stopped,"
+				       "cups-remote-canceled,"
+				       "cups-remote-aborted,"
+				       "cups-remote-completed");
 
  /*
   * Similarly, clear the "offline-report" reason for non-USB devices since we
@@ -3921,6 +3928,13 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
+  cupsdSetPrinterReasons(printer, "cups-remote-pending,"
+				  "cups-remote-pending-held,"
+				  "cups-remote-processing,"
+				  "cups-remote-stopped,"
+				  "cups-remote-canceled,"
+				  "cups-remote-aborted,"
+				  "cups-remote-completed");
 
   job->cost         = 0;
   job->current_file = 0;
