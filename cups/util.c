@@ -1762,7 +1762,7 @@ cups_get_printer_uri(
     {
       httpSeparateURI(HTTP_URI_CODING_ALL,
                       _httpResolveURI(attr->values[0].string.text, uri,
-		                      sizeof(uri), 0),
+		                      sizeof(uri), 0, NULL, NULL),
                       scheme, sizeof(scheme), username, sizeof(username),
 		      host, hostsize, port, resource, resourcesize);
       ippDelete(response);

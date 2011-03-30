@@ -363,7 +363,9 @@ extern char		*_httpEncodeURI(char *dst, const char *src,
 extern void		_httpFreeCredentials(http_tls_credentials_t credentials);
 extern ssize_t		_httpPeek(http_t *http, char *buffer, size_t length);
 extern const char	*_httpResolveURI(const char *uri, char *resolved_uri,
-			                 size_t resolved_size, int log);
+			                 size_t resolved_size, int log,
+					 int (*cb)(void *context),
+					 void *context);
 extern void		_httpSetTimeout(http_t *http, double timeout,
 			                _http_timeout_cb_t cb, void *user_data);
 extern int		_httpUpdate(http_t *http, http_status_t *status);

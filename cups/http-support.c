@@ -1382,7 +1382,9 @@ _httpResolveURI(
     const char *uri,			/* I - DNS-SD URI */
     char       *resolved_uri,		/* I - Buffer for resolved URI */
     size_t     resolved_size,		/* I - Size of URI buffer */
-    int        logit)			/* I - Log progress to stderr? */
+    int        logit,			/* I - Log progress to stderr? */
+    int        (*cb)(void *context),	/* I - Continue callback function */
+    void       *context)		/* I - Context pointer for callback */
 {
   char			scheme[32],	/* URI components... */
 			userpass[256],
@@ -1514,12 +1516,18 @@ _httpResolveURI(
 	  if (logit)
 	    _cupsLangPrintFilter(stderr, "INFO", _("Looking for printer."));
 
+	  if (cb && !(*cb)(context))
+	  {
+	    DEBUG_puts("5_httpResolveURI: callback returned 0 (stop)");
+	    break;
+	  }
+
 	 /*
-	  * For the first minute, wakeup every 2 seconds to emit a
-	  * "looking for printer" message...
+	  * For the first minute (or forever if we have a callback), wakeup
+	  * every 2 seconds to emit a "looking for printer" message...
 	  */
 
-	  timeout = (time(NULL) < (start_time + 60)) ? 2000 : -1;
+	  timeout = (time(NULL) < (start_time + 60) || cb) ? 2000 : -1;
 
 #ifdef HAVE_POLL
 	  polldata.fd     = DNSServiceRefSockFD(ref);

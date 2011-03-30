@@ -3,7 +3,7 @@
  *
  *   HTTP test program for CUPS.
  *
- *   Copyright 2007-2010 by Apple Inc.
+ *   Copyright 2007-2011 by Apple Inc.
  *   Copyright 1997-2006 by Easy Software Products.
  *
  *   These coded instructions, statements, and computer programs are the
@@ -468,7 +468,7 @@ main(int  argc,				/* I - Number of command-line arguments */
     printf("_httpResolveURI(%s): ", argv[1]);
     fflush(stdout);
 
-    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved), 1))
+    if (!_httpResolveURI(argv[1], resolved, sizeof(resolved), 1, NULL, NULL))
     {
       puts("FAIL");
       return (1);
