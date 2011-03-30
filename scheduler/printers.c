@@ -3656,6 +3656,12 @@ add_printer_filter(
 		 "(0%o/uid=%d/gid=%d).", filename, fileinfo.st_mode,
 		 (int)fileinfo.st_uid, (int)fileinfo.st_gid);
 
+#ifdef __APPLE__ /* Don't flag filters with group write for "admin" */
+        if (fileinfo.st_uid ||
+	    (fileinfo.st_gid && fileinfo.st_gid != 80 &&
+	     (fileinfo.st_mode & S_IWGRP)) ||
+	    (fileinfo.st_mode & (S_ISUID | S_IWOTH)))
+#endif /* __APPLE__ */
 	cupsdSetPrinterReasons(p, "+cups-insecure-filter-warning");
 
 	cupsdLogMessage(CUPSD_LOG_WARN, "%s: %s", p->name, p->state_message);
