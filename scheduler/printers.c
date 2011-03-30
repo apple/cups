@@ -3382,8 +3382,11 @@ cupsdWritePrintcap(void)
 			     "\t\t<key>device-uri</key>\n"
 			     "\t\t<string>", p->type);
 	  write_xml_string(fp, p->sanitized_device_uri);
-	  cupsFilePuts(fp, "</string>\n"
-			   "\t</dict>\n");
+	  cupsFilePrintf(fp, "</string>\n"
+			     "\t\t<key>sandbox</key>\n"
+			     "\t\t<%s/>\n"
+			     "\t</dict>\n",
+			     p->pc->sandbox ? "true" : "false");
 	}
 	cupsFilePuts(fp, "</array>\n"
 			 "</plist>\n");

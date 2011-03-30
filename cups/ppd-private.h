@@ -124,7 +124,8 @@ struct _ppd_cache_s			/**** PPD cache and PWG conversion data ****/
   char		*product;		/* Product value */
   cups_array_t	*filters,		/* cupsFilter/cupsFilter2 values */
 		*prefilters;		/* cupsPreFilter values */
-  int		single_file;		/* cupsSingleFile value */
+  int		single_file,		/* cupsSingleFile value */
+	      	sandbox;		/* APDialogSandbox value */
 };
 
 

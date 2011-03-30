@@ -207,6 +207,10 @@ _ppdCacheCreateWithFile(
     {
       pc->single_file = !strcasecmp(value, "true");
     }
+    else if (!strcasecmp(line, "Sandbox"))
+    {
+      pc->sandbox = !strcasecmp(value, "true");
+    }
     else if (!strcasecmp(line, "IPP"))
     {
       off_t	pos = cupsFileTell(fp),	/* Position in file */
@@ -1282,6 +1286,9 @@ _ppdCacheCreateWithPPD(ppd_file_t *ppd)	/* I - PPD file */
   if ((ppd_attr = ppdFindAttr(ppd, "cupsSingleFile", NULL)) != NULL)
     pc->single_file = !strcasecmp(ppd_attr->value, "true");
 
+  if ((ppd_attr = ppdFindAttr(ppd, "APDialogSandbox", NULL)) != NULL)
+    pc->sandbox = !strcasecmp(ppd_attr->value, "true");
+
  /*
   * Copy the product string, if any...
   */
@@ -2116,6 +2123,8 @@ _ppdCacheWriteFile(
     cupsFilePutConf(fp, "PreFilter", value);
 
   cupsFilePrintf(fp, "SingleFile %s\n", pc->single_file ? "true" : "false");
+
+  cupsFilePrintf(fp, "Sandbox %s\n", pc->sandbox ? "true" : "false");
 
  /*
   * IPP attributes, if any...
