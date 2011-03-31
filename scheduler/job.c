@@ -3928,7 +3928,7 @@ start_job(cupsd_job_t     *job,		/* I - Job ID */
 
   cupsdSetJobState(job, IPP_JOB_PROCESSING, CUPSD_JOB_DEFAULT, NULL);
   cupsdSetPrinterState(printer, IPP_PRINTER_PROCESSING, 0);
-  cupsdSetPrinterReasons(printer, "cups-remote-pending,"
+  cupsdSetPrinterReasons(printer, "-cups-remote-pending,"
 				  "cups-remote-pending-held,"
 				  "cups-remote-processing,"
 				  "cups-remote-stopped,"
