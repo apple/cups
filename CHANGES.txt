@@ -1,8 +1,9 @@
-CHANGES.txt - 2011-03-18
+CHANGES.txt - 2011-03-31
 ------------------------
 
 CHANGES IN CUPS V1.5b1
 
+	- Added new PWG Raster filter for IPP Everywhere printer support.
 	- Added printer-uuid attribute.
 	- Added support for the cupsSingleFile PPD keyword.
 	- Dropped support for the printer-state-history attribute (STR #3654)

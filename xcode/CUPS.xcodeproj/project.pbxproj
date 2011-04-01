@@ -47,6 +47,7 @@
 				276683DB1337B24A000D33D0 /* PBXTargetDependency */,
 				276683DD1337B24A000D33D0 /* PBXTargetDependency */,
 				276683DF1337B24A000D33D0 /* PBXTargetDependency */,
+				7258EAEF13459ADA009286F1 /* PBXTargetDependency */,
 				7243793F1333FD23009631B9 /* PBXTargetDependency */,
 				724379C31333FF7D009631B9 /* PBXTargetDependency */,
 			);
@@ -336,6 +337,9 @@
 		724379C71333FFC7009631B9 /* usb.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379C51333FFC7009631B9 /* usb.c */; };
 		724379C91333FFF3009631B9 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 724379C81333FFF3009631B9 /* CoreFoundation.framework */; };
 		724379CB1334000E009631B9 /* ieee1284.c in Sources */ = {isa = PBXBuildFile; fileRef = 724379CA1334000E009631B9 /* ieee1284.c */; };
+		7258EAED134594EB009286F1 /* rastertopwg.c in Sources */ = {isa = PBXBuildFile; fileRef = 7258EAEC134594EB009286F1 /* rastertopwg.c */; };
+		7258EAF413459B6D009286F1 /* libcups.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72220EAE1333047D00FCA411 /* libcups.dylib */; };
+		7258EAF513459B6D009286F1 /* libcupsimage.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72F75A611336F9A3004BB496 /* libcupsimage.dylib */; };
 		7263EE2713330D2800BA4D44 /* libpam.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2613330D2800BA4D44 /* libpam.dylib */; };
 		7263EE2C13330D5C00BA4D44 /* Kerberos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2913330D5C00BA4D44 /* Kerberos.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		7263EE2D13330D5C00BA4D44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7263EE2A13330D5C00BA4D44 /* Security.framework */; };
@@ -747,6 +751,27 @@
 			remoteGlobalIDString = 7243795A1333FF1D009631B9;
 			remoteInfo = usb;
 		};
+		7258EAEE13459ADA009286F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7258EAE1134594C4009286F1;
+			remoteInfo = rastertopwg;
+		};
+		7258EAF013459B67009286F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72220EAD1333047D00FCA411;
+			remoteInfo = libcups;
+		};
+		7258EAF213459B67009286F1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72F75A601336F9A3004BB496;
+			remoteInfo = libcupsimage;
+		};
 		72F75A651336FA30004BB496 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 72BF96371333042100B1EAD7 /* Project object */;
@@ -952,6 +977,15 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		724379591333FF1D009631B9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		7258EAE0134594C4009286F1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -1181,6 +1215,8 @@
 		724379C51333FFC7009631B9 /* usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = usb.c; path = ../backend/usb.c; sourceTree = "<group>"; };
 		724379C81333FFF3009631B9 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = SDKs/MacOSX10.7.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		724379CA1334000E009631B9 /* ieee1284.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ieee1284.c; path = ../backend/ieee1284.c; sourceTree = "<group>"; };
+		7258EAE2134594C4009286F1 /* rastertopwg */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rastertopwg; sourceTree = BUILT_PRODUCTS_DIR; };
+		7258EAEC134594EB009286F1 /* rastertopwg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rastertopwg.c; path = ../filter/rastertopwg.c; sourceTree = "<group>"; };
 		7263EE2613330D2800BA4D44 /* libpam.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpam.dylib; path = SDKs/MacOSX10.6.sdk/usr/lib/libpam.dylib; sourceTree = DEVELOPER_DIR; };
 		7263EE2913330D5C00BA4D44 /* Kerberos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kerberos.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Kerberos.framework; sourceTree = DEVELOPER_DIR; };
 		7263EE2A13330D5C00BA4D44 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = SDKs/MacOSX10.6.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
@@ -1439,6 +1475,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7258EADF134594C4009286F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7258EAF413459B6D009286F1 /* libcups.dylib in Frameworks */,
+				7258EAF513459B6D009286F1 /* libcupsimage.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72F75A4F1336F950004BB496 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1558,6 +1603,7 @@
 				276683A41337ACAB000D33D0 /* ppdpo */,
 				276683F01337F78E000D33D0 /* ipptool */,
 				276684041337FA1D000D33D0 /* cupsaddsmb */,
+				7258EAE2134594C4009286F1 /* rastertopwg */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1762,6 +1808,14 @@
 			name = backends;
 			sourceTree = "<group>";
 		};
+		7258EADC134594A8009286F1 /* filters */ = {
+			isa = PBXGroup;
+			children = (
+				7258EAEC134594EB009286F1 /* rastertopwg.c */,
+			);
+			name = filters;
+			sourceTree = "<group>";
+		};
 		72BF96351333042100B1EAD7 = {
 			isa = PBXGroup;
 			children = (
@@ -1788,6 +1842,7 @@
 				274FF67313333B0A00317ECB /* commands */,
 				72220F5D13330A5A00FCA411 /* cupsd */,
 				274FF5D513332C2C00317ECB /* daemon */,
+				7258EADC134594A8009286F1 /* filters */,
 				276683CB1337B1CC000D33D0 /* ppdc tools */,
 				273BF6B81333B4A90022CAAB /* tests */,
 				72220EAF1333047D00FCA411 /* Products */,
@@ -2356,6 +2411,25 @@
 			productReference = 7243795B1333FF1D009631B9 /* usb */;
 			productType = "com.apple.product-type.tool";
 		};
+		7258EAE1134594C4009286F1 /* rastertopwg */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7258EAE9134594C4009286F1 /* Build configuration list for PBXNativeTarget "rastertopwg" */;
+			buildPhases = (
+				7258EADE134594C4009286F1 /* Sources */,
+				7258EADF134594C4009286F1 /* Frameworks */,
+				7258EAE0134594C4009286F1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7258EAF113459B67009286F1 /* PBXTargetDependency */,
+				7258EAF313459B67009286F1 /* PBXTargetDependency */,
+			);
+			name = rastertopwg;
+			productName = rastertopwg;
+			productReference = 7258EAE2134594C4009286F1 /* rastertopwg */;
+			productType = "com.apple.product-type.tool";
+		};
 		72F75A511336F950004BB496 /* cupstestppd */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 72F75A581336F951004BB496 /* Build configuration list for PBXNativeTarget "cupstestppd" */;
@@ -2439,6 +2513,7 @@
 				276683891337AC97000D33D0 /* ppdi */,
 				276683961337ACA2000D33D0 /* ppdmerge */,
 				276683A31337ACAB000D33D0 /* ppdpo */,
+				7258EAE1134594C4009286F1 /* rastertopwg */,
 				7243792F1333FB85009631B9 /* socket */,
 				273BF6BC1333B5000022CAAB /* testcups */,
 				7243795A1333FF1D009631B9 /* usb */,
@@ -2792,6 +2867,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7258EADE134594C4009286F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7258EAED134594EB009286F1 /* rastertopwg.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72F75A4E1336F950004BB496 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3092,6 +3175,21 @@
 			isa = PBXTargetDependency;
 			target = 7243795A1333FF1D009631B9 /* usb */;
 			targetProxy = 724379C21333FF7D009631B9 /* PBXContainerItemProxy */;
+		};
+		7258EAEF13459ADA009286F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7258EAE1134594C4009286F1 /* rastertopwg */;
+			targetProxy = 7258EAEE13459ADA009286F1 /* PBXContainerItemProxy */;
+		};
+		7258EAF113459B67009286F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72220EAD1333047D00FCA411 /* libcups */;
+			targetProxy = 7258EAF013459B67009286F1 /* PBXContainerItemProxy */;
+		};
+		7258EAF313459B67009286F1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72F75A601336F9A3004BB496 /* libcupsimage */;
+			targetProxy = 7258EAF213459B67009286F1 /* PBXContainerItemProxy */;
 		};
 		72F75A661336FA30004BB496 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4185,6 +4283,45 @@
 			};
 			name = Release;
 		};
+		7258EAEA134594C4009286F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7258EAEB134594C4009286F1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		72BF963C1333042100B1EAD7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4540,6 +4677,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		7258EAE9134594C4009286F1 /* Build configuration list for PBXNativeTarget "rastertopwg" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7258EAEA134594C4009286F1 /* Debug */,
+				7258EAEB134594C4009286F1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		72BF963A1333042100B1EAD7 /* Build configuration list for PBXProject "CUPS" */ = {
 			isa = XCConfigurationList;
