@@ -5,9 +5,9 @@
 #   VERSIONS OF CUPS.  Instead, create a "local.convs" file that
 #   reflects your local configuration changes.
 #
-#   MIME converts file for the Common UNIX Printing System (CUPS).
+#   Base MIME conversions file for CUPS.
 #
-#   Copyright 2007-2010 by Apple Inc.
+#   Copyright 2007-2011 by Apple Inc.
 #   Copyright 1997-2007 by Easy Software Products.
 #
 #   These coded instructions, statements, and computer programs are the
@@ -87,6 +87,9 @@ image/x-sun-raster		application/vnd.cups-raster	100	imagetoraster
 
 # pstoraster is part of GPL Ghostscript...
 application/vnd.cups-postscript	application/vnd.cups-raster	100	pstoraster
+
+# PWG Raster filter for IPP Everywhere...
+application/vnd.cups-raster	image/pwg-raster		100	rastertopwg
 
 ########################################################################
 #
