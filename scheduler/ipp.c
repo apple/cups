@@ -3818,7 +3818,6 @@ apple_register_profiles(
 	kCFPreferencesCurrentHost
       };
       CFDictionaryRef	deviceDict;	/* Device dictionary */
-      CFStringRef	printerUUID;	/* Printer UUID */
       CFUUIDRef		deviceUUID;	/* Device UUID */
 
       deviceDict = CFDictionaryCreate(kCFAllocatorDefault,
@@ -3828,21 +3827,12 @@ apple_register_profiles(
 				          sizeof(deviceDictKeys[0]),
 				      &kCFTypeDictionaryKeyCallBacks,
 				      &kCFTypeDictionaryValueCallBacks);
-      printerUUID = CFStringCreateWithCString(kCFAllocatorDefault,
-                                              p->uuid + 9, /* Skip urn:uuid: */
-					      kCFStringEncodingUTF8);
-      if (printerUUID)
-      {
-        deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
-	CFRelease(printerUUID);
+      deviceUUID = ColorSyncCreateUUIDFromUInt32(device_id);
 
-	if (!deviceDict || !deviceUUID ||
-	    !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
-				     deviceDict))
-	  error = 1001;
-      }
-      else
-        error = 1001;
+      if (!deviceDict || !deviceUUID ||
+	  !ColorSyncRegisterDevice(kColorSyncPrinterDeviceClass, deviceUUID,
+				   deviceDict))
+	error = 1001;
 
       if (deviceUUID)
         CFRelease(deviceUUID);
@@ -3927,7 +3917,6 @@ apple_unregister_profiles(
     * printer.
     */
 
-    CFStringRef printerUUID;		/* Printer UUID */
     CFUUIDRef deviceUUID;		/* Device UUID */
 
     deviceUUID = ColorSyncCreateUUIDFromUInt32(_ppdHashName(p->name));
@@ -3935,20 +3924,6 @@ apple_unregister_profiles(
     {
       ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
       CFRelease(deviceUUID);
-    }
-
-    printerUUID = CFStringCreateWithCString(kCFAllocatorDefault, p->uuid + 9,
-                                            kCFStringEncodingUTF8);
-    if (printerUUID)
-    {
-      deviceUUID = CFUUIDCreateFromString(kCFAllocatorDefault, printerUUID);
-      if (deviceUUID)
-      {
-	ColorSyncUnregisterDevice(kColorSyncPrinterDeviceClass, deviceUUID);
-	CFRelease(deviceUUID);
-      }
-
-      CFRelease(printerUUID);
     }
   }
 
