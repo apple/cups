@@ -235,6 +235,8 @@ backendSNMPSupplies(
     {
       if (supplies[i].max_capacity > 0)
 	percent = 100 * supplies[i].level / supplies[i].max_capacity;
+      else
+        percent = 50;
 
       if (percent <= 10)
       {
