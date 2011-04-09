@@ -1043,7 +1043,6 @@ cups_raster_read(cups_raster_t *r,	/* I - Raster stream */
 
       unsigned char	*bufptr;	/* Temporary buffer pointer */
 
-
       remaining -= count;
 
       for (bufptr = r->bufptr; count > 0; count --, total ++)
@@ -1241,7 +1240,7 @@ cups_raster_write(
   *wptr++ = r->count - 1;
 
  /*
-  * Write using a modified TIFF "packbits" compression...
+  * Write using a modified PackBits compression...
   */
 
   for (ptr = pixels; ptr < pend;)
