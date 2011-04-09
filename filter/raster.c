@@ -1279,7 +1279,7 @@ cups_raster_write(
       * Encode a sequence of non-repeating pixels...
       */
 
-      for (count = 1; count < 127 && ptr < plast; count ++, ptr += bpp)
+      for (count = 1; count < 128 && ptr < plast; count ++, ptr += bpp)
         if (!memcmp(ptr, ptr + bpp, bpp))
 	  break;
 
