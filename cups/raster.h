@@ -66,6 +66,19 @@ extern "C" {
 
 #  define CUPS_RASTER_HAVE_COLORIMETRIC 1
 
+/*
+ * The following definition can be used to determine if the
+ * device colorspaces (DEVICEn) are defined...
+ */
+
+#  define CUPS_RASTER_HAVE_DEVICE 1
+
+/*
+ * The following definition can be used to determine if PWG Raster is supported.
+ */
+
+#  define CUPS_RASTER_HAVE_PWGRASTER 1
+
 
 /*
  * Types...
